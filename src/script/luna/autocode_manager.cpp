@@ -379,7 +379,9 @@ void AutocodeManager::ClearExpired()
     if(!m_hasExpired)
         return; // Nothing to do
 
-#ifdef DEBUG_BUILD
+// #define DEBUG_CLEAN_EXPIRED
+
+#ifdef DEBUG_CLEAN_EXPIRED
     int cleanedAutos = 0, cleanedGlobs = 0;
 #endif
 
@@ -395,7 +397,7 @@ void AutocodeManager::ClearExpired()
             removeFromIndex(&*iter);
 //            delete(*iter);
             iter = m_Autocodes.erase(iter);
-#ifdef DEBUG_BUILD
+#ifdef DEBUG_CLEAN_EXPIRED
             cleanedAutos++;
 #endif
         }
@@ -414,7 +416,7 @@ void AutocodeManager::ClearExpired()
 //            delete(*iter);
             removeFromIndexGlob(&*iter);
             iter = m_GlobalCodes.erase(iter);
-#ifdef DEBUG_BUILD
+#ifdef DEBUG_CLEAN_EXPIRED
             cleanedGlobs++;
 #endif
         }
@@ -422,7 +424,7 @@ void AutocodeManager::ClearExpired()
             ++iter;
     }
 
-#ifdef DEBUG_BUILD
+#ifdef DEBUG_CLEAN_EXPIRED
     if(cleanedAutos > 0)
         D_pLogDebug("Autocode: Cleaned %d expired autocodes", cleanedAutos);
 

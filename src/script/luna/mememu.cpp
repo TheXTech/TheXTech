@@ -307,6 +307,48 @@ class SMBXMemoryEmulator
     std::unordered_map<int, bool *>   m_bf;
     std::unordered_map<int, std::string *>   m_sf;
 
+    enum ValueType
+    {
+        VT_UNKNOWN = 0,
+        VT_DOUBLE,
+        VT_FLOAT,
+        VT_INT,
+        VT_BOOL,
+        VT_STRING
+    };
+
+    std::unordered_map<int, ValueType> m_type;
+
+    void insert(int address, int *field)
+    {
+        m_if.insert({address, field});
+        m_type.insert({address, VT_INT});
+    }
+
+    void insert(int address, double *field)
+    {
+        m_df.insert({address, field});
+        m_type.insert({address, VT_DOUBLE});
+    }
+
+    void insert(int address, float *field)
+    {
+        m_ff.insert({address, field});
+        m_type.insert({address, VT_FLOAT});
+    }
+
+    void insert(int address, bool *field)
+    {
+        m_bf.insert({address, field});
+        m_type.insert({address, VT_BOOL});
+    }
+
+    void insert(int address, std::string *field)
+    {
+        m_sf.insert({address, field});
+        m_type.insert({address, VT_STRING});
+    }
+
 public:
     SMBXMemoryEmulator() noexcept
     {
@@ -315,43 +357,38 @@ public:
 
     void buildTable()
     {
-        m_bf.clear();
-        m_bf.insert({0xB25728, &NoMap});
-        m_bf.insert({0xB2572A, &RestartLevel});
-        m_bf.insert({0x00B2D6D2, &MenuMouseMove});
-        m_bf.insert({0x00B2D6D0, &MenuMouseRelease});
-        m_bf.insert({0x00B2D6CC, &MenuMouseDown});
-        m_bf.insert({0x00B250E2, &GamePaused}); // Pause menu visible
-        m_bf.insert({0x00B2C8C4, &Cheater});
+        insert(0x00B25728, &NoMap);
+        insert(0x00B2572A, &RestartLevel);
+        insert(0x00B2D6D2, &MenuMouseMove);
+        insert(0x00B2D6D0, &MenuMouseRelease);
+        insert(0x00B2D6CC, &MenuMouseDown);
+        insert(0x00B250E2, &GamePaused); // Pause menu visible
+        insert(0x00B2C8C4, &Cheater);
 
-        // m_bf.insert({0x00B2C884, ???}); // Key Released!!!
+        // insert(0x00B2C884, ???}; // Key Released!!!
 
-        m_df.clear();
-        m_df.insert({0x00B2D6BC, &MenuMouseX}); // Mouse cursor X
-        m_df.insert({0x00B2D6C4, &MenuMouseY}); // Mouse cursor Y
+        insert(0x00B2D6BC, &MenuMouseX); // Mouse cursor X
+        insert(0x00B2D6C4, &MenuMouseY); // Mouse cursor Y
 
-        m_if.clear();
-        m_if.insert({0x00B2595E, &numPlayers}); // Player Count
-        m_if.insert({0x00B2595A, &numNPCs}); // NPC count
+        insert(0x00B2595E, &numPlayers); // Player Count
+        insert(0x00B2595A, &numNPCs); // NPC count
 
-        m_if.insert({0x00B2C906, &maxStars}); // Max stars at episode
+        insert(0x00B2C906, &maxStars); // Max stars at episode
 
-        m_if.insert({0x00B251E0, &numStars}); // HUD star count
-        m_if.insert({0x00B2C5A8, &Coins}); // HUD coins count
-        m_if.insert({0x00B2C880, &MenuCursor}); // Current menu choice
-        m_if.insert({0x00B2C8E4, &Score}); // HUD points count
+        insert(0x00B251E0, &numStars); // HUD star count
+        insert(0x00B2C5A8, &Coins); // HUD coins count
+        insert(0x00B2C880, &MenuCursor); // Current menu choice
+        insert(0x00B2C8E4, &Score); // HUD points count
 
-        m_if.insert({0x00B2C62C, &PSwitchTime}); // P-Switch Timer
-        m_if.insert({0x00B2C62E, &PSwitchStop}); // Stopwatch Timer
-        m_if.insert({0x00B2C630, &PSwitchPlayer}); // P-Switch/Stopwatch Player
-        m_if.insert({0x00B2C87C, &Physics.NPCPSwitch}); // P-Switch/Stopwatch Length
+        insert(0x00B2C62C, &PSwitchTime); // P-Switch Timer
+        insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer
+        insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
+        insert(0x00B2C87C, &Physics.NPCPSwitch); // P-Switch/Stopwatch Length
 
-        m_ff.clear();
-        m_ff.insert({0x00B2C5AC, &Lives}); // HUD lives count
+        insert(0x00B2C5AC, &Lives); // HUD lives count
 
-        m_sf.clear();
-        m_sf.insert({0xB2C624, &WorldName});
-        m_sf.insert({0xB25724, &StartLevel});
+        insert(0x00B2C624, &WorldName);
+        insert(0x00B25724, &StartLevel);
     }
 
     double getAny(int address, FIELDTYPE ftype)
@@ -362,42 +399,69 @@ public:
             return 0.0;
         }
 
-        auto dres = m_df.find(address);
-        if(dres != m_df.end())
+        auto ft = m_type.find(address);
+        if(ft == m_type.end())
         {
-            if(ftype != FT_DFLOAT)
-                pLogWarning("MemEmu: Read type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
-
-            return doubleToMem(*dres->second, ftype);
+            pLogWarning("MemEmu: Unknown %s address to read: <Global> 0x%x", FieldtypeToStr(ftype), address);
+            return 0.0;
         }
 
-        auto fres = m_ff.find(address);
-        if(fres != m_ff.end())
+        switch(ft->second)
         {
-            if(ftype != FT_FLOAT)
-                pLogWarning("MemEmu: Read type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
+        case VT_DOUBLE:
+        {
+            auto dres = m_df.find(address);
+            if(dres != m_df.end())
+            {
+                if(ftype != FT_DFLOAT)
+                    pLogWarning("MemEmu: Read type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
 
-            return floatToMem(*fres->second, ftype);
+                return doubleToMem(*dres->second, ftype);
+            }
+            break;
         }
 
-        auto ires = m_if.find(address);
-        if(ires != m_if.end())
+        case VT_FLOAT:
         {
-            if(ftype != FT_DWORD && ftype != FT_WORD)
-                pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
+            auto fres = m_ff.find(address);
+            if(fres != m_ff.end())
+            {
+                if(ftype != FT_FLOAT)
+                    pLogWarning("MemEmu: Read type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
 
-            return intToMem(*ires->second, ftype);
+                return floatToMem(*fres->second, ftype);
+            }
+            break;
         }
 
-        auto bres = m_bf.find(address);
-        if(bres != m_bf.end())
+        case VT_INT:
         {
-            if(ftype != FT_WORD && ftype != FT_BYTE)
-                pLogWarning("MemEmu: Read type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
-            return *bres->second ? 0xffff : 0000;
+            auto ires = m_if.find(address);
+            if(ires != m_if.end())
+            {
+                if(ftype != FT_DWORD && ftype != FT_WORD)
+                    pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
+
+                return intToMem(*ires->second, ftype);
+            }
+            break;
         }
 
-        pLogWarning("MemEmu: Unknown %s address to read: <Global> 0x%x", FieldtypeToStr(ftype), address);
+        case VT_BOOL:
+        {
+            auto bres = m_bf.find(address);
+            if(bres != m_bf.end())
+            {
+                if(ftype != FT_WORD && ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Read type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
+                return *bres->second ? 0xffff : 0000;
+            }
+        }
+
+        default:
+            break;
+        }
+
         return 0.0;
     }
 
@@ -409,46 +473,73 @@ public:
             return;
         }
 
-        auto dres = m_df.find(address);
-        if(dres != m_df.end())
+        auto ft = m_type.find(address);
+        if(ft == m_type.end())
         {
-            if(ftype != FT_DFLOAT)
-                pLogWarning("MemEmu: Write type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
-
-            memToDouble(*dres->second, value, ftype);
+            pLogWarning("MemEmu: Unknown %s address to write: 0x%x", FieldtypeToStr(ftype), address);
             return;
         }
 
-        auto fres = m_ff.find(address);
-        if(fres != m_ff.end())
+        switch(ft->second)
         {
-            if(ftype != FT_FLOAT)
-                pLogWarning("MemEmu: Write type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
+        case VT_DOUBLE:
+        {
+            auto dres = m_df.find(address);
+            if(dres != m_df.end())
+            {
+                if(ftype != FT_DFLOAT)
+                    pLogWarning("MemEmu: Write type missmatched at 0x%x (Double expected, %s actually)", address, FieldtypeToStr(ftype));
 
-            memToFloat(*fres->second, value, ftype);
-            return;
+                memToDouble(*dres->second, value, ftype);
+                return;
+            }
+            break;
         }
 
-        auto ires = m_if.find(address);
-        if(ires != m_if.end())
+        case VT_FLOAT:
         {
-            if(ftype != FT_DWORD && ftype != FT_WORD)
-                pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
+            auto fres = m_ff.find(address);
+            if(fres != m_ff.end())
+            {
+                if(ftype != FT_FLOAT)
+                    pLogWarning("MemEmu: Write type missmatched at 0x%x (Float expected, %s actually)", address, FieldtypeToStr(ftype));
 
-            memToInt(*ires->second, value, ftype);
-            return;
+                memToFloat(*fres->second, value, ftype);
+                return;
+            }
+            break;
         }
 
-        auto bres = m_bf.find(address);
-        if(bres != m_bf.end())
+        case VT_INT:
         {
-            if(ftype != FT_WORD && ftype != FT_BYTE)
-                pLogWarning("MemEmu: Write type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
-            *bres->second = (value != 0.0);
-            return;
+            auto ires = m_if.find(address);
+            if(ires != m_if.end())
+            {
+                if(ftype != FT_DWORD && ftype != FT_WORD)
+                    pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
+
+                memToInt(*ires->second, value, ftype);
+                return;
+            }
+            break;
         }
 
-        pLogWarning("MemEmu: Unknown %s address to write: 0x%x", FieldtypeToStr(ftype), address);
+        case VT_BOOL:
+        {
+            auto bres = m_bf.find(address);
+            if(bres != m_bf.end())
+            {
+                if(ftype != FT_WORD && ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Write type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
+                *bres->second = (value != 0.0);
+                return;
+            }
+            break;
+        }
+
+        default:
+            break;
+        }
     }
 };
 
@@ -465,6 +556,48 @@ protected:
     std::unordered_map<int, bool T::*>   m_bf;
     std::unordered_map<int, std::string T::*>   m_sf;
 
+    enum ValueType
+    {
+        VT_UNKNOWN = 0,
+        VT_DOUBLE,
+        VT_FLOAT,
+        VT_INT,
+        VT_BOOL,
+        VT_STRING
+    };
+
+    std::unordered_map<int, ValueType> m_type;
+
+    void insert(int address, int T::*field)
+    {
+        m_if.insert({address, field});
+        m_type.insert({address, VT_INT});
+    }
+
+    void insert(int address, double T::*field)
+    {
+        m_df.insert({address, field});
+        m_type.insert({address, VT_DOUBLE});
+    }
+
+    void insert(int address, float T::*field)
+    {
+        m_ff.insert({address, field});
+        m_type.insert({address, VT_FLOAT});
+    }
+
+    void insert(int address, bool T::*field)
+    {
+        m_bf.insert({address, field});
+        m_type.insert({address, VT_INT});
+    }
+
+    void insert(int address, std::string T::*field)
+    {
+        m_sf.insert({address, field});
+        m_type.insert({address, VT_STRING});
+    }
+
 public:
     SMBXObjectMemoryEmulator() noexcept
     {};
@@ -477,42 +610,70 @@ public:
             return 0.0;
         }
 
-        auto dres = m_df.find(address);
-        if(dres != m_df.end())
+        auto ft = m_type.find(address);
+        if(ft == m_type.end())
         {
-            if(ftype != FT_DFLOAT)
-                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-
-            return doubleToMem(obj->*(dres->second), ftype);
+            pLogWarning("MemEmu: Unknown %s::%s address to read: 0x%x", objName, FieldtypeToStr(ftype), address);
+            return 0.0;
         }
 
-        auto fres = m_ff.find(address);
-        if(fres != m_ff.end())
+        switch(ft->second)
         {
-            if(ftype != FT_FLOAT)
-                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+        case VT_DOUBLE:
+        {
+            auto dres = m_df.find(address);
+            if(dres != m_df.end())
+            {
+                if(ftype != FT_DFLOAT)
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-            return floatToMem(obj->*(fres->second), ftype);
+                return doubleToMem(obj->*(dres->second), ftype);
+            }
+            break;
         }
 
-        auto ires = m_if.find(address);
-        if(ires != m_if.end())
+        case VT_FLOAT:
         {
-            if(ftype != FT_DWORD && ftype != FT_WORD)
-                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            auto fres = m_ff.find(address);
+            if(fres != m_ff.end())
+            {
+                if(ftype != FT_FLOAT)
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-            return intToMem(obj->*(ires->second), ftype);
+                return floatToMem(obj->*(fres->second), ftype);
+            }
+            break;
         }
 
-        auto bres = m_bf.find(address);
-        if(bres != m_bf.end())
+        case VT_INT:
         {
-            if(ftype != FT_WORD && ftype != FT_BYTE)
-                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-            return obj->*(bres->second) ? 0xffff : 0000;
+            auto ires = m_if.find(address);
+            if(ires != m_if.end())
+            {
+                if(ftype != FT_DWORD && ftype != FT_WORD)
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+
+                return intToMem(obj->*(ires->second), ftype);
+            }
+            break;
         }
 
-        pLogWarning("MemEmu: Unknown %s::%s address to read: 0x%x", objName, FieldtypeToStr(ftype), address);
+        case VT_BOOL:
+        {
+            auto bres = m_bf.find(address);
+            if(bres != m_bf.end())
+            {
+                if(ftype != FT_WORD && ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                return obj->*(bres->second) ? 0xffff : 0000;
+            }
+            break;
+        }
+
+        default:
+            break;
+        }
+
         return 0.0;
     }
 
@@ -524,46 +685,73 @@ public:
             return;
         }
 
-        auto dres = m_df.find(address);
-        if(dres != m_df.end())
+        auto ft = m_type.find(address);
+        if(ft == m_type.end())
         {
-            if(ftype != FT_DFLOAT)
-                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-
-            memToDouble(obj->*(dres->second), value, ftype);
+            pLogWarning("MemEmu: Unknown %s::%s address to write: 0x%x", objName, FieldtypeToStr(ftype), address);
             return;
         }
 
-        auto fres = m_ff.find(address);
-        if(fres != m_ff.end())
+        switch(ft->second)
         {
-            if(ftype != FT_FLOAT)
-                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+        case VT_DOUBLE:
+        {
+            auto dres = m_df.find(address);
+            if(dres != m_df.end())
+            {
+                if(ftype != FT_DFLOAT)
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-            memToFloat(obj->*(fres->second), value, ftype);
-            return;
+                memToDouble(obj->*(dres->second), value, ftype);
+                return;
+            }
+            break;
         }
 
-        auto ires = m_if.find(address);
-        if(ires != m_if.end())
+        case VT_FLOAT:
         {
-            if(ftype != FT_DWORD && ftype != FT_WORD && (ftype != FT_BYTE || value > 255.0))
-                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            auto fres = m_ff.find(address);
+            if(fres != m_ff.end())
+            {
+                if(ftype != FT_FLOAT)
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
 
-            memToInt(obj->*(ires->second), value, ftype);
-            return;
+                memToFloat(obj->*(fres->second), value, ftype);
+                return;
+            }
+            break;
         }
 
-        auto bres = m_bf.find(address);
-        if(bres != m_bf.end())
+        case VT_INT:
         {
-            if(ftype != FT_WORD && ftype != FT_BYTE)
-                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-            obj->*(bres->second) = (value != 0.0);
-            return;
+            auto ires = m_if.find(address);
+            if(ires != m_if.end())
+            {
+                if(ftype != FT_DWORD && ftype != FT_WORD && (ftype != FT_BYTE || value > 255.0))
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+
+                memToInt(obj->*(ires->second), value, ftype);
+                return;
+            }
+            break;
         }
 
-        pLogWarning("MemEmu: Unknown %s::%s address to write: 0x%x", objName, FieldtypeToStr(ftype), address);
+        case VT_BOOL:
+        {
+            auto bres = m_bf.find(address);
+            if(bres != m_bf.end())
+            {
+                if(ftype != FT_WORD && ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                obj->*(bres->second) = (value != 0.0);
+                return;
+            }
+            break;
+        }
+
+        default:
+            break;
+        }
     }
 };
 
@@ -579,13 +767,12 @@ public:
 
     void buildTable()
     {
-        m_df.clear();
-        m_df.insert({0x00, &Location_t::X});
-        m_df.insert({0x08, &Location_t::Y});
-        m_df.insert({0x10, &Location_t::Height});
-        m_df.insert({0x18, &Location_t::Width});
-        m_df.insert({0x20, &Location_t::SpeedX});
-        m_df.insert({0x28, &Location_t::SpeedY});
+        insert(0x00, &Location_t::X);
+        insert(0x08, &Location_t::Y);
+        insert(0x10, &Location_t::Height);
+        insert(0x18, &Location_t::Width);
+        insert(0x20, &Location_t::SpeedX);
+        insert(0x28, &Location_t::SpeedY);
     }
 };
 
@@ -601,17 +788,16 @@ public:
 
     void buildTable()
     {
-        m_bf.clear();
-        m_bf.insert({0x00, &Controls_t::Up});
-        m_bf.insert({0x02, &Controls_t::Down});
-        m_bf.insert({0x04, &Controls_t::Left});
-        m_bf.insert({0x06, &Controls_t::Right});
-        m_bf.insert({0x08, &Controls_t::Jump});
-        m_bf.insert({0x0A, &Controls_t::AltJump});
-        m_bf.insert({0x0C, &Controls_t::Run});
-        m_bf.insert({0x0E, &Controls_t::AltRun});
-        m_bf.insert({0x10, &Controls_t::Drop});
-        m_bf.insert({0x12, &Controls_t::Start});
+        insert(0x00, &Controls_t::Up);
+        insert(0x02, &Controls_t::Down);
+        insert(0x04, &Controls_t::Left);
+        insert(0x06, &Controls_t::Right);
+        insert(0x08, &Controls_t::Jump);
+        insert(0x0A, &Controls_t::AltJump);
+        insert(0x0C, &Controls_t::Run);
+        insert(0x0E, &Controls_t::AltRun);
+        insert(0x10, &Controls_t::Drop);
+        insert(0x12, &Controls_t::Start);
     }
 };
 
@@ -631,135 +817,129 @@ public:
 
     void buildTable()
     {
-        m_bf.clear();
-        m_df.clear();
-        m_if.clear();
-        m_ff.clear();
-        m_sf.clear();
+        insert(0x00000000, &Player_t::DoubleJump);
+        insert(0x00000002, &Player_t::FlySparks);
+        insert(0x00000004, &Player_t::Driving);
+        insert(0x00000006, &Player_t::Quicksand);
+        insert(0x00000008, &Player_t::Bombs);
+        insert(0x0000000a, &Player_t::Slippy);
 
-        m_bf.insert({0x00000000, &Player_t::DoubleJump});
-        m_bf.insert({0x00000002, &Player_t::FlySparks});
-        m_bf.insert({0x00000004, &Player_t::Driving});
-        m_if.insert({0x00000006, &Player_t::Quicksand});
-        m_if.insert({0x00000008, &Player_t::Bombs});
-        m_bf.insert({0x0000000a, &Player_t::Slippy});
+        insert(0x0000000c, &Player_t::Fairy);
+        insert(0x0000000e, &Player_t::FairyCD);
+        insert(0x00000010, &Player_t::FairyTime);
+        insert(0x00000012, &Player_t::HasKey);
+        insert(0x00000014, &Player_t::SwordPoke);
+        insert(0x00000016, &Player_t::Hearts);
 
-        m_bf.insert({0x0000000c, &Player_t::Fairy});
-        m_if.insert({0x0000000e, &Player_t::FairyCD});
-        m_if.insert({0x00000010, &Player_t::FairyTime});
-        m_bf.insert({0x00000012, &Player_t::HasKey});
-        m_if.insert({0x00000014, &Player_t::SwordPoke});
-        m_if.insert({0x00000016, &Player_t::Hearts});
+        insert(0x00000018, &Player_t::CanFloat);
+        insert(0x0000001a, &Player_t::FloatRelease);
+        insert(0x0000001c, &Player_t::FloatTime);
+        insert(0x00000020, &Player_t::FloatSpeed);
+        insert(0x00000024, &Player_t::FloatDir);
+        insert(0x00000026, &Player_t::GrabTime);
+        insert(0x00000028, &Player_t::GrabSpeed);
+        insert(0x0000002c, &Player_t::VineNPC);
 
-        m_bf.insert({0x00000018, &Player_t::CanFloat});
-        m_bf.insert({0x0000001a, &Player_t::FloatRelease});
-        m_if.insert({0x0000001c, &Player_t::FloatTime});
-        m_ff.insert({0x00000020, &Player_t::FloatSpeed});
-        m_if.insert({0x00000024, &Player_t::FloatDir});
-        m_if.insert({0x00000026, &Player_t::GrabTime});
-        m_ff.insert({0x00000028, &Player_t::GrabSpeed});
-        m_df.insert({0x0000002c, &Player_t::VineNPC});
-
-        m_if.insert({0x00000034, &Player_t::Wet});
-        m_bf.insert({0x00000036, &Player_t::WetFrame});
-        m_if.insert({0x00000038, &Player_t::SwimCount});
-        m_if.insert({0x0000003a, &Player_t::NoGravity});
-        m_bf.insert({0x0000003c, &Player_t::Slide});
-        m_bf.insert({0x0000003e, &Player_t::SlideKill});
-        m_if.insert({0x00000040, &Player_t::Vine});
-        m_if.insert({0x00000042, &Player_t::NoShellKick});
-        m_bf.insert({0x00000044, &Player_t::ShellSurf});
-        m_if.insert({0x00000046, &Player_t::StateNPC});
-        m_if.insert({0x00000048, &Player_t::Slope});
-        m_bf.insert({0x0000004a, &Player_t::Stoned});
-        m_if.insert({0x0000004c, &Player_t::StonedCD});
-        m_if.insert({0x0000004e, &Player_t::StonedTime});
-        m_bf.insert({0x00000050, &Player_t::SpinJump});
-        m_if.insert({0x00000052, &Player_t::SpinFrame});
-        m_if.insert({0x00000054, &Player_t::SpinFireDir});
-        m_if.insert({0x00000056, &Player_t::Multiplier});
-        m_if.insert({0x00000058, &Player_t::SlideCounter});
-        m_if.insert({0x0000005a, &Player_t::ShowWarp});
-        m_bf.insert({0x0000005c, &Player_t::GroundPound});
-        m_bf.insert({0x0000005e, &Player_t::GroundPound2});
-        m_bf.insert({0x00000060, &Player_t::CanPound});
-        m_if.insert({0x00000062, &Player_t::ForceHold});
-        m_bf.insert({0x00000064, &Player_t::YoshiYellow});
-        m_bf.insert({0x00000066, &Player_t::YoshiBlue});
-        m_bf.insert({0x00000068, &Player_t::YoshiRed});
-        m_if.insert({0x0000006a, &Player_t::YoshiWingsFrame});
-        m_if.insert({0x0000006c, &Player_t::YoshiWingsFrameCount});
-        m_if.insert({0x0000006e, &Player_t::YoshiTX});
-        m_if.insert({0x00000070, &Player_t::YoshiTY});
-        m_if.insert({0x00000072, &Player_t::YoshiTFrame});
-        m_if.insert({0x00000074, &Player_t::YoshiTFrameCount});
-        m_if.insert({0x00000076, &Player_t::YoshiBX});
-        m_if.insert({0x00000078, &Player_t::YoshiBY});
-        m_if.insert({0x0000007a, &Player_t::YoshiBFrame});
-        m_if.insert({0x0000007c, &Player_t::YoshiBFrameCount});
+        insert(0x00000034, &Player_t::Wet);
+        insert(0x00000036, &Player_t::WetFrame);
+        insert(0x00000038, &Player_t::SwimCount);
+        insert(0x0000003a, &Player_t::NoGravity);
+        insert(0x0000003c, &Player_t::Slide);
+        insert(0x0000003e, &Player_t::SlideKill);
+        insert(0x00000040, &Player_t::Vine);
+        insert(0x00000042, &Player_t::NoShellKick);
+        insert(0x00000044, &Player_t::ShellSurf);
+        insert(0x00000046, &Player_t::StateNPC);
+        insert(0x00000048, &Player_t::Slope);
+        insert(0x0000004a, &Player_t::Stoned);
+        insert(0x0000004c, &Player_t::StonedCD);
+        insert(0x0000004e, &Player_t::StonedTime);
+        insert(0x00000050, &Player_t::SpinJump);
+        insert(0x00000052, &Player_t::SpinFrame);
+        insert(0x00000054, &Player_t::SpinFireDir);
+        insert(0x00000056, &Player_t::Multiplier);
+        insert(0x00000058, &Player_t::SlideCounter);
+        insert(0x0000005a, &Player_t::ShowWarp);
+        insert(0x0000005c, &Player_t::GroundPound);
+        insert(0x0000005e, &Player_t::GroundPound2);
+        insert(0x00000060, &Player_t::CanPound);
+        insert(0x00000062, &Player_t::ForceHold);
+        insert(0x00000064, &Player_t::YoshiYellow);
+        insert(0x00000066, &Player_t::YoshiBlue);
+        insert(0x00000068, &Player_t::YoshiRed);
+        insert(0x0000006a, &Player_t::YoshiWingsFrame);
+        insert(0x0000006c, &Player_t::YoshiWingsFrameCount);
+        insert(0x0000006e, &Player_t::YoshiTX);
+        insert(0x00000070, &Player_t::YoshiTY);
+        insert(0x00000072, &Player_t::YoshiTFrame);
+        insert(0x00000074, &Player_t::YoshiTFrameCount);
+        insert(0x00000076, &Player_t::YoshiBX);
+        insert(0x00000078, &Player_t::YoshiBY);
+        insert(0x0000007a, &Player_t::YoshiBFrame);
+        insert(0x0000007c, &Player_t::YoshiBFrameCount);
         //Location_t YoshiTongue; (Between 0x80 and 0xB0)
-        m_ff.insert({0x000000b0, &Player_t::YoshiTongueX});
-        m_if.insert({0x000000b4, &Player_t::YoshiTongueLength});
-        m_bf.insert({0x000000b6, &Player_t::YoshiTonugeBool});
-        m_if.insert({0x000000b8, &Player_t::YoshiNPC});
-        m_if.insert({0x000000ba, &Player_t::YoshiPlayer});
-        m_if.insert({0x000000bc, &Player_t::Dismount});
-        m_if.insert({0x000000be, &Player_t::NoPlayerCol});
+        insert(0x000000b0, &Player_t::YoshiTongueX);
+        insert(0x000000b4, &Player_t::YoshiTongueLength);
+        insert(0x000000b6, &Player_t::YoshiTonugeBool);
+        insert(0x000000b8, &Player_t::YoshiNPC);
+        insert(0x000000ba, &Player_t::YoshiPlayer);
+        insert(0x000000bc, &Player_t::Dismount);
+        insert(0x000000be, &Player_t::NoPlayerCol);
         //Location_t Location; (Between 0xC0 and 0xF0)
-        m_if.insert({0x000000f0, &Player_t::Character});
+        insert(0x000000f0, &Player_t::Character);
         //Controls_t Controls; (Between 0xF2 and 0x105)
-        m_if.insert({0x00000106, &Player_t::Direction});
-        m_if.insert({0x00000108, &Player_t::Mount});
-        m_if.insert({0x0000010a, &Player_t::MountType});
-        m_if.insert({0x0000010c, &Player_t::MountSpecial});
-        m_if.insert({0x0000010e, &Player_t::MountOffsetY});
-        m_if.insert({0x00000110, &Player_t::MountFrame});
-        m_if.insert({0x00000112, &Player_t::State});
-        m_if.insert({0x00000114, &Player_t::Frame});
-        m_if.insert({0x00000118, &Player_t::FrameCount});
-        m_if.insert({0x0000011c, &Player_t::Jump});
-        m_bf.insert({0x0000011e, &Player_t::CanJump});
-        m_bf.insert({0x00000120, &Player_t::CanAltJump});
-        m_if.insert({0x00000122, &Player_t::Effect});
-        m_df.insert({0x00000124, &Player_t::Effect2});
-        m_bf.insert({0x0000012c, &Player_t::DuckRelease});
-        m_bf.insert({0x0000012e, &Player_t::Duck});
-        m_bf.insert({0x00000130, &Player_t::DropRelease});
-        m_bf.insert({0x00000132, &Player_t::StandUp});
-        m_bf.insert({0x00000134, &Player_t::StandUp2});
-        m_bf.insert({0x00000136, &Player_t::Bumped});
-        m_ff.insert({0x00000138, &Player_t::Bumped2});
-        m_bf.insert({0x0000013c, &Player_t::Dead});
-        m_if.insert({0x0000013e, &Player_t::TimeToLive});
-        m_if.insert({0x00000140, &Player_t::Immune});
-        m_bf.insert({0x00000142, &Player_t::Immune2});
-        m_bf.insert({0x00000144, &Player_t::ForceHitSpot3});
-        m_if.insert({0x00000146, &Player_t::Pinched1});
-        m_if.insert({0x00000148, &Player_t::Pinched2});
-        m_if.insert({0x0000014a, &Player_t::Pinched3});
-        m_if.insert({0x0000014c, &Player_t::Pinched4});
-        m_if.insert({0x0000014e, &Player_t::NPCPinched});
-        m_ff.insert({0x00000150, &Player_t::m2Speed});
-        m_if.insert({0x00000154, &Player_t::HoldingNPC});
-        m_bf.insert({0x00000156, &Player_t::CanGrabNPCs});
-        m_if.insert({0x00000158, &Player_t::HeldBonus});
-        m_if.insert({0x0000015a, &Player_t::Section});
-        m_if.insert({0x0000015c, &Player_t::WarpCD});
-        m_if.insert({0x0000015e, &Player_t::Warp});
-        m_if.insert({0x00000160, &Player_t::FireBallCD});
-        m_if.insert({0x00000162, &Player_t::FireBallCD2});
-        m_if.insert({0x00000164, &Player_t::TailCount});
-        m_ff.insert({0x00000168, &Player_t::RunCount});
-        m_bf.insert({0x0000016c, &Player_t::CanFly});
-        m_bf.insert({0x0000016e, &Player_t::CanFly2});
-        m_if.insert({0x00000170, &Player_t::FlyCount});
-        m_bf.insert({0x00000172, &Player_t::RunRelease});
-        m_bf.insert({0x00000174, &Player_t::JumpRelease});
-        m_if.insert({0x00000176, &Player_t::StandingOnNPC});
-        m_if.insert({0x00000178, &Player_t::StandingOnTempNPC});
-        m_bf.insert({0x0000017a, &Player_t::UnStart});
-        m_ff.insert({0x0000017c, &Player_t::mountBump});
-        m_ff.insert({0x00000180, &Player_t::SpeedFixY});
+        insert(0x00000106, &Player_t::Direction);
+        insert(0x00000108, &Player_t::Mount);
+        insert(0x0000010a, &Player_t::MountType);
+        insert(0x0000010c, &Player_t::MountSpecial);
+        insert(0x0000010e, &Player_t::MountOffsetY);
+        insert(0x00000110, &Player_t::MountFrame);
+        insert(0x00000112, &Player_t::State);
+        insert(0x00000114, &Player_t::Frame);
+        insert(0x00000118, &Player_t::FrameCount);
+        insert(0x0000011c, &Player_t::Jump);
+        insert(0x0000011e, &Player_t::CanJump);
+        insert(0x00000120, &Player_t::CanAltJump);
+        insert(0x00000122, &Player_t::Effect);
+        insert(0x00000124, &Player_t::Effect2);
+        insert(0x0000012c, &Player_t::DuckRelease);
+        insert(0x0000012e, &Player_t::Duck);
+        insert(0x00000130, &Player_t::DropRelease);
+        insert(0x00000132, &Player_t::StandUp);
+        insert(0x00000134, &Player_t::StandUp2);
+        insert(0x00000136, &Player_t::Bumped);
+        insert(0x00000138, &Player_t::Bumped2);
+        insert(0x0000013c, &Player_t::Dead);
+        insert(0x0000013e, &Player_t::TimeToLive);
+        insert(0x00000140, &Player_t::Immune);
+        insert(0x00000142, &Player_t::Immune2);
+        insert(0x00000144, &Player_t::ForceHitSpot3);
+        insert(0x00000146, &Player_t::Pinched1);
+        insert(0x00000148, &Player_t::Pinched2);
+        insert(0x0000014a, &Player_t::Pinched3);
+        insert(0x0000014c, &Player_t::Pinched4);
+        insert(0x0000014e, &Player_t::NPCPinched);
+        insert(0x00000150, &Player_t::m2Speed);
+        insert(0x00000154, &Player_t::HoldingNPC);
+        insert(0x00000156, &Player_t::CanGrabNPCs);
+        insert(0x00000158, &Player_t::HeldBonus);
+        insert(0x0000015a, &Player_t::Section);
+        insert(0x0000015c, &Player_t::WarpCD);
+        insert(0x0000015e, &Player_t::Warp);
+        insert(0x00000160, &Player_t::FireBallCD);
+        insert(0x00000162, &Player_t::FireBallCD2);
+        insert(0x00000164, &Player_t::TailCount);
+        insert(0x00000168, &Player_t::RunCount);
+        insert(0x0000016c, &Player_t::CanFly);
+        insert(0x0000016e, &Player_t::CanFly2);
+        insert(0x00000170, &Player_t::FlyCount);
+        insert(0x00000172, &Player_t::RunRelease);
+        insert(0x00000174, &Player_t::JumpRelease);
+        insert(0x00000176, &Player_t::StandingOnNPC);
+        insert(0x00000178, &Player_t::StandingOnTempNPC);
+        insert(0x0000017a, &Player_t::UnStart);
+        insert(0x0000017c, &Player_t::mountBump);
+        insert(0x00000180, &Player_t::SpeedFixY);
     }
 
     double getAny(Player_t *obj, int address, FIELDTYPE ftype) override
@@ -807,94 +987,88 @@ public:
 
     void buildTable()
     {
-        m_bf.clear();
-        m_df.clear();
-        m_if.clear();
-        m_ff.clear();
-        m_sf.clear();
-
-        m_sf.insert({0x00000000, &NPC_t::AttLayer});
-        m_if.insert({0x00000004, &NPC_t::Quicksand});
-        m_if.insert({0x00000006, &NPC_t::RespawnDelay});
-        m_bf.insert({0x00000008, &NPC_t::Bouce});
-        m_if.insert({0x0000000a, &NPC_t::Pinched1});
-        m_if.insert({0x0000000c, &NPC_t::Pinched2});
-        m_if.insert({0x0000000e, &NPC_t::Pinched3});
-        m_if.insert({0x00000010, &NPC_t::Pinched4});
-        m_if.insert({0x00000012, &NPC_t::MovingPinched});
-        m_if.insert({0x00000014, &NPC_t::NetTimeout});
-        m_ff.insert({0x00000018, &NPC_t::RealSpeedX});
-        m_if.insert({0x0000001c, &NPC_t::Wet});
-        m_if.insert({0x0000001e, &NPC_t::Settings});
-        m_bf.insert({0x00000020, &NPC_t::NoLavaSplash});
-        m_if.insert({0x00000022, &NPC_t::Slope});
-        m_if.insert({0x00000024, &NPC_t::Multiplier});
-        m_if.insert({0x00000026, &NPC_t::TailCD});
-        m_bf.insert({0x00000028, &NPC_t::Shadow});
-        m_sf.insert({0x0000002c, &NPC_t::TriggerActivate});
-        m_sf.insert({0x00000030, &NPC_t::TriggerDeath});
-        m_sf.insert({0x00000034, &NPC_t::TriggerTalk});
-        m_sf.insert({0x00000038, &NPC_t::TriggerLast});
-        m_sf.insert({0x0000003c, &NPC_t::Layer});
-        m_bf.insert({0x00000040, &NPC_t::Hidden});
-        m_bf.insert({0x00000042, &NPC_t::Legacy});
-        m_bf.insert({0x00000044, &NPC_t::Chat});
-        m_bf.insert({0x00000046, &NPC_t::Inert});
-        m_bf.insert({0x00000048, &NPC_t::Stuck});
-        m_bf.insert({0x0000004a, &NPC_t::DefaultStuck});
-        m_sf.insert({0x0000004c, &NPC_t::Text});
-        m_ff.insert({0x00000050, &NPC_t::oldAddBelt});
-        m_if.insert({0x00000054, &NPC_t::PinchCount});
-        m_bf.insert({0x00000056, &NPC_t::Pinched});
-        m_if.insert({0x00000058, &NPC_t::PinchedDirection});
-        m_ff.insert({0x0000005c, &NPC_t::BeltSpeed});
-        m_if.insert({0x00000060, &NPC_t::standingOnPlayer});
-        m_if.insert({0x00000062, &NPC_t::standingOnPlayerY});
-        m_bf.insert({0x00000064, &NPC_t::Generator});
-        m_ff.insert({0x00000068, &NPC_t::GeneratorTimeMax});
-        m_ff.insert({0x0000006c, &NPC_t::GeneratorTime});
-        m_if.insert({0x00000070, &NPC_t::GeneratorDirection});
-        m_if.insert({0x00000072, &NPC_t::GeneratorEffect});
-        m_bf.insert({0x00000074, &NPC_t::GeneratorActive});
-        m_bf.insert({0x00000076, &NPC_t::playerTemp});
-        // m_bf.insert({0x00000078, &NPC_t::Location}); // between 0x78 and 0xA8
-        // m_bf.insert({0x000000a8, &NPC_t::DefaultLocation}); // between 0xA8 and 0xD8
-        m_ff.insert({0x000000d8, &NPC_t::DefaultDirection});
-        m_if.insert({0x000000dc, &NPC_t::DefaultType});
-        m_if.insert({0x000000de, &NPC_t::DefaultSpecial});
-        m_if.insert({0x000000e0, &NPC_t::DefaultSpecial2});
-        m_if.insert({0x000000e2, &NPC_t::Type});
-        m_if.insert({0x000000e4, &NPC_t::Frame});
-        m_ff.insert({0x000000e8, &NPC_t::FrameCount});
-        m_ff.insert({0x000000ec, &NPC_t::Direction});
-        m_df.insert({0x000000f0, &NPC_t::Special});
-        m_df.insert({0x000000f8, &NPC_t::Special2});
-        m_df.insert({0x00000100, &NPC_t::Special3});
-        m_df.insert({0x00000108, &NPC_t::Special4});
-        m_df.insert({0x00000110, &NPC_t::Special5});
-        m_df.insert({0x00000118, &NPC_t::Special6});
-        m_bf.insert({0x00000120, &NPC_t::TurnAround});
-        m_if.insert({0x00000122, &NPC_t::Killed});
-        m_bf.insert({0x00000124, &NPC_t::Active});
-        // m_bf.insert({0x00000126, &NPC_t::Reset});
-        m_if.insert({0x0000012a, &NPC_t::TimeLeft});
-        m_if.insert({0x0000012c, &NPC_t::HoldingPlayer});
-        m_if.insert({0x0000012e, &NPC_t::CantHurt});
-        m_if.insert({0x00000130, &NPC_t::CantHurtPlayer});
-        m_if.insert({0x00000132, &NPC_t::BattleOwner});
-        m_if.insert({0x00000134, &NPC_t::WallDeath});
-        m_bf.insert({0x00000136, &NPC_t::Projectile});
-        m_if.insert({0x00000138, &NPC_t::Effect});
-        m_df.insert({0x0000013c, &NPC_t::Effect2});
-        m_if.insert({0x00000144, &NPC_t::Effect3});
-        m_if.insert({0x00000146, &NPC_t::Section});
-        m_ff.insert({0x00000148, &NPC_t::Damage});
-        m_if.insert({0x0000014c, &NPC_t::JustActivated});
-        m_if.insert({0x0000014e, &NPC_t::Block});
-        m_if.insert({0x00000150, &NPC_t::tempBlock});
-        m_bf.insert({0x00000152, &NPC_t::onWall});
-        m_bf.insert({0x00000154, &NPC_t::TurnBackWipe});
-        m_if.insert({0x00000156, &NPC_t::Immune});
+        insert(0x00000000, &NPC_t::AttLayer);
+        insert(0x00000004, &NPC_t::Quicksand);
+        insert(0x00000006, &NPC_t::RespawnDelay);
+        insert(0x00000008, &NPC_t::Bouce);
+        insert(0x0000000a, &NPC_t::Pinched1);
+        insert(0x0000000c, &NPC_t::Pinched2);
+        insert(0x0000000e, &NPC_t::Pinched3);
+        insert(0x00000010, &NPC_t::Pinched4);
+        insert(0x00000012, &NPC_t::MovingPinched);
+        insert(0x00000014, &NPC_t::NetTimeout);
+        insert(0x00000018, &NPC_t::RealSpeedX);
+        insert(0x0000001c, &NPC_t::Wet);
+        insert(0x0000001e, &NPC_t::Settings);
+        insert(0x00000020, &NPC_t::NoLavaSplash);
+        insert(0x00000022, &NPC_t::Slope);
+        insert(0x00000024, &NPC_t::Multiplier);
+        insert(0x00000026, &NPC_t::TailCD);
+        insert(0x00000028, &NPC_t::Shadow);
+        insert(0x0000002c, &NPC_t::TriggerActivate);
+        insert(0x00000030, &NPC_t::TriggerDeath);
+        insert(0x00000034, &NPC_t::TriggerTalk);
+        insert(0x00000038, &NPC_t::TriggerLast);
+        insert(0x0000003c, &NPC_t::Layer);
+        insert(0x00000040, &NPC_t::Hidden);
+        insert(0x00000042, &NPC_t::Legacy);
+        insert(0x00000044, &NPC_t::Chat);
+        insert(0x00000046, &NPC_t::Inert);
+        insert(0x00000048, &NPC_t::Stuck);
+        insert(0x0000004a, &NPC_t::DefaultStuck);
+        insert(0x0000004c, &NPC_t::Text);
+        insert(0x00000050, &NPC_t::oldAddBelt);
+        insert(0x00000054, &NPC_t::PinchCount);
+        insert(0x00000056, &NPC_t::Pinched);
+        insert(0x00000058, &NPC_t::PinchedDirection);
+        insert(0x0000005c, &NPC_t::BeltSpeed);
+        insert(0x00000060, &NPC_t::standingOnPlayer);
+        insert(0x00000062, &NPC_t::standingOnPlayerY);
+        insert(0x00000064, &NPC_t::Generator);
+        insert(0x00000068, &NPC_t::GeneratorTimeMax);
+        insert(0x0000006c, &NPC_t::GeneratorTime);
+        insert(0x00000070, &NPC_t::GeneratorDirection);
+        insert(0x00000072, &NPC_t::GeneratorEffect);
+        insert(0x00000074, &NPC_t::GeneratorActive);
+        insert(0x00000076, &NPC_t::playerTemp);
+        // insert(0x00000078, &NPC_t::Location); // between 0x78 and 0xA8
+        // insert(0x000000a8, &NPC_t::DefaultLocation); // between 0xA8 and 0xD8
+        insert(0x000000d8, &NPC_t::DefaultDirection);
+        insert(0x000000dc, &NPC_t::DefaultType);
+        insert(0x000000de, &NPC_t::DefaultSpecial);
+        insert(0x000000e0, &NPC_t::DefaultSpecial2);
+        insert(0x000000e2, &NPC_t::Type);
+        insert(0x000000e4, &NPC_t::Frame);
+        insert(0x000000e8, &NPC_t::FrameCount);
+        insert(0x000000ec, &NPC_t::Direction);
+        insert(0x000000f0, &NPC_t::Special);
+        insert(0x000000f8, &NPC_t::Special2);
+        insert(0x00000100, &NPC_t::Special3);
+        insert(0x00000108, &NPC_t::Special4);
+        insert(0x00000110, &NPC_t::Special5);
+        insert(0x00000118, &NPC_t::Special6);
+        insert(0x00000120, &NPC_t::TurnAround);
+        insert(0x00000122, &NPC_t::Killed);
+        insert(0x00000124, &NPC_t::Active);
+        // insert(0x00000126, &NPC_t::Reset);
+        insert(0x0000012a, &NPC_t::TimeLeft);
+        insert(0x0000012c, &NPC_t::HoldingPlayer);
+        insert(0x0000012e, &NPC_t::CantHurt);
+        insert(0x00000130, &NPC_t::CantHurtPlayer);
+        insert(0x00000132, &NPC_t::BattleOwner);
+        insert(0x00000134, &NPC_t::WallDeath);
+        insert(0x00000136, &NPC_t::Projectile);
+        insert(0x00000138, &NPC_t::Effect);
+        insert(0x0000013c, &NPC_t::Effect2);
+        insert(0x00000144, &NPC_t::Effect3);
+        insert(0x00000146, &NPC_t::Section);
+        insert(0x00000148, &NPC_t::Damage);
+        insert(0x0000014c, &NPC_t::JustActivated);
+        insert(0x0000014e, &NPC_t::Block);
+        insert(0x00000150, &NPC_t::tempBlock);
+        insert(0x00000152, &NPC_t::onWall);
+        insert(0x00000154, &NPC_t::TurnBackWipe);
+        insert(0x00000156, &NPC_t::Immune);
     }
 
     double getAny(NPC_t *obj, int address, FIELDTYPE ftype) override
