@@ -365,11 +365,11 @@ static const char *FieldtypeToStr(FIELDTYPE ftype)
  */
 class SMBXMemoryEmulator
 {
-    std::unordered_map<int, double *> m_df;
-    std::unordered_map<int, float *>  m_ff;
-    std::unordered_map<int, int *>    m_if;
-    std::unordered_map<int, bool *>   m_bf;
-    std::unordered_map<int, std::string *>   m_sf;
+    std::unordered_map<size_t, double *> m_df;
+    std::unordered_map<size_t, float *>  m_ff;
+    std::unordered_map<size_t, int *>    m_if;
+    std::unordered_map<size_t, bool *>   m_bf;
+    std::unordered_map<size_t, std::string *>   m_sf;
 
     enum ValueType
     {
@@ -383,31 +383,31 @@ class SMBXMemoryEmulator
 
     std::unordered_map<int, ValueType> m_type;
 
-    void insert(int address, int *field)
+    void insert(size_t address, int *field)
     {
         m_if.insert({address, field});
         m_type.insert({address, VT_INT});
     }
 
-    void insert(int address, double *field)
+    void insert(size_t address, double *field)
     {
         m_df.insert({address, field});
         m_type.insert({address, VT_DOUBLE});
     }
 
-    void insert(int address, float *field)
+    void insert(size_t address, float *field)
     {
         m_ff.insert({address, field});
         m_type.insert({address, VT_FLOAT});
     }
 
-    void insert(int address, bool *field)
+    void insert(size_t address, bool *field)
     {
         m_bf.insert({address, field});
         m_type.insert({address, VT_BOOL});
     }
 
-    void insert(int address, std::string *field)
+    void insert(size_t address, std::string *field)
     {
         m_sf.insert({address, field});
         m_type.insert({address, VT_STRING});
@@ -455,7 +455,7 @@ public:
         insert(0x00B25724, &StartLevel);
     }
 
-    double getAny(int address, FIELDTYPE ftype)
+    double getValue(size_t address, FIELDTYPE ftype)
     {
         if(ftype == FT_INVALID)
         {
@@ -529,7 +529,7 @@ public:
         return 0.0;
     }
 
-    void setAny(int address, double value, FIELDTYPE ftype)
+    void setValue(size_t address, double value, FIELDTYPE ftype)
     {
         if(ftype == FT_INVALID)
         {
@@ -610,15 +610,10 @@ public:
 /*!
  * \brief Per-Object memory emulator
  */
-template<class T, char const *objName>
+template<class T, char const *objName, size_t maxAddr>
 class SMBXObjectMemoryEmulator
 {
 protected:
-    std::unordered_map<int, double T::*> m_df;
-    std::unordered_map<int, float T::*>  m_ff;
-    std::unordered_map<int, int T::*>    m_if;
-    std::unordered_map<int, bool T::*>   m_bf;
-    std::unordered_map<int, std::string T::*>   m_sf;
 
     enum ValueType
     {
@@ -641,115 +636,132 @@ protected:
         int offset = 0;
         //! Base address of real value
         int baseAddress = 0;
+
+        //! Double-type field pointer
+        double      T::* field_d = nullptr;
+        //! Float-type field pointer
+        float       T::* field_f = nullptr;
+        //! Int-type field pointer
+        int         T::* field_i = nullptr;
+        //! Boolean type field pointer
+        bool        T::* field_b = nullptr;
+        //! String-type field pointer
+        std::string T::* field_s = nullptr;
     };
 
-    typedef std::unordered_map<int, Value> ValueMap;
-    typedef typename std::unordered_map<int, Value>::const_iterator ValueMapIt;
     //! Basic map of addresses
-    ValueMap m_type;
+    Value m_type[maxAddr];
     //! Byte map of addresses
-    ValueMap m_byte;
+    Value m_byte[maxAddr];
 
-    void insert(int address, int T::*field)
+    void insert(size_t address, int T::*field)
     {
         Value v;
-        m_if.insert({address, field});
 
         // Normal field
+        v.field_i = field;
         v.type = VT_INT;
         v.baseType = VT_INT;
         v.offset = 0;
         v.baseAddress = address;
-        m_type.insert({address, v});
+        m_type[address] = v;
 
         // Byte hack fields
         v.type = VT_BYTE_HACK;
         for(int i = 0; i < 2; ++i)
         {
             v.offset = i;
-            m_byte.insert({address + i, v});
+            m_byte[address + i] = v;
             if(i > 0)
-                m_type.insert({address + i, v});
+                m_type[address + i] = v;
         }
     }
 
-    void insert(int address, double T::*field)
+    void insert(size_t address, double T::*field)
     {
         Value v;
-        m_df.insert({address, field});
 
         // Normal field
+        v.field_d = field;
         v.type = VT_DOUBLE;
         v.baseType = VT_DOUBLE;
         v.offset = 0;
         v.baseAddress = address;
-        m_type.insert({address, v});
+        m_type[address] = v;
 
         // Byte hack fields
         v.type = VT_BYTE_HACK;
         for(int i = 0; i < 8; ++i)
         {
             v.offset = i;
-            m_byte.insert({address + i, v});
+            m_byte[address + i] = v;
             if(i > 0)
-                m_type.insert({address + i, v});
+                m_type[address + i] = v;
         }
     }
 
-    void insert(int address, float T::*field)
+    void insert(size_t address, float T::*field)
     {
         Value v;
-        m_ff.insert({address, field});
 
         // Normal field
+        v.field_f = field;
         v.type = VT_FLOAT;
         v.baseType = VT_FLOAT;
         v.offset = 0;
         v.baseAddress = address;
-        m_type.insert({address, v});
+        m_type[address] = v;
 
         // Byte hack fields
         v.type = VT_BYTE_HACK;
         for(int i = 0; i < 4; ++i)
         {
             v.offset = i;
-            m_byte.insert({address + i, v});
+            m_byte[address + i] = v;
             if(i > 0)
-                m_type.insert({address + i, v});
+                m_type[address + i] = v;
         }
     }
 
-    void insert(int address, bool T::*field)
+    void insert(size_t address, bool T::*field)
     {
         Value v;
-        m_bf.insert({address, field});
 
         // Normal field
+        v.field_b = field;
         v.type = VT_BOOL;
         v.baseType = VT_BOOL;
         v.offset = 0;
         v.baseAddress = address;
-        m_type.insert({address, v});
+        m_type[address] = v;
     }
 
-    void insert(int address, std::string T::*field)
+    void insert(size_t address, std::string T::*field)
     {
         Value v;
-        m_sf.insert({address, field});
+
+        // Normal field
+        v.field_s = field;
         v.type = VT_STRING;
         v.baseType = VT_STRING;
         v.offset = 0;
         v.baseAddress = address;
-        m_type.insert({address, v});
+        m_type[address] = v;
     }
 
 public:
     SMBXObjectMemoryEmulator() noexcept
     {};
 
-    virtual double getAny(T *obj, int address, FIELDTYPE ftype)
+    virtual double getValue(T *obj, size_t address, FIELDTYPE ftype)
     {
-        ValueMapIt ft;
+        Value *t = nullptr;
+
+        if(address >= maxAddr)
+        {
+            pLogWarning("MemEmu: Requested value of out-of-range address: %s 0x%x", objName, address);
+            return 0.0;
+        }
 
         if(ftype == FT_INVALID)
         {
@@ -759,114 +771,83 @@ public:
 
         if(ftype == FT_BYTE) // byte hacking
         {
-            ft = m_byte.find(address);
-            if(ft == m_type.end())
-                ft = m_type.find(address);
+            t = &m_byte[address];
+            if(t->type == VT_UNKNOWN)
+                t = &m_type[address];
         }
         else
-            ft = m_type.find(address);
+            t = &m_type[address];
 
-        if(ft == m_type.end())
+        if(t->type == VT_UNKNOWN)
         {
             pLogWarning("MemEmu: Unknown %s::%s address to read: 0x%x", objName, FieldtypeToStr(ftype), address);
             return 0.0;
         }
 
-        const auto &t = ft->second;
-
-        switch(t.type)
+        switch(t->type)
         {
         case VT_DOUBLE:
         {
-            auto dres = m_df.find(address);
-            if(dres != m_df.end())
-            {
-                if(ftype != FT_DFLOAT)
-                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-
-                return valueToMem(obj->*(dres->second), ftype);
-            }
-            break;
+            SDL_assert(t->field_d);
+            if(ftype != FT_DFLOAT)
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            return valueToMem(obj->*(t->field_d), ftype);
         }
 
         case VT_FLOAT:
         {
-            auto fres = m_ff.find(address);
-            if(fres != m_ff.end())
-            {
-                if(ftype != FT_FLOAT)
-                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-
-                return valueToMem(obj->*(fres->second), ftype);
-            }
-            break;
+            SDL_assert(t->field_f);
+            if(ftype != FT_FLOAT)
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            return valueToMem(obj->*(t->field_f), ftype);
         }
 
         case VT_INT:
         {
-            auto ires = m_if.find(address);
-            if(ires != m_if.end())
-            {
-                if(ftype != FT_DWORD && ftype != FT_WORD)
-                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-
-                return valueToMem(obj->*(ires->second), ftype);
-            }
-            break;
+            SDL_assert(t->field_i);
+            if(ftype != FT_DWORD && ftype != FT_WORD)
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            return valueToMem(obj->*(t->field_i), ftype);
         }
 
         case VT_BOOL:
         {
-            auto bres = m_bf.find(address);
-            if(bres != m_bf.end())
-            {
-                if(ftype != FT_WORD && ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                return valueToMem(obj->*(bres->second), ftype);
-            }
-            break;
+            SDL_assert(t->field_i);
+            if(ftype != FT_WORD && ftype != FT_BYTE)
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            return valueToMem(obj->*(t->field_b), ftype);
         }
 
         case VT_BYTE_HACK:
         {
-            switch(t.baseType)
+            switch(t->baseType)
             {
             case VT_DOUBLE:
             {
-                auto dres = m_df.find(t.baseAddress);
-                if(dres != m_df.end())
-                {
-                    if(ftype != FT_BYTE)
-                        pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                    return (double)getByteX86(obj->*(dres->second), t.offset);
-                }
-                break;
+                auto &bt = m_type[t->baseAddress];
+                SDL_assert(bt.type == VT_DOUBLE && bt.field_d);
+                if(ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                return (double)getByteX86(obj->*(bt.field_d), t->offset);
             }
 
             case VT_FLOAT:
             {
-                auto fres = m_ff.find(t.baseAddress);
-                if(fres != m_ff.end())
-                {
-                    if(ftype != FT_BYTE)
-                        pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                    return (double)getByteX86(obj->*(fres->second), t.offset);
-                }
-                break;
+                auto &bt = m_type[t->baseAddress];
+                SDL_assert(bt.type == VT_FLOAT && bt.field_f);
+                if(ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                return (double)getByteX86(obj->*(bt.field_f), t->offset);
             }
 
             case VT_INT:
             {
-                auto ires = m_if.find(t.baseAddress);
-                if(ires != m_if.end())
-                {
-                    if(ftype != FT_BYTE)
-                        pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-
-                    int16_t s = static_cast<int16_t>(obj->*(ires->second));
-                    return (double)getByteX86(s, t.offset);
-                }
-                break;
+                auto &bt = m_type[t->baseAddress];
+                SDL_assert(bt.type == VT_INT && bt.field_i);
+                if(ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                int16_t s = static_cast<int16_t>(obj->*(bt.field_i));
+                return (double)getByteX86(s, t->offset);
             }
 
             default:
@@ -883,9 +864,15 @@ public:
         return 0.0;
     }
 
-    virtual void setAny(T *obj, int address, double value, FIELDTYPE ftype)
+    virtual void setValue(T *obj, size_t address, double value, FIELDTYPE ftype)
     {
-        ValueMapIt ft;
+        Value *t = nullptr;
+
+        if(address >= maxAddr)
+        {
+            pLogWarning("MemEmu: Requested value of out-of-range address: %s 0x%x", objName, address);
+            return;
+        }
 
         if(ftype == FT_INVALID)
         {
@@ -895,119 +882,91 @@ public:
 
         if(ftype == FT_BYTE) // byte hacking
         {
-            ft = m_byte.find(address);
-            if(ft == m_type.end())
-                ft = m_type.find(address);
+            t = &m_byte[address];
+            if(t->type == VT_UNKNOWN)
+                t = &m_type[address];
         }
         else
-            ft = m_type.find(address);
+            t = &m_type[address];
 
-        if(ft == m_type.end())
+        if(t->type == VT_UNKNOWN)
         {
             pLogWarning("MemEmu: Unknown %s::%s address to write: 0x%x", objName, FieldtypeToStr(ftype), address);
             return;
         }
 
-        const auto &t = ft->second;
-
-        switch(t.type)
+        switch(t->type)
         {
         case VT_DOUBLE:
         {
-            auto dres = m_df.find(address);
-            if(dres != m_df.end())
-            {
-                if(ftype != FT_DFLOAT)
-                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-
-                memToValue(obj->*(dres->second), value, ftype);
-                return;
-            }
-            break;
+            SDL_assert(t->field_d);
+            if(ftype != FT_DFLOAT)
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            memToValue(obj->*(t->field_d), value, ftype);
+            return;
         }
 
         case VT_FLOAT:
         {
-            auto fres = m_ff.find(address);
-            if(fres != m_ff.end())
-            {
-                if(ftype != FT_FLOAT)
-                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-
-                memToValue(obj->*(fres->second), value, ftype);
-                return;
-            }
-            break;
+            SDL_assert(t->field_f);
+            if(ftype != FT_FLOAT)
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            memToValue(obj->*(t->field_f), value, ftype);
+            return;
         }
 
         case VT_INT:
         {
-            auto ires = m_if.find(address);
-            if(ires != m_if.end())
-            {
-                if(ftype != FT_DWORD && ftype != FT_WORD)
-                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-
-                memToValue(obj->*(ires->second), value, ftype);
-                return;
-            }
-            break;
+            SDL_assert(t->field_i);
+            if(ftype != FT_DWORD && ftype != FT_WORD)
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            memToValue(obj->*(t->field_i), value, ftype);
+            return;
         }
 
         case VT_BOOL:
         {
-            auto bres = m_bf.find(address);
-            if(bres != m_bf.end())
-            {
-                if(ftype != FT_WORD && ftype != FT_BYTE)
-                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-
-                memToValue(obj->*(bres->second), value, ftype);
-                return;
-            }
-            break;
+            SDL_assert(t->field_b);
+            if(ftype != FT_WORD && ftype != FT_BYTE)
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            memToValue(obj->*(t->field_b), value, ftype);
+            return;
         }
 
         case VT_BYTE_HACK:
         {
-            switch(t.baseType)
+            switch(t->baseType)
             {
             case VT_DOUBLE:
             {
-                auto dres = m_df.find(t.baseAddress);
-                if(dres != m_df.end())
-                {
-                    if(ftype != FT_BYTE)
-                        pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                    modifyByteX86(obj->*(dres->second), t.offset, (uint8_t)value);
-                }
-                break;
+                auto &bt = m_type[t->baseAddress];
+                SDL_assert(bt.type == VT_DOUBLE && bt.field_d);
+                if(ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                modifyByteX86(obj->*(bt.field_d), t->offset, (uint8_t)value);
+                return;
             }
 
             case VT_FLOAT:
             {
-                auto fres = m_ff.find(t.baseAddress);
-                if(fres != m_ff.end())
-                {
-                    if(ftype != FT_BYTE)
-                        pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                    modifyByteX86(obj->*(fres->second), t.offset, (uint8_t)value);
-                }
-                break;
+                auto &bt = m_type[t->baseAddress];
+                SDL_assert(bt.type == VT_FLOAT && bt.field_f);
+                if(ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                modifyByteX86(obj->*(bt.field_f), t->offset, (uint8_t)value);
+                return;
             }
 
             case VT_INT:
             {
-                auto ires = m_if.find(t.baseAddress);
-                if(ires != m_if.end())
-                {
-                    if(ftype != FT_BYTE)
-                        pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                    int16_t s = static_cast<int16_t>(obj->*(ires->second));
-                    modifyByteX86(s, t.offset, (uint8_t)value);
-                    obj->*(ires->second) = static_cast<int>(s);
-                }
-                break;
+                auto &bt = m_type[t->baseAddress];
+                SDL_assert(bt.type == VT_INT && bt.field_i);
+                if(ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                int16_t s = static_cast<int16_t>(obj->*(bt.field_i));
+                modifyByteX86(s, t->offset, (uint8_t)value);
+                obj->*(bt.field_i) = static_cast<int>(s);
+                return;
             }
 
             default:
@@ -1024,7 +983,7 @@ public:
 };
 
 static constexpr char location_t_name[] = "Location_t";
-typedef SMBXObjectMemoryEmulator<Location_t, location_t_name> LocationParent;
+typedef SMBXObjectMemoryEmulator<Location_t, location_t_name, 0x31> LocationParent;
 class LocationMemory final : public LocationParent
 {
 public:
@@ -1046,10 +1005,11 @@ public:
 
 
 static constexpr char controls_t_name[] = "Controls_t";
-class ControlsMemory final : public SMBXObjectMemoryEmulator<Controls_t, controls_t_name>
+typedef SMBXObjectMemoryEmulator<Controls_t, controls_t_name, 0x16> ControlsParent;
+class ControlsMemory final : public ControlsParent
 {
 public:
-    ControlsMemory() noexcept : SMBXObjectMemoryEmulator<Controls_t, controls_t_name>()
+    ControlsMemory() noexcept :  ControlsParent()
     {
         buildTable();
     }
@@ -1074,7 +1034,7 @@ static LocationMemory s_locMem;
 
 
 static constexpr char playere_t_name[] = "Player_t";
-typedef SMBXObjectMemoryEmulator<Player_t, playere_t_name> PlayerParent;
+typedef SMBXObjectMemoryEmulator<Player_t, playere_t_name, 0x186> PlayerParent;
 class PlayerMemory final : public PlayerParent
 {
 public:
@@ -1210,41 +1170,41 @@ public:
         insert(0x00000180, &Player_t::SpeedFixY);
     }
 
-    double getAny(Player_t *obj, int address, FIELDTYPE ftype) override
+    double getValue(Player_t *obj, size_t address, FIELDTYPE ftype) override
     {
         if(address >= 0x80 && address < 0xB0) // YoshiTongue
-            return s_locMem.getAny(&obj->YoshiTongue, address - 0x80, ftype);
+            return s_locMem.getValue(&obj->YoshiTongue, address - 0x80, ftype);
         else if(address >= 0xC0 && address < 0xF0) // Location
-            return s_locMem.getAny(&obj->Location, address - 0xC0, ftype);
+            return s_locMem.getValue(&obj->Location, address - 0xC0, ftype);
         else if(address >= 0xF2 && address < 0x106) // Controls
-            return s_conMem.getAny(&obj->Controls, address - 0xF2, ftype);
-        return PlayerParent::getAny(obj, address, ftype);
+            return s_conMem.getValue(&obj->Controls, address - 0xF2, ftype);
+        return PlayerParent::getValue(obj, address, ftype);
     }
 
-    void setAny(Player_t *obj, int address, double value, FIELDTYPE ftype) override
+    void setValue(Player_t *obj, size_t address, double value, FIELDTYPE ftype) override
     {
         if(address >= 0x80 && address < 0xB0) // YoshiTongue
         {
-            s_locMem.setAny(&obj->YoshiTongue, address - 0x80, value, ftype);
+            s_locMem.setValue(&obj->YoshiTongue, address - 0x80, value, ftype);
             return;
         }
         else if(address >= 0xC0 && address < 0xF0) // Location
         {
-            s_locMem.setAny(&obj->Location, address - 0xC0, value, ftype);
+            s_locMem.setValue(&obj->Location, address - 0xC0, value, ftype);
             return;
         }
         else if(address >= 0xF2 && address < 0x106) // Controls
         {
-            s_conMem.setAny(&obj->Controls, address - 0xF2, value, ftype);
+            s_conMem.setValue(&obj->Controls, address - 0xF2, value, ftype);
             return;
         }
 
-        PlayerParent::setAny(obj, address, value, ftype);
+        PlayerParent::setValue(obj, address, value, ftype);
     }
 };
 
 static constexpr char npc_t_name[] = "NPC_t";
-typedef SMBXObjectMemoryEmulator<NPC_t, npc_t_name> NpcParent;
+typedef SMBXObjectMemoryEmulator<NPC_t, npc_t_name, 0x160> NpcParent;
 class NPCMemory final : public NpcParent
 {
 public:
@@ -1339,30 +1299,30 @@ public:
         insert(0x00000156, &NPC_t::Immune);
     }
 
-    double getAny(NPC_t *obj, int address, FIELDTYPE ftype) override
+    double getValue(NPC_t *obj, size_t address, FIELDTYPE ftype) override
     {
         if(address >= 0x78 && address < 0xA8) // Location
-            return s_locMem.getAny(&obj->Location, address - 0x78, ftype);
+            return s_locMem.getValue(&obj->Location, address - 0x78, ftype);
         else if(address >= 0xA8 && address < 0xD8) // DefaultLocation
-            return s_locMem.getAny(&obj->DefaultLocation, address - 0xA8, ftype);
+            return s_locMem.getValue(&obj->DefaultLocation, address - 0xA8, ftype);
         else if(address == 0x126)
             return obj->Reset[1] ? 0xFFFF : 0;
         else if(address == 0x128)
             return obj->Reset[2] ? 0xFFFF : 0;
 
-        return NpcParent::getAny(obj, address, ftype);
+        return NpcParent::getValue(obj, address, ftype);
     }
 
-    void setAny(NPC_t *obj, int address, double value, FIELDTYPE ftype) override
+    void setValue(NPC_t *obj, size_t address, double value, FIELDTYPE ftype) override
     {
         if(address >= 0x78 && address < 0xA8) // Location
         {
-            s_locMem.setAny(&obj->Location, address - 0x78, value, ftype);
+            s_locMem.setValue(&obj->Location, address - 0x78, value, ftype);
             return;
         }
         else if(address >= 0xA8 && address < 0xD8) // DefaultLocation
         {
-            s_locMem.setAny(&obj->DefaultLocation, address - 0xA8, value, ftype);
+            s_locMem.setValue(&obj->DefaultLocation, address - 0xA8, value, ftype);
             return;
         }
         else if(address == 0x126)
@@ -1374,7 +1334,7 @@ public:
             obj->Reset[2] = value != 0;
         }
 
-        NpcParent::setAny(obj, address, value, ftype);
+        NpcParent::setValue(obj, address, value, ftype);
     }
 };
 
@@ -1383,48 +1343,54 @@ static PlayerMemory         s_emuPlayer;
 static NPCMemory            s_emuNPC;
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opAdd(D &mem, int addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opAdd(D &mem, size_t addr, double o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getAny(addr, ftype);
+    double o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) + static_cast<T>(o2);
-    mem.setAny(addr, static_cast<double>(res), ftype);
+    mem.setValue(addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opSub(D &mem, int addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opSub(D &mem, size_t addr, double o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getAny(addr, ftype);
+    double o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) - static_cast<T>(o2);
-    mem.setAny(addr, static_cast<double>(res), ftype);
+    mem.setValue(addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opMul(D &mem, int addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opMul(D &mem, size_t addr, double o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getAny(addr, ftype);
+    double o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) * static_cast<T>(o2);
-    mem.setAny(addr, static_cast<double>(res), ftype);
+    mem.setValue(addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opDiv(D &mem, int addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opDiv(D &mem, size_t addr, double o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getAny(addr, ftype);
+    double o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) / static_cast<T>(o2);
-    mem.setAny(addr, static_cast<double>(res), ftype);
+    mem.setValue(addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D>
-SDL_FORCE_INLINE void opXor(D &mem, int addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opXor(D &mem, size_t addr, double o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getAny(addr, ftype);
+    double o1 = mem.getValue(addr, ftype);
     T res = static_cast<T>(o1) ^ static_cast<T>(o2);
-    mem.setAny(addr, static_cast<double>(res), ftype);
+    mem.setValue(addr, static_cast<double>(res), ftype);
 }
 
 
-void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
+void MemAssign(size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
 {
+    if(address < GM_BASE || address > GM_END)
+    {
+        pLogWarning("MemEmu: MemAssign Requested value of out-of-range global address: 0x%x", address);
+        return;
+    }
+
     if(ftype == FT_INVALID)
         return;
 
@@ -1434,7 +1400,7 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
     switch(operation)
     {
     case OP_Assign:
-        s_emu.setAny(address, value, ftype);
+        s_emu.setValue(address, value, ftype);
         break;
 
     case OP_Add:
@@ -1599,9 +1565,15 @@ void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype)
     }// switch on op
 }
 
-bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype)
+bool CheckMem(size_t address, double value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
-    double cur = s_emu.getAny(address, ftype);
+    if(address < GM_BASE || address > GM_END)
+    {
+        pLogWarning("MemEmu: CheckMem Requested value of out-of-range global address: 0x%x", address);
+        return false;
+    }
+
+    double cur = s_emu.getValue(address, ftype);
 
     switch(ctype)
     {
@@ -1677,9 +1649,15 @@ bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype)
     return false;
 }
 
-double GetMem(int addr, FIELDTYPE ftype)
+double GetMem(size_t addr, FIELDTYPE ftype)
 {
-    double cur = s_emu.getAny(addr, ftype);
+    if(addr < GM_BASE || addr > GM_END)
+    {
+        pLogWarning("MemEmu: GetMem Requested value of out-of-range global address: 0x%x", addr);
+        return 0.0;
+    }
+
+    double cur = s_emu.getValue(addr, ftype);
 
     switch(ftype)
     {
@@ -1699,47 +1677,47 @@ double GetMem(int addr, FIELDTYPE ftype)
 
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opAdd(D &mem, U *obj, int addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opAdd(D &mem, U *obj, size_t addr, double o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getAny(obj, addr, ftype);
+    double o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) + static_cast<T>(o2);
-    mem.setAny(obj, addr, static_cast<double>(res), ftype);
+    mem.setValue(obj, addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opSub(D &mem, U *obj, int addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opSub(D &mem, U *obj, size_t addr, double o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getAny(obj, addr, ftype);
+    double o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) - static_cast<T>(o2);
-    mem.setAny(obj, addr, static_cast<double>(res), ftype);
+    mem.setValue(obj, addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opMul(D &mem, U *obj, int addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opMul(D &mem, U *obj, size_t addr, double o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getAny(obj, addr, ftype);
+    double o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) * static_cast<T>(o2);
-    mem.setAny(obj, addr, static_cast<double>(res), ftype);
+    mem.setValue(obj, addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opDiv(D &mem, U *obj, int addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opDiv(D &mem, U *obj, size_t addr, double o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getAny(obj, addr, ftype);
+    double o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) / static_cast<T>(o2);
-    mem.setAny(obj, addr, static_cast<double>(res), ftype);
+    mem.setValue(obj, addr, static_cast<double>(res), ftype);
 }
 
 template<typename T, class D, class U>
-SDL_FORCE_INLINE void opXor(D &mem, U *obj, int addr, double o2, FIELDTYPE ftype)
+SDL_FORCE_INLINE void opXor(D &mem, U *obj, size_t addr, double o2, FIELDTYPE ftype)
 {
-    double o1 = mem.getAny(obj, addr, ftype);
+    double o1 = mem.getValue(obj, addr, ftype);
     T res = static_cast<T>(o1) ^ static_cast<T>(o2);
-    mem.setAny(obj, addr, static_cast<double>(res), ftype);
+    mem.setValue(obj, addr, static_cast<double>(res), ftype);
 }
 
 template<class T, class U>
-static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE operation, FIELDTYPE ftype)
+static void MemAssignType(T &mem, U *obj, size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
 {
     if(ftype == FT_INVALID)
         return;
@@ -1750,7 +1728,7 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
     switch(operation)
     {
     case OP_Assign:
-        mem.setAny(obj, address, value, ftype);
+        mem.setValue(obj, address, value, ftype);
         break;
 
     case OP_Add:
@@ -1916,9 +1894,9 @@ static void MemAssignType(T &mem, U *obj, int address, double value, OPTYPE oper
 }
 
 template<class T, class U>
-static bool ChecmMemType(T &mem, U *obj, int offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
+static bool ChecmMemType(T &mem, U *obj, size_t offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
-    double cur = mem.getAny(obj, offset, ftype);
+    double cur = mem.getValue(obj, offset, ftype);
 
     switch(ctype)
     {
@@ -1997,7 +1975,7 @@ static bool ChecmMemType(T &mem, U *obj, int offset, double value, COMPARETYPE c
 
 // #define DEBUG_MEMEMU_TRACE
 
-void MemAssign(Player_t *obj, int address, double value, OPTYPE operation, FIELDTYPE ftype)
+void MemAssign(Player_t *obj, size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
     D_pLogDebug("Player mem TRACE: Write 0x%08X, %g, op-%d, ft-%d", address, value, (int)operation, (int)ftype);
@@ -2005,7 +1983,7 @@ void MemAssign(Player_t *obj, int address, double value, OPTYPE operation, FIELD
     MemAssignType(s_emuPlayer, obj, address, value, operation, ftype);
 }
 
-bool CheckMem(Player_t *obj, int offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
+bool CheckMem(Player_t *obj, size_t offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
     D_pLogDebug("Player mem TRACE: Compare 0x%08X, %g, cp-%d, ft-%d", offset, value, (int)ctype, (int)ftype);
@@ -2013,19 +1991,19 @@ bool CheckMem(Player_t *obj, int offset, double value, COMPARETYPE ctype, FIELDT
     return ChecmMemType(s_emuPlayer, obj, offset, value, ctype, ftype);
 }
 
-double GetMem(Player_t *obj, int offset, FIELDTYPE ftype)
+double GetMem(Player_t *obj, size_t offset, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
-    double value = s_emuPlayer.getAny(obj, offset, ftype);
+    double value = s_emuPlayer.getValue(obj, offset, ftype);
     D_pLogDebug("Player mem TRACE: Read 0x%08X, %g, ft-%d", offset, value, (int)ftype);
     return value;
 #else
-    return s_emuPlayer.getAny(obj, offset, ftype);
+    return s_emuPlayer.getValue(obj, offset, ftype);
 #endif
 }
 
 
-void MemAssign(NPC_t *obj, int address, double value, OPTYPE operation, FIELDTYPE ftype)
+void MemAssign(NPC_t *obj, size_t address, double value, OPTYPE operation, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
     D_pLogDebug("NPC mem TRACE: Write 0x%08X, %g, op-%d, ft-%d", address, value, (int)operation, (int)ftype);
@@ -2033,7 +2011,7 @@ void MemAssign(NPC_t *obj, int address, double value, OPTYPE operation, FIELDTYP
     MemAssignType(s_emuNPC, obj, address, value, operation, ftype);
 }
 
-bool CheckMem(NPC_t *obj, int offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
+bool CheckMem(NPC_t *obj, size_t offset, double value, COMPARETYPE ctype, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
     D_pLogDebug("NPC mem TRACE: Compare 0x%08X, %g, cp-%d, ft-%d", offset, value, (int)ctype, (int)ftype);
@@ -2041,13 +2019,13 @@ bool CheckMem(NPC_t *obj, int offset, double value, COMPARETYPE ctype, FIELDTYPE
     return ChecmMemType(s_emuNPC, obj, offset, value, ctype, ftype);
 }
 
-double GetMem(NPC_t *obj, int offset, FIELDTYPE ftype)
+double GetMem(NPC_t *obj, size_t offset, FIELDTYPE ftype)
 {
 #ifdef DEBUG_MEMEMU_TRACE
-    double value = s_emuNPC.getAny(obj, offset, ftype);
+    double value = s_emuNPC.getValue(obj, offset, ftype);
     D_pLogDebug("NPC mem TRACE: Read 0x%08X, %g, ft-%d", offset, value, (int)ftype);
     return value;
 #else
-    return s_emuNPC.getAny(obj, offset, ftype);
+    return s_emuNPC.getValue(obj, offset, ftype);
 #endif
 }

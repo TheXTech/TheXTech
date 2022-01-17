@@ -32,10 +32,10 @@ Player_t *PlayerF::Get(int num)
     return &Player[num];
 }
 
-void PlayerF::MemSet(int offset, double value, OPTYPE operation, FIELDTYPE ftype)
+void PlayerF::MemSet(size_t offset, double value, OPTYPE operation, FIELDTYPE ftype)
 {
     //    char* dbg =  "PLAYER MEM SET";
-    if(ftype == FT_INVALID || offset > (0x184 * 99) || offset < 0)
+    if(ftype == FT_INVALID || offset > (0x184 * 99))
         return;
     Player_t *pPlayer = Get(1);
     MemAssign(pPlayer, offset, value, operation, ftype);

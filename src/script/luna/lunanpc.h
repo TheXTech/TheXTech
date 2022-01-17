@@ -39,7 +39,7 @@ void FindAll(int ID, int section, std::list<NPC_t *> *return_list);
 // GET FIRST MATCH
 NPC_t *GetFirstMatch(int ID, int section);
 
-void MemSet(int ID, int offset, double value, OPTYPE operation, FIELDTYPE ftype); // ID -1 for ALL
+void MemSet(int ID, size_t offset, double value, OPTYPE operation, FIELDTYPE ftype); // ID -1 for ALL
 
 // ITERATORS
 void AllSetHits(int identity, int section, float hits);		// Set all specified NPC hits

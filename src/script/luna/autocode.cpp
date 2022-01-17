@@ -541,7 +541,7 @@ void Autocode::Do(bool init)
             }
 //            uint8_t *ptr = (uint8_t *)demo;
 //            ptr += (int)Target; // offset
-            bool triggered = CheckMem(demo, (int)Target, Param1, (COMPARETYPE)(int)Param2, ftype);
+            bool triggered = CheckMem(demo, (size_t)Target, Param1, (COMPARETYPE)(int)Param2, ftype);
             if(triggered)
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
             break;
@@ -555,7 +555,7 @@ void Autocode::Do(bool init)
                 ftype = StrToFieldtype(MyString);
             }
 
-            bool triggered = CheckMem((int)Target, Param1, (COMPARETYPE)(int)Param2, ftype);
+            bool triggered = CheckMem((size_t)Target, Param1, (COMPARETYPE)(int)Param2, ftype);
             if(triggered)
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
             break;
@@ -585,7 +585,7 @@ void Autocode::Do(bool init)
             // Get the memory
             //uint8_t *ptr = (uint8_t *)demo;
             //ptr += (int)Param1; // offset
-            double gotval = GetMem(demo, (int)Param1, ftype);
+            double gotval = GetMem(demo, (size_t)Param1, ftype);
 
             // Perform the load/add/sub/etc operation on the banked variable using the ref as the name
             gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param2);
@@ -606,7 +606,7 @@ void Autocode::Do(bool init)
             NPC_t *pFound_npc = NpcF::GetFirstMatch((int)Target, (int)Param3);
             if(pFound_npc != nullptr)
             {
-                double gotval = GetMem(pFound_npc, (int)Param1, ftype);
+                double gotval = GetMem(pFound_npc, (size_t)Param1, ftype);
                 gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param2);
             }
 
@@ -624,7 +624,7 @@ void Autocode::Do(bool init)
                 }
 
                 // byte *ptr = (byte *)(int)Target;
-                double gotval = GetMem((int)Target, ftype);
+                double gotval = GetMem((size_t)Target, ftype);
                 gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param1);
             }
             break;
@@ -1059,11 +1059,11 @@ void Autocode::Do(bool init)
             if(ReferenceOK())   // Use referenced var as value
             {
                 double gotval = gAutoMan.GetVar(MyRef);
-                NpcF::MemSet((int)Target, (int)Param1, gotval, (OPTYPE)(int)Param3, ftype);
+                NpcF::MemSet((int)Target, (size_t)Param1, gotval, (OPTYPE)(int)Param3, ftype);
             }
             else   // Use given value as value
             {
-                NpcF::MemSet((int)Target, (int)Param1, Param2, (OPTYPE)(int)Param3, ftype); // NPC ID, offset in obj, value, op, field type
+                NpcF::MemSet((int)Target, (size_t)Param1, Param2, (OPTYPE)(int)Param3, ftype); // NPC ID, offset in obj, value, op, field type
             }
 
             break;
@@ -1080,10 +1080,10 @@ void Autocode::Do(bool init)
             if(ReferenceOK())
             {
                 double gotval = gAutoMan.GetVar(MyRef);
-                PlayerF::MemSet((int)Param1, gotval, (OPTYPE)(int)Param3, ftype);
+                PlayerF::MemSet((size_t)Param1, gotval, (OPTYPE)(int)Param3, ftype);
             }
             else
-                PlayerF::MemSet((int)Param1, Param2, (OPTYPE)(int)Param3, ftype);
+                PlayerF::MemSet((size_t)Param1, Param2, (OPTYPE)(int)Param3, ftype);
             break;
         }
 
@@ -1101,10 +1101,10 @@ void Autocode::Do(bool init)
                 if(ReferenceOK())
                 {
                     double gotval = gAutoMan.GetVar(MyRef);
-                    MemAssign((int)Target, gotval, (OPTYPE)(int)Param2, ftype);
+                    MemAssign((size_t)Target, gotval, (OPTYPE)(int)Param2, ftype);
                 }
                 else
-                    MemAssign((int)Target, Param1, (OPTYPE)(int)Param2, ftype);
+                    MemAssign((size_t)Target, Param1, (OPTYPE)(int)Param2, ftype);
             }
             break;
         }

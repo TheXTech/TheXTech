@@ -21,6 +21,7 @@
 #ifndef MEMEMU_H
 #define MEMEMU_H
 
+#include <stddef.h>
 #include "lunadefs.h"
 struct Player_t;
 struct NPC_t;
@@ -29,18 +30,18 @@ struct NPC_t;
 #define GM_END              0x00B2E000
 
 //Global
-void MemAssign(int address, double value, OPTYPE operation, FIELDTYPE ftype);
-bool CheckMem(int address, double value, COMPARETYPE ctype, FIELDTYPE ftype);
-double GetMem(int addr, FIELDTYPE ftype);
+void MemAssign(size_t address, double value, OPTYPE operation, FIELDTYPE ftype);
+bool CheckMem(size_t address, double value, COMPARETYPE ctype, FIELDTYPE ftype);
+double GetMem(size_t addr, FIELDTYPE ftype);
 
 // Player relative
-void MemAssign(Player_t *obj, int address, double value, OPTYPE operation, FIELDTYPE ftype);
-bool CheckMem(Player_t *obj, int offset, double value, COMPARETYPE ctype, FIELDTYPE ftype);
-double GetMem(Player_t *obj, int offset, FIELDTYPE ftype);
+void MemAssign(Player_t *obj, size_t address, double value, OPTYPE operation, FIELDTYPE ftype);
+bool CheckMem(Player_t *obj, size_t offset, double value, COMPARETYPE ctype, FIELDTYPE ftype);
+double GetMem(Player_t *obj, size_t offset, FIELDTYPE ftype);
 
 // NPC relative
-void MemAssign(NPC_t *obj, int address, double value, OPTYPE operation, FIELDTYPE ftype);
-bool CheckMem(NPC_t *obj, int offset, double value, COMPARETYPE ctype, FIELDTYPE ftype);
-double GetMem(NPC_t *obj, int offset, FIELDTYPE ftype);
+void MemAssign(NPC_t *obj, size_t address, double value, OPTYPE operation, FIELDTYPE ftype);
+bool CheckMem(NPC_t *obj, size_t offset, double value, COMPARETYPE ctype, FIELDTYPE ftype);
+double GetMem(NPC_t *obj, size_t offset, FIELDTYPE ftype);
 
 #endif // MEMEMU_H

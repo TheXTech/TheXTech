@@ -22,6 +22,7 @@
 #ifndef LunaPlayer_HHH
 #define LunaPlayer_HHH
 
+#include <stddef.h>
 #include "lunadefs.h"
 
 struct Player_t;
@@ -33,7 +34,7 @@ Player_t *Get(int num);
 
 // PLAYER MANAGEMENT
 
-void MemSet(int offset, double value, OPTYPE operation, FIELDTYPE ftype);
+void MemSet(size_t offset, double value, OPTYPE operation, FIELDTYPE ftype);
 
 // PLAYER BUTTONS
 bool PressingDown(Player_t* player);

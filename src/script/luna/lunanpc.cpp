@@ -73,7 +73,7 @@ NPC_t *NpcF::GetFirstMatch(int ID, int section)
     return nullptr; //not matched
 }
 
-void NpcF::MemSet(int ID, int offset, double value, OPTYPE operation, FIELDTYPE ftype)
+void NpcF::MemSet(int ID, size_t offset, double value, OPTYPE operation, FIELDTYPE ftype)
 {
     //    char* dbg =  "MemSetDbg";
     if(ftype == FT_INVALID || offset > 0x15C)
