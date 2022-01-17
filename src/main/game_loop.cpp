@@ -300,7 +300,7 @@ bool MessageScreen_Logic(int plr)
     return false;
 }
 
-void PauseGame(PauseCode code, int plr)
+int PauseGame(PauseCode code, int plr)
 {
 //    double fpsTime = 0;
 //    int fpsCount = 0;
@@ -335,6 +335,9 @@ void PauseGame(PauseCode code, int plr)
     }
 
     resetFrameTimer();
+
+    // some pause games may return a status code
+    int result = 0;
 
     do
     {
@@ -386,7 +389,8 @@ void PauseGame(PauseCode code, int plr)
             }
             else if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
             {
-                if(ConnectScreen::Logic())
+                result = ConnectScreen::Logic();
+                if(result)
                     break;
             }
             else if(GamePaused == PauseCode::TextEntry)
@@ -416,4 +420,6 @@ void PauseGame(PauseCode code, int plr)
     }
 
     resetFrameTimer();
+
+    return result;
 }

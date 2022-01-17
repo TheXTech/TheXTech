@@ -74,14 +74,19 @@ static bool s_ResetCheckpoints()
 
 static bool s_DropAddScreen()
 {
-	PauseGame(PauseCode::DropAdd, 0);
-	return true;
+	if(PauseGame(PauseCode::DropAdd, 0) == 1)
+	   return true;
+    MenuCursorCanMove = false;
+    return false;
 }
 
 static bool s_CheatScreen()
 {
 	cheats_setBuffer(TextEntryScreen::Run("Enter cheat:"));
-	return true;
+    // uncomment this if you want to return to the pause menu
+    // MenuCursorCanMove = false;
+    // return false;
+    return true;
 }
 
 static bool s_QuitTesting()
