@@ -1245,6 +1245,9 @@ int MouseLogic()
 
 int Logic()
 {
+    /*-----------------------*\
+    || polling input methods ||
+    \*-----------------------*/
     bool block_poll = false;
     // do not allow more players than previously existed to reconnect
     if(s_context == Context::Reconnect)
@@ -1280,6 +1283,25 @@ int Logic()
             PlaySoundMenu(SFX_DropItem);
         }
     }
+
+    /*-----------------------*\
+    ||    Shared back key    ||
+    \*-----------------------*/
+    if(s_context == Context::MainMenu && Controls::g_InputMethods.size() == 0)
+    {
+        if(!SharedControls.MenuBack)
+            MenuCursorCanMove = true;
+        if(SharedControls.MenuBack && MenuCursorCanMove)
+        {
+            PlaySoundMenu(SFX_Slide);
+            MenuCursorCanMove = false;
+            return -1;
+        }
+    }
+
+    /*-----------------------*\
+    ||   per-player logic    ||
+    \*-----------------------*/
 
     // What is the first player that is not done?
     int menuPlayer = GetMenuPlayer();
