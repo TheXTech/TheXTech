@@ -590,7 +590,8 @@ void ProcEvent(const std::string &EventName, bool NoEffect)
 
             if(evt.Sound > 0)
             {
-                SoundPause[evt.Sound] = 0;
+                if(SoundPause[evt.Sound] > 4)
+                    SoundPause[evt.Sound] = 0;
                 PlaySound(evt.Sound);
             }
 
