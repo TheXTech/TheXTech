@@ -38,6 +38,8 @@
 //#   define swap_halfes(x)
 #endif
 
+
+#if 0 // Unused yet
 SDL_FORCE_INLINE void toX86Endian(double in_d, uint8_t out[8])
 {
     auto *in = reinterpret_cast<uint8_t*>(&in_d);
@@ -105,6 +107,8 @@ SDL_FORCE_INLINE void fromX86Endian(const uint8_t in[8], double &out_d)
     out[7] = in[7];
 #endif
 }
+#endif
+
 
 SDL_FORCE_INLINE void modifyByteX86(double &dst, size_t byte, uint8_t data)
 {
