@@ -308,10 +308,6 @@ int PauseGame(PauseCode code, int plr)
 //    double fpsTime = 0;
 //    int fpsCount = 0;
 
-    // no reason to allow game to be paused during main menu or credits
-    if(GameMenu || GameOutro)
-        return 0;
-
     int prev_cursor = XWindow::showCursor(-1);
 
     if(!GameMenu)
