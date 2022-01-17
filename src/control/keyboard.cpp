@@ -1174,7 +1174,7 @@ bool InputMethodType_Keyboard::OptionChange(size_t i)
     if(i == 0)
     {
         this->m_maxKeyboards ++;
-        if(this->m_maxKeyboards > 6)
+        if(this->m_maxKeyboards > 2)
             this->m_maxKeyboards = 0;
         return true;
     }
@@ -1191,8 +1191,10 @@ bool InputMethodType_Keyboard::OptionRotateLeft(size_t i)
     if(i == 0)
     {
         if(this->m_maxKeyboards > 0)
+        {
             this->m_maxKeyboards --;
-        return true;
+            return true;
+        }
     }
     if(i == 1)
     {
@@ -1206,9 +1208,11 @@ bool InputMethodType_Keyboard::OptionRotateRight(size_t i)
 {
     if(i == 0)
     {
-        if(this->m_maxKeyboards < 6)
+        if(this->m_maxKeyboards < 2)
+        {
             this->m_maxKeyboards ++;
-        return true;
+            return true;
+        }
     }
     if(i == 1)
     {
