@@ -28,6 +28,7 @@
 #include "lunaplayer.h"
 #include "lunacounter.h"
 #include "lunalevels.h"
+#include "lunavarbank.h"
 #include "compat.h"
 
 #include "globals.h"
@@ -72,7 +73,6 @@ void lunaReset()
     Renderer::Get().ClearAllDebugMessages();
     gSpriteMan.ResetSpriteManager();
     gCellMan.Reset();
-//    gSavedVarBank.ClearBank();
     Input::ResetAll();
 
     gDeathCounter.quit();
@@ -92,6 +92,9 @@ void lunaLoad()
     {
         // Load autocode
         gAutoMan.LoadFiles();
+
+        // Init var bank
+        gSavedVarBank.CopyBank(&gAutoMan.m_UserVars);
 
         // Init some stuff
         if(g_compatibility.luna_allow_level_codes)
@@ -132,7 +135,7 @@ void lunaLoop()
 
         // Update some stuff
         gFrames++;
-//        gSavedVarBank.SaveIfNeeded();
+        gSavedVarBank.SaveIfNeeded();
 
         // Run any framecode
 //        TestFrameCode();

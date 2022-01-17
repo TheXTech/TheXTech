@@ -22,6 +22,7 @@
 #include "../game_main.h"
 #include "../compat.h"
 #include "speedrunner.h"
+#include "../script/luna/lunavarbank.h"
 
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
@@ -104,6 +105,10 @@ void SaveGame()
         sav.gottenStars.emplace_back(Star[A].level, Star[A].Section);
 
     sav.totalStars = uint32_t(MaxWorldStars);
+
+    gSavedVarBank.WriteBank();
+    if(gLunaVarBank.name == "LunaDLL" && !gLunaVarBank.data.empty())
+        sav.userData.store.push_back(gLunaVarBank);
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
 
@@ -264,6 +269,18 @@ void LoadGame()
 
     for(A = 1; A <= numPlayers; A++)
         Player[A] = SavedChar[Player[A].Character];
+
+    gLunaVarBank = saveUserData::DataSection();
+    for(auto &s : sav.userData.store)
+    {
+        if(s.name == "LunaDLL" && s.location == saveUserData::DATA_GLOBAL)
+        {
+            gLunaVarBank = s;
+            break;
+        }
+    }
+
+    gSavedVarBank.TryLoadWorldVars();
 }
 
 void ClearGame(bool punnish)
@@ -304,6 +321,9 @@ void ClearGame(bool punnish)
 
     maxStars = 0;
     numStars = 0;
+
+    gLunaVarBank = saveUserData::DataSection();
+    gSavedVarBank.ClearBank();
 
     if(punnish) // Remove gamesave of user who was used a trap cheat
         DeleteSave(selWorld, selSave);

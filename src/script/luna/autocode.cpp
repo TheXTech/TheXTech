@@ -47,6 +47,7 @@
 #include "lunacell.h"
 #include "lunaspriteman.h"
 #include "lunainput.h"
+#include "lunavarbank.h"
 #include "renderop_string.h"
 #include "mememu.h"
 
@@ -720,14 +721,14 @@ void Autocode::Do(bool init)
 
         case AT_BankVar:
         {
-//            if(MyString.length() > 0)
-//                gSavedVarBank.SetVar(MyString, gAutoMan.GetVar(MyString));
+            if(MyString.length() > 0)
+                gSavedVarBank.SetVar(MyString, gAutoMan.GetVar(MyString));
             break;
         }
 
         case AT_WriteBank:
         {
-//            gSavedVarBank.WriteBank();
+            gSavedVarBank.WriteBank();
             break;
         }
 
