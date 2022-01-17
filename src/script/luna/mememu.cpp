@@ -422,59 +422,61 @@ public:
 
     void buildTable()
     {
+        insert(0x00B2504C, &TakeScreen);
+        insert(0x00B250D6, &numLocked);
+        insert(0x00B250E2, &GamePaused); // Pause menu visible
+        insert(0x00B25134, &LevelEditor);
+
+        insert(0x00B251E0, &numStars); // HUD star count
+        insert(0x00B25700, &numWater);
+
+        insert(0x00B25724, &StartLevel);
         insert(0x00B25728, &NoMap);
         insert(0x00B2572A, &RestartLevel);
-        insert(0x00B2D6D2, &MenuMouseMove);
-        insert(0x00B2D6D0, &MenuMouseRelease);
-        insert(0x00B2D6CC, &MenuMouseDown);
-        insert(0x00B250E2, &GamePaused); // Pause menu visible
-        insert(0x00B2C8C4, &Cheater);
 
-        insert(0x00B2504C, &TakeScreen);
-
-        // insert(0x00B2C884, ???}; // Key Released!!!
-
-        insert(0x00B2D6BC, &MenuMouseX); // Mouse cursor X
-        insert(0x00B2D6C4, &MenuMouseY); // Mouse cursor Y
-
-        insert(0x00B2595E, &numPlayers); // Player Count
-        insert(0x00B2595A, &numNPCs); // NPC count
-        insert(0x00B25956, &numBlock);
-        insert(0x00B2C894, &BlocksSorted);
-        insert(0x00B25958, &numBackground);
-        insert(0x00B250D6, &numLocked);
-        insert(0x00B258E2, &numWarps);
-        insert(0x00B25700, &numWater);
-        insert(0x00B2D710, &numEvents);
-
-        insert(0x00B25134, &LevelEditor);
-        insert(0x00B2D734, &noSound);
-        insert(0x00B2C684, &FrameSkip);
-
-        insert(0x00B25960, &numWorldLevels);
         insert(0x00B257A4, &numTiles);
         insert(0x00B257A6, &numScenes);
         insert(0x00B258E0, &numWorldPaths);
+        insert(0x00B258E2, &numWarps);
+        insert(0x00B25956, &numBlock);
+        insert(0x00B25958, &numBackground);
+        insert(0x00B2595A, &numNPCs); // NPC count
+        insert(0x00B2595E, &numPlayers); // Player Count
+        insert(0x00B25960, &numWorldLevels);
         insert(0x00B25980, &numWorldMusic);
 
-        insert(0x00B2C906, &maxStars); // Max stars at episode
-
-        insert(0x00B251E0, &numStars); // HUD star count
         insert(0x00B2C5A8, &Coins); // HUD coins count
-        insert(0x00B2C880, &MenuCursor); // Current menu choice
-        insert(0x00B2C882, &MenuMode); // Current menu mode
-        insert(0x00B2C8E4, &Score); // HUD points count
-
-        insert(0x00B2C8B4, &FreezeNPCs);
-        insert(0x00B2C62C, &PSwitchTime); // P-Switch Timer
-        insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer
-        insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
-        insert(0x00B2C87C, &Physics.NPCPSwitch); // P-Switch/Stopwatch Length
-
         insert(0x00B2C5AC, &Lives); // HUD lives count
 
         insert(0x00B2C624, &WorldName);
-        insert(0x00B25724, &StartLevel);
+
+        insert(0x00B2C62C, &PSwitchTime); // P-Switch Timer
+        insert(0x00B2C62E, &PSwitchStop); // Stopwatch Timer
+        insert(0x00B2C630, &PSwitchPlayer); // P-Switch/Stopwatch Player
+
+        insert(0x00B2C684, &FrameSkip);
+
+        insert(0x00B2C87C, &Physics.NPCPSwitch); // P-Switch/Stopwatch Length
+
+        insert(0x00B2C880, &MenuCursor); // Current menu choice
+        insert(0x00B2C882, &MenuMode); // Current menu mode
+
+        // insert(0x00B2C884, ???}; // Key Released!!!
+        insert(0x00B2C894, &BlocksSorted);
+        insert(0x00B2C8B4, &FreezeNPCs);
+
+        insert(0x00B2C8C4, &Cheater);
+
+        insert(0x00B2C8E4, &Score); // HUD points count
+        insert(0x00B2C906, &maxStars); // Max stars at episode
+
+        insert(0x00B2D6BC, &MenuMouseX); // Mouse cursor X
+        insert(0x00B2D6C4, &MenuMouseY); // Mouse cursor Y
+        insert(0x00B2D6CC, &MenuMouseDown);
+        insert(0x00B2D6D0, &MenuMouseRelease);
+        insert(0x00B2D6D2, &MenuMouseMove);
+        insert(0x00B2D710, &numEvents);
+        insert(0x00B2D734, &noSound);
     }
 
     double getValue(size_t address, FIELDTYPE ftype)
