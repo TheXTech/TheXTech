@@ -780,7 +780,8 @@ void InputMethodType_Keyboard::UpdateControlsPost()
 
     bool altPressed = this->m_keyboardState[SDL_SCANCODE_LALT] ||
                       this->m_keyboardState[SDL_SCANCODE_RALT];
-    bool escPressed = this->m_keyboardState[SDL_SCANCODE_ESCAPE];
+    bool escBackPressed = this->m_keyboardState[SDL_SCANCODE_ESCAPE];
+    bool escPausePressed = this->m_keyboardState[SDL_SCANCODE_ESCAPE];
     bool returnPressed = this->m_keyboardState[SDL_SCANCODE_RETURN];
     bool spacePressed = this->m_keyboardState[SDL_SCANCODE_SPACE];
     bool upPressed = this->m_keyboardState[SDL_SCANCODE_UP];
@@ -803,7 +804,8 @@ void InputMethodType_Keyboard::UpdateControlsPost()
             {
                 // allow escape to count even when it is a player's start key, important for correct menu behavior
                 if(i != PlayerControls::Buttons::Start)
-                    escPressed = false;
+                    escBackPressed = false;
+                escPausePressed = false;
             }
             if(profile->m_keys[i] == SDL_SCANCODE_RETURN || profile->m_keys2[i] == SDL_SCANCODE_RETURN)
                 returnPressed = false;
@@ -828,10 +830,10 @@ void InputMethodType_Keyboard::UpdateControlsPost()
 
     SharedControls.QuitCredits |= (spacePressed || backPressed);
     SharedControls.QuitCredits |= (returnPressed && !altPressed);
-    SharedControls.QuitCredits |= (escPressed && !altPressed);
+    SharedControls.QuitCredits |= (escBackPressed && !altPressed);
 
     SharedControls.Pause |= backPressed;
-    SharedControls.Pause |= (escPressed && !altPressed);
+    SharedControls.Pause |= (escPausePressed && !altPressed);
 
     SharedControls.MenuUp |= upPressed;
     SharedControls.MenuDown |= downPressed;
@@ -839,7 +841,7 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     SharedControls.MenuRight |= rightPressed;
     SharedControls.MenuDo |= (returnPressed && !altPressed) || spacePressed;
     SharedControls.MenuBack |= backPressed;
-    SharedControls.MenuBack |= (escPressed && !altPressed);
+    SharedControls.MenuBack |= (escBackPressed && !altPressed);
 }
 
 // this is challenging for the keyboard because we don't want to allocate 20 copies of it
