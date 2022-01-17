@@ -52,7 +52,7 @@ enum COMPARETYPE
     CMPT_EQUALS = 0,
     CMPT_GREATER = 1,
     CMPT_LESS = 2,
-    CMPT_NOTEQ =3
+    CMPT_NOTEQ = 3
 };
 
 enum DIRECTION
