@@ -226,6 +226,7 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     this->m_keys[PlayerControls::Buttons::Run] = SDL_SCANCODE_X;
     this->m_keys[PlayerControls::Buttons::AltRun] = SDL_SCANCODE_S;
     this->m_keys[PlayerControls::Buttons::Drop] = SDL_SCANCODE_LSHIFT;
+    this->m_keys2[PlayerControls::Buttons::Drop] = SDL_SCANCODE_RSHIFT;
     this->m_keys[PlayerControls::Buttons::Start] = SDL_SCANCODE_RETURN;
 
     this->m_editor_keys[EditorControls::Buttons::ScrollUp] = SDL_SCANCODE_UP;
