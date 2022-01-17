@@ -49,6 +49,8 @@
 #include "screen_textentry.h"
 #include "../pseudo_vb.h"
 
+PauseCode GamePaused = PauseCode::None;
+
 //! Holds the screen overlay for the level
 ScreenFader g_levelScreenFader;
 RangeArr<ScreenFader, 0, 2> g_levelVScreenFader;

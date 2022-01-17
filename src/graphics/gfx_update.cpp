@@ -35,6 +35,7 @@
 #include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
 #include "../compat.h"
+#include "../game_main.h"
 #include "../main/game_globals.h"
 #include "../core/render.h"
 
@@ -381,8 +382,8 @@ void UpdateGraphics(bool skipRepaint)
 
     std::string SuperText;
     std::string tempText;
-    int BoxY = 0;
-    bool tempBool = false;
+    // int BoxY = 0;
+    // bool tempBool = false;
     int B = 0;
 //    int B2 = 0;
     int C = 0;

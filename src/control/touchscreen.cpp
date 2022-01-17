@@ -26,6 +26,7 @@
 
 #include "touchscreen.h"
 #include "../globals.h"
+#include "../game_main.h"
 #include "../player.h"
 #include "../core/render.h"
 #include "../core/window.h"

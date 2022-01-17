@@ -52,7 +52,10 @@ RangeArr<Player_t, 1, 2> testPlayer;
 bool ClearBuffer = false;
 int numLocked = 0;
 bool resChanged = false;
-PauseCode GamePaused = PauseCode::None;
+
+// moved into game_loop.cpp
+// PauseCode GamePaused = PauseCode::None;
+
 std::string MessageText;
 int NumSelectWorld  = 0;
 std::vector<SelectWorld_t> SelectWorld;

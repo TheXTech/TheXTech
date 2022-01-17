@@ -1079,8 +1079,10 @@ extern bool resChanged;
 //Public lastJoyButton As Integer
 // extern KM_Key lastJoyButton;
 
+// moved into game_main.h / game_loop.cpp
 //Public GamePaused As Boolean 'true if the game is paused
-extern PauseCode GamePaused;
+// extern PauseCode GamePaused;
+
 //Public MessageText As String 'when talking to an npc
 extern std::string MessageText;
 //Public NumSelectWorld As Integer

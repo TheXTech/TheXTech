@@ -32,6 +32,7 @@
 #include "../main/screen_connect.h"
 #include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
+#include "../game_main.h"
 #include "../main/world_globals.h"
 #include "../core/render.h"
 #include "../screen_fader.h"

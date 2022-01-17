@@ -36,6 +36,9 @@ enum class PauseCode
     TextEntry,
 };
 
+//Public GamePaused As Boolean 'true if the game is paused
+extern PauseCode GamePaused;
+
 void SetupPhysics();
 
 void initAll();
