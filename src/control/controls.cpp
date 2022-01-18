@@ -860,6 +860,10 @@ bool Update()
     }
     else if(s_requestedPause != PauseCode::None)
     {
+        if(s_requestedPause == PauseCode::TextEntry)
+        {
+            TextEntryScreen::Commit();
+        }
         s_requestedPause = PauseCode::None;
     }
 
