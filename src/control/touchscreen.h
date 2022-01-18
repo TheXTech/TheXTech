@@ -174,16 +174,16 @@ public:
         style_END
     };
 
-    enum sizes
+    enum layouts
     {
-        size_small = 0,
-        size_medium,
-        size_large,
+        layout_standard = 0,
+        layout_tight,
         size_END
     };
 
     // touchscreen settings (duplicated from InputMethodProfile_TouchScreen)
-    int m_size = TouchScreenController::size_medium;
+    int m_layout = TouchScreenController::layout_standard;
+    int m_scale_factor = 100;
     int m_touchpad_style = TouchScreenController::style_actions;
     float m_feedback_strength = 0.f;
     int m_feedback_length = 12;
@@ -286,7 +286,8 @@ public:
     using InputMethodProfile::Type;
 
     // touchscreen settings
-    int m_size = TouchScreenController::size_medium;
+    int m_layout = TouchScreenController::layout_standard;
+    int m_scale_factor = 100;
     int m_touchpad_style = TouchScreenController::style_actions;
     float m_feedback_strength = 0.f;
     int m_feedback_length = 12;
@@ -322,7 +323,8 @@ public:
     {
         enum o
         {
-            size,
+            layout,
+            scale_factor,
             style,
             fb_strength,
             fb_length,

@@ -356,8 +356,19 @@ static int buttonY(int player_no, int style)
 
 static struct TouchKeyMap
 {
+    enum anchor
+    {
+        T = 0,
+        B,
+        L = 0,
+        R,
+        C
+    };
+
     struct KeyPos
     {
+        anchor xa;
+        anchor ya;
         float x1;
         float y1;
         float x2;
@@ -456,188 +467,188 @@ static struct TouchKeyMap
 static const TouchKeyMap::KeyPos c_4_tinyPhoneMap[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-    {335.0f, 12.0f, 451.0f, 52.0f, TouchScreenController::key_start},
-    {11.0f, 262.0f, 91.0f, 342.0f, TouchScreenController::key_left},
-    {171.0f, 262.0f, 251.0f, 342.0f, TouchScreenController::key_right},
-    {91.0f, 182.0f, 171.0f, 262.0f, TouchScreenController::key_up},
-    {91.0f, 342.0f, 171.0f, 422.0f, TouchScreenController::key_down},
-    {11.0f, 182.0f, 91.0f, 262.0f, TouchScreenController::key_upleft},
-    {171.0f, 182.0f, 251.0f, 262.0f, TouchScreenController::key_upright},
-    {11.0f, 342.0f, 91.0f, 422.0f, TouchScreenController::key_downleft},
-    {171.0f, 342.0f, 251.0f, 422.0f, TouchScreenController::key_downright},
-    {396.0f, 276.0f, 493.0f, 373.0f, TouchScreenController::key_run},
-    {512.0f, 307.0f, 609.0f, 404.0f, TouchScreenController::key_jump},
-    {416.0f, 163.0f, 513.0f, 260.0f, TouchScreenController::key_altrun},
-    {531.0f, 191.0f, 628.0f, 288.0f, TouchScreenController::key_altjump},
-    {196.0f, 12.0f, 312.0f, 52.0f, TouchScreenController::key_drop},
-    {494.0f, 50.0f, 618.0f, 97.0f, TouchScreenController::key_holdRun},
-    {10.0f, 10.0f, 64.0f, 64.0f, TouchScreenController::key_toggleKeysView},
-    {10.0f, 66.0f, 64.0f, 110.0f, TouchScreenController::key_enterCheats},
+    {TouchKeyMap::L, TouchKeyMap::T, 335.0f, 12.0f, 451.0f, 52.0f, TouchScreenController::key_start},
+    {TouchKeyMap::L, TouchKeyMap::T, 11.0f, 262.0f, 91.0f, 342.0f, TouchScreenController::key_left},
+    {TouchKeyMap::L, TouchKeyMap::T, 171.0f, 262.0f, 251.0f, 342.0f, TouchScreenController::key_right},
+    {TouchKeyMap::L, TouchKeyMap::T, 91.0f, 182.0f, 171.0f, 262.0f, TouchScreenController::key_up},
+    {TouchKeyMap::L, TouchKeyMap::T, 91.0f, 342.0f, 171.0f, 422.0f, TouchScreenController::key_down},
+    {TouchKeyMap::L, TouchKeyMap::T, 11.0f, 182.0f, 91.0f, 262.0f, TouchScreenController::key_upleft},
+    {TouchKeyMap::L, TouchKeyMap::T, 171.0f, 182.0f, 251.0f, 262.0f, TouchScreenController::key_upright},
+    {TouchKeyMap::L, TouchKeyMap::T, 11.0f, 342.0f, 91.0f, 422.0f, TouchScreenController::key_downleft},
+    {TouchKeyMap::L, TouchKeyMap::T, 171.0f, 342.0f, 251.0f, 422.0f, TouchScreenController::key_downright},
+    {TouchKeyMap::L, TouchKeyMap::T, 396.0f, 276.0f, 493.0f, 373.0f, TouchScreenController::key_run},
+    {TouchKeyMap::L, TouchKeyMap::T, 512.0f, 307.0f, 609.0f, 404.0f, TouchScreenController::key_jump},
+    {TouchKeyMap::L, TouchKeyMap::T, 416.0f, 163.0f, 513.0f, 260.0f, TouchScreenController::key_altrun},
+    {TouchKeyMap::L, TouchKeyMap::T, 531.0f, 191.0f, 628.0f, 288.0f, TouchScreenController::key_altjump},
+    {TouchKeyMap::L, TouchKeyMap::T, 196.0f, 12.0f, 312.0f, 52.0f, TouchScreenController::key_drop},
+    {TouchKeyMap::L, TouchKeyMap::T, 494.0f, 50.0f, 618.0f, 97.0f, TouchScreenController::key_holdRun},
+    {TouchKeyMap::L, TouchKeyMap::T, 10.0f, 10.0f, 64.0f, 64.0f, TouchScreenController::key_toggleKeysView},
+    {TouchKeyMap::L, TouchKeyMap::T, 10.0f, 66.0f, 64.0f, 110.0f, TouchScreenController::key_enterCheats},
 };
 
 static const TouchKeyMap::KeyPos c_averagePhoneMap[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-    {542.0f, 537.0f, 693.0f, 587.0f, TouchScreenController::key_start},
-    {1.0f, 410.0f, 83.0f, 492.0f, TouchScreenController::key_left},
-    {165.0f, 410.0f, 247.0f, 492.0f, TouchScreenController::key_right},
-    {83.0f, 328.0f, 165.0f, 410.0f, TouchScreenController::key_up},
-    {83.0f, 492.0f, 165.0f, 574.0f, TouchScreenController::key_down},
-    {1.0f, 328.0f, 83.0f, 410.0f, TouchScreenController::key_upleft},
-    {165.0f, 328.0f, 247.0f, 410.0f, TouchScreenController::key_upright},
-    {1.0f, 492.0f, 83.0f, 574.0f, TouchScreenController::key_downleft},
-    {165.0f, 492.0f, 247.0f, 574.0f, TouchScreenController::key_downright},
-    {764.0f, 403.0f, 868.0f, 507.0f, TouchScreenController::key_run},
-    {885.0f, 436.0f, 989.0f, 540.0f, TouchScreenController::key_jump},
-    {786.0f, 287.0f, 890.0f, 391.0f, TouchScreenController::key_altrun},
-    {904.0f, 317.0f, 1008.0f, 421.0f, TouchScreenController::key_altjump},
-    {331.0f, 537.0f, 482.0f, 587.0f, TouchScreenController::key_drop},
-    {827.0f, 129.0f, 943.0f, 169.0f, TouchScreenController::key_holdRun},
-    {10.0f, 10.0f, 70.0f, 70.0f, TouchScreenController::key_toggleKeysView},
-    {10.0f, 74.0f, 70.0f, 134.0f, TouchScreenController::key_enterCheats},
+    {TouchKeyMap::L, TouchKeyMap::T, 542.0f, 537.0f, 693.0f, 587.0f, TouchScreenController::key_start},
+    {TouchKeyMap::L, TouchKeyMap::T, 1.0f, 410.0f, 83.0f, 492.0f, TouchScreenController::key_left},
+    {TouchKeyMap::L, TouchKeyMap::T, 165.0f, 410.0f, 247.0f, 492.0f, TouchScreenController::key_right},
+    {TouchKeyMap::L, TouchKeyMap::T, 83.0f, 328.0f, 165.0f, 410.0f, TouchScreenController::key_up},
+    {TouchKeyMap::L, TouchKeyMap::T, 83.0f, 492.0f, 165.0f, 574.0f, TouchScreenController::key_down},
+    {TouchKeyMap::L, TouchKeyMap::T, 1.0f, 328.0f, 83.0f, 410.0f, TouchScreenController::key_upleft},
+    {TouchKeyMap::L, TouchKeyMap::T, 165.0f, 328.0f, 247.0f, 410.0f, TouchScreenController::key_upright},
+    {TouchKeyMap::L, TouchKeyMap::T, 1.0f, 492.0f, 83.0f, 574.0f, TouchScreenController::key_downleft},
+    {TouchKeyMap::L, TouchKeyMap::T, 165.0f, 492.0f, 247.0f, 574.0f, TouchScreenController::key_downright},
+    {TouchKeyMap::L, TouchKeyMap::T, 764.0f, 403.0f, 868.0f, 507.0f, TouchScreenController::key_run},
+    {TouchKeyMap::L, TouchKeyMap::T, 885.0f, 436.0f, 989.0f, 540.0f, TouchScreenController::key_jump},
+    {TouchKeyMap::L, TouchKeyMap::T, 786.0f, 287.0f, 890.0f, 391.0f, TouchScreenController::key_altrun},
+    {TouchKeyMap::L, TouchKeyMap::T, 904.0f, 317.0f, 1008.0f, 421.0f, TouchScreenController::key_altjump},
+    {TouchKeyMap::L, TouchKeyMap::T, 331.0f, 537.0f, 482.0f, 587.0f, TouchScreenController::key_drop},
+    {TouchKeyMap::L, TouchKeyMap::T, 827.0f, 129.0f, 943.0f, 169.0f, TouchScreenController::key_holdRun},
+    {TouchKeyMap::L, TouchKeyMap::T, 10.0f, 10.0f, 70.0f, 70.0f, TouchScreenController::key_toggleKeysView},
+    {TouchKeyMap::L, TouchKeyMap::T, 10.0f, 74.0f, 70.0f, 134.0f, TouchScreenController::key_enterCheats},
 };
 
 static const TouchKeyMap::KeyPos c_averagePhoneLongMap[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-    {727.0f, 632.0f, 911.0f, 691.0f, TouchScreenController::key_start},
-    {5.0f, 444.0f, 106.0f, 545.0f, TouchScreenController::key_left},
-    {207.0f, 444.0f, 308.0f, 545.0f, TouchScreenController::key_right},
-    {106.0f, 343.0f, 207.0f, 444.0f, TouchScreenController::key_up},
-    {106.0f, 545.0f, 207.0f, 646.0f, TouchScreenController::key_down},
-    {5.0f, 343.0f, 106.0f, 444.0f, TouchScreenController::key_upleft},
-    {207.0f, 343.0f, 308.0f, 444.0f, TouchScreenController::key_upright},
-    {5.0f, 545.0f, 106.0f, 646.0f, TouchScreenController::key_downleft},
-    {207.0f, 545.0f, 308.0f, 646.0f, TouchScreenController::key_downright},
-    {1055.0f, 500.0f, 1183.0f, 628.0f, TouchScreenController::key_run},
-    {1218.0f, 537.0f, 1346.0f, 665.0f, TouchScreenController::key_jump},
-    {1085.0f, 351.0f, 1213.0f, 479.0f, TouchScreenController::key_altrun},
-    {1242.0f, 389.0f, 1370.0f, 517.0f, TouchScreenController::key_altjump},
-    {474.0f, 632.0f, 658.0f, 691.0f, TouchScreenController::key_drop},
-    {1178.0f, 214.0f, 1315.0f, 275.0f, TouchScreenController::key_holdRun},
-    {10.0f, 10.0f, 85.0f, 85.0f, TouchScreenController::key_toggleKeysView},
-    {10.0f, 90.0f, 85.0f, 165.0f, TouchScreenController::key_enterCheats},
+    {TouchKeyMap::L, TouchKeyMap::T, 727.0f, 632.0f, 911.0f, 691.0f, TouchScreenController::key_start},
+    {TouchKeyMap::L, TouchKeyMap::T, 5.0f, 444.0f, 106.0f, 545.0f, TouchScreenController::key_left},
+    {TouchKeyMap::L, TouchKeyMap::T, 207.0f, 444.0f, 308.0f, 545.0f, TouchScreenController::key_right},
+    {TouchKeyMap::L, TouchKeyMap::T, 106.0f, 343.0f, 207.0f, 444.0f, TouchScreenController::key_up},
+    {TouchKeyMap::L, TouchKeyMap::T, 106.0f, 545.0f, 207.0f, 646.0f, TouchScreenController::key_down},
+    {TouchKeyMap::L, TouchKeyMap::T, 5.0f, 343.0f, 106.0f, 444.0f, TouchScreenController::key_upleft},
+    {TouchKeyMap::L, TouchKeyMap::T, 207.0f, 343.0f, 308.0f, 444.0f, TouchScreenController::key_upright},
+    {TouchKeyMap::L, TouchKeyMap::T, 5.0f, 545.0f, 106.0f, 646.0f, TouchScreenController::key_downleft},
+    {TouchKeyMap::L, TouchKeyMap::T, 207.0f, 545.0f, 308.0f, 646.0f, TouchScreenController::key_downright},
+    {TouchKeyMap::L, TouchKeyMap::T, 1055.0f, 500.0f, 1183.0f, 628.0f, TouchScreenController::key_run},
+    {TouchKeyMap::L, TouchKeyMap::T, 1218.0f, 537.0f, 1346.0f, 665.0f, TouchScreenController::key_jump},
+    {TouchKeyMap::L, TouchKeyMap::T, 1085.0f, 351.0f, 1213.0f, 479.0f, TouchScreenController::key_altrun},
+    {TouchKeyMap::L, TouchKeyMap::T, 1242.0f, 389.0f, 1370.0f, 517.0f, TouchScreenController::key_altjump},
+    {TouchKeyMap::L, TouchKeyMap::T, 474.0f, 632.0f, 658.0f, 691.0f, TouchScreenController::key_drop},
+    {TouchKeyMap::L, TouchKeyMap::T, 1178.0f, 214.0f, 1315.0f, 275.0f, TouchScreenController::key_holdRun},
+    {TouchKeyMap::L, TouchKeyMap::T, 10.0f, 10.0f, 85.0f, 85.0f, TouchScreenController::key_toggleKeysView},
+    {TouchKeyMap::L, TouchKeyMap::T, 10.0f, 90.0f, 85.0f, 165.0f, TouchScreenController::key_enterCheats},
 };
 
 static const TouchKeyMap::KeyPos c_7_tablet[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-    {636.0f, 544.0f, 775.0f, 582.0f, TouchScreenController::key_start},
-    {3.0f, 430.0f, 76.0f, 503.0f, TouchScreenController::key_left},
-    {149.0f, 430.0f, 222.0f, 503.0f, TouchScreenController::key_right},
-    {76.0f, 357.0f, 149.0f, 430.0f, TouchScreenController::key_up},
-    {76.0f, 503.0f, 149.0f, 576.0f, TouchScreenController::key_down},
-    {3.0f, 357.0f, 76.0f, 430.0f, TouchScreenController::key_upleft},
-    {149.0f, 357.0f, 222.0f, 430.0f, TouchScreenController::key_upright},
-    {3.0f, 503.0f, 76.0f, 576.0f, TouchScreenController::key_downleft},
-    {149.0f, 503.0f, 222.0f, 576.0f, TouchScreenController::key_downright},
-    {797.0f, 439.0f, 887.0f, 529.0f, TouchScreenController::key_run},
-    {897.0f, 463.0f, 987.0f, 553.0f, TouchScreenController::key_jump},
-    {819.0f, 341.0f, 909.0f, 431.0f, TouchScreenController::key_altrun},
-    {919.0f, 363.0f, 1009.0f, 453.0f, TouchScreenController::key_altjump},
-    {257.0f, 544.0f, 396.0f, 582.0f, TouchScreenController::key_drop},
-    {873.0f, 226.0f, 968.0f, 258.0f, TouchScreenController::key_holdRun},
-    {10.0f, 10.0f, 58.0f, 58.0f, TouchScreenController::key_toggleKeysView},
-    {10.0f, 64.0f, 58.0f, 112.0f, TouchScreenController::key_enterCheats},
+    {TouchKeyMap::L, TouchKeyMap::T, 636.0f, 544.0f, 775.0f, 582.0f, TouchScreenController::key_start},
+    {TouchKeyMap::L, TouchKeyMap::T, 3.0f, 430.0f, 76.0f, 503.0f, TouchScreenController::key_left},
+    {TouchKeyMap::L, TouchKeyMap::T, 149.0f, 430.0f, 222.0f, 503.0f, TouchScreenController::key_right},
+    {TouchKeyMap::L, TouchKeyMap::T, 76.0f, 357.0f, 149.0f, 430.0f, TouchScreenController::key_up},
+    {TouchKeyMap::L, TouchKeyMap::T, 76.0f, 503.0f, 149.0f, 576.0f, TouchScreenController::key_down},
+    {TouchKeyMap::L, TouchKeyMap::T, 3.0f, 357.0f, 76.0f, 430.0f, TouchScreenController::key_upleft},
+    {TouchKeyMap::L, TouchKeyMap::T, 149.0f, 357.0f, 222.0f, 430.0f, TouchScreenController::key_upright},
+    {TouchKeyMap::L, TouchKeyMap::T, 3.0f, 503.0f, 76.0f, 576.0f, TouchScreenController::key_downleft},
+    {TouchKeyMap::L, TouchKeyMap::T, 149.0f, 503.0f, 222.0f, 576.0f, TouchScreenController::key_downright},
+    {TouchKeyMap::L, TouchKeyMap::T, 797.0f, 439.0f, 887.0f, 529.0f, TouchScreenController::key_run},
+    {TouchKeyMap::L, TouchKeyMap::T, 897.0f, 463.0f, 987.0f, 553.0f, TouchScreenController::key_jump},
+    {TouchKeyMap::L, TouchKeyMap::T, 819.0f, 341.0f, 909.0f, 431.0f, TouchScreenController::key_altrun},
+    {TouchKeyMap::L, TouchKeyMap::T, 919.0f, 363.0f, 1009.0f, 453.0f, TouchScreenController::key_altjump},
+    {TouchKeyMap::L, TouchKeyMap::T, 257.0f, 544.0f, 396.0f, 582.0f, TouchScreenController::key_drop},
+    {TouchKeyMap::L, TouchKeyMap::T, 873.0f, 226.0f, 968.0f, 258.0f, TouchScreenController::key_holdRun},
+    {TouchKeyMap::L, TouchKeyMap::T, 10.0f, 10.0f, 58.0f, 58.0f, TouchScreenController::key_toggleKeysView},
+    {TouchKeyMap::L, TouchKeyMap::T, 10.0f, 64.0f, 58.0f, 112.0f, TouchScreenController::key_enterCheats},
 };
 
 static const TouchKeyMap::KeyPos c_10_6_tablet[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-    {869.0f, 753.0f, 1002.0f, 785.0f, TouchScreenController::key_start},
-    {19.0f, 591.0f, 89.0f, 661.0f, TouchScreenController::key_left},
-    {159.0f, 591.0f, 229.0f, 661.0f, TouchScreenController::key_right},
-    {89.0f, 521.0f, 159.0f, 591.0f, TouchScreenController::key_up},
-    {89.0f, 661.0f, 159.0f, 731.0f, TouchScreenController::key_down},
-    {19.0f, 521.0f, 89.0f, 591.0f, TouchScreenController::key_upleft},
-    {159.0f, 521.0f, 229.0f, 591.0f, TouchScreenController::key_upright},
-    {19.0f, 661.0f, 89.0f, 731.0f, TouchScreenController::key_downleft},
-    {159.0f, 661.0f, 229.0f, 731.0f, TouchScreenController::key_downright},
-    {1047.0f, 588.0f, 1137.0f, 678.0f, TouchScreenController::key_run},
-    {1159.0f, 624.0f, 1249.0f, 714.0f, TouchScreenController::key_jump},
-    {1067.0f, 477.0f, 1157.0f, 567.0f, TouchScreenController::key_altrun},
-    {1179.0f, 505.0f, 1269.0f, 595.0f, TouchScreenController::key_altjump},
-    {256.0f, 753.0f, 389.0f, 785.0f, TouchScreenController::key_drop},
-    {1131.0f, 387.0f, 1225.0f, 426.0f, TouchScreenController::key_holdRun},
-    {10.0f, 10.0f, 57.0f, 57.0f, TouchScreenController::key_toggleKeysView},
-    {10.0f, 60.0f, 57.0f, 107.0f, TouchScreenController::key_enterCheats},
+    {TouchKeyMap::L, TouchKeyMap::T, 869.0f, 753.0f, 1002.0f, 785.0f, TouchScreenController::key_start},
+    {TouchKeyMap::L, TouchKeyMap::T, 19.0f, 591.0f, 89.0f, 661.0f, TouchScreenController::key_left},
+    {TouchKeyMap::L, TouchKeyMap::T, 159.0f, 591.0f, 229.0f, 661.0f, TouchScreenController::key_right},
+    {TouchKeyMap::L, TouchKeyMap::T, 89.0f, 521.0f, 159.0f, 591.0f, TouchScreenController::key_up},
+    {TouchKeyMap::L, TouchKeyMap::T, 89.0f, 661.0f, 159.0f, 731.0f, TouchScreenController::key_down},
+    {TouchKeyMap::L, TouchKeyMap::T, 19.0f, 521.0f, 89.0f, 591.0f, TouchScreenController::key_upleft},
+    {TouchKeyMap::L, TouchKeyMap::T, 159.0f, 521.0f, 229.0f, 591.0f, TouchScreenController::key_upright},
+    {TouchKeyMap::L, TouchKeyMap::T, 19.0f, 661.0f, 89.0f, 731.0f, TouchScreenController::key_downleft},
+    {TouchKeyMap::L, TouchKeyMap::T, 159.0f, 661.0f, 229.0f, 731.0f, TouchScreenController::key_downright},
+    {TouchKeyMap::L, TouchKeyMap::T, 1047.0f, 588.0f, 1137.0f, 678.0f, TouchScreenController::key_run},
+    {TouchKeyMap::L, TouchKeyMap::T, 1159.0f, 624.0f, 1249.0f, 714.0f, TouchScreenController::key_jump},
+    {TouchKeyMap::L, TouchKeyMap::T, 1067.0f, 477.0f, 1157.0f, 567.0f, TouchScreenController::key_altrun},
+    {TouchKeyMap::L, TouchKeyMap::T, 1179.0f, 505.0f, 1269.0f, 595.0f, TouchScreenController::key_altjump},
+    {TouchKeyMap::L, TouchKeyMap::T, 256.0f, 753.0f, 389.0f, 785.0f, TouchScreenController::key_drop},
+    {TouchKeyMap::L, TouchKeyMap::T, 1131.0f, 387.0f, 1225.0f, 426.0f, TouchScreenController::key_holdRun},
+    {TouchKeyMap::L, TouchKeyMap::T, 10.0f, 10.0f, 57.0f, 57.0f, TouchScreenController::key_toggleKeysView},
+    {TouchKeyMap::L, TouchKeyMap::T, 10.0f, 60.0f, 57.0f, 107.0f, TouchScreenController::key_enterCheats},
 };
 
 // watch your aspect ratios. they are preserved now!
 
-// based on c_10_6_tablet
+// based on c_10_6_tablet; no longer used.
 static const TouchKeyMap::KeyPos c_smallAutoMap[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-    {-0.46, -0.08, -0.35, -0.04, TouchScreenController::key_start},
-    {0.015, -0.245, 0.105, -0.155, TouchScreenController::key_left},
-    {0.195, -0.245, 0.285, -0.155, TouchScreenController::key_right},
-    {0.105, -0.335, 0.195, -0.245, TouchScreenController::key_up},
-    {0.105, -0.155, 0.195, -0.065, TouchScreenController::key_down},
-    {0.015, -0.335, 0.105, -0.245, TouchScreenController::key_upleft},
-    {0.195, -0.335, 0.285, -0.245, TouchScreenController::key_upright},
-    {0.015, -0.155, 0.105, -0.065, TouchScreenController::key_downleft},
-    {0.195, -0.155, 0.285, -0.065, TouchScreenController::key_downright},
-    {-0.265, -0.215, -0.165, -0.115, TouchScreenController::key_run},
-    {-0.15, -0.20, -0.05, -0.10, TouchScreenController::key_jump},
-    {-0.25, -0.33, -0.15, -0.23, TouchScreenController::key_altrun},
-    {-0.135, -0.315, -0.035, -0.215, TouchScreenController::key_altjump},
-    {0.3475, -0.08, 0.4625, -0.04, TouchScreenController::key_drop},
-    {-0.09, -0.40, -0.015, -0.36, TouchScreenController::key_holdRun},
-    {0.01, 0.01, 0.07, 0.07, TouchScreenController::key_toggleKeysView},
-    {0.01, 0.08, 0.07, 0.14, TouchScreenController::key_enterCheats},
+    {TouchKeyMap::C, TouchKeyMap::B, 0.04, -0.08, 0.15, -0.04, TouchScreenController::key_start},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.015, -0.245, 0.105, -0.155, TouchScreenController::key_left},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.195, -0.245, 0.285, -0.155, TouchScreenController::key_right},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.105, -0.335, 0.195, -0.245, TouchScreenController::key_up},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.105, -0.155, 0.195, -0.065, TouchScreenController::key_down},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.015, -0.335, 0.105, -0.245, TouchScreenController::key_upleft},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.195, -0.335, 0.285, -0.245, TouchScreenController::key_upright},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.015, -0.155, 0.105, -0.065, TouchScreenController::key_downleft},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.195, -0.155, 0.285, -0.065, TouchScreenController::key_downright},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.265, -0.215, -0.165, -0.115, TouchScreenController::key_run},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.15, -0.20, -0.05, -0.10, TouchScreenController::key_jump},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.25, -0.33, -0.15, -0.23, TouchScreenController::key_altrun},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.135, -0.315, -0.035, -0.215, TouchScreenController::key_altjump},
+    {TouchKeyMap::C, TouchKeyMap::B, -0.1525, -0.08, -0.0375, -0.04, TouchScreenController::key_drop},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.12, -0.40, -0.045, -0.36, TouchScreenController::key_holdRun},
+    {TouchKeyMap::L, TouchKeyMap::T, 0.01, 0.01, 0.07, 0.07, TouchScreenController::key_toggleKeysView},
+    {TouchKeyMap::L, TouchKeyMap::T, 0.01, 0.08, 0.07, 0.14, TouchScreenController::key_enterCheats},
 };
 
 // based on c_averagePhoneMap
-static const TouchKeyMap::KeyPos c_mediumAutoMap[TouchScreenController::key_END] =
+static const TouchKeyMap::KeyPos c_standardAutoMap[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-    {0.74, -0.09, 0.96, -0.01, TouchScreenController::key_start},
-    {0.01, -0.29, 0.15, -0.15, TouchScreenController::key_left},
-    {0.29, -0.29, 0.43, -0.15, TouchScreenController::key_right},
-    {0.15, -0.43, 0.29, -0.29, TouchScreenController::key_up},
-    {0.15, -0.15, 0.29, -0.01, TouchScreenController::key_down},
-    {0.01, -0.43, 0.15, -0.29, TouchScreenController::key_upleft},
-    {0.29, -0.43, 0.43, -0.29, TouchScreenController::key_upright},
-    {0.01, -0.15, 0.15, -0.01, TouchScreenController::key_downleft},
-    {0.29, -0.15, 0.43, -0.01, TouchScreenController::key_downright},
-    {-0.375, -0.275, -0.225, -0.125, TouchScreenController::key_run},
-    {-0.20, -0.25, -0.05, -0.10, TouchScreenController::key_jump},
-    {-0.35, -0.45, -0.20, -0.30, TouchScreenController::key_altrun},
-    {-0.175, -0.425, -0.025, -0.275, TouchScreenController::key_altjump},
-    {0.47, -0.09, 0.70, -0.01, TouchScreenController::key_drop},
-    {-0.20, 0.11, -0.05, 0.19, TouchScreenController::key_holdRun},
-    {0.02, 0.02, 0.12, 0.12, TouchScreenController::key_toggleKeysView},
-    {0.02, 0.14, 0.12, 0.24, TouchScreenController::key_enterCheats},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.555, -0.07, -0.39, -0.01, TouchScreenController::key_start},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.01, -0.34, 0.15, -0.20, TouchScreenController::key_left},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.29, -0.34, 0.43, -0.20, TouchScreenController::key_right},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.15, -0.48, 0.29, -0.34, TouchScreenController::key_up},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.15, -0.20, 0.29, -0.06, TouchScreenController::key_down},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.01, -0.48, 0.15, -0.34, TouchScreenController::key_upleft},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.29, -0.48, 0.43, -0.34, TouchScreenController::key_upright},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.01, -0.20, 0.15, -0.06, TouchScreenController::key_downleft},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.29, -0.20, 0.43, -0.06, TouchScreenController::key_downright},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.375, -0.275, -0.225, -0.125, TouchScreenController::key_run},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.20, -0.25, -0.05, -0.10, TouchScreenController::key_jump},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.35, -0.45, -0.20, -0.30, TouchScreenController::key_altrun},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.175, -0.425, -0.025, -0.275, TouchScreenController::key_altjump},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.44, -0.07, 0.6125, -0.01, TouchScreenController::key_drop},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.20, -0.56, -0.05, -0.48, TouchScreenController::key_holdRun},
+    {TouchKeyMap::L, TouchKeyMap::T, 0.02, 0.02, 0.12, 0.12, TouchScreenController::key_toggleKeysView},
+    {TouchKeyMap::L, TouchKeyMap::T, 0.02, 0.14, 0.12, 0.24, TouchScreenController::key_enterCheats},
 };
 
 // based on c_4_tinyPhoneMap
-static const TouchKeyMap::KeyPos c_largeAutoMap[TouchScreenController::key_END] =
+static const TouchKeyMap::KeyPos c_tightAutoMap[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
-    {-0.50, 0.02, -0.17, 0.14, TouchScreenController::key_start},
-    {0.01, -0.37, 0.18, -0.20, TouchScreenController::key_left},
-    {0.35, -0.37, 0.52, -0.20, TouchScreenController::key_right},
-    {0.18, -0.54, 0.35, -0.37, TouchScreenController::key_up},
-    {0.18, -0.20, 0.35, -0.03, TouchScreenController::key_down},
-    {0.01, -0.54, 0.18, -0.37, TouchScreenController::key_upleft},
-    {0.35, -0.54, 0.52, -0.37, TouchScreenController::key_upright},
-    {0.01, -0.20, 0.18, -0.03, TouchScreenController::key_downleft},
-    {0.35, -0.20, 0.52, -0.03, TouchScreenController::key_downright},
-    {-0.48, -0.25, -0.28, -0.05, TouchScreenController::key_run},
-    {-0.25, -0.22, -0.05, -0.02, TouchScreenController::key_jump},
-    {-0.45, -0.48, -0.25, -0.28, TouchScreenController::key_altrun},
-    {-0.22, -0.45, -0.02, -0.25, TouchScreenController::key_altjump},
-    {0.165, 0.02, 0.50, 0.14, TouchScreenController::key_drop},
-    {-0.245, 0.16, -0.02, 0.28, TouchScreenController::key_holdRun},
-    {0.02, 0.02, 0.14, 0.14, TouchScreenController::key_toggleKeysView},
-    {0.02, 0.16, 0.14, 0.28, TouchScreenController::key_enterCheats},
+    {TouchKeyMap::R, TouchKeyMap::T, -0.50, 0.02, -0.17, 0.14, TouchScreenController::key_start},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.01, -0.37, 0.18, -0.20, TouchScreenController::key_left},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.35, -0.37, 0.52, -0.20, TouchScreenController::key_right},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.18, -0.54, 0.35, -0.37, TouchScreenController::key_up},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.18, -0.20, 0.35, -0.03, TouchScreenController::key_down},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.01, -0.54, 0.18, -0.37, TouchScreenController::key_upleft},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.35, -0.54, 0.52, -0.37, TouchScreenController::key_upright},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.01, -0.20, 0.18, -0.03, TouchScreenController::key_downleft},
+    {TouchKeyMap::L, TouchKeyMap::B, 0.35, -0.20, 0.52, -0.03, TouchScreenController::key_downright},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.48, -0.25, -0.28, -0.05, TouchScreenController::key_run},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.25, -0.22, -0.05, -0.02, TouchScreenController::key_jump},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.45, -0.48, -0.25, -0.28, TouchScreenController::key_altrun},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.22, -0.45, -0.02, -0.25, TouchScreenController::key_altjump},
+    {TouchKeyMap::L, TouchKeyMap::T, 0.165, 0.02, 0.50, 0.14, TouchScreenController::key_drop},
+    {TouchKeyMap::R, TouchKeyMap::B, -0.245, -0.62, -0.02, -0.50, TouchScreenController::key_holdRun},
+    {TouchKeyMap::L, TouchKeyMap::T, 0.02, 0.02, 0.14, 0.14, TouchScreenController::key_toggleKeysView},
+    {TouchKeyMap::L, TouchKeyMap::T, 0.02, 0.16, 0.14, 0.28, TouchScreenController::key_enterCheats},
 };
 /*---------------------------------------------------------------------------------------*/
 
 // figures out the ratio between sides (such that smaller, usually y, axis size is 1)
 //   then handles all of the bottom/right anchored items
-static void updateTouchMap(int preferredSize, float screenWidth, float screenHeight)
+static void updateTouchMap(int preferredLayout, float screenWidth, float screenHeight, int scaleFactor)
 {
     if(screenWidth > screenHeight)
     {
@@ -649,29 +660,36 @@ static void updateTouchMap(int preferredSize, float screenWidth, float screenHei
         g_touchKeyMap.touchCanvasWidth = 1.f;
         g_touchKeyMap.touchCanvasHeight = screenHeight / screenWidth;
     }
-    if(preferredSize == TouchScreenController::size_small)
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_smallAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
-    else if(preferredSize == TouchScreenController::size_medium)
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_mediumAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
+    if(preferredLayout == TouchScreenController::layout_tight)
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_tightAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
     else
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_largeAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_standardAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
     for(int i = 0; i < TouchScreenController::key_END; i++)
     {
-        if(g_touchKeyMap.touchKeysMap[i].x1 < 0)
+        g_touchKeyMap.touchKeysMap[i].x1 *= scaleFactor / 100.f;
+        g_touchKeyMap.touchKeysMap[i].x2 *= scaleFactor / 100.f;
+        g_touchKeyMap.touchKeysMap[i].y1 *= scaleFactor / 100.f;
+        g_touchKeyMap.touchKeysMap[i].y2 *= scaleFactor / 100.f;
+
+        if(g_touchKeyMap.touchKeysMap[i].xa == TouchKeyMap::R)
         {
             g_touchKeyMap.touchKeysMap[i].x1 += g_touchKeyMap.touchCanvasWidth;
-        }
-        if(g_touchKeyMap.touchKeysMap[i].x2 < 0)
-        {
             g_touchKeyMap.touchKeysMap[i].x2 += g_touchKeyMap.touchCanvasWidth;
         }
-        if(g_touchKeyMap.touchKeysMap[i].y1 < 0)
+        else if(g_touchKeyMap.touchKeysMap[i].xa == TouchKeyMap::C)
+        {
+            g_touchKeyMap.touchKeysMap[i].x1 += g_touchKeyMap.touchCanvasWidth / 2;
+            g_touchKeyMap.touchKeysMap[i].x2 += g_touchKeyMap.touchCanvasWidth / 2;
+        }
+        if(g_touchKeyMap.touchKeysMap[i].ya == TouchKeyMap::B)
         {
             g_touchKeyMap.touchKeysMap[i].y1 += g_touchKeyMap.touchCanvasHeight;
-        }
-        if(g_touchKeyMap.touchKeysMap[i].y2 < 0)
-        {
             g_touchKeyMap.touchKeysMap[i].y2 += g_touchKeyMap.touchCanvasHeight;
+        }
+        else if(g_touchKeyMap.touchKeysMap[i].ya == TouchKeyMap::C)
+        {
+            g_touchKeyMap.touchKeysMap[i].y1 += g_touchKeyMap.touchCanvasHeight / 2;
+            g_touchKeyMap.touchKeysMap[i].y2 += g_touchKeyMap.touchCanvasHeight / 2;
         }
     }
 }
@@ -743,7 +761,7 @@ void TouchScreenController::updateScreenSize()
 {
     XWindow::getWindowSize(&m_screenWidth, &m_screenHeight);
 
-    updateTouchMap(m_size, m_screenWidth, m_screenHeight);
+    updateTouchMap(m_layout, m_screenWidth, m_screenHeight, m_scale_factor);
 }
 
 static void updateKeyValue(bool &key, bool state)
@@ -981,9 +999,14 @@ void TouchScreenController::update()
                 this->m_hold_run = p->m_hold_run;
                 this->m_runHeld = this->m_hold_run;
             }
-            if(this->m_size != p->m_size)
+            if(this->m_layout != p->m_layout)
             {
-                this->m_size = p->m_size;
+                this->m_layout = p->m_layout;
+                this->updateScreenSize();
+            }
+            if(this->m_scale_factor != p->m_scale_factor)
+            {
+                this->m_scale_factor = p->m_scale_factor;
                 this->updateScreenSize();
             }
         }
@@ -1293,7 +1316,8 @@ const char* InputMethodProfile_TouchScreen::NameSecondaryButton(ControlsClass c,
 
 void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
 {
-    ctl->setValue("ui-size", this->m_size);
+    ctl->setValue("ui-layout", this->m_layout);
+    ctl->setValue("scale-factor", this->m_scale_factor);
     ctl->setValue("ui-style", this->m_touchpad_style);
     ctl->setValue("vibration-strength", this->m_feedback_strength);
     ctl->setValue("vibration-length", this->m_feedback_length);
@@ -1303,7 +1327,8 @@ void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
 
 void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
 {
-    ctl->read("ui-size", this->m_size, TouchScreenController::size_medium);
+    ctl->read("ui-layout", this->m_layout, TouchScreenController::layout_standard);
+    ctl->read("scale-factor", this->m_scale_factor, 100);
     ctl->read("ui-style", this->m_touchpad_style, TouchScreenController::style_actions);
     ctl->read("vibration-strength", this->m_feedback_strength, 0.f);
     ctl->read("vibration-length", this->m_feedback_length, 12);
@@ -1325,8 +1350,10 @@ const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
 {
     switch(i)
     {
-    case Options::size:
-        return "INTERFACE SIZE";
+    case Options::layout:
+        return "LAYOUT STYLE";
+    case Options::scale_factor:
+        return "SCALE FACTOR";
     case Options::style:
         return "INTERFACE STYLE";
     case Options::fb_strength:
@@ -1348,13 +1375,14 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
     static char length_buf[8];
     switch(i)
     {
-    case Options::size:
-        if(this->m_size == TouchScreenController::size_small)
-            return "SMALL";
-        else if(this->m_size == TouchScreenController::size_medium)
-            return "MEDIUM";
+    case Options::layout:
+        if(this->m_layout == TouchScreenController::layout_tight)
+            return "TIGHT";
         else
-            return "LARGE";
+            return "STANDARD";
+    case Options::scale_factor:
+        SDL_snprintf(length_buf, 8, "%d%%", this->m_scale_factor);
+        return length_buf;
     case Options::style:
         if(this->m_touchpad_style == TouchScreenController::style_actions)
             return "ACTIONS";
@@ -1399,12 +1427,20 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
 {
     switch(i)
     {
-    case Options::size:
-        if(this->m_size > 0)
-            this->m_size --;
+    case Options::layout:
+        if(this->m_layout > 0)
+            this->m_layout --;
         else
-            this->m_size = TouchScreenController::size_END - 1;
+            this->m_layout = TouchScreenController::size_END - 1;
         return true;
+    case Options::scale_factor:
+        if(this->m_scale_factor > 50)
+        {
+            this->m_scale_factor -= 5;
+            return true;
+        }
+        else
+            return false;
     case Options::style:
         if(this->m_touchpad_style > 0)
             this->m_touchpad_style --;
@@ -1439,11 +1475,19 @@ bool InputMethodProfile_TouchScreen::OptionRotateRight_Custom(size_t i)
 {
     switch(i)
     {
-    case Options::size:
-        this->m_size ++;
-        if(this->m_size >= TouchScreenController::size_END)
-            this->m_size = 0;
+    case Options::layout:
+        this->m_layout ++;
+        if(this->m_layout >= TouchScreenController::size_END)
+            this->m_layout = 0;
         return true;
+    case Options::scale_factor:
+        if(this->m_scale_factor < 150)
+        {
+            this->m_scale_factor += 5;
+            return true;
+        }
+        else
+            return false;
     case Options::style:
         this->m_touchpad_style ++;
         if(this->m_touchpad_style >= TouchScreenController::style_END)
