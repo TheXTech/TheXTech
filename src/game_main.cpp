@@ -1539,6 +1539,8 @@ void StartEpisode()
         Controls::DeleteInputMethodSlot(i);
     }
 
+    ConnectScreen::SaveChars();
+
     numStars = 0;
     Coins = 0;
     Score = 0;
