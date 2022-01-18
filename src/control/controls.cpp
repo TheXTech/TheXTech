@@ -85,11 +85,8 @@ void Hotkeys::Activate(size_t i, int player)
             ShowOnScreenMeta = !ShowOnScreenMeta;
             return;
         case Buttons::LegacyPause:
-            if(player >= 1 && player <= numPlayers)
-                Player[player].Controls.Start = true;
-            else
-                SharedControls.Pause = true;
-            SharedControls.LegacyPause = true;
+            // handled elsewhere
+            (void)player;
             return;
         default:
             return;
@@ -733,7 +730,10 @@ bool Update()
     if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] != -1)
     {
         int A = g_hotkeysPressed[Hotkeys::Buttons::LegacyPause];
-        Player[A].Controls.Start = true;
+        if(A >= 1 && A <= numPlayers)
+            Player[A].Controls.Start = true;
+        else
+            SharedControls.Pause = true;
         SharedControls.LegacyPause = true;
     }
 
