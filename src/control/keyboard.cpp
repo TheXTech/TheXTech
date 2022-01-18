@@ -39,6 +39,15 @@ namespace Controls
 || implementation for InputMethod_Keyboard            ||
 \*====================================================*/
 
+InputMethod_Keyboard::~InputMethod_Keyboard()
+{
+    InputMethodType_Keyboard* t = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
+    if(!t)
+        return;
+
+    t->m_numKeyboards --;
+}
+
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
 bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h)
@@ -847,31 +856,18 @@ void InputMethodType_Keyboard::UpdateControlsPost()
 // this is challenging for the keyboard because we don't want to allocate 20 copies of it
 InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& active_methods) noexcept
 {
-    int n_keyboards = 0;
-    for(InputMethod* method : active_methods)
-    {
-        if(!method)
-            continue;
-        InputMethod_Keyboard* m = dynamic_cast<InputMethod_Keyboard*>(method);
-        if(m)
-        {
-            n_keyboards ++;
-        }
-    }
-
-    if(n_keyboards != m_lastNumKeyboards)
+    if(this->m_numKeyboards != this->m_lastNumKeyboards)
     {
         // this ensures that keys that were held when a keyboard method was removed cannot be polled to add that method back
-        if(n_keyboards < this->m_lastNumKeyboards)
-        {
+        if(this->m_numKeyboards < this->m_lastNumKeyboards)
             this->m_canPoll = false;
-        }
-        this->m_lastNumKeyboards = n_keyboards;
+
+        this->m_lastNumKeyboards = this->m_numKeyboards;
     }
 
-    if(n_keyboards >= m_maxKeyboards)
+    if(this->m_numKeyboards >= m_maxKeyboards)
     {
-        // reset in case things change
+        // ban polling in case things change
         this->m_canPoll = false;
         return nullptr;
     }
@@ -1001,6 +997,8 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
     method->Type = this;
     method->Profile = target_profile;
 
+    this->m_numKeyboards ++;
+
     return (InputMethod*)method;
 }
 
@@ -1019,7 +1017,7 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
     if(ctrlF || altEnter)
         g_hotkeysPressed[Hotkeys::Buttons::Fullscreen] = 0;
 
-    if(m_lastNumKeyboards == 0 && evt.repeat == 0)
+    if(this->m_numKeyboards == 0 && evt.repeat == 0)
     {
         // ALSO UPDATE InputMethodProfile_Keyboard::InputMethodProfile_Keyboard
         if(KeyCode == SDL_SCANCODE_F12 || KeyCode == SDL_SCANCODE_F2)

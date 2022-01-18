@@ -14,6 +14,8 @@ public:
     using InputMethod::Type;
     using InputMethod::Profile;
 
+    ~InputMethod_Keyboard();
+
     // Update functions that set player controls (and editor controls)
     // based on current device input. Return false if device lost.
     bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h);
@@ -79,6 +81,8 @@ private:
     InputMethodProfile* AllocateProfile() noexcept;
 
 public:
+    int m_numKeyboards = 0;
+
     // options
     int m_maxKeyboards = 2;
     bool m_directText = true;
