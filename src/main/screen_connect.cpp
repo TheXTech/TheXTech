@@ -1125,9 +1125,12 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         {
             if(s_context == Context::MainMenu && s_minPlayers == 1)
             {
-                XRender::renderRect(ScreenW / 2 - 320, pY + 2.5 * line, 640, 2.5 * line, 0, 0, 0, 0.5);
-                if(BlockFlash < 45)
-                    SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, pY+3.5*line);
+                if(g_charSelect[0] > 0)
+                {
+                    XRender::renderRect(ScreenW / 2 - 320, pY + 2.5 * line, 640, 2.5 * line, 0, 0, 0, 0.5);
+                    if(BlockFlash < 45)
+                        SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, pY+3.5*line, 0.8, 0, 0);
+                }
             }
             else if(BlockFlash < 45)
                 SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, pY+2*line);
@@ -1306,7 +1309,7 @@ int Mouse_Render(bool mouse, bool render)
 
     if(s_context == Context::MainMenu && s_minPlayers == 1)
     {
-        if(s_playerState[0] == PlayerState::Disconnected || s_playerState[0] == PlayerState::SelectChar)
+        if((s_playerState[0] == PlayerState::Disconnected && s_menuItem[0] != 2) || s_playerState[0] == PlayerState::SelectChar)
             Chars_Mouse_Render(300, 200, 350, 150, mouse, render);
     }
     else
@@ -1351,12 +1354,27 @@ int Mouse_Render(bool mouse, bool render)
 
         if(s_context == Context::MainMenu && s_minPlayers == 1)
         {
-            if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::SelectChar)
+            // reconnecting
+            if(s_playerState[p] == PlayerState::Disconnected && s_menuItem[p] == 2)
+            {
+                XRender::renderRect(250, 350, 300, 200, 0, 0, 0, 0.5);
+                if(BlockFlash < 45)
+                    SuperPrintScreenCenter(g_mainMenu.phrasePressAButton, 3, 440);
+            }
+            else if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::SelectChar)
+            {
                 Player_Mouse_Render(p, 300, 400, 420, 30, mouse, render);
-            else if(s_playerState[p] == PlayerState::ControlsMenu)
+            }
+            else if(s_playerState[p] == PlayerState::ControlsMenu || s_playerState[p] == PlayerState::TestControls)
+            {
+                XRender::renderRect(250, 350, 300, 200, 0, 0, 0, 0.5);
                 Player_Mouse_Render(p, 300, 400, 350, 30, mouse, render);
+            }
             else
+            {
+                XRender::renderRect(250, 350, 300, 200, 0, 0, 0, 0.5);
                 Player_Mouse_Render(p, 300, 400, 380, 30, mouse, render);
+            }
         }
         else
             Player_Mouse_Render(p, lX, cX, sY+line*(max_line-5), line, mouse, render);
@@ -1489,7 +1507,13 @@ int Logic()
                 if(p == 0 && s_minPlayers == 1)
                 {
                     s_inputReady[p] = true;
-                    if(g_charSelect[p] != 0)
+                    if(s_menuItem[p] == 2) // requested reconnect
+                    {
+                        s_playerState[p] = PlayerState::ControlsMenu;
+                        s_inputReady[p] = false;
+                        PlaySoundMenu(SFX_Yoshi);
+                    }
+                    else if(g_charSelect[p] != 0)
                     {
                         s_playerState[p] = PlayerState::StartGame;
                         s_menuItem[p] = -4;
