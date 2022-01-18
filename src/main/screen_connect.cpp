@@ -50,7 +50,9 @@ struct CharInfo
     {
         if(SwapCharAllowed())
             return true;
-        if(numPlayers < this->max_players && !this->char_present[c])
+        bool novel_add = numPlayers >= this->max_players;
+        novel_add &= numPlayers < maxLocalPlayers;
+        if(!novel_add && !this->char_present[c])
             return false;
         return true;
     }
