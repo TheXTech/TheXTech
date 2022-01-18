@@ -1,7 +1,7 @@
 /*
  * A small set of extra string processing functions
  *
- * Copyright (c) 2017-2021 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2017-2022 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation files (the "Software"), to deal in the Software
