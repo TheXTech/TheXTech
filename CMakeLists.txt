@@ -168,7 +168,11 @@ if(USE_STATIC_LIBC)
 endif()
 
 include(lib/DirManager/dirman.cmake)
-include(lib/FileMapper/FileMapper.cmake)
+
+if(NOT VITA)
+    include(lib/FileMapper/FileMapper.cmake)
+endif()
+
 include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
@@ -257,11 +261,8 @@ set(LIB_SRC
     lib/fader.cpp
     lib/AppPath/app_path.cpp
     ${DIRMANAGER_SRCS}
-    ${FILEMAPPER_SRCS}
     ${FMT_SRCS}
-    ${STACK_WALKER_SRCS}
     ${MD5_SRCS}
-    lib/CrashHandler/crash_handler.cpp
     lib/Graphics/graphics_funcs.cpp
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
@@ -280,6 +281,15 @@ if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT VITA AND NOT 3DS)
     set(THEXTECH_INTERPROC_SUPPORTED ON)
 endif()
 
+
+if(NOT 3DS AND NOT VITA)
+    list(APPEND LIB_SRC
+        ${FILEMAPPER_SRCS}
+        ${STACK_WALKER_SRCS}
+        3rdparty/tinyfiledialogs/tinyfiledialogs.c
+        lib/CrashHandler/crash_handler.cpp
+    )
+endif()
 
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
@@ -498,6 +508,19 @@ endif()
 
 if(ANDROID)
     target_link_libraries(A2XT_Int INTERFACE log)
+endif()
+
+if(VITA)
+    if(ENABLE_FAST_MATH)
+        message("FAST MATH ON! HAVE FUN!")
+        set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
+    endif()
+
+    target_compile_definitions(thextech PRIVATE -DVITA -DVITA=1)
+    target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
+    target_compile_definitions(thextech PRIVATE -DFIXED_RES)
+    target_compile_definitions(thextech PRIVATE -DLOW_MEM)
 endif()
 
 if(USE_TOUCHSCREEN_CONTROLLER)
