@@ -176,11 +176,7 @@ inline int DropAddMain_ItemCount()
     if(SwapCharAllowed())
         i ++; // change char
     if(numPlayers > s_minPlayers)
-    {
         i ++; // drop me
-        if(!CheckDone())
-            i++; // DROP NOT DONE
-    }
     return i;
 }
 
