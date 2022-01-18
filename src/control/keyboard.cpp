@@ -1017,7 +1017,15 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
     if(ctrlF || altEnter)
         g_hotkeysPressed[Hotkeys::Buttons::Fullscreen] = 0;
 
-    if(this->m_numKeyboards == 0 && evt.repeat == 0)
+    bool use_defaults = false;
+
+    if(this->m_numKeyboards == 0)
+        use_defaults = true;
+
+    if(this->m_directText && GamePaused == PauseCode::TextEntry)
+        use_defaults = true;
+
+    if(use_defaults && evt.repeat == 0)
     {
         // ALSO UPDATE InputMethodProfile_Keyboard::InputMethodProfile_Keyboard
         if(KeyCode == SDL_SCANCODE_F12 || KeyCode == SDL_SCANCODE_F2)
@@ -1033,6 +1041,9 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
 #endif
             g_hotkeysPressed[Hotkeys::Buttons::RecordGif] = 0;
     }
+
+    if(this->m_directText && GamePaused == PauseCode::TextEntry)
+        return false;
 
     SDL_Scancode KeyASCII = evt.keysym.scancode;
 
@@ -1128,6 +1139,8 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
             }
             return false;
         case SDL_KEYDOWN:
+            if(this->DefaultHotkey(ev))
+                return true;
             if(this->m_directText && GamePaused == PauseCode::TextEntry)
             {
                 if(ev->key.keysym.scancode == SDL_SCANCODE_RETURN || ev->key.keysym.scancode == SDL_SCANCODE_KP_ENTER)
@@ -1140,8 +1153,6 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
                     TextEntryScreen::Backspace();
                 return true;
             }
-            if(this->DefaultHotkey(ev))
-                return true;
             return false;
         default:
             return false;
