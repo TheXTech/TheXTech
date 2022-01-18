@@ -390,6 +390,11 @@ int PauseGame(PauseCode code, int plr)
             else
                 updateScreenFaders();
 
+            // reset the active player if it is no longer present
+            if(plr > numPlayers)
+                plr = 0;
+
+            // run the appropriate pause logic
             if(qScreen)
             {
                 // prevent any logic or unpause from taking place
