@@ -544,12 +544,6 @@ bool Player_Select(int p)
             Player_Remove(p);
             do_sentinel.active = false;
         }
-        else if(numPlayers > s_minPlayers && !CheckDone() && s_menuItem[p] == i++)
-        {
-            DropNotDone(true);
-            PlaySound(SFX_BowserKilled);
-            do_sentinel.active = false;
-        }
         else
         {
             do_sentinel.active = false;
