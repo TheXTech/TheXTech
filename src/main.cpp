@@ -140,7 +140,9 @@ int main(int argc, char**argv)
     CmdLineSetup_t setup;
     FrmMain frmMain;
 
+#if !defined(__3DS__) && !defined(VITA)
     CrashHandler::initSigs();
+#endif
 
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
