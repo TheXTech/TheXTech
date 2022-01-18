@@ -34,14 +34,6 @@
 #include "globals.h"
 
 
-SMBXHUDSettings gSMBXHUDSettings;
-
-bool gLunaEnabledGlobally = true;
-bool gLunaEnabled = true;
-bool gShowDemoCounter = true;
-bool gEnableDemoCounter = true;
-std::string gDemoCounterTitle = "DEMOS";
-
 SDL_FORCE_INLINE bool lunaAllowed()
 {
     if(g_compatibility.luna_enable_engine == Compatibility_t::LUNA_ENGINE_UNSPECIFIED)

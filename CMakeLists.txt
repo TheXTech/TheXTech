@@ -119,6 +119,7 @@ option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on some platfors)" ON)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
+option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
@@ -355,42 +356,48 @@ set(THEXTECH_SRC
     src/npc/npc_frames.cpp
     src/npc/npc_bonus.cpp
     src/player/player_update.cpp
+)
 
 # Luna Autocode script engine
-    src/script/luna/luna.cpp
-    src/script/luna/autocode.cpp
-    src/script/luna/autocode_manager.cpp
-    src/script/luna/csprite.cpp
-    src/script/luna/lunaspriteman.cpp
-    src/script/luna/hitbox.cpp
-    src/script/luna/sprite_component.cpp
-    src/script/luna/sprite_funcs.cpp
-    src/script/luna/lunalevels.cpp
-    src/script/luna/lunaplayer.cpp
-    src/script/luna/lunanpc.cpp
-    src/script/luna/lunablock.cpp
-    src/script/luna/lunalayer.cpp
-    src/script/luna/lunamisc.cpp
-    src/script/luna/lunalevel.cpp
-    src/script/luna/lunarender.cpp
-    src/script/luna/lunacell.cpp
-    src/script/luna/lunainput.cpp
-    src/script/luna/lunacounter.cpp
-    src/script/luna/lunacounter_record.cpp
-    src/script/luna/lunavarbank.cpp
-    src/script/luna/renderop_bitmap.cpp
-    src/script/luna/renderop_rect.cpp
-    src/script/luna/renderop_effect.cpp
-    src/script/luna/renderop_string.cpp
-    src/script/luna/mememu.cpp
-    src/script/luna/levels/Docopoper-AbstractAssault.cpp
-    src/script/luna/levels/Docopoper-Calleoca.cpp
-    src/script/luna/levels/Docopoper-TheFloorisLava.cpp
-    src/script/luna/levels/SAJewers-QraestoliaCaverns.cpp
-    src/script/luna/levels/SAJewers-Snowboardin.cpp
-    src/script/luna/levels/Talkhaus-Science_Final_Battle.cpp
-    src/script/luna/levels/KilArmoryCode.cpp
-)
+list(APPEND THEXTECH_SRC src/script/luna/lunaglobals.cpp)
+if(THEXTECH_ENABLE_LUNA_AUTOCODE)
+    add_definitions(-DTHEXTECH_ENABLE_LUNA_AUTOCODE)
+    list(APPEND THEXTECH_SRC
+        src/script/luna/luna.cpp
+        src/script/luna/autocode.cpp
+        src/script/luna/autocode_manager.cpp
+        src/script/luna/csprite.cpp
+        src/script/luna/lunaspriteman.cpp
+        src/script/luna/hitbox.cpp
+        src/script/luna/sprite_component.cpp
+        src/script/luna/sprite_funcs.cpp
+        src/script/luna/lunalevels.cpp
+        src/script/luna/lunaplayer.cpp
+        src/script/luna/lunanpc.cpp
+        src/script/luna/lunablock.cpp
+        src/script/luna/lunalayer.cpp
+        src/script/luna/lunamisc.cpp
+        src/script/luna/lunalevel.cpp
+        src/script/luna/lunarender.cpp
+        src/script/luna/lunacell.cpp
+        src/script/luna/lunainput.cpp
+        src/script/luna/lunacounter.cpp
+        src/script/luna/lunacounter_record.cpp
+        src/script/luna/lunavarbank.cpp
+        src/script/luna/renderop_bitmap.cpp
+        src/script/luna/renderop_rect.cpp
+        src/script/luna/renderop_effect.cpp
+        src/script/luna/renderop_string.cpp
+        src/script/luna/mememu.cpp
+        src/script/luna/levels/Docopoper-AbstractAssault.cpp
+        src/script/luna/levels/Docopoper-Calleoca.cpp
+        src/script/luna/levels/Docopoper-TheFloorisLava.cpp
+        src/script/luna/levels/SAJewers-QraestoliaCaverns.cpp
+        src/script/luna/levels/SAJewers-Snowboardin.cpp
+        src/script/luna/levels/Talkhaus-Science_Final_Battle.cpp
+        src/script/luna/levels/KilArmoryCode.cpp
+    )
+endif()
 
 add_definitions(-DCORE_EVERYTHING_SDL)
 list(APPEND THEXTECH_SRC
