@@ -41,8 +41,10 @@
 #include "../player.h"
 #include "../npc.h"
 #include "../layers.h"
+#include "../controls.h"
 #include "../game_main.h"
 #include "game_info.h"
+#include "screen_quickreconnect.h"
 
 #include "cheat_code.h"
 
@@ -1021,12 +1023,21 @@ static void onePlayer()
             }
         }
 
+        // set the living player to get the controls if not P1
+        if(B-1 < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[B-1])
+            std::swap(Controls::g_InputMethods[0], Controls::g_InputMethods[B-1]);
+
+        // delete other control methods
+        while(Controls::g_InputMethods.size() > 1)
+            Controls::DeleteInputMethodSlot(1);
+
         numPlayers = 1;
         SingleCoop = 1;
         SetupScreens();
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
 
+        // move the living player into slot 1
         int C = 1;
         Player[C] = Player[B];
         Player[C].Character = 1;
@@ -1051,6 +1062,19 @@ static void twoPlayer()
     if(B > 0)
     {
         numPlayers = 2;
+
+        // setup so there are exactly two controller slots,
+        // activate quick-reconnect if needed
+        while(Controls::g_InputMethods.size() > 2)
+        {
+            Controls::DeleteInputMethodSlot(2);
+        }
+        if(Controls::g_InputMethods.size() == 1)
+        {
+            Controls::g_InputMethods.push_back(nullptr);
+            QuickReconnectScreen::g_active = true;
+        }
+
         SingleCoop = 0;
         SetupScreens();
 
