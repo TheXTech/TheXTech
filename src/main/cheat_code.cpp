@@ -803,7 +803,6 @@ static void superbDemo128()
     if(B > 0)
     {
         numPlayers = 128;
-        ScreenType = 2;
 
         SetupScreens();
 
@@ -830,7 +829,6 @@ static void superbDemo64()
     if(B > 0)
     {
         numPlayers = 64;
-        ScreenType = 2;
         SetupScreens();
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -855,7 +853,6 @@ static void superbDemo32()
     if(B > 0)
     {
         numPlayers = 32;
-        ScreenType = 2;
         SetupScreens();
 
         if(Player[B].Effect == 9)
@@ -882,7 +879,6 @@ static void superbDemo16()
     if(B > 0)
     {
         numPlayers = 16;
-        ScreenType = 2;
         SetupScreens();
 
         if(Player[B].Effect == 9)
@@ -909,7 +905,6 @@ static void superbDemo8()
     if(B > 0)
     {
         numPlayers = 8;
-        ScreenType = 2;
         SetupScreens();
 
         if(Player[B].Effect == 9)
@@ -936,7 +931,6 @@ static void superbDemo4()
     if(B > 0)
     {
         numPlayers = 4;
-        ScreenType = 2;
         SetupScreens();
 
         if(Player[B].Effect == 9)
@@ -964,7 +958,6 @@ static void superbDemo2()
     if(B > 0)
     {
         numPlayers = 2;
-        ScreenType = 6;
         SingleCoop = 1;
         SetupScreens();
         if(Player[B].Effect == 9)
@@ -1029,7 +1022,6 @@ static void onePlayer()
         }
 
         numPlayers = 1;
-        ScreenType = 0;
         SingleCoop = 1;
         SetupScreens();
         if(Player[B].Effect == 9)
@@ -1059,7 +1051,6 @@ static void twoPlayer()
     if(B > 0)
     {
         numPlayers = 2;
-        ScreenType = 5;
         SingleCoop = 0;
         SetupScreens();
 
