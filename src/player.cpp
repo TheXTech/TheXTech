@@ -3551,11 +3551,16 @@ void RespawnPlayer(int A, double Direction, double CenterX, double StopY)
 void RespawnPlayerTo(int A, int TargetPlayer)
 {
     double CenterX = Player[TargetPlayer].Location.X + Player[TargetPlayer].Location.Width / 2.0;
+
+    // don't lose a player when it targets a player who is already respawning
     double StopY;
-    if(Player[TargetPlayer].Mount == 2)
+    if(Player[TargetPlayer].Effect == 6)
+        StopY = Player[TargetPlayer].Effect2 + Player[TargetPlayer].Location.Height;
+    else if(Player[TargetPlayer].Mount == 2)
         StopY = Player[TargetPlayer].Location.Y;
     else
         StopY = Player[TargetPlayer].Location.Y + Player[TargetPlayer].Location.Height;
+
     // technically this would fix a vanilla bug (weird effects after Player 2 dies, Player 1 goes into Warp, Player 2 respawns)
     //   so I will do it where it only affects the new code
     // Player[A].Section = Player[TargetPlayer].Section;
@@ -7124,6 +7129,7 @@ void DropPlayer(const int A)
     // IMPORTANT - removes all references to player A,
     //   decrements all references to higher players
 
+    // NPC player references
     for(int C = 1; C <= numNPCs; C++)
     {
         NPC_t& n = NPC[C];
@@ -7154,8 +7160,10 @@ void DropPlayer(const int A)
             n.JustActivated = 1;
     }
 
+    // Block player references
     // Block[B].IsPlayer is only set for tempBlocks, so no correction here
 
+    // Player player references
     for(int B = 1; B <= numPlayers; B++)
     {
         if(Player[B].YoshiPlayer == A)
