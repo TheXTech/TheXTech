@@ -7271,7 +7271,7 @@ void SwapCharacter(int A, int Character, bool Die, bool Block)
 // returns whether a player is allowed to swap characters
 bool SwapCharAllowed()
 {
-    if(LevelSelect)
+    if(LevelSelect || GameMenu)
         return true;
     else
         return false;
