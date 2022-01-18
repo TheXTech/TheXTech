@@ -41,6 +41,21 @@ enum class Context
     DropAdd,
 };
 
+struct CharInfo
+{
+    int max_players;
+    bool char_present[5];
+
+    bool accept(int c)
+    {
+        if(SwapCharAllowed())
+            return true;
+        if(numPlayers < this->max_players && !this->char_present[c])
+            return false;
+        return true;
+    }
+};
+
 static Context s_context;
 static int s_minPlayers = 1;
 
@@ -49,6 +64,8 @@ static bool s_inputReady[maxLocalPlayers] = {false};
 static PlayerState s_playerState[maxLocalPlayers] = {PlayerState::Disconnected};
 static int s_menuItem[maxLocalPlayers] = {0};
 static Controls::InputMethodProfile* s_savedProfile[maxLocalPlayers];
+
+static CharInfo s_char_info;
 
 void Player_ValidateChar(int p);
 
@@ -141,6 +158,8 @@ bool CharAvailable(int c, int p = 0)
         return false;
     if(blockCharacter[c])
         return false;
+    if(!s_char_info.accept(c-1))
+        return false;
     for(int i = 0; i < maxLocalPlayers; i++)
     {
         if(i == (int)Controls::g_InputMethods.size())
@@ -198,7 +217,7 @@ void Player_ValidateChar(int p)
     {
         for(i = 0; i < 5; i++)
         {
-            if(!blockCharacter[i+1])
+            if(!blockCharacter[i+1] && !s_char_info.accept(i))
             {
                 s_menuItem[p] = i;
                 break;
@@ -459,6 +478,10 @@ bool Player_Select(int p)
         }
         else
         {
+            // set this player as having been selected
+            if(0 <= s_menuItem[p] && s_menuItem[p] < 5)
+                s_char_info.char_present[s_menuItem[p]] = true;
+
             s_playerState[p] = PlayerState::DropAddMain;
             if(p+1 <= numPlayers)
             {
@@ -476,9 +499,12 @@ bool Player_Select(int p)
                 // swap p with the first non-existent player slot
                 s_menuItem[p] = 0;
                 Player_Swap(numPlayers, p);
+
                 // AddPlayer increments numPlayers by 1
                 AddPlayer(g_charSelect[numPlayers]);
-                // lose a life if StrictDropAdd enabled
+                s_char_info.max_players = numPlayers;
+
+                // spend a life if StrictDropAdd enabled
                 if(g_config.StrictDropAdd && !LevelSelect)
                 {
                     if(Lives <= 0)
@@ -615,7 +641,7 @@ void Player_Up(int p)
                 if(s_menuItem[p] == 0)
                     s_menuItem[p] = 5;
                 s_menuItem[p] --;
-                if(!blockCharacter[s_menuItem[p]+1])
+                if(!blockCharacter[s_menuItem[p]+1] && s_char_info.accept(s_menuItem[p]))
                     break;
             }
         }
@@ -686,7 +712,7 @@ void Player_Down(int p)
                 s_menuItem[p] ++;
                 if(s_menuItem[p] == 5)
                     s_menuItem[p] = 0;
-                if(!blockCharacter[s_menuItem[p]+1])
+                if(!blockCharacter[s_menuItem[p]+1] && s_char_info.accept(s_menuItem[p]))
                     break;
             }
         }
@@ -809,7 +835,7 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
             float g = 1.f;
             float b = 1.f;
             float a = 1.f;
-            if(blockCharacter[c+1])
+            if(blockCharacter[c+1] || !s_char_info.accept(c))
                 a = 0.2f;
 
             for(int p = 0; p < maxLocalPlayers; p++)
@@ -1641,6 +1667,22 @@ void Render()
         BlockFlash = 0;
 
     Mouse_Render(false, true);
+}
+
+// reset allowed char tracking
+void SaveChars()
+{
+    for(int c = 0; c < 5; c++)
+        s_char_info.char_present[c] = false;
+
+    s_char_info.max_players = numPlayers;
+
+    for(int A = 1; A <= numPlayers; A++)
+    {
+        int c = Player[A].Character - 1;
+        if(0 <= c && c < 5)
+            s_char_info.char_present[c] = true;
+    }
 }
 
 } // namespace ConnectScreen

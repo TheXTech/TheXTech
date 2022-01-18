@@ -22,6 +22,11 @@ void Render();
 // 1 next
 int Logic();
 
+// used to track which characters
+//   were present in last case with
+//   SwapCharAllowed() true.
+void SaveChars();
+
 } // namespace ConnectScreen
 
 #endif // SCREEN_CONNECT_H

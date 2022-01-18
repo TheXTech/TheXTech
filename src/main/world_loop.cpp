@@ -32,6 +32,7 @@
 #include "../effect.h"
 #include "../graphics.h"
 #include "../collision.h"
+#include "../player.h"
 #include "../main/trees.h"
 #include "../core/events.h"
 #include "../compat.h"
@@ -40,6 +41,7 @@
 #include "level_file.h"
 #include "speedrunner.h"
 #include "screen_quickreconnect.h"
+#include "screen_connect.h"
 
 #include "../pseudo_vb.h"
 
@@ -562,6 +564,13 @@ void WorldLoop()
                         addMissingLvlSuffix(level.FileName);
                         if(Files::fileExists(SelectWorld[selWorld].WorldPath + level.FileName))
                         {
+                            // save which characters were present at level start
+                            if(SwapCharAllowed())
+                            {
+                                pLogDebug("Save drop/add characters configuration at GameLoop()");
+                                ConnectScreen::SaveChars();
+                            }
+
                             StartWarp = level.StartWarp;
                             StopMusic();
                             PlaySound(SFX_LevelSelect);

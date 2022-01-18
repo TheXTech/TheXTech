@@ -143,6 +143,12 @@ void GameLoop()
             }
         }
 
+        if(SwapCharAllowed())
+        {
+            pLogDebug("Save drop/add characters configuration at GameLoop()");
+            ConnectScreen::SaveChars();
+        }
+
         speedRun_triggerLeave();
         NextLevel();
         // Controls::Update();
