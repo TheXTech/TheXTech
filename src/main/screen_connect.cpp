@@ -24,6 +24,7 @@ namespace ConnectScreen
 enum class PlayerState
 {
     Disconnected,
+    Reconnecting,
     SelectChar,
     SelectProfile,
     ConfirmProfile,
@@ -84,6 +85,9 @@ void MainMenu_Start(int minPlayers)
     }
     s_context = Context::MainMenu;
 
+    MenuMouseRelease = false;
+    MenuCursorCanMove = false;
+
     // prepare for first frame
     BlockFlash = 0;
     if(minPlayers == 1)
@@ -104,6 +108,9 @@ void Reconnect_Start()
         s_inputReady[i] = false;
     }
     s_context = Context::Reconnect;
+
+    MenuMouseRelease = false;
+    MenuCursorCanMove = false;
 
     // prepare for first frame
     BlockFlash = 0;
@@ -127,6 +134,9 @@ void DropAdd_Start()
         g_charSelect[i] = Player[i+1].Character;
     }
     s_context = Context::DropAdd;
+
+    MenuMouseRelease = false;
+    MenuCursorCanMove = false;
 
     // prepare for first frame
     BlockFlash = 0;
@@ -417,7 +427,8 @@ bool Player_Select(int p)
         if(s_menuItem[p] == 2)
         {
             Controls::DeleteInputMethod(Controls::g_InputMethods[p]);
-            s_playerState[p] = PlayerState::Disconnected;
+            s_playerState[p] = PlayerState::Reconnecting;
+            s_menuItem[p] = 0;
             if(s_context == Context::MainMenu && s_minPlayers == 1)
             {
                 Controls::DeleteInputMethodSlot(p);
@@ -459,7 +470,10 @@ bool Player_Select(int p)
     {
         if(g_charSelect[p] == 0)
         {
+            g_charSelect[p] = s_menuItem[p]+1;
+            // signal to reset player state to Disconnected
             s_playerState[p] = PlayerState::SelectChar;
+            s_menuItem[p] = -1;
         }
         else
         {
@@ -470,11 +484,20 @@ bool Player_Select(int p)
 
     if(s_playerState[p] == PlayerState::SelectChar)
     {
-        g_charSelect[p] = s_menuItem[p]+1;
+        if(s_menuItem[p] != -1)
+            g_charSelect[p] = s_menuItem[p]+1;
         if(s_context == Context::MainMenu)
         {
-            s_playerState[p] = PlayerState::StartGame;
-            s_menuItem[p] = -4;
+            if(s_menuItem[p] == -1)
+            {
+                s_playerState[p] = PlayerState::Disconnected;
+                s_menuItem[p] = 0;
+            }
+            else
+            {
+                s_playerState[p] = PlayerState::StartGame;
+                s_menuItem[p] = -4;
+            }
             if(CheckDone())
                 return true;
         }
@@ -1118,19 +1141,17 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
     }
 
     // don't process any of the controls stuff when the player is connecting
-    if(s_playerState[p] == PlayerState::Disconnected
+    if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::Reconnecting
         || p >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[p])
     {
         if(render)
         {
-            if(s_context == Context::MainMenu && s_minPlayers == 1)
+            if(s_context == Context::MainMenu && s_minPlayers == 1 && s_playerState[p] == PlayerState::Disconnected)
             {
-                if(g_charSelect[0] > 0)
-                {
-                    XRender::renderRect(ScreenW / 2 - 320, pY + 2.5 * line, 640, 2.5 * line, 0, 0, 0, 0.5);
-                    if(BlockFlash < 45)
-                        SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, pY+3.5*line, 0.8, 0, 0);
-                }
+                XRender::renderRect(ScreenW / 2 - 320, pY + 2.5 * line, 640, 2.5 * line, 0, 0, 0, 0.5);
+
+                SuperPrintCenter("WAITING FOR INPUT DEVICE...", 3, cX, pY + 3*line, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintCenter("PRESS SELECT FOR CONTROLS OPTIONS", 3, cX, pY + 4*line, 0.8f, 0.8f, 0.8f, 0.8f);
             }
             else if(BlockFlash < 45)
                 SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, pY+2*line);
@@ -1309,7 +1330,7 @@ int Mouse_Render(bool mouse, bool render)
 
     if(s_context == Context::MainMenu && s_minPlayers == 1)
     {
-        if((s_playerState[0] == PlayerState::Disconnected && s_menuItem[0] != 2) || s_playerState[0] == PlayerState::SelectChar)
+        if(s_playerState[0] == PlayerState::Disconnected || s_playerState[0] == PlayerState::SelectChar)
             Chars_Mouse_Render(300, 200, 350, 150, mouse, render);
     }
     else
@@ -1355,7 +1376,7 @@ int Mouse_Render(bool mouse, bool render)
         if(s_context == Context::MainMenu && s_minPlayers == 1)
         {
             // reconnecting
-            if(s_playerState[p] == PlayerState::Disconnected && s_menuItem[p] == 2)
+            if(s_playerState[p] == PlayerState::Reconnecting)
             {
                 XRender::renderRect(250, 350, 300, 200, 0, 0, 0, 0.5);
                 if(BlockFlash < 45)
@@ -1497,7 +1518,7 @@ int Logic()
         }
 
         // if the player has a controller and was disconnected, mark them as connected
-        if(s_playerState[p] == PlayerState::Disconnected)
+        if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::Reconnecting)
         {
             s_inputReady[p] = false;
             if(s_context == Context::MainMenu)
@@ -1507,9 +1528,10 @@ int Logic()
                 if(p == 0 && s_minPlayers == 1)
                 {
                     s_inputReady[p] = true;
-                    if(s_menuItem[p] == 2) // requested reconnect
+                    if(s_playerState[p] == PlayerState::Reconnecting) // requested reconnect
                     {
                         s_playerState[p] = PlayerState::ControlsMenu;
+                        s_menuItem[p] = 2;
                         s_inputReady[p] = false;
                         PlaySoundMenu(SFX_Yoshi);
                     }
@@ -1541,9 +1563,10 @@ int Logic()
                     s_playerState[p] = PlayerState::SelectChar;
                     Player_ValidateChar(p);
                 }
-                else if(s_menuItem[p] == 2) // requested Reconnect
+                else if(s_playerState[p] == PlayerState::Reconnecting) // requested Reconnect
                 {
                     s_playerState[p] = PlayerState::ControlsMenu;
+                    s_menuItem[p] = 2;
                 }
                 else
                 {
@@ -1553,9 +1576,10 @@ int Logic()
             }
             else if(s_context == Context::Reconnect)
             {
-                if(s_menuItem[p] == 2) // requested Reconnect
+                if(s_playerState[p] == PlayerState::Reconnecting) // requested Reconnect
                 {
                     s_playerState[p] = PlayerState::ControlsMenu;
+                    s_menuItem[p] = 2;
                 }
                 else
                 {
