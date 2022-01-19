@@ -836,7 +836,7 @@ public:
 
         case VT_BOOL:
         {
-            SDL_assert(t->field_i);
+            SDL_assert(t->field_b);
             if(ftype != FT_WORD && ftype != FT_BYTE)
                 pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field_b), ftype);
