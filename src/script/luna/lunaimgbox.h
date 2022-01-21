@@ -22,6 +22,7 @@
 #ifndef LUNAIMGBOX_H
 #define LUNAIMGBOX_H
 
+#include <string>
 #include "std_picture.h"
 
 #define DEFAULT_TRANS_COLOR 0xFF00DC
