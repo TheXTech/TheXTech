@@ -660,10 +660,12 @@ static void updateTouchMap(int preferredLayout, float screenWidth, float screenH
         g_touchKeyMap.touchCanvasWidth = 1.f;
         g_touchKeyMap.touchCanvasHeight = screenHeight / screenWidth;
     }
+
     if(preferredLayout == TouchScreenController::layout_tight)
         SDL_memcpy(g_touchKeyMap.touchKeysMap, c_tightAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
     else
         SDL_memcpy(g_touchKeyMap.touchKeysMap, c_standardAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
+
     for(int i = 0; i < TouchScreenController::key_END; i++)
     {
         g_touchKeyMap.touchKeysMap[i].x1 *= scaleFactor / 100.f;
