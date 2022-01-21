@@ -24,6 +24,7 @@
 #include "sprite_funcs.h"
 #include "lunaplayer.h"
 #include "lunamisc.h"
+#include "lunaimgbox.h"
 
 #include "globals.h"
 
@@ -51,7 +52,8 @@ void CSpriteManager::BasicInit(CSprite *spr, CSpriteRequest *pReq, bool center)
 
 void CSpriteManager::InitializeDimensions(CSprite *spr, bool center_coords)
 {
-    std::shared_ptr<LunaImage> box = spr->m_directImg;
+    const LunaImage *box = spr->m_directImg;
+
     if(!box)
         box = Renderer::Get().GetImageForResourceCode(spr->m_ImgResCode);
 
@@ -60,8 +62,8 @@ void CSpriteManager::InitializeDimensions(CSprite *spr, bool center_coords)
         LunaRect rect;
         rect.left = 0;
         rect.top = 0;
-        //        rect.right = box->getW();
-        //        rect.bottom = box->getH();
+        rect.right = box->getW();
+        rect.bottom = box->getH();
         spr->m_GfxRects.clear();
         spr->m_GfxRects.push_back(rect);
 
@@ -247,7 +249,8 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest *req, bool center_coords)
     else if(req != nullptr && req->type == BST_Custom)
     {
         CSprite *from_bp = CopyFromBlueprint(const_cast<char *>(req->str.c_str()));
-        if(from_bp != nullptr)
+
+        if(from_bp)
         {
             from_bp->m_Xpos = req->x;
             from_bp->m_Ypos = req->y;
@@ -291,7 +294,7 @@ void CSpriteManager::RunSprites()
         // Process each
         if(!GamePaused)
         {
-            for(auto & iter : m_SpriteList)
+            for(auto &iter : m_SpriteList)
             {
                 if(!iter->m_Invalidated)  // Don't process invalids
                 {
@@ -303,7 +306,7 @@ void CSpriteManager::RunSprites()
         }
 
         // Draw each
-        for(auto & iter : m_SpriteList)
+        for(auto &iter : m_SpriteList)
         {
             if(!iter->m_Invalidated)
             {
@@ -316,6 +319,9 @@ void CSpriteManager::RunSprites()
 
 void CSpriteManager::ClearInvalidSprites()
 {
+    if(!m_hasInvalid)
+        return;
+
     auto iter = m_SpriteList.begin();
     // std::list<CSprite*>::iterator end = m_SpriteList.end();
 
@@ -330,6 +336,8 @@ void CSpriteManager::ClearInvalidSprites()
         else
             ++iter;
     }
+
+    m_hasInvalid = false;
 }
 
 void CSpriteManager::ClearAllSprites()
@@ -369,6 +377,7 @@ void CSpriteManager::ClearSprites(int imgResourceCode)
     {
         //CSprite* spr = *iter;
         CSprite *next = *iter;
+
         if(!next->m_directImg && next->m_ImgResCode == imgResourceCode)
         {
             delete(*iter);
@@ -379,50 +388,50 @@ void CSpriteManager::ClearSprites(int imgResourceCode)
     }
 }
 
-void CSpriteManager::ClearSprites(const std::shared_ptr<LunaImage> &img, int xPos, int yPos)
+void CSpriteManager::ClearSprites(LunaImage *img, int xPos, int yPos)
 {
-    UNUSED(img);
-    UNUSED(xPos);
-    UNUSED(yPos);
-    //    std::list<CSprite*>::iterator iter = m_SpriteList.begin();
+    std::list<CSprite *>::iterator iter = m_SpriteList.begin();
     //    std::list<CSprite*>::iterator end = m_SpriteList.end();
 
-    //    while (iter != m_SpriteList.end()) {
-    //        //CSprite* spr = *iter;
-    //        CSprite* next = *iter;
-    //        if (!next->m_directImg && next->m_directImg->getUID() == img->getUID() && (int)next->m_Xpos == xPos && (int)next->m_Ypos == yPos)
-    //        {
-    //            delete (*iter);
-    //            iter = m_SpriteList.erase(iter);
-    //        }
-    //        else {
-    //            ++iter;
-    //        }
-    //    }
+    while(iter != m_SpriteList.end())
+    {
+        //CSprite* spr = *iter;
+        CSprite *next = *iter;
+        if(next->m_directImg && next->m_directImg->getUID() == img->getUID() &&
+           (int)next->m_Xpos == xPos && (int)next->m_Ypos == yPos)
+        {
+            delete(*iter);
+            iter = m_SpriteList.erase(iter);
+        }
+        else
+            ++iter;
+    }
 }
 
-void CSpriteManager::ClearSprites(const std::shared_ptr<LunaImage> &img)
+void CSpriteManager::ClearSprites(LunaImage *img)
 {
-    UNUSED(img);
-    //    std::list<CSprite*>::iterator iter = m_SpriteList.begin();
-    //    std::list<CSprite*>::iterator end = m_SpriteList.end();
+    std::list<CSprite *>::iterator iter = m_SpriteList.begin();
+    // std::list<CSprite*>::iterator end = m_SpriteList.end();
 
-    //    while (iter != m_SpriteList.end()) {
-    //        //CSprite* spr = *iter;
-    //        CSprite* next = *iter;
-    //        if (next->m_directImg->getUID() == img->getUID()){
-    //            delete (*iter);
-    //            iter = m_SpriteList.erase(iter);
-    //        }
-    //        else {
-    //            ++iter;
-    //        }
-    //    }
+    while(iter != m_SpriteList.end())
+    {
+        //CSprite* spr = *iter;
+        CSprite *next = *iter;
+        if(next->m_directImg->getUID() == img->getUID())
+        {
+            delete(*iter);
+            iter = m_SpriteList.erase(iter);
+        }
+        else
+            ++iter;
+    }
 }
 
 void CSpriteManager::AddSprite(CSprite *spr)
 {
     m_SpriteList.push_back(spr);
+    if(spr->m_Invalidated)
+        m_hasInvalid = true;
 }
 
 void CSpriteManager::GetComponents(int code, std::list<SpriteComponent *> *component_list)

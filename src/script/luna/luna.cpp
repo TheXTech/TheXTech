@@ -63,6 +63,7 @@ void lunaReset()
     gRunTapped = 0;
 
     Renderer::Get().ClearAllDebugMessages();
+    Renderer::Get().ClearAllLoadedImages();
     gSpriteMan.ResetSpriteManager();
     gCellMan.Reset();
     Input::ResetAll();
@@ -149,6 +150,7 @@ void lunaRender(int screenZ)
     if(gLunaEnabled && lunaAllowed())
     {
         Renderer::Get().StartCameraRender(screenZ);
+        gSpriteMan.RunSprites();
         Renderer::Get().RenderBelowPriority(5);
     }
 }

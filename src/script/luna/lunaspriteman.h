@@ -25,7 +25,6 @@
 #include <list>
 #include <map>
 #include <list>
-#include <memory>
 
 #include "sprite_component.h"
 
@@ -90,8 +89,8 @@ struct CSpriteManager
     void ClearAllSprites();
     void ClearSprites(int imgResourceCode, int xPos, int yPos);
     void ClearSprites(int imgResourceCode);
-    void ClearSprites(const std::shared_ptr<LunaImage> &img, int xPos, int yPos);
-    void ClearSprites(const std::shared_ptr<LunaImage> &img);
+    void ClearSprites(LunaImage *img, int xPos, int yPos);
+    void ClearSprites(LunaImage *img);
 
     void AddSprite(CSprite *spr);
 
@@ -100,6 +99,7 @@ struct CSpriteManager
     std::list<CSprite *> m_SpriteList;
     std::map<std::string, CSprite *> m_SpriteBlueprints;
     std::list<SpriteComponent> m_ComponentList;     // User components that can be copied (activated) into a sprite's behavior list
+    bool m_hasInvalid = false;
 };
 
 extern CSpriteManager gSpriteMan;

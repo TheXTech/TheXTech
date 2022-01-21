@@ -29,6 +29,7 @@ class RenderBitmapOp final : public RenderOp
 {
 public:
     RenderBitmapOp();
+
     void Draw(Renderer* renderer) override;
 
     double x = 0.0;				// Absolute screen x position
@@ -38,10 +39,10 @@ public:
     double sw = 0.0;				// Source x1 (right edge)
     double sh = 0.0;				// Source x1 (bottom edge)
 
-    float  opacity = 0.0f;         // Opacity value
+    float  opacity = 1.0f;         // Opacity value
     bool   sceneCoords = false;     // If true, x and y are scene coordinates
 
-    std::shared_ptr<LunaImage> direct_img;
+    LunaImage *direct_img = nullptr;
 };
 
 #endif // RENDERBITMAPOP_H

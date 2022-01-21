@@ -937,6 +937,7 @@ void KillIt()
     XRender::clearBuffer();
     XRender::repaint();
 #endif
+    lunaReset();
     QuitMixerX();
     UnloadGFX();
     XWindow::showCursor(1);

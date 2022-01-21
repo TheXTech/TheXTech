@@ -59,7 +59,10 @@ void SpriteFunc::PlayerCollectible(CSprite *me, SpriteComponent *comp)
     {
         if(me->m_Hitbox.Test((int)demo->Location.X, (int)demo->Location.Y,
                              (int)demo->Location.Width, (int)demo->Location.Height))
+        {
             me->Die();
+            gSpriteMan.m_hasInvalid = true;
+        }
     }
 }
 
@@ -215,6 +218,7 @@ void SpriteFunc::Die(CSprite *me, SpriteComponent *obj)
 {
     UNUSED(obj);
     me->Die();
+    gSpriteMan.m_hasInvalid = true;
 }
 
 // DECCELERATE
@@ -499,7 +503,10 @@ void SpriteFunc::CrashMove(CSprite *me, SpriteComponent *obj)
                                       (int)block->Location.Y,
                                       (int)block->Location.Width,
                                       (int)block->Location.Height))
+                {
                     me->Die();
+                    gSpriteMan.m_hasInvalid = true;
+                }
             }
         }
     }

@@ -369,6 +369,7 @@ if(THEXTECH_ENABLE_LUNA_AUTOCODE)
         src/script/luna/csprite.cpp
         src/script/luna/lunaspriteman.cpp
         src/script/luna/hitbox.cpp
+        src/script/luna/lunaimgbox.cpp
         src/script/luna/sprite_component.cpp
         src/script/luna/sprite_funcs.cpp
         src/script/luna/lunalevels.cpp

@@ -19,6 +19,7 @@
  */
 
 #include "lunarender.h"
+#include "autocode_manager.h"
 #include "renderop.h"
 #include "globals.h"
 #include "lunamisc.h"
@@ -53,37 +54,38 @@ Renderer::Renderer() noexcept :
 
 bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code, int transparency_color)
 {
-    UNUSED(filename);
-    UNUSED(resource_code);
-    UNUSED(transparency_color);
+    DeleteImage(resource_code);
 
-    // TODO: Implement this using proper stuff
+    auto absPath = AutocodeManager::resolveCustomFileCase(filename);
 
-//    if(Renderer::LoadBitmapResource(filename, resource_code))
-//    {
-//        auto it = m_legacyResourceCodeImages.find(resource_code);
-//        if (it != m_legacyResourceCodeImages.end())
-//        {
-//            it->second->makeColorTransparent(transparency_color);
-//            // LUNAIMAGE_TODO: Add support for trasnparency colors for old-style image loading API
-//        }
-//        return true;
-//    }
+    if(absPath.empty())
+        absPath = AutocodeManager::resolveWorldFileCase(filename);
 
-    return false;
+    if(absPath.empty())
+    {
+        pLogWarning("LunaRender: image file %s is not found", filename.c_str());
+        return false;
+    }
+
+    LunaImage img(absPath);
+    if(!img.ImageLoaded())
+    {
+        pLogWarning("LunaRender: Failed to load image: %s", absPath.c_str());
+        return false;
+    }
+
+    img.m_TransColor = transparency_color;
+    StoreImage(img, resource_code);
+
+    return true;
 }
 
 bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code)
 {
-    UNUSED(filename);
-    UNUSED(resource_code);
-
-    // TODO: Implement this using proper stuff
-
-    return false;
+    return LoadBitmapResource(filename, resource_code, DEFAULT_TRANS_COLOR);
 }
 
-void Renderer::StoreImage(const std::shared_ptr<LunaImage> &bmp, int resource_code)
+void Renderer::StoreImage(const LunaImage &bmp, int resource_code)
 {
     m_legacyResourceCodeImages[resource_code] = bmp;
 }
@@ -93,50 +95,21 @@ bool Renderer::DeleteImage(int resource_code)
     auto it = m_legacyResourceCodeImages.find(resource_code);
     if(it != m_legacyResourceCodeImages.end())
     {
+        it->second.Unload();
         m_legacyResourceCodeImages.erase(it);
         return true;
     }
+
     return false;
 }
 
-std::shared_ptr<LunaImage> Renderer::GetImageForResourceCode(int resource_code)
+LunaImage *Renderer::GetImageForResourceCode(int resource_code)
 {
     auto it = m_legacyResourceCodeImages.find(resource_code);
     if(it != m_legacyResourceCodeImages.end())
-        return it->second;
+        return &it->second;
 
     return nullptr;
-}
-
-std::vector<std::shared_ptr<LunaImage> > Renderer::LoadAnimatedBitmapResource(const std::string& filename, int *frameTime)
-{
-    UNUSED(frameTime);
-    // construct full filepath
-
-    std::string full_path = resolveIfNotAbsolutePath(filename);
-
-    /*
-    std::tuple<std::vector<HBITMAP>, int> ret = LoadAnimatedGfx(filename);
-    std::vector<HBITMAP>& bitmaps = std::get<0>(ret);
-    if (frameTime) {
-        double avgFrameTime = (double)std::get<1>(ret);
-        *frameTime = (int)((avgFrameTime / 100) * 65);
-    }
-    */
-
-    std::vector<std::shared_ptr<LunaImage>> bitmapList;
-    /*for (HBITMAP nextBitmap : bitmaps) {
-        std::shared_ptr<LunaImage> pNewbox = std::make_shared<LunaImage>(nextBitmap, GetScreenDC());
-        pNewbox->m_Filename = filename;
-        if (!pNewbox->ImageLoaded() == false) {
-            continue;
-        }
-        bitmapList.push_back(pNewbox);
-    }*/
-
-    // LUNAIMAGE_TODO: Make this work for LunaImage.... also probably doesn't belong in this file
-
-    return bitmapList;
 }
 
 void Renderer::AddOp(RenderOp *op)
@@ -252,6 +225,13 @@ void Renderer::ClearAllDebugMessages()
     this->m_queueState.m_debugMessages.clear();
 }
 
+void Renderer::ClearAllLoadedImages()
+{
+    for(auto &i : m_legacyResourceCodeImages)
+        i.second.Unload();
+    m_legacyResourceCodeImages.clear();
+}
+
 void Renderer::StartCameraRender(int idx)
 {
     m_queueState.m_curCamIdx = idx;
@@ -327,7 +307,7 @@ bool Render::IsOnScreen(double x, double y, double w, double h)
     double cam_y;
     CalcCameraPos(&cam_x, &cam_y);
 
-    return FastTestCollision((int)cam_x, (int)cam_y, (int)cam_x + 800, (int)cam_y + 600,
+    return FastTestCollision((int)cam_x, (int)cam_y, (int)cam_x + ScreenW, (int)cam_y + ScreenH,
                              (int)x, (int)y, (int)x + (int)w, (int)y + (int)h);
 }
 

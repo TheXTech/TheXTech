@@ -154,10 +154,9 @@ bool AutocodeManager::ReadGlobals(const std::string &script_path)
 void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
 {
     char wbuf[2000];
+    char wmidbuf[2000];
     size_t wbuflen = 0;
     char combuf[150];
-    SDL_memset(wbuf, 0, 2000 * sizeof(char));
-    SDL_memset(combuf, 0, 150 * sizeof(char));
     int cur_section = 0;
     AutocodeType ac_type = AT_Invalid;
     double target = 0;
@@ -170,11 +169,15 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
     int bparam2 = 0;
     int bparam3 = 0;
     int blength = 0;
+
     char wstrbuf[1000];
     char wrefbuf[128];
-    SDL_memset(wstrbuf, 0, 1000 * sizeof(char));
-    SDL_memset(wrefbuf, 0, 128 * sizeof(char));
     int lineNum = 0;
+
+    SDL_memset(wbuf, 0, 2000);
+    SDL_memset(combuf, 0, 150);
+    SDL_memset(wstrbuf, 0, 1000);
+    SDL_memset(wrefbuf, 0, 128);
 
     m_errors.clear();
 
@@ -184,10 +187,11 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
     while(!std::feof(code_file))
     {
         // Get a line and reset buffers
-        SDL_memset(wbuf, 0, 2000 * sizeof(char));
-        SDL_memset(wstrbuf, 0, 1000 * sizeof(char));
-        SDL_memset(wrefbuf, 0, 128 * sizeof(char));
-        SDL_memset(combuf, 0, 150 * sizeof(char));
+        SDL_memset(wbuf, 0, sizeof(wbuf));
+        SDL_memset(wmidbuf, 0, sizeof(wmidbuf));
+        SDL_memset(wstrbuf, 0, sizeof(wstrbuf));
+        SDL_memset(wrefbuf, 0, sizeof(wrefbuf));
+        SDL_memset(combuf, 0, sizeof(combuf));
         target = 0;
         param1 = 0;
         param2 = 0;
@@ -229,7 +233,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
             // Is it the level load header?
             if(wbuf[1] == '-')
                 cur_section = -1;
-            else if(SDL_strncasecmp(wbuf + 1, "end", 1999) == 0)
+            else if(SDL_strncasecmp(wbuf + 1, "end", sizeof(wbuf) - 1) == 0)
                 continue; // "END" keyword, just do nothing
             else // Else, parse the section number
             {
@@ -254,8 +258,9 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
                     ++i;
 
                 wbuf[i] = '\x00'; // Turn the comma into a null terminator
-                SDL_strlcpy(wrefbuf, &wbuf[1], 128); // Copy new string into wrefbuf
-                SDL_strlcpy(wbuf, &wbuf[i + 1], 2000); // The rest of the line minus the ref is the new wbuf
+                SDL_strlcpy(wrefbuf, &wbuf[1], sizeof(wrefbuf)); // Copy new string into wrefbuf
+                SDL_memcpy(wmidbuf, wbuf, sizeof(wmidbuf));
+                SDL_strlcpy(wbuf, &wmidbuf[i + 1], sizeof(wbuf)); // The rest of the line minus the ref is the new wbuf
             }
 
             ac_type = Autocode::EnumerizeCommand(wbuf, lineNum);
@@ -316,6 +321,26 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
             }
         }
     }//while
+}
+
+std::string AutocodeManager::resolveWorldFileCase(const std::string &in_name)
+{
+    auto ret = s_dirEpisode.resolveFileCase(in_name);
+
+    if(ret.empty())
+        return std::string();
+
+    return FileNamePath + "/" + ret;
+}
+
+std::string AutocodeManager::resolveCustomFileCase(const std::string &in_name)
+{
+    auto ret = s_dirCustom.resolveFileCase(in_name);
+
+    if(ret.empty())
+        return std::string();
+
+    return FileNamePath + FileName + "/" + ret;
 }
 
 // DO EVENTS

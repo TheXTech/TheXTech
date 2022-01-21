@@ -50,6 +50,9 @@ struct AutocodeManager
     bool ReadGlobals(const std::string &script_path); // Load global codes from dir_path
     void Parse(FILE *open_file, bool add_to_globals);
 
+    static std::string resolveWorldFileCase(const std::string &in_name);
+    static std::string resolveCustomFileCase(const std::string &in_name);
+
     // Management funcs
     void Clear(bool clear_global_codes);
     void ForceExpire(int section);

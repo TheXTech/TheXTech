@@ -24,7 +24,6 @@
 
 #include <list>
 #include <map>
-#include <memory>
 #include <vector>
 
 #include "lunadefs.h"
@@ -59,7 +58,7 @@ public:
     void AddDeathComponent(SpriteComponent component);
 
     void SetImageResource(int _resource_code);
-    void SetImage(const std::shared_ptr<LunaImage>& _img);
+    void SetImage(LunaImage *in_img);
     void MakeLimitedLifetime(int new_lifetime);
 
     void Birth();
@@ -74,7 +73,7 @@ public:
     /// Members///
     //! Image bank code of image resource the sprite uses
     int m_ImgResCode = 0;
-    std::shared_ptr<LunaImage> m_directImg;
+    LunaImage *m_directImg = nullptr;
     //! Collision code for collision blueprint bank (-1 == all blocks collide as solid)
     int m_CollisionCode = 0;
 
@@ -146,7 +145,7 @@ struct CSpriteRequest
     int y = 0;
     int time = 0;
     int img_resource_code = 0;
-    std::shared_ptr<LunaImage> direct_img;
+    LunaImage *direct_img = nullptr;
     std::string str;
 
     // Optional parameters

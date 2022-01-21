@@ -22,11 +22,13 @@
 #ifndef LUNARENDER_H
 #define LUNARENDER_H
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <vector>
 #include <string>
 #include <list>
+
+#include "lunaimgbox.h"
 
 class RenderOp;
 class LunaImage;
@@ -43,11 +45,9 @@ struct Renderer
 
     bool LoadBitmapResource(const std::string &filename, int resource_code, int transparency_color); // don't give full path
     bool LoadBitmapResource(const std::string &filename, int resource_code);
-    void StoreImage(const std::shared_ptr<LunaImage> &bmp, int resource_code);
+    void StoreImage(const LunaImage &bmp, int resource_code);
     bool DeleteImage(int resource_code);
-    std::shared_ptr<LunaImage> GetImageForResourceCode(int resource_code);
-
-    std::vector<std::shared_ptr<LunaImage>> LoadAnimatedBitmapResource(const std::string &filename, int *frameTime = 0);
+    LunaImage *GetImageForResourceCode(int resource_code);
 
     void AddOp(RenderOp *op);                           // Add a drawing operation to the list
     // void GLCmd(const std::shared_ptr<GLEngineCmd>& cmd, double renderPriority = 1.0);
@@ -58,6 +58,8 @@ struct Renderer
     void RenderBelowPriority(double maxPriority);
 
     void ClearAllDebugMessages();
+
+    void ClearAllLoadedImages();
 
     // Calls from hooks
     void StartCameraRender(int idx);
@@ -97,8 +99,7 @@ public:
 
 private:
     QueueState m_queueState;
-
-    std::map<int, std::shared_ptr<LunaImage>> m_legacyResourceCodeImages;  // loaded image resources
+    std::unordered_map<int, LunaImage> m_legacyResourceCodeImages;  // loaded image resources
 
     // Simple getters //
 public:

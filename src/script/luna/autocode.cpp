@@ -1296,7 +1296,7 @@ void Autocode::RunSelfOption()
 // REFERENCE OK
 bool Autocode::ReferenceOK() const
 {
-    return (this->MyRef.length() >= 1);
+    return (!this->MyRef.empty());
 }
 
 

@@ -21,6 +21,7 @@
 #include "csprite.h"
 #include "sprite_funcs.h"
 #include "renderop_rect.h"
+#include "lunaimgbox.h"
 
 
 // CTOR
@@ -119,9 +120,9 @@ void CSprite::SetImageResource(int _resource_code)
 {
     m_ImgResCode = _resource_code;
 }
-void CSprite::SetImage(const std::shared_ptr<LunaImage> &_img)
+void CSprite::SetImage(LunaImage *in_img)
 {
-    m_directImg = _img;
+    m_directImg = in_img;
 }
 
 // MAKE LIMITED LIFETIME
@@ -147,7 +148,7 @@ void CSprite::Process()
 {
     ClearExpiredComponents();
 
-    if(m_Birthed == false)
+    if(!m_Birthed)
         Birth();
 
     m_FrameCounter++;
@@ -159,7 +160,7 @@ void CSprite::Process()
     }
 
     // Die?
-    if(this->m_LimitedFrameLife == true)
+    if(this->m_LimitedFrameLife)
     {
         this->m_FramesLeft--;
         if(m_FramesLeft <= 0 && !m_Died)
@@ -170,9 +171,10 @@ void CSprite::Process()
 // DRAW -- Call all of the registered draw components
 void CSprite::Draw()
 {
-    for(std::list<pfnSprDraw>::iterator iter = m_DrawFuncs.begin(); iter != m_DrawFuncs.end(); ++iter)
-        (*iter)(this);
-    if(false)   //debug
+    for(auto &iter  : m_DrawFuncs)
+        iter(this);
+
+#if 0   //debug
     {
         RenderRectOp op;
         op.x1 = m_Xpos;
@@ -182,13 +184,15 @@ void CSprite::Draw()
         op.m_FramesLeft = 1;
         op.Draw(&Renderer::Get());
     }
+#endif
 }
 
 // DIE -- Run the death components
 void CSprite::Die()
 {
-    for(std::list<SpriteComponent>::iterator iter = m_DeathComponents.begin(); iter != m_DeathComponents.end(); ++iter)
-        (*iter).func(this, &(*iter));
+    for(auto &iter : m_DeathComponents)
+        iter.func(this, &iter);
+
     m_Died = true;
     m_Invalidated = true;
 }
