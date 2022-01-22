@@ -178,7 +178,12 @@ public:
     {
         layout_standard = 0,
         layout_tight,
-        size_END
+        layout_old_tiny,
+        layout_old_average,
+        layout_old_long,
+        layout_old_phablet,
+        layout_old_tablet,
+        layout_END
     };
 
     // touchscreen settings (duplicated from InputMethodProfile_TouchScreen)

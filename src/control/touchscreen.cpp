@@ -680,6 +680,46 @@ static const TouchKeyMap::KeyPos c_tightAutoMap[TouchScreenController::key_END] 
 //   then handles all of the bottom/right anchored items
 static void updateTouchMap(int preferredLayout, float screenWidth, float screenHeight, int scaleFactor)
 {
+    switch(preferredLayout)
+    {
+    case(TouchScreenController::layout_old_tiny):
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_4_tinyPhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
+        g_touchKeyMap.touchCanvasWidth = 640.f;
+        g_touchKeyMap.touchCanvasHeight = 480.f;
+        break;
+    case(TouchScreenController::layout_old_average):
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
+        g_touchKeyMap.touchCanvasWidth = 1024.f;
+        g_touchKeyMap.touchCanvasHeight = 600.f;
+        break;
+    case(TouchScreenController::layout_old_long):
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneLongMap, sizeof(g_touchKeyMap.touchKeysMap));
+        g_touchKeyMap.touchCanvasWidth = 1396.0f;
+        g_touchKeyMap.touchCanvasHeight = 720.0f;
+        break;
+    case(TouchScreenController::layout_old_phablet):
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_7_tablet, sizeof(g_touchKeyMap.touchKeysMap));
+        g_touchKeyMap.touchCanvasWidth = 1024.f;
+        g_touchKeyMap.touchCanvasHeight = 600.f;
+        break;
+    case(TouchScreenController::layout_old_tablet):
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_10_6_tablet, sizeof(g_touchKeyMap.touchKeysMap));
+        g_touchKeyMap.touchCanvasWidth = 1300.f;
+        g_touchKeyMap.touchCanvasHeight = 812.f;
+        break;
+    case(TouchScreenController::layout_tight):
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_tightAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
+        break;
+    case(TouchScreenController::layout_standard):
+    default:
+        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_standardAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
+        break;
+    }
+
+    // legacy layout
+    if(g_touchKeyMap.touchKeysMap[TouchScreenController::key_start].x1 > 2.f)
+        return;
+
     if(screenWidth > screenHeight)
     {
         g_touchKeyMap.touchCanvasWidth = screenWidth / screenHeight;
@@ -690,11 +730,6 @@ static void updateTouchMap(int preferredLayout, float screenWidth, float screenH
         g_touchKeyMap.touchCanvasWidth = 1.f;
         g_touchKeyMap.touchCanvasHeight = screenHeight / screenWidth;
     }
-
-    if(preferredLayout == TouchScreenController::layout_tight)
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_tightAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
-    else
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_standardAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
 
     for(int i = 0; i < TouchScreenController::key_END; i++)
     {
@@ -1365,6 +1400,8 @@ void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
 void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
 {
     ctl->read("ui-layout", this->m_layout, TouchScreenController::layout_standard);
+    if(this->m_layout >= TouchScreenController::layout_END)
+        this->m_layout = TouchScreenController::layout_standard;
     ctl->read("scale-factor", this->m_scale_factor, 100);
     ctl->read("ui-style", this->m_touchpad_style, TouchScreenController::style_actions);
     ctl->read("vibration-strength", this->m_feedback_strength, 0.f);
@@ -1415,6 +1452,16 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
     case Options::layout:
         if(this->m_layout == TouchScreenController::layout_tight)
             return "TIGHT";
+        else if(this->m_layout == TouchScreenController::layout_old_tiny)
+            return "TINY (OLD)";
+        else if(this->m_layout == TouchScreenController::layout_old_average)
+            return "PHONE (OLD)";
+        else if(this->m_layout == TouchScreenController::layout_old_long)
+            return "LONG (OLD)";
+        else if(this->m_layout == TouchScreenController::layout_old_phablet)
+            return "PHABLET (OLD)";
+        else if(this->m_layout == TouchScreenController::layout_old_tablet)
+            return "TABLET (OLD)";
         else
             return "STANDARD";
     case Options::scale_factor:
@@ -1468,7 +1515,7 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
         if(this->m_layout > 0)
             this->m_layout --;
         else
-            this->m_layout = TouchScreenController::size_END - 1;
+            this->m_layout = TouchScreenController::layout_END - 1;
         return true;
     case Options::scale_factor:
         if(this->m_scale_factor > 50)
@@ -1514,7 +1561,7 @@ bool InputMethodProfile_TouchScreen::OptionRotateRight_Custom(size_t i)
     {
     case Options::layout:
         this->m_layout ++;
-        if(this->m_layout >= TouchScreenController::size_END)
+        if(this->m_layout >= TouchScreenController::layout_END)
             this->m_layout = 0;
         return true;
     case Options::scale_factor:
