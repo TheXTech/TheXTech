@@ -35,6 +35,36 @@
 
 #include <SDL2/SDL_haptic.h>
 
+
+#ifdef __ANDROID__
+#   include <jni.h>
+#   if 1
+#       undef JNIEXPORT
+#       undef JNICALL
+#       define JNIEXPORT extern "C"
+#       define JNICALL
+#   endif
+
+static double s_screenSize = -1;
+
+JNIEXPORT void JNICALL
+Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
+        JNIEnv *env,
+        jclass type,
+        jdouble screenSize,
+        jdouble screenWidth,
+        jdouble screenHeight
+)
+{
+    (void)env;
+    (void)type;
+    s_screenSize = screenSize;
+    (void)screenWidth;
+    (void)screenHeight;
+}
+
+#endif
+
 namespace Controls
 {
 
@@ -1272,6 +1302,11 @@ StatusInfo InputMethod_TouchScreen::GetStatus()
 InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 {
     this->m_showPowerStatus = true;
+
+    // @Wohlstand, can you give suggestions about good defaults for certain screen sizes?
+#ifdef __ANDROID__
+    // this is the place where we would set `this->m_layout` and `this->m_scale_factor` according to `s_screenSize`
+#endif
 }
 
 bool InputMethodProfile_TouchScreen::PollPrimaryButton(ControlsClass c, size_t i)

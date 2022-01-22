@@ -162,6 +162,7 @@ public class thextechActivity extends SDLActivity
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        setScreenSize(SDLActivity.getDiagonal(), displayMetrics.widthPixels, displayMetrics.heightPixels);
     }
 
     @Override
@@ -238,6 +239,7 @@ public class thextechActivity extends SDLActivity
     //    }
     //}
 
+    public static native void setScreenSize(double screenSize, double width, double height);
     public static native void setSdCardPath(String path);
     public static native void setAppDataPath(String path);
     public static native void setGameAssetsPath(String path);
