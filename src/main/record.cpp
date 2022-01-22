@@ -18,6 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// needed because there are a lot of writes / scans whose failure is detected at the end of the function
+// updated versions of glibc don't even seem to trigger this warning in this context
+#pragma GCC diagnostic ignored "-Wunused-result"
+
+
 // this module handles particular the control recording and playback functions
 // and the gameplay stats recording functions
 
@@ -588,6 +593,8 @@ static void read_NPCs()
     int success = 0;
 
     fscanf(replay_file, "NPCs\r\n%n", &success);
+
+    // will only possibly be used in the cases where it is initialized by fscanf
     int o_numNPCs;
 
     if(!success || fscanf(replay_file, "numNPCs %d\r\n", &o_numNPCs) != 1)
@@ -653,7 +660,7 @@ static void read_NPCs()
                 diverged = true;
             }
 
-            if(A != n.Active)
+            if((bool)A != n.Active)
             {
                 pLogWarning("NPC[%d].Active diverged (old %d, new %d; type %d) at frame %" PRId64 ".", i, A, n.Active, n.Type, frame_no);
                 diverged = true;

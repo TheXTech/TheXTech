@@ -7191,7 +7191,7 @@ void DropPlayer(const int A)
     SetupScreens();
 }
 
-void SwapCharacter(int A, int Character, bool Die, bool Block)
+void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
 {
     // if already dead or respawning, don't die again
     if(Player[A].Dead || Player[A].Effect == 6)
@@ -7220,7 +7220,7 @@ void SwapCharacter(int A, int Character, bool Die, bool Block)
     }
     p.FlySparks = false;
     p.Immune = 50;
-    if(Block)
+    if(FromBlock)
     {
         p.Effect = 8;
         p.Effect2 = 14;
@@ -7228,7 +7228,7 @@ void SwapCharacter(int A, int Character, bool Die, bool Block)
 
     if(!Die)
     {
-        if(Block)
+        if(FromBlock)
         {
             // make player top match old player top, for bricks (from blocks.cpp)
             if(p.Mount <= 1)

@@ -959,9 +959,9 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
             InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(profile);
             if(!p)
                 continue;
-            for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+            for(size_t j = 0; i < PlayerControls::n_buttons; j++)
             {
-                if(p->m_keys[i] == key || p->m_keys2[i] == key)
+                if(p->m_keys[j] == key || p->m_keys2[j] == key)
                 {
                     target_profile = profile;
                     break;

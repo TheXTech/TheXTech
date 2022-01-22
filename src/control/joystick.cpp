@@ -1426,15 +1426,15 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
     if(method->Name.size() > 10)
         method->Name.resize(10);
 
-    // find controller profile...!
 
+    // In this section, we find the default profile for this controller/player combination...!
+
+    // first, figure out what the player index will be
     int my_index = 0;
-    for(const InputMethod* method : active_methods)
+    for(const InputMethod* m : active_methods)
     {
-        if(!method)
-        {
+        if(!m)
             break;
-        }
         my_index ++;
     }
 

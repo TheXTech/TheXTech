@@ -203,9 +203,10 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
         else
             segments = 1;
 
-        float r = 0.f;
-        float g = 0.f;
-        float b = 0.f;
+        // new color for the inner segments
+        r = 0.f;
+        g = 0.f;
+        b = 0.f;
         if(status_info.power_level <= .5f)
         {
             r = (.5f - status_info.power_level) / .5f;
