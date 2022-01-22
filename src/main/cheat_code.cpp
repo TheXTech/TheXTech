@@ -233,7 +233,7 @@ static void iceAge()
 
 static void iStillPlayWithLegos()
 {
-    ShowLayer("Destroyed Blocks");
+    ShowLayer(LAYER_DESTROYED_BLOCKS);
     PlaySound(SFX_Raccoon);
 }
 
@@ -254,6 +254,7 @@ static void itsRainingMen()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].Section = Player[C].Section;
+            syncLayers_NPC(numNPCs);
         }
     }
 
@@ -277,6 +278,7 @@ static void dontTypeThis()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].Section = Player[C].Section;
+            syncLayers_NPC(numNPCs);
         }
     }
 
@@ -1175,6 +1177,7 @@ static void carKeys()
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
 
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
@@ -1201,6 +1204,7 @@ static void boingyBoing()
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
 
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1228,6 +1232,7 @@ static void bombsAway()
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
 
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1254,6 +1259,7 @@ static void fireMissiles()
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
 
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1281,6 +1287,7 @@ static void hellFire()
             NPC[numNPCs].Location.X = Player[B].Location.X;
             NPC[numNPCs].Location.Y = Player[B].Location.Y;
             NPC[numNPCs].Section = Player[B].Section;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1308,6 +1315,7 @@ static void upAndOut()
             NPC[numNPCs].Location.X = Player[B].Location.X;
             NPC[numNPCs].Location.Y = Player[B].Location.Y;
             NPC[numNPCs].Section = Player[B].Section;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1335,6 +1343,7 @@ static void powHammer()
             NPC[numNPCs].Location.X = Player[B].Location.X;
             NPC[numNPCs].Location.Y = Player[B].Location.Y;
             NPC[numNPCs].Section = Player[B].Section;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1363,6 +1372,7 @@ static void hammerInMyPants()
             NPC[numNPCs].Location.X = Player[B].Location.X;
             NPC[numNPCs].Location.Y = Player[B].Location.Y;
             NPC[numNPCs].Section = Player[B].Section;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1389,6 +1399,7 @@ static void rainbowRider()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1415,6 +1426,7 @@ static void greenEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1442,6 +1454,7 @@ static void blueEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1469,6 +1482,8 @@ static void yellowEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
+
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
             PlaySound(SFX_Grab);
@@ -1495,6 +1510,8 @@ static void redEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
+
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
             PlaySound(SFX_Grab);
@@ -1522,6 +1539,7 @@ static void blackEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1549,6 +1567,7 @@ static void purpleEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1576,6 +1595,7 @@ static void pinkEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1603,6 +1623,7 @@ static void coldEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;

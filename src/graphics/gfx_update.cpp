@@ -27,6 +27,7 @@
 #include "../editor.h"
 #include "../npc.h"
 #include "../gfx.h"
+#include "../layers.h"
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
@@ -2609,9 +2610,9 @@ void UpdateGraphics(bool skipRepaint)
 //                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
                     XRender::renderTexture(curX, curY, GFX.ECursor[2]);
 //                    If LCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)) <> "default" Then
-                    if(!e.Layer.empty() && SDL_strcasecmp(e.Layer.c_str(), "Default") != 0)
+                    if(e.Layer != LAYER_NONE && e.Layer != LAYER_DEFAULT)
 //                        SuperPrint UCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)), 3, .X + 28, .Y + 34
-                        SuperPrint(e.Layer, 3, X + 28, Y + 34);
+                        SuperPrint(Layer[e.Layer].Name, 3, X + 28, Y + 34);
 //                    End If
                 }
 //                Else
@@ -2630,9 +2631,9 @@ void UpdateGraphics(bool skipRepaint)
 //                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
                     XRender::renderTexture(curX, curY, GFX.ECursor[2]);
 //                    If LCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)) <> "default" Then
-                    if(!e.Layer.empty() && SDL_strcasecmp(e.Layer.c_str(), "Default") != 0)
+                    if(e.Layer != LAYER_NONE && e.Layer != LAYER_DEFAULT)
 //                        SuperPrint UCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)), 3, .X + 28, .Y + 34
-                        SuperPrint(EditorCursor.Layer, 3, curX + 28 , curY + 34);
+                        SuperPrint(Layer[e.Layer].Name, 3, X + 28, Y + 34);
 //                    End If
 //                End If
                 }

@@ -41,19 +41,18 @@ public:
 };
 
 
-// restore when blocks get LocationInLayer
-// template<>
-// class Tree_Extractor<Block_t>
-// {
-// public:
-//     static void ExtractBoundingBox(const Block_t *object, loose_quadtree::BoundingBox<double> *bbox)
-//     {
-//         bbox->left      = object->LocationInLayer.X;
-//         bbox->top       = object->LocationInLayer.Y;
-//         bbox->width     = object->LocationInLayer.Width;
-//         bbox->height    = object->LocationInLayer.Height;
-//     }
-// };
+template<>
+class Tree_Extractor<Block_t>
+{
+public:
+    static void ExtractBoundingBox(const Block_t *object, loose_quadtree::BoundingBox<double> *bbox)
+    {
+        bbox->left      = object->LocationInLayer.X;
+        bbox->top       = object->LocationInLayer.Y;
+        bbox->width     = object->LocationInLayer.Width;
+        bbox->height    = object->LocationInLayer.Height;
+    }
+};
 
 template<class ItemT>
 struct Tree_private
@@ -407,7 +406,7 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
         }
 
         double OffsetX, OffsetY;
-        if (layer == maxLayers+1)
+        if(layer == maxLayers+1)
             OffsetX = OffsetY = 0.0;
         else
         {

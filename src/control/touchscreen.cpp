@@ -1058,7 +1058,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
     {
         SDL_Finger* f = SDL_GetTouchFinger(dev, i);
 
-        if(!f || (f->id < 0))  //Skip a wrong finger
+        if(!f || (f->id < 0)) //Skip a wrong finger
             continue;
 
         SDL_FingerID finger_id = f->id;

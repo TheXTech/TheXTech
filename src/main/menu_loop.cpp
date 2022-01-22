@@ -55,7 +55,7 @@ static void updateIntroLevelActivity()
 
     if(CheckLiving() == 0)
     {
-        ShowLayer("Destroyed Blocks");
+        ShowLayer(LAYER_DESTROYED_BLOCKS);
 
         For(A, 1, numNPCs)
         {
@@ -313,7 +313,7 @@ static void updateIntroLevelActivity()
 
             if(p.Mount == 0 && p.Character != 5)
             {
-                numNPCs += 1;
+                numNPCs++;
                 p.HoldingNPC = numNPCs;
                 p.ForceHold = 120;
 
@@ -362,6 +362,7 @@ static void updateIntroLevelActivity()
                     n.Location.X = Player[A].Location.X; // level[n.Section].X + 1000
                     n.TimeLeft = 100;
                     n.Section = Player[A].Section;
+                    syncLayers_NPC(numNPCs);
                 }
             }
 

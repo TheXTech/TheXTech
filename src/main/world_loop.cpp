@@ -110,7 +110,7 @@ static SDL_INLINE bool isWorldMusicNotSame(WorldMusic_t &mus)
 {
     bool ret = false;
     ret |= (curWorldMusic != mus.Type);
-    ret |= (mus.Type == CustomWorldMusicId() && curWorldMusicFile != mus.MusicFile);
+    ret |= (mus.Type == CustomWorldMusicId() && curWorldMusicFile != GetS(mus.MusicFile));
     return ret;
 }
 
@@ -125,7 +125,7 @@ static SDL_INLINE bool s_worldUpdateMusic(const Location_t &loc)
         {
             if(isWorldMusicNotSame(mus))
             {
-                curWorldMusicFile = mus.MusicFile;
+                curWorldMusicFile = GetS(mus.MusicFile);
                 StartMusic(mus.Type);
                 ret = true;
             }

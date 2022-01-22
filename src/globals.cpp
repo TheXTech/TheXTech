@@ -193,6 +193,7 @@ RangeArr<double, 0, maxPlayers> vScreenY;
 RangeArr<double, 0, maxPlayers> qScreenX;
 RangeArr<double, 0, maxPlayers> qScreenY;
 bool qScreen = false;
+RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
 RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
 RangeArrI<int, 0, maxBlockType, 0> BlockHeight;
@@ -629,3 +630,8 @@ double vb6Round(double x, int decimals)
 
     return res;
 }
+
+
+// utilities for stringindex_t
+std::vector<std::string> g_LevelString;
+size_t g_numWorldString;

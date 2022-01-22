@@ -576,6 +576,8 @@ void PlayerHurt(const int A)
                 NPC[numNPCs].Location.SpeedX = 0;
                 NPC[numNPCs].CantHurt = 10;
                 NPC[numNPCs].CantHurtPlayer = A;
+                syncLayers_NPC(numNPCs);
+
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
             }
             else
@@ -671,6 +673,8 @@ void PlayerHurt(const int A)
                         NPC[numNPCs].Location.SpeedX = 0;
                         NPC[numNPCs].CantHurt = 10;
                         NPC[numNPCs].CantHurtPlayer = A;
+                        syncLayers_NPC(numNPCs);
+
                         p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
                         p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
                         p.Location.X += 64 - Physics.PlayerWidth[p.Character][p.State] / 2;
@@ -792,6 +796,8 @@ void PlayerDead(int A)
         NPC[numNPCs].Location.SpeedX = 0;
         NPC[numNPCs].CantHurt = 10;
         NPC[numNPCs].CantHurtPlayer = A;
+        syncLayers_NPC(numNPCs);
+
         p.Mount = 0;
         p.Location.Y -= 32;
         p.Location.Height = 32;
@@ -2319,7 +2325,8 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                             {
                                 PlaySound(SFX_ZeldaGrass);
                                 Block[A].Hidden = true;
-                                Block[A].Layer = "Destroyed Blocks";
+                                Block[A].Layer = LAYER_DESTROYED_BLOCKS;
+                                syncLayersTrees_Block(A);
                                 NewEffect(10, Block[A].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
@@ -2643,6 +2650,7 @@ void YoshiSpit(const int A)
                 NPC[numNPCs].Location.Y = p.Location.Y + p.YoshiTY;
                 NPC[numNPCs].Location.Width = 32;
                 NPC[numNPCs].Location.Height = 32;
+
                 if(B == 1)
                 {
                     NPC[numNPCs].Location.SpeedY = -0.8;
@@ -2658,6 +2666,8 @@ void YoshiSpit(const int A)
                     NPC[numNPCs].Location.SpeedY = 0.8;
                     NPC[numNPCs].Location.SpeedX = 5 * p.Direction;
                 }
+
+                syncLayers_NPC(numNPCs);
             }
         }
         else
@@ -2828,12 +2838,14 @@ void PlayerDismount(const int A)
         NPC[numNPCs].Direction = Player[A].Direction;
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 100;
+
         if(Player[A].MountType == 1)
             NPC[numNPCs].Type = 35;
         else if(Player[A].MountType == 2)
             NPC[numNPCs].Type = 191;
         else if(Player[A].MountType == 3)
             NPC[numNPCs].Type = 193;
+
         NPC[numNPCs].Location.Height = 32;
         NPC[numNPCs].Location.Width = 32;
         NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - 32;
@@ -2842,6 +2854,9 @@ void PlayerDismount(const int A)
         NPC[numNPCs].Location.SpeedX = (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX) * 0.8;
         NPC[numNPCs].CantHurt = 10;
         NPC[numNPCs].CantHurtPlayer = A;
+
+        syncLayers_NPC(numNPCs);
+
         Player[A].Location.Y = Player[A].Location.Y + Player[A].Location.Height;
         Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
         Player[A].Location.Y = Player[A].Location.Y - Player[A].Location.Height;
@@ -2858,7 +2873,7 @@ void PlayerDismount(const int A)
         if(Player[A].SpinJump)
             Player[A].Jump = Player[A].Jump - 6;
         Player[A].Mount = 0;
-        numNPCs += 1;
+        numNPCs++;
         NPC[numNPCs].Direction = Player[A].Direction;
         if(Maths::iRound(NPC[numNPCs].Direction) == 1)
             NPC[numNPCs].Frame = 4;
@@ -2874,6 +2889,8 @@ void PlayerDismount(const int A)
         NPC[numNPCs].Location.SpeedX = 0;
         NPC[numNPCs].CantHurt = 10;
         NPC[numNPCs].CantHurtPlayer = A;
+        syncLayers_NPC(numNPCs);
+
         Player[A].Location.SpeedY = double(Physics.PlayerJumpVelocity) - tempSpeed;
         Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
         Player[A].Location.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
@@ -2926,11 +2943,13 @@ void PlayerDismount(const int A)
         Player[A].StandingOnNPC = 0;
         Player[A].Mount = 0;
         UpdateYoshiMusic();
+
         numNPCs++;
         NPC[numNPCs] = NPC_t();
         NPC[numNPCs].Direction = Player[A].Direction;
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 100;
+
         if(Player[A].MountType == 1)
             NPC[numNPCs].Type = 95;
         else if(Player[A].MountType == 2)
@@ -2947,6 +2966,7 @@ void PlayerDismount(const int A)
             NPC[numNPCs].Type = 150;
         else if(Player[A].MountType == 8)
             NPC[numNPCs].Type = 228;
+
         NPC[numNPCs].Location.Height = 32;
         NPC[numNPCs].Location.Width = 32;
         NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - 32;
@@ -2955,6 +2975,8 @@ void PlayerDismount(const int A)
         NPC[numNPCs].Location.SpeedX = 0;
         NPC[numNPCs].CantHurt = 10;
         NPC[numNPCs].CantHurtPlayer = A;
+        syncLayers_NPC(numNPCs);
+
         Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
         // if not swimming
         if(Player[A].Wet <= 0 || Player[A].Quicksand != 0)
@@ -3705,6 +3727,7 @@ void ClownCar()
             NPC[numNPCs].Location.Y += NPC[numNPCs].Location.SpeedY;
             NPC[numNPCs].Location.X += NPC[numNPCs].Location.SpeedX;
             NPC[numNPCs].Section = Player[A].Section;
+            syncLayers_NPC(numNPCs);
 
             for(B = 1; B <= numPlayers; B++)
             {
@@ -3753,6 +3776,7 @@ void ClownCar()
                                 NPC[numNPCs].Direction = NPC[B].Direction;
                                 if(Maths::iRound(NPC[numNPCs].Direction) == 1)
                                     NPC[numNPCs].Frame = 2;
+                                syncLayers_NPC(numNPCs);
                             }
 
                             for(int numNPCsMax9 = numNPCs, C = 1; C <= numNPCsMax9; C++)
@@ -4110,6 +4134,7 @@ void PowerUps(const int A)
                         }
                         if(p.Character == 4)
                             NPC[numNPCs].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                        syncLayers_NPC(numNPCs);
                         CheckSectionNPC(numNPCs);
                     }
                 }
@@ -4171,6 +4196,7 @@ void PowerUps(const int A)
                         if(Maths::iRound(NPC[numNPCs].Special) == 4)
                             NPC[numNPCs].Frame = 12;
 
+                        syncLayers_NPC(numNPCs);
                         CheckSectionNPC(numNPCs);
                         p.FireBallCD = 30;
                         if(p.Character == 2)
@@ -4304,6 +4330,8 @@ void PowerUps(const int A)
                     p.SwordPoke = -10;
                 PlaySound(SFX_Throw);
             }
+
+            syncLayers_NPC(numNPCs);
         }
         else if(p.FireBallCD == 0 && p.Controls.Run && p.RunRelease)
         {
@@ -4410,14 +4438,14 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
 
     if(warp.Stars > numStars && canWarp)
     {
-        if(warp.StarsMsg.empty())
+        if(warp.StarsMsg == STRINGINDEX_NONE)
         {
             if(warp.Stars == 1)
                 MessageText = "You need 1 star to enter.";
             else
                 MessageText = fmt::format_ne("You need {0} stars to enter.", warp.Stars);
         } else {
-            MessageText = warp.StarsMsg;
+            MessageText = GetS(warp.StarsMsg);
         }
         PauseGame(PauseCode::Message, A);
         MessageText.clear();
@@ -4445,8 +4473,10 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                     {
                         if(CheckCollision(entrance, Background[C].Location))
                         {
-                            Background[C].Layer.clear();
+                            // this makes Background[C] disappear and never reappear
+                            Background[C].Layer = LAYER_NONE;
                             Background[C].Hidden = true;
+                            syncLayers_BGO(C);
                         }
                     }
                 }
@@ -4466,8 +4496,10 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                     {
                         if(CheckCollision(entrance, Background[C].Location))
                         {
-                            Background[C].Layer.clear();
+                            // this makes Background[C] disappear and never reappear
+                            Background[C].Layer = LAYER_NONE;
                             Background[C].Hidden = true;
+                            syncLayers_BGO(C);
                         }
                     }
                 }
@@ -4483,8 +4515,10 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                     {
                         if(CheckCollision(entrance, Background[C].Location))
                         {
-                            Background[C].Layer.clear();
+                            // this makes Background[C] disappear and never reappear
+                            Background[C].Layer = LAYER_NONE;
                             Background[C].Hidden = true;
+                            syncLayers_BGO(C);
                         }
                     }
                 }
@@ -4545,16 +4579,16 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
             plr.Location.SpeedY = 0;
         }
 
-        if(!warp.eventEnter.empty())
+        if(warp.eventEnter != EVENT_NONE)
             ProcEvent(warp.eventEnter);
 
         if(warp.Effect == 0 || warp.Effect == 3) // Instant / Portal
         {
             if(warp.Effect == 3)
             {
-                if(!warp.level.empty())
+                if(warp.level != STRINGINDEX_NONE)
                 {
-                    GoToLevel = warp.level;
+                    GoToLevel = GetS(warp.level);
                     GoToLevelNoGameThing = warp.noEntranceScene;
                     plr.Effect = 8;
                     plr.Effect2 = 2921;
@@ -4813,7 +4847,6 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
     Location_t tempLocation;
     int LayerNPC = 0;
     int B = 0;
-    int C = 0;
     bool tempBool = false;
     double lyrX = 0;
     double lyrY = 0;
@@ -4977,7 +5010,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[numNPCs].Location.Height = NPCHeight[108];
                         NPC[numNPCs].Active = true;
                         NPC[numNPCs].TimeLeft = NPC[p.HoldingNPC].TimeLeft;
-                        NPC[numNPCs].Layer = "Spawned NPCs";
+                        NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                         NPC[numNPCs].Location.Y = NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC].Location.Height - NPC[numNPCs].Location.Height;
                         NPC[numNPCs].Direction = p.Direction;
                         if(NPC[numNPCs].Direction == 1)
@@ -5000,6 +5033,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
                         NPC[numNPCs].Projectile = true;
                         NPC[numNPCs].Frame = EditorNPCFrame(NPC[numNPCs].Type, NPC[numNPCs].Direction);
+
+                        syncLayers_NPC(numNPCs);
                     // Next B
                 }
             }
@@ -5069,6 +5104,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[numNPCs].Special = A;
                     if(p.Direction > 0)
                         NPC[numNPCs].Frame = 2;
+                    syncLayers_NPC(numNPCs);
                 }
                 for(B = 1; B <= numNPCs; B++)
                 {
@@ -5306,11 +5342,12 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
     if(LayerNPC > 0)
     {
-        for(B = 1; B <= maxLayers; B++)
+        int B = NPC[LayerNPC].AttLayer;
+        // for(B = 1; B <= maxLayers; B++)
         {
-            if(!Layer[B].Name.empty())
+            if(B != LAYER_NONE)
             {
-                if(Layer[B].Name == NPC[LayerNPC].AttLayer)
+                // if(Layer[B].Name == NPC[LayerNPC].AttLayer)
                 {
                     if(NPC[LayerNPC].Location.X - lyrX == 0.0 && NPC[LayerNPC].Location.Y - lyrY == 0.0)
                     {
@@ -5319,17 +5356,28 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             Layer[B].EffectStop = true;
                             Layer[B].SpeedX = 0;
                             Layer[B].SpeedY = 0;
-                            for(C = 1; C <= numBlock; C++)
+                            for(int C : Layer[B].blocks)
                             {
-                                if(Block[C].Layer == Layer[B].Name)
+                                // if(Block[C].Layer == Layer[B].Name)
                                 {
-                                    Block[C].Location.SpeedX = Layer[B].SpeedX;
-                                    Block[C].Location.SpeedY = Layer[B].SpeedY;
+                                    Block[C].Location.SpeedX = 0;
+                                    Block[C].Location.SpeedY = 0;
                                 }
                             }
-                            for(C = 1; C <= numNPCs; C++)
+                            if(g_compatibility.enable_climb_bgo_layer_move)
                             {
-                                if(NPC[C].Layer == Layer[B].Name)
+                                for(int C : Layer[B].BGOs)
+                                {
+                                    if(BackgroundFence[Background[C].Type])
+                                    {
+                                        Background[C].Location.SpeedX = 0;
+                                        Background[C].Location.SpeedY = 0;
+                                    }
+                                }
+                            }
+                            for(int C : Layer[B].NPCs)
+                            {
+                                // if(NPC[C].Layer == Layer[B].Name)
                                 {
                                     if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
                                     {
@@ -5348,8 +5396,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     }
                 }
             }
-            else
-                break;
+            // else
+            //     break;
         }
     }
 }
@@ -5868,7 +5916,7 @@ void PlayerEffects(const int A)
             case LevelDoor::TRANSIT_SCROLL:
                 // TODO: Implement the scrolling method
             case LevelDoor::TRANSIT_NONE:
-                if(Maths::iRound(leftToGoal) == 0 && warp.level.empty() && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
+                if(Maths::iRound(leftToGoal) == 0 && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
                     g_levelVScreenFader[A].setupFader(8, 0, 65, ScreenFader::S_FADE);
                 break;
 
@@ -6061,9 +6109,9 @@ void PlayerEffects(const int A)
                 }
             }
 
-            if(!warp.level.empty())
+            if(warp.level != STRINGINDEX_NONE)
             {
-                GoToLevel = warp.level;
+                GoToLevel = GetS(warp.level);
                 GoToLevelNoGameThing = warp.noEntranceScene;
                 p.Effect = 8;
                 p.Effect2 = 2970;
@@ -6359,7 +6407,7 @@ void PlayerEffects(const int A)
         case LevelDoor::TRANSIT_SCROLL:
             // TODO: Implement the scrolling method
         case LevelDoor::TRANSIT_NONE:
-            if(fEqual(p.Effect2, 20) && warp.level.empty() && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
+            if(fEqual(p.Effect2, 20) && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
                 g_levelVScreenFader[A].setupFader(9, 0, 65, ScreenFader::S_FADE);
             break;
 
@@ -6455,9 +6503,9 @@ void PlayerEffects(const int A)
                 }
             }
 
-            if(!warp.level.empty())
+            if(warp.level != STRINGINDEX_NONE)
             {
-                GoToLevel = warp.level;
+                GoToLevel = GetS(warp.level);
                 GoToLevelNoGameThing = warp.noEntranceScene;
                 p.Effect = 8;
                 p.Effect2 = 3000;
@@ -6617,7 +6665,7 @@ void PlayerEffects(const int A)
 
             auto &w = Warp[p.Warp];
 
-            if(g_config.EnableInterLevelFade && (w.MapWarp || !w.level.empty()) && Maths::iRound(p.Effect2) == 2955 && !g_levelScreenFader.isFadingIn())
+            if(g_config.EnableInterLevelFade && (w.MapWarp || w.level != STRINGINDEX_NONE) && Maths::iRound(p.Effect2) == 2955 && !g_levelScreenFader.isFadingIn())
                 g_levelScreenFader.setupFader(2, 0, 65, ScreenFader::S_FADE);
 
             if(fEqual(p.Effect2, 2920))

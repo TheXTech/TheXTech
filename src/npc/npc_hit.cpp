@@ -28,6 +28,7 @@
 #include "../blocks.h"
 #include "../graphics.h"
 #include "../npc_id.h"
+#include "../layers.h"
 
 #include <Logger/logger.h>
 
@@ -1302,6 +1303,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].CantHurt = 6;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
+                syncLayers_NPC(numNPCs);
                 NPC[A].Type +=  4;
             }
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
@@ -1377,6 +1379,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].CantHurt = 6;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
+                syncLayers_NPC(numNPCs);
             }
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
