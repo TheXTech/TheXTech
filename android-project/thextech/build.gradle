@@ -12,10 +12,7 @@ def release_key_alias = System.env.RELEASE_KEY_ALIAS
 def pin_alias = System.env.PIN_ALIAS
 def db_pass_alias = System.env.DB_PASS_ALIAS
 
-def xTechVersionString = "x.x.x.x-xxx"
-def xTechVersionNumber = 1
-
-def getGitHash = { ->
+def getGitHash() {
     def stdout = new ByteArrayOutputStream()
     exec {
         commandLine 'git', 'rev-parse', '--short', 'HEAD'
@@ -24,54 +21,74 @@ def getGitHash = { ->
     return stdout.toString().trim()
 }
 
-def cmakeVersion = file('../../version.cmake')
-if (cmakeVersion.canRead()) {
-    def input = new FileInputStream(cmakeVersion)
-    def rawVersion = input.getText()
+def parseVersion(verNum) {
+    def cmakeVersion = file('../../version.cmake')
 
-    def verMajorEx      = ~/(?m)THEXTECH_VERSION_1 (\d+)/
-    def verMajorM       = verMajorEx.matcher(rawVersion)
-    def verMajor        = verMajorM[0][1]
+    if (cmakeVersion.canRead()) {
+        def input = new FileInputStream(cmakeVersion)
+        def rawVersion = input.getText()
 
-    def verMinorEx      = ~/(?m)THEXTECH_VERSION_2 (\d+)/
-    def verMinorM       = verMinorEx.matcher(rawVersion)
-    def verMinor        = verMinorM[0][1]
+        def verMajorEx      = ~/(?m)THEXTECH_VERSION_1 (\d+)/
+        def verMajorM       = verMajorEx.matcher(rawVersion)
+        verNum[0]           = verMajorM[0][1].toInteger()
 
-    def verRevisionEx   = ~/(?m)THEXTECH_VERSION_3 (\d+)/
-    def verRevisionM    = verRevisionEx.matcher(rawVersion)
-    def verRevision     = verRevisionM[0][1]
+        def verMinorEx      = ~/(?m)THEXTECH_VERSION_2 (\d+)/
+        def verMinorM       = verMinorEx.matcher(rawVersion)
+        verNum[1]           = verMinorM[0][1].toInteger()
 
-    def verPatchEx      = ~/(?m)THEXTECH_VERSION_4 (\d+)/
-    def verPatchM       = verPatchEx.matcher(rawVersion)
-    def verPatch        = verPatchM[0][1]
+        def verRevisionEx   = ~/(?m)THEXTECH_VERSION_3 (\d+)/
+        def verRevisionM    = verRevisionEx.matcher(rawVersion)
+        verNum[2]           = verRevisionM[0][1].toInteger()
 
-    def verRelEx        = ~/(?m)THEXTECH_VERSION_REL "(-?\w*)"/
-    def verRelM         = verRelEx.matcher(rawVersion)
-    def verRel          = verRelM[0][1]
+        def verPatchEx      = ~/(?m)THEXTECH_VERSION_4 (\d+)/
+        def verPatchM       = verPatchEx.matcher(rawVersion)
+        verNum[3]           = verPatchM[0][1].toInteger()
 
-    xTechVersionString = ""
+        def verRelEx        = ~/(?m)THEXTECH_VERSION_REL "(-?\w*)"/
+        def verRelM         = verRelEx.matcher(rawVersion)
+        verNum[5]           = verRelM[0][1]
 
-    xTechVersionString += verMajor
-    xTechVersionString += "." + verMinor
-    if (verRevision.toInteger() > 0 || verPatch.toInteger() > 0) {
-        xTechVersionString += "." + verRevision
-        if (verPatch.toInteger() > 0) {
-            xTechVersionString += "." + verPatch
-        }
+        return verNum
+    } else {
+        throw new GradleException("Can't read ../../version.cmake file")
     }
-    if (verRel != "") {
-        xTechVersionString += verRel
-    }
-
-    xTechVersionString += " #" + getGitHash()
-
-    xTechVersionNumber = (verMajor.toInteger() * 1000000) + (verMinor.toInteger() * 10000) + (verRevision.toInteger() * 100) + verPatch.toInteger()
-
-    println "Project version: " + xTechVersionString + ", version code: " + xTechVersionNumber.toString()
-} else {
-    println "ERROR: Can't read version.cmake!"
 }
 
+def cmakeToVersionCode(verNum) {
+    def ret = ""
+
+    ret += verNum[0].toString()
+    ret += "." + verNum[1].toString()
+    if (verNum[2] > 0 || verNum[3] > 0) {
+        ret += "." + verNum[2].toString()
+        if (verNum[3] > 0) {
+            ret += "." + verNum[3].toString()
+        }
+    }
+
+    if (verNum[5] != "") {
+        ret += verNum[5]
+    }
+
+    ret += " #" + getGitHash()
+
+    return ret
+}
+
+def verNum = [
+    0: 0, // major
+    1: 0, // minor
+    2: 0, // revision
+    3: 0, // patch
+    4: 0, // CI build number
+    5: "" // release type
+]
+
+parseVersion(verNum)
+def xTechVersionString = cmakeToVersionCode(verNum)
+def xTechVersionNumber = (verNum[0] * 1000000) + (verNum[1] * 10000) + (verNum[2] * 100) + verNum[3]
+
+println "Project version: " + xTechVersionString + ", version code: " + xTechVersionNumber.toString()
 
 android {
     compileSdkVersion 31
@@ -85,6 +102,7 @@ android {
 
         versionName xTechVersionString
         versionCode xTechVersionNumber
+
         externalNativeBuild {
             cmake {
                 abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
