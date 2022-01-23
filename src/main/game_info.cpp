@@ -59,8 +59,8 @@ void initGameInfo()
     g_gameInfo.title = "Super Mario Bros. X";
     g_gameInfo.titleWindow = "Super Mario Bros. X - Version 1.3 - www.SuperMarioBrothers.org";
 #   else
-    g_gameInfo.title = "The X-Tech Engine";
-    g_gameInfo.titleWindow = fmt::format_ne("X-Tech v{0}", V_LATEST_STABLE);
+    g_gameInfo.title = "TheXTech Engine";
+    g_gameInfo.titleWindow = fmt::format_ne("TheXTech v{0}, #{1}", V_LATEST_STABLE, V_BUILD_VER);
 #   endif
 #endif /* CUSTOM_GAME_NAME_TITLE */
 
@@ -110,7 +110,7 @@ void initGameInfo()
         {
             if(config.hasKey("title"))
                 config.read("title", g_gameInfo.title, g_gameInfo.title);
-            g_gameInfo.titleWindow = fmt::format_ne("{0} - (X-Tech v{1})", g_gameInfo.title, V_LATEST_STABLE);
+            g_gameInfo.titleWindow = fmt::format_ne("{0} - (TheXTech v{1}, #{2})", g_gameInfo.title, V_LATEST_STABLE, V_BUILD_VER);
             config.read("disable-two-player", g_gameInfo.disableTwoPlayer, false);
             config.read("disable-battle-mode", g_gameInfo.disableBattleMode, false);
         }

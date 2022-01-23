@@ -89,7 +89,7 @@
 //Version of this program
 #define V_LATEST_STABLE V_FILE_VERSION_NUM V_FILE_RELEASE
 
-#define V_FILE_DESC "TheXTech - a C++ source port of a vanilla Engine"
+#define V_FILE_DESC "TheXTech - the modern C++ port and successor of the SMBX engine"
 
 #define V_INTERNAL_NAME "thextech"
 
