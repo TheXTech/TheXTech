@@ -33,14 +33,17 @@ namespace Controls
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_Duplicate::Update(int player, Controls_t &c, CursorControls_t &m, EditorControls_t &e, HotkeysPressed_t &h)
+bool InputMethod_Duplicate::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h)
 {
     if(this->player_no < 1 || this->player_no > maxLocalPlayers)
         return false;
+
     if(this->player_no - 1 >= (int)g_InputMethods.size())
         return false;
+
     if(!g_InputMethods[this->player_no - 1])
         return false;
+
     c = Player[this->player_no].Controls;
 
     UNUSED(player);
@@ -92,26 +95,26 @@ bool InputMethodProfile_Duplicate::DeleteSecondaryButton(ControlsClass c, size_t
     return true;
 }
 
-const char *InputMethodProfile_Duplicate::NamePrimaryButton(ControlsClass c, size_t i)
+const char* InputMethodProfile_Duplicate::NamePrimaryButton(ControlsClass c, size_t i)
 {
     UNUSED(c);
     UNUSED(i);
     return "(DUP)";
 }
 
-const char *InputMethodProfile_Duplicate::NameSecondaryButton(ControlsClass c, size_t i)
+const char* InputMethodProfile_Duplicate::NameSecondaryButton(ControlsClass c, size_t i)
 {
     (void)c;
     (void)i;
     return "";
 }
 
-void InputMethodProfile_Duplicate::SaveConfig(IniProcessing *ctl)
+void InputMethodProfile_Duplicate::SaveConfig(IniProcessing* ctl)
 {
     UNUSED(ctl);
 }
 
-void InputMethodProfile_Duplicate::LoadConfig(IniProcessing *ctl)
+void InputMethodProfile_Duplicate::LoadConfig(IniProcessing* ctl)
 {
     UNUSED(ctl);
 }
@@ -120,9 +123,9 @@ void InputMethodProfile_Duplicate::LoadConfig(IniProcessing *ctl)
 || implementation for InputMethodType_Duplicate     ||
 \*====================================================*/
 
-InputMethodProfile *InputMethodType_Duplicate::AllocateProfile() noexcept
+InputMethodProfile* InputMethodType_Duplicate::AllocateProfile() noexcept
 {
-    return (InputMethodProfile *) new(std::nothrow) InputMethodProfile_Duplicate;
+    return (InputMethodProfile*) new(std::nothrow) InputMethodProfile_Duplicate;
 }
 
 InputMethodType_Duplicate::InputMethodType_Duplicate()
@@ -130,9 +133,9 @@ InputMethodType_Duplicate::InputMethodType_Duplicate()
     this->Name = "Duplicate";
 }
 
-bool InputMethodType_Duplicate::TestProfileType(InputMethodProfile *profile)
+bool InputMethodType_Duplicate::TestProfileType(InputMethodProfile* profile)
 {
-    return (bool)dynamic_cast<InputMethodProfile_Duplicate *>(profile);
+    return (bool)dynamic_cast<InputMethodProfile_Duplicate*>(profile);
 }
 
 bool InputMethodType_Duplicate::RumbleSupported()
@@ -146,7 +149,7 @@ void InputMethodType_Duplicate::UpdateControlsPre()
 void InputMethodType_Duplicate::UpdateControlsPost()
 {}
 
-InputMethod *InputMethodType_Duplicate::Poll(const std::vector<InputMethod *> &active_methods) noexcept
+InputMethod* InputMethodType_Duplicate::Poll(const std::vector<InputMethod*>& active_methods) noexcept
 {
     int found = 0;
 
@@ -154,19 +157,25 @@ InputMethod *InputMethodType_Duplicate::Poll(const std::vector<InputMethod *> &a
     {
         if(p > numPlayers)
             continue;
+
         if(!Player[p].Controls.Drop || !Player[p].Controls.Up)
             continue;
+
         if(p - 1 >= (int)active_methods.size())
             continue;
+
         if(!active_methods[p - 1])
             continue;
 
         bool allowed = true;
-        for(InputMethod *method : active_methods)
+
+        for(InputMethod* method : active_methods)
         {
             if(!method)
                 continue;
-            InputMethod_Duplicate *m = dynamic_cast<InputMethod_Duplicate *>(method);
+
+            InputMethod_Duplicate* m = dynamic_cast<InputMethod_Duplicate*>(method);
+
             if(m && m->player_no == p)
             {
                 allowed = false;
@@ -181,7 +190,7 @@ InputMethod *InputMethodType_Duplicate::Poll(const std::vector<InputMethod *> &a
         break;
     }
 
-    InputMethod_Duplicate *method = new(std::nothrow) InputMethod_Duplicate;
+    InputMethod_Duplicate* method = new(std::nothrow) InputMethod_Duplicate;
 
     if(!method)
         return nullptr;
@@ -191,7 +200,7 @@ InputMethod *InputMethodType_Duplicate::Poll(const std::vector<InputMethod *> &a
     method->Name = "Duplicate P" + std::to_string(found);
     method->Type = this;
 
-    return (InputMethod *)method;
+    return (InputMethod*)method;
 }
 
 /*-----------------------*\
@@ -208,17 +217,18 @@ size_t InputMethodType_Duplicate::GetOptionCount()
 // It is guaranteed that none of these will be called if
 // GetOptionCount() returns 0.
 // get a char* describing the option
-const char *InputMethodType_Duplicate::GetOptionName(size_t i)
+const char* InputMethodType_Duplicate::GetOptionName(size_t i)
 {
     if(i == 0)
         return "PRESS DROP & UP";
+
     return nullptr;
 }
 
 // get a char* describing the current option value
 // must be allocated in static or instance memory
 // WILL NOT be freed
-const char *InputMethodType_Duplicate::GetOptionValue(size_t i)
+const char* InputMethodType_Duplicate::GetOptionValue(size_t i)
 {
     UNUSED(i);
     return nullptr;
@@ -245,12 +255,12 @@ bool InputMethodType_Duplicate::OptionRotateRight(size_t i)
     return false;
 }
 
-void InputMethodType_Duplicate::SaveConfig_Custom(IniProcessing *ctl)
+void InputMethodType_Duplicate::SaveConfig_Custom(IniProcessing* ctl)
 {
     UNUSED(ctl);
 }
 
-void InputMethodType_Duplicate::LoadConfig_Custom(IniProcessing *ctl)
+void InputMethodType_Duplicate::LoadConfig_Custom(IniProcessing* ctl)
 {
     UNUSED(ctl);
 }

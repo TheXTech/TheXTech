@@ -47,8 +47,8 @@
 namespace Controls
 {
 
-std::vector<InputMethod *> g_InputMethods;
-std::vector<InputMethodType *> g_InputMethodTypes;
+std::vector<InputMethod*> g_InputMethods;
+std::vector<InputMethodType*> g_InputMethodTypes;
 bool g_renderTouchscreen = false;
 static PauseCode s_requestedPause = PauseCode::None;
 HotkeysPressed_t g_hotkeysPressed;
@@ -59,7 +59,9 @@ void Hotkeys::Activate(size_t i, int player)
 {
     if(g_disallowHotkeys || g_pollingInput)
         return;
+
     g_disallowHotkeys = true;
+
     switch(i)
     {
 #ifndef RENDER_FULLSCREEN_ALWAYS
@@ -67,27 +69,34 @@ void Hotkeys::Activate(size_t i, int player)
         ChangeScreen();
         return;
 #endif
+
 #ifdef USE_SCREENSHOTS_AND_RECS
     case Buttons::Screenshot:
         TakeScreen = true;
         return;
+
     case Buttons::RecordGif:
         XRender::toggleGifRecorder();
         return;
 #endif
+
     case Buttons::DebugInfo:
         g_stats.enabled = !g_stats.enabled;
         return;
+
     case Buttons::EnterCheats:
         s_requestedPause = PauseCode::TextEntry;
         return;
+
     case Buttons::ToggleHUD:
         ShowOnScreenMeta = !ShowOnScreenMeta;
         return;
+
     case Buttons::LegacyPause:
         // handled elsewhere
         (void)player;
         return;
+
     default:
         return;
     }
@@ -113,7 +122,7 @@ StatusInfo InputMethod::GetStatus()
 // Called (1) in order of InputMethodTypes, then (2) in order of InputMethods
 // Returns true if event is consumed, false if other InputMethodTypes and InputMethods
 //     should receive it.
-bool InputMethod::ConsumeEvent(const SDL_Event *ev)
+bool InputMethod::ConsumeEvent(const SDL_Event* ev)
 {
     UNUSED(ev);
     return false;
@@ -126,19 +135,21 @@ bool InputMethod::ConsumeEvent(const SDL_Event *ev)
 
 InputMethodProfile::~InputMethodProfile() {}
 
-void InputMethodProfile::SaveConfig_All(IniProcessing *ctl)
+void InputMethodProfile::SaveConfig_All(IniProcessing* ctl)
 {
     if(this->Type->RumbleSupported())
         ctl->setValue("enable-rumble", this->m_rumbleEnabled);
+
     ctl->setValue("ground-pound-by-alt-run", this->m_groundPoundByAltRun);
     ctl->setValue("show-power-status", this->m_showPowerStatus);
     this->SaveConfig(ctl);
 }
 
-void InputMethodProfile::LoadConfig_All(IniProcessing *ctl)
+void InputMethodProfile::LoadConfig_All(IniProcessing* ctl)
 {
     if(this->Type->RumbleSupported())
         ctl->read("enable-rumble", this->m_rumbleEnabled, g_config.JoystickEnableRumble);
+
     ctl->read("ground-pound-by-alt-run", this->m_groundPoundByAltRun, g_config.GameplayPoundByAltRun);
     ctl->read("show-power-status", this->m_showPowerStatus, this->m_showPowerStatus);
     this->LoadConfig(ctl);
@@ -148,15 +159,17 @@ void InputMethodProfile::LoadConfig_All(IniProcessing *ctl)
 size_t InputMethodProfile::GetOptionCount()
 {
     size_t shared_options_count = CommonOptions::COUNT;
+
     if(!this->Type->RumbleSupported())
         shared_options_count -= 1;
+
     return shared_options_count + this->GetOptionCount_Custom();
 }
 // Methods to manage per-profile options
 // It is guaranteed that none of these will be called if
 // GetOptionCount() returns 0.
 // get a char* describing the option
-const char *InputMethodProfile::GetOptionName(size_t i)
+const char* InputMethodProfile::GetOptionName(size_t i)
 {
     if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
         i += 1;
@@ -176,7 +189,7 @@ const char *InputMethodProfile::GetOptionName(size_t i)
 // get a char* describing the current option value
 // must be allocated in static or instance memory
 // WILL NOT be freed
-const char *InputMethodProfile::GetOptionValue(size_t i)
+const char* InputMethodProfile::GetOptionValue(size_t i)
 {
     if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
         i += 1;
@@ -220,13 +233,16 @@ bool InputMethodProfile::OptionChange(size_t i)
     if(i == CommonOptions::rumble)
     {
         this->m_rumbleEnabled = !this->m_rumbleEnabled;
-        for(InputMethod *m : g_InputMethods)
+
+        for(InputMethod* m : g_InputMethods)
         {
             if(!m || m->Profile != this)
                 continue;
+
             if(this->m_rumbleEnabled)
                 m->Rumble(200, .5);
         }
+
         return true;
     }
     else if(i == CommonOptions::ground_pound_by_alt_run)
@@ -240,12 +256,15 @@ bool InputMethodProfile::OptionChange(size_t i)
         return true;
     }
     else
+    {
         return false;
+    }
 }
 // called when left is pressed
 bool InputMethodProfile::OptionRotateLeft(size_t i)
 {
     int i_proc = i;
+
     if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
         i_proc += 1;
 
@@ -258,6 +277,7 @@ bool InputMethodProfile::OptionRotateLeft(size_t i)
 bool InputMethodProfile::OptionRotateRight(size_t i)
 {
     int i_proc = i;
+
     if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
         i_proc += 1;
 
@@ -274,14 +294,14 @@ size_t InputMethodProfile::GetOptionCount_Custom()
 }
 
 // get a nullable char* describing the option
-const char *InputMethodProfile::GetOptionName_Custom(size_t i)
+const char* InputMethodProfile::GetOptionName_Custom(size_t i)
 {
     UNUSED(i);
     return nullptr;
 }
 // get a nullable char* describing the current option value
 // must be allocated in static or instance memory
-const char *InputMethodProfile::GetOptionValue_Custom(size_t i)
+const char* InputMethodProfile::GetOptionValue_Custom(size_t i)
 {
     UNUSED(i);
     return nullptr;
@@ -311,57 +331,64 @@ bool InputMethodProfile::OptionRotateRight_Custom(size_t i)
 
 InputMethodType::~InputMethodType()
 {
-    for(InputMethodProfile *p : this->m_profiles)
+    for(InputMethodProfile* p : this->m_profiles)
         delete p;
+
     this->m_profiles.clear();
 }
 
-std::vector<InputMethodProfile *> InputMethodType::GetProfiles()
+std::vector<InputMethodProfile*> InputMethodType::GetProfiles()
 {
     return this->m_profiles;
 }
 
-InputMethodProfile *InputMethodType::AddProfile()
+InputMethodProfile* InputMethodType::AddProfile()
 {
-    InputMethodProfile *profile = this->AllocateProfile();
+    InputMethodProfile* profile = this->AllocateProfile();
+
     if(!profile)
         return nullptr;
 
     profile->Type = this;
-    this->m_profiles.push_back((InputMethodProfile *) profile);
+    this->m_profiles.push_back((InputMethodProfile*) profile);
     profile->Name = this->Name + " " + std::to_string(this->m_profiles.size());
 
     return profile;
 }
 
 // be extremely careful never to delete a profile that is in use
-bool InputMethodType::DeleteProfile(InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods)
+bool InputMethodType::DeleteProfile(InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
 {
     if(!profile)
         return false;
 
     // delete from m_profiles
-    std::vector<InputMethodProfile *>::iterator loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), profile);
+    std::vector<InputMethodProfile*>::iterator loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), profile);
+
     if(loc == this->m_profiles.end())
         return false;
 
     int player_no = 0;
-    for(InputMethod *method : active_methods)
+
+    for(InputMethod* method : active_methods)
     {
         if(!method)
             continue;
+
         if(method->Profile == profile)
         {
             // try to assign an acceptable backup profile to all relevant methods
-            for(InputMethodProfile *backup : this->m_profiles)
+            for(InputMethodProfile* backup : this->m_profiles)
             {
                 if(backup != profile && this->SetProfile(method, player_no, backup, active_methods))
                     break;
             }
+
             // if we couldn't find one, deleting the profile would leave the game inconsistent
             if(method->Profile == profile)
                 return false;
         }
+
         player_no ++;
     }
 
@@ -385,21 +412,23 @@ bool InputMethodType::DeleteProfile(InputMethodProfile *profile, const std::vect
     return true;
 }
 
-bool InputMethodType::ClearProfiles(const std::vector<InputMethod *> &active_methods)
+bool InputMethodType::ClearProfiles(const std::vector<InputMethod*>& active_methods)
 {
     // clear existing profiles safely
     size_t i = 0;
+
     while(i < this->m_profiles.size())
     {
         // only increment the index when deletion fails
         if(!this->DeleteProfile(this->m_profiles[i], active_methods))
             i++;
     }
+
     // succeeded if all were cleared successfully
     return (i == 0);
 }
 
-bool InputMethodType::SetProfile(InputMethod *method, int player_no, InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods)
+bool InputMethodType::SetProfile(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
 {
     if(player_no < 0 || player_no >= maxLocalPlayers || !profile)
         return false;
@@ -416,22 +445,24 @@ bool InputMethodType::SetProfile(InputMethod *method, int player_no, InputMethod
     return true;
 }
 
-void InputMethodType::SetDefaultProfile(int player_no, InputMethodProfile *profile)
+void InputMethodType::SetDefaultProfile(int player_no, InputMethodProfile* profile)
 {
     if(player_no < 0 || player_no >= maxLocalPlayers || !profile)
         return;
+
     this->m_defaultProfiles[player_no] = profile;
 }
 
-InputMethodProfile *InputMethodType::GetDefaultProfile(int player_no)
+InputMethodProfile* InputMethodType::GetDefaultProfile(int player_no)
 {
     if(player_no < 0 || player_no >= maxLocalPlayers)
         return nullptr;
+
     // still possibly a null pointer
     return this->m_defaultProfiles[player_no];
 }
 
-void InputMethodType::SaveConfig(IniProcessing *ctl)
+void InputMethodType::SaveConfig(IniProcessing* ctl)
 {
     ctl->beginGroup(this->Name);
     this->SaveConfig_Custom(ctl);
@@ -442,20 +473,24 @@ void InputMethodType::SaveConfig(IniProcessing *ctl)
     // save the default (most recent) profile for each player
     for(int i = 0; i < maxLocalPlayers; i++)
     {
-        InputMethodProfile *default_profile = this->m_defaultProfiles[i];
+        InputMethodProfile* default_profile = this->m_defaultProfiles[i];
         std::string default_profile_key = "default-profile-" + std::to_string(i + 1);
+
         if(default_profile == nullptr)
         {
             ctl->setValue(default_profile_key.c_str(), -1);
             continue;
         }
-        std::vector<InputMethodProfile *>::iterator loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), default_profile);
+
+        std::vector<InputMethodProfile*>::iterator loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), default_profile);
         size_t index = loc - this->m_profiles.begin();
+
         if(index == this->m_profiles.size())
             ctl->setValue(default_profile_key.c_str(), -1);
         else
             ctl->setValue(default_profile_key.c_str(), index);
     }
+
     ctl->endGroup();
 
     // save each profile
@@ -468,7 +503,7 @@ void InputMethodType::SaveConfig(IniProcessing *ctl)
     }
 }
 
-void InputMethodType::LoadConfig(IniProcessing *ctl)
+void InputMethodType::LoadConfig(IniProcessing* ctl)
 {
     int n_profiles;
     int n_existing = this->m_profiles.size(); // should usually be zero
@@ -487,6 +522,7 @@ void InputMethodType::LoadConfig(IniProcessing *ctl)
             if(!this->LegacyName.empty())
             {
                 group_name = "player-" + std::to_string(i + 1) + "-" + this->LegacyName;
+
                 if(!ctl->contains(group_name))
                     continue;
             }
@@ -495,7 +531,8 @@ void InputMethodType::LoadConfig(IniProcessing *ctl)
         }
 
         // found a profile in the INI, now allocate and load it
-        InputMethodProfile *new_profile = this->AddProfile();
+        InputMethodProfile* new_profile = this->AddProfile();
+
         if(new_profile)
         {
             ctl->beginGroup(group_name);
@@ -507,40 +544,47 @@ void InputMethodType::LoadConfig(IniProcessing *ctl)
 
     // load the default recent profile for each player
     ctl->beginGroup(this->Name);
+
     for(int i = 0; i < maxLocalPlayers; i++)
     {
         std::string default_profile_key = "default-profile-" + std::to_string(i + 1);
         int index;
         ctl->read(default_profile_key.c_str(), index, -1);
+
         if(index == -1)
+        {
             this->m_defaultProfiles[i] = nullptr;
+        }
         else
         {
             index += n_existing;
             this->m_defaultProfiles[i] = this->m_profiles[index];
         }
     }
+
     this->LoadConfig_Custom(ctl);
     ctl->endGroup();
 }
 
 // optionally overriden methods
 
-bool InputMethodType::ConsumeEvent(const SDL_Event *ev)
+bool InputMethodType::ConsumeEvent(const SDL_Event* ev)
 {
     UNUSED(ev);
     return false;
 }
 
-bool InputMethodType::SetProfile_Custom(InputMethod *method, int player_no, InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods)
+bool InputMethodType::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
 {
     (void)active_methods;
+
     if(!method || !profile || player_no < 0 || player_no >= maxLocalPlayers)
         return false;
+
     return true;
 }
 
-bool InputMethodType::DeleteProfile_Custom(InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods)
+bool InputMethodType::DeleteProfile_Custom(InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
 {
     UNUSED(profile);
     UNUSED(active_methods);
@@ -554,14 +598,14 @@ size_t InputMethodType::GetOptionCount()
 }
 
 // get a nullable char* describing the option
-const char *InputMethodType::GetOptionName(size_t i)
+const char* InputMethodType::GetOptionName(size_t i)
 {
     UNUSED(i);
     return nullptr;
 }
 // get a nullable char* describing the current option value
 // must be allocated in static or instance memory
-const char *InputMethodType::GetOptionValue(size_t i)
+const char* InputMethodType::GetOptionValue(size_t i)
 {
     UNUSED(i);
     return nullptr;
@@ -585,13 +629,13 @@ bool InputMethodType::OptionRotateRight(size_t i)
     return false;
 }
 
-void InputMethodType::SaveConfig_Custom(IniProcessing *ctl)
+void InputMethodType::SaveConfig_Custom(IniProcessing* ctl)
 {
     UNUSED(ctl);
     // must be implemented if user has created special options
     SDL_assert_release(this->GetOptionCount() == 0);
 }
-void InputMethodType::LoadConfig_Custom(IniProcessing *ctl)
+void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 {
     UNUSED(ctl);
     // must be implemented if user has created special options
@@ -617,6 +661,7 @@ void Init()
 #ifdef TOUCHSCREEN_H
     g_InputMethodTypes.push_back(new InputMethodType_TouchScreen);
 #endif
+
     // not yet ready for prime time
     // g_InputMethodTypes.push_back(new InputMethodType_Duplicate);
     for(size_t i = 0; i < Hotkeys::n_buttons; i++)
@@ -629,25 +674,29 @@ void Init()
 void Quit()
 {
     ClearInputMethods();
-    for(InputMethodType *type : g_InputMethodTypes)
+
+    for(InputMethodType* type : g_InputMethodTypes)
         delete type;
+
     g_InputMethodTypes.clear();
 }
 
 // (for SDL clients) process SDL_Event using active InputMethodTypes
 // return true if successfully processed, false if unrecognized
-bool ProcessEvent(const SDL_Event *ev)
+bool ProcessEvent(const SDL_Event* ev)
 {
-    for(InputMethodType *type : g_InputMethodTypes)
+    for(InputMethodType* type : g_InputMethodTypes)
     {
         if(type && type->ConsumeEvent(ev))
             return true;
     }
-    for(InputMethod *method : g_InputMethods)
+
+    for(InputMethod* method : g_InputMethods)
     {
         if(method && method->ConsumeEvent(ev))
             return true;
     }
+
     return false;
 }
 
@@ -674,28 +723,30 @@ bool Update()
     // reset SharedControls
     SharedControls = SharedControls_t();
 
-    for(InputMethodType *type : g_InputMethodTypes)
+    for(InputMethodType* type : g_InputMethodTypes)
         type->UpdateControlsPre();
 
     Controls_t blankControls = Controls_t();
 
     for(size_t i = 0; i < maxLocalPlayers; i++)
     {
-        Controls_t &controls = Player[i + 1].Controls;
-        CursorControls_t &cursor = SharedCursor;
-        EditorControls_t &editor = ::EditorControls;
+        Controls_t& controls = Player[i + 1].Controls;
+        CursorControls_t& cursor = SharedCursor;
+        EditorControls_t& editor = ::EditorControls;
 
         controls = blankControls;
 
         if(i >= g_InputMethods.size())
             continue;
 
-        InputMethod *method = g_InputMethods[i];
+        InputMethod* method = g_InputMethods[i];
+
         if(!method)
         {
             // okay = false;
             continue;
         }
+
         if(!method->Update(i + 1, controls, cursor, editor, g_hotkeysPressed))
         {
             okay = false;
@@ -705,17 +756,19 @@ bool Update()
         }
     }
 
-    for(InputMethodType *type : g_InputMethodTypes)
+    for(InputMethodType* type : g_InputMethodTypes)
         type->UpdateControlsPost();
 
     // check for legacy pause key
     if(g_hotkeysPressed[Hotkeys::Buttons::LegacyPause] != -1)
     {
         int A = g_hotkeysPressed[Hotkeys::Buttons::LegacyPause];
+
         if(A >= 1 && A <= numPlayers)
             Player[A].Controls.Start = true;
         else
             SharedControls.Pause = true;
+
         SharedControls.LegacyPause = true;
     }
 
@@ -731,6 +784,7 @@ bool Update()
 
     // sync controls
     Record::Sync();
+
     for(int i = 0; i < numPlayers && i < maxLocalPlayers; i++)
         speedRun_syncControlKeys(i, Player[i + 1].Controls);
 
@@ -738,19 +792,19 @@ bool Update()
     For(B, 1, numPlayers)
     {
         int A;
+
         // if there is/was an input method bound to the player,
         //   let them control themselves.
         //   (same in spirit as old B == 2 && numPlayers == 2 case)
         if(B - 1 < (int)g_InputMethods.size())
             A = B;
-        // otherwise, let Player 1 control them (blank controls later for SingleCoop)
-        else
+        else // otherwise, let Player 1 control them (blank controls later for SingleCoop)
             A = 1;
 
         // With Player(A).Controls
         {
-            auto &p = Player[A];
-            Controls_t &c = p.Controls;
+            auto& p = Player[A];
+            Controls_t& c = p.Controls;
 
             if(!c.Start && !c.Jump)
                 p.UnStart = true;
@@ -794,7 +848,8 @@ bool Update()
     For(A, 1, numPlayers)
     {
         {
-            Player_t &p = Player[A];
+            Player_t& p = Player[A];
+
             if(p.SpinJump)
                 p.Direction = (p.SpinFrame < 4 || p.SpinFrame > 9) ? -1 : 1;
         }
@@ -806,6 +861,7 @@ bool Update()
         // fill with nullptrs
         while((int)g_InputMethods.size() < numPlayers)
             g_InputMethods.push_back(nullptr);
+
         okay = false;
     }
 
@@ -828,6 +884,7 @@ bool Update()
             cheats_setBuffer(TextEntryScreen::Run("Enter cheat:"));
         else
             PauseGame(p);
+
         MenuCursorCanMove = false;
         MenuMouseRelease = false;
         MouseRelease = false;
@@ -836,6 +893,7 @@ bool Update()
     {
         if(s_requestedPause == PauseCode::TextEntry)
             TextEntryScreen::Commit();
+
         s_requestedPause = PauseCode::None;
     }
 
@@ -844,25 +902,26 @@ bool Update()
     return okay;
 }
 
-void SaveConfig(IniProcessing *ctl)
+void SaveConfig(IniProcessing* ctl)
 {
-    for(InputMethodType *type : g_InputMethodTypes)
+    for(InputMethodType* type : g_InputMethodTypes)
         type->SaveConfig(ctl);
 }
 
-void LoadConfig(IniProcessing *ctl)
+void LoadConfig(IniProcessing* ctl)
 {
-    for(InputMethodType *type : g_InputMethodTypes)
+    for(InputMethodType* type : g_InputMethodTypes)
     {
         type->ClearProfiles(g_InputMethods);
         type->LoadConfig(ctl);
     }
 }
 
-InputMethod *PollInputMethod() noexcept
+InputMethod* PollInputMethod() noexcept
 {
     // don't poll unless there is a free slot
     size_t player_no = 0;
+
     while(player_no < g_InputMethods.size() && g_InputMethods[player_no] != nullptr)
         player_no ++;
 
@@ -870,18 +929,22 @@ InputMethod *PollInputMethod() noexcept
         return nullptr;
 
     // try all input method types
-    InputMethod *new_method = nullptr;
-    for(InputMethodType *type : g_InputMethodTypes)
+    InputMethod* new_method = nullptr;
+
+    for(InputMethodType* type : g_InputMethodTypes)
     {
         new_method = type->Poll(g_InputMethods);
+
         if(new_method)
             break;
     }
+
     if(!new_method)
         return nullptr;
 
     // check that the InputMethodType properly assigned itself as the new InputMethod's Type
     SDL_assert_release(new_method->Type != nullptr); // InputMethodType did not assign itself as Type for new InputMethod
+
     if(!new_method->Type)
         return nullptr;
 
@@ -892,16 +955,17 @@ InputMethod *PollInputMethod() noexcept
         g_InputMethods.push_back(new_method);
 
     // try a number of ways of assigning a profile if one has not already been assigned
-    std::vector<InputMethodProfile *> profiles = new_method->Type->GetProfiles();
+    std::vector<InputMethodProfile*> profiles = new_method->Type->GetProfiles();
 
     // fallback 1: last profile used by this player index
     if(!new_method->Profile)
     {
-        InputMethodProfile *default_profile = new_method->Type->GetDefaultProfile(player_no);
+        InputMethodProfile* default_profile = new_method->Type->GetDefaultProfile(player_no);
 
         if(default_profile)
             SetInputMethodProfile(player_no, default_profile);
     }
+
     // fallback 2: find first unused profile
     if(!new_method->Profile)
     {
@@ -910,7 +974,8 @@ InputMethod *PollInputMethod() noexcept
         for(i = 0; i < profiles.size(); i++)
         {
             bool unused = true;
-            for(InputMethod *other_method : g_InputMethods)
+
+            for(InputMethod* other_method : g_InputMethods)
             {
                 if(other_method && other_method->Profile == profiles[i])
                 {
@@ -926,12 +991,15 @@ InputMethod *PollInputMethod() noexcept
         if(i != profiles.size())
             SetInputMethodProfile(player_no, profiles[i]);
     }
+
     // fallback 3: use first profile
     if(!new_method->Profile && !profiles.empty())
         SetInputMethodProfile(player_no, profiles[0]);
+
     // fallback 4: new default profile
     if(!new_method->Profile)
         SetInputMethodProfile(player_no, new_method->Type->AddProfile());
+
     // should only STILL be null if something is very wrong (alloc failed, etc)
     if(!new_method->Profile)
     {
@@ -949,17 +1017,20 @@ InputMethod *PollInputMethod() noexcept
     return new_method;
 }
 
-void DeleteInputMethod(InputMethod *method)
+void DeleteInputMethod(InputMethod* method)
 {
     if(!method)
         return;
-    std::vector<InputMethod *>::iterator loc
+
+    std::vector<InputMethod*>::iterator loc
         = std::find(g_InputMethods.begin(), g_InputMethods.end(), method);
+
     while(loc != g_InputMethods.end())
     {
         *loc = nullptr;
         loc = std::find(g_InputMethods.begin(), g_InputMethods.end(), method);
     }
+
     pLogDebug("Just disconnected %s '%s' with profile '%s'.",
               method->Type->Name.c_str(),  method->Name.c_str(), method->Profile->Name.c_str());
     delete method;
@@ -969,28 +1040,34 @@ void DeleteInputMethodSlot(int slot)
 {
     if(slot < 0 || (size_t)slot > g_InputMethods.size())
         return;
+
     if(g_InputMethods[slot] != nullptr)
         DeleteInputMethod(g_InputMethods[slot]);
+
     g_InputMethods.erase(g_InputMethods.begin() + slot);
 }
 
-bool SetInputMethodProfile(int player_no, InputMethodProfile *profile)
+bool SetInputMethodProfile(int player_no, InputMethodProfile* profile)
 {
     if(player_no >= (int)g_InputMethods.size() || !g_InputMethods[player_no] || !profile)
         return false;
-    InputMethod *method = g_InputMethods[player_no];
+
+    InputMethod* method = g_InputMethods[player_no];
+
     if(!method->Type)
         return false;
+
     return method->Type->SetProfile(method, player_no, profile, g_InputMethods);
 }
 
-bool SetInputMethodProfile(InputMethod *method, InputMethodProfile *profile)
+bool SetInputMethodProfile(InputMethod* method, InputMethodProfile* profile)
 {
     if(!method || !profile || !method->Type)
         return false;
 
-    std::vector<InputMethod *>::iterator loc = std::find(g_InputMethods.begin(), g_InputMethods.end(), method);
+    std::vector<InputMethod*>::iterator loc = std::find(g_InputMethods.begin(), g_InputMethods.end(), method);
     size_t player_no = loc - g_InputMethods.begin();
+
     if(player_no == g_InputMethods.size())
         return false;
 
@@ -1001,6 +1078,7 @@ void ClearInputMethods()
 {
     for(size_t i = 0; i < g_InputMethods.size(); i++)
         DeleteInputMethod(g_InputMethods[i]);
+
     g_InputMethods.clear();
 }
 
@@ -1013,12 +1091,16 @@ void Rumble(int player, int ms, float strength)
 
     if(player < 1 || player > (int)g_InputMethods.size())
         return;
+
     if(!g_InputMethods[player - 1])
         return;
+
     if(!g_InputMethods[player - 1]->Profile)
         return;
+
     if(!g_InputMethods[player - 1]->Profile->m_rumbleEnabled)
         return;
+
     g_InputMethods[player - 1]->Rumble(ms, strength);
 }
 
@@ -1027,14 +1109,17 @@ void RumbleAllPlayers(int ms, float strength)
     if(GameMenu || GameOutro)
         return;
 
-    for(InputMethod *method : g_InputMethods)
+    for(InputMethod* method : g_InputMethods)
     {
         if(!method)
             continue;
+
         if(!method->Profile)
             continue;
+
         if(!method->Profile->m_rumbleEnabled)
             continue;
+
         method->Rumble(ms, strength);
     }
 }
@@ -1044,8 +1129,10 @@ StatusInfo GetStatus(int player)
 {
     if(player < 1 || player >= (int)g_InputMethods.size() + 1 || g_InputMethods[player - 1] == nullptr)
         return StatusInfo();
+
     if(!g_InputMethods[player - 1]->Profile || !g_InputMethods[player - 1]->Profile->m_showPowerStatus)
         return StatusInfo();
+
     return g_InputMethods[player - 1]->GetStatus();
 }
 
@@ -1054,14 +1141,18 @@ void RenderTouchControls()
 {
 #ifdef TOUCHSCREEN_H
     // only want to render when the touchscreen is in use
-    InputMethod_TouchScreen *active_touchscreen = nullptr;
+    InputMethod_TouchScreen* active_touchscreen = nullptr;
     int player_no = 1;
+
     for(size_t i = 0; i < g_InputMethods.size(); i++)
     {
-        InputMethod *method = g_InputMethods[i];
+        InputMethod* method = g_InputMethods[i];
+
         if(!method)
             continue;
-        InputMethod_TouchScreen *m = dynamic_cast<InputMethod_TouchScreen *>(method);
+
+        InputMethod_TouchScreen* m = dynamic_cast<InputMethod_TouchScreen*>(method);
+
         if(m)
         {
             active_touchscreen = m;
@@ -1069,19 +1160,23 @@ void RenderTouchControls()
             break;
         }
     }
+
     if(!g_renderTouchscreen)
         return;
 
-    InputMethodType_TouchScreen *touchscreen = nullptr;
+    InputMethodType_TouchScreen* touchscreen = nullptr;
+
     if(active_touchscreen)
-        touchscreen = dynamic_cast<InputMethodType_TouchScreen *>(active_touchscreen->Type);
+        touchscreen = dynamic_cast<InputMethodType_TouchScreen*>(active_touchscreen->Type);
     else
     {
-        for(InputMethodType *type : g_InputMethodTypes)
+        for(InputMethodType* type : g_InputMethodTypes)
         {
             if(!type)
                 continue;
-            InputMethodType_TouchScreen *t = dynamic_cast<InputMethodType_TouchScreen *>(type);
+
+            InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
+
             if(t)
             {
                 touchscreen = t;
@@ -1089,6 +1184,7 @@ void RenderTouchControls()
             }
         }
     }
+
     if(!touchscreen)
         return;
 
@@ -1106,12 +1202,15 @@ void RenderTouchControls()
 void UpdateTouchScreenSize()
 {
 #ifdef TOUCHSCREEN_H
-    InputMethodType_TouchScreen *touchscreen = nullptr;
-    for(InputMethodType *type : g_InputMethodTypes)
+    InputMethodType_TouchScreen* touchscreen = nullptr;
+
+    for(InputMethodType* type : g_InputMethodTypes)
     {
         if(!type)
             continue;
-        InputMethodType_TouchScreen *t = dynamic_cast<InputMethodType_TouchScreen *>(type);
+
+        InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
+
         if(t)
         {
             touchscreen = t;

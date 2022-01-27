@@ -41,7 +41,8 @@ namespace Controls
 
 InputMethod_Keyboard::~InputMethod_Keyboard()
 {
-    InputMethodType_Keyboard *t = dynamic_cast<InputMethodType_Keyboard *>(this->Type);
+    InputMethodType_Keyboard* t = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
+
     if(!t)
         return;
 
@@ -50,10 +51,10 @@ InputMethod_Keyboard::~InputMethod_Keyboard()
 
 // Update functions that set player controls (and editor controls)
 // based on current device input. Return false if device lost.
-bool InputMethod_Keyboard::Update(int player, Controls_t &c, CursorControls_t &m, EditorControls_t &e, HotkeysPressed_t &h)
+bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h)
 {
-    InputMethodType_Keyboard *k = dynamic_cast<InputMethodType_Keyboard *>(this->Type);
-    InputMethodProfile_Keyboard *p = dynamic_cast<InputMethodProfile_Keyboard *>(this->Profile);
+    InputMethodType_Keyboard* k = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
+    InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(this->Profile);
 
     if(!k || !p)
         return false;
@@ -68,8 +69,8 @@ bool InputMethod_Keyboard::Update(int player, Controls_t &c, CursorControls_t &m
 
     for(int a = 0; a < 4; a++)
     {
-        int *keys;
-        int *keys2;
+        int* keys;
+        int* keys2;
         size_t key_start;
         size_t key_max;
         bool activate = false;
@@ -120,7 +121,8 @@ bool InputMethod_Keyboard::Update(int player, Controls_t &c, CursorControls_t &m
             if(altPressed && (key2 == SDL_SCANCODE_F || key2 == SDL_SCANCODE_RETURN))
                 key2 = null_key;
 
-            bool *b;
+            bool* b;
+
             if(a == 0)
             {
                 b = &PlayerControls::GetButton(c, i);
@@ -150,7 +152,7 @@ bool InputMethod_Keyboard::Update(int player, Controls_t &c, CursorControls_t &m
         }
     }
 
-    double *const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
+    double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
     bool cursor[4];
 
     for(int i = 0; i < 4; i++)
@@ -175,14 +177,19 @@ bool InputMethod_Keyboard::Update(int player, Controls_t &c, CursorControls_t &m
     {
         if(m.X < 0)
             m.X = ScreenW / 2;
+
         if(m.Y < 0)
             m.Y = ScreenH / 2;
+
         if(cursor[3])
             m.X += 16.0;
+
         if(cursor[2])
             m.X -= 16.0;
+
         if(cursor[1])
             m.Y += 16.0;
+
         if(cursor[0])
             m.Y -= 16.0;
 
@@ -305,11 +312,13 @@ bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)
         return true;
 
     // note: m_canPoll is initialized to false
-    InputMethodType_Keyboard *k = dynamic_cast<InputMethodType_Keyboard *>(this->Type);
+    InputMethodType_Keyboard* k = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
+
     if(!k)
         return false;
 
     int key;
+
     for(key = 0; key < k->m_keyboardStateSize; key++)
     {
         if(k->m_keyboardState[key] != 0)
@@ -332,8 +341,8 @@ bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)
     this->m_canPoll = false;
 
     // resolve the particular primary and secondary key arrays
-    int *keys;
-    int *keys2;
+    int* keys;
+    int* keys2;
     size_t key_max;
 
     if(c == ControlsClass::Player)
@@ -389,11 +398,13 @@ bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)
 bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
 {
     // note: m_canPoll is initialized to false
-    InputMethodType_Keyboard *k = dynamic_cast<InputMethodType_Keyboard *>(this->Type);
+    InputMethodType_Keyboard* k = dynamic_cast<InputMethodType_Keyboard*>(this->Type);
+
     if(!k)
         return false;
 
     int key;
+
     for(key = 0; key < k->m_keyboardStateSize; key++)
     {
         if(k->m_keyboardState[key] != 0)
@@ -416,8 +427,8 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
     m_canPoll = false;
 
     // resolve the particular primary and secondary key arrays
-    int *keys;
-    int *keys2;
+    int* keys;
+    int* keys2;
     size_t key_max;
 
     if(c == ControlsClass::Player)
@@ -460,6 +471,7 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
         keys2[i] = null_key;
         return true;
     }
+
     // if another button's secondary key is the new key, delete it.
     // if another button's primary key is the new key,
     //     and it has a secondary key, overwrite it with the secondary key.
@@ -468,6 +480,7 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
     //         this button's PRIMARY key instead
 
     bool can_do_secondary = true;
+
     for(size_t j = 0; j < key_max; j++)
     {
         if(i != j && keys2[j] == key)
@@ -504,8 +517,8 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
 bool InputMethodProfile_Keyboard::DeletePrimaryButton(ControlsClass c, size_t i)
 {
     // resolve the particular primary and secondary key arrays
-    int *keys;
-    int *keys2;
+    int* keys;
+    int* keys2;
 
     if(c == ControlsClass::Player)
     {
@@ -553,7 +566,7 @@ bool InputMethodProfile_Keyboard::DeletePrimaryButton(ControlsClass c, size_t i)
 
 bool InputMethodProfile_Keyboard::DeleteSecondaryButton(ControlsClass c, size_t i)
 {
-    int *keys2;
+    int* keys2;
 
     if(c == ControlsClass::Player)
         keys2 = this->m_keys2;
@@ -575,9 +588,9 @@ bool InputMethodProfile_Keyboard::DeleteSecondaryButton(ControlsClass c, size_t 
     return false;
 }
 
-const char *InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size_t i)
+const char* InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size_t i)
 {
-    int *keys;
+    int* keys;
 
     if(c == ControlsClass::Player)
         keys = this->m_keys;
@@ -596,9 +609,9 @@ const char *InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size
     return SDL_GetScancodeName((SDL_Scancode)keys[i]);
 }
 
-const char *InputMethodProfile_Keyboard::NameSecondaryButton(ControlsClass c, size_t i)
+const char* InputMethodProfile_Keyboard::NameSecondaryButton(ControlsClass c, size_t i)
 {
-    int *keys2;
+    int* keys2;
 
     if(c == ControlsClass::Player)
         keys2 = this->m_keys2;
@@ -617,14 +630,14 @@ const char *InputMethodProfile_Keyboard::NameSecondaryButton(ControlsClass c, si
     return SDL_GetScancodeName((SDL_Scancode)keys2[i]);
 }
 
-void InputMethodProfile_Keyboard::SaveConfig(IniProcessing *ctl)
+void InputMethodProfile_Keyboard::SaveConfig(IniProcessing* ctl)
 {
     char name2[20];
 
     for(int a = 0; a < 4; a++)
     {
-        int *keys;
-        int *keys2;
+        int* keys;
+        int* keys2;
         size_t key_max;
 
         if(a == 0)
@@ -654,7 +667,7 @@ void InputMethodProfile_Keyboard::SaveConfig(IniProcessing *ctl)
 
         for(size_t i = 0; i < key_max; i++)
         {
-            const char *name;
+            const char* name;
 
             if(a == 0)
                 name = PlayerControls::GetButtonName_INI(i);
@@ -676,6 +689,7 @@ void InputMethodProfile_Keyboard::SaveConfig(IniProcessing *ctl)
                     name2[c + 1] = '\0';
                     break;
                 }
+
                 name2[c] = name[c];
             }
 
@@ -684,14 +698,14 @@ void InputMethodProfile_Keyboard::SaveConfig(IniProcessing *ctl)
     }
 }
 
-void InputMethodProfile_Keyboard::LoadConfig(IniProcessing *ctl)
+void InputMethodProfile_Keyboard::LoadConfig(IniProcessing* ctl)
 {
     char name2[20];
 
     for(int a = 0; a < 4; a++)
     {
-        int *keys;
-        int *keys2;
+        int* keys;
+        int* keys2;
         size_t key_max;
 
         if(a == 0)
@@ -721,7 +735,7 @@ void InputMethodProfile_Keyboard::LoadConfig(IniProcessing *ctl)
 
         for(size_t i = 0; i < key_max; i++)
         {
-            const char *name;
+            const char* name;
 
             if(a == 0)
                 name = PlayerControls::GetButtonName_INI(i);
@@ -743,6 +757,7 @@ void InputMethodProfile_Keyboard::LoadConfig(IniProcessing *ctl)
                     name2[c + 1] = '\0';
                     break;
                 }
+
                 name2[c] = name[c];
             }
 
@@ -761,9 +776,9 @@ void InputMethodProfile_Keyboard::LoadConfig(IniProcessing *ctl)
 || implementation for InputMethodType_Keyboard        ||
 \*====================================================*/
 
-InputMethodProfile *InputMethodType_Keyboard::AllocateProfile() noexcept
+InputMethodProfile* InputMethodType_Keyboard::AllocateProfile() noexcept
 {
-    return (InputMethodProfile *) new(std::nothrow) InputMethodProfile_Keyboard;
+    return (InputMethodProfile*) new(std::nothrow) InputMethodProfile_Keyboard;
 }
 
 InputMethodType_Keyboard::InputMethodType_Keyboard()
@@ -773,9 +788,9 @@ InputMethodType_Keyboard::InputMethodType_Keyboard()
     this->LegacyName = "keyboard";
 }
 
-bool InputMethodType_Keyboard::TestProfileType(InputMethodProfile *profile)
+bool InputMethodType_Keyboard::TestProfileType(InputMethodProfile* profile)
 {
-    return (bool)dynamic_cast<InputMethodProfile_Keyboard *>(profile);
+    return (bool)dynamic_cast<InputMethodProfile_Keyboard*>(profile);
 }
 
 bool InputMethodType_Keyboard::RumbleSupported()
@@ -811,8 +826,10 @@ void InputMethodType_Keyboard::UpdateControlsPost()
 
         if(buttons & SDL_BUTTON_LMASK)
             SharedCursor.Primary = true;
+
         if(buttons & SDL_BUTTON_RMASK)
             SharedCursor.Secondary = true;
+
         if(buttons & SDL_BUTTON_MMASK)
             SharedCursor.Tertiary = true;
     }
@@ -847,13 +864,13 @@ void InputMethodType_Keyboard::UpdateControlsPost()
     bool rightPressed = this->m_keyboardState[SDL_SCANCODE_RIGHT];
 
     // disable the shared keys if they are currently in use
-    for(InputMethod *method : g_InputMethods)
+    for(InputMethod* method : g_InputMethods)
     {
         if(!method)
             continue;
 
-        InputMethodProfile *p = method->Profile;
-        InputMethodProfile_Keyboard *profile = dynamic_cast<InputMethodProfile_Keyboard *>(p);
+        InputMethodProfile* p = method->Profile;
+        InputMethodProfile_Keyboard* profile = dynamic_cast<InputMethodProfile_Keyboard*>(p);
 
         if(!profile)
             continue;
@@ -865,19 +882,25 @@ void InputMethodType_Keyboard::UpdateControlsPost()
                 // allow escape to count even when it is a player's start key, important for correct menu behavior
                 if(i != PlayerControls::Buttons::Start)
                     escBackPressed = false;
+
                 escPausePressed = false;
             }
 
             if(profile->m_keys[i] == SDL_SCANCODE_RETURN || profile->m_keys2[i] == SDL_SCANCODE_RETURN)
                 returnPressed = false;
+
             if(profile->m_keys[i] == SDL_SCANCODE_SPACE || profile->m_keys2[i] == SDL_SCANCODE_SPACE)
                 spacePressed = false;
+
             if(profile->m_keys[i] == SDL_SCANCODE_UP || profile->m_keys2[i] == SDL_SCANCODE_UP)
                 upPressed = false;
+
             if(profile->m_keys[i] == SDL_SCANCODE_DOWN || profile->m_keys2[i] == SDL_SCANCODE_DOWN)
                 downPressed = false;
+
             if(profile->m_keys[i] == SDL_SCANCODE_LEFT || profile->m_keys2[i] == SDL_SCANCODE_LEFT)
                 leftPressed = false;
+
             if(profile->m_keys[i] == SDL_SCANCODE_RIGHT || profile->m_keys2[i] == SDL_SCANCODE_RIGHT)
                 rightPressed = false;
         }
@@ -906,7 +929,7 @@ void InputMethodType_Keyboard::UpdateControlsPost()
 }
 
 // this is challenging for the keyboard because we don't want to allocate 20 copies of it
-InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &active_methods) noexcept
+InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& active_methods) noexcept
 {
     if(this->m_numKeyboards != this->m_lastNumKeyboards)
     {
@@ -927,7 +950,7 @@ InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &ac
 
     // ban attachment from active profile, must find new profile
     int key;
-    InputMethodProfile *target_profile = nullptr;
+    InputMethodProfile* target_profile = nullptr;
 
     for(key = 0; key < this->m_keyboardStateSize; key++)
     {
@@ -940,7 +963,7 @@ InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &ac
             allowed = false;
 
         // ban attachment from active profile
-        for(InputMethod *method : active_methods)
+        for(InputMethod* method : active_methods)
         {
             if(!allowed)
                 break;
@@ -948,7 +971,8 @@ InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &ac
             if(!method)
                 continue;
 
-            InputMethodProfile_Keyboard *p = dynamic_cast<InputMethodProfile_Keyboard *>(method->Profile);
+            InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(method->Profile);
+
             if(!p)
                 continue;
 
@@ -998,10 +1022,11 @@ InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &ac
         // which player index is connecting?
         int my_index = 0;
 
-        for(const InputMethod *method : active_methods)
+        for(const InputMethod* method : active_methods)
         {
             if(!method)
                 break;
+
             my_index ++;
         }
 
@@ -1009,7 +1034,7 @@ InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &ac
         for(int i = -1; i < (int)this->m_profiles.size(); i++)
         {
             // start with the most recent profile for this player index
-            InputMethodProfile *profile;
+            InputMethodProfile* profile;
 
             if(i == -1)
                 profile = this->GetDefaultProfile(my_index);
@@ -1019,7 +1044,8 @@ InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &ac
             if(!profile)
                 continue;
 
-            InputMethodProfile_Keyboard *p = dynamic_cast<InputMethodProfile_Keyboard *>(profile);
+            InputMethodProfile_Keyboard* p = dynamic_cast<InputMethodProfile_Keyboard*>(profile);
+
             if(!p)
                 continue;
 
@@ -1055,7 +1081,7 @@ InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &ac
     // reset canPoll for next time
     this->m_canPoll = false;
 
-    InputMethod_Keyboard *method = new(std::nothrow) InputMethod_Keyboard;
+    InputMethod_Keyboard* method = new(std::nothrow) InputMethod_Keyboard;
 
     if(!method)
         return nullptr;
@@ -1066,15 +1092,15 @@ InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &ac
 
     this->m_numKeyboards ++;
 
-    return (InputMethod *)method;
+    return (InputMethod*)method;
 }
 
 /*-----------------------*\
 || OPTIONAL METHODS      ||
 \*-----------------------*/
-bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event *ev)
+bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event* ev)
 {
-    const SDL_KeyboardEvent &evt = ev->key;
+    const SDL_KeyboardEvent& evt = ev->key;
 
     int KeyCode = evt.keysym.scancode;
 
@@ -1101,6 +1127,7 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event *ev)
             g_hotkeysPressed[Hotkeys::Buttons::DebugInfo] = 0;
         else if(KeyCode == SDL_SCANCODE_F1)
             g_hotkeysPressed[Hotkeys::Buttons::ToggleHUD] = 0;
+
 #ifdef __APPLE__
         else if(KeyCode == SDL_SCANCODE_F10) // Reserved by macOS as "show desktop"
 #else
@@ -1120,114 +1147,151 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event *ev)
     case SDL_SCANCODE_A:
         CheatCode('a');
         break;
+
     case SDL_SCANCODE_B:
         CheatCode('b');
         break;
+
     case SDL_SCANCODE_C:
         CheatCode('c');
         break;
+
     case SDL_SCANCODE_D:
         CheatCode('d');
         break;
+
     case SDL_SCANCODE_E:
         CheatCode('e');
         break;
+
     case SDL_SCANCODE_F:
         CheatCode('f');
         break;
+
     case SDL_SCANCODE_G:
         CheatCode('g');
         break;
+
     case SDL_SCANCODE_H:
         CheatCode('h');
         break;
+
     case SDL_SCANCODE_I:
         CheatCode('i');
         break;
+
     case SDL_SCANCODE_J:
         CheatCode('j');
         break;
+
     case SDL_SCANCODE_K:
         CheatCode('k');
         break;
+
     case SDL_SCANCODE_L:
         CheatCode('l');
         break;
+
     case SDL_SCANCODE_M:
         CheatCode('m');
         break;
+
     case SDL_SCANCODE_N:
         CheatCode('n');
         break;
+
     case SDL_SCANCODE_O:
         CheatCode('o');
         break;
+
     case SDL_SCANCODE_P:
         CheatCode('p');
         break;
+
     case SDL_SCANCODE_Q:
         CheatCode('q');
         break;
+
     case SDL_SCANCODE_R:
         CheatCode('r');
         break;
+
     case SDL_SCANCODE_S:
         CheatCode('s');
         break;
+
     case SDL_SCANCODE_T:
         CheatCode('t');
         break;
+
     case SDL_SCANCODE_U:
         CheatCode('u');
         break;
+
     case SDL_SCANCODE_V:
         CheatCode('v');
         break;
+
     case SDL_SCANCODE_W:
         CheatCode('w');
         break;
+
     case SDL_SCANCODE_X:
         CheatCode('x');
         break;
+
     case SDL_SCANCODE_Y:
         CheatCode('y');
         break;
+
     case SDL_SCANCODE_Z:
         CheatCode('z');
         break;
+
     case SDL_SCANCODE_1:
         CheatCode('1');
         break;
+
     case SDL_SCANCODE_2:
         CheatCode('2');
         break;
+
     case SDL_SCANCODE_3:
         CheatCode('3');
         break;
+
     case SDL_SCANCODE_4:
         CheatCode('4');
         break;
+
     case SDL_SCANCODE_5:
         CheatCode('5');
         break;
+
     case SDL_SCANCODE_6:
         CheatCode('6');
         break;
+
     case SDL_SCANCODE_7:
         CheatCode('7');
         break;
+
     case SDL_SCANCODE_8:
         CheatCode('8');
         break;
+
     case SDL_SCANCODE_9:
         CheatCode('9');
         break;
+
     case SDL_SCANCODE_0:
         CheatCode('0');
         break;
+
     case SDL_SCANCODE_SEMICOLON:
         CheatCode(';');
         break; // for AZERTY support
+
     default:
         CheatCode(' ');
         break;
@@ -1236,7 +1300,7 @@ bool InputMethodType_Keyboard::DefaultHotkey(const SDL_Event *ev)
     return true;
 }
 
-bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event *ev)
+bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
 {
     switch(ev->type)
     {
@@ -1249,11 +1313,13 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event *ev)
         }
         else
             return false;
+
     case SDL_MOUSEBUTTONUP:
         if(ev->button.button == SDL_BUTTON_LEFT && ev->button.which != SDL_TOUCH_MOUSEID)
         {
             bool doubleClick = (this->m_lastMousePress + 300) >= SDL_GetTicks();
             this->m_lastMousePress = SDL_GetTicks();
+
             if(doubleClick && !MagicHand)
             {
                 this->m_lastMousePress = 0;
@@ -1261,29 +1327,37 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event *ev)
                 return true;
             }
         }
+
     // intentional fallthrough
     case SDL_MOUSEBUTTONDOWN:
         if(ev->button.which == SDL_TOUCH_MOUSEID)
             this->m_touchscreenActive = true;
         else
             this->m_touchscreenActive = false;
+
         break;
+
     case SDL_MOUSEMOTION:
         if(ev->motion.which == SDL_TOUCH_MOUSEID)
             this->m_touchscreenActive = true;
         else
             this->m_touchscreenActive = false;
+
         break;
+
     case SDL_TEXTINPUT:
         if(this->m_directText && GamePaused == PauseCode::TextEntry)
         {
             TextEntryScreen::Insert(ev->text.text);
             return true;
         }
+
         return false;
+
     case SDL_KEYDOWN:
         if(this->DefaultHotkey(ev))
             return true;
+
         if(this->m_directText && GamePaused == PauseCode::TextEntry)
         {
             if(ev->key.keysym.scancode == SDL_SCANCODE_RETURN || ev->key.keysym.scancode == SDL_SCANCODE_KP_ENTER)
@@ -1294,27 +1368,32 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event *ev)
                 TextEntryScreen::CursorRight();
             else if(ev->key.keysym.scancode == SDL_SCANCODE_BACKSPACE)
                 TextEntryScreen::Backspace();
+
             return true;
         }
+
         return false;
+
     default:
         return false;
     }
+
     return false;
 }
 
 // optional function allowing developer to associate device information with profile, etc
-bool InputMethodType_Keyboard::SetProfile_Custom(InputMethod *method, int player_no, InputMethodProfile *profile,
-        const std::vector<InputMethod *> &active_methods)
+bool InputMethodType_Keyboard::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile,
+        const std::vector<InputMethod*>& active_methods)
 {
     if(!method || !profile || player_no < 0 || player_no >= maxLocalPlayers)
         return false;
 
     // prevent duplicates of a profile from ever being set
-    for(InputMethod *o_method : active_methods)
+    for(InputMethod* o_method : active_methods)
     {
         if(!o_method)
             continue;
+
         if(o_method != method && o_method->Profile == profile)
             return false;
     }
@@ -1333,10 +1412,11 @@ size_t InputMethodType_Keyboard::GetOptionCount()
 // It is guaranteed that none of these will be called if
 // GetOptionCount() returns 0.
 // get a char* describing the option
-const char *InputMethodType_Keyboard::GetOptionName(size_t i)
+const char* InputMethodType_Keyboard::GetOptionName(size_t i)
 {
     if(i == 0)
         return "MAX KBD PLAYERS";
+
     if(i == 1)
         return "TEXT ENTRY STYLE";
 
@@ -1346,7 +1426,7 @@ const char *InputMethodType_Keyboard::GetOptionName(size_t i)
 // get a char* describing the current option value
 // must be allocated in static or instance memory
 // WILL NOT be freed
-const char *InputMethodType_Keyboard::GetOptionValue(size_t i)
+const char* InputMethodType_Keyboard::GetOptionValue(size_t i)
 {
     if(i == 0)
     {
@@ -1372,8 +1452,10 @@ bool InputMethodType_Keyboard::OptionChange(size_t i)
     if(i == 0)
     {
         this->m_maxKeyboards ++;
+
         if(this->m_maxKeyboards > 2)
             this->m_maxKeyboards = 0;
+
         return true;
     }
 
@@ -1428,13 +1510,13 @@ bool InputMethodType_Keyboard::OptionRotateRight(size_t i)
     return false;
 }
 
-void InputMethodType_Keyboard::SaveConfig_Custom(IniProcessing *ctl)
+void InputMethodType_Keyboard::SaveConfig_Custom(IniProcessing* ctl)
 {
     ctl->setValue("max-keyboards", this->m_maxKeyboards);
     ctl->setValue("direct-text-entry", this->m_directText);
 }
 
-void InputMethodType_Keyboard::LoadConfig_Custom(IniProcessing *ctl)
+void InputMethodType_Keyboard::LoadConfig_Custom(IniProcessing* ctl)
 {
     ctl->read("max-keyboards", this->m_maxKeyboards, 2);
     ctl->read("direct-text-entry", this->m_directText, true);
