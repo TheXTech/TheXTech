@@ -187,12 +187,25 @@ public:
     };
 
     // touchscreen settings (duplicated from InputMethodProfile_TouchScreen)
+    //! Current layout type
     int m_layout = TouchScreenController::layout_standard;
+    //! General scale factor
     int m_scale_factor = 100;
+    //! D-Pad exclusive scale factor
+    int m_scale_factor_dpad = 100;
+    //! Buttons scale factor
+    int m_scale_factor_buttons = 100;
+    //! Spacing between Select and Start
+    int m_scale_factor_ss_spacing = 100;
+    //! Current touchpad style
     int m_touchpad_style = TouchScreenController::style_actions;
+    //! Feedback strength
     float m_feedback_strength = 0.f;
+    //! Feedback length in milliseconds
     int m_feedback_length = 12;
+    //! Hold run enabled
     bool m_hold_run = false;
+    //! Show the enter cheats button
     bool m_enable_enter_cheats = false;
 
     // active InputMethod (nullable, used for configuration)
@@ -291,8 +304,17 @@ public:
     using InputMethodProfile::Type;
 
     // touchscreen settings
+    //! Current layout type
     int m_layout = TouchScreenController::layout_standard;
+    //! General scale factor
     int m_scale_factor = 100;
+    //! D-Pad exclusive scale factor
+    int m_scale_factor_dpad = 100;
+    //! Buttons scale factor
+    int m_scale_factor_buttons = 100;
+    //! Spacing between Select and Start
+    int m_scale_factor_ss_spacing = 100;
+    //! Current touchpad style
     int m_touchpad_style = TouchScreenController::style_actions;
     float m_feedback_strength = 0.f;
     int m_feedback_length = 12;
@@ -330,6 +352,9 @@ public:
         {
             layout,
             scale_factor,
+            scale_factor_dpad,
+            scale_factor_buttons,
+            scale_factor_ss_spacing,
             style,
             fb_strength,
             fb_length,

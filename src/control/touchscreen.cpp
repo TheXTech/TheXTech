@@ -678,7 +678,12 @@ static const TouchKeyMap::KeyPos c_tightAutoMap[TouchScreenController::key_END] 
 
 // figures out the ratio between sides (such that smaller, usually y, axis size is 1)
 //   then handles all of the bottom/right anchored items
-static void updateTouchMap(int preferredLayout, float screenWidth, float screenHeight, int scaleFactor)
+static void updateTouchMap(int preferredLayout,
+                           float screenWidth, float screenHeight,
+                           int scaleFactor,
+                           int scaleFactorDPad,
+                           int scaleFactorButtons,
+                           int ssSpacing)
 {
     switch(preferredLayout)
     {
@@ -738,6 +743,21 @@ static void updateTouchMap(int preferredLayout, float screenWidth, float screenH
         g_touchKeyMap.touchKeysMap[i].y1 *= scaleFactor / 100.f;
         g_touchKeyMap.touchKeysMap[i].y2 *= scaleFactor / 100.f;
 
+        if(i >= TouchScreenController::key_left && i <= TouchScreenController::key_downright)
+        {
+            g_touchKeyMap.touchKeysMap[i].x1 *= scaleFactorDPad / 100.f;
+            g_touchKeyMap.touchKeysMap[i].x2 *= scaleFactorDPad / 100.f;
+            g_touchKeyMap.touchKeysMap[i].y1 *= scaleFactorDPad / 100.f;
+            g_touchKeyMap.touchKeysMap[i].y2 *= scaleFactorDPad / 100.f;
+        }
+        else if(i >= TouchScreenController::key_run && i <= TouchScreenController::key_altjump)
+        {
+            g_touchKeyMap.touchKeysMap[i].x1 *= scaleFactorButtons / 100.f;
+            g_touchKeyMap.touchKeysMap[i].x2 *= scaleFactorButtons / 100.f;
+            g_touchKeyMap.touchKeysMap[i].y1 *= scaleFactorButtons / 100.f;
+            g_touchKeyMap.touchKeysMap[i].y2 *= scaleFactorButtons / 100.f;
+        }
+
         if(g_touchKeyMap.touchKeysMap[i].xa == TouchKeyMap::R)
         {
             g_touchKeyMap.touchKeysMap[i].x1 += g_touchKeyMap.touchCanvasWidth;
@@ -757,6 +777,42 @@ static void updateTouchMap(int preferredLayout, float screenWidth, float screenH
         {
             g_touchKeyMap.touchKeysMap[i].y1 += g_touchKeyMap.touchCanvasHeight / 2;
             g_touchKeyMap.touchKeysMap[i].y2 += g_touchKeyMap.touchCanvasHeight / 2;
+        }
+
+        // Don't let hold-run button go lower than buttons
+        if(i == TouchScreenController::key_holdRun)
+        {
+            if(g_touchKeyMap.touchKeysMap[i].ya == TouchKeyMap::B)
+            {
+                float yb1 = g_touchKeyMap.touchKeysMap[TouchScreenController::key_altrun].y1;
+                float yb2 = g_touchKeyMap.touchKeysMap[TouchScreenController::key_altjump].y1;
+                float yb = SDL_min(yb1, yb2) - 0.05f;
+                // is aligning needed?
+                if(yb < g_touchKeyMap.touchKeysMap[i].y2)
+                {
+                    float o = g_touchKeyMap.touchKeysMap[i].y2;
+                    g_touchKeyMap.touchKeysMap[i].y2 = yb;
+                    g_touchKeyMap.touchKeysMap[i].y1 += (g_touchKeyMap.touchKeysMap[i].y2 - o);
+                }
+            }
+        }
+        // Compute spacing between start and select
+        else if(ssSpacing != 100 && (i == TouchScreenController::key_start || i == TouchScreenController::key_drop))
+        {
+            if(g_touchKeyMap.touchKeysMap[i].xa == TouchKeyMap::L)
+            {
+                float o = g_touchKeyMap.touchKeysMap[i].x1;
+                g_touchKeyMap.touchKeysMap[i].x1 *= 1.0f / (ssSpacing / 100.f);
+                g_touchKeyMap.touchKeysMap[i].x2 += (g_touchKeyMap.touchKeysMap[i].x1 - o);
+            }
+            if(g_touchKeyMap.touchKeysMap[i].xa == TouchKeyMap::R)
+            {
+                float o = g_touchKeyMap.touchKeysMap[i].x2;
+                float off = g_touchKeyMap.touchCanvasWidth - g_touchKeyMap.touchKeysMap[i].x2;
+                off *= 1.0f / (ssSpacing / 100.f);
+                g_touchKeyMap.touchKeysMap[i].x2 = g_touchKeyMap.touchCanvasWidth - off;
+                g_touchKeyMap.touchKeysMap[i].x1 += (g_touchKeyMap.touchKeysMap[i].x2 - o);
+            }
         }
     }
 }
@@ -828,7 +884,12 @@ void TouchScreenController::updateScreenSize()
 {
     XWindow::getWindowSize(&m_screenWidth, &m_screenHeight);
 
-    updateTouchMap(m_layout, m_screenWidth, m_screenHeight, m_scale_factor);
+    updateTouchMap(m_layout,
+                   m_screenWidth, m_screenHeight,
+                   m_scale_factor,
+                   m_scale_factor_dpad,
+                   m_scale_factor_buttons,
+                   m_scale_factor_ss_spacing);
 }
 
 static void updateKeyValue(bool &key, bool state)
@@ -1054,6 +1115,7 @@ void TouchScreenController::update()
         {
             this->m_touchpad_style = p->m_touchpad_style;
             this->m_enable_enter_cheats = p->m_enable_enter_cheats;
+
             if(this->m_feedback_strength != p->m_feedback_strength
                 || this->m_feedback_length != p->m_feedback_length)
             {
@@ -1061,19 +1123,40 @@ void TouchScreenController::update()
                 this->m_feedback_length = p->m_feedback_length;
                 this->doVibration();
             }
+
             if(this->m_hold_run != p->m_hold_run)
             {
                 this->m_hold_run = p->m_hold_run;
                 this->m_runHeld = this->m_hold_run;
             }
+
             if(this->m_layout != p->m_layout)
             {
                 this->m_layout = p->m_layout;
                 this->updateScreenSize();
             }
+
             if(this->m_scale_factor != p->m_scale_factor)
             {
                 this->m_scale_factor = p->m_scale_factor;
+                this->updateScreenSize();
+            }
+
+            if(this->m_scale_factor_dpad != p->m_scale_factor_dpad)
+            {
+                this->m_scale_factor_dpad = p->m_scale_factor_dpad;
+                this->updateScreenSize();
+            }
+
+            if(this->m_scale_factor_buttons != p->m_scale_factor_buttons)
+            {
+                this->m_scale_factor_buttons = p->m_scale_factor_buttons;
+                this->updateScreenSize();
+            }
+
+            if(this->m_scale_factor_ss_spacing != p->m_scale_factor_ss_spacing)
+            {
+                this->m_scale_factor_ss_spacing = p->m_scale_factor_ss_spacing;
                 this->updateScreenSize();
             }
         }
@@ -1390,6 +1473,9 @@ void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
 {
     ctl->setValue("ui-layout", this->m_layout);
     ctl->setValue("scale-factor", this->m_scale_factor);
+    ctl->setValue("scale-factor-dpad", this->m_scale_factor_dpad);
+    ctl->setValue("scale-factor-buttons", this->m_scale_factor_buttons);
+    ctl->setValue("scale-factor-ss-spacing", this->m_scale_factor_ss_spacing);
     ctl->setValue("ui-style", this->m_touchpad_style);
     ctl->setValue("vibration-strength", this->m_feedback_strength);
     ctl->setValue("vibration-length", this->m_feedback_length);
@@ -1403,6 +1489,9 @@ void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
     if(this->m_layout >= TouchScreenController::layout_END)
         this->m_layout = TouchScreenController::layout_standard;
     ctl->read("scale-factor", this->m_scale_factor, 100);
+    ctl->read("scale-factor-dpad", this->m_scale_factor_dpad, 100);
+    ctl->read("scale-factor-buttons", this->m_scale_factor_buttons, 100);
+    ctl->read("scale-factor-ss-spacing", this->m_scale_factor_ss_spacing, 100);
     ctl->read("ui-style", this->m_touchpad_style, TouchScreenController::style_actions);
     ctl->read("vibration-strength", this->m_feedback_strength, 0.f);
     ctl->read("vibration-length", this->m_feedback_length, 12);
@@ -1428,6 +1517,12 @@ const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
         return "LAYOUT STYLE";
     case Options::scale_factor:
         return "SCALE FACTOR";
+    case Options::scale_factor_dpad:
+        return "SCALE D-PAD";
+    case Options::scale_factor_buttons:
+        return "SCALE BUTTONS";
+    case Options::scale_factor_ss_spacing:
+        return "S-START SPACING";
     case Options::style:
         return "INTERFACE STYLE";
     case Options::fb_strength:
@@ -1466,6 +1561,15 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
             return "STANDARD";
     case Options::scale_factor:
         SDL_snprintf(length_buf, 8, "%d%%", this->m_scale_factor);
+        return length_buf;
+    case Options::scale_factor_dpad:
+        SDL_snprintf(length_buf, 8, "%d%%", this->m_scale_factor_dpad);
+        return length_buf;
+    case Options::scale_factor_buttons:
+        SDL_snprintf(length_buf, 8, "%d%%", this->m_scale_factor_buttons);
+        return length_buf;
+    case Options::scale_factor_ss_spacing:
+        SDL_snprintf(length_buf, 8, "%d%%", this->m_scale_factor_ss_spacing);
         return length_buf;
     case Options::style:
         if(this->m_touchpad_style == TouchScreenController::style_actions)
@@ -1525,6 +1629,30 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
         }
         else
             return false;
+    case Options::scale_factor_dpad:
+        if(this->m_scale_factor_dpad > 50)
+        {
+            this->m_scale_factor_dpad -= 5;
+            return true;
+        }
+        else
+            return false;
+    case Options::scale_factor_buttons:
+        if(this->m_scale_factor_buttons > 50)
+        {
+            this->m_scale_factor_buttons -= 5;
+            return true;
+        }
+        else
+            return false;
+    case Options::scale_factor_ss_spacing:
+        if(this->m_scale_factor_ss_spacing > 20)
+        {
+            this->m_scale_factor_ss_spacing -= 5;
+            return true;
+        }
+        else
+            return false;
     case Options::style:
         if(this->m_touchpad_style > 0)
             this->m_touchpad_style --;
@@ -1568,6 +1696,30 @@ bool InputMethodProfile_TouchScreen::OptionRotateRight_Custom(size_t i)
         if(this->m_scale_factor < 150)
         {
             this->m_scale_factor += 5;
+            return true;
+        }
+        else
+            return false;
+    case Options::scale_factor_dpad:
+        if(this->m_scale_factor_dpad < 150)
+        {
+            this->m_scale_factor_dpad += 5;
+            return true;
+        }
+        else
+            return false;
+    case Options::scale_factor_buttons:
+        if(this->m_scale_factor_buttons < 150)
+        {
+            this->m_scale_factor_buttons += 5;
+            return true;
+        }
+        else
+            return false;
+    case Options::scale_factor_ss_spacing:
+        if(this->m_scale_factor_ss_spacing < 110)
+        {
+            this->m_scale_factor_ss_spacing += 5;
             return true;
         }
         else
