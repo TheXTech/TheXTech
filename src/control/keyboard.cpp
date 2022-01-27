@@ -73,6 +73,7 @@ bool InputMethod_Keyboard::Update(int player, Controls_t &c, CursorControls_t &m
         size_t key_start;
         size_t key_max;
         bool activate = false;
+
         if(a == 0)
         {
             keys = p->m_keys;
@@ -101,6 +102,7 @@ bool InputMethod_Keyboard::Update(int player, Controls_t &c, CursorControls_t &m
             key_start = 0;
             key_max = Hotkeys::n_buttons;
         }
+
         for(size_t i = key_start; i < key_max; i++)
         {
             int key;
@@ -125,9 +127,13 @@ bool InputMethod_Keyboard::Update(int player, Controls_t &c, CursorControls_t &m
                 *b = false;
             }
             else if(a == 1)
+            {
                 b = &CursorControls::GetButton(m, i);
+            }
             else if(a == 2)
+            {
                 b = &EditorControls::GetButton(e, i);
+            }
             else
             {
                 b = &activate;
@@ -151,6 +157,7 @@ bool InputMethod_Keyboard::Update(int player, Controls_t &c, CursorControls_t &m
     {
         int key = p->m_editor_keys[i];
         int key2 = p->m_editor_keys2[i];
+
         if(key != null_key && k->m_keyboardState[key] != 0)
             *scroll[i] = 1.;
         else if(key2 != null_key && k->m_keyboardState[key2] != 0)
@@ -171,21 +178,24 @@ bool InputMethod_Keyboard::Update(int player, Controls_t &c, CursorControls_t &m
         if(m.Y < 0)
             m.Y = ScreenH / 2;
         if(cursor[3])
-            m.X += 16.;
+            m.X += 16.0;
         if(cursor[2])
-            m.X -= 16.;
+            m.X -= 16.0;
         if(cursor[1])
-            m.Y += 16.;
+            m.Y += 16.0;
         if(cursor[0])
-            m.Y -= 16.;
+            m.Y -= 16.0;
+
         if(m.X < 0)
             m.X = 0;
         else if(m.X >= ScreenW)
             m.X = ScreenW - 1;
+
         if(m.Y < 0)
             m.Y = 0;
         else if(m.Y >= ScreenH)
             m.Y = ScreenH - 1;
+
         m.Move = true;
     }
 
@@ -461,7 +471,9 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
     for(size_t j = 0; j < key_max; j++)
     {
         if(i != j && keys2[j] == key)
+        {
             keys2[j] = null_key;
+        }
         else if(keys && i != j && keys[j] == key)
         {
             if(keys2[j] != null_key)
@@ -470,7 +482,9 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
                 keys2[j] = null_key;
             }
             else if(keys2[i] != null_key)
+            {
                 keys[j] = keys2[i];
+            }
             else
             {
                 keys[j] = keys[i];
@@ -492,13 +506,16 @@ bool InputMethodProfile_Keyboard::DeletePrimaryButton(ControlsClass c, size_t i)
     // resolve the particular primary and secondary key arrays
     int *keys;
     int *keys2;
+
     if(c == ControlsClass::Player)
     {
         keys = this->m_keys;
         keys2 = this->m_keys2;
     }
     else if(c == ControlsClass::Cursor)
+    {
         return false;
+    }
     else if(c == ControlsClass::Editor)
     {
         keys = this->m_editor_keys;
@@ -537,6 +554,7 @@ bool InputMethodProfile_Keyboard::DeletePrimaryButton(ControlsClass c, size_t i)
 bool InputMethodProfile_Keyboard::DeleteSecondaryButton(ControlsClass c, size_t i)
 {
     int *keys2;
+
     if(c == ControlsClass::Player)
         keys2 = this->m_keys2;
     else if(c == ControlsClass::Cursor)
@@ -560,6 +578,7 @@ bool InputMethodProfile_Keyboard::DeleteSecondaryButton(ControlsClass c, size_t 
 const char *InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size_t i)
 {
     int *keys;
+
     if(c == ControlsClass::Player)
         keys = this->m_keys;
     else if(c == ControlsClass::Cursor)
@@ -580,6 +599,7 @@ const char *InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size
 const char *InputMethodProfile_Keyboard::NameSecondaryButton(ControlsClass c, size_t i)
 {
     int *keys2;
+
     if(c == ControlsClass::Player)
         keys2 = this->m_keys2;
     else if(c == ControlsClass::Cursor)
@@ -797,7 +817,9 @@ void InputMethodType_Keyboard::UpdateControlsPost()
             SharedCursor.Tertiary = true;
     }
     else if(!SharedCursor.Move && (SharedCursor.X >= 0 || SharedCursor.Y >= 0))
+    {
         SharedCursor.GoOffscreen();
+    }
 
     if(this->m_scroll >= 1)
     {
@@ -906,6 +928,7 @@ InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &ac
     // ban attachment from active profile, must find new profile
     int key;
     InputMethodProfile *target_profile = nullptr;
+
     for(key = 0; key < this->m_keyboardStateSize; key++)
     {
         if(!this->m_keyboardState[key])
@@ -987,6 +1010,7 @@ InputMethod *InputMethodType_Keyboard::Poll(const std::vector<InputMethod *> &ac
         {
             // start with the most recent profile for this player index
             InputMethodProfile *profile;
+
             if(i == -1)
                 profile = this->GetDefaultProfile(my_index);
             else
@@ -1315,6 +1339,7 @@ const char *InputMethodType_Keyboard::GetOptionName(size_t i)
         return "MAX KBD PLAYERS";
     if(i == 1)
         return "TEXT ENTRY STYLE";
+
     return nullptr;
 }
 
@@ -1329,6 +1354,7 @@ const char *InputMethodType_Keyboard::GetOptionValue(size_t i)
         snprintf(buf, 3, "%d", this->m_maxKeyboards);
         return buf;
     }
+
     if(i == 1)
     {
         if(this->m_directText)
@@ -1336,6 +1362,7 @@ const char *InputMethodType_Keyboard::GetOptionValue(size_t i)
         else
             return "GAMEPAD";
     }
+
     return nullptr;
 }
 
@@ -1349,11 +1376,13 @@ bool InputMethodType_Keyboard::OptionChange(size_t i)
             this->m_maxKeyboards = 0;
         return true;
     }
+
     if(i == 1)
     {
         this->m_directText = !this->m_directText;
         return true;
     }
+
     return false;
 }
 
@@ -1368,11 +1397,13 @@ bool InputMethodType_Keyboard::OptionRotateLeft(size_t i)
             return true;
         }
     }
+
     if(i == 1)
     {
         this->m_directText = !this->m_directText;
         return true;
     }
+
     return false;
 }
 
@@ -1387,11 +1418,13 @@ bool InputMethodType_Keyboard::OptionRotateRight(size_t i)
             return true;
         }
     }
+
     if(i == 1)
     {
         this->m_directText = !this->m_directText;
         return true;
     }
+
     return false;
 }
 

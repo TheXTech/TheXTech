@@ -52,6 +52,7 @@ static void s_updateJoystickKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
             key_new = false;
             break;
         }
+
         val = SDL_JoystickGetAxis(j, mkey.id);
 
         if(SDL_abs(val) <= 15000)
@@ -153,10 +154,13 @@ static void s_updateJoystickAnalogue(SDL_Joystick *j, double &amount, const KM_K
             amount_new = 0.;
             break;
         }
+
         val = SDL_JoystickGetAxis(j, mkey.id);
 
         if(SDL_abs(val) <= 15000)
-            amount_new = 0.;
+        {
+            amount_new = 0.0;
+        }
         else if(mkey.val > val_initial)
         {
             amount_new = (val - val_initial) / (32768. - val_initial);
@@ -172,7 +176,9 @@ static void s_updateJoystickAnalogue(SDL_Joystick *j, double &amount, const KM_K
                 amount_new = other_amount_new;
         }
         else
-            amount_new = 0.;
+        {
+            amount_new = 0.0;
+        }
 
         break;
 
@@ -183,7 +189,8 @@ static void s_updateJoystickAnalogue(SDL_Joystick *j, double &amount, const KM_K
             amount_new = (dx / 32.);
         else if(mkey.id < 0)
             amount_new = (-dx / 32.);
-        else amount_new = 0.;
+        else
+            amount_new = 0.0;
 
         break;
 
@@ -194,23 +201,24 @@ static void s_updateJoystickAnalogue(SDL_Joystick *j, double &amount, const KM_K
             amount_new = (dy / 32.);
         else if(mkey.id < 0)
             amount_new = (dy / 32.);
-        else amount_new = 0.;
+        else
+            amount_new = 0.0;
 
         break;
 
     case KM_Key::JoyHat:
         val = (Sint32)SDL_JoystickGetHat(j, mkey.id);
         if((val & mkey.val))
-            amount_new = 1.;
+            amount_new = 1.0;
         break;
 
     case KM_Key::JoyButton:
         if((Sint32)SDL_JoystickGetButton(j, mkey.id))
-            amount_new = 1.;
+            amount_new = 1.0;
         break;
 
     default:
-        amount_new = 0.;
+        amount_new = 0.0;
         break;
     }
 
@@ -230,27 +238,27 @@ static void s_updateCtrlAnalogue(SDL_GameController *c, double &amount, const KM
         Sint32 val = SDL_GameControllerGetAxis(c, (SDL_GameControllerAxis)mkey.id);
 
         if(SDL_abs(val) <= 15000)
-            amount_new = 0.;
+            amount_new = 0.0;
         else if(mkey.val > 0)
             amount_new = (val - 15000) / (32768. - 15000);
         else if(mkey.val < 0)
             amount_new = (-val - 15000) / (32768. - 15000);
         else
-            amount_new = 0.;
+            amount_new = 0.0;
 
         break;
     }
     case KM_Key::CtrlButton:
         if(SDL_GameControllerGetButton(c, (SDL_GameControllerButton)mkey.id) != 0)
-            amount_new = 1.;
+            amount_new = 1.0;
         break;
 
     default:
-        amount_new = 0.;
+        amount_new = 0.0;
         break;
     }
 
-    if(amount_new > 0.)
+    if(amount_new > 0.0)
         amount = amount_new;
 }
 
@@ -388,12 +396,14 @@ bool InputMethod_Joystick::Update(int player, Controls_t &c, CursorControls_t &m
     InputMethodProfile_Joystick *p = dynamic_cast<InputMethodProfile_Joystick *>(this->Profile);
     if(!p || !this->m_devices)
         return false;
+
     if(!SDL_JoystickGetAttached(this->m_devices->joy))
     {
         // note: the joystick is owned by the InputMethodType, not the InputMethod.
         this->m_devices = nullptr;
         return false;
     }
+
     for(int a = 0; a < 4; a++)
     {
         KM_Key *keys;
@@ -401,6 +411,7 @@ bool InputMethod_Joystick::Update(int player, Controls_t &c, CursorControls_t &m
         size_t key_start;
         size_t key_max;
         bool activate = false;
+
         if(a == 0)
         {
             keys = p->m_keys;
@@ -434,15 +445,20 @@ bool InputMethod_Joystick::Update(int player, Controls_t &c, CursorControls_t &m
             const KM_Key &key = keys[i];
             const KM_Key &key2 = keys2[i];
             bool *b;
+
             if(a == 0)
             {
                 b = &PlayerControls::GetButton(c, i);
                 *b = false;
             }
             else if(a == 1)
+            {
                 b = &CursorControls::GetButton(m, i);
+            }
             else if(a == 2)
+            {
                 b = &EditorControls::GetButton(e, i);
+            }
             else
             {
                 b = &activate;
@@ -498,16 +514,20 @@ bool InputMethod_Joystick::Update(int player, Controls_t &c, CursorControls_t &m
             m.X = ScreenW / 2;
         if(m.Y < 0)
             m.Y = ScreenH / 2;
+
         m.X += (cursor[3] - cursor[2]) * 16.;
         m.Y += (cursor[1] - cursor[0]) * 16.;
+
         if(m.X < 0)
             m.X = 0;
         else if(m.X >= ScreenW)
             m.X = ScreenW - 1;
+
         if(m.Y < 0)
             m.Y = 0;
         else if(m.Y >= ScreenH)
             m.Y = ScreenH - 1;
+
         m.Move = true;
     }
 
@@ -552,9 +572,13 @@ StatusInfo InputMethod_Joystick::GetStatus()
     SDL_JoystickPowerLevel level = SDL_JoystickCurrentPowerLevel(this->m_devices->joy);
 
     if(level == SDL_JOYSTICK_POWER_UNKNOWN)
+    {
         res.power_status = StatusInfo::POWER_UNKNOWN;
+    }
     else if(level == SDL_JOYSTICK_POWER_WIRED)
+    {
         res.power_status = StatusInfo::POWER_WIRED;
+    }
     else if(level == SDL_JOYSTICK_POWER_MAX)
     {
         res.power_status = StatusInfo::POWER_CHARGED;
@@ -617,11 +641,13 @@ void InputMethodProfile_Joystick::InitAsJoystick()
         this->m_cursor_keys[i].assign(KM_Key::NoControl, -1, -1);
         this->m_cursor_keys2[i].assign(KM_Key::NoControl, -1, -1);
     }
+
     for(size_t i = 0; i < EditorControls::n_buttons; i++)
     {
         this->m_editor_keys[i].assign(KM_Key::NoControl, -1, -1);
         this->m_editor_keys2[i].assign(KM_Key::NoControl, -1, -1);
     }
+
     for(size_t i = 0; i < Hotkeys::n_buttons; i++)
     {
         this->m_hotkeys[i].assign(KM_Key::NoControl, -1, -1);
@@ -667,11 +693,13 @@ void InputMethodProfile_Joystick::InitAsController()
         this->m_cursor_keys[i].assign(KM_Key::NoControl, -1, -1);
         this->m_cursor_keys2[i].assign(KM_Key::NoControl, -1, -1);
     }
+
     for(size_t i = 0; i < EditorControls::n_buttons; i++)
     {
         this->m_editor_keys[i].assign(KM_Key::NoControl, -1, -1);
         this->m_editor_keys2[i].assign(KM_Key::NoControl, -1, -1);
     }
+
     for(size_t i = 0; i < Hotkeys::n_buttons; i++)
     {
         this->m_hotkeys[i].assign(KM_Key::NoControl, -1, -1);
@@ -720,11 +748,13 @@ void InputMethodProfile_Joystick::ExpandAsJoystick()
         this->m_cursor_keys[i].assign(KM_Key::NoControl, -1, -1);
         this->m_cursor_keys2[i].assign(KM_Key::NoControl, -1, -1);
     }
+
     for(size_t i = 0; i < EditorControls::n_buttons; i++)
     {
         this->m_editor_keys[i].assign(KM_Key::NoControl, -1, -1);
         this->m_editor_keys2[i].assign(KM_Key::NoControl, -1, -1);
     }
+
     for(size_t i = 0; i < Hotkeys::n_buttons; i++)
     {
         this->m_hotkeys[i].assign(KM_Key::NoControl, -1, -1);
@@ -761,11 +791,13 @@ void InputMethodProfile_Joystick::ExpandAsController()
         this->m_cursor_keys[i].assign(KM_Key::NoControl, -1, -1);
         this->m_cursor_keys2[i].assign(KM_Key::NoControl, -1, -1);
     }
+
     for(size_t i = 0; i < EditorControls::n_buttons; i++)
     {
         this->m_editor_keys[i].assign(KM_Key::NoControl, -1, -1);
         this->m_editor_keys2[i].assign(KM_Key::NoControl, -1, -1);
     }
+
     for(size_t i = 0; i < Hotkeys::n_buttons; i++)
     {
         this->m_hotkeys[i].assign(KM_Key::NoControl, -1, -1);
@@ -848,7 +880,9 @@ bool InputMethodProfile_Joystick::PollPrimaryButton(ControlsClass c, size_t i)
     for(size_t j = 0; j < key_max; j++)
     {
         if(keys2[j] == key)
+        {
             keys2[j] = KM_Key();
+        }
         else if(i != j && keys[j] == key)
         {
             if(keys2[j].type != KM_Key::NoControl)
@@ -857,7 +891,9 @@ bool InputMethodProfile_Joystick::PollPrimaryButton(ControlsClass c, size_t i)
                 keys2[j] = KM_Key();
             }
             else
+            {
                 keys[j] = keys[i];
+            }
         }
     }
 
@@ -950,7 +986,9 @@ bool InputMethodProfile_Joystick::PollSecondaryButton(ControlsClass c, size_t i)
     for(size_t j = 0; j < key_max; j++)
     {
         if(i != j && keys2[j] == key)
+        {
             keys2[j] = KM_Key();
+        }
         else if(i != j && keys[j] == key)
         {
             if(keys2[j].type != KM_Key::NoControl)
@@ -959,7 +997,9 @@ bool InputMethodProfile_Joystick::PollSecondaryButton(ControlsClass c, size_t i)
                 keys2[j] = KM_Key();
             }
             else if(keys2[i].type != KM_Key::NoControl)
+            {
                 keys[j] = keys2[i];
+            }
             else
             {
                 keys[j] = keys[i];
@@ -1023,6 +1063,7 @@ bool InputMethodProfile_Joystick::DeletePrimaryButton(ControlsClass c, size_t i)
         keys[i] = KM_Key();
         return true;
     }
+
     return false;
 }
 
@@ -1040,10 +1081,7 @@ bool InputMethodProfile_Joystick::DeleteSecondaryButton(ControlsClass c, size_t 
     else if(c == ControlsClass::Hotkey)
         keys2 = this->m_hotkeys2;
     else
-    {
-        // BAD!
-        return false;
-    }
+        return false; // BAD!
 
     if(keys2[i].type != KM_Key::NoControl)
     {
@@ -1116,6 +1154,7 @@ static const char *s_nameButton(const KM_Key &k)
 const char *InputMethodProfile_Joystick::NamePrimaryButton(ControlsClass c, size_t i)
 {
     KM_Key *keys;
+
     if(c == ControlsClass::Player)
         keys = this->m_keys;
     else if(c == ControlsClass::Cursor)
@@ -1133,6 +1172,7 @@ const char *InputMethodProfile_Joystick::NamePrimaryButton(ControlsClass c, size
 const char *InputMethodProfile_Joystick::NameSecondaryButton(ControlsClass c, size_t i)
 {
     KM_Key *keys2;
+
     if(c == ControlsClass::Player)
         keys2 = this->m_keys2;
     else if(c == ControlsClass::Cursor)
@@ -1150,6 +1190,7 @@ const char *InputMethodProfile_Joystick::NameSecondaryButton(ControlsClass c, si
 void InputMethodProfile_Joystick::SaveConfig(IniProcessing *ctl)
 {
     std::string name;
+
     for(int a = 0; a < 4; a++)
     {
         KM_Key *keys;
@@ -1222,6 +1263,7 @@ void InputMethodProfile_Joystick::LoadConfig(IniProcessing *ctl)
         KM_Key *keys;
         KM_Key *keys2;
         size_t key_max;
+
         if(a == 0)
         {
             keys = this->m_keys;
@@ -1246,6 +1288,7 @@ void InputMethodProfile_Joystick::LoadConfig(IniProcessing *ctl)
             keys2 = this->m_hotkeys2;
             key_max = Hotkeys::n_buttons;
         }
+
         for(size_t i = 0; i < key_max; i++)
         {
             if(a == 0)
@@ -1256,6 +1299,7 @@ void InputMethodProfile_Joystick::LoadConfig(IniProcessing *ctl)
                 name = EditorControls::GetButtonName_INI(i);
             else
                 name = Hotkeys::GetButtonName_INI(i);
+
             size_t orig_l = name.size();
 
             ctl->read(name.replace(orig_l, std::string::npos, "-type").c_str(),
@@ -1282,6 +1326,7 @@ void InputMethodProfile_Joystick::LoadConfig(IniProcessing *ctl)
 void InputMethodProfile_Joystick::SaveConfig_Legacy(IniProcessing *ctl)
 {
     std::string name;
+
     for(size_t i = 0; i < PlayerControls::n_buttons; i++)
     {
         name = PlayerControls::GetButtonName_INI(i);
@@ -1306,6 +1351,7 @@ void InputMethodProfile_Joystick::SaveConfig_Legacy(IniProcessing *ctl)
 void InputMethodProfile_Joystick::LoadConfig_Legacy(IniProcessing *ctl)
 {
     std::string name;
+
     for(size_t i = 0; i < PlayerControls::n_buttons; i++)
     {
         name = PlayerControls::GetButtonName_INI(i);
@@ -1370,11 +1416,13 @@ InputMethod *InputMethodType_Joystick::Poll(const std::vector<InputMethod *> &ac
     {
         SDL_Joystick *joy = p.second->joy;
         bool duplicate = false;
+
         for(InputMethod *method : active_methods)
         {
             InputMethod_Joystick *m = dynamic_cast<InputMethod_Joystick *>(method);
             if(!m)
                 continue;
+
             if(m->m_devices == p.second)
             {
                 duplicate = true;
@@ -1391,7 +1439,9 @@ InputMethod *InputMethodType_Joystick::Poll(const std::vector<InputMethod *> &ac
 
         // can_poll is set as false on joystick initialization and unbinding
         if(k.type == KM_Key::NoControl)
+        {
             p.second->can_poll = true;
+        }
         else if(p.second->can_poll)
         {
             active_joystick = p.second;
@@ -1448,10 +1498,12 @@ InputMethod *InputMethodType_Joystick::Poll(const std::vector<InputMethod *> &ac
         {
             // expanding a legacy profile based on information from controller
             profile->Name = method->Name + " P" + std::to_string(my_index + 1);
+
             if(active_joystick->ctrl)
                 profile->ExpandAsController();
             else
                 profile->ExpandAsJoystick();
+
             this->m_profiles.push_back(method->Profile);
         }
     }
@@ -1482,10 +1534,10 @@ InputMethod *InputMethodType_Joystick::Poll(const std::vector<InputMethod *> &ac
     return (InputMethod *)method;
 }
 
+
 /*-----------------------*\
 || CUSTOM METHODS        ||
 \*-----------------------*/
-
 
 KM_Key InputMethodType_Joystick::PollJoystickKeyAll()
 {
@@ -1517,6 +1569,7 @@ KM_Key InputMethodType_Joystick::PollControllerKeyAll()
     return k;
 }
 
+
 /*-----------------------*\
 || CUSTOM METHODS        ||
 \*-----------------------*/
@@ -1525,6 +1578,7 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
 {
     pLogDebug("Opening joystick id %d...", joystick_index);
     SDL_Joystick *joy = SDL_JoystickOpen(joystick_index);
+
     if(!joy)
     {
         pLogDebug("  could not open.");
@@ -1557,10 +1611,12 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
 
     devices->joy = joy;
     devices->guid = guid;
+
     if(SDL_IsGameController(joystick_index))
     {
         pLogDebug("  claims to be a game controller...");
         devices->ctrl = SDL_GameControllerOpen(joystick_index);
+
         if(devices->ctrl)
             pLogDebug("    successfully opened game controller!");
         else
@@ -1573,8 +1629,11 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
     {
         pLogDebug("  claims to support haptic...");
         devices->haptic = SDL_HapticOpenFromJoystick(joy);
+
         if(!devices->haptic)
+        {
             pLogDebug("    could not open haptic!");
+        }
         else if(!SDL_HapticRumbleSupported(devices->haptic) || SDL_HapticRumbleInit(devices->haptic) != 0)
         {
             pLogDebug("    could not init haptic rumble!");
@@ -1582,7 +1641,9 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
             devices->haptic = nullptr;
         }
         else
+        {
             pLogDebug("    successfully initialized haptic rumble!");
+        }
     }
     else
         pLogDebug("  does not support haptic.");
@@ -1614,6 +1675,7 @@ bool InputMethodType_Joystick::CloseJoystick(int instance_id)
         InputMethod_Joystick *m = dynamic_cast<InputMethod_Joystick *>(method);
         if(!m)
             continue;
+
         if(m->m_devices == devices)
         {
             pLogDebug("  unset m_devices of InputMethod '%s' using Profile '%s'.", m->Name.c_str(), m->Profile->Name.c_str());
@@ -1768,9 +1830,9 @@ void InputMethodType_Joystick::SaveConfig_Custom(IniProcessing *ctl)
     // set all default controller profiles
     for(auto it = m_lastProfileByGUID.begin(); it != m_lastProfileByGUID.end(); ++it)
     {
-        std::vector<InputMethodProfile *>::iterator loc
-            = std::find(this->m_profiles.begin(), this->m_profiles.end(), it->second);
+        std::vector<InputMethodProfile *>::iterator loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), it->second);
         size_t index = loc - this->m_profiles.begin();
+
         if(index == this->m_profiles.size())
         {
             // this probably a legacy profile, let's check.
@@ -1785,7 +1847,9 @@ void InputMethodType_Joystick::SaveConfig_Custom(IniProcessing *ctl)
             }
         }
         else
+        {
             ctl->setValue(name.replace(uuid_begin, std::string::npos, it->first).c_str(), index);
+        }
     }
 }
 
@@ -1830,6 +1894,7 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing *ctl)
 
             ctl->beginGroup(k);
             InputMethodProfile_Joystick *profile = new(std::nothrow) InputMethodProfile_Joystick;
+
             if(profile)
             {
                 profile->Type = this;
@@ -1838,7 +1903,10 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing *ctl)
                 pLogDebug("Loaded legacy profile as '%s'.", guid.c_str());
             }
             else
+            {
                 pLogWarning("Could not allocate legacy profile (OOM).");
+            }
+
             ctl->endGroup();
         }
     }
