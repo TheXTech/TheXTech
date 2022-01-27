@@ -35,9 +35,9 @@ namespace Controls
 
 struct JoystickDevices
 {
-    SDL_Joystick* joy = nullptr;
-    SDL_GameController* ctrl = nullptr;
-    SDL_Haptic* haptic = nullptr;
+    SDL_Joystick *joy = nullptr;
+    SDL_GameController *ctrl = nullptr;
+    SDL_Haptic *haptic = nullptr;
 
     bool can_poll = false;
     std::string guid;
@@ -47,8 +47,8 @@ struct KM_Key
 {
     enum CtrlTypes
     {
-        NoControl=-1,
-        JoyAxis=0,
+        NoControl = -1,
+        JoyAxis = 0,
         JoyBallX,
         JoyBallY,
         JoyHat,
@@ -62,7 +62,7 @@ struct KM_Key
     int id = -1;
     int type = -1;
 
-    inline bool operator==(const KM_Key& o)
+    inline bool operator==(const KM_Key &o)
     {
         return o.id == id && o.val == val && o.type == type;
     }
@@ -78,7 +78,7 @@ struct KM_Key
 class InputMethod_Joystick : public InputMethod
 {
 public:
-    JoystickDevices* m_devices;
+    JoystickDevices *m_devices;
 
     using InputMethod::Type;
     using InputMethod::Profile;
@@ -87,7 +87,7 @@ public:
 
     // Update functions that set player controls (and editor controls)
     // based on current device input. Return false if device lost.
-    bool Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h);
+    bool Update(int player, Controls_t &c, CursorControls_t &m, EditorControls_t &e, HotkeysPressed_t &h);
 
     void Rumble(int ms, float strength);
 
@@ -129,8 +129,8 @@ public:
     void InitAsController();
     void ExpandAsJoystick();
     void ExpandAsController();
-    void SaveConfig_Legacy(IniProcessing* ctl);
-    void LoadConfig_Legacy(IniProcessing* ctl);
+    void SaveConfig_Legacy(IniProcessing *ctl);
+    void LoadConfig_Legacy(IniProcessing *ctl);
 
     // Polls a new (secondary) device button for the i'th player button
     // Returns true on success and false if no button pressed
@@ -145,21 +145,21 @@ public:
     bool DeleteSecondaryButton(ControlsClass c, size_t i);
 
     // Gets strings for the device buttons currently used for the i'th button of class c
-    const char* NamePrimaryButton(ControlsClass c, size_t i);
-    const char* NameSecondaryButton(ControlsClass c, size_t i);
+    const char *NamePrimaryButton(ControlsClass c, size_t i);
+    const char *NameSecondaryButton(ControlsClass c, size_t i);
 
     // one can assume that the IniProcessing* is already in the correct group
-    void SaveConfig(IniProcessing* ctl);
-    void LoadConfig(IniProcessing* ctl);
+    void SaveConfig(IniProcessing *ctl);
+    void LoadConfig(IniProcessing *ctl);
 };
 
 class InputMethodType_Joystick : public InputMethodType
 {
 private:
-    std::unordered_map<int, JoystickDevices*> m_availableJoysticks;
-    std::unordered_map<std::string, InputMethodProfile*> m_lastProfileByGUID;
+    std::unordered_map<int, JoystickDevices *> m_availableJoysticks;
+    std::unordered_map<std::string, InputMethodProfile *> m_lastProfileByGUID;
 
-    InputMethodProfile* AllocateProfile() noexcept;
+    InputMethodProfile *AllocateProfile() noexcept;
 
     /*-----------------------*\
     || CUSTOM METHODS        ||
@@ -171,12 +171,12 @@ public:
     using InputMethodType::Name;
     using InputMethodType::m_profiles;
 
-    const uint8_t* m_JoystickState;
+    const uint8_t *m_JoystickState;
     int m_JoystickStateSize;
 
     InputMethodType_Joystick();
 
-    bool TestProfileType(InputMethodProfile* profile);
+    bool TestProfileType(InputMethodProfile *profile);
     bool RumbleSupported();
 
     void UpdateControlsPre();
@@ -184,14 +184,14 @@ public:
 
     // null if no input method is ready
     // allocates the new InputMethod on the heap
-    InputMethod* Poll(const std::vector<InputMethod*>& active_methods) noexcept;
+    InputMethod *Poll(const std::vector<InputMethod *> &active_methods) noexcept;
 
     /*-----------------------*\
     || CUSTOM METHODS        ||
     \*-----------------------*/
     KM_Key PollJoystickKeyAll();
     KM_Key PollControllerKeyAll();
-    InputMethodProfile* AddOldJoystickProfile();
+    InputMethodProfile *AddOldJoystickProfile();
 
     /*-----------------------*\
     || OPTIONAL METHODS      ||
@@ -199,12 +199,12 @@ public:
 protected:
     // optional function allowing developer to associate device information with profile, etc
     // if developer wants to forbid assignment, return false
-    bool SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods);
+    bool SetProfile_Custom(InputMethod *method, int player_no, InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods);
     // unregisters any references to the profile before final deallocation
     // returns false to prevent deletion if this is impossible
-    bool DeleteProfile_Custom(InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods);
+    bool DeleteProfile_Custom(InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods);
 public:
-    bool ConsumeEvent(const SDL_Event* ev);
+    bool ConsumeEvent(const SDL_Event *ev);
 
 public:
     // How many per-type special options are there?
@@ -213,17 +213,17 @@ public:
     // It is guaranteed that none of these will be called if
     // GetOptionCount() returns 0.
     // get a char* describing the option
-    const char* GetOptionName(size_t i);
+    const char *GetOptionName(size_t i);
     // get a char* describing the current option value
     // must be allocated in static or instance memory
     // WILL NOT be freed
-    const char* GetOptionValue(size_t i);
+    const char *GetOptionValue(size_t i);
     // called when A is pressed; allowed to interrupt main game loop
     bool OptionChange(size_t i);
 
 protected:
-    void SaveConfig_Custom(IniProcessing* ctl);
-    void LoadConfig_Custom(IniProcessing* ctl);
+    void SaveConfig_Custom(IniProcessing *ctl);
+    void LoadConfig_Custom(IniProcessing *ctl);
 
 };
 
