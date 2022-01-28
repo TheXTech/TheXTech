@@ -320,6 +320,8 @@ set(THEXTECH_SRC
     src/main/outro_loop.cpp
     src/main/trees.cpp
     src/main/QuadTree/LooseQuadtree-impl.cpp
+    src/sound/fx/spc_echo.cpp
+    src/sound/fx/reverb.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
@@ -378,6 +380,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/sdl/*.h
     src/main/*.h
     src/main/QuadTree/*.h
+    src/sound/fx/*.h
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
