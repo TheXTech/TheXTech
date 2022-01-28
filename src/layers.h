@@ -27,7 +27,7 @@
 #include "range_arr.hpp"
 #include "location.h"
 #include "global_constants.h"
-#include "controls.h"
+#include "control_types.h"
 
 //Public Type Layer
 struct Layer_t

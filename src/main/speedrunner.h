@@ -22,7 +22,7 @@
 #ifndef SPEEDRUNNER_H
 #define SPEEDRUNNER_H
 
-#include "controls.h"
+#include "control_types.h"
 
 enum
 {
@@ -39,7 +39,7 @@ void speedRun_tick();
 
 void speedRun_setSemitransparentRender(bool r);
 
-void speedRun_syncControlKeys(int plr, Controls_t &keys);
+void speedRun_syncControlKeys(int plr, const Controls_t &keys);
 
 void speedRun_loadStats();
 void speedRun_saveStats();
@@ -51,6 +51,8 @@ void speedRun_triggerEnter();
 void speedRun_triggerLeave();
 
 void speedRun_bossDeadEvent();
+
+void RenderControls(int player, int x, int y, int w, int h);
 
 void speedRun_renderControls(int player, int screenZ = -1);
 void speedRun_renderTimer();

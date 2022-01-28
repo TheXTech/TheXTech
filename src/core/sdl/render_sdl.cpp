@@ -30,11 +30,9 @@
 #include "video.h"
 #include "../window.h"
 
-#ifdef USE_RENDER_BLOCKING
 #include <SDL2/SDL_assert.h>
-#endif
 
-#include "control/joystick.h"
+#include "controls.h"
 
 #ifndef UNUSED
 #define UNUSED(x) (void)x
@@ -214,9 +212,7 @@ void RenderSDL::repaint()
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
     SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
 
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-    RenderTouchControls();
-#endif
+    Controls::RenderTouchControls();
 
     SDL_RenderPresent(m_gRenderer);
 }
@@ -318,6 +314,12 @@ void RenderSDL::mapToScreen(int x, int y, int *dx, int *dy)
 {
     *dx = static_cast<int>((static_cast<float>(x) - m_offset_x) / m_viewport_scale_x);
     *dy = static_cast<int>((static_cast<float>(y) - m_offset_y) / m_viewport_scale_y);
+}
+
+void RenderSDL::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
+{
+    *window_x = (float)scr_x * m_viewport_scale_x + m_offset_x;
+    *window_y = (float)scr_y * m_viewport_scale_y + m_offset_y;
 }
 
 void RenderSDL::setTargetTexture()

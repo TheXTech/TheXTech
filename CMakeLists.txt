@@ -65,7 +65,6 @@ endif()
 if(ANDROID)
     include(cmake/ndk-stl-config.cmake)
     set(ANDROID_STL "c++_static")
-    set(USE_TOUCHSCREEN_CONTROLLER TRUE)
 endif()
 
 if(WIN32 AND NOT EMSCRIPTEN)
@@ -316,6 +315,12 @@ set(THEXTECH_SRC
     src/main/level_file.cpp
     src/main/menu_loop.cpp
     src/main/menu_main.cpp
+    src/main/screen_pause.cpp
+    src/main/screen_connect.cpp
+    src/main/screen_quickreconnect.cpp
+    src/main/screen_textentry.cpp
+    src/main/screen_cheats.cpp
+    src/main/menu_controls.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
     src/main/trees.cpp
@@ -324,6 +329,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
     src/graphics/gfx_print.cpp
+    src/graphics/gfx_message.cpp
     src/graphics/gfx_credits.cpp
     src/graphics/gfx_hud.cpp
     src/graphics/gfx_enter_screen.cpp
@@ -331,6 +337,10 @@ set(THEXTECH_SRC
     src/graphics/gfx_special_frames.cpp
     src/graphics/gfx_screen.cpp
     src/control/joystick.cpp
+    src/control/keyboard.cpp
+    src/control/touchscreen.cpp
+    src/control/duplicate.cpp
+    src/control/controls.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp
@@ -383,10 +393,6 @@ list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
-endif()
-
-if(USE_TOUCHSCREEN_CONTROLLER)
-    list(APPEND THEXTECH_SRC src/control/touchscreen.cpp)
 endif()
 
 if(THEXTECH_ENABLE_LUA)
@@ -498,10 +504,6 @@ endif()
 
 if(ANDROID)
     target_link_libraries(A2XT_Int INTERFACE log)
-endif()
-
-if(USE_TOUCHSCREEN_CONTROLLER)
-    target_compile_definitions(thextech PRIVATE -DUSE_TOUCHSCREEN_CONTROLLER)
 endif()
 
 if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")

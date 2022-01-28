@@ -28,7 +28,13 @@ extern struct Config_t
 
     //! Record gameplay data
     bool    RecordGameplayData = false;
+    //! Use the native onscreen keyboard instead of the TheXTech one
+    bool    use_native_osk = false;
 
+    /* ---- Video ----*/
+
+    //! The onscreen keyboard should fill the screen
+    bool    osk_fill_screen = false;
 
     /* ---- Gameplay ----*/
 
@@ -36,6 +42,12 @@ extern struct Config_t
     bool    GameplayPoundByAltRun = false;
     //! Policy of stars showing at world map
     int     WorldMapStarShowPolicyGlobal = 0;
+    //! Use strict Drop/Add (lose life on Add after Drop, SwapCharacter)
+    bool    StrictDropAdd = false;
+    //! Use the quick (non-pausing) reconnect screen
+    bool    NoPauseReconnect = false;
+    //! Access the Cheat Screen from the pause menu
+    bool    enter_cheats_menu_item = false;
 
 
     /* ---- Effects ----*/

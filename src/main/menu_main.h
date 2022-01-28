@@ -50,15 +50,14 @@ enum
     MENU_CHARACTER_SELECT_BM_S1 = 400,
     // Character select for battle game, step 2
     MENU_CHARACTER_SELECT_BM_S2 = 500,
+    // New character select for main game
+    MENU_CHARACTER_SELECT_NEW    = 1000,
+    MENU_CHARACTER_SELECT_NEW_BM = 1001,
 
     MENU_CHARACTER_SELECT_BASE  = MENU_CHARACTER_SELECT_1P,
     MENU_CHARACTER_SELECT_BASE_END = MENU_CHARACTER_SELECT_BM_S2,
 
-    MENU_INPUT_SETTINGS_BASE = 30,
-    // Set up controls for player 1
-    MENU_INPUT_SETTINGS_P1 = 31,
-    // Set up controls for player 2
-    MENU_INPUT_SETTINGS_P2 = 32,
+    MENU_INPUT_SETTINGS = 30,
 
     MENU_SELECT_SLOT_BASE = 10,
     // Select game slot for single-player game
@@ -82,7 +81,7 @@ struct MainMenuContent
 {
     std::string mainStartGame;
     std::string main1PlayerGame;
-    std::string main2PlayerGame;
+    std::string mainMultiplayerGame;
     std::string mainBattleGame;
     std::string mainOptions;
     std::string mainExit;
@@ -91,6 +90,39 @@ struct MainMenuContent
 
     RangeArr<std::string, 1, numCharacters> selectPlayer;
 
+    // ConnectScreen
+    std::string charSelTitle;
+    std::string reconnectTitle;
+    std::string dropAddTitle;
+    std::string wordPlayer;
+    std::string wordProfile;
+    std::string playerSelStartGame;
+    std::string phrasePressAButton;
+    std::string phraseTestControls;
+    std::string wordDisconnect;
+    std::string phraseHoldStartToReturn;
+    std::string wordBack;
+    std::string wordResume;
+    std::string wordWaiting;
+    std::string phraseForceResume;
+    std::string phraseDropOthers;
+    std::string phraseDropSelf;
+    std::string phraseChangeChar;
+
+    // Controls menus
+    std::string controlsTitle;
+    std::string controlsConnected;
+    std::string controlsDeleteKey;
+    std::string controlsDeviceTypes;
+    std::string controlsInUse;
+    std::string controlsNotInUse;
+    std::string wordProfiles;
+    std::string wordButtons;
+    std::string controlsReallyDeleteProfile;
+    std::string controlsNewProfile;
+
+    std::string wordYes;
+    std::string wordNo;
 };
 
 extern MainMenuContent g_mainMenu;

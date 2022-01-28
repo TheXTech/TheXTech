@@ -13,46 +13,6 @@
             android:key="setup_assets_path"
             android:title="@string/setup_assets_path_label" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/setup_control_cat">
-        <ListPreference
-            android:defaultValue="1"
-            android:entries="@array/touchscreenControllerTypes"
-            android:entryValues="@array/touchscreenControllerTypesValues"
-            android:key="setup_touchscreen_mode"
-            android:title="@string/setup_touchscreen_mode" />
-        <ListPreference
-            android:defaultValue="0"
-            android:entries="@array/touchPadStyles"
-            android:entryValues="@array/touchPadStylesValues"
-            android:key="setup_touchscreen_style"
-            android:title="@string/setup_touchpad_style" />
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="touchscreen_gamepad_showalways"
-            android:title="@string/setup_touchscreen_alwaysshow" />
-    </PreferenceCategory>
-    <PreferenceCategory android:title="@string/setup_feedback">
-
-        <CheckBoxPreference
-            android:defaultValue="false"
-            android:key="touchscreen_feedback_enabled"
-            android:title="@string/setup_feedback_enable_vibration" />
-        <ListPreference
-            android:defaultValue="1.0"
-            android:entries="@array/feedBackStrength"
-            android:entryValues="@array/feedBackStrengthValues"
-            android:key="touchscreen_vibration_strength"
-            android:title="@string/setup_feedback_vibration_strength" />
-        <ListPreference
-            android:defaultValue="12"
-            android:entries="@array/feedBackLength"
-            android:entryValues="@array/feedBackLengthValues"
-            android:key="touchscreen_vibration_length"
-            android:title="@string/setup_feedback_vibration_length" />
-        <Preference
-            android:key="touchscreen_vibration_test"
-            android:title="@string/touchscreen_vibration_test_label" />
-    </PreferenceCategory>
     <PreferenceCategory android:title="@string/setup_display_cat">
         <CheckBoxPreference
             android:defaultValue="false"

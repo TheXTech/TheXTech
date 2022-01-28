@@ -30,7 +30,6 @@ struct Point_t
     int Y = 0;
 };
 
-extern Point_t CursorPos;
 extern bool HasCursor;
 extern bool NoReallyKillIt;
 extern int curSection;

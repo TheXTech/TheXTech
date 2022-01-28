@@ -25,20 +25,23 @@
 #include <fmt_format_ne.h>
 
 #include "../globals.h"
-#include "../config.h"
 #include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
-#include "../control/joystick.h"
+#include "../controls.h"
 #include "../effect.h"
 #include "../graphics.h"
 #include "../collision.h"
+#include "../player.h"
 #include "../main/trees.h"
 #include "../core/events.h"
 #include "../compat.h"
+#include "../config.h"
 #include "world_globals.h"
 #include "level_file.h"
 #include "speedrunner.h"
+#include "screen_quickreconnect.h"
+#include "screen_connect.h"
 
 #include "../pseudo_vb.h"
 
@@ -176,6 +179,7 @@ static SDL_INLINE double getWorldPlayerCenterY()
 
 void WorldLoop()
 {
+    // again, SOON port the shared allocation from devel
     // Keep them static to don't re-alloc them for every iteration
     static WorldPathPtrArr parr;
     static WorldLevelPtrArr larr;
@@ -207,7 +211,18 @@ void WorldLoop()
 
     speedRun_tick();
     UpdateGraphics2();
-    UpdateControls();
+
+    if(!Controls::Update())
+    {
+        if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect)
+            QuickReconnectScreen::g_active = true;
+        else
+            PauseGame(PauseCode::Reconnect, 0);
+    }
+
+    if(QuickReconnectScreen::g_active)
+        QuickReconnectScreen::Logic();
+
     UpdateSound();
 
     g_worldScreenFader.update();
@@ -327,16 +342,6 @@ void WorldLoop()
         tempLocation.Y += 4;
         WorldPlayer[1].LevelName.clear();
 
-        bool altPressed = XEvents::getKeyState(SDL_SCANCODE_LALT) ||
-                          XEvents::getKeyState(SDL_SCANCODE_RALT);
-
-        bool escPressed = XEvents::getKeyState(SDL_SCANCODE_ESCAPE);
-#ifdef __ANDROID__
-        escPressed |= XEvents::getKeyState(SDL_SCANCODE_AC_BACK);
-#endif
-
-        bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
-
         treeWorldLevelQuery(tempLocation, larr, true);
         //for(A = 1; A <= numWorldLevels; A++)
         for(auto *t : larr)
@@ -353,10 +358,17 @@ void WorldLoop()
             }
         }
 
-        if(pausePress)
+        if(SharedControls.Pause)
         {
-            if(Player[1].UnStart)
-                PauseGame(1);
+            PauseGame(PauseCode::PauseScreen, 0);
+        }
+        for(int i = 1; i <= numPlayers; i++)
+        {
+            if(Player[i].Controls.Start && Player[i].UnStart)
+                PauseGame(PauseCode::PauseScreen, i);
+            // only allow P1 to pause if multiplayer pause controls disabled
+            if(!g_compatibility.multiplayer_pause_controls)
+                break;
         }
 
         if(Player[1].Controls.Up)
@@ -552,6 +564,13 @@ void WorldLoop()
                         addMissingLvlSuffix(level.FileName);
                         if(Files::fileExists(SelectWorld[selWorld].WorldPath + level.FileName))
                         {
+                            // save which characters were present at level start
+                            if(SwapCharAllowed())
+                            {
+                                pLogDebug("Save drop/add characters configuration at GameLoop()");
+                                ConnectScreen::SaveChars();
+                            }
+
                             StartWarp = level.StartWarp;
                             StopMusic();
                             PlaySound(SFX_LevelSelect);
@@ -571,7 +590,7 @@ void WorldLoop()
                             {
                                 delayedMusicStart(); // Allow music being started
                                 MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", level.FileName);
-                                PauseGame(1);
+                                PauseGame(PauseCode::Message);
                                 ErrorQuit = true;
                             }
 

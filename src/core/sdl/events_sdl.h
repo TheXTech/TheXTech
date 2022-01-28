@@ -28,8 +28,6 @@
 
 class EventsSDL final : public AbstractEvents_t
 {
-    const Uint8 *m_keyboardState = nullptr;
-    Uint32 m_lastMousePress = 0;
     SDL_Event m_event = {};
 
 public:
@@ -51,20 +49,6 @@ public:
      * \brief Wait until any events will happen
      */
     void waitEvents() override;
-
-    /*!
-     * \brief Get key state by scancode
-     * \param scan_code Scancode of the backend
-     * \return Key state value
-     */
-    bool getKeyState(int scan_code) override;
-
-    /*!
-     * \brief Get the name of the key by scancode
-     * \param scan_code Scancode of the backend
-     * \return Human-readable name of the key
-     */
-    const char *getScanCodeName(int scan_code) override;
 
 private:
     void processEvent();
