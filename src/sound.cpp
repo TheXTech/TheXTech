@@ -730,20 +730,20 @@ static void readFx(IniProcessing &sounds, SectionEffect_t &s)
 
     case SectionEffect_t::FX_Echo:
         sounds.read("echo-on", s.echo.echoOn, 1);
-        sounds.read("echo-delay", s.echo.echoDelay, 6);
-        sounds.read("echo-feedback", s.echo.echoFeedBack, 30);
-        sounds.read("echo-main-volume-left", s.echo.echoMainVolL, 128);
-        sounds.read("echo-main-volume-right", s.echo.echoMainVolR, 128);
+        sounds.read("delay", s.echo.echoDelay, 6);
+        sounds.read("feedback", s.echo.echoFeedBack, 30);
+        sounds.read("main-volume-left", s.echo.echoMainVolL, 127);
+        sounds.read("main-volume-right", s.echo.echoMainVolR, 127);
         sounds.read("echo-volume-left", s.echo.echoVolL, 28);
         sounds.read("echo-volume-right", s.echo.echoVolR, 28);
-        sounds.read("echo-fir-0", s.echo.echoFir[0], 99);
-        sounds.read("echo-fir-1", s.echo.echoFir[1], -52);
-        sounds.read("echo-fir-2", s.echo.echoFir[2], 32);
-        sounds.read("echo-fir-3", s.echo.echoFir[3], 50);
-        sounds.read("echo-fir-4", s.echo.echoFir[4], 25);
-        sounds.read("echo-fir-5", s.echo.echoFir[5], 51);
-        sounds.read("echo-fir-6", s.echo.echoFir[6], -35);
-        sounds.read("echo-fir-7", s.echo.echoFir[7], 56);
+        sounds.read("fir-0", s.echo.echoFir[0], 99);
+        sounds.read("fir-1", s.echo.echoFir[1], -52);
+        sounds.read("fir-2", s.echo.echoFir[2], 32);
+        sounds.read("fir-3", s.echo.echoFir[3], 50);
+        sounds.read("fir-4", s.echo.echoFir[4], 25);
+        sounds.read("fir-5", s.echo.echoFir[5], 51);
+        sounds.read("fir-6", s.echo.echoFir[6], -35);
+        sounds.read("fir-7", s.echo.echoFir[7], 56);
         break;
 
     default:
