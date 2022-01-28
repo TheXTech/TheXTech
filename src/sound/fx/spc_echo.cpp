@@ -22,6 +22,10 @@
 #include <string.h>
 #include "spc_echo.h"
 
+//#define RESAMPLED_FIR
+//#define CUBE_INTERPOLATION
+
+
 //#define WAVE_DEEP_DEBUG
 #ifdef WAVE_DEEP_DEBUG // Dirty debug
 #define WAVE_PATH "/home/vitaly/Музыка/spc_echo_dump-"
@@ -299,8 +303,6 @@ static void setuint8_t(uint8_t **raw, float ov)
 ///*      0      1     2     3    4     5     6     7     8      9     A    B     C      D     E     F  */
 //};
 
-#define RESAMPLED_FIR
-#define CUBE_INTERPOLATION
 
 struct SpcEcho
 {
@@ -380,10 +382,28 @@ struct SpcEcho
     const uint8_t reg_fir_initial[8] = {0x80, 0xFF, 0x9A, 0xFF, 0x67, 0xFF, 0x0F, 0xFF};
     //! $xf rw FFCx - Echo FIR Filter Coefficient (FFC) X
     int8_t reg_fir[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+#if !defined(RESAMPLED_FIR)
+    int8_t reg_fir_resampled[8];
+
+    void recomputeFirResampled()
+    {
+        const double y_factor1 = 1.0;
+        const double y_factor2 = rate_factor;
+        for(size_t i = 0; i < 8; i++)
+        {
+            double newFactor = y_factor2 + ((y_factor1 - y_factor2) / (0.0 - 7.0)) * (i - 7.0);
+            reg_fir_resampled[i] = (int8_t)(reg_fir[i] * (1.0 + ((newFactor - 1.0) / 100.0)));
+        }
+        std::fflush(stdout);
+    }
+#endif
 
     void setDefaultFir()
     {
         memcpy(reg_fir, reg_fir_initial, 8);
+#if !defined(RESAMPLED_FIR)
+        recomputeFirResampled();
+#endif
     }
 
     void setDefaultRegs()
@@ -416,6 +436,11 @@ struct SpcEcho
         channels = i_channels;
         rate_factor = (double)i_rate / SDSP_RATE;
 
+#ifndef RESAMPLED_FIR
+        if(rate_factor > 50.0)
+            return -1; /* Too big scale factor */
+#endif
+
         if(i_rate < 4000)
             return -1; /* Too small sample rate */
 
@@ -437,6 +462,9 @@ struct SpcEcho
 
         memset(echo_ram, 0, sizeof(echo_ram));
         memset(echo_hist, 0, sizeof(echo_hist));
+#ifndef RESAMPLED_FIR
+        memset(reg_fir_resampled, 0, sizeof(reg_fir_resampled));
+#endif
 
 #ifdef WAVE_DEEP_DEBUG
         debugIn = ctx_wave_open(channels, rate, sizeof(int16_t), WAVE_FORMAT_PCM, 1, 0, WAVE_PATH "in.wav");
@@ -794,6 +822,7 @@ struct SpcEcho
             echo_hist_pos = echohist_pos;
 
             /* --------------- FIR filter-------------- */
+#if 0 // Original code
             for(c = 0; c < channels; c++)
                 echohist_pos[0][c] = echohist_pos[8][c] = echo_in[c];
 
@@ -805,6 +834,19 @@ struct SpcEcho
                 for(c = 0; c < channels; ++c)
                     echo_in[c] += echo_hist_pos[f + 1][c] * reg_fir[f];
             }
+#else
+            for(c = 0; c < channels; c++)
+                echohist_pos[0][c] = echohist_pos[8][c] = echo_in[c];
+
+            for(c = 0; c < channels; ++c)
+                echo_in[c] *= reg_fir_resampled[7];
+
+            for(f = 0; f <= 6; ++f)
+            {
+                for(c = 0; c < channels; ++c)
+                    echo_in[c] += echo_hist_pos[f + 1][c] * reg_fir_resampled[f];
+            }
+#endif
             /* ---------------------------------------- */
 
             /* Echo out */
@@ -889,27 +931,51 @@ void echoEffectSetReg(SpcEcho *out, EchoSetup key, int val)
 
     case ECHO_FIR0:
         out->reg_fir[0]= (int8_t)val;
+#ifndef RESAMPLED_FIR
+        out->recomputeFirResampled();
+#endif
         break;
     case ECHO_FIR1:
         out->reg_fir[1]= (int8_t)val;
+#ifndef RESAMPLED_FIR
+        out->recomputeFirResampled();
+#endif
         break;
     case ECHO_FIR2:
         out->reg_fir[2]= (int8_t)val;
+#ifndef RESAMPLED_FIR
+        out->recomputeFirResampled();
+#endif
         break;
     case ECHO_FIR3:
         out->reg_fir[3]= (int8_t)val;
+#ifndef RESAMPLED_FIR
+        out->recomputeFirResampled();
+#endif
         break;
     case ECHO_FIR4:
         out->reg_fir[4]= (int8_t)val;
+#ifndef RESAMPLED_FIR
+        out->recomputeFirResampled();
+#endif
         break;
     case ECHO_FIR5:
         out->reg_fir[5]= (int8_t)val;
+#ifndef RESAMPLED_FIR
+        out->recomputeFirResampled();
+#endif
         break;
     case ECHO_FIR6:
         out->reg_fir[6]= (int8_t)val;
+#ifndef RESAMPLED_FIR
+        out->recomputeFirResampled();
+#endif
         break;
     case ECHO_FIR7:
         out->reg_fir[7]= (int8_t)val;
+#ifndef RESAMPLED_FIR
+        out->recomputeFirResampled();
+#endif
         break;
     }
 }
