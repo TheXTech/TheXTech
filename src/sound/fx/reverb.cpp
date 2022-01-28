@@ -338,12 +338,27 @@ struct Reverb /* This reverb implementation is based on Freeverb impl. in Sox */
     std::vector<float> out[2];
     std::deque<float> input_fifo;
 
+    static void adjustLimit(double &val, double min, double max)
+    {
+        if(val > max)
+            val = max;
+        else if(val < min)
+            val = min;
+    }
+
     void Create(double sample_rate_Hz,
                 double wet_gain_dB,
                 double room_scale, double reverberance, double fhf_damping, /* 0..1 */
                 double pre_delay_s, double stereo_depth,
                 size_t buffer_size)
     {
+        adjustLimit(wet_gain_dB,   -10.0, +10.0);
+        adjustLimit(room_scale,     0.0, 1.0);
+        adjustLimit(reverberance,   0.0, 1.0);
+        adjustLimit(fhf_damping,    0.0, 1.0);
+        adjustLimit(pre_delay_s,    0.0, 0.5);
+        adjustLimit(stereo_depth,   0.0, 1.0);
+
         size_t delay = static_cast<size_t>(pre_delay_s  * sample_rate_Hz + .5);
         double scale = room_scale * .9 + .1;
         double depth = stereo_depth;
