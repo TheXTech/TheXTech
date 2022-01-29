@@ -76,18 +76,22 @@ void GetvScreen(const int A)
     {
         if(p.Mount == 2)
             pLoc.Height = 0;
-        vScreenX[A] = -pLoc.X + (vScreen[A].Width * 0.5) - pLoc.Width / 2.0;
-        vScreenY[A] = -pLoc.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - pLoc.Height;
-        vScreenX[A] += -vScreen[A].tempX;
-        vScreenY[A] += -vScreen[A].TempY;
-        if(-vScreenX[A] < level[p.Section].X)
-            vScreenX[A] = -level[p.Section].X;
-        if(-vScreenX[A] + vScreen[A].Width > level[p.Section].Width)
-            vScreenX[A] = -(level[p.Section].Width - vScreen[A].Width);
-        if(-vScreenY[A] < level[p.Section].Y)
-            vScreenY[A] = -level[p.Section].Y;
-        if(-vScreenY[A] + vScreen[A].Height > level[p.Section].Height)
-            vScreenY[A] = -(level[p.Section].Height - vScreen[A].Height);
+        // this guard is new because players can now respawn in 1P mode through DropAdd
+        if(Player[A].Effect != 6)
+        {
+            vScreenX[A] = -pLoc.X + (vScreen[A].Width * 0.5) - pLoc.Width / 2.0;
+            vScreenY[A] = -pLoc.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - pLoc.Height;
+            vScreenX[A] += -vScreen[A].tempX;
+            vScreenY[A] += -vScreen[A].TempY;
+            if(-vScreenX[A] < level[p.Section].X)
+                vScreenX[A] = -level[p.Section].X;
+            if(-vScreenX[A] + vScreen[A].Width > level[p.Section].Width)
+                vScreenX[A] = -(level[p.Section].Width - vScreen[A].Width);
+            if(-vScreenY[A] < level[p.Section].Y)
+                vScreenY[A] = -level[p.Section].Y;
+            if(-vScreenY[A] + vScreen[A].Height > level[p.Section].Height)
+                vScreenY[A] = -(level[p.Section].Height - vScreen[A].Height);
+        }
         if(vScreen[A].TempDelay > 0)
             vScreen[A].TempDelay -= 1;
         else
@@ -575,7 +579,7 @@ void ScreenShot()
     XRender::setTargetTexture();
     XRender::makeShot();
     XRender::setTargetScreen();
-    PlaySound(SFX_GotItem);
+    PlaySoundMenu(SFX_GotItem);
 #endif
     TakeScreen = false;
 }

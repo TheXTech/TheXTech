@@ -31,6 +31,7 @@
 #include "../graphics.h"
 #include "../npc_id.h"
 #include "level_file.h"
+#include "record.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>

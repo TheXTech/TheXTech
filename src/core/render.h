@@ -133,6 +133,21 @@ E_INLINE void mapToScreen(int x, int y, int *dx, int *dy) TAIL
 }
 #endif
 
+
+/*!
+ * \brief Map screen relative coordinate into physical canvas
+ * \param x On-screen X position
+ * \param y On-screen Y position
+ * \param dx Destinition window X position
+ * \param dy Destinition window Y position
+ */
+E_INLINE void mapFromScreen(int x, int y, int *dx, int *dy) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->mapFromScreen(x, y, dx, dy);
+}
+#endif
+
 /*!
  * \brief Set render target into the E_INLINE in-game screen (use to render in-game world)
  */

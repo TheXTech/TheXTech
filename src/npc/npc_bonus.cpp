@@ -30,6 +30,8 @@
 #include "../compat.h"
 #include "../config.h"
 
+#include "../controls.h"
+
 #include <Utils/maths.h>
 #include <Logger/logger.h>
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -51,6 +53,11 @@ static bool doPlayGrowWithGotItem()
     }
 }
 
+
+inline void RumbleForPowerup(int A)
+{
+    Controls::Rumble(A, 200, 0.25);
+}
 
 void DropBonus(int A)
 {
@@ -229,6 +236,7 @@ void TouchBonus(int A, int B)
         }
         if(NPC[B].Type == 192) // player touched the chekpoint
         {
+            RumbleForPowerup(A);
             if(Player[A].State == 1)
                 Player[A].State = 2;
             if(Player[A].Hearts == 1)
@@ -275,6 +283,7 @@ void TouchBonus(int A, int B)
             UpdatePlayerBonus(A, NPC[B].Type);
             if(Player[A].State == 1 && Player[A].Character != 5)
             {
+                RumbleForPowerup(A);
                 if(Player[A].Duck)
                     UnDuck(A);
                 Player[A].StateNPC = NPC[B].Type;
@@ -307,6 +316,7 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 3)
             {
+                RumbleForPowerup(A);
                 Player[A].Frame = 1;
                 Player[A].Effect = 4;
                 if(Player[A].Mount > 0)
@@ -343,6 +353,7 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 7)
             {
+                RumbleForPowerup(A);
                 Player[A].Frame = 1;
                 Player[A].Effect = 41;
                 if(Player[A].Mount > 0)
@@ -372,6 +383,7 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 4)
             {
+                RumbleForPowerup(A);
                 Player[A].Frame = 1;
                 Player[A].Effect = 5;
                 Player[A].Effect2 = 0;
@@ -402,6 +414,7 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 5)
             {
+                RumbleForPowerup(A);
                 Player[A].Frame = 1;
                 Player[A].Effect = 11;
                 Player[A].Effect2 = 0;
@@ -432,6 +445,7 @@ void TouchBonus(int A, int B)
             Player[A].StateNPC = NPC[B].Type;
             if(Player[A].State != 6)
             {
+                RumbleForPowerup(A);
                 Player[A].Frame = 1;
                 Player[A].Effect = 12;
                 Player[A].Effect2 = 0;

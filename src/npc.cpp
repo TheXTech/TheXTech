@@ -29,8 +29,8 @@
 #include "editor.h"
 #include "blocks.h"
 #include "compat.h"
+#include "controls.h"
 #include "config.h"
-#include "control/joystick.h"
 #include "main/trees.h"
 #include "core/events.h"
 #include "npc_id.h"
@@ -163,14 +163,14 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     }
     if(Game == 2)
     {
-        joyRumbleAllPlayers(150, 1.0);
+        Controls::RumbleAllPlayers(150, 1.0);
         NewEffect(69, Location);
         PlaySound(SFX_Fireworks);
         Radius = 52;
     }
     if(Game == 3)
     {
-        joyRumbleAllPlayers(200, 1.0);
+        Controls::RumbleAllPlayers(200, 1.0);
         NewEffect(70, Location);
         PlaySound(SFX_Fireworks);
         Radius = 64;

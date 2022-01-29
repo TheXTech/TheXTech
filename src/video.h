@@ -22,8 +22,6 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
-#include <SDL2/SDL_stdinc.h>
-
 enum RenderMode_t
 {
     RENDER_AUTO = -1,
@@ -59,6 +57,6 @@ extern struct VideoSettings_t
     bool   showFrameRate = false;
     //! 2x scale down all textures to reduce the memory usage
     bool   scaleDownAllTextures = false;
-} g_videoSettings; // main_config.cpp
+} g_videoSettings; // config.cpp
 
 #endif // VIDEO_H
