@@ -48,6 +48,8 @@
 #include "screen_connect.h"
 #include "screen_quickreconnect.h"
 #include "screen_textentry.h"
+#include "script/luna/luna.h"
+
 #include "../pseudo_vb.h"
 
 PauseCode GamePaused = PauseCode::None;
@@ -95,6 +97,8 @@ void CheckActive();//in game_main.cpp
 
 void GameLoop()
 {
+    lunaLoop();
+
     if(!Controls::Update())
     {
         if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect)
@@ -174,6 +178,7 @@ void GameLoop()
     }
     else
     {
+        ClearTriggeredEvents();
         UpdateLayers(); // layers before/after npcs
         UpdateNPCs();
 

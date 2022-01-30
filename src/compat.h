@@ -89,6 +89,19 @@ struct Compatibility_t
     };
     int speedrun_stop_timer_by;
     char speedrun_stop_timer_at[250];
+
+    // Deaths counter
+    bool demos_counter_enable;
+
+    // Luna
+    enum LunaEnableEngine_t
+    {
+        LUNA_ENGINE_UNSPECIFIED = 0,
+        LUNA_ENGINE_ENABLE,
+        LUNA_ENGINE_DISABLE
+    };
+    LunaEnableEngine_t luna_enable_engine;
+    bool luna_allow_level_codes;
 };
 
 extern Compatibility_t g_compatibility;
