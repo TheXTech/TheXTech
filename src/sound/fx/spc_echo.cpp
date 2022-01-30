@@ -168,7 +168,6 @@ struct SpcEcho
             double newFactor = y_factor2 + ((y_factor1 - y_factor2) / (0.0 - 7.0)) * (i - 7.0);
             reg_fir_resampled[i] = (int8_t)(reg_fir[i] * (1.0 + ((newFactor - 1.0) / 100.0)));
         }
-        std::fflush(stdout);
     }
 #endif
 
