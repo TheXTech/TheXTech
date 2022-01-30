@@ -2,12 +2,15 @@ TheXTech Changelog.
 
 Changelog for 1.3.6 [WIP]
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F4 key (@Wohlstand)
--Added an ability to type cheats on Android using the Start+ShowKeyboard touchscreen key combination (@Wohlstand)
+-Added an ability to type cheats on touchscreen using special new cheats key (@Wohlstand + @ds-sloth)
 -Added native support for LunaDLL Autocode script language (@Wohlstand)
 -Added deaths counter feature (keeps counting of deaths per game save) (@Wohlstand)
 -Reworked the controllers support (@ds-sloth)
--Improved the touchscreen support (@ds-sloth)
--Added an ability to add/drop the second player (@ds-sloth)
+-Touchscreen support for non-Android platforms (@ds-sloth)
+-Added ability to save multiple keyboard profiles (@ds-sloth)
+-New multiplayer start screen (@ds-sloth with design input from @0lhi)
+-Added controller disconnect recovery screen (@ds-sloth)
+-Added an ability to add/drop the second player from the pause menu (@ds-sloth)
 
 Changes for 1.3.5.3-1
 -Fixed autostart events behaviour
