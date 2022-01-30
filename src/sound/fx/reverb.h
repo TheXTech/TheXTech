@@ -1,55 +1,43 @@
 /*
- * TheXTech - A platform game engine ported from old source code for VB6
+ * Simple Reverb sound effect
  *
- * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2022-2022 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef REVERB_H
 #define REVERB_H
 
 #include <stdint.h>
-
-#ifndef AUDIO_U8 /* Copied from SDL2 heads */
-#define AUDIO_U8        0x0008  /**< Unsigned 8-bit samples */
-#define AUDIO_S8        0x8008  /**< Signed 8-bit samples */
-#define AUDIO_U16LSB    0x0010  /**< Unsigned 16-bit samples */
-#define AUDIO_S16LSB    0x8010  /**< Signed 16-bit samples */
-#define AUDIO_U16MSB    0x1010  /**< As above, but big-endian byte order */
-#define AUDIO_S16MSB    0x9010  /**< As above, but big-endian byte order */
-#define AUDIO_U16       AUDIO_U16LSB
-#define AUDIO_S16       AUDIO_S16LSB
-#define AUDIO_S32LSB    0x8020  /**< 32-bit integer samples */
-#define AUDIO_S32MSB    0x9020  /**< As above, but big-endian byte order */
-#define AUDIO_S32       AUDIO_S32LSB
-#define AUDIO_F32LSB    0x8120  /**< 32-bit floating point samples */
-#define AUDIO_F32MSB    0x9120  /**< As above, but big-endian byte order */
-#define AUDIO_F32       AUDIO_F32LSB
-#endif
+#include "fx_format.h"
 
 struct FxReverb;
 
 struct ReverbSetup
 {
-    double gain         = 6.0;
-    double roomScale    = 0.7;
-    double balance      = 0.6;
-    double hfDamping    = 0.8;
-    double preDelayS    = 0.0;
-    double stereoDepth  = 1.0;
+    float mode         = 0.0f; // Normal (0) or Freeze (>0.5)
+    float roomSize     = 0.7f;
+    float damping      = 0.5f; // 0.0...1.0
+    float wetLevel     = 0.2f;
+    float dryLevel     = 0.4f;
+    float width        = 1.0f; // 0.0...1.0
 };
 
 extern FxReverb *reverbEffectInit(int rate, uint16_t format, int channels);
@@ -57,6 +45,16 @@ extern void reverbEffectFree(FxReverb *context);
 
 extern void reverbEffect(int chan, void *stream, int len, void *context);
 
+// Update all setup at once
 extern void reverbUpdateSetup(FxReverb *context, const ReverbSetup &setup);
+extern void reverbGetSetup(FxReverb *context, ReverbSetup &setup);
+
+// Update every single setting
+extern void reverbUpdateMode(FxReverb *context, float mode);
+extern void reverbUpdateRoomSize(FxReverb *context, float roomSize);
+extern void reverbUpdateDamping(FxReverb *context, float damping);
+extern void reverbUpdateWetLevel(FxReverb *context, float wet);
+extern void reverbUpdateDryLevel(FxReverb *context, float dry);
+extern void reverbUpdateWidth(FxReverb *context, float width);
 
 #endif // REVERB_H

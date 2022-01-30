@@ -1,26 +1,31 @@
 /*
- * TheXTech - A platform game engine ported from old source code for VB6
+ * SPC Echo sound effect
  *
- * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2022-2022 Vitaly Novichkov <admin@wohlnet.ru>
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
 #include <tgmath.h>
 #include <string.h>
 #include "spc_echo.h"
+#include "fx_common.hpp"
 
 //#define RESAMPLED_FIR
 //#define CUBE_INTERPOLATION
@@ -31,236 +36,6 @@
 #define WAVE_PATH "/home/vitaly/Музыка/spc_echo_dump-"
 #include "wave_writer.h"
 #endif
-
-
-#ifndef INT8_MIN
-#define INT8_MIN    (-0x7f - 1)
-#endif
-#ifndef INT8_MAX
-#define INT8_MAX    0x7f
-#endif
-
-#ifndef UINT8_MAX
-#define UINT8_MAX   0xff
-#endif
-
-#ifndef INT16_MIN
-#define INT16_MIN   (-0x7fff - 1)
-#endif
-#ifndef INT16_MAX
-#define INT16_MAX   0x7fff
-#endif
-
-#ifndef UINT16_MAX
-#define UINT16_MAX  0xffff
-#endif
-
-#ifndef INT32_MIN
-#define INT32_MIN   (-0x7fffffff - 1)
-#endif
-
-#ifndef INT32_MAX
-#define INT32_MAX   0x7fffffff
-#endif
-
-
-// Float32-LE
-static float getFloatLSBSample(uint8_t *raw, int c)
-{
-    uint32_t r;
-    float f;
-    void *t;
-    raw += (c * sizeof(float));
-    r = (((uint32_t)raw[0] <<  0) & 0x000000FF) |
-        (((uint32_t)raw[1] <<  8) & 0x0000FF00) |
-        (((uint32_t)raw[2] << 16) & 0x00FF0000) |
-        (((uint32_t)raw[3] << 24) & 0xFF000000);
-    t = &r;
-    f = *(float*)t;
-    return f;
-}
-static void setFloatLSBSample(uint8_t **raw, float ov)
-{
-    void *t = &ov;
-    uint32_t r = *(uint32_t*)t;
-    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
-}
-
-// Float32-BE
-static float getFloatMSBSample(uint8_t *raw, int c)
-{
-    uint32_t r;
-    float f;
-    void *t;
-    raw += (c * sizeof(float));
-    r = (((uint32_t)raw[3] <<  0) & 0x000000FF) |
-        (((uint32_t)raw[2] <<  8) & 0x0000FF00) |
-        (((uint32_t)raw[1] << 16) & 0x00FF0000) |
-        (((uint32_t)raw[0] << 24) & 0xFF000000);
-    t = &r;
-    f = *(float*)t;
-    return f;
-}
-static void setFloatMSBSample(uint8_t **raw, float ov)
-{
-    void *t = &ov;
-    uint32_t r = *(uint32_t*)t;
-    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
-}
-
-// int32_t-LE
-static float getInt32LSB(uint8_t *raw, int c)
-{
-    uint32_t r;
-    int32_t f;
-    raw += (c * sizeof(int32_t));
-    r = (((uint32_t)raw[0] <<  0) & 0x000000FF) |
-        (((uint32_t)raw[1] <<  8) & 0x0000FF00) |
-        (((uint32_t)raw[2] << 16) & 0x00FF0000) |
-        (((uint32_t)raw[3] << 24) & 0xFF000000);
-    f = *(int32_t*)(&r);
-    return (float)((double)f / INT32_MAX);
-}
-static void setInt32LSB(uint8_t **raw, float ov)
-{
-    int32_t f = ((int32_t)(double(ov) * INT32_MAX));
-    uint32_t r = *(uint32_t*)(&f);
-    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
-}
-
-// int32_t-BE
-static float getInt32MSB(uint8_t *raw, int c)
-{
-    uint32_t r;
-    int32_t f;
-    raw += (c * sizeof(int32_t));
-    r = (((uint32_t)raw[3] <<  0) & 0x000000FF) |
-        (((uint32_t)raw[2] <<  8) & 0x0000FF00) |
-        (((uint32_t)raw[1] << 16) & 0x00FF0000) |
-        (((uint32_t)raw[0] << 24) & 0xFF000000);
-    f = *(int32_t*)(&r);
-    return (float)((double)f / INT32_MAX);
-}
-static void setInt32MSB(uint8_t **raw, float ov)
-{
-    int32_t f = (int32_t(double(ov) * INT32_MAX));
-    uint32_t r = *(uint32_t*)(&f);
-    *(*raw)++ = (uint8_t)((r >> 24) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 16) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
-}
-
-// int16_t-LE
-static float getInt16LSB(uint8_t *raw, int c)
-{
-    uint16_t r;
-    int16_t f;
-    raw += (c * sizeof(int16_t));
-    r = (((uint16_t)raw[0] <<  0) & 0x00FF) |
-        (((uint16_t)raw[1] <<  8) & 0xFF00);
-    f = *(int16_t*)(&r);
-    return (float)f / INT16_MAX;
-}
-static void setInt16LSB(uint8_t **raw, float ov)
-{
-    int16_t f = int16_t(ov * INT16_MAX);
-    uint16_t r = *(uint16_t*)(&f);
-    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
-}
-
-// int16_t-BE
-static float getInt16MSB(uint8_t *raw, int c)
-{
-    uint16_t r;
-    int16_t f;
-    raw += (c * sizeof(int16_t));
-    r = (((uint16_t)raw[1] <<  0) & 0x00FF) |
-        (((uint16_t)raw[0] <<  8) & 0xFF00);
-    f = *(int16_t*)(&r);
-    return (float)f / INT16_MIN;
-}
-static void setInt16MSB(uint8_t **raw, float ov)
-{
-    int16_t f = int16_t(ov * INT16_MAX);
-    uint16_t r = *(uint16_t*)(&f);
-    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
-}
-
-// uint16_t-LE
-static float getuint16_tLSB(uint8_t *raw, int c)
-{
-    uint16_t r;
-    float f;
-    raw += (c * sizeof(uint16_t));
-    r = (((uint16_t)raw[0] <<  0) & 0x00FF) |
-        (((uint16_t)raw[1] <<  8) & 0xFF00);
-    f = ((float)r + INT16_MIN) / INT16_MAX;
-    return f;
-}
-static void setuint16_tLSB(uint8_t **raw, float ov)
-{
-    int16_t f = int16_t((ov * INT16_MAX) - INT16_MIN);
-    uint16_t r = *(uint16_t*)(&f);
-    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
-}
-
-// uint16_t-BE
-static float getuint16_tMSB(uint8_t *raw, int c)
-{
-    uint16_t r;
-    float f;
-    raw += (c * sizeof(uint16_t));
-    r = (((uint16_t)raw[1] <<  0) & 0x00FF) |
-        (((uint16_t)raw[0] <<  8) & 0xFF00);
-    f = ((float)r + INT16_MIN) / INT16_MAX;
-    return f;
-}
-static void setuint16_tMSB(uint8_t **raw, float ov)
-{
-    int16_t f = int16_t((ov * INT16_MAX) - INT16_MIN);
-    uint16_t r = *(uint16_t*)(&f);
-    *(*raw)++ = (uint8_t)((r >> 8) & 0xFF);
-    *(*raw)++ = (uint8_t)((r >> 0) & 0xFF);
-}
-
-// int8_t
-static float getInt8(uint8_t *raw, int c)
-{
-    float f;
-    raw += (c * sizeof(int8_t));
-    f = (float)(int8_t)(*raw) / INT8_MAX;
-    return f;
-}
-static void setInt8(uint8_t **raw, float ov)
-{
-    *(*raw)++ = (uint8_t)(ov * INT8_MAX);
-}
-
-// uint8_t
-static float getuint8_t(uint8_t *raw, int c)
-{
-    float f;
-    raw += (c * sizeof(int8_t));
-    f = (float)((int)*raw + INT8_MIN) / INT8_MAX;
-    return f;
-}
-static void setuint8_t(uint8_t **raw, float ov)
-{
-    *(*raw)++ = (uint8_t)((ov * INT8_MAX) - INT8_MIN);
-}
 
 #define CLAMP16F( io )\
     {\
@@ -321,7 +96,6 @@ struct SpcEcho
     double  rate_factor = 1.0;
     int     rate = SDSP_RATE;
     int     channels = 2;
-    int     sample_size = 2;
     uint16_t format = AUDIO_F32;
 
     //! Flags
@@ -394,6 +168,7 @@ struct SpcEcho
             double newFactor = y_factor2 + ((y_factor1 - y_factor2) / (0.0 - 7.0)) * (i - 7.0);
             reg_fir_resampled[i] = (int8_t)(reg_fir[i] * (1.0 + ((newFactor - 1.0) / 100.0)));
         }
+        std::fflush(stdout);
     }
 #endif
 
@@ -424,8 +199,9 @@ struct SpcEcho
         reg_edl = 3;
     }
 
-    float (*readSample)(uint8_t *raw, int channel);
-    void (*writeSample)(uint8_t **raw, float sample);
+    ReadSampleCB    readSample = nullptr;
+    WriteSampleCB   writeSample = nullptr;
+    int             sample_size = 2;
 
     int init(int i_rate, uint16_t i_format, int i_channels)
     {
@@ -476,61 +252,8 @@ struct SpcEcho
         ctx_wave_enable_stereo(debugOut);
 #endif
 
-        switch(format)
-        {
-        case AUDIO_U8:
-            readSample = getuint8_t;
-            writeSample = setuint8_t;
-            sample_size = sizeof(uint8_t);
-            break;
-        case AUDIO_S8:
-            readSample = getInt8;
-            writeSample = setInt8;
-            sample_size = sizeof(int8_t);
-            break;
-        case AUDIO_S16LSB:
-            readSample = getInt16LSB;
-            writeSample = setInt16LSB;
-            sample_size = sizeof(int16_t);
-            break;
-        case AUDIO_S16MSB:
-            readSample = getInt16MSB;
-            writeSample = setInt16MSB;
-            sample_size = sizeof(int16_t);
-            break;
-        case AUDIO_U16LSB:
-            readSample = getuint16_tLSB;
-            writeSample = setuint16_tLSB;
-            sample_size = sizeof(uint16_t);
-            break;
-        case AUDIO_U16MSB:
-            readSample = getuint16_tMSB;
-            writeSample = setuint16_tMSB;
-            sample_size = sizeof(uint16_t);
-            break;
-        case AUDIO_S32LSB:
-            readSample = getInt32LSB;
-            writeSample = setInt32LSB;
-            sample_size = sizeof(int32_t);
-            break;
-        case AUDIO_S32MSB:
-            readSample = getInt32MSB;
-            writeSample = setInt32MSB;
-            sample_size = sizeof(int32_t);
-            break;
-        case AUDIO_F32LSB:
-            readSample = getFloatLSBSample;
-            writeSample = setFloatLSBSample;
-            sample_size = sizeof(float);
-            break;
-        case AUDIO_F32MSB:
-            readSample = getFloatMSBSample;
-            writeSample = setFloatMSBSample;
-            sample_size = sizeof(float);
-            break;
-        default:
-            return -1; /* Unsupported format */
-        }
+        if(!initFormat(readSample, writeSample, sample_size, format))
+            return -1;
 
         setDefaultRegs();
 

@@ -720,12 +720,12 @@ static void readFx(IniProcessing &sounds, SectionEffect_t &s)
     switch(s.fx)
     {
     case SectionEffect_t::FX_Reverb:
-        sounds.read("gain", s.rev.gain, 6.0);
-        sounds.read("room-scale", s.rev.roomScale, 0.7);
-        sounds.read("balance", s.rev.balance, 0.6);
-        sounds.read("hf-damping", s.rev.hfDamping, 0.8);
-        sounds.read("pre-delay-second", s.rev.preDelayS, 0.0);
-        sounds.read("stereo-depth", s.rev.stereoDepth, 1.0);
+        sounds.read("mode", s.rev.mode, 0.0f);
+        sounds.read("room-size", s.rev.roomSize, 0.7f);
+        sounds.read("damping", s.rev.damping, 0.5f);
+        sounds.read("wet-level", s.rev.wetLevel, 0.2f);
+        sounds.read("dry-level", s.rev.dryLevel, 0.4f);
+        sounds.read("width", s.rev.width, 1.0f);
         break;
 
     case SectionEffect_t::FX_Echo:
@@ -1164,12 +1164,12 @@ void SoundFX_SetReverb(const SoundFXReverb& setup)
     if(effectReverb)
     {
         ReverbSetup set;
-        set.gain = setup.gain;
-        set.roomScale = setup.roomScale;
-        set.balance = setup.balance;
-        set.hfDamping = setup.hfDamping;
-        set.preDelayS = setup.preDelayS;
-        set.stereoDepth = setup.stereoDepth;
+        set.mode = setup.mode;
+        set.roomSize = setup.roomSize;
+        set.damping = setup.damping;
+        set.wetLevel = setup.wetLevel;
+        set.dryLevel = setup.dryLevel;
+        set.width = setup.width;
         reverbUpdateSetup(effectReverb, set);
         if(isNew)
             Mix_RegisterEffect(MIX_CHANNEL_POST, reverbEffect, reverbEffectDone, effectReverb);

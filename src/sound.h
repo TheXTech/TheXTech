@@ -219,12 +219,12 @@ void SoundFX_SetEcho(const SoundFXEchoSetup &setup);
 
 struct SoundFXReverb
 {
-    double gain = 6.0;
-    double roomScale = 0.7;
-    double balance = 0.6;
-    double hfDamping = 0.8;
-    double preDelayS = 0.0;
-    double stereoDepth = 1.0;
+    float mode         = 0.0f; // Normal (0) or Freeze (>0.5)
+    float roomSize     = 0.7f;
+    float damping      = 0.5f; // 0.0...1.0
+    float wetLevel     = 0.2f;
+    float dryLevel     = 0.4f;
+    float width        = 1.0f; // 0.0...1.0
 };
 void SoundFX_SetReverb(const SoundFXReverb &setup);
 
