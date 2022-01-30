@@ -117,7 +117,7 @@ void initGameInfo()
         }
         config.endGroup();
 
-        config.beginGroup("deaths-counter");
+        config.beginGroup("death-counter");
         {
             config.read("enabled", gEnableDemoCounter, false);
             config.read("title", gDemoCounterTitle, "DEMOS");
