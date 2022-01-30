@@ -178,7 +178,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
     compat.endGroup();
 
-    compat.beginGroup("deaths-counter");
+    compat.beginGroup("death-counter");
     {
         compat.read("enabled", c.demos_counter_enable, c.demos_counter_enable);
     }
