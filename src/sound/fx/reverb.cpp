@@ -36,10 +36,6 @@
 // http://www.dreampoint.co.uk
 // This code is public domain
 
-
-#define undenormalise(sample) if(((*(unsigned int*)&sample)&0x7f800000)==0) sample=0.0f
-
-
 const int   numcombs        = 8;
 const int   numallpasses    = 4;
 const float muted           = 0;
@@ -86,6 +82,14 @@ const int allpasstuningL3   = 341;
 const int allpasstuningR3   = 341 + stereospread;
 const int allpasstuningL4   = 225;
 const int allpasstuningR4   = 225 + stereospread;
+
+
+static inline void undenormalise(float &sample)
+{
+    uint32_t i = *reinterpret_cast<uint32_t*>(&sample);
+    if((i & 0x7f800000) == 0)
+        sample = 0.0f;
+}
 
 
 class comb
