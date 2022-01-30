@@ -26,58 +26,9 @@
 
 class FrmMain;
 
-
-enum MouseButton_t
-{
-    MOUSE_BUTTON_NONE = 0,
-    MOUSE_BUTTON_LEFT,
-    MOUSE_BUTTON_MIDDLE,
-    MOUSE_BUTTON_RIGHT
-};
-
-struct MouseButtonEvent_t
-{
-    int button = MOUSE_BUTTON_NONE;
-};
-
-struct MouseMoveEvent_t
-{
-    int x;
-    int y;
-};
-
-struct MouseWheelEvent_t
-{
-    int x;
-    int y;
-};
-
-enum KeyboardModifier_t
-{
-    KEYMOD_NONE = 0x0000,
-    KEYMOD_LSHIFT = 0x0001,
-    KEYMOD_RSHIFT = 0x0002,
-    KEYMOD_LCTRL = 0x0040,
-    KEYMOD_RCTRL = 0x0080,
-    KEYMOD_LALT = 0x0100,
-    KEYMOD_RALT = 0x0200,
-
-    KEYMOD_CTRL = KEYMOD_LCTRL | KEYMOD_RCTRL,
-    KEYMOD_SHIFT = KEYMOD_LSHIFT | KEYMOD_RSHIFT,
-    KEYMOD_ALT = KEYMOD_LALT | KEYMOD_RALT,
-};
-
-struct KeyboardEvent_t
-{
-    int scancode;
-    int mod;
-};
-
-
 class AbstractEvents_t
 {
     friend void SetOrigRes();
-    static uint32_t m_lastMousePress;
 
 protected:
     static FrmMain *m_form;
@@ -102,30 +53,6 @@ public:
      */
     virtual void waitEvents() = 0;
 
-    /*!
-     * \brief Get key state by scancode
-     * \param scan_code Scancode of the backend
-     * \return Key state value
-     */
-    virtual bool getKeyState(int scan_code) = 0;
-
-    /*!
-     * \brief Get the name of the key by scancode
-     * \param scan_code Scancode of the backend
-     * \return Human-readable name of the key
-     */
-    virtual const char *getScanCodeName(int scan_code) = 0;
-
-
-protected:
-    static void eventDoubleClick();
-    static void eventKeyPress(int scan_code);
-    static void eventKeyDown(const KeyboardEvent_t &evt);
-    static void eventKeyUp(const KeyboardEvent_t &evt);
-    static void eventMouseDown(const MouseButtonEvent_t &event);
-    static void eventMouseMove(const MouseMoveEvent_t &event);
-    static void eventMouseWheel(const MouseWheelEvent_t &event);
-    static void eventMouseUp(const MouseButtonEvent_t &event);
 public:
     static void eventResize();
 };

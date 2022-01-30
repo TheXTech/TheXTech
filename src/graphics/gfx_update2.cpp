@@ -25,11 +25,16 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../player.h"
+#include "../compat.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../main/screen_pause.h"
+#include "../main/screen_connect.h"
+#include "../main/screen_quickreconnect.h"
+#include "../main/screen_textentry.h"
+#include "../game_main.h"
 #include "../main/world_globals.h"
 #include "../core/render.h"
-#include "../compat.h"
 #include "../screen_fader.h"
 
 #include <fmt_format_ne.h>
@@ -59,6 +64,7 @@ void UpdateGraphics2(bool skipRepaint)
 
     g_stats.reset();
 
+    // TODO: merge the shared arrays from the updated quadtree code
     // Keep them static to don't re-alloc them for every iteration
     static TilePtrArr  tarr;
     static ScenePtrArr sarr;
@@ -740,24 +746,6 @@ void UpdateGraphics2(bool skipRepaint)
             SuperPrint(WorldPlayer[1].LevelName, 2, lnlx, 109);
         }
 
-        if(GamePaused)
-        {
-            XRender::renderRect(210, 200, 380, 200, 0.f, 0.f, 0.f);
-            if(!Cheater)
-            {
-                SuperPrint("CONTINUE", 3, 272, 257);
-                SuperPrint("SAVE & CONTINUE", 3, 272, 292);
-                SuperPrint("SAVE & QUIT", 3, 272, 327);
-                XRender::renderTexture(252, 257 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
-            }
-            else
-            {
-                SuperPrint("CONTINUE", 3, 272 + 56, 275);
-                SuperPrint("QUIT", 3, 272 + 56, 310);
-                XRender::renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
-            }
-        }
-
         g_worldScreenFader.draw();
 
         if(ShowOnScreenMeta)
@@ -771,6 +759,22 @@ void UpdateGraphics2(bool skipRepaint)
         }
 
         speedRun_renderTimer();
+
+        // render special screens
+        if(GamePaused == PauseCode::PauseScreen)
+            PauseScreen::Render();
+
+        if(QuickReconnectScreen::g_active)
+            QuickReconnectScreen::Render();
+
+        if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+        {
+            ConnectScreen::Render();
+            XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+        }
+
+        if(GamePaused == PauseCode::TextEntry)
+            TextEntryScreen::Render();
 
         if(!skipRepaint)
             XRender::repaint();

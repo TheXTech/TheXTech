@@ -124,6 +124,8 @@ public:
 
     void mapToScreen(int x, int y, int *dx, int *dy) override;
 
+    void mapFromScreen(int x, int y, int *dx, int *dy) override;
+
     /*!
      * \brief Set render target into the virtual in-game screen (use to render in-game world)
      */

@@ -54,6 +54,7 @@ public:
      */
     virtual int showCursor(int show) = 0;
 
+    // TODO: move out of AbstractWindow_t for custom implementations
     /*!
      * \brief Cursor type
      */
@@ -74,6 +75,12 @@ public:
      * \return Cursor type
      */
     virtual Cursor_t getCursor() = 0;
+
+    /*!
+     * \brief Place cursor at desired window position
+     * \param x and y positions in physical window coordinates
+     */
+    virtual void placeCursor(int window_x, int window_y) = 0;
 
     /*!
      * \brief Is full-screen mode active?

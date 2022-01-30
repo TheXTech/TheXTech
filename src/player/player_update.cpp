@@ -38,6 +38,7 @@
 #include "../main/game_globals.h"
 #include "../frame_timer.h"
 #include "../graphics.h"
+#include "../controls.h"
 
 #include <SDL2/SDL_timer.h>
 #include "pge_delay.h"
@@ -307,7 +308,16 @@ void UpdatePlayer()
                 {
                     if(Player[A].Mount == 3 && Player[A].MountType == 6) // Purple Yoshi Pound
                     {
-                        bool poundKeyPressed = g_config.GameplayPoundByAltRun ? Player[A].Controls.AltRun : Player[A].Controls.Down;
+                        bool groundPoundByAltRun = false;
+                        if(A - 1 < (int)Controls::g_InputMethods.size() &&
+                           Controls::g_InputMethods[A - 1] &&
+                           Controls::g_InputMethods[A-1]->Profile &&
+                           Controls::g_InputMethods[A - 1]->Profile->m_groundPoundByAltRun)
+                        {
+                            groundPoundByAltRun = true;
+                        }
+
+                        bool poundKeyPressed = groundPoundByAltRun ? Player[A].Controls.AltRun : Player[A].Controls.Down;
                         if(poundKeyPressed && Player[A].DuckRelease && Player[A].CanPound)
                         {
                             Player[A].GroundPound = true;
@@ -515,72 +525,7 @@ void UpdatePlayer()
 
                         if(tempBool)
                         {
-                            Player[A].CanJump = false;
-                            PlaySound(SFX_Jump); // Jump sound
-                            PlaySound(SFX_Boot);
-                            Player[A].Jump = Physics.PlayerJumpHeight;
-                            if(Player[A].Character == 2)
-                                Player[A].Jump += 3;
-                            if(Player[A].SpinJump)
-                                Player[A].Jump -= 6;
-                            Player[A].Mount = 0;
-                            numNPCs += 1;
-                            NPC[numNPCs].Direction = Player[A].Direction;
-                            if(Maths::iRound(NPC[numNPCs].Direction) == 1)
-                                NPC[numNPCs].Frame = 4;
-                            NPC[numNPCs].Frame += SpecialFrame[2];
-                            NPC[numNPCs].Active = true;
-                            NPC[numNPCs].TimeLeft = 100;
-                            NPC[numNPCs].Type = 56;
-                            NPC[numNPCs].Location.Height = 128;
-                            NPC[numNPCs].Location.Width = 128;
-                            NPC[numNPCs].Location.Y = static_cast<int>(floor(static_cast<double>(Player[A].Location.Y)));
-                            NPC[numNPCs].Location.X = static_cast<int>(floor(static_cast<double>(Player[A].Location.X)));
-                            NPC[numNPCs].Location.SpeedY = 0;
-                            NPC[numNPCs].Location.SpeedX = 0;
-                            NPC[numNPCs].CantHurt = 10;
-                            NPC[numNPCs].CantHurtPlayer = A;
-                            Player[A].Location.SpeedY = double(Physics.PlayerJumpVelocity) - tempSpeed;
-                            Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
-                            Player[A].Location.Width = Physics.PlayerWidth[Player[A].Character][Player[A].State];
-                            Player[A].Location.X += 64 - Physics.PlayerWidth[Player[A].Character][Player[A].State] / 2;
-                            Player[A].StandUp = true;
-                            Player[A].StandUp2 = true;
-                            Player[A].ForceHitSpot3 = true;
-                            Player[A].Dismount = 30;
-                            Player[A].Slope = 0;
-                            Player[A].Location.Y = NPC[numNPCs].Location.Y - Player[A].Location.Height;
-
-                            for(B = 1; B <= numPlayers; B++)
-                            {
-                                if(B != A && Player[B].Mount != 2 && CheckCollision(Player[A].Location, Player[B].Location))
-                                    Player[B].Location.Y = Player[A].Location.Y - Player[B].Location.Height;
-                                if(Player[B].StandingOnTempNPC == 56)
-                                {
-                                    Player[B].StandingOnNPC = numNPCs;
-                                    Player[B].StandingOnTempNPC = 0;
-                                }
-                            }
-
-                            for(int numNPCsMax3 = numNPCs, B = 1; B <= numNPCsMax3; B++)
-                            {
-                                if(NPC[B].standingOnPlayer == A)
-                                {
-                                    NPC[B].standingOnPlayer = 0;
-                                    NPC[B].Location.SpeedY = 0;
-                                    NPC[B].Location.Y = NPC[numNPCs].Location.Y - 0.1 - NPC[B].standingOnPlayerY;
-                                    NPC[B].standingOnPlayerY = 0;
-                                    if(NPC[B].Type == 22)
-                                        NPC[B].Special = 0;
-                                    if(NPC[B].Type == 50)
-                                    {
-                                        NPC[B].Killed = 9;
-                                        NPC[B].Special = 0;
-                                    }
-                                    else if(NPC[B].Type == 49)
-                                        NPC[B].Special = 0;
-                                }
-                            }
+                            PlayerDismount(A);
                         }
                     }
                 }
@@ -1184,87 +1129,14 @@ void UpdatePlayer()
                     {
                         if(Player[A].Controls.AltJump && Player[A].CanAltJump)
                         {
-                            Player[A].CanJump = false;
-                            PlaySound(SFX_Jump); // Jump sound
-                            PlaySound(SFX_Boot);
-                            Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
-                            Player[A].Jump = Physics.PlayerJumpHeight;
-                            if(Player[A].Character == 2)
-                                Player[A].Jump += 3;
-                            if(Player[A].SpinJump)
-                                Player[A].Jump -= 6;
-                            Player[A].Mount = 0;
-                            Player[A].StandingOnNPC = 0;
-                            numNPCs++;
-                            NPC[numNPCs] = NPC_t();
-                            Player[A].FlyCount = 0;
-                            Player[A].RunCount = 0;
-                            Player[A].CanFly = false;
-                            Player[A].CanFly2 = false;
-                            NPC[numNPCs].Direction = Player[A].Direction;
-                            NPC[numNPCs].Active = true;
-                            NPC[numNPCs].TimeLeft = 100;
-                            if(Player[A].MountType == 1)
-                                NPC[numNPCs].Type = 35;
-                            else if(Player[A].MountType == 2)
-                                NPC[numNPCs].Type = 191;
-                            else if(Player[A].MountType == 3)
-                                NPC[numNPCs].Type = 193;
-                            NPC[numNPCs].Location.Height = 32;
-                            NPC[numNPCs].Location.Width = 32;
-                            NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - 32;
-                            NPC[numNPCs].Location.X = static_cast<int>(floor(static_cast<double>(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16)));
-                            NPC[numNPCs].Location.SpeedY = 1;
-                            NPC[numNPCs].Location.SpeedX = (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX) * 0.8;
-                            NPC[numNPCs].CantHurt = 10;
-                            NPC[numNPCs].CantHurtPlayer = A;
-                            Player[A].Location.Y += Player[A].Location.Height;
-                            Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
-                            Player[A].Location.Y += -Player[A].Location.Height;
+                            PlayerDismount(A);
                         }
                     }
                     else if(Player[A].Mount == 3)
                     {
                         if(Player[A].Controls.AltJump && Player[A].CanAltJump)
                         {
-                            UnDuck(A);
-                            if(Player[A].YoshiNPC > 0 || Player[A].YoshiPlayer > 0)
-                                YoshiSpit(A);
-                            Player[A].CanJump = false;
-                            Player[A].StandingOnNPC = 0;
-                            Player[A].Mount = 0;
-                            UpdateYoshiMusic();
-                            numNPCs++;
-                            NPC[numNPCs] = NPC_t();
-                            NPC[numNPCs].Direction = Player[A].Direction;
-                            NPC[numNPCs].Active = true;
-                            NPC[numNPCs].TimeLeft = 100;
-                            if(Player[A].MountType == 1)
-                                NPC[numNPCs].Type = 95;
-                            else if(Player[A].MountType == 2)
-                                NPC[numNPCs].Type = 98;
-                            else if(Player[A].MountType == 3)
-                                NPC[numNPCs].Type = 99;
-                            else if(Player[A].MountType == 4)
-                                NPC[numNPCs].Type = 100;
-                            else if(Player[A].MountType == 5)
-                                NPC[numNPCs].Type = 148;
-                            else if(Player[A].MountType == 6)
-                                NPC[numNPCs].Type = 149;
-                            else if(Player[A].MountType == 7)
-                                NPC[numNPCs].Type = 150;
-                            else if(Player[A].MountType == 8)
-                                NPC[numNPCs].Type = 228;
-                            NPC[numNPCs].Location.Height = 32;
-                            NPC[numNPCs].Location.Width = 32;
-                            NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - 32;
-                            NPC[numNPCs].Location.X = static_cast<int>(floor(static_cast<double>(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16)));
-                            NPC[numNPCs].Location.SpeedY = 0.5;
-                            NPC[numNPCs].Location.SpeedX = 0;
-                            NPC[numNPCs].CantHurt = 10;
-                            NPC[numNPCs].CantHurtPlayer = A;
-                            // If ShadowMode = True Then .Shadow = True
-                            Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
+                            PlayerDismount(A);
                         }
                     }
 
@@ -1416,94 +1288,14 @@ void UpdatePlayer()
                         {
                             if(Player[A].Controls.AltJump && Player[A].CanAltJump) // check to see if the player should jump out of the shoe
                             {
-                                UnDuck(A);
-                                Player[A].CanJump = false;
-                                PlaySound(SFX_Jump); // Jump sound
-                                PlaySound(SFX_Boot);
-                                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
-                                Player[A].Jump = Physics.PlayerJumpHeight;
-                                if(Player[A].Character == 2)
-                                    Player[A].Jump += 3;
-                                if(Player[A].SpinJump)
-                                    Player[A].Jump -= 6;
-                                Player[A].Mount = 0;
-                                Player[A].StandingOnNPC = 0;
-                                numNPCs++;
-                                NPC[numNPCs] = NPC_t();
-                                Player[A].FlyCount = 0;
-                                Player[A].RunCount = 0;
-                                Player[A].CanFly = false;
-                                Player[A].CanFly2 = false;
-                                NPC[numNPCs].Direction = Player[A].Direction;
-                                NPC[numNPCs].Active = true;
-                                NPC[numNPCs].TimeLeft = 100;
-                                if(Player[A].MountType == 1)
-                                    NPC[numNPCs].Type = 35;
-                                else if(Player[A].MountType == 2)
-                                    NPC[numNPCs].Type = 191;
-                                else if(Player[A].MountType == 3)
-                                    NPC[numNPCs].Type = 193;
-                                NPC[numNPCs].Location.Height = 32;
-                                NPC[numNPCs].Location.Width = 32;
-                                NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - 32;
-                                NPC[numNPCs].Location.X = static_cast<int>(floor(static_cast<double>(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16)));
-                                NPC[numNPCs].Location.SpeedY = 1;
-                                NPC[numNPCs].Location.SpeedX = (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX) * 0.8;
-                                NPC[numNPCs].CantHurt = 10;
-                                NPC[numNPCs].CantHurtPlayer = A;
-                                Player[A].Location.Y += Player[A].Location.Height;
-                                Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
-                                Player[A].Location.Y += -Player[A].Location.Height;
+                                PlayerDismount(A);
                             }
                         }
                         else if(Player[A].Mount == 3)
                         {
                             if(Player[A].Controls.AltJump && Player[A].CanAltJump) // jump off of yoshi
                             {
-                                UnDuck(A);
-                                if(Player[A].YoshiNPC > 0 || Player[A].YoshiPlayer > 0)
-                                    YoshiSpit(A);
-                                Player[A].CanJump = false;
-                                Player[A].StandingOnNPC = 0;
-                                PlaySound(SFX_Jump); // Jump sound
-                                Player[A].Location.SpeedY = Physics.PlayerJumpVelocity - tempSpeed;
-                                Player[A].Jump = Physics.PlayerJumpHeight;
-                                if(Player[A].Character == 2)
-                                    Player[A].Jump += 3;
-                                if(Player[A].SpinJump)
-                                    Player[A].Jump -= 6;
-                                Player[A].Mount = 0;
-                                UpdateYoshiMusic();
-                                numNPCs++;
-                                NPC[numNPCs] = NPC_t();
-                                NPC[numNPCs].Direction = Player[A].Direction;
-                                NPC[numNPCs].Active = true;
-                                NPC[numNPCs].TimeLeft = 100;
-                                if(Player[A].MountType == 1)
-                                    NPC[numNPCs].Type = 95;
-                                else if(Player[A].MountType == 2)
-                                    NPC[numNPCs].Type = 98;
-                                else if(Player[A].MountType == 3)
-                                    NPC[numNPCs].Type = 99;
-                                else if(Player[A].MountType == 4)
-                                    NPC[numNPCs].Type = 100;
-                                else if(Player[A].MountType == 5)
-                                    NPC[numNPCs].Type = 148;
-                                else if(Player[A].MountType == 6)
-                                    NPC[numNPCs].Type = 149;
-                                else if(Player[A].MountType == 7)
-                                    NPC[numNPCs].Type = 150;
-                                else if(Player[A].MountType == 8)
-                                    NPC[numNPCs].Type = 228;
-                                NPC[numNPCs].Location.Height = 32;
-                                NPC[numNPCs].Location.Width = 32;
-                                NPC[numNPCs].Location.Y = Player[A].Location.Y + Player[A].Location.Height - 32;
-                                NPC[numNPCs].Location.X = static_cast<int>(floor(static_cast<double>(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16)));
-                                NPC[numNPCs].Location.SpeedY = 0.5;
-                                NPC[numNPCs].Location.SpeedX = 0;
-                                NPC[numNPCs].CantHurt = 10;
-                                NPC[numNPCs].CantHurtPlayer = A;
-                                Player[A].Location.Height = Physics.PlayerHeight[Player[A].Character][Player[A].State];
+                                PlayerDismount(A);
                             }
                         }
 
@@ -4518,7 +4310,7 @@ void UpdatePlayer()
                 if(MessageNPC > 0)
                 {
                     MessageText = NPC[MessageNPC].Text;
-                    PauseGame(A);
+                    PauseGame(PauseCode::Message, A);
                     MessageText = "";
                     if(NPC[MessageNPC].TriggerTalk != "")
                         ProcEvent(NPC[MessageNPC].TriggerTalk);

@@ -83,10 +83,12 @@ static void compatInit(Compatibility_t &c)
     c.fix_npc_activation_event_loop_bug = true;
     c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
+    c.pause_on_disconnect = true;
+    c.allow_drop_add = true;
+    c.multiplayer_pause_controls = true;
     c.demos_counter_enable = false;
     c.luna_allow_level_codes = false;
     c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
-
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
@@ -116,6 +118,9 @@ static void compatInit(Compatibility_t &c)
         // 1.3.5.3
         c.fix_npc_activation_event_loop_bug = false;
         // 1.3.6
+        c.pause_on_disconnect = false;
+        c.allow_drop_add = false;
+        c.multiplayer_pause_controls = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -237,6 +242,9 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         };
         compat.readEnum("world-map-stars-show-policy", c.world_map_stars_show_policy, c.world_map_stars_show_policy, starsShowPolicy);
         // 1.3.6
+        compat.read("pause-on-disconnect", c.pause_on_disconnect, c.pause_on_disconnect);
+        compat.read("allow-drop-add", c.allow_drop_add, c.allow_drop_add);
+        compat.read("multiplayer-pause-controls", c.multiplayer_pause_controls, c.multiplayer_pause_controls);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);

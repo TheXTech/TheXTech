@@ -77,7 +77,7 @@ void UpdateEditor()
 //        frmLevelDebugger::UpdateDisplay;
     GameMenu = false;
 
-    if(!EditorControls.Mouse1)
+    if(!OldEditorControls.Mouse1)
         MouseRelease = true;
 
     if(LevelEditor)
@@ -98,13 +98,12 @@ void UpdateEditor()
 
     if(!MagicHand && ScreenType != 0)
     {
-        ScreenType = 0;
         SetupScreens();
     }
 
     if(!MagicHand)
     {
-        if(XEvents::getKeyState(vbKeyPageUp))
+        if(EditorControls.PrevSection)
         {
             if(ScrollRelease)
             {
@@ -117,7 +116,7 @@ void UpdateEditor()
 //                    frmLevelSettings::optSection(curSection).Value = true;
             }
         }
-        else if(XEvents::getKeyState(vbKeyPageDown))
+        else if(EditorControls.NextSection)
         {
             if(ScrollRelease)
             {
@@ -163,16 +162,14 @@ void UpdateEditor()
 //        frmLevelEditor::picLevel.Visible = true;
 //    }
 //    GetCursorPos(CursorPos);
-    CursorPos.X = MenuMouseX;
-    CursorPos.Y = MenuMouseY;
 
-    if(!XWindow::hasWindowMouseFocus() || CursorPos.X < 0 || CursorPos.Y > ScreenW || CursorPos.Y < 0 || CursorPos.Y > ScreenH)
+    if(!XWindow::hasWindowMouseFocus() || SharedCursor.X < 0 || SharedCursor.Y > ScreenW || SharedCursor.Y < 0 || SharedCursor.Y > ScreenH)
         HideCursor();
 
     if(LevelEditor || MagicHand)
     {
         GetEditorControls();
-        if(XEvents::getKeyState(vbKeyShift))
+        if(EditorControls.FastScroll)
             ScrollDelay = 0;
 
         if(MagicHand)
@@ -180,7 +177,8 @@ void UpdateEditor()
 
         if(ScrollDelay <= 0)
         {
-            if(EditorControls.Up)
+            // EditorControls.ScrollUp is now analogue, think...!
+            if(OldEditorControls.Up)
             {
                 vScreenY[1] += 32;
                 EditorCursor.Location.Y -= 32;
@@ -188,7 +186,7 @@ void UpdateEditor()
                 MouseRelease = true;
             }
 
-            if(EditorControls.Down)
+            if(OldEditorControls.Down)
             {
                 vScreenY[1] -= 32;
                 EditorCursor.Location.Y += 32;
@@ -196,7 +194,7 @@ void UpdateEditor()
                 MouseRelease = true;
             }
 
-            if(EditorControls.Left)
+            if(OldEditorControls.Left)
             {
                 vScreenX[1] += 32;
                 EditorCursor.Location.X -= 32;
@@ -204,7 +202,7 @@ void UpdateEditor()
                 MouseRelease = true;
             }
 
-            if(EditorControls.Right)
+            if(OldEditorControls.Right)
             {
                 vScreenX[1] -= 32;
                 EditorCursor.Location.X += 32;
@@ -222,7 +220,7 @@ void UpdateEditor()
             UpdateInterprocess();
 #endif
 
-        if(EditorControls.Mouse1)
+        if(OldEditorControls.Mouse1)
         {
             CanPlace = true;
             if(EditorCursor.Mode == OptCursor_t::LVL_SELECT || EditorCursor.Mode == 14)
@@ -243,7 +241,7 @@ void UpdateEditor()
                             EditorCursor.Mode = 2;
                             MouseMove(EditorCursor.X, EditorCursor.Y);
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
 //                            Netplay::sendData "v" + std::to_string(A) + "|" + PlayerStart[A].X + "|" + PlayerStart[A].Y + "|" + std::to_string(PlayerStart[A].Width) + "|" + std::to_string(PlayerStart[A].Height) + LB;
                         }
                     }
@@ -410,7 +408,7 @@ void UpdateEditor()
 //                            Netplay::sendData Netplay::EraseNPC(A, 1) + "p23" + LB;
                             KillNPC(A, 9);
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             tempBool = true;
                             UNUSED(tempBool);
 
@@ -560,7 +558,7 @@ void UpdateEditor()
 //                                Netplay::sendData Netplay::EraseBlock(A, 1);
                                 KillBlock(A, false);
                                 MouseRelease = false;
-                                EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                                OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -637,7 +635,7 @@ void UpdateEditor()
 //                            if(frmWarp.txtY == -1)
 //                                frmWarp.txtY = "";
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             if(Warp[A].LevelEnt)
                             {
 //                                frmWarp.chkEntrance = 1;
@@ -687,7 +685,7 @@ void UpdateEditor()
 //                            if(frmWarp.txtY == -1)
 //                                frmWarp.txtY = "";
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             if(Warp[A].LevelEnt == true)
                             {
 //                                frmWarp.chkEntrance = 1;
@@ -740,7 +738,7 @@ void UpdateEditor()
                                 UpdateBackgrounds();
                             }
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
                             if(IntProc::isEnabled()) // Report the taken block into the Editor
@@ -862,7 +860,7 @@ void UpdateEditor()
 //                                Netplay::sendData Netplay::EraseBlock(A, 1);
                                 KillBlock(A, false);
                                 MouseRelease = false;
-                                EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                                OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                                 FindSBlocks();
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -915,7 +913,7 @@ void UpdateEditor()
                             Water[A] = Water_t();
                             numWater--;
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             break;
                         }
                     }
@@ -940,7 +938,7 @@ void UpdateEditor()
                             WorldMusic[A] = WorldMusic[numWorldMusic];
                             numWorldMusic -= 1;
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             break;
                         }
                     }
@@ -963,7 +961,7 @@ void UpdateEditor()
 //                            WorldPath[A] = WorldPath(numWorldPaths);
                             numWorldPaths -= 1;
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             break;
                         }
                     }
@@ -988,7 +986,7 @@ void UpdateEditor()
                                 Scene[B] = Scene[B + 1];
                             numScenes -= 1;
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             break;
                         }
                     }
@@ -1041,7 +1039,7 @@ void UpdateEditor()
                             WorldLevel[A] = WorldLevel[numWorldLevels];
                             numWorldLevels -= 1;
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             break;
                         }
                     }
@@ -1073,7 +1071,7 @@ void UpdateEditor()
                             Tile[A] = Tile[numTiles];
                             numTiles -= 1;
                             MouseRelease = false;
-                            EditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
+                            OldEditorControls.Mouse1 = false; /* Simulate "Focus out" inside of SMBX Editor */
                             break;
                         }
                     }
@@ -1611,14 +1609,14 @@ void UpdateEditor()
 //                {
 //                    EditorCursor.Warp.Entrance = EditorCursor.Location;
 //                    Warp[A].Entrance = EditorCursor.Warp.Entrance;
-//                    EditorControls.Mouse1 = false;
+//                    OldEditorControls.Mouse1 = false;
 //                    Warp[A].PlacedEnt = true;
 //                }
 //                if(frmWarp.optE(2).Value == true || Warp[A].level != "" || Warp[A].LevelEnt == true || Warp[A].MapWarp == true)
 //                {
 //                    EditorCursor.Warp.Exit = EditorCursor.Location;
 //                    Warp[A].Exit = EditorCursor.Warp.Exit;
-//                    EditorControls.Mouse1 = false;
+//                    OldEditorControls.Mouse1 = false;
 //                    Warp[A].PlacedExit = true;
 //                }
 //                if(nPlay.Online == true)
@@ -1769,7 +1767,7 @@ void UpdateInterprocess()
     case IntProc::MsgBox:
     {
         MessageText = IntProc::getCMD();
-        PauseGame(1);
+        PauseGame(PauseCode::Message);
         break;
     }
 
@@ -2160,22 +2158,29 @@ void GetEditorControls()
 {
     if(HasCursor)
     {
-        if((XEvents::getKeyState(vbKeyUp)))
-            EditorControls.Up = true;
-        else
-            EditorControls.Up = false;
-        if((XEvents::getKeyState(vbKeyDown)))
-            EditorControls.Down = true;
-        else
-            EditorControls.Down = false;
-        if((XEvents::getKeyState(vbKeyLeft)))
-            EditorControls.Left = true;
-        else
-            EditorControls.Left = false;
-        if((XEvents::getKeyState(vbKeyRight)))
-            EditorControls.Right = true;
-        else
-            EditorControls.Right = false;
+        // JUST FOR NOW, will replace with editorcontrols in future
+        OldEditorControls.Up = SharedControls.MenuUp;
+        OldEditorControls.Down = SharedControls.MenuDown;
+        OldEditorControls.Left = SharedControls.MenuLeft;
+        OldEditorControls.Right = SharedControls.MenuRight;
+        OldEditorControls.Mouse1 = SharedCursor.Primary;
+        if((SharedCursor.Secondary || EditorControls.ModeSelect) && optCursor.current != OptCursor_t::LVL_SELECT)
+        {
+            optCursor.current = OptCursor_t::LVL_SELECT;
+            MouseMove(float(SharedCursor.X), float(SharedCursor.Y));
+            SetCursor();
+        }
+        if((SharedCursor.Tertiary || EditorControls.ModeErase) && optCursor.current != OptCursor_t::LVL_ERASER)
+        {
+            optCursor.current = OptCursor_t::LVL_ERASER;
+            MouseMove(float(SharedCursor.X), float(SharedCursor.Y));
+            SetCursor();
+        }
+        if(SharedCursor.Move)
+        {
+            MouseMove(SharedCursor.X, SharedCursor.Y, true);
+            MouseRelease = true;
+        }
     }
 }
 
@@ -2751,11 +2756,11 @@ void HideCursor()
     EditorCursor.Location.Y = vScreenY[1] - 600;
     EditorCursor.Y = float(vScreenY[1] - 600);
     HasCursor = false;
-    EditorControls.Down = false;
-    EditorControls.Left = false;
-    EditorControls.Mouse1 = false;
-    EditorControls.Right = false;
-    EditorControls.Up = false;
+    OldEditorControls.Down = false;
+    OldEditorControls.Left = false;
+    OldEditorControls.Mouse1 = false;
+    OldEditorControls.Right = false;
+    OldEditorControls.Up = false;
 }
 
 void KillWarp(int A)
@@ -2792,7 +2797,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         // End If
     }
 
-    GamePaused = false;
+    GamePaused = PauseCode::None;
     MessageText.clear();
 //  frmNPCs::chkMessage.Value = 0;
     BattleLives[1] = 3;
@@ -2921,15 +2926,12 @@ void zTestLevel(bool magicHand, bool interProcess)
         if(!OpenLevel(FullFileName))
         {
             MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", FullFileName);
-            PauseGame(1);
+            PauseGame(PauseCode::Message);
             ErrorQuit = true;
         }
     }
 
     GameThing(0, 0);
-
-    if(SingleCoop > 0)
-        ScreenType = 6;
     SetupScreens();
     TestLevel = true;
     LevelSelect = false;
@@ -2939,15 +2941,13 @@ void zTestLevel(bool magicHand, bool interProcess)
 
     optCursor.current = 13;
     OptCursorSync();
-
-    if(numPlayers == 1)
-        ScreenType = 1;
-    else
-        ScreenType = 5;
 }
 
 void MouseMove(float X, float Y, bool /*nCur*/)
 {
+    EditorCursor.X = X;
+    EditorCursor.Y = Y;
+
     int A = 0;
     HasCursor = true;
     A = 1;

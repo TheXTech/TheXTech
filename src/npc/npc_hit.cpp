@@ -36,6 +36,10 @@ void NPCHit(int A, int B, int C)
     NPC_t tempNPC;
     Location_t tempLocation;
     NPC_t oldNPC = NPC[A];
+
+    // if(B == 1 && C != 0)
+    //     Controls::Rumble(C, 50, .25);
+
     // ------+  HIT CODES  +-------
     // B = 1      Jumped on by a player (or kicked)
     // B = 2      Hit by a shaking block
