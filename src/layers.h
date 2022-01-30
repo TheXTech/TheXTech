@@ -161,6 +161,15 @@ void ProcEvent(const std::string &EventName, bool NoEffect = false);
 // Public Sub UpdateEvents()
 void UpdateEvents();
 
+// EXTRA: Cancel awaiting event trigger
+void CancelNewEvent(const std::string &eventName);
+
+// EXTRA: Check was any even got triggered?
+bool EventWasTriggered(const std::string &eventName);
+
+// EXTRA: Clear up the tracklist
+void ClearTriggeredEvents();
+
 // Public Sub UpdateLayers()
 void UpdateLayers();
 

@@ -107,6 +107,9 @@ struct SFX_t
 static std::unordered_map<std::string, Music_t> music;
 static std::unordered_map<std::string, SFX_t>   sound;
 
+//! Sounds played by scripts
+static std::unordered_map<std::string, Mix_Chunk*> extSfx;
+
 static const int maxSfxChannels = 91;
 
 int CustomWorldMusicId()
@@ -507,7 +510,7 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting world music [%s]", mus.c_str());
             PlayMusic(mus, fadeInMs);
         }
-        musicName = mus;
+        musicName = std::move(mus);
     }
     else if(A == -1) // P switch music
     {
@@ -561,7 +564,7 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting level music [%s]", mus.c_str());
             PlayMusic(mus);
         }
-        musicName = mus;
+        musicName = std::move(mus);
     }
 
     musicPlaying = true;
@@ -641,10 +644,10 @@ static void loadMusicIni(const std::string &root, const std::string &path, bool 
         musicSetup.read("level-custom-music-id", g_customLvlMusicId, 0);
         musicSetup.read("world-custom-music-id", g_customWldMusicId, 0);
         musicSetup.endGroup();
+
+        UpdateLoad();
     }
 
-    if(!isLoadingCustom)
-        UpdateLoad();
     for(unsigned int i = 1; i <= g_totalMusicLevel; ++i)
     {
         std::string alias = fmt::format_ne("music{0}", i);
@@ -941,6 +944,10 @@ void UnloadCustomSound()
     restoreDefaultSfx();
     g_customMusicInDataFolder = false;
     g_customSoundsInDataFolder = false;
+
+    for(auto &f : extSfx)
+        Mix_FreeChunk(f.second);
+    extSfx.clear();
 }
 
 void UpdateYoshiMusic()
@@ -954,4 +961,26 @@ void UpdateYoshiMusic()
         hasYoshi |= (Player[i].Mount == 3);
 
     Mix_SetMusicTrackMute(g_curMusic, s_musicYoshiTrackNumber, hasYoshi ? 0 : 1);
+}
+
+void PlayExtSound(const std::string &path)
+{
+    if(noSound)
+        return;
+
+    auto f = extSfx.find(path);
+    if(f == extSfx.end())
+    {
+        auto *ch = Mix_LoadWAV(path.c_str());
+        if(!ch)
+        {
+            pLogWarning("Can't load custom sound: %s", Mix_GetError());
+            return;
+        }
+        extSfx.insert({path, ch});
+        Mix_PlayChannelVol(-1, ch, 0, MIX_MAX_VOLUME);
+        return;
+    }
+
+    Mix_PlayChannelVol(-1, f->second, 0, MIX_MAX_VOLUME);
 }

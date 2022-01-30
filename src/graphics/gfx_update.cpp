@@ -38,6 +38,7 @@
 #include "../game_main.h"
 #include "../main/game_globals.h"
 #include "../core/render.h"
+#include "../script/luna/luna.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -377,6 +378,7 @@ void UpdateGraphics(bool skipRepaint)
 
     frameNextInc();
     frameRenderStart();
+    lunaRenderStart();
 
     g_stats.reset();
 
@@ -2121,9 +2123,11 @@ void UpdateGraphics(bool skipRepaint)
         // player names
         /* Dropped */
 
-            if(numPlayers == 1) // Always draw for single-player
-                g_levelVScreenFader[Z].draw();
-            else if(numScreens != 1) // Don't draw when many players at the same screen
+            lunaRender(Z);
+
+            // Always draw for single-player
+            // And don't draw when many players at the same screen
+            if(numPlayers == 1 || numScreens != 1)
                 g_levelVScreenFader[Z].draw();
 
     //    'Interface
@@ -2153,8 +2157,9 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
+                lunaRenderHud();
     //                DrawInterface Z, numScreens
-                if(ShowOnScreenMeta)
+                if(ShowOnScreenMeta && !gSMBXHUDSettings.skip)
                     DrawInterface(Z, numScreens);
 
                 For(A, 1, numNPCs) // Display NPCs that got dropped from the container
@@ -2737,6 +2742,7 @@ void UpdateGraphics(bool skipRepaint)
 //            Netplay::sendData timeStr + LB;
 //    }
 
+    lunaRenderEnd();
     frameRenderEnd();
 
 //    if(XRender::lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time

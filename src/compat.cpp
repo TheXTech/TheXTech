@@ -86,7 +86,9 @@ static void compatInit(Compatibility_t &c)
     c.pause_on_disconnect = true;
     c.allow_drop_add = true;
     c.multiplayer_pause_controls = true;
-
+    c.demos_counter_enable = false;
+    c.luna_allow_level_codes = false;
+    c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
@@ -173,6 +175,27 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
             {"false", Compatibility_t::SPGWGI_DISABLE}
         };
         compat.readEnum("sfx-player-grow-with-got-item", c.sfx_player_grow_with_got_item, c.sfx_player_grow_with_got_item, spgwgi);
+    }
+    compat.endGroup();
+
+    compat.beginGroup("deaths-counter");
+    {
+        compat.read("enabled", c.demos_counter_enable, c.demos_counter_enable);
+    }
+    compat.endGroup();
+
+    compat.beginGroup("luna-script");
+    {
+        const IniProcessing::StrEnumMap lunaEnable
+        {
+            {"unpsecified", Compatibility_t::LUNA_ENGINE_UNSPECIFIED},
+            {"enable", Compatibility_t::LUNA_ENGINE_ENABLE},
+            {"true", Compatibility_t::LUNA_ENGINE_ENABLE},
+            {"disable", Compatibility_t::LUNA_ENGINE_DISABLE},
+            {"false", Compatibility_t::LUNA_ENGINE_DISABLE}
+        };
+        compat.readEnum("enable-engine", c.luna_enable_engine, c.luna_enable_engine, lunaEnable);
+        compat.read("allow-level-codes", c.luna_allow_level_codes, c.luna_allow_level_codes);
     }
     compat.endGroup();
 

@@ -22,6 +22,9 @@
 #include "../game_main.h"
 #include "../compat.h"
 #include "speedrunner.h"
+#ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
+#include "../script/luna/lunavarbank.h"
+#endif
 
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
@@ -104,6 +107,12 @@ void SaveGame()
         sav.gottenStars.emplace_back(Star[A].level, Star[A].Section);
 
     sav.totalStars = uint32_t(MaxWorldStars);
+
+#ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
+    gSavedVarBank.WriteBank();
+    if(gLunaVarBank.name == "LunaDLL" && !gLunaVarBank.data.empty())
+        sav.userData.store.push_back(gLunaVarBank);
+#endif
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
 
@@ -264,6 +273,20 @@ void LoadGame()
 
     for(A = 1; A <= numPlayers; A++)
         Player[A] = SavedChar[Player[A].Character];
+
+#ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
+    gLunaVarBank = saveUserData::DataSection();
+    for(auto &s : sav.userData.store)
+    {
+        if(s.name == "LunaDLL" && s.location == saveUserData::DATA_GLOBAL)
+        {
+            gLunaVarBank = s;
+            break;
+        }
+    }
+
+    gSavedVarBank.TryLoadWorldVars();
+#endif
 }
 
 void ClearGame(bool punnish)
@@ -304,6 +327,11 @@ void ClearGame(bool punnish)
 
     maxStars = 0;
     numStars = 0;
+
+#ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
+    gLunaVarBank = saveUserData::DataSection();
+    gSavedVarBank.ClearBank();
+#endif
 
     if(punnish) // Remove gamesave of user who was used a trap cheat
         DeleteSave(selWorld, selSave);

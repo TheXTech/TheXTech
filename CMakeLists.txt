@@ -7,6 +7,8 @@ include(ExternalProject)
 include(CheckLibraryExists)
 include(GNUInstallDirs)
 include(FindBacktrace)
+include(TestBigEndian)
+
 
 include(cmake/git_info.cmake)
 message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
@@ -116,6 +118,7 @@ option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on some platfors)" ON)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
+option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
@@ -365,6 +368,48 @@ set(THEXTECH_SRC
     src/player/player_update.cpp
 )
 
+# Luna Autocode script engine
+list(APPEND THEXTECH_SRC src/script/luna/lunaglobals.cpp)
+if(THEXTECH_ENABLE_LUNA_AUTOCODE)
+    add_definitions(-DTHEXTECH_ENABLE_LUNA_AUTOCODE)
+    list(APPEND THEXTECH_SRC
+        src/script/luna/luna.cpp
+        src/script/luna/autocode.cpp
+        src/script/luna/autocode_manager.cpp
+        src/script/luna/csprite.cpp
+        src/script/luna/lunaspriteman.cpp
+        src/script/luna/hitbox.cpp
+        src/script/luna/lunaimgbox.cpp
+        src/script/luna/sprite_component.cpp
+        src/script/luna/sprite_funcs.cpp
+        src/script/luna/lunalevels.cpp
+        src/script/luna/lunaplayer.cpp
+        src/script/luna/lunanpc.cpp
+        src/script/luna/lunablock.cpp
+        src/script/luna/lunalayer.cpp
+        src/script/luna/lunamisc.cpp
+        src/script/luna/lunalevel.cpp
+        src/script/luna/lunarender.cpp
+        src/script/luna/lunacell.cpp
+        src/script/luna/lunainput.cpp
+        src/script/luna/lunacounter.cpp
+        src/script/luna/lunacounter_record.cpp
+        src/script/luna/lunavarbank.cpp
+        src/script/luna/renderop_bitmap.cpp
+        src/script/luna/renderop_rect.cpp
+        src/script/luna/renderop_effect.cpp
+        src/script/luna/renderop_string.cpp
+        src/script/luna/mememu.cpp
+        src/script/luna/levels/Docopoper-AbstractAssault.cpp
+        src/script/luna/levels/Docopoper-Calleoca.cpp
+        src/script/luna/levels/Docopoper-TheFloorisLava.cpp
+        src/script/luna/levels/SAJewers-QraestoliaCaverns.cpp
+        src/script/luna/levels/SAJewers-Snowboardin.cpp
+        src/script/luna/levels/Talkhaus-Science_Final_Battle.cpp
+        src/script/luna/levels/KilArmoryCode.cpp
+    )
+endif()
+
 add_definitions(-DCORE_EVERYTHING_SDL)
 list(APPEND THEXTECH_SRC
     src/core/sdl/render_sdl.cpp
@@ -382,6 +427,9 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/InterProcess/*.h
     src/*.h
     src/*.hpp
+    src/script/*.h
+    src/script/luna/*.h
+    src/script/luna/level/*.h
     src/control/*.h
     src/core/*.h
     src/core/base/*.h
@@ -565,6 +613,14 @@ endif()
 
 if(NOT USE_SYSTEM_LIBS)
     add_dependencies(thextech ${A2XT_DEPS})
+endif()
+
+test_big_endian(THEXTECH_IS_BIG_ENDIAN)
+if(THEXTECH_IS_BIG_ENDIAN)
+    message("== Target processor endianess: BIG ENDIAN")
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BIG_ENDIAN)
+else()
+    message("== Target processor endianess: LITTLE ENDIAN")
 endif()
 
 if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)

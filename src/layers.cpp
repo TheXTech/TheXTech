@@ -19,6 +19,7 @@
  */
 
 #include <SDL2/SDL_timer.h>
+#include <set>
 
 #include "globals.h"
 #include "layers.h"
@@ -43,6 +44,8 @@ RangeArr<Events_t, 0, maxEvents> Events;
 RangeArr<std::string, 1, maxEvents> NewEvent;
 RangeArrI<int, 1, maxEvents, 0> newEventDelay;
 int newEventNum = 0;
+
+static std::set<std::string> recentlyTriggeredEvents;
 
 static SDL_INLINE bool equalCase(const std::string &x, const std::string &y)
 {
@@ -292,6 +295,8 @@ void ProcEvent(const std::string &EventName, bool NoEffect)
         auto &evt = Events[A];
         if(equalCase(EventName, evt.Name))
         {
+            recentlyTriggeredEvents.insert(evt.Name);
+
             if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_EVENT && equalCase(EventName.c_str(), g_compatibility.speedrun_stop_timer_at))
                 speedRun_bossDeadEvent();
 
@@ -706,6 +711,35 @@ void UpdateEvents()
             }
         }
     }
+}
+
+void CancelNewEvent(const std::string &eventName)
+{
+    if(newEventNum <= 0)
+        return; // Nothing to do
+
+    for(int A = 1; A <= newEventNum; ++A)
+    {
+        if(equalCase(eventName, NewEvent[A]))
+        {
+            newEventDelay[A] = newEventDelay[newEventNum];
+            NewEvent[A] = NewEvent[newEventNum];
+            newEventNum--;
+            --A;
+        }
+    }
+}
+
+bool EventWasTriggered(const std::string &eventName)
+{
+    return !recentlyTriggeredEvents.empty() &&
+            recentlyTriggeredEvents.find(eventName) != recentlyTriggeredEvents.end();
+}
+
+void ClearTriggeredEvents()
+{
+    if(!recentlyTriggeredEvents.empty())
+        recentlyTriggeredEvents.clear();
 }
 
 void UpdateLayers()
