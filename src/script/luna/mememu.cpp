@@ -24,8 +24,10 @@
 #include "globals.h"
 #include "global_constants.h"
 #include "layers.h"
+#include "game_main.h" // GamePaused
 
 #include <unordered_map>
+#include <functional>
 
 
 #if defined(arm) && !defined(__SOFTFP__) && !defined(__VFP_FP__) && !defined(__MAVERICK__)
@@ -372,6 +374,10 @@ class SMBXMemoryEmulator
     std::unordered_map<size_t, bool *>   m_bf;
     std::unordered_map<size_t, std::string *>   m_sf;
 
+    typedef std::function<double(FIELDTYPE)> Getter;
+    typedef std::function<void(double,FIELDTYPE)> Setter;
+    std::unordered_map<size_t, std::pair<Getter, Setter>> m_lff;
+
     enum ValueType
     {
         VT_UNKNOWN = 0,
@@ -379,7 +385,8 @@ class SMBXMemoryEmulator
         VT_FLOAT,
         VT_INT,
         VT_BOOL,
-        VT_STRING
+        VT_STRING,
+        VT_LAMBDA
     };
 
     std::unordered_map<int, ValueType> m_type;
@@ -414,6 +421,12 @@ class SMBXMemoryEmulator
         m_type.insert({address, VT_STRING});
     }
 
+    void insert(size_t address, Getter g, Setter s)
+    {
+        m_lff.insert({address, {g, s}});
+        m_type.insert({address, VT_LAMBDA});
+    }
+
 public:
     SMBXMemoryEmulator() noexcept
     {
@@ -424,7 +437,19 @@ public:
     {
         insert(0x00B2504C, &TakeScreen);
         insert(0x00B250D6, &numLocked);
-        insert(0x00B250E2, &GamePaused); // Pause menu visible
+        insert(0x00B250E2, // Pause menu visible
+               [](FIELDTYPE ftype)->double
+               {
+                   bool tmp = (GamePaused != PauseCode::None);
+                   return valueToMem(tmp, ftype);
+               },
+               [](double in, FIELDTYPE ftype)->void
+               {
+                   // FIXME: Verify this, if it needs to be written, try to work around this
+                   pLogWarning("Attempt to write the read-only field at 0x00B250E2 "
+                               "(GamePaused) with value %g as %s", in, FieldtypeToStr(ftype));
+               }
+        );
         insert(0x00B25134, &LevelEditor);
 
         insert(0x00B251E0, &numStars); // HUD star count
@@ -470,11 +495,11 @@ public:
         insert(0x00B2C8E4, &Score); // HUD points count
         insert(0x00B2C906, &maxStars); // Max stars at episode
 
-        insert(0x00B2D6BC, &MenuMouseX); // Mouse cursor X
-        insert(0x00B2D6C4, &MenuMouseY); // Mouse cursor Y
-        insert(0x00B2D6CC, &MenuMouseDown);
+        insert(0x00B2D6BC, &SharedCursor.X); // Mouse cursor X
+        insert(0x00B2D6C4, &SharedCursor.Y); // Mouse cursor Y
+        insert(0x00B2D6CC, &SharedCursor.Primary);
         insert(0x00B2D6D0, &MenuMouseRelease);
-        insert(0x00B2D6D2, &MenuMouseMove);
+        insert(0x00B2D6D2, &SharedCursor.Move);
         insert(0x00B2D710, &numEvents);
         insert(0x00B2D734, &noSound);
     }
@@ -544,6 +569,18 @@ public:
                     pLogWarning("MemEmu: Read type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
                 return *bres->second ? 0xffff : 0x0000;
             }
+            break;
+        }
+
+        case VT_LAMBDA:
+        {
+            auto lfres = m_lff.find(address);
+            if(lfres != m_lff.end())
+            {
+                auto &l = lfres->second;
+                return l.first(ftype);
+            }
+            break;
         }
 
         default:
@@ -621,6 +658,17 @@ public:
                     pLogWarning("MemEmu: Write type missmatched at 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", address, FieldtypeToStr(ftype));
                 *bres->second = (value != 0.0);
                 return;
+            }
+            break;
+        }
+
+        case VT_LAMBDA:
+        {
+            auto lfres = m_lff.find(address);
+            if(lfres != m_lff.end())
+            {
+                auto &l = lfres->second;
+                l.second(value, ftype);
             }
             break;
         }

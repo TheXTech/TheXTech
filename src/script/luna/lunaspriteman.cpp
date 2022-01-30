@@ -25,6 +25,7 @@
 #include "lunaplayer.h"
 #include "lunamisc.h"
 #include "lunaimgbox.h"
+#include "game_main.h" // GamePaused
 
 #include "globals.h"
 
@@ -292,7 +293,7 @@ void CSpriteManager::RunSprites()
     if(demo)
     {
         // Process each
-        if(!GamePaused)
+        if(GamePaused == PauseCode::None)
         {
             for(auto &iter : m_SpriteList)
             {
