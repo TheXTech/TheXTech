@@ -223,10 +223,11 @@ bool SwapEvents(eventindex_t index_1, eventindex_t index_2);
 bool RenameEvent(eventindex_t index, const std::string NewName);
 // deletes an event
 bool DeleteEvent(eventindex_t index);
+
 // EXTRA: Cancel awaiting event trigger
-void CancelNewEvent(const std::string &eventName);
-// EXTRA: Check was any even got triggered?
-bool EventWasTriggered(const std::string &eventName);
+void CancelNewEvent(eventindex_t index);
+// EXTRA: Check was any event got triggered?
+bool EventWasTriggered(eventindex_t index);
 // EXTRA: Clear up the tracklist
 void ClearTriggeredEvents();
 

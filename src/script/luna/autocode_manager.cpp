@@ -27,13 +27,11 @@
 
 #include "autocode_manager.h"
 #include "globals.h"
+#include "global_dirs.h"
 #include "lunamisc.h"
 #include "lunaspriteman.h"
 
 #define PARSEDEBUG true
-
-static DirListCI s_dirEpisode;
-static DirListCI s_dirCustom;
 
 AutocodeManager gAutoMan;
 
@@ -77,18 +75,20 @@ bool AutocodeManager::LoadFiles()
     bool ret = false;
     std::string lunaLevel, lunaWorld;
 
-    s_dirEpisode.setCurDir(FileNamePath);
-    s_dirCustom.setCurDir(FileNamePath + FileName);
+    g_dirEpisode.setCurDir(FileNamePath);
+    g_dirCustom.setCurDir(FileNamePath + FileName);
 
     Clear(false);
 
     // Load autocode
-    lunaLevel = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase(AUTOCODE_FNAME);
-    ret |= ReadFile(lunaLevel);
+    lunaLevel = g_dirCustom.resolveFileCaseExistsAbs(AUTOCODE_FNAME);
+    if(!lunaLevel.empty())
+        ret |= ReadFile(lunaLevel);
 
     // Try to load world codes
-    lunaWorld = FileNamePath + s_dirEpisode.resolveFileCase(WORLDCODE_FNAME);
-    ret |= ReadWorld(lunaWorld);
+    lunaWorld = g_dirEpisode.resolveFileCaseExistsAbs(WORLDCODE_FNAME);
+    if(!lunaWorld.empty())
+        ret |= ReadWorld(lunaWorld);
 
     // Attempt to load global codes at the assets directory
     ret |= ReadGlobals(AppPathManager::assetsRoot() + GLOBALCODE_FNAME);
@@ -325,22 +325,12 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
 
 std::string AutocodeManager::resolveWorldFileCase(const std::string &in_name)
 {
-    auto ret = s_dirEpisode.resolveFileCase(in_name);
-
-    if(ret.empty())
-        return std::string();
-
-    return FileNamePath + "/" + ret;
+    return g_dirEpisode.resolveFileCaseAbs(in_name);
 }
 
 std::string AutocodeManager::resolveCustomFileCase(const std::string &in_name)
 {
-    auto ret = s_dirCustom.resolveFileCase(in_name);
-
-    if(ret.empty())
-        return std::string();
-
-    return FileNamePath + FileName + "/" + ret;
+    return g_dirCustom.resolveFileCaseAbs(in_name);
 }
 
 // DO EVENTS

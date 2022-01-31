@@ -1003,13 +1003,13 @@ void Autocode::Do(bool init)
 
         case AT_TriggerSMBXEvent:
         {
-            ProcEvent(MyString, (int)Param1);
+            ProcEvent(FindEvent(MyString), (int)Param1);
             break;
         }
 
         case AT_OnEvent:
         {
-            if(EventWasTriggered(MyString))
+            if(EventWasTriggered(FindEvent(MyString)))
             {
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 if(Param2 != 0)
@@ -1022,7 +1022,7 @@ void Autocode::Do(bool init)
         {
             if(Length <= 1) // Cancel event after delay
             {
-                CancelNewEvent(MyString);
+                CancelNewEvent(FindEvent(MyString));
                 expire();
             }
             break;

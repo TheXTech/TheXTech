@@ -91,6 +91,7 @@ static void compatInit(Compatibility_t &c)
     c.luna_allow_level_codes = false;
     c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
 
+
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
         c.enable_last_warp_hub_resume = false;

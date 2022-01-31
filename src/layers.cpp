@@ -699,7 +699,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
         {
             recentlyTriggeredEvents.insert(index);
 
-            if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_EVENT && equalCase(EventName.c_str(), g_compatibility.speedrun_stop_timer_at))
+            if(g_compatibility.speedrun_stop_timer_by == Compatibility_t::SPEEDRUN_STOP_EVENT && equalCase(evt.Name.c_str(), g_compatibility.speedrun_stop_timer_at))
                 speedRun_bossDeadEvent();
 
             for(B = 0; B <= numSections; B++)
@@ -1121,7 +1121,7 @@ void CancelNewEvent(eventindex_t index)
 bool EventWasTriggered(eventindex_t index)
 {
     return !recentlyTriggeredEvents.empty() &&
-            recentlyTriggeredEvents.find(eventName) != recentlyTriggeredEvents.end();
+            recentlyTriggeredEvents.find(index) != recentlyTriggeredEvents.end();
 }
 
 void ClearTriggeredEvents()
