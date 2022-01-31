@@ -30,6 +30,9 @@
 #include "global_constants.h"
 #include "control_types.h"
 
+// also defined in "globals.h"
+extern const std::string g_emptyString;
+
 //Public Type Layer
 struct Layer_t
 {
@@ -160,19 +163,19 @@ extern int newEventNum;
 
 extern layerindex_t LAYER_USED_P_SWITCH;
 
-inline std::string GetL(layerindex_t index)
+inline const std::string& GetL(layerindex_t index)
 {
     if(index == LAYER_NONE)
     {
-        return "";
+        return g_emptyString;
     }
     return Layer[index].Name;
 }
-inline std::string GetE(eventindex_t index)
+inline const std::string& GetE(eventindex_t index)
 {
     if(index == EVENT_NONE)
     {
-        return "";
+        return g_emptyString;
     }
     return Events[index].Name;
 }
