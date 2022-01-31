@@ -33,11 +33,16 @@ public:
 
     RenderStringOp(const std::string &str, int font_type, float X, float Y);
 
-    ~RenderStringOp() override = default;
+    ~RenderStringOp() override;
 
     void Draw(Renderer *renderer) override;
 
-    std::string m_String;
+    // FIXME: Replace this with the string data index
+    // Every autocode should use the string index storage, and this thing won't be needed
+    char*  m_String = nullptr;
+    size_t m_StringSize = 0;
+    bool   m_StringDup = false;
+
     int m_FontType;
     float m_X;
     float m_Y;
