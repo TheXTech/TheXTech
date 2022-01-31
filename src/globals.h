@@ -145,7 +145,7 @@ extern bool ScrollRelease;
 //Public TakeScreen As Boolean
 extern bool TakeScreen;
 // EXTRA: Show any on-screen meta (HUD, debug prints, etc.)
-extern bool ShowOnScreenMeta;
+extern bool ShowOnScreenHUD;
 //Public LB As String  ' Line Break
 //extern std::string LB;
 //Public EoT As String  ' End of Transmission for WINSOCK

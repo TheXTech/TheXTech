@@ -89,7 +89,7 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::ToggleHUD:
-        ShowOnScreenMeta = !ShowOnScreenMeta;
+        ShowOnScreenHUD = !ShowOnScreenHUD;
         return;
 
     case Buttons::LegacyPause:

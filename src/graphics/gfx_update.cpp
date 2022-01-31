@@ -2159,7 +2159,7 @@ void UpdateGraphics(bool skipRepaint)
 
                 lunaRenderHud();
     //                DrawInterface Z, numScreens
-                if(ShowOnScreenMeta && !gSMBXHUDSettings.skip)
+                if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
                     DrawInterface(Z, numScreens);
 
                 For(A, 1, numNPCs) // Display NPCs that got dropped from the container
@@ -2206,17 +2206,15 @@ void UpdateGraphics(bool skipRepaint)
             else if(!GameOutro)
                 mainMenuDraw();
 
-            if(ShowOnScreenMeta)
+            if(PrintFPS > 0)
             {
-                if(PrintFPS > 0)
-                {
-                    XRender::offsetViewportIgnore(true);
-                    SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
-                    XRender::offsetViewportIgnore(false);
-                }
-
-                g_stats.print();
+                XRender::offsetViewportIgnore(true);
+                SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+                XRender::offsetViewportIgnore(false);
             }
+
+            g_stats.print();
+
         }
 
 //        If LevelEditor = True Or MagicHand = True Then
@@ -2657,19 +2655,17 @@ void UpdateGraphics(bool skipRepaint)
             s_shakeScreen.update();
         }
 
-        if(ShowOnScreenMeta)
+        // TODO: VERIFY THIS
+        XRender::offsetViewportIgnore(true);
+        if(ScreenType == 5 && numScreens == 1)
         {
-            // TODO: VERIFY THIS
-            XRender::offsetViewportIgnore(true);
-            if(ScreenType == 5 && numScreens == 1)
-            {
-                speedRun_renderControls(1, -1);
-                speedRun_renderControls(2, -1);
-            }
-            else
-                speedRun_renderControls(Z, Z);
-            XRender::offsetViewportIgnore(false);
+            speedRun_renderControls(1, -1);
+            speedRun_renderControls(2, -1);
         }
+        else
+            speedRun_renderControls(Z, Z);
+        XRender::offsetViewportIgnore(false);
+
 //    Next Z
     } // For(Z, 2, numScreens)
 
