@@ -864,20 +864,23 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         }
 
         //for(A = 1; A <= numWorldPaths; A++)
-        for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_ID))
+        WorldPath_t* found = nullptr;
+        for(WorldPath_t *path : treeWorldPathQuery(tempLocation, SORTMODE_ID))
         {
-            WorldPath_t &path = *t;
-            D_pLogDebug("Found path activity: %d", (int)path.Active);
-            if(!path.Active)
+            D_pLogDebug("Found path activity: %d", (int)path->Active);
+            if(!path->Active)
             {
                 D_pLogDebugNA("Collision with path...");
-                if(CheckCollision(tempLocation, path.Location))
+                if(CheckCollision(tempLocation, path->Location))
                 {
                     D_pLogDebugNA("Collision with path FOUND...");
-                    PathPath(path, Skp);
+                    found = path;
+                    break;
                 }
             }
         }
+        if(found)
+            PathPath(*found, Skp);
 
         //for(A = 1; A <= numWorldLevels; A++)
         for(auto *t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))

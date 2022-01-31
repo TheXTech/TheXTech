@@ -851,7 +851,7 @@ void ClearLevel()
 
     UnloadCustomGFX();
     doShakeScreenClear();
-    // treeLevelCleanAll();
+    treeLevelCleanAll();
 
     AutoUseModern = false;
 

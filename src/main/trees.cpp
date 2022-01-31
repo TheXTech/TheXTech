@@ -24,7 +24,7 @@
 #include "layers.h"
 #include "QuadTree/LooseQuadtree.h"
 
-std::vector<void*> treeresult_vec[4] = {std::vector<void*>(400), std::vector<void*>(400), std::vector<void*>(50), std::vector<void*>(50)};
+std::vector<void*> treeresult_vec[MAX_TREEQUERY_DEPTH] = {std::vector<void*>(400), std::vector<void*>(400), std::vector<void*>(50), std::vector<void*>(50)};
 ptrdiff_t cur_treeresult_vec = 0;
 
 template<class ItemT>
@@ -410,9 +410,8 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
             OffsetX = OffsetY = 0.0;
         else
         {
-            // restore when layers get offsets
-            // OffsetX = Layer[layer].OffsetX;
-            // OffsetY = Layer[layer].OffsetY;
+            OffsetX = Layer[layer].OffsetX;
+            OffsetY = Layer[layer].OffsetY;
         }
         std::unique_ptr<Tree_private<Block_t>>& p = s_levelBlockTrees[layer];
         if(!p.get())

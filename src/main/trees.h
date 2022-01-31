@@ -24,7 +24,8 @@
 
 #include "globals.h"
 
-extern std::vector<void*> treeresult_vec[4];
+#define MAX_TREEQUERY_DEPTH 4
+extern std::vector<void*> treeresult_vec[MAX_TREEQUERY_DEPTH];
 extern ptrdiff_t cur_treeresult_vec;
 
 enum SortMode
@@ -77,7 +78,7 @@ public:
     TreeResult_Sentinel()
     {
         SDL_assert(cur_treeresult_vec >= 0); // invalid state
-        SDL_assert(cur_treeresult_vec < 4); // insufficient sentinels: move recursive calls out of sentinel scope
+        SDL_assert_release(cur_treeresult_vec < MAX_TREEQUERY_DEPTH); // insufficient sentinels: move recursive calls out of sentinel scope
         i_vec = &treeresult_vec[cur_treeresult_vec];
         i_vec->clear();
         cur_treeresult_vec ++;
