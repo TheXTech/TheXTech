@@ -41,7 +41,7 @@ bool StartMenu = false;
 int BlockFlash = 0;
 bool ScrollRelease = false;
 bool TakeScreen = false;
-bool ShowOnScreenMeta = true;
+bool ShowOnScreenHUD = true;
 std::string LB;
 std::string EoT;
 

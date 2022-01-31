@@ -748,15 +748,13 @@ void UpdateGraphics2(bool skipRepaint)
 
         g_worldScreenFader.draw();
 
-        if(ShowOnScreenMeta)
-        {
-            if(PrintFPS > 0)
-                SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+        if(PrintFPS > 0)
+            SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
 
-            g_stats.print();
+        g_stats.print();
 
-            speedRun_renderControls(1, -1);
-        }
+        speedRun_renderControls(1, -1);
+
 
         speedRun_renderTimer();
 

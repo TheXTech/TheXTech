@@ -571,11 +571,13 @@ void AbstractRender_t::drawBatteryStatus()
     {
         XRender::setTargetTexture();
 
+        XRender::offsetViewportIgnore(true);
         XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
         XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
         XRender::renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
         XRender::renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
         XRender::renderRect(bx + 4, by + 4, segments, 14, br, bg, bb, alhpaB / 2.f, true);//Level
+        XRender::offsetViewportIgnore(false);
 
         XRender::setTargetScreen();
     }
