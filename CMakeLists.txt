@@ -169,6 +169,7 @@ if(USE_STATIC_LIBC)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+include(lib/Allocator/pool-allocator.cmake)
 include(lib/DirManager/dirman.cmake)
 include(lib/FileMapper/FileMapper.cmake)
 include(lib/fmt/fmt.cmake)
@@ -263,6 +264,7 @@ set(LIB_SRC
     ${FMT_SRCS}
     ${STACK_WALKER_SRCS}
     ${MD5_SRCS}
+    ${POOLALLOC_SRCS}
     lib/CrashHandler/crash_handler.cpp
     lib/Graphics/graphics_funcs.cpp
     lib/Graphics/image_size.cpp
