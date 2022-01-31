@@ -921,6 +921,7 @@ void UpdateEditor()
 #endif
 
 #if 0 // Unused
+// TODO: port this back in
                 if(MouseRelease && !MagicHand) // World map music
                 {
                     for(int numWorldMusicMax = numWorldMusic, A = 1; A <= numWorldMusicMax; A++)
