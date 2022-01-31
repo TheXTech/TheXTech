@@ -1496,7 +1496,7 @@ void KillBlock(int A, bool Splode)
             {
                 for(int npc : Layer[C].NPCs)
                 {
-                    if(NPC[npc].Generator == false)
+                    if(!NPC[npc].Generator)
                     {
                         tempBool = true;
                         break;
