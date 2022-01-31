@@ -103,14 +103,15 @@ extern double vb6Round(double x, int decimals);
 
 
 // utilities for stringindex_t
+extern const std::string g_emptyString;
 extern std::vector<std::string> g_LevelString;
 extern size_t g_numWorldString;
 
-inline std::string GetS(stringindex_t index)
+inline const std::string& GetS(stringindex_t index)
 {
     if(index == STRINGINDEX_NONE)
     {
-        return "";
+        return g_emptyString;
     }
     return g_LevelString[index];
 }

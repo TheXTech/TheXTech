@@ -633,5 +633,6 @@ double vb6Round(double x, int decimals)
 
 
 // utilities for stringindex_t
+const std::string g_emptyString = "";
 std::vector<std::string> g_LevelString;
 size_t g_numWorldString;
