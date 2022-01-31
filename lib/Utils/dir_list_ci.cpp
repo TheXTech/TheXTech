@@ -106,7 +106,7 @@ std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
         // THIS BEHAVIOR IS EXPENSIVE AND WASTEFUL, AVOID INVOKING AT ALL COSTS!!!
         auto sdName = resolveDirCase(name.substr(0, subDir));
         DirListCI sd(m_curDir + "/" + sdName);
-        std::string found = sd.resolveFileCase(name.substr(subDir + 1));
+        std::string found = sd.resolveFileCaseExists(name.substr(subDir + 1));
         if(found.empty())
             return "";
         else
@@ -114,26 +114,25 @@ std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
     }
 
     // keep MixerX path arguments untouched
-    auto pathArgs = name.find('|');
-    if(pathArgs != std::string::npos)
+    bool hasArgs = true;
+    auto fnLen = name.find('|');
+    if(fnLen == std::string::npos)
     {
-        auto n = name.substr(0, pathArgs);
-        std::string uppercase_string;
-        uppercase_string.resize(n.length());
-        std::transform(n.begin(), n.end(), uppercase_string.begin(),
-            [](unsigned char c){ return std::toupper(c); });
-        auto found = m_fileMap.find(uppercase_string);
-        if(found != m_fileMap.end())
-            return found->second + name.substr(pathArgs);
+        fnLen = name.size();
+        hasArgs = false;
     }
-    else
+
+    std::string uppercase_string;
+    uppercase_string.resize(fnLen);
+    std::transform(name.begin(), name.begin() + fnLen, uppercase_string.begin(),
+        [](unsigned char c){ return std::toupper(c); });
+
+    auto found = m_fileMap.find(uppercase_string);
+    if(found != m_fileMap.end())
     {
-        std::string uppercase_string;
-        uppercase_string.resize(name.length());
-        std::transform(name.begin(), name.end(), uppercase_string.begin(),
-            [](unsigned char c){ return std::toupper(c); });
-        auto found = m_fileMap.find(uppercase_string);
-        if(found != m_fileMap.end())
+        if(hasArgs)
+            return found->second + name.substr(fnLen);
+        else
             return found->second;
     }
 
@@ -142,9 +141,6 @@ std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
 
 std::string DirListCI::resolveFileCase(const std::string &in_name)
 {
-#if 0
-    return in_name; // no need on Windows
-#else
     if(in_name.empty())
         return in_name;
 
@@ -156,14 +152,10 @@ std::string DirListCI::resolveFileCase(const std::string &in_name)
         replaceSlashes(found, in_name);
 
     return found;
-#endif
 }
 
 std::string DirListCI::resolveFileCaseAbs(const std::string &in_name)
 {
-#if 0
-    return m_curDir + "/" + in_name; // no need on Windows
-#else
     if(in_name.empty())
         return in_name;
 
@@ -175,7 +167,6 @@ std::string DirListCI::resolveFileCaseAbs(const std::string &in_name)
         replaceSlashes(found, in_name);
 
     return m_curDir + "/" + found;
-#endif
 }
 
 std::string DirListCI::resolveFileCaseExistsAbs(const std::string &in_name)
@@ -195,9 +186,6 @@ std::string DirListCI::resolveFileCaseExistsAbs(const std::string &in_name)
 
 std::string DirListCI::resolveDirCase(const std::string &name)
 {
-#if 0
-    return name; // no need on Windows
-#else
     if(name.empty())
         return name;
 
@@ -211,7 +199,6 @@ std::string DirListCI::resolveDirCase(const std::string &name)
         return name;
 
     return found->second;
-#endif
 }
 
 void DirListCI::rescan()
@@ -236,6 +223,7 @@ void DirListCI::rescan()
             [](unsigned char c){ return std::toupper(c); });
         m_fileMap.insert(std::make_pair(uppercase_string, file));
     }
+
     for(std::string& dir : dirList)
     {
         uppercase_string.resize(dir.length());

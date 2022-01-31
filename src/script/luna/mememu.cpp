@@ -1412,12 +1412,14 @@ public:
 
         NpcParent::setValue(obj, address, value, ftype);
 
-        if(address == 0x3C) // Layer, but setting it is not yet supported.
+#if 0 // Layer sync hook, but setting it is not yet supported.
+        if(address == 0x3C)
         {
             int index = obj - &NPC[0];
             if(index >= -128 && index <= maxNPCs)
                 syncLayers_NPC(index);
         }
+#endif
     }
 };
 
