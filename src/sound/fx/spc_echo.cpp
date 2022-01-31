@@ -27,15 +27,6 @@
 #include "spc_echo.h"
 #include "fx_common.hpp"
 
-//#define RESAMPLED_FIR
-//#define CUBE_INTERPOLATION
-
-
-//#define WAVE_DEEP_DEBUG
-#ifdef WAVE_DEEP_DEBUG // Dirty debug
-#define WAVE_PATH "/home/vitaly/Музыка/spc_echo_dump-"
-#include "wave_writer.h"
-#endif
 
 #define CLAMP16F( io )\
     {\
@@ -112,51 +103,10 @@ struct SpcEcho
     int8_t reg_evoll = 0;
     int8_t reg_evolr = 0;
 
-#ifdef RESAMPLED_FIR
-    //! FIR resampler
-    double fir_stream_rateratio = 0;
-    double fir_stream_samplecnt = 0;
-    float  fir_stream_old_samples[MAX_CHANNELS];
-    float  fir_stream_old_samples2[MAX_CHANNELS];
-    float  fir_stream_old_samples3[MAX_CHANNELS];
-    float  fir_stream_samples[MAX_CHANNELS];
-    double fir_stream_rateratio_back = 0;
-    double fir_stream_samplecnt_back = 0;
-    float  fir_stream_old_samples_back[MAX_CHANNELS];
-    float  fir_stream_old_samples_back2[MAX_CHANNELS];
-    float  fir_stream_old_samples_back3[MAX_CHANNELS];
-    float  fir_stream_samples_back[MAX_CHANNELS];
-    float  fir_stream_midbuffer_in[20][MAX_CHANNELS];
-    float  fir_stream_midbuffer_out[20][MAX_CHANNELS];
-    int    fir_buffer_size = 0;
-    int    fir_buffer_read = 0;
-#endif
-
-
-#ifdef WAVE_DEEP_DEBUG
-    void *debugIn;
-    void *debugInRes;
-    void *debugOutRes;
-    void *debugOut;
-#endif
-
-    inline double cubic(double y1, double y2, double y3, double y4, double x)
-    {
-        double p[] = {y1, y2, y3, y4};
-        double x2 = x * x;
-        double x3 = x2 * x;
-
-        return p[1] +
-              (-(0.5 * p[0]) + (0.5 * p[2])) * x +
-              (p[0] - (2.5 * p[1]) + (2.0 * p[2]) - (0.5 * p[3])) * x2 +
-              (-(0.5 * p[0]) + (1.5 * p[1]) - (1.5 * p[2]) + (0.5 * p[3])) * x3;
-    }
-
     //! FIR Defaults: 80 FF 9A FF 67 FF 0F FF
     const uint8_t reg_fir_initial[8] = {0x80, 0xFF, 0x9A, 0xFF, 0x67, 0xFF, 0x0F, 0xFF};
     //! $xf rw FFCx - Echo FIR Filter Coefficient (FFC) X
     int8_t reg_fir[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-#if !defined(RESAMPLED_FIR)
     int8_t reg_fir_resampled[8];
 
     void recomputeFirResampled()
@@ -169,14 +119,11 @@ struct SpcEcho
             reg_fir_resampled[i] = (int8_t)(reg_fir[i] * (1.0 + ((newFactor - 1.0) / 100.0)));
         }
     }
-#endif
 
     void setDefaultFir()
     {
         memcpy(reg_fir, reg_fir_initial, 8);
-#if !defined(RESAMPLED_FIR)
         recomputeFirResampled();
-#endif
     }
 
     void setDefaultRegs()
@@ -210,46 +157,15 @@ struct SpcEcho
         channels = i_channels;
         rate_factor = (double)i_rate / SDSP_RATE;
 
-#ifndef RESAMPLED_FIR
         if(rate_factor > 50.0)
             return -1; /* Too big scale factor */
-#endif
 
         if(i_rate < 4000)
             return -1; /* Too small sample rate */
 
-#ifdef RESAMPLED_FIR
-        fir_stream_rateratio = (double)SDSP_RATE / i_rate;
-        fir_stream_rateratio_back = (double)i_rate / SDSP_RATE;
-        fir_stream_samplecnt = 0;
-        fir_stream_samplecnt_back = 0;
-        memset(fir_stream_old_samples, 0, sizeof(fir_stream_old_samples));
-        memset(fir_stream_old_samples2, 0, sizeof(fir_stream_old_samples2));
-        memset(fir_stream_old_samples3, 0, sizeof(fir_stream_old_samples3));
-
-        memset(fir_stream_samples, 0, sizeof(fir_stream_samples));
-        memset(fir_stream_old_samples_back, 0, sizeof(fir_stream_old_samples_back));
-        memset(fir_stream_old_samples_back2, 0, sizeof(fir_stream_old_samples_back2));
-        memset(fir_stream_old_samples_back3, 0, sizeof(fir_stream_old_samples_back3));
-        memset(fir_stream_samples_back, 0, sizeof(fir_stream_samples_back));
-#endif
-
         memset(echo_ram, 0, sizeof(echo_ram));
         memset(echo_hist, 0, sizeof(echo_hist));
-#ifndef RESAMPLED_FIR
         memset(reg_fir_resampled, 0, sizeof(reg_fir_resampled));
-#endif
-
-#ifdef WAVE_DEEP_DEBUG
-        debugIn = ctx_wave_open(channels, rate, sizeof(int16_t), WAVE_FORMAT_PCM, 1, 0, WAVE_PATH "in.wav");
-        debugInRes = ctx_wave_open(channels, SDSP_RATE, sizeof(int16_t), WAVE_FORMAT_PCM, 1, 0, WAVE_PATH "in-res.wav");
-        debugOutRes = ctx_wave_open(channels, SDSP_RATE, sizeof(int16_t), WAVE_FORMAT_PCM, 1, 0, WAVE_PATH "out-res.wav");
-        debugOut = ctx_wave_open(channels, rate, sizeof(int16_t), WAVE_FORMAT_PCM, 1, 0, WAVE_PATH "out.wav");
-        ctx_wave_enable_stereo(debugIn);
-        ctx_wave_enable_stereo(debugInRes);
-        ctx_wave_enable_stereo(debugOutRes);
-        ctx_wave_enable_stereo(debugOut);
-#endif
 
         if(!initFormat(readSample, writeSample, sample_size, format))
             return -1;
@@ -261,223 +177,7 @@ struct SpcEcho
     }
 
     void close()
-    {
-#ifdef WAVE_DEEP_DEBUG
-        ctx_wave_close(debugIn);
-        ctx_wave_close(debugInRes);
-        ctx_wave_close(debugOutRes);
-        ctx_wave_close(debugOut);
-#endif
-    }
-
-#ifdef RESAMPLED_FIR
-    void sub_process_echo(float *out, float *echo_out)
-    {
-        float echo_in[MAX_CHANNELS];
-        float *echo_ptr;
-        int c, f, e_offset;
-        float v;
-        float (*echohist_pos)[MAX_CHANNELS];
-
-        e_offset = echo_offset;
-        echo_ptr = echo_ram + echo_offset;
-
-        if(!echo_offset)
-            echo_length = ((reg_edl & 0x0F) * 0x400 * channels) / 2;
-        e_offset += channels;
-        if(e_offset >= echo_length)
-            e_offset = 0;
-        echo_offset = e_offset;
-
-        /* FIR */
-        for(c = 0; c < channels; c++)
-            echo_in[c] = echo_ptr[c];
-
-        echohist_pos = echo_hist_pos;
-        if(++echohist_pos >= &echo_hist[ECHO_HIST_SIZE])
-            echohist_pos = echo_hist;
-        echo_hist_pos = echohist_pos;
-
-        /* --------------- FIR filter-------------- */
-        for(c = 0; c < channels; c++)
-            echohist_pos[0][c] = echohist_pos[8][c] = echo_in[c];
-
-        for(c = 0; c < channels; ++c)
-            echo_in[c] *= reg_fir[7];
-
-        for(f = 0; f <= 6; ++f)
-        {
-            for(c = 0; c < channels; ++c)
-                echo_in[c] += echohist_pos[f + 1][c] * reg_fir[f];
-        }
-        /* ---------------------------------------- */
-
-        /* Echo out */
-        if(!(reg_flg & 0x20))
-        {
-            for(c = 0; c < channels; c++)
-            {
-                // v = (echo_out[c] >> 7) + ((echo_in[c] * reg_efb) >> 14);
-                v = (echo_out[c] / 128) + ((echo_in[c] * reg_efb) / 16384.f);
-                CLAMP16F(v);
-                echo_ptr[c] = v;
-            }
-        }
-
-        // Do out
-        for(c = 0; c < channels; ++c)
-            out[c] = echo_in[c];
-    }
-
-    void pre_process_echo(float *echo_out)
-    {
-        int c, q = 0;
-
-        while(fir_stream_samplecnt >= fir_stream_rateratio)
-        {
-            if(q > 0)
-                return;
-            for(c = 0; c < channels; c++)
-            {
-                fir_stream_old_samples3[c] = fir_stream_old_samples2[c];
-                fir_stream_old_samples2[c] = fir_stream_old_samples[c];
-                fir_stream_old_samples[c] = fir_stream_samples[c];
-                fir_stream_samples[c] = echo_out[c];
-            }
-            fir_stream_samplecnt -= fir_stream_rateratio;
-            q++;
-        }
-
-        fir_buffer_size = 0;
-        while(fir_stream_samplecnt < fir_stream_rateratio)
-        {
-            for(c = 0; c < channels; c++)
-            {
-#ifdef CUBE_INTERPOLATION
-
-#define         X   (fir_stream_samplecnt)
-#define         D   ((double)fir_stream_samples[c])
-#define         C   ((double)fir_stream_old_samples[c])
-#define         B   ((double)fir_stream_old_samples2[c])
-#define         A   ((double)fir_stream_old_samples3[c])
-
-                fir_stream_midbuffer_in[fir_buffer_size][c] = cubic(A, B, C, D, X);
-
-#undef         X
-#undef         A
-#undef         B
-#undef         C
-#undef         D
-
-#else
-                fir_stream_midbuffer_in[fir_buffer_size][c] = (((double)fir_stream_old_samples[c] * (fir_stream_rateratio - fir_stream_samplecnt)
-                                                              + (double)fir_stream_samples[c] * fir_stream_samplecnt) / fir_stream_rateratio);
-#endif
-            }
-
-            sub_process_echo(fir_stream_midbuffer_out[fir_buffer_size], fir_stream_midbuffer_in[fir_buffer_size]);
-#ifdef WAVE_DEEP_DEBUG
-            {
-                int16_t outw[MAX_CHANNELS];
-                for(c = 0; c < channels; ++c)
-                    outw[c] = fir_stream_midbuffer_in[fir_buffer_size][c] / 128;
-                ctx_wave_write(debugInRes, (const uint8_t*)outw, channels * sizeof(int16_t));
-            }
-            {
-                int16_t outw[MAX_CHANNELS];
-                for(c = 0; c < channels; ++c)
-                    outw[c] = fir_stream_midbuffer_out[fir_buffer_size][c] / 128;
-                ctx_wave_write(debugOutRes, (const uint8_t*)outw, channels * sizeof(int16_t));
-            }
-#endif
-
-            fir_stream_samplecnt += 1.0;
-            fir_buffer_size++;
-        }
-    }
-
-    void process_echo(float *out, float *echo_out)
-    {
-        int c, f;
-
-#ifdef WAVE_DEEP_DEBUG
-        {
-            int16_t outw[MAX_CHANNELS];
-            for(c = 0; c < channels; ++c)
-                outw[c] = echo_out[c] / 128;
-            ctx_wave_write(debugIn, (const uint8_t*)outw, channels * sizeof(int16_t));
-        }
-#endif
-
-        // Process directly if no resampling needed
-        if(rate == SDSP_RATE)
-        {
-            sub_process_echo(out, echo_out);
-
-#ifdef WAVE_DEEP_DEBUG
-            {
-                int16_t outw[MAX_CHANNELS];
-                for(c = 0; c < channels; ++c)
-                    outw[c] = out[c] / 128;
-                ctx_wave_write(debugOut, (const uint8_t*)outw, channels * sizeof(int16_t));
-            }
-#endif
-            return;
-        }
-
-        pre_process_echo(echo_out);
-
-        f = 0;
-        while(fir_stream_samplecnt_back >= fir_stream_rateratio_back && fir_buffer_size > 0)
-        {
-            for(c = 0; c < channels; c++)
-            {
-                fir_stream_old_samples_back3[c] = fir_stream_old_samples_back2[c];
-                fir_stream_old_samples_back2[c] = fir_stream_old_samples_back[c];
-                fir_stream_old_samples_back[c] = fir_stream_samples_back[c];
-                fir_stream_samples_back[c] = fir_stream_midbuffer_out[f][c];
-            }
-            fir_stream_samplecnt_back -= fir_stream_rateratio_back;
-            f++;
-        }
-
-        for(c = 0; c < channels; c++)
-        {
-#ifdef CUBE_INTERPOLATION
-
-#define         X   (fir_stream_samplecnt_back)
-#define         D   ((double)fir_stream_samples_back[c])
-#define         C   ((double)fir_stream_old_samples_back[c])
-#define         B   ((double)fir_stream_old_samples_back2[c])
-#define         A   ((double)fir_stream_old_samples_back3[c])
-
-                out[c] = cubic(A, B, C, D, X);
-
-#undef         X
-#undef         A
-#undef         B
-#undef         C
-#undef         D
-
-#else
-            out[c] = (((double)fir_stream_old_samples_back[c] * (fir_stream_rateratio_back - fir_stream_samplecnt_back)
-                     + (double)fir_stream_samples_back[c] * fir_stream_samplecnt_back) / fir_stream_rateratio_back);
-#endif
-        }
-
-#ifdef WAVE_DEEP_DEBUG
-        {
-            int16_t outw[MAX_CHANNELS];
-            for(c = 0; c < channels; ++c)
-                outw[c] = out[c] / 128;
-            ctx_wave_write(debugOut, (const uint8_t*)outw, channels * sizeof(int16_t));
-        }
-#endif
-
-        if(fir_buffer_size > 0)
-            fir_stream_samplecnt_back += 1.0;
-    }
-#endif
+    {}
 
     void process(uint8_t *stream, int len)
     {
@@ -489,18 +189,15 @@ struct SpcEcho
 
         int c;
         float ov;
-#ifndef RESAMPLED_FIR
+
         int f, e_offset;
         float v;
-#endif
 
         float mvoll[2] = {(float)reg_mvoll, (float)reg_mvolr};
         float evoll[2] = {(float)reg_evoll, (float)reg_evolr};
 
-#ifndef RESAMPLED_FIR
         float (*echohist_pos)[MAX_CHANNELS];
         float *echo_ptr;
-#endif
 
         memset(main_out, 0, sizeof(main_out));
         memset(echo_out, 0, sizeof(echo_out));
@@ -520,9 +217,6 @@ struct SpcEcho
                     echo_out[c] = main_out[c];
             }
 
-#ifdef RESAMPLED_FIR
-            process_echo(echo_in, echo_out);
-#else
             e_offset = echo_offset;
             echo_ptr = echo_ram + echo_offset;
 
@@ -543,19 +237,6 @@ struct SpcEcho
             echo_hist_pos = echohist_pos;
 
             /* --------------- FIR filter-------------- */
-#if 0 // Original code
-            for(c = 0; c < channels; c++)
-                echohist_pos[0][c] = echohist_pos[8][c] = echo_in[c];
-
-            for(c = 0; c < channels; ++c)
-                echo_in[c] *= reg_fir[7];
-
-            for(f = 0; f <= 6; ++f)
-            {
-                for(c = 0; c < channels; ++c)
-                    echo_in[c] += echo_hist_pos[f + 1][c] * reg_fir[f];
-            }
-#else
             for(c = 0; c < channels; c++)
                 echohist_pos[0][c] = echohist_pos[8][c] = echo_in[c];
 
@@ -567,7 +248,6 @@ struct SpcEcho
                 for(c = 0; c < channels; ++c)
                     echo_in[c] += echo_hist_pos[f + 1][c] * reg_fir_resampled[f];
             }
-#endif
             /* ---------------------------------------- */
 
             /* Echo out */
@@ -581,7 +261,7 @@ struct SpcEcho
                     echo_ptr[c] = v;
                 }
             }
-#endif
+
             /* Sound out */
             for(c = 0; c < channels; c++)
             {
@@ -652,51 +332,35 @@ void echoEffectSetReg(SpcEcho *out, EchoSetup key, int val)
 
     case ECHO_FIR0:
         out->reg_fir[0]= (int8_t)val;
-#ifndef RESAMPLED_FIR
         out->recomputeFirResampled();
-#endif
         break;
     case ECHO_FIR1:
         out->reg_fir[1]= (int8_t)val;
-#ifndef RESAMPLED_FIR
         out->recomputeFirResampled();
-#endif
         break;
     case ECHO_FIR2:
         out->reg_fir[2]= (int8_t)val;
-#ifndef RESAMPLED_FIR
         out->recomputeFirResampled();
-#endif
         break;
     case ECHO_FIR3:
         out->reg_fir[3]= (int8_t)val;
-#ifndef RESAMPLED_FIR
         out->recomputeFirResampled();
-#endif
         break;
     case ECHO_FIR4:
         out->reg_fir[4]= (int8_t)val;
-#ifndef RESAMPLED_FIR
         out->recomputeFirResampled();
-#endif
         break;
     case ECHO_FIR5:
         out->reg_fir[5]= (int8_t)val;
-#ifndef RESAMPLED_FIR
         out->recomputeFirResampled();
-#endif
         break;
     case ECHO_FIR6:
         out->reg_fir[6]= (int8_t)val;
-#ifndef RESAMPLED_FIR
         out->recomputeFirResampled();
-#endif
         break;
     case ECHO_FIR7:
         out->reg_fir[7]= (int8_t)val;
-#ifndef RESAMPLED_FIR
         out->recomputeFirResampled();
-#endif
         break;
     }
 }
