@@ -36,6 +36,8 @@
 #include <Logger/logger.h>
 #include <PGE_File_Formats/file_formats.h>
 
+#include "global_dirs.h"
+
 void OpenWorld(std::string FilePath)
 {
     // USE PGE-FL here
@@ -46,7 +48,6 @@ void OpenWorld(std::string FilePath)
     int B = 0;
     long long zCounter = 0;
     WorldData wld;
-    DirListCI dirEpisode;
 
     ClearWorld();
 
@@ -58,10 +59,11 @@ void OpenWorld(std::string FilePath)
 //            break;
 //    }
 
-    dirEpisode.setCurDir(wld.meta.path);
+    g_dirEpisode.setCurDir(wld.meta.path);
     FileNameFull = Files::basename(FilePath);
-    FileName = dirEpisode.resolveDirCase(wld.meta.filename); //FilePath.substr(FilePath.length() - (FilePath.length() - A));
+    FileName = g_dirEpisode.resolveDirCase(wld.meta.filename); //FilePath.substr(FilePath.length() - (FilePath.length() - A));
     FileNamePath = wld.meta.path + "/"; //FilePath.substr(0, (A));
+    g_dirCustom.setCurDir(FileNamePath + FileName);
 
     // Preserve these values for quick restoring when going to the world map
     FileNameFullWorld = FileNameFull;
@@ -99,14 +101,16 @@ void OpenWorld(std::string FilePath)
         blockCharacter[5] = true;
     }
 
-    StartLevel = dirEpisode.resolveFileCase(wld.IntroLevel_file);
+    StartLevel = wld.IntroLevel_file;
+    addMissingLvlSuffix(StartLevel);
+    StartLevel = g_dirEpisode.resolveFileCase(StartLevel);
+
     NoMap = wld.HubStyledWorld;
     RestartLevel = wld.restartlevel;
     WorldStarsShowPolicy = wld.starsShowPolicy;
 
     MaxWorldStars = int(wld.stars);
 
-    addMissingLvlSuffix(StartLevel);
 
     for(int i = 1; i <= maxWorldCredits; i++)
         WorldCredits[i].clear();
@@ -235,7 +239,7 @@ void OpenWorld(std::string FilePath)
         ll.Location.X = l.x;
         ll.Location.Y = l.y;
         ll.Type = int(l.id);
-        ll.FileName = dirEpisode.resolveFileCase(l.lvlfile);
+        ll.FileName = g_dirEpisode.resolveFileCase(l.lvlfile);
         ll.LevelName = l.title;
         ll.LevelExit[1] = l.top_exit;
         ll.LevelExit[2] = l.left_exit;
@@ -279,7 +283,7 @@ void OpenWorld(std::string FilePath)
         box.Location.X = m.x;
         box.Location.Y = m.y;
         box.Type = int(m.id);
-        std::string music_file = dirEpisode.resolveFileCase(m.music_file);
+        std::string music_file = g_dirEpisode.resolveFileCase(m.music_file);
         if(!music_file.empty())
         {
             SetS(box.MusicFile, music_file); // adds to LevelString
@@ -415,14 +419,17 @@ void FindWldStars()
     for(int A = 1; A <= numWorldLevels; A++)
     {
         auto &l = WorldLevel[A];
+
         if(!l.FileName.empty())
         {
-            std::string lFile = FileNamePath + l.FileName;
+            std::string lFile = l.FileName;
             addMissingLvlSuffix(lFile);
 
-            if(Files::fileExists(lFile))
+            std::string fullPath = g_dirEpisode.resolveFileCaseExistsAbs(lFile);
+
+            if(!fullPath.empty())
             {
-                if(FileFormats::OpenLevelFileHeader(lFile, head))
+                if(FileFormats::OpenLevelFileHeader(fullPath, head))
                 {
                     l.maxStars = head.stars;
                     l.curStars = 0;

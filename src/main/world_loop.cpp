@@ -45,6 +45,8 @@
 
 #include "../pseudo_vb.h"
 
+#include "global_dirs.h"
+
 //! Holds the screen overlay for the world map
 ScreenFader g_worldScreenFader;
 
@@ -534,7 +536,8 @@ void WorldLoop()
                     if(!level.FileName.empty() && level.FileName != ".lvl" && level.FileName != ".lvlx")
                     {
                         addMissingLvlSuffix(level.FileName);
-                        if(Files::fileExists(SelectWorld[selWorld].WorldPath + level.FileName))
+                        std::string levelPath = g_dirEpisode.resolveFileCaseExistsAbs(level.FileName);
+                        if(!levelPath.empty())
                         {
                             // save which characters were present at level start
                             if(SwapCharAllowed())
@@ -557,7 +560,6 @@ void WorldLoop()
 
                             ClearLevel();
 
-                            std::string levelPath = SelectWorld[selWorld].WorldPath + level.FileName;
                             if(!OpenLevel(levelPath))
                             {
                                 delayedMusicStart(); // Allow music being started

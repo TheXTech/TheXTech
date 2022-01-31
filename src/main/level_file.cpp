@@ -42,6 +42,8 @@
 #include <Logger/logger.h>
 #include <PGE_File_Formats/file_formats.h>
 
+#include "global_dirs.h"
+
 
 void bgoApplyZMode(Background_t *bgo, int smbx64sp)
 {
@@ -79,7 +81,7 @@ void addMissingLvlSuffix(std::string &fileName)
         if(isAbsolute)
             lvlxExists = Files::fileExists(fileName + ".lvlx");
         else
-            lvlxExists = Files::fileExists(FileNamePath + fileName + ".lvlx");
+            lvlxExists = !g_dirEpisode.resolveFileCaseExists(fileName + ".lvlx").empty();
 
         if(lvlxExists)
             fileName += ".lvlx";
@@ -125,8 +127,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //    int mSections = 0;
 //    Location_t tempLocation;
 
-    DirListCI dirEpisode;
-
     qScreen = false;
     ClearLevel();
     BlockSound();
@@ -137,9 +137,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FileFormats::smbx64LevelSortBlocks(lvl);
     FileFormats::smbx64LevelSortBGOs(lvl);
 
-    dirEpisode.setCurDir(lvl.meta.path);
-    FileName = dirEpisode.resolveDirCase(lvl.meta.filename);
+    g_dirEpisode.setCurDir(lvl.meta.path);
+    FileName = g_dirEpisode.resolveDirCase(lvl.meta.filename);
     FileNamePath = lvl.meta.path + "/";
+    g_dirCustom.setCurDir(FileNamePath + FileName);
 
     bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     bool isSmbx64 = (lvl.meta.RecentFormat == LevelData::SMBX64);
@@ -208,7 +209,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(s.music_file.empty())
             CustomMusic[B] = "";
         else
-            CustomMusic[B] = dirEpisode.resolveFileCase(s.music_file);
+            CustomMusic[B] = g_dirEpisode.resolveFileCase(s.music_file);
         B++;
         if(B > maxSections)
             break;
@@ -672,35 +673,27 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.twoWay = w.two_way;
         warp.transitEffect = w.transition_effect;
 
-        std::string level_name;
-
         // Work around filenames with no extension suffix and case missmatch
-        if(!w.lname.empty() && !Strings::endsWith(w.lname, ".lvl") && !Strings::endsWith(w.lname, ".lvlx"))
+        if(!w.lname.empty())
         {
-            std::string lx = dirEpisode.resolveFileCase(w.lname + ".lvlx"),
-                        lo = dirEpisode.resolveFileCase(w.lname + ".lvl");
-            if(Files::fileExists(FileNamePath + lx))
-                level_name = lx;
-            else if(Files::fileExists(FileNamePath + lo))
-                level_name = lo;
+            std::string level_name;
+
+            if(!Strings::endsWith(w.lname, ".lvl") && !Strings::endsWith(w.lname, ".lvlx"))
+            {
+                std::string lx = g_dirEpisode.resolveFileCaseExists(w.lname + ".lvlx"),
+                            lo = g_dirEpisode.resolveFileCaseExists(w.lname + ".lvl");
+                if(!lx.empty())
+                    level_name = lx;
+                else if(!lo.empty())
+                    level_name = lo;
+                else
+                    level_name = g_dirEpisode.resolveFileCase(w.lname);
+            }
             else
-                level_name = dirEpisode.resolveFileCase(w.lname);
+                level_name = g_dirEpisode.resolveFileCase(w.lname);
 
-            // the above is quite inefficient but the below requires the improved dirman.
-            // std::string lx = dirEpisode.resolveFileCaseExists(w.lname + ".lvlx"),
-            //             lo = dirEpisode.resolveFileCaseExists(w.lname + ".lvl");
-            // if(!lx.empty())
-            //     level_name = lx;
-            // else if(!lo.empty())
-            //     level_name = lo;
-            // else
-            //     level_name = dirEpisode.resolveFileCase(w.lname);
-        }
-        else if(!w.lname.empty())
-            level_name = dirEpisode.resolveFileCase(w.lname);
-
-        if(!level_name.empty())
             SetS(warp.level, level_name);
+        }
 
         warp.LevelWarp = int(w.warpto);
         warp.LevelEnt = w.lvl_i;
@@ -1033,12 +1026,14 @@ void FindStars()
 
         if(warp.level != STRINGINDEX_NONE)
         {
-            std::string lFile = FileNamePath + GetS(warp.level);
+            std::string lFile = GetS(warp.level);
             addMissingLvlSuffix(lFile);
 
-            if(Files::fileExists(lFile))
+            std::string fullPath = g_dirEpisode.resolveFileCaseExistsAbs(lFile);
+
+            if(!fullPath.empty())
             {
-                if(FileFormats::OpenLevelFileHeader(lFile, head))
+                if(FileFormats::OpenLevelFileHeader(fullPath, head))
                 {
                     warp.maxStars = head.stars;
                     warp.curStars = 0;

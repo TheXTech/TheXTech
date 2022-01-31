@@ -299,6 +299,7 @@ set(THEXTECH_SRC
     src/npc.cpp
     src/sound.cpp
     src/frame_timer.cpp
+    src/global_dirs.cpp
     src/core/base/render_base.cpp
     src/core/base/window_base.cpp
     src/core/base/msgbox_base.cpp

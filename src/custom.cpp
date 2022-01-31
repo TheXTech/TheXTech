@@ -19,6 +19,8 @@
  */
 
 #include "globals.h"
+#include "global_dirs.h"
+
 #include "custom.h"
 
 #include <utility>
@@ -30,9 +32,6 @@
 #include <PGE_File_Formats/file_formats.h>
 #include <fmt_format_ne.h>
 
-
-static DirListCI s_dirEpisode;
-static DirListCI s_dirCustom;
 
 static struct PlayerBackup
 {
@@ -119,18 +118,20 @@ void SavePlayerDefaults()
 {
     pLogDebug("Saving Player defaults...");
 
-    const std::string GfxRoot = AppPath + "graphics/";
-    std::string playerPathG;
+    DirListCI PlayerDir;
+    std::string PlayerPathRes;
 
     // Load global customization configs first
     for(int C = 1; C <= numCharacters; ++C)
     {
+        PlayerDir.setCurDir(AppPath + "graphics/" + s_playerFileName[C]);
+
         for(int S = 1; S <= numStates; ++S)
         {
             // Global override of player setup
-            playerPathG = GfxRoot + fmt::format_ne("{1}/{1}-{0}.ini", S, s_playerFileName[C]);
-            if(Files::fileExists(playerPathG))
-                LoadCustomPlayer(C, S, playerPathG);
+            PlayerPathRes = PlayerDir.resolveFileCaseExistsAbs(fmt::format_ne("{0}-{1}.ini", s_playerFileName[C], S));
+            if(!PlayerPathRes.empty())
+                LoadCustomPlayer(C, S, PlayerPathRes);
         }
     }
 
@@ -181,8 +182,8 @@ void LoadPlayerDefaults()
 
 void SaveNPCDefaults()
 {
-    const std::string GfxRoot = AppPath + "graphics/";
-    std::string npcPathG;
+    DirListCI NPCDir = DirListCI(AppPath + "graphics/npc/");
+    std::string npcPathRes;
 
     NPCFrame.fill(0);
     NPCFrameSpeed.fill(8);
@@ -191,10 +192,10 @@ void SaveNPCDefaults()
     for(int A = 1; A <= maxNPCType; A++)
     {
         // Global override of NPC setup
-        npcPathG = GfxRoot + fmt::format_ne("npc/npc-{0}.txt", A);
+        npcPathRes = NPCDir.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}.txt", A));
 
-        if(Files::fileExists(npcPathG))
-            LoadCustomNPC(A, npcPathG);
+        if(!npcPathRes.empty())
+            LoadCustomNPC(A, npcPathRes);
 
         s_NPCDefaults.NPCFrameOffsetX[A] = NPCFrameOffsetX[A];
         s_NPCDefaults.NPCFrameOffsetY[A] = NPCFrameOffsetY[A];
@@ -294,21 +295,21 @@ void FindCustomPlayers()
     pLogDebug("Trying to load custom Player configs...");
 
     std::string playerPath, playerPathC;
-    s_dirEpisode.setCurDir(FileNamePath);
-    s_dirCustom.setCurDir(FileNamePath + FileName);
+    g_dirEpisode.setCurDir(FileNamePath);
+    g_dirCustom.setCurDir(FileNamePath + FileName);
 
     for(int C = 1; C <= numCharacters; ++C)
     {
         for(int S = 1; S <= numStates; ++S)
         {
             // Episode-wide custom player setup
-            playerPath = FileNamePath + s_dirEpisode.resolveFileCase(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
+            playerPath = g_dirEpisode.resolveFileCaseExistsAbs(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
             // Level-wide custom player setup
-            playerPathC = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
+            playerPathC = g_dirCustom.resolveFileCaseExistsAbs(fmt::format_ne("{1}-{0}.ini", S, s_playerFileName[C]));
 
-            if(Files::fileExists(playerPath))
+            if(!playerPath.empty())
                 LoadCustomPlayer(C, S, playerPath);
-            if(Files::fileExists(playerPathC))
+            if(!playerPathC.empty())
                 LoadCustomPlayer(C, S, playerPathC);
         }
     }
@@ -401,15 +402,15 @@ void FindCustomNPCs(/*std::string cFilePath*/)
 
     //const std::string GfxRoot = AppPath + "graphics/";
     std::string /*npcPathG,*/ npcPath, npcPathC;
-    DirMan searchDir(FileNamePath);
+    // DirMan searchDir(FileNamePath);
 //    std::set<std::string> existingFiles;
 //    std::vector<std::string> files;
 //    searchDir.getListOfFiles(files, {".txt"});
 //    for(auto &p : files)
 //        existingFiles.insert(FileNamePath + p);
 
-    s_dirEpisode.setCurDir(FileNamePath);
-    s_dirCustom.setCurDir(FileNamePath + FileName);
+    g_dirEpisode.setCurDir(FileNamePath);
+    g_dirCustom.setCurDir(FileNamePath + FileName);
 
 //    if(DirMan::exists(FileNamePath + FileName))
 //    {
@@ -422,13 +423,13 @@ void FindCustomNPCs(/*std::string cFilePath*/)
     for(int A = 1; A < maxNPCType; ++A)
     {
         // Episode-wide custom NPC setup
-        npcPath = FileNamePath + s_dirEpisode.resolveFileCase(fmt::format_ne("npc-{0}.txt", A));
+        npcPath = g_dirEpisode.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}.txt", A));
         // Level-wide custom NPC setup
-        npcPathC = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase(fmt::format_ne("npc-{0}.txt", A));
+        npcPathC = g_dirCustom.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}.txt", A));
 
-        if(Files::fileExists(npcPath))
+        if(!npcPath.empty())
             LoadCustomNPC(A, npcPath);
-        if(Files::fileExists(npcPathC))
+        if(!npcPathC.empty())
             LoadCustomNPC(A, npcPathC);
     }
 }

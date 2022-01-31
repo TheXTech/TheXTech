@@ -23,6 +23,7 @@
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include "globals.h"
+#include "global_dirs.h"
 #include "compat.h"
 #include "main/speedrunner.h"
 
@@ -259,23 +260,21 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
 
 void LoadCustomCompat()
 {
-    DirListCI s_dirEpisode;
-    DirListCI s_dirCustom;
     std::string episodeCompat, customCompat;
 
-    s_dirEpisode.setCurDir(FileNamePath);
-    s_dirCustom.setCurDir(FileNamePath + FileName);
+    g_dirEpisode.setCurDir(FileNamePath);
+    g_dirCustom.setCurDir(FileNamePath + FileName);
 
     // Episode-wide custom player setup
-    episodeCompat = FileNamePath + s_dirEpisode.resolveFileCase("compat.ini");
+    episodeCompat = g_dirEpisode.resolveFileCaseExistsAbs("compat.ini");
     // Level-wide custom player setup
-    customCompat = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase("compat.ini");
+    customCompat = g_dirCustom.resolveFileCaseExistsAbs("compat.ini");
 
     compatInit(g_compatibility);
 
-    if(Files::fileExists(episodeCompat))
+    if(!episodeCompat.empty())
         loadCompatIni(g_compatibility, episodeCompat);
-    if(Files::fileExists(customCompat))
+    if(!customCompat.empty())
         loadCompatIni(g_compatibility, customCompat);
 }
 
