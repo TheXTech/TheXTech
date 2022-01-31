@@ -23,6 +23,8 @@
 #define RENDEROP_H
 
 #include "lunarender.h"
+#include <SDL2/SDL_assert.h>
+
 
 static const double RENDEROP_PRIORITY_MIN = -100.0;
 static const double RENDEROP_PRIORITY_MAX = 10.0;
@@ -45,10 +47,23 @@ struct RenderOpColor
 class RenderOp
 {
 public:
-    RenderOp() : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(RENDEROP_DEFAULT_PRIORITY_RENDEROP) { }
-    explicit RenderOp(double priority) : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(priority) { }
+    RenderOp() : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(RENDEROP_DEFAULT_PRIORITY_RENDEROP) {}
+    explicit RenderOp(double priority) : m_FramesLeft(1), m_selectedCamera(0), m_renderPriority(priority) {}
     virtual ~RenderOp() = default;
     virtual void Draw(Renderer* /*renderer*/) {}
+
+    inline void* operator new(size_t size)
+    {
+        // Note: If you creating any chunks with a size bigger than current size, please increase it
+        SDL_assert_release(size < c_rAllocChunkSize);
+        auto *ret = g_rAlloc.Allocate(c_rAllocChunkSize);
+        return ret;
+    }
+
+    inline void operator delete(void* memory)
+    {
+        g_rAlloc.Free(memory);
+    }
 
     int m_FramesLeft;		// How many frames until this op should be destroyed
     int m_selectedCamera;
