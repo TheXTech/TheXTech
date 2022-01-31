@@ -50,14 +50,9 @@ class RenderEffectOp final : public RenderOp
 {
 public:
     RenderEffectOp();
-    RenderEffectOp(RENDER_EFFECT effect, BLEND_TYPE blend, COLORREF col, int intensity)
-    {
-        effect_type = effect;
-        blend_type = blend;
-        color = col;
-        this->intensity = intensity;
-        flip_type = FLIP_TYPE_NONE;
-    }
+    explicit RenderEffectOp(RENDER_EFFECT effect, BLEND_TYPE blend, COLORREF col, int intensity);
+
+    ~RenderEffectOp() override = default;
 
     void Draw(Renderer *renderer) override;
 
