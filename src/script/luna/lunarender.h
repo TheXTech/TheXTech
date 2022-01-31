@@ -34,8 +34,8 @@
 class RenderOp;
 class LunaImage;
 
-const size_t c_rAllocChunkSize = 104;
-const size_t c_rAllocTotalSize = 104 * 1000;
+constexpr size_t c_rAllocChunkSize = 96;
+constexpr size_t c_rAllocTotalSize = c_rAllocChunkSize * 1000;
 extern PoolAllocator g_rAlloc;
 
 struct Renderer

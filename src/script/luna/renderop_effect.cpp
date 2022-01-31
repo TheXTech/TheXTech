@@ -23,12 +23,25 @@
 #include "globals.h"
 
 // DRAW
-RenderEffectOp::RenderEffectOp() :
+RenderEffectOp::RenderEffectOp() : RenderOp(),
     effect_type(RNDEFF_ScreenGlow),
     blend_type(BLEND_Additive),
     color(0x00000000),
     intensity(0),
-    flip_type(FLIP_TYPE_NONE) {}
+    flip_type(FLIP_TYPE_NONE)
+{
+    static_assert(sizeof(RenderEffectOp) <= c_rAllocChunkSize,
+                  "Size of RenderBitmapOp class must be smaller than c_rAllocChunkSize");
+}
+
+RenderEffectOp::RenderEffectOp(RENDER_EFFECT effect, BLEND_TYPE blend, COLORREF col, int intensity)
+{
+    effect_type = effect;
+    blend_type = blend;
+    color = col;
+    this->intensity = intensity;
+    flip_type = FLIP_TYPE_NONE;
+}
 
 void RenderEffectOp::Draw(Renderer *g)
 {

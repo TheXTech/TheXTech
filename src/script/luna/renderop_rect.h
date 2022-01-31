@@ -26,11 +26,9 @@
 class RenderRectOp final : public RenderOp
 {
 public:
-    RenderRectOp() : x1(0), y1(0), x2(0), y2(0),
-        fillColor(0.0, 0.0, 0.0, 0.0),
-        borderColor(1.0f, 1.0f, 1.0f, 1.0f),
-        sceneCoords(false)
-    {};
+    RenderRectOp();
+
+    ~RenderRectOp() override = default;
 
     void Draw(Renderer *renderer) override;
 

@@ -21,7 +21,12 @@
 #include "renderop_string.h"
 #include "core/render.h"
 
-RenderStringOp::RenderStringOp() : RenderStringOp(std::string(), 1, 400.f, 400.f) {}
+RenderStringOp::RenderStringOp() :
+    RenderStringOp(std::string(), 1, 400.f, 400.f)
+{
+    static_assert(sizeof(RenderStringOp) <= c_rAllocChunkSize,
+                  "Size of RenderStringOp class must be smaller than c_rAllocChunkSize");
+}
 
 RenderStringOp::RenderStringOp(const std::string &str, int font_type, float X, float Y) :
     RenderOp(RENDEROP_DEFAULT_PRIORITY_TEXT),
