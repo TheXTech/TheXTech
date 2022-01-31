@@ -559,7 +559,11 @@ bool Player_Select(int p)
     {
         s_playerState[p] = PlayerState::StartGame;
         if(CheckDone())
+        {
+            PlaySound(SFX_Pause);
+            do_sentinel.active = false;
             return true;
+        }
         s_menuItem[p] = 0;
     }
     else if(s_playerState[p] == PlayerState::DropAddMain)
