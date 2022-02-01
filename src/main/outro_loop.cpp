@@ -229,7 +229,7 @@ void AddCredit(std::string newCredit)
         pLogWarning("Can't add more credits lines: max limit has been excited ({0} linex maximum)", maxCreditsLines);
         return;
     }
-    Credit[numCredits].Text = newCredit;
+    SetS(Credit[numCredits].Text, newCredit);
 }
 
 void SetupCredits()
@@ -399,7 +399,7 @@ void SetupCredits()
     for(A = 1; A <= numCredits; A++)
     {
         auto &cr = Credit[A];
-        cr.Location.Width = cr.Text.size() * 18;
+        cr.Location.Width = GetS(cr.Text).size() * 18;
         cr.Location.Height = 16;
         cr.Location.X = (double(ScreenW) / 2) - (cr.Location.Width / 2.0);
         cr.Location.Y = 32 * A;

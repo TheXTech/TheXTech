@@ -36,6 +36,7 @@
 #include "floats.h"
 
 #include "global_constants.h"
+#include "global_strings.h"
 
 //Option Explicit
 //Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
@@ -100,6 +101,7 @@ extern int vb6Round(double x);
  * @return rounded result
  */
 extern double vb6Round(double x, int decimals);
+
 
 //'Saved Events
 //Public numSavedEvents As Integer
@@ -242,7 +244,7 @@ struct OldEditorControls_t
 struct NPC_t
 {
 //    AttLayer As String
-    std::string AttLayer;
+    layerindex_t AttLayer = LAYER_NONE;
 //    Quicksand As Integer
     int Quicksand = 0;
 //    RespawnDelay As Integeri
@@ -278,15 +280,15 @@ struct NPC_t
 //    Shadow As Boolean 'if true turn the NPC black and allow it to pass through walls.  only used for a cheat code
     bool Shadow = false;
 //    TriggerActivate As String 'for events - triggers when NPC gets activated
-    std::string TriggerActivate;
+    eventindex_t TriggerActivate = EVENT_NONE;
 //    TriggerDeath As String 'triggers when NPC dies
-    std::string TriggerDeath;
+    eventindex_t TriggerDeath = EVENT_NONE;
 //    TriggerTalk As String 'triggers when you talk to the NPC
-    std::string TriggerTalk;
+    eventindex_t TriggerTalk = EVENT_NONE;
 //    TriggerLast As String 'trigger when this is the last NPC in a layer to die
-    std::string TriggerLast;
+    eventindex_t TriggerLast = EVENT_NONE;
 //    Layer As String 'the layer name that the NPC is in
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean 'if the layer is hidden or not
     bool Hidden = false;
 //    Legacy As Boolean 'Legacy Boss
@@ -300,7 +302,7 @@ struct NPC_t
 //    DefaultStuck As Boolean
     bool DefaultStuck = false;
 //    Text As String 'the text that is displayed when you talk to the NPC
-    std::string Text;
+    stringindex_t Text = STRINGINDEX_NONE;
 //    oldAddBelt As Single
     float oldAddBelt = 0.0f;
 //    PinchCount As Integer 'obsolete
@@ -671,7 +673,7 @@ struct Player_t
 struct Background_t
 {
 //    Layer As String
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
 //    Type As Integer
@@ -693,7 +695,7 @@ struct Background_t
 struct Water_t
 {
 //    Layer As String
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
 //    Buoy As Single 'not used
@@ -722,19 +724,20 @@ struct Block_t
     int DefaultSpecial2 = 0;
 //'for event triggers
 //    TriggerHit As String
-    std::string TriggerHit;
+    eventindex_t TriggerHit = EVENT_NONE;
 //    TriggerDeath As String
-    std::string TriggerDeath;
+    eventindex_t TriggerDeath = EVENT_NONE;
 //    TriggerLast As String
-    std::string TriggerLast;
+    eventindex_t TriggerLast = EVENT_NONE;
 //    Layer As String
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
 //    Type As Integer 'the block's type
     int Type = 0;
 //    Location As Location
     Location_t Location;
+    Location_t LocationInLayer;
 //    Special As Integer 'what is in the block?
     int Special = 0;
 //! EXTRA: second special
@@ -858,7 +861,7 @@ struct Warp_t
 //    NoYoshi As Boolean 'don't allow yoshi
     bool NoYoshi = false;
 //    Layer As String 'the name of the layer
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean 'if the layer is hidden
     bool Hidden = false;
 //    PlacedEnt As Boolean 'for the editor, flags the entranced as placed
@@ -874,7 +877,7 @@ struct Warp_t
 //    Effect As Integer 'style of warp. door/
     int Effect = 0;
 //    level As String 'filename of the level it should warp to
-    std::string level;
+    stringindex_t level = STRINGINDEX_NONE;
 //    LevelWarp As Integer
     int LevelWarp = 0;
 //    LevelEnt As Boolean 'this warp can't be used if set to true (this is for level entrances)
@@ -900,8 +903,8 @@ struct Warp_t
     bool cannonExit = false;
     bool stoodRequired = false; // Require player stood on the ground to enter this warp
     double cannonExitSpeed = 10.0;
-    std::string eventEnter;
-    std::string StarsMsg;
+    eventindex_t eventEnter = EVENT_NONE;
+    stringindex_t StarsMsg = STRINGINDEX_NONE;
     int transitEffect = 0;
 //End Type
 };
@@ -953,7 +956,7 @@ struct WorldMusic_t
 //    Type As Integer
     int Type = 0;
 //    EXTRA: Custom Music
-    std::string MusicFile;
+    stringindex_t MusicFile = STRINGINDEX_NONE;
 //End Type
     int64_t Z = 0;
     bool Active = true;
@@ -973,9 +976,11 @@ struct EditorCursor_t
 //    Location As Location
     Location_t Location;
 //    Layer As String 'current layer
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Mode As Integer
     int Mode = 0;
+//  New, used to represent warp entrance/exit and level settings submodes
+    int SubMode = 0;
 //    Block As Block
     Block_t Block;
 //    Water As Water
@@ -1037,7 +1042,7 @@ struct CreditLine_t
 //    Location As Location
     Location_t Location;
 //    Text As String
-    std::string Text;
+    stringindex_t Text = STRINGINDEX_NONE;
 //End Type
 };
 
@@ -1397,6 +1402,8 @@ extern RangeArr<double, 0, maxPlayers> qScreenX;
 extern RangeArr<double, 0, maxPlayers> qScreenY;
 //Public qScreen As Boolean 'Weather or not the screen needs adjusting
 extern bool qScreen;
+// NEW: allows screen position to change during qScreen
+extern RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
 //Public BlockWidth(0 To maxBlockType) As Integer 'Block type width
 extern RangeArrI<int, 0, maxBlockType, 0> BlockWidth;

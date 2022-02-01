@@ -23,6 +23,7 @@
 #include "collision.h"
 #include "rand.h"
 #include <Utils/files.h>
+#include "global_dirs.h"
 
 
 void InitIfMissing(std::map<std::string, double> *pMap, const std::string& sought_key, double init_val)
@@ -88,20 +89,20 @@ void RandomPointInRadius(double *ox, double *oy, double cx, double cy, int radiu
 
 std::string resolveIfNotAbsolutePath(const std::string &filename)
 {
-    if (Files::isAbsolute(filename)) {
+    if(Files::isAbsolute(filename)) {
         return filename;
     }
 
-    std::vector<std::string> paths =
+    std::vector<DirListCI *> dirs =
     {
-        FileNameFull + FileName,
-        FileNameFull
+        &g_dirCustom,
+        &g_dirEpisode
     };
 
-    for (const std::string &nextSearchPath : paths)
+    for(DirListCI *nextSearchDir : dirs)
     {
-        std::string nextEntry = nextSearchPath + filename;
-        if(!Files::fileExists(nextEntry))
+        std::string nextEntry = nextSearchDir->resolveFileCaseExistsAbs(filename);
+        if(nextEntry.empty())
             continue;
         return nextEntry;
     }

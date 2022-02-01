@@ -90,7 +90,7 @@ void DrawCredits()
             break; // Nothing also to draw
 
         // Printing lines of credits
-        SuperPrint(c.Text,
+        SuperPrint(GetS(c.Text),
                    g_gameInfo.creditsFont,
                    static_cast<float>(l.X),
                    y,

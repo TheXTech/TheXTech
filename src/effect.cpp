@@ -24,6 +24,7 @@
 #include "sound.h"
 #include "game_main.h"
 #include "collision.h"
+#include "layers.h"
 
 // Updates the effects
 void UpdateEffects()
@@ -63,6 +64,7 @@ void UpdateEffects()
                     nn.Active = true;
                     nn.TimeLeft = 100;
                     nn.Frame = 0;
+                    syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     PlaySound(SFX_BossBeat);
                 }
@@ -711,6 +713,7 @@ void UpdateEffects()
                         nn.Location.X += -nn.Location.Width / 2.0 + 16;
                         if(nn.Type == 34)
                             nn.Location.SpeedY = -6;
+                        syncLayers_NPC(numNPCs);
                         CheckSectionNPC(numNPCs);
                     }
                 }
@@ -756,6 +759,7 @@ void UpdateEffects()
                 nn.Type = e.NewNpc;
                 nn.Location.Height = NPCHeight[nn.Type];
                 nn.Location.Width = NPCWidth[nn.Type];
+                syncLayers_NPC(numNPCs);
                 CheckSectionNPC(numNPCs);
             }
             if(e.NewNpc == 98)

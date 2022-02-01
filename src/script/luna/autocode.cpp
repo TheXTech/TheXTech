@@ -31,6 +31,7 @@
 #include "sprite_funcs.h"
 #include "csprite.h"
 #include "globals.h"
+#include "global_dirs.h"
 #include "player.h"
 #include "graphics.h"
 #include "sound.h"
@@ -84,8 +85,8 @@ Autocode::Autocode(AutocodeType iType, double iTarget, double ip1, double ip2, d
     Param2 = ip2;
     Param3 = ip3;
     Length = iLength;
-    MyString = ip4;
-    MyRef = iVarRef;
+    SetS(MyString, ip4);
+    SetS(MyRef, iVarRef);
     m_OriginalTime = iLength;
     ftype = FT_INVALID;
     Activated = true;
@@ -111,8 +112,9 @@ Autocode &Autocode::operator=(const Autocode &o)
     Param2 = o.Param2;
     Param3 = o.Param3;
     Length = o.Length;
-    MyString = o.MyString;
-    MyRef = o.MyRef;
+    // de-duplicate strings, while re-using allocated string indices if possible
+    SetS(MyString, GetS(o.MyString));
+    SetS(MyRef, GetS(o.MyRef));
 
     m_OriginalTime = o.m_OriginalTime;
     ActiveSection = o.ActiveSection;
@@ -274,13 +276,13 @@ void Autocode::Do(bool init)
 
         // SHOW TEXT
         case AT_ShowText:
-            Renderer::Get().AddOp(new RenderStringOp(MyString, (int)Param3, (float)Param1, (float)Param2));
+            Renderer::Get().AddOp(new RenderStringOp(GetS(MyString), (int)Param3, (float)Param1, (float)Param2));
             break;
 
         // SHOW NPC LIFE LEFT
         case AT_ShowNPCLifeLeft:
         {
-            int base_health = SDL_atoi(MyString.data());
+            int base_health = SDL_atoi(GetS(MyString).data());
             NPC_t *npc = NpcF::GetFirstMatch((int)Target, (int)Param3 - 1);
             if(npc != nullptr)
             {
@@ -304,10 +306,10 @@ void Autocode::Do(bool init)
                 else
                 {
                     // Sound from level folder
-                    if(MyString.length() > 0)
+                    if(GetS(MyString).length() > 0)
                     {
                         //char* dbg = "CUSTOM SOUND PLAY DBG";
-                        std::string full_path = FileNamePath + FileName + "/" + MyString;
+                        std::string full_path = g_dirCustom.resolveFileCaseAbs(GetS(MyString));
                         PlayExtSound(full_path);
                     }
 
@@ -324,8 +326,8 @@ void Autocode::Do(bool init)
             {
                 if(Param1 >= 0.0 && Param1 <= 24)
                     bgMusic[sec] = (int)Param1;
-                if(MyString.length() >= 5)
-                    CustomMusic[sec] = MyString;
+                if(GetS(MyString).length() >= 5)
+                    CustomMusic[sec] = GetS(MyString);
             }
             break;
         }
@@ -450,8 +452,8 @@ void Autocode::Do(bool init)
         {
             LunaRect player_screen_rect = PlayerF::GetScreenPosition(demo);
             int depth = 0;
-            if(MyString.length() > 0)
-                depth = SDL_atoi(MyString.c_str());
+            if(GetS(MyString).length() > 0)
+                depth = SDL_atoi(GetS(MyString).c_str());
 
             double L_edge = 0 + depth;
             double U_edge = 0 + depth;
@@ -538,7 +540,7 @@ void Autocode::Do(bool init)
             if(ftype == FT_INVALID)
             {
                 ftype = FT_BYTE;
-                ftype = StrToFieldtype(MyString);
+                ftype = StrToFieldtype(GetS(MyString));
             }
 //            uint8_t *ptr = (uint8_t *)demo;
 //            ptr += (int)Target; // offset
@@ -553,7 +555,7 @@ void Autocode::Do(bool init)
             if(ftype == FT_INVALID)
             {
                 ftype = FT_BYTE;
-                ftype = StrToFieldtype(MyString);
+                ftype = StrToFieldtype(GetS(MyString));
             }
 
             bool triggered = CheckMem((size_t)Target, Param1, (COMPARETYPE)(int)Param2, ftype);
@@ -566,9 +568,9 @@ void Autocode::Do(bool init)
         case AT_SetVar:
         {
             if(ReferenceOK())
-                gAutoMan.VarOperation(MyRef, Param2, (OPTYPE)(int)Param1);
+                gAutoMan.VarOperation(GetS(MyRef), Param2, (OPTYPE)(int)Param1);
             else
-                gAutoMan.VarOperation(MyString, Param2, (OPTYPE)(int)Param1);
+                gAutoMan.VarOperation(GetS(MyString), Param2, (OPTYPE)(int)Param1);
             break;
         }
 
@@ -580,7 +582,7 @@ void Autocode::Do(bool init)
             if(ftype == FT_INVALID)
             {
                 ftype = FT_BYTE;
-                ftype = StrToFieldtype(MyString);
+                ftype = StrToFieldtype(GetS(MyString));
             }
 
             // Get the memory
@@ -589,7 +591,7 @@ void Autocode::Do(bool init)
             double gotval = GetMem(demo, (size_t)Param1, ftype);
 
             // Perform the load/add/sub/etc operation on the banked variable using the ref as the name
-            gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param2);
+            gAutoMan.VarOperation(GetS(MyRef), gotval, (OPTYPE)(int)Param2);
 
             break;
         }
@@ -601,14 +603,14 @@ void Autocode::Do(bool init)
             if(ftype == FT_INVALID)
             {
                 ftype = FT_BYTE;
-                ftype = StrToFieldtype(MyString);
+                ftype = StrToFieldtype(GetS(MyString));
             }
 
             NPC_t *pFound_npc = NpcF::GetFirstMatch((int)Target, (int)Param3);
             if(pFound_npc != nullptr)
             {
                 double gotval = GetMem(pFound_npc, (size_t)Param1, ftype);
-                gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param2);
+                gAutoMan.VarOperation(GetS(MyRef), gotval, (OPTYPE)(int)Param2);
             }
 
             break;
@@ -621,12 +623,12 @@ void Autocode::Do(bool init)
                 if(ftype == FT_INVALID)
                 {
                     ftype = FT_BYTE;
-                    ftype = StrToFieldtype(MyString);
+                    ftype = StrToFieldtype(GetS(MyString));
                 }
 
                 // byte *ptr = (byte *)(int)Target;
                 double gotval = GetMem((size_t)Target, ftype);
-                gAutoMan.VarOperation(MyRef, gotval, (OPTYPE)(int)Param1);
+                gAutoMan.VarOperation(GetS(MyRef), gotval, (OPTYPE)(int)Param1);
             }
             break;
         }
@@ -635,13 +637,13 @@ void Autocode::Do(bool init)
         {
             if(!ReferenceOK())
             {
-                InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);// Initalize var if not existing
+                InitIfMissing(&gAutoMan.m_UserVars, GetS(MyString), 0);// Initalize var if not existing
             }
             double varval;
             if(ReferenceOK())
-                varval = gAutoMan.m_UserVars[MyRef];
+                varval = gAutoMan.m_UserVars[GetS(MyRef)];
             else
-                varval = gAutoMan.m_UserVars[MyString];
+                varval = gAutoMan.m_UserVars[GetS(MyString)];
 
             // Check if the value meets the criteria and activate event if so
             switch((COMPARETYPE)(int)Param1)
@@ -675,11 +677,11 @@ void Autocode::Do(bool init)
                 auto compare_type = (COMPARETYPE)(int)Param1;
                 // if(true)
                 //{
-                InitIfMissing(&gAutoMan.m_UserVars, MyString, 0);
-                InitIfMissing(&gAutoMan.m_UserVars, MyRef, 0);
+                InitIfMissing(&gAutoMan.m_UserVars, GetS(MyString), 0);
+                InitIfMissing(&gAutoMan.m_UserVars, GetS(MyRef), 0);
 
-                double var1 = gAutoMan.m_UserVars[MyRef];
-                double var2 = gAutoMan.m_UserVars[MyString];
+                double var1 = gAutoMan.m_UserVars[GetS(MyRef)];
+                double var2 = gAutoMan.m_UserVars[GetS(MyString)];
 
                 switch(compare_type)
                 {
@@ -711,9 +713,9 @@ void Autocode::Do(bool init)
         {
             if(ReferenceOK())
             {
-                std::string str = fmt::format_ne("{0}", gAutoMan.GetVar(MyRef));
-                if(MyString.length() > 0)
-                    str = MyString + str;
+                std::string str = fmt::format_ne("{0}", gAutoMan.GetVar(GetS(MyRef)));
+                if(GetS(MyString).length() > 0)
+                    str = GetS(MyString) + str;
                 Renderer::Get().AddOp(new RenderStringOp(str, (int)Param3, (float)Param1, (float)Param2));
             }
             break;
@@ -721,8 +723,8 @@ void Autocode::Do(bool init)
 
         case AT_BankVar:
         {
-            if(MyString.length() > 0)
-                gSavedVarBank.SetVar(MyString, gAutoMan.GetVar(MyString));
+            if(GetS(MyString).length() > 0)
+                gSavedVarBank.SetVar(GetS(MyString), gAutoMan.GetVar(GetS(MyString)));
             break;
         }
 
@@ -744,7 +746,7 @@ void Autocode::Do(bool init)
         // DELETE COMMAND
         case AT_DeleteCommand:
         {
-            gAutoMan.DeleteEvent(MyString);
+            gAutoMan.DeleteEvent(GetS(MyString));
             break;
         }
 
@@ -754,7 +756,7 @@ void Autocode::Do(bool init)
             if(Target < 6 && Target > 0)
             {
                 Autocode *coderef = nullptr;
-                coderef = gAutoMan.GetEventByRef(MyString);
+                coderef = gAutoMan.GetEventByRef(GetS(MyString));
                 if(coderef)
                 {
                     switch((int)Target)
@@ -784,7 +786,7 @@ void Autocode::Do(bool init)
         case AT_ChangeTime:
         {
             Autocode *coderef = nullptr;
-            coderef = gAutoMan.GetEventByRef(MyString);
+            coderef = gAutoMan.GetEventByRef(GetS(MyString));
             if(coderef)
                 Autocode::modParam(coderef->Length, Param1, (OPTYPE)(int)Param2);
             break;
@@ -793,7 +795,7 @@ void Autocode::Do(bool init)
         // INPUT BUFFER STUFF
         case AT_OnCustomCheat:
         {
-            if(cheats_contains(MyString))
+            if(cheats_contains(GetS(MyString)))
             {
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 cheats_clearBuffer();
@@ -822,7 +824,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                LayerF::SetXSpeed(layer, (float)SDL_atof(MyString.c_str()));
+                LayerF::SetXSpeed(layer, (float)SDL_atof(GetS(MyString).c_str()));
                 if(Length == 1 && Param1 != 0.0)
                     LayerF::SetXSpeed(layer, 0.0001f);
             }
@@ -834,7 +836,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                LayerF::SetYSpeed(layer, (float)SDL_atof(MyString.c_str()));
+                LayerF::SetYSpeed(layer, (float)SDL_atof(GetS(MyString).c_str()));
                 if(Length == 1 && Param1 != 0.0)
                     LayerF::SetYSpeed(layer, 0.0001f);
             }
@@ -846,7 +848,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto accel = (float)SDL_atof(MyString.c_str());
+                auto accel = (float)SDL_atof(GetS(MyString).c_str());
                 if(std::abs(layer->SpeedX) + std::abs(accel) >= std::abs((float)Param1))
                     LayerF::SetXSpeed(layer, (float)Param1);
                 else
@@ -860,7 +862,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto accel = (float)SDL_atof(MyString.c_str());
+                auto accel = (float)SDL_atof(GetS(MyString).c_str());
                 if(std::abs(layer->SpeedY) + std::abs(accel) >= std::abs((float)Param1))
                     LayerF::SetYSpeed(layer, (float)Param1);
                 else
@@ -874,7 +876,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto deccel = (float)SDL_atof(MyString.c_str());
+                auto deccel = (float)SDL_atof(GetS(MyString).c_str());
                 deccel = std::abs(deccel);
                 if(layer->SpeedX > 0)
                 {
@@ -898,7 +900,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto deccel = (float)SDL_atof(MyString.c_str());
+                auto deccel = (float)SDL_atof(GetS(MyString).c_str());
                 deccel = std::abs(deccel);
                 if(layer->SpeedY > 0)
                 {
@@ -945,7 +947,7 @@ void Autocode::Do(bool init)
         case AT_PushScreenBoundary:
         {
             if(Target > 0 && Target < numSections && Param1 >= 0 && Param1 < 5)
-                LevelF::PushSectionBoundary((int)Target - 1, (int)Param1, SDL_atof(MyString.c_str()));
+                LevelF::PushSectionBoundary((int)Target - 1, (int)Param1, SDL_atof(GetS(MyString).c_str()));
             break;
         }
 
@@ -1003,13 +1005,13 @@ void Autocode::Do(bool init)
 
         case AT_TriggerSMBXEvent:
         {
-            ProcEvent(MyString, (int)Param1);
+            ProcEvent(FindEvent(GetS(MyString)), (int)Param1);
             break;
         }
 
         case AT_OnEvent:
         {
-            if(EventWasTriggered(MyString))
+            if(EventWasTriggered(FindEvent(GetS(MyString))))
             {
                 gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 if(Param2 != 0)
@@ -1022,7 +1024,7 @@ void Autocode::Do(bool init)
         {
             if(Length <= 1) // Cancel event after delay
             {
-                CancelNewEvent(MyString);
+                CancelNewEvent(FindEvent(GetS(MyString)));
                 expire();
             }
             break;
@@ -1053,13 +1055,13 @@ void Autocode::Do(bool init)
             if(ftype == FT_INVALID)
             {
                 ftype = FT_BYTE;
-                ftype = StrToFieldtype(MyString);
+                ftype = StrToFieldtype(GetS(MyString));
             }
 
             // Assign the mem
             if(ReferenceOK())   // Use referenced var as value
             {
-                double gotval = gAutoMan.GetVar(MyRef);
+                double gotval = gAutoMan.GetVar(GetS(MyRef));
                 NpcF::MemSet((int)Target, (size_t)Param1, gotval, (OPTYPE)(int)Param3, ftype);
             }
             else   // Use given value as value
@@ -1076,11 +1078,11 @@ void Autocode::Do(bool init)
             if(ftype == FT_INVALID)
             {
                 ftype = FT_BYTE;
-                ftype = StrToFieldtype(MyString);
+                ftype = StrToFieldtype(GetS(MyString));
             }
             if(ReferenceOK())
             {
-                double gotval = gAutoMan.GetVar(MyRef);
+                double gotval = gAutoMan.GetVar(GetS(MyRef));
                 PlayerF::MemSet((size_t)Param1, gotval, (OPTYPE)(int)Param3, ftype);
             }
             else
@@ -1097,11 +1099,11 @@ void Autocode::Do(bool init)
                 if(ftype == FT_INVALID)
                 {
                     ftype = FT_BYTE;
-                    ftype = StrToFieldtype(MyString);
+                    ftype = StrToFieldtype(GetS(MyString));
                 }
                 if(ReferenceOK())
                 {
-                    double gotval = gAutoMan.GetVar(MyRef);
+                    double gotval = gAutoMan.GetVar(GetS(MyRef));
                     MemAssign((size_t)Target, gotval, (OPTYPE)(int)Param2, ftype);
                 }
                 else
@@ -1135,7 +1137,7 @@ void Autocode::Do(bool init)
 
         case AT_DebugWindow:
         {
-            XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_INFORMATION, "LunaScript debug message", MyString);
+            XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_INFORMATION, "LunaScript debug message", GetS(MyString));
             expire();
             break;
         }
@@ -1151,7 +1153,7 @@ void Autocode::Do(bool init)
         {
             // Only allow loading image during init phase
             if(init)
-                Renderer::Get().LoadBitmapResource(MyString, (int)Target, (uint32_t)(int32_t)Param1);
+                Renderer::Get().LoadBitmapResource(GetS(MyString), (int)Target, (uint32_t)(int32_t)Param1);
             expire();
             break;
         }
@@ -1161,7 +1163,7 @@ void Autocode::Do(bool init)
             if(ReferenceOK())
             {
                 auto *blueprint = new CSprite();
-                gSpriteMan.AddBlueprint(MyRef.c_str(), blueprint);
+                gSpriteMan.AddBlueprint(GetS(MyRef).c_str(), blueprint);
             }
 
             expire();
@@ -1171,12 +1173,12 @@ void Autocode::Do(bool init)
         case AT_Attach:
         {
             //char* dbg = "!!! ATTACH DEBUG !!!";
-            if(ReferenceOK() && !MyString.empty())
+            if(ReferenceOK() && !GetS(MyString).empty())
             {
-                if(gSpriteMan.m_SpriteBlueprints.find(MyRef) != gSpriteMan.m_SpriteBlueprints.end()) // BLueprint exists
+                if(gSpriteMan.m_SpriteBlueprints.find(GetS(MyRef)) != gSpriteMan.m_SpriteBlueprints.end()) // BLueprint exists
                 {
-                    CSprite *pSpr = gSpriteMan.m_SpriteBlueprints[MyRef];                   // Get blueprint
-                    Autocode *pComponent = gAutoMan.GetEventByRef(MyString);                // Get autocode containing component
+                    CSprite *pSpr = gSpriteMan.m_SpriteBlueprints[GetS(MyRef)];                   // Get blueprint
+                    Autocode *pComponent = gAutoMan.GetEventByRef(GetS(MyString));                // Get autocode containing component
                     if(pComponent)
                     {
                         switch((BlueprintAttachType)(int)Target)
@@ -1213,7 +1215,7 @@ void Autocode::Do(bool init)
             req.x = (int)Param2;
             req.y = (int)Param3;
             req.time = pretick_len;
-            req.str = MyString;
+            req.str = GetS(MyString);
             gSpriteMan.InstantiateSprite(&req, false);
 
             expire();
@@ -1289,14 +1291,14 @@ bool Autocode::NPCConditional(int target, int cond)
 // RUN SELF OPTION
 void Autocode::RunSelfOption()
 {
-    if(this->MyString.find("once") != std::string::npos)
+    if(GetS(this->MyString).find("once") != std::string::npos)
         this->expire();
 }
 
 // REFERENCE OK
 bool Autocode::ReferenceOK() const
 {
-    return (!this->MyRef.empty());
+    return (!GetS(this->MyRef).empty());
 }
 
 
@@ -1574,7 +1576,7 @@ SpriteComponent Autocode::GenerateComponent(const Autocode &obj_to_convert)
     comp.data2 = obj_to_convert.Param1;
     comp.data3 = obj_to_convert.Param2;
     comp.data4 = obj_to_convert.Param3;
-    comp.data5 = obj_to_convert.MyString;
+    comp.data5 = GetS(obj_to_convert.MyString);
     comp.lookup_code = obj_to_convert.ActiveSection;
 
     comp.func = Autocode::GetSpriteFunc(obj_to_convert);

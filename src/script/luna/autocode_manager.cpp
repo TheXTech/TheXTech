@@ -27,13 +27,11 @@
 
 #include "autocode_manager.h"
 #include "globals.h"
+#include "global_dirs.h"
 #include "lunamisc.h"
 #include "lunaspriteman.h"
 
 #define PARSEDEBUG true
-
-static DirListCI s_dirEpisode;
-static DirListCI s_dirCustom;
 
 AutocodeManager gAutoMan;
 
@@ -77,18 +75,20 @@ bool AutocodeManager::LoadFiles()
     bool ret = false;
     std::string lunaLevel, lunaWorld;
 
-    s_dirEpisode.setCurDir(FileNamePath);
-    s_dirCustom.setCurDir(FileNamePath + FileName);
+    g_dirEpisode.setCurDir(FileNamePath);
+    g_dirCustom.setCurDir(FileNamePath + FileName);
 
     Clear(false);
 
     // Load autocode
-    lunaLevel = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase(AUTOCODE_FNAME);
-    ret |= ReadFile(lunaLevel);
+    lunaLevel = g_dirCustom.resolveFileCaseExistsAbs(AUTOCODE_FNAME);
+    if(!lunaLevel.empty())
+        ret |= ReadFile(lunaLevel);
 
     // Try to load world codes
-    lunaWorld = FileNamePath + s_dirEpisode.resolveFileCase(WORLDCODE_FNAME);
-    ret |= ReadWorld(lunaWorld);
+    lunaWorld = g_dirEpisode.resolveFileCaseExistsAbs(WORLDCODE_FNAME);
+    if(!lunaWorld.empty())
+        ret |= ReadWorld(lunaWorld);
 
     // Attempt to load global codes at the assets directory
     ret |= ReadGlobals(AppPathManager::assetsRoot() + GLOBALCODE_FNAME);
@@ -304,7 +304,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
             Autocode newcode(ac_type, target, param1, param2, param3, ac_str, length, cur_section, ref_str);
             if(!add_to_globals)
             {
-                if(newcode.m_Type < 10000 || !newcode.MyRef.empty())
+                if(newcode.m_Type < 10000 || newcode.MyRef != STRINGINDEX_NONE)
                 {
                     m_Autocodes.emplace_back(std::move(newcode));
                     addToIndex(&m_Autocodes.back());
@@ -326,22 +326,12 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
 
 std::string AutocodeManager::resolveWorldFileCase(const std::string &in_name)
 {
-    auto ret = s_dirEpisode.resolveFileCase(in_name);
-
-    if(ret.empty())
-        return std::string();
-
-    return FileNamePath + "/" + ret;
+    return g_dirEpisode.resolveFileCaseAbs(in_name);
 }
 
 std::string AutocodeManager::resolveCustomFileCase(const std::string &in_name)
 {
-    auto ret = s_dirCustom.resolveFileCase(in_name);
-
-    if(ret.empty())
-        return std::string();
-
-    return FileNamePath + FileName + "/" + ret;
+    return g_dirCustom.resolveFileCaseAbs(in_name);
 }
 
 // DO EVENTS
@@ -536,7 +526,7 @@ Autocode *AutocodeManager::FindMatching(int section, const std::string &soughtst
 
     for(auto *code : s->second)
     {
-        if(code->MyString == soughtstr)
+        if(GetS(code->MyString) == soughtstr)
             return code;
     }
 
@@ -587,8 +577,8 @@ bool AutocodeManager::VarOperation(const std::string &var_name, double value, OP
 void AutocodeManager::addToIndex(Autocode *code)
 {
     m_autocodeIdxSection[code->ActiveSection].push_back(code);
-    if(!code->MyRef.empty())
-        m_autocodeIdxRef[code->MyRef].push_back(code);
+    if(!GetS(code->MyRef).empty())
+        m_autocodeIdxRef[GetS(code->MyRef)].push_back(code);
 }
 
 void AutocodeManager::removeFromIndex(Autocode *code)
@@ -602,9 +592,9 @@ void AutocodeManager::removeFromIndex(Autocode *code)
             ++it;
     }
 
-    if(!code->MyRef.empty())
+    if(!GetS(code->MyRef).empty())
     {
-        auto &ref = m_autocodeIdxRef[code->MyRef];
+        auto &ref = m_autocodeIdxRef[GetS(code->MyRef)];
         for(auto it = ref.begin(); it != ref.end(); )
         {
             if(*it == code)
@@ -618,8 +608,8 @@ void AutocodeManager::removeFromIndex(Autocode *code)
 void AutocodeManager::addToIndexGlob(Autocode *code)
 {
     m_globcodeIdxSection[code->ActiveSection].push_back(code);
-    if(!code->MyRef.empty())
-        m_globcodeIdxRef[code->MyRef].push_back(code);
+    if(!GetS(code->MyRef).empty())
+        m_globcodeIdxRef[GetS(code->MyRef)].push_back(code);
 }
 
 void AutocodeManager::removeFromIndexGlob(Autocode *code)
@@ -633,9 +623,9 @@ void AutocodeManager::removeFromIndexGlob(Autocode *code)
             ++it;
     }
 
-    if(!code->MyRef.empty())
+    if(!GetS(code->MyRef).empty())
     {
-        auto &ref = m_globcodeIdxRef[code->MyRef];
+        auto &ref = m_globcodeIdxRef[GetS(code->MyRef)];
         for(auto it = ref.begin(); it != ref.end(); )
         {
             if(*it == code)

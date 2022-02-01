@@ -1930,6 +1930,7 @@ void UpdatePlayer()
                                     NPC[numNPCs].Location.SpeedX = 9 * Player[A].Direction + (Player[A].Location.SpeedX / 3);
                                 if(Player[A].StandingOnNPC != 0)
                                     NPC[numNPCs].Location.Y += -Player[A].Location.SpeedY;
+                                syncLayers_NPC(numNPCs);
                                 CheckSectionNPC(numNPCs);
                             }
                         }
@@ -2772,7 +2773,8 @@ void UpdatePlayer()
                                 Player[A].Location.SpeedX = Player[A].GrabSpeed;
                                 Player[A].GrabSpeed = 0;
                                 Block[B].Hidden = true;
-                                Block[B].Layer = "Destroyed Blocks";
+                                Block[B].Layer = LAYER_DESTROYED_BLOCKS;
+                                syncLayersTrees_Block(B);
                                 NewEffect(10, Block[B].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                                 Player[A].GrabTime = 0;
@@ -3320,7 +3322,7 @@ void UpdatePlayer()
                                     if(NPC[B].Inert) // if the npc is friendly then you can't touch it
                                     {
                                         HitSpot = 0;
-                                        if(NPC[B].Text != "" && Player[A].Controls.Up && !FreezeNPCs)
+                                        if(NPC[B].Text != STRINGINDEX_NONE && Player[A].Controls.Up && !FreezeNPCs)
                                             MessageNPC = B;
                                     }
                                     if(Player[A].Stoned && HitSpot != 1) // if you are a statue then SLAM into the npc
@@ -3376,6 +3378,7 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = 4;
                                                     NPC[numNPCs].Location.SpeedY = 10;
+                                                    syncLayers_NPC(numNPCs);
                                                     numNPCs++;
                                                     NPC[numNPCs] = NPC_t();
                                                     NPC[numNPCs].Active = true;
@@ -3389,6 +3392,7 @@ void UpdatePlayer()
                                                     NPC[numNPCs].Location.X = Player[A].Location.X + Player[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                                                     NPC[numNPCs].Location.SpeedX = -4;
                                                     NPC[numNPCs].Location.SpeedY = 10;
+                                                    syncLayers_NPC(numNPCs);
                                                 }
                                                 if(NPC[B].Killed == 0 && Player[A].SpinJump == 0)
                                                     PlaySound(SFX_Stomp);
@@ -4174,20 +4178,26 @@ void UpdatePlayer()
                     {
                         if(Player[A].GroundPound)
                         {
-                            numBlock += 1;
+                            numBlock++;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
+                            // seems weird but I'll sync it since we don't know what could happen inside YoshiPound
+                            syncLayersTrees_Block(numBlock);
                             YoshiPound(A, Player[A].Mount, true);
                             Block[numBlock].Location.Y = 0;
-                            numBlock -= 1;
+                            numBlock--;
+                            syncLayersTrees_Block(numBlock);
                             Player[A].GroundPound = false;
                         }
                         else if(Player[A].YoshiYellow)
                         {
-                            numBlock += 1;
+                            numBlock++;
                             Block[numBlock].Location.Y = NPC[B].Location.Y;
+                            // seems weird but I'll sync it since we don't know what could happen inside YoshiPound
+                            syncLayersTrees_Block(numBlock);
                             YoshiPound(A, Player[A].Mount);
                             Block[numBlock].Location.Y = 0;
-                            numBlock -= 1;
+                            numBlock--;
+                            syncLayersTrees_Block(numBlock);
                         }
                     }
                     if(NPC[B].playerTemp == 0)
@@ -4309,10 +4319,10 @@ void UpdatePlayer()
                 // Talk to NPC
                 if(MessageNPC > 0)
                 {
-                    MessageText = NPC[MessageNPC].Text;
+                    MessageText = GetS(NPC[MessageNPC].Text);
                     PauseGame(PauseCode::Message, A);
                     MessageText = "";
-                    if(NPC[MessageNPC].TriggerTalk != "")
+                    if(NPC[MessageNPC].TriggerTalk != EVENT_NONE)
                         ProcEvent(NPC[MessageNPC].TriggerTalk);
                     MessageNPC = 0;
                 }

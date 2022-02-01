@@ -1287,7 +1287,10 @@ public:
 
     void buildTable()
     {
-        insert(0x00000000, &NPC_t::AttLayer);
+        // Note: strings that became indices have been blocked out temporarily
+        // (mememu does not support setting strings yet)
+
+        // insert(0x00000000, &NPC_t::AttLayer);
         insert(0x00000004, &NPC_t::Quicksand);
         insert(0x00000006, &NPC_t::RespawnDelay);
         insert(0x00000008, &NPC_t::Bouce);
@@ -1305,18 +1308,18 @@ public:
         insert(0x00000024, &NPC_t::Multiplier);
         insert(0x00000026, &NPC_t::TailCD);
         insert(0x00000028, &NPC_t::Shadow);
-        insert(0x0000002c, &NPC_t::TriggerActivate);
-        insert(0x00000030, &NPC_t::TriggerDeath);
-        insert(0x00000034, &NPC_t::TriggerTalk);
-        insert(0x00000038, &NPC_t::TriggerLast);
-        insert(0x0000003c, &NPC_t::Layer);
+        // insert(0x0000002c, &NPC_t::TriggerActivate);
+        // insert(0x00000030, &NPC_t::TriggerDeath);
+        // insert(0x00000034, &NPC_t::TriggerTalk);
+        // insert(0x00000038, &NPC_t::TriggerLast);
+        // insert(0x0000003c, &NPC_t::Layer);
         insert(0x00000040, &NPC_t::Hidden);
         insert(0x00000042, &NPC_t::Legacy);
         insert(0x00000044, &NPC_t::Chat);
         insert(0x00000046, &NPC_t::Inert);
         insert(0x00000048, &NPC_t::Stuck);
         insert(0x0000004a, &NPC_t::DefaultStuck);
-        insert(0x0000004c, &NPC_t::Text);
+        // insert(0x0000004c, &NPC_t::Text);
         insert(0x00000050, &NPC_t::oldAddBelt);
         insert(0x00000054, &NPC_t::PinchCount);
         insert(0x00000056, &NPC_t::Pinched);
@@ -1390,6 +1393,7 @@ public:
         if(address >= 0x78 && address < 0xA8) // Location
         {
             s_locMem.setValue(&obj->Location, address - 0x78, value, ftype);
+            // sync trees for NPC eventually
             return;
         }
         else if(address >= 0xA8 && address < 0xD8) // DefaultLocation
@@ -1407,6 +1411,15 @@ public:
         }
 
         NpcParent::setValue(obj, address, value, ftype);
+
+#if 0 // Layer sync hook, but setting it is not yet supported.
+        if(address == 0x3C)
+        {
+            int index = obj - &NPC[0];
+            if(index >= -128 && index <= maxNPCs)
+                syncLayers_NPC(index);
+        }
+#endif
     }
 };
 

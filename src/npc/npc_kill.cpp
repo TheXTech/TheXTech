@@ -28,6 +28,7 @@
 #include "../main/speedrunner.h"
 #include "../compat.h"
 #include "../controls.h"
+#include "../layers.h"
 
 void KillNPC(int A, int B)
 {
@@ -162,26 +163,27 @@ void KillNPC(int A, int B)
         }
     }
 
-    if(!NPC[A].TriggerDeath.empty() && !LevelEditor)
+    if(NPC[A].TriggerDeath != EVENT_NONE && !LevelEditor)
     {
         ProcEvent(NPC[A].TriggerDeath);
     }
 
-    if(!NPC[A].TriggerLast.empty())
+    if(NPC[A].TriggerLast != EVENT_NONE)
     {
         tempBool = false;
-        for(C = 1; C <= numNPCs; C++)
-        {
-            if(C != A)
-            {
-                if(NPC[C].Layer == NPC[A].Layer && !NPC[C].Generator)
-                    tempBool = true;
-            }
-        }
 
-        for(C = 1; C <= numBlock; C++)
+        int C = NPC[A].Layer;
+        if(C != LAYER_NONE)
         {
-            if(NPC[A].Layer == Block[C].Layer)
+            for(int other_npc : Layer[C].NPCs)
+            {
+                if(other_npc != A && !NPC[other_npc].Generator)
+                {
+                    tempBool = true;
+                    break;
+                }
+            }
+            if(!Layer[C].blocks.empty())
                 tempBool = true;
         }
 
@@ -227,6 +229,7 @@ void KillNPC(int A, int B)
                 NPC[numNPCs].Special = 1;
                 NPC[numNPCs].Location.SpeedY = -5;
                 NPC[numNPCs].Location.SpeedX = (1 + dRand() * 0.5) * NPC[A].Direction;
+                syncLayers_NPC(numNPCs);
                 CheckSectionNPC(numNPCs);
             }
         }
@@ -1085,6 +1088,7 @@ void KillNPC(int A, int B)
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].TimeLeft = 100;
                     NPC[numNPCs].Frame = 0;
+                    syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     PlaySound(SFX_BirdoBeat);
                 }
@@ -1520,14 +1524,16 @@ void KillNPC(int A, int B)
     if(BattleMode)
         NPC[A].RespawnDelay = 65 * 30;
 
-    if(!NPC[A].AttLayer.empty())
+    if(NPC[A].AttLayer != LAYER_NONE)
     {
-        for(C = 1; C <= maxLayers; C++)
+        // for(C = 1; C <= maxLayers; C++)
         {
-            if(NPC[A].AttLayer == Layer[C].Name)
+            // if(NPC[A].AttLayer == Layer[C].Name)
             {
-                Layer[C].SpeedX = 0;
-                Layer[C].SpeedY = 0;
+                Layer[NPC[A].AttLayer].SpeedX = 0;
+                Layer[NPC[A].AttLayer].SpeedY = 0;
+
+                // @Wohlstand, do we want to add some code to keep the climbing on BGOs working?
             }
         }
     }
@@ -1554,6 +1560,8 @@ void KillNPC(int A, int B)
         NPC[A] = NPC[numNPCs];
         NPC[numNPCs] = blankNPC;
         numNPCs--;
+        syncLayers_NPC(A);
+        syncLayers_NPC(numNPCs + 1);
 
         if(NPC[A].HoldingPlayer > 0)
         {

@@ -87,9 +87,9 @@ void DrawMessage(const std::string& SuperText)
         int gfxMidH = GFX.TextBox.h - 20 - 20;
         int vertReps = rndMidH / gfxMidH + 1;
 
-        for (int i = 0; i < vertReps; i++)
+        for(int i = 0; i < vertReps; i++)
         {
-            if ((i+1) * gfxMidH <= rndMidH)
+            if((i+1) * gfxMidH <= rndMidH)
                 XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
                                       BoxY_Start + 20 + i*gfxMidH,
                                       TextBoxW, gfxMidH, GFX.TextBox, 0, 20);

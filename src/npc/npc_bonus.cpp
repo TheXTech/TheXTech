@@ -29,6 +29,7 @@
 #include "../core/events.h"
 #include "../compat.h"
 #include "../config.h"
+#include "../layers.h"
 
 #include "../controls.h"
 
@@ -107,6 +108,7 @@ void DropBonus(int A)
             NPC[numNPCs].Effect2 = 1;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
             Player[A].HeldBonus = 0;
             //            if(nPlay.Online == true)
@@ -130,8 +132,10 @@ void CheckAfterStarTake(bool many)
                 auto &b = Background[d];
                 if(b.Type == 160 && CheckCollision(w.Entrance, b.Location))
                 {
-                    b.Layer.clear();
+                    // this makes the background permanently disappear
+                    b.Layer = LAYER_NONE;
                     b.Hidden = true;
+                    syncLayers_BGO(d);
                 }
             }
         }

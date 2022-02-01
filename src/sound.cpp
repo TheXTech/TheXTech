@@ -22,6 +22,8 @@
 #include <SDL2/SDL_mixer_ext.h>
 
 #include "globals.h"
+#include "global_dirs.h"
+
 #include "load_gfx.h"
 #include "core/msgbox.h"
 #include "pge_delay.h"
@@ -41,6 +43,13 @@
 #include <fmt_format_ne.h>
 
 #include "pseudo_vb.h"
+
+enum class SoundScope
+{
+    global,
+    episode,
+    custom
+};
 
 // Public musicPlaying As Boolean
 bool musicPlaying = false;
@@ -222,7 +231,7 @@ void QuitMixerX()
     Mix_Quit();
 }
 
-static void AddMusic(const std::string &root,
+static void AddMusic(SoundScope root,
                      IniProcessing &ini,
                      const std::string &alias,
                      const std::string &group,
@@ -235,7 +244,12 @@ static void AddMusic(const std::string &root,
     if(!f.empty())
     {
         Music_t m;
-        m.path = root + f;
+        if(root == SoundScope::global)
+            m.path = MusicRoot + f;
+        else if(root == SoundScope::episode)
+            m.path = g_dirEpisode.resolveFileCaseAbs(f);
+        else if(root == SoundScope::custom)
+            m.path = g_dirCustom.resolveFileCaseAbs(f);
         ini.read("yoshi-mode-track", m.yoshiModeTrack, -1);
         m.volume = volume;
         pLogDebug("Adding music [%s] '%s'", alias.c_str(), m.path.c_str());
@@ -267,7 +281,7 @@ static void RestoreSfx(SFX_t &u)
     }
 }
 
-static void AddSfx(const std::string &root,
+static void AddSfx(SoundScope root,
                    IniProcessing &ini,
                    const std::string &alias,
                    const std::string &group,
@@ -288,7 +302,14 @@ static void AddSfx(const std::string &root,
             if(s != sound.end())
             {
                 auto &m = s->second;
-                std::string newPath = root + f;
+
+                std::string newPath;
+                if(root == SoundScope::global)
+                    newPath = SfxRoot + f;
+                else if(root == SoundScope::episode)
+                    newPath = g_dirEpisode.resolveFileCaseAbs(f);
+                else if(root == SoundScope::custom)
+                    newPath = g_dirCustom.resolveFileCaseAbs(f);
 
                 if(!isSilent && m.isCustom && newPath == m.customPath)
                 {
@@ -301,7 +322,7 @@ static void AddSfx(const std::string &root,
                 m.customPath = newPath;
 
                 if(!isSilent)
-                    m.chunk = Mix_LoadWAV((root + f).c_str());
+                    m.chunk = Mix_LoadWAV((newPath).c_str());
 
                 if(m.chunk || isSilent)
                 {
@@ -327,7 +348,14 @@ static void AddSfx(const std::string &root,
         else
         {
             SFX_t m;
-            m.path = root + f;
+
+            if(root == SoundScope::global)
+                m.path = SfxRoot + f;
+            else if(root == SoundScope::episode)
+                m.path = g_dirEpisode.resolveFileCaseAbs(f);
+            else if(root == SoundScope::custom)
+                m.path = g_dirCustom.resolveFileCaseAbs(f);
+
             m.isSilent = isSilent;
             pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
             if(!isSilent)
@@ -662,7 +690,7 @@ void PlayInitSound()
     }
 }
 
-static void loadMusicIni(const std::string &root, const std::string &path, bool isLoadingCustom)
+static void loadMusicIni(SoundScope root, const std::string &path, bool isLoadingCustom)
 {
     IniProcessing musicSetup(path);
     if(!isLoadingCustom)
@@ -762,7 +790,7 @@ static void readFx(IniProcessing &sounds, SectionEffect_t &s)
 }
 #endif // THEXTECH_ENABLE_AUDIO_FX
 
-static void loadCustomSfxIni(const std::string &root, const std::string &path)
+static void loadCustomSfxIni(SoundScope root, const std::string &path)
 {
     IniProcessing sounds(path);
     for(unsigned int i = 1; i <= g_totalSounds; ++i)
@@ -860,7 +888,7 @@ void InitSound()
                      "File sounds.ini is not exist, game will work without SFX.");
     }
 
-    loadMusicIni(MusicRoot, musicIni, false);
+    loadMusicIni(SoundScope::global, musicIni, false);
 
     UpdateLoad();
     IniProcessing sounds(sfxIni);
@@ -886,7 +914,7 @@ void InitSound()
     {
         std::string alias = fmt::format_ne("sound{0}", i);
         std::string group = fmt::format_ne("sound-{0}", i);
-        AddSfx(SfxRoot, sounds, alias, group);
+        AddSfx(SoundScope::global, sounds, alias, group);
     }
     UpdateLoad();
     Mix_ReserveChannels(g_reservedChannels);
@@ -1023,15 +1051,10 @@ void LoadCustomSound()
     if(GameMenu)
         return; // Don't load custom music in menu mode
 
-    std::string mIni = FileNamePath + "music.ini";
-    std::string sIni = FileNamePath + "sounds.ini";
-    std::string mIniC = FileNamePath + FileName + "/music.ini";
-    std::string sIniC = FileNamePath + FileName + "/sounds.ini";
-
     // To avoid bugs like custom local sounds was transferred into another level, it's need to clean-up old one if that was
     if(g_customMusicInDataFolder)
     {
-        loadMusicIni(MusicRoot, musicIni, true);
+        loadMusicIni(SoundScope::global, musicIni, true);
         g_customMusicInDataFolder = false;
     }
 
@@ -1044,21 +1067,25 @@ void LoadCustomSound()
     if(FileNamePath == AppPath)
         return; // Don't treat default music/sounds ini as custom
 
-    if(Files::fileExists(mIni)) // Load music.ini from an episode folder
-        loadMusicIni(FileNamePath, mIni, true);
+    std::string mIni = g_dirEpisode.resolveFileCaseExistsAbs("music.ini");
+    if(!mIni.empty()) // Load music.ini from an episode folder
+        loadMusicIni(SoundScope::episode, mIni, true);
 
-    if(Files::fileExists(mIniC)) // Load music.ini from a level/world custom folder
+    std::string mIniC = g_dirCustom.resolveFileCaseExistsAbs("music.ini");
+    if(!mIniC.empty()) // Load music.ini from a level/world custom folder
     {
-        loadMusicIni(FileNamePath + FileName + "/", mIniC, true);
+        loadMusicIni(SoundScope::custom, mIniC, true);
         g_customMusicInDataFolder = true;
     }
 
-    if(Files::fileExists(sIni)) // Load sounds.ini from an episode folder
-        loadCustomSfxIni(FileNamePath, sIni);
+    std::string sIni = g_dirEpisode.resolveFileCaseExistsAbs("sound.ini");
+    if(!sIni.empty()) // Load sounds.ini from an episode folder
+        loadCustomSfxIni(SoundScope::episode, sIni);
 
-    if(Files::fileExists(sIniC)) // Load sounds.ini from a level/world custom folder
+    std::string sIniC = g_dirCustom.resolveFileCaseExistsAbs("sound.ini");
+    if(!sIniC.empty()) // Load sounds.ini from a level/world custom folder
     {
-        loadCustomSfxIni(FileNamePath + FileName + "/", sIniC);
+        loadCustomSfxIni(SoundScope::custom, sIniC);
         g_customSoundsInDataFolder = true;
     }
 }
@@ -1067,7 +1094,7 @@ void UnloadCustomSound()
 {
     if(noSound)
         return;
-    loadMusicIni(MusicRoot, musicIni, true);
+    loadMusicIni(SoundScope::global, musicIni, true);
     restoreDefaultSfx();
     g_customMusicInDataFolder = false;
     g_customSoundsInDataFolder = false;

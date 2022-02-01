@@ -32,6 +32,7 @@
 #include "../config.h"
 #include "../main/trees.h"
 #include "../npc_id.h"
+#include "../layers.h"
 
 #include <Utils/maths.h>
 
@@ -329,7 +330,7 @@ void UpdateNPCs()
                             }
                             else if(NPC[A].GeneratorEffect == 2) // projectile
                             {
-                                NPC[numNPCs].Layer = "Spawned NPCs";
+                                NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                                 PlaySound(SFX_Bullet);
                                 NPC[numNPCs].Projectile = true;
                                 if(NPC[numNPCs].Type == 17) // Normal Bullet Bills
@@ -377,10 +378,11 @@ void UpdateNPCs()
                             NPC[numNPCs].TriggerLast = NPC[A].TriggerLast;
                             NPC[numNPCs].TriggerTalk = NPC[A].TriggerTalk;
                             CheckSectionNPC(numNPCs);
-                            if(NPC[numNPCs].TriggerActivate != "")
+                            if(NPC[numNPCs].TriggerActivate != EVENT_NONE)
                                 ProcEvent(NPC[numNPCs].TriggerActivate);
                             if(NPC[numNPCs].Type == 287)
                                 NPC[numNPCs].Type = RandomBonus();
+                            syncLayers_NPC(numNPCs);
                         }
                     }
                 }
@@ -418,7 +420,7 @@ void UpdateNPCs()
                NPC[A].Type != 57 && NPC[A].Type != 46 &&
                NPC[A].Type != 212 && !NPCIsACoin[NPC[A].Type]) // And .Type <> 47
             {
-                if(!NPC[A].TriggerActivate.empty())
+                if(NPC[A].TriggerActivate != EVENT_NONE)
                     ProcEvent(NPC[A].TriggerActivate);
 
                 tempLocation = NPC[A].Location;
@@ -442,7 +444,7 @@ void UpdateNPCs()
                             NPC[B].Section = NPC[A].Section;
                             if(B < A)
                             {
-                                if(!NPC[B].TriggerActivate.empty())
+                                if(NPC[B].TriggerActivate != EVENT_NONE)
                                     ProcEvent(NPC[B].TriggerActivate);
                             }
                         }
@@ -485,7 +487,7 @@ void UpdateNPCs()
                                     NPC[B].Section = NPC[newAct[C]].Section;
                                     if(B < A)
                                     {
-                                        if(!NPC[B].TriggerActivate.empty())
+                                        if(NPC[B].TriggerActivate != EVENT_NONE)
                                             ProcEvent(NPC[B].TriggerActivate);
                                     }
 
@@ -580,7 +582,7 @@ void UpdateNPCs()
                     NPC[A].Type == 69 || NPC[A].Type == 70
                 )
                 {
-                    numBlock += 1;
+                    numBlock++;
                     Block[numBlock] = blankBlock;
                     Block[numBlock].Type = 0;
                     Block[numBlock].Location = NPC[A].Location;
@@ -601,6 +603,7 @@ void UpdateNPCs()
                     }
                     Block[numBlock].Location.SpeedX += NPC[A].BeltSpeed;
                     Block[numBlock].IsNPC = NPC[A].Type;
+                    // not syncing the block layer here because we'll sync all of them together later
                     numTempBlock++;
                     NPC[A].tempBlock = numBlock;
                 }
@@ -611,7 +614,7 @@ void UpdateNPCs()
     {
         if(Player[A].Mount == 2)
         {
-            numBlock += 1;
+            numBlock++;
             Block[numBlock] = blankBlock;
             Block[numBlock].Type = 25;
             Block[numBlock].Location = Player[A].Location;
@@ -619,9 +622,16 @@ void UpdateNPCs()
             Block[numBlock].Location.Y = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Y))) + 1;
             Block[numBlock].Location.Width = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Width))) + 1;
             Block[numBlock].IsPlayer = A;
-            numTempBlock += 1;
+            // not syncing the block layer here because we'll sync all of them together later
+            numTempBlock++;
         }
     }
+    // don't need to sync yet since its layer is LAYER_NONE,
+    //   but will want to sync once we use the quadtree
+    // for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
+    // {
+    //     syncLayersTrees_Block(A);
+    // }
     if(numTempBlock > 1)
         qSortBlocksX(numBlock + 1 - numTempBlock, numBlock);
     for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
@@ -894,7 +904,7 @@ void UpdateNPCs()
                 NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
             }
 
-            if(!NPC[A].Text.empty())
+            if(NPC[A].Text != STRINGINDEX_NONE)
             {
                 NPC[A].Chat = false;
                 tempLocation = NPC[A].Location;
@@ -2180,8 +2190,9 @@ void UpdateNPCs()
                                                                     Block[B].Type = 109;
                                                                 else
                                                                 {
-                                                                    Block[B].Layer = "Destroyed Blocks";
+                                                                    Block[B].Layer = LAYER_DESTROYED_BLOCKS;
                                                                     Block[B].Hidden = true;
+                                                                    syncLayersTrees_Block(B);
                                                                     numNPCs++;
                                                                     NPC[numNPCs] = NPC_t();
                                                                     NPC[numNPCs].Location.Width = 28;
@@ -2193,6 +2204,7 @@ void UpdateNPCs()
                                                                     NPC[numNPCs].DefaultType = NPC[numNPCs].Type;
                                                                     NPC[numNPCs].DefaultLocation = NPC[numNPCs].Location;
                                                                     NPC[numNPCs].TimeLeft = 100;
+                                                                    syncLayers_NPC(numNPCs);
                                                                     CheckSectionNPC(numNPCs);
                                                                 }
                                                             }
@@ -4478,6 +4490,7 @@ void UpdateNPCs()
                                     NPC[numNPCs].Location.SpeedY = 1;
                                 else if(NPC[numNPCs].Location.SpeedY < -1)
                                     NPC[numNPCs].Location.SpeedY = -1;
+                                syncLayers_NPC(numNPCs);
                                 PlaySound(SFX_BigFireball);
                             }
                         }
@@ -4517,6 +4530,7 @@ void UpdateNPCs()
                         NPC[numNPCs].TimeLeft = 50;
                         NPC[numNPCs].Location.SpeedY = -8;
                         NPC[numNPCs].Location.SpeedX = 3 * Player[NPC[A].HoldingPlayer].Direction + Player[NPC[A].HoldingPlayer].Location.SpeedX * 0.8;
+                        syncLayers_NPC(numNPCs);
                     }
                 }
                 else if(NPC[A].Type == 21 || NPC[A].Type == 22) // Bullet Bill Shooter
@@ -4640,7 +4654,7 @@ void UpdateNPCs()
                                 else if(NPC[A].Type == 22)
                                 {
                                     tempBool = true;
-                                    numNPCs -= 1;
+                                    numNPCs--;
                                 }
                                 if(!tempBool)
                                 {
@@ -4663,6 +4677,7 @@ void UpdateNPCs()
                                     else
                                         NPC[numNPCs].Frame = 0;
                                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - NPC[numNPCs].Location.Height / 2.0;
+                                    syncLayers_NPC(numNPCs);
 
                                     tempLocation = NPC[numNPCs].Location;
                                     tempLocation.X = NPC[numNPCs].Location.X + (NPC[numNPCs].Location.Width / 2.0) * NPC[numNPCs].Direction;
@@ -4748,6 +4763,7 @@ void UpdateNPCs()
                         else
                             NPC[numNPCs].Location.X = NPC[A].Location.X - NPC[numNPCs].Location.Width;
                         NPC[numNPCs].Location.Y = NPC[A].Location.Y;
+                        syncLayers_NPC(numNPCs);
                     }
 #endif
 
@@ -5081,7 +5097,8 @@ void UpdateNPCs()
                 NPCFrames(A);
 
                 if(NPC[A].Effect == 0 && NPC[A].Type != 91)
-                    NPC[A].Layer = "Spawned NPCs";
+                    NPC[A].Layer = LAYER_SPAWNED_NPCS;
+                syncLayers_NPC(A);
 
             }
             else if(NPC[A].Effect == 5) // Grabbed by Yoshi
@@ -5123,13 +5140,14 @@ void UpdateNPCs()
             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * double(speedVar);
         }
 
-        if(NPC[A].AttLayer != "" && NPC[A].HoldingPlayer == 0)
+        if(NPC[A].AttLayer != LAYER_NONE && NPC[A].HoldingPlayer == 0)
         {
-            for(B = 1; B <= maxLayers; B++)
+            int B = NPC[A].AttLayer;
+            // for(B = 1; B <= maxLayers; B++)
             {
-                if(Layer[B].Name != "")
+                // if(Layer[B].Name != "")
                 {
-                    if(Layer[B].Name == NPC[A].AttLayer)
+                    // if(Layer[B].Name == NPC[A].AttLayer)
                     {
                         if(NPC[A].Location.X - lyrX == 0.0 && NPC[A].Location.Y - lyrY == 0.0)
                         {
@@ -5139,18 +5157,19 @@ void UpdateNPCs()
                                 Layer[B].SpeedX = 0;
                                 Layer[B].SpeedY = 0;
 
-                                for(int C = 1; C <= numBlock; C++)
+                                for(int C : Layer[B].blocks)
+                                // for(int C = 1; C <= numBlock; C++)
                                 {
-                                    if(Block[C].Layer == Layer[B].Name)
+                                    // if(Block[C].Layer == Layer[B].Name)
                                     {
                                         Block[C].Location.SpeedX = double(Layer[B].SpeedX);
                                         Block[C].Location.SpeedY = double(Layer[B].SpeedY);
                                     }
                                 }
 
-                                for(int C = 1; C <= numNPCs; C++)
+                                for(int C : Layer[B].NPCs)
                                 {
-                                    if(NPC[C].Layer == Layer[B].Name)
+                                    // if(NPC[C].Layer == Layer[B].Name)
                                     {
                                         if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
                                         {
@@ -5159,6 +5178,8 @@ void UpdateNPCs()
                                         }
                                     }
                                 }
+
+                                // @Wohlstand, should we add something here for the BGO fence fix?
                             }
                         }
                         else
@@ -5169,14 +5190,19 @@ void UpdateNPCs()
                         }
                     }
                 }
-                else
-                    break;
+                // else
+                //     break;
             }
         }
 
     }
 
-    numBlock += -numTempBlock; // clean up the temp npc blocks
+    numBlock -= numTempBlock; // clean up the temp npc blocks
+    // again, don't need this until the block quadtree
+    // for(int i = numBlock + 1; i <= numBlock + numTempBlock; i++)
+    // {
+    //     syncLayersTrees_Block(i);
+    // }
     for(A = numNPCs; A >= 1; A--) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
     {
         if(NPC[A].Killed > 0)

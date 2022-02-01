@@ -145,7 +145,7 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
         }
 
     }
-    else if (Font == 3)
+    else if(Font == 3)
     {
 //        Do While Len(Words) > 0
         for(int i = 0; i < SuperN; i++)

@@ -38,7 +38,7 @@ extern bool enableAutoAlign;
 
 struct OptCursor_t
 {
-    enum Level {
+    enum Modes {
         LVL_SELECT = 13,
         LVL_ERASER0 = 0,
         LVL_ERASER = 6,
@@ -47,12 +47,21 @@ struct OptCursor_t
         LVL_NPCS = 4,
         LVL_SETTINGS = 2,
         LVL_WARPS = 5,
-        LVL_WATER = 15
+        LVL_WATER = 15,
+        WLD_PATHS = 10,
+        WLD_MUSIC = 11,
+        WLD_SCENES = 8,
+        WLD_LEVELS = 9,
+        WLD_TILES = 7,
     };
     int current = LVL_SELECT;
 };
 
 extern OptCursor_t optCursor;
+
+// NEW: set / reset the scrolls when changing sections
+void ResetSectionScrolls();
+void SetSection(int i);
 
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode
