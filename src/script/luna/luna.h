@@ -35,8 +35,13 @@ extern SMBXHUDSettings gSMBXHUDSettings;
 
 extern bool gLunaEnabledGlobally;
 extern bool gLunaEnabled;
+//! Show demos counter when it works
 extern bool gShowDemoCounter;
+//! Enable Demos counter globally by gameinfo
 extern bool gEnableDemoCounter;
+//! Enable Demos counter locally by LunaControl command
+extern bool gEnableDemoCounterByLC;
+//! Title shown at demos counter
 extern std::string gDemoCounterTitle;
 
 extern void lunaReset();

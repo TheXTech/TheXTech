@@ -62,6 +62,8 @@ void lunaReset()
     gLastRunPress = 0;
     gRunTapped = 0;
 
+    gEnableDemoCounterByLC = false;
+
     Renderer::Get().ClearAllDebugMessages();
     Renderer::Get().ClearAllLoadedImages();
     Renderer::Get().ClearQueue();
@@ -102,7 +104,7 @@ void lunaLoad()
 
 void lunaLoop()
 {
-    bool dcAllow = (gEnableDemoCounter || g_compatibility.demos_counter_enable);
+    bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_compatibility.demos_counter_enable);
 
     if(gLunaEnabledGlobally)
     {
@@ -141,7 +143,7 @@ void lunaLoop()
 
 void lunaRenderHud()
 {
-    bool dcAllow = (gEnableDemoCounter || g_compatibility.demos_counter_enable);
+    bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_compatibility.demos_counter_enable);
     if(dcAllow && gShowDemoCounter)
         gDeathCounter.Draw();
 }

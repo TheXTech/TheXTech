@@ -26,6 +26,7 @@ bool gLunaEnabledGlobally = true;
 bool gLunaEnabled = true;
 bool gShowDemoCounter = true;
 bool gEnableDemoCounter = true;
+bool gEnableDemoCounterByLC = false;
 std::string gDemoCounterTitle = "DEMOS";
 
 

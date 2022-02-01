@@ -49,6 +49,7 @@
 #include "lunaspriteman.h"
 #include "lunainput.h"
 #include "lunavarbank.h"
+#include "lunacounter.h"
 #include "renderop_string.h"
 #include "mememu.h"
 
@@ -1361,6 +1362,16 @@ void Autocode::LunaControl(LunaControlAct act, int val)
     {
     case LCA_DemoCounter:
         gShowDemoCounter = (val == 1);
+
+        if(gShowDemoCounter && !gEnableDemoCounter && !gEnableDemoCounterByLC) // Initialize the demos counter if wasn't enabled before
+        {
+            if(!GameMenu && !GameOutro && !BattleMode && !LevelEditor && !TestLevel)
+            {
+                gEnableDemoCounterByLC = true;
+                gDeathCounter.init();
+                gDeathCounter.Recount();
+            }
+        }
         break;
 
     case LCA_SMBXHUD:
