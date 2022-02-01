@@ -559,7 +559,11 @@ bool Player_Select(int p)
     {
         s_playerState[p] = PlayerState::StartGame;
         if(CheckDone())
+        {
+            PlaySound(SFX_Pause);
+            do_sentinel.active = false;
             return true;
+        }
         s_menuItem[p] = 0;
     }
     else if(s_playerState[p] == PlayerState::DropAddMain)
@@ -633,6 +637,11 @@ bool Player_Select(int p)
                 Player_Back(p);
                 do_sentinel.active = false;
             }
+            else if(s_savedProfile[p] == profiles[s_menuItem[p]])
+            {
+                Player_Back(p);
+                do_sentinel.active = false;
+            }
             else if(Controls::SetInputMethodProfile(p, profiles[s_menuItem[p]]))
             {
                 s_playerState[p] = PlayerState::ConfirmProfile;
@@ -643,7 +652,6 @@ bool Player_Select(int p)
                 PlaySoundMenu(SFX_BlockHit);
                 do_sentinel.active = false;
             }
-
         }
     }
 
