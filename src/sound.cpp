@@ -27,8 +27,11 @@
 #include "pge_delay.h"
 
 #include "sound.h"
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
 #include "sound/fx/reverb.h"
 #include "sound/fx/spc_echo.h"
+#endif
 
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
@@ -87,6 +90,7 @@ static std::string SfxRoot;
 static std::string musicIni; // = "music.ini";
 static std::string sfxIni; // = "sounds.ini";
 
+#ifdef THEXTECH_ENABLE_AUDIO_FX
 struct SectionEffect_t
 {
     enum FX
@@ -102,6 +106,7 @@ struct SectionEffect_t
 
 static SectionEffect_t s_sectionEffect[maxSections + 1];
 static std::unordered_map<std::string, SectionEffect_t> s_effectsList;
+#endif
 
 struct Music_t
 {
@@ -709,6 +714,7 @@ static void loadMusicIni(const std::string &root, const std::string &path, bool 
     }
 }
 
+#ifdef THEXTECH_ENABLE_AUDIO_FX
 static void readFx(IniProcessing &sounds, SectionEffect_t &s)
 {
     const IniProcessing::StrEnumMap fxType =
@@ -754,6 +760,7 @@ static void readFx(IniProcessing &sounds, SectionEffect_t &s)
         break;
     }
 }
+#endif // THEXTECH_ENABLE_AUDIO_FX
 
 static void loadCustomSfxIni(const std::string &root, const std::string &path)
 {
@@ -765,6 +772,7 @@ static void loadCustomSfxIni(const std::string &root, const std::string &path)
         AddSfx(root, sounds, alias, group, true);
     }
 
+#ifdef THEXTECH_ENABLE_AUDIO_FX
     auto ch = sounds.childGroups();
     for(const auto &g : ch)
     {
@@ -794,6 +802,7 @@ static void loadCustomSfxIni(const std::string &root, const std::string &path)
             readFx(sounds, s);
         sounds.endGroup();
     }
+#endif // THEXTECH_ENABLE_AUDIO_FX
 }
 
 static void restoreDefaultSfx()
@@ -804,6 +813,7 @@ static void restoreDefaultSfx()
         RestoreSfx(u);
     }
 
+#ifdef THEXTECH_ENABLE_AUDIO_FX
     s_effectsList.clear();
 
     for(int i = 0; i <= maxSections; ++i)
@@ -812,8 +822,8 @@ static void restoreDefaultSfx()
         s_sectionEffect[i].rev = SoundFXReverb();
         s_sectionEffect[i].echo = SoundFXEchoSetup();
     }
-
     SoundFX_Clear();
+#endif
 }
 
 void InitSound()
@@ -905,7 +915,8 @@ static void s_resetSoundDelay(int A)
         SoundPause[A] = 4;
     else
         SoundPause[A] = i->second;
-#if 0
+
+#if 0 // Very old code, replaced with a more flexible thing at above
     switch(A)
     {
     case 2: SoundPause[A] = 12; break;
@@ -1102,6 +1113,8 @@ void PlayExtSound(const std::string &path)
 }
 
 
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+
 static bool     enableEffectEcho = false;
 static SpcEcho *effectEcho = nullptr;
 
@@ -1235,8 +1248,13 @@ void SoundFX_Clear()
     }
 }
 
+#endif // THEXTECH_ENABLE_AUDIO_FX
+
 void UpdateSoundFX(int recentSection)
 {
+#ifndef THEXTECH_ENABLE_AUDIO_FX
+    UNUSED(recentSection);
+#else
     if(noSound || LevelSelect)
         return;
 
@@ -1257,5 +1275,6 @@ void UpdateSoundFX(int recentSection)
         SoundFX_SetReverb(s.rev);
         break;
     }
+#endif // THEXTECH_ENABLE_AUDIO_FX
 }
 

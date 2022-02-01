@@ -203,6 +203,7 @@ void UnloadCustomSound();
 
 void PlayExtSound(const std::string &path);
 
+#ifdef THEXTECH_ENABLE_AUDIO_FX
 struct SoundFXEchoSetup
 {
     int echoOn = 0;
@@ -231,6 +232,7 @@ struct SoundFXReverb
 void SoundFX_SetReverb(const SoundFXReverb &setup);
 
 void SoundFX_Clear();
+#endif // THEXTECH_ENABLE_AUDIO_FX
 
 void UpdateSoundFX(int recentSection);
 

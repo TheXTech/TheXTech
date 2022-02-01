@@ -120,6 +120,8 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
+option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
+
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
 # ============ Customization ==============
@@ -330,8 +332,6 @@ set(THEXTECH_SRC
     src/main/outro_loop.cpp
     src/main/trees.cpp
     src/main/QuadTree/LooseQuadtree-impl.cpp
-    src/sound/fx/spc_echo.cpp
-    src/sound/fx/reverb.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
@@ -411,6 +411,14 @@ if(THEXTECH_ENABLE_LUNA_AUTOCODE)
         src/script/luna/levels/SAJewers-Snowboardin.cpp
         src/script/luna/levels/Talkhaus-Science_Final_Battle.cpp
         src/script/luna/levels/KilArmoryCode.cpp
+    )
+endif()
+
+if(THEXTECH_ENABLE_AUDIO_FX)
+    add_definitions(-DTHEXTECH_ENABLE_AUDIO_FX)
+    list(APPEND THEXTECH_SRC
+        src/sound/fx/spc_echo.cpp
+        src/sound/fx/reverb.cpp
     )
 endif()
 
