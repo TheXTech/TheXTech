@@ -120,6 +120,8 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
+option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
+
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
 # ============ Customization ==============
@@ -412,6 +414,14 @@ if(THEXTECH_ENABLE_LUNA_AUTOCODE)
     )
 endif()
 
+if(THEXTECH_ENABLE_AUDIO_FX)
+    add_definitions(-DTHEXTECH_ENABLE_AUDIO_FX)
+    list(APPEND THEXTECH_SRC
+        src/sound/fx/spc_echo.cpp
+        src/sound/fx/reverb.cpp
+    )
+endif()
+
 add_definitions(-DCORE_EVERYTHING_SDL)
 list(APPEND THEXTECH_SRC
     src/core/sdl/render_sdl.cpp
@@ -438,6 +448,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/sdl/*.h
     src/main/*.h
     src/main/QuadTree/*.h
+    src/sound/fx/*.h
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 

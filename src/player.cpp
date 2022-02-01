@@ -1099,13 +1099,17 @@ void CheckSection(const int A)
                         {
                             ClearBuffer = true;
                             p.Section = B;
-//                            if(nPlay.Online)
-//                            {
-//                                if(nPlay.MySlot == A - 1)
-//                                    Netplay::sendData "1e" + std::to_string(A) + "|" + p.Section;
-//                                else
-//                                    return;
-//                            }
+
+                            //if(nPlay.Online)
+                            //{
+                            //    if(nPlay.MySlot == A - 1)
+                            //        Netplay::sendData "1e" + std::to_string(A) + "|" + p.Section;
+                            //    else
+                            //        return;
+                            //}
+
+                            UpdateSoundFX(B);
+
                             if(curMusic >= 0 && !GameMenu) // Dont interupt boss / switch music
                             {
                                 if(curMusic != bgMusic[B])
@@ -1144,16 +1148,20 @@ void CheckSection(const int A)
                         if(p.Location.Y <= LevelREAL[B].Height)
                         {
                             p.Section = B;
-//                            if(nPlay.Online)
-//                            {
-//                                if(nPlay.MySlot == A - 1)
-//                                    Netplay::sendData "1e" + std::to_string(A) + "|" + p.Section;
-//                                else
-//                                    return;
-//                            }
+
+                            //if(nPlay.Online)
+                            //{
+                            //    if(nPlay.MySlot == A - 1)
+                            //        Netplay::sendData "1e" + std::to_string(A) + "|" + p.Section;
+                            //    else
+                            //        return;
+                            //}
+
                             if(oldSection != B)
                             {
                                 ClearBuffer = true;
+                                UpdateSoundFX(B);
+
                                 if(curMusic != 6 && curMusic >= 0 && curMusic != 15) // Dont interupt boss / switch music
                                 {
                                     if(curMusic != bgMusic[B])
@@ -1169,6 +1177,7 @@ void CheckSection(const int A)
                                     }
                                 }
                             }
+
                             for(C = 1; C <= numPlayers; C++)
                             {
                                 if(Player[C].Section == p.Section && C != A)

@@ -28,6 +28,11 @@
 
 #include "sound.h"
 
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+#include "sound/fx/reverb.h"
+#include "sound/fx/spc_echo.h"
+#endif
+
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
@@ -47,6 +52,7 @@ std::string musicName;
 int playerHammerSFX = SFX_Fireball;
 
 AudioSetup_t g_audioSetup;
+static AudioSetup_t s_audioSetupObtained;
 
 static Mix_Music *g_curMusic = nullptr;
 static bool g_mixerLoaded = false;
@@ -83,6 +89,24 @@ static std::string SfxRoot;
 
 static std::string musicIni; // = "music.ini";
 static std::string sfxIni; // = "sounds.ini";
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+struct SectionEffect_t
+{
+    enum FX
+    {
+        FX_None = 0,
+        FX_Echo,
+        FX_Reverb
+    };
+    SoundFXReverb rev;
+    SoundFXEchoSetup echo;
+    int fx = FX_None;
+};
+
+static SectionEffect_t s_sectionEffect[maxSections + 1];
+static std::unordered_map<std::string, SectionEffect_t> s_effectsList;
+#endif
 
 struct Music_t
 {
@@ -158,6 +182,16 @@ void InitMixerX()
         pLogCritical(msg.c_str());
         XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "Sound opening error", msg);
         noSound = true;
+    }
+
+    ret = Mix_QuerySpec(&s_audioSetupObtained.sampleRate,
+                        &s_audioSetupObtained.format,
+                        &s_audioSetupObtained.channels);
+
+    if(ret == 0)
+    {
+        pLogCritical("Failed to call the Mix_QuerySpec!");
+        s_audioSetupObtained = g_audioSetup;
     }
 
     Mix_VolumeMusic(MIX_MAX_VOLUME);
@@ -680,6 +714,54 @@ static void loadMusicIni(const std::string &root, const std::string &path, bool 
     }
 }
 
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+static void readFx(IniProcessing &sounds, SectionEffect_t &s)
+{
+    const IniProcessing::StrEnumMap fxType =
+    {
+        {"none", SectionEffect_t::FX_None},
+        {"reverb", SectionEffect_t::FX_Reverb},
+        {"echo", SectionEffect_t::FX_Echo}
+    };
+
+    sounds.readEnum("fx", s.fx, (int)SectionEffect_t::FX_None, fxType);
+
+    switch(s.fx)
+    {
+    case SectionEffect_t::FX_Reverb:
+        sounds.read("mode", s.rev.mode, 0.0f);
+        sounds.read("room-size", s.rev.roomSize, 0.7f);
+        sounds.read("damping", s.rev.damping, 0.5f);
+        sounds.read("wet-level", s.rev.wetLevel, 0.2f);
+        sounds.read("dry-level", s.rev.dryLevel, 0.4f);
+        sounds.read("width", s.rev.width, 1.0f);
+        break;
+
+    case SectionEffect_t::FX_Echo:
+        sounds.read("echo-on", s.echo.echoOn, 1);
+        sounds.read("delay", s.echo.echoDelay, 6);
+        sounds.read("feedback", s.echo.echoFeedBack, 30);
+        sounds.read("main-volume-left", s.echo.echoMainVolL, 127);
+        sounds.read("main-volume-right", s.echo.echoMainVolR, 127);
+        sounds.read("echo-volume-left", s.echo.echoVolL, 28);
+        sounds.read("echo-volume-right", s.echo.echoVolR, 28);
+        sounds.read("fir-0", s.echo.echoFir[0], 99);
+        sounds.read("fir-1", s.echo.echoFir[1], -52);
+        sounds.read("fir-2", s.echo.echoFir[2], 32);
+        sounds.read("fir-3", s.echo.echoFir[3], 50);
+        sounds.read("fir-4", s.echo.echoFir[4], 25);
+        sounds.read("fir-5", s.echo.echoFir[5], 51);
+        sounds.read("fir-6", s.echo.echoFir[6], -35);
+        sounds.read("fir-7", s.echo.echoFir[7], 56);
+        break;
+
+    default:
+    case SectionEffect_t::FX_None:
+        break;
+    }
+}
+#endif // THEXTECH_ENABLE_AUDIO_FX
+
 static void loadCustomSfxIni(const std::string &root, const std::string &path)
 {
     IniProcessing sounds(path);
@@ -689,6 +771,38 @@ static void loadCustomSfxIni(const std::string &root, const std::string &path)
         std::string group = fmt::format_ne("sound-{0}", i);
         AddSfx(root, sounds, alias, group, true);
     }
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+    auto ch = sounds.childGroups();
+    for(const auto &g : ch)
+    {
+        if(g.find("fx-") == 0)
+        {
+            sounds.beginGroup(g);
+            SectionEffect_t fx;
+            auto e = g;
+            e.erase(e.begin(), e.begin() + 3);
+            readFx(sounds, fx);
+            s_effectsList.insert({e, fx});
+            sounds.endGroup();
+        }
+    }
+
+    // FX settings
+    for(int i = 0; i <= maxSections; ++i)
+    {
+        auto &s = s_sectionEffect[i];
+        std::string cfx;
+
+        sounds.beginGroup(fmt::format_ne("section-fx-{0}", i));
+        sounds.read("custom-fx", cfx, std::string());
+        if(!cfx.empty() && s_effectsList.find(cfx) != s_effectsList.end())
+            s = s_effectsList[cfx];
+        else
+            readFx(sounds, s);
+        sounds.endGroup();
+    }
+#endif // THEXTECH_ENABLE_AUDIO_FX
 }
 
 static void restoreDefaultSfx()
@@ -698,6 +812,18 @@ static void restoreDefaultSfx()
         auto &u = s.second;
         RestoreSfx(u);
     }
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+    s_effectsList.clear();
+
+    for(int i = 0; i <= maxSections; ++i)
+    {
+        s_sectionEffect[i].fx = SectionEffect_t::FX_None;
+        s_sectionEffect[i].rev = SoundFXReverb();
+        s_sectionEffect[i].echo = SoundFXEchoSetup();
+    }
+    SoundFX_Clear();
+#endif
 }
 
 void InitSound()
@@ -789,7 +915,8 @@ static void s_resetSoundDelay(int A)
         SoundPause[A] = 4;
     else
         SoundPause[A] = i->second;
-#if 0
+
+#if 0 // Very old code, replaced with a more flexible thing at above
     switch(A)
     {
     case 2: SoundPause[A] = 12; break;
@@ -984,3 +1111,170 @@ void PlayExtSound(const std::string &path)
 
     Mix_PlayChannelVol(-1, f->second, 0, MIX_MAX_VOLUME);
 }
+
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+
+static bool     enableEffectEcho = false;
+static SpcEcho *effectEcho = nullptr;
+
+static void echoEffectDone(int, void *context)
+{
+    SpcEcho *out = reinterpret_cast<SpcEcho *>(context);
+    if(out == effectEcho)
+    {
+        echoEffectFree(effectEcho);
+        effectEcho = nullptr;
+        enableEffectEcho = false;
+    }
+}
+
+void SoundFX_SetEcho(const SoundFXEchoSetup& setup)
+{
+    if(noSound)
+        return;
+
+    bool isNew = false;
+
+    // Clear previously installed effects first
+    if(!effectEcho)
+    {
+        SoundFX_Clear();
+
+        effectEcho = echoEffectInit(s_audioSetupObtained.sampleRate,
+                                    s_audioSetupObtained.format,
+                                    s_audioSetupObtained.channels);
+        isNew = true;
+    }
+
+    if(effectEcho)
+    {
+        echoEffectSetReg(effectEcho, ECHO_EON, setup.echoOn);
+        echoEffectSetReg(effectEcho, ECHO_EDL, setup.echoDelay);
+        echoEffectSetReg(effectEcho, ECHO_EFB, setup.echoFeedBack);
+
+        echoEffectSetReg(effectEcho, ECHO_MVOLL, setup.echoMainVolL);
+        echoEffectSetReg(effectEcho, ECHO_MVOLR, setup.echoMainVolR);
+        echoEffectSetReg(effectEcho, ECHO_EVOLL, setup.echoVolL);
+        echoEffectSetReg(effectEcho, ECHO_EVOLR, setup.echoVolR);
+
+        echoEffectSetReg(effectEcho, ECHO_FIR0, setup.echoFir[0]);
+        echoEffectSetReg(effectEcho, ECHO_FIR1, setup.echoFir[1]);
+        echoEffectSetReg(effectEcho, ECHO_FIR2, setup.echoFir[2]);
+        echoEffectSetReg(effectEcho, ECHO_FIR3, setup.echoFir[3]);
+        echoEffectSetReg(effectEcho, ECHO_FIR4, setup.echoFir[4]);
+        echoEffectSetReg(effectEcho, ECHO_FIR5, setup.echoFir[5]);
+        echoEffectSetReg(effectEcho, ECHO_FIR6, setup.echoFir[6]);
+        echoEffectSetReg(effectEcho, ECHO_FIR7, setup.echoFir[7]);
+        if(isNew)
+            Mix_RegisterEffect(MIX_CHANNEL_POST, spcEchoEffect, echoEffectDone, effectEcho);
+        enableEffectEcho = true;
+    }
+}
+
+static bool enableEffectReverb = false;
+static FxReverb *effectReverb = nullptr;
+
+static void reverbEffectDone(int, void *context)
+{
+    FxReverb *out = reinterpret_cast<FxReverb *>(context);
+    if(out == effectReverb)
+    {
+        reverbEffectFree(effectReverb);
+        effectReverb = nullptr;
+        enableEffectReverb = false;
+    }
+}
+
+void SoundFX_SetReverb(const SoundFXReverb& setup)
+{
+    if(noSound)
+        return;
+
+    bool isNew = false;
+
+    if(!effectReverb)
+    {
+        // Clear previously installed effects first
+        SoundFX_Clear();
+
+        effectReverb = reverbEffectInit(s_audioSetupObtained.sampleRate,
+                                        s_audioSetupObtained.format,
+                                        s_audioSetupObtained.channels);
+        isNew = true;
+    }
+
+    if(effectReverb)
+    {
+        ReverbSetup set;
+        set.mode = setup.mode;
+        set.roomSize = setup.roomSize;
+        set.damping = setup.damping;
+        set.wetLevel = setup.wetLevel;
+        set.dryLevel = setup.dryLevel;
+        set.width = setup.width;
+        reverbUpdateSetup(effectReverb, set);
+        if(isNew)
+            Mix_RegisterEffect(MIX_CHANNEL_POST, reverbEffect, reverbEffectDone, effectReverb);
+        enableEffectReverb = true;
+    }
+}
+
+void SoundFX_Clear()
+{
+    if(noSound)
+        return;
+
+    if(effectEcho)
+    {
+        Mix_UnregisterEffect(MIX_CHANNEL_POST, spcEchoEffect);
+        if(effectEcho)
+        {
+            echoEffectFree(effectEcho);
+            effectEcho = nullptr;
+        }
+        enableEffectEcho = false;
+    }
+
+    if(effectReverb)
+    {
+        Mix_UnregisterEffect(MIX_CHANNEL_POST, reverbEffect);
+        if(effectReverb)
+        {
+            reverbEffectFree(effectReverb);
+            effectReverb = nullptr;
+        }
+        enableEffectReverb = false;
+    }
+}
+
+#endif // THEXTECH_ENABLE_AUDIO_FX
+
+void UpdateSoundFX(int recentSection)
+{
+#ifndef THEXTECH_ENABLE_AUDIO_FX
+    UNUSED(recentSection);
+#else
+    if(noSound || LevelSelect)
+        return;
+
+    SDL_assert_release(recentSection >= 0 && recentSection <= maxSections);
+    auto &s = s_sectionEffect[recentSection];
+    switch(s.fx)
+    {
+    default:
+    case SectionEffect_t::FX_None:
+        SoundFX_Clear();
+        break;
+
+    case SectionEffect_t::FX_Echo:
+        SoundFX_SetEcho(s.echo);
+        break;
+
+    case SectionEffect_t::FX_Reverb:
+        SoundFX_SetReverb(s.rev);
+        break;
+    }
+#endif // THEXTECH_ENABLE_AUDIO_FX
+}
+

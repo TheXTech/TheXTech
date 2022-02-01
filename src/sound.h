@@ -24,6 +24,8 @@
 
 #include <string>
 
+#include "global_constants.h"
+
 // Public musicPlaying As Boolean
 extern bool musicPlaying;
 // Public musicLoop As Integer
@@ -200,5 +202,38 @@ void LoadCustomSound();
 void UnloadCustomSound();
 
 void PlayExtSound(const std::string &path);
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+struct SoundFXEchoSetup
+{
+    int echoOn = 0;
+    int echoDelay = 0;
+    int echoFeedBack = 0;
+
+    int echoMainVolL = 0;
+    int echoMainVolR = 0;
+
+    int echoVolL = 0;
+    int echoVolR = 0;
+
+    int echoFir[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+};
+void SoundFX_SetEcho(const SoundFXEchoSetup &setup);
+
+struct SoundFXReverb
+{
+    float mode         = 0.0f; // Normal (0) or Freeze (>0.5)
+    float roomSize     = 0.7f;
+    float damping      = 0.5f; // 0.0...1.0
+    float wetLevel     = 0.2f;
+    float dryLevel     = 0.4f;
+    float width        = 1.0f; // 0.0...1.0
+};
+void SoundFX_SetReverb(const SoundFXReverb &setup);
+
+void SoundFX_Clear();
+#endif // THEXTECH_ENABLE_AUDIO_FX
+
+void UpdateSoundFX(int recentSection);
 
 #endif // SOUND_H
