@@ -36,6 +36,7 @@
 #include "floats.h"
 
 #include "global_constants.h"
+#include "global_strings.h"
 
 //Option Explicit
 //Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
@@ -100,44 +101,6 @@ extern int vb6Round(double x);
  * @return rounded result
  */
 extern double vb6Round(double x, int decimals);
-
-
-// utilities for stringindex_t
-extern const std::string g_emptyString;
-extern std::vector<std::string> g_LevelString;
-extern size_t g_numWorldString;
-
-inline const std::string& GetS(stringindex_t index)
-{
-    if(index == STRINGINDEX_NONE)
-    {
-        return g_emptyString;
-    }
-    return g_LevelString[index];
-}
-inline void SetS(stringindex_t& index, const std::string& target)
-{
-    if(index == STRINGINDEX_NONE && g_LevelString.size() < MaxLevelStrings)
-    {
-        index = (stringindex_t)g_LevelString.size();
-        g_LevelString.push_back(target);
-    }
-    else
-    {
-        g_LevelString[index] = target;
-    }
-}
-inline std::string* PtrS(stringindex_t& index)
-{
-    if(index == STRINGINDEX_NONE)
-    {
-        if(g_LevelString.size() >= MaxLevelStrings)
-            return nullptr;
-        index = (stringindex_t)g_LevelString.size();
-        g_LevelString.push_back(std::string());
-    }
-    return &g_LevelString[index];
-}
 
 
 //'Saved Events
