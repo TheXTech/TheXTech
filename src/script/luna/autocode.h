@@ -25,7 +25,7 @@
 #include <string>
 
 #include "lunadefs.h"
-
+#include "global_strings.h"
 
 enum LunaControlAct
 {
@@ -239,13 +239,13 @@ public:
     /// Members ///
     AutocodeType m_Type = AT_Invalid;
 
-    double Target = 0.0;             // arg 1 "Target"
-    double Param1 = 0.0;              // arg 2 "Param 1"
-    double Param2 = 0.0;              // arg 3 "Param 2"
-    double Param3 = 0.0;              // arg 4 "Param 3"
-    double Length = 0.0;              // arg 5 "Length"
-    std::string MyString;       // arg 6 "string"
-    std::string MyRef;          // Optional arg 0 value
+    double Target = 0.0;                       // arg 1 "Target"
+    double Param1 = 0.0;                       // arg 2 "Param 1"
+    double Param2 = 0.0;                       // arg 3 "Param 2"
+    double Param3 = 0.0;                       // arg 4 "Param 3"
+    double Length = 0.0;                       // arg 5 "Length"
+    stringindex_t MyString = STRINGINDEX_NONE; // arg 6 "string"
+    stringindex_t MyRef = STRINGINDEX_NONE;    // Optional arg 0 value
 
     double m_OriginalTime = 0.0;
     int ActiveSection = 0;          // Section to be active in, or custom event ID if > 1000

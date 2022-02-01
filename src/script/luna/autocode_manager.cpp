@@ -303,7 +303,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
             Autocode newcode(ac_type, target, param1, param2, param3, ac_str, length, cur_section, ref_str);
             if(!add_to_globals)
             {
-                if(newcode.m_Type < 10000 || !newcode.MyRef.empty())
+                if(newcode.m_Type < 10000 || newcode.MyRef != STRINGINDEX_NONE)
                 {
                     m_Autocodes.emplace_back(std::move(newcode));
                     addToIndex(&m_Autocodes.back());
@@ -525,7 +525,7 @@ Autocode *AutocodeManager::FindMatching(int section, const std::string &soughtst
 
     for(auto *code : s->second)
     {
-        if(code->MyString == soughtstr)
+        if(GetS(code->MyString) == soughtstr)
             return code;
     }
 
@@ -576,8 +576,8 @@ bool AutocodeManager::VarOperation(const std::string &var_name, double value, OP
 void AutocodeManager::addToIndex(Autocode *code)
 {
     m_autocodeIdxSection[code->ActiveSection].push_back(code);
-    if(!code->MyRef.empty())
-        m_autocodeIdxRef[code->MyRef].push_back(code);
+    if(!GetS(code->MyRef).empty())
+        m_autocodeIdxRef[GetS(code->MyRef)].push_back(code);
 }
 
 void AutocodeManager::removeFromIndex(Autocode *code)
@@ -591,9 +591,9 @@ void AutocodeManager::removeFromIndex(Autocode *code)
             ++it;
     }
 
-    if(!code->MyRef.empty())
+    if(!GetS(code->MyRef).empty())
     {
-        auto &ref = m_autocodeIdxRef[code->MyRef];
+        auto &ref = m_autocodeIdxRef[GetS(code->MyRef)];
         for(auto it = ref.begin(); it != ref.end(); )
         {
             if(*it == code)
@@ -607,8 +607,8 @@ void AutocodeManager::removeFromIndex(Autocode *code)
 void AutocodeManager::addToIndexGlob(Autocode *code)
 {
     m_globcodeIdxSection[code->ActiveSection].push_back(code);
-    if(!code->MyRef.empty())
-        m_globcodeIdxRef[code->MyRef].push_back(code);
+    if(!GetS(code->MyRef).empty())
+        m_globcodeIdxRef[GetS(code->MyRef)].push_back(code);
 }
 
 void AutocodeManager::removeFromIndexGlob(Autocode *code)
@@ -622,9 +622,9 @@ void AutocodeManager::removeFromIndexGlob(Autocode *code)
             ++it;
     }
 
-    if(!code->MyRef.empty())
+    if(!GetS(code->MyRef).empty())
     {
-        auto &ref = m_globcodeIdxRef[code->MyRef];
+        auto &ref = m_globcodeIdxRef[GetS(code->MyRef)];
         for(auto it = ref.begin(); it != ref.end(); )
         {
             if(*it == code)
