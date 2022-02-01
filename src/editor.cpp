@@ -1574,7 +1574,7 @@ void UpdateEditor()
             }
             else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS) // Warps
             {
-                for(int numWarpsMax = numWarps + 1, A = 1; A <= numWarpsMax; A++)
+                for(A = 1; A <= numWarps + 1; A++)
                 {
                     if(!Warp[A].PlacedEnt || !Warp[A].PlacedExit)
                         break;
