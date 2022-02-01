@@ -11,6 +11,7 @@ Changelog for 1.3.6 [WIP]
 -New multiplayer start screen (@ds-sloth with design input from @0lhi)
 -Added controller disconnect recovery screen (@ds-sloth)
 -Added an ability to add/drop the second player from the pause menu (@ds-sloth)
+-Added the support for real-time audio effects such as reverb and SPC echo. They can be configured by sounds.ini for each level section (@Wohlstand)
 
 Changes for 1.3.5.3-1
 -Fixed autostart events behaviour
