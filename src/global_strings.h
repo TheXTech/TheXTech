@@ -27,6 +27,7 @@
 
 #include "global_constants.h"
 #include <vector>
+#include <SDL2/SDL_assert.h>
 
 extern const std::string g_emptyString;
 extern std::vector<std::string> g_LevelString;
@@ -36,6 +37,8 @@ inline const std::string& GetS(stringindex_t index)
 {
     if(index == STRINGINDEX_NONE)
         return g_emptyString;
+
+    SDL_assert_release(index < g_LevelString.size());
 
     return g_LevelString[index];
 }
@@ -52,6 +55,7 @@ inline void SetS(stringindex_t& index, const std::string& target)
     }
     else
     {
+        SDL_assert_release(index < g_LevelString.size());
         g_LevelString[index] = target;
     }
 }
@@ -65,6 +69,8 @@ inline std::string* PtrS(stringindex_t& index)
         index = (stringindex_t)g_LevelString.size();
         g_LevelString.push_back(std::string());
     }
+
+    SDL_assert_release(index < g_LevelString.size());
 
     return &g_LevelString[index];
 }
