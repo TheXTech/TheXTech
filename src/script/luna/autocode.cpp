@@ -711,7 +711,7 @@ void Autocode::Do(bool init)
         {
             if(ReferenceOK())
             {
-                std::string str = std::to_string((long double)gAutoMan.GetVar(MyRef));
+                std::string str = fmt::format_ne("{0}", gAutoMan.GetVar(MyRef));
                 if(MyString.length() > 0)
                     str = MyString + str;
                 Renderer::Get().AddOp(new RenderStringOp(str, (int)Param3, (float)Param1, (float)Param2));
