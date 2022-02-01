@@ -49,6 +49,13 @@ void DeathCounter::init()
 {
     if(counterFile.empty())
     {
+        // prevent a segfault
+        if(TestLevel || selWorld < 0 || selWorld >= (int)SelectWorld.size())
+        {
+            mEnabled = false;
+            return;
+        }
+
         counterFile = makeGameSavePath(SelectWorld[selWorld].WorldPath,
                                        SelectWorld[selWorld].WorldFile,
                                        fmt::format_ne("demos-{0}.dmo", selSave));
