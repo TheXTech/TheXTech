@@ -220,7 +220,7 @@ void OutroLoop()
     }
 }
 
-void AddCredit(std::string newCredit)
+void AddCredit(const std::string &newCredit)
 {
     numCredits += 1;
     if(numCredits > maxCreditsLines)
@@ -229,7 +229,11 @@ void AddCredit(std::string newCredit)
         pLogWarning("Can't add more credits lines: max limit has been excited ({0} linex maximum)", maxCreditsLines);
         return;
     }
-    SetS(Credit[numCredits].Text, newCredit);
+
+    auto &c = Credit[numCredits];
+    c.Text = STRINGINDEX_NONE;
+
+    SetS(c.Text, newCredit);
 }
 
 void SetupCredits()
