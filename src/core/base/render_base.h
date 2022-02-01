@@ -189,6 +189,8 @@ public:
                                       const std::string &maskPath = std::string(),
                                       const std::string &maskFallbackPath = std::string());
 
+    static void setTransparentColor(StdPicture &target, uint32_t rgb);
+
     virtual void loadTexture(StdPicture &target,
                              uint32_t width,
                              uint32_t height,

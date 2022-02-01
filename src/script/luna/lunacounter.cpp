@@ -337,7 +337,7 @@ void DeathCounter::PrintDebug() const
         float y = 300;
         for(const auto &iter : mDeathRecords)
         {
-            Renderer::Get().AddOp(new RenderStringOp(std::to_string(iter.m_deaths), 2, 50, y));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("{0}", iter.m_deaths), 2, 50, y));
             Renderer::Get().AddOp(new RenderStringOp(iter.m_levelName, 2, 80, y));
             y += 30;
         }

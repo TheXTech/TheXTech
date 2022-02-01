@@ -361,6 +361,14 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
     return target;
 }
 
+void AbstractRender_t::setTransparentColor(StdPicture& target, uint32_t rgb)
+{
+    target.l.colorKey = true;
+    target.l.keyRgb[0] = (rgb >> 0) & 0xFF;
+    target.l.keyRgb[1] = (rgb >> 8) & 0xFF;
+    target.l.keyRgb[2] = (rgb >> 16) & 0xFF;
+}
+
 void AbstractRender_t::lazyLoad(StdPicture &target)
 {
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
@@ -405,6 +413,17 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
     target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
     target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
+
+    if(target.l.colorKey) // Apply transparent color for key pixels
+    {
+        PGE_Pix colSrc = {target.l.keyRgb[0],
+                          target.l.keyRgb[1],
+                          target.l.keyRgb[2], 0xFF};
+        PGE_Pix colDst = {target.l.keyRgb[0],
+                          target.l.keyRgb[1],
+                          target.l.keyRgb[2], 0x00};
+        GraphicsHelps::replaceColor(sourceImage, colSrc, colDst);
+    }
 
     FreeImage_FlipVertical(sourceImage);
     target.w = static_cast<int>(w);

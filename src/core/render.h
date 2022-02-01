@@ -184,6 +184,11 @@ SDL_FORCE_INLINE StdPicture lazyLoadPicture(const std::string &path,
     return AbstractRender_t::lazyLoadPicture(path, maskPath, maskFallbackPath);
 }
 
+SDL_FORCE_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb)
+{
+    AbstractRender_t::setTransparentColor(target, rgb);
+}
+
 
 
 E_INLINE void loadTexture(StdPicture &target,

@@ -61,7 +61,7 @@ Renderer::~Renderer()
     ClearQueue();
 }
 
-bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code, int transparency_color)
+bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code, uint32_t transparency_color)
 {
     DeleteImage(resource_code);
 
@@ -83,7 +83,7 @@ bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code
         return false;
     }
 
-    img.m_TransColor = transparency_color;
+    img.setTransparentColor(transparency_color);
     StoreImage(std::move(img), resource_code);
 
     return true;

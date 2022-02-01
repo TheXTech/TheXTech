@@ -37,6 +37,9 @@ class LunaImage
     int m_H = 0;
     //! Width of bitmap
     int m_W = 0;
+    //! Value that represents transparency (will write nothing)
+    uint32_t m_TransColor = DEFAULT_TRANS_COLOR;
+    bool     m_useTransColor = false;
 
 public:
     /// Functions ///
@@ -53,6 +56,8 @@ public:
 
     bool ImageLoaded();
 
+    void setTransparentColor(uint32_t rgb);
+
     inline uint64_t getUID() const
     {
         return m_uid;
@@ -68,8 +73,7 @@ public:
         return m_H;
     }
 
-    //! Value that represents transparency (will write nothing)
-    int m_TransColor = DEFAULT_TRANS_COLOR;
+
 
     //! Image handler
     StdPicture m_image;

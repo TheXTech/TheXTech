@@ -125,6 +125,7 @@ bool AutocodeManager::ReadWorld(const std::string &script_path)
 
     pLogDebug("Loading %s episode wide autocode script...", script_path.c_str());
 
+    m_Enabled = true;
     Parse(code_file, false);
     std::fclose(code_file);
     showErrors(script_path);
