@@ -353,6 +353,39 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
     }
 }
 
+void GraphicsHelps::replaceColor(FIBITMAP* image, const PGE_Pix& src, const PGE_Pix& dst)
+{
+    if(!image)
+        return;
+
+    unsigned int img_w = FreeImage_GetWidth(image);
+    unsigned int img_h = FreeImage_GetHeight(image);
+    unsigned int img_pitch = FreeImage_GetPitch(image);
+
+    BYTE *img_bits  = FreeImage_GetBits(image);
+    BYTE *FPixP = nullptr;
+
+    for(unsigned int y = 0; y < img_h; ++y)
+    {
+        FPixP = img_bits + (img_pitch * y);
+
+        for(unsigned int x = 0; (x < img_w); ++x)
+        {
+            if(FPixP[FI_RGBA_GREEN] == src.g &&
+               FPixP[FI_RGBA_BLUE] == src.b &&
+               FPixP[FI_RGBA_RED] == src.a &&
+               FPixP[FI_RGBA_ALPHA] == src.a)
+            {
+                FPixP[FI_RGBA_RED]   = dst.r;
+                FPixP[FI_RGBA_GREEN] = dst.g;
+                FPixP[FI_RGBA_BLUE]  = dst.b;
+                FPixP[FI_RGBA_ALPHA] = dst.a;
+            }
+            FPixP += 4;
+        }
+    }
+}
+
 bool GraphicsHelps::getImageMetrics(const std::string &imageFile, PGE_Size* imgSize)
 {
     if(!imgSize)

@@ -48,7 +48,7 @@ struct Renderer
     Renderer() noexcept;
     ~Renderer();
 
-    bool LoadBitmapResource(const std::string &filename, int resource_code, int transparency_color); // don't give full path
+    bool LoadBitmapResource(const std::string &filename, int resource_code, uint32_t transparency_color); // don't give full path
     bool LoadBitmapResource(const std::string &filename, int resource_code);
     void StoreImage(LunaImage&& bmp, int resource_code);
     bool DeleteImage(int resource_code);

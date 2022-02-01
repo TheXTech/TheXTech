@@ -22,6 +22,7 @@
 
 #include "lunaimgbox.h"
 #include "core/render.h"
+#include <Utils/files.h>
 
 
 uint64_t LunaImage::getNewUID()
@@ -46,6 +47,11 @@ LunaImage::LunaImage(const std::string &filename)
     Init();
 
     m_image = XRender::lazyLoadPicture(filename);
+    if(Files::hasSuffix(filename, ".jpg") || Files::hasSuffix(filename, ".bmp"))
+    {
+        m_useTransColor = true;
+        XRender::setTransparentColor(m_image, m_TransColor);
+    }
 
     m_uid = getNewUID();
 
@@ -85,4 +91,11 @@ void LunaImage::Unload()
 bool LunaImage::ImageLoaded()
 {
     return m_image.inited;
+}
+
+void LunaImage::setTransparentColor(uint32_t rgb)
+{
+    m_TransColor = rgb;
+    if(m_useTransColor)
+        XRender::setTransparentColor(m_image, rgb);
 }

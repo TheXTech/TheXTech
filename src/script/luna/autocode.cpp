@@ -1151,7 +1151,7 @@ void Autocode::Do(bool init)
         {
             // Only allow loading image during init phase
             if(init)
-                Renderer::Get().LoadBitmapResource(MyString, (int)Target, (int)Param1);
+                Renderer::Get().LoadBitmapResource(MyString, (int)Target, (uint32_t)(int32_t)Param1);
             expire();
             break;
         }
