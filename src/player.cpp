@@ -5926,7 +5926,7 @@ void PlayerEffects(const int A)
                 // TODO: Implement the scrolling method
             case LevelDoor::TRANSIT_NONE:
                 if(Maths::iRound(leftToGoal) == 0 && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
-                    g_levelVScreenFader[A].setupFader(8, 0, 65, ScreenFader::S_FADE);
+                    g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 0, 65, ScreenFader::S_FADE);
                 break;
 
             case LevelDoor::TRANSIT_FADE:
@@ -6093,7 +6093,7 @@ void PlayerEffects(const int A)
                 case LevelDoor::TRANSIT_SCROLL:
                     // TODO: Implement the scrolling method
                 case LevelDoor::TRANSIT_NONE:
-                    g_levelVScreenFader[A].setupFader(8, 65, 0, ScreenFader::S_FADE);
+                    g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_FADE:
@@ -6417,7 +6417,7 @@ void PlayerEffects(const int A)
             // TODO: Implement the scrolling method
         case LevelDoor::TRANSIT_NONE:
             if(fEqual(p.Effect2, 20) && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
-                g_levelVScreenFader[A].setupFader(9, 0, 65, ScreenFader::S_FADE);
+                g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 9 : 64, 0, 65, ScreenFader::S_FADE);
             break;
 
         case LevelDoor::TRANSIT_FADE:
@@ -6487,7 +6487,7 @@ void PlayerEffects(const int A)
                 case LevelDoor::TRANSIT_SCROLL:
                     // TODO: Implement the scrolling method
                 case LevelDoor::TRANSIT_NONE:
-                    g_levelVScreenFader[A].setupFader(8, 65, 0, ScreenFader::S_FADE);
+                    g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
                     break;
 
                 case LevelDoor::TRANSIT_FADE:
