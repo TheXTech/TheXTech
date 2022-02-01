@@ -186,7 +186,7 @@ bool SwapLayers(layerindex_t index_1, layerindex_t index_2)
     else if(EditorCursor.Layer == index_2)
         EditorCursor.Layer = index_1;
 
-    LAYER_USED_P_SWITCH = FindLayer("Used P Switch");
+    LAYER_USED_P_SWITCH = FindLayer(LAYER_USED_P_SWITCH_TITLE);
 
     return true;
 }
@@ -208,7 +208,7 @@ bool RenameLayer(layerindex_t L, const std::string& NewName)
 
     Layer[L].Name = NewName;
 
-    LAYER_USED_P_SWITCH = FindLayer("Used P Switch");
+    LAYER_USED_P_SWITCH = FindLayer(LAYER_USED_P_SWITCH_TITLE);
 
     return true;
 }
@@ -339,7 +339,7 @@ bool DeleteLayer(layerindex_t L, bool killall)
     if(EditorCursor.Layer == L)
         EditorCursor.Layer = LAYER_DEFAULT;
 
-    LAYER_USED_P_SWITCH = FindLayer("Used P Switch");
+    LAYER_USED_P_SWITCH = FindLayer(LAYER_USED_P_SWITCH_TITLE);
 
     return true;
 }

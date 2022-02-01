@@ -161,6 +161,8 @@ extern int newEventNum;
 
 // utilities for layerindex_t and eventindex_t
 
+#define LAYER_USED_P_SWITCH_TITLE "Used P Switch"
+
 extern layerindex_t LAYER_USED_P_SWITCH;
 
 inline const std::string& GetL(layerindex_t index)

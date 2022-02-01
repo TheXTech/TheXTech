@@ -256,7 +256,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
     }
 
-    LAYER_USED_P_SWITCH = FindLayer("Used P Switch");
+    LAYER_USED_P_SWITCH = FindLayer(LAYER_USED_P_SWITCH_TITLE);
 
     // items in layers will be hidden after they are loaded
 
