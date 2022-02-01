@@ -741,6 +741,13 @@ void SpriteFunc::StaticDraw(CSprite *me)
 {
     if(me != nullptr && me->m_Visible)
     {
+        if(!me->m_directImg && me->m_GfxRects.empty()) // Workaround
+        {
+            auto *direct_img = Renderer::Get().GetImageForResourceCode(me->m_ImgResCode);
+            if(direct_img)
+                gSpriteMan.InitializeDimensions(me, false);
+        }
+
         if(me->m_AnimationFrame < (signed)me->m_GfxRects.size())   // Frame should be less than size of GfxRect container
         {
             auto *op = new RenderBitmapOp();
@@ -768,6 +775,13 @@ void SpriteFunc::RelativeDraw(CSprite *me)
 {
     if(me != nullptr && me->m_Visible)
     {
+        if(!me->m_directImg && me->m_GfxRects.empty()) // Workaround
+        {
+            auto *direct_img = Renderer::Get().GetImageForResourceCode(me->m_ImgResCode);
+            if(direct_img)
+                gSpriteMan.InitializeDimensions(me, false);
+        }
+
         if(me->m_AnimationFrame < (signed)me->m_GfxRects.size())
         {
             double cx = 0;              // camera x (top left of screen)
