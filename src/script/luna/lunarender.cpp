@@ -29,6 +29,8 @@
 #include <algorithm>
 
 
+PoolAllocator g_rAlloc(c_rAllocTotalSize, c_rAllocChunkSize);
+
 static Renderer sLunaRender;
 
 Renderer &Renderer::Get()
@@ -50,7 +52,14 @@ bool Renderer::IsAltThreadActive()
 Renderer::Renderer() noexcept :
     m_queueState(),
     m_legacyResourceCodeImages()
-{}
+{
+    g_rAlloc.Init();
+}
+
+Renderer::~Renderer()
+{
+    ClearQueue();
+}
 
 bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code, int transparency_color)
 {
@@ -75,7 +84,7 @@ bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code
     }
 
     img.m_TransColor = transparency_color;
-    StoreImage(img, resource_code);
+    StoreImage(std::move(img), resource_code);
 
     return true;
 }
@@ -85,7 +94,7 @@ bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code
     return LoadBitmapResource(filename, resource_code, DEFAULT_TRANS_COLOR);
 }
 
-void Renderer::StoreImage(const LunaImage &bmp, int resource_code)
+void Renderer::StoreImage(LunaImage &&bmp, int resource_code)
 {
     m_legacyResourceCodeImages[resource_code] = bmp;
 }
@@ -288,6 +297,7 @@ void Renderer::ClearQueue()
     m_queueState.m_curCamIdx = 0;
     for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
         delete m_currentRenderOp;
+    g_rAlloc.Reset();
     m_queueState.m_currentRenderOps.clear();
     m_queueState.m_renderOpsProcessedCount = 0;
     m_queueState.m_renderOpsSortedCount = 0;

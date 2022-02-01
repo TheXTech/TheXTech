@@ -25,7 +25,11 @@
 #include "lunaimgbox.h"
 
 
-RenderBitmapOp::RenderBitmapOp() = default;
+RenderBitmapOp::RenderBitmapOp() : RenderOp()
+{
+    static_assert(sizeof(RenderBitmapOp) <= c_rAllocChunkSize,
+                  "Size of RenderBitmapOp class must be smaller than c_rAllocChunkSize");
+}
 
 void RenderBitmapOp::Draw(Renderer *renderer)
 {

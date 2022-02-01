@@ -120,6 +120,8 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
+option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
+
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
 # ============ Customization ==============
@@ -169,6 +171,7 @@ if(USE_STATIC_LIBC)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+include(lib/Allocator/pool-allocator.cmake)
 include(lib/DirManager/dirman.cmake)
 include(lib/FileMapper/FileMapper.cmake)
 include(lib/fmt/fmt.cmake)
@@ -263,6 +266,7 @@ set(LIB_SRC
     ${FMT_SRCS}
     ${STACK_WALKER_SRCS}
     ${MD5_SRCS}
+    ${POOLALLOC_SRCS}
     lib/CrashHandler/crash_handler.cpp
     lib/Graphics/graphics_funcs.cpp
     lib/Graphics/image_size.cpp
@@ -411,6 +415,14 @@ if(THEXTECH_ENABLE_LUNA_AUTOCODE)
     )
 endif()
 
+if(THEXTECH_ENABLE_AUDIO_FX)
+    add_definitions(-DTHEXTECH_ENABLE_AUDIO_FX)
+    list(APPEND THEXTECH_SRC
+        src/sound/fx/spc_echo.cpp
+        src/sound/fx/reverb.cpp
+    )
+endif()
+
 add_definitions(-DCORE_EVERYTHING_SDL)
 list(APPEND THEXTECH_SRC
     src/core/sdl/render_sdl.cpp
@@ -437,6 +449,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/sdl/*.h
     src/main/*.h
     src/main/QuadTree/*.h
+    src/sound/fx/*.h
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 

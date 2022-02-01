@@ -23,6 +23,16 @@
 #include "globals.h"
 
 
+RenderRectOp::RenderRectOp() : RenderOp(),
+    x1(0), y1(0), x2(0), y2(0),
+    fillColor(0.0, 0.0, 0.0, 0.0),
+    borderColor(1.0f, 1.0f, 1.0f, 1.0f),
+    sceneCoords(false)
+{
+    static_assert(sizeof(RenderRectOp) <= c_rAllocChunkSize,
+            "Size of RenderRectOp class must be smaller than c_rAllocChunkSize");
+}
+
 void RenderRectOp::Draw(Renderer *renderer)
 {
     if(borderColor.a <= 0.0 && fillColor.a <= 0.0) return;

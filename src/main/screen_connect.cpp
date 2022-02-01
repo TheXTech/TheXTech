@@ -313,7 +313,17 @@ bool Player_Back(int p)
     // adding player at main menu
     if(s_playerState[p] == PlayerState::SelectChar && s_context == Context::MainMenu)
     {
-        Controls::DeleteInputMethod(Controls::g_InputMethods[p]);
+        // remove the player's slot and quit if there aren't any other players
+        if(Controls::g_InputMethods.size() <= 1)
+        {
+            Player_Remove(p);
+            PlaySoundMenu(SFX_Slide);
+            return true;
+        }
+
+        // otherwise, disconnect its input method (slot will be deleted later)
+        if(p < (int)Controls::g_InputMethods.size())
+            Controls::DeleteInputMethod(Controls::g_InputMethods[p]);
         s_playerState[p] = PlayerState::Disconnected;
         g_charSelect[p] = 0;
         return false;
@@ -348,7 +358,10 @@ bool Player_Back(int p)
         s_playerState[p] = PlayerState::StartGame;
         s_menuItem[p] = 0;
         if(CheckDone())
+        {
+            PlaySoundMenu(SFX_Slide);
             return true;
+        }
         else
             return false;
     }
@@ -1422,45 +1435,6 @@ int MouseLogic()
 int Logic()
 {
     /*-----------------------*\
-    || polling input methods ||
-    \*-----------------------*/
-    bool block_poll = false;
-    // do not allow more players than previously existed to reconnect
-    if(s_context == Context::Reconnect)
-    {
-        if((int)Controls::g_InputMethods.size() < s_minPlayers)
-            block_poll = false;
-        else
-        {
-            block_poll = true;
-            for(Controls::InputMethod* method : Controls::g_InputMethods)
-            {
-                if(!method)
-                    block_poll = false;
-            }
-        }
-    }
-    // in 1-player mode, only allow a single player to connect
-    if(s_context == Context::MainMenu && s_minPlayers == 1)
-    {
-        if((int)Controls::g_InputMethods.size() >= s_minPlayers)
-            block_poll = true;
-    }
-    // block polling if a player is hitting random buttons
-    for(int p = 0; p < maxLocalPlayers; p++)
-    {
-        if(s_playerState[p] == PlayerState::TestControls || s_playerState[p] == PlayerState::ConfirmProfile)
-            block_poll = true;
-    }
-    if(!block_poll && Controls::PollInputMethod())
-    {
-        if((int)Controls::g_InputMethods.size() > 1 || !(s_context == Context::MainMenu && s_minPlayers == 1))
-        {
-            PlaySoundMenu(SFX_DropItem);
-        }
-    }
-
-    /*-----------------------*\
     ||    Shared back key    ||
     \*-----------------------*/
     if(s_context == Context::MainMenu && Controls::g_InputMethods.size() == 0)
@@ -1587,8 +1561,7 @@ int Logic()
                     s_menuItem[p] = 0;
                 }
             }
-            // wait one frame to process them because Controls are not updated yet
-            continue;
+            // okay to continue processing them because Controls are now updated
         }
 
         const Controls_t& c = Player[p+1].Controls;
@@ -1700,7 +1673,48 @@ int Logic()
         }
     }
 
-    return MouseLogic();
+    bool ret = MouseLogic();
+
+    /*-----------------------*\
+    || polling input methods ||
+    \*-----------------------*/
+    bool block_poll = false;
+    // do not allow more players than previously existed to reconnect
+    if(s_context == Context::Reconnect)
+    {
+        if((int)Controls::g_InputMethods.size() < s_minPlayers)
+            block_poll = false;
+        else
+        {
+            block_poll = true;
+            for(Controls::InputMethod* method : Controls::g_InputMethods)
+            {
+                if(!method)
+                    block_poll = false;
+            }
+        }
+    }
+    // in 1-player mode, only allow a single player to connect
+    if(s_context == Context::MainMenu && s_minPlayers == 1)
+    {
+        if((int)Controls::g_InputMethods.size() >= s_minPlayers)
+            block_poll = true;
+    }
+    // block polling if a player is hitting random buttons
+    for(int p = 0; p < maxLocalPlayers; p++)
+    {
+        if(s_playerState[p] == PlayerState::TestControls || s_playerState[p] == PlayerState::ConfirmProfile)
+            block_poll = true;
+    }
+    if(!block_poll && Controls::PollInputMethod())
+    {
+        if((int)Controls::g_InputMethods.size() > 1 || !(s_context == Context::MainMenu && s_minPlayers == 1))
+        {
+            PlaySoundMenu(SFX_DropItem);
+        }
+    }
+
+    return ret;
 }
 
 void Render()

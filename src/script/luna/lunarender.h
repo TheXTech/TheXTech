@@ -27,11 +27,16 @@
 #include <vector>
 #include <string>
 #include <list>
+#include <Allocator/PoolAllocator.h>
 
 #include "lunaimgbox.h"
 
 class RenderOp;
 class LunaImage;
+
+constexpr size_t c_rAllocChunkSize = 96;
+constexpr size_t c_rAllocTotalSize = c_rAllocChunkSize * 1000;
+extern PoolAllocator g_rAlloc;
 
 struct Renderer
 {
@@ -41,11 +46,11 @@ struct Renderer
     static bool IsAltThreadActive();
 
     Renderer() noexcept;
-    ~Renderer() = default;
+    ~Renderer();
 
     bool LoadBitmapResource(const std::string &filename, int resource_code, int transparency_color); // don't give full path
     bool LoadBitmapResource(const std::string &filename, int resource_code);
-    void StoreImage(const LunaImage &bmp, int resource_code);
+    void StoreImage(LunaImage&& bmp, int resource_code);
     bool DeleteImage(int resource_code);
     LunaImage *GetImageForResourceCode(int resource_code);
 

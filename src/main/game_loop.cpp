@@ -101,7 +101,7 @@ void GameLoop()
 
     if(!Controls::Update())
     {
-        if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect)
+        if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect || TestLevel)
             QuickReconnectScreen::g_active = true;
         else
             PauseGame(PauseCode::Reconnect, 0);
@@ -380,7 +380,7 @@ int PauseGame(PauseCode code, int plr)
             {
                 if(code != PauseCode::Reconnect)
                 {
-                    if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect)
+                    if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect || TestLevel)
                         QuickReconnectScreen::g_active = true;
                     else
                         PauseGame(PauseCode::Reconnect, 0);

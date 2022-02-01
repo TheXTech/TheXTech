@@ -29,6 +29,7 @@ class RenderBitmapOp final : public RenderOp
 {
 public:
     RenderBitmapOp();
+    ~RenderBitmapOp() override = default;
 
     void Draw(Renderer* renderer) override;
 

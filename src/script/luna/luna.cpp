@@ -64,6 +64,7 @@ void lunaReset()
 
     Renderer::Get().ClearAllDebugMessages();
     Renderer::Get().ClearAllLoadedImages();
+    Renderer::Get().ClearQueue();
     gSpriteMan.ResetSpriteManager();
     gCellMan.Reset();
     Input::ResetAll();
