@@ -28,6 +28,9 @@ PoolAllocator::~PoolAllocator()
 
 void* PoolAllocator::Allocate(const std::size_t allocationSize, const std::size_t /*alignment*/)
 {
+#ifdef NDEBUG
+    (void)allocationSize;
+#endif
     assert(allocationSize == this->m_chunkSize && "Allocation size must be equal to chunk size");
 
     Node* freePosition = m_freeList.pop();

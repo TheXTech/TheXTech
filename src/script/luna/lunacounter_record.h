@@ -29,7 +29,7 @@
 struct DeathRecord
 {
     void Save(FILE *openfile);
-    void Load(FILE *openfile);
+    bool Load(FILE *openfile);
 
     std::string m_levelName;
     int32_t m_deaths = 0;

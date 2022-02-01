@@ -79,6 +79,7 @@ bool DeathCounter::TryLoadStats()
 {
     // Try to open the file
     int32_t tempint = 0;
+    size_t got;
     FILE *statsfile;
 
     // If file is not exist yet, try to create empty file
@@ -130,7 +131,15 @@ bool DeathCounter::TryLoadStats()
 //    }
 
     // Check version
-    std::fread(&tempint, 1, sizeof(int32_t), statsfile);
+    got = std::fread(&tempint, 1, sizeof(int32_t), statsfile);
+    if(got != sizeof(int32_t))
+    {
+        pLogWarning("Demos counter: Failed to read version numbe at the %s file", counterFile.c_str());
+        mStatFileOK = false;
+        mEnabled = false;
+        return false;
+    }
+
     tempint = SDL_SwapLE32(tempint);
 
     if(tempint < 5)
@@ -230,10 +239,18 @@ void DeathCounter::WriteHeader(FILE *statsfile)
 // READ RECORDS - Add death records from file into death record list
 void DeathCounter::ReadRecords(FILE *statsfile)
 {
+    int32_t tempint = 0;
+    size_t got;
+
     // Read the record count at 100 bytes
     std::fseek(statsfile, 100, SEEK_SET);
-    int32_t tempint = 0;
-    std::fread(&tempint, 1, sizeof(tempint), statsfile);
+    got = std::fread(&tempint, 1, sizeof(tempint), statsfile);
+
+    if(got != sizeof(tempint))
+    {
+        pLogWarning("Demos counter: Failed to read the number of records");
+        return;
+    }
 
     if(tempint == 0)
         return;
@@ -243,8 +260,8 @@ void DeathCounter::ReadRecords(FILE *statsfile)
     for(int i = 0; i < tempint; i++)
     {
         DeathRecord newrec;
-        newrec.Load(statsfile);
-        mDeathRecords.push_back(newrec);
+        if(newrec.Load(statsfile))
+            mDeathRecords.push_back(newrec);
     }
 }
 
