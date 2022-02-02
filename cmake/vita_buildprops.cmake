@@ -3,16 +3,22 @@ include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
 
 cmake_policy(SET CMP0077 OLD)
 
-if(VITA_APP_NAME)
-    message("YES")
-else()
-    message("NO")
+if(NOT VITA_APP_NAME)
+    set(VITA_APP_NAME "wip-vita-master test1")
 endif()
 
-set(VITA_APP_NAME "wip-vita-master test1")
-set(VITA_TITLEID "THEXTECH2")
-set(VITA_VERSION "01.00")
-set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12") # ATTRIBUTE2=12 specifies we need more RAM.
+if(NOT VITA_TITLEID)
+    set(VITA_TITLEID "THEXTECH2")
+endif()
+
+if(NOT VITA_VERSION)
+    set(VITA_VERSION "01.00")
+endif()
+
+if(NOT VITA_MKSFOEX_FLAGS)
+    set(VITA_MKSFOEX_FLAGS "-d ATTRIBUTE2=12") # ATTRIBUTE2=12 specifies we need more RAM.  
+endif()
+
 
 set(VITA_ADDTL_LIBS
     FLAC

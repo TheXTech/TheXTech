@@ -511,6 +511,7 @@ if(ANDROID)
 endif()
 
 if(VITA)
+    message("Enabling PS Vita Support.")
     if(ENABLE_FAST_MATH)
         message("FAST MATH ON! HAVE FUN!")
         set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")

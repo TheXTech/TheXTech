@@ -84,7 +84,9 @@ if(ANDROID)
     )
 endif()
 
-include(cmake/vita_buildprops.cmake)
+if(VITA)
+    include(cmake/vita_buildprops.cmake)
+endif()
 
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
 if (CMAKE_BUILD_TYPE_LOWER STREQUAL "release")
