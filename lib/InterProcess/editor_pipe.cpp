@@ -39,6 +39,7 @@ void EditorPipe::start()
 #ifndef PGE_NO_THREADING
     m_thread_isAlive = true;
     m_thread = SDL_CreateThread(&run, "EditorPipe_std", this);
+    SDL_DetachThread(m_thread);
 #endif
 }
 

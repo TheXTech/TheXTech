@@ -514,6 +514,7 @@ bool mainMenuUpdate()
 #else
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
+                    SDL_DetachThread(loadingThread);
 #endif
                 }
                 else if(!g_gameInfo.disableTwoPlayer && MenuCursor == i++)
@@ -528,6 +529,7 @@ bool mainMenuUpdate()
                     MenuCursor = 0;
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
+                    SDL_DetachThread(loadingThread);
 #endif
                 }
                 else if(!g_gameInfo.disableBattleMode && MenuCursor == i++)
@@ -541,6 +543,7 @@ bool mainMenuUpdate()
 #else
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", NULL);
+                    SDL_DetachThread(loadingThread);
 #endif
                     MenuCursor = 0;
                 }
