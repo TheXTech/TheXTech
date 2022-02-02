@@ -41,21 +41,12 @@
 #include "../player.h"
 #include "../npc.h"
 #include "../layers.h"
+#include "../controls.h"
 #include "../game_main.h"
 #include "game_info.h"
+#include "screen_quickreconnect.h"
 
 #include "cheat_code.h"
-
-#ifdef __ANDROID__
-#   include <SDL2/SDL_system.h>
-#   include <jni.h>
-#   if 1
-#       undef JNIEXPORT
-#       undef JNICALL
-#       define JNIEXPORT extern "C"
-#       define JNICALL
-#   endif
-#endif
 
 
 static void redigitIsCool()
@@ -86,7 +77,7 @@ static void dieCheater()
                       "                           "
                       "     Time to be evil!      "
                       "      Mu-ha-ha-ha-ha!      ";
-        PauseGame(1);
+        PauseGame(PauseCode::Message);
         MessageText.clear();
     }
     else
@@ -242,7 +233,7 @@ static void iceAge()
 
 static void iStillPlayWithLegos()
 {
-    ShowLayer("Destroyed Blocks");
+    ShowLayer(LAYER_DESTROYED_BLOCKS);
     PlaySound(SFX_Raccoon);
 }
 
@@ -263,6 +254,7 @@ static void itsRainingMen()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].Section = Player[C].Section;
+            syncLayers_NPC(numNPCs);
         }
     }
 
@@ -286,6 +278,7 @@ static void dontTypeThis()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].Section = Player[C].Section;
+            syncLayers_NPC(numNPCs);
         }
     }
 
@@ -814,7 +807,6 @@ static void superbDemo128()
     if(B > 0)
     {
         numPlayers = 128;
-        ScreenType = 2;
 
         SetupScreens();
 
@@ -841,7 +833,6 @@ static void superbDemo64()
     if(B > 0)
     {
         numPlayers = 64;
-        ScreenType = 2;
         SetupScreens();
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
@@ -866,7 +857,6 @@ static void superbDemo32()
     if(B > 0)
     {
         numPlayers = 32;
-        ScreenType = 2;
         SetupScreens();
 
         if(Player[B].Effect == 9)
@@ -893,7 +883,6 @@ static void superbDemo16()
     if(B > 0)
     {
         numPlayers = 16;
-        ScreenType = 2;
         SetupScreens();
 
         if(Player[B].Effect == 9)
@@ -920,7 +909,6 @@ static void superbDemo8()
     if(B > 0)
     {
         numPlayers = 8;
-        ScreenType = 2;
         SetupScreens();
 
         if(Player[B].Effect == 9)
@@ -947,7 +935,6 @@ static void superbDemo4()
     if(B > 0)
     {
         numPlayers = 4;
-        ScreenType = 2;
         SetupScreens();
 
         if(Player[B].Effect == 9)
@@ -975,7 +962,6 @@ static void superbDemo2()
     if(B > 0)
     {
         numPlayers = 2;
-        ScreenType = 6;
         SingleCoop = 1;
         SetupScreens();
         if(Player[B].Effect == 9)
@@ -1039,13 +1025,21 @@ static void onePlayer()
             }
         }
 
+        // set the living player to get the controls if not P1
+        if(B-1 < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[B-1])
+            std::swap(Controls::g_InputMethods[0], Controls::g_InputMethods[B-1]);
+
+        // delete other control methods
+        while(Controls::g_InputMethods.size() > 1)
+            Controls::DeleteInputMethodSlot(1);
+
         numPlayers = 1;
-        ScreenType = 0;
         SingleCoop = 1;
         SetupScreens();
         if(Player[B].Effect == 9)
             Player[B].Effect = 0;
 
+        // move the living player into slot 1
         int C = 1;
         Player[C] = Player[B];
         Player[C].Character = 1;
@@ -1070,7 +1064,19 @@ static void twoPlayer()
     if(B > 0)
     {
         numPlayers = 2;
-        ScreenType = 5;
+
+        // setup so there are exactly two controller slots,
+        // activate quick-reconnect if needed
+        while(Controls::g_InputMethods.size() > 2)
+        {
+            Controls::DeleteInputMethodSlot(2);
+        }
+        if(Controls::g_InputMethods.size() == 1)
+        {
+            Controls::g_InputMethods.push_back(nullptr);
+            QuickReconnectScreen::g_active = true;
+        }
+
         SingleCoop = 0;
         SetupScreens();
 
@@ -1171,6 +1177,7 @@ static void carKeys()
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
 
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
@@ -1197,6 +1204,7 @@ static void boingyBoing()
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
 
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1224,6 +1232,7 @@ static void bombsAway()
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
 
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1250,6 +1259,7 @@ static void fireMissiles()
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
 
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1277,6 +1287,7 @@ static void hellFire()
             NPC[numNPCs].Location.X = Player[B].Location.X;
             NPC[numNPCs].Location.Y = Player[B].Location.Y;
             NPC[numNPCs].Section = Player[B].Section;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1304,6 +1315,7 @@ static void upAndOut()
             NPC[numNPCs].Location.X = Player[B].Location.X;
             NPC[numNPCs].Location.Y = Player[B].Location.Y;
             NPC[numNPCs].Section = Player[B].Section;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1331,6 +1343,7 @@ static void powHammer()
             NPC[numNPCs].Location.X = Player[B].Location.X;
             NPC[numNPCs].Location.Y = Player[B].Location.Y;
             NPC[numNPCs].Section = Player[B].Section;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1359,6 +1372,7 @@ static void hammerInMyPants()
             NPC[numNPCs].Location.X = Player[B].Location.X;
             NPC[numNPCs].Location.Y = Player[B].Location.Y;
             NPC[numNPCs].Section = Player[B].Section;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1385,6 +1399,7 @@ static void rainbowRider()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1411,6 +1426,7 @@ static void greenEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1438,6 +1454,7 @@ static void blueEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1465,6 +1482,8 @@ static void yellowEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
+
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
             PlaySound(SFX_Grab);
@@ -1491,6 +1510,8 @@ static void redEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
+
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
             PlaySound(SFX_Grab);
@@ -1518,6 +1539,7 @@ static void blackEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1545,6 +1567,7 @@ static void purpleEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1572,6 +1595,7 @@ static void pinkEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -1599,6 +1623,7 @@ static void coldEgg()
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 200;
             NPC[numNPCs].HoldingPlayer = B;
+            syncLayers_NPC(numNPCs);
 
             Player[B].HoldingNPC = numNPCs;
             Player[B].ForceHold = 60;
@@ -2204,31 +2229,6 @@ void cheats_setBuffer(const std::string &line)
     s_buffer.setBuffer(line);
     processCheats();
 }
-
-#ifdef __ANDROID__
-
-JNIEXPORT void JNICALL
-Java_ru_wohlsoft_thextech_thextechActivity_cheats_1setBuffer(JNIEnv *env, jclass clazz, jstring line_j)
-{
-    const char *line;
-    (void)clazz;
-    line = env->GetStringUTFChars(line_j, nullptr);
-    cheats_setBuffer(line);
-    env->ReleaseStringUTFChars(line_j, line);
-}
-
-void cheats_callDialog()
-{
-    JNIEnv* env = (JNIEnv*)SDL_AndroidGetJNIEnv();
-    jobject activity = (jobject)SDL_AndroidGetActivity();
-    jclass clazz = env->GetObjectClass(activity);
-    jmethodID method = env->GetMethodID(clazz, "requestCheat", "()V");
-    env->CallVoidMethod(activity, method);
-    env->DeleteLocalRef(activity);
-    env->DeleteLocalRef(clazz);
-}
-
-#endif
 
 void cheats_clearBuffer()
 {

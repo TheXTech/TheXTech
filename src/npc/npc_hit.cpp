@@ -28,6 +28,7 @@
 #include "../blocks.h"
 #include "../graphics.h"
 #include "../npc_id.h"
+#include "../layers.h"
 
 #include <Logger/logger.h>
 
@@ -36,6 +37,10 @@ void NPCHit(int A, int B, int C)
     NPC_t tempNPC;
     Location_t tempLocation;
     NPC_t oldNPC = NPC[A];
+
+    // if(B == 1 && C != 0)
+    //     Controls::Rumble(C, 50, .25);
+
     // ------+  HIT CODES  +-------
     // B = 1      Jumped on by a player (or kicked)
     // B = 2      Hit by a shaking block
@@ -1298,6 +1303,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].CantHurt = 6;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
+                syncLayers_NPC(numNPCs);
                 NPC[A].Type +=  4;
             }
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
@@ -1373,6 +1379,7 @@ void NPCHit(int A, int B, int C)
                 NPC[numNPCs].CantHurt = 6;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
+                syncLayers_NPC(numNPCs);
             }
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];

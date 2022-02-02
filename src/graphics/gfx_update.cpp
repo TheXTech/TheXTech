@@ -27,11 +27,19 @@
 #include "../editor.h"
 #include "../npc.h"
 #include "../gfx.h"
+#include "../layers.h"
 #include "../main/menu_main.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../main/screen_pause.h"
+#include "../main/screen_connect.h"
+#include "../main/screen_quickreconnect.h"
+#include "../main/screen_textentry.h"
+#include "../compat.h"
+#include "../game_main.h"
 #include "../main/game_globals.h"
 #include "../core/render.h"
+#include "../script/luna/luna.h"
 
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
@@ -146,6 +154,9 @@ void doShakeScreenClear()
 
 void GraphicsLazyPreLoad()
 {
+    // TODO: check if this is needed at caller
+    SetupScreens();
+
     int numScreens = 1;
 
     if(ScreenType == 1)
@@ -165,8 +176,7 @@ void GraphicsLazyPreLoad()
 
 
     if(SingleCoop == 2)
-        numScreens = 2;
-
+        numScreens = 1; // fine to be 1, since it would just be run for Z = 2 twice otherwise;
 
     For(Z, 1, numScreens)
     {
@@ -277,6 +287,9 @@ void UpdateGraphics(bool skipRepaint)
         return;
 
 #ifdef USE_RENDER_BLOCKING
+    // might want to put this after the logic part of UpdateGraphics,
+    // once we have merged the multires code that separates logic from
+    // rendering
     if(XRender::renderBlocked())
         return;
 #endif
@@ -366,13 +379,14 @@ void UpdateGraphics(bool skipRepaint)
 
     frameNextInc();
     frameRenderStart();
+    lunaRenderStart();
 
     g_stats.reset();
 
     std::string SuperText;
     std::string tempText;
-    int BoxY = 0;
-    bool tempBool = false;
+    // int BoxY = 0;
+    // bool tempBool = false;
     int B = 0;
 //    int B2 = 0;
     int C = 0;
@@ -380,7 +394,7 @@ void UpdateGraphics(bool skipRepaint)
     int E = 0;
     double d2 = 0;
 //    int e2 = 0;
-    int X = 0;
+//    int X = 0;
     int Y = 0;
     int64_t fBlock = 0;
     int64_t lBlock = 0;
@@ -574,7 +588,7 @@ void UpdateGraphics(bool skipRepaint)
 //        End If
         }
 
-//        If GameOutro = True Then ScreenType = 7
+        // not sure why this is getting set over and over again
         if(GameOutro)
             ScreenType = 7;
 //        If LevelEditor = False Then
@@ -2110,9 +2124,11 @@ void UpdateGraphics(bool skipRepaint)
         // player names
         /* Dropped */
 
-            if(numPlayers == 1) // Always draw for single-player
-                g_levelVScreenFader[Z].draw();
-            else if(numScreens != 1) // Don't draw when many players at the same screen
+            lunaRender(Z);
+
+            // Always draw for single-player
+            // And don't draw when many players at the same screen
+            if(numPlayers == 1 || numScreens != 1)
                 g_levelVScreenFader[Z].draw();
 
     //    'Interface
@@ -2142,8 +2158,9 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
+                lunaRenderHud();
     //                DrawInterface Z, numScreens
-                if(ShowOnScreenMeta)
+                if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
                     DrawInterface(Z, numScreens);
 
                 For(A, 1, numNPCs) // Display NPCs that got dropped from the container
@@ -2185,159 +2202,26 @@ void UpdateGraphics(bool skipRepaint)
                         }
                     }
                 }
-
-
-    //                If GamePaused = True Then
-                if(GamePaused)
-                {
-                    XRender::offsetViewportIgnore(true);
-
-                    if(MessageText.empty())
-                    {
-                        X = 0;
-                        Y = 0;
-
-                        if((DScreenType == 1 && Z == 2) || (DScreenType == 2 && Z == 1))
-                            X = -400;
-                        else if((DScreenType == 6 && Z == 2) || (DScreenType == 4 && Z == 2) || (DScreenType == 3 && Z == 1))
-                            Y = -300;
-
-                        XRender::renderRect(210 + X, 200 + Y, 380, 200, 0.f, 0.f, 0.f);
-
-                        if(TestLevel)
-                        {
-                            SuperPrint("CONTINUE", 3, 272 + X, 237 + Y);
-                            SuperPrint("RESTART LEVEL", 3, 272 + X, 272 + Y);
-                            SuperPrint("RESET CHECKPOINTS", 3, 272 + X, 307 + Y);
-                            SuperPrint("QUIT TESTING", 3, 272 + X, 342 + Y);
-                            XRender::renderTexture(252 + X, 237 + (MenuCursor * 35) + Y, 16, 16, GFX.MCursor[0], 0, 0);
-                        }
-                        else if(!Cheater && (LevelSelect || (/*StartLevel == FileName*/IsEpisodeIntro && NoMap)))
-                        {
-                            SuperPrint("CONTINUE", 3, 272 + X, 257 + Y);
-                            SuperPrint("SAVE & CONTINUE", 3, 272 + X, 292 + Y);
-                            SuperPrint("SAVE & QUIT", 3, 272 + X, 327 + Y);
-                            XRender::renderTexture(252 + X, 257 + (MenuCursor * 35) + Y, 16, 16, GFX.MCursor[0], 0, 0);
-                        }
-                        else
-                        {
-                            SuperPrint("CONTINUE", 3, 272 + 56 + X, 275 + Y);
-                            SuperPrint("QUIT", 3, 272 + 56 + X, 310 + Y);
-                            XRender::renderTexture(252 + 56 + X, 275 + (MenuCursor * 35) + Y, 16, 16, GFX.MCursor[0], 0, 0);
-                        }
-                    }
-                    else
-                    {
-                        X = 0;
-                        Y = 0;
-
-                        if((DScreenType == 1 && Z == 2) || (DScreenType == 2 && Z == 1))
-                            X = -400;
-                        else if((DScreenType == 6 && Z == 2) || (DScreenType == 4 && Z == 2) || (DScreenType == 3 && Z == 1))
-                            Y = -300;
-
-                        SuperText = MessageText;
-                        BoxY = 150;
-                        XRender::renderTexture(400 - GFX.TextBox.w / 2 + X,
-                                              BoxY + Y + Y,
-                                              GFX.TextBox.w, 20, GFX.TextBox, 0, 0);
-                        BoxY += 10;
-                        tempBool = false;
-
-                        do
-                        {
-                            B = 0;
-
-#if 0 // Old line breaking algorithm
-                            for(A = 1; A <= int(SuperText.size()); A++)
-                            {
-                                if(SuperText[size_t(A) - 1] == ' ' || A == int(SuperText.size()))
-                                {
-                                    if(A < 28)
-                                        B = A;
-                                    else
-                                        break;
-                                }
-                            }
-#else // Better line breaking algorithm
-
-                            for(A = 1; A <= int(SuperText.size()) && A <= 27; A++)
-                            {
-                                auto c = SuperText[size_t(A) - 1];
-
-                                if(B == 0 && A >= 27)
-                                    break;
-
-                                if(A == int(SuperText.size()))
-                                {
-                                    if(A < 28)
-                                        B = A;
-                                }
-                                else if(c == ' ')
-                                {
-                                    B = A;
-                                }
-                                else if(c == '\n')
-                                {
-                                    B = A;
-                                    break;
-                                }
-                            }
-#endif
-
-                            if(B == 0)
-                                B = A;
-
-                            tempText = SuperText.substr(0, size_t(B));
-//                            SuperText = SuperText.substr(size_t(B), SuperText.length());
-                            SuperText.erase(0, size_t(B));
-
-                            XRender::renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y,
-                                                  GFX.TextBox.w, 20, GFX.TextBox, 0, 20);
-
-                            if(SuperText.length() == 0 && !tempBool)
-                            {
-                                SuperPrint(tempText,
-                                           4,
-                                           162 + X + (27 * 9) - (tempText.length() * 9),
-                                           Y + BoxY);
-                            }
-                            else
-                            {
-                                SuperPrint(tempText, 4, 162 + X, Y + BoxY);
-                            }
-
-                            BoxY += 16;
-                            tempBool = true;
-                        } while(!SuperText.empty());
-
-                        XRender::renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.w, 10, GFX.TextBox, 0, GFX.TextBox.h - 10);
-                    }
-                }
-
-                XRender::offsetViewportIgnore(false);
-    //            ElseIf GameOutro = False Then
             }
 
             else if(!GameOutro)
                 mainMenuDraw();
 
-            if(ShowOnScreenMeta)
+            if(PrintFPS > 0)
             {
-                if(PrintFPS > 0)
-                {
-                    XRender::offsetViewportIgnore(true);
-                    SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
-                    XRender::offsetViewportIgnore(false);
-                }
-
-                g_stats.print();
+                XRender::offsetViewportIgnore(true);
+                SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+                XRender::offsetViewportIgnore(false);
             }
+
+            g_stats.print();
+
         }
 
 //        If LevelEditor = True Or MagicHand = True Then
-        if((LevelEditor || MagicHand) && !GamePaused)
+        if((LevelEditor || MagicHand) && GamePaused == PauseCode::None)
         {
+            // TODO: port the editor code (`gfx_editor.cpp`) from multires
 
 #if 0 //.Useless editor-only stuff
 //            If LevelEditor = True Then
@@ -2534,59 +2418,7 @@ void UpdateGraphics(bool skipRepaint)
 //End If
 
             if(!MessageText.empty()) // In-Editor message box preview
-            {
-                X = 0;
-                Y = 0;
-
-                if((DScreenType == 1 && Z == 2) || (DScreenType == 2 && Z == 1))
-                    X = -400;
-                else if((DScreenType == 6 && Z == 2) || (DScreenType == 4 && Z == 2) || (DScreenType == 3 && Z == 1))
-                    Y = -300;
-
-                SuperText = MessageText;
-                BoxY = 150;
-                XRender::renderTexture(400 - GFX.TextBox.w / 2 + X,
-                                      BoxY + Y + Y,
-                                      GFX.TextBox.w, 20, GFX.TextBox, 0, 0);
-                BoxY += 10;
-                tempBool = false;
-                do
-                {
-                    B = 0;
-                    for(A = 1; A <= int(SuperText.size()); A++)
-                    {
-                        if(SuperText[size_t(A) - 1] == ' ' || A == int(SuperText.size()))
-                        {
-                            if(A < 28)
-                                B = A;
-                            else
-                                break;
-                        }
-                    }
-
-                    if(B == 0)
-                        B = A;
-
-                    tempText = SuperText.substr(0, size_t(B));
-                    SuperText = SuperText.substr(size_t(B), SuperText.length());
-                    XRender::renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y,
-                                          GFX.TextBox.w, 20, GFX.TextBox, 0, 20);
-                    if(SuperText.length() == 0 && !tempBool)
-                    {
-                        SuperPrint(tempText,
-                                   4,
-                                   float(162 + X + (27 * 9)) - (tempText.length() * 9),
-                                   Y + BoxY);
-                    }
-                    else
-                    {
-                        SuperPrint(tempText, 4, 162 + X, Y + BoxY);
-                    }
-                    BoxY += 16;
-                    tempBool = true;
-                } while(!SuperText.empty());
-                XRender::renderTexture(400 - GFX.TextBox.w / 2 + X, BoxY + Y + Y, GFX.TextBox.w, 10, GFX.TextBox, 0, GFX.TextBox.h - 10);
-            }
+                DrawMessage(MessageText);
 
             // Display the cursor
             {
@@ -2778,9 +2610,9 @@ void UpdateGraphics(bool skipRepaint)
 //                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
                     XRender::renderTexture(curX, curY, GFX.ECursor[2]);
 //                    If LCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)) <> "default" Then
-                    if(!e.Layer.empty() && SDL_strcasecmp(e.Layer.c_str(), "Default") != 0)
+                    if(e.Layer != LAYER_NONE && e.Layer != LAYER_DEFAULT)
 //                        SuperPrint UCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)), 3, .X + 28, .Y + 34
-                        SuperPrint(e.Layer, 3, X + 28, Y + 34);
+                        SuperPrint(GetL(e.Layer), 3, curX + 28, curY + 34);
 //                    End If
                 }
 //                Else
@@ -2799,9 +2631,9 @@ void UpdateGraphics(bool skipRepaint)
 //                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
                     XRender::renderTexture(curX, curY, GFX.ECursor[2]);
 //                    If LCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)) <> "default" Then
-                    if(!e.Layer.empty() && SDL_strcasecmp(e.Layer.c_str(), "Default") != 0)
+                    if(e.Layer != LAYER_NONE && e.Layer != LAYER_DEFAULT)
 //                        SuperPrint UCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)), 3, .X + 28, .Y + 34
-                        SuperPrint(EditorCursor.Layer, 3, curX + 28 , curY + 34);
+                        SuperPrint(GetL(e.Layer), 3, curX + 28, curY + 34);
 //                    End If
 //                End If
                 }
@@ -2824,23 +2656,45 @@ void UpdateGraphics(bool skipRepaint)
             s_shakeScreen.update();
         }
 
-        if(ShowOnScreenMeta)
+        // TODO: VERIFY THIS
+        XRender::offsetViewportIgnore(true);
+        if(ScreenType == 5 && numScreens == 1)
         {
-            // TODO: VERIFY THIS
-            if(ScreenType == 5 && numScreens == 1)
-            {
-                speedRun_renderControls(1, -1);
-                speedRun_renderControls(2, -1);
-            }
-            else
-                speedRun_renderControls(Z, Z);
+            speedRun_renderControls(1, -1);
+            speedRun_renderControls(2, -1);
         }
+        else
+            speedRun_renderControls(Z, Z);
+        XRender::offsetViewportIgnore(false);
+
 //    Next Z
     } // For(Z, 2, numScreens)
 
     g_levelScreenFader.draw();
 
+    XRender::offsetViewportIgnore(true);
     speedRun_renderTimer();
+
+    // render special screens
+    if(GamePaused == PauseCode::PauseScreen)
+        PauseScreen::Render();
+
+    if(GamePaused == PauseCode::Message)
+        DrawMessage(MessageText);
+
+    if(QuickReconnectScreen::g_active)
+        QuickReconnectScreen::Render();
+
+    if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+    {
+        ConnectScreen::Render();
+        XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+    }
+
+    if(GamePaused == PauseCode::TextEntry)
+        TextEntryScreen::Render();
+
+    XRender::offsetViewportIgnore(false);
 
     if(!skipRepaint)
         XRender::repaint();
@@ -2885,6 +2739,7 @@ void UpdateGraphics(bool skipRepaint)
 //            Netplay::sendData timeStr + LB;
 //    }
 
+    lunaRenderEnd();
     frameRenderEnd();
 
 //    if(XRender::lazyLoadedBytes() > 200000) // Reset timer while loading many pictures at the same time

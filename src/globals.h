@@ -34,10 +34,9 @@
 #include "range_arr.hpp"
 #include "rand.h"
 #include "floats.h"
-#include "control/con_control.h"
 
 #include "global_constants.h"
-#include "controls.h"
+#include "global_strings.h"
 
 //Option Explicit
 //Public Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
@@ -86,10 +85,7 @@ extern std::string AppPath;
  * @param key Key code
  * @return Human-readable key name
  */
-const char *getKeyName(int key);
-
-struct KM_Key;
-std::string getJoyKeyName(bool isController, const KM_Key &key);
+// const char *getKeyName(int key); // no longer used
 
 /**
  * @brief Rounding function that works same as in VB6
@@ -105,6 +101,7 @@ extern int vb6Round(double x);
  * @return rounded result
  */
 extern double vb6Round(double x, int decimals);
+
 
 //'Saved Events
 //Public numSavedEvents As Integer
@@ -150,14 +147,15 @@ extern bool ScrollRelease;
 //Public TakeScreen As Boolean
 extern bool TakeScreen;
 // EXTRA: Show any on-screen meta (HUD, debug prints, etc.)
-extern bool ShowOnScreenMeta;
+extern bool ShowOnScreenHUD;
 //Public LB As String  ' Line Break
 //extern std::string LB;
 //Public EoT As String  ' End of Transmission for WINSOCK
 //extern std::string EoT;
 
-//Public Type Controls 'Controls for the player
-//moved into "controls.h"
+// Moved back into "control_types.h"
+//     since "controls.h" is changing more rapidly
+#include "control_types.h"
 
 //Public Type nPlayer  'online player type
 //    Controls As Controls  'online players controls
@@ -205,7 +203,7 @@ extern bool ShowOnScreenMeta;
 //End Type
 
 //Public Type EditorControls      'Controls for the editor
-struct EditorControls_t
+struct OldEditorControls_t
 {
 //    Up As Boolean
     bool Up = false;
@@ -220,23 +218,33 @@ struct EditorControls_t
 //End Type
 };
 
+
 // Structures moved into con_control.h
 
-//Public conKeyboard(1 To 2) As conKeyboard  'player 1 and 2's controls
-extern RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
+// Functionality moved into the Controls namespace
 
+// The information of conKeyboard and conJoystick is now found in the InputMethodType Profiles.
+// To access it you will need to access the internals of the Controls namespace.
+// Avoid doing this.
+
+//Public conKeyboard(1 To 2) As conKeyboard  'player 1 and 2's controls
+// extern RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
 //Public conJoystick(1 To 2) As conJoystick
-extern RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
+// extern RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
+
+// The information of useJoystick and wantedKeyboard is now dynamic you can
+// determine by observing the RTTI of the members of Controls::g_InputMethods.
+// Avoid doing this.
 
 //Public useJoystick(1 To 2) As Integer
-extern RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
-extern RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
+// extern RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick; // no longer
+// extern RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
 //Public Type NPC 'The NPC Type
 struct NPC_t
 {
 //    AttLayer As String
-    std::string AttLayer;
+    layerindex_t AttLayer = LAYER_NONE;
 //    Quicksand As Integer
     int Quicksand = 0;
 //    RespawnDelay As Integeri
@@ -272,15 +280,15 @@ struct NPC_t
 //    Shadow As Boolean 'if true turn the NPC black and allow it to pass through walls.  only used for a cheat code
     bool Shadow = false;
 //    TriggerActivate As String 'for events - triggers when NPC gets activated
-    std::string TriggerActivate;
+    eventindex_t TriggerActivate = EVENT_NONE;
 //    TriggerDeath As String 'triggers when NPC dies
-    std::string TriggerDeath;
+    eventindex_t TriggerDeath = EVENT_NONE;
 //    TriggerTalk As String 'triggers when you talk to the NPC
-    std::string TriggerTalk;
+    eventindex_t TriggerTalk = EVENT_NONE;
 //    TriggerLast As String 'trigger when this is the last NPC in a layer to die
-    std::string TriggerLast;
+    eventindex_t TriggerLast = EVENT_NONE;
 //    Layer As String 'the layer name that the NPC is in
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean 'if the layer is hidden or not
     bool Hidden = false;
 //    Legacy As Boolean 'Legacy Boss
@@ -294,7 +302,7 @@ struct NPC_t
 //    DefaultStuck As Boolean
     bool DefaultStuck = false;
 //    Text As String 'the text that is displayed when you talk to the NPC
-    std::string Text;
+    stringindex_t Text = STRINGINDEX_NONE;
 //    oldAddBelt As Single
     float oldAddBelt = 0.0f;
 //    PinchCount As Integer 'obsolete
@@ -665,7 +673,7 @@ struct Player_t
 struct Background_t
 {
 //    Layer As String
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
 //    Type As Integer
@@ -687,7 +695,7 @@ struct Background_t
 struct Water_t
 {
 //    Layer As String
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
 //    Buoy As Single 'not used
@@ -716,19 +724,20 @@ struct Block_t
     int DefaultSpecial2 = 0;
 //'for event triggers
 //    TriggerHit As String
-    std::string TriggerHit;
+    eventindex_t TriggerHit = EVENT_NONE;
 //    TriggerDeath As String
-    std::string TriggerDeath;
+    eventindex_t TriggerDeath = EVENT_NONE;
 //    TriggerLast As String
-    std::string TriggerLast;
+    eventindex_t TriggerLast = EVENT_NONE;
 //    Layer As String
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
 //    Type As Integer 'the block's type
     int Type = 0;
 //    Location As Location
     Location_t Location;
+    Location_t LocationInLayer;
 //    Special As Integer 'what is in the block?
     int Special = 0;
 //! EXTRA: second special
@@ -852,7 +861,7 @@ struct Warp_t
 //    NoYoshi As Boolean 'don't allow yoshi
     bool NoYoshi = false;
 //    Layer As String 'the name of the layer
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean 'if the layer is hidden
     bool Hidden = false;
 //    PlacedEnt As Boolean 'for the editor, flags the entranced as placed
@@ -868,7 +877,7 @@ struct Warp_t
 //    Effect As Integer 'style of warp. door/
     int Effect = 0;
 //    level As String 'filename of the level it should warp to
-    std::string level;
+    stringindex_t level = STRINGINDEX_NONE;
 //    LevelWarp As Integer
     int LevelWarp = 0;
 //    LevelEnt As Boolean 'this warp can't be used if set to true (this is for level entrances)
@@ -894,8 +903,8 @@ struct Warp_t
     bool cannonExit = false;
     bool stoodRequired = false; // Require player stood on the ground to enter this warp
     double cannonExitSpeed = 10.0;
-    std::string eventEnter;
-    std::string StarsMsg;
+    eventindex_t eventEnter = EVENT_NONE;
+    stringindex_t StarsMsg = STRINGINDEX_NONE;
     int transitEffect = 0;
 //End Type
 };
@@ -947,7 +956,7 @@ struct WorldMusic_t
 //    Type As Integer
     int Type = 0;
 //    EXTRA: Custom Music
-    std::string MusicFile;
+    stringindex_t MusicFile = STRINGINDEX_NONE;
 //End Type
     int64_t Z = 0;
     bool Active = true;
@@ -967,9 +976,11 @@ struct EditorCursor_t
 //    Location As Location
     Location_t Location;
 //    Layer As String 'current layer
-    std::string Layer;
+    layerindex_t Layer = LAYER_NONE;
 //    Mode As Integer
     int Mode = 0;
+//  New, used to represent warp entrance/exit and level settings submodes
+    int SubMode = 0;
 //    Block As Block
     Block_t Block;
 //    Water As Water
@@ -1031,7 +1042,7 @@ struct CreditLine_t
 //    Location As Location
     Location_t Location;
 //    Text As String
-    std::string Text;
+    stringindex_t Text = STRINGINDEX_NONE;
 //End Type
 };
 
@@ -1059,16 +1070,24 @@ extern bool ClearBuffer;
 extern int numLocked;
 //Public resChanged As Boolean 'true if in fullscreen mode
 extern bool resChanged;
+
+
+// These have been partially moved into the Controls namespace
+// and partially moved to g_pollingInput (declared and defined in main/menu_controls.*)
+
 //Public inputKey As Integer 'for setting the players controls
-extern int inputKey;
+// extern int inputKey;
 //Public getNewKeyboard As Boolean 'true if setting keyboard controls
-extern bool getNewKeyboard;
+// extern bool getNewKeyboard;
 //Public getNewJoystick As Boolean
-extern bool getNewJoystick;
+// extern bool getNewJoystick;
 //Public lastJoyButton As Integer
-extern KM_Key lastJoyButton;
+// extern KM_Key lastJoyButton;
+
+// moved into game_main.h / game_loop.cpp
 //Public GamePaused As Boolean 'true if the game is paused
-extern bool GamePaused;
+// extern PauseCode GamePaused;
+
 //Public MessageText As String 'when talking to an npc
 extern std::string MessageText;
 //Public NumSelectWorld As Integer
@@ -1383,6 +1402,8 @@ extern RangeArr<double, 0, maxPlayers> qScreenX;
 extern RangeArr<double, 0, maxPlayers> qScreenY;
 //Public qScreen As Boolean 'Weather or not the screen needs adjusting
 extern bool qScreen;
+// NEW: allows screen position to change during qScreen
+extern RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
 //Public BlockWidth(0 To maxBlockType) As Integer 'Block type width
 extern RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
@@ -1478,7 +1499,15 @@ extern RangeArrI<int, 1, 10, 0> CoinFrame2;
 //Public EditorCursor As EditorCursor
 extern EditorCursor_t EditorCursor;
 //Public EditorControls As EditorControls
+extern OldEditorControls_t OldEditorControls;
+
+extern SharedControls_t SharedControls;
+
+extern CursorControls_t SharedCursor;
+
 extern EditorControls_t EditorControls;
+
+// extern RangeArr<CursorControls_t, 1, maxLocalPlayers> PlayerCursor;
 
 //Public Sound(1 To numSounds) As Integer
 extern RangeArrI<int, 1, numSounds, 0> Sound;
@@ -1732,8 +1761,11 @@ extern RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 extern int Score;
 //Public Points(1 To 13) As Integer
 extern RangeArrI<int, 1, 13, 0> Points;
+
+// moved into the implementation details of InputMethodProfile_Joystick
 //Public oldJumpJoy As Integer
-extern KM_Key oldJumpJoy;
+// extern KM_Key oldJumpJoy;
+
 //Public MaxWorldStars As Integer 'maximum number of world stars
 extern int MaxWorldStars;
 //Public Debugger As Boolean 'if the debugger window is open
@@ -1754,11 +1786,11 @@ extern RangeArrI<bool, 1, maxBlockType, false> GFXBlockCustom;
 //extern RangeArrI<long, 1, maxBlockType, 0> GFXBlock;
 #define GFXBlock GFXBlockBMP
 //Public GFXBlockMask(1 To maxBlockType) As Long
-extern RangeArrI<long, 1, maxBlockType, 0> GFXBlockMask;
+//extern RangeArrI<long, 1, maxBlockType, 0> GFXBlockMask;
 //Public GFXBlockBMP(1 To maxBlockType) As StdPicture
 extern RangeArr<StdPicture, 1, maxBlockType> GFXBlockBMP;
 //Public GFXBlockMaskBMP(1 To maxBlockType) As StdPicture
-extern RangeArr<StdPicture, 1, maxBlockType> GFXBlockMaskBMP;
+//extern RangeArr<StdPicture, 1, maxBlockType> GFXBlockMaskBMP;
 //Public GFXBackground2Custom(1 To numBackground2) As Boolean
 extern RangeArrI<bool, 1, numBackground2, false> GFXBackground2Custom;
 //Public GFXBackground2(1 To numBackground2) As Long
@@ -1776,11 +1808,11 @@ extern RangeArrI<bool, 1, maxNPCType, false> GFXNPCCustom;
 //extern RangeArrI<long, 1, maxNPCType, 0> GFXNPC;
 #define GFXNPC GFXNPCBMP
 //Public GFXNPCMask(1 To maxNPCType) As Long
-extern RangeArrI<long, 1, maxNPCType, 0> GFXNPCMask;
+//extern RangeArrI<long, 1, maxNPCType, 0> GFXNPCMask;
 //Public GFXNPCBMP(1 To maxNPCType) As StdPicture
 extern RangeArr<StdPicture, 0, maxNPCType> GFXNPCBMP;
 //Public GFXNPCMaskBMP(1 To maxNPCType) As StdPicture
-extern RangeArr<StdPicture, 0, maxNPCType> GFXNPCMaskBMP;
+//extern RangeArr<StdPicture, 0, maxNPCType> GFXNPCMaskBMP;
 //Public GFXNPCHeight(1 To maxNPCType) As Integer
 extern RangeArrI<int, 1, maxNPCType, 0> GFXNPCHeight;
 //Public GFXNPCWidth(1 To maxNPCType) As Integer
@@ -1791,11 +1823,11 @@ extern RangeArrI<bool, 1, maxEffectType, false> GFXEffectCustom;
 //extern RangeArrI<long, 1, maxEffectType, 0> GFXEffect;
 #define GFXEffect GFXEffectBMP
 //Public GFXEffectMask(1 To maxEffectType) As Long
-extern RangeArrI<long, 1, maxEffectType, 0> GFXEffectMask;
+//extern RangeArrI<long, 1, maxEffectType, 0> GFXEffectMask;
 //Public GFXEffectBMP(1 To maxEffectType) As StdPicture
 extern RangeArr<StdPicture, 1, maxEffectType> GFXEffectBMP;
 //Public GFXEffectMaskBMP(1 To maxEffectType) As StdPicture
-extern RangeArr<StdPicture, 1, maxEffectType> GFXEffectMaskBMP;
+//extern RangeArr<StdPicture, 1, maxEffectType> GFXEffectMaskBMP;
 //Public GFXEffectHeight(1 To maxEffectType) As Integer
 extern RangeArrI<int, 1, maxEffectType, 0> GFXEffectHeight;
 //Public GFXEffectWidth(1 To maxEffectType) As Integer
@@ -1806,11 +1838,11 @@ extern RangeArrI<bool, 1, maxBackgroundType, false> GFXBackgroundCustom;
 //extern RangeArrI<long, 1, maxBackgroundType, 0> GFXBackground;
 #define GFXBackground GFXBackgroundBMP
 //Public GFXBackgroundMask(1 To maxBackgroundType) As Long
-extern RangeArrI<long, 1, maxBackgroundType, 0> GFXBackgroundMask;
+//extern RangeArrI<long, 1, maxBackgroundType, 0> GFXBackgroundMask;
 //Public GFXBackgroundBMP(1 To maxBackgroundType) As StdPicture
 extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundBMP;
 //Public GFXBackgroundMaskBMP(1 To maxBackgroundType) As StdPicture
-extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
+//extern RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
 //Public GFXBackgroundHeight(1 To maxBackgroundType) As Integer
 extern RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundHeight;
 //Public GFXBackgroundWidth(1 To maxBackgroundType) As Integer
@@ -1828,11 +1860,11 @@ extern RangeArrI<bool, 1, 10, false> GFXMarioCustom;
 //extern RangeArrI<long, 1, 10, 0> GFXMario;
 #define GFXMario GFXMarioBMP
 //Public GFXMarioMask(1 To 10) As Long
-extern RangeArrI<long, 1, 10, 0> GFXMarioMask;
+//extern RangeArrI<long, 1, 10, 0> GFXMarioMask;
 //Public GFXMarioBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXMarioBMP;
 //Public GFXMarioMaskBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXMarioMaskBMP;
+//extern RangeArr<StdPicture, 1, 10> GFXMarioMaskBMP;
 //Public GFXMarioHeight(1 To 10) As Integer
 extern RangeArrI<int, 1, 10, 0> GFXMarioHeight;
 //Public GFXMarioWidth(1 To 10) As Integer
@@ -1843,11 +1875,11 @@ extern RangeArrI<bool, 1, 10, false> GFXLuigiCustom;
 //extern RangeArrI<long, 1, 10, 0> GFXLuigi;
 #define GFXLuigi GFXLuigiBMP
 //Public GFXLuigiMask(1 To 10) As Long
-extern RangeArrI<long, 1, 10, 0> GFXLuigiMask;
+//extern RangeArrI<long, 1, 10, 0> GFXLuigiMask;
 //Public GFXLuigiBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXLuigiBMP;
 //Public GFXLuigiMaskBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXLuigiMaskBMP;
+//extern RangeArr<StdPicture, 1, 10> GFXLuigiMaskBMP;
 //Public GFXLuigiHeight(1 To 10) As Integer
 extern RangeArrI<int, 1, 10, 0> GFXLuigiHeight;
 //Public GFXLuigiWidth(1 To 10) As Integer
@@ -1858,11 +1890,11 @@ extern RangeArrI<bool, 1, 10, false> GFXPeachCustom;
 //extern RangeArrI<long, 1, 10, 0> GFXPeach;
 #define GFXPeach GFXPeachBMP
 //Public GFXPeachMask(1 To 10) As Long
-extern RangeArrI<long, 1, 10, 0> GFXPeachMask;
+//extern RangeArrI<long, 1, 10, 0> GFXPeachMask;
 //Public GFXPeachBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXPeachBMP;
 //Public GFXPeachMaskBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXPeachMaskBMP;
+//extern RangeArr<StdPicture, 1, 10> GFXPeachMaskBMP;
 //Public GFXPeachHeight(1 To 10) As Integer
 extern RangeArrI<int, 1, 10, 0> GFXPeachHeight;
 //Public GFXPeachWidth(1 To 10) As Integer
@@ -1873,11 +1905,11 @@ extern RangeArrI<bool, 1, 10, false> GFXToadCustom;
 //extern RangeArrI<long, 1, 10, 0> GFXToad;
 #define GFXToad GFXToadBMP
 //Public GFXToadMask(1 To 10) As Long
-extern RangeArrI<long, 1, 10, 0> GFXToadMask;
+//extern RangeArrI<long, 1, 10, 0> GFXToadMask;
 //Public GFXToadBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXToadBMP;
 //Public GFXToadMaskBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXToadMaskBMP;
+//extern RangeArr<StdPicture, 1, 10> GFXToadMaskBMP;
 //Public GFXToadHeight(1 To 10) As Integer
 extern RangeArrI<int, 1, 10, 0> GFXToadHeight;
 //Public GFXToadWidth(1 To 10) As Integer
@@ -1889,11 +1921,11 @@ extern RangeArrI<bool, 1, 10, false> GFXLinkCustom;
 //extern RangeArrI<long, 1, 10, 0> GFXLink;
 #define GFXLink GFXLinkBMP
 //Public GFXLinkMask(1 To 10) As Long
-extern RangeArrI<long, 1, 10, 0> GFXLinkMask;
+//extern RangeArrI<long, 1, 10, 0> GFXLinkMask;
 //Public GFXLinkBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, 10> GFXLinkBMP;
 //Public GFXLinkMaskBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, 10> GFXLinkMaskBMP;
+//extern RangeArr<StdPicture, 1, 10> GFXLinkMaskBMP;
 //Public GFXLinkHeight(1 To 10) As Integer
 extern RangeArrI<int, 1, 10, 0> GFXLinkHeight;
 //Public GFXLinkWidth(1 To 10) As Integer
@@ -1904,22 +1936,22 @@ extern RangeArrI<bool, 1, maxYoshiGfx, false> GFXYoshiBCustom;
 //extern RangeArrI<long, 1, maxYoshiGfx, 0> GFXYoshiB;
 #define GFXYoshiB GFXYoshiBBMP
 //Public GFXYoshiBMask(1 To 10) As Long
-extern RangeArrI<long, 1, maxYoshiGfx, 0> GFXYoshiBMask;
+//extern RangeArrI<long, 1, maxYoshiGfx, 0> GFXYoshiBMask;
 //Public GFXYoshiBBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiBBMP;
 //Public GFXYoshiBMaskBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiBMaskBMP;
+//extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiBMaskBMP;
 //Public GFXYoshiTCustom(1 To 10) As Boolean
 extern RangeArrI<bool, 1, maxYoshiGfx, false> GFXYoshiTCustom;
 //Public GFXYoshiT(1 To 10) As Long
 //extern RangeArrI<long, 1, maxYoshiGfx, 0> GFXYoshiT;
 #define GFXYoshiT GFXYoshiTBMP
 //Public GFXYoshiTMask(1 To 10) As Long
-extern RangeArrI<long, 1, maxYoshiGfx, 0> GFXYoshiTMask;
+//extern RangeArrI<long, 1, maxYoshiGfx, 0> GFXYoshiTMask;
 //Public GFXYoshiTBMP(1 To 10) As StdPicture
 extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiTBMP;
 //Public GFXYoshiTMaskBMP(1 To 10) As StdPicture
-extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiTMaskBMP;
+//extern RangeArr<StdPicture, 1, maxYoshiGfx> GFXYoshiTMaskBMP;
 //'World Map Graphics
 //Public GFXTileCustom(1 To maxTileType) As Long
 extern RangeArrI<bool, 1, maxTileType, false> GFXTileCustom;
@@ -1938,11 +1970,11 @@ extern RangeArrI<bool, 0, maxLevelType, false> GFXLevelCustom;
 //extern RangeArrI<long, 0, maxLevelType, 0> GFXLevel;
 #define GFXLevel GFXLevelBMP
 //Public GFXLevelMask(0 To maxLevelType) As Long
-extern RangeArrI<long, 0, maxLevelType, 0> GFXLevelMask;
+//extern RangeArrI<long, 0, maxLevelType, 0> GFXLevelMask;
 //Public GFXLevelBMP(0 To maxLevelType) As StdPicture
 extern RangeArr<StdPicture, 0, maxLevelType> GFXLevelBMP;
 //Public GFXLevelMaskBMP(0 To maxLevelType) As StdPicture
-extern RangeArr<StdPicture, 0, maxLevelType> GFXLevelMaskBMP;
+//extern RangeArr<StdPicture, 0, maxLevelType> GFXLevelMaskBMP;
 //Public GFXLevelHeight(0 To maxLevelType) As Integer
 extern RangeArrI<int, 0, maxLevelType, 0> GFXLevelHeight;
 //Public GFXLevelWidth(0 To maxLevelType) As Integer
@@ -1955,11 +1987,11 @@ extern RangeArrI<bool, 1, maxSceneType, false> GFXSceneCustom;
 //extern RangeArrI<long, 1, maxSceneType, 0> GFXScene;
 #define GFXScene GFXSceneBMP
 //Public GFXSceneMask(1 To maxSceneType) As Long
-extern RangeArrI<long, 1, maxSceneType, 0> GFXSceneMask;
+//extern RangeArrI<long, 1, maxSceneType, 0> GFXSceneMask;
 //Public GFXSceneBMP(1 To maxSceneType) As StdPicture
 extern RangeArr<StdPicture, 1, maxSceneType> GFXSceneBMP;
 //Public GFXSceneMaskBMP(1 To maxSceneType) As StdPicture
-extern RangeArr<StdPicture, 1, maxSceneType> GFXSceneMaskBMP;
+//extern RangeArr<StdPicture, 1, maxSceneType> GFXSceneMaskBMP;
 //Public GFXSceneHeight(1 To maxSceneType) As Integer
 extern RangeArrI<int, 1, maxSceneType, 0> GFXSceneHeight;
 //Public GFXSceneWidth(1 To maxSceneType) As Integer
@@ -1970,11 +2002,11 @@ extern RangeArrI<bool, 1, maxPathType, false> GFXPathCustom;
 //extern RangeArrI<long, 1, maxPathType, 0> GFXPath;
 #define GFXPath GFXPathBMP
 //Public GFXPathMask(1 To maxPathType) As Long
-extern RangeArrI<long, 1, maxPathType, 0> GFXPathMask;
+//extern RangeArrI<long, 1, maxPathType, 0> GFXPathMask;
 //Public GFXPathBMP(1 To maxPathType) As StdPicture
 extern RangeArr<StdPicture, 1, maxPathType> GFXPathBMP;
 //Public GFXPathMaskBMP(1 To maxPathType) As StdPicture
-extern RangeArr<StdPicture, 1, maxPathType> GFXPathMaskBMP;
+//extern RangeArr<StdPicture, 1, maxPathType> GFXPathMaskBMP;
 //Public GFXPathHeight(1 To maxPathType) As Integer
 extern RangeArrI<int, 1, maxPathType, 0> GFXPathHeight;
 //Public GFXPathWidth(1 To maxPathType) As Integer
@@ -1986,11 +2018,11 @@ extern RangeArrI<bool, 1, numCharacters, false> GFXPlayerCustom;
 //extern RangeArrI<long, 1, numCharacters, 0> GFXPlayer;
 #define GFXPlayer GFXPlayerBMP
 //Public GFXPlayerMask(1 To numCharacters) As Long
-extern RangeArrI<long, 1, numCharacters, 0> GFXPlayerMask;
+//extern RangeArrI<long, 1, numCharacters, 0> GFXPlayerMask;
 //Public GFXPlayerBMP(1 To numCharacters) As StdPicture
 extern RangeArr<StdPicture, 1, numCharacters> GFXPlayerBMP;
 //Public GFXPlayerMaskBMP(1 To numCharacters) As StdPicture
-extern RangeArr<StdPicture, 1, numCharacters> GFXPlayerMaskBMP;
+//extern RangeArr<StdPicture, 1, numCharacters> GFXPlayerMaskBMP;
 //Public GFXPlayerHeight(1 To numCharacters) As Integer
 extern RangeArrI<int, 1, numCharacters, 0> GFXPlayerHeight;
 //Public GFXPlayerWidth(1 To numCharacters) As Integer
@@ -2000,22 +2032,29 @@ extern RangeArrI<int, 1, numCharacters, 0> GFXPlayerWidth;
 extern int PlayerCharacter;
 //Public PlayerCharacter2 As Integer
 extern int PlayerCharacter2;
+
+// replaced with SharedCursor.*
+
 //Public MenuMouseX As Double
-extern double MenuMouseX;
+// extern double MenuMouseX;
 //Public MenuMouseY As Double
-extern double MenuMouseY;
+// extern double MenuMouseY;
 //! mouse wheel delta
-extern Sint32 MenuWheelDelta;
+// extern Sint32 MenuWheelDelta;
 //! mouse wheel event
-extern bool MenuWheelMoved;
+// extern bool MenuWheelMoved;
 //Public MenuMouseDown As Boolean
-extern bool MenuMouseDown;
+// extern bool MenuMouseDown;
 //Public MenuMouseBack As Boolean
-extern bool MenuMouseBack;
+// extern bool MenuMouseBack;
+//Public MenuMouseMove As Boolean
+// extern bool MenuMouseMove;
+
+// these are preserved because they keep track of the specific frame
+//   that the mouse is clicked / released
+
 //Public MenuMouseRelease As Boolean
 extern bool MenuMouseRelease;
-//Public MenuMouseMove As Boolean
-extern bool MenuMouseMove;
 //Public MenuMouseClick As Boolean
 extern bool MenuMouseClick;
 

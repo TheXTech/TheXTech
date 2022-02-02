@@ -114,14 +114,6 @@ public class thextechActivity extends SDLActivity
         if(!levelToRun.isEmpty())
             args.add(levelToRun);
 
-        setTouchScreenMode(Integer.parseInt(setup.getString("setup_touchscreen_mode", "1")));
-        setTouchScreenShowOnStart(setup.getBoolean("touchscreen_gamepad_showalways", false));
-        setTouchPadStyle(Integer.parseInt(setup.getString("setup_touchscreen_style", "0")));
-
-        setVibrationEnabled(setup.getBoolean("touchscreen_feedback_enabled", false));
-        setVibrationStrength(Float.parseFloat(setup.getString("touchscreen_vibration_strength", "1.0")));
-        setVibrationLength(Integer.parseInt(setup.getString("touchscreen_vibration_length", "12")));
-
         String gameAssetsPath = setup.getString("setup_assets_path", "");
         if(!gameAssetsPath.isEmpty())
         {
@@ -143,7 +135,6 @@ public class thextechActivity extends SDLActivity
         super.onStart();
         gameRunning = true;
         levelToRun = "";
-        setHardwareKeyboardPresence(getResources().getConfiguration().keyboard);
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if(extras != null)
@@ -182,7 +173,7 @@ public class thextechActivity extends SDLActivity
         System.exit(0);
     }
 
-    private void requestCheatShow()
+    private void requestTextShow()
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(R.string.cheat_dialog_title);
@@ -198,7 +189,7 @@ public class thextechActivity extends SDLActivity
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                cheats_setBuffer(input.getText().toString());
+                textentry_setBuffer(input.getText().toString());
                 messageboxSelection[0] = 1;
                 dialog.dismiss();
             }
@@ -227,7 +218,7 @@ public class thextechActivity extends SDLActivity
         dialog.show();
     }
 
-    public void requestCheat()
+    public void requestText()
     {
         messageboxSelection[0] = -1;
 
@@ -235,7 +226,7 @@ public class thextechActivity extends SDLActivity
         {
             @Override
             public void run() {
-                requestCheatShow();
+                requestTextShow();
             }
         });
 
@@ -248,18 +239,10 @@ public class thextechActivity extends SDLActivity
         }
     }
 
-    public static native void setHardwareKeyboardPresence(int keyboard);
-    public static native void setTouchScreenMode(int mode);
-    public static native void setTouchScreenShowOnStart(boolean showOnStart);
     public static native void setScreenSize(double screenSize, double width, double height);
-    public static native void setTouchPadStyle(int style);
     public static native void setSdCardPath(String path);
     public static native void setAppDataPath(String path);
     public static native void setGameAssetsPath(String path);
     // Send the cheat buffer line
-    public static native void cheats_setBuffer(String line);
-    // Touch-screen controller feeback
-    public static native void setVibrationEnabled(boolean enabled);
-    public static native void setVibrationStrength(float strength);
-    public static native void setVibrationLength(int length);
+    public static native void textentry_setBuffer(String line);
 }

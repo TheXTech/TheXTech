@@ -23,6 +23,7 @@
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include "globals.h"
+#include "global_dirs.h"
 #include "compat.h"
 #include "main/speedrunner.h"
 
@@ -83,6 +84,12 @@ static void compatInit(Compatibility_t &c)
     c.fix_npc_activation_event_loop_bug = true;
     c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
+    c.pause_on_disconnect = true;
+    c.allow_drop_add = true;
+    c.multiplayer_pause_controls = true;
+    c.demos_counter_enable = false;
+    c.luna_allow_level_codes = false;
+    c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -113,6 +120,9 @@ static void compatInit(Compatibility_t &c)
         // 1.3.5.3
         c.fix_npc_activation_event_loop_bug = false;
         // 1.3.6
+        c.pause_on_disconnect = false;
+        c.allow_drop_add = false;
+        c.multiplayer_pause_controls = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -170,6 +180,27 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
     compat.endGroup();
 
+    compat.beginGroup("death-counter");
+    {
+        compat.read("enabled", c.demos_counter_enable, c.demos_counter_enable);
+    }
+    compat.endGroup();
+
+    compat.beginGroup("luna-script");
+    {
+        const IniProcessing::StrEnumMap lunaEnable
+        {
+            {"unpsecified", Compatibility_t::LUNA_ENGINE_UNSPECIFIED},
+            {"enable", Compatibility_t::LUNA_ENGINE_ENABLE},
+            {"true", Compatibility_t::LUNA_ENGINE_ENABLE},
+            {"disable", Compatibility_t::LUNA_ENGINE_DISABLE},
+            {"false", Compatibility_t::LUNA_ENGINE_DISABLE}
+        };
+        compat.readEnum("enable-engine", c.luna_enable_engine, c.luna_enable_engine, lunaEnable);
+        compat.read("allow-level-codes", c.luna_allow_level_codes, c.luna_allow_level_codes);
+    }
+    compat.endGroup();
+
     if(s_compatLevel >= COMPAT_SMBX13)
     {
         if(g_speedRunnerMode >= SPEEDRUN_MODE_3)
@@ -213,6 +244,9 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         };
         compat.readEnum("world-map-stars-show-policy", c.world_map_stars_show_policy, c.world_map_stars_show_policy, starsShowPolicy);
         // 1.3.6
+        compat.read("pause-on-disconnect", c.pause_on_disconnect, c.pause_on_disconnect);
+        compat.read("allow-drop-add", c.allow_drop_add, c.allow_drop_add);
+        compat.read("multiplayer-pause-controls", c.multiplayer_pause_controls, c.multiplayer_pause_controls);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
@@ -227,23 +261,21 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
 
 void LoadCustomCompat()
 {
-    DirListCI s_dirEpisode;
-    DirListCI s_dirCustom;
     std::string episodeCompat, customCompat;
 
-    s_dirEpisode.setCurDir(FileNamePath);
-    s_dirCustom.setCurDir(FileNamePath + FileName);
+    g_dirEpisode.setCurDir(FileNamePath);
+    g_dirCustom.setCurDir(FileNamePath + FileName);
 
     // Episode-wide custom player setup
-    episodeCompat = FileNamePath + s_dirEpisode.resolveFileCase("compat.ini");
+    episodeCompat = g_dirEpisode.resolveFileCaseExistsAbs("compat.ini");
     // Level-wide custom player setup
-    customCompat = FileNamePath + FileName + "/" + s_dirCustom.resolveFileCase("compat.ini");
+    customCompat = g_dirCustom.resolveFileCaseExistsAbs("compat.ini");
 
     compatInit(g_compatibility);
 
-    if(Files::fileExists(episodeCompat))
+    if(!episodeCompat.empty())
         loadCompatIni(g_compatibility, episodeCompat);
-    if(Files::fileExists(customCompat))
+    if(!customCompat.empty())
         loadCompatIni(g_compatibility, customCompat);
 }
 

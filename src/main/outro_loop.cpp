@@ -25,7 +25,7 @@
 #include "../game_main.h"
 #include "../core/render.h"
 #include "../core/events.h"
-#include "../control/joystick.h"
+#include "../controls.h"
 #include "../npc.h"
 #include "../blocks.h"
 #include "../collision.h"
@@ -38,7 +38,7 @@
 #include "game_info.h"
 
 
-void DoCredits()
+void DoCredits(bool quit)
 {
     if(GameMenu)
         return;
@@ -98,23 +98,7 @@ void DoCredits()
     {
 //        for(A = 1; A <= 2; A++) // Useless loop
 //        {
-        bool quitKey = false;
-        quitKey |= XEvents::getKeyState(vbKeyEscape);
-        quitKey |= XEvents::getKeyState(vbKeySpace);
-        quitKey |= XEvents::getKeyState(vbKeyReturn);
-        for(int p = 1; p <= maxLocalPlayers; ++p)
-        {
-            if(useJoystick[p] > 0)
-                quitKey |= joyIsKeyDown(useJoystick[p] - 1, conJoystick[p].Start);
-        }
-#ifdef __ANDROID__ // Quit credits on BACK key press
-        quitKey |= XEvents::getKeyState(SDL_SCANCODE_AC_BACK);
-#endif
-#ifdef USE_TOUCHSCREEN_CONTROLLER // Quit when pressed the "Start" on a touchscreen controller
-        quitKey |= CurrentTouchControls().Start;
-#endif
-
-        if(quitKey)
+        if(quit)
         {
             CreditChop = static_cast<float>(screenH_half);
             EndCredits = 0;
@@ -129,16 +113,20 @@ void DoCredits()
 
 void OutroLoop()
 {
-    const Controls_t blankControls;
+    Controls::Update();
+    bool quit = SharedControls.QuitCredits;
+    for(int i = 0; i < maxLocalPlayers; i++)
+    {
+        quit |= Player[i+1].Controls.Start;
+    }
 
     if(g_gameInfo.outroDeadMode)
     {
-        UpdateControls();
         UpdateNPCs();
         UpdateBlocks();
         UpdateEffects();
         // UpdatePlayer();
-        DoCredits();
+        DoCredits(quit);
         UpdateGraphics();
         UpdateSound();
 
@@ -150,12 +138,10 @@ void OutroLoop()
         return;
     }
 
-    UpdateControls();
-
     for(int A = 1; A <= numPlayers; A++)
     {
         auto &pp = Player[A];
-        pp.Controls = blankControls;
+        pp.Controls = Controls_t();
 
         if(g_gameInfo.outroWalkDirection < 0)
             pp.Controls.Left = true;
@@ -224,7 +210,7 @@ void OutroLoop()
     UpdateBlocks();
     UpdateEffects();
     UpdatePlayer();
-    DoCredits();
+    DoCredits(quit);
     UpdateGraphics();
     UpdateSound();
     if(GameOutroDoQuit) // Don't unset the GameOutro before GFX update, otherwise a glitch will happen
@@ -234,7 +220,7 @@ void OutroLoop()
     }
 }
 
-void AddCredit(std::string newCredit)
+void AddCredit(const std::string &newCredit)
 {
     numCredits += 1;
     if(numCredits > maxCreditsLines)
@@ -243,7 +229,11 @@ void AddCredit(std::string newCredit)
         pLogWarning("Can't add more credits lines: max limit has been excited ({0} linex maximum)", maxCreditsLines);
         return;
     }
-    Credit[numCredits].Text = newCredit;
+
+    auto &c = Credit[numCredits];
+    c.Text = STRINGINDEX_NONE;
+
+    SetS(c.Text, newCredit);
 }
 
 void SetupCredits()
@@ -331,6 +321,7 @@ void SetupCredits()
     AddCredit("Yingchun Soul"); // Idea for individual iceball shooting SFX and contribution with the "frozen NPC breaking" SFX
     AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
     AddCredit("Slash-18"); // Contribution with the better iceball shooting SFX
+    AddCredit("ds-sloth"); // For the major contribution to the code and becoming a co-developer
 #endif
     AddCredit("");
     AddCredit("4matsy");
@@ -412,7 +403,7 @@ void SetupCredits()
     for(A = 1; A <= numCredits; A++)
     {
         auto &cr = Credit[A];
-        cr.Location.Width = cr.Text.size() * 18;
+        cr.Location.Width = GetS(cr.Text).size() * 18;
         cr.Location.Height = 16;
         cr.Location.X = (double(ScreenW) / 2) - (cr.Location.Width / 2.0);
         cr.Location.Y = 32 * A;

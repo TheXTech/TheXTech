@@ -19,9 +19,6 @@
  */
 
 #include <SDL2/SDL_version.h>
-#include <SDL2/SDL_scancode.h>
-#include <SDL2/SDL_mouse.h>
-#include <SDL2/SDL_gamecontroller.h>
 
 #include "core/events.h"
 #include "globals.h"
@@ -51,13 +48,9 @@ bool StartMenu = false;
 int BlockFlash = 0;
 bool ScrollRelease = false;
 bool TakeScreen = false;
-bool ShowOnScreenMeta = true;
+bool ShowOnScreenHUD = true;
 std::string LB;
 std::string EoT;
-RangeArr<ConKeyboard_t, 1, maxLocalPlayers> conKeyboard;
-RangeArr<ConJoystick_t, 1, maxLocalPlayers> conJoystick;
-RangeArrI<int, 1, maxLocalPlayers, 0> useJoystick;
-RangeArrI<bool, 1, maxLocalPlayers, false> wantedKeyboard;
 
 std::string Checkpoint;
 std::vector<Checkpoint_t> CheckpointsList;
@@ -66,11 +59,10 @@ RangeArr<Player_t, 1, 2> testPlayer;
 bool ClearBuffer = false;
 int numLocked = 0;
 bool resChanged = false;
-int inputKey = 0;
-bool getNewKeyboard = false;
-bool getNewJoystick = false;
-KM_Key lastJoyButton;
-bool GamePaused = false;
+
+// moved into game_loop.cpp
+// PauseCode GamePaused = PauseCode::None;
+
 std::string MessageText;
 int NumSelectWorld  = 0;
 std::vector<SelectWorld_t> SelectWorld;
@@ -208,6 +200,7 @@ RangeArr<double, 0, maxPlayers> vScreenY;
 RangeArr<double, 0, maxPlayers> qScreenX;
 RangeArr<double, 0, maxPlayers> qScreenY;
 bool qScreen = false;
+RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
 RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
 RangeArrI<int, 0, maxBlockType, 0> BlockHeight;
@@ -250,7 +243,12 @@ RangeArrI<bool, 0, maxBlockType, false> BlockNoClipping;
 RangeArrI<int, 1, 10, 0> CoinFrame;
 RangeArrI<int, 1, 10, 0> CoinFrame2;
 EditorCursor_t EditorCursor;
+OldEditorControls_t OldEditorControls;
 EditorControls_t EditorControls;
+SharedControls_t SharedControls;
+
+CursorControls_t SharedCursor;
+// RangeArr<CursorControls_t, 1, maxLocalPlayers> PlayerCursor;
 
 RangeArrI<int, 1, numSounds, 0> Sound;
 RangeArrI<int, 1, numSounds, 0> SoundPause;
@@ -341,7 +339,6 @@ bool Cheater = false;
 RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 int Score = 0;
 RangeArrI<int, 1, 13, 0> Points;
-KM_Key oldJumpJoy;
 int MaxWorldStars = 0;
 bool Debugger = false;
 RangeArr<Player_t, 0, 10> SavedChar;
@@ -352,9 +349,9 @@ float LoadCoinsT = 0.0f;
 
 RangeArrI<bool, 1, maxBlockType, false> GFXBlockCustom;
 //RangeArrI<long, 1, maxBlockType, 0> GFXBlock;
-RangeArrI<long, 1, maxBlockType, 0> GFXBlockMask;
+//RangeArrI<long, 1, maxBlockType, 0> GFXBlockMask;
 RangeArr<StdPicture, 1, maxBlockType> GFXBlockBMP;
-RangeArr<StdPicture, 1, maxBlockType> GFXBlockMaskBMP;
+//RangeArr<StdPicture, 1, maxBlockType> GFXBlockMaskBMP;
 RangeArrI<bool, 1, numBackground2, false> GFXBackground2Custom;
 //RangeArrI<long, 1, numBackground2, 0> GFXBackground2;
 RangeArr<StdPicture, 1, numBackground2> GFXBackground2BMP;
@@ -362,23 +359,23 @@ RangeArrI<int, 1, numBackground2, 0> GFXBackground2Height;
 RangeArrI<int, 1, numBackground2, 0> GFXBackground2Width;
 RangeArrI<bool, 1, maxNPCType, false> GFXNPCCustom;
 //RangeArrI<long, 1, maxNPCType, 0> GFXNPC;
-RangeArrI<long, 1, maxNPCType, 0> GFXNPCMask;
+//RangeArrI<long, 1, maxNPCType, 0> GFXNPCMask;
 RangeArr<StdPicture, 0, maxNPCType> GFXNPCBMP;
-RangeArr<StdPicture, 0, maxNPCType> GFXNPCMaskBMP;
+//RangeArr<StdPicture, 0, maxNPCType> GFXNPCMaskBMP;
 RangeArrI<int, 1, maxNPCType, 0> GFXNPCHeight;
 RangeArrI<int, 1, maxNPCType, 0> GFXNPCWidth;
 RangeArrI<bool, 1, maxEffectType, false> GFXEffectCustom;
 //RangeArrI<long, 1, maxEffectType, 0> GFXEffect;
-RangeArrI<long, 1, maxEffectType, 0> GFXEffectMask;
+//RangeArrI<long, 1, maxEffectType, 0> GFXEffectMask;
 RangeArr<StdPicture, 1, maxEffectType> GFXEffectBMP;
-RangeArr<StdPicture, 1, maxEffectType> GFXEffectMaskBMP;
+//RangeArr<StdPicture, 1, maxEffectType> GFXEffectMaskBMP;
 RangeArrI<int, 1, maxEffectType, 0> GFXEffectHeight;
 RangeArrI<int, 1, maxEffectType, 0> GFXEffectWidth;
 RangeArrI<bool, 1, maxBackgroundType, false> GFXBackgroundCustom;
 //RangeArrI<long, 1, maxBackgroundType, 0> GFXBackground;
-RangeArrI<long, 1, maxBackgroundType, 0> GFXBackgroundMask;
+//RangeArrI<long, 1, maxBackgroundType, 0> GFXBackgroundMask;
 RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundBMP;
-RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
+//RangeArr<StdPicture, 1, maxBackgroundType> GFXBackgroundMaskBMP;
 RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundHeight;
 RangeArrI<int, 1, maxBackgroundType, 0> GFXBackgroundWidth;
 
@@ -405,51 +402,51 @@ RangeArrI<bool, 1, 10, false> *GFXCharacterCustom[numCharacters] =
 
 RangeArrI<bool, 1, 10, false> GFXMarioCustom;
 //RangeArrI<long, 1, 10, 0> GFXMario;
-RangeArrI<long, 1, 10, 0> GFXMarioMask;
+//RangeArrI<long, 1, 10, 0> GFXMarioMask;
 RangeArr<StdPicture, 1, 10> GFXMarioBMP;
-RangeArr<StdPicture, 1, 10> GFXMarioMaskBMP;
+//RangeArr<StdPicture, 1, 10> GFXMarioMaskBMP;
 RangeArrI<int, 1, 10, 0> GFXMarioHeight;
 RangeArrI<int, 1, 10, 0> GFXMarioWidth;
 RangeArrI<bool, 1, 10, false> GFXLuigiCustom;
 //RangeArrI<long, 1, 10, 0> GFXLuigi;
-RangeArrI<long, 1, 10, 0> GFXLuigiMask;
+//RangeArrI<long, 1, 10, 0> GFXLuigiMask;
 RangeArr<StdPicture, 1, 10> GFXLuigiBMP;
-RangeArr<StdPicture, 1, 10> GFXLuigiMaskBMP;
+//RangeArr<StdPicture, 1, 10> GFXLuigiMaskBMP;
 RangeArrI<int, 1, 10, 0> GFXLuigiHeight;
 RangeArrI<int, 1, 10, 0> GFXLuigiWidth;
 RangeArrI<bool, 1, 10, false> GFXPeachCustom;
 //RangeArrI<long, 1, 10, 0> GFXPeach;
-RangeArrI<long, 1, 10, 0> GFXPeachMask;
+//RangeArrI<long, 1, 10, 0> GFXPeachMask;
 RangeArr<StdPicture, 1, 10> GFXPeachBMP;
-RangeArr<StdPicture, 1, 10> GFXPeachMaskBMP;
+//RangeArr<StdPicture, 1, 10> GFXPeachMaskBMP;
 RangeArrI<int, 1, 10, 0> GFXPeachHeight;
 RangeArrI<int, 1, 10, 0> GFXPeachWidth;
 RangeArrI<bool, 1, 10, false> GFXToadCustom;
 //RangeArrI<long, 1, 10, 0> GFXToad;
-RangeArrI<long, 1, 10, 0> GFXToadMask;
+//RangeArrI<long, 1, 10, 0> GFXToadMask;
 RangeArr<StdPicture, 1, 10> GFXToadBMP;
-RangeArr<StdPicture, 1, 10> GFXToadMaskBMP;
+//RangeArr<StdPicture, 1, 10> GFXToadMaskBMP;
 RangeArrI<int, 1, 10, 0> GFXToadHeight;
 RangeArrI<int, 1, 10, 0> GFXToadWidth;
 
 RangeArrI<bool, 1, 10, false> GFXLinkCustom;
 //RangeArrI<long, 1, 10, 0> GFXLink;
-RangeArrI<long, 1, 10, 0> GFXLinkMask;
+//RangeArrI<long, 1, 10, 0> GFXLinkMask;
 RangeArr<StdPicture, 1, 10> GFXLinkBMP;
-RangeArr<StdPicture, 1, 10> GFXLinkMaskBMP;
+//RangeArr<StdPicture, 1, 10> GFXLinkMaskBMP;
 RangeArrI<int, 1, 10, 0> GFXLinkHeight;
 RangeArrI<int, 1, 10, 0> GFXLinkWidth;
 
 RangeArrI<bool, 1, maxYoshiGfx, false> GFXYoshiBCustom;
 //RangeArrI<long, 1, 10, 0> GFXYoshiB;
-RangeArrI<long, 1, 10, 0> GFXYoshiBMask;
+//RangeArrI<long, 1, 10, 0> GFXYoshiBMask;
 RangeArr<StdPicture, 1, 10> GFXYoshiBBMP;
-RangeArr<StdPicture, 1, 10> GFXYoshiBMaskBMP;
+//RangeArr<StdPicture, 1, 10> GFXYoshiBMaskBMP;
 RangeArrI<bool, 1, 10, false> GFXYoshiTCustom;
 //RangeArrI<long, 1, 10, 0> GFXYoshiT;
-RangeArrI<long, 1, 10, 0> GFXYoshiTMask;
+//RangeArrI<long, 1, 10, 0> GFXYoshiTMask;
 RangeArr<StdPicture, 1, 10> GFXYoshiTBMP;
-RangeArr<StdPicture, 1, 10> GFXYoshiTMaskBMP;
+//RangeArr<StdPicture, 1, 10> GFXYoshiTMaskBMP;
 RangeArrI<bool, 1, maxTileType, false> GFXTileCustom;
 //RangeArrI<long, 1, maxTileType, 0> GFXTile;
 RangeArr<StdPicture, 1, maxTileType> GFXTileBMP;
@@ -457,45 +454,45 @@ RangeArrI<int, 1, maxTileType, 0> GFXTileHeight;
 RangeArrI<int, 1, maxTileType, 0> GFXTileWidth;
 RangeArrI<bool, 0, maxLevelType, false> GFXLevelCustom;
 //RangeArrI<long, 0, maxLevelType, 0> GFXLevel;
-RangeArrI<long, 0, maxLevelType, 0> GFXLevelMask;
+//RangeArrI<long, 0, maxLevelType, 0> GFXLevelMask;
 RangeArr<StdPicture, 0, maxLevelType> GFXLevelBMP;
-RangeArr<StdPicture, 0, maxLevelType> GFXLevelMaskBMP;
+//RangeArr<StdPicture, 0, maxLevelType> GFXLevelMaskBMP;
 RangeArrI<int, 0, maxLevelType, 0> GFXLevelHeight;
 RangeArrI<int, 0, maxLevelType, 0> GFXLevelWidth;
 RangeArrI<bool, 0, maxLevelType, false> GFXLevelBig;
 RangeArrI<bool, 1, maxSceneType, false> GFXSceneCustom;
 //RangeArrI<long, 1, maxSceneType, 0> GFXScene;
-RangeArrI<long, 1, maxSceneType, 0> GFXSceneMask;
+//RangeArrI<long, 1, maxSceneType, 0> GFXSceneMask;
 RangeArr<StdPicture, 1, maxSceneType> GFXSceneBMP;
-RangeArr<StdPicture, 1, maxSceneType> GFXSceneMaskBMP;
+//RangeArr<StdPicture, 1, maxSceneType> GFXSceneMaskBMP;
 RangeArrI<int, 1, maxSceneType, 0> GFXSceneHeight;
 RangeArrI<int, 1, maxSceneType, 0> GFXSceneWidth;
 RangeArrI<bool, 1, maxPathType, false> GFXPathCustom;
 //RangeArrI<long, 1, maxPathType, 0> GFXPath;
-RangeArrI<long, 1, maxPathType, 0> GFXPathMask;
+//RangeArrI<long, 1, maxPathType, 0> GFXPathMask;
 RangeArr<StdPicture, 1, maxPathType> GFXPathBMP;
-RangeArr<StdPicture, 1, maxPathType> GFXPathMaskBMP;
+//RangeArr<StdPicture, 1, maxPathType> GFXPathMaskBMP;
 RangeArrI<int, 1, maxPathType, 0> GFXPathHeight;
 RangeArrI<int, 1, maxPathType, 0> GFXPathWidth;
 
 RangeArrI<bool, 1, numCharacters, false> GFXPlayerCustom;
 //RangeArrI<long, 1, numCharacters, 0> GFXPlayer;
-RangeArrI<long, 1, numCharacters, 0> GFXPlayerMask;
+//RangeArrI<long, 1, numCharacters, 0> GFXPlayerMask;
 RangeArr<StdPicture, 1, numCharacters> GFXPlayerBMP;
-RangeArr<StdPicture, 1, numCharacters> GFXPlayerMaskBMP;
+//RangeArr<StdPicture, 1, numCharacters> GFXPlayerMaskBMP;
 RangeArrI<int, 1, numCharacters, 0> GFXPlayerHeight;
 RangeArrI<int, 1, numCharacters, 0> GFXPlayerWidth;
 
 int PlayerCharacter = 0;
 int PlayerCharacter2 = 0;
-double MenuMouseX = 0.0;
-double MenuMouseY = 0.0;
-Sint32 MenuWheelDelta = 0;
-bool MenuWheelMoved = false;
-bool MenuMouseDown = false;
-bool MenuMouseBack = false;
+// double MenuMouseX = 0.0;
+// double MenuMouseY = 0.0;
+// Sint32 MenuWheelDelta = 0;
+// bool MenuWheelMoved = false;
+// bool MenuMouseDown = false;
+// bool MenuMouseBack = false;
 bool MenuMouseRelease = false;
-bool MenuMouseMove = false;
+// bool MenuMouseMove = false;
 bool MenuMouseClick = false;
 
 bool ForcedControls = false;
@@ -530,88 +527,18 @@ std::string LevelName;
 //    return XEvents::getKeyState(key);
 //}
 
-const char *getKeyName(int key)
-{
-    if(key < 0)
-        return " ... ";
-    return g_events->getScanCodeName(key);
-}
-
-std::string getJoyKeyName(bool isController, const KM_Key &key)
-{
-    if(isController)
-    {
-        if(key.ctrl_type < 0)
-            return "_";
-
-        switch(key.ctrl_id)
-        {
-        case SDL_CONTROLLER_BUTTON_A:
-            return "Button A";
-        case SDL_CONTROLLER_BUTTON_B:
-            return "Button B";
-        case SDL_CONTROLLER_BUTTON_X:
-            return "Button X";
-        case SDL_CONTROLLER_BUTTON_Y:
-            return "Button Y";
-        case SDL_CONTROLLER_BUTTON_BACK:
-            return "Button BACK";
-        case SDL_CONTROLLER_BUTTON_GUIDE:
-            return "Button GUIDE";
-        case SDL_CONTROLLER_BUTTON_START:
-            return "Button START";
-        case SDL_CONTROLLER_BUTTON_LEFTSTICK:
-            return "Button L-Stick";
-        case SDL_CONTROLLER_BUTTON_RIGHTSTICK:
-            return "Button R-Stick";
-        case SDL_CONTROLLER_BUTTON_LEFTSHOULDER:
-            return "Button L-Shoulder";
-        case SDL_CONTROLLER_BUTTON_RIGHTSHOULDER:
-            return "Button R-Shoulder";
-        case SDL_CONTROLLER_BUTTON_DPAD_UP:
-            return "D-Pad UP";
-        case SDL_CONTROLLER_BUTTON_DPAD_DOWN:
-            return "D-Pad DOWN";
-        case SDL_CONTROLLER_BUTTON_DPAD_LEFT:
-            return "D-Pad LEFT";
-        case SDL_CONTROLLER_BUTTON_DPAD_RIGHT:
-            return "D-Pad RIGHT";
-#if SDL_VERSION_ATLEAST(2, 0, 14)
-        case SDL_CONTROLLER_BUTTON_MISC1:
-            return "Misc. 1";
-        case SDL_CONTROLLER_BUTTON_PADDLE1:
-            return "Paddle 1";
-        case SDL_CONTROLLER_BUTTON_PADDLE2:
-            return "Paddle 2";
-        case SDL_CONTROLLER_BUTTON_PADDLE3:
-            return "Paddle 3";
-        case SDL_CONTROLLER_BUTTON_PADDLE4:
-            return "Paddle 4";
-        case SDL_CONTROLLER_BUTTON_TOUCHPAD:
-            return "Touchpad";
-#endif
-        default:
-            return "<invalid>";
-        }
-    }
-    else
-    {
-        if(key.type < 0)
-            return "_";
-        return fmt::format_ne("K={0} ID={1} T={2}", key.val, key.id, key.type);
-    }
-}
-
+// const char *getKeyName(int key)
+// {
+//     if(key < 0)
+//         return " ... ";
+//     return g_events->getScanCodeName(key);
+// }
 
 void initAll()
 {
     SavedEvents.fill(std::string());
     BlockSwitch.fill(false);
     PowerUpUnlock.fill(false);
-    conKeyboard.fill(ConKeyboard_t());
-    conJoystick.fill(ConJoystick_t());
-    useJoystick.fill(0);
-    wantedKeyboard.fill(false);
     vScreen.fill(vScreen_t());
     PlayerStart.fill(Location_t());
     blockCharacter.fill(false);
@@ -714,3 +641,9 @@ double vb6Round(double x, int decimals)
 
     return res;
 }
+
+
+// utilities for stringindex_t
+const std::string g_emptyString = "";
+std::vector<std::string> g_LevelString;
+size_t g_numWorldString;

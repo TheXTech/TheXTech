@@ -361,6 +361,14 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
     return target;
 }
 
+void AbstractRender_t::setTransparentColor(StdPicture& target, uint32_t rgb)
+{
+    target.l.colorKey = true;
+    target.l.keyRgb[0] = (rgb >> 0) & 0xFF;
+    target.l.keyRgb[1] = (rgb >> 8) & 0xFF;
+    target.l.keyRgb[2] = (rgb >> 16) & 0xFF;
+}
+
 void AbstractRender_t::lazyLoad(StdPicture &target)
 {
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
@@ -405,6 +413,17 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
     target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
     target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;
+
+    if(target.l.colorKey) // Apply transparent color for key pixels
+    {
+        PGE_Pix colSrc = {target.l.keyRgb[0],
+                          target.l.keyRgb[1],
+                          target.l.keyRgb[2], 0xFF};
+        PGE_Pix colDst = {target.l.keyRgb[0],
+                          target.l.keyRgb[1],
+                          target.l.keyRgb[2], 0x00};
+        GraphicsHelps::replaceColor(sourceImage, colSrc, colDst);
+    }
 
     FreeImage_FlipVertical(sourceImage);
     target.w = static_cast<int>(w);
@@ -571,11 +590,13 @@ void AbstractRender_t::drawBatteryStatus()
     {
         XRender::setTargetTexture();
 
+        XRender::offsetViewportIgnore(true);
         XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
         XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
         XRender::renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
         XRender::renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
         XRender::renderRect(bx + 4, by + 4, segments, 14, br, bg, bb, alhpaB / 2.f, true);//Level
+        XRender::offsetViewportIgnore(false);
 
         XRender::setTargetScreen();
     }
@@ -731,7 +752,7 @@ void AbstractRender_t::toggleGifRecorder()
         {
             m_gif->enabled = true;
             m_gif->doFinalize = false;
-            PlaySound(SFX_PlayerGrow);
+            PlaySoundMenu(SFX_PlayerGrow);
         }
 
         m_gif->worker = SDL_CreateThread(processRecorder_action, "gif_recorder", reinterpret_cast<void *>(m_gif));
@@ -741,11 +762,11 @@ void AbstractRender_t::toggleGifRecorder()
         if(!m_gif->doFinalize)
         {
             m_gif->doFinalize = true;
-            PlaySound(SFX_PlayerShrink);
+            PlaySoundMenu(SFX_PlayerShrink);
         }
         else
         {
-            PlaySound(SFX_BlockHit);
+            PlaySoundMenu(SFX_BlockHit);
         }
     }
 }

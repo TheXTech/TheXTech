@@ -25,6 +25,19 @@
 #include "globals.h"
 #include "cmd_line_setup.h"
 
+enum class PauseCode
+{
+    None,
+    PauseScreen,
+    Message,
+    Reconnect,
+    DropAdd,
+    TextEntry,
+};
+
+//Public GamePaused As Boolean 'true if the game is paused
+extern PauseCode GamePaused;
+
 void SetupPhysics();
 
 void initAll();
@@ -76,9 +89,7 @@ void ClearGame(bool punnish = false);
 void DeleteSave(int world, int save);
 void CopySave(int world, int src, int dst);
 
-void PauseGame(int plr);
-
-void InitControls();
+int PauseGame(PauseCode code, int plr = 0);
 
 void OpenConfig_preSetup();
 
@@ -98,13 +109,14 @@ void SetupCredits();
 // FindStars() moved into main/level_file.h
 
 // for settings up the game's credits
-void AddCredit(std::string newCredit);
+void AddCredit(const std::string& newCredit);
 // calcualtes scores based on the multiplyer and how much the NPC is worth
 void MoreScore(int addScore, const Location_t &Loc);
 void MoreScore(int addScore, const Location_t &Loc, int &Multiplier);
 // sets up player frame offsets so they are displayed correctly on the screen
 void SetupPlayerFrames();
 
+void StartEpisode();
 void StartBattleMode();
 
 // std::string FixComma(std::string newStr); // USELESS

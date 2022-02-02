@@ -22,11 +22,18 @@
 #include <SDL2/SDL_mixer_ext.h>
 
 #include "globals.h"
+#include "global_dirs.h"
+
 #include "load_gfx.h"
 #include "core/msgbox.h"
 #include "pge_delay.h"
 
 #include "sound.h"
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+#include "sound/fx/reverb.h"
+#include "sound/fx/spc_echo.h"
+#endif
 
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
@@ -36,6 +43,13 @@
 #include <fmt_format_ne.h>
 
 #include "pseudo_vb.h"
+
+enum class SoundScope
+{
+    global,
+    episode,
+    custom
+};
 
 // Public musicPlaying As Boolean
 bool musicPlaying = false;
@@ -47,6 +61,7 @@ std::string musicName;
 int playerHammerSFX = SFX_Fireball;
 
 AudioSetup_t g_audioSetup;
+static AudioSetup_t s_audioSetupObtained;
 
 static Mix_Music *g_curMusic = nullptr;
 static bool g_mixerLoaded = false;
@@ -84,6 +99,24 @@ static std::string SfxRoot;
 static std::string musicIni; // = "music.ini";
 static std::string sfxIni; // = "sounds.ini";
 
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+struct SectionEffect_t
+{
+    enum FX
+    {
+        FX_None = 0,
+        FX_Echo,
+        FX_Reverb
+    };
+    SoundFXReverb rev;
+    SoundFXEchoSetup echo;
+    int fx = FX_None;
+};
+
+static SectionEffect_t s_sectionEffect[maxSections + 1];
+static std::unordered_map<std::string, SectionEffect_t> s_effectsList;
+#endif
+
 struct Music_t
 {
     std::string path;
@@ -106,6 +139,9 @@ struct SFX_t
 
 static std::unordered_map<std::string, Music_t> music;
 static std::unordered_map<std::string, SFX_t>   sound;
+
+//! Sounds played by scripts
+static std::unordered_map<std::string, Mix_Chunk*> extSfx;
 
 static const int maxSfxChannels = 91;
 
@@ -157,6 +193,16 @@ void InitMixerX()
         noSound = true;
     }
 
+    ret = Mix_QuerySpec(&s_audioSetupObtained.sampleRate,
+                        &s_audioSetupObtained.format,
+                        &s_audioSetupObtained.channels);
+
+    if(ret == 0)
+    {
+        pLogCritical("Failed to call the Mix_QuerySpec!");
+        s_audioSetupObtained = g_audioSetup;
+    }
+
     Mix_VolumeMusic(MIX_MAX_VOLUME);
     Mix_AllocateChannels(maxSfxChannels);
 
@@ -185,7 +231,7 @@ void QuitMixerX()
     Mix_Quit();
 }
 
-static void AddMusic(const std::string &root,
+static void AddMusic(SoundScope root,
                      IniProcessing &ini,
                      const std::string &alias,
                      const std::string &group,
@@ -198,7 +244,12 @@ static void AddMusic(const std::string &root,
     if(!f.empty())
     {
         Music_t m;
-        m.path = root + f;
+        if(root == SoundScope::global)
+            m.path = MusicRoot + f;
+        else if(root == SoundScope::episode)
+            m.path = g_dirEpisode.resolveFileCaseAbs(f);
+        else if(root == SoundScope::custom)
+            m.path = g_dirCustom.resolveFileCaseAbs(f);
         ini.read("yoshi-mode-track", m.yoshiModeTrack, -1);
         m.volume = volume;
         pLogDebug("Adding music [%s] '%s'", alias.c_str(), m.path.c_str());
@@ -230,7 +281,7 @@ static void RestoreSfx(SFX_t &u)
     }
 }
 
-static void AddSfx(const std::string &root,
+static void AddSfx(SoundScope root,
                    IniProcessing &ini,
                    const std::string &alias,
                    const std::string &group,
@@ -251,7 +302,14 @@ static void AddSfx(const std::string &root,
             if(s != sound.end())
             {
                 auto &m = s->second;
-                std::string newPath = root + f;
+
+                std::string newPath;
+                if(root == SoundScope::global)
+                    newPath = SfxRoot + f;
+                else if(root == SoundScope::episode)
+                    newPath = g_dirEpisode.resolveFileCaseAbs(f);
+                else if(root == SoundScope::custom)
+                    newPath = g_dirCustom.resolveFileCaseAbs(f);
 
                 if(!isSilent && m.isCustom && newPath == m.customPath)
                 {
@@ -264,7 +322,7 @@ static void AddSfx(const std::string &root,
                 m.customPath = newPath;
 
                 if(!isSilent)
-                    m.chunk = Mix_LoadWAV((root + f).c_str());
+                    m.chunk = Mix_LoadWAV((newPath).c_str());
 
                 if(m.chunk || isSilent)
                 {
@@ -290,7 +348,14 @@ static void AddSfx(const std::string &root,
         else
         {
             SFX_t m;
-            m.path = root + f;
+
+            if(root == SoundScope::global)
+                m.path = SfxRoot + f;
+            else if(root == SoundScope::episode)
+                m.path = g_dirEpisode.resolveFileCaseAbs(f);
+            else if(root == SoundScope::custom)
+                m.path = g_dirCustom.resolveFileCaseAbs(f);
+
             m.isSilent = isSilent;
             pLogDebug("Adding SFX [%s] '%s'", alias.c_str(), isSilent ? "<silence>" : m.path.c_str());
             if(!isSilent)
@@ -507,7 +572,7 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting world music [%s]", mus.c_str());
             PlayMusic(mus, fadeInMs);
         }
-        musicName = mus;
+        musicName = std::move(mus);
     }
     else if(A == -1) // P switch music
     {
@@ -561,7 +626,7 @@ void StartMusic(int A, int fadeInMs)
             pLogDebug("Starting level music [%s]", mus.c_str());
             PlayMusic(mus);
         }
-        musicName = mus;
+        musicName = std::move(mus);
     }
 
     musicPlaying = true;
@@ -625,7 +690,7 @@ void PlayInitSound()
     }
 }
 
-static void loadMusicIni(const std::string &root, const std::string &path, bool isLoadingCustom)
+static void loadMusicIni(SoundScope root, const std::string &path, bool isLoadingCustom)
 {
     IniProcessing musicSetup(path);
     if(!isLoadingCustom)
@@ -641,10 +706,10 @@ static void loadMusicIni(const std::string &root, const std::string &path, bool 
         musicSetup.read("level-custom-music-id", g_customLvlMusicId, 0);
         musicSetup.read("world-custom-music-id", g_customWldMusicId, 0);
         musicSetup.endGroup();
+
+        UpdateLoad();
     }
 
-    if(!isLoadingCustom)
-        UpdateLoad();
     for(unsigned int i = 1; i <= g_totalMusicLevel; ++i)
     {
         std::string alias = fmt::format_ne("music{0}", i);
@@ -677,7 +742,55 @@ static void loadMusicIni(const std::string &root, const std::string &path, bool 
     }
 }
 
-static void loadCustomSfxIni(const std::string &root, const std::string &path)
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+static void readFx(IniProcessing &sounds, SectionEffect_t &s)
+{
+    const IniProcessing::StrEnumMap fxType =
+    {
+        {"none", SectionEffect_t::FX_None},
+        {"reverb", SectionEffect_t::FX_Reverb},
+        {"echo", SectionEffect_t::FX_Echo}
+    };
+
+    sounds.readEnum("fx", s.fx, (int)SectionEffect_t::FX_None, fxType);
+
+    switch(s.fx)
+    {
+    case SectionEffect_t::FX_Reverb:
+        sounds.read("mode", s.rev.mode, 0.0f);
+        sounds.read("room-size", s.rev.roomSize, 0.7f);
+        sounds.read("damping", s.rev.damping, 0.5f);
+        sounds.read("wet-level", s.rev.wetLevel, 0.2f);
+        sounds.read("dry-level", s.rev.dryLevel, 0.4f);
+        sounds.read("width", s.rev.width, 1.0f);
+        break;
+
+    case SectionEffect_t::FX_Echo:
+        sounds.read("echo-on", s.echo.echoOn, 1);
+        sounds.read("delay", s.echo.echoDelay, 6);
+        sounds.read("feedback", s.echo.echoFeedBack, 30);
+        sounds.read("main-volume-left", s.echo.echoMainVolL, 127);
+        sounds.read("main-volume-right", s.echo.echoMainVolR, 127);
+        sounds.read("echo-volume-left", s.echo.echoVolL, 28);
+        sounds.read("echo-volume-right", s.echo.echoVolR, 28);
+        sounds.read("fir-0", s.echo.echoFir[0], 99);
+        sounds.read("fir-1", s.echo.echoFir[1], -52);
+        sounds.read("fir-2", s.echo.echoFir[2], 32);
+        sounds.read("fir-3", s.echo.echoFir[3], 50);
+        sounds.read("fir-4", s.echo.echoFir[4], 25);
+        sounds.read("fir-5", s.echo.echoFir[5], 51);
+        sounds.read("fir-6", s.echo.echoFir[6], -35);
+        sounds.read("fir-7", s.echo.echoFir[7], 56);
+        break;
+
+    default:
+    case SectionEffect_t::FX_None:
+        break;
+    }
+}
+#endif // THEXTECH_ENABLE_AUDIO_FX
+
+static void loadCustomSfxIni(SoundScope root, const std::string &path)
 {
     IniProcessing sounds(path);
     for(unsigned int i = 1; i <= g_totalSounds; ++i)
@@ -686,6 +799,38 @@ static void loadCustomSfxIni(const std::string &root, const std::string &path)
         std::string group = fmt::format_ne("sound-{0}", i);
         AddSfx(root, sounds, alias, group, true);
     }
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+    auto ch = sounds.childGroups();
+    for(const auto &g : ch)
+    {
+        if(g.find("fx-") == 0)
+        {
+            sounds.beginGroup(g);
+            SectionEffect_t fx;
+            auto e = g;
+            e.erase(e.begin(), e.begin() + 3);
+            readFx(sounds, fx);
+            s_effectsList.insert({e, fx});
+            sounds.endGroup();
+        }
+    }
+
+    // FX settings
+    for(int i = 0; i <= maxSections; ++i)
+    {
+        auto &s = s_sectionEffect[i];
+        std::string cfx;
+
+        sounds.beginGroup(fmt::format_ne("section-fx-{0}", i));
+        sounds.read("custom-fx", cfx, std::string());
+        if(!cfx.empty() && s_effectsList.find(cfx) != s_effectsList.end())
+            s = s_effectsList[cfx];
+        else
+            readFx(sounds, s);
+        sounds.endGroup();
+    }
+#endif // THEXTECH_ENABLE_AUDIO_FX
 }
 
 static void restoreDefaultSfx()
@@ -695,6 +840,18 @@ static void restoreDefaultSfx()
         auto &u = s.second;
         RestoreSfx(u);
     }
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+    s_effectsList.clear();
+
+    for(int i = 0; i <= maxSections; ++i)
+    {
+        s_sectionEffect[i].fx = SectionEffect_t::FX_None;
+        s_sectionEffect[i].rev = SoundFXReverb();
+        s_sectionEffect[i].echo = SoundFXEchoSetup();
+    }
+    SoundFX_Clear();
+#endif
 }
 
 void InitSound()
@@ -731,7 +888,7 @@ void InitSound()
                      "File sounds.ini is not exist, game will work without SFX.");
     }
 
-    loadMusicIni(MusicRoot, musicIni, false);
+    loadMusicIni(SoundScope::global, musicIni, false);
 
     UpdateLoad();
     IniProcessing sounds(sfxIni);
@@ -757,7 +914,7 @@ void InitSound()
     {
         std::string alias = fmt::format_ne("sound{0}", i);
         std::string group = fmt::format_ne("sound-{0}", i);
-        AddSfx(SfxRoot, sounds, alias, group);
+        AddSfx(SoundScope::global, sounds, alias, group);
     }
     UpdateLoad();
     Mix_ReserveChannels(g_reservedChannels);
@@ -786,7 +943,8 @@ static void s_resetSoundDelay(int A)
         SoundPause[A] = 4;
     else
         SoundPause[A] = i->second;
-#if 0
+
+#if 0 // Very old code, replaced with a more flexible thing at above
     switch(A)
     {
     case 2: SoundPause[A] = 12; break;
@@ -893,15 +1051,10 @@ void LoadCustomSound()
     if(GameMenu)
         return; // Don't load custom music in menu mode
 
-    std::string mIni = FileNamePath + "music.ini";
-    std::string sIni = FileNamePath + "sounds.ini";
-    std::string mIniC = FileNamePath + FileName + "/music.ini";
-    std::string sIniC = FileNamePath + FileName + "/sounds.ini";
-
     // To avoid bugs like custom local sounds was transferred into another level, it's need to clean-up old one if that was
     if(g_customMusicInDataFolder)
     {
-        loadMusicIni(MusicRoot, musicIni, true);
+        loadMusicIni(SoundScope::global, musicIni, true);
         g_customMusicInDataFolder = false;
     }
 
@@ -914,21 +1067,25 @@ void LoadCustomSound()
     if(FileNamePath == AppPath)
         return; // Don't treat default music/sounds ini as custom
 
-    if(Files::fileExists(mIni)) // Load music.ini from an episode folder
-        loadMusicIni(FileNamePath, mIni, true);
+    std::string mIni = g_dirEpisode.resolveFileCaseExistsAbs("music.ini");
+    if(!mIni.empty()) // Load music.ini from an episode folder
+        loadMusicIni(SoundScope::episode, mIni, true);
 
-    if(Files::fileExists(mIniC)) // Load music.ini from a level/world custom folder
+    std::string mIniC = g_dirCustom.resolveFileCaseExistsAbs("music.ini");
+    if(!mIniC.empty()) // Load music.ini from a level/world custom folder
     {
-        loadMusicIni(FileNamePath + FileName + "/", mIniC, true);
+        loadMusicIni(SoundScope::custom, mIniC, true);
         g_customMusicInDataFolder = true;
     }
 
-    if(Files::fileExists(sIni)) // Load sounds.ini from an episode folder
-        loadCustomSfxIni(FileNamePath, sIni);
+    std::string sIni = g_dirEpisode.resolveFileCaseExistsAbs("sound.ini");
+    if(!sIni.empty()) // Load sounds.ini from an episode folder
+        loadCustomSfxIni(SoundScope::episode, sIni);
 
-    if(Files::fileExists(sIniC)) // Load sounds.ini from a level/world custom folder
+    std::string sIniC = g_dirCustom.resolveFileCaseExistsAbs("sound.ini");
+    if(!sIniC.empty()) // Load sounds.ini from a level/world custom folder
     {
-        loadCustomSfxIni(FileNamePath + FileName + "/", sIniC);
+        loadCustomSfxIni(SoundScope::custom, sIniC);
         g_customSoundsInDataFolder = true;
     }
 }
@@ -937,10 +1094,14 @@ void UnloadCustomSound()
 {
     if(noSound)
         return;
-    loadMusicIni(MusicRoot, musicIni, true);
+    loadMusicIni(SoundScope::global, musicIni, true);
     restoreDefaultSfx();
     g_customMusicInDataFolder = false;
     g_customSoundsInDataFolder = false;
+
+    for(auto &f : extSfx)
+        Mix_FreeChunk(f.second);
+    extSfx.clear();
 }
 
 void UpdateYoshiMusic()
@@ -955,3 +1116,192 @@ void UpdateYoshiMusic()
 
     Mix_SetMusicTrackMute(g_curMusic, s_musicYoshiTrackNumber, hasYoshi ? 0 : 1);
 }
+
+void PlayExtSound(const std::string &path)
+{
+    if(noSound)
+        return;
+
+    auto f = extSfx.find(path);
+    if(f == extSfx.end())
+    {
+        auto *ch = Mix_LoadWAV(path.c_str());
+        if(!ch)
+        {
+            pLogWarning("Can't load custom sound: %s", Mix_GetError());
+            return;
+        }
+        extSfx.insert({path, ch});
+        Mix_PlayChannelVol(-1, ch, 0, MIX_MAX_VOLUME);
+        return;
+    }
+
+    Mix_PlayChannelVol(-1, f->second, 0, MIX_MAX_VOLUME);
+}
+
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+
+static bool     enableEffectEcho = false;
+static SpcEcho *effectEcho = nullptr;
+
+static void echoEffectDone(int, void *context)
+{
+    SpcEcho *out = reinterpret_cast<SpcEcho *>(context);
+    if(out == effectEcho)
+    {
+        echoEffectFree(effectEcho);
+        effectEcho = nullptr;
+        enableEffectEcho = false;
+    }
+}
+
+void SoundFX_SetEcho(const SoundFXEchoSetup& setup)
+{
+    if(noSound)
+        return;
+
+    bool isNew = false;
+
+    // Clear previously installed effects first
+    if(!effectEcho)
+    {
+        SoundFX_Clear();
+
+        effectEcho = echoEffectInit(s_audioSetupObtained.sampleRate,
+                                    s_audioSetupObtained.format,
+                                    s_audioSetupObtained.channels);
+        isNew = true;
+    }
+
+    if(effectEcho)
+    {
+        echoEffectSetReg(effectEcho, ECHO_EON, setup.echoOn);
+        echoEffectSetReg(effectEcho, ECHO_EDL, setup.echoDelay);
+        echoEffectSetReg(effectEcho, ECHO_EFB, setup.echoFeedBack);
+
+        echoEffectSetReg(effectEcho, ECHO_MVOLL, setup.echoMainVolL);
+        echoEffectSetReg(effectEcho, ECHO_MVOLR, setup.echoMainVolR);
+        echoEffectSetReg(effectEcho, ECHO_EVOLL, setup.echoVolL);
+        echoEffectSetReg(effectEcho, ECHO_EVOLR, setup.echoVolR);
+
+        echoEffectSetReg(effectEcho, ECHO_FIR0, setup.echoFir[0]);
+        echoEffectSetReg(effectEcho, ECHO_FIR1, setup.echoFir[1]);
+        echoEffectSetReg(effectEcho, ECHO_FIR2, setup.echoFir[2]);
+        echoEffectSetReg(effectEcho, ECHO_FIR3, setup.echoFir[3]);
+        echoEffectSetReg(effectEcho, ECHO_FIR4, setup.echoFir[4]);
+        echoEffectSetReg(effectEcho, ECHO_FIR5, setup.echoFir[5]);
+        echoEffectSetReg(effectEcho, ECHO_FIR6, setup.echoFir[6]);
+        echoEffectSetReg(effectEcho, ECHO_FIR7, setup.echoFir[7]);
+        if(isNew)
+            Mix_RegisterEffect(MIX_CHANNEL_POST, spcEchoEffect, echoEffectDone, effectEcho);
+        enableEffectEcho = true;
+    }
+}
+
+static bool enableEffectReverb = false;
+static FxReverb *effectReverb = nullptr;
+
+static void reverbEffectDone(int, void *context)
+{
+    FxReverb *out = reinterpret_cast<FxReverb *>(context);
+    if(out == effectReverb)
+    {
+        reverbEffectFree(effectReverb);
+        effectReverb = nullptr;
+        enableEffectReverb = false;
+    }
+}
+
+void SoundFX_SetReverb(const SoundFXReverb& setup)
+{
+    if(noSound)
+        return;
+
+    bool isNew = false;
+
+    if(!effectReverb)
+    {
+        // Clear previously installed effects first
+        SoundFX_Clear();
+
+        effectReverb = reverbEffectInit(s_audioSetupObtained.sampleRate,
+                                        s_audioSetupObtained.format,
+                                        s_audioSetupObtained.channels);
+        isNew = true;
+    }
+
+    if(effectReverb)
+    {
+        ReverbSetup set;
+        set.mode = setup.mode;
+        set.roomSize = setup.roomSize;
+        set.damping = setup.damping;
+        set.wetLevel = setup.wetLevel;
+        set.dryLevel = setup.dryLevel;
+        set.width = setup.width;
+        reverbUpdateSetup(effectReverb, set);
+        if(isNew)
+            Mix_RegisterEffect(MIX_CHANNEL_POST, reverbEffect, reverbEffectDone, effectReverb);
+        enableEffectReverb = true;
+    }
+}
+
+void SoundFX_Clear()
+{
+    if(noSound)
+        return;
+
+    if(effectEcho)
+    {
+        Mix_UnregisterEffect(MIX_CHANNEL_POST, spcEchoEffect);
+        if(effectEcho)
+        {
+            echoEffectFree(effectEcho);
+            effectEcho = nullptr;
+        }
+        enableEffectEcho = false;
+    }
+
+    if(effectReverb)
+    {
+        Mix_UnregisterEffect(MIX_CHANNEL_POST, reverbEffect);
+        if(effectReverb)
+        {
+            reverbEffectFree(effectReverb);
+            effectReverb = nullptr;
+        }
+        enableEffectReverb = false;
+    }
+}
+
+#endif // THEXTECH_ENABLE_AUDIO_FX
+
+void UpdateSoundFX(int recentSection)
+{
+#ifndef THEXTECH_ENABLE_AUDIO_FX
+    UNUSED(recentSection);
+#else
+    if(noSound || LevelSelect)
+        return;
+
+    SDL_assert_release(recentSection >= 0 && recentSection <= maxSections);
+    auto &s = s_sectionEffect[recentSection];
+    switch(s.fx)
+    {
+    default:
+    case SectionEffect_t::FX_None:
+        SoundFX_Clear();
+        break;
+
+    case SectionEffect_t::FX_Echo:
+        SoundFX_SetEcho(s.echo);
+        break;
+
+    case SectionEffect_t::FX_Reverb:
+        SoundFX_SetReverb(s.rev);
+        break;
+    }
+#endif // THEXTECH_ENABLE_AUDIO_FX
+}
+

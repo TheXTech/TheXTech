@@ -29,7 +29,6 @@
 #include "../globals.h"
 #include "../game_main.h"
 #include "../sound.h"
-#include "../control/joystick.h"
 #include "../effect.h"
 #include "../graphics.h"
 #include "../blocks.h"
@@ -37,11 +36,13 @@
 #include "../layers.h"
 #include "../player.h"
 #include "../collision.h"
+#include "../controls.h"
 #include "level_file.h"
 #include "menu_main.h"
 #include "game_info.h"
 #include "speedrunner.h"
 #include "game_globals.h"
+#include "menu_controls.h"
 
 #include "../pseudo_vb.h"
 
@@ -54,7 +55,7 @@ static void updateIntroLevelActivity()
 
     if(CheckLiving() == 0)
     {
-        ShowLayer("Destroyed Blocks");
+        ShowLayer(LAYER_DESTROYED_BLOCKS);
 
         For(A, 1, numNPCs)
         {
@@ -95,7 +96,7 @@ static void updateIntroLevelActivity()
 
         if(p.HoldingNPC ==0)
         {
-            if((p.State ==3 || p.State == 6 || p.State == 7) && iRand(100) >= 90)
+            if((p.State == 3 || p.State == 6 || p.State == 7) && iRand(100) >= 90)
             {
                 if(p.FireBallCD == 0 && !p.RunRelease)
                     p.Controls.Run = false;
@@ -312,7 +313,7 @@ static void updateIntroLevelActivity()
 
             if(p.Mount == 0 && p.Character != 5)
             {
-                numNPCs += 1;
+                numNPCs++;
                 p.HoldingNPC = numNPCs;
                 p.ForceHold = 120;
 
@@ -361,6 +362,7 @@ static void updateIntroLevelActivity()
                     n.Location.X = Player[A].Location.X; // level[n.Section].X + 1000
                     n.TimeLeft = 100;
                     n.Section = Player[A].Section;
+                    syncLayers_NPC(numNPCs);
                 }
             }
 
@@ -479,6 +481,7 @@ static void updateIntroLevelActivity()
     if(LevelMacro > LEVELMACRO_OFF)
         UpdateMacro();
 
+    ClearTriggeredEvents();
     UpdateLayers();
     UpdateNPCs();
     UpdateBlocks();
@@ -492,7 +495,15 @@ static void updateIntroLevelActivity()
 
 void MenuLoop()
 {
-    UpdateControls();
+    // ConnectScreen and ControlsSettings screens handles its own input method polling
+    if(MenuMode != MENU_CHARACTER_SELECT_NEW && MenuMode != MENU_INPUT_SETTINGS && !g_pollingInput)
+        Controls::PollInputMethod();
+    Controls::Update();
+    if(!SharedCursor.Primary && !SharedCursor.Secondary)
+        MenuMouseRelease = true;
+    // replicates legacy behavior allowing clicks to be detected
+    if(SharedCursor.Primary || SharedCursor.Secondary || SharedCursor.Tertiary)
+        SharedCursor.Move = true;
 
     if(mainMenuUpdate())
         return;
@@ -501,6 +512,7 @@ void MenuLoop()
         updateIntroLevelActivity();
     else
     {
+        ClearTriggeredEvents();
         UpdateLayers();
         UpdateNPCs();
         UpdateBlocks();
@@ -512,11 +524,11 @@ void MenuLoop()
         updateScreenFaders();
     }
 
-    if(MenuMouseDown)
+    if(SharedCursor.Primary)
     {
         if(iRand(5) >= 2)
         {
-            NewEffect(80, newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]));
+            NewEffect(80, newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]));
             Effect[numEffects].Location.SpeedX = dRand() * 4 - 2;
             Effect[numEffects].Location.SpeedY = dRand() * 4 - 2;
         }
@@ -525,13 +537,13 @@ void MenuLoop()
         {
             if(NPC[A].Active)
             {
-                if(CheckCollision(newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]), NPC[A].Location))
+                if(CheckCollision(newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]), NPC[A].Location))
                 {
                     if(!NPCIsACoin[NPC[A].Type])
                     {
                         NPC[0] = NPC[A];
-                        NPC[0].Location.X = MenuMouseX - vScreenX[1];
-                        NPC[0].Location.Y = MenuMouseY - vScreenY[1];
+                        NPC[0].Location.X = SharedCursor.X - vScreenX[1];
+                        NPC[0].Location.Y = SharedCursor.Y - vScreenY[1];
                         NPCHit(A, 3, 0);
                     }
                     else
@@ -547,7 +559,7 @@ void MenuLoop()
         {
             if(!Block[A].Hidden)
             {
-                if(CheckCollision(newLoc(MenuMouseX - vScreenX[1], MenuMouseY - vScreenY[1]), Block[A].Location))
+                if(CheckCollision(newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]), Block[A].Location))
                 {
                     BlockHit(A);
                     BlockHitHard(A);
@@ -556,16 +568,9 @@ void MenuLoop()
         }
     }
 
-    MenuMouseMove = false;
-    MenuMouseClick = false;
-    MenuWheelMoved = false;
-
-    if(MenuMouseDown)
+    if(SharedCursor.Primary || SharedCursor.Secondary)
         MenuMouseRelease = false;
-    else
-        MenuMouseRelease = true;
-
-    MenuMouseBack = false;
+    MenuMouseClick = false;
 }
 
 void FindSaves()

@@ -48,7 +48,6 @@
 #include "collision.h"
 #include "effect.h"
 #include "graphics.h"
-#include "control/joystick.h"
 #include "layers.h"
 #include "load_gfx.h"
 #include "player.h"
@@ -67,8 +66,14 @@
 #include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
+#include "script/luna/luna.h"
 
 #include "pseudo_vb.h"
+
+#include "controls.h"
+
+#include "config.h"
+#include "main/screen_connect.h"
 
 void CheckActive();
 // set up sizable blocks
@@ -159,13 +164,14 @@ int GameMain(const CmdLineSetup_t &setup)
     ShowFPS = setup.testShowFPS;
     MaxFPS = setup.testMaxFPS; // || (g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC);
 
-    InitControls(); // init player's controls
+    OpenConfig();
+
     XEvents::doEvents();
 
 #ifdef __EMSCRIPTEN__ // Workaround for a recent Chrome's policy to avoid sudden sound without user's interaction
     XWindow::show(); // Don't show window until playing an initial sound
 
-    while(!MenuMouseDown)
+    while(!SharedCursor.Primary)
     {
         XRender::setTargetTexture();
         XRender::clearBuffer();
@@ -173,6 +179,7 @@ int GameMain(const CmdLineSetup_t &setup)
         XRender::repaint();
         XRender::setTargetScreen();
         XEvents::doEvents();
+        Controls::Update();
         PGE_Delay(10);
     }
 #endif
@@ -314,7 +321,6 @@ int GameMain(const CmdLineSetup_t &setup)
                 outroPath = AppPath + "outro.lvl";
             OpenLevel(outroPath);
 
-            ScreenType = 7;
             SetupScreens();
             ClearBuffer = true;
 
@@ -397,6 +403,8 @@ int GameMain(const CmdLineSetup_t &setup)
                     Player[A].Dead = true;
             }
 
+            lunaLoad();
+
             clearScreenFaders();
 
             // Run the frame-loop
@@ -406,7 +414,6 @@ int GameMain(const CmdLineSetup_t &setup)
                         nullptr,
                         []()->void
                         {
-                            ScreenType = 0;
                             SetupScreens();
                         });
         }
@@ -428,11 +435,9 @@ int GameMain(const CmdLineSetup_t &setup)
                 OwedMountType[A] = 0;
             }
 
-            MenuMouseMove = false;
-            MenuWheelMoved = false;
             MenuMouseRelease = false;
             MenuMouseClick = false;
-            MenuMouseBack = false;
+            MenuCursorCanMove = false;
             BattleMode = false;
 
             if(MenuMode != MENU_BATTLE_MODE)
@@ -464,7 +469,6 @@ int GameMain(const CmdLineSetup_t &setup)
             SuperSpeed = false;
             FlyForever = false;
             BeatTheGame = false;
-            ScreenType = 2;
 
             SetupScreens();
 
@@ -533,13 +537,15 @@ int GameMain(const CmdLineSetup_t &setup)
             // Clear the speed-runner timer
             speedRun_resetTotal();
 
+            lunaLoad();
+
             delayedMusicStart(); // Allow music being started
 
-            ProcEvent("Level - Start", true);
+            ProcEvent(EVENT_LEVEL_START, true);
             For(A, 2, maxEvents)
             {
                 if(Events[A].AutoStart)
-                    ProcEvent(Events[A].Name, true);
+                    ProcEvent(A, true);
             }
 
             // Main menu loop
@@ -608,6 +614,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 XRender::clearBuffer();
                 XRender::repaint();
 
+                lunaReset();
                 ClearLevel();
 
                 std::string levelPath;
@@ -622,7 +629,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(!OpenLevel(levelPath))
                 {
                     MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", levelPath);
-                    PauseGame(1);
+                    PauseGame(PauseCode::Message);
                     ErrorQuit = true;
                 }
 
@@ -682,20 +689,6 @@ int GameMain(const CmdLineSetup_t &setup)
             EndLevel = false;
 
             Record::InitRecording(); // initializes level data recording
-
-            if(numPlayers == 1)
-                ScreenType = 0; // Follow 1 player
-            else if(numPlayers == 2)
-                ScreenType = 5; // Dynamic screen
-            else
-            {
-                // ScreenType = 3 'Average, no one leaves the screen
-                ScreenType = 2; // Average
-            }
-
-            if(SingleCoop > 0)
-                ScreenType = 6;
-//            If nPlay.Online = True Then ScreenType = 8 'Online
 
             for(int A = 1; A <= numPlayers; ++A)
             {
@@ -816,13 +809,15 @@ int GameMain(const CmdLineSetup_t &setup)
             else
                 clearScreenFaders();
 
+            lunaLoad();
+
             delayedMusicStart(); // Allow music being started
 
-            ProcEvent("Level - Start", true);
+            ProcEvent(EVENT_LEVEL_START, true);
             for(int A = 2; A <= maxEvents; ++A)
             {
                 if(Events[A].AutoStart)
-                    ProcEvent(Events[A].Name, true);
+                    ProcEvent(A, true);
             }
 
             // MAIN GAME LOOP
@@ -896,6 +891,7 @@ int GameMain(const CmdLineSetup_t &setup)
 //            Else
             else if(!LevelRestartRequested)
             {
+                lunaReset();
                 ClearLevel();
 //            End If
             } // TestLevel
@@ -928,6 +924,7 @@ void KillIt()
     XRender::clearBuffer();
     XRender::repaint();
 #endif
+    lunaReset();
     QuitMixerX();
     UnloadGFX();
     XWindow::showCursor(1);
@@ -944,6 +941,7 @@ void NextLevel()
     LevelMacro = LEVELMACRO_OFF;
     LevelMacroCounter = 0;
     StopMusic();
+    lunaReset();
     ClearLevel();
     XRender::setTargetTexture();
     XRender::clearBuffer();
@@ -1311,84 +1309,6 @@ void UpdateMacro()
     }
 }
 
-void InitControls()
-{
-    int A = 0;
-//    int B = 0;
-    bool newJoystick = false;
-
-    int joysticksCount = joyInitJoysticks();
-
-    for(int i = 0; i < joysticksCount; ++i)
-    {
-        newJoystick = joyStartJoystick(i);
-        if(newJoystick) {
-            A += 1;
-        } else {
-            break;
-        }
-    }
-    numJoysticks = A;
-
-    /* // Crazy Redigit's solution, useless
-//    If numJoysticks = 0 Then
-    if(numJoysticks == 0) {
-//        useJoystick(1) = 0
-        useJoystick[1] = 0;
-//        useJoystick(2) = 0
-        useJoystick[2] = 0;
-//    ElseIf numJoysticks = 1 Then
-    } else if(numJoysticks == 1) {
-//        useJoystick(1) = 1
-        useJoystick[1] = 1;
-//        useJoystick(2) = 0
-        useJoystick[2] = 0;
-//    Else
-    } else {
-//        useJoystick(1) = 1
-        useJoystick[1] = 1;
-//        useJoystick(2) = 2
-        useJoystick[2] = 2;
-//    End If
-    }
-    */
-
-    For(A, 1, maxLocalPlayers)
-        useJoystick[A] = 0;
-
-    For(A, 1, maxLocalPlayers)
-    {
-        joyFillDefaults(conKeyboard[A]);
-        joyFillDefaults(conJoystick[A]);
-    }
-
-    OpenConfig();
-
-    // Automatically set the joystick if keyboard chosen
-    for(int i = 1; i <= numJoysticks && i <= maxLocalPlayers; i++)
-    {
-        if(useJoystick[i] <= 0 && !wantedKeyboard[i])
-            useJoystick[i] = i;
-    }
-
-    for(int player = 1; player <= maxLocalPlayers; ++player)
-    {
-        if(useJoystick[player] > numJoysticks)
-            useJoystick[player] = 0;
-        else
-        {
-            int jip = useJoystick[player];
-            int ji = jip - 1;
-            if(ji >= 0)
-                joyGetByIndex(player, ji, conJoystick[player]);
-        }
-    }
-
-    if(!Files::fileExists(AppPathManager::settingsFileSTD()))
-        SaveConfig(); // Create the config file on first run
-}
-
-
 // main_config.cpp
 
 
@@ -1591,11 +1511,137 @@ void SizableBlocks()
     BlockIsSizable[445] = true;
 }
 
+void StartEpisode()
+{
+    For(A, 1, numCharacters)
+    {
+        SavedChar[A] = Player_t();
+        SavedChar[A].Character = A;
+        SavedChar[A].State = 1;
+    }
+
+    for(int i = 1; i <= maxLocalPlayers; i++)
+    {
+        Player[i].State = 1;
+        Player[i].Mount = 0;
+        // reassigned below unless something is wrong
+        Player[i].Character = (i - 1) % 5 + 1;
+        Player[i].HeldBonus = 0;
+        Player[i].CanFly = false;
+        Player[i].CanFly2 = false;
+        Player[i].TailCount = 0;
+        Player[i].YoshiBlue = false;
+        Player[i].YoshiRed = false;
+        Player[i].YoshiYellow = false;
+        Player[i].Hearts = 0;
+    }
+
+    numPlayers = Controls::g_InputMethods.size();
+    if(numPlayers > maxLocalPlayers)
+        numPlayers = maxLocalPlayers;
+    for(int i = 0; i < numPlayers; i++)
+    {
+        if(g_charSelect[i] != 0)
+            Player[i+1].Character = g_charSelect[i];
+    }
+
+    for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
+    {
+        Controls::DeleteInputMethodSlot(i);
+    }
+
+    ConnectScreen::SaveChars();
+
+    numStars = 0;
+    Coins = 0;
+    Score = 0;
+    Lives = 3;
+    LevelSelect = true;
+    GameMenu = false;
+    XRender::setTargetTexture();
+    XRender::clearBuffer();
+    XRender::repaint();
+    StopMusic();
+    XEvents::doEvents();
+    // Note: this causes the rendered touchscreen controller to freeze with button pressed.
+    PGE_Delay(500);
+    ClearGame();
+
+    std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
+
+    if(numPlayers == 1 && g_recentWorld1p != wPath)
+    {
+        g_recentWorld1p = wPath;
+        SaveConfig();
+    }
+    else if(numPlayers >= 2 && g_recentWorld2p != wPath)
+    {
+        g_recentWorld2p = wPath;
+        SaveConfig();
+    }
+
+    OpenWorld(wPath);
+
+    if(SaveSlot[selSave] >= 0)
+    {
+        if(!NoMap)
+            StartLevel.clear();
+        LoadGame();
+        speedRun_loadStats();
+    }
+
+    if(WorldUnlock)
+    {
+        For(A, 1, numWorldPaths)
+        {
+            Location_t tempLocation = WorldPath[A].Location;
+            {
+                Location_t &l = tempLocation;
+                l.X += 4;
+                l.Y += 4;
+                l.Width -= 8;
+                l.Height -= 8;
+            }
+
+            WorldPath[A].Active = true;
+
+            For(B, 1, numScenes)
+            {
+                if(CheckCollision(tempLocation, Scene[B].Location))
+                    Scene[B].Active = false;
+            }
+        }
+
+        For(A, 1, numWorldLevels)
+            WorldLevel[A].Active = true;
+    }
+
+    SetupPlayers();
+
+    if(!StartLevel.empty())
+    {
+        // TODO: why did Wohlstand disable this?
+        PlaySoundMenu(SFX_LevelSelect);
+        SoundPause[26] = 200;
+        LevelSelect = false;
+
+        // todo: update this!
+        ClearLevel();
+        std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
+        if(!OpenLevel(levelPath))
+        {
+            MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", StartLevel);
+            PauseGame(PauseCode::Message);
+            ErrorQuit = true;
+        }
+        GameThing(1000, 3);
+    }
+}
+
 void StartBattleMode()
 {
     int A = 0;
     Player_t blankPlayer;
-    numPlayers = 2;
 
     for(A = 1; A <= numCharacters; A++)
     {
@@ -1604,30 +1650,36 @@ void StartBattleMode()
         SavedChar[A].State = 1;
     }
 
-    Player[1].State = 2;
-    Player[1].Mount = 0;
-    // Player[1].Character = 1; // Assigned below
-    Player[1].HeldBonus = 0;
-    Player[1].CanFly = false;
-    Player[1].CanFly2 = false;
-    Player[1].TailCount = 0;
-    Player[1].YoshiBlue = false;
-    Player[1].YoshiRed = false;
-    Player[1].YoshiYellow = false;
-    Player[1].Hearts = 2;
-    Player[2].State = 2;
-    Player[2].Mount = 0;
-    //Player[2].Character = 2; // Assigned below
-    Player[2].HeldBonus = 0;
-    Player[2].CanFly = false;
-    Player[2].CanFly2 = false;
-    Player[2].TailCount = 0;
-    Player[2].YoshiBlue = false;
-    Player[2].YoshiRed = false;
-    Player[2].YoshiYellow = false;
-    Player[2].Hearts = 2;
-    Player[1].Character = PlayerCharacter;
-    Player[2].Character = PlayerCharacter2;
+    for(int i = 1; i <= maxLocalPlayers; i++)
+    {
+        Player[i].State = 2;
+        Player[i].Mount = 0;
+        // reassigned below unless something is wrong
+        Player[i].Character = (i - 1) % 5 + 1;
+        Player[i].HeldBonus = 0;
+        Player[i].CanFly = false;
+        Player[i].CanFly2 = false;
+        Player[i].TailCount = 0;
+        Player[i].YoshiBlue = false;
+        Player[i].YoshiRed = false;
+        Player[i].YoshiYellow = false;
+        Player[i].Hearts = 2;
+    }
+
+    numPlayers = Controls::g_InputMethods.size();
+    if(numPlayers > maxLocalPlayers)
+        numPlayers = maxLocalPlayers;
+    for(int i = 0; i < numPlayers; i++)
+    {
+        if(g_charSelect[i] != 0)
+            Player[i+1].Character = g_charSelect[i];
+    }
+
+    for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
+    {
+        Controls::DeleteInputMethodSlot(i);
+    }
+
     numStars = 0;
     Coins = 0;
     Score = 0;
@@ -1643,12 +1695,13 @@ void StartBattleMode()
     StopMusic();
     XEvents::doEvents();
     PGE_Delay(500);
+    lunaReset();
     ClearLevel();
 
     if(NumSelectWorld <= 1)
     {
         MessageText = "Can't start battle because of no levels available";
-        PauseGame(1);
+        PauseGame(PauseCode::Message);
         ErrorQuit = true;
     }
     else
@@ -1661,7 +1714,7 @@ void StartBattleMode()
     if(!OpenLevel(levelPath))
     {
         MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", SelectWorld[selWorld].WorldFile);
-        PauseGame(1);
+        PauseGame(PauseCode::Message);
         ErrorQuit = true;
     }
     SetupPlayers();

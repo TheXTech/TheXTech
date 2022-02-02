@@ -22,6 +22,7 @@
 #ifndef STD_PICTURE_LOAD_H
 #define STD_PICTURE_LOAD_H
 
+#include <cstdint>
 #include <vector>
 
 /*!
@@ -52,6 +53,10 @@ struct StdPictureLoad
     //! Height scale factor
     float h_scale = 1.0f;
 
+    // Transparent color for BMP and JPEG
+    bool     colorKey = false;
+    uint8_t  keyRgb[3] = {0 /*R*/, 0 /*G*/, 0 /*B*/};
+
     /*!
      * \brief Clear all held data
      *
@@ -67,6 +72,10 @@ struct StdPictureLoad
         h_orig = 0;
         w_scale = 1.f;
         h_scale = 1.f;
+        colorKey = false;
+        keyRgb[0] = 0;
+        keyRgb[1] = 0;
+        keyRgb[2] = 0;
     }
 };
 

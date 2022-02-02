@@ -25,22 +25,27 @@
 #include <fmt_format_ne.h>
 
 #include "../globals.h"
-#include "../config.h"
 #include "../frame_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
-#include "../control/joystick.h"
+#include "../controls.h"
 #include "../effect.h"
 #include "../graphics.h"
 #include "../collision.h"
+#include "../player.h"
 #include "../main/trees.h"
 #include "../core/events.h"
 #include "../compat.h"
+#include "../config.h"
 #include "world_globals.h"
 #include "level_file.h"
 #include "speedrunner.h"
+#include "screen_quickreconnect.h"
+#include "screen_connect.h"
 
 #include "../pseudo_vb.h"
+
+#include "global_dirs.h"
 
 //! Holds the screen overlay for the world map
 ScreenFader g_worldScreenFader;
@@ -107,28 +112,22 @@ static SDL_INLINE bool isWorldMusicNotSame(WorldMusic_t &mus)
 {
     bool ret = false;
     ret |= (curWorldMusic != mus.Type);
-    ret |= (mus.Type == CustomWorldMusicId() && curWorldMusicFile != mus.MusicFile);
+    ret |= (mus.Type == CustomWorldMusicId() && curWorldMusicFile != GetS(mus.MusicFile));
     return ret;
 }
 
 static SDL_INLINE bool s_worldUpdateMusic(const Location_t &loc)
 {
     bool ret = false;
-    static WorldMusicPtrArr marr;
 
-    if(marr.capacity() < 20)
-        marr.reserve(20);
-
-    treeWorldMusicQuery(loc, marr, false);
-
-    for(auto *t : marr)
+    for(auto *t : treeWorldMusicQuery(loc, false))
     {
         WorldMusic_t &mus = *t;
         if(CheckCollision(loc, mus.Location))
         {
             if(isWorldMusicNotSame(mus))
             {
-                curWorldMusicFile = mus.MusicFile;
+                curWorldMusicFile = GetS(mus.MusicFile);
                 StartMusic(mus.Type);
                 ret = true;
             }
@@ -176,19 +175,6 @@ static SDL_INLINE double getWorldPlayerCenterY()
 
 void WorldLoop()
 {
-    // Keep them static to don't re-alloc them for every iteration
-    static WorldPathPtrArr parr;
-    static WorldLevelPtrArr larr;
-    static WorldLevelPtrArr larr2;
-
-    // Reserve 20 elements per every array
-    if(parr.capacity() < 20)
-        parr.reserve(20);
-    if(larr2.capacity() < 20)
-        larr2.reserve(20);
-    if(larr2.capacity() < 20)
-        larr2.reserve(20);
-
     bool musicReset = false;
     Location_t tempLocation;
     int A = 0;
@@ -207,7 +193,18 @@ void WorldLoop()
 
     speedRun_tick();
     UpdateGraphics2();
-    UpdateControls();
+
+    if(!Controls::Update())
+    {
+        if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect)
+            QuickReconnectScreen::g_active = true;
+        else
+            PauseGame(PauseCode::Reconnect, 0);
+    }
+
+    if(QuickReconnectScreen::g_active)
+        QuickReconnectScreen::Logic();
+
     UpdateSound();
 
     g_worldScreenFader.update();
@@ -239,9 +236,8 @@ void WorldLoop()
         {
             s_worldUpdateMusic(WorldPlayer[1].Location);
 
-            treeWorldLevelQuery(WorldPlayer[1].Location, larr, false);
             //for(A = 1; A <= numWorldLevels; A++)
-            for(auto *t : larr)
+            for(auto *t : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_NONE))
             {
                 WorldLevel_t &l = *t;
                 if(CheckCollision(WorldPlayer[1].Location, l.Location))
@@ -327,19 +323,8 @@ void WorldLoop()
         tempLocation.Y += 4;
         WorldPlayer[1].LevelName.clear();
 
-        bool altPressed = XEvents::getKeyState(SDL_SCANCODE_LALT) ||
-                          XEvents::getKeyState(SDL_SCANCODE_RALT);
-
-        bool escPressed = XEvents::getKeyState(SDL_SCANCODE_ESCAPE);
-#ifdef __ANDROID__
-        escPressed |= XEvents::getKeyState(SDL_SCANCODE_AC_BACK);
-#endif
-
-        bool pausePress = (Player[1].Controls.Start || escPressed) && !altPressed;
-
-        treeWorldLevelQuery(tempLocation, larr, true);
         //for(A = 1; A <= numWorldLevels; A++)
-        for(auto *t : larr)
+        for(auto *t : treeWorldLevelQuery(tempLocation, SORTMODE_Z))
         {
             WorldLevel_t &l = *t;
             if(CheckCollision(tempLocation, l.Location))
@@ -353,18 +338,25 @@ void WorldLoop()
             }
         }
 
-        if(pausePress)
+        if(SharedControls.Pause)
         {
-            if(Player[1].UnStart)
-                PauseGame(1);
+            PauseGame(PauseCode::PauseScreen, 0);
+        }
+        for(int i = 1; i <= numPlayers; i++)
+        {
+            if(Player[i].Controls.Start && Player[i].UnStart)
+                PauseGame(PauseCode::PauseScreen, i);
+            // only allow P1 to pause if multiplayer pause controls disabled
+            if(!g_compatibility.multiplayer_pause_controls)
+                break;
         }
 
         if(Player[1].Controls.Up)
         {
             tempLocation.Y -= 32;
-            treeWorldPathQuery(tempLocation, parr, true);
+
             //for(A = 1; A <= numWorldPaths; A++)
-            for(auto *t : parr)
+            for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_ID))
             {
                 WorldPath_t &path = *t;
                 if(CheckCollision(tempLocation, path.Location) && path.Active)
@@ -374,9 +366,8 @@ void WorldLoop()
                 }
             }
 
-            treeWorldLevelQuery(tempLocation, larr, true);
             //for(A = 1; A <= numWorldLevels; A++)
-            for(auto *t : larr)
+            for(auto *t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
                 WorldLevel_t &level = *t;
                 if(WorldPlayer[1].Move == 0)
@@ -400,9 +391,9 @@ void WorldLoop()
         else if(Player[1].Controls.Left)
         {
             tempLocation.X -= 32;
-            treeWorldPathQuery(tempLocation, parr, true);
+
             //for(A = 1; A <= numWorldPaths; A++)
-            for(auto *t : parr)
+            for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_ID))
             {
                 WorldPath_t &path = *t;
                 if(CheckCollision(tempLocation, path.Location) && path.Active)
@@ -412,9 +403,8 @@ void WorldLoop()
                 }
             }
 
-            treeWorldLevelQuery(tempLocation, larr, true);
             //for(A = 1; A <= numWorldLevels; A++)
-            for(auto *t : larr)
+            for(auto *t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
                 WorldLevel_t &level = *t;
                 if(WorldPlayer[1].Move == 0)
@@ -439,9 +429,9 @@ void WorldLoop()
         else if(Player[1].Controls.Down)
         {
             tempLocation.Y += 32;
-            treeWorldPathQuery(tempLocation, parr, true);
+
             //for(A = 1; A <= numWorldPaths; A++)
-            for(auto *t : parr)
+            for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_ID))
             {
                 WorldPath_t &path = *t;
                 if(CheckCollision(tempLocation, path.Location) && path.Active)
@@ -451,9 +441,8 @@ void WorldLoop()
                 }
             }
 
-            treeWorldLevelQuery(tempLocation, larr, true);
             //for(A = 1; A <= numWorldLevels; A++)
-            for(auto *t : larr)
+            for(auto *t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
                 WorldLevel_t &level = *t;
                 if(WorldPlayer[1].Move == 0)
@@ -478,9 +467,9 @@ void WorldLoop()
         else if(Player[1].Controls.Right)
         {
             tempLocation.X += 32;
-            treeWorldPathQuery(tempLocation, parr, true);
+
             //for(A = 1; A <= numWorldPaths; A++)
-            for(auto *t : parr)
+            for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_ID))
             {
                 WorldPath_t &path = *t;
                 if(CheckCollision(tempLocation, path.Location) && path.Active)
@@ -490,9 +479,8 @@ void WorldLoop()
                 }
             }
 
-            treeWorldLevelQuery(tempLocation, larr, true);
             //for(A = 1; A <= numWorldLevels; A++)
-            for(auto *t : larr)
+            for(auto *t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
                 WorldLevel_t &level = *t;
                 if(WorldPlayer[1].Move == 0)
@@ -516,9 +504,8 @@ void WorldLoop()
         }
         else if(Player[1].Controls.Jump && Player[1].UnStart)
         {
-            treeWorldLevelQuery(tempLocation, larr, true);
             //for(A = 1; A <= numWorldLevels; A++)
-            for(auto *t : larr)
+            for(auto *t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
                 WorldLevel_t &level = *t;
                 if(CheckCollision(tempLocation, level.Location))
@@ -533,9 +520,8 @@ void WorldLoop()
                     if(int(level.WarpY) != -1 || int(level.WarpX) != -1)
                     {
                         LevelBeatCode = 6;
-                        treeWorldLevelQuery(WorldPlayer[1].Location, larr2, true);
                         //for(B = 1; B <= numWorldLevels; B++)
-                        for(auto *t2 : larr2)
+                        for(auto *t2 : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
                         {
                             WorldLevel_t &level2 = *t2;
                             if(CheckCollision(WorldPlayer[1].Location, level2.Location))
@@ -550,8 +536,16 @@ void WorldLoop()
                     if(!level.FileName.empty() && level.FileName != ".lvl" && level.FileName != ".lvlx")
                     {
                         addMissingLvlSuffix(level.FileName);
-                        if(Files::fileExists(SelectWorld[selWorld].WorldPath + level.FileName))
+                        std::string levelPath = g_dirEpisode.resolveFileCaseExistsAbs(level.FileName);
+                        if(!levelPath.empty())
                         {
+                            // save which characters were present at level start
+                            if(SwapCharAllowed())
+                            {
+                                pLogDebug("Save drop/add characters configuration at GameLoop()");
+                                ConnectScreen::SaveChars();
+                            }
+
                             StartWarp = level.StartWarp;
                             StopMusic();
                             PlaySound(SFX_LevelSelect);
@@ -566,12 +560,11 @@ void WorldLoop()
 
                             ClearLevel();
 
-                            std::string levelPath = SelectWorld[selWorld].WorldPath + level.FileName;
                             if(!OpenLevel(levelPath))
                             {
                                 delayedMusicStart(); // Allow music being started
                                 MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", level.FileName);
-                                PauseGame(1);
+                                PauseGame(PauseCode::Message);
                                 ErrorQuit = true;
                             }
 
@@ -602,9 +595,9 @@ void WorldLoop()
                             WorldPlayer[1].Location.Y = level.WarpY;
 
                         LevelBeatCode = 6;
-                        treeWorldLevelQuery(WorldPlayer[1].Location, larr2, true);
+
                         //for(B = 1; B <= numWorldLevels; B++)
-                        for(auto *t2 : larr2)
+                        for(auto *t2 : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
                         {
                             WorldLevel_t &level2 = *t2;
                             if(CheckCollision(WorldPlayer[1].Location, level2.Location))
@@ -716,8 +709,6 @@ void WorldLoop()
 
 void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
 {
-    WorldPathPtrArr parr;
-    parr.reserve(20);
     Location_t tempLocation;
 //    int A = 0;
 
@@ -731,9 +722,8 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
         tempLocation.Height -=  8;
         tempLocation.Y -= 32;
 
-        treeWorldPathQuery(tempLocation, parr, false);
         //for(A = 1; A <= numWorldPaths; A++)
-        for(auto *t : parr)
+        for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_NONE))
         {
             WorldPath_t &path = *t;
             if(!path.Active)
@@ -756,9 +746,8 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
         tempLocation.Height -= 8;
         tempLocation.X -= 32;
 
-        treeWorldPathQuery(tempLocation, parr, false);
         //for(A = 1; A <= numWorldPaths; A++)
-        for(auto *t : parr)
+        for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_NONE))
         {
             WorldPath_t &path = *t;
             if(!path.Active)
@@ -781,9 +770,8 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
         tempLocation.Height -= 8;
         tempLocation.Y += 32;
 
-        treeWorldPathQuery(tempLocation, parr, false);
         //for(A = 1; A <= numWorldPaths; A++)
-        for(auto *t : parr)
+        for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_NONE))
         {
             WorldPath_t &path = *t;
             if(!path.Active)
@@ -806,9 +794,8 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
         tempLocation.Height -= 8;
         tempLocation.X += 32;
 
-        treeWorldPathQuery(tempLocation, parr, false);
         //for(A = 1; A <= numWorldPaths; A++)
-        for(auto *t : parr)
+        for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_NONE))
         {
             WorldPath_t &path = *t;
             if(!path.Active)
@@ -824,12 +811,6 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
 
 void PathPath(WorldPath_t &Pth, bool Skp)
 {
-    WorldPathPtrArr parr;
-    WorldLevelPtrArr larr;
-    ScenePtrArr sarr;
-    parr.reserve(20);
-    larr.reserve(20);
-    sarr.reserve(20);
     //int A = 0;
     int B = 0;
 
@@ -840,9 +821,8 @@ void PathPath(WorldPath_t &Pth, bool Skp)
     tempLocation.Width -= 8;
     tempLocation.Height -= 8;
 
-    treeWorldSceneQuery(tempLocation, sarr, true);
     //for(A = 1; A <= numScenes; A++)
-    for(auto *t : sarr)
+    for(auto *t : treeWorldSceneQuery(tempLocation, SORTMODE_ID))
     {
         Scene_t &scene = *t;
         if(scene.Active)
@@ -883,26 +863,27 @@ void PathPath(WorldPath_t &Pth, bool Skp)
             tempLocation.X += 32; // Right
         }
 
-        treeWorldPathQuery(tempLocation, parr, true);
         //for(A = 1; A <= numWorldPaths; A++)
-        for(auto *t : parr)
+        WorldPath_t* found = nullptr;
+        for(WorldPath_t *path : treeWorldPathQuery(tempLocation, SORTMODE_ID))
         {
-            WorldPath_t &path = *t;
-            D_pLogDebug("Found path activity: %d", (int)path.Active);
-            if(!path.Active)
+            D_pLogDebug("Found path activity: %d", (int)path->Active);
+            if(!path->Active)
             {
                 D_pLogDebugNA("Collision with path...");
-                if(CheckCollision(tempLocation, path.Location))
+                if(CheckCollision(tempLocation, path->Location))
                 {
                     D_pLogDebugNA("Collision with path FOUND...");
-                    PathPath(path, Skp);
+                    found = path;
+                    break;
                 }
             }
         }
+        if(found)
+            PathPath(*found, Skp);
 
-        treeWorldLevelQuery(tempLocation, larr, true);
         //for(A = 1; A <= numWorldLevels; A++)
-        for(auto *t : larr)
+        for(auto *t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
         {
             WorldLevel_t &lev = *t;
             D_pLogDebug("Found level activity: %d", (int)lev.Active);

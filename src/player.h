@@ -72,7 +72,12 @@ void YoshiEat(const int A);
 // Public Sub YoshiSpit(A As Integer)
 void YoshiSpit(const int A);
 // Public Sub YoshiPound(A As Integer, C As Integer, Optional BreakBlocks As Boolean = False)
-void YoshiPound(const int A, int mount, bool BreakBlocks = false);
+void YoshiPound(int A, int mount, bool BreakBlocks = false);
+
+
+// NEW (but derived from existing code) forces player to jump out of mount as they do for AltJump, bypassing all checks.
+void PlayerDismount(const int A);
+
 // Public Sub SwapCoop()
 void SwapCoop();
 // Public Sub PlayerPush(A As Integer, HitSpot As Integer)
@@ -105,5 +110,14 @@ void LinkFrame(Player_t &p);
 // Private Sub PlayerEffects(A As Integer)
 void PlayerEffects(const int A);
 
+// main Drop/Add functions
+void DropPlayer(const int A);
+void AddPlayer(int Character);
+
+// NEW but, when Die is false and FromBlock is true, identical to hitting character block.
+void SwapCharacter(int A, int Character, bool Die = false, bool FromBlock = false);
+
+// returns whether a player is allowed to swap characters
+bool SwapCharAllowed();
 
 #endif // PLAYER_H

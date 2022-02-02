@@ -158,6 +158,15 @@ public:
     virtual void mapToScreen(int x, int y, int *dx, int *dy) = 0;
 
     /*!
+     * \brief Map screen relative coordinate into physical canvas
+     * \param x On-screen X position
+     * \param y On-screen Y position
+     * \param dx Destinition window X position
+     * \param dy Destinition window Y position
+     */
+    virtual void mapFromScreen(int x, int y, int *dx, int *dy) = 0;
+
+    /*!
      * \brief Set render target into the virtual in-game screen (use to render in-game world)
      */
     virtual void setTargetTexture() = 0;
@@ -179,6 +188,8 @@ public:
     static StdPicture lazyLoadPicture(const std::string &path,
                                       const std::string &maskPath = std::string(),
                                       const std::string &maskFallbackPath = std::string());
+
+    static void setTransparentColor(StdPicture &target, uint32_t rgb);
 
     virtual void loadTexture(StdPicture &target,
                              uint32_t width,

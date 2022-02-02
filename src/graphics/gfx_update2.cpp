@@ -25,11 +25,16 @@
 #include "../graphics.h"
 #include "../collision.h"
 #include "../player.h"
+#include "../compat.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
+#include "../main/screen_pause.h"
+#include "../main/screen_connect.h"
+#include "../main/screen_quickreconnect.h"
+#include "../main/screen_textentry.h"
+#include "../game_main.h"
 #include "../main/world_globals.h"
 #include "../core/render.h"
-#include "../compat.h"
 #include "../screen_fader.h"
 
 #include <fmt_format_ne.h>
@@ -58,22 +63,6 @@ void UpdateGraphics2(bool skipRepaint)
     frameRenderStart();
 
     g_stats.reset();
-
-    // Keep them static to don't re-alloc them for every iteration
-    static TilePtrArr  tarr;
-    static ScenePtrArr sarr;
-    static WorldPathPtrArr parr;
-    static WorldLevelPtrArr larr;
-
-    // Reserve 400 elements per every array
-    if(tarr.capacity() < 400)
-        tarr.reserve(400);
-    if(sarr.capacity() < 400)
-        sarr.reserve(400);
-    if(parr.capacity() < 400)
-        parr.reserve(400);
-    if(larr.capacity() < 400)
-        larr.reserve(400);
 
     int A = 0;
     int B = 0;
@@ -249,15 +238,15 @@ void UpdateGraphics2(bool skipRepaint)
 //            End With
 //        Next A
 //    Else
+    double sLeft, sTop, sRight, sBottom;
     {
-        double sLeft = -vScreenX[1] + 64;
-        double sTop = -vScreenY[1] + 96;
-        double sRight = -vScreenX[1] + vScreen[1].Width - 64;
-        double sBottom = -vScreenY[1] + vScreen[1].Height - 64;
+        sLeft = -vScreenX[1] + 64;
+        sTop = -vScreenY[1] + 96;
+        sRight = -vScreenX[1] + vScreen[1].Width - 64;
+        sBottom = -vScreenY[1] + vScreen[1].Height - 64;
 
-        treeWorldTileQuery(sLeft, sTop, sRight, sBottom, tarr, true);
         //for(A = 1; A <= numTiles; A++)
-        for(auto *t : tarr)
+        for(Tile_t* t : treeWorldTileQuery(sLeft, sTop, sRight, sBottom, true))
         {
             Tile_t &tile = *t;
             SDL_assert(IF_INRANGE(tile.Type, 1, maxTileType));
@@ -275,9 +264,8 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        treeWorldSceneQuery(sLeft, sTop, sRight, sBottom, sarr, true);
         //for(A = 1; A <= numScenes; A++)
-        for(auto *t : sarr)
+        for(Scene_t* t : treeWorldSceneQuery(sLeft, sTop, sRight, sBottom, true))
         {
             Scene_t &scene = *t;
             SDL_assert(IF_INRANGE(scene.Type, 1, maxSceneType));
@@ -295,9 +283,8 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        treeWorldPathQuery(sLeft, sTop, sRight, sBottom, parr, true);
         //for(A = 1; A <= numWorldPaths; A++)
-        for(auto *t : parr)
+        for(WorldPath_t* t : treeWorldPathQuery(sLeft, sTop, sRight, sBottom, true))
         {
             WorldPath_t &path = *t;
             SDL_assert(IF_INRANGE(path.Type, 1, maxPathType));
@@ -315,9 +302,8 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
-        treeWorldLevelQuery(sLeft, sTop, sRight, sBottom, larr, true);
         //for(A = 1; A <= numWorldLevels; A++)
-        for(auto *t : larr)
+        for(WorldLevel_t* t : treeWorldLevelQuery(sLeft, sTop, sRight, sBottom, true))
         {
             WorldLevel_t &level = *t;
             SDL_assert(IF_INRANGE(level.Type, 0, maxLevelType));
@@ -359,81 +345,32 @@ void UpdateGraphics2(bool skipRepaint)
         }
     }
 
-//    If WorldEditor = True Then
-//        For A = 1 To numEffects
-//            With Effect(A)
-//                If vScreenCollision(Z, .Location) Then
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffectMask(.Type), 0, .Frame * EffectHeight(.Type), vbSrcAnd
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffect(.Type), 0, .Frame * EffectHeight(.Type), vbSrcPaint
-//                End If
-//            End With
-//        Next A
-//        For A = 1 To numWorldMusic
-//            With WorldMusic(A).Location
-//                BitBlt myBackBuffer, vScreenX(Z) + .X, vScreenY(Z) + .Y, .Width, .Height, GFX.WarpMask(1).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, vScreenX(Z) + .X, vScreenY(Z) + .Y, .Width, .Height, GFX.Warp(1).hdc, 0, 0, vbSrcPaint
-//                SuperPrint Str(WorldMusic(A).Type), 1, Int(.X + 2 + vScreenX(Z)), Int(.Y + 2 + vScreenY(Z))
-//            End With
-//        Next A
-//        If EditorCursor.Mode = 7 Then
-//            With EditorCursor.Tile
-//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXTile(.Type), 0, TileHeight(.Type) * TileFrame(.Type), vbSrcCopy
-//            End With
-//        End If
-//        If EditorCursor.Mode = 8 Then
-//            With EditorCursor.Scene
-//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXSceneMask(.Type), 0, SceneHeight(.Type) * SceneFrame(.Type), vbSrcAnd
-//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXScene(.Type), 0, SceneHeight(.Type) * SceneFrame(.Type), vbSrcPaint
-//            End With
-//        End If
-//        If EditorCursor.Mode = 9 Then
-//            With EditorCursor.WorldLevel
-//                If .Path = True Then
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXLevelMask(0), 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXLevel(0), 0, 0, vbSrcPaint
-//                End If
-//                If .Path2 = True Then
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 16, vScreenY(Z) + 8 + .Location.Y, 64, 32, GFXLevelMask(29), 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 16, vScreenY(Z) + 8 + .Location.Y, 64, 32, GFXLevel(29), 0, 0, vbSrcPaint
-//                End If
-//                If GFXLevelBig(.Type) = True Then
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X - (GFXLevelWidth(.Type) - 32) / 2, vScreenY(Z) + .Location.Y - GFXLevelHeight(.Type) + 32, GFXLevelWidth(.Type), GFXLevelHeight(.Type), GFXLevelMask(.Type), 0, 32 * LevelFrame(.Type), vbSrcAnd
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X - (GFXLevelWidth(.Type) - 32) / 2, vScreenY(Z) + .Location.Y - GFXLevelHeight(.Type) + 32, GFXLevelWidth(.Type), GFXLevelHeight(.Type), GFXLevel(.Type), 0, 32 * LevelFrame(.Type), vbSrcPaint
-//                Else
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXLevelMask(.Type), 0, 32 * LevelFrame(.Type), vbSrcAnd
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXLevel(.Type), 0, 32 * LevelFrame(.Type), vbSrcPaint
-//                End If
-//            End With
-//        End If
-//        If EditorCursor.Mode = 10 Then
-//            With EditorCursor.WorldPath
-//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXPathMask(.Type), 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXPath(.Type), 0, 0, vbSrcPaint
-//            End With
-//        End If
-//        With EditorCursor
-//                If .Mode = 6 Then
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 2, vScreenY(Z) + .Location.Y, 22, 30, GFX.ECursorMask(3).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, vScreenX(Z) + .Location.X - 2, vScreenY(Z) + .Location.Y, 22, 30, GFX.ECursor(3).hdc, 0, 0, vbSrcPaint
-//                Else
-//                    If .Mode = 11 Then
-
-//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFX.WarpMask(1).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFX.Warp(1).hdc, 0, 0, vbSrcPaint
-//                SuperPrint Str(.WorldMusic.Type), 1, Int(.Location.X + 2 + vScreenX(Z)), Int(.Location.Y + 2 + vScreenY(Z))
-
-//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, 2, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y + .Location.Height - 2, .Location.Width, 2, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, 2, .Location.Height, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                        'BitBlt myBackBuffer, vScreenX(Z) + .Location.X + .Location.Width - 2, vScreenY(Z) + .Location.Y, 2, .Location.Height, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                    End If
-//                    BitBlt myBackBuffer, .X, .Y + 8, 32, 32, GFX.ECursorMask(2).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, .X, .Y + 8, 32, 32, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
-//                End If
-//        End With
-//        'BitBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, vbSrcCopy
-//        StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
-//    Else
+    if(WorldEditor)
+    {
+        for(A = 1; A <= numEffects; A++)
+        {
+            if(vScreenCollision(Z, Effect[A].Location))
+            {
+                XRender::renderTexture(vScreenX[Z] + Effect[A].Location.X,
+                    vScreenY[Z] + Effect[A].Location.Y,
+                    Effect[A].Location.Width, Effect[A].Location.Height,
+                    GFXEffect[Effect[A].Type], 0, Effect[A].Frame * EffectHeight[Effect[A].Type]);
+            }
+        }
+        for(WorldMusic_t* t : treeWorldMusicQuery(sLeft, sTop, sRight, sBottom, true))
+        {
+            WorldMusic_t &music = *t;
+            if(vScreenCollision(Z, music.Location))
+            {
+                XRender::renderRect(vScreenX[Z] + music.Location.X, vScreenY[Z] + music.Location.Y, 32, 32,
+                    1.f, 0.f, 1.f, 1.f, false);
+                SuperPrint(std::to_string(music.Type), 1, vScreenX[Z] + music.Location.X + 2, vScreenY[Z] + music.Location.Y + 2);
+            }
+        }
+        // TODO: port remainder of editor UI from devel
+        // DrawEditorWorld();
+    }
+    else
     { // NOT AN EDITOR!!!
         if(WorldPlayer[1].Type == 0)
             WorldPlayer[1].Type = 1;
@@ -740,37 +677,33 @@ void UpdateGraphics2(bool skipRepaint)
             SuperPrint(WorldPlayer[1].LevelName, 2, lnlx, 109);
         }
 
-        if(GamePaused)
-        {
-            XRender::renderRect(210, 200, 380, 200, 0.f, 0.f, 0.f);
-            if(!Cheater)
-            {
-                SuperPrint("CONTINUE", 3, 272, 257);
-                SuperPrint("SAVE & CONTINUE", 3, 272, 292);
-                SuperPrint("SAVE & QUIT", 3, 272, 327);
-                XRender::renderTexture(252, 257 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
-            }
-            else
-            {
-                SuperPrint("CONTINUE", 3, 272 + 56, 275);
-                SuperPrint("QUIT", 3, 272 + 56, 310);
-                XRender::renderTexture(252 + 56, 275 + (MenuCursor * 35), 16, 16, GFX.MCursor[0], 0, 0);
-            }
-        }
-
         g_worldScreenFader.draw();
 
-        if(ShowOnScreenMeta)
-        {
-            if(PrintFPS > 0)
-                SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+        if(PrintFPS > 0)
+            SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
 
-            g_stats.print();
+        g_stats.print();
 
-            speedRun_renderControls(1, -1);
-        }
+        speedRun_renderControls(1, -1);
+
 
         speedRun_renderTimer();
+
+        // render special screens
+        if(GamePaused == PauseCode::PauseScreen)
+            PauseScreen::Render();
+
+        if(QuickReconnectScreen::g_active)
+            QuickReconnectScreen::Render();
+
+        if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+        {
+            ConnectScreen::Render();
+            XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);
+        }
+
+        if(GamePaused == PauseCode::TextEntry)
+            TextEntryScreen::Render();
 
         if(!skipRepaint)
             XRender::repaint();

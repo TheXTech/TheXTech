@@ -7,6 +7,8 @@ include(ExternalProject)
 include(CheckLibraryExists)
 include(GNUInstallDirs)
 include(FindBacktrace)
+include(TestBigEndian)
+
 
 include(cmake/git_info.cmake)
 message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
@@ -65,7 +67,6 @@ endif()
 if(ANDROID)
     include(cmake/ndk-stl-config.cmake)
     set(ANDROID_STL "c++_static")
-    set(USE_TOUCHSCREEN_CONTROLLER TRUE)
 endif()
 
 if(WIN32 AND NOT EMSCRIPTEN)
@@ -117,6 +118,9 @@ option(ENABLE_OLD_CREDITS "Use original Redigit's credits without changes" OFF)
 option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on some platfors)" ON)
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
+option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
+
+option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
 
@@ -167,6 +171,7 @@ if(USE_STATIC_LIBC)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+include(lib/Allocator/pool-allocator.cmake)
 include(lib/DirManager/dirman.cmake)
 
 if(NOT VITA)
@@ -263,6 +268,8 @@ set(LIB_SRC
     ${DIRMANAGER_SRCS}
     ${FMT_SRCS}
     ${MD5_SRCS}
+    ${POOLALLOC_SRCS}
+    lib/CrashHandler/crash_handler.cpp
     lib/Graphics/graphics_funcs.cpp
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
@@ -307,6 +314,7 @@ set(THEXTECH_SRC
     src/npc.cpp
     src/sound.cpp
     src/frame_timer.cpp
+    src/global_dirs.cpp
     src/core/base/render_base.cpp
     src/core/base/window_base.cpp
     src/core/base/msgbox_base.cpp
@@ -326,6 +334,12 @@ set(THEXTECH_SRC
     src/main/level_file.cpp
     src/main/menu_loop.cpp
     src/main/menu_main.cpp
+    src/main/screen_pause.cpp
+    src/main/screen_connect.cpp
+    src/main/screen_quickreconnect.cpp
+    src/main/screen_textentry.cpp
+    src/main/screen_cheats.cpp
+    src/main/menu_controls.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
     src/main/trees.cpp
@@ -334,6 +348,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
     src/graphics/gfx_print.cpp
+    src/graphics/gfx_message.cpp
     src/graphics/gfx_credits.cpp
     src/graphics/gfx_hud.cpp
     src/graphics/gfx_enter_screen.cpp
@@ -341,6 +356,10 @@ set(THEXTECH_SRC
     src/graphics/gfx_special_frames.cpp
     src/graphics/gfx_screen.cpp
     src/control/joystick.cpp
+    src/control/keyboard.cpp
+    src/control/touchscreen.cpp
+    src/control/duplicate.cpp
+    src/control/controls.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp
@@ -365,6 +384,56 @@ set(THEXTECH_SRC
     src/player/player_update.cpp
 )
 
+# Luna Autocode script engine
+list(APPEND THEXTECH_SRC src/script/luna/lunaglobals.cpp)
+if(THEXTECH_ENABLE_LUNA_AUTOCODE)
+    add_definitions(-DTHEXTECH_ENABLE_LUNA_AUTOCODE)
+    list(APPEND THEXTECH_SRC
+        src/script/luna/luna.cpp
+        src/script/luna/autocode.cpp
+        src/script/luna/autocode_manager.cpp
+        src/script/luna/csprite.cpp
+        src/script/luna/lunaspriteman.cpp
+        src/script/luna/hitbox.cpp
+        src/script/luna/lunaimgbox.cpp
+        src/script/luna/sprite_component.cpp
+        src/script/luna/sprite_funcs.cpp
+        src/script/luna/lunalevels.cpp
+        src/script/luna/lunaplayer.cpp
+        src/script/luna/lunanpc.cpp
+        src/script/luna/lunablock.cpp
+        src/script/luna/lunalayer.cpp
+        src/script/luna/lunamisc.cpp
+        src/script/luna/lunalevel.cpp
+        src/script/luna/lunarender.cpp
+        src/script/luna/lunacell.cpp
+        src/script/luna/lunainput.cpp
+        src/script/luna/lunacounter.cpp
+        src/script/luna/lunacounter_record.cpp
+        src/script/luna/lunavarbank.cpp
+        src/script/luna/renderop_bitmap.cpp
+        src/script/luna/renderop_rect.cpp
+        src/script/luna/renderop_effect.cpp
+        src/script/luna/renderop_string.cpp
+        src/script/luna/mememu.cpp
+        src/script/luna/levels/Docopoper-AbstractAssault.cpp
+        src/script/luna/levels/Docopoper-Calleoca.cpp
+        src/script/luna/levels/Docopoper-TheFloorisLava.cpp
+        src/script/luna/levels/SAJewers-QraestoliaCaverns.cpp
+        src/script/luna/levels/SAJewers-Snowboardin.cpp
+        src/script/luna/levels/Talkhaus-Science_Final_Battle.cpp
+        src/script/luna/levels/KilArmoryCode.cpp
+    )
+endif()
+
+if(THEXTECH_ENABLE_AUDIO_FX)
+    add_definitions(-DTHEXTECH_ENABLE_AUDIO_FX)
+    list(APPEND THEXTECH_SRC
+        src/sound/fx/spc_echo.cpp
+        src/sound/fx/reverb.cpp
+    )
+endif()
+
 add_definitions(-DCORE_EVERYTHING_SDL)
 list(APPEND THEXTECH_SRC
     src/core/sdl/render_sdl.cpp
@@ -382,21 +451,21 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/InterProcess/*.h
     src/*.h
     src/*.hpp
+    src/script/*.h
+    src/script/luna/*.h
+    src/script/luna/level/*.h
     src/control/*.h
     src/core/*.h
     src/core/base/*.h
     src/core/sdl/*.h
     src/main/*.h
     src/main/QuadTree/*.h
+    src/sound/fx/*.h
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
-endif()
-
-if(USE_TOUCHSCREEN_CONTROLLER)
-    list(APPEND THEXTECH_SRC src/control/touchscreen.cpp)
 endif()
 
 if(THEXTECH_ENABLE_LUA)
@@ -587,6 +656,14 @@ endif()
 
 if(NOT USE_SYSTEM_LIBS)
     add_dependencies(thextech ${A2XT_DEPS})
+endif()
+
+test_big_endian(THEXTECH_IS_BIG_ENDIAN)
+if(THEXTECH_IS_BIG_ENDIAN)
+    message("== Target processor endianess: BIG ENDIAN")
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BIG_ENDIAN)
+else()
+    message("== Target processor endianess: LITTLE ENDIAN")
 endif()
 
 if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)

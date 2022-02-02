@@ -19,519 +19,24 @@
  */
 
 #include <SDL2/SDL_version.h>
-#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_joystick.h>
 #include <SDL2/SDL_gamecontroller.h>
 #include <SDL2/SDL_haptic.h>
+#include <SDL2/SDL_events.h>
 
-#include <fmt_format_ne.h>
-
-#include <unordered_map>
 #include <Logger/logger.h>
-#include <AppPath/app_path.h>
-#include <Utils/files.h>
 
-#include "../globals.h"
-#include "../config.h"
-#include "../sound.h"
+#include "../controls.h"
 #include "joystick.h"
-#include "../pseudo_vb.h"
-#include "../main/speedrunner.h"
-#include "../main/menu_main.h"
-#include "../main/record.h"
-#include "../core/events.h"
 
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-#include "touchscreen.h"
-#   ifdef __ANDROID__
-#       include "../main/cheat_code.h"
-#   endif
-#endif
-
-
-// this module handles the players controls, both keyboard and joystick
-
-struct Joystick_t
+namespace Controls
 {
-    SDL_Joystick        *joystick = nullptr;
-    SDL_GameController  *control = nullptr;
-    SDL_Haptic          *haptic = nullptr;
-    SDL_JoystickID      id = -1;
-    std::string         name;
-};
 
-static std::vector<Joystick_t> s_joysticks;
+/*====================================================*\
+|| implementation for InputMethod_Joystick            ||
+\*====================================================*/
 
-static std::unordered_map<std::string, ConJoystick_t> s_joystickControls[maxLocalPlayers];
-static std::unordered_map<SDL_JoystickID, int> s_joystickMap;
-
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-static TouchScreenController      s_touch;
-const Controls_t &CurrentTouchControls()
-{
-    return s_touch.m_current_keys;
-}
-#endif
-
-void joyFillDefaults(ConKeyboard_t &k)
-{
-    k.Down = vbKeyDown;
-    k.Left = vbKeyLeft;
-    k.Up = vbKeyUp;
-    k.Right = vbKeyRight;
-    k.Jump = vbKeyZ;
-    k.Run = vbKeyX;
-    k.Drop = vbKeyShift;
-    k.Start = vbKeyEscape;
-    k.AltJump = vbKeyA;
-    k.AltRun = vbKeyS;
-}
-
-void joyFillDefaults(ConJoystick_t &j)
-{
-    j.Up.val = SDL_HAT_UP;
-    j.Up.type = ConJoystick_t::JoyHat;
-    j.Up.id = 0;
-    j.Up.ctrl_val = 1;
-    j.Up.ctrl_type = ConJoystick_t::CtrlButton;
-    j.Up.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_UP;
-
-    j.Down.val = SDL_HAT_DOWN;
-    j.Down.type = ConJoystick_t::JoyHat;
-    j.Down.id = 0;
-    j.Down.ctrl_val = 1;
-    j.Down.ctrl_type = ConJoystick_t::CtrlButton;
-    j.Down.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_DOWN;
-
-    j.Left.val = SDL_HAT_LEFT;
-    j.Left.id = 0;
-    j.Left.type = ConJoystick_t::JoyHat;
-    j.Left.ctrl_val = 1;
-    j.Left.ctrl_type = ConJoystick_t::CtrlButton;
-    j.Left.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_LEFT;
-
-    j.Right.val = SDL_HAT_RIGHT;
-    j.Right.type = ConJoystick_t::JoyHat;
-    j.Right.id = 0;
-    j.Right.ctrl_val = 1;
-    j.Right.ctrl_type = ConJoystick_t::CtrlButton;
-    j.Right.ctrl_id = SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
-
-    j.Run.id = 2;
-    j.Run.val = 1;
-    j.Run.type = ConJoystick_t::JoyButton;
-    j.Run.ctrl_val = 1;
-    j.Run.ctrl_type = ConJoystick_t::CtrlButton;
-    j.Run.ctrl_id = SDL_CONTROLLER_BUTTON_X;
-
-    j.AltRun.id = 3;
-    j.AltRun.val = 1;
-    j.AltRun.type = ConJoystick_t::JoyButton;
-    j.AltRun.ctrl_val = 1;
-    j.AltRun.ctrl_type = ConJoystick_t::CtrlButton;
-    j.AltRun.ctrl_id = SDL_CONTROLLER_BUTTON_Y;
-
-    j.Jump.id = 0;
-    j.Jump.val = 1;
-    j.Jump.type = ConJoystick_t::JoyButton;
-    j.Jump.ctrl_val = 1;
-    j.Jump.ctrl_type = ConJoystick_t::CtrlButton;
-    j.Jump.ctrl_id = SDL_CONTROLLER_BUTTON_A;
-
-    j.AltJump.id = 1;
-    j.AltJump.val = 1;
-    j.AltJump.type = ConJoystick_t::JoyButton;
-    j.AltJump.ctrl_val = 1;
-    j.AltJump.ctrl_type = ConJoystick_t::CtrlButton;
-    j.AltJump.ctrl_id = SDL_CONTROLLER_BUTTON_B;
-
-    j.Drop.id = 6;
-    j.Drop.val = 1;
-    j.Drop.type = ConJoystick_t::JoyButton;
-    j.Drop.ctrl_val = 1;
-    j.Drop.ctrl_type = ConJoystick_t::CtrlButton;
-    j.Drop.ctrl_id = SDL_CONTROLLER_BUTTON_BACK;
-
-    j.Start.id = 7;
-    j.Start.val = 1;
-    j.Start.type = ConJoystick_t::JoyButton;
-    j.Start.ctrl_val = 1;
-    j.Start.ctrl_type = ConJoystick_t::CtrlButton;
-    j.Start.ctrl_id = SDL_CONTROLLER_BUTTON_START;
-}
-
-static std::string getJoyUuidStr(SDL_Joystick *j)
-{
-    SDL_JoystickGUID guid = SDL_JoystickGetGUID(j);
-    std::string guidStr;
-    guidStr.resize(32);
-    SDL_JoystickGetGUIDString(guid, &guidStr[0], 33);
-    return guidStr;
-}
-
-std::string joyGetUuidStr(int joystick)
-{
-    if(joystick < 0 || joystick >= int(s_joysticks.size()))
-        return std::string();
-    return getJoyUuidStr(s_joysticks[joystick].joystick);
-}
-
-std::string joyGetName(int joystick)
-{
-    if(joystick < 0 || joystick >= int(s_joysticks.size()))
-        return fmt::format_ne("Joystick {0}", joystick);
-
-    const char *n;
-    auto &j = s_joysticks[joystick];
-
-//    if(j.control)
-//        n = SDL_GameControllerName(j.control);
-//    else
-    n = SDL_JoystickName(j.joystick);
-
-    if(!n)
-    {
-        if(j.control)
-            return fmt::format_ne("Controller {0}", joystick + 1);
-        else
-            return fmt::format_ne("Joystick {0}", joystick + 1);
-    }
-
-    return fmt::format("{0}: {1}", joystick + 1, n);
-}
-
-static int s_joyDeviceAdd(int i)
-{
-    Joystick_t joy;
-    SDL_JoystickID instance = SDL_JoystickGetDeviceInstanceID(i);
-
-    if(instance < 0)
-    {
-        pLogWarning("Joystick %d: Failed to get ID of the controller", i);
-        return -1;
-    }
-
-    if(s_joystickMap.find(instance) != s_joystickMap.end())
-    {
-        pLogWarning("Joystick %d: Attempted to add the duplicated controller instance", i);
-        return -1;
-    }
-
-    joy.joystick = SDL_JoystickOpen(i);
-
-    if(joy.joystick)
-    {
-        joy.id = SDL_JoystickInstanceID(joy.joystick);
-        std::string guidStr = getJoyUuidStr(joy.joystick);
-        bool exist1 = s_joystickControls[0].find(guidStr) != s_joystickControls[0].end();
-        bool exist2 = s_joystickControls[1].find(guidStr) != s_joystickControls[1].end();
-        auto &j = s_joystickControls[0][guidStr];
-        int power = SDL_JoystickCurrentPowerLevel(joy.joystick);
-
-//            j.hwGUID = guidStr;
-        j.isValid = true;
-        j.isGameController = SDL_IsGameController(i);
-        j.isHaptic = SDL_JoystickIsHaptic(joy.joystick);
-        if(!exist1)
-            joyFillDefaults(j);
-
-        joy.name = SDL_JoystickName(joy.joystick);
-
-        pLogDebug("==========================");
-        pLogDebug("Josytick available: %s", joy.name.c_str());
-        pLogDebug("--------------------------");
-        pLogDebug("GUID:    %s", guidStr.c_str());
-        pLogDebug("Axes:    %d", SDL_JoystickNumAxes(joy.joystick));
-        pLogDebug("Balls:   %d", SDL_JoystickNumBalls(joy.joystick));
-        pLogDebug("Hats:    %d", SDL_JoystickNumHats(joy.joystick));
-        pLogDebug("Buttons: %d", SDL_JoystickNumButtons(joy.joystick));
-        if(j.isGameController)
-            pLogDebug("Supported by the game controller interface!");
-        if(j.isHaptic)
-            pLogDebug("Is the haptic device!");
-        switch(power)
-        {
-        case SDL_JOYSTICK_POWER_UNKNOWN:
-            pLogDebug("Power level: <unknown>");
-            break;
-        case SDL_JOYSTICK_POWER_EMPTY:
-            pLogDebug("Power level: Empty battery");
-            break;
-        case SDL_JOYSTICK_POWER_LOW:
-            pLogDebug("Power level: Low battery");
-            break;
-        case SDL_JOYSTICK_POWER_MEDIUM:
-            pLogDebug("Power level: Medium battery");
-            break;
-        case SDL_JOYSTICK_POWER_FULL:
-            pLogDebug("Power level: Full battery");
-            break;
-        case SDL_JOYSTICK_POWER_WIRED:
-            pLogDebug("Power level: <wired gamepad>");
-            break;
-        case SDL_JOYSTICK_POWER_MAX:
-            pLogDebug("Power level: <max>");
-            break;
-        }
-
-        if(j.isGameController)
-        {
-            joy.control = SDL_GameControllerOpen(i);
-            if(!joy.control)
-            {
-                pLogWarning("Couldn't open the game controller %d, using as a joystick!", i);
-                j.isGameController = false;
-            }
-            else
-                pLogDebug("Controller: %s", SDL_GameControllerName(joy.control));
-        }
-
-        if(j.isHaptic)
-        {
-            joy.haptic = SDL_HapticOpenFromJoystick(joy.joystick);
-            if(joy.haptic)
-            {
-                if(SDL_HapticRumbleSupported(joy.haptic) && SDL_HapticRumbleInit(joy.haptic) != 0)
-                {
-                    pLogWarning("Couldn't open the rumble at the haptic device %d, disabling the haptic support!", i);
-                    SDL_HapticClose(joy.haptic);
-                    j.isHaptic = false;
-                }
-            }
-            else
-            {
-                pLogWarning("Couldn't open the haptic device %d, disabling the haptic support!", i);
-                j.isHaptic = false;
-            }
-        }
-
-        pLogDebug("==========================");
-
-        if(exist2)
-        {
-            // Don't override controls when model entry is already loaded
-            auto &j2 = s_joystickControls[1][guidStr];
-            j2.isHaptic = j.isHaptic;
-            j2.isGameController = j.isGameController;
-            j2.isValid = j.isValid;
-        }
-        else
-            s_joystickControls[1][guidStr] = j;
-
-        int objIdx = (int)s_joysticks.size();
-        s_joysticks.push_back(joy);
-        s_joystickMap.emplace(joy.id, objIdx);
-        return objIdx;
-    }
-    else
-    {
-        pLogWarning("==========================");
-        pLogWarning("Can't open joystick #%d", i);
-        pLogWarning("==========================");
-        return -1;
-    }
-}
-
-static void s_joyDeviceClose(int i)
-{
-    auto j = s_joysticks[i];
-    if(j.control)
-        SDL_GameControllerClose(j.control);
-    if(j.haptic)
-        SDL_HapticClose(j.haptic);
-    if(j.joystick)
-        SDL_JoystickClose(j.joystick);
-}
-
-void joyDeviceAddEvent(const SDL_JoyDeviceEvent *e)
-{
-    pLogDebug("Connected game device: %s (index %d)", SDL_JoystickNameForIndex(e->which), e->which);
-
-    int idx;
-    if((idx = s_joyDeviceAdd(e->which)) >= 0)
-    {
-        numJoysticks++; // Do count the successfully loaded devices only
-
-        for(int i = 1; i <= maxLocalPlayers; i++)
-        {
-            // Return back the lost joystick to the player if they wanted it
-            if(useJoystick[i] <= 0 && !wantedKeyboard[i])
-            {
-                useJoystick[i] = (idx + 1);
-                if(useJoystick[i] >= 0)
-                    joyGetByIndex(i, idx, conJoystick[i]);
-                PlaySoundMenu(SFX_Yoshi);
-                break;
-            }
-        }
-    }
-}
-
-void joyDeviceRemoveEvent(const SDL_JoyDeviceEvent *e)
-{
-    auto i = s_joystickMap.find(e->which);
-    if(i == s_joystickMap.end())
-    {
-        pLogWarning("Attempt to disconnect the dead device: %d", e->which);
-        return;
-    }
-
-    int idx = i->second;
-
-    pLogDebug("Disconnected game device: %s, index %d instance %d", s_joysticks[idx].name.c_str(), idx, e->which);
-
-    PlaySoundMenu(SFX_SMGlass);
-
-    if(GameMenu && getNewJoystick) // Cancel the key binding if device got disconnected in the middle of the key awaiting
-    {
-        auto &cj = conJoystick[MenuMode - MENU_INPUT_SETTINGS_BASE];
-        setKey(cj, MenuCursor, lastJoyButton);
-        getNewJoystick = false;
-        MenuCursorCanMove = false;
-    }
-
-    for(int p = 1; p <= maxLocalPlayers; ++p)
-    {
-        if(useJoystick[p] > 0)
-        {
-            int uj = useJoystick[p] - 1;
-            if(uj == idx)
-                useJoystick[p] = 0; // Drop player back into keyboard
-            else if(uj > idx)
-                useJoystick[p]--; // Removal of the device will cause the offset of all next devices down
-        }
-    }
-
-    s_joyDeviceClose(idx);
-
-    // Reduce all index numbers that got an offset
-    for(auto &m : s_joystickMap)
-    {
-        if(m.second > idx)
-            m.second--;
-    }
-
-    s_joystickMap.erase(e->which);
-    s_joysticks.erase(s_joysticks.begin() + idx);
-    numJoysticks--;
-}
-
-int joyCount()
-{
-    return (int)s_joysticks.size();
-}
-
-void joyGetAllUUIDs(int player, std::vector<std::string> &out)
-{
-    SDL_assert(player >= 1 && player <= maxLocalPlayers);
-    out.clear();
-    for(auto &q : s_joystickControls[player - 1])
-        out.push_back(q.first);
-}
-
-ConJoystick_t &joyGetByUuid(int player, const std::string &uuid)
-{
-    SDL_assert(player >= 1 && player <= maxLocalPlayers);
-    return s_joystickControls[player - 1][uuid];
-}
-
-void joyGetByUuid(ConJoystick_t &dst, int player, const std::string &uuid)
-{
-    auto &j = joyGetByUuid(player, uuid);
-    SDL_memcpy(&dst, &j, sizeof(ConJoystick_t));
-}
-
-ConJoystick_t &joyGetByIndex(int player, int joyNum)
-{
-    SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
-    SDL_assert(player >= 1 && player <= maxLocalPlayers);
-
-    std::string guidStr = getJoyUuidStr(s_joysticks[joyNum].joystick);
-    auto &ret = s_joystickControls[player - 1][guidStr];
-//    if(ret.hwGUID.empty() && ret.hwGUID != guidStr)
-//        ret.hwGUID = guidStr;
-    return ret;
-}
-
-void joyGetByIndex(int player, int joyNum, ConJoystick_t &dst)
-{
-    SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
-    SDL_assert(player >= 1 && player <= maxLocalPlayers);
-
-    std::string guidStr = getJoyUuidStr(s_joysticks[joyNum].joystick);
-    auto &ret = s_joystickControls[player - 1][guidStr];
-    SDL_memcpy(&dst, &ret, sizeof(ConJoystick_t));
-}
-
-
-void joySetByUuid(int player, const std::string &uuid, const ConJoystick_t &cj)
-{
-    SDL_assert(player >= 1 && player <= maxLocalPlayers);
-    SDL_memcpy(&s_joystickControls[player - 1][uuid], &cj, sizeof(ConJoystick_t));
-}
-
-void joySetByIndex(int player, int index, const ConJoystick_t &cj)
-{
-    auto u = joyGetUuidStr(index);
-    joySetByUuid(player, u, cj);
-}
-
-int joyGetPowerLevel(int joyNum)
-{
-    SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
-    auto *j = s_joysticks[joyNum].joystick;
-    if(j)
-        return SDL_JoystickCurrentPowerLevel(j);
-    return SDL_JOYSTICK_POWER_UNKNOWN;
-}
-
-void joyRumble(int joyNum, int ms, float strength)
-{
-    if(!g_config.JoystickEnableRumble || GameMenu || GameOutro)
-        return;
-
-    SDL_assert(joyNum >= 0 && (size_t)joyNum < s_joysticks.size());
-    auto &j = s_joysticks[joyNum];
-
-    if(j.haptic)
-    {
-        if(SDL_HapticRumblePlay(j.haptic, strength, ms) == 0)
-            return;
-    }
-
-    int intStrength = (int)(0xFFFF * strength + 0.5f);
-
-    if(intStrength > 0xFFFF)
-        intStrength = 0xFFFF;
-
-    if(intStrength < 0)
-        intStrength = 0;
-
-#if SDL_VERSION_ATLEAST(2, 0, 12)
-    if(j.control)
-    {
-        if(SDL_GameControllerRumble(j.control, intStrength, intStrength, ms) == 0)
-            return;
-    }
-    if(j.joystick)
-        SDL_JoystickRumble(j.joystick, intStrength, intStrength, ms);
-#endif
-}
-
-void joyRumbleAllPlayers(int ms, float strength)
-{
-    if(!g_config.JoystickEnableRumble)
-        return;
-
-    for(int plr = 1; plr <= numPlayers && plr <= maxLocalPlayers; ++plr)
-    {
-        if(useJoystick[plr] > 0)
-            joyRumble(useJoystick[plr] - 1, ms, strength);
-    }
-}
-
-
-static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
+static void s_updateJoystickKey(SDL_Joystick* j, bool& key, const KM_Key& mkey)
 {
     Sint32 val = 0, dx = 0, dy = 0;
     Sint16 val_initial = 0;
@@ -539,7 +44,7 @@ static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
 
     switch(mkey.type)
     {
-    case ConJoystick_t::JoyAxis:
+    case KM_Key::JoyAxis:
         //Note: SDL_JoystickGetAxisInitialState is a new API function added into dev version
         //      and doesn't available in already released assemblies
         if(SDL_JoystickGetAxisInitialState(j, mkey.id, &val_initial) == SDL_FALSE)
@@ -547,6 +52,7 @@ static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
             key_new = false;
             break;
         }
+
         val = SDL_JoystickGetAxis(j, mkey.id);
 
         if(SDL_abs(val) <= 15000)
@@ -560,7 +66,7 @@ static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
 
         break;
 
-    case ConJoystick_t::JoyBallX:
+    case KM_Key::JoyBallX:
         SDL_JoystickGetBall(j, mkey.id, &dx, &dy);
 
         if(mkey.id > 0)
@@ -571,7 +77,7 @@ static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
 
         break;
 
-    case ConJoystick_t::JoyBallY:
+    case KM_Key::JoyBallY:
         SDL_JoystickGetBall(j, mkey.id, &dx, &dy);
 
         if(mkey.id > 0)
@@ -582,12 +88,12 @@ static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
 
         break;
 
-    case ConJoystick_t::JoyHat:
+    case KM_Key::JoyHat:
         val = (Sint32)SDL_JoystickGetHat(j, mkey.id);
         key_new = ((val & mkey.val)) != 0;
         break;
 
-    case ConJoystick_t::JoyButton:
+    case KM_Key::JoyButton:
         key_new = (0 != (Sint32)SDL_JoystickGetButton(j, mkey.id));
         break;
 
@@ -596,67 +102,180 @@ static void updateJoyKey(SDL_Joystick *j, bool &key, const KM_Key &mkey)
         break;
     }
 
-//    key_pressed = (key_new && !key);
-    key = key_new;
-}
-
-static void updateCtrlKey(SDL_GameController *j, bool &key, const KM_Key &mkey)
-{
-    key = (0 != (Sint32)SDL_GameControllerGetButton(j, static_cast<SDL_GameControllerButton>(mkey.ctrl_id)));
-}
-
-
-static void updateCtrlAxisOr(SDL_GameController *j, bool &key, SDL_GameControllerAxis axis, Sint16 dst_val)
-{
-    bool key_new = false;
-    Sint16 val = SDL_GameControllerGetAxis(j, axis);
-
-    dst_val *= 25000;
-
-    if(SDL_abs(val) <= 15000)
-        key_new = false;
-    else if(dst_val > 0)
-        key_new = (val > 0);
-    else if(dst_val < 0)
-        key_new = (val < 0);
-    else
-        key_new = false;
     key |= key_new;
 }
 
-
-static bool bindControllerKey(SDL_GameController *ctrl, KM_Key &k)
+static void s_updateCtrlKey(SDL_GameController* c, bool& key, const KM_Key& mkey)
 {
-    Uint8 val;
+    bool key_new = false;
 
-    for(int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
+    switch(mkey.type)
     {
-        val = SDL_GameControllerGetButton(ctrl, static_cast<SDL_GameControllerButton>(i));
-        if(val != 0)
-        {
-            k.ctrl_val = val;
-            k.ctrl_id = i;
-            k.ctrl_type = (int)ConJoystick_t::CtrlButton;
-            k.type = k.ctrl_type;
-            return true;
-        }
+    // using brackets to scope val
+    case KM_Key::CtrlAxis:
+    {
+        Sint32 val = SDL_GameControllerGetAxis(c, (SDL_GameControllerAxis)mkey.id);
+
+        if(SDL_abs(val) <= 15000)
+            key_new = false;
+        else if(mkey.val > 0)
+            key_new = (val > 0);
+        else if(mkey.val < 0)
+            key_new = (val < 0);
+        else
+            key_new = false;
+
+        break;
     }
 
-    k.ctrl_val = 0;
-    k.ctrl_id = -1;
-    k.ctrl_type = (int)ConJoystick_t::NoControl;
-    k.type = k.ctrl_type;
-    return false;
+    case KM_Key::CtrlButton:
+        key_new = (SDL_GameControllerGetButton(c, (SDL_GameControllerButton)mkey.id) != 0);
+        break;
+
+    default:
+        key_new = false;
+        break;
+    }
+
+    key |= key_new;
 }
 
+static void s_updateJoystickAnalogue(SDL_Joystick* j, double& amount, const KM_Key& mkey)
+{
+    Sint32 val = 0, dx = 0, dy = 0;
+    Sint16 val_initial = 0;
+    double amount_new = 0.;
 
-static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
+    switch(mkey.type)
+    {
+    case KM_Key::JoyAxis:
+        //Note: SDL_JoystickGetAxisInitialState is a new API function added into dev version
+        //      and doesn't available in already released assemblies
+        if(SDL_JoystickGetAxisInitialState(j, mkey.id, &val_initial) == SDL_FALSE)
+        {
+            amount_new = 0.;
+            break;
+        }
+
+        val = SDL_JoystickGetAxis(j, mkey.id);
+
+        if(SDL_abs(val) <= 15000)
+        {
+            amount_new = 0.0;
+        }
+        else if(mkey.val > val_initial)
+        {
+            amount_new = (val - val_initial) / (32768. - val_initial);
+            double other_amount_new = (val - 15000) / (32768. - 15000);
+
+            if(other_amount_new > 0 && other_amount_new < amount_new)
+                amount_new = other_amount_new;
+        }
+        else if(mkey.val < val_initial)
+        {
+            amount_new = (val_initial - val) / (val_initial + 32768.);
+            double other_amount_new = (-val - 15000) / (32768. - 15000);
+
+            if(other_amount_new > 0 && other_amount_new < amount_new)
+                amount_new = other_amount_new;
+        }
+        else
+        {
+            amount_new = 0.0;
+        }
+
+        break;
+
+    case KM_Key::JoyBallX:
+        SDL_JoystickGetBall(j, mkey.id, &dx, &dy);
+
+        if(mkey.id > 0)
+            amount_new = (dx / 32.);
+        else if(mkey.id < 0)
+            amount_new = (-dx / 32.);
+        else
+            amount_new = 0.0;
+
+        break;
+
+    case KM_Key::JoyBallY:
+        SDL_JoystickGetBall(j, mkey.id, &dx, &dy);
+
+        if(mkey.id > 0)
+            amount_new = (dy / 32.);
+        else if(mkey.id < 0)
+            amount_new = (dy / 32.);
+        else
+            amount_new = 0.0;
+
+        break;
+
+    case KM_Key::JoyHat:
+        val = (Sint32)SDL_JoystickGetHat(j, mkey.id);
+
+        if((val & mkey.val))
+            amount_new = 1.0;
+
+        break;
+
+    case KM_Key::JoyButton:
+        if((Sint32)SDL_JoystickGetButton(j, mkey.id))
+            amount_new = 1.0;
+
+        break;
+
+    default:
+        amount_new = 0.0;
+        break;
+    }
+
+    if(amount_new > 0)
+        amount = amount_new;
+}
+
+static void s_updateCtrlAnalogue(SDL_GameController* c, double& amount, const KM_Key& mkey)
+{
+    double amount_new = 0.;
+
+    switch(mkey.type)
+    {
+    // using brackets to scope val
+    case KM_Key::CtrlAxis:
+    {
+        Sint32 val = SDL_GameControllerGetAxis(c, (SDL_GameControllerAxis)mkey.id);
+
+        if(SDL_abs(val) <= 15000)
+            amount_new = 0.0;
+        else if(mkey.val > 0)
+            amount_new = (val - 15000) / (32768. - 15000);
+        else if(mkey.val < 0)
+            amount_new = (-val - 15000) / (32768. - 15000);
+        else
+            amount_new = 0.0;
+
+        break;
+    }
+
+    case KM_Key::CtrlButton:
+        if(SDL_GameControllerGetButton(c, (SDL_GameControllerButton)mkey.id) != 0)
+            amount_new = 1.0;
+
+        break;
+
+    default:
+        amount_new = 0.0;
+        break;
+    }
+
+    if(amount_new > 0.0)
+        amount = amount_new;
+}
+
+static bool s_bindJoystickKey(SDL_Joystick* joy, KM_Key& k)
 {
     Sint32 val = 0;
     Sint16 val_initial = 0;
     int dx = 0, dy = 0;
-    //SDL_PumpEvents();
-    //SDL_JoystickUpdate();
     int balls = SDL_JoystickNumBalls(joy);
     int hats = SDL_JoystickNumHats(joy);
     int buttons = SDL_JoystickNumButtons(joy);
@@ -670,8 +289,7 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
         {
             k.val = val;
             k.id = i;
-            k.type = (int)ConJoystick_t::JoyButton;
-            D_pLogDebug("Joystick button %d", i);
+            k.type = (int)KM_Key::JoyButton;
             return true;
         }
     }
@@ -684,8 +302,7 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
         {
             k.val = val;
             k.id = i;
-            k.type = (int)ConJoystick_t::JoyHat;
-            D_pLogDebug("Joystick hat state %d", val);
+            k.type = (int)KM_Key::JoyHat;
             return true;
         }
     }
@@ -702,8 +319,7 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
         {
             k.val = val;
             k.id = i;
-            k.type = (int)ConJoystick_t::JoyAxis;
-            D_pLogDebug("Joystick axis %d value %d", i, val);
+            k.type = (int)KM_Key::JoyAxis;
             return true;
         }
     }
@@ -718,537 +334,1645 @@ static bool bindJoystickKey(SDL_Joystick *joy, KM_Key &k)
         {
             k.val = dx;
             k.id = i;
-            k.type = (int)ConJoystick_t::JoyBallX;
-            D_pLogDebug("Joystick ball %d value %d dx", i, dx);
+            k.type = (int)KM_Key::JoyBallX;
             return true;
         }
         else if(dy != 0)
         {
             k.val = dy;
             k.id = i;
-            k.type = (int)ConJoystick_t::JoyBallY;
-            D_pLogDebug("Joystick ball %d value %d dy", i, dy);
+            k.type = (int)KM_Key::JoyBallY;
             return true;
         }
     }
 
     k.val = 0;
     k.id = 0;
-    k.type = (int)ConJoystick_t::NoControl;
+    k.type = (int)KM_Key::NoControl;
     return false;
 }
 
-void UpdateControls()
+static bool s_bindControllerKey(SDL_GameController* ctrl, KM_Key& k)
 {
-    int A = 0;
-//    int B = 0;
-//    int C = 0;
+    Sint32 val = 0;
 
-//    If TestLevel = True And Not (nPlay.Online = True And nPlay.Mode = 0) Then
-//    if(TestLevel)
-//    {
-//        if(XEvents::getKeyState(vbKeyEscape))
-//        {
-//            EndLevel = true;
-//        }
-//    }
-
-//    if(numJoysticks > 0 && (useJoystick[1] || useJoystick[2]))
-//        SDL_JoystickUpdate();
-
-    For(B, 1, numPlayers)
+    for(int i = 0; i < SDL_CONTROLLER_BUTTON_MAX; i++)
     {
-        if(B == 2 && numPlayers == 2) {
-            A = 2;
-        } else {
-            A = 1;
+        val = SDL_GameControllerGetButton(ctrl, (SDL_GameControllerButton)i);
+
+        if(val != 0)
+        {
+            k.val = val;
+            k.id = i;
+            k.type = (int)KM_Key::CtrlButton;
+            return true;
+        }
+    }
+
+    for(int i = 0; i < SDL_CONTROLLER_AXIS_MAX; i++)
+    {
+        val = SDL_GameControllerGetAxis(ctrl, (SDL_GameControllerAxis)i);
+
+        if(SDL_abs(val) > 15000)
+        {
+            k.val = val;
+            k.id = i;
+            k.type = (int)KM_Key::CtrlAxis;
+            return true;
+        }
+    }
+
+    k.val = 0;
+    k.id = 0;
+    k.type = (int)KM_Key::NoControl;
+    return false;
+}
+
+/*====================================================*\
+|| implementation for InputMethod_Joystick            ||
+\*====================================================*/
+
+InputMethod_Joystick::~InputMethod_Joystick()
+{
+    if(this->m_devices)
+        this->m_devices->can_poll = false;
+}
+
+// Update functions that set player controls (and editor controls)
+// based on current device input. Return false if device lost.
+bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h)
+{
+    InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(this->Profile);
+
+    if(!p || !this->m_devices)
+        return false;
+
+    if(!SDL_JoystickGetAttached(this->m_devices->joy))
+    {
+        // note: the joystick is owned by the InputMethodType, not the InputMethod.
+        this->m_devices = nullptr;
+        return false;
+    }
+
+    for(int a = 0; a < 4; a++)
+    {
+        KM_Key* keys;
+        KM_Key* keys2;
+        size_t key_start;
+        size_t key_max;
+        bool activate = false;
+
+        if(a == 0)
+        {
+            keys = p->m_keys;
+            keys2 = p->m_keys2;
+            key_start = 0;
+            key_max = PlayerControls::n_buttons;
+        }
+        else if(a == 1)
+        {
+            keys = p->m_cursor_keys;
+            keys2 = p->m_cursor_keys2;
+            key_start = 4;
+            key_max = CursorControls::n_buttons;
+        }
+        else if(a == 2)
+        {
+            keys = p->m_editor_keys;
+            keys2 = p->m_editor_keys2;
+            key_start = 4;
+            key_max = EditorControls::n_buttons;
+        }
+        else
+        {
+            keys = p->m_hotkeys;
+            keys2 = p->m_hotkeys2;
+            key_start = 0;
+            key_max = Hotkeys::n_buttons;
         }
 
-        auto &joyCon = conJoystick[A];
-        auto &keyCon = conKeyboard[A];
-
-        // With Player(A).Controls
+        for(size_t i = key_start; i < key_max; i++)
         {
-            auto &p = Player[A];
-            Controls_t &c = p.Controls;
-            c.Down = false;
-            c.Drop = false;
-            c.Jump = false;
-            c.Left = false;
-            c.Right = false;
-            c.Run = false;
-            c.Start = false;
-            c.Up = false;
-            c.AltJump = false;
-            c.AltRun = false;
+            const KM_Key& key = keys[i];
+            const KM_Key& key2 = keys2[i];
+            bool* b;
 
-            if(useJoystick[A] > 0) // There is a joystick
+            if(a == 0)
             {
-                int jNum = useJoystick[A] - 1;
+                b = &PlayerControls::GetButton(c, i);
+                *b = false;
+            }
+            else if(a == 1)
+            {
+                b = &CursorControls::GetButton(m, i);
+            }
+            else if(a == 2)
+            {
+                b = &EditorControls::GetButton(e, i);
+            }
+            else
+            {
+                b = &activate;
+                *b = false;
+            }
 
-                if(jNum < 0 || jNum >= int(s_joysticks.size()))
-                    continue;
+            if(p->m_controllerProfile && this->m_devices->ctrl)
+            {
+                s_updateCtrlKey(this->m_devices->ctrl, *b, key);
+                s_updateCtrlKey(this->m_devices->ctrl, *b, key2);
+            }
+            else
+            {
+                s_updateJoystickKey(this->m_devices->joy, *b, key);
+                s_updateJoystickKey(this->m_devices->joy, *b, key2);
+            }
 
-                auto &jj = s_joysticks[size_t(jNum)];
+            if(a == 3 && *b)
+                h[i] = player;
+        }
+    }
 
-                auto *j = jj.joystick;
-                auto *k = jj.control;
+    double cursor[4];
+    double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
 
-                if(joyCon.isGameController)
-                {
-// Experimental share-button key hook, not working yet
-#if DEBUG_BUILD && SDL_VERSION_ATLEAST(2, 0, 14)
-                    KM_Key share;
-                    share.ctrl_type = ConJoystick_t::CtrlButton;
-                    share.ctrl_id = SDL_CONTROLLER_BUTTON_MISC1;
-                    share.ctrl_val = 1;
-                    static bool take = false;
-                    bool takePrev = take;
-                    updateCtrlKey(k, take, share);
+    if(p->m_controllerProfile && this->m_devices->ctrl)
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            cursor[i] = 0.;
+            s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_cursor_keys[i]);
+            s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_cursor_keys2[i]);
+            s_updateCtrlAnalogue(this->m_devices->ctrl, *scroll[i], p->m_editor_keys[i]);
+            s_updateCtrlAnalogue(this->m_devices->ctrl, *scroll[i], p->m_editor_keys2[i]);
+        }
+    }
+    else
+    {
+        for(int i = 0; i < 4; i++)
+        {
+            cursor[i] = 0.;
+            s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_cursor_keys[i]);
+            s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_cursor_keys2[i]);
+            s_updateJoystickAnalogue(this->m_devices->joy, *scroll[i], p->m_editor_keys[i]);
+            s_updateJoystickAnalogue(this->m_devices->joy, *scroll[i], p->m_editor_keys2[i]);
+        }
+    }
 
-                    if(take != takePrev && take)
-                        TakeScreen = true;
+    // Cursor control (UDLR)
+    if(cursor[0] || cursor[1] || cursor[2] || cursor[3])
+    {
+        if(m.X < 0)
+            m.X = ScreenW / 2;
+
+        if(m.Y < 0)
+            m.Y = ScreenH / 2;
+
+        m.X += (cursor[3] - cursor[2]) * 16.;
+        m.Y += (cursor[1] - cursor[0]) * 16.;
+
+        if(m.X < 0)
+            m.X = 0;
+        else if(m.X >= ScreenW)
+            m.X = ScreenW - 1;
+
+        if(m.Y < 0)
+            m.Y = 0;
+        else if(m.Y >= ScreenH)
+            m.Y = ScreenH - 1;
+
+        m.Move = true;
+    }
+
+    return true;
+}
+
+void InputMethod_Joystick::Rumble(int ms, float strength)
+{
+    if(!this->m_devices)
+        return;
+
+    if(this->m_devices->haptic)
+    {
+        pLogDebug("Trying to use SDL haptic rumble: %dms %f", ms, strength);
+
+        if(SDL_HapticRumblePlay(this->m_devices->haptic, strength, ms) == 0)
+            return;
+    }
+
+    int intStrength = (int)(0xFFFF * strength + 0.5f);
+
+    if(intStrength > 0xFFFF)
+        intStrength = 0xFFFF;
+
+    if(intStrength < 0)
+        intStrength = 0;
+
+#if SDL_VERSION_ATLEAST(2, 0, 12)
+    if(this->m_devices->joy)
+    {
+        pLogDebug("Trying to use SDL joystick rumble: %dms %f", ms, strength);
+        SDL_JoystickRumble(this->m_devices->joy, intStrength, intStrength, ms);
+    }
 #endif
+}
 
-                    updateCtrlKey(k, c.Up, joyCon.Up);
-                    updateCtrlKey(k, c.Down, joyCon.Down);
-                    updateCtrlKey(k, c.Left, joyCon.Left);
-                    updateCtrlKey(k, c.Right, joyCon.Right);
-                    updateCtrlKey(k, c.Run, joyCon.Run);
-                    updateCtrlKey(k, c.AltRun, joyCon.AltRun);
-                    updateCtrlKey(k, c.Jump, joyCon.Jump);
-                    updateCtrlKey(k, c.AltJump, joyCon.AltJump);
-                    updateCtrlKey(k, c.Drop, joyCon.Drop);
-                    updateCtrlKey(k, c.Start, joyCon.Start);
-                    // Use analog stick as an additional move controller
-                    updateCtrlAxisOr(k, c.Up, SDL_CONTROLLER_AXIS_LEFTY, -1);
-                    updateCtrlAxisOr(k, c.Down, SDL_CONTROLLER_AXIS_LEFTY, +1);
-                    updateCtrlAxisOr(k, c.Left, SDL_CONTROLLER_AXIS_LEFTX, -1);
-                    updateCtrlAxisOr(k, c.Right, SDL_CONTROLLER_AXIS_LEFTX, +1);
-                }
-                else
-                {
-                    updateJoyKey(j, c.Up, joyCon.Up);
-                    updateJoyKey(j, c.Down, joyCon.Down);
-                    updateJoyKey(j, c.Left, joyCon.Left);
-                    updateJoyKey(j, c.Right, joyCon.Right);
-                    updateJoyKey(j, c.Run, joyCon.Run);
-                    updateJoyKey(j, c.AltRun, joyCon.AltRun);
-                    updateJoyKey(j, c.Jump, joyCon.Jump);
-                    updateJoyKey(j, c.AltJump, joyCon.AltJump);
-                    updateJoyKey(j, c.Drop, joyCon.Drop);
-                    updateJoyKey(j, c.Start, joyCon.Start);
-                }
-            }
+StatusInfo InputMethod_Joystick::GetStatus()
+{
+    StatusInfo res;
 
-            if(useJoystick[A] == 0) // Keyboard controls
-            {
-                if(XEvents::getKeyState(keyCon.Up)) {
-                    c.Up = true;
-                }
+    if(!this->m_devices)
+        return res;
 
-                if(XEvents::getKeyState(keyCon.Down)) {
-                    c.Down = true;
-                }
+    SDL_JoystickPowerLevel level = SDL_JoystickCurrentPowerLevel(this->m_devices->joy);
 
-                if(XEvents::getKeyState(keyCon.Left)) {
-                    c.Left = true;
-                }
+    if(level == SDL_JOYSTICK_POWER_UNKNOWN)
+    {
+        res.power_status = StatusInfo::POWER_UNKNOWN;
+    }
+    else if(level == SDL_JOYSTICK_POWER_WIRED)
+    {
+        res.power_status = StatusInfo::POWER_WIRED;
+    }
+    else if(level == SDL_JOYSTICK_POWER_MAX)
+    {
+        res.power_status = StatusInfo::POWER_CHARGED;
+        res.power_level = 1.f;
+    }
+    else
+    {
+        res.power_status = StatusInfo::POWER_DISCHARGING;
 
-                if(XEvents::getKeyState(keyCon.Right)) {
-                    c.Right = true;
-                }
+        if(level == SDL_JOYSTICK_POWER_EMPTY)
+            res.power_level = 0.15f;
 
-                if(XEvents::getKeyState(keyCon.Jump)) {
-                    c.Jump = true;
-                }
+        if(level == SDL_JOYSTICK_POWER_LOW)
+            res.power_level = 0.3f;
 
-                if(XEvents::getKeyState(keyCon.Run)) {
-                    c.Run = true;
-                }
+        if(level == SDL_JOYSTICK_POWER_MEDIUM)
+            res.power_level = 0.6f;
 
-                if(XEvents::getKeyState(keyCon.Drop)) {
-                    c.Drop = true;
-                }
-
-                if(XEvents::getKeyState(keyCon.Start)) {
-                    c.Start = true;
-                }
-
-                if(XEvents::getKeyState(keyCon.AltJump)) {
-                    c.AltJump = true;
-                }
-
-                if(XEvents::getKeyState(keyCon.AltRun)) {
-                    c.AltRun = true;
-                }
-            }
-
-            /* // DEAD CODE
-//            If .Left = True And .Right = True Then
-            if(c.Left And c.Right) {
-//                .Left = False
-                c.Left = False;
-//                .Right = False
-                c.Right = False;
-//            End If
-            }*/
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-            // Mix controls of a touch screen with a player 1
-            if(A == 1)
-            {
-                s_touch.update();
-                if(!s_touch.m_touchHidden)
-                {
-                    auto &t = s_touch.m_current_keys;
-                    auto &te = s_touch.m_current_extra_keys;
-                    c.Down |= t.Down;
-                    c.Drop |= t.Drop;
-                    c.Jump |= t.Jump;
-                    c.Left |= t.Left;
-                    c.Right |= t.Right;
-                    c.Run |= t.Run;
-                    c.Start |= t.Start;
-                    c.Up |= t.Up;
-                    c.AltJump |= t.AltJump;
-                    c.AltRun |= t.AltRun;
-
-                    if(!GamePaused && !GameMenu && !GameOutro && !LevelSelect)
-                    {
-                        if(s_touch.m_runHeld && c.AltRun)
-                        {
-                            if(te.keyAltRunOnce)
-                                c.AltRun = false;
-                            c.Run = false;
-                        }
-                        else if(s_touch.m_runHeld && !te.keyRunOnce)
-                            c.Run |= true;
-                        else if(te.keyRunOnce && c.Run)
-                            c.Run = false;
-                    }
-
-                    // Call cheat type dialog when hold start and press the key toggle button
-                    if(!LevelEditor && !GameMenu && !BattleMode)
-                    {
-                        if(t.Start && te.keyToggleViewOnce)
-                            cheats_callDialog();
-                    }
-                } // s_touch.m_touchHidden
-            }
-#endif
-        }
+        if(level == SDL_JOYSTICK_POWER_FULL)
+            res.power_level = 0.9f;
     }
 
-    // sync controls, other recording data
-    Record::Sync();
+    return res;
+}
 
-    For(B, 1, numPlayers)
+/*====================================================*\
+|| implementation for InputMethodProfile_Joystick     ||
+\*====================================================*/
+
+// the job of this function is to initialize the class in a consistent state
+InputMethodProfile_Joystick::InputMethodProfile_Joystick()
+{
+    this->InitAsController();
+    this->m_showPowerStatus = true;
+}
+
+void InputMethodProfile_Joystick::InitAsJoystick()
+{
+    this->m_controllerProfile = false;
+    this->m_keys[PlayerControls::Buttons::Up].assign(KM_Key::JoyHat, 0, SDL_HAT_UP);
+    this->m_keys[PlayerControls::Buttons::Down].assign(KM_Key::JoyHat, 0, SDL_HAT_DOWN);
+    this->m_keys[PlayerControls::Buttons::Left].assign(KM_Key::JoyHat, 0, SDL_HAT_LEFT);
+    this->m_keys[PlayerControls::Buttons::Right].assign(KM_Key::JoyHat, 0, SDL_HAT_RIGHT);
+    this->m_keys[PlayerControls::Buttons::Jump].assign(KM_Key::JoyButton, 0, 1);
+    this->m_keys[PlayerControls::Buttons::AltJump].assign(KM_Key::JoyButton, 1, 1);
+    this->m_keys[PlayerControls::Buttons::Run].assign(KM_Key::JoyButton, 2, 1);
+    this->m_keys[PlayerControls::Buttons::AltRun].assign(KM_Key::JoyButton, 3, 1);
+    this->m_keys[PlayerControls::Buttons::Drop].assign(KM_Key::JoyButton, 6, 1);
+    this->m_keys[PlayerControls::Buttons::Start].assign(KM_Key::JoyButton, 7, 1);
+
+    // clear all of them, then fill in some of them
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+        this->m_keys2[i].assign(KM_Key::NoControl, -1, -1);
+
+    this->m_keys2[PlayerControls::Buttons::Up].assign(KM_Key::JoyAxis, 1, -1);
+    this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::JoyAxis, 1, 1);
+    this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::JoyAxis, 0, -1);
+    this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::JoyAxis, 0, 1);
+    this->m_keys2[PlayerControls::Buttons::AltRun].assign(KM_Key::JoyButton, 4, 1);
+    this->m_keys2[PlayerControls::Buttons::AltJump].assign(KM_Key::JoyButton, 5, 1);
+
+    // clear all of the non-standard controls, then fill in some of them
+    for(size_t i = 0; i < CursorControls::n_buttons; i++)
     {
-        if(B == 2 && numPlayers == 2) {
-            A = 2;
-        } else {
-            A = 1;
-        }
+        this->m_cursor_keys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_cursor_keys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
 
-        // With Player(A).Controls
+    for(size_t i = 0; i < EditorControls::n_buttons; i++)
+    {
+        this->m_editor_keys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_editor_keys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+    {
+        this->m_hotkeys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_hotkeys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    this->m_cursor_keys[CursorControls::Buttons::CursorUp].assign(KM_Key::JoyAxis, 3, -1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorDown].assign(KM_Key::JoyAxis, 3, 1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorLeft].assign(KM_Key::JoyAxis, 2, -1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorRight].assign(KM_Key::JoyAxis, 2, 1);
+    this->m_cursor_keys[CursorControls::Buttons::Primary].assign(KM_Key::JoyAxis, 4, 1);
+    this->m_cursor_keys[CursorControls::Buttons::Secondary].assign(KM_Key::JoyAxis, 5, 1);
+}
+
+void InputMethodProfile_Joystick::InitAsController()
+{
+    this->m_controllerProfile = true;
+
+    this->m_keys[PlayerControls::Buttons::Up].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_DPAD_UP, 1);
+    this->m_keys[PlayerControls::Buttons::Down].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_DPAD_DOWN, 1);
+    this->m_keys[PlayerControls::Buttons::Left].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_DPAD_LEFT, 1);
+    this->m_keys[PlayerControls::Buttons::Right].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_DPAD_RIGHT, 1);
+    this->m_keys[PlayerControls::Buttons::Jump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_A, 1);
+    this->m_keys[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_B, 1);
+    this->m_keys[PlayerControls::Buttons::Run].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_X, 1);
+    this->m_keys[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_Y, 1);
+    this->m_keys[PlayerControls::Buttons::Drop].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_BACK, 1);
+    this->m_keys[PlayerControls::Buttons::Start].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_START, 1);
+
+    // clear all of them, then fill in some of them
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+        this->m_keys2[i].assign(KM_Key::NoControl, -1, -1);
+
+    this->m_keys2[PlayerControls::Buttons::Up].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, -1);
+    this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, 1);
+    this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, -1);
+    this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, 1);
+    this->m_keys2[PlayerControls::Buttons::AltRun].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_LEFTSHOULDER, 1);
+    this->m_keys2[PlayerControls::Buttons::AltJump].assign(KM_Key::CtrlButton, SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, 1);
+
+    // clear all of the non-standard controls, then fill in some of them
+    for(size_t i = 0; i < CursorControls::n_buttons; i++)
+    {
+        this->m_cursor_keys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_cursor_keys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    for(size_t i = 0; i < EditorControls::n_buttons; i++)
+    {
+        this->m_editor_keys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_editor_keys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+    {
+        this->m_hotkeys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_hotkeys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    this->m_cursor_keys[CursorControls::Buttons::CursorUp].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTY, -1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorDown].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTY, 1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorLeft].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTX, -1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorRight].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTX, 1);
+    this->m_cursor_keys[CursorControls::Buttons::Primary].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_TRIGGERRIGHT, 1);
+    this->m_cursor_keys[CursorControls::Buttons::Secondary].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_TRIGGERLEFT, 1);
+}
+
+void InputMethodProfile_Joystick::ExpandAsJoystick()
+{
+    this->m_legacyProfile = false;
+    this->m_controllerProfile = false;
+
+    // controller keys are stored in m_keys, joystick in m_keys2
+    // copy joystick keys from m_keys2 to m_keys
+    this->m_keys[PlayerControls::Buttons::Up] = this->m_keys2[PlayerControls::Buttons::Up];
+    this->m_keys[PlayerControls::Buttons::Down] = this->m_keys2[PlayerControls::Buttons::Down];
+    this->m_keys[PlayerControls::Buttons::Left] = this->m_keys2[PlayerControls::Buttons::Left];
+    this->m_keys[PlayerControls::Buttons::Right] = this->m_keys2[PlayerControls::Buttons::Right];
+    this->m_keys[PlayerControls::Buttons::Jump] = this->m_keys2[PlayerControls::Buttons::Jump];
+    this->m_keys[PlayerControls::Buttons::AltJump] = this->m_keys2[PlayerControls::Buttons::AltJump];
+    this->m_keys[PlayerControls::Buttons::Run] = this->m_keys2[PlayerControls::Buttons::Run];
+    this->m_keys[PlayerControls::Buttons::AltRun] = this->m_keys2[PlayerControls::Buttons::AltRun];
+    this->m_keys[PlayerControls::Buttons::Drop] = this->m_keys2[PlayerControls::Buttons::Drop];
+    this->m_keys[PlayerControls::Buttons::Start] = this->m_keys2[PlayerControls::Buttons::Start];
+
+    // clear all of the old joystick keys that have been copied over
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+        this->m_keys2[i].assign(KM_Key::NoControl, -1, -1);
+
+    // this is needed because using the LStick was not configurable before
+    this->m_keys2[PlayerControls::Buttons::Up].assign(KM_Key::JoyAxis, 1, -1);
+    this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::JoyAxis, 1, 1);
+    this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::JoyAxis, 0, -1);
+    this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::JoyAxis, 0, 1);
+
+    // clear all of the non-standard controllers, then fill in some of them
+    for(size_t i = 0; i < CursorControls::n_buttons; i++)
+    {
+        this->m_cursor_keys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_cursor_keys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    for(size_t i = 0; i < EditorControls::n_buttons; i++)
+    {
+        this->m_editor_keys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_editor_keys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+    {
+        this->m_hotkeys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_hotkeys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    this->m_cursor_keys[CursorControls::Buttons::CursorUp].assign(KM_Key::JoyAxis, 3, -1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorDown].assign(KM_Key::JoyAxis, 3, 1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorLeft].assign(KM_Key::JoyAxis, 2, -1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorRight].assign(KM_Key::JoyAxis, 2, 1);
+}
+
+void InputMethodProfile_Joystick::ExpandAsController()
+{
+    this->m_legacyProfile = false;
+    this->m_controllerProfile = true;
+
+    // controller keys are stored in m_keys, joystick in m_keys2
+    // no action needed for m_keys
+
+    // clear all of the old joystick keys, then fill in some of them
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+        this->m_keys2[i].assign(KM_Key::NoControl, -1, -1);
+
+    // this is needed because using the LStick was not configurable before
+    this->m_keys2[PlayerControls::Buttons::Up].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, -1);
+    this->m_keys2[PlayerControls::Buttons::Down].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTY, 1);
+    this->m_keys2[PlayerControls::Buttons::Left].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, -1);
+    this->m_keys2[PlayerControls::Buttons::Right].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_LEFTX, 1);
+
+    // clear all of the non-standard controllers, then fill in some of them
+    for(size_t i = 0; i < CursorControls::n_buttons; i++)
+    {
+        this->m_cursor_keys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_cursor_keys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    for(size_t i = 0; i < EditorControls::n_buttons; i++)
+    {
+        this->m_editor_keys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_editor_keys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+    {
+        this->m_hotkeys[i].assign(KM_Key::NoControl, -1, -1);
+        this->m_hotkeys2[i].assign(KM_Key::NoControl, -1, -1);
+    }
+
+    this->m_cursor_keys[CursorControls::Buttons::CursorUp].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTY, -1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorDown].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTY, 1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorLeft].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTX, -1);
+    this->m_cursor_keys[CursorControls::Buttons::CursorRight].assign(KM_Key::CtrlAxis, SDL_CONTROLLER_AXIS_RIGHTX, 1);
+}
+
+bool InputMethodProfile_Joystick::PollPrimaryButton(ControlsClass c, size_t i)
+{
+    // note: m_canPoll is initialized to false
+    InputMethodType_Joystick* t = dynamic_cast<InputMethodType_Joystick*>(this->Type);
+
+    if(!t)
+        return false;
+
+    KM_Key key = this->m_controllerProfile ?
+                 t->PollControllerKeyAll() :
+                 t->PollJoystickKeyAll();
+
+    // if didn't find any key, allow poll in future but return false
+    if(key.type == KM_Key::NoControl)
+    {
+        this->m_canPoll = true;
+        return false;
+    }
+
+    // if poll not allowed, return false
+    if(!this->m_canPoll)
+        return false;
+
+    // we will assign the key!
+    // reset canPoll for next time
+    this->m_canPoll = false;
+
+    // resolve the particular primary and secondary key arrays
+    KM_Key* keys;
+    KM_Key* keys2;
+    size_t key_max;
+
+    if(c == ControlsClass::Player)
+    {
+        keys = this->m_keys;
+        keys2 = this->m_keys2;
+        key_max = PlayerControls::n_buttons;
+    }
+    else if(c == ControlsClass::Cursor)
+    {
+        keys = this->m_cursor_keys;
+        keys2 = this->m_cursor_keys2;
+        key_max = CursorControls::n_buttons;
+    }
+    else if(c == ControlsClass::Editor)
+    {
+        keys = this->m_editor_keys;
+        keys2 = this->m_editor_keys2;
+        key_max = EditorControls::n_buttons;
+    }
+    else if(c == ControlsClass::Hotkey)
+    {
+        keys = this->m_hotkeys;
+        keys2 = this->m_hotkeys2;
+        key_max = Hotkeys::n_buttons;
+    }
+    else
+    {
+        // BAD!
+        return true;
+    }
+
+    // minor switching algorithm to ensure that every button always has at least one key
+    // and no button ever has a non-unique key
+    // if a button's secondary key (including the current one) is the new key, delete it.
+    // if a button's primary key (excluding the current one) is the new key,
+    //     and it has a secondary key, overwrite it with the secondary key.
+    //     otherwise, replace it with the button the player is replacing.
+    for(size_t j = 0; j < key_max; j++)
+    {
+        if(keys2[j] == key)
         {
-            auto &p = Player[A];
-            Controls_t &c = p.Controls;
-
-            if(B == 1 || B == 2) // Push the controls state into the speed-runner to properly display
-                speedRun_syncControlKeys(B - 1, c);
-
-            if(!c.Start && !c.Jump) {
-                p.UnStart = true;
-            }
-
-            if(c.Up && c.Down)
-            {
-                c.Up = false;
-                c.Down = false;
-            }
-
-            if(c.Left && c.Right)
-            {
-                c.Left = false;
-                c.Right = false;
-            }
-
-            if(!(p.State == 5 && p.Mount == 0) && c.AltRun)
-                c.Run = true;
-            if(ForcedControls && !GamePaused)
-            {
-                c = ForcedControl;
-            }
-        } // End With
-    }
-
-    if(SingleCoop > 0)
-    {
-        if(numPlayers == 1 || numPlayers > 2)
-            SingleCoop = 0;
-
-        Controls_t tempControls;
-        if(SingleCoop == 1) {
-            Player[2].Controls = tempControls;
-        } else {
-            Player[2].Controls = Player[1].Controls;
-            Player[1].Controls = tempControls;
+            keys2[j] = KM_Key();
         }
-    }
-
-    // !UNNEEDED DEAD CODE
-//    If nPlay.Online = True Then
-//        Player(nPlay.MySlot + 1).Controls = Player(1).Controls
-//        If Not (nPlay.MyControls.AltJump = Player(1).Controls.AltJump And nPlay.MyControls.AltRun = Player(1).Controls.AltRun And nPlay.MyControls.Down = Player(1).Controls.Down And nPlay.MyControls.Drop = Player(1).Controls.Drop And nPlay.MyControls.Jump = Player(1).Controls.Jump And nPlay.MyControls.Left = Player(1).Controls.Left And nPlay.MyControls.Right = Player(1).Controls.Right And nPlay.MyControls.Run = Player(1).Controls.Run And nPlay.MyControls.Start = Player(1).Controls.Start And nPlay.MyControls.Up = Player(1).Controls.Up) Then
-//            nPlay.MyControls = Player(1).Controls
-//            nPlay.Player(nPlay.MySlot).Controls = Player(1).Controls
-//            If Player(nPlay.MySlot + 1).Dead = False And Player(nPlay.MySlot + 1).TimeToLive = 0 Then Netplay.sendData Netplay.PutPlayerControls(nPlay.MySlot)
-//        Else
-//            nPlay.MyControls = Player(1).Controls
-//            nPlay.Player(nPlay.MySlot).Controls = Player(1).Controls
-//        End If
-//        For A = 0 To numPlayers - 1
-//            If nPlay.Player(A).Active = True And A <> nPlay.MySlot Then
-//                Player(A + 1).Controls = nPlay.Player(A).Controls
-//            End If
-//        Next A
-//    End If
-
-    For(A, 1, numPlayers)
-    {
+        else if(i != j && keys[j] == key)
         {
-            Player_t &p = Player[A];
-            if(p.SpinJump)
+            if(keys2[j].type != KM_Key::NoControl)
             {
-                if(p.SpinFrame < 4 || p.SpinFrame > 9) {
-                    p.Direction = -1;
-                } else {
-                    p.Direction = 1;
-                }
+                keys[j] = keys2[j];
+                keys2[j] = KM_Key();
+            }
+            else
+            {
+                keys[j] = keys[i];
             }
         }
+    }
+
+    keys[i] = key;
+    return true;
+}
+
+bool InputMethodProfile_Joystick::PollSecondaryButton(ControlsClass c, size_t i)
+{
+    // note: m_canPoll is initialized to false
+    InputMethodType_Joystick* t = dynamic_cast<InputMethodType_Joystick*>(this->Type);
+
+    if(!t)
+        return false;
+
+    KM_Key key;
+
+    if(this->m_controllerProfile)
+        key = t->PollControllerKeyAll();
+    else
+        key = t->PollJoystickKeyAll();
+
+    // if didn't find any key, allow poll in future but return false
+    if(key.type == KM_Key::NoControl)
+    {
+        this->m_canPoll = true;
+        return false;
+    }
+
+    // if poll not allowed, return false
+    if(!this->m_canPoll)
+        return false;
+
+    // we will assign the key!
+    // reset canPoll for next time
+    m_canPoll = false;
+
+    // resolve the particular primary and secondary key arrays
+    KM_Key* keys;
+    KM_Key* keys2;
+    size_t key_max;
+
+    if(c == ControlsClass::Player)
+    {
+        keys = this->m_keys;
+        keys2 = this->m_keys2;
+        key_max = PlayerControls::n_buttons;
+    }
+    else if(c == ControlsClass::Cursor)
+    {
+        keys = this->m_cursor_keys;
+        keys2 = this->m_cursor_keys2;
+        key_max = CursorControls::n_buttons;
+    }
+    else if(c == ControlsClass::Editor)
+    {
+        keys = this->m_editor_keys;
+        keys2 = this->m_editor_keys2;
+        key_max = EditorControls::n_buttons;
+    }
+    else if(c == ControlsClass::Hotkey)
+    {
+        keys = this->m_hotkeys;
+        keys2 = this->m_hotkeys2;
+        key_max = Hotkeys::n_buttons;
+    }
+    else
+    {
+        // BAD!
+        return true;
+    }
+
+    // minor switching algorithm to ensure that every button always has at least one key
+    // and no button ever has a non-unique key
+
+    // if the current button's primary key is the new key,
+    //     delete its secondary key instead of setting it.
+    if(keys[i] == key)
+    {
+        keys2[i] = KM_Key();
+        return true;
+    }
+
+    // if another button's secondary key is the new key, delete it.
+    // if another button's primary key is the new key,
+    //     and it has a secondary key, overwrite it with the secondary key.
+    //     otherwise, if this button's secondary key is defined, overwrite the other's with this.
+    //     if all else fails, overwrite the other button's with this button's PRIMARY key and assign
+    //         this button's PRIMARY key instead
+
+    bool can_do_secondary = true;
+
+    for(size_t j = 0; j < key_max; j++)
+    {
+        if(i != j && keys2[j] == key)
+        {
+            keys2[j] = KM_Key();
+        }
+        else if(i != j && keys[j] == key)
+        {
+            if(keys2[j].type != KM_Key::NoControl)
+            {
+                keys[j] = keys2[j];
+                keys2[j] = KM_Key();
+            }
+            else if(keys2[i].type != KM_Key::NoControl)
+            {
+                keys[j] = keys2[i];
+            }
+            else
+            {
+                keys[j] = keys[i];
+                can_do_secondary = false;
+            }
+        }
+    }
+
+    if(can_do_secondary)
+        keys2[i] = key;
+    else
+        keys[i] = key;
+
+    return true;
+}
+
+bool InputMethodProfile_Joystick::DeletePrimaryButton(ControlsClass c, size_t i)
+{
+    // resolve the particular primary and secondary key arrays
+    KM_Key* keys;
+    KM_Key* keys2;
+
+    if(c == ControlsClass::Player)
+    {
+        keys = this->m_keys;
+        keys2 = this->m_keys2;
+    }
+    else if(c == ControlsClass::Cursor)
+    {
+        keys = this->m_cursor_keys;
+        keys2 = this->m_cursor_keys2;
+    }
+    else if(c == ControlsClass::Editor)
+    {
+        keys = this->m_editor_keys;
+        keys2 = this->m_editor_keys2;
+    }
+    else if(c == ControlsClass::Hotkey)
+    {
+        keys = this->m_hotkeys;
+        keys2 = this->m_hotkeys2;
+    }
+    else
+    {
+        // BAD!
+        return false;
+    }
+
+    if(keys2[i].type != KM_Key::NoControl)
+    {
+        keys[i] = keys2[i];
+        keys2[i] = KM_Key();
+        return true;
+    }
+
+    if(c == ControlsClass::Player)
+        return false;
+
+    if(keys[i].type != KM_Key::NoControl)
+    {
+        keys[i] = KM_Key();
+        return true;
+    }
+
+    return false;
+}
+
+bool InputMethodProfile_Joystick::DeleteSecondaryButton(ControlsClass c, size_t i)
+{
+    // resolve the particular primary and secondary key arrays
+    KM_Key* keys2;
+
+    if(c == ControlsClass::Player)
+        keys2 = this->m_keys2;
+    else if(c == ControlsClass::Cursor)
+        keys2 = this->m_cursor_keys2;
+    else if(c == ControlsClass::Editor)
+        keys2 = this->m_editor_keys2;
+    else if(c == ControlsClass::Hotkey)
+        keys2 = this->m_hotkeys2;
+    else
+        return false; // BAD!
+
+    if(keys2[i].type != KM_Key::NoControl)
+    {
+        keys2[i] = KM_Key();
+        return true;
+    }
+
+    return false;
+}
+
+static char s_buttonNameBuffer[16] = "XXXXXXXXXXXXXXX";
+
+static const char* s_nameButton(const KM_Key& k)
+{
+    switch(k.type)
+    {
+    case KM_Key::NoControl:
+        return "NONE";
+        break;
+
+    case KM_Key::CtrlButton:
+        return SDL_GameControllerGetStringForButton((SDL_GameControllerButton)k.id);
+        break;
+
+    case KM_Key::CtrlAxis:
+        if(k.val < 0)
+            snprintf(s_buttonNameBuffer, 15, "%s-", SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)k.id));
+        else
+            snprintf(s_buttonNameBuffer, 15, "%s+", SDL_GameControllerGetStringForAxis((SDL_GameControllerAxis)k.id));
+
+        break;
+
+    case KM_Key::JoyButton:
+        snprintf(s_buttonNameBuffer, 15, "BUT %d", k.id);
+        break;
+
+    case KM_Key::JoyAxis:
+        if(k.val < 0)
+            snprintf(s_buttonNameBuffer, 15, "AX %d-", k.id);
+        else
+            snprintf(s_buttonNameBuffer, 15, "AX %d+", k.id);
+
+        break;
+
+    case KM_Key::JoyBallX:
+        if(k.val < 0)
+            snprintf(s_buttonNameBuffer, 15, "BALL %dX-", k.id);
+        else
+            snprintf(s_buttonNameBuffer, 15, "BALL %dX+", k.id);
+
+        break;
+
+    case KM_Key::JoyBallY:
+        if(k.val < 0)
+            snprintf(s_buttonNameBuffer, 15, "BALL %dY-", k.id);
+        else
+            snprintf(s_buttonNameBuffer, 15, "BALL %dY+", k.id);
+
+        break;
+
+    case KM_Key::JoyHat:
+        if(k.val == SDL_HAT_UP)
+            snprintf(s_buttonNameBuffer, 15, "HAT %dU", k.id);
+        else if(k.val == SDL_HAT_DOWN)
+            snprintf(s_buttonNameBuffer, 15, "HAT %dD", k.id);
+        else if(k.val == SDL_HAT_LEFT)
+            snprintf(s_buttonNameBuffer, 15, "HAT %dL", k.id);
+        else if(k.val == SDL_HAT_RIGHT)
+            snprintf(s_buttonNameBuffer, 15, "HAT %dR", k.id);
+        else
+            snprintf(s_buttonNameBuffer, 15, "HAT %d %d", k.id, k.val);
+
+        break;
+
+    default:
+        return "INVALID";
+        break;
+    }
+
+    return s_buttonNameBuffer;
+}
+
+const char* InputMethodProfile_Joystick::NamePrimaryButton(ControlsClass c, size_t i)
+{
+    KM_Key* keys;
+
+    if(c == ControlsClass::Player)
+        keys = this->m_keys;
+    else if(c == ControlsClass::Cursor)
+        keys = this->m_cursor_keys;
+    else if(c == ControlsClass::Editor)
+        keys = this->m_editor_keys;
+    else if(c == ControlsClass::Hotkey)
+        keys = this->m_hotkeys;
+    else
+        return nullptr;
+
+    return s_nameButton(keys[i]);
+}
+
+const char* InputMethodProfile_Joystick::NameSecondaryButton(ControlsClass c, size_t i)
+{
+    KM_Key* keys2;
+
+    if(c == ControlsClass::Player)
+        keys2 = this->m_keys2;
+    else if(c == ControlsClass::Cursor)
+        keys2 = this->m_cursor_keys2;
+    else if(c == ControlsClass::Editor)
+        keys2 = this->m_editor_keys2;
+    else if(c == ControlsClass::Hotkey)
+        keys2 = this->m_hotkeys2;
+    else
+        return nullptr;
+
+    return s_nameButton(keys2[i]);
+}
+
+void InputMethodProfile_Joystick::SaveConfig(IniProcessing* ctl)
+{
+    std::string name;
+
+    for(int a = 0; a < 4; a++)
+    {
+        KM_Key* keys;
+        KM_Key* keys2;
+        size_t key_max;
+
+        if(a == 0)
+        {
+            keys = this->m_keys;
+            keys2 = this->m_keys2;
+            key_max = PlayerControls::n_buttons;
+        }
+        else if(a == 1)
+        {
+            keys = this->m_cursor_keys;
+            keys2 = this->m_cursor_keys2;
+            key_max = CursorControls::n_buttons;
+        }
+        else if(a == 2)
+        {
+            keys = this->m_editor_keys;
+            keys2 = this->m_editor_keys2;
+            key_max = EditorControls::n_buttons;
+        }
+        else
+        {
+            keys = this->m_hotkeys;
+            keys2 = this->m_hotkeys2;
+            key_max = Hotkeys::n_buttons;
+        }
+
+        for(size_t i = 0; i < key_max; i++)
+        {
+            if(a == 0)
+                name = PlayerControls::GetButtonName_INI(i);
+            else if(a == 1)
+                name = CursorControls::GetButtonName_INI(i);
+            else if(a == 2)
+                name = EditorControls::GetButtonName_INI(i);
+            else
+                name = Hotkeys::GetButtonName_INI(i);
+
+            size_t orig_l = name.size();
+
+            ctl->setValue(name.replace(orig_l, std::string::npos, "-type").c_str(),
+                          keys[i].type);
+            ctl->setValue(name.replace(orig_l, std::string::npos, "-id").c_str(),
+                          keys[i].id);
+            ctl->setValue(name.replace(orig_l, std::string::npos, "-val").c_str(),
+                          keys[i].val);
+
+            ctl->setValue(name.replace(orig_l, std::string::npos, "2-type").c_str(),
+                          keys2[i].type);
+            ctl->setValue(name.replace(orig_l, std::string::npos, "2-id").c_str(),
+                          keys2[i].id);
+            ctl->setValue(name.replace(orig_l, std::string::npos, "2-val").c_str(),
+                          keys2[i].val);
+        }
+    }
+
+    ctl->setValue("old-joystick", !this->m_controllerProfile);
+}
+
+void InputMethodProfile_Joystick::LoadConfig(IniProcessing* ctl)
+{
+    std::string name;
+
+    for(int a = 0; a < 4; a++)
+    {
+        KM_Key* keys;
+        KM_Key* keys2;
+        size_t key_max;
+
+        if(a == 0)
+        {
+            keys = this->m_keys;
+            keys2 = this->m_keys2;
+            key_max = PlayerControls::n_buttons;
+        }
+        else if(a == 1)
+        {
+            keys = this->m_cursor_keys;
+            keys2 = this->m_cursor_keys2;
+            key_max = CursorControls::n_buttons;
+        }
+        else if(a == 2)
+        {
+            keys = this->m_editor_keys;
+            keys2 = this->m_editor_keys2;
+            key_max = EditorControls::n_buttons;
+        }
+        else
+        {
+            keys = this->m_hotkeys;
+            keys2 = this->m_hotkeys2;
+            key_max = Hotkeys::n_buttons;
+        }
+
+        for(size_t i = 0; i < key_max; i++)
+        {
+            if(a == 0)
+                name = PlayerControls::GetButtonName_INI(i);
+            else if(a == 1)
+                name = CursorControls::GetButtonName_INI(i);
+            else if(a == 2)
+                name = EditorControls::GetButtonName_INI(i);
+            else
+                name = Hotkeys::GetButtonName_INI(i);
+
+            size_t orig_l = name.size();
+
+            ctl->read(name.replace(orig_l, std::string::npos, "-type").c_str(),
+                      keys[i].type, keys[i].type);
+            ctl->read(name.replace(orig_l, std::string::npos, "-id").c_str(),
+                      keys[i].id, keys[i].id);
+            ctl->read(name.replace(orig_l, std::string::npos, "-val").c_str(),
+                      keys[i].val, keys[i].val);
+
+            ctl->read(name.replace(orig_l, std::string::npos, "2-type").c_str(),
+                      keys2[i].type, keys2[i].type);
+            ctl->read(name.replace(orig_l, std::string::npos, "2-id").c_str(),
+                      keys2[i].id, keys2[i].id);
+            ctl->read(name.replace(orig_l, std::string::npos, "2-val").c_str(),
+                      keys2[i].val, keys2[i].val);
+        }
+    }
+
+    bool legacyProfile;
+    ctl->read("old-joystick", legacyProfile, false);
+    this->m_controllerProfile = !legacyProfile;
+}
+
+void InputMethodProfile_Joystick::SaveConfig_Legacy(IniProcessing* ctl)
+{
+    std::string name;
+
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+    {
+        name = PlayerControls::GetButtonName_INI(i);
+        size_t orig_l = name.size();
+
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-ctrl-type").c_str(),
+                      this->m_keys[i].type);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-ctrl-id").c_str(),
+                      this->m_keys[i].id);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-ctrl-val").c_str(),
+                      this->m_keys[i].val);
+
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-type").c_str(),
+                      this->m_keys2[i].type);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-id").c_str(),
+                      this->m_keys2[i].id);
+        ctl->setValue(name.replace(orig_l, std::string::npos, "-val").c_str(),
+                      this->m_keys2[i].val);
     }
 }
 
-
-int joyInitJoysticks()
+void InputMethodProfile_Joystick::LoadConfig_Legacy(IniProcessing* ctl)
 {
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-    s_touch.init();
-#endif
+    std::string name;
 
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-    std::string dbAssets = AppPathManager::assetsRoot() + "gamecontrollerdb.txt";
-    std::string dbUserDir = AppPathManager::userAppDirSTD() + "gamecontrollerdb.txt";
-
-    if(Files::fileExists(dbAssets))
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
     {
-        pLogDebug("Loading game controller mapping file: %s", dbAssets.c_str());
-        if(SDL_GameControllerAddMappingsFromFile(dbAssets.c_str()) < 0)
-            pLogWarning("Failed to load game controller mapping [%s]: %s", dbAssets.c_str(), SDL_GetError());
+        name = PlayerControls::GetButtonName_INI(i);
+        size_t orig_l = name.size();
+
+        ctl->read(name.replace(orig_l, std::string::npos, "-ctrl-type").c_str(),
+                  this->m_keys[i].type, this->m_keys[i].type);
+        ctl->read(name.replace(orig_l, std::string::npos, "-ctrl-id").c_str(),
+                  this->m_keys[i].id, this->m_keys[i].id);
+        ctl->read(name.replace(orig_l, std::string::npos, "-ctrl-val").c_str(),
+                  this->m_keys[i].val, this->m_keys[i].val);
+
+        ctl->read(name.replace(orig_l, std::string::npos, "-type").c_str(),
+                  this->m_keys2[i].type, this->m_keys2[i].type);
+        ctl->read(name.replace(orig_l, std::string::npos, "-id").c_str(),
+                  this->m_keys2[i].id, this->m_keys2[i].id);
+        ctl->read(name.replace(orig_l, std::string::npos, "-val").c_str(),
+                  this->m_keys2[i].val, this->m_keys2[i].val);
     }
 
-    if(AppPathManager::userDirIsAvailable() && Files::fileExists(dbUserDir))
-    {
-        pLogDebug("Loading game controller mapping file: %s", dbUserDir.c_str());
-        if(SDL_GameControllerAddMappingsFromFile(dbUserDir.c_str()) < 0)
-            pLogWarning("Failed to load game controller mapping [%s]: %s", dbUserDir.c_str(), SDL_GetError());
-    }
-#endif
+    this->m_legacyProfile = true;
+}
+
+/*====================================================*\
+|| implementation for InputMethodType_Joystick        ||
+\*====================================================*/
+
+InputMethodProfile* InputMethodType_Joystick::AllocateProfile() noexcept
+{
+    return (InputMethodProfile*) new(std::nothrow) InputMethodProfile_Joystick;
+}
+
+InputMethodType_Joystick::InputMethodType_Joystick()
+{
+    this->Name = "Joystick";
 
     SDL_JoystickEventState(SDL_ENABLE);
     int num = SDL_NumJoysticks();
 
     for(int i = 0; i < num; ++i)
-        s_joyDeviceAdd(i);
+        this->OpenJoystick(i);
+}
 
-    return int(s_joysticks.size());
+InputMethodType_Joystick::~InputMethodType_Joystick()
+{
+    for(InputMethodProfile_Joystick* profile : this->m_hiddenProfiles)
+        delete profile;
+
+    this->m_hiddenProfiles.clear();
+    this->m_lastProfileByGUID.clear();
+}
+
+bool InputMethodType_Joystick::TestProfileType(InputMethodProfile* profile)
+{
+    return (bool)dynamic_cast<InputMethodProfile_Joystick*>(profile);
+}
+
+bool InputMethodType_Joystick::RumbleSupported()
+{
+    return true;
+}
+
+void InputMethodType_Joystick::UpdateControlsPre() {}
+void InputMethodType_Joystick::UpdateControlsPost() {}
+
+InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& active_methods) noexcept
+{
+    JoystickDevices* active_joystick = nullptr;
+
+    for(std::pair<const int, JoystickDevices*>& p : this->m_availableJoysticks)
+    {
+        SDL_Joystick* joy = p.second->joy;
+        bool duplicate = false;
+
+        for(InputMethod* method : active_methods)
+        {
+            InputMethod_Joystick* m = dynamic_cast<InputMethod_Joystick*>(method);
+
+            if(!m)
+                continue;
+
+            if(m->m_devices == p.second)
+            {
+                duplicate = true;
+                break;
+            }
+        }
+
+        // don't want any duplicates!
+        if(duplicate)
+            continue;
+
+        KM_Key k;
+        s_bindJoystickKey(joy, k);
+
+        // can_poll is set as false on joystick initialization and unbinding
+        if(k.type == KM_Key::NoControl)
+        {
+            p.second->can_poll = true;
+        }
+        else if(p.second->can_poll)
+        {
+            active_joystick = p.second;
+            break;
+        }
+    }
+
+    // if didn't find any joystick return false right now
+    if(!active_joystick)
+        return nullptr;
+
+    // we're going to create a new joystick!
+    InputMethod_Joystick* method = new(std::nothrow) InputMethod_Joystick;
+
+    // alloc failed :(
+    if(!method)
+        return nullptr;
+
+    method->Type = this;
+    method->Name = SDL_JoystickName(active_joystick->joy);
+    method->m_devices = active_joystick;
+
+    // I've found that truncation to 10 characters is
+    // needed for this to display well with multiplayer
+    if(method->Name.size() > 10)
+        method->Name.resize(10);
+
+
+    // In this section, we find the default profile for this controller/player combination...!
+
+    // first, figure out what the player index will be
+    int my_index = 0;
+
+    for(const InputMethod* m : active_methods)
+    {
+        if(!m)
+            break;
+
+        my_index ++;
+    }
+
+    // 1. cleverly look for profile by GUID and player...
+    std::unordered_map<std::string, InputMethodProfile*>::iterator found
+        = this->m_lastProfileByGUID.find(std::to_string(my_index + 1) + "-" + active_joystick->guid);
+
+    // ...then by just GUID.
+    if(found == this->m_lastProfileByGUID.end())
+        found = this->m_lastProfileByGUID.find(active_joystick->guid);
+
+    if(found != this->m_lastProfileByGUID.end())
+    {
+        method->Profile = found->second;
+        InputMethodProfile_Joystick* profile = dynamic_cast<InputMethodProfile_Joystick*>(found->second);
+
+        if(profile->m_legacyProfile)
+        {
+            // expanding a legacy profile based on information from controller
+            profile->Name = method->Name + " P" + std::to_string(my_index + 1);
+
+            if(active_joystick->ctrl)
+                profile->ExpandAsController();
+            else
+                profile->ExpandAsJoystick();
+
+            this->m_profiles.push_back(method->Profile);
+            this->m_hiddenProfiles.erase(profile);
+        }
+    }
+
+    // 2. find first profile appropriate to the controller-ness of the controller
+    if(!method->Profile)
+    {
+        for(InputMethodProfile* p_ : this->m_profiles)
+        {
+            InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(p_);
+
+            if(!p)
+                continue;
+
+            if((active_joystick->ctrl && p->m_controllerProfile)
+               || (!active_joystick->ctrl && !p->m_controllerProfile))
+            {
+                method->Profile = p_;
+                break;
+            }
+        }
+
+        // 3. make appropriate new profile (note that allocs could fail, that will be cleaned up later)
+        if(!method->Profile && active_joystick->ctrl)
+            method->Profile = this->AddProfile();
+        else if(!method->Profile)
+            method->Profile = this->AddOldJoystickProfile();
+    }
+
+    return (InputMethod*)method;
 }
 
 
-bool joyStartJoystick(int JoystickNumber)
+/*-----------------------*\
+|| CUSTOM METHODS        ||
+\*-----------------------*/
+
+KM_Key InputMethodType_Joystick::PollJoystickKeyAll()
 {
-    if(JoystickNumber < 0 || JoystickNumber >= int(s_joysticks.size()))
+    KM_Key k;
+
+    for(std::pair<const int, JoystickDevices*>& p : this->m_availableJoysticks)
+    {
+        if(p.second->joy)
+            s_bindJoystickKey(p.second->joy, k);
+
+        if(k.type != KM_Key::NoControl)
+            break;
+    }
+
+    return k;
+}
+
+KM_Key InputMethodType_Joystick::PollControllerKeyAll()
+{
+    KM_Key k;
+
+    for(std::pair<const int, JoystickDevices*>& p : this->m_availableJoysticks)
+    {
+        if(p.second->ctrl)
+            s_bindControllerKey(p.second->ctrl, k);
+
+        if(k.type != KM_Key::NoControl)
+            break;
+    }
+
+    return k;
+}
+
+
+/*-----------------------*\
+|| CUSTOM METHODS        ||
+\*-----------------------*/
+
+bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
+{
+    pLogDebug("Opening joystick id %d...", joystick_index);
+    SDL_Joystick* joy = SDL_JoystickOpen(joystick_index);
+
+    if(!joy)
+    {
+        pLogDebug("  could not open.");
+        return false;
+    }
+
+    pLogDebug("  successfully opened!");
+    pLogDebug("  Name: %s", SDL_JoystickName(joy));
+
+    std::string guid;
+    // explicitly scoping this buffer
+    {
+        SDL_JoystickGUID guid_bytes = SDL_JoystickGetGUID(joy);
+        char guid_chars[35];
+        SDL_JoystickGetGUIDString(guid_bytes, guid_chars, 35);
+        pLogDebug("  GUID: %s", guid_chars);
+        guid = guid_chars;
+    }
+    pLogDebug("  Number of Axes: %d", SDL_JoystickNumAxes(joy));
+    pLogDebug("  Number of Buttons: %d", SDL_JoystickNumButtons(joy));
+    pLogDebug("  Number of Balls: %d", SDL_JoystickNumBalls(joy));
+
+    JoystickDevices* devices = new(std::nothrow) JoystickDevices;
+
+    if(!devices)
+    {
+        SDL_JoystickClose(joy);
+        pLogDebug("  could not allocate devices struct (OOM).");
+        return false;
+    }
+
+    devices->joy = joy;
+    devices->guid = guid;
+
+    if(SDL_IsGameController(joystick_index))
+    {
+        pLogDebug("  claims to be a game controller...");
+        devices->ctrl = SDL_GameControllerOpen(joystick_index);
+
+        if(devices->ctrl)
+            pLogDebug("    successfully opened game controller!");
+        else
+            pLogDebug("    could not open.");
+    }
+    else
+        pLogDebug("  is not a game controller.");
+
+    if(SDL_JoystickIsHaptic(joy))
+    {
+        pLogDebug("  claims to support haptic...");
+        devices->haptic = SDL_HapticOpenFromJoystick(joy);
+
+        if(!devices->haptic)
+        {
+            pLogDebug("    could not open haptic!");
+        }
+        else if(!SDL_HapticRumbleSupported(devices->haptic) || SDL_HapticRumbleInit(devices->haptic) != 0)
+        {
+            pLogDebug("    could not init haptic rumble!");
+            SDL_HapticClose(devices->haptic);
+            devices->haptic = nullptr;
+        }
+        else
+        {
+            pLogDebug("    successfully initialized haptic rumble!");
+        }
+    }
+    else
+        pLogDebug("  does not support haptic.");
+
+    int id = SDL_JoystickInstanceID(joy);
+    pLogDebug("  received ID %d. adding to poll list!", id);
+
+    this->m_availableJoysticks.emplace(id, devices);
+
+    return true;
+}
+
+bool InputMethodType_Joystick::CloseJoystick(int instance_id)
+{
+    pLogDebug("joystick with ID %d removed.", instance_id);
+    std::unordered_map<int, JoystickDevices*>::iterator found
+        = this->m_availableJoysticks.find(instance_id);
+
+    if(found == this->m_availableJoysticks.end())
+    {
+        pLogDebug("  could not find!");
+        return false;
+    }
+
+    JoystickDevices* devices = found->second;
+
+    for(InputMethod* method : g_InputMethods)
+    {
+        InputMethod_Joystick* m = dynamic_cast<InputMethod_Joystick*>(method);
+
+        if(!m)
+            continue;
+
+        if(m->m_devices == devices)
+        {
+            pLogDebug("  unset m_devices of InputMethod '%s' using Profile '%s'.", m->Name.c_str(), m->Profile->Name.c_str());
+            m->m_devices = nullptr;
+        }
+    }
+
+    if(devices->haptic)
+        SDL_HapticClose(devices->haptic);
+
+    if(devices->ctrl)
+        SDL_GameControllerClose(devices->ctrl);
+
+    SDL_JoystickClose(devices->joy);
+    delete devices;
+
+    this->m_availableJoysticks.erase(found);
+
+    return true;
+}
+
+InputMethodProfile* InputMethodType_Joystick::AddOldJoystickProfile()
+{
+    InputMethodProfile* p_ = this->AddProfile();
+    InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(p_);
+
+    if(!p)
+        return nullptr;
+
+    p->InitAsJoystick();
+    p->Name = "Old Joy " + std::to_string(this->m_profiles.size());
+
+    return p_;
+}
+
+/*-----------------------*\
+|| OPTIONAL METHODS      ||
+\*-----------------------*/
+
+// optional function allowing developer to associate device information with profile, etc
+// if developer wants to forbid assignment, return false
+bool InputMethodType_Joystick::SetProfile_Custom(InputMethod* method, int player_no, InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
+{
+    (void)active_methods;
+
+    InputMethod_Joystick* m = dynamic_cast<InputMethod_Joystick*>(method);
+    InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(profile);
+
+    if(!m || !p || !m->m_devices)
         return false;
 
-    auto &joy = s_joysticks[size_t(JoystickNumber)];
-    if(joy.joystick)
+    // only allow controllerProfiles for controllers, joystick profiles for old joysticks
+    // C++ has no proper logical XOR operator, so two lines
+    if(p->m_controllerProfile && !m->m_devices->ctrl)
+        return false;
+
+    if(!p->m_controllerProfile && m->m_devices->ctrl)
+        return false;
+
+    // set in map!
+    this->m_lastProfileByGUID[std::to_string(player_no + 1) + "-" + m->m_devices->guid] = profile;
+    this->m_lastProfileByGUID[m->m_devices->guid] = profile;
+
+    pLogDebug("Setting default controller for GUID '%s' and player %d to %s.",
+              m->m_devices->guid.c_str(), player_no, profile->Name.c_str());
+
+    return true;
+}
+
+// unregisters any references to the profile before final deallocation
+// returns false to prevent deletion if this is impossible
+bool InputMethodType_Joystick::DeleteProfile_Custom(InputMethodProfile* profile, const std::vector<InputMethod*>& active_methods)
+{
+    UNUSED(active_methods);
+
+    for(auto it = m_lastProfileByGUID.begin(); it != m_lastProfileByGUID.end();)
     {
-        pLogDebug("==========================");
-        pLogDebug("Josytick started: %s", SDL_JoystickName(joy.joystick));
-        pLogDebug("==========================");
+        if(it->second == profile)
+        {
+            pLogDebug("Unsetting default controller for GUID '%s'.", it->first.c_str());
+            it = m_lastProfileByGUID.erase(it);
+        }
+        else
+            ++it;
+    }
+
+    return true;
+}
+
+// Optional function allowing developer to consume an SDL event (on SDL clients)
+//     usually used for hotkeys or for connect/disconnect events.
+// Called (1) in order of InputMethodTypes, then (2) in order of InputMethods
+// Returns true if event is consumed, false if other InputMethodTypes and InputMethods
+//     should receive it.
+bool InputMethodType_Joystick::ConsumeEvent(const SDL_Event* ev)
+{
+    if(ev->type == SDL_JOYDEVICEADDED)
+    {
+        this->OpenJoystick(ev->jdevice.which);
         return true;
     }
+    else if(ev->type == SDL_JOYDEVICEREMOVED)
+    {
+        this->CloseJoystick(ev->jdevice.which);
+        return true;
+    }
+
+    return false;
+}
+
+// How many per-type special options are there?
+size_t InputMethodType_Joystick::GetOptionCount()
+{
+    return 1;
+}
+
+// Methods to manage per-profile options
+// It is guaranteed that none of these will be called if
+// GetOptionCount() returns 0.
+// get a char* describing the option
+const char* InputMethodType_Joystick::GetOptionName(size_t i)
+{
+    if(i == 0)
+        return "NEW PROFILE FOR OLD JOYSTICK";
     else
+        return nullptr;
+}
+
+// get a char* describing the current option value
+// must be allocated in static or instance memory
+// WILL NOT be freed
+const char* InputMethodType_Joystick::GetOptionValue(size_t i)
+{
+    (void)i;
+    return nullptr;
+}
+
+// called when A is pressed; allowed to interrupt main game loop
+bool InputMethodType_Joystick::OptionChange(size_t i)
+{
+    if(i == 0 && this->AddOldJoystickProfile())
+        return true;
+
+    return false;
+}
+
+void InputMethodType_Joystick::SaveConfig_Custom(IniProcessing* ctl)
+{
+    std::string name = "last-profile-";
+    int uuid_begin = name.size();
+
+    // set all default controller profiles
+    for(auto it = m_lastProfileByGUID.begin(); it != m_lastProfileByGUID.end(); ++it)
     {
-        pLogWarning("==========================");
-        pLogWarning("Can't open joystick #%d", JoystickNumber);
-        pLogWarning("==========================");
-        return false;
+        std::vector<InputMethodProfile*>::iterator loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), it->second);
+        size_t index = loc - this->m_profiles.begin();
+
+        if(index == this->m_profiles.size())
+        {
+            // this probably a legacy profile, let's check.
+            InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(it->second);
+
+            if(p && p->m_legacyProfile)
+            {
+                ctl->endGroup();
+                ctl->beginGroup("joystick-uuid-" + it->first);
+                p->SaveConfig_Legacy(ctl);
+                ctl->endGroup();
+                ctl->beginGroup(this->Name);
+            }
+        }
+        else
+        {
+            ctl->setValue(name.replace(uuid_begin, std::string::npos, it->first).c_str(), index);
+        }
     }
 }
 
-void joyCloseJoysticks()
+void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
 {
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-    s_touch.quit();
-#endif
+    // load all default controller profiles
+    std::vector<std::string> keys = ctl->allKeys();
+    std::string keyNeed = "last-profile-";
 
-    for(size_t i = 0; i < s_joysticks.size(); ++i) // scan hats first
-        s_joyDeviceClose(i);
-
-    s_joysticks.clear();
-}
-
-bool joyPollJoystick(int joystick, KM_Key &key)
-{
-    if(joystick < 0 || joystick >= int(s_joysticks.size()))
-        return false;
-
-    auto &j = s_joysticks[size_t(joystick)];
-
-    if(j.control)
-        return bindControllerKey(j.control, key);
-
-    return bindJoystickKey(j.joystick, key);
-}
-
-bool joyIsKeyDown(int JoystickNumber, const KM_Key &key)
-{
-    bool val = false;
-
-    if(JoystickNumber < 0 || JoystickNumber >= int(s_joysticks.size()))
-        return false;
-
-    auto &j = s_joysticks[size_t(JoystickNumber)];
-    if(j.control)
-        updateCtrlKey(j.control, val, key);
-    else
-        updateJoyKey(j.joystick, val, key);
-    return val;
-}
-
-#ifdef USE_TOUCHSCREEN_CONTROLLER
-void RenderTouchControls()
-{
-    s_touch.render();
-}
-
-void UpdateTouchScreenSize()
-{
-    s_touch.updateScreenSize();
-}
-#endif
-
-void setKey(ConKeyboard_t &ck, int id, int val)
-{
-    switch(id)
+    for(std::string& k : keys)
     {
-    case 1:
-        ck.Up = val;
-        break;
-    case 2:
-        ck.Down = val;
-        break;
-    case 3:
-        ck.Left = val;
-        break;
-    case 4:
-        ck.Right = val;
-        break;
-    case 5:
-        ck.Run = val;
-        break;
-    case 6:
-        ck.AltRun = val;
-        break;
-    case 7:
-        ck.Jump = val;
-        break;
-    case 8:
-        ck.AltJump = val;
-        break;
-    case 9:
-        ck.Drop = val;
-        break;
-    case 10:
-        ck.Start = val;
-        break;
+        std::string::size_type r = k.find(keyNeed);
+
+        if(r != std::string::npos && r == 0)
+        {
+            std::string guid = k.substr(13); // length of "last-profile-"
+            int index;
+            ctl->read(k.c_str(), index, -1);
+
+            if(index >= 0 && index < (int)this->m_profiles.size() && this->m_profiles[index])
+            {
+                this->m_lastProfileByGUID[guid] = this->m_profiles[index];
+                pLogDebug("Set default profile for '%s' to '%s'.", guid.c_str(), this->m_profiles[index]->Name.c_str());
+            }
+        }
     }
+
+    ctl->endGroup();
+
+    // load legacy controller profiles
+    keys = ctl->childGroups();
+    keyNeed = "joystick-uuid-";
+
+    for(std::string& k : keys)
+    {
+        std::string::size_type r = k.find(keyNeed);
+
+        if(r != std::string::npos && r == 0)
+        {
+            std::string guid = k.substr(14); // length of "joystick-uuid-"
+
+            // once legacy controller has been converted, forget about it
+            if(this->m_lastProfileByGUID.find(guid) != this->m_lastProfileByGUID.end())
+                continue;
+
+            ctl->beginGroup(k);
+            InputMethodProfile_Joystick* profile = new(std::nothrow) InputMethodProfile_Joystick;
+
+            if(profile)
+            {
+                profile->Type = this;
+                profile->LoadConfig_Legacy(ctl);
+                this->m_hiddenProfiles.insert(profile);
+                this->m_lastProfileByGUID[guid] = profile;
+                pLogDebug("Loaded legacy profile as '%s'.", guid.c_str());
+            }
+            else
+            {
+                pLogWarning("Could not allocate legacy profile (OOM).");
+            }
+
+            ctl->endGroup();
+        }
+    }
+
+    ctl->beginGroup(this->Name);
 }
 
-void setKey(ConJoystick_t &cj, int id, const KM_Key &val)
-{
-    switch(id)
-    {
-    case 1:
-        cj.Up = val;
-        break;
-    case 2:
-        cj.Down = val;
-        break;
-    case 3:
-        cj.Left = val;
-        break;
-    case 4:
-        cj.Right = val;
-        break;
-    case 5:
-        cj.Run = val;
-        break;
-    case 6:
-        cj.AltRun = val;
-        break;
-    case 7:
-        cj.Jump = val;
-        break;
-    case 8:
-        cj.AltJump = val;
-        break;
-    case 9:
-        cj.Drop = val;
-        break;
-    case 10:
-        cj.Start = val;
-        break;
-    }
-}
-
-KM_Key &getKey(ConJoystick_t &cj, int id)
-{
-    switch(id)
-    {
-    case 1:
-    default:
-        return cj.Up;
-        break;
-    case 2:
-        return cj.Down;
-        break;
-    case 3:
-        return cj.Left;
-        break;
-    case 4:
-        return cj.Right;
-        break;
-    case 5:
-        return cj.Run;
-        break;
-    case 6:
-        return cj.AltRun;
-        break;
-    case 7:
-        return cj.Jump;
-        break;
-    case 8:
-        return cj.AltJump;
-        break;
-    case 9:
-        return cj.Drop;
-        break;
-    case 10:
-        return cj.Start;
-        break;
-    }
-}
+} // namespace Controls

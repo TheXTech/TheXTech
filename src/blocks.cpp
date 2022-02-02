@@ -52,6 +52,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     if(BattleMode && b.RespawnDelay == 0)
         b.RespawnDelay = 1;
 
+    // if(whatPlayer != 0)
+    //     Controls::Rumble(whatPlayer, 10, .1);
+
     if((b.Type >= 622 && b.Type <= 625) || b.Type == 631)
     {
         if(whatPlayer == 0)
@@ -65,6 +68,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             for(auto B = 1; B <= tmpNumPlayers; B++)
             {
+                // why is this inside the for loop, seems silly.
                 SavedChar[Player[whatPlayer].Character] = Player[whatPlayer];
                 if(Player[B].Character == 1)
                 {
@@ -90,60 +94,32 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
             if(BlockFrame[b.Type] < 4)
             {
-                PlaySound(SFX_Raccoon);
-
                 // UnDuck whatPlayer
+
+                // moved SwapCharacter logic into player.cpp
+
                 if(b.Type == 622)
                 {
-                    Player[whatPlayer].Character = 1;
+                    SwapCharacter(whatPlayer, 1, false, true);
                 }
                 if(b.Type == 623)
                 {
-                    Player[whatPlayer].Character = 2;
+                    SwapCharacter(whatPlayer, 2, false, true);
                 }
                 if(b.Type == 624)
                 {
-                    Player[whatPlayer].Character = 3;
+                    SwapCharacter(whatPlayer, 3, false, true);
                 }
                 if(b.Type == 625)
                 {
-                    Player[whatPlayer].Character = 4;
+                    SwapCharacter(whatPlayer, 4, false, true);
                 }
                 if(b.Type == 631)
                 {
-                    Player[whatPlayer].Character = 5;
+                    SwapCharacter(whatPlayer, 5, false, true);
                 }
 
-                auto &p = Player[whatPlayer];
-                p.State = SavedChar[p.Character].State;
-                p.HeldBonus = SavedChar[p.Character].HeldBonus;
-                p.Mount = SavedChar[p.Character].Mount;
-                p.MountType = SavedChar[p.Character].MountType;
-                p.Hearts = SavedChar[p.Character].Hearts;
-                if(p.State == 0)
-                {
-                    p.State = 1;
-                }
-                p.FlySparks = false;
-                p.Immune = 50;
-                p.Effect = 8;
-                p.Effect2 = 14;
-
-                if(p.Mount <= 1)
-                {
-                    p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
-                    if(p.Mount == 1 && p.State == 1)
-                    {
-                        p.Location.Height = Physics.PlayerHeight[1][2];
-                    }
-                    p.StandUp = true;
-                }
-
-                tempLocation = p.Location;
-                tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
-                tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
-                NewEffect(10, tempLocation);
-                UpdateYoshiMusic();
+                PlaySound(SFX_Raccoon);
             }
             else
             {
@@ -414,6 +390,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 
                     nn.Special = 1;
                     nn.Immune = 20;
+                    syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
 
                     if(B > 20 || (Player[whatPlayer].Character == 5 && B > 5))
@@ -492,6 +469,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 nn.Special = 1;
                 nn.Immune = 20;
                 PlaySound(SFX_Coin);
+                syncLayers_NPC(numNPCs);
                 CheckSectionNPC(numNPCs);
                 b.Special -= 1;
             }
@@ -767,6 +745,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             nn.Effect2 = 0;
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
             if(NPCIsYoshi[nn.Type] ||
                NPCIsBoot[nn.Type] || nn.Type == 9 ||
@@ -862,6 +841,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             nn.Effect2 = 0;
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
         }
         else
@@ -969,6 +949,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             nn.Effect2 = 0;
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
         }
         else // Rez player
@@ -1028,6 +1009,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             tempPlayer = 0;
         }
 
+        // TODO: @Wohlstand why was this commented out?
         // PlaySound(SFX_Mushroom);
 
         if(tempPlayer == 0)
@@ -1083,6 +1065,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             }
 
             nn.Effect2 = 0;
+            syncLayers_NPC(numNPCs);
             CheckSectionNPC(numNPCs);
         }
         else // Rez player
@@ -1166,6 +1149,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         nn.Effect2 = 0;
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
     }
     else if(b.Special == 105) // Block contains a Green Yoshi
@@ -1230,6 +1214,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         nn.Effect2 = 0;
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
     }
     else if(b.Special == 101) // Block contains a Goomba
@@ -1290,6 +1275,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         nn.Effect2 = 0;
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
     }
     else if(b.Special == 201) // Block contains a 1-up
@@ -1349,6 +1335,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         nn.Effect2 = 0;
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
     }
 #endif
@@ -1369,6 +1356,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         nn.Location.Y -= 0.01;
         nn.DefaultLocation = nn.Location;
         nn.DefaultType = nn.Type;
+        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
         b = blankBlock;
     }
@@ -1449,7 +1437,6 @@ void KillBlock(int A, bool Splode)
 {
     Block_t blankBlock;
     bool tempBool = false;
-    int C = 0;
 
     if(Block[A].Hidden)
         return;
@@ -1486,34 +1473,45 @@ void KillBlock(int A, bool Splode)
         {
             Block[A] = Block[numBlock];
             Block[numBlock] = blankBlock;
-            numBlock -= 1;
+            numBlock--;
+            syncLayersTrees_Block(A);
+            syncLayersTrees_Block(numBlock + 1);
         }
     }
     else
     {
         Score += 50;
 
-        if(!Block[A].TriggerDeath.empty())
+        if(Block[A].TriggerDeath != EVENT_NONE)
         {
             ProcEvent(Block[A].TriggerDeath);
         }
 
-        if(!Block[A].TriggerLast.empty())
+        if(Block[A].TriggerLast != EVENT_NONE)
         {
             tempBool = false;
 
-            for(C = 1; C <= numNPCs; C++)
+            int C = Block[A].Layer;
+            if(C != LAYER_NONE)
             {
-                if(NPC[C].Layer == Block[A].Layer && !NPC[C].Generator)
-                    tempBool = true;
-            }
-
-            for(C = 1; C <= numBlock; C++)
-            {
-                if(C != A)
+                for(int npc : Layer[C].NPCs)
                 {
-                    if(Block[A].Layer == Block[C].Layer)
+                    if(!NPC[npc].Generator)
+                    {
                         tempBool = true;
+                        break;
+                    }
+                }
+                if(!tempBool)
+                {
+                    for(int other_block : Layer[C].blocks)
+                    {
+                        if(other_block != A)
+                        {
+                            tempBool = true;
+                            break;
+                        }
+                    }
                 }
             }
 
@@ -1524,8 +1522,9 @@ void KillBlock(int A, bool Splode)
         }
 
         Block[A].Hidden = true;
-        Block[A].Layer = "Destroyed Blocks";
+        Block[A].Layer = LAYER_DESTROYED_BLOCKS;
         Block[A].Kill = false;
+        syncLayersTrees_Block(A);
     }
 
 }
@@ -1797,7 +1796,7 @@ void UpdateBlocks()
                 b.RespawnDelay += 1;
                 if(b.RespawnDelay >= 65 * 60)
                 {
-                    if(b.DefaultType > 0 || b.DefaultSpecial > 0 || b.Layer == "Destroyed Blocks")
+                    if(b.DefaultType > 0 || b.DefaultSpecial > 0 || b.Layer == LAYER_DESTROYED_BLOCKS)
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
@@ -1809,19 +1808,19 @@ void UpdateBlocks()
                         }
                         if(B > 0)
                         {
-                            if(b.Layer == "Destroyed Blocks")
-                                b.Layer = "Default";
+                            if(b.Layer == LAYER_DESTROYED_BLOCKS)
+                                b.Layer = LAYER_DEFAULT;
 
                             if(b.Hidden)
                             {
-                                for(B = 0; B <= maxLayers; B++)
-                                {
-                                    if(Layer[B].Name == b.Layer)
-                                        b.Hidden = Layer[B].Hidden;
-                                }
+                                syncLayersTrees_Block_SetHidden(A);
 
                                 if(!b.Hidden)
                                     NewEffect(10, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
+                            }
+                            else
+                            {
+                                syncLayersTrees_Block(A);
                             }
 
                             if(b.Type != b.DefaultType || b.Special != b.DefaultSpecial)
@@ -1863,7 +1862,7 @@ void UpdateBlocks()
 
             if(ib.ShakeY == 0)
             {
-                if(!ib.TriggerHit.empty())
+                if(ib.TriggerHit != EVENT_NONE)
                 {
                     ProcEvent(ib.TriggerHit);
                 }
@@ -1889,7 +1888,7 @@ void UpdateBlocks()
 
             if(ib.ShakeY == 0)
             {
-                if(!ib.TriggerHit.empty())
+                if(ib.TriggerHit != EVENT_NONE)
                     ProcEvent(ib.TriggerHit);
 
                 if(ib.Type == 282)
@@ -2092,6 +2091,7 @@ void PSwitch(bool enabled)
                     nb.Special = 0;
                     nb.Kill = false;
                     nb.NPC = NPC[A].Type;
+                    syncLayersTrees_Block(numBlock);
                 }
                 NPC[A].Killed = 9;
             }
@@ -2133,15 +2133,18 @@ void PSwitch(bool enabled)
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
+                    syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     Block[A] = Block[numBlock];
                     Block[numBlock] = blankBlock;
                     numBlock--;
+                    syncLayersTrees_Block(A);
+                    syncLayersTrees_Block(numBlock + 1);
                 }
             }
         }
 
-        ProcEvent("P Switch - Start", true);
+        ProcEvent(EVENT_PSWITCH_START, true);
     }
     else
     {
@@ -2167,6 +2170,7 @@ void PSwitch(bool enabled)
                     nb.Location.X += (NPC[A].Location.Width - nb.Location.Width) / 2.0;
                     nb.Special = 0;
                     nb.Kill = false;
+                    syncLayersTrees_Block(numBlock);
                 }
                 NPC[A].Killed = 9;
             }
@@ -2198,15 +2202,19 @@ void PSwitch(bool enabled)
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
+                    syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     nn.Killed = 0;
                     KillBlock(A, false);
-                    Block[A].Layer = "Used P Switch";
+                    Block[A].Layer = LAYER_USED_P_SWITCH;
+                    syncLayersTrees_Block(A);
+                    // this is as close to a permanent death as blocks get in the game,
+                    // because this layer usually doesn't exist
                 }
             }
         }
 
-        ProcEvent("P Switch - End", true);
+        ProcEvent(EVENT_PSWITCH_END, true);
     }
 
     qSortBlocksX(1, numBlock);
@@ -2224,6 +2232,8 @@ void PSwitch(bool enabled)
     qSortBlocksY(B, A - 1);
     FindSBlocks();
     FindBlocks();
+    // SO expensive, can't wait to get rid of this.
+    syncLayersTrees_AllBlocks();
 
     iBlocks = numBlock;
     for(A = 1; A <= numBlock; A++)

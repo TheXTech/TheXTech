@@ -105,6 +105,14 @@ public:
     static void mergeWithMask(FIBITMAP *image, FIBITMAP *mask);
 
     /*!
+     * \brief Replaces one color with another
+     * \param image Image
+     * \param src Original pixel color
+     * \param dst New pixel color
+     */
+    static void replaceColor(FIBITMAP *image, const PGE_Pix &src, const PGE_Pix &dst);
+
+    /*!
      * \brief Gets metric from image file
      * \param [__in] imageFile Path to image file
      * \param [__out] imgSize Pointer to PGE_Size value
