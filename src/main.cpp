@@ -134,14 +134,130 @@ static void strToPlayerSetup(int player, const std::string &setupString)
     }
 }
 
+#ifdef VITA
+#include <Logger/logger.h>
+#include <psp2/io/dirent.h>
+#include <psp2/io/fcntl.h>
+#include <psp2/kernel/clib.h>
+#include <psp2/kernel/processmgr.h>
+#include <psp2/kernel/threadmgr.h>
+#include <psp2/appmgr.h>
+#include <psp2/apputil.h>
+#include <psp2/ctrl.h>
+#include <psp2/power.h>
+#include <psp2/touch.h>
+#include <psp2/vshbridge.h>
+
+#define MEMORY_SCELIBC_MB 120
+#define MEMORY_NEWLIB_MB 120
+
+int sceLibcHeapSize = MEMORY_SCELIBC_MB * 1024 * 1024;
+int _newlib_heap_size_user = MEMORY_NEWLIB_MB * 1024 * 1024;
+
+/**
+ * @brief Checks for PS Vita Command Line arguments.
+ * 
+ * If a LiveArea command line argument is provided, we'll return it as a std::string for TCLAP to take care of.
+ * 
+ * @returns std::string with 'LiveArea' (command line) or nullptr if no command line args.
+ */
+static std::string Vita_TestArguments()
+{
+    SceAppUtilInitParam u1 = {};
+    SceAppUtilBootParam u2 = {};
+    // sceAppUtilInit, talking to Sony APIs now.
+    sceAppUtilInit(&u1, &u2);
+    
+    // Getting the "event param" aka just a fancy and different argv
+    SceAppUtilAppEventParam eventParam;
+    sceClibMemset(&eventParam, 0, sizeof(SceAppUtilAppEventParam));
+
+    sceAppUtilReceiveAppEvent(&eventParam);
+
+    // Unknown where these values are pulled from. 
+    // But, apparently this means we have an argument.
+    if(eventParam.type == 0x05)
+    {
+        char buffer[2048];
+        sceAppUtilAppEventParseLiveArea(&eventParam, buffer);
+
+        pLogDebug("Live Area Args:\n\n%s\n\nEND LIVE AREA ARGS\n", buffer);
+        return std::string(buffer);
+    }
+    else pLogDebug("Live Area Event Param Type: %02x", eventParam.type);
+
+    return "";
+}
+
+static std::vector<std::string> Vita_ParseArgs(const std::string& inputString, const std::string& delimiter)
+{
+    std::vector<std::string> rval;
+
+    auto start = 0U;
+    auto end = inputString.find(delimiter);
+
+    // Early return if no delim found.
+    if(end == std::string::npos)
+    {
+        pLogDebug("Early return.");
+        rval.push_back(inputString);
+        return rval;
+    }
+
+    std::string token;
+    while(end != std::string::npos) {
+        token = inputString.substr(start, end - start);
+        start = end + delimiter.length();
+        end = inputString.find(delimiter, start);
+
+        rval.push_back(token);
+    }
+
+    rval.push_back(inputString.substr(start, end));
+
+    return rval;
+}
+
+static void Vita_DebugArgs(const std::string& initialArgv, const std::vector<std::string>& parsedArgs)
+{
+    pLogDebug("\n\nArgs\n");
+    pLogDebug("Initial Argv: ");
+    pLogDebug(initialArgv.c_str());
+    pLogDebug("\nPARSED:");
+    for(auto s : parsedArgs)
+        pLogDebug(s.c_str());
+    pLogDebug("\n");
+}
+
+static void Vita_SetPriority()
+{
+    sceKernelChangeThreadPriority(0, 127);
+    // sceKernelChangeThreadCpuAffinityMask(0, 0x40000);
+
+    scePowerSetArmClockFrequency(444);
+    scePowerSetBusClockFrequency(222);
+    scePowerSetGpuClockFrequency(222);
+    scePowerSetGpuXbarClockFrequency(166);
+}
+#endif
+
 extern "C"
 int main(int argc, char**argv)
 {
+
     CmdLineSetup_t setup;
     FrmMain frmMain;
 
 #if !defined(__3DS__) && !defined(VITA)
     CrashHandler::initSigs();
+#endif
+#if defined(VITA)
+    (void)argc;
+    (void)argv;
+
+    const std::string _VitaArgv = (const std::string)Vita_TestArguments();
+    const std::string _VitaArgDelim = ",";
+    auto _ParsedVitaArgs = Vita_ParseArgs(_VitaArgv, _VitaArgDelim);
 #endif
 
     AppPathManager::initAppPath();
@@ -275,7 +391,11 @@ int main(int argc, char**argv)
         cmd.add(&switchDisplayControls);
         cmd.add(&inputFileNames);
 
+        #if defined(VITA)
+        cmd.parse(_ParsedVitaArgs);
+        #else
         cmd.parse(argc, argv);
+        #endif
 
         std::string customAssets = customAssetsPath.getValue();
 
@@ -443,7 +563,10 @@ int main(int argc, char**argv)
         return 1;
 #endif
 
+
     int ret = GameMain(setup);
+
+
 
 #ifdef ENABLE_XTECH_LUA
     if(!xtech_lua_quit())
