@@ -1,0 +1,16 @@
+void main(
+    float2 aPosition,
+    float2 vTexCoord,
+    float4 vColor,
+    uniform float4x4 mvp,
+    uniform float4x4 _rot,
+    uniform float4x4 _scale,
+    float4 out vertPos : POSITION,
+    float4 out fragColor : COLOR,
+    float2 out texCoord : TEXCOORD0
+)
+{
+    vertPos = mul(mul(mul(float4(aPosition, 0.f, 1.f), _scale), _rot), mvp);
+    fragColor = vColor;
+    texCoord = vTexCoord;
+}
