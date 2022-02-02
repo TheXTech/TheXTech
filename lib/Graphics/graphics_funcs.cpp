@@ -271,9 +271,10 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, std::vector<char> &maskRaw, b
 
     if(maskIsPng)
     {
-        FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
-        getMaskFromRGBA(front, mask);
-        closeImage(front);
+        FIBITMAP *newMask = nullptr;
+        getMaskFromRGBA(mask, newMask);
+        closeImage(mask);
+        mask = newMask;
     }
 
     mergeWithMask(image, mask);
