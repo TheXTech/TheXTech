@@ -564,10 +564,7 @@ int main(int argc, char**argv)
         return 1;
 #endif
 
-<<<<<<< HEAD
-=======
     Controls::Init();
->>>>>>> 97a20f2d4fa46860199f9d90bdab82cfb0b304da
 
     int ret = GameMain(setup);
 
