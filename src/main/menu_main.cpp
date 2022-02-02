@@ -338,9 +338,9 @@ static void s_handleMouseMove(int items, int x, int y, int maxWidth, int itemHei
 bool mainMenuUpdate()
 {
     int B;
-    Location_t tempLocation;
+    // Location_t tempLocation;
     int menuLen;
-    Player_t blankPlayer;
+    // Player_t blankPlayer;
 
     bool upPressed = SharedControls.MenuUp;
     bool downPressed = SharedControls.MenuDown;
