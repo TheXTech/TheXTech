@@ -1432,6 +1432,15 @@ InputMethodType_Joystick::InputMethodType_Joystick()
         this->OpenJoystick(i);
 }
 
+InputMethodType_Joystick::~InputMethodType_Joystick()
+{
+    for(InputMethodProfile_Joystick* profile : this->m_hiddenProfiles)
+        delete profile;
+
+    this->m_hiddenProfiles.clear();
+    this->m_lastProfileByGUID.clear();
+}
+
 bool InputMethodType_Joystick::TestProfileType(InputMethodProfile* profile)
 {
     return (bool)dynamic_cast<InputMethodProfile_Joystick*>(profile);
@@ -1545,6 +1554,7 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
                 profile->ExpandAsJoystick();
 
             this->m_profiles.push_back(method->Profile);
+            this->m_hiddenProfiles.erase(profile);
         }
     }
 
@@ -1949,6 +1959,7 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
             {
                 profile->Type = this;
                 profile->LoadConfig_Legacy(ctl);
+                this->m_hiddenProfiles.insert(profile);
                 this->m_lastProfileByGUID[guid] = profile;
                 pLogDebug("Loaded legacy profile as '%s'.", guid.c_str());
             }

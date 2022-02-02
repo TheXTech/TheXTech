@@ -24,6 +24,7 @@
 #include "../controls.h"
 
 #include <string>
+#include <set>
 #include <unordered_map>
 
 typedef struct _SDL_Joystick SDL_Joystick;
@@ -157,6 +158,7 @@ class InputMethodType_Joystick : public InputMethodType
 {
 private:
     std::unordered_map<int, JoystickDevices *> m_availableJoysticks;
+    std::set<InputMethodProfile_Joystick *> m_hiddenProfiles; // owns unconverted legacy profiles
     std::unordered_map<std::string, InputMethodProfile *> m_lastProfileByGUID;
 
     InputMethodProfile *AllocateProfile() noexcept;
@@ -175,6 +177,7 @@ public:
     int m_JoystickStateSize;
 
     InputMethodType_Joystick();
+    ~InputMethodType_Joystick();
 
     bool TestProfileType(InputMethodProfile *profile);
     bool RumbleSupported();
