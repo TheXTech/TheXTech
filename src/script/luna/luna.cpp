@@ -64,6 +64,7 @@ void lunaReset()
 
     gEnableDemoCounterByLC = false;
 
+    gAutoMan.Clear();
     Renderer::Get().ClearAllDebugMessages();
     Renderer::Get().ClearAllLoadedImages();
     Renderer::Get().ClearQueue();

@@ -38,26 +38,26 @@ AutocodeManager gAutoMan;
 // CTOR
 AutocodeManager::AutocodeManager() noexcept
 {
-    Clear(true);
-    m_Enabled = true;
+    Clear();
 }
 
 AutocodeManager::~AutocodeManager()
 {
-    Clear(true);
+    Clear();
 }
 
 // CLEAR - Delete all autocodes and clear lists (and reset hearts to 2)
-void AutocodeManager::Clear(bool clear_global_codes)
+void AutocodeManager::Clear()
 {
-    if(clear_global_codes)
-    {
-        m_GlobalCodes.clear();
-        m_GlobalEnabled = false;
-        m_globcodeIdxRef.clear();
-        m_globcodeIdxSection.clear();
-    }
+    // Clear global codes
+    m_GlobalCodes.clear();
+    m_GlobalEnabled = false;
 
+    m_globcodeIdxRef.clear();
+    m_globcodeIdxSection.clear();
+
+
+    // Clear level local and index tables
     m_Autocodes.clear();
     m_InitAutocodes.clear();
     m_CustomCodes.clear();
@@ -78,7 +78,7 @@ bool AutocodeManager::LoadFiles()
     g_dirEpisode.setCurDir(FileNamePath);
     g_dirCustom.setCurDir(FileNamePath + FileName);
 
-    Clear(false);
+    Clear();
 
     // Load autocode
     lunaLevel = g_dirCustom.resolveFileCaseExistsAbs(AUTOCODE_FNAME);
@@ -142,6 +142,7 @@ bool AutocodeManager::ReadGlobals(const std::string &script_path)
 
     pLogDebug("Loading %s global autocode script...", script_path.c_str());
 
+    m_Enabled = true;
     Parse(code_file, true);
     std::fclose(code_file);
     m_GlobalEnabled = true;
