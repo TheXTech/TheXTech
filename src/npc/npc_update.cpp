@@ -4701,22 +4701,22 @@ void UpdateNPCs()
                                 B = 1;
                         }
                     }
-                    else if(NPC[NPC[A].Special2].Projectile && NPC[NPC[A].Special2].Active)
+                    else if(NPC[(int)NPC[A].Special2].Projectile && NPC[(int)NPC[A].Special2].Active)
                     {
                         B = 1;
                         NPC[A].Projectile = true;
-                        NPC[A].Direction = NPC[NPC[A].Special2].Direction;
+                        NPC[A].Direction = NPC[(int)NPC[A].Special2].Direction;
                         if(NPC[A].Direction > 0)
-                            NPC[A].Location.X = NPC[NPC[A].Special2].Location.X + 32;
+                            NPC[A].Location.X = NPC[(int)NPC[A].Special2].Location.X + 32;
                         else
-                            NPC[A].Location.X = NPC[NPC[A].Special2].Location.X - NPC[A].Location.Width;
-                        NPC[A].Location.Y = NPC[NPC[A].Special2].Location.Y;
+                            NPC[A].Location.X = NPC[(int)NPC[A].Special2].Location.X - NPC[A].Location.Width;
+                        NPC[A].Location.Y = NPC[(int)NPC[A].Special2].Location.Y;
                     }
 
                     if(Player[NPC[A].standingOnPlayer].Controls.Run)
                         B = 1;
 
-                    if(NPC[A].Special2 > 0 && NPC[NPC[A].Special2].Special2 != A)
+                    if(NPC[A].Special2 > 0 && NPC[(int)NPC[A].Special2].Special2 != A)
                         B = 0;
 
                     if(NPC[A].Special > 0)
@@ -4733,7 +4733,7 @@ void UpdateNPCs()
                     if(NPC[A].HoldingPlayer == 0 && NPC[A].standingOnPlayer == 0)
                         NPC[A].Special = 0;
                     if(NPC[A].HoldingPlayer > 0 && NPC[A].Special2 > 0)
-                        NPC[NPC[A].Special2].Direction = NPC[A].Direction;
+                        NPC[(int)NPC[A].Special2].Direction = NPC[A].Direction;
                     if(Player[NPC[A].HoldingPlayer].Effect != 0)
                         NPC[A].Special = 0;
 #if 1
@@ -4767,15 +4767,15 @@ void UpdateNPCs()
                     }
 #endif
 
-                    if(NPC[NPC[A].Special2].Type == NPCID_TOOTHY && fEqual(NPC[NPC[A].Special2].Special2, A))
+                    if(NPC[(int)NPC[A].Special2].Type == NPCID_TOOTHY && fEqual(NPC[(int)NPC[A].Special2].Special2, A))
                     {
-                        NPC[NPC[A].Special2].Projectile = true;
-                        NPC[NPC[A].Special2].Direction = NPC[A].Direction;
+                        NPC[(int)NPC[A].Special2].Projectile = true;
+                        NPC[(int)NPC[A].Special2].Direction = NPC[A].Direction;
                         if(NPC[A].Direction > 0)
-                            NPC[NPC[A].Special2].Location.X = NPC[A].Location.X + 32;
+                            NPC[(int)NPC[A].Special2].Location.X = NPC[A].Location.X + 32;
                         else
-                            NPC[NPC[A].Special2].Location.X = NPC[A].Location.X - NPC[NPC[A].Special2].Location.Width;
-                        NPC[NPC[A].Special2].Location.Y = NPC[A].Location.Y;
+                            NPC[(int)NPC[A].Special2].Location.X = NPC[A].Location.X - NPC[(int)NPC[A].Special2].Location.Width;
+                        NPC[(int)NPC[A].Special2].Location.Y = NPC[A].Location.Y;
                     }
 
                     if(NPC[A].standingOnPlayer > 0 && !Player[NPC[A].standingOnPlayer].Controls.Run)

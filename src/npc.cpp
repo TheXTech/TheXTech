@@ -1973,7 +1973,7 @@ void NPCSpecial(int A)
                     {
                         if(npc.Special3 > 0)
                         {
-                            npc.Location.X = Block[npc.Special3].Location.X + Block[npc.Special3].Location.Width + 2;
+                            npc.Location.X = Block[(int)npc.Special3].Location.X + Block[(int)npc.Special3].Location.Width + 2;
                             npc.Location.Y += 2;
                         }
                         npc.Special = 4;
