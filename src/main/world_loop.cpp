@@ -521,7 +521,7 @@ void WorldLoop()
                     {
                         LevelBeatCode = 6;
                         //for(B = 1; B <= numWorldLevels; B++)
-                        for(auto *t2 : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
+                        for(auto *t2 : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_ID))
                         {
                             WorldLevel_t &level2 = *t2;
                             if(CheckCollision(WorldPlayer[1].Location, level2.Location))
@@ -597,7 +597,7 @@ void WorldLoop()
                         LevelBeatCode = 6;
 
                         //for(B = 1; B <= numWorldLevels; B++)
-                        for(auto *t2 : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
+                        for(auto *t2 : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_ID))
                         {
                             WorldLevel_t &level2 = *t2;
                             if(CheckCollision(WorldPlayer[1].Location, level2.Location))
