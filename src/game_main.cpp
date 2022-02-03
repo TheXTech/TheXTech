@@ -1743,8 +1743,17 @@ void DeleteSave(int world, int save)
     std::string timersPath = makeGameSavePath(w.WorldPath,
                                               w.WorldFile,
                                               fmt::format_ne("timers{0}.ini", save));
+
     if(Files::fileExists(timersPath))
         Files::deleteFile(timersPath);
+
+
+    std::string demosPath = makeGameSavePath(w.WorldPath,
+                                              w.WorldFile,
+                                              fmt::format_ne("demos-{0}.dmo", save));
+
+    if(Files::fileExists(demosPath))
+        Files::deleteFile(demosPath);
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
@@ -1780,6 +1789,7 @@ void CopySave(int world, int src, int dst)
 
     Files::copyFile(savePathDst, savePathSrc, true);
 
+
     std::string timersPathSrc = makeGameSavePath(w.WorldPath,
                                                  w.WorldFile,
                                                  fmt::format_ne("timers{0}.ini", src));
@@ -1787,6 +1797,15 @@ void CopySave(int world, int src, int dst)
                                                  w.WorldFile,
                                                  fmt::format_ne("timers{0}.ini", dst));
     Files::copyFile(timersPathDst, timersPathSrc, true);
+
+
+    std::string demosPathSrc = makeGameSavePath(w.WorldPath,
+                                                w.WorldFile,
+                                                fmt::format_ne("demos-{0}.dmo", src));
+    std::string demosPathDst = makeGameSavePath(w.WorldPath,
+                                                w.WorldFile,
+                                                fmt::format_ne("demos-{0}.dmo", dst));
+    Files::copyFile(demosPathDst, demosPathSrc, true);
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
