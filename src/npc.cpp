@@ -4522,9 +4522,9 @@ void SpecialNPC(int A)
             {
                 for(int Ei = 1; Ei <= numBlock; Ei++)
                 {
-                    if(!BlockNoClipping[Block[E].Type] &&
-                       !BlockIsSizable[Block[E].Type] &&
-                       !BlockOnlyHitspot1[Block[E].Type])
+                    if(!BlockNoClipping[Block[Ei].Type] &&
+                       !BlockIsSizable[Block[Ei].Type] &&
+                       !BlockOnlyHitspot1[Block[Ei].Type])
                     {
                         if(CheckCollision(tempLocation, Block[Ei].Location))
                             D = 1;
