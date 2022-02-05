@@ -1973,7 +1973,7 @@ void NPCSpecial(int A)
                     {
                         if(npc.Special3 > 0)
                         {
-                            npc.Location.X = Block[npc.Special3].Location.X + Block[npc.Special3].Location.Width + 2;
+                            npc.Location.X = Block[(int)npc.Special3].Location.X + Block[(int)npc.Special3].Location.Width + 2;
                             npc.Location.Y += 2;
                         }
                         npc.Special = 4;
@@ -4522,9 +4522,9 @@ void SpecialNPC(int A)
             {
                 for(int Ei = 1; Ei <= numBlock; Ei++)
                 {
-                    if(!BlockNoClipping[Block[E].Type] &&
-                       !BlockIsSizable[Block[E].Type] &&
-                       !BlockOnlyHitspot1[Block[E].Type])
+                    if(!BlockNoClipping[Block[Ei].Type] &&
+                       !BlockIsSizable[Block[Ei].Type] &&
+                       !BlockOnlyHitspot1[Block[Ei].Type])
                     {
                         if(CheckCollision(tempLocation, Block[Ei].Location))
                             D = 1;
@@ -5250,7 +5250,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
         {
             if(NPC[A].Type == 96 && NPC[A].Special > 0 && CheckEggs) // Check Eggs
             {
-                if(NPCIsYoshi[NPC[A].Special]) // Yoshi into mushroom (Egg)
+                if(NPCIsYoshi[(int)NPC[A].Special]) // Yoshi into mushroom (Egg)
                 {
                     // NPC(A).Special = 249
                     NPC[A].Special = 35; // Yoshi into boot
@@ -5290,7 +5290,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
             }
             if(NPC[A].Type == 96 && NPC[A].Special > 0 && CheckEggs) // Check Eggs
             {
-                if(NPCIsYoshi[NPC[A].Special] || NPCIsBoot[NPC[A].Special]) // Yoshi / boot into mushroom (Egg)
+                if(NPCIsYoshi[(int)NPC[A].Special] || NPCIsBoot[(int)NPC[A].Special]) // Yoshi / boot into mushroom (Egg)
                     NPC[A].Special = 250;
                 if(NPC[A].Special == 9 || NPC[A].Special == 184 || NPC[A].Special == 185) // mushrooms into hearts (eggs)
                     NPC[A].Special = 250;

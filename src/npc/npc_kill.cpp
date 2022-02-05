@@ -1582,9 +1582,9 @@ void KillNPC(int A, int B)
             }
         }
         else if(NPC[A].Type == 49 && NPC[A].Special2 > 0)
-            NPC[NPC[A].Special2].Special2 = A;
+            NPC[(int)NPC[A].Special2].Special2 = A;
         else if(NPC[A].Type == 50 && NPC[A].Special2 > 0)
-            NPC[NPC[A].Special2].Special2 = A;
+            NPC[(int)NPC[A].Special2].Special2 = A;
     }
     else
     {

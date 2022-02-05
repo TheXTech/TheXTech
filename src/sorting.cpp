@@ -165,8 +165,8 @@ void qSortBackgrounds(int min, int max)
 
 void FindBlocks()
 {
-    double A = 0;
-    double B = 0;
+    int A = 0;
+    int B = 0;
 //    int C = 0;
     int curBlk = 0;
 //    bool fBool = false;

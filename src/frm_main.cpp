@@ -22,7 +22,6 @@
 #include <Logger/logger.h>
 #include <Graphics/graphics_funcs.h>
 
-#include "control/joystick.h"
 #include "gfx.h"
 
 #ifdef CORE_EVERYTHING_SDL

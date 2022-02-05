@@ -1311,8 +1311,8 @@ void PlayerFrame(Player_t &p)
         }
         else
         {
-            doesPlayerMoves = !fEqual(p.Location.SpeedX,  NPC[p.VineNPC].Location.SpeedX) ||
-                               p.Location.SpeedY < NPC[p.VineNPC].Location.SpeedY - 0.1;
+            doesPlayerMoves = !fEqual(p.Location.SpeedX,  NPC[(int)p.VineNPC].Location.SpeedX) ||
+                               p.Location.SpeedY < NPC[(int)p.VineNPC].Location.SpeedY - 0.1;
         }
 
         if(doesPlayerMoves) // Or .Location.SpeedY > 0.1 Then
@@ -2527,7 +2527,7 @@ void YoshiEat(const int A)
             {
                 if(n.Type == 91)
                 {
-                    if(!NPCNoYoshi[n.Special])
+                    if(!NPCNoYoshi[(int)n.Special])
                     {
                         PlaySound(SFX_Grab);
                         n.Generator = false;
