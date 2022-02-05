@@ -163,7 +163,7 @@ void UpdateEditor()
 
     GetEditorControls();
 
-    if(!SharedCursor.Primary && !EditorControls.SwitchScreens)
+    if(!SharedCursor.Primary && !EditorControls.SwitchScreens && !EditorControls.TestPlay)
     {
         MouseRelease = true;
         MouseCancel = false;
@@ -2012,7 +2012,7 @@ void GetEditorControls()
         optCursor.current = OptCursor_t::LVL_ERASER;
         SetCursor();
     }
-    if(!WorldEditor && EditorControls.TestPlay)
+    if(!WorldEditor && EditorControls.TestPlay && MouseRelease)
     {
         EditorBackup();
         Backup_FullFileName = FullFileName;

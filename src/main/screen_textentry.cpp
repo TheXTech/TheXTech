@@ -490,6 +490,8 @@ bool Logic()
     {
         MenuCursorCanMove = false;
         MenuMouseRelease = false;
+        MouseRelease = false;
+        ScrollRelease = false;
         return true;
     }
 
