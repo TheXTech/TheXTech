@@ -240,10 +240,26 @@ void UpdateGraphics2(bool skipRepaint)
 //    Else
     double sLeft, sTop, sRight, sBottom;
     {
-        sLeft = -vScreenX[1] + 64;
-        sTop = -vScreenY[1] + 96;
-        sRight = -vScreenX[1] + vScreen[1].Width - 64;
-        sBottom = -vScreenY[1] + vScreen[1].Height - 64;
+        if(WorldEditor)
+        {
+            sLeft = -vScreenX[1];
+            sTop = -vScreenY[1];
+            sRight = -vScreenX[1] + vScreen[1].Width;
+            sBottom = -vScreenY[1] + vScreen[1].Height;
+        }
+        else
+        {
+            sLeft = -vScreenX[1] + 64;
+            sTop = -vScreenY[1] + 96;
+            sRight = -vScreenX[1] + vScreen[1].Width - 64;
+            sBottom = -vScreenY[1] + vScreen[1].Height - 64;
+        }
+
+        Location_t sView;
+        sView.X = sLeft;
+        sView.Y = sTop;
+        sView.Width = sRight - sLeft;
+        sView.Height = sBottom - sTop;
 
         //for(A = 1; A <= numTiles; A++)
         for(Tile_t* t : treeWorldTileQuery(sLeft, sTop, sRight, sBottom, true))
@@ -252,7 +268,7 @@ void UpdateGraphics2(bool skipRepaint)
             SDL_assert(IF_INRANGE(tile.Type, 1, maxTileType));
 
             g_stats.checkedTiles++;
-            if(vScreenCollision2(1, tile.Location))
+            if(CheckCollision(sView, tile.Location))
             {
                 g_stats.renderedTiles++;
 //                XRender::renderTexture(vScreenX[Z] + Tile[A].Location.X, vScreenY[Z] + Tile[A].Location.Y, Tile[A].Location.Width, Tile[A].Location.Height, GFXTile[Tile[A].Type], 0, TileHeight[Tile[A].Type] * TileFrame[Tile[A].Type]);
@@ -271,7 +287,7 @@ void UpdateGraphics2(bool skipRepaint)
             SDL_assert(IF_INRANGE(scene.Type, 1, maxSceneType));
 
             g_stats.checkedScenes++;
-            if(vScreenCollision2(1, scene.Location) && scene.Active)
+            if(CheckCollision(sView, scene.Location) && (WorldEditor || scene.Active))
             {
                 g_stats.renderedScenes++;
 //                XRender::renderTexture(vScreenX[Z] + scene.Location.X, vScreenY[Z] + scene.Location.Y, scene.Location.Width, scene.Location.Height, GFXSceneMask[scene.Type], 0, SceneHeight[scene.Type] * SceneFrame[scene.Type]);
@@ -290,7 +306,7 @@ void UpdateGraphics2(bool skipRepaint)
             SDL_assert(IF_INRANGE(path.Type, 1, maxPathType));
 
             g_stats.checkedPaths++;
-            if(vScreenCollision2(1, path.Location) && path.Active)
+            if(CheckCollision(sView, path.Location) && (WorldEditor || path.Active))
             {
                 g_stats.renderedPaths++;
 //                XRender::renderTexture(vScreenX[Z] + path.Location.X, vScreenY[Z] + path.Location.Y, path.Location.Width, path.Location.Height, GFXPathMask[path.Type], 0, 0);
@@ -309,7 +325,7 @@ void UpdateGraphics2(bool skipRepaint)
             SDL_assert(IF_INRANGE(level.Type, 0, maxLevelType));
 
             g_stats.checkedLevels++;
-            if(vScreenCollision2(1, level.Location) && level.Active)
+            if(CheckCollision(sView, level.Location) && (WorldEditor || level.Active))
             {
                 g_stats.renderedLevels++;
                 if(level.Path)
@@ -367,8 +383,8 @@ void UpdateGraphics2(bool skipRepaint)
                 SuperPrint(std::to_string(music.Type), 1, vScreenX[Z] + music.Location.X + 2, vScreenY[Z] + music.Location.Y + 2);
             }
         }
-        // TODO: port remainder of editor UI from devel
-        // DrawEditorWorld();
+
+        DrawEditorWorld();
     }
     else
     { // NOT AN EDITOR!!!
@@ -688,7 +704,10 @@ void UpdateGraphics2(bool skipRepaint)
 
 
         speedRun_renderTimer();
+    }
 
+    // this code is for both non-editor and editor cases
+    {
         // render special screens
         if(GamePaused == PauseCode::PauseScreen)
             PauseScreen::Render();

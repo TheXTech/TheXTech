@@ -113,6 +113,14 @@ bool GFX_t::load()
         return false;
     }
 
+    loadImage(EIcons, uiPath + "EditorIcons.png");
+
+    if(m_loadErrors > 0)
+    {
+        pLogWarning("Missing new editor icons.");
+        m_loadErrors = 0;
+    }
+
     return true;
 }
 

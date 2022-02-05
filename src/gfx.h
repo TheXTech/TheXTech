@@ -59,6 +59,7 @@ public:
     RangeArr<StdPicture, 1, 2> Tongue;
     StdPicture Warp;
     StdPicture YoshiWings;
+    StdPicture EIcons;
 };
 
 //! Container of "hardcoded" (no more) graphics

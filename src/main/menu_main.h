@@ -26,6 +26,14 @@
 #include "global_constants.h"
 #include "range_arr.hpp"
 
+struct SelectWorld_t;
+extern int NumSelectWorld;
+extern int NumSelectWorldEditable; // NEW
+extern int NumSelectBattle; // NEW
+extern std::vector<SelectWorld_t> SelectWorld;
+extern std::vector<SelectWorld_t> SelectWorldEditable; // NEW
+extern std::vector<SelectWorld_t> SelectBattle; // NEW
+
 // Menu modes
 enum
 {
@@ -39,6 +47,8 @@ enum
     MENU_BATTLE_MODE = 4,
     // Options menu
     MENU_OPTIONS = 3,
+    // Editor mode episode select
+    MENU_EDITOR = 9,
 
     // Character select for single player game
     MENU_CHARACTER_SELECT_1P    = 100,
@@ -83,6 +93,7 @@ struct MainMenuContent
     std::string main1PlayerGame;
     std::string mainMultiplayerGame;
     std::string mainBattleGame;
+    std::string mainEditor;
     std::string mainOptions;
     std::string mainExit;
 

@@ -321,7 +321,7 @@ int PauseGame(PauseCode code, int plr)
 
     int prev_cursor = XWindow::showCursor(-1);
 
-    if(!GameMenu)
+    if(!GameMenu && !LevelEditor)
     {
         for(int A = numPlayers; A >= 1; A--)
             SavedChar[Player[A].Character] = Player[A];
@@ -372,7 +372,7 @@ int PauseGame(PauseCode code, int plr)
             CheckActive();
 
             speedRun_tick();
-            if(LevelSelect && !GameMenu)
+            if((LevelSelect && !GameMenu) || WorldEditor)
                 UpdateGraphics2();
             else
                 UpdateGraphics();

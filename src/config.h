@@ -30,6 +30,8 @@ extern struct Config_t
     bool    RecordGameplayData = false;
     //! Use the native onscreen keyboard instead of the TheXTech one
     bool    use_native_osk = false;
+    //! Enable the in-game editor
+    bool    enable_editor = true;
 
     /* ---- Video ----*/
 

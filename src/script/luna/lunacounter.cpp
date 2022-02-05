@@ -32,6 +32,7 @@
 #include "graphics.h"
 #include "game_main.h"
 #include "core/render.h"
+#include "main/menu_main.h"
 
 
 DeathCounter gDeathCounter;
@@ -50,7 +51,7 @@ void DeathCounter::init()
     if(counterFile.empty())
     {
         // prevent a segfault
-        if(TestLevel || selWorld < 0 || selWorld >= (int)SelectWorld.size())
+        if(TestLevel || selWorld < 0 || selWorld >= (int)SelectWorld.size() || BattleMode || LevelEditor)
         {
             mEnabled = false;
             return;

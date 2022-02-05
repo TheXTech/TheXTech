@@ -547,7 +547,8 @@ void UpdateGraphics(bool skipRepaint)
 
 
 //    If LevelEditor = False Then  'Sets up the screens if not in level editor
-    { // NOT AN EDITOR
+    if(!LevelEditor)
+    {
         if(ScreenType == 1)
             numScreens = 2;
         if(ScreenType == 4)
@@ -578,20 +579,16 @@ void UpdateGraphics(bool skipRepaint)
         if(SingleCoop == 2)
             Z = 2;
 
-//        If LevelEditor = True Then
-//            S = curSection
-//        ElseIf nPlay.Online = True Then
-//            S = Player(nPlay.MySlot + 1).Section
-//        Else
-        {
+        if(LevelEditor)
+            S = curSection;
+        else
             S = Player[Z].Section;
-//        End If
-        }
 
         // not sure why this is getting set over and over again
         if(GameOutro)
             ScreenType = 7;
-//        If LevelEditor = False Then
+
+        if(!LevelEditor)
         {
             if(ScreenType == 2 || ScreenType == 3)
                 GetvScreenAverage();
@@ -662,41 +659,39 @@ void UpdateGraphics(bool skipRepaint)
 
         DrawBackground(S, Z);
 
-
-//            If LevelEditor = True Then
-//                If BlockFlash <= 30 Then
-//                    With tempLocation 'Black out the level edges
-//                        .X = level(curSection).X
-//                        .Y = level(curSection).Y
-//                        .Width = level(curSection).Width
-//                        .Height = level(curSection).Height
-//                        BitBlt myBackBuffer, 0, 0, vScreenX(Z) + level(curSection).X, vScreen(Z).Height, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        BitBlt myBackBuffer, 0, 0, vScreenX(Z) + level(curSection).Width, vScreenY(Z) + level(curSection).Y, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        If -vScreenX(Z) < level(curSection).Width Then
-//                            BitBlt myBackBuffer, vScreenX(Z) + level(curSection).Width, 0, vScreen(Z).Width, vScreen(Z).Height, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        Else
-//                            BitBlt myBackBuffer, 0, 0, vScreen(Z).Width, vScreen(Z).Height, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        End If
-//                        If -vScreenY(Z) < level(curSection).Height Then
-//                            BitBlt myBackBuffer, 0, vScreenY(Z) + level(curSection).Height, vScreen(Z).Width, vScreen(Z).Height, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        Else
-//                            BitBlt myBackBuffer, 0, 0, vScreen(Z).Width, vScreen(Z).Height, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        End If
-//                    End With
-//                End If
-//            End If
+        // don't show background outside of the current section!
+        if(LevelEditor)
+        {
+            if(vScreenX[Z] + level[S].X > 0) {
+                XRender::renderRect(0, 0,
+                                   vScreenX[Z] + level[S].X, ScreenH, 0.2f, 0.2f, 0.2f, 1.f, true);
+            }
+            if(ScreenW > level[S].Width + vScreenX[Z]) {
+                XRender::renderRect(level[S].Width + vScreenX[Z], 0,
+                                   ScreenW - (level[S].Width + vScreenX[Z]), ScreenH, 0.2f, 0.2f, 0.2f, 1.f, true);
+            }
+            if(vScreenY[Z] + level[S].Y > 0) {
+                XRender::renderRect(0, 0,
+                                   ScreenW, vScreenY[Z] + level[S].Y, 0.2f, 0.2f, 0.2f, 1.f, true);
+            }
+            if(ScreenH > level[S].Height + vScreenY[Z]) {
+                XRender::renderRect(0, level[S].Height + vScreenY[Z],
+                                   ScreenW, ScreenH - (level[S].Height + vScreenY[Z]), 0.2f, 0.2f, 0.2f, 1.f, true);
+            }
+        }
 
 
 //        If GameMenu = True Then
-        if(GameMenu)
-        {
+        // if(GameMenu)
+        // {
             // (Commented out in original code :thinking:)
             // Curtain
 //            XRender::renderTexture(0, 0, GFX.MenuGFX[1]);
             // Game logo
 //            XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70, GFX.MenuGFX[2]);
 //        ElseIf LevelEditor = False Then
-        } else { // it's NO editor, obviously
+        if(!GameMenu && !LevelEditor)
+        {
 //            If numPlayers > 2 And nPlay.Online = False Then
             if(numPlayers > 2)
             {
@@ -752,23 +747,31 @@ void UpdateGraphics(bool skipRepaint)
 //        End If
         }
 
-//        If LevelEditor = True Or MagicHand = True Then
-//            For A = 1 To numBackground 'First backgrounds
-//                With Background(A)
-//                    If .Type = 11 Then
-//                        If vScreenCollision(Z, .Location) And .Hidden = False Then
-//                            BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, BackgroundWidth(.Type), BackgroundHeight(.Type), GFXBackgroundMask(.Type), 0, 0, vbSrcAnd
-//                            BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, BackgroundWidth(.Type), BackgroundHeight(.Type), GFXBackground(.Type), 0, 0, vbSrcPaint
-//                        End If
-//                    ElseIf .Type = 12 Or .Type = 60 Or .Type = 61 Or .Type = 75 Or .Type = 76 Or .Type = 77 Or .Type = 78 Or .Type = 79 Then
-//                        If vScreenCollision(Z, .Location) And .Hidden = False Then
-//                            BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, BackgroundWidth(.Type), BackgroundHeight(.Type), GFXBackground(.Type), 0, 0, vbSrcCopy
-//                        End If
-//                    End If
-//                End With
-//            Next A
-//        Else
-        {// NOT AN EDITOR
+        if(LevelEditor)
+        {
+            For(A, 1, numBackground)
+            {
+                if(Background[A].Type == 11 || Background[A].Type == 12 || Background[A].Type == 60
+                    || Background[A].Type == 61 || Background[A].Type == 75 || Background[A].Type == 76
+                    || Background[A].Type == 77 || Background[A].Type == 78 || Background[A].Type == 79)
+                {
+                    g_stats.checkedBGOs++;
+                    if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+                    {
+                        g_stats.renderedBGOs++;
+                        XRender::renderTexture(vScreenX[Z] + Background[A].Location.X,
+                                              vScreenY[Z] + Background[A].Location.Y,
+                                              GFXBackgroundWidth[Background[A].Type],
+                                              BackgroundHeight[Background[A].Type],
+                                              GFXBackgroundBMP[Background[A].Type], 0,
+                                              BackgroundHeight[Background[A].Type] *
+                                              BackgroundFrame[Background[A].Type]);
+                    }
+                }
+            }
+        }
+        else
+        {
 //            For A = 1 To MidBackground - 1 'First backgrounds
             For(A, 1, MidBackground - 1)  // First backgrounds
             {
@@ -863,24 +866,30 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-//        If LevelEditor = True Or MagicHand = True Then
-//            For A = 1 To numBackground 'Second backgrounds
-//                With Background(A)
-//                    If Not (.Type = 11 Or .Type = 12 Or .Type = 60 Or .Type = 61 Or .Type = 75 Or .Type = 76 Or .Type = 77 Or .Type = 78 Or .Type = 79) Then
-//                        If vScreenCollision(Z, .Location) And .Hidden = False Then
-//                            If BackgroundHasNoMask(.Type) = False Then
-//                                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, BackgroundWidth(.Type), BackgroundHeight(.Type), GFXBackgroundMask(.Type), 0, BackgroundHeight(.Type) * BackgroundFrame(.Type), vbSrcAnd
-//                                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, BackgroundWidth(.Type), BackgroundHeight(.Type), GFXBackground(.Type), 0, BackgroundHeight(.Type) * BackgroundFrame(.Type), vbSrcPaint
-//                            Else
-//                                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, BackgroundWidth(.Type), BackgroundHeight(.Type), GFXBackground(.Type), 0, BackgroundHeight(.Type) * BackgroundFrame(.Type), vbSrcCopy
-//                            End If
-//                        End If
-//                    End If
-//                End With
-//            Next A
-//        Else
-        if(numBackground > 0)
-        { // NOT AN EDITOR
+        if(LevelEditor)
+        {
+            For(A, 1, numBackground)
+            {
+                if(!(Background[A].Type == 11 || Background[A].Type == 12 || Background[A].Type == 60
+                    || Background[A].Type == 61 || Background[A].Type == 75 || Background[A].Type == 76
+                    || Background[A].Type == 77 || Background[A].Type == 78 || Background[A].Type == 79) && !Foreground[Background[A].Type])
+                {
+                    g_stats.checkedBGOs++;
+                    if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+                    {
+                        g_stats.renderedBGOs++;
+                        XRender::renderTexture(vScreenX[Z] + Background[A].Location.X,
+                                              vScreenY[Z] + Background[A].Location.Y,
+                                              GFXBackgroundWidth[Background[A].Type],
+                                              BackgroundHeight[Background[A].Type],
+                                              GFXBackgroundBMP[Background[A].Type], 0,
+                                              BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                    }
+                }
+            }
+        }
+        else if(numBackground > 0)
+        {
             for(A = MidBackground; A <= LastBackground; A++) // Second backgrounds
             {
                 g_stats.checkedBGOs++;
@@ -1402,15 +1411,16 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
-//        If LevelEditor = True Then
-//            fBlock = 1
-//            lBlock = numBlock
-//        Else
-        { // NOT AN EDITOR!!!
+        if(LevelEditor)
+        {
+            fBlock = 1;
+            lBlock = numBlock;
+        }
+        else
+        {
             //fBlock = FirstBlock[int(-vScreenX[Z] / 32) - 1];
             //lBlock = LastBlock[int((-vScreenX[Z] + vScreen[Z].Width) / 32) + 1];
             blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
-//        End If
         }
 
 
@@ -1924,25 +1934,28 @@ void UpdateGraphics(bool skipRepaint)
 
 
 
-//        If LevelEditor = True Or MagicHand = True Then
-//            For A = 1 To numBackground 'Foreground objects
-//                With Background(A)
-//                    If Foreground(.Type) = True Then
-//                        If vScreenCollision(Z, .Location) And .Hidden = False Then
-//                            If BackgroundHasNoMask(.Type) Then
-//                                'BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, GFXBackgroundWidth(.Type), GFXBackgroundHeight(.Type), GFXBackground(.Type), 0, 0, vbSrcCopy
-//                                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, GFXBackgroundWidth(.Type), BackgroundHeight(.Type), GFXBackground(.Type), 0, BackgroundHeight(.Type) * BackgroundFrame(.Type), vbSrcCopy
-//                            Else
-//                                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, BackgroundWidth(.Type), BackgroundHeight(.Type), GFXBackgroundMask(.Type), 0, BackgroundHeight(.Type) * BackgroundFrame(.Type), vbSrcAnd
-//                                BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, BackgroundWidth(.Type), BackgroundHeight(.Type), GFXBackground(.Type), 0, BackgroundHeight(.Type) * BackgroundFrame(.Type), vbSrcPaint
-//                            End If
-//                        End If
-//                    End If
-//                End With
-//            Next A
-//        Else
-
-        { // NOT AN EDITOR
+        if(LevelEditor)
+        {
+            For(A, 1, numBackground)
+            {
+                if(Foreground[Background[A].Type])
+                {
+                    g_stats.checkedBGOs++;
+                    if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+                    {
+                        g_stats.renderedBGOs++;
+                        XRender::renderTexture(vScreenX[Z] + Background[A].Location.X,
+                                              vScreenY[Z] + Background[A].Location.Y,
+                                              GFXBackgroundWidth[Background[A].Type],
+                                              BackgroundHeight[Background[A].Type],
+                                              GFXBackgroundBMP[Background[A].Type], 0,
+                                              BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                    }
+                }
+            }
+        }
+        else
+        {
             for(A = LastBackground + 1; A <= numBackground; A++) // Foreground objects
             {
                 g_stats.checkedBGOs++;
@@ -2064,24 +2077,22 @@ void UpdateGraphics(bool skipRepaint)
 //        Next A
         }
 
-//        'water
-//        If LevelEditor = True Then
-//            For B = 1 To numWater
-//                With Water(B)
-//                    If .Hidden = False Then
-//                        For A = 1 To .Location.Height / 32
-//                            BitBlt myBackBuffer, .Location.X + vScreenX(Z), .Location.Y + vScreenY(Z) + 32 * A - 32, 2, 32, GFX.Water.hdc, 0, 0, vbSrcCopy
-//                            BitBlt myBackBuffer, .Location.X + vScreenX(Z) + .Location.Width - 2, .Location.Y + vScreenY(Z) + 32 * A - 32, 2, 32, GFX.Water.hdc, 0, 0, vbSrcCopy
-//                        Next A
-//                        For A = 1 To .Location.Width / 32
-//                            BitBlt myBackBuffer, .Location.X + vScreenX(Z) + 32 * A - 32, .Location.Y + vScreenY(Z), 32, 2, GFX.Water.hdc, 0, 0, vbSrcCopy
-//                            BitBlt myBackBuffer, .Location.X + vScreenX(Z) + 32 * A - 32, .Location.Y + vScreenY(Z) + .Location.Height - 2, 32, 2, GFX.Water.hdc, 0, 0, vbSrcCopy
-//                        Next A
-//                    End If
-//                End With
-//            Next B
-//        End If
-
+        // water
+        if(LevelEditor)
+        {
+            for(B = 1; B <= numWater; B++)
+            {
+                if(!Water[B].Hidden && vScreenCollision(Z, Water[B].Location))
+                {
+                    if(Water[B].Quicksand)
+                        XRender::renderRect(vScreenX[Z] + Water[B].Location.X, vScreenY[Z] + Water[B].Location.Y, Water[B].Location.Width, Water[B].Location.Height,
+                            1.f, 1.f, 0.f, 1.f, false);
+                    else
+                        XRender::renderRect(vScreenX[Z] + Water[B].Location.X, vScreenY[Z] + Water[B].Location.Y, Water[B].Location.Width, Water[B].Location.Height,
+                            0.f, 1.f, 1.f, 1.f, false);
+                }
+            }
+        }
 
         if(!LevelEditor) // Graphics for the main game.
         {
@@ -2221,426 +2232,8 @@ void UpdateGraphics(bool skipRepaint)
 //        If LevelEditor = True Or MagicHand = True Then
         if((LevelEditor || MagicHand) && GamePaused == PauseCode::None)
         {
-            // TODO: port the editor code (`gfx_editor.cpp`) from multires
-
-#if 0 //.Useless editor-only stuff
-//            If LevelEditor = True Then
-            if(LevelEditor)
-            {
-
-    //            BlockFlash += 1
-                BlockFlash += 1;
-
-    //            If BlockFlash > 45 Then BlockFlash = 0
-                if(BlockFlash > 45)
-                    BlockFlash = 0;
-
-    //            If BlockFlash <= 30 Then
-                if(BlockFlash <= 30)
-                {
-    //                For A = 1 To numBlock
-    //                    If Block(A).Special > 1000 Then
-    //                        If Block(A).Hidden = False Then
-    //                            If vScreenCollision(Z, Block(A).Location) Then
-    //                                If NPCWidthGFX(Block(B).Special - 1000) = 0 Then
-    //                                    tempLocation.X = Block(A).Location.X + Block(A).Location.Width / 2 - NPCWidth(Block(A).Special - 1000) / 2
-    //                                    tempLocation.Y = Block(A).Location.Y + Block(A).Location.Height / 2 - NPCHeight(Block(A).Special - 1000) / 2
-    //                                    tempLocation.Height = NPCHeight(Block(A).Special - 1000)
-    //                                    tempLocation.Width = NPCWidth(Block(A).Special - 1000)
-    //                                    BitBlt myBackBuffer, vScreenX(Z) + tempLocation.X + NPCFrameOffsetX(Block(A).Special - 1000), vScreenY(Z) + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPCMask(Block(A).Special - 1000), 0, EditorNPCFrame(Block(A).Special - 1000, -1) * tempLocation.Height, vbSrcAnd
-    //                                    BitBlt myBackBuffer, vScreenX(Z) + tempLocation.X + NPCFrameOffsetX(Block(A).Special - 1000), vScreenY(Z) + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC(Block(A).Special - 1000), 0, EditorNPCFrame(Block(A).Special - 1000, -1) * tempLocation.Height, vbSrcPaint
-    //                                Else
-    //                                    tempLocation.X = Block(A).Location.X + Block(A).Location.Width / 2 - NPCWidthGFX(Block(A).Special - 1000) / 2
-    //                                    tempLocation.Y = Block(A).Location.Y + Block(A).Location.Height / 2 - NPCHeightGFX(Block(A).Special - 1000) / 2
-    //                                    tempLocation.Height = NPCHeightGFX(Block(A).Special - 1000)
-    //                                    tempLocation.Width = NPCWidthGFX(Block(A).Special - 1000)
-    //                                    BitBlt myBackBuffer, vScreenX(Z) + tempLocation.X + (NPCFrameOffsetX(Block(A).Special - 1000)) - NPCWidthGFX(Block(A).Special - 1000) / 2 + tempLocation.Width / 2, vScreenY(Z) + tempLocation.Y + NPCFrameOffsetY(Block(A).Special - 1000) - NPCHeightGFX(Block(A).Special - 1000) + tempLocation.Height, NPCWidthGFX(Block(A).Special - 1000), NPCHeightGFX(Block(A).Special - 1000), GFXNPCMask(Block(A).Special - 1000), 0, EditorNPCFrame(Block(A).Special - 1000, -1) * NPCHeightGFX(Block(A).Special - 1000), vbSrcAnd
-    //                                    BitBlt myBackBuffer, vScreenX(Z) + tempLocation.X + (NPCFrameOffsetX(Block(A).Special - 1000)) - NPCWidthGFX(Block(A).Special - 1000) / 2 + tempLocation.Width / 2, vScreenY(Z) + tempLocation.Y + NPCFrameOffsetY(Block(A).Special - 1000) - NPCHeightGFX(Block(A).Special - 1000) + tempLocation.Height, NPCWidthGFX(Block(A).Special - 1000), NPCHeightGFX(Block(A).Special - 1000), GFXNPC(Block(A).Special - 1000), 0, EditorNPCFrame(Block(A).Special - 1000, -1) * NPCHeightGFX(Block(A).Special - 1000), vbSrcPaint
-    //                                End If
-    //                            End If
-    //                        End If
-    //                    ElseIf Block(A).Special > 0 And Block(A).Hidden = False Then
-    //                        tempLocation.X = Block(A).Location.X + Block(A).Location.Width / 2 - NPCWidth(10) / 2
-    //                        tempLocation.Y = Block(A).Location.Y + Block(A).Location.Height / 2 - NPCHeight(10) / 2
-    //                        tempLocation.Height = NPCHeight(10)
-    //                        tempLocation.Width = NPCWidth(10)
-    //                        BitBlt myBackBuffer, vScreenX(Z) + tempLocation.X + NPCFrameOffsetX(10), vScreenY(Z) + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPCMask(10), 0, EditorNPCFrame(10, -1) * tempLocation.Height, vbSrcAnd
-    //                        BitBlt myBackBuffer, vScreenX(Z) + tempLocation.X + NPCFrameOffsetX(10), vScreenY(Z) + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC(10), 0, EditorNPCFrame(10, -1) * tempLocation.Height, vbSrcPaint
-    //                    End If
-    //                Next A
-
-    //                For A = 1 To numNPCs
-    //                    If NPC(A).Hidden = False And (NPC(A).Type = 91 Or NPC(A).Type = 96) Then
-    //                        If NPC(A).Special > 0 Then
-    //                            If vScreenCollision(Z, NPC(A).Location) Then
-    //                                If NPCWidthGFX(NPC(A).Special) = 0 Then
-    //                                    tempLocation.Height = NPCHeight(NPC(A).Special)
-    //                                    tempLocation.Width = NPCWidth(NPC(A).Special)
-    //                                    If NPC(A).Type = 96 Then
-    //                                        tempLocation.Y = NPC(A).Location.Y + NPC(A).Location.Height - tempLocation.Height
-    //                                    Else
-    //                                        tempLocation.Y = NPC(A).Location.Y
-    //                                    End If
-    //                                    tempLocation.X = NPC(A).Location.X + NPC(A).Location.Width / 2 - tempLocation.Width / 2
-    //                                    BitBlt myBackBuffer, vScreenX(Z) + tempLocation.X + NPCFrameOffsetX(NPC(A).Special), vScreenY(Z) + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPCMask(NPC(A).Special), 0, EditorNPCFrame(Int(NPC(A).Special), -1) * tempLocation.Height, vbSrcAnd
-    //                                    BitBlt myBackBuffer, vScreenX(Z) + tempLocation.X + NPCFrameOffsetX(NPC(A).Special), vScreenY(Z) + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC(NPC(A).Special), 0, EditorNPCFrame(Int(NPC(A).Special), -1) * tempLocation.Height, vbSrcPaint
-    //                                Else
-    //                                    tempLocation.Height = NPCHeightGFX(NPC(A).Special)
-    //                                    tempLocation.Width = NPCWidthGFX(NPC(A).Special)
-    //                                    If NPC(A).Type = 96 Then
-    //                                        tempLocation.Y = NPC(A).Location.Y + NPC(A).Location.Height - tempLocation.Height
-    //                                    Else
-    //                                        tempLocation.Y = NPC(A).Location.Y
-    //                                    End If
-    //                                    tempLocation.X = NPC(A).Location.X + NPC(A).Location.Width / 2 - tempLocation.Width / 2
-    //                                    BitBlt myBackBuffer, vScreenX(Z) + tempLocation.X + (NPCFrameOffsetX(NPC(A).Special)) - NPCWidthGFX(NPC(A).Special) / 2 + tempLocation.Width / 2, vScreenY(Z) + tempLocation.Y + NPCFrameOffsetY(NPC(A).Special) - NPCHeightGFX(NPC(A).Special) + tempLocation.Height, NPCWidthGFX(NPC(A).Special), NPCHeightGFX(NPC(A).Special), GFXNPCMask(NPC(A).Special), 0, EditorNPCFrame(Int(NPC(A).Special), -1) * NPCHeightGFX(NPC(A).Special), vbSrcAnd
-    //                                    BitBlt myBackBuffer, vScreenX(Z) + tempLocation.X + (NPCFrameOffsetX(NPC(A).Special)) - NPCWidthGFX(NPC(A).Special) / 2 + tempLocation.Width / 2, vScreenY(Z) + tempLocation.Y + NPCFrameOffsetY(NPC(A).Special) - NPCHeightGFX(NPC(A).Special) + tempLocation.Height, NPCWidthGFX(NPC(A).Special), NPCHeightGFX(NPC(A).Special), GFXNPC(NPC(A).Special), 0, EditorNPCFrame(Int(NPC(A).Special), -1) * NPCHeightGFX(NPC(A).Special), vbSrcPaint
-    //                                End If
-    //                            End If
-    //                        End If
-    //                    End If
-    //                Next A
-
-    //            End If
-                }
-
-
-    //            For A = 1 To 2 'Player start locations
-    //                If PlayerStart(A).Width > 0 Then
-    //                    C = Physics.PlayerHeight(testPlayer(A).Character, 2) - Physics.PlayerHeight(A, 2)
-    //                    If vScreenCollision(Z, PlayerStart(A)) Then
-    //                        If testPlayer(A).Character = 1 Then
-    //                            BitBlt myBackBuffer, vScreenX(Z) + Int(PlayerStart(A).X) + MarioFrameX(201), vScreenY(Z) + PlayerStart(A).Y + MarioFrameY(201) - C, 99, 99, GFXMarioMask(2), 500, 0, vbSrcAnd
-    //                            BitBlt myBackBuffer, vScreenX(Z) + Int(PlayerStart(A).X) + MarioFrameX(201), vScreenY(Z) + PlayerStart(A).Y + MarioFrameY(201) - C, 99, 99, GFXMario(2), 500, 0, vbSrcPaint
-    //                        ElseIf testPlayer(A).Character = 2 Then
-    //                            BitBlt myBackBuffer, vScreenX(Z) + Int(PlayerStart(A).X) + LuigiFrameX(201), vScreenY(Z) + PlayerStart(A).Y + LuigiFrameY(201) - C, 99, 99, GFXLuigiMask(2), 500, 0, vbSrcAnd
-    //                            BitBlt myBackBuffer, vScreenX(Z) + Int(PlayerStart(A).X) + LuigiFrameX(201), vScreenY(Z) + PlayerStart(A).Y + LuigiFrameY(201) - C, 99, 99, GFXLuigi(2), 500, 0, vbSrcPaint
-    //                        ElseIf testPlayer(A).Character = 3 Then
-    //                            BitBlt myBackBuffer, vScreenX(Z) + Int(PlayerStart(A).X) + PeachFrameX(201), vScreenY(Z) + PlayerStart(A).Y + PeachFrameY(201) - C, 99, 99, GFXPeachMask(2), 500, 0, vbSrcAnd
-    //                            BitBlt myBackBuffer, vScreenX(Z) + Int(PlayerStart(A).X) + PeachFrameX(201), vScreenY(Z) + PlayerStart(A).Y + PeachFrameY(201) - C, 99, 99, GFXPeach(2), 500, 0, vbSrcPaint
-    //                        ElseIf testPlayer(A).Character = 4 Then
-    //                            BitBlt myBackBuffer, vScreenX(Z) + Int(PlayerStart(A).X) + ToadFrameX(201), vScreenY(Z) + PlayerStart(A).Y + ToadFrameY(201) - C, 99, 99, GFXToadMask(2), 500, 0, vbSrcAnd
-    //                            BitBlt myBackBuffer, vScreenX(Z) + Int(PlayerStart(A).X) + ToadFrameX(201), vScreenY(Z) + PlayerStart(A).Y + ToadFrameY(201) - C, 99, 99, GFXToad(2), 500, 0, vbSrcPaint
-    //                        ElseIf testPlayer(A).Character = 5 Then
-    //                            BitBlt myBackBuffer, vScreenX(Z) + Int(PlayerStart(A).X) + LinkFrameX(201), vScreenY(Z) + PlayerStart(A).Y + LinkFrameY(201) - C, 99, 99, GFXLinkMask(2), 500, 0, vbSrcAnd
-    //                            BitBlt myBackBuffer, vScreenX(Z) + Int(PlayerStart(A).X) + LinkFrameX(201), vScreenY(Z) + PlayerStart(A).Y + LinkFrameY(201) - C, 99, 99, GFXLink(2), 500, 0, vbSrcPaint
-    //                        End If
-    //                    End If
-    //                End If
-    //            Next A
-
-    //            For A = 0 To maxSections 'Show sections
-    //                If A <> curSection Then
-    //                    With tempLocation
-    //                        .X = level(A).X
-    //                        .Y = level(A).Y
-    //                        .Width = level(A).Width - .X
-    //                        .Height = level(A).Height - .Y
-    //                        If .X < -vScreenX(Z) Then
-    //                            .Width += -(-vScreenX(Z) - .X)
-    //                            .X = -vScreenX(Z)
-
-    //                        End If
-    //                        If .Y < -vScreenY(Z) Then
-    //                            .Height += -(-vScreenY(Z) - .Y)
-    //                            .Y = -vScreenY(Z)
-    //                        End If
-    //                        BitBlt myBackBuffer, .X + vScreenX(Z), .Y + vScreenY(Z), .Width, .Height, 0, 0, 0, vbWhiteness
-    //                    End With
-    //                End If
-    //            Next A
-
-    //            For A = 1 To numWarps 'Warps
-    //                With Warp(A)
-    //                    If .Direction > 0 And .Hidden = False Then
-    //                        If .PlacedEnt = True Then
-    //                            BitBlt myBackBuffer, vScreenX(Z) + .Entrance.X, vScreenY(Z) + .Entrance.Y, .Entrance.Width, .Entrance.Height, GFX.WarpMask(1).hdc, 0, 0, vbSrcAnd
-    //                            BitBlt myBackBuffer, vScreenX(Z) + .Entrance.X, vScreenY(Z) + .Entrance.Y, .Entrance.Width, .Entrance.Height, GFX.Warp(1).hdc, 0, 0, vbSrcPaint
-    //                            SuperPrint Str(A), 1, Int(.Entrance.X + 2 + vScreenX(Z)), Int(.Entrance.Y + 2 + vScreenY(Z))
-    //                        End If
-    //                        If .PlacedExit = True Then
-    //                            BitBlt myBackBuffer, vScreenX(Z) + .Exit.X, vScreenY(Z) + .Exit.Y, .Exit.Width, .Exit.Height, GFX.WarpMask(1).hdc, 0, 0, vbSrcAnd
-    //                            BitBlt myBackBuffer, vScreenX(Z) + .Exit.X, vScreenY(Z) + .Exit.Y, .Exit.Width, .Exit.Height, GFX.Warp(1).hdc, 0, 0, vbSrcPaint
-    //                            SuperPrint Str(A), 1, Int(.Exit.X + .Exit.Width - 16 - 2 + vScreenX(Z)), Int(.Exit.Y + .Exit.Height - 14 - 2 + vScreenY(Z))
-    //                        End If
-    //                    End If
-    //                End With
-    //            Next A
-//            End If
-            }
-
-//            If LevelEditor = True Then
-            if(LevelEditor)
-            {
-//                If BlockFlash > 30 Or BlockFlash = 0 Then
-//                    With tempLocation 'Black out the level edges
-//                        .X = level(curSection).X
-//                        .Y = level(curSection).Y
-//                        .Width = level(curSection).Width
-//                        .Height = level(curSection).Height
-//                        BitBlt myBackBuffer, 0, 0, vScreenX(Z) + level(curSection).X, vScreen(Z).Height, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        BitBlt myBackBuffer, 0, 0, vScreenX(Z) + level(curSection).Width, vScreenY(Z) + level(curSection).Y, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        If -vScreenX(Z) < level(curSection).Width Then
-//                            BitBlt myBackBuffer, vScreenX(Z) + level(curSection).Width, 0, vScreen(Z).Width, vScreen(Z).Height, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        Else
-//                            BitBlt myBackBuffer, 0, 0, vScreen(Z).Width, vScreen(Z).Height, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        End If
-//                        If -vScreenY(Z) < level(curSection).Height Then
-//                            BitBlt myBackBuffer, 0, vScreenY(Z) + level(curSection).Height, vScreen(Z).Width, vScreen(Z).Height, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        Else
-//                            BitBlt myBackBuffer, 0, 0, vScreen(Z).Width, vScreen(Z).Height, GFX.Split(2).hdc, 0, 0, vbSrcCopy
-//                        End If
-//                    End With
-//                End If
-//            End If
-            }
-
-#endif
-
-//If nPlay.Online = True Then
-//    For A = 0 To 15
-//        With nPlay.Player(A)
-//            If nPlay.Player(A).Active = True And nPlay.Player(A).IsMe = False Then
-//                If nPlay.Player(A).Nick = "Redigit" Then
-//                    nPlay.Player(A).Cursor = Int(Rnd * 8)
-//                    If Rnd * 100 > 80 Then
-//                        NewEffect 80, newLoc(.ECurserX, .ECurserY)
-//                        Effect(numEffects).Location.SpeedX = Rnd * 4 - 2
-//                        Effect(numEffects).Location.SpeedY = Rnd * 4 - 2
-//                    End If
-//                End If
-//                BitBlt myBackBuffer, vScreenX(Z) + .ECurserX, vScreenY(Z) + .ECurserY, GFX.nCursor(.Cursor).ScaleWidth, GFX.nCursor(.Cursor).ScaleHeight, GFX.nCursorMask(.Cursor).hdc, 0, 0, vbSrcAnd
-//                BitBlt myBackBuffer, vScreenX(Z) + .ECurserX, vScreenY(Z) + .ECurserY, GFX.nCursor(.Cursor).ScaleWidth, GFX.nCursor(.Cursor).ScaleHeight, GFX.nCursor(.Cursor).hdc, 0, 0, vbSrcPaint
-//                SuperPrint UCase(.Nick), 3, vScreenX(Z) + .ECurserX + 28, vScreenY(Z) + .ECurserY + 34
-//            End If
-//        End With
-//    Next A
-//End If
-
-            if(!MessageText.empty()) // In-Editor message box preview
-                DrawMessage(MessageText);
-
-            // Display the cursor
-            {
-                auto &e = EditorCursor;
-                int curX = int(double(e.X) - vScreen[Z].Left);
-                int curY = int(double(e.Y) - vScreen[Z].Top);
-
-                if(e.Mode == OptCursor_t::LVL_BLOCKS) // Blocks
-                {
-                    auto &b = e.Block;
-                    if(BlockIsSizable[b.Type])
-                    {
-                        if(vScreenCollision(Z, b.Location))
-                        {
-                            for(B = 0; B <= (b.Location.Height / 32) - 1; B++)
-                            {
-                                for(C = 0; C <= (b.Location.Width / 32) - 1; C++)
-                                {
-                                    D = C;
-                                    E = B;
-
-                                    if(D != 0)
-                                    {
-                                        if(fEqual(D, (b.Location.Width / 32) - 1))
-                                            D = 2;
-                                        else
-                                        {
-                                            D = 1;
-                                            d2 = 0.5;
-                                        }
-                                    }
-
-                                    if(E != 0)
-                                    {
-                                        if(fEqual(E, (b.Location.Height / 32) - 1))
-                                            E = 2;
-                                        else
-                                            E = 1;
-                                    }
-
-                                    XRender::renderTexture(vScreenX[Z] + b.Location.X + C * 32,
-                                                          vScreenY[Z] + b.Location.Y + B * 32,
-                                                          32, 32, GFXBlock[b.Type], D * 32, E * 32);
-//                                    if((D == 0 || D == 2) || (E == 0 || E == 2))
-//                                    {
-//                                        XRender::renderTexture(vScreenX(Z) + .Location.X + C * 32, vScreenY(Z) + .Location.Y + B * 32, 32, 32, GFXBlock(.Type), D * 32, E * 32)
-//                                    }
-//                                    else
-//                                        XRender::renderTexture(vScreenX(Z) + .Location.X + C * 32, vScreenY(Z) + .Location.Y + B * 32, 32, 32, GFXBlock(.Type), D * 32, E * 32)
-
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if(vScreenCollision(Z, b.Location))
-                        {
-                            XRender::renderTexture(vScreenX[Z] + b.Location.X,
-                                                  vScreenY[Z] + b.Location.Y + b.ShakeY3,
-                                                  b.Location.Width,
-                                                  b.Location.Height,
-                                                  GFXBlock[b.Type], 0, BlockFrame[b.Type] * 32);
-                        }
-                    }
-                }
-
-                else if(e.Mode == OptCursor_t::LVL_SETTINGS) // Player start points
-                {
-//                    If frmLevelSettings.optLevel(4).Value = True Or frmLevelSettings.optLevel(5).Value = True Then
-//                        If frmLevelSettings.optLevel(4).Value = True Then
-//                            A = 1
-//                        Else
-//                            A = 2
-//                        End If
-//                        C = Physics.PlayerHeight(testPlayer(A).Character, 2) - Physics.PlayerHeight(A, 2)
-//                        With EditorCursor
-//                            If vScreenCollision(Z, .Location) Then
-//                                If testPlayer(A).Character = 1 Then
-//                                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + MarioFrameX(201), vScreenY(Z) + .Location.Y + MarioFrameY(201) - C, 99, 99, GFXMarioMask(2), 500, 0, vbSrcAnd
-//                                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + MarioFrameX(201), vScreenY(Z) + .Location.Y + MarioFrameY(201) - C, 99, 99, GFXMario(2), 500, 0, vbSrcPaint
-//                                ElseIf testPlayer(A).Character = 2 Then
-//                                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + LuigiFrameX(201), vScreenY(Z) + .Location.Y + LuigiFrameY(201) - C, 99, 99, GFXLuigiMask(2), 500, 0, vbSrcAnd
-//                                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + LuigiFrameX(201), vScreenY(Z) + .Location.Y + LuigiFrameY(201) - C, 99, 99, GFXLuigi(2), 500, 0, vbSrcPaint
-//                                ElseIf testPlayer(A).Character = 3 Then
-//                                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + PeachFrameX(201), vScreenY(Z) + .Location.Y + PeachFrameY(201) - C, 99, 99, GFXPeachMask(2), 500, 0, vbSrcAnd
-//                                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + PeachFrameX(201), vScreenY(Z) + .Location.Y + PeachFrameY(201) - C, 99, 99, GFXPeach(2), 500, 0, vbSrcPaint
-//                                ElseIf testPlayer(A).Character = 4 Then
-//                                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + ToadFrameX(201), vScreenY(Z) + .Location.Y + ToadFrameY(201) - C, 99, 99, GFXToadMask(2), 500, 0, vbSrcAnd
-//                                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + ToadFrameX(201), vScreenY(Z) + .Location.Y + ToadFrameY(201) - C, 99, 99, GFXToad(2), 500, 0, vbSrcPaint
-//                                ElseIf testPlayer(A).Character = 5 Then
-//                                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + LinkFrameX(201), vScreenY(Z) + .Location.Y + LinkFrameY(201) - C, 99, 99, GFXLinkMask(2), 500, 0, vbSrcAnd
-//                                    BitBlt myBackBuffer, vScreenX(Z) + Int(.Location.X) + LinkFrameX(201), vScreenY(Z) + .Location.Y + LinkFrameY(201) - C, 99, 99, GFXLink(2), 500, 0, vbSrcPaint
-//                                End If
-//                            End If
-//                        End With
-//                    End If
-                }
-
-                else if(e.Mode == OptCursor_t::LVL_BGOS) // BGOs
-                {
-                    auto &b = e.Background;
-                    if(vScreenCollision(Z, b.Location))
-                    {
-                        XRender::renderTexture(vScreenX[Z] + b.Location.X,
-                                              vScreenY[Z] + b.Location.Y,
-                                              BackgroundWidth[b.Type],
-                                              BackgroundHeight[b.Type],
-                                              GFXBackground[b.Type], 0,
-                                              BackgroundHeight[b.Type] * BackgroundFrame[b.Type]);
-                    }
-                }
-
-                else if(e.Mode == OptCursor_t::LVL_NPCS) // NPCs
-                {
-                    e.NPC.Frame = NPC[0].Frame;
-                    e.NPC.FrameCount = NPC[0].FrameCount;
-                    NPC[0] = e.NPC;
-                    NPCFrames(0);
-                    e.NPC = NPC[0];
-
-                    auto &n = e.NPC;
-                    if(NPCWidthGFX[n.Type] == 0)
-                    {
-                        XRender::renderTexture(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type],
-                                              vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type],
-                                              n.Location.Width,
-                                              n.Location.Height,
-                                              GFXNPC[n.Type], 0, n.Frame * n.Location.Height);
-                    }
-                    else
-                    {
-                        if(n.Type == 283 && n.Special > 0)
-                        {
-                            if(NPCWidthGFX[n.Special] == 0)
-                            {
-                                tempLocation.Width = NPCWidth[n.Special];
-                                tempLocation.Height = NPCHeight[n.Special];
-                            }
-                            else
-                            {
-                                tempLocation.Width = NPCWidthGFX[n.Special];
-                                tempLocation.Height = NPCHeightGFX[n.Special];
-                            }
-                            tempLocation.X = n.Location.X + n.Location.Width / 2 - tempLocation.Width / 2;
-                            tempLocation.Y = n.Location.Y + n.Location.Height / 2 - tempLocation.Height / 2;
-                            B = EditorNPCFrame(int(n.Special), n.Direction);
-
-                            XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[n.Type],
-                                                  vScreenY[Z] + tempLocation.Y,
-                                                  tempLocation.Width, tempLocation.Height,
-                                                  GFXNPC[n.Special], 0, B * tempLocation.Height);
-                        }
-
-                        XRender::renderTexture(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] - NPCWidthGFX[n.Type] / 2 + n.Location.Width / 2,
-                                              vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] - NPCHeightGFX[n.Type] + n.Location.Height,
-                                              NPCWidthGFX[n.Type], NPCHeightGFX[n.Type], GFXNPC[n.Type],
-                                              0, n.Frame * NPCHeightGFX[n.Type]);
-                    }
-                }
-
-                if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6) // Eraser
-                {
-                    XRender::renderTexture(curX - 2, curY, GFX.ECursor[3]);
-                }
-
-                else if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14) // Selector
-                {
-                    XRender::renderTexture(curX, curY, GFX.ECursor[2]);
-                }
-
-                // ElseIf .Mode = 2 And (frmLevelSettings.optLevel(0).Value = True Or frmLevelSettings.optLevel(1).Value = True Or frmLevelSettings.optLevel(2).Value = True Or frmLevelSettings.optLevel(3).Value = True) Then
-                else if(EditorCursor.Mode == 2)
-                {
-                    XRender::renderTexture(curX, curY, GFX.ECursor[1]);
-                }
-
-                else if(EditorCursor.Mode == 15) // Water
-                {
-//                    For A = 1 To .Location.Height / 32
-//                        BitBlt myBackBuffer, .Location.X + vScreenX(Z), .Location.Y + vScreenY(Z) + 32 * A - 32, 2, 32, GFX.Water.hdc, 0, 0, vbSrcCopy
-//                        BitBlt myBackBuffer, .Location.X + vScreenX(Z) + .Location.Width - 2, .Location.Y + vScreenY(Z) + 32 * A - 32, 2, 32, GFX.Water.hdc, 0, 0, vbSrcCopy
-//                    Next A
-//                    For A = 1 To .Location.Width / 32
-//                        BitBlt myBackBuffer, .Location.X + vScreenX(Z) + 32 * A - 32, .Location.Y + vScreenY(Z), 32, 2, GFX.Water.hdc, 0, 0, vbSrcCopy
-//                        BitBlt myBackBuffer, .Location.X + vScreenX(Z) + 32 * A - 32, .Location.Y + vScreenY(Z) + .Location.Height - 2, 32, 2, GFX.Water.hdc, 0, 0, vbSrcCopy
-//                    Next A
-//                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursorMask(2).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
-                    XRender::renderTexture(curX, curY, GFX.ECursor[2]);
-//                    If LCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)) <> "default" Then
-                    if(e.Layer != LAYER_NONE && e.Layer != LAYER_DEFAULT)
-//                        SuperPrint UCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)), 3, .X + 28, .Y + 34
-                        SuperPrint(GetL(e.Layer), 3, curX + 28, curY + 34);
-//                    End If
-                }
-//                Else
-                else
-                {
-//                    If .Mode = 5 Then
-                    if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
-                    {
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, 2, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y + .Location.Height - 2, .Location.Width, 2, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, 2, .Location.Height, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X + .Location.Width - 2, vScreenY(Z) + .Location.Y, 2, .Location.Height, GFX.Split(1).hdc, 0, 0, vbSrcCopy
-//                    End If
-                    }
-//                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursorMask(2).hdc, 0, 0, vbSrcAnd
-//                    BitBlt myBackBuffer, .X - vScreen(Z).Left, .Y - vScreen(Z).Top, 32, 32, GFX.ECursor(2).hdc, 0, 0, vbSrcPaint
-                    XRender::renderTexture(curX, curY, GFX.ECursor[2]);
-//                    If LCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)) <> "default" Then
-                    if(e.Layer != LAYER_NONE && e.Layer != LAYER_DEFAULT)
-//                        SuperPrint UCase(frmLayers.lstLayer.List(frmLayers.lstLayer.ListIndex)), 3, .X + 28, .Y + 34
-                        SuperPrint(GetL(e.Layer), 3, curX + 28, curY + 34);
-//                    End If
-//                End If
-                }
-
-//            End With
-            }
-//        End If
+            // editor code now located in `gfx_editor.cpp`
+            DrawEditorLevel(Z);
         }
 
         if(numScreens > 1) // for multiple screens

@@ -1090,14 +1090,19 @@ extern bool resChanged;
 
 //Public MessageText As String 'when talking to an npc
 extern std::string MessageText;
+
+// moved to menu_main.h
+
 //Public NumSelectWorld As Integer
-extern int NumSelectWorld;
+// extern int NumSelectWorld;
 //Public SelectWorld(1 To 100) As SelectWorld
-struct SelectWorld_t;
+// struct SelectWorld_t;
 //extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
-extern std::vector<SelectWorld_t> SelectWorld;
+// extern std::vector<SelectWorld_t> SelectWorld;
+
 extern std::string g_recentWorld1p;
 extern std::string g_recentWorld2p;
+extern std::string g_recentWorldEditor;
 //Public ShowFPS As Boolean
 extern bool ShowFPS;
 //Public PrintFPS As Double

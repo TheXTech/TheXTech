@@ -23,6 +23,9 @@
 #define EDITOR_H
 
 #include "location.h"
+#include <string>
+
+extern std::string Backup_FullFileName;
 
 struct Point_t
 {
@@ -30,6 +33,7 @@ struct Point_t
     int Y = 0;
 };
 
+extern Point_t CursorPos;
 extern bool HasCursor;
 extern bool NoReallyKillIt;
 extern int curSection;
@@ -63,6 +67,9 @@ extern OptCursor_t optCursor;
 void ResetSectionScrolls();
 void SetSection(int i);
 
+void EditorBackup();
+void EditorRestore();
+
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode
 extern void UpdateEditor();
@@ -71,6 +78,7 @@ extern void UpdateEditor();
 extern void UpdateInterprocess();
 #endif
 
+extern int EditorNPCFrame(const int A, int C, int N = 0);
 extern int EditorNPCFrame(const int A, float& C, int N = 0);
 
 extern void GetEditorControls();

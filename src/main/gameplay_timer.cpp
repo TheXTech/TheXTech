@@ -28,6 +28,7 @@
 #include "game_main.h"
 #include "globals.h"
 
+#include "menu_main.h"
 
 std::string GameplayTimer::formatTime(int64_t t)
 {

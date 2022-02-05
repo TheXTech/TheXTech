@@ -54,6 +54,7 @@
 #include "sound.h"
 #include "video.h"
 #include "editor.h"
+#include "editor/new_editor.h"
 #include "custom.h"
 #include "main/world_globals.h"
 #include "main/cheat_code.h"
@@ -95,6 +96,11 @@ static int loadingThread(void *waiter_ptr)
     SizableBlocks();
     LoadGFX(); // load the graphics from file
     SetupVars(); //Setup Variables
+
+#ifdef THEXTECH_PRELOAD_LEVELS
+    FindWorlds();
+    FindLevels();
+#endif
 
     InitSound(); // Setup sound effects
 
@@ -289,11 +295,47 @@ int GameMain(const CmdLineSetup_t &setup)
             XWindow::showCursor(1);
         }
 
-//        If LevelEditor = True Then 'Load the level editor
-//            [USELESS!]
+
+        if(LevelEditor) // Load the level editor
+        {
+            if(resChanged)
+                ChangeScreen();
+            BattleMode = false;
+            SingleCoop = 0;
+            numPlayers = 0;
+            ScreenType = 0;
+            XEvents::doEvents();
+            SetupEditorGraphics(); //Set up the editor graphics
+            SetupScreens();
+            MagicHand = false;
+            MouseRelease = false;
+            ScrollRelease = false;
+
+            // coming back from a level test
+            if(!WorldEditor)
+            {
+                EditorRestore();
+            }
+
+            // Run the frame-loop
+            runFrameLoop(&EditorLoop,
+                         nullptr,
+                        []()->bool{ return LevelEditor || WorldEditor;}, nullptr,
+                        nullptr,
+                        nullptr);
+
+            MenuMode = MENU_MAIN; // MENU_INTRO when this is implemented
+            LevelEditor = false;
+            WorldEditor = false;
+            XRender::clearBuffer();
+            XRender::repaint();
+#ifdef THEXTECH_PRELOAD_LEVELS
+            FindWorlds();
+#endif
+        }
 
         // TheXTech Credits
-        if(GameOutro)
+        else if(GameOutro)
         {
             ShadowMode = false;
             GodMode = false;
@@ -856,12 +898,29 @@ int GameMain(const CmdLineSetup_t &setup)
 //                LevelEditor = true;
 //                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
 
-                if(LevelBeatCode != 0)
-                    GameIsActive = false;
-                else
+                if(LevelBeatCode == 0)
                 {
                     GameThing();
                     zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
+                }
+                // from editor, return to editor
+                else if(!Backup_FullFileName.empty())
+                {
+                    TestLevel = false;
+                    LevelEditor = true;
+
+                    OpenLevel(FullFileName);
+                    if(!Backup_FullFileName.empty())
+                    {
+                        Files::deleteFile(FullFileName);
+                        FullFileName = Backup_FullFileName;
+                        Backup_FullFileName = "";
+                    }
+                }
+                // from command line
+                else if(setup.testLevelMode && !setup.interprocess)
+                {
+                    GameIsActive = false;
                 }
 
                 LevelBeatCode = 0;
@@ -914,7 +973,27 @@ int GameMain(const CmdLineSetup_t &setup)
 
 void EditorLoop()
 {
-    // DUMMY
+    Controls::Update();
+    UpdateEditor();
+    UpdateBlocks();
+    UpdateEffects();
+    if(WorldEditor)
+        UpdateGraphics2(true);
+    else
+        UpdateGraphics(true);
+    XRender::setTargetTexture();
+#ifdef __3DS__
+    editorScreen.UpdateSelectorBar(true);
+    editorScreen.UpdateEditorScreen();
+#else
+    if(editorScreen.active)
+        editorScreen.UpdateEditorScreen();
+    else
+        editorScreen.UpdateSelectorBar(true);
+#endif
+    XRender::setTargetScreen();
+    XRender::repaint();
+    UpdateSound();
 }
 
 void KillIt()
@@ -1705,7 +1784,7 @@ void StartBattleMode()
     ResetSoundFX();
     ClearLevel();
 
-    if(NumSelectWorld <= 1)
+    if(NumSelectBattle <= 1)
     {
         MessageText = "Can't start battle because of no levels available";
         PauseGame(PauseCode::Message);
@@ -1714,13 +1793,13 @@ void StartBattleMode()
     else
     {
         if(selWorld == 1)
-            selWorld = iRand(NumSelectWorld - 1) + 2;
+            selWorld = (iRand(NumSelectBattle - 1)) + 2;
     }
 
-    std::string levelPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
+    std::string levelPath = SelectBattle[selWorld].WorldPath + SelectBattle[selWorld].WorldFile;
     if(!OpenLevel(levelPath))
     {
-        MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", SelectWorld[selWorld].WorldFile);
+        MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", SelectBattle[selWorld].WorldFile);
         PauseGame(PauseCode::Message);
         ErrorQuit = true;
     }
