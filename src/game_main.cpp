@@ -975,24 +975,16 @@ void EditorLoop()
 {
     Controls::Update();
     UpdateEditor();
+    editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Logic);
     UpdateBlocks();
     UpdateEffects();
     if(WorldEditor)
-        UpdateGraphics2(true);
+        UpdateGraphics2();
     else
-        UpdateGraphics(true);
-    XRender::setTargetTexture();
-#ifdef __3DS__
-    editorScreen.UpdateSelectorBar(true);
-    editorScreen.UpdateEditorScreen();
-#else
-    if(editorScreen.active)
-        editorScreen.UpdateEditorScreen();
-    else
-        editorScreen.UpdateSelectorBar(true);
-#endif
-    XRender::setTargetScreen();
-    XRender::repaint();
+        UpdateGraphics();
+
+    // TODO: if there's a second screen, draw editor screen there too
+
     UpdateSound();
 }
 

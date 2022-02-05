@@ -706,6 +706,8 @@ void UpdateGraphics2(bool skipRepaint)
         speedRun_renderTimer();
     }
 
+    XRender::setViewport(0, 0, ScreenW, ScreenH);
+
     // this code is for both non-editor and editor cases
     {
         // render special screens

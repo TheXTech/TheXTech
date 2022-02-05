@@ -43,6 +43,13 @@ namespace Icon
 
 class EditorScreen
 {
+public:
+    enum class CallMode
+    {
+        Logic,
+        Render
+    };
+
 private:
     typedef enum
     {
@@ -131,59 +138,59 @@ private:
     void FileBrowserFailure();
     void FileBrowserCleanup();
 
-    bool UpdateButton(int x, int y, StdPicture &im, bool sel,
+    bool UpdateButton(CallMode mode, int x, int y, StdPicture &im, bool sel,
         int src_x = 0, int src_y = 0, int src_w = 32, int src_h = 32);
 
-    void UpdateNPC(int x, int y, int type);
-    void UpdateNPCGrid(int x, int y, const int* types, int n_npcs, int n_cols);
-    void UpdateNPCScreen();
+    void UpdateNPC(CallMode mode, int x, int y, int type);
+    void UpdateNPCGrid(CallMode mode, int x, int y, const int* types, int n_npcs, int n_cols);
+    void UpdateNPCScreen(CallMode mode);
 
-    void UpdateBlock(int x, int y, int type);
-    void UpdateBlockGrid(int x, int y, const int* types, int n_blocks, int n_cols);
-    void UpdateBlockScreen();
+    void UpdateBlock(CallMode mode, int x, int y, int type);
+    void UpdateBlockGrid(CallMode mode, int x, int y, const int* types, int n_blocks, int n_cols);
+    void UpdateBlockScreen(CallMode mode);
 
-    void UpdateBGO(int x, int y, int type);
-    void UpdateBGOGrid(int x, int y, const int* types, int n_bgos, int n_cols);
-    void UpdateBGOScreen();
+    void UpdateBGO(CallMode mode, int x, int y, int type);
+    void UpdateBGOGrid(CallMode mode, int x, int y, const int* types, int n_bgos, int n_cols);
+    void UpdateBGOScreen(CallMode mode);
 
-    void UpdateWaterScreen();
-    void UpdateWarpScreen();
+    void UpdateWaterScreen(CallMode mode);
+    void UpdateWarpScreen(CallMode mode);
 
-    void UpdateSectionsScreen();
+    void UpdateSectionsScreen(CallMode mode);
 
-    void UpdateWorldSettingsScreen();
+    void UpdateWorldSettingsScreen(CallMode mode);
 
-    void UpdateLayersScreen();
+    void UpdateLayersScreen(CallMode mode);
 
-    void UpdateEventsScreen();
-    void UpdateEventSettingsScreen();
-    void UpdateEventsSubScreen();
+    void UpdateEventsScreen(CallMode mode);
+    void UpdateEventSettingsScreen(CallMode mode);
+    void UpdateEventsSubScreen(CallMode mode);
 
-    void UpdateTile(int x, int y, int type);
-    void UpdateTileGrid(int x, int y, const int* types, int n_tiles, int n_cols);
-    void UpdateTileScreen();
+    void UpdateTile(CallMode mode, int x, int y, int type);
+    void UpdateTileGrid(CallMode mode, int x, int y, const int* types, int n_tiles, int n_cols);
+    void UpdateTileScreen(CallMode mode);
 
-    void UpdateScene(int x, int y, int type);
-    void UpdateSceneGrid(int x, int y, const int* types, int n_scenes, int n_cols);
-    void UpdateSceneScreen();
+    void UpdateScene(CallMode mode, int x, int y, int type);
+    void UpdateSceneGrid(CallMode mode, int x, int y, const int* types, int n_scenes, int n_cols);
+    void UpdateSceneScreen(CallMode mode);
 
-    void UpdateLevel(int x, int y, int type);
-    void UpdateLevelGrid(int x, int y, const int* types, int n_levels, int n_cols);
-    void UpdateLevelScreen();
+    void UpdateLevel(CallMode mode, int x, int y, int type);
+    void UpdateLevelGrid(CallMode mode, int x, int y, const int* types, int n_levels, int n_cols);
+    void UpdateLevelScreen(CallMode mode);
 
-    void UpdatePath(int x, int y, int type);
-    void UpdatePathGrid(int x, int y, const int* types, int n_paths, int n_cols);
-    void UpdatePathScreen();
+    void UpdatePath(CallMode mode, int x, int y, int type);
+    void UpdatePathGrid(CallMode mode, int x, int y, const int* types, int n_paths, int n_cols);
+    void UpdatePathScreen(CallMode mode);
 
-    void UpdateSelectListScreen();
+    void UpdateSelectListScreen(CallMode mode);
 
-    void UpdateFileScreen();
-    void UpdateBrowserScreen();
+    void UpdateFileScreen(CallMode mode);
+    void UpdateBrowserScreen(CallMode mode);
 
 public:
     bool active = true;
-    void UpdateEditorScreen();
-    void UpdateSelectorBar(bool level_screen = false);
+    void UpdateEditorScreen(CallMode mode, bool second_screen = false);
+    void UpdateSelectorBar(CallMode mode, bool select_bar_only = false);
     void ResetCursor();
     // set m_NPC_page based on the editor cursor
     void FocusNPC();

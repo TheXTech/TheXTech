@@ -2230,14 +2230,14 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 //        If LevelEditor = True Or MagicHand = True Then
-        if((LevelEditor || MagicHand) && GamePaused == PauseCode::None)
+        if((LevelEditor || MagicHand))
         {
             // editor code now located in `gfx_editor.cpp`
             DrawEditorLevel(Z);
         }
 
         if(numScreens > 1) // for multiple screens
-            XRender::resetViewport();
+            XRender::setViewport(0, 0, ScreenW, ScreenH);
 
         if(GameOutro)
             DrawCredits();
@@ -2266,6 +2266,7 @@ void UpdateGraphics(bool skipRepaint)
     g_levelScreenFader.draw();
 
     XRender::offsetViewportIgnore(true);
+    XRender::setViewport(0, 0, ScreenW, ScreenH);
     speedRun_renderTimer();
 
     // render special screens

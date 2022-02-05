@@ -432,6 +432,9 @@ void DrawEditorLevel(int Z)
 
 //            End With
     }
+
+    if(Z == 1)
+        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
 }
 
 void DrawEditorWorld()
@@ -528,4 +531,6 @@ void DrawEditorWorld()
             32, 32,
             GFX.ECursor[2], 0, 0);
     }
+
+    editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
 }

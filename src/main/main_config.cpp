@@ -170,7 +170,8 @@ void OpenConfig()
         config.read("full-screen", resBool, false);
         config.read("record-gameplay", g_config.RecordGameplayData, false);
         config.read("use-native-osk", g_config.use_native_osk, false);
-        config.read("enable-editor", g_config.enable_editor, false);
+        config.read("new-editor", g_config.enable_editor, false);
+        config.read("enable-editor", g_config.enable_editor, g_config.enable_editor);
         config.endGroup();
 
         config.beginGroup("recent");
