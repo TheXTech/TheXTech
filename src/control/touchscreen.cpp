@@ -928,6 +928,36 @@ void TouchScreenController::scanTouchDevices()
         pLogDebug("Found %d touch devices, screen size: %d x %d",
                   m_touchDevicesCount,
                   m_screenWidth, m_screenHeight);
+
+        for(int i = 0; i < m_touchDevicesCount; ++i)
+        {
+            const char *typeText = "Invalid type";
+            auto t = SDL_GetTouchDevice(i);
+
+            if(!t)
+                typeText = "БInvalid touch index>";
+            else
+            {
+                auto ty = SDL_GetTouchDeviceType(t);
+                switch(ty)
+                {
+                default:
+                case SDL_TOUCH_DEVICE_INVALID: // invalid
+                    break;
+                case SDL_TOUCH_DEVICE_DIRECT:
+                    typeText = "Direct touch type";
+                    break;
+                case SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE:
+                    typeText = "Indiriect absolute type";
+                    break;
+                case SDL_TOUCH_DEVICE_INDIRECT_RELATIVE:
+                    typeText = "Indiriect relative type";
+                    break;
+                }
+            }
+
+            pLogDebug("Touch device %d: %s", i, typeText);
+        }
     }
 }
 
