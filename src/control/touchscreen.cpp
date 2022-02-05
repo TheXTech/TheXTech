@@ -1129,10 +1129,12 @@ void TouchScreenController::processTouchDevice(int dev_i)
                     m_keysHeld[key] = true;
                     st.heldKeyPrev[key] = st.heldKey[key];
 
+#if 0 // Some phones detects more than one touch device, this is a problem somewhere...
                     // Also: when more than one touch devices found, choose one which is actual
                     // Otherwise, the spam of on/off events will happen
                     if(m_actualDevice < 0)
                         m_actualDevice = dev_i;
+#endif
                 }
             }
 
