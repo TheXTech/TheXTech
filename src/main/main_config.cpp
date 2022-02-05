@@ -175,6 +175,7 @@ void OpenConfig()
         config.beginGroup("recent");
         config.read("episode-1p", g_recentWorld1p, std::string());
         config.read("episode-2p", g_recentWorld2p, std::string());
+        config.read("episode-editor", g_recentWorldEditor, std::string());
         config.endGroup();
 
         config.beginGroup("gameplay");
@@ -230,6 +231,7 @@ void SaveConfig()
     config.beginGroup("recent");
     config.setValue("episode-1p", g_recentWorld1p);
     config.setValue("episode-2p", g_recentWorld2p);
+    config.setValue("episode-editor", g_recentWorldEditor);
     config.endGroup();
 
     config.beginGroup("video");
