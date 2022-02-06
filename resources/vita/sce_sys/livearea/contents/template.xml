@@ -19,7 +19,7 @@
 
 	<frame id="frame3">
 		<liveitem>
-			<target>psla:-c ux0:data/fuck</target>
+			<target>psla:-c "ux0:data/fuck"</target>
 			<text>
 				<str size="30">TEST ARGS</str>
 			</text>

@@ -100,7 +100,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated-include)
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU)
+if(HAIKU OR VITA)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
@@ -269,7 +269,6 @@ set(LIB_SRC
     ${FMT_SRCS}
     ${MD5_SRCS}
     ${POOLALLOC_SRCS}
-    lib/CrashHandler/crash_handler.cpp
     lib/Graphics/graphics_funcs.cpp
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
@@ -582,7 +581,6 @@ endif()
 if(VITA)
     message("Enabling PS Vita Support.")
     if(ENABLE_FAST_MATH)
-        message("FAST MATH ON! HAVE FUN!")
         set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
     endif()

@@ -433,7 +433,11 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     bool shrink2x = false;
 
-    if(g_videoSettings.scaleDownAllTextures || GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target)))
+    if(g_videoSettings.scaleDownAllTextures 
+#if !defined(VITA)
+        || GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target))
+#endif
+    )
     {
         target.l.w_orig = int(w);
         target.l.h_orig = int(h);
