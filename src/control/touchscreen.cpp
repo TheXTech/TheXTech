@@ -1093,6 +1093,18 @@ void TouchScreenController::processTouchDevice(int dev_i)
 {
     const SDL_TouchID dev = SDL_GetTouchDevice(dev_i);
 
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+    if(SDL_GetTouchDeviceType(dev) != SDL_TOUCH_DEVICE_DIRECT)
+    {
+        if(m_actualDevice == dev_i)
+        {
+            pLogWarning("Indirect touch device %d is not supported, dropping into auto mode", dev_i);
+            m_actualDevice = -1; // Drop into auto mode
+        }
+        return;
+    }
+#endif
+
     int fingers = SDL_GetNumTouchFingers(dev);
 
     for(auto& m_finger : m_fingers)
