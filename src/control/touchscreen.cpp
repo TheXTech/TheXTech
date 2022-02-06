@@ -182,6 +182,21 @@ bool TouchScreenController::touchSupported()
     return true;
 }
 
+int TouchScreenController::numDevices() const
+{
+    return m_touchDevicesCount;
+}
+
+int TouchScreenController::selectDevice(int dev)
+{
+    if(dev >= m_touchDevicesCount || dev < -1)
+        dev = -1;
+
+    m_actualDevice = dev;
+
+    return m_actualDevice;
+}
+
 bool TouchScreenController::touchOn()
 {
     for(int dev_i = 0; dev_i < m_touchDevicesCount; dev_i++)
@@ -928,6 +943,38 @@ void TouchScreenController::scanTouchDevices()
         pLogDebug("Found %d touch devices, screen size: %d x %d",
                   m_touchDevicesCount,
                   m_screenWidth, m_screenHeight);
+
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+        for(int i = 0; i < m_touchDevicesCount; ++i)
+        {
+            const char *typeText = "Invalid type";
+            auto t = SDL_GetTouchDevice(i);
+
+            if(!t)
+                typeText = "<Invalid touch index>";
+            else
+            {
+                auto ty = SDL_GetTouchDeviceType(t);
+                switch(ty)
+                {
+                default:
+                case SDL_TOUCH_DEVICE_INVALID: // invalid
+                    break;
+                case SDL_TOUCH_DEVICE_DIRECT:
+                    typeText = "Direct touch type";
+                    break;
+                case SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE:
+                    typeText = "Indiriect absolute type";
+                    break;
+                case SDL_TOUCH_DEVICE_INDIRECT_RELATIVE:
+                    typeText = "Indiriect relative type";
+                    break;
+                }
+            }
+
+            pLogDebug("Touch device %d: %s", i, typeText);
+        }
+#endif // SDL version >= 2.0.10
     }
 }
 
@@ -1045,6 +1092,18 @@ static void updateFingerKeyState(TouchScreenController::FingerState& st,
 void TouchScreenController::processTouchDevice(int dev_i)
 {
     const SDL_TouchID dev = SDL_GetTouchDevice(dev_i);
+
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+    if(SDL_GetTouchDeviceType(dev) != SDL_TOUCH_DEVICE_DIRECT)
+    {
+        if(m_actualDevice == dev_i)
+        {
+            pLogWarning("Indirect touch device %d is not supported, dropping into auto mode", dev_i);
+            m_actualDevice = -1; // Drop into auto mode
+        }
+        return;
+    }
+#endif
 
     int fingers = SDL_GetNumTouchFingers(dev);
 
@@ -1197,6 +1256,18 @@ void TouchScreenController::update()
         {
             this->m_touchpad_style = p->m_touchpad_style;
             this->m_enable_enter_cheats = p->m_enable_enter_cheats;
+
+            if(p->m_device_count <= 0)
+                p->m_device_count = this->m_touchDevicesCount;
+
+            if(p->m_device_selected >= this->m_touchDevicesCount || p->m_device_selected < -1)
+                p->m_device_selected = -1;
+
+            if(m_deviceChosen != p->m_device_selected)
+            {
+                m_deviceChosen = p->m_device_selected;
+                m_actualDevice = p->m_device_selected;
+            }
 
             if(this->m_feedback_strength != p->m_feedback_strength
                || this->m_feedback_length != p->m_feedback_length)
@@ -1474,8 +1545,6 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
 
 void InputMethod_TouchScreen::Rumble(int ms, float strength)
 {
-    UNUSED(ms);
-    UNUSED(strength);
     InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(this->Type);
 
     if(!t)
@@ -1527,8 +1596,10 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
     this->m_showPowerStatus = true;
 
     // @Wohlstand, can you give suggestions about good defaults for certain screen sizes?
+    // @ds-sloth, will take a look on this and probably will put some code here (and at JNI)
 #ifdef __ANDROID__
     // this is the place where we would set `this->m_layout` and `this->m_scale_factor` according to `s_screenSize`
+    // FIXME: Revive the screenSize factor being set to initialize the default controls scale
 #endif
 }
 
@@ -1586,6 +1657,7 @@ void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
     ctl->setValue("vibration-length", this->m_feedback_length);
     ctl->setValue("hold-run", this->m_hold_run);
     ctl->setValue("enable-enter-cheats", this->m_enable_enter_cheats);
+    ctl->setValue("device-selected", this->m_device_selected);
 }
 
 void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
@@ -1604,6 +1676,7 @@ void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
     ctl->read("vibration-length", this->m_feedback_length, 12);
     ctl->read("hold-run", this->m_hold_run, false);
     ctl->read("enable-enter-cheats", this->m_enable_enter_cheats, false);
+    ctl->read("device-selected", this->m_device_selected, -1);
 }
 
 // How many per-type special options are there?
@@ -1622,6 +1695,9 @@ const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
     {
     case Options::layout:
         return "LAYOUT STYLE";
+
+    case Options::device_select:
+        return "DEVICE SELECT";
 
     case Options::scale_factor:
         return "SCALE FACTOR";
@@ -1678,6 +1754,12 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
             return "TABLET (OLD)";
         else
             return "STANDARD";
+
+    case Options::device_select:
+        if(this->m_device_selected < 0)
+            return "AUTO";
+        SDL_snprintf(length_buf, 8, "#%d", this->m_device_selected);
+        return length_buf;
 
     case Options::scale_factor:
         SDL_snprintf(length_buf, 8, "%d%%", this->m_scale_factor);
@@ -1748,9 +1830,17 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
     {
     case Options::layout:
         if(this->m_layout > 0)
-            this->m_layout --;
+            this->m_layout--;
         else
             this->m_layout = TouchScreenController::layout_END - 1;
+
+        return true;
+
+    case Options::device_select:
+        if(this->m_device_selected >= -1)
+            this->m_device_selected--;
+        else
+            this->m_device_selected = m_device_count - 1;
 
         return true;
 
@@ -1792,7 +1882,7 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
 
     case Options::style:
         if(this->m_touchpad_style > 0)
-            this->m_touchpad_style --;
+            this->m_touchpad_style--;
         else
             this->m_touchpad_style = TouchScreenController::style_END - 1;
 
@@ -1834,10 +1924,18 @@ bool InputMethodProfile_TouchScreen::OptionRotateRight_Custom(size_t i)
     switch(i)
     {
     case Options::layout:
-        this->m_layout ++;
+        this->m_layout++;
 
         if(this->m_layout >= TouchScreenController::layout_END)
             this->m_layout = 0;
+
+        return true;
+
+    case Options::device_select:
+        if(this->m_device_selected < m_device_count)
+            this->m_device_selected++;
+        else
+            this->m_device_selected = -1;
 
         return true;
 

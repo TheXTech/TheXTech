@@ -1262,10 +1262,19 @@ extern RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
 extern RangeArr<Background_t, 1, (maxBackgrounds + maxWarps)> Background;
 //Public Effect(1 To maxEffects) As Effect
 extern RangeArr<Effect_t, 1, maxEffects> Effect;
+
+#ifdef THEXTECH_UNSAFE_ARRAYS
+extern NPC_t _NPC[maxNPCs+128+1];
+constexpr NPC_t* NPC = &_NPC[128];
+
+extern Block_t Block[maxBlocks+1];
+#else
 //Public NPC(-128 To maxNPCs) As NPC
 extern RangeArr<NPC_t, -128, maxNPCs> NPC;
 //Public Block(0 To maxBlocks) As Block
 extern RangeArr<Block_t, 0, maxBlocks> Block;
+#endif
+
 //Public Player(0 To maxPlayers) As Player
 extern RangeArr<Player_t, 0, maxPlayers> Player;
 //Public MarioFrameX(0 To maxPlayerFrames) As Integer 'Player frame offset X
@@ -1304,6 +1313,69 @@ extern RangeArrI<int, 0, maxNPCType, 0> NPCWidthGFX;
 extern RangeArrI<int, 0, maxNPCType, 0> NPCHeightGFX;
 //Public NPCSpeedvar(0 To maxNPCType) As Single 'NPC Speed Change
 extern RangeArr<float, 0, maxNPCType> NPCSpeedvar;
+
+#ifdef THEXTECH_UNSAFE_ARRAYS
+//Public NPCIsAShell(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a shell
+extern bool NPCIsAShell[maxNPCType+1];
+//Public NPCIsABlock(0 To maxNPCType) As Boolean 'Flag NPC as a block
+extern bool NPCIsABlock[maxNPCType+1];
+//Public NPCIsAHit1Block(0 To maxNPCType) As Boolean 'Flag NPC as a hit1 block
+extern bool NPCIsAHit1Block[maxNPCType+1];
+//Public NPCIsABonus(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a bonus
+extern bool NPCIsABonus[maxNPCType+1];
+//Public NPCIsACoin(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a coin
+extern bool NPCIsACoin[maxNPCType+1];
+//Public NPCIsAVine(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a vine
+extern bool NPCIsAVine[maxNPCType+1];
+//Public NPCIsAnExit(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a level exit
+extern bool NPCIsAnExit[maxNPCType+1];
+//Public NPCIsAParaTroopa(0 To maxNPCType) As Boolean 'Flags the NPC type as a para-troopa
+extern bool NPCIsAParaTroopa[maxNPCType+1];
+//Public NPCIsCheep(0 To maxNPCType) As Boolean 'Flags the NPC type as a cheep cheep
+extern bool NPCIsCheep[maxNPCType+1];
+//Public NPCJumpHurt(0 To maxNPCType) As Boolean 'Hurts the player even if it jumps on the NPC
+extern bool NPCJumpHurt[maxNPCType+1];
+//Public NPCNoClipping(0 To maxNPCType) As Boolean 'NPC can go through blocks
+extern bool NPCNoClipping[maxNPCType+1];
+//Public NPCScore(0 To maxNPCType) As Integer 'NPC score value
+extern int NPCScore[maxNPCType+1];
+//Public NPCCanWalkOn(0 To maxNPCType) As Boolean  'NPC can be walked on
+extern bool NPCCanWalkOn[maxNPCType+1];
+//Public NPCGrabFromTop(0 To maxNPCType) As Boolean  'NPC can be grabbed from the top
+extern bool NPCGrabFromTop[maxNPCType+1];
+//Public NPCTurnsAtCliffs(0 To maxNPCType) As Boolean  'NPC turns around at cliffs
+extern bool NPCTurnsAtCliffs[maxNPCType+1];
+//Public NPCWontHurt(0 To maxNPCType) As Boolean  'NPC wont hurt the player
+extern bool NPCWontHurt[maxNPCType+1];
+//Public NPCMovesPlayer(0 To maxNPCType) As Boolean 'Player can not walk through the NPC
+extern bool NPCMovesPlayer[maxNPCType+1];
+//Public NPCStandsOnPlayer(0 To maxNPCType) As Boolean 'for the clown car
+extern bool NPCStandsOnPlayer[maxNPCType+1];
+//Public NPCIsGrabbable(0 To maxNPCType) As Boolean 'Player can grab the NPC
+extern bool NPCIsGrabbable[maxNPCType+1];
+//Public NPCIsBoot(0 To maxNPCType) As Boolean 'npc is a kurbo's shoe
+extern bool NPCIsBoot[maxNPCType+1];
+//Public NPCIsYoshi(0 To maxNPCType) As Boolean 'npc is a yoshi
+extern bool NPCIsYoshi[maxNPCType+1];
+//Public NPCIsToad(0 To maxNPCType) As Boolean 'npc is a toad
+extern bool NPCIsToad[maxNPCType+1];
+//Public NPCNoYoshi(0 To maxNPCType) As Boolean 'Player can't eat the NPC
+extern bool NPCNoYoshi[maxNPCType+1];
+//Public NPCForeground(0 To maxNPCType) As Boolean 'draw the npc in front
+extern bool NPCForeground[maxNPCType+1];
+//Public NPCIsABot(0 To maxNPCType) As Boolean 'Zelda 2 Bot monster
+extern bool NPCIsABot[maxNPCType+1];
+//Public NPCDefaultMovement(0 To maxNPCType) As Boolean 'default NPC movement
+extern bool NPCDefaultMovement[maxNPCType+1];
+//Public NPCIsVeggie(0 To maxNPCType) As Boolean 'turnips
+extern bool NPCIsVeggie[maxNPCType+1];
+//Public NPCNoFireBall(0 To maxNPCType) As Boolean 'not hurt by fireball
+extern bool NPCNoFireBall[maxNPCType+1];
+//Public NPCNoIceBall(0 To maxNPCType) As Boolean 'not hurt by fireball
+extern bool NPCNoIceBall[maxNPCType+1];
+//Public NPCNoGravity(0 To maxNPCType) As Boolean 'not affected by gravity
+extern bool NPCNoGravity[maxNPCType+1];
+#else
 //Public NPCIsAShell(0 To maxNPCType) As Boolean 'Flags the NPC type if it is a shell
 extern RangeArrI<bool, 0, maxNPCType, false> NPCIsAShell;
 //Public NPCIsABlock(0 To maxNPCType) As Boolean 'Flag NPC as a block
@@ -1364,6 +1436,7 @@ extern RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
 extern RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
 //Public NPCNoGravity(0 To maxNPCType) As Boolean 'not affected by gravity
 extern RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
+#endif
 
 //Public NPCFrame(0 To maxNPCType) As Integer
 extern RangeArrI<int, 0, maxNPCType, 0> NPCFrame;

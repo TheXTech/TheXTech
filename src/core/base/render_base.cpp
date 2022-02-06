@@ -666,6 +666,7 @@ void AbstractRender_t::makeShot()
 
 #ifndef PGE_NO_THREADING
     s_screenshot_thread = SDL_CreateThread(makeShot_action, "scrn_maker", reinterpret_cast<void *>(shoot));
+    SDL_DetachThread(s_screenshot_thread);
 #else
     makeShot_action(reinterpret_cast<void *>(shoot));
 #endif
@@ -766,6 +767,8 @@ void AbstractRender_t::toggleGifRecorder()
         if(!m_gif->doFinalize)
         {
             m_gif->doFinalize = true;
+            SDL_DetachThread(m_gif->worker);
+            m_gif->worker = nullptr;
             PlaySoundMenu(SFX_PlayerShrink);
         }
         else

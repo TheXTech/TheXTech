@@ -1727,35 +1727,51 @@ void StartBattleMode()
 void DeleteSave(int world, int save)
 {
     auto &w = SelectWorld[world];
-    std::string savePath = makeGameSavePath(w.WorldPath,
-                                            w.WorldFile,
-                                            fmt::format_ne("save{0}.savx", save));
-    std::string savePathOld = w.WorldPath + fmt::format_ne("save{0}.savx", save);
-    std::string savePathAncient = w.WorldPath + fmt::format_ne("save{0}.sav", save);
+    std::vector<std::string> deleteList;
 
-    if(Files::fileExists(savePath))
-        Files::deleteFile(savePath);
-    if(Files::fileExists(savePathOld))
-        Files::deleteFile(savePathOld);
-    if(Files::fileExists(savePathAncient))
-        Files::deleteFile(savePathAncient);
+#define AddFile(f) \
+    deleteList.push_back(makeGameSavePath(w.WorldPath, \
+                                          w.WorldFile,\
+                                          fmt::format_ne(f, save)));
+#define AddFileW(f) \
+    deleteList.push_back(w.WorldPath + fmt::format_ne(f, save));
 
-    std::string timersPath = makeGameSavePath(w.WorldPath,
-                                              w.WorldFile,
-                                              fmt::format_ne("timers{0}.ini", save));
-    if(Files::fileExists(timersPath))
-        Files::deleteFile(timersPath);
+    AddFile("save{0}.savx");
+    AddFile("timers{0}.ini");
+    AddFile("demos-{0}.dmo");
+    // Old gamesaves
+    AddFileW("save{0}.savx");
+    AddFileW("save{0}.sav");
+
+    // Clear all files in list
+    for(auto &s : deleteList)
+    {
+        if(Files::fileExists(s))
+            Files::deleteFile(s);
+    }
+
+#undef AddFile
+#undef AddFileW
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
 #endif
 }
 
+static void copySaveFile(const SelectWorld_t& w, const char*file_mask, int src, int dst)
+{
+    std::string filePathSrc = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne(file_mask, src));
+    std::string filePathDst = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne(file_mask, dst));
+    Files::copyFile(filePathDst, filePathSrc, true);
+}
+
 void CopySave(int world, int src, int dst)
 {
     auto &w = SelectWorld[world];
-    std::string savePathOld = SelectWorld[world].WorldPath + fmt::format_ne("save{0}.savx", src);
-    std::string savePathAncient = SelectWorld[world].WorldPath + fmt::format_ne("save{0}.sav", src);
 
     std::string savePathSrc = makeGameSavePath(w.WorldPath,
                                                w.WorldFile,
@@ -1764,8 +1780,11 @@ void CopySave(int world, int src, int dst)
                                                w.WorldFile,
                                                fmt::format_ne("save{0}.savx", dst));
 
-    if(!Files::fileExists(savePathSrc)) // Attempt to convert an old game-save from the episode directory
+    if(!Files::fileExists(savePathSrc)) // Attempt to import an old game-save from the episode directory
     {
+        std::string savePathOld     = w.WorldPath + fmt::format_ne("save{0}.savx", src);
+        std::string savePathAncient = w.WorldPath + fmt::format_ne("save{0}.sav", src);
+
         GamesaveData sav;
         bool succ = false;
 
@@ -1780,13 +1799,8 @@ void CopySave(int world, int src, int dst)
 
     Files::copyFile(savePathDst, savePathSrc, true);
 
-    std::string timersPathSrc = makeGameSavePath(w.WorldPath,
-                                                 w.WorldFile,
-                                                 fmt::format_ne("timers{0}.ini", src));
-    std::string timersPathDst = makeGameSavePath(w.WorldPath,
-                                                 w.WorldFile,
-                                                 fmt::format_ne("timers{0}.ini", dst));
-    Files::copyFile(timersPathDst, timersPathSrc, true);
+    copySaveFile(w, "timers{0}.ini", src, dst);
+    copySaveFile(w, "demos-{0}.dmo", src, dst);
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();

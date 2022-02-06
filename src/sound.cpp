@@ -1078,11 +1078,11 @@ void LoadCustomSound()
         g_customMusicInDataFolder = true;
     }
 
-    std::string sIni = g_dirEpisode.resolveFileCaseExistsAbs("sound.ini");
+    std::string sIni = g_dirEpisode.resolveFileCaseExistsAbs("sounds.ini");
     if(!sIni.empty()) // Load sounds.ini from an episode folder
         loadCustomSfxIni(SoundScope::episode, sIni);
 
-    std::string sIniC = g_dirCustom.resolveFileCaseExistsAbs("sound.ini");
+    std::string sIniC = g_dirCustom.resolveFileCaseExistsAbs("sounds.ini");
     if(!sIniC.empty()) // Load sounds.ini from a level/world custom folder
     {
         loadCustomSfxIni(SoundScope::custom, sIniC);

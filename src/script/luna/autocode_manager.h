@@ -54,7 +54,7 @@ struct AutocodeManager
     static std::string resolveCustomFileCase(const std::string &in_name);
 
     // Management funcs
-    void Clear(bool clear_global_codes);
+    void Clear();
     void ForceExpire(int section);
     void ClearExpired();
     void DeleteEvent(const std::string &event_reference_name);     // Look up event with given name and expire it
