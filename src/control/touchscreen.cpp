@@ -182,6 +182,21 @@ bool TouchScreenController::touchSupported()
     return true;
 }
 
+int TouchScreenController::numDevices() const
+{
+    return m_touchDevicesCount;
+}
+
+int TouchScreenController::selectDevice(int dev)
+{
+    if(dev >= m_touchDevicesCount || dev < -1)
+        dev = -1;
+
+    m_actualDevice = dev;
+
+    return m_actualDevice;
+}
+
 bool TouchScreenController::touchOn()
 {
     for(int dev_i = 0; dev_i < m_touchDevicesCount; dev_i++)
@@ -1161,12 +1176,10 @@ void TouchScreenController::processTouchDevice(int dev_i)
                     m_keysHeld[key] = true;
                     st.heldKeyPrev[key] = st.heldKey[key];
 
-#if 0 // Some phones detects more than one touch device, this is a problem somewhere...
                     // Also: when more than one touch devices found, choose one which is actual
                     // Otherwise, the spam of on/off events will happen
                     if(m_actualDevice < 0)
                         m_actualDevice = dev_i;
-#endif
                 }
             }
 
@@ -1231,6 +1244,18 @@ void TouchScreenController::update()
         {
             this->m_touchpad_style = p->m_touchpad_style;
             this->m_enable_enter_cheats = p->m_enable_enter_cheats;
+
+            if(p->m_device_count <= 0)
+                p->m_device_count = this->m_touchDevicesCount;
+
+            if(p->m_device_selected >= this->m_touchDevicesCount || p->m_device_selected < -1)
+                p->m_device_selected = -1;
+
+            if(m_deviceChosen != p->m_device_selected)
+            {
+                m_deviceChosen = p->m_device_selected;
+                m_actualDevice = p->m_device_selected;
+            }
 
             if(this->m_feedback_strength != p->m_feedback_strength
                || this->m_feedback_length != p->m_feedback_length)
@@ -1508,8 +1533,6 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
 
 void InputMethod_TouchScreen::Rumble(int ms, float strength)
 {
-    UNUSED(ms);
-    UNUSED(strength);
     InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(this->Type);
 
     if(!t)
@@ -1561,8 +1584,10 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
     this->m_showPowerStatus = true;
 
     // @Wohlstand, can you give suggestions about good defaults for certain screen sizes?
+    // @ds-sloth, will take a look on this and probably will put some code here (and at JNI)
 #ifdef __ANDROID__
     // this is the place where we would set `this->m_layout` and `this->m_scale_factor` according to `s_screenSize`
+    // FIXME: Revive the screenSize factor being set to initialize the default controls scale
 #endif
 }
 
@@ -1620,6 +1645,7 @@ void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
     ctl->setValue("vibration-length", this->m_feedback_length);
     ctl->setValue("hold-run", this->m_hold_run);
     ctl->setValue("enable-enter-cheats", this->m_enable_enter_cheats);
+    ctl->setValue("device-selected", this->m_device_selected);
 }
 
 void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
@@ -1638,6 +1664,7 @@ void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
     ctl->read("vibration-length", this->m_feedback_length, 12);
     ctl->read("hold-run", this->m_hold_run, false);
     ctl->read("enable-enter-cheats", this->m_enable_enter_cheats, false);
+    ctl->read("device-selected", this->m_device_selected, -1);
 }
 
 // How many per-type special options are there?
@@ -1656,6 +1683,9 @@ const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
     {
     case Options::layout:
         return "LAYOUT STYLE";
+
+    case Options::device_select:
+        return "DEVICE SELECT";
 
     case Options::scale_factor:
         return "SCALE FACTOR";
@@ -1712,6 +1742,12 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
             return "TABLET (OLD)";
         else
             return "STANDARD";
+
+    case Options::device_select:
+        if(this->m_device_selected < 0)
+            return "AUTO";
+        SDL_snprintf(length_buf, 8, "#%d", this->m_device_selected);
+        return length_buf;
 
     case Options::scale_factor:
         SDL_snprintf(length_buf, 8, "%d%%", this->m_scale_factor);
@@ -1787,6 +1823,15 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
             this->m_layout = TouchScreenController::layout_END - 1;
 
         return true;
+
+    case Options::device_select:
+        if(this->m_device_selected >= -1)
+        {
+            this->m_device_selected--;
+            return true;
+        }
+        else
+            return false;
 
     case Options::scale_factor:
         if(this->m_scale_factor > 50)
@@ -1868,12 +1913,21 @@ bool InputMethodProfile_TouchScreen::OptionRotateRight_Custom(size_t i)
     switch(i)
     {
     case Options::layout:
-        this->m_layout ++;
+        this->m_layout++;
 
         if(this->m_layout >= TouchScreenController::layout_END)
             this->m_layout = 0;
 
         return true;
+
+    case Options::device_select:
+        if(this->m_device_selected < m_device_count)
+        {
+            this->m_device_selected++;
+            return true;
+        }
+        else
+            return false;
 
     case Options::scale_factor:
         if(this->m_scale_factor < 150)

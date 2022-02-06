@@ -126,17 +126,32 @@ class TouchScreenController
     int m_screenHeight = 0;
     //! Actual touch device to use
     int m_actualDevice = -1;
+    //! Device chosen by user
+    int m_deviceChosen = -1;
     //! Graphics for controller
     TouchScreenGFX_t m_GFX;
 
 public:
-
+    //! Vibrator used with the touch device as rumble and/or feedback
     SDL_Haptic *m_vibrator = nullptr;
 
     /*!
      * \brief Is touch-screen supported?
      */
     bool touchSupported();
+
+    /*!
+     * \brief Number of detected touchscreen devices
+     * \return Count of devices detected
+     */
+    int numDevices() const;
+
+    /*!
+     * \brief Select the device to use
+     * \param dev Device number from 0 to N-1. Also allowed to specify -1 for automatical device selection
+     * \return Actually selected device (if invalid input got passed, it doesn't match)
+     */
+    int selectDevice(int dev);
 
     /*!
      * \brief Is touch-screen being touched?
@@ -320,6 +335,10 @@ public:
     int m_feedback_length = 12;
     bool m_hold_run = false;
     bool m_enable_enter_cheats = false;
+    //! Select the touch device, -1 means "auto"
+    int m_device_selected = -1;
+    //! Count of touch devices, gets filled on initialization
+    int m_device_count = 0;
 
     InputMethodProfile_TouchScreen();
 
@@ -351,6 +370,7 @@ public:
         enum o
         {
             layout,
+            device_select,
             scale_factor,
             scale_factor_dpad,
             scale_factor_buttons,
