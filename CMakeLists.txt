@@ -580,10 +580,11 @@ endif()
 
 if(VITA)
     message("Enabling PS Vita Support.")
-    if(ENABLE_FAST_MATH)
-        set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
-    endif()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
+
+    # Disable annoying warning for Parameter passing.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
 
     target_compile_definitions(thextech PRIVATE -DVITA -DVITA=1)
     target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
