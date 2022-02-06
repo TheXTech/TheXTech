@@ -929,13 +929,14 @@ void TouchScreenController::scanTouchDevices()
                   m_touchDevicesCount,
                   m_screenWidth, m_screenHeight);
 
+#if SDL_VERSION_ATLEAST(2, 0, 10)
         for(int i = 0; i < m_touchDevicesCount; ++i)
         {
             const char *typeText = "Invalid type";
             auto t = SDL_GetTouchDevice(i);
 
             if(!t)
-                typeText = "БInvalid touch index>";
+                typeText = "<Invalid touch index>";
             else
             {
                 auto ty = SDL_GetTouchDeviceType(t);
@@ -958,6 +959,7 @@ void TouchScreenController::scanTouchDevices()
 
             pLogDebug("Touch device %d: %s", i, typeText);
         }
+#endif // SDL version >= 2.0.10
     }
 }
 
