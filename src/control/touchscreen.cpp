@@ -1818,7 +1818,7 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
     {
     case Options::layout:
         if(this->m_layout > 0)
-            this->m_layout --;
+            this->m_layout--;
         else
             this->m_layout = TouchScreenController::layout_END - 1;
 
@@ -1826,12 +1826,11 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
 
     case Options::device_select:
         if(this->m_device_selected >= -1)
-        {
             this->m_device_selected--;
-            return true;
-        }
         else
-            return false;
+            this->m_device_selected = m_device_count - 1;
+
+        return true;
 
     case Options::scale_factor:
         if(this->m_scale_factor > 50)
@@ -1871,7 +1870,7 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
 
     case Options::style:
         if(this->m_touchpad_style > 0)
-            this->m_touchpad_style --;
+            this->m_touchpad_style--;
         else
             this->m_touchpad_style = TouchScreenController::style_END - 1;
 
@@ -1922,12 +1921,11 @@ bool InputMethodProfile_TouchScreen::OptionRotateRight_Custom(size_t i)
 
     case Options::device_select:
         if(this->m_device_selected < m_device_count)
-        {
             this->m_device_selected++;
-            return true;
-        }
         else
-            return false;
+            this->m_device_selected = -1;
+
+        return true;
 
     case Options::scale_factor:
         if(this->m_scale_factor < 150)
