@@ -46,6 +46,8 @@
 #   endif
 
 static double s_screenSize = -1;
+static double s_screenWidth = -1;
+static double s_screenHeight = -1;
 
 JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
@@ -59,8 +61,8 @@ Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
     (void)env;
     (void)type;
     s_screenSize = screenSize;
-    (void)screenWidth;
-    (void)screenHeight;
+    s_screenWidth = screenWidth;
+    s_screenHeight = screenHeight;
 }
 
 #endif
@@ -1622,11 +1624,51 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 {
     this->m_showPowerStatus = true;
 
-    // @Wohlstand, can you give suggestions about good defaults for certain screen sizes?
-    // @ds-sloth, will take a look on this and probably will put some code here (and at JNI)
 #ifdef __ANDROID__
-    // this is the place where we would set `this->m_layout` and `this->m_scale_factor` according to `s_screenSize`
-    // FIXME: Revive the screenSize factor being set to initialize the default controls scale
+    if(s_screenSize >= 9.0) // Big tablets
+    {
+        m_default_layout = TouchScreenController::layout_standard;
+        m_default_scale_factor = 65;
+        m_default_scale_factor_dpad = 80;
+        m_default_scale_factor_buttons = 105;
+        m_default_scale_factor_ss_spacing = 110;
+    }
+    else if(s_screenSize >= 7.0) // Middle tablets
+    {
+        m_default_layout = TouchScreenController::layout_standard;
+        m_default_scale_factor = 95;
+        m_default_scale_factor_dpad = 80;
+        m_default_scale_factor_buttons = 105;
+        m_default_scale_factor_ss_spacing = 95;
+    }
+    else if(s_screenSize < 4.0) // Very small phones
+    {
+        m_default_layout = TouchScreenController::layout_tight;
+        m_default_scale_factor = 100;
+        m_default_scale_factor_dpad = 110;
+        m_default_scale_factor_buttons = 135;
+        m_default_scale_factor_ss_spacing = 75;
+    }
+    else // All other devices
+    {
+        // Longer screens (big ration between sides, more like a stick)
+        if((s_screenWidth / s_screenHeight) > 1.6f)
+        {
+            m_default_layout = TouchScreenController::layout_standard;
+            m_default_scale_factor = 135;
+            m_default_scale_factor_dpad = 80;
+            m_default_scale_factor_buttons = 100;
+            m_default_scale_factor_ss_spacing = 100;
+        }
+        else // Shorter screens (smaller ratio between sides, more like a square)
+        {
+            m_default_layout = TouchScreenController::layout_standard;
+            m_default_scale_factor = 135;
+            m_default_scale_factor_dpad = 80;
+            m_default_scale_factor_buttons = 100;
+            m_default_scale_factor_ss_spacing = 90;
+        }
+    }
 #endif
 }
 
@@ -1688,15 +1730,15 @@ void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
 
 void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
 {
-    ctl->read("ui-layout", this->m_layout, TouchScreenController::layout_standard);
+    ctl->read("ui-layout", this->m_layout, this->m_default_layout);
 
     if(this->m_layout >= TouchScreenController::layout_END)
-        this->m_layout = TouchScreenController::layout_standard;
+        this->m_layout = this->m_default_layout;
 
-    ctl->read("scale-factor", this->m_scale_factor, 100);
-    ctl->read("scale-factor-dpad", this->m_scale_factor_dpad, 100);
-    ctl->read("scale-factor-buttons", this->m_scale_factor_buttons, 100);
-    ctl->read("scale-factor-ss-spacing", this->m_scale_factor_ss_spacing, 100);
+    ctl->read("scale-factor", this->m_scale_factor, this->m_default_scale_factor);
+    ctl->read("scale-factor-dpad", this->m_scale_factor_dpad, this->m_default_scale_factor_dpad);
+    ctl->read("scale-factor-buttons", this->m_scale_factor_buttons, this->m_default_scale_factor_buttons);
+    ctl->read("scale-factor-ss-spacing", this->m_scale_factor_ss_spacing, this->m_default_scale_factor_ss_spacing);
     ctl->read("ui-style", this->m_touchpad_style, TouchScreenController::style_actions);
     ctl->read("vibration-strength", this->m_feedback_strength, 0.f);
     ctl->read("vibration-length", this->m_feedback_length, 12);
@@ -1732,6 +1774,9 @@ const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
 
     case Options::scale_factor_ss_spacing:
         return "S-START SPACING";
+
+    case Options::reset_layout:
+        return "RESET LAYOUT";
 
     case Options::style:
         return "INTERFACE STYLE";
@@ -1836,7 +1881,19 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
 // called when A is pressed; allowed to interrupt main game loop
 bool InputMethodProfile_TouchScreen::OptionChange_Custom(size_t i)
 {
-    return this->OptionRotateRight_Custom(i);
+    switch(i)
+    {
+    case Options::reset_layout:
+        this->m_layout = this->m_default_layout;
+        this->m_scale_factor = this->m_default_scale_factor;
+        this->m_scale_factor_dpad = this->m_default_scale_factor_dpad;
+        this->m_scale_factor_buttons = this->m_default_scale_factor_buttons;
+        this->m_scale_factor_ss_spacing = this->m_default_scale_factor_ss_spacing;
+        return true;
+
+    default:
+        return this->OptionRotateRight_Custom(i);
+    }
 }
 
 // called when left is pressed

@@ -325,6 +325,14 @@ public:
     using InputMethodProfile::Type;
 
     // touchscreen settings
+    /* Screen-size depend defaults (computed on load) */
+    int m_default_layout = TouchScreenController::layout_standard;
+    int m_default_scale_factor = 100;
+    int m_default_scale_factor_dpad = 100;
+    int m_default_scale_factor_buttons = 100;
+    int m_default_scale_factor_ss_spacing = 100;
+
+    /* Current settings */
     //! Current layout type
     int m_layout = TouchScreenController::layout_standard;
     //! General scale factor
@@ -378,6 +386,7 @@ public:
             scale_factor_dpad,
             scale_factor_buttons,
             scale_factor_ss_spacing,
+            reset_layout,
             style,
             fb_strength,
             fb_length,
