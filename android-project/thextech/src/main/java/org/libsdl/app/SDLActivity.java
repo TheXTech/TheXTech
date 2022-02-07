@@ -1204,7 +1204,7 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
 
         for (int id : ids) {
             InputDevice device = InputDevice.getDevice(id);
-            if (device != null && (device.getSources() & InputDevice.SOURCE_TOUCHSCREEN) != 0) {
+            if (device != null && (device.getSources() & InputDevice.SOURCE_TOUCHSCREEN) == InputDevice.SOURCE_TOUCHSCREEN) {
                 nativeAddTouch(device.getId(), device.getName());
             }
         }
@@ -1895,7 +1895,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             }
         }
 
-        if ((source & InputDevice.SOURCE_KEYBOARD) != 0) {
+        if ((source & InputDevice.SOURCE_KEYBOARD) == InputDevice.SOURCE_KEYBOARD) {
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
                 if (SDLActivity.isTextInputEvent(event)) {
                     SDLInputConnection.nativeCommitText(String.valueOf((char) event.getUnicodeChar()), 1);
@@ -1908,7 +1908,7 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
             }
         }
 
-        if ((source & InputDevice.SOURCE_MOUSE) != 0) {
+        if ((source & InputDevice.SOURCE_MOUSE) == InputDevice.SOURCE_MOUSE) {
             // on some devices key events are sent for mouse BUTTON_BACK/FORWARD presses
             // they are ignored here because sending them as mouse input to SDL is messy
             if ((keyCode == KeyEvent.KEYCODE_BACK) || (keyCode == KeyEvent.KEYCODE_FORWARD)) {
