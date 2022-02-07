@@ -24,7 +24,9 @@
 
 #include <cstddef>
 #include <cstring>
+#ifndef RANGE_ARR_UNSAFE_MODE
 #include <SDL2/SDL_assert.h>
+#endif
 
 #define For(A, From, To) for(int A = From; A <= To; ++A)
 
@@ -33,7 +35,8 @@ class RangeArr
 {
     static constexpr long range_diff = begin - end;
     static constexpr size_t size = (range_diff < 0 ? -range_diff : range_diff) + 1;
-    static const long offset = -begin;
+    static constexpr long offset = -begin;
+
 #ifdef RANGE_ARR_USE_HEAP
     T *array = nullptr;
 #else
@@ -67,6 +70,8 @@ public:
     RangeArr& operator=(const RangeArr &o)
     {
 #ifdef RANGE_ARR_USE_HEAP
+        if(array)
+            delete [] array;
         array = new T[size];
 #endif
         for(size_t i = 0; i < size; i++)
@@ -80,17 +85,32 @@ public:
             array[i] = o;
     }
 
-    T& operator[](long index)
+    constexpr T *base() const
     {
-#ifdef RANGE_ARR_USE_HEAP
+        return array + offset;
+    }
+
+    constexpr T *baseReal() const
+    {
+        return array;
+    }
+
+#ifdef RANGE_ARR_UNSAFE_MODE
+    constexpr T& operator[](long index) const
+    {
+        return *(const_cast<T*>(array) + index + offset);
+    }
+#else
+    inline T& operator[](long index)
+    {
+#   ifdef RANGE_ARR_USE_HEAP
         SDL_assert_release(array); // When array won't initialize
-#endif
+#   endif
         SDL_assert_release(index <= end);
         SDL_assert_release(index >= begin);
-        SDL_assert_release(offset + index < static_cast<long>(size));
-        SDL_assert_release(offset + index >= 0);
-        return array[offset + index];
+        return *(array + index + offset);
     }
+#endif
 };
 
 template <class T, long begin, long end, T defaultValue>
@@ -98,7 +118,8 @@ class RangeArrI
 {
     static constexpr long range_diff = begin - end;
     static constexpr size_t size = (range_diff < 0 ? -range_diff : range_diff) + 1;
-    static const long offset = -begin;
+    static constexpr long offset = -begin;
+
 #ifdef RANGE_ARR_USE_HEAP
     T *array = nullptr;
 #else
@@ -134,6 +155,8 @@ public:
     RangeArrI& operator=(const RangeArrI &o)
     {
 #ifdef RANGE_ARR_USE_HEAP
+        if(array)
+            delete [] array;
         array = new T[size];
 #endif
         for(size_t i = 0; i < size; i++)
@@ -147,17 +170,32 @@ public:
             array[i] = o;
     }
 
-    T& operator[](long index)
+    constexpr T *base() const
     {
-#ifdef RANGE_ARR_USE_HEAP
+        return array + offset;
+    }
+
+    constexpr T *baseReal() const
+    {
+        return array;
+    }
+
+#ifdef RANGE_ARR_UNSAFE_MODE
+    constexpr T& operator[](long index) const
+    {
+        return *(const_cast<T*>(array) + index + offset);
+    }
+#else
+    inline T& operator[](long index)
+    {
+#   ifdef RANGE_ARR_USE_HEAP
         SDL_assert_release(array); // When array won't initialize
-#endif
+#   endif
         SDL_assert_release(index <= end);
         SDL_assert_release(index >= begin);
-        SDL_assert_release(offset + index < static_cast<long>(size));
-        SDL_assert_release(offset + index >= 0);
-        return array[offset + index];
+        return *(array + index + offset);
     }
+#endif
 };
 
 #endif // RANGE_ARR_HPP
