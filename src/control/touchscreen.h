@@ -124,10 +124,6 @@ class TouchScreenController
     int m_screenWidth = 0;
     //! Physical screen height
     int m_screenHeight = 0;
-    //! Actual touch device to use
-    int m_actualDevice = -1;
-    //! Device chosen by user
-    int m_deviceChosen = -1;
     //! Graphics for controller
     TouchScreenGFX_t m_GFX;
 
@@ -145,13 +141,6 @@ public:
      * \return Count of devices detected
      */
     int numDevices() const;
-
-    /*!
-     * \brief Select the device to use
-     * \param dev Device number from 0 to N-1. Also allowed to specify -1 for automatical device selection
-     * \return Actually selected device (if invalid input got passed, it doesn't match)
-     */
-    int selectDevice(int dev);
 
     /*!
      * \brief Is touch-screen being touched?
@@ -244,6 +233,8 @@ public:
         bool keyAltRunOnce = false;
 
         bool keyCheats = false;
+
+        ExtraKeys_t &operator|=(const ExtraKeys_t& o);
     } m_current_extra_keys;
 
     //! Touch can be hidden by left-top corner to use virtual mouse
@@ -263,10 +254,30 @@ public:
     };
 
 private:
-    //! Held finger states
-    std::map<SDL_FingerID, FingerState> m_fingers;
+    typedef std::map<SDL_FingerID, FingerState> FingersMap;
+
+    struct TouchDevice_t
+    {
+        //! Touch device ID
+        SDL_TouchID id = -1;
+        //! Registered finger states
+        FingersMap  fingers;
+        //! States for control keys
+        Controls_t current_keys;
+        //! States for extra keys
+        ExtraKeys_t extra_keys;
+        //! Held finger states
+        bool keysHeld[key_END] = {false};
+    };
+
+    std::vector<TouchDevice_t> m_devices;
 
     void doVibration();
+
+    /*!
+     * \brief Read current state of touch controller
+     */
+    void processTouchDevice(TouchDevice_t &dev);
 
 public:
     /*!
@@ -282,11 +293,6 @@ public:
     void scanTouchDevices();
 
     void updateScreenSize();
-
-    /*!
-     * \brief Read current state of touch controller
-     */
-    void processTouchDevice(int dev_i);
 
     void update();
 
@@ -335,8 +341,6 @@ public:
     int m_feedback_length = 12;
     bool m_hold_run = false;
     bool m_enable_enter_cheats = false;
-    //! Select the touch device, -1 means "auto"
-    int m_device_selected = -1;
     //! Count of touch devices, gets filled on initialization
     int m_device_count = 0;
 
@@ -370,7 +374,6 @@ public:
         enum o
         {
             layout,
-            device_select,
             scale_factor,
             scale_factor_dpad,
             scale_factor_buttons,

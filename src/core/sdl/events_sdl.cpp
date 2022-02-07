@@ -65,12 +65,24 @@ void EventsSDL::processEvent()
 {
     if(Controls::ProcessEvent(&m_event))
         return;
+
     switch(m_event.type)
     {
     case SDL_QUIT:
         XWindow::showCursor(1);
         KillIt();
         break;
+
+#ifdef DEBUG_BUILD
+    case SDL_FINGERDOWN:
+        pLogDebug("Touch finger down at device %d", m_event.tfinger.touchId);
+        break;
+
+    case SDL_FINGERUP:
+        pLogDebug("Touch finger up at device %d", m_event.tfinger.touchId);
+        break;
+#endif
+
     case SDL_WINDOWEVENT:
         switch(m_event.window.event)
         {

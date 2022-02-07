@@ -44,6 +44,27 @@
 
 #include <Logger/logger.h>
 
+
+Controls_t& operator|=(Controls_t& o1, const Controls_t& o2)
+{
+    o1.Up |= o2.Up;
+    o1.Down |= o2.Down;
+    o1.Left |= o2.Left;
+    o1.Right |= o2.Right;
+
+    o1.Jump |= o2.Jump;
+    o1.AltJump |= o2.AltJump;
+
+    o1.Run |= o2.Run;
+    o1.AltRun |= o2.AltRun;
+
+    o1.Drop |= o2.Drop;
+    o1.Start |= o2.Start;
+
+    return o1;
+}
+
+
 namespace Controls
 {
 
@@ -1226,3 +1247,4 @@ void UpdateTouchScreenSize()
 }
 
 } // namespace Controls
+
