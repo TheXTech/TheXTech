@@ -39,10 +39,8 @@ class RangeArr
 
 #ifdef RANGE_ARR_USE_HEAP
     T *array = nullptr;
-    T *arrayPtr = nullptr;
 #else
     T array[size];
-    T *arrayPtr = array + offset;
 #endif
 
 public:
@@ -50,7 +48,6 @@ public:
     {
 #ifdef RANGE_ARR_USE_HEAP
         array = new T[size];
-        arrayPtr = array + offset;
 #endif
     }
 
@@ -65,7 +62,6 @@ public:
     {
 #ifdef RANGE_ARR_USE_HEAP
         array = new T[size];
-        arrayPtr = array + offset;
 #endif
         for(size_t i = 0; i < size; i++)
             array[i] = o.array[i];
@@ -77,7 +73,6 @@ public:
         if(array)
             delete [] array;
         array = new T[size];
-        arrayPtr = array + offset;
 #endif
         for(size_t i = 0; i < size; i++)
             array[i] = o.array[i];
@@ -92,7 +87,7 @@ public:
 
     constexpr T *base() const
     {
-        return arrayPtr;
+        return array + offset;
     }
 
     constexpr T *baseReal() const
@@ -103,17 +98,17 @@ public:
 #ifdef RANGE_ARR_UNSAFE_MODE
     constexpr T& operator[](long index) const
     {
-        return *(arrayPtr + index);
+        return *(const_cast<T*>(array) + index + offset);
     }
 #else
     inline T& operator[](long index)
     {
 #   ifdef RANGE_ARR_USE_HEAP
-        SDL_assert_release(array && arrayPtr); // When array won't initialize
+        SDL_assert_release(array); // When array won't initialize
 #   endif
         SDL_assert_release(index <= end);
         SDL_assert_release(index >= begin);
-        return *(arrayPtr + index);
+        return *(array + index + offset);
     }
 #endif
 };
@@ -127,10 +122,8 @@ class RangeArrI
 
 #ifdef RANGE_ARR_USE_HEAP
     T *array = nullptr;
-    T *arrayPtr = nullptr;
 #else
     T array[size];
-    T *arrayPtr = array + offset;
 #endif
 
 public:
@@ -138,7 +131,6 @@ public:
     {
 #ifdef RANGE_ARR_USE_HEAP
         array = new T[size];
-        arrayPtr = array + offset;
 #endif
         for(size_t i = 0; i < size; i++)
             array[i] = defaultValue;
@@ -155,7 +147,6 @@ public:
     {
 #ifdef RANGE_ARR_USE_HEAP
         array = new T[size];
-        arrayPtr = array + offset;
 #endif
         for(size_t i = 0; i < size; i++)
             array[i] = o.array[i];
@@ -167,7 +158,6 @@ public:
         if(array)
             delete [] array;
         array = new T[size];
-        arrayPtr = array + offset;
 #endif
         for(size_t i = 0; i < size; i++)
             array[i] = o.array[i];
@@ -182,7 +172,7 @@ public:
 
     constexpr T *base() const
     {
-        return arrayPtr;
+        return array + offset;
     }
 
     constexpr T *baseReal() const
@@ -193,17 +183,17 @@ public:
 #ifdef RANGE_ARR_UNSAFE_MODE
     constexpr T& operator[](long index) const
     {
-        return *(arrayPtr + index);
+        return *(const_cast<T*>(array) + index + offset);
     }
 #else
     inline T& operator[](long index)
     {
 #   ifdef RANGE_ARR_USE_HEAP
-        SDL_assert_release(array && arrayPtr); // When array won't initialize
+        SDL_assert_release(array); // When array won't initialize
 #   endif
         SDL_assert_release(index <= end);
         SDL_assert_release(index >= begin);
-        return *(arrayPtr + index);
+        return *(array + index + offset);
     }
 #endif
 };
