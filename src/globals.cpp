@@ -129,13 +129,8 @@ RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
 RangeArr<Background_t, 1, (maxBackgrounds + maxWarps)> Background;
 RangeArr<Effect_t, 1, maxEffects> Effect;
 
-#ifdef THEXTECH_UNSAFE_ARRAYS
-NPC_t _NPC[maxNPCs+128+1];
-Block_t Block[maxBlocks+1];
-#else
 RangeArr<NPC_t, -128, maxNPCs> NPC;
 RangeArr<Block_t, 0, maxBlocks> Block;
-#endif
 
 RangeArr<Player_t, 0, maxPlayers> Player;
 RangeArrI<int, 0, maxPlayerFrames, 0> MarioFrameX;
@@ -157,38 +152,6 @@ RangeArrI<int, 0, maxNPCType, 0> NPCWidthGFX;
 RangeArrI<int, 0, maxNPCType, 0> NPCHeightGFX;
 RangeArr<float, 0, maxNPCType> NPCSpeedvar;
 
-#ifdef THEXTECH_UNSAFE_ARRAYS
-bool NPCIsAShell[maxNPCType+1] = {false};
-bool NPCIsABlock[maxNPCType+1] = {false};
-bool NPCIsAHit1Block[maxNPCType+1] = {false};
-bool NPCIsABonus[maxNPCType+1] = {false};
-bool NPCIsACoin[maxNPCType+1] = {false};
-bool NPCIsAVine[maxNPCType+1] = {false};
-bool NPCIsAnExit[maxNPCType+1] = {false};
-bool NPCIsAParaTroopa[maxNPCType+1] = {false};
-bool NPCIsCheep[maxNPCType+1] = {false};
-bool NPCJumpHurt[maxNPCType+1] = {false};
-bool NPCNoClipping[maxNPCType+1] = {false};
-int NPCScore[maxNPCType+1] = {0};
-bool NPCCanWalkOn[maxNPCType+1] = {false};
-bool NPCGrabFromTop[maxNPCType+1] = {false};
-bool NPCTurnsAtCliffs[maxNPCType+1] = {false};
-bool NPCWontHurt[maxNPCType+1] = {false};
-bool NPCMovesPlayer[maxNPCType+1] = {false};
-bool NPCStandsOnPlayer[maxNPCType+1] = {false};
-bool NPCIsGrabbable[maxNPCType+1] = {false};
-bool NPCIsBoot[maxNPCType+1] = {false};
-bool NPCIsYoshi[maxNPCType+1] = {false};
-bool NPCIsToad[maxNPCType+1] = {false};
-bool NPCNoYoshi[maxNPCType+1] = {false};
-bool NPCForeground[maxNPCType+1] = {false};
-bool NPCIsABot[maxNPCType+1] = {false};
-bool NPCDefaultMovement[maxNPCType+1] = {false};
-bool NPCIsVeggie[maxNPCType+1] = {false};
-bool NPCNoFireBall[maxNPCType+1] = {false};
-bool NPCNoIceBall[maxNPCType+1] = {false};
-bool NPCNoGravity[maxNPCType+1] = {false};
-#else
 RangeArrI<bool, 0, maxNPCType, false> NPCIsAShell;
 RangeArrI<bool, 0, maxNPCType, false> NPCIsABlock;
 RangeArrI<bool, 0, maxNPCType, false> NPCIsAHit1Block;
@@ -219,7 +182,6 @@ RangeArrI<bool, 0, maxNPCType, false> NPCIsVeggie;
 RangeArrI<bool, 0, maxNPCType, false> NPCNoFireBall;
 RangeArrI<bool, 0, maxNPCType, false> NPCNoIceBall;
 RangeArrI<bool, 0, maxNPCType, false> NPCNoGravity;
-#endif
 
 RangeArrI<int, 0, maxNPCType, 0> NPCFrame;
 RangeArrI<int, 0, maxNPCType, 0> NPCFrameSpeed;
@@ -601,17 +563,9 @@ void initAll()
     qScreenX.fill(0.0);
     qScreenY.fill(0.0);
 
-    for(int A = 0; A <= maxBlocks; A++)
-    {
-        Block[A] = Block_t();
-    }
-    // Block.fill(Block_t());
+    Block.fill(Block_t());
     Background.fill(Background_t());
-    for(int A = -128; A <= maxNPCs; A++)
-    {
-        NPC[A] = NPC_t();
-    }
-    // NPC.fill(NPC_t());
+    NPC.fill(NPC_t());
 }
 
 
