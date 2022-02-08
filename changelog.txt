@@ -15,6 +15,7 @@ Changelog for 1.3.6 [WIP]
 -Performance improvements for showing, hiding, and moving layers (@ds-sloth)
 -Reduced game object memory footprint (@ds-sloth)
 -Performance improvements when run on slow filesystems (@ds-sloth)
+-Fixed unexpected music got started after the level got entered too quick from the world map (@Wohlstand)
 
 Changes for 1.3.5.3-1
 -Fixed autostart events behaviour

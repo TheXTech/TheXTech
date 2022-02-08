@@ -674,6 +674,7 @@ int GameMain(const CmdLineSetup_t &setup)
                              []()->bool{return LevelSelect;},
                              nullptr,
                              []()->void{FreezeNPCs = false;});
+
                 if(!GameIsActive)
                 {
                     speedRun_saveStats();
