@@ -65,6 +65,19 @@ Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
     s_screenHeight = screenHeight;
 }
 
+JNIEXPORT void JNICALL
+Java_org_libsdl_app_SDLActivity_thextechDebugLog(
+    JNIEnv* env,
+    jclass clazz,
+    jstring line_j)
+{
+    const char *line;
+    (void)clazz;
+    line = env->GetStringUTFChars(line_j, nullptr);
+    pLogDebug("Java-Side: %s", line);
+    env->ReleaseStringUTFChars(line_j, line);
+}
+
 #endif
 
 namespace Controls
