@@ -57,6 +57,8 @@ import android.widget.Toast;
 import java.util.Hashtable;
 import java.util.Locale;
 
+import ru.wohlsoft.thextech.BuildConfig;
+
 
 /**
     SDL Activity
@@ -2069,6 +2071,10 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
          */
         if (touchDevId < 0) {
             touchDevId -= 1;
+        }
+
+        if (BuildConfig.DEBUG) {
+            SDLActivity.debugSource(event.getSource(), touchDevId, "touch-event", "onTouch Event");
         }
 
         // 12290 = Samsung DeX mode desktop mouse
