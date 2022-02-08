@@ -992,6 +992,8 @@ void TouchScreenController::scanTouchDevices()
                 ++it;
         }
     }
+
+    pLogDebug("Totally loaded valid touch devices: %d", (int)m_devices.size());
 }
 
 void TouchScreenController::updateScreenSize()
