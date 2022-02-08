@@ -985,7 +985,7 @@ void TouchScreenController::scanTouchDevices()
                 break;
             }
 
-            pLogDebug("Touch device %d (id=%d): %s", i, typeText, (int)d.id);
+            pLogDebug("Touch device %d (id=%d): %s", i, (int)d.id, typeText);
 
             if(ty != SDL_TOUCH_DEVICE_DIRECT)
             {
