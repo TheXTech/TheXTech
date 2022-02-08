@@ -991,38 +991,6 @@ void TouchScreenController::scanTouchDevices()
             else
                 ++it;
         }
-
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-        for(int i = 0; i < m_touchDevicesCount; ++i)
-        {
-            const char *typeText = "Invalid type";
-            auto t = SDL_GetTouchDevice(i);
-
-            if(!t)
-                typeText = "<Invalid touch index>";
-            else
-            {
-                auto ty = SDL_GetTouchDeviceType(t);
-                switch(ty)
-                {
-                default:
-                case SDL_TOUCH_DEVICE_INVALID: // invalid
-                    break;
-                case SDL_TOUCH_DEVICE_DIRECT:
-                    typeText = "Direct touch type";
-                    break;
-                case SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE:
-                    typeText = "Indiriect absolute type";
-                    break;
-                case SDL_TOUCH_DEVICE_INDIRECT_RELATIVE:
-                    typeText = "Indiriect relative type";
-                    break;
-                }
-            }
-
-            pLogDebug("Touch device %d: %s", i, typeText);
-        }
-#endif // SDL version >= 2.0.10
     }
 }
 
