@@ -985,7 +985,7 @@ void TouchScreenController::scanTouchDevices()
                 break;
             }
 
-            pLogDebug("Touch device %d: %s", i, typeText);
+            pLogDebug("Touch device %d (id=%d): %s", i, typeText, (int)d.id);
 
             if(ty != SDL_TOUCH_DEVICE_DIRECT)
             {
@@ -993,6 +993,7 @@ void TouchScreenController::scanTouchDevices()
                 continue;
             }
 #endif
+
             SDL_memset(d.keysHeld, 0, sizeof(d.keysHeld));
         }
 
