@@ -1317,9 +1317,12 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
             InputDevice device = InputDevice.getDevice(id);
 
             if (device != null) {
-                debugSource(device.getSources(), id, device.getName(), "device available");
+                if (BuildConfig.DEBUG) {
+                    debugSource(device.getSources(), id, device.getName(), "device available");
+                }
 
-                if ((device.getSources() & InputDevice.SOURCE_TOUCHSCREEN) == InputDevice.SOURCE_TOUCHSCREEN || device.getId() == -1) {
+                /* Allow SOURCE_TOUCHSCREEN and also Virtual InputDevices because they can send TOUCHSCREEN events */
+                if ((device.getSources() & InputDevice.SOURCE_TOUCHSCREEN) == InputDevice.SOURCE_TOUCHSCREEN || device.isVirtual()) {
                     int touchDevId = device.getId();
                     /*
                      * Prevent id to be -1, since it's used in SDL internal for synthetic events
@@ -1330,7 +1333,9 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
                     if (touchDevId < 0) {
                         touchDevId -= 1;
                     }
-                    debugSource(device.getSources(), touchDevId, device.getName(), "touch added");
+                    if (BuildConfig.DEBUG) {
+                        debugSource(device.getSources(), touchDevId, device.getName(), "touch added");
+                    }
                     nativeAddTouch(touchDevId, device.getName());
                 }
             }
@@ -2075,6 +2080,9 @@ class SDLSurface extends SurfaceView implements SurfaceHolder.Callback,
 
         if (BuildConfig.DEBUG) {
             SDLActivity.debugSource(event.getSource(), touchDevId, "touch-event", "onTouch Event");
+            InputDevice device = InputDevice.getDevice(event.getDeviceId());
+            int sources = device.getSources();
+            SDLActivity.debugSource(sources,event.getDeviceId(), "touch-event-indev", "onTouch Input Device Event");
         }
 
         // 12290 = Samsung DeX mode desktop mouse
