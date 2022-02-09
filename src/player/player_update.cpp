@@ -366,7 +366,7 @@ void UpdatePlayer()
                     }
                 }
 
-                SizeCheck(A); // check that the player is the correct size for it's character/state/mount and set it if not
+                SizeCheck(Player[A]); // check that the player is the correct size for it's character/state/mount and set it if not
 
                 if(Player[A].Stoned) // stop the player from climbing/spinning/jumping when in tanooki statue form
                 {
@@ -390,7 +390,7 @@ void UpdatePlayer()
                    Player[A].GrabTime == 0)
                 {
                     if(Player[A].Duck)
-                        UnDuck(A);
+                        UnDuck(Player[A]);
                     Player[A].Slide = true;
                 }
                 else if(Player[A].Location.SpeedX == 0.0)
@@ -400,7 +400,7 @@ void UpdatePlayer()
 
                 // unduck a player that should be able to duck
                 if(Player[A].Duck && (Player[A].Character == 1 || Player[A].Character == 2) && Player[A].State == 1 && (Player[A].Mount == 0 || Player[A].Mount == 2))
-                    UnDuck(A);
+                    UnDuck(Player[A]);
 
                 if(GameMenu && !Player[A].SpinJump) // force the player to look right when on the game menu
                     Player[A].Direction = 1;
@@ -532,7 +532,7 @@ void UpdatePlayer()
                 else if(Player[A].Driving) // driving
                 {
                     if(Player[A].Duck)
-                        UnDuck(A);
+                        UnDuck(Player[A]);
                     Player[A].Driving = false;
                     if(Player[A].StandingOnNPC > 0)
                     {
@@ -619,7 +619,7 @@ void UpdatePlayer()
                     if(Player[A].Duck && Player[A].WetFrame)
                     {
                         if(Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0)
-                            UnDuck(A);
+                            UnDuck(Player[A]);
                     }
                     // the following code controls the players ability to duck
                     if(!(Player[A].Character == 5 && ((Player[A].Location.SpeedY != 0.0 && Player[A].Slope == 0 && Player[A].StandingOnNPC == 0) || Player[A].FireBallCD != 0))) // Link can't duck/unduck in air
@@ -682,7 +682,7 @@ void UpdatePlayer()
                         else
                         {
                             if(Player[A].Duck)
-                                UnDuck(A);
+                                UnDuck(Player[A]);
                         }
                     }
                     C = 1;
@@ -1010,7 +1010,7 @@ void UpdatePlayer()
                     Player[A].Effect = 8;
                     Player[A].Effect2 = 4;
                     Player[A].Fairy = false;
-                    SizeCheck(A);
+                    SizeCheck(Player[A]);
                     NewEffect(63, Player[A].Location);
                     PlayerPush(A, 3);
                 }
@@ -1145,7 +1145,7 @@ void UpdatePlayer()
                         if(Player[A].StandingOnNPC == 0 && Player[A].Slope == 0 && Player[A].Location.SpeedY != 0 && Player[A].Mount != 1)
                         {
                             if(Player[A].Character <= 2) // unduck wet players that aren't peach o toad
-                                UnDuck(A);
+                                UnDuck(Player[A]);
                         }
                     }
 
@@ -1194,7 +1194,7 @@ void UpdatePlayer()
                                (Player[A].Controls.AltJump && Player[A].CanAltJump))
                             {
                                 if(Player[A].Duck && Player[A].Mount != 1 && Player[A].Character <= 2)
-                                    UnDuck(A);
+                                    UnDuck(Player[A]);
                                 if(Player[A].Slope != 0)
                                     Player[A].Location.SpeedY = 0;
                                 Player[A].Vine = 0;
@@ -1524,7 +1524,7 @@ void UpdatePlayer()
 //                                    if(nPlay.Online == true && nPlay.MySlot + 1 == A)
 //                                        Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1l" + std::to_string(A) + LB;
                                     if(Player[A].Duck)
-                                        UnDuck(A);
+                                        UnDuck(Player[A]);
 
                                     if(Player[A].ShellSurf)
                                     {
@@ -1802,7 +1802,7 @@ void UpdatePlayer()
                                 Player[A].FairyCD = 1;
                                 Player[A].FlyCount = 0;
                                 Player[A].Fairy = true;
-                                SizeCheck(A);
+                                SizeCheck(Player[A]);
                                 PlaySound(SFX_ZeldaFairy);
                                 Player[A].Immune = 10;
                                 Player[A].Effect = 8;
@@ -1968,7 +1968,7 @@ void UpdatePlayer()
                         else if(Player[A].Duck && Player[A].Location.SpeedY > Physics.PlayerGravity && Player[A].StandingOnNPC == 0 && Player[A].Slope == 0) // Link stands when falling
                         {
                             Player[A].SwordPoke = 0;
-                            UnDuck(A);
+                            UnDuck(Player[A]);
                         }
                     }
                     if(Player[A].Mount > 0 && Player[A].Mount != 2)
@@ -2410,7 +2410,7 @@ void UpdatePlayer()
                                                             if(Player[A].Mount == 0 && Player[A].HoldingNPC == 0 && Player[A].Character <= 2)
                                                             {
                                                                 if(Player[A].Duck)
-                                                                    UnDuck(A);
+                                                                    UnDuck(Player[A]);
                                                                 Player[A].Slide = true;
                                                             }
                                                         }
@@ -3124,7 +3124,7 @@ void UpdatePlayer()
                                         if(!Player[A].Fairy)
                                         {
                                             Player[A].Fairy = true;
-                                            SizeCheck(A);
+                                            SizeCheck(Player[A]);
                                             PlaySound(SFX_ZeldaFairy);
                                             Player[A].Immune = 10;
                                             Player[A].Effect = 8;
@@ -3142,7 +3142,7 @@ void UpdatePlayer()
                                         if(Player[A].Vine > 0)
                                         {
                                             if(Player[A].Duck)
-                                                UnDuck(A);
+                                                UnDuck(Player[A]);
                                             if(Player[A].Location.Y >= Background[B].Location.Y - 20 && Player[A].Vine < 2)
                                                 Player[A].Vine = 2;
                                             if(Player[A].Location.Y >= Background[B].Location.Y - 18)
@@ -3154,7 +3154,7 @@ void UpdatePlayer()
                                                                            Player[A].Slope <= 0)) && Player[A].Jump == 0)
                                         {
                                             if(Player[A].Duck)
-                                                UnDuck(A);
+                                                UnDuck(Player[A]);
                                             if(Player[A].Location.Y >= Background[B].Location.Y - 20 && Player[A].Vine < 2)
                                                 Player[A].Vine = 2;
                                             if(Player[A].Location.Y >= Background[B].Location.Y - 18)
@@ -3477,7 +3477,7 @@ void UpdatePlayer()
                                                 if(!Player[A].Fairy)
                                                 {
                                                     Player[A].Fairy = true;
-                                                    SizeCheck(A);
+                                                    SizeCheck(Player[A]);
                                                     PlaySound(SFX_ZeldaFairy);
                                                     Player[A].Immune = 10;
                                                     Player[A].Effect = 8;
@@ -3495,7 +3495,7 @@ void UpdatePlayer()
                                                 if(Player[A].Vine > 0)
                                                 {
                                                     if(Player[A].Duck)
-                                                        UnDuck(A);
+                                                        UnDuck(Player[A]);
                                                     if(Player[A].Location.Y >= NPC[B].Location.Y - 20 && Player[A].Vine < 2)
                                                         Player[A].Vine = 2;
                                                     if(Player[A].Location.Y >= NPC[B].Location.Y - 18)
@@ -3509,7 +3509,7 @@ void UpdatePlayer()
                                                         ) && Player[A].Jump == 0)
                                                 {
                                                     if(Player[A].Duck)
-                                                        UnDuck(A);
+                                                        UnDuck(Player[A]);
                                                     if(Player[A].Location.Y >= NPC[B].Location.Y - 20 && Player[A].Vine < 2)
                                                         Player[A].Vine = 2;
                                                     if(Player[A].Location.Y >= NPC[B].Location.Y - 18)
@@ -3612,7 +3612,7 @@ void UpdatePlayer()
                                             {
                                                 if(NPCIsBoot[NPC[B].Type])
                                                 {
-                                                    UnDuck(A);
+                                                    UnDuck(Player[A]);
                                                     NPC[B].Killed = 9;
                                                     if(Player[A].State == 1)
                                                     {
@@ -3630,7 +3630,7 @@ void UpdatePlayer()
                                                 }
                                                 else if(NPCIsYoshi[NPC[B].Type] && (Player[A].Character == 1 || Player[A].Character == 2))
                                                 {
-                                                    UnDuck(A);
+                                                    UnDuck(Player[A]);
                                                     NPC[B].Killed = 9;
                                                     Player[A].Mount = 3;
                                                     if(NPC[B].Type == 95)
@@ -3680,7 +3680,7 @@ void UpdatePlayer()
                                                         if(Player[A].Character >= 3)
                                                             PlaySound(SFX_Grab);
                                                         else
-                                                            UnDuck(A);
+                                                            UnDuck(Player[A]);
                                                         Player[A].HoldingNPC = B;
                                                         NPC[B].HoldingPlayer = A;
                                                         NPC[B].CantHurt = Physics.NPCCanHurtWait;
@@ -3784,7 +3784,7 @@ void UpdatePlayer()
                                                                 PlaySound(SFX_Grab);
                                                         }
                                                         if(Player[A].Character <= 2)
-                                                            UnDuck(A);
+                                                            UnDuck(Player[A]);
                                                         Player[A].HoldingNPC = B;
                                                         NPC[B].Direction = Player[A].Direction;
                                                         NPC[B].Frame = EditorNPCFrame(NPC[B].Type, NPC[B].Direction);
@@ -3804,7 +3804,7 @@ void UpdatePlayer()
                                                     if(Player[A].Character >= 3)
                                                         PlaySound(SFX_Grab);
                                                     else
-                                                        UnDuck(A);
+                                                        UnDuck(Player[A]);
                                                     Player[A].HoldingNPC = B;
                                                     NPC[B].HoldingPlayer = A;
                                                     NPC[B].CantHurt = Physics.NPCCanHurtWait;
@@ -4224,7 +4224,7 @@ void UpdatePlayer()
                        !NPC[B].playerTemp && Player[A].DuckRelease &&
                        (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
                     {
-                        UnDuck(A);
+                        UnDuck(Player[A]);
                         if(g_compatibility.fix_link_clowncar_fairy && Player[A].Fairy) // Avoid the mortal glitch
                         {
                             Player[A].Fairy = false;

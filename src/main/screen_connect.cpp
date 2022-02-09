@@ -911,7 +911,7 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
                                 if(Player[A].Character != c+1)
                                 {
                                     Player[A].Character = c+1;
-                                    SizeCheck(A);
+                                    SizeCheck(Player[A]);
                                 }
                             }
                         }

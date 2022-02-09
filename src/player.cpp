@@ -424,7 +424,7 @@ void SetupPlayers()
         //            if(nPlay.Player[A - 1].Active == false && A != 1)
         //                Player[A].Dead = true;
         //        }
-        SizeCheck(A);
+        SizeCheck(Player[A]);
     }
     //    if(nPlay.Online)
     //    {
@@ -474,7 +474,10 @@ void PlayerHurt(const int A)
         p.Effect2 = 4;
         p.Fairy = false;
         p.FairyTime = 0;
-        SizeCheck(B);
+
+        // FIXME: Here is a possible vanilla bug: B is always 0 even at original code
+        SizeCheck(Player[B]);
+
         NewEffect(63, p.Location);
         if(p.Character == 5)
         {
@@ -507,7 +510,7 @@ void PlayerHurt(const int A)
             {
                 p.Mount = 0;
                 PlaySound(SFX_Boot);
-                UnDuck(A);
+                UnDuck(Player[A]);
                 tempLocation = p.Location;
                 tempLocation.SpeedX = 5 * -p.Direction;
                 if(p.MountType == 1)
@@ -524,7 +527,7 @@ void PlayerHurt(const int A)
             }
             else if(p.Mount == 3)
             {
-                UnDuck(A);
+                UnDuck(Player[A]);
                 PlaySound(SFX_YoshiHurt);
                 p.Immune = 100;
                 p.Immune2 = true;
@@ -681,7 +684,7 @@ void PlayerHurt(const int A)
                         p.ForceHitSpot3 = true;
                         p.Location.Y = NPC[numNPCs].Location.Y - p.Location.Height;
 
-                        for(B = 1; B <= numNPCs; B++)
+                        for(int B = 1; B <= numNPCs; B++)
                         {
                             if(NPC[B].standingOnPlayer == A)
                             {
@@ -801,7 +804,7 @@ void PlayerDead(int A)
         p.Mount = 0;
         p.Location.Y -= 32;
         p.Location.Height = 32;
-        SizeCheck(A);
+        SizeCheck(Player[A]);
     }
 
     p.Mount = 0;
@@ -1035,10 +1038,8 @@ void EveryonesDead()
     XEvents::doEvents();
 }
 
-void UnDuck(const int A)
+void UnDuck(Player_t &p)
 {
-    auto &p = Player[A];
-
     if(p.Duck && p.GrabTime == 0) // Player stands up
     {
         if(p.Location.SpeedY != 0.0) // Fixes a block collision bug
@@ -1072,7 +1073,7 @@ void UnDuck(const int A)
             }
         }
 
-        SizeCheck(A);
+        SizeCheck(p);
     }
 }
 
@@ -2826,7 +2827,7 @@ void PlayerDismount(const int A)
     {
         // if not swimming
         if(Player[A].Wet <= 0 || Player[A].Quicksand != 0)
-            UnDuck(A);
+            UnDuck(Player[A]);
         Player[A].CanJump = false;
         PlaySound(SFX_Jump); // Jump sound
         PlaySound(SFX_Boot);
@@ -2945,7 +2946,7 @@ void PlayerDismount(const int A)
     // jump off yoshi
     else if(Player[A].Mount == 3)
     {
-        UnDuck(A);
+        UnDuck(Player[A]);
         if(Player[A].YoshiNPC > 0 || Player[A].YoshiPlayer > 0)
             YoshiSpit(A);
         Player[A].CanJump = false;
@@ -3077,9 +3078,8 @@ void PlayerPush(const int A, int HitSpot)
     }
 }
 
-void SizeCheck(const int A)
+void SizeCheck(Player_t &p)
 {
-    auto &p = Player[A];
 //On Error Resume Next
 
 // player size fix
@@ -3093,7 +3093,7 @@ void SizeCheck(const int A)
     {
         if(p.Duck)
         {
-            UnDuck(A);
+            UnDuck(p);
         }
         if(p.Location.Width != 22.0)
         {
@@ -4358,7 +4358,7 @@ void PowerUps(const int A)
                     }
                     else if(!p.Controls.Down && p.Duck)
                     {
-                        UnDuck(A);
+                        UnDuck(Player[A]);
                     }
                 }
             }
@@ -4539,7 +4539,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
 
     if(canWarp)
     {
-        UnDuck(A);
+        UnDuck(Player[A]);
         plr.YoshiTongueLength = 0;
         plr.MountSpecial = 0;
         plr.FrameCount = 0;
@@ -4876,7 +4876,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
 
                     if(p.Character == 1 || p.Character == 2)
                     {
-                        UnDuck(A);
+                        UnDuck(Player[A]);
                     }
 
                     p.HoldingNPC = p.StandingOnNPC;
@@ -5599,7 +5599,7 @@ void PlayerEffects(const int A)
     if(p.Effect != 8 && p.Fairy)
     {
         p.Fairy = false;
-        SizeCheck(A);
+        SizeCheck(Player[A]);
     }
 
     p.TailCount = 0;
@@ -5962,11 +5962,11 @@ void PlayerEffects(const int A)
                     OwedMount[A] = p.Mount;
                     OwedMountType[A] = p.MountType;
                 }
-                UnDuck(A);
+                UnDuck(Player[A]);
                 p.Mount = 0;
                 p.MountType = 0;
                 p.MountOffsetY = 0;
-                SizeCheck(A);
+                SizeCheck(Player[A]);
                 UpdateYoshiMusic();
             }
 
@@ -6052,7 +6052,7 @@ void PlayerEffects(const int A)
             {
                 if(warp_dir_exit == 1 || warp_dir_exit == 3)
                 {
-                    UnDuck(A);
+                    UnDuck(Player[A]);
                 }
             }
 
@@ -6456,7 +6456,7 @@ void PlayerEffects(const int A)
 
                 p.Mount = 0;
                 p.MountType = 0;
-                SizeCheck(A);
+                SizeCheck(Player[A]);
                 p.MountOffsetY = 0;
                 p.Frame = 1;
                 UpdateYoshiMusic();
@@ -6707,7 +6707,7 @@ void PlayerEffects(const int A)
     {
         if(p.Duck && p.Character != 5)
         {
-            UnDuck(A);
+            UnDuck(Player[A]);
             p.Frame = 1;
         }
 
@@ -6757,7 +6757,7 @@ void PlayerEffects(const int A)
     {
         if(p.Duck && p.Character != 5)
         {
-            UnDuck(A);
+            UnDuck(Player[A]);
             p.Frame = 1;
         }
 
@@ -6940,7 +6940,7 @@ void PlayerEffects(const int A)
 
         if(p.Effect2 == 0.0)
         {
-            UnDuck(A);
+            UnDuck(Player[A]);
             PlaySound(SFX_Raccoon);
             tempLocation.Width = 32;
             tempLocation.Height = 32;
@@ -7162,7 +7162,7 @@ void AddPlayer(int Character)
         p.CanFloat = true;
     p.Direction = 1.;
 
-    SizeCheck(numPlayers);
+    SizeCheck(Player[numPlayers]);
 
     // the rest only matters during level play
     if(LevelSelect && (StartLevel.empty() || !NoMap))
@@ -7301,8 +7301,8 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
         else
         {
             // make player bottom match old player bottom, to avoid floor glitches
-            UnDuck(A);
-            SizeCheck(A);
+            UnDuck(Player[A]);
+            SizeCheck(Player[A]);
         }
 
         if(!LevelSelect)
@@ -7318,8 +7318,8 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
     {
         // make player bottom match old player bottom, for respawn
         Lives --;
-        UnDuck(A);
-        SizeCheck(A);
+        UnDuck(Player[A]);
+        SizeCheck(Player[A]);
         RespawnPlayerTo(A, A);
         PlaySound(SFX_DropItem);
     }
