@@ -4629,6 +4629,8 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
         {
             PlaySound(SFX_Warp);
             plr.Effect = 3;
+            if(g_compatibility.fix_fairy_stuck_in_pipe)
+                plr.Effect2 = 0;
             plr.Warp = B;
             plr.WarpBackward = backward;
 //                        if(nPlay.Online && A == nPlay.MySlot + 1)
@@ -4638,6 +4640,8 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
         {
             PlaySound(SFX_Door);
             plr.Effect = 7;
+            if(g_compatibility.fix_fairy_stuck_in_pipe)
+                plr.Effect2 = 0;
             plr.Warp = B;
             plr.WarpBackward = backward;
 //                        if(nPlay.Online && A == nPlay.MySlot + 1)

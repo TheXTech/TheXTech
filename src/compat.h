@@ -77,7 +77,7 @@ struct Compatibility_t
     bool pause_on_disconnect;
     bool allow_drop_add;
     bool multiplayer_pause_controls;
-
+    bool fix_fairy_stuck_in_pipe;
 
     // SpeedRun section
     enum
