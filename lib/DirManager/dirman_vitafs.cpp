@@ -458,7 +458,9 @@ bool DirMan::rmAbsPath(const std::string &dirPath)
     // return (ret == 0);
 }
 
+
 extern "C" {
+    /*
     int mkdir(const char *path, mode_t mode)
     {
         return sceIoMkdir(path, mode);
@@ -468,6 +470,7 @@ extern "C" {
     {
         return sceIoRmdir(__path);
     }
+    */
 
     int dup2(int oldfd, int newfd)
     {
