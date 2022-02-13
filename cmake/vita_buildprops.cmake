@@ -31,8 +31,6 @@ set(VITA_ADDTL_LIBS
     ogg
     jpeg
     mpg123
-    vitaGL
-    cglm
     debugnet
     mathneon
     SceCtrl_stub
