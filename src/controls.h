@@ -32,6 +32,8 @@ typedef union SDL_Event SDL_Event;
 
 #include "globals.h"
 
+extern Controls_t &operator|=(Controls_t &o1, const Controls_t &o2);
+
 namespace Controls
 {
 

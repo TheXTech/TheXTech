@@ -438,7 +438,7 @@ void UpdateGraphics2(bool skipRepaint)
             Player[A].Controls.Left = false;
             Player[A].Controls.Right = false;
             if(Player[A].Duck)
-                UnDuck(A);
+                UnDuck(Player[A]);
             PlayerFrame(Player[A]);
 
             if(Player[A].Mount == 3)

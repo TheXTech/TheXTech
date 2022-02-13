@@ -508,8 +508,7 @@ static int  s_delayedMusicFadeInMs = 0;
 
 void setMusicStartDelay()
 {
-    if(!s_delayMusic)
-        s_delayedMusicRequested = false;
+    s_delayedMusicRequested = false;
     s_delayMusic = true;
 }
 
@@ -523,9 +522,18 @@ void delayedMusicStart()
     s_delayMusic = false;
     if(s_delayedMusicRequested)
     {
+        D_pLogDebug("Restored delayed music request A=%d", s_delayedMusicA);
         StartMusic(s_delayedMusicA, s_delayedMusicFadeInMs);
         s_delayedMusicRequested = false;
     }
+}
+
+void delayedMusicReset()
+{
+    s_delayMusic = false;
+    if(s_delayedMusicRequested)
+        D_pLogDebug("Saved music request erase A=%d", s_delayedMusicA);
+    s_delayedMusicRequested = false;
 }
 
 void StartMusic(int A, int fadeInMs)
@@ -535,8 +543,11 @@ void StartMusic(int A, int fadeInMs)
         s_delayedMusicA = A;
         s_delayedMusicFadeInMs = fadeInMs;
         s_delayedMusicRequested = true;
+        D_pLogDebug("Saved start music request A=%d", A);
         return;
     }
+
+    D_pLogDebug("Start music A=%d", A);
 
     if(noSound)
     {

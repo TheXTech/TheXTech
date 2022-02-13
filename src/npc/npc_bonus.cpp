@@ -209,7 +209,7 @@ void TouchBonus(int A, int B)
                     Player[A].Effect = 8;
                     Player[A].Effect2 = 4;
                     Player[A].Fairy = true;
-                    SizeCheck(A);
+                    SizeCheck(Player[A]);
                     NewEffect(63, Player[A].Location);
                 }
                 PlaySound(SFX_ZeldaFairy);
@@ -245,7 +245,7 @@ void TouchBonus(int A, int B)
                 Player[A].State = 2;
             if(Player[A].Hearts == 1)
                 Player[A].Hearts = 2;
-            SizeCheck(A);
+            SizeCheck(Player[A]);
             NPC[B].Killed = 9;
             PlaySound(SFX_Checkpoint);
             Checkpoint = FullFileName;
@@ -289,12 +289,12 @@ void TouchBonus(int A, int B)
             {
                 RumbleForPowerup(A);
                 if(Player[A].Duck)
-                    UnDuck(A);
+                    UnDuck(Player[A]);
                 Player[A].StateNPC = NPC[B].Type;
                 Player[A].Frame = 1;
                 Player[A].Effect = 1;
                 if(Player[A].Mount > 0)
-                    UnDuck(A);
+                    UnDuck(Player[A]);
                 PlaySound(SFX_PlayerGrow);
             }
             else if(NPC[B].Type == 250)
@@ -324,7 +324,7 @@ void TouchBonus(int A, int B)
                 Player[A].Frame = 1;
                 Player[A].Effect = 4;
                 if(Player[A].Mount > 0)
-                    UnDuck(A);
+                    UnDuck(Player[A]);
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaItem);
                 else
@@ -361,7 +361,7 @@ void TouchBonus(int A, int B)
                 Player[A].Frame = 1;
                 Player[A].Effect = 41;
                 if(Player[A].Mount > 0)
-                    UnDuck(A);
+                    UnDuck(Player[A]);
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaItem);
                 else
@@ -392,7 +392,7 @@ void TouchBonus(int A, int B)
                 Player[A].Effect = 5;
                 Player[A].Effect2 = 0;
                 if(Player[A].Mount > 0)
-                    UnDuck(A);
+                    UnDuck(Player[A]);
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaItem);
                 else
@@ -423,7 +423,7 @@ void TouchBonus(int A, int B)
                 Player[A].Effect = 11;
                 Player[A].Effect2 = 0;
                 if(Player[A].Mount > 0)
-                    UnDuck(A);
+                    UnDuck(Player[A]);
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaItem);
                 else
@@ -454,7 +454,7 @@ void TouchBonus(int A, int B)
                 Player[A].Effect = 12;
                 Player[A].Effect2 = 0;
                 if(Player[A].Mount > 0)
-                    UnDuck(A);
+                    UnDuck(Player[A]);
                 if(Player[A].Character == 5)
                     PlaySound(SFX_ZeldaItem);
                 else

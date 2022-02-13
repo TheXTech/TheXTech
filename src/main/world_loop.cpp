@@ -558,6 +558,8 @@ void WorldLoop()
                             curWorldLevel = level.index;
                             LevelSelect = false;
 
+                            delayedMusicReset(); // Reset delayed music to prevent unexpected behaviour at loaded level
+
                             ClearLevel();
 
                             if(!OpenLevel(levelPath))

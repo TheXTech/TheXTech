@@ -46,6 +46,8 @@
 #   endif
 
 static double s_screenSize = -1;
+static double s_screenWidth = -1;
+static double s_screenHeight = -1;
 
 JNIEXPORT void JNICALL
 Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
@@ -59,8 +61,21 @@ Java_ru_wohlsoft_thextech_thextechActivity_setScreenSize(
     (void)env;
     (void)type;
     s_screenSize = screenSize;
-    (void)screenWidth;
-    (void)screenHeight;
+    s_screenWidth = screenWidth;
+    s_screenHeight = screenHeight;
+}
+
+JNIEXPORT void JNICALL
+Java_org_libsdl_app_SDLActivity_thextechDebugLog(
+    JNIEnv* env,
+    jclass clazz,
+    jstring line_j)
+{
+    const char *line;
+    (void)clazz;
+    line = env->GetStringUTFChars(line_j, nullptr);
+    pLogDebug("Java-Side: %s", line);
+    env->ReleaseStringUTFChars(line_j, line);
 }
 
 #endif
@@ -185,16 +200,6 @@ bool TouchScreenController::touchSupported()
 int TouchScreenController::numDevices() const
 {
     return m_touchDevicesCount;
-}
-
-int TouchScreenController::selectDevice(int dev)
-{
-    if(dev >= m_touchDevicesCount || dev < -1)
-        dev = -1;
-
-    m_actualDevice = dev;
-
-    return m_actualDevice;
 }
 
 bool TouchScreenController::touchOn()
@@ -901,15 +906,18 @@ TouchScreenController::TouchScreenController() noexcept
 {
     updateScreenSize();
 
-    for(int key = key_BEGIN; key < key_END; ++key)
-        m_keysHeld[key] = false;
-
     pLogDebug("Initialization of touch-screen controller...");
 
     if(!m_GFX.m_success)
         pLogDebug("Touch-screen controller cannot be used due to missing assets.");
 
     scanTouchDevices();
+
+    for(auto &d : m_devices)
+    {
+        for(int key = key_BEGIN; key < key_END; ++key)
+            d.keysHeld[key] = false;
+    }
 
     m_vibrator = nullptr;
     int numHaptics = SDL_NumHaptics();
@@ -944,38 +952,62 @@ void TouchScreenController::scanTouchDevices()
                   m_touchDevicesCount,
                   m_screenWidth, m_screenHeight);
 
-#if SDL_VERSION_ATLEAST(2, 0, 10)
+        m_devices.clear();
+        m_devices.resize(m_touchDevicesCount);
+
         for(int i = 0; i < m_touchDevicesCount; ++i)
         {
-            const char *typeText = "Invalid type";
-            auto t = SDL_GetTouchDevice(i);
-
-            if(!t)
-                typeText = "<Invalid touch index>";
-            else
+            auto &d = m_devices[i];
+            d.id = SDL_GetTouchDevice(i);
+            if(!d.id) // Invalid touch device, will be dropped from the list
             {
-                auto ty = SDL_GetTouchDeviceType(t);
-                switch(ty)
-                {
-                default:
-                case SDL_TOUCH_DEVICE_INVALID: // invalid
-                    break;
-                case SDL_TOUCH_DEVICE_DIRECT:
-                    typeText = "Direct touch type";
-                    break;
-                case SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE:
-                    typeText = "Indiriect absolute type";
-                    break;
-                case SDL_TOUCH_DEVICE_INDIRECT_RELATIVE:
-                    typeText = "Indiriect relative type";
-                    break;
-                }
+                pLogDebug("Touch device %d: <Invalid device>", i);
+                continue;
             }
 
-            pLogDebug("Touch device %d: %s", i, typeText);
+#if SDL_VERSION_ATLEAST(2, 0, 10)
+            const char *typeText = "Invalid type";
+            SDL_TouchDeviceType ty = SDL_GetTouchDeviceType(d.id);
+
+            switch(ty)
+            {
+            default:
+            case SDL_TOUCH_DEVICE_INVALID: // invalid
+                break;
+            case SDL_TOUCH_DEVICE_DIRECT:
+                typeText = "Direct touch type";
+                break;
+            case SDL_TOUCH_DEVICE_INDIRECT_ABSOLUTE:
+                typeText = "Indiriect absolute type";
+                break;
+            case SDL_TOUCH_DEVICE_INDIRECT_RELATIVE:
+                typeText = "Indiriect relative type";
+                break;
+            }
+
+            pLogDebug("Touch device %d (id=%d): %s", i, (int)d.id, typeText);
+
+            if(ty != SDL_TOUCH_DEVICE_DIRECT)
+            {
+                d.id = 0; // Drop any indirect devices
+                continue;
+            }
+#endif
+
+            SDL_memset(d.keysHeld, 0, sizeof(d.keysHeld));
         }
-#endif // SDL version >= 2.0.10
+
+        // Remove unnecessary devices from the list
+        for(auto it = m_devices.begin(); it != m_devices.end(); )
+        {
+            if(!it->id)
+                it = m_devices.erase(it);
+            else
+                ++it;
+        }
     }
+
+    pLogDebug("Totally loaded valid touch devices: %d", (int)m_devices.size());
 }
 
 void TouchScreenController::updateScreenSize()
@@ -1089,23 +1121,13 @@ static void updateFingerKeyState(TouchScreenController::FingerState& st,
         st.alive = false;
 }
 
-void TouchScreenController::processTouchDevice(int dev_i)
+void TouchScreenController::processTouchDevice(TouchDevice_t& dev)
 {
-    const SDL_TouchID dev = SDL_GetTouchDevice(dev_i);
-
-#if SDL_VERSION_ATLEAST(2, 0, 10)
-    if(SDL_GetTouchDeviceType(dev) != SDL_TOUCH_DEVICE_DIRECT)
-    {
-        if(m_actualDevice == dev_i)
-        {
-            pLogWarning("Indirect touch device %d is not supported, dropping into auto mode", dev_i);
-            m_actualDevice = -1; // Drop into auto mode
-        }
-        return;
-    }
-#endif
-
-    int fingers = SDL_GetNumTouchFingers(dev);
+    auto& m_fingers = dev.fingers;
+    auto& keysHeld = dev.keysHeld;
+    auto& current_extra_keys = dev.extra_keys;
+    auto& current_keys = dev.current_keys;
+    int  fingers = SDL_GetNumTouchFingers(dev.id);
 
     for(auto& m_finger : m_fingers)
     {
@@ -1115,7 +1137,7 @@ void TouchScreenController::processTouchDevice(int dev_i)
 
     for(int i = 0; i < fingers; i++)
     {
-        SDL_Finger* f = SDL_GetTouchFinger(dev, i);
+        SDL_Finger* f = SDL_GetTouchFinger(dev.id, i);
 
         if(!f || (f->id < 0)) //Skip a wrong finger
             continue;
@@ -1150,9 +1172,9 @@ void TouchScreenController::processTouchDevice(int dev_i)
 
                 if(fs.heldKeyPrev[key] && !fs.heldKey[key]) // set key off
                 {
-                    updateFingerKeyState(fs, m_current_keys, key, false, m_current_extra_keys);
+                    updateFingerKeyState(fs, current_keys, key, false, current_extra_keys);
                     D_pLogDebug("= Finger Key ID=%d released (move)", static_cast<int>(key));
-                    m_keysHeld[key] = false;
+                    keysHeld[key] = false;
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
                 else if(fs.heldKey[key]) // set key on and keep alive
@@ -1160,9 +1182,9 @@ void TouchScreenController::processTouchDevice(int dev_i)
                     if(!fs.heldKeyPrev[key] && fs.heldKey[key])
                         doVibration(); // Vibrate when key gets on
 
-                    updateFingerKeyState(fs, m_current_keys, key, true, m_current_extra_keys);
+                    updateFingerKeyState(fs, current_keys, key, true, current_extra_keys);
                     D_pLogDebug("= Finger Key ID=%d pressed (move)", static_cast<int>(key));
-                    m_keysHeld[key] = true;
+                    keysHeld[key] = true;
                     fs.heldKeyPrev[key] = fs.heldKey[key];
                 }
             }
@@ -1182,16 +1204,11 @@ void TouchScreenController::processTouchDevice(int dev_i)
 
                 if(st.heldKey[key]) // set key on
                 {
-                    updateFingerKeyState(st, m_current_keys, key, true, m_current_extra_keys);
+                    updateFingerKeyState(st, current_keys, key, true, current_extra_keys);
                     D_pLogDebug("= Finger Key ID=%d pressed (put)", static_cast<int>(key));
                     doVibration();
-                    m_keysHeld[key] = true;
+                    keysHeld[key] = true;
                     st.heldKeyPrev[key] = st.heldKey[key];
-
-                    // Also: when more than one touch devices found, choose one which is actual
-                    // Otherwise, the spam of on/off events will happen
-                    if(m_actualDevice < 0)
-                        m_actualDevice = dev_i;
                 }
             }
 
@@ -1216,9 +1233,9 @@ void TouchScreenController::processTouchDevice(int dev_i)
             {
                 if(it->second.heldKey[key]) // Key was previously held
                 {
-                    updateFingerKeyState(it->second, m_current_keys, key, false, m_current_extra_keys);
+                    updateFingerKeyState(it->second, current_keys, key, false, current_extra_keys);
                     D_pLogDebug("= Finger Key ID=%d released (take)", static_cast<int>(key));
-                    m_keysHeld[key] = false;
+                    keysHeld[key] = false;
                 }
             }
 
@@ -1231,16 +1248,12 @@ void TouchScreenController::processTouchDevice(int dev_i)
         it++;
     }
 
-    if(m_current_extra_keys.keyToggleViewOnce)
-    {
-        m_touchHidden = !m_touchHidden;
+    // Merge per-device states into common states:
+    for(int key = key_BEGIN; key < key_END; ++key)
+        m_keysHeld[key] |= keysHeld[key];
 
-        if(!m_touchHidden)
-            SharedCursor.GoOffscreen();
-    }
-
-    if(m_current_extra_keys.keyHoldRunOnce)
-        m_runHeld = !m_runHeld;
+    m_current_keys |= current_keys;
+    m_current_extra_keys |= current_extra_keys;
 }
 
 void TouchScreenController::update()
@@ -1250,7 +1263,7 @@ void TouchScreenController::update()
 
     if(this->m_active_method)
     {
-        InputMethodProfile_TouchScreen* p = dynamic_cast<InputMethodProfile_TouchScreen*>(this->m_active_method->Profile);
+        auto* p = dynamic_cast<InputMethodProfile_TouchScreen*>(this->m_active_method->Profile);
 
         if(p)
         {
@@ -1259,15 +1272,6 @@ void TouchScreenController::update()
 
             if(p->m_device_count <= 0)
                 p->m_device_count = this->m_touchDevicesCount;
-
-            if(p->m_device_selected >= this->m_touchDevicesCount || p->m_device_selected < -1)
-                p->m_device_selected = -1;
-
-            if(m_deviceChosen != p->m_device_selected)
-            {
-                m_deviceChosen = p->m_device_selected;
-                m_actualDevice = p->m_device_selected;
-            }
 
             if(this->m_feedback_strength != p->m_feedback_strength
                || this->m_feedback_length != p->m_feedback_length)
@@ -1318,21 +1322,26 @@ void TouchScreenController::update()
 
     m_cursorHeld = false;
 
-    // If actually used in the game touch was found, use it
-    if(m_actualDevice >= 0)
+    for(int key = key_BEGIN; key < key_END; ++key)
+        m_keysHeld[key] = false;
+
+    m_current_extra_keys = ExtraKeys_t();
+    m_current_keys = Controls_t();
+
+    // Process all working touch devices
+    for(auto& d : m_devices)
+        processTouchDevice(d);
+
+    if(m_current_extra_keys.keyToggleViewOnce)
     {
-        processTouchDevice(m_actualDevice);
-        return;
+        m_touchHidden = !m_touchHidden;
+
+        if(!m_touchHidden)
+            SharedCursor.GoOffscreen();
     }
 
-    // Otherwise, find it
-    for(int dev_i = 0; dev_i < m_touchDevicesCount; dev_i++)
-    {
-        processTouchDevice(dev_i);
-
-        if(m_actualDevice >= 0)
-            break;
-    }
+    if(m_current_extra_keys.keyHoldRunOnce)
+        m_runHeld = !m_runHeld;
 }
 
 void TouchScreenController::render(int player_no)
@@ -1341,6 +1350,8 @@ void TouchScreenController::render(int player_no)
         return;
 
     int style = m_touchpad_style;
+
+    XRender::offsetViewportIgnore(true);
 
     for(int key = key_BEGIN; key < key_END; key++)
     {
@@ -1452,20 +1463,26 @@ void TouchScreenController::render(int player_no)
             break;
         }
     }
+
+    XRender::offsetViewportIgnore(false);
 }
 
 void TouchScreenController::resetState()
 {
     this->update();
 
-    for(std::pair<const SDL_FingerID, Controls::TouchScreenController::FingerState>& state : m_fingers)
-        state.second.ignore = true;
+    for(auto &d : m_devices)
+    {
+        for(auto& state : d.fingers)
+            state.second.ignore = true;
+        d.current_keys = Controls_t();
+        d.extra_keys = ExtraKeys_t();
+        SDL_memset(d.keysHeld, 0, sizeof(d.keysHeld));
+    }
 
     m_current_keys = Controls_t();
     m_current_extra_keys = ExtraKeys_t();
-
-    for(int i = 0; i < key_END; i++)
-        m_keysHeld[i] = false;
+    SDL_memset(m_keysHeld, 0, sizeof(m_keysHeld));
 }
 
 /*====================================================*\
@@ -1595,11 +1612,51 @@ InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 {
     this->m_showPowerStatus = true;
 
-    // @Wohlstand, can you give suggestions about good defaults for certain screen sizes?
-    // @ds-sloth, will take a look on this and probably will put some code here (and at JNI)
 #ifdef __ANDROID__
-    // this is the place where we would set `this->m_layout` and `this->m_scale_factor` according to `s_screenSize`
-    // FIXME: Revive the screenSize factor being set to initialize the default controls scale
+    if(s_screenSize >= 9.0) // Big tablets
+    {
+        m_default_layout = TouchScreenController::layout_standard;
+        m_default_scale_factor = 65;
+        m_default_scale_factor_dpad = 80;
+        m_default_scale_factor_buttons = 105;
+        m_default_scale_factor_ss_spacing = 110;
+    }
+    else if(s_screenSize >= 7.0) // Middle tablets
+    {
+        m_default_layout = TouchScreenController::layout_standard;
+        m_default_scale_factor = 95;
+        m_default_scale_factor_dpad = 80;
+        m_default_scale_factor_buttons = 105;
+        m_default_scale_factor_ss_spacing = 95;
+    }
+    else if(s_screenSize < 4.0) // Very small phones
+    {
+        m_default_layout = TouchScreenController::layout_tight;
+        m_default_scale_factor = 100;
+        m_default_scale_factor_dpad = 110;
+        m_default_scale_factor_buttons = 135;
+        m_default_scale_factor_ss_spacing = 75;
+    }
+    else // All other devices
+    {
+        // Longer screens (big ration between sides, more like a stick)
+        if((s_screenWidth / s_screenHeight) > 1.6f)
+        {
+            m_default_layout = TouchScreenController::layout_standard;
+            m_default_scale_factor = 135;
+            m_default_scale_factor_dpad = 80;
+            m_default_scale_factor_buttons = 100;
+            m_default_scale_factor_ss_spacing = 100;
+        }
+        else // Shorter screens (smaller ratio between sides, more like a square)
+        {
+            m_default_layout = TouchScreenController::layout_standard;
+            m_default_scale_factor = 135;
+            m_default_scale_factor_dpad = 80;
+            m_default_scale_factor_buttons = 100;
+            m_default_scale_factor_ss_spacing = 90;
+        }
+    }
 #endif
 }
 
@@ -1657,26 +1714,24 @@ void InputMethodProfile_TouchScreen::SaveConfig(IniProcessing* ctl)
     ctl->setValue("vibration-length", this->m_feedback_length);
     ctl->setValue("hold-run", this->m_hold_run);
     ctl->setValue("enable-enter-cheats", this->m_enable_enter_cheats);
-    ctl->setValue("device-selected", this->m_device_selected);
 }
 
 void InputMethodProfile_TouchScreen::LoadConfig(IniProcessing* ctl)
 {
-    ctl->read("ui-layout", this->m_layout, TouchScreenController::layout_standard);
+    ctl->read("ui-layout", this->m_layout, this->m_default_layout);
 
     if(this->m_layout >= TouchScreenController::layout_END)
-        this->m_layout = TouchScreenController::layout_standard;
+        this->m_layout = this->m_default_layout;
 
-    ctl->read("scale-factor", this->m_scale_factor, 100);
-    ctl->read("scale-factor-dpad", this->m_scale_factor_dpad, 100);
-    ctl->read("scale-factor-buttons", this->m_scale_factor_buttons, 100);
-    ctl->read("scale-factor-ss-spacing", this->m_scale_factor_ss_spacing, 100);
+    ctl->read("scale-factor", this->m_scale_factor, this->m_default_scale_factor);
+    ctl->read("scale-factor-dpad", this->m_scale_factor_dpad, this->m_default_scale_factor_dpad);
+    ctl->read("scale-factor-buttons", this->m_scale_factor_buttons, this->m_default_scale_factor_buttons);
+    ctl->read("scale-factor-ss-spacing", this->m_scale_factor_ss_spacing, this->m_default_scale_factor_ss_spacing);
     ctl->read("ui-style", this->m_touchpad_style, TouchScreenController::style_actions);
     ctl->read("vibration-strength", this->m_feedback_strength, 0.f);
     ctl->read("vibration-length", this->m_feedback_length, 12);
     ctl->read("hold-run", this->m_hold_run, false);
     ctl->read("enable-enter-cheats", this->m_enable_enter_cheats, false);
-    ctl->read("device-selected", this->m_device_selected, -1);
 }
 
 // How many per-type special options are there?
@@ -1696,9 +1751,6 @@ const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
     case Options::layout:
         return "LAYOUT STYLE";
 
-    case Options::device_select:
-        return "DEVICE SELECT";
-
     case Options::scale_factor:
         return "SCALE FACTOR";
 
@@ -1710,6 +1762,9 @@ const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
 
     case Options::scale_factor_ss_spacing:
         return "S-START SPACING";
+
+    case Options::reset_layout:
+        return "RESET LAYOUT";
 
     case Options::style:
         return "INTERFACE STYLE";
@@ -1754,12 +1809,6 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
             return "TABLET (OLD)";
         else
             return "STANDARD";
-
-    case Options::device_select:
-        if(this->m_device_selected < 0)
-            return "AUTO";
-        SDL_snprintf(length_buf, 8, "#%d", this->m_device_selected);
-        return length_buf;
 
     case Options::scale_factor:
         SDL_snprintf(length_buf, 8, "%d%%", this->m_scale_factor);
@@ -1820,7 +1869,19 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
 // called when A is pressed; allowed to interrupt main game loop
 bool InputMethodProfile_TouchScreen::OptionChange_Custom(size_t i)
 {
-    return this->OptionRotateRight_Custom(i);
+    switch(i)
+    {
+    case Options::reset_layout:
+        this->m_layout = this->m_default_layout;
+        this->m_scale_factor = this->m_default_scale_factor;
+        this->m_scale_factor_dpad = this->m_default_scale_factor_dpad;
+        this->m_scale_factor_buttons = this->m_default_scale_factor_buttons;
+        this->m_scale_factor_ss_spacing = this->m_default_scale_factor_ss_spacing;
+        return true;
+
+    default:
+        return this->OptionRotateRight_Custom(i);
+    }
 }
 
 // called when left is pressed
@@ -1833,14 +1894,6 @@ bool InputMethodProfile_TouchScreen::OptionRotateLeft_Custom(size_t i)
             this->m_layout--;
         else
             this->m_layout = TouchScreenController::layout_END - 1;
-
-        return true;
-
-    case Options::device_select:
-        if(this->m_device_selected >= -1)
-            this->m_device_selected--;
-        else
-            this->m_device_selected = m_device_count - 1;
 
         return true;
 
@@ -1928,14 +1981,6 @@ bool InputMethodProfile_TouchScreen::OptionRotateRight_Custom(size_t i)
 
         if(this->m_layout >= TouchScreenController::layout_END)
             this->m_layout = 0;
-
-        return true;
-
-    case Options::device_select:
-        if(this->m_device_selected < m_device_count)
-            this->m_device_selected++;
-        else
-            this->m_device_selected = -1;
 
         return true;
 
@@ -2125,6 +2170,22 @@ InputMethod* InputMethodType_TouchScreen::Poll(const std::vector<InputMethod*>& 
     g_renderTouchscreen = true;
 
     return (InputMethod*)method;
+}
+
+TouchScreenController::ExtraKeys_t& TouchScreenController::ExtraKeys_t::operator|=(const ExtraKeys_t& o)
+{
+    keyToggleView |= o.keyToggleView;
+    keyToggleViewOnce |= o.keyToggleViewOnce;
+
+    keyHoldRun |= o.keyHoldRun;
+    keyHoldRunOnce |= o.keyHoldRunOnce;
+
+    keyRunOnce |= o.keyRunOnce;
+    keyAltRunOnce |= o.keyAltRunOnce;
+
+    keyCheats |= o.keyCheats;
+
+    return *this;
 }
 
 } // namespace Controls

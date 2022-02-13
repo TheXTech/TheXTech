@@ -194,7 +194,7 @@ static void fairyMagic()
             Player[B].Effect2 = 4;
             Player[B].Fairy = false;
             Player[B].FairyTime = 0;
-            SizeCheck(B);
+            SizeCheck(Player[B]);
             NewEffect(63, Player[B].Location);
         }
     }
@@ -208,7 +208,7 @@ static void fairyMagic()
             Player[B].Effect2 = 4;
             Player[B].Fairy = true;
             Player[B].FairyTime = -1;
-            SizeCheck(B);
+            SizeCheck(Player[B]);
             NewEffect(63, Player[B].Location);
         }
     }
@@ -425,7 +425,7 @@ static void needATanookiSuit()
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 5;
-            SizeCheck(B);
+            SizeCheck(Player[B]);
             NewEffect(10,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
@@ -451,7 +451,7 @@ static void needAHammerSuit()
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 6;
-            SizeCheck(B);
+            SizeCheck(Player[B]);
             NewEffect(10,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
@@ -477,7 +477,7 @@ static void needAMushroom()
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 2;
-            SizeCheck(B);
+            SizeCheck(Player[B]);
             NewEffect(10,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
@@ -503,7 +503,7 @@ static void needAFlower()
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 3;
-            SizeCheck(B);
+            SizeCheck(Player[B]);
             NewEffect(10,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
@@ -529,7 +529,7 @@ static void needAnIceFlower()
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 7;
-            SizeCheck(B);
+            SizeCheck(Player[B]);
             NewEffect(10,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
@@ -554,7 +554,7 @@ static void needALeaf()
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 4;
-            SizeCheck(B);
+            SizeCheck(Player[B]);
             NewEffect(10,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));

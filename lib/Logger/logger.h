@@ -72,16 +72,16 @@ extern std::string getLogFilePath();
 #define D_pLogInfoNA(fmt) pLogInfo(fmt)
 #define D_pLogFatalNA(fmt) pLogFatal(fmt)
 #else
-#define D_pLogDebug(fmt, ...)
-#define D_pLogWarning(fmt, ...)
-#define D_pLogCritical(fmt, ...)
-#define D_pLogFatal(fmt, ...)
-#define D_pLogInfo(fmt, ...)
-#define D_pLogDebugNA(fmt)
-#define D_pLogWarningNA(fmt)
-#define D_pLogCriticalNA(fmt)
-#define D_pLogFatalNA(fmt)
-#define D_pLogInfoNA(fmt)
+#define D_pLogDebug(fmt, ...) (void)0;
+#define D_pLogWarning(fmt, ...) (void)0;
+#define D_pLogCritical(fmt, ...) (void)0;
+#define D_pLogFatal(fmt, ...) (void)0;
+#define D_pLogInfo(fmt, ...) (void)0;
+#define D_pLogDebugNA(fmt) (void)0;
+#define D_pLogWarningNA(fmt) (void)0;
+#define D_pLogCriticalNA(fmt) (void)0;
+#define D_pLogFatalNA(fmt) (void)0;
+#define D_pLogInfoNA(fmt) (void)0;
 #endif
 
 #ifdef __cplusplus

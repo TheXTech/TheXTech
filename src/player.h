@@ -53,12 +53,12 @@ void EveryonesDead();
 void ProcessLastDead();
 // Public Sub UnDuck(A As Integer) 'Un Duck the player
 // Un Duck the player
-void UnDuck(const int A);
+void UnDuck(struct Player_t &p);
 // Public Sub CheckSection(A As Integer)
 void CheckSection(const int A);
 // Public Sub PlayerFrame(A As Integer)
 void PlayerFrame(const int A);
-void PlayerFrame(Player_t &p);
+void PlayerFrame(struct Player_t &p);
 // Public Sub UpdatePlayerBonus(A As Integer, B As Integer)
 void UpdatePlayerBonus(const int A, const int B);
 // Public Sub TailSwipe(plr As Integer, Optional bool As Boolean = False, Optional Stab As Boolean = False, Optional StabDir As Integer = 0)  'for whacking something with the tail
@@ -83,7 +83,7 @@ void SwapCoop();
 // Public Sub PlayerPush(A As Integer, HitSpot As Integer)
 void PlayerPush(const int A, int HitSpot);
 // Public Sub SizeCheck(A As Integer)
-void SizeCheck(const int A);
+void SizeCheck(struct Player_t &p);
 // Public Sub YoshiEatCode(A As Integer)
 void YoshiEatCode(const int A);
 // Public Sub StealBonus()
@@ -106,7 +106,7 @@ void PlayerCollide(const int A); //PRIVATE
 void PlayerGrabCode(const int A, bool DontResetGrabTime = false);
 // Public Sub LinkFrame(A As Integer)
 void LinkFrame(const int A);
-void LinkFrame(Player_t &p);
+void LinkFrame(struct Player_t &p);
 // Private Sub PlayerEffects(A As Integer)
 void PlayerEffects(const int A);
 

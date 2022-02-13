@@ -255,7 +255,7 @@ class SDLJoystickHandler_API16 extends SDLJoystickHandler {
 
     @Override
     public boolean handleMotionEvent(MotionEvent event) {
-        if ((event.getSource() & InputDevice.SOURCE_JOYSTICK) != 0) {
+        if ((event.getSource() & InputDevice.SOURCE_JOYSTICK) == InputDevice.SOURCE_JOYSTICK) {
             int actionPointerIndex = event.getActionIndex();
             int action = event.getActionMasked();
             if (action == MotionEvent.ACTION_MOVE) {
