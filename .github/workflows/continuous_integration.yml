@@ -95,7 +95,7 @@ jobs:
           }
         - {
             name: "Windows - ARM64",
-            os: windows-latest,
+            os: windows-2019,
             extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=thextech",
             generator: "Visual Studio 16 2019",
             build_type: "MinSizeRel",
