@@ -37,16 +37,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Set output
-      id: vars
-      run: |
-        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo ::set-output name=short_ref::pull-request
-            echo "Is Pull-Request"
-        else
-            echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-            echo "Is normal build at the branch"
-        fi
+    - uses: nelonoel/branch-name@v1.0.1
 
     - name: Install Dependencies
       shell: bash
@@ -119,6 +110,13 @@ jobs:
       if: success()
       shell: bash
       run: |
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+            BRANCH_NAME_RES="pull-request"
+            echo "-- Pull-request detected!"
+        else
+            BRANCH_NAME_RES=${BRANCH_NAME}
+        fi
+
         cd build
         mkdir package
         mkdir "package/${{ matrix.config.subdir_name }}"
@@ -129,7 +127,7 @@ jobs:
         cat ../docs/README_VITA.ESP.md ../README.ESP.md >> "package/${{ matrix.config.subdir_name }}/README.ESP.md"
         cp thextech.vpk "package/${{ matrix.config.subdir_name }}/"
         cd package
-        zip -9 -r "thextech-vita-${{ steps.vars.outputs.short_ref }}.zip" "${{ matrix.config.subdir_name }}"
+        zip -9 -r "thextech-vita-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
         cd ../..
 
@@ -137,7 +135,7 @@ jobs:
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        path: build/package/thextech-vita-${{ steps.vars.outputs.short_ref }}.zip
+        path: build/package/*.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
@@ -148,7 +146,9 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/thextech-vita-${{ steps.vars.outputs.short_ref }}.zip;"
+        for q in ./build/package/*.zip; do
+            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+        done
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory
