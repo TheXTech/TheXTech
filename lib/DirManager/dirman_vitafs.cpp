@@ -118,30 +118,6 @@ bool DirMan::DirMan_private::getListOfFiles(std::vector<std::string> &list, cons
         
         sceIoDclose(dfd);
     }
-
-
-
-    // POSIX
-    // dirent *dent = NULL;
-    // DIR *srcdir = opendir(m_dirPath.c_str());
-    // if(srcdir == NULL)
-    //     return false;
-
-    // while((dent = readdir(srcdir)) != NULL)
-    // {
-    //     struct stat st;
-    //     if(strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
-    //         continue;
-
-    //     if(fstatat(dirfd(srcdir), dent->d_name, &st, 0) < 0)
-    //         continue;
-    //     if(S_ISREG(st.st_mode))
-    //     {
-    //         if(matchSuffixFilters(dent->d_name, suffix_filters))
-    //             list.push_back(dent->d_name);
-    //     }
-    // }
-    // closedir(srcdir);
     return true;
 }
 

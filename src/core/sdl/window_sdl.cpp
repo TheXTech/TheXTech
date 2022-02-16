@@ -123,7 +123,7 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
-#if defined(__ANDROID__) || defined(VITA) // Use a full-screen on Android mode by default
+#if defined(__ANDROID__) || defined(VITA) // Use a full-screen on Android & PS Vita mode by default
     setFullScreen(true);
     show();
 #endif
