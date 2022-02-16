@@ -92,6 +92,9 @@ static int g_errorsSfx = 0;
 
 static bool s_musicHasYoshiMode = false;
 static int  s_musicYoshiTrackNumber = -1;
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+static bool s_musicDisableSpcEcho = false;
+#endif
 
 static std::string MusicRoot;
 static std::string SfxRoot;
@@ -108,9 +111,14 @@ struct SectionEffect_t
         FX_Echo,
         FX_Reverb
     };
+    //! Reverb effect settings
     SoundFXReverb rev;
+    //! Echo effect settings
     SoundFXEchoSetup echo;
+    //! Selected effect
     int fx = FX_None;
+    //! Disable echo of playing SPC files
+    bool disableSpcEcho = false;
 };
 
 static SectionEffect_t s_sectionEffect[maxSections + 1];
@@ -462,6 +470,7 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
         std::string p = m.path;
         processPathArgs(p, FileNamePath + "/", FileName + "/");
         g_curMusic = Mix_LoadMUS(p.c_str());
+
         if(!g_curMusic)
             pLogWarning("Music '%s' opening error: %s", m.path.c_str(), Mix_GetError());
         else
@@ -470,6 +479,12 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
             s_musicYoshiTrackNumber = m.yoshiModeTrack;
             s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
             UpdateYoshiMusic();
+
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+            if(s_musicDisableSpcEcho)
+                Mix_GME_SetSpcEchoDisabled(g_curMusic, s_musicDisableSpcEcho);
+#endif
+
             if(fadeInMs > 0)
                 Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
             else
@@ -764,6 +779,7 @@ static void readFx(IniProcessing &sounds, SectionEffect_t &s)
     };
 
     sounds.readEnum("fx", s.fx, (int)SectionEffect_t::FX_None, fxType);
+    sounds.read("spc-echo-off", s.disableSpcEcho, false);
 
     switch(s.fx)
     {
@@ -1298,6 +1314,13 @@ void UpdateSoundFX(int recentSection)
 
     SDL_assert_release(recentSection >= 0 && recentSection <= maxSections);
     auto &s = s_sectionEffect[recentSection];
+
+    if(g_curMusic && s_musicDisableSpcEcho != s.disableSpcEcho)
+    {
+        Mix_GME_SetSpcEchoDisabled(g_curMusic, s.disableSpcEcho);
+        s_musicDisableSpcEcho = s.disableSpcEcho;
+    }
+
     switch(s.fx)
     {
     default:
