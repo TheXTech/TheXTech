@@ -283,7 +283,6 @@ int main(int argc, char**argv)
         cmd.add(&inputFileNames);
 
         cmd.parse(argc, argv);
-        
         std::string customAssets = customAssetsPath.getValue();
 
         if(!customAssets.empty())
