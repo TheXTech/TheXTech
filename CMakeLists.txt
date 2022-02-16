@@ -161,6 +161,17 @@ if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
     set(THEXTECH_UNIX_INSTALL TRUE)
 endif()
 
+if(VITA)
+    message("Enabling PS Vita Support and fast-math flags.")
+        
+    # Fast Math flags for Vita, ensuring -DVITA is passed to the compiler.
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon -DVITA")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon -DVITA")
+
+    # Disable annoying warning for Parameter passing.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
+endif()
+
 # ============ Customization ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
@@ -293,7 +304,6 @@ if(NOT 3DS AND NOT VITA)
     list(APPEND LIB_SRC
         ${FILEMAPPER_SRCS}
         ${STACK_WALKER_SRCS}
-        3rdparty/tinyfiledialogs/tinyfiledialogs.c
         lib/CrashHandler/crash_handler.cpp
     )
 endif()
@@ -580,21 +590,12 @@ if(ANDROID)
 endif()
 
 if(VITA)
-    message("Enabling PS Vita Support.")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
-
-    # Disable annoying warning for Parameter passing.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
-
-    target_compile_definitions(thextech PRIVATE -DVITA -DVITA=1)
-    target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
-    target_compile_definitions(thextech PRIVATE -DFIXED_RES)
-    target_compile_definitions(thextech PRIVATE -DLOW_MEM)
-endif()
-
-if(USE_TOUCHSCREEN_CONTROLLER)
-    target_compile_definitions(thextech PRIVATE -DUSE_TOUCHSCREEN_CONTROLLER)
+    # Link Vita specific libraries to the generic interface.
+    target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS}) 
+    
+    # Set explicit flags for this project
+    target_compile_definitions(thextech PRIVATE
+        -DVITA -DNO_SCREENSHOT -DFIXED_RES -DLOW_MEM -DPRELOAD_LEVELS -DNO_INTPTROC)
 endif()
 
 if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")
@@ -741,18 +742,6 @@ elseif(WIN32)
     install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
 elseif(VITA)
     include(cmake/package_vita.cmake)
-    if(ENABLE_FAST_MATH)
-        message("FAST MATH ON! HAVE FUN!")
-        set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon")
-    endif()
-    target_compile_definitions(thextech PRIVATE -DVITA -DVITA=1)
-    target_compile_definitions(thextech PRIVATE -DNO_SCREENSHOT)
-#   target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING)
-    # target_compile_definitions(thextech PRIVATE -DPRELOAD_LEVELS)
-    target_compile_definitions(thextech PRIVATE -DFIXED_RES)
-    target_compile_definitions(thextech PRIVATE -DLOW_MEM)
-    target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS}) 
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

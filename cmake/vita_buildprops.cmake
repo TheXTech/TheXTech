@@ -4,11 +4,11 @@ include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
 cmake_policy(SET CMP0077 OLD)
 
 if(NOT VITA_APP_NAME)
-    set(VITA_APP_NAME "wip-vita-master test1")
+    set(VITA_APP_NAME "TheXTech PS Vita")
 endif()
 
 if(NOT VITA_TITLEID)
-    set(VITA_TITLEID "THEXTECH2")
+    set(VITA_TITLEID "THEXTECH0")
 endif()
 
 if(NOT VITA_VERSION)
@@ -29,7 +29,6 @@ set(VITA_ADDTL_LIBS
     vorbisfile
     vorbis
     ogg
-    jpeg
     mpg123
     debugnet
     mathneon
@@ -66,19 +65,14 @@ set(VITA_ADDTL_LIBS
     SceVshBridge_stub
 )
 
+# VITA_CMAKE_FLAGS is used in conjunction with ExternalProject_Add
 set(VITA_CMAKE_FLAGS
     # General/TheXTech
     "-DVITA=1"
     "-DENABLE_FPIC=0"
-    "-DBUILD_OGG_VORBIS=1"
-    "-DPGE_NO_THREADING=1"
-    "-DLOW_MEM=1"
-    "-DPRELOAD_LEVELS=1"
     "-DUSE_SYSTEM_SDL2_DEFAULT=ON"
     "-DUSE_SYSTEM_SDL2=ON"
-    "-DNO_INTPTROC=ON"
     "-DUSE_STATIC_LIBC=OFF"
-    "-DNO_SCREENSHOT=1"
 
     # Free Image
     "-DCMAKE_POSITION_INDEPENDENT_CODE=OFF"
@@ -95,18 +89,7 @@ set(VITA_CMAKE_FLAGS
     "-DADLMIDI_LIBRARY="
     "-DBUILD_OGG_VORBIS=1"
     "-DLIBXMP_PIC=0"
-    # VitaSDK has local Opus available through vdpm (usually installed as part of a default install)
-    # BUILDS LOCALLY NOW!
-    # "-DBUILD_OPUS=OFF"
-    # "-DLIBOPUSFILE_LIB=${vita_opusfile}"
-    # "-DLIBOPUS_LIB=${vita_opus}"
 )
-
-if(USE_SDL_VID)
-    set(VITA_CMAKE_FLAGS "${VITA_CMAKE_FLAGS} -DUSE_SDL_VID=1")
-else()
-    set(VITA_CMAKE_FLAGS "${VITA_CMAKE_FLAGS} -DNO_SCREENSHOT=1")
-endif()
 
 
 
