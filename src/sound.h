@@ -235,6 +235,8 @@ void SoundFX_SetReverb(const SoundFXReverb &setup);
 void SoundFX_Clear();
 #endif // THEXTECH_ENABLE_AUDIO_FX
 
+void ResetSoundFX();
+
 void UpdateSoundFX(int recentSection);
 
 #endif // SOUND_H

@@ -1304,6 +1304,15 @@ void SoundFX_Clear()
 
 #endif // THEXTECH_ENABLE_AUDIO_FX
 
+
+void ResetSoundFX()
+{
+#ifdef THEXTECH_ENABLE_AUDIO_FX
+    SoundFX_Clear();
+    s_musicDisableSpcEcho = false;
+#endif
+}
+
 void UpdateSoundFX(int recentSection)
 {
 #ifndef THEXTECH_ENABLE_AUDIO_FX

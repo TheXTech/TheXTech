@@ -1009,6 +1009,7 @@ void EveryonesDead()
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
 
+        ResetSoundFX();
         ClearLevel();
         if(RestartLevel)
         {
@@ -1029,6 +1030,7 @@ void EveryonesDead()
         SaveGame();
         LevelMacro = LEVELMACRO_OFF;
         LevelMacroCounter = 0;
+        ResetSoundFX();
         ClearLevel();
         LevelSelect = true;
         GameMenu = true;

@@ -615,6 +615,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 XRender::repaint();
 
                 lunaReset();
+                ResetSoundFX();
                 ClearLevel();
 
                 std::string levelPath;
@@ -646,6 +647,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
             else
             {
+                ResetSoundFX();
                 setMusicStartDelay(); // Don't start music until all gfx will be loaded
 
                 if(curWorldMusic > 0)
@@ -893,6 +895,7 @@ int GameMain(const CmdLineSetup_t &setup)
             else if(!LevelRestartRequested)
             {
                 lunaReset();
+                ResetSoundFX();
                 ClearLevel();
 //            End If
             } // TestLevel
@@ -943,6 +946,7 @@ void NextLevel()
     LevelMacroCounter = 0;
     StopMusic();
     lunaReset();
+    ResetSoundFX();
     ClearLevel();
     XRender::setTargetTexture();
     XRender::clearBuffer();
@@ -1626,6 +1630,7 @@ void StartEpisode()
         SoundPause[26] = 200;
         LevelSelect = false;
 
+        ResetSoundFX();
         // todo: update this!
         ClearLevel();
         std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
@@ -1697,6 +1702,7 @@ void StartBattleMode()
     XEvents::doEvents();
     PGE_Delay(500);
     lunaReset();
+    ResetSoundFX();
     ClearLevel();
 
     if(NumSelectWorld <= 1)
