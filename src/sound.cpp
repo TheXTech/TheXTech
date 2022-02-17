@@ -1315,11 +1315,9 @@ void UpdateSoundFX(int recentSection)
     SDL_assert_release(recentSection >= 0 && recentSection <= maxSections);
     auto &s = s_sectionEffect[recentSection];
 
-    if(g_curMusic && s_musicDisableSpcEcho != s.disableSpcEcho)
-    {
+    s_musicDisableSpcEcho = s.disableSpcEcho;
+    if(g_curMusic)
         Mix_GME_SetSpcEchoDisabled(g_curMusic, s.disableSpcEcho);
-        s_musicDisableSpcEcho = s.disableSpcEcho;
-    }
 
     switch(s.fx)
     {
@@ -1338,4 +1336,3 @@ void UpdateSoundFX(int recentSection)
     }
 #endif // THEXTECH_ENABLE_AUDIO_FX
 }
-
