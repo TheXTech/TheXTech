@@ -293,12 +293,16 @@ void DrawEditorLevel(int Z)
 
         else if(e.Mode == OptCursor_t::LVL_SETTINGS) // Player start points
         {
-            // TODO: determine what is going on here
             if(e.SubMode == 4 || e.SubMode == 5)
             {
                 A = e.SubMode - 3;
-                C = Physics.PlayerHeight[testPlayer[A].Character][2] - Physics.PlayerHeight[A][2];
-                switch (testPlayer[A].Character)
+
+                int ch = testPlayer[A].Character;
+                if(ch == 0)
+                    ch = A;
+
+                C = Physics.PlayerHeight[ch][2] - Physics.PlayerHeight[A][2];
+                switch (ch)
                 {
                 case 1:
                     XRender::renderTexture(vScreenX[Z] + e.Location.X + MarioFrameX[201],
