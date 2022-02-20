@@ -26,6 +26,8 @@
 #include "speedrunner.h"
 #include "cheat_code.h"
 
+#include "editor.h"
+
 namespace PauseScreen
 {
 
@@ -97,10 +99,14 @@ static bool s_QuitTesting()
 	XRender::clearBuffer();
 	XRender::repaint();
 	EndLevel = true;
+    LevelBeatCode = -1;
 	StopMusic();
 	XEvents::doEvents();
 	// change this when editor is reimplemented!
-	KillIt(); // Quit the game entirely
+    if(Backup_FullFileName.empty())
+    {
+        KillIt(); // Quit the game entirely
+    }
 	return true;
 }
 
@@ -170,7 +176,10 @@ void Init(bool LegacyPause)
 	    	s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
 	    if(g_config.enter_cheats_menu_item && !LegacyPause)
 	    	s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
-	    s_items.push_back(MenuItem{"QUIT TESTING", s_QuitTesting});
+        if(Backup_FullFileName.empty())
+    	    s_items.push_back(MenuItem{"QUIT TESTING", s_QuitTesting});
+        else
+            s_items.push_back(MenuItem{"RETURN TO EDITOR", s_QuitTesting});
     }
     else
     {

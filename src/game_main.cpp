@@ -892,12 +892,7 @@ int GameMain(const CmdLineSetup_t &setup)
 //            If TestLevel = True Then
             if(TestLevel)
             {
-//                TestLevel = False
-//                TestLevel = false;
-//                LevelEditor = True
-//                LevelEditor = true;
-//                LevelEditor = true; //FIXME: Restart level testing or quit a game instead of THIS
-
+                // if failed, restart
                 if(LevelBeatCode == 0)
                 {
                     GameThing();
@@ -906,18 +901,25 @@ int GameMain(const CmdLineSetup_t &setup)
                 // from editor, return to editor
                 else if(!Backup_FullFileName.empty())
                 {
+                    // printf("returning to editor...\n");
+
                     TestLevel = false;
                     LevelEditor = true;
 
+                    // reopen the temporary level (FullFileName)
                     OpenLevel(FullFileName);
-                    if(!Backup_FullFileName.empty())
-                    {
-                        Files::deleteFile(FullFileName);
-                        FullFileName = Backup_FullFileName;
-                        Backup_FullFileName = "";
-                    }
+
+                    // reset FullFileName to point to the real level (Backup_FullFileName)
+                    Files::deleteFile(FullFileName);
+                    FullFileName = Backup_FullFileName;
+                    Backup_FullFileName = "";
+
+                    editorScreen.active = false;
+
+                    if(g_config.EnableInterLevelFade)
+                        g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
                 }
-                // from command line
+                // from command line, close
                 else if(setup.testLevelMode && !setup.interprocess)
                 {
                     GameIsActive = false;
@@ -982,6 +984,8 @@ void EditorLoop()
         UpdateGraphics2();
     else
         UpdateGraphics();
+
+    updateScreenFaders();
 
     // TODO: if there's a second screen, draw editor screen there too
 
