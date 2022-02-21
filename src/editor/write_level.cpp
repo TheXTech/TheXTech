@@ -306,7 +306,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         auto &e = Events[i];
 
         evt.name = e.Name;
-        evt.msg = e.Text;
+        evt.msg = GetS(e.Text);
         evt.sound_id = e.Sound;
         evt.end_game = e.EndGame;
         evt.layers_hide.clear();
