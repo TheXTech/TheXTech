@@ -27,6 +27,7 @@
 
 #include "global_constants.h"
 #include <vector>
+#include <string>
 #include <SDL2/SDL_assert.h>
 
 extern const std::string g_emptyString;
