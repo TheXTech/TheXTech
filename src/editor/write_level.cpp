@@ -144,9 +144,9 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         if(block.layer.empty())
             block.layer = "Default";
 
-        block.event_destroy = b.TriggerDeath;
-        block.event_hit = b.TriggerHit;
-        block.event_emptylayer = b.TriggerLast;
+        block.event_destroy = GetE(b.TriggerDeath);
+        block.event_hit = GetE(b.TriggerHit);
+        block.event_emptylayer = GetE(b.TriggerLast);
 
         block.meta.array_id = (out.blocks_array_id++);
 
@@ -258,7 +258,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         warp.cannon_exit = w.cannonExit;
         warp.cannon_exit_speed = w.cannonExitSpeed;
         warp.event_enter = GetE(w.eventEnter);
-        warp.stars_msg = w.StarsMsg;
+        warp.stars_msg = GetS(w.StarsMsg);
         warp.star_num_hide = w.noPrintStars;
         warp.hide_entering_scene = w.noEntranceScene;
 
@@ -335,7 +335,7 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
 
             s.music_id = ss.music_id;
             s.background_id = ss.background_id;
-            s.music_file = ss.music_file;
+            s.music_file = GetS(ss.music_file);
 
             s.position_left = ss.position.X;
             s.position_top = ss.position.Y;
