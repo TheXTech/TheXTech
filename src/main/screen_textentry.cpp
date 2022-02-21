@@ -469,6 +469,10 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     s_timer = -1;
     s_committed = false;
     PauseGame(PauseCode::TextEntry, 0);
+    MenuCursorCanMove = false;
+    MenuMouseRelease = false;
+    MouseRelease = false;
+    ScrollRelease = false;
     return Text;
 }
 
