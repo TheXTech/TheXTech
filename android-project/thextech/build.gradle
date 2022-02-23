@@ -91,14 +91,14 @@ def xTechVersionNumber = (verNum[0] * 1000000) + (verNum[1] * 10000) + (verNum[2
 println "Project version: " + xTechVersionString + ", version code: " + xTechVersionNumber.toString()
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
     defaultConfig {
         if (buildAsApplication) {
             applicationId "ru.wohlsoft.thextech"
         }
 
         minSdkVersion 16
-        targetSdkVersion 31
+        targetSdkVersion 32
 
         versionName xTechVersionString
         versionCode xTechVersionNumber
