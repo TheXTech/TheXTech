@@ -34,6 +34,7 @@ import androidx.core.content.res.ResourcesCompat;
 public class OpenFileDialog extends AlertDialog.Builder {
 
     private String currentPath = Environment.getExternalStorageDirectory().getPath();
+    private String initialPath = currentPath;
     private List<File> files = new ArrayList<File>();
     private TextView title;
     private ListView listView;
@@ -94,10 +95,18 @@ public class OpenFileDialog extends AlertDialog.Builder {
         super(context);
         title = createTitle(context);
         changeTitle();
+
         LinearLayout linearLayout = createMainLayout(context);
-        linearLayout.addView(createBackItem(context));
+
+        LinearLayout menuBar = createMenuLayout(linearLayout.getContext());
+        menuBar.addView(createBackItem(context));
+        menuBar.addView(createGoHomeItem(context));
+        menuBar.addView(createGoInitPathItem(context));
+        linearLayout.addView(menuBar);
+
         listView = createListView(context);
         linearLayout.addView(listView);
+
         setCustomTitle(title)
             .setView(linearLayout)
             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
@@ -151,6 +160,7 @@ public class OpenFileDialog extends AlertDialog.Builder {
     public OpenFileDialog setCurrentDirectory(String path)
     {
         currentPath = path;
+        initialPath = path;
         changeTitle();
         return this;
     }
@@ -200,6 +210,12 @@ public class OpenFileDialog extends AlertDialog.Builder {
         return linearLayout;
     }
 
+    private LinearLayout createMenuLayout(Context context) {
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        return linearLayout;
+    }
+
     private int getItemHeight(Context context) {
         TypedValue value = new TypedValue();
         DisplayMetrics metrics = new DisplayMetrics();
@@ -225,16 +241,11 @@ public class OpenFileDialog extends AlertDialog.Builder {
 
     private TextView createBackItem(Context context) {
         TextView textView = createTextView(context, android.R.style.TextAppearance_DeviceDefault_Small);
-        Drawable drawable = ResourcesCompat.getDrawable(getContext().getResources(), android.R.drawable.ic_menu_directions, context.getTheme());
-//        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-//            drawable = getContext().getResources().getDrawable(android.R.drawable.ic_menu_directions, context.getTheme());
-//        } else {
-//            drawable = getContext().getResources().getDrawable(android.R.drawable.ic_menu_directions);
-//        }
+        Drawable drawable = ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.ic_menu_back, context.getTheme());
         assert drawable != null;
         drawable.setBounds(0, 0, 60, 60);
         textView.setCompoundDrawables(drawable, null, null, null);
-        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         textView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -244,6 +255,40 @@ public class OpenFileDialog extends AlertDialog.Builder {
                     currentPath = parentDirectory.getPath();
                     RebuildFiles(((FileAdapter) listView.getAdapter()));
                 }
+            }
+        });
+        return textView;
+    }
+
+    private TextView createGoHomeItem(Context context) {
+        TextView textView = createTextView(context, android.R.style.TextAppearance_DeviceDefault_Small);
+        Drawable drawable = ResourcesCompat.getDrawable(getContext().getResources(), R.drawable.ic_menu_home, context.getTheme());
+        assert drawable != null;
+        drawable.setBounds(0, 0, 60, 60);
+        textView.setCompoundDrawables(drawable, null, null, null);
+        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentPath = Environment.getExternalStorageDirectory().getPath();
+                RebuildFiles(((FileAdapter) listView.getAdapter()));
+            }
+        });
+        return textView;
+    }
+
+    private TextView createGoInitPathItem(Context context) {
+        TextView textView = createTextView(context, android.R.style.TextAppearance_DeviceDefault_Small);
+        Drawable drawable = ResourcesCompat.getDrawable(getContext().getResources(), android.R.drawable.ic_menu_directions, context.getTheme());
+        assert drawable != null;
+        drawable.setBounds(0, 0, 60, 60);
+        textView.setCompoundDrawables(drawable, null, null, null);
+        textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        textView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentPath = initialPath;
+                RebuildFiles(((FileAdapter) listView.getAdapter()));
             }
         });
         return textView;
