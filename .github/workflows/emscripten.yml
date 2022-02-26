@@ -53,16 +53,18 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-    - name: Set output
-      id: vars
-      run: |
-        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo ::set-output name=short_ref::pull-request
-            echo "Is Pull-Request"
-        else
-            echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-            echo "Is normal build at the branch"
-        fi
+    - uses: nelonoel/branch-name@v1.0.1
+
+#    - name: Set output
+#      id: vars
+#      run: |
+#        if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "push" ]]; then
+#            echo ::set-output name=short_ref::pull-request
+#            echo "Is Pull-Request"
+#        else
+#            echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+#            echo "Is normal build at the branch"
+#        fi
 
     - name: Install Dependencies
       shell: bash
@@ -113,6 +115,13 @@ jobs:
       if: success()
       shell: bash
       run: |
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+            BRANCH_NAME_RES="pull-request"
+            echo "-- Pull-request detected!"
+        else
+            BRANCH_NAME_RES=${BRANCH_NAME}
+        fi
+
         cd build
         mkdir package
         mkdir "package/${{ matrix.config.subdir_name }}"
@@ -123,7 +132,7 @@ jobs:
         cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/"
         cp output/bin/${{ matrix.config.executable_name }}* "package/${{ matrix.config.subdir_name }}/"
         cd package
-        tar -cvzf "thextech-${{ matrix.config.package_filename_game }}-webassembly-${{ steps.vars.outputs.short_ref }}.tar.gz" "${{ matrix.config.subdir_name }}"
+        tar -cvzf "thextech-${{ matrix.config.package_filename_game }}-webassembly-${BRANCH_NAME_RES}.tar.gz" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
         cd ../..
 
@@ -131,7 +140,7 @@ jobs:
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        path: build/package/thextech-${{ matrix.config.package_filename_game }}-webassembly-${{ steps.vars.outputs.short_ref }}.tar.gz
+        path: build/package/*.tar.gz
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
@@ -142,7 +151,9 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} ./build/package/thextech-${{ matrix.config.package_filename_game }}-webassembly-${{ steps.vars.outputs.short_ref }}.tar.gz;"
+        for q in ./build/package/*.tar.gz; do
+            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+        done
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory

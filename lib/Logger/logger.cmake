@@ -14,6 +14,11 @@ elseif(EMSCRIPTEN)
     list(APPEND LOGGER_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/logger_emscripten.cpp
     )
+elseif(VITA)
+    message("-- Logger for PS Vita")
+    list(APPEND LOGGER_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/private/logger_vita.cpp
+    )
 else()
     message("-- Logger for Desktop")
     list(APPEND LOGGER_SRCS

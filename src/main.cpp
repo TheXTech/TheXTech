@@ -36,6 +36,10 @@
 #include <Utils/files.h>
 #include <CrashHandler/crash_handler.h>
 
+#ifdef VITA
+#include "vita/vita_memory.h"
+#endif
+
 #ifdef ENABLE_XTECH_LUA
 #include "xtech_lua_main.h"
 #endif
@@ -73,6 +77,7 @@ static void macosReceiveOpenFile()
     }
 }
 #endif
+
 
 static void strToPlayerSetup(int player, const std::string &setupString)
 {
@@ -138,10 +143,13 @@ static void strToPlayerSetup(int player, const std::string &setupString)
 extern "C"
 int main(int argc, char**argv)
 {
+
     CmdLineSetup_t setup;
     FrmMain frmMain;
 
+#if !defined(__3DS__) && !defined(VITA)
     CrashHandler::initSigs();
+#endif
 
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
@@ -275,7 +283,6 @@ int main(int argc, char**argv)
         cmd.add(&inputFileNames);
 
         cmd.parse(argc, argv);
-
         std::string customAssets = customAssetsPath.getValue();
 
         if(!customAssets.empty())
@@ -445,6 +452,8 @@ int main(int argc, char**argv)
     Controls::Init();
 
     int ret = GameMain(setup);
+
+
 
 #ifdef ENABLE_XTECH_LUA
     if(!xtech_lua_quit())

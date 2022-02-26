@@ -119,6 +119,10 @@ static std::string s_bundleName;
 static std::string s_defaultAssetsRoot;
 #endif
 
+#if defined(VITA)
+static std::string m_vitaAppDataPath = "ux0:data/TheXTech/";
+#endif
+
 #if defined(__ANDROID__)
 //! Default path to the internal sotrage directory
 static std::string m_androidSdCardPath = "/storage/emulated/0";
@@ -294,6 +298,9 @@ void AppPathManager::initAppPath()
 
 #elif defined(__ANDROID__)
     ApplicationPathSTD = m_androidAppDataPath;
+
+#elif defined(VITA)
+    ApplicationPathSTD = m_vitaAppDataPath;
 
 #else // all other platforms (Windows, Linux, Haiku, etc.)
     char *path = SDL_GetBasePath();

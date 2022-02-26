@@ -116,13 +116,15 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
     SDL_SetWindowMinimumSize(m_window, ScreenW / 2, ScreenH / 2);
 #elif defined(__ANDROID__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
+#elif defined(VITA)
+    SDL_SetWindowMinimumSize(m_window, 960, 544);
 #else
     SDL_SetWindowMinimumSize(m_window, ScreenW, ScreenH);
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
-#if defined(__ANDROID__) // Use a full-screen on Android mode by default
+#if defined(__ANDROID__) || defined(VITA) // Use a full-screen on Android & PS Vita mode by default
     setFullScreen(true);
     show();
 #endif

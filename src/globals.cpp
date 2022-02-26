@@ -26,6 +26,13 @@
 #include <cmath>
 #include <cfenv>
 
+#if defined(VITA) || defined(__3DS__)
+#define USE_CUSTOM_TONEAREST
+#endif
+
+#ifdef USE_CUSTOM_TONEAREST
+#include <pge_tonearest.h>
+#endif
 
 bool GameIsActive = false;
 std::string AppPath;
@@ -604,6 +611,9 @@ int vb6Round(double x)
     return static_cast<int>(vb6Round(x, 0));
 }
 
+#ifdef USE_CUSTOM_TONEAREST
+#   define toNearest pge_toNearest
+#else
 static SDL_INLINE double toNearest(double x)
 {
     int round_old = std::fegetround();
@@ -617,6 +627,7 @@ static SDL_INLINE double toNearest(double x)
         return x;
     }
 }
+#endif
 
 double vb6Round(double x, int decimals)
 {

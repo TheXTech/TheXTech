@@ -1,0 +1,159 @@
+name: Vita CI
+
+on:
+  push:
+    branches:
+      - master
+      - devel
+      - wip-vita-support
+      - wip-vita-master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
+    runs-on: ${{ matrix.config.os }}
+    env:
+        VITASDK: /usr/local/vitasdk
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Vita build",
+            os: ubuntu-20.04,
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake -DVITA_APP_NAME=\"TheXTech Vita\" -DVITA_TITLEID=\"THEXTECH0\" -DVITA_VERSION=\"01.05\"",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip",
+            generator: "Unix Makefiles",
+            build_type: "MinSizeRel",
+            executable_name: "thextech",
+            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+            subdir_name: "thextech-vita",
+            upload_directory: "www/vita/"
+          }
+
+    steps:
+    - uses: actions/checkout@v1
+
+    - uses: nelonoel/branch-name@v1.0.1
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
+          eval ${{ matrix.config.deps_cmdline }}
+        fi
+        # Pull submodules
+        git submodule init
+        git submodule update --recursive --remote
+
+    - name: Install Vita SDK
+      run: |
+        cd ..
+        export PATH=$VITASDK/bin:$PATH
+        git clone https://github.com/vitasdk/vdpm
+        cd vdpm
+        ./bootstrap-vitasdk.sh
+        ./install-all.sh
+
+# NOTE: 2/13/2022 Current Vita version does not use cglm or vitaGL renderer. All is handled by SDL2 at the moment.
+#    - name: Install cglm
+#      run: |
+#        cd ..
+#        export PATH=$VITASDK/bin:$PATH
+#        git clone https://github.com/recp/cglm.git
+#        cd cglm
+#        sed -i "s|-Werror||g" CMakeLists.txt
+#        cmake -B build-vita -G Ninja -DCMAKE_INSTALL_PREFIX=$VITASDK/arm-vita-eabi -DCGLM_STATIC=ON -DCGLM_SHARED=OFF -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake .
+#        cmake --build build-vita --target all
+#        cmake --build build-vita --target install
+
+#    - name: Install Latest vitaGL
+#      run: |
+#        cd ..
+#        export PATH=$VITASDK/bin:$PATH
+#        git clone https://github.com/Rinnegatamante/vitaGL.git
+#        cd vitaGL
+#        NO_DEBUG=1 NO_TEX_COMBINER=1 make
+#        make install
+
+#    - name: Download assets
+#      uses: carlosperate/download-file-action@v1.0.3
+#      with:
+#        file-url: "${{ matrix.config.assets_url }}"
+#        file-name: assets.7z
+#
+#    - name: Unpack assets
+#      shell: bash
+#      run: |
+#        mkdir -p assets
+#        cd assets
+#        7z x ../assets.7z
+#        cd ..
+#        rm assets.7z
+
+    - name: Configure
+      shell: bash
+      run: |
+        export PATH=$VITASDK/bin:$PATH
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+
+    - name: Build
+      shell: bash
+      run: |
+        export PATH=$VITASDK/bin:$PATH
+        cmake --build build --target all -j4
+
+    - name: Create Package
+      if: success()
+      shell: bash
+      run: |
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+            BRANCH_NAME_RES="pull-request"
+            echo "-- Pull-request detected!"
+        else
+            BRANCH_NAME_RES=${BRANCH_NAME}
+        fi
+
+        cd build
+        mkdir package
+        mkdir "package/${{ matrix.config.subdir_name }}"
+        cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
+        cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
+        cat ../docs/README_VITA.md ../README.md >> "package/${{ matrix.config.subdir_name }}/README.md"
+        cat ../docs/README_VITA.RUS.md ../README.RUS.md >> "package/${{ matrix.config.subdir_name }}/README.RUS.md"
+        cat ../docs/README_VITA.ESP.md ../README.ESP.md >> "package/${{ matrix.config.subdir_name }}/README.ESP.md"
+        cp thextech.vpk "package/${{ matrix.config.subdir_name }}/"
+        cd package
+        zip -9 -r "thextech-vita-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"
+        rm -Rf "${{ matrix.config.subdir_name }}"
+        cd ../..
+
+    - name: Upload artifact
+      if: success()
+      uses: actions/upload-artifact@v2
+      with:
+        path: build/package/*.zip
+        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    - name: Deploy to builds.wohlsoft.ru
+      if: success() && github.event_name != 'pull_request'
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        UPLOAD_LIST="set ssl:verify-certificate no;"
+        for q in ./build/package/*.zip; do
+            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+        done
+        lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
+
+    - name: List Build Directory
+      if: always()
+      shell: bash
+      run: |
+        git status
+        ls -lR build

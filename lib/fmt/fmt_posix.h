@@ -23,6 +23,12 @@
 
 #include <cstddef>
 
+#if defined(VITA)
+// Under certain circumstances, this function cannot be found on PS Vita.
+// Seems to only happen on a CI build.
+// extern double strtod_l(const char* _a, const char ** _b, locale_t c);
+#endif
+
 #if defined __APPLE__ || defined(__FreeBSD__)
 # include <xlocale.h>  // for LC_NUMERIC_MASK on OS X
 #endif
@@ -303,11 +309,13 @@ class File {
 long getpagesize();
 
 #if (defined(LC_NUMERIC_MASK) || defined(_MSC_VER)) && \
-    !defined(__ANDROID__) && !defined(__CYGWIN__)
+    !defined(__ANDROID__) && !defined(__CYGWIN__) && !defined(VITA)
 # define FMT_LOCALE
 #endif
 
+
 #ifdef FMT_LOCALE
+
 // A "C" numeric locale.
 class Locale {
  private:
@@ -348,6 +356,7 @@ class Locale {
   // of the parsed input.
   double strtod(const char *&str) const {
     char *end = FMT_NULL;
+    
     double result = strtod_l(str, &end, locale_);
     str = end;
     return result;

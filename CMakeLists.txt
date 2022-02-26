@@ -100,7 +100,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated-include)
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU)
+if(HAIKU OR VITA)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
@@ -161,6 +161,17 @@ if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
     set(THEXTECH_UNIX_INSTALL TRUE)
 endif()
 
+if(VITA)
+    message("Enabling PS Vita Support and fast-math flags.")
+        
+    # Fast Math flags for Vita, ensuring -DVITA is passed to the compiler.
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon -DVITA")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon -DVITA")
+
+    # Disable annoying warning for Parameter passing.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
+endif()
+
 # ============ Customization ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
@@ -174,7 +185,11 @@ endif()
 
 include(lib/Allocator/pool-allocator.cmake)
 include(lib/DirManager/dirman.cmake)
-include(lib/FileMapper/FileMapper.cmake)
+
+if(NOT VITA)
+    include(lib/FileMapper/FileMapper.cmake)
+endif()
+
 include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
@@ -263,12 +278,9 @@ set(LIB_SRC
     lib/fader.cpp
     lib/AppPath/app_path.cpp
     ${DIRMANAGER_SRCS}
-    ${FILEMAPPER_SRCS}
     ${FMT_SRCS}
-    ${STACK_WALKER_SRCS}
     ${MD5_SRCS}
     ${POOLALLOC_SRCS}
-    lib/CrashHandler/crash_handler.cpp
     lib/Graphics/graphics_funcs.cpp
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
@@ -287,6 +299,14 @@ if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT VITA AND NOT 3DS)
     set(THEXTECH_INTERPROC_SUPPORTED ON)
 endif()
 
+
+if(NOT 3DS AND NOT VITA)
+    list(APPEND LIB_SRC
+        ${FILEMAPPER_SRCS}
+        ${STACK_WALKER_SRCS}
+        lib/CrashHandler/crash_handler.cpp
+    )
+endif()
 
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
@@ -569,6 +589,15 @@ if(ANDROID)
     target_link_libraries(A2XT_Int INTERFACE log)
 endif()
 
+if(VITA)
+    # Link Vita specific libraries to the generic interface.
+    target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS}) 
+    
+    # Set explicit flags for this project
+    target_compile_definitions(thextech PRIVATE
+        -DVITA -DNO_SCREENSHOT -DFIXED_RES -DLOW_MEM -DPRELOAD_LEVELS -DNO_INTPTROC)
+endif()
+
 if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")
     target_compile_definitions(thextech PRIVATE -DFIXED_ASSETS_PATH="${THEXTECH_FIXED_ASSETS_PATH}")
 endif()
@@ -711,6 +740,8 @@ elseif(WIN32)
     install(FILES changelog.txt DESTINATION .)
     install(FILES README.md DESTINATION . RENAME ReadMe.txt)
     install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
+elseif(VITA)
+    include(cmake/package_vita.cmake)
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
