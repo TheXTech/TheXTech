@@ -431,19 +431,17 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
-    bool shrink2x = false;
-
-    if(g_videoSettings.scaleDownAllTextures 
+    bool shrink2x = g_videoSettings.scaleDownAllTextures;
 #if !defined(VITA)
-        || GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target))
+    shrink2x |= GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target));
 #endif
-    )
+
+    if(shrink2x)
     {
         target.l.w_orig = int(w);
         target.l.h_orig = int(h);
         w /= 2;
         h /= 2;
-        shrink2x = true;
     }
 
     bool wLimitExcited = m_maxTextureWidth > 0 && w > Uint32(m_maxTextureWidth);
