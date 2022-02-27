@@ -143,7 +143,6 @@ static void strToPlayerSetup(int player, const std::string &setupString)
 extern "C"
 int main(int argc, char**argv)
 {
-
     CmdLineSetup_t setup;
     FrmMain frmMain;
 
@@ -283,6 +282,7 @@ int main(int argc, char**argv)
         cmd.add(&inputFileNames);
 
         cmd.parse(argc, argv);
+
         std::string customAssets = customAssetsPath.getValue();
 
         if(!customAssets.empty())
@@ -452,8 +452,6 @@ int main(int argc, char**argv)
     Controls::Init();
 
     int ret = GameMain(setup);
-
-
 
 #ifdef ENABLE_XTECH_LUA
     if(!xtech_lua_quit())
