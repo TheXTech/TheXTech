@@ -598,6 +598,8 @@ void UpdateGraphics(bool skipRepaint)
                 GetvScreenCredits();
             else
                 GetvScreen(Z);
+        }
+        {
             if(Background2[S] == 0)
             {
                 if(numScreens > 1)
