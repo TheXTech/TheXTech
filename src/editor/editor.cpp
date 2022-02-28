@@ -2327,10 +2327,9 @@ void SetCursor()
         EditorCursor.Location.Width = 32;
         EditorCursor.WorldMusic.Location = EditorCursor.Location;
         // make it play the music
-        if(curWorldMusic != EditorCursor.WorldMusic.Type)
-        {
-            StartMusic(EditorCursor.WorldMusic.Type);
-        }
+        if(g_isWorldMusicNotSame(EditorCursor.WorldMusic))
+            g_playWorldMusic(EditorCursor.WorldMusic);
+
 //        for(A = 0; A < frmMusic::optMusic.Count; A++)
 //        {
 //            if(frmMusic::optMusic(A).Value == true)

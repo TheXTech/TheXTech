@@ -567,12 +567,12 @@ void StartMusic(int A, int fadeInMs)
     if(noSound)
     {
         // Keep world map music being remembered when sound disabled
-        if(LevelSelect && !GameMenu && !GameOutro)
+        if((LevelSelect || WorldEditor) && !GameMenu && !GameOutro)
             curWorldMusic = A;
         return;
     }
 
-    if(LevelSelect && !GameMenu && !GameOutro) // music on the world map
+    if((LevelSelect || WorldEditor) && !GameMenu && !GameOutro) // music on the world map
     {
         StopMusic();
         curWorldMusic = A;

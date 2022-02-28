@@ -108,12 +108,18 @@ static SDL_INLINE int computeStarsShowingPolicy(int ll, int cur)
     return g_config.WorldMapStarShowPolicyGlobal;
 }
 
-static SDL_INLINE bool isWorldMusicNotSame(WorldMusic_t &mus)
+bool g_isWorldMusicNotSame(WorldMusic_t &mus)
 {
     bool ret = false;
     ret |= (curWorldMusic != mus.Type);
     ret |= (mus.Type == CustomWorldMusicId() && curWorldMusicFile != GetS(mus.MusicFile));
     return ret;
+}
+
+void g_playWorldMusic(WorldMusic_t &mus)
+{
+    curWorldMusicFile = GetS(mus.MusicFile);
+    StartMusic(mus.Type);
 }
 
 static SDL_INLINE bool s_worldUpdateMusic(const Location_t &loc)
@@ -125,10 +131,9 @@ static SDL_INLINE bool s_worldUpdateMusic(const Location_t &loc)
         WorldMusic_t &mus = *t;
         if(CheckCollision(loc, mus.Location))
         {
-            if(isWorldMusicNotSame(mus))
+            if(g_isWorldMusicNotSame(mus))
             {
-                curWorldMusicFile = GetS(mus.MusicFile);
-                StartMusic(mus.Type);
+                g_playWorldMusic(mus);
                 ret = true;
             }
         }

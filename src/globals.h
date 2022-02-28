@@ -1576,6 +1576,12 @@ extern int curWorldLevel;
 extern int curWorldMusic;
 //EXTRA: Custom world music
 extern std::string curWorldMusicFile;
+
+// EXTRA: convenience functions to check if world music is new or not, and play
+// defined in main/world_loop.cpp
+bool g_isWorldMusicNotSame(WorldMusic_t &mus);
+void g_playWorldMusic(WorldMusic_t &mus);
+
 //Public NoTurnBack(0 To maxSections) As Boolean
 extern RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 //Public UnderWater(0 To maxSections) As Boolean
