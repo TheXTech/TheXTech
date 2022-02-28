@@ -298,8 +298,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
         if(LevelEditor) // Load the level editor
         {
-            if(resChanged)
-                ChangeScreen();
+            // if(resChanged)
+            //     ChangeScreen();
             BattleMode = false;
             SingleCoop = 0;
             numPlayers = 0;
