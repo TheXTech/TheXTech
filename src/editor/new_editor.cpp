@@ -3511,6 +3511,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
                 ClearWorld();
                 GameMenu = true;
                 MenuMode = 0;
+                MenuCursor = 0;
                 LevelEditor = false;
                 WorldEditor = false;
                 TestLevel = false;
