@@ -1144,6 +1144,24 @@ void UpdateYoshiMusic()
     Mix_SetMusicTrackMute(g_curMusic, s_musicYoshiTrackNumber, hasYoshi ? 0 : 1);
 }
 
+void PreloadExtSound(const std::string& path)
+{
+    if(noSound)
+        return;
+
+    auto f = extSfx.find(path);
+    if(f == extSfx.end())
+    {
+        auto *ch = Mix_LoadWAV(path.c_str());
+        if(!ch)
+        {
+            pLogWarning("Can't load custom sound: %s", Mix_GetError());
+            return;
+        }
+        extSfx.insert({path, ch});
+    }
+}
+
 void PlayExtSound(const std::string &path)
 {
     if(noSound)

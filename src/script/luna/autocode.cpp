@@ -320,6 +320,22 @@ void Autocode::Do(bool init)
             break;
         }
 
+        case AT_SFXPreLoad:
+        {
+            if(this->Length <= 1) // Preload custom SFX file
+            {
+                // Sound from level folder
+                if(GetS(MyString).length() > 0)
+                {
+                    //char* dbg = "CUSTOM SOUND PLAY DBG";
+                    std::string full_path = g_dirCustom.resolveFileCaseAbs(GetS(MyString));
+                    PreloadExtSound(full_path);
+                }
+                expire();
+            }
+            break;
+        }
+
         case AT_SetMusic:
         {
             int sec = (int)Target - 1;
@@ -1485,6 +1501,7 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"CyclePlayerLeft", AT_CyclePlayerLeft},
 
     {"SFX", AT_SFX},
+    {"SFXPreLoad", AT_SFXPreLoad},
     {"SetMusic", AT_SetMusic},
     {"PlayMusic", AT_PlayMusic},
 
