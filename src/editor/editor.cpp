@@ -2522,6 +2522,7 @@ void zTestLevel(bool magicHand, bool interProcess)
                 Player[A].Mount = testPlayer[1].Mount;
                 Player[A].MountType = testPlayer[1].MountType;
                 Player[A].Character = testPlayer[1].Character;
+                Player[A].UnStart = false;
                 if(Player[A].Character == 0)
                     Player[1].Character = 1;
             }
@@ -2539,6 +2540,7 @@ void zTestLevel(bool magicHand, bool interProcess)
                 if(Player[A].Character == 0)
                     Player[A].Character = A;
                 SavedChar[Player[A].Character] = Player[A];
+                Player[A].UnStart = false;
             }
         }
     }
