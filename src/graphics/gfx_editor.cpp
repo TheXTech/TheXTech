@@ -174,7 +174,7 @@ void DrawEditorLevel(int Z)
                             1.f, 0.f, 1.f, 1.f, false);
                     else
                         XRender::renderRect(vScreenX[Z] + Warp[A].Entrance.X, vScreenY[Z] + Warp[A].Entrance.Y, 32, 32,
-                            1.f, 0.f, 0.f, 1.f, false);
+                            0.7f, 0.3f, 0.f, 1.f, false);
                     SuperPrint(std::to_string(A), 1, vScreenX[Z] + Warp[A].Entrance.X + 2, vScreenY[Z] + Warp[A].Entrance.Y + 2);
                 }
                 if(Warp[A].PlacedExit)
@@ -184,7 +184,7 @@ void DrawEditorLevel(int Z)
                             1.f, 0.f, 1.f, 1.f, false);
                     else
                         XRender::renderRect(vScreenX[Z] + Warp[A].Exit.X, vScreenY[Z] + Warp[A].Exit.Y, 32, 32,
-                            1.f, 0.f, 0.f, 1.f, false);
+                            0.7f, 0.3f, 0.f, 1.f, false);
                     SuperPrint(std::to_string(A), 1, vScreenX[Z] + Warp[A].Exit.X + Warp[A].Exit.Width - 16 - 2,
                         vScreenY[Z] + Warp[A].Exit.Y + Warp[A].Exit.Height - 14 - 2);
                 }
