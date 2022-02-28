@@ -44,13 +44,15 @@ void DrawEditorLevel(int Z)
 // #endif
     if(LevelEditor)
     {
-        BlockFlash += 1;
+        if(Z == 1)
+            BlockFlash += 1;
 
         if(BlockFlash > 45)
             BlockFlash = 0;
 
         if(BlockFlash <= 30)
         {
+            // render NPCs in blocks
             for(A = 1; A <= numBlock; A++)
             {
                 if(Block[A].Special > 0 && !Block[A].Hidden)
@@ -61,6 +63,7 @@ void DrawEditorLevel(int Z)
                             C = Block[A].Special - 1000;
                         else
                             C = 10;
+
                         if(NPCWidthGFX[C] == 0)
                         {
                             tempLocation.X = Block[A].Location.X + Block[A].Location.Width / 2 - NPCWidth[C] / 2;
@@ -75,6 +78,7 @@ void DrawEditorLevel(int Z)
                             tempLocation.Height = NPCHeightGFX[C];
                             tempLocation.Width = NPCWidthGFX[C];
                         }
+
                         XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[C],
                             vScreenY[Z] + tempLocation.Y + NPCFrameOffsetY[C],
                             tempLocation.Width, tempLocation.Height,
@@ -83,6 +87,7 @@ void DrawEditorLevel(int Z)
                 }
             }
 
+            // render NPCs in containers
             for(A = 1; A <= numNPCs; A++)
             {
                 if(!NPC[A].Hidden && (NPC[A].Type == 91 || NPC[A].Type == 96)
@@ -115,7 +120,7 @@ void DrawEditorLevel(int Z)
             }
         }
 
-
+        // render player start points
         for(A = 1; A <= 2; A++)
         {
             if(!(PlayerStart[A].Width > 0)) continue;
@@ -156,6 +161,7 @@ void DrawEditorLevel(int Z)
             }
         }
 
+        // render warps
         for(A = 1; A <= numWarps; A++)
         {
             if(Warp[A].Direction > 0 && !Warp[A].Hidden)
@@ -189,6 +195,7 @@ void DrawEditorLevel(int Z)
 // #ifdef __3DS__
 //     XRender::setLayer(0);
 // #endif
+    // render section boundary
     if(LevelEditor)
     {
         if(BlockFlash > 30 || BlockFlash == 0)
@@ -228,7 +235,7 @@ void DrawEditorLevel(int Z)
         int curX = int(double(e.X) - vScreen[Z].Left);
         int curY = int(double(e.Y) - vScreen[Z].Top);
 
-        if(BlockFlash < 15)
+        if(BlockFlash < 10)
         {
             // don't draw the currently held object
         }
@@ -267,13 +274,6 @@ void DrawEditorLevel(int Z)
                             XRender::renderTexture(vScreenX[Z] + b.Location.X + C * 32,
                                                   vScreenY[Z] + b.Location.Y + B * 32,
                                                   32, 32, GFXBlock[b.Type], D * 32, E * 32);
-//                                    if((D == 0 || D == 2) || (E == 0 || E == 2))
-//                                    {
-//                                        XRender::renderTexture(vScreenX(Z) + .Location.X + C * 32, vScreenY(Z) + .Location.Y + B * 32, 32, 32, GFXBlock(.Type), D * 32, E * 32)
-//                                    }
-//                                    else
-//                                        XRender::renderTexture(vScreenX(Z) + .Location.X + C * 32, vScreenY(Z) + .Location.Y + B * 32, 32, 32, GFXBlock(.Type), D * 32, E * 32)
-
                         }
                     }
                 }
@@ -287,6 +287,38 @@ void DrawEditorLevel(int Z)
                                           b.Location.Width,
                                           b.Location.Height,
                                           GFXBlock[b.Type], 0, BlockFrame[b.Type] * 32);
+                }
+            }
+
+            // render NPC inside block
+            if(BlockFlash <= 30 && b.Special > 0)
+            {
+                if(vScreenCollision(Z, b.Location))
+                {
+                    if(b.Special > 1000)
+                        C = b.Special - 1000;
+                    else
+                        C = 10;
+
+                    if(NPCWidthGFX[C] == 0)
+                    {
+                        tempLocation.X = b.Location.X + b.Location.Width / 2 - NPCWidth[C] / 2;
+                        tempLocation.Y = b.Location.Y + b.Location.Height / 2 - NPCHeight[C] / 2;
+                        tempLocation.Height = NPCHeight[C];
+                        tempLocation.Width = NPCWidth[C];
+                    }
+                    else
+                    {
+                        tempLocation.X = b.Location.X + b.Location.Width / 2 - NPCWidthGFX[C] / 2;
+                        tempLocation.Y = b.Location.Y + b.Location.Height / 2 - NPCHeightGFX[C] / 2;
+                        tempLocation.Height = NPCHeightGFX[C];
+                        tempLocation.Width = NPCWidthGFX[C];
+                    }
+
+                    XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[C],
+                        vScreenY[Z] + tempLocation.Y + NPCFrameOffsetY[C],
+                        tempLocation.Width, tempLocation.Height,
+                        GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
                 }
             }
         }
@@ -393,6 +425,37 @@ void DrawEditorLevel(int Z)
                                       NPCWidthGFX[n.Type], NPCHeightGFX[n.Type], GFXNPC[n.Type],
                                       0, n.Frame * NPCHeightGFX[n.Type]);
             }
+
+            // render NPC inside container
+            if(BlockFlash <= 30 && (n.Type == 91 || n.Type == 96)
+                && (n.Special > 0))
+            {
+                if(vScreenCollision(Z, n.Location))
+                {
+                    C = n.Special;
+                    if(NPCWidthGFX[C] == 0)
+                    {
+                        tempLocation.Height = NPCHeight[C];
+                        tempLocation.Width = NPCWidth[C];
+                    }
+                    else
+                    {
+                        tempLocation.Height = NPCHeightGFX[C];
+                        tempLocation.Width = NPCWidthGFX[C];
+                    }
+
+                    if(n.Type == 96)
+                        tempLocation.Y = n.Location.Y + n.Location.Height - tempLocation.Height;
+                    else
+                        tempLocation.Y = n.Location.Y;
+                    tempLocation.X = n.Location.X + n.Location.Width / 2 - tempLocation.Width / 2;
+
+                    XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[C],
+                        vScreenY[Z] + tempLocation.Y + NPCFrameOffsetY[C],
+                        tempLocation.Width, tempLocation.Height,
+                        GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
+                }
+            }
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
         {
@@ -450,7 +513,7 @@ void DrawEditorWorld()
     if(BlockFlash > 45)
         BlockFlash = 0;
 
-    if(BlockFlash >= 30)
+    if(BlockFlash < 10)
     {
         // don't draw the currently held object
     }
