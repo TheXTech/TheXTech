@@ -114,8 +114,8 @@ Autocode &Autocode::operator=(const Autocode &o)
     Param3 = o.Param3;
     Length = o.Length;
     // de-duplicate strings, while re-using allocated string indices if possible
-    SetS(MyString, GetS(o.MyString));
-    SetS(MyRef, GetS(o.MyRef));
+    MyString = o.MyString;
+    MyRef = o.MyRef;
 
     m_OriginalTime = o.m_OriginalTime;
     ActiveSection = o.ActiveSection;
