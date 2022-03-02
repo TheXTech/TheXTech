@@ -28,52 +28,34 @@
 #include "global_constants.h"
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include <SDL2/SDL_assert.h>
 
 extern const std::string g_emptyString;
-extern std::vector<std::string> g_LevelString;
-extern size_t g_numWorldString;
 
-inline const std::string& GetS(stringindex_t index)
-{
-    if(index == STRINGINDEX_NONE)
-        return g_emptyString;
+extern void SaveWorldStrings();
+extern void RestoreWorldStrings();
+extern void ClearStringsBank();
 
-    SDL_assert_release(index < g_LevelString.size());
+/*!
+ * \brief Get string from the bank by index
+ * \param index Index of string
+ * \return Const referrence to the actual string
+ */
+extern const std::string& GetS(stringindex_t index);
 
-    return g_LevelString[index];
-}
+/*!
+ * \brief Set the string to the index
+ * \param index destinition string field
+ * \param target Target string data to assign
+ */
+extern void SetS(stringindex_t& index, const std::string& target);
 
-inline void SetS(stringindex_t& index, const std::string& target)
-{
-    if(index == STRINGINDEX_NONE && target.empty())
-        return;
-
-    if(index == STRINGINDEX_NONE && g_LevelString.size() < MaxLevelStrings)
-    {
-        index = (stringindex_t)g_LevelString.size();
-        g_LevelString.push_back(target);
-    }
-    else
-    {
-        SDL_assert_release(index < g_LevelString.size());
-        g_LevelString[index] = target;
-    }
-}
-
-inline std::string* PtrS(stringindex_t& index)
-{
-    if(index == STRINGINDEX_NONE)
-    {
-        if(g_LevelString.size() >= MaxLevelStrings)
-            return nullptr;
-        index = (stringindex_t)g_LevelString.size();
-        g_LevelString.push_back(std::string());
-    }
-
-    SDL_assert_release(index < g_LevelString.size());
-
-    return &g_LevelString[index];
-}
+/*!
+ * \brief Get string as pointer from the bank by index
+ * \param index Index of string
+ * \return Pointer to the actual string
+ */
+extern std::string* PtrS(stringindex_t& index);
 
 #endif // #ifndef GLOBAL_STRINGS_H
