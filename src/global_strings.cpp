@@ -25,6 +25,10 @@
 const std::string g_emptyString = "";
 //! Strings storage
 static std::vector<std::string> g_LevelString;
+//! Number of world strings
+static size_t g_numWorldString = 0;
+
+#ifdef STRS_UNIQUENESS_TRACKING
 //! Counter of usages per every string
 static std::vector<int> g_LevelStringUsages;
 //! List of free indexes appearing at the moddle of array
@@ -127,6 +131,13 @@ void SetS(stringindex_t& index, const std::string& target)
             g_LevelStringUsages[index]++;
         }
     }
+}
+
+stringindex_t SetS(const std::string& target)
+{
+    stringindex_t out = STRINGINDEX_NONE;
+    SetS(out, target);
+    return out;
 }
 
 std::string* PtrS(stringindex_t& index)

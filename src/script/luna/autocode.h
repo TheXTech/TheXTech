@@ -217,7 +217,7 @@ public:
     // Ctors
     Autocode();
     Autocode(AutocodeType, double Target, double p1, double p2, double p3,
-             const std::string &p4, double Length, int Section, const std::string &VarRef);
+             const stringindex_t &p4, double Length, int Section, const stringindex_t &VarRef);
     Autocode(const Autocode &o);
     ~Autocode() = default;
 

@@ -302,7 +302,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
 
             std::string ref_str = std::string(wrefbuf); // Get var reference string if any
 
-            Autocode newcode(ac_type, target, param1, param2, param3, ac_str, length, cur_section, ref_str);
+            Autocode newcode(ac_type, target, param1, param2, param3, SetS(ac_str), length, cur_section, SetS(ref_str));
             if(!add_to_globals)
             {
                 if(newcode.m_Type < 10000 || newcode.MyRef != STRINGINDEX_NONE)

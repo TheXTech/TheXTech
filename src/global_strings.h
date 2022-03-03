@@ -33,6 +33,8 @@
 
 extern const std::string g_emptyString;
 
+extern size_t StringsBankSize();
+
 extern void SaveWorldStrings();
 extern void RestoreWorldStrings();
 extern void ClearStringsBank();
@@ -50,6 +52,13 @@ extern const std::string& GetS(stringindex_t index);
  * \param target Target string data to assign
  */
 extern void SetS(stringindex_t& index, const std::string& target);
+
+/*!
+ * \brief Create new string index entry or return exist matching
+ * \param target Targete string data to assing
+ * \return destinition string field
+ */
+extern stringindex_t SetS(const std::string& target);
 
 /*!
  * \brief Get string as pointer from the bank by index
