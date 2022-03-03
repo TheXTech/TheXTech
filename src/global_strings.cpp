@@ -29,12 +29,12 @@ const std::string g_emptyString = "";
 static std::vector<std::string> g_LevelString;
 //! Number of world strings
 static size_t g_numWorldString = 0;
+//! List of free indexes appearing at the moddle of array
+static std::vector<int> g_FreeIndexes;
 
 #ifdef STRS_UNIQUENESS_TRACKING
 //! Counter of usages per every string
 static std::vector<int> g_LevelStringUsages;
-//! List of free indexes appearing at the moddle of array
-static std::vector<int> g_FreeIndexes;
 //! String-To-Index map
 static std::unordered_map<std::string, int> g_uniqueStringsIds;
 #endif
@@ -51,6 +51,11 @@ static std::unordered_map<std::string, int> g_uniqueStringsIds_backup;
 size_t StringsBankSize()
 {
     return g_LevelString.size();
+}
+
+size_t StringsUnusedEntries()
+{
+    return g_FreeIndexes.size();
 }
 
 void SaveWorldStrings()
@@ -73,6 +78,13 @@ void RestoreWorldStrings()
     g_FreeIndexes = g_FreeIndexes_backup;
     g_uniqueStringsIds = g_uniqueStringsIds_backup;
 #else
+    for(auto i = g_FreeIndexes.begin(); i != g_FreeIndexes.end(); )
+    {
+        if(*i >= (int)g_numWorldString)
+            i = g_FreeIndexes.erase(i);
+        else
+            ++i;
+    }
     g_LevelString.resize(g_numWorldString);
 #endif
 }
@@ -156,17 +168,49 @@ void SetS(stringindex_t& index, const std::string& target)
             g_LevelStringUsages[index]++;
         }
 #else
-        index = (stringindex_t)g_LevelString.size();
-        g_LevelString.push_back(target);
+        if(g_FreeIndexes.empty())
+        {
+            index = (stringindex_t)g_LevelString.size();
+            g_LevelString.push_back(target);
+        }
+        else
+        {
+            index = g_FreeIndexes.back();
+            g_FreeIndexes.pop_back();
+            g_LevelString[index] = target;
+        }
 #endif
     }
 }
 
-stringindex_t SetS(const std::string& target)
+stringindex_t AllocS(const std::string& target)
 {
     stringindex_t out = STRINGINDEX_NONE;
     SetS(out, target);
     return out;
+}
+
+void FreeS(stringindex_t& index)
+{
+    if(index == STRINGINDEX_NONE)
+        return;
+
+    SDL_assert_release(index <= STRINGINDEX_NONE);
+    SDL_assert_release(index < g_LevelString.size());
+
+#ifdef STRS_UNIQUENESS_TRACKING
+    g_LevelStringUsages[index]--;
+    if(g_LevelStringUsages[index] == 0)
+    {
+        g_uniqueStringsIds.erase(g_LevelString[index]);
+        g_LevelString[index].clear();
+        g_FreeIndexes.push_back(index);
+    }
+#else
+    g_FreeIndexes.push_back(index);
+#endif
+
+    index = STRINGINDEX_NONE;
 }
 
 std::string* PtrS(stringindex_t& index)

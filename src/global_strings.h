@@ -34,6 +34,7 @@
 extern const std::string g_emptyString;
 
 extern size_t StringsBankSize();
+extern size_t StringsUnusedEntries();
 
 extern void SaveWorldStrings();
 extern void RestoreWorldStrings();
@@ -58,7 +59,13 @@ extern void SetS(stringindex_t& index, const std::string& target);
  * \param target Targete string data to assing
  * \return destinition string field
  */
-extern stringindex_t SetS(const std::string& target);
+extern stringindex_t AllocS(const std::string& target);
+
+/*!
+ * \brief Clear the string index entry
+ * \param index Target index to clear
+ */
+extern void FreeS(stringindex_t& index);
 
 /*!
  * \brief Get string as pointer from the bank by index

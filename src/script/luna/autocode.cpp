@@ -1151,6 +1151,7 @@ void Autocode::Do(bool init)
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("NEAR: {0}", cellobjs.size()), 3, 50, 440));
 
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("STRINGS: {0}", StringsBankSize()), 3, 50, 460));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("STRINGS-Unused: {0}", StringsUnusedEntries()), 3, 50, 480));
             break;
         }
 
