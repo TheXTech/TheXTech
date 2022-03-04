@@ -28,52 +28,50 @@
 #include "global_constants.h"
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include <SDL2/SDL_assert.h>
 
 extern const std::string g_emptyString;
-extern std::vector<std::string> g_LevelString;
-extern size_t g_numWorldString;
 
-inline const std::string& GetS(stringindex_t index)
-{
-    if(index == STRINGINDEX_NONE)
-        return g_emptyString;
+extern size_t StringsBankSize();
+extern size_t StringsUnusedEntries();
 
-    SDL_assert_release(index < g_LevelString.size());
+extern void SaveWorldStrings();
+extern void RestoreWorldStrings();
+extern void ClearStringsBank();
 
-    return g_LevelString[index];
-}
+/*!
+ * \brief Get string from the bank by index
+ * \param index Index of string
+ * \return Const referrence to the actual string
+ */
+extern const std::string& GetS(stringindex_t index);
 
-inline void SetS(stringindex_t& index, const std::string& target)
-{
-    if(index == STRINGINDEX_NONE && target.empty())
-        return;
+/*!
+ * \brief Set the string to the index
+ * \param index destinition string field
+ * \param target Target string data to assign
+ */
+extern void SetS(stringindex_t& index, const std::string& target);
 
-    if(index == STRINGINDEX_NONE && g_LevelString.size() < MaxLevelStrings)
-    {
-        index = (stringindex_t)g_LevelString.size();
-        g_LevelString.push_back(target);
-    }
-    else
-    {
-        SDL_assert_release(index < g_LevelString.size());
-        g_LevelString[index] = target;
-    }
-}
+/*!
+ * \brief Create new string index entry or return exist matching
+ * \param target Targete string data to assing
+ * \return destinition string field
+ */
+extern stringindex_t AllocS(const std::string& target);
 
-inline std::string* PtrS(stringindex_t& index)
-{
-    if(index == STRINGINDEX_NONE)
-    {
-        if(g_LevelString.size() >= MaxLevelStrings)
-            return nullptr;
-        index = (stringindex_t)g_LevelString.size();
-        g_LevelString.push_back(std::string());
-    }
+/*!
+ * \brief Clear the string index entry
+ * \param index Target index to clear
+ */
+extern void FreeS(stringindex_t& index);
 
-    SDL_assert_release(index < g_LevelString.size());
-
-    return &g_LevelString[index];
-}
+/*!
+ * \brief Get string as pointer from the bank by index
+ * \param index Index of string
+ * \return Pointer to the actual string
+ */
+extern std::string* PtrS(stringindex_t& index);
 
 #endif // #ifndef GLOBAL_STRINGS_H

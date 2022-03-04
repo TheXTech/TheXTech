@@ -347,7 +347,7 @@ void OpenWorld(std::string FilePath)
 //            frmWorld::txtCredits(A).Text = WorldCredits[A];
 //        frmWorld.txtStars = MaxWorldStars;
 //    }
-    g_numWorldString = g_LevelString.size();
+    SaveWorldStrings();
     resetFrameTimer();
 }
 
@@ -375,8 +375,7 @@ void ClearWorld()
     for(A = 1; A <= numWorldMusic; A++)
         WorldMusic[A] = WorldMusic_t();
 
-    g_LevelString.clear();
-    g_numWorldString = 0;
+    ClearStringsBank();
     MaxWorldStars = 0;
     numTiles = 0;
     numWorldPaths = 0;

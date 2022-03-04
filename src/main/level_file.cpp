@@ -840,7 +840,7 @@ void ClearLevel()
     const Location_t BlankLocation = Location_t();
     const Effect_t blankEffect = Effect_t();
     NPCScore[NPCID_DRAGONCOIN] = 6;
-    g_LevelString.resize(g_numWorldString);
+    RestoreWorldStrings();
     LevelName.clear();
     ResetCompat();
     LoadNPCDefaults();
