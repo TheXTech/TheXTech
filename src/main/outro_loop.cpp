@@ -322,6 +322,8 @@ void SetupCredits()
     AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
     AddCredit("Slash-18"); // Contribution with the better iceball shooting SFX
     AddCredit("ds-sloth"); // For the major contribution to the code and becoming a co-developer
+    AddCredit("0lhi"); // Significant contribution to TheXTech development, testing, improvement process
+    AddCredit("Eclipsed"); // For the help to verify and polish the speed-run mode
 #endif
     AddCredit("");
     AddCredit("4matsy");
