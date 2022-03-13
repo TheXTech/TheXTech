@@ -206,9 +206,9 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
         m.Move = true;
     }
 
-    // TODO: for debugging purposes, REMOVE
-    if(c.Up && c.Down)
-        return false;
+    // one may uncomment this to quickly simulate controller disconnection for debugging purposes
+    // if(c.Up && c.Down)
+    //     return false;
 
     return true;
 }
