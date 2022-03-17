@@ -1021,6 +1021,8 @@ struct WorldPlayer_t
     int Move2 = 0;
 //    Move3 As Boolean
     int Move3 = 0;
+// EXTRA: last move direction
+    int LastMove = 0;
 //    LevelName As String
     std::string LevelName;
 //End Type
