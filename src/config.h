@@ -49,7 +49,7 @@ extern struct Config_t
     //! Access the Cheat Screen from the pause menu
     bool    enter_cheats_menu_item = false;
     //! Allow player quickly move through paths on the world map (works for compatibility Mode 1 only)
-    bool    fastMove = false;
+    bool    worldMapFastMove = false;
 
 
     /* ---- Effects ----*/

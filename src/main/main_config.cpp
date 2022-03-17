@@ -183,7 +183,7 @@ void OpenConfig()
         config.read("strict-drop-add", g_config.StrictDropAdd, false);
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
         config.read("enter-cheats-menu-item", g_config.enter_cheats_menu_item, false);
-        config.read("world-fast-move", g_config.fastMove, false);
+        config.read("world-map-fast-move", g_config.worldMapFastMove, false);
         config.endGroup();
 
         config.beginGroup("effects");
@@ -306,7 +306,7 @@ void SaveConfig()
     config.setValue("strict-drop-add", g_config.StrictDropAdd);
     config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
     config.setValue("enter-cheats-menu-item", g_config.enter_cheats_menu_item);
-    config.setValue("world-fast-move", g_config.fastMove);
+    config.setValue("world-map-fast-move", g_config.worldMapFastMove);
     config.endGroup();
 
     config.beginGroup("speedrun");

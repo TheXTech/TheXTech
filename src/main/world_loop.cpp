@@ -179,7 +179,7 @@ void WorldLoop()
     Location_t tempLocation;
     int A = 0;
     int B = 0;
-    bool allowFastMove = g_config.fastMove && CompatGetLevel() == COMPAT_MODERN;
+    bool allowFastMove = (g_config.worldMapFastMove || g_config.worldMapFastMove) && g_speedRunnerMode < SPEEDRUN_MODE_2;
 
     if(SingleCoop > 0)
         SingleCoop = 1;
