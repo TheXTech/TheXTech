@@ -32,6 +32,14 @@ class GameplayTimer
     int64_t m_cyclesCurrent = 0;
     int64_t m_cyclesTotal = 0;
 
+    bool    m_levelBlinkActive = false;
+    bool    m_worldBlinkActive = false;
+    float   m_blinkingFactor = 0.f;
+    float   m_blinkingDir = 1.0f;
+    float   m_colorSpin[3] = {0.0f, 0.8f, 0.8f};
+    float   m_colorSpinHue = 0.f;
+    void    updateColorSpin(float delta);
+
     bool    m_semiTransparent = false;
 
 public:
