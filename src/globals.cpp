@@ -517,6 +517,11 @@ int BattleIntro = 0;
 int BattleOutro = 0;
 std::string LevelName;
 
+#ifndef THEXTECH_FIXED_RES
+int ScreenW = 800;
+int ScreenH = 600;
+#endif
+
 //void DoEvents()
 //{
 //    g_events->doEvents();

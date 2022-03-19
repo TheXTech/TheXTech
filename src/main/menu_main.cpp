@@ -49,6 +49,8 @@
 #include "level_file.h"
 #include "world_file.h"
 #include "pge_delay.h"
+#include "video.h"
+#include "change_res.h"
 
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
@@ -1306,10 +1308,15 @@ bool mainMenuUpdate()
         // Options
         else if(MenuMode == MENU_OPTIONS)
         {
+            int optionsMenuLength = 1; // controls, credits
 #ifndef RENDER_FULLSCREEN_ALWAYS
-            const int optionsMenuLength = 2;
-#else
-            const int optionsMenuLength = 1;
+            optionsMenuLength++;
+#endif
+#if !defined(__3DS__) && !defined(VITA)
+            optionsMenuLength ++; // ScaleMode
+#endif
+#ifndef FIXED_RES
+            optionsMenuLength ++; // resolution
 #endif
 
             if(SharedCursor.Move)
@@ -1329,6 +1336,14 @@ bool mainMenuUpdate()
                             else
                                 menuLen = 18 * 15; // std::strlen("fullscreen mode")
                         }
+#endif
+#if !defined(__3DS__) && !defined(VITA)
+                        else if(A == i++)
+                            menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
+#endif
+#if !defined(FIXED_RES)
+                        else if(A == i++)
+                            menuLen = 18 * std::strlen("res: WWWxHHH (word)");
 #endif
                         else
                             menuLen = 18 * 12 - 2; // std::strlen("view credits")
@@ -1364,7 +1379,7 @@ bool mainMenuUpdate()
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
                 }
-                else if(menuDoPress || MenuMouseClick)
+                else if(menuDoPress || MenuMouseClick || leftPressed || rightPressed)
                 {
                     MenuCursorCanMove = false;
                     int i = 0;
@@ -1379,6 +1394,74 @@ bool mainMenuUpdate()
                     {
                         PlaySoundMenu(SFX_Do);
                         ChangeScreen();
+                    }
+#endif
+#if !defined(__3DS__) && !defined(VITA)
+                    else if(MenuCursor == i++)
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        if(!leftPressed)
+                            g_videoSettings.scaleMode = g_videoSettings.scaleMode + 1;
+                        else
+                            g_videoSettings.scaleMode = g_videoSettings.scaleMode - 1;
+                        if(g_videoSettings.scaleMode > SCALE_FIXED_2X)
+                            g_videoSettings.scaleMode = SCALE_DYNAMIC_INTEGER;
+                        if(g_videoSettings.scaleMode < SCALE_DYNAMIC_INTEGER)
+                            g_videoSettings.scaleMode = SCALE_FIXED_2X;
+                        UpdateInternalRes();
+                    }
+#endif
+#ifndef FIXED_RES
+                    else if(MenuCursor == i++)
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        if(!leftPressed)
+                        {
+                            if (g_config.InternalW == 0 && g_config.InternalH == 0)
+                                { g_config.InternalW = 480; g_config.InternalH = 320; }
+                            else if (g_config.InternalW == 480 && g_config.InternalH == 320)
+                                { g_config.InternalW = 512; g_config.InternalH = 384; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 384)
+                                { g_config.InternalW = 512; g_config.InternalH = 448; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 448)
+                                { g_config.InternalW = 640; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 640 && g_config.InternalH == 480)
+                                { g_config.InternalW = 800; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 480)
+                                { g_config.InternalW = 800; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 600)
+                                { g_config.InternalW = 1280; g_config.InternalH = 720; }
+                            else if (g_config.InternalW == 1280 && g_config.InternalH == 720)
+                                { g_config.InternalW = 0; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 0 && g_config.InternalH == 600)
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
+                            else
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
+                        }
+                        else
+                        {
+                            if (g_config.InternalW == 0 && g_config.InternalH == 0)
+                                { g_config.InternalW = 0; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 480 && g_config.InternalH == 320)
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 384)
+                                { g_config.InternalW = 480; g_config.InternalH = 320; }
+                            else if (g_config.InternalW == 512 && g_config.InternalH == 448)
+                                { g_config.InternalW = 512; g_config.InternalH = 384; }
+                            else if (g_config.InternalW == 640 && g_config.InternalH == 480)
+                                { g_config.InternalW = 512; g_config.InternalH = 448; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 480)
+                                { g_config.InternalW = 640; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 800 && g_config.InternalH == 600)
+                                { g_config.InternalW = 800; g_config.InternalH = 480; }
+                            else if (g_config.InternalW == 1280 && g_config.InternalH == 720)
+                                { g_config.InternalW = 800; g_config.InternalH = 600; }
+                            else if (g_config.InternalW == 0 && g_config.InternalH == 600)
+                                { g_config.InternalW = 1280; g_config.InternalH = 720; }
+                            else
+                                { g_config.InternalW = 0; g_config.InternalH = 0; }
+                        }
+                        UpdateInternalRes();
                     }
 #endif
                     else if(MenuCursor == i++)
@@ -1758,6 +1841,33 @@ void mainMenuDraw()
             SuperPrint("WINDOWED MODE", 3, 300, 350 + 30*i++);
         else
             SuperPrint("FULLSCREEN MODE", 3, 300, 350 + 30*i++);
+#endif
+#if !defined(__3DS__) && !defined(VITA)
+        SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, 300, 350 + 30*i++);
+#endif
+#ifndef FIXED_RES
+        std::string resString = fmt::format_ne("RES: {0}x{1}", g_config.InternalW, g_config.InternalH);
+        if (g_config.InternalW == 480 && g_config.InternalH == 320)
+            resString += " (GBA)";
+        else if (g_config.InternalW == 512 && g_config.InternalH == 384)
+            resString += " (NDS)";
+        else if (g_config.InternalW == 512 && g_config.InternalH == 448)
+            resString += " (SNES)";
+        else if (g_config.InternalW == 640 && g_config.InternalH == 480)
+            resString += " (VGA)";
+        else if (g_config.InternalW == 800 && g_config.InternalH == 480)
+            resString += " (3DS)";
+        else if (g_config.InternalW == 800 && g_config.InternalH == 600)
+            resString += " (SMBX)";
+        else if (g_config.InternalW == 1280 && g_config.InternalH == 720)
+            resString += " (HD)";
+        else if (g_config.InternalW == 0 && g_config.InternalH == 600)
+            resString = "RES: 600P DYNAMIC";
+        else if (g_config.InternalW == 0 && g_config.InternalH == 0)
+            resString = "RES: DYNAMIC";
+        else
+            resString += " (CUSTOM)";
+        SuperPrint(resString, 3, 300, 350 + 30*i++);
 #endif
         SuperPrint("VIEW CREDITS", 3, 300, 350 + 30*i++);
         XRender::renderTexture(300 - 20, 350 + (MenuCursor * 30),

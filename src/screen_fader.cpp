@@ -21,7 +21,7 @@
 #include <cmath>
 #include <SDL2/SDL_stdinc.h>
 
-#include "global_constants.h"
+#include "globals.h"
 #include "range_arr.hpp"
 #include "core/render.h"
 

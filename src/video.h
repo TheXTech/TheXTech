@@ -22,6 +22,9 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
+#include <string>
+#include <unordered_map>
+
 enum RenderMode_t
 {
     RENDER_AUTO = -1,
@@ -39,12 +42,34 @@ enum BatteryStatus_t
     BATTERY_STATUS_ALWAYS_ON,
 };
 
+enum ScaleModes
+{
+    SCALE_DYNAMIC_INTEGER = -3,
+    SCALE_DYNAMIC_NEAREST = -2,
+    SCALE_DYNAMIC_LINEAR = -1,
+    SCALE_FIXED_05X = 0,
+    SCALE_FIXED_1X = 1,
+    SCALE_FIXED_2X = 2,
+};
+
+static const std::unordered_map<int, std::string> ScaleMode_strings =
+{
+    {SCALE_DYNAMIC_INTEGER, "integer"},
+    {SCALE_DYNAMIC_NEAREST, "nearest"},
+    {SCALE_DYNAMIC_LINEAR, "linear"},
+    {SCALE_FIXED_05X, "0.5x"},
+    {SCALE_FIXED_1X, "1x"},
+    {SCALE_FIXED_2X, "2x"},
+};
+
 extern struct VideoSettings_t
 {
     //! Render mode
     int    renderMode = RENDER_ACCELERATED;
     //! The currently running render mode
     int    renderModeObtained = RENDER_AUTO;
+    //! Render scaling mode
+    int    scaleMode = SCALE_DYNAMIC_NEAREST;
     //! Device battery status indicator
     int    batteryStatus = BATTERY_STATUS_OFF;
     //! Allow game to work when window is not active

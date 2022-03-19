@@ -58,6 +58,9 @@ extern struct Config_t
     bool    worldMapFastMove = false;
     //! Enter the pause menu after dying while testing a level
     bool    editor_pause_on_death = true;
+    //! Internal gameplay resolution (0 means that Renderer may set on window resize)
+    int     InternalW = 800;
+    int     InternalH = 600;
 
     /* ---- Effects ----*/
 

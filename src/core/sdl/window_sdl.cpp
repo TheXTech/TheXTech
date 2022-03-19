@@ -24,6 +24,7 @@
 #include <Logger/logger.h>
 #include <Graphics/graphics_funcs.h>
 
+#include "globals.h"
 #include "main/game_info.h"
 #include "window_sdl.h"
 #include "../render.h"

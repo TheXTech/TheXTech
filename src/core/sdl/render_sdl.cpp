@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_opengl.h>
@@ -164,7 +165,6 @@ void RenderSDL::repaint()
 #endif
 
     int w, h, off_x, off_y, wDst, hDst;
-    float scale_x, scale_y;
 
     setTargetScreen();
 
@@ -180,23 +180,8 @@ void RenderSDL::repaint()
     SDL_GetRendererOutputSize(m_gRenderer, &w, &h);
 
     // Calculate the size difference factor
-    scale_x = float(w) / ScaleWidth;
-    scale_y = float(h) / ScaleHeight;
-
-    wDst = w;
-    hDst = h;
-
-    // Keep aspect ratio
-    if(scale_x > scale_y) // Width more than height
-    {
-        wDst = int(scale_y * ScaleWidth);
-        hDst = int(scale_y * ScaleHeight);
-    }
-    else if(scale_x < scale_y) // Height more than width
-    {
-        hDst = int(scale_x * ScaleHeight);
-        wDst = int(scale_x * ScaleWidth);
-    }
+    wDst = int(m_scale_x * ScaleWidth);
+    hDst = int(m_scale_y * ScaleHeight);
 
     // Align the rendering scene to the center of screen
     off_x = (w - wDst) / 2;
@@ -219,6 +204,31 @@ void RenderSDL::repaint()
 
 void RenderSDL::updateViewport()
 {
+    // update video settings
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+    else
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+    // will never happen in the fixed res case
+    if(ScaleWidth != ScreenW || ScaleHeight != ScreenH)
+    {
+
+#ifdef USE_SCREENSHOTS_AND_RECS
+        // invalidates GIF recorder handle
+        if(recordInProcess())
+            toggleGifRecorder();
+#endif
+
+        SDL_DestroyTexture(m_tBuffer);
+        m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
+        SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+
+        ScaleWidth = ScreenW;
+        ScaleHeight = ScreenH;
+    }
+
+
     float w, w1, h, h1;
     int   wi, hi;
 
@@ -241,27 +251,36 @@ void RenderSDL::updateViewport()
     w1 = w;
     h1 = h;
 
-    m_scale_x = w / ScaleWidth;
-    m_scale_y = h / ScaleHeight;
-    m_viewport_scale_x = m_scale_x;
-    m_viewport_scale_y = m_scale_y;
+    float scale = w / ScaleWidth;
+
+    if(scale > h / ScaleHeight)
+        scale = h / ScaleHeight;
+
+    if(g_videoSettings.scaleMode == SCALE_FIXED_05X && scale > 0.5f)
+    {
+        printf("The scale is shirnked.\n");
+        scale = 0.5f;
+    }
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
+        scale = std::floor(scale);
+    if(g_videoSettings.scaleMode == SCALE_FIXED_1X && scale > 1.f)
+        scale = 1.f;
+    if(g_videoSettings.scaleMode == SCALE_FIXED_2X && scale > 2.f)
+        scale = 2.f;
+
+    w1 = scale * ScaleWidth;
+    h1 = scale * ScaleHeight;
+
+    m_scale_x = scale;
+    m_scale_y = scale;
+    m_viewport_scale_x = scale;
+    m_viewport_scale_y = scale;
 
     m_viewport_offset_x = 0;
     m_viewport_offset_y = 0;
     m_viewport_offset_x_cur = 0;
     m_viewport_offset_y_cur = 0;
     m_viewport_offset_ignore = false;
-
-    if(m_scale_x > m_scale_y)
-    {
-        w1 = m_scale_y * ScaleWidth;
-        m_viewport_scale_x = w1 / ScaleWidth;
-    }
-    else if(m_scale_x < m_scale_y)
-    {
-        h1 = m_scale_x * ScaleHeight;
-        m_viewport_scale_y = h1 / ScaleHeight;
-    }
 
     m_offset_x = (w - w1) / 2;
     m_offset_y = (h - h1) / 2;
@@ -274,7 +293,6 @@ void RenderSDL::updateViewport()
 
 void RenderSDL::resetViewport()
 {
-    updateViewport();
     SDL_RenderSetViewport(m_gRenderer, nullptr);
 }
 

@@ -31,7 +31,7 @@
 #include "graphics.h"
 #include "editor.h"
 #include "frame_timer.h"
-
+#include "change_res.h"
 
 AbstractEvents_t *g_events = nullptr;
 
@@ -45,7 +45,7 @@ void AbstractEvents_t::init(FrmMain *form)
 
 void AbstractEvents_t::eventResize()
 {
-    XRender::updateViewport();
+    UpdateInternalRes();
     SetupScreens();
     Controls::UpdateTouchScreenSize();
 }

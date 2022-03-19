@@ -2115,5 +2115,9 @@ extern std::string LevelName;
 //Public Const curRelease As Integer = 64
 const int curRelease = 64;
 
+#ifndef THEXTECH_FIXED_RES
+extern int ScreenW;
+extern int ScreenH;
+#endif
 
 #endif // GLOBALS_H
