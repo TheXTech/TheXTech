@@ -209,27 +209,21 @@ void GameplayTimer::tick()
     }
     else
     {
-        bool updateFactor = false;
-
         if(LevelSelect || (!LevelSelect && LevelMacro == 0))
             m_cyclesCurrent += 1;
         else
         {
             if(!m_levelBlinkActive)
                 m_levelBlinkActive = true;
-            updateColorSpin(5.0f);
         }
 
         if(!m_cyclesFin)
             m_cyclesTotal += 1;
-        else
-        {
-            updateFactor = true;
-            if(!m_worldBlinkActive)
-                m_worldBlinkActive = true;
-        }
 
-        if(updateFactor)
+        if(m_levelBlinkActive)
+            updateColorSpin(5.0f);
+
+        if(m_worldBlinkActive)
         {
             m_blinkingFactor += m_blinkingDir * 0.02;
             if(m_blinkingFactor >= 0.3f || m_blinkingFactor <= -0.3f)
@@ -241,6 +235,7 @@ void GameplayTimer::tick()
 void GameplayTimer::onBossDead()
 {
     m_cyclesFin = true;
+    m_worldBlinkActive = true;
 }
 
 void GameplayTimer::render()
