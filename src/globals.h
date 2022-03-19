@@ -801,6 +801,11 @@ struct vScreen_t
     double Width = 0.0;
 //    Height As Double
     double Height = 0.0;
+
+//    NEW: location on screen when vScreens are smaller due to level size
+    double ScreenTop = 0.0;
+    double ScreenLeft = 0.0;
+
 //    Visible As Boolean
     bool Visible = false;
 //    tempX As Double

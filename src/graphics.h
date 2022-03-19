@@ -47,9 +47,17 @@ void UpdateGraphics(bool skipRepaint = false);
 // Public Sub GetvScreen(A As Integer) ' Get the screen position
 //  Get the screen position
 void GetvScreen(const int A);
+
+// NEW: get the screen position if it were 800x600, and write the top-left coordinate to (left, top)
+void GetvScreenCanonical(int A, int* X, int* Y);
+
 // Public Sub GetvScreenAverage() ' Get the average screen position for all players
 //  Get the average screen position for all players
 void GetvScreenAverage();
+
+// NEW: get the average screen position for all players if it were 800x600, and write the top-left coordinate to (left, top)
+void GetvScreenAverageCanonical(int* left, int* top);
+
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2();
@@ -64,6 +72,12 @@ void SetupScreens();
 // Public Sub DynamicScreen() 'for the split screen stuff
 // for the split screen stuff
 void DynamicScreen();
+
+// NEW: limit vScreens to playable section area and center them on the real screen
+void CenterScreens();
+// NEW: moves qScreen towards vScreen, now including the screen size
+void Update_qScreen();
+
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen
 int SuperTextPixLen(int SuperN, const char* SuperChars, int Font);

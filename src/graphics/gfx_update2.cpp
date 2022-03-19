@@ -75,6 +75,8 @@ void UpdateGraphics2(bool skipRepaint)
     vScreen[Z].Top = 0;
     vScreen[Z].Width = ScreenW;
     vScreen[Z].Height = ScreenH;
+    CenterScreens();
+
     SpecialFrames();
     SceneFrame2[1] += 1;
     if(SceneFrame2[1] >= 12)
@@ -183,6 +185,9 @@ void UpdateGraphics2(bool skipRepaint)
 //        XRender::renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
 //    }
     XRender::clearBuffer();
+
+    XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
+        vScreen[Z].Width, vScreen[Z].Height);
 
 //    if(TakeScreen == true)
 //    {
@@ -699,6 +704,8 @@ void UpdateGraphics2(bool skipRepaint)
             SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
 
         g_stats.print();
+
+        XRender::setViewport(0, 0, ScreenW, ScreenH);
 
         speedRun_renderControls(1, -1);
 

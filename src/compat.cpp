@@ -93,6 +93,9 @@ static void compatInit(Compatibility_t &c)
     c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
     c.fix_fairy_stuck_in_pipe = true;
     c.world_map_fast_move = false;
+    c.free_level_res = true;
+    c.free_world_res = true;
+    c.NPC_activate_mode = NPC_activate_modes::smart;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -127,6 +130,9 @@ static void compatInit(Compatibility_t &c)
         c.allow_drop_add = false;
         c.multiplayer_pause_controls = false;
         c.fix_fairy_stuck_in_pipe = false;
+        c.free_level_res = false;
+        c.free_world_res = false;
+        c.NPC_activate_mode = NPC_activate_modes::onscreen;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -264,6 +270,15 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("allow-drop-add", c.allow_drop_add, c.allow_drop_add);
         compat.read("multiplayer-pause-controls", c.multiplayer_pause_controls, c.multiplayer_pause_controls);
         compat.read("fix-fairy-stuck-in-pipe", c.fix_fairy_stuck_in_pipe, c.fix_fairy_stuck_in_pipe);
+        compat.read("free-level-res", c.free_level_res, c.free_level_res);
+        compat.read("free-world-res", c.free_world_res, c.free_world_res);
+        const IniProcessing::StrEnumMap activModes =
+        {
+            {"onscreen", (int)NPC_activate_modes::onscreen},
+            {"smart", (int)NPC_activate_modes::smart},
+            {"orig", (int)NPC_activate_modes::orig},
+        };
+        compat.readEnum("npc-activate-mode", c.NPC_activate_mode, c.NPC_activate_mode, activModes);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);

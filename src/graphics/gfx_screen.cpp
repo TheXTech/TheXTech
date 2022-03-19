@@ -25,11 +25,13 @@
 #include "../change_res.h"
 #include "../load_gfx.h"
 #include "../core/window.h"
+#include "../compat.h"
 
 
 void SetScreenType()
 {
-    // moved this code from game_main.cpp, but it occurs elsewhere also
+    // moved this code from game_main.cpp, but it occured elsewhere also
+    //   it was always called before setup screens, now it is a part of setup screens.
     //   better to have it in one place so it can be updated
     if(numPlayers == 1)
         ScreenType = 0; // Follow 1 player
@@ -117,12 +119,12 @@ void SetupScreens()
         vScreen[2].Left = 0;
         vScreen[2].Top = 0;
         break;
-    case 7:
+    case 7: // Credits
     case 8: // netplay
         vScreen[1].Left = 0;
-        vScreen[1].Width = 800;
+        vScreen[1].Height = ScreenH;
         vScreen[1].Top = 0;
-        vScreen[1].Height = 600;
+        vScreen[1].Width = ScreenW;
         vScreen[2].Visible = false;
         break;
 #if 0 // Merged with the branch above because they both are same
@@ -320,6 +322,140 @@ void DynamicScreen()
         if(Player[A].Mount == 2)
             Player[A].Location.Height = 128;
     }
+}
+
+// NEW: limit vScreens to playable section area and center them on the real screen
+void CenterScreens()
+{
+    vScreen[1].ScreenLeft = vScreen[1].Left;
+    vScreen[2].ScreenLeft = vScreen[2].Left;
+    vScreen[1].ScreenTop = vScreen[1].Top;
+    vScreen[2].ScreenTop = vScreen[2].Top;
+
+    if(GameMenu || GameOutro || LevelEditor || WorldEditor)
+        return;
+
+    // restrict the vScreen to the level if the level is smaller than the screen
+    double MaxWidth1, MaxWidth2, MaxHeight1, MaxHeight2;
+
+    MaxWidth1 = MaxWidth2 = ScreenW;
+    MaxHeight1 = MaxHeight2 = ScreenH;
+    if(LevelSelect && !g_compatibility.free_world_res)
+    {
+        MaxWidth1 = MaxWidth2 = 800;
+        MaxHeight1 = MaxHeight2 = 600;
+    }
+    else if(!LevelSelect && !g_compatibility.free_level_res)
+    {
+        MaxWidth1 = MaxWidth2 = 800;
+        MaxHeight1 = MaxHeight2 = 600;
+    }
+    else if(!LevelSelect)
+    {
+        MaxWidth1 = level[Player[1].Section].Width - level[Player[1].Section].X;
+        MaxWidth2 = level[Player[2].Section].Width - level[Player[2].Section].X;
+        MaxHeight1 = level[Player[1].Section].Height - level[Player[1].Section].Y;
+        MaxHeight2 = level[Player[2].Section].Height - level[Player[2].Section].Y;
+        if(NoTurnBack[Player[1].Section])
+            MaxWidth1 = 800;
+        if(NoTurnBack[Player[2].Section])
+            MaxWidth2 = 800;
+    }
+
+    if(MaxWidth1 < vScreen[1].Width)
+    {
+        vScreen[1].ScreenLeft += (vScreen[1].Width - MaxWidth1) / 2;
+        vScreen[1].Width = MaxWidth1;
+    }
+
+    if(MaxWidth2 < vScreen[2].Width)
+    {
+        vScreen[2].ScreenLeft += (vScreen[2].Width - MaxWidth2) / 2;
+        vScreen[2].Width = MaxWidth2;
+    }
+
+    if(MaxHeight1 < vScreen[1].Height)
+    {
+        vScreen[1].ScreenTop += (vScreen[1].Height - MaxHeight1) / 2;
+        vScreen[1].Height = MaxHeight1;
+    }
+
+    if(MaxHeight2 < vScreen[2].Height)
+    {
+        vScreen[2].ScreenTop += (vScreen[2].Height - MaxHeight2) / 2;
+        vScreen[2].Height = MaxHeight2;
+    }
+}
+
+// NEW: moves qScreen towards vScreen, now including the screen size
+void Update_qScreen()
+{
+    // take the slower option of 2px per second camera (vanilla)
+    //   or 2px per second resize, then scale the speed of the faster one to match
+    double camRateX = 2;
+    double camRateY = 2;
+
+    double resizeRateX = 2;
+    double resizeRateY = 2;
+
+    double camFramesX = std::abs(vScreenX[1] - qScreenX[1])/camRateX;
+    double camFramesY = std::abs(vScreenY[1] - qScreenY[1])/camRateY;
+    double resizeFramesX = std::abs(vScreen[1].ScreenLeft - qScreenLoc[1].ScreenLeft)/resizeRateX;
+    double resizeFramesY = std::abs(vScreen[1].ScreenTop - qScreenLoc[1].ScreenTop)/resizeRateY;
+    double qFramesX = (camFramesX > resizeFramesX ? camFramesX : resizeFramesX);
+    double qFramesY = (camFramesY > resizeFramesY ? camFramesY : resizeFramesY);
+
+    // don't continue after this frame if it would arrive next frame
+    // (this is equivalent to the <5 condition in the vanilla game)
+    if(qFramesX < 2.5 && qFramesY < 2.5)
+        qScreen = false;
+
+    if(qFramesX < 1)
+        qFramesX = 1;
+    if(qFramesY < 1)
+        qFramesY = 1;
+
+    camRateX = std::abs(vScreenX[1] - qScreenX[1])/qFramesX;
+    camRateY = std::abs(vScreenY[1] - qScreenY[1])/qFramesY;
+
+    resizeRateX = std::abs(vScreen[1].ScreenLeft - qScreenLoc[1].ScreenLeft)/qFramesX;
+    resizeRateY = std::abs(vScreen[1].ScreenTop - qScreenLoc[1].ScreenTop)/qFramesY;
+
+    if(vScreenX[1] < qScreenX[1] - camRateX)
+        qScreenX[1] = qScreenX[1] - camRateX;
+    else if(vScreenX[1] > qScreenX[1] + camRateX)
+        qScreenX[1] = qScreenX[1] + camRateX;
+    else
+        qScreenX[1] = vScreenX[1];
+
+    if(vScreenY[1] < qScreenY[1] - camRateY)
+        qScreenY[1] = qScreenY[1] - camRateY;
+    else if(vScreenY[1] > qScreenY[1] + camRateY)
+        qScreenY[1] = qScreenY[1] + camRateY;
+    else
+        qScreenY[1] = vScreenY[1];
+
+    if(vScreen[1].ScreenLeft < qScreenLoc[1].ScreenLeft - resizeRateX)
+        qScreenLoc[1].ScreenLeft -= resizeRateX;
+    else if(vScreen[1].ScreenLeft > qScreenLoc[1].ScreenLeft + resizeRateX)
+        qScreenLoc[1].ScreenLeft += resizeRateX;
+    else
+        qScreenLoc[1].ScreenLeft = vScreen[1].ScreenLeft;
+
+    if(vScreen[1].ScreenTop < qScreenLoc[1].ScreenTop - resizeRateY)
+        qScreenLoc[1].ScreenTop -= resizeRateY;
+    else if(vScreen[1].ScreenTop > qScreenLoc[1].ScreenTop + resizeRateY)
+        qScreenLoc[1].ScreenTop += resizeRateY;
+    else
+        qScreenLoc[1].ScreenTop = vScreen[1].ScreenTop;
+
+    vScreenX[1] = qScreenX[1];
+    vScreenY[1] = qScreenY[1];
+
+    vScreen[1].Width -= 2*(std::floor(qScreenLoc[1].ScreenLeft) - vScreen[1].ScreenLeft);
+    vScreen[1].Height -= 2*(std::floor(qScreenLoc[1].ScreenTop) - vScreen[1].ScreenTop);
+    vScreen[1].ScreenLeft = std::floor(qScreenLoc[1].ScreenLeft);
+    vScreen[1].ScreenTop = std::floor(qScreenLoc[1].ScreenTop);
 }
 
 void SetRes()

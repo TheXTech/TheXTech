@@ -22,6 +22,13 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
+enum class NPC_activate_modes : int
+{
+    onscreen,
+    smart,
+    orig,
+};
+
 struct Compatibility_t
 {
     // 1.3.4
@@ -79,6 +86,9 @@ struct Compatibility_t
     bool multiplayer_pause_controls;
     bool fix_fairy_stuck_in_pipe;
     bool world_map_fast_move;
+    bool free_level_res;
+    bool free_world_res;
+    NPC_activate_modes NPC_activate_mode;
 
     // SpeedRun section
     enum

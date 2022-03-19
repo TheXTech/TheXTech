@@ -178,6 +178,8 @@ void GraphicsLazyPreLoad()
     if(SingleCoop == 2)
         numScreens = 1; // fine to be 1, since it would just be run for Z = 2 twice otherwise;
 
+    CenterScreens();
+
     For(Z, 1, numScreens)
     {
         if(SingleCoop == 2)
@@ -547,6 +549,7 @@ void UpdateGraphics(bool skipRepaint)
 
 
 //    If LevelEditor = False Then  'Sets up the screens if not in level editor
+    SetupScreens();
     if(!LevelEditor)
     {
         if(ScreenType == 1)
@@ -565,14 +568,15 @@ void UpdateGraphics(bool skipRepaint)
             numScreens = 1;
     }
 
+    if(SingleCoop == 2)
+        numScreens = 2;
+    CenterScreens();
+
     if(ClearBuffer)
     {
         ClearBuffer = false;
         XRender::clearBuffer();
     }
-
-    if(SingleCoop == 2)
-        numScreens = 2;
 
     For(Z, 1, numScreens)
     {
@@ -614,22 +618,9 @@ void UpdateGraphics(bool skipRepaint)
 //            If Background2(S) = 0 Then BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //        End If
 
-        if(qScreen)
-        {
-            if(vScreenX[1] < qScreenX[1] - 2)
-                qScreenX[1] -= 2;
-            else if(vScreenX[1] > qScreenX[1] + 2)
-                qScreenX[1] += 2;
-            if(vScreenY[1] < qScreenY[1] - 2)
-                qScreenY[1] -= 2;
-            else if(vScreenY[1] > qScreenY[1] + 2)
-                qScreenY[1] += 2;
-            if(qScreenX[1] < vScreenX[1] + 5 && qScreenX[1] > vScreenX[1] - 5 &&
-               qScreenY[1] < vScreenY[1] + 5 && qScreenY[1] > vScreenY[1] - 5)
-                qScreen = false;
-            vScreenX[1] = qScreenX[1];
-            vScreenY[1] = qScreenY[1];
-        }
+        // moved to `graphics/gfx_screen.cpp`
+        if(/*!Do_FrameSkip && */qScreen)
+            Update_qScreen();
 
         // noturningback
         if(!LevelEditor)
@@ -657,8 +648,9 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-        if(numScreens > 1) // To separate drawing of screens
-            XRender::setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
+        // if(numScreens > 1) // To separate drawing of screens
+        // always needed now due to cases where vScreen is smaller than physical screen
+        XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height);
 
         DrawBackground(S, Z);
 
@@ -2243,8 +2235,8 @@ void UpdateGraphics(bool skipRepaint)
             XRender::offsetViewportIgnore(false);
         }
 
-        if(numScreens > 1) // for multiple screens
-            XRender::setViewport(0, 0, ScreenW, ScreenH);
+        // if(numScreens > 1) // for multiple screens
+        XRender::resetViewport();
 
         if(GameOutro)
             DrawCredits();

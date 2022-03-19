@@ -74,24 +74,36 @@ void GetvScreen(const int A)
 //    }
 //    else
     {
-        if(p.Mount == 2)
-            pLoc.Height = 0;
+        double pHeight = (p.Mount != 2) ? pLoc.Height : 0;
+
         // this guard is new because players can now respawn in 1P mode through DropAdd
         if(Player[A].Effect != 6)
         {
             vScreenX[A] = -pLoc.X + (vScreen[A].Width * 0.5) - pLoc.Width / 2.0;
-            vScreenY[A] = -pLoc.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - pLoc.Height;
+            vScreenY[A] = -pLoc.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - pHeight;
             vScreenX[A] += -vScreen[A].tempX;
             vScreenY[A] += -vScreen[A].TempY;
-            if(-vScreenX[A] < level[p.Section].X)
+
+            // center the level if too small, otherwise shift so that it is onscreen
+            if(vScreen[A].Width + level[p.Section].X > level[p.Section].Width)
+                vScreenX[A] = -level[p.Section].X/2 + -(level[p.Section].Width - vScreen[A].Width)/2;
+            else if(-vScreenX[A] < level[p.Section].X)
                 vScreenX[A] = -level[p.Section].X;
-            if(-vScreenX[A] + vScreen[A].Width > level[p.Section].Width)
+            else if(-vScreenX[A] + vScreen[A].Width > level[p.Section].Width)
                 vScreenX[A] = -(level[p.Section].Width - vScreen[A].Width);
-            if(-vScreenY[A] < level[p.Section].Y)
+
+            // center the level if too small, otherwise shift so that it is onscreen
+            if(vScreen[A].Height + level[p.Section].Y > level[p.Section].Height)
+                vScreenY[A] = -level[p.Section].Y/2 + -(level[p.Section].Height - vScreen[A].Height)/2;
+            else if(-vScreenY[A] < level[p.Section].Y)
                 vScreenY[A] = -level[p.Section].Y;
-            if(-vScreenY[A] + vScreen[A].Height > level[p.Section].Height)
+            else if(-vScreenY[A] + vScreen[A].Height > level[p.Section].Height)
                 vScreenY[A] = -(level[p.Section].Height - vScreen[A].Height);
         }
+
+        // there is some 3DS-specific code to ensure the screen boundaries work with the 3D effect, not ported yet.
+        // also to ensure the vScreen boundary occurs on an even pixel
+
         if(vScreen[A].TempDelay > 0)
             vScreen[A].TempDelay -= 1;
         else
@@ -105,9 +117,35 @@ void GetvScreen(const int A)
             if(vScreen[A].TempY < 0)
                 vScreen[A].TempY += 1;
         }
-        if(p.Mount == 2)
-            pLoc.Height = 128;
     }
+
+    // keep vScreen boundary even on 3DS
+#ifdef __3DS__
+    vScreenX[A] -= std::fmod(vScreenX[A], 2.);
+    vScreenY[A] -= std::fmod(vScreenY[A], 2.);
+#endif
+}
+
+// NEW: get the screen position if it were 800x600, and write the top-left coordinate to (left, top)
+void GetvScreenCanonical(int A, int* left, int* top)
+{
+    auto &p = Player[A];
+    auto &pLoc = p.Location;
+
+    double pHeight = (p.Mount != 2) ? pLoc.Height : 0;
+
+    *left = -pLoc.X + (800 * 0.5) - pLoc.Width / 2.0;
+    *top = -pLoc.Y + (600 * 0.5) - vScreenYOffset - pHeight;
+    *left -= vScreen[A].tempX;
+    *top -= vScreen[A].TempY;
+    if(-(*left) < level[p.Section].X)
+        *left = -level[p.Section].X;
+    else if(-(*left) + 800 > level[p.Section].Width)
+        *left = -(level[p.Section].Width - 800);
+    if(-(*top) < level[p.Section].Y)
+        *top = -level[p.Section].Y;
+    else if(-(*top) + 600 > level[p.Section].Height)
+        *top = -(level[p.Section].Height - 600);
 }
 
 // Get the average screen position for all players
@@ -120,7 +158,6 @@ void GetvScreenAverage()
 
     OldX = vScreenX[1];
     OldY = vScreenY[1];
-    UNUSED(OldY);
 
     vScreenX[1] = 0;
     vScreenY[1] = 0;
@@ -153,17 +190,28 @@ void GetvScreenAverage()
             return;
         }
     }
-    vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
-    vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
+    vScreenX[1] = (vScreenX[1] / B) + (vScreen[1].Width * 0.5);
+    vScreenY[1] = (vScreenY[1] / B) + (vScreen[1].Height * 0.5) - vScreenYOffset;
 
-    if(-vScreenX[A] < level[Player[1].Section].X)
+    // case one: level is too small, center it.
+    if(vScreen[A].Width + level[Player[1].Section].X > level[Player[1].Section].Width)
+        vScreenX[A] = -level[Player[1].Section].X/2 + -(level[Player[1].Section].Width - vScreen[A].Width)/2;
+    // case two: we are too close to the left
+    else if(-vScreenX[A] < level[Player[1].Section].X)
         vScreenX[A] = -level[Player[1].Section].X;
-    if(-vScreenX[A] + ScreenW > level[Player[1].Section].Width)
-        vScreenX[A] = -(level[Player[1].Section].Width - ScreenW);
-    if(-vScreenY[A] < level[Player[1].Section].Y)
+    // case three: we are too close to the right
+    else if(-vScreenX[A] + vScreen[A].Width > level[Player[1].Section].Width)
+        vScreenX[A] = -(level[Player[1].Section].Width - vScreen[A].Width);
+
+    // case one: level is too small, center it.
+    if(vScreen[A].Height + level[Player[1].Section].Y > level[Player[1].Section].Height)
+        vScreenY[A] = -level[Player[1].Section].Y/2 + -(level[Player[1].Section].Height - vScreen[A].Height)/2;
+    // case two: we are too close to the top
+    else if(-vScreenY[A] < level[Player[1].Section].Y)
         vScreenY[A] = -level[Player[1].Section].Y;
-    if(-vScreenY[A] + ScreenH > level[Player[1].Section].Height)
-        vScreenY[A] = -(level[Player[1].Section].Height - ScreenH);
+    // case three: we are too close to the bottom
+    else if(-vScreenY[A] + vScreen[A].Height > level[Player[1].Section].Height)
+        vScreenY[A] = -(level[Player[1].Section].Height - vScreen[A].Height);
 
     if(GameMenu)
     {
@@ -176,7 +224,61 @@ void GetvScreenAverage()
         }
         else if(vScreenX[1] < OldX - 10)
             vScreenX[1] = OldX - 10;
+
+        // on menu, bottom of screen always tracks bottom of level
+        vScreenY[A] = -(level[Player[1].Section].Height - ScreenH);
     }
+
+    // keep vScreen boundary even on 3DS
+#ifdef __3DS__
+    vScreenX[A] -= std::fmod(vScreenX[A], 2.);
+    vScreenY[A] -= std::fmod(vScreenY[A], 2.);
+#endif
+}
+
+// NEW: get the average screen position for all players if it were 800x600, and write the top-left coordinate to (left, top)
+void GetvScreenAverageCanonical(int* left, int* top)
+{
+    int A = 0;
+    int B = 0;
+
+    *left = 0;
+    *top = 0;
+
+    for(A = 1; A <= numPlayers; A++)
+    {
+        if(!Player[A].Dead && Player[A].Effect != 6)
+        {
+            *left -= Player[A].Location.X + Player[A].Location.Width / 2.0;
+            if(Player[A].Mount == 2)
+                *top -= Player[A].Location.Y;
+            else
+                *top -= Player[A].Location.Y + Player[A].Location.Height;
+            B += 1;
+        }
+    }
+
+    if(B == 0)
+    {
+        if(GameMenu)
+        {
+            *left = -level[0].X;
+            B = 1;
+        }
+        else
+            return;
+    }
+    *left = (*left / B) + (800 / 2);
+    *top = (*top / B) + (600 / 2) - vScreenYOffset;
+
+    if(-(*left) < level[Player[1].Section].X)
+        *left = -level[Player[1].Section].X;
+    else if(-(*left) + 800 > level[Player[1].Section].Width)
+        *left = -(level[Player[1].Section].Width - 800);
+    if(-(*top) < level[Player[1].Section].Y)
+        *top = -level[Player[1].Section].Y;
+    else if(-(*top) + 600 > level[Player[1].Section].Height)
+        *top = -(level[Player[1].Section].Height - 600);
 }
 
 // Get the average screen position for all players with no level edge detection
@@ -207,6 +309,11 @@ void GetvScreenAverage2()
 
     vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
     vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
+
+#ifdef __3DS__
+    vScreenX[1] -= std::fmod(vScreenX[1], 2.);
+    vScreenY[1] -= std::fmod(vScreenY[1], 2.);
+#endif
 }
 
 void SetupGraphics()
