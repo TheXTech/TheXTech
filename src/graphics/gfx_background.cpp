@@ -24,6 +24,276 @@
 #include "../core/render.h"
 #include "../compat.h"
 
+void DrawBackgroundColor(int A, int Z, bool lower = false)
+{
+    XRender::lazyPreLoad(GFXBackground2[A]);
+    if(lower)
+    {
+        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
+            GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
+    }
+    else
+    {
+        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
+            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
+    }
+}
+
+// draws backgrounds _, _, _, _, _
+void DrawTopAnchoredBackground(int S, int Z, int A, int offset = 32, int expected_height = 0, int tile_bottom = 0, double h_parallax = 0.5)
+{
+    DrawBackgroundColor(A, Z, true);
+
+    int horiz_reps = (level[S].Width - level[S].X + ScreenW / h_parallax) / GFXBackground2Width[A] * h_parallax + 1;
+
+    Location_t tempLocation;
+
+    for(int B = 0; B <= horiz_reps; B++)
+    {
+        tempLocation.Width = GFXBackground2Width[A];
+        tempLocation.Height = GFXBackground2Height[A];
+
+        tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * h_parallax);
+
+        tempLocation.Y = level[S].Y - offset;
+        if(GameMenu && tempLocation.Y > -vScreenY[Z])
+            tempLocation.Y = -vScreenY[Z];
+
+        while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
+                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
+                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
+        {
+            XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, GFXBackground2Height[A] - tempLocation.Height);
+
+            if(g_compatibility.disable_background2_tiling)
+                break;
+
+            if(expected_height != 0 && GFXBackground2Height[A] != expected_height)
+                break;
+
+            tempLocation.Y += tempLocation.Height;
+
+            if(tile_bottom != 0)
+            {
+                if(GFXBackground2Height[A] != expected_height)
+                    break;
+                tempLocation.Height = tile_bottom;
+            }
+        }
+    }
+}
+
+void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, int tile_bottom = 0, int tile_top = 0, bool flip_tile = false, double h_parallax = 0.5, bool anim = false)
+{
+    double Eff_ScreenH = 0;
+    for(int i = 1; i <= 2; i++)
+    {
+        if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
+            Eff_ScreenH += vScreen[i].Height;
+    }
+
+    bool no_tiling = g_compatibility.disable_background2_tiling;
+    if((tile_bottom != 0 || tile_top != 0 || expected_height != 0) && GFXBackground2Height[A] != expected_height)
+        no_tiling = true;
+
+    double frameH = GFXBackground2Height[A];
+    if(anim)
+    {
+        frameH = GFXBackground2Height[A] / 4.0;
+        // add the exception here
+    }
+
+    double CanvasH = frameH;
+    double CanvasOffset = 0;
+
+    // ensure that the canvas covers above and below the screen
+    if(Eff_ScreenH > CanvasH)
+    {
+        CanvasOffset = Eff_ScreenH - CanvasH;
+        CanvasH += CanvasOffset * 2;
+    }
+
+    Location_t tempLocation;
+
+    int horiz_reps = (level[S].Width - level[S].X + ScreenW / h_parallax) / GFXBackground2Width[A] * h_parallax + 1;
+
+    for(int B = 0; B <= horiz_reps; B++)
+    {
+        tempLocation.Width = GFXBackground2Width[A];
+        tempLocation.Height = frameH;
+
+        tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * h_parallax);
+        if(level[S].Height - level[S].Y > frameH)
+        {
+            // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
+            // .Y = -vScreenY(Z) - .Y
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            tempLocation.Y += CanvasOffset;
+        }
+        else
+            tempLocation.Y = level[S].Height - frameH;
+
+        double bottom_Y = tempLocation.Y + frameH;
+        unsigned int flip = X_FLIP_NONE;
+        while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
+            && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
+            && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
+        {
+            if(anim)
+            {
+                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    GFXBackground2[A],
+                    0, frameH * SpecialFrame[3],
+                    GFXBackground2Width[A], tempLocation.Height,
+                    0., nullptr, flip);
+            }
+            else
+            {
+                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    GFXBackground2[A],
+                    0, 0,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    0., nullptr, flip);
+            }
+
+            if(no_tiling)
+                break;
+
+            if(tile_top != 0)
+                tempLocation.Height = tile_top;
+
+            tempLocation.Y -= tempLocation.Height;
+            if(flip_tile)
+                flip ^= X_FLIP_VERTICAL;
+        }
+
+        if(no_tiling)
+            continue;
+
+        tempLocation.Y = bottom_Y;
+        if(tile_bottom != 0)
+            tempLocation.Height = tile_bottom;
+        else
+            tempLocation.Height = frameH;
+
+        if(flip_tile)
+            flip = X_FLIP_VERTICAL;
+
+        while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
+            && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
+            && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
+        {
+            if(anim)
+            {
+                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    GFXBackground2[A],
+                    0, frameH * SpecialFrame[3] + frameH - tempLocation.Height,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    0., nullptr, flip);
+            }
+            else
+            {
+                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    GFXBackground2[A],
+                    0, frameH - tempLocation.Height,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    0., nullptr, flip);
+            }
+
+            tempLocation.Y += tempLocation.Height;
+            if(flip_tile)
+                flip ^= X_FLIP_VERTICAL;
+        }
+    }
+
+    // use the remaining information from the tempLocation (Y and Height, never tiled)
+    if(no_tiling)
+    {
+        double undrawn_above = tempLocation.Y + vScreenY[Z];
+        double undrawn_below = tempLocation.Y + vScreenY[Z] + tempLocation.Height;
+        XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
+            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
+        XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
+            GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
+    }
+}
+
+void DrawBottomAnchoredBackground(int S, int Z, int A, int offset = 0, int expected_height = 0, int tile_top = 0, double h_parallax = 0.5, bool no_bg = false, bool anim = false)
+{
+    if(!no_bg)
+        DrawBackgroundColor(A, Z, false);
+
+    double frameH = GFXBackground2Height[A];
+    if(anim)
+        frameH = GFXBackground2Height[A] / 4.0;
+
+    Location_t tempLocation;
+
+    int horiz_reps = (level[S].Width - level[S].X + ScreenW / h_parallax) / GFXBackground2Width[A] * h_parallax + 1;
+    for(int B = 0; B <= horiz_reps; B++)
+    {
+        tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * h_parallax);
+        tempLocation.Y = level[S].Height - frameH - offset;
+
+        tempLocation.Height = frameH;
+        tempLocation.Width = GFXBackground2Width[A];
+
+        if(vScreenCollision(Z, tempLocation))
+        {
+            if(anim)
+            {
+                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    GFXBackground2[A], 0, frameH * SpecialFrame[3]);
+            }
+            else
+            {
+                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    GFXBackground2[A], 0, 0);
+            }
+        }
+
+        if(g_compatibility.disable_background2_tiling)
+            continue;
+
+        if(expected_height != 0 && GFXBackground2Height[A] != expected_height)
+            continue;
+
+        if(tile_top != 0 && GFXBackground2Height[A] != expected_height)
+            continue;
+
+        if(tile_top != 0)
+            tempLocation.Height = tile_top;
+
+        while(tempLocation.Y > level[S].Y || tempLocation.Y > -vScreenY[Z])
+        {
+            tempLocation.Y -= tempLocation.Height;
+            if(vScreenCollision(Z, tempLocation))
+            {
+                if(anim)
+                {
+                    XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                        GFXBackground2Width[A], tempLocation.Height,
+                        GFXBackground2[A], 0, frameH * SpecialFrame[3]);
+                }
+                else
+                {
+                    XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                        GFXBackground2Width[A], tempLocation.Height,
+                        GFXBackground2[A], 0, 0);
+                }
+            }
+        }
+    }
+
+}
 
 void DrawBackground(int S, int Z)
 {
@@ -36,146 +306,33 @@ void DrawBackground(int S, int Z)
         LevelREAL[S] = level[S];
     level[S] = LevelREAL[S];
 
-    if(Background2[S] == 0)
-    {
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, 0.f, 0.f, 0.f, 1.f, true);
-    }
-    A = 1; // Blocks
-    if(Background2[S] == 1)
-    {
-        int tempVar = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
-    }
-
     A = 2; // Clouds
     if(Background2[S] == 1 || Background2[S] == 2 || Background2[S] == 22)
     {
-        int tempVar2 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar2; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
-            // the lower graphics is 500px tall, so we really need exactly this offset
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A] - 600 + 100;
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-
-            while(tempLocation.Y > level[S].Y || tempLocation.Y > -vScreenY[Z])
-            {
-                tempLocation.Y -= tempLocation.Height;
-                if(vScreenCollision(Z, tempLocation))
-                    XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
+        DrawBottomAnchoredBackground(S, Z, A, 500, 0, 0, 0.75);
     }
 
-    if(Background2[S] == 13) // clouds
+    if(Background2[S] == 13)
     {
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 0.75);
+    }
 
-        int tempVar3 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar3; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            // this motif, repeated a few times in this file, tiles a texture in two directions (up and down here)
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-
-        }
+    A = 1; // Blocks
+    if(Background2[S] == 1)
+    {
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true);
     }
 
     A = 3; // Hills
     if(Background2[S] == 2)
     {
-
-        int tempVar4 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar4; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true);
     }
 
     A = 4; // Castle
     if(Background2[S] == 3)
     {
-
-        int tempVar5 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar5; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
 
     A = 5; // Pipes
@@ -194,7 +351,7 @@ void DrawBackground(int S, int Z)
 
             if(level[S].Width - level[S].X > GFXBackground2Width[A])
             {
-                tempLocation.X = (-vScreenX[Z] - level[S].X) / (level[S].Width - level[S].X - (800 - vScreen[Z].Left)) * (GFXBackground2Width[A] - (800 - vScreen[Z].Left));
+                tempLocation.X = (-vScreenX[Z] - level[S].X - vScreen[Z].Left) / (level[S].Width - level[S].X - 800) * (GFXBackground2Width[A] - 800) + vScreen[Z].Left;
                 tempLocation.X = -vScreenX[Z] - tempLocation.X;
             }
             else
@@ -225,713 +382,123 @@ void DrawBackground(int S, int Z)
     A = 6; // Trees
     if(Background2[S] == 5)
     {
-        // use a simple color fill for the sky beyond the texture
-        // (bonus: allows smaller texture in asset packs!)
-        if(tempLocation.Y > -vScreenY[Z])
-        {
-            XRender::lazyPreLoad(GFXBackground2[A]);
-            XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-                GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-        }
-
-        int tempVar7 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
-        for(B = 0; B <= tempVar7; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, -1);
     }
 
     A = 7; // Bonus
     if(Background2[S] == 6)
     {
-
-        int tempVar8 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar8; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
 
     A = 8; // SMB Underground
     if(Background2[S] == 7)
     {
-
-        int tempVar9 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar9; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Y - 32;
-            if(GameMenu && tempLocation.Y > -vScreenY[Z])
-                tempLocation.Y = -vScreenY[Z];
-
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawTopAnchoredBackground(S, Z, A);
     }
 
     A = 9; // Night
     if(Background2[S] == 8 || Background2[S] == 9)
     {
-        XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-
-        int tempVar10 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar10; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, -1, 0, 0, false, 0.75);
     }
 
     A = 10; // Night 2
     if(Background2[S] == 9)
     {
-
-        int tempVar11 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar11; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true);
     }
 
     A = 11; // Overworld
     if(Background2[S] == 10)
     {
-
-        int tempVar12 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar12; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            if(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-
-                // clouds occupy top 640px of vanilla asset
-                if(tempLocation.Y > -vScreenY[Z])
-                {
-                    if(GFXBackground2Height[A] < 640 || g_compatibility.disable_background2_tiling)
-                    {
-                        // color fill fallback
-                        double color_height = tempLocation.Y + vScreenY[Z];
-                        XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                    }
-                    else
-                    {
-                        tempLocation.Y -= 640;
-                        tempLocation.Height = 640;
-                        while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                            && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                            && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-                        {
-                            XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, 0);
-                            tempLocation.Y -= 640;
-                        }
-                    }
-                }
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, -1);
     }
 
     A = 12; // SMW Hills
     if(Background2[S] == 11)
     {
-        XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-
-        int tempVar13 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar13; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, -1);
     }
 
     A = 13; // SMW Trees
     if(Background2[S] == 12)
     {
-
-        int tempVar14 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar14; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            // repeat it with vertical flips
-            unsigned int flip = X_FLIP_NONE;
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0, GFXBackground2Width[A], GFXBackground2Height[A], 0., nullptr, flip);
-                flip ^= X_FLIP_VERTICAL;
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-
-            flip = X_FLIP_VERTICAL;
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0, GFXBackground2Width[A], GFXBackground2Height[A], 0., nullptr, flip);
-                flip ^= X_FLIP_VERTICAL;
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, 800, 0, 0, true);
     }
 
     A = 14; // SMB3 Desert
     if(Background2[S] == 14)
     {
-        XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-
-        int tempVar15 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar15; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
+        // could possibly tile
+        DrawCenterAnchoredBackground(S, Z, A, -1);
     }
 
     A = 15; // SMB3 Dungeon
     if(Background2[S] == 15)
     {
-
-        int tempVar16 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar16; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
 
     A = 16; // Crateria
     if(Background2[S] == 16)
     {
-
-        int tempVar17 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar17; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
 
     A = 17; // smb3 ship
     if(Background2[S] == 17)
     {
-        int tempVar18 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-
-        if(g_compatibility.disable_background2_tiling)
-        {
-            XRender::lazyPreLoad(GFXBackground2[A]);
-            XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-                GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
-        }
-
-        // in tall levels, must repeat the texture.
-        // the upper part of the texture is 254px in the original assets
-        for(B = 0; B <= tempVar18; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Y - 32;
-            if(GameMenu && vScreen[Z].Height > level[S].Height - level[S].Y)
-                tempLocation.Y = -vScreenY[Z];
-
-            tempLocation.Height = 254;
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], 254, GFXBackground2[A], 0, 0);
-            }
-
-            tempLocation.Y += 254;
-            tempLocation.Height = GFXBackground2Height[A] - 254;
-
-            int verticalReps = static_cast<int>(floor(static_cast<double>((vScreen[Z].Height - (tempLocation.Y + vScreenY[Z])) / tempLocation.Height))) + 1;
-
-            for(int C = 0; C <= verticalReps; C++)
-            {
-                if(vScreenCollision(Z, tempLocation))
-                {
-                    XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] - 254, GFXBackground2[A], 0, 254);
-                }
-                tempLocation.Y += GFXBackground2Height[A] - 254;
-                if(g_compatibility.disable_background2_tiling)
-                    break;
-            }
-        }
+        // top segment is 254px tall
+        DrawTopAnchoredBackground(S, Z, A, 32, 858, 858-254);
     }
 
     A = 18; // SMW ghost house
     if(Background2[S] == 18)
     {
-
-        int tempVar19 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar19; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
-                // .Y = -vScreenY(Z) - .Y
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] / 4.0 - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
-            tempLocation.Height = GFXBackground2Height[A] / 4;
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A] / 4.0;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
-                tempLocation.Y -= GFXBackground2Height[A] / 4.0;
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
-                tempLocation.Y += GFXBackground2Height[A] / 4.0;
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 0.5, true);
     }
 
     A = 19; // smw forest
     if(Background2[S] == 19)
     {
-
-        int tempVar20 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar20; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            // repeat it with vertical flips
-            unsigned int flip = X_FLIP_NONE;
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0, GFXBackground2Width[A], GFXBackground2Height[A], 0., nullptr, flip);
-                flip ^= X_FLIP_VERTICAL;
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-
-            flip = X_FLIP_VERTICAL;
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0, GFXBackground2Width[A], GFXBackground2Height[A], 0., nullptr, flip);
-                flip ^= X_FLIP_VERTICAL;
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, 1200, 0, 0, true);
     }
 
     A = 20; // smb3 forest
     if(Background2[S] == 20)
     {
-        int tempVar21 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar21; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-            
-            if(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            
-                // top 500px of vanilla asset loop
-                if(tempLocation.Y > -vScreenY[Z])
-                {
-                    if(GFXBackground2Height[A] < 500 || g_compatibility.disable_background2_tiling)
-                    {
-                        // color fill fallback
-                        double color_height = tempLocation.Y + vScreenY[Z];
-                        XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                    }
-                    else
-                    {
-                        tempLocation.Y -= 500;
-                        tempLocation.Height = 500;
-                        while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                            && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                            && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-                        {
-                            XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, 0);
-                            tempLocation.Y -= 500;
-                        }
-                    }
-                }
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, -1);
     }
 
     A = 21; // smb3 battle game
     if(Background2[S] == 21)
     {
-
-        int tempVar22 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar22; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
 
     A = 22; // SMB3 Waterfall
     if(Background2[S] == 22)
     {
-
-        int tempVar23 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5) + vScreen[Z].Width / GFXBackground2Width[A])) + 1;
-        for(B = 0; B <= tempVar23; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
-            tempLocation.Height = GFXBackground2Height[A] / 4;
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
-            }
-        }
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true, true);
     }
 
     A = 23; // SMB3 Tank
     if(Background2[S] == 23)
     {
-
-        XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-
-        int tempVar24 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar24; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, -1);
     }
 
     A = 24; // smb3 bowsers castle
     if(Background2[S] == 24)
     {
-        // the bottom segment is 384px tall
-        const int loop = 384;
-
-        if(g_compatibility.disable_background2_tiling)
-        {
-            XRender::lazyPreLoad(GFXBackground2[A]);
-            XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-                GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
-        }
-
-        int horizontalReps = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= horizontalReps; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Y - 32; // Height - GFXBackground2height(a)
-            if(GameMenu && vScreen[Z].Height > level[S].Height - level[S].Y)
-                tempLocation.Y = -vScreenY[Z];
-
-            tempLocation.Height = GFXBackground2Height[A] - loop;
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, 0);
-            }
-
-            tempLocation.Y += tempLocation.Height;
-            tempLocation.Height = loop;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], loop, GFXBackground2[A], 0, GFXBackground2Height[A] - loop);
-                tempLocation.Y += loop;
-
-                if(g_compatibility.disable_background2_tiling)
-                    break;
-            }
-        }
+        DrawTopAnchoredBackground(S, Z, A, 32, 1504, 384);
     }
 
     A = 25; // SMB2 Underground
     if(Background2[S] == 25)
     {
+        // another y-tiled one
 
         int tempVar26 = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y) / GFXBackground2Height[A] * 0.5 + (double)ScreenH * 2 / GFXBackground2Height[A]))) + 1;
         for(B = 0; B <= tempVar26; B++)
@@ -967,49 +534,98 @@ void DrawBackground(int S, int Z)
     A = 26; // Toad's House
     if(Background2[S] == 26)
     {
-        // the top segment is 244px tall
-        const int loop = GFXBackground2Height[A] - 244;
-
-        if(g_compatibility.disable_background2_tiling)
-        {
-            XRender::lazyPreLoad(GFXBackground2[A]);
-            XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-                GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
-        }
-
-        int horizontalReps = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        int verticalReps = static_cast<int>(floor(static_cast<double>((level[S].Height - level[S].Y - (GFXBackground2Height[A] - loop) + 32) / loop))) + 1;
-        for(B = 0; B <= horizontalReps; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Y - 32; // Height - GFXBackground2height(a)
-            if(GameMenu && vScreen[Z].Height > level[S].Height - level[S].Y)
-                tempLocation.Y = -vScreenY[Z];
-
-            tempLocation.Height = GFXBackground2Height[A] - loop;
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, 0);
-            }
-            tempLocation.Y += tempLocation.Height;
-            tempLocation.Height = loop;
-            for(int C = 0; C <= verticalReps; C++)
-            {
-                if(vScreenCollision(Z, tempLocation))
-                    XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], loop, GFXBackground2[A], 0, GFXBackground2Height[A] - loop);
-                tempLocation.Y += loop;
-                if(g_compatibility.disable_background2_tiling)
-                    break;
-            }
-        }
+        // top segment is 244px tall
+        DrawTopAnchoredBackground(S, Z, A, 32, 1396, 1396-244);
     }
 
     A = 27; // SMB3 Castle
     if(Background2[S] == 27)
     {
-        // the top 1000px of the vanilla asset loops
+        // can be tiled; top section is 1000px
+        DrawCenterAnchoredBackground(S, Z, A, -1);
+    }
 
+    A = 28; // SMW Bonus
+    if(Background2[S] == 28)
+    {
+        DrawCenterAnchoredBackground(S, Z, A);
+    }
+
+    A = 29; // SMW Night
+    if(Background2[S] == 29)
+    {
+        DrawCenterAnchoredBackground(S, Z, A, -1, 0, 0, false, 0.5, true);
+    }
+
+    A = 30; // SMW Cave
+    if(Background2[S] == 30)
+    {
+        DrawCenterAnchoredBackground(S, Z, A, 3456, 0, 0, true, 0.5, true);
+    }
+
+    A = 31; // SMW Hills 2
+    if(Background2[S] == 31)
+    {
+        DrawCenterAnchoredBackground(S, Z, A, -1);
+    }
+
+    A = 32; // SMW Clouds
+    if(Background2[S] == 32)
+    {
+        DrawCenterAnchoredBackground(S, Z, A, -1);
+    }
+
+    A = 33; // SMW Snow
+    if(Background2[S] == 33)
+    {
+        DrawCenterAnchoredBackground(S, Z, A, -1);
+    }
+
+    A = 34; // SMW Hills 3
+    if(Background2[S] == 34)
+    {
+        DrawCenterAnchoredBackground(S, Z, A, -1);
+    }
+
+    A = 36; // Snow Clouds
+    if(Background2[S] == 35 || Background2[S] == 37)
+    {
+        DrawBottomAnchoredBackground(S, Z, A, 500, 0, 0, 0.75);
+    }
+
+    if(Background2[S] == 36)
+    {
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 0.75);
+    }
+
+    A = 35; // SMB 3 Snow Trees
+    if(Background2[S] == 35)
+    {
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true);
+    }
+
+    A = 37; // SMB 3 Snow Hills
+    if(Background2[S] == 37)
+    {
+        DrawBottomAnchoredBackground(S, Z, A, 0, -1, 0, 0.5, true);
+    }
+
+    A = 38; // SMB3 Cave with Sky
+    if(Background2[S] == 38)
+    {
+        // each of the lower cave segments are 428px
+        DrawTopAnchoredBackground(S, Z, A, 20, 1500, 428*2);
+    }
+
+    A = 39; // SMB3 Cave no Sky
+    if(Background2[S] == 39)
+    {
+        DrawCenterAnchoredBackground(S, Z, A);
+    }
+
+    A = 40; // Mystic Cave Zone
+    if(Background2[S] == 40)
+    {
         if(g_compatibility.disable_background2_tiling)
         {
             XRender::lazyPreLoad(GFXBackground2[A]);
@@ -1017,529 +633,6 @@ void DrawBackground(int S, int Z)
                 GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
         }
 
-        int tempVar28 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar28; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + 1000;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, 0);
-                if(tempLocation.Height < 1000 || g_compatibility.disable_background2_tiling)
-                {
-                    if(tempLocation.Y > -vScreenY[Z])
-                    {
-                        // color fill fallback
-                        double color_height = tempLocation.Y + vScreenY[Z];
-                        XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                    }
-                    if(tempLocation.Y + tempLocation.Height < -vScreenY[Z] + vScreen[Z].Height)
-                    {
-                        double shortfall = -vScreenY[Z] + vScreen[Z].Height - tempLocation.Y - tempLocation.Height;
-                        // color fill
-                        XRender::renderRect(vScreenX[Z] + tempLocation.X, vScreen[Z].Height - shortfall, GFXBackground2Width[A], shortfall,
-                            GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
-                    }
-                    break;
-                }
-                tempLocation.Height = 1000;
-                tempLocation.Y -= tempLocation.Height;
-                if(tempLocation.Y < -vScreenY[Z])
-                    break;
-            }
-            if(tempLocation.Height >= 1000 && !g_compatibility.disable_background2_tiling)
-            {
-                tempLocation.Y = bottom_Y;
-                while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                    && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                    && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-                {
-                    XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, 0);
-                    tempLocation.Y += tempLocation.Height;
-                }
-            }
-        }
-    }
-
-    A = 28; // SMW Bonus
-    if(Background2[S] == 28)
-    {
-
-        int tempVar29 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar29; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height >= -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
-    }
-
-    A = 29; // SMW Night
-    if(Background2[S] == 29)
-    {
-        // safe to loop the top 600px of the vanilla asset
-
-        int tempVar30 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar30; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] / 4.0 || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A] / 4.0)))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
-                // .Y = -vScreenY(Z) - .Y
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 4.0 - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
-            tempLocation.Height = GFXBackground2Height[A] / 4;
-            tempLocation.Width = GFXBackground2Width[A];
-
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height >= -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, 0);
-                if(tempLocation.Height < 600 || g_compatibility.disable_background2_tiling)
-                {
-                    if(tempLocation.Y > -vScreenY[Z])
-                    {
-                        // color fill fallback
-                        double color_height = tempLocation.Y + vScreenY[Z];
-                        XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                    }
-                    break;
-                }
-                tempLocation.Height = 600;
-                tempLocation.Y -= tempLocation.Height;
-            }
-        }
-    }
-
-    A = 30; // SMW Cave
-    if(Background2[S] == 30)
-    {
-
-        int tempVar31 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar31; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
-                // .Y = -vScreenY(Z) - .Y
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] / 4.0 - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
-            tempLocation.Height = GFXBackground2Height[A] / 4;
-            tempLocation.Width = GFXBackground2Width[A];
-
-            // repeat it with vertical flips
-            unsigned int flip = X_FLIP_NONE;
-            double bottom_Y = tempLocation.Y + tempLocation.Height;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height >= -vScreenY[Z])
-            {
-                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3], tempLocation.Width, tempLocation.Height, 0., nullptr, flip);
-                flip ^= X_FLIP_VERTICAL;
-                tempLocation.Y -= tempLocation.Height;
-            }
-
-            tempLocation.Y = bottom_Y;
-            flip = X_FLIP_VERTICAL;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3], tempLocation.Width, tempLocation.Height, 0., nullptr, flip);
-                flip ^= X_FLIP_VERTICAL;
-                tempLocation.Y += tempLocation.Height;
-            }
-        }
-    }
-
-    A = 31; // SMW Hills 2
-    if(Background2[S] == 31)
-    {
-        // use a simple color fill
-        XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-
-        int tempVar32 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar32; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            if(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
-    }
-
-    A = 32; // SMW Clouds
-    if(Background2[S] == 32)
-    {
-        // safe to loop the top 400px of the vanilla asset
-
-        int tempVar33 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar33; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, 0);
-                if(tempLocation.Height < 400 || g_compatibility.disable_background2_tiling)
-                {
-                    if(tempLocation.Y > -vScreenY[Z])
-                    {
-                        // color fill fallback
-                        double color_height = tempLocation.Y + vScreenY[Z];
-                        XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                    }
-                    break;
-                }
-                tempLocation.Height = 400;
-                tempLocation.Y -= tempLocation.Height;
-            }
-        }
-    }
-
-    A = 33; // SMW Snow
-    if(Background2[S] == 33)
-    {
-        int tempVar34 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar34; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            if(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-
-                // use a simple color fill
-                if(tempLocation.Y > -vScreenY[Z])
-                {
-                    double color_height = tempLocation.Y + vScreenY[Z];
-                    XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                        GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                }
-            }
-        }
-    }
-
-    A = 34; // SMW Hills 3
-    if(Background2[S] == 34)
-    {
-        int tempVar35 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar35; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, 0);
-                if(tempLocation.Height < 412 || g_compatibility.disable_background2_tiling)
-                {
-                    if(tempLocation.Y > -vScreenY[Z])
-                    {
-                        // color fill fallback
-                        double color_height = tempLocation.Y + vScreenY[Z];
-                        XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                    }
-                    break;
-                }
-                tempLocation.Height = 412;
-                tempLocation.Y -= tempLocation.Height;
-            }
-        }
-    }
-
-    A = 35; // SMB 3 Snow Trees
-    if(Background2[S] == 35)
-    {
-
-        int tempVar36 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar36; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
-    }
-
-    A = 36; // Snow Clouds
-    if(Background2[S] == 35 || Background2[S] == 37)
-    {
-
-        int tempVar37 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar37; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
-            // the other background is 500px, so this really needs to be 600...
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A] - 600 + 100;
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= tempLocation.Height;
-            }
-        }
-    }
-
-    if(Background2[S] == 36)
-    {
-
-        int tempVar38 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar38; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.75);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
-    }
-
-    A = 37; // SMB 3 Snow Hills
-    if(Background2[S] == 37)
-    {
-
-        int tempVar39 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar39; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
-    }
-
-    A = 38; // SMB3 Cave with Sky
-    if(Background2[S] == 38)
-    {
-        XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-            GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
-
-        // the two cave segments are each 428px tall
-
-        int tempVar40 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar40; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            tempLocation.Y = level[S].Y - 20; // Height - GFXBackground2height(a)
-            if(GameMenu && tempLocation.Y > -vScreenY[Z])
-                tempLocation.Y = -vScreenY[Z];
-
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, GFXBackground2Height[A] - tempLocation.Height);
-                tempLocation.Y += tempLocation.Height;
-                if(tempLocation.Height > 428*2)
-                {
-                    tempLocation.Height = 428*2;
-                }
-                if(g_compatibility.disable_background2_tiling)
-                    break;
-            }
-        }
-    }
-
-    A = 39; // SMB3 Cave no Sky
-    if(Background2[S] == 39)
-    {
-
-        int tempVar41 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar41; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
-    }
-
-    A = 40; // Mystic Cave Zone
-    if(Background2[S] == 40)
-    {
         if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
         {
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
@@ -1727,66 +820,35 @@ void DrawBackground(int S, int Z)
 
         tempLocation.Y -= GFXBackground2Height[A];
 
+        if(g_compatibility.disable_background2_tiling)
+            break;
+
         } while(tempLocation.Y + GFXBackground2Height[A] > -vScreenY[Z]);
     }
 
     A = 41; // SMB 1 Castle
     if(Background2[S] == 41)
     {
-
-        int tempVar58 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar58; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
     A = 42; // SMW Castle
     if(Background2[S] == 42)
     {
-        // safe to loop top 546px of vanilla asset
+        // save to tile top 546px and bottom 160px of vanilla asset
+        DrawCenterAnchoredBackground(S, Z, A, 3456, 160, 546, false, 0.5, true);
 
-        int tempVar59 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
+#if 0
+        int tempVar59 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
         for(B = 0; B <= tempVar59; B++)
         {
             tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
             double frameH = vb6Round(GFXBackground2Height[A] / 4.0);
 
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > frameH || (vScreen[Z].Height == ScreenH / 2 && ScreenH > frameH)))
-            {
-                tempLocation.Y = level[S].Height - frameH;
-            }
-            else if(level[S].Height - level[S].Y > frameH)
+            if(level[S].Height - level[S].Y > frameH)
             {
                 // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
                 // .Y = -vScreenY(Z) - .Y
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (frameH - 600) + vScreen[Z].Top;
+                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (frameH - ScreenH) + vScreen[Z].Top;
                 tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
             }
             else
@@ -1799,273 +861,82 @@ void DrawBackground(int S, int Z)
 
             tempLocation.Height = GFXBackground2Height[A] / 4;
             tempLocation.Width = GFXBackground2Width[A];
-
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
+            if(vScreenCollision(Z, tempLocation))
             {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], tempLocation.Height, GFXBackground2[A], 0, (frameH) * SpecialFrame[3]);
-                if(tempLocation.Height < 546 || g_compatibility.disable_background2_tiling)
-                {
-                    if(tempLocation.Y > -vScreenY[Z])
-                    {
-                        // color fill fallback
-                        double color_height = tempLocation.Y + vScreenY[Z];
-                        XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                    }
-                    break;
-                }
-                tempLocation.Height = 546;
-                tempLocation.Y -= tempLocation.Height;
+                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], frameH, GFXBackground2[A], 0, (frameH) * SpecialFrame[3]);
             }
         }
+#endif
     }
     A = 43; // SMW Castle 2
     if(Background2[S] == 43)
     {
-
-        int tempVar60 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar60; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
     A = 44; // SMB2 Castle
     if(Background2[S] == 44)
     {
-
-        int tempVar61 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar61; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
     A = 45; // Brinstar
     if(Background2[S] == 45)
     {
-
-        int tempVar62 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar62; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
     A = 46; // Transport
     if(Background2[S] == 46)
     {
-
-        int tempVar63 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar63; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
     A = 47; // Transport
     if(Background2[S] == 47)
     {
-
-        int tempVar64 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar64; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
     A = 48; // SMB2 Blouds
     if(Background2[S] == 48)
     {
-
-        int tempVar65 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar65; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            if(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-
-                // use a simple color fill for the sky beyond the texture
-                if(tempLocation.Y > -vScreenY[Z])
-                {
-                    double color_height = tempLocation.Y + vScreenY[Z];
-                    XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                        GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                }
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, -1);
     }
     A = 49; // Desert Night
     if(Background2[S] == 49)
     {
-        // use a simple color fill for the sky beyond the texture
-        XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
-            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-
-        if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
+        double Eff_ScreenH = 0;
+        for(int i = 1; i <= 2; i++)
         {
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
+                Eff_ScreenH += vScreen[i].Height;
         }
-        else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        double CanvasH = GFXBackground2Height[A];
+        double CanvasOffset = 0;
+
+        // ensure that the canvas covers above and below the screen
+        if(Eff_ScreenH > CanvasH)
+        {
+            CanvasOffset = Eff_ScreenH - CanvasH;
+            CanvasH += CanvasOffset * 2;
+        }
+
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
             tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            tempLocation.Y += CanvasOffset;
         }
         else
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
         tempLocation.Height = GFXBackground2Height[A];
         tempLocation.Width = GFXBackground2Width[A];
+
+        // use a simple color fill for the sky above and sand below the texture
+        XRender::lazyPreLoad(GFXBackground2[A]);
+        double undrawn_above = tempLocation.Y + vScreenY[Z];
+        double undrawn_below = tempLocation.Y + vScreenY[Z] + tempLocation.Height;
+        XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
+            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
+        XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
+            GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
 
         int tempVar66 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar66; B++)
@@ -2160,15 +1031,32 @@ void DrawBackground(int S, int Z)
     A = 50; // Shrooms
     if(Background2[S] == 50)
     {
-        if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
+        XRender::lazyPreLoad(GFXBackground2[A]);
+        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height,
+            GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
+
+        double Eff_ScreenH = 0;
+        for(int i = 1; i <= 2; i++)
         {
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
+                Eff_ScreenH += vScreen[i].Height;
         }
-        else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        double CanvasH = GFXBackground2Height[A];
+        double CanvasOffset = 0;
+
+        // ensure that the canvas covers above and below the screen
+        if(Eff_ScreenH > CanvasH)
+        {
+            CanvasOffset = Eff_ScreenH - CanvasH;
+            CanvasH += CanvasOffset * 2;
+        }
+
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
             tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            tempLocation.Y += CanvasOffset;
         }
         else
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
@@ -2208,33 +1096,51 @@ void DrawBackground(int S, int Z)
             }
 
             tempLocation.Y -= 378;
+
+            if(g_compatibility.disable_background2_tiling)
+                break;
         }
     }
 
     A = 51; // SMB1 Desert
     if(Background2[S] == 51)
     {
-        if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
+        double Eff_ScreenH = 0;
+        for(int i = 1; i <= 2; i++)
         {
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
+                Eff_ScreenH += vScreen[i].Height;
         }
-        else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        double CanvasH = GFXBackground2Height[A];
+        double CanvasOffset = 0;
+
+        // ensure that the canvas covers above and below the screen
+        if(Eff_ScreenH > CanvasH)
+        {
+            CanvasOffset = 0;
+            CanvasH += (Eff_ScreenH - CanvasH);
+        }
+
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            if(GFXBackground2Height[A] - ScreenH > 0)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-            else
-                tempLocation.Y = (GFXBackground2Height[A] - vScreen[Z].Height) + vScreen[Z].Top;
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
             tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            tempLocation.Y += CanvasOffset;
         }
         else
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
         tempLocation.Height = GFXBackground2Height[A];
         tempLocation.Width = GFXBackground2Width[A];
 
-        // use a simple color fill for the sky beyond the texture
+        // use a simple color fill for the sky above and sand below the texture
         XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b, 1.f, true);
+        double undrawn_above = tempLocation.Y + vScreenY[Z];
+        double undrawn_below = tempLocation.Y + vScreenY[Z] + tempLocation.Height;
+        XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
+            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
+        XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
+            GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
 
         int tempVar78 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.75 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar78; B++)
@@ -2259,27 +1165,42 @@ void DrawBackground(int S, int Z)
     A = 52; // SMB2 Desert Night
     if(Background2[S] == 52)
     {
-        if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
+        double Eff_ScreenH = 0;
+        for(int i = 1; i <= 2; i++)
         {
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
+                Eff_ScreenH += vScreen[i].Height;
         }
-        else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        double CanvasH = GFXBackground2Height[A];
+        double CanvasOffset = 0;
+
+        // ensure that the canvas covers above and below the screen
+        if(Eff_ScreenH > CanvasH)
+        {
+            CanvasOffset = (Eff_ScreenH - CanvasH) * 1.5;
+            CanvasH += CanvasOffset;
+        }
+
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            if (GFXBackground2Height[A] - ScreenH > 0)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-            else
-                tempLocation.Y = (GFXBackground2Height[A] - vScreen[Z].Height) + vScreen[Z].Top;
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
             tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            tempLocation.Y += CanvasOffset;
         }
         else
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
         tempLocation.Height = GFXBackground2Height[A];
         tempLocation.Width = GFXBackground2Width[A];
 
-        // use a simple color fill for the sky beyond the texture
+        // use a simple color fill for the sky above and sand below the texture
         XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b, 1.f, true);
+        double undrawn_above = tempLocation.Y + vScreenY[Z];
+        double undrawn_below = tempLocation.Y + vScreenY[Z] + tempLocation.Height;
+        XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
+            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
+        XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
+            GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
 
         int tempVar80 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar80; B++)
@@ -2374,132 +1295,59 @@ void DrawBackground(int S, int Z)
     A = 53; // Cliffs
     if(Background2[S] == 53)
     {
-
-        // use a simple color fill for the sky beyond the texture
-        XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b, 1.f, true);
-
-        int tempVar89 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar89; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, -1);
     }
     A = 54; // Warehouse
     if(Background2[S] == 54)
     {
-
-        int tempVar90 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar90; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (890 - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A];
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y -= GFXBackground2Height[A];
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A], GFXBackground2[A], 0, 0);
-                tempLocation.Y += GFXBackground2Height[A];
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A);
     }
 
     A = 55; // SMW Water
     if(Background2[S] == 55)
     {
-
-        int tempVar91 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar91; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) / 4 - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - 600) * (GFXBackground2Height[A] / 4.0 - 600) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
-            tempLocation.Height = GFXBackground2Height[A] / 4;
-            tempLocation.Width = GFXBackground2Width[A];
-
-            double bottom_Y = tempLocation.Y + GFXBackground2Height[A] / 4.;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
-                tempLocation.Y -= GFXBackground2Height[A] / 4.;
-            }
-            tempLocation.Y = bottom_Y;
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], GFXBackground2Height[A] / 4.0, GFXBackground2[A], 0, (GFXBackground2Height[A] / 4.0) * SpecialFrame[3]);
-                tempLocation.Y += GFXBackground2Height[A] / 4.;
-            }
-        }
+        DrawCenterAnchoredBackground(S, Z, A, 0, 0, 0, false, 0.5, true);
     }
 
     A = 56; // SMB3 Water
     if(Background2[S] == 56)
     {
-        if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
+        double Eff_ScreenH = 0;
+        for(int i = 1; i <= 2; i++)
         {
-            tempLocation.Y = level[S].Height - GFXBackground2Height[A];
+            if((i == 1 || vScreen[i].Visible) && vScreen[i].Left == vScreen[Z].Left)
+                Eff_ScreenH += vScreen[i].Height;
         }
-        else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
+        double CanvasH = GFXBackground2Height[A];
+        double CanvasOffset = 0;
+
+        // ensure that the canvas covers above and below the screen
+        if(Eff_ScreenH > CanvasH)
+        {
+            CanvasOffset = (Eff_ScreenH - CanvasH) * 1.5;
+            CanvasH += CanvasOffset;
+        }
+
+        if(level[S].Height - level[S].Y > GFXBackground2Height[A])
         {
             // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
+            tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - Eff_ScreenH) * (CanvasH - Eff_ScreenH) + vScreen[Z].Top;
             tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
+            tempLocation.Y += CanvasOffset;
         }
         else
             tempLocation.Y = level[S].Height - GFXBackground2Height[A];
         tempLocation.Height = GFXBackground2Height[A];
         tempLocation.Width = GFXBackground2Width[A];
 
-        // use a simple color fill for the water beyond the texture
+        // use a simple color fill for the water above and below the texture
         XRender::lazyPreLoad(GFXBackground2[A]);
-        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b, 1.f, true);
+        double undrawn_above = tempLocation.Y + vScreenY[Z];
+        double undrawn_below = tempLocation.Y + vScreenY[Z] + tempLocation.Height;
+        XRender::renderRect(0, 0, vScreen[Z].Width, std::ceil(undrawn_above),
+            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
+        XRender::renderRect(0, undrawn_below, vScreen[Z].Width, vScreen[Z].Height - undrawn_below + 1,
+            GFXBackground2[A].ColorLower.r, GFXBackground2[A].ColorLower.g, GFXBackground2[A].ColorLower.b);
 
         int tempVar92 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.65 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
         for(B = 0; B <= tempVar92; B++)
@@ -2545,113 +1393,21 @@ void DrawBackground(int S, int Z)
         }
     }
 
-    A = 57; // Warehouse (doesn't look like one, more like a temple)
+    A = 57; // Warehouse
     if(Background2[S] == 57)
     {
-        // can loop everything but bottom 128px (top 672px by default)
-        // TODO: add compat flag
-
-        int tempVar96 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar96; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A])))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A])
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - 600) * (GFXBackground2Height(A) - 600)
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A];
-            tempLocation.Height = GFXBackground2Height[A];
-            tempLocation.Width = GFXBackground2Width[A];
-
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X,
-                                      vScreenY[Z] + tempLocation.Y,
-                                      GFXBackground2Width[A],
-                                      tempLocation.Height,
-                                      GFXBackground2[A],
-                                      0, 0);
-
-                if(GFXBackground2Height[A] < 129)
-                {
-                    if(tempLocation.Y > -vScreenY[Z])
-                    {
-                        // color fill fallback
-                        double color_height = tempLocation.Y + vScreenY[Z];
-                        XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                    }
-                    break;
-                }
-                tempLocation.Height = GFXBackground2Height[A] - 128;
-                tempLocation.Y -= tempLocation.Height;
-            }
-        }
+        // looks more like a temple to me.
+        // in vanilla asset:
+        // top: can loop top 672px
+        // bottom: can loop bottom 64px
+        DrawCenterAnchoredBackground(S, Z, A, 800, 64, 672);
     }
 
     A = 58; // SMW Night
     if(Background2[S] == 58)
     {
-        // can loop top 600px
-        // TODO: add compat flag
-
-        int tempVar97 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5 + (double)ScreenW / GFXBackground2Width[A]))) + 1;
-        for(B = 0; B <= tempVar97; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            if(g_compatibility.free_level_res && (vScreen[Z].Height > GFXBackground2Height[A] / 4. || (vScreen[Z].Height == ScreenH / 2 && ScreenH > GFXBackground2Height[A] / 4.)))
-            {
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.;
-            }
-            else if(level[S].Height - level[S].Y > GFXBackground2Height[A] / 4.0)
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
-                // .Y = -vScreenY(Z) - .Y
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (GFXBackground2Height[A] / 4.0 - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - GFXBackground2Height[A] / 4.0;
-            tempLocation.Height = GFXBackground2Height[A] / 4;
-            tempLocation.Width = GFXBackground2Width[A];
-
-            while(tempLocation.X + tempLocation.Width > -vScreenX[Z]
-                && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
-                && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X,
-                                      vScreenY[Z] + tempLocation.Y,
-                                      GFXBackground2Width[A],
-                                      tempLocation.Height,
-                                      GFXBackground2[A],
-                                      0,
-                                      (GFXBackground2Height[A] / 4.0) * SpecialFrame[6]
-                );
-
-                if(tempLocation.Height < 600)
-                {
-                    if(tempLocation.Y > -vScreenY[Z])
-                    {
-                        // color fill fallback
-                        double color_height = tempLocation.Y + vScreenY[Z];
-                        XRender::renderRect(vScreenX[Z] + tempLocation.X, 0, GFXBackground2Width[A], color_height,
-                            GFXBackground2[A].ColorUpper.r, GFXBackground2[A].ColorUpper.g, GFXBackground2[A].ColorUpper.b);
-                    }
-                    break;
-                }
-                tempLocation.Height = 600;
-                tempLocation.Y -= tempLocation.Height;
-            }
-        }
+        // can loop top 600px and bottom 128px of vanilla asset
+        DrawCenterAnchoredBackground(S, Z, A, 3584, 128, 600, false, 0.5, true);
     }
 
     level[S] = tempLevel;
