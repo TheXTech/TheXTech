@@ -403,13 +403,13 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         m_lazyLoadedBytes += (w * h * 4);
 
     RGBQUAD upperColor;
-    FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
+    FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &upperColor);
     target.ColorUpper.r = float(upperColor.rgbRed) / 255.0f;
     target.ColorUpper.b = float(upperColor.rgbBlue) / 255.0f;
     target.ColorUpper.g = float(upperColor.rgbGreen) / 255.0f;
 
     RGBQUAD lowerColor;
-    FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
+    FreeImage_GetPixelColor(sourceImage, 0, 0, &lowerColor);
     target.ColorLower.r = float(lowerColor.rgbRed) / 255.0f;
     target.ColorLower.b = float(lowerColor.rgbBlue) / 255.0f;
     target.ColorLower.g = float(lowerColor.rgbGreen) / 255.0f;

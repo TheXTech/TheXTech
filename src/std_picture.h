@@ -33,11 +33,14 @@
 /*!
  * \brief RGB pixel color
  */
+// uses floats right now but should be converted into a packed
+// 32-bit integer for efficient parameter passing;
+// see the wip render queue branch
 struct PGEColor
 {
-    uint8_t r = 0;
-    uint8_t g = 0;
-    uint8_t b = 0;
+    float r = 0;
+    float g = 0;
+    float b = 0;
 };
 
 struct SDL_Texture;

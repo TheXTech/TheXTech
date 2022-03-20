@@ -130,6 +130,19 @@ void OpenConfig_preSetup()
         config.read("display-controllers", g_drawController, false);
         config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
         config.read("osk-fill-screen", g_config.osk_fill_screen, false);
+#ifndef FIXED_RES
+        config.read("internal-width", g_config.InternalW, 800);
+        config.read("internal-height", g_config.InternalH, 600);
+#endif
+        IniProcessing::StrEnumMap scaleModes =
+        {
+            {"linear", SCALE_DYNAMIC_LINEAR},
+            {"integer", SCALE_DYNAMIC_INTEGER},
+            {"nearest", SCALE_DYNAMIC_NEAREST},
+            {"1x", SCALE_FIXED_1X},
+            {"2x", SCALE_FIXED_2X},
+        };
+        config.readEnum("scale-mode", g_videoSettings.scaleMode, (int)SCALE_DYNAMIC_NEAREST, scaleModes);
         config.endGroup();
 
         config.beginGroup("sound");
@@ -279,6 +292,11 @@ void SaveConfig()
         config.setValue("display-controllers", g_drawController);
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
         config.setValue("osk-fill-screen", g_config.osk_fill_screen);
+#       ifndef FIXED_RES
+        config.setValue("internal-width", g_config.InternalW);
+        config.setValue("internal-height", g_config.InternalH);
+#       endif
+        config.setValue("scale-mode", ScaleMode_strings.at(g_videoSettings.scaleMode));
     }
     config.endGroup();
 

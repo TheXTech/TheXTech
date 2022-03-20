@@ -88,6 +88,7 @@ struct Compatibility_t
     bool world_map_fast_move;
     bool free_level_res;
     bool free_world_res;
+    bool disable_background2_tiling;
     NPC_activate_modes NPC_activate_mode;
 
     // SpeedRun section

@@ -96,6 +96,7 @@ static void compatInit(Compatibility_t &c)
     c.free_level_res = true;
     c.free_world_res = true;
     c.NPC_activate_mode = NPC_activate_modes::smart;
+    c.disable_background2_tiling = false;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -279,6 +280,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
             {"orig", (int)NPC_activate_modes::orig},
         };
         compat.readEnum("npc-activate-mode", c.NPC_activate_mode, c.NPC_activate_mode, activModes);
+        compat.read("disable-background2-tiling", c.disable_background2_tiling, c.disable_background2_tiling);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
