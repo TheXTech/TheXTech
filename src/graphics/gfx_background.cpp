@@ -95,13 +95,23 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
 
     bool no_tiling = g_compatibility.disable_background2_tiling;
     if((tile_bottom != 0 || tile_top != 0 || expected_height != 0) && GFXBackground2Height[A] != expected_height)
-        no_tiling = true;
+    {
+        // HACK: don't cancel the tiling if we have the slightly incorrect original asset
+        if(!(A == 42 && GFXBackground2Height[A] == expected_height - 1))
+            no_tiling = true;
+    }
 
     double frameH = GFXBackground2Height[A];
-    if(anim)
+    // HACK: align non-rounded pictures (there was Redigit's original with the 3455 pixels height,
+    // but it must be 3456. There are lot of custom resources that using the 3455 height by mistake)
+    // in the original image, the fourth frame is missing its top line.
+    if(A == 42 && GFXBackground2Height[A] == expected_height - 1 && anim)
+    {
+        frameH = expected_height / 4.0;
+    }
+    else if(anim)
     {
         frameH = GFXBackground2Height[A] / 4.0;
-        // add the exception here
     }
 
     double CanvasH = frameH;
@@ -141,7 +151,25 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
             && tempLocation.Y + tempLocation.Height > -vScreenY[Z])
         {
-            if(anim)
+            // HACK: place the fourth frame in the correct location if we are missing a single line
+            if(A == 42 && GFXBackground2Height[A] == expected_height - 1 && anim && SpecialFrame[3] == 3)
+            {
+                // duplicate the line
+                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                    GFXBackground2Width[A], 1,
+                    GFXBackground2[A],
+                    0, frameH * SpecialFrame[3],
+                    GFXBackground2Width[A], 1,
+                    0., nullptr, flip);
+                // draw the frame
+                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y + 1,
+                    GFXBackground2Width[A], tempLocation.Height - 1,
+                    GFXBackground2[A],
+                    0, frameH * SpecialFrame[3],
+                    GFXBackground2Width[A], tempLocation.Height - 1,
+                    0., nullptr, flip);
+            }
+            else if(anim)
             {
                 XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
@@ -187,7 +215,17 @@ void DrawCenterAnchoredBackground(int S, int Z, int A, int expected_height = 0, 
             && tempLocation.X < -vScreenX[Z] + vScreen[Z].Width
             && tempLocation.Y < -vScreenY[Z] + vScreen[Z].Height)
         {
-            if(anim)
+            // HACK: use the smaller frame size if we are missing a single line
+            if(A == 42 && GFXBackground2Height[A] == expected_height - 1 && anim && SpecialFrame[3] == 3)
+            {
+                XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    GFXBackground2[A],
+                    0, frameH * SpecialFrame[3] + (frameH - 1) - tempLocation.Height,
+                    GFXBackground2Width[A], tempLocation.Height,
+                    0., nullptr, flip);
+            }
+            else if(anim)
             {
                 XRender::renderTextureScaleEx(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y,
                     GFXBackground2Width[A], tempLocation.Height,
@@ -834,39 +872,8 @@ void DrawBackground(int S, int Z)
     A = 42; // SMW Castle
     if(Background2[S] == 42)
     {
-        // save to tile top 546px and bottom 160px of vanilla asset
+        // safe to tile top 546px and bottom 160px of vanilla asset
         DrawCenterAnchoredBackground(S, Z, A, 3456, 160, 546, false, 0.5, true);
-
-#if 0
-        int tempVar59 = static_cast<int>(floor(static_cast<double>((level[S].Width - level[S].X) / GFXBackground2Width[A] * 0.5))) + 1;
-        for(B = 0; B <= tempVar59; B++)
-        {
-            tempLocation.X = level[S].X + ((B * GFXBackground2Width[A]) - (vScreenX[Z] + vScreen[Z].Left + level[S].X) * 0.5);
-            double frameH = vb6Round(GFXBackground2Height[A] / 4.0);
-
-            if(level[S].Height - level[S].Y > frameH)
-            {
-                // .Y = (-vScreenY(Z) - level(S).Y) / (level(S).Height - level(S).Y - (600 - vScreen(Z).Top)) * (GFXBackground2Height(A) / 4 - (600 - vScreen(Z).Top))
-                // .Y = -vScreenY(Z) - .Y
-                tempLocation.Y = (-vScreenY[Z] - vScreen[Z].Top - level[S].Y) / (level[S].Height - level[S].Y - ScreenH) * (frameH - ScreenH) + vScreen[Z].Top;
-                tempLocation.Y = -vScreenY[Z] - tempLocation.Y;
-            }
-            else
-                tempLocation.Y = level[S].Height - frameH;
-
-            // HACK: align non-rounded pictures (there was Redigit's original with the 3455 pixels height,
-            // but it must be 3466. There are lot of custom resources that using the 3455 height by mistake)
-            if(SpecialFrame[3] == 3 && (GFXBackground2Height[A] % 4 != 0))
-                tempLocation.Y += 4 - (GFXBackground2Height[A] % 4); // So, align them by the same way
-
-            tempLocation.Height = GFXBackground2Height[A] / 4;
-            tempLocation.Width = GFXBackground2Width[A];
-            if(vScreenCollision(Z, tempLocation))
-            {
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFXBackground2Width[A], frameH, GFXBackground2[A], 0, (frameH) * SpecialFrame[3]);
-            }
-        }
-#endif
     }
     A = 43; // SMW Castle 2
     if(Background2[S] == 43)
