@@ -47,6 +47,8 @@
 
 #include "global_dirs.h"
 
+#include "../logic/world_map_visibility.cpp"
+
 //! Holds the screen overlay for the world map
 ScreenFader g_worldScreenFader;
 
@@ -189,8 +191,14 @@ void WorldLoop()
     if(SingleCoop > 0)
         SingleCoop = 1;
 
-    vScreenX[1] = -(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0) + vScreen[1].Width / 2.0;
-    vScreenY[1] = -(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0) + vScreen[1].Height / 2.0 + 32;
+    UpdateWorldMapScreen();
+    // tempLocation = AutoCheckVisibleRange();
+
+    vScreenX[1] = -(visible_map.X + visible_map.Width / 2.0) + vScreen[1].Width / 2.0;
+    vScreenY[1] = -(visible_map.Y + visible_map.Height / 2.0) + vScreen[1].Height / 2.0 + 32;
+
+    vScreenX[1] = std::round(vScreenX[1]);
+    vScreenY[1] = std::round(vScreenY[1]);
 
     if(numPlayers > 2)
         numPlayers = 1;
@@ -605,6 +613,8 @@ void WorldLoop()
                             WorldPlayer[1].Location.X = level.WarpX;
                         if(int(level.WarpY) != -1)
                             WorldPlayer[1].Location.Y = level.WarpY;
+
+                        ResetWorldMapScreen();
 
                         LevelBeatCode = 6;
 

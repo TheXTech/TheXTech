@@ -39,6 +39,7 @@
 
 #include <fmt_format_ne.h>
 
+extern Location_t visible_map;
 
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
@@ -189,12 +190,14 @@ void UpdateGraphics2(bool skipRepaint)
     XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
         vScreen[Z].Width, vScreen[Z].Height);
 
+    Location_t tempLocation = visible_map;
+
 //    if(TakeScreen == true)
 //    {
 //        if(LevelEditor == true || MagicHand == true)
 //            frmLevelWindow::vScreen[1].AutoRedraw = true;
 //        else
-//            frmMain.AutoRedraw = true;
+//            XRender::AutoRedraw = true;
 //    }
 
 //    If LevelEditor = True Then
@@ -265,6 +268,11 @@ void UpdateGraphics2(bool skipRepaint)
         sView.Y = sTop;
         sView.Width = sRight - sLeft;
         sView.Height = sBottom - sTop;
+
+        sLeft = tempLocation.X;
+        sTop = tempLocation.Y;
+        sRight = tempLocation.X + tempLocation.Width;
+        sBottom = tempLocation.Y + tempLocation.Height;
 
         //for(A = 1; A <= numTiles; A++)
         for(Tile_t* t : treeWorldTileQuery(sLeft, sTop, sRight, sBottom, true))
@@ -446,10 +454,58 @@ void UpdateGraphics2(bool skipRepaint)
 
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
 
-        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
-        XRender::renderTexture(0, 534, 800, 66, GFX.Interface[4], 0, 534);
-        XRender::renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);
-        XRender::renderTexture(734, 130, 66, 404, GFX.Interface[4], 734, 130);
+        // render background, in MANY careful segments...
+
+        double sW = vScreen[Z].Width;
+        double sH = vScreen[Z].Height;
+
+        double margin = std::round((sW - tempLocation.Width) / 2);
+        double marginTop = std::round((sH - tempLocation.Height) / 2 + 32);
+        double marginBottom = std::round((sH - tempLocation.Height) / 2 - 32);
+
+        XRender::lazyPreLoad(GFX.Interface[4]);
+
+        XRender::renderRect(0, 0, margin-66, sH, GFX.Interface[4].ColorLower.r, GFX.Interface[4].ColorLower.g, GFX.Interface[4].ColorLower.b);
+        XRender::renderRect(sW-margin+66, 0, margin-66, sH, GFX.Interface[4].ColorLower.r, GFX.Interface[4].ColorLower.g, GFX.Interface[4].ColorLower.b);
+        XRender::renderRect(0, 0, sW, marginTop-130, GFX.Interface[4].ColorLower.r, GFX.Interface[4].ColorLower.g, GFX.Interface[4].ColorLower.b);
+        XRender::renderRect(0, sH-marginBottom+66, sW, marginBottom-66, GFX.Interface[4].ColorLower.r, GFX.Interface[4].ColorLower.g, GFX.Interface[4].ColorLower.b);
+
+        // top-left
+        XRender::renderTexture(margin-66, marginTop-130, 66, 130, GFX.Interface[4], 0, 0);
+        // top
+        A = GFX.Interface[4].w-66-66;
+        for (B = 0; B < (sW-margin*2)/A+1; B++)
+        {
+            int w = sW - margin - (margin+B*A) + 1;
+            XRender::renderTexture(margin+B*A, marginTop-130, w < A ? w : A, 130, GFX.Interface[4], 66, 0);
+        }
+        // top-right
+        XRender::renderTexture(sW-margin, marginTop-130, 66, 130+20, GFX.Interface[4], GFX.Interface[4].w-66, 0);
+        // left
+        A = GFX.Interface[4].h-130-66;
+        for (B = 0; B < (sH-marginTop-marginBottom)/A+1; B++)
+        {
+            int h = sH - marginBottom - (marginTop+B*A) + 1;
+            XRender::renderTexture(margin-66, marginTop+B*A, 66, h < A ? h : A, GFX.Interface[4], 0, 130);
+        }
+        // right
+        A = GFX.Interface[4].h-(130+20)-66;
+        for (B = 0; B < (sH-(marginTop+20)-marginBottom)/A+1; B++)
+        {
+            int h = sH - marginBottom - (marginTop+20+B*A) + 1;
+            XRender::renderTexture(sW-margin, (marginTop+20)+B*A, 66, h < A ? h : A, GFX.Interface[4], GFX.Interface[4].w-66, 150);
+        }
+        // bottom-left
+        XRender::renderTexture(margin-66, sH-marginBottom, 66+34, 66, GFX.Interface[4], 0, GFX.Interface[4].h-66);
+        // bottom
+        A = GFX.Interface[4].w-100-66;
+        for (B = 0; B < (sW-(margin+34)-margin)/A+1; B++)
+        {
+            int w = sW - margin - (margin+34+B*A) + 1;
+            XRender::renderTexture((margin+34)+B*A, sH-marginBottom, w < A ? w : A, 66, GFX.Interface[4], 100, GFX.Interface[4].h-66);
+        }
+        // bottom-right
+        XRender::renderTexture(sW-margin, sH-marginBottom, 66, 66, GFX.Interface[4], GFX.Interface[4].w-66, GFX.Interface[4].h-66);
 
         for(A = 1; A <= numPlayers; A++)
         {

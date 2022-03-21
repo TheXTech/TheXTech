@@ -77,6 +77,8 @@
 #include "config.h"
 #include "main/screen_connect.h"
 
+void ResetWorldMapScreen();
+
 void CheckActive();
 // set up sizable blocks
 void SizableBlocks();
@@ -716,6 +718,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 // WorldLoop will automatically resume the music as needed
                 // delayedMusicStart(); // Allow music being started
+
+                ResetWorldMapScreen();
 
                 // 'level select loop
                 runFrameLoop(nullptr, &WorldLoop,
