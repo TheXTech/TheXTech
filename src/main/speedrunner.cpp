@@ -264,36 +264,65 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
         SuperPrintCenter(status_info.info_string, 3, bx + bw / 2, by - 30);
 }
 
-void speedRun_renderControls(int player, int screenZ)
+void speedRun_renderControls(int player, int screenZ, int align)
 {
     if(g_speedRunnerMode == SPEEDRUN_MODE_OFF && !g_drawController)
         return; // Do nothing
 
-    if(GameMenu || GameOutro || BattleMode)
+    if(GameMenu || GameOutro || BattleMode || LevelEditor)
         return; // Don't draw things at Menu and Outro
 
     if(player < 1 || player > 2)
         return;
 
     // Controller
-    int x = 4;
-    int y = ScreenH - 34;
+    int x, y;
     int w = 76;
     int h = 30;
 
     // Battery status
-    int bx = x + w + 4;
-    int by = y + 4;
+    int bx, by;
     int bw = 40;
     int bh = 22;
 
     if(screenZ >= 0)
     {
         auto &scr = vScreen[screenZ];
-        x = scr.Left > 0 ? (int)(scr.Left + scr.Width) - (w + 4) : (int)scr.Left + 4;
-        y = (int)(scr.Top + scr.Height) - 34;
-        bx = scr.Left > 0 ? x - (bw + 4) : (x + w + 4);
+        y = (int)scr.Height - 34;
         by = y + 4;
+
+        if(align == SPEEDRUN_ALIGN_AUTO)
+        {
+            align = scr.Left > 0 ? SPEEDRUN_ALIGN_RIGHT : SPEEDRUN_ALIGN_LEFT;
+        }
+
+        // this keeps the locations fixed even when the vScreens expand/contract
+        if(align == SPEEDRUN_ALIGN_LEFT)
+        {
+            if((int)scr.Width < 800)
+            {
+                x = 4;
+                bx = x + w + 4;
+            }
+            else
+            {
+                x = (int)scr.Width / 2 - 800 / 2 + 4;
+                bx = x - (bw + 4);
+            }
+        }
+        else
+        {
+            if((int)scr.Width < 800)
+            {
+                x = (int)scr.Width - (w + 4);
+                bx = x - (bw + 4);
+            }
+            else
+            {
+                x = (int)scr.Width / 2 + 800 / 2 - (w + 4);
+                bx = x - (bw + 4);
+            }
+        }
     }
     else
     {
@@ -311,6 +340,11 @@ void speedRun_renderControls(int player, int screenZ)
             break;
         }
 #else
+        if(align == SPEEDRUN_ALIGN_LEFT)
+            player = 1;
+        else if(align == SPEEDRUN_ALIGN_RIGHT)
+            player = 2;
+
         switch(player)
         {
         case 1:
@@ -322,6 +356,9 @@ void speedRun_renderControls(int player, int screenZ)
             bx = x - (bw + 4);
             break;
         }
+
+        y = ScreenH - 34;
+        by = y + 4;
 #endif
     }
 
