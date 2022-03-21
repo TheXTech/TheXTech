@@ -2101,31 +2101,8 @@ void UpdateGraphics(bool skipRepaint)
                         NPC[A].GeneratorActive = true;
                 }
             }
-            if(vScreen[2].Visible)
-            {
-                if(int(vScreen[Z].Width) == ScreenW)
-                {
-                    if(vScreen[Z].Top != 0.0)
-                    {
-                        XRender::renderRect(0, 0, vScreen[Z].Width, 1, 0.f, 0.f, 0.f);
-                    }
-                    else
-                    {
-                        XRender::renderRect(0, vScreen[Z].Height - 1, vScreen[Z].Width, 1, 0.f, 0.f, 0.f);
-                    }
-                }
-                else
-                {
-                    if(vScreen[Z].Left != 0.0)
-                    {
-                        XRender::renderRect(0, 0, 1, vScreen[Z].Height, 0.f, 0.f, 0.f);
-                    }
-                    else
-                    {
-                        XRender::renderRect(vScreen[Z].Width - 1, 0, 1, vScreen[Z].Height, 0.f, 0.f, 0.f);
-                    }
-                }
-            }
+
+            // vScreen divider was here, moved to after vScreen section
 
         // player names
         /* Dropped */
@@ -2209,19 +2186,6 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
             }
-
-            else if(!GameOutro)
-                mainMenuDraw();
-
-            if(PrintFPS > 0)
-            {
-                XRender::offsetViewportIgnore(true);
-                SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
-                XRender::offsetViewportIgnore(false);
-            }
-
-            g_stats.print();
-
         }
 
 //        If LevelEditor = True Or MagicHand = True Then
@@ -2235,9 +2199,6 @@ void UpdateGraphics(bool skipRepaint)
             XRender::offsetViewportIgnore(false);
         }
 
-        if(GameOutro)
-            DrawCredits();
-
         XRender::offsetViewportIgnore(true);
         if(ScreenType == 5 && numScreens == 1)
         {
@@ -2250,17 +2211,6 @@ void UpdateGraphics(bool skipRepaint)
         }
         XRender::offsetViewportIgnore(false);
 
-        // for multiple screens or small sections
-        XRender::resetViewport();
-
-        if(ScreenType != 5 && numScreens == 1)
-        {
-            XRender::offsetViewportIgnore(true);
-            speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
-            XRender::offsetViewportIgnore(false);
-        }
-
-
 //        If LevelEditor = True Then
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
 //        Else
@@ -2268,16 +2218,40 @@ void UpdateGraphics(bool skipRepaint)
             s_shakeScreen.update();
         }
 
-
 //    Next Z
     } // For(Z, 2, numScreens)
 
+    // graphics shared by all vScreens
+    XRender::resetViewport();
     XRender::offsetViewportIgnore(true);
-    XRender::setViewport(0, 0, ScreenW, ScreenH);
 
     g_levelScreenFader.draw();
 
+    // 1P controls indicator
+    if(ScreenType != 5 && numScreens == 1)
+        speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
+
+    // splitscreen divider
+    if(vScreen[2].Visible)
+    {
+        if(DScreenType == 3 || DScreenType == 4 || DScreenType == 6)
+            XRender::renderRect(0, ScreenH/2-2, ScreenW, 4, 0, 0, 0);
+        else
+            XRender::renderRect(ScreenW/2-2, 0, 4, ScreenH, 0, 0, 0);
+    }
+
     speedRun_renderTimer();
+
+    if(GameMenu && !GameOutro)
+        mainMenuDraw();
+
+    if(GameOutro)
+        DrawCredits();
+
+    if(PrintFPS > 0)
+        SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+
+    g_stats.print();
 
     if(LevelEditor || MagicHand)
         DrawEditorLevel_UI();
