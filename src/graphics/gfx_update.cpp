@@ -2235,11 +2235,31 @@ void UpdateGraphics(bool skipRepaint)
             XRender::offsetViewportIgnore(false);
         }
 
-        // if(numScreens > 1) // for multiple screens
-        XRender::resetViewport();
-
         if(GameOutro)
             DrawCredits();
+
+        XRender::offsetViewportIgnore(true);
+        if(ScreenType == 5 && numScreens == 1)
+        {
+            speedRun_renderControls(1, Z, SPEEDRUN_ALIGN_LEFT);
+            speedRun_renderControls(2, Z, SPEEDRUN_ALIGN_RIGHT);
+        }
+        else if(numScreens == 2)
+        {
+            speedRun_renderControls(Z, Z, SPEEDRUN_ALIGN_AUTO);
+        }
+        XRender::offsetViewportIgnore(false);
+
+        // for multiple screens or small sections
+        XRender::resetViewport();
+
+        if(ScreenType != 5 && numScreens == 1)
+        {
+            XRender::offsetViewportIgnore(true);
+            speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
+            XRender::offsetViewportIgnore(false);
+        }
+
 
 //        If LevelEditor = True Then
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
@@ -2248,16 +2268,6 @@ void UpdateGraphics(bool skipRepaint)
             s_shakeScreen.update();
         }
 
-        // TODO: VERIFY THIS
-        XRender::offsetViewportIgnore(true);
-        if(ScreenType == 5 && numScreens == 1)
-        {
-            speedRun_renderControls(1, -1);
-            speedRun_renderControls(2, -1);
-        }
-        else
-            speedRun_renderControls(Z, Z);
-        XRender::offsetViewportIgnore(false);
 
 //    Next Z
     } // For(Z, 2, numScreens)

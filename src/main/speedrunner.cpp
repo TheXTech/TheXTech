@@ -306,8 +306,8 @@ void speedRun_renderControls(int player, int screenZ, int align)
             }
             else
             {
-                x = (int)scr.Width / 2 - 800 / 2 + 4;
-                bx = x - (bw + 4);
+                x = ScreenW / 2 - 800 / 2 - scr.ScreenLeft + 4;
+                bx = x + w + 4;
             }
         }
         else
@@ -319,7 +319,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
             }
             else
             {
-                x = (int)scr.Width / 2 + 800 / 2 - (w + 4);
+                x = ScreenW / 2 + 800 / 2 - scr.ScreenLeft - (w + 4);
                 bx = x - (bw + 4);
             }
         }
