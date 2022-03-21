@@ -126,7 +126,7 @@ void GetvScreen(const int A)
 #endif
 }
 
-// NEW: get the screen position if it were 800x600, and write the top-left coordinate to (left, top)
+// NEW: get the vScreen position if it were 800x600, and write the top-left coordinate to (left, top)
 void GetvScreenCanonical(int A, int* left, int* top)
 {
     auto &p = Player[A];
