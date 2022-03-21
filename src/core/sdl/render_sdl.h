@@ -56,7 +56,7 @@ class RenderSDL final : public AbstractRender_t
     int m_viewport_offset_x_cur = 0;
     int m_viewport_offset_y_cur = 0;
 
-    //Need to calculate relative viewport position when screen was scaled
+    // Need to calculate relative viewport position when screen was scaled
     float m_viewport_scale_x = 1.0f;
     float m_viewport_scale_y = 1.0f;
 
@@ -64,6 +64,9 @@ class RenderSDL final : public AbstractRender_t
     int m_viewport_y = 0;
     int m_viewport_w = 0;
     int m_viewport_h = 0;
+
+    // Current scaling filter
+    bool m_filter_linear = false;
 
 public:
     RenderSDL();

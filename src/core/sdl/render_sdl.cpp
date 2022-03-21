@@ -113,6 +113,8 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         return false;
     }
 
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
     SDL_RendererInfo ri;
     SDL_GetRendererInfo(m_gRenderer, &ri);
     m_maxTextureWidth = ri.max_texture_width;
@@ -204,14 +206,10 @@ void RenderSDL::repaint()
 
 void RenderSDL::updateViewport()
 {
-    // update video settings
-    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-    else
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+    bool new_linear = (g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR);
 
     // will never happen in the fixed res case
-    if(ScaleWidth != ScreenW || ScaleHeight != ScreenH)
+    if(ScaleWidth != ScreenW || ScaleHeight != ScreenH || m_filter_linear != new_linear)
     {
 
 #ifdef USE_SCREENSHOTS_AND_RECS
@@ -220,12 +218,22 @@ void RenderSDL::updateViewport()
             toggleGifRecorder();
 #endif
 
+        // update video settings
+        if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+        else
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
         SDL_DestroyTexture(m_tBuffer);
         m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
         SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
 
+        // reset scaling setting for images loaded later
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
         ScaleWidth = ScreenW;
         ScaleHeight = ScreenH;
+        m_filter_linear = new_linear;
     }
 
 
@@ -258,7 +266,6 @@ void RenderSDL::updateViewport()
 
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X && scale > 0.5f)
     {
-        printf("The scale is shirnked.\n");
         scale = 0.5f;
     }
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
