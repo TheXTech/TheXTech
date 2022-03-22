@@ -176,7 +176,7 @@ void UpdateEditor()
 
     if(MagicHand)
     {
-        MouseMove(EditorCursor.X, EditorCursor.Y, true);
+        // MouseMove(EditorCursor.X, EditorCursor.Y, true);
 //        frmNPCs::chkMessage.Enabled = false;
     }
     else
@@ -1584,6 +1584,8 @@ void UpdateEditor()
             }
         }
     }
+
+    editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Logic);
 }
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
@@ -1996,22 +1998,29 @@ int EditorNPCFrame(const int A, float& C, int N)
 
 void GetEditorControls()
 {
-    if(MagicHand)
+    if(GamePaused != PauseCode::None)
+    {
+        if(HasCursor)
+            HideCursor();
         return;
+    }
+
     if(SharedCursor.Move)
     {
         MouseMove(SharedCursor.X, SharedCursor.Y);
     }
-    if(SharedCursor.Secondary || EditorControls.ModeSelect)
+    if(SharedCursor.Secondary || (EditorControls.ModeSelect && !MagicHand))
     {
         optCursor.current = OptCursor_t::LVL_SELECT;
         SetCursor();
     }
-    if(SharedCursor.Tertiary || EditorControls.ModeErase)
+    if(SharedCursor.Tertiary || (EditorControls.ModeErase && !MagicHand))
     {
         optCursor.current = OptCursor_t::LVL_ERASER;
         SetCursor();
     }
+    if(MagicHand)
+        return;
     if(!WorldEditor && EditorControls.TestPlay && MouseRelease)
     {
         EditorBackup();
@@ -2631,6 +2640,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     TestLevel = true;
     LevelSelect = false;
     EndLevel = false;
+    editorScreen.active = false;
     ReturnWarp = 0;
     StartWarp = 0;
 

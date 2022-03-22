@@ -977,7 +977,6 @@ void EditorLoop()
 {
     Controls::Update();
     UpdateEditor();
-    editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Logic);
     UpdateBlocks();
     UpdateEffects();
     if(WorldEditor)

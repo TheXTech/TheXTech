@@ -42,14 +42,14 @@ void DrawEditorLevel(int Z)
 // #ifdef __3DS__
 //     XRender::setLayer(2);
 // #endif
+    if(Z == 1)
+        BlockFlash += 1;
+
+    if(BlockFlash > 45)
+        BlockFlash = 0;
+
     if(LevelEditor)
     {
-        if(Z == 1)
-            BlockFlash += 1;
-
-        if(BlockFlash > 45)
-            BlockFlash = 0;
-
         if(BlockFlash <= 30)
         {
             // render NPCs in blocks

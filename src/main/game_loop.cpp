@@ -179,6 +179,9 @@ void GameLoop()
     }
     else
     {
+        if(MagicHand)
+            UpdateEditor();
+
         ClearTriggeredEvents();
         UpdateLayers(); // layers before/after npcs
         UpdateNPCs();
@@ -195,8 +198,6 @@ void GameLoop()
         UpdateSound();
         UpdateEvents();
 //        If MagicHand = True Then UpdateEditor
-        if(MagicHand)
-            UpdateEditor();
 
         updateScreenFaders();
 
