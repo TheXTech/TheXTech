@@ -50,6 +50,8 @@ extern struct Config_t
     bool    NoPauseReconnect = false;
     //! Access the Cheat Screen from the pause menu
     bool    enter_cheats_menu_item = false;
+    //! Enter the pause menu after dying while testing a level
+    bool    pause_on_TestLevel_death = true;
 
 
     /* ---- Effects ----*/

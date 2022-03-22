@@ -186,6 +186,7 @@ void OpenConfig()
         config.read("strict-drop-add", g_config.StrictDropAdd, false);
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
         config.read("enter-cheats-menu-item", g_config.enter_cheats_menu_item, false);
+        config.read("pause-on-test-level-death", g_config.pause_on_TestLevel_death, true);
         config.endGroup();
 
         config.beginGroup("effects");
@@ -310,6 +311,7 @@ void SaveConfig()
     config.setValue("strict-drop-add", g_config.StrictDropAdd);
     config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
     config.setValue("enter-cheats-menu-item", g_config.enter_cheats_menu_item);
+    config.setValue("pause-on-test-level-death", g_config.pause_on_TestLevel_death);
     config.endGroup();
 
     config.beginGroup("speedrun");
