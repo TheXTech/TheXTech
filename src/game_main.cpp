@@ -923,7 +923,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
                 }
                 // from command line, close
-                else if(setup.testLevelMode && !setup.interprocess)
+                else if(setup.testLevelMode)
                 {
                     GameIsActive = false;
                 }
