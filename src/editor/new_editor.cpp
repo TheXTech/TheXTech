@@ -3944,7 +3944,21 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         sx = 0;
 
     if(mode == CallMode::Render)
-        XRender::renderRect(sx+0, 0, e_ScreenW, 40, 0.8f, 0.8f, 0.8f, 1.0f, true);
+    {
+        float alpha = 1.0f;
+        if(select_bar_only && MagicHand)
+            alpha = 0.7f;
+
+        for(int i = 0; i < 5; i++)
+        {
+            float r = 0.6f + 0.05f*i;
+            float g = 0.5f + 0.075f*i;
+            XRender::renderRect(sx+0, 38-2*i, e_ScreenW, 2, r, g, 0.8f, alpha, true);
+            // XRender::renderRect(sx-10+2*i, 0, 2, 40-10+2*i, r, g, 0.8f, alpha, true);
+            // XRender::renderRect(sx+e_ScreenW+8-2*i, 0, 2, 40-10+2*i, r, g, 0.8f, alpha, true);
+        }
+        XRender::renderRect(sx+0, 0, e_ScreenW, 30, 0.8f, 0.8f, 0.8f, alpha, true);
+    }
 
     bool in_layers = (m_special_page == SPECIAL_PAGE_LAYERS || m_special_page == SPECIAL_PAGE_LAYER_DELETION);
     bool in_events = (m_special_page == SPECIAL_PAGE_EVENTS || m_special_page == SPECIAL_PAGE_EVENT_LAYERS
@@ -4149,7 +4163,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     else
     {
         switch_screens_icon = Icon::up;
-        switch_screens_tooltip = "Hide";
+        switch_screens_tooltip = nullptr;
     }
     if(UpdateButton(mode, sx+15*40 + 4, 4, GFX.EIcons, false, 0, 32*switch_screens_icon, 32, 32, switch_screens_tooltip))
         swap_screens();
