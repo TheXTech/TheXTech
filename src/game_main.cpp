@@ -279,6 +279,8 @@ int GameMain(const CmdLineSetup_t &setup)
         }
         GodMode = setup.testGodMode;
         GrabAll = setup.testGrabAll;
+
+        editorScreen.ResetCursor();
         zTestLevel(setup.testMagicHand, setup.interprocess);
     }
 
