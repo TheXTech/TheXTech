@@ -37,6 +37,8 @@ extern std::vector<SelectWorld_t> SelectBattle; // NEW
 // Menu modes
 enum
 {
+    // Main intro
+    MENU_INTRO = -1,
     // Main menu
     MENU_MAIN = 0,
     // One player game episode select
@@ -89,6 +91,8 @@ enum
 
 struct MainMenuContent
 {
+    std::string introPressStart;
+
     std::string mainStartGame;
     std::string main1PlayerGame;
     std::string mainMultiplayerGame;
@@ -142,5 +146,7 @@ extern void initMainMenu();
 
 extern bool mainMenuUpdate();
 extern void mainMenuDraw();
+
+void GetMenuPos(int* MenuX, int* MenuY);
 
 #endif // MENU_MAIN_H

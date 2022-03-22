@@ -1034,7 +1034,7 @@ void EveryonesDead()
         ClearLevel();
         LevelSelect = true;
         GameMenu = true;
-        MenuMode = MENU_MAIN;
+        MenuMode = MENU_INTRO;
         MenuCursor = 0;
     }
     XEvents::doEvents();

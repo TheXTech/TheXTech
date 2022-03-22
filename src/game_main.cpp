@@ -1307,7 +1307,7 @@ void UpdateMacro()
                 BeatTheGame = true;
                 SaveGame();
                 GameOutro = true;
-                MenuMode = MENU_MAIN;
+                MenuMode = MENU_INTRO;
                 MenuCursor = 0;
             }
             XRender::clearBuffer();
