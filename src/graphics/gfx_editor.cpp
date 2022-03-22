@@ -142,7 +142,7 @@ void DrawEditorLevel(int Z)
                         if(NPC[A].Text == STRINGINDEX_NONE)
                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - GFX.Chat.w / 2;
                         else
-                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - 8 - GFX.Chat.w;
+                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - 4 - GFX.Chat.w;
                         tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
 
                         XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
@@ -157,7 +157,7 @@ void DrawEditorLevel(int Z)
                         if(!(NPC[A].TriggerActivate != EVENT_NONE || NPC[A].TriggerTalk != EVENT_NONE || NPC[A].TriggerDeath != EVENT_NONE || NPC[A].TriggerLast != EVENT_NONE))
                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - GFX.Chat.w / 2;
                         else
-                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 + 8;
+                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 + 4;
                         tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
 
                         XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
