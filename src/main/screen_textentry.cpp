@@ -4,6 +4,8 @@
 #include "../config.h"
 #include "core/render.h"
 #include "../game_main.h"
+#include "controls.h"
+#include "gfx.h"
 
 #ifdef __ANDROID__
 
@@ -445,6 +447,10 @@ bool KeyboardMouseRender(bool mouse, bool render)
             }
         }
     }
+
+    if(!Controls::g_renderTouchscreen)
+        XRender::renderTexture(SharedCursor.X, SharedCursor.Y, GFX.ECursor[2]);
+
     return false;
 }
 
@@ -473,6 +479,14 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     MenuMouseRelease = false;
     MouseRelease = false;
     ScrollRelease = false;
+
+    for(int i = 1; i <= numPlayers; i++)
+    {
+        Player[i].UnStart = false;
+        Player[i].CanJump = false;
+        Player[i].CanAltJump = false;
+    }
+
     return Text;
 }
 

@@ -35,6 +35,8 @@ constexpr auto LESet_ResetDefault = EventSection_t::LESet_ResetDefault;
 constexpr int e_ScreenW = 640;
 constexpr int e_ScreenH = 480;
 
+int e_CursorX, e_CursorY;
+
 void EditorScreen::EnsureWorld()
 {
     if(WorldEditor) return;
@@ -266,8 +268,8 @@ bool EditorScreen::UpdateButton(CallMode mode, int x, int y, StdPicture &im, boo
 {
     // the button is 32x32 and outlined by a 36x36 box
     bool coll = false;
-    if(SharedCursor.X >= x && SharedCursor.X < x + 32
-        && SharedCursor.Y >= y && SharedCursor.Y < y + 32)
+    if(e_CursorX >= x && e_CursorX < x + 32
+        && e_CursorY >= y && e_CursorY < y + 32)
         coll = true;
 
     // just do the simple logic if in logic mode
@@ -3919,10 +3921,10 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     if(select_bar_only)
     {
 #ifndef __3DS__
-        SharedCursor.X = EditorCursor.X;
-        SharedCursor.Y = EditorCursor.Y;
+        e_CursorX = EditorCursor.X;
+        e_CursorY = EditorCursor.Y;
         if(WorldEditor)
-            SharedCursor.Y += 8;
+            e_CursorY += 8;
 #endif
         sx = (ScreenW - e_ScreenW)/2;
     }
@@ -4145,8 +4147,8 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         m_last_mode = EditorCursor.Mode;
     }
 #ifndef __3DS__
-    if(select_bar_only && mode == CallMode::Render && SharedCursor.Y < 40 && SharedCursor.X >= sx && SharedCursor.X < sx+e_ScreenW)
-        XRender::renderTexture(SharedCursor.X, SharedCursor.Y, GFX.ECursor[2]);
+    if(select_bar_only && mode == CallMode::Render && e_CursorY < 40 && e_CursorX >= sx && e_CursorX < sx+e_ScreenW)
+        XRender::renderTexture(e_CursorX, e_CursorY, GFX.ECursor[2]);
 #endif
 }
 
@@ -4157,7 +4159,12 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         return;
 
     if(mode == CallMode::Logic)
+    {
+        if(GamePaused != PauseCode::None)
+            return;
+
         MenuMouseRelease = !MenuMouseRelease && !SharedCursor.Primary;
+    }
 
     bool select_bar_only = ((active && second_screen) || (!active && !second_screen));
 
@@ -4176,14 +4183,13 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     if(mode == CallMode::Render)
         XRender::initDraw(1);
 #else
-    if(mode == CallMode::Logic)
-    {
-        SharedCursor.X = EditorCursor.X;
-        SharedCursor.Y = EditorCursor.Y;
-        if(WorldEditor)
-            SharedCursor.Y += 8;
-        SharedCursor.X -= ScreenW/2-e_ScreenW/2;
-    }
+
+    e_CursorX = EditorCursor.X;
+    e_CursorY = EditorCursor.Y;
+    e_CursorX -= ScreenW/2-e_ScreenW/2;
+    if(WorldEditor)
+        e_CursorY += 8;
+
     if(mode == CallMode::Render)
         XRender::setViewport(ScreenW/2-e_ScreenW/2, 0, e_ScreenW, e_ScreenH);
 #endif
@@ -4243,8 +4249,8 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     }
 
 #ifndef __3DS__
-    if(mode == CallMode::Render && SharedCursor.X >= 0)
-        XRender::renderTexture(SharedCursor.X, SharedCursor.Y, GFX.ECursor[2]);
+    if(mode == CallMode::Render && e_CursorX >= 0 && GamePaused == PauseCode::None)
+        XRender::renderTexture(e_CursorX, e_CursorY, GFX.ECursor[2]);
 #endif
 
     if(mode == CallMode::Logic)
