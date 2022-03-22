@@ -414,10 +414,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         block.DefaultSpecial = block.Special;
 
         block.Special2 = 0;
-        if(b.id == 90 && lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 20)
-            block.Special2 = 1; // Restore bricks algorithm for turn blocks for SMBX19 and lower
-        else if(b.id == 90)
-            block.Special2 = b.special_data;
+        if(b.id == 90)
+        {
+            if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 20)
+                block.Special2 = 1; // Restore bricks algorithm for turn blocks for SMBX19 and lower
+            else
+                block.Special2 = b.special_data; // load it if set in the modern format
+        }
 
         block.DefaultSpecial2 = block.Special2;
 
