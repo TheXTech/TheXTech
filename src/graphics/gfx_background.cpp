@@ -348,6 +348,9 @@ void DrawBackground(int S, int Z)
         LevelREAL[S] = level[S];
     level[S] = LevelREAL[S];
 
+    if(Background2[S] == 0)
+        XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, 0, 0, 0);
+
     A = 2; // Clouds
     if(Background2[S] == 1 || Background2[S] == 2 || Background2[S] == 22)
     {

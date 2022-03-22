@@ -41,6 +41,9 @@
 #include "../core/render.h"
 #include "../script/luna/luna.h"
 
+#include "gfx_special_frames.h"
+#include "npc_id.h"
+
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
 
@@ -151,6 +154,125 @@ void doShakeScreenClear()
 {
     s_shakeScreen.clear();
 }
+
+
+// this organizes all of the NPC draw conditions into one queue
+class NPC_Draw_Queue_t
+{
+    static constexpr int maxDrawNPCs = 512;
+public:
+    uint16_t BG[maxDrawNPCs];
+    size_t BG_n;
+    uint16_t Low[maxDrawNPCs];
+    size_t Low_n;
+    uint16_t Iced[maxDrawNPCs];
+    size_t Iced_n;
+    uint16_t Normal[maxDrawNPCs];
+    size_t Normal_n;
+    uint16_t Chat[20];
+    size_t Chat_n;
+    uint16_t Held[20];
+    size_t Held_n;
+    uint16_t FG[maxDrawNPCs];
+    size_t FG_n;
+    uint16_t Dropped[20];
+    size_t Dropped_n;
+    void reset()
+    {
+        BG_n = Low_n = Iced_n = Normal_n = Chat_n = Held_n = FG_n = Dropped_n = 0;
+    }
+    void add(uint16_t A)
+    {
+        if(NPC[A].Chat)
+        {
+            if(Chat_n != sizeof(Chat)/sizeof(uint16_t))
+            {
+                Chat[Chat_n] = A;
+                Chat_n += 1;
+                g_stats.renderedNPCs += 1;
+            }
+        }
+
+        if(NPC[A].Effect == 2)
+        {
+            if(std::fmod(NPC[A].Effect2, 3) == 0.0)
+                return;
+            if(Dropped_n == sizeof(Dropped)/sizeof(uint16_t))
+                return;
+            Dropped[Dropped_n] = A;
+            Dropped_n += 1;
+            g_stats.renderedNPCs += 1;
+        }
+        else if(
+                (
+                  (
+                    (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
+                    (NPC[A].Type == 50 && NPC[A].standingOnPlayer == 0) ||
+                    (NPC[A].Type == 17 && NPC[A].CantHurt > 0)
+                  ) || NPC[A].Effect == 5
+                ) && NPC[A].Type != 91 && !Player[NPC[A].HoldingPlayer].Dead
+            )
+        {
+            if(Held_n == sizeof(Held)/sizeof(uint16_t))
+                return;
+            Held[Held_n] = A;
+            Held_n += 1;
+            g_stats.renderedNPCs += 1;
+        }
+        else if(NPC[A].Effect == 0 && NPCForeground[NPC[A].Type] && NPC[A].HoldingPlayer == 0 && !NPCIsACoin[NPC[A].Type])
+        {
+            if(FG_n == sizeof(FG)/sizeof(uint16_t))
+                return;
+            FG[FG_n] = A;
+            FG_n += 1;
+            g_stats.renderedNPCs += 1;
+        }
+        else if(NPC[A].Type == 263 && NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0)
+        {
+            if(Iced_n == sizeof(Iced)/sizeof(uint16_t))
+                return;
+            Iced[Iced_n] = A;
+            Iced_n += 1;
+            g_stats.renderedNPCs += 1;
+        }
+        else if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0 &&
+            (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 || NPC[A].Type == 22 ||
+                NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160 ||
+                NPC[A].Type == 282 || NPCIsACoin[NPC[A].Type]))
+        {
+            if(Low_n == sizeof(Low)/sizeof(uint16_t))
+                return;
+            Low[Low_n] = A;
+            Low_n += 1;
+            g_stats.renderedNPCs += 1;
+        }
+        else if(NPC[A].Type == 179 || NPC[A].Type == 270 ||
+            ((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] ||
+                    NPC[A].Type == 209 || NPC[A].Type == 159 || NPC[A].Type == 245 ||
+                    NPC[A].Type == 8 || NPC[A].Type == 93 || NPC[A].Type == 74 ||
+                    NPC[A].Type == 256 || NPC[A].Type == 257 || NPC[A].Type == 51 ||
+                    NPC[A].Type == 52 || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
+                    NPC[A].Effect == 4 || (NPC[A].Type == 45 && NPC[A].Special == 0.0))
+                && NPC[A].standingOnPlayer == 0))
+        {
+            if(BG_n == sizeof(BG)/sizeof(uint16_t))
+                return;
+            BG[BG_n] = A;
+            BG_n += 1;
+            g_stats.renderedNPCs += 1;
+        }
+        else if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0)
+        {
+            if(Normal_n == sizeof(Normal)/sizeof(uint16_t))
+                return;
+            Normal[Normal_n] = A;
+            Normal_n += 1;
+            g_stats.renderedNPCs += 1;
+        }
+    }
+};
+
+NPC_Draw_Queue_t NPC_Draw_Queue[2] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
 
 void GraphicsLazyPreLoad()
 {
@@ -283,7 +405,6 @@ void UpdateGraphics(bool skipRepaint)
     int A = 0;
 //    std::string timeStr;
     int Z = 0;
-    int numScreens = 0;
 
     if(!GameIsActive)
         return;
@@ -299,91 +420,362 @@ void UpdateGraphics(bool skipRepaint)
     // frame skip code
     cycleNextInc();
 
-    if(FrameSkip && !TakeScreen)
+    bool Do_FrameSkip = FrameSkip && !TakeScreen && frameSkipNeeded();
+
+    // ALL graphics-based logic code has been moved here, separate from rendering.
+    // (This code is a combination of the FrameSkip logic from before with the
+    //   logic components of the full rendering code.)
+    // NPC render queue formation is also here.
+    SetupScreens();
+    int numScreens = 1;
+    if(ScreenType == 1)
+        numScreens = 2;
+    if(ScreenType == 4)
+        numScreens = 2;
+    if(ScreenType == 5)
     {
-        if(frameSkipNeeded()) // Don't draw this frame
-        {
+        DynamicScreen();
+        if(vScreen[2].Visible)
+            numScreens = 2;
+        else
             numScreens = 1;
-            if(!LevelEditor)
+    }
+    if(ScreenType == 8)
+        numScreens = 1;
+    if(SingleCoop == 2)
+        numScreens = 2;
+    CenterScreens();
+
+    g_stats.reset();
+
+    for(Z = 1; Z <= numScreens; Z++)
+    {
+        if(SingleCoop == 2)
+            Z = 2;
+
+        int S;
+        if(LevelEditor)
+            S = curSection;
+        else
+            S = Player[Z].Section;
+
+        int X, Y;
+
+        // update vScreen location
+        if(!LevelEditor)
+        {
+            if(ScreenType == 2 || ScreenType == 3)
+                GetvScreenAverage();
+            else if(ScreenType == 5 && !vScreen[2].Visible)
+                GetvScreenAverage();
+            else if(ScreenType == 7)
+                GetvScreenCredits();
+            else
+                GetvScreen(Z);
+
+            if(ScreenType == 2 || ScreenType == 3)
+                GetvScreenAverageCanonical(&X, &Y);
+            else if(ScreenType == 5 && !vScreen[2].Visible)
+                GetvScreenAverageCanonical(&X, &Y);
+            else if(ScreenType == 7)
+                GetvScreenAverageCanonical(&X, &Y);
+            else
+                GetvScreenCanonical(Z, &X, &Y);
+        }
+
+        // moved to `graphics/gfx_screen.cpp`
+        if(!Do_FrameSkip && qScreen)
+            Update_qScreen();
+
+        // noturningback
+        if(!LevelEditor && NoTurnBack[Player[Z].Section])
+        {
+            A = Z;
+            if(numScreens > 1)
             {
-                if(ScreenType == 1)
-                    numScreens = 2;
-                if(ScreenType == 4)
-                    numScreens = 2;
-                if(ScreenType == 5)
+                if(Player[1].Section == Player[2].Section)
                 {
-                    DynamicScreen();
-                    if(vScreen[2].Visible)
-                        numScreens = 2;
+                    if(Z == 1)
+                        GetvScreen(2);
+                    if(-vScreenX[1] < -vScreenX[2])
+                        A = 1;
                     else
-                        numScreens = 1;
+                        A = 2;
                 }
-                if(ScreenType == 8)
-                    numScreens = 1;
             }
-
-            for(Z = 1; Z <= numScreens; Z++)
+            if(-vScreenX[A] > level[S].X)
             {
-                if(!LevelEditor)
+                LevelChop[S] += float(-vScreenX[A] - level[S].X);
+                level[S].X = -vScreenX[A];
+            }
+        }
+
+        // Position swap code?
+        if(!GameMenu && !LevelEditor)
+        {
+            if(numPlayers > 2)
+            {
+                int C = 0;
+                int D = 0;
+//                For A = 1 To numPlayers
+                For(A, 1, numPlayers)
                 {
-                    if(ScreenType == 2 || ScreenType == 3)
-                        GetvScreenAverage();
-                    else if(ScreenType == 5 && !vScreen[2].Visible)
-                        GetvScreenAverage();
-                    else if(ScreenType == 7)
-                        GetvScreenCredits();
-                    else
+//                    With Player(A)
+                    Player_t &p = Player[A];
+//                        If vScreenCollision(Z, .Location) = False And LevelMacro = 0 And .Location.Y < level(.Section).Height And .Location.Y + .Location.Height > level(.Section).Y And .TimeToLive = 0 And .Dead = False Then
+                    if(!vScreenCollision(Z, p.Location) && LevelMacro == LEVELMACRO_OFF &&
+                        p.Location.Y < level[p.Section].Height &&
+                        p.Location.Y + p.Location.Height > level[p.Section].Y &&
+                        p.TimeToLive == 0 && !p.Dead)
                     {
-                        GetvScreen(Z);
+                        for(int B = 1; B <= numPlayers; B++)
+                        {
+                            if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section && vScreenCollision(Z, Player[B].Location))
+                            {
+                                if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                {
+                                    C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                    D = B;
+                                }
+                            }
+                        }
+                        if(C == 0)
+                        {
+                            for(int B = 1; B <= numPlayers; B++)
+                            {
+                                if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section)
+                                {
+                                    if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                                    {
+                                        C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                                        D = B;
+                                    }
+                                }
+                            }
+                        }
+                        Player[A].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
+                        Player[A].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[A].Location.Height;
+                        Player[A].Section = Player[D].Section;
+                        Player[A].Location.SpeedX = Player[D].Location.SpeedX;
+                        Player[A].Location.SpeedY = Player[D].Location.SpeedY;
+                        Player[A].Location.SpeedY = dRand() * 12 - 6;
+                        Player[A].CanJump = true;
                     }
+//                    End With
+//                Next A
+                }
+//            End If
+            }
+        }
+
+        // It's time to process NPCs. We will update their active state and fill a draw queue.
+
+        // Make sure we are in range.
+        // If we later add more than two screens,
+        // need to change how many NPC draw queues we have.
+        SDL_assert_release(Z-1 >= 0 && Z-1 < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
+        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
+        if(!Do_FrameSkip)
+            NPC_Draw_Queue_p.reset();
+
+        // we'll check the NPCs and do some logic for the game,
+        // just check if we need to render them for the editor.
+        if(!LevelEditor)
+        {
+            for(A = 1; A <= numNPCs; A++)
+            {
+                g_stats.checkedNPCs++;
+
+                // there are three related things we will determine:
+                // - is the NPC onscreen for rendering?
+                // - can we reset the NPC (respawn it to its original location)?
+                // - can we activate the NPC?
+
+                // they are normally the same thing -- onscreen -- but we need to separate them to support multiple resolutions.
+
+                bool render, cannot_reset, can_activate;
+
+                Location_t loc2;
+                bool loc2_exists;
+                if(NPCWidthGFX[NPC[A].Type] != 0)
+                {
+                    loc2_exists = true;
+                    loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
+                        NPC[A].Location.Y,
+                        NPCWidthGFX[NPC[A].Type],
+                        NPCHeight[NPC[A].Type]);
+                    // not sure why loc2 does not consider NPCHeightGFX...
+                }
+                else
+                    loc2_exists = false;
+
+                if(NPC[A].Hidden)
+                {
+                    render = cannot_reset = can_activate = false;
+                }
+                else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::smart)
+                {
+                    render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
+
+                    bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
+                        || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
+
+                    cannot_reset = (render || onscreen_canonical);
+
+                    // Possible situations where we need to activate as original:
+                    // - ForcedControls: activate them when originally done,
+                    //                   there could be scripting going on (such as an NPC killing another NPC).
+                    // - qScreen is here just in case
+                    // - If the NPC triggers an event, naturally should be activated as original
+                    // - Generator NPCs, Jumping Cheeps, and Thwomps.
+                    // Think about NPCID_BULLET_SMB3, NPCID_BULLET_SMW, and NPCID_EERIE...
+                    if(
+                           ForcedControls
+                        || qScreen
+                        || NPC[A].TriggerActivate != EVENT_NONE
+                        || NPC[A].Generator
+                        || NPC[A].Type == NPCID_THWOMP_SMB3
+                        || NPC[A].Type == NPCID_THWOMP_SMW
+                        || NPC[A].Type == NPCID_METALBARREL
+                        || (NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
+                    )
+                        can_activate = onscreen_canonical;
+                    else
+                        can_activate = render;
+                }
+                else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::orig)
+                {
+                    render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
+
+                    bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
+                        || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
+
+                    cannot_reset = (render || onscreen_canonical);
+                    can_activate = onscreen_canonical;
+                }
+                else // if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
+                {
+                    render = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
                 }
 
-                for(A = 1; A <= numNPCs; A++)
+                if(NPC[A].Type == 0 || NPC[A].Generator)
                 {
-                    if(vScreenCollision(Z, NPC[A].Location) && !NPC[A].Hidden)
+                    render = false;
+                }
+
+                // don't show a Cheep that hasn't jumped yet or a podoboo that hasn't started coming out yet
+                if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
+                    && (
+                       (NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
+                    || NPC[A].Type == NPCID_PODOBOO
+                    )
+                )
+                {
+                    if(!NPC[A].Active)
+                        render = false;
+                }
+
+                // activate the NPC if allowed
+                if(can_activate)
+                {
+                    if(NPC[A].Type == 0) // what is this?
                     {
-                        if(NPC[A].Reset[Z] || NPC[A].Active)
-                        {
-                            if(!NPC[A].Active)
-                            {
-                                NPC[A].JustActivated = Z;
-//                                if(nPlay.Online == true)
-//                                {
-//                                    Netplay::sendData "2a" + std::to_string(A) + "|" + (nPlay.MySlot + 1) + LB;
-//                                    NPC[A].JustActivated = nPlay.MySlot + 1;
-//                                }
-                            }
+                        NPC[A].Killed = 9;
+                        KillNPC(A, 9);
+                    }
+                    else if(!NPC[A].Active
+                        && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Type == NPCID_CONVEYER))
+                    {
+                        NPC[A].Active = true;
+                        NPC[A].JustActivated = Z;
+                    }
+
+                    if(NPC[A].Generator)
+                        NPC[A].GeneratorActive = true;
+                }
+
+                // track the NPC's reset timer
+                if(cannot_reset)
+                {
+                    if(NPC[A].Type != 0
+                        && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYER))
+                    {
+                        if(
+                               NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == NPCID_SHROOM_SMB3
+                            || NPC[A].Type == NPCID_FIREFLOWER_SMB3 || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_LIFE_SMB3
+                            || NPC[A].Type == 153 || NPC[A].Type == NPCID_TANOOKISUIT || NPC[A].Type == NPCID_HAMMERSUIT || NPC[A].Type == NPCID_FIREFLOWER_SMB
+                            || NPC[A].Type == NPCID_FIREFLOWER_SMW || NPC[A].Type == NPCID_SHROOM_SMB || NPC[A].Type == NPCID_SHROOM_SMW
+                            || NPC[A].Type == NPCID_LIFE_SMB || NPC[A].Type == NPCID_LIFE_SMW || NPC[A].Type == NPCID_MOON || NPC[A].Type == NPCID_FLIPPEDDISCO
+                            || NPC[A].Type == NPCID_PLATFORM_SMB3
+                        )
+                            NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
+                        else
                             NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-//                            if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                timeStr += "2b" + std::to_string(A) + LB;
-                            NPC[A].Active = true;
-                        }
+                    }
+
+                    if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen
+                        || NPC[A].Active)
+                    {
                         NPC[A].Reset[1] = false;
                         NPC[A].Reset[2] = false;
                     }
-                    else
+                }
+                else
+                {
+                    NPC[A].Reset[Z] = true;
+                    if(numScreens == 1)
+                        NPC[A].Reset[2] = true;
+                    if(SingleCoop == 1)
+                        NPC[A].Reset[2] = true;
+                    else if(SingleCoop == 2)
+                        NPC[A].Reset[1] = true;
+                }
+
+                if(!Do_FrameSkip && render && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYER))
+                {
+                    NPC_Draw_Queue_p.add(A);
+
+                    // just for appearance, do the NPC's frames if it hasn't been activated yet
+                    if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
+                        && !NPC[A].Active && !FreezeNPCs)
                     {
-                        NPC[A].Reset[Z] = true;
-                        if(numScreens == 1)
-                            NPC[A].Reset[2] = true;
-                        if(SingleCoop == 1)
-                            NPC[A].Reset[2] = true;
-                        else if(SingleCoop == 2)
-                            NPC[A].Reset[1] = true;
+                        NPCFrames(A);
                     }
                 }
             }
-            return;
+        }
+        // fill the NPC render queue for the level editor
+        else if(!Do_FrameSkip)
+        {
+            for(A = 1; A <= numNPCs; A++)
+            {
+                g_stats.checkedNPCs++;
+
+                if(NPC[A].Hidden)
+                    continue;
+
+                const Location_t loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
+                    NPC[A].Location.Y,
+                    NPCWidthGFX[NPC[A].Type], NPCHeight[NPC[A].Type]);
+
+                if(vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, loc2))
+                {
+                    NPC_Draw_Queue_p.add(A);
+                }
+            }
         }
     }
+
+    // we've now done all the logic that UpdateGraphics can do.
+    if(Do_FrameSkip)
+        return;
+
 
     XRender::setTargetTexture();
 
     frameNextInc();
     frameRenderStart();
     lunaRenderStart();
-
-    g_stats.reset();
 
     std::string SuperText;
     std::string tempText;
@@ -401,15 +793,12 @@ void UpdateGraphics(bool skipRepaint)
     int64_t fBlock = 0;
     int64_t lBlock = 0;
     Location_t tempLocation;
-    int S = 0; // Level section to display
 
     if(Score > 9999990)
         Score = 9999990;
 
     if(Lives > 99)
         Lives = 99;
-
-    numScreens = 1;
 
 //    If TakeScreen = True Then // Useless
 //        If LevelEditor = True Or MagicHand = True Then
@@ -422,155 +811,11 @@ void UpdateGraphics(bool skipRepaint)
     // Background frames
     if(!FreezeNPCs)
     {
-        BackgroundFrameCount[26]++;
-        if(BackgroundFrameCount[26] >= 8)
-        {
-            BackgroundFrame[26]++;
-            if(BackgroundFrame[26] >= 8)
-                BackgroundFrame[26] = 0;
-            BackgroundFrameCount[26] = 0;
-        }
-        BackgroundFrameCount[18]++;
-        if(BackgroundFrameCount[18] >= 12)
-        {
-            BackgroundFrame[18]++;
-            if(BackgroundFrame[18] >= 4)
-                BackgroundFrame[18] = 0;
-            BackgroundFrame[19] = BackgroundFrame[18];
-            BackgroundFrame[20] = BackgroundFrame[18];
-            BackgroundFrame[161] = BackgroundFrame[18];
-            BackgroundFrameCount[18] = 0;
-        }
-        BackgroundFrameCount[36] += 1;
-        if(BackgroundFrameCount[36] >= 2)
-        {
-            BackgroundFrame[36] += 1;
-            if(BackgroundFrame[36] >= 4)
-                BackgroundFrame[36] = 0;
-            BackgroundFrameCount[36] = 0;
-        }
-        BackgroundFrame[68] = BackgroundFrame[36];
-        BackgroundFrameCount[65] += 1;
-        if(BackgroundFrameCount[65] >= 8)
-        {
-            BackgroundFrame[65] += 1;
-            if(BackgroundFrame[65] >= 4)
-                BackgroundFrame[65] = 0;
-            BackgroundFrameCount[65] = 0;
-        }
-
-        BackgroundFrame[66] = BackgroundFrame[65];
-
-        BackgroundFrame[70] = BackgroundFrame[65];
-        BackgroundFrame[100] = BackgroundFrame[65];
-
-        BackgroundFrame[134] = BackgroundFrame[65];
-        BackgroundFrame[135] = BackgroundFrame[65];
-        BackgroundFrame[136] = BackgroundFrame[65];
-        BackgroundFrame[137] = BackgroundFrame[65];
-        BackgroundFrame[138] = BackgroundFrame[65];
-
-
-        BackgroundFrameCount[82] += 1;
-        if(BackgroundFrameCount[82] >= 10)
-        {
-            BackgroundFrame[82] += 1;
-            if(BackgroundFrame[82] >= 4)
-                BackgroundFrame[82] = 0;
-            BackgroundFrameCount[82] = 0;
-        }
-
-        BackgroundFrameCount[170] += 1;
-        if(BackgroundFrameCount[170] >= 8)
-        {
-            BackgroundFrame[170] += 1;
-            if(BackgroundFrame[170] >= 4)
-                BackgroundFrame[170] = 0;
-            BackgroundFrame[171] = BackgroundFrame[170];
-            BackgroundFrameCount[170] = 0;
-        }
-
-        BackgroundFrameCount[125] += 1;
-        if(BackgroundFrameCount[125] >= 4)
-        {
-            if(BackgroundFrame[125] == 0)
-                BackgroundFrame[125] = 1;
-            else
-                BackgroundFrame[125] = 0;
-            BackgroundFrameCount[125] = 0;
-        }
+        LevelFramesNotFrozen();
         SpecialFrames();
     }
 
-    BackgroundFrame[172] = BackgroundFrame[66];
-    BackgroundFrameCount[158] += 1;
-
-    if(BackgroundFrameCount[158] >= 6)
-    {
-        BackgroundFrameCount[158] = 0;
-        BackgroundFrame[158] += 1;
-        BackgroundFrame[159] += 1;
-        if(BackgroundFrame[158] >= 4)
-            BackgroundFrame[158] = 0;
-        if(BackgroundFrame[159] >= 8)
-            BackgroundFrame[159] = 0;
-    }
-
-    BackgroundFrameCount[168] += 1;
-    if(BackgroundFrameCount[168] >= 8)
-    {
-        BackgroundFrame[168] += 1;
-        if(BackgroundFrame[168] >= 8)
-            BackgroundFrame[168] = 0;
-        BackgroundFrameCount[168] = 0;
-    }
-
-    BackgroundFrameCount[173] += 1;
-    if(BackgroundFrameCount[173] >= 8)
-    {
-        BackgroundFrameCount[173] = 0;
-        if(BackgroundFrame[173] == 0)
-            BackgroundFrame[173] = 1;
-        else
-            BackgroundFrame[173] = 0;
-    }
-
-    BackgroundFrameCount[187] += 1;
-    if(BackgroundFrameCount[187] >= 6)
-    {
-        BackgroundFrame[187] += 1;
-        if(BackgroundFrame[187] >= 4)
-            BackgroundFrame[187] = 0;
-        BackgroundFrame[188] = BackgroundFrame[187];
-        BackgroundFrame[189] = BackgroundFrame[187];
-        BackgroundFrame[190] = BackgroundFrame[187];
-        BackgroundFrameCount[187] = 0;
-    }
-
-
-//    If LevelEditor = False Then  'Sets up the screens if not in level editor
-    SetupScreens();
-    if(!LevelEditor)
-    {
-        if(ScreenType == 1)
-            numScreens = 2;
-        if(ScreenType == 4)
-            numScreens = 2;
-        if(ScreenType == 5)
-        {
-            DynamicScreen();
-            if(vScreen[2].Visible)
-                numScreens = 2;
-            else
-                numScreens = 1;
-        }
-        if(ScreenType == 8)
-            numScreens = 1;
-    }
-
-    if(SingleCoop == 2)
-        numScreens = 2;
-    CenterScreens();
+    LevelFramesAlways();
 
     if(ClearBuffer)
     {
@@ -581,77 +826,38 @@ void UpdateGraphics(bool skipRepaint)
     // even if not, black background is good, to be safe
     XRender::renderRect(0, 0, ScreenW, ScreenH, 0, 0, 0);
 
+    // No logic
+    // Draw the screens!
     For(Z, 1, numScreens)
     {
         if(SingleCoop == 2)
             Z = 2;
 
+        int S;
         if(LevelEditor)
             S = curSection;
         else
             S = Player[Z].Section;
 
-        // not sure why this is getting set over and over again
-        if(GameOutro)
-            ScreenType = 7;
-
-        if(!LevelEditor)
-        {
-            if(ScreenType == 2 || ScreenType == 3)
-                GetvScreenAverage();
-            else if(ScreenType == 5 && !vScreen[2].Visible)
-                GetvScreenAverage();
-            else if(ScreenType == 7)
-                GetvScreenCredits();
-            else
-                GetvScreen(Z);
-        }
+        // (Code to get vScreen moved into logic section above.)
 
         // Note: this was guarded by an if(!LevelEditor) condition in the past
         if(Background2[S] == 0)
         {
-            if(numScreens > 1)
-                XRender::renderRect(vScreen[Z].Left, vScreen[Z].Top,
+            if(numScreens > 1 || LevelEditor)
+                XRender::renderRect(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
                                     vScreen[Z].Width, vScreen[Z].Height, 0.f, 0.f, 0.f, 1.f, true);
             else
                 XRender::clearBuffer();
         }
 
-//        Else
-//            If Background2(S) = 0 Then BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
-//        End If
+        // Get a reference to our NPC draw queue.
+        // Make sure we are in range.
+        // If we later add more than two screens,
+        // need to change how many NPC draw queues we have.
+        SDL_assert_release(Z-1 >= 0 && Z-1 < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
+        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
 
-        // moved to `graphics/gfx_screen.cpp`
-        if(/*!Do_FrameSkip && */qScreen)
-            Update_qScreen();
-
-        // noturningback
-        if(!LevelEditor)
-        {
-            if(NoTurnBack[Player[Z].Section])
-            {
-                A = Z;
-                if(numScreens > 1)
-                {
-                    if(Player[1].Section == Player[2].Section)
-                    {
-                        if(Z == 1)
-                            GetvScreen(2);
-                        if(-vScreenX[1] < -vScreenX[2])
-                            A = 1;
-                        else
-                            A = 2;
-                    }
-                }
-                if(-vScreenX[A] > level[S].X)
-                {
-                    LevelChop[S] += float(-vScreenX[A] - level[S].X);
-                    level[S].X = -vScreenX[A];
-                }
-            }
-        }
-
-        // if(numScreens > 1) // To separate drawing of screens
         // always needed now due to cases where vScreen is smaller than physical screen
         XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height);
 
@@ -691,57 +897,9 @@ void UpdateGraphics(bool skipRepaint)
         if(!GameMenu && !LevelEditor)
         {
 //            If numPlayers > 2 And nPlay.Online = False Then
-            if(numPlayers > 2)
-            {
-//                For A = 1 To numPlayers
-                For(A, 1, numPlayers)
-                {
-//                    With Player(A)
-                    Player_t &p = Player[A];
-//                        If vScreenCollision(Z, .Location) = False And LevelMacro = 0 And .Location.Y < level(.Section).Height And .Location.Y + .Location.Height > level(.Section).Y And .TimeToLive = 0 And .Dead = False Then
-                    if(!vScreenCollision(Z, p.Location) && LevelMacro == LEVELMACRO_OFF &&
-                        p.Location.Y < level[p.Section].Height &&
-                        p.Location.Y + p.Location.Height > level[p.Section].Y &&
-                        p.TimeToLive == 0 && !p.Dead)
-                    {
-                        for(B = 1; B <= numPlayers; B++)
-                        {
-                            if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section && vScreenCollision(Z, Player[B].Location))
-                            {
-                                if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
-                                {
-                                    C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
-                                    D = B;
-                                }
-                            }
-                        }
-                        if(C == 0)
-                        {
-                            for(B = 1; B <= numPlayers; B++)
-                            {
-                                if(!Player[B].Dead && Player[B].TimeToLive == 0 && Player[B].Section == Player[A].Section)
-                                {
-                                    if(C == 0 || std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
-                                    {
-                                        C = std::abs(Player[A].Location.X + Player[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
-                                        D = B;
-                                    }
-                                }
-                            }
-                        }
-                        Player[A].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
-                        Player[A].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[A].Location.Height;
-                        Player[A].Section = Player[D].Section;
-                        Player[A].Location.SpeedX = Player[D].Location.SpeedX;
-                        Player[A].Location.SpeedY = Player[D].Location.SpeedY;
-                        Player[A].Location.SpeedY = dRand() * 12 - 6;
-                        Player[A].CanJump = true;
-                    }
-//                    End With
-//                Next A
-                }
-//            End If
-            }
+
+            // moved strange many-player handling code to logic section above
+
 //        End If
         }
 
@@ -920,33 +1078,20 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 //        For A = 1 To numNPCs 'Display NPCs that should be behind blocks
-        For(A, 1, numNPCs) // Display NPCs that should be behind blocks
+        for(size_t i = 0; i < NPC_Draw_Queue_p.BG_n; i++)
         {
-            g_stats.checkedNPCs++;
+            A = NPC_Draw_Queue_p.BG[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
-            if(((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] ||
-                 NPC[A].Type == 209 || NPC[A].Type == 159 || NPC[A].Type == 245 ||
-                 NPC[A].Type == 8 || NPC[A].Type == 93 || NPC[A].Type == 74 ||
-                 NPC[A].Type == 256 || NPC[A].Type == 257 || NPC[A].Type == 51 ||
-                 NPC[A].Type == 52 || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
-                 NPC[A].Effect == 4 || (NPC[A].Type == 45 && NPC[A].Special == 0.0)) &&
-                 (NPC[A].standingOnPlayer == 0 && (!NPC[A].Generator || LevelEditor))) ||
-                 NPC[A].Type == 179 || NPC[A].Type == 270)
             {
-                if(NPC[A].Effect != 2 && (!NPC[A].Generator || LevelEditor))
                 {
-                    if(vScreenCollision(Z, NPC[A].Location) && !NPC[A].Hidden)
                     {
-                        if(NPC[A].Active)
                         {
                             if(NPC[A].Type == 8 || NPC[A].Type == 74 || NPC[A].Type == 93 || NPC[A].Type == 245 || NPC[A].Type == 256 || NPC[A].Type == 270)
                             {
-                                g_stats.renderedNPCs++;
                                 XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type], cn, cn, cn);
                             }
                             else if(NPC[A].Type == 51 || NPC[A].Type == 257)
                             {
-                                g_stats.renderedNPCs++;
                                 XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type],
                                         vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type],
                                         NPC[A].Location.Width, NPC[A].Location.Height,
@@ -956,7 +1101,6 @@ void UpdateGraphics(bool skipRepaint)
                             }
                             else if(NPC[A].Type == 52)
                             {
-                                g_stats.renderedNPCs++;
                                 if(NPC[A].Direction == -1)
                                 {
                                     XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type]);
@@ -968,43 +1112,13 @@ void UpdateGraphics(bool skipRepaint)
                             }
                             else if(NPCWidthGFX[NPC[A].Type] == 0 || NPC[A].Effect == 1)
                             {
-                                g_stats.renderedNPCs++;
                                 XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type], cn ,cn ,cn);
                             }
                             else
                             {
-                                g_stats.renderedNPCs++;
                                 XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type] - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn, cn, cn);
                             }
                         }
-                        if(NPC[A].Reset[Z] || NPC[A].Active)
-                        {
-                            if(!NPC[A].Active)
-                            {
-                                NPC[A].JustActivated = Z;
-//                                if(nPlay.Online == true)
-//                                {
-//                                    Netplay::sendData "2a" + std::to_string(A) + "|" + (nPlay.MySlot + 1) + LB;
-//                                    NPC[A].JustActivated = nPlay.MySlot + 1;
-//                                }
-                            }
-                            NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-//                            if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                timeStr += "2b" + std::to_string(A) + LB;
-                            NPC[A].Active = true;
-                        }
-                        NPC[A].Reset[1] = false;
-                        NPC[A].Reset[2] = false;
-                    }
-                    else
-                    {
-                        NPC[A].Reset[Z] = true;
-                        if(numScreens == 1)
-                            NPC[A].Reset[2] = true;
-                        if(SingleCoop == 1)
-                            NPC[A].Reset[2] = true;
-                        else if(SingleCoop == 2)
-                            NPC[A].Reset[1] = true;
                     }
                 }
             }
@@ -1464,28 +1578,16 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
-        for(A = 1; A <= numNPCs; A++) // Display NPCs that should be behind other npcs
+        // draw NPCs that should be behind other NPCs
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Low_n; i++)
         {
-            g_stats.checkedNPCs++;
+            A = NPC_Draw_Queue_p.Low[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
-
-            if(NPC[A].Effect == 0)
             {
-                if(NPC[A].HoldingPlayer == 0 && (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 ||
-                   NPC[A].Type == 22 || NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160 ||
-                   NPC[A].Type == 282 || NPCIsACoin[NPC[A].Type]) && (!NPC[A].Generator || LevelEditor))
                 {
-                    auto npcALoc = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
-                                          NPC[A].Location.Y,
-                                          static_cast<double>(NPCWidthGFX[NPC[A].Type]),
-                                          static_cast<double>(NPCHeight[NPC[A].Type]));
-
                     // If Not NPCIsACoin(.Type) Then
-                    if((vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, npcALoc)) && !NPC[A].Hidden)
                     {
-                        if(NPC[A].Active)
                         {
-                            g_stats.renderedNPCs++;
                             if(NPCWidthGFX[NPC[A].Type] == 0)
                             {
                                 XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
@@ -1495,121 +1597,36 @@ void UpdateGraphics(bool skipRepaint)
                                 XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn, cn, cn);
                             }
                         }
-
-                        if(NPC[A].Reset[Z] || NPC[A].Active)
-                        {
-                            if(!NPC[A].Active)
-                            {
-                                NPC[A].JustActivated = Z;
-//                                    if(nPlay.Online == true)
-//                                    {
-//                                        Netplay::sendData "2a" + std::to_string(A) + "|" + (nPlay.MySlot + 1) + LB;
-//                                        NPC[A].JustActivated = nPlay.MySlot + 1;
-//                                    }
-                            }
-
-                            NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-//                                if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                    timeStr += "2b" + std::to_string(A) + LB;
-                            NPC[A].Active = true;
-                        }
-
-                        NPC[A].Reset[1] = false;
-                        NPC[A].Reset[2] = false;
                     }
-                    else
-                    {
-                        NPC[A].Reset[Z] = true;
-                        if(numScreens == 1)
-                            NPC[A].Reset[2] = true;
-                        if(SingleCoop == 1)
-                            NPC[A].Reset[2] = true;
-                        else if(SingleCoop == 2)
-                            NPC[A].Reset[1] = true;
-                    }
-                    // End If
                 }
             }
         }
 
 
-        for(A = 1; A <= numNPCs; A++) // ice
+        // ice
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Iced_n; i++)
         {
-            g_stats.checkedNPCs++;
-            if(NPC[A].Type == 263 && NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0)
+            A = NPC_Draw_Queue_p.Iced[i];
             {
-                auto npcALoc = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
-                                      NPC[A].Location.Y,
-                                      static_cast<double>(NPCWidthGFX[NPC[A].Type]),
-                                      static_cast<double>(NPCHeight[NPC[A].Type]));
-
-                if((vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, npcALoc)) && !NPC[A].Hidden)
                 {
-                    g_stats.renderedNPCs++;
                     DrawFrozenNPC(Z, A);
-                    if(NPC[A].Reset[Z] || NPC[A].Active)
-                    {
-                        if(!NPC[A].Active)
-                        {
-                            NPC[A].JustActivated = Z;
-//                            if(nPlay.Online == true)
-//                            {
-//                                Netplay::sendData "2a" + std::to_string(A) + "|" + (nPlay.MySlot + 1) + LB;
-//                                NPC[A].JustActivated = nPlay.MySlot + 1;
-//                            }
-                        }
-
-                        NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-//                        if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                            timeStr += "2b" + std::to_string(A) + LB;
-                        NPC[A].Active = true;
-                    }
-                    NPC[A].Reset[1] = false;
-                    NPC[A].Reset[2] = false;
-                }
-                else
-                {
-                    NPC[A].Reset[Z] = true;
-                    if(numScreens == 1)
-                        NPC[A].Reset[2] = true;
-                    if(SingleCoop == 1)
-                        NPC[A].Reset[2] = true;
-                    else if(SingleCoop == 2)
-                        NPC[A].Reset[1] = true;
                 }
             }
         }
 
 
 //        For A = 1 To numNPCs 'Display NPCs that should be in front of blocks
-        For(A, 1, numNPCs) // Display NPCs that should be in front of blocks
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Normal_n; i++)
         {
-            g_stats.checkedNPCs++;
+            A = NPC_Draw_Queue_p.Normal[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
-            if(NPC[A].Effect == 0)
             {
-                if(!(NPC[A].HoldingPlayer > 0 || NPCIsAVine[NPC[A].Type] || NPC[A].Type == 209 || NPC[A].Type == 282 ||
-                     NPC[A].Type == 270 || NPC[A].Type == 160 || NPC[A].Type == 159 || NPC[A].Type == 8 || NPC[A].Type == 245 ||
-                     NPC[A].Type == 93 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 256 ||
-                     NPC[A].Type == 257 || NPC[A].Type == 56 || NPC[A].Type == 22 || NPC[A].Type == 49 || NPC[A].Type == 91) &&
-                   !(NPC[A].Type == 45 && NPC[A].Special == 0) && NPC[A].standingOnPlayer == 0 &&
-                   !NPCForeground[NPC[A].Type] && (!NPC[A].Generator || LevelEditor) &&
-                   NPC[A].Type != 179 && NPC[A].Type != 263)
                 {
-                    if(!NPCIsACoin[NPC[A].Type])
                     {
-                        if(vScreenCollision(Z, NPC[A].Location) && !NPC[A].Hidden)
                         {
-                            if(NPC[A].Type == 0)
-                            {
-                                NPC[A].Killed = 9;
-                                KillNPC(A, 9);
-                            }
-                            else if(NPC[A].Active)
                             {
                                 if(!NPCIsYoshi[NPC[A].Type])
                                 {
-                                    g_stats.renderedNPCs++;
                                     if(NPCWidthGFX[NPC[A].Type] == 0)
                                     {
                                         XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
@@ -1630,6 +1647,7 @@ void UpdateGraphics(bool skipRepaint)
                                             }
                                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
                                             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - tempLocation.Height / 2.0;
+
                                             B = EditorNPCFrame((int)SDL_floor(NPC[A].Special), NPC[A].Direction);
                                             XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC[NPC[A].Special], 0, B * tempLocation.Height);
                                         }
@@ -1748,37 +1766,6 @@ void UpdateGraphics(bool skipRepaint)
                                     XRender::renderTexture(vScreenX[Z] + SDL_floor(NPC[A].Location.X) + YoshiTX, vScreenY[Z] + NPC[A].Location.Y + YoshiTY, 32, 32, GFXYoshiT[B], 0, 32 * YoshiTFrame, cn, cn, cn);
                                 }
                             }
-                            if((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == 57)
-                            {
-                                if(!NPC[A].Active)
-                                {
-                                    NPC[A].JustActivated = Z;
-//                                    if(nPlay.Online == true)
-//                                    {
-//                                        Netplay::sendData "2a" + std::to_string(A) + "|" + (nPlay.MySlot + 1) + LB;
-//                                        NPC[A].JustActivated = nPlay.MySlot + 1;
-//                                    }
-                                }
-                                NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-                                if(NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == 9 || NPC[A].Type == 14 || NPC[A].Type == 22 || NPC[A].Type == 90 || NPC[A].Type == 153 || NPC[A].Type == 169 || NPC[A].Type == 170 || NPC[A].Type == 182 || NPC[A].Type == 183 || NPC[A].Type == 184 || NPC[A].Type == 185 || NPC[A].Type == 186 || NPC[A].Type == 187 || NPC[A].Type == 188 || NPC[A].Type == 195 || NPC[A].Type == 104)
-                                    NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
-
-//                                if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                    timeStr += "2b" + std::to_string(A) + LB;
-                                NPC[A].Active = true;
-                            }
-                            NPC[A].Reset[1] = false;
-                            NPC[A].Reset[2] = false;
-                        }
-                        else
-                        {
-                            NPC[A].Reset[Z] = true;
-                            if(numScreens == 1)
-                                NPC[A].Reset[2] = true;
-                            if(SingleCoop == 1)
-                                NPC[A].Reset[2] = true;
-                            else if(SingleCoop == 2)
-                                NPC[A].Reset[1] = true;
                         }
                     }
                 }
@@ -1787,15 +1774,13 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // npc chat bubble
-        for(A = 1; A <= numNPCs; A++)
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Chat_n; i++)
         {
-            g_stats.checkedNPCs++;
-            if(NPC[A].Active && NPC[A].Chat)
+            A = NPC_Draw_Queue_p.Chat[i];
             {
                 B = NPCHeightGFX[NPC[A].Type] - NPC[A].Location.Height;
                 if(B < 0)
                     B = 0;
-                g_stats.renderedNPCs++;
                 XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPC[A].Location.Width / 2.0 - GFX.Chat.w / 2, vScreenY[Z] + NPC[A].Location.Y - 30 - B, GFX.Chat.w, GFX.Chat.h, GFX.Chat, 0, 0);
             }
         }
@@ -1883,28 +1868,18 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
-        for(A = 1; A <= numNPCs; A++) // Put held NPCs on top
+        // Put held NPCs on top
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Held_n; i++)
         {
-            g_stats.checkedNPCs++;
+            A = NPC_Draw_Queue_p.Held[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
-            if(
-                (
-                  (
-                    (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
-                    (NPC[A].Type == 50 && NPC[A].standingOnPlayer == 0) ||
-                    (NPC[A].Type == 17 && NPC[A].CantHurt > 0)
-                  ) || NPC[A].Effect == 5
-                ) && NPC[A].Type != 91 && !Player[NPC[A].HoldingPlayer].Dead
-            )
             {
                 if(NPC[A].Type == 263)
                 {
-                    g_stats.renderedNPCs++;
                     DrawFrozenNPC(Z, A);
                 }
                 else if(!NPCIsYoshi[NPC[A].Type] && NPC[A].Type > 0)
                 {
-                    g_stats.renderedNPCs++;
                     if(NPCWidthGFX[NPC[A].Type] == 0)
                     {
                         XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
@@ -1966,21 +1941,16 @@ void UpdateGraphics(bool skipRepaint)
 //        End If
         }
 
-        for(A = 1; A <= numNPCs; A++) // foreground NPCs
+        // foreground NPCs
+        for(size_t i = 0; i < NPC_Draw_Queue_p.FG_n; i++)
         {
-            g_stats.checkedNPCs++;
+            A = NPC_Draw_Queue_p.FG[i];
             float cn = NPC[A].Shadow ? 0.f : 1.f;
-            if(NPC[A].Effect == 0)
             {
-                if(NPCForeground[NPC[A].Type] && NPC[A].HoldingPlayer == 0 && (!NPC[A].Generator || LevelEditor))
                 {
-                    if(!NPCIsACoin[NPC[A].Type])
                     {
-                        if(vScreenCollision(Z, NPC[A].Location) && !NPC[A].Hidden)
                         {
-                            if(NPC[A].Active)
                             {
-                                g_stats.renderedNPCs++;
                                 if(NPCWidthGFX[NPC[A].Type] == 0)
                                 {
                                     XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
@@ -1990,34 +1960,6 @@ void UpdateGraphics(bool skipRepaint)
                                     XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn, cn, cn);
                                 }
                             }
-                            if((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active)
-                            {
-                                if(!NPC[A].Active)
-                                {
-                                    NPC[A].JustActivated = Z;
-//                                    if(nPlay.Online == true)
-//                                    {
-//                                        Netplay::sendData "2a" + std::to_string(A) + "|" + (nPlay.MySlot + 1) + LB;
-//                                        NPC[A].JustActivated = nPlay.MySlot + 1;
-//                                    }
-                                }
-                                NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-//                                if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                    timeStr += "2b" + std::to_string(A) + LB;
-                                NPC[A].Active = true;
-                            }
-                            NPC[A].Reset[1] = false;
-                            NPC[A].Reset[2] = false;
-                        }
-                        else
-                        {
-                            NPC[A].Reset[Z] = true;
-                            if(numScreens == 1)
-                                NPC[A].Reset[2] = true;
-                            if(SingleCoop == 1)
-                                NPC[A].Reset[2] = true;
-                            else if(SingleCoop == 2)
-                                NPC[A].Reset[1] = true;
                         }
                     }
                 }
@@ -2094,16 +2036,6 @@ void UpdateGraphics(bool skipRepaint)
 
         if(!LevelEditor) // Graphics for the main game.
         {
-        // NPC Generators
-            for(A = 1; A <= numNPCs; A++)
-            {
-                g_stats.checkedNPCs++;
-                if(NPC[A].Generator)
-                {
-                    if(vScreenCollision(Z, NPC[A].Location) && !NPC[A].Hidden)
-                        NPC[A].GeneratorActive = true;
-                }
-            }
 
             // vScreen divider was here, moved to after vScreen section
 
@@ -2152,42 +2084,22 @@ void UpdateGraphics(bool skipRepaint)
                     DrawInterface(Z, numScreens);
                 }
 
-                For(A, 1, numNPCs) // Display NPCs that got dropped from the container
+                // Display NPCs that got dropped from the container
+                for(size_t i = 0; i < NPC_Draw_Queue_p.Dropped_n; i++)
                 {
-                    g_stats.checkedNPCs++;
-
-                    if(NPC[A].Effect == 2)
+                    A = NPC_Draw_Queue_p.Dropped[i];
                     {
-                        if(std::fmod(NPC[A].Effect2, 3) != 0.0)
                         {
-                            if(vScreenCollision(Z, NPC[A].Location))
                             {
-                                if(NPC[A].Active)
+                                if(NPCWidthGFX[NPC[A].Type] == 0)
                                 {
-                                    g_stats.renderedNPCs++;
-                                    if(NPCWidthGFX[NPC[A].Type] == 0)
-                                    {
-                                        XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height);
-                                    }
-                                    else
-                                    {
-                                        XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type] - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type]);
-                                    }
+                                    XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height);
                                 }
-
-                                if(NPC[A].Reset[Z] || NPC[A].Active)
+                                else
                                 {
-                                    NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-//                                    if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                        timeStr += "2b" + std::to_string(A) + LB;
-                                    NPC[A].Active = true;
+                                    XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type] - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type]);
                                 }
-
-                                NPC[A].Reset[1] = false;
-                                NPC[A].Reset[2] = false;
                             }
-                            else
-                                NPC[A].Reset[Z] = true;
                         }
                     }
                 }

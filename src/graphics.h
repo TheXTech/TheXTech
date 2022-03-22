@@ -103,8 +103,10 @@ void DrawMessage(const std::string& SuperText);
 void SetRes();
 // Public Function CheckKey(newStrizzle As String) As String
 //std::string CheckKey(std::string newStrizzle); // USELESS
+
+// moved to gfx_special_frames.h
 // Private Sub SpecialFrames() 'update frames for special things such as coins and kuribo's shoe
-extern void SpecialFrames();//PRIVATE
+// extern void SpecialFrames();//PRIVATE
 // update frames for special things such as coins and kuribo's shoe
 
 // Public Sub DrawBackground(S As Integer, Z As Integer) 'draws the background to the screen

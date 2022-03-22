@@ -627,7 +627,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.Location.Height = NPCHeight[npc.Type];
         npc.DefaultLocation = npc.Location;
         npc.DefaultDirection = npc.Direction;
-        if(true) //g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
+        if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
         {
             npc.TimeLeft = 1;
             npc.Active = true;
