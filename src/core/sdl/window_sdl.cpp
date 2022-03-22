@@ -28,6 +28,8 @@
 #include "main/game_info.h"
 #include "window_sdl.h"
 #include "../render.h"
+#include "config.h"
+#include "video.h"
 
 //! Path to game resources assets (by default it's ~/.PGE_Project/thextech/)
 extern std::string AppPath;
@@ -120,7 +122,12 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 #elif defined(VITA)
     SDL_SetWindowMinimumSize(m_window, 960, 544);
 #else
-    SDL_SetWindowMinimumSize(m_window, ScreenW, ScreenH);
+    if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        SDL_SetWindowMinimumSize(m_window, ScreenW/2, ScreenH/2);
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        SDL_SetWindowMinimumSize(m_window, ScreenW*2, ScreenH*2);
+    else
+        SDL_SetWindowMinimumSize(m_window, ScreenW, ScreenH);
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");

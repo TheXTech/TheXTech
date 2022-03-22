@@ -1436,6 +1436,8 @@ bool mainMenuUpdate()
             {
                 if(menuBackPress)
                 {
+                    SaveConfig();
+
                     int optionsIndex = 1;
                     if(!g_gameInfo.disableTwoPlayer)
                         optionsIndex++;

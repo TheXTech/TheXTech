@@ -33,7 +33,12 @@ void SetOrigRes()
 {
     XWindow::setFullScreen(false);
     resChanged = false;
-    XWindow::setWindowSize(ScreenW, ScreenH);
+    if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        XWindow::setWindowSize(ScreenW/2, ScreenH/2);
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        XWindow::setWindowSize(ScreenW*2, ScreenH*2);
+    else
+        XWindow::setWindowSize(ScreenW, ScreenH);
 
 #ifdef __EMSCRIPTEN__
     XEvents::eventResize();

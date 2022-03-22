@@ -133,12 +133,25 @@ void OpenConfig_preSetup()
 #ifndef FIXED_RES
         config.read("internal-width", g_config.InternalW, 800);
         config.read("internal-height", g_config.InternalH, 600);
+
+        ScreenW = g_config.InternalW;
+        ScreenH = g_config.InternalH;
+        if(ScreenH == 0)
+        {
+            ScreenW = 1280;
+            ScreenH = 720;
+        }
+        else if(ScreenW == 0)
+        {
+            ScreenW = 800;
+        }
 #endif
         IniProcessing::StrEnumMap scaleModes =
         {
             {"linear", SCALE_DYNAMIC_LINEAR},
             {"integer", SCALE_DYNAMIC_INTEGER},
             {"nearest", SCALE_DYNAMIC_NEAREST},
+            {"0.5x", SCALE_FIXED_05X},
             {"1x", SCALE_FIXED_1X},
             {"2x", SCALE_FIXED_2X},
         };

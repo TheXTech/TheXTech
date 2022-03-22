@@ -26,7 +26,7 @@
 
 #include "../base/render_base.h"
 #include "cmd_line_setup.h"
-
+#include "video.h"
 
 struct SDL_Renderer;
 struct SDL_Texture;
@@ -65,8 +65,8 @@ class RenderSDL final : public AbstractRender_t
     int m_viewport_w = 0;
     int m_viewport_h = 0;
 
-    // Current scaling filter
-    bool m_filter_linear = false;
+    // Current scaling mode
+    int m_current_scale_mode = SCALE_DYNAMIC_NEAREST;
 
 public:
     RenderSDL();

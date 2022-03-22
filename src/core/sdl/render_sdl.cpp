@@ -29,6 +29,7 @@
 
 #include "render_sdl.h"
 #include "video.h"
+#include "config.h"
 #include "../window.h"
 
 #include <SDL2/SDL_assert.h>
@@ -206,12 +207,9 @@ void RenderSDL::repaint()
 
 void RenderSDL::updateViewport()
 {
-    bool new_linear = (g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR);
-
     // will never happen in the fixed res case
-    if(ScaleWidth != ScreenW || ScaleHeight != ScreenH || m_filter_linear != new_linear)
+    if(ScaleWidth != ScreenW || ScaleHeight != ScreenH || m_current_scale_mode != g_videoSettings.scaleMode)
     {
-
 #ifdef USE_SCREENSHOTS_AND_RECS
         // invalidates GIF recorder handle
         if(recordInProcess())
@@ -233,7 +231,18 @@ void RenderSDL::updateViewport()
 
         ScaleWidth = ScreenW;
         ScaleHeight = ScreenH;
-        m_filter_linear = new_linear;
+        m_current_scale_mode = g_videoSettings.scaleMode;
+
+        // change window size if it should not be dynamic
+        if(g_config.InternalH != 0 && g_config.InternalW != 0)
+        {
+            if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+                XWindow::setWindowSize(ScreenW/2, ScreenH/2);
+            else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
+                XWindow::setWindowSize(ScreenW, ScreenH);
+            else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+                XWindow::setWindowSize(ScreenW*2, ScreenH*2);
+        }
     }
 
 
