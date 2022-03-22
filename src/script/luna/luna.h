@@ -48,7 +48,7 @@ extern void lunaReset();
 extern void lunaLoad();
 extern void lunaLoop();
 extern void lunaRenderStart();
-extern void lunaRenderHud();
+extern void lunaRenderHud(int screenZ);
 extern void lunaRender(int screenZ);
 extern void lunaRenderEnd();
 

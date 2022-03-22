@@ -578,6 +578,9 @@ void UpdateGraphics(bool skipRepaint)
         XRender::clearBuffer();
     }
 
+    // even if not, black background is good, to be safe
+    XRender::renderRect(0, 0, ScreenW, ScreenH, 0, 0, 0);
+
     For(Z, 1, numScreens)
     {
         if(SingleCoop == 2)
@@ -2141,10 +2144,13 @@ void UpdateGraphics(bool skipRepaint)
                     }
                 }
 
-                lunaRenderHud();
+                
     //                DrawInterface Z, numScreens
                 if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
+                {
+                    lunaRenderHud(Z);
                     DrawInterface(Z, numScreens);
+                }
 
                 For(A, 1, numNPCs) // Display NPCs that got dropped from the container
                 {

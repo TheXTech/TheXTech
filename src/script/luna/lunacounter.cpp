@@ -335,7 +335,7 @@ void DeathCounter::Recount()
 }
 
 // DRAW - Print the death counter in its current state
-void DeathCounter::Draw() const
+void DeathCounter::Draw(int screenZ) const
 {
     if(!mEnabled)
         return;
@@ -346,8 +346,21 @@ void DeathCounter::Draw() const
 
     XRender::offsetViewportIgnore(true);
     // Print to screen in upper left
-    SuperPrint(gDemoCounterTitle, 3, 80, 27);
-    SuperPrint(printstr, 3, minusoffset, 48);
+    if(vScreen[screenZ].Width >= 800)
+    {
+        SuperPrint(gDemoCounterTitle, 3, 80, 27);
+        SuperPrint(printstr, 3, minusoffset, 48);
+    }
+    else if(vScreen[screenZ].Width >= 700)
+    {
+        SuperPrint(gDemoCounterTitle, 3, 10, 27);
+        SuperPrint(printstr, 3, minusoffset - 70, 48);
+    }
+    else
+    {
+        SuperPrint(gDemoCounterTitle, 3, 50, 3);
+        SuperPrint(printstr, 3, 50 + gDemoCounterTitle.length() * 18 + 24, 3);
+    }
     XRender::offsetViewportIgnore(false);
 }
 

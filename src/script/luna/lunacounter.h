@@ -41,7 +41,7 @@ struct DeathCounter
     void UpdateDeaths(bool write_save);
     void AddDeath(const std::string &, int amount);
     void TrySave();
-    void Draw() const;
+    void Draw(int screenZ) const;
     void Recount();
     void ClearRecords();
 
