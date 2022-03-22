@@ -29,6 +29,10 @@
 #include "editor.h"
 #include "editor/new_editor.h"
 
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+#   include <InterProcess/intproc.h>
+#endif
+
 void DrawEditorLevel(int Z)
 {
     int A = 0;
@@ -501,7 +505,14 @@ void DrawEditorLevel(int Z)
     }
 
     if(Z == 1)
-        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
+    {
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+        if(!MagicHand || !IntProc::isEnabled())
+#endif
+        {
+            editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
+        }
+    }
 }
 
 void DrawEditorWorld()

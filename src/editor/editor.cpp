@@ -1586,7 +1586,12 @@ void UpdateEditor()
         }
     }
 
-    editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Logic);
+#ifdef THEXTECH_INTERPROC_SUPPORTED
+    if(!MagicHand || !IntProc::isEnabled())
+#endif
+    {
+        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Logic);
+    }
 }
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
