@@ -898,7 +898,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     GameThing();
                     zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
 
-                    if(g_config.pause_on_TestLevel_death)
+                    if(g_config.editor_pause_on_death)
                         PauseGame(PauseCode::PauseScreen);
                 }
                 // from editor, return to editor
