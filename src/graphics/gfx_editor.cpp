@@ -89,6 +89,18 @@ void DrawEditorLevel(int Z)
                             GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
                     }
                 }
+
+                // new: indicate that blocks have events
+                if(Block[A].TriggerHit != EVENT_NONE || Block[A].TriggerDeath != EVENT_NONE || Block[A].TriggerLast != EVENT_NONE)
+                {
+                    if(vScreenCollision(Z, Block[A].Location))
+                    {
+                        tempLocation.X = Block[A].Location.X + Block[A].Location.Width / 2 - GFX.Chat.w / 2;
+                        tempLocation.Y = Block[A].Location.Y - GFX.Chat.h - 8;
+
+                        XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                    }
+                }
             }
 
             // render NPCs in containers
@@ -119,6 +131,36 @@ void DrawEditorLevel(int Z)
                             vScreenY[Z] + tempLocation.Y + NPCFrameOffsetY[C],
                             tempLocation.Width, tempLocation.Height,
                             GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
+                    }
+                }
+
+                // new: indicate that NPCs have events
+                if(NPC[A].TriggerActivate != EVENT_NONE || NPC[A].TriggerTalk != EVENT_NONE || NPC[A].TriggerDeath != EVENT_NONE || NPC[A].TriggerLast != EVENT_NONE)
+                {
+                    if(vScreenCollision(Z, NPC[A].Location))
+                    {
+                        if(NPC[A].Text == STRINGINDEX_NONE)
+                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - GFX.Chat.w / 2;
+                        else
+                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - 8 - GFX.Chat.w;
+                        tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
+
+                        XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                    }
+                }
+
+                // and that they can talk
+                if(NPC[A].Text != STRINGINDEX_NONE)
+                {
+                    if(vScreenCollision(Z, NPC[A].Location))
+                    {
+                        if(!(NPC[A].TriggerActivate != EVENT_NONE || NPC[A].TriggerTalk != EVENT_NONE || NPC[A].TriggerDeath != EVENT_NONE || NPC[A].TriggerLast != EVENT_NONE))
+                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - GFX.Chat.w / 2;
+                        else
+                            tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 + 8;
+                        tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
+
+                        XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
                     }
                 }
             }
@@ -325,6 +367,15 @@ void DrawEditorLevel(int Z)
                         GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
                 }
             }
+
+            // new: indicate that blocks have events
+            if(b.TriggerHit != EVENT_NONE || b.TriggerDeath != EVENT_NONE || b.TriggerLast != EVENT_NONE)
+            {
+                tempLocation.X = b.Location.X + b.Location.Width / 2 - GFX.Chat.w / 2;
+                tempLocation.Y = b.Location.Y - GFX.Chat.h - 8;
+
+                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+            }
         }
 
         else if(e.Mode == OptCursor_t::LVL_SETTINGS) // Player start points
@@ -459,6 +510,30 @@ void DrawEditorLevel(int Z)
                         tempLocation.Width, tempLocation.Height,
                         GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
                 }
+            }
+
+            // new: indicate that NPCs have events
+            if(n.TriggerActivate != EVENT_NONE || n.TriggerTalk != EVENT_NONE || n.TriggerDeath != EVENT_NONE || n.TriggerLast != EVENT_NONE)
+            {
+                if(n.Text == STRINGINDEX_NONE)
+                    tempLocation.X = n.Location.X + n.Location.Width / 2 - GFX.Chat.w / 2;
+                else
+                    tempLocation.X = n.Location.X + n.Location.Width / 2 - 4 - GFX.Chat.w;
+                tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
+
+                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+            }
+
+            // and that they can talk
+            if(n.Text != STRINGINDEX_NONE)
+            {
+                if(!(n.TriggerActivate != EVENT_NONE || n.TriggerTalk != EVENT_NONE || n.TriggerDeath != EVENT_NONE || n.TriggerLast != EVENT_NONE))
+                    tempLocation.X = n.Location.X + n.Location.Width / 2 - GFX.Chat.w / 2;
+                else
+                    tempLocation.X = n.Location.X + n.Location.Width / 2 + 4;
+                tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
+
+                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
