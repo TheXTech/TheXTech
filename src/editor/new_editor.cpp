@@ -37,6 +37,8 @@ constexpr int e_ScreenH = 480;
 
 int e_CursorX, e_CursorY;
 
+const char* e_tooltip = nullptr;
+
 void EditorScreen::EnsureWorld()
 {
     if(WorldEditor) return;
@@ -264,19 +266,23 @@ void EditorScreen::FocusTile()
 }
 
 bool EditorScreen::UpdateButton(CallMode mode, int x, int y, StdPicture &im, bool sel,
-    int src_x, int src_y, int src_w, int src_h)
+    int src_x, int src_y, int src_w, int src_h, const char* tooltip)
 {
     // the button is 32x32 and outlined by a 36x36 box
     bool coll = false;
     if(e_CursorX >= x && e_CursorX < x + 32
         && e_CursorY >= y && e_CursorY < y + 32)
+    {
         coll = true;
+    }
 
     // just do the simple logic if in logic mode
     if(mode == CallMode::Logic)
         return (MenuMouseRelease && coll);
 
     // otherwise, fully render!
+    if(coll && tooltip)
+        e_tooltip = tooltip;
 
     // outline:
     if(sel)
@@ -3910,6 +3916,7 @@ inline void swap_screens()
     HasCursor = false;
     MouseRelease = false;
     MenuMouseRelease = false;
+    PlaySound(SFX_Pause);
 }
 
 void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
@@ -3947,7 +3954,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
 
     bool currently_in;
     currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_SELECT;
-    if(UpdateButton(mode, sx+0*40+4, 4, GFX.ECursor[2], currently_in, 0, 0, 32, 32))
+    if(UpdateButton(mode, sx+0*40+4, 4, GFX.ECursor[2], currently_in, 0, 0, 32, 32, "Select"))
     {
         if(editorScreen.active)
             swap_screens();
@@ -3956,7 +3963,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             exit_special = true;
     }
     currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_ERASER0;
-    if(UpdateButton(mode, sx+1*40+4, 4, GFX.ECursor[3], currently_in, 0, 0, 22, 30))
+    if(UpdateButton(mode, sx+1*40+4, 4, GFX.ECursor[3], currently_in, 0, 0, 22, 30, "Erase"))
     {
         if(editorScreen.active)
             swap_screens();
@@ -3969,7 +3976,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     if(!WorldEditor)
     {
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_BLOCKS;
-        if(UpdateButton(mode, sx+3*40+4, 4, GFXBlock[1], currently_in, 0, 0, 32, 32))
+        if(UpdateButton(mode, sx+3*40+4, 4, GFXBlock[1], currently_in, 0, 0, 32, 32, "Blocks"))
         {
             if(currently_in)
                 swap_screens();
@@ -3978,7 +3985,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 exit_special = true;
         }
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_BGOS;
-        if(UpdateButton(mode, sx+4*40+4, 4, GFXBackgroundBMP[1], currently_in, 0, 0, 32, 32))
+        if(UpdateButton(mode, sx+4*40+4, 4, GFXBackgroundBMP[1], currently_in, 0, 0, 32, 32, "BGOs"))
         {
             if(currently_in)
                 swap_screens();
@@ -3987,7 +3994,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 exit_special = true;
         }
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_NPCS;
-        if(UpdateButton(mode, sx+5*40+4, 4, GFXNPC[1], currently_in, 0, 0, 32, 32))
+        if(UpdateButton(mode, sx+5*40+4, 4, GFXNPC[1], currently_in, 0, 0, 32, 32, "NPCs"))
         {
             if(currently_in)
                 swap_screens();
@@ -3996,7 +4003,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 exit_special = true;
         }
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_WATER;
-        if(UpdateButton(mode, sx+6*40+4, 4, GFXBackgroundBMP[26], currently_in, 0, 0, 32, 32))
+        if(!MagicHand && UpdateButton(mode, sx+6*40+4, 4, GFXBackgroundBMP[26], currently_in, 0, 0, 32, 32, "Water"))
         {
             if(currently_in)
                 swap_screens();
@@ -4005,7 +4012,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 exit_special = true;
         }
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_WARPS;
-        if(UpdateButton(mode, sx+7*40+4, 4, GFXBlock[294], currently_in, 0, 0, 32, 32))
+        if(!MagicHand && UpdateButton(mode, sx+7*40+4, 4, GFXBlock[294], currently_in, 0, 0, 32, 32, "Warps"))
         {
             if(currently_in)
                 swap_screens();
@@ -4014,17 +4021,17 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 exit_special = true;
         }
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_SETTINGS;
-        if(UpdateButton(mode, sx+9*40+4, 4, GFXBlock[60], currently_in, 0, 0, 32, 32))
+        if(!MagicHand && UpdateButton(mode, sx+9*40+4, 4, GFXBlock[60], currently_in, 0, 0, 32, 32, "Settings"))
         {
-            if(currently_in)
+            if(currently_in || !editorScreen.active)
                 swap_screens();
             EditorCursor.Mode = OptCursor_t::LVL_SETTINGS;
             if(in_excl_special)
                 exit_special = true;
         }
-        if(UpdateButton(mode, sx+10*40+4, 4, GFXBlock[447], in_layers, 0, 0, 32, 32))
+        if(!MagicHand && UpdateButton(mode, sx+10*40+4, 4, GFXBlock[447], in_layers, 0, 0, 32, 32, "Layers"))
         {
-            if(!editorScreen.active)
+            if(in_layers || !editorScreen.active)
                 swap_screens();
             EditorCursor.Mode = OptCursor_t::LVL_SELECT;
             optCursor.current = OptCursor_t::LVL_SELECT;
@@ -4032,9 +4039,9 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             if(!in_layers)
                 m_special_page = SPECIAL_PAGE_LAYERS;
         }
-        if(UpdateButton(mode, sx+11*40+4, 4, GFXBlock[169], in_events, 0, 0, 32, 32))
+        if(!MagicHand && UpdateButton(mode, sx+11*40+4, 4, GFXBlock[169], in_events, 0, 0, 32, 32, "Events"))
         {
-            if(!editorScreen.active)
+            if(in_events || !editorScreen.active)
                 swap_screens();
             EditorCursor.Mode = OptCursor_t::LVL_SELECT;
             optCursor.current = OptCursor_t::LVL_SELECT;
@@ -4048,7 +4055,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     if(WorldEditor)
     {
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::WLD_TILES;
-        if(UpdateButton(mode, sx+3*40+4, 4, GFXTileBMP[1], currently_in, 0, 0, 32, 32))
+        if(UpdateButton(mode, sx+3*40+4, 4, GFXTileBMP[1], currently_in, 0, 0, 32, 32, "Tiles"))
         {
             if(currently_in)
                 swap_screens();
@@ -4057,7 +4064,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 exit_special = true;
         }
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::WLD_SCENES;
-        if(UpdateButton(mode, sx+4*40+4, 4, GFXSceneBMP[1], currently_in, 0, 0, 32, 32))
+        if(UpdateButton(mode, sx+4*40+4, 4, GFXSceneBMP[1], currently_in, 0, 0, 32, 32, "Scenes"))
         {
             if(currently_in)
                 swap_screens();
@@ -4066,7 +4073,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 exit_special = true;
         }
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::WLD_LEVELS;
-        if(UpdateButton(mode, sx+5*40+4, 4, GFXLevelBMP[2], currently_in, 0, 0, 32, 32))
+        if(UpdateButton(mode, sx+5*40+4, 4, GFXLevelBMP[2], currently_in, 0, 0, 32, 32, "Levels"))
         {
             if(currently_in)
                 swap_screens();
@@ -4075,7 +4082,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 exit_special = true;
         }
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::WLD_PATHS;
-        if(UpdateButton(mode, sx+6*40+4, 4, GFXPathBMP[4], currently_in, 0, 0, 32, 32))
+        if(UpdateButton(mode, sx+6*40+4, 4, GFXPathBMP[4], currently_in, 0, 0, 32, 32, "Paths"))
         {
             if(currently_in)
                 swap_screens();
@@ -4084,7 +4091,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 exit_special = true;
         }
         currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::WLD_MUSIC;
-        if(UpdateButton(mode, sx+7*40+4, 4, GFX.EIcons, currently_in, 0, 32*Icon::music, 32, 32))
+        if(UpdateButton(mode, sx+7*40+4, 4, GFX.EIcons, currently_in, 0, 32*Icon::music, 32, 32, "Music"))
         {
             if(currently_in)
                 swap_screens();
@@ -4092,9 +4099,9 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             if(in_excl_special)
                 exit_special = true;
         }
-        if(UpdateButton(mode, sx+9*40+4, 4, GFXLevelBMP[15], in_world_settings, 0, 0, 32, 32))
+        if(UpdateButton(mode, sx+9*40+4, 4, GFXLevelBMP[15], in_world_settings, 0, 0, 32, 32, "Settings"))
         {
-            if(!editorScreen.active)
+            if(in_world_settings || !editorScreen.active)
                 swap_screens();
             EditorCursor.Mode = OptCursor_t::LVL_SELECT;
             optCursor.current = OptCursor_t::LVL_SELECT;
@@ -4104,9 +4111,9 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         }
     }
 
-    if(UpdateButton(mode, sx+13*40+4, 4, GFX.EIcons, in_file, 0, 32*Icon::page, 32, 32))
+    if(!MagicHand && UpdateButton(mode, sx+13*40+4, 4, GFX.EIcons, in_file, 0, 32*Icon::page, 32, 32, "File"))
     {
-        if(!editorScreen.active)
+        if(in_file || !editorScreen.active)
             swap_screens();
         EditorCursor.Mode = OptCursor_t::LVL_SELECT;
         optCursor.current = OptCursor_t::LVL_SELECT;
@@ -4115,7 +4122,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             m_special_page = SPECIAL_PAGE_FILE;
     }
 
-    if(!WorldEditor && UpdateButton(mode, sx+14*40 + 4, 4, GFX.EIcons, false, 0, 32*Icon::play, 32, 32))
+    if(!WorldEditor && !MagicHand && UpdateButton(mode, sx+14*40 + 4, 4, GFX.EIcons, false, 0, 32*Icon::play, 32, 32, "Test"))
     {
         // turn this into a routine...?!
         EditorBackup();
@@ -4128,11 +4135,18 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     }
 
     int switch_screens_icon = 0;
+    const char* switch_screens_tooltip;
     if(select_bar_only)
+    {
         switch_screens_icon = Icon::down;
+        switch_screens_tooltip = "Show";
+    }
     else
+    {
         switch_screens_icon = Icon::up;
-    if(UpdateButton(mode, sx+15*40 + 4, 4, GFX.EIcons, false, 0, 32*switch_screens_icon, 32, 32))
+        switch_screens_tooltip = "Hide";
+    }
+    if(UpdateButton(mode, sx+15*40 + 4, 4, GFX.EIcons, false, 0, 32*switch_screens_icon, 32, 32, switch_screens_tooltip))
         swap_screens();
 
     // if mode has been updated for any reason, close any special dialogue boxes
@@ -4146,10 +4160,14 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         optCursor.current = EditorCursor.Mode;
         m_last_mode = EditorCursor.Mode;
     }
-#ifndef __3DS__
     if(select_bar_only && mode == CallMode::Render && e_CursorY < 40 && e_CursorX >= sx && e_CursorX < sx+e_ScreenW)
+    {
+#ifndef __3DS__
         XRender::renderTexture(e_CursorX, e_CursorY, GFX.ECursor[2]);
 #endif
+        if(e_tooltip)
+            SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34);
+    }
 }
 
 void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
@@ -4165,6 +4183,8 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
 
         MenuMouseRelease = !MenuMouseRelease && !SharedCursor.Primary;
     }
+
+    e_tooltip = nullptr;
 
     bool select_bar_only = ((active && second_screen) || (!active && !second_screen));
 
@@ -4248,10 +4268,19 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         SuperPrintR(mode, "IN WORLD COORDINATES.", 3, 40, 140);
     }
 
-#ifndef __3DS__
     if(mode == CallMode::Render && e_CursorX >= 0 && GamePaused == PauseCode::None)
+    {
+#ifndef __3DS__
         XRender::renderTexture(e_CursorX, e_CursorY, GFX.ECursor[2]);
 #endif
+        if(e_tooltip)
+        {
+            if(e_CursorX + 28 < e_ScreenW - 60)
+                SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34);
+            else
+                SuperPrintRightAlign(e_tooltip, 3, e_CursorX + 10, e_CursorY + 34);
+        }
+    }
 
     if(mode == CallMode::Logic)
         MenuMouseRelease = !SharedCursor.Primary;

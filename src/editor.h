@@ -26,6 +26,7 @@
 #include <string>
 
 extern std::string Backup_FullFileName;
+extern int editor_section_toast;
 
 struct Point_t
 {

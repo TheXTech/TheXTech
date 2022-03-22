@@ -80,6 +80,8 @@ int last_vScreenY_b[maxSections+1];
 
 int curSection_b;
 
+int editor_section_toast = 0;
+
 void ResetSectionScrolls()
 {
     for(int i = 0; i <= maxSections; i++)
@@ -110,6 +112,12 @@ void SetSection(int i)
         if(curSection >= 0)
             if(CustomMusic[curSection] != CustomMusic[i])
                 StartMusic(i);
+    }
+
+    if(curSection != i)
+    {
+        PlaySound(SFX_Slide);
+        editor_section_toast = 66;
     }
 
     last_vScreenY[curSection] = vScreenY[1];
@@ -2042,6 +2050,7 @@ void GetEditorControls()
         HasCursor = false;
         MouseRelease = false;
         MenuMouseRelease = false;
+        PlaySound(SFX_Pause);
     }
 }
 

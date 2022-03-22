@@ -498,10 +498,22 @@ void DrawEditorLevel(int Z)
 //                    If .Mode = 5 Then
             XRender::renderTexture(curX, curY, GFX.ECursor[2]);
             if(e.Layer != LAYER_NONE && e.Layer != LAYER_DEFAULT)
-                SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34);
+            {
+                // there might be a tooltip in this case
+                if(editorScreen.active || EditorCursor.Y < 40)
+                    SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34, 1., 1., 1., 0.3);
+                else
+                    SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34);
+            }
         }
 
 //            End With
+    }
+
+    if(editor_section_toast > 0)
+    {
+        SuperPrintCenter("SECTION " + std::to_string(curSection+1), 3, vScreen[Z].Width / 2, vScreen[Z].Height - 100);
+        editor_section_toast--;
     }
 
     if(Z == 1)
