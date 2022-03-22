@@ -413,7 +413,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
     {
         // Containers
         SuperPrintR(mode, "IN", 3, e_ScreenW - 40, 40);
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFXNPC[91], EditorCursor.NPC.Type == 91, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFXNPC[91], EditorCursor.NPC.Type == 91, 0, 0, NPCWidth[91], NPCHeight[91]))
         {
             if(EditorCursor.NPC.Type == 91)
             {
@@ -431,7 +431,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Type = 91;
             }
         }
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 100 + 4, GFXNPC[96], EditorCursor.NPC.Type == 96, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 100 + 4, GFXNPC[96], EditorCursor.NPC.Type == 96))
         {
             if(EditorCursor.NPC.Type == 96)
             {
@@ -449,7 +449,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Type = 96;
             }
         }
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFXNPC[284], EditorCursor.NPC.Type == 284, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFXNPC[284], EditorCursor.NPC.Type == 284, 0, 0, NPCWidthGFX[284], NPCHeightGFX[284]))
         {
             if(EditorCursor.NPC.Type == 284)
             {
@@ -469,7 +469,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         }
         if(AllowBubble())
         {
-            if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[283], EditorCursor.NPC.Type == 283, 0, 0, 32, 32))
+            if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[283], EditorCursor.NPC.Type == 283, 0, 0, NPCWidthGFX[283], NPCHeightGFX[283]))
             {
                 if(EditorCursor.NPC.Type == 283)
                 {
