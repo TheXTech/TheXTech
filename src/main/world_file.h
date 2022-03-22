@@ -20,30 +20,18 @@
 
 
 #pragma once
-#ifndef LEVEL_FILE_H
-#define LEVEL_FILE_H
+#ifndef WORLD_FILE_H
+#define WORLD_FILE_H
 
 #include <string>
-#include <PGE_File_Formats/lvl_filedata.h>
 
-struct Background_t;
-
-extern void bgoApplyZMode(Background_t *bgo, int smbx64sp);
-
-extern void addMissingLvlSuffix(std::string &fileName);
-
-//! loads the level
-bool OpenLevel(std::string FilePath);
-bool OpenLevelData(LevelData &lvl, const std::string FilePath = std::string());
-//! Reset everything to zero
-void ClearLevel();
-
-//! checks for stars in warps the lead to another level
-void FindStars();
+//! loads the world
+void OpenWorld(std::string FilePath);
+void FindWldStars();
+void ClearWorld();
 
 //! NEW: routines to check if it is possible to convert to legacy file formats and to remove all non-legacy content
-bool CanConvertLevel(int format, std::string* reasons);
-void ConvertLevel(int format);
+bool CanConvertWorld(int format, std::string* reasons);
+void ConvertWorld(int format);
 
-#endif // LEVEL_FILE_H
-
+#endif // WORLD_FILE_H

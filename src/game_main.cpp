@@ -60,6 +60,7 @@
 #include "main/cheat_code.h"
 #include "main/game_globals.h"
 #include "main/level_file.h"
+#include "main/world_file.h"
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/game_info.h"

@@ -59,9 +59,9 @@ void KillIt();
 void NextLevel();
 //! macros mainly used for end of level stuffs. takes over the players controls
 void UpdateMacro();
-//! loads the world
-void OpenWorld(std::string FilePath);
-void FindWldStars();
+
+// OpenWorld, FindWldStars, and ClearWorld moved into main/world_file.h
+
 //! Loop for world select
 void WorldLoop();
 
@@ -72,8 +72,6 @@ void PlayerPath(WorldPlayer_t &p);
 void PathPath(WorldPath_t &Pth, bool Skp = false);
 
 void PathWait();
-
-void ClearWorld();
 
 void FindWorlds();
 

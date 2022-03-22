@@ -47,6 +47,7 @@
 #include "../config.h"
 #include "../compat.h"
 #include "level_file.h"
+#include "world_file.h"
 #include "pge_delay.h"
 
 #include "screen_textentry.h"
@@ -303,7 +304,7 @@ void FindWorlds()
     NumSelectWorld = (int)(SelectWorld.size() - 1);
 
     SelectWorld_t createWorld = SelectWorld_t();
-    createWorld.WorldName = "Create New";
+    createWorld.WorldName = "<New World>";
     SelectWorldEditable.push_back(createWorld);
     NumSelectWorldEditable = (SelectWorldEditable.size() - 1);
 
@@ -627,9 +628,9 @@ bool mainMenuUpdate()
                     MenuMode = MENU_EDITOR;
                     MenuCursor = 0;
 
-#if !defined(PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
+#if !defined(THEXTECH_PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
                     FindWorlds();
-#elif !defined(PRELOAD_LEVELS)
+#elif !defined(THEXTECH_PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
                     SDL_DetachThread(loadingThread);
@@ -999,7 +1000,14 @@ bool mainMenuUpdate()
                                 while(DirMan::exists(AppPathManager::userWorldsRootDir() + "/" + fn))
                                     fn += "2";
                                 DirMan::mkAbsPath(AppPathManager::userWorldsRootDir() + "/" + fn);
-                                SaveWorld(AppPathManager::userWorldsRootDir() + "/" + fn + "/world.wldx", FileFormats::WLD_PGEX);
+
+                                std::string wPath = AppPathManager::userWorldsRootDir() + "/" + fn + "/world.wld";
+                                if(g_config.preferred_file_format != FileFormats::WLD_SMBX64 && g_config.preferred_file_format != FileFormats::WLD_SMBX38A)
+                                    wPath += "x";
+                                g_recentWorldEditor = wPath;
+
+                                SaveWorld(wPath, g_config.preferred_file_format);
+
 #ifdef PGE_NO_THREADING
                                 FindWorlds();
 #else

@@ -3,6 +3,7 @@
 #include "layers.h"
 #include "write_common.h"
 #include "sound.h"
+#include "npc_id.h"
 #include <PGE_File_Formats/file_formats.h>
 #include "Logger/logger.h"
 
@@ -183,15 +184,30 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         npc.y = n.Location.Y;
         npc.direct = n.Direction;
 
-        if(n.Type == 91 || n.Type == 96 || n.Type == 283 || n.Type == 284)
+        if(n.Type == NPCID_BURIEDPLANT || n.Type == NPCID_YOSHIEGG ||
+           n.Type == NPCID_BUBBLE || n.Type == NPCID_LAKITU_SMW)
+        {
             npc.contents = n.Special;
+        }
 
-        if(n.Type == 288 || n.Type == 289 || (n.Type == 91 && n.Special == 288))
+        // Warp Section pointer
+        if(n.Type == NPCID_POTION || n.Type == NPCID_POTIONDOOR ||
+          (n.Type == NPCID_BURIEDPLANT && n.Special == NPCID_POTION))
+        {
             npc.special_data = n.Special2;
-        else if(n.Type == 260 || NPCIsAParaTroopa[n.Type] || NPCIsCheep[n.Type])
+        }
+        // AI / firebar length
+        else if(n.Type == NPCID_FIREBAR || NPCIsAParaTroopa[n.Type] || NPCIsCheep[n.Type])
+        {
             npc.special_data = n.Special;
-        else if(n.Type == 86)
+        }
+        // Legacy behaviors
+        else if(n.Type == NPCID_CANNONITEM || n.Type == NPCID_THWOMP_SMB3 || n.Type == NPCID_BOWSER_SMB3
+            || n.Type == NPCID_YELBLOCKS || n.Type == NPCID_BLUBLOCKS || n.Type == NPCID_GRNBLOCKS
+            || n.Type == NPCID_REDBLOCKS || n.Type == NPCID_PLATFORM_SMB3 || n.Type == NPCID_SAW)
+        {
             npc.special_data = n.Special7;
+        }
 
         npc.generator = n.Generator;
         npc.generator_direct = n.GeneratorDirection;
@@ -237,7 +253,6 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         warp.odirect = w.Direction2;
 
         warp.type = w.Effect;
-        warp.two_way = w.twoWay;
         warp.lname = GetS(w.level);
 
         warp.warpto = w.LevelWarp;
@@ -255,12 +270,18 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         warp.allownpc = w.WarpNPC;
         warp.locked = w.Locked;
 
+        // custom fields:
+        warp.two_way = w.twoWay;
+
         warp.cannon_exit = w.cannonExit;
         warp.cannon_exit_speed = w.cannonExitSpeed;
         warp.event_enter = GetE(w.eventEnter);
         warp.stars_msg = GetS(w.StarsMsg);
         warp.star_num_hide = w.noPrintStars;
         warp.hide_entering_scene = w.noEntranceScene;
+
+        warp.stood_state_required = w.stoodRequired;
+        warp.transition_effect = w.transitEffect;
 
         // fix this to update as needed
         if(warp.layer.empty())

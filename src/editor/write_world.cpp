@@ -91,6 +91,10 @@ void SaveWorld(std::string FilePath, int format, int version)   // Saves the wor
         level.gotoy = s.WarpY;
         level.pathbg = s.Path;
         level.bigpathbg = s.Path2;
+
+        // new:
+        level.starsShowPolicy = s.starsShowPolicy;
+
         out.levels.push_back(level);
     }
 
@@ -101,7 +105,10 @@ void SaveWorld(std::string FilePath, int format, int version)   // Saves the wor
         musicbox.x = s.Location.X;
         musicbox.y = s.Location.Y;
         musicbox.id = s.Type;
+
+        // new:
         musicbox.music_file = GetS(s.MusicFile);
+
         musicbox.meta.array_id = out.musicbox_array_id++;
         out.music.push_back(musicbox);
     }

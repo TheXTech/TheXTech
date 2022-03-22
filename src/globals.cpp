@@ -265,6 +265,7 @@ int LevelMacroCounter = 0;
 int numJoysticks = 0;
 std::string FileName;
 std::string FileNameFull;
+int FileFormat = 0;
 std::string FileNameWorld;
 std::string FileNameFullWorld;
 bool IsEpisodeIntro = false;

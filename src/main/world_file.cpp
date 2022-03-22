@@ -29,6 +29,7 @@
 #include "../compat.h"
 #include "../main/trees.h"
 #include "level_file.h"
+#include "world_file.h"
 
 #include <Utils/strings.h>
 #include <Utils/files.h>
@@ -60,6 +61,7 @@ void OpenWorld(std::string FilePath)
 //    }
 
     g_dirEpisode.setCurDir(wld.meta.path);
+    FileFormat = wld.meta.RecentFormat;
     FileNameFull = Files::basename(FilePath);
     FileName = g_dirEpisode.resolveDirCase(wld.meta.filename); //FilePath.substr(FilePath.length() - (FilePath.length() - A));
     FileNamePath = wld.meta.path + "/"; //FilePath.substr(0, (A));
@@ -107,6 +109,8 @@ void OpenWorld(std::string FilePath)
 
     NoMap = wld.HubStyledWorld;
     RestartLevel = wld.restartlevel;
+
+    // new:
     WorldStarsShowPolicy = wld.starsShowPolicy;
 
     MaxWorldStars = int(wld.stars);
@@ -255,7 +259,10 @@ void OpenWorld(std::string FilePath)
         ll.WarpX = l.gotox;
         ll.WarpY = l.gotoy;
         ll.Path2 = l.bigpathbg;
+
+        // new:
         ll.starsShowPolicy = l.starsShowPolicy;
+
         ll.Z = zCounter++;
         treeWorldLevelAdd(&ll);
 
@@ -283,6 +290,8 @@ void OpenWorld(std::string FilePath)
         box.Location.X = m.x;
         box.Location.Y = m.y;
         box.Type = int(m.id);
+
+        // new:
         std::string music_file = g_dirEpisode.resolveFileCase(m.music_file);
         if(!music_file.empty())
         {
@@ -326,6 +335,13 @@ void OpenWorld(std::string FilePath)
     }
     else
     {
+        for(A = 1; A <= numWorldLevels; A++)
+        {
+            auto &ll = WorldLevel[A];
+            if(FileRelease <= 20 && ll.Type == 1)
+                ll.Start = true;
+        }
+
         vScreenX[1] = 0;
         vScreenY[1] = 0;
     }
@@ -452,5 +468,79 @@ void FindWldStars()
             }
 
         }
+    }
+}
+
+// Is there any unsupported content for this format in the world?
+bool CanConvertWorld(int format, std::string* reasons)
+{
+    if(format == FileFormats::WLD_PGEX)
+        return true;
+
+    if(format == FileFormats::WLD_SMBX38A)
+    {
+        if(reasons)
+            *reasons = "The SMBX38-A format is not supported at this time.\n";
+        return false;
+    }
+
+    if(format != FileFormats::WLD_SMBX64)
+    {
+        if(reasons)
+            *reasons = "Requested format is unknown.\n";
+        return false;
+    }
+
+    bool can_convert = true;
+    if(reasons)
+        reasons->clear();
+
+    for(int i = 1; i <= numWorldMusic; i++)
+    {
+        if(!GetS(WorldMusic[i].MusicFile).empty())
+        {
+            can_convert = false;
+            if(reasons)
+                *reasons += "Uses custom world music file.\n";
+            break;
+        }
+    }
+
+    if(WorldStarsShowPolicy != WorldData::STARS_UNSPECIFIED)
+    {
+        can_convert = false;
+        if(reasons)
+            *reasons += "Uses world setting for star display.\n";
+    }
+
+    for(int i = 1; i <= numWorldLevels; i++)
+    {
+        if(WorldLevel[i].starsShowPolicy != WorldData::STARS_UNSPECIFIED)
+        {
+            can_convert = false;
+            if(reasons)
+                *reasons += "Uses per-level setting for star display.\n";
+        }
+    }
+
+    return can_convert;
+}
+
+// Strips all unsupported content from the world.
+void ConvertWorld(int format)
+{
+    if(format != FileFormats::WLD_SMBX64)
+        return;
+
+    for(int i = 1; i <= numWorldMusic; i++)
+    {
+        SetS(WorldMusic[i].MusicFile, "");
+    }
+
+    WorldStarsShowPolicy = WorldData::STARS_UNSPECIFIED;
+
+    for(int i = 1; i <= numWorldLevels; i++)
+    {
+        WorldLevel[i].starsShowPolicy = WorldData::STARS_UNSPECIFIED;
     }
 }

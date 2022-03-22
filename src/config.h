@@ -32,6 +32,8 @@ extern struct Config_t
     bool    use_native_osk = false;
     //! Enable the in-game editor
     bool    enable_editor = true;
+    //! Preferred file format for editor (0 is Moondust engine lvlx format)
+    int     preferred_file_format = 0;
 
     /* ---- Video ----*/
 
