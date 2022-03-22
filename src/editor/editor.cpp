@@ -185,7 +185,8 @@ void UpdateEditor()
 
     if(MagicHand)
     {
-        // MouseMove(EditorCursor.X, EditorCursor.Y, true);
+        // keep the cursor's position correct when the player moves!
+        MouseMove(EditorCursor.X, EditorCursor.Y, true);
 //        frmNPCs::chkMessage.Enabled = false;
     }
     else
