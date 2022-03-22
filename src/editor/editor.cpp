@@ -48,6 +48,7 @@
 #include "core/events.h"
 
 #include "pseudo_vb.h"
+#include "npc_id.h"
 
 #include "write_level.h"
 #include "write_world.h"
@@ -2181,7 +2182,7 @@ void SetCursor()
         // Container NPCs are handled elsewhere in new editor
         if(MagicHand)
         {
-            if(t != 91 && t != 96 && t != 283 && t != 284)
+            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCIsCheep[t] && !NPCIsAParaTroopa[t] && t != NPCID_FIREBAR)
                 EditorCursor.NPC.Special = 0;
             if(t != 288 && t != 289 && t != 91 && t != 260)
                 EditorCursor.NPC.Special2 = 0.0;

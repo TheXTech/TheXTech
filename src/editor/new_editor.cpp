@@ -18,6 +18,8 @@
 #include "write_level.h"
 #include "write_world.h"
 
+#include "npc_id.h"
+
 #include "main/screen_textentry.h"
 
 template<typename... Args>
@@ -118,9 +120,9 @@ void SetEditorNPCType(int type)
         if(NPCIsAParaTroopa[type] && (!NPCIsAParaTroopa[EditorCursor.NPC.Type]))
             EditorCursor.NPC.Special = 1;
         EditorCursor.NPC.Type = type;
-        if(!(NPCIsCheep[type] || NPCIsAParaTroopa[type] || type == 260))
+        if(!(NPCIsCheep[type] || NPCIsAParaTroopa[type] || type == NPCID_FIREBAR))
             EditorCursor.NPC.Special = 0;
-        if(!(type == 260) && EditorCursor.NPC.Special > 5)
+        if(!(type == NPCID_FIREBAR) && EditorCursor.NPC.Special > 5)
             EditorCursor.NPC.Special = 0;
     }
     if(!(type == 15 || type == 39 || type == 86))
