@@ -1210,6 +1210,22 @@ bool CanConvertLevel(int format, std::string* reasons)
 // Strips all unsupported content from the level.
 void ConvertLevel(int format)
 {
+    FileFormat = format;
+    if(format == FileFormats::LVL_SMBX64 || format == FileFormats::LVL_SMBX38A)
+    {
+        if(!FileNameFull.empty() && FileNameFull.back() == 'x')
+            FileNameFull.resize(FileNameFull.size() - 1);
+        if(!FullFileName.empty() && FullFileName.back() == 'x')
+            FullFileName.resize(FullFileName.size() - 1);
+    }
+    else
+    {
+        if(!FileNameFull.empty() && FileNameFull.back() != 'x')
+            FileNameFull += "x";
+        if(!FullFileName.empty() && FullFileName.back() != 'x')
+            FileNameFull += "x";
+    }
+
     if(format != FileFormats::LVL_SMBX64)
         return;
 
