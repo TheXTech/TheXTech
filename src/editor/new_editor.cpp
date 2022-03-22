@@ -278,7 +278,12 @@ bool EditorScreen::UpdateButton(CallMode mode, int x, int y, StdPicture &im, boo
 
     // just do the simple logic if in logic mode
     if(mode == CallMode::Logic)
-        return (MenuMouseRelease && coll);
+    {
+        bool ret = (MenuMouseRelease && coll);
+        if(ret)
+            PlaySound(SFX_Saw);
+        return ret;
+    }
 
     // otherwise, fully render!
     if(coll && tooltip)
