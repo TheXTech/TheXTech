@@ -78,6 +78,7 @@ struct Compatibility_t
     bool allow_drop_add;
     bool multiplayer_pause_controls;
     bool fix_fairy_stuck_in_pipe;
+    bool world_map_fast_move;
 
     // SpeedRun section
     enum

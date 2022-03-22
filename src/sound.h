@@ -202,6 +202,7 @@ void LoadCustomSound();
 // EXTRA: Unload custom-loaded music and sounds, and restore originals
 void UnloadCustomSound();
 
+void PreloadExtSound(const std::string &path);
 void PlayExtSound(const std::string &path);
 
 #ifdef THEXTECH_ENABLE_AUDIO_FX

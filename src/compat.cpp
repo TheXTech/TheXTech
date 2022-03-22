@@ -91,6 +91,7 @@ static void compatInit(Compatibility_t &c)
     c.luna_allow_level_codes = false;
     c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
     c.fix_fairy_stuck_in_pipe = true;
+    c.world_map_fast_move = false;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -259,6 +260,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("require-ground-to-enter-warps", c.require_ground_to_enter_warps, c.require_ground_to_enter_warps);
     compat.read("fix-npc-activation-event-loop-bug", c.fix_npc_activation_event_loop_bug, c.fix_npc_activation_event_loop_bug);
     // 1.3.6
+    compat.read("world-map-fast-move", c.world_map_fast_move, c.world_map_fast_move);
     compat.endGroup();
 }
 

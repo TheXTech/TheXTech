@@ -50,9 +50,10 @@ extern struct Config_t
     bool    NoPauseReconnect = false;
     //! Access the Cheat Screen from the pause menu
     bool    enter_cheats_menu_item = false;
+    //! Allow player quickly move through paths on the world map (works for compatibility Mode 1 only)
+    bool    worldMapFastMove = false;
     //! Enter the pause menu after dying while testing a level
     bool    editor_pause_on_death = true;
-
 
     /* ---- Effects ----*/
 

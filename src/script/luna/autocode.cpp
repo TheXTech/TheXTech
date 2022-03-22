@@ -78,7 +78,7 @@ Autocode::Autocode()
 }
 
 Autocode::Autocode(AutocodeType iType, double iTarget, double ip1, double ip2, double ip3,
-                   const std::string &ip4, double iLength, int iSection, const std::string &iVarRef)
+                   const stringindex_t& ip4, double iLength, int iSection, const stringindex_t& iVarRef)
 {
     m_Type = iType;
     Target = iTarget;
@@ -86,8 +86,8 @@ Autocode::Autocode(AutocodeType iType, double iTarget, double ip1, double ip2, d
     Param2 = ip2;
     Param3 = ip3;
     Length = iLength;
-    SetS(MyString, ip4);
-    SetS(MyRef, iVarRef);
+    MyString = ip4;
+    MyRef = iVarRef;
     m_OriginalTime = iLength;
     ftype = FT_INVALID;
     Activated = true;
@@ -114,8 +114,8 @@ Autocode &Autocode::operator=(const Autocode &o)
     Param3 = o.Param3;
     Length = o.Length;
     // de-duplicate strings, while re-using allocated string indices if possible
-    SetS(MyString, GetS(o.MyString));
-    SetS(MyRef, GetS(o.MyRef));
+    MyString = o.MyString;
+    MyRef = o.MyRef;
 
     m_OriginalTime = o.m_OriginalTime;
     ActiveSection = o.ActiveSection;
@@ -314,6 +314,22 @@ void Autocode::Do(bool init)
                         PlayExtSound(full_path);
                     }
 
+                }
+                expire();
+            }
+            break;
+        }
+
+        case AT_SFXPreLoad:
+        {
+            if(this->Length <= 1) // Preload custom SFX file
+            {
+                // Sound from level folder
+                if(GetS(MyString).length() > 0)
+                {
+                    //char* dbg = "CUSTOM SOUND PLAY DBG";
+                    std::string full_path = g_dirCustom.resolveFileCaseAbs(GetS(MyString));
+                    PreloadExtSound(full_path);
                 }
                 expire();
             }
@@ -1118,21 +1134,24 @@ void Autocode::Do(bool init)
         {
             Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("LunaScript (TheXTech) VERSION-{0}", LUNA_VERSION), 3, 50, 250));
             //Renderer::Get().SafePrint(, 3, 340, 250);
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("GLOBL-{0}", gAutoMan.m_GlobalCodes.size()), 3, 50, 300));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("INIT -{0}", gAutoMan.m_InitAutocodes.size()), 3, 50, 330));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("CODES-{0}", gAutoMan.m_Autocodes.size()), 3, 50, 360));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("QUEUE-{0}", gAutoMan.m_CustomCodes.size()), 3, 50, 390));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("SPRITE-{0}", gSpriteMan.CountSprites()), 3, 50, 420));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("BLPRNT-{0}", gSpriteMan.CountBlueprints()), 3, 50, 450));
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("COMP-{0}", gSpriteMan.m_ComponentList.size()), 3, 50, 480));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Globl: {0}", gAutoMan.m_GlobalCodes.size()), 3, 50, 280));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Init:  {0}", gAutoMan.m_InitAutocodes.size()), 3, 50, 300));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Codes: {0}", gAutoMan.m_Autocodes.size()), 3, 50, 320));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Queue: {0}", gAutoMan.m_CustomCodes.size()), 3, 50, 340));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Sprites: {0}", gSpriteMan.CountSprites()), 3, 50, 360));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("BlueePrints: {0}", gSpriteMan.CountBlueprints()), 3, 50, 380));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Components: {0}", gSpriteMan.m_ComponentList.size()), 3, 50, 400));
 
             int buckets = 0, cells = 0, objs = 0;
             gCellMan.CountAll(&buckets, &cells, &objs);
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("BCO-{0} {1} {2}", buckets, cells, objs), 3, 50, 510));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("Buckets={0} Cells={1} Objs={2}", buckets, cells, objs), 3, 50, 420));
 
             std::list<CellObj> cellobjs;
             gCellMan.GetObjectsOfInterest(&cellobjs, demo->Location.X, demo->Location.Y, (int)demo->Location.Width, (int)demo->Location.Height);
-            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("NEAR-{0}", cellobjs.size()), 3, 50, 540));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("NEAR: {0}", cellobjs.size()), 3, 50, 440));
+
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("STRINGS: {0}", StringsBankSize()), 3, 50, 460));
+            Renderer::Get().AddOp(new RenderStringOp(fmt::format_ne("STRINGS-Unused: {0}", StringsUnusedEntries()), 3, 50, 480));
             break;
         }
 
@@ -1485,6 +1504,7 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"CyclePlayerLeft", AT_CyclePlayerLeft},
 
     {"SFX", AT_SFX},
+    {"SFXPreLoad", AT_SFXPreLoad},
     {"SetMusic", AT_SetMusic},
     {"PlayMusic", AT_PlayMusic},
 

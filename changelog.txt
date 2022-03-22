@@ -1,8 +1,8 @@
 TheXTech Changelog.
 
 Changelog for 1.3.6 [WIP]
--Added an ability to toggle drawing of the HUD and other on-screen meta data using F4 key (@Wohlstand)
--Added an ability to type cheats on touchscreen using special new cheats key (@Wohlstand + @ds-sloth)
+-Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)
+-Added an ability to type cheats on touchscreen using special new cheats key (@Wohlstand, @ds-sloth)
 -Added native support for LunaDLL Autocode script language (@Wohlstand)
 -Added deaths counter feature (keeps counting of deaths per game save) (@Wohlstand)
 -Reworked the controllers support (@ds-sloth)
@@ -16,7 +16,8 @@ Changelog for 1.3.6 [WIP]
 -Reduced game object memory footprint (@ds-sloth)
 -Performance improvements when run on slow filesystems (@ds-sloth)
 -Fixed unexpected music got started after the level got entered too quick from the world map (@Wohlstand)
--Fixed the vanilla bug: a Player can stuck in the pipe when enters it being a fairy
+-Fixed the vanilla bug: a Player can stuck in the pipe when enters it being a fairy (@Wohlstand)
+-Added an option to enable the fast walking on the world map (@ds-sloth, (@Wohlstand)
 
 Changes for 1.3.5.3-1
 -Fixed autostart events behaviour

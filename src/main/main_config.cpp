@@ -186,6 +186,7 @@ void OpenConfig()
         config.read("strict-drop-add", g_config.StrictDropAdd, false);
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
         config.read("enter-cheats-menu-item", g_config.enter_cheats_menu_item, false);
+        config.read("world-map-fast-move", g_config.worldMapFastMove, false);
         config.read("editor-pause-on-death", g_config.editor_pause_on_death, true);
         config.endGroup();
 
@@ -311,6 +312,7 @@ void SaveConfig()
     config.setValue("strict-drop-add", g_config.StrictDropAdd);
     config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
     config.setValue("enter-cheats-menu-item", g_config.enter_cheats_menu_item);
+    config.setValue("world-map-fast-move", g_config.worldMapFastMove);
     config.setValue("editor-pause-on-death", g_config.editor_pause_on_death);
     config.endGroup();
 

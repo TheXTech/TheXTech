@@ -193,6 +193,7 @@ void Input::UpdateKeyRecords(Player_t *pPlayer)
 #define TOGGLE_DEMO_COUNTER_CHT "toggledemocounter"
 #define DELETE_ALL_RECORDS_CHT  "formatcdrive"
 #define LUNA_DEBUG_CHT          "lunadebug"
+#define LUNA_LONG_DEBUG_CHT     "lunalongdebug"
 
 void Input::CheckSpecialCheats()
 {
@@ -204,11 +205,11 @@ void Input::CheckSpecialCheats()
         return;
     }
 
-    else if(cheats_contains(LUNA_DEBUG_CHT))
+    else if(cheats_contains(LUNA_DEBUG_CHT) || cheats_contains(LUNA_LONG_DEBUG_CHT))
     {
-        const char *none = "__null";
+        int length = cheats_contains(LUNA_LONG_DEBUG_CHT) ? 99999 : 600;
         // FIXME: Replace this with the boolean toggle than adding this command infinitely times
-        gAutoMan.m_CustomCodes.emplace_back(AT_DebugPrint, 0, 0, 0, 0, none, 600, 0, none);
+        gAutoMan.m_CustomCodes.emplace_back(AT_DebugPrint, 0, 0, 0, 0, STRINGINDEX_NONE, length, 0, STRINGINDEX_NONE);
         PlaySound(SFX_Stomp);
         cheats_clearBuffer();
         return;
