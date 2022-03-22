@@ -54,6 +54,7 @@ static bool s_RestartLevel()
 	XRender::clearBuffer();
 	XRender::repaint();
 	EndLevel = true;
+    LevelBeatCode = -2;
 	StopMusic();
 	XEvents::doEvents();
 	return true;
@@ -102,10 +103,9 @@ static bool s_QuitTesting()
     LevelBeatCode = -1;
 	StopMusic();
 	XEvents::doEvents();
-	// change this when editor is reimplemented!
     if(Backup_FullFileName.empty())
     {
-        KillIt(); // Quit the game entirely
+        GameIsActive = false; // Quit the game entirely
     }
 	return true;
 }
