@@ -16,6 +16,7 @@
 
 #include "config.h"
 #include "npc_id.h"
+#include "npc_special_data.h"
 
 #include "editor.h"
 #include "new_editor.h"
@@ -118,29 +119,57 @@ bool AllowBubble()
 
 void SetEditorNPCType(int type)
 {
+    int prev_type;
+
     if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
         || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
+    {
+        prev_type = EditorCursor.NPC.Special;
         EditorCursor.NPC.Special = type;
+    }
     else
     {
-        // can't have a murderous default
-        if(NPCIsAParaTroopa[type] && (!NPCIsAParaTroopa[EditorCursor.NPC.Type]))
-            EditorCursor.NPC.Special = 1;
+        prev_type = EditorCursor.NPC.Type;
         EditorCursor.NPC.Type = type;
+
+        // can't have a murderous default, reset to 1 for ParaTroopas
+        if(NPCIsAParaTroopa[type] && !NPCIsAParaTroopa[prev_type])
+            EditorCursor.NPC.Special = 1;
+
+        // reset special for NPCs that don't allow it
         if(!(NPCIsCheep[type] || NPCIsAParaTroopa[type] || type == NPCID_FIREBAR))
             EditorCursor.NPC.Special = 0;
+
+        // reset special if it's out of range
         if(!(type == NPCID_FIREBAR) && EditorCursor.NPC.Special > 5)
             EditorCursor.NPC.Special = 0;
     }
-    if(!(type == 15 || type == 39 || type == 86))
+
+    // reset legacy for the NPCs that don't allow it
+    if(!(type == NPCID_BOOMBOOM || type == NPCID_BIRDO || type == NPCID_BOWSER_SMB3))
         EditorCursor.NPC.Legacy = false;
+
+    if(find_Special7_Data(prev_type) != find_Special7_Data(type))
+    {
+        if(FileFormat == FileFormats::LVL_PGEX)
+        {
+            EditorCursor.NPC.Special7 = find_modern_Special7(type);
+        }
+        else
+            EditorCursor.NPC.Special7 = 0.;
+    }
+
+    // turn into new type if can't be in bubble anymore
     if(EditorCursor.NPC.Type == 283 && !AllowBubble())
     {
         EditorCursor.NPC.Type = type;
         EditorCursor.NPC.Special = 0;
     }
+
+    // force a direction if they don't allow neutral direction (conveyers, moving platform blocks)
     if(EditorCursor.NPC.Direction == 0 && (type == 57 || type == 60 || type == 62 || type == 64 || type == 66))
         EditorCursor.NPC.Direction = -1;
+
     ResetNPC(type);
 }
 
@@ -540,7 +569,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
         // Inert ("nice") and Stuck ("stop")
         // The sign (NPC ID 151) is always nice.
-        if(type == 151)
+        if(type == NPCID_SIGN)
             EditorCursor.NPC.Inert = true;
         else
         {
@@ -624,7 +653,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             if(UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 4, 0, 32*Icon::ud, 32, 32))
                 EditorCursor.NPC.Special = 4;
         }
-        if(type == 15 || type == 39 || type == 86)
+        if(type == NPCID_BOOMBOOM || type == NPCID_BIRDO || type == NPCID_BOWSER_SMB3)
         {
             SuperPrintR(mode, "USE 1.0 AI?", 3, e_ScreenW - 200, 220);
             if(UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Legacy, 0, 32*Icon::_10, 32, 32))
@@ -648,6 +677,60 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Special2 --;
             if(EditorCursor.NPC.Special2 < 20 && UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                 EditorCursor.NPC.Special2 ++;
+        }
+
+        const NPC_Special7_Data_t* data = find_Special7_Data(EditorCursor.NPC.Type);
+
+        // special case for NPCID_BOWSER_SMB3 since it also has the Legacy button
+        if(EditorCursor.NPC.Type == NPCID_BOWSER_SMB3 && FileFormat == FileFormats::LVL_PGEX)
+        {
+            if(UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFXBlock[4], fiEqual(EditorCursor.NPC.Special7, 1),
+                0, 32*BlockFrame[4], 32, 32, "Custom: expand section"))
+            {
+                if(EditorCursor.NPC.Special7 == 0.)
+                    EditorCursor.NPC.Special7 = 1.;
+                else
+                    EditorCursor.NPC.Special7 = 0.;
+            }
+        }
+        else if(data && FileFormat == FileFormats::LVL_PGEX)
+        {
+            int i;
+            bool valid;
+
+            if(data)
+            {
+                i = data->find_current(EditorCursor.NPC.Special7);
+                valid = data->strings[i] != nullptr;
+            }
+
+            if(mode == CallMode::Render)
+            {
+                SuperPrint("CUSTOM AI", 3, e_ScreenW - 180, 220);
+                if(data && valid)
+                    SuperPrint(data->strings[i], 3, e_ScreenW - 160, 242);
+                else
+                    SuperPrint(std::to_string(EditorCursor.NPC.Special7), 3, e_ScreenW - 160, 242);
+            }
+
+            // only show it if it will (i) reset, or (ii) have something to go to.
+            // short-circuit evaluation keeps this from accessing outside of the valid range
+            bool show_prev_button = data && (!valid || i != 0);
+            bool show_next_button = data && (!valid || data->strings[i+1]);
+            if(show_prev_button && UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+            {
+                if(!valid)
+                    EditorCursor.NPC.Special7 = data->values[0];
+                else
+                    EditorCursor.NPC.Special7 = data->values[i-1];
+            }
+            if(show_next_button && UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+            {
+                if(!valid)
+                    EditorCursor.NPC.Special7 = data->values[0];
+                else
+                    EditorCursor.NPC.Special7 = data->values[i+1];
+            }
         }
 
         // Events
@@ -3556,6 +3639,8 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
 
     if(m_special_page == SPECIAL_PAGE_FILE_CONVERT)
     {
+        // TODO: find a way to warn them if this would overwrite something
+
         const char* format = (m_special_subpage == FileFormats::LVL_PGEX) ? "MODERN?" : "LEGACY?";
 
         SuperPrintR(mode, "CONVERT FORMAT TO", 3, 10, 50);
