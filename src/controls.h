@@ -179,7 +179,7 @@ inline const char *GetButtonName_INI(size_t i)
     case Buttons::CursorUp:
         return "cursor-up";
     case Buttons::CursorDown:
-        return "scroll-down";
+        return "cursor-down";
     case Buttons::CursorLeft:
         return "cursor-left";
     case Buttons::CursorRight:
