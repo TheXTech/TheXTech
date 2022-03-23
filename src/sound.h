@@ -165,7 +165,7 @@ void SoundPauseEngine(int paused);
 // Public Sub PlayMusic(Alias As String)
 void PlayMusic(const std::string &Alias, int fadeInMs = 0);
 // Public Sub PlaySfx(Alias As String)
-void PlaySfx(const std::string &Alias, int loops = 0);
+void PlaySfx(const std::string &Alias, int loops = 0, int volume = 128);
 // Public Sub StopSfx(Alias As String)
 void StopSfx(const std::string &Alias);
 // Public Sub StartMusic(A As Integer) 'play music
@@ -185,7 +185,7 @@ void PlayInitSound();
 void InitSound();
 // Public Sub PlaySound(A As Integer) 'play a sound
 // play a sound
-void PlaySound(int A, int loops = 0);
+void PlaySound(int A, int loops = 0, int volume = 128);
 void PlaySoundMenu(int A, int loops = 0);
 // Public Sub BlockSound() 'stops all sound from being played for 10 cycles
 // stops all sound from being played for 10 cycles
@@ -203,7 +203,11 @@ void LoadCustomSound();
 void UnloadCustomSound();
 
 void PreloadExtSound(const std::string &path);
-void PlayExtSound(const std::string &path);
+void UnloadExtSounds();
+void PlayExtSound(const std::string &path, int loops = 0, int volume = 128);
+void StopExtSound(const std::string &path);
+void StopAllExtSounds();
+void StopAllSounds();
 
 #ifdef THEXTECH_ENABLE_AUDIO_FX
 struct SoundFXEchoSetup
