@@ -706,7 +706,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             if(mode == CallMode::Render)
             {
-                SuperPrint("CUSTOM AI", 3, e_ScreenW - 180, 220);
+                SuperPrint("CUSTOM AI:", 3, e_ScreenW - 180, 220);
                 if(data && valid)
                     SuperPrint(data->strings[i], 3, e_ScreenW - 160, 242);
                 else
@@ -2015,6 +2015,18 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 280 + 4, GFX.ECursor[1], m_special_subpage == 3, 0, 0, 32, 32))
             m_special_subpage = 3;
     }
+    else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
+    {
+        m_special_subpage = 1;
+
+        SuperPrintR(mode, "ENTER:", 3, e_ScreenW - 200, 200 + 2);
+        if(EditorCursor.Block.TriggerHit != EVENT_NONE)
+            SuperPrintR(mode, GetE(EditorCursor.Warp.eventEnter), 3, e_ScreenW - 200, 220 + 2);
+        else
+            SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 220 + 2);
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.ECursor[1], m_special_subpage == 1, 0, 0, 32, 32))
+            m_special_subpage = 1;
+    }
     else
         return;
     int page_max = numEvents / 10;
@@ -2096,6 +2108,18 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             event_desc_2 = "BLOCK LAYER";
             event_desc_3 = "HAS DIED";
             event_to_set = &EditorCursor.Block.TriggerLast;
+        }
+        else
+            return;
+    }
+    else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
+    {
+        if(m_special_subpage == 1)
+        {
+            event_name = "ENTER";
+            event_desc = "WARP IS";
+            event_desc_2 = "ENTERED";
+            event_to_set = &EditorCursor.Warp.eventEnter;
         }
         else
             return;
@@ -2962,70 +2986,79 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
 {
     SuperPrintR(mode, "WARP SETTINGS", 3, 200, 50);
 
-    // placement selection
+    // prep for placement selection
     if(EditorCursor.Warp.level == STRINGINDEX_NONE && !EditorCursor.Warp.LevelEnt && !EditorCursor.Warp.MapWarp)
     {
         if(EditorCursor.SubMode != 1 && EditorCursor.SubMode != 2)
             EditorCursor.SubMode = 1;
-        SuperPrintR(mode, "PLACING IN", 3, 118, 90);
-        if(UpdateButton(mode, 300 + 4, 80 + 4, GFX.ECursor[1], EditorCursor.SubMode == 1, 0, 0, 32, 32))
-            EditorCursor.SubMode = 1;
-        SuperPrintR(mode, "OUT", 3, 344, 90);
-        if(UpdateButton(mode, 400 + 4, 80 + 4, GFX.ECursor[1], EditorCursor.SubMode == 2, 0, 0, 32, 32))
-            EditorCursor.SubMode = 2;
     }
+    else if(!EditorCursor.Warp.LevelEnt)
+        EditorCursor.SubMode = 1;
+    else
+        EditorCursor.SubMode = 2;
 
-    // directions
+    // placement selection and directions
     if(!EditorCursor.Warp.LevelEnt)
     {
-        SuperPrintR(mode, "IN DIRECTION", 3, 28, 130);
-        if(UpdateButton(mode, 260 + 4, 120 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 1, 0, 32*Icon::up, 32, 32))
+        SuperPrintR(mode, "PLACING:", 3, 40, 82);
+
+        SuperPrintR(mode, "IN    DIR.", 3, 28, 110);
+        if(UpdateButton(mode, 80 + 4, 100 + 4, GFX.ECursor[1], EditorCursor.SubMode == 1, 0, 0, 32, 32))
+            EditorCursor.SubMode = 1;
+
+        if(UpdateButton(mode, 220 + 4, 100 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 1, 0, 32*Icon::up, 32, 32))
             EditorCursor.Warp.Direction = 1;
-        if(UpdateButton(mode, 300 + 4, 120 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 3, 0, 32*Icon::down, 32, 32))
+        if(UpdateButton(mode, 260 + 4, 100 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 3, 0, 32*Icon::down, 32, 32))
             EditorCursor.Warp.Direction = 3;
-        if(UpdateButton(mode, 340 + 4, 120 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 2, 0, 32*Icon::left, 32, 32))
+        if(UpdateButton(mode, 300 + 4, 100 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 2, 0, 32*Icon::left, 32, 32))
             EditorCursor.Warp.Direction = 2;
-        if(UpdateButton(mode, 380 + 4, 120 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 4, 0, 32*Icon::right, 32, 32))
+        if(UpdateButton(mode, 340 + 4, 100 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 4, 0, 32*Icon::right, 32, 32))
             EditorCursor.Warp.Direction = 4;
+    }
+    else
+    {
+        SuperPrintR(mode, "PLACING:", 3, 40, 122);
     }
     if(EditorCursor.Warp.level == STRINGINDEX_NONE && !EditorCursor.Warp.MapWarp)
     {
-        SuperPrintR(mode, "OUT DIRECTION", 3, 10, 170);
-        if(UpdateButton(mode, 260 + 4, 160 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 1, 0, 32*Icon::down, 32, 32))
+        SuperPrintR(mode, "OUT    DIR.", 3, 10, 150);
+        if(UpdateButton(mode, 80 + 4, 140 + 4, GFX.ECursor[1], EditorCursor.SubMode == 2, 0, 0, 32, 32))
+            EditorCursor.SubMode = 2;
+
+        if(UpdateButton(mode, 220 + 4, 140 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 1, 0, 32*Icon::down, 32, 32))
             EditorCursor.Warp.Direction2 = 1;
-        if(UpdateButton(mode, 300 + 4, 160 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 3, 0, 32*Icon::up, 32, 32))
+        if(UpdateButton(mode, 260 + 4, 140 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 3, 0, 32*Icon::up, 32, 32))
             EditorCursor.Warp.Direction2 = 3;
-        if(UpdateButton(mode, 340 + 4, 160 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 2, 0, 32*Icon::right, 32, 32))
+        if(UpdateButton(mode, 300 + 4, 140 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 2, 0, 32*Icon::right, 32, 32))
             EditorCursor.Warp.Direction2 = 2;
-        if(UpdateButton(mode, 380 + 4, 160 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 4, 0, 32*Icon::left, 32, 32))
+        if(UpdateButton(mode, 340 + 4, 140 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 4, 0, 32*Icon::left, 32, 32))
             EditorCursor.Warp.Direction2 = 4;
     }
 
     // warp effect
     if(EditorCursor.Warp.Effect == 1)
-        SuperPrintR(mode, "EFFECT PIPE", 3, 46, 210);
+        SuperPrintR(mode, "STYLE: PIPE", 3, 6, 210);
     else if(EditorCursor.Warp.Effect == 2)
-        SuperPrintR(mode, "EFFECT DOOR", 3, 46, 210);
+        SuperPrintR(mode, "STYLE: DOOR", 3, 6, 210);
     else if(EditorCursor.Warp.Effect == 3)
-        SuperPrintR(mode, "EFFECT BLIP", 3, 46, 210);
-    // TODO: need to add Wohlstand's new effect
+        SuperPrintR(mode, "STYLE: BLIP", 3, 6, 210);
     else
     {
         EditorCursor.Warp.Effect = 1;
-        SuperPrintR(mode, "EFFECT PIPE", 3, 46, 210);
+        SuperPrintR(mode, "STYLE: PIPE", 3, 6, 210);
     }
-    if(UpdateButton(mode, 260 + 4, 200, GFXBlock[294], EditorCursor.Warp.Effect == 1, 0, 0, 32, 32))
+    if(UpdateButton(mode, 220 + 4, 200, GFXBlock[294], EditorCursor.Warp.Effect == 1, 0, 0, 32, 32))
         EditorCursor.Warp.Effect = 1;
-    if(UpdateButton(mode, 300 + 4, 200, GFXBackgroundBMP[88], EditorCursor.Warp.Effect == 2, 0, 0, 32, 32))
+    if(UpdateButton(mode, 260 + 4, 200, GFXBackgroundBMP[88], EditorCursor.Warp.Effect == 2, 0, 0, 32, 32))
     {
         EditorCursor.Warp.Effect = 2;
         EditorCursor.Warp.Direction = 1;
         EditorCursor.Warp.Direction2 = 1;
     }
-    if(UpdateButton(mode, 340 + 4, 200, GFXBackgroundBMP[61], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
+    if(UpdateButton(mode, 300 + 4, 200, GFXBackgroundBMP[61], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
         EditorCursor.Warp.Effect = 3;
 
-    // stars required / locked
+    // stars required
     if(EditorCursor.Warp.Stars >= 10)
         SuperPrintR(mode, "REQ STARS " + std::to_string(EditorCursor.Warp.Stars), 3, 26, 250);
     else
@@ -3034,23 +3067,62 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
         EditorCursor.Warp.Stars --;
     if(UpdateButton(mode, 300 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         EditorCursor.Warp.Stars ++;
-    SuperPrintR(mode, "LOCKED", 3, 386, 250);
-    if(UpdateButton(mode, 500 + 4, 240 + 4, GFX.EIcons, EditorCursor.Warp.Locked, 0, 32*Icon::check, 32, 32))
-        EditorCursor.Warp.Locked = !EditorCursor.Warp.Locked;
 
-    // TODO: need to add the "not enough stars" message here
+    if(FileFormat == FileFormats::LVL_PGEX)
+    {
+        SuperPrintR(mode, "MSG", 3, 350, 250);
+        if(UpdateButton(mode, 420 + 4, 240 + 4, GFX.EIcons, EditorCursor.Warp.StarsMsg != STRINGINDEX_NONE, 0, 32*Icon::pencil, 32, 32))
+            SetS(EditorCursor.Warp.StarsMsg, TextEntryScreen::Run("Star lock message", GetS(EditorCursor.Warp.StarsMsg)));
 
-    // TODO: need to add the eventEnter event here
+    }
+
+    // side panel for a few custom things
+    if(FileFormat == FileFormats::LVL_PGEX)
+    {
+        if(mode == CallMode::Render)
+            XRender::renderRect(e_ScreenW - 160, 40, 240, e_ScreenH - 120, 0.7f, 0.7f, 0.9f, 1.0f, true);
+
+        // eventEnter
+        SuperPrintR(mode, "ENTER\nEVENT:", 3, e_ScreenW - 160 + 4, 84);
+        SuperPrintR(mode, EditorCursor.Warp.eventEnter != EVENT_NONE ? GetE(EditorCursor.Warp.eventEnter) : "NONE", 3, e_ScreenW - 160 + 4, 120);
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 80 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+            m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
+
+        // transition effect
+        SuperPrintR(mode, "TRANSITION", 3, e_ScreenW - 160 + 4, 160);
+
+        // cannon
+        SuperPrintR(mode, "CANNON", 3, e_ScreenW - 160 + 4, 220);
+    }
 
     // allow / forbid
-    SuperPrintR(mode, "ALLOW MOUNT", 3, 46, 290);
-    if(UpdateButton(mode, 260 + 4, 280 + 4, GFX.EIcons, !EditorCursor.Warp.NoYoshi, 0, 32*Icon::check, 32, 32))
-        EditorCursor.Warp.NoYoshi = !EditorCursor.Warp.NoYoshi;
-    SuperPrintR(mode, "ITEM", 3, 324, 290);
-    if(UpdateButton(mode, 420 + 4, 280 + 4, GFX.EIcons, EditorCursor.Warp.WarpNPC, 0, 32*Icon::check, 32, 32))
+    SuperPrintR(mode, "ALLOW: ITEM", 3, 6, 290);
+    if(UpdateButton(mode, 220 + 4, 280 + 4, GFX.EIcons, EditorCursor.Warp.WarpNPC, 0, 32*Icon::check, 32, 32, "Can take NPC thru"))
         EditorCursor.Warp.WarpNPC = !EditorCursor.Warp.WarpNPC;
+    SuperPrintR(mode, "MOUNT", 3, 280, 290);
+    if(UpdateButton(mode, 380 + 4, 280 + 4, GFX.EIcons, !EditorCursor.Warp.NoYoshi, 0, 32*Icon::check, 32, 32, "Can take Yoshi, boot"))
+        EditorCursor.Warp.NoYoshi = !EditorCursor.Warp.NoYoshi;
+
+    // locked and (new) must stand
+    if(FileFormat == FileFormats::LVL_PGEX)
+    {
+        SuperPrintR(mode, "NEED FLOOR", 3, 6, 330);
+        if(UpdateButton(mode, 220 + 4, 320 + 4, GFX.EIcons, EditorCursor.Warp.stoodRequired, 0, 32*Icon::check, 32, 32, "Custom: player must be standing"))
+            EditorCursor.Warp.stoodRequired = !EditorCursor.Warp.stoodRequired;
+
+        SuperPrintR(mode, "LOCKED", 3, 270, 330);
+        if(UpdateButton(mode, 380 + 4, 320 + 4, GFX.EIcons, EditorCursor.Warp.Locked, 0, 32*Icon::check, 32, 32))
+            EditorCursor.Warp.Locked = !EditorCursor.Warp.Locked;
+    }
+    else
+    {
+        SuperPrintR(mode, "LOCKED", 3, 60, 330);
+        if(UpdateButton(mode, 220 + 4, 320 + 4, GFX.EIcons, EditorCursor.Warp.Locked, 0, 32*Icon::check, 32, 32))
+            EditorCursor.Warp.Locked = !EditorCursor.Warp.Locked;
+    }
+
     // map/level warps
-    SuperPrintR(mode, "SPECIAL OPTIONS", 3, 164, 350);
+    SuperPrintR(mode, "SPECIAL OPTIONS", 3, 164, 366);
     SuperPrintR(mode, "TO MAP", 3, 10, 390);
     if(UpdateButton(mode, 120 + 4, 380 + 4, GFX.EIcons, EditorCursor.Warp.MapWarp, 0, 32*Icon::check, 32, 32))
     {
@@ -3095,14 +3167,29 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
         }
         if(UpdateButton(mode, 330 + 4, 420 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
             StartFileBrowser(PtrS(EditorCursor.Warp.level), FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
+
+        // display this in a different way if modern options are enabled
+        int warp_buttons_x = (FileFormat == FileFormats::LVL_PGEX) ? 380 : 440;
         if(EditorCursor.Warp.LevelWarp == 0)
-            SuperPrintR(mode, "LVL START", 3, 384, 430);
+            SuperPrintR(mode, "TO: LVL START", 3, 384, 424);
         else
-            SuperPrintR(mode, "SECTION "+std::to_string(EditorCursor.Warp.LevelWarp), 3, 384, 430);
-        if(EditorCursor.Warp.LevelWarp > 0 && UpdateButton(mode, 560 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+            SuperPrintR(mode, "TO: WARP "+std::to_string(EditorCursor.Warp.LevelWarp), 3, 384, 424);
+        if(EditorCursor.Warp.LevelWarp > 0 && UpdateButton(mode, warp_buttons_x + 4, 440 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             EditorCursor.Warp.LevelWarp --;
-        if(UpdateButton(mode, 600 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+        if(UpdateButton(mode, warp_buttons_x + 40 + 4, 440 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             EditorCursor.Warp.LevelWarp ++;
+
+        if(FileFormat == FileFormats::LVL_PGEX)
+        {
+            // display the option to show/hide the level start scene
+            SuperPrintR(mode, "START\nSCENE", 3, warp_buttons_x + 126, 444);
+            if(UpdateButton(mode, warp_buttons_x + 80 + 4, 440 + 4, GFX.EIcons, !EditorCursor.Warp.noEntranceScene, 0, 32*Icon::check, 32, 32, "Custom: show/hide level start scene"))
+                EditorCursor.Warp.noEntranceScene = !EditorCursor.Warp.noEntranceScene;
+            // display the option to show/hide the level star count
+            SuperPrintR(mode, "SHOW\nSTARS", 3, warp_buttons_x + 206, 444);
+            if(UpdateButton(mode, warp_buttons_x + 200 + 4, 440 + 4, GFXNPC[NPCID_STAR_SMB3], !EditorCursor.Warp.noPrintStars, 0, 0, 32, 32, "Custom: show/hide star count"))
+                EditorCursor.Warp.noPrintStars = !EditorCursor.Warp.noPrintStars;
+        }
     }
     // special options for map warp
     if(EditorCursor.Warp.MapWarp)
