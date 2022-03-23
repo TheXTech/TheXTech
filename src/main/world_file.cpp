@@ -70,10 +70,25 @@ bool OpenWorld(std::string FilePath)
 
     g_dirEpisode.setCurDir(wld.meta.path);
     FileFormat = wld.meta.RecentFormat;
-    FileNameFull = Files::basename(FilePath);
     FileName = g_dirEpisode.resolveDirCase(wld.meta.filename); //FilePath.substr(FilePath.length() - (FilePath.length() - A));
     FileNamePath = wld.meta.path + "/"; //FilePath.substr(0, (A));
     g_dirCustom.setCurDir(FileNamePath + FileName);
+
+    if(!FilePath.empty())
+    {
+        FileNameFull = Files::basename(FilePath);
+        FullFileName = FilePath;
+    }
+    else if(FileFormat == FileFormats::LVL_SMBX64 || FileFormat == FileFormats::LVL_SMBX38A)
+    {
+        FileNameFull = FileName + ".lvl";
+        FullFileName = FileNamePath + FileName + ".lvl";
+    }
+    else
+    {
+        FileNameFull = FileName + ".lvlx";
+        FullFileName = FileNamePath + FileName + ".lvlx";
+    }
 
     // Preserve these values for quick restoring when going to the world map
     FileNameFullWorld = FileNameFull;

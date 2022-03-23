@@ -152,6 +152,11 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         FileNameFull = Files::basename(FilePath);
         FullFileName = FilePath;
     }
+    else if(FileFormat == FileFormats::LVL_SMBX64 || FileFormat == FileFormats::LVL_SMBX38A)
+    {
+        FileNameFull = FileName + ".lvl";
+        FullFileName = FileNamePath + FileName + ".lvl";
+    }
     else
     {
         FileNameFull = FileName + ".lvlx";
