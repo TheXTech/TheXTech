@@ -1190,7 +1190,7 @@ bool CanConvertLevel(int format, std::string* reasons)
             {
                 *reasons += "An NPC type ";
                 *reasons += std::to_string(NPC[i].Type);
-                *reasons += " has ancient behavior:\n  affects TheXTech, not old games.\n";
+                *reasons += " has custom behavior.\n";
             }
             break;
         }
@@ -1198,11 +1198,11 @@ bool CanConvertLevel(int format, std::string* reasons)
 
     for(int i = 1; i <= numBlock; i++)
     {
-        if(Block[i].Special2)
+        if(Block[i].Type == 90 && Block[i].Special2 == 1)
         {
             can_convert = false;
             if(reasons)
-                *reasons += "A spin block has ancient behavior:\n  affects TheXTech, not old games.\n";
+                *reasons += "A spin block uses ancient behavior.\n";
             break;
         }
     }
