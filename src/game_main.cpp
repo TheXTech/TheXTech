@@ -838,6 +838,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
             Record::EndRecording();
 
+            StopAllSounds();
+            UnloadExtSounds();
+
             if(!GameIsActive)
             {
                 speedRun_saveStats();
