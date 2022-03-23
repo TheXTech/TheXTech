@@ -95,8 +95,16 @@ void ResetSectionScrolls()
             level[i].Width = level[i].X + 800;
         }
 
-        last_vScreenY[i] = -(level[i].Height - 600);
+        last_vScreenY[i] = -(level[i].Height - ScreenH);
         last_vScreenX[i] = -(level[i].X);
+        if(level[i].Width - level[i].X < ScreenW)
+            last_vScreenX[i] += ScreenW / 2 - (level[i].Width - level[i].X) / 2;
+        if(level[i].Height - level[i].Y < ScreenH)
+            last_vScreenY[i] = -level[i].Y + ScreenH / 2 - (level[i].Height - level[i].Y) / 2;
+        if(std::fmod((last_vScreenY[i] + 8), 32) != 0.0)
+            last_vScreenY[i] = static_cast<int>(round((last_vScreenY[i] + 8) / 32)) * 32 - 8;
+        if(std::fmod(last_vScreenX[i], 32) != 0.0)
+            last_vScreenX[i] = static_cast<int>(round(last_vScreenX[i] / 32)) * 32;
     }
     curSection = 0;
     vScreenY[1] = last_vScreenY[curSection];
