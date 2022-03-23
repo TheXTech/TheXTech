@@ -923,6 +923,10 @@ int GameMain(const CmdLineSetup_t &setup)
                     // reset FullFileName to point to the real level (Backup_FullFileName)
                     Files::deleteFile(FullFileName);
                     FullFileName = Backup_FullFileName;
+                    // this is needed because the temporary levels are currently saved as ".lvl(x)tst"
+                    if(FileNameFull.size() > 3 && FileNameFull.substr(FileNameFull.size() - 3) == "tst")
+                        FileNameFull.resize(FileNameFull.size() - 3);
+
                     Backup_FullFileName = "";
 
                     editorScreen.active = false;

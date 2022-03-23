@@ -3459,9 +3459,9 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         }
 
         if(can_save)
-            SuperPrintR(mode, "SAVE BEFORE YOU " + action + "?", 3, 20, 40);
+            SuperPrintR(mode, "SAVE BEFORE YOU " + action + "?", 3, 10, 50);
         else
-            SuperPrintR(mode, "ARE YOU SURE YOU WANT TO " + action + "?", 3, 20, 40);
+            SuperPrintR(mode, "ARE YOU SURE YOU WANT TO " + action + "?", 3, 10, 50);
 
         bool confirmed = false;
         if(can_save)
@@ -3567,10 +3567,13 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         if(m_saved_message.empty())
             SuperPrintR(mode, "There are no compatibility issues.", 4, 20, 150);
         else
-            SuperPrintR(mode, "See compatibility issues below.", 4, 20, 150);
+        {
+            SuperPrintR(mode, "The features below will be LOST:", 4, 20, 150, 1.0f, 0.5f, 0.5f);
+            SuperPrintR(mode, m_saved_message, 4, 4, 180);
+        }
 
-        SuperPrintR(mode, "PROCEED WITH CONVERSION", 3, 60, 200);
-        if(UpdateButton(mode, 20 + 4, 190 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        SuperPrintR(mode, "PROCEED WITH CONVERSION", 3, 60, 390);
+        if(UpdateButton(mode, 20 + 4, 380 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
         {
             if(WorldEditor)
             {
@@ -3590,16 +3593,13 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             m_saved_message.clear();
         }
 
-        SuperPrintR(mode, "CANCEL CONVERSION", 3, 60, 240);
-        if(UpdateButton(mode, 20 + 4, 230 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        SuperPrintR(mode, "CANCEL CONVERSION", 3, 60, 430);
+        if(UpdateButton(mode, 20 + 4, 420 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_FILE;
             m_special_subpage = 0;
             m_saved_message.clear();
         }
-
-        if(!m_saved_message.empty())
-            SuperPrintR(mode, m_saved_message, 4, 40, 280);
 
         return;
     }
@@ -4280,7 +4280,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         XRender::renderTexture(e_CursorX, e_CursorY, GFX.ECursor[2]);
 #endif
         if(e_tooltip)
-            SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34);
+            SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34, 1.0f, 0.7f, 0.7f);
     }
 }
 
@@ -4391,9 +4391,9 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         if(e_tooltip)
         {
             if(e_CursorX + 28 < e_ScreenW - 60)
-                SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34);
+                SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34, 1.0f, 0.7f, 0.7f);
             else
-                SuperPrintRightAlign(e_tooltip, 3, e_CursorX + 10, e_CursorY + 34);
+                SuperPrintRightAlign(e_tooltip, 3, e_CursorX + 10, e_CursorY + 34, 1.0f, 0.7f, 0.7f);
         }
     }
 

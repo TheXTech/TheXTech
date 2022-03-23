@@ -104,6 +104,11 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
             if(c >= '0' && c <= '9')
                 XRender::renderTexture(int(X + B), int(Y), 16, 14, GFX.Font1[c - '0'], 0, 0, r, g, b, a);
             B += 18;
+            if(c == '\n')
+            {
+                B = 0;
+                Y += 16;
+            }
         }
     }
     else if(Font == 2)
@@ -142,6 +147,12 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
             } else {
                 B += 16;
             }
+
+            if(c == '\n')
+            {
+                B = 0;
+                Y += 18;
+            }
         }
 
     }
@@ -170,6 +181,13 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
 //                B = B + 16
                 B += 16;
             }
+
+            if(c == '\n')
+            {
+                B = 0;
+                Y += 18;
+            }
+
 //            End If
 //            Words = Right(Words, Len(Words) - 1)
 //        Loop
@@ -197,6 +215,13 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
                 B += 18;
 //            End If
             }
+
+            if(c == '\n')
+            {
+                B = 0;
+                Y += 18;
+            }
+
 //            Words = Right(Words, Len(Words) - 1)
 //        Loop
         }

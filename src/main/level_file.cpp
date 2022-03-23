@@ -1101,7 +1101,7 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_transit = true;
             if(reasons)
-                *reasons += "Uses warp transition effect.\n";
+                *reasons += "A warp uses new transition effect.\n";
         }
 
         if(!seen_stood && w.stoodRequired)
@@ -1109,7 +1109,7 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_stood = true;
             if(reasons)
-                *reasons += "A warp requires the player to be standing.\n";
+                *reasons += "A warp requires player to stand.\n";
         }
 
         if(!seen_cannon && w.cannonExit)
@@ -1125,7 +1125,7 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_warp_event = true;
             if(reasons)
-                *reasons += "A warp triggers an event on entrance.\n";
+                *reasons += "A warp triggers an event on entry.\n";
         }
 
         if(!seen_stars_msg && !GetS(w.StarsMsg).empty())
@@ -1141,7 +1141,7 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_no_print_stars = true;
             if(reasons)
-                *reasons += "A warp doesn't show how many stars it needs.\n";
+                *reasons += "A warp hides its star requirement.\n";
         }
 
         if(!seen_no_entrance_scene && w.noEntranceScene)
@@ -1149,7 +1149,7 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_no_entrance_scene = true;
             if(reasons)
-                *reasons += "A level warp skips the level entrance scene.\n";
+                *reasons += "A level warp skips the start scene.\n";
         }
     }
 
@@ -1168,7 +1168,7 @@ bool CanConvertLevel(int format, std::string* reasons)
                 can_convert = false;
                 seen_event_custom_music = true;
                 if(reasons)
-                    *reasons += "An event sets a section's music to a file.\n";
+                    *reasons += "An event sets music to a file.\n";
             }
 
             if(!seen_modern_autoscroll && ss.autoscroll)
@@ -1188,9 +1188,9 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             if(reasons)
             {
-                *reasons += "An NPC of type ";
+                *reasons += "An NPC type ";
                 *reasons += std::to_string(NPC[i].Type);
-                *reasons += " uses ancient behavior.\n(Removing this will affect TheXTech but not old fan-games.)\n";
+                *reasons += " has ancient behavior:\n  affects TheXTech, not old games.\n";
             }
             break;
         }
@@ -1202,7 +1202,7 @@ bool CanConvertLevel(int format, std::string* reasons)
         {
             can_convert = false;
             if(reasons)
-                *reasons += "A spin block uses ancient behavior.\n(Removing this will affect TheXTech but not old fan-games.)\n";
+                *reasons += "A spin block has ancient behavior:\n  affects TheXTech, not old games.\n";
             break;
         }
     }
