@@ -2143,6 +2143,12 @@ void UpdateGraphics(bool skipRepaint)
     XRender::resetViewport();
     XRender::offsetViewportIgnore(true);
 
+    if(GameMenu && !GameOutro)
+        mainMenuDraw();
+
+    if(GameOutro)
+        DrawCredits();
+
     g_levelScreenFader.draw();
 
     // 1P controls indicator
@@ -2159,12 +2165,6 @@ void UpdateGraphics(bool skipRepaint)
     }
 
     speedRun_renderTimer();
-
-    if(GameMenu && !GameOutro)
-        mainMenuDraw();
-
-    if(GameOutro)
-        DrawCredits();
 
     if(PrintFPS > 0)
         SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);

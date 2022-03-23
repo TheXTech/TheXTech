@@ -51,6 +51,7 @@
 #include "pge_delay.h"
 #include "video.h"
 #include "change_res.h"
+#include "game_globals.h"
 
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
@@ -1696,6 +1697,8 @@ void mainMenuDraw()
     B = ScreenW / A + 1;
     for(int C = 0; C < B; C++)
         XRender::renderTexture(A * C, 0, A, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+
+    // can animate curtain falling by replacing y coordinate with -GFX.MenuGFX[1].h * g_levelScreenFader.m_scale
 
     // URL
     if(ScreenH >= SmallScreenH)
