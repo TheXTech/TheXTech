@@ -4,6 +4,7 @@
 #include "write_common.h"
 #include "sound.h"
 #include "npc_id.h"
+#include "npc_special_data.h"
 #include <PGE_File_Formats/file_formats.h>
 #include "Logger/logger.h"
 
@@ -205,10 +206,8 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         {
             npc.special_data = n.Special;
         }
-        // Legacy behaviors
-        else if(n.Type == NPCID_CANNONITEM || n.Type == NPCID_THWOMP_SMB3 || n.Type == NPCID_BOWSER_SMB3
-            || n.Type == NPCID_YELBLOCKS || n.Type == NPCID_BLUBLOCKS || n.Type == NPCID_GRNBLOCKS
-            || n.Type == NPCID_REDBLOCKS || n.Type == NPCID_PLATFORM_SMB3 || n.Type == NPCID_SAW)
+        // Legacy and custom behaviors
+        else if(find_Special7_Data(n.Type) != nullptr)
         {
             npc.special_data = n.Special7;
         }
