@@ -3910,7 +3910,13 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
         m_special_subpage ++;
 
     if(!m_cur_path.empty())
-        SuperPrintR(mode, "IN " + m_cur_path, 3, 10, 60);
+    {
+        const int avail_chars = (e_ScreenW-140)/18;
+        if(m_cur_path.size() > avail_chars)
+            SuperPrintR(mode, "IN ..." + m_cur_path.substr(m_cur_path.size() - avail_chars), 3, 10, 60);
+        else
+            SuperPrintR(mode, "IN " + m_cur_path, 3, 10, 60);
+    }
     // render file selector
     for(int i = 0; i < 20; i++)
     {
