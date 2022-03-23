@@ -365,8 +365,8 @@ bool OpenWorld(std::string FilePath)
                 ll.Start = true;
         }
 
-        vScreenX[1] = (ScreenW / 2 - 800 / 2);
-        vScreenY[1] = (ScreenH / 2 - 600 / 2);
+        vScreenX[1] = ScreenW / 2 - 800 / 2;
+        vScreenY[1] = ScreenH / 2 - 600 / 2;
     }
 //    else
 //    {
