@@ -4340,7 +4340,7 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedY = 10;
                             else
                             {
-                                bool legacy = NPC[A].Legacy && fiEqual(NPC[A].Special7, 1);
+                                bool legacy = /*NPC[A].Legacy &&*/ fiEqual(NPC[A].Special7, 1);
                                 PlaySound(SFX_Twomp);
                                 NPC[A].Special3 = 30;
                                 NPC[A].Frame = 11;
