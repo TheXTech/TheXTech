@@ -37,7 +37,8 @@ namespace Icon
         newf,
         page,
         music,
-        move
+        move,
+        thextech
     };
 }
 
@@ -77,6 +78,7 @@ private:
         SPECIAL_PAGE_WORLD_SETTINGS,
         SPECIAL_PAGE_FILE,
         SPECIAL_PAGE_FILE_CONFIRM,
+        SPECIAL_PAGE_FILE_CONVERT,
     } SpecialPage_t;
     typedef enum
     {
@@ -111,6 +113,9 @@ private:
     int m_music_page = 0;
     int m_background_page = 0;
     int m_current_event = 0;
+
+    // saved message string for user (maybe expensive to recalculate each frame)
+    std::string m_saved_message;
 
     // file browser info
     std::string* m_file_target = nullptr;

@@ -39,7 +39,7 @@
 
 #include "global_dirs.h"
 
-void OpenWorld(std::string FilePath)
+bool OpenWorld(std::string FilePath)
 {
     // USE PGE-FL here
     // std::string newInput = "";
@@ -52,7 +52,15 @@ void OpenWorld(std::string FilePath)
 
     ClearWorld();
 
-    FileFormats::OpenWorldFile(FilePath, wld);
+    // FileFormats::OpenWorldFile(FilePath, wld);
+    if(!FileFormats::OpenWorldFile(FilePath, wld))
+    {
+        pLogWarning("Error of world \"%s\" file loading: %s (line %d).",
+                    FilePath.c_str(),
+                    wld.meta.ERROR_info.c_str(),
+                    wld.meta.ERROR_linenum);
+        return false;
+    }
 
 //    for(A = FilePath.length(); A >= 1; A--)
 //    {
@@ -370,6 +378,8 @@ void OpenWorld(std::string FilePath)
 //    }
     SaveWorldStrings();
     resetFrameTimer();
+
+    return true;
 }
 
 void ClearWorld()
@@ -542,7 +552,7 @@ void ConvertWorld(int format)
         if(!FileNameFull.empty() && FileNameFull.back() != 'x')
             FileNameFull += "x";
         if(!FullFileName.empty() && FullFileName.back() != 'x')
-            FileNameFull += "x";
+            FullFileName += "x";
     }
 
     if(format != FileFormats::WLD_SMBX64)

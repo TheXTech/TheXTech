@@ -26,7 +26,7 @@
 #include <string>
 
 //! loads the world
-void OpenWorld(std::string FilePath);
+bool OpenWorld(std::string FilePath);
 void FindWldStars();
 void ClearWorld();
 

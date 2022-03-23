@@ -1226,7 +1226,7 @@ void ConvertLevel(int format)
         if(!FileNameFull.empty() && FileNameFull.back() != 'x')
             FileNameFull += "x";
         if(!FullFileName.empty() && FullFileName.back() != 'x')
-            FileNameFull += "x";
+            FullFileName += "x";
     }
 
     if(format != FileFormats::LVL_SMBX64)
