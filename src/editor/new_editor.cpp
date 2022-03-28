@@ -4479,7 +4479,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         if(GamePaused != PauseCode::None)
             return;
 
-        MenuMouseRelease = !MenuMouseRelease && !SharedCursor.Primary;
+        MenuMouseRelease = MouseRelease && !MenuMouseRelease && !SharedCursor.Primary;
     }
 
     e_tooltip = nullptr;
