@@ -41,11 +41,13 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
     }
 
     m_loadedImages.push_back(&img);
-    m_isCustom.push_back(false);
 }
 
 GFX_t::GFX_t() noexcept
-{}
+{
+    if(m_isCustom)
+        SDL_free(m_isCustom);
+}
 
 bool GFX_t::load()
 {
@@ -114,6 +116,12 @@ bool GFX_t::load()
         return false;
     }
 
+    if(m_isCustom)
+        SDL_free(m_isCustom);
+
+    m_isCustom = (bool*)SDL_malloc(m_loadedImages.size() * sizeof(bool));
+    SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
+
     return true;
 }
 
@@ -122,5 +130,12 @@ void GFX_t::unLoad()
     for(StdPicture *p : m_loadedImages)
         XRender::deleteTexture(*p);
     m_loadedImages.clear();
-    m_isCustom.clear();
+    SDL_free(m_isCustom);
+    m_isCustom = nullptr;
+}
+
+bool& GFX_t::isCustom(size_t i)
+{
+    SDL_assert_release(m_isCustom && i < m_loadedImages.size());
+    return m_isCustom[i];
 }

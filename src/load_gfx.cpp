@@ -493,7 +493,7 @@ void UnloadGFX()
 static void loadCustomUIAssets()
 {
     std::string uiRoot = AppPath + "graphics/ui/";
-    int ci = 0;
+    size_t ci = 0;
 
      // these should all have been set previously, but will do no harm
     g_dirEpisode.setCurDir(FileNamePath);
@@ -502,103 +502,103 @@ static void loadCustomUIAssets()
 
     loadCGFX(uiRoot + "BMVs.png",
              "BMVs",
-             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.BMVs, false, true);
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.BMVs, false, true);
 
     loadCGFX(uiRoot + "BMWin.png",
              "BMWin",
-             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.BMWin, false, true);
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.BMWin, false, true);
 
     For(i, 1, 3)
         loadCGFX(uiRoot + fmt::format_ne("Boot{0}.png", i),
                  fmt::format_ne("Boot{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Boot[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.Boot[i], false, true);
 
     For(i, 1, 5)
         loadCGFX(uiRoot + fmt::format_ne("CharacterName{0}.png", i),
                  fmt::format_ne("CharacterName{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.CharacterName[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.CharacterName[i], false, true);
 
     loadCGFX(uiRoot + "Chat.png",
              "Chat",
-             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Chat, false, true);
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.Chat, false, true);
 
     For(i, 0, 2)
         loadCGFX(uiRoot + fmt::format_ne("Container{0}.png", i),
                  fmt::format_ne("Container{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Container[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.Container[i], false, true);
 
     For(i, 1, 3)
         loadCGFX(uiRoot + fmt::format_ne("ECursor{0}.png", i),
                  fmt::format_ne("ECursor{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.ECursor[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.ECursor[i], false, true);
 
     For(i, 0, 9)
         loadCGFX(uiRoot + fmt::format_ne("Font1_{0}.png", i),
                  fmt::format_ne("Font1_{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Font1[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.Font1[i], false, true);
 
     For(i, 1, 3)
         loadCGFX(uiRoot + fmt::format_ne("Font2_{0}.png", i),
                  fmt::format_ne("Font2_{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Font2[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.Font2[i], false, true);
 
     loadCGFX(uiRoot + "Font2S.png",
              "Font2S",
-             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Font2S, false, true);
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.Font2S, false, true);
 
     For(i, 1, 2)
         loadCGFX(uiRoot + fmt::format_ne("Heart{0}.png", i),
                  fmt::format_ne("Heart{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Heart[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.Heart[i], false, true);
 
     For(i, 0, 8)
         loadCGFX(uiRoot + fmt::format_ne("Interface{0}.png", i),
                  fmt::format_ne("Interface{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Interface[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.Interface[i], false, true);
 
     loadCGFX(uiRoot + "LoadCoin.png",
              "LoadCoin",
-             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.LoadCoin, false, true);
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.LoadCoin, false, true);
 
     loadCGFX(uiRoot + "Loader.png",
              "Loader",
-             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Loader, false, true);
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.Loader, false, true);
 
     For(i, 0, 3)
         loadCGFX(uiRoot + fmt::format_ne("MCursor{0}.png", i),
                  fmt::format_ne("MCursor{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.MCursor[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.MCursor[i], false, true);
 
     For(i, 1, 4)
         loadCGFX(uiRoot + fmt::format_ne("MenuGFX{0}.png", i),
                  fmt::format_ne("MenuGFX{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.MenuGFX[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.MenuGFX[i], false, true);
 
     loadCGFX(uiRoot + "Mount.png",
              "Mount",
-             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Mount[2], false, true);
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.Mount[2], false, true);
 
     For(i, 0, 7)
         loadCGFX(uiRoot + fmt::format_ne("nCursor{0}.png", i),
                  fmt::format_ne("nCursor{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.nCursor[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.nCursor[i], false, true);
 
     loadCGFX(uiRoot + "TextBox.png",
              "TextBox",
-             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.TextBox, false, true);
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.TextBox, false, true);
 
     For(i, 1, 2)
         loadCGFX(uiRoot + fmt::format_ne("Tongue{0}.png", i),
                  fmt::format_ne("Tongue{0}", i),
-                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Tongue[i], false, true);
+                 nullptr, nullptr, GFX.isCustom(ci++), GFX.Tongue[i], false, true);
 
     loadCGFX(uiRoot + "Warp.png",
              "Warp",
-             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Warp, false, true);
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.Warp, false, true);
 
     loadCGFX(uiRoot + "YoshiWings.png",
              "YoshiWings",
-             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.YoshiWings, false, true);
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.YoshiWings, false, true);
 
     // FIXME: @ds-sloth, Please add an Editor specific textures here if needed
 }
