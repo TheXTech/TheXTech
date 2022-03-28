@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "globals.h"
 #include "global_strings.h"
 
 #define STRS_UNIQUENESS_TRACKING
@@ -72,6 +73,8 @@ void SaveWorldStrings()
 
 void RestoreWorldStrings()
 {
+    EditorCursor.ClearStrings();
+
 #ifdef STRS_UNIQUENESS_TRACKING
     g_LevelString = g_LevelString_backup;
     g_LevelStringUsages = g_LevelStringUsages_backup;
@@ -91,6 +94,8 @@ void RestoreWorldStrings()
 
 void ClearStringsBank()
 {
+    EditorCursor.ClearStrings();
+
     g_LevelString.clear();
     g_numWorldString = 0;
 

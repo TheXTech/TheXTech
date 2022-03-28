@@ -164,6 +164,14 @@ void EditorRestore()
     vScreenY[1] = last_vScreenY_b[curSection];
 }
 
+void EditorCursor_t::ClearStrings()
+{
+    FreeS(this->NPC.Text);
+    FreeS(this->Warp.StarsMsg);
+    FreeS(this->Warp.level);
+    FreeS(this->WorldMusic.MusicFile);
+}
+
 // this sub handles the level editor
 // it is still called when the player is testing a level in the editor in windowed mode
 void UpdateEditor()

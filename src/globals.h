@@ -1002,6 +1002,9 @@ struct EditorCursor_t
 //    WorldMusic As WorldMusic
     WorldMusic_t WorldMusic;
 //End Type
+
+    // clears any strings of objects stored by the world cursor
+    void ClearStrings();
 };
 
 //Public Type WorldPlayer 'the players variables on the world map
