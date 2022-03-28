@@ -416,7 +416,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 {
     // NPC GUI
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 1.0f, true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
 
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
     {
@@ -593,7 +593,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
         // Generator
         SuperPrintR(mode, "GEN", 3, e_ScreenW - 110, 160);
-        if(UpdateButton(mode, e_ScreenW - 120 + 4, 180 + 4, GFX.ECursor[1], EditorCursor.NPC.Generator, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 120 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.Generator, 0, 32*Icon::subscreen, 32, 32))
             m_NPC_page = 6;
 
         // Behavior
@@ -742,7 +742,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             SuperPrint("T:" + GetE(EditorCursor.NPC.TriggerTalk), 3, e_ScreenW - 240, 360);
             SuperPrint("L:" + GetE(EditorCursor.NPC.TriggerLast), 3, e_ScreenW - 240, 380);
         }
-        if(UpdateButton(mode, e_ScreenW - 80 + 4, 280 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 80 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
 
         // Layers
@@ -756,7 +756,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             if(EditorCursor.NPC.AttLayer != LAYER_NONE)
                 SuperPrint("ATT: " + GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 240, 460);
         }
-        if(UpdateButton(mode, e_ScreenW - 80 + 4, 400 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 80 + 4, 400 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_LAYER;
     }
 
@@ -1038,14 +1038,14 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
         SuperPrintR(mode, "DELETING EVENT " + Events[m_current_event].Name, 3, 60, 40);
         SuperPrintR(mode, "ARE YOU SURE?", 3, 10, 60);
         SuperPrintR(mode, "YES: DELETE EVENT", 3, 60, 110);
-        if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             DeleteEvent((eventindex_t)m_current_event);
             m_special_page = SPECIAL_PAGE_EVENTS;
             m_current_event = 0;
         }
         SuperPrintR(mode, "NO: DO NOT DELETE EVENT", 3, 60, 150);
-        if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_EVENTS;
             m_current_event = 0;
@@ -1139,7 +1139,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         else
             SuperPrintR(mode, "CHANGE ALL SECTION BOUNDS TO CURRENT?", 3, 10, 60);
         SuperPrintR(mode, "YES", 3, 60, 110);
-        if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             if(m_special_subpage == 0)
             {
@@ -1151,7 +1151,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
         }
         SuperPrintR(mode, "NO", 3, 60, 150);
-        if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
         }
@@ -1210,7 +1210,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 
     // RIGHT PANE: layers
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 1.0f, true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
     {
         m_special_page = SPECIAL_PAGE_EVENTS;
@@ -1330,7 +1330,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     {
         SuperPrintR(mode, "LAYERS:", 3, e_ScreenW-200, 50);
     }
-    if(UpdateButton(mode, e_ScreenW - 240 + 4, 40 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+    if(UpdateButton(mode, e_ScreenW - 240 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_LAYERS;
 
     // BOTTOM PANE: sections - background, music, autoscroll
@@ -1370,7 +1370,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             else if(set_same != Events[m_current_event].section[s].music_id)
                 all_set = false;
         }
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 120 + 4, GFX.EIcons, all_keep, 0, 32*31, 32, 32) && !all_keep)
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 120 + 4, GFX.EIcons, all_keep, 0, 0, 1, 1) && !all_keep)
         {
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].music_id = LESet_Nothing;
@@ -1380,7 +1380,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].music_id = LESet_ResetDefault;
         }
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 120 + 4, GFX.ECursor[1], all_set, 0, 0, 32, 32))
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 120 + 4, GFX.EIcons, all_set, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_MUSIC;
         all_keep = true;
         all_reset = true;
@@ -1399,7 +1399,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             else if(set_same != Events[m_current_event].section[s].background_id)
                 all_set = false;
         }
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 80 + 4, GFX.EIcons, all_keep, 0, 32*31, 32, 32) && !all_keep)
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 80 + 4, GFX.EIcons, all_keep, 0, 0, 1, 1) && !all_keep)
         {
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].background_id = LESet_Nothing;
@@ -1409,7 +1409,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].background_id = LESet_ResetDefault;
         }
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 80 + 4, GFX.ECursor[1], all_set, 0, 0, 32, 32))
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 80 + 4, GFX.EIcons, all_set, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_BACKGROUND;
         all_keep = true;
         all_reset = true;
@@ -1432,7 +1432,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
                 all_reset = false;
             }
         }
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, all_keep, 0, 32*31, 32, 32) && !all_keep)
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, all_keep, 0, 0, 1, 1) && !all_keep)
         {
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].position.X = -1;
@@ -1442,13 +1442,13 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             for(int s = 0; s <= maxSections; s++)
                 Events[m_current_event].section[s].position.X = -2;
         }
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.ECursor[1], all_set, 0, 0, 32, 32))
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, all_set, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_BOUNDS;
     }
     else
     {
         SuperPrintR(mode, "SECTION "+std::to_string(m_special_subpage), 3, 120, e_ScreenH - 174);
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 120 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].music_id == LESet_Nothing, 0, 32*31, 32, 32))
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 120 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].music_id == LESet_Nothing, 0, 0, 1, 1))
         {
             Events[m_current_event].section[m_special_subpage-1].music_id = LESet_Nothing;
         }
@@ -1456,9 +1456,9 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         {
             Events[m_current_event].section[m_special_subpage-1].music_id = LESet_ResetDefault;
         }
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 120 + 4, GFX.ECursor[1], Events[m_current_event].section[m_special_subpage-1].music_id >= 0, 0, 0, 32, 32))
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 120 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].music_id >= 0, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_MUSIC;
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 80 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].background_id == LESet_Nothing, 0, 32*31, 32, 32))
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 80 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].background_id == LESet_Nothing, 0, 0, 1, 1))
         {
             Events[m_current_event].section[m_special_subpage-1].background_id = LESet_Nothing;
         }
@@ -1466,9 +1466,9 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         {
             Events[m_current_event].section[m_special_subpage-1].background_id = LESet_ResetDefault;
         }
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 80 + 4, GFX.ECursor[1], Events[m_current_event].section[m_special_subpage-1].background_id >= 0, 0, 0, 32, 32))
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 80 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].background_id >= 0, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_BACKGROUND;
-        if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)Events[m_current_event].section[m_special_subpage-1].position.X == LESet_Nothing, 0, 32*31, 32, 32))
+        if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)Events[m_current_event].section[m_special_subpage-1].position.X == LESet_Nothing, 0, 0, 1, 1))
         {
             Events[m_current_event].section[m_special_subpage-1].position.X = LESet_Nothing;
         }
@@ -1476,7 +1476,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         {
             Events[m_current_event].section[m_special_subpage-1].position.X = LESet_ResetDefault;
         }
-        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.ECursor[1], (int)Events[m_current_event].section[m_special_subpage-1].position.X != LESet_Nothing && (int)Events[m_current_event].section[m_special_subpage-1].position.X != LESet_ResetDefault, 0, 0, 32, 32))
+        if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)Events[m_current_event].section[m_special_subpage-1].position.X != LESet_Nothing && (int)Events[m_current_event].section[m_special_subpage-1].position.X != LESet_ResetDefault, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_BOUNDS;
     }
 
@@ -1486,7 +1486,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         Events[m_current_event].AutoStart = !Events[m_current_event].AutoStart;
     // sound
     SuperPrintR(mode, "SOUND", 3, 254, 90);
-    if(UpdateButton(mode, 210 + 4, 80 + 4, GFX.ECursor[1], Events[m_current_event].Sound != 0, 0, 0, 32, 32))
+    if(UpdateButton(mode, 210 + 4, 80 + 4, GFX.EIcons, Events[m_current_event].Sound != 0, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_SOUND;
     // end game
     SuperPrintR(mode, "END GAME", 3, 54, 130);
@@ -1504,7 +1504,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         Events[m_current_event].Controls.Start ||
         Events[m_current_event].Controls.Up);
     SuperPrintR(mode, "CONTROLS", 3, 254, 130);
-    if(UpdateButton(mode, 210 + 4, 120 + 4, GFX.ECursor[1], controls_set, 0, 0, 32, 32))
+    if(UpdateButton(mode, 210 + 4, 120 + 4, GFX.EIcons, controls_set, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_CONTROLS;
     // message
     MessageText = Events[m_current_event].Text;
@@ -1514,7 +1514,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 
     // trigger event
     SuperPrintR(mode, "TRIGGER:", 3, 54, 220);
-    if(UpdateButton(mode, 10 + 4, 220 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+    if(UpdateButton(mode, 10 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_TRIGGER;
     if(Events[m_current_event].TriggerEvent != EVENT_NONE)
     {
@@ -1579,7 +1579,7 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         SetSection(curSection + 1);
 
     // music
-    if(UpdateButton(mode, 10 + 4, 280 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+    if(UpdateButton(mode, 10 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_SECTION_MUSIC;
     SuperPrintR(mode, "MUSIC: "+display_music_names[bgMusic[curSection]], 3, 54, 286);
     if(bgMusic[curSection] == 24)
@@ -1591,12 +1591,12 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
             SuperPrintR(mode, CustomMusic[curSection].substr(0,14), 3, 374, 282);
             SuperPrintR(mode, CustomMusic[curSection].substr(14,14), 3, 374, 300);
         }
-        if(UpdateButton(mode, 330 + 4, 280 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 330 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
             StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", {".mp3", ".ogg", ".spc", ".vgm"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
     }
 
     // background
-    if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+    if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_SECTION_BACKGROUND;
     SuperPrintR(mode, "BG: "+display_backgrounds_names[Background2[curSection]], 3, 54, 246);
 
@@ -1683,7 +1683,7 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
         SuperPrintR(mode, "NONE", 3, 54, 60);
 
     // auto start level
-    if(UpdateButton(mode, 10 + 4, 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+    if(UpdateButton(mode, 10 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
         StartFileBrowser(&StartLevel, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
     SuperPrintR(mode, "AUTO START LEVEL:", 3, 54, 102);
     if(!StartLevel.empty())
@@ -1937,7 +1937,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
 {
     // render shared GUI elements on right
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 1.0f, true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
 
     // back button
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
@@ -1962,7 +1962,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerActivate), 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 220 + 2);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.ECursor[1], m_special_subpage == 1, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
 
         SuperPrintR(mode, "DEATH:", 3, e_ScreenW - 200, 240 + 2);
@@ -1970,7 +1970,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerDeath), 3, e_ScreenW - 200, 260 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 260 + 2);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 240 + 4, GFX.ECursor[1], m_special_subpage == 2, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 240 + 4, GFX.EIcons, m_special_subpage == 2, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 2;
 
         SuperPrintR(mode, "TALK:", 3, e_ScreenW - 200, 280 + 2);
@@ -1978,7 +1978,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerTalk), 3, e_ScreenW - 200, 300 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 300 + 2);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 280 + 4, GFX.ECursor[1], m_special_subpage == 3, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 280 + 4, GFX.EIcons, m_special_subpage == 3, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 3;
 
         SuperPrintR(mode, "LAYER CLEAR:", 3, e_ScreenW - 200, 320 + 2);
@@ -1986,7 +1986,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerLast), 3, e_ScreenW - 200, 340 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 340 + 2);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 320 + 4, GFX.ECursor[1], m_special_subpage == 4, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 320 + 4, GFX.EIcons, m_special_subpage == 4, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 4;
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_BLOCKS)
@@ -1996,7 +1996,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 220 + 2);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.ECursor[1], m_special_subpage == 1, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
 
         SuperPrintR(mode, "DESTROY:", 3, e_ScreenW - 200, 240 + 2);
@@ -2004,7 +2004,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 200, 260 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 260 + 2);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 240 + 4, GFX.ECursor[1], m_special_subpage == 2, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 240 + 4, GFX.EIcons, m_special_subpage == 2, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 2;
 
         SuperPrintR(mode, "LAYER CLEAR:", 3, e_ScreenW - 200, 280 + 2);
@@ -2012,7 +2012,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 200, 300 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 300 + 2);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 280 + 4, GFX.ECursor[1], m_special_subpage == 3, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 280 + 4, GFX.EIcons, m_special_subpage == 3, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 3;
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
@@ -2024,7 +2024,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             SuperPrintR(mode, GetE(EditorCursor.Warp.eventEnter), 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 220 + 2);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.ECursor[1], m_special_subpage == 1, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
     }
     else
@@ -2175,21 +2175,21 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         SuperPrintR(mode, "DELETING LAYER " + Layer[m_special_subpage].Name, 3, 60, 40);
         SuperPrintR(mode, "PRESERVE LAYER CONTENTS?", 3, 10, 60);
         SuperPrintR(mode, "YES: MOVE TO DEFAULT LAYER", 3, 60, 110);
-        if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             DeleteLayer((layerindex_t)m_special_subpage, false);
             m_special_subpage = 0;
             m_special_page = SPECIAL_PAGE_LAYERS;
         }
         SuperPrintR(mode, "NO: *DELETE ALL CONTENTS*", 3, 60, 150);
-        if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             DeleteLayer((layerindex_t)m_special_subpage, true);
             m_special_subpage = 0;
             m_special_page = SPECIAL_PAGE_LAYERS;
         }
         SuperPrintR(mode, "CANCEL: DO NOT DELETE " + Layer[m_special_subpage].Name, 3, 60, 190);
-        if(UpdateButton(mode, 20 + 4, 180 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 180 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_subpage = 0;
             m_special_page = SPECIAL_PAGE_LAYERS;
@@ -2199,7 +2199,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
 
     // render shared GUI elements on right
     if(mode == CallMode::Render && m_special_page != SPECIAL_PAGE_LAYERS && m_special_page != SPECIAL_PAGE_EVENT_LAYERS)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 1.0f, true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
 
     if(m_special_page != SPECIAL_PAGE_LAYERS && UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
     {
@@ -2216,7 +2216,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             SuperPrintR(mode, "DEFAULT", 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, GetL(EditorCursor.Layer), 3, e_ScreenW - 200, 220 + 2);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.ECursor[1], m_special_subpage == 0, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 0, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 0;
 
         SuperPrintR(mode, "ATTACHED:", 3, e_ScreenW - 200, 260 + 2);
@@ -2224,7 +2224,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 280 + 2);
         else
             SuperPrintR(mode, GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 200, 280 + 2);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 260 + 4, GFX.ECursor[1], m_special_subpage == 1, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 260 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
     }
 
@@ -2385,7 +2385,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                 bool cur_show = show_it != Events[m_current_event].ShowLayer.end();
                 bool cur_togg = togg_it != Events[m_current_event].ToggleLayer.end();
                 // no change
-                if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, !cur_hide && !cur_show && !cur_togg, 0, 32*31, 32, 32))
+                if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, !cur_hide && !cur_show && !cur_togg, 0, 0, 1, 1))
                 {
                     if(cur_hide) Events[m_current_event].HideLayer.erase(hide_it);
                     if(cur_show) Events[m_current_event].ShowLayer.erase(show_it);
@@ -2472,7 +2472,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
 {
     // Block GUI
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 1.0f, true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
 
     // Page selector
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 40 + 4, GFXBlock[63], m_Block_page == 1, 0, 0, 32, 32))
@@ -2522,16 +2522,22 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     // Contents
     SuperPrintR(mode, "CONTENT:", 3, e_ScreenW - 240 + 10, 294);
     StdPicture* image;
+    int im_y = 0;
     if(EditorCursor.Block.Special > 0 && EditorCursor.Block.Special <= 1000)
     {
         image = &GFXNPC[10];
         SuperPrintR(mode, "x" + std::to_string(EditorCursor.Block.Special), 3, e_ScreenW-40, 294);
     }
     else if(EditorCursor.Block.Special != 0)
+    {
         image = &GFXNPC[EditorCursor.Block.Special - 1000];
+    }
     else
-        image = &GFX.ECursor[1];
-    if(UpdateButton(mode, e_ScreenW - 80 + 4, 280 + 4, *image, EditorCursor.Block.Special != 0, 0, 0, 32, 32))
+    {
+        image = &GFX.EIcons;
+        im_y = 32*Icon::subscreen;
+    }
+    if(UpdateButton(mode, e_ScreenW - 80 + 4, 280 + 4, *image, EditorCursor.Block.Special != 0, 0, im_y, 32, 32))
     {
         m_special_page = SPECIAL_PAGE_BLOCK_CONTENTS;
         FocusNPC();
@@ -2542,7 +2548,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     SuperPrintR(mode, "H:" + GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 240, 360);
     SuperPrintR(mode, "D:" + GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 240, 380);
     SuperPrintR(mode, "L:" + GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 240, 400);
-    if(UpdateButton(mode, e_ScreenW - 80 + 4, 320 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+    if(UpdateButton(mode, e_ScreenW - 80 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
 
     // Layers
@@ -2551,7 +2557,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
         SuperPrintR(mode, "DEFAULT", 3, e_ScreenW - 240, 460);
     else
         SuperPrintR(mode, GetL(EditorCursor.Block.Layer), 3, e_ScreenW - 240, 460);
-    if(UpdateButton(mode, e_ScreenW - 80 + 4, 420 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+    if(UpdateButton(mode, e_ScreenW - 80 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 
     // SMB 1: 63
@@ -2787,7 +2793,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
 {
     // Block GUI
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 1.0f, true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
 
     // Page selector
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 40 + 4, GFXBlock[63], m_BGO_page == 1, 0, 0, 32, 32))
@@ -2807,7 +2813,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
         SuperPrintR(mode, "DEFAULT", 3, e_ScreenW - 240, 440);
     else
         SuperPrintR(mode, GetL(EditorCursor.Background.Layer), 3, e_ScreenW - 240, 440);
-    if(UpdateButton(mode, e_ScreenW - 80 + 4, 400 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+    if(UpdateButton(mode, e_ScreenW - 80 + 4, 400 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 
     // SMB 1: 63
@@ -2978,7 +2984,7 @@ void EditorScreen::UpdateWaterScreen(CallMode mode)
         SuperPrintR(mode, "DEFAULT", 3, 206, 260);
     else
         SuperPrintR(mode, GetL(EditorCursor.Layer), 3, 206, 260);
-    if(UpdateButton(mode, 380 + 4, 220 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+    if(UpdateButton(mode, 380 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 }
 
@@ -3003,7 +3009,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
         SuperPrintR(mode, "PLACING:", 3, 40, 82);
 
         SuperPrintR(mode, "IN    DIR.", 3, 28, 110);
-        if(UpdateButton(mode, 80 + 4, 100 + 4, GFX.ECursor[1], EditorCursor.SubMode == 1, 0, 0, 32, 32))
+        if(UpdateButton(mode, 80 + 4, 100 + 4, GFX.EIcons, EditorCursor.SubMode == 1, 0, 32*Icon::action, 32, 32))
             EditorCursor.SubMode = 1;
 
         if(UpdateButton(mode, 220 + 4, 100 + 4, GFX.EIcons, EditorCursor.Warp.Direction == 1, 0, 32*Icon::up, 32, 32))
@@ -3022,7 +3028,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
     if(EditorCursor.Warp.level == STRINGINDEX_NONE && !EditorCursor.Warp.MapWarp)
     {
         SuperPrintR(mode, "OUT    DIR.", 3, 10, 150);
-        if(UpdateButton(mode, 80 + 4, 140 + 4, GFX.ECursor[1], EditorCursor.SubMode == 2, 0, 0, 32, 32))
+        if(UpdateButton(mode, 80 + 4, 140 + 4, GFX.EIcons, EditorCursor.SubMode == 2, 0, 32*Icon::action, 32, 32))
             EditorCursor.SubMode = 2;
 
         if(UpdateButton(mode, 220 + 4, 140 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 1, 0, 32*Icon::down, 32, 32))
@@ -3080,12 +3086,12 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
     if(FileFormat == FileFormats::LVL_PGEX)
     {
         if(mode == CallMode::Render)
-            XRender::renderRect(e_ScreenW - 160, 40, 240, e_ScreenH - 120, 0.7f, 0.7f, 0.9f, 1.0f, true);
+            XRender::renderRect(e_ScreenW - 160, 40, 240, e_ScreenH - 120, 0.7f, 0.7f, 0.9f, 0.75f, true);
 
         // eventEnter
         SuperPrintR(mode, "ENTER\nEVENT:", 3, e_ScreenW - 160 + 4, 84);
         SuperPrintR(mode, EditorCursor.Warp.eventEnter != EVENT_NONE ? GetE(EditorCursor.Warp.eventEnter) : "NONE", 3, e_ScreenW - 160 + 4, 120);
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 80 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
 
         // transition effect
@@ -3165,7 +3171,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             SuperPrintR(mode, "TARGET: " + GetS(EditorCursor.Warp.level).substr(0,10), 3, 10, 420);
             SuperPrintR(mode, GetS(EditorCursor.Warp.level).substr(10), 3, 28, 440);
         }
-        if(UpdateButton(mode, 330 + 4, 420 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 330 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
             StartFileBrowser(PtrS(EditorCursor.Warp.level), FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
 
         // display this in a different way if modern options are enabled
@@ -3262,7 +3268,7 @@ void EditorScreen::UpdateTileScreen(CallMode mode)
 {
     // Block GUI
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 120, 40, 120, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 1.0f, true);
+        XRender::renderRect(e_ScreenW - 120, 40, 120, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
 
     // Page selector
     if(UpdateButton(mode, e_ScreenW - 120 + 4, 40 + 4, GFXTileBMP[11], m_tile_page == 1, 0, 0, 32, 32))
@@ -3403,7 +3409,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
 {
     // World Level GUI
     if(mode == CallMode::Render)
-        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 1.0f, true);
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
 
     SuperPrintR(mode, "LEVEL GRAPHIC", 3, 10, 40);
     static const int levels[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32};
@@ -3496,7 +3502,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         SuperPrintR(mode, EditorCursor.WorldLevel.FileName, 3, 10 + 44, e_ScreenH - 180 + 20);
     else
         SuperPrintR(mode, "<NONE>", 3, 10 + 44, e_ScreenH - 180 + 20);
-    if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+    if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
         StartFileBrowser(&EditorCursor.WorldLevel.FileName, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
 
     if(!EditorCursor.WorldLevel.FileName.empty())
@@ -3515,7 +3521,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         // exits
         SuperPrintR(mode, "PATH UNLOCKS", 3, 10 + 44, e_ScreenH - 180 + 80 + 2);
 
-        if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 100 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_LEVEL_EXIT;
             m_special_subpage = 1;
@@ -3523,7 +3529,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         SuperPrintR(mode, "UP", 3, 10 + 44, e_ScreenH - 180 + 102);
         SuperPrintR(mode, list_level_exit_names[EditorCursor.WorldLevel.LevelExit[1]+1], 3, 10 + 44, e_ScreenH - 180 + 120);
 
-        if(UpdateButton(mode, (e_ScreenW - 240)/2 + 10 + 4, e_ScreenH - 180 + 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, (e_ScreenW - 240)/2 + 10 + 4, e_ScreenH - 180 + 100 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_LEVEL_EXIT;
             m_special_subpage = 3;
@@ -3531,7 +3537,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         SuperPrintR(mode, "DOWN", 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 102);
         SuperPrintR(mode, list_level_exit_names[EditorCursor.WorldLevel.LevelExit[3]+1], 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 120);
 
-        if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 140 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 140 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_LEVEL_EXIT;
             m_special_subpage = 2;
@@ -3539,7 +3545,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         SuperPrintR(mode, "LEFT", 3, 10 + 44, e_ScreenH - 180 + 142);
         SuperPrintR(mode, list_level_exit_names[EditorCursor.WorldLevel.LevelExit[2]+1], 3, 10 + 44, e_ScreenH - 180 + 160);
 
-        if(UpdateButton(mode, (e_ScreenW - 240)/2 + 10 + 4, e_ScreenH - 180 + 140 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, (e_ScreenW - 240)/2 + 10 + 4, e_ScreenH - 180 + 140 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_LEVEL_EXIT;
             m_special_subpage = 4;
@@ -3637,7 +3643,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         if(can_save)
         {
             SuperPrintR(mode, "YES: SAVE THEN " + action, 3, 60, 110);
-            if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+            if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
             {
                 if(!WorldEditor)
                     SaveLevel(FullFileName, FileFormat);
@@ -3651,13 +3657,13 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             SuperPrintR(mode, "NO: " + action + " WITHOUT SAVING", 3, 60, 150);
         else
             SuperPrintR(mode, action + " WITHOUT SAVING", 3, 60, 150);
-        if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             confirmed = true;
         }
 
         SuperPrintR(mode, "CANCEL: DO NOT " + action, 3, 60, 190);
-        if(UpdateButton(mode, 20 + 4, 180 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 180 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_FILE;
             m_special_subpage = 0;
@@ -3745,7 +3751,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         }
 
         SuperPrintR(mode, "PROCEED WITH CONVERSION", 3, 60, 390);
-        if(UpdateButton(mode, 20 + 4, 380 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             if(WorldEditor)
             {
@@ -3766,7 +3772,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         }
 
         SuperPrintR(mode, "CANCEL CONVERSION", 3, 60, 430);
-        if(UpdateButton(mode, 20 + 4, 420 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 20 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_FILE;
             m_special_subpage = 0;
@@ -4038,13 +4044,13 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
         SuperPrintR(mode, "CONFIRM", 3, 60, 40);
         SuperPrintR(mode, "OVERWRITE " + m_cur_file + "?", 3, 10, 60);
         SuperPrintR(mode, "YES", 3, 60, 110);
-        if(UpdateButton(mode, 10 + 4, 100 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 10 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             FileBrowserSuccess();
             return;
         }
         SuperPrintR(mode, "NO", 3, 60, 150);
-        if(UpdateButton(mode, 10 + 4, 140 + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+        if(UpdateButton(mode, 10 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_BROWSER;
             m_cur_file.clear();
@@ -4099,7 +4105,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
         if(!IGNORE_DIRS && l == 0)
         {
             SuperPrintR(mode, "..", 3, x + 44, y + 12);
-            if(UpdateButton(mode, x + 4, y + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+            if(UpdateButton(mode, x + 4, y + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
             {
                 GoToSuper();
                 m_special_subpage = 0;
@@ -4108,7 +4114,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
         else if((m_browser_mode == BROWSER_MODE_SAVE || m_browser_mode == BROWSER_MODE_SAVE_NEW) && l == dir_length - 1)
         {
             SuperPrintR(mode, "<NEW FOLDER>", 3, x + 44, y + 12);
-            if(UpdateButton(mode, x + 4, y + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+            if(UpdateButton(mode, x + 4, y + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
                 std::string folder_name = TextEntryScreen::Run("New folder name", "");
                 if(!folder_name.empty() && !m_dirman.exists(folder_name))
@@ -4128,7 +4134,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
                 SuperPrintR(mode, m_cur_path_dirs[l].substr(0, 14), 3, x + 44, y + 2);
                 SuperPrintR(mode, m_cur_path_dirs[l].substr(14, 14), 3, x + 44, y + 20);
             }
-            if(UpdateButton(mode, x + 4, y + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+            if(UpdateButton(mode, x + 4, y + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
             {
                 m_cur_path += m_cur_path_dirs[l] + "/";
                 m_path_synced = false;
@@ -4138,7 +4144,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
         else if((m_browser_mode == BROWSER_MODE_SAVE || m_browser_mode == BROWSER_MODE_SAVE_NEW) && l == dir_length)
         {
             SuperPrintR(mode, "<NEW FILE>", 3, x + 44, y + 12);
-            if(UpdateButton(mode, x + 4, y + 4, GFX.ECursor[1], false, 0, 0, 32, 32))
+            if(UpdateButton(mode, x + 4, y + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
                 std::string file_name = TextEntryScreen::Run("Save as", "");
                 if(!file_name.empty())
@@ -4506,7 +4512,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         XRender::setViewport(ScreenW/2-e_ScreenW/2, 0, e_ScreenW, e_ScreenH);
 #endif
     if(mode == CallMode::Render)
-        XRender::renderRect(0, 0, e_ScreenW, e_ScreenH, 0.4f, 0.4f, 0.8f, 1.0f, true);
+        XRender::renderRect(0, 0, e_ScreenW, e_ScreenH, 0.4f, 0.4f, 0.8f, 0.75f, true);
 
     UpdateSelectorBar(mode, false);
 

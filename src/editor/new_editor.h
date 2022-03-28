@@ -38,7 +38,10 @@ namespace Icon
         page,
         music,
         move,
-        thextech
+        thextech,
+        subscreen,
+        select,
+        action
     };
 }
 
