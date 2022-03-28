@@ -600,7 +600,9 @@ static void loadCustomUIAssets()
              "YoshiWings",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.YoshiWings, false, true);
 
-    // FIXME: @ds-sloth, Please add an Editor specific textures here if needed
+    loadCGFX(uiRoot + "EditorIcons.png",
+             "EditorIcons",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.EIcons, false, true);
 }
 
 void LoadCustomGFX()
