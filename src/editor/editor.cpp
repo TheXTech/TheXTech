@@ -29,6 +29,7 @@
 #include <fmt_format_ne.h>
 
 #include "globals.h"
+#include "config.h"
 #include "editor.h"
 #include "graphics.h"
 #include "sound.h"
@@ -43,6 +44,7 @@
 #include "main/level_file.h"
 #include "main/cheat_code.h"
 #include "main/trees.h"
+#include "main/game_globals.h"
 #include "load_gfx.h"
 #include "core/window.h"
 #include "core/events.h"
@@ -2050,6 +2052,13 @@ void GetEditorControls()
         Backup_FullFileName = FullFileName;
         FullFileName = FullFileName + "tst";
         SaveLevel(FullFileName, FileFormats::LVL_PGEX);
+
+        if(g_config.EnableInterLevelFade)
+            g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
+        else
+            g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
+        editorWaitForFade();
+
         HasCursor = false;
         zTestLevel();
     }

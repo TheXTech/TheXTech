@@ -92,6 +92,28 @@ void levelWaitForFade()
     }
 }
 
+void editorWaitForFade()
+{
+    while(!g_levelScreenFader.isComplete() && GameIsActive)
+    {
+        XEvents::doEvents();
+
+        if(canProceedFrame())
+        {
+            computeFrameTime1();
+            if(WorldEditor)
+                UpdateGraphics2();
+            else
+                UpdateGraphics();
+            UpdateSound();
+            XEvents::doEvents();
+            computeFrameTime2();
+            updateScreenFaders();
+        }
+        PGE_Delay(1);
+    }
+}
+
 
 void CheckActive();//in game_main.cpp
 

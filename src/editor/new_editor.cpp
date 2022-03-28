@@ -13,6 +13,8 @@
 #include "../main/level_file.h"
 #include "../main/world_file.h"
 #include "../game_main.h"
+#include "main/game_globals.h"
+#include "main/world_globals.h"
 
 #include "config.h"
 #include "npc_id.h"
@@ -3715,6 +3717,18 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             }
             else if(m_special_subpage == 4) // exit
             {
+                if(g_config.EnableInterLevelFade)
+                {
+                    g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
+                    g_worldScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
+                }
+                else
+                {
+                    g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
+                    g_worldScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
+                }
+                editorWaitForFade();
+
                 ClearLevel();
                 ClearWorld();
                 GameMenu = true;
@@ -4428,6 +4442,13 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         // how does this interact with cross-level warps?
         FullFileName = FullFileName + "tst";
         SaveLevel(FullFileName, FileFormat);
+
+        if(g_config.EnableInterLevelFade)
+            g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
+        else
+            g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
+        editorWaitForFade();
+
         HasCursor = false;
         zTestLevel();
     }

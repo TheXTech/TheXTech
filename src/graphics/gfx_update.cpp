@@ -2265,10 +2265,11 @@ void UpdateGraphics(bool skipRepaint)
 //    Next Z
     } // For(Z, 2, numScreens)
 
-    g_levelScreenFader.draw();
-
     XRender::offsetViewportIgnore(true);
     XRender::setViewport(0, 0, ScreenW, ScreenH);
+
+    g_levelScreenFader.draw();
+
     speedRun_renderTimer();
 
     // render special screens
