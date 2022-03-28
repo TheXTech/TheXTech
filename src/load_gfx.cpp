@@ -83,6 +83,17 @@ static std::string getGfxDir()
     return AppPath + "graphics/";
 }
 
+/*!
+ * \brief Load the custom GFX sprite
+ * \param origPath Path to original texture
+ * \param fName file name for custommization target
+ * \param width Reference to width field (optional)
+ * \param height Reference to height field (optional)
+ * \param isCustom Reference to the "is custom" boolean
+ * \param texture Target texture to load
+ * \param world Is a world map
+ * \param skipMask Don't even try to load a masked GIF sprite
+ */
 static void loadCGFX(const std::string &origPath,
                      const std::string &fName,
                      int *width, int *height, bool& isCustom, StdPicture &texture,
@@ -479,6 +490,119 @@ void UnloadGFX()
     // Do nothing
 }
 
+static void loadCustomUIAssets()
+{
+    std::string uiRoot = AppPath + "graphics/ui/";
+    int ci = 0;
+
+     // these should all have been set previously, but will do no harm
+    g_dirEpisode.setCurDir(FileNamePath);
+    g_dirCustom.setCurDir(FileNamePath + FileName);
+    s_dirFallback.setCurDir(getGfxDir() + "fallback");
+
+    loadCGFX(uiRoot + "BMVs.png",
+             "BMVs",
+             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.BMVs, false, true);
+
+    loadCGFX(uiRoot + "BMWin.png",
+             "BMWin",
+             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.BMWin, false, true);
+
+    For(i, 1, 3)
+        loadCGFX(uiRoot + fmt::format_ne("Boot{0}.png", i),
+                 fmt::format_ne("Boot{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Boot[i], false, true);
+
+    For(i, 1, 5)
+        loadCGFX(uiRoot + fmt::format_ne("CharacterName{0}.png", i),
+                 fmt::format_ne("CharacterName{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.CharacterName[i], false, true);
+
+    loadCGFX(uiRoot + "Chat.png",
+             "Chat",
+             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Chat, false, true);
+
+    For(i, 0, 2)
+        loadCGFX(uiRoot + fmt::format_ne("Container{0}.png", i),
+                 fmt::format_ne("Container{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Container[i], false, true);
+
+    For(i, 1, 3)
+        loadCGFX(uiRoot + fmt::format_ne("ECursor{0}.png", i),
+                 fmt::format_ne("ECursor{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.ECursor[i], false, true);
+
+    For(i, 0, 9)
+        loadCGFX(uiRoot + fmt::format_ne("Font1_{0}.png", i),
+                 fmt::format_ne("Font1_{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Font1[i], false, true);
+
+    For(i, 1, 3)
+        loadCGFX(uiRoot + fmt::format_ne("Font2_{0}.png", i),
+                 fmt::format_ne("Font2_{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Font2[i], false, true);
+
+    loadCGFX(uiRoot + "Font2S.png",
+             "Font2S",
+             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Font2S, false, true);
+
+    For(i, 1, 2)
+        loadCGFX(uiRoot + fmt::format_ne("Heart{0}.png", i),
+                 fmt::format_ne("Heart{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Heart[i], false, true);
+
+    For(i, 0, 8)
+        loadCGFX(uiRoot + fmt::format_ne("Interface{0}.png", i),
+                 fmt::format_ne("Interface{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Interface[i], false, true);
+
+    loadCGFX(uiRoot + "LoadCoin.png",
+             "LoadCoin",
+             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.LoadCoin, false, true);
+
+    loadCGFX(uiRoot + "Loader.png",
+             "Loader",
+             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Loader, false, true);
+
+    For(i, 0, 3)
+        loadCGFX(uiRoot + fmt::format_ne("MCursor{0}.png", i),
+                 fmt::format_ne("MCursor{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.MCursor[i], false, true);
+
+    For(i, 1, 4)
+        loadCGFX(uiRoot + fmt::format_ne("MenuGFX{0}.png", i),
+                 fmt::format_ne("MenuGFX{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.MenuGFX[i], false, true);
+
+    loadCGFX(uiRoot + "Mount.png",
+             "Mount",
+             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Mount[2], false, true);
+
+    For(i, 0, 7)
+        loadCGFX(uiRoot + fmt::format_ne("nCursor{0}.png", i),
+                 fmt::format_ne("nCursor{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.nCursor[i], false, true);
+
+    loadCGFX(uiRoot + "TextBox.png",
+             "TextBox",
+             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.TextBox, false, true);
+
+    For(i, 1, 2)
+        loadCGFX(uiRoot + fmt::format_ne("Tongue{0}.png", i),
+                 fmt::format_ne("Tongue{0}", i),
+                 nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Tongue[i], false, true);
+
+    loadCGFX(uiRoot + "Warp.png",
+             "Warp",
+             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.Warp, false, true);
+
+    loadCGFX(uiRoot + "YoshiWings.png",
+             "YoshiWings",
+             nullptr, nullptr, GFX.m_isCustom[ci++], GFX.YoshiWings, false, true);
+
+    // FIXME: @ds-sloth, Please add an Editor specific textures here if needed
+}
+
 void LoadCustomGFX()
 {
     std::string GfxRoot = AppPath + "graphics/";
@@ -554,6 +678,8 @@ void LoadCustomGFX()
                      (*GFXCharacterCustom[c])[A], (*GFXCharacterBMP[c])[A]);
         }
     }
+
+    loadCustomUIAssets();
 }
 
 

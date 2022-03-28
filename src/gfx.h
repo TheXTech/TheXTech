@@ -25,6 +25,7 @@
 #include "range_arr.hpp"
 #include "std_picture.h"
 #include <vector>
+#include <deque>
 #include <string>
 
 class GFX_t
@@ -59,6 +60,9 @@ public:
     RangeArr<StdPicture, 1, 2> Tongue;
     StdPicture Warp;
     StdPicture YoshiWings;
+
+    //! Holder of "is custom" flag
+    std::deque<bool> m_isCustom;
 };
 
 //! Container of "hardcoded" (no more) graphics

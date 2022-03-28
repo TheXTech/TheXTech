@@ -41,6 +41,7 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
     }
 
     m_loadedImages.push_back(&img);
+    m_isCustom.push_back(false);
 }
 
 GFX_t::GFX_t() noexcept
@@ -121,4 +122,5 @@ void GFX_t::unLoad()
     for(StdPicture *p : m_loadedImages)
         XRender::deleteTexture(*p);
     m_loadedImages.clear();
+    m_isCustom.clear();
 }
