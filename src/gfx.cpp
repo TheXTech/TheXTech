@@ -121,6 +121,9 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
+    SDL_assert_release(m_loadedImages.size() <= m_isCustomVolume);
+    SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
+
     return true;
 }
 
@@ -129,4 +132,11 @@ void GFX_t::unLoad()
     for(StdPicture *p : m_loadedImages)
         XRender::deleteTexture(*p);
     m_loadedImages.clear();
+    SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
+}
+
+bool& GFX_t::isCustom(size_t i)
+{
+    SDL_assert_release(i < m_isCustomVolume);
+    return m_isCustom[i];
 }

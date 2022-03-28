@@ -27,10 +27,26 @@
 #include <vector>
 #include <string>
 
+/*!
+ * \brief Holder of commonly-used textures such as interface, font, etc.
+ */
 class GFX_t
 {
+    //! Holder of loaded textures for easier clean-up
     std::vector<StdPicture*> m_loadedImages;
+    //! Capacity of the m_isCustom array
+    static constexpr size_t m_isCustomVolume = 67;
+    //! Holder of "is custom" flag
+    bool m_isCustom[m_isCustomVolume];
+
+    /*!
+     * \brief Internal function of the texture loading
+     * \param img Target texture
+     * \param path Path to the texture file
+     */
     void loadImage(StdPicture &img, const std::string &path);
+
+    //! Counter of loading errors
     int m_loadErrors = 0;
 public:
     GFX_t() noexcept;
@@ -60,6 +76,8 @@ public:
     StdPicture Warp;
     StdPicture YoshiWings;
     StdPicture EIcons;
+
+    bool &isCustom(size_t i);
 };
 
 //! Container of "hardcoded" (no more) graphics
