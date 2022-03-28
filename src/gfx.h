@@ -34,8 +34,10 @@ class GFX_t
 {
     //! Holder of loaded textures for easier clean-up
     std::vector<StdPicture*> m_loadedImages;
+    //! Capacity of the m_isCustom array
+    static constexpr size_t m_isCustomVolume = 66;
     //! Holder of "is custom" flag
-    bool *m_isCustom = nullptr;
+    bool m_isCustom[m_isCustomVolume];
 
     /*!
      * \brief Internal function of the texture loading
