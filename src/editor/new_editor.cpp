@@ -43,6 +43,18 @@ constexpr int e_ScreenH = 480;
 
 int e_CursorX, e_CursorY;
 
+void DisableCursorNew()
+{
+    EditorCursor.Location.X = vScreenX[1] - 800;
+    EditorCursor.X = float(vScreenX[1] - 800);
+    EditorCursor.Location.Y = vScreenY[1] - 600;
+    EditorCursor.Y = float(vScreenY[1] - 600);
+    HasCursor = false;
+
+    e_CursorX = -50;
+    e_CursorY = -50;
+}
+
 const char* e_tooltip = nullptr;
 
 void EditorScreen::EnsureWorld()
@@ -75,6 +87,7 @@ void EditorScreen::ResetCursor()
     EditorCursor.Warp.Direction2 = 3;
     EditorCursor.Warp.MapX = -1;
     EditorCursor.Warp.MapY = -1;
+    m_Warp_page = WARP_PAGE_MAIN;
 
     EditorCursor.Tile = Tile_t();
     EditorCursor.Tile.Type = 1;
@@ -590,7 +603,11 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             MessageText = GetS(EditorCursor.NPC.Text);
             SuperPrintR(mode, "TEXT", 3, e_ScreenW - 200, 160);
             if(UpdateButton(mode, e_ScreenW - 160 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.Text != STRINGINDEX_NONE, 0, 32*Icon::pencil, 32, 32))
+            {
+                DisableCursorNew();
                 SetS(EditorCursor.NPC.Text, TextEntryScreen::Run("NPC text", GetS(EditorCursor.NPC.Text)));
+                MouseMove(SharedCursor.X, SharedCursor.Y);
+            }
         }
 
         // Generator
@@ -1091,9 +1108,11 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
             // rename
             if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
+                DisableCursorNew();
                 std::string new_name = TextEntryScreen::Run("New event name", Events[e].Name);
                 if(!new_name.empty())
                     RenameEvent((eventindex_t)e, new_name);
+                MouseMove(SharedCursor.X, SharedCursor.Y);
             }
 
             // shift up
@@ -1119,7 +1138,9 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
             // rename only
             if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
+                DisableCursorNew();
                 std::string new_name = TextEntryScreen::Run("New event name", "");
+                MouseMove(SharedCursor.X, SharedCursor.Y);
                 if(!new_name.empty() && FindEvent(new_name) == EVENT_NONE)
                 {
                     InitializeEvent(Events[e]);
@@ -1512,7 +1533,11 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     MessageText = Events[m_current_event].Text;
     SuperPrintR(mode, "TEXT", 3, 54, 170);
     if(UpdateButton(mode, 10 + 4, 160 + 4, GFX.EIcons, !Events[m_current_event].Text, 0, 32*Icon::pencil, 32, 32))
+    {
+        DisableCursorNew();
         SetS(Events[m_current_event].Text, TextEntryScreen::Run("Event text", GetS(Events[m_current_event].Text)));
+        MouseMove(SharedCursor.X, SharedCursor.Y);
+    }
 
     // trigger event
     SuperPrintR(mode, "TRIGGER:", 3, 54, 220);
@@ -1560,7 +1585,11 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
 {
     // level settings
     if(UpdateButton(mode, 10 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
+    {
+        DisableCursorNew();
         LevelName = TextEntryScreen::Run("Level name", LevelName);
+        MouseMove(SharedCursor.X, SharedCursor.Y);
+    }
     SuperPrintR(mode, "LEVEL NAME:", 3, 54, 42);
     if(!LevelName.empty())
         SuperPrintR(mode, LevelName, 3, 54, 60);
@@ -1677,7 +1706,11 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
 {
     // world name
     if(UpdateButton(mode, 10 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
+    {
+        DisableCursorNew();
         WorldName = TextEntryScreen::Run("World name", WorldName);
+        MouseMove(SharedCursor.X, SharedCursor.Y);
+    }
     SuperPrintR(mode, "WORLD NAME:", 3, 54, 42);
     if(!WorldName.empty())
         SuperPrintR(mode, WorldName, 3, 54, 60);
@@ -1729,7 +1762,11 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     if(m_special_subpage > 0 && UpdateButton(mode, 10 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_special_subpage --;
     if(UpdateButton(mode, 50 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
+    {
+        DisableCursorNew();
         WorldCredits[m_special_subpage+1] = TextEntryScreen::Run("Credits", WorldCredits[m_special_subpage+1]);
+        MouseMove(SharedCursor.X, SharedCursor.Y);
+    }
     if(m_special_subpage < 4 && UpdateButton(mode, 90 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_special_subpage ++;
     SuperPrintR(mode, "WORLD CREDITS LINE "+std::to_string(m_special_subpage+1)+":", 3, 144, 342);
@@ -1744,6 +1781,7 @@ static const std::vector<int> list_music_indices = {0, 24, -1, 9, 7, 42, 46, -1,
 static const std::vector<std::string> list_world_music_names = {"None", "SMB3", "SMB3 World 1", "SMB3 World 2", "SMB3 World 3", "SMB3 World 4", "SMB3 World 5", "SMB3 World 6", "SMB3 World 7", "SMB3 World 8", "SMW", "SMW Theme", "SMW Cave", "SMW Island", "SMW Forest", "SMW Bowser", "SMW Star Road", "SMW Special", "NSMB", "NSMB Theme"};
 static const std::vector<int> list_world_music_indices = {0, -1, 1, 6, 8, 2, 11, 10, 3, 9, -1, 4, 16, 15, 7, 13, 14, 12, -1, 5};
 static const std::vector<std::string> list_level_exit_names = {"ANY", "NONE", "SMB3 END", "SMB3 ORB", "LEAVE", "KEYHOLE", "SMB2 ORB", "WARP", "STAR", "SMW END"};
+static const std::vector<std::string> list_warp_transit_names = {"NONE", "SCROLL", "FADE", "CIRCLE", "FLIP (H)", "FLIP (V)"};
 
 void EditorScreen::UpdateSelectListScreen(CallMode mode)
 {
@@ -1803,7 +1841,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     }
     else if(m_special_page == SPECIAL_PAGE_SECTION_BACKGROUND)
     {
-        SuperPrintR(mode, "SECTION " + std::to_string(curSection + 1) + " BG", 3, 10, 40);
+        SuperPrintR(mode, "SECTION " + std::to_string(curSection + 1) + " BG", 3, 10, 50);
         target = &Background2[curSection];
         current_page = &m_background_page;
         source = &list_backgrounds_names;
@@ -1811,7 +1849,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     }
     else if(m_special_page == SPECIAL_PAGE_SECTION_MUSIC)
     {
-        SuperPrintR(mode, "SECTION " + std::to_string(curSection + 1) + " MUSIC", 3, 10, 40);
+        SuperPrintR(mode, "SECTION " + std::to_string(curSection + 1) + " MUSIC", 3, 10, 50);
         target = &bgMusic[curSection];
         current_page = &m_music_page;
         source = &list_music_names;
@@ -1820,13 +1858,13 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     else if(m_special_page == SPECIAL_PAGE_LEVEL_EXIT)
     {
         if(m_special_subpage == 1)
-            SuperPrintR(mode, "UPPER PATH UNLOCK", 3, 10, 40);
+            SuperPrintR(mode, "UPPER PATH UNLOCK", 3, 10, 50);
         else if(m_special_subpage == 2)
-            SuperPrintR(mode, "LEFT PATH UNLOCK", 3, 10, 40);
+            SuperPrintR(mode,  "LEFT PATH UNLOCK", 3, 10, 50);
         else if(m_special_subpage == 3)
-            SuperPrintR(mode, "LOWER PATH UNLOCK", 3, 10, 40);
+            SuperPrintR(mode, "LOWER PATH UNLOCK", 3, 10, 50);
         else if(m_special_subpage == 4)
-            SuperPrintR(mode, "RIGHT PATH UNLOCK", 3, 10, 40);
+            SuperPrintR(mode, "RIGHT PATH UNLOCK", 3, 10, 50);
         else
             return;
         target = &EditorCursor.WorldLevel.LevelExit[m_special_subpage];
@@ -1834,9 +1872,18 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         source = &list_level_exit_names;
         source_indices = nullptr;
     }
+    else if(m_special_page == SPECIAL_PAGE_WARP_TRANSITION)
+    {
+        SuperPrintR(mode, "WARP TRANSITION EFFECT", 3, 10, 50);
+
+        target = &EditorCursor.Warp.transitEffect;
+        current_page = nullptr;
+        source = &list_warp_transit_names;
+        source_indices = nullptr;
+    }
     else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC)
     {
-        SuperPrintR(mode, "WORLD MUSIC", 3, 10, 40);
+        SuperPrintR(mode, "WORLD MUSIC", 3, 10, 50);
         target = &EditorCursor.WorldMusic.Type;
         current_page = nullptr;
         source = &list_world_music_names;
@@ -1851,7 +1898,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     {
         int page_max = (source->size() - 1) / 20;
         if(!(page_max == 0 && *current_page == 0))
-        SuperPrintR(mode, "PAGE " + std::to_string(*current_page+1) + " OF " + std::to_string(page_max+1), 3, e_ScreenW - 320, 40);
+        SuperPrintR(mode, "PAGE " + std::to_string(*current_page+1) + " OF " + std::to_string(page_max+1), 3, e_ScreenW - 320, 50);
         if(*current_page > 0 && UpdateButton(mode, e_ScreenW - 120 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             *current_page = *current_page - 1;
         if(*current_page < page_max && UpdateButton(mode, e_ScreenW - 80 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -1911,25 +1958,35 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
                 return;
             }
 
-            if(UpdateButton(mode, x + 4, y + 4, GFX.ECursor[2], sel, 0, 0, 32, 32) && !sel)
+            if(UpdateButton(mode, x + 4, y + 4, GFX.ECursor[2], sel, 0, 0, 32, 32))
             {
-                if(target != nullptr)
-                    *target = index;
-                else if(m_special_page == SPECIAL_PAGE_EVENT_BACKGROUND)
+                if(!sel)
                 {
-                    for(int s = 0; s <= maxSections; s++)
-                        Events[m_current_event].section[s].background_id = index;
+                    if(target != nullptr)
+                        *target = index;
+                    else if(m_special_page == SPECIAL_PAGE_EVENT_BACKGROUND)
+                    {
+                        for(int s = 0; s <= maxSections; s++)
+                            Events[m_current_event].section[s].background_id = index;
+                    }
+                    else if(m_special_page == SPECIAL_PAGE_EVENT_MUSIC)
+                    {
+                        for(int s = 0; s <= maxSections; s++)
+                            Events[m_current_event].section[s].music_id = index;
+                    }
+                    // and do whatever necessary to preview it.
+                    if(m_special_page == SPECIAL_PAGE_EVENT_SOUND && index != 0)
+                        PlaySound(index);
+                    else if(m_special_page == SPECIAL_PAGE_SECTION_MUSIC)
+                        StartMusic(curSection);
                 }
-                else if(m_special_page == SPECIAL_PAGE_EVENT_MUSIC)
+                else
                 {
-                    for(int s = 0; s <= maxSections; s++)
-                        Events[m_current_event].section[s].music_id = index;
+                    if(m_special_page == SPECIAL_PAGE_EVENT_SOUND || m_special_page == SPECIAL_PAGE_EVENT_MUSIC || m_special_page == SPECIAL_PAGE_EVENT_BACKGROUND)
+                        m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
+                    else
+                        m_special_page = SPECIAL_PAGE_NONE;
                 }
-                // and do whatever necessary to preview it.
-                if(m_special_page == SPECIAL_PAGE_EVENT_SOUND && index != 0)
-                    PlaySound(index);
-                else if(m_special_page == SPECIAL_PAGE_SECTION_MUSIC)
-                    StartMusic(curSection);
             }
         }
     }
@@ -1949,6 +2006,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         else
             m_special_page = SPECIAL_PAGE_NONE;
         m_special_subpage = 0;
+        return;
     }
     if(m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
     {
@@ -2022,7 +2080,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         m_special_subpage = 1;
 
         SuperPrintR(mode, "ENTER:", 3, e_ScreenW - 200, 200 + 2);
-        if(EditorCursor.Block.TriggerHit != EVENT_NONE)
+        if(EditorCursor.Warp.eventEnter != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Warp.eventEnter), 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 220 + 2);
@@ -2199,6 +2257,10 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         return;
     }
 
+    // fix just in case wrong subpage is set for obj layer selection
+    if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && EditorCursor.Mode != OptCursor_t::LVL_NPCS && m_special_subpage != 0)
+        m_special_subpage = 0;
+
     // render shared GUI elements on right
     if(mode == CallMode::Render && m_special_page != SPECIAL_PAGE_LAYERS && m_special_page != SPECIAL_PAGE_EVENT_LAYERS)
         XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
@@ -2355,9 +2417,11 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                 // rename
                 if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
                 {
+                    DisableCursorNew();
                     std::string new_name = TextEntryScreen::Run("New layer name", Layer[l].Name);
                     if(!new_name.empty())
                         RenameLayer(l, new_name);
+                    MouseMove(SharedCursor.X, SharedCursor.Y);
                 }
 
                 // shift up
@@ -2425,6 +2489,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             // rename only
             if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
+                DisableCursorNew();
                 std::string new_name = TextEntryScreen::Run("New layer name", "");
                 if(!new_name.empty() && FindLayer(new_name) == LAYER_NONE)
                 {
@@ -2432,6 +2497,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     Layer[l].Name = new_name;
                     numLayers ++;
                 }
+                MouseMove(SharedCursor.X, SharedCursor.Y);
             }
         }
     }
@@ -2992,6 +3058,12 @@ void EditorScreen::UpdateWaterScreen(CallMode mode)
 
 void EditorScreen::UpdateWarpScreen(CallMode mode)
 {
+    // Warp GUI
+    if(mode == CallMode::Render)
+        XRender::renderRect(0, 40, e_ScreenW - 240, 140, 0.7f, 0.7f, 0.9f, 0.75f, true);
+    if(mode == CallMode::Render)
+        XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
+
     SuperPrintR(mode, "WARP SETTINGS", 3, 200, 50);
 
     // prep for placement selection
@@ -3001,16 +3073,22 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             EditorCursor.SubMode = 1;
     }
     else if(!EditorCursor.Warp.LevelEnt)
+    {
+        EditorCursor.Warp.twoWay = false;
         EditorCursor.SubMode = 1;
+    }
     else
+    {
+        EditorCursor.Warp.twoWay = false;
         EditorCursor.SubMode = 2;
+    }
 
     // placement selection and directions
     if(!EditorCursor.Warp.LevelEnt)
     {
         SuperPrintR(mode, "PLACING:", 3, 40, 82);
 
-        SuperPrintR(mode, "IN    DIR.", 3, 28, 110);
+        SuperPrintR(mode, "IN    DIR.", 3, 28, 114);
         if(UpdateButton(mode, 80 + 4, 100 + 4, GFX.EIcons, EditorCursor.SubMode == 1, 0, 32*Icon::action, 32, 32))
             EditorCursor.SubMode = 1;
 
@@ -3029,7 +3107,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
     }
     if(EditorCursor.Warp.level == STRINGINDEX_NONE && !EditorCursor.Warp.MapWarp)
     {
-        SuperPrintR(mode, "OUT    DIR.", 3, 10, 150);
+        SuperPrintR(mode, "OUT    DIR.", 3, 10, 154);
         if(UpdateButton(mode, 80 + 4, 140 + 4, GFX.EIcons, EditorCursor.SubMode == 2, 0, 32*Icon::action, 32, 32))
             EditorCursor.SubMode = 2;
 
@@ -3042,204 +3120,267 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
         if(UpdateButton(mode, 340 + 4, 140 + 4, GFX.EIcons, EditorCursor.Warp.Direction2 == 4, 0, 32*Icon::left, 32, 32))
             EditorCursor.Warp.Direction2 = 4;
     }
-
-    // warp effect
-    if(EditorCursor.Warp.Effect == 1)
-        SuperPrintR(mode, "STYLE: PIPE", 3, 6, 210);
-    else if(EditorCursor.Warp.Effect == 2)
-        SuperPrintR(mode, "STYLE: DOOR", 3, 6, 210);
-    else if(EditorCursor.Warp.Effect == 3)
-        SuperPrintR(mode, "STYLE: BLIP", 3, 6, 210);
-    else
+    if(EditorCursor.Warp.level == STRINGINDEX_NONE && !EditorCursor.Warp.LevelEnt && !EditorCursor.Warp.MapWarp)
     {
-        EditorCursor.Warp.Effect = 1;
-        SuperPrintR(mode, "STYLE: PIPE", 3, 6, 210);
-    }
-    if(UpdateButton(mode, 220 + 4, 200, GFXBlock[294], EditorCursor.Warp.Effect == 1, 0, 0, 32, 32))
-        EditorCursor.Warp.Effect = 1;
-    if(UpdateButton(mode, 260 + 4, 200, GFXBackgroundBMP[88], EditorCursor.Warp.Effect == 2, 0, 0, 32, 32))
-    {
-        EditorCursor.Warp.Effect = 2;
-        EditorCursor.Warp.Direction = 1;
-        EditorCursor.Warp.Direction2 = 1;
-    }
-    if(UpdateButton(mode, 300 + 4, 200, GFXBackgroundBMP[61], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
-        EditorCursor.Warp.Effect = 3;
-
-    // stars required
-    if(EditorCursor.Warp.Stars >= 10)
-        SuperPrintR(mode, "REQ STARS " + std::to_string(EditorCursor.Warp.Stars), 3, 26, 250);
-    else
-        SuperPrintR(mode, "REQ STARS  " + std::to_string(EditorCursor.Warp.Stars), 3, 26, 250);
-    if(EditorCursor.Warp.Stars > 0 && UpdateButton(mode, 260 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
-        EditorCursor.Warp.Stars --;
-    if(UpdateButton(mode, 300 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
-        EditorCursor.Warp.Stars ++;
-
-    if(FileFormat == FileFormats::LVL_PGEX)
-    {
-        SuperPrintR(mode, "MSG", 3, 350, 250);
-        if(UpdateButton(mode, 420 + 4, 240 + 4, GFX.EIcons, EditorCursor.Warp.StarsMsg != STRINGINDEX_NONE, 0, 32*Icon::pencil, 32, 32))
-            SetS(EditorCursor.Warp.StarsMsg, TextEntryScreen::Run("Star lock message", GetS(EditorCursor.Warp.StarsMsg)));
+        SuperPrintR(mode, "TWO-WAY", 3, e_ScreenW - 240 + 40 + 4, 134);
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 120 + 4, GFX.EIcons, EditorCursor.Warp.twoWay, 0, 32*Icon::check, 32, 32))
+            EditorCursor.Warp.twoWay = !EditorCursor.Warp.twoWay;
 
     }
 
-    // side panel for a few custom things
+    // Events
     if(FileFormat == FileFormats::LVL_PGEX)
     {
         if(mode == CallMode::Render)
-            XRender::renderRect(e_ScreenW - 160, 40, 240, e_ScreenH - 120, 0.7f, 0.7f, 0.9f, 0.75f, true);
-
-        // eventEnter
-        SuperPrintR(mode, "ENTER\nEVENT:", 3, e_ScreenW - 160 + 4, 84);
-        SuperPrintR(mode, EditorCursor.Warp.eventEnter != EVENT_NONE ? GetE(EditorCursor.Warp.eventEnter) : "NONE", 3, e_ScreenW - 160 + 4, 120);
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
+        {
+            SuperPrint("EVENTS:", 3, e_ScreenW - 200, 334);
+            SuperPrint("E:" + GetE(EditorCursor.Warp.eventEnter), 3, e_ScreenW - 240, 360);
+        }
+        if(UpdateButton(mode, e_ScreenW - 80 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
-
-        // transition effect
-        SuperPrintR(mode, "TRANSITION", 3, e_ScreenW - 160 + 4, 160);
-
-        // cannon
-        SuperPrintR(mode, "CANNON", 3, e_ScreenW - 160 + 4, 220);
     }
 
-    // allow / forbid
-    SuperPrintR(mode, "ALLOW: ITEM", 3, 6, 290);
-    if(UpdateButton(mode, 220 + 4, 280 + 4, GFX.EIcons, EditorCursor.Warp.WarpNPC, 0, 32*Icon::check, 32, 32, "Can take NPC thru"))
-        EditorCursor.Warp.WarpNPC = !EditorCursor.Warp.WarpNPC;
-    SuperPrintR(mode, "MOUNT", 3, 280, 290);
-    if(UpdateButton(mode, 380 + 4, 280 + 4, GFX.EIcons, !EditorCursor.Warp.NoYoshi, 0, 32*Icon::check, 32, 32, "Can take Yoshi, boot"))
-        EditorCursor.Warp.NoYoshi = !EditorCursor.Warp.NoYoshi;
-
-    // locked and (new) must stand
-    if(FileFormat == FileFormats::LVL_PGEX)
+    // Layers
+    if(mode == CallMode::Render)
     {
-        SuperPrintR(mode, "NEED FLOOR", 3, 6, 330);
-        if(UpdateButton(mode, 220 + 4, 320 + 4, GFX.EIcons, EditorCursor.Warp.stoodRequired, 0, 32*Icon::check, 32, 32, "Custom: player must be standing"))
-            EditorCursor.Warp.stoodRequired = !EditorCursor.Warp.stoodRequired;
-
-        SuperPrintR(mode, "LOCKED", 3, 270, 330);
-        if(UpdateButton(mode, 380 + 4, 320 + 4, GFX.EIcons, EditorCursor.Warp.Locked, 0, 32*Icon::check, 32, 32))
-            EditorCursor.Warp.Locked = !EditorCursor.Warp.Locked;
-    }
-    else
-    {
-        SuperPrintR(mode, "LOCKED", 3, 60, 330);
-        if(UpdateButton(mode, 220 + 4, 320 + 4, GFX.EIcons, EditorCursor.Warp.Locked, 0, 32*Icon::check, 32, 32))
-            EditorCursor.Warp.Locked = !EditorCursor.Warp.Locked;
-    }
-
-    // map/level warps
-    SuperPrintR(mode, "SPECIAL OPTIONS", 3, 164, 366);
-    SuperPrintR(mode, "TO MAP", 3, 10, 390);
-    if(UpdateButton(mode, 120 + 4, 380 + 4, GFX.EIcons, EditorCursor.Warp.MapWarp, 0, 32*Icon::check, 32, 32))
-    {
-        EditorCursor.Warp.MapWarp = !EditorCursor.Warp.MapWarp;
-        if(EditorCursor.Warp.MapWarp)
-        {
-            EditorCursor.Warp.level = STRINGINDEX_NONE;
-            EditorCursor.Warp.LevelEnt = false;
-        }
-    }
-    SuperPrintR(mode, "LVL WARP ENTER", 3, 210, 390);
-    if(UpdateButton(mode, 466 + 4, 380 + 4, GFX.EIcons, EditorCursor.Warp.level != STRINGINDEX_NONE, 0, 32*Icon::check, 32, 32))
-    {
-        if(EditorCursor.Warp.level == STRINGINDEX_NONE)
-        {
-            SetS(EditorCursor.Warp.level, "...");
-            EditorCursor.Warp.MapWarp = false;
-            EditorCursor.Warp.LevelEnt = false;
-        }
+        SuperPrint("LAYER:", 3, e_ScreenW - 200, 414);
+        if(EditorCursor.Warp.Layer == LAYER_NONE)
+            SuperPrint("DEFAULT", 3, e_ScreenW - 240, 440);
         else
-            EditorCursor.Warp.level = STRINGINDEX_NONE;
+            SuperPrint(GetL(EditorCursor.Warp.Layer), 3, e_ScreenW - 240, 440);
     }
-    SuperPrintR(mode, "EXIT", 3, 516, 390);
-    if(UpdateButton(mode, 590 + 4, 380 + 4, GFX.EIcons, EditorCursor.Warp.LevelEnt, 0, 32*Icon::check, 32, 32))
+    if(UpdateButton(mode, e_ScreenW - 80 + 4, 400 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
+        m_special_page = SPECIAL_PAGE_OBJ_LAYER;
+
+    // page selector
+    if(UpdateButton(mode, e_ScreenW - 240 + 4, 180 + 4, GFXBlock[294], m_Warp_page == WARP_PAGE_MAIN, 0, 0, 32, 32))
+        m_Warp_page = WARP_PAGE_MAIN;
+    if(UpdateButton(mode, e_ScreenW - 240 + 4, 220 + 4, GFXNPC[31], m_Warp_page == WARP_PAGE_REQS, 0, 0, 32, 32))
+        m_Warp_page = WARP_PAGE_REQS;
+    if(UpdateButton(mode, e_ScreenW - 240 + 4, 260 + 4, GFXLevelBMP[2], m_Warp_page == WARP_PAGE_LEVEL, 0, 0, 32, 32))
+        m_Warp_page = WARP_PAGE_LEVEL;
+
+
+    // MAIN WARP PAGE
+
+    if(m_Warp_page == WARP_PAGE_MAIN)
     {
-        EditorCursor.Warp.LevelEnt = !EditorCursor.Warp.LevelEnt;
-        if(EditorCursor.Warp.LevelEnt)
-        {
-            EditorCursor.Warp.level = STRINGINDEX_NONE;
-            EditorCursor.Warp.MapWarp = false;
-        }
-    }
-    // special options for lvl warp entrance
-    if(EditorCursor.Warp.level != STRINGINDEX_NONE)
-    {
-        if(GetS(EditorCursor.Warp.level).length() <= 10)
-            SuperPrintR(mode, "TARGET: " + GetS(EditorCursor.Warp.level), 3, 10, 430);
+        // warp effect
+        if(EditorCursor.Warp.Effect == 1)
+            SuperPrintR(mode, "STYLE: PIPE", 3, 6, 194);
+        else if(EditorCursor.Warp.Effect == 2)
+            SuperPrintR(mode, "STYLE: DOOR", 3, 6, 194);
+        else if(EditorCursor.Warp.Effect == 3)
+            SuperPrintR(mode, "STYLE: BLIP", 3, 6, 194);
         else
         {
-            SuperPrintR(mode, "TARGET: " + GetS(EditorCursor.Warp.level).substr(0,10), 3, 10, 420);
-            SuperPrintR(mode, GetS(EditorCursor.Warp.level).substr(10), 3, 28, 440);
+            EditorCursor.Warp.Effect = 1;
+            SuperPrintR(mode, "STYLE: PIPE", 3, 6, 194);
         }
-        if(UpdateButton(mode, 330 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
-            StartFileBrowser(PtrS(EditorCursor.Warp.level), FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
+        if(UpdateButton(mode, 220 + 4, 180 + 4, GFXBlock[294], EditorCursor.Warp.Effect == 1, 0, 0, 32, 32))
+            EditorCursor.Warp.Effect = 1;
+        if(UpdateButton(mode, 260 + 4, 180 + 4, GFXBackgroundBMP[88], EditorCursor.Warp.Effect == 2, 0, 0, 32, 32))
+        {
+            EditorCursor.Warp.Effect = 2;
+            EditorCursor.Warp.Direction = 1;
+            EditorCursor.Warp.Direction2 = 1;
+        }
+        if(UpdateButton(mode, 300 + 4, 180 + 4, GFXBackgroundBMP[61], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
+            EditorCursor.Warp.Effect = 3;
 
-        // display this in a different way if modern options are enabled
-        int warp_buttons_x = (FileFormat == FileFormats::LVL_PGEX) ? 380 : 440;
-        if(EditorCursor.Warp.LevelWarp == 0)
-            SuperPrintR(mode, "TO: LVL START", 3, 384, 424);
-        else
-            SuperPrintR(mode, "TO: WARP "+std::to_string(EditorCursor.Warp.LevelWarp), 3, 384, 424);
-        if(EditorCursor.Warp.LevelWarp > 0 && UpdateButton(mode, warp_buttons_x + 4, 440 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
-            EditorCursor.Warp.LevelWarp --;
-        if(UpdateButton(mode, warp_buttons_x + 40 + 4, 440 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
-            EditorCursor.Warp.LevelWarp ++;
-
+        // fade effect
         if(FileFormat == FileFormats::LVL_PGEX)
         {
-            // display the option to show/hide the level start scene
-            SuperPrintR(mode, "START\nSCENE", 3, warp_buttons_x + 126, 444);
-            if(UpdateButton(mode, warp_buttons_x + 80 + 4, 440 + 4, GFX.EIcons, !EditorCursor.Warp.noEntranceScene, 0, 32*Icon::check, 32, 32, "Custom: show/hide level start scene"))
-                EditorCursor.Warp.noEntranceScene = !EditorCursor.Warp.noEntranceScene;
-            // display the option to show/hide the level star count
-            SuperPrintR(mode, "SHOW\nSTARS", 3, warp_buttons_x + 206, 444);
-            if(UpdateButton(mode, warp_buttons_x + 200 + 4, 440 + 4, GFXNPC[NPCID_STAR_SMB3], !EditorCursor.Warp.noPrintStars, 0, 0, 32, 32, "Custom: show/hide star count"))
-                EditorCursor.Warp.noPrintStars = !EditorCursor.Warp.noPrintStars;
+            if(EditorCursor.Warp.transitEffect < 0 || EditorCursor.Warp.transitEffect >= (int)list_warp_transit_names.size())
+                EditorCursor.Warp.transitEffect = 0;
+
+            SuperPrintR(mode, " FADE:", 3, 6, 234);
+            if(mode == CallMode::Render)
+                SuperPrintRightAlign(list_warp_transit_names[EditorCursor.Warp.transitEffect], 3, 296, 234);
+
+            if(UpdateButton(mode, 300 + 4, 220 + 4, GFX.EIcons, EditorCursor.Warp.transitEffect, 0, 32*Icon::subscreen, 32, 32))
+                m_special_page = SPECIAL_PAGE_WARP_TRANSITION;
         }
-    }
-    // special options for map warp
-    if(EditorCursor.Warp.MapWarp)
-    {
-        SuperPrintR(mode, "MAP WARP:", 3, 50, 424);
-        if((int)EditorCursor.Warp.MapX != -1 || (int)EditorCursor.Warp.MapY != -1.)
+
+        // cannon
+        // SuperPrintR(mode, "CANNON", 3, e_ScreenW - 160 + 4, 220);
+
+        // allow / forbid
+        SuperPrintR(mode, "ALLOW: ITEM", 3, 6, 294);
+        if(UpdateButton(mode, 220 + 4, 280 + 4, GFX.EIcons, EditorCursor.Warp.WarpNPC, 0, 32*Icon::check, 32, 32, "Can take NPC thru"))
+            EditorCursor.Warp.WarpNPC = !EditorCursor.Warp.WarpNPC;
+        SuperPrintR(mode, "RIDE", 3, 280, 294);
+        if(UpdateButton(mode, 360 + 4, 280 + 4, GFX.EIcons, !EditorCursor.Warp.NoYoshi, 0, 32*Icon::check, 32, 32, "Can take Yoshi, boot"))
+            EditorCursor.Warp.NoYoshi = !EditorCursor.Warp.NoYoshi;
+
+        // cannon exit
+        if(FileFormat == FileFormats::LVL_PGEX)
         {
-            SuperPrintR(mode, "X: "+std::to_string((int)EditorCursor.Warp.MapX), 3, 10, 442);
-            SuperPrintR(mode, "Y: "+std::to_string((int)EditorCursor.Warp.MapY), 3, 10, 460);
-            if(UpdateButton(mode, 160 + 160 + 4, 440 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
+            SuperPrintR(mode, "CANNON EXIT", 3, 6, 354);
+
+            if(UpdateButton(mode, 220 + 4, 340 + 4, GFX.EIcons, EditorCursor.Warp.cannonExit, 0, 32*Icon::check, 32, 32))
             {
-                EditorCursor.Warp.MapX = -1.;
-                EditorCursor.Warp.MapY = -1.;
+                EditorCursor.Warp.cannonExit = !EditorCursor.Warp.cannonExit;
+                if(!EditorCursor.Warp.cannonExit)
+                    EditorCursor.Warp.cannonExitSpeed = Warp_t().cannonExitSpeed;
+            }
+
+            if(EditorCursor.Warp.cannonExit)
+            {
+                SuperPrintR(mode, "SPEED " + std::to_string(vb6Round(EditorCursor.Warp.cannonExitSpeed)), 3, 26, 394);
+                if(EditorCursor.Warp.cannonExitSpeed > 1 && UpdateButton(mode, 180 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+                    EditorCursor.Warp.cannonExitSpeed --;
+                if(UpdateButton(mode, 220 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+                    EditorCursor.Warp.cannonExitSpeed ++;
             }
         }
+    }
+
+    if(m_Warp_page == WARP_PAGE_REQS)
+    {
+        // stars required
+        if(EditorCursor.Warp.Stars >= 10)
+            SuperPrintR(mode, "NEED STARS " + std::to_string(EditorCursor.Warp.Stars), 3, 6, 194);
         else
+            SuperPrintR(mode, "NEED STARS  " + std::to_string(EditorCursor.Warp.Stars), 3, 6, 194);
+        if(EditorCursor.Warp.Stars > 0 && UpdateButton(mode, 260 + 4, 180 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+            EditorCursor.Warp.Stars --;
+        if(UpdateButton(mode, 300 + 4, 180 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+            EditorCursor.Warp.Stars ++;
+
+        // new: StarsMsg
+        if(FileFormat == FileFormats::LVL_PGEX)
         {
-            SuperPrintR(mode, "NONE", 3, 10, 450);
+            SuperPrintR(mode, "STAR LOCK MSG", 3, 44, 234);
+            if(UpdateButton(mode, 300 + 4, 220 + 4, GFX.EIcons, EditorCursor.Warp.StarsMsg != STRINGINDEX_NONE, 0, 32*Icon::pencil, 32, 32))
+            {
+                DisableCursorNew();
+                SetS(EditorCursor.Warp.StarsMsg, TextEntryScreen::Run("Star lock message", GetS(EditorCursor.Warp.StarsMsg)));
+                MouseMove(SharedCursor.X, SharedCursor.Y);
+            }
         }
-        if(UpdateButton(mode, 160 + 4, 440 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
+
+        SuperPrintR(mode, "NEED KEY", 3, 6, 274);
+        if(UpdateButton(mode, 220 + 4, 260 + 4, GFX.EIcons, EditorCursor.Warp.Locked, 0, 32*Icon::check, 32, 32))
+            EditorCursor.Warp.Locked = !EditorCursor.Warp.Locked;
+
+        // new: must stand to enter
+        if(FileFormat == FileFormats::LVL_PGEX)
         {
-            EditorCursor.Warp.MapY = 32*((int)EditorCursor.Warp.MapY/32 - 1);
-            if((int)EditorCursor.Warp.MapX == -1)
-                EditorCursor.Warp.MapX = 0.;
+            SuperPrintR(mode, "NEED FLOOR", 3, 6, 314);
+            if(UpdateButton(mode, 220 + 4, 300 + 4, GFX.EIcons, EditorCursor.Warp.stoodRequired, 0, 32*Icon::check, 32, 32))
+                EditorCursor.Warp.stoodRequired = !EditorCursor.Warp.stoodRequired;
         }
-        if(UpdateButton(mode, 160 + 40 + 4, 440 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
+    }
+
+    if(m_Warp_page == WARP_PAGE_LEVEL)
+    {
+        // map/level warps
+        SuperPrintR(mode, "TO MAP", 3, 6, 194);
+        if(UpdateButton(mode, 120 + 4, 180 + 4, GFX.EIcons, EditorCursor.Warp.MapWarp, 0, 32*Icon::check, 32, 32))
         {
-            EditorCursor.Warp.MapY = 32*((int)EditorCursor.Warp.MapY/32 + 1);
-            if((int)EditorCursor.Warp.MapX == -1)
-                EditorCursor.Warp.MapX = 0.;
+            EditorCursor.Warp.MapWarp = !EditorCursor.Warp.MapWarp;
+            if(EditorCursor.Warp.MapWarp)
+            {
+                EditorCursor.Warp.level = STRINGINDEX_NONE;
+                EditorCursor.Warp.LevelEnt = false;
+            }
         }
-        if(UpdateButton(mode, 160 + 80 + 4, 440 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+        SuperPrintR(mode, "LVL WARP IN", 3, 6, 234);
+        if(UpdateButton(mode, 240 + 4, 220 + 4, GFX.EIcons, EditorCursor.Warp.level != STRINGINDEX_NONE, 0, 32*Icon::check, 32, 32))
         {
-            EditorCursor.Warp.MapX = 32*((int)EditorCursor.Warp.MapX/32 - 1);
-            if((int)EditorCursor.Warp.MapY == -1)
-                EditorCursor.Warp.MapY = 0.;
+            if(EditorCursor.Warp.level == STRINGINDEX_NONE)
+            {
+                SetS(EditorCursor.Warp.level, "...");
+                EditorCursor.Warp.MapWarp = false;
+                EditorCursor.Warp.LevelEnt = false;
+            }
+            else
+                EditorCursor.Warp.level = STRINGINDEX_NONE;
         }
-        if(UpdateButton(mode, 160 + 120 + 4, 440 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+        SuperPrintR(mode, "OUT", 3, 300, 234);
+        if(UpdateButton(mode, 360 + 4, 220 + 4, GFX.EIcons, EditorCursor.Warp.LevelEnt, 0, 32*Icon::check, 32, 32))
         {
-            EditorCursor.Warp.MapX = 32*((int)EditorCursor.Warp.MapX/32 + 1);
-            if((int)EditorCursor.Warp.MapY == -1)
-                EditorCursor.Warp.MapY = 0.;
+            EditorCursor.Warp.LevelEnt = !EditorCursor.Warp.LevelEnt;
+            if(EditorCursor.Warp.LevelEnt)
+            {
+                EditorCursor.Warp.level = STRINGINDEX_NONE;
+                EditorCursor.Warp.MapWarp = false;
+            }
+        }
+        // special options for lvl warp entrance
+        if(EditorCursor.Warp.level != STRINGINDEX_NONE)
+        {
+            if(GetS(EditorCursor.Warp.level).length() <= 12)
+                SuperPrintR(mode, "TARGET: " + GetS(EditorCursor.Warp.level), 3, 6, 314);
+            else
+            {
+                SuperPrintR(mode, "TARGET: " + GetS(EditorCursor.Warp.level).substr(0,12), 3, 6, 302);
+                SuperPrintR(mode, GetS(EditorCursor.Warp.level).substr(12), 3, 24, 322);
+            }
+            if(UpdateButton(mode, 360 + 4, 300 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
+                StartFileBrowser(PtrS(EditorCursor.Warp.level), FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
+
+            // display this in a different way if modern options are enabled
+            if(EditorCursor.Warp.LevelWarp == 0)
+                SuperPrintR(mode, "TO: LVL START", 3, 46, 354);
+            else
+                SuperPrintR(mode, "TO:   WARP "+std::to_string(EditorCursor.Warp.LevelWarp), 3, 46, 354);
+            if(EditorCursor.Warp.LevelWarp > 0 && UpdateButton(mode, 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+                EditorCursor.Warp.LevelWarp --;
+            if(UpdateButton(mode, 280 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+                EditorCursor.Warp.LevelWarp ++;
+
+            if(FileFormat == FileFormats::LVL_PGEX)
+            {
+                // display the option to show/hide the level start scene
+                SuperPrintR(mode, "SHOW LEVEL\nSTART SCENE", 3, 6, 404);
+                if(UpdateButton(mode, 240 + 4, 400 + 4, GFX.EIcons, !EditorCursor.Warp.noEntranceScene, 0, 32*Icon::check, 32, 32))
+                    EditorCursor.Warp.noEntranceScene = !EditorCursor.Warp.noEntranceScene;
+                // display the option to show/hide the level star count
+                SuperPrintR(mode, "SHOW LEVEL\nSTAR COUNT", 3, 6, 444);
+                if(UpdateButton(mode, 240 + 4, 440 + 4, GFXNPC[NPCID_STAR_SMB3], !EditorCursor.Warp.noPrintStars, 0, 0, 32, 32))
+                    EditorCursor.Warp.noPrintStars = !EditorCursor.Warp.noPrintStars;
+            }
+        }
+        // special options for map warp
+        if(EditorCursor.Warp.MapWarp)
+        {
+            // map warp!
+            SuperPrintR(mode, "MAP WARP:", 3, 44, 302);
+            if((int)EditorCursor.Warp.MapX != -1 || (int)EditorCursor.Warp.MapY != -1.)
+            {
+                SuperPrintR(mode, "X: "+std::to_string((int)EditorCursor.Warp.MapX), 3, 4, 320);
+                SuperPrintR(mode, "Y: "+std::to_string((int)EditorCursor.Warp.MapY), 3, 4, 340);
+            }
+            else
+            {
+                SuperPrintR(mode, "NONE", 3, 4, 330);
+            }
+            if(UpdateButton(mode, 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
+            {
+                EditorCursor.Warp.MapY = 32*((int)EditorCursor.Warp.MapY/32 - 1);
+                if((int)EditorCursor.Warp.MapX == -1)
+                    EditorCursor.Warp.MapX = 0.;
+            }
+            if(UpdateButton(mode, 40 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
+            {
+                EditorCursor.Warp.MapY = 32*((int)EditorCursor.Warp.MapY/32 + 1);
+                if((int)EditorCursor.Warp.MapX == -1)
+                    EditorCursor.Warp.MapX = 0.;
+            }
+            if(UpdateButton(mode, 80 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+            {
+                EditorCursor.Warp.MapX = 32*((int)EditorCursor.Warp.MapX/32 - 1);
+                if((int)EditorCursor.Warp.MapY == -1)
+                    EditorCursor.Warp.MapY = 0.;
+            }
+            if(UpdateButton(mode, 120 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+            {
+                EditorCursor.Warp.MapX = 32*((int)EditorCursor.Warp.MapX/32 + 1);
+                if((int)EditorCursor.Warp.MapY == -1)
+                    EditorCursor.Warp.MapY = 0.;
+            }
         }
     }
 }
@@ -3496,7 +3637,11 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     if(EditorCursor.WorldLevel.LevelName.length() > 19)
         SuperPrintR(mode, EditorCursor.WorldLevel.LevelName.substr(19), 3, 10 + 44 + 18, e_ScreenH - 240 + 38);
     if(UpdateButton(mode, 10 + 4, e_ScreenH - 240 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
+    {
+        DisableCursorNew();
         EditorCursor.WorldLevel.LevelName = TextEntryScreen::Run("Level name", EditorCursor.WorldLevel.LevelName);
+        MouseMove(SharedCursor.X, SharedCursor.Y);
+    }
 
     // level filename - FileName
     SuperPrintR(mode, "FILENAME:", 3, 10 + 44, e_ScreenH - 180 + 2);
@@ -4130,12 +4275,14 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
             SuperPrintR(mode, "<NEW FOLDER>", 3, x + 44, y + 12);
             if(UpdateButton(mode, x + 4, y + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
+                DisableCursorNew();
                 std::string folder_name = TextEntryScreen::Run("New folder name", "");
                 if(!folder_name.empty() && !m_dirman.exists(folder_name))
                 {
                     m_dirman.mkdir(folder_name);
                     m_path_synced = false;
                 }
+                MouseMove(SharedCursor.X, SharedCursor.Y);
             }
         }
         else if(l < dir_length)
@@ -4160,7 +4307,9 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
             SuperPrintR(mode, "<NEW FILE>", 3, x + 44, y + 12);
             if(UpdateButton(mode, x + 4, y + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
+                DisableCursorNew();
                 std::string file_name = TextEntryScreen::Run("Save as", "");
+                MouseMove(SharedCursor.X, SharedCursor.Y);
                 if(!file_name.empty())
                 {
                     // validate: append the file extension if it doesn't already appear.
@@ -4558,7 +4707,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     else if(m_special_page == SPECIAL_PAGE_EVENT_MUSIC || m_special_page == SPECIAL_PAGE_EVENT_BACKGROUND
         || m_special_page == SPECIAL_PAGE_EVENT_SOUND || m_special_page == SPECIAL_PAGE_SECTION_BACKGROUND
         || m_special_page == SPECIAL_PAGE_SECTION_MUSIC || m_special_page == SPECIAL_PAGE_LEVEL_EXIT
-        || EditorCursor.Mode == OptCursor_t::WLD_MUSIC)
+        || EditorCursor.Mode == OptCursor_t::WLD_MUSIC || m_special_page == SPECIAL_PAGE_WARP_TRANSITION)
         UpdateSelectListScreen(mode);
     else if(EditorCursor.Mode == OptCursor_t::LVL_BLOCKS)
         UpdateBlockScreen(mode);

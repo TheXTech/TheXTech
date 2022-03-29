@@ -77,12 +77,19 @@ private:
         SPECIAL_PAGE_OBJ_LAYER,
         SPECIAL_PAGE_OBJ_TRIGGERS,
         SPECIAL_PAGE_BLOCK_CONTENTS,
+        SPECIAL_PAGE_WARP_TRANSITION,
         SPECIAL_PAGE_LEVEL_EXIT,
         SPECIAL_PAGE_WORLD_SETTINGS,
         SPECIAL_PAGE_FILE,
         SPECIAL_PAGE_FILE_CONFIRM,
         SPECIAL_PAGE_FILE_CONVERT,
     } SpecialPage_t;
+    typedef enum
+    {
+        WARP_PAGE_MAIN,
+        WARP_PAGE_REQS,
+        WARP_PAGE_LEVEL,
+    } WarpPage_t;
     typedef enum
     {
         BROWSER_MODE_NONE,
@@ -109,6 +116,7 @@ private:
     int m_NPC_page = 0;
     int m_Block_page = 0;
     int m_BGO_page = 0;
+    WarpPage_t m_Warp_page = WARP_PAGE_MAIN;
     int m_layers_page = 0;
     int m_events_page = 0;
     int m_sounds_page = 0;

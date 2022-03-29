@@ -2489,7 +2489,7 @@ void PositionCursor()
 
 void HideCursor()
 {
-    printf("Hiding cursor...\n");
+    // printf("Hiding cursor...\n");
     EditorCursor.Location.X = vScreenX[1] - 800;
     EditorCursor.X = float(vScreenX[1] - 800);
     EditorCursor.Location.Y = vScreenY[1] - 600;
