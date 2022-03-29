@@ -1530,9 +1530,10 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     if(UpdateButton(mode, 210 + 4, 120 + 4, GFX.EIcons, controls_set, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_CONTROLS;
     // message
-    MessageText = Events[m_current_event].Text;
+    if(!GetS(Events[m_current_event].Text).empty())
+        MessageText = GetS(Events[m_current_event].Text);
     SuperPrintR(mode, "TEXT", 3, 54, 170);
-    if(UpdateButton(mode, 10 + 4, 160 + 4, GFX.EIcons, !Events[m_current_event].Text, 0, 32*Icon::pencil, 32, 32))
+    if(UpdateButton(mode, 10 + 4, 160 + 4, GFX.EIcons, !GetS(Events[m_current_event].Text).empty(), 0, 32*Icon::pencil, 32, 32))
     {
         DisableCursorNew();
         SetS(Events[m_current_event].Text, TextEntryScreen::Run("Event text", GetS(Events[m_current_event].Text)));
