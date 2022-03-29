@@ -2567,16 +2567,28 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     {
         int H = ((int)EditorCursor.Block.Location.Height)/32;
         int W = ((int)EditorCursor.Block.Location.Width)/32;
-        SuperPrintR(mode, "W " + std::to_string(W), 3, e_ScreenW - 72, 40);
+        SuperPrintR(mode, "W " + std::to_string(W), 3, e_ScreenW - 72, 46);
         if(W > 2 && UpdateButton(mode, e_ScreenW - 80 + 4, 60 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             EditorCursor.Block.Location.Width = 32 * (W - 1);
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             EditorCursor.Block.Location.Width = 32 * (W + 1);
-        SuperPrintR(mode, "H " + std::to_string(H), 3, e_ScreenW - 72, 100);
+        SuperPrintR(mode, "H " + std::to_string(H), 3, e_ScreenW - 72, 106);
         if(H > 2 && UpdateButton(mode, e_ScreenW - 80 + 4, 120 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             EditorCursor.Block.Location.Height = 32 * (H - 1);
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 120 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             EditorCursor.Block.Location.Height = 32 * (H + 1);
+    }
+
+    // Legacy for Spin Block
+    if(FileFormat == FileFormats::LVL_PGEX && EditorCursor.Block.Type == 90)
+    {
+        SuperPrintR(mode, "CAN BREAK", 3, e_ScreenW - 160, 46);
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFXBlock[188], EditorCursor.Block.Special2, 0, 0, 32, 32, "LEGACY: BREAKS WHEN HIT"))
+            EditorCursor.Block.Special2 = (EditorCursor.Block.Special2 ? 0 : 1);
+    }
+    else
+    {
+        EditorCursor.Block.Special2 = 0;
     }
 
     // Slippy ("SLICK") and Invis
