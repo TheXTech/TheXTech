@@ -34,11 +34,15 @@ class GameplayTimer
 
     bool    m_levelBlinkActive = false;
     bool    m_worldBlinkActive = false;
+    int     m_blinkEffect = 0;
+    bool    m_allowBlink = false;
     float   m_blinkingFactor = 0.f;
     float   m_blinkingDir = 1.0f;
     float   m_colorSpin[3] = {0.0f, 0.8f, 0.8f};
     float   m_colorSpinHue = 0.f;
     void    updateColorSpin(float delta);
+
+    void    updateAllowBlink();
 
     bool    m_semiTransparent = false;
 
@@ -46,6 +50,7 @@ public:
     GameplayTimer();
 
     void setSemitransparent(bool t);
+    void setBlinkEffect(int be);
     bool semitransparent();
 
     void reset();

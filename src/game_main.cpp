@@ -127,6 +127,7 @@ int GameMain(const CmdLineSetup_t &setup)
     g_speedRunnerMode = setup.speedRunnerMode;
     g_drawController |= setup.showControllerState;
     speedRun_setSemitransparentRender(setup.speedRunnerSemiTransparent);
+    speedRun_setBlinkEffect(setup.speedRunnerBlinkEffect);
 
     ResetCompat();
     cheats_reset();

@@ -384,6 +384,14 @@ void speedRun_setSemitransparentRender(bool r)
     s_gamePlayTimer.setSemitransparent(r);
 }
 
+void speedRun_setBlinkEffect(int be)
+{
+    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF)
+        return; // Do nothing
+
+    s_gamePlayTimer.setBlinkEffect(be);
+}
+
 void speedRun_syncControlKeys(int plr, const Controls_t &keys)
 {
     // there are still reasons to sync control keys (eg control tests)

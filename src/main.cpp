@@ -247,6 +247,14 @@ int main(int argc, char**argv)
                                                    cmd);
         TCLAP::SwitchArg switchSpeedRunSemiTransparent(std::string(), "speed-run-semitransparent",
                                                        "Make the speed-runner mode timer be drawn transparently", false);
+        TCLAP::ValueArg<std::string> speedRunBlinkMode(std::string(), "speed-run-blink-mode",
+                                                   "Choose the speed-run timer blinking effect for a level/episode completion\n"
+                                                   "Supported values:\n"
+                                                   "  opaque - Blink effect works when semi-transparent mode is not enabled\n"
+                                                   "  always - Blink effect will work always\n"
+                                                   "  never - Disable blink effect completely",
+                                                    false, "undefined",
+                                                   "opaque, always, never");
         TCLAP::SwitchArg switchDisplayControls(std::string(), "show-controls", "Display current controller state while the game process", false);
         TCLAP::ValueArg<unsigned int> showBatteryStatus(std::string(), "show-battery-status",
                                                    "Display the battery status indicator (if available):\n"
@@ -399,6 +407,28 @@ int main(int argc, char**argv)
         setup.speedRunnerSemiTransparent = switchSpeedRunSemiTransparent.isSet() ?
                                             switchSpeedRunSemiTransparent.getValue() :
                                             g_preSetup.speedRunSemiTransparentTimer;
+
+        if(speedRunBlinkMode.isSet())
+        {
+            std::string mode = speedRunBlinkMode.getValue();
+            if(mode == "opaque")
+                setup.speedRunnerBlinkEffect = SPEEDRUN_EFFECT_BLINK_OPAQUEONLY;
+            else if(mode == "always")
+                setup.speedRunnerBlinkEffect = SPEEDRUN_EFFECT_BLINK_ALWAYS;
+            else if(mode == "never")
+                setup.speedRunnerBlinkEffect = SPEEDRUN_EFFECT_BLINK_NEVER;
+            else
+            {
+                std::cerr << "Error: Invalid value for the --speed-run-blink argument: " << mode << std::endl;
+                std::cerr.flush();
+                return 2;
+            }
+        }
+        else
+        {
+            setup.speedRunnerBlinkEffect = g_preSetup.speedRunEffectBlink;
+        }
+
         setup.showControllerState = switchDisplayControls.isSet() ?
                                         switchDisplayControls.getValue() :
                                         g_drawController;
