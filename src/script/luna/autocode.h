@@ -116,6 +116,8 @@ enum AutocodeType
     AT_ForceFacing,             //1: NpcID  2: Section      3:              4:          5: Active time  6:
 
     AT_SFX,                     //1:        2: Index        3:              4:          5: Delay        6:
+    AT_PlaySFX,                 //1:        2: Index        3: Loops        4: Volume   5: Delay        6:
+    AT_StopSFX,                 //1:        2: Index        3:              4:          5: Delay        6:
     AT_SFXPreLoad,              //1:        2: Index        3:              4:          5: Delay        6:
     AT_SetMusic,                //1: Section2: Music #      3:              4:          5: Active time  6: Optional file name
     AT_PlayMusic,               //1:        2: Section      3:              4:          5: Delay        6:

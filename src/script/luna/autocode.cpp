@@ -320,6 +320,45 @@ void Autocode::Do(bool init)
             break;
         }
 
+        case AT_PlaySFX:
+        {
+            if(this->Length <= 1) // Play once when delay runs out
+            {
+                // Play built in sound
+                if(Param1 > 0)
+                    PlaySound((int)Param1, (int)Param2, (int)(Param3 <= 0.0 ? 128 : Param3));
+                else
+                {
+                    // Sound from level folder
+                    if(GetS(MyString).length() > 0)
+                    {
+                        //char* dbg = "CUSTOM SOUND PLAY DBG";
+                        std::string full_path = g_dirCustom.resolveFileCaseAbs(GetS(MyString));
+                        PlayExtSound(full_path, (int)Param2, (int)(Param3 <= 0.0 ? 128 : Param3));
+                    }
+
+                }
+                expire();
+            }
+            break;
+        }
+
+        case AT_StopSFX:
+        {
+            if(this->Length <= 1) // Stop once when delay runs out
+            {
+                // Sound from level folder
+                if(GetS(MyString).length() > 0)
+                {
+                    //char* dbg = "CUSTOM SOUND STOP DBG";
+                    std::string full_path = g_dirCustom.resolveFileCaseAbs(GetS(MyString));
+                    StopExtSound(full_path);
+                }
+                expire();
+            }
+            break;
+        }
+
         case AT_SFXPreLoad:
         {
             if(this->Length <= 1) // Preload custom SFX file
@@ -1504,6 +1543,8 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"CyclePlayerLeft", AT_CyclePlayerLeft},
 
     {"SFX", AT_SFX},
+    {"PlaySFX", AT_PlaySFX},
+    {"StopSFX", AT_StopSFX},
     {"SFXPreLoad", AT_SFXPreLoad},
     {"SetMusic", AT_SetMusic},
     {"PlayMusic", AT_PlayMusic},

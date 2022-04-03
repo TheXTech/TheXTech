@@ -19,6 +19,7 @@
  */
 
 #include <SDL2/SDL_timer.h>
+#include <SDL2/SDL_atomic.h>
 #include <SDL2/SDL_mixer_ext.h>
 
 #include "globals.h"
@@ -149,7 +150,10 @@ static std::unordered_map<std::string, Music_t> music;
 static std::unordered_map<std::string, SFX_t>   sound;
 
 //! Sounds played by scripts
+static SDL_atomic_t                                extSfxBusy;
 static std::unordered_map<std::string, Mix_Chunk*> extSfx;
+static std::unordered_map<int, std::string>        extSfxPlaying;
+static void extSfxStopCallback(int channel);
 
 static const int maxSfxChannels = 91;
 
@@ -164,6 +168,8 @@ void InitMixerX()
     const int initFlags = MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3;
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
+
+    SDL_AtomicSet(&extSfxBusy, 0);
 
     if(g_mixerLoaded)
         return;
@@ -214,6 +220,9 @@ void InitMixerX()
     Mix_VolumeMusic(MIX_MAX_VOLUME);
     Mix_AllocateChannels(maxSfxChannels);
 
+    // Set channel finished callback to handle finished custom SFX
+    Mix_ChannelFinished(&extSfxStopCallback);
+
     g_mixerLoaded = true;
 }
 
@@ -221,6 +230,8 @@ void QuitMixerX()
 {
     if(!g_mixerLoaded)
         return;
+
+    UnloadExtSounds();
 
     noSound = true;
     if(g_curMusic)
@@ -493,14 +504,14 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
     }
 }
 
-void PlaySfx(const std::string &Alias, int loops)
+void PlaySfx(const std::string &Alias, int loops, int volume)
 {
     auto sfx = sound.find(Alias);
     if(sfx != sound.end())
     {
         auto &s = sfx->second;
         if(!s.isSilent)
-            Mix_PlayChannel(s.channel, s.chunk, loops);
+            Mix_PlayChannelVol(s.channel, s.chunk, loops, volume);
     }
 }
 
@@ -1014,7 +1025,7 @@ static int getFallbackSfx(int A)
     return A;
 }
 
-void PlaySound(int A, int loops)
+void PlaySound(int A, int loops, int volume)
 {
     if(noSound)
         return;
@@ -1035,7 +1046,7 @@ void PlaySound(int A, int loops)
     if(SoundPause[A] == 0) // if the sound wasn't just played
     {
         std::string alias = fmt::format_ne("sound{0}", A);
-        PlaySfx(alias, loops);
+        PlaySfx(alias, loops, volume);
         s_resetSoundDelay(A);
     }
 }
@@ -1126,9 +1137,7 @@ void UnloadCustomSound()
     g_customMusicInDataFolder = false;
     g_customSoundsInDataFolder = false;
 
-    for(auto &f : extSfx)
-        Mix_FreeChunk(f.second);
-    extSfx.clear();
+    UnloadExtSounds();
 }
 
 void UpdateYoshiMusic()
@@ -1162,8 +1171,26 @@ void PreloadExtSound(const std::string& path)
     }
 }
 
-void PlayExtSound(const std::string &path)
+void UnloadExtSounds()
 {
+    if(noSound)
+        return;
+
+    SDL_AtomicSet(&extSfxBusy, 1);
+
+    for(auto &f : extSfx)
+        Mix_FreeChunk(f.second);
+
+    extSfx.clear();
+    extSfxPlaying.clear();
+
+    SDL_AtomicSet(&extSfxBusy, 0);
+}
+
+void PlayExtSound(const std::string &path, int loops, int volume)
+{
+    int play_ch = -1;
+
     if(noSound)
         return;
 
@@ -1176,14 +1203,81 @@ void PlayExtSound(const std::string &path)
             pLogWarning("Can't load custom sound: %s", Mix_GetError());
             return;
         }
-        extSfx.insert({path, ch});
-        Mix_PlayChannelVol(-1, ch, 0, MIX_MAX_VOLUME);
-        return;
-    }
 
-    Mix_PlayChannelVol(-1, f->second, 0, MIX_MAX_VOLUME);
+        extSfx.insert({path, ch});
+        play_ch = Mix_PlayChannelVol(-1, ch, loops, volume);
+    }
+    else
+        play_ch = Mix_PlayChannelVol(-1, f->second, loops, volume);
+
+    if(play_ch >= 0)
+    {
+        SDL_AtomicSet(&extSfxBusy, 1);
+        // Never re-use the same channel!
+        SDL_assert_release(extSfxPlaying.find(play_ch) == extSfxPlaying.end());
+        extSfxPlaying.insert({play_ch, path});
+        SDL_AtomicSet(&extSfxBusy, 0);
+    }
+    else
+        pLogWarning("Can't play custom sound %s: %s", Mix_GetError());
 }
 
+static void extSfxStopCallback(int channel)
+{
+    if(SDL_AtomicGet(&extSfxBusy) == 1)
+        return; // Do nothing!
+
+    auto i = extSfxPlaying.find(channel);
+    if(i != extSfxPlaying.end())
+        extSfxPlaying.erase(i);
+}
+
+void StopExtSound(const std::string& path)
+{
+    if(noSound)
+        return;
+
+    SDL_AtomicSet(&extSfxBusy, 1);
+
+    for(auto i = extSfxPlaying.begin(); i != extSfxPlaying.end();)
+    {
+        if(i->second == path)
+        {
+            Mix_HaltChannel(i->first);
+            i = extSfxPlaying.erase(i);
+        }
+        else
+            ++i;
+    }
+
+    SDL_AtomicSet(&extSfxBusy, 0);
+}
+
+void StopAllExtSounds()
+{
+    if(noSound)
+        return;
+
+    SDL_AtomicSet(&extSfxBusy, 1);
+
+    for(auto i = extSfxPlaying.begin(); i != extSfxPlaying.end(); ++i)
+        Mix_HaltChannel(i->first);
+
+    extSfxPlaying.clear();
+
+    SDL_AtomicSet(&extSfxBusy, 0);
+}
+
+void StopAllSounds()
+{
+    if(noSound)
+        return;
+
+    SDL_AtomicSet(&extSfxBusy, 1);
+    Mix_HaltChannel(-1);
+    extSfxPlaying.clear();
+    SDL_AtomicSet(&extSfxBusy, 0);
+}
 
 #ifdef THEXTECH_ENABLE_AUDIO_FX
 
