@@ -27,6 +27,8 @@
 #include "graphics.h"
 #include "game_main.h"
 #include "globals.h"
+#include "presetup.h"
+#include "compat.h"
 
 
 std::string GameplayTimer::formatTime(int64_t t)
@@ -53,9 +55,105 @@ std::string GameplayTimer::formatTime(int64_t t)
     return displayTime;
 }
 
+void GameplayTimer::updateColorSpin(float delta)
+{
+    float in_s = 0.7f;
+    float in_v = 1.0f;
+    double      hh, p, q, t, ff;
+    long        i;
+
+    m_colorSpinHue += delta;
+    if(m_colorSpinHue >= 360.f)
+        m_colorSpinHue -= 360.f;
+    else if(m_colorSpinHue < 0.f)
+        m_colorSpinHue += 360.f;
+
+    if(in_s <= 0.0) // < is bogus, just shuts up warnings
+    {
+        m_colorSpin[0] = in_v;
+        m_colorSpin[1] = in_v;
+        m_colorSpin[2] = in_v;
+        return;
+    }
+
+    hh = m_colorSpinHue;
+    if(hh >= 360.0f)
+        hh = 0.0f;
+
+    hh /= 60.0f;
+    i = (long)hh;
+    ff = hh - i;
+    p = in_v * (1.0f - in_s);
+    q = in_v * (1.0f - (in_s * ff));
+    t = in_v * (1.0f - (in_s * (1.0f - ff)));
+
+    switch(i)
+    {
+    case 0:
+        m_colorSpin[0] = in_v;
+        m_colorSpin[1] = t;
+        m_colorSpin[2] = p;
+        break;
+    case 1:
+        m_colorSpin[0] = q;
+        m_colorSpin[1] = in_v;
+        m_colorSpin[2] = p;
+        break;
+    case 2:
+        m_colorSpin[0] = p;
+        m_colorSpin[1] = in_v;
+        m_colorSpin[2] = t;
+        break;
+    case 3:
+        m_colorSpin[0] = p;
+        m_colorSpin[1] = q;
+        m_colorSpin[2] = in_v;
+        break;
+    case 4:
+        m_colorSpin[0] = t;
+        m_colorSpin[1] = p;
+        m_colorSpin[2] = in_v;
+        break;
+    case 5:
+    default:
+        m_colorSpin[0] = in_v;
+        m_colorSpin[1] = p;
+        m_colorSpin[2] = q;
+        break;
+    }
+}
+
+void GameplayTimer::updateAllowBlink()
+{
+    int effectBlink = (m_blinkEffect == SPEEDRUN_EFFECT_BLINK_UNDEFINED) ?
+                          g_compatibility.speedrun_blink_effect :
+                          m_blinkEffect;
+
+    switch(effectBlink)
+    {
+    default:
+    case SPEEDRUN_EFFECT_BLINK_OPAQUEONLY:
+        m_allowBlink = !m_semiTransparent;
+        break;
+
+    case SPEEDRUN_EFFECT_BLINK_ALWAYS:
+        m_allowBlink = true;
+        break;
+
+    case SPEEDRUN_EFFECT_BLINK_NEVER:
+        m_allowBlink = false;
+        break;
+    }
+}
+
 void GameplayTimer::setSemitransparent(bool t)
 {
     m_semiTransparent = t;
+}
+
+void GameplayTimer::setBlinkEffect(int be)
+{
+    m_blinkEffect = be;
 }
 
 bool GameplayTimer::semitransparent()
@@ -72,11 +170,19 @@ void GameplayTimer::reset()
     m_cyclesFin = false;
     m_cyclesCurrent = 0;
     m_cyclesTotal = 0;
+    m_levelBlinkActive = false;
+    m_worldBlinkActive = false;
+    m_blinkingFactor = 0.0f;
+    updateAllowBlink();
 }
 
 void GameplayTimer::resetCurrent()
 {
     m_cyclesCurrent = 0;
+    m_levelBlinkActive = false;
+    m_worldBlinkActive = false;
+    m_blinkingFactor = 0.0f;
+    updateAllowBlink();
 }
 
 void GameplayTimer::load()
@@ -99,6 +205,7 @@ void GameplayTimer::load()
     o.read("total", m_cyclesTotal, 0);
     m_cyclesCurrent = 0; // Reset the counter
     o.endGroup();
+    updateAllowBlink();
 }
 
 void GameplayTimer::save()
@@ -129,20 +236,37 @@ void GameplayTimer::tick()
         m_cyclesCurrent = 1;
         m_cyclesTotal = 1;
         m_cyclesFin = 0;
+        m_levelBlinkActive = false;
+        m_worldBlinkActive = false;
+        m_blinkingFactor = 0.0f;
     }
     else
     {
         if(LevelSelect || (!LevelSelect && LevelMacro == 0))
             m_cyclesCurrent += 1;
+        else if(m_allowBlink && !m_levelBlinkActive)
+            m_levelBlinkActive = true;
 
         if(!m_cyclesFin)
             m_cyclesTotal += 1;
+
+        if(m_levelBlinkActive)
+            updateColorSpin(5.0f);
+
+        if(m_worldBlinkActive)
+        {
+            m_blinkingFactor += m_blinkingDir * 0.02;
+            if(m_blinkingFactor >= 0.3f || m_blinkingFactor <= -0.3f)
+                m_blinkingDir *= -1.0f;
+        }
     }
 }
 
 void GameplayTimer::onBossDead()
 {
     m_cyclesFin = true;
+    if(m_allowBlink)
+        m_worldBlinkActive = true;
 }
 
 void GameplayTimer::render()
@@ -150,6 +274,15 @@ void GameplayTimer::render()
     float a = m_semiTransparent ? 0.5f : 1.f;
     // int x = (ScreenW / 2) - (144 / 2);
     int y = ScreenH;
-    SuperPrintScreenCenter(formatTime(m_cyclesCurrent), 3, y - 34, 1.f, 1.f, 1.f, a);
-    SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, 1.f, 1.f, 1.f, a);
+
+    float lc[3] =
+    {
+        m_levelBlinkActive ? m_colorSpin[0] : 0.6f,
+        m_levelBlinkActive ? m_colorSpin[1] : 0.6f,
+        m_levelBlinkActive ? m_colorSpin[2] : 0.6f
+    };
+    float wc = m_worldBlinkActive ? 0.5f + m_blinkingFactor : 1.f;
+
+    SuperPrintScreenCenter(formatTime(m_cyclesCurrent), 3, y - 34, lc[0], lc[1], lc[2], a);
+    SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, wc, 1.0f, wc, a);
 }

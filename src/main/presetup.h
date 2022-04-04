@@ -25,13 +25,23 @@
 // Game settings loaded on initial startup and used to manipulate options
 // controllable via command line arguments
 
+enum
+{
+    SPEEDRUN_EFFECT_BLINK_UNDEFINED = 0,
+    SPEEDRUN_EFFECT_BLINK_OPAQUEONLY,
+    SPEEDRUN_EFFECT_BLINK_ALWAYS,
+    SPEEDRUN_EFFECT_BLINK_NEVER
+};
+
 extern struct PreSetup_t
 {
     int     speedRunMode = 0;
     bool    speedRunSemiTransparentTimer = false;
+    int     speedRunEffectBlink = SPEEDRUN_EFFECT_BLINK_UNDEFINED;
 
     int     compatibilityMode = 0;
 } g_preSetup; // main_config.cpp
 
 
 #endif // PRESETUP_H
+

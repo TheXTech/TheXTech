@@ -26,6 +26,7 @@
 #include "global_dirs.h"
 #include "compat.h"
 #include "main/speedrunner.h"
+#include "main/presetup.h"
 
 
 static int s_compatLevel = COMPAT_MODERN;
@@ -140,6 +141,7 @@ static void compatInit(Compatibility_t &c)
     c.speedrun_stop_timer_by = Compatibility_t::SPEEDRUN_STOP_NONE;
     SDL_memset(c.speedrun_stop_timer_at, 0, sizeof(c.speedrun_stop_timer_at));
     SDL_strlcpy(c.speedrun_stop_timer_at, "Boss Dead", sizeof(c.speedrun_stop_timer_at));
+    c.speedrun_blink_effect = SPEEDRUN_EFFECT_BLINK_OPAQUEONLY;
 }
 
 static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
@@ -163,9 +165,20 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
             {"leave", Compatibility_t::SPEEDRUN_STOP_LEAVE_LEVEL},
             {"enter", Compatibility_t::SPEEDRUN_STOP_ENTER_LEVEL}
         };
+
+        const IniProcessing::StrEnumMap speedRunBlinkMode =
+        {
+            {"opaque", SPEEDRUN_EFFECT_BLINK_OPAQUEONLY},
+            {"always", SPEEDRUN_EFFECT_BLINK_ALWAYS},
+            {"true", SPEEDRUN_EFFECT_BLINK_ALWAYS},
+            {"never", SPEEDRUN_EFFECT_BLINK_NEVER},
+            {"false", SPEEDRUN_EFFECT_BLINK_NEVER}
+        };
+
         compat.readEnum("stop-timer-by", c.speedrun_stop_timer_by, c.speedrun_stop_timer_by, stopBy);
         compat.read("stop-timer-at", buffer, std::string(c.speedrun_stop_timer_at));
         SDL_strlcpy(c.speedrun_stop_timer_at, buffer.c_str(), sizeof(c.speedrun_stop_timer_at));
+        compat.readEnum("blink-effect", c.speedrun_blink_effect, c.speedrun_blink_effect, speedRunBlinkMode);
     }
     compat.endGroup();
 

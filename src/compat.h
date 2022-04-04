@@ -90,6 +90,7 @@ struct Compatibility_t
     };
     int speedrun_stop_timer_by;
     char speedrun_stop_timer_at[250];
+    int speedrun_blink_effect;
 
     // Deaths counter
     bool demos_counter_enable;
