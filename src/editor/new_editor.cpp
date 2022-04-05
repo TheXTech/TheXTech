@@ -87,7 +87,7 @@ void EditorScreen::ResetCursor()
     EditorCursor.Warp.Direction2 = 3;
     EditorCursor.Warp.MapX = -1;
     EditorCursor.Warp.MapY = -1;
-    EditorCursor.Effect = 1;
+    EditorCursor.Warp.Effect = 1;
     m_Warp_page = WARP_PAGE_MAIN;
 
     EditorCursor.Tile = Tile_t();
