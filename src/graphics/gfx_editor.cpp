@@ -25,6 +25,7 @@
 #include "npc.h"
 #include "collision.h"
 #include "gfx.h"
+#include "config.h"
 
 #include "editor.h"
 #include "editor/new_editor.h"
@@ -551,6 +552,18 @@ void DrawEditorLevel(int Z)
                 1.f, 0.f, 0.f, 1.f, false);
         }
 
+        if(g_config.editor_edge_scroll && !editorScreen.active)
+        {
+            if(curX < 36)
+                curX = 36;
+            if(curY < 36)
+                curY = 36;
+            if(curX >= ScreenW - 36)
+                curX = ScreenW - 36;
+            if(curY >= ScreenH - 36)
+                curY = ScreenH - 36;
+        }
+
         if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6) // Eraser
         {
             XRender::renderTexture(curX - 2, curY, GFX.ECursor[3]);
@@ -682,17 +695,29 @@ void DrawEditorWorld()
             1.f, 0.f, 1.f, 1.f, false);
         SuperPrint(std::to_string(EditorCursor.WorldMusic.Type), 1, vScreenX[Z] + EditorCursor.WorldMusic.Location.X + 2, vScreenY[Z] + EditorCursor.WorldMusic.Location.Y + 2);
     }
+
+    double X = EditorCursor.X;
+    double Y = EditorCursor.Y;
+    if(g_config.editor_edge_scroll && !editorScreen.active)
+    {
+        if(X < 36)
+            X = 36;
+        if(Y < 36)
+            Y = 36;
+        if(X >= ScreenW - 36)
+            X = ScreenW - 36;
+        if(Y >= ScreenH - 36)
+            Y = ScreenH - 36;
+    }
     if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0)
     {
-        XRender::renderTexture(EditorCursor.X - 2,
-            EditorCursor.Y,
+        XRender::renderTexture(X - 2, Y,
             22, 30,
             GFX.ECursor[3], 0, 0);
     }
     else
     {
-        XRender::renderTexture(EditorCursor.X,
-            EditorCursor.Y + 8,
+        XRender::renderTexture(X, Y,
             32, 32,
             GFX.ECursor[2], 0, 0);
     }

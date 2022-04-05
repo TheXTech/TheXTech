@@ -3835,7 +3835,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             {
                 int cur_FileFormat = FileFormat;
                 if(cur_FileFormat < 0 || cur_FileFormat > 2)
-                    cur_FileFormat = g_config.preferred_file_format;
+                    cur_FileFormat = g_config.editor_preferred_file_format;
 
                 if(cur_FileFormat == FileFormats::LVL_SMBX64 || cur_FileFormat == FileFormats::LVL_SMBX38A)
                     StartFileBrowser(&FullFileName, "", FileNamePath, {".lvl"}, BROWSER_MODE_SAVE_NEW, BROWSER_CALLBACK_NEW_LEVEL);
@@ -3856,7 +3856,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             {
                 int cur_FileFormat = FileFormat;
                 if(cur_FileFormat < 0 || cur_FileFormat > 2)
-                    cur_FileFormat = g_config.preferred_file_format;
+                    cur_FileFormat = g_config.editor_preferred_file_format;
 
                 if(cur_FileFormat == FileFormats::LVL_SMBX64 || cur_FileFormat == FileFormats::LVL_SMBX38A)
                     StartFileBrowser(&FullFileName, "", FileNamePath, {".wld"}, BROWSER_MODE_SAVE_NEW, BROWSER_CALLBACK_NEW_WORLD);
@@ -4086,7 +4086,7 @@ void EditorScreen::FileBrowserSuccess()
     {
         int cur_FileFormat = FileFormat;
         if(cur_FileFormat < 0 || cur_FileFormat > 2)
-            cur_FileFormat = g_config.preferred_file_format;
+            cur_FileFormat = g_config.editor_preferred_file_format;
         EnsureLevel();
         ClearLevel();
         SaveLevel(FullFileName, cur_FileFormat);
@@ -4110,7 +4110,7 @@ void EditorScreen::FileBrowserSuccess()
     {
         int cur_FileFormat = FileFormat;
         if(cur_FileFormat < 0 || cur_FileFormat > 2)
-            cur_FileFormat = g_config.preferred_file_format;
+            cur_FileFormat = g_config.editor_preferred_file_format;
         EnsureWorld();
         ClearWorld();
         SaveWorld(FullFileName, cur_FileFormat);
@@ -4389,8 +4389,8 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
 #ifndef __3DS__
         e_CursorX = EditorCursor.X;
         e_CursorY = EditorCursor.Y;
-        if(WorldEditor)
-            e_CursorY += 8;
+        // if(WorldEditor)
+        //     e_CursorY += 8;
 #endif
         sx = (ScreenW - e_ScreenW)/2;
     }
@@ -4643,11 +4643,25 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     }
     if(select_bar_only && mode == CallMode::Render && e_CursorY < 40 && e_CursorX >= sx && e_CursorX < sx+e_ScreenW)
     {
+        int X = e_CursorX;
+        int Y = e_CursorY;
+        if(g_config.editor_edge_scroll)
+        {
+            if(X < 36)
+                X = 36;
+            if(Y < 36)
+                Y = 36;
+            if(X >= ScreenW - 36)
+                X = ScreenW - 36;
+            if(Y >= ScreenH - 36)
+                Y = ScreenH - 36;
+        }
+
 #ifndef __3DS__
-        XRender::renderTexture(e_CursorX, e_CursorY, GFX.ECursor[2]);
+        XRender::renderTexture(X, Y, GFX.ECursor[2]);
 #endif
         if(e_tooltip)
-            SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34, 1.0f, 0.7f, 0.7f);
+            SuperPrint(e_tooltip, 3, X + 28, Y + 34, 1.0f, 0.7f, 0.7f);
     }
 }
 
@@ -4688,8 +4702,8 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     e_CursorX = EditorCursor.X;
     e_CursorY = EditorCursor.Y;
     e_CursorX -= ScreenW/2-e_ScreenW/2;
-    if(WorldEditor)
-        e_CursorY += 8;
+    // if(WorldEditor)
+    //     e_CursorY += 8;
 
     if(mode == CallMode::Render)
         XRender::setViewport(ScreenW/2-e_ScreenW/2, 0, e_ScreenW, e_ScreenH);

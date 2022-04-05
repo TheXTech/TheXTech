@@ -46,6 +46,7 @@
 #include "main/trees.h"
 #include "main/game_globals.h"
 #include "load_gfx.h"
+#include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
 
@@ -273,9 +274,6 @@ void UpdateEditor()
 
         if(ScrollDelay <= 0)
         {
-            // EditorControls.Scroll* are now analogue, think...!
-            // we could set it up so we only do the screen grid lock after scrolling is done
-
             if(EditorControls.ScrollUp)
             {
                 vScreenY[1] += 32;
@@ -2077,6 +2075,48 @@ void GetEditorControls()
         MouseRelease = false;
         MenuMouseRelease = false;
         PlaySound(SFX_Pause);
+    }
+
+    if(g_config.editor_edge_scroll && !editorScreen.active) // scroll-by-edge
+    {
+        bool scrolled = false;
+        if(SharedCursor.X < 4 && SharedCursor.Y >= 0 && SharedCursor.Y < ScreenH)
+        {
+            SharedCursor.X += 32;
+            EditorControls.ScrollLeft = true;
+            ScrollDelay = 0;
+            scrolled = true;
+        }
+        if(SharedCursor.X >= ScreenW - 4 && SharedCursor.Y >= 0 && SharedCursor.Y < ScreenH)
+        {
+            SharedCursor.X -= 32;
+            EditorControls.ScrollRight = true;
+            ScrollDelay = 0;
+            scrolled = true;
+        }
+
+        if(SharedCursor.Y < 4 && SharedCursor.X >= 0 && SharedCursor.X < ScreenW)
+        {
+            SharedCursor.Y += 32;
+            EditorControls.ScrollUp = true;
+            ScrollDelay = 0;
+            scrolled = true;
+        }
+
+        if(SharedCursor.Y >= ScreenH - 4 && SharedCursor.X >= 0 && SharedCursor.X < ScreenW)
+        {
+            SharedCursor.Y -= 32;
+            EditorControls.ScrollDown = true;
+            ScrollDelay = 0;
+            scrolled = true;
+        }
+
+        if(scrolled)
+        {
+            int window_x, window_y;
+            XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &window_x, &window_y);
+            XWindow::placeCursor(window_x, window_y);
+        }
     }
 }
 

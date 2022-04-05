@@ -1002,11 +1002,11 @@ bool mainMenuUpdate()
                                 DirMan::mkAbsPath(AppPathManager::userWorldsRootDir() + "/" + fn);
 
                                 std::string wPath = AppPathManager::userWorldsRootDir() + "/" + fn + "/world.wld";
-                                if(g_config.preferred_file_format != FileFormats::WLD_SMBX64 && g_config.preferred_file_format != FileFormats::WLD_SMBX38A)
+                                if(g_config.editor_preferred_file_format != FileFormats::WLD_SMBX64 && g_config.editor_preferred_file_format != FileFormats::WLD_SMBX38A)
                                     wPath += "x";
                                 g_recentWorldEditor = wPath;
 
-                                SaveWorld(wPath, g_config.preferred_file_format);
+                                SaveWorld(wPath, g_config.editor_preferred_file_format);
 
 #ifdef PGE_NO_THREADING
                                 FindWorlds();
