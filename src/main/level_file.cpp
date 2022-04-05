@@ -1097,6 +1097,7 @@ bool CanConvertLevel(int format, std::string* reasons)
     bool seen_stars_msg = false;
     bool seen_no_print_stars = false;
     bool seen_no_entrance_scene = false;
+    bool seen_portal_warp = false;
     for(int i = 1; i <= numWarps; i++)
     {
         Warp_t& w = Warp[i];
@@ -1156,6 +1157,14 @@ bool CanConvertLevel(int format, std::string* reasons)
             if(reasons)
                 *reasons += "A level warp skips the start scene.\n";
         }
+
+        if(!seen_portal_warp && w.Effect == 3)
+        {
+            can_convert = false;
+            seen_portal_warp = true;
+           if(reasons)
+                *reasons += "A warp uses the portal effect.\n";
+         }
     }
 
     bool seen_event_custom_music = false;
@@ -1248,6 +1257,9 @@ void ConvertLevel(int format)
         SetS(w.StarsMsg, "");
         w.noPrintStars = false;
         w.noEntranceScene = false;
+
+        if(w.Effect == 3)
+            w.Effect = 0;
     }
 
     for(int i = 0; i < numEvents; ++i)

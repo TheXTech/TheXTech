@@ -87,6 +87,7 @@ void EditorScreen::ResetCursor()
     EditorCursor.Warp.Direction2 = 3;
     EditorCursor.Warp.MapX = -1;
     EditorCursor.Warp.MapY = -1;
+    EditorCursor.Effect = 1;
     m_Warp_page = WARP_PAGE_MAIN;
 
     EditorCursor.Tile = Tile_t();
@@ -3183,8 +3184,10 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             SuperPrintR(mode, "STYLE: PIPE", 3, 6, 194);
         else if(EditorCursor.Warp.Effect == 2)
             SuperPrintR(mode, "STYLE: DOOR", 3, 6, 194);
-        else if(EditorCursor.Warp.Effect == 3)
+        else if(EditorCursor.Warp.Effect == 0)
             SuperPrintR(mode, "STYLE: BLIP", 3, 6, 194);
+        else if(EditorCursor.Warp.Effect == 3)
+            SuperPrintR(mode, "STYLE: PORT", 3, 6, 194);
         else
         {
             EditorCursor.Warp.Effect = 1;
@@ -3198,7 +3201,9 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             EditorCursor.Warp.Direction = 1;
             EditorCursor.Warp.Direction2 = 1;
         }
-        if(UpdateButton(mode, 300 + 4, 180 + 4, GFXBackgroundBMP[61], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
+        if(UpdateButton(mode, 300 + 4, 180 + 4, GFXBackgroundBMP[61], EditorCursor.Warp.Effect == 0, 0, 0, 32, 32))
+            EditorCursor.Warp.Effect = 0;
+        if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, 340 + 4, 180 + 4, GFXNPC[NPCID_RINKA], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
             EditorCursor.Warp.Effect = 3;
 
         // fade effect
@@ -3243,7 +3248,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
                 SuperPrintR(mode, "SPEED " + std::to_string(vb6Round(EditorCursor.Warp.cannonExitSpeed)), 3, 26, 394);
                 if(EditorCursor.Warp.cannonExitSpeed > 1 && UpdateButton(mode, 180 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                     EditorCursor.Warp.cannonExitSpeed --;
-                if(UpdateButton(mode, 220 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+                if(EditorCursor.Warp.cannonExitSpeed <= 31 && UpdateButton(mode, 220 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                     EditorCursor.Warp.cannonExitSpeed ++;
             }
         }
