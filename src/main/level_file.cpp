@@ -34,6 +34,7 @@
 #include "level_file.h"
 #include "trees.h"
 #include "record.h"
+#include "npc_special_data.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -535,6 +536,20 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);
+        }
+
+        if(compatModern && isSmbx64)
+        {
+            // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
+            npc.Special7 = find_legacy_Special7(npc.Type, fVersion);
+        }
+        else if(isSmbx64)
+        {
+            npc.Special7 = 0.0;
+        }
+        else
+        {
+            npc.Special7 = n.special_data;
         }
 
         if(npc.Type == NPCID_CANNONITEM) // billy gun
