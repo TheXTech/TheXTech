@@ -50,6 +50,8 @@
 #include "core/window.h"
 #include "core/events.h"
 
+#include "controls.h"
+
 #include "pseudo_vb.h"
 #include "npc_id.h"
 
@@ -177,6 +179,8 @@ void EditorCursor_t::ClearStrings()
 // it is still called when the player is testing a level in the editor in windowed mode
 void UpdateEditor()
 {
+    Controls::PollInputMethod();
+
     int A = 0;
     int B = 0;
 //    int C = 0;
@@ -2716,6 +2720,9 @@ void zTestLevel(bool magicHand, bool interProcess)
             ErrorQuit = true;
         }
     }
+
+    // force reconnect on leveltest start
+    Controls::ClearInputMethods();
 
     GameThing(0, 0);
     SetupScreens();
