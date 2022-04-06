@@ -2057,7 +2057,7 @@ void GetEditorControls()
         EditorBackup();
         Backup_FullFileName = FullFileName;
         FullFileName = FullFileName + "tst";
-        SaveLevel(FullFileName, FileFormats::LVL_PGEX);
+        SaveLevel(FullFileName, FileFormat);
 
         if(g_config.EnableInterLevelFade)
             g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
