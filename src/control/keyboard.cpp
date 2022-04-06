@@ -27,6 +27,7 @@
 #include "../game_main.h"
 
 #include "core/render.h"
+#include "core/window.h"
 #include "main/cheat_code.h"
 
 namespace Controls
@@ -833,7 +834,7 @@ void InputMethodType_Keyboard::UpdateControlsPost()
         if(buttons & SDL_BUTTON_MMASK)
             SharedCursor.Tertiary = true;
     }
-    else if(!SharedCursor.Move && (SharedCursor.X >= 0 || SharedCursor.Y >= 0))
+    else if(XWindow::hasWindowInputFocus() && !SharedCursor.Move && (SharedCursor.X >= 0 || SharedCursor.Y >= 0))
     {
         SharedCursor.GoOffscreen();
     }

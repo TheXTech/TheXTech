@@ -236,7 +236,10 @@ void WindowSDL::placeCursor(int window_x, int window_y)
 
     if(n_sx - o_sx < -2 || n_sx - o_sx > 2 || n_sy - o_sy < -2 || n_sy - o_sy > 2)
     {
-        SDL_WarpMouseInWindow(m_window, window_x, window_y);
+        int window_w, window_h;
+        this->getWindowSize(&window_w, &window_h);
+        if(window_x >= 0 && window_x < window_w && window_y >= 0 && window_y < window_h)
+            SDL_WarpMouseInWindow(m_window, window_x, window_y);
     }
 }
 
