@@ -2080,16 +2080,17 @@ void GetEditorControls()
     if(g_config.editor_edge_scroll && !editorScreen.active) // scroll-by-edge
     {
         bool scrolled = false;
+        int scroll_margin = EditorControls.FastScroll ? 16 : 32;
         if(SharedCursor.X < 4 && SharedCursor.Y >= 0 && SharedCursor.Y < ScreenH)
         {
-            SharedCursor.X += 32;
+            SharedCursor.X += scroll_margin;
             EditorControls.ScrollLeft = true;
             ScrollDelay = 0;
             scrolled = true;
         }
         if(SharedCursor.X >= ScreenW - 4 && SharedCursor.Y >= 0 && SharedCursor.Y < ScreenH)
         {
-            SharedCursor.X -= 32;
+            SharedCursor.X -= scroll_margin;
             EditorControls.ScrollRight = true;
             ScrollDelay = 0;
             scrolled = true;
@@ -2097,7 +2098,7 @@ void GetEditorControls()
 
         if(SharedCursor.Y < 4 && SharedCursor.X >= 0 && SharedCursor.X < ScreenW)
         {
-            SharedCursor.Y += 32;
+            SharedCursor.Y += scroll_margin;
             EditorControls.ScrollUp = true;
             ScrollDelay = 0;
             scrolled = true;
@@ -2105,7 +2106,7 @@ void GetEditorControls()
 
         if(SharedCursor.Y >= ScreenH - 4 && SharedCursor.X >= 0 && SharedCursor.X < ScreenW)
         {
-            SharedCursor.Y -= 32;
+            SharedCursor.Y -= scroll_margin;
             EditorControls.ScrollDown = true;
             ScrollDelay = 0;
             scrolled = true;
