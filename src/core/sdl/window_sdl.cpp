@@ -224,6 +224,9 @@ AbstractWindow_t::Cursor_t WindowSDL::getCursor()
 
 void WindowSDL::placeCursor(int window_x, int window_y)
 {
+    if(!this->hasWindowInputFocus())
+        return;
+
     int old_window_x, old_window_y;
     SDL_GetMouseState(&old_window_x, &old_window_y);
     int o_sx, o_sy, n_sx, n_sy;
