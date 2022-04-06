@@ -40,7 +40,7 @@ void SetOrigRes()
     if(LoadingInProcess)
         UpdateLoad();
 
-    if(!GameMenu && !MagicHand)
+    if(!GameMenu && !MagicHand && !LevelEditor)
         XWindow::showCursor(1);
 }
 

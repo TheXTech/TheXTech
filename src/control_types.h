@@ -40,8 +40,8 @@ struct CursorControls_t
     // moved this frame
     bool Move = false;
     // position of cursor in screen coordinates
-    double X = -128.;
-    double Y = -128.;
+    double X = -4000.;
+    double Y = -4000.;
     // "left button" down
     bool Primary = false;
     // "right button" down
@@ -54,8 +54,8 @@ struct CursorControls_t
     // call to easily send cursor offscreen (on disconnect, etc)
     inline void GoOffscreen()
     {
-        X = -128.;
-        Y = -128.;
+        X = -4000.;
+        Y = -4000.;
     }
 };
 
