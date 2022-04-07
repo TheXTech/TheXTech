@@ -167,7 +167,17 @@ void Init(bool LegacyPause)
 
     bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
 
-    if(TestLevel)
+    // pause 
+    if(TestLevel && LevelBeatCode == -2)
+    {
+        s_items.push_back(MenuItem{"RESTART", s_RestartLevel});
+        s_items.push_back(MenuItem{"RESET CHECKPOINTS", s_ResetCheckpoints});
+        if(Backup_FullFileName.empty())
+            s_items.push_back(MenuItem{"QUIT TESTING", s_QuitTesting});
+        else
+            s_items.push_back(MenuItem{"RETURN TO EDITOR", s_QuitTesting});
+    }
+    else if(TestLevel)
     {
     	s_items.push_back(MenuItem{"CONTINUE", s_Continue});
     	s_items.push_back(MenuItem{"RESTART LEVEL", s_RestartLevel});

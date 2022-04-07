@@ -2601,7 +2601,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     Lives = 3;
 
     if(numPlayers == 0)
-        numPlayers = 1;
+        numPlayers = editorScreen.num_test_players;
 
     if(Checkpoint.empty()) // Don't reset players when resume at the checkpoint
     {
@@ -2618,7 +2618,7 @@ void zTestLevel(bool magicHand, bool interProcess)
                 Player[A].Character = testPlayer[1].Character;
                 Player[A].UnStart = false;
                 if(Player[A].Character == 0)
-                    Player[1].Character = 1;
+                    Player[A].Character = 1;
             }
         }
         else

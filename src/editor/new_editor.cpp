@@ -1712,6 +1712,141 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     }
 }
 
+void EditorScreen::UpdateLevelTestScreen(CallMode mode)
+{
+    if(m_special_subpage < 1)
+        m_special_subpage = 1;
+    if(m_special_subpage > maxLocalPlayers)
+        m_special_subpage = maxLocalPlayers;
+    if(this->num_test_players < 1)
+        this->num_test_players = 1;
+    if(m_special_subpage > this->num_test_players + 1)
+        m_special_subpage = this->num_test_players;
+
+    SuperPrintR(mode, "MAGIC HAND", 3, 54, 54);
+    if(UpdateCheckBox(mode, 10 + 4, 40 + 4, this->test_magic_hand))
+        this->test_magic_hand = !this->test_magic_hand;
+
+    SuperPrintR(mode, "TEST PLAY", 3, e_ScreenW-220, 54);
+    if(UpdateButton(mode, e_ScreenW-50 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::play, 32, 32))
+    {
+        // turn this into a routine...?! (cross-reference editor.cpp handler for EditorControls.TestPlay)
+        EditorBackup();
+        Backup_FullFileName = FullFileName;
+        // how does this interact with cross-level warps?
+        FullFileName = FullFileName + "tst";
+        SaveLevel(FullFileName, FileFormat);
+
+        if(g_config.EnableInterLevelFade)
+            g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
+        else
+            g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
+        editorWaitForFade();
+
+        HasCursor = false;
+        zTestLevel(this->test_magic_hand);
+    }
+
+    SuperPrintR(mode, "PLAYER " + std::to_string(m_special_subpage), 3, 240, 94);
+    if(m_special_subpage > 1 && UpdateButton(mode, 200 + 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+        m_special_subpage --;
+    if(m_special_subpage < maxLocalPlayers && m_special_subpage <= this->num_test_players && UpdateButton(mode, 380 + 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+        m_special_subpage ++;
+
+    if(m_special_subpage >= this->num_test_players && m_special_subpage != 1)
+    {
+        SuperPrintR(mode, "ENABLED", 3, 54, 154);
+
+        if(UpdateCheckBox(mode, 10 + 4, 140 + 4, m_special_subpage == this->num_test_players))
+        {
+            if(m_special_subpage == this->num_test_players)
+                this->num_test_players -= 1;
+            else
+                this->num_test_players += 1;
+        }
+    }
+
+    if(m_special_subpage > this->num_test_players)
+        return;
+
+    SuperPrintR(mode, "CHARACTER", 3, 4, 194);
+
+    constexpr int block_for_char[] = {622, 623, 624, 625, 631};
+    for(int ch = 1; ch <= 5; ch++)
+    {
+        bool active = testPlayer[m_special_subpage].Character == ch;
+        int block = block_for_char[ch - 1];
+
+        if(UpdateButton(mode, 120 + 4 + 40*ch, 180 + 4, GFXBlock[block], active, 0, 0, 32, 32))
+            testPlayer[m_special_subpage].Character = ch;
+    }
+
+    SuperPrintR(mode, "POWERUP", 3, 4, 234);
+
+    if(testPlayer[m_special_subpage].State == 0)
+        testPlayer[m_special_subpage].State = 1;
+
+    constexpr int NPC_for_state[] = {0, NPCID_SHROOM_SMB3, NPCID_FIREFLOWER_SMB3, NPCID_LEAF, NPCID_TANOOKISUIT, NPCID_HAMMERSUIT, NPCID_ICEFLOWER_SMB3};
+    for(int state = 1; state <= 7; state++)
+    {
+        bool active = testPlayer[m_special_subpage].State == state;
+        int NPC = NPC_for_state[state - 1];
+
+        bool selected;
+        if(!NPC)
+            selected = UpdateButton(mode, 120 + 4 + 40*state, 220 + 4, GFX.EIcons, active, 0, 0, 1, 1);
+        else
+            selected = UpdateButton(mode, 120 + 4 + 40*state, 220 + 4, GFXNPC[NPC], active, 0, 0, 32, 32);
+
+        if(selected)
+            testPlayer[m_special_subpage].State = state;
+    }
+
+    SuperPrintR(mode, "BOOT", 3, 4, 274);
+
+    constexpr int NPC_for_boot[] = {NPCID_GRNBOOT, NPCID_REDBOOT, NPCID_BLUBOOT};
+    for(int boot = 1; boot <= 3; boot++)
+    {
+        bool active = testPlayer[m_special_subpage].Mount == 1 && testPlayer[m_special_subpage].MountType == boot;
+        int NPC = NPC_for_boot[boot - 1];
+
+        if(UpdateButton(mode, 120 + 4 + 40*boot, 260 + 4, GFXNPC[NPC], active, 0, 0, 32, 32))
+        {
+            if(active)
+            {
+                testPlayer[m_special_subpage].Mount = 0;
+            }
+            else
+            {
+                testPlayer[m_special_subpage].Mount = 1;
+                testPlayer[m_special_subpage].MountType = boot;
+            }
+        }
+    }
+
+    SuperPrintR(mode, "YOSHI", 3, 4, 314);
+
+    constexpr int NPC_for_yoshi[] = {NPCID_YOSHI_GREEN, NPCID_YOSHI_BLUE, NPCID_YOSHI_YELLOW, NPCID_YOSHI_RED, NPCID_YOSHI_BLACK, NPCID_YOSHI_PURPLE, NPCID_YOSHI_PINK, NPCID_YOSHI_CYAN};
+    for(int yoshi = 1; yoshi <= 8; yoshi++)
+    {
+        bool active = testPlayer[m_special_subpage].Mount == 3 && testPlayer[m_special_subpage].MountType == yoshi;
+        int NPC = NPC_for_yoshi[yoshi - 1];
+
+        if(UpdateButton(mode, 120 + 4 + 40*yoshi, 300 + 4, GFXNPC[NPC], active, 0, 0, 72, 56))
+        {
+            if(active)
+            {
+                testPlayer[m_special_subpage].Mount = 0;
+            }
+            else
+            {
+                testPlayer[m_special_subpage].Mount = 3;
+                testPlayer[m_special_subpage].MountType = yoshi;
+            }
+        }
+    }
+}
+
 void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
 {
     // world name
@@ -4436,7 +4571,8 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     bool in_file = (m_special_page == SPECIAL_PAGE_FILE || m_special_page == SPECIAL_PAGE_FILE_CONFIRM
         || m_special_page == SPECIAL_PAGE_FILE_CONVERT);
     bool in_world_settings = (m_special_page == SPECIAL_PAGE_WORLD_SETTINGS);
-    bool in_excl_special = in_layers || in_events || in_world_settings || in_file;
+    bool in_leveltest_settings = (m_special_page == SPECIAL_PAGE_LEVELTEST || m_special_page == SPECIAL_PAGE_LEVELTEST_HELDNPC);
+    bool in_excl_special = in_layers || in_events || in_world_settings || in_leveltest_settings || in_file;
     bool exit_special = false;
 
     bool currently_in;
@@ -4609,23 +4745,15 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             m_special_page = SPECIAL_PAGE_FILE;
     }
 
-    if(!WorldEditor && !MagicHand && UpdateButton(mode, sx+14*40 + 4, 4, GFX.EIcons, false, 0, 32*Icon::play, 32, 32, "Test"))
+    if(!WorldEditor && !MagicHand && UpdateButton(mode, sx+14*40 + 4, 4, GFX.EIcons, in_leveltest_settings, 0, 32*Icon::play, 32, 32, "Test"))
     {
-        // turn this into a routine...?!
-        EditorBackup();
-        Backup_FullFileName = FullFileName;
-        // how does this interact with cross-level warps?
-        FullFileName = FullFileName + "tst";
-        SaveLevel(FullFileName, FileFormat);
-
-        if(g_config.EnableInterLevelFade)
-            g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
-        else
-            g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
-        editorWaitForFade();
-
-        HasCursor = false;
-        zTestLevel();
+        if(in_leveltest_settings || !editorScreen.active)
+            swap_screens();
+        EditorCursor.Mode = OptCursor_t::LVL_SELECT;
+        optCursor.current = OptCursor_t::LVL_SELECT;
+        m_last_mode = OptCursor_t::LVL_SELECT;
+        if(!in_leveltest_settings)
+            m_special_page = SPECIAL_PAGE_LEVELTEST;
     }
 
     int switch_screens_icon = 0;
@@ -4740,8 +4868,10 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         UpdateEventSettingsScreen(mode);
     else if(m_special_page == SPECIAL_PAGE_OBJ_TRIGGERS || m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
         UpdateEventsSubScreen(mode);
-    else if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS)
+    else if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS || m_special_page == SPECIAL_PAGE_LEVELTEST_HELDNPC)
         UpdateNPCScreen(mode);
+    else if(m_special_page == SPECIAL_PAGE_LEVELTEST)
+        UpdateLevelTestScreen(mode);
     else if(m_special_page == SPECIAL_PAGE_WORLD_SETTINGS)
         UpdateWorldSettingsScreen(mode);
     else if(m_special_page == SPECIAL_PAGE_EVENT_MUSIC || m_special_page == SPECIAL_PAGE_EVENT_BACKGROUND

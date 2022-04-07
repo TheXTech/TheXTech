@@ -900,19 +900,19 @@ int GameMain(const CmdLineSetup_t &setup)
             if(TestLevel)
             {
                 // if failed, restart
+                if(LevelBeatCode == 0 && g_config.editor_pause_on_death)
+                {
+                    LevelSelect = false;
+                    LevelBeatCode = -2; // checked in PauseScreen::Init()
+                    PauseGame(PauseCode::PauseScreen);
+                }
+
+                // check that we are still restarting (it could have been canceled above)
                 if(LevelBeatCode == 0 || LevelBeatCode == -2)
                 {
                     GameThing();
-                    zTestLevel(setup.testMagicHand, setup.interprocess); // Restart level
-
-                    if(g_config.editor_pause_on_death && LevelBeatCode == 0)
-                    {
-                        PauseGame(PauseCode::PauseScreen);
-                    }
+                    zTestLevel(setup.testMagicHand || editorScreen.test_magic_hand, setup.interprocess); // Restart level
                 }
-
-                // check that we are not restarting (it could have been canceled above)
-                if(LevelBeatCode == 0) {}
                 // from editor, return to editor
                 else if(!Backup_FullFileName.empty())
                 {

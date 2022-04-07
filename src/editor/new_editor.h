@@ -80,6 +80,8 @@ private:
         SPECIAL_PAGE_WARP_TRANSITION,
         SPECIAL_PAGE_LEVEL_EXIT,
         SPECIAL_PAGE_WORLD_SETTINGS,
+        SPECIAL_PAGE_LEVELTEST,
+        SPECIAL_PAGE_LEVELTEST_HELDNPC,
         SPECIAL_PAGE_FILE,
         SPECIAL_PAGE_FILE_CONFIRM,
         SPECIAL_PAGE_FILE_CONVERT,
@@ -175,6 +177,8 @@ private:
     void UpdateWarpScreen(CallMode mode);
 
     void UpdateSectionsScreen(CallMode mode);
+
+    void UpdateLevelTestScreen(CallMode mode);
 
     void UpdateWorldSettingsScreen(CallMode mode);
 
