@@ -30,4 +30,7 @@
     <string name="start_game_button">Start spill</string>
     <string name="title_activity_game_settings">Spillinnstillinger</string>
     <string name="app_name">X-Tech-motoren</string>
+    <string name="cheat_dialog_cancel">Avbryt</string>
+    <string name="cheat_dialog_ok">Kjør</string>
+    <string name="cheat_dialog_title">Skriv kommando:</string>
 </resources>
