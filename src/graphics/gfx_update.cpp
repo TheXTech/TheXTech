@@ -673,11 +673,15 @@ void UpdateGraphics(bool skipRepaint)
                     render = false;
                 }
 
-                // don't show a Cheep that hasn't jumped yet or a podoboo that hasn't started coming out yet
+                // don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
+                //   a piranha plant that hasn't emerged yet, 
                 if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
                     && (
                        (NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
                     || NPC[A].Type == NPCID_PODOBOO
+                    || NPC[A].Type == NPCID_PIRHANA_SMB3 || NPC[A].Type == NPCID_BOTTOMPIRHANA || NPC[A].Type == NPCID_SIDEPIRHANA
+                    || NPC[A].Type == NPCID_BIGPIRHANA || NPC[A].Type == NPCID_PIRHANA_SMB || NPC[A].Type == NPCID_FIREPIRHANA
+                    || NPC[A].Type == NPCID_LONGPIRHANA_UP || NPC[A].Type == NPCID_LONGPIRHANA_DOWN || NPC[A].Type == NPCID_PIRHANAHEAD
                     )
                 )
                 {
