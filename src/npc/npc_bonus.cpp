@@ -89,10 +89,21 @@ void DropBonus(int A)
                 GetvScreenAverage();
 
                 double ScreenTop = -vScreenY[1];
-                if (vScreen[1].Height > 600)
+                if(vScreen[1].Height > 600)
                     ScreenTop += vScreen[1].Height / 2 - 300;
+                int CenterX = -vScreenX[1] + vScreen[1].Width / 2;
 
-                NPC[numNPCs].Location.X = -vScreenX[1] + vScreen[1].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0 + B;
+                if(g_config.hud_follows_player)
+                {
+                    int l, t;
+                    GetvScreenAverageCanonical(&l, &t);
+                    if(vScreen[1].Height > 600)
+                        ScreenTop = -t;
+                    if(vScreen[1].Width > 800)
+                        CenterX = -l + 400;
+                }
+
+                NPC[numNPCs].Location.X = CenterX - NPC[numNPCs].Location.Width / 2.0 + B;
                 NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
             }
                 //            else if(nPlay.Online == true)
@@ -105,11 +116,22 @@ void DropBonus(int A)
             {
                 GetvScreen(A);
 
-                double ScreenTop = -vScreenY[1];
-                if (vScreen[1].Height > 600)
-                    ScreenTop += vScreen[1].Height / 2 - 300;
+                double ScreenTop = -vScreenY[A];
+                if(vScreen[A].Height > 600)
+                    ScreenTop += vScreen[A].Height / 2 - 300;
+                int CenterX = -vScreenX[A] + vScreen[A].Width / 2;
 
-                NPC[numNPCs].Location.X = -vScreenX[A] + vScreen[A].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                if(g_config.hud_follows_player)
+                {
+                    int l, t;
+                    GetvScreenCanonical(A, &l, &t);
+                    if(vScreen[A].Height > 600)
+                        ScreenTop = -t;
+                    if(vScreen[A].Width > 800)
+                        CenterX = -l + 400;
+                }
+
+                NPC[numNPCs].Location.X = CenterX - NPC[numNPCs].Location.Width / 2.0;
                 NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
             }
             NPC[numNPCs].Location.SpeedX = 0;
