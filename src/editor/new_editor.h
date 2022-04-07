@@ -157,6 +157,8 @@ private:
     bool UpdateButton(CallMode mode, int x, int y, StdPicture &im, bool sel,
         int src_x = 0, int src_y = 0, int src_w = 32, int src_h = 32, const char* tooltip = nullptr);
 
+    bool UpdateCheckBox(CallMode mode, int x, int y, bool sel, const char* tooltip = nullptr);
+
     void UpdateNPC(CallMode mode, int x, int y, int type);
     void UpdateNPCGrid(CallMode mode, int x, int y, const int* types, int n_npcs, int n_cols);
     void UpdateNPCScreen(CallMode mode);

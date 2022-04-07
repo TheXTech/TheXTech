@@ -382,6 +382,14 @@ bool EditorScreen::UpdateButton(CallMode mode, int x, int y, StdPicture &im, boo
     return false;
 }
 
+bool EditorScreen::UpdateCheckBox(CallMode mode, int x, int y, bool sel, const char* tooltip)
+{
+    if(sel)
+        return this->UpdateButton(mode, x, y, GFX.EIcons, sel, 0, 32*Icon::check, 32, 32, tooltip);
+    else
+        return this->UpdateButton(mode, x, y, GFX.EIcons, sel, 0, 0, 1, 1, tooltip);
+}
+
 void EditorScreen::UpdateNPC(CallMode mode, int x, int y, int type)
 {
     if((type < 1) || (type >= maxNPCType))
@@ -590,12 +598,12 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         else
         {
             SuperPrintR(mode, "NICE", 3, e_ScreenW - 200, 100);
-            if(UpdateButton(mode, e_ScreenW - 160 + 4, 120 + 4, GFX.EIcons, EditorCursor.NPC.Inert, 0, 32*Icon::check, 32, 32))
+            if(UpdateCheckBox(mode, e_ScreenW - 160 + 4, 120 + 4, EditorCursor.NPC.Inert))
                 EditorCursor.NPC.Inert = !EditorCursor.NPC.Inert;
         }
 
         SuperPrintR(mode, "STOP", 3, e_ScreenW - 110, 100);
-        if(UpdateButton(mode, e_ScreenW - 120 + 4, 120 + 4, GFX.EIcons, EditorCursor.NPC.Stuck, 0, 32*Icon::check, 32, 32))
+        if(UpdateCheckBox(mode, e_ScreenW - 120 + 4, 120 + 4, EditorCursor.NPC.Stuck))
             EditorCursor.NPC.Stuck = !EditorCursor.NPC.Stuck;
 
         // Text
@@ -962,7 +970,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         if(UpdateButton(mode, e_ScreenW - 240 - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
             FocusNPC();
         SuperPrintR(mode, "ENABLED", 3, 10, 110);
-        if(UpdateButton(mode, 220 + 4, 100 + 4, GFX.EIcons, EditorCursor.NPC.Generator, 0, 32*Icon::check, 32, 32))
+        if(UpdateCheckBox(mode, 220 + 4, 100 + 4, EditorCursor.NPC.Generator))
         {
             EditorCursor.NPC.Generator = true;
             if(!EditorCursor.NPC.GeneratorDirection)
@@ -1506,7 +1514,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 
     // autostart
     SuperPrintR(mode, "AUTOSTART", 3, 54, 90);
-    if(UpdateButton(mode, 10 + 4, 80 + 4, GFX.EIcons, Events[m_current_event].AutoStart, 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, 10 + 4, 80 + 4, Events[m_current_event].AutoStart))
         Events[m_current_event].AutoStart = !Events[m_current_event].AutoStart;
     // sound
     SuperPrintR(mode, "SOUND", 3, 254, 90);
@@ -1514,7 +1522,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         m_special_page = SPECIAL_PAGE_EVENT_SOUND;
     // end game
     SuperPrintR(mode, "END GAME", 3, 54, 130);
-    if(UpdateButton(mode, 10 + 4, 120 + 4, GFX.EIcons, Events[m_current_event].EndGame == 1, 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, 10 + 4, 120 + 4, Events[m_current_event].EndGame == 1))
         Events[m_current_event].EndGame ^= 1;
     // control lock
     bool controls_set = (Events[m_current_event].Controls.AltJump ||
@@ -1645,19 +1653,19 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         EditorCursor.SubMode = 2;
 
     // hwrap - LevelWrap
-    if(UpdateButton(mode, 10 + 4, 320 + 4, GFX.EIcons, LevelWrap[curSection], 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, 10 + 4, 320 + 4, LevelWrap[curSection]))
         LevelWrap[curSection] = !LevelWrap[curSection];
     SuperPrintR(mode, "HORIZ. WRAP", 3, 54, 326);
     // underwater - UnderWater
-    if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 320 + 4, GFX.EIcons, UnderWater[curSection], 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 320 + 4, UnderWater[curSection]))
         UnderWater[curSection] = !UnderWater[curSection];
     SuperPrintR(mode, "UNDERWATER", 3, e_ScreenW/2 + 54, 326);
     // no turn back - NoTurnBack
-    if(UpdateButton(mode, 10 + 4, 360 + 4, GFX.EIcons, NoTurnBack[curSection], 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, 10 + 4, 360 + 4, NoTurnBack[curSection]))
         NoTurnBack[curSection] = !NoTurnBack[curSection];
     SuperPrintR(mode, "NO TURN BACK", 3, 54, 366);
     // leave to exit - OffScreenExit
-    if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 360 + 4, GFX.EIcons, OffScreenExit[curSection], 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 360 + 4, OffScreenExit[curSection]))
         OffScreenExit[curSection] = !OffScreenExit[curSection];
     SuperPrintR(mode, "LEAVE TO EXIT", 3, e_ScreenW/2 + 54, 366);
 
@@ -1729,11 +1737,11 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
         SuperPrintR(mode, "NONE", 3, 54, 120);
 
     // no world map - NoMap
-    if(UpdateButton(mode, 10 + 4, 160 + 4, GFX.EIcons, NoMap, 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, 10 + 4, 160 + 4, NoMap))
         NoMap = !NoMap;
     SuperPrintR(mode, "NO WORLD MAP", 3, 54, 170);
     // restart after death - RestartLevel
-    if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 160 + 4, GFX.EIcons, RestartLevel, 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 160 + 4, RestartLevel))
         RestartLevel = !RestartLevel;
     SuperPrintR(mode, "RESTART", 3, e_ScreenW/2 + 54, 162);
     SuperPrintR(mode, "ON DEATH", 3, e_ScreenW/2 + 54, 180);
@@ -2595,10 +2603,10 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
 
     // Slippy ("SLICK") and Invis
     SuperPrintR(mode, "SLICK:", 3, e_ScreenW - 150, 214);
-    if(UpdateButton(mode, e_ScreenW - 40 + 4, 200 + 4, GFX.EIcons, EditorCursor.Block.Slippy, 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, e_ScreenW - 40 + 4, 200 + 4, EditorCursor.Block.Slippy))
         EditorCursor.Block.Slippy = !EditorCursor.Block.Slippy;
     SuperPrintR(mode, "INVIS:", 3, e_ScreenW - 150, 254);
-    if(UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFX.EIcons, EditorCursor.Block.Invis, 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, e_ScreenW - 40 + 4, 240 + 4, EditorCursor.Block.Invis))
         EditorCursor.Block.Invis = !EditorCursor.Block.Invis;
 
     // Contents
@@ -3137,7 +3145,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
     if(EditorCursor.Warp.level == STRINGINDEX_NONE && !EditorCursor.Warp.LevelEnt && !EditorCursor.Warp.MapWarp)
     {
         SuperPrintR(mode, "TWO-WAY", 3, e_ScreenW - 240 + 40 + 4, 134);
-        if(UpdateButton(mode, e_ScreenW - 240 + 4, 120 + 4, GFX.EIcons, EditorCursor.Warp.twoWay, 0, 32*Icon::check, 32, 32))
+        if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 120 + 4, EditorCursor.Warp.twoWay))
             EditorCursor.Warp.twoWay = !EditorCursor.Warp.twoWay;
 
     }
@@ -3225,10 +3233,10 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
 
         // allow / forbid
         SuperPrintR(mode, "ALLOW: ITEM", 3, 6, 294);
-        if(UpdateButton(mode, 220 + 4, 280 + 4, GFX.EIcons, EditorCursor.Warp.WarpNPC, 0, 32*Icon::check, 32, 32, "Can take NPC thru"))
+        if(UpdateCheckBox(mode, 220 + 4, 280 + 4, EditorCursor.Warp.WarpNPC, "Can take NPC thru"))
             EditorCursor.Warp.WarpNPC = !EditorCursor.Warp.WarpNPC;
         SuperPrintR(mode, "RIDE", 3, 280, 294);
-        if(UpdateButton(mode, 360 + 4, 280 + 4, GFX.EIcons, !EditorCursor.Warp.NoYoshi, 0, 32*Icon::check, 32, 32, "Can take Yoshi, boot"))
+        if(UpdateCheckBox(mode, 360 + 4, 280 + 4, !EditorCursor.Warp.NoYoshi, "Can take Yoshi, boot"))
             EditorCursor.Warp.NoYoshi = !EditorCursor.Warp.NoYoshi;
 
         // cannon exit
@@ -3236,7 +3244,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
         {
             SuperPrintR(mode, "CANNON EXIT", 3, 6, 354);
 
-            if(UpdateButton(mode, 220 + 4, 340 + 4, GFX.EIcons, EditorCursor.Warp.cannonExit, 0, 32*Icon::check, 32, 32))
+            if(UpdateCheckBox(mode, 220 + 4, 340 + 4, EditorCursor.Warp.cannonExit))
             {
                 EditorCursor.Warp.cannonExit = !EditorCursor.Warp.cannonExit;
                 if(!EditorCursor.Warp.cannonExit)
@@ -3279,14 +3287,14 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
         }
 
         SuperPrintR(mode, "NEED KEY", 3, 6, 274);
-        if(UpdateButton(mode, 220 + 4, 260 + 4, GFX.EIcons, EditorCursor.Warp.Locked, 0, 32*Icon::check, 32, 32))
+        if(UpdateCheckBox(mode, 220 + 4, 260 + 4, EditorCursor.Warp.Locked))
             EditorCursor.Warp.Locked = !EditorCursor.Warp.Locked;
 
         // new: must stand to enter
         if(FileFormat == FileFormats::LVL_PGEX)
         {
             SuperPrintR(mode, "NEED FLOOR", 3, 6, 314);
-            if(UpdateButton(mode, 220 + 4, 300 + 4, GFX.EIcons, EditorCursor.Warp.stoodRequired, 0, 32*Icon::check, 32, 32))
+            if(UpdateCheckBox(mode, 220 + 4, 300 + 4, EditorCursor.Warp.stoodRequired))
                 EditorCursor.Warp.stoodRequired = !EditorCursor.Warp.stoodRequired;
         }
     }
@@ -3295,7 +3303,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
     {
         // map/level warps
         SuperPrintR(mode, "TO MAP", 3, 6, 194);
-        if(UpdateButton(mode, 120 + 4, 180 + 4, GFX.EIcons, EditorCursor.Warp.MapWarp, 0, 32*Icon::check, 32, 32))
+        if(UpdateCheckBox(mode, 120 + 4, 180 + 4, EditorCursor.Warp.MapWarp))
         {
             EditorCursor.Warp.MapWarp = !EditorCursor.Warp.MapWarp;
             if(EditorCursor.Warp.MapWarp)
@@ -3305,7 +3313,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             }
         }
         SuperPrintR(mode, "LVL WARP IN", 3, 6, 234);
-        if(UpdateButton(mode, 240 + 4, 220 + 4, GFX.EIcons, EditorCursor.Warp.level != STRINGINDEX_NONE, 0, 32*Icon::check, 32, 32))
+        if(UpdateCheckBox(mode, 240 + 4, 220 + 4, EditorCursor.Warp.level != STRINGINDEX_NONE))
         {
             if(EditorCursor.Warp.level == STRINGINDEX_NONE)
             {
@@ -3317,7 +3325,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
                 EditorCursor.Warp.level = STRINGINDEX_NONE;
         }
         SuperPrintR(mode, "OUT", 3, 300, 234);
-        if(UpdateButton(mode, 360 + 4, 220 + 4, GFX.EIcons, EditorCursor.Warp.LevelEnt, 0, 32*Icon::check, 32, 32))
+        if(UpdateCheckBox(mode, 360 + 4, 220 + 4, EditorCursor.Warp.LevelEnt))
         {
             EditorCursor.Warp.LevelEnt = !EditorCursor.Warp.LevelEnt;
             if(EditorCursor.Warp.LevelEnt)
@@ -3353,7 +3361,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             {
                 // display the option to show/hide the level start scene
                 SuperPrintR(mode, "SHOW LEVEL\nSTART SCENE", 3, 6, 404);
-                if(UpdateButton(mode, 240 + 4, 400 + 4, GFX.EIcons, !EditorCursor.Warp.noEntranceScene, 0, 32*Icon::check, 32, 32))
+                if(UpdateCheckBox(mode, 240 + 4, 400 + 4, !EditorCursor.Warp.noEntranceScene))
                     EditorCursor.Warp.noEntranceScene = !EditorCursor.Warp.noEntranceScene;
                 // display the option to show/hide the level star count
                 SuperPrintR(mode, "SHOW LEVEL\nSTAR COUNT", 3, 6, 444);
@@ -3577,7 +3585,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     UpdateLevelGrid(mode, 0, 60, levels, sizeof(levels)/sizeof(int), 8);
 
     // path bg - Path
-    if(UpdateButton(mode, e_ScreenW - 240 + 4, 80+4, GFX.EIcons, EditorCursor.WorldLevel.Path, 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 80+4, EditorCursor.WorldLevel.Path))
     {
         EditorCursor.WorldLevel.Path = !EditorCursor.WorldLevel.Path;
         if(EditorCursor.WorldLevel.Path)
@@ -3586,7 +3594,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     SuperPrintR(mode, "PATH BG", 3, e_ScreenW - 240 + 44, 90);
 
     // big bg - Path2
-    if(UpdateButton(mode, e_ScreenW - 240 + 4, 120+4, GFX.EIcons, EditorCursor.WorldLevel.Path2, 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 120+4, EditorCursor.WorldLevel.Path2))
     {
         EditorCursor.WorldLevel.Path2 = !EditorCursor.WorldLevel.Path2;
         if(EditorCursor.WorldLevel.Path2)
@@ -3595,12 +3603,12 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     SuperPrintR(mode, "BIG BG", 3, e_ScreenW - 240 + 44, 130);
 
     // game start - Start
-    if(UpdateButton(mode, e_ScreenW - 240 + 4, 160 + 4, GFX.EIcons, EditorCursor.WorldLevel.Start, 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 160 + 4, EditorCursor.WorldLevel.Start))
         EditorCursor.WorldLevel.Start = !EditorCursor.WorldLevel.Start;
     SuperPrintR(mode, "GAME START", 3, e_ScreenW - 240 + 44, 170);
 
     // always visible - Visible
-    if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, EditorCursor.WorldLevel.Visible, 0, 32*Icon::check, 32, 32))
+    if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 200 + 4, EditorCursor.WorldLevel.Visible))
         EditorCursor.WorldLevel.Visible = !EditorCursor.WorldLevel.Visible;
     SuperPrintR(mode, "ALWAYS VIS", 3, e_ScreenW - 240 + 44, 210);
 
