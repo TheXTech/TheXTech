@@ -653,6 +653,16 @@ void UpdateGraphics(bool skipRepaint)
                     cannot_reset = (render || onscreen_canonical);
                     can_activate = onscreen_canonical;
                 }
+                else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::orig_with_despawn)
+                {
+                    render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
+
+                    bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
+                        || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
+
+                    cannot_reset = onscreen_canonical;
+                    can_activate = onscreen_canonical;
+                }
                 else // if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
                 {
                     render = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));

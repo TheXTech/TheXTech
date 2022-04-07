@@ -27,6 +27,7 @@ enum class NPC_activate_modes : int
     onscreen,
     smart,
     orig,
+    orig_with_despawn,
 };
 
 struct Compatibility_t

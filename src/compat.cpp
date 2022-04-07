@@ -278,6 +278,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
             {"onscreen", (int)NPC_activate_modes::onscreen},
             {"smart", (int)NPC_activate_modes::smart},
             {"orig", (int)NPC_activate_modes::orig},
+            {"orig-with-despawn", (int)NPC_activate_modes::orig_with_despawn},
         };
         compat.readEnum("npc-activate-mode", c.NPC_activate_mode, c.NPC_activate_mode, activModes);
         compat.read("disable-background2-tiling", c.disable_background2_tiling, c.disable_background2_tiling);
