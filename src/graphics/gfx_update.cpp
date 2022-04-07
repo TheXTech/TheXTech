@@ -627,8 +627,10 @@ void UpdateGraphics(bool skipRepaint)
                     //                   there could be scripting going on (such as an NPC killing another NPC).
                     // - qScreen is here just in case
                     // - If the NPC triggers an event, naturally should be activated as original
-                    // - Generator NPCs, Jumping Cheeps, and Thwomps.
-                    // Think about NPCID_BULLET_SMB3, NPCID_BULLET_SMW, and NPCID_EERIE...
+                    // - Generator NPCs, Jumping Cheeps, Thwomps, bullet shooters, and Bowser statues.
+                    // Think about bullet-like, missile-like, and tank-like items
+                    //      NPCID_BULLET_SMB3, NPCID_BULLET_SMW, NPCID_EERIE, etc...
+                    // Think more about NPCID_METALBARREL and other falling items
                     if(
                            ForcedControls
                         || qScreen
@@ -637,6 +639,11 @@ void UpdateGraphics(bool skipRepaint)
                         || NPC[A].Type == NPCID_THWOMP_SMB3
                         || NPC[A].Type == NPCID_THWOMP_SMW
                         || NPC[A].Type == NPCID_METALBARREL
+                        || NPC[A].Type == NPCID_CANNONENEMY
+                        || NPC[A].Type == NPCID_STATUE_SMB3
+                        || NPC[A].Type == NPCID_STATUE_SMW
+                        || NPC[A].Type == NPCID_RINKAGEN
+                        || NPC[A].Type == NPCID_BLARGG
                         || (NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
                     )
                         can_activate = onscreen_canonical;
@@ -682,6 +689,7 @@ void UpdateGraphics(bool skipRepaint)
                     || NPC[A].Type == NPCID_PIRHANA_SMB3 || NPC[A].Type == NPCID_BOTTOMPIRHANA || NPC[A].Type == NPCID_SIDEPIRHANA
                     || NPC[A].Type == NPCID_BIGPIRHANA || NPC[A].Type == NPCID_PIRHANA_SMB || NPC[A].Type == NPCID_FIREPIRHANA
                     || NPC[A].Type == NPCID_LONGPIRHANA_UP || NPC[A].Type == NPCID_LONGPIRHANA_DOWN || NPC[A].Type == NPCID_PIRHANAHEAD
+                    || NPC[A].Type == NPCID_BLARGG
                     )
                 )
                 {
