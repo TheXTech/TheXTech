@@ -205,6 +205,9 @@ private:
 
 public:
     bool active = true;
+    int num_test_players = 1;
+    bool test_magic_hand = false;
+
     void UpdateEditorScreen(CallMode mode, bool second_screen = false);
     void UpdateSelectorBar(CallMode mode, bool select_bar_only = false);
     void ResetCursor();

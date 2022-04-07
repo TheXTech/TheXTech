@@ -2070,7 +2070,7 @@ void GetEditorControls()
         editorWaitForFade();
 
         HasCursor = false;
-        zTestLevel();
+        zTestLevel(editorScreen.test_magic_hand);
     }
     if(EditorControls.SwitchScreens && MouseRelease)
     {
@@ -2081,7 +2081,7 @@ void GetEditorControls()
         PlaySound(SFX_Pause);
     }
 
-    if(g_config.editor_edge_scroll && !editorScreen.active) // scroll-by-edge
+    if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand) // scroll-by-edge
     {
         bool scrolled = false;
         int scroll_margin = EditorControls.FastScroll ? 16 : 32;

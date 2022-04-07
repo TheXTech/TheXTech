@@ -552,7 +552,7 @@ void DrawEditorLevel(int Z)
                 1.f, 0.f, 0.f, 1.f, false);
         }
 
-        if(g_config.editor_edge_scroll && !editorScreen.active)
+        if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand)
         {
             if(curX < 36)
                 curX = 36;
@@ -698,7 +698,7 @@ void DrawEditorWorld()
 
     double X = EditorCursor.X;
     double Y = EditorCursor.Y;
-    if(g_config.editor_edge_scroll && !editorScreen.active)
+    if(g_config.editor_edge_scroll && !editorScreen.active && !MagicHand)
     {
         if(X < 36)
             X = 36;

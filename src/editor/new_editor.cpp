@@ -4650,7 +4650,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     {
         int X = e_CursorX;
         int Y = e_CursorY;
-        if(g_config.editor_edge_scroll)
+        if(g_config.editor_edge_scroll && !MagicHand)
         {
             if(X < 36)
                 X = 36;

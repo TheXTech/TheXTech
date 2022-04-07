@@ -2234,8 +2234,12 @@ void UpdateGraphics(bool skipRepaint)
 //        If LevelEditor = True Or MagicHand = True Then
         if((LevelEditor || MagicHand))
         {
+            XRender::offsetViewportIgnore(true);
+
             // editor code now located in `gfx_editor.cpp`
             DrawEditorLevel(Z);
+
+            XRender::offsetViewportIgnore(false);
         }
 
         if(numScreens > 1) // for multiple screens
