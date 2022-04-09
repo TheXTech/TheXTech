@@ -3594,8 +3594,8 @@ void RespawnPlayerTo(int A, int TargetPlayer)
     else
         StopY = Player[TargetPlayer].Location.Y + Player[TargetPlayer].Location.Height;
 
-    // technically this would fix a vanilla bug (weird effects after Player 2 dies, Player 1 goes into Warp, Player 2 respawns)
-    //   so I will do it where it only affects the new code
+    // technically this would fix a vanilla bug (possible weird effects after Player 2 dies, Player 1 goes through Warp, Player 2 respawns)
+    //   so I will do it where it only affects the new code.
     // Player[A].Section = Player[TargetPlayer].Section;
     RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY);
 }
@@ -7218,7 +7218,7 @@ void AddPlayer(int Character)
         return;
 
     int alivePlayer = CheckLiving();
-    if(alivePlayer == 0 || alivePlayer == Character)
+    if(alivePlayer == 0 || alivePlayer == numPlayers)
         alivePlayer = 1;
     p.Section = Player[alivePlayer].Section;
     RespawnPlayerTo(numPlayers, alivePlayer);

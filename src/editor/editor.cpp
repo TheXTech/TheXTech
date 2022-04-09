@@ -45,6 +45,7 @@
 #include "main/cheat_code.h"
 #include "main/trees.h"
 #include "main/game_globals.h"
+#include "main/screen_connect.h"
 #include "load_gfx.h"
 #include "core/render.h"
 #include "core/window.h"
@@ -2723,6 +2724,8 @@ void zTestLevel(bool magicHand, bool interProcess)
 
     // force reconnect on leveltest start
     Controls::ClearInputMethods();
+    // reset Drop/Add allowed characters
+    ConnectScreen::SaveChars();
 
     GameThing(0, 0);
     SetupScreens();
