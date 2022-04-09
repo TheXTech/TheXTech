@@ -33,6 +33,12 @@ static int s_toast_duration[maxLocalPlayers] = {0};
 
 void Render()
 {
+	if(GameMenu || LevelEditor || GameOutro)
+	{
+		g_active = false;
+		return;
+	}
+
 	const int draw_X = 20;
 	const int press_button_Y = ScreenH - 40;
 	const int last_player_Y = press_button_Y - 20;
@@ -72,6 +78,12 @@ void Render()
 
 void Logic()
 {
+	if(GameMenu || LevelEditor || GameOutro)
+	{
+		g_active = false;
+		return;
+	}
+
 	bool has_missing = false;
 	bool has_toast = false;
 	bool was_missing[maxLocalPlayers] = {false};
