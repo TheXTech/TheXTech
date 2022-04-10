@@ -314,6 +314,10 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         out.physez.push_back(pez);
     }
 
+    // clear the layers to prevent duplicates of the built-in layers
+    out.layers_array_id = 1;
+    out.layers.clear();
+
     for(int i = 0; i < numLayers; ++i)
     {
         auto &l = Layer[i];
@@ -324,6 +328,10 @@ void SaveLevel(std::string FilePath, int format, int version)   // saves the lev
         layer.meta.array_id = out.layers_array_id++;
         out.layers.push_back(layer);
     }
+
+    // clear the events to prevent duplicates of the built-in events
+    out.events_array_id = 1;
+    out.events.clear();
 
     for(int i = 0; i < numEvents; ++i)
     {
