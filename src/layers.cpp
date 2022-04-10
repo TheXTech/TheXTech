@@ -688,6 +688,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
     int plr = 0;
     bool tempBool = false;
     Location_t tempLevel;
+    Location_t newLevel;
     vScreen_t screenLoc;
     double tX = 0;
     double tY = 0;
@@ -738,13 +739,17 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                     AutoY[B] = s.autoscroll_y;
                 }
 
-                /* Resize the section noundaries */
-                if(int(s.position.X) == EventSection_t::LESet_ResetDefault)
+                /* Resize the section boundaries */
+                if(int(s.position.X) == EventSection_t::LESet_ResetDefault && !g_compatibility.modern_section_reset)
                     level[B] = LevelREAL[B];
                 else if(int(s.position.X) != EventSection_t::LESet_Nothing)
                 {
                     tempLevel = level[B];
-                    level[B] = s.position;
+                    if(int(s.position.X) == EventSection_t::LESet_ResetDefault)
+                        newLevel = LevelREAL[B];
+                    else
+                        newLevel = s.position;
+                    level[B] = newLevel;
 
                     if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start"))
                     {
@@ -837,7 +842,8 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                 qScreenY[1] = -level[Player[C].Section].Y;
                             if(-qScreenY[1] + ScreenH /*FrmMain.ScaleHeight*/ > level[Player[C].Section].Height)
                                 qScreenY[1] = -(level[Player[C].Section].Height - ScreenH);
-                            level[B] = s.position;
+
+                            level[B] = newLevel;
                         }
                         else
                         {

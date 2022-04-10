@@ -97,6 +97,7 @@ static void compatInit(Compatibility_t &c)
     c.free_world_res = true;
     c.NPC_activate_mode = NPC_activate_modes::smart;
     c.disable_background2_tiling = false;
+    c.modern_section_reset = true;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -134,6 +135,7 @@ static void compatInit(Compatibility_t &c)
         c.free_level_res = false;
         c.free_world_res = false;
         c.NPC_activate_mode = NPC_activate_modes::onscreen;
+        c.modern_section_reset = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -282,6 +284,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         };
         compat.readEnum("npc-activate-mode", c.NPC_activate_mode, c.NPC_activate_mode, activModes);
         compat.read("disable-background2-tiling", c.disable_background2_tiling, c.disable_background2_tiling);
+        compat.read("modern-section-reset", c.modern_section_reset, c.modern_section_reset);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
