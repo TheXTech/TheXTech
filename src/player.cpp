@@ -2209,8 +2209,8 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
     int A = 0;
     long long B = 0;
     int C = 0;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
 
     if(Stab)
     {
@@ -2279,10 +2279,11 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
     {
         // fBlock = FirstBlock[(tailLoc.X / 32) - 1];
         // lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
-        blockTileGet(tailLoc, fBlock, lBlock);
+        // blockTileGet(tailLoc, fBlock, lBlock);
 
-        for(A = (int)fBlock; A <= lBlock; A++)
+        for(Block_t* block : treeBlockQuery(tailLoc, SORTMODE_LOC))
         {
+            A = block - &Block[1] + 1;
             if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && (Block[A].Type != 293 || Stab) && !Block[A].Invis && !BlockNoClipping[Block[A].Type])
             {
                 if(CheckCollision(tailLoc, Block[A].Location))
@@ -3038,8 +3039,8 @@ void SwapCoop()
 void PlayerPush(const int A, int HitSpot)
 {
     Location_t tempLocation;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
 
     if(ShadowMode)
         return;
@@ -3048,11 +3049,12 @@ void PlayerPush(const int A, int HitSpot)
 
     // fBlock = FirstBlock[(p.Location.X / 32) - 1];
     // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
-    blockTileGet(p.Location, fBlock, lBlock);
+    // blockTileGet(p.Location, fBlock, lBlock);
 
-    for(int B = int(fBlock); B <= lBlock; B++)
+    for(Block_t* block : treeBlockQuery(p.Location, SORTMODE_LOC))
     {
-        auto &b = Block[B];
+        int B = block - &Block[1] + 1;
+        Block_t& b = *block;
 
         if(b.Hidden || BlockIsSizable[b.Type])
             continue;

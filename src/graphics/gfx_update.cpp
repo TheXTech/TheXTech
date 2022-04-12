@@ -254,12 +254,17 @@ void GraphicsLazyPreLoad()
                 XRender::lazyPreLoad(GFXBackgroundBMP[b.Type]);
         }
 
-        int64_t fBlock = 0;
-        int64_t lBlock = 0;
-        blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
+        // int64_t fBlock = 0;
+        // int64_t lBlock = 0;
+        // blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
+        TreeResult_Sentinel<Block_t> screenBlocks = treeBlockQuery(
+            -vScreenX[Z], -vScreenY[Z],
+            -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
+            SORTMODE_ID);
 
-        For(A, fBlock, lBlock)
+        for(Block_t* block : screenBlocks)
         {
+            int A = block - &Block[1] + 1;
             auto &b = Block[A];
             if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBlockType))
                 XRender::lazyPreLoad(GFXBlock[Block[A].Type]);
@@ -397,8 +402,8 @@ void UpdateGraphics(bool skipRepaint)
 //    int e2 = 0;
 //    int X = 0;
     int Y = 0;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
     Location_t tempLocation;
     int S = 0; // Level section to display
 
@@ -1415,22 +1420,28 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
-        if(LevelEditor)
-        {
-            fBlock = 1;
-            lBlock = numBlock;
-        }
-        else
-        {
-            //fBlock = FirstBlock[int(-vScreenX[Z] / 32) - 1];
-            //lBlock = LastBlock[int((-vScreenX[Z] + vScreen[Z].Width) / 32) + 1];
-            blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
-        }
+//        if(LevelEditor)
+//        {
+//            fBlock = 1;
+//            lBlock = numBlock;
+//        }
+//        else
+//        {
+//            //fBlock = FirstBlock[int(-vScreenX[Z] / 32) - 1];
+//            //lBlock = LastBlock[int((-vScreenX[Z] + vScreen[Z].Width) / 32) + 1];
+//            blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
+//        }
+
+        TreeResult_Sentinel<Block_t> screenBlocks = treeBlockQuery(
+            -vScreenX[Z], -vScreenY[Z],
+            -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
+            SORTMODE_ID);
 
 
 //        For A = fBlock To lBlock 'Non-Sizable Blocks
-        For(A, fBlock, lBlock)
+        for(Block_t* block : screenBlocks)
         {
+            A = block - &Block[1] + 1;
             g_stats.checkedBlocks++;
             if(!BlockIsSizable[Block[A].Type] && (!Block[A].Invis || (LevelEditor && BlockFlash <= 30)) && Block[A].Type != 0 && !BlockKills[Block[A].Type])
             {
@@ -2035,8 +2046,10 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-        for(A = fBlock; A <= lBlock; A++) // Blocks in Front
+        // Blocks in Front
+        for(Block_t* block : screenBlocks)
         {
+            A = block - &Block[1] + 1;
             g_stats.checkedBlocks++;
             if(BlockKills[Block[A].Type])
             {

@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "sorting.h"
 
+// these are now used only when saving levels
 void qSortBlocksY(int min, int max)
 {
     Block_t medBlock;

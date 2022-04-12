@@ -1354,7 +1354,7 @@ void syncLayersTrees_Block(int block)
         if(layer != Block[block].Layer)
         {
             Layer[layer].blocks.erase(block);
-            // treeBlockRemoveLayer(layer, &Block[block]);
+            treeBlockRemoveLayer(layer, &Block[block]);
         }
     }
     int layer = Block[block].Layer;
@@ -1365,25 +1365,25 @@ void syncLayersTrees_Block(int block)
             Block[block].LocationInLayer = Block[block].Location;
             Block[block].LocationInLayer.X = Block[block].Location.X - Layer[layer].OffsetX;
             Block[block].LocationInLayer.Y = Block[block].Location.Y - Layer[layer].OffsetY;
-            // treeBlockAddLayer(layer, &Block[block]);
+            treeBlockAddLayer(layer, &Block[block]);
             Layer[layer].blocks.insert(block);
         }
         else
         {
             Block[block].LocationInLayer = Block[block].Location;
-            // treeBlockAddLayer(-1, &Block[block]);
+            treeBlockAddLayer(-1, &Block[block]);
         }
     }
     else
     {
         if(layer != LAYER_NONE)
         {
-            // treeBlockRemoveLayer(layer, &Block[block]);
+            treeBlockRemoveLayer(layer, &Block[block]);
             Layer[layer].blocks.erase(block);
         }
         else
         {
-            // treeBlockRemoveLayer(-1, &Block[block]);
+            treeBlockRemoveLayer(-1, &Block[block]);
         }
     }
 }
