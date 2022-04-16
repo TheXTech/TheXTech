@@ -62,7 +62,7 @@
 
 #include <PGE_File_Formats/file_formats.h>
 
-static int ScrollDelay = 0; // slows down the camera movement when scrolling through a level
+// static int ScrollDelay = 0; // slows down the camera movement when scrolling through a level
 //Public Declare Function GetCursorPos Lib "user32" (lpPoint As POINTAPI) As long long;
 
 std::string Backup_FullFileName;
@@ -81,12 +81,17 @@ bool enableAutoAlign = true;
 int last_vScreenX[maxSections+1];
 int last_vScreenY[maxSections+1];
 
+// backup values
+int curSection_b = 0;
 int last_vScreenX_b[maxSections+1];
 int last_vScreenY_b[maxSections+1];
 
-int curSection_b;
-
+// number of frames to show section
 int editor_section_toast = 0;
+
+// buffer for scrolling since we can only scroll in 32-pixel increments
+int scroll_buffer_x = 0;
+int scroll_buffer_y = 0;
 
 void ResetSectionScrolls()
 {
@@ -271,48 +276,37 @@ void UpdateEditor()
 
     if(LevelEditor || MagicHand)
     {
-        if(EditorControls.FastScroll)
-            ScrollDelay = 0;
+        int scroll_required = EditorControls.FastScroll ? 16 : 32;
 
         if(MagicHand)
-            ScrollDelay = 10;
-
-        if(ScrollDelay <= 0)
         {
-            if(EditorControls.ScrollUp)
+            scroll_buffer_x = 0;
+            scroll_buffer_y = 0;
+        }
+
+        // if(ScrollDelay <= 0)
+        {
+            int to_scroll_x = scroll_buffer_x / scroll_required;
+            int to_scroll_y = scroll_buffer_y / scroll_required;
+
+            if(to_scroll_x)
             {
-                vScreenY[1] += 32;
-                EditorCursor.Location.Y -= 32;
-                ScrollDelay = 2;
+                vScreenX[1] -= 32 * to_scroll_x;
+                EditorCursor.Location.X += 32 * to_scroll_x;
                 MouseRelease = true;
+                scroll_buffer_x -= to_scroll_x * scroll_required;
             }
 
-            if(EditorControls.ScrollDown)
+            if(to_scroll_y)
             {
-                vScreenY[1] -= 32;
-                EditorCursor.Location.Y += 32;
-                ScrollDelay = 2;
+                vScreenY[1] -= 32 * to_scroll_y;
+                EditorCursor.Location.Y += 32 * to_scroll_y;
                 MouseRelease = true;
-            }
-
-            if(EditorControls.ScrollLeft)
-            {
-                vScreenX[1] += 32;
-                EditorCursor.Location.X -= 32;
-                ScrollDelay = 2;
-                MouseRelease = true;
-            }
-
-            if(EditorControls.ScrollRight)
-            {
-                vScreenX[1] -= 32;
-                EditorCursor.Location.X += 32;
-                ScrollDelay = 2;
-                MouseRelease = true;
+                scroll_buffer_y -= to_scroll_y * scroll_required;
             }
         }
-        else
-            ScrollDelay -= 1;
+        // else
+        //     ScrollDelay -= 1;
         SetCursor();
 
         // this is where objects are placed/grabbed/deleted
@@ -2055,8 +2049,10 @@ void GetEditorControls()
         optCursor.current = OptCursor_t::LVL_ERASER;
         SetCursor();
     }
+
     if(MagicHand)
         return;
+
     if(!WorldEditor && EditorControls.TestPlay && MouseRelease)
     {
         EditorBackup();
@@ -2089,31 +2085,27 @@ void GetEditorControls()
         if(SharedCursor.X < 4 && SharedCursor.Y >= 0 && SharedCursor.Y < ScreenH)
         {
             SharedCursor.X += scroll_margin;
-            EditorControls.ScrollLeft = true;
-            ScrollDelay = 0;
+            EditorControls.ScrollLeft += scroll_margin;
             scrolled = true;
         }
         if(SharedCursor.X >= ScreenW - 4 && SharedCursor.Y >= 0 && SharedCursor.Y < ScreenH)
         {
             SharedCursor.X -= scroll_margin;
-            EditorControls.ScrollRight = true;
-            ScrollDelay = 0;
+            EditorControls.ScrollRight += scroll_margin;
             scrolled = true;
         }
 
         if(SharedCursor.Y < 4 && SharedCursor.X >= 0 && SharedCursor.X < ScreenW)
         {
             SharedCursor.Y += scroll_margin;
-            EditorControls.ScrollUp = true;
-            ScrollDelay = 0;
+            EditorControls.ScrollUp += scroll_margin;
             scrolled = true;
         }
 
         if(SharedCursor.Y >= ScreenH - 4 && SharedCursor.X >= 0 && SharedCursor.X < ScreenW)
         {
             SharedCursor.Y -= scroll_margin;
-            EditorControls.ScrollDown = true;
-            ScrollDelay = 0;
+            EditorControls.ScrollDown += scroll_margin;
             scrolled = true;
         }
 
@@ -2123,6 +2115,19 @@ void GetEditorControls()
             XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &window_x, &window_y);
             XWindow::placeCursor(window_x, window_y);
         }
+    }
+
+    if(EditorControls.ScrollDown || EditorControls.ScrollUp || EditorControls.ScrollLeft || EditorControls.ScrollRight)
+    {
+        scroll_buffer_x += EditorControls.ScrollRight;
+        scroll_buffer_x -= EditorControls.ScrollLeft;
+        scroll_buffer_y += EditorControls.ScrollDown;
+        scroll_buffer_y -= EditorControls.ScrollUp;
+    }
+    else
+    {
+        scroll_buffer_x = 0;
+        scroll_buffer_y = 0;
     }
 }
 

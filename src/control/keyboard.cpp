@@ -154,7 +154,6 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
     }
 
     double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
-    bool cursor[4];
 
     for(int i = 0; i < 4; i++)
     {
@@ -162,10 +161,12 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
         int key2 = p->m_editor_keys2[i];
 
         if(key != null_key && k->m_keyboardState[key] != 0)
-            *scroll[i] = 1.;
+            *scroll[i] += 10.;
         else if(key2 != null_key && k->m_keyboardState[key2] != 0)
-            *scroll[i] = 1.;
+            *scroll[i] += 10.;
     }
+
+    bool cursor[4];
 
     for(int i = 0; i < 4; i++)
     {
