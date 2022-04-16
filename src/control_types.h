@@ -35,8 +35,8 @@ struct SharedControls_t
 // Each player has one; there is also a shared fallback mouse
 struct CursorControls_t
 {
-    // mouse should not be drawn (usually because touchscreen)
-    bool NoDraw = false;
+    // using direct touch device; affects rendering
+    bool Touch = false;
     // moved this frame
     bool Move = false;
     // position of cursor in screen coordinates

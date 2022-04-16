@@ -934,6 +934,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     Backup_FullFileName = "";
 
                     editorScreen.active = false;
+                    MouseRelease = false;
 
                     if(g_config.EnableInterLevelFade)
                         g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);

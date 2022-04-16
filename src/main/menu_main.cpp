@@ -1035,6 +1035,7 @@ bool mainMenuUpdate()
                             }
                             editorScreen.ResetCursor();
                             editorScreen.active = false;
+                            MouseRelease = false;
                             return true;
                         }
                     }
