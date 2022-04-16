@@ -2742,6 +2742,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     StartWarp = 0;
 
     optCursor.current = OptCursor_t::LVL_SELECT;
+    EditorCursor.Mode = OptCursor_t::LVL_SELECT;
     OptCursorSync();
 }
 

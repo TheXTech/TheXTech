@@ -73,6 +73,8 @@ void EditorScreen::EnsureLevel()
 
 void EditorScreen::ResetCursor()
 {
+    EditorCursor.Mode = OptCursor_t::LVL_SELECT;
+
     EditorCursor.Block = Block_t();
     EditorCursor.Block.Type = 1;
     EditorCursor.Background = Background_t();
