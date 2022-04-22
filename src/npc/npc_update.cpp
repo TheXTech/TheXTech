@@ -3430,7 +3430,9 @@ void UpdateNPCs()
                                                                                         // {
                                                                                                // ds-sloth comment: should be numBlock - numTempBlock + 1,
                                                                                                // this will double-count numBlock - numTempBlock.
-                                                                                               // I'll reproduce the buggy behavior below for now.
+                                                                                               // not a problem because it is the last of the non-temp blocks
+                                                                                               // and the first of the temp blocks in the original check,
+                                                                                               // so order is the same if we exclusively count it is a non-temp block.
                                                                                         //     fBlock2 = numBlock - numTempBlock;
                                                                                         //     lBlock2 = numBlock;
                                                                                         // }
@@ -3440,10 +3442,9 @@ void UpdateNPCs()
                                                                                             int C = block2 - &Block[1] + 1;
 
                                                                                             // the paranoid check.
-                                                                                            // asymmetric to follow a bug in the above code
-                                                                                            if(bCheck2 == 1 && C >= numBlock - numTempBlock + 1)
+                                                                                            if(bCheck2 == 1 && C >= numBlock + 1 - numTempBlock)
                                                                                                 continue;
-                                                                                            if(bCheck2 == 2 && C < numBlock - numTempBlock)
+                                                                                            if(bCheck2 == 2 && C < numBlock + 1 - numTempBlock)
                                                                                                 continue;
 
                                                                                             if(!BlockIsSizable[Block[C].Type] && !BlockOnlyHitspot1[Block[C].Type] && !Block[C].Hidden && BlockSlope[Block[C].Type] == 0)
@@ -5089,6 +5090,8 @@ void UpdateNPCs()
                         // else
                         // {
                                // buggy, mentioned above, should be numBlock - numTempBlock + 1 -- ds-sloth
+                               // it's not a problem here because the NPC is moved out of the way of the block
+                               // during the first loop, so can't collide during the second loop.
                         //     fBlock = numBlock - numTempBlock;
                         //     lBlock = numBlock;
                         // }
@@ -5096,11 +5099,10 @@ void UpdateNPCs()
                         {
                             B = block - &Block[1] + 1;
 
-                            // the paranoid check. asymmetric due to above bug.
-                            // double-counts numBlock - numTempBlock (the last non-temp block)
-                            if(bCheck == 1 && B >= numBlock - numTempBlock + 1)
+                            // the paranoid check.
+                            if(bCheck == 1 && B >= numBlock + 1 - numTempBlock)
                                 continue;
-                            if(bCheck == 2 && B < numBlock - numTempBlock)
+                            if(bCheck == 2 && B < numBlock + 1 - numTempBlock)
                                 continue;
 
                             if(!Block[B].Invis && !(BlockIsSizable[Block[B].Type] && NPC[A].Location.Y > Block[B].Location.Y) && !Block[B].Hidden)
