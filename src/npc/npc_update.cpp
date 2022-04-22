@@ -3851,6 +3851,10 @@ void UpdateNPCs()
 
                                 // eliminating the dysfunctional pattern because the check is not order-sensitive
                                 // for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+
+                                // we are able to wrap this whole thing in the inner-loop check that (NPC[A].Slope <= 0)
+                                // commenting for now to avoid inadvertently introducing any bugs
+                                // if(NPC[A].Slope <= 0)
                                 {
                                     // if(bCheck2 == 1)
                                     // {
