@@ -26,6 +26,7 @@
 #include "collision.h"
 #include "gfx.h"
 #include "config.h"
+#include "npc_id.h"
 
 #include "editor.h"
 #include "editor/new_editor.h"
@@ -566,7 +567,15 @@ void DrawEditorLevel(int Z)
 
         if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6) // Eraser
         {
-            XRender::renderTexture(curX - 2, curY, GFX.ECursor[3]);
+            if(EditorCursor.SubMode == -1)
+            {
+                int frame = BlockFlash / 20;
+                if(frame > 2)
+                    frame = 2;
+                XRender::renderTexture(curX - 8, curY, 32, 32, GFXNPC[NPCID_AXE], 0, 32 * frame);
+            }
+            else
+                XRender::renderTexture(curX - 2, curY, GFX.ECursor[3]);
         }
 
         else if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14) // Selector
@@ -711,9 +720,15 @@ void DrawEditorWorld()
     }
     if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0)
     {
-        XRender::renderTexture(X - 2, Y,
-            22, 30,
-            GFX.ECursor[3], 0, 0);
+        if(EditorCursor.SubMode == -1)
+        {
+            int frame = BlockFlash / 20;
+            if(frame > 2)
+                frame = 2;
+            XRender::renderTexture(X - 8, Y, 32, 32, GFXNPC[NPCID_AXE], 0, 32 * frame);
+        }
+        else
+            XRender::renderTexture(X - 2, Y, GFX.ECursor[3]);
     }
     else
     {

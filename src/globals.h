@@ -979,7 +979,8 @@ struct EditorCursor_t
     layerindex_t Layer = LAYER_NONE;
 //    Mode As Integer
     int Mode = 0;
-//  New, used to represent warp entrance/exit and level settings submodes
+//  New, used to represent warp entrance/exit, level settings submodes, and erase mode
+//  (erase mode: 0 for unset, positive number for each type of item, negative number for *everything*)
     int SubMode = 0;
 //    Block As Block
     Block_t Block;

@@ -4588,11 +4588,21 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             exit_special = true;
     }
     currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_ERASER0;
-    if(UpdateButton(mode, sx+1*40+4, 4, GFX.ECursor[3], currently_in, 0, 0, 22, 30, "Erase"))
+    if(UpdateButton(mode, sx+1*40+4, 4, GFX.ECursor[3], currently_in && EditorCursor.SubMode != -1, 0, 0, 22, 30, "Erase"))
     {
         if(editorScreen.active)
             swap_screens();
         EditorCursor.Mode = OptCursor_t::LVL_ERASER0;
+        EditorCursor.SubMode = 0;
+        if(in_excl_special)
+            exit_special = true;
+    }
+    if(currently_in && UpdateButton(mode, sx+2*40+4, 4, GFXNPC[NPCID_AXE], currently_in && EditorCursor.SubMode == -1, 0, 0, 32, 32, "ERASE ALL"))
+    {
+        if(editorScreen.active)
+            swap_screens();
+        EditorCursor.Mode = OptCursor_t::LVL_ERASER0;
+        EditorCursor.SubMode = -1;
         if(in_excl_special)
             exit_special = true;
     }

@@ -205,6 +205,8 @@ void UpdateEditor()
     {
         MouseRelease = true;
         MouseCancel = false;
+        if(EditorCursor.SubMode > 0 && (EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0))
+            EditorCursor.SubMode = 0;
     }
 
     bool MouseClick_Current = SharedCursor.Primary && !MouseCancel;
@@ -843,7 +845,9 @@ void UpdateEditor()
             }
             else if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0) // Eraser
             {
-                if(MouseRelease)
+                if((SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::LVL_NPCS))
                 {
                     for(A = 1; A <= numNPCs; A++)
                     {
@@ -863,12 +867,16 @@ void UpdateEditor()
                             else
                                 KillNPC(A, 2); // Kill the NPC
                             MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::LVL_NPCS;
                             break;
                         }
                     }
                 }
 
-                if(MouseRelease)
+                if((SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::LVL_BLOCKS))
                 {
                     for(A = 1; A <= numBlock; A++)
                     {
@@ -880,13 +888,17 @@ void UpdateEditor()
                                 KillBlock(A); // Erase the block
                                 FindSBlocks();
                                 MouseRelease = false;
+                                if(EditorCursor.SubMode == 0)
+                                    EditorCursor.SubMode = OptCursor_t::LVL_BLOCKS;
                                 break;
                             }
                         }
                     }
                 }
 
-                if(MouseRelease && !MagicHand)
+                if(!MagicHand && (SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::LVL_WARPS))
                 {
                     for(A = 1; A <= numWarps; A++)
                     {
@@ -899,6 +911,8 @@ void UpdateEditor()
 //                            if(nPlay.Online == true)
 //                                Netplay::sendData "B" + std::to_string(A) + LB;
                             MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::LVL_WARPS;
                             break;
                         }
                         tempLocation = Warp[A].Exit;
@@ -910,11 +924,15 @@ void UpdateEditor()
 //                            if(nPlay.Online == true)
 //                                Netplay::sendData "B" + std::to_string(A) + LB;
                             MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::LVL_WARPS;
                             break;
                         }
                     }
                 }
-                if(MouseRelease)
+                if((SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::LVL_BGOS))
                 {
                     for(A = numBackground; A >= 1; A--)
                     {
@@ -929,6 +947,8 @@ void UpdateEditor()
                             Background[A] = Background[numBackground];
                             numBackground--;
                             MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::LVL_BGOS;
                             if(MagicHand)
                             {
                                 qSortBackgrounds(1, numBackground);
@@ -946,7 +966,9 @@ void UpdateEditor()
                     }
                 }
 
-                if(MouseRelease)
+                if((SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::LVL_BLOCKS))
                 {
                     for(A = numBlock; A >= 1; A--)
                     {
@@ -958,13 +980,17 @@ void UpdateEditor()
                                 KillBlock(A); // Erase the block
                                 FindSBlocks();
                                 MouseRelease = false;
+                                if(EditorCursor.SubMode == 0)
+                                    EditorCursor.SubMode = OptCursor_t::LVL_BLOCKS;
                                 break;
                             }
                         }
                     }
                 }
 
-                if(MouseRelease && LevelEditor)
+                if(LevelEditor && (SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::LVL_WATER))
                 {
                     for(int numWaterMax = numWater, A = 1; A <= numWaterMax; A++)
                     {
@@ -979,12 +1005,16 @@ void UpdateEditor()
                             syncLayers_Water(A);
                             syncLayers_Water(numWater + 1);
                             MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::LVL_WATER;
                             break;
                         }
                     }
                 }
 
-                if(MouseRelease)
+                if((SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::WLD_MUSIC))
                 {
                     // for(int numWorldMusicMax = numWorldMusic, A = 1; A <= numWorldMusicMax; A++)
                     for(auto *t : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
@@ -1005,12 +1035,16 @@ void UpdateEditor()
                             treeWorldMusicRemove(&WorldMusic[numWorldMusic]);
                             numWorldMusic--;
                             MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::WLD_MUSIC;
                             break;
                         }
                     }
                 }
 
-                if(MouseRelease)
+                if((SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::WLD_PATHS))
                 {
                     for(auto *t : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
@@ -1031,12 +1065,16 @@ void UpdateEditor()
                             treeWorldPathRemove(&WorldPath[numWorldPaths]);
                             numWorldPaths--;
                             MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::WLD_PATHS;
                             break;
                         }
                     }
                 }
 
-                if(MouseRelease)
+                if((SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::WLD_SCENES))
                 {
                     // more difficult to iterate backwards, but that's what we need to do here
                     auto sentinel = treeWorldSceneQuery(EditorCursor.Location, SORTMODE_ID);
@@ -1060,12 +1098,16 @@ void UpdateEditor()
                             treeWorldSceneRemove(&Scene[numScenes]);
                             numScenes--;
                             MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::WLD_SCENES;
                             break;
                         }
                     }
                 }
 
-                if(MouseRelease)
+                if((SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::WLD_LEVELS))
                 {
                     for(auto *t : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
@@ -1085,12 +1127,16 @@ void UpdateEditor()
                             treeWorldLevelRemove(&WorldLevel[numWorldLevels]);
                             numWorldLevels--;
                             MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::WLD_LEVELS;
                             break;
                         }
                     }
                 }
 
-                if(MouseRelease)
+                if((SharedCursor.Move || MouseRelease)
+                    && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
+                        || EditorCursor.SubMode == OptCursor_t::WLD_TILES))
                 {
                     for(auto *t : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
@@ -1110,6 +1156,8 @@ void UpdateEditor()
                             treeWorldTileRemove(&Tile[numTiles]);
                             numTiles--;
                             MouseRelease = false;
+                            if(EditorCursor.SubMode == 0)
+                                EditorCursor.SubMode = OptCursor_t::WLD_TILES;
                             break;
                         }
                     }
