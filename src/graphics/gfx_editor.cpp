@@ -612,16 +612,15 @@ void DrawEditorLevel(int Z)
         SuperPrintCenter("SECTION " + std::to_string(curSection+1), 3, vScreen[Z].Width / 2, vScreen[Z].Height - 100);
         editor_section_toast--;
     }
+}
 
-    if(Z == 1)
-    {
+void DrawEditorLevel_UI()
+{
 #ifdef THEXTECH_INTERPROC_SUPPORTED
-        if(!MagicHand || !IntProc::isEnabled())
+    if(!MagicHand || !IntProc::isEnabled())
 #endif
-        {
-            XRender::resetViewport();
-            editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
-        }
+    {
+        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
     }
 }
 

@@ -115,6 +115,8 @@ void DrawCredits();
 void DrawInterface(int Z, int numScreens);
 // NEW: draws the level editor interface on vScreen Z
 void DrawEditorLevel(int Z);
+// NEW: draws the level editor UI
+void DrawEditorLevel_UI();
 // NEW: draws the world editor interface
 void DrawEditorWorld();
 // Public Function pfrX(plrFrame As Integer) As Integer

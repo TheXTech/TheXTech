@@ -2276,6 +2276,9 @@ void UpdateGraphics(bool skipRepaint)
 
     speedRun_renderTimer();
 
+    if(LevelEditor || MagicHand)
+        DrawEditorLevel_UI();
+
     // render special screens
     if(GamePaused == PauseCode::PauseScreen)
         PauseScreen::Render();
