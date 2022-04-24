@@ -980,7 +980,7 @@ bool mainMenuUpdate()
                     {
                         if(selWorld == NumSelectWorldEditable)
                         {
-                            ClearWorld();
+                            ClearWorld(true);
                             WorldName = TextEntryScreen::Run("New world name");
                             if(!WorldName.empty())
                             {

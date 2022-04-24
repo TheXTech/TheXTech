@@ -397,7 +397,7 @@ bool OpenWorld(std::string FilePath)
     return true;
 }
 
-void ClearWorld()
+void ClearWorld(bool quick)
 {
     int A = 0;
 
@@ -421,7 +421,15 @@ void ClearWorld()
     for(A = 1; A <= numWorldMusic; A++)
         WorldMusic[A] = WorldMusic_t();
 
-    ClearStringsBank();
+    if(!quick)
+    {
+        ClearStringsBank();
+        UnloadCustomGFX();
+        UnloadWorldCustomGFX();
+        UnloadCustomSound();
+        LoadPlayerDefaults();
+    }
+
     MaxWorldStars = 0;
     numTiles = 0;
     numWorldPaths = 0;
@@ -437,10 +445,6 @@ void ClearWorld()
     BeatTheGame = false;
     for(int A = 1; A <= maxWorldCredits; A++)
         WorldCredits[A].clear();
-    UnloadCustomGFX();
-    UnloadWorldCustomGFX();
-    UnloadCustomSound();
-    LoadPlayerDefaults();
     if(LevelEditor)
     {
         vScreenX[1] = 0;
