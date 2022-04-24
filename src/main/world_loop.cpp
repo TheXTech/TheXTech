@@ -861,6 +861,18 @@ void PlayerPath(WorldPlayer_t &p)
     tempLocation.Width -= 8;
     tempLocation.Height -= 8;
 
+    // stop at level
+    for(auto *t : treeWorldLevelQuery(tempLocation, false))
+    {
+        WorldLevel_t& level = *t;
+        if(CheckCollision(tempLocation, level.Location) && level.Active)
+        {
+            p.Move = 0;
+            return;
+        }
+    }
+
+    // stop at branch point
     int n_moves = 0;
     for(int B = 1; B <= 4; B++)
     {
