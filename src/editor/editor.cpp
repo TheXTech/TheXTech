@@ -2808,13 +2808,13 @@ void MouseMove(float X, float Y, bool /*nCur*/)
         A = SingleCoop;
     else if(ScreenType == 5 && vScreen[2].Visible)
     {
-        if(X < float(vScreen[2].Left + vScreen[2].Width))
+        if(X < float(vScreen[2].ScreenLeft + vScreen[2].Width))
         {
-            if(X > float(vScreen[2].Left))
+            if(X > float(vScreen[2].ScreenLeft))
             {
-                if(Y < float(vScreen[2].Top + vScreen[2].Height))
+                if(Y < float(vScreen[2].ScreenTop + vScreen[2].Height))
                 {
-                    if(Y > float(vScreen[2].Top))
+                    if(Y > float(vScreen[2].ScreenTop))
                         A = 2;
                 }
             }
@@ -2911,8 +2911,8 @@ void MouseMove(float X, float Y, bool /*nCur*/)
             PositionCursor();
         }
     }
-    EditorCursor.Location.X += -vScreen[A].Left;
-    EditorCursor.Location.Y += -vScreen[A].Top;
+    EditorCursor.Location.X += -vScreen[A].ScreenLeft;
+    EditorCursor.Location.Y += -vScreen[A].ScreenTop;
 //    if(nPlay.Online == true && nCur == true)
 //    {
 //        if(nPlay.Mode == 0)
