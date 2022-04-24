@@ -93,11 +93,13 @@ void treeWorldCleanAll()
     clearTree(s_worldMusicTree);
 }
 
+#if 0
 void treeLevelCleanBlockLayers()
 {
     for(int i = 0; i < maxLayers+2; i++)
         clearTree(s_levelBlockTrees[i]);
 }
+#endif
 
 void treeLevelCleanAll()
 {
@@ -372,6 +374,7 @@ TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(const Location_t &loc,
 
 /* ================= Level blocks ================= */
 
+#if 0
 void treeBlockAddLayer(int layer, BlockRef_t obj)
 {
     if(layer < 0 || layer == LAYER_NONE)
@@ -476,6 +479,7 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
                    loc.X + loc.Width,
                    loc.Y + loc.Height, sort_mode, margin);
 }
+#endif
 
 /* ================= Temp blocks ================= */
 

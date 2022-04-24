@@ -357,6 +357,7 @@ set(THEXTECH_SRC
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
     src/main/trees.cpp
+    src/main/block_table.cpp
     src/main/QuadTree/LooseQuadtree-impl.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
