@@ -4587,7 +4587,7 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
         if(in_excl_special)
             exit_special = true;
     }
-    currently_in = !in_excl_special && EditorCursor.Mode == OptCursor_t::LVL_ERASER0;
+    currently_in = !in_excl_special && (EditorCursor.Mode == OptCursor_t::LVL_ERASER0 || EditorCursor.Mode == OptCursor_t::LVL_ERASER);
     if(UpdateButton(mode, sx+1*40+4, 4, GFX.ECursor[3], currently_in && EditorCursor.SubMode != -1, 0, 0, 22, 30, "Erase"))
     {
         if(editorScreen.active)
