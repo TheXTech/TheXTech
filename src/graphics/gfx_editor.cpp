@@ -619,6 +619,7 @@ void DrawEditorLevel(int Z)
         if(!MagicHand || !IntProc::isEnabled())
 #endif
         {
+            XRender::resetViewport();
             editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
         }
     }
