@@ -1322,7 +1322,7 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
             bool doubleClick = (this->m_lastMousePress + 300) >= SDL_GetTicks();
             this->m_lastMousePress = SDL_GetTicks();
 
-            if(doubleClick && !MagicHand)
+            if(doubleClick && !MagicHand && !LevelEditor)
             {
                 this->m_lastMousePress = 0;
                 g_hotkeysPressed[Hotkeys::Buttons::Fullscreen] = 0;
