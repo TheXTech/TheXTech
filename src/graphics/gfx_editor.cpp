@@ -215,6 +215,7 @@ void DrawEditorLevel(int Z)
             if(Warp[A].Direction > 0 && !Warp[A].Hidden)
             {
                 bool complete = Warp[A].PlacedEnt && Warp[A].PlacedExit;
+
                 if(Warp[A].PlacedEnt)
                 {
                     if(complete)
@@ -225,6 +226,7 @@ void DrawEditorLevel(int Z)
                             0.7f, 0.3f, 0.f, 1.f, false);
                     SuperPrint(std::to_string(A), 1, vScreenX[Z] + Warp[A].Entrance.X + 2, vScreenY[Z] + Warp[A].Entrance.Y + 2);
                 }
+
                 if(Warp[A].PlacedExit)
                 {
                     if(complete)
@@ -248,19 +250,26 @@ void DrawEditorLevel(int Z)
     {
         if(BlockFlash > 30 || BlockFlash == 0)
         {
-            if(vScreenX[Z] + level[S].X > 0) {
+            if(vScreenX[Z] + level[S].X > 0)
+            {
                 XRender::renderRect(0, 0,
                                    vScreenX[Z] + level[S].X, ScreenH, 0.f, 0.f, 0.f, 1.f, true);
             }
-            if(ScreenW > level[S].Width + vScreenX[Z]) {
+
+            if(ScreenW > level[S].Width + vScreenX[Z])
+            {
                 XRender::renderRect(level[S].Width + vScreenX[Z], 0,
                                    ScreenW - (level[S].Width + vScreenX[Z]), ScreenH, 0.f, 0.f, 0.f, 1.f, true);
             }
-            if(vScreenY[Z] + level[S].Y > 0) {
+
+            if(vScreenY[Z] + level[S].Y > 0)
+            {
                 XRender::renderRect(0, 0,
                                    ScreenW, vScreenY[Z] + level[S].Y, 0.f, 0.f, 0.f, 1.f, true);
             }
-            if(ScreenH > level[S].Height + vScreenY[Z]) {
+
+            if(ScreenH > level[S].Height + vScreenY[Z])
+            {
                 XRender::renderRect(0, level[S].Height + vScreenY[Z],
                                    ScreenW, ScreenH - (level[S].Height + vScreenY[Z]), 0.f, 0.f, 0.f, 1.f, true);
             }
@@ -467,6 +476,7 @@ void DrawEditorLevel(int Z)
                         tempLocation.Width = NPCWidthGFX[n.Special];
                         tempLocation.Height = NPCHeightGFX[n.Special];
                     }
+
                     tempLocation.X = n.Location.X + n.Location.Width / 2 - tempLocation.Width / 2;
                     tempLocation.Y = n.Location.Y + n.Location.Height / 2 - tempLocation.Height / 2;
                     B = EditorNPCFrame(int(n.Special), n.Direction);
@@ -667,6 +677,7 @@ void DrawEditorWorld()
                                   EditorCursor.WorldLevel.Location.Height,
                                   GFXLevelBMP[0], 0, 0);
         }
+
         if(EditorCursor.WorldLevel.Path2)
         {
             XRender::renderTexture(vScreenX[Z] + EditorCursor.WorldLevel.Location.X - 16,
@@ -674,6 +685,7 @@ void DrawEditorWorld()
                                   64, 32,
                                   GFXLevelBMP[29], 0, 0);
         }
+
         if(GFXLevelBig[EditorCursor.WorldLevel.Type])
         {
             XRender::renderTexture(vScreenX[Z] + EditorCursor.WorldLevel.Location.X - (GFXLevelWidth[EditorCursor.WorldLevel.Type] - 32) / 2.0,
@@ -718,6 +730,7 @@ void DrawEditorWorld()
         if(Y >= ScreenH - 36)
             Y = ScreenH - 36;
     }
+
     if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0)
     {
         if(EditorCursor.SubMode == -1)

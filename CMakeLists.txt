@@ -474,6 +474,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/*.h
     src/core/base/*.h
     src/core/sdl/*.h
+    src/editor/*.h
     src/main/*.h
     src/main/QuadTree/*.h
     src/sound/fx/*.h

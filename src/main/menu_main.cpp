@@ -292,14 +292,17 @@ void FindWorlds()
     }
 
     // Sort all worlds by alphabetical order
-    std::sort(SelectWorld.begin(), SelectWorld.end(), 
-        [](const SelectWorld_t& a, const SelectWorld_t& b) {
-            return a.WorldName < b.WorldName;
-        });
-    std::sort(SelectWorldEditable.begin(), SelectWorldEditable.end(), 
-        [](const SelectWorld_t& a, const SelectWorld_t& b) {
-            return a.WorldName < b.WorldName;
-        });
+    std::sort(SelectWorld.begin(), SelectWorld.end(),
+              [](const SelectWorld_t& a, const SelectWorld_t& b)
+    {
+        return a.WorldName < b.WorldName;
+    });
+
+    std::sort(SelectWorldEditable.begin(), SelectWorldEditable.end(),
+              [](const SelectWorld_t& a, const SelectWorld_t& b)
+    {
+        return a.WorldName < b.WorldName;
+    });
 
     NumSelectWorld = (int)(SelectWorld.size() - 1);
 
@@ -584,7 +587,7 @@ bool mainMenuUpdate()
                     FindWorlds();
 #elif !defined(THEXTECH_PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
                     SDL_DetachThread(loadingThread);
 #else
                     s_findRecentEpisode();
@@ -601,7 +604,7 @@ bool mainMenuUpdate()
                     FindWorlds();
 #elif !defined(THEXTECH_PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
                     SDL_DetachThread(loadingThread);
 #else
                     s_findRecentEpisode();
@@ -617,7 +620,7 @@ bool mainMenuUpdate()
                     FindLevels();
 #elif !defined(THEXTECH_PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", NULL);
+                    loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", nullptr);
                     SDL_DetachThread(loadingThread);
 #endif
                     MenuCursor = 0;
@@ -632,7 +635,7 @@ bool mainMenuUpdate()
                     FindWorlds();
 #elif !defined(THEXTECH_PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
                     SDL_DetachThread(loadingThread);
 #else
                     s_findRecentEpisode();

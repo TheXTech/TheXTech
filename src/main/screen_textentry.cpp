@@ -1,3 +1,23 @@
+/*
+ * TheXTech - A platform game engine ported from old source code for VB6
+ *
+ * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
+ * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "../frm_main.h"
 #include "../globals.h"
 #include "../graphics.h"
@@ -88,8 +108,10 @@ bool UpdateButton(int x, int y, int size, const char* c, bool sel, bool render)
 {
     if(*c == '\x12' || *c == '\x11') // empty space or someone else's continuation
         return false;
+
     const char* next_char = c+1;
     char print_char[6];
+
     if(*c == '\b')
     {
         print_char[0] = 'B'; print_char[1] = 'S'; print_char[2] = '\0';
@@ -154,6 +176,7 @@ bool UpdateButton(int x, int y, int size, const char* c, bool sel, bool render)
     if(SharedCursor.X >= x + 2 && SharedCursor.X < x + width - 2
         && SharedCursor.Y >= y + 2 && SharedCursor.Y < y + size - 2)
         coll = true;
+
     // outline:
     if(render)
     {
@@ -185,6 +208,7 @@ void GoLeft()
         s_cur_col = 11;
     else
         s_cur_col --;
+
     while(*get_char() == '\x11' || *get_char() == '\x12')
     {
         if(s_cur_col == 0)
@@ -199,10 +223,12 @@ void GoLeft()
 void GoRight()
 {
     int break_col = s_cur_col;
+
     if(s_cur_col == 11)
         s_cur_col = 0;
     else
         s_cur_col ++;
+
     while(*get_char() == '\x11' || *get_char() == '\x12')
     {
         if(s_cur_col == 11)
@@ -217,10 +243,12 @@ void GoRight()
 void GoDown()
 {
     int break_row = s_cur_row;
+
     if(s_cur_row == 4)
         s_cur_row = 0;
     else
         s_cur_row ++;
+
     while(*get_char() == '\x12')
     {
         if(s_cur_row == 4)
@@ -230,6 +258,7 @@ void GoDown()
         if(s_cur_row == break_row)
             break;
     }
+
     while(*get_char() == '\x11')
         s_cur_col --;
 }
@@ -237,10 +266,12 @@ void GoDown()
 void GoUp()
 {
     int break_row = s_cur_row;
+
     if(s_cur_row == 0)
         s_cur_row = 4;
     else
         s_cur_row --;
+
     while(*get_char() == '\x12')
     {
         if(s_cur_row == 0)
@@ -250,6 +281,7 @@ void GoUp()
         if(s_cur_row == break_row)
             break;
     }
+
     while(*get_char() == '\x11')
         s_cur_col --;
 }
@@ -264,6 +296,7 @@ inline void InsertUnicodeChar(const char* c)
 {
     char unicode[5];
     unicode[0] = c[0];
+
     if(c[0] & 1<<7)
     {
         unicode[1] = c[1];
@@ -285,6 +318,7 @@ inline void InsertUnicodeChar(const char* c)
     {
         unicode[1] = '\0';
     }
+
     Insert(unicode);
 }
 
@@ -415,6 +449,7 @@ bool KeyboardMouseRender(bool mouse, bool render)
         {
             SuperPrint(s_Prompt.substr(27*i, 27), 4, win_x + 10, win_y + 6 + 20*i);
         }
+
         XRender::renderRect(win_x + 20, win_y+n_prompt_lines*20+4, win_width - 40, n_text_lines*20, 0.f, 0.f, 0.f, 0.8f);
         for(int i = 0; i < n_text_lines; i ++)
         {
@@ -428,8 +463,10 @@ bool KeyboardMouseRender(bool mouse, bool render)
                 XRender::renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20*(n_prompt_lines+i), 2, 20, 1.f, 1.f, 1.f, 0.5f);
             }
         }
+
         XRender::renderRect(kb_x, kb_y, kb_width, kb_height, 0.f, 0.f, 0.f, 0.2f);
     }
+
     for(int row = 0; row < 5; row ++)
     {
         for(int col = 0; col < 12; col ++)
@@ -437,6 +474,7 @@ bool KeyboardMouseRender(bool mouse, bool render)
             bool sel = false;
             if(s_render_sel && s_cur_row == row && s_cur_col == col)
                 sel = true;
+
             if(UpdateButton(key_size*col + kb_x, key_size*row + kb_y, key_size, get_char(s_cur_level, row, col), sel, render) && mouse)
             {
                 s_render_sel = false;
@@ -540,14 +578,19 @@ bool Logic()
     {
         if(upPressed)
             GoUp();
+
         if(downPressed)
             GoDown();
+
         if(leftPressed)
             GoLeft();
+
         if(rightPressed)
             GoRight();
+
         if(backPressed)
             Backspace();
+
         if((doPressed && DoAction()) || startPressed)
         {
             MenuCursorCanMove = false;

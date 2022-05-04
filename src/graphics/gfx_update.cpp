@@ -599,16 +599,17 @@ void UpdateGraphics(bool skipRepaint)
             else
                 GetvScreen(Z);
         }
+
+        // Note: this was guarded by an if(!LevelEditor) condition in the past
+        if(Background2[S] == 0)
         {
-            if(Background2[S] == 0)
-            {
-                if(numScreens > 1)
-                    XRender::renderRect(vScreen[Z].Left, vScreen[Z].Top,
-                                         vScreen[Z].Width, vScreen[Z].Height, 0.f, 0.f, 0.f, 1.f, true);
-                else
-                    XRender::clearBuffer();
-            }
+            if(numScreens > 1)
+                XRender::renderRect(vScreen[Z].Left, vScreen[Z].Top,
+                                    vScreen[Z].Width, vScreen[Z].Height, 0.f, 0.f, 0.f, 1.f, true);
+            else
+                XRender::clearBuffer();
         }
+
 //        Else
 //            If Background2(S) = 0 Then BitBlt myBackBuffer, 0, 0, ScreenW, ScreenH, 0, 0, 0, vbWhiteness
 //        End If
