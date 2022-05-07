@@ -360,6 +360,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_background.cpp
     src/graphics/gfx_print.cpp
     src/graphics/gfx_message.cpp
+    src/graphics/gfx_editor.cpp
     src/graphics/gfx_credits.cpp
     src/graphics/gfx_hud.cpp
     src/graphics/gfx_enter_screen.cpp
@@ -378,7 +379,11 @@ set(THEXTECH_SRC
     src/layers.cpp
     src/custom.cpp
     src/graphics.cpp
-    src/editor.cpp
+    src/editor/editor.cpp
+    src/editor/new_editor.cpp
+    src/editor/write_common.cpp
+    src/editor/write_level.cpp
+    src/editor/write_world.cpp
     src/main.cpp
     src/blocks.cpp
     src/gfx.cpp
@@ -469,6 +474,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/*.h
     src/core/base/*.h
     src/core/sdl/*.h
+    src/editor/*.h
     src/main/*.h
     src/main/QuadTree/*.h
     src/sound/fx/*.h

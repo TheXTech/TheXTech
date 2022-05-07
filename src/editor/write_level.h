@@ -19,17 +19,11 @@
  */
 
 #pragma once
-#ifndef SCREEN_PAUSE_H
-#define SCREEN_PAUSE_H
+#ifndef WRITE_LEVEL_HHHH
+#define WRITE_LEVEL_HHHH
 
-namespace PauseScreen
-{
+#include <string>
 
-void Init(bool LegacyPause);
+void SaveLevel(const std::string &FilePath, int format, int version = 64);
 
-bool Logic(int plr);
-void Render();
-
-} // namespace PauseScreen
-
-#endif // #ifndef SCREEN_PAUSE_H
+#endif // WRITE_LEVEL_HHHH

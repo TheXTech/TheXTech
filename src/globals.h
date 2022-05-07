@@ -979,7 +979,8 @@ struct EditorCursor_t
     layerindex_t Layer = LAYER_NONE;
 //    Mode As Integer
     int Mode = 0;
-//  New, used to represent warp entrance/exit and level settings submodes
+//  New, used to represent warp entrance/exit, level settings submodes, and erase mode
+//  (erase mode: 0 for unset, positive number for each type of item, negative number for *everything*)
     int SubMode = 0;
 //    Block As Block
     Block_t Block;
@@ -1002,6 +1003,9 @@ struct EditorCursor_t
 //    WorldMusic As WorldMusic
     WorldMusic_t WorldMusic;
 //End Type
+
+    // clears any strings of objects stored by the world cursor
+    void ClearStrings();
 };
 
 //Public Type WorldPlayer 'the players variables on the world map
@@ -1092,14 +1096,19 @@ extern bool resChanged;
 
 //Public MessageText As String 'when talking to an npc
 extern std::string MessageText;
+
+// moved to menu_main.h
+
 //Public NumSelectWorld As Integer
-extern int NumSelectWorld;
+// extern int NumSelectWorld;
 //Public SelectWorld(1 To 100) As SelectWorld
-struct SelectWorld_t;
+// struct SelectWorld_t;
 //extern RangeArr<SelectWorld_t, 1, maxSelectWorlds> SelectWorld;
-extern std::vector<SelectWorld_t> SelectWorld;
+// extern std::vector<SelectWorld_t> SelectWorld;
+
 extern std::string g_recentWorld1p;
 extern std::string g_recentWorld2p;
+extern std::string g_recentWorldEditor;
 //Public ShowFPS As Boolean
 extern bool ShowFPS;
 //Public PrintFPS As Double
@@ -1545,6 +1554,8 @@ extern int numJoysticks;
 extern std::string FileName;
 //! EXTRA: A full filename (the "FileName" is now has the "base name" sense)
 extern std::string FileNameFull;
+//! EXTRA: The format of the current file
+extern int FileFormat;
 //! EXTRA: World map preserved filename
 extern std::string FileNameWorld;
 //! EXTRA: World map preserved full path
@@ -1573,6 +1584,12 @@ extern int curWorldLevel;
 extern int curWorldMusic;
 //EXTRA: Custom world music
 extern std::string curWorldMusicFile;
+
+// EXTRA: convenience functions to check if world music is new or not, and play
+// defined in main/world_loop.cpp
+bool g_isWorldMusicNotSame(WorldMusic_t &mus);
+void g_playWorldMusic(WorldMusic_t &mus);
+
 //Public NoTurnBack(0 To maxSections) As Boolean
 extern RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 //Public UnderWater(0 To maxSections) As Boolean

@@ -92,6 +92,28 @@ void levelWaitForFade()
     }
 }
 
+void editorWaitForFade()
+{
+    while(!g_levelScreenFader.isComplete() && GameIsActive)
+    {
+        XEvents::doEvents();
+
+        if(canProceedFrame())
+        {
+            computeFrameTime1();
+            if(WorldEditor)
+                UpdateGraphics2();
+            else
+                UpdateGraphics();
+            UpdateSound();
+            XEvents::doEvents();
+            computeFrameTime2();
+            updateScreenFaders();
+        }
+        PGE_Delay(1);
+    }
+}
+
 
 void CheckActive();//in game_main.cpp
 
@@ -131,6 +153,7 @@ void GameLoop()
     {
         EndLevel = true;
         ErrorQuit = false;
+        LevelBeatCode = -1;
         pLogWarning("Quit level because of an error");
         XRender::clearBuffer();
     }
@@ -178,6 +201,9 @@ void GameLoop()
     }
     else
     {
+        if(MagicHand)
+            UpdateEditor();
+
         ClearTriggeredEvents();
         UpdateLayers(); // layers before/after npcs
         UpdateNPCs();
@@ -194,8 +220,6 @@ void GameLoop()
         UpdateSound();
         UpdateEvents();
 //        If MagicHand = True Then UpdateEditor
-        if(MagicHand)
-            UpdateEditor();
 
         updateScreenFaders();
 
@@ -321,7 +345,7 @@ int PauseGame(PauseCode code, int plr)
 
     int prev_cursor = XWindow::showCursor(-1);
 
-    if(!GameMenu)
+    if(!GameMenu && !LevelEditor)
     {
         for(int A = numPlayers; A >= 1; A--)
             SavedChar[Player[A].Character] = Player[A];
@@ -372,7 +396,7 @@ int PauseGame(PauseCode code, int plr)
             CheckActive();
 
             speedRun_tick();
-            if(LevelSelect && !GameMenu)
+            if((LevelSelect && !GameMenu) || WorldEditor)
                 UpdateGraphics2();
             else
                 UpdateGraphics();

@@ -30,6 +30,7 @@
 #include "presetup.h"
 #include "compat.h"
 
+#include "menu_main.h"
 
 std::string GameplayTimer::formatTime(int64_t t)
 {

@@ -31,5 +31,6 @@ extern RangeArr<ScreenFader, 0, 2> g_levelVScreenFader;
 extern void clearScreenFaders();
 extern void updateScreenFaders();
 extern void levelWaitForFade();
+extern void editorWaitForFade();
 
 #endif // GAME_GLOBALS_H

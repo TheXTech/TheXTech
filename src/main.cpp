@@ -156,6 +156,10 @@ int main(int argc, char**argv)
     OpenConfig_preSetup();
 
     testPlayer.fill(Player_t());
+    for(int i = 1; i <= maxLocalPlayers; i++)
+    {
+        testPlayer[i].Character = i;
+    }
 
     try
     {

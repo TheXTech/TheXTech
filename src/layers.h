@@ -197,7 +197,7 @@ eventindex_t FindEvent(const std::string& EventName);
 // swaps two layers and updates all references to them
 bool SwapLayers(layerindex_t index_1, layerindex_t index_2);
 // renames a layer
-bool RenameLayer(layerindex_t index, const std::string NewName);
+bool RenameLayer(layerindex_t index, const std::string& NewName);
 // deletes a layer (and, optionally, everything in it)
 bool DeleteLayer(layerindex_t index, bool killall);
 
@@ -225,7 +225,7 @@ void InitializeEvent(Events_t& event);
 // swaps two events and updates all references to them
 bool SwapEvents(eventindex_t index_1, eventindex_t index_2);
 // renames an event
-bool RenameEvent(eventindex_t index, const std::string NewName);
+bool RenameEvent(eventindex_t index, const std::string& NewName);
 // deletes an event
 bool DeleteEvent(eventindex_t index);
 

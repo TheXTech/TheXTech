@@ -32,6 +32,7 @@
 #include "../player.h"
 #include "../core/render.h"
 #include "../core/window.h"
+#include "editor/new_editor.h"
 
 #include <SDL2/SDL_haptic.h>
 
@@ -1135,6 +1136,10 @@ void TouchScreenController::processTouchDevice(TouchDevice_t& dev)
         m_finger.second.alive = false;
     }
 
+    int n_real_fingers = 0;
+    double total_finger_x = 0;
+    double total_finger_y = 0;
+
     for(int i = 0; i < fingers; i++)
     {
         SDL_Finger* f = SDL_GetTouchFinger(dev.id, i);
@@ -1146,9 +1151,15 @@ void TouchScreenController::processTouchDevice(TouchDevice_t& dev)
         float finger_x = f->x, finger_y = f->y, finger_pressure = f->pressure;
         (void)finger_pressure;
 
-        if(!m_cursorHeld)
+        n_real_fingers++;
+        total_finger_x += finger_x;
+        total_finger_y += finger_y;
+
+        // track which finger is controlling the cursor
+        if(!m_wasScrolling && (m_cursorFinger == -1 || m_cursorFinger == finger_id))
         {
-            m_cursorHeld = true;
+            m_cursorActive = true;
+            m_cursorFinger = finger_id;
             int cX, cY;
             XRender::mapToScreen(finger_x * m_screenWidth, finger_y * m_screenHeight, &cX, &cY);
             m_cursorX = cX;
@@ -1248,6 +1259,22 @@ void TouchScreenController::processTouchDevice(TouchDevice_t& dev)
         it++;
     }
 
+    if(n_real_fingers > 1 && LevelEditor && !editorScreen.active)
+    {
+        int MeanX, MeanY;
+        XRender::mapToScreen(total_finger_x / n_real_fingers * m_screenWidth, total_finger_y / n_real_fingers * m_screenHeight, &MeanX, &MeanY);
+
+        if(m_wasScrolling)
+        {
+            m_scrollX += m_lastMeanX - MeanX;
+            m_scrollY += m_lastMeanY - MeanY;
+        }
+
+        m_lastMeanX = MeanX;
+        m_lastMeanY = MeanY;
+        m_scrollActive = true;
+    }
+
     // Merge per-device states into common states:
     for(int key = key_BEGIN; key < key_END; ++key)
         m_keysHeld[key] |= keysHeld[key];
@@ -1320,7 +1347,12 @@ void TouchScreenController::update()
     }
 
 
-    m_cursorHeld = false;
+    bool cursor_was_held = m_cursorActive;
+    m_cursorActive = false;
+    m_scrollActive = false;
+
+    m_scrollX = 0;
+    m_scrollY = 0;
 
     for(int key = key_BEGIN; key < key_END; ++key)
         m_keysHeld[key] = false;
@@ -1332,6 +1364,50 @@ void TouchScreenController::update()
     for(auto& d : m_devices)
         processTouchDevice(d);
 
+    // handle cursor for double-tap logic
+    if(!m_cursorActive && cursor_was_held)
+    {
+        m_lastCursorX = m_cursorX;
+        m_lastCursorY = m_cursorY;
+        m_cursorFinger = -1;
+    }
+
+
+    // handle scrolling and scroll momentum
+
+    if(m_scrollActive && m_wasScrolling)
+    {
+        m_scrollMomentumX = m_lastScrollX;
+        m_scrollMomentumY = m_lastScrollY;
+    }
+
+    if(m_scrollActive)
+    {
+        // need two counters because of an SDL bug where the frame
+        // a finger it is lifted its finger still exists at its old location
+        m_lastScrollX = m_scrollX;
+        m_lastScrollY = m_scrollY;
+    }
+
+    m_wasScrolling = m_scrollActive;
+
+    if(!m_scrollActive && m_scrollMomentumX != 0.)
+    {
+        m_scrollMomentumX *= 0.97;
+        m_scrollX += m_scrollMomentumX;
+        if(m_scrollMomentumX > -0.1 && m_scrollMomentumX < 0.1)
+            m_scrollMomentumX = 0.;
+    }
+
+    if(!m_scrollActive && m_scrollMomentumY != 0.)
+    {
+        m_scrollMomentumY *= 0.97;
+        m_scrollY += m_scrollMomentumY;
+        if(m_scrollMomentumY > -0.1 && m_scrollMomentumY < 0.1)
+            m_scrollMomentumY = 0.;
+    }
+
+    // handle special keys
     if(m_current_extra_keys.keyToggleViewOnce)
     {
         m_touchHidden = !m_touchHidden;
@@ -1355,7 +1431,7 @@ void TouchScreenController::render(int player_no)
 
     for(int key = key_BEGIN; key < key_END; key++)
     {
-        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess || GamePaused == PauseCode::TextEntry)
+        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess || GamePaused == PauseCode::TextEntry || LevelEditor)
             continue;
 
         const auto& k = g_touchKeyMap.touchKeysMap[key];
@@ -1535,24 +1611,59 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
             c.Run = !c.Run;
     }
 
-    // use the touchscreen as a mouse if the buttons are currently hidden or we are in TextEntry mode
-    bool allowed = t->m_controller.m_touchHidden || GamePaused == PauseCode::TextEntry;
+    // use the touchscreen as a mouse if the buttons are currently hidden, we are in TextEntry mode, or we are in LevelEditor mode
+    bool allowed = t->m_controller.m_touchHidden || GamePaused == PauseCode::TextEntry || LevelEditor;
 
-    if(allowed && t->m_controller.m_cursorHeld)
+    if(allowed && t->m_controller.m_scrollActive)
     {
-        m.Primary = true;
+        m.GoOffscreen();
+        m.Move = true;
+    }
+    else if(allowed && t->m_controller.m_cursorActive)
+    {
+        if(LevelEditor || MagicHand)
+        {
+            // hold to preview, double-tap to click in main editor screen
+            if(editorScreen.active || t->m_controller.m_cursorY < 40)
+            {
+                m.Primary = true;
+            }
+            else if(t->m_controller.m_lastCursorX == -42
+                || (t->m_controller.m_cursorX - t->m_controller.m_lastCursorX > -10
+                && t->m_controller.m_cursorX - t->m_controller.m_lastCursorX < 10
+                && t->m_controller.m_cursorY - t->m_controller.m_lastCursorY > -10
+                && t->m_controller.m_cursorY - t->m_controller.m_lastCursorY < 10))
+            {
+                m.Primary = true;
+                // special value to allow drags
+                t->m_controller.m_lastCursorX = -42;
+            }
+        }
+        else
+        {
+            m.Primary = true;
+        }
 
-        if(t->m_controller.m_cursorX - m.X <= 1 || t->m_controller.m_cursorX - m.X >= 1
-           || t->m_controller.m_cursorY - m.Y <= 1 || t->m_controller.m_cursorY - m.Y >= 1)
+        if(t->m_controller.m_cursorX - m.X <= -1 || t->m_controller.m_cursorX - m.X >= 1
+           || t->m_controller.m_cursorY - m.Y <= -1 || t->m_controller.m_cursorY - m.Y >= 1)
         {
             m.Move = true;
             m.X = t->m_controller.m_cursorX;
             m.Y = t->m_controller.m_cursorY;
         }
+
+        m.Touch = true;
     }
 
-    // TODO: beautiful editor controls :)
-    UNUSED(e);
+    // update editor scroll
+    if(t->m_controller.m_scrollX < 0)
+        e.ScrollLeft += -t->m_controller.m_scrollX;
+    else if(t->m_controller.m_scrollX > 0)
+        e.ScrollRight += t->m_controller.m_scrollX;
+    if(t->m_controller.m_scrollY < 0)
+        e.ScrollUp += -t->m_controller.m_scrollY;
+    else if(t->m_controller.m_scrollY > 0)
+        e.ScrollDown += t->m_controller.m_scrollY;
 
     if(t->m_controller.m_current_extra_keys.keyCheats && t->m_controller.m_enable_enter_cheats)
         h[Hotkeys::Buttons::EnterCheats] = player;

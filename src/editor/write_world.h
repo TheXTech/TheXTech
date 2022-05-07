@@ -19,17 +19,11 @@
  */
 
 #pragma once
-#ifndef SCREEN_PAUSE_H
-#define SCREEN_PAUSE_H
+#ifndef WRITE_WORLD_HHHH
+#define WRITE_WORLD_HHHH
 
-namespace PauseScreen
-{
+#include <string>
 
-void Init(bool LegacyPause);
+void SaveWorld(const std::string &FilePath, int format, int version = 64);
 
-bool Logic(int plr);
-void Render();
-
-} // namespace PauseScreen
-
-#endif // #ifndef SCREEN_PAUSE_H
+#endif // WRITE_WORLD_HHHH

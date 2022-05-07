@@ -19,17 +19,21 @@
  */
 
 #pragma once
-#ifndef SCREEN_PAUSE_H
-#define SCREEN_PAUSE_H
+#ifndef WRITE_COMMON_HHHH
+#define WRITE_COMMON_HHHH
 
-namespace PauseScreen
-{
+#include <cstdio>
+#include <string>
 
-void Init(bool LegacyPause);
 
-bool Logic(int plr);
-void Render();
+void fwritestr(FILE* f, const std::string& s);
 
-} // namespace PauseScreen
+void fwritestr_multiline(FILE* f, const std::string& s);
 
-#endif // #ifndef SCREEN_PAUSE_H
+void fwritenum(FILE* f, int n);
+
+void fwritebool(FILE* f, bool b);
+
+void fwritefloat(FILE* f, float n);
+
+#endif // WRITE_COMMON_HHHH

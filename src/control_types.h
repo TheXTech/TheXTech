@@ -35,13 +35,13 @@ struct SharedControls_t
 // Each player has one; there is also a shared fallback mouse
 struct CursorControls_t
 {
-    // mouse should not be drawn (usually because touchscreen)
-    bool NoDraw = false;
+    // using direct touch device; affects rendering
+    bool Touch = false;
     // moved this frame
     bool Move = false;
     // position of cursor in screen coordinates
-    double X = -128.;
-    double Y = -128.;
+    double X = -4000.0;
+    double Y = -4000.0;
     // "left button" down
     bool Primary = false;
     // "right button" down
@@ -51,21 +51,22 @@ struct CursorControls_t
     // scroll up / down
     bool ScrollUp = false;
     bool ScrollDown = false;
+
     // call to easily send cursor offscreen (on disconnect, etc)
     inline void GoOffscreen()
     {
-        X = -128.;
-        Y = -128.;
+        X = -4000.0;
+        Y = -4000.0;
     }
 };
 
 // Controls for the editor
 struct EditorControls_t
 {
-    double ScrollUp = 0.;
-    double ScrollDown = 0.;
-    double ScrollLeft = 0.;
-    double ScrollRight = 0.;
+    double ScrollUp = 0.0;
+    double ScrollDown = 0.0;
+    double ScrollLeft = 0.0;
+    double ScrollRight = 0.0;
 
     bool FastScroll = false;
 

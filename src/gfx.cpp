@@ -103,6 +103,8 @@ bool GFX_t::load()
 
     loadImage(YoshiWings, uiPath + "YoshiWings.png");
 
+    // Add new required assets here. Also update load_gfx.cpp:loadCustomUIAssets()
+
     if(m_loadErrors > 0)
     {
         std::string msg = fmt::format_ne("Failed to load an UI image assets. Look a log file to get more details:\n{0}"
@@ -112,6 +114,16 @@ bool GFX_t::load()
         XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
         return false;
     }
+
+    loadImage(EIcons, uiPath + "EditorIcons.png");
+
+    if(m_loadErrors > 0)
+    {
+        pLogWarning("Missing new editor icons.");
+        m_loadErrors = 0;
+    }
+
+    // Add new optional assets here. Also update load_gfx.cpp:loadCustomUIAssets()
 
     SDL_assert_release(m_loadedImages.size() <= m_isCustomVolume);
     SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));

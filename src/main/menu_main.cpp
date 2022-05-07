@@ -47,8 +47,12 @@
 #include "../config.h"
 #include "../compat.h"
 #include "level_file.h"
+#include "world_file.h"
 #include "pge_delay.h"
 
+#include "screen_textentry.h"
+#include "editor/new_editor.h"
+#include "editor/write_world.h"
 
 MainMenuContent g_mainMenu;
 
@@ -58,6 +62,13 @@ static SDL_atomic_t         loadingProgrssMax;
 
 static SDL_Thread*          loadingThread = nullptr;
 
+
+int NumSelectWorld = 0;
+int NumSelectWorldEditable = 0;
+int NumSelectBattle = 0;
+std::vector<SelectWorld_t> SelectWorld;
+std::vector<SelectWorld_t> SelectWorldEditable;
+std::vector<SelectWorld_t> SelectBattle;
 
 void initMainMenu()
 {
@@ -69,6 +80,7 @@ void initMainMenu()
     g_mainMenu.main1PlayerGame = "1 Player Game";
     g_mainMenu.mainMultiplayerGame = "2 Player Game";
     g_mainMenu.mainBattleGame = "Battle Game";
+    g_mainMenu.mainEditor = "Editor";
     g_mainMenu.mainOptions = "Options";
     g_mainMenu.mainExit = "Exit";
 
@@ -123,6 +135,49 @@ static int menuRecentEpisode = -1;
 static int listMenuLastScroll = 0;
 static int listMenuLastCursor = 0;
 
+static void s_findRecentEpisode()
+{
+    menuRecentEpisode = -1;
+
+    if((MenuMode == MENU_1PLAYER_GAME && !g_recentWorld1p.empty()) ||
+       (MenuMode == MENU_2PLAYER_GAME && !g_recentWorld2p.empty()))
+    {
+        for(size_t i = 1; i < SelectWorld.size(); ++i)
+        {
+            auto &w = SelectWorld[i];
+            const std::string wPath = w.WorldPath + w.WorldFile;
+
+            if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
+               (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p) ||
+               (MenuMode == MENU_EDITOR && wPath == g_recentWorldEditor))
+            {
+                menuRecentEpisode = i - 1;
+                w.highlight = true;
+            }
+        }
+    }
+    else if(MenuMode == MENU_EDITOR && !g_recentWorldEditor.empty())
+    {
+        for(size_t i = 1; i < SelectWorldEditable.size(); ++i)
+        {
+            auto &w = SelectWorldEditable[i];
+            const std::string wPath = w.WorldPath + w.WorldFile;
+
+            if(wPath == g_recentWorldEditor)
+            {
+                menuRecentEpisode = i - 1;
+                w.highlight = true;
+            }
+        }
+    }
+
+    if(menuRecentEpisode >= 0)
+        worldCurs = menuRecentEpisode - 3;
+
+    MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
+}
+
+
 static int FindWorldsThread(void *)
 {
     FindWorlds();
@@ -132,43 +187,57 @@ static int FindWorldsThread(void *)
 #if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
 #   define USER_WORLDS_NEEDED
 #   define WORLD_ROOTS_SIZE 2
+#   define CAN_WRITE_APPPATH_WORLDS false
 #else
 #   define WORLD_ROOTS_SIZE 1
+#   define CAN_WRITE_APPPATH_WORLDS true
 #endif
+
+struct WorldRoot_t
+{
+    std::string path;
+    bool editable;
+};
 
 void FindWorlds()
 {
     bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     NumSelectWorld = 0;
-    menuRecentEpisode = -1;
 
-    // will probably change back to vector since
-    // multiple world packages can be used on 3DS
-    std::array<std::string, WORLD_ROOTS_SIZE> worldRoots =
+    std::vector<WorldRoot_t> worldRoots =
     {
-        AppPath + "worlds/"
+        {AppPath + "worlds/", CAN_WRITE_APPPATH_WORLDS}
 #ifdef USER_WORLDS_NEEDED
-        , AppPathManager::userWorldsRootDir() + "/"
+        , {AppPathManager::userWorldsRootDir() + "/", true}
 #endif
     };
 
+#ifdef __3DS__
+    for(const std::string& root : AppPathManager.worldPackages())
+        worldRoots.push_back({root, false});
+#endif
+
     SelectWorld.clear();
     SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
+    SelectWorldEditable.clear();
+    SelectWorldEditable.push_back(SelectWorld_t()); // Dummy entry
 
+#ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
 
     for(const auto &worldsRoot : worldRoots)
     {
         std::vector<std::string> dirs;
-        DirMan episodes(worldsRoot);
+        DirMan episodes(worldsRoot.path);
         episodes.getListOfFolders(dirs);
         SDL_AtomicAdd(&loadingProgrssMax, (int)dirs.size());
     }
+#endif
 
     for(const auto &worldsRoot : worldRoots)
     {
-        DirMan episodes(worldsRoot);
+        DirMan episodes(worldsRoot.path);
 
         std::vector<std::string> dirs;
         std::vector<std::string> files;
@@ -177,7 +246,7 @@ void FindWorlds()
 
         for(auto &dir : dirs)
         {
-            std::string epDir = worldsRoot + dir + "/";
+            std::string epDir = worldsRoot.path + dir + "/";
             DirMan episode(epDir);
             episode.getListOfFiles(files, {".wld", ".wldx"});
 
@@ -211,41 +280,38 @@ void FindWorlds()
                     }
 
                     SelectWorld.push_back(w);
+                    if(worldsRoot.editable)
+                        SelectWorldEditable.push_back(w);
                 }
             }
 
+#ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
+#endif
         }
     }
 
     // Sort all worlds by alphabetical order
-    std::sort(SelectWorld.begin(), SelectWorld.end(), [](const SelectWorld_t &a, const SelectWorld_t &b)
+    std::sort(SelectWorld.begin(), SelectWorld.end(),
+              [](const SelectWorld_t& a, const SelectWorld_t& b)
     {
         return a.WorldName < b.WorldName;
     });
 
-    if((MenuMode == MENU_1PLAYER_GAME && !g_recentWorld1p.empty()) ||
-       (MenuMode == MENU_2PLAYER_GAME && !g_recentWorld2p.empty()))
+    std::sort(SelectWorldEditable.begin(), SelectWorldEditable.end(),
+              [](const SelectWorld_t& a, const SelectWorld_t& b)
     {
-        for(size_t i = 1; i < SelectWorld.size(); ++i)
-        {
-            auto &w = SelectWorld[i];
-            const std::string wPath = w.WorldPath + w.WorldFile;
-
-            if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
-               (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p))
-            {
-                menuRecentEpisode = i - 1;
-                w.highlight = true;
-            }
-        }
-
-        if(menuRecentEpisode >= 0)
-            worldCurs = menuRecentEpisode - 3;
-    }
+        return a.WorldName < b.WorldName;
+    });
 
     NumSelectWorld = (int)(SelectWorld.size() - 1);
-    MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
+
+    SelectWorld_t createWorld = SelectWorld_t();
+    createWorld.WorldName = "<New World>";
+    SelectWorldEditable.push_back(createWorld);
+    NumSelectWorldEditable = (SelectWorldEditable.size() - 1);
+
+    s_findRecentEpisode();
 
     SDL_AtomicSet(&loading, 0);
 }
@@ -258,7 +324,7 @@ static int FindLevelsThread(void *)
 
 void FindLevels()
 {
-    std::array<std::string, WORLD_ROOTS_SIZE> battleRoots =
+    std::vector<std::string> battleRoots =
     {
         AppPath + "battle/"
 #ifdef USER_WORLDS_NEEDED
@@ -266,14 +332,15 @@ void FindLevels()
 #endif
     };
 
-    SelectWorld.clear();
-    SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
+    SelectBattle.clear();
+    SelectBattle.emplace_back(SelectWorld_t()); // Dummy entry
 
-    NumSelectWorld = 1;
-    SelectWorld.emplace_back(SelectWorld_t()); // "random level" entry
-    SelectWorld[1].WorldName = "Random Level";
+    NumSelectBattle = 1;
+    SelectBattle.emplace_back(SelectWorld_t()); // "random level" entry
+    SelectBattle[1].WorldName = "Random Level";
     LevelData head;
 
+#ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
 
@@ -284,6 +351,7 @@ void FindLevels()
         battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
         SDL_AtomicAdd(&loadingProgrssMax, (int)files.size());
     }
+#endif
 
     for(const auto &battleRoot : battleRoots)
     {
@@ -301,14 +369,18 @@ void FindLevels()
                 w.WorldName = head.LevelName;
                 if(w.WorldName.empty())
                     w.WorldName = fName;
-                SelectWorld.push_back(w);
+                SelectBattle.push_back(w);
             }
+#ifndef PGE_NO_THREADING
             SDL_AtomicAdd(&loadingProgrss, 1);
+#endif
         }
     }
 
-    NumSelectWorld = (SelectWorld.size() - 1);
+    NumSelectBattle = (SelectBattle.size() - 1);
+#ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loading, 0);
+#endif
 }
 
 
@@ -488,6 +560,8 @@ bool mainMenuUpdate()
                     quitKeyPos ++;
                 if(!g_gameInfo.disableBattleMode)
                     quitKeyPos ++;
+                if(g_config.enable_editor)
+                    quitKeyPos ++;
 
                 if(MenuCursor != quitKeyPos)
                 {
@@ -509,12 +583,14 @@ bool mainMenuUpdate()
                     menuPlayersNum = 1;
                     menuBattleMode = false;
                     MenuCursor = 0;
-#ifdef __EMSCRIPTEN__
+#if !defined(THEXTECH_PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
                     FindWorlds();
-#else
+#elif !defined(THEXTECH_PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
                     SDL_DetachThread(loadingThread);
+#else
+                    s_findRecentEpisode();
 #endif
                 }
                 else if(!g_gameInfo.disableTwoPlayer && MenuCursor == i++)
@@ -523,13 +599,15 @@ bool mainMenuUpdate()
                     MenuMode = MENU_2PLAYER_GAME;
                     menuPlayersNum = 2;
                     menuBattleMode = false;
-#ifdef __EMSCRIPTEN__
-                    FindWorlds();
-#else
                     MenuCursor = 0;
+#if !defined(THEXTECH_PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
+                    FindWorlds();
+#elif !defined(THEXTECH_PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
                     SDL_DetachThread(loadingThread);
+#else
+                    s_findRecentEpisode();
 #endif
                 }
                 else if(!g_gameInfo.disableBattleMode && MenuCursor == i++)
@@ -538,14 +616,30 @@ bool mainMenuUpdate()
                     MenuMode = MENU_BATTLE_MODE;
                     menuPlayersNum = 2;
                     menuBattleMode = true;
-#ifdef __EMSCRIPTEN__
+#if !defined(THEXTECH_PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
                     FindLevels();
-#else
+#elif !defined(THEXTECH_PRELOAD_LEVELS)
                     SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", NULL);
+                    loadingThread = SDL_CreateThread(FindLevelsThread, "FindLevels", nullptr);
                     SDL_DetachThread(loadingThread);
 #endif
                     MenuCursor = 0;
+                }
+                else if(g_config.enable_editor && MenuCursor == i++)
+                {
+                    PlaySoundMenu(SFX_Do);
+                    MenuMode = MENU_EDITOR;
+                    MenuCursor = 0;
+
+#if !defined(THEXTECH_PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
+                    FindWorlds();
+#elif !defined(THEXTECH_PRELOAD_LEVELS)
+                    SDL_AtomicSet(&loading, 1);
+                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
+                    SDL_DetachThread(loadingThread);
+#else
+                    s_findRecentEpisode();
+#endif
                 }
                 else if(MenuCursor == i++)
                 {
@@ -574,6 +668,9 @@ bool mainMenuUpdate()
                 quitKeyPos ++;
             if(!g_gameInfo.disableBattleMode)
                 quitKeyPos ++;
+            if(g_config.enable_editor)
+                quitKeyPos ++;
+
             if(MenuCursor > quitKeyPos)
                 MenuCursor = 0;
             if(MenuCursor < 0)
@@ -805,8 +902,14 @@ bool mainMenuUpdate()
 #endif
 
         // World Select
-        else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
+        else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME
+            || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
         {
+            const std::vector<SelectWorld_t>& SelectorList
+                = (MenuMode == MENU_BATTLE_MODE) ? SelectBattle :
+                    ((MenuMode == MENU_EDITOR) ? SelectWorldEditable :
+                        SelectWorld);
+
             if(ScrollDelay > 0)
             {
                 SharedCursor.Move = true;
@@ -821,7 +924,7 @@ bool mainMenuUpdate()
                 {
                     if(SharedCursor.Y >= 350 + B * 30 && SharedCursor.Y <= 366 + B * 30)
                     {
-                        menuLen = 19 * static_cast<int>(SelectWorld[A + 1].WorldName.size());
+                        menuLen = 19 * static_cast<int>(SelectorList[A + 1].WorldName.size());
 
                         if(SharedCursor.X >= 300 && SharedCursor.X <= 300 + menuLen)
                         {
@@ -851,6 +954,14 @@ bool mainMenuUpdate()
                     {
                         MenuCursor = g_gameInfo.disableTwoPlayer ? 1 : 2;
                     }
+                    else if(MenuMode == MENU_EDITOR)
+                    {
+                        MenuCursor = 3;
+                        if(g_gameInfo.disableTwoPlayer)
+                            MenuCursor--;
+                        if(g_gameInfo.disableBattleMode)
+                            MenuCursor--;
+                    }
 
                     MenuMode = MENU_MAIN;
 //'world select back
@@ -866,25 +977,95 @@ bool mainMenuUpdate()
 
                     PlaySoundMenu(SFX_Do);
                     selWorld = MenuCursor + 1;
-                    FindSaves();
 
-                    For(A, 1, numCharacters)
+                    // level editor
+                    if(MenuMode == MENU_EDITOR)
                     {
-                        if(MenuMode == MENU_BATTLE_MODE)
-                            blockCharacter[A] = false;
+                        if(selWorld == NumSelectWorldEditable)
+                        {
+                            ClearWorld(true);
+                            WorldName = TextEntryScreen::Run("New world name");
+                            if(!WorldName.empty())
+                            {
+                                std::string fn = WorldName;
+                                // eliminate bad characters
+                                std::replace(fn.begin(), fn.end(), '/', '_');
+                                std::replace(fn.begin(), fn.end(), '\\', '_');
+                                std::replace(fn.begin(), fn.end(), '.', '_');
+                                std::replace(fn.begin(), fn.end(), ':', '_');
+                                std::replace(fn.begin(), fn.end(), '<', '_');
+                                std::replace(fn.begin(), fn.end(), '>', '_');
+                                std::replace(fn.begin(), fn.end(), '"', '_');
+                                std::replace(fn.begin(), fn.end(), '|', '_');
+                                std::replace(fn.begin(), fn.end(), '?', '_');
+                                std::replace(fn.begin(), fn.end(), '*', '_');
+                                // ensure uniqueness (but still case-sensitive for now)
+                                while(DirMan::exists(AppPathManager::userWorldsRootDir() + "/" + fn))
+                                    fn += "2";
+                                DirMan::mkAbsPath(AppPathManager::userWorldsRootDir() + "/" + fn);
+
+                                std::string wPath = AppPathManager::userWorldsRootDir() + "/" + fn + "/world.wld";
+                                if(g_config.editor_preferred_file_format != FileFormats::WLD_SMBX64 && g_config.editor_preferred_file_format != FileFormats::WLD_SMBX38A)
+                                    wPath += "x";
+                                g_recentWorldEditor = wPath;
+
+                                SaveWorld(wPath, g_config.editor_preferred_file_format);
+
+#ifdef PGE_NO_THREADING
+                                FindWorlds();
+#else
+                                SDL_AtomicSet(&loading, 1);
+                                loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", NULL);
+#endif
+                            }
+                        }
                         else
-                            blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
+                        {
+                            GameMenu = false;
+                            LevelSelect = false;
+                            BattleMode = false;
+                            LevelEditor = true;
+                            WorldEditor = true;
+                            ClearLevel();
+                            ClearGame();
+                            std::string wPath = SelectWorldEditable[selWorld].WorldPath
+                                + SelectWorldEditable[selWorld].WorldFile;
+                            OpenWorld(wPath);
+                            if(g_recentWorldEditor != wPath)
+                            {
+                                g_recentWorldEditor = wPath;
+                                SaveConfig();
+                            }
+                            editorScreen.ResetCursor();
+                            editorScreen.active = false;
+                            MouseRelease = false;
+                            return true;
+                        }
                     }
-
-                    if(MenuMode == MENU_BATTLE_MODE)
-                    {
-                        MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
-                        ConnectScreen::MainMenu_Start(2);
-                    }
+                    // game mode
                     else
                     {
-                        MenuMode *= MENU_SELECT_SLOT_BASE;
-                        MenuCursor = 0;
+                        if(MenuMode != MENU_BATTLE_MODE)
+                            FindSaves();
+
+                        For(A, 1, numCharacters)
+                        {
+                            if(MenuMode == MENU_BATTLE_MODE)
+                                blockCharacter[A] = false;
+                            else
+                                blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
+                        }
+
+                        if(MenuMode == MENU_BATTLE_MODE)
+                        {
+                            MenuMode = MENU_CHARACTER_SELECT_NEW_BM;
+                            ConnectScreen::MainMenu_Start(2);
+                        }
+                        else
+                        {
+                            MenuMode *= MENU_SELECT_SLOT_BASE;
+                            MenuCursor = 0;
+                        }
                     }
 
                     MenuCursorCanMove = false;
@@ -939,21 +1120,26 @@ bool mainMenuUpdate()
                 dontWrap = true;
             }
             
-            if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
+            if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME
+                || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
             {
+                maxShow = (MenuMode == MENU_BATTLE_MODE) ? NumSelectBattle :
+                    ((MenuMode == MENU_EDITOR) ? NumSelectWorldEditable :
+                        NumSelectWorld);
+
                 if(dontWrap)
                 {
-                    if(MenuCursor >= NumSelectWorld)
-                        MenuCursor = NumSelectWorld - 1;
+                    if(MenuCursor >= maxShow)
+                        MenuCursor = maxShow - 1;
                     if(MenuCursor < 0)
                         MenuCursor = 0;
                 }
                 else
                 {
-                    if(MenuCursor >= NumSelectWorld)
+                    if(MenuCursor >= maxShow)
                         MenuCursor = 0;
                     if(MenuCursor < 0)
-                        MenuCursor = NumSelectWorld - 1;
+                        MenuCursor = maxShow - 1;
                 }
             }
         } // World select
@@ -1169,6 +1355,8 @@ bool mainMenuUpdate()
                         optionsIndex++;
                     if(!g_gameInfo.disableBattleMode)
                         optionsIndex++;
+                    if(g_config.enable_editor)
+                        optionsIndex++;
                     MenuMode = MENU_MAIN;
                     MenuCursor = optionsIndex;
                     MenuCursorCanMove = false;
@@ -1184,7 +1372,7 @@ bool mainMenuUpdate()
                         MenuMode = MENU_INPUT_SETTINGS;
                         PlaySoundMenu(SFX_Do);
                     }
-#ifndef __ANDROID__ // on Android run the always full-screen
+#ifndef RENDER_FULLSCREEN_ALWAYS // on Android and some other platforms, run the always full-screen
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
@@ -1279,7 +1467,9 @@ bool mainMenuUpdate()
 
 static void s_drawGameTypeTitle(int x, int y)
 {
-    if(menuBattleMode)
+    if(MenuMode == MENU_EDITOR)
+        SuperPrint(g_mainMenu.mainEditor, 3, x, y, 0.8f, 0.8f, 0.3f);
+    else if(menuBattleMode)
         SuperPrint(g_mainMenu.mainBattleGame, 3, x, y, 0.3f, 0.3f, 1.0f);
     else
     {
@@ -1333,7 +1523,7 @@ void mainMenuDraw()
     // just don't call this during an offset!
     // XRender::offsetViewportIgnore(true);
 
-    if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE)
+    if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE && MenuMode != MENU_EDITOR)
         worldCurs = 0;
 
     XRender::renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
@@ -1363,6 +1553,8 @@ void mainMenuDraw()
             SuperPrint(g_mainMenu.mainMultiplayerGame, 3, 300, 350+30*(i++));
         if(!g_gameInfo.disableBattleMode)
             SuperPrint(g_mainMenu.mainBattleGame, 3, 300, 350+30*(i++));
+        if(g_config.enable_editor)
+            SuperPrint(g_mainMenu.mainEditor, 3, 300, 350+30*(i++));
         SuperPrint(g_mainMenu.mainOptions, 3, 300, 350+30*(i++));
         SuperPrint(g_mainMenu.mainExit, 3, 300, 350+30*(i++));
         XRender::renderTexture(300 - 20, 350 + (MenuCursor * 30), 16, 16, GFX.MCursor[0], 0, 0);
@@ -1457,15 +1649,22 @@ void mainMenuDraw()
 #endif
 
     // Episode / Level selection
-    else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE)
+    else if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
     {
         s_drawGameTypeTitle(300, 280);
         // std::string tempStr;
 
         minShow = 1;
-        maxShow = NumSelectWorld;
+        maxShow = (MenuMode == MENU_BATTLE_MODE) ? NumSelectBattle :
+            ((MenuMode == MENU_EDITOR) ? NumSelectWorldEditable :
+                NumSelectWorld);
+        const std::vector<SelectWorld_t>& SelectorList
+            = (MenuMode == MENU_BATTLE_MODE) ? SelectBattle :
+                ((MenuMode == MENU_EDITOR) ? SelectWorldEditable :
+                    SelectWorld);
 
-        if(NumSelectWorld > 5)
+        int original_maxShow = maxShow;
+        if(maxShow > 5)
         {
             minShow = worldCurs;
             maxShow = minShow + 4;
@@ -1479,14 +1678,8 @@ void mainMenuDraw()
             if(worldCurs < 1)
                 worldCurs = 1;
 
-            if(worldCurs > NumSelectWorld - 4)
-                worldCurs = NumSelectWorld - 4;
-
-            if(maxShow >= NumSelectWorld)
-            {
-                maxShow = NumSelectWorld;
-                minShow = NumSelectWorld - 4;
-            }
+            if(worldCurs > original_maxShow - 4)
+                worldCurs = original_maxShow - 4;
 
             minShow = worldCurs;
             maxShow = minShow + 4;
@@ -1494,7 +1687,7 @@ void mainMenuDraw()
 
         for(auto A = minShow; A <= maxShow; A++)
         {
-            auto w = SelectWorld[A];
+            auto w = SelectorList[A];
             B = A - minShow + 1;
             float r = w.highlight ? 0.f : 1.f;
             SuperPrint(w.WorldName, 3, 300, 320 + (B * 30), r, 1.f, 1.f, 1.f);
@@ -1504,7 +1697,7 @@ void mainMenuDraw()
         if(minShow > 1)
             XRender::renderTexture(400 - 8, 350 - 20, GFX.MCursor[1]);
 
-        if(maxShow < NumSelectWorld)
+        if(maxShow < original_maxShow)
             XRender::renderTexture(400 - 8, 490, GFX.MCursor[2]);
 
         B = MenuCursor - minShow + 1;

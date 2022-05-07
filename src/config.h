@@ -30,6 +30,12 @@ extern struct Config_t
     bool    RecordGameplayData = false;
     //! Use the native onscreen keyboard instead of the TheXTech one
     bool    use_native_osk = false;
+    //! Enable the in-game editor
+    bool    enable_editor = true;
+    //! Scroll when cursor is at edge of screen in editor
+    bool    editor_edge_scroll = false;
+    //! Preferred file format for editor (0 is Moondust engine lvlx format)
+    int     editor_preferred_file_format = 0;
 
     /* ---- Video ----*/
 
@@ -50,7 +56,8 @@ extern struct Config_t
     bool    enter_cheats_menu_item = false;
     //! Allow player quickly move through paths on the world map (works for compatibility Mode 1 only)
     bool    worldMapFastMove = false;
-
+    //! Enter the pause menu after dying while testing a level
+    bool    editor_pause_on_death = true;
 
     /* ---- Effects ----*/
 

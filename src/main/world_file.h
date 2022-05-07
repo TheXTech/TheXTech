@@ -18,18 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #pragma once
-#ifndef SCREEN_PAUSE_H
-#define SCREEN_PAUSE_H
+#ifndef WORLD_FILE_H
+#define WORLD_FILE_H
 
-namespace PauseScreen
-{
+#include <string>
 
-void Init(bool LegacyPause);
+//! loads the world
+bool OpenWorld(std::string FilePath);
+void FindWldStars();
+//! clears the world.
+//  when "quick" is true, does not unload custom assets. this is used only for creating new worlds at menu.
+void ClearWorld(bool quick = false);
 
-bool Logic(int plr);
-void Render();
+//! NEW: routines to check if it is possible to convert to legacy file formats and to remove all non-legacy content
+bool CanConvertWorld(int format, std::string* reasons);
+void ConvertWorld(int format);
 
-} // namespace PauseScreen
-
-#endif // #ifndef SCREEN_PAUSE_H
+#endif // WORLD_FILE_H

@@ -229,7 +229,7 @@ void Player_ValidateChar(int p)
     {
         for(i = 0; i < 5; i++)
         {
-            if(!blockCharacter[i+1] && !s_char_info.accept(i))
+            if(!blockCharacter[i+1] && s_char_info.accept(i))
             {
                 s_menuItem[p] = i;
                 break;

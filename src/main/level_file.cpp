@@ -34,6 +34,7 @@
 #include "level_file.h"
 #include "trees.h"
 #include "record.h"
+#include "npc_special_data.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -138,6 +139,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FileFormats::smbx64LevelSortBGOs(lvl);
 
     g_dirEpisode.setCurDir(lvl.meta.path);
+    FileFormat = lvl.meta.RecentFormat;
     FileName = g_dirEpisode.resolveDirCase(lvl.meta.filename);
     FileNamePath = lvl.meta.path + "/";
     g_dirCustom.setCurDir(FileNamePath + FileName);
@@ -150,6 +152,11 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     {
         FileNameFull = Files::basename(FilePath);
         FullFileName = FilePath;
+    }
+    else if(FileFormat == FileFormats::LVL_SMBX64 || FileFormat == FileFormats::LVL_SMBX38A)
+    {
+        FileNameFull = FileName + ".lvl";
+        FullFileName = FileNamePath + FileName + ".lvl";
     }
     else
     {
@@ -413,8 +420,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         block.DefaultSpecial = block.Special;
 
         block.Special2 = 0;
-        if(b.id == 90 && lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 20)
-            block.Special2 = 1; // Restore bricks algorithm for turn blocks for SMBX19 and lower
+        if(b.id == 90)
+        {
+            if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 20)
+                block.Special2 = 1; // Restore bricks algorithm for turn blocks for SMBX19 and lower
+            else
+                block.Special2 = b.special_data; // load it if set in the modern format
+        }
+
         block.DefaultSpecial2 = block.Special2;
 
         block.Invis = b.invisible;
@@ -523,6 +536,20 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);
+        }
+
+        if(compatModern && isSmbx64)
+        {
+            // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
+            npc.Special7 = find_legacy_Special7(npc.Type, fVersion);
+        }
+        else if(isSmbx64)
+        {
+            npc.Special7 = 0.0;
+        }
+        else
+        {
+            npc.Special7 = n.special_data;
         }
 
         if(npc.Type == NPCID_CANNONITEM) // billy gun
@@ -670,8 +697,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Direction = w.idirect;
         warp.Direction2 = w.odirect;
         warp.Effect = w.type;
-        warp.twoWay = w.two_way;
-        warp.transitEffect = w.transition_effect;
 
         // Work around filenames with no extension suffix and case missmatch
         if(!w.lname.empty())
@@ -709,7 +734,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.NoYoshi = w.novehicles;
         warp.WarpNPC = w.allownpc;
         warp.Locked = w.locked;
-        warp.stoodRequired = w.stood_state_required;
+
+        // custom fields:
+        warp.twoWay = w.two_way;
 
         warp.cannonExit = w.cannon_exit;
         warp.cannonExitSpeed = w.cannon_exit_speed;
@@ -718,6 +745,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             SetS(warp.StarsMsg, w.stars_msg);
         warp.noPrintStars = w.star_num_hide;
         warp.noEntranceScene = w.hide_entering_scene;
+
+        warp.stoodRequired = w.stood_state_required;
+        warp.transitEffect = w.transition_effect;
 
         warp.Entrance.Height = 32;
         warp.Entrance.Width = 32;
@@ -771,6 +801,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     if(LevelEditor)
     {
         ResetSectionScrolls();
+        curSection = 0; // suppresses SFX and visual feedback
         SetSection(0);
     }
     else
@@ -1047,5 +1078,225 @@ void FindStars()
             }
 
         }
+    }
+}
+
+// Is there any unsupported content for this format in the level?
+bool CanConvertLevel(int format, std::string* reasons)
+{
+    if(format == FileFormats::LVL_PGEX)
+        return true;
+
+    if(format == FileFormats::LVL_SMBX38A)
+    {
+        if(reasons)
+            *reasons = "The SMBX38-A format is not supported at this time.\n";
+        return false;
+    }
+
+    if(format != FileFormats::LVL_SMBX64)
+    {
+        if(reasons)
+            *reasons = "Requested format is unknown.\n";
+        return false;
+    }
+
+    bool can_convert = true;
+    if(reasons)
+        reasons->clear();
+
+    bool seen_transit = false;
+    bool seen_stood = false;
+    bool seen_cannon = false;
+    bool seen_warp_event = false;
+    bool seen_stars_msg = false;
+    bool seen_no_print_stars = false;
+    bool seen_no_entrance_scene = false;
+    bool seen_portal_warp = false;
+    for(int i = 1; i <= numWarps; i++)
+    {
+        Warp_t& w = Warp[i];
+
+        if(!seen_transit && w.transitEffect != LevelDoor::TRANSIT_NONE)
+        {
+            can_convert = false;
+            seen_transit = true;
+            if(reasons)
+                *reasons += "A warp uses new transition effect.\n";
+        }
+
+        if(!seen_stood && w.stoodRequired)
+        {
+            can_convert = false;
+            seen_stood = true;
+            if(reasons)
+                *reasons += "A warp requires player to stand.\n";
+        }
+
+        if(!seen_cannon && w.cannonExit)
+        {
+            can_convert = false;
+            seen_cannon = true;
+            if(reasons)
+                *reasons += "A warp has the cannon exit effect.\n";
+        }
+
+        if(!seen_warp_event && w.eventEnter != EVENT_NONE)
+        {
+            can_convert = false;
+            seen_warp_event = true;
+            if(reasons)
+                *reasons += "A warp triggers an event on entry.\n";
+        }
+
+        if(!seen_stars_msg && !GetS(w.StarsMsg).empty())
+        {
+            can_convert = false;
+            seen_stars_msg = true;
+            if(reasons)
+                *reasons += "A warp has a custom stars message.\n";
+        }
+
+        if(!seen_no_print_stars && w.noPrintStars)
+        {
+            can_convert = false;
+            seen_no_print_stars = true;
+            if(reasons)
+                *reasons += "A warp hides its star requirement.\n";
+        }
+
+        if(!seen_no_entrance_scene && w.noEntranceScene)
+        {
+            can_convert = false;
+            seen_no_entrance_scene = true;
+            if(reasons)
+                *reasons += "A level warp skips the start scene.\n";
+        }
+
+        if(!seen_portal_warp && w.Effect == 3)
+        {
+            can_convert = false;
+            seen_portal_warp = true;
+           if(reasons)
+                *reasons += "A warp uses the portal effect.\n";
+         }
+    }
+
+    bool seen_event_custom_music = false;
+    bool seen_modern_autoscroll = false;
+    for(int i = 0; i < numEvents; ++i)
+    {
+        Events_t& e = Events[i];
+
+        for(int j = 0; j < numSections; ++j)
+        {
+            auto &ss = e.section[j];
+
+            if(!seen_event_custom_music && !GetS(ss.music_file).empty())
+            {
+                can_convert = false;
+                seen_event_custom_music = true;
+                if(reasons)
+                    *reasons += "An event sets music to a file.\n";
+            }
+
+            if(!seen_modern_autoscroll && ss.autoscroll)
+            {
+                can_convert = false;
+                seen_modern_autoscroll = true;
+                if(reasons)
+                    *reasons += "An event uses modern autoscroll.\n";
+            }
+        }
+    }
+
+    for(int i = 1; i <= numNPCs; i++)
+    {
+        if(NPC[i].Special7 != 0)
+        {
+            can_convert = false;
+            if(reasons)
+            {
+                *reasons += "An NPC type ";
+                *reasons += std::to_string(NPC[i].Type);
+                *reasons += " has custom behavior.\n";
+            }
+            break;
+        }
+    }
+
+    for(int i = 1; i <= numBlock; i++)
+    {
+        if(Block[i].Type == 90 && Block[i].Special2 == 1)
+        {
+            can_convert = false;
+            if(reasons)
+                *reasons += "A spin block uses ancient behavior.\n";
+            break;
+        }
+    }
+
+    return can_convert;
+}
+
+// Strips all unsupported content from the level.
+void ConvertLevel(int format)
+{
+    FileFormat = format;
+    if(format == FileFormats::LVL_SMBX64 || format == FileFormats::LVL_SMBX38A)
+    {
+        if(!FileNameFull.empty() && FileNameFull.back() == 'x')
+            FileNameFull.resize(FileNameFull.size() - 1);
+        if(!FullFileName.empty() && FullFileName.back() == 'x')
+            FullFileName.resize(FullFileName.size() - 1);
+    }
+    else
+    {
+        if(!FileNameFull.empty() && FileNameFull.back() != 'x')
+            FileNameFull += "x";
+        if(!FullFileName.empty() && FullFileName.back() != 'x')
+            FullFileName += "x";
+    }
+
+    if(format != FileFormats::LVL_SMBX64)
+        return;
+
+    for(int i = 1; i <= numWarps; i++)
+    {
+        Warp_t& w = Warp[i];
+
+        w.transitEffect = LevelDoor::TRANSIT_NONE;
+        w.stoodRequired = false;
+        w.cannonExit = false;
+        w.eventEnter = EVENT_NONE;
+        SetS(w.StarsMsg, "");
+        w.noPrintStars = false;
+        w.noEntranceScene = false;
+
+        if(w.Effect == 3)
+            w.Effect = 0;
+    }
+
+    for(int i = 0; i < numEvents; ++i)
+    {
+        Events_t& e = Events[i];
+
+        for(int j = 0; j < numSections; ++j)
+        {
+            auto &ss = e.section[j];
+
+            SetS(ss.music_file, "");
+            ss.autoscroll = false;
+        }
+    }
+
+    for(int i = 1; i <= numNPCs; i++)
+    {
+        NPC[i].Special7 = 0;
+    }
+
+    for(int i = 1; i <= numBlock; i++)
+    {
+        Block[i].Special2 = 0;
     }
 }

@@ -29,6 +29,7 @@
 #include "../compat.h"
 #include "../main/trees.h"
 #include "level_file.h"
+#include "world_file.h"
 
 #include <Utils/strings.h>
 #include <Utils/files.h>
@@ -38,7 +39,7 @@
 
 #include "global_dirs.h"
 
-void OpenWorld(std::string FilePath)
+bool OpenWorld(std::string FilePath)
 {
     // USE PGE-FL here
     // std::string newInput = "";
@@ -51,7 +52,15 @@ void OpenWorld(std::string FilePath)
 
     ClearWorld();
 
-    FileFormats::OpenWorldFile(FilePath, wld);
+    // FileFormats::OpenWorldFile(FilePath, wld);
+    if(!FileFormats::OpenWorldFile(FilePath, wld))
+    {
+        pLogWarning("Error of world \"%s\" file loading: %s (line %d).",
+                    FilePath.c_str(),
+                    wld.meta.ERROR_info.c_str(),
+                    wld.meta.ERROR_linenum);
+        return false;
+    }
 
 //    for(A = FilePath.length(); A >= 1; A--)
 //    {
@@ -60,10 +69,26 @@ void OpenWorld(std::string FilePath)
 //    }
 
     g_dirEpisode.setCurDir(wld.meta.path);
-    FileNameFull = Files::basename(FilePath);
+    FileFormat = wld.meta.RecentFormat;
     FileName = g_dirEpisode.resolveDirCase(wld.meta.filename); //FilePath.substr(FilePath.length() - (FilePath.length() - A));
     FileNamePath = wld.meta.path + "/"; //FilePath.substr(0, (A));
     g_dirCustom.setCurDir(FileNamePath + FileName);
+
+    if(!FilePath.empty())
+    {
+        FileNameFull = Files::basename(FilePath);
+        FullFileName = FilePath;
+    }
+    else if(FileFormat == FileFormats::LVL_SMBX64 || FileFormat == FileFormats::LVL_SMBX38A)
+    {
+        FileNameFull = FileName + ".lvl";
+        FullFileName = FileNamePath + FileName + ".lvl";
+    }
+    else
+    {
+        FileNameFull = FileName + ".lvlx";
+        FullFileName = FileNamePath + FileName + ".lvlx";
+    }
 
     // Preserve these values for quick restoring when going to the world map
     FileNameFullWorld = FileNameFull;
@@ -107,6 +132,8 @@ void OpenWorld(std::string FilePath)
 
     NoMap = wld.HubStyledWorld;
     RestartLevel = wld.restartlevel;
+
+    // new:
     WorldStarsShowPolicy = wld.starsShowPolicy;
 
     MaxWorldStars = int(wld.stars);
@@ -255,7 +282,10 @@ void OpenWorld(std::string FilePath)
         ll.WarpX = l.gotox;
         ll.WarpY = l.gotoy;
         ll.Path2 = l.bigpathbg;
+
+        // new:
         ll.starsShowPolicy = l.starsShowPolicy;
+
         ll.Z = zCounter++;
         treeWorldLevelAdd(&ll);
 
@@ -283,6 +313,8 @@ void OpenWorld(std::string FilePath)
         box.Location.X = m.x;
         box.Location.Y = m.y;
         box.Type = int(m.id);
+
+        // new:
         std::string music_file = g_dirEpisode.resolveFileCase(m.music_file);
         if(!music_file.empty())
         {
@@ -301,7 +333,7 @@ void OpenWorld(std::string FilePath)
     LoadCustomGFX();
     LoadCustomSound();
 
-//    if(LevelEditor == false)
+    if(!LevelEditor)
     {
         for(A = 1; A <= numWorldLevels; A++)
         {
@@ -323,6 +355,18 @@ void OpenWorld(std::string FilePath)
                 LevelPath(WorldLevel[A], 5, true);
             }
         }
+    }
+    else
+    {
+        for(A = 1; A <= numWorldLevels; A++)
+        {
+            auto &ll = WorldLevel[A];
+            if(FileRelease <= 20 && ll.Type == 1)
+                ll.Start = true;
+        }
+
+        vScreenX[1] = (ScreenW / 2 - 800 / 2);
+        vScreenY[1] = (ScreenH / 2 - 600 / 2);
     }
 //    else
 //    {
@@ -349,9 +393,11 @@ void OpenWorld(std::string FilePath)
 //    }
     SaveWorldStrings();
     resetFrameTimer();
+
+    return true;
 }
 
-void ClearWorld()
+void ClearWorld(bool quick)
 {
     int A = 0;
 
@@ -375,7 +421,15 @@ void ClearWorld()
     for(A = 1; A <= numWorldMusic; A++)
         WorldMusic[A] = WorldMusic_t();
 
-    ClearStringsBank();
+    if(!quick)
+    {
+        ClearStringsBank();
+        UnloadCustomGFX();
+        UnloadWorldCustomGFX();
+        UnloadCustomSound();
+        LoadPlayerDefaults();
+    }
+
     MaxWorldStars = 0;
     numTiles = 0;
     numWorldPaths = 0;
@@ -391,10 +445,11 @@ void ClearWorld()
     BeatTheGame = false;
     for(int A = 1; A <= maxWorldCredits; A++)
         WorldCredits[A].clear();
-    UnloadCustomGFX();
-    UnloadWorldCustomGFX();
-    UnloadCustomSound();
-    LoadPlayerDefaults();
+    if(LevelEditor)
+    {
+        vScreenX[1] = 0;
+        vScreenY[1] = 0;
+    }
 //    if(LevelEditor == true)
 //    {
 //        frmLevelEditor::optCursor(14).Value = true;
@@ -442,5 +497,95 @@ void FindWldStars()
             }
 
         }
+    }
+}
+
+// Is there any unsupported content for this format in the world?
+bool CanConvertWorld(int format, std::string* reasons)
+{
+    if(format == FileFormats::WLD_PGEX)
+        return true;
+
+    if(format == FileFormats::WLD_SMBX38A)
+    {
+        if(reasons)
+            *reasons = "The SMBX38-A format is not supported at this time.\n";
+        return false;
+    }
+
+    if(format != FileFormats::WLD_SMBX64)
+    {
+        if(reasons)
+            *reasons = "Requested format is unknown.\n";
+        return false;
+    }
+
+    bool can_convert = true;
+    if(reasons)
+        reasons->clear();
+
+    for(int i = 1; i <= numWorldMusic; i++)
+    {
+        if(!GetS(WorldMusic[i].MusicFile).empty())
+        {
+            can_convert = false;
+            if(reasons)
+                *reasons += "Uses custom world music file.\n";
+            break;
+        }
+    }
+
+    if(WorldStarsShowPolicy != WorldData::STARS_UNSPECIFIED)
+    {
+        can_convert = false;
+        if(reasons)
+            *reasons += "Uses world setting for star display.\n";
+    }
+
+    for(int i = 1; i <= numWorldLevels; i++)
+    {
+        if(WorldLevel[i].starsShowPolicy != WorldData::STARS_UNSPECIFIED)
+        {
+            can_convert = false;
+            if(reasons)
+                *reasons += "Uses per-level setting for star display.\n";
+        }
+    }
+
+    return can_convert;
+}
+
+// Strips all unsupported content from the world.
+void ConvertWorld(int format)
+{
+    FileFormat = format;
+    if(format == FileFormats::LVL_SMBX64 || format == FileFormats::LVL_SMBX38A)
+    {
+        if(!FileNameFull.empty() && FileNameFull.back() == 'x')
+            FileNameFull.resize(FileNameFull.size() - 1);
+        if(!FullFileName.empty() && FullFileName.back() == 'x')
+            FullFileName.resize(FullFileName.size() - 1);
+    }
+    else
+    {
+        if(!FileNameFull.empty() && FileNameFull.back() != 'x')
+            FileNameFull += "x";
+        if(!FullFileName.empty() && FullFileName.back() != 'x')
+            FullFileName += "x";
+    }
+
+    if(format != FileFormats::WLD_SMBX64)
+        return;
+
+    for(int i = 1; i <= numWorldMusic; i++)
+    {
+        SetS(WorldMusic[i].MusicFile, "");
+    }
+
+    WorldStarsShowPolicy = WorldData::STARS_UNSPECIFIED;
+
+    for(int i = 1; i <= numWorldLevels; i++)
+    {
+        WorldLevel[i].starsShowPolicy = WorldData::STARS_UNSPECIFIED;
     }
 }

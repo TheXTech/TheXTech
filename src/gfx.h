@@ -34,8 +34,8 @@ class GFX_t
 {
     //! Holder of loaded textures for easier clean-up
     std::vector<StdPicture*> m_loadedImages;
-    //! Capacity of the m_isCustom array
-    static constexpr size_t m_isCustomVolume = 66;
+    //! Capacity of the m_isCustom array (update when new assets are added)
+    static constexpr size_t m_isCustomVolume = 67;
     //! Holder of "is custom" flag
     bool m_isCustom[m_isCustomVolume];
 
@@ -75,6 +75,7 @@ public:
     RangeArr<StdPicture, 1, 2> Tongue;
     StdPicture Warp;
     StdPicture YoshiWings;
+    StdPicture EIcons;
 
     bool &isCustom(size_t i);
 };

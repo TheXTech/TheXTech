@@ -27,6 +27,7 @@
 #include "../game_main.h"
 
 #include "core/render.h"
+#include "core/window.h"
 #include "main/cheat_code.h"
 
 namespace Controls
@@ -153,7 +154,6 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
     }
 
     double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
-    bool cursor[4];
 
     for(int i = 0; i < 4; i++)
     {
@@ -161,10 +161,12 @@ bool InputMethod_Keyboard::Update(int player, Controls_t& c, CursorControls_t& m
         int key2 = p->m_editor_keys2[i];
 
         if(key != null_key && k->m_keyboardState[key] != 0)
-            *scroll[i] = 1.;
+            *scroll[i] += 10.0;
         else if(key2 != null_key && k->m_keyboardState[key2] != 0)
-            *scroll[i] = 1.;
+            *scroll[i] += 10.0;
     }
+
+    bool cursor[4];
 
     for(int i = 0; i < 4; i++)
     {
@@ -833,7 +835,7 @@ void InputMethodType_Keyboard::UpdateControlsPost()
         if(buttons & SDL_BUTTON_MMASK)
             SharedCursor.Tertiary = true;
     }
-    else if(!SharedCursor.Move && (SharedCursor.X >= 0 || SharedCursor.Y >= 0))
+    else if(XWindow::hasWindowInputFocus() && !SharedCursor.Move && (SharedCursor.X >= 0 || SharedCursor.Y >= 0))
     {
         SharedCursor.GoOffscreen();
     }
@@ -1320,7 +1322,7 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
             bool doubleClick = (this->m_lastMousePress + 300) >= SDL_GetTicks();
             this->m_lastMousePress = SDL_GetTicks();
 
-            if(doubleClick && !MagicHand)
+            if(doubleClick && !MagicHand && !LevelEditor)
             {
                 this->m_lastMousePress = 0;
                 g_hotkeysPressed[Hotkeys::Buttons::Fullscreen] = 0;

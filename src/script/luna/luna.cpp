@@ -85,7 +85,7 @@ void lunaLoad()
     if(dcAllow && isGame)
         gDeathCounter.init();
 
-    if(gLunaEnabled && lunaAllowed())
+    if(!LevelEditor && gLunaEnabled && lunaAllowed())
     {
         // Load autocode
         gAutoMan.LoadFiles();
@@ -120,7 +120,7 @@ void lunaLoop()
     if(dcAllow)
         gDeathCounter.UpdateDeaths(true);
 
-    if(gLunaEnabled && lunaAllowed())
+    if(!LevelEditor && gLunaEnabled && lunaAllowed())
     {
 #if COMPILE_PLAYGROUND
         Playground::doPlaygroundStuff();
@@ -151,7 +151,7 @@ void lunaRenderHud()
 
 void lunaRender(int screenZ)
 {
-    if(gLunaEnabled && lunaAllowed())
+    if(!LevelEditor && gLunaEnabled && lunaAllowed())
     {
         Renderer::Get().StartCameraRender(screenZ);
         gSpriteMan.RunSprites();
@@ -161,12 +161,12 @@ void lunaRender(int screenZ)
 
 void lunaRenderStart()
 {
-    if(gLunaEnabled && lunaAllowed())
+    if(!LevelEditor && gLunaEnabled && lunaAllowed())
         Renderer::Get().StartFrameRender();
 }
 
 void lunaRenderEnd()
 {
-    if(gLunaEnabled && lunaAllowed())
+    if(!LevelEditor && gLunaEnabled && lunaAllowed())
         Renderer::Get().EndFrameRender();
 }

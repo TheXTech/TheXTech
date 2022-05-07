@@ -744,6 +744,9 @@ bool Update()
     // reset SharedControls
     SharedControls = SharedControls_t();
 
+    // reset EditorControls
+    ::EditorControls = EditorControls_t();
+
     for(InputMethodType* type : g_InputMethodTypes)
         type->UpdateControlsPre();
 

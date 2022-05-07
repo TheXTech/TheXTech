@@ -147,7 +147,11 @@ void GetvScreenAverage()
             B = 1;
         }
         else
+        {
+            vScreenX[1] = OldX;
+            vScreenY[1] = OldY;
             return;
+        }
     }
     vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
     vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;

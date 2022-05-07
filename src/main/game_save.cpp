@@ -32,6 +32,7 @@
 #include <PGE_File_Formats/file_formats.h>
 #include <fmt_format_ne.h>
 
+#include "menu_main.h"
 
 std::string makeGameSavePath(std::string episode, std::string world, std::string saveFile)
 {

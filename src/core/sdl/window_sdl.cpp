@@ -224,6 +224,9 @@ AbstractWindow_t::Cursor_t WindowSDL::getCursor()
 
 void WindowSDL::placeCursor(int window_x, int window_y)
 {
+    if(!this->hasWindowInputFocus())
+        return;
+
     int old_window_x, old_window_y;
     SDL_GetMouseState(&old_window_x, &old_window_y);
     int o_sx, o_sy, n_sx, n_sy;
@@ -233,7 +236,10 @@ void WindowSDL::placeCursor(int window_x, int window_y)
 
     if(n_sx - o_sx < -2 || n_sx - o_sx > 2 || n_sy - o_sy < -2 || n_sy - o_sy > 2)
     {
-        SDL_WarpMouseInWindow(m_window, window_x, window_y);
+        int window_w, window_h;
+        this->getWindowSize(&window_w, &window_h);
+        if(window_x >= 0 && window_x < window_w && window_y >= 0 && window_y < window_h)
+            SDL_WarpMouseInWindow(m_window, window_x, window_y);
     }
 }
 

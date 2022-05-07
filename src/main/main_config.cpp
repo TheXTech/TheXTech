@@ -181,11 +181,15 @@ void OpenConfig()
         config.read("full-screen", resBool, false);
         config.read("record-gameplay", g_config.RecordGameplayData, false);
         config.read("use-native-osk", g_config.use_native_osk, false);
+        config.read("new-editor", g_config.enable_editor, false);
+        config.read("enable-editor", g_config.enable_editor, g_config.enable_editor);
+        config.read("editor-edge-scroll", g_config.editor_edge_scroll, g_config.editor_edge_scroll);
         config.endGroup();
 
         config.beginGroup("recent");
         config.read("episode-1p", g_recentWorld1p, std::string());
         config.read("episode-2p", g_recentWorld2p, std::string());
+        config.read("episode-editor", g_recentWorldEditor, std::string());
         config.endGroup();
 
         config.beginGroup("gameplay");
@@ -195,6 +199,7 @@ void OpenConfig()
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
         config.read("enter-cheats-menu-item", g_config.enter_cheats_menu_item, false);
         config.read("world-map-fast-move", g_config.worldMapFastMove, false);
+        config.read("editor-pause-on-death", g_config.editor_pause_on_death, true);
         config.endGroup();
 
         config.beginGroup("effects");
@@ -237,11 +242,14 @@ void SaveConfig()
 #endif
     config.setValue("record-gameplay", g_config.RecordGameplayData);
     config.setValue("use-native-osk", g_config.use_native_osk);
+    config.setValue("enable-editor", g_config.enable_editor);
+    config.setValue("editor-edge-scroll", g_config.editor_edge_scroll);
     config.endGroup();
 
     config.beginGroup("recent");
     config.setValue("episode-1p", g_recentWorld1p);
     config.setValue("episode-2p", g_recentWorld2p);
+    config.setValue("episode-editor", g_recentWorldEditor);
     config.endGroup();
 
     config.beginGroup("video");
@@ -318,6 +326,7 @@ void SaveConfig()
     config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
     config.setValue("enter-cheats-menu-item", g_config.enter_cheats_menu_item);
     config.setValue("world-map-fast-move", g_config.worldMapFastMove);
+    config.setValue("editor-pause-on-death", g_config.editor_pause_on_death);
     config.endGroup();
 
     config.beginGroup("speedrun");

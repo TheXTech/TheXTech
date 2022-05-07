@@ -41,5 +41,9 @@ void ClearLevel();
 //! checks for stars in warps the lead to another level
 void FindStars();
 
+//! NEW: routines to check if it is possible to convert to legacy file formats and to remove all non-legacy content
+bool CanConvertLevel(int format, std::string* reasons);
+void ConvertLevel(int format);
+
 #endif // LEVEL_FILE_H
 

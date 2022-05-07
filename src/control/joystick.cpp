@@ -493,7 +493,7 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
     }
 
     double cursor[4];
-    double* const scroll[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
+    double scroll[4] = {0, 0, 0, 0};
 
     if(p->m_controllerProfile && this->m_devices->ctrl)
     {
@@ -502,8 +502,8 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
             cursor[i] = 0.;
             s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_cursor_keys[i]);
             s_updateCtrlAnalogue(this->m_devices->ctrl, cursor[i], p->m_cursor_keys2[i]);
-            s_updateCtrlAnalogue(this->m_devices->ctrl, *scroll[i], p->m_editor_keys[i]);
-            s_updateCtrlAnalogue(this->m_devices->ctrl, *scroll[i], p->m_editor_keys2[i]);
+            s_updateCtrlAnalogue(this->m_devices->ctrl, scroll[i], p->m_editor_keys[i]);
+            s_updateCtrlAnalogue(this->m_devices->ctrl, scroll[i], p->m_editor_keys2[i]);
         }
     }
     else
@@ -513,9 +513,16 @@ bool InputMethod_Joystick::Update(int player, Controls_t& c, CursorControls_t& m
             cursor[i] = 0.;
             s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_cursor_keys[i]);
             s_updateJoystickAnalogue(this->m_devices->joy, cursor[i], p->m_cursor_keys2[i]);
-            s_updateJoystickAnalogue(this->m_devices->joy, *scroll[i], p->m_editor_keys[i]);
-            s_updateJoystickAnalogue(this->m_devices->joy, *scroll[i], p->m_editor_keys2[i]);
+            s_updateJoystickAnalogue(this->m_devices->joy, scroll[i], p->m_editor_keys[i]);
+            s_updateJoystickAnalogue(this->m_devices->joy, scroll[i], p->m_editor_keys2[i]);
         }
+    }
+
+    // Scroll control (UDLR)
+    double* const scroll_dest[4] = {&e.ScrollUp, &e.ScrollDown, &e.ScrollLeft, &e.ScrollRight};
+    for(int i = 0; i < 4; i++)
+    {
+        *scroll_dest[i] += scroll[i] * 10.;
     }
 
     // Cursor control (UDLR)

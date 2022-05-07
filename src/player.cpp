@@ -3594,8 +3594,8 @@ void RespawnPlayerTo(int A, int TargetPlayer)
     else
         StopY = Player[TargetPlayer].Location.Y + Player[TargetPlayer].Location.Height;
 
-    // technically this would fix a vanilla bug (weird effects after Player 2 dies, Player 1 goes into Warp, Player 2 respawns)
-    //   so I will do it where it only affects the new code
+    // technically this would fix a vanilla bug (possible weird effects after Player 2 dies, Player 1 goes through Warp, Player 2 respawns)
+    //   so I will do it where it only affects the new code.
     // Player[A].Section = Player[TargetPlayer].Section;
     RespawnPlayer(A, Player[TargetPlayer].Direction, CenterX, StopY);
 }
@@ -5928,11 +5928,15 @@ void PlayerEffects(const int A)
             switch(warp.transitEffect)
             {
             default:
-            case LevelDoor::TRANSIT_SCROLL:
-                // TODO: Implement the scrolling method
             case LevelDoor::TRANSIT_NONE:
                 if(Maths::iRound(leftToGoal) == 0 && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
                     g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 0, 65, ScreenFader::S_FADE);
+                break;
+
+            case LevelDoor::TRANSIT_SCROLL:
+                // uses fade effect if not same section
+                if(Maths::iRound(leftToGoal) == 24 && !SectionCollision(p.Section, warp_exit))
+                    g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
                 break;
 
             case LevelDoor::TRANSIT_FADE:
@@ -6062,7 +6066,12 @@ void PlayerEffects(const int A)
                 }
             }
 
+            int last_section = p.Section;
+
             CheckSection(A);
+
+            bool same_section = (last_section == p.Section);
+
             if(p.HoldingNPC > 0)
             {
                 CheckSectionNPC(p.HoldingNPC);
@@ -6091,15 +6100,28 @@ void PlayerEffects(const int A)
                 }
             }
 
-            if(g_levelVScreenFader[A].isVisible())
+            if(g_levelVScreenFader[A].isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL)
             {
                 switch(warp.transitEffect)
                 {
                 default:
-                case LevelDoor::TRANSIT_SCROLL:
-                    // TODO: Implement the scrolling method
                 case LevelDoor::TRANSIT_NONE:
                     g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
+                    break;
+
+                case LevelDoor::TRANSIT_SCROLL:
+                    if(same_section)
+                    {
+                        qScreenX[A] = vScreenX[A];
+                        qScreenY[A] = vScreenY[A];
+                        qScreenLoc[A] = vScreen[A];
+                        qScreen = true;
+                    }
+                    // follows fade logic if cross section
+                    else if(g_levelVScreenFader[A].isVisible())
+                    {
+                        g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
+                    }
                     break;
 
                 case LevelDoor::TRANSIT_FADE:
@@ -6419,11 +6441,15 @@ void PlayerEffects(const int A)
         switch(warp.transitEffect)
         {
         default:
-        case LevelDoor::TRANSIT_SCROLL:
-            // TODO: Implement the scrolling method
         case LevelDoor::TRANSIT_NONE:
             if(fEqual(p.Effect2, 20) && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
                 g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 9 : 64, 0, 65, ScreenFader::S_FADE);
+            break;
+
+        case LevelDoor::TRANSIT_SCROLL:
+            // uses fade effect if not same section
+            if(fEqual(p.Effect2, 5) && !SectionCollision(p.Section, warp_exit))
+                g_levelVScreenFader[A].setupFader(3, 0, 65, ScreenFader::S_FADE);
             break;
 
         case LevelDoor::TRANSIT_FADE:
@@ -6471,7 +6497,11 @@ void PlayerEffects(const int A)
             p.Location.X = warp_exit.X + warp_exit.Width / 2.0 - p.Location.Width / 2.0;
             p.Location.Y = warp_exit.Y + warp_exit.Height - p.Location.Height;
 
+            int last_section = p.Section;
+
             CheckSection(A);
+
+            bool same_section = (last_section == p.Section);
 
             if(p.HoldingNPC > 0)
             {
@@ -6485,15 +6515,28 @@ void PlayerEffects(const int A)
             p.Effect2 = 0;
             p.WarpCD = 40;
 
-            if(g_levelVScreenFader[A].isVisible())
+            if(g_levelVScreenFader[A].isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL)
             {
                 switch(warp.transitEffect)
                 {
                 default:
-                case LevelDoor::TRANSIT_SCROLL:
-                    // TODO: Implement the scrolling method
                 case LevelDoor::TRANSIT_NONE:
                     g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
+                    break;
+
+                case LevelDoor::TRANSIT_SCROLL:
+                    if(same_section)
+                    {
+                        qScreenX[A] = vScreenX[A];
+                        qScreenY[A] = vScreenY[A];
+                        qScreenLoc[A] = vScreen[A];
+                        qScreen = true;
+                    }
+                    // follows fade logic if cross section
+                    else if(g_levelVScreenFader[A].isVisible())
+                    {
+                        g_levelVScreenFader[A].setupFader(3, 65, 0, ScreenFader::S_FADE);
+                    }
                     break;
 
                 case LevelDoor::TRANSIT_FADE:
@@ -7175,7 +7218,7 @@ void AddPlayer(int Character)
         return;
 
     int alivePlayer = CheckLiving();
-    if(alivePlayer == 0 || alivePlayer == Character)
+    if(alivePlayer == 0 || alivePlayer == numPlayers)
         alivePlayer = 1;
     p.Section = Player[alivePlayer].Section;
     RespawnPlayerTo(numPlayers, alivePlayer);

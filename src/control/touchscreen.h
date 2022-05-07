@@ -218,8 +218,20 @@ public:
     //! In-game controls pressed
     Controls_t m_current_keys;
     bool m_keysHeld[key_END] = {false};
+
+    bool m_cursorActive = false;
+    SDL_FingerID m_cursorFinger = -1;
     double m_cursorX, m_cursorY;
-    bool m_cursorHeld = false;
+    double m_lastCursorX = -32.;
+    double m_lastCursorY = -32.;
+
+    bool m_scrollActive = false;
+    bool m_wasScrolling = false;
+    int m_lastMeanX = 0, m_lastMeanY = 0;
+    double m_scrollX = 0., m_scrollY = 0.;
+    // needed because of an SDL bug where the frame a finger it is lifted its finger still exists at its old location
+    double m_lastScrollX = 0., m_lastScrollY = 0.;
+    double m_scrollMomentumX = 0., m_scrollMomentumY = 0.;
 
     struct ExtraKeys_t
     {

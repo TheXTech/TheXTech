@@ -64,10 +64,13 @@ bool resChanged = false;
 // PauseCode GamePaused = PauseCode::None;
 
 std::string MessageText;
-int NumSelectWorld  = 0;
-std::vector<SelectWorld_t> SelectWorld;
+
+// int NumSelectWorld  = 0;
+// std::vector<SelectWorld_t> SelectWorld;
+
 std::string g_recentWorld1p;
 std::string g_recentWorld2p;
+std::string g_recentWorldEditor;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
 RangeArr<vScreen_t, 0, 2> vScreen;
@@ -262,6 +265,7 @@ int LevelMacroCounter = 0;
 int numJoysticks = 0;
 std::string FileName;
 std::string FileNameFull;
+int FileFormat = 0;
 std::string FileNameWorld;
 std::string FileNameFullWorld;
 bool IsEpisodeIntro = false;
