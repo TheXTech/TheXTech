@@ -23,6 +23,7 @@
 #include "config.h"
 #include "change_res.h"
 #include "load_gfx.h"
+#include "graphics.h"
 #include "core/render.h"
 #include "core/window.h"
 #ifdef __EMSCRIPTEN__
@@ -178,4 +179,13 @@ void UpdateInternalRes()
 #endif // #ifndef THEXTECH_FIXED_RES
 
     XRender::updateViewport();
+
+    // recenter the game menu graphics
+    if(GameMenu)
+    {
+        SetupScreens();
+        GameMenu = false;
+        GetvScreenAverage();
+        GameMenu = true;
+    }
 }
