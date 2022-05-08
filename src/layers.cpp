@@ -592,7 +592,7 @@ bool SwapEvents(eventindex_t index_1, eventindex_t index_2)
             Block[A].TriggerLast = index_1;
     }
 
-    for(A = 0; A <= numWarps; A++)
+    for(A = 1; A <= numWarps; A++)
     {
         if(Warp[A].eventEnter == index_1)
             Warp[A].eventEnter = index_2;
