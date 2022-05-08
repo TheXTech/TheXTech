@@ -73,54 +73,95 @@ void UpdateInternalRes()
 
         XWindow::getWindowSize(&int_w, &int_h);
 
+        int orig_int_h = int_h;
+
+        // set internal height first
         if(g_config.InternalH != 0)
         {
-            int_w = int_w*g_config.InternalH/int_h;
             int_h = g_config.InternalH;
         }
         else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
         {
-            int_w *= 2;
             int_h *= 2;
         }
         else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
         {
-            int_w /= 2;
             int_h /= 2;
         }
         else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
         {
-            int i = 1;
-            while(int_w/(i+1) > 800 && int_h/(i+1) > 600)
-                i++;
-            int_w /= i;
-            int_h /= i;
+            if(int_h > 600)
+            {
+                // constrains height to be in the 600-720p range
+                int scale_factor = int_h / 600;
+                int_h /= scale_factor;
+            }
         }
 
-        if(int_w < 480) int_w = 480;
-        if(int_h < 320) int_h = 320;
+        // minimum height constraint
+        if(int_h < 320)
+            int_h = 320;
 
-        // maximum height 720p, rescale width accordingly so long as above 800p
+        // maximum height constraint
         if(int_h > 720)
-        {
-            // still a couple cases to smooth out, such as the cases where we're a little wide and over 720p tall
-            if((g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST
-                || g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR))
-            {
-                int_w = int_w * 720 / int_h;
-                if(int_w < 800)
-                    int_w = 800;
-            }
-            if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER
-                && int_w / std::floor(int_h / 720) > 800)
-            {
-                int_w = int_w / std::floor(int_h / 720);
-            }
             int_h = 720;
+
+        // now, set width based on height and scaling mode
+        if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        {
+            int_w = int_w * 2;
         }
+        else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
+        {
+            int_w = int_w;
+        }
+        else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        {
+            int_w = int_w / 2;
+        }
+        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+        {
+            int scale_factor = orig_int_h / int_h;
+            if(scale_factor == 0)
+            {
+                int_w = int_w;
+            }
+            else if(int_w / scale_factor >= 800)
+            {
+                int_w = int_w / scale_factor;
+            }
+            else
+            {
+                // scale based on width
+                int scale_factor = int_w / 800;
+                if(scale_factor != 0)
+                    int_w = int_w / scale_factor;
+
+                // rescale the height if possible
+                if(scale_factor != 0 && g_config.InternalH == 0)
+                {
+                    int_h = orig_int_h / scale_factor;
+                    if(int_h < 600)
+                        int_h = 600;
+                    if(int_h > 720)
+                        int_h = 720;
+                }
+            }
+        }
+        else
+        {
+            int_w = (int_w * int_h) / orig_int_h;
+            if(int_w < 800)
+                int_w = 800;
+        }
+
+        // minimum width constraint
+        if(int_w < 480)
+            int_w = 480;
+
         // maximum 2.4 (cinematic) aspect ratio
         if(int_w > int_h*2.4)
-            int_w = int_h*2.4;
+            int_w = (int)(int_h*2.4);
 
         // force even dimensions
         int_w -= int_w & 1;
