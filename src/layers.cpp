@@ -740,7 +740,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                 }
 
                 /* Resize the section boundaries */
-                if(int(s.position.X) == EventSection_t::LESet_ResetDefault && !g_compatibility.modern_section_reset)
+                if(int(s.position.X) == EventSection_t::LESet_ResetDefault && !g_compatibility.modern_section_change)
                     level[B] = LevelREAL[B];
                 else if(int(s.position.X) != EventSection_t::LESet_Nothing)
                 {
@@ -751,6 +751,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         newLevel = s.position;
                     level[B] = newLevel;
 
+                    // warp other players to resized section, if not a reset
                     if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start"))
                     {
                         for(C = 1; C <= numPlayers; C++)
@@ -802,8 +803,10 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         }
                     }
 
+                    // start the qScreen animation
                     if(!equalCase(evt.Name, "Level - Start"))
                     {
+                        // the onscreen player
                         C = plr;
                         if(numPlayers == 2 && DScreenType != 5)
                         {

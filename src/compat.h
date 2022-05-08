@@ -91,7 +91,7 @@ struct Compatibility_t
     bool free_world_res;
     bool disable_background2_tiling;
     NPC_activate_modes NPC_activate_mode;
-    bool modern_section_reset;
+    bool modern_section_change;
 
     // SpeedRun section
     enum
