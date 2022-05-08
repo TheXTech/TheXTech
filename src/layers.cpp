@@ -816,10 +816,28 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             screenLoc = vScreen[C];
                             SoundPause[13] = 10;
                             DynamicScreen();
-                            GetvScreenAverage();
+                            CenterScreens();
+                            if(g_compatibility.modern_section_change && vScreen[2].Visible)
+                            {
+                                for(int Z = 1; Z <= 2; Z++)
+                                    GetvScreen(Z);
+                            }
+                            else
+                            {
+                                GetvScreenAverage();
+                                vScreenX[2] = vScreenX[1];
+                                vScreenY[2] = vScreenY[1];
+                                vScreen[2] = vScreen[1];
+                            }
+
                             qScreen = true;
                             qScreenX[1] = vScreenX[1];
                             qScreenY[1] = vScreenY[1];
+                            qScreenLoc[1] = vScreen[1];
+
+                            qScreenX[2] = vScreenX[2];
+                            qScreenY[2] = vScreenY[2];
+                            qScreenLoc[2] = vScreen[2];
 
                             if(int(screenLoc.Width) == 400)
                             {
@@ -837,14 +855,17 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                     qScreenY[1] -= 150;
                             }
 
-                            if(-qScreenX[1] < level[Player[C].Section].X)
-                                qScreenX[1] = -level[Player[C].Section].X;
-                            if(-qScreenX[1] + ScreenW /*FrmMain.ScaleWidth*/ > level[Player[C].Section].Width)
-                                qScreenX[1] = -(level[Player[C].Section].Width - ScreenW);
-                            if(-qScreenY[1] < level[Player[C].Section].Y)
-                                qScreenY[1] = -level[Player[C].Section].Y;
-                            if(-qScreenY[1] + ScreenH /*FrmMain.ScaleHeight*/ > level[Player[C].Section].Height)
-                                qScreenY[1] = -(level[Player[C].Section].Height - ScreenH);
+                            for(int Z = 1; Z <= 2; Z++)
+                            {
+                                if(-qScreenX[Z] < level[Player[C].Section].X)
+                                    qScreenX[Z] = -level[Player[C].Section].X;
+                                if(-qScreenX[Z] + qScreenLoc[Z].Width /*FrmMain.ScaleWidth*/ > level[Player[C].Section].Width)
+                                    qScreenX[Z] = -(level[Player[C].Section].Width - qScreenLoc[Z].Width);
+                                if(-qScreenY[Z] < level[Player[C].Section].Y)
+                                    qScreenY[Z] = -level[Player[C].Section].Y;
+                                if(-qScreenY[Z] + qScreenLoc[Z].Height /*FrmMain.ScaleHeight*/ > level[Player[C].Section].Height)
+                                    qScreenY[Z] = -(level[Player[C].Section].Height - qScreenLoc[Z].Height);
+                            }
 
                             level[B] = newLevel;
                         }
