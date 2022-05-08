@@ -531,6 +531,8 @@ bool mainMenuUpdate()
                             menuLen = 18 * g_mainMenu.mainMultiplayerGame.size() - 2;
                         else if(!g_gameInfo.disableBattleMode && A == i++)
                             menuLen = 18 * g_mainMenu.mainBattleGame.size();
+                        else if(g_config.enable_editor && A == i++)
+                            menuLen = 18 * g_mainMenu.mainEditor.size();
                         else if(A == i++)
                             menuLen = 18 * g_mainMenu.mainOptions.size();
                         else if(A == i++)
