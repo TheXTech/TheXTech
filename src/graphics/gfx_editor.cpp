@@ -631,6 +631,7 @@ void DrawEditorLevel_UI()
 #endif
     {
         editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
+        XRender::resetViewport();
     }
 }
 
