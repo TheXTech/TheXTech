@@ -90,7 +90,7 @@ void UpdateInternalRes()
         }
         else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
         {
-            if(int_h > 600)
+            if(int_h >= 600)
             {
                 // constrains height to be in the 600-720p range
                 int scale_factor = int_h / 600;
