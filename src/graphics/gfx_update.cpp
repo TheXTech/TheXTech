@@ -448,6 +448,8 @@ void UpdateGraphics(bool skipRepaint)
 
     g_stats.reset();
 
+    bool continue_qScreen = false;
+
     for(Z = 1; Z <= numScreens; Z++)
     {
         if(SingleCoop == 2)
@@ -485,7 +487,7 @@ void UpdateGraphics(bool skipRepaint)
 
         // moved to `graphics/gfx_screen.cpp`
         if(!Do_FrameSkip && qScreen)
-            Update_qScreen();
+            continue_qScreen |= Update_qScreen(Z);
 
         // noturningback
         if(!LevelEditor && NoTurnBack[Player[Z].Section])
@@ -791,6 +793,8 @@ void UpdateGraphics(bool skipRepaint)
     // we've now done all the logic that UpdateGraphics can do.
     if(Do_FrameSkip)
         return;
+
+    qScreen = continue_qScreen;
 
 
     XRender::setTargetTexture();

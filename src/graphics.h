@@ -76,7 +76,7 @@ void DynamicScreen();
 // NEW: limit vScreens to playable section area and center them on the real screen
 void CenterScreens();
 // NEW: moves qScreen towards vScreen, now including the screen size
-void Update_qScreen();
+bool Update_qScreen(int Z);
 
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen

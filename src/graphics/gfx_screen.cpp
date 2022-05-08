@@ -388,8 +388,10 @@ void CenterScreens()
 }
 
 // NEW: moves qScreen towards vScreen, now including the screen size
-void Update_qScreen()
+bool Update_qScreen(int Z)
 {
+    bool continue_qScreen = true;
+
     // take the slower option of 2px per second camera (vanilla)
     //   or 2px per second resize, then scale the speed of the faster one to match
     double camRateX = 2;
@@ -398,64 +400,81 @@ void Update_qScreen()
     double resizeRateX = 2;
     double resizeRateY = 2;
 
-    double camFramesX = std::abs(vScreenX[1] - qScreenX[1])/camRateX;
-    double camFramesY = std::abs(vScreenY[1] - qScreenY[1])/camRateY;
-    double resizeFramesX = std::abs(vScreen[1].ScreenLeft - qScreenLoc[1].ScreenLeft)/resizeRateX;
-    double resizeFramesY = std::abs(vScreen[1].ScreenTop - qScreenLoc[1].ScreenTop)/resizeRateY;
+    double camFramesX = std::abs(vScreenX[Z] - qScreenX[Z])/camRateX;
+    double camFramesY = std::abs(vScreenY[Z] - qScreenY[Z])/camRateY;
+    double resizeFramesX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft)/resizeRateX;
+    double resizeFramesY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop)/resizeRateY;
     double qFramesX = (camFramesX > resizeFramesX ? camFramesX : resizeFramesX);
     double qFramesY = (camFramesY > resizeFramesY ? camFramesY : resizeFramesY);
 
     // don't continue after this frame if it would arrive next frame
     // (this is equivalent to the <5 condition in the vanilla game)
     if(qFramesX < 2.5 && qFramesY < 2.5)
-        qScreen = false;
+        continue_qScreen = false;
 
     if(qFramesX < 1)
         qFramesX = 1;
     if(qFramesY < 1)
         qFramesY = 1;
 
-    camRateX = std::abs(vScreenX[1] - qScreenX[1])/qFramesX;
-    camRateY = std::abs(vScreenY[1] - qScreenY[1])/qFramesY;
+    camRateX = std::abs(vScreenX[Z] - qScreenX[Z])/qFramesX;
+    camRateY = std::abs(vScreenY[Z] - qScreenY[Z])/qFramesY;
 
-    resizeRateX = std::abs(vScreen[1].ScreenLeft - qScreenLoc[1].ScreenLeft)/qFramesX;
-    resizeRateY = std::abs(vScreen[1].ScreenTop - qScreenLoc[1].ScreenTop)/qFramesY;
+    resizeRateX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft)/qFramesX;
+    resizeRateY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop)/qFramesY;
 
-    if(vScreenX[1] < qScreenX[1] - camRateX)
-        qScreenX[1] = qScreenX[1] - camRateX;
-    else if(vScreenX[1] > qScreenX[1] + camRateX)
-        qScreenX[1] = qScreenX[1] + camRateX;
+    if(vScreenX[Z] < qScreenX[Z] - camRateX)
+        qScreenX[Z] = qScreenX[Z] - camRateX;
+    else if(vScreenX[Z] > qScreenX[Z] + camRateX)
+        qScreenX[Z] = qScreenX[Z] + camRateX;
     else
-        qScreenX[1] = vScreenX[1];
+        qScreenX[Z] = vScreenX[Z];
 
-    if(vScreenY[1] < qScreenY[1] - camRateY)
-        qScreenY[1] = qScreenY[1] - camRateY;
-    else if(vScreenY[1] > qScreenY[1] + camRateY)
-        qScreenY[1] = qScreenY[1] + camRateY;
+    if(vScreenY[Z] < qScreenY[Z] - camRateY)
+        qScreenY[Z] = qScreenY[Z] - camRateY;
+    else if(vScreenY[Z] > qScreenY[Z] + camRateY)
+        qScreenY[Z] = qScreenY[Z] + camRateY;
     else
-        qScreenY[1] = vScreenY[1];
+        qScreenY[Z] = vScreenY[Z];
 
-    if(vScreen[1].ScreenLeft < qScreenLoc[1].ScreenLeft - resizeRateX)
-        qScreenLoc[1].ScreenLeft -= resizeRateX;
-    else if(vScreen[1].ScreenLeft > qScreenLoc[1].ScreenLeft + resizeRateX)
-        qScreenLoc[1].ScreenLeft += resizeRateX;
+    if(vScreen[Z].ScreenLeft < qScreenLoc[Z].ScreenLeft - resizeRateX)
+        qScreenLoc[Z].ScreenLeft -= resizeRateX;
+    else if(vScreen[Z].ScreenLeft > qScreenLoc[Z].ScreenLeft + resizeRateX)
+        qScreenLoc[Z].ScreenLeft += resizeRateX;
     else
-        qScreenLoc[1].ScreenLeft = vScreen[1].ScreenLeft;
+        qScreenLoc[Z].ScreenLeft = vScreen[Z].ScreenLeft;
 
-    if(vScreen[1].ScreenTop < qScreenLoc[1].ScreenTop - resizeRateY)
-        qScreenLoc[1].ScreenTop -= resizeRateY;
-    else if(vScreen[1].ScreenTop > qScreenLoc[1].ScreenTop + resizeRateY)
-        qScreenLoc[1].ScreenTop += resizeRateY;
+    if(vScreen[Z].ScreenTop < qScreenLoc[Z].ScreenTop - resizeRateY)
+        qScreenLoc[Z].ScreenTop -= resizeRateY;
+    else if(vScreen[Z].ScreenTop > qScreenLoc[Z].ScreenTop + resizeRateY)
+        qScreenLoc[Z].ScreenTop += resizeRateY;
     else
-        qScreenLoc[1].ScreenTop = vScreen[1].ScreenTop;
+        qScreenLoc[Z].ScreenTop = vScreen[Z].ScreenTop;
 
-    vScreenX[1] = qScreenX[1];
-    vScreenY[1] = qScreenY[1];
+    if(vScreen[Z].Width < qScreenLoc[Z].Width - resizeRateX * 2)
+        qScreenLoc[Z].Width -= resizeRateX * 2;
+    else if(vScreen[Z].Width > qScreenLoc[Z].Width + resizeRateX * 2)
+        qScreenLoc[Z].Width += resizeRateX * 2;
+    else
+        qScreenLoc[Z].Width = vScreen[Z].Width;
 
-    vScreen[1].Width -= 2*(std::floor(qScreenLoc[1].ScreenLeft) - vScreen[1].ScreenLeft);
-    vScreen[1].Height -= 2*(std::floor(qScreenLoc[1].ScreenTop) - vScreen[1].ScreenTop);
-    vScreen[1].ScreenLeft = std::floor(qScreenLoc[1].ScreenLeft);
-    vScreen[1].ScreenTop = std::floor(qScreenLoc[1].ScreenTop);
+    if(vScreen[Z].Height < qScreenLoc[Z].Height - resizeRateY * 2)
+        qScreenLoc[Z].Height -= resizeRateY * 2;
+    else if(vScreen[Z].Height > qScreenLoc[Z].Height + resizeRateY * 2)
+        qScreenLoc[Z].Height += resizeRateY * 2;
+    else
+        qScreenLoc[Z].Height = vScreen[Z].Height;
+
+    vScreenX[Z] = qScreenX[Z];
+    vScreenY[Z] = qScreenY[Z];
+
+    // for now -- eventually may want to set width/height another way
+    vScreen[Z].Width -= 2*(std::floor(qScreenLoc[Z].ScreenLeft) - vScreen[Z].ScreenLeft);
+    vScreen[Z].Height -= 2*(std::floor(qScreenLoc[Z].ScreenTop) - vScreen[Z].ScreenTop);
+    vScreen[Z].ScreenLeft = std::floor(qScreenLoc[Z].ScreenLeft);
+    vScreen[Z].ScreenTop = std::floor(qScreenLoc[Z].ScreenTop);
+
+    return continue_qScreen;
 }
 
 void SetRes()
