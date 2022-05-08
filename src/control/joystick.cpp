@@ -1446,6 +1446,17 @@ InputMethodType_Joystick::~InputMethodType_Joystick()
 
     this->m_hiddenProfiles.clear();
     this->m_lastProfileByGUID.clear();
+
+    // A single pass would be much more efficient,
+    // but I want to avoid duplicating code
+    // and this only happens on program exit.
+    std::vector<int> open_joystick_ids;
+
+    for(const std::pair<const int, JoystickDevices*>& p : this->m_availableJoysticks)
+        open_joystick_ids.push_back(p.first);
+
+    for(int joystick_id : open_joystick_ids)
+        this->CloseJoystick(joystick_id);
 }
 
 bool InputMethodType_Joystick::TestProfileType(InputMethodProfile* profile)
