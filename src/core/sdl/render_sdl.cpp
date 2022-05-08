@@ -232,17 +232,6 @@ void RenderSDL::updateViewport()
         ScaleWidth = ScreenW;
         ScaleHeight = ScreenH;
         m_current_scale_mode = g_videoSettings.scaleMode;
-
-        // change window size if it should not be dynamic
-        if(g_config.InternalH != 0 && g_config.InternalW != 0)
-        {
-            if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
-                XWindow::setWindowSize(ScreenW/2, ScreenH/2);
-            else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
-                XWindow::setWindowSize(ScreenW, ScreenH);
-            else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
-                XWindow::setWindowSize(ScreenW*2, ScreenH*2);
-        }
     }
 
 
