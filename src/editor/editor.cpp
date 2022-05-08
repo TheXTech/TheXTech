@@ -185,7 +185,8 @@ void EditorCursor_t::ClearStrings()
 // it is still called when the player is testing a level in the editor in windowed mode
 void UpdateEditor()
 {
-    Controls::PollInputMethod();
+    if(!MagicHand)
+        Controls::PollInputMethod();
 
     int A = 0;
     int B = 0;
