@@ -104,6 +104,18 @@ void ResetSectionScrolls()
             level[i].Y = level[i].Height - 600;
             level[i].X = (-200000 + 20000 * i);
             level[i].Width = level[i].X + 800;
+
+            // initialize player positions
+            if(i == 0)
+            {
+                for(int p = 1; p <= 2; p++)
+                {
+                    PlayerStart[p].Width = Physics.PlayerWidth[p][2];
+                    PlayerStart[p].Height = Physics.PlayerHeight[p][2];
+                    PlayerStart[p].X = level[i].X + 128 - 64 * (p - 1);
+                    PlayerStart[p].Y = level[i].Height - 32 - PlayerStart[p].Height;
+                }
+            }
         }
 
         last_vScreenY[i] = -(level[i].Height - ScreenH);
