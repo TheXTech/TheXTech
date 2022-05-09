@@ -110,7 +110,6 @@ void EditorScreen::ResetCursor()
     EditorCursor.Warp.MapX = -1;
     EditorCursor.Warp.MapY = -1;
     EditorCursor.Warp.Effect = 1;
-    m_Warp_page = WARP_PAGE_MAIN;
 
     EditorCursor.Tile = Tile_t();
     EditorCursor.Tile.Type = 1;
@@ -123,6 +122,20 @@ void EditorScreen::ResetCursor()
     EditorCursor.WorldPath = WorldPath_t();
     EditorCursor.WorldPath.Type = 1;
     EditorCursor.WorldMusic = WorldMusic_t();
+
+    m_special_page = SPECIAL_PAGE_NONE;
+    m_special_subpage = 0;
+    m_NPC_page = 0;
+    m_Block_page = 0;
+    m_BGO_page = 0;
+    m_Warp_page = WARP_PAGE_MAIN;
+    m_layers_page = 0;
+    m_events_page = 0;
+    m_sounds_page = 0;
+    m_tile_page = 0;
+    m_music_page = 0;
+    m_background_page = 0;
+    m_current_event = 0;
 
     FocusNPC();
     FocusBlock();
