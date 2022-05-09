@@ -1183,6 +1183,7 @@ void UpdateEditor()
                             if(fEqual(EditorCursor.Location.X, Block[A].Location.X) &&
                                fEqual(EditorCursor.Location.Y, Block[A].Location.Y))
                             {
+                                pLogDebug("Block was rejected at block at EC Loc (%f, %f), other block loc (%f, %f)", EditorCursor.Location.X, EditorCursor.Location.Y, Block[A].Location.X, Block[A].Location.Y);
                                 CanPlace = false;
                                 break;
                             }
