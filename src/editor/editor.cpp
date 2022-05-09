@@ -1168,7 +1168,7 @@ void UpdateEditor()
             {
                 for(A = 1; A <= numBlock; A++)
                 {
-                    if(!BlockIsSizable[Block[A].Type] && !BlockIsSizable[EditorCursor.Block.Type])
+                    if(!MouseRelease || (!BlockIsSizable[Block[A].Type] && !BlockIsSizable[EditorCursor.Block.Type]))
                     {
                         if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
                         {
@@ -1233,6 +1233,7 @@ void UpdateEditor()
                     {
                         if(numBlock < maxBlocks) // Not out of blocks
                         {
+                            MouseRelease = false;
                             numBlock++;
                             Block[numBlock] = EditorCursor.Block;
                             Block[numBlock].DefaultType = Block[numBlock].Type;
