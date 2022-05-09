@@ -93,6 +93,12 @@ int editor_section_toast = 0;
 int scroll_buffer_x = 0;
 int scroll_buffer_y = 0;
 
+// the first f stands for "fixed"
+constexpr bool ffEqual(double i, double j)
+{
+    return (i - j > -0.1) && (i - j < 0.1);
+}
+
 void ResetSectionScrolls()
 {
     for(int i = 0; i <= maxSections; i++)
@@ -104,6 +110,18 @@ void ResetSectionScrolls()
             level[i].Y = level[i].Height - 600;
             level[i].X = (-200000 + 20000 * i);
             level[i].Width = level[i].X + 800;
+
+            // initialize player positions
+            if(i == 0)
+            {
+                for(int p = 1; p <= 2; p++)
+                {
+                    PlayerStart[p].Width = Physics.PlayerWidth[p][2];
+                    PlayerStart[p].Height = Physics.PlayerHeight[p][2];
+                    PlayerStart[p].X = level[i].X + 128 - 64 * (p - 1);
+                    PlayerStart[p].Y = level[i].Height - 32 - PlayerStart[p].Height;
+                }
+            }
         }
 
         last_vScreenY[i] = -(level[i].Height - ScreenH);
@@ -824,10 +842,10 @@ void UpdateEditor()
                     CanPlace = true;
                     for(A = 1; A <= numWater; A++)
                     {
-                        if(fEqual(Water[A].Location.X, EditorCursor.Location.X) &&
-                           fEqual(Water[A].Location.Y, EditorCursor.Location.Y) &&
-                           fEqual(Water[A].Location.Height, EditorCursor.Location.Height) &&
-                           fEqual(Water[A].Location.Width, EditorCursor.Location.Width))
+                        if(ffEqual(Water[A].Location.X, EditorCursor.Location.X) &&
+                           ffEqual(Water[A].Location.Y, EditorCursor.Location.Y) &&
+                           ffEqual(Water[A].Location.Height, EditorCursor.Location.Height) &&
+                           ffEqual(Water[A].Location.Width, EditorCursor.Location.Width))
                         {
                             CanPlace = false;
                             break;
@@ -1168,7 +1186,7 @@ void UpdateEditor()
             {
                 for(A = 1; A <= numBlock; A++)
                 {
-                    if(!BlockIsSizable[Block[A].Type] && !BlockIsSizable[EditorCursor.Block.Type])
+                    if(!MouseRelease || (!BlockIsSizable[Block[A].Type] && !BlockIsSizable[EditorCursor.Block.Type]))
                     {
                         if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
                         {
@@ -1180,9 +1198,10 @@ void UpdateEditor()
                     {
                         if(Block[A].Type == EditorCursor.Block.Type)
                         {
-                            if(fEqual(EditorCursor.Location.X, Block[A].Location.X) &&
-                               fEqual(EditorCursor.Location.Y, Block[A].Location.Y))
+                            if(ffEqual(EditorCursor.Location.X, Block[A].Location.X) &&
+                               ffEqual(EditorCursor.Location.Y, Block[A].Location.Y))
                             {
+                                pLogDebug("Block was rejected at block at EC Loc (%f, %f), other block loc (%f, %f)", EditorCursor.Location.X, EditorCursor.Location.Y, Block[A].Location.X, Block[A].Location.Y);
                                 CanPlace = false;
                                 break;
                             }
@@ -1233,6 +1252,7 @@ void UpdateEditor()
                     {
                         if(numBlock < maxBlocks) // Not out of blocks
                         {
+                            MouseRelease = false;
                             numBlock++;
                             Block[numBlock] = EditorCursor.Block;
                             Block[numBlock].DefaultType = Block[numBlock].Type;
@@ -1518,8 +1538,8 @@ void UpdateEditor()
                     {
                         if(EditorCursor.Scene.Type == Scene[A].Type)
                         {
-                            if(fEqual(EditorCursor.Scene.Location.X, Scene[A].Location.X) &&
-                               fEqual(EditorCursor.Scene.Location.Y, Scene[A].Location.Y))
+                            if(ffEqual(EditorCursor.Scene.Location.X, Scene[A].Location.X) &&
+                               ffEqual(EditorCursor.Scene.Location.Y, Scene[A].Location.Y))
                             {
                                 CanPlace = false;
                                 break;
@@ -2865,8 +2885,8 @@ void MouseMove(float X, float Y, bool /*nCur*/)
                 EditorCursor.NPC.Type == 257 || EditorCursor.NPC.Type == 260))
         )
         {
-            if(!(fEqual(EditorCursor.Location.X, double(std::floor(X / 16)) * 16 - vScreenX[A]) &&
-                 fEqual(EditorCursor.Location.Y + 8, double(std::floor(Y / 16)) * 16 - vScreenY[A])) )
+            if(!(ffEqual(EditorCursor.Location.X, double(std::floor(X / 16)) * 16 - vScreenX[A]) &&
+                 ffEqual(EditorCursor.Location.Y + 8, double(std::floor(Y / 16)) * 16 - vScreenY[A])) )
             {
                 EditorCursor.Location.X = double(std::floor(X / 16)) * 16 - vScreenX[A];
                 EditorCursor.Location.Y = double(std::floor(Y / 16)) * 16 - vScreenY[A];
