@@ -96,7 +96,7 @@ int scroll_buffer_y = 0;
 // the first f stands for "fixed"
 constexpr bool ffEqual(double i, double j)
 {
-    return std::abs(i - j) < 0.1;
+    return (i - j > -0.1) && (i - j < 0.1);
 }
 
 void ResetSectionScrolls()
