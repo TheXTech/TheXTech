@@ -189,3 +189,29 @@ void UpdateInternalRes()
         GameMenu = true;
     }
 }
+
+void UpdateWindowRes()
+{
+#ifndef THEXTECH_FIXED_RES
+    if(resChanged)
+        return;
+
+    int h = g_config.InternalH;
+    if(h == 0)
+        h = 720;
+
+    int w = g_config.InternalW;
+    if(w == 0 && h <= 600)
+        w = h * 4 / 3;
+    else if(w == 0)
+        w = h * 16 / 9;
+
+    if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        XWindow::setWindowSize(w / 2, h / 2);
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
+        XWindow::setWindowSize(w, h);
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        XWindow::setWindowSize(w * 2, h * 2);
+#endif // #ifndef THEXTECH_FIXED_RES
+}
+

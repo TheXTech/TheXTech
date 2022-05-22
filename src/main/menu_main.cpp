@@ -1480,6 +1480,7 @@ bool mainMenuUpdate()
                             g_videoSettings.scaleMode = SCALE_DYNAMIC_INTEGER;
                         if(g_videoSettings.scaleMode < SCALE_DYNAMIC_INTEGER)
                             g_videoSettings.scaleMode = SCALE_FIXED_2X;
+                        UpdateWindowRes();
                         UpdateInternalRes();
                     }
 #endif
@@ -1533,6 +1534,7 @@ bool mainMenuUpdate()
                             else
                                 { g_config.InternalW = 0; g_config.InternalH = 0; }
                         }
+                        UpdateWindowRes();
                         UpdateInternalRes();
                     }
 #endif

@@ -302,6 +302,7 @@ void WindowSDL::restoreWindow()
 
 void WindowSDL::setWindowSize(int w, int h)
 {
+    SDL_SetWindowMinimumSize(m_window, w, h);
     SDL_SetWindowSize(m_window, w, h);
 }
 
