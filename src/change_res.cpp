@@ -198,13 +198,13 @@ void UpdateWindowRes()
 
     int h = g_config.InternalH;
     if(h == 0)
-        h = 720;
+        return;
 
     int w = g_config.InternalW;
-    if(w == 0 && h <= 600)
-        w = h * 4 / 3;
+    if(w == 0 && h == ScreenH)
+        w = ScreenW;
     else if(w == 0)
-        w = h * 16 / 9;
+        return;
 
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
         XWindow::setWindowSize(w / 2, h / 2);
