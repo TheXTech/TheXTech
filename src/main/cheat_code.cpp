@@ -33,20 +33,24 @@
 #include <pge_delay.h>
 #endif
 
-#include "../globals.h"
-#include "../sound.h"
-#include "../graphics.h"
-#include "../collision.h"
-#include "../effect.h"
-#include "../player.h"
-#include "../npc.h"
-#include "../layers.h"
-#include "../controls.h"
-#include "../game_main.h"
-#include "game_info.h"
-#include "screen_quickreconnect.h"
+#include "globals.h"
+#include "sound.h"
+#include "graphics.h"
+#include "collision.h"
+#include "effect.h"
+#include "player.h"
+#include "npc.h"
+#include "layers.h"
+#include "controls.h"
+#include "game_main.h"
+#include "change_res.h"
+#include "config.h"
 
-#include "cheat_code.h"
+#include "main/game_info.h"
+#include "main/screen_quickreconnect.h"
+#include "main/screen_textentry.h"
+
+#include "main/cheat_code.h"
 
 
 static void redigitIsCool()
@@ -1708,7 +1712,87 @@ static void speedDemon()
     PlaySound(MaxFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
+static void setRes(int w, int h)
+{
+    g_config.InternalW = w;
+    g_config.InternalH = h;
+    UpdateWindowRes();
+    UpdateInternalRes();
+}
 
+static void setResGb()
+{
+    setRes(320, 288);
+}
+
+static void setResGba()
+{
+    setRes(480, 320);
+}
+
+static void setResNds()
+{
+    setRes(512, 384);
+}
+
+static void setResSnes()
+{
+    setRes(512, 448);
+}
+
+static void setResVga()
+{
+    setRes(640, 480);
+}
+
+static void setRes3ds()
+{
+    setRes(800, 480);
+}
+
+static void setResClassic()
+{
+    setRes(800, 600);
+}
+
+static void setResHD()
+{
+    setRes(1280, 720);
+}
+
+static void setResDyn()
+{
+    setRes(0, 0);
+}
+
+static void setResCustom()
+{
+    int w, h;
+
+    std::string s = TextEntryScreen::Run("Game width:");
+    if(s.empty())
+        return;
+
+    while((w = atol(s.c_str())) <= 0)
+    {
+        s = TextEntryScreen::Run("Invalid input. Game width:");
+        if(s.empty())
+            return;
+    }
+
+    s = TextEntryScreen::Run("Game height:");
+    if(s.empty())
+        return;
+
+    while((h = atol(s.c_str())) <= 0)
+    {
+        s = TextEntryScreen::Run("Invalid input. Game height:");
+        if(s.empty())
+            return;
+    }
+
+    setRes(w, h);
+}
 
 
 
@@ -1736,6 +1820,24 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
     {"redigitiscool", redigitIsCool, false},
 #endif
     {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false},
+
+    // resolution cheats
+    {"gameboyview", setResGb, false},
+    {"tinyview", setResGba, false},
+    {"gbaview", setResGba, false},
+    {"superbdemoadvance", setResGba, false},
+    {"ndsview", setResNds, false},
+    {"snesview", setResSnes, false},
+    {"vgaview", setResVga, false},
+    {"3dsview", setRes3ds, false},
+    {"smbxview", setResClassic, false},
+    {"aodview", setResClassic, false},
+    {"classicview", setResClassic, false},
+    {"hdview", setResHD, false},
+    {"dynview", setResDyn, false},
+    {"debugview", setResCustom, false},
+    {"customview", setResCustom, false},
+
     {nullptr, nullptr, false}
 };
 
