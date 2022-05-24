@@ -288,6 +288,12 @@ void GoUp()
 
 void Insert(const char* c)
 {
+    // don't allow keyboard insertions until event loop has properly started
+    // (this is the input repetition timer, which is initialized first time
+    // no input is pressed.)
+    if(s_timer < 0)
+        return;
+
     Text.insert(s_cursor, c);
     s_cursor += SDL_strlen(c);
 }
