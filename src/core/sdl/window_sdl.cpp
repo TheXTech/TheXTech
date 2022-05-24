@@ -116,18 +116,18 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
     }
 
 #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
-    SDL_SetWindowMinimumSize(m_window, ScreenW / 2, ScreenH / 2);
+    SDL_SetWindowSize(m_window, ScreenW / 2, ScreenH / 2);
 #elif defined(__ANDROID__) // Set as small as possible
-    SDL_SetWindowMinimumSize(m_window, 200, 150);
+    SDL_SetWindowSize(m_window, 200, 150);
 #elif defined(VITA)
-    SDL_SetWindowMinimumSize(m_window, 960, 544);
+    SDL_SetWindowSize(m_window, 960, 544);
 #else
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
-        SDL_SetWindowMinimumSize(m_window, ScreenW/2, ScreenH/2);
+        SDL_SetWindowSize(m_window, ScreenW/2, ScreenH/2);
     else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
-        SDL_SetWindowMinimumSize(m_window, ScreenW*2, ScreenH*2);
+        SDL_SetWindowSize(m_window, ScreenW*2, ScreenH*2);
     else
-        SDL_SetWindowMinimumSize(m_window, ScreenW, ScreenH);
+        SDL_SetWindowSize(m_window, ScreenW, ScreenH);
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -314,7 +314,7 @@ void WindowSDL::setWindowSize(int w, int h)
         }
     }
 
-    SDL_SetWindowMinimumSize(m_window, w, h);
+    // SDL_SetWindowMinimumSize(m_window, w, h);
     SDL_SetWindowSize(m_window, w, h);
 }
 
