@@ -104,7 +104,7 @@ void UpdateInternalRes()
             int_h = 320;
 
         // maximum height constraint
-        if(int_h > 720)
+        if(int_h > 720 && orig_int_h <= 720)
             int_h = 720;
 
         // now, set width based on height and scaling mode
