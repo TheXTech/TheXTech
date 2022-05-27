@@ -104,7 +104,7 @@ void UpdateInternalRes()
             int_h = 320;
 
         // maximum height constraint
-        if(int_h > 720 && orig_int_h <= 720)
+        if(int_h > 720 && g_config.InternalH <= 720)
             int_h = 720;
 
         // now, set width based on height and scaling mode
@@ -152,8 +152,6 @@ void UpdateInternalRes()
         else
         {
             int_w = (int_w * int_h) / orig_int_h;
-            if(int_w < 800)
-                int_w = 800;
         }
 
         // minimum width constraint
