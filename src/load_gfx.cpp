@@ -603,6 +603,20 @@ static void loadCustomUIAssets()
     loadCGFX(uiRoot + "EditorIcons.png",
              "EditorIcons",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.EIcons, false, true);
+
+    loadCGFX(uiRoot + "Backdrop.png",
+             "Backdrop",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.Backdrop, false, true);
+
+    loadCGFX(uiRoot + "WorldMapFrame_Tile.png",
+             "WorldMapFrame_Tile",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.WorldMapFrame_Tile, false, true);
+
+    loadCGFX(uiRoot + "WorldMapFrame_Border.png",
+             "WorldMapFrame_Border",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.WorldMapFrame_Border, false, true);
+
+    // Add new optional assets above this line. Also update gfx.cpp: GFX_t::load(), and gfx.h: GFX_t::m_isCustomVolume.
 }
 
 void LoadCustomGFX()

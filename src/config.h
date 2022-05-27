@@ -41,6 +41,8 @@ extern struct Config_t
 
     //! The onscreen keyboard should fill the screen
     bool    osk_fill_screen = false;
+    //! Show a backdrop texture when level is smaller than screen
+    bool    show_backdrop = true;
 
     /* ---- Gameplay ----*/
 

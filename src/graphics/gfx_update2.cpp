@@ -41,6 +41,43 @@
 
 #include <fmt_format_ne.h>
 
+void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx, int src_x = 0, int src_y = 0, int src_w = -1, int src_h = -1, int off_x = -1, int off_y = -1)
+{
+    if(off_x == -1)
+        off_x = dst_x;
+    if(off_y == -1)
+        off_y = dst_y;
+    if(src_w == -1)
+        src_w = tx.w;
+    if(src_h == -1)
+        src_h = tx.h;
+
+    int c_off_x = off_x % src_w;
+
+    for(int x = dst_x; x < dst_x + dst_w;)
+    {
+        int c_off_y = off_y % src_h;
+
+        for(int y = dst_y; y < dst_y + dst_h;)
+        {
+            int render_w = src_w - c_off_x;
+            if(x + render_w > dst_x + dst_w)
+                render_w = dst_x + dst_w - x;
+
+            int render_h = src_h - c_off_y;
+            if(y + render_h > dst_y + dst_h)
+                render_h = dst_y + dst_h - y;
+
+            XRender::renderTexture(x, y, render_w, render_h, tx, src_x + c_off_x, src_y + c_off_y);
+
+            y += src_h - c_off_y;
+            c_off_y = 0;
+        }
+
+        x += src_w - c_off_x;
+        c_off_x = 0;
+    }
+}
 
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
@@ -187,9 +224,11 @@ void UpdateGraphics2(bool skipRepaint)
 //        XRender::renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
 //    }
     XRender::clearBuffer();
+    DrawBackdrop();
 
     XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
         vScreen[Z].Width, vScreen[Z].Height);
+    XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, 0, 0, 0);
 
 //    if(TakeScreen == true)
 //    {
@@ -471,32 +510,131 @@ void UpdateGraphics2(bool skipRepaint)
         }
 
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
-        // render background, in MANY careful segments...
+        if(GFX.WorldMapFrame_Tile.inited && (!GFX.Interface[4].inited || !GFX.isCustom(37) || GFX.isCustom(68)))
+        {
+            // render a modern background: first the tile, then the border (if it exists)
 
-        // top-left
-        XRender::renderTexture(0, 0, margin, marginTop, GFX.Interface[4], 66-margin, 130-marginTop);
-        // top
-        A = GFX.Interface[4].w-66-66;
-        for (B = 0; B < (sW-margin*2)/A+1; B++)
-            XRender::renderTexture(margin+B*A, 0, A, marginTop, GFX.Interface[4], 66, 130-marginTop);
-        // top-right
-        XRender::renderTexture(sW-margin, 0, margin, marginTop+20, GFX.Interface[4], GFX.Interface[4].w-66, 130-marginTop);
-        // left
-        A = GFX.Interface[4].h-130-66;
-        for (B = 0; B < (sH-marginTop-margin)/A+1; B++)
-            XRender::renderTexture(0, marginTop+B*A, margin, A, GFX.Interface[4], 66-margin, 130);
-        // right
-        A = GFX.Interface[4].h-(130+20)-66;
-        for (B = 0; B < (sH-(marginTop+20)-margin)/A+1; B++)
-            XRender::renderTexture(sW-margin, (marginTop+20)+B*A, margin, A, GFX.Interface[4], GFX.Interface[4].w-66, 150);
-        // bottom-left
-        XRender::renderTexture(0, sH-margin, margin+34, margin, GFX.Interface[4], 66-margin, GFX.Interface[4].h-66);
-        // bottom
-        A = GFX.Interface[4].w-100-66;
-        for (B = 0; B < (sW-(margin+34)-margin)/A+1; B++)
-            XRender::renderTexture((margin+34)+B*A, sH-margin, A, margin, GFX.Interface[4], 100, GFX.Interface[4].h-66);
-        // bottom-right
-        XRender::renderTexture(sW-margin, sH-margin, margin, margin, GFX.Interface[4], GFX.Interface[4].w-66, GFX.Interface[4].h-66);
+            // top
+            DrawTextureTiled(0, 0, sW, marginTop, GFX.WorldMapFrame_Tile);
+            // left (excl top)
+            DrawTextureTiled(0, marginTop, margin, sH - marginTop, GFX.WorldMapFrame_Tile);
+            // right (excl top)
+            DrawTextureTiled(sW - margin, marginTop, margin, sH - marginTop, GFX.WorldMapFrame_Tile);
+            // bottom (excl left and right)
+            DrawTextureTiled(margin, sH - margin, sW - margin - margin, margin, GFX.WorldMapFrame_Tile);
+
+            if(GFX.WorldMapFrame_Border.inited)
+            {
+                StdPicture& border = GFX.WorldMapFrame_Border;
+                // render the border (needs some custom info here...)
+                int t = 2;
+                int te = 18;
+                int l = 2;
+                int le = 18;
+                int b = 18;
+                int be = 0;
+                int r = 18;
+                int re = 0;
+
+                // top-left
+                XRender::renderTexture(margin - l, marginTop - t, l, t,
+                    border,
+                    0, 0);
+                // top left-ext
+                XRender::renderTexture(margin, marginTop - t, le, t,
+                    border,
+                    l, 0);
+                // top center
+                DrawTextureTiled(margin + le, marginTop - t, sW - 2 * margin - le - re, t,
+                    border,
+                    l + le, 0, border.w - l - le - r - re, t,
+                    0, 0);
+                // top right-ext
+                XRender::renderTexture(sW - margin - re, marginTop - t, re, t,
+                    border,
+                    border.w - r - re, 0);
+                // top-right
+                XRender::renderTexture(sW - margin, marginTop - t, r, t,
+                    border,
+                    border.w - r, 0);
+                // left top-ext
+                XRender::renderTexture(margin - l, marginTop, l, te,
+                    border,
+                    0, t);
+                // left center
+                DrawTextureTiled(margin - l, marginTop + te, l, sH - margin - marginTop - te - be,
+                    border,
+                    0, t + te, l, border.h - t - te - b - be,
+                    0, 0);
+                // left bottom-ext
+                XRender::renderTexture(margin - l, sH - margin - be, l, be,
+                    border,
+                    0, border.h - b - be);
+                // bottom-left
+                XRender::renderTexture(margin - l, sH - margin, l, b,
+                    border,
+                    0, border.h - b);
+                // bottom left-ext
+                XRender::renderTexture(margin, sH - margin, le, b,
+                    border,
+                    l, border.h - b);
+                // bottom center
+                DrawTextureTiled(margin + le, sH - margin, sW - 2 * margin - le - re, b,
+                    border,
+                    l + le, border.h - b, border.w - l - le - r - re, b,
+                    0, 0);
+                // bottom right-ext
+                XRender::renderTexture(sW - margin - re, sH - margin, re, b,
+                    border,
+                    border.w - r - re, border.h - b);
+                // bottom-right
+                XRender::renderTexture(sW - margin, sH - margin, r, b,
+                    border,
+                    border.w - r, border.h - b);
+                // right top-ext
+                XRender::renderTexture(sW - margin, marginTop, r, te,
+                    border,
+                    border.w - r, t);
+                // right center
+                DrawTextureTiled(sW - margin, marginTop + te, r, sH - margin - marginTop - te - be,
+                    border,
+                    border.w - r, t + te, r, border.h - t - te - b - be,
+                    0, 0);
+                // right bottom-ext
+                XRender::renderTexture(sW - margin, sH - margin - be, r, be,
+                    border,
+                    border.w - r, border.h - b - be);
+            }
+        }
+        else
+        {
+            // render a legacy background, in MANY careful segments...
+
+            // top-left
+            XRender::renderTexture(0, 0, margin, marginTop, GFX.Interface[4], 66-margin, 130-marginTop);
+            // top
+            A = GFX.Interface[4].w-66-66;
+            for (B = 0; B < (sW-margin*2)/A+1; B++)
+                XRender::renderTexture(margin+B*A, 0, A, marginTop, GFX.Interface[4], 66, 130-marginTop);
+            // top-right
+            XRender::renderTexture(sW-margin, 0, margin, marginTop+20, GFX.Interface[4], GFX.Interface[4].w-66, 130-marginTop);
+            // left
+            A = GFX.Interface[4].h-130-66;
+            for (B = 0; B < (sH-marginTop-margin)/A+1; B++)
+                XRender::renderTexture(0, marginTop+B*A, margin, A, GFX.Interface[4], 66-margin, 130);
+            // right
+            A = GFX.Interface[4].h-(130+20)-66;
+            for (B = 0; B < (sH-(marginTop+20)-margin)/A+1; B++)
+                XRender::renderTexture(sW-margin, (marginTop+20)+B*A, margin, A, GFX.Interface[4], GFX.Interface[4].w-66, 150);
+            // bottom-left
+            XRender::renderTexture(0, sH-margin, margin+34, margin, GFX.Interface[4], 66-margin, GFX.Interface[4].h-66);
+            // bottom
+            A = GFX.Interface[4].w-100-66;
+            for (B = 0; B < (sW-(margin+34)-margin)/A+1; B++)
+                XRender::renderTexture((margin+34)+B*A, sH-margin, A, margin, GFX.Interface[4], 100, GFX.Interface[4].h-66);
+            // bottom-right
+            XRender::renderTexture(sW-margin, sH-margin, margin, margin, GFX.Interface[4], GFX.Interface[4].w-66, GFX.Interface[4].h-66);
+        }
 
 
         int pX, pY;

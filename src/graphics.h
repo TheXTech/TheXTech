@@ -159,6 +159,8 @@ void ScreenShot();
 // Public Sub DrawFrozenNPC(Z As Integer, A As Integer)
 void DrawFrozenNPC(int Z, int A);
 
+// NEW: draw the backdrop texture behind the vScreens
+void DrawBackdrop();
 
 
 #endif // GRAPHICS_H

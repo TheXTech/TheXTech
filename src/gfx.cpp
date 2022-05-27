@@ -123,7 +123,24 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
-    // Add new optional assets here. Also update load_gfx.cpp:loadCustomUIAssets()
+    loadImage(Backdrop, uiPath + "Backdrop.png");
+
+    if(m_loadErrors > 0)
+    {
+        pLogDebug("Missing new backdrop texture.");
+        m_loadErrors = 0;
+    }
+
+    loadImage(WorldMapFrame_Tile, uiPath + "WorldMapFrame_Tile.png");
+    loadImage(WorldMapFrame_Border, uiPath + "WorldMapFrame_Border.png");
+
+    if(m_loadErrors > 0)
+    {
+        pLogDebug("Missing world map frame tile/border textures.");
+        m_loadErrors = 0;
+    }
+
+    // Add new optional assets above this line. Also update load_gfx.cpp: loadCustomUIAssets(), and gfx.h: GFX_t::m_isCustomVolume.
 
     SDL_assert_release(m_loadedImages.size() <= m_isCustomVolume);
     SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));

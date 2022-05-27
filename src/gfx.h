@@ -35,7 +35,7 @@ class GFX_t
     //! Holder of loaded textures for easier clean-up
     std::vector<StdPicture*> m_loadedImages;
     //! Capacity of the m_isCustom array (update when new assets are added)
-    static constexpr size_t m_isCustomVolume = 67;
+    static constexpr size_t m_isCustomVolume = 70;
     //! Holder of "is custom" flag
     bool m_isCustom[m_isCustomVolume];
 
@@ -64,7 +64,7 @@ public:
     RangeArr<StdPicture, 1, 3> Font2;
     StdPicture Font2S;
     RangeArr<StdPicture, 1, 2> Heart;
-    RangeArr<StdPicture, 0, 8> Interface;
+    RangeArr<StdPicture, 0, 8> Interface; // Interface[4] is 37
     StdPicture LoadCoin;
     StdPicture Loader;
     RangeArr<StdPicture, 0, 3> MCursor;
@@ -76,6 +76,9 @@ public:
     StdPicture Warp;
     StdPicture YoshiWings;
     StdPicture EIcons;
+    StdPicture Backdrop;
+    StdPicture WorldMapFrame_Tile; // WorldMapFrame_Tile is 68
+    StdPicture WorldMapFrame_Border;
 
     bool &isCustom(size_t i);
 };

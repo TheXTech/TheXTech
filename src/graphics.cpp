@@ -29,6 +29,8 @@
 #include "core/events.h"
 
 #include "pseudo_vb.h"
+#include "gfx.h"
+#include "config.h"
 
 #include <Utils/maths.h>
 
@@ -737,5 +739,19 @@ void DrawFrozenNPC(int Z, int A)
                                 float(vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] + n.Location.Height - 6),
                                 6, 6, GFXNPCBMP[n.Type],
                                 128 - 6, 128 - 6, c, c, c);
+    }
+}
+
+void DrawBackdrop()
+{
+    if(g_config.show_backdrop && GFX.Backdrop.inited)
+    {
+        for(int x = 0; x < ScreenW; x += GFX.Backdrop.w)
+        {
+            for(int y = 0; y < ScreenH; y += GFX.Backdrop.h)
+            {
+                XRender::renderTexture(x, y, GFX.Backdrop);
+            }
+        }
     }
 }

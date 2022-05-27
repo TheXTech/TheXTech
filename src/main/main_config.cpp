@@ -130,6 +130,7 @@ void OpenConfig_preSetup()
         config.read("display-controllers", g_drawController, false);
         config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
         config.read("osk-fill-screen", g_config.osk_fill_screen, false);
+        config.read("show-backdrop", g_config.show_backdrop, true);
 #ifndef FIXED_RES
         config.read("internal-width", g_config.InternalW, 800);
         config.read("internal-height", g_config.InternalH, 600);
@@ -306,6 +307,7 @@ void SaveConfig()
         config.setValue("display-controllers", g_drawController);
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
         config.setValue("osk-fill-screen", g_config.osk_fill_screen);
+        config.setValue("show-backdrop", g_config.show_backdrop);
 #       ifndef FIXED_RES
         config.setValue("internal-width", g_config.InternalW);
         config.setValue("internal-height", g_config.InternalH);

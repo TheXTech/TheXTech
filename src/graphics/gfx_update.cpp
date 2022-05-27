@@ -851,6 +851,7 @@ void UpdateGraphics(bool skipRepaint)
 
     // even if not, black background is good, to be safe
     XRender::renderRect(0, 0, ScreenW, ScreenH, 0, 0, 0);
+    DrawBackdrop();
 
     // No logic
     // Draw the screens!
