@@ -28,6 +28,7 @@
 
 #include "touchscreen.h"
 #include "../globals.h"
+#include "config.h"
 #include "../game_main.h"
 #include "../player.h"
 #include "../core/render.h"
@@ -1721,7 +1722,7 @@ StatusInfo InputMethod_TouchScreen::GetStatus()
 // the job of this function is to initialize the class in a consistent state
 InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 {
-    this->m_showPowerStatus = true;
+    this->m_showPowerStatus = g_config.JoystickEnableBatteryStatus;
 
 #ifdef __ANDROID__
     if(s_screenSize >= 9.0) // Big tablets

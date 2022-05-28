@@ -1151,9 +1151,11 @@ void RumbleAllPlayers(int ms, float strength)
 
 StatusInfo GetStatus(int player)
 {
+    // return something blank if player doesn't exist
     if(player < 1 || player >= (int)g_InputMethods.size() + 1 || g_InputMethods[player - 1] == nullptr)
         return StatusInfo();
 
+    // return something blank if player doesn't want to show status
     if(!g_InputMethods[player - 1]->Profile || !g_InputMethods[player - 1]->Profile->m_showPowerStatus)
         return StatusInfo();
 

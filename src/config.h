@@ -75,9 +75,9 @@ extern struct Config_t
 
     /* ---- Joystick ----*/
 
-    //! Enable usage of the rumble control
+    //! Enable usage of the rumble control. Only affects new controller profiles.
     bool    JoystickEnableRumble = true;
-    //! Show the battery status for wireless gamepads (if possible)
+    //! Show the battery status for wireless gamepads (if possible). Only affects new controller profiles.
     bool    JoystickEnableBatteryStatus = true;
 
 
