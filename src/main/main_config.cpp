@@ -56,15 +56,6 @@ void OpenConfig_preSetup()
         {"2", RENDER_ACCELERATED_VSYNC}
     };
 
-    const IniProcessing::StrEnumMap batteryStatus =
-    {
-        {"off", BATTERY_STATUS_OFF},
-        {"fullscreen-low", BATTERY_STATUS_FULLSCREEN_WHEN_LOW},
-        {"low", BATTERY_STATUS_ANY_WHEN_LOW},
-        {"fullscreen", BATTERY_STATUS_FULLSCREEN_ON},
-        {"on", BATTERY_STATUS_ALWAYS_ON}
-    };
-
     const IniProcessing::StrEnumMap sampleFormats =
     {
         {"s8", AUDIO_S8},
@@ -127,10 +118,6 @@ void OpenConfig_preSetup()
         config.read("frame-skip", g_videoSettings.enableFrameSkip, true);
         config.read("show-fps", g_videoSettings.showFrameRate, false);
         config.read("scale-down-all-textures", g_videoSettings.scaleDownAllTextures, false);
-        config.read("display-controllers", g_drawController, false);
-        config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
-        config.read("osk-fill-screen", g_config.osk_fill_screen, false);
-        config.read("show-backdrop", g_config.show_backdrop, true);
 #ifndef FIXED_RES
         config.read("internal-width", g_config.InternalW, 800);
         config.read("internal-height", g_config.InternalH, 600);
@@ -194,6 +181,25 @@ void OpenConfig()
          // Keep backward compatibility and restore old mappings from the "thextech.ini"
         IniProcessing *ctl = Files::fileExists(controlsPath) ? &controls : &config;
 
+        const IniProcessing::StrEnumMap batteryStatus =
+        {
+            {"off", BATTERY_STATUS_OFF},
+            {"fullscreen-low", BATTERY_STATUS_FULLSCREEN_WHEN_LOW},
+            {"low", BATTERY_STATUS_ANY_WHEN_LOW},
+            {"fullscreen", BATTERY_STATUS_FULLSCREEN_ON},
+            {"on", BATTERY_STATUS_ALWAYS_ON}
+        };
+
+        const IniProcessing::StrEnumMap showEpisodeTitle
+        {
+            {"off", Config_t::EPISODE_TITLE_OFF},
+            {"on", Config_t::EPISODE_TITLE_ON},
+            {"transparent", Config_t::EPISODE_TITLE_TRANSPARENT},
+            {"0", Config_t::EPISODE_TITLE_OFF},
+            {"1", Config_t::EPISODE_TITLE_ON},
+            {"2", Config_t::EPISODE_TITLE_TRANSPARENT}
+        };
+
         const IniProcessing::StrEnumMap starsShowPolicy =
         {
             {"hide", 0},
@@ -211,6 +217,14 @@ void OpenConfig()
         config.read("new-editor", g_config.enable_editor, false);
         config.read("enable-editor", g_config.enable_editor, g_config.enable_editor);
         config.read("editor-edge-scroll", g_config.editor_edge_scroll, g_config.editor_edge_scroll);
+        config.endGroup();
+
+        config.beginGroup("video");
+        config.read("display-controllers", g_drawController, false);
+        config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
+        config.read("osk-fill-screen", g_config.osk_fill_screen, false);
+        config.readEnum("show-episode-title", g_config.show_episode_title, (int)Config_t::EPISODE_TITLE_OFF, showEpisodeTitle);
+        config.read("show-backdrop", g_config.show_backdrop, true);
         config.endGroup();
 
         config.beginGroup("recent");
@@ -298,6 +312,13 @@ void SaveConfig()
             {BATTERY_STATUS_ALWAYS_ON, "on"}
         };
 
+        std::unordered_map<int, std::string> showEpisodeTitle =
+        {
+            {Config_t::EPISODE_TITLE_OFF, "off"},
+            {Config_t::EPISODE_TITLE_ON, "on"},
+            {Config_t::EPISODE_TITLE_TRANSPARENT, "transparent"}
+        };
+
         config.setValue("render", renderMode[g_videoSettings.renderMode]);
         config.setValue("background-work", g_videoSettings.allowBgWork);
         config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
@@ -307,6 +328,7 @@ void SaveConfig()
         config.setValue("display-controllers", g_drawController);
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
         config.setValue("osk-fill-screen", g_config.osk_fill_screen);
+        config.setValue("show-episode-title", showEpisodeTitle[g_config.show_episode_title]);
         config.setValue("show-backdrop", g_config.show_backdrop);
 #       ifndef FIXED_RES
         config.setValue("internal-width", g_config.InternalW);

@@ -26,6 +26,7 @@
 
 #include <Logger/logger.h>
 
+#include "config.h"
 #include "../controls.h"
 #include "joystick.h"
 
@@ -633,7 +634,7 @@ StatusInfo InputMethod_Joystick::GetStatus()
 InputMethodProfile_Joystick::InputMethodProfile_Joystick()
 {
     this->InitAsController();
-    this->m_showPowerStatus = true;
+    this->m_showPowerStatus = g_config.JoystickEnableBatteryStatus;
 }
 
 void InputMethodProfile_Joystick::InitAsJoystick()

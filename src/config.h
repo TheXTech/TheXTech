@@ -41,6 +41,14 @@ extern struct Config_t
 
     //! The onscreen keyboard should fill the screen
     bool    osk_fill_screen = false;
+    //! Show the episode title onscreen
+    enum
+    {
+        EPISODE_TITLE_OFF = 0,
+        EPISODE_TITLE_ON,
+        EPISODE_TITLE_TRANSPARENT,
+    };
+    int show_episode_title;
     //! Show a backdrop texture when level is smaller than screen
     bool    show_backdrop = true;
 
@@ -84,9 +92,9 @@ extern struct Config_t
 
     /* ---- Joystick ----*/
 
-    //! Enable usage of the rumble control
+    //! Enable usage of the rumble control. Only affects new controller profiles.
     bool    JoystickEnableRumble = true;
-    //! Show the battery status for wireless gamepads (if possible)
+    //! Show the battery status for wireless gamepads (if possible). Only affects new controller profiles.
     bool    JoystickEnableBatteryStatus = true;
 
 

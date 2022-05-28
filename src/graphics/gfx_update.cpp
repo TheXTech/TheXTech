@@ -36,6 +36,7 @@
 #include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
 #include "../compat.h"
+#include "../config.h"
 #include "../game_main.h"
 #include "../main/game_globals.h"
 #include "../core/render.h"
@@ -2193,6 +2194,15 @@ void UpdateGraphics(bool skipRepaint)
         SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
 
     g_stats.print();
+
+    if(!BattleMode && !GameMenu && g_config.show_episode_title)
+    {
+        int y = (ScreenH >= 640) ? 20 : ScreenH - 60;
+        if(g_config.show_episode_title == Config_t::EPISODE_TITLE_TRANSPARENT)
+            SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, 0.5f);
+        else
+            SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, 1.f);
+    }
 
     if(LevelEditor || MagicHand)
         DrawEditorLevel_UI();
