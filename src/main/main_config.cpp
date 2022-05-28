@@ -164,6 +164,16 @@ void OpenConfig()
             {"on", BATTERY_STATUS_ALWAYS_ON}
         };
 
+        const IniProcessing::StrEnumMap showEpisodeTitle
+        {
+            {"off", Config_t::EPISODE_TITLE_OFF},
+            {"on", Config_t::EPISODE_TITLE_ON},
+            {"transparent", Config_t::EPISODE_TITLE_TRANSPARENT},
+            {"0", Config_t::EPISODE_TITLE_OFF},
+            {"1", Config_t::EPISODE_TITLE_ON},
+            {"2", Config_t::EPISODE_TITLE_TRANSPARENT}
+        };
+
         const IniProcessing::StrEnumMap starsShowPolicy =
         {
             {"hide", 0},
@@ -187,6 +197,7 @@ void OpenConfig()
         config.read("display-controllers", g_drawController, false);
         config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
         config.read("osk-fill-screen", g_config.osk_fill_screen, false);
+        config.readEnum("show-episode-title", g_config.show_episode_title, (int)Config_t::EPISODE_TITLE_OFF, showEpisodeTitle);
         config.endGroup();
 
         config.beginGroup("recent");
@@ -273,6 +284,13 @@ void SaveConfig()
             {BATTERY_STATUS_ALWAYS_ON, "on"}
         };
 
+        std::unordered_map<int, std::string> showEpisodeTitle =
+        {
+            {Config_t::EPISODE_TITLE_OFF, "off"},
+            {Config_t::EPISODE_TITLE_ON, "on"},
+            {Config_t::EPISODE_TITLE_TRANSPARENT, "transparent"}
+        };
+
         config.setValue("render", renderMode[g_videoSettings.renderMode]);
         config.setValue("background-work", g_videoSettings.allowBgWork);
         config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
@@ -282,6 +300,7 @@ void SaveConfig()
         config.setValue("display-controllers", g_drawController);
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
         config.setValue("osk-fill-screen", g_config.osk_fill_screen);
+        config.setValue("show-episode-title", showEpisodeTitle[g_config.show_episode_title]);
     }
     config.endGroup();
 

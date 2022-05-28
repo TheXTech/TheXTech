@@ -41,6 +41,14 @@ extern struct Config_t
 
     //! The onscreen keyboard should fill the screen
     bool    osk_fill_screen = false;
+    //! Show the episode title onscreen
+    enum
+    {
+        EPISODE_TITLE_OFF = 0,
+        EPISODE_TITLE_ON,
+        EPISODE_TITLE_TRANSPARENT,
+    };
+    int show_episode_title;
 
     /* ---- Gameplay ----*/
 

@@ -26,6 +26,7 @@
 #include "../collision.h"
 #include "../player.h"
 #include "../compat.h"
+#include "../config.h"
 #include "../main/speedrunner.h"
 #include "../main/trees.h"
 #include "../main/screen_pause.h"
@@ -699,6 +700,15 @@ void UpdateGraphics2(bool skipRepaint)
             SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
 
         g_stats.print();
+
+        if(!BattleMode && !GameMenu && g_config.show_episode_title)
+        {
+            int y = (ScreenH >= 640) ? 20 : ScreenH - 60;
+            if(g_config.show_episode_title == Config_t::EPISODE_TITLE_TRANSPARENT)
+                SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, 0.5f);
+            else
+                SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, 1.f);
+        }
 
         speedRun_renderControls(1, -1);
 
