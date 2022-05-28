@@ -146,7 +146,6 @@ set_static_lib(AC_VORBIS       "${CODECS_LIBRARIES_DIR}" vorbis)
 set_static_lib(AC_OPUSFILE     "${CODECS_LIBRARIES_DIR}" opusfile)
 set_static_lib(AC_OPUS         "${CODECS_LIBRARIES_DIR}" opus)
 set_static_lib(AC_OGG          "${CODECS_LIBRARIES_DIR}" ogg)
-set_static_lib(AC_MAD          "${CODECS_LIBRARIES_DIR}" mad)
 set_static_lib(AC_ADLMIDI      "${CODECS_LIBRARIES_DIR}" ADLMIDI)
 set_static_lib(AC_OPNMIDI      "${CODECS_LIBRARIES_DIR}" OPNMIDI)
 set_static_lib(AC_EDMIDI       "${CODECS_LIBRARIES_DIR}" EDMIDI)
@@ -161,14 +160,13 @@ set_static_lib(AC_MODPLUG      "${CODECS_LIBRARIES_DIR}" modplug)
 set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)
 
 set(MixerX_CodecLibs
-    "${AC_FLAC}"
+#    "${AC_FLAC}"
     "${AC_FLUIDLITE}"
 #    "${AC_VORBISFILE}"
 #    "${AC_VORBIS}"
     "${AC_OPUSFILE}"
     "${AC_OPUS}"
     "${AC_OGG}"
-#    "${AC_MAD}"
     "${AC_ADLMIDI}"
     "${AC_OPNMIDI}"
     "${AC_EDMIDI}"
@@ -182,10 +180,8 @@ set(MixerX_CodecLibs
 if(VITA)
     set(VITA_AUDIOCODECS_CMAKE_FLAGS
         -DBUILD_OGG_VORBIS=OFF
-        -DBUILD_FLAC=ON
+        -DBUILD_FLAC=OFF
         -DBUILD_OPUS=ON
-        -DBUILD_MP3_MAD=OFF
-        -DBUILD_MIKMOD=OFF
         -DBUILD_MPG123=OFF)
 
     set(VITA_MIXERX_CMAKE_FLAGS
@@ -201,7 +197,6 @@ if(VITA)
         "-DLIBVORBISIDEC_LIB=vorbisidec"
         "-DLIBVORBIS_LIB=vorbis"
         "-DLIBVORBISFILE_LIB=vorbisfile"
-        "-DMAD_LIBRARIES=mad"
     )
 
     set(MixerX_CodecLibs # Minimal list of libraries to link
@@ -236,9 +231,8 @@ ExternalProject_Add(
         "-DUSE_LOCAL_SDL2=${USE_LOCAL_SDL2}"
         "-DBUILD_SDL2_SHARED=${PGE_SHARED_SDLMIXER}"
         "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
-        "-DBUILD_MIKMOD=OFF"
         "-DBUILD_OGG_VORBIS=OFF"
-        "-DBUILD_MP3_MAD=OFF"
+        "-DBUILD_FLAC=OFF"
         "-DBUILD_MPG123=OFF"
         ${ANDROID_CMAKE_FLAGS}
         ${VITA_CMAKE_FLAGS}
@@ -279,9 +273,10 @@ ExternalProject_Add(
         "-DAUDIO_CODECS_SDL2_GIT_BRANCH=${SDL_GIT_BRANCH}"
         "-DWITH_SDL2_WASAPI=ON"
         "-DUSE_MIDI_FLUIDLITE_OGG_STB=ON"
-        "-DUSE_MP3_MINIMP3=ON"
+        "-DUSE_DRFLAC=ON"
+        "-DUSE_FLAC=OFF"
         "-DUSE_OGG_VORBIS_STB=ON"
-        "-DUSE_MP3_MAD=OFF"
+        "-DUSE_MP3_DRMP3=ON"
         "-DUSE_MP3_MPG123=OFF"
         ${ANDROID_CMAKE_FLAGS}
         ${VITA_CMAKE_FLAGS}
