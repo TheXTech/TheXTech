@@ -23,7 +23,6 @@ endif()
 set(VITA_ADDTL_LIBS
     FLAC
     modplug
-    mad
     opusfile
     opus
     vorbisfile
