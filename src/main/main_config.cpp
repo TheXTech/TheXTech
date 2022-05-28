@@ -56,15 +56,6 @@ void OpenConfig_preSetup()
         {"2", RENDER_ACCELERATED_VSYNC}
     };
 
-    const IniProcessing::StrEnumMap batteryStatus =
-    {
-        {"off", BATTERY_STATUS_OFF},
-        {"fullscreen-low", BATTERY_STATUS_FULLSCREEN_WHEN_LOW},
-        {"low", BATTERY_STATUS_ANY_WHEN_LOW},
-        {"fullscreen", BATTERY_STATUS_FULLSCREEN_ON},
-        {"on", BATTERY_STATUS_ALWAYS_ON}
-    };
-
     const IniProcessing::StrEnumMap sampleFormats =
     {
         {"s8", AUDIO_S8},
@@ -127,9 +118,6 @@ void OpenConfig_preSetup()
         config.read("frame-skip", g_videoSettings.enableFrameSkip, true);
         config.read("show-fps", g_videoSettings.showFrameRate, false);
         config.read("scale-down-all-textures", g_videoSettings.scaleDownAllTextures, false);
-        config.read("display-controllers", g_drawController, false);
-        config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
-        config.read("osk-fill-screen", g_config.osk_fill_screen, false);
         config.endGroup();
 
         config.beginGroup("sound");
@@ -167,6 +155,15 @@ void OpenConfig()
          // Keep backward compatibility and restore old mappings from the "thextech.ini"
         IniProcessing *ctl = Files::fileExists(controlsPath) ? &controls : &config;
 
+        const IniProcessing::StrEnumMap batteryStatus =
+        {
+            {"off", BATTERY_STATUS_OFF},
+            {"fullscreen-low", BATTERY_STATUS_FULLSCREEN_WHEN_LOW},
+            {"low", BATTERY_STATUS_ANY_WHEN_LOW},
+            {"fullscreen", BATTERY_STATUS_FULLSCREEN_ON},
+            {"on", BATTERY_STATUS_ALWAYS_ON}
+        };
+
         const IniProcessing::StrEnumMap starsShowPolicy =
         {
             {"hide", 0},
@@ -184,6 +181,12 @@ void OpenConfig()
         config.read("new-editor", g_config.enable_editor, false);
         config.read("enable-editor", g_config.enable_editor, g_config.enable_editor);
         config.read("editor-edge-scroll", g_config.editor_edge_scroll, g_config.editor_edge_scroll);
+        config.endGroup();
+
+        config.beginGroup("video");
+        config.read("display-controllers", g_drawController, false);
+        config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
+        config.read("osk-fill-screen", g_config.osk_fill_screen, false);
         config.endGroup();
 
         config.beginGroup("recent");
