@@ -916,11 +916,49 @@ void UpdateGraphics2(bool skipRepaint)
 
         if(!BattleMode && !GameMenu && g_config.show_episode_title)
         {
-            int y = (ScreenH >= 640) ? 20 : ScreenH - 60;
-            if(g_config.show_episode_title == Config_t::EPISODE_TITLE_TRANSPARENT)
-                SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, 0.5f);
+            int y;
+            float alpha;
+
+            // big screen, display at top
+            if(ScreenH >= 640)
+            {
+                y = 20;
+                switch(g_config.show_episode_title)
+                {
+                    case Config_t::EPISODE_TITLE_ON:
+                    case Config_t::EPISODE_TITLE_AUTO:
+                    case Config_t::EPISODE_TITLE_ON_ALWAYS:
+                        alpha = 1.0f;
+                        break;
+                    case Config_t::EPISODE_TITLE_TRANSPARENT:
+                    case Config_t::EPISODE_TITLE_TRANSPARENT_ALWAYS:
+                        alpha = 0.5f;
+                        break;
+                    default:
+                        alpha = 0.f;
+                }
+            }
+            // small screen, maybe don't display, display at bottom
             else
-                SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, 1.f);
+            {
+                y = ScreenH - 60;
+                switch(g_config.show_episode_title)
+                {
+                    case Config_t::EPISODE_TITLE_ON_ALWAYS:
+                        alpha = 1.0f;
+                        break;
+                    case Config_t::EPISODE_TITLE_AUTO:
+                    case Config_t::EPISODE_TITLE_TRANSPARENT_ALWAYS:
+                        alpha = 0.5f;
+                        break;
+                    case Config_t::EPISODE_TITLE_TRANSPARENT:
+                    case Config_t::EPISODE_TITLE_ON:
+                    default:
+                        alpha = 0.f;
+                }
+            }
+
+            SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, alpha);
         }
 
         speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);

@@ -47,6 +47,9 @@ extern struct Config_t
         EPISODE_TITLE_OFF = 0,
         EPISODE_TITLE_ON,
         EPISODE_TITLE_TRANSPARENT,
+        EPISODE_TITLE_AUTO,
+        EPISODE_TITLE_ON_ALWAYS,
+        EPISODE_TITLE_TRANSPARENT_ALWAYS,
     };
     int show_episode_title;
     //! Show a backdrop texture when level is smaller than screen

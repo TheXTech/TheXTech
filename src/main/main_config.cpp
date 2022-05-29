@@ -195,6 +195,9 @@ void OpenConfig()
             {"off", Config_t::EPISODE_TITLE_OFF},
             {"on", Config_t::EPISODE_TITLE_ON},
             {"transparent", Config_t::EPISODE_TITLE_TRANSPARENT},
+            {"auto", Config_t::EPISODE_TITLE_AUTO},
+            {"on-always", Config_t::EPISODE_TITLE_ON_ALWAYS},
+            {"transparent-always", Config_t::EPISODE_TITLE_TRANSPARENT_ALWAYS},
             {"0", Config_t::EPISODE_TITLE_OFF},
             {"1", Config_t::EPISODE_TITLE_ON},
             {"2", Config_t::EPISODE_TITLE_TRANSPARENT}
@@ -316,7 +319,10 @@ void SaveConfig()
         {
             {Config_t::EPISODE_TITLE_OFF, "off"},
             {Config_t::EPISODE_TITLE_ON, "on"},
-            {Config_t::EPISODE_TITLE_TRANSPARENT, "transparent"}
+            {Config_t::EPISODE_TITLE_TRANSPARENT, "transparent"},
+            {Config_t::EPISODE_TITLE_AUTO, "auto"},
+            {Config_t::EPISODE_TITLE_ON_ALWAYS, "on-always"},
+            {Config_t::EPISODE_TITLE_TRANSPARENT_ALWAYS, "transparent-always"}
         };
 
         config.setValue("render", renderMode[g_videoSettings.renderMode]);
