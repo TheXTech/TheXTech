@@ -820,30 +820,31 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         B = numBackground;
         for(A = 1; A <= numWarps; A++)
         {
-            if(Warp[A].Effect == 2 && Warp[A].Stars > numStars)
+            auto &w = Warp[A];
+            if(w.Effect == 2 && w.Stars > numStars)
             {
                 B++;
                 numLocked++;
                 auto &bgo = Background[B];
                 bgo = Background_t();
-                bgo.Layer = Warp[A].Layer;
-                bgo.Hidden = Warp[A].Hidden;
+                bgo.Layer = w.Layer;
+                bgo.Hidden = w.Hidden;
                 bgo.Location.Width = 24;
                 bgo.Location.Height = 24;
-                bgo.Location.Y = Warp[A].Entrance.Y - bgo.Location.Height;
-                bgo.Location.X = Warp[A].Entrance.X + Warp[A].Entrance.Width / 2.0 - bgo.Location.Width / 2.0;
+                bgo.Location.Y = w.Entrance.Y - bgo.Location.Height;
+                bgo.Location.X = w.Entrance.X + w.Entrance.Width / 2.0 - bgo.Location.Width / 2.0;
                 bgo.Type = 160;
                 syncLayers_BGO(B);
             }
-            else if(Warp[A].Effect == 2 && Warp[A].Locked) // For locks
+            else if(w.Effect == 2 && w.Locked) // For locks
             {
                 B++;
                 numLocked++;
                 auto &bgo = Background[B];
                 bgo = Background_t();
-                bgo.Layer = Warp[A].Layer;
-                bgo.Hidden = Warp[A].Hidden;
-                bgo.Location = Warp[A].Entrance;
+                bgo.Layer = w.Layer;
+                bgo.Hidden = w.Hidden;
+                bgo.Location = w.Entrance;
                 bgo.Type = 98;
                 bgo.Location.Width = 16;
                 syncLayers_BGO(B);
