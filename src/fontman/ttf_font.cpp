@@ -19,9 +19,8 @@
 
 #include "ttf_font.h"
 #include <SDL2/SDL_assert.h>
-#include <graphics/gl_renderer.h>
-#include <common_features/logger.h>
-#include <data_configs/config_manager.h>
+#include "core/render.h"
+#include <Logger/logger.h>
 #include <unordered_set>
 #include <mutex>
 
@@ -60,8 +59,8 @@ TtfFont::TtfFont() : BaseFontEngine()
 
 TtfFont::~TtfFont()
 {
-    for(PGE_Texture &t : m_texturesBank)
-        GlRenderer::deleteTexture(t);
+    for(StdPicture &t : m_texturesBank)
+        XRender::deleteTexture(t);
     m_texturesBank.clear();
 
     g_loadedFaces_mutex.lock();
@@ -127,10 +126,13 @@ bool TtfFont::loadFont(const char *mem, size_t size)
     return true;
 }
 
-PGE_Size TtfFont::textSize(std::string &text,
+PGE_Size TtfFont::textSize(const std::string &text,
                            uint32_t max_line_length,
                            bool cut, uint32_t fontSize)
 {
+    const std::string *t = &text;
+    std::string modText;
+
     SDL_assert_release(g_ft);
     if(text.empty())
         return PGE_Size(0, 0);
@@ -147,16 +149,18 @@ PGE_Size TtfFont::textSize(std::string &text,
 
     if(cut)
     {
-        std::string::size_type i = text.find('\n');
+        modText = text;
+        std::string::size_type i = modText.find('\n');
         if(i != std::string::npos)
-            text.erase(i, text.size() - i);
+            modText.erase(i, modText.size() - i);
+        t = &modText;
     }
 
     /****************Word wrap*********************/
     uint32_t x = 0;
-    for(size_t i = 0; i < text.size(); i++, x++)
+    for(size_t i = 0; i < t->size(); i++, x++)
     {
-        char &cx = text[i];
+        const char &cx = (*t)[i];
         UTF8 uch = static_cast<unsigned char>(cx);
 
         switch(cx)
@@ -201,15 +205,22 @@ PGE_Size TtfFont::textSize(std::string &text,
         if((max_line_length > 0) && (x >= max_line_length)) //If lenght more than allowed
         {
             maxWidth = x;
+
+            if(t != &modText)
+            {
+                modText = text;
+                t = &modText;
+            }
+
             if(lastspace > 0)
             {
-                text[lastspace] = '\n';
+                modText[lastspace] = '\n';
                 i = lastspace - 1;
                 lastspace = 0;
             }
             else
             {
-                text.insert(i, 1, '\n');
+                modText.insert(i, 1, '\n');
                 x = 0;
                 count++;
             }
@@ -235,7 +246,7 @@ void TtfFont::printText(const std::string &text,
 
     uint32_t offsetX = 0;
     uint32_t offsetY = 0;
-    bool    doublePixel = ConfigManager::setup_fonts.double_pixled;
+    bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;
 
     const char *strIt  = text.c_str();
     const char *strEnd = strIt + text.size();
@@ -265,15 +276,25 @@ void TtfFont::printText(const std::string &text,
         const TheGlyph &glyph = getGlyph(doublePixel ? (fontSize / 2) : fontSize, get_utf8_char(&cx));
         if(glyph.tx)
         {
-            GlRenderer::setTextureColor(Red, Green, Blue, Alpha);
+            // GlRenderer::setTextureColor(Red, Green, Blue, Alpha);
             int32_t glyph_x = x + static_cast<int32_t>(offsetX);
             int32_t glyph_y = y + static_cast<int32_t>(offsetY + fontSize);
-            GlRenderer::renderTexture(glyph.tx,
-                                      static_cast<float>(glyph_x + glyph.left),
-                                      static_cast<float>(glyph_y - glyph.top),
-                                      (doublePixel ? (glyph.width * 2) : glyph.width),
-                                      (doublePixel ? (glyph.height * 2) : glyph.height)
-                                      );
+            XRender::renderTexture(
+                static_cast<float>(glyph_x + glyph.left),
+                static_cast<float>(glyph_y - glyph.top),
+                (doublePixel ? (glyph.width * 2) : glyph.width),
+                (doublePixel ? (glyph.height * 2) : glyph.height),
+                *glyph.tx,
+                0,
+                0,
+                Red, Green, Blue, Alpha
+            );
+//            GlRenderer::renderTexture(glyph.tx,
+//                                      static_cast<float>(glyph_x + glyph.left),
+//                                      static_cast<float>(glyph_y - glyph.top),
+//                                      (doublePixel ? (glyph.width * 2) : glyph.width),
+//                                      (doublePixel ? (glyph.height * 2) : glyph.height)
+//                                      );
         }
         offsetX += glyph.tx ? uint32_t(glyph.advance >> 6) : (fontSize >> 2);
 
@@ -295,18 +316,23 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
                            int32_t x, int32_t y, uint32_t fontSize, double scaleSize,
                            float Red, float Green, float Blue, float Alpha)
 {
+    (void)(scaleSize);
+
     const TheGlyph &glyph = getGlyph(fontSize, get_utf8_char(u8char));
     if(glyph.tx)
     {
-        GlRenderer::setTextureColor(Red, Green, Blue, Alpha);
         int32_t glyph_x = x;
         int32_t glyph_y = y + static_cast<int32_t>(fontSize);
-        GlRenderer::renderTexture(glyph.tx,
-                                  static_cast<float>(glyph_x + glyph.left),
-                                  static_cast<float>(glyph_y - glyph.top),
-                                  glyph.width * static_cast<float>(scaleSize),
-                                  glyph.height * static_cast<float>(scaleSize)
-                                  );
+        XRender::renderTexture(
+            static_cast<float>(glyph_x + glyph.left),
+            static_cast<float>(glyph_y - glyph.top),
+            glyph.width * static_cast<float>(scaleSize),
+            glyph.height * static_cast<float>(scaleSize),
+            *glyph.tx,
+            0,
+            0,
+            Red, Green, Blue, Alpha
+        );
         return glyph.width;
     }
     return fontSize;
@@ -388,6 +414,7 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
     FT_Bitmap &bitmap   = glyph->bitmap;
     uint32_t width      = bitmap.width;
     uint32_t height     = bitmap.rows;
+    uint32_t pitch      = width * 4;
 
     if((width == 0) || (height == 0))
         return dummyGlyph;
@@ -423,11 +450,18 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
     }
 
     m_texturesBank.emplace_back();
-    PGE_Texture &texture = m_texturesBank.back();
-    texture.nOfColors   = GL_RGBA;
-    texture.format      = GL_BGRA;
+    StdPicture &texture = m_texturesBank.back();
+    texture.w = width;
+    texture.h = height;
+    texture.frame_w = width;
+    texture.frame_h = height;
+    texture.inited = true;
+    texture.l.w_orig = int(texture.w);
+    texture.l.h_orig = int(texture.h);
+    texture.l.w_scale = float(width) / float(texture.l.w_orig);
+    texture.l.h_scale = float(width) / float(texture.l.h_orig);
 
-    GlRenderer::loadRawTextureP(texture, image, width, height);
+    XRender::loadTexture(texture, width, height, image, pitch);
     t_glyph.tx      = &texture;
     t_glyph.width   = width;
     t_glyph.height  = height;

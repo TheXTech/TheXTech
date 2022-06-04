@@ -47,6 +47,7 @@ size_t       utf8_strlen(const std::string &str);
  */
 size_t       utf8_substrlen(const std::string &str, size_t utf8len);
 std::string  utf8_substr(const std::string &str, size_t utf8_begin, size_t utf8_len);
+const char*  utf8_skip_begin(const char *str, size_t utf8_begin);
 void         utf8_pop_back(std::string &str);
 void         utf8_erase_at(std::string &str, size_t begin);
 void         utf8_erase_before(std::string &str, size_t end);
@@ -82,10 +83,10 @@ enum DefaultFont
  * @param ttfFontPixelSize Point size for the TTF fonts
  * @return
  */
-PGE_Size textSize(std::string &text, int    fontID,
-                 uint32_t max_line_lenght = 0,
-                 bool   cut = false,
-                 uint32_t ttfFontSize = 14);
+PGE_Size textSize(const std::string &text, int    fontID,
+                  uint32_t max_line_lenght = 0,
+                  bool   cut = false,
+                  uint32_t ttfFontSize = 14);
 
 /**
  * @brief Retreive Font-ID from the font name
@@ -106,10 +107,15 @@ int      getFontID(std::string fontName);
  * @param Alpha Alpha-channel level from 0.0 to 1.0
  * @param ttf_FontSize Point size for the TTF fonts
  */
-void printText(std::string text,
-                      int x, int y, int font = DefaultRaster,
-                      float Red=1.0, float Green=1.0, float Blue=1.0, float Alpha=1.0,
-                      uint32_t ttf_FontSize = 14);
+void printText(const std::string& text,
+               int x, int y, int font = DefaultRaster,
+               float Red=1.0, float Green=1.0, float Blue=1.0, float Alpha=1.0,
+               uint32_t ttf_FontSize = 14);
+
+void printText(const char* text,
+               int x, int y, int font = DefaultRaster,
+               float Red=1.0, float Green=1.0, float Blue=1.0, float Alpha=1.0,
+               uint32_t ttf_FontSize = 14);
 
 /**
  * @brief Clean-Up text fragment to fit into the character width

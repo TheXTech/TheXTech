@@ -56,7 +56,7 @@ public:
     bool loadFont(const char* mem, size_t size);
 
 
-    PGE_Size textSize(std::string &text,
+    PGE_Size textSize(const std::string& text,
                       uint32_t max_line_length = 0,
                       bool cut = false, uint32_t fontSize = 14);
 

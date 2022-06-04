@@ -23,7 +23,7 @@
 size_t FontManager::utf8_strlen(const char *str)
 {
     size_t size = 0;
-    while(str)
+    while(str && *str != 0)
     {
         size_t  charLen = 1 + static_cast<size_t>(trailingBytesForUTF8[static_cast<UTF8>(*str)]);
         size += charLen;
@@ -87,6 +87,23 @@ std::string FontManager::utf8_substr(const std::string &str, size_t utf8_begin, 
         len  -= charLen;
         utf8_pos++;
     }
+    return out;
+}
+
+const char* FontManager::utf8_skip_begin(const char *str, size_t utf8_begin)
+{
+    size_t utf8_pos = 0;
+    const char *cstr = str;
+    const char *out = cstr;
+    while(cstr && *cstr != 0)
+    {
+        size_t  charLen = 1 + static_cast<size_t>(trailingBytesForUTF8[static_cast<UTF8>(*cstr)]);
+        if(utf8_pos >= utf8_begin)
+            out = cstr;
+        cstr += charLen;
+        utf8_pos++;
+    }
+
     return out;
 }
 

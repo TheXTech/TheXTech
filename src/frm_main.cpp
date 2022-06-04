@@ -42,6 +42,8 @@ typedef EventsSDL EventsUsed;
 #   define USE_CORE_EVENTS_SDL
 #endif
 
+#include "fontman/font_manager.h"
+
 #include "frm_main.h"
 
 
@@ -114,11 +116,15 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         return true;
     }
 
+    FontManager::initFull();
+
     return !res;
 }
 
 void FrmMain::freeSystem()
 {
+    FontManager::quit();
+
     GFX.unLoad();
     if(m_render)
         m_render->clearAllTextures();

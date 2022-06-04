@@ -29,7 +29,7 @@ class BaseFontEngine
 public:
     virtual ~BaseFontEngine();
 
-    virtual PGE_Size textSize(std::string &text,
+    virtual PGE_Size textSize(const std::string &text,
                               uint32_t max_line_lenght = 0,
                               bool cut = false, uint32_t fontSize = 14) = 0;
 
