@@ -4450,14 +4450,12 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
     if(warp.Stars > numStars && canWarp)
     {
         if(warp.StarsMsg == STRINGINDEX_NONE)
-        {
-            if(warp.Stars == 1)
-                MessageText = "You need 1 star to enter.";
-            else
-                MessageText = fmt::format_ne("You need {0} stars to enter.", warp.Stars);
-        } else {
+            MessageText = (warp.Stars == 1) ?
+                              "You need 1 star to enter." :
+                              fmt::format_ne("You need {0} stars to enter.", warp.Stars);
+        else
             MessageText = GetS(warp.StarsMsg);
-        }
+
         PauseGame(PauseCode::Message, A);
         MessageText.clear();
         canWarp = false;
