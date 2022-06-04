@@ -121,6 +121,8 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
+option(THEXTECH_ENABLE_TTF_SUPPORT "[NOT IMPLEMENTED YET] Enable TTF fonts support" OFF)
+
 option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
@@ -285,6 +287,10 @@ set(LIB_SRC
     lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
     lib/Graphics/sizef.cpp
+    lib/Graphics/rect.cpp
+    lib/Graphics/rectf.cpp
+    lib/Graphics/point.cpp
+    lib/Graphics/pointf.cpp
     ${INIPROCESSOR_SRCS}
     ${LOGGER_SRCS}
     ${UTILS_SRCS}
@@ -398,7 +404,18 @@ set(THEXTECH_SRC
     src/npc/npc_frames.cpp
     src/npc/npc_bonus.cpp
     src/player/player_update.cpp
+    src/fontman/font_manager.cpp
+    src/fontman/font_manager_private.cpp
+    src/fontman/raster_font.cpp
+    src/fontman/utf8_helpers.cpp
 )
+
+if(THEXTECH_ENABLE_TTF_SUPPORT)
+    add_definitions(-DTHEXTECH_ENABLE_TTF_SUPPORT)
+    list(APPEND THEXTECH_SRC
+        src/fontman/ttf_font.cpp
+    )
+endif()
 
 # Luna Autocode script engine
 list(APPEND THEXTECH_SRC src/script/luna/lunaglobals.cpp)
@@ -478,6 +495,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/main/*.h
     src/main/QuadTree/*.h
     src/sound/fx/*.h
+    src/fontman/*.h
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
