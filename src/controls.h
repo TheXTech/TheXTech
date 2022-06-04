@@ -360,7 +360,7 @@ namespace Hotkeys
 // enumerate of the Hotkey indices (which are almost never used)
 enum Buttons : size_t
 {
-    Fullscreen = 0, Screenshot, RecordGif, DebugInfo, EnterCheats, ToggleHUD, LegacyPause, MAX
+    Fullscreen = 0, Screenshot, RecordGif, DebugInfo, EnterCheats, ToggleHUD, LegacyPause, ToggleFontRender, MAX
 };
 
 constexpr size_t n_buttons = Buttons::MAX;
@@ -384,6 +384,8 @@ inline const char *GetButtonName_INI(size_t i)
         return "toggle-hud";
     case Buttons::LegacyPause:
         return "legacy-pause";
+    case Buttons::ToggleFontRender:
+        return "toggle-font-render";
     default:
         return "NULL";
     }
@@ -408,6 +410,8 @@ inline const char *GetButtonName_UI(size_t i)
         return "Toggle HUD";
     case Buttons::LegacyPause:
         return "Old Pause";
+    case Buttons::ToggleFontRender:
+        return "Toggle font renderer";
     default:
         return "NULL";
     }

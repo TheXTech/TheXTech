@@ -148,6 +148,7 @@ extern bool ScrollRelease;
 extern bool TakeScreen;
 // EXTRA: Show any on-screen meta (HUD, debug prints, etc.)
 extern bool ShowOnScreenHUD;
+extern bool NewFontRender;
 //Public LB As String  ' Line Break
 //extern std::string LB;
 //Public EoT As String  ' End of Transmission for WINSOCK

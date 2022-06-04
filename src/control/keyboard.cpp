@@ -306,6 +306,7 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
 #endif
     this->m_hotkeys[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F12;
     this->m_hotkeys2[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F2;
+    this->m_hotkeys[Hotkeys::Buttons::ToggleFontRender] = SDL_SCANCODE_F4;
 }
 
 bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)

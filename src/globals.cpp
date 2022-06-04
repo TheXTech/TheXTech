@@ -49,6 +49,7 @@ int BlockFlash = 0;
 bool ScrollRelease = false;
 bool TakeScreen = false;
 bool ShowOnScreenHUD = true;
+bool NewFontRender = true;
 std::string LB;
 std::string EoT;
 

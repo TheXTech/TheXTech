@@ -101,6 +101,10 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 #endif
 
+    case Buttons::ToggleFontRender:
+        NewFontRender = !NewFontRender;
+        return;
+
     case Buttons::DebugInfo:
         g_stats.enabled = !g_stats.enabled;
         return;
