@@ -835,6 +835,18 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 bgo.Location.X = w.Entrance.X + w.Entrance.Width / 2.0 - bgo.Location.Width / 2.0;
                 bgo.Type = 160;
                 syncLayers_BGO(B);
+
+                if(w.twoWay)
+                {
+                    B++;
+                    numLocked++;
+                    auto &bgo2 = Background[B];
+                    bgo2 = bgo;
+                    bgo2.Location = bgo.Location;
+                    bgo2.Location.Y = w.Exit.Y - bgo2.Location.Height;
+                    bgo2.Location.X = w.Exit.X + w.Exit.Width / 2.0 - bgo2.Location.Width / 2.0;
+                    syncLayers_BGO(B);
+                }
             }
             else if(w.Effect == 2 && w.Locked) // For locks
             {
@@ -848,6 +860,17 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 bgo.Type = 98;
                 bgo.Location.Width = 16;
                 syncLayers_BGO(B);
+
+                if(w.twoWay)
+                {
+                    B++;
+                    numLocked++;
+                    auto &bgo2 = Background[B];
+                    bgo2 = bgo;
+                    bgo2.Location = w.Exit;
+                    bgo2.Location.Width = 16;
+                    syncLayers_BGO(B);
+                }
             }
         }
     }
