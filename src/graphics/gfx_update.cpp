@@ -1464,7 +1464,12 @@ void UpdateGraphics(bool skipRepaint)
                 if(vScreenCollision(Z, Effect[A].Location))
                 {
                     float cn = Effect[A].Shadow ? 0.f : 1.f;
-                    XRender::renderTexture(vScreenX[Z] + Effect[A].Location.X, vScreenY[Z] + Effect[A].Location.Y, Effect[A].Location.Width, Effect[A].Location.Height, GFXEffect[Effect[A].Type], 0, Effect[A].Frame * EffectHeight[Effect[A].Type], cn, cn, cn);
+                    XRender::renderTexture(vScreenX[Z] + Effect[A].Location.X,
+                                           vScreenY[Z] + Effect[A].Location.Y,
+                                           Effect[A].Location.Width,
+                                           Effect[A].Location.Height,
+                                           GFXEffect[Effect[A].Type], 0,
+                                           Effect[A].Frame * EffectHeight[Effect[A].Type], cn, cn, cn);
                 }
             }
         }
