@@ -121,7 +121,7 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
-option(THEXTECH_ENABLE_TTF_SUPPORT "[NOT IMPLEMENTED YET] Enable TTF fonts support" OFF)
+option(THEXTECH_ENABLE_TTF_SUPPORT "Enable TTF fonts support (FreeType required)" ON)
 
 option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
 
@@ -202,6 +202,11 @@ if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
 
+if(THEXTECH_ENABLE_TTF_SUPPORT)
+    include(cmake/library_HarfBuzz.cmake)
+    include(cmake/library_FreeType.cmake)
+endif()
+
 if(THEXTECH_ENABLE_LUA)
     include(cmake/library_luajit.cmake)
     include(cmake/library_luabind.cmake)
@@ -237,6 +242,11 @@ set(A2XT_INCS src lib 3rdparty)
 set(A2XT_DEPS)
 
 add_library(A2XT_Int INTERFACE)
+
+if(THEXTECH_ENABLE_TTF_SUPPORT)
+    list(APPEND A2XT_DEPS FREETYPE_Local HARFBUZZ_Local)
+    list(APPEND A2XT_LIBS PGE_FreeType PGE_HarfBuzz)
+endif()
 
 if(THEXTECH_ENABLE_LUA)
     list(APPEND A2XT_DEPS LuaBind_Local)
