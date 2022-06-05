@@ -34,7 +34,7 @@ void DrawMessage(const std::string& SuperText)
     int lineStart = 0; // start of current line
     int lastWord = 0; // planned start of next line
     int numLines = 0; // n lines
-    int maxChars = (TextBoxW-24)/charWidth+1; // 27 by default
+    int maxChars = ((TextBoxW - 24) / charWidth) + 1; // 27 by default
 
     // PASS ONE: determine the number of lines
     // Wohlstand's updated algorithm, no substrings, reasonably fast
