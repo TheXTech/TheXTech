@@ -164,6 +164,9 @@ void qSortBackgrounds(int min, int max)
     qSortBackgrounds(lo + 1, max);
 }
 
+// deprecated by block quadtree
+
+#if 0
 void FindBlocks()
 {
     int A = 0;
@@ -199,8 +202,9 @@ void FindBlocks()
         }
         LastBlock[A] = curBlk;
     }
-    BlocksSorted = true;
+    // BlocksSorted = true;
 }
+#endif
 
 void BlockSort()
 {

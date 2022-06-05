@@ -487,7 +487,7 @@ public:
         insert(0x00B2C882, &MenuMode); // Current menu mode
 
         // insert(0x00B2C884, ???}; // Key Released!!!
-        insert(0x00B2C894, &BlocksSorted);
+        // insert(0x00B2C894, &BlocksSorted); // removed by block quadtree
         insert(0x00B2C8B4, &FreezeNPCs);
 
         insert(0x00B2C8C4, &Cheater);

@@ -3086,7 +3086,9 @@ void UpdateNPCs()
                                     }
                                     else
                                     {
-                                        if((bCheck == 2 || BlocksSorted) && PSwitchTime == 0)
+                                        // the returned collision list is always sorted by location now
+                                        // if((bCheck == 2 || BlocksSorted) && PSwitchTime == 0)
+                                        if(PSwitchTime == 0)
                                             break;
                                     }
                                 }

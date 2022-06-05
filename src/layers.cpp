@@ -1135,7 +1135,7 @@ void UpdateLayers()
     // this is mainly for moving layers
     int A = 0;
     int B = 0;
-    int C = 0;
+    // int C = 0;
 
     bool FreezeLayers = false;
 
@@ -1209,7 +1209,9 @@ void UpdateLayers()
                 Layer[A].OffsetX += double(Layer[A].SpeedX);
                 Layer[A].OffsetY += double(Layer[A].SpeedY);
 
+                // no longer needed thanks to block quadtree
                 // move the sort invalidation out of the loop over blocks
+#if 0
                 if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f)
                 {
                     if(BlocksSorted)
@@ -1222,6 +1224,7 @@ void UpdateLayers()
                         BlocksSorted = false;
                     }
                 }
+#endif
 
                 for(int B : Layer[A].blocks)
                 {

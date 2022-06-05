@@ -69,6 +69,10 @@ const int maxStarsNum = 1000;
 
 const int maxLocalPlayers = 2;
 
+// was previously changed to 10000; now only used for certain NPC bounds checking.
+// returned to 8000.
+const int FLBlocks = 8000;
+
 //Public Const vScreenYOffset As Integer = 0     'Players Y on the screen
 const int vScreenYOffset = 0;
 //Public Const maxBlocks As Integer = 20000  'Max # of blocks

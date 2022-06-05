@@ -471,8 +471,9 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc,
 }
 
 /* ================= Tile block search ================= */
-// the old ones, still good for now
+// removed in favor of block quadtree
 
+#if 0
 void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock)
 {
     int f = vb6Round(loc.X / 32) - 1;
@@ -488,3 +489,4 @@ void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock)
     fBlock = FirstBlock[f < -FLBlocks ? -FLBlocks : f];
     lBlock = LastBlock[l > FLBlocks ? FLBlocks : l];
 }
+#endif
