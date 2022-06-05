@@ -400,13 +400,10 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
     {
         // skip empty layers except the tempBlock layer
         if(layer > numLayers && layer != maxLayers + 1)
-        {
             layer = maxLayers + 1;
-            continue;
-        }
 
         double OffsetX, OffsetY;
-        if(layer == maxLayers+1)
+        if(layer == maxLayers + 1)
             OffsetX = OffsetY = 0.0;
         else
         {
