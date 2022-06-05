@@ -279,14 +279,12 @@ void TtfFont::printText(const std::string &text,
             // GlRenderer::setTextureColor(Red, Green, Blue, Alpha);
             int32_t glyph_x = x + static_cast<int32_t>(offsetX);
             int32_t glyph_y = y + static_cast<int32_t>(offsetY + fontSize);
-            XRender::renderTexture(
+            XRender::renderTextureScale(
                 static_cast<float>(glyph_x + glyph.left),
                 static_cast<float>(glyph_y - glyph.top),
                 (doublePixel ? (glyph.width * 2) : glyph.width),
                 (doublePixel ? (glyph.height * 2) : glyph.height),
                 *glyph.tx,
-                0,
-                0,
                 Red, Green, Blue, Alpha
             );
 //            GlRenderer::renderTexture(glyph.tx,
@@ -323,14 +321,12 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
     {
         int32_t glyph_x = x;
         int32_t glyph_y = y + static_cast<int32_t>(fontSize);
-        XRender::renderTexture(
+        XRender::renderTextureScale(
             static_cast<float>(glyph_x + glyph.left),
             static_cast<float>(glyph_y - glyph.top),
             glyph.width * static_cast<float>(scaleSize),
             glyph.height * static_cast<float>(scaleSize),
             *glyph.tx,
-            0,
-            0,
             Red, Green, Blue, Alpha
         );
         return glyph.width;
