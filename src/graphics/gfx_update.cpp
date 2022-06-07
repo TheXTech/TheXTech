@@ -1600,7 +1600,12 @@ void UpdateGraphics(bool skipRepaint)
                 if(vScreenCollision(Z, Effect[A].Location))
                 {
                     float cn = Effect[A].Shadow ? 0.f : 1.f;
-                    XRender::renderTexture(vScreenX[Z] + Effect[A].Location.X, vScreenY[Z] + Effect[A].Location.Y, Effect[A].Location.Width, Effect[A].Location.Height, GFXEffect[Effect[A].Type], 0, Effect[A].Frame * EffectHeight[Effect[A].Type], cn, cn, cn);
+                    XRender::renderTexture(vScreenX[Z] + Effect[A].Location.X,
+                                           vScreenY[Z] + Effect[A].Location.Y,
+                                           Effect[A].Location.Width,
+                                           Effect[A].Location.Height,
+                                           GFXEffect[Effect[A].Type], 0,
+                                           Effect[A].Frame * EffectHeight[Effect[A].Type], cn, cn, cn);
                 }
             }
         }
@@ -2034,9 +2039,11 @@ void UpdateGraphics(bool skipRepaint)
 //                        BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffectMask(.Type), 0, .Frame * EffectHeight(.Type), vbSrcAnd
 //                        If .Shadow = False Then BitBlt myBackBuffer, vScreenX(Z) + .Location.X, vScreenY(Z) + .Location.Y, .Location.Width, .Location.Height, GFXEffect(.Type), 0, .Frame * EffectHeight(.Type), vbSrcPaint
                     float c = e.Shadow ? 0.f : 1.f;
-                    XRender::renderTexture(int(vScreenX[Z] + e.Location.X), int(vScreenY[Z] + e.Location.Y),
-                                          int(e.Location.Width), int(e.Location.Height),
-                                          GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], c, c, c);
+                    XRender::renderTexture(vb6Round(vScreenX[Z] + e.Location.X),
+                                           vb6Round(vScreenY[Z] + e.Location.Y),
+                                           vb6Round(e.Location.Width),
+                                           vb6Round(e.Location.Height),
+                                           GFXEffectBMP[e.Type], 0, e.Frame * EffectHeight[e.Type], c, c, c);
 //                    End If
                 }
 //                End If

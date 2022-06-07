@@ -4450,14 +4450,12 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
     if(warp.Stars > numStars && canWarp)
     {
         if(warp.StarsMsg == STRINGINDEX_NONE)
-        {
-            if(warp.Stars == 1)
-                MessageText = "You need 1 star to enter.";
-            else
-                MessageText = fmt::format_ne("You need {0} stars to enter.", warp.Stars);
-        } else {
+            MessageText = (warp.Stars == 1) ?
+                              "You need 1 star to enter." :
+                              fmt::format_ne("You need {0} stars to enter.", warp.Stars);
+        else
             MessageText = GetS(warp.StarsMsg);
-        }
+
         PauseGame(PauseCode::Message, A);
         MessageText.clear();
         canWarp = false;
@@ -4482,7 +4480,8 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                 {
                     if(Background[C].Type == 98)
                     {
-                        if(CheckCollision(entrance, Background[C].Location))
+                        if(CheckCollision(entrance, Background[C].Location) ||
+                           (warp.twoWay && CheckCollision(exit, Background[C].Location)))
                         {
                             // this makes Background[C] disappear and never reappear
                             Background[C].Layer = LAYER_NONE;
@@ -4505,7 +4504,8 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                 {
                     if(Background[C].Type == 98)
                     {
-                        if(CheckCollision(entrance, Background[C].Location))
+                        if(CheckCollision(entrance, Background[C].Location) ||
+                           (warp.twoWay && CheckCollision(exit, Background[C].Location)))
                         {
                             // this makes Background[C] disappear and never reappear
                             Background[C].Layer = LAYER_NONE;
@@ -4524,7 +4524,8 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                 {
                     if(Background[C].Type == 98)
                     {
-                        if(CheckCollision(entrance, Background[C].Location))
+                        if(CheckCollision(entrance, Background[C].Location) ||
+                           (warp.twoWay && CheckCollision(exit, Background[C].Location)))
                         {
                             // this makes Background[C] disappear and never reappear
                             Background[C].Layer = LAYER_NONE;
