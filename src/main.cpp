@@ -150,11 +150,6 @@ int main(int argc, char**argv)
     CrashHandler::initSigs();
 #endif
 
-    AppPathManager::initAppPath();
-    AppPath = AppPathManager::assetsRoot();
-
-    OpenConfig_preSetup();
-
     testPlayer.fill(Player_t());
     for(int i = 1; i <= maxLocalPlayers; i++)
     {
@@ -298,10 +293,14 @@ int main(int argc, char**argv)
         std::string customAssets = customAssetsPath.getValue();
 
         if(!customAssets.empty())
-        {
             AppPathManager::setAssetsRoot(customAssets);
-            AppPath = AppPathManager::assetsRoot();
-        }
+
+        // TODO: Add the custom user directory path here
+
+        AppPathManager::initAppPath();
+        AppPath = AppPathManager::assetsRoot();
+
+        OpenConfig_preSetup();
 
         if(switchDisableFrameSkip.isSet())
             setup.frameSkip = !switchDisableFrameSkip.getValue();
