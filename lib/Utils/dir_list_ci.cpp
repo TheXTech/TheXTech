@@ -17,9 +17,14 @@ DirListCI::DirListCI(std::string curDir) noexcept
 
 void DirListCI::setCurDir(const std::string &path)
 {
-    if(path != m_curDir)
+    auto nPath = path;
+
+    if(nPath.empty() || nPath.back() != '/')
+        nPath.push_back('/');
+
+    if(nPath != m_curDir)
     {
-        m_curDir = path;
+        m_curDir = nPath;
         rescan();
     }
 }
@@ -64,7 +69,7 @@ bool DirListCI::existsCI(const std::string &in_name)
     {
         // THIS BEHAVIOR IS EXPENSIVE AND WASTEFUL, AVOID INVOKING AT ALL COSTS!!!
         auto sdName = resolveDirCase(name.substr(0, subDir));
-        DirListCI sd(m_curDir + "/" + sdName);
+        DirListCI sd(m_curDir + sdName);
         return sd.existsCI(name.substr(subDir + 1));
     }
 
@@ -105,12 +110,12 @@ std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
     {
         // THIS BEHAVIOR IS EXPENSIVE AND WASTEFUL, AVOID INVOKING AT ALL COSTS!!!
         auto sdName = resolveDirCase(name.substr(0, subDir));
-        DirListCI sd(m_curDir + "/" + sdName);
+        DirListCI sd(m_curDir + sdName);
         std::string found = sd.resolveFileCaseExists(name.substr(subDir + 1));
         if(found.empty())
             return "";
         else
-            return sdName + "/" + found;
+            return sdName + found;
     }
 
     // keep MixerX path arguments untouched
@@ -166,7 +171,7 @@ std::string DirListCI::resolveFileCaseAbs(const std::string &in_name)
     if(found.empty())
         replaceSlashes(found, in_name);
 
-    return m_curDir + "/" + found;
+    return m_curDir + found;
 }
 
 std::string DirListCI::resolveFileCaseExistsAbs(const std::string &in_name)
@@ -181,7 +186,7 @@ std::string DirListCI::resolveFileCaseExistsAbs(const std::string &in_name)
     if(found.empty())
         return found;
 
-    return m_curDir + "/" + found;
+    return m_curDir + found;
 }
 
 std::string DirListCI::resolveDirCase(const std::string &name)
