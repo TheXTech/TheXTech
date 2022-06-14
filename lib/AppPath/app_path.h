@@ -35,6 +35,7 @@ public:
     static std::string userAppDirSTD(); // Must be writable
     static std::string assetsRoot(); // Read-Only
     static void setAssetsRoot(const std::string &root);
+    static void setUserDirectory(const std::string &root);
     static std::string logsDir(); // Must be writable
     static std::string languagesDir(); // Read-Only
     static std::string screenshotsDir(); // Must be writable
@@ -63,6 +64,8 @@ private:
     static std::string m_userPath;
     //! Location for read-only custom assets root
     static std::string m_customAssetsRoot;
+    //! Location for writable custom user directory
+    static std::string m_customUserDirectory;
 #ifdef __APPLE__
     static std::string m_userDataRoot; // A game media root at home directory
 #endif

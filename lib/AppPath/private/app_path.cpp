@@ -112,6 +112,7 @@ std::string ApplicationPathSTD;
 std::string AppPathManager::m_settingsPath;
 std::string AppPathManager::m_userPath;
 std::string AppPathManager::m_customAssetsRoot;
+std::string AppPathManager::m_customUserDirectory;
 
 #if defined(__APPLE__)
 //! The name of application bundle to be re-used as the user directory name
@@ -325,6 +326,14 @@ void AppPathManager::initAppPath()
     loadCustomState();
 #endif
 
+    // When user directory is redefined externally
+    if(!m_customUserDirectory.empty())
+    {
+        m_userPath = m_customUserDirectory;
+        initSettingsPath();
+        return;
+    }
+
     if(checkPortable())
         return;
 
@@ -447,6 +456,13 @@ void AppPathManager::setAssetsRoot(const std::string &root)
     m_customAssetsRoot = root;
     if(!m_customAssetsRoot.empty() && m_customAssetsRoot.back() != '/')
         m_customAssetsRoot.push_back('/');
+}
+
+void AppPathManager::setUserDirectory(const std::string& root)
+{
+    m_customUserDirectory = root;
+    if(!m_customUserDirectory.empty() && m_customUserDirectory.back() != '/')
+        m_customUserDirectory.push_back('/');
 }
 
 std::string AppPathManager::logsDir() // Writable

@@ -168,6 +168,10 @@ int main(int argc, char**argv)
                                                       "directory path",
                                                       cmd);
 
+        TCLAP::ValueArg<std::string> customUserDirectory("u", "user-directory", "Specify the different writable user directory to store settings, gamesaves, logs, screenshots, etc.",
+                                                         false, "",
+                                                         "directory path",
+                                                         cmd);
 
         TCLAP::SwitchArg switchFrameSkip("f", "frameskip", "Enable frame skipping mode", false);
         TCLAP::SwitchArg switchDisableFrameSkip(std::string(), "no-frameskip", "Disable frame skipping mode", false);
@@ -290,17 +294,26 @@ int main(int argc, char**argv)
 
         cmd.parse(argc, argv);
 
-        std::string customAssets = customAssetsPath.getValue();
 
-        if(!customAssets.empty())
-            AppPathManager::setAssetsRoot(customAssets);
+        // Initialize the assets and user paths
+        {
+            std::string customAssets = customAssetsPath.getValue();
+            std::string customUserDir = customUserDirectory.getValue();
 
-        // TODO: Add the custom user directory path here
+            if(!customAssets.empty())
+                AppPathManager::setAssetsRoot(customAssets);
 
-        AppPathManager::initAppPath();
-        AppPath = AppPathManager::assetsRoot();
+            if(!customUserDir.empty())
+                AppPathManager::setUserDirectory(customUserDir);
+
+            AppPathManager::initAppPath();
+            AppPath = AppPathManager::assetsRoot();
+        }
 
         OpenConfig_preSetup();
+
+
+        // Set other settings
 
         if(switchDisableFrameSkip.isSet())
             setup.frameSkip = !switchDisableFrameSkip.getValue();
