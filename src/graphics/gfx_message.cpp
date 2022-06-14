@@ -1,7 +1,11 @@
-#include "globals.h"
+﻿#include "globals.h"
 #include "../graphics.h"
 #include "core/render.h"
 #include "../gfx.h"
+#include "fontman/font_manager_private.h"
+#include "fontman/font_manager.h"
+
+// #define USE_OLD_TEXT_PARSER
 
 // based on Wohlstand's improved algorithm, but screen-size aware
 void DrawMessage(const std::string& SuperText)
@@ -34,19 +38,30 @@ void DrawMessage(const std::string& SuperText)
     int lineStart = 0; // start of current line
     int lastWord = 0; // planned start of next line
     int numLines = 0; // n lines
-    int maxChars = ((TextBoxW - 24) / charWidth) + 1; // 27 by default
+    const int maxChars = ((TextBoxW - 24) / charWidth) + 1; // 27 by default
+    const int textSize = static_cast<int>(SuperText.size());
+
+#ifndef USE_OLD_TEXT_PARSER
+    const int textSizeU = FontManager::utf8_strlen(SuperText);
+    int lineStartU = 0;
+    int lastWordU = 0;
+#endif
 
     // PASS ONE: determine the number of lines
     // Wohlstand's updated algorithm, no substrings, reasonably fast
-    while(lineStart < int(SuperText.size()))
+    while(lineStart < textSize)
     {
         lastWord = lineStart;
+#ifndef USE_OLD_TEXT_PARSER
+        lastWordU = lineStartU;
+#endif
 
+#ifdef USE_OLD_TEXT_PARSER
         for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
         {
             auto c = SuperText[size_t(i) - 1];
 
-            if((lastWord == lineStart && i == lineStart+maxChars) || i == int(SuperText.size()) || c == '\n')
+            if((lastWord == lineStart && i == lineStart+maxChars) || i == textSize || c == '\n')
             {
                 lastWord = i;
                 break;
@@ -56,9 +71,68 @@ void DrawMessage(const std::string& SuperText)
                 lastWord = i;
             }
         }
+#else
+        const char *strIt  = SuperText.c_str() + lineStart;
+        const char *strEnd = strIt + SuperText.size();
+        int count = lineStart;
+
+        for(; strIt < strEnd; strIt++)
+        {
+            const char &cx = *strIt;
+            UTF8 ucx = static_cast<unsigned char>(cx);
+
+            if(count == maxChars || cx == '\n')
+            {
+                lastWord = count;
+                break;
+            }
+            count++;
+
+            if(cx == ' ')
+                lastWord = count;
+
+            strIt += static_cast<size_t>(trailingBytesForUTF8[ucx]);
+        }
+
+        if(strIt >= strEnd)
+        {
+            lastWord = count;
+        }
+
+//        for(int i = lineStart + 1 + b1, iU = lineStartU + 1;
+//            iU <= lineStartU + maxChars;
+//            i++, iU++)
+//        {
+//            SDL_assert(i <= textSize);
+//            auto c = SuperText[size_t(i - (1 + b1))];
+//            uint8_t b = trailingBytesForUTF8[static_cast<UTF8>(c)];
+
+//            if(
+//                (lastWordU == lineStartU && iU == lineStartU + maxChars) ||
+//                (iU == textSizeU) ||
+//                (b == 0 && c == '\n')
+//            )
+//            {
+//                lastWord = i;//i + 1;
+//                lastWordU = iU;
+//                break;
+//            }
+//            else if(b == 0 && c == ' ')
+//            {
+//                lastWord = i;
+//                lastWordU = iU;
+//            }
+
+//            i += b;
+//            b1 = b;
+//        }
+#endif
 
         numLines ++;
         lineStart = lastWord;
+#ifndef USE_OLD_TEXT_PARSER
+        lineStartU = lastWordU;
+#endif
     }
 
     // Draw the background now we know how many lines there are.
@@ -111,15 +185,23 @@ void DrawMessage(const std::string& SuperText)
     bool firstLine = true;
     BoxY = BoxY_Start + 10;
     lineStart = 0; // start of current line
+#ifndef USE_OLD_TEXT_PARSER
+    lineStartU = 0;
+#endif
 
-    while(lineStart < int(SuperText.size()))
+    while(lineStart < textSize)
     {
         lastWord = lineStart;
+#ifndef USE_OLD_TEXT_PARSER
+        lastWordU = lineStartU;
+#endif
+
+#ifdef USE_OLD_TEXT_PARSER
         for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
         {
             auto c = SuperText[size_t(i) - 1];
 
-            if((lastWord == lineStart && i == lineStart+maxChars) || i == int(SuperText.size()) || c == '\n')
+            if((lastWord == lineStart && i == lineStart+maxChars) || i == textSize || c == '\n')
             {
                 lastWord = i;
                 break;
@@ -144,8 +226,60 @@ void DrawMessage(const std::string& SuperText)
                 ScreenW/2 - TextBoxW / 2 + 12,
                 BoxY);
         }
+#else
+        auto c1 = SuperText[0];
+        uint8_t b1 = trailingBytesForUTF8[static_cast<UTF8>(c1)];
+
+        for(int i = lineStart + 1 + b1, iU = lineStartU + 1;
+            iU <= lineStartU + maxChars;
+            i++, iU++)
+        {
+            SDL_assert(i <= textSize);
+            auto c = SuperText[size_t(i - (1 + b1))];
+            uint8_t b = trailingBytesForUTF8[static_cast<UTF8>(c)];
+
+            if(
+                (lastWordU == lineStartU && iU == lineStartU + maxChars) ||
+                (iU == textSizeU) ||
+                (b == 0 && c == '\n')
+            )
+            {
+                lastWord = i;//i + 1;
+                lastWordU = iU;
+                break;
+            }
+            else if(b == 0 && c == ' ')
+            {
+                lastWord = i;
+                lastWordU = iU;
+            }
+
+            i += b;
+            b1 = b;
+        }
+
+        if(lastWord == textSize && firstLine)
+        {
+            SuperPrint(size_t(lastWordU) - size_t(lineStartU),
+                       SuperText.c_str() + size_t(lineStart),
+                       4,
+                       ScreenW / 2 - ((lastWordU - lineStartU) * charWidth) / 2,
+                       BoxY);
+        }
+        else
+        {
+            SuperPrint(size_t(lastWordU) - size_t(lineStartU),
+                       SuperText.c_str() + size_t(lineStart),
+                       4,
+                       ScreenW / 2 - TextBoxW / 2 + 12,
+                       BoxY);
+        }
+#endif
 
         lineStart = lastWord;
+#ifndef USE_OLD_TEXT_PARSER
+        lineStartU = lastWordU;
+#endif
         BoxY += lineHeight;
         firstLine = false;
     }
