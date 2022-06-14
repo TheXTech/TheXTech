@@ -194,6 +194,7 @@ include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
 include(lib/Logger/logger.cmake)
+include(lib/AppPath/app_path.cmake)
 include(lib/tclap/tclap.cmake)
 include(lib/md5/md5.cmake)
 if(WIN32)
@@ -276,7 +277,7 @@ target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 set(LIB_SRC
     lib/util.cpp
     lib/fader.cpp
-    lib/AppPath/app_path.cpp
+    ${APPPATH_SRCS}
     ${DIRMANAGER_SRCS}
     ${FMT_SRCS}
     ${MD5_SRCS}
@@ -311,7 +312,6 @@ endif()
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
     list(APPEND LIB_SRC
-        lib/AppPath/app_path_macosx.m
         resources/thextech.icns
         ${PGE_FILE_ICONS}
     )

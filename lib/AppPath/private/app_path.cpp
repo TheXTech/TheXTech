@@ -104,8 +104,8 @@ static void saveCustomState()
 }
 #endif
 
-#include "app_path.h"
-#include "../version.h"
+#include "../app_path.h"
+#include "../../version.h"
 
 std::string ApplicationPathSTD;
 
