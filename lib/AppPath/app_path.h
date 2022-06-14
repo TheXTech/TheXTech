@@ -22,8 +22,6 @@
 
 #include <string>
 
-extern std::string  ApplicationPathSTD;
-
 class AppPathManager
 {
 public:

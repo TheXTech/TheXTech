@@ -107,7 +107,7 @@ static void saveCustomState()
 #include "../app_path.h"
 #include "../../version.h"
 
-std::string ApplicationPathSTD;
+static std::string ApplicationPathSTD;
 
 std::string AppPathManager::m_settingsPath;
 std::string AppPathManager::m_userPath;
