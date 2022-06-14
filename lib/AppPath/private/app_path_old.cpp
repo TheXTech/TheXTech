@@ -110,7 +110,13 @@ static void saveCustomState()
 static std::string ApplicationPathSTD;
 
 std::string AppPathManager::m_settingsPath;
+std::string AppPathManager::m_assetsPath;
 std::string AppPathManager::m_userPath;
+
+std::string AppPathManager::m_screenshotsPath;
+std::string AppPathManager::m_gifrecordingsPath;
+std::string AppPathManager::m_logsPath;
+
 std::string AppPathManager::m_customAssetsRoot;
 std::string AppPathManager::m_customUserDirectory;
 
@@ -467,7 +473,7 @@ void AppPathManager::setUserDirectory(const std::string& root)
 
 std::string AppPathManager::logsDir() // Writable
 {
-    return m_userPath + "logs";
+    return m_userPath + "logs/";
 }
 
 std::string AppPathManager::languagesDir() // Readable
@@ -485,10 +491,10 @@ std::string AppPathManager::languagesDir() // Readable
     return path;
 
 #elif defined(__ANDROID__)
-    return AppPathManager::assetsRoot() + "languages";
+    return AppPathManager::assetsRoot() + "languages/";
 
 #else
-    return ApplicationPathSTD + "languages";
+    return ApplicationPathSTD + "languages/";
 
 #endif
 }
@@ -496,7 +502,7 @@ std::string AppPathManager::languagesDir() // Readable
 std::string AppPathManager::screenshotsDir() // Writable
 {
 #ifndef __APPLE__
-    return m_userPath + "screenshots";
+    return m_userPath + "screenshots/";
 
 #else
     std::string path = m_userPath;
@@ -506,7 +512,7 @@ std::string AppPathManager::screenshotsDir() // Writable
         path = base_path;
         SDL_free(base_path);
     }
-    return path + "/TheXTech Game Screenshots";
+    return path + "/TheXTech Game Screenshots/";
 
 #endif
 }
@@ -514,7 +520,7 @@ std::string AppPathManager::screenshotsDir() // Writable
 std::string AppPathManager::gifRecordsDir() // Writable
 {
 #ifndef __APPLE__
-    return m_userPath + "gif-recordings";
+    return m_userPath + "gif-recordings/";
 
 #else
     std::string path = m_userPath;
@@ -524,36 +530,36 @@ std::string AppPathManager::gifRecordsDir() // Writable
         path = base_path;
         SDL_free(base_path);
     }
-    return path + "/TheXTech Game Screenshots/gif-recordings";
+    return path + "/TheXTech Game Screenshots/gif-recordings/";
 
 #endif
 }
 
 std::string AppPathManager::gameSaveRootDir() // Writable
 {
-    return m_settingsPath + "gamesaves";
+    return m_settingsPath + "gamesaves/";
 }
 
 std::string AppPathManager::gameplayRecordsRootDir() // Writable
 {
-    return m_userPath + "gameplay-records";
+    return m_userPath + "gameplay-records/";
 }
 
 std::string AppPathManager::userWorldsRootDir() // Readable
 {
 #ifdef __APPLE__
-    return m_userDataRoot + "worlds";
+    return m_userDataRoot + "worlds/";
 #else
-    return m_userPath + "worlds";
+    return m_userPath + "worlds/";
 #endif
 }
 
 std::string AppPathManager::userBattleRootDir() // Readable
 {
 #ifdef __APPLE__
-    return m_userDataRoot + "battle";
+    return m_userDataRoot + "battle/";
 #else
-    return m_userPath + "battle";
+    return m_userPath + "battle/";
 #endif
 }
 

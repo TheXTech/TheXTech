@@ -36,7 +36,8 @@
 
 std::string makeGameSavePath(std::string episode, std::string world, std::string saveFile)
 {
-    std::string gameSaveDir = AppPathManager::gameSaveRootDir() + "/"+ Files::basename(Files::dirname(episode + world));
+    std::string gameSaveDir = AppPathManager::gameSaveRootDir() + Files::basename(Files::dirname(episode + world));
+
     if(!DirMan::exists(gameSaveDir))
         DirMan::mkAbsPath(gameSaveDir);
 
