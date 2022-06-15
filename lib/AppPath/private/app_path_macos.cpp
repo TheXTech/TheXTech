@@ -98,7 +98,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         if(!appSupport.empty() && appSupport.back() != '/')
             appSupport.push_back('/');
 
-        const char *homeDir = std::getenv("HOME");
+        const char *homeDir = SDL_getenv("HOME");
         if(homeDir)
         {
             s_userDirectory = std::string(homeDir) + "/TheXTech Games/" + s_bundleName;
