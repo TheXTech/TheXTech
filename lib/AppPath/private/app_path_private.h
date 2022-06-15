@@ -67,6 +67,14 @@ extern std::string gifRecsRoot();
 extern std::string logsRoot();
 
 /*!
+ * \brief Reports does platform supports portable mode
+ * \return true if Portable mode is supported
+ *
+ * When it returns false, the "thextech.ini" with "force-portable" flag will never been checked
+ */
+extern bool portableAvailable();
+
+/*!
  * \brief Run the FS synchronization (Emscripten only)
  */
 extern void syncFS();

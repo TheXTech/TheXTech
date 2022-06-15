@@ -88,7 +88,7 @@ void AppPathManager::initAppPath()
         return;
     }
 
-    if(checkPortable())
+    if(AppPathP::portableAvailable() && checkPortable())
         return;
 
 #if defined(FIXED_ASSETS_PATH) // Fixed assets path, for the rest of UNIX-like OS packages
@@ -279,7 +279,7 @@ void AppPathManager::install()
 
 bool AppPathManager::userDirIsAvailable()
 {
-    return (m_userPath != assetsRoot());
+    return (m_userPath != m_assetsPath);
 }
 
 void AppPathManager::syncFs()

@@ -121,5 +121,13 @@ std::string AppPathP::logsRoot()
     return std::string();
 }
 
+bool AppPathP::portableAvailable()
+{
+    /*
+     * Report, does this platfor support portable mode or not
+     */
+    return true;
+}
+
 void AppPathP::syncFS()
 {}
