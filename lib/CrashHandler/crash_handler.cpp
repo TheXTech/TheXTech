@@ -40,6 +40,13 @@
 #include <unistd.h>
 #endif
 
+#ifdef __APPLE__
+#include <stdbool.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sys/sysctl.h>
+#endif
+
 #ifdef _WIN32
 #include <windows.h>
 #endif
@@ -49,7 +56,7 @@
 #ifdef PGE_ENGINE_DEBUG
 static int isDebuggerPresent()
 {
-#ifdef __gnu_linux__
+#if defined(__gnu_linux__)
     const size_t buf_size = 2048;
     char buf[buf_size];
     int debugger_present = 0;
@@ -74,10 +81,42 @@ static int isDebuggerPresent()
             debugger_present = static_cast<bool>(SDL_atoi(tracer_pid + sizeof(TracerPid) - 1));
     }
     return debugger_present;
-#endif // __gnu_linux__
 
-#ifdef _WIN32
+#elif defined(__APPLE__)
+    // https://stackoverflow.com/a/2200786/5618998
+    int                 junk;
+    int                 mib[4];
+    struct kinfo_proc   info;
+    size_t              size;
+
+    // Initialize the flags so that, if sysctl fails for some bizarre
+    // reason, we get a predictable result.
+
+    info.kp_proc.p_flag = 0;
+
+    // Initialize mib, which tells sysctl the info we want, in this case
+    // we're looking for information about a specific process ID.
+
+    mib[0] = CTL_KERN;
+    mib[1] = KERN_PROC;
+    mib[2] = KERN_PROC_PID;
+    mib[3] = getpid();
+
+    // Call sysctl.
+
+    size = sizeof(info);
+    junk = sysctl(mib, sizeof(mib) / sizeof(*mib), &info, &size, NULL, 0);
+    SDL_assert(junk == 0);
+
+    // We're being debugged if the P_TRACED flag is set.
+
+    return ( (info.kp_proc.p_flag & P_TRACED) != 0 );
+
+#elif defined(_WIN32)
     return IsDebuggerPresent();
+
+#else
+    return 0; // Unknown platform
 #endif
 }
 #endif
@@ -236,8 +275,10 @@ static std::string getCurrentUserName()
     size_t nCnt = WideCharToMultiByte(CP_UTF8, 0, userNameW, usernameLen, userName, 256, 0, 0);
     userName[nCnt] = '\0';
     user = std::string(userName);
+
 #elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__HAIKU__)
     user = "user"; // No way to get user, here is SINGLE generic user
+
 #else
     struct passwd *pwd = getpwuid(getuid());
     if(pwd == nullptr)
@@ -259,8 +300,10 @@ static std::string getCurrentHomePath()
     size_t nCnt = WideCharToMultiByte(CP_UTF8, 0, homeDirW, -1, homeDir, MAX_PATH * 4, 0, 0);
     homeDir[nCnt] = '\0';
     homedir = std::string(homeDir);
+
 #elif defined(__EMSCRIPTEN__) || defined(__ANDROID__)
     homedir = "/"; // No way to get user, here is SINGLE generic user
+
 #elif defined(__HAIKU__)
     {
         const char *home = SDL_getenv("HOME");
@@ -304,6 +347,7 @@ static void removePersonalData(std::string &log)
         replaceStr(log, homePath, "{...}");
 #endif
     }
+
     replaceStr(log, user, "anonymouse");
 }
 
@@ -319,6 +363,7 @@ static std::string getStacktrace()
     void  *array[400];
     int size;
     char **strings;
+
     D_pLogDebugNA("Requesting backtrace...");
     size = backtrace(array, 400);
     D_pLogDebugNA("Converting...");
@@ -351,11 +396,11 @@ static std::string getStacktrace()
 
 
 #ifdef __GNUC__
-#define LLVM_ATTRIBUTE_NORETURN __attribute__((noreturn))
+#   define LLVM_ATTRIBUTE_NORETURN __attribute__((noreturn))
 #elif defined(_MSC_VER)
-#define LLVM_ATTRIBUTE_NORETURN //__declspec(noreturn)
+#   define LLVM_ATTRIBUTE_NORETURN //__declspec(noreturn)
 #else
-#define LLVM_ATTRIBUTE_NORETURN
+#   define LLVM_ATTRIBUTE_NORETURN
 #endif
 
 static LLVM_ATTRIBUTE_NORETURN void abortEngine(int signal)
@@ -411,13 +456,13 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByFlood()
     abortEngine(-2);
 }
 
-#ifdef _WIN32//Unsupported signals by Windows
+#ifdef _WIN32 // Unsupported signals by Windows
 struct siginfo_t;
 #endif
 
 static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
 {
-#ifdef _WIN32  //Unsupported signals by Windows
+#ifdef _WIN32  // Unsupported signals by Windows
     (void)siginfo;
 #endif
 
@@ -653,7 +698,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     }
 }
 
-#ifndef _WIN32//Unsupported signals by Windows
+#ifndef _WIN32 // Unsupported signals by Windows
 static struct sigaction act;
 #else
 struct siginfo_t;
@@ -669,12 +714,12 @@ void CrashHandler::initSigs()
 {
 #ifdef PGE_ENGINE_DEBUG
     if(isDebuggerPresent())
-        return;//Don't initialize crash handlers on attached debugger
+        return; // Don't initialize crash handlers on attached debugger
 #endif
 
     std::set_new_handler(&crashByFlood);
     std::set_terminate(&crashByUnhandledException);
-#ifndef _WIN32//Unsupported signals by Windows
+#ifndef _WIN32 // Unsupported signals by Windows
     memset(&act, 0, sizeof(struct sigaction));
     sigemptyset(&act.sa_mask);
     act.sa_sigaction = handle_signal;
