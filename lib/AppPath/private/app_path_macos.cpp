@@ -125,7 +125,6 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     // Assets directory
 #if defined(USE_BUNDLED_ASSETS) // When its release game with assets shipped with a game
     {
-        std::string path;
         CFURLRef appUrlRef;
         appUrlRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("assets"), NULL, NULL);
         CFStringRef filePathRef = CFURLGetString(appUrlRef);
