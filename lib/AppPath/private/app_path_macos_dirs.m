@@ -23,7 +23,7 @@
 #include <SDL2/SDL_error.h>
 #include <SDL2/SDL_filesystem.h>
 
-#include "app_path_macosx.h"
+#include "app_path_macos_dirs.h"
 
 char * getAppSupportDir(void)
 { @autoreleasepool

@@ -45,7 +45,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
 #include <PGE_File_Formats/pge_file_lib_private.h>//It's only exception for macOS here to get URL-Decode. Never include this!
-#include "app_path_macosx.h"
+#include "app_path_macos_dirs.h"
 #endif
 
 #ifdef __gnu_linux__
