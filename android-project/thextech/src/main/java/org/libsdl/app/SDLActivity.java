@@ -66,8 +66,13 @@ import ru.wohlsoft.thextech.BuildConfig;
 public class SDLActivity extends Activity implements View.OnSystemUiVisibilityChangeListener {
     private static final String TAG = "SDL";
 
-    public static void debugSource(int s, int id, String name, String prefix) {
-        int s_copy = s;
+    // Display InputType.SOURCE/CLASS of events and devices
+    //
+    // SDLActivity.debugSource(device.getSources(), "device[" + device.getName() + "]");
+    // SDLActivity.debugSource(event.getSource(), "event");
+    public static void debugSource(int sources, int id, String name, String prefix) {
+        int s = sources;
+        int s_copy = sources;
         String cls = "";
         String src = "";
         int tst = 0;
@@ -87,7 +92,6 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
                 | InputDevice.SOURCE_CLASS_POSITION
                 | InputDevice.SOURCE_CLASS_TRACKBALL);
 
-        // Everything has been processed
         if (s2 != 0) cls += "Some_Unkown";
 
         s2 = s_copy & InputDevice.SOURCE_ANY; // keep source only, no class;
@@ -159,15 +163,9 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         if ((s & tst) == tst) src += " ANY";
         s2 &= ~tst;
 
-
-        /* Private flag that indicates when the system has detected that
-         * this key event may be inconsistent with respect to the sequence of
-         * previously delivered key events, such as when a key up event is sent but the key
-         * was not down.*/
         if (s == FLAG_TAINTED) src += " FLAG_TAINTED";
         s2 &= ~FLAG_TAINTED;
 
-        // Everything has been processed
         if (s2 != 0) src += " Some_Unkown";
 
         thextechDebugLog(prefix + " name=[" + name + "] id=" + String.format(Locale.ROOT, "%d", id) + " value=" + s_copy + " CLASS={" + cls + " } source(s):" + src);
@@ -1316,27 +1314,27 @@ public class SDLActivity extends Activity implements View.OnSystemUiVisibilityCh
         for (int id : ids) {
             InputDevice device = InputDevice.getDevice(id);
 
-            if (device != null) {
-                if (BuildConfig.DEBUG) {
-                    debugSource(device.getSources(), id, device.getName(), "device available");
-                }
+            if (device != null && BuildConfig.DEBUG) {
+                debugSource(device.getSources(), id, device.getName(), "device available");
+            }
 
-                /* Allow SOURCE_TOUCHSCREEN and also Virtual InputDevices because they can send TOUCHSCREEN events */
-                if ((device.getSources() & InputDevice.SOURCE_TOUCHSCREEN) == InputDevice.SOURCE_TOUCHSCREEN || device.isVirtual()) {
-                    int touchDevId = device.getId();
-                    /*
-                     * Prevent id to be -1, since it's used in SDL internal for synthetic events
-                     * Appears when using Android emulator, eg:
-                     *  adb shell input mouse tap 100 100
-                     *  adb shell input touchscreen tap 100 100
-                     */
-                    if (touchDevId < 0) {
-                        touchDevId -= 1;
-                    }
-                    if (BuildConfig.DEBUG) {
-                        debugSource(device.getSources(), touchDevId, device.getName(), "touch added");
-                    }
-                    nativeAddTouch(touchDevId, device.getName());
+            /* Allow SOURCE_TOUCHSCREEN and also Virtual InputDevices because they can send TOUCHSCREEN events */
+            if (device != null && ((device.getSources() & InputDevice.SOURCE_TOUCHSCREEN) == InputDevice.SOURCE_TOUCHSCREEN
+                    || device.isVirtual())) {
+
+                int touchDevId = device.getId();
+                /*
+                 * Prevent id to be -1, since it's used in SDL internal for synthetic events
+                 * Appears when using Android emulator, eg:
+                 *  adb shell input mouse tap 100 100
+                 *  adb shell input touchscreen tap 100 100
+                 */
+                if (touchDevId < 0) {
+                    touchDevId -= 1;
+                }
+                nativeAddTouch(touchDevId, device.getName());
+                if (BuildConfig.DEBUG) {
+                    debugSource(device.getSources(), touchDevId, device.getName(), "touch added");
                 }
             }
         }
