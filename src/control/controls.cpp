@@ -192,7 +192,7 @@ size_t InputMethodProfile::GetOptionCount()
 // get a char* describing the option
 const char* InputMethodProfile::GetOptionName(size_t i)
 {
-    if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
+    if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
         i += 1;
 
     if(i >= CommonOptions::COUNT)
@@ -212,7 +212,7 @@ const char* InputMethodProfile::GetOptionName(size_t i)
 // WILL NOT be freed
 const char* InputMethodProfile::GetOptionValue(size_t i)
 {
-    if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
+    if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
         i += 1;
 
     if(i >= CommonOptions::COUNT)
@@ -245,7 +245,7 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
 // called when A is pressed; allowed to interrupt main game loop
 bool InputMethodProfile::OptionChange(size_t i)
 {
-    if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
+    if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
         i += 1;
 
     if(i >= CommonOptions::COUNT)
@@ -286,7 +286,7 @@ bool InputMethodProfile::OptionRotateLeft(size_t i)
 {
     int i_proc = i;
 
-    if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
+    if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
         i_proc += 1;
 
     if(i_proc >= CommonOptions::COUNT)
@@ -299,7 +299,7 @@ bool InputMethodProfile::OptionRotateRight(size_t i)
 {
     int i_proc = i;
 
-    if(!this->Type->RumbleSupported() && i >= CommonOptions::rumble)
+    if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
         i_proc += 1;
 
     if(i_proc >= CommonOptions::COUNT)
