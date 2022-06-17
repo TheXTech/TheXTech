@@ -467,6 +467,7 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
 {
     if(noSound)
         return;
+
     if(g_curMusic)
     {
         Mix_HaltMusic();
@@ -502,6 +503,8 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
                 Mix_PlayMusic(g_curMusic, -1);
         }
     }
+    else
+        pLogWarning("Unknown music alias '%s'", Alias.c_str());
 }
 
 void PlaySfx(const std::string &Alias, int loops, int volume)
@@ -1086,7 +1089,7 @@ void LoadCustomSound()
     if(noSound)
         return;
 
-    if(GameMenu)
+    if(GameMenu || GameOutro)
         return; // Don't load custom music in menu mode
 
     // To avoid bugs like custom local sounds was transferred into another level, it's need to clean-up old one if that was
