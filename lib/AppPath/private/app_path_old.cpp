@@ -575,10 +575,10 @@ void AppPathManager::install()
     }
 }
 
-bool AppPathManager::isPortable()
-{
-    return m_isPortable;
-}
+//bool AppPathManager::isPortable()
+//{
+//    return m_isPortable;
+//}
 
 bool AppPathManager::checkPortable()
 {

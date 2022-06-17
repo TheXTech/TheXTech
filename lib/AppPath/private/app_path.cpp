@@ -83,7 +83,7 @@ void AppPathManager::initAppPath()
     {
         m_userPath = m_customUserDirectory;
         // Assets root matches to user directory if not specified other
-        m_assetsPath = m_customAssetsRoot.empty() ? m_userPath : m_customAssetsRoot;
+        m_assetsPath = (m_customAssetsRoot.empty() ? m_userPath : m_customAssetsRoot);
         initSettingsPath();
         return;
     }
@@ -94,7 +94,7 @@ void AppPathManager::initAppPath()
 #if defined(FIXED_ASSETS_PATH) // Fixed assets path, for the rest of UNIX-like OS packages
     m_assetsPath = FIXED_ASSETS_PATH;
 #else
-    m_assetsPath = m_customAssetsRoot.empty() ? AppPathP::assetsRoot() : m_customAssetsRoot;
+    m_assetsPath = (m_customAssetsRoot.empty() ? AppPathP::assetsRoot() : m_customAssetsRoot);
 #endif
     appendSlash(m_assetsPath);
 
@@ -105,7 +105,7 @@ void AppPathManager::initAppPath()
     else
     {
         DirMan appDir(userDirPath);
-        if(!appDir.exists() && !appDir.mkpath())
+        if(userDirPath != "/" && !appDir.exists() && !appDir.mkpath())
             goto defaultSettingsPath;
 
         m_userPath = appDir.absolutePath();
@@ -121,9 +121,10 @@ defaultSettingsPath:
     m_userPath = AppPathP::appDirectory();
     m_assetsPath = AppPathP::appDirectory();
     initSettingsPath();
+
 #if defined(__EMSCRIPTEN__) && !defined(DISABLE_LOGGING)
-    std::printf("== App Path is %s\n", ApplicationPathSTD.c_str());
-    std::printf("== User Path is %s\n", m_userPath.c_str());
+    std::printf("== Default Assets Path is %s\n", m_assetsPath.c_str());
+    std::printf("== Default User Path is %s\n", m_userPath.c_str());
     fflush(stdout);
 #endif
 }
