@@ -34,6 +34,12 @@ elseif(EMSCRIPTEN)
         ${CMAKE_CURRENT_LIST_DIR}/private/app_path.cpp
         ${CMAKE_CURRENT_LIST_DIR}/private/app_path_emscripten.cpp
     )
+elseif(WIN32)
+    message("-- AppPath for Windows")
+    list(APPEND APPPATH_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/private/app_path.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/private/app_path_win32.cpp
+    )
 elseif(UNIX OR HAIKU)
     message("-- AppPath for UNIX-like operating systems")
     list(APPEND APPPATH_SRCS
