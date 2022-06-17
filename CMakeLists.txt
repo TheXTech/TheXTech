@@ -163,7 +163,7 @@ endif()
 
 if(VITA)
     message("Enabling PS Vita Support and fast-math flags.")
-        
+
     # Fast Math flags for Vita, ensuring -DVITA is passed to the compiler.
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon -DVITA")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon -DVITA")
@@ -598,8 +598,8 @@ endif()
 
 if(VITA)
     # Link Vita specific libraries to the generic interface.
-    target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS}) 
-    
+    target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS})
+
     # Set explicit flags for this project
     target_compile_definitions(thextech PRIVATE
         -DVITA -DNO_SCREENSHOT -DFIXED_RES -DLOW_MEM -DPRELOAD_LEVELS -DNO_INTPTROC)
@@ -677,6 +677,16 @@ if(THEXTECH_IS_BIG_ENDIAN)
 else()
     message("== Target processor endianess: LITTLE ENDIAN")
 endif()
+
+message("== Size of void pointer is ${CMAKE_SIZEOF_VOID_P}!")
+if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_WORDSIZE=64)
+elseif(CMAKE_SIZEOF_VOID_P MATCHES "4")
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_WORDSIZE=32)
+else()
+    message(WARNING "Unknown word size ${CMAKE_SIZEOF_VOID_P}!")
+endif()
+
 
 if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
     if(NOT APPLE AND NOT MSVC)
