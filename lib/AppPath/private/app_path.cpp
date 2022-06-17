@@ -181,9 +181,11 @@ void AppPathManager::initSettingsPath()
     if(m_logsPath.empty())
         m_logsPath = m_userPath + "logs/";
 
+#ifndef VITA
     // Just in case, avoid mad jokes with making name-sake file as a settings folder
     if(Files::fileExists(m_settingsPath))
         Files::deleteFile(m_settingsPath);
+#endif
 
     // Create the settings directory
     if(!DirMan::exists(m_settingsPath))
