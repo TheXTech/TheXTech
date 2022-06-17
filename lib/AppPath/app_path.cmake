@@ -8,7 +8,7 @@ list(APPEND APPPATH_SRCS
 # TODO: Implement update for next platforms
 # + UNIX-like (Linux/FreeBSD/Haiku)
 # + macOS
-# - Windows
+# + Windows
 # + Android
 # + Emscripten
 # - Vita
