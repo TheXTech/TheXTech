@@ -83,7 +83,7 @@ static std::string makeRecordPrefix()
     std::time_t in_time_t = std::chrono::system_clock::to_time_t(now);
     std::tm t = fmt::localtime_ne(in_time_t);
 
-    return fmt::sprintf_ne("%s/%s_%s_%04d-%02d-%02d_%02d-%02d-%02d.rec",
+    return fmt::sprintf_ne("%s%s_%s_%04d-%02d-%02d_%02d-%02d-%02d.rec",
                            AppPathManager::gameplayRecordsRootDir(), FileName, SHORT_VERSION,
                            (1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday,
                            t.tm_hour, t.tm_min, t.tm_sec);
