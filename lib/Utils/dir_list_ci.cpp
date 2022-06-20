@@ -12,6 +12,9 @@
 DirListCI::DirListCI(std::string curDir) noexcept
     : m_curDir(std::move(curDir))
 {
+    if(!m_curDir.empty() && m_curDir.back() != '/')
+        m_curDir.push_back('/');
+
     rescan();
 }
 
@@ -68,7 +71,6 @@ bool DirListCI::existsCI(const std::string &in_name)
 
     if(subDir != std::string::npos)
     {
-        // THIS BEHAVIOR IS EXPENSIVE AND WASTEFUL, AVOID INVOKING AT ALL COSTS!!!
         auto sdName = resolveDirCase(name.substr(0, subDir));
         auto file = name.substr(subDir + 1);
         auto sdf = m_subDirs.find(sdName);
@@ -132,9 +134,13 @@ std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
         else
             found = sdf->second->resolveFileCaseExists(file);
 
+        if(!sdName.empty() && sdName.back() != '/')
+            sdName.push_back('/');
+
         if(found.empty())
             return std::string();
         else
+            return sdName + found;
     }
 
     // keep MixerX path arguments untouched
