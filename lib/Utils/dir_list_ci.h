@@ -3,6 +3,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <memory>
 
 /**
  * @brief Case-Insensitive directory list
@@ -12,6 +13,8 @@ class DirListCI
     std::string m_curDir;
     std::unordered_map<std::string, std::string> m_fileMap;
     std::unordered_map<std::string, std::string> m_dirMap;
+    std::unordered_map<std::string, std::unique_ptr<DirListCI>> m_subDirs;
+
 public:
     DirListCI(std::string curDir = std::string()) noexcept;
     void setCurDir(const std::string &path);
