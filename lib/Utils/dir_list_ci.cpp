@@ -12,6 +12,9 @@
 DirListCI::DirListCI(std::string curDir) noexcept
     : m_curDir(std::move(curDir))
 {
+    if(!m_curDir.empty() && m_curDir.back() != '/')
+        m_curDir.push_back('/');
+
     rescan();
 }
 
@@ -19,7 +22,7 @@ void DirListCI::setCurDir(const std::string &path)
 {
     auto nPath = path;
 
-    if(nPath.empty() || nPath.back() != '/')
+    if(!nPath.empty() && nPath.back() != '/')
         nPath.push_back('/');
 
     if(nPath != m_curDir)
@@ -65,12 +68,21 @@ bool DirListCI::existsCI(const std::string &in_name)
 
     // For sub-directory path, look deeply
     auto subDir = name.find('/');
+
     if(subDir != std::string::npos)
     {
-        // THIS BEHAVIOR IS EXPENSIVE AND WASTEFUL, AVOID INVOKING AT ALL COSTS!!!
         auto sdName = resolveDirCase(name.substr(0, subDir));
-        DirListCI sd(m_curDir + sdName);
-        return sd.existsCI(name.substr(subDir + 1));
+        auto file = name.substr(subDir + 1);
+        auto sdf = m_subDirs.find(sdName);
+        std::string found;
+
+        if(sdf == m_subDirs.end())
+        {
+            auto f = m_subDirs.emplace(sdName, DirListCIPtr(new DirListCI(m_curDir + sdName)));
+            return f.first->second->existsCI(file);
+        }
+        else
+            return sdf->second->existsCI(file);
     }
 
     // keep MixerX path arguments untouched
@@ -108,12 +120,24 @@ std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
     auto subDir = name.find('/');
     if(subDir != std::string::npos)
     {
-        // THIS BEHAVIOR IS EXPENSIVE AND WASTEFUL, AVOID INVOKING AT ALL COSTS!!!
         auto sdName = resolveDirCase(name.substr(0, subDir));
-        DirListCI sd(m_curDir + sdName);
-        std::string found = sd.resolveFileCaseExists(name.substr(subDir + 1));
+        auto file = name.substr(subDir + 1);
+        auto sdf = m_subDirs.find(sdName);
+        std::string found;
+
+        if(sdf == m_subDirs.end())
+        {
+            auto f = m_subDirs.emplace(sdName, DirListCIPtr(new DirListCI(m_curDir + sdName)));
+            found = f.first->second->resolveFileCaseExists(file);
+        }
+        else
+            found = sdf->second->resolveFileCaseExists(file);
+
+        if(!sdName.empty() && sdName.back() != '/')
+            sdName.push_back('/');
+
         if(found.empty())
-            return "";
+            return std::string();
         else
             return sdName + found;
     }
@@ -141,7 +165,7 @@ std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
             return found->second;
     }
 
-    return "";
+    return std::string();
 }
 
 std::string DirListCI::resolveFileCase(const std::string &in_name)
@@ -210,6 +234,8 @@ void DirListCI::rescan()
 {
     m_fileMap.clear();
     m_dirMap.clear();
+    m_subDirs.clear();
+
     if(m_curDir.empty())
         return;
 

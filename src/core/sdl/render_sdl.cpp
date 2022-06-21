@@ -252,6 +252,8 @@ void RenderSDL::updateViewport()
     }
 #endif
 
+    D_pLogDebug("Updated window size: %d x %d", wi, hi);
+
     w = wi;
     h = hi;
     w1 = w;
@@ -298,18 +300,26 @@ void RenderSDL::updateViewport()
 
 void RenderSDL::resetViewport()
 {
+    // FIXME: Clarify the version of SDL2 with the buggy viewport
+//#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 22)
     // set to an alt viewport as a workaround for SDL bug (doesn't allow resizing viewport without changing position)
     SDL_Rect altViewport = {m_viewport_x + 1, m_viewport_y + 1, 1, 1};
     SDL_RenderSetViewport(m_gRenderer, &altViewport);
+//#endif
 
     SDL_RenderSetViewport(m_gRenderer, nullptr);
 }
 
 void RenderSDL::setViewport(int x, int y, int w, int h)
 {
+    SDL_Rect topLeftViewport;
+
+    // FIXME: Clarify the version of SDL2 with the buggy viewport
+//#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 22)
     // set to an alt viewport as a workaround for SDL bug (doesn't allow resizing viewport without changing position)
-    SDL_Rect topLeftViewport = {m_viewport_x + 1, m_viewport_y + 1, 1, 1};
+    topLeftViewport = {m_viewport_x + 1, m_viewport_y + 1, 1, 1};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
+//#endif
 
     topLeftViewport = {x, y, w, h};
     SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);

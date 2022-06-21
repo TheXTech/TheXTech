@@ -214,7 +214,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         NoTurnBack[B] = s.lock_left_scroll;
         UnderWater[B] = s.underwater;
         if(s.music_file.empty())
-            CustomMusic[B] = "";
+            CustomMusic[B].clear();
         else
             CustomMusic[B] = g_dirEpisode.resolveFileCase(s.music_file);
         B++;

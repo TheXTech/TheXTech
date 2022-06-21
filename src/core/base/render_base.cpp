@@ -630,7 +630,7 @@ static std::string shoot_getTimedString(const std::string &path, const char *ext
 
     if(!prevSecCounter)
     {
-        return fmt::sprintf_ne("%s/Scr_%04d-%02d-%02d_%02d-%02d-%02d.%s",
+        return fmt::sprintf_ne("%sScr_%04d-%02d-%02d_%02d-%02d-%02d.%s",
                                path,
                                (1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday,
                                t.tm_hour, t.tm_min, t.tm_sec,
@@ -638,7 +638,7 @@ static std::string shoot_getTimedString(const std::string &path, const char *ext
     }
     else
     {
-        return fmt::sprintf_ne("%s/Scr_%04d-%02d-%02d_%02d-%02d-%02d_(%d).%s",
+        return fmt::sprintf_ne("%sScr_%04d-%02d-%02d_%02d-%02d-%02d_(%d).%s",
                                path,
                                (1900 + t.tm_year), (1 + t.tm_mon), t.tm_mday,
                                t.tm_hour, t.tm_min, t.tm_sec,
@@ -704,10 +704,12 @@ static int makeShot_action(void *_pixels)
         }
     }
 
-    if(!DirMan::exists(AppPathManager::screenshotsDir()))
-        DirMan::mkAbsPath(AppPathManager::screenshotsDir());
+    auto outDir = AppPathManager::screenshotsDir();
 
-    std::string saveTo = shoot_getTimedString(AppPathManager::screenshotsDir(), "png");
+    if(!DirMan::exists(outDir))
+        DirMan::mkAbsPath(outDir);
+
+    std::string saveTo = shoot_getTimedString(outDir, "png");
     pLogDebug("%s %d %d", saveTo.c_str(), shoot->w, shoot->h);
 
     if(FreeImage_HasPixels(shotImg) == FALSE)
@@ -742,10 +744,12 @@ void AbstractRender_t::toggleGifRecorder()
 
     if(!m_gif->enabled)
     {
-        if(!DirMan::exists(AppPathManager::gifRecordsDir()))
-            DirMan::mkAbsPath(AppPathManager::gifRecordsDir());
+        auto outDir = AppPathManager::gifRecordsDir();
 
-        std::string saveTo = shoot_getTimedString(AppPathManager::gifRecordsDir(), "gif");
+        if(!DirMan::exists(outDir))
+            DirMan::mkAbsPath(outDir);
+
+        std::string saveTo = shoot_getTimedString(outDir, "gif");
 
         if(m_gif->worker)
             SDL_WaitThread(m_gif->worker, nullptr);

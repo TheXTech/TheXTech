@@ -240,10 +240,10 @@ void FindWorlds()
     std::vector<WorldRoot_t> worldRoots =
     {
         {AppPath + "worlds/", CAN_WRITE_APPPATH_WORLDS}
-#ifdef USER_WORLDS_NEEDED
-        , {AppPathManager::userWorldsRootDir() + "/", true}
-#endif
     };
+
+    if(AppPathManager::userDirIsAvailable())
+        worldRoots.push_back({AppPathManager::userWorldsRootDir(), true});
 
 #ifdef __3DS__
     for(const std::string& root : AppPathManager.worldPackages())
@@ -360,10 +360,10 @@ void FindLevels()
     std::vector<std::string> battleRoots =
     {
         AppPath + "battle/"
-#ifdef USER_WORLDS_NEEDED
-        , AppPathManager::userBattleRootDir() + "/"
-#endif
     };
+
+    if(AppPathManager::userDirIsAvailable())
+        battleRoots.push_back(AppPathManager::userBattleRootDir());
 
     SelectBattle.clear();
     SelectBattle.emplace_back(SelectWorld_t()); // Dummy entry
@@ -1074,11 +1074,11 @@ bool mainMenuUpdate()
                                 std::replace(fn.begin(), fn.end(), '?', '_');
                                 std::replace(fn.begin(), fn.end(), '*', '_');
                                 // ensure uniqueness (but still case-sensitive for now)
-                                while(DirMan::exists(AppPathManager::userWorldsRootDir() + "/" + fn))
+                                while(DirMan::exists(AppPathManager::userWorldsRootDir() + fn))
                                     fn += "2";
-                                DirMan::mkAbsPath(AppPathManager::userWorldsRootDir() + "/" + fn);
+                                DirMan::mkAbsPath(AppPathManager::userWorldsRootDir() + fn);
 
-                                std::string wPath = AppPathManager::userWorldsRootDir() + "/" + fn + "/world.wld";
+                                std::string wPath = AppPathManager::userWorldsRootDir() + fn + "/world.wld";
                                 if(g_config.editor_preferred_file_format != FileFormats::WLD_SMBX64 && g_config.editor_preferred_file_format != FileFormats::WLD_SMBX38A)
                                     wPath += "x";
                                 g_recentWorldEditor = wPath;

@@ -1,7 +1,9 @@
 message("Set CMAKE Flags for Vita.")
 include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
 
-cmake_policy(SET CMP0077 OLD)
+if(POLICY CMP0077)
+    cmake_policy(SET CMP0077 OLD)
+endif()
 
 if(NOT VITA_APP_NAME)
     set(VITA_APP_NAME "TheXTech PS Vita")
@@ -42,6 +44,7 @@ set(VITA_ADDTL_LIBS
     SceAppMgr_stub
     SceAppUtil_stub
     ScePgf_stub
+    ScePower_stub
     freetype
     png
     jpeg
@@ -55,6 +58,7 @@ set(VITA_ADDTL_LIBS
     SceSysmodule_stub
     SceTouch_stub
     SceAudio_stub
+    SceAudioIn_stub
     vitashark
     SceShaccCg_stub
     SceSysmem_stub

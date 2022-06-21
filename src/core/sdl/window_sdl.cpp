@@ -271,11 +271,11 @@ int WindowSDL::setFullScreen(bool fs)
             // Swith to FULLSCREEN mode
             if(SDL_SetWindowFullscreen(m_window, SDL_WINDOW_FULLSCREEN_DESKTOP) < 0)
             {
-                //Hide mouse cursor in full screen mdoe
                 pLogWarning("Setting fullscreen failed: %s", SDL_GetError());
                 return -1;
             }
 
+            // Hide mouse cursor in full screen mdoe
             SDL_ShowCursor(SDL_DISABLE);
             return 1;
         }
