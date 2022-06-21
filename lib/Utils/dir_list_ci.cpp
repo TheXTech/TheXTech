@@ -78,8 +78,7 @@ bool DirListCI::existsCI(const std::string &in_name)
 
         if(sdf == m_subDirs.end())
         {
-            auto f = m_subDirs.insert(std::make_pair(sdName, new DirListCI(m_curDir + sdName)));
-            found = f.first->second->resolveFileCaseExists(file);
+            auto f = m_subDirs.emplace(sdName, DirListCIPtr(new DirListCI(m_curDir + sdName)));
             return f.first->second->existsCI(file);
         }
         else
@@ -128,7 +127,7 @@ std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
 
         if(sdf == m_subDirs.end())
         {
-            auto f = m_subDirs.insert(std::make_pair(sdName, new DirListCI(m_curDir + sdName)));
+            auto f = m_subDirs.emplace(sdName, DirListCIPtr(new DirListCI(m_curDir + sdName)));
             found = f.first->second->resolveFileCaseExists(file);
         }
         else

@@ -13,7 +13,8 @@ class DirListCI
     std::string m_curDir;
     std::unordered_map<std::string, std::string> m_fileMap;
     std::unordered_map<std::string, std::string> m_dirMap;
-    std::unordered_map<std::string, std::unique_ptr<DirListCI>> m_subDirs;
+    typedef std::unique_ptr<DirListCI> DirListCIPtr;
+    std::unordered_map<std::string, DirListCIPtr> m_subDirs;
 
 public:
     DirListCI(std::string curDir = std::string()) noexcept;
