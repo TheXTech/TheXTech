@@ -54,33 +54,35 @@ jobs:
         git submodule init
         git submodule update
 
-    - name: Download SMBX assets
+    - name: CI Server's network meta-info
       shell: bash
       run: |
-        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
-          eval ${{ matrix.config.deps_cmdline }}
-        fi
-        wget -nv "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z" -O smbx13.7z
+        echo "CI server IP address:"
+        wget -q -O - ipinfo.io/ip
+        printf "\n"
+        wget -d ipinfo.io/ip -O/dev/null 2>&1 |grep ^User-Agent
 
 #    - name: Download SMBX assets
-#      uses: carlosperate/download-file-action@v1.0.3
-#      with:
-#        file-url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
-#        file-name: smbx13.7z
-
-    - name: Download AoD assets
-      shell: bash
-      run: |
-        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
-          eval ${{ matrix.config.deps_cmdline }}
-        fi
-        wget -nv "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z" -O aod.7z
+#      shell: bash
+#      run: |
+#        wget -d -nv "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z" -O smbx13.7z
+#
+    - name: Download SMBX assets
+      uses: carlosperate/download-file-action@v1.0.3
+      with:
+        file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
+        file-name: smbx13.7z
 
 #    - name: Download AoD assets
-#      uses: carlosperate/download-file-action@v1.0.3
-#      with:
-#        file-url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
-#        file-name: aod.7z
+#      shell: bash
+#      run: |
+#        wget -d -nv "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z" -O aod.7z
+
+    - name: Download AoD assets
+      uses: carlosperate/download-file-action@v1.0.3
+      with:
+        file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
+        file-name: aod.7z
 
     - name: Unpack all assets
       shell: bash
