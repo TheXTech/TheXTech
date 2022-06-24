@@ -303,6 +303,8 @@ void CSpriteManager::RunSprites()
                        iter->m_AlwaysProcess || iter->m_StaticScreenPos)   // Valid level section to process in?
                         iter->Process();
                 }
+                else
+                    m_hasInvalid = true;
             }
         }
 
@@ -314,6 +316,8 @@ void CSpriteManager::RunSprites()
                 if(iter->m_StaticScreenPos || Render::IsOnScreen(iter->m_Xpos, iter->m_Ypos, iter->m_Wd, iter->m_Ht))
                     iter->Draw();
             }
+            else
+                m_hasInvalid = true;
         }
     }
 }
