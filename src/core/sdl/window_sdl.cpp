@@ -119,8 +119,6 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
 #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
     SDL_SetWindowSize(m_window, ScreenW / 2, ScreenH / 2);
-#elif defined(__ANDROID__) // Set as small as possible
-    SDL_SetWindowSize(m_window, 200, 150);
 #elif defined(VITA)
     SDL_SetWindowSize(m_window, 960, 544);
 #else
