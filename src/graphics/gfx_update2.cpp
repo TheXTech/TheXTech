@@ -905,14 +905,14 @@ void UpdateGraphics2(bool skipRepaint)
                 SuperPrint(WorldPlayer[1].LevelName, 2, pX + 116, marginTop - 21);
         }
 
+        XRender::setViewport(0, 0, ScreenW, ScreenH);
+
         g_worldScreenFader.draw();
 
         if(PrintFPS > 0)
             SuperPrint(std::to_string(int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
 
         g_stats.print();
-
-        XRender::setViewport(0, 0, ScreenW, ScreenH);
 
         if(!BattleMode && !GameMenu && g_config.show_episode_title)
         {

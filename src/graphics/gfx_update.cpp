@@ -2082,7 +2082,7 @@ void UpdateGraphics(bool skipRepaint)
             // Always draw for single-player
             // And don't draw when many players at the same screen
             if(numPlayers == 1 || numScreens != 1)
-                g_levelVScreenFader[Z].draw();
+                g_levelVScreenFader[Z].draw(false);
 
     //    'Interface
     //            B = 0

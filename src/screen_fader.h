@@ -70,7 +70,7 @@ struct ScreenFader
 
     void update();
 
-    void draw();
+    void draw(bool fullscreen = true);
 };
 
 #endif // SCREEN_FADER_H
