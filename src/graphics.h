@@ -61,6 +61,10 @@ void GetvScreenAverageCanonical(int* left, int* top);
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2();
+
+// NEW: get the average screen position for all players with no level edge detection if it were 800x600, and write the top-left coordinate to (left, top)
+void GetvScreenAverage2Canonical(int* left, int* top);
+
 // Public Sub SetupGraphics()
 //! DUMMY AND USELESS
 void SetupGraphics();

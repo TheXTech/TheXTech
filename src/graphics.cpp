@@ -318,6 +318,40 @@ void GetvScreenAverage2()
 #endif
 }
 
+// NEW: Get the average screen position for all players with no level edge detection if it were 800x600, and write the top-left coordinate to (left, top)
+void GetvScreenAverage2Canonical(int* left, int* top)
+{
+    // int A = 0;
+    int B = 0;
+    double l = 0;
+    double t = 0;
+
+    for(int A = 1; A <= numPlayers; A++)
+    {
+        if(!Player[A].Dead)
+        {
+            l += -Player[A].Location.X - Player[A].Location.Width / 2.0;
+            if(Player[A].Mount == 2)
+                t += -Player[A].Location.Y;
+            else
+                t += -Player[A].Location.Y - Player[A].Location.Height;
+            B += 1;
+        }
+    }
+
+    //A = 1; // Stored value gets never read
+
+    if(B == 0)
+    {
+        *left = l;
+        *top = t;
+        return;
+    }
+
+    *left = (l / B) + (800 * 0.5);
+    *top = (t / B) + (600 * 0.5) - vScreenYOffset;
+}
+
 void SetupGraphics()
 {
     //DUMMY AND USELESS
