@@ -426,6 +426,10 @@ void CenterScreens()
         MaxWidth1 = MaxWidth2 = 800;
         MaxHeight1 = MaxHeight2 = 600;
     }
+    else
+    {
+        return;
+    }
 
     if(!LevelSelect && !g_compatibility.free_level_res)
     {
