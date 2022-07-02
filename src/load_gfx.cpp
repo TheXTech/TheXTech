@@ -608,6 +608,10 @@ static void loadCustomUIAssets()
              "Backdrop",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Backdrop, false, true);
 
+    loadCGFX(uiRoot + "Backdrop_Border.png",
+             "Backdrop_Border",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.Backdrop_Border, false, true);
+
     loadCGFX(uiRoot + "WorldMapFrame_Tile.png",
              "WorldMapFrame_Tile",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.WorldMapFrame_Tile, false, true);

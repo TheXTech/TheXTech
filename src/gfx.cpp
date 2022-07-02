@@ -124,10 +124,11 @@ bool GFX_t::load()
     }
 
     loadImage(Backdrop, uiPath + "Backdrop.png");
+    loadImage(Backdrop_Border, uiPath + "Backdrop_Border.png");
 
     if(m_loadErrors > 0)
     {
-        pLogDebug("Missing new backdrop texture.");
+        pLogDebug("Missing new backdrop textures.");
         m_loadErrors = 0;
     }
 
@@ -136,7 +137,7 @@ bool GFX_t::load()
 
     if(m_loadErrors > 0)
     {
-        pLogDebug("Missing world map frame tile/border textures.");
+        pLogDebug("Missing new world map frame tile/border textures.");
         m_loadErrors = 0;
     }
 

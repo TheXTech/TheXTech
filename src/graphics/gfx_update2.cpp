@@ -38,47 +38,11 @@
 #include "../core/render.h"
 #include "../screen_fader.h"
 
+#include "graphics/gfx_frame.h"
+
 #include "gfx_special_frames.h"
 
 #include <fmt_format_ne.h>
-
-void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx, int src_x = 0, int src_y = 0, int src_w = -1, int src_h = -1, int off_x = -1, int off_y = -1)
-{
-    if(off_x == -1)
-        off_x = dst_x;
-    if(off_y == -1)
-        off_y = dst_y;
-    if(src_w == -1)
-        src_w = tx.w;
-    if(src_h == -1)
-        src_h = tx.h;
-
-    int c_off_x = off_x % src_w;
-
-    for(int x = dst_x; x < dst_x + dst_w;)
-    {
-        int c_off_y = off_y % src_h;
-
-        for(int y = dst_y; y < dst_y + dst_h;)
-        {
-            int render_w = src_w - c_off_x;
-            if(x + render_w > dst_x + dst_w)
-                render_w = dst_x + dst_w - x;
-
-            int render_h = src_h - c_off_y;
-            if(y + render_h > dst_y + dst_h)
-                render_h = dst_y + dst_h - y;
-
-            XRender::renderTexture(x, y, render_w, render_h, tx, src_x + c_off_x, src_y + c_off_y);
-
-            y += src_h - c_off_y;
-            c_off_y = 0;
-        }
-
-        x += src_w - c_off_x;
-        c_off_x = 0;
-    }
-}
 
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
@@ -511,101 +475,14 @@ void UpdateGraphics2(bool skipRepaint)
         }
 
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
-        if(GFX.WorldMapFrame_Tile.inited && (!GFX.Interface[4].inited || !GFX.isCustom(37) || GFX.isCustom(68)))
+        if(GFX.WorldMapFrame_Tile.inited && (!GFX.Interface[4].inited || !GFX.isCustom(37) || GFX.isCustom(69)))
         {
-            // render a modern background: first the tile, then the border (if it exists)
+            bool border_valid = GFX.WorldMapFrame_Border.inited && GFX.isCustom(69) == GFX.isCustom(70);
 
-            // top
-            DrawTextureTiled(0, 0, sW, marginTop, GFX.WorldMapFrame_Tile);
-            // left (excl top)
-            DrawTextureTiled(0, marginTop, margin, sH - marginTop, GFX.WorldMapFrame_Tile);
-            // right (excl top)
-            DrawTextureTiled(sW - margin, marginTop, margin, sH - marginTop, GFX.WorldMapFrame_Tile);
-            // bottom (excl left and right)
-            DrawTextureTiled(margin, sH - margin, sW - margin - margin, margin, GFX.WorldMapFrame_Tile);
+            const FrameBorderInfo borderinfo;
 
-            if(GFX.WorldMapFrame_Border.inited)
-            {
-                StdPicture& border = GFX.WorldMapFrame_Border;
-                // render the border (needs some custom info here...)
-                int t = 2;
-                int te = 18;
-                int l = 2;
-                int le = 18;
-                int b = 18;
-                int be = 0;
-                int r = 18;
-                int re = 0;
-
-                // top-left
-                XRender::renderTexture(margin - l, marginTop - t, l, t,
-                    border,
-                    0, 0);
-                // top left-ext
-                XRender::renderTexture(margin, marginTop - t, le, t,
-                    border,
-                    l, 0);
-                // top center
-                DrawTextureTiled(margin + le, marginTop - t, sW - 2 * margin - le - re, t,
-                    border,
-                    l + le, 0, border.w - l - le - r - re, t,
-                    0, 0);
-                // top right-ext
-                XRender::renderTexture(sW - margin - re, marginTop - t, re, t,
-                    border,
-                    border.w - r - re, 0);
-                // top-right
-                XRender::renderTexture(sW - margin, marginTop - t, r, t,
-                    border,
-                    border.w - r, 0);
-                // left top-ext
-                XRender::renderTexture(margin - l, marginTop, l, te,
-                    border,
-                    0, t);
-                // left center
-                DrawTextureTiled(margin - l, marginTop + te, l, sH - margin - marginTop - te - be,
-                    border,
-                    0, t + te, l, border.h - t - te - b - be,
-                    0, 0);
-                // left bottom-ext
-                XRender::renderTexture(margin - l, sH - margin - be, l, be,
-                    border,
-                    0, border.h - b - be);
-                // bottom-left
-                XRender::renderTexture(margin - l, sH - margin, l, b,
-                    border,
-                    0, border.h - b);
-                // bottom left-ext
-                XRender::renderTexture(margin, sH - margin, le, b,
-                    border,
-                    l, border.h - b);
-                // bottom center
-                DrawTextureTiled(margin + le, sH - margin, sW - 2 * margin - le - re, b,
-                    border,
-                    l + le, border.h - b, border.w - l - le - r - re, b,
-                    0, 0);
-                // bottom right-ext
-                XRender::renderTexture(sW - margin - re, sH - margin, re, b,
-                    border,
-                    border.w - r - re, border.h - b);
-                // bottom-right
-                XRender::renderTexture(sW - margin, sH - margin, r, b,
-                    border,
-                    border.w - r, border.h - b);
-                // right top-ext
-                XRender::renderTexture(sW - margin, marginTop, r, te,
-                    border,
-                    border.w - r, t);
-                // right center
-                DrawTextureTiled(sW - margin, marginTop + te, r, sH - margin - marginTop - te - be,
-                    border,
-                    border.w - r, t + te, r, border.h - t - te - b - be,
-                    0, 0);
-                // right bottom-ext
-                XRender::renderTexture(sW - margin, sH - margin - be, r, be,
-                    border,
-                    border.w - r, border.h - b - be);
-            }
+            RenderFrame(newLoc(0, 0, sW, sH), newLoc(margin, marginTop, sW - margin - margin, sH - marginTop - margin),
+                GFX.WorldMapFrame_Tile, border_valid ? &GFX.WorldMapFrame_Border : nullptr, &borderinfo);
         }
         else
         {

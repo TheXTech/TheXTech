@@ -28,6 +28,8 @@
 #include "core/render.h"
 #include "core/events.h"
 
+#include "graphics/gfx_frame.h"
+
 #include "pseudo_vb.h"
 #include "gfx.h"
 #include "config.h"
@@ -780,12 +782,50 @@ void DrawBackdrop()
 {
     if(g_config.show_backdrop && GFX.Backdrop.inited)
     {
-        for(int x = 0; x < ScreenW; x += GFX.Backdrop.w)
+        bool border_valid = GFX.Backdrop_Border.inited && GFX.isCustom(67) == GFX.isCustom(68);
+
+        const FrameBorderInfo borderinfo;
+
+        Location_t loc;
+
+        if(!vScreen[2].Visible)
         {
-            for(int y = 0; y < ScreenH; y += GFX.Backdrop.h)
-            {
-                XRender::renderTexture(x, y, GFX.Backdrop);
-            }
+            loc.X = vScreen[1].ScreenLeft;
+            loc.Y = vScreen[1].ScreenTop;
+            loc.Width = vScreen[1].Width;
+            loc.Height = vScreen[1].Height;
         }
+        else if(!vScreen[1].Visible)
+        {
+            loc.X = vScreen[2].ScreenLeft;
+            loc.Y = vScreen[2].ScreenTop;
+            loc.Width = vScreen[2].Width;
+            loc.Height = vScreen[2].Height;
+        }
+        else
+        {
+            if(vScreen[1].ScreenLeft < vScreen[2].ScreenLeft)
+                loc.X = vScreen[1].ScreenLeft;
+            else
+                loc.X = vScreen[2].ScreenLeft;
+
+            if(vScreen[1].ScreenTop < vScreen[2].ScreenTop)
+                loc.Y = vScreen[1].ScreenTop;
+            else
+                loc.Y = vScreen[2].ScreenTop;
+
+            if(vScreen[1].ScreenLeft != vScreen[2].ScreenLeft)
+                loc.Width = vScreen[1].Width + vScreen[2].Width;
+            else
+                loc.Width = vScreen[1].Width;
+
+            if(vScreen[1].ScreenTop != vScreen[2].ScreenTop)
+                loc.Height = vScreen[1].Height + vScreen[2].Height;
+            else
+                loc.Height = vScreen[1].Height;
+        }
+
+        RenderFrame(newLoc(0, 0, ScreenW, ScreenH), loc,
+            GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr, &borderinfo);
     }
 }
