@@ -456,7 +456,10 @@ void CenterScreens()
         if(vScreen[2].Visible && !(DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
         {
             if(vScreen[1].ScreenLeft == 0)
+            {
                 vScreen[1].ScreenLeft += (vScreen[1].Width - MaxWidth1);
+                vScreen[2].Left -= (vScreen[1].Width - MaxWidth1);
+            }
         }
         else
             vScreen[1].ScreenLeft += (vScreen[1].Width - MaxWidth1) / 2;
@@ -468,7 +471,10 @@ void CenterScreens()
         if(vScreen[2].Visible && !(DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
         {
             if(vScreen[2].ScreenLeft == 0)
+            {
                 vScreen[2].ScreenLeft += (vScreen[2].Width - MaxWidth2);
+                vScreen[1].Left -= (vScreen[2].Width - MaxWidth2);
+            }
         }
         else
             vScreen[2].ScreenLeft += (vScreen[2].Width - MaxWidth2) / 2;
@@ -480,7 +486,10 @@ void CenterScreens()
         if(vScreen[2].Visible && (DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
         {
             if(vScreen[1].ScreenTop == 0)
+            {
                 vScreen[1].ScreenTop += (vScreen[1].Height - MaxHeight1);
+                vScreen[2].Top -= (vScreen[1].Height - MaxHeight1);
+            }
         }
         else
             vScreen[1].ScreenTop += (vScreen[1].Height - MaxHeight1) / 2;
@@ -492,7 +501,10 @@ void CenterScreens()
         if(vScreen[2].Visible && (DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
         {
             if(vScreen[2].ScreenTop == 0)
+            {
                 vScreen[2].ScreenTop += (vScreen[2].Height - MaxHeight2);
+                vScreen[1].Top -= (vScreen[2].Height - MaxHeight2);
+            }
         }
         else
             vScreen[2].ScreenTop += (vScreen[2].Height - MaxHeight2) / 2;
