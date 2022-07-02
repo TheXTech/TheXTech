@@ -1,2 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_name">Az X-Tech Motor</string>
+    <string name="title_activity_game_settings">Játékbeállítások</string>
+    <string name="start_game_button">Játék indítása</string>
+    <string name="settings_button">Beállítások</string>
+    <string name="game_logo_label">Játék logó</string>
+    <string name="settings_enable_frameskip">Képkockakihagyás engedélyezése</string>
+    <string name="setup_disable_sound">Hang tiltása</string>
+    <string name="setup_general_cat">Központi</string>
+    <string name="setup_control_cat">Érintőképernyős vezérlés</string>
+    <string name="setup_display_cat">Kijelző</string>
+    <string name="setup_touchscreen_controller_enable">Érintőképernyős vezérlés használata</string>
+    <string name="setup_touchscreen_alwaysshow">Érintőképernyős vezérlés mutatása indításkor</string>
+    <string name="setup_show_framerate">Képráta mutatása</string>
+    <string name="setup_max_framerate_mode">Maximális képráta mód</string>
+    <string name="setup_touchscreen_mode">Kontroller mód</string>
+    <string name="setup_sr_speedrunMode">Speedrun mód</string>
+    <string name="setup_sr_stopwatchSemiTransparent">Áttetsző stopperóra</string>
+    <string name="setup_touchpad_style">Kontrollerstílus</string>
+    <string name="managePermExplainTitle">Fájlhozzáférési jog szükséges</string>
+    <string name="setup_assets_path_label">A források abszolút útvonalának megváltoztatása</string>
+    <string name="launcher_no_resources_question">A játék bizonyos adatcsomagokat igényel működéséhez. Kérjük töltsd le és tömörítsd ki az adatokat a megfelelő könyvtárba. Szeretnél kiválasztani egy már kicsomagolt adatcsomagot\?</string>
+    <string name="setup_feedback_enable_vibration">Rezgés engedélyezése</string>
+    <string name="setup_feedback_vibration_strength">Rezgés erőssége</string>
+    <string name="setup_feedback_vibration_length">Rezgés hossza</string>
+    <string name="setup_feedback">Visszajelzés</string>
+    <string name="touchscreen_vibration_test_label">Visszajelzés próba</string>
+    <string name="setup_show_battery_status_label">Eszköz akkumulátorállapota</string>
+    <string name="setup_show_controller_state_label">A kontrollerállapot mutatása</string>
+    <string name="cheat_dialog_cancel">Mégse</string>
+    <string name="cheat_dialog_ok">Futtatás</string>
+    <string name="cheat_dialog_title">Írj be parancsot:</string>
+    <string name="managePermExplainText">Ez a játék olyan forrásokat (mint a pályák, epizódok, grafikák, zene, hangok, konfigurációk, stb...) használ, amiket a felhasználónak kell elhelyeznie közvetlenül a helyi tárolóba. Ez megengedi, hogy módosítsd és bővítsd a játék tartalmát, ahogyan az asztali verziójában is történik. Sajnos az Android 11-es verziójától nem lehet személyi hozzáférést nyerni néhány játékkönyvtárhoz vagy fájlhoz. Hogy futtasd ezt a játékot, hozzáférést kell nyerned az összes játékfájlhoz az említett okok miatt.</string>
+</resources>
