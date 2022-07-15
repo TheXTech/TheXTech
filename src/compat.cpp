@@ -93,8 +93,7 @@ static void compatInit(Compatibility_t &c)
     c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
     c.fix_fairy_stuck_in_pipe = true;
     c.world_map_fast_move = false;
-	// 1.3.7
-	c.fix_flamethrower_gravity = true
+    c.fix_flamethrower_gravity = true
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -129,7 +128,7 @@ static void compatInit(Compatibility_t &c)
         c.allow_drop_add = false;
         c.multiplayer_pause_controls = false;
         c.fix_fairy_stuck_in_pipe = false;
-		c.fix_flamethrower_gravity = false;
+        c.fix_flamethrower_gravity = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
