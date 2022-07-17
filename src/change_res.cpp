@@ -20,6 +20,7 @@
 
 #include "globals.h"
 #include "video.h"
+#include "compat.h"
 #include "config.h"
 #include "change_res.h"
 #include "load_gfx.h"
@@ -67,8 +68,27 @@ void ChangeRes(int, int, int, int)
 
 void UpdateInternalRes()
 {
+    int req_w = g_config.InternalW;
+    int req_h = g_config.InternalH;
+    if((!g_compatibility.free_level_res && !LevelSelect)
+        || (!g_compatibility.free_world_res && LevelSelect))
+    {
+        if(req_w < 800 || req_h < 600)
+        {
+            req_w = 800;
+            req_h = 600;
+
+#ifdef THEXTECH_FIXED_RES
+            PlaySoundMenu(SFX_BowserKilled);
+            MessageText = "Sorry! The requested compatibility mode was not enabled because your copy of TheXTech was not built to support a resolution of 800x600.";
+            PauseGame(PauseCode::Message);
+            MessageText.clear();
+#endif
+        }
+    }
+
 #ifndef THEXTECH_FIXED_RES
-    if(g_config.InternalW == 0 || g_config.InternalH == 0)
+    if(req_w == 0 || req_h == 0)
     {
         int int_w, int_h;
 
@@ -77,9 +97,9 @@ void UpdateInternalRes()
         int orig_int_h = int_h;
 
         // set internal height first
-        if(g_config.InternalH != 0)
+        if(req_h != 0)
         {
-            int_h = g_config.InternalH;
+            int_h = req_h;
         }
         else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
         {
@@ -104,7 +124,7 @@ void UpdateInternalRes()
             int_h = 320;
 
         // maximum height constraint
-        if(int_h > 720 && g_config.InternalH <= 720)
+        if(int_h > 720 && req_h <= 720)
             int_h = 720;
 
         // now, set width based on height and scaling mode
@@ -139,7 +159,7 @@ void UpdateInternalRes()
                     int_w = int_w / scale_factor;
 
                 // rescale the height if possible
-                if(scale_factor != 0 && g_config.InternalH == 0)
+                if(scale_factor != 0 && req_h == 0)
                 {
                     int_h = orig_int_h / scale_factor;
                     if(int_h < 600)
@@ -171,8 +191,8 @@ void UpdateInternalRes()
     }
     else
     {
-        ScreenW = g_config.InternalW;
-        ScreenH = g_config.InternalH;
+        ScreenW = req_w;
+        ScreenH = req_h;
     }
 #endif // #ifndef THEXTECH_FIXED_RES
 

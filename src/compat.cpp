@@ -25,6 +25,7 @@
 #include "globals.h"
 #include "global_dirs.h"
 #include "compat.h"
+#include "change_res.h"
 #include "main/speedrunner.h"
 #include "main/presetup.h"
 
@@ -318,11 +319,14 @@ void LoadCustomCompat()
         loadCompatIni(g_compatibility, episodeCompat);
     if(!customCompat.empty())
         loadCompatIni(g_compatibility, customCompat);
+
+    UpdateInternalRes();
 }
 
 void ResetCompat()
 {
     compatInit(g_compatibility);
+    UpdateInternalRes();
 }
 
 void CompatSetEnforcedLevel(int cLevel)
