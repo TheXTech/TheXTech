@@ -689,9 +689,9 @@ void UpdateGraphics(bool skipRepaint)
                     && (
                        (NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
                     || NPC[A].Type == NPCID_PODOBOO
-                    || NPC[A].Type == NPCID_PIRHANA_SMB3 || NPC[A].Type == NPCID_BOTTOMPIRHANA || NPC[A].Type == NPCID_SIDEPIRHANA
-                    || NPC[A].Type == NPCID_BIGPIRHANA || NPC[A].Type == NPCID_PIRHANA_SMB || NPC[A].Type == NPCID_FIREPIRHANA
-                    || NPC[A].Type == NPCID_LONGPIRHANA_UP || NPC[A].Type == NPCID_LONGPIRHANA_DOWN || NPC[A].Type == NPCID_PIRHANAHEAD
+                    || NPC[A].Type == NPCID_PIRANHA_SMB3 || NPC[A].Type == NPCID_BOTTOMPIRANHA || NPC[A].Type == NPCID_SIDEPIRANHA
+                    || NPC[A].Type == NPCID_BIGPIRANHA || NPC[A].Type == NPCID_PIRANHA_SMB || NPC[A].Type == NPCID_FIREPIRANHA
+                    || NPC[A].Type == NPCID_LONGPIRANHA_UP || NPC[A].Type == NPCID_LONGPIRANHA_DOWN || NPC[A].Type == NPCID_PIRANHAHEAD
                     || NPC[A].Type == NPCID_BLARGG
                     )
                 )
@@ -709,7 +709,7 @@ void UpdateGraphics(bool skipRepaint)
                         KillNPC(A, 9);
                     }
                     else if(!NPC[A].Active
-                        && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Type == NPCID_CONVEYER))
+                        && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Type == NPCID_CONVEYOR))
                     {
                         NPC[A].Active = true;
                         NPC[A].JustActivated = Z;
@@ -723,7 +723,7 @@ void UpdateGraphics(bool skipRepaint)
                 if(cannot_reset)
                 {
                     if(NPC[A].Type != 0
-                        && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYER))
+                        && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
                     {
                         if(
                                NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == NPCID_SHROOM_SMB3
@@ -756,7 +756,7 @@ void UpdateGraphics(bool skipRepaint)
                         NPC[A].Reset[1] = true;
                 }
 
-                if(!Do_FrameSkip && render && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYER))
+                if(!Do_FrameSkip && render && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
                 {
                     NPC_Draw_Queue_p.add(A);
 
