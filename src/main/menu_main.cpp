@@ -568,6 +568,8 @@ bool mainMenuUpdate()
                     quitKeyPos ++;
                 if(!g_gameInfo.disableBattleMode)
                     quitKeyPos ++;
+                if(g_config.enable_editor)
+                    quitKeyPos ++;
 
                 MenuMode = MENU_MAIN;
                 MenuCursor = quitKeyPos;
