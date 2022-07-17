@@ -701,19 +701,36 @@ bool mainMenuUpdate()
                 }
                 else if(g_config.enable_editor && MenuCursor == i++)
                 {
-                    PlaySoundMenu(SFX_Do);
-                    MenuMode = MENU_EDITOR;
-                    MenuCursor = 0;
+                    if(ScreenW < 640 || ScreenH < 480)
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                        MessageText = "Sorry! The in-game editor is not supported at your current resolution.";
+                        PauseGame(PauseCode::Message);
+                        // MenuCursorCanMove = false;
+                    }
+                    else if(!GFX.EIcons.inited)
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                        MessageText = "Sorry! You are missing EditorIcons.png, the icons for the in-game editor.";
+                        PauseGame(PauseCode::Message);
+                        // MenuCursorCanMove = false;
+                    }
+                    else
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        MenuMode = MENU_EDITOR;
+                        MenuCursor = 0;
 
 #if !defined(THEXTECH_PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
-                    FindWorlds();
+                        FindWorlds();
 #elif !defined(THEXTECH_PRELOAD_LEVELS)
-                    SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
-                    SDL_DetachThread(loadingThread);
+                        SDL_AtomicSet(&loading, 1);
+                        loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
+                        SDL_DetachThread(loadingThread);
 #else
-                    s_findRecentEpisode();
+                        s_findRecentEpisode();
 #endif
+                    }
                 }
                 else if(MenuCursor == i++)
                 {
