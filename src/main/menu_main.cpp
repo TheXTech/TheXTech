@@ -708,14 +708,12 @@ bool mainMenuUpdate()
                         PlaySoundMenu(SFX_BlockHit);
                         MessageText = "Sorry! The in-game editor is not supported at your current resolution.";
                         PauseGame(PauseCode::Message);
-                        // MenuCursorCanMove = false;
                     }
                     else if(!GFX.EIcons.inited)
                     {
                         PlaySoundMenu(SFX_BlockHit);
                         MessageText = "Sorry! You are missing EditorIcons.png, the icons for the in-game editor.";
                         PauseGame(PauseCode::Message);
-                        // MenuCursorCanMove = false;
                     }
                     else
                     {
@@ -1516,6 +1514,8 @@ bool mainMenuUpdate()
                             else if (g_config.InternalW == 512 && g_config.InternalH == 384)
                                 { g_config.InternalW = 512; g_config.InternalH = 448; }
                             else if (g_config.InternalW == 512 && g_config.InternalH == 448)
+                                { g_config.InternalW = 768; g_config.InternalH = 432; }
+                            else if (g_config.InternalW == 768 && g_config.InternalH == 432)
                                 { g_config.InternalW = 640; g_config.InternalH = 480; }
                             else if (g_config.InternalW == 640 && g_config.InternalH == 480)
                                 { g_config.InternalW = 800; g_config.InternalH = 480; }
@@ -1541,6 +1541,8 @@ bool mainMenuUpdate()
                             else if (g_config.InternalW == 512 && g_config.InternalH == 448)
                                 { g_config.InternalW = 512; g_config.InternalH = 384; }
                             else if (g_config.InternalW == 640 && g_config.InternalH == 480)
+                                { g_config.InternalW = 768; g_config.InternalH = 432; }
+                            else if (g_config.InternalW == 768 && g_config.InternalH == 432)
                                 { g_config.InternalW = 512; g_config.InternalH = 448; }
                             else if (g_config.InternalW == 800 && g_config.InternalH == 480)
                                 { g_config.InternalW = 640; g_config.InternalH = 480; }
@@ -2004,6 +2006,8 @@ void mainMenuDraw()
             resString += " (SNES)";
         else if (g_config.InternalW == 640 && g_config.InternalH == 480)
             resString += " (VGA)";
+        else if (g_config.InternalW == 768 && g_config.InternalH == 432)
+            resString += " (HELLO)";
         else if (g_config.InternalW == 800 && g_config.InternalH == 480)
             resString += " (3DS)";
         else if (g_config.InternalW == 800 && g_config.InternalH == 600)
