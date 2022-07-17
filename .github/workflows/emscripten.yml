@@ -28,7 +28,7 @@ jobs:
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "advdemo",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+            assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-adventures-of-demo",
             package_filename_game: "adventures-of-demo",
             upload_directory: "www/webassembly/"
@@ -44,7 +44,7 @@ jobs:
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "smbx",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+            assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
             subdir_name: "thextech-super-mario-bros-x",
             package_filename_game: "super-mario-bros-x",
             upload_directory: "www/webassembly/"

@@ -89,13 +89,13 @@ jobs:
     - name: Download SMBX assets
       uses: carlosperate/download-file-action@v1.0.3
       with:
-        file-url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
+        file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
         file-name: smbx13.7z
 
 #    - name: Download AoD assets
 #      uses: carlosperate/download-file-action@v1.0.3
 #      with:
-#        file-url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
+#        file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
 #        file-name: aod.7z
 
     - name: Unpack all assets

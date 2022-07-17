@@ -29,7 +29,7 @@ jobs:
             generator: "Unix Makefiles",
             build_type: "MinSizeRel",
             executable_name: "thextech",
-            assets_url: "https://wohlsoft.ru/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+            assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
             subdir_name: "thextech-vita",
             upload_directory: "www/vita/"
           }

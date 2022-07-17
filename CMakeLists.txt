@@ -165,7 +165,7 @@ endif()
 
 if(VITA)
     message("Enabling PS Vita Support and fast-math flags.")
-        
+
     # Fast Math flags for Vita, ensuring -DVITA is passed to the compiler.
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon -DVITA")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math -mtune=cortex-a9 -mfpu=neon -DVITA")
@@ -196,6 +196,7 @@ include(lib/fmt/fmt.cmake)
 include(lib/IniProcessor/IniProcessor.cmake)
 include(lib/Utils/Utils.cmake)
 include(lib/Logger/logger.cmake)
+include(lib/AppPath/app_path.cmake)
 include(lib/tclap/tclap.cmake)
 include(lib/md5/md5.cmake)
 if(WIN32)
@@ -288,7 +289,7 @@ target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 set(LIB_SRC
     lib/util.cpp
     lib/fader.cpp
-    lib/AppPath/app_path.cpp
+    ${APPPATH_SRCS}
     ${DIRMANAGER_SRCS}
     ${FMT_SRCS}
     ${MD5_SRCS}
@@ -327,7 +328,6 @@ endif()
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
     list(APPEND LIB_SRC
-        lib/AppPath/app_path_macosx.m
         resources/thextech.icns
         ${PGE_FILE_ICONS}
     )
@@ -626,8 +626,8 @@ endif()
 
 if(VITA)
     # Link Vita specific libraries to the generic interface.
-    target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS}) 
-    
+    target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS})
+
     # Set explicit flags for this project
     target_compile_definitions(thextech PRIVATE
         -DVITA -DNO_SCREENSHOT -DFIXED_RES -DLOW_MEM -DPRELOAD_LEVELS -DNO_INTPTROC)
@@ -705,6 +705,16 @@ if(THEXTECH_IS_BIG_ENDIAN)
 else()
     message("== Target processor endianess: LITTLE ENDIAN")
 endif()
+
+message("== Size of void pointer is ${CMAKE_SIZEOF_VOID_P}!")
+if(CMAKE_SIZEOF_VOID_P MATCHES "8")
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_WORDSIZE=64)
+elseif(CMAKE_SIZEOF_VOID_P MATCHES "4")
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_WORDSIZE=32)
+else()
+    message(WARNING "Unknown word size ${CMAKE_SIZEOF_VOID_P}!")
+endif()
+
 
 if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
     if(NOT APPLE AND NOT MSVC)
