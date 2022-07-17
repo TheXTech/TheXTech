@@ -93,12 +93,12 @@ static void compatInit(Compatibility_t &c)
     c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
     c.fix_fairy_stuck_in_pipe = true;
     c.world_map_fast_move = false;
+    c.fix_flamethrower_gravity = true;
     c.free_level_res = true;
     c.free_world_res = true;
     c.NPC_activate_mode = NPC_activate_modes::smart;
     c.disable_background2_tiling = false;
     c.modern_section_change = true;
-
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
@@ -132,6 +132,7 @@ static void compatInit(Compatibility_t &c)
         c.allow_drop_add = false;
         c.multiplayer_pause_controls = false;
         c.fix_fairy_stuck_in_pipe = false;
+        c.fix_flamethrower_gravity = false;
         c.free_level_res = false;
         c.free_world_res = false;
         c.NPC_activate_mode = NPC_activate_modes::onscreen;
@@ -295,6 +296,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("fix-npc-activation-event-loop-bug", c.fix_npc_activation_event_loop_bug, c.fix_npc_activation_event_loop_bug);
     // 1.3.6
     compat.read("world-map-fast-move", c.world_map_fast_move, c.world_map_fast_move);
+    compat.read("fix-framethrower-gravity", c.fix_flamethrower_gravity, c.fix_flamethrower_gravity);
     compat.endGroup();
 }
 
