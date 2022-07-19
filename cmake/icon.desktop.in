@@ -10,3 +10,24 @@ Icon=@DESKTOP_ICON@
 Exec=@DESKTOP_EXEC@ @F
 Categories=Game;
 StartupWMClass=@DESKTOP_WMCLASS@
+Actions=SpeedRunMode1;SpeedRunMode2;SpeedRunMode3;CompatModeX2;CompatMode13;
+
+[Desktop Action SpeedRunMode1]
+Name=Speedrun Mode 1 (Native)
+Exec=@DESKTOP_EXEC@ --speed-run-mode 1 @F
+
+[Desktop Action SpeedRunMode2]
+Name=Speedrun Mode 2 (SMBX2)
+Exec=@DESKTOP_EXEC@ --speed-run-mode 2 @F
+
+[Desktop Action SpeedRunMode3]
+Name=Speedrun Mode 3 (Strict SMBX 1.3)
+Exec=@DESKTOP_EXEC@ --speed-run-mode 3 @F
+
+[Desktop Action CompatModeX2]
+Name=Run in SMBX2 compatibiltiy mode
+Exec=@DESKTOP_EXEC@ --compat-level smbx2 @F
+
+[Desktop Action CompatMode13]
+Name=Run in SMBX 1.3 strict compatibiltiy mode
+Exec=@DESKTOP_EXEC@ --compat-level smbx13 @F
