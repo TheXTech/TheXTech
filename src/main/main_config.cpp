@@ -127,7 +127,7 @@ void OpenConfig_preSetup()
 
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
-        config.readEnum("scale-down-textures", g_videoSettings.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_NONE, scaleDownTextures);
+        config.readEnum("scale-down-textures", g_videoSettings.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_SAFE, scaleDownTextures);
         config.endGroup();
 
         config.beginGroup("sound");

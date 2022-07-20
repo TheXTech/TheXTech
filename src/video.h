@@ -63,7 +63,7 @@ extern struct VideoSettings_t
     //! Show FPS counter
     bool   showFrameRate = false;
     //! 2x scale down all textures to reduce the memory usage
-    int    scaleDownTextures = SCALE_NONE;
+    int    scaleDownTextures = SCALE_SAFE;
 } g_videoSettings; // main_config.cpp
 
 #endif // VIDEO_H
