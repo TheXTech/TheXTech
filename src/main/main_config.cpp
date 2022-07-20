@@ -126,7 +126,7 @@ void OpenConfig_preSetup()
         config.read("show-fps", g_videoSettings.showFrameRate, false);
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
-        config.readEnum("scale-down-textures", g_videoSettings.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_NONE, scaleDownTextures);
+        config.readEnum("scale-down-textures", g_videoSettings.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_SAFE, scaleDownTextures);
 #ifndef FIXED_RES
         config.read("internal-width", g_config.InternalW, 800);
         config.read("internal-height", g_config.InternalH, 600);
