@@ -64,6 +64,13 @@ static const std::unordered_map<int, std::string> ScaleMode_strings =
 
 extern struct VideoSettings_t
 {
+    enum ScaleDownTextures
+    {
+        SCALE_NONE = 0,
+        SCALE_SAFE = 1,
+        SCALE_ALL = 2,
+    };
+
     //! Render mode
     int    renderMode = RENDER_ACCELERATED;
     //! The currently running render mode
@@ -81,7 +88,7 @@ extern struct VideoSettings_t
     //! Show FPS counter
     bool   showFrameRate = false;
     //! 2x scale down all textures to reduce the memory usage
-    bool   scaleDownAllTextures = false;
-} g_videoSettings; // config.cpp
+    int    scaleDownTextures = SCALE_NONE;
+} g_videoSettings; // main_config.cpp
 
 #endif // VIDEO_H

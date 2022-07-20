@@ -105,6 +105,13 @@ void OpenConfig_preSetup()
         {"false", SPEEDRUN_EFFECT_BLINK_NEVER}
     };
 
+    const IniProcessing::StrEnumMap scaleDownTextures =
+    {
+        {"none", VideoSettings_t::SCALE_NONE},
+        {"safe", VideoSettings_t::SCALE_SAFE},
+        {"all", VideoSettings_t::SCALE_ALL}
+    };
+
     std::string configPath = AppPathManager::settingsFileSTD();
 
     if(Files::fileExists(configPath))
@@ -117,7 +124,9 @@ void OpenConfig_preSetup()
         config.read("background-controller-input", g_videoSettings.allowBgControllerInput, false);
         config.read("frame-skip", g_videoSettings.enableFrameSkip, true);
         config.read("show-fps", g_videoSettings.showFrameRate, false);
-        config.read("scale-down-all-textures", g_videoSettings.scaleDownAllTextures, false);
+        bool scale_down_all;
+        config.read("scale-down-all-textures", scale_down_all, false);
+        config.readEnum("scale-down-textures", g_videoSettings.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_NONE, scaleDownTextures);
 #ifndef FIXED_RES
         config.read("internal-width", g_config.InternalW, 800);
         config.read("internal-height", g_config.InternalH, 600);
@@ -333,12 +342,19 @@ void SaveConfig()
             {Config_t::EPISODE_TITLE_TRANSPARENT_ALWAYS, "transparent-always"}
         };
 
+        std::unordered_map<int, std::string> scaleDownTextures =
+        {
+            {VideoSettings_t::SCALE_NONE, "none"},
+            {VideoSettings_t::SCALE_SAFE, "safe"},
+            {VideoSettings_t::SCALE_ALL, "all"},
+        };
+
         config.setValue("render", renderMode[g_videoSettings.renderMode]);
         config.setValue("background-work", g_videoSettings.allowBgWork);
         config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
         config.setValue("frame-skip", g_videoSettings.enableFrameSkip);
         config.setValue("show-fps", g_videoSettings.showFrameRate);
-        config.setValue("scale-down-all-textures", g_videoSettings.scaleDownAllTextures);
+        config.setValue("scale-down-textures", scaleDownTextures[g_videoSettings.scaleDownTextures]);
         config.setValue("display-controllers", g_drawController);
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
         config.setValue("osk-fill-screen", g_config.osk_fill_screen);
