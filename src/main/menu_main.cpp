@@ -324,6 +324,15 @@ void FindWorlds()
         }
     }
 
+    if(SelectWorld.size() <= 1) // No available worlds in the list
+    {
+        SelectWorld.clear();
+        SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
+        SelectWorld.emplace_back(SelectWorld_t()); // "no battle levels" entry
+        SelectWorld[1].WorldName = "<No episodes to play>";
+        SelectWorld[1].disabled = true;
+    }
+
     // Sort all worlds by alphabetical order
     std::sort(SelectWorld.begin(), SelectWorld.end(),
               [](const SelectWorld_t& a, const SelectWorld_t& b)
@@ -414,6 +423,17 @@ void FindLevels()
 #ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loading, 0);
 #endif
+
+    if(SelectBattle.size() <= 2) // No available levels in the list
+    {
+        SelectBattle.clear();
+        SelectBattle.emplace_back(SelectWorld_t()); // Dummy entry
+
+        NumSelectBattle = 1;
+        SelectBattle.emplace_back(SelectWorld_t()); // "no battle levels" entry
+        SelectBattle[1].WorldName = "<No battle levels>";
+        SelectBattle[1].disabled = true;
+    }
 }
 
 
@@ -1062,15 +1082,27 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
+                    bool disabled = false;
                     // Save menu state
                     listMenuLastScroll = worldCurs;
                     listMenuLastCursor = MenuCursor;
 
-                    PlaySoundMenu(SFX_Do);
                     selWorld = MenuCursor + 1;
 
+                    if((MenuMode == MENU_BATTLE_MODE && SelectBattle[selWorld].disabled) ||
+                       ((MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME) && SelectWorld[selWorld].disabled))
+                        disabled = true;
+
+                    if(!disabled)
+                        PlaySoundMenu(SFX_Do);
+
+                    if(disabled)
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                        // Do nothing. stay at menu
+                    }
                     // level editor
-                    if(MenuMode == MENU_EDITOR)
+                    else if(MenuMode == MENU_EDITOR)
                     {
                         if(selWorld == NumSelectWorldEditable)
                         {
@@ -1924,9 +1956,20 @@ void mainMenuDraw()
         for(auto A = minShow; A <= maxShow; A++)
         {
             auto w = SelectorList[A];
-            B = A - minShow + 1;
             float r = w.highlight ? 0.f : 1.f;
-            SuperPrint(w.WorldName, 3, MenuX, MenuY - 30 + (B * 30), r, 1.f, 1.f, 1.f);
+            float g = 1.0f;
+            float b = 1.0f;
+
+            B = A - minShow + 1;
+
+            if(w.disabled)
+            {
+                r = 0.5f;
+                g = 0.5f;
+                b = 0.5f;
+            }
+
+            SuperPrint(w.WorldName, 3, MenuX, MenuY - 30 + (B * 30), r, g, b, 1.f);
         }
 
         // render the scroll indicators

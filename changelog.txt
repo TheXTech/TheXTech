@@ -25,6 +25,7 @@ Changelog for 1.3.6 [WIP]
 -Fixed the clipped render of the Roto-Disk's effect (@Wohlstand)
 -Fixed the lock/star sign behavior at locked two-way warps: now they work correctly at the opposite side (@Wohlstand)
 -Added an ability to set a different path for the user directory by command line argument (@Wohlstand)
+-Blocked an ability to start the game with no episodes or battle levels available in the list and prevented several issues with this (@Wohlstand)
 -Added support for different display resolutions (@ds-sloth)
 -Added compat setting to choose when NPCs activate, based on both the screen size and the episode's original screen size (@ds-sloth)
 -Added setting to make the HUD follow the player when the screen is larger than the episode's original screen size (@ds-sloth)

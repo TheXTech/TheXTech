@@ -22,6 +22,7 @@
 #include "global_dirs.h"
 
 #include "custom.h"
+#include "compat.h"
 
 #include <utility>
 
@@ -180,6 +181,14 @@ void LoadPlayerDefaults()
     }
 }
 
+/**
+ * @brief Applies bug-fixes to default settings of NPC objects according to compatibility settings
+ */
+SDL_FORCE_INLINE void loadNpcSetupFixes()
+{
+    // TODO: Implement settings fixing logic here!
+}
+
 void SaveNPCDefaults()
 {
     DirListCI NPCDir = DirListCI(AppPath + "graphics/npc/");
@@ -288,6 +297,8 @@ void LoadNPCDefaults()
         NPCFrameSpeed[A] = s_NPCDefaults.NPCFrameSpeed[A];
         NPCFrameStyle[A] = s_NPCDefaults.NPCFrameStyle[A];
     }
+
+    loadNpcSetupFixes();
 }
 
 void FindCustomPlayers()
