@@ -52,6 +52,8 @@
 
 #include "main/cheat_code.h"
 
+#include "logic/world_map_fog.h"
+
 
 static void redigitIsCool()
 {
@@ -153,6 +155,8 @@ static void moonWalk()
     for(int B = 1; B <= numWorldLevels; B++)
         WorldLevel[B].Active = true;
 
+    g_worldMapFog.Update();
+
     PlaySound(SFX_NewPath);
 }
 
@@ -164,6 +168,8 @@ static void illParkWhereIWant()
     if(WalkAnywhere)
     {
         WalkAnywhere = false;
+        g_worldMapFog.Update();
+
         PlaySound(SFX_PlayerShrink);
     }
     else

@@ -451,7 +451,7 @@ void UpdateGraphics2(bool skipRepaint)
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 
         // render the fog-of-war effect
-        if(g_worldMapFog.m_active)
+        if(g_worldMapFog.m_active && !WalkAnywhere)
         {
             // render fog map
             for(int row = 0; row < g_worldMapFog.m_map_rows; row++)

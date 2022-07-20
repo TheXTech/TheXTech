@@ -177,6 +177,10 @@ void WorldMapFog::Update()
     m_fog_alpha.resize(m_map_cols * m_map_rows);
     std::fill(m_fog_alpha.begin(), m_fog_alpha.end(), m_fog_levels);
 
+    // for cheating player after using ParkingLot
+    RevealLoc(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0, WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0);
+
+    // show all the reachable places
     for(WorldPathRef_t p : m_active_paths)
     {
         RevealLoc(p->Location.X + p->Location.Width / 2.0, p->Location.Y + p->Location.Height / 2.0);
