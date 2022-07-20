@@ -31,6 +31,7 @@ Changelog for 1.3.6 [WIP]
 -Fix vanilla peculiarity in which an event resetting section boundaries does not trigger the same checks as an event setting section boundaries. (@ds-sloth)
 -Added optional backdrop for levels smaller than the screen at graphics/ui/Backdrop.png (@ds-sloth)
 -Added alternative format for world map frame with better support for various display resolutions (@ds-sloth)
+-Added "fog-of-war" effect using a texture loaded from graphics/ui/WorldMapFog.png (@ds-sloth)
 
 Changes for 1.3.5.3-1
 -Fixed autostart events behaviour

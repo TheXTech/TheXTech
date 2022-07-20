@@ -42,6 +42,7 @@
 #include "speedrunner.h"
 #include "screen_quickreconnect.h"
 #include "screen_connect.h"
+#include "logic/world_map_fog.h"
 
 #include "../pseudo_vb.h"
 
@@ -606,6 +607,8 @@ void WorldLoop()
                         if(int(level.WarpY) != -1)
                             WorldPlayer[1].Location.Y = level.WarpY;
 
+                        g_worldMapFog.Update();
+
                         LevelBeatCode = 6;
 
                         //for(B = 1; B <= numWorldLevels; B++)
@@ -956,6 +959,7 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         vScreenX[1] = -(Pth.Location.X + Pth.Location.Width / 2.0) + vScreen[1].Width / 2.0;
         vScreenY[1] = -(Pth.Location.Y + Pth.Location.Height / 2.0) + vScreen[1].Height / 2.0;
         PlaySound(SFX_NewPath);
+        g_worldMapFog.Update();
         PathWait();
     }
 

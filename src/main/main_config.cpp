@@ -212,6 +212,13 @@ void OpenConfig()
             {"show-all", 2}
         };
 
+        const IniProcessing::StrEnumMap worldMapFog =
+        {
+            {"off", Config_t::WORLD_MAP_FOG_OFF},
+            {"normal", Config_t::WORLD_MAP_FOG_NORMAL},
+            {"spoilers", Config_t::WORLD_MAP_FOG_SPOILERS},
+        };
+
         config.beginGroup("main");
         config.read("release", FileRelease, curRelease);
         config.read("full-screen", resBool, false);
@@ -245,6 +252,7 @@ void OpenConfig()
         config.read("world-map-fast-move", g_config.worldMapFastMove, false);
         config.read("editor-pause-on-death", g_config.editor_pause_on_death, true);
         config.read("hud-follows-player", g_config.hud_follows_player, false);
+        config.readEnum("world-map-fog", g_config.world_map_fog, (int)Config_t::WORLD_MAP_FOG_NORMAL, worldMapFog);
         config.endGroup();
 
         config.beginGroup("effects");
@@ -390,6 +398,16 @@ void SaveConfig()
     config.setValue("world-map-fast-move", g_config.worldMapFastMove);
     config.setValue("editor-pause-on-death", g_config.editor_pause_on_death);
     config.setValue("hud-follows-player", g_config.hud_follows_player);
+    {
+        std::unordered_map<int, std::string> worldMapFog =
+        {
+            {Config_t::WORLD_MAP_FOG_OFF, "off"},
+            {Config_t::WORLD_MAP_FOG_NORMAL, "normal"},
+            {Config_t::WORLD_MAP_FOG_SPOILERS, "spoilers"},
+        };
+
+        config.setValue("world-map-fog", worldMapFog[g_config.world_map_fog]);
+    }
     config.endGroup();
 
     config.beginGroup("speedrun");

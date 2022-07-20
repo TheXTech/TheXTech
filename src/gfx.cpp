@@ -134,6 +134,7 @@ bool GFX_t::load()
 
     loadImage(WorldMapFrame_Tile, uiPath + "WorldMapFrame_Tile.png");
     loadImage(WorldMapFrame_Border, uiPath + "WorldMapFrame_Border.png");
+    loadImage(WorldMapFog, uiPath + "WorldMapFog.png");
 
     if(m_loadErrors > 0)
     {

@@ -51,7 +51,7 @@ extern struct Config_t
         EPISODE_TITLE_ON_ALWAYS,
         EPISODE_TITLE_TRANSPARENT_ALWAYS,
     };
-    int show_episode_title;
+    int show_episode_title = EPISODE_TITLE_OFF;
     //! Show a backdrop texture when level is smaller than screen
     bool    show_backdrop = true;
 
@@ -78,6 +78,14 @@ extern struct Config_t
     int     InternalH = 600;
     //! HUD follows player onscreen (useful for levels much larger than the intended screen size)
     bool    hud_follows_player = false;
+    //! Show fog on canonically hidden portions of the world map
+    enum
+    {
+        WORLD_MAP_FOG_OFF = 0,
+        WORLD_MAP_FOG_NORMAL,
+        WORLD_MAP_FOG_SPOILERS,
+    };
+    int world_map_fog = WORLD_MAP_FOG_NORMAL;
 
     /* ---- Effects ----*/
 

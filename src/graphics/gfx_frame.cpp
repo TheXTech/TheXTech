@@ -22,7 +22,7 @@
 
 #include "graphics/gfx_frame.h"
 
-void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx, int src_x = 0, int src_y = 0, int src_w = -1, int src_h = -1, int off_x = -1, int off_y = -1)
+void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx, int src_x, int src_y, int src_w, int src_h, int off_x, int off_y, float alpha)
 {
     if(off_x == -1)
         off_x = dst_x;
@@ -34,22 +34,28 @@ void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx
         src_h = tx.h;
 
     int c_off_x = off_x % src_w;
+    // want modulus, not remainder
+    if(c_off_x < 0)
+    	c_off_x += src_w;
 
     for(int x = dst_x; x < dst_x + dst_w;)
     {
+        int render_w = src_w - c_off_x;
+        if(x + render_w > dst_x + dst_w)
+            render_w = dst_x + dst_w - x;
+
         int c_off_y = off_y % src_h;
+        // want modulus, not remainder
+        if(c_off_y < 0)
+        	c_off_y += src_h;
 
         for(int y = dst_y; y < dst_y + dst_h;)
         {
-            int render_w = src_w - c_off_x;
-            if(x + render_w > dst_x + dst_w)
-                render_w = dst_x + dst_w - x;
-
             int render_h = src_h - c_off_y;
             if(y + render_h > dst_y + dst_h)
                 render_h = dst_y + dst_h - y;
 
-            XRender::renderTexture(x, y, render_w, render_h, tx, src_x + c_off_x, src_y + c_off_y);
+            XRender::renderTexture(x, y, render_w, render_h, tx, src_x + c_off_x, src_y + c_off_y, 1.f, 1.f, 1.f, alpha);
 
             y += src_h - c_off_y;
             c_off_y = 0;

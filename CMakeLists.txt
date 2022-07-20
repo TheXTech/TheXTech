@@ -373,6 +373,7 @@ set(THEXTECH_SRC
     src/control/touchscreen.cpp
     src/control/duplicate.cpp
     src/control/controls.cpp
+    src/logic/world_map_fog.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp

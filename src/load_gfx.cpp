@@ -620,6 +620,10 @@ static void loadCustomUIAssets()
              "WorldMapFrame_Border",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.WorldMapFrame_Border, false, true);
 
+    loadCGFX(uiRoot + "WorldMapFog.png",
+             "WorldMapFog",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.WorldMapFog, false, true);
+
     // Add new optional assets above this line. Also update gfx.cpp: GFX_t::load(), and gfx.h: GFX_t::m_isCustomVolume.
 }
 

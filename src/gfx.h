@@ -35,7 +35,7 @@ class GFX_t
     //! Holder of loaded textures for easier clean-up
     std::vector<StdPicture*> m_loadedImages;
     //! Capacity of the m_isCustom array (update when new assets are added)
-    static constexpr size_t m_isCustomVolume = 71;
+    static constexpr size_t m_isCustomVolume = 72;
     //! Holder of "is custom" flag
     bool m_isCustom[m_isCustomVolume];
 
@@ -80,6 +80,7 @@ public:
     StdPicture Backdrop_Border;
     StdPicture WorldMapFrame_Tile; // WorldMapFrame_Tile is 69
     StdPicture WorldMapFrame_Border;
+    StdPicture WorldMapFog;
 
     bool &isCustom(size_t i);
 };

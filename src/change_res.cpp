@@ -25,6 +25,7 @@
 #include "change_res.h"
 #include "load_gfx.h"
 #include "graphics.h"
+#include "logic/world_map_fog.h"
 #include "core/render.h"
 #include "core/window.h"
 #ifdef __EMSCRIPTEN__
@@ -206,6 +207,10 @@ void UpdateInternalRes()
         GetvScreenAverage();
         GameMenu = true;
     }
+
+    // update the world map fog
+    if(LevelSelect)
+        g_worldMapFog.Update();
 }
 
 void UpdateWindowRes()

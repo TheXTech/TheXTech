@@ -1,0 +1,85 @@
+/*
+ * TheXTech - A platform game engine ported from old source code for VB6
+ *
+ * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
+ * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#pragma once
+
+#ifndef WORLD_MAP_FOG_H
+#define WORLD_MAP_FOG_H
+
+#include <bitset>
+#include <vector>
+
+#include "globals.h"
+
+struct WorldPathRef_t
+{
+    const int16_t index;
+
+    WorldPathRef_t(int16_t i) : index(i) {}
+
+    operator int16_t() const { return index; }
+
+    WorldPath_t& operator*() const { return WorldPath[index]; }
+    WorldPath_t* operator->() const { return &WorldPath[index]; }
+};
+
+struct WorldLevelRef_t
+{
+    const int16_t index;
+
+    WorldLevelRef_t(int16_t i) : index(i) {}
+
+    operator int16_t() const { return index; }
+
+    WorldLevel_t& operator*() const { return WorldLevel[index]; }
+    WorldLevel_t* operator->() const { return &WorldLevel[index]; }
+};
+
+class WorldMapFog
+{
+private:
+    std::bitset<maxWorldPaths + 1> m_path_active;
+    std::bitset<maxWorldLevels + 1> m_level_active;
+
+    std::vector<WorldPathRef_t> m_active_paths;
+    std::vector<WorldLevelRef_t> m_active_levels;
+
+    void RevealLoc(double x, double y);
+
+public:
+    double m_map_left = 0.;
+    double m_map_top = 0.;
+    int m_map_cols = 0;
+    int m_map_rows = 0;
+
+    const int m_tile_size = 16;
+    const int8_t m_fog_levels = 6;
+
+    bool m_active = false;
+
+    std::vector<int8_t> m_fog_alpha;
+
+    void Update();
+};
+
+// defined in world_map_visibility.cpp
+extern WorldMapFog g_worldMapFog;
+
+#endif // #ifndef WORLD_MAP_FOG_H
