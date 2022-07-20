@@ -1712,7 +1712,7 @@ int Logic()
         if((int)Controls::g_InputMethods.size() >= s_minPlayers)
             block_poll = true;
     }
-    // if the game has disabled 1-player mode, only allow a single player to connect
+    // if the game has disabled 2-player mode, only allow a single player to connect
     if(g_gameInfo.disableTwoPlayer && (int)Controls::g_InputMethods.size() == 1)
     {
         block_poll = true;
