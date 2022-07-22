@@ -261,7 +261,6 @@ void OpenConfig()
         config.read("world-map-fast-move", g_config.worldMapFastMove, false);
         config.read("editor-pause-on-death", g_config.editor_pause_on_death, true);
         config.read("hud-follows-player", g_config.hud_follows_player, false);
-        config.readEnum("world-map-fog", g_config.world_map_fog, (int)Config_t::WORLD_MAP_FOG_NORMAL, worldMapFog);
         config.endGroup();
 
         config.beginGroup("effects");
@@ -271,6 +270,7 @@ void OpenConfig()
         config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
         config.read("enable-inter-level-fade-effect", g_config.EnableInterLevelFade, true);
         config.read("world-map-expand-view", g_config.world_map_expand_view, false);
+        config.readEnum("world-map-fog", g_config.world_map_fog, (int)Config_t::WORLD_MAP_FOG_OFF, worldMapFog);
         // disabled pending further discussion
         // config.read("world-map-smart-pan", g_config.world_map_smart_pan, false);
         config.endGroup();
@@ -417,16 +417,6 @@ void SaveConfig()
     config.setValue("world-map-fast-move", g_config.worldMapFastMove);
     config.setValue("editor-pause-on-death", g_config.editor_pause_on_death);
     config.setValue("hud-follows-player", g_config.hud_follows_player);
-    {
-        std::unordered_map<int, std::string> worldMapFog =
-        {
-            {Config_t::WORLD_MAP_FOG_OFF, "off"},
-            {Config_t::WORLD_MAP_FOG_NORMAL, "normal"},
-            {Config_t::WORLD_MAP_FOG_SPOILERS, "spoilers"},
-        };
-
-        config.setValue("world-map-fog", worldMapFog[g_config.world_map_fog]);
-    }
     config.endGroup();
 
     config.beginGroup("speedrun");
@@ -453,6 +443,13 @@ void SaveConfig()
         config.setValue("enable-inter-level-fade-effect", g_config.EnableInterLevelFade);
 
         config.setValue("world-map-expand-view", g_config.world_map_expand_view);
+        std::unordered_map<int, std::string> worldMapFog =
+        {
+            {Config_t::WORLD_MAP_FOG_OFF, "off"},
+            {Config_t::WORLD_MAP_FOG_NORMAL, "normal"},
+            {Config_t::WORLD_MAP_FOG_SPOILERS, "spoilers"},
+        };
+
         config.setValue("world-map-fog", worldMapFog[g_config.world_map_fog]);
         // disabled pending further discussion
         // config.setValue("world-map-smart-pan", g_config.world_map_smart_pan);
