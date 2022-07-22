@@ -25,6 +25,7 @@
 
 #include <bitset>
 #include <vector>
+#include <utility>
 
 #include "globals.h"
 
@@ -61,7 +62,10 @@ private:
     std::vector<WorldPathRef_t> m_active_paths;
     std::vector<WorldLevelRef_t> m_active_levels;
 
+    std::vector<std::pair<double, double>> m_best_pans;
+
     void RevealLoc(double x, double y);
+    std::pair<double, double> FindCenterOfVisibleMass(double x, double y);
 
 public:
     double m_map_left = 0.;
@@ -70,13 +74,16 @@ public:
     int m_map_rows = 0;
 
     const int m_tile_size = 16;
+    const int m_tiles_per_zone = 16;
     const int8_t m_fog_levels = 6;
 
+    bool m_ready = false;
     bool m_active = false;
 
     std::vector<int8_t> m_fog_alpha;
 
     void Update();
+    std::pair<double, double> GetPan(double cx, double cy);
 };
 
 // defined in world_map_visibility.cpp

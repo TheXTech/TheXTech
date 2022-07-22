@@ -27,11 +27,13 @@
 
 void WorldMapFog::Update()
 {
+    m_ready = false;
     m_active = false;
-    if(ScreenW <= 800 && ScreenH <= 600)
+
+    if(!LevelSelect || GameMenu)
         return;
 
-    if(g_config.world_map_fog == Config_t::WORLD_MAP_FOG_OFF)
+    if(g_config.world_map_fog == Config_t::WORLD_MAP_FOG_OFF && !g_config.world_map_smart_pan)
         return;
 
     bool spoilers = (g_config.world_map_fog == Config_t::WORLD_MAP_FOG_SPOILERS);
@@ -191,6 +193,33 @@ void WorldMapFog::Update()
         RevealLoc(l->Location.X + l->Location.Width / 2.0, l->Location.Y + l->Location.Height / 2.0);
     }
 
+    // calculate the optimal pans based on player position
+    if(g_config.world_map_smart_pan)
+    {
+        const int pan_cols = m_map_rows / m_tiles_per_zone + 1;
+        const int pan_rows = m_map_cols / m_tiles_per_zone + 1;
+        const int zone_size = m_tile_size * m_tiles_per_zone;
+        m_best_pans.resize(pan_cols * pan_rows);
+
+        for(int row = 0; row < pan_rows; row++)
+        {
+            double cy = m_map_top + row * zone_size;
+            for(int col = 0; col < pan_cols; col++)
+            {
+                double cx = m_map_left + col * zone_size;
+                m_best_pans[row * pan_cols + col] = FindCenterOfVisibleMass(cx, cy);
+            }
+        }
+    }
+
+    m_ready = true;
+
+    if(ScreenW <= 800 && ScreenH <= 600)
+        return;
+
+    if(g_config.world_map_fog == Config_t::WORLD_MAP_FOG_OFF)
+        return;
+
     m_active = true;
 }
 
@@ -248,6 +277,99 @@ void WorldMapFog::RevealLoc(double x, double y)
             }
         }
     }
+}
+
+std::pair<double, double> WorldMapFog::FindCenterOfVisibleMass(double cx, double cy)
+{
+    double start_x = cx - ScreenW + 66 + 66;
+    int start_col = std::floor((start_x - m_map_left) / m_tile_size);
+    double limit_x = cx + ScreenW - 66 - 66;
+    int limit_col = std::ceil((limit_x - m_map_left) / m_tile_size);
+
+    double start_y = cy - (ScreenH - 66 - 130);
+    int start_row = std::floor((start_y - m_map_top) / m_tile_size);
+    double limit_y = cy + (ScreenH - 66 - 130);
+    int limit_row = std::ceil((limit_y - m_map_top) / m_tile_size);
+
+    long cum_row = 0;
+    long cum_col = 0;
+    long divisor = 0;
+
+    for(int row = start_row; row < limit_row; row++)
+    {
+        if(row < 0 || row >= m_map_rows)
+            continue;
+
+        int row_from_start = row - start_row + 1;
+        int row_from_limit = limit_row - row;
+
+        int row_interior = row_from_start < row_from_limit ? row_from_start : row_from_limit;
+
+        if(row_interior > m_fog_levels)
+            row_interior = m_fog_levels;
+
+        for(int col = start_col; col < limit_col; col++)
+        {
+            if(col < 0 || col >= m_map_cols)
+                continue;
+
+            int visibility = m_fog_levels - m_fog_alpha[row * m_map_cols + col];
+
+            divisor += visibility;
+            cum_row += visibility * row;
+            cum_col += visibility * col;
+        }
+    }
+
+    if(divisor == 0)
+    {
+        // printf("no way %d %d %d %d %d %d\n", start_row, limit_row, m_map_rows, start_col, limit_col, m_map_cols);
+        return {cx, cy};
+    }
+
+    double rx = (cum_col / divisor) * m_tile_size + m_map_left;
+    double ry = (cum_row / divisor) * m_tile_size + m_map_top;
+
+    return {rx, ry};
+}
+
+std::pair<double, double> WorldMapFog::GetPan(double cx, double cy)
+{
+    if(!m_ready || !g_config.world_map_smart_pan)
+        return {cx, cy};
+
+    const int pan_cols = m_map_rows / m_tiles_per_zone + 1;
+    const int pan_rows = m_map_cols / m_tiles_per_zone + 1;
+    const int zone_size = m_tile_size * m_tiles_per_zone;
+
+    int col_1 = std::floor((cx - m_map_left) / zone_size);
+    int col_2 = col_1 + 1;
+
+    int row_1 = std::floor((cy - m_map_top) / zone_size);
+    int row_2 = row_1 + 1;
+
+    auto tl = m_best_pans[row_1 * pan_cols + col_1];
+    auto tr = m_best_pans[row_1 * pan_cols + col_2];
+    auto bl = m_best_pans[row_2 * pan_cols + col_1];
+    auto br = m_best_pans[row_2 * pan_cols + col_2];
+
+    if(col_1 < 0 || col_2 >= pan_cols || row_1 < 0 || row_2 >= pan_rows)
+        return {cx, cy};
+
+    double col_coord = (cx - m_map_left - col_1 * zone_size) / zone_size;
+    double row_coord = (cy - m_map_top - row_1 * zone_size) / zone_size;
+
+    double ret_x = tl.first * (1 - row_coord) * (1 - col_coord)
+        + tr.first * (1 - row_coord) * col_coord
+        + bl.first * row_coord * (1 - col_coord)
+        + br.first * row_coord * col_coord;
+
+    double ret_y = tl.second * (1 - row_coord) * (1 - col_coord)
+        + tr.second * (1 - row_coord) * col_coord
+        + bl.second * row_coord * (1 - col_coord)
+        + br.second * row_coord * col_coord;
+
+    return {ret_x, ret_y};
 }
 
 WorldMapFog g_worldMapFog;

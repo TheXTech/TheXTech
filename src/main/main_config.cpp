@@ -271,6 +271,8 @@ void OpenConfig()
         config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
         config.read("enable-inter-level-fade-effect", g_config.EnableInterLevelFade, true);
         config.read("world-map-expand-view", g_config.world_map_expand_view, false);
+        // disabled pending further discussion
+        // config.read("world-map-smart-pan", g_config.world_map_smart_pan, false);
         config.endGroup();
 
         Controls::LoadConfig(ctl);
@@ -449,7 +451,11 @@ void SaveConfig()
         config.setValue("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd);
         config.setValue("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem);
         config.setValue("enable-inter-level-fade-effect", g_config.EnableInterLevelFade);
+
         config.setValue("world-map-expand-view", g_config.world_map_expand_view);
+        config.setValue("world-map-fog", worldMapFog[g_config.world_map_fog]);
+        // disabled pending further discussion
+        // config.setValue("world-map-smart-pan", g_config.world_map_smart_pan);
     }
     config.endGroup();
 

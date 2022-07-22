@@ -190,8 +190,18 @@ void WorldLoop()
     if(SingleCoop > 0)
         SingleCoop = 1;
 
-    vScreenX[1] = -(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0) + vScreen[1].Width / 2.0;
-    vScreenY[1] = -(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0) + vScreen[1].Height / 2.0 + 32;
+    if(g_config.world_map_smart_pan && g_worldMapFog.m_ready && !WalkAnywhere)
+    {
+        std::pair<double, double> c = g_worldMapFog.GetPan(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0, WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0);
+
+        vScreenX[1] = -c.first + vScreen[1].Width / 2.0;
+        vScreenY[1] = -c.second + vScreen[1].Height / 2.0 + 32.0;
+    }
+    else
+    {
+        vScreenX[1] = -(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0) + vScreen[1].Width / 2.0;
+        vScreenY[1] = -(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0) + vScreen[1].Height / 2.0 + 32;
+    }
 
     if(numPlayers > 2)
         numPlayers = 1;
