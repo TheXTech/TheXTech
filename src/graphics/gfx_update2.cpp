@@ -527,8 +527,13 @@ void UpdateGraphics2(bool skipRepaint)
 
             const FrameBorderInfo borderinfo;
 
-            RenderFrame(newLoc(0, 0, sW, sH), newLoc(margin, marginTop, sW - margin - margin, sH - marginTop - margin),
+            XRender::resetViewport();
+
+            RenderFrame(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft + margin, vScreen[Z].ScreenTop + marginTop, sW - margin - margin, sH - marginTop - margin),
                 GFX.WorldMapFrame_Tile, border_valid ? &GFX.WorldMapFrame_Border : nullptr, &borderinfo);
+
+            XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
+                vScreen[Z].Width, vScreen[Z].Height);
         }
         else
         {
