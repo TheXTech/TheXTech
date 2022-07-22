@@ -457,13 +457,13 @@ void UpdateGraphics2(bool skipRepaint)
             for(int row = 0; row < g_worldMapFog.m_map_rows; row++)
             {
                 double y = g_worldMapFog.m_map_top + g_worldMapFog.m_tile_size * row + vScreenY[Z];
-                if(y + g_worldMapFog.m_tile_size < marginTop || y >= ScreenH - margin)
+                if(y + g_worldMapFog.m_tile_size < marginTop || y >= sH - margin)
                     continue;
 
                 for(int col = 0; col < g_worldMapFog.m_map_cols; col++)
                 {
                     double x = g_worldMapFog.m_map_left + g_worldMapFog.m_tile_size * col + vScreenX[Z];
-                    if(x + g_worldMapFog.m_tile_size < margin || x >= ScreenW - margin)
+                    if(x + g_worldMapFog.m_tile_size < margin || x >= sW - margin)
                         continue;
 
                     int8_t fog_alpha = g_worldMapFog.m_fog_alpha[row * g_worldMapFog.m_map_cols + col];

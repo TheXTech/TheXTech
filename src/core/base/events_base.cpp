@@ -46,6 +46,5 @@ void AbstractEvents_t::init(FrmMain *form)
 void AbstractEvents_t::eventResize()
 {
     UpdateInternalRes();
-    SetupScreens();
     Controls::UpdateTouchScreenSize();
 }
