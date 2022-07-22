@@ -372,6 +372,23 @@ void WorldLoop()
                 break;
         }
 
+        // check whether the player is currently on a path (important for parkinglot workaround)
+        // second part of workaround is after this big clause for all the possible player actions.
+        // if player wasn't on a path and is about to start moving, then update the world map fog based on the player's next destination.
+        bool currently_on_path = false;
+        if(Player[1].Controls.Up || Player[1].Controls.Down || Player[1].Controls.Left || Player[1].Controls.Right)
+        {
+            for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_ID))
+            {
+                WorldPath_t &path = *t;
+                if(CheckCollision(tempLocation, path.Location) && path.Active)
+                {
+                    currently_on_path = true;
+                    break;
+                }
+            }
+        }
+
         if(Player[1].Controls.Up)
         {
             tempLocation.Y -= 32;
@@ -653,6 +670,30 @@ void WorldLoop()
                 WorldPlayer[1].Move3 = false;
                 PlaySound(SFX_Slide);
             }
+        }
+
+        // second part of parkinglot workaround: update the fog based on the path the player is about to go onto
+        if(WorldPlayer[1].Move && !currently_on_path)
+        {
+            if(WorldPlayer[1].Move == 1)
+                WorldPlayer[1].Location.Y -= 32;
+            else if(WorldPlayer[1].Move == 2)
+                WorldPlayer[1].Location.X -= 32;
+            else if(WorldPlayer[1].Move == 3)
+                WorldPlayer[1].Location.Y += 32;
+            else if(WorldPlayer[1].Move == 4)
+                WorldPlayer[1].Location.X += 32;
+
+            g_worldMapFog.Update();
+
+            if(WorldPlayer[1].Move == 1)
+                WorldPlayer[1].Location.Y += 32;
+            else if(WorldPlayer[1].Move == 2)
+                WorldPlayer[1].Location.X += 32;
+            else if(WorldPlayer[1].Move == 3)
+                WorldPlayer[1].Location.Y -= 32;
+            else if(WorldPlayer[1].Move == 4)
+                WorldPlayer[1].Location.X -= 32;
         }
 
         if(WorldPlayer[1].Move == 0)
