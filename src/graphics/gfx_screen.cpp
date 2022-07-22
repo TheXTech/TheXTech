@@ -26,6 +26,7 @@
 #include "../load_gfx.h"
 #include "../core/window.h"
 #include "../compat.h"
+#include "config.h"
 
 
 void SetScreenType()
@@ -421,7 +422,7 @@ void CenterScreens()
         if(NoTurnBack[Player[2].Section])
             MaxWidth2 = 800;
     }
-    else if(!g_compatibility.free_world_res)
+    else if(!g_compatibility.free_world_res || !g_config.world_map_expand_view)
     {
         MaxWidth1 = MaxWidth2 = 800;
         MaxHeight1 = MaxHeight2 = 600;

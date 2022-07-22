@@ -78,6 +78,9 @@ extern struct Config_t
     int     InternalH = 600;
     //! HUD follows player onscreen (useful for levels much larger than the intended screen size)
     bool    hud_follows_player = false;
+    //! Allow the view to grow beyond 800x600 in the world map (nearly duplicates Compatibility_t::free_world_res),
+    //  but does not enforce at least 800x600 render resolution when off.
+    bool world_map_expand_view = false;
     //! Show fog on canonically hidden portions of the world map
     enum
     {

@@ -270,6 +270,7 @@ void OpenConfig()
         config.read("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd, true);
         config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
         config.read("enable-inter-level-fade-effect", g_config.EnableInterLevelFade, true);
+        config.read("world-map-expand-view", g_config.world_map_expand_view, false);
         config.endGroup();
 
         Controls::LoadConfig(ctl);
@@ -448,6 +449,7 @@ void SaveConfig()
         config.setValue("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd);
         config.setValue("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem);
         config.setValue("enable-inter-level-fade-effect", g_config.EnableInterLevelFade);
+        config.setValue("world-map-expand-view", g_config.world_map_expand_view);
     }
     config.endGroup();
 
