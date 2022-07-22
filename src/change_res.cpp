@@ -25,6 +25,8 @@
 #include "change_res.h"
 #include "load_gfx.h"
 #include "graphics.h"
+#include "sound.h"
+#include "game_main.h"
 #include "logic/world_map_fog.h"
 #include "core/render.h"
 #include "core/window.h"
