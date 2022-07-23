@@ -38,6 +38,7 @@ class RenderSDL final : public AbstractRender_t
 
     SDL_Renderer *m_gRenderer = nullptr;
     SDL_Texture  *m_tBuffer = nullptr;
+    SDL_Texture  *m_t2xScreen = nullptr;
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<SDL_Texture *> m_textureBank;
 
@@ -138,6 +139,11 @@ public:
      * \brief Set render target into the real window or screen (use to render on-screen buttons and other meta-info)
      */
     void setTargetScreen() override;
+
+    /*!
+     * \brief Set render target into the 2x map of the screen (use for emergency speed run timers and other info that is not legible at <0.5x scale)
+     */
+    void setTarget2xScreen();
 
 
     void loadTexture(StdPicture &target,
