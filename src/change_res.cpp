@@ -175,6 +175,24 @@ void UpdateInternalRes()
             int_w = (int_w * int_h) / orig_int_h;
         }
 
+        // force >800x600 resolution if required
+        if((!g_compatibility.free_level_res && !LevelSelect && !GameMenu)
+            || (!g_compatibility.free_world_res && LevelSelect && !GameMenu))
+        {
+            if(int_w < 800)
+            {
+                int_h = int_h * 800 / int_w;
+                int_w = 800;
+                if(int_h > 720)
+                    int_h = 720;
+            }
+            if(int_h < 600)
+            {
+                int_w = int_w * 600 / int_h;
+                int_h = 600;
+            }
+        }
+
         // minimum width constraint
         if(int_w < 480)
             int_w = 480;
