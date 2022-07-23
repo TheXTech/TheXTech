@@ -74,7 +74,7 @@ void UpdateInternalRes()
     if((!g_compatibility.free_level_res && !LevelSelect && !GameMenu)
         || (!g_compatibility.free_world_res && LevelSelect && !GameMenu))
     {
-        if(req_w < 800 || req_h < 600)
+        if((req_w != 0 && req_w < 800) || (req_h != 0 && req_h < 600))
         {
             req_w = 800;
             req_h = 600;
