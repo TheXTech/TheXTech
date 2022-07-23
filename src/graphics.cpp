@@ -786,46 +786,28 @@ void DrawBackdrop()
 
         const FrameBorderInfo borderinfo;
 
-        Location_t loc;
-
-        if(!vScreen[2].Visible)
+        for(int Z = 1; Z <= 2; Z++)
         {
-            loc.X = vScreen[1].ScreenLeft;
-            loc.Y = vScreen[1].ScreenTop;
-            loc.Width = vScreen[1].Width;
-            loc.Height = vScreen[1].Height;
+            const auto& s = vScreen[Z];
+            if((Z == 1 && SingleCoop == 2) || (Z == 2 && !s.Visible))
+                continue;
+
+            Location_t full = newLoc(0, 0, ScreenW, ScreenH);
+            if(DScreenType == 1 || DScreenType == 2)
+            {
+                full.Width = ScreenW / 2;
+                if((DScreenType == 1 && Z == 2) || (DScreenType == 2 && Z == 1))
+                    full.X = ScreenW / 2;
+            }
+            else if(DScreenType == 3 || DScreenType == 4 || DScreenType == 6)
+            {
+                full.Height = ScreenH / 2;
+                if(((DScreenType == 3 || DScreenType == 6) && Z == 2) || (DScreenType == 4 && Z == 1))
+                    full.Y = ScreenH / 2;
+            }
+
+            RenderFrame(full, newLoc(s.ScreenLeft, s.ScreenTop, s.Width, s.Height),
+                GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr, &borderinfo);
         }
-        else if(!vScreen[1].Visible)
-        {
-            loc.X = vScreen[2].ScreenLeft;
-            loc.Y = vScreen[2].ScreenTop;
-            loc.Width = vScreen[2].Width;
-            loc.Height = vScreen[2].Height;
-        }
-        else
-        {
-            if(vScreen[1].ScreenLeft < vScreen[2].ScreenLeft)
-                loc.X = vScreen[1].ScreenLeft;
-            else
-                loc.X = vScreen[2].ScreenLeft;
-
-            if(vScreen[1].ScreenTop < vScreen[2].ScreenTop)
-                loc.Y = vScreen[1].ScreenTop;
-            else
-                loc.Y = vScreen[2].ScreenTop;
-
-            if(vScreen[1].ScreenLeft != vScreen[2].ScreenLeft)
-                loc.Width = vScreen[1].Width + vScreen[2].Width;
-            else
-                loc.Width = vScreen[1].Width;
-
-            if(vScreen[1].ScreenTop != vScreen[2].ScreenTop)
-                loc.Height = vScreen[1].Height + vScreen[2].Height;
-            else
-                loc.Height = vScreen[1].Height;
-        }
-
-        RenderFrame(newLoc(0, 0, ScreenW, ScreenH), loc,
-            GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr, &borderinfo);
     }
 }
