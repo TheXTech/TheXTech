@@ -31,8 +31,10 @@
 #include "video.h"
 #include "config.h"
 #include "../window.h"
+#include "graphics.h"
 
 #include <SDL2/SDL_assert.h>
+#include <fmt_format_ne.h>
 
 #include "controls.h"
 #include "main/speedrunner.h"
@@ -209,23 +211,30 @@ void RenderSDL::repaint()
     // emergency speedrun timer for very low-resolution devices
     if(m_t2xScreen)
     {
+        // set target to 2x map
         setTarget2xScreen();
 
         SDL_SetTextureBlendMode(m_t2xScreen, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 0);
         SDL_RenderClear(m_gRenderer);
 
+        // temporarily set ScreenW / H
         int real_ScreenW = ScreenW;
         int real_ScreenH = ScreenH;
         ScreenW = w * 2;
         ScreenH = h * 2;
 
+        // render content
+        if(PrintFPS > 0)
+            SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
         speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
         speedRun_renderTimer();
 
+        // restore ScreenW / H
         ScreenW = real_ScreenW;
         ScreenH = real_ScreenH;
 
+        // draw 2x map to screen
         setTargetScreen();
 
         SDL_Rect destRect = {0, 0, w, h};
