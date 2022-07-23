@@ -793,16 +793,20 @@ void DrawBackdrop()
                 continue;
 
             Location_t full = newLoc(0, 0, ScreenW, ScreenH);
-            if(DScreenType == 1 || DScreenType == 2)
+            // horizontal
+            if(ScreenType == 4 || (ScreenType == 5 && (DScreenType == 1 || DScreenType == 2)))
             {
                 full.Width = ScreenW / 2;
-                if((DScreenType == 1 && Z == 2) || (DScreenType == 2 && Z == 1))
+                // our screen on right
+                if(((ScreenType == 4 || (ScreenType == 5 && DScreenType == 1)) && Z == 2) || (DScreenType == 2 && Z == 1))
                     full.X = ScreenW / 2;
             }
-            else if(DScreenType == 3 || DScreenType == 4 || DScreenType == 6)
+            // vertical
+            else if(ScreenType == 1 || (ScreenType == 5 && (DScreenType == 3 || DScreenType == 4 || DScreenType == 6)))
             {
                 full.Height = ScreenH / 2;
-                if(((DScreenType == 3 || DScreenType == 6) && Z == 2) || (DScreenType == 4 && Z == 1))
+                // our screen on bottom
+                if(((ScreenType == 1 || (ScreenType == 5 && (DScreenType == 3 || DScreenType == 6))) && Z == 2) || (DScreenType == 4 && Z == 1))
                     full.Y = ScreenH / 2;
             }
 
