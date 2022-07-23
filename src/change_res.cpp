@@ -71,8 +71,8 @@ void UpdateInternalRes()
 {
     int req_w = g_config.InternalW;
     int req_h = g_config.InternalH;
-    if((!g_compatibility.free_level_res && !LevelSelect)
-        || (!g_compatibility.free_world_res && LevelSelect))
+    if((!g_compatibility.free_level_res && !LevelSelect && !GameMenu)
+        || (!g_compatibility.free_world_res && LevelSelect && !GameMenu))
     {
         if(req_w < 800 || req_h < 600)
         {
