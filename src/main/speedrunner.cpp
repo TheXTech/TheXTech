@@ -177,6 +177,12 @@ void RenderControls(int player, int x, int y, int w, int h)
 
 void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
 {
+    // force to 2x
+    bx &= ~1;
+    by &= ~1;
+    bw &= ~1;
+    bh &= ~1;
+
     float alhpa = 0.7f;
     float alhpaB = 0.8f;
     float r, g, b;
@@ -253,11 +259,11 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
             break;
         }
         if(status_info.power_status == Controls::StatusInfo::POWER_UNKNOWN)
-            SuperPrintCenter("?", 3, bx + bw / 2, by + bh / 2 - 8);
+            SuperPrintCenter("?", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 8) & ~1);
         if(status_info.power_status == Controls::StatusInfo::POWER_WIRED)
-            SuperPrintCenter("W", 3, bx + bw / 2, by + bh / 2 - 8);
+            SuperPrintCenter("W", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 8) & ~1);
         if(status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
-            SuperPrintCenter("+", 3, bx + bw / 2, by + bh / 2 - 7);
+            SuperPrintCenter("+", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 7) & ~1);
     }
 
     if(status_info.info_string)
