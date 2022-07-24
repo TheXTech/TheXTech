@@ -433,7 +433,13 @@ void UpdateNPCs()
                 {
                     if(!NPC[B].Active && B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
                     {
-                        if(CheckCollision(tempLocation, NPC[B].Location))
+                        if(g_compatibility.NPC_activate_mode == NPC_activate_modes::smart
+                            && NPC[B].TriggerActivate != EVENT_NONE
+                            && (int)(Events[NPC[B].TriggerActivate].section[NPC[A].Section].position.X) != EventSection_t::LESet_Nothing)
+                        {
+                            // don't chain activate NPCs with activate events in smart mode.
+                        }
+                        else if(CheckCollision(tempLocation, NPC[B].Location))
                         {
                             numAct++;
                             SDL_assert_release(numAct <= maxNPCs);
@@ -476,7 +482,13 @@ void UpdateNPCs()
                               (!NPC[B].Hidden || !g_compatibility.fix_npc_activation_event_loop_bug) &&
                                B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
                             {
-                                if(CheckCollision(tempLocation, NPC[B].Location))
+                                if(g_compatibility.NPC_activate_mode == NPC_activate_modes::smart
+                                    && NPC[B].TriggerActivate != EVENT_NONE
+                                    && (int)(Events[NPC[B].TriggerActivate].section[NPC[A].Section].position.X) != EventSection_t::LESet_Nothing)
+                                {
+                                    // don't chain activate NPCs with activate section resize events in smart mode.
+                                }
+                                else if(CheckCollision(tempLocation, NPC[B].Location))
                                 {
                                     numAct += 1;
                                     SDL_assert_release(numAct <= maxNPCs);
