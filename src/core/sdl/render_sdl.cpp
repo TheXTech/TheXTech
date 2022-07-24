@@ -31,10 +31,14 @@
 #include "video.h"
 #include "config.h"
 #include "../window.h"
+#include "graphics.h"
 
 #include <SDL2/SDL_assert.h>
+#include <fmt_format_ne.h>
 
 #include "controls.h"
+#include "main/speedrunner.h"
+
 
 #ifndef UNUSED
 #define UNUSED(x) (void)x
@@ -155,6 +159,10 @@ void RenderSDL::close()
         SDL_DestroyTexture(m_tBuffer);
     m_tBuffer = nullptr;
 
+    if(m_t2xScreen)
+        SDL_DestroyTexture(m_t2xScreen);
+    m_t2xScreen = nullptr;
+
     if(m_gRenderer)
         SDL_DestroyRenderer(m_gRenderer);
     m_gRenderer = nullptr;
@@ -200,6 +208,43 @@ void RenderSDL::repaint()
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
     SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
 
+    // emergency speedrun timer for very low-resolution devices
+    if(m_t2xScreen)
+    {
+        // set target to 2x map
+        setTarget2xScreen();
+
+        SDL_SetTextureBlendMode(m_t2xScreen, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 0);
+        SDL_RenderClear(m_gRenderer);
+
+        // temporarily set ScreenW / H
+        int real_ScreenW = ScreenW;
+        int real_ScreenH = ScreenH;
+        ScreenW = w * 2;
+        ScreenH = h * 2;
+
+        // render content
+        if(PrintFPS > 0)
+            SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+        speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
+        speedRun_renderTimer();
+
+        // restore ScreenW / H
+        ScreenW = real_ScreenW;
+        ScreenH = real_ScreenH;
+
+        // draw 2x map to screen
+        setTargetScreen();
+
+        SDL_Rect destRect = {0, 0, w, h};
+        SDL_Rect sourceRect = {0, 0, w * 2, h * 2};
+
+        SDL_SetTextureColorMod(m_t2xScreen, 255, 255, 255);
+        SDL_SetTextureAlphaMod(m_t2xScreen, 255);
+        SDL_RenderCopyEx(m_gRenderer, m_t2xScreen, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
+    }
+
     Controls::RenderTouchControls();
 
     SDL_RenderPresent(m_gRenderer);
@@ -207,34 +252,6 @@ void RenderSDL::repaint()
 
 void RenderSDL::updateViewport()
 {
-    // will never happen in the fixed res case
-    if(ScaleWidth != ScreenW || ScaleHeight != ScreenH || m_current_scale_mode != g_videoSettings.scaleMode)
-    {
-#ifdef USE_SCREENSHOTS_AND_RECS
-        // invalidates GIF recorder handle
-        if(recordInProcess())
-            toggleGifRecorder();
-#endif
-
-        // update video settings
-        if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
-            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
-        else
-            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-
-        SDL_DestroyTexture(m_tBuffer);
-        m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
-        SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
-
-        // reset scaling setting for images loaded later
-        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-
-        ScaleWidth = ScreenW;
-        ScaleHeight = ScreenH;
-        m_current_scale_mode = g_videoSettings.scaleMode;
-    }
-
-
     float w, w1, h, h1;
     int   wi, hi;
 
@@ -247,8 +264,8 @@ void RenderSDL::updateViewport()
     }
     else
     {
-        wi = ScaleWidth;
-        hi = ScaleHeight;
+        wi = ScreenW;
+        hi = ScreenH;
     }
 #endif
 
@@ -259,15 +276,13 @@ void RenderSDL::updateViewport()
     w1 = w;
     h1 = h;
 
-    float scale = w / ScaleWidth;
+    float scale = w / ScreenW;
 
-    if(scale > h / ScaleHeight)
-        scale = h / ScaleHeight;
+    if(scale > h / ScreenH)
+        scale = h / ScreenH;
 
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X && scale > 0.5f)
-    {
         scale = 0.5f;
-    }
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
         scale = std::floor(scale);
     if(g_videoSettings.scaleMode == SCALE_FIXED_1X && scale > 1.f)
@@ -275,8 +290,8 @@ void RenderSDL::updateViewport()
     if(g_videoSettings.scaleMode == SCALE_FIXED_2X && scale > 2.f)
         scale = 2.f;
 
-    w1 = scale * ScaleWidth;
-    h1 = scale * ScaleHeight;
+    w1 = scale * ScreenW;
+    h1 = scale * ScreenH;
 
     m_scale_x = scale;
     m_scale_y = scale;
@@ -294,8 +309,47 @@ void RenderSDL::updateViewport()
 
     m_viewport_x = 0;
     m_viewport_y = 0;
-    m_viewport_w = ScaleWidth;
-    m_viewport_h = ScaleHeight;
+    m_viewport_w = ScreenW;
+    m_viewport_h = ScreenH;
+
+    // update render targets; will never happen in the fixed res case
+    if(ScaleWidth != ScreenW || ScaleHeight != ScreenH || m_current_scale_mode != g_videoSettings.scaleMode)
+    {
+#ifdef USE_SCREENSHOTS_AND_RECS
+        // invalidates GIF recorder handle
+        if(recordInProcess())
+            toggleGifRecorder();
+#endif
+
+        // update video settings
+        if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || scale < 0.5f)
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+        else
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+        SDL_DestroyTexture(m_tBuffer);
+        m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
+        SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+
+        // reset scaling setting for images loaded later
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+        ScaleWidth = ScreenW;
+        ScaleHeight = ScreenH;
+        m_current_scale_mode = g_videoSettings.scaleMode;
+    }
+
+    // if necessary, create / update the emergency 2x screen map
+    if(m_t2xScreen)
+    {
+        SDL_DestroyTexture(m_t2xScreen);
+        m_t2xScreen = nullptr;
+    }
+    if(scale < 0.5f)
+    {
+        m_t2xScreen = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, wi * 2, hi * 2);
+        SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+    }
 }
 
 void RenderSDL::resetViewport()
@@ -377,6 +431,14 @@ void RenderSDL::setTargetScreen()
         return;
     SDL_SetRenderTarget(m_gRenderer, nullptr);
     m_recentTarget = nullptr;
+}
+
+void RenderSDL::setTarget2xScreen()
+{
+    if(!m_t2xScreen || m_recentTarget == m_t2xScreen)
+        return;
+    SDL_SetRenderTarget(m_gRenderer, m_t2xScreen);
+    m_recentTarget = m_t2xScreen;
 }
 
 void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)

@@ -872,11 +872,8 @@ void UpdateGraphics(bool skipRepaint)
         // Note: this was guarded by an if(!LevelEditor) condition in the past
         if(Background2[S] == 0)
         {
-            if(numScreens > 1 || LevelEditor)
-                XRender::renderRect(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
-                                    vScreen[Z].Width, vScreen[Z].Height, 0.f, 0.f, 0.f, 1.f, true);
-            else
-                XRender::clearBuffer();
+            XRender::renderRect(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
+                                vScreen[Z].Width, vScreen[Z].Height, 0.f, 0.f, 0.f, 1.f, true);
         }
 
         // Get a reference to our NPC draw queue.

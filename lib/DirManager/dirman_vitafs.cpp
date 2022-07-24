@@ -330,7 +330,6 @@ bool DirMan::rmAbsDir(const std::string &dirPath)
 bool DirMan::mkAbsPath(const std::string &dirPath)
 {
     PUT_THREAD_GUARD();
-    pLogWarning("TODO: NEED TO MAKE ABSOLUTE PATH FOR `%s`", dirPath.c_str());
     char tmp[PATH_MAX];
     char *p = NULL;
     size_t len;
@@ -348,12 +347,13 @@ bool DirMan::mkAbsPath(const std::string &dirPath)
             first_slash = i;
     }
 
+    constexpr SceMode dirMode = 0777;
     for(p = (tmp + first_slash + 1); *p; p++)
     {
         if(*p == '/')
         {
             *p = 0;
-            int err = sceIoMkdir(tmp, SCE_S_IRWXU | SCE_S_IRWXG);
+            int err = sceIoMkdir(tmp, dirMode);
             if((err != 0))
             {
                 pLogDebug("err != 0 when calling sceIoMkdir for mkabspath (%s was the path)", tmp);
@@ -364,8 +364,8 @@ bool DirMan::mkAbsPath(const std::string &dirPath)
         }
     }
 
-    bool rv = sceIoMkdir(tmp, SCE_S_IRWXU | SCE_S_IRWXG) == 0;
-    pLogDebug("    mkAbsPath: %s. Success: %s", tmp, (rv ? "TRUE" : "FALSE"));
+    bool rv = sceIoMkdir(tmp, dirMode) == 0;
+    pLogDebug("    mkAbsPath: `%s`. Success: %s", tmp, (rv ? "TRUE" : "FALSE"));
     return rv;
 }
 
