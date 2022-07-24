@@ -208,7 +208,8 @@ void RenderSDL::repaint()
     SDL_SetTextureAlphaMod(m_tBuffer, 255);
     SDL_RenderCopyEx(m_gRenderer, m_tBuffer, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
 
-    // emergency speedrun timer for very low-resolution devices
+#ifndef THEXTECH_FIXED_RES
+    // emergency speedrun timer for very low-resolution devices rendering high-resolution levels
     if(m_t2xScreen)
     {
         // set target to 2x map
@@ -244,6 +245,7 @@ void RenderSDL::repaint()
         SDL_SetTextureAlphaMod(m_t2xScreen, 255);
         SDL_RenderCopyEx(m_gRenderer, m_t2xScreen, &sourceRect, &destRect, 0.0, nullptr, SDL_FLIP_NONE);
     }
+#endif // #ifndef THEXTECH_FIXED_RES
 
     Controls::RenderTouchControls();
 
@@ -345,11 +347,13 @@ void RenderSDL::updateViewport()
         SDL_DestroyTexture(m_t2xScreen);
         m_t2xScreen = nullptr;
     }
+#ifndef THEXTECH_FIXED_RES
     if(scale < 0.5f)
     {
         m_t2xScreen = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, wi * 2, hi * 2);
         SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
     }
+#endif // #ifndef THEXTECH_FIXED_RES
 }
 
 void RenderSDL::resetViewport()
