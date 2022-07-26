@@ -1751,6 +1751,11 @@ static void setResVga()
     setRes(640, 480);
 }
 
+static void setResHello()
+{
+    setRes(768, 432);
+}
+
 static void setRes3ds()
 {
     setRes(800, 480);
@@ -1840,6 +1845,7 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
     {"ndsview", setResNds, false},
     {"snesview", setResSnes, false},
     {"vgaview", setResVga, false},
+    {"helloview", setResHello, false},
     {"3dsview", setRes3ds, false},
     {"smbxview", setResClassic, false},
     {"aodview", setResClassic, false},
