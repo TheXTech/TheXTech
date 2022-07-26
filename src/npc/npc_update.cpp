@@ -1746,7 +1746,7 @@ void UpdateNPCs()
                                 }
                                 else if(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 1 && NPC[A].Special5 == 1)
                                     NPC[A].Location.SpeedY += Physics.NPCGravity * 0.6;
-                                else if(NPC[A].Type == 278) // Here was a junk: duplicated "|| NPC[A].Type == 278" condition
+                                else if(NPC[A].Type == 278 || (g_compatibility.fix_flamethrower_gravity && NPC[A].Type == 279))
                                 {
                                     NPC[A].Location.SpeedY += Physics.NPCGravity * 0.75;
                                     if(NPC[A].Location.SpeedY > Physics.NPCGravity * 15)

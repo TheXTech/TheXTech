@@ -11,6 +11,7 @@ Changes for 1.3.5.4
 -Fixed the invalid size of some effects (Bug #296)
 -Blocked an ability to start the game with no episodes or battle levels available in the list and prevented several issues with this (Bug #345)
 -Fixed the vanilla bug: a Player can stuck in the pipe when enters it being a fairy
+-Fixed the vanilla bug of the gravity of the flamethrower gravity (#350)
 
 Changes for 1.3.5.3-1
 -Fixed autostart events behaviour
