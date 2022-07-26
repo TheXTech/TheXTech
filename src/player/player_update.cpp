@@ -307,7 +307,8 @@ void UpdatePlayer()
                 {
                     if(Player[A].Mount == 3 && Player[A].MountType == 6) // Purple Yoshi Pound
                     {
-                        bool poundKeyPressed = g_config.GameplayPoundByAltRun ? Player[A].Controls.AltRun : Player[A].Controls.Down;
+                        bool poundKeyPressed = !ForcedControls && g_config.GameplayPoundByAltRun ? Player[A].Controls.AltRun : Player[A].Controls.Down;
+
                         if(poundKeyPressed && Player[A].DuckRelease && Player[A].CanPound)
                         {
                             Player[A].GroundPound = true;

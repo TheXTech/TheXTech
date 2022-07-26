@@ -6,6 +6,7 @@ Changelog for 1.3.6 [WIP]
 Changes for 1.3.5.4
 -Fixed the reading of some SMBX-38A level files
 -Updated the MixerX library
+-Use Down as the ground-pound key during ForcedControls events (Bug #331)
 
 Changes for 1.3.5.3-1
 -Fixed autostart events behaviour
