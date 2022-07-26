@@ -431,11 +431,20 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
-    bool shrink2x = g_videoSettings.scaleDownAllTextures;
-#if !defined(VITA)
-    if(!shrink2x)
+    bool shrink2x;
+    switch(g_videoSettings.scaleDownTextures)
+    {
+    case VideoSettings_t::SCALE_ALL:
+        shrink2x = true;
+        break;
+    case VideoSettings_t::SCALE_SAFE:
         shrink2x = GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target));
-#endif
+        break;
+    case VideoSettings_t::SCALE_NONE:
+    default:
+        shrink2x = false;
+        break;
+    }
 
     if(shrink2x)
     {
