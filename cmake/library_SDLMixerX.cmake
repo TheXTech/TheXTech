@@ -7,14 +7,19 @@ add_library(PGE_SDLMixerX_static INTERFACE)
 set(SDL_BRANCH "release-2.0.12")
 set(SDL_GIT_BRANCH "origin/release-2.0.12")
 
-if(EMSCRIPTEN OR APPLE OR ANDROID)
+if(EMSCRIPTEN OR APPLE OR ANDROID OR VITA)
     set(PGE_SHARED_SDLMIXER_DEFAULT OFF)
 else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
 endif()
 
 option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
-option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
+
+if(NOT VITA AND NOT 3DS)
+    option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
+else()
+    option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." OFF)
+endif()
 
 
 #if(WIN32)
@@ -141,7 +146,6 @@ set_static_lib(AC_VORBIS       "${CODECS_LIBRARIES_DIR}" vorbis)
 set_static_lib(AC_OPUSFILE     "${CODECS_LIBRARIES_DIR}" opusfile)
 set_static_lib(AC_OPUS         "${CODECS_LIBRARIES_DIR}" opus)
 set_static_lib(AC_OGG          "${CODECS_LIBRARIES_DIR}" ogg)
-set_static_lib(AC_MAD          "${CODECS_LIBRARIES_DIR}" mad)
 set_static_lib(AC_ADLMIDI      "${CODECS_LIBRARIES_DIR}" ADLMIDI)
 set_static_lib(AC_OPNMIDI      "${CODECS_LIBRARIES_DIR}" OPNMIDI)
 set_static_lib(AC_EDMIDI       "${CODECS_LIBRARIES_DIR}" EDMIDI)
@@ -156,14 +160,13 @@ set_static_lib(AC_MODPLUG      "${CODECS_LIBRARIES_DIR}" modplug)
 set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)
 
 set(MixerX_CodecLibs
-    "${AC_FLAC}"
+#    "${AC_FLAC}"
     "${AC_FLUIDLITE}"
 #    "${AC_VORBISFILE}"
 #    "${AC_VORBIS}"
     "${AC_OPUSFILE}"
     "${AC_OPUS}"
     "${AC_OGG}"
-#    "${AC_MAD}"
     "${AC_ADLMIDI}"
     "${AC_OPNMIDI}"
     "${AC_EDMIDI}"
@@ -173,6 +176,42 @@ set(MixerX_CodecLibs
     "${AC_MODPLUG}"
     "${AC_ZLIB}"
 )
+
+if(VITA)
+    set(VITA_AUDIOCODECS_CMAKE_FLAGS
+        -DBUILD_OGG_VORBIS=OFF
+        -DBUILD_FLAC=OFF
+        -DBUILD_OPUS=ON
+        -DBUILD_MPG123=OFF)
+
+    set(VITA_MIXERX_CMAKE_FLAGS
+        "-DUSE_OGG_VORBIS_TREMOR=OFF"
+        "-DUSE_SYSTEM_SDL2=ON"
+        "-DUSE_SYSTEM_AUDIO_LIBRARIES_DEFAULT=ON"
+        "-DSDL_MIXER_X_SHARED=OFF"
+        "-DFLAC_LIBRARIES=FLAC"
+        "-DOGG_LIBRARIES=ogg"
+        "-DLIBOPUSFILE_LIB=opusfile"
+        "-DLIBOPUS_LIB=opus"
+        "-DCMAKE_C_FLAGS=-I$ENV{VITASDK}/arm-vita-eabi/include/opus"
+        "-DLIBVORBISIDEC_LIB=vorbisidec"
+        "-DLIBVORBIS_LIB=vorbis"
+        "-DLIBVORBISFILE_LIB=vorbisfile"
+    )
+
+    set(MixerX_CodecLibs # Minimal list of libraries to link
+        "${AC_FLUIDLITE}"
+        "${AC_ADLMIDI}"
+        "${AC_OPNMIDI}"
+        "${AC_EDMIDI}"
+        "${AC_TIMIDITYSDL}"
+        "${AC_GME}"
+        "${AC_LIBXMP}"
+        "${AC_MODPLUG}"
+        "${AC_ZLIB}"
+    )
+
+endif()
 
 set(MixerX_Deps)
 set(AudioCodecs_Deps)
@@ -190,11 +229,14 @@ ExternalProject_Add(
         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
         "-DUSE_LOCAL_SDL2=${USE_LOCAL_SDL2}"
+        "-DBUILD_SDL2_SHARED=${PGE_SHARED_SDLMIXER}"
         "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
-        "-DBUILD_MIKMOD=OFF"
         "-DBUILD_OGG_VORBIS=OFF"
-        "-DBUILD_MP3_MAD=OFF"
+        "-DBUILD_FLAC=OFF"
+        "-DBUILD_MPG123=OFF"
         ${ANDROID_CMAKE_FLAGS}
+        ${VITA_CMAKE_FLAGS}
+        ${VITA_AUDIOCODECS_CMAKE_FLAGS}
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
         $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
@@ -229,12 +271,17 @@ ExternalProject_Add(
         "-DSDL_MIXER_X_SHARED=${PGE_SHARED_SDLMIXER}"
         "-DAUDIO_CODECS_SDL2_HG_BRANCH=${SDL_BRANCH}"
         "-DAUDIO_CODECS_SDL2_GIT_BRANCH=${SDL_GIT_BRANCH}"
+        "-DMIXERX_ENABLE_GPL=ON"
         "-DWITH_SDL2_WASAPI=ON"
         "-DUSE_MIDI_FLUIDLITE_OGG_STB=ON"
-        "-DUSE_MP3_MINIMP3=ON"
+        "-DUSE_DRFLAC=ON"
+        "-DUSE_FLAC=OFF"
         "-DUSE_OGG_VORBIS_STB=ON"
-        "-DUSE_MP3_MAD=OFF"
+        "-DUSE_MP3_DRMP3=ON"
+        "-DUSE_MP3_MPG123=OFF"
         ${ANDROID_CMAKE_FLAGS}
+        ${VITA_CMAKE_FLAGS}
+        ${VITA_MIXERX_CMAKE_FLAGS}
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
         $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
@@ -280,3 +327,4 @@ target_link_libraries(PGE_SDLMixerX_static INTERFACE "${MixerX_SysLibs}")
 if(PGE_SHARED_SDLMIXER AND NOT WIN32)
     install(FILES ${SDL_MixerX_SO_Lib} DESTINATION "${PGE_INSTALL_DIRECTORY}")
 endif()
+

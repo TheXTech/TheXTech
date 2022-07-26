@@ -18,6 +18,7 @@ flag_pack_src=false
 flag_pack_src_gz=false
 flag_pack_src_zip=false
 
+
 for var in "$@"
 do
     case "$var" in
@@ -45,28 +46,20 @@ do
             ;;
 
         update-submodules)
-            git submodule foreach git checkout master
-            git submodule foreach git pull origin master
-            cd 3rdparty/LuaJIT
-            git checkout v2.1
-            git pull origin v2.1
-            cd ../..
+            PATH=${PATH}:$PWD/utils
+            git submodule foreach submodule-update.sh
             exit 0
             ;;
 
         repair-submodules)
+            PATH=${PATH}:$PWD/utils
             echo "=== Cleaning-up old state..."
             git submodule foreach 'pwd; rm -Rf * .git*;'
             echo "=== Fetching new submodules..."
             git submodule init
             git submodule update
             echo ""
-            git submodule foreach git checkout master
-            git submodule foreach git pull origin master
-            cd 3rdparty/LuaJIT
-            git checkout v2.1
-            git pull origin v2.1
-            cd ../..
+            git submodule foreach submodule-update.sh
             echo ""
             echo "==== Fixed! ===="
             exit 0;

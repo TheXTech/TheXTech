@@ -5,6 +5,12 @@ add_library(PGE_FreeImage INTERFACE)
 option(USE_SHARED_FREEIMAGE "Use shared build of FreeImage" OFF)
 option(USE_FREEIMAGE_SYSTEM_LIBS "Let FreeImage to use libPNG and libJPEG from the system" OFF)
 option(USE_PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations for the FreeImage internal build of libPNG" ON)
+option(FREEIMAGE_PIC "Enable -fPIC flag for libFreeImage" ON)
+
+if(VITA)
+    set(FREEIMAGE_PIC OFF)
+endif()
+
 
 if(USE_SHARED_FREEIMAGE)
     set_shared_lib(libFreeImage_Libs "${DEPENDENCIES_INSTALL_DIR}/lib" FreeImageLite)
@@ -31,7 +37,7 @@ ExternalProject_Add(
         "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-        "-DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+        "-DCMAKE_POSITION_INDEPENDENT_CODE=${FREEIMAGE_PIC}"
         "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
         "-DFREEIMAGE_USE_SYSTEM_LIBPNG=${USE_FREEIMAGE_SYSTEM_LIBS}"
         "-DFREEIMAGE_USE_SYSTEM_LIBJPEG=${USE_FREEIMAGE_SYSTEM_LIBS}"
