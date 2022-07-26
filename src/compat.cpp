@@ -82,8 +82,9 @@ static void compatInit(Compatibility_t &c)
     c.require_ground_to_enter_warps = false;
     c.fix_npc_activation_event_loop_bug = true;
     c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
+    // 1.3.5.4
+    c.fix_fairy_stuck_in_pipe = true;
     // 1.3.6
-
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
@@ -112,6 +113,8 @@ static void compatInit(Compatibility_t &c)
         c.fix_FreezeNPCs_no_reset = false; //-V1048
         // 1.3.5.3
         c.fix_npc_activation_event_loop_bug = false;
+        // 1.3.5.4
+        c.fix_fairy_stuck_in_pipe = false;
         // 1.3.6
     }
 
@@ -211,6 +214,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
             {"show", Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE}
         };
         compat.readEnum("world-map-stars-show-policy", c.world_map_stars_show_policy, c.world_map_stars_show_policy, starsShowPolicy);
+        // 1.3.5.4
+        compat.read("fix-fairy-stuck-in-pipe", c.fix_fairy_stuck_in_pipe, c.fix_fairy_stuck_in_pipe);
         // 1.3.6
     }
     // 1.3.4

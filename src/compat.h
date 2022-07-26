@@ -73,8 +73,9 @@ struct Compatibility_t
         SPGWGI_DISABLE
     };
     int sfx_player_grow_with_got_item;
+    // 1.3.5.4
+    bool fix_fairy_stuck_in_pipe;
     // 1.3.6
-
 
     // SpeedRun section
     enum
