@@ -118,7 +118,10 @@ void CheckAfterStarTake(bool many)
             for(int d = numBackground + 1; d <= allBGOs; d++)
             {
                 auto &b = Background[d];
-                if(b.Type == 160 && CheckCollision(w.Entrance, b.Location))
+                if(b.Type == 160 &&
+                    (CheckCollision(w.Entrance, b.Location) ||
+                     (w.twoWay && CheckCollision(w.Exit, b.Location)))
+                )
                 {
                     b.Layer.clear();
                     b.Hidden = true;

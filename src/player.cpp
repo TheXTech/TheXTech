@@ -4235,7 +4235,8 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                 {
                     if(Background[C].Type == 98)
                     {
-                        if(CheckCollision(entrance, Background[C].Location))
+                        if(CheckCollision(entrance, Background[C].Location) ||
+                           (warp.twoWay && CheckCollision(exit, Background[C].Location)))
                         {
                             Background[C].Layer.clear();
                             Background[C].Hidden = true;
@@ -4256,7 +4257,8 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                 {
                     if(Background[C].Type == 98)
                     {
-                        if(CheckCollision(entrance, Background[C].Location))
+                        if(CheckCollision(entrance, Background[C].Location) ||
+                           (warp.twoWay && CheckCollision(exit, Background[C].Location)))
                         {
                             Background[C].Layer.clear();
                             Background[C].Hidden = true;
@@ -4273,7 +4275,8 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
                 {
                     if(Background[C].Type == 98)
                     {
-                        if(CheckCollision(entrance, Background[C].Location))
+                        if(CheckCollision(entrance, Background[C].Location) ||
+                           (warp.twoWay && CheckCollision(exit, Background[C].Location)))
                         {
                             Background[C].Layer.clear();
                             Background[C].Hidden = true;
