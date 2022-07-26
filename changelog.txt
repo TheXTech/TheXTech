@@ -9,6 +9,7 @@ Changes for 1.3.5.4
 -Use Down as the ground-pound key during ForcedControls events (Bug #331)
 -Fixed locks and stars at two-way warps (Bug #300)
 -Fixed the invalid size of some effects (Bug #296)
+-Blocked an ability to start the game with no episodes or battle levels available in the list and prevented several issues with this (Bug #345)
 
 Changes for 1.3.5.3-1
 -Fixed autostart events behaviour

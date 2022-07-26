@@ -205,6 +205,17 @@ void FindWorlds()
     NumSelectWorld = (int)(SelectWorld.size() - 1);
     MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 
+    if(SelectWorld.size() <= 1) // No available worlds in the list
+    {
+        SelectWorld.clear();
+        SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
+
+        NumSelectWorld = 1;
+        SelectWorld.emplace_back(SelectWorld_t()); // "no battle levels" entry
+        SelectWorld[1].WorldName = "<No episodes to play>";
+        SelectWorld[1].disabled = true;
+    }
+
     SDL_AtomicSet(&loading, 0);
 }
 
@@ -266,6 +277,18 @@ void FindLevels()
     }
 
     NumSelectWorld = (SelectWorld.size() - 1);
+
+    if(SelectWorld.size() <= 2) // No available levels in the list
+    {
+        SelectWorld.clear();
+        SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
+
+        NumSelectWorld = 1;
+        SelectWorld.emplace_back(SelectWorld_t()); // "no battle levels" entry
+        SelectWorld[1].WorldName = "<No battle levels>";
+        SelectWorld[1].disabled = true;
+    }
+
     SDL_AtomicSet(&loading, 0);
 }
 
@@ -772,27 +795,43 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
+                    bool disabled = false;
                     // Save menu state
                     listMenuLastScroll = worldCurs;
                     listMenuLastCursor = MenuCursor;
 
-                    PlaySoundMenu(SFX_Do);
                     selWorld = MenuCursor + 1;
-                    FindSaves();
 
-                    For(A, 1, numCharacters)
+                    if((MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME) && SelectWorld[selWorld].disabled)
+                        disabled = true;
+
+                    if(!disabled)
+                        PlaySoundMenu(SFX_Do);
+
+                    if(disabled)
                     {
-                        if(MenuMode == MENU_BATTLE_MODE)
-                            blockCharacter[A] = false;
-                        else
-                            blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
+                        PlaySoundMenu(SFX_BlockHit);
+                        // Do nothing. stay at menu
                     }
+                    else
+                    {
+                        if(MenuMode != MENU_BATTLE_MODE)
+                            FindSaves();
 
-                    MenuMode *= MENU_CHARACTER_SELECT_BASE;
-                    MenuCursor = 0;
+                        For(A, 1, numCharacters)
+                        {
+                            if(MenuMode == MENU_BATTLE_MODE)
+                                blockCharacter[A] = false;
+                            else
+                                blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
+                        }
 
-                    if(MenuMode == MENU_CHARACTER_SELECT_BM_S1 && PlayerCharacter != 0)
-                        MenuCursor = PlayerCharacter - 1;
+                        MenuMode *= MENU_CHARACTER_SELECT_BASE;
+                        MenuCursor = 0;
+
+                        if(MenuMode == MENU_CHARACTER_SELECT_BM_S1 && PlayerCharacter != 0)
+                            MenuCursor = PlayerCharacter - 1;
+                    }
 
                     MenuCursorCanMove = false;
                 }
@@ -1795,9 +1834,20 @@ void mainMenuDraw()
         for(auto A = minShow; A <= maxShow; A++)
         {
             auto w = SelectWorld[A];
-            B = A - minShow + 1;
             float r = w.highlight ? 0.f : 1.f;
-            SuperPrint(w.WorldName, 3, 300, 320 + (B * 30), r, 1.f, 1.f, 1.f);
+            float g = 1.0f;
+            float b = 1.0f;
+
+            B = A - minShow + 1;
+
+            if(w.disabled)
+            {
+                r = 0.5f;
+                g = 0.5f;
+                b = 0.5f;
+            }
+
+            SuperPrint(w.WorldName, 3, 300, 320 + (B * 30), r, g, b, 1.f);
         }
 
         if(minShow > 1)

@@ -1128,6 +1128,7 @@ struct SelectWorld_t
 //    blockChar(1 To numCharacters) As Boolean
     RangeArrI<bool, 1, numCharacters, false> blockChar;
     bool highlight = false;
+    bool disabled = false;
 //End Type
 };
 
