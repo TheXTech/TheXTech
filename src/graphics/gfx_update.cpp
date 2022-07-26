@@ -42,7 +42,8 @@
 #include "../core/render.h"
 #include "../script/luna/luna.h"
 
-#include "gfx_special_frames.h"
+#include "effect.h"
+#include "graphics/gfx_special_frames.h"
 #include "npc_id.h"
 
 #include <fmt_format_ne.h>
@@ -686,19 +687,39 @@ void UpdateGraphics(bool skipRepaint)
                 // don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
                 //   a piranha plant that hasn't emerged yet, 
                 if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
-                    && (
-                       (NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
-                    || NPC[A].Type == NPCID_PODOBOO
-                    || NPC[A].Type == NPCID_PIRANHA_SMB3 || NPC[A].Type == NPCID_BOTTOMPIRANHA || NPC[A].Type == NPCID_SIDEPIRANHA
-                    || NPC[A].Type == NPCID_BIGPIRANHA || NPC[A].Type == NPCID_PIRANHA_SMB || NPC[A].Type == NPCID_FIREPIRANHA
-                    || NPC[A].Type == NPCID_LONGPIRANHA_UP || NPC[A].Type == NPCID_LONGPIRANHA_DOWN || NPC[A].Type == NPCID_PIRANHAHEAD
-                    || NPC[A].Type == NPCID_BLARGG
-                    )
-                )
+                    && !NPC[A].Active && render)
                 {
-                    if(!NPC[A].Active)
+                    if((NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
+                        || NPC[A].Type == NPCID_PODOBOO
+                        || NPC[A].Type == NPCID_PIRANHA_SMB3 || NPC[A].Type == NPCID_BOTTOMPIRANHA || NPC[A].Type == NPCID_SIDEPIRANHA
+                        || NPC[A].Type == NPCID_BIGPIRANHA || NPC[A].Type == NPCID_PIRANHA_SMB || NPC[A].Type == NPCID_FIREPIRANHA
+                        || NPC[A].Type == NPCID_LONGPIRANHA_UP || NPC[A].Type == NPCID_LONGPIRANHA_DOWN || NPC[A].Type == NPCID_PIRANHAHEAD
+                        || NPC[A].Type == NPCID_BLARGG || NPC[A].Type == NPCID_ROTODISK
+                        )
+                    {
                         render = false;
+                    }
+
+                    if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
+                        && g_config.hide_inactive_event_NPC && NPC[A].TriggerActivate != EVENT_NONE)
+                    {
+                        if(!NPC[A].Inert
+                            && !NPCIsACoin[NPC[A].Type] && !NPCIsABlock[NPC[A].Type] && !NPCIsAVine[NPC[A].Type]
+                            && NPC[A].Type != NPCID_CHECKPOINT && NPC[A].Type != NPCID_BURIEDPLANT && NPC[A].Type != NPCID_CONVEYOR)
+                        {
+                            render = false;
+
+                            if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
+                            {
+                                Location_t tempLocation = NPC[A].Location;
+                                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                                NewEffect(10, tempLocation);
+                            }
+                        }
+                    }
                 }
+
 
                 // activate the NPC if allowed
                 if(can_activate)
