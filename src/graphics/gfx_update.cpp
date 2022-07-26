@@ -701,7 +701,8 @@ void UpdateGraphics(bool skipRepaint)
                     }
 
                     if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
-                        && g_config.hide_inactive_event_NPC && NPC[A].TriggerActivate != EVENT_NONE)
+                        && g_config.hide_inactive_event_NPC && (vScreen[Z].Width > 800 || vScreen[Z].Height > 600)
+                        && NPC[A].TriggerActivate != EVENT_NONE)
                     {
                         if(!NPC[A].Inert
                             && !NPCIsACoin[NPC[A].Type] && !NPCIsABlock[NPC[A].Type] && !NPCIsAVine[NPC[A].Type]
