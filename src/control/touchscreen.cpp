@@ -1593,23 +1593,20 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
 
     TouchScreenController::ExtraKeys_t& te = t->m_controller.m_current_extra_keys;
 
-    // This run lock logic has been modified to work as run invert code instead.
-    // The original code always delayed running by one frame,
-    //   even when run lock was not enabled.
-    if(GamePaused == PauseCode::None && !GameMenu && !GameOutro && !LevelSelect)
+    if(GamePaused == PauseCode::None && !GameMenu && !GameOutro && !LevelSelect && t->m_controller.m_runHeld)
     {
         // Alt Run functions as normal
-        if(t->m_controller.m_runHeld && c.AltRun)
+        if(c.AltRun)
         {
             // make sure Alt Run activates properly
             if(te.keyAltRunOnce)
                 c.AltRun = false;
-
             c.Run = false;
         }
-        // Run is inverted
-        else if(t->m_controller.m_runHeld)
-            c.Run = !c.Run;
+        else if(te.keyRunOnce)
+            c.Run = false;
+        else
+            c.Run |= true;
     }
 
     // use the touchscreen as a mouse if the buttons are currently hidden, we are in TextEntry mode, or we are in LevelEditor mode
