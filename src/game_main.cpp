@@ -113,6 +113,34 @@ static int loadingThread(void *waiter_ptr)
     return 0;
 }
 
+static std::string getIntrFile()
+{
+    auto introPath = AppPath + "intro.lvlx";
+
+    if(!Files::fileExists(introPath))
+        introPath = AppPath + "intro.lvl";
+
+    return introPath;
+}
+
+static std::string findIntroLevel()
+{
+    std::string introPath;
+    std::string introSetDir = AppPath + "introset/";
+
+    if(!DirMan::exists(introSetDir))
+        return getIntrFile();
+
+    DirMan introSet(introSetDir);
+    std::vector<std::string> intros;
+
+    if(!introSet.getListOfFiles(intros, {".lvl", "lvlx"}) || intros.empty())
+        return getIntrFile();
+
+    return introSetDir + intros[iRand2(intros.size() - 1)];
+}
+
+
 int GameMain(const CmdLineSetup_t &setup)
 {
     Player_t blankPlayer;
@@ -530,9 +558,8 @@ int GameMain(const CmdLineSetup_t &setup)
             if(g_gameInfo.introDeadMode)
                 numPlayers = 1;// one deadman should be
 
-            auto introPath = AppPath + "intro.lvlx";
-            if(!Files::fileExists(introPath))
-                introPath = AppPath + "intro.lvl";
+            auto introPath = findIntroLevel();
+
             OpenLevel(introPath);
             vScreenX[1] = -level[0].X;
 
