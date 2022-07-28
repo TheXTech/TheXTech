@@ -276,17 +276,21 @@ public:
 
 NPC_Draw_Queue_t NPC_Draw_Queue[2] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
 
+constexpr int NPC_intro_length = 8;
+constexpr float NPC_shade_opacity = 0.4f;
+constexpr size_t NPC_intro_count_MAX = 32;
+
 uint8_t NPC_intro_count = 0;
-int16_t NPC_intro[32];
+int16_t NPC_intro[NPC_intro_count_MAX];
 // positive values represent just-activated onscreen NPCs; negative values represent conditionally active NPCs
-int8_t NPC_intro_frame[32];
+int8_t NPC_intro_frame[NPC_intro_count_MAX];
 
 inline void ProcessIntroNPCFrames()
 {
     for(uint8_t i = 0; i < NPC_intro_count; i++)
     {
         NPC_intro_frame[i]++;
-        if(NPC_intro_frame[i] == g_config.debug_npc_intro_length || NPC_intro_frame[i] == 0)
+        if(NPC_intro_frame[i] == NPC_intro_length || NPC_intro_frame[i] == 0)
         {
             NPC_intro_count--;
             NPC_intro[i] = NPC_intro[NPC_intro_count];
@@ -328,7 +332,7 @@ inline void get_NPC_tint(int A, float& cn, float& an)
             if(!always_render_NPC(n))
             {
                 cn = 0.0f;
-                an = g_config.debug_inactive_npc_opacity;
+                an = 0.4f;
                 return;
             }
         }
@@ -338,9 +342,9 @@ inline void get_NPC_tint(int A, float& cn, float& an)
             {
                 if(NPC_intro_frame[i] >= 0 && !always_render_NPC(n))
                 {
-                    float coord = NPC_intro_frame[i]/(float)g_config.debug_npc_intro_length;
+                    float coord = NPC_intro_frame[i]/(float)NPC_intro_length;
                     cn = coord;
-                    an = g_config.debug_inactive_npc_opacity + coord * (1 - g_config.debug_inactive_npc_opacity);
+                    an = NPC_shade_opacity + coord * (1.0f - NPC_shade_opacity);
                     return;
                 }
                 break;
@@ -780,21 +784,23 @@ void UpdateGraphics(bool skipRepaint)
                 //   with TimeLeft = 0 by the time we get to rendering. In this case, "resetting" means "not activating",
                 //   so it's essential that we set cannot_reset to follow can_activate for this frame and the next one
                 //   (when Reset[1] and Reset[2] need to become true).
-                if(NPC[A].TimeLeft == 0)
+                if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen && NPC[A].TimeLeft == 0)
                 {
                     if(render && !can_activate)
                     {
-                        if(NPC_intro_index == NPC_intro_count)
+                        if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
                         {
-                            NPC_intro[NPC_intro_count] = A;
+                            NPC_intro[NPC_intro_index] = A;
                             NPC_intro_count++;
                         }
-                        NPC_intro_frame[NPC_intro_index] = -2;
+
+                        if(NPC_intro_index < NPC_intro_count)
+                            NPC_intro_frame[NPC_intro_index] = -2;
                     }
                 }
 
                 // if the NPC is in the "conditional activation" state but didn't activate, then allow it to reset even when onscreen
-                if(NPC_intro_index < NPC_intro_count && NPC_intro[NPC_intro_index] < 0)
+                if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] < 0)
                 {
                     cannot_reset = can_activate;
                 }
@@ -821,7 +827,7 @@ void UpdateGraphics(bool skipRepaint)
                         // add to queue of hidden NPCs
                         if(!can_activate && !always_render_NPC(NPC[A]))
                         {
-                            if(NPC_intro_index == NPC_intro_count && NPC_intro_count < sizeof(NPC_intro) / sizeof(int16_t))
+                            if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
                             {
                                 NPC_intro[NPC_intro_index] = A;
                                 NPC_intro_frame[NPC_intro_index] = 0;
@@ -829,9 +835,9 @@ void UpdateGraphics(bool skipRepaint)
                             }
 
                             // keep it hidden
-                            if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0)
+                            if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0)
                             {
-                                NPC_intro_frame[NPC_intro_count] = 0;
+                                NPC_intro_frame[NPC_intro_index] = 0;
                             }
                         }
 

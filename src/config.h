@@ -121,11 +121,6 @@ extern struct Config_t
     //! Show the battery status for wireless gamepads (if possible). Only affects new controller profiles.
     bool    JoystickEnableBatteryStatus = true;
 
-    /* ---- Debug ----*/
-
-    float debug_inactive_npc_opacity = 0.5f;
-    int debug_npc_intro_length = 10;
-
 
 } g_config; // main_config.cpp
 

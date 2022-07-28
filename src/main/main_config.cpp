@@ -283,11 +283,6 @@ void OpenConfig()
         // config.read("world-map-smart-pan", g_config.world_map_smart_pan, false);
         config.endGroup();
 
-        config.beginGroup("debug");
-        config.read("inactive-npc-opacity", g_config.debug_inactive_npc_opacity, 0.5f);
-        config.read("npc-intro-length", g_config.debug_npc_intro_length, 10);
-        config.endGroup();
-
         Controls::LoadConfig(ctl);
 
         pLogDebug("Loaded config: %s", configPath.c_str());
