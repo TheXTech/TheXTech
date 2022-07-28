@@ -299,9 +299,20 @@ inline void ProcessIntroNPCFrames()
 
 inline bool always_render_NPC(const NPC_t& n)
 {
-    return n.Inert || n.Stuck
-        || NPCIsACoin[n.Type] || NPCIsABlock[n.Type] || NPCIsAVine[n.Type]
-        || n.Type == NPCID_CHECKPOINT || n.Type == NPCID_BURIEDPLANT || n.Type == NPCID_CONVEYOR;
+    return n.Inert
+        || n.Stuck
+        || NPCIsACoin[n.Type]
+        || NPCIsABlock[n.Type]
+        || NPCIsAVine[n.Type]
+        || n.Type == NPCID_CHECKPOINT
+        || n.Type == NPCID_BURIEDPLANT
+        || n.Type == NPCID_CONVEYOR
+        || n.Type == NPCID_THWOMP_SMB3
+        || n.Type == NPCID_THWOMP_SMW
+        || n.Type == NPCID_CANNONENEMY
+        || n.Type == NPCID_STATUE_SMB3
+        || n.Type == NPCID_STATUE_SMW
+        || n.Type == NPCID_RINKAGEN;
 }
 
 // tints NPCS
@@ -818,13 +829,10 @@ void UpdateGraphics(bool skipRepaint)
                                 for(i = 0; i < NPC_intro_count; i++)
                                 {
                                     if(NPC_intro[i] == A)
-                                    {
-                                        NPC_intro_frame[i] = 0;
                                         break;
-                                    }
                                 }
 
-                                if(i == NPC_intro_count)
+                                if(i != NPC_intro_count)
                                 {
                                     Location_t tempLocation = NPC[A].Location;
                                     tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
