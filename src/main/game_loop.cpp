@@ -183,7 +183,8 @@ void GameLoop()
     else if(qScreen)
     {
         UpdateEffects();
-        speedRun_tick();
+        if(CompatGetLevel() >= COMPAT_SMBX2)
+            speedRun_tick();
         UpdateGraphics();
         updateScreenFaders();
     }
