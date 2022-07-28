@@ -721,7 +721,7 @@ void UpdateGraphics(bool skipRepaint)
                         || NPC[A].Type == NPCID_PIRANHA_SMB3 || NPC[A].Type == NPCID_BOTTOMPIRANHA || NPC[A].Type == NPCID_SIDEPIRANHA
                         || NPC[A].Type == NPCID_BIGPIRANHA || NPC[A].Type == NPCID_PIRANHA_SMB || NPC[A].Type == NPCID_FIREPIRANHA
                         || NPC[A].Type == NPCID_LONGPIRANHA_UP || NPC[A].Type == NPCID_LONGPIRANHA_DOWN || NPC[A].Type == NPCID_PIRANHAHEAD
-                        || NPC[A].Type == NPCID_BLARGG || NPC[A].Type == NPCID_ROTODISK
+                        || NPC[A].Type == NPCID_BLARGG
                         )
                     {
                         render = false;
