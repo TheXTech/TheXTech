@@ -312,8 +312,14 @@ struct PlayDoSentinel
 bool Player_Back(int p)
 {
     s_inputReady[p] = false;
+    // first screen of main menu
+    if(s_playerState[p] == PlayerState::Disconnected && s_context == Context::MainMenu)
+    {
+        PlaySoundMenu(SFX_Slide);
+        return true;
+    }
     // adding player at main menu
-    if(s_playerState[p] == PlayerState::SelectChar && s_context == Context::MainMenu)
+    else if(s_playerState[p] == PlayerState::SelectChar && s_context == Context::MainMenu)
     {
         // remove the player's slot and quit if there aren't any other players
         if(Controls::g_InputMethods.size() <= 1)
@@ -1714,7 +1720,7 @@ int Logic()
         }
     }
 
-    bool ret = MouseLogic();
+    int ret = MouseLogic();
 
     /*-----------------------*\
     || polling input methods ||

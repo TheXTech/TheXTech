@@ -57,6 +57,10 @@ struct PerformanceStats_t
 
     bool enabled = false;
 
+    // Displays title of the music OR filename
+    std::string currentMusic;
+    std::string currentMusicFile;
+
     void reset();
     void print();
 };

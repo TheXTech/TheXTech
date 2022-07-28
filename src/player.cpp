@@ -6101,7 +6101,7 @@ void PlayerEffects(const int A)
                 }
             }
 
-            if(g_levelVScreenFader[A].isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL)
+            if(numPlayers <= 2 && (g_levelVScreenFader[A].isVisible() || warp.transitEffect == LevelDoor::TRANSIT_SCROLL))
             {
                 switch(warp.transitEffect)
                 {
