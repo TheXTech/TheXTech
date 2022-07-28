@@ -277,15 +277,16 @@ public:
 NPC_Draw_Queue_t NPC_Draw_Queue[2] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
 
 uint8_t NPC_intro_count = 0;
-int16_t NPC_intro[10];
-uint8_t NPC_intro_frame[10];
+int16_t NPC_intro[32];
+// positive values represent just-activated onscreen NPCs; negative values represent conditionally active NPCs
+int8_t NPC_intro_frame[32];
 
 inline void ProcessIntroNPCFrames()
 {
     for(uint8_t i = 0; i < NPC_intro_count; i++)
     {
         NPC_intro_frame[i]++;
-        if(NPC_intro_frame[i] == g_config.debug_npc_intro_length)
+        if(NPC_intro_frame[i] == g_config.debug_npc_intro_length || NPC_intro_frame[i] == 0)
         {
             NPC_intro_count--;
             NPC_intro[i] = NPC_intro[NPC_intro_count];
@@ -335,7 +336,7 @@ inline void get_NPC_tint(int A, float& cn, float& an)
         {
             if(NPC_intro[i] == A)
             {
-                if(!always_render_NPC(n))
+                if(NPC_intro_frame[i] >= 0 && !always_render_NPC(n))
                 {
                     float coord = NPC_intro_frame[i]/(float)g_config.debug_npc_intro_length;
                     cn = coord;
@@ -767,14 +768,33 @@ void UpdateGraphics(bool skipRepaint)
                     render = false;
                 }
 
-                // handle the game's "conditional activation" state where NPC is activated *without* its events being triggered,
-                // with TimeLeft = 0 by the time we get to rendering
+                // track the NPC intro frames of this NPC
+                uint8_t NPC_intro_index;
+                for(NPC_intro_index = 0; NPC_intro_index < NPC_intro_count; NPC_intro_index++)
+                {
+                    if(NPC_intro[NPC_intro_index] == A)
+                        break;
+                }
 
-                // WANT this whole sequence to let cannot_reset equal can_activate, because in effect they are being conditionally activated (and their activation event is being cancelled).
-                // frame 0: every NPC has TimeLeft = 1, JustActivated = 1, does a full timestep update to initialize its state, and sets TimeLeft = 0.
-                // frame 1: every NPC has TimeLeft = 0 if not onscreen, TimeLeft = N if onscreen, JustActivated = 0, and Deactivates if not onscreen -> Reset[1] = false, Reset[2] = false.
-                // frame 2: every not-onscreen NPC has TimeLeft = -1, Reset[1] = false, Reset[2] = false, and needs them set to true
+                // Handle the game's "conditional activation" state where NPC is activated *without* its events being triggered,
+                //   with TimeLeft = 0 by the time we get to rendering. In this case, "resetting" means "not activating",
+                //   so it's essential that we set cannot_reset to follow can_activate for this frame and the next one
+                //   (when Reset[1] and Reset[2] need to become true).
                 if(NPC[A].TimeLeft == 0)
+                {
+                    if(render && !can_activate)
+                    {
+                        if(NPC_intro_index == NPC_intro_count)
+                        {
+                            NPC_intro[NPC_intro_count] = A;
+                            NPC_intro_count++;
+                        }
+                        NPC_intro_frame[NPC_intro_index] = -2;
+                    }
+                }
+
+                // if the NPC is in the "conditional activation" state but didn't activate, then allow it to reset even when onscreen
+                if(NPC_intro_index < NPC_intro_count && NPC_intro[NPC_intro_index] < 0)
                 {
                     cannot_reset = can_activate;
                 }
@@ -801,21 +821,17 @@ void UpdateGraphics(bool skipRepaint)
                         // add to queue of hidden NPCs
                         if(!can_activate && !always_render_NPC(NPC[A]))
                         {
-                            uint8_t i;
-                            for(i = 0; i < NPC_intro_count; i++)
+                            if(NPC_intro_index == NPC_intro_count && NPC_intro_count < sizeof(NPC_intro) / sizeof(int16_t))
                             {
-                                if(NPC_intro[i] == A)
-                                {
-                                    NPC_intro_frame[i] = 0;
-                                    break;
-                                }
+                                NPC_intro[NPC_intro_index] = A;
+                                NPC_intro_frame[NPC_intro_index] = 0;
+                                NPC_intro_count++;
                             }
 
-                            if(i == NPC_intro_count && NPC_intro_count < sizeof(NPC_intro) / sizeof(int16_t))
+                            // keep it hidden
+                            if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0)
                             {
-                                NPC_intro[NPC_intro_count] = A;
                                 NPC_intro_frame[NPC_intro_count] = 0;
-                                NPC_intro_count++;
                             }
                         }
 
@@ -825,14 +841,7 @@ void UpdateGraphics(bool skipRepaint)
                             if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
                             {
                                 // if it was hidden, then add the poof effect!
-                                uint8_t i;
-                                for(i = 0; i < NPC_intro_count; i++)
-                                {
-                                    if(NPC_intro[i] == A)
-                                        break;
-                                }
-
-                                if(i != NPC_intro_count)
+                                if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0)
                                 {
                                     Location_t tempLocation = NPC[A].Location;
                                     tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;

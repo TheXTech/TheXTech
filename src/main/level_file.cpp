@@ -627,21 +627,11 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.Location.Height = NPCHeight[npc.Type];
         npc.DefaultLocation = npc.Location;
         npc.DefaultDirection = npc.Direction;
-        if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
-        {
-            npc.TimeLeft = 1;
-            npc.Active = true;
-            npc.JustActivated = 1;
-        }
-        else
-        {
-            // TimeLeft = -1 is the outcome of a normal Deactivate call followed by TimeLeft -= 1
-            npc.TimeLeft = -1;
-            npc.Active = false;
-            npc.JustActivated = 0;
-            npc.Reset[1] = true;
-            npc.Reset[2] = true;
-        }
+
+        // allow every NPC to be active for one frame to initialize its internal state
+        npc.TimeLeft = 1;
+        npc.Active = true;
+        npc.JustActivated = 1;
 
         syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
