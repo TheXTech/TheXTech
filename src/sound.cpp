@@ -24,6 +24,7 @@
 
 #include "globals.h"
 #include "global_dirs.h"
+#include "frame_timer.h"
 
 #include "load_gfx.h"
 #include "core/msgbox.h"
@@ -473,6 +474,8 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
         Mix_HaltMusic();
         Mix_FreeMusic(g_curMusic);
         g_curMusic = nullptr;
+        g_stats.currentMusic.clear();
+        g_stats.currentMusicFile.clear();
     }
 
     auto mus = music.find(Alias);
@@ -487,6 +490,8 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
             pLogWarning("Music '%s' opening error: %s", m.path.c_str(), Mix_GetError());
         else
         {
+            int ret;
+
             Mix_VolumeMusicStream(g_curMusic, m.volume);
             s_musicYoshiTrackNumber = m.yoshiModeTrack;
             s_musicHasYoshiMode = (s_musicYoshiTrackNumber >= 0 && (Mix_GetMusicTracks(g_curMusic) > s_musicYoshiTrackNumber));
@@ -498,9 +503,17 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
 #endif
 
             if(fadeInMs > 0)
-                Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
+                ret = Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
             else
-                Mix_PlayMusic(g_curMusic, -1);
+                ret = Mix_PlayMusic(g_curMusic, -1);
+
+            if(ret >= 0)
+            {
+                g_stats.currentMusic = Mix_GetMusicTitle(g_curMusic);
+                g_stats.currentMusicFile = Files::basename(m.path);
+            }
+            else
+                pLogWarning("Music '%s' playing error: %s", m.path.c_str(), Mix_GetError());
         }
     }
     else
@@ -635,6 +648,8 @@ void StartMusic(int A, int fadeInMs)
         std::string mus = fmt::format_ne("music{0}", curMusic);
         if(curMusic == g_customLvlMusicId)
         {
+            int ret = 0;
+
             pLogDebug("Starting custom music [%s%s]", FileNamePath.c_str(), CustomMusic[A].c_str());
             if(g_curMusic)
                 Mix_FreeMusic(g_curMusic);
@@ -651,14 +666,22 @@ void StartMusic(int A, int fadeInMs)
                 Mix_VolumeMusicStream(g_curMusic, 52);
                 if(fadeInMs > 0)
                 {
-                    if(Mix_FadeInMusic(g_curMusic, -1, fadeInMs) < 0)
+                    ret = Mix_FadeInMusic(g_curMusic, -1, fadeInMs);
+                    if(ret < 0)
                         pLogWarning("Failed to fade-in the music [%s]: %s", p.c_str(), Mix_GetError());
                 }
                 else
                 {
-                    if(Mix_PlayMusic(g_curMusic, -1) < 0)
+                    ret = Mix_PlayMusic(g_curMusic, -1);
+                    if(ret < 0)
                         pLogWarning("Failed to play the music [%s]: %s", p.c_str(), Mix_GetError());
                 }
+            }
+
+            if(ret >= 0)
+            {
+                g_stats.currentMusic = Mix_GetMusicTitle(g_curMusic);
+                g_stats.currentMusicFile = CustomMusic[A];
             }
         }
         else
@@ -684,6 +707,8 @@ void StopMusic()
         Mix_FreeMusic(g_curMusic);
     g_curMusic = nullptr;
     musicPlaying = false;
+    g_stats.currentMusic.clear();
+    g_stats.currentMusicFile.clear();
 }
 
 void FadeOutMusic(int ms)
