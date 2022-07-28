@@ -221,6 +221,13 @@ void OpenConfig()
             {"show-all", 2}
         };
 
+        const IniProcessing::StrEnumMap renderInactiveNPC =
+        {
+            {"hide", Config_t::INACTIVE_NPC_HIDE},
+            {"shade", Config_t::INACTIVE_NPC_SHADE},
+            {"show", Config_t::INACTIVE_NPC_SHOW},
+        };
+
         const IniProcessing::StrEnumMap worldMapFog =
         {
             {"off", Config_t::WORLD_MAP_FOG_OFF},
@@ -269,7 +276,7 @@ void OpenConfig()
         config.read("enable-bowser-iiird-screen-shake", g_config.GameplayShakeScreenBowserIIIrd, true);
         config.read("sfx-player-grow-with-got-item", g_config.SoundPlayerGrowWithGetItem, false);
         config.read("enable-inter-level-fade-effect", g_config.EnableInterLevelFade, true);
-        config.read("hide-inactive-event-npc", g_config.hide_inactive_event_NPC, false);
+        config.readEnum("render-inactive-npc", g_config.render_inactive_NPC, (int)Config_t::INACTIVE_NPC_SHADE, renderInactiveNPC);
         config.read("world-map-expand-view", g_config.world_map_expand_view, false);
         config.readEnum("world-map-fog", g_config.world_map_fog, (int)Config_t::WORLD_MAP_FOG_OFF, worldMapFog);
         // disabled pending further discussion

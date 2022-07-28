@@ -92,7 +92,13 @@ extern struct Config_t
     //! Enables the inter-level fade effect
     bool    EnableInterLevelFade = true;
     //! Hide an event trigger NPC that is inactive but onscreen
-    bool hide_inactive_event_NPC = false;
+    enum
+    {
+        INACTIVE_NPC_HIDE = 0,
+        INACTIVE_NPC_SHADE,
+        INACTIVE_NPC_SHOW,
+    };
+    int render_inactive_NPC = INACTIVE_NPC_SHADE;
     //! Allow the view to grow beyond 800x600 in the world map (nearly duplicates Compatibility_t::free_world_res),
     //  but does not enforce at least 800x600 render resolution when off.
     bool world_map_expand_view = false;
