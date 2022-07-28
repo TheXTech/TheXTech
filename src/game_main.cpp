@@ -68,6 +68,7 @@
 #include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
+#include "core/msgbox.h"
 #include "script/luna/luna.h"
 
 #include "pseudo_vb.h"
@@ -120,6 +121,11 @@ static std::string getIntrFile()
     if(!Files::fileExists(introPath))
         introPath = AppPath + "intro.lvl";
 
+    if(!Files::fileExists(introPath))
+        return std::string();
+
+    pLogDebug("Found root intro level file: %s", introPath.c_str());
+
     return introPath;
 }
 
@@ -137,7 +143,23 @@ static std::string findIntroLevel()
     if(!introSet.getListOfFiles(intros, {".lvl", "lvlx"}) || intros.empty())
         return getIntrFile();
 
-    return introSetDir + intros[iRand2(intros.size() - 1)];
+    std::sort(intros.begin(), intros.end());
+
+    for(auto &i : intros)
+    {
+        i.insert(0, introSetDir);
+        pLogDebug("Found introset intro level: %s", i.c_str());
+    }
+
+    auto rootIntro = getIntrFile();
+    if(!rootIntro.empty())
+        intros.push_back(rootIntro);
+
+    const std::string &selected = intros[iRand2(intros.size())];;
+
+    pLogDebug("Selected intro level to start: %s", selected.c_str());
+
+    return selected;
 }
 
 
@@ -559,6 +581,17 @@ int GameMain(const CmdLineSetup_t &setup)
                 numPlayers = 1;// one deadman should be
 
             auto introPath = findIntroLevel();
+            if(introPath.empty())
+            {
+                XMsgBox::errorMsgBox("Fatal error",
+                                     "Can't find any intro level file to start the main menu.\n"
+                                     "The game will be closed.\n"
+                                     "\n"
+                                     "Please make sure the intro.lvlx or intro.lvl file is exist\n"
+                                     "in the game assets directory, or make sure the \"introset\" directory\n"
+                                     "contains any valid level files.");
+                return 1;// Fatal error happen
+            }
 
             OpenLevel(introPath);
             vScreenX[1] = -level[0].X;

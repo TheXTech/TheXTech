@@ -23,6 +23,7 @@
 #include "game_main.h"
 #include "frm_main.h"
 #include "gfx.h"
+#include "rand.h"
 #include "sound.h"
 #include "video.h"
 #include "main/presetup.h"
@@ -149,6 +150,8 @@ int main(int argc, char**argv)
 #if !defined(__3DS__) && !defined(VITA)
     CrashHandler::initSigs();
 #endif
+
+    seedRandom(std::time(NULL));
 
     testPlayer.fill(Player_t());
     for(int i = 1; i <= maxLocalPlayers; i++)
