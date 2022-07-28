@@ -276,6 +276,27 @@ public:
 
 NPC_Draw_Queue_t NPC_Draw_Queue[2] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
 
+uint8_t NPC_intro_count = 0;
+int16_t NPC_intro[10];
+uint8_t NPC_intro_frame[10];
+
+inline void ProcessIntroNPCFrames()
+{
+    for(uint8_t i = 0; i < NPC_intro_count; i++)
+    {
+        NPC_intro_frame[i]++;
+        if(NPC_intro_frame[i] == g_config.debug_npc_intro_length)
+        {
+            NPC_intro_count--;
+            NPC_intro[i] = NPC_intro[NPC_intro_count];
+            NPC_intro_frame[i] = NPC_intro_frame[NPC_intro_count];
+
+            // don't advance the iteration counter, since a new NPC is here now
+            i--;
+        }
+    }
+}
+
 inline bool always_render_NPC(const NPC_t& n)
 {
     return n.Inert || n.Stuck
@@ -284,17 +305,42 @@ inline bool always_render_NPC(const NPC_t& n)
 }
 
 // tints NPCS
-inline void get_NPC_tint(const NPC_t& n, float& cn, float& an)
+inline void get_NPC_tint(int A, float& cn, float& an)
 {
+    const NPC_t& n = NPC[A];
+
+    if(!LevelEditor && g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_SHADE)
+    {
+        if(!n.Active)
+        {
+            if(!always_render_NPC(n))
+            {
+                cn = 0.0f;
+                an = g_config.debug_inactive_npc_opacity;
+                return;
+            }
+        }
+        else for(uint8_t i = 0; i < NPC_intro_count; i++)
+        {
+            if(NPC_intro[i] == A)
+            {
+                printf("Got %d\n", A);
+                if(!always_render_NPC(n))
+                {
+                    float coord = NPC_intro_frame[i]/(float)g_config.debug_npc_intro_length;
+                    cn = coord;
+                    an = g_config.debug_inactive_npc_opacity + coord * (1 - g_config.debug_inactive_npc_opacity);
+                    return;
+                }
+                break;
+            }
+        }
+    }
+
     if(n.Shadow)
     {
         cn = 0.0f;
         an = 1.0f;
-    }
-    else if(!LevelEditor && g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_SHADE && !n.Active && !always_render_NPC(n))
-    {
-        cn = 0.2f;
-        an = 0.5f;
     }
     else
     {
@@ -711,6 +757,15 @@ void UpdateGraphics(bool skipRepaint)
                     render = false;
                 }
 
+                // WANT this whole sequence to let cannot_reset equal can_activate, because in effect they are being conditionally activated (and their activation event is being cancelled).
+                // frame 0: every NPC has TimeLeft = 1, JustActivated = 1, does a full timestep update to initialize its state, and sets TimeLeft = 0.
+                // frame 1: every NPC has TimeLeft = 0 if not onscreen, TimeLeft = N if onscreen, JustActivated = 0, and Deactivates if not onscreen -> Reset[1] = false, Reset[2] = false.
+                // frame 2: every not-onscreen NPC has TimeLeft = -1, Reset[1] = false, Reset[2] = false, and needs them set to true
+                if(NPC[A].TimeLeft == 0)
+                {
+                    cannot_reset = can_activate;
+                }
+
                 // don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
                 //   a piranha plant that hasn't emerged yet, etc
                 if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
@@ -727,8 +782,7 @@ void UpdateGraphics(bool skipRepaint)
                         render = false;
                     }
 
-                    else if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
-                        && g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_HIDE && (vScreen[Z].Width > 800 || vScreen[Z].Height > 600))
+                    else if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_HIDE && (vScreen[Z].Width > 800 || vScreen[Z].Height > 600))
                     {
                         if(!always_render_NPC(NPC[A]))
                         {
@@ -740,6 +794,19 @@ void UpdateGraphics(bool skipRepaint)
                                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
                                 NewEffect(10, tempLocation);
+                            }
+                        }
+                    }
+
+                    else if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_SHADE && (vScreen[Z].Width > 800 || vScreen[Z].Height > 600))
+                    {
+                        if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
+                        {
+                            if(NPC_intro_count < sizeof(NPC_intro) / sizeof(int16_t))
+                            {
+                                NPC_intro[NPC_intro_count] = A;
+                                NPC_intro_frame[NPC_intro_count] = 0;
+                                NPC_intro_count++;
                             }
                         }
                     }
@@ -810,7 +877,11 @@ void UpdateGraphics(bool skipRepaint)
                     if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
                         && !NPC[A].Active && !FreezeNPCs)
                     {
-                        NPCFrames(A);
+                        if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_SHOW
+                            || always_render_NPC(NPC[A]))
+                        {
+                            NPCFrames(A);
+                        }
                     }
                 }
             }
@@ -889,6 +960,7 @@ void UpdateGraphics(bool skipRepaint)
     }
 
     LevelFramesAlways();
+    ProcessIntroNPCFrames();
 
     if(ClearBuffer)
     {
@@ -1153,7 +1225,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             A = NPC_Draw_Queue_p.BG[i];
             float cn, an;
-            get_NPC_tint(NPC[A], cn, an);
+            get_NPC_tint(A, cn, an);
             {
                 {
                     {
@@ -1660,7 +1732,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             A = NPC_Draw_Queue_p.Low[i];
             float cn, an;
-            get_NPC_tint(NPC[A], cn, an);
+            get_NPC_tint(A, cn, an);
             {
                 {
                     // If Not NPCIsACoin(.Type) Then
@@ -1698,7 +1770,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             A = NPC_Draw_Queue_p.Normal[i];
             float cn, an;
-            get_NPC_tint(NPC[A], cn, an);
+            get_NPC_tint(A, cn, an);
             {
                 {
                     {
@@ -2025,7 +2097,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             A = NPC_Draw_Queue_p.FG[i];
             float cn, an;
-            get_NPC_tint(NPC[A], cn, an);
+            get_NPC_tint(A, cn, an);
             {
                 {
                     {
