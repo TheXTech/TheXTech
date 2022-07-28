@@ -324,7 +324,6 @@ inline void get_NPC_tint(int A, float& cn, float& an)
         {
             if(NPC_intro[i] == A)
             {
-                printf("Got %d\n", A);
                 if(!always_render_NPC(n))
                 {
                     float coord = NPC_intro_frame[i]/(float)g_config.debug_npc_intro_length;
@@ -757,6 +756,9 @@ void UpdateGraphics(bool skipRepaint)
                     render = false;
                 }
 
+                // handle the game's "conditional activation" state where NPC is activated *without* its events being triggered,
+                // with TimeLeft = 0 by the time we get to rendering
+
                 // WANT this whole sequence to let cannot_reset equal can_activate, because in effect they are being conditionally activated (and their activation event is being cancelled).
                 // frame 0: every NPC has TimeLeft = 1, JustActivated = 1, does a full timestep update to initialize its state, and sets TimeLeft = 0.
                 // frame 1: every NPC has TimeLeft = 0 if not onscreen, TimeLeft = N if onscreen, JustActivated = 0, and Deactivates if not onscreen -> Reset[1] = false, Reset[2] = false.
@@ -766,11 +768,12 @@ void UpdateGraphics(bool skipRepaint)
                     cannot_reset = can_activate;
                 }
 
-                // don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
-                //   a piranha plant that hasn't emerged yet, etc
+                // this section of the logic handles NPCs that are onscreen but not active yet
                 if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
                     && !NPC[A].Active && render)
                 {
+                    // don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
+                    //   a piranha plant that hasn't emerged yet, etc
                     if((NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
                         || NPC[A].Type == NPCID_PODOBOO
                         || NPC[A].Type == NPCID_PIRANHA_SMB3 || NPC[A].Type == NPCID_BOTTOMPIRANHA || NPC[A].Type == NPCID_SIDEPIRANHA
@@ -782,31 +785,52 @@ void UpdateGraphics(bool skipRepaint)
                         render = false;
                     }
 
-                    else if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_HIDE && (vScreen[Z].Width > 800 || vScreen[Z].Height > 600))
+                    else if(g_config.render_inactive_NPC != Config_t::INACTIVE_NPC_SHOW)
                     {
-                        if(!always_render_NPC(NPC[A]))
+                        // add to queue of hidden NPCs
+                        if(!can_activate && !always_render_NPC(NPC[A]))
                         {
-                            render = false;
-
-                            if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
+                            uint8_t i;
+                            for(i = 0; i < NPC_intro_count; i++)
                             {
-                                Location_t tempLocation = NPC[A].Location;
-                                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                                NewEffect(10, tempLocation);
+                                if(NPC_intro[i] == A)
+                                {
+                                    NPC_intro_frame[i] = 0;
+                                    break;
+                                }
                             }
-                        }
-                    }
 
-                    else if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_SHADE && (vScreen[Z].Width > 800 || vScreen[Z].Height > 600))
-                    {
-                        if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
-                        {
-                            if(NPC_intro_count < sizeof(NPC_intro) / sizeof(int16_t))
+                            if(i == NPC_intro_count && NPC_intro_count < sizeof(NPC_intro) / sizeof(int16_t))
                             {
                                 NPC_intro[NPC_intro_count] = A;
                                 NPC_intro_frame[NPC_intro_count] = 0;
                                 NPC_intro_count++;
+                            }
+                        }
+
+                        // if in "poof" mode, render this effect here
+                        if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_HIDE)
+                        {
+                            if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
+                            {
+                                // if it was hidden, then add the poof effect!
+                                uint8_t i;
+                                for(i = 0; i < NPC_intro_count; i++)
+                                {
+                                    if(NPC_intro[i] == A)
+                                    {
+                                        NPC_intro_frame[i] = 0;
+                                        break;
+                                    }
+                                }
+
+                                if(i == NPC_intro_count)
+                                {
+                                    Location_t tempLocation = NPC[A].Location;
+                                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                                    NewEffect(10, tempLocation);
+                                }
                             }
                         }
                     }
