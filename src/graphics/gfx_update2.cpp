@@ -46,6 +46,73 @@
 
 #include <fmt_format_ne.h>
 
+// based on Wohlstand's string-breaking algorithm (gfx_message.cpp)
+static void s_DrawLevelName(const std::string& name, int lX, int bY, int w)
+{
+    const int charWidth = 16;
+    const int lineHeight = 20;
+
+    int lineStart = 0; // start of current line
+    int lastWord = 0; // planned start of next line
+    int numLines = 0; // n lines
+    int maxChars = w/charWidth+1; // 27 by default
+
+    // PASS ONE: determine the number of lines
+    while(lineStart < int(name.size()))
+    {
+        lastWord = lineStart;
+
+        for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
+        {
+            auto c = name[size_t(i) - 1];
+
+            if((lastWord == lineStart && i == lineStart+maxChars) || i == int(name.size()) || c == '\n')
+            {
+                lastWord = i;
+                break;
+            }
+            else if(c == ' ')
+            {
+                lastWord = i;
+            }
+        }
+
+        numLines ++;
+        lineStart = lastWord;
+    }
+
+    // PASS TWO: draw the lines
+    int Y = bY - (numLines - 1) * 20;
+    lineStart = 0; // start of current line
+
+    while(lineStart < int(name.size()))
+    {
+        lastWord = lineStart;
+        for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
+        {
+            auto c = name[size_t(i) - 1];
+
+            if((lastWord == lineStart && i == lineStart+maxChars) || i == int(name.size()) || c == '\n')
+            {
+                lastWord = i;
+                break;
+            }
+            else if(c == ' ')
+            {
+                lastWord = i;
+            }
+        }
+
+        SuperPrint(size_t(lastWord) - size_t(lineStart), name.c_str() + size_t(lineStart),
+            2,
+            lX,
+            Y);
+
+        lineStart = lastWord;
+        Y += lineHeight;
+    }
+}
+
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
 {
@@ -810,25 +877,7 @@ void UpdateGraphics2(bool skipRepaint)
         // Print the level's name
         if(!WorldPlayer[1].LevelName.empty())
         {
-            size_t availChars = (size_t)((sW - margin - (pX + 116))/16) + 1;
-            if(WorldPlayer[1].LevelName.length() > availChars*2)
-            {
-                SuperPrint(WorldPlayer[1].LevelName.substr(0, availChars), 2,
-                    pX + 116, marginTop - 21 - 40);
-                SuperPrint(WorldPlayer[1].LevelName.substr(availChars, availChars), 2,
-                    pX + 116 + 16, marginTop - 21 - 20);
-                SuperPrint(WorldPlayer[1].LevelName.substr(availChars*2), 2,
-                    pX + 116 + 16, marginTop - 21);
-            }
-            else if(WorldPlayer[1].LevelName.length() > availChars)
-            {
-                SuperPrint(WorldPlayer[1].LevelName.substr(0, availChars), 2,
-                    pX + 116, marginTop - 21 - 20);
-                SuperPrint(WorldPlayer[1].LevelName.substr(availChars), 2,
-                    pX + 116 + 16, marginTop - 21);
-            }
-            else
-                SuperPrint(WorldPlayer[1].LevelName, 2, pX + 116, marginTop - 21);
+            s_DrawLevelName(WorldPlayer[1].LevelName, pX + 116, marginTop - 21, sW - margin - (pX + 116));
         }
 
         XRender::setViewport(0, 0, ScreenW, ScreenH);
