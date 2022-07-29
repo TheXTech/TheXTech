@@ -132,6 +132,16 @@ bool GFX_t::load()
     ini.open(uiPath + "Backdrop_Border.ini");
     loadFrameInfo(ini, g_backdropBorderInfo);
 
+    if(Backdrop_Border.inited)
+    {
+        // warn if invalid
+        const FrameBorderInfo& i = g_backdropBorderInfo;
+        if(i.le + i.li + i.ri + i.re > Backdrop_Border.w)
+            pLogWarning("Invalid border: total internal/external width is %d but Backdrop_Border.png is only %dpx wide.", i.le + i.li + i.ri + i.re, Backdrop_Border.w);
+        if(i.te + i.ti + i.bi + i.be > Backdrop_Border.h)
+            pLogWarning("Invalid border: total internal/external height is %d but Backdrop_Border.png is only %dpx wide.", i.te + i.ti + i.bi + i.be, Backdrop_Border.h);
+    }
+
     if(m_loadErrors > 0)
     {
         pLogDebug("Missing new backdrop textures.");
@@ -144,6 +154,16 @@ bool GFX_t::load()
 
     ini.open(uiPath + "WorldMapFrame_Border.ini");
     loadFrameInfo(ini, g_worldMapFrameBorderInfo);
+
+    if(WorldMapFrame_Border.inited)
+    {
+        // warn if invalid
+        const FrameBorderInfo& i = g_worldMapFrameBorderInfo;
+        if(i.le + i.li + i.ri + i.re > WorldMapFrame_Border.w)
+            pLogWarning("Invalid border: total internal/external width is %d but WorldMapFrame_Border.png is only %dpx wide.", i.le + i.li + i.ri + i.re, WorldMapFrame_Border.w);
+        if(i.te + i.ti + i.bi + i.be > WorldMapFrame_Border.h)
+            pLogWarning("Invalid border: total internal/external height is %d but WorldMapFrame_Border.png is only %dpx wide.", i.te + i.ti + i.bi + i.be, WorldMapFrame_Border.h);
+    }
 
     if(m_loadErrors > 0)
     {

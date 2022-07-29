@@ -646,6 +646,13 @@ static void loadCustomUIAssets()
         {
             g_backdropBorderInfo = FrameBorderInfo();
         }
+
+        // warn if invalid
+        const FrameBorderInfo& i = g_backdropBorderInfo;
+        if(i.le + i.li + i.ri + i.re > GFX.Backdrop_Border.w)
+            pLogWarning("Invalid border: total internal/external width is %d but Backdrop_Border.png is only %dpx wide.", i.le + i.li + i.ri + i.re, GFX.Backdrop_Border.w);
+        if(i.te + i.ti + i.bi + i.be > GFX.Backdrop_Border.h)
+            pLogWarning("Invalid border: total internal/external height is %d but Backdrop_Border.png is only %dpx wide.", i.te + i.ti + i.bi + i.be, GFX.Backdrop_Border.h);
     }
 
     loadCGFX(uiRoot + "WorldMapFrame_Tile.png",
@@ -684,6 +691,13 @@ static void loadCustomUIAssets()
         {
             g_worldMapFrameBorderInfo = FrameBorderInfo();
         }
+
+        // warn if invalid
+        const FrameBorderInfo& i = g_worldMapFrameBorderInfo;
+        if(i.le + i.li + i.ri + i.re > GFX.WorldMapFrame_Border.w)
+            pLogWarning("Invalid border: total internal/external width is %d but WorldMapFrame_Border.png is only %dpx wide.", i.le + i.li + i.ri + i.re, GFX.WorldMapFrame_Border.w);
+        if(i.te + i.ti + i.bi + i.be > GFX.WorldMapFrame_Border.h)
+            pLogWarning("Invalid border: total internal/external height is %d but WorldMapFrame_Border.png is only %dpx wide.", i.te + i.ti + i.bi + i.be, GFX.WorldMapFrame_Border.h);
     }
 
     loadCGFX(uiRoot + "WorldMapFog.png",

@@ -19,6 +19,7 @@
  */
 
 #include <IniProcessor/ini_processing.h>
+#include <Logger/logger.h>
 
 #include "core/render.h"
 
@@ -139,27 +140,33 @@ void RenderFrame(const Location_t& external, const Location_t& internal,
 
 	const FrameBorderInfo& i = *borderinfo;
 
+	// zero: check if the `ini` is invalid
+	if(i.le + i.li + i.ri + i.re > border->w)
+		return;
+	if(i.te + i.ti + i.bi + i.be > border->h)
+		return;
+
 	int li = have_l ? i.li : 0;
 	int ti = have_t ? i.ti : 0;
 	int ri = have_r ? i.ri : 0;
 	int bi = have_b ? i.bi : 0;
 
 	// top external-left external
-	if(have_l && have_t)
+	if(have_l && have_t && i.le && i.te)
 	{
 		XRender::renderTexture(internal.X - i.le, internal.Y - i.te, i.le, i.te,
 		    *border,
 		    0, 0);
 	}
 	// top external-left internal
-	if(have_l && have_t)
+	if(have_l && have_t && i.li && i.te)
 	{
 		XRender::renderTexture(internal.X, internal.Y - i.te, i.li, i.te,
 		    *border,
 		    i.le, 0);
 	}
 	// top external-center
-	if(have_t)
+	if(have_t && i.te && internal.Width - li - ri > 0)
 	{
 		DrawTextureTiled(internal.X + li, internal.Y - i.te, internal.Width - li - ri, i.te,
 		    *border,
@@ -168,58 +175,59 @@ void RenderFrame(const Location_t& external, const Location_t& internal,
 		    0, 0);
 	}
 	// top external-right internal
-	if(have_t && have_r)
+	if(have_t && have_r && i.ri && i.te)
 	{
 		XRender::renderTexture(internal.X + internal.Width - i.ri, internal.Y - i.te, i.ri, i.te,
 		    *border,
 		    border->w - i.ri - i.re, 0);
 	}
 	// top external-right external
-	if(have_t && have_r)
+	if(have_t && have_r && i.re && i.te)
 	{
 		XRender::renderTexture(internal.X + internal.Width, internal.Y - i.te, i.re, i.te,
 		    *border,
 		    border->w - i.re, 0);
 	}
 	// top internal-left external
-	if(have_t && have_l)
+	if(have_t && have_l && i.le && i.ti)
 	{
 		XRender::renderTexture(internal.X - i.le, internal.Y, i.le, i.ti,
 		    *border,
 		    0, i.te);
 	}
 	// center-left external
-	if(have_l)
+	if(have_l && i.le && internal.Height - ti - bi > 0)
 	{
 		DrawTextureTiled(internal.X - i.le, internal.Y + ti, i.le, internal.Height - ti - bi,
 		    *border,
 		    0, i.te + i.ti,
-		    i.le, border->h - i.te - i.ti - i.bi - i.be,
+		    i.le,
+		    border->h - i.te - i.ti - i.bi - i.be,
 		    0, 0);
 	}
 	// bottom internal-left external
-	if(have_b && have_l)
+	if(have_b && have_l && i.le && i.bi)
 	{
 		XRender::renderTexture(internal.X - i.le, internal.Y + internal.Height - i.bi, i.le, i.bi,
 		    *border,
 		    0, border->h - i.bi - i.be);
 	}
 	// bottom external-left external
-	if(have_b && have_l)
+	if(have_b && have_l && i.le && i.be)
 	{
 		XRender::renderTexture(internal.X - i.le, internal.Y + internal.Height, i.le, i.be,
 		    *border,
 		    0, border->h - i.be);
 	}
 	// bottom external-left internal
-	if(have_b && have_l)
+	if(have_b && have_l && i.li && i.be)
 	{
 		XRender::renderTexture(internal.X, internal.Y + internal.Height, i.li, i.be,
 		    *border,
 		    i.le, border->h - i.be);
 	}
 	// bottom external-center
-	if(have_b)
+	if(have_b && i.be && internal.Width - li - ri > 0)
 	{
 		DrawTextureTiled(internal.X + li, internal.Y + internal.Height, internal.Width - li - ri, i.be,
 		    *border,
@@ -227,28 +235,28 @@ void RenderFrame(const Location_t& external, const Location_t& internal,
 		    0, 0);
 	}
 	// bottom external-right internal
-	if(have_b && have_r)
+	if(have_b && have_r && i.ri && i.be)
 	{
 		XRender::renderTexture(internal.X + internal.Width - i.ri, internal.Y + internal.Height, i.ri, i.be,
 		    *border,
 		    border->w - i.ri - i.re, border->h - i.be);
 	}
 	// bottom external-right external
-	if(have_b && have_r)
+	if(have_b && have_r && i.re && i.be)
 	{
 		XRender::renderTexture(internal.X + internal.Width, internal.Y + internal.Height, i.re, i.be,
 		    *border,
 		    border->w - i.re, border->h - i.be);
 	}
 	// top internal-right external
-	if(have_t && have_r)
+	if(have_t && have_r && i.re && i.ti)
 	{
 		XRender::renderTexture(internal.X + internal.Width, internal.Y, i.re, i.ti,
 		    *border,
 		    border->w - i.re, i.te);
 	}
 	// center-right external
-	if(have_r)
+	if(have_r && i.re && internal.Height - ti - bi)
 	{
 		DrawTextureTiled(internal.X + internal.Width, internal.Y + ti, i.re, internal.Height - ti - bi,
 		    *border,
@@ -257,7 +265,7 @@ void RenderFrame(const Location_t& external, const Location_t& internal,
 		    0, 0);
 	}
 	// bottom internal-right external
-	if(have_b && have_r)
+	if(have_b && have_r && i.bi && i.re)
 	{
 		XRender::renderTexture(internal.X + internal.Width, internal.Y + internal.Height - i.bi, i.re, i.bi,
 		    *border,
