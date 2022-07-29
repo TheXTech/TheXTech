@@ -364,6 +364,39 @@ inline void get_NPC_tint(int A, float& cn, float& an)
     }
 }
 
+inline static bool s_SoundOnly(const Events_t& evt, int test_section)
+{
+    if(!(evt.Text == STRINGINDEX_NONE
+        && evt.HideLayer.empty()
+        && evt.ShowLayer.empty()
+        && evt.ToggleLayer.empty()
+        && evt.MoveLayer == LAYER_NONE
+        && evt.TriggerEvent == EVENT_NONE
+        && evt.EndGame == 0))
+    {
+        return false;
+    }
+
+    bool autoscroll_okay = !AutoUseModern || evt.AutoSection != test_section
+        || (g_compatibility.fix_autoscroll_speed
+            ? (!(evt.AutoX != 0.0 || evt.AutoY != 0.0)
+                || (AutoX[evt.AutoSection] == evt.AutoX && AutoY[evt.AutoSection] == evt.AutoY))
+            : (!IF_INRANGE(evt.AutoSection, 0, SDL_min(maxSections, maxEvents))
+                || (AutoX[evt.AutoSection] == Events[evt.AutoSection].AutoX
+                    && AutoY[evt.AutoSection] == Events[evt.AutoSection].AutoY)));
+
+    if(!autoscroll_okay)
+        return false;
+
+    const EventSection_t& s = const_cast<Events_t&>(evt).section[test_section];
+    bool section_okay = s.music_id == EventSection_t::LESet_Nothing
+        && s.background_id == EventSection_t::LESet_Nothing
+        && (int)s.position.X == EventSection_t::LESet_Nothing
+        && s.autoscroll == false;
+
+    return section_okay;
+}
+
 void GraphicsLazyPreLoad()
 {
     // TODO: check if this is needed at caller
@@ -726,7 +759,7 @@ void UpdateGraphics(bool skipRepaint)
                     if(
                            ForcedControls
                         || qScreen
-                        || NPC[A].TriggerActivate != EVENT_NONE
+                        || onscreen_canonical == render
                         || NPC[A].Generator
                         || NPC[A].Type == NPCID_THWOMP_SMB3
                         || NPC[A].Type == NPCID_THWOMP_SMW
@@ -737,6 +770,7 @@ void UpdateGraphics(bool skipRepaint)
                         || NPC[A].Type == NPCID_RINKAGEN
                         || NPC[A].Type == NPCID_BLARGG
                         || (NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
+                        || (NPC[A].TriggerActivate != EVENT_NONE && s_SoundOnly(Events[NPC[A].TriggerActivate], Player[Z].Section))
                     )
                         can_activate = onscreen_canonical;
                     else
