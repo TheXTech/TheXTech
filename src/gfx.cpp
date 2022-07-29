@@ -24,7 +24,9 @@
 #include "core/render.h"
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
+#include <IniProcessor/ini_processing.h>
 
+#include "graphics/gfx_frame.h"
 
 GFX_t GFX;
 
@@ -126,6 +128,10 @@ bool GFX_t::load()
     loadImage(Backdrop, uiPath + "Backdrop.png");
     loadImage(Backdrop_Border, uiPath + "Backdrop_Border.png");
 
+    IniProcessing ini;
+    ini.open(uiPath + "Backdrop_Border.ini");
+    loadFrameInfo(ini, g_backdropBorderInfo);
+
     if(m_loadErrors > 0)
     {
         pLogDebug("Missing new backdrop textures.");
@@ -135,6 +141,9 @@ bool GFX_t::load()
     loadImage(WorldMapFrame_Tile, uiPath + "WorldMapFrame_Tile.png");
     loadImage(WorldMapFrame_Border, uiPath + "WorldMapFrame_Border.png");
     loadImage(WorldMapFog, uiPath + "WorldMapFog.png");
+
+    ini.open(uiPath + "WorldMapFrame_Border.ini");
+    loadFrameInfo(ini, g_worldMapFrameBorderInfo);
 
     if(m_loadErrors > 0)
     {

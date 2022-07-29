@@ -26,8 +26,11 @@
 #include "gfx.h"
 #include "load_gfx.h"
 #include "graphics.h" // SuperPrint
+#include "graphics/gfx_frame.h" // FrameBorderInfo, loadFrameInfo
 #include "core/render.h"
 #include "core/events.h"
+
+#include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
 #include <DirManager/dirman.h>
@@ -75,6 +78,11 @@ static std::set<std::string> g_customLevelCGFXPathsCache;
 
 static std::vector<GFXBackup_t> g_defaultWorldGfxBackup;
 static std::set<std::string> g_customWorldCGFXPathsCache;
+
+static bool s_custom_backdropBorderInfo = false;
+static FrameBorderInfo s_backup_backdropBorderInfo;
+static bool s_custom_worldMapFrameBorderInfo = false;
+static FrameBorderInfo s_backup_worldMapFrameBorderInfo;
 
 static DirListCI s_dirFallback;
 
@@ -612,6 +620,34 @@ static void loadCustomUIAssets()
              "Backdrop_Border",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Backdrop_Border, false, true);
 
+    if(GFX.isCustom(ci - 1))
+    {
+        if(!s_custom_backdropBorderInfo)
+        {
+            s_backup_backdropBorderInfo = g_backdropBorderInfo;
+            s_custom_backdropBorderInfo = true;
+        }
+
+        // find the frame border info
+        std::string res;
+
+        res = g_dirCustom.resolveFileCaseExistsAbs("Backdrop_Border.ini");
+
+        if(res.empty())
+            res = g_dirEpisode.resolveFileCaseExistsAbs("Backdrop_Border.ini");
+
+        // load the frame border info
+        if(!res.empty())
+        {
+            IniProcessing ini(res);
+            loadFrameInfo(ini, g_backdropBorderInfo);
+        }
+        else
+        {
+            g_backdropBorderInfo = FrameBorderInfo();
+        }
+    }
+
     loadCGFX(uiRoot + "WorldMapFrame_Tile.png",
              "WorldMapFrame_Tile",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.WorldMapFrame_Tile, false, true);
@@ -619,6 +655,36 @@ static void loadCustomUIAssets()
     loadCGFX(uiRoot + "WorldMapFrame_Border.png",
              "WorldMapFrame_Border",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.WorldMapFrame_Border, false, true);
+
+    if(GFX.isCustom(ci - 1))
+    {
+        if(!s_custom_worldMapFrameBorderInfo)
+        {
+            s_backup_worldMapFrameBorderInfo = g_worldMapFrameBorderInfo;
+            s_custom_worldMapFrameBorderInfo = true;
+        }
+
+        // find the frame border info
+        std::string res;
+
+        res = g_dirCustom.resolveFileCaseExistsAbs("WorldMapFrame_Border.ini");
+
+        if(res.empty())
+            res = g_dirEpisode.resolveFileCaseExistsAbs("WorldMapFrame_Border.ini");
+
+        // load the frame border info
+        if(!res.empty())
+        {
+            printf("loading world map frame border...\n");
+            IniProcessing ini(res);
+            loadFrameInfo(ini, g_worldMapFrameBorderInfo);
+            printf("te %d...\n", g_worldMapFrameBorderInfo.te);
+        }
+        else
+        {
+            g_worldMapFrameBorderInfo = FrameBorderInfo();
+        }
+    }
 
     loadCGFX(uiRoot + "WorldMapFog.png",
              "WorldMapFog",
@@ -714,6 +780,17 @@ void UnloadCustomGFX()
     {
         EffectWidth[A] = EffectDefaults.EffectWidth[A];
         EffectHeight[A] = EffectDefaults.EffectHeight[A];
+    }
+
+    if(s_custom_worldMapFrameBorderInfo)
+    {
+        g_worldMapFrameBorderInfo = s_backup_worldMapFrameBorderInfo;
+        s_custom_worldMapFrameBorderInfo = false;
+    }
+    if(s_custom_backdropBorderInfo)
+    {
+        g_backdropBorderInfo = s_backup_backdropBorderInfo;
+        s_custom_backdropBorderInfo = false;
     }
 
     restoreLevelBackupTextures();

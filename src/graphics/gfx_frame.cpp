@@ -18,9 +18,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <IniProcessor/ini_processing.h>
+
 #include "core/render.h"
 
 #include "graphics/gfx_frame.h"
+
+void loadFrameInfo(IniProcessing& ini, FrameBorderInfo& info)
+{
+	info = FrameBorderInfo();
+
+	ini.beginGroup("border-info");
+	ini.read("te", info.te, info.te);
+	ini.read("ti", info.ti, info.ti);
+	ini.read("be", info.be, info.be);
+	ini.read("bi", info.bi, info.bi);
+	ini.read("le", info.le, info.le);
+	ini.read("li", info.li, info.li);
+	ini.read("re", info.re, info.re);
+	ini.read("ri", info.ri, info.ri);
+	ini.endGroup();
+}
 
 void DrawTextureTiled(int dst_x, int dst_y, int dst_w, int dst_h, StdPicture& tx, int src_x, int src_y, int src_w, int src_h, int off_x, int off_y, float alpha)
 {
@@ -246,3 +264,6 @@ void RenderFrame(const Location_t& external, const Location_t& internal,
 		    border->w - i.re, border->h - i.bi - i.be);
 	}
 }
+
+FrameBorderInfo g_backdropBorderInfo;
+FrameBorderInfo g_worldMapFrameBorderInfo;

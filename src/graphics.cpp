@@ -782,9 +782,7 @@ void DrawBackdrop()
 {
     if(g_config.show_backdrop && GFX.Backdrop.inited)
     {
-        bool border_valid = GFX.Backdrop_Border.inited && GFX.isCustom(67) == GFX.isCustom(68);
-
-        const FrameBorderInfo borderinfo;
+        bool border_valid = GFX.Backdrop_Border.inited && (!GFX.isCustom(67) || GFX.isCustom(68));
 
         for(int Z = 1; Z <= 2; Z++)
         {
@@ -811,7 +809,7 @@ void DrawBackdrop()
             }
 
             RenderFrame(full, newLoc(s.ScreenLeft, s.ScreenTop, s.Width, s.Height),
-                GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr, &borderinfo);
+                GFX.Backdrop, border_valid ? &GFX.Backdrop_Border : nullptr, &g_backdropBorderInfo);
         }
     }
 }
