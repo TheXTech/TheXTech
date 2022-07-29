@@ -402,14 +402,14 @@ void CenterScreens()
     vScreen[1].ScreenTop = vScreen[1].Top;
     vScreen[2].ScreenTop = vScreen[2].Top;
 
-    if(GameMenu || GameOutro || LevelEditor || WorldEditor)
+    if(GameOutro || LevelEditor || WorldEditor)
         return;
 
     // restrict the vScreen to the level if the level is smaller than the screen
     double MaxWidth1, MaxWidth2, MaxHeight1, MaxHeight2;
 
     // set based on level bounds
-    if(!LevelSelect)
+    if(GameMenu || !LevelSelect)
     {
         MaxWidth1 = level[Player[1].Section].Width - level[Player[1].Section].X;
         MaxWidth2 = level[Player[2].Section].Width - level[Player[2].Section].X;

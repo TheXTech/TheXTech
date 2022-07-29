@@ -1749,9 +1749,15 @@ void mainMenuDraw()
     if(A == 800)
         A = 768;
     // horizReps
-    B = ScreenW / A + 1;
+    B = ScreenW / A + 2;
+
+    double x = 0;
+
+    // can add parallax scrolling to curtain by uncommenting following line
+    // double x = -A + std::fmod(1.25 * vScreenX[1], A);
+
     for(int C = 0; C < B; C++)
-        XRender::renderTexture(A * C, 0, A, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+        XRender::renderTexture(x + A * C, vScreen[1].ScreenTop, A, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
 
     // can animate curtain falling by replacing y coordinate with -GFX.MenuGFX[1].h * g_levelScreenFader.m_scale
 
