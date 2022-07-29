@@ -46,6 +46,18 @@ void RenderRectOp::Draw(Renderer *renderer)
         sx2 -= vScreenX[renderer->GetCameraIdx()];
         sy2 -= vScreenY[renderer->GetCameraIdx()];
     }
+    else
+    {
+        if(sx1 == 0.0 && sx2 == 800.0 && sy1 == 0.0 && sy2 == 600.0)
+        {
+            sx2 = vScreen[1].Width;
+            sy2 = vScreen[1].Height;
+        }
+        else
+        {
+            Render::TranslateScreenCoords(sx1, sy1, sx2 - sx1, sy2 - sy1);
+        }
+    }
 
     if(!sceneCoords)
         XRender::offsetViewportIgnore(true);

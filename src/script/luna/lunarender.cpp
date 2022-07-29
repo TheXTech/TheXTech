@@ -22,6 +22,8 @@
 #include "autocode_manager.h"
 #include "renderop.h"
 #include "globals.h"
+#include "graphics.h"
+#include "config.h"
 #include "lunamisc.h"
 #include "renderop_string.h"
 #include <fmt_format_ne.h>
@@ -336,5 +338,37 @@ void Render::CalcCameraPos(double *ret_x, double *ret_y)
     {
         val = vScreenY[1];
         *ret_y = val - val - val; // Fix backwards smbx camera
+    }
+}
+
+void Render::TranslateScreenCoords(double &x, double &y, double w, double h)
+{
+    if(g_config.autocode_translate_coords)
+    {
+        int top = 0;
+        if(vScreen[1].Height > 600)
+            top = vScreen[1].Height / 2 - 300;
+        int left = vScreen[1].Width / 2 - 400;
+
+        // code to make the HUD follow the player (useful for huge resolutions)
+        // cross-ref DropBonus in npc_bonus.cpp
+        if(g_config.hud_follows_player)
+        {
+            int l, t;
+            if(ScreenType == 5 && !vScreen[2].Visible)
+                GetvScreenAverageCanonical(&l, &t);
+            else
+                GetvScreenCanonical(1, &l, &t);
+            if(vScreen[1].Height > 600)
+                top = -t + vScreenY[1];
+            if(vScreen[1].Width > 800)
+                left = -l + vScreenX[1];
+        }
+
+        x += left;
+        y += top;
+
+        if(vScreen[1].Height < 600.0)
+            y *= vScreen[1].Height / 600.0;
     }
 }

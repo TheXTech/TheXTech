@@ -59,12 +59,17 @@ RenderStringOp::~RenderStringOp()
 void RenderStringOp::Draw(Renderer *renderer)
 {
     //        VB6StrPtr text(m_String);
-    float x = m_X, y = m_Y;
+    double x = m_X, y = m_Y;
 
     if(sceneCoords)
     {
         x -= static_cast<float>(vScreenX[renderer->GetCameraIdx()]);
         y -= static_cast<float>(vScreenY[renderer->GetCameraIdx()]);
+    }
+    else
+    {
+        int w = SuperTextPixLen(m_StringSize, m_String, m_FontType);
+        Render::TranslateScreenCoords(x, y, w, 18);
     }
 
     if(!sceneCoords)

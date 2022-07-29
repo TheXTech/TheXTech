@@ -281,6 +281,7 @@ void OpenConfig()
         config.readEnum("world-map-fog", g_config.world_map_fog, (int)Config_t::WORLD_MAP_FOG_OFF, worldMapFog);
         // disabled pending further discussion
         // config.read("world-map-smart-pan", g_config.world_map_smart_pan, false);
+        config.read("autocode-translate-coords", g_config.autocode_translate_coords, true);
         config.endGroup();
 
         Controls::LoadConfig(ctl);
@@ -461,6 +462,7 @@ void SaveConfig()
         config.setValue("world-map-fog", worldMapFog[g_config.world_map_fog]);
         // disabled pending further discussion
         // config.setValue("world-map-smart-pan", g_config.world_map_smart_pan);
+        config.setValue("autocode-translate-coords", g_config.autocode_translate_coords);
     }
     config.endGroup();
 

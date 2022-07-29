@@ -112,6 +112,8 @@ extern struct Config_t
     int world_map_fog = WORLD_MAP_FOG_OFF;
     //! Intelligently pan the world map to focus on the path
     bool world_map_smart_pan = false;
+    //! Translate the coordinates of autocode screen-space objects based on the HUD location
+    bool autocode_translate_coords = true;
 
 
     /* ---- Joystick ----*/

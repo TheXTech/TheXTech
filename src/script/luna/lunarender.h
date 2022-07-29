@@ -145,8 +145,9 @@ public:
 namespace Render
 {
 
-bool IsOnScreen(double x, double y, double w, double h); // Returns whether or not the digven rectangle is on screen this frame
-void CalcCameraPos(double *p_X, double *p_Y);            // Tries to read smbx memory to return the camera coords in the 2 passed args
+bool IsOnScreen(double x, double y, double w, double h);              // Returns whether or not the digven rectangle is on screen this frame
+void CalcCameraPos(double *p_X, double *p_Y);                         // Tries to read smbx memory to return the camera coords in the 2 passed args
+void TranslateScreenCoords(double &x, double &y, double w, double h); // Converts 800x600 coordinates to dynamic-res coordinates, depending on config options
 
 }
 

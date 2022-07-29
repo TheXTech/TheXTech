@@ -784,17 +784,17 @@ void SpriteFunc::RelativeDraw(CSprite *me)
 
         if(me->m_AnimationFrame < (signed)me->m_GfxRects.size())
         {
-            double cx = 0;              // camera x (top left of screen)
-            double cy = 0;              // camera y (top left of screen)
+            // double cx = 0;              // camera x (top left of screen)
+            // double cy = 0;              // camera y (top left of screen)
             double sx = me->m_Xpos;     // sprite x position (top left of sprite)
             double sy = me->m_Ypos;     // sprite y position (top left of sprite)
             sx +=  me->m_GfxXOffset;
             sy +=  me->m_GfxYOffset;
 
             // Calc screen draw position based on camera position
-            Render::CalcCameraPos(&cx, &cy);
-            sx = sx - cx;
-            sy = sy - cy;
+            // Render::CalcCameraPos(&cx, &cy);
+            // sx = sx - cx;
+            // sy = sy - cy;
 
             // Register drawing operation
             auto *op = new RenderBitmapOp();
@@ -809,6 +809,7 @@ void SpriteFunc::RelativeDraw(CSprite *me)
                 op->direct_img = me->m_directImg;
             else
                 op->direct_img = Renderer::Get().GetImageForResourceCode(me->m_ImgResCode);
+            op->sceneCoords = true;
 
             Renderer::Get().AddOp(op);
             return;
