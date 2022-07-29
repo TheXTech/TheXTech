@@ -259,7 +259,7 @@ void RenderFrame(const Location_t& external, const Location_t& internal,
 	// bottom internal-right external
 	if(have_b && have_r)
 	{
-		XRender::renderTexture(internal.X + internal.Width, internal.Y + internal.Height - i.ti, i.re, i.bi,
+		XRender::renderTexture(internal.X + internal.Width, internal.Y + internal.Height - i.bi, i.re, i.bi,
 		    *border,
 		    border->w - i.re, border->h - i.bi - i.be);
 	}
