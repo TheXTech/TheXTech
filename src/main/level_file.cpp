@@ -35,6 +35,7 @@
 #include "trees.h"
 #include "record.h"
 #include "npc_special_data.h"
+#include "graphics/gfx_camera.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -896,6 +897,7 @@ void ClearLevel()
 
     UnloadCustomGFX();
     doShakeScreenClear();
+    ResetCameraPanning();
     treeLevelCleanAll();
 
     AutoUseModern = false;
