@@ -24,7 +24,7 @@
 
 #include <cstdint>
 
-extern int16_t g_vScreenOffsetY_hold[2] = {0, 0};
+extern int16_t g_vScreenOffsetY_hold[2];
 
 void ResetCameraPanning();
 
