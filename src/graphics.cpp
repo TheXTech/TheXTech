@@ -39,8 +39,20 @@
 
 static int16_t s_vScreenOffsetX[2] = {0, 0};
 static int16_t s_vScreenOffsetY[2] = {0, 0};
-static int16_t s_vScreenOffsetY_hold[2] = {0, 0};
 static int8_t s_lastButtonsHeld[2] = {0, 0};
+int16_t g_vScreenOffsetY_hold[2] = {0, 0};
+
+void ResetCameraPanning()
+{
+    s_vScreenOffsetX[0] = 0;
+    s_vScreenOffsetX[1] = 0;
+    s_vScreenOffsetY[0] = 0;
+    s_vScreenOffsetY[1] = 0;
+    s_lastButtonsHeld[0] = 0;
+    s_lastButtonsHeld[1] = 0;
+    g_vScreenOffsetY_hold[0] = 0;
+    g_vScreenOffsetY_hold[1] = 0;
+}
 
 //  Get the screen position
 void GetvScreen(const int A)
@@ -124,43 +136,53 @@ void GetvScreen(const int A)
 
                 vScreenX[A] -= s_vScreenOffsetX[A - 1]/2;
 
-                int16_t max_offsetY = 100;
+                int16_t max_offsetY = 200;
 
                 int16_t lookY_target = max_offsetY;
 
                 if(Player[A].Controls.Up == Player[A].Controls.Down)
-                    lookY_target = s_vScreenOffsetY_hold[A - 1];
+                    lookY_target = g_vScreenOffsetY_hold[A - 1];
                 else if(Player[A].Controls.Down)
                     lookY_target *= -1;
 
-                int16_t rateY = 1;
+                int16_t rateY = 4;
                 if((s_vScreenOffsetY[A - 1] < 0 && lookY_target > 0)
                     || (s_vScreenOffsetY[A - 1] > 0 && lookY_target < 0))
                 {
-                    if(s_vScreenOffsetY[A - 1] < 30 && s_vScreenOffsetY[A - 1] > -30)
+                    if(s_vScreenOffsetY[A - 1] < 50 && s_vScreenOffsetY[A - 1] > -50)
                         s_vScreenOffsetY[A - 1] *= -1;
                 }
 
                 if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
                 {
                     if(s_vScreenOffsetY[A - 1] < lookY_target)
+                    {
                         s_vScreenOffsetY[A - 1] += rateY;
+
+                        if(s_vScreenOffsetY[A - 1] > lookY_target)
+                            s_vScreenOffsetY[A - 1] = lookY_target;
+                    }
                     else if(s_vScreenOffsetY[A - 1] > lookY_target)
+                    {
                         s_vScreenOffsetY[A - 1] -= rateY;
 
-                    if(s_vScreenOffsetY_hold[A - 1] == 0 && s_vScreenOffsetY[A - 1] < -max_offsetY + 20 && (s_lastButtonsHeld[A - 1] & 1) == 0 && Player[A].Controls.Down)
+                        if(s_vScreenOffsetY[A - 1] < lookY_target)
+                            s_vScreenOffsetY[A - 1] = lookY_target;
+                    }
+
+                    if(g_vScreenOffsetY_hold[A - 1] == 0 && s_vScreenOffsetY[A - 1] < -max_offsetY + 40 && (s_lastButtonsHeld[A - 1] & 1) == 0 && Player[A].Controls.Down)
                     {
-                        s_vScreenOffsetY_hold[A - 1] = -max_offsetY;
+                        g_vScreenOffsetY_hold[A - 1] = -max_offsetY;
                         PlaySound(SFX_Camera);
                     }
-                    else if(s_vScreenOffsetY_hold[A - 1] == 0 && s_vScreenOffsetY[A - 1] > max_offsetY - 20 && (s_lastButtonsHeld[A - 1] & 2) == 0 && Player[A].Controls.Up)
+                    else if(g_vScreenOffsetY_hold[A - 1] == 0 && s_vScreenOffsetY[A - 1] > max_offsetY - 40 && (s_lastButtonsHeld[A - 1] & 2) == 0 && Player[A].Controls.Up)
                     {
-                        s_vScreenOffsetY_hold[A - 1] = max_offsetY;
+                        g_vScreenOffsetY_hold[A - 1] = max_offsetY;
                         PlaySound(SFX_Camera);
                     }
-                    else if(s_vScreenOffsetY_hold[A - 1] != 0 && s_vScreenOffsetY[A - 1] > -40 && s_vScreenOffsetY[A - 1] < 40)
+                    else if(g_vScreenOffsetY_hold[A - 1] != 0 && s_vScreenOffsetY[A - 1] > -60 && s_vScreenOffsetY[A - 1] < 60)
                     {
-                        s_vScreenOffsetY_hold[A - 1] = 0;
+                        g_vScreenOffsetY_hold[A - 1] = 0;
                         PlaySound(SFX_Camera);
                     }
 
@@ -169,14 +191,15 @@ void GetvScreen(const int A)
 
                 int16_t lookY = s_vScreenOffsetY[A - 1];
 
-                if(lookY > -30 && lookY < 30)
+                if(lookY > -50 && lookY < 50)
                     lookY = 0;
                 else
                 {
                     if(lookY > 0)
-                        lookY -= 30;
+                        lookY -= 50;
                     if(lookY < 0)
-                        lookY += 30;
+                        lookY += 50;
+                    lookY /= 2;
                 }
 
                 vScreenY[A] += lookY + 32;
