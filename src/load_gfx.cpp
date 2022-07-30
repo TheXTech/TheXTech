@@ -682,10 +682,8 @@ static void loadCustomUIAssets()
         // load the frame border info
         if(!res.empty())
         {
-            printf("loading world map frame border...\n");
             IniProcessing ini(res);
             loadFrameInfo(ini, g_worldMapFrameBorderInfo);
-            printf("te %d...\n", g_worldMapFrameBorderInfo.te);
         }
         else
         {
