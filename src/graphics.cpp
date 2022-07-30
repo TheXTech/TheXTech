@@ -39,6 +39,8 @@
 
 static int16_t s_vScreenOffsetX[2] = {0, 0};
 static int16_t s_vScreenOffsetY[2] = {0, 0};
+static int16_t s_vScreenOffsetY_hold[2] = {0, 0};
+static int8_t s_lastButtonsHeld[2] = {0, 0};
 
 //  Get the screen position
 void GetvScreen(const int A)
@@ -112,22 +114,22 @@ void GetvScreen(const int A)
                     rateX = 2;
                 }
 
-                if(GamePaused != PauseCode::None || qScreen)
-                    rateX = 0;
-
-                if(s_vScreenOffsetX[A - 1] < lookX_target)
-                    s_vScreenOffsetX[A - 1] += rateX;
-                else if(s_vScreenOffsetX[A - 1] > lookX_target)
-                    s_vScreenOffsetX[A - 1] -= rateX;
+                if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
+                {
+                    if(s_vScreenOffsetX[A - 1] < lookX_target)
+                        s_vScreenOffsetX[A - 1] += rateX;
+                    else if(s_vScreenOffsetX[A - 1] > lookX_target)
+                        s_vScreenOffsetX[A - 1] -= rateX;
+                }
 
                 vScreenX[A] -= s_vScreenOffsetX[A - 1]/2;
 
-                int16_t max_offsetY = 140;
+                int16_t max_offsetY = 100;
 
                 int16_t lookY_target = max_offsetY;
 
                 if(Player[A].Controls.Up == Player[A].Controls.Down)
-                    lookY_target = 0;
+                    lookY_target = s_vScreenOffsetY_hold[A - 1];
                 else if(Player[A].Controls.Down)
                     lookY_target *= -1;
 
@@ -135,31 +137,49 @@ void GetvScreen(const int A)
                 if((s_vScreenOffsetY[A - 1] < 0 && lookY_target > 0)
                     || (s_vScreenOffsetY[A - 1] > 0 && lookY_target < 0))
                 {
-                    if(s_vScreenOffsetY[A - 1] < 50 && s_vScreenOffsetY[A - 1] > -50)
+                    if(s_vScreenOffsetY[A - 1] < 30 && s_vScreenOffsetY[A - 1] > -30)
                         s_vScreenOffsetY[A - 1] *= -1;
                 }
 
-                if(GamePaused != PauseCode::None || qScreen)
-                    rateY = 0;
+                if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
+                {
+                    if(s_vScreenOffsetY[A - 1] < lookY_target)
+                        s_vScreenOffsetY[A - 1] += rateY;
+                    else if(s_vScreenOffsetY[A - 1] > lookY_target)
+                        s_vScreenOffsetY[A - 1] -= rateY;
 
-                if(s_vScreenOffsetY[A - 1] < lookY_target)
-                    s_vScreenOffsetY[A - 1] += rateY;
-                else if(s_vScreenOffsetY[A - 1] > lookY_target)
-                    s_vScreenOffsetY[A - 1] -= rateY;
+                    if(s_vScreenOffsetY_hold[A - 1] == 0 && s_vScreenOffsetY[A - 1] < -max_offsetY + 20 && (s_lastButtonsHeld[A - 1] & 1) == 0 && Player[A].Controls.Down)
+                    {
+                        s_vScreenOffsetY_hold[A - 1] = -max_offsetY;
+                        PlaySound(SFX_Camera);
+                    }
+                    else if(s_vScreenOffsetY_hold[A - 1] == 0 && s_vScreenOffsetY[A - 1] > max_offsetY - 20 && (s_lastButtonsHeld[A - 1] & 2) == 0 && Player[A].Controls.Up)
+                    {
+                        s_vScreenOffsetY_hold[A - 1] = max_offsetY;
+                        PlaySound(SFX_Camera);
+                    }
+                    else if(s_vScreenOffsetY_hold[A - 1] != 0 && s_vScreenOffsetY[A - 1] > -40 && s_vScreenOffsetY[A - 1] < 40)
+                    {
+                        s_vScreenOffsetY_hold[A - 1] = 0;
+                        PlaySound(SFX_Camera);
+                    }
+
+                    s_lastButtonsHeld[A - 1] = (int8_t)Player[A].Controls.Down | (int8_t)Player[A].Controls.Up << 1;
+                }
 
                 int16_t lookY = s_vScreenOffsetY[A - 1];
 
-                if(lookY > -50 && lookY < 50)
+                if(lookY > -30 && lookY < 30)
                     lookY = 0;
                 else
                 {
                     if(lookY > 0)
-                        lookY -= 50;
+                        lookY -= 30;
                     if(lookY < 0)
-                        lookY += 50;
+                        lookY += 30;
                 }
 
-                vScreenY[A] += lookY;
+                vScreenY[A] += lookY + 32;
             }
 
 
