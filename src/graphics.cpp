@@ -91,7 +91,7 @@ void GetvScreen(const int A)
 
             if(g_config.small_screen_camera_features && (ScreenW < 800 || ScreenH < 600))
             {
-                int16_t max_offsetX = 240;
+                int16_t max_offsetX = 360;
                 int16_t lookX_target = max_offsetX * Player[A].Location.SpeedX * 1.5 / Physics.PlayerRunSpeed;
                 if(lookX_target > max_offsetX)
                     lookX_target = max_offsetX;
@@ -100,20 +100,29 @@ void GetvScreen(const int A)
                 lookX_target &= ~1;
 
                 int16_t rateX = 1;
+                // switching directions
                 if((s_vScreenOffsetX[A - 1] < 0 && lookX_target > 0)
                     || (s_vScreenOffsetX[A - 1] > 0 && lookX_target < 0))
                 {
+                    rateX = 3;
+                }
+                // accelerating
+                else if((s_vScreenOffsetX[A - 1] > 0) == (lookX_target > s_vScreenOffsetX[A - 1]))
+                {
                     rateX = 2;
                 }
+
+                if(GamePaused != PauseCode::None || qScreen)
+                    rateX = 0;
 
                 if(s_vScreenOffsetX[A - 1] < lookX_target)
                     s_vScreenOffsetX[A - 1] += rateX;
                 else if(s_vScreenOffsetX[A - 1] > lookX_target)
                     s_vScreenOffsetX[A - 1] -= rateX;
 
-                vScreenX[A] -= s_vScreenOffsetX[A - 1];
+                vScreenX[A] -= s_vScreenOffsetX[A - 1]/2;
 
-                int16_t max_offsetY = 180;
+                int16_t max_offsetY = 140;
 
                 int16_t lookY_target = max_offsetY;
 
@@ -129,6 +138,9 @@ void GetvScreen(const int A)
                     if(s_vScreenOffsetY[A - 1] < 50 && s_vScreenOffsetY[A - 1] > -50)
                         s_vScreenOffsetY[A - 1] *= -1;
                 }
+
+                if(GamePaused != PauseCode::None || qScreen)
+                    rateY = 0;
 
                 if(s_vScreenOffsetY[A - 1] < lookY_target)
                     s_vScreenOffsetY[A - 1] += rateY;
