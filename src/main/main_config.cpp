@@ -282,6 +282,7 @@ void OpenConfig()
         // disabled pending further discussion
         // config.read("world-map-smart-pan", g_config.world_map_smart_pan, false);
         config.read("autocode-translate-coords", g_config.autocode_translate_coords, true);
+        config.read("small-screen-camera-features", g_config.small_screen_camera_features, false);
         config.endGroup();
 
         Controls::LoadConfig(ctl);
@@ -463,6 +464,7 @@ void SaveConfig()
         // disabled pending further discussion
         // config.setValue("world-map-smart-pan", g_config.world_map_smart_pan);
         config.setValue("autocode-translate-coords", g_config.autocode_translate_coords);
+        config.setValue("small-screen-camera-features", g_config.small_screen_camera_features);
     }
     config.endGroup();
 

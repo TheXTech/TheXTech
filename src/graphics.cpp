@@ -37,6 +37,9 @@
 #include <Utils/maths.h>
 
 
+static int16_t s_vScreenOffsetX[2] = {0, 0};
+static int16_t s_vScreenOffsetY[2] = {0, 0};
+
 //  Get the screen position
 void GetvScreen(const int A)
 {
@@ -85,6 +88,69 @@ void GetvScreen(const int A)
         {
             vScreenX[A] = -pLoc.X + (vScreen[A].Width * 0.5) - pLoc.Width / 2.0;
             vScreenY[A] = -pLoc.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - pHeight;
+
+            if(g_config.small_screen_camera_features && (ScreenW < 800 || ScreenH < 600))
+            {
+                int16_t max_offsetX = 240;
+                int16_t lookX_target = max_offsetX * Player[A].Location.SpeedX * 1.5 / Physics.PlayerRunSpeed;
+                if(lookX_target > max_offsetX)
+                    lookX_target = max_offsetX;
+                if(lookX_target < -max_offsetX)
+                    lookX_target = -max_offsetX;
+                lookX_target &= ~1;
+
+                int16_t rateX = 1;
+                if((s_vScreenOffsetX[A - 1] < 0 && lookX_target > 0)
+                    || (s_vScreenOffsetX[A - 1] > 0 && lookX_target < 0))
+                {
+                    rateX = 2;
+                }
+
+                if(s_vScreenOffsetX[A - 1] < lookX_target)
+                    s_vScreenOffsetX[A - 1] += rateX;
+                else if(s_vScreenOffsetX[A - 1] > lookX_target)
+                    s_vScreenOffsetX[A - 1] -= rateX;
+
+                vScreenX[A] -= s_vScreenOffsetX[A - 1];
+
+                int16_t max_offsetY = 180;
+
+                int16_t lookY_target = max_offsetY;
+
+                if(Player[A].Controls.Up == Player[A].Controls.Down)
+                    lookY_target = 0;
+                else if(Player[A].Controls.Down)
+                    lookY_target *= -1;
+
+                int16_t rateY = 1;
+                if((s_vScreenOffsetY[A - 1] < 0 && lookY_target > 0)
+                    || (s_vScreenOffsetY[A - 1] > 0 && lookY_target < 0))
+                {
+                    if(s_vScreenOffsetY[A - 1] < 50 && s_vScreenOffsetY[A - 1] > -50)
+                        s_vScreenOffsetY[A - 1] *= -1;
+                }
+
+                if(s_vScreenOffsetY[A - 1] < lookY_target)
+                    s_vScreenOffsetY[A - 1] += rateY;
+                else if(s_vScreenOffsetY[A - 1] > lookY_target)
+                    s_vScreenOffsetY[A - 1] -= rateY;
+
+                int16_t lookY = s_vScreenOffsetY[A - 1];
+
+                if(lookY > -50 && lookY < 50)
+                    lookY = 0;
+                else
+                {
+                    if(lookY > 0)
+                        lookY -= 50;
+                    if(lookY < 0)
+                        lookY += 50;
+                }
+
+                vScreenY[A] += lookY;
+            }
+
+
             vScreenX[A] += -vScreen[A].tempX;
             vScreenY[A] += -vScreen[A].TempY;
 

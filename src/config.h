@@ -114,6 +114,8 @@ extern struct Config_t
     bool world_map_smart_pan = false;
     //! Translate the coordinates of autocode screen-space objects based on the HUD location
     bool autocode_translate_coords = true;
+    //! Camera optimizations that improve the experience at low resolutions
+    bool small_screen_camera_features = false;
 
 
     /* ---- Joystick ----*/
