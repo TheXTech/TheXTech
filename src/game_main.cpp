@@ -163,6 +163,28 @@ static std::string findIntroLevel()
     return selected;
 }
 
+// expand the section vertically if the top 8px of the level are empty
+static void s_ExpandSectionForMenu()
+{
+    // check current section top for expandability
+    Location_t tempLocation = newLoc(level[Player[1].Section].X, level[0].Y, level[Player[1].Section].Width - level[Player[1].Section].X, 8);
+
+    for(int A = 1; A <= numBlock; A++)
+    {
+        if(CheckCollision(Block[A].Location, tempLocation))
+            return;
+    }
+
+    for(int A = 1; A <= numBackground; A++)
+    {
+        if(CheckCollision(Background[A].Location, tempLocation))
+            return;
+    }
+
+    // expand level height to a maximum of 2160px
+    if(level[Player[1].Section].Y > level[Player[1].Section].Height - 2160)
+        level[Player[1].Section].Y = level[Player[1].Section].Height - 2160;
+}
 
 int GameMain(const CmdLineSetup_t &setup)
 {
@@ -379,7 +401,7 @@ int GameMain(const CmdLineSetup_t &setup)
                         nullptr,
                         nullptr);
 
-            MenuMode = MENU_MAIN; // MENU_INTRO when this is implemented
+            MenuMode = MENU_INTRO;
             LevelEditor = false;
             WorldEditor = false;
             XRender::clearBuffer();
@@ -596,6 +618,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
             OpenLevel(introPath);
             vScreenX[1] = -level[0].X;
+            s_ExpandSectionForMenu();
 
             if(g_config.EnableInterLevelFade)
                 g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);

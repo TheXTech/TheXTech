@@ -352,9 +352,6 @@ void GetvScreenAverage()
 
         // on menu, bottom of screen always tracks bottom of level
         vScreenY[A] = -(level[Player[1].Section].Height - vScreen[A].Height);
-        // expand level (could add compat option guard here possibly)
-        if(level[Player[1].Section].Y > level[Player[1].Section].Height - ScreenH)
-            level[Player[1].Section].Y = level[Player[1].Section].Height - ScreenH;
     }
 
     // keep vScreen boundary even on 3DS
