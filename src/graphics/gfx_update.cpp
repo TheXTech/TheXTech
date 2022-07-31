@@ -2361,7 +2361,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // indicate any small-screen camera features
-        if(g_config.small_screen_camera_features && ScreenH < 600)
+        if(g_config.small_screen_camera_features && ScreenH < 600
+            && ScreenType != 2 && ScreenType != 3 && ScreenType != 7 && (ScreenType != 5 || vScreen[2].Visible))
         {
             if(g_vScreenOffsetY_hold[Z - 1] != 0)
             {
