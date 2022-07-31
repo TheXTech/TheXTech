@@ -1757,7 +1757,7 @@ void mainMenuDraw()
     // double x = -A + std::fmod(1.25 * vScreenX[1], A);
 
     for(int C = 0; C < B; C++)
-        XRender::renderTexture(x + A * C, vScreen[1].ScreenTop, A, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
+        XRender::renderTexture(x + A * C, 0, A, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
 
     // can animate curtain falling by replacing y coordinate with -GFX.MenuGFX[1].h * g_levelScreenFader.m_scale
 
