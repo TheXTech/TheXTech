@@ -702,6 +702,10 @@ static void loadCustomUIAssets()
              "WorldMapFog",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.WorldMapFog, false, true);
 
+    loadCGFX(uiRoot + "Camera.png",
+             "Camera",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.Camera, false, true);
+
     // Add new optional assets above this line. Also update gfx.cpp: GFX_t::load(), and gfx.h: GFX_t::m_isCustomVolume.
 }
 

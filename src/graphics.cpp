@@ -38,20 +38,128 @@
 
 
 static int16_t s_vScreenOffsetX[2] = {0, 0};
-static int16_t s_vScreenOffsetY[2] = {0, 0};
 static int8_t s_lastButtonsHeld[2] = {0, 0};
+int16_t g_vScreenOffsetY[2] = {0, 0};
 int16_t g_vScreenOffsetY_hold[2] = {0, 0};
 
 void ResetCameraPanning()
 {
     s_vScreenOffsetX[0] = 0;
     s_vScreenOffsetX[1] = 0;
-    s_vScreenOffsetY[0] = 0;
-    s_vScreenOffsetY[1] = 0;
     s_lastButtonsHeld[0] = 0;
     s_lastButtonsHeld[1] = 0;
+    g_vScreenOffsetY[0] = 0;
+    g_vScreenOffsetY[1] = 0;
     g_vScreenOffsetY_hold[0] = 0;
     g_vScreenOffsetY_hold[1] = 0;
+}
+
+static void s_ProcessSmallScreenFeatures(int A)
+{
+    if(g_config.small_screen_camera_features && ScreenW < 800)
+    {
+        int16_t max_offsetX = 360;
+        int16_t lookX_target = max_offsetX * Player[A].Location.SpeedX * 1.5 / Physics.PlayerRunSpeed;
+        if(lookX_target > max_offsetX)
+            lookX_target = max_offsetX;
+        if(lookX_target < -max_offsetX)
+            lookX_target = -max_offsetX;
+        lookX_target &= ~1;
+
+        int16_t rateX = 1;
+        // switching directions
+        if((s_vScreenOffsetX[A - 1] < 0 && lookX_target > 0)
+            || (s_vScreenOffsetX[A - 1] > 0 && lookX_target < 0))
+        {
+            rateX = 3;
+        }
+        // accelerating
+        else if((s_vScreenOffsetX[A - 1] > 0) == (lookX_target > s_vScreenOffsetX[A - 1]))
+        {
+            rateX = 2;
+        }
+
+        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
+        {
+            if(s_vScreenOffsetX[A - 1] < lookX_target)
+                s_vScreenOffsetX[A - 1] += rateX;
+            else if(s_vScreenOffsetX[A - 1] > lookX_target)
+                s_vScreenOffsetX[A - 1] -= rateX;
+        }
+
+        vScreenX[A] -= s_vScreenOffsetX[A - 1]/2;
+    }
+
+    if(g_config.small_screen_camera_features && ScreenH < 600)
+    {
+        int16_t max_offsetY = 200;
+
+        int16_t lookY_target = max_offsetY;
+
+        if(Player[A].Controls.Up == Player[A].Controls.Down)
+            lookY_target = g_vScreenOffsetY_hold[A - 1];
+        else if(Player[A].Controls.Down)
+            lookY_target *= -1;
+
+        int16_t rateY = 4;
+        if((g_vScreenOffsetY[A - 1] < 0 && lookY_target > 0)
+            || (g_vScreenOffsetY[A - 1] > 0 && lookY_target < 0))
+        {
+            if(g_vScreenOffsetY[A - 1] < 50 && g_vScreenOffsetY[A - 1] > -50)
+                g_vScreenOffsetY[A - 1] *= -1;
+        }
+
+        if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
+        {
+            if(g_vScreenOffsetY[A - 1] < lookY_target)
+            {
+                g_vScreenOffsetY[A - 1] += rateY;
+
+                if(g_vScreenOffsetY[A - 1] > lookY_target)
+                    g_vScreenOffsetY[A - 1] = lookY_target;
+            }
+            else if(g_vScreenOffsetY[A - 1] > lookY_target)
+            {
+                g_vScreenOffsetY[A - 1] -= rateY;
+
+                if(g_vScreenOffsetY[A - 1] < lookY_target)
+                    g_vScreenOffsetY[A - 1] = lookY_target;
+            }
+
+            if(g_vScreenOffsetY_hold[A - 1] == 0 && g_vScreenOffsetY[A - 1] < -max_offsetY + 40 && (s_lastButtonsHeld[A - 1] & 1) == 0 && Player[A].Controls.Down)
+            {
+                g_vScreenOffsetY_hold[A - 1] = -max_offsetY;
+                PlaySound(SFX_Camera);
+            }
+            else if(g_vScreenOffsetY_hold[A - 1] == 0 && g_vScreenOffsetY[A - 1] > max_offsetY - 40 && (s_lastButtonsHeld[A - 1] & 2) == 0 && Player[A].Controls.Up)
+            {
+                g_vScreenOffsetY_hold[A - 1] = max_offsetY;
+                PlaySound(SFX_Camera);
+            }
+            else if(g_vScreenOffsetY_hold[A - 1] != 0 && g_vScreenOffsetY[A - 1] > -60 && g_vScreenOffsetY[A - 1] < 60)
+            {
+                g_vScreenOffsetY_hold[A - 1] = 0;
+                PlaySound(SFX_Camera);
+            }
+
+            s_lastButtonsHeld[A - 1] = (int8_t)Player[A].Controls.Down | (int8_t)Player[A].Controls.Up << 1;
+        }
+
+        int16_t lookY = g_vScreenOffsetY[A - 1];
+
+        if(lookY > -50 && lookY < 50)
+            lookY = 0;
+        else
+        {
+            if(lookY > 0)
+                lookY -= 50;
+            if(lookY < 0)
+                lookY += 50;
+            lookY /= 2;
+        }
+
+        vScreenY[A] += lookY + 32;
+    }
 }
 
 //  Get the screen position
@@ -103,108 +211,7 @@ void GetvScreen(const int A)
             vScreenX[A] = -pLoc.X + (vScreen[A].Width * 0.5) - pLoc.Width / 2.0;
             vScreenY[A] = -pLoc.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - pHeight;
 
-            if(g_config.small_screen_camera_features && (ScreenW < 800 || ScreenH < 600))
-            {
-                int16_t max_offsetX = 360;
-                int16_t lookX_target = max_offsetX * Player[A].Location.SpeedX * 1.5 / Physics.PlayerRunSpeed;
-                if(lookX_target > max_offsetX)
-                    lookX_target = max_offsetX;
-                if(lookX_target < -max_offsetX)
-                    lookX_target = -max_offsetX;
-                lookX_target &= ~1;
-
-                int16_t rateX = 1;
-                // switching directions
-                if((s_vScreenOffsetX[A - 1] < 0 && lookX_target > 0)
-                    || (s_vScreenOffsetX[A - 1] > 0 && lookX_target < 0))
-                {
-                    rateX = 3;
-                }
-                // accelerating
-                else if((s_vScreenOffsetX[A - 1] > 0) == (lookX_target > s_vScreenOffsetX[A - 1]))
-                {
-                    rateX = 2;
-                }
-
-                if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
-                {
-                    if(s_vScreenOffsetX[A - 1] < lookX_target)
-                        s_vScreenOffsetX[A - 1] += rateX;
-                    else if(s_vScreenOffsetX[A - 1] > lookX_target)
-                        s_vScreenOffsetX[A - 1] -= rateX;
-                }
-
-                vScreenX[A] -= s_vScreenOffsetX[A - 1]/2;
-
-                int16_t max_offsetY = 200;
-
-                int16_t lookY_target = max_offsetY;
-
-                if(Player[A].Controls.Up == Player[A].Controls.Down)
-                    lookY_target = g_vScreenOffsetY_hold[A - 1];
-                else if(Player[A].Controls.Down)
-                    lookY_target *= -1;
-
-                int16_t rateY = 4;
-                if((s_vScreenOffsetY[A - 1] < 0 && lookY_target > 0)
-                    || (s_vScreenOffsetY[A - 1] > 0 && lookY_target < 0))
-                {
-                    if(s_vScreenOffsetY[A - 1] < 50 && s_vScreenOffsetY[A - 1] > -50)
-                        s_vScreenOffsetY[A - 1] *= -1;
-                }
-
-                if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
-                {
-                    if(s_vScreenOffsetY[A - 1] < lookY_target)
-                    {
-                        s_vScreenOffsetY[A - 1] += rateY;
-
-                        if(s_vScreenOffsetY[A - 1] > lookY_target)
-                            s_vScreenOffsetY[A - 1] = lookY_target;
-                    }
-                    else if(s_vScreenOffsetY[A - 1] > lookY_target)
-                    {
-                        s_vScreenOffsetY[A - 1] -= rateY;
-
-                        if(s_vScreenOffsetY[A - 1] < lookY_target)
-                            s_vScreenOffsetY[A - 1] = lookY_target;
-                    }
-
-                    if(g_vScreenOffsetY_hold[A - 1] == 0 && s_vScreenOffsetY[A - 1] < -max_offsetY + 40 && (s_lastButtonsHeld[A - 1] & 1) == 0 && Player[A].Controls.Down)
-                    {
-                        g_vScreenOffsetY_hold[A - 1] = -max_offsetY;
-                        PlaySound(SFX_Camera);
-                    }
-                    else if(g_vScreenOffsetY_hold[A - 1] == 0 && s_vScreenOffsetY[A - 1] > max_offsetY - 40 && (s_lastButtonsHeld[A - 1] & 2) == 0 && Player[A].Controls.Up)
-                    {
-                        g_vScreenOffsetY_hold[A - 1] = max_offsetY;
-                        PlaySound(SFX_Camera);
-                    }
-                    else if(g_vScreenOffsetY_hold[A - 1] != 0 && s_vScreenOffsetY[A - 1] > -60 && s_vScreenOffsetY[A - 1] < 60)
-                    {
-                        g_vScreenOffsetY_hold[A - 1] = 0;
-                        PlaySound(SFX_Camera);
-                    }
-
-                    s_lastButtonsHeld[A - 1] = (int8_t)Player[A].Controls.Down | (int8_t)Player[A].Controls.Up << 1;
-                }
-
-                int16_t lookY = s_vScreenOffsetY[A - 1];
-
-                if(lookY > -50 && lookY < 50)
-                    lookY = 0;
-                else
-                {
-                    if(lookY > 0)
-                        lookY -= 50;
-                    if(lookY < 0)
-                        lookY += 50;
-                    lookY /= 2;
-                }
-
-                vScreenY[A] += lookY + 32;
-            }
-
+            s_ProcessSmallScreenFeatures(A);
 
             vScreenX[A] += -vScreen[A].tempX;
             vScreenY[A] += -vScreen[A].TempY;

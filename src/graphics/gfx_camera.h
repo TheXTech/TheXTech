@@ -24,6 +24,8 @@
 
 #include <cstdint>
 
+// graphics.cpp
+extern int16_t g_vScreenOffsetY[2];
 extern int16_t g_vScreenOffsetY_hold[2];
 
 void ResetCameraPanning();

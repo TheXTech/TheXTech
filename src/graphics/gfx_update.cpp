@@ -44,6 +44,7 @@
 
 #include "effect.h"
 #include "graphics/gfx_special_frames.h"
+#include "graphics/gfx_camera.h"
 #include "npc_id.h"
 
 #include <fmt_format_ne.h>
@@ -2358,6 +2359,48 @@ void UpdateGraphics(bool skipRepaint)
         {
             speedRun_renderControls(Z, Z, SPEEDRUN_ALIGN_AUTO);
         }
+
+        // indicate any small-screen camera features
+        if(g_config.small_screen_camera_features && ScreenH < 600)
+        {
+            if(g_vScreenOffsetY_hold[Z - 1] != 0)
+            {
+                if(GFX.Camera.inited)
+                    XRender::renderTexture(vScreen[Z].Width - 34, vScreen[Z].Height - 42, GFX.Camera, 1.0f, 0.2f, 0.2f);
+                else
+                    XRender::renderRect(vScreen[Z].Width - 34, vScreen[Z].Height - 42, 24, 16, 1.0f, 0.2f, 0.2f);
+                if(g_vScreenOffsetY_hold[Z - 1] > 0)
+                    XRender::renderTexture(vScreen[Z].Width - 30, vScreen[Z].Height - 60, GFX.MCursor[1]);
+                else
+                    XRender::renderTexture(vScreen[Z].Width - 30, vScreen[Z].Height - 24, GFX.MCursor[2]);
+            }
+            else if(g_vScreenOffsetY[Z - 1] < -160 || g_vScreenOffsetY[Z - 1] > 160)
+            {
+                if(GFX.Camera.inited)
+                    XRender::renderTexture(vScreen[Z].Width - 34, vScreen[Z].Height - 42, GFX.Camera, 0.5f, 1.0f, 0.5f, 0.5f);
+                else
+                    XRender::renderRect(vScreen[Z].Width - 34, vScreen[Z].Height - 42, 24, 16, 0.5f, 1.0f, 0.5f, 0.5f);
+                if(g_vScreenOffsetY[Z - 1] > 0)
+                    XRender::renderTexture(vScreen[Z].Width - 30, vScreen[Z].Height - 60, GFX.MCursor[1], 1.0f, 1.0f, 1.0f, 0.5f);
+                else
+                    XRender::renderTexture(vScreen[Z].Width - 30, vScreen[Z].Height - 24, GFX.MCursor[2], 1.0f, 1.0f, 1.0f, 0.5f);
+            }
+            else if(g_vScreenOffsetY[Z - 1] <= -48 || g_vScreenOffsetY[Z - 1] >= 48)
+            {
+                if(GFX.Camera.inited)
+                    XRender::renderTexture(vScreen[Z].Width - 34, vScreen[Z].Height - 42, GFX.Camera, 1.0f, 1.0f, 1.0f, 0.5f);
+                else
+                    XRender::renderRect(vScreen[Z].Width - 34, vScreen[Z].Height - 42, 24, 16, 1.0f, 1.0f, 1.0f, 0.5f);
+            }
+            else
+            {
+                if(GFX.Camera.inited)
+                    XRender::renderTexture(vScreen[Z].Width - 34, vScreen[Z].Height - 42, GFX.Camera, 0.0f, 0.0f, 0.0f, 0.3f);
+                else
+                    XRender::renderRect(vScreen[Z].Width - 34, vScreen[Z].Height - 42, 24, 16, 0.0f, 0.0f, 0.0f, 0.3f);
+            }
+        }
+
         XRender::offsetViewportIgnore(false);
 
 //        If LevelEditor = True Then

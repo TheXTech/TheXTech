@@ -171,6 +171,14 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
+    loadImage(Camera, uiPath + "Camera.png");
+
+    if(m_loadErrors > 0)
+    {
+        pLogDebug("Missing new small-screen look up/down camera texture.");
+        m_loadErrors = 0;
+    }
+
     // Add new optional assets above this line. Also update load_gfx.cpp: loadCustomUIAssets(), and gfx.h: GFX_t::m_isCustomVolume.
 
     SDL_assert_release(m_loadedImages.size() <= m_isCustomVolume);
