@@ -2364,41 +2364,46 @@ void UpdateGraphics(bool skipRepaint)
         if(g_config.small_screen_camera_features && ScreenH < 600
             && ScreenType != 2 && ScreenType != 3 && ScreenType != 7 && (ScreenType != 5 || vScreen[2].Visible))
         {
+            int CamX = vScreen[Z].Width - 54;
+            int CamY = vScreen[Z].Height - 42;
+            if(ScreenType == 5 && vScreen[2].Visible && vScreen[Z].Left > 0)
+                CamY -= 24;
+
             if(g_vScreenOffsetY_hold[Z - 1] != 0)
             {
                 if(GFX.Camera.inited)
-                    XRender::renderTexture(vScreen[Z].Width - 34, vScreen[Z].Height - 42, GFX.Camera, 1.0f, 0.2f, 0.2f);
+                    XRender::renderTexture(CamX, CamY, GFX.Camera, 1.0f, 0.2f, 0.2f);
                 else
-                    XRender::renderRect(vScreen[Z].Width - 34, vScreen[Z].Height - 42, 24, 16, 1.0f, 0.2f, 0.2f);
+                    XRender::renderRect(CamX, CamY, 24, 16, 1.0f, 0.2f, 0.2f);
                 if(g_vScreenOffsetY_hold[Z - 1] > 0)
-                    XRender::renderTexture(vScreen[Z].Width - 30, vScreen[Z].Height - 60, GFX.MCursor[1]);
+                    XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1]);
                 else
-                    XRender::renderTexture(vScreen[Z].Width - 30, vScreen[Z].Height - 24, GFX.MCursor[2]);
+                    XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2]);
             }
             else if(g_vScreenOffsetY[Z - 1] < -160 || g_vScreenOffsetY[Z - 1] > 160)
             {
                 if(GFX.Camera.inited)
-                    XRender::renderTexture(vScreen[Z].Width - 34, vScreen[Z].Height - 42, GFX.Camera, 0.5f, 1.0f, 0.5f, 0.5f);
+                    XRender::renderTexture(CamX, CamY, GFX.Camera, 0.5f, 1.0f, 0.5f, 0.7f);
                 else
-                    XRender::renderRect(vScreen[Z].Width - 34, vScreen[Z].Height - 42, 24, 16, 0.5f, 1.0f, 0.5f, 0.5f);
+                    XRender::renderRect(CamX, CamY, 24, 16, 0.5f, 1.0f, 0.5f, 0.7f);
                 if(g_vScreenOffsetY[Z - 1] > 0)
-                    XRender::renderTexture(vScreen[Z].Width - 30, vScreen[Z].Height - 60, GFX.MCursor[1], 1.0f, 1.0f, 1.0f, 0.5f);
+                    XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1], 1.0f, 1.0f, 1.0f, 0.7f);
                 else
-                    XRender::renderTexture(vScreen[Z].Width - 30, vScreen[Z].Height - 24, GFX.MCursor[2], 1.0f, 1.0f, 1.0f, 0.5f);
+                    XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2], 1.0f, 1.0f, 1.0f, 0.7f);
             }
             else if(g_vScreenOffsetY[Z - 1] <= -48 || g_vScreenOffsetY[Z - 1] >= 48)
             {
                 if(GFX.Camera.inited)
-                    XRender::renderTexture(vScreen[Z].Width - 34, vScreen[Z].Height - 42, GFX.Camera, 1.0f, 1.0f, 1.0f, 0.5f);
+                    XRender::renderTexture(CamX, CamY, GFX.Camera, 1.0f, 1.0f, 1.0f, 0.5f);
                 else
-                    XRender::renderRect(vScreen[Z].Width - 34, vScreen[Z].Height - 42, 24, 16, 1.0f, 1.0f, 1.0f, 0.5f);
+                    XRender::renderRect(CamX, CamY, 24, 16, 1.0f, 1.0f, 1.0f, 0.5f);
             }
             else
             {
                 if(GFX.Camera.inited)
-                    XRender::renderTexture(vScreen[Z].Width - 34, vScreen[Z].Height - 42, GFX.Camera, 0.0f, 0.0f, 0.0f, 0.3f);
+                    XRender::renderTexture(CamX, CamY, GFX.Camera, 0.0f, 0.0f, 0.0f, 0.3f);
                 else
-                    XRender::renderRect(vScreen[Z].Width - 34, vScreen[Z].Height - 42, 24, 16, 0.0f, 0.0f, 0.0f, 0.3f);
+                    XRender::renderRect(CamX, CamY, 24, 16, 0.0f, 0.0f, 0.0f, 0.3f);
             }
         }
 
