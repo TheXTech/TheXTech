@@ -1754,7 +1754,7 @@ void mainMenuDraw()
     double x = 0;
 
     // can add parallax scrolling to curtain by uncommenting following line
-    // double x = -A + std::fmod(1.25 * vScreenX[1], A);
+    // x = -A + std::fmod(1.25 * vScreenX[1], A);
 
     for(int C = 0; C < B; C++)
         XRender::renderTexture(x + A * C, 0, A, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
@@ -1785,8 +1785,11 @@ void mainMenuDraw()
         if(ScreenH < SmallScreenH)
             XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 30,
                     GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
-        else
+        else if(ScreenH <= 600)
             XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
+                    GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
+        else
+            XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, ScreenH / 2 - 230,
                     GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);
     }
     else if(LogoMode == 2)
