@@ -526,9 +526,10 @@ void MenuLoop()
 
     if(SharedCursor.Primary)
     {
+        Location_t cursorLoc = newLoc(SharedCursor.X - vScreenX[1] - vScreen[1].ScreenLeft, SharedCursor.Y - vScreenY[1] - vScreen[1].ScreenTop);
         if(iRand(5) >= 2)
         {
-            NewEffect(80, newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]));
+            NewEffect(80, cursorLoc);
             Effect[numEffects].Location.SpeedX = dRand() * 4 - 2;
             Effect[numEffects].Location.SpeedY = dRand() * 4 - 2;
         }
@@ -537,13 +538,13 @@ void MenuLoop()
         {
             if(NPC[A].Active)
             {
-                if(CheckCollision(newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]), NPC[A].Location))
+                if(CheckCollision(cursorLoc, NPC[A].Location))
                 {
                     if(!NPCIsACoin[NPC[A].Type])
                     {
                         NPC[0] = NPC[A];
-                        NPC[0].Location.X = SharedCursor.X - vScreenX[1];
-                        NPC[0].Location.Y = SharedCursor.Y - vScreenY[1];
+                        NPC[0].Location.X = SharedCursor.X - vScreenX[1] - vScreen[1].ScreenLeft;
+                        NPC[0].Location.Y = SharedCursor.Y - vScreenY[1] - vScreen[1].ScreenTop;
                         NPCHit(A, 3, 0);
                     }
                     else
@@ -559,7 +560,7 @@ void MenuLoop()
         {
             if(!Block[A].Hidden)
             {
-                if(CheckCollision(newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]), Block[A].Location))
+                if(CheckCollision(cursorLoc, Block[A].Location))
                 {
                     BlockHit(A);
                     BlockHitHard(A);
