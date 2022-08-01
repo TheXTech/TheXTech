@@ -771,6 +771,7 @@ void UpdateGraphics(bool skipRepaint)
                         || NPC[A].Type == NPCID_RINKAGEN
                         || NPC[A].Type == NPCID_BLARGG
                         || (NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
+                        || NPC[A].AttLayer != LAYER_NONE
                         || (NPC[A].TriggerActivate != EVENT_NONE && !s_SoundOnly(Events[NPC[A].TriggerActivate], Player[Z].Section))
                     )
                         can_activate = onscreen_canonical;
