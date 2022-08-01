@@ -73,6 +73,7 @@ void UpdateInternalRes()
 {
     int req_w = g_config.InternalW;
     int req_h = g_config.InternalH;
+
     if((!g_compatibility.free_level_res && !LevelSelect && !GameMenu)
         || (!g_compatibility.free_world_res && LevelSelect && !GameMenu))
     {
@@ -93,11 +94,10 @@ void UpdateInternalRes()
 #ifndef THEXTECH_FIXED_RES
     if(req_w == 0 || req_h == 0)
     {
-        int int_w, int_h;
+        int int_w, int_h, orig_int_h;
 
         XWindow::getWindowSize(&int_w, &int_h);
-
-        int orig_int_h = int_h;
+        orig_int_h = int_h;
 
         // set internal height first
         if(req_h != 0)
