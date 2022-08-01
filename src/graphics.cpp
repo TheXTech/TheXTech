@@ -96,7 +96,11 @@ static void s_ProcessSmallScreenFeatures(int A)
 
         int16_t lookY_target = max_offsetY;
 
-        if(Player[A].Controls.Up == Player[A].Controls.Down)
+        bool on_ground = Player[A].Pinched1 || Player[A].Slope || Player[A].StandingOnNPC || Player[A].Wet || Player[A].Quicksand;
+        bool duck_jump = !on_ground && Player[A].Duck;
+        bool prevent_unlock = g_vScreenOffsetY_hold[A - 1] != 0 && (Player[A].Vine || duck_jump || Player[A].GrabTime);
+
+        if(Player[A].Controls.Up == Player[A].Controls.Down || prevent_unlock)
             lookY_target = g_vScreenOffsetY_hold[A - 1];
         else if(Player[A].Controls.Down)
             lookY_target *= -1;
