@@ -691,6 +691,11 @@ int GameMain(const CmdLineSetup_t &setup)
                 // Restore the previously preserved world map paths
                 FileNameFull = FileNameFullWorld;
                 FileName = FileNameWorld;
+                FileNamePath = FileNamePathWorld;
+                FileFormat = FileFormatWorld;
+
+                // Recalculate the FullFileName
+                FullFileName = FileNamePath + FileNameFull;
             }
 
             LoadCustomCompat();
