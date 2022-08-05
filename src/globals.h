@@ -1552,16 +1552,27 @@ extern int LevelMacro;
 extern int LevelMacroCounter;
 //Public numJoysticks As Integer
 extern int numJoysticks;
+
 //Public FileName As String
 extern std::string FileName;
 //! EXTRA: A full filename (the "FileName" is now has the "base name" sense)
 extern std::string FileNameFull;
+//Public FullFileName As String
+extern std::string FullFileName;
+//Public FileNamePath As String
+extern std::string FileNamePath;
 //! EXTRA: The format of the current file
 extern int FileFormat;
+
 //! EXTRA: World map preserved filename
 extern std::string FileNameWorld;
 //! EXTRA: World map preserved full path
 extern std::string FileNameFullWorld;
+//! EXTRA: World map preserved parent directory
+extern std::string FileNamePathWorld;
+//! EXTRA: The format of the world file
+extern int FileFormatWorld;
+
 //! EXTRA: Identify that episode is an intro level
 extern bool IsEpisodeIntro;
 //Public Coins As Integer 'number of coins
@@ -1598,10 +1609,6 @@ extern RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 extern RangeArrI<bool, 0, maxSections, false> UnderWater;
 //Public TestLevel As Boolean
 extern bool TestLevel;
-//Public FullFileName As String
-extern std::string FullFileName;
-//Public FileNamePath As String
-extern std::string FileNamePath;
 //Public GameMenu As Boolean
 extern bool GameMenu;
 //Public WorldName As String

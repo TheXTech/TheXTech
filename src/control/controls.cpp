@@ -110,7 +110,8 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::EnterCheats:
-        s_requestedPause = PauseCode::TextEntry;
+        if(!GameMenu && !GameOutro && !LevelEditor && !BattleMode)
+            s_requestedPause = PauseCode::TextEntry;
         return;
 
     case Buttons::ToggleHUD:

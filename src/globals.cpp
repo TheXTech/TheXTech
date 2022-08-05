@@ -264,11 +264,20 @@ bool EndLevel = false;
 int LevelMacro = LEVELMACRO_OFF;
 int LevelMacroCounter = 0;
 int numJoysticks = 0;
+
+// information about the currently loaded file
 std::string FileName;
 std::string FileNameFull;
+std::string FullFileName;
+std::string FileNamePath;
 int FileFormat = 0;
+
+// backup information to restore when returning to world map
 std::string FileNameWorld;
 std::string FileNameFullWorld;
+std::string FileNamePathWorld;
+int FileFormatWorld = 0;
+
 bool IsEpisodeIntro = false;
 int Coins = 0;
 float Lives = 0.0f;
@@ -284,8 +293,6 @@ std::string curWorldMusicFile;
 RangeArrI<bool, 0, maxSections, false> NoTurnBack;
 RangeArrI<bool, 0, maxSections, false> UnderWater;
 bool TestLevel = false;
-std::string FullFileName;
-std::string FileNamePath;
 bool GameMenu = false;
 std::string WorldName;
 int selWorld = 0;
