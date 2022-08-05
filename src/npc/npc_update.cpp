@@ -1889,82 +1889,34 @@ void UpdateNPCs()
                             NPC[A].Special3 = 0;
                         }
 
-                        auto loc = NPC[A].Location;
-                        loc.X += 1 * NPC[A].Direction;
-                        loc.SpeedX += 2 * NPC[A].Direction;
-
-                        int64_t fBlock;// = FirstBlock[static_cast<int>(floor(static_cast<double>(loc.X / 32))) - 1];
-                        int64_t lBlock;// = LastBlock[floor((loc.X + loc.Width) / 32.0) + 1];
-
-                        if(NPC[A].Special == 1)
+                        if(NPC[A].Special == 3) // Watch for wall collisions. If one got dissappear (hidden layer, toggled switch), resume a ride
                         {
-                            bool hasWallCollision = false;
-                            bool hasGround = false;
+                            auto loc = NPC[A].Location;
+                            loc.X += 1 * NPC[A].Direction;
+                            loc.SpeedX += 2 * NPC[A].Direction;
 
+                            int64_t fBlock;// = FirstBlock[static_cast<int>(floor(static_cast<double>(loc.X / 32))) - 1];
+                            int64_t lBlock;// = LastBlock[floor((loc.X + loc.Width) / 32.0) + 1];
                             blockTileGet(loc, fBlock, lBlock);
-
-                            for(int B = (int)fBlock; B <= lBlock; B++)
-                            {
-                                if(!CheckCollision(loc, Block[B].Location))
-                                    continue;
-
-                                int bt = Block[B].Type;
-
-                                if(NPC[A].Block == B || BlockOnlyHitspot1[bt] || BlockIsSizable[bt] ||
-                                   BlockNoClipping[bt] || Block[B].Hidden)
-                                    continue;
-
-                                int hs = NPCFindCollision(loc, Block[B].Location);
-
-                                if(hs == COLLISION_BOTTOM)
-                                    hasGround = true;
-
-                                if(Block[B].IsNPC > 0)
-                                    hs = 0;
-
-                                if(hs == COLLISION_LEFT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING)
-                                    hasWallCollision = true;
-                                else if(hs == COLLISION_RIGHT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING)
-                                    hasWallCollision = true;
-                            }
-
-                            if(hasWallCollision && hasGround)
-                            {
-                                SkullRideDone(A, Block[B].Location);
-                                NPC[A].Special = 3; // 3 - watcher, 2 - waiter
-                            }
-
-                        }
-                        else if(NPC[A].Special == 3) // Watch for wall collisions. If one got dissappear (hidden layer, toggled switch), resume a ride
-                        {
                             bool stillCollide = false;
-                            bool hasGround = false;
-
-                            blockTileGet(loc, fBlock, lBlock);
 
                             for(int B = (int)fBlock; B <= lBlock; B++)
                             {
                                 if(!CheckCollision(loc, Block[B].Location))
                                     continue;
-
                                 if(NPC[A].Block == B || Block[B].noProjClipping ||
                                    BlockOnlyHitspot1[Block[B].Type] || BlockIsSizable[Block[B].Type] ||
                                    BlockNoClipping[Block[B].Type] || Block[B].Hidden)
                                     continue;
 
                                 int hs = NPCFindCollision(loc, Block[B].Location);
-
                                 if(Block[B].IsNPC > 0)
                                     hs = 0;
-
-                                if(hs == COLLISION_RIGHT || hs == COLLISION_LEFT)
+                                if(hs == 2 || hs == 4)
                                     stillCollide = true;
-
-                                if(hs == COLLISION_BOTTOM)
-                                    hasGround = true;
                             }
 
-                            if(!stillCollide || !hasGround)
+                            if(!stillCollide)
                             {
                                 NPC[A].Special = 2;
                                 SkullRide(A, true);
@@ -2178,6 +2130,19 @@ void UpdateNPCs()
                                                         {
                                                             if(Block[B].IsNPC > 0)
                                                                 HitSpot = 0;
+
+                                                            if(g_compatibility.fix_skull_raft) // reached a solid wall
+                                                            {
+                                                                auto bt = Block[B].Type;
+                                                                if(Block[B].IsNPC <= 0 && NPC[A].Special == 1 &&
+                                                                  ((HitSpot == COLLISION_LEFT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING) ||
+                                                                   (HitSpot == COLLISION_RIGHT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING)) &&
+                                                                   !BlockOnlyHitspot1[bt] && !BlockIsSizable[bt])
+                                                                {
+                                                                    SkullRideDone(A, Block[B].Location);
+                                                                    NPC[A].Special = 3; // 3 - watcher, 2 - waiter
+                                                                }
+                                                            }
                                                         }
 
                                                         if(NPC[A].Type == 86)
