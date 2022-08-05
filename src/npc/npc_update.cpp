@@ -1872,7 +1872,7 @@ void UpdateNPCs()
                         NPC[A].Location.SpeedY = 0;
                     }
 
-                    if(NPC[A].Type == 190) // Skull raft
+                    if(NPC[A].Type == NPCID_SKULL) // Skull raft
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
@@ -2174,7 +2174,7 @@ void UpdateNPCs()
                                                         if(NPC[A].Type == 48 && (Block[B].IsNPC == 22 || Block[B].IsNPC == 49)) // spiney eggs don't walk on special items
                                                             HitSpot = 0;
 
-                                                        if(NPC[A].Type == 190) // Skull raft
+                                                        if(NPC[A].Type == NPCID_SKULL) // Skull raft
                                                         {
                                                             if(Block[B].IsNPC > 0)
                                                                 HitSpot = 0;
