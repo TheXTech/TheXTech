@@ -93,6 +93,8 @@ bool OpenWorld(std::string FilePath)
     // Preserve these values for quick restoring when going to the world map
     FileNameFullWorld = FileNameFull;
     FileNameWorld = FileName;
+    FileNamePathWorld = FileNamePath;
+    FileFormatWorld = FileFormat;
 
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);
