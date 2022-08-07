@@ -891,6 +891,10 @@ void UpdateGraphics(bool skipRepaint)
                                     NewEffect(10, tempLocation);
                                 }
                             }
+                            else
+                            {
+                                render = false;
+                            }
                         }
                     }
                 }
