@@ -223,6 +223,7 @@ void UpdateInternalRes()
     if(GameMenu)
     {
         SetupScreens();
+        CenterScreens();
         GameMenu = false;
         GetvScreenAverage();
         GameMenu = true;
