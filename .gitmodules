@@ -19,3 +19,9 @@
 [submodule "3rdparty/tinyfiledialogs"]
 	path = 3rdparty/tinyfiledialogs
 	url = https://github.com/Wohlstand/tinyfiledialogs
+[submodule "3rdparty/freetype"]
+	path = 3rdparty/freetype
+	url = https://github.com/Wohlstand/freetype.git
+[submodule "3rdparty/harfbuzz"]
+	path = 3rdparty/harfbuzz
+	url = https://github.com/Wohlstand/harfbuzz.git

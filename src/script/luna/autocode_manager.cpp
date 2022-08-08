@@ -327,12 +327,12 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
 
 std::string AutocodeManager::resolveWorldFileCase(const std::string &in_name)
 {
-    return g_dirEpisode.resolveFileCaseAbs(in_name);
+    return g_dirEpisode.resolveFileCaseExistsAbs(in_name);
 }
 
 std::string AutocodeManager::resolveCustomFileCase(const std::string &in_name)
 {
-    return g_dirCustom.resolveFileCaseAbs(in_name);
+    return g_dirCustom.resolveFileCaseExistsAbs(in_name);
 }
 
 // DO EVENTS

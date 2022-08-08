@@ -547,6 +547,7 @@ void WorldLoop()
                     {
                         addMissingLvlSuffix(level.FileName);
                         std::string levelPath = g_dirEpisode.resolveFileCaseExistsAbs(level.FileName);
+
                         if(!levelPath.empty())
                         {
                             // save which characters were present at level start
@@ -583,6 +584,16 @@ void WorldLoop()
                             GameThing(1000, 3);
 
                             break;
+                        }
+                        else
+                        {
+                            pLogWarning("Level file name \"%s\" at %d x %d (id=%d) was not found (directory %s)",
+                                        level.FileName.c_str(),
+                                        (int)level.Location.X,
+                                        (int)level.Location.Y,
+                                        level.Type,
+                                        g_dirEpisode.getCurDir().c_str()
+                            );
                         }
                     }
                     else if(int(level.WarpX) != -1 || int(level.WarpY) != -1)
