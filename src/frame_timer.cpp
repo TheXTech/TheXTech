@@ -69,31 +69,58 @@ void PerformanceStats_t::print()
 
     XRender::offsetViewportIgnore(true);
 
+#define YLINE (8 + (y++ * 18))
+
+    int y = 0;
+    int items = 0;
+
     if(LevelSelect && !GameMenu)
     {
+        items = 5;
+        XRender::renderRect(42, 6, 745, 6 + (18 * items), 0.0f,0.0f, 0.0f, 0.3f, true);
+
+        SuperPrint(fmt::sprintf_ne("FILE: %s", FileNameFull.empty() ? "<none>" : FileNameFull.c_str()),
+                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+        SuperPrint(fmt::sprintf_ne("MUSK: %s", currentMusic.empty() ? "<none>" : currentMusic.c_str()),
+                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+        SuperPrint(fmt::sprintf_ne("MUSF: %s", currentMusicFile.empty() ? "<none>" : currentMusicFile.c_str()),
+                   3, 45, YLINE, 0.5f, 1.f, 1.f);
+
         SuperPrint(fmt::sprintf_ne("DRAW: T=%03d S=%03d P=%03d L=%03d, SUM=%03d",
                                    renderedTiles, renderedScenes, renderedPaths, renderedLevels,
                                    (renderedTiles + renderedScenes + renderedPaths + renderedLevels)),
-                   3, 45, 8);
+                   3, 45, YLINE);
         SuperPrint(fmt::sprintf_ne("CHEK: T=%03d S=%03d P=%03d L=%03d, SUM=%03d",
                                    checkedTiles, checkedScenes, checkedPaths, checkedLevels,
                                    (checkedTiles + checkedScenes + checkedPaths + checkedLevels)),
-                   3, 45, 26);
+                   3, 45, YLINE);
     }
     else
     {
-        XRender::renderRect(42, 6, 745, 72, 0.0f,0.0f, 0.0f, 0.3f, true);
+        items = 7;
+        if(GameMenu)
+            items++;
+
+        XRender::renderRect(42, 6, 745, 6 + (18 * items), 0.0f,0.0f, 0.0f, 0.3f, true);
+
+        SuperPrint(fmt::sprintf_ne("FILE: %s", FileNameFull.empty() ? "<none>" : FileNameFull.c_str()),
+                   3, 45, YLINE, 1.f, 0.5f, 1.f);
+        SuperPrint(fmt::sprintf_ne("MUSK: %s", currentMusic.empty() ? "<none>" : currentMusic.c_str()),
+                   3, 45, YLINE, 1.f, 0.5f, 1.f);
+        SuperPrint(fmt::sprintf_ne("MUSF: %s", currentMusicFile.empty() ? "<none>" : currentMusicFile.c_str()),
+                   3, 45, YLINE, 1.f, 0.5f, 1.f);
+
         SuperPrint(fmt::sprintf_ne("DRAW: B=%05d Z=%04d G=%04d N=%04d, E=%03d",
                                    renderedBlocks, renderedSzBlocks, renderedBGOs, renderedNPCs, renderedEffects,
                                    (renderedBlocks + renderedSzBlocks + renderedBGOs + renderedNPCs + renderedEffects)),
-                   3, 45, 8, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, 0.5f, 1.f, 1.f);
         SuperPrint(fmt::sprintf_ne("DRAW: SUMM=%d", (renderedBlocks + renderedSzBlocks + renderedBGOs + renderedNPCs + renderedEffects)),
-                   3, 45, 26, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, 0.5f, 1.f, 1.f);
         SuperPrint(fmt::sprintf_ne("CHEK: B=%05d Z=%04d G=%04d N=%04d, E=%03d",
                                    checkedBlocks, checkedSzBlocks, checkedBGOs, checkedNPCs, checkedEffects),
-                   3, 45, 44, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, 0.5f, 1.f, 1.f);
         SuperPrint(fmt::sprintf_ne("CHEK: SUMM=%d", (checkedBlocks + checkedSzBlocks+ checkedBGOs + checkedNPCs + checkedEffects)),
-                   3, 45, 62, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, 0.5f, 1.f, 1.f);
         // WIP
 //        SuperPrint(fmt::sprintf_ne("PHYS: B%03d G%03d N%03d, S:%03d",
 //                                   physScannedBlocks, physScannedBGOs, physScannedNPCs,
@@ -104,9 +131,10 @@ void PerformanceStats_t::print()
     if(GameMenu)
     {
         SuperPrint(fmt::sprintf_ne("MENU-MODE: %d", MenuMode),
-                   3, 45, 70, 0.5f, 1.f, 1.f);
+                   3, 45, YLINE, 0.5f, 1.f, 1.f);
     }
 
+#undef YLINE
     XRender::offsetViewportIgnore(false);
 }
 

@@ -138,7 +138,7 @@ void NPCHit(int A, int B, int C)
 
             NPC[A].Location.SpeedX = 0;
 
-            if(NPC[A].Type == NPCID_SIDEPIRHANA)
+            if(NPC[A].Type == NPCID_SIDEPIRANHA)
             {
                 if(NPC[A].Direction == -1)
                     NPC[A].Location.Width = static_cast<int>(floor(static_cast<double>(NPC[A].Location.Width))) - 0.01;

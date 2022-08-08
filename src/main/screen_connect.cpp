@@ -12,6 +12,8 @@
 #include "../compat.h"
 #include "../config.h"
 
+#include "main/game_info.h"
+
 #include "screen_connect.h"
 #include "menu_main.h"
 #include "speedrunner.h"
@@ -310,8 +312,14 @@ struct PlayDoSentinel
 bool Player_Back(int p)
 {
     s_inputReady[p] = false;
+    // first screen of main menu
+    if(s_playerState[p] == PlayerState::Disconnected && s_context == Context::MainMenu)
+    {
+        PlaySoundMenu(SFX_Slide);
+        return true;
+    }
     // adding player at main menu
-    if(s_playerState[p] == PlayerState::SelectChar && s_context == Context::MainMenu)
+    else if(s_playerState[p] == PlayerState::SelectChar && s_context == Context::MainMenu)
     {
         // remove the player's slot and quit if there aren't any other players
         if(Controls::g_InputMethods.size() <= 1)
@@ -1242,6 +1250,8 @@ int Mouse_Render(bool mouse, bool render)
         n = s_minPlayers;
     if(n > maxLocalPlayers)
         n = maxLocalPlayers;
+    if(s_context == Context::DropAdd && g_gameInfo.disableTwoPlayer)
+        n = 1;
 
     // What is the first player that is not done?
     int menuPlayer = GetMenuPlayer();
@@ -1681,7 +1691,7 @@ int Logic()
         }
     }
 
-    bool ret = MouseLogic();
+    int ret = MouseLogic();
 
     /*-----------------------*\
     || polling input methods ||
@@ -1707,6 +1717,11 @@ int Logic()
     {
         if((int)Controls::g_InputMethods.size() >= s_minPlayers)
             block_poll = true;
+    }
+    // if the game has disabled 2-player mode, only allow a single player to connect
+    if(g_gameInfo.disableTwoPlayer && (int)Controls::g_InputMethods.size() == 1)
+    {
+        block_poll = true;
     }
     // block polling if a player is hitting random buttons
     for(int p = 0; p < maxLocalPlayers; p++)
