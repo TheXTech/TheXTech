@@ -18,7 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_stdinc.h>
+#include "core/std.h"
+
 #include "sprite_funcs.h"
 #include "sprite_component.h"
 #include "autocode_manager.h"
@@ -73,7 +74,7 @@ void SpriteFunc::WaitForPlayer(CSprite *me, SpriteComponent *obj)
     Player_t *demo = PlayerF::Get(1);
     if(demo)
     {
-        auto ftype = (FIELDTYPE)SDL_atoi(obj->data5.c_str());
+        auto ftype = (FIELDTYPE)XStd::atoi(obj->data5.c_str());
 //        uint8_t *ptr = (uint8_t *)demo;
 //        ptr += (int)obj->data1; // offset
         bool triggered = CheckMem(demo, (int)obj->data1, std::floor(obj->data2), (COMPARETYPE)(int)obj->data3, ftype);

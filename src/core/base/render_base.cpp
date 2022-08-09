@@ -20,7 +20,7 @@
 
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_power.h>
-#include <SDL2/SDL_timer.h>
+#include "core/std.h"
 #include <SDL2/SDL_rwops.h>
 
 #define USE_SDL_POWER

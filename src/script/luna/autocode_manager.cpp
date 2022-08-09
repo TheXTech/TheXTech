@@ -22,8 +22,10 @@
 #include <Utils/dir_list_ci.h>
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
-#include "core/msgbox.h"
 #include <fmt_format_ne.h>
+
+#include "core/std.h"
+#include "core/msgbox.h"
 
 #include "autocode_manager.h"
 #include "globals.h"
@@ -176,10 +178,10 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
     char wrefbuf[128];
     int lineNum = 0;
 
-    SDL_memset(wbuf, 0, 2000);
-    SDL_memset(combuf, 0, 150);
-    SDL_memset(wstrbuf, 0, 1000);
-    SDL_memset(wrefbuf, 0, 128);
+    XStd::memset(wbuf, 0, 2000);
+    XStd::memset(combuf, 0, 150);
+    XStd::memset(wstrbuf, 0, 1000);
+    XStd::memset(wrefbuf, 0, 128);
 
     m_errors.clear();
 
@@ -189,11 +191,11 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
     while(!std::feof(code_file))
     {
         // Get a line and reset buffers
-        SDL_memset(wbuf, 0, sizeof(wbuf));
-        SDL_memset(wmidbuf, 0, sizeof(wmidbuf));
-        SDL_memset(wstrbuf, 0, sizeof(wstrbuf));
-        SDL_memset(wrefbuf, 0, sizeof(wrefbuf));
-        SDL_memset(combuf, 0, sizeof(combuf));
+        XStd::memset(wbuf, 0, sizeof(wbuf));
+        XStd::memset(wmidbuf, 0, sizeof(wmidbuf));
+        XStd::memset(wstrbuf, 0, sizeof(wstrbuf));
+        XStd::memset(wrefbuf, 0, sizeof(wrefbuf));
+        XStd::memset(combuf, 0, sizeof(combuf));
         target = 0;
         param1 = 0;
         param2 = 0;
@@ -210,12 +212,12 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
         lineNum++;
 
         // Is it a comment?
-        char *commentLine = SDL_strstr(wbuf, "//");
+        char *commentLine = XStd::strstr(wbuf, "//");
         if(commentLine != nullptr)
             commentLine[0] = '\0'; // Cut the comment line at here
 
         // does this line contains anything useful?
-        wbuflen = SDL_strlen(wbuf);
+        wbuflen = XStd::strlen(wbuf);
         while(wbuflen > 0)
         {
             auto c = wbuf[wbuflen - 1];
@@ -235,7 +237,7 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
             // Is it the level load header?
             if(wbuf[1] == '-')
                 cur_section = -1;
-            else if(SDL_strncasecmp(wbuf + 1, "end", sizeof(wbuf) - 1) == 0)
+            else if(XStd::strncasecmp(wbuf + 1, "end", sizeof(wbuf) - 1) == 0)
                 continue; // "END" keyword, just do nothing
             else // Else, parse the section number
             {
@@ -260,18 +262,18 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
                     ++i;
 
                 wbuf[i] = '\x00'; // Turn the comma into a null terminator
-                SDL_strlcpy(wrefbuf, &wbuf[1], sizeof(wrefbuf)); // Copy new string into wrefbuf
-                SDL_memcpy(wmidbuf, wbuf, sizeof(wmidbuf));
-                SDL_strlcpy(wbuf, &wmidbuf[i + 1], sizeof(wbuf)); // The rest of the line minus the ref is the new wbuf
+                XStd::strlcpy(wrefbuf, &wbuf[1], sizeof(wrefbuf)); // Copy new string into wrefbuf
+                XStd::memcpy(wmidbuf, wbuf, sizeof(wmidbuf));
+                XStd::strlcpy(wbuf, &wmidbuf[i + 1], sizeof(wbuf)); // The rest of the line minus the ref is the new wbuf
             }
 
             ac_type = Autocode::EnumerizeCommand(wbuf, lineNum);
 
             // Decimal pass
-            int hits = SDL_sscanf(wbuf, PARSE_FMT_STR, combuf, &target, &param1, &param2, &param3, &length, wstrbuf);
+            int hits = XStd::sscanf(wbuf, PARSE_FMT_STR, combuf, &target, &param1, &param2, &param3, &length, wstrbuf);
 
             // Integer pass
-            int bhits = SDL_sscanf(wbuf, PARSE_FMT_STR_2, combuf, &btarget, &bparam1, &bparam2, &bparam3, &blength, wstrbuf);
+            int bhits = XStd::sscanf(wbuf, PARSE_FMT_STR_2, combuf, &btarget, &bparam1, &bparam2, &bparam3, &blength, wstrbuf);
 
             // Check for formatting failure
             if(hits < 3 && bhits < 3)

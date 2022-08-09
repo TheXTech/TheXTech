@@ -18,9 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
+#ifndef PGE_NO_THREADING
 #include <SDL2/SDL_atomic.h>
 #include <SDL2/SDL_thread.h>
+#endif
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
@@ -35,6 +36,8 @@
 #ifdef ENABLE_XTECH_LUA
 #include "xtech_lua_main.h"
 #endif
+
+#include "core/std.h"
 
 #include "globals.h"
 #include "game_main.h"
@@ -1261,7 +1264,7 @@ void UpdateMacro()
         {
             // tempTime = Timer - Int(Timer)
 
-            tempTime = (float(SDL_GetTicks()) / 1000.0f) - std::floor(float(SDL_GetTicks()) / 1000.0f);
+            tempTime = (float(XStd::GetTicks()) / 1000.0f) - std::floor(float(XStd::GetTicks()) / 1000.0f);
 //            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
 
             if(g_compatibility.fix_keyhole_framerate)

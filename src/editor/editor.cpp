@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
+#include "core/std.h"
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #   include <InterProcess/intproc.h>

@@ -28,6 +28,8 @@
 
 #include <vector>
 
+#include "core/std.h"
+
 #include "Talkhaus-Science_Final_Battle.h"
 #include "globals.h"
 #include "../lunanpc.h"
@@ -67,7 +69,7 @@ void ScienceCode()
         hurt_timer      = 0;
         throw_timer     = 0;
         demo            = PlayerF::Get(1);
-        SDL_assert_release(demo);
+        XStd::assert_release(demo);
     }
 
     hurt_npc = FindNPC(NPC_FIREBAR);

@@ -125,8 +125,8 @@ bool GFX_t::load()
 
     // Add new optional assets here. Also update load_gfx.cpp:loadCustomUIAssets()
 
-    SDL_assert_release(m_loadedImages.size() <= m_isCustomVolume);
-    SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
+    XStd::assert_release(m_loadedImages.size() <= m_isCustomVolume);
+    XStd::memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
 
     return true;
 }
@@ -136,11 +136,11 @@ void GFX_t::unLoad()
     for(StdPicture *p : m_loadedImages)
         XRender::deleteTexture(*p);
     m_loadedImages.clear();
-    SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
+    XStd::memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
 }
 
 bool& GFX_t::isCustom(size_t i)
 {
-    SDL_assert_release(i < m_isCustomVolume);
+    XStd::assert_release(i < m_isCustomVolume);
     return m_isCustom[i];
 }

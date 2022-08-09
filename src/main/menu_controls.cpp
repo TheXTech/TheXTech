@@ -405,7 +405,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         // should never happen
         if(s_curType < 0 || s_curType >= n_types)
         {
-            SDL_assert_release(false); // invalid state in controls settings
+            XStd::assert_release(false); // invalid state in controls settings
             PlaySoundMenu(SFX_BlockHit);
             s_curType = -1;
             MenuCursorCanMove = false;
@@ -796,7 +796,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             }
             if(mouse)
             {
-                int item_width = SDL_strlen(name) * 18;
+                int item_width = XStd::strlen(name) * 18;
                 if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
                     && SharedCursor.Y >= start_y + (i+s-scroll_start)*line && SharedCursor.Y <= start_y + (i+s-scroll_start)*line + 16)
                 {
@@ -1402,7 +1402,7 @@ int menuControls_Logic()
         // should never happen
         if(s_curType < 0 || s_curType >= n_types)
         {
-            SDL_assert_release(false); // invalid state in controls settings
+            XStd::assert_release(false); // invalid state in controls settings
             PlaySoundMenu(SFX_BlockHit);
             s_curType = -1;
             MenuCursorCanMove = false;
@@ -1489,7 +1489,7 @@ int menuControls_Logic()
         // should never happen
         if(s_curType < 0 || s_curType >= n_types)
         {
-            SDL_assert_release(false); // invalid state in controls settings
+            XStd::assert_release(false); // invalid state in controls settings
             PlaySoundMenu(SFX_BlockHit);
             s_curType = -1;
             s_curProfile = -1;
@@ -1501,7 +1501,7 @@ int menuControls_Logic()
 
         if(s_curProfile < 0 || s_curProfile >= n_profiles)
         {
-            SDL_assert_release(false); // invalid state in controls settings
+            XStd::assert_release(false); // invalid state in controls settings
             PlaySoundMenu(SFX_BlockHit);
             s_curProfile = -1;
             MenuCursorCanMove = false;
@@ -1574,7 +1574,7 @@ int menuControls_Logic()
         // should never happen
         if(s_curType < 0 || s_curType >= n_types)
         {
-            SDL_assert_release(false); // invalid state in controls settings
+            XStd::assert_release(false); // invalid state in controls settings
             PlaySoundMenu(SFX_BlockHit);
             s_curType = -1;
             s_curProfile = -1;
@@ -1586,7 +1586,7 @@ int menuControls_Logic()
 
         if(s_curProfile < 0 || s_curProfile >= n_profiles)
         {
-            SDL_assert_release(false); // invalid state in controls settings
+            XStd::assert_release(false); // invalid state in controls settings
             PlaySoundMenu(SFX_BlockHit);
             s_curProfile = -1;
             MenuCursorCanMove = false;
@@ -1607,7 +1607,7 @@ int menuControls_Logic()
         else
         {
             // shouldn't happen
-            SDL_assert_release(false);
+            XStd::assert_release(false);
             s_profileTab = Controls::ControlsClass::None;
             return 0;
         }

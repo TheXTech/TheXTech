@@ -25,7 +25,7 @@
  *  Author:     Docopoper                        *
  *************************************************/
 
-#include <SDL2/SDL_assert.h>
+#include "core/std.h"
 
 #include "globals.h"
 #include "layers.h"
@@ -45,9 +45,9 @@ void AbstractAssaultCode()
     Layer_t *layerDefault = LayerF::Get(0);
     Layer_t *layerStartingPlatform = LayerF::Get(3);
 
-    SDL_assert_release(demo);
-    SDL_assert_release(layerDefault);
-    SDL_assert_release(layerStartingPlatform);
+    XStd::assert_release(demo);
+    XStd::assert_release(layerDefault);
+    XStd::assert_release(layerStartingPlatform);
 
     static float hspeed = 0, vspeed = 0;
     static char gameStarted = 0;

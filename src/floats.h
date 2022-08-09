@@ -22,7 +22,7 @@
 #ifndef FLOATS_H
 #define FLOATS_H
 
-#include <SDL2/SDL_types.h>
+#include <cstdint>
 #include <Utils/maths.h>
 
 /**
@@ -31,10 +31,10 @@
  * @param b Second argument
  * @return true whe both arguments are equal (almost)
  */
-SDL_INLINE bool fEqual(double a, double b)
+inline bool fEqual(double a, double b)
 {
-    Sint64 ai = Sint64(Maths::lRound(a * 1000000.0));
-    Sint64 bi = Sint64(Maths::lRound(b * 1000000.0));
+    int64_t ai = int64_t(Maths::lRound(a * 1000000.0));
+    int64_t bi = int64_t(Maths::lRound(b * 1000000.0));
     return ai == bi;
 }
 
@@ -44,23 +44,23 @@ SDL_INLINE bool fEqual(double a, double b)
  * @param b Second argument
  * @return true whe both arguments are equal (almost)
  */
-SDL_INLINE bool fEqual(float a, float b)
+inline bool fEqual(float a, float b)
 {
-    Sint64 ai = Sint64(Maths::lRound(a * 10000.0f));
-    Sint64 bi = Sint64(Maths::lRound(b * 10000.0f));
+    int64_t ai = int64_t(Maths::lRound(a * 10000.0f));
+    int64_t bi = int64_t(Maths::lRound(b * 10000.0f));
     return ai == bi;
 }
 
-SDL_INLINE bool fiEqual(double a, int b)
+inline bool fiEqual(double a, int b)
 {
-    int ai = Sint64(Maths::iRound(a));
+    int ai = int64_t(Maths::iRound(a));
     int bi = b;
     return ai == bi;
 }
 
-SDL_INLINE bool fiEqual(float a, int b)
+inline bool fiEqual(float a, int b)
 {
-    int ai = Sint64(Maths::iRound(a));
+    int ai = int64_t(Maths::iRound(a));
     int bi = b;
     return ai == bi;
 }

@@ -20,16 +20,16 @@
 
 #include <vector>
 
-#include <SDL2/SDL_stdinc.h>
 #ifdef ENABLE_ANTICHEAT_TRAP
 #include "core/msgbox.h"
 #include "core/render.h"
 #include "core/events.h"
 #endif
 
+#include "core/std.h"
+
 #include <Logger/logger.h>
 #ifdef ENABLE_ANTICHEAT_TRAP
-#include <SDL2/SDL_timer.h>
 #include <pge_delay.h>
 #endif
 
@@ -1841,7 +1841,7 @@ static std::vector<CheatCode_t> s_cheatsListLevel;
  * \param s Checks does string is suitable for conversion into QWERTZ
  * \return true if string can be converted into QWERTZ
  */
-SDL_FORCE_INLINE bool hasQWERTZ(const std::string &s)
+TXT_FORCE_INLINE bool hasQWERTZ(const std::string &s)
 {
     for(const char &c : s)
     {
@@ -1863,7 +1863,7 @@ SDL_FORCE_INLINE bool hasQWERTZ(const std::string &s)
  * \param s Source string in QWERTY
  * \return QWERTZ string
  */
-SDL_FORCE_INLINE std::string toQWERTZ(std::string s)
+TXT_FORCE_INLINE std::string toQWERTZ(std::string s)
 {
     for(char &c : s)
     {
@@ -1888,7 +1888,7 @@ SDL_FORCE_INLINE std::string toQWERTZ(std::string s)
  * \param s Checks does string is suitable for conversion into AZERTY
  * \return true if string can be converted into AZERTY
  */
-SDL_FORCE_INLINE bool hasAZERTY(const std::string &s)
+TXT_FORCE_INLINE bool hasAZERTY(const std::string &s)
 {
     for(const char &c : s)
     {
@@ -1914,7 +1914,7 @@ SDL_FORCE_INLINE bool hasAZERTY(const std::string &s)
  * \param s Source string in AZERTY
  * \return AZERTY string
  */
-SDL_FORCE_INLINE std::string toAZERTY(std::string s)
+TXT_FORCE_INLINE std::string toAZERTY(std::string s)
 {
     for(char &c : s)
     {
@@ -1943,16 +1943,16 @@ SDL_FORCE_INLINE std::string toAZERTY(std::string s)
     return s;
 }
 
-SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const CheatCodeDefault_t *src)
+TXT_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const CheatCodeDefault_t *src)
 {
     dst.clear();
 
     while(src->key && src->call)
     {
         CheatCode_t cd = {};
-        SDL_memset(cd.key, 0, sizeof(cd.key));
-        SDL_strlcpy(cd.key, src->key, sizeof(cd.key));
-        cd.keyLen = SDL_strlen(cd.key);
+        XStd::memset(cd.key, 0, sizeof(cd.key));
+        XStd::strlcpy(cd.key, src->key, sizeof(cd.key));
+        cd.keyLen = XStd::strlen(cd.key);
         cd.call = src->call;
         cd.isCheat = src->isCheat;
         dst.push_back(cd);
@@ -1960,18 +1960,18 @@ SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const CheatCod
         if(hasQWERTZ(src->key)) // Automatically add QWERTZ alias
         {
             std::string z = toQWERTZ(src->key);
-            SDL_memset(cd.key, 0, sizeof(cd.key));
-            SDL_strlcpy(cd.key, z.c_str(), SDL_min(sizeof(cd.key), z.size() + 1));
-            cd.keyLen = SDL_strlen(cd.key);
+            XStd::memset(cd.key, 0, sizeof(cd.key));
+            XStd::strlcpy(cd.key, z.c_str(), XStd::min(sizeof(cd.key), z.size() + 1));
+            cd.keyLen = XStd::strlen(cd.key);
             dst.push_back(cd);
         }
 
         if(hasAZERTY(src->key)) // Automatically add AZERTY alias
         {
             std::string z = toAZERTY(src->key);
-            SDL_memset(cd.key, 0, sizeof(cd.key));
-            SDL_strlcpy(cd.key, z.c_str(), SDL_min(sizeof(cd.key), z.size() + 1));
-            cd.keyLen = SDL_strlen(cd.key);
+            XStd::memset(cd.key, 0, sizeof(cd.key));
+            XStd::strlcpy(cd.key, z.c_str(), XStd::min(sizeof(cd.key), z.size() + 1));
+            cd.keyLen = XStd::strlen(cd.key);
             dst.push_back(cd);
         }
 
@@ -1979,7 +1979,7 @@ SDL_FORCE_INLINE void convertArray(std::vector<CheatCode_t> &dst, const CheatCod
     }
 }
 
-SDL_FORCE_INLINE void addAliasCheats(CheatsScope scope, std::vector<GameInfo::CheatAlias> &list)
+TXT_FORCE_INLINE void addAliasCheats(CheatsScope scope, std::vector<GameInfo::CheatAlias> &list)
 {
     for(const auto &c : list)
     {
@@ -1991,7 +1991,7 @@ SDL_FORCE_INLINE void addAliasCheats(CheatsScope scope, std::vector<GameInfo::Ch
     }
 }
 
-SDL_FORCE_INLINE void addRenameCheats(CheatsScope scope, std::vector<GameInfo::CheatAlias> &list)
+TXT_FORCE_INLINE void addRenameCheats(CheatsScope scope, std::vector<GameInfo::CheatAlias> &list)
 {
     for(const auto &c : list)
     {
@@ -2042,16 +2042,16 @@ void cheats_addAlias(CheatsScope scope, const std::string &source, const std::st
         break;
     }
 
-    SDL_assert(dst);
+    XStd::assert_debug(dst);
 
     for(auto &c : *dst)
     {
         if(source == c.key)
         {
             auto cc = c;
-            SDL_memset(cc.key, 0, sizeof(cc.key));
-            SDL_strlcpy(cc.key, alias.c_str(), SDL_min(sizeof(cc.key), alias.size() + 1));
-            cc.keyLen = SDL_strlen(cc.key);
+            XStd::memset(cc.key, 0, sizeof(cc.key));
+            XStd::strlcpy(cc.key, alias.c_str(), XStd::min(sizeof(cc.key), alias.size() + 1));
+            cc.keyLen = XStd::strlen(cc.key);
             dst->push_back(cc);
             break;
         }
@@ -2075,15 +2075,15 @@ void cheats_rename(CheatsScope scope, const std::string &source, const std::stri
         break;
     }
 
-    SDL_assert(dst);
+    XStd::assert_debug(dst);
 
     for(auto &c : *dst)
     {
         if(source == c.key)
         {
-            SDL_memset(c.key, 0, sizeof(c.key));
-            SDL_strlcpy(c.key, alias.c_str(), SDL_min(sizeof(c.key), alias.size() + 1));
-            c.keyLen = SDL_strlen(c.key);
+            XStd::memset(c.key, 0, sizeof(c.key));
+            XStd::strlcpy(c.key, alias.c_str(), XStd::min(sizeof(c.key), alias.size() + 1));
+            c.keyLen = XStd::strlen(c.key);
             break;
         }
     }
@@ -2107,7 +2107,7 @@ void cheats_erase(CheatsScope scope, const std::string &source)
         break;
     }
 
-    SDL_assert(dst);
+    XStd::assert_debug(dst);
 
     for(auto it = dst->begin(); it != dst->end(); ++it)
     {
@@ -2136,8 +2136,8 @@ struct CheatBuffer_t
 
     void setBuffer(const std::string &line)
     {
-        bufLen = SDL_min(maxLen, line.size());
-        SDL_memcpy(buffer[t], line.c_str(), bufLen);
+        bufLen = XStd::min(maxLen, line.size());
+        XStd::memcpy(buffer[t], line.c_str(), bufLen);
         buffer[t][bufLen] = 0;
     }
 
@@ -2152,7 +2152,7 @@ struct CheatBuffer_t
         {
             size_t ts = t,
                    td = !t;
-            SDL_memcpy(buffer[td], buffer[ts] + 1, bufLen - 1);
+            XStd::memcpy(buffer[td], buffer[ts] + 1, bufLen - 1);
             t = td;
             buffer[t][bufLen - 1] = c;
             buffer[t][bufLen] = 0;
@@ -2175,13 +2175,13 @@ struct CheatBuffer_t
 static CheatBuffer_t s_buffer;
 
 
-SDL_FORCE_INLINE bool cheatCompare(size_t bufLen, const char *buf,
+TXT_FORCE_INLINE bool cheatCompare(size_t bufLen, const char *buf,
                                    size_t keyLen, const char *key)
 {
     if(bufLen < keyLen)
         return false;
 
-    return SDL_memcmp(buf + (bufLen - keyLen), key, keyLen) == 0;
+    return XStd::memcmp(buf + (bufLen - keyLen), key, keyLen) == 0;
 }
 
 static void processCheats()

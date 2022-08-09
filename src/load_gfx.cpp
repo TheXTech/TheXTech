@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
+#include "core/std.h"
 
 #include "globals.h"
 #include "global_dirs.h"
@@ -206,7 +206,7 @@ static void restoreLevelBackupTextures()
             *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
-        SDL_assert_release(t.remote_texture);
+        XStd::assert_release(t.remote_texture);
         XRender::deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
@@ -224,7 +224,7 @@ static void restoreWorldBackupTextures()
             *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
-        SDL_assert_release(t.remote_texture);
+        XStd::assert_release(t.remote_texture);
         XRender::deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
@@ -764,9 +764,9 @@ void UpdateLoadREAL()
 
     static float alphaFader = 1.0f;
 
-    if(LoadCoinsT <= SDL_GetTicks())
+    if(LoadCoinsT <= XStd::GetTicks())
     {
-        LoadCoinsT = SDL_GetTicks() + 100;
+        LoadCoinsT = XStd::GetTicks() + 100;
         LoadCoins += 1;
         if(LoadCoins > 3)
             LoadCoins = 0;

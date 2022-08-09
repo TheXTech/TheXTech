@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL.h>
+#include "core/std.h"
 
 #include "game_main.h"
 #include "frm_main.h"
@@ -95,13 +95,13 @@ static void strToPlayerSetup(int player, const std::string &setupString)
         if(k.empty())
             continue;
         if(k[0] == 'c') // Character
-            p.Character = int(SDL_strtol(k.substr(1).c_str(), nullptr, 10));
+            p.Character = int(XStd::strtol(k.substr(1).c_str(), nullptr, 10));
         else if(k[0] == 's') // State
-            p.State = int(SDL_strtol(k.substr(1).c_str(), nullptr, 10));
+            p.State = int(XStd::strtol(k.substr(1).c_str(), nullptr, 10));
         else if(k[0] == 'm') // Mounts
-            p.Mount = int(SDL_strtol(k.substr(1).c_str(), nullptr, 10));
+            p.Mount = int(XStd::strtol(k.substr(1).c_str(), nullptr, 10));
         else if(k[0] == 't') // Mount types
-            p.MountType = int(SDL_strtol(k.substr(1).c_str(), nullptr, 10));
+            p.MountType = int(XStd::strtol(k.substr(1).c_str(), nullptr, 10));
     }
 
     if(p.Character < 1)

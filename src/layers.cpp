@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
 #include <set>
 
 #include "globals.h"
@@ -51,14 +50,14 @@ int newEventNum = 0;
 layerindex_t LAYER_USED_P_SWITCH = LAYER_NONE;
 static std::set<eventindex_t> recentlyTriggeredEvents;
 
-static SDL_INLINE bool equalCase(const std::string &x, const std::string &y)
+static inline bool equalCase(const std::string &x, const std::string &y)
 {
-    return (SDL_strcasecmp(x.c_str(), y.c_str()) == 0);
+    return (XStd::strcasecmp(x.c_str(), y.c_str()) == 0);
 }
 
-static SDL_INLINE bool equalCase(const char *x, const char *y)
+static inline bool equalCase(const char *x, const char *y)
 {
-    return (SDL_strcasecmp(x, y) == 0);
+    return (XStd::strcasecmp(x, y) == 0);
 }
 
 
@@ -977,7 +976,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         }
                     }
                 }
-                else if(IF_INRANGE(evt.AutoSection, 0, SDL_min(maxSections, maxEvents)))
+                else if(IF_INRANGE(evt.AutoSection, 0, XStd::min(maxSections, maxEvents)))
                 {
                     // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
                     AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;

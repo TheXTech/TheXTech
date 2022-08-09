@@ -23,9 +23,9 @@
 #define MSGBOX_HHHHH
 
 #ifndef MSGBOX_CUSTOM
-#   include <SDL2/SDL_stdinc.h>
+#   include "core/std.h"
 #   include "base/msgbox_base.h"
-#   define E_INLINE SDL_FORCE_INLINE
+#   define E_INLINE TXT_FORCE_INLINE
 #   define TAIL
 #else
 #   define E_INLINE    extern

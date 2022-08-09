@@ -4894,8 +4894,8 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
 
     MessageText.clear();
 #ifdef __3DS__
-    if(mode == CallMode::Render)
-        XRender::initDraw(1);
+    // if(mode == CallMode::Render)
+    //     XRender::setTargetSubscreen();
 #else
 
     e_CursorX = EditorCursor.X;

@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <cstdlib>
 
-#include <SDL2/SDL_stdinc.h>
+#include "core/std.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -60,7 +60,7 @@ bool util::strempty(const char *str)
 {
     if(str)
     {
-        if(SDL_strlen(str))
+        if(XStd::strlen(str))
             return true;
     }
 

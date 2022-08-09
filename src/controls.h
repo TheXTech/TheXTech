@@ -30,6 +30,8 @@ typedef union SDL_Event SDL_Event;
 
 #include <IniProcessor/ini_processing.h>
 
+#include "core/std.h"
+
 #include "globals.h"
 
 extern Controls_t &operator|=(Controls_t &o1, const Controls_t &o2);
@@ -147,7 +149,7 @@ inline bool &GetButton(Controls_t &c, size_t i)
     case Buttons::Start:
         return c.Start;
     default:
-        SDL_assert(false);
+        XStd::assert_debug(false);
         return c.Start;
     }
 }
@@ -235,7 +237,7 @@ inline bool &GetButton(CursorControls_t &c, size_t i)
     case Buttons::CursorLeft:
     case Buttons::CursorRight:
     default:
-        SDL_assert(false);
+        XStd::assert_debug(false);
         return c.Primary;
     }
 }
@@ -345,7 +347,7 @@ inline bool &GetButton(EditorControls_t &c, size_t i)
     case Buttons::ScrollLeft:
     case Buttons::ScrollRight:
     default:
-        SDL_assert(false);
+        XStd::assert_debug(false);
         return c.FastScroll;
     }
 }

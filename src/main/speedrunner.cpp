@@ -357,7 +357,7 @@ void speedRun_triggerEnter()
     if(g_compatibility.speedrun_stop_timer_by != Compatibility_t::SPEEDRUN_STOP_ENTER_LEVEL)
         return;
 
-    if(SDL_strcasecmp(FileName.c_str(), g_compatibility.speedrun_stop_timer_at) == 0)
+    if(XStd::strcasecmp(FileName.c_str(), g_compatibility.speedrun_stop_timer_at) == 0)
         speedRun_bossDeadEvent();
 }
 
@@ -369,7 +369,7 @@ void speedRun_triggerLeave()
     if(g_compatibility.speedrun_stop_timer_by != Compatibility_t::SPEEDRUN_STOP_LEAVE_LEVEL)
         return;
 
-    if(SDL_strcasecmp(FileName.c_str(), g_compatibility.speedrun_stop_timer_at) == 0)
+    if(XStd::strcasecmp(FileName.c_str(), g_compatibility.speedrun_stop_timer_at) == 0)
         speedRun_bossDeadEvent();
 }
 
@@ -407,6 +407,6 @@ void speedRun_syncControlKeys(int plr, const Controls_t &keys)
     // if(g_speedRunnerMode == SPEEDRUN_MODE_OFF && !g_drawController)
     //     return; // Do nothing
 
-    SDL_assert(plr >= 0 && plr < maxLocalPlayers);
-    SDL_memcpy(&s_displayControls[plr], &keys, sizeof(Controls_t));
+    XStd::assert_debug(plr >= 0 && plr < maxLocalPlayers);
+    XStd::memcpy(&s_displayControls[plr], &keys, sizeof(Controls_t));
 }

@@ -23,9 +23,9 @@
 #define EVENTS_HHHHHHH
 
 #ifndef EVENTS_CUSTOM
-#   include <SDL2/SDL_stdinc.h>
+#   include "core/std.h"
 #   include "base/events_base.h"
-#   define E_INLINE SDL_FORCE_INLINE
+#   define E_INLINE TXT_FORCE_INLINE
 #   define TAIL
 #else
 #   include <stdint.h>
@@ -62,7 +62,7 @@ E_INLINE void waitEvents() TAIL
 }
 #endif
 
-SDL_FORCE_INLINE void eventResize()
+TXT_FORCE_INLINE void eventResize()
 {
     g_events->eventResize();
 }

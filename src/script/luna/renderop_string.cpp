@@ -19,6 +19,8 @@
  */
 
 #include "renderop_string.h"
+
+#include "core/std.h"
 #include "core/render.h"
 
 RenderStringOp::RenderStringOp() :
@@ -39,18 +41,18 @@ RenderStringOp::RenderStringOp(const std::string &str, int font_type, float X, f
     m_StringDup = (m_StringSize >= c_rAllocChunkSize);
 
     if(m_StringDup) // fallback if string is longer than chunk size, that shouldn't happen usually
-        m_String = SDL_strdup(str.c_str());
+        m_String = XStd::strdup(str.c_str());
     else
     {
         m_String = (char*)g_rAlloc.Allocate(c_rAllocChunkSize);
-        m_StringSize = SDL_strlcpy(m_String, str.c_str(), c_rAllocChunkSize);
+        m_StringSize = XStd::strlcpy(m_String, str.c_str(), c_rAllocChunkSize);
     }
 }
 
 RenderStringOp::~RenderStringOp()
 {
     if(m_StringDup)
-        SDL_free(m_String);
+        XStd::free(m_String);
     else
         g_rAlloc.Free(m_String);
     m_String = nullptr;

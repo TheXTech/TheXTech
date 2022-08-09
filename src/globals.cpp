@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_version.h>
+#include "core/std.h"
 
 #include "core/events.h"
 #include "globals.h"
@@ -628,7 +628,7 @@ int vb6Round(double x)
 #ifdef USE_CUSTOM_TONEAREST
 #   define toNearest pge_toNearest
 #else
-static SDL_INLINE double toNearest(double x)
+static inline double toNearest(double x)
 {
     int round_old = std::fegetround();
     if(round_old == FE_TONEAREST)
@@ -650,7 +650,7 @@ double vb6Round(double x, int decimals)
     if(decimals < 0 || decimals >= 22)
         decimals = 0;
 
-    if(SDL_fabs(x) < 1.0e16)
+    if(XStd::fabs(x) < 1.0e16)
     {
         decmul = power10[decimals];
         res = toNearest(x * decmul) / decmul;

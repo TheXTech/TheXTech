@@ -25,6 +25,8 @@
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
 
+#include "core/std.h"
+
 #include "autocode.h"
 #include "autocode_manager.h"
 #include "lunamisc.h"
@@ -285,7 +287,7 @@ void Autocode::Do(bool init)
         // SHOW NPC LIFE LEFT
         case AT_ShowNPCLifeLeft:
         {
-            int base_health = SDL_atoi(GetS(MyString).data());
+            int base_health = XStd::atoi(GetS(MyString).data());
             NPC_t *npc = NpcF::GetFirstMatch((int)Target, (int)Param3 - 1);
             if(npc != nullptr)
             {
@@ -525,7 +527,7 @@ void Autocode::Do(bool init)
             LunaRect player_screen_rect = PlayerF::GetScreenPosition(demo);
             int depth = 0;
             if(GetS(MyString).length() > 0)
-                depth = SDL_atoi(GetS(MyString).c_str());
+                depth = XStd::atoi(GetS(MyString).c_str());
 
             double L_edge = 0 + depth;
             double U_edge = 0 + depth;
@@ -866,7 +868,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                LayerF::SetXSpeed(layer, (float)SDL_atof(GetS(MyString).c_str()));
+                LayerF::SetXSpeed(layer, (float)XStd::atof(GetS(MyString).c_str()));
                 if(Length == 1 && Param1 != 0.0)
                     LayerF::SetXSpeed(layer, 0.0001f);
             }
@@ -878,7 +880,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                LayerF::SetYSpeed(layer, (float)SDL_atof(GetS(MyString).c_str()));
+                LayerF::SetYSpeed(layer, (float)XStd::atof(GetS(MyString).c_str()));
                 if(Length == 1 && Param1 != 0.0)
                     LayerF::SetYSpeed(layer, 0.0001f);
             }
@@ -890,7 +892,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto accel = (float)SDL_atof(GetS(MyString).c_str());
+                auto accel = (float)XStd::atof(GetS(MyString).c_str());
                 if(std::abs(layer->SpeedX) + std::abs(accel) >= std::abs((float)Param1))
                     LayerF::SetXSpeed(layer, (float)Param1);
                 else
@@ -904,7 +906,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto accel = (float)SDL_atof(GetS(MyString).c_str());
+                auto accel = (float)XStd::atof(GetS(MyString).c_str());
                 if(std::abs(layer->SpeedY) + std::abs(accel) >= std::abs((float)Param1))
                     LayerF::SetYSpeed(layer, (float)Param1);
                 else
@@ -918,7 +920,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto deccel = (float)SDL_atof(GetS(MyString).c_str());
+                auto deccel = (float)XStd::atof(GetS(MyString).c_str());
                 deccel = std::abs(deccel);
                 if(layer->SpeedX > 0)
                 {
@@ -942,7 +944,7 @@ void Autocode::Do(bool init)
             Layer_t *layer = LayerF::Get((int)Target);
             if(layer)
             {
-                auto deccel = (float)SDL_atof(GetS(MyString).c_str());
+                auto deccel = (float)XStd::atof(GetS(MyString).c_str());
                 deccel = std::abs(deccel);
                 if(layer->SpeedY > 0)
                 {
@@ -989,7 +991,7 @@ void Autocode::Do(bool init)
         case AT_PushScreenBoundary:
         {
             if(Target > 0 && Target < numSections && Param1 >= 0 && Param1 < 5)
-                LevelF::PushSectionBoundary((int)Target - 1, (int)Param1, SDL_atof(GetS(MyString).c_str()));
+                LevelF::PushSectionBoundary((int)Target - 1, (int)Param1, XStd::atof(GetS(MyString).c_str()));
             break;
         }
 
@@ -1656,8 +1658,8 @@ AutocodeType Autocode::EnumerizeCommand(char *wbuf, int lineNumber)
     if(wbuf)
     {
         char command[100];
-        SDL_memset(command, 0, 100 * sizeof(char));
-        int success = SDL_sscanf(wbuf, " %99[^,] ,", command);
+        XStd::memset(command, 0, 100 * sizeof(char));
+        int success = XStd::sscanf(wbuf, " %99[^,] ,", command);
         if(!success)
         {
             // Bad or mistyped command?

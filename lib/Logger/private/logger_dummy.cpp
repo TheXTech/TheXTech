@@ -19,7 +19,6 @@
 
 #define LOGGER_INTERNAL
 #include "logger_sets.h"
-#include "logger_private.h"
 
 
 void LogWriter::OpenLogFile()

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
+#include "core/std.h"
 
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
@@ -158,26 +158,26 @@ void PerformanceStats_t::print()
 
 typedef int64_t nanotime_t;
 
-static SDL_INLINE nanotime_t getNanoTime()
+static inline nanotime_t getNanoTime()
 {
-    return static_cast<nanotime_t>(SDL_GetTicks()) * 1000000;
+    return static_cast<nanotime_t>(XStd::GetTicks()) * 1000000;
 }
 
-static SDL_INLINE nanotime_t getElapsedTime(nanotime_t oldTime)
+static inline nanotime_t getElapsedTime(nanotime_t oldTime)
 {
     return getNanoTime() - oldTime;
 }
 
-static SDL_INLINE nanotime_t getSleepTime(nanotime_t oldTime, nanotime_t target)
+static inline nanotime_t getSleepTime(nanotime_t oldTime, nanotime_t target)
 {
     return target - getElapsedTime(oldTime);
 }
 
-static SDL_INLINE void xtech_nanosleep(nanotime_t sleepTime)
+static inline void xtech_nanosleep(nanotime_t sleepTime)
 {
     if(sleepTime <= 0)
         return;
-    PGE_Delay((Uint32)SDL_ceil(sleepTime / 1000000.0));
+    PGE_Delay((uint32_t)XStd::ceil(sleepTime / 1000000.0));
 }
 
 
@@ -239,7 +239,7 @@ void resetFrameTimer()
     s_doUpdate = 0;
     s_goalTime = 0;
 #else
-    s_goalTime = SDL_GetTicks() + 1000;
+    s_goalTime = XStd::GetTicks() + 1000;
 #endif
     // D_pLogDebugNA("Time counter reset was called");
 }
@@ -260,7 +260,7 @@ bool frameSkipNeeded()
 
 bool frameSkipNeeded() // Old and buggy Redigit's
 {
-    return SDL_GetTicks() + SDL_floor(1000 * (1 - (s_cycleCount / 63.0))) > s_goalTime;
+    return XStd::GetTicks() + XStd::floor(1000 * (1 - (s_cycleCount / 63.0))) > s_goalTime;
 }
 
 #endif
@@ -277,7 +277,7 @@ void cycleNextInc()
 
 extern void CheckActive(); // game_main.cpp
 
-static SDL_INLINE bool canProcessFrameCond()
+static inline bool canProcessFrameCond()
 {
     bool ret = s_currentTicks >= s_gameTime + c_frameRate || s_currentTicks < s_gameTime || MaxFPS;
 #ifdef USE_NEW_FRAMESKIP
@@ -289,12 +289,12 @@ static SDL_INLINE bool canProcessFrameCond()
 
 bool canProceedFrame()
 {
-    s_currentTicks = SDL_GetTicks();
+    s_currentTicks = XStd::GetTicks();
     return canProcessFrameCond();
 }
 
 #ifndef USE_NEW_TIMER
-static SDL_INLINE void computeFrameTime1Real()
+static inline void computeFrameTime1Real()
 {
     if(s_fpsCount >= 32000)
         s_fpsCount = 0; // Fixes Overflow bug
@@ -316,9 +316,9 @@ static SDL_INLINE void computeFrameTime1Real()
     s_overTime -= (s_currentTicks - s_gameTime);
 }
 
-static SDL_INLINE void computeFrameTime2Real()
+static inline void computeFrameTime2Real()
 {
-    if(SDL_GetTicks() > s_fpsTime)
+    if(XStd::GetTicks() > s_fpsTime)
     {
         if(s_cycleCount >= 65)
         {
@@ -326,7 +326,7 @@ static SDL_INLINE void computeFrameTime2Real()
             s_gameTime = s_currentTicks;
         }
         s_cycleCount = 0;
-        s_fpsTime = SDL_GetTicks() + 1000;
+        s_fpsTime = XStd::GetTicks() + 1000;
         s_goalTime = s_fpsTime;
         //      if(Debugger == true)
         //          frmLevelDebugger.lblFPS = fpsCount;
@@ -339,7 +339,7 @@ static SDL_INLINE void computeFrameTime2Real()
 
 
 #ifdef USE_NEW_TIMER
-static SDL_INLINE void computeFrameTime1Real_2()
+static inline void computeFrameTime1Real_2()
 {
     if(s_fpsCount >= 32000)
         s_fpsCount = 0; // Fixes Overflow bug
@@ -348,7 +348,7 @@ static SDL_INLINE void computeFrameTime1Real_2()
         s_cycleCount = 0; // Fixes Overflow bug
 }
 
-static SDL_INLINE void computeFrameTime2Real_2()
+static inline void computeFrameTime2Real_2()
 {
 #ifdef USE_NEW_FRAMESKIP
     if(s_doUpdate > 0)
@@ -357,7 +357,7 @@ static SDL_INLINE void computeFrameTime2Real_2()
     s_stopProcessing = 0;
 #endif
 
-    if(SDL_GetTicks() > s_fpsTime)
+    if(XStd::GetTicks() > s_fpsTime)
     {
         if(s_cycleCount >= 65)
         {
@@ -365,7 +365,7 @@ static SDL_INLINE void computeFrameTime2Real_2()
             s_gameTime = s_currentTicks;
         }
         s_cycleCount = 0;
-        s_fpsTime = SDL_GetTicks() + 1000;
+        s_fpsTime = XStd::GetTicks() + 1000;
         s_goalTime = s_fpsTime;
 
         if(ShowFPS)
@@ -386,7 +386,7 @@ static SDL_INLINE void computeFrameTime2Real_2()
             xtech_nanosleep(adjustedSleepTime);
             auto e = getElapsedTime(start);
             nanotime_t overslept = e - adjustedSleepTime;
-            // SDL_assert(overslept >= 0);
+            // XStd::assert_debug(overslept >= 0);
             if(overslept < 0)
                 s_overheadTimes.add(0);
             else if(overslept < c_frameRateNano)
@@ -422,7 +422,7 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
             preTimerExtraPre();
 
         XEvents::doEvents();
-        s_currentTicks = SDL_GetTicks();
+        s_currentTicks = XStd::GetTicks();
 
         if(preTimerExtraPost)
             preTimerExtraPost();
@@ -474,7 +474,7 @@ void frameRenderEnd()
             newTime = c_frameRateNano * 25;
         }
         s_doUpdate += newTime;
-        s_goalTime = double(SDL_GetTicks() + (newTime / 1000000));
+        s_goalTime = double(XStd::GetTicks() + (newTime / 1000000));
     }
 #endif
 }

@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
-
 #include <cmath>
 #include <ctime>
 #include <Utils/maths.h>
 #include <fmt_format_ne.h>
 #include <pge_delay.h>
+
+#include "core/std.h"
 
 #include "globals.h"
 #include "player.h"
@@ -4410,7 +4410,7 @@ void PowerUps(const int A)
 }
 
 
-static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
+static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
 {
     bool canWarp = false;
 
@@ -5839,7 +5839,7 @@ void PlayerEffects(const int A)
                 p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
 
                 sign = (warp_enter.Y + warp_enter.Height) > p.Location.Y ? +1.0 : -1.0;
-                leftToGoal = SDL_fabs((warp_enter.Y + warp_enter.Height) - p.Location.Y) * sign;
+                leftToGoal = XStd::fabs((warp_enter.Y + warp_enter.Height) - p.Location.Y) * sign;
 
                 if(p.Location.Y > warp_enter.Y + warp_enter.Height + 8)
                     p.Effect2 = 1;
@@ -5859,7 +5859,7 @@ void PlayerEffects(const int A)
                 p.Location.X = warp_enter.X + warp_enter.Width / 2.0 - p.Location.Width / 2.0;
 
                 sign = (p.Location.Y + p.Location.Height) > warp_enter.Y ? +1.0 : -1.0;
-                leftToGoal = SDL_fabs(warp_enter.Y - (p.Location.Y + p.Location.Height)) * sign;
+                leftToGoal = XStd::fabs(warp_enter.Y - (p.Location.Y + p.Location.Height)) * sign;
 
                 if(p.Location.Y + p.Location.Height + 8 < warp_enter.Y)
                     p.Effect2 = 1;
@@ -5885,7 +5885,7 @@ void PlayerEffects(const int A)
                 p.Location.X -= 0.5;
 
                 sign = (p.Location.X + p.Location.Width) > warp_enter.X ? +1.0 : -1.0;
-                leftToGoal = SDL_fabs((warp_enter.X - (p.Location.X + p.Location.Width)) * 2) * sign;
+                leftToGoal = XStd::fabs((warp_enter.X - (p.Location.X + p.Location.Width)) * 2) * sign;
 
                 if(p.Location.X + p.Location.Width + 8 < warp_enter.X)
                     p.Effect2 = 1;
@@ -5914,7 +5914,7 @@ void PlayerEffects(const int A)
                 p.Location.X += 0.5;
 
                 sign = p.Location.X < (warp_enter.X + warp_enter.Width) ? +1.0 : -1.0;
-                leftToGoal = SDL_fabs(((warp_enter.X + warp_enter.Width) - p.Location.X) * 2) * sign;
+                leftToGoal = XStd::fabs(((warp_enter.X + warp_enter.Width) - p.Location.X) * 2) * sign;
 
                 if(p.Location.X > warp_enter.X + warp_enter.Width + 8)
                     p.Effect2 = 1;

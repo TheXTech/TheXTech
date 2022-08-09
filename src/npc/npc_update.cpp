@@ -436,7 +436,7 @@ void UpdateNPCs()
                         if(CheckCollision(tempLocation, NPC[B].Location))
                         {
                             numAct++;
-                            SDL_assert_release(numAct <= maxNPCs);
+                            XStd::assert_release(numAct <= maxNPCs);
                             newAct[numAct] = B;
                             NPC[B].Active = true;
                             NPC[B].TimeLeft = NPC[A].TimeLeft;
@@ -479,7 +479,7 @@ void UpdateNPCs()
                                 if(CheckCollision(tempLocation, NPC[B].Location))
                                 {
                                     numAct += 1;
-                                    SDL_assert_release(numAct <= maxNPCs);
+                                    XStd::assert_release(numAct <= maxNPCs);
                                     newAct[numAct] = B;
                                     NPC[B].Active = true;
                                     NPC[B].TimeLeft = NPC[newAct[C]].TimeLeft;

@@ -471,13 +471,13 @@ static struct TouchKeyMap
 
     TouchKeyMap()
     {
-        SDL_assert(sizeof(touchKeysMap) == TouchScreenController::key_END * sizeof(KeyPos));
+        XStd::assert_debug(sizeof(touchKeysMap) == TouchScreenController::key_END * sizeof(KeyPos));
 
         for(int it = TouchScreenController::key_BEGIN; it < TouchScreenController::key_END; it++)
         {
             auto& p = touchKeysMap[it];
             p.cmd = static_cast<TouchScreenController::commands>(it);
-            SDL_assert(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
+            XStd::assert_debug(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
         }
     }
 
@@ -505,7 +505,7 @@ static struct TouchKeyMap
         if(cmd < TouchScreenController::key_BEGIN || cmd >= TouchScreenController::key_END)
             return;
 
-        SDL_assert_release(touchKeysMap[cmd].cmd == cmd);
+        XStd::assert_release(touchKeysMap[cmd].cmd == cmd);
 
         auto& key = touchKeysMap[cmd];
         key.x1 = left;
@@ -530,7 +530,7 @@ static struct TouchKeyMap
 
         for(const auto& p : touchKeysMap)
         {
-            SDL_assert(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
+            XStd::assert_debug(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
             fs.heldKey[p.cmd] = false;
 
             if(x >= p.x1 && x <= p.x2 && y >= p.y1 && y <= p.y2)
@@ -745,42 +745,42 @@ static void updateTouchMap(int preferredLayout,
     switch(preferredLayout)
     {
     case(TouchScreenController::layout_old_tiny):
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_4_tinyPhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
+        XStd::memcpy(g_touchKeyMap.touchKeysMap, c_4_tinyPhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
         g_touchKeyMap.touchCanvasWidth = 640.f;
         g_touchKeyMap.touchCanvasHeight = 480.f;
         break;
 
     case(TouchScreenController::layout_old_average):
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
+        XStd::memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneMap, sizeof(g_touchKeyMap.touchKeysMap));
         g_touchKeyMap.touchCanvasWidth = 1024.f;
         g_touchKeyMap.touchCanvasHeight = 600.f;
         break;
 
     case(TouchScreenController::layout_old_long):
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneLongMap, sizeof(g_touchKeyMap.touchKeysMap));
+        XStd::memcpy(g_touchKeyMap.touchKeysMap, c_averagePhoneLongMap, sizeof(g_touchKeyMap.touchKeysMap));
         g_touchKeyMap.touchCanvasWidth = 1396.0f;
         g_touchKeyMap.touchCanvasHeight = 720.0f;
         break;
 
     case(TouchScreenController::layout_old_phablet):
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_7_tablet, sizeof(g_touchKeyMap.touchKeysMap));
+        XStd::memcpy(g_touchKeyMap.touchKeysMap, c_7_tablet, sizeof(g_touchKeyMap.touchKeysMap));
         g_touchKeyMap.touchCanvasWidth = 1024.f;
         g_touchKeyMap.touchCanvasHeight = 600.f;
         break;
 
     case(TouchScreenController::layout_old_tablet):
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_10_6_tablet, sizeof(g_touchKeyMap.touchKeysMap));
+        XStd::memcpy(g_touchKeyMap.touchKeysMap, c_10_6_tablet, sizeof(g_touchKeyMap.touchKeysMap));
         g_touchKeyMap.touchCanvasWidth = 1300.f;
         g_touchKeyMap.touchCanvasHeight = 812.f;
         break;
 
     case(TouchScreenController::layout_tight):
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_tightAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
+        XStd::memcpy(g_touchKeyMap.touchKeysMap, c_tightAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
         break;
 
     case(TouchScreenController::layout_standard):
     default:
-        SDL_memcpy(g_touchKeyMap.touchKeysMap, c_standardAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
+        XStd::memcpy(g_touchKeyMap.touchKeysMap, c_standardAutoMap, sizeof(g_touchKeyMap.touchKeysMap));
         break;
     }
 
@@ -850,7 +850,7 @@ static void updateTouchMap(int preferredLayout,
             {
                 float yb1 = g_touchKeyMap.touchKeysMap[TouchScreenController::key_altrun].y1;
                 float yb2 = g_touchKeyMap.touchKeysMap[TouchScreenController::key_altjump].y1;
-                float yb = SDL_min(yb1, yb2) - 0.05f;
+                float yb = XStd::min(yb1, yb2) - 0.05f;
 
                 // is aligning needed?
                 if(yb < g_touchKeyMap.touchKeysMap[i].y2)
@@ -996,7 +996,7 @@ void TouchScreenController::scanTouchDevices()
             }
 #endif
 
-            SDL_memset(d.keysHeld, 0, sizeof(d.keysHeld));
+            XStd::memset(d.keysHeld, 0, sizeof(d.keysHeld));
         }
 
         // Remove unnecessary devices from the list
@@ -1554,12 +1554,12 @@ void TouchScreenController::resetState()
             state.second.ignore = true;
         d.current_keys = Controls_t();
         d.extra_keys = ExtraKeys_t();
-        SDL_memset(d.keysHeld, 0, sizeof(d.keysHeld));
+        XStd::memset(d.keysHeld, 0, sizeof(d.keysHeld));
     }
 
     m_current_keys = Controls_t();
     m_current_extra_keys = ExtraKeys_t();
-    SDL_memset(m_keysHeld, 0, sizeof(m_keysHeld));
+    XStd::memset(m_keysHeld, 0, sizeof(m_keysHeld));
 }
 
 /*====================================================*\

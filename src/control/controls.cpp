@@ -37,10 +37,13 @@
 
 // Control methods
 
+#ifndef __3DS__
 #include "keyboard.h"
 #include "joystick.h"
-#include "duplicate.h"
 #include "touchscreen.h"
+#endif
+
+#include "duplicate.h"
 
 #include <Logger/logger.h>
 
@@ -655,13 +658,13 @@ void InputMethodType::SaveConfig_Custom(IniProcessing* ctl)
 {
     UNUSED(ctl);
     // must be implemented if user has created special options
-    SDL_assert_release(this->GetOptionCount() == 0);
+    XStd::assert_release(this->GetOptionCount() == 0);
 }
 void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 {
     UNUSED(ctl);
     // must be implemented if user has created special options
-    SDL_assert_release(this->GetOptionCount() == 0);
+    XStd::assert_release(this->GetOptionCount() == 0);
 }
 
 /*====================================================*\
@@ -678,8 +681,12 @@ void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 // allocate InputMethodTypes according to system configuration
 void Init()
 {
+#ifdef KEYBOARD_H
     g_InputMethodTypes.push_back(new InputMethodType_Keyboard);
+#endif
+#ifdef JOYSTICK_H
     g_InputMethodTypes.push_back(new InputMethodType_Joystick);
+#endif
 #ifdef TOUCHSCREEN_H
     g_InputMethodTypes.push_back(new InputMethodType_TouchScreen);
 #endif
@@ -968,7 +975,7 @@ InputMethod* PollInputMethod() noexcept
         return nullptr;
 
     // check that the InputMethodType properly assigned itself as the new InputMethod's Type
-    SDL_assert_release(new_method->Type != nullptr); // InputMethodType did not assign itself as Type for new InputMethod
+    XStd::assert_release(new_method->Type != nullptr); // InputMethodType did not assign itself as Type for new InputMethod
 
     if(!new_method->Type)
         return nullptr;

@@ -19,10 +19,6 @@
  */
 
 
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_rwops.h>
-#include <SDL2/SDL_filesystem.h>
-
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
 #include <IniProcessor/ini_processing.h>

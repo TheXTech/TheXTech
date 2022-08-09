@@ -23,9 +23,9 @@
 #define RENDER_HHHHHH
 
 #ifndef RENDER_CUSTOM
-#   include <SDL2/SDL_stdinc.h>
+#   include "core/std.h"
 #   include "base/render_base.h"
-#   define E_INLINE SDL_FORCE_INLINE
+#   define E_INLINE TXT_FORCE_INLINE
 #   define TAIL
 #else
 #   include "render_types.h"
@@ -170,21 +170,21 @@ E_INLINE void setTargetScreen() TAIL
 
 
 
-SDL_FORCE_INLINE StdPicture LoadPicture(const std::string &path,
+TXT_FORCE_INLINE StdPicture LoadPicture(const std::string &path,
                                         const std::string &maskPath = std::string(),
                                         const std::string &maskFallbackPath = std::string())
 {
     return AbstractRender_t::LoadPicture(path, maskPath, maskFallbackPath);
 }
 
-SDL_FORCE_INLINE StdPicture lazyLoadPicture(const std::string &path,
+TXT_FORCE_INLINE StdPicture lazyLoadPicture(const std::string &path,
                                             const std::string &maskPath = std::string(),
                                             const std::string &maskFallbackPath = std::string())
 {
     return AbstractRender_t::lazyLoadPicture(path, maskPath, maskFallbackPath);
 }
 
-SDL_FORCE_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb)
+TXT_FORCE_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb)
 {
     AbstractRender_t::setTransparentColor(target, rgb);
 }
@@ -202,27 +202,27 @@ E_INLINE void loadTexture(StdPicture &target,
 }
 #endif
 
-SDL_FORCE_INLINE void lazyLoad(StdPicture &target)
+TXT_FORCE_INLINE void lazyLoad(StdPicture &target)
 {
     AbstractRender_t::lazyLoad(target);
 }
 
-SDL_FORCE_INLINE void lazyUnLoad(StdPicture &target)
+TXT_FORCE_INLINE void lazyUnLoad(StdPicture &target)
 {
     AbstractRender_t::lazyUnLoad(target);
 }
 
-SDL_FORCE_INLINE void lazyPreLoad(StdPicture &target)
+TXT_FORCE_INLINE void lazyPreLoad(StdPicture &target)
 {
     AbstractRender_t::lazyPreLoad(target);
 }
 
-SDL_FORCE_INLINE size_t lazyLoadedBytes()
+TXT_FORCE_INLINE size_t lazyLoadedBytes()
 {
     return AbstractRender_t::lazyLoadedBytes();
 }
 
-SDL_FORCE_INLINE void lazyLoadedBytesReset()
+TXT_FORCE_INLINE void lazyLoadedBytesReset()
 {
     AbstractRender_t::lazyLoadedBytesReset();
 }
@@ -399,12 +399,12 @@ E_INLINE void getPixelData(const StdPicture &tx, unsigned char *pixelData) TAIL
 #endif
 
 #ifdef USE_RENDER_BLOCKING
-SDL_FORCE_INLINE bool renderBlocked()
+TXT_FORCE_INLINE bool renderBlocked()
 {
     return AbstractRender_t::renderBlocked();
 }
 
-SDL_FORCE_INLINE void setBlockRender(bool b)
+TXT_FORCE_INLINE void setBlockRender(bool b)
 {
     AbstractRender_t::setBlockRender(b);
 }
@@ -413,17 +413,17 @@ SDL_FORCE_INLINE void setBlockRender(bool b)
 
 #ifdef USE_SCREENSHOTS_AND_RECS
 
-SDL_FORCE_INLINE void makeShot()
+TXT_FORCE_INLINE void makeShot()
 {
     AbstractRender_t::makeShot();
 }
 
-SDL_FORCE_INLINE void toggleGifRecorder()
+TXT_FORCE_INLINE void toggleGifRecorder()
 {
     AbstractRender_t::toggleGifRecorder();
 }
 
-SDL_FORCE_INLINE void processRecorder()
+TXT_FORCE_INLINE void processRecorder()
 {
     AbstractRender_t::processRecorder();
 }

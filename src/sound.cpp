@@ -18,9 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_atomic.h>
-#include <SDL2/SDL_mixer_ext.h>
+#include "core/std.h"
+#include "core/mixer.h"
 
 #include "globals.h"
 #include "global_dirs.h"
@@ -173,7 +172,7 @@ static std::unordered_map<std::string, Music_t> music;
 static std::unordered_map<std::string, SFX_t>   sound;
 
 //! Sounds played by scripts
-static SDL_atomic_t                                extSfxBusy;
+static XStd::atomic_t                              extSfxBusy;
 static std::unordered_map<std::string, Mix_Chunk*> extSfx;
 static std::unordered_map<int, std::string>        extSfxPlaying;
 static void extSfxStopCallback(int channel);
@@ -227,77 +226,21 @@ void InitMixerX()
 {
     int ret;
     const int initFlags = MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3;
-    SDL_AudioSpec obtained;
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 
-    SDL_AtomicSet(&extSfxBusy, 0);
+    XStd::AtomicSet(&extSfxBusy, 0);
 
     if(g_mixerLoaded)
         return;
 
-    pLogDebug("Opening sound (wanted: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
-              g_audioSetup.sampleRate,
-              audio_format_to_string(g_audioSetup.format),
-              g_audioSetup.channels,
-              g_audioSetup.bufferSize);
-    ret = Mix_Init(initFlags);
-
-    if(ret != initFlags)
+    if(MixPlatform_Init())
     {
-        pLogWarning("MixerX: Some modules aren't properly initialized");
-        if((ret & MIX_INIT_MID) != MIX_INIT_MID)
-            pLogWarning("MixerX: Failed to initialize MIDI module");
-        if((ret & MIX_INIT_MOD) != MIX_INIT_MOD)
-            pLogWarning("MixerX: Failed to initialize Tracker music module");
-        if((ret & MIX_INIT_FLAC) != MIX_INIT_FLAC)
-            pLogWarning("MixerX: Failed to initialize FLAC module");
-        if((ret & MIX_INIT_OGG) != MIX_INIT_OGG)
-            pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
-        if((ret & MIX_INIT_OPUS) != MIX_INIT_OPUS)
-            pLogWarning("MixerX: Failed to initialize Opus module");
-        if((ret & MIX_INIT_MP3) != MIX_INIT_MP3)
-            pLogWarning("MixerX: Failed to initialize MP3 module");
+        // Set channel finished callback to handle finished custom SFX
+        Mix_ChannelFinished(&extSfxStopCallback);
+
+        g_mixerLoaded = true;
     }
-
-    ret = Mix_OpenAudio(g_audioSetup.sampleRate,
-                        g_audioSetup.format,
-                        g_audioSetup.channels,
-                        g_audioSetup.bufferSize);
-
-    if(ret < 0)
-    {
-        std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
-        pLogCritical(msg.c_str());
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "Sound opening error", msg);
-        noSound = true;
-    }
-
-    ret = Mix_QuerySpecEx(&obtained);
-    if(ret == 0)
-    {
-        pLogCritical("Failed to call the Mix_QuerySpec: Audio is not open!");
-        s_audioSetupObtained = g_audioSetup;
-    }
-
-    s_audioSetupObtained.sampleRate = obtained.freq;
-    s_audioSetupObtained.format = obtained.format;
-    s_audioSetupObtained.channels = obtained.channels;
-    s_audioSetupObtained.bufferSize = obtained.samples;
-
-    pLogDebug("Sound opened (obtained: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
-              s_audioSetupObtained.sampleRate,
-              audio_format_to_string(s_audioSetupObtained.format),
-              s_audioSetupObtained.channels,
-              s_audioSetupObtained.bufferSize);
-
-    Mix_VolumeMusic(MIX_MAX_VOLUME);
-    Mix_AllocateChannels(maxSfxChannels);
-
-    // Set channel finished callback to handle finished custom SFX
-    Mix_ChannelFinished(&extSfxStopCallback);
-
-    g_mixerLoaded = true;
 }
 
 void QuitMixerX()
@@ -317,11 +260,14 @@ void QuitMixerX()
         auto &s = it.second;
         if(s.chunk)
             Mix_FreeChunk(s.chunk);
+        if(s.chunkOrig)
+            Mix_FreeChunk(s.chunkOrig);
     }
     sound.clear();
     music.clear();
-    Mix_CloseAudio();
-    Mix_Quit();
+    MixPlatform_Quit();
+
+    g_mixerLoaded = false;
 }
 
 static void AddMusic(SoundScope root,
@@ -487,8 +433,7 @@ void SoundPauseAll()
         return;
 
     pLogDebug("Pause all sound");
-    Mix_Pause(-1);
-    Mix_PauseMusic();
+    Mix_PauseAudio(1);
 }
 
 void SoundResumeAll()
@@ -497,8 +442,7 @@ void SoundResumeAll()
         return;
 
     pLogDebug("Resume all sound");
-    Mix_Resume(-1);
-    Mix_ResumeMusic();
+    Mix_PauseAudio(0);
 }
 
 void SoundPauseEngine(int paused)
@@ -527,7 +471,7 @@ static void processPathArgs(std::string &path,
         {
             if(arg.compare(0, 3, "ym=") != 0)
                 continue;
-            *yoshiModeTrack = SDL_atoi(arg.substr(3).c_str());
+            *yoshiModeTrack = XStd::atoi(arg.substr(3).c_str());
         }
     }
 
@@ -544,7 +488,7 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
 
     if(g_curMusic)
     {
-        Mix_HaltMusic();
+        Mix_HaltMusicStream(g_curMusic);
         Mix_FreeMusic(g_curMusic);
         g_curMusic = nullptr;
         g_stats.currentMusic.clear();
@@ -793,9 +737,11 @@ void StopMusic()
 
     pLogDebug("Stopping music");
 
-    Mix_HaltMusic();
     if(g_curMusic)
+    {
+        Mix_HaltMusicStream(g_curMusic);
         Mix_FreeMusic(g_curMusic);
+    }
     g_curMusic = nullptr;
     musicPlaying = false;
     g_stats.currentMusic.clear();
@@ -807,7 +753,8 @@ void FadeOutMusic(int ms)
     if(!musicPlaying || noSound)
         return;
     pLogDebug("Fading out music");
-    Mix_FadeOutMusic(ms);
+    if(g_curMusic)
+        Mix_FadeOutMusicStream(g_curMusic, ms);
     musicPlaying = false;
 }
 
@@ -1300,7 +1247,7 @@ void UnloadExtSounds()
     if(noSound)
         return;
 
-    SDL_AtomicSet(&extSfxBusy, 1);
+    XStd::AtomicSet(&extSfxBusy, 1);
 
     for(auto &f : extSfx)
         Mix_FreeChunk(f.second);
@@ -1308,7 +1255,7 @@ void UnloadExtSounds()
     extSfx.clear();
     extSfxPlaying.clear();
 
-    SDL_AtomicSet(&extSfxBusy, 0);
+    XStd::AtomicSet(&extSfxBusy, 0);
 }
 
 void PlayExtSound(const std::string &path, int loops, int volume)
@@ -1336,11 +1283,11 @@ void PlayExtSound(const std::string &path, int loops, int volume)
 
     if(play_ch >= 0)
     {
-        SDL_AtomicSet(&extSfxBusy, 1);
+        XStd::AtomicSet(&extSfxBusy, 1);
         // Never re-use the same channel!
-        SDL_assert_release(extSfxPlaying.find(play_ch) == extSfxPlaying.end());
+        XStd::assert_release(extSfxPlaying.find(play_ch) == extSfxPlaying.end());
         extSfxPlaying.insert({play_ch, path});
-        SDL_AtomicSet(&extSfxBusy, 0);
+        XStd::AtomicSet(&extSfxBusy, 0);
     }
     else
         pLogWarning("Can't play custom sound %s: %s", Mix_GetError());
@@ -1348,7 +1295,7 @@ void PlayExtSound(const std::string &path, int loops, int volume)
 
 static void extSfxStopCallback(int channel)
 {
-    if(SDL_AtomicGet(&extSfxBusy) == 1)
+    if(XStd::AtomicGet(&extSfxBusy) == 1)
         return; // Do nothing!
 
     auto i = extSfxPlaying.find(channel);
@@ -1361,7 +1308,7 @@ void StopExtSound(const std::string& path)
     if(noSound)
         return;
 
-    SDL_AtomicSet(&extSfxBusy, 1);
+    XStd::AtomicSet(&extSfxBusy, 1);
 
     for(auto i = extSfxPlaying.begin(); i != extSfxPlaying.end();)
     {
@@ -1374,7 +1321,7 @@ void StopExtSound(const std::string& path)
             ++i;
     }
 
-    SDL_AtomicSet(&extSfxBusy, 0);
+    XStd::AtomicSet(&extSfxBusy, 0);
 }
 
 void StopAllExtSounds()
@@ -1382,14 +1329,14 @@ void StopAllExtSounds()
     if(noSound)
         return;
 
-    SDL_AtomicSet(&extSfxBusy, 1);
+    XStd::AtomicSet(&extSfxBusy, 1);
 
     for(auto i = extSfxPlaying.begin(); i != extSfxPlaying.end(); ++i)
         Mix_HaltChannel(i->first);
 
     extSfxPlaying.clear();
 
-    SDL_AtomicSet(&extSfxBusy, 0);
+    XStd::AtomicSet(&extSfxBusy, 0);
 }
 
 void StopAllSounds()
@@ -1397,10 +1344,10 @@ void StopAllSounds()
     if(noSound)
         return;
 
-    SDL_AtomicSet(&extSfxBusy, 1);
+    XStd::AtomicSet(&extSfxBusy, 1);
     Mix_HaltChannel(-1);
     extSfxPlaying.clear();
-    SDL_AtomicSet(&extSfxBusy, 0);
+    XStd::AtomicSet(&extSfxBusy, 0);
 }
 
 #ifdef THEXTECH_ENABLE_AUDIO_FX
@@ -1557,7 +1504,7 @@ void UpdateSoundFX(int recentSection)
     if(noSound || LevelSelect)
         return;
 
-    SDL_assert_release(recentSection >= 0 && recentSection <= maxSections);
+    XStd::assert_release(recentSection >= 0 && recentSection <= maxSections);
     auto &s = s_sectionEffect[recentSection];
 
     s_musicDisableSpcEcho = s.disableSpcEcho;

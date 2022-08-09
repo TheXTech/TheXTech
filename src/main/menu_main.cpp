@@ -18,8 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
+#include "core/std.h"
+
+#ifndef PGE_NO_THREADING
 #include <SDL2/SDL_thread.h>
+#endif
+
 #include <fmt_format_ne.h>
 #include <array>
 
@@ -56,11 +60,13 @@
 
 MainMenuContent g_mainMenu;
 
+#ifndef PGE_NO_THREADING
 static SDL_atomic_t         loading;
 static SDL_atomic_t         loadingProgrss;
 static SDL_atomic_t         loadingProgrssMax;
 
 static SDL_Thread*          loadingThread = nullptr;
+#endif
 
 
 int NumSelectWorld = 0;
@@ -72,9 +78,11 @@ std::vector<SelectWorld_t> SelectBattle;
 
 void initMainMenu()
 {
+#ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loading, 0);
     SDL_AtomicSet(&loadingProgrss, 0);
     SDL_AtomicSet(&loadingProgrssMax, 0);
+#endif
 
     g_mainMenu.mainStartGame = "Start Game";
     g_mainMenu.main1PlayerGame = "1 Player Game";
@@ -214,7 +222,7 @@ void FindWorlds()
         worldRoots.push_back({AppPathManager::userWorldsRootDir(), true});
 
 #ifdef __3DS__
-    for(const std::string& root : AppPathManager.worldPackages())
+    for(const std::string& root : AppPathManager::worldRootDirs())
         worldRoots.push_back({root, false});
 #endif
 
@@ -323,7 +331,9 @@ void FindWorlds()
 
     s_findRecentEpisode();
 
+#ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loading, 0);
+#endif
 }
 
 static int FindLevelsThread(void *)
@@ -529,6 +539,7 @@ bool mainMenuUpdate()
 
         } // No keyboard/Joystick grabbing active
 
+#ifndef PGE_NO_THREADING
         if(SDL_AtomicGet(&loading))
         {
             if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
@@ -536,8 +547,10 @@ bool mainMenuUpdate()
             if(MenuCursor != 0)
                 MenuCursor = 0;
         }
+        else
+#endif
         // Main Menu
-        else if(MenuMode == MENU_MAIN)
+        if(MenuMode == MENU_MAIN)
         {
             if(SharedCursor.Move)
             {
@@ -1261,7 +1274,7 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
-                    SDL_assert_release(IF_INRANGE(MenuCursor, 0, maxSaveSlots - 1));
+                    XStd::assert_release(IF_INRANGE(MenuCursor, 0, maxSaveSlots - 1));
                     int slot = MenuCursor + 1;
 
                     if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
@@ -1568,6 +1581,7 @@ void mainMenuDraw()
     XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[3].w / 2, 576,
             GFX.MenuGFX[3].w, GFX.MenuGFX[3].h, GFX.MenuGFX[3], 0, 0);
 
+#ifndef PGE_NO_THREADING
     if(SDL_AtomicGet(&loading))
     {
         if(SDL_AtomicGet(&loadingProgrssMax) <= 0)
@@ -1578,6 +1592,8 @@ void mainMenuDraw()
             SuperPrint(fmt::format_ne("{0} {1}%", g_mainMenu.loading, progress), 3, 300, 350);
         }
     }
+    else
+#endif
 
     // Main menu
     else if(MenuMode == MENU_MAIN)

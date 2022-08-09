@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
-
 #include <Utils/files.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
@@ -71,7 +69,7 @@ void worldWaitForFade(int waitTicks)
 }
 
 
-static SDL_INLINE int computeStarsShowingPolicy(int ll, int cur)
+static inline int computeStarsShowingPolicy(int ll, int cur)
 {
     // Level individual
     if(ll > Compatibility_t::STARS_UNSPECIFIED)
@@ -119,7 +117,7 @@ void g_playWorldMusic(WorldMusic_t &mus)
     StartMusic(mus.Type);
 }
 
-static SDL_INLINE bool s_worldUpdateMusic(const Location_t &loc)
+static inline bool s_worldUpdateMusic(const Location_t &loc)
 {
     bool ret = false;
 
@@ -139,7 +137,7 @@ static SDL_INLINE bool s_worldUpdateMusic(const Location_t &loc)
     return ret;
 }
 
-static SDL_INLINE double getWPHeight()
+static inline double getWPHeight()
 {
     switch(WorldPlayer[1].Type)
     {
@@ -155,22 +153,22 @@ static SDL_INLINE double getWPHeight()
     }
 }
 
-//static SDL_INLINE double getWorldPlayerX()
+//static inline double getWorldPlayerX()
 //{
 //    return WorldPlayer[1].Location.X;
 //}
 
-//static SDL_INLINE double getWorldPlayerY()
+//static inline double getWorldPlayerY()
 //{
 //    return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight();
 //}
 
-static SDL_INLINE double getWorldPlayerCenterX()
+static inline double getWorldPlayerCenterX()
 {
     return WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2;
 }
 
-static SDL_INLINE double getWorldPlayerCenterY()
+static inline double getWorldPlayerCenterY()
 {
     return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight() / 2;
 }

@@ -18,9 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if 0
 
 #include <Logger/logger.h>
+
+#ifndef __3DS__
 #include <Graphics/graphics_funcs.h>
+#endif
 
 #include "gfx.h"
 
@@ -142,3 +146,5 @@ void FrmMain::freeSystem()
     pLogDebug("<Application closed>");
     CloseLog();
 }
+
+#endif

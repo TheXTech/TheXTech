@@ -40,7 +40,7 @@
 #include "../graphics.h"
 #include "../controls.h"
 
-#include <SDL2/SDL_timer.h>
+#include "core/std.h"
 #include "pge_delay.h"
 
 

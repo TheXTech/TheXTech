@@ -19,9 +19,10 @@
  */
 
 
-#include <SDL2/SDL_stdinc.h>
 #include <fmt_format_ne.h>
 #include <IniProcessor/ini_processing.h>
+
+#include "core/std.h"
 
 #include "gameplay_timer.h"
 #include "graphics.h"
@@ -36,15 +37,15 @@ std::string GameplayTimer::formatTime(int64_t t)
 {
     std::string displayTime;
 
-    int64_t realMiliseconds = (int64_t)SDL_floor(double(t) * 15.6);
+    int64_t realMiliseconds = (int64_t)XStd::floor(double(t) * 15.6);
     int miliseconds = realMiliseconds % 1000;
-    int64_t realSeconds = (int64_t)SDL_floor(double(realMiliseconds) / 1000.0);
+    int64_t realSeconds = (int64_t)XStd::floor(double(realMiliseconds) / 1000.0);
     int seconds = realSeconds % 60;
-    int64_t realMinutes = (int64_t)SDL_floor(double(realSeconds) / 60.0);
+    int64_t realMinutes = (int64_t)XStd::floor(double(realSeconds) / 60.0);
     int minutes = realMinutes % 60;
-    int64_t realHours = (int64_t)SDL_floor(double(realMinutes) / 60.0);
+    int64_t realHours = (int64_t)XStd::floor(double(realMinutes) / 60.0);
     int hours = realHours % 24;
-    int days = (int)SDL_floor(realHours / 24.0);
+    int days = (int)XStd::floor(realHours / 24.0);
 
     if(days >= 1)
         displayTime = fmt::sprintf_ne("%02d:%02d:%02d:%02d.%03d", days, hours, minutes, seconds, miliseconds);

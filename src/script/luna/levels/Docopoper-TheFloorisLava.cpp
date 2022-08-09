@@ -25,6 +25,8 @@
  *  Author:     Docopoper                        *
  *************************************************/
 
+#include "core/std.h"
+
 #include "globals.h"
 #include "../lunaplayer.h"
 #include "../lunalayer.h"
@@ -57,13 +59,13 @@ void TheFloorisLavaCode()
     if(!demo)
         return;
 
-    SDL_assert_release(layerSecretExit);
-    SDL_assert_release(layerSinUpDown);
-    SDL_assert_release(layerSinRightLeft);
-    SDL_assert_release(layerSinUpDownAlternate);
-    SDL_assert_release(layerSinUpDownWeak);
-    SDL_assert_release(layerSinUpDownWeakAlt);
-    SDL_assert_release(layerSinRightLeftAlternate);
+    XStd::assert_release(layerSecretExit);
+    XStd::assert_release(layerSinUpDown);
+    XStd::assert_release(layerSinRightLeft);
+    XStd::assert_release(layerSinUpDownAlternate);
+    XStd::assert_release(layerSinUpDownWeak);
+    XStd::assert_release(layerSinUpDownWeakAlt);
+    XStd::assert_release(layerSinRightLeftAlternate);
 
     // The player has touched the ground, trigger the fail sequence
     if(demo->Slippy && secretExitFailedStage == 0)

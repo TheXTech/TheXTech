@@ -36,7 +36,7 @@
 EventsSDL::EventsSDL() :
     AbstractEvents_t()
 {
-    SDL_memset(&m_event, 0, sizeof(SDL_Event));
+    XStd::memset(&m_event, 0, sizeof(SDL_Event));
 }
 
 EventsSDL::~EventsSDL()

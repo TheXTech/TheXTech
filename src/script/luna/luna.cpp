@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/std.h"
+
 #include "luna.h"
 #include "autocode.h"
 #include "autocode_manager.h"
@@ -34,7 +36,7 @@
 #include "globals.h"
 
 
-SDL_FORCE_INLINE bool lunaAllowed()
+TXT_FORCE_INLINE bool lunaAllowed()
 {
     if(g_compatibility.luna_enable_engine == Compatibility_t::LUNA_ENGINE_UNSPECIFIED)
         return gLunaEnabledGlobally;
