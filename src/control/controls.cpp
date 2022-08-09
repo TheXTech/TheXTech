@@ -1047,8 +1047,7 @@ void DeleteInputMethod(InputMethod* method)
     if(!method)
         return;
 
-    std::vector<InputMethod*>::iterator loc
-        = std::find(g_InputMethods.begin(), g_InputMethods.end(), method);
+    std::vector<InputMethod*>::iterator loc = std::find(g_InputMethods.begin(), g_InputMethods.end(), method);
 
     while(loc != g_InputMethods.end())
     {
@@ -1178,12 +1177,11 @@ void RenderTouchControls()
         if(!method)
             continue;
 
-        InputMethod_TouchScreen* m = dynamic_cast<InputMethod_TouchScreen*>(method);
-
+        auto* m = dynamic_cast<InputMethod_TouchScreen*>(method);
         if(m)
         {
             active_touchscreen = m;
-            player_no = i + 1;
+            player_no = (int)i + 1;
             break;
         }
     }
@@ -1202,8 +1200,7 @@ void RenderTouchControls()
             if(!type)
                 continue;
 
-            InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
-
+            auto* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
             if(t)
             {
                 touchscreen = t;
@@ -1215,13 +1212,6 @@ void RenderTouchControls()
     if(!touchscreen)
         return;
 
-    // This is also called within Controls::Update.
-    //   We also need to call here, because of cases
-    //   such as GameThing where Controls::Update is
-    //   not called.
-    //   Will result in duplicated calls many frames,
-    //   but this is not a problem.
-    touchscreen->m_controller.update();
     touchscreen->m_controller.render(player_no);
 #endif // #ifdef TOUCHSCREEN_H
 }
@@ -1236,7 +1226,7 @@ void UpdateTouchScreenSize()
         if(!type)
             continue;
 
-        InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
+        auto* t = dynamic_cast<InputMethodType_TouchScreen*>(type);
 
         if(t)
         {

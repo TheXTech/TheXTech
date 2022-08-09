@@ -1269,6 +1269,7 @@ void UpdateMacro()
                     XEvents::doEvents();
 
                 speedRun_tick();
+                Controls::Update();
                 UpdateGraphics();
                 UpdateSound();
                 BlockFrames();
