@@ -1581,7 +1581,7 @@ InputMethod_TouchScreen::~InputMethod_TouchScreen()
 // based on current device input. Return false if device lost.
 bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t& m, EditorControls_t& e, HotkeysPressed_t& h)
 {
-    InputMethodType_TouchScreen* t = dynamic_cast<InputMethodType_TouchScreen*>(this->Type);
+    auto* t = dynamic_cast<InputMethodType_TouchScreen*>(this->Type);
 
     if(!t)
         return false;
