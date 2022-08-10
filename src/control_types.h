@@ -75,7 +75,7 @@ struct EditorControls_t
 
     bool NextSection = false;
     bool PrevSection = false;
- 
+
     bool SwitchScreens = false;
     bool TestPlay = false;
 };
