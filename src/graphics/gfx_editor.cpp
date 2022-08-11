@@ -45,9 +45,9 @@ void DrawEditorLevel(int Z)
     Location_t tempLocation;
     int S = curSection; // Level section to display
 
-// #ifdef __3DS__
-//     XRender::setLayer(2);
-// #endif
+#ifdef __3DS__
+    XRender::setTargetLayer(2);
+#endif
     if(Z == 1)
         BlockFlash += 1;
 
@@ -242,9 +242,9 @@ void DrawEditorLevel(int Z)
         }
     }
 
-// #ifdef __3DS__
-//     XRender::setLayer(0);
-// #endif
+#ifdef __3DS__
+    XRender::setTargetLayer(0);
+#endif
     // render section boundary
     if(LevelEditor)
     {
@@ -276,9 +276,9 @@ void DrawEditorLevel(int Z)
         }
     }
 
-// #ifdef __3DS__
-//     XRender::setLayer(3);
-// #endif
+#ifdef __3DS__
+    XRender::setTargetLayer(3);
+#endif
 
     // In-Editor message box preview
     if(editorScreen.active && !MessageText.empty())

@@ -1574,6 +1574,10 @@ void mainMenuDraw()
     if(MenuMode != MENU_1PLAYER_GAME && MenuMode != MENU_2PLAYER_GAME && MenuMode != MENU_BATTLE_MODE && MenuMode != MENU_EDITOR)
         worldCurs = 0;
 
+#ifdef __3DS__
+    XRender::setTargetLayer(1);
+#endif
+
     XRender::renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
     XRender::renderTexture(ScreenW / 2 - GFX.MenuGFX[2].w / 2, 70,
             GFX.MenuGFX[2].w, GFX.MenuGFX[2].h, GFX.MenuGFX[2], 0, 0);

@@ -71,6 +71,7 @@ int s_viewport_offset_y_bak = 0;
 bool s_viewport_offset_ignore = false;
 
 int s_tex_w = 0;
+int s_tex_show_w = 0;
 int s_tex_h = 0;
 int s_screen_phys_x = 0;
 int s_screen_phys_y = 0;
@@ -131,6 +132,8 @@ static void s_createSceneTargets()
         if(s_single_layer_mode)
             break;
     }
+
+    s_tex_show_w = s_tex_w - MAX_3D_OFFSET;
 }
 
 static bool s_freeTextureMem() // make it take an amount of memory, someday.....
@@ -322,8 +325,7 @@ void repaint()
     float scale_y = (float)s_screen_phys_h / tex_h;
 
     constexpr int shift = MAX_3D_OFFSET / 2;
-    constexpr double bg_shift = shift;
-    constexpr double mid_shift = shift * .4;
+    constexpr double shift_i[] = {shift, shift * 0.4, 0, shift * -0.4};
 
     s_depth_slider = osGet3DSliderState();
 
@@ -332,29 +334,38 @@ void repaint()
     {
         C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);
-        C2D_DrawImageAt(s_layer_ims[0], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
-        if(!s_single_layer_mode)
+        for(int layer = 0; layer < 4; layer++)
         {
-            C2D_DrawImageAt(s_layer_ims[1], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
-            C2D_DrawImageAt(s_layer_ims[2], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
-            C2D_DrawImageAt(s_layer_ims[3], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+            C2D_DrawImage_Custom(s_layer_ims[layer],
+                s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                shift, 0, s_tex_show_w, s_tex_h,
+                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+
+            if(s_single_layer_mode)
+                break;
         }
     }
     else
     {
         C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);
-        C2D_DrawImageAt(s_layer_ims[0], s_screen_phys_x - (int)(bg_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
-        C2D_DrawImageAt(s_layer_ims[1], s_screen_phys_x - (int)(mid_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
-        C2D_DrawImageAt(s_layer_ims[2], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
-        C2D_DrawImageAt(s_layer_ims[3], s_screen_phys_x + (int)(mid_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+        for(int layer = 0; layer < 4; layer++)
+        {
+            C2D_DrawImage_Custom(s_layer_ims[layer],
+                s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                shift + (int)(shift_i[layer] * s_depth_slider), 0, s_tex_show_w, s_tex_h,
+                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+        }
 
         C2D_TargetClear(s_right_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_right_screen);
-        C2D_DrawImageAt(s_layer_ims[0], s_screen_phys_x + (int)(bg_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
-        C2D_DrawImageAt(s_layer_ims[1], s_screen_phys_x + (int)(mid_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
-        C2D_DrawImageAt(s_layer_ims[2], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
-        C2D_DrawImageAt(s_layer_ims[3], s_screen_phys_x - (int)(mid_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+        for(int layer = 0; layer < 4; layer++)
+        {
+            C2D_DrawImage_Custom(s_layer_ims[layer],
+                s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                shift - (int)(shift_i[layer] * s_depth_slider), 0, s_tex_show_w, s_tex_h,
+                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+        }
     }
     s_current_frame ++;
     g_in_frame = false;
@@ -423,15 +434,17 @@ void updateViewport()
             break;
     }
 
+    int ScreenW_Show = ScreenW - MAX_3D_OFFSET * 2;
+
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
     {
         int res_h = s_hardware_h;
-        int res_w = ScreenW * res_h / ScreenH;
+        int res_w = ScreenW_Show * res_h / ScreenH;
 
-        if(res_w > s_hardware_w + MAX_3D_OFFSET)
+        if(res_w > s_hardware_w)
         {
-            res_w = s_hardware_w + MAX_3D_OFFSET;
-            res_h = ScreenH * res_w / ScreenW;
+            res_w = s_hardware_w;
+            res_h = ScreenH * res_w / ScreenW_Show;
         }
 
         s_screen_phys_w = res_w;
@@ -439,31 +452,31 @@ void updateViewport()
     }
     else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
     {
-        s_screen_phys_w = ScreenW / 2;
+        s_screen_phys_w = ScreenW_Show / 2;
         s_screen_phys_h = ScreenH / 2;
     }
     else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
     {
-        s_screen_phys_w = ScreenW;
+        s_screen_phys_w = ScreenW_Show;
         s_screen_phys_h = ScreenH;
     }
     else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
     {
-        s_screen_phys_w = ScreenW / 4;
+        s_screen_phys_w = ScreenW_Show / 4;
         s_screen_phys_h = ScreenH / 4;
     }
     else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
     {
-        s_screen_phys_w = ScreenW / 2;
+        s_screen_phys_w = ScreenW_Show / 2;
         s_screen_phys_h = ScreenH / 2;
-        while(s_screen_phys_w <= s_hardware_w + MAX_3D_OFFSET && s_screen_phys_h <= s_hardware_h)
+        while(s_screen_phys_w <= s_hardware_w && s_screen_phys_h <= s_hardware_h)
         {
-            s_screen_phys_w += ScreenW / 2;
+            s_screen_phys_w += ScreenW_Show / 2;
             s_screen_phys_h += ScreenH / 2;
         }
-        if(s_screen_phys_w > ScreenW / 2)
+        if(s_screen_phys_w > ScreenW_Show / 2)
         {
-            s_screen_phys_w -= ScreenW / 2;
+            s_screen_phys_w -= ScreenW_Show / 2;
             s_screen_phys_h -= ScreenH / 2;
         }
     }
@@ -775,29 +788,55 @@ void deleteTexture(StdPicture &tx, bool lazyUnload)
     }
 }
 
+inline int ROUNDDIV2(int x)
+{
+    return (x<0)?(x - 1) / 2:x / 2;
+}
+
+inline float ROUNDDIV2(float x)
+{
+    return std::nearbyintf(std::roundf(x) / 2.0f);
+}
+
+inline float ROUNDDIV2(double x)
+{
+    return std::nearbyintf(std::roundf((float)x) / 2.0f);
+}
+
+inline float FLOORDIV2(float x)
+{
+    return std::floor(x / 2.0f);
+}
+
 void renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
+    int x_real = ROUNDDIV2(x);
+    int w_real = ROUNDDIV2(x + w) - x_real;
+
+    int y_real = ROUNDDIV2(y);
+    int h_real = ROUNDDIV2(y + h) - y_real;
+
     uint32_t clr = C2D_Color32f(red, green, blue, alpha);
 
     // Filled is always True in this game
     if(filled)
-        C2D_DrawRectSolid(x / 2 + s_viewport_offset_x,
-                          y / 2 + s_viewport_offset_y,
-                          0, w / 2, h / 2, clr);
+        C2D_DrawRectSolid(x_div + s_viewport_offset_x,
+                          y_div + s_viewport_offset_y,
+                          0, w_div, h_div, clr);
     else
     {
-        C2D_DrawRectangle(x / 2 + s_viewport_offset_x,
-                          y / 2 + s_viewport_offset_y,
-                          0, 1, h / 2, clr, clr, clr, clr);
-        C2D_DrawRectangle(x / 2 + s_viewport_offset_x+w / 2 - 1,
-                          y / 2 + s_viewport_offset_y,
-                          0, 1, h / 2, clr, clr, clr, clr);
-        C2D_DrawRectangle(x / 2 + s_viewport_offset_x,
-                          y / 2 + s_viewport_offset_y,
-                          0, w / 2, 1, clr, clr, clr, clr);
-        C2D_DrawRectangle(x / 2 + s_viewport_offset_x,
-                          y / 2 + s_viewport_offset_y+h / 2 - 1,
-                          0, w / 2, 1, clr, clr, clr, clr);
+        C2D_DrawRectangle(x_div + s_viewport_offset_x,
+                          y_div + s_viewport_offset_y,
+                          0, 1, h_div, clr, clr, clr, clr);
+        C2D_DrawRectangle(x_div + s_viewport_offset_x + w_div - 1,
+                          y_div + s_viewport_offset_y,
+                          0, 1, h_div, clr, clr, clr, clr);
+        C2D_DrawRectangle(x_div + s_viewport_offset_x,
+                          y_div + s_viewport_offset_y,
+                          0, w_div, 1, clr, clr, clr, clr);
+        C2D_DrawRectangle(x_div + s_viewport_offset_x,
+                          y_div + s_viewport_offset_y + h_div - 1,
+                          0, w_div, 1, clr, clr, clr, clr);
     }
 }
 
@@ -817,26 +856,6 @@ void renderCircleHole(int cx, int cy,
                       int radius,
                       float red, float green, float blue, float alpha)
 {
-}
-
-inline int ROUNDDIV2(int x)
-{
-    return (x<0)?(x - 1) / 2:x / 2;
-}
-
-inline float ROUNDDIV2(float x)
-{
-    return std::nearbyintf(std::roundf(x) / 2.0f);
-}
-
-inline float ROUNDDIV2(double x)
-{
-    return std::nearbyintf(std::roundf((float)x) / 2.0f);
-}
-
-inline float FLOORDIV2(float x)
-{
-    return std::floor(x / 2.0f);
 }
 
 inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,

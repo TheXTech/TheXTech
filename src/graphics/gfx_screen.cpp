@@ -26,6 +26,9 @@
 #include "../load_gfx.h"
 #include "../core/window.h"
 
+#include "../compat.h"
+#include "config.h"
+#include "core/render.h"
 
 void SetScreenType()
 {
