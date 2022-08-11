@@ -1575,7 +1575,7 @@ void mainMenuDraw()
         worldCurs = 0;
 
 #ifdef __3DS__
-    XRender::setTargetLayer(1);
+    XRender::setTargetLayer(2);
 #endif
 
     XRender::renderTexture(0, 0, GFX.MenuGFX[1].w, GFX.MenuGFX[1].h, GFX.MenuGFX[1], 0, 0);
