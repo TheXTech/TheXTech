@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Linux & Windows CI
 
 on:
   push:
@@ -45,7 +45,8 @@ jobs:
           }
         - {
             name: "Ubuntu 18.04 x86_64",
-            os: ubuntu-18.04,
+            os: ubuntu-latest,
+            container: "ubuntu:18.04",
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
             generator: "Ninja",
