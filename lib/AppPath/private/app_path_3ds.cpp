@@ -66,9 +66,6 @@ bool mountRomfsFile(const char* path, const char* mount_label)
 // find additional user worlds packaged in .romfs files
 void findUserWorlds()
 {
-    s_worldRootDirs.push_back(AppPathP::appDirectory() + "worlds/");
-    s_worldRootDirs.push_back(AppPathP::userDirectory() + "worlds/");
-
     std::vector<std::string> romfsFiles;
     static const std::vector<std::string> romfsExt = {".romfs"};
 
@@ -127,7 +124,7 @@ std::string AppPathP::appDirectory()
 
 std::string AppPathP::userDirectory()
 {
-    return "/3ds/thextech";
+    return "/3ds/thextech/";
 }
 
 std::string AppPathP::assetsRoot()

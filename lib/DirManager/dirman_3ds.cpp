@@ -37,6 +37,10 @@ DEALINGS IN THE SOFTWARE.
 void DirMan::DirMan_private::setPath(const std::string &dirPath)
 {
     m_dirPath = dirPath;
+
+    if(dirPath.size() > 2 && dirPath[dirPath.size() - 2] == ':')
+        return;
+
     delEnd(m_dirPath, '/');
 }
 
