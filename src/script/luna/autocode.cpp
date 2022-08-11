@@ -868,6 +868,16 @@ void Autocode::Do(bool init)
             break;
         }
 
+        case AT_RunCheat:
+        {
+            if(this->Length <= 1) // Play once when delay runs out
+            {
+                cheats_setBuffer(GetS(MyString));
+                this->expire();
+            }
+            break;
+        }
+
         case AT_DeleteEventsFrom:
         {
             gAutoMan.ForceExpire((int)Target);
@@ -1505,6 +1515,7 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"OnCustomCheat", AT_OnCustomCheat},
     {"OnPlayerMem", AT_OnPlayerMem},
     {"OnGlobalMem", AT_OnGlobalMem},
+    {"RunCheat", AT_RunCheat},
 
     {"SetVar", AT_SetVar},
     {"LoadPlayerVar", AT_LoadPlayerVar},

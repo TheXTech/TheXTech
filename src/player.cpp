@@ -105,7 +105,7 @@ static void setupCheckpoints()
 {
     if(Checkpoint != FullFileName || Checkpoint.empty())
     {
-        if(StartLevel != FileNameFull)
+        if(StartLevel != FileNameFull && !LevelSelect)
         {
             pLogDebug("Clear check-points at SetupPlayers()");
             Checkpoint.clear();

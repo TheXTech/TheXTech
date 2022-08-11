@@ -411,6 +411,10 @@ int PauseGame(PauseCode code, int plr)
                         PauseGame(PauseCode::Reconnect, 0);
                 }
             }
+
+            if(QuickReconnectScreen::g_active)
+                QuickReconnectScreen::Logic();
+
             UpdateSound();
             BlockFrames();
             UpdateEffects();
