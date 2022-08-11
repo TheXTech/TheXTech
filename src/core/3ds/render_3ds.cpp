@@ -292,6 +292,8 @@ void setTargetScreen()
 
 void setTargetLayer(int layer)
 {
+    s_ensureInFrame();
+
     if(!s_single_layer_mode)
         C2D_SceneBegin(s_layer_targets[layer]);
 }
@@ -812,11 +814,11 @@ inline float FLOORDIV2(float x)
 
 void renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
-    int x_real = ROUNDDIV2(x);
-    int w_real = ROUNDDIV2(x + w) - x_real;
+    int x_div = ROUNDDIV2(x);
+    int w_div = ROUNDDIV2(x + w) - x_div;
 
-    int y_real = ROUNDDIV2(y);
-    int h_real = ROUNDDIV2(y + h) - y_real;
+    int y_div = ROUNDDIV2(y);
+    int h_div = ROUNDDIV2(y + h) - y_div;
 
     uint32_t clr = C2D_Color32f(red, green, blue, alpha);
 
