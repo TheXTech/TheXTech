@@ -419,7 +419,7 @@ void UpdateGraphics(bool skipRepaint)
 //        If LevelEditor = True Or MagicHand = True Then
 //            frmLevelWindow.vScreen(1).AutoRedraw = True
 //        Else
-//            frmMain.AutoRedraw = True
+//            XRender::AutoRedraw = True
 //        End If
 //    End If
 
@@ -576,6 +576,10 @@ void UpdateGraphics(bool skipRepaint)
         ClearBuffer = false;
         XRender::clearBuffer();
     }
+
+#ifdef __3DS__
+        XRender::setTargetLayer(0);
+#endif
 
     if(SingleCoop == 2)
         numScreens = 2;
@@ -755,6 +759,10 @@ void UpdateGraphics(bool skipRepaint)
             }
 //        End If
         }
+
+#ifdef __3DS__
+        XRender::setTargetLayer(1);
+#endif
 
         // save a vector of all the onscreen BGOs for use at multiple places
         TreeResult_Sentinel<BackgroundRef_t> _screenBackgrounds = treeBackgroundQuery(
@@ -974,6 +982,10 @@ void UpdateGraphics(bool skipRepaint)
                                       0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
             }
         }
+
+#ifdef __3DS__
+        XRender::setTargetLayer(2);
+#endif
 
 //        For A = 1 To numNPCs 'Display NPCs that should be behind blocks
         For(A, 1, numNPCs) // Display NPCs that should be behind blocks
@@ -2212,6 +2224,10 @@ void UpdateGraphics(bool skipRepaint)
             // And don't draw when many players at the same screen
             if(numPlayers == 1 || numScreens != 1)
                 g_levelVScreenFader[Z].draw();
+
+#ifdef __3DS__
+        XRender::setTargetLayer(3);
+#endif
 
     //    'Interface
     //            B = 0

@@ -31,6 +31,7 @@
 
 #include "globals.h"
 #include "core/window.h"
+#include "core/render.h"
 
 
 namespace XWindow
@@ -56,7 +57,7 @@ void setWindowSize(int /*w*/, int /*h*/) {}
 
 void getWindowSize(int *w, int *h)
 {
-    *w = 800;
+    *w = 800 + XRender::MAX_3D_OFFSET * 2;
     *h = 480;
 }
 

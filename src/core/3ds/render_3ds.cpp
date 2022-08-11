@@ -31,6 +31,7 @@
 #include <Logger/logger.h>
 
 #include "globals.h"
+#include "video.h"
 #include "core/render.h"
 
 // #include "core/3ds/n3ds-clock.h"
@@ -58,7 +59,6 @@ bool s_single_layer_mode = false;
 
 constexpr int s_hardware_w = 400;
 constexpr int s_hardware_h = 240;
-constexpr int s_max_3d_offset = 20;
 
 int s_viewport_x = 0;
 int s_viewport_y = 0;
@@ -69,6 +69,13 @@ int s_viewport_offset_y = 0;
 int s_viewport_offset_x_bak = 0;
 int s_viewport_offset_y_bak = 0;
 bool s_viewport_offset_ignore = false;
+
+int s_tex_w = 0;
+int s_tex_h = 0;
+int s_screen_phys_x = 0;
+int s_screen_phys_y = 0;
+int s_screen_phys_w = 0;
+int s_screen_phys_h = 0;
 
 int s_num_textures_loaded = 0;
 int s_num_big_pictures_loaded = 0;
@@ -94,18 +101,21 @@ static void s_createSceneTargets()
 {
     s_destroySceneTargets();
 
-    uint16_t tex_w = ScreenW / 2;
-    uint16_t tex_h = ScreenH / 2;
+    s_tex_w = ScreenW / 2;
+    s_tex_h = ScreenH / 2;
 
-    uint16_t mem_w = (tex_w <= 256) ? 256 : 512;
-    uint16_t mem_h = (tex_h <= 256) ? 256 : 512;
+    uint16_t mem_w = (s_tex_w <= 256) ? 256 : 512;
+    uint16_t mem_h = (s_tex_h <= 256) ? 256 : 512;
 
-    if(tex_w > mem_w)
-        tex_w = mem_w;
-    if(tex_h > mem_h)
-        tex_h = mem_h;
+    if(s_tex_w > 512)
+        mem_w = 1024;
 
-    if(mem_w == 512 && mem_h == 512)
+    if(s_tex_w > mem_w)
+        s_tex_w = mem_w;
+    if(s_tex_h > mem_h)
+        s_tex_h = mem_h;
+
+    if(mem_w >= 512 && mem_h == 512)
         s_single_layer_mode = true;
     else
         s_single_layer_mode = false;
@@ -114,7 +124,7 @@ static void s_createSceneTargets()
     {
         C3D_TexInitVRAM(&s_layer_texs[i], mem_w, mem_h, GPU_RGBA8);
         s_layer_targets[i] = C3D_RenderTargetCreateFromTex(&s_layer_texs[i], GPU_TEXFACE_2D, 0, GPU_RB_DEPTH24_STENCIL8);
-        s_layer_subtexs[i] = {tex_w, tex_h, 0.0, 1.0, (float)((double)tex_w/(double)mem_w), 1.0f - (float)((double)tex_h/(double)mem_h)};
+        s_layer_subtexs[i] = {(uint16_t)s_tex_w, (uint16_t)s_tex_h, 0.0, 1.0, (float)((double)s_tex_w/(double)mem_w), 1.0f - (float)((double)s_tex_h/(double)mem_h)};
         s_layer_ims[i].tex = &s_layer_texs[i];
         s_layer_ims[i].subtex = &s_layer_subtexs[i];
 
@@ -230,7 +240,7 @@ bool init()
     // 3ds libs
     gfxInitDefault();
 
-    gfxSet3D(false); // Enable stereoscopic 3D
+    gfxSet3D(true); // Enable stereoscopic 3D
 
     C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
     C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
@@ -242,8 +252,6 @@ bool init()
     s_right_screen = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
     s_bottom_screen = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
     // bottom = right;
-
-    s_createSceneTargets();
 
     s_viewport_x = s_viewport_y = 0;
     updateViewport();
@@ -277,7 +285,7 @@ void setTargetScreen()
 {
 }
 
-void setLayer(int layer)
+void setTargetLayer(int layer)
 {
     if(!s_single_layer_mode)
         C2D_SceneBegin(s_layer_targets[layer]);
@@ -310,10 +318,10 @@ void repaint()
     int tex_w = ScreenW / 2;
     int tex_h = ScreenH / 2;
 
-    int base_off_x = s_hardware_w / 2 - tex_w / 2;
-    int base_off_y = s_hardware_h / 2 - tex_h / 2;
+    float scale_x = (float)s_screen_phys_w / tex_w;
+    float scale_y = (float)s_screen_phys_h / tex_h;
 
-    constexpr int shift = s_max_3d_offset / 2;
+    constexpr int shift = MAX_3D_OFFSET / 2;
     constexpr double bg_shift = shift;
     constexpr double mid_shift = shift * .4;
 
@@ -324,29 +332,29 @@ void repaint()
     {
         C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);
-        C2D_DrawImageAt(s_layer_ims[0], base_off_x - shift, base_off_y, 0);
+        C2D_DrawImageAt(s_layer_ims[0], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
         if(!s_single_layer_mode)
         {
-            C2D_DrawImageAt(s_layer_ims[1], base_off_x - shift, base_off_y, 0);
-            C2D_DrawImageAt(s_layer_ims[2], base_off_x - shift, base_off_y, 0);
-            C2D_DrawImageAt(s_layer_ims[3], base_off_x - shift, base_off_y, 0);
+            C2D_DrawImageAt(s_layer_ims[1], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+            C2D_DrawImageAt(s_layer_ims[2], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+            C2D_DrawImageAt(s_layer_ims[3], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
         }
     }
     else
     {
         C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);
-        C2D_DrawImageAt(s_layer_ims[0], base_off_x - shift - (int)(bg_shift * s_depth_slider), base_off_y, 0);
-        C2D_DrawImageAt(s_layer_ims[1], base_off_x - shift - (int)(mid_shift * s_depth_slider), base_off_y, 0);
-        C2D_DrawImageAt(s_layer_ims[2], base_off_x - shift, base_off_y, 0);
-        C2D_DrawImageAt(s_layer_ims[3], base_off_x - shift + (int)(mid_shift * s_depth_slider), base_off_y, 0);
+        C2D_DrawImageAt(s_layer_ims[0], s_screen_phys_x - (int)(bg_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+        C2D_DrawImageAt(s_layer_ims[1], s_screen_phys_x - (int)(mid_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+        C2D_DrawImageAt(s_layer_ims[2], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+        C2D_DrawImageAt(s_layer_ims[3], s_screen_phys_x + (int)(mid_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
 
         C2D_TargetClear(s_right_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_right_screen);
-        C2D_DrawImageAt(s_layer_ims[0], base_off_x - shift + (int)(bg_shift * s_depth_slider), base_off_y, 0);
-        C2D_DrawImageAt(s_layer_ims[1], base_off_x - shift + (int)(mid_shift * s_depth_slider), base_off_y, 0);
-        C2D_DrawImageAt(s_layer_ims[2], base_off_x - shift, 0, 0);
-        C2D_DrawImageAt(s_layer_ims[3], base_off_x - shift - (int)(mid_shift * s_depth_slider), base_off_y, 0);
+        C2D_DrawImageAt(s_layer_ims[0], s_screen_phys_x + (int)(bg_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+        C2D_DrawImageAt(s_layer_ims[1], s_screen_phys_x + (int)(mid_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+        C2D_DrawImageAt(s_layer_ims[2], s_screen_phys_x, s_screen_phys_y, 0, nullptr, scale_x, scale_y);
+        C2D_DrawImageAt(s_layer_ims[3], s_screen_phys_x - (int)(mid_shift * s_depth_slider), s_screen_phys_y, 0, nullptr, scale_x, scale_y);
     }
     s_current_frame ++;
     g_in_frame = false;
@@ -371,32 +379,97 @@ void cancelFrame()
 
     s_current_frame ++;
     g_in_frame = false;
-
-    C3D_FrameEnd(0);
 }
 
 void mapToScreen(int x, int y, int *dx, int *dy)
 {
-    int base_off_x = s_hardware_w / 2 - ScreenW / 4;
-    int base_off_y = s_hardware_h / 2 - ScreenH / 4;
+    // lower screen to upper screen conversion
+    x += 40;
 
-    *dx = x - base_off_x;
-    *dy = y - base_off_y;
+    *dx = (x - s_screen_phys_x) * ScreenW / s_screen_phys_w;
+    *dy = (y - s_screen_phys_y) * ScreenH / s_screen_phys_h;
 }
 
 void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
 {
-    int base_off_x = s_hardware_w / 2 - ScreenW / 4;
-    int base_off_y = s_hardware_h / 2 - ScreenH / 4;
-
-    *window_x = scr_x + base_off_x;
-    *window_y = scr_y + base_off_y;
+    *window_x = (scr_x * s_screen_phys_w / ScreenW) + s_screen_phys_x;
+    *window_y = (scr_y * s_screen_phys_h / ScreenH) + s_screen_phys_y;
 }
 
 void updateViewport()
 {
+    int tex_w = ScreenW / 2;
+    if(tex_w > 1024)
+        tex_w = 1024;
+
+    int tex_h = ScreenH / 2;
+    if(tex_h > 512)
+        tex_h = 512;
+
+    if(tex_w != s_tex_w || tex_h != s_tex_h)
+        s_createSceneTargets();
+
     resetViewport();
     offsetViewport(0, 0);
+
+    GPU_TEXTURE_FILTER_PARAM filter = (g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        ? GPU_LINEAR
+        : GPU_NEAREST;
+
+    for(int layer = 0; layer < 4; layer++)
+    {
+        C3D_TexSetFilter(&s_layer_texs[layer], filter, filter);
+        if(s_single_layer_mode)
+            break;
+    }
+
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
+    {
+        int res_h = s_hardware_h;
+        int res_w = ScreenW * res_h / ScreenH;
+
+        if(res_w > s_hardware_w + MAX_3D_OFFSET)
+        {
+            res_w = s_hardware_w + MAX_3D_OFFSET;
+            res_h = ScreenH * res_w / ScreenW;
+        }
+
+        s_screen_phys_w = res_w;
+        s_screen_phys_h = res_h;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
+    {
+        s_screen_phys_w = ScreenW / 2;
+        s_screen_phys_h = ScreenH / 2;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+    {
+        s_screen_phys_w = ScreenW;
+        s_screen_phys_h = ScreenH;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+    {
+        s_screen_phys_w = ScreenW / 4;
+        s_screen_phys_h = ScreenH / 4;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+    {
+        s_screen_phys_w = ScreenW / 2;
+        s_screen_phys_h = ScreenH / 2;
+        while(s_screen_phys_w <= s_hardware_w + MAX_3D_OFFSET && s_screen_phys_h <= s_hardware_h)
+        {
+            s_screen_phys_w += ScreenW / 2;
+            s_screen_phys_h += ScreenH / 2;
+        }
+        if(s_screen_phys_w > ScreenW / 2)
+        {
+            s_screen_phys_w -= ScreenW / 2;
+            s_screen_phys_h -= ScreenH / 2;
+        }
+    }
+
+    s_screen_phys_x = s_hardware_w / 2 - s_screen_phys_w / 2;
+    s_screen_phys_y = s_hardware_h / 2 - s_screen_phys_h / 2;
 }
 
 void resetViewport()

@@ -183,6 +183,11 @@ void UpdateGraphics2(bool skipRepaint)
 //    {
 //        XRender::renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
 //    }
+
+    #ifdef __3DS__
+            XRender::setTargetLayer(0);
+    #endif
+
     XRender::clearBuffer();
 
 //    if(TakeScreen == true)
@@ -385,6 +390,10 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
+#ifdef __3DS__
+        XRender::setTargetLayer(3);
+#endif
+
         DrawEditorWorld();
     }
     else
@@ -440,12 +449,20 @@ void UpdateGraphics2(bool skipRepaint)
              }
         }
 
+#ifdef __3DS__
+        XRender::setTargetLayer(2);
+#endif
+
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
 
         XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
         XRender::renderTexture(0, 534, 800, 66, GFX.Interface[4], 0, 534);
         XRender::renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);
         XRender::renderTexture(734, 130, 66, 404, GFX.Interface[4], 734, 130);
+
+#ifdef __3DS__
+        XRender::setTargetLayer(3);
+#endif
 
         for(A = 1; A <= numPlayers; A++)
         {

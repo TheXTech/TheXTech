@@ -54,6 +54,12 @@ struct FPoint_t
 namespace XRender
 {
 
+#ifdef __3DS__
+
+constexpr int MAX_3D_OFFSET = 20;
+
+#endif
+
 #ifdef RENDER_CUSTOM
 
 extern bool init();
@@ -193,6 +199,12 @@ E_INLINE void setTargetScreen() TAIL
 }
 #endif
 
+#ifdef __3DS__
+/*!
+ * \brief Set render target to a certain layer of the in-game screen
+ */
+E_INLINE void setTargetLayer(int layer) TAIL
+#endif
 
 
 E_INLINE StdPicture LoadPicture(const std::string &path,
