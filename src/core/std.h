@@ -45,13 +45,13 @@ inline uint32_t SwapLE32(uint32_t x)
 }
 
 template<class value_t>
-inline bool min(value_t x, value_t y)
+inline value_t min(value_t x, value_t y)
 {
     return x < y ? x : y;
 }
 
 template<class value_t>
-inline bool max(value_t x, value_t y)
+inline value_t max(value_t x, value_t y)
 {
     return x > y ? x : y;
 }
