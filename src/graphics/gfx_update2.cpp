@@ -640,7 +640,7 @@ void UpdateGraphics2(bool skipRepaint)
             for(B = 0; B < (sH-(marginTop+20)-marginBottom)/A+1; B++)
                 XRender::renderTexture(sW-margin, (marginTop+20)+B*A, margin, A, GFX.Interface[4], GFX.Interface[4].w-66, 150);
             // bottom-left
-            XRender::renderTexture(0, sH-margin, margin+34, margin, GFX.Interface[4], 66-margin, GFX.Interface[4].h-66);
+            XRender::renderTexture(0, sH-marginBottom, margin+34, marginBottom, GFX.Interface[4], 66-margin, GFX.Interface[4].h-66);
             // bottom
             A = GFX.Interface[4].w-100-66;
             for(B = 0; B < (sW-(margin+34)-margin)/A+1; B++)
