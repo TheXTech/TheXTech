@@ -860,8 +860,10 @@ void UpdateGraphics(bool skipRepaint)
 
                     else if(g_config.render_inactive_NPC != Config_t::INACTIVE_NPC_SHOW)
                     {
+                        bool always_render = always_render_NPC(NPC[A]);
+
                         // add to queue of hidden NPCs
-                        if(!can_activate && !always_render_NPC(NPC[A]))
+                        if(!can_activate && !always_render)
                         {
                             if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
                             {
@@ -880,7 +882,7 @@ void UpdateGraphics(bool skipRepaint)
                         // if in "poof" mode, render this effect here
                         if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_HIDE)
                         {
-                            if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
+                            if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]) && !always_render)
                             {
                                 // if it was hidden, then add the poof effect!
                                 if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0)
@@ -891,7 +893,7 @@ void UpdateGraphics(bool skipRepaint)
                                     NewEffect(10, tempLocation);
                                 }
                             }
-                            else
+                            else if(!always_render)
                             {
                                 render = false;
                             }
