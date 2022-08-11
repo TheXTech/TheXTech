@@ -310,9 +310,6 @@ void clearBuffer()
         C2D_SceneBegin(s_right_screen);
         renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
 
-        C2D_SceneBegin(s_bottom_screen);
-        renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
-
         C3D_FrameEnd(0);
     }
 }
