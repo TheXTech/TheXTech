@@ -27,6 +27,9 @@
 #error This file should only be built on 3DS.
 #endif
 
+#include <string>
+#include <set>
+
 #include <cstring>
 #include <cstdlib>
 
@@ -34,6 +37,8 @@
 #include "3ds-audio-lib.h"
 
 static SoundId* cur_sound = nullptr;
+
+std::set<const std::string*> sound_stream_paths;
 
 bool MixPlatform_Init()
 {
@@ -76,7 +81,18 @@ int MixPlatform_PlayStream(int channel, const char* path, int loops)
 
 Mix_Chunk* MixPlatform_LoadWAV(const char* path)
 {
-    return (Mix_Chunk*)audioLoadWave(path);
+    Mix_Chunk* ret;
+    if(MixPlatform_NoPreload(path) || (ret = (Mix_Chunk*)audioLoadWave(path)) == nullptr)
+    {
+        const std::string* s = new(std::nothrow) const std::string(path);
+        if(!s)
+            return nullptr;
+
+        sound_stream_paths.insert(s);
+        ret = (Mix_Chunk*)s;
+    }
+
+    return ret;
 }
 
 const char* MixPlatform_GetError()
@@ -84,16 +100,27 @@ const char* MixPlatform_GetError()
     return "";
 }
 
+inline SoundId playSoundMaybeStream(Mix_Chunk* chunk, int loops)
+{
+    auto it = sound_stream_paths.find((const std::string*)chunk);
+    if(it != sound_stream_paths.end())
+    {
+        return playSoundAuto(((const std::string*)chunk)->c_str(), loops);
+    }
+
+    return playSoundMem((WaveObject*)chunk, loops);
+}
+
 int MixPlatform_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks)
 {
     (void)ticks;
     if(!cur_sound || channel < 0)
     {
-        playSoundMem((WaveObject*)chunk, loops);
+        playSoundMaybeStream(chunk, loops);
         return 0;
     }
     killSound(cur_sound[channel]);
-    cur_sound[channel] = playSoundMem((WaveObject*)chunk, loops);
+    cur_sound[channel] = playSoundMaybeStream(chunk, loops);
     return 0;
 }
 
@@ -213,6 +240,14 @@ void Mix_FreeMusic(Mix_Music* music)
 }
 void Mix_FreeChunk(Mix_Chunk* chunk)
 {
+    auto it = sound_stream_paths.find((const std::string*)chunk);
+    if(it != sound_stream_paths.end())
+    {
+        sound_stream_paths.erase(it);
+        delete (const std::string*)chunk;
+        return;
+    }
+
     audioFreeWave((WaveObject*) chunk);
 }
 
