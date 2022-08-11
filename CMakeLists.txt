@@ -504,7 +504,7 @@ if(NINTENDO_3DS)
     list(APPEND THEXTECH_SRC
         src/3ds/3ds-audio-lib.cpp
         src/3ds/mixer_platform.cpp
-#        src/control/3ds.cpp
+        src/control/input_3ds.cpp
         src/core/3ds/std_3ds.cpp
         src/core/3ds/render_3ds.cpp
         src/core/3ds/window_3ds.cpp

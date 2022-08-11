@@ -317,6 +317,8 @@ void repaint()
     constexpr double bg_shift = shift;
     constexpr double mid_shift = shift * .4;
 
+    s_depth_slider = osGet3DSliderState();
+
     // leave the draw context and wait for vblank...
     if(s_depth_slider <= 0.05 || s_single_layer_mode)
     {
@@ -480,12 +482,18 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
 
     sourceImage = C2D_SpriteSheetLoad(target.l.path.c_str());
     if(sourceImage)
+    {
         s_loadTexture(target, sourceImage);
 
-    s_num_textures_loaded ++;
+        s_num_textures_loaded ++;
+    }
 
     if(!target.d.texture)
+    {
         pLogWarning("FAILED TO LOAD!!! %s\n", path.c_str());
+        target.inited = false;
+    }
+
     return target;
 }
 
@@ -529,9 +537,9 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
     // unload is essential because lazy load would save the address incorrectly.
     else
     {
+        pLogWarning("lazyLoadPicture: Couldn't open size file.");
         lazyLoad(target);
         lazyUnLoad(target);
-        pLogWarning("lazyLoadPicture: Couldn't open size file.");
     }
 
     return target;

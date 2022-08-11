@@ -37,7 +37,9 @@
 
 // Control methods
 
-#ifndef __3DS__
+#ifdef __3DS__
+#include "input_3ds.h"
+#else
 #include "keyboard.h"
 #include "joystick.h"
 #include "touchscreen.h"
@@ -681,6 +683,9 @@ void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 // allocate InputMethodTypes according to system configuration
 void Init()
 {
+#ifdef INPUT_3DS_H
+    g_InputMethodTypes.push_back(new InputMethodType_3DS);
+#endif
 #ifdef KEYBOARD_H
     g_InputMethodTypes.push_back(new InputMethodType_Keyboard);
 #endif
