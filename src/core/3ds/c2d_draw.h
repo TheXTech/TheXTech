@@ -87,7 +87,7 @@ inline bool C2D_DrawImage_Custom_Rotated(C2D_Image img,
         cy = center->y;
     }
 
-    const C2D_DrawParams params = {{x, y, w*scale_x, h*scale_y}, {cx, cy}, 0.f, angle};
+    const C2D_DrawParams params = {{x, y, w*scale_x, h*scale_y}, {cx, cy}, 0.f, angle * M_PI / 180};
     bool result;
     if(r != 1.f || g != 1.f || b != 1.f || a != 1.f)
     {
