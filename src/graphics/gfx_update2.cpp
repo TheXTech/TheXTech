@@ -319,7 +319,7 @@ void UpdateGraphics2(bool skipRepaint)
 //        Next A
 //    Else
     double sLeft, sTop, sRight, sBottom, sW, sH;
-    double margin, marginTop;
+    double margin, marginTop, marginBottom;
     {
 
         sW = vScreen[Z].Width;
@@ -327,21 +327,40 @@ void UpdateGraphics2(bool skipRepaint)
 
         margin = 66;
         marginTop = 130;
+        marginBottom = 66;
 
         if(WorldEditor)
-            margin = 0;
+        {
+            marginBottom = 0;
+            marginTop = 0;
+        }
         else if(sH < 400)
         {
-            margin = 24;
+            marginBottom = 24;
             marginTop = 72;
         }
         else if(sH < 500)
         {
-            margin = 32;
+            marginBottom = 32;
             marginTop = 96;
         }
-        else if(sW < 500)
+
+        if(WorldEditor)
+        {
+            margin = 0;
+        }
+        else if(sW < 400)
+        {
+            margin = 24;
+        }
+        else if(sW < 600)
+        {
             margin = 32;
+        }
+        else if(sW < 800)
+        {
+            margin = 48;
+        }
 
         if(WorldEditor)
         {
@@ -355,7 +374,7 @@ void UpdateGraphics2(bool skipRepaint)
             sLeft = -vScreenX[1] + margin - 2;
             sTop = -vScreenY[1] + (marginTop - 34);
             sRight = -vScreenX[1] + vScreen[1].Width - (margin - 2);
-            sBottom = -vScreenY[1] + vScreen[1].Height - (margin - 2);
+            sBottom = -vScreenY[1] + vScreen[1].Height - (marginBottom - 2);
         }
 
         Location_t sView;
@@ -524,7 +543,7 @@ void UpdateGraphics2(bool skipRepaint)
             for(int row = 0; row < g_worldMapFog.m_map_rows; row++)
             {
                 double y = g_worldMapFog.m_map_top + g_worldMapFog.m_tile_size * row + vScreenY[Z];
-                if(y + g_worldMapFog.m_tile_size < marginTop || y >= sH - margin)
+                if(y + g_worldMapFog.m_tile_size < marginTop || y >= sH - marginBottom)
                     continue;
 
                 for(int col = 0; col < g_worldMapFog.m_map_cols; col++)
@@ -594,7 +613,7 @@ void UpdateGraphics2(bool skipRepaint)
 
             XRender::resetViewport();
 
-            RenderFrame(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft + margin, vScreen[Z].ScreenTop + marginTop, sW - margin - margin, sH - marginTop - margin),
+            RenderFrame(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft + margin, vScreen[Z].ScreenTop + marginTop, sW - margin - margin, sH - marginTop - marginBottom),
                 GFX.WorldMapFrame_Tile, border_valid ? &GFX.WorldMapFrame_Border : nullptr, &g_worldMapFrameBorderInfo);
 
             XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
@@ -608,26 +627,26 @@ void UpdateGraphics2(bool skipRepaint)
             XRender::renderTexture(0, 0, margin, marginTop, GFX.Interface[4], 66-margin, 130-marginTop);
             // top
             A = GFX.Interface[4].w-66-66;
-            for (B = 0; B < (sW-margin*2)/A+1; B++)
+            for(B = 0; B < (sW-margin*2)/A+1; B++)
                 XRender::renderTexture(margin+B*A, 0, A, marginTop, GFX.Interface[4], 66, 130-marginTop);
             // top-right
             XRender::renderTexture(sW-margin, 0, margin, marginTop+20, GFX.Interface[4], GFX.Interface[4].w-66, 130-marginTop);
             // left
             A = GFX.Interface[4].h-130-66;
-            for (B = 0; B < (sH-marginTop-margin)/A+1; B++)
+            for(B = 0; B < (sH-marginTop-marginBottom)/A+1; B++)
                 XRender::renderTexture(0, marginTop+B*A, margin, A, GFX.Interface[4], 66-margin, 130);
             // right
             A = GFX.Interface[4].h-(130+20)-66;
-            for (B = 0; B < (sH-(marginTop+20)-margin)/A+1; B++)
+            for(B = 0; B < (sH-(marginTop+20)-marginBottom)/A+1; B++)
                 XRender::renderTexture(sW-margin, (marginTop+20)+B*A, margin, A, GFX.Interface[4], GFX.Interface[4].w-66, 150);
             // bottom-left
             XRender::renderTexture(0, sH-margin, margin+34, margin, GFX.Interface[4], 66-margin, GFX.Interface[4].h-66);
             // bottom
             A = GFX.Interface[4].w-100-66;
-            for (B = 0; B < (sW-(margin+34)-margin)/A+1; B++)
-                XRender::renderTexture((margin+34)+B*A, sH-margin, A, margin, GFX.Interface[4], 100, GFX.Interface[4].h-66);
+            for(B = 0; B < (sW-(margin+34)-margin)/A+1; B++)
+                XRender::renderTexture((margin+34)+B*A, sH-marginBottom, A, marginBottom, GFX.Interface[4], 100, GFX.Interface[4].h-66);
             // bottom-right
-            XRender::renderTexture(sW-margin, sH-margin, margin, margin, GFX.Interface[4], GFX.Interface[4].w-66, GFX.Interface[4].h-66);
+            XRender::renderTexture(sW-margin, sH-marginBottom, margin, marginBottom, GFX.Interface[4], GFX.Interface[4].w-66, GFX.Interface[4].h-66);
         }
 
 
