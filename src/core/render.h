@@ -22,6 +22,9 @@
 #ifndef RENDER_HHHHHH
 #define RENDER_HHHHHH
 
+#include <string>
+#include "std_picture.h"
+
 #ifndef RENDER_CUSTOM
 #   include "core/std.h"
 #   include "base/render_base.h"
@@ -33,8 +36,30 @@
 #   define TAIL ;
 #endif
 
+
+enum RendererFlip_t
+{
+    X_FLIP_NONE       = 0x00000000,    /**< Do not flip */
+    X_FLIP_HORIZONTAL = 0x00000001,    /**< flip horizontally */
+    X_FLIP_VERTICAL   = 0x00000002     /**< flip vertically */
+};
+
+struct FPoint_t
+{
+    float x;
+    float y;
+};
+
+
 namespace XRender
 {
+
+#ifdef RENDER_CUSTOM
+
+extern bool init();
+extern void quit();
+
+#endif
 
 
 /*!
@@ -170,62 +195,65 @@ E_INLINE void setTargetScreen() TAIL
 
 
 
-TXT_FORCE_INLINE StdPicture LoadPicture(const std::string &path,
-                                        const std::string &maskPath = std::string(),
-                                        const std::string &maskFallbackPath = std::string())
+E_INLINE StdPicture LoadPicture(const std::string &path,
+                                const std::string &maskPath = std::string(),
+                                const std::string &maskFallbackPath = std::string()) TAIL
+#ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::LoadPicture(path, maskPath, maskFallbackPath);
 }
+#endif
 
-TXT_FORCE_INLINE StdPicture lazyLoadPicture(const std::string &path,
-                                            const std::string &maskPath = std::string(),
-                                            const std::string &maskFallbackPath = std::string())
+E_INLINE StdPicture lazyLoadPicture(const std::string &path,
+                                    const std::string &maskPath = std::string(),
+                                    const std::string &maskFallbackPath = std::string()) TAIL
+#ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::lazyLoadPicture(path, maskPath, maskFallbackPath);
 }
+#endif
 
-TXT_FORCE_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb)
+E_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb) TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::setTransparentColor(target, rgb);
 }
-
-
-
-E_INLINE void loadTexture(StdPicture &target,
-                          uint32_t width,
-                          uint32_t height,
-                          uint8_t *RGBApixels,
-                          uint32_t pitch) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->loadTexture(target, width, height, RGBApixels, pitch);
-}
 #endif
 
-TXT_FORCE_INLINE void lazyLoad(StdPicture &target)
+E_INLINE void lazyLoad(StdPicture &target) TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::lazyLoad(target);
 }
+#endif
 
-TXT_FORCE_INLINE void lazyUnLoad(StdPicture &target)
+E_INLINE void lazyUnLoad(StdPicture &target) TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::lazyUnLoad(target);
 }
+#endif
 
-TXT_FORCE_INLINE void lazyPreLoad(StdPicture &target)
+E_INLINE void lazyPreLoad(StdPicture &target) TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::lazyPreLoad(target);
 }
+#endif
 
-TXT_FORCE_INLINE size_t lazyLoadedBytes()
+E_INLINE size_t lazyLoadedBytes() TAIL
+#ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::lazyLoadedBytes();
 }
+#endif
 
-TXT_FORCE_INLINE void lazyLoadedBytesReset()
+E_INLINE void lazyLoadedBytesReset() TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::lazyLoadedBytesReset();
 }
+#endif
 
 
 
@@ -233,13 +261,6 @@ E_INLINE void deleteTexture(StdPicture &tx, bool lazyUnload = false) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->deleteTexture(tx, lazyUnload);
-}
-#endif
-
-E_INLINE void clearAllTextures() TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->clearAllTextures();
 }
 #endif
 
@@ -367,66 +388,45 @@ E_INLINE void renderTexture(float xDst, float yDst, StdPicture &tx,
 #endif
 
 
-
-// Retrieve raw pixel data
-
-E_INLINE void getScreenPixels(int x, int y, int w, int h, unsigned char *pixels) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->getScreenPixels(x, y, w, h, pixels);
-}
-#endif
-
-E_INLINE void getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->getScreenPixelsRGBA(x, y, w, h, pixels);
-}
-#endif
-
-E_INLINE int  getPixelDataSize(const StdPicture &tx) TAIL
-#ifndef RENDER_CUSTOM
-{
-    return g_render->getPixelDataSize(tx);
-}
-#endif
-
-E_INLINE void getPixelData(const StdPicture &tx, unsigned char *pixelData) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->getPixelData(tx, pixelData);
-}
-#endif
-
 #ifdef USE_RENDER_BLOCKING
-TXT_FORCE_INLINE bool renderBlocked()
+E_INLINE bool renderBlocked() TAIL
+#   ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::renderBlocked();
 }
+#   endif
 
-TXT_FORCE_INLINE void setBlockRender(bool b)
+E_INLINE void setBlockRender(bool b) TAIL
+#   ifndef RENDER_CUSTOM
 {
     AbstractRender_t::setBlockRender(b);
 }
+#   endif
 #endif // USE_RENDER_BLOCKING
 
 
 #ifdef USE_SCREENSHOTS_AND_RECS
 
-TXT_FORCE_INLINE void makeShot()
+E_INLINE void makeShot() TAIL
+#   ifndef RENDER_CUSTOM
 {
     AbstractRender_t::makeShot();
 }
+#   endif
 
-TXT_FORCE_INLINE void toggleGifRecorder()
+E_INLINE void toggleGifRecorder() TAIL
+#   ifndef RENDER_CUSTOM
 {
     AbstractRender_t::toggleGifRecorder();
 }
+#   endif
 
-TXT_FORCE_INLINE void processRecorder()
+E_INLINE void processRecorder() TAIL
+#   ifndef RENDER_CUSTOM
 {
     AbstractRender_t::processRecorder();
 }
+#   endif
 
 #endif // USE_SCREENSHOTS_AND_RECS
 

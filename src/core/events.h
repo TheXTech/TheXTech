@@ -40,6 +40,13 @@
 namespace XEvents
 {
 
+#ifdef EVENTS_CUSTOM
+
+extern bool init();
+extern void quit();
+
+#endif
+
 /*!
  * \brief Process events
  */
@@ -62,10 +69,13 @@ E_INLINE void waitEvents() TAIL
 }
 #endif
 
-TXT_FORCE_INLINE void eventResize()
+E_INLINE void eventResize() TAIL
+
+#ifndef EVENTS_CUSTOM
 {
     g_events->eventResize();
 }
+#endif
 
 } // XEvents
 

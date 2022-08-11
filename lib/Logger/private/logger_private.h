@@ -25,15 +25,15 @@
 #include "logger_sets.h"
 #endif
 
-#ifndef NO_FILE_LOGGING
-#include <SDL2/SDL_rwops.h>
-#endif
-
 #include <fmt_format_ne.h>
 #include <fmt/fmt_printf.h>
 #include <stdarg.h>
 #include <cstdio>
-#include <mutex>
+
+#ifndef PGE_NO_THREADING
+#    include <mutex>
+#endif
+
 #include <sstream>
 #include <algorithm>
 
@@ -44,6 +44,12 @@
 #define OS_NEWLINE "\n"
 #define OS_NEWLINE_LEN 1
 #endif
+
+#ifdef PGE_NO_THREADING
+
+#   define MUTEXLOCK(mn) (void)mn
+
+#else
 
 class MutexLocker
 {
@@ -62,6 +68,8 @@ public:
     }
 };
 
-#define MUTEXLOCK(mn) \
+#   define MUTEXLOCK(mn) \
     MutexLocker mn(&g_lockLocker); \
     (void)mn
+
+#endif

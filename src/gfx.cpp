@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "core/std.h"
+
 #include "globals.h"
 #include "gfx.h"
 #include "core/msgbox.h"
@@ -111,7 +113,7 @@ bool GFX_t::load()
                                          "\n\n"
                                          "It's possible that you didn't installed the game assets package, or you had installed it at the incorrect directory.",
                                          getLogFilePath());
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "UI image assets loading error", msg);
         return false;
     }
 

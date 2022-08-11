@@ -27,8 +27,6 @@
 
 #include "../logger.h"
 
-typedef struct SDL_RWops SDL_RWops;
-
 class LogWriter
 {
 public:

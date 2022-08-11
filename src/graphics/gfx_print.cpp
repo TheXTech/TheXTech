@@ -20,10 +20,12 @@
 
 #include <algorithm>
 
-#include "../globals.h"
-#include "../graphics.h"
-#include "../core/render.h"
-#include "../gfx.h"
+#include "core/std.h"
+#include "core/render.h"
+
+#include "globals.h"
+#include "graphics.h"
+#include "gfx.h"
 
 
 #if defined(_MSC_VER) && _MSC_VER <= 1900 // Workaround for MSVC 2015

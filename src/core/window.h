@@ -41,6 +41,22 @@ namespace XWindow
 {
 
 /*!
+ * \brief Cursor type
+ */
+enum Cursor_t
+{
+    CURSOR_DEFAULT = 0,
+    CURSOR_NONE
+};
+
+#ifdef WINDOW_CUSTOM
+
+extern bool init();
+extern void quit();
+
+#endif
+
+/*!
  * \brief Show the window
  */
 E_INLINE void show() TAIL

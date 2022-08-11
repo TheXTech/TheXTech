@@ -19,6 +19,11 @@
  */
 
 #pragma once
+
+#ifdef __3DS__
+#   include "core/3ds/picture_load.h"
+#endif
+
 #ifndef STD_PICTURE_LOAD_H
 #define STD_PICTURE_LOAD_H
 

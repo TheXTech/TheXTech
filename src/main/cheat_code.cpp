@@ -82,7 +82,7 @@ static void dieCheater()
     }
     else
     {
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                               "Die, cheater!",
                               "       Die, cheater!       \n"
                               "Now play the game all over \n"

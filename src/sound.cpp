@@ -777,12 +777,16 @@ void PlayInitSound()
 
         if(!p.empty())
         {
+#ifdef __3DS__
+            MixPlatform_PlayStream(-1, (SfxRoot + p).c_str(), 0);
+#else
             Mix_Music *loadsfx = Mix_LoadMUS((SfxRoot + p).c_str());
             if(loadsfx)
             {
                 Mix_PlayMusicStream(loadsfx, 0);
                 Mix_SetFreeOnStop(loadsfx, 1);
             }
+#endif
         }
     }
 }
@@ -964,7 +968,7 @@ void InitSound()
     if(!Files::fileExists(musicIni) && !Files::fileExists(sfxIni))
     {
         pLogWarning("music.ini and sounds.ini are missing");
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                      "music.ini and sounds.ini are missing",
                      "Files music.ini and sounds.ini are not exist, game will work without default music and SFX.");
         g_customLvlMusicId = 24;
@@ -974,14 +978,14 @@ void InitSound()
     else if(!Files::fileExists(musicIni))
     {
         pLogWarning("music.ini is missing");
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                      "music.ini is missing",
                      "File music.ini is not exist, game will work without default music.");
     }
     else if(!Files::fileExists(sfxIni))
     {
         pLogWarning("sounds.ini is missing");
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                      "sounds.ini is missing",
                      "File sounds.ini is not exist, game will work without SFX.");
     }
@@ -1019,7 +1023,7 @@ void InitSound()
 
     if(g_errorsSfx > 0)
     {
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                               "Sounds loading error",
                               fmt::format_ne("Failed to load some SFX assets. Loo a log file to get more details:\n{0}", getLogFilePath()));
     }

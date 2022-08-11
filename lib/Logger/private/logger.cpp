@@ -21,7 +21,6 @@
 #include "../logger.h"
 #include "logger_sets.h"
 #ifndef NO_FILE_LOGGING
-#include <SDL2/SDL_rwops.h>
 #include <chrono>  // chrono::system_clock
 #include <ctime>   // localtime
 #include <DirManager/dirman.h>
@@ -32,6 +31,8 @@
 
 #include <fmt_format_ne.h>
 #include <fmt/fmt_printf.h>
+
+#include "core/std.h"
 
 
 std::string     LogWriter::m_logDirPath;
@@ -49,7 +50,7 @@ static std::string return_current_time_and_date()
     auto now = std::chrono::system_clock::now();
     auto in_time_t = std::chrono::system_clock::to_time_t(now);
     char out[24];
-    SDL_memset(out, 0, sizeof(out));
+    XStd::memset(out, 0, sizeof(out));
     if(0 < strftime(out, sizeof(out), "%Y_%m_%d_%H_%M_%S", std::localtime(&in_time_t)))
         return std::string(out);
     else
@@ -68,7 +69,7 @@ static void cleanUpLogs(const std::string &logsPath, int maxLogs)
     // Be sure that we are looking for our log files and don't touch others
     for(auto &s : filesPre)
     {
-        if(SDL_strncasecmp(s.c_str(), "TheXTech_log_", 13) == 0)
+        if(XStd::strncasecmp(s.c_str(), "TheXTech_log_", 13) == 0)
             files.push_back(s);
     }
 

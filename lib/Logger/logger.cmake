@@ -20,9 +20,9 @@ elseif(VITA)
         ${CMAKE_CURRENT_LIST_DIR}/private/logger_vita.cpp
     )
 elseif(3DS)
-    message("-- Dummy Logger for 3DS")
+    message("-- Logger for 3DS")
     list(APPEND LOGGER_SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/private/logger_dummy.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/private/logger_3ds.cpp
     )
 else()
     message("-- Logger for Desktop")

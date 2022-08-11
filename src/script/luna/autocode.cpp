@@ -1184,7 +1184,7 @@ void Autocode::Do(bool init)
 
         case AT_DebugWindow:
         {
-            XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_INFORMATION, "LunaScript debug message", GetS(MyString));
+            XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_INFORMATION, "LunaScript debug message", GetS(MyString));
             expire();
             break;
         }

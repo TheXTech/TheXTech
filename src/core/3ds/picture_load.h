@@ -19,15 +19,26 @@
  */
 
 #pragma once
-#ifndef PICTURE_DATA_H
-#define PICTURE_DATA_H
 
-// TODO: Implement here branching between platform specific StdPictureData variants
+#ifndef STD_PICTURE_LOAD_H
+#define STD_PICTURE_LOAD_H
 
-#ifdef __3DS__
-#   include "3ds/picture_data_3ds.h"
-#else
-#   include "sdl/picture_data_sdl.h"
-#endif
+#include <string>
 
-#endif // PICTURE_DATA_H
+/*!
+ * \brief Generic image loading store.
+ *
+ * If needed somehing unusual, please define alternative structure instead of this
+ */
+struct StdPictureLoad
+{
+    //! Is this a lazy-loaded texture?
+    bool lazyLoaded = false;
+
+    //! Path to find image
+    std::string path = "";
+
+    inline void clear() {}
+};
+
+#endif // #ifndef STD_PICTURE_LOAD_H

@@ -37,10 +37,7 @@ inline void assert_debug(bool arg)
     UNUSED(arg);
 }
 
-inline uint32_t GetTicks()
-{
-    return 0;
-}
+uint32_t GetTicks();
 
 inline uint32_t SwapLE32(uint32_t x)
 {

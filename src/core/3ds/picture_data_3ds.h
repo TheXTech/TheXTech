@@ -19,15 +19,32 @@
  */
 
 #pragma once
-#ifndef PICTURE_DATA_H
-#define PICTURE_DATA_H
+#ifndef PICTURE_DATA_SDL_H
+#define PICTURE_DATA_SDL_H
 
-// TODO: Implement here branching between platform specific StdPictureData variants
+#include <cstdint>
+#include <citro2d.h>
 
-#ifdef __3DS__
-#   include "3ds/picture_data_3ds.h"
-#else
-#   include "sdl/picture_data_sdl.h"
-#endif
+/*!
+ * \brief Platform specific picture data. Fields should not be used directly
+ */
+struct StdPictureData
+{
 
-#endif // PICTURE_DATA_H
+    uint32_t last_draw_frame = 0;
+
+    C2D_SpriteSheet texture = nullptr;
+    C2D_Image image;
+    C2D_SpriteSheet texture2 = nullptr;
+    C2D_Image image2;
+    C2D_SpriteSheet texture3 = nullptr;
+    C2D_Image image3;
+
+    inline bool hasTexture()
+    {
+        return texture != nullptr;
+    }
+
+};
+
+#endif // PICTURE_DATA_SDL_H
