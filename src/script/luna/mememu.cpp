@@ -488,6 +488,18 @@ public:
 
         // insert(0x00B2C884, ???}; // Key Released!!!
         // insert(0x00B2C894, &BlocksSorted); // removed by block quadtree
+        insert(0x00B2C894,
+            [](FIELDTYPE ftype)->double
+            {
+                bool ret = true;
+                return valueToMem(ret, ftype);
+            },
+            [](double in, FIELDTYPE ftype)->void
+            {
+                pLogWarning("Attempt to write the read-only field at 0x00B2C894 "
+                            "(BlocksSorted) with value %g as %s", in, FieldtypeToStr(ftype));
+            }
+        );
         insert(0x00B2C8B4, &FreezeNPCs);
 
         insert(0x00B2C8C4, &Cheater);
