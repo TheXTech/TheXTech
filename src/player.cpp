@@ -2281,10 +2281,10 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
         // lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
         // blockTileGet(tailLoc, fBlock, lBlock);
 
-        for(Block_t* block_p : treeBlockQuery(tailLoc, SORTMODE_LOC))
+        for(BlockRef_t block_p : treeBlockQuery(tailLoc, SORTMODE_LOC))
         {
-            auto &block = *block_p;
-            A = getBlockArrayIndex(block_p);
+            Block_t& block = *block_p;
+            A = (int)block_p;
 
             if(!BlockIsSizable[block.Type] && !block.Hidden && (block.Type != 293 || Stab) && !block.Invis && !BlockNoClipping[block.Type])
             {
