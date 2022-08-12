@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "sorting.h"
 
+// these are now used only when saving levels
 void qSortBlocksY(int min, int max)
 {
     Block_t medBlock;
@@ -163,6 +164,9 @@ void qSortBackgrounds(int min, int max)
     qSortBackgrounds(lo + 1, max);
 }
 
+// deprecated by block quadtree
+
+#if 0
 void FindBlocks()
 {
     int A = 0;
@@ -198,8 +202,9 @@ void FindBlocks()
         }
         LastBlock[A] = curBlk;
     }
-    BlocksSorted = true;
+    // BlocksSorted = true;
 }
+#endif
 
 void BlockSort()
 {

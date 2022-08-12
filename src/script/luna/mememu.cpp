@@ -438,17 +438,17 @@ public:
         insert(0x00B2504C, &TakeScreen);
         insert(0x00B250D6, &numLocked);
         insert(0x00B250E2, // Pause menu visible
-               [](FIELDTYPE ftype)->double
-               {
-                   bool tmp = (GamePaused != PauseCode::None);
-                   return valueToMem(tmp, ftype);
-               },
-               [](double in, FIELDTYPE ftype)->void
-               {
-                   // FIXME: Verify this, if it needs to be written, try to work around this
-                   pLogWarning("Attempt to write the read-only field at 0x00B250E2 "
-                               "(GamePaused) with value %g as %s", in, FieldtypeToStr(ftype));
-               }
+            [](FIELDTYPE ftype)->double
+            {
+                bool tmp = (GamePaused != PauseCode::None);
+                return valueToMem(tmp, ftype);
+            },
+            [](double in, FIELDTYPE ftype)->void
+            {
+                // FIXME: Verify this, if it needs to be written, try to work around this
+                pLogWarning("Attempt to write the read-only field at 0x00B250E2 "
+                            "(GamePaused) with value %g as %s", in, FieldtypeToStr(ftype));
+            }
         );
         insert(0x00B25134, &LevelEditor);
 
@@ -487,7 +487,19 @@ public:
         insert(0x00B2C882, &MenuMode); // Current menu mode
 
         // insert(0x00B2C884, ???}; // Key Released!!!
-        insert(0x00B2C894, &BlocksSorted);
+        // insert(0x00B2C894, &BlocksSorted); // removed by block quadtree
+        insert(0x00B2C894,
+            [](FIELDTYPE ftype)->double
+            {
+                bool ret = true;
+                return valueToMem(ret, ftype);
+            },
+            [](double in, FIELDTYPE ftype)->void
+            {
+                pLogWarning("Attempt to write the read-only field at 0x00B2C894 "
+                            "(BlocksSorted) with value %g as %s", in, FieldtypeToStr(ftype));
+            }
+        );
         insert(0x00B2C8B4, &FreezeNPCs);
 
         insert(0x00B2C8C4, &Cheater);
