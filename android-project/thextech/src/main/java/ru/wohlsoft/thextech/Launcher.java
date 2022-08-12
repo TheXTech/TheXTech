@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import androidx.annotation.NonNull;
@@ -24,10 +25,24 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
+import android.util.Pair;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Launcher extends AppCompatActivity
 {
@@ -60,6 +75,9 @@ public class Launcher extends AppCompatActivity
         }
     });
     /* ================================================== */
+
+    private static final int MENU_ADD = Menu.FIRST;
+    private List<Pair<String, String>> menu_items = new ArrayList<Pair<String, String>>();;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -108,6 +126,102 @@ public class Launcher extends AppCompatActivity
         });
 
         updateOverlook();
+        reloadAssetsList();
+
+        FloatingActionButton fab = findViewById(R.id.selectGame);
+        fab.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                int i = 0;
+                PopupMenu menu = new PopupMenu(Launcher.this, view);
+
+                MenuItem dirSelect = menu.getMenu().add(0, MENU_ADD, Menu.NONE, R.string.launcher_gameSelect_pickTheDir);
+                dirSelect.setIcon(R.drawable.add_directory);
+
+                for(i = 0; i < menu_items.size(); i++)
+                {
+                    Pair<String, String> e = menu_items.get(i);
+                    String gameName = e.first;
+                    String gamePath = e.second;
+
+                    Log.d(LOG_TAG, "Assets name: " + gameName + "; path: " + gamePath);
+
+                    if(!GameSettings.isDirectoryExist(gamePath))
+                        continue; // Skip invalid assets
+
+                    MenuItem it = menu.getMenu().add(0, MENU_ADD + i + 1, Menu.NONE, gameName);
+
+                    String iconPath = gamePath + "/graphics/ui/icon/thextech_128.png";
+                    if(GameSettings.isFileExist(iconPath)) // Add icon only when it exists and accessible
+                    {
+                        Log.d(LOG_TAG, "Icon file exists: " + iconPath);
+                        Drawable d = Drawable.createFromPath(iconPath);
+                        it.setIcon(d);
+                    }
+                    else
+                        Log.d(LOG_TAG, "Icon file DOES NOT EXISTS: " + iconPath);
+                }
+
+                int CLEAR_ITEM = MENU_ADD + i + 1;
+                MenuItem clearItem = menu.getMenu().add(0, CLEAR_ITEM, Menu.NONE, R.string.launcher_gameSelect_clearList);
+                clearItem.setIcon(R.drawable.clear_list);
+
+                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener()
+                {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item)
+                    {
+                        int id = item.getItemId();
+
+                        if(id == MENU_ADD)
+                        {
+                            if(checkFilePermissions(READWRITE_PERMISSION_FOR_GAME) || !hasManageAppFS())
+                                return false;
+                            GameSettings.selectAssetsPath(Launcher.this, Launcher.this);
+                        }
+                        else if(id == CLEAR_ITEM)
+                        {
+                            AlertDialog.Builder b = new AlertDialog.Builder(Launcher.this);
+                            b.setTitle(R.string.launcher_gameselect_clearlist_title);
+                            b.setMessage(R.string.launcher_gameselect_clearlist_question);
+                            b.setNegativeButton(android.R.string.no, null);
+                            b.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int whichButton)
+                                {
+                                    SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                                    setup.edit().putString("setup_assets_list", "").apply();
+                                    reloadAssetsList();
+                                    Toast.makeText(getApplicationContext(), getString(R.string.launcher_gameselect_toast_listclean), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            b.show();
+                        }
+                        else
+                        {
+                            int itemId = id - 2;
+                            String gameName = menu_items.get(itemId).first;
+                            String gamePath = menu_items.get(itemId).second;
+
+                            Toast.makeText(getApplicationContext(), String.format(getString(R.string.launcher_gameselect_toast_selected), gameName), Toast.LENGTH_SHORT).show();
+                            SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+                            setup.edit().putString("setup_assets_path", gamePath).apply();
+                            updateOverlook();
+                        }
+
+                        return true;
+                    }
+                });
+
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                    menu.setForceShowIcon(true);
+
+                menu.show();
+            }
+        });
+
     }
 
     private void handleFileIntent()
@@ -194,12 +308,41 @@ public class Launcher extends AppCompatActivity
         startGame();
     }
 
+    public void reloadAssetsList()
+    {
+        SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String gameAssetsPath = setup.getString("setup_assets_list", "");
+
+        menu_items.clear();
+
+        if(!gameAssetsPath.isEmpty())
+        {
+            try
+            {
+                JSONObject jObject = new JSONObject(gameAssetsPath);
+                JSONArray jArray = jObject.getJSONArray("assets");
+                for(int i = 0; i < jArray.length(); i++)
+                {
+                    JSONObject oneObject = jArray.getJSONObject(i);
+                    String gameName = oneObject.getString("game");
+                    String gamePath = oneObject.getString("path");
+                    menu_items.add(new Pair<String, String>(gameName, gamePath));
+                }
+            }
+            catch (JSONException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void updateOverlook()
     {
         SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String gameAssetsPath = setup.getString("setup_assets_path", "");
 
         String logoImagePath = "graphics/ui/MenuGFX2.png";
+        String assetsIcon = "graphics/ui/icon/thextech_128.png";
         String bgImagePath = "graphics/background2/background2-2.png";
         int bgImageFrames = 1;
         int bgImageFramesDelay = 125;
@@ -217,6 +360,7 @@ public class Launcher extends AppCompatActivity
 
         String bgPath = gameAssetsPath + "/" + bgImagePath;
         String logoPath = gameAssetsPath + "/" + logoImagePath;
+        String iconPath = gameAssetsPath + "/" + assetsIcon;
 
         m_bgAnimator.stopUpdates();
 
@@ -252,6 +396,15 @@ public class Launcher extends AppCompatActivity
         }
         else
             gameLogo.setImageResource(R.drawable.logo);
+
+        FloatingActionButton fab = findViewById(R.id.selectGame);
+        if(!gameAssetsPath.isEmpty() && GameSettings.isFileExist(iconPath))
+        {
+            Drawable d = Drawable.createFromPath(iconPath);
+            fab.setImageDrawable(d);
+        }
+        else
+            fab.setImageResource(R.drawable.add_directory);
     }
 
     private boolean checkFilePermissions(int requestCode)
@@ -353,6 +506,7 @@ public class Launcher extends AppCompatActivity
         Intent myIntent = new Intent(Launcher.this, thextechActivity.class);
         if(!filePathToOpen.isEmpty())
             myIntent.putExtra("do-open-file", filePathToOpen);
+
 //        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
 //        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
