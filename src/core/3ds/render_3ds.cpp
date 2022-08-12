@@ -32,6 +32,7 @@
 
 #include "globals.h"
 #include "video.h"
+#include "frame_timer.h"
 #include "core/render.h"
 
 // #include "core/3ds/n3ds-clock.h"
@@ -182,7 +183,7 @@ void s_ensureInFrame()
 {
     if(!g_in_frame)
     {
-        C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+        C3D_FrameBegin(0);
 
         for(int layer = 0; layer < 4; layer++)
         {
@@ -364,6 +365,11 @@ void repaint()
     }
     s_current_frame ++;
     g_in_frame = false;
+
+    g_microStats.start_sleep();
+    C3D_FrameSync();
+
+    g_microStats.start_task(MicroStats::Graphics);
     C3D_FrameEnd(0);
 }
 

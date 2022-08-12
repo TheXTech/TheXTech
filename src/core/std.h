@@ -39,6 +39,13 @@ inline void assert_debug(bool arg)
 
 uint32_t GetTicks();
 
+#ifdef __3DS__
+
+#define XT_HAS_MICROSECOND_TIMER
+uint64_t GetMicroTicks();
+
+#endif
+
 inline uint32_t SwapLE32(uint32_t x)
 {
     return x;

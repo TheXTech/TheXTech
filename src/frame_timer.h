@@ -22,7 +22,72 @@
 #ifndef FRAME_TIMER_H
 #define FRAME_TIMER_H
 
+#include "core/std.h"
+
+#include <cstdint>
 #include <functional>
+
+struct MicroStats
+{
+public:
+    enum Task
+    {
+        Script,
+        Controls,
+        Layers,
+        NPCs,
+        Blocks,
+        Effects,
+        Player,
+        Graphics,
+        Sound,
+        Events,
+        TASK_END
+    };
+
+    static constexpr const char* task_names[] =
+    {
+        "Sct",
+        "Ctl",
+        "Lay",
+        "NPC",
+        "Blk",
+        "Eff",
+        "Plr",
+        "Gfx",
+        "Snd",
+        "Evt",
+    };
+
+#ifdef XT_HAS_MICROSECOND_TIMER
+
+private:
+    uint8_t m_cur_task = TASK_END;
+    uint8_t m_cur_frame = 0;
+    uint64_t m_level_frame = 0;
+    uint64_t m_cur_time = 0;
+    uint64_t m_cur_timer[TASK_END] = {0};
+
+public:
+    uint64_t level_timer[TASK_END] = {0};
+    int view_timer[TASK_END] = {0};
+    int view_total = 0;
+
+    void reset();
+    void start_task(Task task);
+    void start_sleep();
+    void end_frame();
+
+#else
+
+    inline void reset() {}
+    inline void start_task(Task task) { UNUSED(task); }
+    inline void start_sleep() {}
+    inline void end_frame() {}
+
+#endif
+
+};
 
 struct PerformanceStats_t
 {
@@ -65,6 +130,7 @@ struct PerformanceStats_t
     void print();
 };
 
+extern MicroStats g_microStats;
 extern PerformanceStats_t g_stats;
 
 void resetFrameTimer();

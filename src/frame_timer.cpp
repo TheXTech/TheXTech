@@ -30,8 +30,67 @@
 #include "core/render.h"
 #include "core/events.h"
 
-
+MicroStats g_microStats;
 PerformanceStats_t g_stats;
+
+#ifdef XT_HAS_MICROSECOND_TIMER
+
+void MicroStats::reset()
+{
+    for(uint8_t i = 0; i < TASK_END; i++)
+    {
+        level_timer[i] = 0;
+        view_timer[i] = 0;
+        m_cur_timer[i] = 0;
+    }
+
+    view_total = 0;
+
+    m_cur_task = TASK_END;
+    m_cur_frame = 0;
+}
+
+void MicroStats::start_task(Task task)
+{
+    uint64_t next_time = XStd::GetMicroTicks();
+
+    if(m_cur_task < TASK_END)
+    {
+        m_cur_timer[m_cur_task] += next_time - m_cur_time;
+        level_timer[m_cur_task] += next_time - m_cur_time;
+    }
+
+    m_cur_time = next_time;
+    m_cur_task = task;
+}
+
+void MicroStats::start_sleep()
+{
+    start_task(TASK_END);
+}
+
+void MicroStats::end_frame()
+{
+    start_task(TASK_END);
+
+    m_cur_frame++;
+    m_level_frame++;
+
+    if(m_cur_frame == 66)
+    {
+        m_cur_frame = 0;
+        view_total = 0;
+
+        for(uint8_t i = 0; i < TASK_END; i++)
+        {
+            view_timer[i] = (m_cur_timer[i] + 500) / 1000;
+            view_total += (m_cur_timer[i] + 500) / 1000;
+            m_cur_timer[i] = 0;
+        }
+    }
+}
+
+#endif
 
 void PerformanceStats_t::reset()
 {
@@ -98,6 +157,10 @@ void PerformanceStats_t::print()
     else
     {
         items = 7;
+#ifdef XT_HAS_MICROSECOND_TIMER
+        if(!GameMenu)
+            items += 3;
+#endif
         if(GameMenu)
             items++;
 
@@ -121,6 +184,29 @@ void PerformanceStats_t::print()
                    3, 45, YLINE, 0.5f, 1.f, 1.f);
         SuperPrint(fmt::sprintf_ne("CHEK: SUMM=%d", (checkedBlocks + checkedSzBlocks+ checkedBGOs + checkedNPCs + checkedEffects)),
                    3, 45, YLINE, 0.5f, 1.f, 1.f);
+#ifdef XT_HAS_MICROSECOND_TIMER
+        // MicroStats
+        if(!GameMenu)
+        {
+            SuperPrint(fmt::sprintf_ne("PROC TIME: %05dms/s",
+                                       g_microStats.view_total),
+                       3, 45, YLINE, 1.f, 1.f, 1.f);
+            SuperPrint(fmt::sprintf_ne("%s %04d %s %04d %s %04d %s %04d %s %04d",
+                                       g_microStats.task_names[0], g_microStats.view_timer[0],
+                                       g_microStats.task_names[1], g_microStats.view_timer[1],
+                                       g_microStats.task_names[2], g_microStats.view_timer[2],
+                                       g_microStats.task_names[3], g_microStats.view_timer[3],
+                                       g_microStats.task_names[4], g_microStats.view_timer[4]),
+                       3, 45, YLINE, 0.5f, 1.f, 1.f);
+            SuperPrint(fmt::sprintf_ne("%s %04d %s %04d %s %04d %s %04d %s %04d",
+                                       g_microStats.task_names[5], g_microStats.view_timer[5],
+                                       g_microStats.task_names[6], g_microStats.view_timer[6],
+                                       g_microStats.task_names[7], g_microStats.view_timer[7],
+                                       g_microStats.task_names[8], g_microStats.view_timer[8],
+                                       g_microStats.task_names[9], g_microStats.view_timer[9]),
+                       3, 45, YLINE, 0.5f, 1.f, 1.f);
+        }
+#endif
         // WIP
 //        SuperPrint(fmt::sprintf_ne("PHYS: B%03d G%03d N%03d, S:%03d",
 //                                   physScannedBlocks, physScannedBGOs, physScannedNPCs,
