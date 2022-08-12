@@ -69,6 +69,7 @@ static std::unique_ptr<Tree_private<WorldPath_t>> s_worldPathTree;
 static std::unique_ptr<Tree_private<WorldLevel_t>> s_worldLevelTree;
 static std::unique_ptr<Tree_private<WorldMusic_t>> s_worldMusicTree;
 static std::unique_ptr<Tree_private<Block_t>> s_levelBlockTrees[maxLayers+2];
+static std::unique_ptr<Tree_private<Block_t>> s_tempBlockTree;
 
 template<class Q>
 void clearTree(Q &tree)
@@ -371,21 +372,21 @@ TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(const Location_t &loc,
 
 void treeBlockAddLayer(int layer, Block_t *obj)
 {
-    if(layer < 0)
+    if(layer < 0 || layer == LAYER_NONE)
         layer = maxLayers + 1;
     treeInsert(s_levelBlockTrees[layer], obj);
 }
 
 void treeBlockUpdateLayer(int layer, Block_t *obj)
 {
-    if(layer < 0)
+    if(layer < 0 || layer == LAYER_NONE)
         layer = maxLayers + 1;
     treeUpdate(s_levelBlockTrees[layer], obj);
 }
 
 void treeBlockRemoveLayer(int layer, Block_t *obj)
 {
-    if(layer < 0)
+    if(layer < 0 || layer == LAYER_NONE)
         layer = maxLayers + 1;
     treeRemove(s_levelBlockTrees[layer], obj);
 }
@@ -398,7 +399,7 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
 
     for(int layer = 0; layer < maxLayers+2; layer++)
     {
-        // skip empty layers except the tempBlock layer
+        // skip empty layers except LAYER_NONE
         if(layer > numLayers && layer != maxLayers + 1)
             layer = maxLayers + 1;
 
@@ -462,6 +463,85 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc,
                          double margin)
 {
     return treeBlockQuery(loc.X,
+                   loc.Y,
+                   loc.X + loc.Width,
+                   loc.Y + loc.Height, sort_mode, margin);
+}
+
+/* ================= Temp blocks ================= */
+
+void treeTempBlockStartFrame()
+{
+    if(!s_tempBlockTree.get())
+        s_tempBlockTree.reset(new Tree_private<Block_t>());
+    s_tempBlockTree->tree.Clear();
+}
+
+void treeTempBlockAdd(Block_t *obj)
+{
+    treeInsert(s_tempBlockTree, obj);
+}
+
+void treeTempBlockUpdate(Block_t *obj)
+{
+    treeUpdate(s_tempBlockTree, obj);
+}
+
+TreeResult_Sentinel<Block_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
+                         int sort_mode,
+                         double margin)
+{
+    TreeResult_Sentinel<Block_t> result;
+
+    std::unique_ptr<Tree_private<Block_t>>& p = s_tempBlockTree;
+
+    auto q = p->tree.QueryIntersectsRegion(loose_quadtree::BoundingBox<double>(Left - margin - s_gridSize,
+                                                                               Top - margin - s_gridSize,
+                                                                               (Right - Left) + (margin + s_gridSize) * 2,
+                                                                               (Bottom - Top) + (margin + s_gridSize) * 2));
+    while(!q.EndOfQuery())
+    {
+        auto *item = q.GetCurrent();
+        if(item)
+            result.i_vec->push_back(item);
+        q.Next();
+    }
+
+    if(sort_mode == SORTMODE_LOC)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+            [](void* a, void* b) {
+                return (((Block_t*)a)->Location.X < ((Block_t*)b)->Location.X
+                    || (((Block_t*)a)->Location.X == ((Block_t*)b)->Location.X
+                        && ((Block_t*)a)->Location.Y < ((Block_t*)b)->Location.Y));
+            });
+    }
+    else if(sort_mode == SORTMODE_ID)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+            [](void* a, void* b) {
+                return a < b;
+            });
+    }
+    else if(sort_mode == SORTMODE_Z)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+            [](void* a, void* b) {
+                // not implemented yet, might never be
+                // instead, just sort by the index
+                // (which is currently the same as z-order)
+                return a < b;
+            });
+    }
+
+    return result;
+}
+
+TreeResult_Sentinel<Block_t> treeTempBlockQuery(const Location_t &loc,
+                         int sort_mode,
+                         double margin)
+{
+    return treeTempBlockQuery(loc.X,
                    loc.Y,
                    loc.X + loc.Width,
                    loc.Y + loc.Height, sort_mode, margin);

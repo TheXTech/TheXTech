@@ -1404,7 +1404,7 @@ void syncLayersTrees_Block(int block)
         else
         {
             Block[block].LocationInLayer = Block[block].Location;
-            treeBlockAddLayer(-1, &Block[block]);
+            treeBlockAddLayer(LAYER_NONE, &Block[block]);
         }
     }
     else
@@ -1416,7 +1416,7 @@ void syncLayersTrees_Block(int block)
         }
         else
         {
-            treeBlockRemoveLayer(-1, &Block[block]);
+            treeBlockRemoveLayer(LAYER_NONE, &Block[block]);
         }
     }
 }
