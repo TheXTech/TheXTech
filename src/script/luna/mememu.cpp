@@ -438,17 +438,17 @@ public:
         insert(0x00B2504C, &TakeScreen);
         insert(0x00B250D6, &numLocked);
         insert(0x00B250E2, // Pause menu visible
-               [](FIELDTYPE ftype)->double
-               {
-                   bool tmp = (GamePaused != PauseCode::None);
-                   return valueToMem(tmp, ftype);
-               },
-               [](double in, FIELDTYPE ftype)->void
-               {
-                   // FIXME: Verify this, if it needs to be written, try to work around this
-                   pLogWarning("Attempt to write the read-only field at 0x00B250E2 "
-                               "(GamePaused) with value %g as %s", in, FieldtypeToStr(ftype));
-               }
+            [](FIELDTYPE ftype)->double
+            {
+                bool tmp = (GamePaused != PauseCode::None);
+                return valueToMem(tmp, ftype);
+            },
+            [](double in, FIELDTYPE ftype)->void
+            {
+                // FIXME: Verify this, if it needs to be written, try to work around this
+                pLogWarning("Attempt to write the read-only field at 0x00B250E2 "
+                            "(GamePaused) with value %g as %s", in, FieldtypeToStr(ftype));
+            }
         );
         insert(0x00B25134, &LevelEditor);
 
