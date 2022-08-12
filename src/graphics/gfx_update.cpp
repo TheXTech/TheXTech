@@ -262,12 +262,11 @@ void GraphicsLazyPreLoad()
             -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
             SORTMODE_ID);
 
-        for(Block_t* block : screenBlocks)
+        for(Block_t* block_p : screenBlocks)
         {
-            int A = block - &Block[1] + 1;
-            auto &b = Block[A];
+            auto &b = *block_p;
             if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBlockType))
-                XRender::lazyPreLoad(GFXBlock[Block[A].Type]);
+                XRender::lazyPreLoad(GFXBlock[b.Type]);
         }
 
         for(int A = 1; A <= numNPCs; A++)
@@ -1439,25 +1438,26 @@ void UpdateGraphics(bool skipRepaint)
 
 
 //        For A = fBlock To lBlock 'Non-Sizable Blocks
-        for(Block_t* block : screenBlocks)
+        for(Block_t* block_p : screenBlocks)
         {
-            A = block - &Block[1] + 1;
+            auto &block = *block_p;
             g_stats.checkedBlocks++;
-            if(!BlockIsSizable[Block[A].Type] && (!Block[A].Invis || (LevelEditor && BlockFlash <= 30)) && Block[A].Type != 0 && !BlockKills[Block[A].Type])
+
+            if(!BlockIsSizable[block.Type] && (!block.Invis || (LevelEditor && BlockFlash <= 30)) && block.Type != 0 && !BlockKills[block.Type])
             {
-                if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
+                if(vScreenCollision(Z, block.Location) && !block.Hidden)
                 {
                     g_stats.renderedBlocks++;
                     // Don't show a visual difference of hit-resized block in a comparison to original state
-                    double offX = Block[A].wasShrinkResized ? 0.05 : 0.0;
-                    double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
-                    XRender::renderTexture(vScreenX[Z] + Block[A].Location.X - offX,
-                                          vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
-                                          Block[A].Location.Width + offW,
-                                          Block[A].Location.Height,
-                                          GFXBlock[Block[A].Type],
+                    double offX = block.wasShrinkResized ? 0.05 : 0.0;
+                    double offW = block.wasShrinkResized ? 0.1 : 0.0;
+                    XRender::renderTexture(vScreenX[Z] + block.Location.X - offX,
+                                          vScreenY[Z] + block.Location.Y + block.ShakeY3,
+                                          block.Location.Width + offW,
+                                          block.Location.Height,
+                                          GFXBlock[block.Type],
                                           0,
-                                          BlockFrame[Block[A].Type] * 32);
+                                          BlockFrame[block.Type] * 32);
                 }
             }
         }
@@ -2047,25 +2047,26 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // Blocks in Front
-        for(Block_t* block : screenBlocks)
+        for(Block_t* block_p : screenBlocks)
         {
-            A = block - &Block[1] + 1;
+            auto &block = *block_p;
             g_stats.checkedBlocks++;
-            if(BlockKills[Block[A].Type])
+
+            if(BlockKills[block.Type])
             {
-                if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
+                if(vScreenCollision(Z, block.Location) && !block.Hidden)
                 {
                     g_stats.renderedBlocks++;
                     // Don't show a visual difference of hit-resized block in a comparison to original state
-                    double offX = Block[A].wasShrinkResized ? 0.05 : 0.0;
-                    double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
-                    XRender::renderTexture(vScreenX[Z] + Block[A].Location.X - offX,
-                                          vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
-                                          Block[A].Location.Width + offW,
-                                          Block[A].Location.Height,
-                                          GFXBlock[Block[A].Type],
+                    double offX = block.wasShrinkResized ? 0.05 : 0.0;
+                    double offW = block.wasShrinkResized ? 0.1 : 0.0;
+                    XRender::renderTexture(vScreenX[Z] + block.Location.X - offX,
+                                          vScreenY[Z] + block.Location.Y + block.ShakeY3,
+                                          block.Location.Width + offW,
+                                          block.Location.Height,
+                                          GFXBlock[block.Type],
                                           0,
-                                          BlockFrame[Block[A].Type] * 32);
+                                          BlockFrame[block.Type] * 32);
                 }
             }
         }

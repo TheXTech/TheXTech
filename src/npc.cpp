@@ -1918,12 +1918,13 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(Block_t* block_p : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
-                int i = block - &Block[1] + 1;
-                if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
+                auto &block = *block_p;
+
+                if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                 {
-                    if(CheckCollision(tempLocation, Block[i].Location) && BlockSlope[Block[i].Type] == 0)
+                    if(CheckCollision(tempLocation, block.Location) && BlockSlope[block.Type] == 0)
                     {
                         if(npc.Special2 == 1)
                         {
@@ -1954,12 +1955,14 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                for(Block_t* block_p : treeBlockQuery(tempLocation, SORTMODE_NONE))
                 {
-                    int i = block - &Block[1] + 1;
-                    if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
+                    auto &block = *block_p;
+                    int i = getBlockArrayIndex(block_p);
+
+                    if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                     {
-                        if(CheckCollision(tempLocation, Block[i].Location))
+                        if(CheckCollision(tempLocation, block.Location))
                         {
                             npc.Special3 = i;
                             tempBool2 = true;

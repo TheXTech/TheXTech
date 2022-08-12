@@ -170,6 +170,16 @@ extern TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, doub
                                int sort_mode, double margin = 16.0);
 extern TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
 
+inline int getBlockArrayIndex(Block_t &block)
+{
+    return &block - &Block[1] + 1;
+}
+
+inline int getBlockArrayIndex(Block_t *block)
+{
+    return block - &Block[1] + 1;
+}
+
 // removed in favor of block quadtree
 
 // extern void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock);
