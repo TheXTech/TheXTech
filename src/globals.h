@@ -1189,13 +1189,17 @@ extern bool RestartLevel;
 extern int WorldStarsShowPolicy;
 //Public LevelChop(0 To maxSections) As Single 'for drawing backgrounds when the level has been shrunk
 extern float LevelChop[maxSections + 1];
+
 //'collision detection optimization. creates a table of contents for blocks
+// removed in favor of new block quadtree
+
 //Public Const FLBlocks As Long = 8000
-const int64_t FLBlocks = 10000;
+// const int64_t FLBlocks = 10000; // moved to global_constants.h and changed back to 8000
 //Public FirstBlock(-FLBlocks To FLBlocks) As Integer
-extern RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
+// extern RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
 //Public LastBlock(-FLBlocks To FLBlocks) As Integer
-extern RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
+// extern RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
+
 //Public MidBackground As Integer 'for drawing backgrounds
 extern int MidBackground;
 //Public LastBackground As Integer 'last backgrounds to be drawn
@@ -1738,8 +1742,11 @@ extern bool TestFullscreen;
 //extern bool keyDownAlt;
 ////Public keyDownEnter As Boolean
 //extern bool keyDownEnter;
+
+// no longer needed thanks to block quadtree
 //Public BlocksSorted As Boolean 'if using block optimization it requires the locks to be sorted
-extern bool BlocksSorted;
+// extern bool BlocksSorted;
+
 //Public SingleCoop As Integer 'cheat code
 extern int SingleCoop;
 //Public CheatString As String 'logs keys for cheats

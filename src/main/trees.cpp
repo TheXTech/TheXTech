@@ -400,13 +400,10 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
     {
         // skip empty layers except the tempBlock layer
         if(layer > numLayers && layer != maxLayers + 1)
-        {
             layer = maxLayers + 1;
-            continue;
-        }
 
         double OffsetX, OffsetY;
-        if(layer == maxLayers+1)
+        if(layer == maxLayers + 1)
             OffsetX = OffsetY = 0.0;
         else
         {
@@ -471,8 +468,9 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc,
 }
 
 /* ================= Tile block search ================= */
-// the old ones, still good for now
+// removed in favor of block quadtree
 
+#if 0
 void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock)
 {
     int f = vb6Round(loc.X / 32) - 1;
@@ -488,3 +486,4 @@ void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock)
     fBlock = FirstBlock[f < -FLBlocks ? -FLBlocks : f];
     lBlock = LastBlock[l > FLBlocks ? FLBlocks : l];
 }
+#endif

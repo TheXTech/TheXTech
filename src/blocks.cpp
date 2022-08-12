@@ -2044,7 +2044,7 @@ void UpdateBlocks()
 void PSwitch(bool enabled)
 {
     int A = 0;
-    int B = 0;
+    // int B = 0;
     Block_t blankBlock;
 
     if(enabled)
@@ -2217,23 +2217,23 @@ void PSwitch(bool enabled)
         ProcEvent(EVENT_PSWITCH_END, true);
     }
 
-    qSortBlocksX(1, numBlock);
-    B = 1;
+    // qSortBlocksX(1, numBlock);
+    // B = 1;
 
-    for(A = 2; A <= numBlock; A++)
-    {
-        if(Block[A].Location.X > Block[B].Location.X)
-        {
-            qSortBlocksY(B, A - 1);
-            B = A;
-        }
-    }
+    // for(A = 2; A <= numBlock; A++)
+    // {
+    //     if(Block[A].Location.X > Block[B].Location.X)
+    //     {
+    //         qSortBlocksY(B, A - 1);
+    //         B = A;
+    //     }
+    // }
 
-    qSortBlocksY(B, A - 1);
-    FindSBlocks();
-    FindBlocks();
+    // qSortBlocksY(B, A - 1);
+    // FindSBlocks();
+    // FindBlocks();
     // SO expensive, can't wait to get rid of this.
-    syncLayersTrees_AllBlocks();
+    // syncLayersTrees_AllBlocks();
 
     iBlocks = numBlock;
     for(A = 1; A <= numBlock; A++)
