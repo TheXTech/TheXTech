@@ -319,12 +319,6 @@ void repaint()
     if(!g_in_frame)
         return;
 
-    int tex_w = ScreenW / 2;
-    int tex_h = ScreenH / 2;
-
-    float scale_x = (float)s_screen_phys_w / tex_w;
-    float scale_y = (float)s_screen_phys_h / tex_h;
-
     constexpr int shift = MAX_3D_OFFSET / 2;
     constexpr double shift_i[] = {shift, shift * 0.4, 0, shift * -0.4};
 
@@ -801,7 +795,7 @@ inline float ROUNDDIV2(float x)
 
 inline float ROUNDDIV2(double x)
 {
-    return std::nearbyintf(std::roundf((float)x) / 2.0f);
+    return std::nearbyintf(std::roundf((float)x / 2.0f));
 }
 
 inline float FLOORDIV2(float x)
@@ -851,12 +845,40 @@ void renderCircle(int cx, int cy,
                   float red , float green, float blue, float alpha,
                   bool filled)
 {
+    renderRect(cx - radius, cy - radius, radius, radius, red, green, blue, alpha, filled);
 }
 
 void renderCircleHole(int cx, int cy,
                       int radius,
                       float red, float green, float blue, float alpha)
 {
+    if(radius <= 0)
+        return; // Nothing to draw
+
+    double line_size = 4;
+    double dy = line_size;
+
+    do
+    {
+        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
+
+        renderRectBR(cx - radius, cy + dy - radius - line_size, cx - dx, cy + dy - radius + line_size,
+            red, green, blue, alpha);
+
+        renderRectBR(cx + dx, cy + dy - radius - line_size, cx + radius, cy + dy - radius + line_size,
+            red, green, blue, alpha);
+
+        if(dy < radius) // Don't cross lines
+        {
+            renderRectBR(cx - radius, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
+                red, green, blue, alpha);
+
+            renderRectBR(cx + dx, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
+                red, green, blue, alpha);
+        }
+
+        dy += line_size * 2;
+    } while(dy + line_size <= radius);
 }
 
 inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
@@ -1020,8 +1042,9 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             int xSrc, int ySrc, int wSrc, int hSrc,
                             float red, float green, float blue, float alpha)
 {
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
     i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), ROUNDDIV2(wDst), ROUNDDIV2(hDst),
+        div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
         tx,
         xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
         0.0f, nullptr, X_FLIP_NONE,
@@ -1033,12 +1056,14 @@ void renderTexture(double xDst, double yDst, double wDst, double hDst,
                             int xSrc, int ySrc,
                             float red, float green, float blue, float alpha)
 {
-    float w = ROUNDDIV2(wDst);
-    float h = ROUNDDIV2(hDst);
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
+    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+
     i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
+        div_x, div_y, div_w, div_h,
         tx,
-        xSrc / 2, ySrc / 2, w, h,
+        xSrc / 2, ySrc / 2, div_w, div_h,
         0.0f, nullptr, X_FLIP_NONE,
         red, green, blue, alpha);
 }
@@ -1084,12 +1109,14 @@ void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
                           double rotateAngle, FPoint_t *center, unsigned int flip,
                           float red, float green, float blue, float alpha)
 {
-    float w = ROUNDDIV2(wDst);
-    float h = ROUNDDIV2(hDst);
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
+    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+
     i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
+        div_x, div_y, div_w, div_h,
         tx,
-        xSrc / 2, ySrc / 2, w, h,
+        xSrc / 2, ySrc / 2, div_w, div_h,
         rotateAngle, center, flip,
         red, green, blue, alpha);
 }
@@ -1101,10 +1128,12 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
                           double rotateAngle, FPoint_t *center, unsigned int flip,
                           float red, float green, float blue, float alpha)
 {
-    float w = ROUNDDIV2(wDst);
-    float h = ROUNDDIV2(hDst);
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
+    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+
     i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
+        div_x, div_y, div_w, div_h,
         tx,
         xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
         rotateAngle, center, flip,
