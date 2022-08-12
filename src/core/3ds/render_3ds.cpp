@@ -367,7 +367,8 @@ void repaint()
     g_in_frame = false;
 
     g_microStats.start_sleep();
-    C3D_FrameSync();
+    if(g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC)
+        C3D_FrameSync();
 
     g_microStats.start_task(MicroStats::Graphics);
     C3D_FrameEnd(0);
