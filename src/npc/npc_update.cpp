@@ -85,10 +85,10 @@ void UpdateNPCs()
     int oldDirection = 0;
 
     // used for collision detection
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
-    int64_t fBlock2 = 0;
-    int64_t lBlock2 = 0;
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
+    // int64_t fBlock2 = 0;
+    // int64_t lBlock2 = 0;
     int bCheck2 = 0;
     int bCheck = 0;
     float addBelt = 0;
@@ -638,16 +638,18 @@ void UpdateNPCs()
             numTempBlock++;
         }
     }
-    // don't need to sync yet since its layer is LAYER_NONE,
-    //   but will want to sync once we use the quadtree
-    // for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
-    // {
-    //     syncLayersTrees_Block(A);
-    // }
-    if(numTempBlock > 1)
-        qSortBlocksX(numBlock + 1 - numTempBlock, numBlock);
+
+    // add the NPC temp blocks to the quadtree for LAYER_NONE
     for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
-        NPC[Block[A].IsReally].tempBlock = A;
+    {
+        Block[A].LocationInLayer = Block[A].Location;
+        treeBlockAddLayer(-1, &Block[A]);
+    }
+
+    // if(numTempBlock > 1)
+    //     qSortBlocksX(numBlock + 1 - numTempBlock, numBlock);
+    // for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
+    //     NPC[Block[A].IsReally].tempBlock = A;
 
     for(A = 1; A <= numNPCs; A++)
     {
@@ -1907,13 +1909,14 @@ void UpdateNPCs()
                             loc.X += 1 * NPC[A].Direction;
                             loc.SpeedX += 2 * NPC[A].Direction;
 
-                            int64_t fBlock;// = FirstBlock[static_cast<int>(floor(static_cast<double>(loc.X / 32))) - 1];
-                            int64_t lBlock;// = LastBlock[floor((loc.X + loc.Width) / 32.0) + 1];
-                            blockTileGet(loc, fBlock, lBlock);
+                            // int64_t fBlock;// = FirstBlock[static_cast<int>(floor(static_cast<double>(loc.X / 32))) - 1];
+                            // int64_t lBlock;// = LastBlock[floor((loc.X + loc.Width) / 32.0) + 1];
+                            // blockTileGet(loc, fBlock, lBlock);
                             bool stillCollide = false;
 
-                            for(int B = (int)fBlock; B <= lBlock; B++)
+                            for(Block_t* block : treeBlockQuery(loc, SORTMODE_NONE))
                             {
+                                B = block - &Block[1] + 1;
                                 if(!CheckCollision(loc, Block[B].Location))
                                     continue;
                                 if(NPC[A].Block == B || Block[B].noProjClipping ||
@@ -2040,22 +2043,35 @@ void UpdateNPCs()
                            NPC[A].Type != 30 && NPC[A].Type != 18 && NPC[A].Type != 108 &&
                            !(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && NPC[A].Type != 272)
                         {
+                            auto collBlockSentinel = treeBlockQuery(NPC[A].Location, SORTMODE_LOC);
+
+                            // This code is paranoid and slower than it has to be,
+                            // in order to match the original code's two-pass structure
+                            // in extremely rare edge cases.
+
+                            // The non-paranoid version would set bCheck = 0 and only perform the following code once.
                             for(bCheck = 1; bCheck <= 2; bCheck++)
                             {
-                                if(bCheck == 1)
-                                {
-                                    // fBlock = FirstBlock[(int)SDL_floor(NPC[A].Location.X / 32) - 1];
-                                    // lBlock = LastBlock[(int)SDL_floor((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
-                                    blockTileGet(NPC[A].Location, fBlock, lBlock);
-                                }
-                                else
-                                {
-                                    fBlock = numBlock + 1 - numTempBlock;
-                                    lBlock = numBlock;
-                                }
+                                // if(bCheck == 1)
+                                // {
+                                //     // fBlock = FirstBlock[(int)SDL_floor(NPC[A].Location.X / 32) - 1];
+                                //     // lBlock = LastBlock[(int)SDL_floor((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+                                //     blockTileGet(NPC[A].Location, fBlock, lBlock);
+                                // }
+                                // else
+                                // {
+                                //     fBlock = numBlock + 1 - numTempBlock;
+                                //     lBlock = numBlock;
+                                // }
 
-                                for(B = (int)fBlock; B <= lBlock; B++)
+                                for(Block_t* block : collBlockSentinel)
                                 {
+                                    B = block - &Block[1] + 1;
+                                    // the paranoid check. otherwise, we could just do a single pass.
+                                    if(bCheck == 1 && B >= numBlock + 1 - numTempBlock)
+                                        continue;
+                                    if(bCheck == 2 && B < numBlock + 1 - numTempBlock)
+                                        continue;
                                     // If Not .Block = B And Not .tempBlock = B And Not (.Projectile = True And Block(B).noProjClipping = True) And BlockNoClipping(Block(B).Type) = False And Block(B).Hidden = False And Block(B).Hidden = False Then
 
 
@@ -3082,7 +3098,9 @@ void UpdateNPCs()
                                     }
                                     else
                                     {
-                                        if((bCheck == 2 || BlocksSorted) && PSwitchTime == 0)
+                                        // the returned collision list is always sorted by location now
+                                        // if((bCheck == 2 || BlocksSorted) && PSwitchTime == 0)
+                                        if(PSwitchTime == 0)
                                             break;
                                     }
                                 }
@@ -3409,22 +3427,40 @@ void UpdateNPCs()
                                                                                     tempLocation = NPC[B].Location;
                                                                                     tempLocation.Y += 1;
                                                                                     tempLocation.Height -= 2;
+
+                                                                                    // again, this is the same paranoid pattern (see comment above)
+                                                                                    // we probably don't even need to sort the results here.
+                                                                                    auto collBlockSentinel2 = treeBlockQuery(NPC[B].Location, SORTMODE_LOC);
+
                                                                                     for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                                                                     {
-                                                                                        if(bCheck2 == 1)
-                                                                                        {
-                                                                                            // fBlock2 = FirstBlock[(NPC[B].Location.X / 32) - 1];
-                                                                                            // lBlock2 = LastBlock[((NPC[B].Location.X + NPC[B].Location.Width) / 32.0) + 1];
-                                                                                            blockTileGet(NPC[B].Location, fBlock2, lBlock2);
-                                                                                        }
-                                                                                        else
-                                                                                        {
-                                                                                            fBlock2 = numBlock - numTempBlock;
-                                                                                            lBlock2 = numBlock;
-                                                                                        }
+                                                                                        // if(bCheck2 == 1)
+                                                                                        // {
+                                                                                        //     // fBlock2 = FirstBlock[(NPC[B].Location.X / 32) - 1];
+                                                                                        //     // lBlock2 = LastBlock[((NPC[B].Location.X + NPC[B].Location.Width) / 32.0) + 1];
+                                                                                        //     blockTileGet(NPC[B].Location, fBlock2, lBlock2);
+                                                                                        // }
+                                                                                        // else
+                                                                                        // {
+                                                                                               // ds-sloth comment: should be numBlock - numTempBlock + 1,
+                                                                                               // this will double-count numBlock - numTempBlock.
+                                                                                               // not a problem because it is the last of the non-temp blocks
+                                                                                               // and the first of the temp blocks in the original check,
+                                                                                               // so order is the same if we exclusively count it is a non-temp block.
+                                                                                        //     fBlock2 = numBlock - numTempBlock;
+                                                                                        //     lBlock2 = numBlock;
+                                                                                        // }
 
-                                                                                        for(auto C = fBlock2; C <= lBlock2; C++)
+                                                                                        for(Block_t* block2 : collBlockSentinel2)
                                                                                         {
+                                                                                            int C = block2 - &Block[1] + 1;
+
+                                                                                            // the paranoid check.
+                                                                                            if(bCheck2 == 1 && C >= numBlock + 1 - numTempBlock)
+                                                                                                continue;
+                                                                                            if(bCheck2 == 2 && C < numBlock + 1 - numTempBlock)
+                                                                                                continue;
+
                                                                                             if(!BlockIsSizable[Block[C].Type] && !BlockOnlyHitspot1[Block[C].Type] && !Block[C].Hidden && BlockSlope[Block[C].Type] == 0)
                                                                                             {
                                                                                                 if(CheckCollision(tempLocation, Block[C].Location))
@@ -3714,22 +3750,25 @@ void UpdateNPCs()
                                     // If .Type = 189 Then tempLocation.X += 10
                                 }
 
-                                for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
-                                {
-                                    if(bCheck2 == 1)
-                                    {
-                                        // fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
-                                        // lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                                        blockTileGet(tempLocation, fBlock2, lBlock2);
-                                    }
-                                    else
-                                    {
-                                        fBlock2 = numBlock - numTempBlock;
-                                        lBlock2 = numBlock;
-                                    }
+                                // here we can eliminate this dysfunctional pattern because the checks are not order-sensitive
 
-                                    for(B = (int)fBlock2; B <= lBlock2; B++)
+                                // for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+                                {
+                                    // if(bCheck2 == 1)
+                                    // {
+                                    //     // fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
+                                    //     // lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                    //     blockTileGet(tempLocation, fBlock2, lBlock2);
+                                    // }
+                                    // else
+                                    // {
+                                    //     fBlock2 = numBlock - numTempBlock;
+                                    //     lBlock2 = numBlock;
+                                    // }
+
+                                    for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
                                     {
+                                        B = block - &Block[1] + 1;
                                         //If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
 
                                         // Don't collapse Pokey during walking on slopes and other touching surfaces
@@ -3784,22 +3823,25 @@ void UpdateNPCs()
                                     tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width - 16;
                                 else
                                     tempLocation.X = NPC[A].Location.X - tempLocation.Width + 16;
-                                for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
-                                {
-                                    if(bCheck2 == 1)
-                                    {
-                                        // fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
-                                        // lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                                        blockTileGet(tempLocation, fBlock2, lBlock2);
-                                    }
-                                    else
-                                    {
-                                        fBlock2 = numBlock - numTempBlock;
-                                        lBlock2 = numBlock;
-                                    }
 
-                                    for(B = (int)fBlock2; B <= lBlock2; B++)
+                                // again, we can eliminate the dysfunctional pattern since it is not order-sensitive.
+                                // for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+                                {
+                                    // if(bCheck2 == 1)
+                                    // {
+                                    //     // fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
+                                    //     // lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                    //     blockTileGet(tempLocation, fBlock2, lBlock2);
+                                    // }
+                                    // else
+                                    // {
+                                    //     fBlock2 = numBlock - numTempBlock;
+                                    //     lBlock2 = numBlock;
+                                    // }
+
+                                    for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
                                     {
+                                        B = block - &Block[1] + 1;
                                         if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
                                         {
                                             if(CheckCollision(tempLocation, Block[B].Location))
@@ -3820,21 +3862,28 @@ void UpdateNPCs()
                                     tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width;
                                 else
                                     tempLocation.X = NPC[A].Location.X - tempLocation.Width;
-                                for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+
+                                // eliminating the dysfunctional pattern because the check is not order-sensitive
+                                // for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+
+                                // we are able to wrap this whole thing in the inner-loop check that (NPC[A].Slope <= 0)
+                                // commenting for now to avoid inadvertently introducing any bugs
+                                // if(NPC[A].Slope <= 0)
                                 {
-                                    if(bCheck2 == 1)
+                                    // if(bCheck2 == 1)
+                                    // {
+                                    //     // fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
+                                    //     // lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
+                                    //     blockTileGet(tempLocation, fBlock2, lBlock2);
+                                    // }
+                                    // else
+                                    // {
+                                    //     fBlock2 = numBlock - numTempBlock;
+                                    //     lBlock2 = numBlock;
+                                    // }
+                                    for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
                                     {
-                                        // fBlock2 = FirstBlock[(tempLocation.X / 32) - 1];
-                                        // lBlock2 = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                                        blockTileGet(tempLocation, fBlock2, lBlock2);
-                                    }
-                                    else
-                                    {
-                                        fBlock2 = numBlock - numTempBlock;
-                                        lBlock2 = numBlock;
-                                    }
-                                    for(B = (int)fBlock2; B <= lBlock2; B++)
-                                    {
+                                        B = block - &Block[1] + 1;
                                         if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 1))
                                         {
                                             if(CheckCollision(tempLocation, Block[B].Location))
@@ -3939,6 +3988,18 @@ void UpdateNPCs()
                             Block[NPC[A].tempBlock].Location.Y -= 16;
                             Block[NPC[A].tempBlock].Location.Height += 16;
                         }
+
+                        // necessary for tree update
+                        Block[NPC[A].tempBlock].LocationInLayer = Block[NPC[A].tempBlock].Location;
+                        if(Block[NPC[A].tempBlock].Layer != LAYER_NONE)
+                        {
+                            Block[NPC[A].tempBlock].LocationInLayer.X -= Layer[Block[NPC[A].tempBlock].Layer].OffsetX;
+                            Block[NPC[A].tempBlock].LocationInLayer.Y -= Layer[Block[NPC[A].tempBlock].Layer].OffsetY;
+                        }
+                        treeBlockUpdateLayer(Block[NPC[A].tempBlock].Layer, &Block[NPC[A].tempBlock]);
+
+                        // no longer needed; maintaining the sort
+#if 0
                         while(Block[NPC[A].tempBlock].Location.X < Block[NPC[A].tempBlock - 1].Location.X && NPC[A].tempBlock > numBlock + 1 - numTempBlock)
                         {
 
@@ -3969,6 +4030,7 @@ void UpdateNPCs()
 
 
                         }
+#endif
                     }
                     Block[NPC[A].tempBlock].Location.SpeedX = NPC[A].Location.SpeedX + NPC[A].BeltSpeed;
                 }
@@ -4367,10 +4429,11 @@ void UpdateNPCs()
                                 tempLocation.Height = 16;
                                 // fBlock = FirstBlock[long(NPC[A].Location.X / 32) - 1];
                                 // lBlock = LastBlock[long((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
-                                blockTileGet(NPC[A].Location, fBlock, lBlock);
+                                // blockTileGet(NPC[A].Location, fBlock, lBlock);
 
-                                for(B = (int)fBlock; B <= lBlock; B++)
+                                for(Block_t* block : treeBlockQuery(tempLocation, false))
                                 {
+                                    B = block - &Block[1] + 1;
                                     if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) && !Block[B].Hidden)
                                         KillBlock(B);
                                 }
@@ -4382,17 +4445,30 @@ void UpdateNPCs()
                                 {
                                     // fBlock = FirstBlock[long(level[NPC[A].Section].X / 32) - 1];
                                     // lBlock = LastBlock[long((level[NPC[A].Section].Width) / 32.0) + 2];
+                                    // {
+                                    //     auto &sec = level[NPC[A].Section];
+                                    //     Location_t toShake;
+                                    //     toShake.X = sec.X;
+                                    //     toShake.Width = (sec.Width - sec.X);
+                                    //     blockTileGet(toShake, fBlock, lBlock);
+                                    // }
+
+                                    // Shake all blocks up
+                                    // for(int B = (int)fBlock; B <= lBlock; B++)
+                                    //     BlockShakeUp(B);
                                     {
                                         auto &sec = level[NPC[A].Section];
                                         Location_t toShake;
                                         toShake.X = sec.X;
                                         toShake.Width = (sec.Width - sec.X);
-                                        blockTileGet(toShake, fBlock, lBlock);
+                                        toShake.Y = sec.Y;
+                                        toShake.Height = (sec.Height - sec.Y);
+                                        for(Block_t* block : treeBlockQuery(toShake, false))
+                                        {
+                                            B = block - &Block[1] + 1;
+                                            BlockShakeUp(B);
+                                        }
                                     }
-
-                                    // Shake all blocks up
-                                    for(int B = (int)fBlock; B <= lBlock; B++)
-                                        BlockShakeUp(B);
 
                                     // expand down a section at the bottom of destroyed blocks
                                     for(int B = 0; B <= numSections; B++)
@@ -5017,21 +5093,36 @@ void UpdateNPCs()
                     NPC[A].Effect = 0;
                     NPC[A].Effect2 = 0;
                     NPC[A].Location.Height = 32;
+
+                    // the dysfunctional pattern and the same paranoid behavior again.
+                    auto collBlockSentinel = treeBlockQuery(NPC[A].Location, SORTMODE_LOC);
+
                     for(bCheck = 1; bCheck <= 2; bCheck++)
                     {
-                        if(bCheck == 1)
+                        // if(bCheck == 1)
+                        // {
+                        //     // fBlock = FirstBlock[(NPC[A].Location.X / 32) - 1];
+                        //     // lBlock = LastBlock[((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
+                        //     blockTileGet(NPC[A].Location, fBlock, lBlock);
+                        // }
+                        // else
+                        // {
+                               // buggy, mentioned above, should be numBlock - numTempBlock + 1 -- ds-sloth
+                               // it's not a problem here because the NPC is moved out of the way of the block
+                               // during the first loop, so can't collide during the second loop.
+                        //     fBlock = numBlock - numTempBlock;
+                        //     lBlock = numBlock;
+                        // }
+                        for(Block_t* block : collBlockSentinel)
                         {
-                            // fBlock = FirstBlock[(NPC[A].Location.X / 32) - 1];
-                            // lBlock = LastBlock[((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
-                            blockTileGet(NPC[A].Location, fBlock, lBlock);
-                        }
-                        else
-                        {
-                            fBlock = numBlock - numTempBlock;
-                            lBlock = numBlock;
-                        }
-                        for(B = (int)fBlock; B <= lBlock; B++)
-                        {
+                            B = block - &Block[1] + 1;
+
+                            // the paranoid check.
+                            if(bCheck == 1 && B >= numBlock + 1 - numTempBlock)
+                                continue;
+                            if(bCheck == 2 && B < numBlock + 1 - numTempBlock)
+                                continue;
+
                             if(!Block[B].Invis && !(BlockIsSizable[Block[B].Type] && NPC[A].Location.Y > Block[B].Location.Y) && !Block[B].Hidden)
                             {
                                 if(CheckCollision(NPC[A].Location, Block[B].Location))
@@ -5210,11 +5301,13 @@ void UpdateNPCs()
     }
 
     numBlock -= numTempBlock; // clean up the temp npc blocks
-    // again, don't need this until the block quadtree
-    // for(int i = numBlock + 1; i <= numBlock + numTempBlock; i++)
-    // {
-    //     syncLayersTrees_Block(i);
-    // }
+
+    // remove all temp NPC blocks from tree
+    for(int i = numBlock + 1; i <= numBlock + numTempBlock; i++)
+    {
+        treeBlockRemoveLayer(LAYER_NONE, &Block[i]);
+    }
+
     for(A = numNPCs; A >= 1; A--) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
     {
         if(NPC[A].Killed > 0)

@@ -772,7 +772,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         syncLayers_Water(numWater);
     }
 
-    FindBlocks();
+    // FindBlocks();
     qSortBackgrounds(1, numBackground);
     UpdateBackgrounds();
     FindSBlocks();
@@ -892,7 +892,7 @@ void ClearLevel()
     LoadNPCDefaults();
     LoadPlayerDefaults();
     noUpdate = true;
-    BlocksSorted = true;
+    // BlocksSorted = true;
     qScreen = false;
 
     UnloadCustomGFX();

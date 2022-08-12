@@ -1259,6 +1259,7 @@ void UpdateEditor()
                             Block[numBlock].DefaultSpecial = Block[numBlock].Special;
                             Block[numBlock].DefaultSpecial2 = Block[numBlock].Special2;
                             syncLayersTrees_Block(numBlock);
+#if 0
                             if(MagicHand)
                             {
                                 for(A = -FLBlocks; A <= FLBlocks; A++)
@@ -1268,6 +1269,7 @@ void UpdateEditor()
                                 }
                                 BlocksSorted = false;
                             }
+#endif
                         }
                         FindSBlocks();
 //                        if(nPlay.Online == true)

@@ -169,22 +169,22 @@ void OutroLoop()
 
         if(g_gameInfo.outroAutoJump)
         {
-            int64_t fBlock = 0;
-            int64_t lBlock = 0;
+            // int64_t fBlock = 0;
+            // int64_t lBlock = 0;
             // fBlock = FirstBlock[long(tempLocation.X / 32) - 1];
             // lBlock = LastBlock[long((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-            blockTileGet(tempLocation, fBlock, lBlock);
-            if(!BlocksSorted)
-            {
-                fBlock = 1;
-                lBlock = numBlock;
-            }
+            // blockTileGet(tempLocation, fBlock, lBlock);
+            // if(!BlocksSorted)
+            // {
+            //     fBlock = 1;
+            //     lBlock = numBlock;
+            // }
 
             bool doJump = true;
 
-            for(auto B = fBlock; B <= lBlock; B++)
+            for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
-                const auto &bb = Block[B];
+                const Block_t& bb = *block;
 //                if(tempLocation.X + tempLocation.Width >= Block[B].Location.X &&
 //                   tempLocation.X <= Block[B].Location.X + Block[B].Location.Width &&
 //                   tempLocation.Y + tempLocation.Height >= Block[B].Location.Y &&
@@ -196,6 +196,7 @@ void OutroLoop()
                        !(BlockIsSizable[bb.Type] && bb.Location.Y < pp_bottom - 3))
                     {
                         doJump = false;
+                        break;
                     }
                 }
             }
