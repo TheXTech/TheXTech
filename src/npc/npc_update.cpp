@@ -627,11 +627,12 @@ void UpdateNPCs()
         }
     }
 
-    // add the NPC temp blocks to the quadtree for LAYER_NONE
+    // add the NPC temp blocks to the quadtree
+    treeTempBlockStartFrame();
     for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
     {
         Block[A].LocationInLayer = Block[A].Location;
-        treeBlockAddLayer(-1, &Block[A]);
+        treeTempBlockAdd(&Block[A]);
     }
 
     // if(numTempBlock > 1)
@@ -2031,13 +2032,6 @@ void UpdateNPCs()
                            NPC[A].Type != 30 && NPC[A].Type != 18 && NPC[A].Type != 108 &&
                            !(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && NPC[A].Type != 272)
                         {
-                            auto collBlockSentinel = treeBlockQuery(NPC[A].Location, SORTMODE_LOC);
-
-                            // This code is paranoid and slower than it has to be,
-                            // in order to match the original code's two-pass structure
-                            // in extremely rare edge cases.
-
-                            // The non-paranoid version would set bCheck = 0 and only perform the following code once.
                             for(bCheck = 1; bCheck <= 2; bCheck++)
                             {
                                 // if(bCheck == 1)
@@ -2051,15 +2045,13 @@ void UpdateNPCs()
                                 //     fBlock = numBlock + 1 - numTempBlock;
                                 //     lBlock = numBlock;
                                 // }
+                                auto collBlockSentinel = (bCheck == 1)
+                                    ? treeBlockQuery(NPC[A].Location, SORTMODE_LOC)
+                                    : treeTempBlockQuery(NPC[A].Location, SORTMODE_LOC);
 
                                 for(Block_t* block : collBlockSentinel)
                                 {
                                     B = block - &Block[1] + 1;
-                                    // the paranoid check. otherwise, we could just do a single pass.
-                                    if(bCheck == 1 && B >= numBlock + 1 - numTempBlock)
-                                        continue;
-                                    if(bCheck == 2 && B < numBlock + 1 - numTempBlock)
-                                        continue;
                                     // If Not .Block = B And Not .tempBlock = B And Not (.Projectile = True And Block(B).noProjClipping = True) And BlockNoClipping(Block(B).Type) = False And Block(B).Hidden = False And Block(B).Hidden = False Then
 
 
@@ -3416,10 +3408,6 @@ void UpdateNPCs()
                                                                                     tempLocation.Y += 1;
                                                                                     tempLocation.Height -= 2;
 
-                                                                                    // again, this is the same paranoid pattern (see comment above)
-                                                                                    // we probably don't even need to sort the results here.
-                                                                                    auto collBlockSentinel2 = treeBlockQuery(NPC[B].Location, SORTMODE_LOC);
-
                                                                                     for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                                                                     {
                                                                                         // if(bCheck2 == 1)
@@ -3430,24 +3418,25 @@ void UpdateNPCs()
                                                                                         // }
                                                                                         // else
                                                                                         // {
-                                                                                               // ds-sloth comment: should be numBlock - numTempBlock + 1,
+                                                                                               // ds-sloth comment: this was a "bug",
+                                                                                               // but it never affected the result so wasn't fixed
+                                                                                               // should be numBlock - numTempBlock + 1,
                                                                                                // this will double-count numBlock - numTempBlock.
                                                                                                // not a problem because it is the last of the non-temp blocks
                                                                                                // and the first of the temp blocks in the original check,
-                                                                                               // so order is the same if we exclusively count it is a non-temp block.
+                                                                                               // so order is the same if we exclusively count it is a non-temp block,
+                                                                                               // which is what the new code does
                                                                                         //     fBlock2 = numBlock - numTempBlock;
                                                                                         //     lBlock2 = numBlock;
                                                                                         // }
 
+                                                                                        auto collBlockSentinel2 = (bCheck2 == 1)
+                                                                                            ? treeBlockQuery(NPC[B].Location, SORTMODE_LOC)
+                                                                                            : treeTempBlockQuery(NPC[B].Location, SORTMODE_LOC);
+
                                                                                         for(Block_t* block2 : collBlockSentinel2)
                                                                                         {
                                                                                             int C = block2 - &Block[1] + 1;
-
-                                                                                            // the paranoid check.
-                                                                                            if(bCheck2 == 1 && C >= numBlock + 1 - numTempBlock)
-                                                                                                continue;
-                                                                                            if(bCheck2 == 2 && C < numBlock + 1 - numTempBlock)
-                                                                                                continue;
 
                                                                                             if(!BlockIsSizable[Block[C].Type] && !BlockOnlyHitspot1[Block[C].Type] && !Block[C].Hidden && BlockSlope[Block[C].Type] == 0)
                                                                                             {
@@ -3738,9 +3727,7 @@ void UpdateNPCs()
                                     // If .Type = 189 Then tempLocation.X += 10
                                 }
 
-                                // here we can eliminate this dysfunctional pattern because the checks are not order-sensitive
-
-                                // for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+                                for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                 {
                                     // if(bCheck2 == 1)
                                     // {
@@ -3753,8 +3740,11 @@ void UpdateNPCs()
                                     //     fBlock2 = numBlock - numTempBlock;
                                     //     lBlock2 = numBlock;
                                     // }
+                                    auto collBlockSentinel2 = (bCheck2 == 1)
+                                        ? treeBlockQuery(tempLocation, SORTMODE_NONE)
+                                        : treeTempBlockQuery(tempLocation, SORTMODE_NONE);
 
-                                    for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                                    for(Block_t* block : collBlockSentinel2)
                                     {
                                         B = block - &Block[1] + 1;
                                         //If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
@@ -3781,6 +3771,9 @@ void UpdateNPCs()
 
                                         // End If
                                     }
+
+                                    if(!tempTurn)
+                                        break;
                                 }
 
                                 if(tempTurn)
@@ -3812,8 +3805,7 @@ void UpdateNPCs()
                                 else
                                     tempLocation.X = NPC[A].Location.X - tempLocation.Width + 16;
 
-                                // again, we can eliminate the dysfunctional pattern since it is not order-sensitive.
-                                // for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
+                                for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                 {
                                     // if(bCheck2 == 1)
                                     // {
@@ -3826,8 +3818,11 @@ void UpdateNPCs()
                                     //     fBlock2 = numBlock - numTempBlock;
                                     //     lBlock2 = numBlock;
                                     // }
+                                    auto collBlockSentinel2 = (bCheck2 == 1)
+                                        ? treeBlockQuery(tempLocation, SORTMODE_NONE)
+                                        : treeTempBlockQuery(tempLocation, SORTMODE_NONE);
 
-                                    for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                                    for(Block_t* block : collBlockSentinel2)
                                     {
                                         B = block - &Block[1] + 1;
                                         if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
@@ -3838,8 +3833,12 @@ void UpdateNPCs()
                                                 break;
                                             }
                                         }
+
+                                        if(!tempTurn)
+                                            break;
                                     }
                                 }
+
                                 tempLocation = NPC[A].Location;
                                 tempLocation.SpeedX = 0;
                                 tempLocation.SpeedY = 0;
@@ -3851,12 +3850,10 @@ void UpdateNPCs()
                                 else
                                     tempLocation.X = NPC[A].Location.X - tempLocation.Width;
 
-                                // eliminating the dysfunctional pattern because the check is not order-sensitive
-                                // for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
-
                                 // we are able to wrap this whole thing in the inner-loop check that (NPC[A].Slope <= 0)
                                 // commenting for now to avoid inadvertently introducing any bugs
                                 // if(NPC[A].Slope <= 0)
+                                for(bCheck2 = 1; bCheck2 <= 2; bCheck2++)
                                 {
                                     // if(bCheck2 == 1)
                                     // {
@@ -3869,7 +3866,11 @@ void UpdateNPCs()
                                     //     fBlock2 = numBlock - numTempBlock;
                                     //     lBlock2 = numBlock;
                                     // }
-                                    for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                                    auto collBlockSentinel2 = (bCheck2 == 1)
+                                        ? treeBlockQuery(tempLocation, SORTMODE_NONE)
+                                        : treeTempBlockQuery(tempLocation, SORTMODE_NONE);
+
+                                    for(Block_t* block : collBlockSentinel2)
                                     {
                                         B = block - &Block[1] + 1;
                                         if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 1))
@@ -3885,6 +3886,9 @@ void UpdateNPCs()
                                                 break;
                                             }
                                         }
+
+                                        if(tempTurn)
+                                            break;
                                     }
                                 }
 
@@ -3984,7 +3988,7 @@ void UpdateNPCs()
                             Block[NPC[A].tempBlock].LocationInLayer.X -= Layer[Block[NPC[A].tempBlock].Layer].OffsetX;
                             Block[NPC[A].tempBlock].LocationInLayer.Y -= Layer[Block[NPC[A].tempBlock].Layer].OffsetY;
                         }
-                        treeBlockUpdateLayer(Block[NPC[A].tempBlock].Layer, &Block[NPC[A].tempBlock]);
+                        treeTempBlockUpdate(&Block[NPC[A].tempBlock]);
 
                         // no longer needed; maintaining the sort
 #if 0
@@ -5082,9 +5086,6 @@ void UpdateNPCs()
                     NPC[A].Effect2 = 0;
                     NPC[A].Location.Height = 32;
 
-                    // the dysfunctional pattern and the same paranoid behavior again.
-                    auto collBlockSentinel = treeBlockQuery(NPC[A].Location, SORTMODE_LOC);
-
                     for(bCheck = 1; bCheck <= 2; bCheck++)
                     {
                         // if(bCheck == 1)
@@ -5101,15 +5102,14 @@ void UpdateNPCs()
                         //     fBlock = numBlock - numTempBlock;
                         //     lBlock = numBlock;
                         // }
+
+                        auto collBlockSentinel = (bCheck == 1)
+                            ? treeBlockQuery(NPC[A].Location, SORTMODE_LOC)
+                            : treeTempBlockQuery(NPC[A].Location, SORTMODE_LOC);
+
                         for(Block_t* block : collBlockSentinel)
                         {
                             B = block - &Block[1] + 1;
-
-                            // the paranoid check.
-                            if(bCheck == 1 && B >= numBlock + 1 - numTempBlock)
-                                continue;
-                            if(bCheck == 2 && B < numBlock + 1 - numTempBlock)
-                                continue;
 
                             if(!Block[B].Invis && !(BlockIsSizable[Block[B].Type] && NPC[A].Location.Y > Block[B].Location.Y) && !Block[B].Hidden)
                             {
@@ -5290,11 +5290,7 @@ void UpdateNPCs()
 
     numBlock -= numTempBlock; // clean up the temp npc blocks
 
-    // remove all temp NPC blocks from tree
-    for(int i = numBlock + 1; i <= numBlock + numTempBlock; i++)
-    {
-        treeBlockRemoveLayer(LAYER_NONE, &Block[i]);
-    }
+    // temp block tree is cleared immediately before fill
 
     for(A = numNPCs; A >= 1; A--) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
     {
