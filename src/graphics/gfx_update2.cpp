@@ -184,9 +184,9 @@ void UpdateGraphics2(bool skipRepaint)
 //        XRender::renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
 //    }
 
-    #ifdef __3DS__
-            XRender::setTargetLayer(0);
-    #endif
+#ifdef __3DS__
+        XRender::setTargetLayer(0);
+#endif
 
     XRender::clearBuffer();
 
