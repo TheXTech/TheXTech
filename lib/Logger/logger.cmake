@@ -19,7 +19,7 @@ elseif(VITA)
     list(APPEND LOGGER_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/logger_vita.cpp
     )
-elseif(3DS)
+elseif(PGE_MIN_PORT)
     message("-- Logger for 3DS")
     list(APPEND LOGGER_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/logger_3ds.cpp

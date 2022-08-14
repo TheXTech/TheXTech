@@ -50,6 +50,8 @@ bool AppPathManager::m_isPortable = false;
 #   define UserDirName "/PGE Project/thextech/"
 #elif defined(__3DS__)
 #   define UserDirName "/3ds/thextech/"
+#elif defined(__WII__)
+#   define UserDirName "/thextech/"
 #else
 #   define UserDirName "/.PGE_Project/thextech/"
 #endif

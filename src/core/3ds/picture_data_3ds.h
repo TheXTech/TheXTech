@@ -19,8 +19,9 @@
  */
 
 #pragma once
-#ifndef PICTURE_DATA_SDL_H
-#define PICTURE_DATA_SDL_H
+
+#ifndef PICTURE_DATA_3DS_H
+#define PICTURE_DATA_3DS_H
 
 #include <cstdint>
 #include <citro2d.h>
@@ -47,4 +48,4 @@ struct StdPictureData
 
 };
 
-#endif // PICTURE_DATA_SDL_H
+#endif // PICTURE_DATA_3DS_H

@@ -24,7 +24,6 @@ struct Mix_Chunk;
 bool MixPlatform_Init();
 void MixPlatform_Quit();
 
-bool MixPlatform_NoPreload(const char* path);
 int  MixPlatform_PlayStream(int channel, const char* path, int loops);
 
 // need to do this because LoadWAV is not properly declared in MixerX.

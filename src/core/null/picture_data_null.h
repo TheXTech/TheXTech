@@ -19,17 +19,21 @@
  */
 
 #pragma once
-#ifndef PICTURE_DATA_H
-#define PICTURE_DATA_H
 
-// TODO: Implement here branching between platform specific StdPictureData variants
+#ifndef PICTURE_DATA_NULL_H
+#define PICTURE_DATA_NULL_H
 
-#ifdef __3DS__
-#   include "3ds/picture_data_3ds.h"
-#elif defined(__WII__)
-#   include "null/picture_data_null.h"
-#else
-#   include "sdl/picture_data_sdl.h"
-#endif
+/*!
+ * \brief Platform specific picture data. Fields should not be used directly
+ */
+struct StdPictureData
+{
 
-#endif // PICTURE_DATA_H
+    inline bool hasTexture()
+    {
+        return true;
+    }
+
+};
+
+#endif // PICTURE_DATA_NULL_H

@@ -115,7 +115,7 @@ option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" 
 
 option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
 
-if(NINTENDO_3DS)
+if(NINTENDO_3DS OR NINTENDO_WII)
     set(USE_STATIC_LIBC ON)
 endif()
 
@@ -187,6 +187,10 @@ if(NINTENDO_SWITCH)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -DNINTENDO_SWITCH -D__SWITCH__")
 endif()
 
+if(WII OR 3DS)
+    add_compile_definitions(PGE_MIN_PORT)
+endif()
+
 # ============ Customization ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
@@ -201,7 +205,7 @@ endif()
 include(lib/Allocator/pool-allocator.cmake)
 include(lib/DirManager/dirman.cmake)
 
-if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS)
+if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII)
     include(lib/FileMapper/FileMapper.cmake)
 endif()
 
@@ -216,7 +220,7 @@ if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
 
-if(NINTENDO_3DS)
+if(NINTENDO_3DS OR NINTENDO_WII)
     set(GME_YM2612_EMU "GENS" CACHE STRING "" FORCE)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
@@ -286,7 +290,7 @@ if(USE_SYSTEM_LIBS)
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
-elseif(NOT NINTENDO_3DS)
+elseif(NOT NINTENDO_3DS AND NOT NINTENDO_WII)
     include(cmake/library_FreeImage.cmake)
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_LIBS PGE_FreeImage)
@@ -316,7 +320,7 @@ set(LIB_SRC
     ${LIB_SRC_EXTRA}
 )
 
-if(NOT NINTENDO_3DS)
+if(NOT NINTENDO_3DS AND NOT NINTENDO_WII)
     list(APPEND LIB_SRC
         lib/Graphics/graphics_funcs.cpp
         lib/Graphics/image_size.cpp
@@ -482,7 +486,7 @@ if(THEXTECH_ENABLE_AUDIO_FX)
     )
 endif()
 
-if(NOT NINTENDO_3DS)
+if(NOT NINTENDO_3DS AND NOT NINTENDO_WII)
     add_definitions(-DCORE_EVERYTHING_SDL)
     list(APPEND THEXTECH_SRC
         src/control/joystick.cpp
@@ -510,6 +514,19 @@ if(NINTENDO_3DS)
         src/core/3ds/window_3ds.cpp
         src/core/3ds/msgbox_3ds.cpp
         src/core/3ds/events_3ds.cpp
+    )
+endif()
+
+if(WII)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
+    list(APPEND THEXTECH_SRC
+#        src/control/input_wii.cpp
+        src/core/wii/std_wii.cpp
+        src/core/wii/render_wii.cpp
+        src/core/wii/window_wii.cpp
+        src/core/wii/msgbox_wii.cpp
+        src/core/wii/events_wii.cpp
+        src/core/wii/mixer_wii.cpp
     )
 endif()
 
@@ -599,6 +616,18 @@ elseif(NINTENDO_3DS)
     target_link_libraries(thextech PRIVATE citro2d citro3d ctru)
     target_link_libraries(thextech PRIVATE vorbisidec ogg)
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
+elseif(WII)
+    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
+    target_include_directories(thextech PRIVATE "3rdparty/AudioCodecs/libgme/include/" SYSTEM)
+    target_link_libraries(thextech PRIVATE db)
+    target_link_libraries(thextech PRIVATE gme_static)
+    target_link_libraries(thextech PRIVATE pgefl)
+    target_link_libraries(thextech PRIVATE wiiuse)
+    target_link_libraries(thextech PRIVATE ogc)
+    target_link_libraries(thextech PRIVATE fat)
+    target_link_libraries(thextech PRIVATE asnd)
+    target_link_libraries(thextech PRIVATE vorbisidec ogg)
+    set_target_properties(thextech PROPERTIES SUFFIX ".elf")
 else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
@@ -680,7 +709,11 @@ if(VITA)
 endif()
 
 if(NINTENDO_3DS)
-    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DLOW_MEM -DPRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__3DS__)
+    target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_NO_THREADING -DLOW_MEM -DPRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__3DS__)
+endif()
+
+if(NINTENDO_WII)
+    target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_NO_THREADING -DLOW_MEM -DPRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__3DS__)
 endif()
 
 if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")
@@ -870,6 +903,8 @@ elseif(WIN32)
 elseif(VITA)
     include(cmake/package_vita.cmake)
 elseif(NINTENDO_3DS)
+    install(TARGETS thextech DESTINATION .)
+elseif(WII)
     install(TARGETS thextech DESTINATION .)
 elseif(NINTENDO_SWITCH)
     include(cmake/package_switch.cmake)

@@ -20,7 +20,7 @@
 
 #pragma once
 
-#ifdef __3DS__
+#if defined(__3DS__) || defined(__WII__)
 #   include "core/3ds/picture_load.h"
 #endif
 

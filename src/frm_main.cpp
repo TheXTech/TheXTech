@@ -20,7 +20,7 @@
 
 #include <Logger/logger.h>
 
-#ifndef __3DS__
+#ifndef RENDER_CUSTOM
 #include <Graphics/graphics_funcs.h>
 #endif
 
@@ -60,7 +60,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     //Write into log the application start event
     pLogDebug("<Application started>");
 
-#ifndef __3DS__
+#ifndef RENDER_CUSTOM
     //Initialize FreeImage
     GraphicsHelps::initFreeImage();
 #endif
@@ -189,7 +189,7 @@ void FrmMain::freeSystem()
     g_window = nullptr;
 #endif
 
-#ifndef __3DS__
+#ifndef RENDER_CUSTOM
     GraphicsHelps::closeFreeImage();
 #endif
 

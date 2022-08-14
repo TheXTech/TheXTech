@@ -18,7 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef PGE_NO_THREADING
 #include <atomic>
+#endif
 
 #include "lunaimgbox.h"
 #include "core/render.h"
@@ -26,10 +28,18 @@
 
 uint64_t LunaImage::p_uidCounter = 1;
 
+#ifndef PGE_NO_THREADING
 uint64_t LunaImage::getNewUID()
 {
     return p_uidCounter++;
 }
+#else
+uint64_t LunaImage::getNewUID()
+{
+    static uint64_t uidCounter = 1;
+    return uidCounter++;
+}
+#endif
 
 LunaImage::LunaImage()
 {

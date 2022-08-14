@@ -39,6 +39,8 @@
 
 #ifdef __3DS__
 #include "input_3ds.h"
+#elif defined(__WII__)
+// #include "input_wii.h"
 #else
 #include "keyboard.h"
 #include "joystick.h"

@@ -41,6 +41,11 @@
 #include "vita/vita_memory.h"
 #endif
 
+#ifdef __WII__
+#include <gccore.h>
+#include <fat.h>
+#endif
+
 #ifdef ENABLE_XTECH_LUA
 #include "xtech_lua_main.h"
 #endif
@@ -144,10 +149,16 @@ static void strToPlayerSetup(int player, const std::string &setupString)
 extern "C"
 int main(int argc, char**argv)
 {
+#ifdef __WII__
+    if(!fatInitDefault()) {
+        printf("fatInitDefault failure: terminating\n");
+        return -1;
+    }
+#endif
     CmdLineSetup_t setup;
     FrmMain frmMain;
 
-#if !defined(__3DS__) && !defined(VITA)
+#if !defined(__3DS__) && !defined(VITA) && !defined(__WII__)
     CrashHandler::initSigs();
 #endif
 
@@ -159,6 +170,7 @@ int main(int argc, char**argv)
         testPlayer[i].Character = i;
     }
 
+#ifndef __WII__
     try
     {
         // Define the command line object.
@@ -470,6 +482,10 @@ int main(int argc, char**argv)
         std::cerr.flush();
         return 2;
     }
+#else
+    AppPathManager::initAppPath();
+    AppPath = AppPathManager::assetsRoot();
+#endif
 
     initGameInfo();
 

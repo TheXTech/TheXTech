@@ -309,7 +309,7 @@ class File {
 long getpagesize();
 
 #if (defined(LC_NUMERIC_MASK) || defined(_MSC_VER)) && \
-    !defined(__ANDROID__) && !defined(__CYGWIN__) && !defined(VITA) && !defined(__SWITCH__) && !defined(__3DS__)
+    !defined(__ANDROID__) && !defined(__CYGWIN__) && !defined(VITA) && !defined(__SWITCH__) && !defined(__3DS__) && !defined(__WII__)
 # define FMT_LOCALE
 #endif
 
