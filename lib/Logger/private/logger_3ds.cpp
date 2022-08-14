@@ -48,10 +48,14 @@ void LogWriter::CloseLog()
 
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
 {
+    va_list arg_in;
     (void)level;
-    (void)label;
-    (void)format;
-    (void)arg;
+
+    va_copy(arg_in, arg);
+    std::printf("%s: ", label);
+    std::vprintf(format, arg_in);
+    std::printf(OS_NEWLINE);
+    va_end(arg_in);
 }
 
 void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg)

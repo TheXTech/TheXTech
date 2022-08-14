@@ -33,12 +33,18 @@ GFX_t GFX;
 
 void GFX_t::loadImage(StdPicture &img, const std::string &path)
 {
-    pLogDebug("Loading texture %s...", path.c_str());
-    img = XRender::LoadPicture(path);
+#ifdef X_IMG_EXT
+    std::string path_ext = path + X_IMG_EXT;
+#else
+    std::string path_ext = path + ".png";
+#endif
+
+    pLogDebug("Loading texture %s...", path_ext.c_str());
+    img = XRender::LoadPicture(path_ext);
 
     if(!img.d.hasTexture())
     {
-        pLogWarning("Failed to load texture: %s...", path.c_str());
+        pLogWarning("Failed to load texture: %s...", path_ext.c_str());
         m_loadErrors++;
     }
 
@@ -52,58 +58,58 @@ bool GFX_t::load()
 {
     std::string uiPath = AppPath + "graphics/ui/";
 
-    loadImage(BMVs, uiPath + "BMVs.png");
-    loadImage(BMWin, uiPath + "BMWin.png");
+    loadImage(BMVs, uiPath + "BMVs");
+    loadImage(BMWin, uiPath + "BMWin");
     For(i, 1, 3)
-        loadImage(Boot[i], uiPath + fmt::format_ne("Boot{0}.png", i));
+        loadImage(Boot[i], uiPath + fmt::format_ne("Boot{0}", i));
 
     For(i, 1, 5)
-        loadImage(CharacterName[i], uiPath + fmt::format_ne("CharacterName{0}.png", i));
+        loadImage(CharacterName[i], uiPath + fmt::format_ne("CharacterName{0}", i));
 
-    loadImage(Chat, uiPath + "Chat.png");
+    loadImage(Chat, uiPath + "Chat");
 
     For(i, 0, 2)
-        loadImage(Container[i], uiPath + fmt::format_ne("Container{0}.png", i));
+        loadImage(Container[i], uiPath + fmt::format_ne("Container{0}", i));
 
     For(i, 1, 3)
-        loadImage(ECursor[i], uiPath + fmt::format_ne("ECursor{0}.png", i));
+        loadImage(ECursor[i], uiPath + fmt::format_ne("ECursor{0}", i));
 
     For(i, 0, 9)
-        loadImage(Font1[i], uiPath + fmt::format_ne("Font1_{0}.png", i));
+        loadImage(Font1[i], uiPath + fmt::format_ne("Font1_{0}", i));
 
     For(i, 1, 3)
-        loadImage(Font2[i], uiPath + fmt::format_ne("Font2_{0}.png", i));
+        loadImage(Font2[i], uiPath + fmt::format_ne("Font2_{0}", i));
 
-    loadImage(Font2S, uiPath + "Font2S.png");
+    loadImage(Font2S, uiPath + "Font2S");
 
     For(i, 1, 2)
-        loadImage(Heart[i], uiPath + fmt::format_ne("Heart{0}.png", i));
+        loadImage(Heart[i], uiPath + fmt::format_ne("Heart{0}", i));
 
     For(i, 0, 8)
-        loadImage(Interface[i], uiPath + fmt::format_ne("Interface{0}.png", i));
+        loadImage(Interface[i], uiPath + fmt::format_ne("Interface{0}", i));
 
-    loadImage(LoadCoin, uiPath + "LoadCoin.png");
-    loadImage(Loader, uiPath + "Loader.png");
+    loadImage(LoadCoin, uiPath + "LoadCoin");
+    loadImage(Loader, uiPath + "Loader");
 
     For(i, 0, 3)
-        loadImage(MCursor[i], uiPath + fmt::format_ne("MCursor{0}.png", i));
+        loadImage(MCursor[i], uiPath + fmt::format_ne("MCursor{0}", i));
 
     For(i, 1, 4)
-        loadImage(MenuGFX[i], uiPath + fmt::format_ne("MenuGFX{0}.png", i));
+        loadImage(MenuGFX[i], uiPath + fmt::format_ne("MenuGFX{0}", i));
 
-    loadImage(Mount[2], uiPath + "Mount.png");
+    loadImage(Mount[2], uiPath + "Mount");
 
     For(i, 0, 7)
-        loadImage(nCursor[i], uiPath + fmt::format_ne("nCursor{0}.png", i));
+        loadImage(nCursor[i], uiPath + fmt::format_ne("nCursor{0}", i));
 
-    loadImage(TextBox, uiPath + "TextBox.png");
+    loadImage(TextBox, uiPath + "TextBox");
 
     For(i, 1, 2)
-        loadImage(Tongue[i], uiPath + fmt::format_ne("Tongue{0}.png", i));
+        loadImage(Tongue[i], uiPath + fmt::format_ne("Tongue{0}", i));
 
-    loadImage(Warp, uiPath + "Warp.png");
+    loadImage(Warp, uiPath + "Warp");
 
-    loadImage(YoshiWings, uiPath + "YoshiWings.png");
+    loadImage(YoshiWings, uiPath + "YoshiWings");
 
     // Add new required assets here. Also update load_gfx.cpp:loadCustomUIAssets()
 
@@ -117,7 +123,7 @@ bool GFX_t::load()
         return false;
     }
 
-    loadImage(EIcons, uiPath + "EditorIcons.png");
+    loadImage(EIcons, uiPath + "EditorIcons");
 
     if(m_loadErrors > 0)
     {

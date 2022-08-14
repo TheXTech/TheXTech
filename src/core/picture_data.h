@@ -27,7 +27,7 @@
 #ifdef __3DS__
 #   include "3ds/picture_data_3ds.h"
 #elif defined(__WII__)
-#   include "null/picture_data_null.h"
+#   include "wii/picture_data_wii.h"
 #else
 #   include "sdl/picture_data_sdl.h"
 #endif

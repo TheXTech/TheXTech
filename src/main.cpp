@@ -485,6 +485,11 @@ int main(int argc, char**argv)
 #else
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
+
+    setup.verboseLogging = true;
+    setup.testMaxFPS = true;
+    setup.frameSkip = false;
+    setup.testShowFPS = true;
 #endif
 
     initGameInfo();

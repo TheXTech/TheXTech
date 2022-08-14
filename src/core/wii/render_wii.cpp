@@ -41,6 +41,7 @@
 namespace XRender
 {
 
+uint32_t s_current_frame = 0;
 bool g_in_frame = false;
 
 #define DEFAULT_FIFO_SIZE   (256*1024)
@@ -50,7 +51,44 @@ int cur_buffer = 0;
 GXRModeObj *rmode;
 Mtx view;
 
-uint8_t frame = 0;
+int s_num_textures_loaded = 0;
+int s_num_big_pictures_loaded = 0;
+std::set<StdPicture*> s_big_pictures;
+
+int s_viewport_x = 0;
+int s_viewport_y = 0;
+int s_viewport_w = 0;
+int s_viewport_h = 0;
+int s_viewport_offset_x = 0;
+int s_viewport_offset_y = 0;
+int s_viewport_offset_x_bak = 0;
+int s_viewport_offset_y_bak = 0;
+bool s_viewport_offset_ignore = false;
+
+void s_loadTexture(StdPicture &target, int i)
+{
+    if(target.d.texture_file_init[i])
+    {
+        u32 info;
+        TPL_GetTextureInfo(&target.d.texture_file[i], 0, &info, &target.d.tex_w[i], &target.d.tex_h[i]);
+
+        if(!target.w)
+        {
+            target.w = target.d.tex_w[i]*2;
+            target.h = target.d.tex_h[i]*2;
+        }
+
+        if(TPL_GetTexture(&target.d.texture_file[i], 0, &target.d.texture[i]) != 0)
+        {
+            TPL_CloseTPLFile(&target.d.texture_file[i]);
+            target.d.texture_file_init[i] = false;
+        }
+        else
+        {
+            target.d.texture_init[i] = true;
+        }
+    }
+}
 
 bool init()
 {
@@ -97,6 +135,10 @@ bool init()
     GX_SetDispCopyDst(rmode->fbWidth,xfbHeight);
     GX_SetCopyFilter(rmode->aa,rmode->sample_pattern,GX_TRUE,rmode->vfilter);
     GX_SetFieldMode(rmode->field_rendering,((rmode->viHeight==2*rmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
+    GX_SetColorUpdate(1);
+    GX_SetAlphaUpdate(1);
+    GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
+
 
     printf("%d %d\n", (int)rmode->viWidth, (int)rmode->viHeight);
 
@@ -110,7 +152,7 @@ bool init()
     GX_ClearVtxDesc();
     GX_SetVtxDesc(GX_VA_POS, GX_DIRECT);
     GX_SetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-    // GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GX_SetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 
     // setup the vertex attribute table
     // describes the data
@@ -119,12 +161,16 @@ bool init()
     // 3 values X,Y,Z of size F32. scale sets the number of fractional
     // bits for non float data.
     GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
+    GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
 
+    GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+
+    GX_InvVtxCache();
+    GX_InvalidateTexAll();
+
     GX_SetNumChans(1);
-    GX_SetNumTexGens(0);
-    GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+    GX_SetNumTexGens(1);
 
     // setup our camera at the origin
     // looking down the -z axis with y up
@@ -139,6 +185,9 @@ bool init()
     f32 h = rmode->viHeight;
     guOrtho(perspective, 0.0f, 480.0f, 0.0f, 640.0f, -1.0f, 1.0f);
     GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
+
+    s_viewport_x = s_viewport_y = 0;
+    updateViewport();
 
     return true;
 }
@@ -158,7 +207,7 @@ void setTargetTexture()
     GX_LoadPosMtxImm(view, GX_PNMTX0);
 
     g_in_frame = true;
-    frame++;
+    s_current_frame ++;
 }
 
 void setTargetScreen()
@@ -183,7 +232,7 @@ void repaint()
 
     VIDEO_Flush();
 
-    VIDEO_WaitVSync();
+    // VIDEO_WaitVSync();
     g_in_frame = false;
 }
 
@@ -201,29 +250,64 @@ void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
 
 void updateViewport()
 {
+    resetViewport();
+    offsetViewport(0, 0);
 }
 
 void resetViewport()
 {
+    setViewport(0, 0, ScreenW, ScreenH);
 }
 
 void setViewport(int x, int y, int w, int h)
 {
-    UNUSED(x);
-    UNUSED(y);
-    UNUSED(w);
-    UNUSED(h);
+    int offset_x = s_viewport_offset_x - s_viewport_x;
+    int offset_y = s_viewport_offset_y - s_viewport_y;
+    int offset_x_bak = s_viewport_offset_x_bak - s_viewport_x;
+    int offset_y_bak = s_viewport_offset_y_bak - s_viewport_y;
+
+    s_viewport_x = x / 2;
+    s_viewport_y = y / 2;
+    s_viewport_w = w / 2;
+    s_viewport_h = h / 2;
+
+    s_viewport_offset_x = s_viewport_x + offset_x;
+    s_viewport_offset_y = s_viewport_y + offset_y;
+    s_viewport_offset_x_bak = s_viewport_x + offset_x_bak;
+    s_viewport_offset_y_bak = s_viewport_y + offset_y_bak;
 }
 
 void offsetViewport(int x, int y)
 {
-    UNUSED(x);
-    UNUSED(y);
+    if(s_viewport_offset_ignore)
+    {
+        s_viewport_offset_x_bak = s_viewport_x + x / 2;
+        s_viewport_offset_y_bak = s_viewport_y + y / 2;
+    }
+    else
+    {
+        s_viewport_offset_x = s_viewport_x + x / 2;
+        s_viewport_offset_y = s_viewport_y + y / 2;
+    }
 }
 
 void offsetViewportIgnore(bool en)
 {
-    UNUSED(en);
+    if(s_viewport_offset_ignore == en)
+        return;
+
+    s_viewport_offset_ignore = en;
+
+    if(en)
+    {
+        s_viewport_offset_x_bak = s_viewport_offset_x;
+        s_viewport_offset_y_bak = s_viewport_offset_y;
+    }
+    else
+    {
+        s_viewport_offset_x = s_viewport_offset_x_bak;
+        s_viewport_offset_y = s_viewport_offset_y_bak;
+    }
 }
 
 void setTransparentColor(StdPicture &target, uint32_t rgb)
@@ -238,10 +322,52 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     (void)maskFallbackPath;
 
     StdPicture target;
+
     if(!GameIsActive)
         return target; // do nothing when game is closed
 
+    target.inited = false;
+    target.l.path = path;
+    if(target.l.path.empty())
+        return target;
+
     target.inited = true;
+    target.l.lazyLoaded = false;
+
+    if(TPL_OpenTPLFromFile(&target.d.texture_file[0], target.l.path.c_str()) == 1)
+    {
+        target.d.texture_file_init[0] = true;
+        s_loadTexture(target, 0);
+        s_num_textures_loaded ++;
+    }
+
+    if(!target.d.hasTexture())
+    {
+        pLogWarning("FAILED TO LOAD!!! %s\n", path.c_str());
+        target.d.destroy();
+        target.inited = false;
+    }
+
+    return target;
+}
+
+StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+{
+    (void)maskPath;
+    (void)maskFallbackPath;
+
+    StdPicture target;
+    if(!GameIsActive)
+        return target; // do nothing when game is closed
+
+    target.inited = false;
+    target.l.path = path;
+    if(target.l.path.empty())
+        return target;
+
+    target.inited = true;
+
+    target.l.lazyLoaded = true;
 
     // We need to figure out the height and width!
     std::string sizePath = path + ".size";
@@ -258,29 +384,86 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         target.w = atoi(&contents[0]);
         target.h = atoi(&contents[5]);
         if(fclose(fs))
-            pLogWarning("loadPicture: Couldn't close file.");
+            pLogWarning("lazyLoadPicture: Couldn't close file.");
     }
     // lazy load and unload to read dimensions if it doesn't exist.
     // unload is essential because lazy load would save the address incorrectly.
     else
     {
-        pLogWarning("loadPicture: Couldn't open size file.");
-        target.inited = false;
+        pLogWarning("lazyLoadPicture: Couldn't open size file.");
+        lazyLoad(target);
+        lazyUnLoad(target);
     }
 
     return target;
 }
 
-
-StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
-{
-    return LoadPicture(path, maskPath, maskFallbackPath);
-}
-
 void lazyLoad(StdPicture &target)
 {
-    UNUSED(target);
-    return;
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
+        return;
+
+    std::string suppPath;
+
+    target.inited = true;
+    target.l.lazyLoaded = false;
+
+    if(TPL_OpenTPLFromFile(&target.d.texture_file[0], target.l.path.c_str()) != 1)
+    {
+        pLogWarning("Permanently failed to load %s", target.l.path.c_str());
+        pLogWarning("Error: %d (%s)", errno, strerror(errno));
+        target.inited = false;
+        return;
+    }
+
+    target.d.texture_file_init[0] = true;
+    s_loadTexture(target, 0);
+
+    if(!target.d.hasTexture())
+    {
+        pLogWarning("Permanently failed to load %s", target.l.path.c_str());
+        pLogWarning("Error: %d (%s)", errno, strerror(errno));
+        target.d.destroy();
+        target.inited = false;
+        return;
+    }
+
+    if(target.h > 2048)
+    {
+        suppPath = target.l.path + '1';
+        if(TPL_OpenTPLFromFile(&target.d.texture_file[1], suppPath.c_str()) != 1)
+        {
+            pLogWarning("Permanently failed to load %s", suppPath.c_str());
+            pLogWarning("Error: %d (%s)", errno, strerror(errno));
+        }
+        else
+        {
+            target.d.texture_file_init[1] = true;
+            s_loadTexture(target, 1);
+        }
+    }
+    if(target.h > 4096)
+    {
+        suppPath = target.l.path + '2';
+        if(TPL_OpenTPLFromFile(&target.d.texture_file[2], suppPath.c_str()) != 1)
+        {
+            pLogWarning("Permanently failed to load %s", suppPath.c_str());
+            pLogWarning("Error: %d (%s)", errno, strerror(errno));
+        }
+        else
+        {
+            target.d.texture_file_init[2] = true;
+            s_loadTexture(target, 2);
+        }
+    }
+
+    s_num_textures_loaded++;
+
+    if(target.w >= 256 || target.h >= 256)
+    {
+        s_big_pictures.insert(&target);
+        s_num_big_pictures_loaded++;
+    }
 }
 
 void lazyPreLoad(StdPicture &target)
@@ -290,14 +473,32 @@ void lazyPreLoad(StdPicture &target)
 
 void lazyUnLoad(StdPicture &target)
 {
+    if(!target.inited || !target.l.lazyLoaded || !target.d.hasTexture())
+        return;
+
     deleteTexture(target, true);
 }
 
 void deleteTexture(StdPicture &tx, bool lazyUnload)
 {
+    if(!tx.inited)
+        return;
+
+    if(s_big_pictures.find(&tx) != s_big_pictures.end())
+    {
+        s_big_pictures.erase(&tx);
+        s_num_big_pictures_loaded --;
+    }
+
+    if(tx.d.hasTexture())
+        s_num_textures_loaded--;
+
+    tx.d.destroy();
+
     if(!lazyUnload)
     {
         tx.inited = false;
+        tx.l.lazyLoaded = false;
         tx.w = 0;
         tx.h = 0;
         tx.frame_w = 0;
@@ -327,15 +528,33 @@ inline float FLOORDIV2(float x)
 
 void renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
+    int x_div = ROUNDDIV2(x);
+    int w_div = ROUNDDIV2(x + w) - x_div;
+
+    int y_div = ROUNDDIV2(y);
+    int h_div = ROUNDDIV2(y + h) - y_div;
+
+    uint8_t r = red * 255.0f + 0.5f;
+    uint8_t g = green * 255.0f + 0.5f;
+    uint8_t b = blue * 255.0f + 0.5f;
+    uint8_t a = alpha * 255.0f + 0.5f;
+
+    GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+
     GX_Begin(GX_QUADS, GX_VTXFMT0, 4);          // Draw A Quad
-        GX_Position3s16((int16_t)x, (int16_t)y, 0); // Top Left
-        GX_Color4u8(127+frame,127+frame,255+frame,255);           // Set The Color To Blue
-        GX_Position3s16( (int16_t)(x + w), (int16_t)(y), 0);        // Top Right
-        GX_Color4u8(127+frame,255+frame,255+frame,255);           // Set The Color To Blue
-        GX_Position3s16( (int16_t)(x + w),(int16_t)(y + h), 0); // Bottom Right
-        GX_Color4u8(127+frame,127+frame,255+frame,127);           // Set The Color To Blue
-        GX_Position3s16((int16_t)(x), (int16_t)(y + h), 0);  // Bottom Left
-        GX_Color4u8(255+frame,127+frame,255+frame,255);           // Set The Color To Blue
+        GX_Position3s16(x_div, y_div, 0); // Top Left
+        GX_TexCoord2f32(0.0f, 0.0f);
+        GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+        GX_Position3s16( x_div + w_div, y_div, 0);        // Top Right
+        GX_TexCoord2f32(0.0f, 0.0f);
+        GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+        GX_Position3s16( x_div + w_div, y_div + h_div, 0); // Bottom Right
+        GX_TexCoord2f32(0.0f, 0.0f);
+        GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+        GX_Position3s16( x_div, y_div + h_div, 0);  // Bottom Left
+        GX_TexCoord2f32(0.0f, 0.0f);
+        GX_Color4u8(r, g, b, a);           // Set The Color To Blue
     GX_End();                                   // Done Drawing The Quad
 }
 
@@ -384,13 +603,242 @@ void renderCircleHole(int cx, int cy,
     } while(dy + line_size <= radius);
 }
 
+inline bool GX_DrawImage_Custom(GXTexObj* img,
+    int16_t x, int16_t y, uint16_t w, uint16_t h,
+    int stex_w, int stex_h,
+    float src_x, float src_y, float src_w, float src_h,
+    unsigned int flip,
+    float _r, float _g, float _b, float _a)
+{
+    float scale_x = 1.0f / stex_w;
+    float scale_y = 1.0f / stex_h;
+
+    float u1 = src_x * scale_x;
+    float u2 = (src_x + src_w) * scale_x;
+    float v1 = src_y * scale_y;
+    float v2 = (src_y + src_h) * scale_y;
+
+    if(flip & X_FLIP_HORIZONTAL)
+        std::swap(u1, u2);
+    if(flip & X_FLIP_VERTICAL)
+        std::swap(v1, v2);
+
+    uint8_t r = _r * 255.0f + 0.5f;
+    uint8_t g = _g * 255.0f + 0.5f;
+    uint8_t b = _b * 255.0f + 0.5f;
+    uint8_t a = _a * 255.0f + 0.5f;
+
+    GX_SetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+    GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GX_LoadTexObj(img, GX_TEXMAP0);
+
+    GX_Begin(GX_QUADS, GX_VTXFMT0, 4);          // Draw A Quad
+        GX_Position3s16(x, y, 0); // Top Left
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2f32(u1, v1);
+
+        GX_Position3s16(x + w, y, 0);        // Top Right
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2f32(u2, v1);
+
+        GX_Position3s16(x + w, y + h, 0); // Bottom Right
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2f32(u2, v2);
+
+        GX_Position3s16(x, y + h, 0);  // Bottom Left
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2f32(u1, v2);
+    GX_End();                                   // Done Drawing The Quad
+
+    return true;
+}
+
+inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
+    float x, float y, float w, float h,
+    float src_x, float src_y, float src_w, float src_h,
+    unsigned int flip, FPoint_t *center, float angle,
+    float r, float g, float b, float a)
+{
+    return true;
+}
+
 inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
                              StdPicture &tx,
                              float xSrc, float ySrc, float wSrc, float hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
-    renderRect(xDst, yDst, wDst, hDst);
+    if(!tx.inited)
+        return;
+
+    if(!tx.d.hasTexture() && tx.l.lazyLoaded)
+        lazyLoad(tx);
+
+    tx.d.last_draw_frame = s_current_frame;
+
+    if(!tx.d.hasTexture())
+        return;
+    if(xDst > s_viewport_w || yDst > s_viewport_h)
+        return;
+
+    // automatic flipping based on SMBX style!
+    unsigned int mode = 0;
+    while(ySrc >= tx.h / 2 && mode < 3)
+    {
+        ySrc -= tx.h / 2;
+        mode += 1;
+    }
+    flip ^= mode;
+
+    // texture boundaries
+    // this never happens unless there was an invalid input
+    // if((xSrc < 0.0f) || (ySrc < 0.0f)) return;
+
+    // TODO: graphics tests for how offscreen draws interact with flips
+    //       handling rotations properly is probably impossible
+    if(xDst < 0.0f)
+    {
+        if(!(flip & X_FLIP_HORIZONTAL))
+            xSrc -= xDst * wSrc / wDst;
+
+        if(wDst+xDst > s_viewport_w)
+        {
+            if(flip & X_FLIP_HORIZONTAL)
+                xSrc += (wDst + xDst - s_viewport_w) * wSrc / wDst;
+            wSrc = s_viewport_w * wSrc / wDst;
+            wDst = s_viewport_w;
+        }
+        else
+        {
+            wSrc += xDst * wSrc / wDst;
+            wDst += xDst;
+        }
+        xDst = 0.0f;
+    }
+    else if(xDst + wDst > s_viewport_w)
+    {
+        if(flip & X_FLIP_HORIZONTAL)
+            xSrc += (wDst + xDst - s_viewport_w) * wSrc / wDst;
+        wSrc = (s_viewport_w - xDst) * wSrc / wDst;
+        wDst = (s_viewport_w - xDst);
+    }
+
+    if(yDst < 0.0f)
+    {
+        if(!(flip & X_FLIP_VERTICAL))
+            ySrc -= yDst * hSrc / hDst;
+
+        if(hDst + yDst > s_viewport_h)
+        {
+            if(flip & X_FLIP_VERTICAL)
+                ySrc += (hDst + yDst - s_viewport_h) * hSrc / hDst;
+            hSrc = s_viewport_h * hSrc / hDst;
+            hDst = s_viewport_h;
+        }
+        else
+        {
+            hSrc += yDst * hSrc / hDst;
+            hDst += yDst;
+        }
+        yDst = 0.0f;
+    }
+    else if(yDst + hDst > s_viewport_h)
+    {
+        if(flip & X_FLIP_VERTICAL)
+            ySrc += (hDst + yDst - s_viewport_h) * hSrc / hDst;
+        hSrc = (s_viewport_h - yDst) * hSrc / hDst;
+        hDst = (s_viewport_h - yDst);
+    }
+
+    GXTexObj* to_draw = nullptr;
+    uint16_t stex_w, stex_h;
+    GXTexObj* to_draw_2 = nullptr;
+    uint16_t stex2_w, stex2_h;
+
+    // Don't go more than size of texture
+    // Failure conditions should only happen if texture is smaller than expected
+    if(xSrc + wSrc > tx.w / 2)
+    {
+        wDst = (tx.w / 2 - xSrc) * wDst / wSrc;
+        wSrc = tx.w / 2 - xSrc;
+        if(wDst < 0.0f)
+            return;
+    }
+    if(ySrc + hSrc > tx.h / 2)
+    {
+        hDst = (tx.h / 2 - ySrc) * hDst / hSrc;
+        hSrc = tx.h / 2 - ySrc;
+        if(hDst < 0.0f)
+            return;
+    }
+
+    if(ySrc + hSrc > 1024.0f)
+    {
+        if(ySrc + hSrc > 2048.0f)
+        {
+            if(tx.d.texture_init[2])
+            {
+                to_draw = &tx.d.texture[2];
+                stex_w = tx.d.tex_w[2];
+                stex_h = tx.d.tex_h[2];
+            }
+            if(ySrc < 2048.0f && tx.d.texture_init[1])
+            {
+                to_draw_2 = &tx.d.texture[1];
+                stex2_w = tx.d.tex_w[1];
+                stex2_h = tx.d.tex_h[1];
+            }
+            ySrc -= 1024.0f;
+        }
+        else
+        {
+            if(tx.d.texture_init[1])
+            {
+                to_draw = &tx.d.texture[1];
+                stex_w = tx.d.tex_w[1];
+                stex_h = tx.d.tex_h[1];
+            }
+            if(ySrc < 1024.0f)
+            {
+                to_draw_2 = &tx.d.texture[0];
+                stex2_w = tx.d.tex_w[0];
+                stex2_h = tx.d.tex_h[0];
+            }
+        }
+        // draw the top pic
+        if(to_draw_2 != nullptr)
+        {
+            if(rotateAngle != 0.0)
+                GX_DrawImage_Custom_Rotated(to_draw_2, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, (1024.0f - ySrc) * hDst / hSrc,
+                                    xSrc, ySrc, wSrc, 1024.0f - ySrc, flip, center, rotateAngle, red, green, blue, alpha);
+            else
+                GX_DrawImage_Custom(to_draw_2, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, (1024.0f - ySrc) * hDst / hSrc,
+                                    stex2_w, stex2_h,
+                                    xSrc, ySrc, wSrc, 1024.0f - ySrc, flip, red, green, blue, alpha);
+            yDst += (1024.0f - ySrc) * hDst / hSrc;
+            hDst -= (1024.0f - ySrc) * hDst / hSrc;
+            hSrc -= (1024.0f - ySrc);
+            ySrc = 0.0f;
+        }
+        else
+            ySrc -= 1024.0f;
+    }
+    else
+    {
+        to_draw = &tx.d.texture[0];
+        stex_w = tx.d.tex_w[0];
+        stex_h = tx.d.tex_h[0];
+    }
+
+    if(to_draw == nullptr) return;
+
+    if(rotateAngle != 0.0)
+        GX_DrawImage_Custom_Rotated(to_draw, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, hDst,
+                             xSrc, ySrc, wSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
+    else
+        GX_DrawImage_Custom(to_draw, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, hDst,
+                            stex_w, stex_h,
+                            xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
 }
 
 // public draw methods

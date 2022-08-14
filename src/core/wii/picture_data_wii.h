@@ -20,8 +20,13 @@
 
 #pragma once
 
-#ifndef PICTURE_DATA_NULL_H
-#define PICTURE_DATA_NULL_H
+#ifndef PICTURE_DATA_WII_H
+#define PICTURE_DATA_WII_H
+
+#include <cstdint>
+#include <gccore.h>
+
+#define X_IMG_EXT ".tpl"
 
 /*!
  * \brief Platform specific picture data. Fields should not be used directly
@@ -29,9 +34,30 @@
 struct StdPictureData
 {
 
+    uint32_t last_draw_frame = 0;
+
+    bool texture_file_init[3] = {false, false, false};
+    bool texture_init[3] = {false, false, false};
+    TPLFile texture_file[3];
+    GXTexObj texture[3];
+    uint16_t tex_w[3];
+    uint16_t tex_h[3];
+
     inline bool hasTexture()
     {
-        return true;
+        return texture_init[0];
+    }
+
+    inline void destroy()
+    {
+        for(int i = 0; i < 3; i++)
+        {
+            if(texture_file_init[i])
+                TPL_CloseTPLFile(&texture_file[i]);
+
+            texture_file_init[i] = false;
+            texture_init[i] = false;
+        }
     }
 
 };
