@@ -22,9 +22,9 @@
  *
  * Generic parameters are:
  * - NumberT generic number type allows its floating- and fixed-point usage
- * - ObjectT* only pointer is stored, no object copying is done, not an inclusive container
+ * - ObjectT only reference is stored, no object copying is done, not an inclusive container
  * - BoundingBoxExtractorT allows using your own bounding box type/source, needs
- *     BoundingBoxExtractor::ExtractBoundingBox(ObjectT* in, BoundingBox<Number>* out) implemented
+ *     BoundingBoxExtractor::ExtractBoundingBox(ObjectT in, BoundingBox<Number>* out) implemented
  */
 
 #ifndef LOOSEQUADTREE_LOOSEQUADTREE_H
@@ -77,7 +77,7 @@ public:
         Query &operator=(Query &&);
 
         bool EndOfQuery() const;
-        Object *GetCurrent() const;
+        Object GetCurrent() const;
         void Next();
 
     private:
@@ -92,10 +92,10 @@ public:
     LooseQuadtree(const LooseQuadtree &) = delete;
     LooseQuadtree &operator=(const LooseQuadtree &) = delete;
 
-    bool Insert(Object *object); ///< true if it was inserted (else updated)
-    bool Update(Object *object); ///< true if it was updated (else inserted)
-    bool Remove(Object *object); ///< true if it was removed
-    bool Contains(Object *object) const; ///< true if object is in tree
+    bool Insert(Object object); ///< true if it was inserted (else updated)
+    bool Update(Object object); ///< true if it was updated (else inserted)
+    bool Remove(Object object); ///< true if it was removed
+    bool Contains(Object object) const; ///< true if object is in tree
     Query QueryIntersectsRegion(const BoundingBox<Number> &region);
     Query QueryInsideRegion(const BoundingBox<Number> &region);
     Query QueryContainsRegion(const BoundingBox<Number> &region);

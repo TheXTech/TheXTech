@@ -257,7 +257,7 @@ void GraphicsLazyPreLoad()
         // int64_t fBlock = 0;
         // int64_t lBlock = 0;
         // blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
-        TreeResult_Sentinel<Block_t> screenBlocks = treeBlockQuery(
+        TreeResult_Sentinel<BlockRef_t> screenBlocks = treeBlockQuery(
             -vScreenX[Z], -vScreenY[Z],
             -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
             SORTMODE_ID);
@@ -1431,7 +1431,7 @@ void UpdateGraphics(bool skipRepaint)
 //            blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
 //        }
 
-        TreeResult_Sentinel<Block_t> screenBlocks = treeBlockQuery(
+        TreeResult_Sentinel<BlockRef_t> screenBlocks = treeBlockQuery(
             -vScreenX[Z], -vScreenY[Z],
             -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
             SORTMODE_ID);

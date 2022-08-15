@@ -24,14 +24,14 @@
 #include "layers.h"
 #include "QuadTree/LooseQuadtree.h"
 
-std::vector<void*> treeresult_vec[MAX_TREEQUERY_DEPTH] = {std::vector<void*>(400), std::vector<void*>(400), std::vector<void*>(50), std::vector<void*>(50)};
+std::vector<BaseRef_t> treeresult_vec[MAX_TREEQUERY_DEPTH] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(50), std::vector<BaseRef_t>(50)};
 ptrdiff_t cur_treeresult_vec = 0;
 
-template<class ItemT>
+template<class ItemRef_t>
 class Tree_Extractor
 {
 public:
-    static void ExtractBoundingBox(const ItemT *object, loose_quadtree::BoundingBox<double> *bbox)
+    static void ExtractBoundingBox(const ItemRef_t object, loose_quadtree::BoundingBox<double> *bbox)
     {
         bbox->left      = object->Location.X;
         bbox->top       = object->Location.Y;
@@ -42,10 +42,10 @@ public:
 
 
 template<>
-class Tree_Extractor<Block_t>
+class Tree_Extractor<BlockRef_t>
 {
 public:
-    static void ExtractBoundingBox(const Block_t *object, loose_quadtree::BoundingBox<double> *bbox)
+    static void ExtractBoundingBox(const BlockRef_t object, loose_quadtree::BoundingBox<double> *bbox)
     {
         bbox->left      = object->LocationInLayer.X;
         bbox->top       = object->LocationInLayer.Y;
@@ -54,22 +54,22 @@ public:
     }
 };
 
-template<class ItemT>
+template<class ItemRef_t>
 struct Tree_private
 {
-    typedef loose_quadtree::LooseQuadtree<double, ItemT, Tree_Extractor<ItemT>> IndexTreeQ;
+    typedef loose_quadtree::LooseQuadtree<double, ItemRef_t, Tree_Extractor<ItemRef_t>> IndexTreeQ;
     IndexTreeQ tree;
 };
 
 const double s_gridSize = 4;
 
-static std::unique_ptr<Tree_private<Tile_t>> s_worldTilesTree;
-static std::unique_ptr<Tree_private<Scene_t>> s_worldSceneTree;
-static std::unique_ptr<Tree_private<WorldPath_t>> s_worldPathTree;
-static std::unique_ptr<Tree_private<WorldLevel_t>> s_worldLevelTree;
-static std::unique_ptr<Tree_private<WorldMusic_t>> s_worldMusicTree;
-static std::unique_ptr<Tree_private<Block_t>> s_levelBlockTrees[maxLayers+2];
-static std::unique_ptr<Tree_private<Block_t>> s_tempBlockTree;
+static std::unique_ptr<Tree_private<TileRef_t>> s_worldTilesTree;
+static std::unique_ptr<Tree_private<SceneRef_t>> s_worldSceneTree;
+static std::unique_ptr<Tree_private<WorldPathRef_t>> s_worldPathTree;
+static std::unique_ptr<Tree_private<WorldLevelRef_t>> s_worldLevelTree;
+static std::unique_ptr<Tree_private<WorldMusicRef_t>> s_worldMusicTree;
+static std::unique_ptr<Tree_private<BlockRef_t>> s_levelBlockTrees[maxLayers+2];
+static std::unique_ptr<Tree_private<BlockRef_t>> s_tempBlockTree;
 
 template<class Q>
 void clearTree(Q &tree)
@@ -101,33 +101,33 @@ void treeLevelCleanAll()
     treeLevelCleanBlockLayers();
 }
 
-template<class Obj, class Arr>
-void treeInsert(Arr &p, Obj*obj)
+template<class ItemRef_t, class Arr>
+void treeInsert(Arr &p, ItemRef_t obj)
 {
     if(!p.get())
-        p.reset(new Tree_private<Obj>());
+        p.reset(new Tree_private<ItemRef_t>());
     p->tree.Insert(obj);
 }
 
-template<class Obj, class Arr>
-void treeUpdate(Arr &p, Obj*obj)
+template<class ItemRef_t, class Arr>
+void treeUpdate(Arr &p, ItemRef_t obj)
 {
     if(p.get())
         p->tree.Update(obj);
 }
 
-template<class Obj, class Arr>
-void treeRemove(Arr &p, Obj*obj)
+template<class ItemRef_t, class Arr>
+void treeRemove(Arr &p, ItemRef_t obj)
 {
     if(p.get())
         p->tree.Remove(obj);
 }
 
-template<class Obj>
-TreeResult_Sentinel<Obj> treeWorldQuery(std::unique_ptr<Tree_private<Obj>> &p,
+template<class ItemRef_t>
+TreeResult_Sentinel<ItemRef_t> treeWorldQuery(std::unique_ptr<Tree_private<ItemRef_t>> &p,
     double Left, double Top, double Right, double Bottom, int sort_mode)
 {
-    TreeResult_Sentinel<Obj> result;
+    TreeResult_Sentinel<ItemRef_t> result;
 
     if(!p.get())
         return result;
@@ -139,33 +139,32 @@ TreeResult_Sentinel<Obj> treeWorldQuery(std::unique_ptr<Tree_private<Obj>> &p,
 
     while(!q.EndOfQuery())
     {
-        auto *item = q.GetCurrent();
-        if(item)
-            result.i_vec->push_back(item);
+        ItemRef_t item = q.GetCurrent();
+        result.i_vec->push_back((BaseRef_t)item);
         q.Next();
     }
 
     if(sort_mode == SORTMODE_ID)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
+            [](BaseRef_t a, BaseRef_t b) {
                 return a < b;
             });
     }
     else if(sort_mode == SORTMODE_LOC)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
-                return (((Obj*)a)->Location.X < ((Obj*)b)->Location.X
-                    || (((Obj*)a)->Location.X == ((Obj*)b)->Location.X
-                        && ((Obj*)a)->Location.Y < ((Obj*)b)->Location.Y));
+            [](BaseRef_t a, BaseRef_t b) {
+                return (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
+                    || (((ItemRef_t)a)->Location.X == ((ItemRef_t)b)->Location.X
+                        && ((ItemRef_t)a)->Location.Y < ((ItemRef_t)b)->Location.Y));
             });
     }
     else if(sort_mode == SORTMODE_Z)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
-                return ((Obj*)a)->Z < ((Obj*)b)->Z;
+            [](BaseRef_t a, BaseRef_t b) {
+                return ((ItemRef_t)a)->Z < ((ItemRef_t)b)->Z;
             });
     }
 
@@ -175,22 +174,22 @@ TreeResult_Sentinel<Obj> treeWorldQuery(std::unique_ptr<Tree_private<Obj>> &p,
 
 /* ================= Terrain Tile ================= */
 
-void treeWorldTileAdd(Tile_t *obj)
+void treeWorldTileAdd(TileRef_t obj)
 {
     treeInsert(s_worldTilesTree, obj);
 }
 
-void treeWorldTileUpdate(Tile_t *obj)
+void treeWorldTileUpdate(TileRef_t obj)
 {
     treeUpdate(s_worldTilesTree, obj);
 }
 
-void treeWorldTileRemove(Tile_t *obj)
+void treeWorldTileRemove(TileRef_t obj)
 {
     treeRemove(s_worldTilesTree, obj);
 }
 
-TreeResult_Sentinel<Tile_t> treeWorldTileQuery(double Left, double Top, double Right, double Bottom, int sort_mode, double margin)
+TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(double Left, double Top, double Right, double Bottom, int sort_mode, double margin)
 {
     return treeWorldQuery(s_worldTilesTree,
                    Left - margin,
@@ -200,7 +199,7 @@ TreeResult_Sentinel<Tile_t> treeWorldTileQuery(double Left, double Top, double R
                    sort_mode);
 }
 
-TreeResult_Sentinel<Tile_t> treeWorldTileQuery(const Location_t &loc, int sort_mode, double margin)
+TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(const Location_t &loc, int sort_mode, double margin)
 {
     return treeWorldQuery(s_worldTilesTree,
                    loc.X - margin,
@@ -213,22 +212,22 @@ TreeResult_Sentinel<Tile_t> treeWorldTileQuery(const Location_t &loc, int sort_m
 
 /* ================= Scenery ================= */
 
-void treeWorldSceneAdd(Scene_t *obj)
+void treeWorldSceneAdd(SceneRef_t obj)
 {
     treeInsert(s_worldSceneTree, obj);
 }
 
-void treeWorldSceneUpdate(Scene_t *obj)
+void treeWorldSceneUpdate(SceneRef_t obj)
 {
     treeUpdate(s_worldSceneTree, obj);
 }
 
-void treeWorldSceneRemove(Scene_t *obj)
+void treeWorldSceneRemove(SceneRef_t obj)
 {
     treeRemove(s_worldSceneTree, obj);
 }
 
-TreeResult_Sentinel<Scene_t> treeWorldSceneQuery(double Left, double Top, double Right, double Bottom, int sort_mode, double margin)
+TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(double Left, double Top, double Right, double Bottom, int sort_mode, double margin)
 {
     return treeWorldQuery(s_worldSceneTree,
                    Left - margin,
@@ -238,7 +237,7 @@ TreeResult_Sentinel<Scene_t> treeWorldSceneQuery(double Left, double Top, double
                    sort_mode);
 }
 
-TreeResult_Sentinel<Scene_t> treeWorldSceneQuery(const Location_t &loc, int sort_mode, double margin)
+TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(const Location_t &loc, int sort_mode, double margin)
 {
     return treeWorldQuery(s_worldSceneTree,
                    loc.X - margin,
@@ -251,22 +250,22 @@ TreeResult_Sentinel<Scene_t> treeWorldSceneQuery(const Location_t &loc, int sort
 
 /* ================= Paths ================= */
 
-void treeWorldPathAdd(WorldPath_t *obj)
+void treeWorldPathAdd(WorldPathRef_t obj)
 {
     treeInsert(s_worldPathTree, obj);
 }
 
-void treeWorldPathUpdate(WorldPath_t *obj)
+void treeWorldPathUpdate(WorldPathRef_t obj)
 {
     treeUpdate(s_worldPathTree, obj);
 }
 
-void treeWorldPathRemove(WorldPath_t *obj)
+void treeWorldPathRemove(WorldPathRef_t obj)
 {
     treeRemove(s_worldPathTree, obj);
 }
 
-TreeResult_Sentinel<WorldPath_t> treeWorldPathQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(double Left, double Top, double Right, double Bottom,
                         int sort_mode, double margin)
 {
     return treeWorldQuery(s_worldPathTree,
@@ -277,7 +276,7 @@ TreeResult_Sentinel<WorldPath_t> treeWorldPathQuery(double Left, double Top, dou
                    sort_mode);
 }
 
-TreeResult_Sentinel<WorldPath_t> treeWorldPathQuery(const Location_t &loc, int sort_mode, double margin)
+TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(const Location_t &loc, int sort_mode, double margin)
 {
     return treeWorldQuery(s_worldPathTree,
                    loc.X - margin,
@@ -289,22 +288,22 @@ TreeResult_Sentinel<WorldPath_t> treeWorldPathQuery(const Location_t &loc, int s
 
 /* ================= Levels ================= */
 
-void treeWorldLevelAdd(WorldLevel_t *obj)
+void treeWorldLevelAdd(WorldLevelRef_t obj)
 {
     treeInsert(s_worldLevelTree, obj);
 }
 
-void treeWorldLevelUpdate(WorldLevel_t *obj)
+void treeWorldLevelUpdate(WorldLevelRef_t obj)
 {
     treeUpdate(s_worldLevelTree, obj);
 }
 
-void treeWorldLevelRemove(WorldLevel_t *obj)
+void treeWorldLevelRemove(WorldLevelRef_t obj)
 {
     treeRemove(s_worldLevelTree, obj);
 }
 
-TreeResult_Sentinel<WorldLevel_t> treeWorldLevelQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(double Left, double Top, double Right, double Bottom,
                          int sort_mode, double margin)
 {
     return treeWorldQuery(s_worldLevelTree,
@@ -315,7 +314,7 @@ TreeResult_Sentinel<WorldLevel_t> treeWorldLevelQuery(double Left, double Top, d
                    sort_mode);
 }
 
-TreeResult_Sentinel<WorldLevel_t> treeWorldLevelQuery(const Location_t &loc, int sort_mode, double margin)
+TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(const Location_t &loc, int sort_mode, double margin)
 {
     return treeWorldQuery(s_worldLevelTree,
                    loc.X - margin,
@@ -328,22 +327,22 @@ TreeResult_Sentinel<WorldLevel_t> treeWorldLevelQuery(const Location_t &loc, int
 
 /* ================= Music ================= */
 
-void treeWorldMusicAdd(WorldMusic_t *obj)
+void treeWorldMusicAdd(WorldMusicRef_t obj)
 {
     treeInsert(s_worldMusicTree, obj);
 }
 
-void treeWorldMusicUpdate(WorldMusic_t *obj)
+void treeWorldMusicUpdate(WorldMusicRef_t obj)
 {
     treeUpdate(s_worldMusicTree, obj);
 }
 
-void treeWorldMusicRemove(WorldMusic_t *obj)
+void treeWorldMusicRemove(WorldMusicRef_t obj)
 {
     treeRemove(s_worldMusicTree, obj);
 }
 
-TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(double Left, double Top, double Right, double Bottom,
                          int sort_mode,
                          double margin)
 {
@@ -355,7 +354,7 @@ TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(double Left, double Top, d
                    sort_mode);
 }
 
-TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(const Location_t &loc,
+TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(const Location_t &loc,
                          int sort_mode,
                          double margin)
 {
@@ -370,32 +369,32 @@ TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(const Location_t &loc,
 
 /* ================= Level blocks ================= */
 
-void treeBlockAddLayer(int layer, Block_t *obj)
+void treeBlockAddLayer(int layer, BlockRef_t obj)
 {
     if(layer < 0 || layer == LAYER_NONE)
         layer = maxLayers + 1;
     treeInsert(s_levelBlockTrees[layer], obj);
 }
 
-void treeBlockUpdateLayer(int layer, Block_t *obj)
+void treeBlockUpdateLayer(int layer, BlockRef_t obj)
 {
     if(layer < 0 || layer == LAYER_NONE)
         layer = maxLayers + 1;
     treeUpdate(s_levelBlockTrees[layer], obj);
 }
 
-void treeBlockRemoveLayer(int layer, Block_t *obj)
+void treeBlockRemoveLayer(int layer, BlockRef_t obj)
 {
     if(layer < 0 || layer == LAYER_NONE)
         layer = maxLayers + 1;
     treeRemove(s_levelBlockTrees[layer], obj);
 }
 
-TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
                          int sort_mode,
                          double margin)
 {
-    TreeResult_Sentinel<Block_t> result;
+    TreeResult_Sentinel<BlockRef_t> result;
 
     for(int layer = 0; layer < maxLayers+2; layer++)
     {
@@ -411,7 +410,7 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
             OffsetX = Layer[layer].OffsetX;
             OffsetY = Layer[layer].OffsetY;
         }
-        std::unique_ptr<Tree_private<Block_t>>& p = s_levelBlockTrees[layer];
+        std::unique_ptr<Tree_private<BlockRef_t>>& p = s_levelBlockTrees[layer];
         if(!p.get())
             continue;
 
@@ -421,9 +420,8 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
                                                                                    (Bottom - Top) + (margin + s_gridSize) * 2));
         while(!q.EndOfQuery())
         {
-            auto *item = q.GetCurrent();
-            if(item)
-                result.i_vec->push_back(item);
+            BlockRef_t item = q.GetCurrent();
+            result.i_vec->push_back((BaseRef_t)item);
             q.Next();
         }
     }
@@ -431,34 +429,34 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
     if(sort_mode == SORTMODE_LOC)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
-                return (((Block_t*)a)->Location.X < ((Block_t*)b)->Location.X
-                    || (((Block_t*)a)->Location.X == ((Block_t*)b)->Location.X
-                        && ((Block_t*)a)->Location.Y < ((Block_t*)b)->Location.Y));
+            [](BaseRef_t a, BaseRef_t b) {
+                return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                    || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
+                        && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
             });
     }
     else if(sort_mode == SORTMODE_ID)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
-                return a < b;
+            [](BaseRef_t a, BaseRef_t b) {
+                return a.index < b.index;
             });
     }
     else if(sort_mode == SORTMODE_Z)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
+            [](BaseRef_t a, BaseRef_t b) {
                 // not implemented yet, might never be
                 // instead, just sort by the index
                 // (which is currently the same as z-order)
-                return a < b;
+                return a.index < b.index;
             });
     }
 
     return result;
 }
 
-TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc,
+TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
                          int sort_mode,
                          double margin)
 {
@@ -473,27 +471,27 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc,
 void treeTempBlockStartFrame()
 {
     if(!s_tempBlockTree.get())
-        s_tempBlockTree.reset(new Tree_private<Block_t>());
+        s_tempBlockTree.reset(new Tree_private<BlockRef_t>());
     s_tempBlockTree->tree.Clear();
 }
 
-void treeTempBlockAdd(Block_t *obj)
+void treeTempBlockAdd(BlockRef_t obj)
 {
     treeInsert(s_tempBlockTree, obj);
 }
 
-void treeTempBlockUpdate(Block_t *obj)
+void treeTempBlockUpdate(BlockRef_t obj)
 {
     treeUpdate(s_tempBlockTree, obj);
 }
 
-TreeResult_Sentinel<Block_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
                          int sort_mode,
                          double margin)
 {
-    TreeResult_Sentinel<Block_t> result;
+    TreeResult_Sentinel<BlockRef_t> result;
 
-    std::unique_ptr<Tree_private<Block_t>>& p = s_tempBlockTree;
+    std::unique_ptr<Tree_private<BlockRef_t>>& p = s_tempBlockTree;
 
     auto q = p->tree.QueryIntersectsRegion(loose_quadtree::BoundingBox<double>(Left - margin - s_gridSize,
                                                                                Top - margin - s_gridSize,
@@ -501,43 +499,42 @@ TreeResult_Sentinel<Block_t> treeTempBlockQuery(double Left, double Top, double 
                                                                                (Bottom - Top) + (margin + s_gridSize) * 2));
     while(!q.EndOfQuery())
     {
-        auto *item = q.GetCurrent();
-        if(item)
-            result.i_vec->push_back(item);
+        BlockRef_t item = q.GetCurrent();
+        result.i_vec->push_back((BaseRef_t)item);
         q.Next();
     }
 
     if(sort_mode == SORTMODE_LOC)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
-                return (((Block_t*)a)->Location.X < ((Block_t*)b)->Location.X
-                    || (((Block_t*)a)->Location.X == ((Block_t*)b)->Location.X
-                        && ((Block_t*)a)->Location.Y < ((Block_t*)b)->Location.Y));
+            [](BaseRef_t a, BaseRef_t b) {
+                return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                    || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
+                        && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
             });
     }
     else if(sort_mode == SORTMODE_ID)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
-                return a < b;
+            [](BaseRef_t a, BaseRef_t b) {
+                return a.index < b.index;
             });
     }
     else if(sort_mode == SORTMODE_Z)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
+            [](BaseRef_t a, BaseRef_t b) {
                 // not implemented yet, might never be
                 // instead, just sort by the index
                 // (which is currently the same as z-order)
-                return a < b;
+                return a.index < b.index;
             });
     }
 
     return result;
 }
 
-TreeResult_Sentinel<Block_t> treeTempBlockQuery(const Location_t &loc,
+TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc,
                          int sort_mode,
                          double margin)
 {
