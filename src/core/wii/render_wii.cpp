@@ -85,6 +85,7 @@ void s_loadTexture(StdPicture &target, int i)
         }
         else
         {
+            GX_InitTexObjFilterMode(&target.d.texture[i], GX_NEAR, GX_NEAR);
             target.d.texture_init[i] = true;
         }
     }
@@ -161,16 +162,17 @@ bool init()
     // 3 values X,Y,Z of size F32. scale sets the number of fractional
     // bits for non float data.
     GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
-    GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U16, 0);
     GX_SetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-
-    GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-
-    GX_InvVtxCache();
-    GX_InvalidateTexAll();
 
     GX_SetNumChans(1);
     GX_SetNumTexGens(1);
+
+    GX_SetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+    GX_SetTexCoordScaleManually(GX_TEXCOORD0, GX_TRUE, 1, 1);
+
+    GX_InvVtxCache();
+    GX_InvalidateTexAll();
 
     // setup our camera at the origin
     // looking down the -z axis with y up
@@ -535,30 +537,37 @@ void renderRect(int x, int y, int w, int h, float red, float green, float blue, 
     int x_div = ROUNDDIV2(x);
     int w_div = ROUNDDIV2(x + w) - x_div;
 
+    x_div += s_viewport_offset_x;
+
     int y_div = ROUNDDIV2(y);
     int h_div = ROUNDDIV2(y + h) - y_div;
+
+    x_div += s_viewport_offset_y;
 
     uint8_t r = red * 255.0f + 0.5f;
     uint8_t g = green * 255.0f + 0.5f;
     uint8_t b = blue * 255.0f + 0.5f;
     uint8_t a = alpha * 255.0f + 0.5f;
 
-    GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLOR0);
     GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
     GX_Begin(GX_QUADS, GX_VTXFMT0, 4);          // Draw A Quad
         GX_Position3s16(x_div, y_div, 0); // Top Left
-        GX_TexCoord2f32(0.0f, 0.0f);
         GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+        GX_TexCoord2u16(0, 0);
+
         GX_Position3s16( x_div + w_div, y_div, 0);        // Top Right
-        GX_TexCoord2f32(0.0f, 0.0f);
         GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+        GX_TexCoord2u16(0, 0);
+
         GX_Position3s16( x_div + w_div, y_div + h_div, 0); // Bottom Right
-        GX_TexCoord2f32(0.0f, 0.0f);
         GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+        GX_TexCoord2u16(0, 0);
+
         GX_Position3s16( x_div, y_div + h_div, 0);  // Bottom Left
-        GX_TexCoord2f32(0.0f, 0.0f);
         GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+        GX_TexCoord2u16(0, 0);
     GX_End();                                   // Done Drawing The Quad
 }
 
@@ -609,18 +618,14 @@ void renderCircleHole(int cx, int cy,
 
 inline bool GX_DrawImage_Custom(GXTexObj* img,
     int16_t x, int16_t y, uint16_t w, uint16_t h,
-    int stex_w, int stex_h,
-    float src_x, float src_y, float src_w, float src_h,
+    uint16_t src_x, uint16_t src_y, uint16_t src_w, uint16_t src_h,
     unsigned int flip,
     float _r, float _g, float _b, float _a)
 {
-    float scale_x = 1.0f / stex_w;
-    float scale_y = 1.0f / stex_h;
-
-    float u1 = src_x * scale_x;
-    float u2 = (src_x + src_w) * scale_x;
-    float v1 = src_y * scale_y;
-    float v2 = (src_y + src_h) * scale_y;
+    uint16_t u1 = src_x;
+    uint16_t u2 = src_x + src_w;
+    uint16_t v1 = src_y;
+    uint16_t v2 = src_y + src_h;
 
     if(flip & X_FLIP_HORIZONTAL)
         std::swap(u1, u2);
@@ -639,19 +644,19 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
     GX_Begin(GX_QUADS, GX_VTXFMT0, 4);          // Draw A Quad
         GX_Position3s16(x, y, 0); // Top Left
         GX_Color4u8(r, g, b, a);
-        GX_TexCoord2f32(u1, v1);
+        GX_TexCoord2u16(u1, v1);
 
         GX_Position3s16(x + w, y, 0);        // Top Right
         GX_Color4u8(r, g, b, a);
-        GX_TexCoord2f32(u2, v1);
+        GX_TexCoord2u16(u2, v1);
 
         GX_Position3s16(x + w, y + h, 0); // Bottom Right
         GX_Color4u8(r, g, b, a);
-        GX_TexCoord2f32(u2, v2);
+        GX_TexCoord2u16(u2, v2);
 
         GX_Position3s16(x, y + h, 0);  // Bottom Left
         GX_Color4u8(r, g, b, a);
-        GX_TexCoord2f32(u1, v2);
+        GX_TexCoord2u16(u1, v2);
     GX_End();                                   // Done Drawing The Quad
 
     return true;
@@ -666,9 +671,9 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
     return true;
 }
 
-inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
+inline void i_renderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
-                             float xSrc, float ySrc, float wSrc, float hSrc,
+                             int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
@@ -700,7 +705,7 @@ inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
 
     // TODO: graphics tests for how offscreen draws interact with flips
     //       handling rotations properly is probably impossible
-    if(xDst < 0.0f)
+    if(xDst < 0)
     {
         if(!(flip & X_FLIP_HORIZONTAL))
             xSrc -= xDst * wSrc / wDst;
@@ -717,7 +722,7 @@ inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
             wSrc += xDst * wSrc / wDst;
             wDst += xDst;
         }
-        xDst = 0.0f;
+        xDst = 0;
     }
     else if(xDst + wDst > s_viewport_w)
     {
@@ -727,7 +732,7 @@ inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
         wDst = (s_viewport_w - xDst);
     }
 
-    if(yDst < 0.0f)
+    if(yDst < 0)
     {
         if(!(flip & X_FLIP_VERTICAL))
             ySrc -= yDst * hSrc / hDst;
@@ -744,7 +749,7 @@ inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
             hSrc += yDst * hSrc / hDst;
             hDst += yDst;
         }
-        yDst = 0.0f;
+        yDst = 0;
     }
     else if(yDst + hDst > s_viewport_h)
     {
@@ -755,9 +760,7 @@ inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
     }
 
     GXTexObj* to_draw = nullptr;
-    uint16_t stex_w, stex_h;
     GXTexObj* to_draw_2 = nullptr;
-    uint16_t stex2_w, stex2_h;
 
     // Don't go more than size of texture
     // Failure conditions should only happen if texture is smaller than expected
@@ -765,73 +768,54 @@ inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
     {
         wDst = (tx.w / 2 - xSrc) * wDst / wSrc;
         wSrc = tx.w / 2 - xSrc;
-        if(wDst < 0.0f)
+        if(wDst < 0)
             return;
     }
     if(ySrc + hSrc > tx.h / 2)
     {
         hDst = (tx.h / 2 - ySrc) * hDst / hSrc;
         hSrc = tx.h / 2 - ySrc;
-        if(hDst < 0.0f)
+        if(hDst < 0)
             return;
     }
 
-    if(ySrc + hSrc > 1024.0f)
+    if(ySrc + hSrc > 1024)
     {
-        if(ySrc + hSrc > 2048.0f)
+        if(ySrc + hSrc > 2048)
         {
             if(tx.d.texture_init[2])
-            {
                 to_draw = &tx.d.texture[2];
-                stex_w = tx.d.tex_w[2];
-                stex_h = tx.d.tex_h[2];
-            }
-            if(ySrc < 2048.0f && tx.d.texture_init[1])
-            {
+            if(ySrc < 2048 && tx.d.texture_init[1])
                 to_draw_2 = &tx.d.texture[1];
-                stex2_w = tx.d.tex_w[1];
-                stex2_h = tx.d.tex_h[1];
-            }
-            ySrc -= 1024.0f;
+            ySrc -= 1024;
         }
         else
         {
             if(tx.d.texture_init[1])
-            {
                 to_draw = &tx.d.texture[1];
-                stex_w = tx.d.tex_w[1];
-                stex_h = tx.d.tex_h[1];
-            }
-            if(ySrc < 1024.0f)
-            {
+            if(ySrc < 1024)
                 to_draw_2 = &tx.d.texture[0];
-                stex2_w = tx.d.tex_w[0];
-                stex2_h = tx.d.tex_h[0];
-            }
         }
         // draw the top pic
         if(to_draw_2 != nullptr)
         {
             if(rotateAngle != 0.0)
-                GX_DrawImage_Custom_Rotated(to_draw_2, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, (1024.0f - ySrc) * hDst / hSrc,
-                                    xSrc, ySrc, wSrc, 1024.0f - ySrc, flip, center, rotateAngle, red, green, blue, alpha);
+                GX_DrawImage_Custom_Rotated(to_draw_2, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, (1024 - ySrc) * hDst / hSrc,
+                                    xSrc, ySrc, wSrc, 1024 - ySrc, flip, center, rotateAngle, red, green, blue, alpha);
             else
-                GX_DrawImage_Custom(to_draw_2, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, (1024.0f - ySrc) * hDst / hSrc,
-                                    stex2_w, stex2_h,
-                                    xSrc, ySrc, wSrc, 1024.0f - ySrc, flip, red, green, blue, alpha);
-            yDst += (1024.0f - ySrc) * hDst / hSrc;
-            hDst -= (1024.0f - ySrc) * hDst / hSrc;
-            hSrc -= (1024.0f - ySrc);
-            ySrc = 0.0f;
+                GX_DrawImage_Custom(to_draw_2, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, (1024 - ySrc) * hDst / hSrc,
+                                    xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
+            yDst += (1024 - ySrc) * hDst / hSrc;
+            hDst -= (1024 - ySrc) * hDst / hSrc;
+            hSrc -= (1024 - ySrc);
+            ySrc = 0;
         }
         else
-            ySrc -= 1024.0f;
+            ySrc -= 1024;
     }
     else
     {
         to_draw = &tx.d.texture[0];
-        stex_w = tx.d.tex_w[0];
-        stex_h = tx.d.tex_h[0];
     }
 
     if(to_draw == nullptr) return;
@@ -841,7 +825,6 @@ inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
                              xSrc, ySrc, wSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
     else
         GX_DrawImage_Custom(to_draw, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, hDst,
-                            stex_w, stex_h,
                             xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
 }
 
@@ -873,7 +856,7 @@ void renderTexture(double xDst, double yDst, double wDst, double hDst,
     i_renderTexturePrivate(
         div_x, div_y, div_w, div_h,
         tx,
-        xSrc / 2, ySrc / 2, div_w, div_h,
+        ROUNDDIV2(xSrc), ROUNDDIV2(ySrc), div_w, div_h,
         0.0f, nullptr, X_FLIP_NONE,
         red, green, blue, alpha);
 }
@@ -886,7 +869,7 @@ void renderTexture(float xDst, float yDst, StdPicture &tx,
     i_renderTexturePrivate(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
         tx,
-        0.0f, 0.0f, w, h,
+        0, 0, w, h,
         0.0f, nullptr, X_FLIP_NONE,
         red, green, blue, alpha);
 }
@@ -905,10 +888,14 @@ void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, f
 
 void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
+    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+
     i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), tx.w / 2, tx.h / 2,
+        div_x, div_y, div_w, div_h,
         tx,
-        0.0f, 0.0f, wDst / 2, hDst / 2,
+        0.0f, 0.0f, tx.w / 2, tx.h / 2,
         0.0f, nullptr, X_FLIP_NONE,
         red, green, blue, alpha);
 }
@@ -926,7 +913,7 @@ void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
     i_renderTexturePrivate(
         div_x, div_y, div_w, div_h,
         tx,
-        xSrc / 2, ySrc / 2, div_w, div_h,
+        ROUNDDIV2(xSrc), ROUNDDIV2(ySrc), div_w, div_h,
         rotateAngle, center, flip,
         red, green, blue, alpha);
 }
@@ -942,10 +929,14 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
     auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
     auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
 
+    auto div_sx = ROUNDDIV2(xSrc), div_sy = ROUNDDIV2(ySrc);
+    auto div_sw = ROUNDDIV2(xSrc + wSrc) - div_sx;
+    auto div_sh = ROUNDDIV2(ySrc + hSrc) - div_sy;
+
     i_renderTexturePrivate(
         div_x, div_y, div_w, div_h,
         tx,
-        xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
+        div_sx, div_sy, div_sw, div_sh,
         rotateAngle, center, flip,
         red, green, blue, alpha);
 }
