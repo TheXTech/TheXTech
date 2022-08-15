@@ -40,7 +40,7 @@
 #ifdef __3DS__
 #include "input_3ds.h"
 #elif defined(__WII__)
-// #include "input_wii.h"
+#include "input_wii.h"
 #else
 #include "keyboard.h"
 #include "joystick.h"
@@ -687,6 +687,9 @@ void Init()
 {
 #ifdef INPUT_3DS_H
     g_InputMethodTypes.push_back(new InputMethodType_3DS);
+#endif
+#ifdef INPUT_WII_H
+    g_InputMethodTypes.push_back(new InputMethodType_Wii);
 #endif
 #ifdef KEYBOARD_H
     g_InputMethodTypes.push_back(new InputMethodType_Keyboard);

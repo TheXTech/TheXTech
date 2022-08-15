@@ -520,7 +520,7 @@ endif()
 if(WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
     list(APPEND THEXTECH_SRC
-#        src/control/input_wii.cpp
+        src/control/input_wii.cpp
         src/core/wii/std_wii.cpp
         src/core/wii/render_wii.cpp
         src/core/wii/window_wii.cpp
