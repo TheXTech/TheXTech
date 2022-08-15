@@ -1112,7 +1112,7 @@ bool InputMethodType_Wii::TestProfileType(InputMethodProfile* profile)
 
 bool InputMethodType_Wii::RumbleSupported()
 {
-    return false;
+    return true;
 }
 
 void InputMethodType_Wii::UpdateControlsPre()
