@@ -39,7 +39,7 @@ inline void assert_debug(bool arg)
 
 uint32_t GetTicks();
 
-#ifdef __3DS__
+#if defined(__3DS__) || defined(__WII__)
 
 #define XT_HAS_MICROSECOND_TIMER
 uint64_t GetMicroTicks();
