@@ -22,6 +22,10 @@
 #ifndef REF_TYPE_H
 #define REF_TYPE_H
 
+#include <cstdint>
+#include <functional>
+
+
 struct BaseRef_t
 {
     int16_t index;
