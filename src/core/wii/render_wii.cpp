@@ -228,24 +228,28 @@ void repaint()
     GX_SetColorUpdate(GX_TRUE);
     GX_CopyDisp(frameBuffer[cur_buffer],GX_TRUE);
 
+    g_microStats.start_sleep();
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+        VIDEO_WaitVSync();
+    g_microStats.start_task(MicroStats::Graphics);
+
     VIDEO_SetNextFramebuffer(frameBuffer[cur_buffer]);
 
     VIDEO_Flush();
 
-    // VIDEO_WaitVSync();
     g_in_frame = false;
 }
 
 void mapToScreen(int x, int y, int *dx, int *dy)
 {
-    *dx = x;
-    *dy = y;
+    *dx = x * 2;
+    *dy = y * 2;
 }
 
 void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
 {
-    *window_x = scr_x;
-    *window_y = scr_y;
+    *window_x = scr_x / 2;
+    *window_y = scr_y / 2;
 }
 
 void updateViewport()

@@ -33,12 +33,13 @@
 #define WPAD_STICK_LL  0x2000
 #define WPAD_STICK_LR  0x4000
 #define WPAD_STICK_LU  0x6000
-#define WPAD_STICK_LD  0x8000
+// not technically legal.
+#define WPAD_STICK_LD  0x7000
 #define WPAD_STICK_RL  0xA000
 #define WPAD_STICK_RR  0xC000
 #define WPAD_STICK_RU  0xE000
 // not technically legal.
-#define WPAD_STICK_RD  0xD000
+#define WPAD_STICK_RD  0xF000
 
 #define WPAD_SHAKE     0x1FFF
 
@@ -99,6 +100,52 @@ static const char* s_get_name(uint32_t button, uint8_t expansion)
     return "INVALID";
 }
 
+static inline double i_get_thumb_dbl(WPADData* data, uint32_t button, uint8_t expansion)
+{
+    const joystick_t& js = (expansion == WPAD_EXP_NUNCHUK)
+        ? data->exp.nunchuk.js
+        : ((button < WPAD_STICK_RL)
+            ? data->exp.classic.ljs
+            : data->exp.classic.rjs);
+
+    if(button >= 0x8000)
+        button -= 0x8000;
+
+    double center, max, val;
+    if(button == WPAD_STICK_LL)
+    {
+        center = js.center.x;
+        max = js.max.x;
+        val = js.pos.x;
+    }
+    else if(button == WPAD_STICK_LR)
+    {
+        center = js.center.x;
+        max = js.min.x;
+        val = js.pos.x;
+    }
+    else if(button == WPAD_STICK_LU)
+    {
+        center = js.center.y;
+        max = js.min.y;
+        val = js.pos.y;
+    }
+    else // (button == WPAD_STICK_LD)
+    {
+        center = js.center.y;
+        max = js.max.y;
+        val = js.pos.y;
+    }
+
+    double decode = (val - center) / (max - center);
+    decode -= 0.1;
+    decode /= 0.9;
+    if(decode < 0.1)
+        decode = 0.0;
+
+    return decode;
+}
+
 static bool s_get_button(WPADData* data, uint32_t button, uint8_t expansion)
 {
     (void)expansion;
@@ -107,15 +154,28 @@ static bool s_get_button(WPADData* data, uint32_t button, uint8_t expansion)
         return false;
 
     if(button < WPAD_SHAKE)
-    {
         return button & data->btns_h;
-    }
+
+    if(button == WPAD_SHAKE)
+        return data->gforce.z < 0.0f || data->gforce.z > 2.0f;
+
+    // thumbstick button
+    if(button <= WPAD_STICK_RU)
+        return i_get_thumb_dbl(data, button, expansion) > 0.25;
+
+    // expansion button, WPAD makes this easy :)
+    return button & data->btns_h;
 
     return false;
 }
 
-double s_get_button_dbl(WPADData* data, uint32_t button, uint8_t expansion)
+static double s_get_button_dbl(WPADData* data, uint32_t button, uint8_t expansion)
 {
+    if(button >= WPAD_STICK_LL && button <= WPAD_STICK_RU)
+    {
+        return i_get_thumb_dbl(data, button, expansion);
+    }
+
     if(s_get_button(data, button, expansion))
         return 0.5;
     else
@@ -132,10 +192,16 @@ namespace Controls
 || implementation for InputMethod_Wii            ||
 \*===============================================*/
 
-InputMethod_Wii::InputMethod_Wii(int chn) : m_chn(chn) {}
+InputMethod_Wii::InputMethod_Wii(int chn) : m_chn(chn)
+{
+    WPAD_SetDataFormat(m_chn, WPAD_FMT_BTNS_ACC_IR);
+    WPAD_SetVRes(m_chn, 640, 480);
+}
 
 InputMethod_Wii::~InputMethod_Wii()
 {
+    WPAD_SetDataFormat(m_chn, WPAD_FMT_BTNS);
+
     InputMethodType_Wii* t = dynamic_cast<InputMethodType_Wii*>(this->Type);
 
     if(!t)
@@ -161,7 +227,10 @@ bool InputMethod_Wii::Update(int player, Controls_t& c, CursorControls_t& m, Edi
         return false;
 
     if(data->exp.type != p->m_expansion)
+    {
+        pLogDebug("Disconnected input profile %s from Wiimote index %d because of extension mismatch: (Wiimote %d, profile %d). This usually happens because an extension has been connected or disconnected.", p->Name.c_str(), m_chn, (int)data->exp.type, (int)p->m_expansion);
         return false;
+    }
 
     if(m_rumble_ticks)
     {
@@ -261,6 +330,37 @@ bool InputMethod_Wii::Update(int player, Controls_t& c, CursorControls_t& m, Edi
         *scroll[i] += s_get_button_dbl(data, key, p->m_expansion) * 32.0;
         *scroll[i] += s_get_button_dbl(data, key2, p->m_expansion) * 32.0;
     }
+
+    static bool was_valid = false;
+
+    if(data->ir.valid)
+    {
+        printf("Got IR data: %f %f\n", data->ir.x, data->ir.y);
+        int phys_x = data->ir.x;
+        int phys_y = data->ir.y;
+
+        int scr_x, scr_y;
+        XRender::mapToScreen(phys_x, phys_y, &scr_x, &scr_y);
+        static int last_x = 0, last_y = 0;
+
+        if(scr_x - last_x <= -1 || scr_x - last_x >= 1 ||
+           scr_y - last_y <= -1 || scr_y - last_y >= 1)
+        {
+            last_x = scr_x;
+            last_y = scr_y;
+            SharedCursor.Move = true;
+            SharedCursor.X = scr_x;
+            SharedCursor.Y = scr_y;
+        }
+
+        was_valid = true;
+    }
+    else if(was_valid)
+    {
+        SharedCursor.GoOffscreen();
+        was_valid = false;
+    }
+
 
     double cursor[4];
 
@@ -471,6 +571,30 @@ bool InputMethodProfile_Wii::PollPrimaryButton(ControlsClass c, size_t i)
             }
         }
 
+        if(data->exp.type == WPAD_EXP_NUNCHUK)
+        {
+            for(uint32_t but : nunchuck_buttons)
+            {
+                if(s_get_button(data, but, data->exp.type))
+                {
+                    key = but;
+                    break;
+                }
+            }
+        }
+
+        if(data->exp.type == WPAD_EXP_CLASSIC)
+        {
+            for(uint32_t but : classic_buttons)
+            {
+                if(s_get_button(data, but, data->exp.type))
+                {
+                    key = but;
+                    break;
+                }
+            }
+        }
+
         if(key != null_but)
             break;
     }
@@ -569,6 +693,30 @@ bool InputMethodProfile_Wii::PollSecondaryButton(ControlsClass c, size_t i)
             {
                 key = but;
                 break;
+            }
+        }
+
+        if(data->exp.type == WPAD_EXP_NUNCHUK)
+        {
+            for(uint32_t but : nunchuck_buttons)
+            {
+                if(s_get_button(data, but, data->exp.type))
+                {
+                    key = but;
+                    break;
+                }
+            }
+        }
+
+        if(data->exp.type == WPAD_EXP_CLASSIC)
+        {
+            for(uint32_t but : classic_buttons)
+            {
+                if(s_get_button(data, but, data->exp.type))
+                {
+                    key = but;
+                    break;
+                }
             }
         }
 
@@ -796,7 +944,7 @@ const char* InputMethodProfile_Wii::NameSecondaryButton(ControlsClass c, size_t 
 
 void InputMethodProfile_Wii::SaveConfig(IniProcessing* ctl)
 {
-    ctl->setValue("expansion", this->m_expansion);
+    ctl->setValue("expansion", (int)this->m_expansion);
 
     char name2[20];
 
@@ -866,7 +1014,10 @@ void InputMethodProfile_Wii::SaveConfig(IniProcessing* ctl)
 
 void InputMethodProfile_Wii::LoadConfig(IniProcessing* ctl)
 {
-    ctl->read("expansion", this->m_expansion, WPAD_EXP_NONE);
+    int expansion;
+    ctl->read("expansion", expansion, WPAD_EXP_NONE);
+
+    this->m_expansion = expansion;
 
     char name2[20];
 
@@ -945,8 +1096,7 @@ InputMethodProfile* InputMethodType_Wii::AllocateProfile() noexcept
 
 InputMethodType_Wii::InputMethodType_Wii()
 {
-    this->Name = "WII";
-    this->LegacyName = "wii";
+    this->Name = "Wii";
     WPAD_Init();
 }
 
@@ -1010,6 +1160,30 @@ InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_m
             {
                 key = but;
                 break;
+            }
+        }
+
+        if(data->exp.type == WPAD_EXP_NUNCHUK)
+        {
+            for(uint32_t but : nunchuck_buttons)
+            {
+                if(s_get_button(data, but, data->exp.type))
+                {
+                    key = but;
+                    break;
+                }
+            }
+        }
+
+        if(data->exp.type == WPAD_EXP_CLASSIC)
+        {
+            for(uint32_t but : classic_buttons)
+            {
+                if(s_get_button(data, but, data->exp.type))
+                {
+                    key = but;
+                    break;
+                }
             }
         }
 

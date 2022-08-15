@@ -805,7 +805,6 @@ InputMethodProfile* InputMethodType_3DS::AllocateProfile() noexcept
 InputMethodType_3DS::InputMethodType_3DS()
 {
     this->Name = "3DS";
-    this->LegacyName = "3ds";
     hidInit();
 }
 

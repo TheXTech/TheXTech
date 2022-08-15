@@ -49,8 +49,8 @@ void setWindowSize(int /*w*/, int /*h*/) {}
 
 void getWindowSize(int *w, int *h)
 {
-    *w = 800;
-    *h = 600;
+    *w = 1280;
+    *h = 960;
 }
 
 bool hasWindowInputFocus() { return true; }
