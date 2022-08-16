@@ -335,7 +335,6 @@ bool InputMethod_Wii::Update(int player, Controls_t& c, CursorControls_t& m, Edi
 
     if(data->ir.valid)
     {
-        printf("Got IR data: %f %f\n", data->ir.x, data->ir.y);
         int phys_x = data->ir.x;
         int phys_y = data->ir.y;
 

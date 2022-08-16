@@ -91,6 +91,17 @@ void s_loadTexture(StdPicture &target, int i)
     }
 }
 
+void gxDrawDoneCB()
+{
+    cur_buffer ^= 1;
+}
+
+void videoPreTraceCB(u32 /*retraceCnt*/)
+{
+    VIDEO_SetNextFramebuffer(frameBuffer[cur_buffer]);
+    VIDEO_Flush();
+}
+
 bool init()
 {
     Mtx44 perspective;
@@ -116,6 +127,7 @@ bool init()
     VIDEO_Flush();
     VIDEO_WaitVSync();
     if(rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
+    VIDEO_SetPreRetraceCallback(videoPreTraceCB);
 
     // setup the fifo and then init the flipper
     void *gp_fifo = NULL;
@@ -126,6 +138,7 @@ bool init()
 
     // clears the bg to color and clears the z buffer
     GX_SetCopyClear(background, 0x00ffffff);
+    GX_SetDrawDoneCallback(gxDrawDoneCB);
 
     // other gx setup
     GX_SetViewport(0,0,rmode->fbWidth,rmode->efbHeight,0,1);
@@ -223,21 +236,18 @@ void clearBuffer()
 void repaint()
 {
     // do this stuff after drawing
-    GX_DrawDone();
-
-    cur_buffer ^= 1;        // flip framebuffer
+    int next_buffer = cur_buffer ^ 1;
     GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GX_SetColorUpdate(GX_TRUE);
-    GX_CopyDisp(frameBuffer[cur_buffer],GX_TRUE);
+    GX_CopyDisp(frameBuffer[next_buffer],GX_TRUE);
+    GX_DrawDone();
+
+    GX_Flush();
 
     g_microStats.start_sleep();
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
         VIDEO_WaitVSync();
     g_microStats.start_task(MicroStats::Graphics);
-
-    VIDEO_SetNextFramebuffer(frameBuffer[cur_buffer]);
-
-    VIDEO_Flush();
 
     g_in_frame = false;
 }
