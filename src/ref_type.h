@@ -24,6 +24,7 @@
 
 #include <cstdint>
 #include <functional>
+#include <type_traits>
 
 
 struct BaseRef_t
@@ -53,7 +54,7 @@ struct BaseRef_t
 };
 
 #if defined(_MSC_VER)
-#    define XTECH_TYPEOF(x) decltype(x);
+#    define XTECH_TYPEOF(x) typename std::remove_reference<decltype(x)>::type
 #else
 #    define XTECH_TYPEOF(x) __typeof__(x)
 #endif
