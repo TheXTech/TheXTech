@@ -52,7 +52,7 @@ struct BaseRef_t
     inline bool operator>=(const BaseRef_t& o) const { return index >= o.index; }
 };
 
-#if defined(_MSC_VER) && _MSC_VER < 1920
+#if defined(_MSC_VER)
 #    define XTECH_TYPEOF(x) decltype(x);
 #else
 #    define XTECH_TYPEOF(x) __typeof__(x)
