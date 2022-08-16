@@ -52,10 +52,16 @@ struct BaseRef_t
     inline bool operator>=(const BaseRef_t& o) const { return index >= o.index; }
 };
 
+#if defined(_MSC_VER) && _MSC_VER < 1920
+#    define XTECH_TYPEOF(x) decltype(x);
+#else
+#    define XTECH_TYPEOF(x) __typeof__(x)
+#endif
+
 template<class _target, _target& target>
 struct Ref_t : public BaseRef_t
 {
-    using T = typeof(target[1]);
+    using T = XTECH_TYPEOF(target[1]);
     using value_type = T;
 
     inline Ref_t() : BaseRef_t{} {}
@@ -87,6 +93,8 @@ struct Ref_t : public BaseRef_t
     inline bool operator<=(const Ref_t& o) const { return index <= o.index; }
     inline bool operator>=(const Ref_t& o) const { return index >= o.index; }
 };
+
+#undef XTECH_TYPEOF
 
 namespace std
 {
