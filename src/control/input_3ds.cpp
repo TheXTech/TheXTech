@@ -24,6 +24,7 @@
 #include "game_main.h"
 
 #include "core/render.h"
+#include "editor/new_editor.h"
 
 #include "controls.h"
 #include "control/input_3ds.h"
@@ -841,7 +842,7 @@ void InputMethodType_3DS::UpdateControlsPost()
 
     if(keys_pressed & KEY_TOUCH)
     {
-        if(LevelEditor && ty > 40)
+        if(LevelEditor && ty > 40 && !editorScreen.active)
         {
             int distance2 = (m_lastTouchX - tx)*(m_lastTouchX - tx)
                 + (m_lastTouchY - ty)*(m_lastTouchY - ty);

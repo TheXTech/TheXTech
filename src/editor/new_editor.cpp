@@ -4582,12 +4582,10 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     int sx;
     if(select_bar_only)
     {
-#ifndef __3DS__
         e_CursorX = EditorCursor.X;
         e_CursorY = EditorCursor.Y;
         // if(WorldEditor)
         //     e_CursorY += 8;
-#endif
         sx = (ScreenW - e_ScreenW)/2;
     }
     else
@@ -4856,7 +4854,10 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 Y = ScreenH - 36;
         }
 
-#ifndef __3DS__
+#ifdef __3DS__
+        if(select_bar_only)
+            XRender::renderTexture(X, Y, GFX.ECursor[2]);
+#else
         XRender::renderTexture(X, Y, GFX.ECursor[2]);
 #endif
         if(e_tooltip)
@@ -4893,10 +4894,19 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     }
 
     MessageText.clear();
+
 #ifdef __3DS__
-    // if(mode == CallMode::Render)
-    //     XRender::setTargetSubscreen();
+    if(mode == CallMode::Render && active)
+        XRender::setTargetSubscreen();
+    else if(mode == CallMode::Render)
+    {
+        XRender::setTargetScreen();
+        XRender::setViewport(80, 0, 640, 480);
+    }
 #else
+    if(mode == CallMode::Render)
+        XRender::setViewport(ScreenW/2-e_ScreenW/2, 0, e_ScreenW, e_ScreenH);
+#endif
 
     e_CursorX = EditorCursor.X;
     e_CursorY = EditorCursor.Y;
@@ -4904,9 +4914,6 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     // if(WorldEditor)
     //     e_CursorY += 8;
 
-    if(mode == CallMode::Render)
-        XRender::setViewport(ScreenW/2-e_ScreenW/2, 0, e_ScreenW, e_ScreenH);
-#endif
     if(mode == CallMode::Render)
         XRender::renderRect(0, 0, e_ScreenW, e_ScreenH, 0.4f, 0.4f, 0.8f, 0.75f, true);
 

@@ -34,6 +34,7 @@
 #include "video.h"
 #include "frame_timer.h"
 #include "core/render.h"
+#include "editor/new_editor.h"
 
 // #include "core/3ds/n3ds-clock.h"
 // #include "second_screen.h"
@@ -289,6 +290,18 @@ void setTargetTexture()
 
 void setTargetScreen()
 {
+    if(g_in_frame)
+    {
+        C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_SceneBegin(s_top_screen);
+    }
+}
+
+void setTargetSubscreen()
+{
+    s_ensureInFrame();
+
+    C2D_SceneBegin(s_bottom_screen);
 }
 
 void setTargetLayer(int layer)
@@ -326,7 +339,22 @@ void repaint()
     s_depth_slider = osGet3DSliderState();
 
     // leave the draw context and wait for vblank...
-    if(s_depth_slider <= 0.05 || s_single_layer_mode)
+    if(LevelEditor && !editorScreen.active)
+    {
+        C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_SceneBegin(s_bottom_screen);
+        for(int layer = 0; layer < 4; layer++)
+        {
+            C2D_DrawImage_Custom(s_layer_ims[layer],
+                s_screen_phys_x - 40, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                shift, 0, s_tex_show_w, s_tex_h,
+                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+
+            if(s_single_layer_mode)
+                break;
+        }
+    }
+    else if(s_depth_slider <= 0.05 || s_single_layer_mode)
     {
         C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);

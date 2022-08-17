@@ -282,6 +282,13 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
 #endif
+#ifdef __WII__
+    AddCredit("Wii port By:");
+    AddCredit("");
+    AddCredit("'ds-sloth'");
+    AddCredit("");
+    AddCredit("");
+#endif
 #ifdef VITA
     AddCredit("PS Vita Port By:");
     AddCredit("");

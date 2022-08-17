@@ -286,6 +286,10 @@ void DrawEditorLevel(int Z)
         DrawMessage(MessageText);
     }
 
+#ifdef __3DS__
+    // disable cursor rendering on main screen when editor screen is active
+    if(!editorScreen.active)
+#endif
     // Display the cursor
     {
         auto &e = EditorCursor;
@@ -633,6 +637,11 @@ void DrawEditorLevel_UI()
         editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
         XRender::resetViewport();
     }
+
+#ifdef __3DS__
+    if(!editorScreen.active)
+        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render, false);
+#endif
 }
 
 void DrawEditorWorld()
@@ -643,6 +652,12 @@ void DrawEditorWorld()
 
     if(BlockFlash > 45)
         BlockFlash = 0;
+
+#ifdef __3DS__
+    // disable cursor rendering on inactive screen of 3DS
+    if(editorScreen.active) {}
+    else
+#endif
 
     if(BlockFlash < 10)
     {
@@ -732,6 +747,12 @@ void DrawEditorWorld()
             Y = ScreenH - 36;
     }
 
+#ifdef __3DS__
+    // disable cursor rendering on inactive screen of 3DS
+    if(editorScreen.active) {}
+    else
+#endif
+
     if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0)
     {
         if(EditorCursor.SubMode == -1)
@@ -752,4 +773,10 @@ void DrawEditorWorld()
     }
 
     editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
+    XRender::resetViewport();
+
+#ifdef __3DS__
+    if(!editorScreen.active)
+        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render, false);
+#endif
 }

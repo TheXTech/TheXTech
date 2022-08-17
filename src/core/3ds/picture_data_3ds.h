@@ -26,6 +26,8 @@
 #include <cstdint>
 #include <citro2d.h>
 
+#define X_IMG_EXT ".t3x"
+
 /*!
  * \brief Platform specific picture data. Fields should not be used directly
  */

@@ -165,8 +165,8 @@ void GetvScreenAverage()
     if(-vScreenY[A] + ScreenH > level[Player[1].Section].Height)
         vScreenY[A] = -(level[Player[1].Section].Height - ScreenH);
 
-    // keep vScreen boundary even on 3DS
-#ifdef __3DS__
+    // keep vScreen boundary even (on 1x platforms)
+#ifdef PGE_MIN_PORT
     vScreenX[A] += 1;
     if(vScreenX[A] > 0)
         vScreenX[A] -= std::fmod(vScreenX[A], 2.);

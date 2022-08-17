@@ -87,7 +87,7 @@ bool fillBuffer(volatile SimpleChannel *channel, volatile ndspWaveBuf *wavebuf)
                 {
                     if(channel->loops > 0)
                         channel->loops -= 1;
-                    fseek((FILE*)channel->data_pointer, 44, SEEK_SET);
+                    fseek((FILE*)channel->data_pointer, channel->data_idx, SEEK_SET);
                 }
             }
 
@@ -250,12 +250,43 @@ void audioThread(void* /*nul_*/)
     }
 }
 
-int loadWaveFileData(FILE* f, uint16_t* nChannels, uint32_t* sampleRate)
+int loadWaveFileData(FILE* f, uint16_t* nChannels, uint32_t* sampleRate, uint32_t* length, uint32_t* restart_pos)
 {
+    // all of this is little endian code
     fseek(f, 22, SEEK_SET);
     fread(nChannels, 2, 1, f);
     fread(sampleRate, 4, 1, f);
-    fseek(f, 44, SEEK_SET);
+
+    uint32_t chunktype = 0;
+    uint32_t chunksize = 0;
+
+    int i = 0;
+
+    // find correct header
+    uint32_t read_pos = 36;
+    do
+    {
+        read_pos += chunksize;
+        fseek(f, read_pos, SEEK_SET);
+        fread(&chunktype, 4, 1, f);
+        fread(&chunksize, 4, 1, f);
+        i++;
+        read_pos += 8;
+    } while(chunktype != 0x61746164 && i < 10);
+
+    if(i == 10)
+    {
+        *nChannels = 0;
+        chunksize = 0;
+        read_pos = 0;
+    }
+
+    if(length)
+        *length = chunksize;
+
+    if(restart_pos)
+        *restart_pos = read_pos;
+
     return 0;
 }
 
@@ -267,13 +298,28 @@ SoundId playSoundWAV(const char* path, int loops) {
         if(channel->format != FORMAT_FREE) continue;
 
         FILE* f = fopen(path, "rb");
-        if(!f) return INVALID_ID;
-        channel->data_pointer = f;
+        if(!f)
+            return INVALID_ID;
+
         uint16_t nChannels;
         uint32_t sampleRate;
-        loadWaveFileData(f, &nChannels, &sampleRate);
+        uint32_t restart_pos;
+
+        loadWaveFileData(f, &nChannels, &sampleRate, nullptr, &restart_pos);
+
+        if(nChannels == 0 || nChannels > 2 || restart_pos < 44)
+        {
+            fclose(f);
+            return INVALID_ID;
+        }
+
         ndspChnReset(ci);
         ndspChnSetInterp(ci, NDSP_INTERP_POLYPHASE);
+        ndspChnSetRate(channel->channel_id, sampleRate);
+
+        channel->data_pointer = f;
+        channel->data_idx = restart_pos;
+
         if(nChannels == 2)
         {
             ndspChnSetFormat(channel->channel_id, NDSP_FORMAT_STEREO_PCM16);
@@ -284,7 +330,6 @@ SoundId playSoundWAV(const char* path, int loops) {
             ndspChnSetFormat(channel->channel_id, NDSP_FORMAT_MONO_PCM16);
             channel->stereo=false;
         }
-        ndspChnSetRate(channel->channel_id, sampleRate);
         channel->format = FORMAT_PCM_FILE;
         channel->loops = loops;
         LightEvent_Signal(&sound_event);
@@ -582,8 +627,9 @@ WaveObject* audioLoadWave(const char* path)
     if(!f) return nullptr;
     WaveObject* wave = (WaveObject*) malloc(sizeof(WaveObject));
     uint16_t nChannels;
-    fseek(f, 22, SEEK_SET);
-    fread(&nChannels, 2, 1, f);
+
+    loadWaveFileData(f, &nChannels, &wave->sampleRate, &wave->length, nullptr);
+
     if(nChannels == 2)
         wave->stereo = true;
     else if(nChannels == 1)
@@ -595,16 +641,12 @@ WaveObject* audioLoadWave(const char* path)
         return nullptr;
     }
 
-    fread(&wave->sampleRate, 4, 1, f);
-    fseek(f, 40, SEEK_SET);
-    fread(&wave->length, 4, 1, f);
     if(wave->length > 256*1024)
     {
         free(wave);
         fclose(f);
         return nullptr;
     }
-    // fseek(f, 44, SEEK_SET); // unnecessary
     char* temp_buf = (char*) malloc(wave->length);
     if(!temp_buf)
     {
