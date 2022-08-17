@@ -1,4 +1,4 @@
-name: 3DS CI
+name: Wii CI
 
 on:
   push:
@@ -12,21 +12,21 @@ jobs:
   build:
     name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
     runs-on: ubuntu-latest
-    container: devkitpro/devkitarm
+    container: devkitpro/devkitppc
     strategy:
       fail-fast: false
       matrix:
         config:
         - {
-            name: "3DS build",
-            extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/3DS.cmake -D3DS=On",
+            name: "Wii build",
+            extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake -DWII=On",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake make lftp git-core python zip",
             generator: "Unix Makefiles",
             build_type: "MinSizeRel",
             executable_name: "thextech",
             assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
-            subdir_name: "thextech-3ds",
-            upload_directory: "www/3ds/"
+            subdir_name: "thextech-wii",
+            upload_directory: "www/wii/"
           }
 
     steps:
@@ -69,7 +69,7 @@ jobs:
         mkdir "package/${{ matrix.config.subdir_name }}"
         cp changelog.txt "package/${{ matrix.config.subdir_name }}/"
         cp LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
-        cp thextech.3dsx "package/${{ matrix.config.subdir_name }}/"
+        cp thextech.dol "package/${{ matrix.config.subdir_name }}/"
         cd package
         zip -9 -r "thextech-3ds-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"

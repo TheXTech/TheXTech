@@ -144,16 +144,10 @@ static void strToPlayerSetup(int player, const std::string &setupString)
 extern "C"
 int main(int argc, char**argv)
 {
-#ifdef __WII__
-    if(!fatInitDefault()) {
-        printf("fatInitDefault failure: terminating\n");
-        return -1;
-    }
-#endif
     CmdLineSetup_t setup;
     FrmMain frmMain;
 
-#if !defined(__3DS__) && !defined(VITA) && !defined(PGE_MIN_PORT)
+#if !defined(VITA) && !defined(PGE_MIN_PORT)
     CrashHandler::initSigs();
 #endif
 
