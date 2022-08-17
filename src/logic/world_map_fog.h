@@ -29,30 +29,6 @@
 
 #include "globals.h"
 
-struct WorldPathRef_t
-{
-    const int16_t index;
-
-    WorldPathRef_t(int16_t i) : index(i) {}
-
-    operator int16_t() const { return index; }
-
-    WorldPath_t& operator*() const { return WorldPath[index]; }
-    WorldPath_t* operator->() const { return &WorldPath[index]; }
-};
-
-struct WorldLevelRef_t
-{
-    const int16_t index;
-
-    WorldLevelRef_t(int16_t i) : index(i) {}
-
-    operator int16_t() const { return index; }
-
-    WorldLevel_t& operator*() const { return WorldLevel[index]; }
-    WorldLevel_t* operator->() const { return &WorldLevel[index]; }
-};
-
 class WorldMapFog
 {
 private:

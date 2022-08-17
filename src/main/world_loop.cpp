@@ -378,9 +378,8 @@ void WorldLoop()
         bool currently_on_path = false;
         if(Player[1].Controls.Up || Player[1].Controls.Down || Player[1].Controls.Left || Player[1].Controls.Right)
         {
-            for(auto *t : treeWorldPathQuery(tempLocation, SORTMODE_ID))
+            for(WorldPath_t &path : treeWorldPathQuery(tempLocation, SORTMODE_ID))
             {
-                WorldPath_t &path = *t;
                 if(CheckCollision(tempLocation, path.Location) && path.Active)
                 {
                     currently_on_path = true;

@@ -51,9 +51,8 @@ void WorldMapFog::Update()
     tempLocation.Y += 4;
     tempLocation.Width -= 8;
     tempLocation.Height -= 8;
-    for(auto *t : treeWorldPathQuery(tempLocation, false))
+    for(WorldPathRef_t path : treeWorldPathQuery(tempLocation, false))
     {
-        WorldPathRef_t path = t - &WorldPath[1] + 1;
         if((spoilers || path->Active) && CheckCollision(tempLocation, path->Location))
         {
             if(!m_path_active[path])
@@ -63,9 +62,8 @@ void WorldMapFog::Update()
             }
         }
     }
-    for(auto *t : treeWorldLevelQuery(tempLocation, false))
+    for(WorldLevelRef_t level : treeWorldLevelQuery(tempLocation, false))
     {
-        WorldLevelRef_t level = t - &WorldLevel[1] + 1;
         if((spoilers || level->Active) && CheckCollision(tempLocation, level->Location))
         {
             if(!m_level_active[level])
@@ -132,9 +130,8 @@ void WorldMapFog::Update()
                 tempLocation.X += 32; // Right
             }
 
-            for(auto *t : treeWorldPathQuery(tempLocation, false))
+            for(WorldPathRef_t path : treeWorldPathQuery(tempLocation, false))
             {
-                WorldPathRef_t path = t - &WorldPath[1] + 1;
                 if((spoilers || path->Active) && CheckCollision(tempLocation, path->Location))
                 {
                     if(!m_path_active[path])
@@ -144,9 +141,8 @@ void WorldMapFog::Update()
                     }
                 }
             }
-            for(auto *t : treeWorldLevelQuery(tempLocation, false))
+            for(WorldLevelRef_t level : treeWorldLevelQuery(tempLocation, false))
             {
-                WorldLevelRef_t level = t - &WorldLevel[1] + 1;
                 if((spoilers || level->Active) && CheckCollision(tempLocation, level->Location))
                 {
                     if(!m_level_active[level])
