@@ -41,11 +41,6 @@
 #include "vita/vita_memory.h"
 #endif
 
-#ifdef __WII__
-#include <gccore.h>
-#include <fat.h>
-#endif
-
 #ifdef ENABLE_XTECH_LUA
 #include "xtech_lua_main.h"
 #endif
@@ -158,7 +153,7 @@ int main(int argc, char**argv)
     CmdLineSetup_t setup;
     FrmMain frmMain;
 
-#if !defined(__3DS__) && !defined(VITA) && !defined(__WII__)
+#if !defined(__3DS__) && !defined(VITA) && !defined(PGE_MIN_PORT)
     CrashHandler::initSigs();
 #endif
 
@@ -170,7 +165,7 @@ int main(int argc, char**argv)
         testPlayer[i].Character = i;
     }
 
-#ifndef __WII__
+#ifndef PGE_MIN_PORT
     try
     {
         // Define the command line object.
@@ -483,8 +478,10 @@ int main(int argc, char**argv)
         return 2;
     }
 #else
+    printf("Launching AppPath...\n");
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
+    printf("Will load from %s...\n", AppPath.c_str());
 
     setup.verboseLogging = true;
     setup.frameSkip = false;

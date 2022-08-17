@@ -33,7 +33,7 @@ elseif(3DS)
     list(APPEND APPPATH_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/app_path_3ds.cpp
     )
-elseif(WII)
+elseif(PGE_MIN_PORT)
     message("-- AppPath for Wii")
     list(APPEND APPPATH_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/app_path_wii.cpp

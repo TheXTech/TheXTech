@@ -53,7 +53,7 @@ void OpenConfig_preSetup()
         {"2", RENDER_ACCELERATED_VSYNC}
     };
 
-#if !defined(__3DS__) && !defined(__WII__)
+#ifndef PGE_MIN_PORT
     const IniProcessing::StrEnumMap sampleFormats =
     {
         {"s8", AUDIO_S8},
@@ -136,7 +136,7 @@ void OpenConfig_preSetup()
         // Defaults for audio setum at sounds.cpp, at g_audioDefaults
         config.read("sample-rate", g_audioSetup.sampleRate, g_audioDefaults.sampleRate);
         config.read("channels", g_audioSetup.channels, g_audioDefaults.channels);
-#ifndef __3DS__
+#ifndef PGE_MIN_PORT
         config.readEnum("format", g_audioSetup.format, g_audioDefaults.format, sampleFormats);
 #endif
         config.read("buffer-size", g_audioSetup.bufferSize, g_audioDefaults.bufferSize);
@@ -330,7 +330,7 @@ void SaveConfig()
     config.setValue("sample-rate", g_audioSetup.sampleRate);
     config.setValue("channels", g_audioSetup.channels);
     config.setValue("buffer-size", g_audioSetup.bufferSize);
-#if !defined(__3DS__) && !defined(__WII__)
+#ifndef PGE_MIN_PORT
     static const std::unordered_map<int, std::string> formats_back = {
         {AUDIO_S8 , "s8"},
         {AUDIO_U8 , "u8"},

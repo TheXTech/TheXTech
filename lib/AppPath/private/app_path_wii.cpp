@@ -19,6 +19,7 @@
 
 #include <vector>
 #include <string>
+#include <fat.h>
 
 #include <DirManager/dirman.h>
 
@@ -29,6 +30,8 @@ constexpr const char* s_assetRoot = "sd:/thextech/";
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
+    fatInitDefault();
+
     (void)userDirName;
 }
 

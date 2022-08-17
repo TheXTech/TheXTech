@@ -247,6 +247,7 @@ void LoadGFX()
     std::string p;
     DirListCI CurDir;
 
+    pLogDebug("Loading character textures");
     for(int c = 0; c < numCharacters; ++c)
     {
         CurDir.setCurDir(getGfxDir() + GFXPlayerNames[c]);
@@ -267,6 +268,7 @@ void LoadGFX()
         UpdateLoad();
     }
 
+    pLogDebug("Loading block textures");
     CurDir.setCurDir(getGfxDir() + "block/");
     for(int A = 1; A <= maxBlockType; ++A)
     {
@@ -288,6 +290,7 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading BG2 textures");
     CurDir.setCurDir(getGfxDir() + "background2/");
     for(int A = 1; A <= numBackground2; ++A)
     {
@@ -312,6 +315,7 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading NPC textures");
     CurDir.setCurDir(getGfxDir() + "npc/");
     for(int A = 1; A <= maxNPCType; ++A)
     {
@@ -337,6 +341,7 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading effect textures");
     CurDir.setCurDir(getGfxDir() + "effect/");
     for(int A = 1; A <= maxEffectType; ++A)
     {
@@ -362,6 +367,7 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading mount textures");
     CurDir.setCurDir(getGfxDir() + "yoshi/");
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
@@ -403,6 +409,7 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading background textures");
     CurDir.setCurDir(getGfxDir() + "background/");
     for(int A = 1; A <= maxBackgroundType; ++A)
     {
@@ -430,6 +437,7 @@ void LoadGFX()
 
 
 // 'world map
+    pLogDebug("Loading tile textures");
     CurDir.setCurDir(getGfxDir() + "tile/");
     for(int A = 1; A <= maxTileType; ++A)
     {
@@ -453,6 +461,7 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading level textures");
     CurDir.setCurDir(getGfxDir() + "level/");
     for(int A = 0; A <= maxLevelType; ++A)
     {
@@ -476,6 +485,7 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading scene textures");
     CurDir.setCurDir(getGfxDir() + "scene/");
     for(int A = 1; A <= maxSceneType; ++A)
     {
@@ -499,6 +509,7 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading world player textures");
     CurDir.setCurDir(getGfxDir() + "player/");
     for(int A = 1; A <= numCharacters; ++A)
     {
@@ -522,6 +533,7 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading path textures");
     CurDir.setCurDir(getGfxDir() + "path/");
     for(int A = 1; A <= maxPathType; ++A)
     {

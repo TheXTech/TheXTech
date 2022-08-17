@@ -28,6 +28,8 @@
 #   include "3ds/picture_data_3ds.h"
 #elif defined(__WII__)
 #   include "wii/picture_data_wii.h"
+#elif defined(PGE_MIN_PORT)
+#   include "null/picture_data_null.h"
 #else
 #   include "sdl/picture_data_sdl.h"
 #endif
