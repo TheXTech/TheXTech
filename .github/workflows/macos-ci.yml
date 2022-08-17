@@ -31,6 +31,12 @@ jobs:
           }
 
     steps:
+    - uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        workflow_id: macos-ci.yml
+        all_but_latest: true
+        access_token: ${{ github.token }}
+
     - uses: actions/checkout@v1
 
     - name: Set output
