@@ -23,49 +23,15 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include <3ds.h>
-
-#include <set>
-
-#include <Logger/logger.h>
-
-#include "core/3ds/should_swap_screen.h"
+#pragma once
+#ifndef SHOULD_SWAP_SCREEN_H
+#define SHOULD_SWAP_SCREEN_H
 
 #include "globals.h"
-#include "core/window.h"
 
-namespace XWindow
+inline bool should_swap_screen()
 {
-
-bool init()
-{
-    return true;
+    return MagicHand;
 }
 
-void quit() {}
-
-void show() {}
-void hide() {}
-int showCursor(int show) { return show; }
-void setCursor(Cursor_t /*cursor*/) {}
-Cursor_t getCursor() { return CURSOR_NONE; }
-void placeCursor(int /*window_x*/, int /*window_y*/) {}
-bool isFullScreen() { return true; }
-int setFullScreen(bool /*fs*/) { return 1; }
-void restoreWindow() {}
-void setWindowSize(int /*w*/, int /*h*/) {}
-
-void getWindowSize(int *w, int *h)
-{
-    if(!should_swap_screen())
-        *w = 800;
-    else
-        *w = 640;
-    *h = 480;
-}
-
-bool hasWindowInputFocus() { return true; }
-bool hasWindowMouseFocus() { return true; }
-
-
-}; // namespace XWindow
+#endif

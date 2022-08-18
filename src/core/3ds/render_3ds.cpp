@@ -36,6 +36,9 @@
 #include "core/render.h"
 #include "editor/new_editor.h"
 
+#include "change_res.h"
+#include "core/3ds/should_swap_screen.h"
+
 // #include "core/3ds/n3ds-clock.h"
 // #include "second_screen.h"
 #include "c2d_draw.h"
@@ -48,6 +51,7 @@ uint32_t s_current_frame = 0;
 float s_depth_slider = 0.;
 
 bool g_in_frame = false;
+bool g_screen_swapped = false;
 
 C3D_RenderTarget* s_top_screen;
 C3D_RenderTarget* s_right_screen;
@@ -60,6 +64,7 @@ C3D_RenderTarget* s_layer_targets[4];
 bool s_single_layer_mode = false;
 
 constexpr int s_hardware_w = 400;
+constexpr int s_hardware_w2 = 320;
 constexpr int s_hardware_h = 240;
 
 int s_viewport_x = 0;
@@ -119,6 +124,8 @@ static void s_createSceneTargets()
         s_tex_h = mem_h;
 
     if(mem_w >= 512 && mem_h == 512)
+        s_single_layer_mode = true;
+    else if(should_swap_screen())
         s_single_layer_mode = true;
     else
         s_single_layer_mode = false;
@@ -184,6 +191,9 @@ void s_ensureInFrame()
 {
     if(!g_in_frame)
     {
+        if(g_screen_swapped != should_swap_screen())
+            UpdateInternalRes();
+
         C3D_FrameBegin(0);
 
         for(int layer = 0; layer < 4; layer++)
@@ -193,6 +203,8 @@ void s_ensureInFrame()
             if(s_single_layer_mode)
                 break;
         }
+
+        C2D_TargetClear(s_bottom_screen, C2D_Color32(0, 0, 0, 0));
 
         g_in_frame = true;
     }
@@ -290,17 +302,21 @@ void setTargetTexture()
 
 void setTargetScreen()
 {
-    if(g_in_frame)
-    {
-        C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
-        C2D_SceneBegin(s_top_screen);
-    }
 }
 
-void setTargetSubscreen()
+void setTargetMainScreen()
 {
     s_ensureInFrame();
 
+    C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+    C2D_SceneBegin(s_top_screen);
+}
+
+void setTargetSubScreen()
+{
+    s_ensureInFrame();
+
+    C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
     C2D_SceneBegin(s_bottom_screen);
 }
 
@@ -310,6 +326,8 @@ void setTargetLayer(int layer)
 
     if(!s_single_layer_mode)
         C2D_SceneBegin(s_layer_targets[layer]);
+    else
+        C2D_SceneBegin(s_layer_targets[0]);
 }
 
 void clearBuffer()
@@ -318,10 +336,16 @@ void clearBuffer()
     {
         C3D_FrameBegin(0);
 
+        C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);
         renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
 
+        C2D_TargetClear(s_right_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_right_screen);
+        renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
+
+        C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_SceneBegin(s_bottom_screen);
         renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
 
         C3D_FrameEnd(0);
@@ -338,8 +362,39 @@ void repaint()
 
     s_depth_slider = osGet3DSliderState();
 
-    // leave the draw context and wait for vblank...
-    if(LevelEditor && !editorScreen.active)
+    // in this case, the level graphics have already been rescaled to the bottom screen
+    if(g_screen_swapped && (LevelEditor || MagicHand) && editorScreen.active)
+    {
+        C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_SceneBegin(s_top_screen);
+        for(int layer = 0; layer < 4; layer++)
+        {
+            C2D_DrawImage_Custom(s_layer_ims[layer],
+                s_screen_phys_x + 40, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                shift, 0, s_tex_show_w, s_tex_h,
+                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+
+            if(s_single_layer_mode)
+                break;
+        }
+    }
+    else if(g_screen_swapped)
+    {
+        C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
+        C2D_SceneBegin(s_bottom_screen);
+        for(int layer = 0; layer < 4; layer++)
+        {
+            C2D_DrawImage_Custom(s_layer_ims[layer],
+                s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                shift, 0, s_tex_show_w, s_tex_h,
+                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+
+            if(s_single_layer_mode)
+                break;
+        }
+    }
+    // normally in editor mode, just center the level graphics
+    else if(LevelEditor && !editorScreen.active)
     {
         C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_bottom_screen);
@@ -394,6 +449,7 @@ void repaint()
     s_current_frame ++;
     g_in_frame = false;
 
+    // leave the draw context and wait for vblank...
     g_microStats.start_sleep();
     if(g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC)
         C3D_FrameSync();
@@ -425,7 +481,15 @@ void cancelFrame()
 void mapToScreen(int x, int y, int *dx, int *dy)
 {
     // lower screen to upper screen conversion
-    x += 40;
+    if((LevelEditor || MagicHand) && editorScreen.active)
+    {
+        *dx = x * 2;
+        *dy = y * 2;
+        return;
+    }
+
+    if(!g_screen_swapped)
+        x += 40;
 
     *dx = (x - s_screen_phys_x) * ScreenW / s_screen_phys_w;
     *dy = (y - s_screen_phys_y) * ScreenH / s_screen_phys_h;
@@ -433,8 +497,19 @@ void mapToScreen(int x, int y, int *dx, int *dy)
 
 void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
 {
+    // lower screen to upper screen conversion
+    if((LevelEditor || MagicHand) && editorScreen.active)
+    {
+        *window_x = scr_x / 2;
+        *window_y = scr_y / 2;
+        return;
+    }
+
     *window_x = (scr_x * s_screen_phys_w / ScreenW) + s_screen_phys_x;
     *window_y = (scr_y * s_screen_phys_h / ScreenH) + s_screen_phys_y;
+
+    if(!g_screen_swapped)
+        *window_x -= 40;
 }
 
 void updateViewport()
@@ -447,8 +522,10 @@ void updateViewport()
     if(tex_h > 512)
         tex_h = 512;
 
-    if(tex_w != s_tex_w || tex_h != s_tex_h)
+    if(tex_w != s_tex_w || tex_h != s_tex_h || g_screen_swapped != should_swap_screen())
         s_createSceneTargets();
+
+    g_screen_swapped = should_swap_screen();
 
     resetViewport();
     offsetViewport(0, 0);
@@ -464,6 +541,8 @@ void updateViewport()
             break;
     }
 
+    int hardware_w = g_screen_swapped ? s_hardware_w2 : s_hardware_w;
+
     int ScreenW_Show = ScreenW - MAX_3D_OFFSET * 2;
 
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
@@ -471,9 +550,9 @@ void updateViewport()
         int res_h = s_hardware_h;
         int res_w = ScreenW_Show * res_h / ScreenH;
 
-        if(res_w > s_hardware_w)
+        if(res_w > hardware_w)
         {
-            res_w = s_hardware_w;
+            res_w = hardware_w;
             res_h = ScreenH * res_w / ScreenW_Show;
         }
 
@@ -499,7 +578,7 @@ void updateViewport()
     {
         s_screen_phys_w = ScreenW_Show / 2;
         s_screen_phys_h = ScreenH / 2;
-        while(s_screen_phys_w <= s_hardware_w && s_screen_phys_h <= s_hardware_h)
+        while(s_screen_phys_w <= hardware_w && s_screen_phys_h <= s_hardware_h)
         {
             s_screen_phys_w += ScreenW_Show / 2;
             s_screen_phys_h += ScreenH / 2;
@@ -511,7 +590,7 @@ void updateViewport()
         }
     }
 
-    s_screen_phys_x = s_hardware_w / 2 - s_screen_phys_w / 2;
+    s_screen_phys_x = hardware_w / 2 - s_screen_phys_w / 2;
     s_screen_phys_y = s_hardware_h / 2 - s_screen_phys_h / 2;
 }
 

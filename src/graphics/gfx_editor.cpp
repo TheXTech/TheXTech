@@ -640,7 +640,11 @@ void DrawEditorLevel_UI()
 
 #ifdef __3DS__
     if(!editorScreen.active)
-        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render, false);
+    {
+        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render, true);
+        XRender::resetViewport();
+        XRender::setTargetLayer(3);
+    }
 #endif
 }
 
@@ -777,6 +781,10 @@ void DrawEditorWorld()
 
 #ifdef __3DS__
     if(!editorScreen.active)
-        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render, false);
+    {
+        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render, true);
+        XRender::resetViewport();
+        XRender::setTargetLayer(3);
+    }
 #endif
 }

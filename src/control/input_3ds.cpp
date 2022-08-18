@@ -842,7 +842,7 @@ void InputMethodType_3DS::UpdateControlsPost()
 
     if(keys_pressed & KEY_TOUCH)
     {
-        if(LevelEditor && ty > 40 && !editorScreen.active)
+        if((LevelEditor || MagicHand) && ty > 40 && !editorScreen.active)
         {
             int distance2 = (m_lastTouchX - tx)*(m_lastTouchX - tx)
                 + (m_lastTouchY - ty)*(m_lastTouchY - ty);

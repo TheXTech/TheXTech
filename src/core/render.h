@@ -206,9 +206,14 @@ E_INLINE void setTargetScreen() TAIL
 E_INLINE void setTargetLayer(int layer) TAIL
 
 /*!
+ * \brief Set render target to directly render to the 3DS top screen
+ */
+E_INLINE void setTargetMainScreen() TAIL
+
+/*!
  * \brief Set render target to directly render to the 3DS subscreen
  */
-E_INLINE void setTargetSubscreen() TAIL
+E_INLINE void setTargetSubScreen() TAIL
 #endif
 
 

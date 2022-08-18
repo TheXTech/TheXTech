@@ -4567,7 +4567,21 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
 
 inline void swap_screens()
 {
+#ifdef __3DS__
+    int win_x, win_y;
+    XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &win_x, &win_y);
+#endif
+
     editorScreen.active = !editorScreen.active;
+
+#ifdef __3DS__
+    int m_x, m_y;
+    XRender::mapToScreen(win_x, win_y, &m_x, &m_y);
+    SharedCursor.X = m_x;
+    SharedCursor.Y = m_y;
+    MouseMove(m_x, m_y);
+#endif
+
     HasCursor = false;
     MouseRelease = false;
     MenuMouseRelease = false;
@@ -4871,6 +4885,9 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     if(second_screen && mode == CallMode::Logic)
         return;
 
+    if(MagicHand && !LevelEditor)
+        m_special_page = SPECIAL_PAGE_NONE;
+
     if(mode == CallMode::Logic)
     {
         if(GamePaused != PauseCode::None)
@@ -4897,11 +4914,11 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
 
 #ifdef __3DS__
     if(mode == CallMode::Render && active)
-        XRender::setTargetSubscreen();
+        XRender::setTargetSubScreen();
     else if(mode == CallMode::Render)
     {
-        XRender::setTargetScreen();
-        XRender::setViewport(80, 0, 640, 480);
+        XRender::setTargetMainScreen();
+        XRender::setViewport(800/2 - e_ScreenW/2, 0, e_ScreenW, e_ScreenH);
     }
 #else
     if(mode == CallMode::Render)
@@ -4910,7 +4927,14 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
 
     e_CursorX = EditorCursor.X;
     e_CursorY = EditorCursor.Y;
+
+#ifdef __3DS__
+    if(!editorScreen.active)
+        e_CursorX -= ScreenW/2-e_ScreenW/2;
+#else
     e_CursorX -= ScreenW/2-e_ScreenW/2;
+#endif
+
     // if(WorldEditor)
     //     e_CursorY += 8;
 

@@ -228,6 +228,9 @@ void UpdateEditor()
             EditorCursor.SubMode = 0;
     }
 
+    if(EditorCursor.Y < 40)
+        MouseCancel = true;
+
     bool MouseClick_Current = SharedCursor.Primary && !MouseCancel;
 
     if(LevelEditor)
@@ -2134,7 +2137,21 @@ void GetEditorControls()
     }
     if(EditorControls.SwitchScreens && MouseRelease)
     {
+#ifdef __3DS__
+        int win_x, win_y;
+        XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &win_x, &win_y);
+#endif
+
         editorScreen.active = !editorScreen.active;
+
+#ifdef __3DS__
+        int m_x, m_y;
+        XRender::mapToScreen(win_x, win_y, &m_x, &m_y);
+        SharedCursor.X = m_x;
+        SharedCursor.Y = m_y;
+        MouseMove(m_x, m_y);
+#endif
+
         HasCursor = false;
         MouseRelease = false;
         MenuMouseRelease = false;
