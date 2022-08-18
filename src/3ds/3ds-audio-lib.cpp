@@ -470,7 +470,7 @@ SoundId playSoundGME(const char* path, int loops) {
 
         channel->format = FORMAT_LOADING;
         channel->loops = loops;
-        gme_open_file(path, (Music_Emu**)&(channel->data_pointer), 32000);
+        gme_open_file(path, (Music_Emu**)&(channel->data_pointer), 24000);
         if(!channel->data_pointer)
         {
             channel->format = FORMAT_FREE;
@@ -481,7 +481,7 @@ SoundId playSoundGME(const char* path, int loops) {
         ndspChnSetInterp(ci, NDSP_INTERP_POLYPHASE);
 
         ndspChnSetFormat(ci, NDSP_FORMAT_STEREO_PCM16);
-        ndspChnSetRate(channel->channel_id, 32000);
+        ndspChnSetRate(channel->channel_id, 24000);
 
         channel->format = FORMAT_GME_FILE;
         SoundId uniquePlayId = getSoundId(channel);

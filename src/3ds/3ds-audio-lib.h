@@ -4,7 +4,7 @@
 // must *never* exceed 32
 #define NUM_CHANNELS 16
 #define NUM_BUFFERS 4
-#define BUFFER_SIZE (512 * (44100 / 1000))
+#define BUFFER_SIZE (128 * (44100 / 1000))
 
 #define THREAD_STACK_SZ 32 * 1024
 
