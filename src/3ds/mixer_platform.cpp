@@ -81,16 +81,31 @@ int MixPlatform_PlayStream(int channel, const char* path, int loops)
 
 Mix_Chunk* MixPlatform_LoadWAV(const char* path)
 {
-    Mix_Chunk* ret;
-    if(MixPlatform_NoPreload(path) || (ret = (Mix_Chunk*)audioLoadWave(path)) == nullptr)
+    // remove arguments from path
+    char* path2 = strdup(path);
+    if(path2)
     {
-        const std::string* s = new(std::nothrow) const std::string(path);
+        for(int i = 0; path2[i] != '\0'; i++)
+        {
+            if(path2[i] == '|')
+                path2[i] = '\0';
+        }
+    }
+    const char* path_use = path2 ? path2 : path;
+
+    Mix_Chunk* ret;
+    if(MixPlatform_NoPreload(path_use) || (ret = (Mix_Chunk*)audioLoadWave(path_use)) == nullptr)
+    {
+        const std::string* s = new(std::nothrow) const std::string(path_use);
         if(!s)
             return nullptr;
 
         sound_stream_paths.insert(s);
         ret = (Mix_Chunk*)s;
     }
+
+    if(path2)
+        free(path2);
 
     return ret;
 }
@@ -153,7 +168,24 @@ void Mix_PauseAudio(int pause)
 
 Mix_Music* Mix_LoadMUS(const char* path)
 {
-    return (Mix_Music*)playSoundAuto(path);
+    // remove arguments from path
+    char* path2 = strdup(path);
+    if(path2)
+    {
+        for(int i = 0; path2[i] != '\0'; i++)
+        {
+            if(path2[i] == '|')
+                path2[i] = '\0';
+        }
+    }
+    const char* path_use = path2 ? path2 : path;
+
+    Mix_Music* ret = (Mix_Music*)playSoundAuto(path_use);
+
+    if(path2)
+        free(path2);
+
+    return ret;
 }
 
 int Mix_VolumeMusicStream(Mix_Music* music, int volume)
