@@ -162,6 +162,10 @@ static void s_findRecentEpisode()
                 menuRecentEpisode = i - 1;
                 w.highlight = true;
             }
+            else
+            {
+                w.highlight = false;
+            }
         }
     }
     else if(MenuMode == MENU_EDITOR && !g_recentWorldEditor.empty())
@@ -175,6 +179,10 @@ static void s_findRecentEpisode()
             {
                 menuRecentEpisode = i - 1;
                 w.highlight = true;
+            }
+            else
+            {
+                w.highlight = false;
             }
         }
     }
