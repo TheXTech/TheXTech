@@ -619,14 +619,14 @@ bool mainMenuUpdate()
                     menuPlayersNum = 1;
                     menuBattleMode = false;
                     MenuCursor = 0;
-#if !defined(THEXTECH_PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
+#ifdef THEXTECH_PRELOAD_LEVELS
+                    s_findRecentEpisode();
+#elif defined(PGE_NO_THREADING)
                     FindWorlds();
-#elif !defined(THEXTECH_PRELOAD_LEVELS)
+#else
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
                     SDL_DetachThread(loadingThread);
-#else
-                    s_findRecentEpisode();
 #endif
                 }
                 else if(!g_gameInfo.disableTwoPlayer && MenuCursor == i++)
@@ -636,14 +636,14 @@ bool mainMenuUpdate()
                     menuPlayersNum = 2;
                     menuBattleMode = false;
                     MenuCursor = 0;
-#if !defined(THEXTECH_PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
+#ifdef THEXTECH_PRELOAD_LEVELS
+                    s_findRecentEpisode();
+#elif defined(PGE_NO_THREADING)
                     FindWorlds();
-#elif !defined(THEXTECH_PRELOAD_LEVELS)
+#else
                     SDL_AtomicSet(&loading, 1);
                     loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
                     SDL_DetachThread(loadingThread);
-#else
-                    s_findRecentEpisode();
 #endif
                 }
                 else if(!g_gameInfo.disableBattleMode && MenuCursor == i++)
@@ -667,14 +667,14 @@ bool mainMenuUpdate()
                     MenuMode = MENU_EDITOR;
                     MenuCursor = 0;
 
-#if !defined(THEXTECH_PRELOAD_LEVELS) && defined(PGE_NO_THREADING)
-                    FindWorlds();
-#elif !defined(THEXTECH_PRELOAD_LEVELS)
-                    SDL_AtomicSet(&loading, 1);
-                    loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
-                    SDL_DetachThread(loadingThread);
+#ifdef THEXTECH_PRELOAD_LEVELS
+                        s_findRecentEpisode();
+#elif defined(PGE_NO_THREADING)
+                        FindWorlds();
 #else
-                    s_findRecentEpisode();
+                        SDL_AtomicSet(&loading, 1);
+                        loadingThread = SDL_CreateThread(FindWorldsThread, "FindWorlds", nullptr);
+                        SDL_DetachThread(loadingThread);
 #endif
                 }
                 else if(MenuCursor == i++)
