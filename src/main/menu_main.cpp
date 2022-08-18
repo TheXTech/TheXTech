@@ -147,43 +147,26 @@ static void s_findRecentEpisode()
 {
     menuRecentEpisode = -1;
 
-    if((MenuMode == MENU_1PLAYER_GAME && !g_recentWorld1p.empty()) ||
-       (MenuMode == MENU_2PLAYER_GAME && !g_recentWorld2p.empty()))
-    {
-        for(size_t i = 1; i < SelectWorld.size(); ++i)
-        {
-            auto &w = SelectWorld[i];
-            const std::string wPath = w.WorldPath + w.WorldFile;
+    std::vector<SelectWorld_t>& SelectorList
+        = (MenuMode == MENU_EDITOR)
+        ? SelectWorldEditable
+        : SelectWorld;
 
-            if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
-               (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p) ||
-               (MenuMode == MENU_EDITOR && wPath == g_recentWorldEditor))
-            {
-                menuRecentEpisode = i - 1;
-                w.highlight = true;
-            }
-            else
-            {
-                w.highlight = false;
-            }
+    for(size_t i = 1; i < SelectorList.size(); ++i)
+    {
+        auto &w = SelectorList[i];
+        const std::string wPath = w.WorldPath + w.WorldFile;
+
+        if((MenuMode == MENU_1PLAYER_GAME && wPath == g_recentWorld1p) ||
+           (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p) ||
+           (MenuMode == MENU_EDITOR && wPath == g_recentWorldEditor))
+        {
+            menuRecentEpisode = i - 1;
+            w.highlight = true;
         }
-    }
-    else if(MenuMode == MENU_EDITOR && !g_recentWorldEditor.empty())
-    {
-        for(size_t i = 1; i < SelectWorldEditable.size(); ++i)
+        else
         {
-            auto &w = SelectWorldEditable[i];
-            const std::string wPath = w.WorldPath + w.WorldFile;
-
-            if(wPath == g_recentWorldEditor)
-            {
-                menuRecentEpisode = i - 1;
-                w.highlight = true;
-            }
-            else
-            {
-                w.highlight = false;
-            }
+            w.highlight = false;
         }
     }
 
