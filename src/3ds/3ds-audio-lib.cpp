@@ -534,6 +534,7 @@ bool audioInit()
     {
         channels[ci].channel_id = ci;
         channels[ci].format = FORMAT_FREE;
+        channels[ci].index = 1;
         channels[ci].data_pointer = NULL;
 
         ndspChnReset(ci);

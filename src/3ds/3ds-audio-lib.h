@@ -41,7 +41,7 @@ typedef struct _WaveObject {
     uint32_t length;
 } WaveObject;
 
-static const SoundId INVALID_ID = -1;
+static const SoundId INVALID_ID = 0;
 
 bool audioInit();
 
