@@ -45,7 +45,7 @@ public:
         TASK_END
     };
 
-    static constexpr const char* task_names[] =
+    const char* const task_names[TASK_END] =
     {
         "Sct",
         "Ctl",
@@ -58,8 +58,6 @@ public:
         "Snd",
         "Evt",
     };
-
-#ifdef XT_HAS_MICROSECOND_TIMER
 
 private:
     uint8_t m_cur_task = TASK_END;
@@ -77,15 +75,6 @@ public:
     void start_task(Task task);
     void start_sleep();
     void end_frame();
-
-#else
-
-    inline void reset() {}
-    inline void start_task(Task task) { UNUSED(task); }
-    inline void start_sleep() {}
-    inline void end_frame() {}
-
-#endif
 
 };
 

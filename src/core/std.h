@@ -46,13 +46,7 @@ inline value_t max(value_t x, value_t y)
 }
 
 uint32_t GetTicks();
-
-#if defined(__3DS__) || defined(__WII__)
-
-#define XT_HAS_MICROSECOND_TIMER
 uint64_t GetMicroTicks();
-
-#endif
 
 TXT_IMPORT(free);
 
