@@ -18,12 +18,121 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <array>
+
 #include "../globals.h"
 #include "../graphics.h"
 #include "../collision.h"
 #include "../core/render.h"
 #include "../gfx.h"
 
+//! Get left pixel at the player sprite
+int pfrX(const StdPicture& tx, const Player_t& p)
+{
+    // will use internal flags (tx.flags & PLAYER_MODERN and tx.flags & PLAYER_CUSTOM) in future
+    // if tx.flags & PLAYER_CUSTOM, then will use heap-allocated polymorphic CustomData_t* tx.custom_data,
+    // which will include all frame bounding boxes and offsets
+    if(tx.w == 1000)
+        return ((p.Frame * p.Direction + 49) / 10) * 100;
+    else
+    {
+        int col_w = (p.Character == 5) ? 64 : 48;
+        int n_rows = 4;
+        int n_cols = (p.Character == 5) ? 4 : 10;
+
+        int fr = (p.Frame <= 32) ? p.Frame : p.Frame - 7;
+
+        if(p.Character == 5)
+            fr -= 1;
+
+        int col = fr / n_rows;
+
+        // load left-facing frame (bottom) - right to left (in order to mirror top half)
+        if(fr != 0 && p.Direction < 0)
+            return col_w * (n_cols - col - 1);
+        // load right-facing frame (top) - left to right
+        else
+            return col_w * col;
+    }
+}
+
+//! Get top pixel at the player sprite
+int pfrY(const StdPicture& tx, const Player_t& p)
+{
+    if(tx.w == 1000)
+        return ((p.Frame * p.Direction + 49) % 10) * 100;
+    else
+    {
+        int row_h = 64;
+        int n_rows = 4;
+
+        int fr = (p.Frame <= 32) ? p.Frame : p.Frame - 7;
+
+        if(p.Character == 5)
+            fr -= 1;
+
+        int row = fr % n_rows;
+
+        // load left-facing frame (bottom)
+        if(fr != 0 && p.Direction < 0)
+            return row_h * (n_rows + row);
+        // load right-facing frame (top)
+        else
+            return row_h * row;
+    }
+}
+
+//! Get width at the player sprite
+int pfrW(const StdPicture& tx, const Player_t& p)
+{
+    if(tx.w == 1000)
+        return 100;
+    else if(p.Character == 5)
+        return 64;
+    else
+        return 48;
+}
+
+//! Get height at the player sprite
+int pfrH(const StdPicture& tx, const Player_t& p)
+{
+    UNUSED(p);
+
+    if(tx.w == 1000)
+        return 100;
+    else
+        return 64;
+}
+
+//! Get x offset that should be ADDED to the player position to draw the sprite
+int pfrOffX(const StdPicture& tx, const Player_t& p)
+{
+    UNUSED(tx);
+
+    if(p.Character < 1 || p.Character > 5)
+        return 0;
+
+    using plr_frame_off_arr = RangeArrI<int, 0, maxPlayerFrames, 0>;
+    constexpr std::array<plr_frame_off_arr*, 5> char_offsetX = {&MarioFrameX, &LuigiFrameX, &PeachFrameX, &ToadFrameX, &LinkFrameX};
+    int offX = (*char_offsetX[p.Character - 1])[(p.State * 100) + (p.Frame * p.Direction)];
+
+    return offX;
+}
+
+//! Get y offset that should be ADDED to the player position to draw the sprite
+int pfrOffY(const StdPicture& tx, const Player_t& p)
+{
+    UNUSED(tx);
+
+    if(p.Character < 1 || p.Character > 5)
+        return 0;
+
+    using plr_frame_off_arr = RangeArrI<int, 0, maxPlayerFrames, 0>;
+    constexpr std::array<plr_frame_off_arr*, 5> char_offsetY = {&MarioFrameY, &LuigiFrameY, &PeachFrameY, &ToadFrameY, &LinkFrameY};
+    int offY = (*char_offsetY[p.Character - 1])[(p.State * 100) + (p.Frame * p.Direction)];
+
+    return offY;
+}
 
 void DrawPlayer(const int A, const int Z)
 {
@@ -109,31 +218,49 @@ void DrawPlayer(Player_t &p, const int Z)
 //                    }
                 }
             }
-            else if(p.Character == 1) // draw mario
+            else if(p.Character >= 1 && p.Character <= 5) // draw player
             {
+                using plr_pic_arr = RangeArr<StdPicture, 1, 10>;
+                constexpr std::array<plr_pic_arr*, 5> char_tex = {&GFXMario, &GFXLuigi, &GFXPeach, &GFXToad, &GFXLink};
+
+                StdPicture& tx = (*char_tex[p.Character - 1])[p.State];
+                int offX = pfrOffX(tx, p);
+                int offY = pfrOffY(tx, p);
+
                 if(p.Mount == 0)
                 {
                     XRender::renderTexture(
-                                vScreenX[Z] + p.Location.X + MarioFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                vScreenY[Z] + p.Location.Y + MarioFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                100, 100,
-                                GFXMario[p.State],
-                                pfrX(p.Frame * p.Direction),
-                                pfrY(p.Frame * p.Direction),
+                                vScreenX[Z] + p.Location.X + offX,
+                                vScreenY[Z] + p.Location.Y + offY,
+                                pfrW(tx, p),
+                                pfrH(tx, p),
+                                tx,
+                                pfrX(tx, p),
+                                pfrY(tx, p),
                                 s, s, s);
                 }
                 else if(p.Mount == 1)
                 {
                     if(!p.Duck)
                     {
+                        int small_toad_oy_corr
+                            = (p.Character == 4 && p.State == 1)
+                            ? 6
+                            : 0;
+
+                        int peach_h_corr
+                            = (p.Character == 3)
+                            ? -2
+                            : 0;
+
                         XRender::renderTexture(
-                                    vScreenX[Z] + p.Location.X + MarioFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                    vScreenY[Z] + p.Location.Y + MarioFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                    100,
-                                    p.Location.Height - 26 /*- p.MountOffsetY*/ - MarioFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                    GFXMario[p.State],
-                                    pfrX(p.Frame * p.Direction),
-                                    pfrY(p.Frame * p.Direction),
+                                    vScreenX[Z] + p.Location.X + offX,
+                                    small_toad_oy_corr + vScreenY[Z] + p.Location.Y + offY,
+                                    pfrW(tx, p),
+                                    p.Location.Height - 26 /*- p.MountOffsetY*/ - offY + peach_h_corr,
+                                    tx,
+                                    pfrX(tx, p),
+                                    pfrY(tx, p),
                                     s, s, s);
                     }
 
@@ -147,158 +274,17 @@ void DrawPlayer(Player_t &p, const int Z)
                 }
                 else if(p.Mount == 3)
                 {
-                    XRender::renderTexture(vScreenX[Z] + p.Location.X + MarioFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                          vScreenY[Z] + p.Location.Y + MarioFrameY[(p.State * 100) + (p.Frame * p.Direction)] + p.MountOffsetY,
-                                          100, 100,
-                                          GFXMario[p.State],
-                                          pfrX(p.Frame * p.Direction),
-                                          pfrY(p.Frame * p.Direction),
+                    XRender::renderTexture(vScreenX[Z] + p.Location.X + offX,
+                                          vScreenY[Z] + p.Location.Y + offY + p.MountOffsetY,
+                                          pfrW(tx, p),
+                                          pfrH(tx, p),
+                                          tx,
+                                          pfrX(tx, p),
+                                          pfrY(tx, p),
                                           s, s, s);
                 }
             }
-            else if(p.Character == 2) // draw luigi
-            {
-                if(p.Mount == 0)
-                {
-                    XRender::renderTexture(
-                                vScreenX[Z] + p.Location.X + LuigiFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                vScreenY[Z] + p.Location.Y + LuigiFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                100, 100,
-                                GFXLuigi[p.State],
-                                pfrX(p.Frame * p.Direction),
-                                pfrY(p.Frame * p.Direction),
-                                s, s, s);
-                }
-                else if(p.Mount == 1)
-                {
-                    if(!p.Duck)
-                    {
-                        XRender::renderTexture(vScreenX[Z] + p.Location.X + LuigiFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                              vScreenY[Z] + p.Location.Y + LuigiFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                              100,
-                                              p.Location.Height - 26 /*- p.MountOffsetY*/ - LuigiFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                              GFXLuigi[p.State],
-                                              pfrX(p.Frame * p.Direction),
-                                              pfrY(p.Frame * p.Direction),
-                                              s, s, s);
-                    }
 
-                    XRender::renderTexture(vScreenX[Z] + p.Location.X + p.Location.Width / 2.0 - 16,
-                                          vScreenY[Z] + p.Location.Y + p.Location.Height - 30,
-                                          32, 32,
-                                          GFX.Boot[p.MountType],
-                                          0,
-                                          32 * p.MountFrame,
-                                          s, s, s);
-                }
-                else if(p.Mount == 3)
-                {
-                    XRender::renderTexture(vScreenX[Z] + p.Location.X + LuigiFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                          vScreenY[Z] + p.Location.Y + LuigiFrameY[(p.State * 100) + (p.Frame * p.Direction)] + p.MountOffsetY,
-                                          100, 100,
-                                          GFXLuigi[p.State],
-                                          pfrX(p.Frame * p.Direction),
-                                          pfrY(p.Frame * p.Direction),
-                                          s, s, s);
-                }
-            }
-            else if(p.Character == 3) // draw peach
-            {
-                if(p.Mount == 0)
-                {
-                    XRender::renderTexture(
-                                vScreenX[Z] + p.Location.X + PeachFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                vScreenY[Z] + p.Location.Y + PeachFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                100, 100,
-                                GFXPeach[p.State],
-                                pfrX(p.Frame * p.Direction),
-                                pfrY(p.Frame * p.Direction),
-                                s, s, s);
-                }
-                else if(p.Mount == 1)
-                {
-                    if(!p.Duck)
-                    {
-                        XRender::renderTexture(vScreenX[Z] + p.Location.X + PeachFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                              vScreenY[Z] + p.Location.Y + PeachFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                              100,
-                                              p.Location.Height - 26 - PeachFrameY[(p.State * 100) + (p.Frame * p.Direction)] - 2,
-                                              GFXPeach[p.State],
-                                              pfrX(p.Frame * p.Direction),
-                                              pfrY(p.Frame * p.Direction),
-                                              s, s, s);
-                    }
-
-                    XRender::renderTexture(vScreenX[Z] + p.Location.X + p.Location.Width / 2.0 - 16,
-                                          vScreenY[Z] + p.Location.Y + p.Location.Height - 30,
-                                          32, 32,
-                                          GFX.Boot[p.MountType],
-                                          0,
-                                          32 * p.MountFrame,
-                                          s, s, s);
-                }
-            }
-            else if(p.Character == 4) // draw Toad
-            {
-                if(p.Mount == 0)
-                {
-                    XRender::renderTexture(
-                                vScreenX[Z] + p.Location.X + ToadFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                vScreenY[Z] + p.Location.Y + ToadFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                100, 100,
-                                GFXToad[p.State],
-                                pfrX(p.Frame * p.Direction),
-                                pfrY(p.Frame * p.Direction),
-                                s, s, s);
-                }
-                else if(p.Mount == 1)
-                {
-                    if(!p.Duck)
-                    {
-                        if(p.State == 1)
-                        {
-                            XRender::renderTexture(vScreenX[Z] + p.Location.X + ToadFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                                  6 + vScreenY[Z] + p.Location.Y + ToadFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                                  100,
-                                                  p.Location.Height - 26 /*- p.MountOffsetY*/ - ToadFrameY[(p.State * 100) + (p.Frame * p.Direction)], GFXToad[p.State],
-                                                  pfrX(p.Frame * p.Direction),
-                                                  pfrY(p.Frame * p.Direction),
-                                                  s, s, s);
-                        }
-                        else
-                        {
-                            XRender::renderTexture(vScreenX[Z] + p.Location.X + ToadFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                                  vScreenY[Z] + p.Location.Y + ToadFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                                  100,
-                                                  p.Location.Height - 26 /*- p.MountOffsetY*/ - ToadFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                                  GFXToad[p.State],
-                                                  pfrX(p.Frame * p.Direction),
-                                                  pfrY(p.Frame * p.Direction),
-                                                  s, s, s);
-                        }
-                    }
-
-                    XRender::renderTexture(vScreenX[Z] + p.Location.X + p.Location.Width / 2.0 - 16,
-                                          vScreenY[Z] + p.Location.Y + p.Location.Height - 30,
-                                          32, 32,
-                                          GFX.Boot[p.MountType],
-                                          0,
-                                          32 * p.MountFrame, s, s, s);
-                }
-            }
-            else if(p.Character == 5) // draw link
-            {
-                if(p.Mount == 0)
-                {
-                    XRender::renderTexture(vScreenX[Z] + p.Location.X + LinkFrameX[(p.State * 100) + (p.Frame * p.Direction)],
-                                          vScreenY[Z] + p.Location.Y + LinkFrameY[(p.State * 100) + (p.Frame * p.Direction)],
-                                          100, 100,
-                                          GFXLink[p.State],
-                                          pfrX(p.Frame * p.Direction),
-                                          pfrY(p.Frame * p.Direction),
-                                          s, s, s);
-                }
-            }
         // peach/toad held npcs
             if((p.Character == 3 || p.Character == 4) && p.HoldingNPC > 0 && p.Effect != 7)
             {

@@ -1818,7 +1818,7 @@ void EditorScreen::UpdateLevelTestScreen(CallMode mode)
     SuperPrintR(mode, "POWERUP", 3, 4, 234);
 
     if(testPlayer[m_special_subpage].State == 0)
-        testPlayer[m_special_subpage].State = 1;
+        testPlayer[m_special_subpage].State = 2;
 
     constexpr int NPC_for_state[] = {0, NPCID_SHROOM_SMB3, NPCID_FIREFLOWER_SMB3, NPCID_LEAF, NPCID_TANOOKISUIT, NPCID_HAMMERSUIT, NPCID_ICEFLOWER_SMB3};
     for(int state = 1; state <= 7; state++)

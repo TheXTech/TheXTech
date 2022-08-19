@@ -998,6 +998,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                     TestLevel = false;
                     LevelEditor = true;
+                    SetupPlayers();
 
                     // reopen the temporary level (FullFileName)
                     OpenLevel(FullFileName);

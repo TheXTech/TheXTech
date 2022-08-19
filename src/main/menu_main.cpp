@@ -1067,6 +1067,7 @@ bool mainMenuUpdate()
                             WorldEditor = true;
                             ClearLevel();
                             ClearGame();
+                            SetupPlayers();
                             std::string wPath = SelectWorldEditable[selWorld].WorldPath
                                 + SelectWorldEditable[selWorld].WorldFile;
                             OpenWorld(wPath);

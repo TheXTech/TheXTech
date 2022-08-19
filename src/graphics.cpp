@@ -521,6 +521,10 @@ void GetvScreenCredits()
         vScreenY[A] = -(level[Player[1].Section].Height - ScreenH) - 100;
 }
 
+#if 0
+// old, 100x100-based functions
+// now defined at gfx_draw_player.cpp
+
 int pfrXo(int plrFrame)
 {
 #if 1
@@ -585,6 +589,7 @@ int pfrY(int plrFrame)
 {
     return ((plrFrame + 49) % 10) * 100;
 }
+#endif
 
 void ScreenShot()
 {
