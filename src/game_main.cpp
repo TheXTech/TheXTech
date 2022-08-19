@@ -918,10 +918,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
             speedRun_triggerEnter();
 
+            clearScreenFaders(); // Reset all faders
             if(g_config.EnableInterLevelFade)
                 g_levelScreenFader.setupFader(2, 65, 0, ScreenFader::S_FADE);
-            else
-                clearScreenFaders();
 
             lunaLoad();
 

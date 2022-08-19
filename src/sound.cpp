@@ -1043,6 +1043,7 @@ static const std::unordered_map<int, int> s_soundFallback =
     {SFX_Freeze, SFX_ShellHit},
     {SFX_Icebreak, SFX_ShellHit},
     {SFX_SproutVine, SFX_Mushroom},
+    {SFX_LudwigKilled, SFX_WartKilled},
 };
 
 static int getFallbackSfx(int A)
@@ -1077,6 +1078,11 @@ void PlaySound(int A, int loops, int volume)
         PlaySfx(alias, loops, volume);
         s_resetSoundDelay(A);
     }
+}
+
+bool HasSound(int A)
+{
+    return A <= (int)g_totalSounds;
 }
 
 void PlaySoundMenu(int A, int loops)
@@ -1485,3 +1491,4 @@ void UpdateSoundFX(int recentSection)
     }
 #endif // THEXTECH_ENABLE_AUDIO_FX
 }
+

@@ -1955,10 +1955,10 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(Block_t* block_p : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                for(BlockRef_t block_p : treeBlockQuery(tempLocation, SORTMODE_NONE))
                 {
-                    auto &block = *block_p;
-                    int i = getBlockArrayIndex(block_p);
+                    Block_t& block = *block_p;
+                    int i = (int)block_p;
 
                     if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                     {
