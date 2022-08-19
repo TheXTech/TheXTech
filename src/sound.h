@@ -146,7 +146,10 @@ enum
     SFX_Freeze,
     SFX_Icebreak,
     SFX_PlayerHammer, // Reserved
-    SFX_SproutVine
+    SFX_SproutVine,
+    SFX_LarryShell,
+    SFX_LarryKilled = 100,
+    SFX_LudwigKilled
 };
 
 int CustomWorldMusicId();
@@ -186,6 +189,8 @@ void InitSound();
 // Public Sub PlaySound(A As Integer) 'play a sound
 // play a sound
 void PlaySound(int A, int loops = 0, int volume = 128);
+// Check does sound is defined at sounds.ini
+bool HasSound(int A);
 void PlaySoundMenu(int A, int loops = 0);
 // Public Sub BlockSound() 'stops all sound from being played for 10 cycles
 // stops all sound from being played for 10 cycles
