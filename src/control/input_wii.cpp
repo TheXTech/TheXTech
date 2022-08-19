@@ -45,7 +45,6 @@
 
 static constexpr std::array<const uint32_t, 12> wiimote_buttons = {WPAD_BUTTON_2, WPAD_BUTTON_1, WPAD_BUTTON_B, WPAD_BUTTON_A, WPAD_BUTTON_MINUS, WPAD_BUTTON_HOME, WPAD_BUTTON_LEFT, WPAD_BUTTON_RIGHT, WPAD_BUTTON_DOWN, WPAD_BUTTON_UP, WPAD_BUTTON_PLUS, WPAD_SHAKE};
 static constexpr std::array<const char*, 12> wiimote_button_names = {"2", "1", "B", "A", "-", "HOME", "D LEFT", "D RIGHT", "D DOWN", "D UP", "+", "SHAKE"};
-static constexpr std::array<const char*, 12> wiimote_button_names_side = {"2", "1", "B", "A", "-", "HOME", "DOWN", "UP", "RIGHT", "LEFT", "+", "SHAKE"};
 
 static constexpr std::array<const uint32_t, 6> nunchuck_buttons = {WPAD_STICK_LL, WPAD_STICK_LR, WPAD_STICK_LU, WPAD_STICK_LD, WPAD_NUNCHUK_BUTTON_Z, WPAD_NUNCHUK_BUTTON_C};
 static constexpr std::array<const char*, 6> nunchuck_button_names = {"N LEFT", "N RIGHT", "N UP", "N DOWN", "Z", "C"};
@@ -69,10 +68,7 @@ static const char* s_get_name(uint32_t button, uint8_t expansion)
             return "INVALID";
 
         int index = i - wiimote_buttons.begin();
-        if(expansion)
-            return wiimote_button_names[index];
-        else
-            return wiimote_button_names_side[index];
+        return wiimote_button_names[index];
     }
 
     // nunchuck buttons
@@ -153,6 +149,32 @@ static bool s_get_button(WPADData* data, uint32_t button, uint8_t expansion)
     if(button == Controls::null_but)
         return false;
 
+    // intelligent sideways controls
+    if(button >= WPAD_BUTTON_LEFT && button <= WPAD_BUTTON_UP && expansion == WPAD_EXP_NONE)
+    {
+        bool probably_sideways = (!GameMenu && !LevelEditor && (GamePaused == PauseCode::None || GamePaused == PauseCode::PauseScreen || GamePaused == PauseCode::Message));
+        probably_sideways |= !data->ir.valid;
+
+        if(probably_sideways)
+        {
+            switch(button)
+            {
+            case WPAD_BUTTON_LEFT:
+                button = WPAD_BUTTON_UP;
+                break;
+            case WPAD_BUTTON_DOWN:
+                button = WPAD_BUTTON_LEFT;
+                break;
+            case WPAD_BUTTON_RIGHT:
+                button = WPAD_BUTTON_DOWN;
+                break;
+            case WPAD_BUTTON_UP:
+                button = WPAD_BUTTON_RIGHT;
+                break;
+            }
+        }
+    }
+
     if(button < WPAD_SHAKE)
         return button & data->btns_h;
 
@@ -182,11 +204,13 @@ static double s_get_button_dbl(WPADData* data, uint32_t button, uint8_t expansio
         return 0.0;
 }
 
+namespace XRender
+{
+    extern int g_rmode_w, g_rmode_h;
+};
+
 namespace Controls
 {
-
-// helper functions
-
 
 /*===============================================*\
 || implementation for InputMethod_Wii            ||
@@ -195,7 +219,7 @@ namespace Controls
 InputMethod_Wii::InputMethod_Wii(int chn) : m_chn(chn)
 {
     WPAD_SetDataFormat(m_chn, WPAD_FMT_BTNS_ACC_IR);
-    WPAD_SetVRes(m_chn, 640, 480);
+    WPAD_SetVRes(m_chn, XRender::g_rmode_w, XRender::g_rmode_h);
 }
 
 InputMethod_Wii::~InputMethod_Wii()
