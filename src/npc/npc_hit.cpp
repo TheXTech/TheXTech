@@ -395,6 +395,8 @@ void NPCHit(int A, int B, int C)
             NPC[A].Damage += 5;
             PlaySound(SFX_Stomp);
             NPC[A].Special = 5;
+            if(NPC[A].Type == NPCID_LARRY && NPC[A].Damage < 15)
+                PlaySound(SFX_LarryShell);
         }
         else if(B == 3 || B == 4 || B == 5)
         {
@@ -409,6 +411,8 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Special = 5;
                 NPC[A].Damage += 5;
                 PlaySound(SFX_BirdoHit);
+                if(NPC[A].Type == NPCID_LARRY && NPC[A].Damage < 15)
+                    PlaySound(SFX_LarryShell);
             }
         }
         else if(B == 10)
