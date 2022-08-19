@@ -31,6 +31,19 @@
 #   include "base/window_types.h"
 #   define E_INLINE    extern
 #   define TAIL ;
+
+namespace XWindow
+{
+    /*!
+     * \brief Cursor type
+     */
+    enum Cursor_t
+    {
+        CURSOR_DEFAULT = 0,
+        CURSOR_NONE
+    };
+};
+
 #endif
 
 
@@ -39,15 +52,6 @@
  */
 namespace XWindow
 {
-
-/*!
- * \brief Cursor type
- */
-enum Cursor_t
-{
-    CURSOR_DEFAULT = 0,
-    CURSOR_NONE
-};
 
 #ifdef WINDOW_CUSTOM
 

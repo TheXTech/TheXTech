@@ -45,9 +45,9 @@ void AbstractAssaultCode()
     Layer_t *layerDefault = LayerF::Get(0);
     Layer_t *layerStartingPlatform = LayerF::Get(3);
 
-    XStd::assert_release(demo);
-    XStd::assert_release(layerDefault);
-    XStd::assert_release(layerStartingPlatform);
+    TXT_assert_release(demo);
+    TXT_assert_release(layerDefault);
+    TXT_assert_release(layerStartingPlatform);
 
     static float hspeed = 0, vspeed = 0;
     static char gameStarted = 0;

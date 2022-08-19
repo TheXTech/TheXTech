@@ -118,7 +118,7 @@ TXT_FORCE_INLINE void fromX86Endian(const uint8_t in[8], double &out_d)
 TXT_FORCE_INLINE void modifyByteX86(double &dst, size_t byte, uint8_t data)
 {
     auto *in = reinterpret_cast<uint8_t*>(&dst);
-    XStd::assert_debug(byte < 8);
+    TXT_assert_debug(byte < 8);
 
 #if defined(THEXTECH_BIG_ENDIAN)
     in[7 - byte] = data;
@@ -133,7 +133,7 @@ TXT_FORCE_INLINE void modifyByteX86(double &dst, size_t byte, uint8_t data)
 TXT_FORCE_INLINE void modifyByteX86(float &dst, size_t byte, uint8_t data)
 {
     auto *in = reinterpret_cast<uint8_t*>(&dst);
-    XStd::assert_debug(byte < 4);
+    TXT_assert_debug(byte < 4);
 
 #if defined(THEXTECH_BIG_ENDIAN)
     in[3 - byte] = data;
@@ -145,7 +145,7 @@ TXT_FORCE_INLINE void modifyByteX86(float &dst, size_t byte, uint8_t data)
 TXT_FORCE_INLINE void modifyByteX86(int16_t &dst, size_t byte, uint8_t data)
 {
     auto *in = reinterpret_cast<uint8_t*>(&dst);
-    XStd::assert_debug(byte < 2);
+    TXT_assert_debug(byte < 2);
 
 #if defined(THEXTECH_BIG_ENDIAN)
     in[1 - byte] = data;
@@ -158,7 +158,7 @@ TXT_FORCE_INLINE void modifyByteX86(int16_t &dst, size_t byte, uint8_t data)
 TXT_FORCE_INLINE uint8_t getByteX86(const double &src, size_t byte)
 {
     const auto *in = reinterpret_cast<const uint8_t*>(&src);
-    XStd::assert_debug(byte < 8);
+    TXT_assert_debug(byte < 8);
 #if defined(THEXTECH_BIG_ENDIAN)
     return in[7 - byte];
 #elif defined(ARM_BIDI_ENDIAN) // some old devices
@@ -172,7 +172,7 @@ TXT_FORCE_INLINE uint8_t getByteX86(const double &src, size_t byte)
 TXT_FORCE_INLINE uint8_t getByteX86(const float &src, size_t byte)
 {
     const auto *in = reinterpret_cast<const uint8_t*>(&src);
-    XStd::assert_debug(byte < 4);
+    TXT_assert_debug(byte < 4);
 #if defined(THEXTECH_BIG_ENDIAN)
     return in[3 - byte];
 #else // normal little endian
@@ -183,7 +183,7 @@ TXT_FORCE_INLINE uint8_t getByteX86(const float &src, size_t byte)
 TXT_FORCE_INLINE uint8_t getByteX86(const int16_t &src, size_t byte)
 {
     const auto *in = reinterpret_cast<const uint8_t*>(&src);
-    XStd::assert_debug(byte < 2);
+    TXT_assert_debug(byte < 2);
 #if defined(THEXTECH_BIG_ENDIAN)
     return in[1 - byte];
 #else // normal little endian
@@ -874,7 +874,7 @@ public:
         {
         case VT_DOUBLE:
         {
-            XStd::assert_debug(t->field_d);
+            TXT_assert_debug(t->field_d);
             if(ftype != FT_DFLOAT)
                 pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field_d), ftype);
@@ -882,7 +882,7 @@ public:
 
         case VT_FLOAT:
         {
-            XStd::assert_debug(t->field_f);
+            TXT_assert_debug(t->field_f);
             if(ftype != FT_FLOAT)
                 pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field_f), ftype);
@@ -890,7 +890,7 @@ public:
 
         case VT_INT:
         {
-            XStd::assert_debug(t->field_i);
+            TXT_assert_debug(t->field_i);
             if(ftype != FT_DWORD && ftype != FT_WORD)
                 pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field_i), ftype);
@@ -898,7 +898,7 @@ public:
 
         case VT_BOOL:
         {
-            XStd::assert_debug(t->field_b);
+            TXT_assert_debug(t->field_b);
             if(ftype != FT_WORD && ftype != FT_BYTE)
                 pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field_b), ftype);
@@ -911,7 +911,7 @@ public:
             case VT_DOUBLE:
             {
                 auto &bt = m_type[t->baseAddress];
-                XStd::assert_debug(bt.type == VT_DOUBLE && bt.field_d);
+                TXT_assert_debug(bt.type == VT_DOUBLE && bt.field_d);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
                 return (double)getByteX86(obj->*(bt.field_d), t->offset);
@@ -920,7 +920,7 @@ public:
             case VT_FLOAT:
             {
                 auto &bt = m_type[t->baseAddress];
-                XStd::assert_debug(bt.type == VT_FLOAT && bt.field_f);
+                TXT_assert_debug(bt.type == VT_FLOAT && bt.field_f);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
                 return (double)getByteX86(obj->*(bt.field_f), t->offset);
@@ -929,7 +929,7 @@ public:
             case VT_INT:
             {
                 auto &bt = m_type[t->baseAddress];
-                XStd::assert_debug(bt.type == VT_INT && bt.field_i);
+                TXT_assert_debug(bt.type == VT_INT && bt.field_i);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
                 int16_t s = static_cast<int16_t>(obj->*(bt.field_i));
@@ -985,7 +985,7 @@ public:
         {
         case VT_DOUBLE:
         {
-            XStd::assert_debug(t->field_d);
+            TXT_assert_debug(t->field_d);
             if(ftype != FT_DFLOAT)
                 pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Double expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             memToValue(obj->*(t->field_d), value, ftype);
@@ -994,7 +994,7 @@ public:
 
         case VT_FLOAT:
         {
-            XStd::assert_debug(t->field_f);
+            TXT_assert_debug(t->field_f);
             if(ftype != FT_FLOAT)
                 pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Float expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             memToValue(obj->*(t->field_f), value, ftype);
@@ -1003,7 +1003,7 @@ public:
 
         case VT_INT:
         {
-            XStd::assert_debug(t->field_i);
+            TXT_assert_debug(t->field_i);
             if(ftype != FT_DWORD && ftype != FT_WORD)
                 pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             memToValue(obj->*(t->field_i), value, ftype);
@@ -1012,7 +1012,7 @@ public:
 
         case VT_BOOL:
         {
-            XStd::assert_debug(t->field_b);
+            TXT_assert_debug(t->field_b);
             if(ftype != FT_WORD && ftype != FT_BYTE)
                 pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             memToValue(obj->*(t->field_b), value, ftype);
@@ -1026,7 +1026,7 @@ public:
             case VT_DOUBLE:
             {
                 auto &bt = m_type[t->baseAddress];
-                XStd::assert_debug(bt.type == VT_DOUBLE && bt.field_d);
+                TXT_assert_debug(bt.type == VT_DOUBLE && bt.field_d);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
                 modifyByteX86(obj->*(bt.field_d), t->offset, (uint8_t)value);
@@ -1036,7 +1036,7 @@ public:
             case VT_FLOAT:
             {
                 auto &bt = m_type[t->baseAddress];
-                XStd::assert_debug(bt.type == VT_FLOAT && bt.field_f);
+                TXT_assert_debug(bt.type == VT_FLOAT && bt.field_f);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
                 modifyByteX86(obj->*(bt.field_f), t->offset, (uint8_t)value);
@@ -1046,7 +1046,7 @@ public:
             case VT_INT:
             {
                 auto &bt = m_type[t->baseAddress];
-                XStd::assert_debug(bt.type == VT_INT && bt.field_i);
+                TXT_assert_debug(bt.type == VT_INT && bt.field_i);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
                 int16_t s = static_cast<int16_t>(obj->*(bt.field_i));

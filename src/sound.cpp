@@ -1289,7 +1289,7 @@ void PlayExtSound(const std::string &path, int loops, int volume)
     {
         XStd::AtomicSet(&extSfxBusy, 1);
         // Never re-use the same channel!
-        XStd::assert_release(extSfxPlaying.find(play_ch) == extSfxPlaying.end());
+        TXT_assert_release(extSfxPlaying.find(play_ch) == extSfxPlaying.end());
         extSfxPlaying.insert({play_ch, path});
         XStd::AtomicSet(&extSfxBusy, 0);
     }
@@ -1508,7 +1508,7 @@ void UpdateSoundFX(int recentSection)
     if(noSound || LevelSelect)
         return;
 
-    XStd::assert_release(recentSection >= 0 && recentSection <= maxSections);
+    TXT_assert_release(recentSection >= 0 && recentSection <= maxSections);
     auto &s = s_sectionEffect[recentSection];
 
     s_musicDisableSpcEcho = s.disableSpcEcho;

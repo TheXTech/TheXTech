@@ -472,7 +472,7 @@ static inline void computeFrameTime2Real_2()
             xtech_nanosleep(adjustedSleepTime);
             auto e = getElapsedTime(start);
             nanotime_t overslept = e - adjustedSleepTime;
-            // XStd::assert_debug(overslept >= 0);
+            // TXT_assert_debug(overslept >= 0);
             if(overslept < 0)
                 s_overheadTimes.add(0);
             else if(overslept < c_frameRateNano)

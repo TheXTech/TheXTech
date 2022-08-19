@@ -471,13 +471,13 @@ static struct TouchKeyMap
 
     TouchKeyMap()
     {
-        XStd::assert_debug(sizeof(touchKeysMap) == TouchScreenController::key_END * sizeof(KeyPos));
+        TXT_assert_debug(sizeof(touchKeysMap) == TouchScreenController::key_END * sizeof(KeyPos));
 
         for(int it = TouchScreenController::key_BEGIN; it < TouchScreenController::key_END; it++)
         {
             auto& p = touchKeysMap[it];
             p.cmd = static_cast<TouchScreenController::commands>(it);
-            XStd::assert_debug(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
+            TXT_assert_debug(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
         }
     }
 
@@ -505,7 +505,7 @@ static struct TouchKeyMap
         if(cmd < TouchScreenController::key_BEGIN || cmd >= TouchScreenController::key_END)
             return;
 
-        XStd::assert_release(touchKeysMap[cmd].cmd == cmd);
+        TXT_assert_release(touchKeysMap[cmd].cmd == cmd);
 
         auto& key = touchKeysMap[cmd];
         key.x1 = left;
@@ -530,7 +530,7 @@ static struct TouchKeyMap
 
         for(const auto& p : touchKeysMap)
         {
-            XStd::assert_debug(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
+            TXT_assert_debug(p.cmd >= TouchScreenController::key_BEGIN && p.cmd < TouchScreenController::key_END);
             fs.heldKey[p.cmd] = false;
 
             if(x >= p.x1 && x <= p.x2 && y >= p.y1 && y <= p.y2)

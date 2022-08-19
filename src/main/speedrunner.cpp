@@ -407,6 +407,6 @@ void speedRun_syncControlKeys(int plr, const Controls_t &keys)
     // if(g_speedRunnerMode == SPEEDRUN_MODE_OFF && !g_drawController)
     //     return; // Do nothing
 
-    XStd::assert_debug(plr >= 0 && plr < maxLocalPlayers);
+    TXT_assert_debug(plr >= 0 && plr < maxLocalPlayers);
     XStd::memcpy(&s_displayControls[plr], &keys, sizeof(Controls_t));
 }

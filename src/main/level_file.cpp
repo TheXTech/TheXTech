@@ -887,7 +887,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     }
 
     // If too much locks
-    XStd::assert_release(numBackground + numLocked <= (maxBackgrounds + maxWarps));
+    TXT_assert_release(numBackground + numLocked <= (maxBackgrounds + maxWarps));
 
     SoundPause[13] = 100;
     resetFrameTimer();

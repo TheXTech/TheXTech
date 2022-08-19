@@ -113,7 +113,7 @@ const std::string& GetS(stringindex_t index)
     if(index == STRINGINDEX_NONE)
         return g_emptyString;
 
-    XStd::assert_release(index < g_LevelString.size());
+    TXT_assert_release(index < g_LevelString.size());
 
     return g_LevelString[index];
 }
@@ -123,14 +123,14 @@ void SetS(stringindex_t& index, const std::string& target)
     if(index == STRINGINDEX_NONE && target.empty())
         return;
 
-    XStd::assert_release(index <= STRINGINDEX_NONE);
+    TXT_assert_release(index <= STRINGINDEX_NONE);
 
     bool stringEmpty = index == STRINGINDEX_NONE && g_LevelString.size() < MaxLevelStrings;
 
     if(!stringEmpty)
     {
 #ifdef STRS_UNIQUENESS_TRACKING
-        XStd::assert_release(index < g_LevelString.size());
+        TXT_assert_release(index < g_LevelString.size());
         if(g_LevelString[index] == target)
             return; // Do nothing, there is an attempt to set the same string
 
@@ -143,7 +143,7 @@ void SetS(stringindex_t& index, const std::string& target)
         }
         stringEmpty = true;
 #else
-        XStd::assert_release(index < g_LevelString.size());
+        TXT_assert_release(index < g_LevelString.size());
         g_LevelString[index] = target;
 #endif
     }
@@ -202,8 +202,8 @@ void FreeS(stringindex_t& index)
     if(index == STRINGINDEX_NONE)
         return;
 
-    XStd::assert_release(index <= STRINGINDEX_NONE);
-    XStd::assert_release(index < g_LevelString.size());
+    TXT_assert_release(index <= STRINGINDEX_NONE);
+    TXT_assert_release(index < g_LevelString.size());
 
 #ifdef STRS_UNIQUENESS_TRACKING
     g_LevelStringUsages[index]--;
@@ -230,7 +230,7 @@ std::string* PtrS(stringindex_t& index)
         g_LevelString.push_back(std::string());
     }
 
-    XStd::assert_release(index < g_LevelString.size());
+    TXT_assert_release(index < g_LevelString.size());
 
     return &g_LevelString[index];
 }

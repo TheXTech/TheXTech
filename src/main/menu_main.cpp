@@ -1266,7 +1266,7 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
-                    XStd::assert_release(IF_INRANGE(MenuCursor, 0, maxSaveSlots - 1));
+                    TXT_assert_release(IF_INRANGE(MenuCursor, 0, maxSaveSlots - 1));
                     int slot = MenuCursor + 1;
 
                     if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)

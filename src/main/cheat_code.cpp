@@ -2042,7 +2042,7 @@ void cheats_addAlias(CheatsScope scope, const std::string &source, const std::st
         break;
     }
 
-    XStd::assert_debug(dst);
+    TXT_assert_debug(dst);
 
     for(auto &c : *dst)
     {
@@ -2075,7 +2075,7 @@ void cheats_rename(CheatsScope scope, const std::string &source, const std::stri
         break;
     }
 
-    XStd::assert_debug(dst);
+    TXT_assert_debug(dst);
 
     for(auto &c : *dst)
     {
@@ -2107,7 +2107,7 @@ void cheats_erase(CheatsScope scope, const std::string &source)
         break;
     }
 
-    XStd::assert_debug(dst);
+    TXT_assert_debug(dst);
 
     for(auto it = dst->begin(); it != dst->end(); ++it)
     {

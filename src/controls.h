@@ -149,7 +149,7 @@ inline bool &GetButton(Controls_t &c, size_t i)
     case Buttons::Start:
         return c.Start;
     default:
-        XStd::assert_debug(false);
+        TXT_assert_debug(false);
         return c.Start;
     }
 }
@@ -237,7 +237,7 @@ inline bool &GetButton(CursorControls_t &c, size_t i)
     case Buttons::CursorLeft:
     case Buttons::CursorRight:
     default:
-        XStd::assert_debug(false);
+        TXT_assert_debug(false);
         return c.Primary;
     }
 }
@@ -347,7 +347,7 @@ inline bool &GetButton(EditorControls_t &c, size_t i)
     case Buttons::ScrollLeft:
     case Buttons::ScrollRight:
     default:
-        XStd::assert_debug(false);
+        TXT_assert_debug(false);
         return c.FastScroll;
     }
 }

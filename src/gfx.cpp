@@ -133,7 +133,7 @@ bool GFX_t::load()
 
     // Add new optional assets here. Also update load_gfx.cpp:loadCustomUIAssets()
 
-    XStd::assert_release(m_loadedImages.size() <= m_isCustomVolume);
+    TXT_assert_release(m_loadedImages.size() <= m_isCustomVolume);
     XStd::memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
 
     return true;
@@ -149,6 +149,6 @@ void GFX_t::unLoad()
 
 bool& GFX_t::isCustom(size_t i)
 {
-    XStd::assert_release(i < m_isCustomVolume);
+    TXT_assert_release(i < m_isCustomVolume);
     return m_isCustom[i];
 }

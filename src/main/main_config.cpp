@@ -26,6 +26,8 @@
 #include "../video.h"
 #include "../controls.h"
 
+#include "core/mixer.h"
+
 #include "speedrunner.h"
 #include "presetup.h"
 

@@ -274,7 +274,7 @@ void UpdateGraphics2(bool skipRepaint)
         for(Tile_t* t : treeWorldTileQuery(sLeft, sTop, sRight, sBottom, true))
         {
             Tile_t &tile = *t;
-            XStd::assert_debug(IF_INRANGE(tile.Type, 1, maxTileType));
+            TXT_assert_debug(IF_INRANGE(tile.Type, 1, maxTileType));
 
             g_stats.checkedTiles++;
             if(CheckCollision(sView, tile.Location))
@@ -293,7 +293,7 @@ void UpdateGraphics2(bool skipRepaint)
         for(Scene_t* t : treeWorldSceneQuery(sLeft, sTop, sRight, sBottom, true))
         {
             Scene_t &scene = *t;
-            XStd::assert_debug(IF_INRANGE(scene.Type, 1, maxSceneType));
+            TXT_assert_debug(IF_INRANGE(scene.Type, 1, maxSceneType));
 
             g_stats.checkedScenes++;
             if(CheckCollision(sView, scene.Location) && (WorldEditor || scene.Active))
@@ -312,7 +312,7 @@ void UpdateGraphics2(bool skipRepaint)
         for(WorldPath_t* t : treeWorldPathQuery(sLeft, sTop, sRight, sBottom, true))
         {
             WorldPath_t &path = *t;
-            XStd::assert_debug(IF_INRANGE(path.Type, 1, maxPathType));
+            TXT_assert_debug(IF_INRANGE(path.Type, 1, maxPathType));
 
             g_stats.checkedPaths++;
             if(CheckCollision(sView, path.Location) && (WorldEditor || path.Active))
@@ -331,7 +331,7 @@ void UpdateGraphics2(bool skipRepaint)
         for(WorldLevel_t* t : treeWorldLevelQuery(sLeft, sTop, sRight, sBottom, true))
         {
             WorldLevel_t &level = *t;
-            XStd::assert_debug(IF_INRANGE(level.Type, 0, maxLevelType));
+            TXT_assert_debug(IF_INRANGE(level.Type, 0, maxLevelType));
 
             g_stats.checkedLevels++;
             if(CheckCollision(sView, level.Location) && (WorldEditor || level.Active))

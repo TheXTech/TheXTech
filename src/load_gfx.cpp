@@ -215,7 +215,7 @@ static void restoreLevelBackupTextures()
             *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
-        XStd::assert_release(t.remote_texture);
+        TXT_assert_release(t.remote_texture);
         XRender::deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
@@ -233,7 +233,7 @@ static void restoreWorldBackupTextures()
             *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
-        XStd::assert_release(t.remote_texture);
+        TXT_assert_release(t.remote_texture);
         XRender::deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }

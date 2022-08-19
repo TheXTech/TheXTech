@@ -34,8 +34,6 @@
 #   include "render_types.h"
 #   define E_INLINE    extern
 #   define TAIL ;
-#endif
-
 
 enum RendererFlip_t
 {
@@ -49,6 +47,8 @@ struct FPoint_t
     float x;
     float y;
 };
+
+#endif
 
 
 namespace XRender

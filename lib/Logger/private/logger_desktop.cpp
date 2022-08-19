@@ -18,6 +18,8 @@
  */
 
 #define LOGGER_INTERNAL
+#include <SDL2/SDL_rwops.h>
+
 #include "logger_sets.h"
 #include "logger_private.h"
 

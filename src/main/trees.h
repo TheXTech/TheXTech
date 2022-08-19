@@ -80,8 +80,8 @@ public:
 
     TreeResult_Sentinel()
     {
-        XStd::assert_debug(cur_treeresult_vec >= 0); // invalid state
-        XStd::assert_release(cur_treeresult_vec < MAX_TREEQUERY_DEPTH); // insufficient sentinels: move recursive calls out of sentinel scope
+        TXT_assert_debug(cur_treeresult_vec >= 0); // invalid state
+        TXT_assert_release(cur_treeresult_vec < MAX_TREEQUERY_DEPTH); // insufficient sentinels: move recursive calls out of sentinel scope
         i_vec = &treeresult_vec[cur_treeresult_vec];
         i_vec->clear();
         cur_treeresult_vec ++;
@@ -90,7 +90,7 @@ public:
     TreeResult_Sentinel(const TreeResult_Sentinel& other)
     {
         UNUSED(other);
-        XStd::assert_debug(false); // can't have two sentinels for same results
+        TXT_assert_debug(false); // can't have two sentinels for same results
     }
 
     TreeResult_Sentinel(TreeResult_Sentinel&& other)
@@ -101,7 +101,7 @@ public:
 
     it begin() const
     {
-        XStd::assert_debug(i_vec); // invalid use of discarded sentinel
+        TXT_assert_debug(i_vec); // invalid use of discarded sentinel
         it ret;
         ret.it_internal = i_vec->begin();
         return ret;
@@ -109,7 +109,7 @@ public:
 
     it end() const
     {
-        XStd::assert_debug(i_vec); // invalid use of discarded sentinel
+        TXT_assert_debug(i_vec); // invalid use of discarded sentinel
         it ret;
         ret.it_internal = i_vec->end();
         return ret;
@@ -120,7 +120,7 @@ public:
         if(!i_vec)
             return;
         cur_treeresult_vec --;
-        XStd::assert_debug(cur_treeresult_vec == i_vec - &treeresult_vec[0]); // scopes have been switched
+        TXT_assert_debug(cur_treeresult_vec == i_vec - &treeresult_vec[0]); // scopes have been switched
     }
 };
 

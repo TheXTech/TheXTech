@@ -59,13 +59,13 @@ void TheFloorisLavaCode()
     if(!demo)
         return;
 
-    XStd::assert_release(layerSecretExit);
-    XStd::assert_release(layerSinUpDown);
-    XStd::assert_release(layerSinRightLeft);
-    XStd::assert_release(layerSinUpDownAlternate);
-    XStd::assert_release(layerSinUpDownWeak);
-    XStd::assert_release(layerSinUpDownWeakAlt);
-    XStd::assert_release(layerSinRightLeftAlternate);
+    TXT_assert_release(layerSecretExit);
+    TXT_assert_release(layerSinUpDown);
+    TXT_assert_release(layerSinRightLeft);
+    TXT_assert_release(layerSinUpDownAlternate);
+    TXT_assert_release(layerSinUpDownWeak);
+    TXT_assert_release(layerSinUpDownWeakAlt);
+    TXT_assert_release(layerSinRightLeftAlternate);
 
     // The player has touched the ground, trigger the fail sequence
     if(demo->Slippy && secretExitFailedStage == 0)

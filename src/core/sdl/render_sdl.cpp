@@ -438,7 +438,7 @@ void RenderSDL::clearAllTextures()
 void RenderSDL::clearBuffer()
 {
 #ifdef USE_RENDER_BLOCKING
-    XStd::assert_debug(!m_blockRender);
+    TXT_assert_debug(!m_blockRender);
 #endif
     SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
     SDL_RenderClear(m_gRenderer);
@@ -447,7 +447,7 @@ void RenderSDL::clearBuffer()
 void RenderSDL::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
 #ifdef USE_RENDER_BLOCKING
-    XStd::assert_debug(!m_blockRender);
+    TXT_assert_debug(!m_blockRender);
 #endif
     SDL_Rect aRect = {x + m_viewport_offset_x,
                       y + m_viewport_offset_y,
@@ -468,7 +468,7 @@ void RenderSDL::renderRect(int x, int y, int w, int h, float red, float green, f
 void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
 {
 #ifdef USE_RENDER_BLOCKING
-    XStd::assert_debug(!m_blockRender);
+    TXT_assert_debug(!m_blockRender);
 #endif
     SDL_Rect aRect = {_left + m_viewport_offset_x,
                       _top + m_viewport_offset_y,
@@ -485,7 +485,7 @@ void RenderSDL::renderRectBR(int _left, int _top, int _right, int _bottom, float
 void RenderSDL::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
 {
 #ifdef USE_RENDER_BLOCKING
-    XStd::assert_debug(!m_blockRender);
+    TXT_assert_debug(!m_blockRender);
 #endif
     UNUSED(filled);
 
@@ -528,7 +528,7 @@ void RenderSDL::renderCircle(int cx, int cy, int radius, float red, float green,
 void RenderSDL::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
 {
 #ifdef USE_RENDER_BLOCKING
-    XStd::assert_debug(!m_blockRender);
+    TXT_assert_debug(!m_blockRender);
 #endif
 
     if(radius <= 0)
@@ -613,7 +613,7 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
                                        float red, float green, float blue, float alpha)
 {
 #ifdef USE_RENDER_BLOCKING
-    XStd::assert_debug(!m_blockRender);
+    TXT_assert_debug(!m_blockRender);
 #endif
     if(!tx.inited)
         return;
@@ -627,7 +627,7 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
         return;
     }
 
-    XStd::assert_release(tx.d.texture);
+    TXT_assert_release(tx.d.texture);
 
     int xDst = Maths::iRound(xDstD);
     int yDst = Maths::iRound(yDstD);
@@ -681,7 +681,7 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
                                      float red, float green, float blue, float alpha)
 {
 #ifdef USE_RENDER_BLOCKING
-    XStd::assert_debug(!m_blockRender);
+    TXT_assert_debug(!m_blockRender);
 #endif
     const unsigned int flip = SDL_FLIP_NONE;
 
@@ -726,7 +726,7 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
                                 float red, float green, float blue, float alpha)
 {
 #ifdef USE_RENDER_BLOCKING
-    XStd::assert_debug(!m_blockRender);
+    TXT_assert_debug(!m_blockRender);
 #endif
     if(!tx.inited)
         return;
@@ -740,7 +740,7 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
         return;
     }
 
-    XStd::assert_release(tx.d.texture);
+    TXT_assert_release(tx.d.texture);
 
     int xDst = Maths::iRound(xDstD);
     int yDst = Maths::iRound(yDstD);
@@ -793,7 +793,7 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
                                   float red, float green, float blue, float alpha)
 {
 #ifdef USE_RENDER_BLOCKING
-    XStd::assert_debug(!m_blockRender);
+    TXT_assert_debug(!m_blockRender);
 #endif
     if(!tx.inited)
         return;
@@ -807,7 +807,7 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
         return;
     }
 
-    XStd::assert_release(tx.d.texture);
+    TXT_assert_release(tx.d.texture);
 
     int xDst = Maths::iRound(xDstD);
     int yDst = Maths::iRound(yDstD);
@@ -863,7 +863,7 @@ void RenderSDL::renderTexture(float xDst, float yDst,
                                 float red, float green, float blue, float alpha)
 {
 #ifdef USE_RENDER_BLOCKING
-    XStd::assert_debug(!m_blockRender);
+    TXT_assert_debug(!m_blockRender);
 #endif
     const unsigned int flip = SDL_FLIP_NONE;
 

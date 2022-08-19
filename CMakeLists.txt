@@ -501,6 +501,7 @@ if(NOT NINTENDO_3DS AND NOT NINTENDO_WII)
         src/core/sdl/window_sdl.cpp
         src/core/sdl/msgbox_sdl.cpp
         src/core/sdl/events_sdl.cpp
+        src/core/sdl/mixer_mixerx.cpp
     )
 endif()
 

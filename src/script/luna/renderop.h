@@ -55,7 +55,7 @@ public:
     inline void* operator new(size_t size)
     {
         // Note: If you creating any chunks with a size bigger than current size, please increase it
-        XStd::assert_release(size < c_rAllocChunkSize);
+        TXT_assert_release(size < c_rAllocChunkSize);
         auto *ret = g_rAlloc.Allocate(c_rAllocChunkSize);
         return ret;
     }

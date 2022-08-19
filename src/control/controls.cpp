@@ -662,13 +662,13 @@ void InputMethodType::SaveConfig_Custom(IniProcessing* ctl)
 {
     UNUSED(ctl);
     // must be implemented if user has created special options
-    XStd::assert_release(this->GetOptionCount() == 0);
+    TXT_assert_release(this->GetOptionCount() == 0);
 }
 void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 {
     UNUSED(ctl);
     // must be implemented if user has created special options
-    XStd::assert_release(this->GetOptionCount() == 0);
+    TXT_assert_release(this->GetOptionCount() == 0);
 }
 
 /*====================================================*\
@@ -985,7 +985,7 @@ InputMethod* PollInputMethod() noexcept
         return nullptr;
 
     // check that the InputMethodType properly assigned itself as the new InputMethod's Type
-    XStd::assert_release(new_method->Type != nullptr); // InputMethodType did not assign itself as Type for new InputMethod
+    TXT_assert_release(new_method->Type != nullptr); // InputMethodType did not assign itself as Type for new InputMethod
 
     if(!new_method->Type)
         return nullptr;

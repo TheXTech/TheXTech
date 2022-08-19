@@ -106,10 +106,10 @@ public:
     inline T& operator[](long index)
     {
 #   ifdef RANGE_ARR_USE_HEAP
-        XStd::assert_release(array); // When array won't initialize
+        TXT_assert_release(array); // When array won't initialize
 #   endif
-        XStd::assert_release(index <= end);
-        XStd::assert_release(index >= begin);
+        TXT_assert_release(index <= end);
+        TXT_assert_release(index >= begin);
         return *(array + index + offset);
     }
 #endif
@@ -193,10 +193,10 @@ public:
     inline T& operator[](long index)
     {
 #   ifdef RANGE_ARR_USE_HEAP
-        XStd::assert_release(array); // When array won't initialize
+        TXT_assert_release(array); // When array won't initialize
 #   endif
-        XStd::assert_release(index <= end);
-        XStd::assert_release(index >= begin);
+        TXT_assert_release(index <= end);
+        TXT_assert_release(index >= begin);
         return *(array + index + offset);
     }
 #endif

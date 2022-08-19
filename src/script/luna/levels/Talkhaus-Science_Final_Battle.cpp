@@ -69,7 +69,7 @@ void ScienceCode()
         hurt_timer      = 0;
         throw_timer     = 0;
         demo            = PlayerF::Get(1);
-        XStd::assert_release(demo);
+        TXT_assert_release(demo);
     }
 
     hurt_npc = FindNPC(NPC_FIREBAR);
