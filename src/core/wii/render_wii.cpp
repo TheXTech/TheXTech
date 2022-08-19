@@ -552,7 +552,7 @@ void renderRect(int x, int y, int w, int h, float red, float green, float blue, 
     int y_div = ROUNDDIV2(y);
     int h_div = ROUNDDIV2(y + h) - y_div;
 
-    x_div += s_viewport_offset_y;
+    y_div += s_viewport_offset_y;
 
     uint8_t r = red * 255.0f + 0.5f;
     uint8_t g = green * 255.0f + 0.5f;
