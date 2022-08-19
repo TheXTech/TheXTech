@@ -44,6 +44,8 @@ class RangeArr
 #endif
 
 public:
+    using Type = T;
+
     RangeArr() noexcept
     {
 #ifdef RANGE_ARR_USE_HEAP
@@ -127,6 +129,8 @@ class RangeArrI
 #endif
 
 public:
+    using Type = T;
+
     RangeArrI() noexcept
     {
 #ifdef RANGE_ARR_USE_HEAP

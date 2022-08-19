@@ -32,6 +32,7 @@
 
 #include "location.h"
 #include "range_arr.hpp"
+#include "ref_type.h"
 #include "rand.h"
 #include "floats.h"
 
@@ -1240,16 +1241,20 @@ extern RangeArrI<long, 0, maxSections, 0> bgColor;
 extern RangeArrI<int, 0, maxSections, 0> Background2;
 //Public WorldPath(1 To maxWorldPaths) As WorldPath
 extern RangeArr<WorldPath_t, 1, maxWorldPaths> WorldPath;
+DECLREF_T(WorldPath);
 //Public numWorldPaths As Integer
 extern int numWorldPaths;
 //Public numWarps As Integer 'number of warps in a level
 extern int numWarps;
 //Public Warp(1 To maxWarps) As Warp 'define the warps
 extern RangeArr<Warp_t, 1, maxWarps> Warp;
+DECLREF_T(Warp);
 //Public Tile(1 To maxTiles) As Tile
 extern RangeArr<Tile_t, 1, maxTiles> Tile;
+DECLREF_T(Tile);
 //Public Scene(1 To maxScenes) As Scene
 extern RangeArr<Scene_t, 1, maxScenes> Scene;
+DECLREF_T(Scene);
 //Public Credit(1 To 200) As CreditLine 'for end game credits
 extern RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
 extern double CreditOffsetY;
@@ -1270,19 +1275,24 @@ extern int numPlayers;
 extern int numWorldLevels;
 //Public WorldMusic(1 To maxWorldMusic) As WorldMusic
 extern RangeArr<WorldMusic_t, 1, maxWorldMusic> WorldMusic;
+DECLREF_T(WorldMusic);
 //Public numWorldMusic As Integer
 extern int numWorldMusic;
 //Public WorldLevel(1 To maxWorldLevels) As WorldLevel
 extern RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
+DECLREF_T(WorldLevel);
 //Public Background(1 To maxBackgrounds) As Background
 extern RangeArr<Background_t, 1, (maxBackgrounds + maxWarps)> Background;
+DECLREF_T(Background);
 //Public Effect(1 To maxEffects) As Effect
 extern RangeArr<Effect_t, 1, maxEffects> Effect;
 
 //Public NPC(-128 To maxNPCs) As NPC
 extern RangeArr<NPC_t, -128, maxNPCs> NPC;
+DECLREF_T(NPC);
 //Public Block(0 To maxBlocks) As Block
 extern RangeArr<Block_t, 0, maxBlocks> Block;
+DECLREF_T(Block);
 
 //Public Player(0 To maxPlayers) As Player
 extern RangeArr<Player_t, 0, maxPlayers> Player;
