@@ -111,25 +111,25 @@ static inline double i_get_thumb_dbl(WPADData* data, uint32_t button, uint8_t ex
     if(button == WPAD_STICK_LL)
     {
         center = js.center.x;
-        max = js.max.x;
+        max = js.min.x;
         val = js.pos.x;
     }
     else if(button == WPAD_STICK_LR)
     {
         center = js.center.x;
-        max = js.min.x;
+        max = js.max.x;
         val = js.pos.x;
     }
     else if(button == WPAD_STICK_LU)
     {
         center = js.center.y;
-        max = js.min.y;
+        max = js.max.y;
         val = js.pos.y;
     }
     else // (button == WPAD_STICK_LD)
     {
         center = js.center.y;
-        max = js.max.y;
+        max = js.min.y;
         val = js.pos.y;
     }
 
