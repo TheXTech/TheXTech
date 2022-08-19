@@ -2837,6 +2837,9 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     else
         A = 1;
 
+    X -= vScreen[A].ScreenLeft;
+    Y -= vScreen[A].ScreenTop;
+
     if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6 || EditorCursor.Mode == 13 || EditorCursor.Mode == 14 /*|| frmLevelEditor::chkAlign.Value == 0*/)
     {
         EditorCursor.Location.X = double(X) - vScreenX[A];
@@ -2925,8 +2928,6 @@ void MouseMove(float X, float Y, bool /*nCur*/)
             PositionCursor();
         }
     }
-    EditorCursor.Location.X += -vScreen[A].ScreenLeft;
-    EditorCursor.Location.Y += -vScreen[A].ScreenTop;
 //    if(nPlay.Online == true && nCur == true)
 //    {
 //        if(nPlay.Mode == 0)
