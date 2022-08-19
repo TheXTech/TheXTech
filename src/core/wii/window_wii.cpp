@@ -23,8 +23,15 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <gccore.h>
+
 #include "globals.h"
 #include "core/window.h"
+
+namespace XRender
+{
+    extern int g_rmode_w, g_rmode_h;
+};
 
 namespace XWindow
 {
@@ -49,8 +56,10 @@ void setWindowSize(int /*w*/, int /*h*/) {}
 
 void getWindowSize(int *w, int *h)
 {
-    *w = 1280;
-    *h = 960;
+    // widescreen_stretch || widescreen_zoom
+    int eff_h = (true) ? XRender::g_rmode_w * 9 / 16 : XRender::g_rmode_h;
+    *w = XRender::g_rmode_w * 2;
+    *h = eff_h * 2;
 }
 
 bool hasWindowInputFocus() { return true; }

@@ -48,7 +48,7 @@ bool g_in_frame = false;
 
 void *frameBuffer[2] = { NULL, NULL};
 int cur_buffer = 0;
-GXRModeObj *rmode;
+GXRModeObj *rmode = nullptr;
 Mtx view;
 
 int s_num_textures_loaded = 0;
@@ -64,6 +64,14 @@ int s_viewport_offset_y = 0;
 int s_viewport_offset_x_bak = 0;
 int s_viewport_offset_y_bak = 0;
 bool s_viewport_offset_ignore = false;
+
+int g_rmode_w = 640;
+int g_rmode_h = 480;
+
+int s_screen_phys_x = 0;
+int s_screen_phys_y = 0;
+int s_screen_phys_w = 0;
+int s_screen_phys_h = 0;
 
 void s_loadTexture(StdPicture &target, int i)
 {
@@ -86,6 +94,7 @@ void s_loadTexture(StdPicture &target, int i)
         else
         {
             GX_InitTexObjFilterMode(&target.d.texture[i], GX_NEAR, GX_NEAR);
+            GX_InitTexObjWrapMode(&target.d.texture[i], GX_CLAMP, GX_CLAMP);
             target.d.texture_init[i] = true;
         }
     }
@@ -104,12 +113,9 @@ void videoPreTraceCB(u32 /*retraceCnt*/)
 
 bool init()
 {
-    Mtx44 perspective;
     f32 yscale;
     u32 xfbHeight;
 
-    GXColor backgroundColor = {0, 0, 0, 255};
-    void *fifoBuffer = NULL;
     GXColor background = {0, 0, 0, 0xff};
 
     // init the vi.
@@ -156,6 +162,9 @@ bool init()
 
     printf("%d %d\n", (int)rmode->viWidth, (int)rmode->viHeight);
 
+    g_rmode_w = rmode->fbWidth;
+    g_rmode_h = rmode->efbHeight;
+
     GX_SetCullMode(GX_CULL_NONE);
     GX_CopyDisp(frameBuffer[cur_buffer],GX_TRUE);
     GX_SetDispCopyGamma(GX_GM_1_0);
@@ -195,12 +204,6 @@ bool init()
     guLookAt(view, &cam, &up, &look);
 
 
-    // setup our projection matrix
-    f32 w = rmode->viWidth;
-    f32 h = rmode->viHeight;
-    guOrtho(perspective, 0.0f, 480.0f, 0.0f, 640.0f, -1.0f, 1.0f);
-    GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
-
     s_viewport_x = s_viewport_y = 0;
     updateViewport();
 
@@ -217,7 +220,7 @@ void setTargetTexture()
         return;
 
     // do this before drawing
-    GX_SetViewport(0,0,rmode->fbWidth,rmode->efbHeight,0,1);
+    GX_SetViewport(s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h, 0, 1);
     // load the view matrix into matrix memory
     GX_LoadPosMtxImm(view, GX_PNMTX0);
 
@@ -245,8 +248,14 @@ void repaint()
     GX_Flush();
 
     g_microStats.start_sleep();
+
+    // video settings: VSync
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+    {
         VIDEO_WaitVSync();
+        if(rmode->viTVMode & VI_NON_INTERLACE)
+            VIDEO_WaitVSync();
+    }
     g_microStats.start_task(MicroStats::Graphics);
 
     g_in_frame = false;
@@ -254,20 +263,104 @@ void repaint()
 
 void mapToScreen(int x, int y, int *dx, int *dy)
 {
-    *dx = x * 2;
-    *dy = y * 2;
+    *dx = (x - s_screen_phys_x) * ScreenW / s_screen_phys_w;
+    *dy = (y - s_screen_phys_y) * ScreenH / s_screen_phys_h;
 }
 
 void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
 {
-    *window_x = scr_x / 2;
-    *window_y = scr_y / 2;
+    *window_x = (scr_x * s_screen_phys_w / ScreenW) + s_screen_phys_x;
+    *window_y = (scr_y * s_screen_phys_h / ScreenH) + s_screen_phys_y;
 }
 
 void updateViewport()
 {
     resetViewport();
     offsetViewport(0, 0);
+
+    // calculate physical render coordinates
+
+    pLogDebug("Updating viewport. Game screen is %d x %d", ScreenW, ScreenH);
+
+    // widescreen_stretch || widescreen_zoom
+    int eff_h = (true) ? g_rmode_w * 9 / 16 : g_rmode_h;
+
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
+    {
+        int res_h = eff_h;
+        int res_w = ScreenW * eff_h / ScreenH;
+
+        if(res_w > g_rmode_w)
+        {
+            res_w = g_rmode_w;
+            res_h = ScreenH * res_w / ScreenW;
+        }
+
+        s_screen_phys_w = res_w;
+        s_screen_phys_h = res_h;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
+    {
+        s_screen_phys_w = ScreenW / 2;
+        s_screen_phys_h = ScreenH / 2;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+    {
+        s_screen_phys_w = ScreenW;
+        s_screen_phys_h = ScreenH;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+    {
+        s_screen_phys_w = ScreenW / 4;
+        s_screen_phys_h = ScreenH / 4;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+    {
+        s_screen_phys_w = ScreenW / 2;
+        s_screen_phys_h = ScreenH / 2;
+        while(s_screen_phys_w <= g_rmode_w && s_screen_phys_h <= eff_h)
+        {
+            s_screen_phys_w += ScreenW / 2;
+            s_screen_phys_h += ScreenH / 2;
+        }
+        if(s_screen_phys_w > ScreenW / 2)
+        {
+            s_screen_phys_w -= ScreenW / 2;
+            s_screen_phys_h -= ScreenH / 2;
+        }
+    }
+
+    pLogDebug("Phys screen is %d x %d", s_screen_phys_w, s_screen_phys_h);
+
+    if(false) // widescreen_stretch
+    {
+        s_screen_phys_h = s_screen_phys_h * g_rmode_h / eff_h;
+        if(s_screen_phys_h > g_rmode_h)
+        {
+            s_screen_phys_w = s_screen_phys_w * s_screen_phys_h / g_rmode_h;
+            s_screen_phys_h = g_rmode_h;
+        }
+        if(s_screen_phys_w > g_rmode_w)
+        {
+            s_screen_phys_w = g_rmode_w;
+            s_screen_phys_h = s_screen_phys_h * s_screen_phys_w / g_rmode_w;
+        }
+
+        pLogDebug("Phys screen stretched to %d x %d", s_screen_phys_w, s_screen_phys_h);
+    }
+
+    s_screen_phys_x = g_rmode_w / 2 - s_screen_phys_w / 2;
+    s_screen_phys_y = g_rmode_h / 2 - s_screen_phys_h / 2;
+
+    GXColor background = {0, 0, 0, 0xff};
+    GX_SetCopyClear(background, 0x00ffffff);
+
+    // setup our projection matrix
+    GX_SetViewport(s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h, 0, 1);
+
+    Mtx44 perspective;
+    guOrtho(perspective, 0.0f, ScreenH / 2, 0.0f, ScreenW / 2, -1.0f, 1.0f);
+    GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 }
 
 void resetViewport()
@@ -578,6 +671,14 @@ void renderRect(int x, int y, int w, int h, float red, float green, float blue, 
         GX_Position3s16(x_div, y_div + h_div, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
+
+        // complete the rect
+        if(!filled)
+        {
+            GX_Position3s16(x_div, y_div, 0);
+            GX_Color4u8(r, g, b, a);
+            GX_TexCoord2u16(0, 0);
+        }
     GX_End();
 }
 
