@@ -562,23 +562,23 @@ void renderRect(int x, int y, int w, int h, float red, float green, float blue, 
     GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLOR0);
     GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-    GX_Begin(GX_QUADS, GX_VTXFMT0, 4);          // Draw A Quad
-        GX_Position3s16(x_div, y_div, 0); // Top Left
-        GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+    GX_Begin(filled ? GX_QUADS : GX_LINESTRIP, GX_VTXFMT0, 4);
+        GX_Position3s16(x_div, y_div, 0);
+        GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
 
-        GX_Position3s16( x_div + w_div, y_div, 0);        // Top Right
-        GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+        GX_Position3s16(x_div + w_div, y_div, 0);
+        GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
 
-        GX_Position3s16( x_div + w_div, y_div + h_div, 0); // Bottom Right
-        GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+        GX_Position3s16(x_div + w_div, y_div + h_div, 0);
+        GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
 
-        GX_Position3s16( x_div, y_div + h_div, 0);  // Bottom Left
-        GX_Color4u8(r, g, b, a);           // Set The Color To Blue
+        GX_Position3s16(x_div, y_div + h_div, 0);
+        GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
-    GX_End();                                   // Done Drawing The Quad
+    GX_End();
 }
 
 void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
@@ -651,23 +651,23 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
     GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
     GX_LoadTexObj(img, GX_TEXMAP0);
 
-    GX_Begin(GX_QUADS, GX_VTXFMT0, 4);          // Draw A Quad
-        GX_Position3s16(x, y, 0); // Top Left
+    GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
+        GX_Position3s16(x, y, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(u1, v1);
 
-        GX_Position3s16(x + w, y, 0);        // Top Right
+        GX_Position3s16(x + w, y, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(u2, v1);
 
-        GX_Position3s16(x + w, y + h, 0); // Bottom Right
+        GX_Position3s16(x + w, y + h, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(u2, v2);
 
-        GX_Position3s16(x, y + h, 0);  // Bottom Left
+        GX_Position3s16(x, y + h, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(u1, v2);
-    GX_End();                                   // Done Drawing The Quad
+    GX_End();
 
     return true;
 }
@@ -678,6 +678,39 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
     unsigned int flip, FPoint_t *center, float angle,
     float r, float g, float b, float a)
 {
+    Mtx rotated;
+
+    float cx, cy;
+    if(center)
+    {
+        cx = center->x / 2.0f;
+        cy = center->y / 2.0f;
+    }
+    else
+    {
+        cx = w / 2.0f;
+        cy = h / 2.0f;
+    }
+
+    for(int r = 0; r < 3; r++)
+    {
+        for(int c = 0; c < 4; c++)
+            rotated[r][c] = view[r][c];
+    }
+
+    guMtxRotDeg(rotated, 'z', angle);
+    guMtxTransApply(rotated, rotated, x + cx, y + cy, 0.0f);
+
+    GX_LoadPosMtxImm(rotated, GX_PNMTX0);
+
+    GX_DrawImage_Custom(img,
+        -cx, -cy, w, h,
+        src_x, src_y, src_w, src_h,
+        flip,
+        r, g, b, a);
+
+    GX_LoadPosMtxImm(view, GX_PNMTX0);
+
     return true;
 }
 
