@@ -718,8 +718,10 @@ int GameMain(const CmdLineSetup_t &setup)
             LoadCustomSound();
             SetupPlayers();
 
+#ifndef PGE_MIN_PORT
             if(!NoMap)
                 FindWldStars();
+#endif
 
             if((!StartLevel.empty() && NoMap) || !GoToLevel.empty())
             {
