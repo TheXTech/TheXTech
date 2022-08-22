@@ -5348,3 +5348,55 @@ int RandomBonus()
 
     return 0;
 }
+
+bool npcHasFloor(const struct NPC_t &npc)
+{
+    bool hasFloor = false;
+
+    if(npc.Type < 1 || npc.Type > maxNPCType)
+        return false; // invalid NPC type
+
+    if(NPCNoClipping[npc.Type])
+        return false; // No collision with blocks
+
+    const auto &l = npc.Location;
+
+    auto checkLoc = l;
+    checkLoc.Y = l.Y + l.Height;
+    checkLoc.Height = 4;
+    checkLoc.Width = l.Width / 2;
+    checkLoc.X = l.X + (l.Width / 2) - (checkLoc.Width / 2);
+
+    // Ensure that there is a floor under feet
+    for(int subCheck = 1; subCheck <= 2; subCheck++)
+    {
+        auto subQuery = (subCheck == 1)
+            ? treeBlockQuery(l, SORTMODE_LOC)
+            : treeTempBlockQuery(l, SORTMODE_LOC);
+
+        for(BlockRef_t sb : subQuery)
+        {
+            int idx = sb;
+
+            if(npc.Block == idx)
+                continue; // Skip collision check to self
+
+            if(BlockNoClipping[sb->Type] || sb->Hidden || sb->noProjClipping)
+                continue;
+
+            if(sb->IsNPC > 1)
+                continue;
+
+            if(CheckCollision(checkLoc, sb->Location))
+            {
+                hasFloor = true;
+                break;
+            }
+        }
+
+        if(hasFloor)
+            break;
+    }
+
+    return hasFloor;
+}
