@@ -29,6 +29,8 @@ Changelog for 1.3.6 [WIP]
 -Disabled 2x texture scale down optimization by default
 -Added the ability to have multiple intro levels per assets pack (if introset directory exists and it contains at least one level file, they will be selected randomly every time when main menu opens)
 -Added game selection menu into Android launcher: every browsed assets directory will be remembered and can be accessed quickly using the new menu
+-Added the individual sound for Ludwig for Koopa's death
+-Added the individual sound for Larry Koopa's death and shell spinning after stomp
 -Fixed an improper new (when specific compatibility option is not disabled) behaviour of the Skull Raft when the head segment impacts a wall but loses a floor at the same time, causing the following segments to suspend forever
 
 Changes for 1.3.5.3-1
