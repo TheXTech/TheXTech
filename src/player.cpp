@@ -105,7 +105,7 @@ static void setupCheckpoints()
 {
     if(Checkpoint != FullFileName || Checkpoint.empty())
     {
-        if(StartLevel != FileNameFull)
+        if(StartLevel != FileNameFull && !LevelSelect)
         {
             pLogDebug("Clear check-points at SetupPlayers()");
             Checkpoint.clear();
@@ -2209,8 +2209,8 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
     int A = 0;
     long long B = 0;
     int C = 0;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
 
     if(Stab)
     {
@@ -2279,17 +2279,20 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
     {
         // fBlock = FirstBlock[(tailLoc.X / 32) - 1];
         // lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
-        blockTileGet(tailLoc, fBlock, lBlock);
+        // blockTileGet(tailLoc, fBlock, lBlock);
 
-        for(A = (int)fBlock; A <= lBlock; A++)
+        for(BlockRef_t block_p : treeBlockQuery(tailLoc, SORTMODE_LOC))
         {
-            if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && (Block[A].Type != 293 || Stab) && !Block[A].Invis && !BlockNoClipping[Block[A].Type])
+            Block_t& block = *block_p;
+            A = (int)block_p;
+
+            if(!BlockIsSizable[block.Type] && !block.Hidden && (block.Type != 293 || Stab) && !block.Invis && !BlockNoClipping[block.Type])
             {
-                if(CheckCollision(tailLoc, Block[A].Location))
+                if(CheckCollision(tailLoc, block.Location))
                 {
-                    if(Block[A].ShakeY == 0 && Block[A].ShakeY2 == 0 && Block[A].ShakeY3 == 0)
+                    if(block.ShakeY == 0 && block.ShakeY2 == 0 && block.ShakeY3 == 0)
                     {
-                        if(Block[A].Special > 0 || Block[A].Type == 55 || Block[A].Type == 159 || Block[A].Type == 90)
+                        if(block.Special > 0 || block.Type == 55 || block.Type == 159 || block.Type == 90)
                             PlaySound(SFX_BlockHit);
 //                        if(nPlay.Online && plr - 1 == nPlay.MySlot)
 //                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1g" + std::to_string(plr) + "|" + p.TailCount - 1;
@@ -2310,10 +2313,10 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         BlockHitHard(A);
                         if(!Stab)
                         {
-                            if(Block[A].ShakeY != 0)
+                            if(block.ShakeY != 0)
                             {
-                                tempLoc.X = (Block[A].Location.X + tailLoc.X + (Block[A].Location.Width + tailLoc.Width) / 2.0) / 2 - 16;
-                                tempLoc.Y = (Block[A].Location.Y + tailLoc.Y + (Block[A].Location.Height + tailLoc.Height) / 2.0) / 2 - 16;
+                                tempLoc.X = (block.Location.X + tailLoc.X + (block.Location.Width + tailLoc.Width) / 2.0) / 2 - 16;
+                                tempLoc.Y = (block.Location.Y + tailLoc.Y + (block.Location.Height + tailLoc.Height) / 2.0) / 2 - 16;
                                 NewEffect(73, tempLoc);
                             }
                             break;
@@ -2322,9 +2325,9 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         {
                             if(StabDir == 2)
                             {
-                                if(Block[A].Type == 293 || Block[A].Type == 370 || Block[A].ShakeY != 0 || Block[A].ShakeY2 != 0 || Block[A].ShakeY3 != 0 || Block[A].Hidden || BlockHurts[Block[A].Type])
+                                if(block.Type == 293 || block.Type == 370 || block.ShakeY != 0 || block.ShakeY2 != 0 || block.ShakeY3 != 0 || block.Hidden || BlockHurts[block.Type])
                                 {
-                                    if(BlockHurts[Block[A].Type])
+                                    if(BlockHurts[block.Type])
                                         PlaySound(SFX_Spring);
                                     p.Location.Y -= 0.1;
                                     p.Location.SpeedY = Physics.PlayerJumpVelocity;
@@ -2333,17 +2336,17 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                         p.Jump = 10;
                                 }
                             }
-                            if(Block[A].Type == 370)
+                            if(block.Type == 370)
                             {
                                 PlaySound(SFX_ZeldaGrass);
-                                Block[A].Hidden = true;
-                                Block[A].Layer = LAYER_DESTROYED_BLOCKS;
+                                block.Hidden = true;
+                                block.Layer = LAYER_DESTROYED_BLOCKS;
                                 syncLayersTrees_Block(A);
-                                NewEffect(10, Block[A].Location);
+                                NewEffect(10, block.Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
 
-                            if(Block[A].Type == 457 && p.State == 6)
+                            if(block.Type == 457 && p.State == 6)
                             {
                                 KillBlock(A);
                             }
@@ -3038,8 +3041,8 @@ void SwapCoop()
 void PlayerPush(const int A, int HitSpot)
 {
     Location_t tempLocation;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
 
     if(ShadowMode)
         return;
@@ -3048,11 +3051,12 @@ void PlayerPush(const int A, int HitSpot)
 
     // fBlock = FirstBlock[(p.Location.X / 32) - 1];
     // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
-    blockTileGet(p.Location, fBlock, lBlock);
+    // blockTileGet(p.Location, fBlock, lBlock);
 
-    for(int B = int(fBlock); B <= lBlock; B++)
+    for(Block_t* block : treeBlockQuery(p.Location, SORTMODE_LOC))
     {
-        auto &b = Block[B];
+        int B = block - &Block[1] + 1;
+        Block_t& b = *block;
 
         if(b.Hidden || BlockIsSizable[b.Type])
             continue;

@@ -1135,7 +1135,7 @@ void UpdateLayers()
     // this is mainly for moving layers
     int A = 0;
     int B = 0;
-    int C = 0;
+    // int C = 0;
 
     bool FreezeLayers = false;
 
@@ -1209,7 +1209,9 @@ void UpdateLayers()
                 Layer[A].OffsetX += double(Layer[A].SpeedX);
                 Layer[A].OffsetY += double(Layer[A].SpeedY);
 
+                // no longer needed thanks to block quadtree
                 // move the sort invalidation out of the loop over blocks
+#if 0
                 if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f)
                 {
                     if(BlocksSorted)
@@ -1222,6 +1224,7 @@ void UpdateLayers()
                         BlocksSorted = false;
                     }
                 }
+#endif
 
                 for(int B : Layer[A].blocks)
                 {
@@ -1354,7 +1357,7 @@ void syncLayersTrees_Block(int block)
         if(layer != Block[block].Layer)
         {
             Layer[layer].blocks.erase(block);
-            // treeBlockRemoveLayer(layer, &Block[block]);
+            treeBlockRemoveLayer(layer, &Block[block]);
         }
     }
     int layer = Block[block].Layer;
@@ -1365,25 +1368,25 @@ void syncLayersTrees_Block(int block)
             Block[block].LocationInLayer = Block[block].Location;
             Block[block].LocationInLayer.X = Block[block].Location.X - Layer[layer].OffsetX;
             Block[block].LocationInLayer.Y = Block[block].Location.Y - Layer[layer].OffsetY;
-            // treeBlockAddLayer(layer, &Block[block]);
+            treeBlockAddLayer(layer, &Block[block]);
             Layer[layer].blocks.insert(block);
         }
         else
         {
             Block[block].LocationInLayer = Block[block].Location;
-            // treeBlockAddLayer(-1, &Block[block]);
+            treeBlockAddLayer(LAYER_NONE, &Block[block]);
         }
     }
     else
     {
         if(layer != LAYER_NONE)
         {
-            // treeBlockRemoveLayer(layer, &Block[block]);
+            treeBlockRemoveLayer(layer, &Block[block]);
             Layer[layer].blocks.erase(block);
         }
         else
         {
-            // treeBlockRemoveLayer(-1, &Block[block]);
+            treeBlockRemoveLayer(LAYER_NONE, &Block[block]);
         }
     }
 }

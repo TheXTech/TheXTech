@@ -680,9 +680,8 @@ void UpdateEditor()
 
                 if(MouseRelease && !MagicHand) // World map music
                 {
-                    for(auto *t : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
+                    for(int A : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
-                        A = (t - &WorldMusic[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
                         {
                             PlaySound(SFX_Grab);
@@ -709,9 +708,8 @@ void UpdateEditor()
 
                 if(MouseRelease && !MagicHand) // World paths
                 {
-                    for(auto *t : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
+                    for(int A : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
-                        A = (t - &WorldPath[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
                         {
                             PlaySound(SFX_Grab);
@@ -779,9 +777,8 @@ void UpdateEditor()
 
                 if(MouseRelease && !MagicHand) // World map level points
                 {
-                    for(auto *t : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
+                    for(int A : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
-                        A = (t - &WorldLevel[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
                         {
                             PlaySound(SFX_Grab);
@@ -807,9 +804,8 @@ void UpdateEditor()
 
                 if(MouseRelease && !MagicHand) // Terrain tiles
                 {
-                    for(auto *t : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
+                    for(int A : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
-                        A = (t - &Tile[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, Tile[A].Location))
                         {
                             PlaySound(SFX_Grab);
@@ -1036,9 +1032,8 @@ void UpdateEditor()
                         || EditorCursor.SubMode == OptCursor_t::WLD_MUSIC))
                 {
                     // for(int numWorldMusicMax = numWorldMusic, A = 1; A <= numWorldMusicMax; A++)
-                    for(auto *t : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
+                    for(int A : treeWorldMusicQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
-                        A = (t - &WorldMusic[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
                         {
                             tempLocation = WorldMusic[A].Location;
@@ -1065,9 +1060,8 @@ void UpdateEditor()
                     && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
                         || EditorCursor.SubMode == OptCursor_t::WLD_PATHS))
                 {
-                    for(auto *t : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
+                    for(int A : treeWorldPathQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
-                        A = (t - &WorldPath[1]) + 1;
 
                         if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
                         {
@@ -1128,9 +1122,8 @@ void UpdateEditor()
                     && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
                         || EditorCursor.SubMode == OptCursor_t::WLD_LEVELS))
                 {
-                    for(auto *t : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
+                    for(int A : treeWorldLevelQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
-                        A = (t - &WorldLevel[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
                         {
                             tempLocation = WorldLevel[A].Location;
@@ -1157,9 +1150,8 @@ void UpdateEditor()
                     && (EditorCursor.SubMode == -1 || EditorCursor.SubMode == 0
                         || EditorCursor.SubMode == OptCursor_t::WLD_TILES))
                 {
-                    for(auto *t : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
+                    for(int A : treeWorldTileQuery(EditorCursor.Location, SORTMODE_NONE))
                     {
-                        A = (t - &Tile[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, Tile[A].Location))
                         {
                             tempLocation = Tile[A].Location;
@@ -1259,6 +1251,7 @@ void UpdateEditor()
                             Block[numBlock].DefaultSpecial = Block[numBlock].Special;
                             Block[numBlock].DefaultSpecial2 = Block[numBlock].Special2;
                             syncLayersTrees_Block(numBlock);
+#if 0
                             if(MagicHand)
                             {
                                 for(A = -FLBlocks; A <= FLBlocks; A++)
@@ -1268,6 +1261,7 @@ void UpdateEditor()
                                 }
                                 BlocksSorted = false;
                             }
+#endif
                         }
                         FindSBlocks();
 //                        if(nPlay.Online == true)

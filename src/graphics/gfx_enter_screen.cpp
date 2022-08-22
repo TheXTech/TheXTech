@@ -29,6 +29,7 @@
 #include "../screen_fader.h"
 #include "../core/render.h"
 #include "../core/events.h"
+#include "../controls.h"
 #include "pge_delay.h"
 
 
@@ -188,6 +189,9 @@ void GameThing(int waitms, int fadeSpeed)
             if(canProceedFrame())
             {
                 computeFrameTime1();
+
+                Controls::Update();
+
                 XRender::setTargetTexture();
                 XRender::clearBuffer();
                 drawEnterScreen(tempPlayer);

@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: Ubuntu TAR CI
 
 on:
   push:
@@ -20,7 +20,7 @@ jobs:
       matrix:
         config:
         - {
-            name: "Ubuntu 16.04 x86_64",
+            name: "TAR Ubuntu 16.04 x86_64",
             os: ubuntu-latest,
             container: "ubuntu:16.04",
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
@@ -32,7 +32,7 @@ jobs:
             upload_directory: "www/ubuntu-16-04/"
           }
         - {
-            name: "Ubuntu 16.04 32bit",
+            name: "TAR Ubuntu 16.04 32bit",
             os: ubuntu-latest,
             container: "ubuntu:16.04",
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_x32.cmake",
@@ -44,10 +44,11 @@ jobs:
             upload_directory: "www/ubuntu-16-04/"
           }
         - {
-            name: "Ubuntu 18.04 x86_64",
-            os: ubuntu-18.04,
+            name: "TAR Ubuntu 18.04 x86_64",
+            os: ubuntu-latest,
+            container: "ubuntu:18.04",
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
+            deps_cmdline: "apt-get update -qq && apt-get install -qq sudo git p7zip-full ninja-build wget lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh && chmod uog+x cmake-3.15.4-Linux-x86_64.sh && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr && git config --global --add safe.directory '*'",
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
@@ -55,7 +56,7 @@ jobs:
             upload_directory: "www/ubuntu-18-04/"
           }
         - {
-            name: "Ubuntu 20.04 x86_64",
+            name: "TAR Ubuntu 20.04 x86_64",
             os: ubuntu-20.04,
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
@@ -65,49 +66,14 @@ jobs:
             package_filename_suffix: "ubuntu-20-04-amd64",
             upload_directory: "www/ubuntu-20-04/"
           }
-        - {
-            name: "Windows - 64-bit",
-            os: windows-latest,
-            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw64 -DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x64.cmake",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            extra_path: "/c/WohlMinGWw64/mingw64/bin",
-            executable_name_suffix: "-win64",
-            package_filename_suffix: "win64",
-            upload_directory: "www/win32/",
-            mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
-            ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw64/bin",
-            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw64/"
-          }
-        - {
-            name: "Windows - 32-bit",
-            os: windows-latest,
-            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw32 -DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x32.cmake",
-            generator: "Ninja",
-            build_type: "MinSizeRel",
-            extra_path: "/c/WohlMinGWw64/mingw32/bin",
-            executable_name_suffix: "",
-            package_filename_suffix: "win32",
-            upload_directory: "www/win32/",
-            mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
-            ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw32/bin",
-            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
-          }
-        - {
-            name: "Windows - ARM64",
-            os: windows-2019,
-            extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=thextech",
-            generator: "Visual Studio 16 2019",
-            build_type: "MinSizeRel",
-            extra_path: "/c/WohlLFTP/bin",
-            executable_name_suffix: "-arm64",
-            package_filename_suffix: "arm64",
-            upload_directory: "www/win-arm/",
-            lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlLFTP/"
-          }
-
 
     steps:
+    - uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        workflow_id: ubuntu-tar-ci.yml
+        all_but_latest: true
+        access_token: ${{ github.token }}
+
     - uses: actions/checkout@v1
 
     - uses: nelonoel/branch-name@v1.0.1
@@ -122,45 +88,6 @@ jobs:
         git submodule init
         git submodule update
         cmake --version
-
-    - name: Download MinGW
-      if: matrix.config.mingw_download
-      uses: carlosperate/download-file-action@v1.0.3
-      with:
-        file-url: "${{ matrix.config.mingw_download }}"
-        file-name: mingw.7z
-
-    - name: Extract MinGW
-      if: matrix.config.mingw_install_dir
-      shell: bash
-      run: |
-        7z x mingw.7z -o"${{ matrix.config.mingw_install_dir }}"
-
-    - name: Download Ninja
-      if: matrix.config.ninja_download
-      uses: carlosperate/download-file-action@v1.0.3
-      with:
-        file-url: "${{ matrix.config.ninja_download }}"
-        file-name: ninja.zip
-
-    - name: Extract Ninja
-      if: matrix.config.ninja_install_dir
-      shell: bash
-      run: |
-        7z x ninja.zip -o"${{ matrix.config.ninja_install_dir }}"
-
-    - name: Download LFTP
-      if: matrix.config.lftp_download
-      uses: carlosperate/download-file-action@v1.0.3
-      with:
-        file-url: "${{ matrix.config.lftp_download }}"
-        file-name: lftp.7z
-
-    - name: Extract LFTP
-      if: matrix.config.lftp_install_dir
-      shell: bash
-      run: |
-        7z x lftp.7z bin etc -o"${{ matrix.config.lftp_install_dir }}"
 
     - name: Download SMBX assets
       uses: carlosperate/download-file-action@v1.0.3

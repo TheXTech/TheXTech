@@ -25,7 +25,7 @@
 #include "globals.h"
 
 #define MAX_TREEQUERY_DEPTH 4
-extern std::vector<void*> treeresult_vec[MAX_TREEQUERY_DEPTH];
+extern std::vector<BaseRef_t> treeresult_vec[MAX_TREEQUERY_DEPTH];
 extern ptrdiff_t cur_treeresult_vec;
 
 enum SortMode
@@ -36,7 +36,7 @@ enum SortMode
     SORTMODE_Z = 2,
 };
 
-template<class ItemT>
+template<class ItemRef_t>
 class TreeResult_Sentinel
 {
 public:
@@ -44,21 +44,21 @@ public:
     {
         using iterator_category = std::input_iterator_tag;
         using difference_type   = std::ptrdiff_t;
-        using value_type        = ItemT;
-        using pointer           = ItemT*&;
-        using reference         = ItemT*;
+        using value_type        = typename ItemRef_t::value_type;
+        using pointer           = ItemRef_t*;
+        using reference         = ItemRef_t;
 
-        reference operator*() const { return (ItemT*)*it_internal; }
-        pointer operator->() { return &((ItemT*)*it_internal); }
+        reference operator*() const { return (reference)*it_internal; }
+        pointer operator->() { return &((reference)*it_internal); }
 
         // Prefix increment
-        it& operator++() { it_internal++; return *this; }  
+        it& operator++() { it_internal++; return *this; }
 
         // Postfix increment
         it operator++(int) { it tmp = *this; ++(*this); return tmp; }
 
         // Prefix decrement
-        it& operator--() { it_internal--; return *this; }  
+        it& operator--() { it_internal--; return *this; }
 
         // Postfix decrement
         it operator--(int) { it tmp = *this; --(*this); return tmp; }
@@ -70,10 +70,10 @@ public:
         friend bool operator< (const it& a, const it& b) { return a.it_internal < b.it_internal; };
         friend bool operator> (const it& a, const it& b) { return a.it_internal > b.it_internal; };
 
-        std::vector<void*>::iterator it_internal;
+        std::vector<BaseRef_t>::iterator it_internal;
     };
 
-    std::vector<void*>* i_vec = nullptr;
+    std::vector<BaseRef_t>* i_vec = nullptr;
 
     TreeResult_Sentinel()
     {
@@ -124,53 +124,62 @@ extern void treeWorldCleanAll();
 extern void treeLevelCleanBlockLayers();
 extern void treeLevelCleanAll();
 
-extern void treeWorldTileAdd(Tile_t *obj);
-extern void treeWorldTileUpdate(Tile_t *obj);
-extern void treeWorldTileRemove(Tile_t *obj);
-extern TreeResult_Sentinel<Tile_t> treeWorldTileQuery(double Left, double Top, double Right, double Bottom,
+extern void treeWorldTileAdd(TileRef_t obj);
+extern void treeWorldTileUpdate(TileRef_t obj);
+extern void treeWorldTileRemove(TileRef_t obj);
+extern TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 0.0);
-extern TreeResult_Sentinel<Tile_t> treeWorldTileQuery(const Location_t &loc, int sort_mode, double margin = 0.0);
+extern TreeResult_Sentinel<TileRef_t> treeWorldTileQuery(const Location_t &loc, int sort_mode, double margin = 0.0);
 
 
-extern void treeWorldSceneAdd(Scene_t *obj);
-extern void treeWorldSceneUpdate(Scene_t *obj);
-extern void treeWorldSceneRemove(Scene_t *obj);
-extern TreeResult_Sentinel<Scene_t> treeWorldSceneQuery(double Left, double Top, double Right, double Bottom,
+extern void treeWorldSceneAdd(SceneRef_t obj);
+extern void treeWorldSceneUpdate(SceneRef_t obj);
+extern void treeWorldSceneRemove(SceneRef_t obj);
+extern TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<Scene_t> treeWorldSceneQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<SceneRef_t> treeWorldSceneQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
 
 
-extern void treeWorldPathAdd(WorldPath_t *obj);
-extern void treeWorldPathUpdate(WorldPath_t *obj);
-extern void treeWorldPathRemove(WorldPath_t *obj);
-extern TreeResult_Sentinel<WorldPath_t> treeWorldPathQuery(double Left, double Top, double Right, double Bottom,
+extern void treeWorldPathAdd(WorldPathRef_t obj);
+extern void treeWorldPathUpdate(WorldPathRef_t obj);
+extern void treeWorldPathRemove(WorldPathRef_t obj);
+extern TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<WorldPath_t> treeWorldPathQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<WorldPathRef_t> treeWorldPathQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
 
 
-extern void treeWorldLevelAdd(WorldLevel_t *obj);
-extern void treeWorldLevelUpdate(WorldLevel_t *obj);
-extern void treeWorldLevelRemove(WorldLevel_t *obj);
-extern TreeResult_Sentinel<WorldLevel_t> treeWorldLevelQuery(double Left, double Top, double Right, double Bottom,
+extern void treeWorldLevelAdd(WorldLevelRef_t obj);
+extern void treeWorldLevelUpdate(WorldLevelRef_t obj);
+extern void treeWorldLevelRemove(WorldLevelRef_t obj);
+extern TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<WorldLevel_t> treeWorldLevelQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<WorldLevelRef_t> treeWorldLevelQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
 
-extern void treeWorldMusicAdd(WorldMusic_t *obj);
-extern void treeWorldMusicUpdate(WorldMusic_t *obj);
-extern void treeWorldMusicRemove(WorldMusic_t *obj);
-extern TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(double Left, double Top, double Right, double Bottom,
+extern void treeWorldMusicAdd(WorldMusicRef_t obj);
+extern void treeWorldMusicUpdate(WorldMusicRef_t obj);
+extern void treeWorldMusicRemove(WorldMusicRef_t obj);
+extern TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<WorldMusic_t> treeWorldMusicQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
 
 
-extern void treeBlockAddLayer(int layer, Block_t *obj);
-extern void treeBlockRemoveLayer(int layer, Block_t *obj);
-extern void treeBlockUpdateLayer(int layer, Block_t *obj);
-extern TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
+extern void treeBlockAddLayer(int layer, BlockRef_t obj);
+extern void treeBlockRemoveLayer(int layer, BlockRef_t obj);
+extern void treeBlockUpdateLayer(int layer, BlockRef_t obj);
+extern TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
 
-extern void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock);
-extern void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock);
+extern void treeTempBlockStartFrame();
+extern void treeTempBlockAdd(BlockRef_t obj);
+extern void treeTempBlockUpdate(BlockRef_t obj);
+extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
+                               int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+
+// removed in favor of block quadtree
+
+// extern void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock);
+// extern void blockTileGet(double x, double w, int64_t &fBlock, int64_t &lBlock);
 
 #endif // TREES_HHHH

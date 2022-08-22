@@ -158,12 +158,22 @@ void UpdateEffects()
             if(e.Frame > 7)
                 e.Frame = 0;
 
-            if(e.Life == 100)
+            if(HasSound(SFX_LarryShell)) // When new sound is presented, do animation a bit differently
+            {
+                if(e.Life == 75)
+                    e.Location.SpeedY = -5;
+                else if(e.Life == 65)
+                    e.Location.SpeedY = -8;
+                else if(e.Life == 60)
+                    e.Location.SpeedY = -11;
+                else if(e.Life == 52)
+                    e.Location.SpeedY = -14;
+            }
+            else if(!HasSound(SFX_LarryShell) && e.Life == 100) // Old sound
             {
                 e.Location.SpeedY = -8;
                 PlaySound(SFX_WartKilled);
             }
-
         }
         else if(e.Type == 114) // Splash
         {
@@ -859,6 +869,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
         ne.Type = A;
         ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
+        PlaySound(SFX_LarryKilled);
     }
     else if(A == 104) // Blaarg eyes
     {
@@ -1872,7 +1883,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
         ne.Location.SpeedX = 3 * -Direction;
         ne.Life = 200;
         ne.Type = A;
-        PlaySound(SFX_WartKilled);
+        PlaySound(SFX_LudwigKilled);
     }
 }
 
