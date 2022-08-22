@@ -1920,7 +1920,7 @@ void UpdateNPCs()
                                     stillCollide = true;
                             }
 
-                            if(!stillCollide)
+                            if(!npcHasFloor(NPC[A]) || !stillCollide)
                             {
                                 NPC[A].Special = 2;
                                 SkullRide(A, true);
@@ -2143,12 +2143,15 @@ void UpdateNPCs()
                                                             {
                                                                 auto bt = Block[B].Type;
                                                                 if(Block[B].IsNPC <= 0 && NPC[A].Special == 1 &&
-                                                                  ((HitSpot == COLLISION_LEFT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING) ||
-                                                                   (HitSpot == COLLISION_RIGHT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING)) &&
+                                                                  (HitSpot == COLLISION_LEFT || HitSpot == COLLISION_RIGHT) &&
+                                                                   BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING &&
                                                                    !BlockOnlyHitspot1[bt] && !BlockIsSizable[bt])
                                                                 {
-                                                                    SkullRideDone(A, Block[B].Location);
-                                                                    NPC[A].Special = 3; // 3 - watcher, 2 - waiter
+                                                                    if(npcHasFloor(NPC[A]))
+                                                                    {
+                                                                        SkullRideDone(A, Block[B].Location);
+                                                                        NPC[A].Special = 3; // 3 - watcher, 2 - waiter
+                                                                    }
                                                                 }
                                                             }
                                                         }
