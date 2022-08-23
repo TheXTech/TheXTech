@@ -356,7 +356,19 @@ int GameMain(const CmdLineSetup_t &setup)
         GrabAll = setup.testGrabAll;
 
         editorScreen.ResetCursor();
-        zTestLevel(setup.testMagicHand, setup.interprocess);
+
+        if(setup.testReplay.empty() && setup.testEditor)
+        {
+            editorScreen.active = false;
+            MouseRelease = false;
+            LevelEditor = true;
+            OpenLevel(FullFileName);
+            EditorBackup();
+        }
+        else
+        {
+            zTestLevel(setup.testMagicHand, setup.interprocess);
+        }
     }
 
     do

@@ -54,12 +54,14 @@ struct CmdLineSetup_t
     bool testGrabAll = false;
     //! Make playable character be inmortal
     bool testGodMode = false;
-    //! Make playable character be inmortal
+    //! Show FPS during level test
     bool testShowFPS = false;
-    //! Make playable character be inmortal
+    //! Do not limit framerate
     bool testMaxFPS = false;
     //! Enable magic-hand functionality
     bool testMagicHand = false;
+    //! Open in editor
+    bool testEditor = false;
 
     //! Force log output into console
     bool verboseLogging = false;
