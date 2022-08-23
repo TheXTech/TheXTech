@@ -1524,7 +1524,7 @@ void KillNPC(int A, int B)
     if(BattleMode)
         NPC[A].RespawnDelay = 65 * 30;
 
-    if(NPC[A].AttLayer != LAYER_NONE)
+    if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT)
     {
         // for(C = 1; C <= maxLayers; C++)
         {

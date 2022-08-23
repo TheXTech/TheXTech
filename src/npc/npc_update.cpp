@@ -5234,7 +5234,7 @@ void UpdateNPCs()
             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * double(speedVar);
         }
 
-        if(NPC[A].AttLayer != LAYER_NONE && NPC[A].HoldingPlayer == 0)
+        if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT && NPC[A].HoldingPlayer == 0)
         {
             int B = NPC[A].AttLayer;
             // for(B = 1; B <= maxLayers; B++)
