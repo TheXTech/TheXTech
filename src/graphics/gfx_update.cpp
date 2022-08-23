@@ -765,9 +765,9 @@ void UpdateGraphics(bool skipRepaint)
                 //   so it's essential that we set cannot_reset to follow can_activate for this frame and the next one
                 //   (when Reset[1] and Reset[2] need to become true).
 
-                // Note that this condition, NPC[A].TimeLeft == 0, is practically never encountered when the NPC is onscreen,
+                // Note that this condition, NPC[A].TimeLeft == 0 or 1, is practically never encountered when the NPC is onscreen,
                 //   except in the conditional activation code.
-                if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen && NPC[A].TimeLeft == 0)
+                if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen && (NPC[A].TimeLeft == 0 || NPC[A].TimeLeft == 1))
                 {
                     if(render && !can_activate)
                     {
