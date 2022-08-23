@@ -229,6 +229,7 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestShowFPS("m", "show-fps", "Show FPS counter on the screen", false);
         TCLAP::SwitchArg switchTestMaxFPS("x", "max-fps", "Run FPS as fast as possible", false);
         TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
+        TCLAP::SwitchArg switchTestEditor("e", "editor", "Open level in the editor", false);
         TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
 
         TCLAP::ValueArg<std::string> compatLevel(std::string(), "compat-level",
@@ -289,6 +290,7 @@ int main(int argc, char**argv)
         cmd.add(&switchTestShowFPS);
         cmd.add(&switchTestMaxFPS);
         cmd.add(&switchTestMagicHand);
+        cmd.add(&switchTestEditor);
         cmd.add(&switchTestInterprocess);
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
@@ -398,6 +400,7 @@ int main(int argc, char**argv)
                                 g_videoSettings.showFrameRate;
         setup.testMaxFPS = switchTestMaxFPS.getValue();
         setup.testMagicHand = switchTestMagicHand.getValue();
+        setup.testEditor = switchTestEditor.getValue();
 
         if(compatLevel.isSet())
         {
