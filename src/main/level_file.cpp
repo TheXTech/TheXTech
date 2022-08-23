@@ -36,6 +36,7 @@
 #include "record.h"
 #include "npc_special_data.h"
 #include "graphics/gfx_camera.h"
+#include "npc/npc_activation.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -778,6 +779,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FindSBlocks();
     syncLayersTrees_AllBlocks();
     syncLayers_AllBGOs();
+
+    NPC_ConstructCanonicalSet();
 
     // moved the old event/layer loading code to the top
     // since it is needed before loading objects now

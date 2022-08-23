@@ -42,6 +42,7 @@
 #include "../core/render.h"
 #include "../script/luna/luna.h"
 
+#include "npc/npc_activation.h"
 #include "effect.h"
 #include "graphics/gfx_special_frames.h"
 #include "graphics/gfx_camera.h"
@@ -291,6 +292,8 @@ inline void ProcessIntroNPCFrames()
     for(uint8_t i = 0; i < NPC_intro_count; i++)
     {
         NPC_intro_frame[i]++;
+
+        // two termination conditions, remove the NPC from the intro list either way
         if(NPC_intro_frame[i] == NPC_intro_length || NPC_intro_frame[i] == 0)
         {
             NPC_intro_count--;
@@ -303,24 +306,6 @@ inline void ProcessIntroNPCFrames()
     }
 }
 
-inline bool always_render_NPC(const NPC_t& n)
-{
-    return n.Inert
-        || n.Stuck
-        || NPCIsACoin[n.Type]
-        || NPCIsABlock[n.Type]
-        || NPCIsAVine[n.Type]
-        || n.Type == NPCID_CHECKPOINT
-        || n.Type == NPCID_BURIEDPLANT
-        || n.Type == NPCID_CONVEYOR
-        || n.Type == NPCID_THWOMP_SMB3
-        || n.Type == NPCID_THWOMP_SMW
-        || n.Type == NPCID_CANNONENEMY
-        || n.Type == NPCID_STATUE_SMB3
-        || n.Type == NPCID_STATUE_SMW
-        || n.Type == NPCID_RINKAGEN;
-}
-
 // tints NPCS
 inline void get_NPC_tint(int A, float& cn, float& an)
 {
@@ -330,7 +315,7 @@ inline void get_NPC_tint(int A, float& cn, float& an)
     {
         if(!n.Active)
         {
-            if(!always_render_NPC(n))
+            if(!NPC_MustRenderInactive(n))
             {
                 cn = 0.0f;
                 an = 0.4f;
@@ -341,7 +326,7 @@ inline void get_NPC_tint(int A, float& cn, float& an)
         {
             if(NPC_intro[i] == A)
             {
-                if(NPC_intro_frame[i] >= 0 && !always_render_NPC(n))
+                if(NPC_intro_frame[i] >= 0)
                 {
                     float coord = NPC_intro_frame[i]/(float)NPC_intro_length;
                     cn = coord;
@@ -363,39 +348,6 @@ inline void get_NPC_tint(int A, float& cn, float& an)
         cn = 1.0f;
         an = 1.0f;
     }
-}
-
-inline static bool s_SoundOnly(const Events_t& evt, int test_section)
-{
-    if(!(evt.Text == STRINGINDEX_NONE
-        && evt.HideLayer.empty()
-        && evt.ShowLayer.empty()
-        && evt.ToggleLayer.empty()
-        && evt.MoveLayer == LAYER_NONE
-        && evt.TriggerEvent == EVENT_NONE
-        && evt.EndGame == 0))
-    {
-        return false;
-    }
-
-    bool autoscroll_okay = !AutoUseModern || evt.AutoSection != test_section
-        || (g_compatibility.fix_autoscroll_speed
-            ? (!(evt.AutoX != 0.0 || evt.AutoY != 0.0)
-                || (AutoX[evt.AutoSection] == evt.AutoX && AutoY[evt.AutoSection] == evt.AutoY))
-            : (!IF_INRANGE(evt.AutoSection, 0, SDL_min(maxSections, maxEvents))
-                || (AutoX[evt.AutoSection] == Events[evt.AutoSection].AutoX
-                    && AutoY[evt.AutoSection] == Events[evt.AutoSection].AutoY)));
-
-    if(!autoscroll_okay)
-        return false;
-
-    const EventSection_t& s = const_cast<Events_t&>(evt).section[test_section];
-    bool section_okay = s.music_id == EventSection_t::LESet_Nothing
-        && s.background_id == EventSection_t::LESet_Nothing
-        && (int)s.position.X == EventSection_t::LESet_Nothing
-        && s.autoscroll == false;
-
-    return section_okay;
 }
 
 void GraphicsLazyPreLoad()
@@ -764,19 +716,7 @@ void UpdateGraphics(bool skipRepaint)
                     if(
                            ForcedControls
                         || qScreen
-                        || onscreen_canonical == render
-                        || NPC[A].Generator
-                        || NPC[A].Type == NPCID_THWOMP_SMB3
-                        || NPC[A].Type == NPCID_THWOMP_SMW
-                        || NPC[A].Type == NPCID_METALBARREL
-                        || NPC[A].Type == NPCID_CANNONENEMY
-                        || NPC[A].Type == NPCID_STATUE_SMB3
-                        || NPC[A].Type == NPCID_STATUE_SMW
-                        || NPC[A].Type == NPCID_RINKAGEN
-                        || NPC[A].Type == NPCID_BLARGG
-                        || (NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
-                        || NPC[A].AttLayer != LAYER_NONE
-                        || (NPC[A].TriggerActivate != EVENT_NONE && !s_SoundOnly(Events[NPC[A].TriggerActivate], Player[Z].Section))
+                        || NPC_MustBeCanonical(A)
                     )
                         can_activate = onscreen_canonical;
                     else
@@ -824,16 +764,22 @@ void UpdateGraphics(bool skipRepaint)
                 //   with TimeLeft = 0 by the time we get to rendering. In this case, "resetting" means "not activating",
                 //   so it's essential that we set cannot_reset to follow can_activate for this frame and the next one
                 //   (when Reset[1] and Reset[2] need to become true).
+
+                // Note that this condition, NPC[A].TimeLeft == 0, is practically never encountered when the NPC is onscreen,
+                //   except in the conditional activation code.
                 if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen && NPC[A].TimeLeft == 0)
                 {
                     if(render && !can_activate)
                     {
+                        // add it to the set of NPCs in intro/conditional states
                         if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
                         {
                             NPC_intro[NPC_intro_index] = A;
                             NPC_intro_count++;
                         }
 
+                        // if it was already in the set, or if it was successfully added,
+                        // set its intro frame to -2 to give it 2 frames of allowing it to reset while onscreen
                         if(NPC_intro_index < NPC_intro_count)
                             NPC_intro_frame[NPC_intro_index] = -2;
                     }
@@ -849,25 +795,17 @@ void UpdateGraphics(bool skipRepaint)
                 if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
                     && !NPC[A].Active && render)
                 {
-                    // don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
-                    //   a piranha plant that hasn't emerged yet, etc
-                    if((NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2)
-                        || NPC[A].Type == NPCID_PODOBOO
-                        || NPC[A].Type == NPCID_PIRANHA_SMB3 || NPC[A].Type == NPCID_BOTTOMPIRANHA || NPC[A].Type == NPCID_SIDEPIRANHA
-                        || NPC[A].Type == NPCID_BIGPIRANHA || NPC[A].Type == NPCID_PIRANHA_SMB || NPC[A].Type == NPCID_FIREPIRANHA
-                        || NPC[A].Type == NPCID_LONGPIRANHA_UP || NPC[A].Type == NPCID_LONGPIRANHA_DOWN || NPC[A].Type == NPCID_PIRANHAHEAD
-                        || NPC[A].Type == NPCID_BLARGG
-                        )
+                    // Don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
+                    //   a piranha plant that hasn't emerged yet, etc. Also, don't do poofs for them, etc.
+                    if(NPC_MustNotRenderInactive(NPC[A]))
                     {
                         render = false;
                     }
 
-                    else if(g_config.render_inactive_NPC != Config_t::INACTIVE_NPC_SHOW)
+                    else if(g_config.render_inactive_NPC != Config_t::INACTIVE_NPC_SHOW && !NPC_MustRenderInactive(NPC[A]))
                     {
-                        bool always_render = always_render_NPC(NPC[A]);
-
                         // add to queue of hidden NPCs
-                        if(!can_activate && !always_render)
+                        if(!can_activate)
                         {
                             if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
                             {
@@ -886,7 +824,7 @@ void UpdateGraphics(bool skipRepaint)
                         // if in "poof" mode, render this effect here
                         if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_HIDE)
                         {
-                            if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]) && !always_render)
+                            if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
                             {
                                 // if it was hidden, then add the poof effect!
                                 if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0)
@@ -897,7 +835,7 @@ void UpdateGraphics(bool skipRepaint)
                                     NewEffect(10, tempLocation);
                                 }
                             }
-                            else if(!always_render)
+                            else
                             {
                                 render = false;
                             }
@@ -966,12 +904,12 @@ void UpdateGraphics(bool skipRepaint)
                 {
                     NPC_Draw_Queue_p.add(A);
 
-                    // just for appearance, do the NPC's frames if it hasn't been activated yet
+                    // just for appearance, do the NPC's frames if it hasn't been activated yet and isn't in a shade / hidden mode
                     if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
                         && !NPC[A].Active && !FreezeNPCs)
                     {
-                        if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_SHOW
-                            || always_render_NPC(NPC[A]))
+                        bool in_hidden_mode = NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0;
+                        if(!in_hidden_mode)
                         {
                             NPCFrames(A);
                         }
