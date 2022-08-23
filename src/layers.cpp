@@ -1313,7 +1313,7 @@ void UpdateLayers()
 
                             if(!NPC[B].Active)
                             {
-                                if(NPC[B].AttLayer != LAYER_NONE)
+                                if(NPC[B].AttLayer != LAYER_NONE && NPC[B].AttLayer != LAYER_DEFAULT)
                                 {
                                     Layer[NPC[B].AttLayer].SpeedX = Layer[A].SpeedX;
                                     Layer[NPC[B].AttLayer].SpeedY = Layer[A].SpeedY;
