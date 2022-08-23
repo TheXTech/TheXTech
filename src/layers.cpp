@@ -875,6 +875,54 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             qScreenX[1] = vScreenX[1];
                             qScreenY[1] = vScreenY[1];
                             qScreenLoc[1] = vScreen[1];
+
+                            // only use the temp X/Y instead of qScreen mode if 3 conditions are met
+                            if(g_compatibility.modern_section_change)
+                            {
+                                bool use_new_resize = true;
+
+                                int old_w = vScreen[1].Width;
+                                int old_h = vScreen[1].Height;
+                                int old_x = vScreenX[1];
+                                int old_y = vScreenY[1];
+
+                                // (1) old bounds shouldn't be outside of the new level
+                                if(-old_x < level[B].X
+                                    || -old_x + old_w > level[B].Width
+                                    || -old_y < level[B].Y
+                                    || -old_y + old_h > level[B].Height)
+                                {
+                                    use_new_resize = false;
+                                }
+
+                                // (2) new screen size should equal old
+
+                                GetvScreen(1);
+
+                                if(vScreen[1].Width != old_w || vScreen[1].Height != old_h)
+                                    use_new_resize = false;
+
+                                // (3) qScreen should not have occurred in old game
+                                int cx, cy, old_cx, old_cy;
+
+                                GetvScreenCanonical(1, &cx, &cy);
+
+                                level[B] = tempLevel;
+                                GetvScreenCanonical(1, &old_cx, &old_cy);
+                                level[B] = newLevel;
+
+                                if(std::abs(cx - old_cx) > 32 || std::abs(cy - old_cy) > 32)
+                                    use_new_resize = false;
+
+                                // do it!
+                                if(use_new_resize)
+                                {
+                                    qScreen = false;
+
+                                    vScreen[1].tempX = vScreenX[1] - old_x;
+                                    vScreen[1].TempY = vScreenY[1] - old_y;
+                                }
+                            }
                         }
 
                         resetFrameTimer();
