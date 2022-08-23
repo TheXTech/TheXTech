@@ -897,7 +897,9 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                                 // (2) new screen size should equal old
 
+                                SetupScreens();
                                 GetvScreen(1);
+                                CenterScreens();
 
                                 if(vScreen[1].Width != old_w || vScreen[1].Height != old_h)
                                     use_new_resize = false;
