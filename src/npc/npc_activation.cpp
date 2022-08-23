@@ -100,17 +100,34 @@ bool NPC_MustRenderInactive(const NPC_t& n)
         || n.Stuck
         || NPCIsACoin[n.Type]
         || NPCIsABlock[n.Type]
+        || NPCIsAHit1Block[n.Type]
         || NPCIsAVine[n.Type]
+        || NPCIsABonus[n.Type]
         || n.Type == NPCID_CHECKPOINT
         || n.Type == NPCID_BURIEDPLANT
         || n.Type == NPCID_CONVEYOR
         || n.Type == NPCID_THWOMP_SMB3
         || n.Type == NPCID_THWOMP_SMW
+        || n.Type == NPCID_RINKAGEN
+        || n.Type == NPCID_ITEMGOAL
         || n.Type == NPCID_CANNONENEMY
         || n.Type == NPCID_STATUE_SMB3
         || n.Type == NPCID_STATUE_SMW
-        || n.Type == NPCID_RINKAGEN
-        || n.Type == NPCID_YOSHIEGG;
+        || n.Type == NPCID_YOSHIEGG
+        || n.Type == NPCID_SPRING
+        || n.Type == NPCID_CANNONITEM
+        || n.Type == NPCID_KEY
+        || n.Type == NPCID_PSWITCH_SMB3
+        || n.Type == NPCID_TIMESWITCH
+        || n.Type == NPCID_PSWITCH_SMW
+        || n.Type == NPCID_ICE_BLOCK
+        || n.Type == NPCID_CLOWNCAR
+        || n.Type == NPCID_AXE
+        || n.Type == NPCID_NIPPER_PLANT
+        || n.Type == NPCID_PROPELLERBLOCK
+        || n.Type == NPCID_PROPELLERCANNON
+        || n.Type == NPCID_POTIONDOOR
+        || n.Type == NPCID_POTION;
 }
 
 void NPC_ConstructCanonicalSet()
