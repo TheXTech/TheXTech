@@ -715,6 +715,7 @@ void UpdateGraphics(bool skipRepaint)
                     // Think more about NPCID_METALBARREL and other falling items
                     if(
                            ForcedControls
+                        || LevelMacro != LEVELMACRO_OFF
                         || qScreen
                         || NPC_MustBeCanonical(A)
                     )
