@@ -133,6 +133,7 @@ bool NPC_MustRenderInactive(const NPC_t& n)
 void NPC_ConstructCanonicalSet()
 {
     std::vector<int16_t> to_check;
+    to_check.reserve(64);
 
     s_canonicalNPCs.reset();
 
@@ -146,8 +147,10 @@ void NPC_ConstructCanonicalSet()
     }
 
     // perform chain activation
-    for(int16_t n : to_check)
+    for(size_t i = 0; i < to_check.size(); i++)
     {
+        int16_t n = to_check[i];
+
         Location_t tempLocation = NPC[n].Location;
         tempLocation.Y -= 32;
         tempLocation.X -= 32;
