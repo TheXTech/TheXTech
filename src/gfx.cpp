@@ -42,7 +42,11 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
     pLogDebug("Loading texture %s...", path_ext.c_str());
     img = XRender::LoadPicture(path_ext);
 
+#ifdef PGE_MIN_PORT
+    if(!img.inited)
+#else
     if(!img.d.hasTexture())
+#endif
     {
         pLogWarning("Failed to load texture: %s...", path_ext.c_str());
         m_loadErrors++;
