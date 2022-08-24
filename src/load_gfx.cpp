@@ -216,6 +216,7 @@ static void loadImageFromList(FILE* f, const std::string& dir,
         backup.remote_height = height;
         backup.remote_isCustom = &is_custom_loc;
         backup.remote_texture = &texture;
+        XRender::lazyUnLoad(texture);
         if(width)
             backup.width = *width;
         if(height)
