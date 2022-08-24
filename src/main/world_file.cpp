@@ -101,7 +101,7 @@ bool OpenWorld(std::string FilePath)
 
     LoadCustomCompat();
     FindCustomPlayers();
-    LoadWorldCustomGFX();
+    LoadCustomGFX(true);
 
     numTiles = 0;
     numScenes = 0;
@@ -332,7 +332,6 @@ bool OpenWorld(std::string FilePath)
         treeWorldMusicAdd(&box);
     }
 
-    LoadCustomGFX();
     LoadCustomSound();
 
     if(!LevelEditor)

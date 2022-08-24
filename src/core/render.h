@@ -235,6 +235,10 @@ E_INLINE StdPicture lazyLoadPicture(const std::string &path,
 }
 #endif
 
+#ifdef PGE_MIN_PORT
+E_INLINE StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir);
+#endif
+
 E_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb) TAIL
 #ifndef RENDER_CUSTOM
 {

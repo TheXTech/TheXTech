@@ -22,6 +22,8 @@
 #ifndef MSGBOX_HHHHH
 #define MSGBOX_HHHHH
 
+#include <string>
+
 #ifndef MSGBOX_CUSTOM
 #   include "core/std.h"
 #   include "base/msgbox_base.h"
