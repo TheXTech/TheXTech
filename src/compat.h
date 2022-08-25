@@ -95,6 +95,7 @@ struct Compatibility_t
 
     // Deaths counter
     bool demos_counter_enable;
+    char demos_counter_title[250];
 
     // Luna
     enum LunaEnableEngine_t
