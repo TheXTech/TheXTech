@@ -257,7 +257,7 @@ void renderCircleHole(int cx, int cy,
 
         if(dy < radius) // Don't cross lines
         {
-            renderRectBR(cx - radius, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
+            renderRectBR(cx - radius, cy - dy + radius - line_size, cx - dx, cy - dy + radius + line_size,
                 red, green, blue, alpha);
 
             renderRectBR(cx + dx, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
