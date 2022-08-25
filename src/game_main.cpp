@@ -421,6 +421,10 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[A] = blankPlayer;
 
             numPlayers = g_gameInfo.outroMaxPlayersCount;
+#ifdef __NDS__
+            if(numPlayers > 3)
+                numPlayers = 3;
+#endif
             if(g_gameInfo.outroDeadMode)
                 numPlayers = 1; // Deadman mode
             GameMenu = false;
@@ -591,6 +595,10 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             numPlayers = g_gameInfo.introMaxPlayersCount;
+#ifdef __NDS__
+            if(numPlayers > 3)
+                numPlayers = 3;
+#endif
             if(g_gameInfo.introDeadMode)
                 numPlayers = 1;// one deadman should be
 
