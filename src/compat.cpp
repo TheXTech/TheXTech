@@ -89,6 +89,7 @@ static void compatInit(Compatibility_t &c)
     c.allow_drop_add = true;
     c.multiplayer_pause_controls = true;
     c.demos_counter_enable = false;
+    SDL_strlcpy(c.demos_counter_title, "", sizeof(c.demos_counter_title));
     c.luna_allow_level_codes = false;
     c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
     c.fix_fairy_stuck_in_pipe = true;
@@ -200,7 +201,10 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
 
     compat.beginGroup("death-counter");
     {
+        std::string buffer;
         compat.read("enabled", c.demos_counter_enable, c.demos_counter_enable);
+        compat.read("title", buffer, std::string(c.demos_counter_title));
+        SDL_strlcpy(c.demos_counter_title, buffer.c_str(), sizeof(c.demos_counter_title));
     }
     compat.endGroup();
 
