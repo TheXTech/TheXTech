@@ -5365,7 +5365,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
         int B = NPC[LayerNPC].AttLayer;
         // for(B = 1; B <= maxLayers; B++)
         {
-            if(B != LAYER_NONE)
+            if(B != LAYER_NONE && B != LAYER_DEFAULT)
             {
                 // if(Layer[B].Name == NPC[LayerNPC].AttLayer)
                 {

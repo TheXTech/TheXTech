@@ -815,7 +815,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 SuperPrint("DEFAULT", 3, e_ScreenW - 240, 440);
             else
                 SuperPrint(GetL(EditorCursor.NPC.Layer), 3, e_ScreenW - 240, 440);
-            if(EditorCursor.NPC.AttLayer != LAYER_NONE)
+            if(EditorCursor.NPC.AttLayer != LAYER_NONE && EditorCursor.NPC.AttLayer != LAYER_DEFAULT)
                 SuperPrint("ATT: " + GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 240, 460);
         }
         if(UpdateButton(mode, e_ScreenW - 80 + 4, 400 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
@@ -2463,7 +2463,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             m_special_subpage = 0;
 
         SuperPrintR(mode, "ATTACHED:", 3, e_ScreenW - 200, 260 + 2);
-        if(EditorCursor.NPC.AttLayer == LAYER_NONE)
+        if(EditorCursor.NPC.AttLayer == LAYER_NONE || EditorCursor.NPC.AttLayer == LAYER_DEFAULT)
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 280 + 2);
         else
             SuperPrintR(mode, GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 200, 280 + 2);
@@ -2473,7 +2473,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
 
     int page_max;
     // extra slot for layer creation when not in the object layer selection
-    if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 0)
+    if(m_special_page == SPECIAL_PAGE_OBJ_LAYER)
         page_max = (numLayers - 1) / 10;
     else
         page_max = numLayers / 10;
@@ -2544,25 +2544,31 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
     for(int i = 0; i < 10; i++)
     {
         int l;
-        // separate Default and None for AttLayer
-        if((m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1) || m_special_page == SPECIAL_PAGE_EVENT_LAYERS)
+        // separate Default and None for Event layers
+        if(m_special_page == SPECIAL_PAGE_EVENT_LAYERS)
             l = m_layers_page*10 + i - 1;
         else
             l = m_layers_page*10 + i;
         if(l > maxLayers)
             continue;
-        if(l == -1)
+
+        if(l == -1 || (l == 0 && m_special_subpage == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1))
         {
             SuperPrintR(mode, "NONE", 3, 54, 80 + 40*i + 12);
+
             if(m_special_page != SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *layer_to_set == LAYER_NONE, 0, 0, 32, 32))
                 *layer_to_set = LAYER_NONE;
             if(m_special_page == SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.EIcons, *layer_to_set == LAYER_NONE, 0, 32*Icon::move, 32, 32))
                 *layer_to_set = LAYER_NONE;
         }
-        // default is a special case on OBJ page 1
-        else if(l == 0 && ((m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 0) || m_special_page == SPECIAL_PAGE_LAYERS))
+        // Default and None are the same for objects layers and for the editor cursor
+        else if(l == 0 && (m_special_page == SPECIAL_PAGE_OBJ_LAYER || m_special_page == SPECIAL_PAGE_LAYERS))
         {
-            SuperPrintR(mode, "DEFAULT", 3, 54, 80 + 40*i + 12);
+            if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
+                SuperPrintR(mode, "NONE", 3, 54, 80 + 40*i + 12);
+            else
+                SuperPrintR(mode, "DEFAULT", 3, 54, 80 + 40*i + 12);
+
             if(UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *layer_to_set == LAYER_NONE || (*layer_to_set) == l, 0, 0, 32, 32))
                 *layer_to_set = LAYER_NONE;
         }
@@ -2575,8 +2581,10 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                 SuperPrintR(mode, Layer[l].Name.substr(0,19), 3, 54, 80 + 40*i + 2);
                 SuperPrintR(mode, Layer[l].Name.substr(19), 3, 54, 80 + 40*i + 20);
             }
+
             if(m_special_page != SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.ECursor[2], (*layer_to_set) == l, 0, 0, 32, 32))
                 *layer_to_set = l;
+
             // extra buttons for layers page
             if(m_special_page == SPECIAL_PAGE_LAYERS)
             {
