@@ -35,7 +35,11 @@
 #include "globals.h"
 #include "video.h"
 #include "frame_timer.h"
+
+#include "core/window.h"
+
 #include "core/render.h"
+#include "core/minport/render_minport_shared.h"
 
 
 namespace XRender
@@ -55,23 +59,8 @@ int s_num_textures_loaded = 0;
 int s_num_big_pictures_loaded = 0;
 std::set<StdPicture*> s_big_pictures;
 
-int s_viewport_x = 0;
-int s_viewport_y = 0;
-int s_viewport_w = 0;
-int s_viewport_h = 0;
-int s_viewport_offset_x = 0;
-int s_viewport_offset_y = 0;
-int s_viewport_offset_x_bak = 0;
-int s_viewport_offset_y_bak = 0;
-bool s_viewport_offset_ignore = false;
-
 int g_rmode_w = 640;
 int g_rmode_h = 480;
-
-int s_screen_phys_x = 0;
-int s_screen_phys_y = 0;
-int s_screen_phys_w = 0;
-int s_screen_phys_h = 0;
 
 void s_loadTexture(StdPicture &target, int i)
 {
@@ -203,8 +192,6 @@ bool init()
           look = {0.0F, 0.0F, -1.0F};
     guLookAt(view, &cam, &up, &look);
 
-
-    s_viewport_x = s_viewport_y = 0;
     updateViewport();
 
     return true;
@@ -220,7 +207,7 @@ void setTargetTexture()
         return;
 
     // do this before drawing
-    GX_SetViewport(s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h, 0, 1);
+    GX_SetViewport(g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h, 0, 1);
     // load the view matrix into matrix memory
     GX_LoadPosMtxImm(view, GX_PNMTX0);
 
@@ -263,166 +250,76 @@ void repaint()
 
 void mapToScreen(int x, int y, int *dx, int *dy)
 {
-    *dx = (x - s_screen_phys_x) * ScreenW / s_screen_phys_w;
-    *dy = (y - s_screen_phys_y) * ScreenH / s_screen_phys_h;
+    *dx = (x - g_screen_phys_x) * ScreenW / g_screen_phys_w;
+    *dy = (y - g_screen_phys_y) * ScreenH / g_screen_phys_h;
 }
 
 void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
 {
-    *window_x = (scr_x * s_screen_phys_w / ScreenW) + s_screen_phys_x;
-    *window_y = (scr_y * s_screen_phys_h / ScreenH) + s_screen_phys_y;
+    *window_x = (scr_x * g_screen_phys_w / ScreenW) + g_screen_phys_x;
+    *window_y = (scr_y * g_screen_phys_h / ScreenH) + g_screen_phys_y;
 }
 
-void updateViewport()
+void minport_TransformPhysCoords()
 {
-    resetViewport();
-    offsetViewport(0, 0);
-
-    // calculate physical render coordinates
-
-    pLogDebug("Updating viewport. Game screen is %d x %d", ScreenW, ScreenH);
-
-    // widescreen_stretch || widescreen_zoom
-    int eff_h = (true) ? g_rmode_w * 9 / 16 : g_rmode_h;
-
-    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
-    {
-        int res_h = eff_h;
-        int res_w = ScreenW * eff_h / ScreenH;
-
-        if(res_w > g_rmode_w)
-        {
-            res_w = g_rmode_w;
-            res_h = ScreenH * res_w / ScreenW;
-        }
-
-        s_screen_phys_w = res_w;
-        s_screen_phys_h = res_h;
-    }
-    else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
-    {
-        s_screen_phys_w = ScreenW / 2;
-        s_screen_phys_h = ScreenH / 2;
-    }
-    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
-    {
-        s_screen_phys_w = ScreenW;
-        s_screen_phys_h = ScreenH;
-    }
-    else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
-    {
-        s_screen_phys_w = ScreenW / 4;
-        s_screen_phys_h = ScreenH / 4;
-    }
-    else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
-    {
-        s_screen_phys_w = ScreenW / 2;
-        s_screen_phys_h = ScreenH / 2;
-        while(s_screen_phys_w <= g_rmode_w && s_screen_phys_h <= eff_h)
-        {
-            s_screen_phys_w += ScreenW / 2;
-            s_screen_phys_h += ScreenH / 2;
-        }
-        if(s_screen_phys_w > ScreenW / 2)
-        {
-            s_screen_phys_w -= ScreenW / 2;
-            s_screen_phys_h -= ScreenH / 2;
-        }
-    }
-
-    pLogDebug("Phys screen is %d x %d", s_screen_phys_w, s_screen_phys_h);
+    int hardware_w, hardware_h;
+    XWindow::getWindowSize(&hardware_w, &hardware_h);
 
     if(false) // widescreen_stretch
     {
-        s_screen_phys_h = s_screen_phys_h * g_rmode_h / eff_h;
-        if(s_screen_phys_h > g_rmode_h)
+        g_screen_phys_h = g_screen_phys_h * g_rmode_h / hardware_h;
+        if(g_screen_phys_h > g_rmode_h)
         {
-            s_screen_phys_w = s_screen_phys_w * s_screen_phys_h / g_rmode_h;
-            s_screen_phys_h = g_rmode_h;
+            g_screen_phys_w = g_screen_phys_w * g_screen_phys_h / g_rmode_h;
+            g_screen_phys_h = g_rmode_h;
         }
-        if(s_screen_phys_w > g_rmode_w)
+        if(g_screen_phys_w > g_rmode_w)
         {
-            s_screen_phys_w = g_rmode_w;
-            s_screen_phys_h = s_screen_phys_h * s_screen_phys_w / g_rmode_w;
+            g_screen_phys_w = g_rmode_w;
+            g_screen_phys_h = g_screen_phys_h * g_screen_phys_w / g_rmode_w;
         }
 
-        pLogDebug("Phys screen stretched to %d x %d", s_screen_phys_w, s_screen_phys_h);
+        pLogDebug("Phys screen stretched to %d x %d", g_screen_phys_w, g_screen_phys_h);
     }
 
-    s_screen_phys_x = g_rmode_w / 2 - s_screen_phys_w / 2;
-    s_screen_phys_y = g_rmode_h / 2 - s_screen_phys_h / 2;
+    g_screen_phys_x = g_rmode_w / 2 - g_screen_phys_w / 2;
+    g_screen_phys_y = g_rmode_h / 2 - g_screen_phys_h / 2;
+}
 
+void minport_ApplyPhysCoords()
+{
     GXColor background = {0, 0, 0, 0xff};
     GX_SetCopyClear(background, 0x00ffffff);
 
     // setup our projection matrix
-    GX_SetViewport(s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h, 0, 1);
+    GX_SetViewport(g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h, 0, 1);
 
     Mtx44 perspective;
     guOrtho(perspective, 0.0f, ScreenH / 2, 0.0f, ScreenW / 2, -1.0f, 1.0f);
     GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 }
 
-void resetViewport()
+void minport_ApplyViewport()
 {
-    setViewport(0, 0, ScreenW, ScreenH);
-}
+    int phys_offset_x = (g_viewport_x + g_viewport_offset_x) * g_screen_phys_w * 2 / ScreenW;
+    int phys_width = (g_viewport_w) * g_screen_phys_w * 2 / ScreenW;
 
-void setViewport(int x, int y, int w, int h)
-{
-    int offset_x = s_viewport_offset_x - s_viewport_x;
-    int offset_y = s_viewport_offset_y - s_viewport_y;
-    int offset_x_bak = s_viewport_offset_x_bak - s_viewport_x;
-    int offset_y_bak = s_viewport_offset_y_bak - s_viewport_y;
+    int phys_offset_y = (g_viewport_y + g_viewport_offset_y) * g_screen_phys_h * 2 / ScreenH;
+    int phys_height = (g_viewport_h) * g_screen_phys_h * 2 / ScreenH;
 
-    s_viewport_x = x / 2;
-    s_viewport_y = y / 2;
-    s_viewport_w = w / 2;
-    s_viewport_h = h / 2;
+    GX_SetViewport(g_screen_phys_x + phys_offset_x, g_screen_phys_y + phys_offset_y, phys_width, phys_height, 0, 1);
 
-    s_viewport_offset_x = s_viewport_x + offset_x;
-    s_viewport_offset_y = s_viewport_y + offset_y;
-    s_viewport_offset_x_bak = s_viewport_x + offset_x_bak;
-    s_viewport_offset_y_bak = s_viewport_y + offset_y_bak;
-}
+    Mtx44 perspective;
+    guOrtho(perspective, 0, g_viewport_h, 0, g_viewport_w, -1.0f, 1.0f);
+    GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 
-void offsetViewport(int x, int y)
-{
-    if(s_viewport_offset_ignore)
-    {
-        s_viewport_offset_x_bak = s_viewport_x + x / 2;
-        s_viewport_offset_y_bak = s_viewport_y + y / 2;
-    }
-    else
-    {
-        s_viewport_offset_x = s_viewport_x + x / 2;
-        s_viewport_offset_y = s_viewport_y + y / 2;
-    }
-}
+    // int ox = g_viewport_x + g_viewport_offset_x;
+    // int oy = g_viewport_y + g_viewport_offset_y;
 
-void offsetViewportIgnore(bool en)
-{
-    if(s_viewport_offset_ignore == en)
-        return;
+    // ox &= ~1;
+    // oy &= ~1;
 
-    s_viewport_offset_ignore = en;
-
-    if(en)
-    {
-        s_viewport_offset_x_bak = s_viewport_offset_x;
-        s_viewport_offset_y_bak = s_viewport_offset_y;
-    }
-    else
-    {
-        s_viewport_offset_x = s_viewport_offset_x_bak;
-        s_viewport_offset_y = s_viewport_offset_y_bak;
-    }
-}
-
-void setTransparentColor(StdPicture &target, uint32_t rgb)
-{
-    UNUSED(target);
-    UNUSED(rgb);
+    // GX_SetScissorBoxOffset(-ox, -oy);
 }
 
 StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
@@ -456,6 +353,48 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         target.d.destroy();
         target.inited = false;
     }
+
+    return target;
+}
+
+StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
+{
+    StdPicture target;
+    if(!GameIsActive)
+        return target; // do nothing when game is closed
+
+    int length;
+
+    char filename[256];
+    if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
+    {
+        pLogWarning("Could not load image path from load list");
+        return target;
+    }
+
+    if(length == 255)
+    {
+        pLogWarning("Image path %s was truncated in load list", filename);
+        return target;
+    }
+
+    target.inited = true;
+    target.l.path = dir;
+    target.l.path += filename;
+    target.l.lazyLoaded = true;
+
+    int w, h;
+    if(fscanf(f, "%d\n%d\n", &w, &h) != 2 || w < 0 || w > 8192 || h < 0 || h > 8192)
+    {
+        pLogWarning("Could not load image %s dimensions from load list", filename);
+        target.inited = false;
+        return target;
+    }
+
+    // pLogDebug("Successfully loaded %s (%d %d)", target.l.path.c_str(), w, h);
+
+    target.w = w;
+    target.h = h;
 
     return target;
 }
@@ -635,96 +574,46 @@ inline float FLOORDIV2(float x)
     return std::floor(x / 2.0f);
 }
 
-void renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
+void wii_RenderBox(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a, bool filled)
 {
-    int x_div = ROUNDDIV2(x);
-    int w_div = ROUNDDIV2(x + w) - x_div;
-
-    x_div += s_viewport_offset_x;
-
-    int y_div = ROUNDDIV2(y);
-    int h_div = ROUNDDIV2(y + h) - y_div;
-
-    y_div += s_viewport_offset_y;
-
-    uint8_t r = red * 255.0f + 0.5f;
-    uint8_t g = green * 255.0f + 0.5f;
-    uint8_t b = blue * 255.0f + 0.5f;
-    uint8_t a = alpha * 255.0f + 0.5f;
-
     GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLOR0);
     GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
     GX_Begin(filled ? GX_QUADS : GX_LINESTRIP, GX_VTXFMT0, 4);
-        GX_Position3s16(x_div, y_div, 0);
+        GX_Position3s16(x1, y1, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
 
-        GX_Position3s16(x_div + w_div, y_div, 0);
+        GX_Position3s16(x2, y1, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
 
-        GX_Position3s16(x_div + w_div, y_div + h_div, 0);
+        GX_Position3s16(x2, y2, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
 
-        GX_Position3s16(x_div, y_div + h_div, 0);
+        GX_Position3s16(x1, y2, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
 
         // complete the rect
         if(!filled)
         {
-            GX_Position3s16(x_div, y_div, 0);
+            GX_Position3s16(x1, y1, 0);
             GX_Color4u8(r, g, b, a);
             GX_TexCoord2u16(0, 0);
         }
     GX_End();
 }
 
-void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
+void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-    renderRect(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha, true);
+    wii_RenderBox(x1, y1, x2, y2, r, g, b, a, true);
 }
 
-void renderCircle(int cx, int cy,
-                  int radius,
-                  float red , float green, float blue, float alpha,
-                  bool filled)
+void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-}
-
-void renderCircleHole(int cx, int cy,
-                      int radius,
-                      float red, float green, float blue, float alpha)
-{
-    if(radius <= 0)
-        return; // Nothing to draw
-
-    double line_size = 4;
-    double dy = line_size;
-
-    do
-    {
-        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
-
-        renderRectBR(cx - radius, cy + dy - radius - line_size, cx - dx, cy + dy - radius + line_size,
-            red, green, blue, alpha);
-
-        renderRectBR(cx + dx, cy + dy - radius - line_size, cx + radius, cy + dy - radius + line_size,
-            red, green, blue, alpha);
-
-        if(dy < radius) // Don't cross lines
-        {
-            renderRectBR(cx - radius, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
-                red, green, blue, alpha);
-
-            renderRectBR(cx + dx, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
-                red, green, blue, alpha);
-        }
-
-        dy += line_size * 2;
-    } while(dy + line_size <= radius);
+    wii_RenderBox(x1, y1, x2, y2, r, g, b, a, false);
 }
 
 inline bool GX_DrawImage_Custom(GXTexObj* img,
@@ -815,7 +704,7 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
     return true;
 }
 
-inline void i_renderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
                              int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
@@ -831,8 +720,6 @@ inline void i_renderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int
 
     if(!tx.d.hasTexture())
         return;
-    if(xDst > s_viewport_w || yDst > s_viewport_h)
-        return;
 
     // automatic flipping based on SMBX style!
     unsigned int mode = 0;
@@ -843,85 +730,8 @@ inline void i_renderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int
     }
     flip ^= mode;
 
-    // texture boundaries
-    // this never happens unless there was an invalid input
-    // if((xSrc < 0.0f) || (ySrc < 0.0f)) return;
-
-    // TODO: graphics tests for how offscreen draws interact with flips
-    //       handling rotations properly is probably impossible
-    if(xDst < 0)
-    {
-        if(!(flip & X_FLIP_HORIZONTAL))
-            xSrc -= xDst * wSrc / wDst;
-
-        if(wDst+xDst > s_viewport_w)
-        {
-            if(flip & X_FLIP_HORIZONTAL)
-                xSrc += (wDst + xDst - s_viewport_w) * wSrc / wDst;
-            wSrc = s_viewport_w * wSrc / wDst;
-            wDst = s_viewport_w;
-        }
-        else
-        {
-            wSrc += xDst * wSrc / wDst;
-            wDst += xDst;
-        }
-        xDst = 0;
-    }
-    else if(xDst + wDst > s_viewport_w)
-    {
-        if(flip & X_FLIP_HORIZONTAL)
-            xSrc += (wDst + xDst - s_viewport_w) * wSrc / wDst;
-        wSrc = (s_viewport_w - xDst) * wSrc / wDst;
-        wDst = (s_viewport_w - xDst);
-    }
-
-    if(yDst < 0)
-    {
-        if(!(flip & X_FLIP_VERTICAL))
-            ySrc -= yDst * hSrc / hDst;
-
-        if(hDst + yDst > s_viewport_h)
-        {
-            if(flip & X_FLIP_VERTICAL)
-                ySrc += (hDst + yDst - s_viewport_h) * hSrc / hDst;
-            hSrc = s_viewport_h * hSrc / hDst;
-            hDst = s_viewport_h;
-        }
-        else
-        {
-            hSrc += yDst * hSrc / hDst;
-            hDst += yDst;
-        }
-        yDst = 0;
-    }
-    else if(yDst + hDst > s_viewport_h)
-    {
-        if(flip & X_FLIP_VERTICAL)
-            ySrc += (hDst + yDst - s_viewport_h) * hSrc / hDst;
-        hSrc = (s_viewport_h - yDst) * hSrc / hDst;
-        hDst = (s_viewport_h - yDst);
-    }
-
     GXTexObj* to_draw = nullptr;
     GXTexObj* to_draw_2 = nullptr;
-
-    // Don't go more than size of texture
-    // Failure conditions should only happen if texture is smaller than expected
-    if(xSrc + wSrc > tx.w / 2)
-    {
-        wDst = (tx.w / 2 - xSrc) * wDst / wSrc;
-        wSrc = tx.w / 2 - xSrc;
-        if(wDst < 0)
-            return;
-    }
-    if(ySrc + hSrc > tx.h / 2)
-    {
-        hDst = (tx.h / 2 - ySrc) * hDst / hSrc;
-        hSrc = tx.h / 2 - ySrc;
-        if(hDst < 0)
-            return;
-    }
 
     if(ySrc + hSrc > 1024)
     {
@@ -944,10 +754,10 @@ inline void i_renderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int
         if(to_draw_2 != nullptr)
         {
             if(rotateAngle != 0.0)
-                GX_DrawImage_Custom_Rotated(to_draw_2, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, (1024 - ySrc) * hDst / hSrc,
+                GX_DrawImage_Custom_Rotated(to_draw_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, center, rotateAngle, red, green, blue, alpha);
             else
-                GX_DrawImage_Custom(to_draw_2, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, (1024 - ySrc) * hDst / hSrc,
+                GX_DrawImage_Custom(to_draw_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
             yDst += (1024 - ySrc) * hDst / hSrc;
             hDst -= (1024 - ySrc) * hDst / hSrc;
@@ -965,134 +775,11 @@ inline void i_renderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int
     if(to_draw == nullptr) return;
 
     if(rotateAngle != 0.0)
-        GX_DrawImage_Custom_Rotated(to_draw, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, hDst,
+        GX_DrawImage_Custom_Rotated(to_draw, xDst, yDst, wDst, hDst,
                              xSrc, ySrc, wSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
     else
-        GX_DrawImage_Custom(to_draw, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, hDst,
+        GX_DrawImage_Custom(to_draw, xDst, yDst, wDst, hDst,
                             xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
-}
-
-// public draw methods
-
-void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
-                            StdPicture &tx,
-                            int xSrc, int ySrc, int wSrc, int hSrc,
-                            float red, float green, float blue, float alpha)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    i_renderTexturePrivate(
-        div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
-        tx,
-        xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
-        0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
-}
-
-void renderTexture(double xDst, double yDst, double wDst, double hDst,
-                            StdPicture &tx,
-                            int xSrc, int ySrc,
-                            float red, float green, float blue, float alpha)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
-
-    i_renderTexturePrivate(
-        div_x, div_y, div_w, div_h,
-        tx,
-        ROUNDDIV2(xSrc), ROUNDDIV2(ySrc), div_w, div_h,
-        0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
-}
-
-void renderTexture(float xDst, float yDst, StdPicture &tx,
-                   float red, float green, float blue, float alpha)
-{
-    int w = tx.w / 2;
-    int h = tx.h / 2;
-    i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
-        tx,
-        0, 0, w, h,
-        0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
-}
-
-void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, float blue, float alpha)
-{
-    int w = tx.w / 2;
-    int h = tx.h / 2;
-    i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
-        tx,
-        0.0f, 0.0f, w, h,
-        0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
-}
-
-void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
-
-    i_renderTexturePrivate(
-        div_x, div_y, div_w, div_h,
-        tx,
-        0.0f, 0.0f, tx.w / 2, tx.h / 2,
-        0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
-}
-
-void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
-                          StdPicture &tx,
-                          int xSrc, int ySrc,
-                          double rotateAngle, FPoint_t *center, unsigned int flip,
-                          float red, float green, float blue, float alpha)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
-
-    i_renderTexturePrivate(
-        div_x, div_y, div_w, div_h,
-        tx,
-        ROUNDDIV2(xSrc), ROUNDDIV2(ySrc), div_w, div_h,
-        rotateAngle, center, flip,
-        red, green, blue, alpha);
-}
-
-void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
-                          StdPicture &tx,
-                          int xSrc, int ySrc,
-                          int wSrc, int hSrc,
-                          double rotateAngle, FPoint_t *center, unsigned int flip,
-                          float red, float green, float blue, float alpha)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
-
-    auto div_sx = ROUNDDIV2(xSrc), div_sy = ROUNDDIV2(ySrc);
-    auto div_sw = ROUNDDIV2(xSrc + wSrc) - div_sx;
-    auto div_sh = ROUNDDIV2(ySrc + hSrc) - div_sy;
-
-    i_renderTexturePrivate(
-        div_x, div_y, div_w, div_h,
-        tx,
-        div_sx, div_sy, div_sw, div_sh,
-        rotateAngle, center, flip,
-        red, green, blue, alpha);
-}
-
-
-size_t lazyLoadedBytes()
-{
-    return 0;
-}
-
-void lazyLoadedBytesReset()
-{
 }
 
 }; // namespace XRender

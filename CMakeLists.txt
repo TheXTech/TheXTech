@@ -525,6 +525,7 @@ if(WII)
     list(APPEND THEXTECH_SRC
         src/control/input_wii.cpp
         src/core/wii/std_wii.cpp
+        src/core/minport/render_minport_shared.cpp
         src/core/wii/render_wii.cpp
         src/core/wii/window_wii.cpp
         src/core/wii/msgbox_wii.cpp

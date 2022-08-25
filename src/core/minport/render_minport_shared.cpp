@@ -1,0 +1,397 @@
+﻿/*
+ * TheXTech - A platform game engine ported from old source code for VB6
+ *
+ * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
+ * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining
+ * a copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included
+ * in all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+ * IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ * DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ * ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
+ */
+
+
+#include <malloc.h>
+
+#include <gccore.h>
+
+#include <set>
+
+#include <Logger/logger.h>
+
+#include "globals.h"
+#include "video.h"
+#include "frame_timer.h"
+#include "core/window.h"
+#include "core/render.h"
+#include "core/minport/render_minport_shared.h"
+
+
+namespace XRender
+{
+
+int g_viewport_x = 0;
+int g_viewport_y = 0;
+int g_viewport_w = 0;
+int g_viewport_h = 0;
+int g_viewport_offset_x = 0;
+int g_viewport_offset_y = 0;
+bool g_viewport_offset_ignore = false;
+
+int g_screen_phys_x = 0;
+int g_screen_phys_y = 0;
+int g_screen_phys_w = 0;
+int g_screen_phys_h = 0;
+
+void updateViewport()
+{
+    resetViewport();
+    offsetViewport(0, 0);
+
+    // calculate physical render coordinates
+
+    pLogDebug("Updating viewport. Game screen is %d x %d", ScreenW, ScreenH);
+
+    // widescreen_stretch || widescreen_zoom
+    int hardware_w, hardware_h;
+    XWindow::getWindowSize(&hardware_w, &hardware_h);
+
+    hardware_w /= 2;
+    hardware_h /= 2;
+
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
+    {
+        int res_h = hardware_h;
+        int res_w = ScreenW * hardware_h / ScreenH;
+
+        if(res_w > hardware_w)
+        {
+            res_w = hardware_w;
+            res_h = ScreenH * res_w / ScreenW;
+        }
+
+        g_screen_phys_w = res_w;
+        g_screen_phys_h = res_h;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
+    {
+        g_screen_phys_w = ScreenW / 2;
+        g_screen_phys_h = ScreenH / 2;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+    {
+        g_screen_phys_w = ScreenW;
+        g_screen_phys_h = ScreenH;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+    {
+        g_screen_phys_w = ScreenW / 4;
+        g_screen_phys_h = ScreenH / 4;
+    }
+    else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+    {
+        g_screen_phys_w = ScreenW / 2;
+        g_screen_phys_h = ScreenH / 2;
+        while(g_screen_phys_w <= hardware_w && g_screen_phys_h <= hardware_h)
+        {
+            g_screen_phys_w += ScreenW / 2;
+            g_screen_phys_h += ScreenH / 2;
+        }
+        if(g_screen_phys_w > ScreenW / 2)
+        {
+            g_screen_phys_w -= ScreenW / 2;
+            g_screen_phys_h -= ScreenH / 2;
+        }
+    }
+
+    pLogDebug("Phys screen is %d x %d", g_screen_phys_w, g_screen_phys_h);
+
+    g_screen_phys_x = hardware_w / 2 - g_screen_phys_w / 2;
+    g_screen_phys_y = hardware_h / 2 - g_screen_phys_h / 2;
+
+    // for widescreen stretch mode on Wii
+    minport_TransformPhysCoords();
+
+    minport_ApplyPhysCoords();
+}
+
+void resetViewport()
+{
+    setViewport(0, 0, ScreenW, ScreenH);
+}
+
+void setViewport(int x, int y, int w, int h)
+{
+    if(g_viewport_x == x / 2 && g_viewport_y == y / 2 && g_viewport_w == w / 2 && g_viewport_h == h / 2)
+        return;
+
+    g_viewport_x = x / 2;
+    g_viewport_y = y / 2;
+    g_viewport_w = w / 2;
+    g_viewport_h = h / 2;
+
+    minport_ApplyViewport();
+}
+
+void offsetViewport(int x, int y)
+{
+    if(g_viewport_offset_x == x / 2 && g_viewport_offset_y == y / 2)
+        return;
+
+    g_viewport_offset_x = x / 2;
+    g_viewport_offset_y = y / 2;
+
+    minport_ApplyViewport();
+}
+
+void offsetViewportIgnore(bool en)
+{
+    if(g_viewport_offset_ignore == en)
+        return;
+
+    g_viewport_offset_ignore = en;
+
+    minport_ApplyViewport();
+}
+
+void setTransparentColor(StdPicture &target, uint32_t rgb)
+{
+    UNUSED(target);
+    UNUSED(rgb);
+}
+
+
+inline int ROUNDDIV2(int x)
+{
+    return (x<0)?(x - 1) / 2:x / 2;
+}
+
+inline float ROUNDDIV2(float x)
+{
+    return std::nearbyintf(std::roundf(x) / 2.0f);
+}
+
+inline float ROUNDDIV2(double x)
+{
+    return std::nearbyintf(std::roundf((float)x / 2.0f));
+}
+
+inline float FLOORDIV2(float x)
+{
+    return std::floor(x / 2.0f);
+}
+
+#ifndef __WII__
+void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t alpha)
+{
+    minport_RenderBoxFilled(x_div, y_div, 1, h_div, r, g, b, a);
+    minport_RenderBoxFilled(x_div + w_div - 1, y_div, 1, h_div, r, g, b, a);
+    minport_RenderBoxFilled(x_div, y_div, w_div, 1, r, g, b, a);
+    minport_RenderBoxFilled(x_div, y_div + h_div - 1, w_div, 1, r, g, b, a);
+}
+#endif
+
+void renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
+{
+    int x_div = ROUNDDIV2(x);
+    int w_div = ROUNDDIV2(x + w) - x_div;
+
+    int y_div = ROUNDDIV2(y);
+    int h_div = ROUNDDIV2(y + h) - y_div;
+
+    uint8_t r = red * 255.0f + 0.5f;
+    uint8_t g = green * 255.0f + 0.5f;
+    uint8_t b = blue * 255.0f + 0.5f;
+    uint8_t a = alpha * 255.0f + 0.5f;
+
+    if(filled)
+        minport_RenderBoxFilled(x_div, y_div, x_div + w_div, y_div + h_div, r, g, b, a);
+    else
+        minport_RenderBoxUnfilled(x_div, y_div, x_div + w_div, y_div + h_div, r, g, b, a);
+}
+
+void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
+{
+    renderRect(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha, true);
+}
+
+void renderCircle(int cx, int cy,
+                  int radius,
+                  float red , float green, float blue, float alpha,
+                  bool filled)
+{
+}
+
+void renderCircleHole(int cx, int cy,
+                      int radius,
+                      float red, float green, float blue, float alpha)
+{
+    if(radius <= 0)
+        return; // Nothing to draw
+
+    double line_size = 4;
+    double dy = line_size;
+
+    do
+    {
+        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
+
+        renderRectBR(cx - radius, cy + dy - radius - line_size, cx - dx, cy + dy - radius + line_size,
+            red, green, blue, alpha);
+
+        renderRectBR(cx + dx, cy + dy - radius - line_size, cx + radius, cy + dy - radius + line_size,
+            red, green, blue, alpha);
+
+        if(dy < radius) // Don't cross lines
+        {
+            renderRectBR(cx - radius, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
+                red, green, blue, alpha);
+
+            renderRectBR(cx + dx, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
+                red, green, blue, alpha);
+        }
+
+        dy += line_size * 2;
+    } while(dy + line_size <= radius);
+}
+
+// public draw methods
+
+void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+                            StdPicture &tx,
+                            int xSrc, int ySrc, int wSrc, int hSrc,
+                            float red, float green, float blue, float alpha)
+{
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+
+    minport_RenderTexturePrivate(
+        div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
+        tx,
+        xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
+        0.0f, nullptr, X_FLIP_NONE,
+        red, green, blue, alpha);
+}
+
+void renderTexture(double xDst, double yDst, double wDst, double hDst,
+                            StdPicture &tx,
+                            int xSrc, int ySrc,
+                            float red, float green, float blue, float alpha)
+{
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
+    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+
+    minport_RenderTexturePrivate(
+        div_x, div_y, div_w, div_h,
+        tx,
+        ROUNDDIV2(xSrc), ROUNDDIV2(ySrc), div_w, div_h,
+        0.0f, nullptr, X_FLIP_NONE,
+        red, green, blue, alpha);
+}
+
+void renderTexture(float xDst, float yDst, StdPicture &tx,
+                   float red, float green, float blue, float alpha)
+{
+    int w = tx.w / 2;
+    int h = tx.h / 2;
+
+    minport_RenderTexturePrivate(
+        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
+        tx,
+        0, 0, w, h,
+        0.0f, nullptr, X_FLIP_NONE,
+        red, green, blue, alpha);
+}
+
+void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, float blue, float alpha)
+{
+    int w = tx.w / 2;
+    int h = tx.h / 2;
+
+    minport_RenderTexturePrivate(
+        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
+        tx,
+        0.0f, 0.0f, w, h,
+        0.0f, nullptr, X_FLIP_NONE,
+        red, green, blue, alpha);
+}
+
+void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
+{
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
+    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+
+    minport_RenderTexturePrivate(
+        div_x, div_y, div_w, div_h,
+        tx,
+        0.0f, 0.0f, tx.w / 2, tx.h / 2,
+        0.0f, nullptr, X_FLIP_NONE,
+        red, green, blue, alpha);
+}
+
+void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
+                          StdPicture &tx,
+                          int xSrc, int ySrc,
+                          double rotateAngle, FPoint_t *center, unsigned int flip,
+                          float red, float green, float blue, float alpha)
+{
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
+    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+
+    minport_RenderTexturePrivate(
+        div_x, div_y, div_w, div_h,
+        tx,
+        ROUNDDIV2(xSrc), ROUNDDIV2(ySrc), div_w, div_h,
+        rotateAngle, center, flip,
+        red, green, blue, alpha);
+}
+
+void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
+                          StdPicture &tx,
+                          int xSrc, int ySrc,
+                          int wSrc, int hSrc,
+                          double rotateAngle, FPoint_t *center, unsigned int flip,
+                          float red, float green, float blue, float alpha)
+{
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
+    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
+
+    auto div_sx = ROUNDDIV2(xSrc), div_sy = ROUNDDIV2(ySrc);
+    auto div_sw = ROUNDDIV2(xSrc + wSrc) - div_sx;
+    auto div_sh = ROUNDDIV2(ySrc + hSrc) - div_sy;
+
+    minport_RenderTexturePrivate(
+        div_x, div_y, div_w, div_h,
+        tx,
+        div_sx, div_sy, div_sw, div_sh,
+        rotateAngle, center, flip,
+        red, green, blue, alpha);
+}
+
+
+size_t lazyLoadedBytes()
+{
+    return 0;
+}
+
+void lazyLoadedBytesReset()
+{
+}
+
+}; // namespace XRender
