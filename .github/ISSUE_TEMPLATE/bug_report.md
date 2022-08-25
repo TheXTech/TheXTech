@@ -13,9 +13,9 @@ A clear and concise description of what the bug is.
 
 **Example Case**
 
-Post a link to the level where the issue occurs:
-*levelname.lvl* from [Episode name](https://link.to.episode/)
-Even better: If you make a dedicated test level and link to that or attach it to your GitHub Post (pack it as `.zip` or `.tar.gz` first).
+Post a link to the level where the issue occurs:    
+*levelname.lvl* from [Episode name](https://link.to.episode/)    
+Even better: If you make a dedicated test level and attach it to your GitHub Post (pack it as `.zip` or `.7z` first).
 
 **Recording**
 

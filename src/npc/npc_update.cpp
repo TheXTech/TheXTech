@@ -1875,7 +1875,7 @@ void UpdateNPCs()
                         NPC[A].Location.SpeedY = 0;
                     }
 
-                    if(NPC[A].Type == 190) // Skull raft
+                    if(NPC[A].Type == NPCID_SKULL) // Skull raft
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
@@ -1920,7 +1920,7 @@ void UpdateNPCs()
                                     stillCollide = true;
                             }
 
-                            if(!stillCollide)
+                            if(!npcHasFloor(NPC[A]) || !stillCollide)
                             {
                                 NPC[A].Special = 2;
                                 SkullRide(A, true);
@@ -2134,7 +2134,7 @@ void UpdateNPCs()
                                                         if(NPC[A].Type == 48 && (Block[B].IsNPC == 22 || Block[B].IsNPC == 49)) // spiney eggs don't walk on special items
                                                             HitSpot = 0;
 
-                                                        if(NPC[A].Type == 190) // Skull raft
+                                                        if(NPC[A].Type == NPCID_SKULL) // Skull raft
                                                         {
                                                             if(Block[B].IsNPC > 0)
                                                                 HitSpot = 0;
@@ -2143,12 +2143,15 @@ void UpdateNPCs()
                                                             {
                                                                 auto bt = Block[B].Type;
                                                                 if(Block[B].IsNPC <= 0 && NPC[A].Special == 1 &&
-                                                                  ((HitSpot == COLLISION_LEFT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING) ||
-                                                                   (HitSpot == COLLISION_RIGHT && BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING)) &&
+                                                                  (HitSpot == COLLISION_LEFT || HitSpot == COLLISION_RIGHT) &&
+                                                                   BlockSlope[bt] == SLOPE_FLOOR && BlockSlope2[bt] == SLOPE_CEILING &&
                                                                    !BlockOnlyHitspot1[bt] && !BlockIsSizable[bt])
                                                                 {
-                                                                    SkullRideDone(A, Block[B].Location);
-                                                                    NPC[A].Special = 3; // 3 - watcher, 2 - waiter
+                                                                    if(npcHasFloor(NPC[A]))
+                                                                    {
+                                                                        SkullRideDone(A, Block[B].Location);
+                                                                        NPC[A].Special = 3; // 3 - watcher, 2 - waiter
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -5231,7 +5234,7 @@ void UpdateNPCs()
             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * double(speedVar);
         }
 
-        if(NPC[A].AttLayer != LAYER_NONE && NPC[A].HoldingPlayer == 0)
+        if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT && NPC[A].HoldingPlayer == 0)
         {
             int B = NPC[A].AttLayer;
             // for(B = 1; B <= maxLayers; B++)

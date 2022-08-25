@@ -33,4 +33,10 @@
     <string name="cheat_dialog_ok">执行</string>
     <string name="cheat_dialog_cancel">取消</string>
     <string name="cheat_dialog_title">输入指令：</string>
+    <string name="launcher_gameSelect_clearList">清除列表</string>
+    <string name="launcher_gameSelect_pickTheDir">选择文件夹……</string>
+    <string name="launcher_gameselect_toast_listclean">游戏列表已清除。</string>
+    <string name="launcher_gameselect_clearlist_title">清除游戏列表</string>
+    <string name="launcher_gameselect_toast_selected">游戏已更改为：%s</string>
+    <string name="launcher_gameselect_clearlist_question">要清除游戏列表吗？</string>
 </resources>
