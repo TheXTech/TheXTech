@@ -189,7 +189,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     {
         const IniProcessing::StrEnumMap spgwgi
         {
-            {"unpsecified", Compatibility_t::SPGWGI_UNSPECIFIED},
+            {"unspecified", Compatibility_t::SPGWGI_UNSPECIFIED},
             {"enable", Compatibility_t::SPGWGI_ENABLE},
             {"true", Compatibility_t::SPGWGI_ENABLE},
             {"disable", Compatibility_t::SPGWGI_DISABLE},
@@ -212,7 +212,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     {
         const IniProcessing::StrEnumMap lunaEnable
         {
-            {"unpsecified", Compatibility_t::LUNA_ENGINE_UNSPECIFIED},
+            {"unspecified", Compatibility_t::LUNA_ENGINE_UNSPECIFIED},
             {"enable", Compatibility_t::LUNA_ENGINE_ENABLE},
             {"true", Compatibility_t::LUNA_ENGINE_ENABLE},
             {"disable", Compatibility_t::LUNA_ENGINE_DISABLE},
@@ -259,7 +259,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
         IniProcessing::StrEnumMap starsShowPolicy
         {
-            {"unpsecified", Compatibility_t::STARS_UNSPECIFIED},
+            {"unspecified", Compatibility_t::STARS_UNSPECIFIED},
             {"hide", Compatibility_t::STARS_DONT_SHOW},
             {"show-collected", Compatibility_t::STARS_SHOW_COLLECTED_ONLY},
             {"show", Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE}
