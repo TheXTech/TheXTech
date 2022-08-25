@@ -231,7 +231,7 @@ static void loadImageFromList(FILE* f, const std::string& dir,
 
     if(this_is_custom)
     {
-        pLogDebug("Loaded custom GFX: %s", newTexture.l.path.c_str());
+        // pLogDebug("Loaded custom GFX: %s", newTexture.l.path.c_str());
         is_custom_loc = true;
     }
 
@@ -304,7 +304,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
 
             while(out == '\n')
             {
-                pLogDebug("skipping failed lines at %d", ftell(f));
+                // pLogDebug("skipping failed lines at %d", ftell(f));
                 if(fscanf(f, "%*[^\n]%c", &out) != 1)
                     break;
             }
@@ -501,12 +501,6 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
         // character graphics
         else
         {
-            if(A > numStates)
-            {
-                pLogWarning("Received load request for invalid player state %s %d", type_buf, A);
-                continue;
-            }
-
             int c;
             if(type_buf[0] == 'l' && type_buf[4] == '\0')
                 c = 4;
@@ -519,7 +513,16 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
             else if(type_buf[0] == 'p')
                 c = 2;
             else
+            {
+                pLogWarning("Received unrecognized load request category %s", type_buf);
                 continue;
+            }
+
+            if(A > numStates)
+            {
+                pLogWarning("Received load request for invalid player state %s %d", type_buf, A);
+                continue;
+            }
 
             loadImageFromList(f, source_dir,
                 (*GFXCharacterBMP[c])[A], &(*GFXCharacterWidth[c])[A], &(*GFXCharacterHeight[c])[A], (*GFXCharacterCustom[c])[A],
