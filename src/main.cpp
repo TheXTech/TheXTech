@@ -477,6 +477,8 @@ int main(int argc, char**argv)
     AppPath = AppPathManager::assetsRoot();
     printf("Will load from %s...\n", AppPath.c_str());
 
+    OpenConfig_preSetup();
+
     setup.verboseLogging = true;
     setup.frameSkip = false;
     setup.testShowFPS = true;
