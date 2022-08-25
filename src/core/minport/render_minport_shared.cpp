@@ -197,10 +197,10 @@ inline float FLOORDIV2(float x)
 #ifndef __WII__
 void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t alpha)
 {
-    minport_RenderBoxFilled(x_div, y_div, 1, h_div, r, g, b, a);
-    minport_RenderBoxFilled(x_div + w_div - 1, y_div, 1, h_div, r, g, b, a);
-    minport_RenderBoxFilled(x_div, y_div, w_div, 1, r, g, b, a);
-    minport_RenderBoxFilled(x_div, y_div + h_div - 1, w_div, 1, r, g, b, a);
+    minport_RenderBoxFilled(x1, y1, x1 + 1, y2, r, g, b, a);
+    minport_RenderBoxFilled(x2 - 1, y1, x2, y2, r, g, b, a);
+    minport_RenderBoxFilled(x1, y1, x2, y1 + 1, r, g, b, a);
+    minport_RenderBoxFilled(x1, y2 - 1, x2, y2, r, g, b, a);
 }
 #endif
 
