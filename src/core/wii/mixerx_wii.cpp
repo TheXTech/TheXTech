@@ -71,7 +71,7 @@ bool MixPlatform_Init()
     }
 
     ret = Mix_OpenAudio(g_audioSetup.sampleRate,
-                        g_audioSetup.format,
+                        AUDIO_S16SYS,
                         g_audioSetup.channels,
                         g_audioSetup.bufferSize);
 
@@ -79,6 +79,7 @@ bool MixPlatform_Init()
     {
         std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
         pLogCritical(msg.c_str());
+        noSound = true;
         return false;
     }
 
