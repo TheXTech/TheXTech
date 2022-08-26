@@ -28,8 +28,11 @@ A partir de su fundación, el Proyecto Moondust poseía 2 fines:
 2) Dar un grupo de herramientas flexible para nuevos juegos de plataformas.
 La apertura del código fuente de SMBX y la introducción de TheXTech ha resuelto el primer objetivo: SMBX ha sido salvado y ahora es un software multiplataforma gratuito de código abierto. Moondust Engine se usará para el segundo objetivo: dar un grupo de herramientas para nuevos juegos. A diferencia de TheXTech, Moondust Engine da un elevado nivel de flexibilidad que posibilita a cualquier persona edificar algo nuevo a partir de cero sin heredar un viejo juego base. No obstante, TheXTech se necesita para Moondust Engine como modelo de investigacion funcional para desarrollar el nuevo motor. Va a ser parecido a las transportaciónes GZDoom y Chocolate Doom del juego Doom: GZDoom es un motor potente y servible, la mejor alternativa para los modders; Chocolate Doom es una adaptacion precisa del juego original a  plataformas modernas para representar el juego original, incluidos los errores. El motor Moondust pretende ser como GZDoom, en lo que TheXTech es un semejante de Chocolate Doom para representar un juego original en plataformas modernas.
 
+## ¿Los niveles y episodios con LunaDLL Autocode funcionarán en Este juego?
+Sí, lo harán. A partir de la versión 1.3.6 de TheXTech, hay una implementación incorporada del lenguaje de scripting LunaDLL Autocode, llamado LunaScript. Con este sistema, es posible ejecutar episodios LunaDLL en cualquier hardware, incluso con una arquitectura de procesador que no sea x86.
+
 ## ¿Puede LunaLua funcionar en esto?
-No, LunaLua no funcionará: este proyecto es binario-incompatible con LunaLua. Esto también significa que el contenido SMBX2 es incompatible.
+No, LunaLua no funcionará: este proyecto es binario-incompatible con LunaLua. Esto también significa que el contenido SMBX2 es incompatible. El sistema de secuencias de comandos planificado en el lenguaje lua no podrá garantizar la compatibilidad. Por lo tanto, después de la posible aparición de soporte para scripts lua, será aconsejable portar o crear desde cero específicamente para TheXTech.
 
 
 ## ¿Por qué el código aquí es tan malo?
