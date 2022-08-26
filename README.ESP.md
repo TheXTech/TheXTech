@@ -2,28 +2,28 @@
 <a href="https://github.com/Wohlstand/TheXTech/releases"><img src="https://raw.githubusercontent.com/Wohlstand/TheXTech/master/resources/icon/thextech_512.png" alt="TheXTech"></a>
 </p>
 
-# TheXTech 
+# TheXTech
 
-Motor SMBX, reescrito en C ++ a partir de VisualBasic 6. 
+Motor SMBX, reescrito en C ++ a partir de VisualBasic 6.
 
 # Preguntas Frecuentes
 
-## ¿Qué es esto? 
-Es una transportación del antiguo motor VB6, escrito puramente en C ++. Reproduce enteramente el antiguo motor SMBX 1.3 (aparte de su Editor), incluye varios de sus errores lógicos (errores críticos que hacen que el juego se bloquee o se congele). 
+## ¿Qué es esto?
+Es una transportación del antiguo motor VB6, escrito puramente en C ++. Reproduce enteramente el antiguo motor SMBX 1.3 (aparte de su Editor), incluye varios de sus errores lógicos (errores críticos que hacen que el juego se bloquee o se congele).
 
-## ¿Por qué lo hiciste? 
-Tengo diversos fines para realizarlo: 
+## ¿Por qué lo hiciste?
+Tengo diversos fines para realizarlo:
 - Es un modelo de investigación bastante conveniente que deseo usar en el desarrollo del motor Moondust.
-- Proveer una copia plenamente compatible del motor antiguo para plataformas modernas, lo cual posibilita jugar niveles y episodios viejos con la misma sensación que si se hubieran jugado en el juego SMBX original basado en VB6. 
-- Para que funcione sin la necesidad de usar Wine en plataformas que no sean Windows y que se encuentre disponible en plataformas que no sean x86 / x64. 
-- Optimizarlo para utilizar menos recursos de hardware que el juego original con base en VB6. 
+- Proveer una copia plenamente compatible del motor antiguo para plataformas modernas, lo cual posibilita jugar niveles y episodios viejos con la misma sensación que si se hubieran jugado en el juego SMBX original basado en VB6.
+- Para que funcione sin la necesidad de usar Wine en plataformas que no sean Windows y que se encuentre disponible en plataformas que no sean x86 / x64.
+- Optimizarlo para utilizar menos recursos de hardware que el juego original con base en VB6.
 
-## Tienes Moondust Engine, ¿por qué has pasado bastante más de un mes para producir esta cosa? 
-Lo necesito para el desarrollo de Moondust Engine de manera directa, es muchísimo más simple de hackear y examinar que un ambiente VB6 antiguo e inconveniente. 
+## Tienes Moondust Engine, ¿por qué has pasado bastante más de un mes para producir esta cosa?
+Lo necesito para el desarrollo de Moondust Engine de manera directa, es muchísimo más simple de hackear y examinar que un ambiente VB6 antiguo e inconveniente.
 
-## ¿Cuál es el futuro de Moondust Engine ahora que existe TheXTech? 
-Continuaré desarrollando el motor Moondust debido a que aún tengo que conseguir el segundo objetivo del proyecto. 
-A partir de su fundación, el Proyecto Moondust poseía 2 fines: 
+## ¿Cuál es el futuro de Moondust Engine ahora que existe TheXTech?
+Continuaré desarrollando el motor Moondust debido a que aún tengo que conseguir el segundo objetivo del proyecto.
+A partir de su fundación, el Proyecto Moondust poseía 2 fines:
 1) Salvar SMBX
 2) Dar un grupo de herramientas flexible para nuevos juegos de plataformas.
 La apertura del código fuente de SMBX y la introducción de TheXTech ha resuelto el primer objetivo: SMBX ha sido salvado y ahora es un software multiplataforma gratuito de código abierto. Moondust Engine se usará para el segundo objetivo: dar un grupo de herramientas para nuevos juegos. A diferencia de TheXTech, Moondust Engine da un elevado nivel de flexibilidad que posibilita a cualquier persona edificar algo nuevo a partir de cero sin heredar un viejo juego base. No obstante, TheXTech se necesita para Moondust Engine como modelo de investigacion funcional para desarrollar el nuevo motor. Va a ser parecido a las transportaciónes GZDoom y Chocolate Doom del juego Doom: GZDoom es un motor potente y servible, la mejor alternativa para los modders; Chocolate Doom es una adaptacion precisa del juego original a  plataformas modernas para representar el juego original, incluidos los errores. El motor Moondust pretende ser como GZDoom, en lo que TheXTech es un semejante de Chocolate Doom para representar un juego original en plataformas modernas.
@@ -99,5 +99,3 @@ Para compilarlo, necesita tener lo siguiente:
 - Git (necesario para extraer submódulos y clonar la fuente de las líbrerias dependientes para construirlos en su lugar)
 - Mercurial (necesario para clonar un repositorio oficial de SDL2 para construirlo en su lugar aquí)
 - Opcionalmente: dependencias instaladas en todo el sistema: SDL2, libFreeImageLite (una implementación modificada de FreeImage), librería de sonido MixerX, colección de librerías AudioCodecs. Tenerlos instalados en el sistema aumenta la velocidad de compilación. Sin embargo, es posible compilar todas estas dependencias en su lugar aquí con un costo adicional de tiempo de compilación agregado.
-
-
