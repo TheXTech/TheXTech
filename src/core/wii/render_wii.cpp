@@ -284,15 +284,24 @@ void minport_TransformPhysCoords()
 
     g_screen_phys_x = g_rmode_w / 2 - g_screen_phys_w / 2;
     g_screen_phys_y = g_rmode_h / 2 - g_screen_phys_h / 2;
+
+    if(g_screen_phys_x < 0)
+        g_screen_phys_x = 0;
+    if(g_screen_phys_y < 0)
+        g_screen_phys_y = 0;
 }
 
 void minport_ApplyPhysCoords()
 {
+    if(!g_in_frame)
+        return;
+
     GXColor background = {0, 0, 0, 0xff};
     GX_SetCopyClear(background, 0x00ffffff);
 
     // setup our projection matrix
     GX_SetViewport(g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h, 0, 1);
+    GX_SetScissor(g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h);
 
     Mtx44 perspective;
     guOrtho(perspective, 0.0f, ScreenH / 2, 0.0f, ScreenW / 2, -1.0f, 1.0f);
@@ -301,13 +310,17 @@ void minport_ApplyPhysCoords()
 
 void minport_ApplyViewport()
 {
-    int phys_offset_x = (g_viewport_x + g_viewport_offset_x) * g_screen_phys_w * 2 / ScreenW;
-    int phys_width = (g_viewport_w) * g_screen_phys_w * 2 / ScreenW;
+    if(!g_in_frame)
+        return;
+
+    int phys_offset_x = g_viewport_x * g_screen_phys_w * 2 / ScreenW;
+    int phys_width = g_viewport_w * g_screen_phys_w * 2 / ScreenW;
 
     int phys_offset_y = (g_viewport_y + g_viewport_offset_y) * g_screen_phys_h * 2 / ScreenH;
     int phys_height = (g_viewport_h) * g_screen_phys_h * 2 / ScreenH;
 
     GX_SetViewport(g_screen_phys_x + phys_offset_x, g_screen_phys_y + phys_offset_y, phys_width, phys_height, 0, 1);
+    GX_SetScissor(g_screen_phys_x + phys_offset_x, g_screen_phys_y + phys_offset_y, phys_width, phys_height);
 
     Mtx44 perspective;
     guOrtho(perspective, 0, g_viewport_h, 0, g_viewport_w, -1.0f, 1.0f);
@@ -579,7 +592,7 @@ void wii_RenderBox(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t
     GX_SetTevOrder(GX_TEVSTAGE0, GX_TEXCOORDNULL, GX_TEXMAP_NULL, GX_COLOR0);
     GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
-    GX_Begin(filled ? GX_QUADS : GX_LINESTRIP, GX_VTXFMT0, 4);
+    GX_Begin(filled ? GX_QUADS : GX_LINESTRIP, GX_VTXFMT0, filled ? 4 : 5);
         GX_Position3s16(x1, y1, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
