@@ -7,7 +7,7 @@ set(THEXTECH_VERSION_3 6)
 # Patch
 set(THEXTECH_VERSION_4 0)
 # Type of version: "-alpha","-beta","-dev", or "" aka "release"
-set(THEXTECH_VERSION_REL "-dev")
+set(THEXTECH_VERSION_REL "")
 
 add_definitions(-DTHEXTECH_VERSION_1=${THEXTECH_VERSION_1})
 add_definitions(-DTHEXTECH_VERSION_2=${THEXTECH_VERSION_2})
