@@ -49,6 +49,12 @@ static std::string return_current_time_and_date()
 {
     auto now = std::chrono::system_clock::now();
     auto in_time_t = std::chrono::system_clock::to_time_t(now);
+
+#ifdef PGE_MIN_PORT
+    // chrono doesn't work reliably here
+    time( &in_time_t );
+#endif
+
     char out[24];
     XStd::memset(out, 0, sizeof(out));
     if(0 < strftime(out, sizeof(out), "%Y_%m_%d_%H_%M_%S", std::localtime(&in_time_t)))
