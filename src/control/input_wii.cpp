@@ -152,7 +152,7 @@ static bool s_get_button(WPADData* data, uint32_t button, uint8_t expansion)
     // intelligent sideways controls
     if(button >= WPAD_BUTTON_LEFT && button <= WPAD_BUTTON_UP && expansion == WPAD_EXP_NONE)
     {
-        bool probably_sideways = (!GameMenu && !LevelEditor && (GamePaused == PauseCode::None || GamePaused == PauseCode::PauseScreen || GamePaused == PauseCode::Message));
+        bool probably_sideways = (!GameMenu && !LevelEditor && !MagicHand && (GamePaused == PauseCode::None || GamePaused == PauseCode::PauseScreen || GamePaused == PauseCode::Message));
         probably_sideways |= !data->ir.valid;
 
         if(probably_sideways)
@@ -261,6 +261,9 @@ bool InputMethod_Wii::Update(int player, Controls_t& c, CursorControls_t& m, Edi
 
     m_battery_status = data->battery_level;
 
+    bool probably_sideways = (!GameMenu && !LevelEditor && !MagicHand && (GamePaused == PauseCode::None || GamePaused == PauseCode::PauseScreen || GamePaused == PauseCode::Message));
+    probably_sideways |= !data->ir.valid;
+
     for(int a = 0; a < 4; a++)
     {
         uint32_t* keys;
@@ -307,7 +310,25 @@ bool InputMethod_Wii::Update(int player, Controls_t& c, CursorControls_t& m, Edi
             else
                 key = null_but;
 
-            int key2 = keys2[i];
+            uint32_t key2 = keys2[i];
+
+            if(p->m_expansion == WPAD_EXP_NONE)
+            {
+                // don't use A/B as cursor controls if in sideways mode
+                if(probably_sideways && a == 1)
+                {
+                    continue;
+                }
+
+                // don't use A/B as AltJump / AltRun if in IR mode
+                if(!probably_sideways && a != 1)
+                {
+                    if(key == p->m_cursor_keys2[CursorControls::Primary] || key == p->m_cursor_keys2[CursorControls::Secondary])
+                        key = null_but;
+                    if(key2 == p->m_cursor_keys2[CursorControls::Primary] || key == p->m_cursor_keys2[CursorControls::Secondary])
+                        key2 = null_but;
+                }
+            }
 
             bool* b;
 
@@ -509,11 +530,13 @@ InputMethodProfile_Wii::InputMethodProfile_Wii(uint8_t expansion) : m_expansion(
         this->m_keys[PlayerControls::Buttons::Left] = WPAD_BUTTON_UP;
         this->m_keys[PlayerControls::Buttons::Right] = WPAD_BUTTON_DOWN;
         this->m_keys[PlayerControls::Buttons::Jump] = WPAD_BUTTON_2;
-        this->m_keys[PlayerControls::Buttons::AltJump] = WPAD_SHAKE;
+        this->m_keys[PlayerControls::Buttons::AltJump] = WPAD_BUTTON_A;
         this->m_keys[PlayerControls::Buttons::Run] = WPAD_BUTTON_1;
         this->m_keys[PlayerControls::Buttons::AltRun] = WPAD_BUTTON_B;
         this->m_keys[PlayerControls::Buttons::Drop] = WPAD_BUTTON_MINUS;
         this->m_keys[PlayerControls::Buttons::Start] = WPAD_BUTTON_PLUS;
+
+        this->m_keys2[PlayerControls::Buttons::AltJump] = WPAD_SHAKE;
 
         this->m_editor_keys[EditorControls::Buttons::ScrollUp] = WPAD_BUTTON_UP;
         this->m_editor_keys[EditorControls::Buttons::ScrollDown] = WPAD_BUTTON_DOWN;
