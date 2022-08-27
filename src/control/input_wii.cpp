@@ -218,14 +218,10 @@ namespace Controls
 
 InputMethod_Wii::InputMethod_Wii(int chn) : m_chn(chn)
 {
-    WPAD_SetDataFormat(m_chn, WPAD_FMT_BTNS_ACC_IR);
-    WPAD_SetVRes(m_chn, XRender::g_rmode_w, XRender::g_rmode_h);
 }
 
 InputMethod_Wii::~InputMethod_Wii()
 {
-    WPAD_SetDataFormat(m_chn, WPAD_FMT_BTNS);
-
     InputMethodType_Wii* t = dynamic_cast<InputMethodType_Wii*>(this->Type);
 
     if(!t)
@@ -247,7 +243,7 @@ bool InputMethod_Wii::Update(int player, Controls_t& c, CursorControls_t& m, Edi
     if(!data)
         return false;
 
-    if(data->err)
+    if(data->err || !data->data_present)
         return false;
 
     if(data->exp.type != p->m_expansion)
@@ -355,36 +351,6 @@ bool InputMethod_Wii::Update(int player, Controls_t& c, CursorControls_t& m, Edi
         *scroll[i] += s_get_button_dbl(data, key2, p->m_expansion) * 32.0;
     }
 
-    static bool was_valid = false;
-
-    if(data->ir.valid)
-    {
-        int phys_x = data->ir.x;
-        int phys_y = data->ir.y;
-
-        int scr_x, scr_y;
-        XRender::mapToScreen(phys_x, phys_y, &scr_x, &scr_y);
-        static int last_x = 0, last_y = 0;
-
-        if(scr_x - last_x <= -1 || scr_x - last_x >= 1 ||
-           scr_y - last_y <= -1 || scr_y - last_y >= 1)
-        {
-            last_x = scr_x;
-            last_y = scr_y;
-            SharedCursor.Move = true;
-            SharedCursor.X = scr_x;
-            SharedCursor.Y = scr_y;
-        }
-
-        was_valid = true;
-    }
-    else if(was_valid)
-    {
-        SharedCursor.GoOffscreen();
-        was_valid = false;
-    }
-
-
     double cursor[4];
 
     for(int i = 0; i < 4; i++)
@@ -438,7 +404,7 @@ StatusInfo InputMethod_Wii::GetStatus()
 
     res.power_status = StatusInfo::POWER_DISCHARGING;
 
-    res.power_level = m_battery_status / 255.f;
+    res.power_level = m_battery_status / 105.f;
 
     return res;
 }
@@ -1121,6 +1087,11 @@ InputMethodType_Wii::InputMethodType_Wii()
 {
     this->Name = "Wii";
     WPAD_Init();
+    for(int chn = 0; chn < 4; chn++)
+    {
+        WPAD_SetDataFormat(chn, WPAD_FMT_BTNS_ACC_IR);
+        WPAD_SetVRes(chn, XRender::g_rmode_w, XRender::g_rmode_h);
+    }
 }
 
 InputMethodType_Wii::~InputMethodType_Wii()
@@ -1143,7 +1114,46 @@ void InputMethodType_Wii::UpdateControlsPre()
     WPAD_ScanPads();
 }
 
-void InputMethodType_Wii::UpdateControlsPost() {}
+void InputMethodType_Wii::UpdateControlsPost()
+{
+    int active_chn = -1;
+    int scr_x = -10;
+    int scr_y = -10;
+
+    for(int i = 0; i < 4; i++)
+    {
+        WPADData* data = WPAD_Data(i);
+
+        if(data->ir.valid)
+        {
+            int phys_x = data->ir.x;
+            int phys_y = data->ir.y;
+
+            XRender::mapToScreen(phys_x, phys_y, &scr_x, &scr_y);
+            active_chn = i;
+
+            break;
+        }
+    }
+
+    if(active_chn == -1 && m_irActiveChn != -1)
+    {
+        SharedCursor.GoOffscreen();
+        return;
+    }
+
+    if(scr_x - m_irLastX <= -1 || scr_x - m_irLastX >= 1 ||
+       scr_y - m_irLastY <= -1 || scr_y - m_irLastY >= 1 ||
+       active_chn != m_irActiveChn)
+    {
+        m_irLastX = scr_x;
+        m_irLastY = scr_y;
+        m_irActiveChn = active_chn;
+        SharedCursor.Move = true;
+        SharedCursor.X = scr_x;
+        SharedCursor.Y = scr_y;
+    }
+}
 
 InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_methods) noexcept
 {
@@ -1242,11 +1252,13 @@ InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_m
     printf("allocated\n");
 
     if(expansion == WPAD_EXP_NUNCHUK)
-        method->Name = "Nunchuck";
+        method->Name = "Nunchuck ";
     else if(expansion == WPAD_EXP_CLASSIC)
-        method->Name = "Classic";
+        method->Name = "Classic ";
     else
-        method->Name = "Wiimote";
+        method->Name = "Wiimote ";
+
+    method->Name += std::to_string(chn + 1);
     method->Type = this;
 
     printf("it's a %s!\n", method->Name.c_str());
@@ -1297,7 +1309,7 @@ InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_m
             method->Profile = new(std::nothrow) InputMethodProfile_Wii(expansion);
             if(method->Profile)
             {
-                method->Profile->Name = method->Name + " 1";
+                method->Profile->Name = method->Name;
                 method->Profile->Type = this;
                 this->m_profiles.push_back(method->Profile);
             }

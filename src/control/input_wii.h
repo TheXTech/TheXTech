@@ -88,6 +88,9 @@ private:
 
 public:
     bool m_canPoll = false;
+    int m_irActiveChn = -1;
+    int m_irLastX = -10;
+    int m_irLastY = -10;
 
     using InputMethodType::Name;
     using InputMethodType::m_profiles;
