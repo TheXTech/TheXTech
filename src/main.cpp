@@ -233,12 +233,12 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
 
         TCLAP::ValueArg<std::string> compatLevel(std::string(), "compat-level",
-                                                   "Enforce the specific gameplay compatibiltiy level. Supported values:\n"
+                                                   "Enforce the specific gameplay compatibility level. Supported values:\n"
                                                    "  modern - TheXTech native, all features and fixes enabled [Default]\n"
                                                    "  smbx2  - Disables all features and bugfixes except fixed at SMBX2\n"
                                                    "  smbx13 - Enforces the full compatibility with the SMBX 1.3 behaviour\n"
                                                    "\n"
-                                                   "  Note: If speed-run mode is set, the compatibility level will be overriden by the speed-run mode",
+                                                   "  Note: If speed-run mode is set, the compatibility level will be overridden by the speed-run mode",
                                                     false, "modern",
                                                    "modern, smbx2, smbx3",
                                                    cmd);
