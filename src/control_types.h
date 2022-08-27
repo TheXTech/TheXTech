@@ -57,6 +57,7 @@ struct CursorControls_t
     {
         X = -4000.0;
         Y = -4000.0;
+        Move = true;
     }
 };
 
