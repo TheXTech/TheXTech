@@ -89,6 +89,7 @@ static void compatInit(Compatibility_t &c)
     c.allow_drop_add = true;
     c.multiplayer_pause_controls = true;
     c.demos_counter_enable = false;
+    SDL_strlcpy(c.demos_counter_title, "", sizeof(c.demos_counter_title));
     c.luna_allow_level_codes = false;
     c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
     c.fix_fairy_stuck_in_pipe = true;
@@ -188,7 +189,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     {
         const IniProcessing::StrEnumMap spgwgi
         {
-            {"unpsecified", Compatibility_t::SPGWGI_UNSPECIFIED},
+            {"unspecified", Compatibility_t::SPGWGI_UNSPECIFIED},
             {"enable", Compatibility_t::SPGWGI_ENABLE},
             {"true", Compatibility_t::SPGWGI_ENABLE},
             {"disable", Compatibility_t::SPGWGI_DISABLE},
@@ -200,7 +201,10 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
 
     compat.beginGroup("death-counter");
     {
+        std::string buffer;
         compat.read("enabled", c.demos_counter_enable, c.demos_counter_enable);
+        compat.read("title", buffer, std::string(c.demos_counter_title));
+        SDL_strlcpy(c.demos_counter_title, buffer.c_str(), sizeof(c.demos_counter_title));
     }
     compat.endGroup();
 
@@ -208,7 +212,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     {
         const IniProcessing::StrEnumMap lunaEnable
         {
-            {"unpsecified", Compatibility_t::LUNA_ENGINE_UNSPECIFIED},
+            {"unspecified", Compatibility_t::LUNA_ENGINE_UNSPECIFIED},
             {"enable", Compatibility_t::LUNA_ENGINE_ENABLE},
             {"true", Compatibility_t::LUNA_ENGINE_ENABLE},
             {"disable", Compatibility_t::LUNA_ENGINE_DISABLE},
@@ -255,7 +259,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
         IniProcessing::StrEnumMap starsShowPolicy
         {
-            {"unpsecified", Compatibility_t::STARS_UNSPECIFIED},
+            {"unspecified", Compatibility_t::STARS_UNSPECIFIED},
             {"hide", Compatibility_t::STARS_DONT_SHOW},
             {"show-collected", Compatibility_t::STARS_SHOW_COLLECTED_ONLY},
             {"show", Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE}
