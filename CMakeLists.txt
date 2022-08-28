@@ -513,6 +513,7 @@ if(NINTENDO_3DS)
         src/3ds/mixer_platform.cpp
         src/control/input_3ds.cpp
         src/core/3ds/std_3ds.cpp
+#        src/core/minport/render_minport_shared.cpp
         src/core/3ds/render_3ds.cpp
         src/core/3ds/window_3ds.cpp
         src/core/3ds/msgbox_3ds.cpp
@@ -626,7 +627,7 @@ elseif(WII)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     target_include_directories(thextech PRIVATE "3rdparty/AudioCodecs/libgme/include/" SYSTEM)
 
-    if(1)
+    if(0)
         target_include_directories(thextech PRIVATE "/opt/devkitpro/portlibs/wii/include/" SYSTEM)
         target_link_libraries(thextech PRIVATE SDL2_mixer_ext)
         target_link_libraries(thextech PRIVATE SDL2)
