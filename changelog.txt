@@ -1,6 +1,6 @@
 TheXTech Changelog.
 
-Changelog for 1.3.6 [WIP]
+Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)
 -Added an ability to type cheats on touchscreen using special new cheats key (@Wohlstand, @ds-sloth)
 -Added native support for LunaDLL Autocode script language (@Wohlstand)
