@@ -1,6 +1,15 @@
 TheXTech Changelog.
 
-Changelog for 1.3.6 [WIP]
+Changelog for 1.3.7 [WIP]
+-Added support for different display resolutions (@ds-sloth)
+-Added compat setting to choose when NPCs activate, based on both the screen size and the episode's original screen size (@ds-sloth)
+-Added setting to make the HUD follow the player when the screen is larger than the episode's original screen size (@ds-sloth)
+-Fix vanilla peculiarity in which an event resetting section boundaries does not trigger the same checks as an event setting section boundaries. (@ds-sloth)
+-Added optional backdrop for levels smaller than the screen at graphics/ui/Backdrop.png (@ds-sloth)
+-Added alternative format for world map frame with better support for various display resolutions (@ds-sloth)
+-Added "fog-of-war" effect using a texture loaded from graphics/ui/WorldMapFog.png (@ds-sloth)
+
+Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)
 -Added an ability to type cheats on touchscreen using special new cheats key (@Wohlstand, @ds-sloth)
 -Added native support for LunaDLL Autocode script language (@Wohlstand)
@@ -10,6 +19,7 @@ Changelog for 1.3.6 [WIP]
 -Added ability to save multiple keyboard profiles (@ds-sloth)
 -New multiplayer start screen (@ds-sloth with design input from @0lhi)
 -Added controller disconnect recovery screen (@ds-sloth)
+-Ground pound by alt run is now a per-controller setting (@ds-sloth)
 -Added an ability to add/drop the second player from the pause menu (@ds-sloth)
 -Added the support for real-time audio effects such as reverb and SPC echo. They can be configured by sounds.ini for each level section (@Wohlstand)
 -Performance improvements for showing, hiding, and moving layers (@ds-sloth)
@@ -32,15 +42,7 @@ Changelog for 1.3.6 [WIP]
 -Added the individual sound for Ludwig for Koopa's death (@Wohlstand)
 -Added the individual sound for Larry Koopa's death and shell spinning after stomp (@Wohlstand)
 -Fixed an improper new (when specific compatibility option is not disabled) behaviour of the Skull Raft when the head segment impacts a wall but loses a floor at the same time, causing the following segments to suspend forever (@Wohlstand)
-
-Changelog for 1.3.7 [WIP]
--Added support for different display resolutions (@ds-sloth)
--Added compat setting to choose when NPCs activate, based on both the screen size and the episode's original screen size (@ds-sloth)
--Added setting to make the HUD follow the player when the screen is larger than the episode's original screen size (@ds-sloth)
--Fix vanilla peculiarity in which an event resetting section boundaries does not trigger the same checks as an event setting section boundaries. (@ds-sloth)
--Added optional backdrop for levels smaller than the screen at graphics/ui/Backdrop.png (@ds-sloth)
--Added alternative format for world map frame with better support for various display resolutions (@ds-sloth)
--Added "fog-of-war" effect using a texture loaded from graphics/ui/WorldMapFog.png (@ds-sloth)
+-Fixed the issue of a possible fall through the floor if walking point-blank to a block that had an extracted bonus and another solid block placed under it (does not happen if the "fix-player-downward-clip" option was disabled) (https://github.com/Wohlstand/TheXTech/issues/401) (@Wohlstand)
 
 Changes for 1.3.5.3-1
 -Fixed autostart events behaviour
