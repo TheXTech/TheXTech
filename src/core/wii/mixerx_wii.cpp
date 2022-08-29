@@ -70,10 +70,10 @@ bool MixPlatform_Init()
             pLogWarning("MixerX: Failed to initialize MP3 module");
     }
 
-    ret = Mix_OpenAudio(g_audioSetup.sampleRate,
-                        AUDIO_S16SYS,
-                        g_audioSetup.channels,
-                        g_audioSetup.bufferSize);
+    ret = Mix_OpenAudio(MIX_DEFAULT_FREQUENCY,
+                        MIX_DEFAULT_FORMAT,
+                        MIX_DEFAULT_CHANNELS,
+                        2048);
 
     if(ret < 0)
     {

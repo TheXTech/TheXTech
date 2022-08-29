@@ -531,8 +531,8 @@ if(WII)
         src/core/wii/window_wii.cpp
         src/core/wii/msgbox_wii.cpp
         src/core/wii/events_wii.cpp
-        src/core/wii/mixer_wii.cpp
-#        src/core/wii/mixerx_wii.cpp
+#        src/core/wii/mixer_wii.cpp
+        src/core/wii/mixerx_wii.cpp
     )
 endif()
 
@@ -627,7 +627,7 @@ elseif(WII)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     target_include_directories(thextech PRIVATE "3rdparty/AudioCodecs/libgme/include/" SYSTEM)
 
-    if(0)
+    if(1)
         target_include_directories(thextech PRIVATE "/opt/devkitpro/portlibs/wii/include/" SYSTEM)
         target_link_libraries(thextech PRIVATE SDL2_mixer_ext)
         target_link_libraries(thextech PRIVATE SDL2)
