@@ -10,6 +10,7 @@ Changelog for 1.3.6
 -Added ability to save multiple keyboard profiles (@ds-sloth)
 -New multiplayer start screen (@ds-sloth with design input from @0lhi)
 -Added controller disconnect recovery screen (@ds-sloth)
+-Ground pound by alt run is now a per-controller setting (@ds-sloth)
 -Added an ability to add/drop the second player from the pause menu (@ds-sloth)
 -Added the support for real-time audio effects such as reverb and SPC echo. They can be configured by sounds.ini for each level section (@Wohlstand)
 -Performance improvements for showing, hiding, and moving layers (@ds-sloth)
@@ -17,7 +18,7 @@ Changelog for 1.3.6
 -Performance improvements when run on slow filesystems (@ds-sloth)
 -Fixed unexpected music got started after the level got entered too quick from the world map (@Wohlstand)
 -Fixed the vanilla bug: a Player can stuck in the pipe when enters it being a fairy (@Wohlstand)
--Added an option to enable the fast walking on the world map (@ds-sloth, (@Wohlstand)
+-Added an option to enable the fast walking on the world map (@ds-sloth, @Wohlstand)
 -Added an ability to customize UI/common assets from the episode and level sides (@Wohlstand)
 -Added a blink effect at speedrun timer on level/episode completion (@Wohlstand)
 -Added an in-game editor based on the original game's editor code (requires EditorIcons.png asset) (@ds-sloth)
@@ -26,13 +27,13 @@ Changelog for 1.3.6
 -Fixed the lock/star sign behavior at locked two-way warps: now they work correctly at the opposite side (@Wohlstand)
 -Added an ability to set a different path for the user directory by command line argument (@Wohlstand)
 -Blocked an ability to start the game with no episodes or battle levels available in the list and prevented several issues with this (@Wohlstand)
--Disabled 2x texture scale down optimization by default
--Added the ability to have multiple intro levels per assets pack (if introset directory exists and it contains at least one level file, they will be selected randomly every time when main menu opens)
--Added game selection menu into Android launcher: every browsed assets directory will be remembered and can be accessed quickly using the new menu
--Added the individual sound for Ludwig for Koopa's death
--Added the individual sound for Larry Koopa's death and shell spinning after stomp
--Fixed an improper new (when specific compatibility option is not disabled) behaviour of the Skull Raft when the head segment impacts a wall but loses a floor at the same time, causing the following segments to suspend forever
--Fixed the issue of a possible fall through the floor if walking point-blank to a block that had an extracted bonus and another solid block placed under it (does not happen if the "fix-player-downward-clip" option was disabled) (https://github.com/Wohlstand/TheXTech/issues/401)
+-Added option to disable or always perform 2x texture scale down optimization (@ds-sloth)
+-Added the ability to have multiple intro levels per assets pack (if introset directory exists and it contains at least one level file, they will be selected randomly every time when main menu opens) (@Wohlstand)
+-Added game selection menu into Android launcher: every browsed assets directory will be remembered and can be accessed quickly using the new menu (@Wohlstand)
+-Added the individual sound for Ludwig for Koopa's death (@Wohlstand)
+-Added the individual sound for Larry Koopa's death and shell spinning after stomp (@Wohlstand)
+-Fixed an improper new (when specific compatibility option is not disabled) behaviour of the Skull Raft when the head segment impacts a wall but loses a floor at the same time, causing the following segments to suspend forever (@Wohlstand)
+-Fixed the issue of a possible fall through the floor if walking point-blank to a block that had an extracted bonus and another solid block placed under it (does not happen if the "fix-player-downward-clip" option was disabled) (https://github.com/Wohlstand/TheXTech/issues/401) (@Wohlstand)
 
 Changes for 1.3.5.3-1
 -Fixed autostart events behaviour
