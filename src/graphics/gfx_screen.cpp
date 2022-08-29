@@ -149,7 +149,7 @@ void DynamicScreen()
         GetvScreenAverage();
     else
     {
-        int l, t;
+        double l, t;
         GetvScreenAverageCanonical(&l, &t);
         vScreenX[1] = l;
         vScreenY[1] = t;
@@ -185,7 +185,7 @@ void DynamicScreen()
                 vScreen[1].Left = 0;
                 vScreen[1].Top = 0;
 
-                int l, t;
+                double l, t;
                 if(g_compatibility.free_level_res)
                 {
                     GetvScreenAverage2();
@@ -219,7 +219,7 @@ void DynamicScreen()
                 vScreen[2].Left = 0;
                 vScreen[2].Top = 0;
 
-                int l, t;
+                double l, t;
                 if(g_compatibility.free_level_res)
                 {
                     GetvScreenAverage2();
@@ -253,7 +253,7 @@ void DynamicScreen()
                 vScreen[2].Left = 0;
                 vScreen[2].Top = 0;
 
-                int l, t;
+                double l, t;
                 if(g_compatibility.free_level_res)
                 {
                     GetvScreenAverage2();
@@ -287,7 +287,7 @@ void DynamicScreen()
                 vScreen[2].Left = 0;
                 vScreen[2].Top = ScreenH / 2.0;
 
-                int l, t;
+                double l, t;
                 if(g_compatibility.free_level_res)
                 {
                     GetvScreenAverage2();

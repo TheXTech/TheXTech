@@ -541,7 +541,7 @@ void UpdateGraphics(bool skipRepaint)
         else
             S = Player[Z].Section;
 
-        int X, Y;
+        double X, Y;
 
         // update vScreen location
         if(!LevelEditor)

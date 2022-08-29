@@ -905,7 +905,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                     use_new_resize = false;
 
                                 // (3) qScreen should not have occurred in old game
-                                int cx, cy, old_cx, old_cy;
+                                double cx, cy, old_cx, old_cy;
 
                                 GetvScreenCanonical(1, &cx, &cy);
 

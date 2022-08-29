@@ -263,7 +263,7 @@ void GetvScreen(const int A)
 }
 
 // NEW: get the vScreen position if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenCanonical(int A, int* left, int* top)
+void GetvScreenCanonical(int A, double* left, double* top)
 {
     auto &p = Player[A];
     auto &pLoc = p.Location;
@@ -373,7 +373,7 @@ void GetvScreenAverage()
 }
 
 // NEW: get the average screen position for all players if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenAverageCanonical(int* left, int* top)
+void GetvScreenAverageCanonical(double* left, double* top)
 {
     int A = 0;
     int B = 0;
@@ -453,7 +453,7 @@ void GetvScreenAverage2()
 }
 
 // NEW: Get the average screen position for all players with no level edge detection if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenAverage2Canonical(int* left, int* top)
+void GetvScreenAverage2Canonical(double* left, double* top)
 {
     // int A = 0;
     int B = 0;

@@ -76,11 +76,11 @@ bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3)
 bool vScreenCollision(int A, const Location_t &Loc2);
 
 // NEW: vScreen collisions assuming 800xH
-bool vScreenCollisionCanonicalX(int A, int left, int top, const Location_t &Loc2);
+bool vScreenCollisionCanonicalX(int A, double left, double top, const Location_t &Loc2);
 // NEW: vScreen collisions assuming Wx600
-bool vScreenCollisionCanonicalY(int A, int left, int top, const Location_t &Loc2);
+bool vScreenCollisionCanonicalY(int A, double left, double top, const Location_t &Loc2);
 // NEW: vScreen collisions assuming 800x600
-bool vScreenCollisionCanonical(int left, int top, const Location_t &Loc2);
+bool vScreenCollisionCanonical(double left, double top, const Location_t &Loc2);
 
 
 // Public Function vScreenCollision2(A As Integer, Loc2 As Location) As Boolean  'vScreen collisions 2

@@ -95,7 +95,7 @@ void DropBonus(int A)
 
                 if(g_config.hud_follows_player)
                 {
-                    int l, t;
+                    double l, t;
                     GetvScreenAverageCanonical(&l, &t);
                     if(vScreen[1].Height > 600)
                         ScreenTop = -t;
@@ -123,7 +123,7 @@ void DropBonus(int A)
 
                 if(g_config.hud_follows_player)
                 {
-                    int l, t;
+                    double l, t;
                     GetvScreenCanonical(A, &l, &t);
                     if(vScreen[A].Height > 600)
                         ScreenTop = -t;

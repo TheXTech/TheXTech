@@ -37,7 +37,7 @@ void DrawInterface(int Z, int numScreens)
     // cross-ref DropBonus in npc_bonus.cpp
     if(g_config.hud_follows_player)
     {
-        int l, t;
+        double l, t;
         if(ScreenType == 5 && !vScreen[2].Visible)
             GetvScreenAverageCanonical(&l, &t);
         else
