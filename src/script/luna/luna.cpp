@@ -83,7 +83,12 @@ void lunaLoad()
     bool dcAllow = (gEnableDemoCounter || g_compatibility.demos_counter_enable);
 
     if(dcAllow && isGame)
+    {
         gDeathCounter.init();
+        gDemoCounterTitle = gDemoCounterTitleDefault;
+        if(g_compatibility.demos_counter_title[0])
+            gDemoCounterTitle = std::string(g_compatibility.demos_counter_title);
+    }
 
     if(!LevelEditor && gLunaEnabled && lunaAllowed())
     {

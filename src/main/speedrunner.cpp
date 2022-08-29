@@ -266,9 +266,6 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
 
 void speedRun_renderControls(int player, int screenZ)
 {
-    if(g_speedRunnerMode == SPEEDRUN_MODE_OFF && !g_drawController)
-        return; // Do nothing
-
     if(GameMenu || GameOutro || BattleMode)
         return; // Don't draw things at Menu and Outro
 
@@ -325,7 +322,19 @@ void speedRun_renderControls(int player, int screenZ)
 #endif
     }
 
-    RenderControls(player, x, y, w, h);
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController)
+    {
+        // render controls if enabled
+        RenderControls(player, x, y, w, h);
+    }
+    else
+    {
+        // reposition battery correctly
+        if(x < bx)
+            bx = x;
+        else
+            bx = x + w - bw;
+    }
 
     RenderControllerBattery(player, bx, by, bw, bh);
 }
