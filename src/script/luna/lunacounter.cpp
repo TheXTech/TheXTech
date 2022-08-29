@@ -30,6 +30,7 @@
 #include "renderop_string.h"
 #include "globals.h"
 #include "graphics.h"
+#include "config.h"
 #include "game_main.h"
 #include "core/render.h"
 #include "main/menu_main.h"
@@ -344,22 +345,42 @@ void DeathCounter::Draw(int screenZ) const
     std::string printstr = fmt::format_ne("{0} / {1}", mCurLevelDeaths, mCurTotalDeaths);
     auto minusoffset = (float)(123 - (printstr.size() * 8));
 
+    int ScreenTop = 0;
+    if(vScreen[screenZ].Height > 600)
+        ScreenTop = vScreen[screenZ].Height / 2 - 300;
+    int HUDLeft = vScreen[screenZ].Width / 2 - 400;
+
+    // code to make the HUD follow the player (useful for huge resolutions)
+    // cross-ref DropBonus in npc_bonus.cpp
+    if(g_config.hud_follows_player)
+    {
+        double l, t;
+        if(ScreenType == 5 && !vScreen[2].Visible)
+            GetvScreenAverageCanonical(&l, &t);
+        else
+            GetvScreenCanonical(screenZ, &l, &t);
+        if(vScreen[screenZ].Height > 600)
+            ScreenTop = -t + vScreenY[screenZ];
+        if(vScreen[screenZ].Width > 800)
+            HUDLeft = -l + vScreenX[screenZ];
+    }
+
     XRender::offsetViewportIgnore(true);
     // Print to screen in upper left
     if(vScreen[screenZ].Width >= 800)
     {
-        SuperPrint(gDemoCounterTitle, 3, 80, 27);
-        SuperPrint(printstr, 3, minusoffset, 48);
+        SuperPrint(gDemoCounterTitle, 3, HUDLeft + 80, ScreenTop + 26);
+        SuperPrint(printstr, 3, HUDLeft + minusoffset, ScreenTop + 48);
     }
     else if(vScreen[screenZ].Width >= 700)
     {
-        SuperPrint(gDemoCounterTitle, 3, 10, 27);
-        SuperPrint(printstr, 3, minusoffset - 70, 48);
+        SuperPrint(gDemoCounterTitle, 3, 10, ScreenTop + 26);
+        SuperPrint(printstr, 3, minusoffset - 70, ScreenTop + 48);
     }
     else
     {
-        SuperPrint(gDemoCounterTitle, 3, 50, 3);
-        SuperPrint(printstr, 3, 50 + gDemoCounterTitle.length() * 18 + 24, 3);
+        SuperPrint(gDemoCounterTitle, 3, 50, ScreenTop + 4);
+        SuperPrint(printstr, 3, 50 + gDemoCounterTitle.length() * 18 + 24, ScreenTop + 4);
     }
     XRender::offsetViewportIgnore(false);
 }
