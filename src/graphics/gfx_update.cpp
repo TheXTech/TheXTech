@@ -560,6 +560,10 @@ void UpdateGraphics(bool skipRepaint)
         if(!Do_FrameSkip && qScreen)
             continue_qScreen |= Update_qScreen(Z);
 
+        // the original code was badly written and made THIS happen (always exactly one frame of qScreen)
+        if(Z == 2 && !g_compatibility.modern_section_change)
+            continue_qScreen = false;
+
         if(!LevelEditor)
         {
             if(ScreenType == 2 || ScreenType == 3)
