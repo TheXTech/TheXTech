@@ -1,23 +1,18 @@
 <resources>
-    <string-array name="touchscreenControllerTypes">
-        <item>Всегда включать</item>
-        <item>Выключить при наличии аппаратной клавиатуры</item>
-        <item>Всегда выключать</item>
-    </string-array>
-    <string-array name="speedRunModes">
-        <item>Отключить</item>
-        <item>Режим 1 (Штатный функционал TheXTech)</item>
-        <item>Режим 2 (Отключить функции, дающие преимущество во времени)</item>
-        <item>Режим 3 (Строгое следование SMBX 1.3, все баги будут включены)</item>
-    </string-array>
-    <string-array name="touchPadStyles">
-        <item>Внутри-игровые действия</item>
-        <item>Стиль Nintendo/Xbox (A/B/X/Y)</item>
-        <item>Стиль PlayStation (X/O/D/A)</item>
-    </string-array>
-    <string-array name="batteryStatusShow">
-        <item>Скрывать</item>
-        <item>Показывать при слабом заряде</item>
-        <item>Показывать всегда</item>
-    </string-array>
+    <string name="touchscreenControllerType0">Всегда включать</string>
+    <string name="touchscreenControllerType1">Выключить при наличии аппаратной клавиатуры</string>
+    <string name="touchscreenControllerType2">Всегда выключать</string>
+
+    <string name="speedRunMode0">Отключить</string>
+    <string name="speedRunMode1">Режим 1 (Штатный функционал TheXTech)</string>
+    <string name="speedRunMode2">Режим 2 (Отключить функции, дающие преимущество во времени)</string>
+    <string name="speedRunMode3">Режим 3 (Строгое следование SMBX 1.3, все баги будут включены)</string>
+
+    <string name="touchPadStyle0">Внутри-игровые действия</string>
+    <string name="touchPadStyle1">Стиль Nintendo/Xbox (A/B/X/Y)</string>
+    <string name="touchPadStyle2">Стиль PlayStation (X/O/D/A)</string>
+
+    <string name="batteryStatusShow0">Скрывать</string>
+    <string name="batteryStatusShow1">Показывать при слабом заряде</string>
+    <string name="batteryStatusShow2">Показывать всегда</string>
 </resources>
