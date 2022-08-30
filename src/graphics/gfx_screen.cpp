@@ -150,7 +150,7 @@ void DynamicScreen()
     else
     {
         double l, t;
-        GetvScreenAverageCanonical(&l, &t);
+        GetvScreenAverageCanonical(&l, &t, true);
         vScreenX[1] = l;
         vScreenY[1] = t;
     }
@@ -193,7 +193,7 @@ void DynamicScreen()
                 }
                 else
                 {
-                    GetvScreenAverage2Canonical(&l, &t);
+                    GetvScreenAverage2Canonical(&l, &t, true);
                 }
 
                 for(A = 1; A <= 2; A++)
@@ -227,7 +227,7 @@ void DynamicScreen()
                 }
                 else
                 {
-                    GetvScreenAverage2Canonical(&l, &t);
+                    GetvScreenAverage2Canonical(&l, &t, true);
                 }
 
                 for(A = 1; A <= 2; A++)
@@ -261,7 +261,7 @@ void DynamicScreen()
                 }
                 else
                 {
-                    GetvScreenAverage2Canonical(&l, &t);
+                    GetvScreenAverage2Canonical(&l, &t, true);
                 }
 
                 for(A = 1; A <= 2; A++)
@@ -295,7 +295,7 @@ void DynamicScreen()
                 }
                 else
                 {
-                    GetvScreenAverage2Canonical(&l, &t);
+                    GetvScreenAverage2Canonical(&l, &t, true);
                 }
 
                 for(A = 1; A <= 2; A++)
@@ -520,6 +520,9 @@ void CenterScreens()
 // NEW: moves qScreen towards vScreen, now including the screen size
 bool Update_qScreen(int Z)
 {
+    if(Z == 2 && !g_compatibility.modern_section_change)
+        return false;
+
     bool continue_qScreen = true;
 
     // take the slower option of 2px per second camera (vanilla)
@@ -534,6 +537,13 @@ bool Update_qScreen(int Z)
     double camFramesY = std::abs(vScreenY[Z] - qScreenY[Z])/camRateY;
     double resizeFramesX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft)/resizeRateX;
     double resizeFramesY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop)/resizeRateY;
+
+    if(!g_compatibility.modern_section_change)
+    {
+        resizeFramesX = 0;
+        resizeFramesY = 0;
+    }
+
     double qFramesX = (camFramesX > resizeFramesX ? camFramesX : resizeFramesX);
     double qFramesY = (camFramesY > resizeFramesY ? camFramesY : resizeFramesY);
 
@@ -599,10 +609,13 @@ bool Update_qScreen(int Z)
     vScreenY[Z] = qScreenY[Z];
 
     // for now -- eventually may want to set width/height another way
-    vScreen[Z].Width -= 2*(std::floor(qScreenLoc[Z].ScreenLeft) - vScreen[Z].ScreenLeft);
-    vScreen[Z].Height -= 2*(std::floor(qScreenLoc[Z].ScreenTop) - vScreen[Z].ScreenTop);
-    vScreen[Z].ScreenLeft = std::floor(qScreenLoc[Z].ScreenLeft);
-    vScreen[Z].ScreenTop = std::floor(qScreenLoc[Z].ScreenTop);
+    if(g_compatibility.modern_section_change)
+    {
+        vScreen[Z].Width -= 2*(std::floor(qScreenLoc[Z].ScreenLeft) - vScreen[Z].ScreenLeft);
+        vScreen[Z].Height -= 2*(std::floor(qScreenLoc[Z].ScreenTop) - vScreen[Z].ScreenTop);
+        vScreen[Z].ScreenLeft = std::floor(qScreenLoc[Z].ScreenLeft);
+        vScreen[Z].ScreenTop = std::floor(qScreenLoc[Z].ScreenTop);
+    }
 
     return continue_qScreen;
 }

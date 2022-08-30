@@ -263,7 +263,7 @@ void GetvScreen(const int A)
 }
 
 // NEW: get the vScreen position if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenCanonical(int A, double* left, double* top)
+void GetvScreenCanonical(int A, double* left, double* top, bool ignore_qScreen)
 {
     auto &p = Player[A];
     auto &pLoc = p.Location;
@@ -283,7 +283,7 @@ void GetvScreenCanonical(int A, double* left, double* top)
     else if(-(*top) + 600 > level[p.Section].Height)
         *top = -(level[p.Section].Height - 600);
 
-    if(qScreen)
+    if(qScreen && !ignore_qScreen)
     {
         double tX = vScreenX[A];
         double tY = vScreenY[A];
@@ -384,7 +384,7 @@ void GetvScreenAverage()
 }
 
 // NEW: get the average screen position for all players if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenAverageCanonical(double* left, double* top)
+void GetvScreenAverageCanonical(double* left, double* top, bool ignore_qScreen)
 {
     int A = 0;
     int B = 0;
@@ -427,7 +427,7 @@ void GetvScreenAverageCanonical(double* left, double* top)
     else if(-(*top) + 600 > level[Player[1].Section].Height)
         *top = -(level[Player[1].Section].Height - 600);
 
-    if(qScreen)
+    if(qScreen && !ignore_qScreen)
     {
         double tX = vScreenX[1];
         double tY = vScreenY[1];
@@ -475,7 +475,7 @@ void GetvScreenAverage2()
 }
 
 // NEW: Get the average screen position for all players with no level edge detection if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenAverage2Canonical(double* left, double* top)
+void GetvScreenAverage2Canonical(double* left, double* top, bool ignore_qScreen)
 {
     // int A = 0;
     int B = 0;
@@ -507,7 +507,7 @@ void GetvScreenAverage2Canonical(double* left, double* top)
     *left = (l / B) + (800 * 0.5);
     *top = (t / B) + (600 * 0.5) - vScreenYOffset;
 
-    if(qScreen)
+    if(qScreen && !ignore_qScreen)
     {
         double tX = vScreenX[1];
         double tY = vScreenY[1];
