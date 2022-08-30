@@ -554,7 +554,14 @@ void UpdateGraphics(bool skipRepaint)
                 GetvScreenCredits();
             else
                 GetvScreen(Z);
+        }
 
+        // moved to `graphics/gfx_screen.cpp`
+        if(!Do_FrameSkip && qScreen)
+            continue_qScreen |= Update_qScreen(Z);
+
+        if(!LevelEditor)
+        {
             if(ScreenType == 2 || ScreenType == 3)
                 GetvScreenAverageCanonical(&X, &Y);
             else if(ScreenType == 5 && !vScreen[2].Visible)
@@ -564,10 +571,6 @@ void UpdateGraphics(bool skipRepaint)
             else
                 GetvScreenCanonical(Z, &X, &Y);
         }
-
-        // moved to `graphics/gfx_screen.cpp`
-        if(!Do_FrameSkip && qScreen)
-            continue_qScreen |= Update_qScreen(Z);
 
         // noturningback
         if(!LevelEditor && NoTurnBack[Player[Z].Section])

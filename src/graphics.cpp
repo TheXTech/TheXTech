@@ -282,6 +282,17 @@ void GetvScreenCanonical(int A, double* left, double* top)
         *top = -level[p.Section].Y;
     else if(-(*top) + 600 > level[p.Section].Height)
         *top = -(level[p.Section].Height - 600);
+
+    if(qScreen)
+    {
+        double tX = vScreenX[A];
+        double tY = vScreenY[A];
+        GetvScreen(A);
+        *left += tX - vScreenX[A];
+        *top += tY - vScreenY[A];
+        vScreenX[A] = tX;
+        vScreenY[A] = tY;
+    }
 }
 
 // Get the average screen position for all players
@@ -415,6 +426,17 @@ void GetvScreenAverageCanonical(double* left, double* top)
         *top = -level[Player[1].Section].Y;
     else if(-(*top) + 600 > level[Player[1].Section].Height)
         *top = -(level[Player[1].Section].Height - 600);
+
+    if(qScreen)
+    {
+        double tX = vScreenX[1];
+        double tY = vScreenY[1];
+        GetvScreenAverage();
+        *left += tX - vScreenX[1];
+        *top += tY - vScreenY[1];
+        vScreenX[1] = tX;
+        vScreenY[1] = tY;
+    }
 }
 
 // Get the average screen position for all players with no level edge detection
@@ -484,6 +506,17 @@ void GetvScreenAverage2Canonical(double* left, double* top)
 
     *left = (l / B) + (800 * 0.5);
     *top = (t / B) + (600 * 0.5) - vScreenYOffset;
+
+    if(qScreen)
+    {
+        double tX = vScreenX[1];
+        double tY = vScreenY[1];
+        GetvScreenAverage2();
+        *left += tX - vScreenX[1];
+        *top += tY - vScreenY[1];
+        vScreenX[1] = tX;
+        vScreenY[1] = tY;
+    }
 }
 
 void SetupGraphics()
