@@ -1,14 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="touchscreenControllerType0">总是启用</string>
-    <string name="touchscreenControllerType1">当没插实体键盘时启用</string>
+    <string name="touchscreenControllerType0">启用</string>
+    <string name="touchscreenControllerType1">仅在未连接实体键盘时启用</string>
     <string name="touchscreenControllerType2">禁用</string>
-
     <string name="speedRunMode0">关闭</string>
-    <string name="speedRunMode1">模式 1 (TheXTech 原始模式，修复所有bug)</string>
-    <string name="speedRunMode2">模式 2 (包含 SMBX 2.0的bug)</string>
-    <string name="speedRunMode3">模式 3 (不使用bug修复，包含所有bug)</string>
-
-    <string name="touchPadStyle0">显示游戏动作</string>
-    <string name="touchPadStyle1">字母形式 (A/B/X/Y)</string>
-    <string name="touchPadStyle2">图形形式 (X/O/D/A)</string>
+    <string name="speedRunMode1">模式 1 (原始 TheXTech)</string>
+    <string name="speedRunMode2">模式 2 (禁用计时过关特性)</string>
+    <string name="speedRunMode3">模式 3 (SMBX 1.3，启用所有 Bug)</string>
+    <string name="touchPadStyle0">游戏内动作</string>
+    <string name="touchPadStyle1">字母风格 (A/B/X/Y)</string>
+    <string name="touchPadStyle2">PS 风格 (X/O/D/A)</string>
+    <string name="batteryStatusShow0">不显示</string>
+    <string name="batteryStatusShow2">显示</string>
+    <string name="batteryStatusShow1">在电池电量低时显示</string>
 </resources>
