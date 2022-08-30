@@ -1,23 +1,14 @@
 <resources>
-    <string-array name="touchscreenControllerTypes">
-        <item>总是启用</item>
-        <item>当没插实体键盘时启用</item>
-        <item>禁用</item>
-    </string-array>
-    <string-array name="speedRunModes">
-        <item>关闭</item>
-        <item>模式 1 (TheXTech 原始模式，修复所有bug)</item>
-        <item>模式 2 (包含 SMBX 2.0的bug)</item>
-        <item>模式 3 (不使用bug修复，包含所有bug)</item>
-    </string-array>
-    <string-array name="touchPadStyles">
-        <item>显示游戏动作</item>
-        <item>字母形式 (A/B/X/Y)</item>
-        <item>图形形式 (X/O/D/A)</item>
-    </string-array>
-    <string-array name="batteryStatusShow">
-        <item>[X]Never show</item>
-        <item>[X]Show when low battery</item>
-        <item>[X]Show always</item>
-    </string-array>
+    <string name="touchscreenControllerType0">总是启用</string>
+    <string name="touchscreenControllerType1">当没插实体键盘时启用</string>
+    <string name="touchscreenControllerType2">禁用</string>
+
+    <string name="speedRunMode0">关闭</string>
+    <string name="speedRunMode1">模式 1 (TheXTech 原始模式，修复所有bug)</string>
+    <string name="speedRunMode2">模式 2 (包含 SMBX 2.0的bug)</string>
+    <string name="speedRunMode3">模式 3 (不使用bug修复，包含所有bug)</string>
+
+    <string name="touchPadStyle0">显示游戏动作</string>
+    <string name="touchPadStyle1">字母形式 (A/B/X/Y)</string>
+    <string name="touchPadStyle2">图形形式 (X/O/D/A)</string>
 </resources>
