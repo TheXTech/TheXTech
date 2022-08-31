@@ -979,17 +979,28 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             screenLoc = vScreen[C];
                             SoundPause[13] = 10;
 
+                            DynamicScreen();
+
                             // the original game forces vScreenAverage to be 800x600 -- this creates the same effect of ignoring the dynamic screen
-                            // DynamicScreen();
-                            SetupScreens(false);
+                            bool screen2_vis = vScreen[2].Visible;
+
+                            // this will reset vScreen[2].Visible
+                            // needed for CenterScreens() to do the right thing,
+                            // but have to set it back so DynamicScreen() does the right thing next frame
+                            SetupScreens(true);
                             CenterScreens();
+                            vScreen[2].Visible = screen2_vis;
+
+                            // calculate the vScreen at non-splitscreen resolution (as the original game does)
                             GetvScreenAverage();
 
+                            // enable qScreen!
                             qScreen = true;
                             qScreenX[1] = vScreenX[1];
                             qScreenY[1] = vScreenY[1];
                             qScreenLoc[1] = screenLoc;
 
+                            // pan to indicate warped player
                             if(int(screenLoc.Width) == 400)
                             {
                                 if(qScreenX[1] < tX + screenLoc.Left)
@@ -1014,9 +1025,6 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                 qScreenY[1] = -level[Player[C].Section].Y;
                             if(-qScreenY[1] + vScreen[1].Height > level[Player[C].Section].Height)
                                 qScreenY[1] = -(level[Player[C].Section].Height - vScreen[1].Height);
-
-                            // now, need dynamic screen to be set to ignore the resulting qScreen
-                            DynamicScreen();
 
                             level[B] = s.position;
                         }
