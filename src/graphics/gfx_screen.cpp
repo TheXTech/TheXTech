@@ -56,7 +56,7 @@ void SetScreenType()
 }
 
 // Sets up the split lines
-void SetupScreens()
+void SetupScreens(bool reset)
 {
     SetScreenType();
 
@@ -108,7 +108,9 @@ void SetupScreens()
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
         vScreen[1].Top = 0;
-        vScreen[2].Visible = false;
+
+        if(reset)
+            vScreen[2].Visible = false;
         break;
     case 6: // VScreen Coop
         vScreen[1].Height = ScreenH;

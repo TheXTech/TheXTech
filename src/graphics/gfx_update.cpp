@@ -353,7 +353,7 @@ inline void get_NPC_tint(int A, float& cn, float& an)
 void GraphicsLazyPreLoad()
 {
     // TODO: check if this is needed at caller
-    SetupScreens();
+    SetupScreens(false);
 
     int numScreens = 1;
 
@@ -506,7 +506,7 @@ void UpdateGraphics(bool skipRepaint)
     // (This code is a combination of the FrameSkip logic from before with the
     //   logic components of the full rendering code.)
     // NPC render queue formation is also here.
-    SetupScreens();
+    SetupScreens(false);
     int numScreens = 1;
     if(ScreenType == 1)
         numScreens = 2;

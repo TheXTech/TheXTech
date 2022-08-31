@@ -831,7 +831,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             SoundPause[13] = 10;
 
                             // need two cycles to fully update the dynamic screens in the new level
-                            SetupScreens();
+                            SetupScreens(false);
                             DynamicScreen();
                             CenterScreens();
                             if(vScreen[2].Visible)
@@ -843,7 +843,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                 GetvScreenAverage();
 
                             // set up the dynamic screens in the new level
-                            SetupScreens();
+                            SetupScreens(false);
                             DynamicScreen();
 
                             // set the positions (including screen positions) in the old level
@@ -934,7 +934,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             // (2) new screen size should equal old
 
-                            SetupScreens();
+                            SetupScreens(false);
                             CenterScreens();
 
                             if(vScreen[1].Width != old_w || vScreen[1].Height != old_h)
@@ -981,7 +981,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             // the original game forces vScreenAverage to be 800x600 -- this creates the same effect of ignoring the dynamic screen
                             // DynamicScreen();
-                            SetupScreens();
+                            SetupScreens(false);
                             CenterScreens();
                             GetvScreenAverage();
 
@@ -1015,7 +1015,9 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             if(-qScreenY[1] + vScreen[1].Height > level[Player[C].Section].Height)
                                 qScreenY[1] = -(level[Player[C].Section].Height - vScreen[1].Height);
 
-                            printf("Decided on %f %f\n", qScreenX[1], qScreenY[1]);
+                            // now, need dynamic screen to be set to ignore the resulting qScreen
+                            DynamicScreen();
+
                             level[B] = s.position;
                         }
                         else
@@ -1024,8 +1026,6 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             qScreenX[1] = vScreenX[1];
                             qScreenY[1] = vScreenY[1];
                             qScreenLoc[1] = vScreen[1];
-
-                            printf("Set up qScreen with %f %f\n", qScreenX[1], qScreenY[1]);
                         }
 
                         resetFrameTimer();

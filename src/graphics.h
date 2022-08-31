@@ -72,7 +72,7 @@ void SetupGraphics();
 //! DUMMY AND USELESS
 void SetupEditorGraphics();
 // Public Sub SetupScreens()
-void SetupScreens();
+void SetupScreens(bool reset = true);
 // Public Sub DynamicScreen() 'for the split screen stuff
 // for the split screen stuff
 void DynamicScreen();
