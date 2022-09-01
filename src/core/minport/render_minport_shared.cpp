@@ -56,6 +56,11 @@ int g_screen_phys_y = 0;
 int g_screen_phys_w = 0;
 int g_screen_phys_h = 0;
 
+StdPicture* g_render_chain_head = nullptr;
+StdPicture* g_render_chain_tail = nullptr;
+
+uint32_t g_current_frame = 0;
+
 void updateViewport()
 {
     resetViewport();
@@ -268,6 +273,121 @@ void renderCircleHole(int cx, int cy,
     } while(dy + line_size <= radius);
 }
 
+// texture chain methods
+
+// increment the frame counter, and unload all textures not rendered since g_always_unload_after
+void minport_initFrame()
+{
+    g_current_frame++;
+
+    int num_unloaded = 0;
+
+    while(g_render_chain_tail && g_current_frame - g_render_chain_tail->l.last_draw_frame > g_always_unload_after)
+    {
+        StdPicture* last_tail = g_render_chain_tail;
+
+        // will internally invoke deleteTexture, which invokes minport_unlinkTexture if written properly
+        lazyUnLoad(*g_render_chain_tail);
+
+        if(g_render_chain_tail == last_tail)
+        {
+            pLogCritical("Failed to unlink texture during lazyUnLoad! Manually unlinking texture. VRAM may be leaked.");
+            minport_unlinkTexture(g_render_chain_tail);
+        }
+
+        num_unloaded++;
+    }
+
+    if(num_unloaded > 0)
+    {
+        pLogDebug("Unloaded %d stale textures at frame start", num_unloaded);
+    }
+}
+
+// removes a texture from the render chain
+void minport_unlinkTexture(StdPicture* tx)
+{
+    // redirect the tail and head
+    if(tx == g_render_chain_tail)
+        g_render_chain_tail = tx->l.next_texture;
+
+    if(tx == g_render_chain_head)
+        g_render_chain_head = tx->l.last_texture;
+
+    // unlink from its context
+    if(tx->l.last_texture)
+    {
+        tx->l.last_texture->l.next_texture = tx->l.next_texture;
+        tx->l.last_texture = nullptr;
+    }
+
+    if(tx->l.next_texture)
+    {
+        tx->l.next_texture->l.last_texture = tx->l.last_texture;
+        tx->l.next_texture = nullptr;
+    }
+}
+
+// unload all textures not rendered since g_never_unload_before
+void minport_freeTextureMemory()
+{
+    int num_unloaded = 0;
+
+    while(g_render_chain_tail && g_current_frame - g_render_chain_tail->l.last_draw_frame > g_never_unload_before)
+    {
+        StdPicture* last_tail = g_render_chain_tail;
+
+        // will internally invoke deleteTexture, which invokes minport_unlinkTexture if written properly
+        lazyUnLoad(*g_render_chain_tail);
+
+        if(g_render_chain_tail == last_tail)
+        {
+            pLogCritical("Failed to unlink texture during lazyUnLoad! Manually unlinking texture. VRAM may be leaked.");
+            minport_unlinkTexture(g_render_chain_tail);
+        }
+
+        num_unloaded++;
+    }
+
+    pLogDebug("Unloaded %d stale textures at free texture memory request", num_unloaded);
+}
+
+// intermediate draw method
+
+inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
+                             StdPicture &tx,
+                             int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
+                             float rotateAngle, FPoint_t *center, unsigned int flip,
+                             float red, float green, float blue, float alpha)
+{
+    minport_RenderTexturePrivate(xDst, yDst, wDst, hDst,
+                             tx,
+                             xSrc, ySrc, wSrc, hSrc,
+                             rotateAngle, center, flip,
+                             red, green, blue, alpha);
+
+    if(tx.inited && tx.l.lazyLoaded && &tx != g_render_chain_head)
+    {
+        tx.l.last_draw_frame = g_current_frame;
+
+        // unlink
+        minport_unlinkTexture(&tx);
+
+        // insert at head
+        if(g_render_chain_head)
+        {
+            g_render_chain_head->l.next_texture = &tx;
+            tx.l.last_texture = g_render_chain_head;
+        }
+        else
+        {
+            g_render_chain_tail = &tx;
+        }
+
+        g_render_chain_head = &tx;
+    }
+}
+
 // public draw methods
 
 void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
@@ -277,7 +397,7 @@ void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
 {
     auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
 
-    minport_RenderTexturePrivate(
+    minport_RenderTexturePrivate_2(
         div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
         tx,
         xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
@@ -294,7 +414,7 @@ void renderTexture(double xDst, double yDst, double wDst, double hDst,
     auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
     auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
 
-    minport_RenderTexturePrivate(
+    minport_RenderTexturePrivate_2(
         div_x, div_y, div_w, div_h,
         tx,
         ROUNDDIV2(xSrc), ROUNDDIV2(ySrc), div_w, div_h,
@@ -308,7 +428,7 @@ void renderTexture(float xDst, float yDst, StdPicture &tx,
     int w = tx.w / 2;
     int h = tx.h / 2;
 
-    minport_RenderTexturePrivate(
+    minport_RenderTexturePrivate_2(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
         tx,
         0, 0, w, h,
@@ -321,7 +441,7 @@ void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, f
     int w = tx.w / 2;
     int h = tx.h / 2;
 
-    minport_RenderTexturePrivate(
+    minport_RenderTexturePrivate_2(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
         tx,
         0.0f, 0.0f, w, h,
@@ -335,7 +455,7 @@ void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, 
     auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
     auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
 
-    minport_RenderTexturePrivate(
+    minport_RenderTexturePrivate_2(
         div_x, div_y, div_w, div_h,
         tx,
         0.0f, 0.0f, tx.w / 2, tx.h / 2,
@@ -353,7 +473,7 @@ void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
     auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
     auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
 
-    minport_RenderTexturePrivate(
+    minport_RenderTexturePrivate_2(
         div_x, div_y, div_w, div_h,
         tx,
         ROUNDDIV2(xSrc), ROUNDDIV2(ySrc), div_w, div_h,
@@ -376,7 +496,7 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
     auto div_sw = ROUNDDIV2(xSrc + wSrc) - div_sx;
     auto div_sh = ROUNDDIV2(ySrc + hSrc) - div_sy;
 
-    minport_RenderTexturePrivate(
+    minport_RenderTexturePrivate_2(
         div_x, div_y, div_w, div_h,
         tx,
         div_sx, div_sy, div_sw, div_sh,

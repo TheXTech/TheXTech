@@ -22,6 +22,7 @@
 #ifndef RENDER_MINPORT_SHARED_H
 #define RENDER_MINPORT_SHARED_H
 
+struct StdPicture;
 
 namespace XRender
 {
@@ -38,6 +39,21 @@ extern int g_screen_phys_x;
 extern int g_screen_phys_y;
 extern int g_screen_phys_w;
 extern int g_screen_phys_h;
+
+// the most recently rendered texture
+extern StdPicture* g_render_chain_head;
+
+// the least recently rendered texture
+extern StdPicture* g_render_chain_tail;
+
+// the current render frame
+extern uint32_t g_current_frame;
+
+// never unload a texture that was rendered less than this many frames ago
+constexpr uint32_t g_never_unload_before = 2;
+
+// always unload a texture that was rendered more than this many frames ago
+constexpr uint32_t g_always_unload_after = 18000;
 
 // do not need to be implemented per-platform
 
@@ -83,6 +99,18 @@ void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
 size_t lazyLoadedBytes();
 void lazyLoadedBytesReset();
 #endif
+
+// new functions that platforms should use when deleting textures or trying to free texture memory
+
+// increment the frame counter, and unload all textures not rendered since g_always_unload_after
+void minport_initFrame();
+
+// removes a texture from the render chain
+void minport_unlinkTexture(StdPicture* tx);
+
+// unload all textures not rendered since g_never_unload_before
+void minport_freeTextureMemory();
+
 
 // new functions that should be implemented per-platform
 

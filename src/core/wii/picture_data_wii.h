@@ -34,8 +34,6 @@
 struct StdPictureData
 {
 
-    uint32_t last_draw_frame = 0;
-
     bool texture_file_init[3] = {false, false, false};
     bool texture_init[3] = {false, false, false};
     TPLFile texture_file[3];

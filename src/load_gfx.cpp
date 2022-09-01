@@ -173,6 +173,9 @@ static void loadCGFX(const std::string &origPath,
 
     if(success)
     {
+        // don't allow texture to be incorrectly tracked as loaded
+        XRender::lazyUnLoad(texture);
+
         pLogDebug("Loaded custom GFX: %s", loadedPath.c_str());
         isCustom = true;
         texture = newTexture;
@@ -188,6 +191,7 @@ static void loadCGFX(const std::string &origPath,
     }
 }
 
+#ifdef PGE_MIN_PORT
 /*!
  * \brief Load the custom GFX from a load list
  * \param f The load list
@@ -241,45 +245,6 @@ static void loadImageFromList(FILE* f, const std::string& dir,
     if(height)
         *height = newTexture.h;
 }
-
-static void restoreLevelBackupTextures()
-{
-    for(auto it = g_defaultLevelGfxBackup.rbegin(); it != g_defaultLevelGfxBackup.rend(); ++it)
-    {
-        auto &t = *it;
-
-        if(t.remote_width)
-            *t.remote_width = t.width;
-        if(t.remote_height)
-            *t.remote_height = t.height;
-        if(t.remote_isCustom)
-            *t.remote_isCustom = false;
-        TXT_assert_release(t.remote_texture);
-        XRender::deleteTexture(*t.remote_texture);
-        *t.remote_texture = t.texture;
-    }
-    g_defaultLevelGfxBackup.clear();
-}
-
-static void restoreWorldBackupTextures()
-{
-    for(auto it = g_defaultWorldGfxBackup.rbegin(); it != g_defaultWorldGfxBackup.rend(); ++it)
-    {
-        auto &t = *it;
-
-        if(t.remote_width)
-            *t.remote_width = t.width;
-        if(t.remote_height)
-            *t.remote_height = t.height;
-        if(t.remote_isCustom)
-            *t.remote_isCustom = false;
-        TXT_assert_release(t.remote_texture);
-        XRender::deleteTexture(*t.remote_texture);
-        *t.remote_texture = t.texture;
-    }
-    g_defaultWorldGfxBackup.clear();
-}
-
 
 bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
 {
@@ -535,6 +500,46 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
     fclose(f);
 
     return true;
+}
+
+#endif // #ifdef PGE_MIN_PORT
+
+static void restoreLevelBackupTextures()
+{
+    for(auto it = g_defaultLevelGfxBackup.rbegin(); it != g_defaultLevelGfxBackup.rend(); ++it)
+    {
+        auto &t = *it;
+
+        if(t.remote_width)
+            *t.remote_width = t.width;
+        if(t.remote_height)
+            *t.remote_height = t.height;
+        if(t.remote_isCustom)
+            *t.remote_isCustom = false;
+        TXT_assert_release(t.remote_texture);
+        XRender::deleteTexture(*t.remote_texture);
+        *t.remote_texture = t.texture;
+    }
+    g_defaultLevelGfxBackup.clear();
+}
+
+static void restoreWorldBackupTextures()
+{
+    for(auto it = g_defaultWorldGfxBackup.rbegin(); it != g_defaultWorldGfxBackup.rend(); ++it)
+    {
+        auto &t = *it;
+
+        if(t.remote_width)
+            *t.remote_width = t.width;
+        if(t.remote_height)
+            *t.remote_height = t.height;
+        if(t.remote_isCustom)
+            *t.remote_isCustom = false;
+        TXT_assert_release(t.remote_texture);
+        XRender::deleteTexture(*t.remote_texture);
+        *t.remote_texture = t.texture;
+    }
+    g_defaultWorldGfxBackup.clear();
 }
 
 

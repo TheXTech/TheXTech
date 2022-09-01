@@ -45,7 +45,6 @@
 namespace XRender
 {
 
-uint32_t s_current_frame = 0;
 bool g_in_frame = false;
 
 #define DEFAULT_FIFO_SIZE   (256*1024)
@@ -56,11 +55,21 @@ GXRModeObj *rmode = nullptr;
 Mtx view;
 
 int s_num_textures_loaded = 0;
-int s_num_big_pictures_loaded = 0;
-std::set<StdPicture*> s_big_pictures;
 
 int g_rmode_w = 640;
 int g_rmode_h = 480;
+
+int robust_TPL_GetTexture(TPLFile* file, int i, GXTexObj* gxtex)
+{
+    int ret = TPL_GetTexture(file, i, gxtex);
+    if(ret == 0 || errno != ENOMEM)
+        return ret;
+
+    pLogWarning("Failed to load due to lack of memory");
+    minport_freeTextureMemory();
+
+    return TPL_GetTexture(file, i, gxtex);
+}
 
 void s_loadTexture(StdPicture &target, int i)
 {
@@ -75,7 +84,7 @@ void s_loadTexture(StdPicture &target, int i)
             target.h = target.d.tex_h[i]*2;
         }
 
-        if(TPL_GetTexture(&target.d.texture_file[i], 0, &target.d.texture[i]) != 0)
+        if(robust_TPL_GetTexture(&target.d.texture_file[i], 0, &target.d.texture[i]) != 0)
         {
             TPL_CloseTPLFile(&target.d.texture_file[i]);
             target.d.texture_file_init[i] = false;
@@ -212,7 +221,16 @@ void setTargetTexture()
     GX_LoadPosMtxImm(view, GX_PNMTX0);
 
     g_in_frame = true;
-    s_current_frame ++;
+
+    struct mallinfo info = mallinfo();
+
+    if(info.uordblks > 292000000)
+    {
+        pLogWarning("Memory low, triggering free texture memory");
+        minport_freeTextureMemory();
+    }
+
+    minport_initFrame();
 }
 
 void setTargetScreen()
@@ -459,6 +477,18 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
     return target;
 }
 
+int robust_OpenTPLFromFile(TPLFile* target, const char* path)
+{
+    int ret = TPL_OpenTPLFromFile(target, path);
+    if(ret == 1 || errno != ENOMEM)
+        return ret;
+
+    pLogWarning("Failed to load %s due to lack of memory", path);
+    minport_freeTextureMemory();
+
+    return TPL_OpenTPLFromFile(target, path);
+}
+
 void lazyLoad(StdPicture &target)
 {
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
@@ -467,9 +497,8 @@ void lazyLoad(StdPicture &target)
     std::string suppPath;
 
     target.inited = true;
-    target.l.lazyLoaded = false;
 
-    if(TPL_OpenTPLFromFile(&target.d.texture_file[0], target.l.path.c_str()) != 1)
+    if(robust_OpenTPLFromFile(&target.d.texture_file[0], target.l.path.c_str()) != 1)
     {
         pLogWarning("Permanently failed to load %s", target.l.path.c_str());
         pLogWarning("Error: %d (%s)", errno, strerror(errno));
@@ -492,7 +521,7 @@ void lazyLoad(StdPicture &target)
     if(target.h > 2048)
     {
         suppPath = target.l.path + '1';
-        if(TPL_OpenTPLFromFile(&target.d.texture_file[1], suppPath.c_str()) != 1)
+        if(robust_OpenTPLFromFile(&target.d.texture_file[1], suppPath.c_str()) != 1)
         {
             pLogWarning("Permanently failed to load %s", suppPath.c_str());
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
@@ -506,7 +535,7 @@ void lazyLoad(StdPicture &target)
     if(target.h > 4096)
     {
         suppPath = target.l.path + '2';
-        if(TPL_OpenTPLFromFile(&target.d.texture_file[2], suppPath.c_str()) != 1)
+        if(robust_OpenTPLFromFile(&target.d.texture_file[2], suppPath.c_str()) != 1)
         {
             pLogWarning("Permanently failed to load %s", suppPath.c_str());
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
@@ -519,12 +548,6 @@ void lazyLoad(StdPicture &target)
     }
 
     s_num_textures_loaded++;
-
-    if(target.w >= 256 || target.h >= 256)
-    {
-        s_big_pictures.insert(&target);
-        s_num_big_pictures_loaded++;
-    }
 }
 
 void lazyPreLoad(StdPicture &target)
@@ -545,11 +568,7 @@ void deleteTexture(StdPicture &tx, bool lazyUnload)
     if(!tx.inited)
         return;
 
-    if(s_big_pictures.find(&tx) != s_big_pictures.end())
-    {
-        s_big_pictures.erase(&tx);
-        s_num_big_pictures_loaded --;
-    }
+    minport_unlinkTexture(&tx);
 
     if(tx.d.hasTexture())
         s_num_textures_loaded--;
@@ -728,8 +747,6 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
 
     if(!tx.d.hasTexture() && tx.l.lazyLoaded)
         lazyLoad(tx);
-
-    tx.d.last_draw_frame = s_current_frame;
 
     if(!tx.d.hasTexture())
         return;

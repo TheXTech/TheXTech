@@ -25,6 +25,8 @@
 
 #include <string>
 
+struct StdPicture;
+
 /*!
  * \brief Generic image loading store.
  *
@@ -34,6 +36,15 @@ struct StdPictureLoad
 {
     //! Is this a lazy-loaded texture?
     bool lazyLoaded = false;
+
+    //! The previous texture in the render chain (nullptr if this is the tail or unloaded)
+    StdPicture* last_texture = nullptr;
+
+    //! The next texture in the render chain (nullptr if this is the head or unloaded)
+    StdPicture* next_texture = nullptr;
+
+    //! The last frame that the texture was rendered (not accessed if not in the render chain)
+    uint32_t last_draw_frame;
 
     //! Path to find image
     std::string path = "";
