@@ -918,10 +918,10 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             // the next code is designed to avoid needing a qScreen if it wouldn't have occurred in the original game
                             bool use_new_resize = true;
 
-                            int old_w = vScreen[1].Width;
-                            int old_h = vScreen[1].Height;
-                            int old_x = vScreenX[1];
-                            int old_y = vScreenY[1];
+                            double old_w = vScreen[1].Width;
+                            double old_h = vScreen[1].Height;
+                            double old_x = vScreenX[1];
+                            double old_y = vScreenY[1];
 
                             // (1) old bounds shouldn't be outside of the new level
                             if(-old_x < level[B].X
@@ -945,10 +945,10 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             {
                                 double cx, cy, old_cx, old_cy;
 
-                                GetvScreenCanonical(1, &cx, &cy);
+                                GetvScreenCanonical(1, &cx, &cy, true);
 
                                 level[B] = tempLevel;
-                                GetvScreenCanonical(1, &old_cx, &old_cy);
+                                GetvScreenCanonical(1, &old_cx, &old_cy, true);
                                 level[B] = newLevel;
 
                                 if(std::abs(cx - old_cx) > 32 || std::abs(cy - old_cy) > 32)
