@@ -1017,6 +1017,9 @@ void InitSound()
         std::string alias = fmt::format_ne("sound{0}", i);
         std::string group = fmt::format_ne("sound-{0}", i);
         AddSfx(SoundScope::global, sounds, alias, group);
+
+        if(i % 4 == 0)
+            UpdateLoad();
     }
     UpdateLoad();
     Mix_ReserveChannels(g_reservedChannels);

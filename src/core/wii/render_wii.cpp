@@ -239,10 +239,20 @@ void setTargetScreen()
 
 void clearBuffer()
 {
+    if(!g_in_frame)
+    {
+        setTargetTexture();
+        resetViewport();
+        renderRect(0, 0, ScreenW, ScreenH, 0, 0, 0);
+        repaint();
+    }
 }
 
 void repaint()
 {
+    if(!g_in_frame)
+        return;
+
     // do this stuff after drawing
     int next_buffer = cur_buffer ^ 1;
     GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
@@ -311,9 +321,6 @@ void minport_TransformPhysCoords()
 
 void minport_ApplyPhysCoords()
 {
-    if(!g_in_frame)
-        return;
-
     GXColor background = {0, 0, 0, 0xff};
     GX_SetCopyClear(background, 0x00ffffff);
 
@@ -328,9 +335,6 @@ void minport_ApplyPhysCoords()
 
 void minport_ApplyViewport()
 {
-    if(!g_in_frame)
-        return;
-
     int phys_offset_x = g_viewport_x * g_screen_phys_w * 2 / ScreenW;
     int phys_width = g_viewport_w * g_screen_phys_w * 2 / ScreenW;
 
