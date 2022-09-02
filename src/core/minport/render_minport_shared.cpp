@@ -316,16 +316,13 @@ void minport_unlinkTexture(StdPicture* tx)
 
     // unlink from its context
     if(tx->l.last_texture)
-    {
         tx->l.last_texture->l.next_texture = tx->l.next_texture;
-        tx->l.last_texture = nullptr;
-    }
 
     if(tx->l.next_texture)
-    {
         tx->l.next_texture->l.last_texture = tx->l.last_texture;
-        tx->l.next_texture = nullptr;
-    }
+
+    tx->l.last_texture = nullptr;
+    tx->l.next_texture = nullptr;
 }
 
 // unload all textures not rendered since g_never_unload_before
