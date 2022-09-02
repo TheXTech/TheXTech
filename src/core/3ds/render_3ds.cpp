@@ -39,6 +39,8 @@
 #include "change_res.h"
 #include "core/3ds/should_swap_screen.h"
 
+#include "core/minport/render_minport_shared.h"
+
 // #include "core/3ds/n3ds-clock.h"
 // #include "second_screen.h"
 #include "c2d_draw.h"
@@ -63,32 +65,13 @@ C2D_Image s_layer_ims[4];
 C3D_RenderTarget* s_layer_targets[4];
 bool s_single_layer_mode = false;
 
-constexpr int s_hardware_w = 400;
-constexpr int s_hardware_w2 = 320;
-constexpr int s_hardware_h = 240;
-
-int s_viewport_x = 0;
-int s_viewport_y = 0;
-int s_viewport_w = 0;
-int s_viewport_h = 0;
-int s_viewport_offset_x = 0;
-int s_viewport_offset_y = 0;
-int s_viewport_offset_x_bak = 0;
-int s_viewport_offset_y_bak = 0;
-bool s_viewport_offset_ignore = false;
-
 int s_tex_w = 0;
 int s_tex_show_w = 0;
 int s_tex_h = 0;
-int s_screen_phys_x = 0;
-int s_screen_phys_y = 0;
-int s_screen_phys_w = 0;
-int s_screen_phys_h = 0;
 
 int s_num_textures_loaded = 0;
-int s_num_big_pictures_loaded = 0;
-std::set<C2D_SpriteSheet> s_texture_bank;
-std::set<StdPicture*> s_big_pictures;
+
+C3D_Mtx s_target_view;
 
 static void s_destroySceneTargets()
 {
@@ -145,52 +128,12 @@ static void s_createSceneTargets()
     s_tex_show_w = s_tex_w - MAX_3D_OFFSET;
 }
 
-static bool s_freeTextureMem() // make it take an amount of memory, someday.....
-{
-    D_pLogDebug("Freeing texture memory...");
-
-    StdPicture* oldest = nullptr;
-    uint32_t earliestDraw = 0;
-
-    StdPicture* second_oldest = nullptr;
-    uint32_t second_earliestDraw = 0;
-
-    for(StdPicture* poss : s_big_pictures)
-    {
-        if(poss->d.texture && poss->l.lazyLoaded && (poss->d.last_draw_frame+30 < s_current_frame))
-        {
-            if((oldest == nullptr) || (poss->d.last_draw_frame < earliestDraw))
-            {
-                second_oldest = oldest;
-                second_earliestDraw = earliestDraw;
-                oldest = poss;
-                earliestDraw = poss->d.last_draw_frame;
-            }
-            else if((second_oldest == nullptr) || (poss->d.last_draw_frame < second_earliestDraw))
-            {
-                second_oldest = poss;
-                second_earliestDraw = poss->d.last_draw_frame;
-            }
-        }
-    }
-
-    if(oldest == nullptr)
-        return false;
-
-    D_pLogDebug("Clearing %p, %p", oldest, second_oldest);
-    D_pLogDebug("Clearing %s, %s", oldest->path.c_str(), (second_oldest) ? second_oldest->path.c_str() : "");
-
-    lazyUnLoad(*oldest);
-    if(second_oldest)
-        lazyUnLoad(*second_oldest);
-
-    return true;
-}
-
 void s_ensureInFrame()
 {
     if(!g_in_frame)
     {
+        minport_initFrame();
+
         if(g_screen_swapped != should_swap_screen())
             UpdateInternalRes();
 
@@ -212,9 +155,8 @@ void s_ensureInFrame()
 
 void s_clearAllTextures()
 {
-    for(C2D_SpriteSheet tx : s_texture_bank)
-        C2D_SpriteSheetFree(tx);
-    s_texture_bank.clear();
+    for(StdPicture* p = g_render_chain_tail; p != nullptr; p = p->l.next_texture)
+        deleteTexture(*p);
 }
 
 void s_loadTexture(StdPicture &target, C2D_SpriteSheet &sheet)
@@ -228,8 +170,6 @@ void s_loadTexture(StdPicture &target, C2D_SpriteSheet &sheet)
         target.w = im.subtex->width*2;
         target.h = im.subtex->height*2;
     }
-
-    s_texture_bank.insert(sheet);
 }
 
 void s_loadTexture2(StdPicture &target, C2D_SpriteSheet &sheet)
@@ -238,8 +178,6 @@ void s_loadTexture2(StdPicture &target, C2D_SpriteSheet &sheet)
 
     target.d.texture2 = sheet;
     target.d.image2 = im;
-
-    s_texture_bank.insert(sheet);
 }
 
 void s_loadTexture3(StdPicture &target, C2D_SpriteSheet &sheet)
@@ -248,8 +186,6 @@ void s_loadTexture3(StdPicture &target, C2D_SpriteSheet &sheet)
 
     target.d.texture3 = sheet;
     target.d.image3 = im;
-
-    s_texture_bank.insert(sheet);
 }
 
 bool init()
@@ -272,7 +208,6 @@ bool init()
     s_bottom_screen = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
     // bottom = right;
 
-    s_viewport_x = s_viewport_y = 0;
     updateViewport();
 
     return true;
@@ -298,6 +233,9 @@ void setTargetTexture()
         C2D_SceneBegin(s_layer_targets[0]);
     else
         C2D_SceneBegin(s_layer_targets[2]); // screen plane target
+
+    C2D_ViewSave(&s_target_view);
+    minport_ApplyViewport();
 }
 
 void setTargetScreen()
@@ -310,6 +248,9 @@ void setTargetMainScreen()
 
     C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
     C2D_SceneBegin(s_top_screen);
+
+    C2D_ViewSave(&s_target_view);
+    minport_ApplyViewport();
 }
 
 void setTargetSubScreen()
@@ -318,6 +259,9 @@ void setTargetSubScreen()
 
     C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
     C2D_SceneBegin(s_bottom_screen);
+
+    C2D_ViewSave(&s_target_view);
+    minport_ApplyViewport();
 }
 
 void setTargetLayer(int layer)
@@ -328,6 +272,9 @@ void setTargetLayer(int layer)
         C2D_SceneBegin(s_layer_targets[layer]);
     else
         C2D_SceneBegin(s_layer_targets[0]);
+
+    C2D_ViewSave(&s_target_view);
+    minport_ApplyViewport();
 }
 
 void clearBuffer()
@@ -338,15 +285,15 @@ void clearBuffer()
 
         C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);
-        renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
+        renderRect(0, 0, 400, 240, 0.0f, 0.0f, 0.0f, 1.0f, true);
 
         C2D_TargetClear(s_right_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_right_screen);
-        renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
+        renderRect(0, 0, 400, 240, 0.0f, 0.0f, 0.0f, 1.0f, true);
 
         C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_bottom_screen);
-        renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
+        renderRect(0, 0, 320, 240, 0.0f, 0.0f, 0.0f, 1.0f, true);
 
         C3D_FrameEnd(0);
     }
@@ -370,7 +317,7 @@ void repaint()
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                s_screen_phys_x + 40, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                g_screen_phys_x + 40, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                 shift, 0, s_tex_show_w, s_tex_h,
                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -385,7 +332,7 @@ void repaint()
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                 shift, 0, s_tex_show_w, s_tex_h,
                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -401,7 +348,7 @@ void repaint()
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                s_screen_phys_x - 40, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                g_screen_phys_x - 40, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                 shift, 0, s_tex_show_w, s_tex_h,
                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -416,7 +363,7 @@ void repaint()
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                 shift, 0, s_tex_show_w, s_tex_h,
                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -431,7 +378,7 @@ void repaint()
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                 shift + (int)(shift_i[layer] * s_depth_slider), 0, s_tex_show_w, s_tex_h,
                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
         }
@@ -441,7 +388,7 @@ void repaint()
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                s_screen_phys_x, s_screen_phys_y, s_screen_phys_w, s_screen_phys_h,
+                g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
                 shift - (int)(shift_i[layer] * s_depth_slider), 0, s_tex_show_w, s_tex_h,
                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
         }
@@ -458,26 +405,6 @@ void repaint()
     C3D_FrameEnd(0);
 }
 
-void cancelFrame()
-{
-    if(!g_in_frame)
-        return;
-
-    C2D_SceneBegin(s_top_screen);
-    renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
-
-    C2D_SceneBegin(s_right_screen);
-    renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
-
-    C2D_SceneBegin(s_bottom_screen);
-    renderRect(0, 0, s_hardware_w, s_hardware_h, 0.0f, 0.0f, 0.0f, 1.0f, true);
-
-    C3D_FrameEnd(0);
-
-    s_current_frame ++;
-    g_in_frame = false;
-}
-
 void mapToScreen(int x, int y, int *dx, int *dy)
 {
     // lower screen to upper screen conversion
@@ -491,8 +418,8 @@ void mapToScreen(int x, int y, int *dx, int *dy)
     if(!g_screen_swapped)
         x += 40;
 
-    *dx = (x - s_screen_phys_x) * ScreenW / s_screen_phys_w;
-    *dy = (y - s_screen_phys_y) * ScreenH / s_screen_phys_h;
+    *dx = (x - g_screen_phys_x) * ScreenW / g_screen_phys_w;
+    *dy = (y - g_screen_phys_y) * ScreenH / g_screen_phys_h;
 }
 
 void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
@@ -505,30 +432,24 @@ void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
         return;
     }
 
-    *window_x = (scr_x * s_screen_phys_w / ScreenW) + s_screen_phys_x;
-    *window_y = (scr_y * s_screen_phys_h / ScreenH) + s_screen_phys_y;
+    *window_x = (scr_x * g_screen_phys_w / ScreenW) + g_screen_phys_x;
+    *window_y = (scr_y * g_screen_phys_h / ScreenH) + g_screen_phys_y;
 
     if(!g_screen_swapped)
         *window_x -= 40;
 }
 
-void updateViewport()
+void minport_TransformPhysCoords() {}
+
+void minport_ApplyPhysCoords()
 {
     int tex_w = ScreenW / 2;
-    if(tex_w > 1024)
-        tex_w = 1024;
-
     int tex_h = ScreenH / 2;
-    if(tex_h > 512)
-        tex_h = 512;
 
     if(tex_w != s_tex_w || tex_h != s_tex_h || g_screen_swapped != should_swap_screen())
         s_createSceneTargets();
 
     g_screen_swapped = should_swap_screen();
-
-    resetViewport();
-    offsetViewport(0, 0);
 
     GPU_TEXTURE_FILTER_PARAM filter = (g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_FIXED_05X)
         ? GPU_LINEAR
@@ -540,120 +461,21 @@ void updateViewport()
         if(s_single_layer_mode)
             break;
     }
-
-    int hardware_w = g_screen_swapped ? s_hardware_w2 : s_hardware_w;
-
-    int ScreenW_Show = ScreenW - MAX_3D_OFFSET * 2;
-
-    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
-    {
-        int res_h = s_hardware_h;
-        int res_w = ScreenW_Show * res_h / ScreenH;
-
-        if(res_w > hardware_w)
-        {
-            res_w = hardware_w;
-            res_h = ScreenH * res_w / ScreenW_Show;
-        }
-
-        s_screen_phys_w = res_w;
-        s_screen_phys_h = res_h;
-    }
-    else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
-    {
-        s_screen_phys_w = ScreenW_Show / 2;
-        s_screen_phys_h = ScreenH / 2;
-    }
-    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
-    {
-        s_screen_phys_w = ScreenW_Show;
-        s_screen_phys_h = ScreenH;
-    }
-    else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
-    {
-        s_screen_phys_w = ScreenW_Show / 4;
-        s_screen_phys_h = ScreenH / 4;
-    }
-    else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
-    {
-        s_screen_phys_w = ScreenW_Show / 2;
-        s_screen_phys_h = ScreenH / 2;
-        while(s_screen_phys_w <= hardware_w && s_screen_phys_h <= s_hardware_h)
-        {
-            s_screen_phys_w += ScreenW_Show / 2;
-            s_screen_phys_h += ScreenH / 2;
-        }
-        if(s_screen_phys_w > ScreenW_Show / 2)
-        {
-            s_screen_phys_w -= ScreenW_Show / 2;
-            s_screen_phys_h -= ScreenH / 2;
-        }
-    }
-
-    s_screen_phys_x = hardware_w / 2 - s_screen_phys_w / 2;
-    s_screen_phys_y = s_hardware_h / 2 - s_screen_phys_h / 2;
 }
 
-void resetViewport()
+void minport_ApplyViewport()
 {
-    setViewport(0, 0, ScreenW, ScreenH);
-}
-
-void setViewport(int x, int y, int w, int h)
-{
-    int offset_x = s_viewport_offset_x - s_viewport_x;
-    int offset_y = s_viewport_offset_y - s_viewport_y;
-    int offset_x_bak = s_viewport_offset_x_bak - s_viewport_x;
-    int offset_y_bak = s_viewport_offset_y_bak - s_viewport_y;
-
-    s_viewport_x = x / 2;
-    s_viewport_y = y / 2;
-    s_viewport_w = w / 2;
-    s_viewport_h = h / 2;
-
-    s_viewport_offset_x = s_viewport_x + offset_x;
-    s_viewport_offset_y = s_viewport_y + offset_y;
-    s_viewport_offset_x_bak = s_viewport_x + offset_x_bak;
-    s_viewport_offset_y_bak = s_viewport_y + offset_y_bak;
-}
-
-void offsetViewport(int x, int y)
-{
-    if(s_viewport_offset_ignore)
-    {
-        s_viewport_offset_x_bak = s_viewport_x + x / 2;
-        s_viewport_offset_y_bak = s_viewport_y + y / 2;
-    }
-    else
-    {
-        s_viewport_offset_x = s_viewport_x + x / 2;
-        s_viewport_offset_y = s_viewport_y + y / 2;
-    }
-}
-
-void offsetViewportIgnore(bool en)
-{
-    if(s_viewport_offset_ignore == en)
+    if(!g_in_frame)
         return;
 
-    s_viewport_offset_ignore = en;
+    C2D_ViewRestore(&s_target_view);
 
-    if(en)
-    {
-        s_viewport_offset_x_bak = s_viewport_offset_x;
-        s_viewport_offset_y_bak = s_viewport_offset_y;
-    }
+    if(g_viewport_offset_ignore)
+        C2D_ViewTranslate(g_viewport_x, g_viewport_y);
     else
-    {
-        s_viewport_offset_x = s_viewport_offset_x_bak;
-        s_viewport_offset_y = s_viewport_offset_y_bak;
-    }
-}
+        C2D_ViewTranslate(g_viewport_x + g_viewport_offset_x, g_viewport_y + g_viewport_offset_y);
 
-void setTransparentColor(StdPicture &target, uint32_t rgb)
-{
-    UNUSED(target);
-    UNUSED(rgb);
+    // C3D_SetScissor(GPU_SCISSOR_NORMAL, g_viewport_x, g_viewport_y, g_viewport_w, g_viewport_h);
 }
 
 StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
@@ -785,38 +607,13 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
 static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
 {
     C2D_SpriteSheet sourceImage = C2D_SpriteSheetLoad(path);
-    int i;
 
     if(!sourceImage)
     {
-        // wish I knew the largest contiguous portion of memory
-        // max tex should be 4194304
-        for(i = 0; i < 10; i ++)
-        {
-            if(linearSpaceFree() > 4000000) break;
-            if(!s_freeTextureMem()) break;
-        }
+        if(linearSpaceFree() < 4000000)
+            minport_freeTextureMemory();
+
         sourceImage = C2D_SpriteSheetLoad(path);
-
-        if(!sourceImage)
-        {
-            for(i = 0; i < 10; i ++)
-            {
-                if(linearSpaceFree() > 8000000) break;
-                if(!s_freeTextureMem()) break;
-            }
-            sourceImage = C2D_SpriteSheetLoad(path);
-
-            if(!sourceImage)
-            {
-                for(i = 0; i < 25; i ++)
-                {
-                    if(linearSpaceFree() > 20000000) break;
-                    if(!s_freeTextureMem()) break;
-                }
-                sourceImage = C2D_SpriteSheetLoad(path);
-            }
-        }
     }
 
     return sourceImage;
@@ -869,14 +666,11 @@ void lazyLoad(StdPicture &target)
 
     s_num_textures_loaded++;
 
-    if(target.w >= 256 || target.h >= 256)
-    {
-        s_big_pictures.insert(&target);
-        s_num_big_pictures_loaded++;
-    }
-
     if(linearSpaceFree() < 4194304)
-        s_freeTextureMem();
+    {
+        pLogDebug("Triggering free texture memory due to low memory (%u bytes)", (unsigned)linearSpaceFree());
+        minport_freeTextureMemory();
+    }
 }
 
 void lazyPreLoad(StdPicture &target)
@@ -897,33 +691,21 @@ void deleteTexture(StdPicture &tx, bool lazyUnload)
     if(!tx.inited)
         return;
 
-    if(s_big_pictures.find(&tx) != s_big_pictures.end())
-    {
-        s_big_pictures.erase(&tx);
-        s_num_big_pictures_loaded --;
-    }
-
     if(tx.d.texture)
     {
         s_num_textures_loaded --;
-        if(s_texture_bank.find(tx.d.texture) != s_texture_bank.end())
-            s_texture_bank.erase(tx.d.texture);
         C2D_SpriteSheetFree(tx.d.texture);
         tx.d.texture = nullptr;
     }
 
     if(tx.d.texture2)
     {
-        if(s_texture_bank.find(tx.d.texture2) != s_texture_bank.end())
-            s_texture_bank.erase(tx.d.texture2);
         C2D_SpriteSheetFree(tx.d.texture2);
         tx.d.texture2 = nullptr;
     }
 
     if(tx.d.texture3)
     {
-        if(s_texture_bank.find(tx.d.texture3) != s_texture_bank.end())
-            s_texture_bank.erase(tx.d.texture3);
         C2D_SpriteSheetFree(tx.d.texture3);
         tx.d.texture3 = nullptr;
     }
@@ -939,107 +721,16 @@ void deleteTexture(StdPicture &tx, bool lazyUnload)
     }
 }
 
-inline int ROUNDDIV2(int x)
+void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)
 {
-    return (x<0)?(x - 1) / 2:x / 2;
+    uint32_t clr = C2D_Color32(red, green, blue, alpha);
+
+    C2D_DrawRectSolid(x1, y1, 0, x2 - x1, y2 - y1, clr);
 }
 
-inline float ROUNDDIV2(float x)
-{
-    return std::nearbyintf(std::roundf(x) / 2.0f);
-}
-
-inline float ROUNDDIV2(double x)
-{
-    return std::nearbyintf(std::roundf((float)x / 2.0f));
-}
-
-inline float FLOORDIV2(float x)
-{
-    return std::floor(x / 2.0f);
-}
-
-void renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
-{
-    int x_div = ROUNDDIV2(x);
-    int w_div = ROUNDDIV2(x + w) - x_div;
-
-    int y_div = ROUNDDIV2(y);
-    int h_div = ROUNDDIV2(y + h) - y_div;
-
-    uint32_t clr = C2D_Color32f(red, green, blue, alpha);
-
-    // Filled is always True in this game
-    if(filled)
-        C2D_DrawRectSolid(x_div + s_viewport_offset_x,
-                          y_div + s_viewport_offset_y,
-                          0, w_div, h_div, clr);
-    else
-    {
-        C2D_DrawRectangle(x_div + s_viewport_offset_x,
-                          y_div + s_viewport_offset_y,
-                          0, 1, h_div, clr, clr, clr, clr);
-        C2D_DrawRectangle(x_div + s_viewport_offset_x + w_div - 1,
-                          y_div + s_viewport_offset_y,
-                          0, 1, h_div, clr, clr, clr, clr);
-        C2D_DrawRectangle(x_div + s_viewport_offset_x,
-                          y_div + s_viewport_offset_y,
-                          0, w_div, 1, clr, clr, clr, clr);
-        C2D_DrawRectangle(x_div + s_viewport_offset_x,
-                          y_div + s_viewport_offset_y + h_div - 1,
-                          0, w_div, 1, clr, clr, clr, clr);
-    }
-}
-
-void renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
-{
-    renderRect(_left, _top, _right-_left, _bottom-_top, red, green, blue, alpha, true);
-}
-
-void renderCircle(int cx, int cy,
-                  int radius,
-                  float red , float green, float blue, float alpha,
-                  bool filled)
-{
-    renderRect(cx - radius, cy - radius, radius, radius, red, green, blue, alpha, filled);
-}
-
-void renderCircleHole(int cx, int cy,
-                      int radius,
-                      float red, float green, float blue, float alpha)
-{
-    if(radius <= 0)
-        return; // Nothing to draw
-
-    double line_size = 4;
-    double dy = line_size;
-
-    do
-    {
-        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
-
-        renderRectBR(cx - radius, cy + dy - radius - line_size, cx - dx, cy + dy - radius + line_size,
-            red, green, blue, alpha);
-
-        renderRectBR(cx + dx, cy + dy - radius - line_size, cx + radius, cy + dy - radius + line_size,
-            red, green, blue, alpha);
-
-        if(dy < radius) // Don't cross lines
-        {
-            renderRectBR(cx - radius, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
-                red, green, blue, alpha);
-
-            renderRectBR(cx + dx, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
-                red, green, blue, alpha);
-        }
-
-        dy += line_size * 2;
-    } while(dy + line_size <= radius);
-}
-
-inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDst,
+void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
                              StdPicture &tx,
-                             float xSrc, float ySrc, float wSrc, float hSrc,
+                             int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
                              float rotateAngle, FPoint_t *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
@@ -1049,11 +740,7 @@ inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
     if(!tx.d.texture && tx.l.lazyLoaded)
         lazyLoad(tx);
 
-    tx.d.last_draw_frame = s_current_frame;
-
     if(!tx.d.texture)
-        return;
-    if(xDst > s_viewport_w || yDst > s_viewport_h)
         return;
 
     // automatic flipping based on SMBX style!
@@ -1071,109 +758,38 @@ inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
 
     // TODO: graphics tests for how offscreen draws interact with flips
     //       handling rotations properly is probably impossible
-    if(xDst < 0.0f)
-    {
-        if(!(flip & X_FLIP_HORIZONTAL))
-            xSrc -= xDst * wSrc / wDst;
-
-        if(wDst+xDst > s_viewport_w)
-        {
-            if(flip & X_FLIP_HORIZONTAL)
-                xSrc += (wDst + xDst - s_viewport_w) * wSrc / wDst;
-            wSrc = s_viewport_w * wSrc / wDst;
-            wDst = s_viewport_w;
-        }
-        else
-        {
-            wSrc += xDst * wSrc / wDst;
-            wDst += xDst;
-        }
-        xDst = 0.0f;
-    }
-    else if(xDst + wDst > s_viewport_w)
-    {
-        if(flip & X_FLIP_HORIZONTAL)
-            xSrc += (wDst + xDst - s_viewport_w) * wSrc / wDst;
-        wSrc = (s_viewport_w - xDst) * wSrc / wDst;
-        wDst = (s_viewport_w - xDst);
-    }
-
-    if(yDst < 0.0f)
-    {
-        if(!(flip & X_FLIP_VERTICAL))
-            ySrc -= yDst * hSrc / hDst;
-
-        if(hDst + yDst > s_viewport_h)
-        {
-            if(flip & X_FLIP_VERTICAL)
-                ySrc += (hDst + yDst - s_viewport_h) * hSrc / hDst;
-            hSrc = s_viewport_h * hSrc / hDst;
-            hDst = s_viewport_h;
-        }
-        else
-        {
-            hSrc += yDst * hSrc / hDst;
-            hDst += yDst;
-        }
-        yDst = 0.0f;
-    }
-    else if(yDst + hDst > s_viewport_h)
-    {
-        if(flip & X_FLIP_VERTICAL)
-            ySrc += (hDst + yDst - s_viewport_h) * hSrc / hDst;
-        hSrc = (s_viewport_h - yDst) * hSrc / hDst;
-        hDst = (s_viewport_h - yDst);
-    }
 
     C2D_Image* to_draw = nullptr;
     C2D_Image* to_draw_2 = nullptr;
 
     // Don't go more than size of texture
     // Failure conditions should only happen if texture is smaller than expected
-    if(xSrc + wSrc > tx.w / 2)
-    {
-        wDst = (tx.w / 2 - xSrc) * wDst / wSrc;
-        wSrc = tx.w / 2 - xSrc;
-        if(wDst < 0.0f)
-            return;
-    }
-    if(ySrc + hSrc > tx.h / 2)
-    {
-        hDst = (tx.h / 2 - ySrc) * hDst / hSrc;
-        hSrc = tx.h / 2 - ySrc;
-        if(hDst < 0.0f)
-            return;
-    }
 
-    if(ySrc + hSrc > 1024.0f)
+    if(ySrc + hSrc > 1024)
     {
-        if(ySrc + hSrc > 2048.0f)
+        if(ySrc + hSrc > 2048)
         {
             if(tx.d.texture3)
                 to_draw = &tx.d.image3;
-            if(ySrc < 2048.0f && tx.d.texture2)
+            if(ySrc < 2048 && tx.d.texture2)
                 to_draw_2 = &tx.d.image2;
-            ySrc -= 1024.0f;
+            ySrc -= 1024;
         }
         else
         {
             if(tx.d.texture2)
                 to_draw = &tx.d.image2;
-            if(ySrc < 1024.0f)
+            if(ySrc < 1024)
                 to_draw_2 = &tx.d.image;
         }
         // draw the top pic
         if(to_draw_2 != nullptr)
         {
-            if(rotateAngle != 0.0)
-                C2D_DrawImage_Custom_Rotated(*to_draw_2, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, (1024.0f - ySrc) * hDst / hSrc,
-                                     xSrc, ySrc, wSrc, 1024.0f - ySrc, flip, center, rotateAngle, red, green, blue, alpha);
-            else
-                C2D_DrawImage_Custom(*to_draw_2, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, (1024.0f - ySrc) * hDst / hSrc,
-                                     xSrc, ySrc, wSrc, 1024.0f - ySrc, flip, red, green, blue, alpha);
-            yDst += (1024.0f - ySrc) * hDst / hSrc;
-            hDst -= (1024.0f - ySrc) * hDst / hSrc;
-            hSrc -= (1024.0f - ySrc);
+            C2D_DrawImage_Custom(*to_draw_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
+                                 xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
+            yDst += (1024 - ySrc) * hDst / hSrc;
+            hDst -= (1024 - ySrc) * hDst / hSrc;
+            hSrc -= (1024 - ySrc);
             ySrc = 0.0f;
         }
         else
@@ -1183,127 +799,8 @@ inline void i_renderTexturePrivate(float xDst, float yDst, float wDst, float hDs
 
     if(to_draw == nullptr) return;
 
-    if(rotateAngle != 0.0)
-        C2D_DrawImage_Custom_Rotated(*to_draw, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, hDst,
-                             xSrc, ySrc, wSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
-    else
-        C2D_DrawImage_Custom(*to_draw, xDst + s_viewport_offset_x, yDst + s_viewport_offset_y, wDst, hDst,
-                             xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
-}
-
-// public draw methods
-
-void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
-                            StdPicture &tx,
-                            int xSrc, int ySrc, int wSrc, int hSrc,
-                            float red, float green, float blue, float alpha)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    i_renderTexturePrivate(
-        div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
-        tx,
-        xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
-        0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
-}
-
-void renderTexture(double xDst, double yDst, double wDst, double hDst,
-                            StdPicture &tx,
-                            int xSrc, int ySrc,
-                            float red, float green, float blue, float alpha)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
-
-    i_renderTexturePrivate(
-        div_x, div_y, div_w, div_h,
-        tx,
-        xSrc / 2, ySrc / 2, div_w, div_h,
-        0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
-}
-
-void renderTexture(float xDst, float yDst, StdPicture &tx,
-                   float red, float green, float blue, float alpha)
-{
-    int w = tx.w / 2;
-    int h = tx.h / 2;
-    i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
-        tx,
-        0.0f, 0.0f, w, h,
-        0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
-}
-
-void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, float blue, float alpha)
-{
-    int w = tx.w / 2;
-    int h = tx.h / 2;
-    i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), w, h,
-        tx,
-        0.0f, 0.0f, w, h,
-        0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
-}
-
-void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
-{
-    i_renderTexturePrivate(
-        ROUNDDIV2(xDst), ROUNDDIV2(yDst), tx.w / 2, tx.h / 2,
-        tx,
-        0.0f, 0.0f, wDst / 2, hDst / 2,
-        0.0f, nullptr, X_FLIP_NONE,
-        red, green, blue, alpha);
-}
-
-void renderTextureFL(double xDst, double yDst, double wDst, double hDst,
-                          StdPicture &tx,
-                          int xSrc, int ySrc,
-                          double rotateAngle, FPoint_t *center, unsigned int flip,
-                          float red, float green, float blue, float alpha)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
-
-    i_renderTexturePrivate(
-        div_x, div_y, div_w, div_h,
-        tx,
-        xSrc / 2, ySrc / 2, div_w, div_h,
-        rotateAngle, center, flip,
-        red, green, blue, alpha);
-}
-
-void renderTextureScaleEx(double xDst, double yDst, double wDst, double hDst,
-                          StdPicture &tx,
-                          int xSrc, int ySrc,
-                          int wSrc, int hSrc,
-                          double rotateAngle, FPoint_t *center, unsigned int flip,
-                          float red, float green, float blue, float alpha)
-{
-    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
-    auto div_w = ROUNDDIV2(xDst + wDst) - div_x;
-    auto div_h = ROUNDDIV2(yDst + hDst) - div_y;
-
-    i_renderTexturePrivate(
-        div_x, div_y, div_w, div_h,
-        tx,
-        xSrc / 2, ySrc / 2, wSrc / 2, hSrc / 2,
-        rotateAngle, center, flip,
-        red, green, blue, alpha);
-}
-
-
-size_t lazyLoadedBytes()
-{
-    return 0;
-}
-
-void lazyLoadedBytesReset()
-{
+    C2D_DrawImage_Custom(*to_draw, xDst, yDst, wDst, hDst,
+                         xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
 }
 
 }; // namespace XRender

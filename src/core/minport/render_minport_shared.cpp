@@ -77,10 +77,16 @@ void updateViewport()
     hardware_w /= 2;
     hardware_h /= 2;
 
+#ifdef __3DS__
+    int ScreenW_Show = ScreenW - MAX_3D_OFFSET * 2;
+#else
+    int ScreenW_Show = ScreenW;
+#endif
+
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
     {
         int res_h = hardware_h;
-        int res_w = ScreenW * hardware_h / ScreenH;
+        int res_w = ScreenW_Show * hardware_h / ScreenH;
 
         if(res_w > hardware_w)
         {
@@ -93,31 +99,31 @@ void updateViewport()
     }
     else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
     {
-        g_screen_phys_w = ScreenW / 2;
+        g_screen_phys_w = ScreenW_Show / 2;
         g_screen_phys_h = ScreenH / 2;
     }
     else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
     {
-        g_screen_phys_w = ScreenW;
+        g_screen_phys_w = ScreenW_Show;
         g_screen_phys_h = ScreenH;
     }
     else if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
     {
-        g_screen_phys_w = ScreenW / 4;
+        g_screen_phys_w = ScreenW_Show / 4;
         g_screen_phys_h = ScreenH / 4;
     }
     else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
     {
-        g_screen_phys_w = ScreenW / 2;
+        g_screen_phys_w = ScreenW_Show / 2;
         g_screen_phys_h = ScreenH / 2;
         while(g_screen_phys_w <= hardware_w && g_screen_phys_h <= hardware_h)
         {
-            g_screen_phys_w += ScreenW / 2;
+            g_screen_phys_w += ScreenW_Show / 2;
             g_screen_phys_h += ScreenH / 2;
         }
-        if(g_screen_phys_w > ScreenW / 2)
+        if(g_screen_phys_w > ScreenW_Show / 2)
         {
-            g_screen_phys_w -= ScreenW / 2;
+            g_screen_phys_w -= ScreenW_Show / 2;
             g_screen_phys_h -= ScreenH / 2;
         }
     }

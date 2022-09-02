@@ -522,7 +522,7 @@ if(NINTENDO_3DS)
         src/3ds/mixer_platform.cpp
         src/control/input_3ds.cpp
         src/core/3ds/std_3ds.cpp
-#        src/core/minport/render_minport_shared.cpp
+        src/core/minport/render_minport_shared.cpp
         src/core/3ds/render_3ds.cpp
         src/core/3ds/window_3ds.cpp
         src/core/3ds/msgbox_3ds.cpp
