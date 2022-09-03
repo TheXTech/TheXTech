@@ -53,6 +53,7 @@
 #include "renderop_string.h"
 #include "mememu.h"
 #include "compat.h"
+#include "main/speedrunner.h"
 
 
 static FIELDTYPE StrToFieldtype(std::string string)
@@ -459,29 +460,8 @@ void Autocode::Do(bool init)
 
         case AT_IfCompatMode:
         {
-            int varval = CompatGetLevel();
-            // Check if the value meets the criteria and activate event if so
-            switch((COMPARETYPE)(int)Param1)
-            {
-            case CMPT_EQUALS:
-                if(varval == (int)Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            case CMPT_GREATER:
-                if(varval > (int)Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            case CMPT_LESS:
-                if(varval < (int)Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            case CMPT_NOTEQ:
-                if(varval != (int)Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            default:
-                break;
-            }
+            if(CheckConditionI(CompatGetLevel(), (int)Param2, (COMPARETYPE)(int)Param1))
+                gAutoMan.ActivateCustomEvents(0, (int)Param3);
             break;
         }
 
@@ -731,27 +711,9 @@ void Autocode::Do(bool init)
                 varval = gAutoMan.m_UserVars[GetS(MyString)];
 
             // Check if the value meets the criteria and activate event if so
-            switch((COMPARETYPE)(int)Param1)
-            {
-            case CMPT_EQUALS:
-                if(varval == Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            case CMPT_GREATER:
-                if(varval > Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            case CMPT_LESS:
-                if(varval < Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            case CMPT_NOTEQ:
-                if(varval != Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            default:
-                break;
-            }
+            if(CheckConditionD(varval, Param2, (COMPARETYPE)(int)Param1))
+                gAutoMan.ActivateCustomEvents(0, (int)Param3);
+
             break;
         }
 
@@ -760,36 +722,14 @@ void Autocode::Do(bool init)
             if(ReferenceOK())
             {
                 auto compare_type = (COMPARETYPE)(int)Param1;
-                // if(true)
-                //{
                 InitIfMissing(&gAutoMan.m_UserVars, GetS(MyString), 0);
                 InitIfMissing(&gAutoMan.m_UserVars, GetS(MyRef), 0);
 
                 double var1 = gAutoMan.m_UserVars[GetS(MyRef)];
                 double var2 = gAutoMan.m_UserVars[GetS(MyString)];
 
-                switch(compare_type)
-                {
-                case CMPT_EQUALS:
-                    if(var1 == var2)
-                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                    break;
-                case CMPT_GREATER:
-                    if(var1 > var2)
-                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                    break;
-                case CMPT_LESS:
-                    if(var1 < var2)
-                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                    break;
-                case CMPT_NOTEQ:
-                    if(var1 != var2)
-                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                    break;
-                default:
-                    break;
-                }
-                //}
+                if(CheckConditionD(var1, var2, compare_type))
+                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
             }
             break;
         }
