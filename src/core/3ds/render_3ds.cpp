@@ -71,7 +71,7 @@ int s_tex_h = 0;
 
 int s_num_textures_loaded = 0;
 
-C3D_Mtx s_target_view;
+C3D_RenderTarget* s_cur_target = nullptr;
 
 static void s_destroySceneTargets()
 {
@@ -206,7 +206,7 @@ bool init()
     s_top_screen = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
     s_right_screen = C2D_CreateScreenTarget(GFX_TOP, GFX_RIGHT);
     s_bottom_screen = C2D_CreateScreenTarget(GFX_BOTTOM, GFX_LEFT);
-    // bottom = right;
+    // s_bottom_screen = s_right_screen;
 
     updateViewport();
 
@@ -227,15 +227,8 @@ void quit()
 
 void setTargetTexture()
 {
-    s_ensureInFrame();
-
-    if(s_single_layer_mode)
-        C2D_SceneBegin(s_layer_targets[0]);
-    else
-        C2D_SceneBegin(s_layer_targets[2]); // screen plane target
-
-    C2D_ViewSave(&s_target_view);
-    minport_ApplyViewport();
+    // default to the screen plane target
+    setTargetLayer(2);
 }
 
 void setTargetScreen()
@@ -247,9 +240,10 @@ void setTargetMainScreen()
     s_ensureInFrame();
 
     C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
-    C2D_SceneBegin(s_top_screen);
 
-    C2D_ViewSave(&s_target_view);
+    C2D_SceneBegin(s_top_screen);
+    s_cur_target = s_top_screen;
+
     minport_ApplyViewport();
 }
 
@@ -258,9 +252,10 @@ void setTargetSubScreen()
     s_ensureInFrame();
 
     C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
-    C2D_SceneBegin(s_bottom_screen);
 
-    C2D_ViewSave(&s_target_view);
+    C2D_SceneBegin(s_bottom_screen);
+    s_cur_target = s_bottom_screen;
+
     minport_ApplyViewport();
 }
 
@@ -269,11 +264,16 @@ void setTargetLayer(int layer)
     s_ensureInFrame();
 
     if(!s_single_layer_mode)
+    {
         C2D_SceneBegin(s_layer_targets[layer]);
+        s_cur_target = s_layer_targets[layer];
+    }
     else
+    {
         C2D_SceneBegin(s_layer_targets[0]);
+        s_cur_target = s_layer_targets[0];
+    }
 
-    C2D_ViewSave(&s_target_view);
     minport_ApplyViewport();
 }
 
@@ -282,6 +282,7 @@ void clearBuffer()
     if(!g_in_frame)
     {
         C3D_FrameBegin(0);
+        C2D_ViewReset();
 
         C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);
@@ -308,6 +309,9 @@ void repaint()
     constexpr double shift_i[] = {shift, shift * 0.4, 0, shift * -0.4};
 
     s_depth_slider = osGet3DSliderState();
+
+    s_cur_target = nullptr;
+    C2D_ViewReset();
 
     // in this case, the level graphics have already been rescaled to the bottom screen
     if(g_screen_swapped && (LevelEditor || MagicHand) && editorScreen.active)
@@ -398,8 +402,8 @@ void repaint()
 
     // leave the draw context and wait for vblank...
     g_microStats.start_sleep();
-    if(g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC)
-        C3D_FrameSync();
+    // if(g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC)
+    //     C3D_FrameSync();
 
     g_microStats.start_task(MicroStats::Graphics);
     C3D_FrameEnd(0);
@@ -468,14 +472,38 @@ void minport_ApplyViewport()
     if(!g_in_frame)
         return;
 
-    C2D_ViewRestore(&s_target_view);
+    C2D_Flush();
 
-    if(g_viewport_offset_ignore)
-        C2D_ViewTranslate(g_viewport_x, g_viewport_y);
-    else
-        C2D_ViewTranslate(g_viewport_x + g_viewport_offset_x, g_viewport_y + g_viewport_offset_y);
+    C2D_ViewReset();
 
-    // C3D_SetScissor(GPU_SCISSOR_NORMAL, g_viewport_x, g_viewport_y, g_viewport_w, g_viewport_h);
+    if(!g_viewport_offset_ignore)
+        C2D_ViewTranslate(g_viewport_offset_x, g_viewport_offset_y);
+
+    if(s_cur_target)
+    {
+        int hw_viewport_w, hw_viewport_h;
+        int hw_viewport_x, hw_viewport_y;
+
+        // rotated 90deg clockwise
+        if(s_cur_target->linked)
+        {
+            hw_viewport_x = XStd::min(XStd::max(g_viewport_y, 0), s_cur_target->frameBuf.width - 1);
+            hw_viewport_y = XStd::min(XStd::max(g_viewport_x, 0), s_cur_target->frameBuf.height - 1);
+            hw_viewport_w = XStd::min(s_cur_target->frameBuf.width - hw_viewport_y, g_viewport_h);
+            hw_viewport_h = XStd::min(s_cur_target->frameBuf.height - hw_viewport_x, g_viewport_w);
+        }
+        else
+        {
+            hw_viewport_x = XStd::min(XStd::max(g_viewport_x, 0), s_cur_target->frameBuf.width - 1);
+            hw_viewport_y = XStd::min(XStd::max(g_viewport_y, 0), s_cur_target->frameBuf.height - 1);
+            hw_viewport_w = XStd::min(s_cur_target->frameBuf.width - hw_viewport_x, g_viewport_w);
+            hw_viewport_h = XStd::min(s_cur_target->frameBuf.height - hw_viewport_y, g_viewport_h);
+        }
+
+        C3D_SetViewport(g_viewport_x, s_cur_target->frameBuf.height - hw_viewport_y - hw_viewport_h, hw_viewport_w, hw_viewport_h);
+
+        C2D_SceneSize(g_viewport_w, g_viewport_h, false);
+    }
 }
 
 StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
@@ -690,6 +718,8 @@ void deleteTexture(StdPicture &tx, bool lazyUnload)
 {
     if(!tx.inited)
         return;
+
+    minport_unlinkTexture(&tx);
 
     if(tx.d.texture)
     {
