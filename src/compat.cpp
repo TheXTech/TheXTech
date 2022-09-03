@@ -81,7 +81,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_FreezeNPCs_no_reset = false;
     c.world_map_stars_show_policy = Compatibility_t::STARS_UNSPECIFIED;
     // 1.3.5.3
-    c.require_ground_to_enter_warps = false;
+    // c.require_ground_to_enter_warps = false; // REMOVED SINCE 1.3.6
     c.fix_npc_activation_event_loop_bug = true;
     c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
@@ -276,7 +276,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);
     compat.read("fix-npc-downward-clip", c.fix_npc_downward_clip, c.fix_npc_downward_clip);
     // 1.3.5.3
-    compat.read("require-ground-to-enter-warps", c.require_ground_to_enter_warps, c.require_ground_to_enter_warps);
+    // compat.read("require-ground-to-enter-warps", c.require_ground_to_enter_warps, c.require_ground_to_enter_warps); // REMOVED SINCE 1.3.6
     compat.read("fix-npc-activation-event-loop-bug", c.fix_npc_activation_event_loop_bug, c.fix_npc_activation_event_loop_bug);
     // 1.3.6
     compat.read("world-map-fast-move", c.world_map_fast_move, c.world_map_fast_move);
