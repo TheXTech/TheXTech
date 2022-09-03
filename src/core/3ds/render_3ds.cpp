@@ -803,6 +803,33 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     }
     flip ^= mode;
 
+    C3D_Mtx prev_view;
+
+    // handle rotation NOW
+    if(rotateAngle)
+    {
+        int16_t cx, cy;
+
+        if(center)
+        {
+            cx = center->x / 2.0f + 0.5f;
+            cy = center->y / 2.0f + 0.5f;
+        }
+        else
+        {
+            cx = wDst / 2;
+            cy = hDst / 2;
+        }
+
+        C2D_ViewSave(&prev_view);
+
+        C2D_ViewTranslate(xDst + cx, yDst + cy);
+        C2D_ViewRotateDegrees(rotateAngle);
+
+        xDst = -cx;
+        yDst = -cy;
+    }
+
     // texture boundaries
     // this never happens unless there was an invalid input
     // if((xSrc < 0.0f) || (ySrc < 0.0f)) return;
@@ -848,10 +875,15 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     }
     else to_draw = &tx.d.image;
 
-    if(to_draw == nullptr) return;
+    if(to_draw != nullptr)
+    {
+        C2D_DrawImage_Custom(*to_draw, xDst, yDst, wDst, hDst,
+                             xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
+    }
 
-    C2D_DrawImage_Custom(*to_draw, xDst, yDst, wDst, hDst,
-                         xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
+    // Finalize rotation HERE
+    if(rotateAngle)
+        C2D_ViewRestore(&prev_view);
 }
 
 }; // namespace XRender
