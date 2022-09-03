@@ -363,6 +363,9 @@ inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t w
                              float rotateAngle, FPoint_t *center, unsigned int flip,
                              float red, float green, float blue, float alpha)
 {
+    if(wDst <= 0 || hDst <= 0)
+        return;
+
     minport_RenderTexturePrivate(xDst, yDst, wDst, hDst,
                              tx,
                              xSrc, ySrc, wSrc, hSrc,

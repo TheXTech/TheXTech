@@ -611,6 +611,11 @@ void UpdateGraphics(bool skipRepaint)
                 GetvScreen(Z);
         }
 
+#ifdef __3DS__
+        if(Z != 1)
+            XRender::setTargetLayer(0);
+#endif
+
         // Note: this was guarded by an if(!LevelEditor) condition in the past
         if(Background2[S] == 0)
         {
