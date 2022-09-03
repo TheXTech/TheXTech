@@ -465,6 +465,13 @@ void Autocode::Do(bool init)
             break;
         }
 
+        case AT_IfSpeedRunMode:
+        {
+            if(CheckConditionI(g_speedRunnerMode, (int)Param2, (COMPARETYPE)(int)Param1))
+                gAutoMan.ActivateCustomEvents(0, (int)Param3);
+            break;
+        }
+
         case AT_TriggerRandom:
         {
             int choice = iRand2(4);
@@ -1531,6 +1538,7 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"IfNPC", AT_IfNPC},
     {"BlockTrigger", AT_BlockTrigger},
     {"IfCompatMode", AT_IfCompatMode},
+    {"IfSpeedRunMode", AT_IfSpeedRunMode},
     {"TriggerRandom", AT_TriggerRandom},
     {"TriggerRandomRange", AT_TriggerRandomRange},
     {"TriggerZone", AT_TriggerZone},
