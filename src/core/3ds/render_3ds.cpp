@@ -200,6 +200,7 @@ bool init()
     C2D_Prepare();
 
     C2D_SetTintMode(C2D_TintMult);
+    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
 
     // consoleInit(GFX_BOTTOM, NULL);
 
