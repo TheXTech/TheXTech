@@ -231,6 +231,8 @@ public:
     static void DoPredicate(int target, int predicate);
 
     static bool NPCConditional(int NPCID, int condition);
+    static bool CheckConditionI(int value1, int value2, COMPARETYPE cond);
+    static bool CheckConditionD(double value1, double value2, COMPARETYPE cond);
 
     static AutocodeType EnumerizeCommand(char *wbuf, int lineNumber = -1);
     static SpriteComponent GenerateComponent(const Autocode &obj_to_convert); // Convert an autocode object to a sprite component

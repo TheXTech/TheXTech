@@ -1386,6 +1386,60 @@ bool Autocode::NPCConditional(int target, int cond)
     }
 }
 
+bool Autocode::CheckConditionI(int value1, int value2, COMPARETYPE cond)
+{
+    switch(cond)
+    {
+    case CMPT_EQUALS:
+        if(value1 == value2)
+            return true;
+        break;
+    case CMPT_GREATER:
+        if(value1 > value2)
+            return true;
+        break;
+    case CMPT_LESS:
+        if(value1 < value2)
+            return true;
+        break;
+    case CMPT_NOTEQ:
+        if(value1 != value2)
+            return true;
+        break;
+    default:
+        break;
+    }
+
+    return false;
+}
+
+bool Autocode::CheckConditionD(double value1, double value2, COMPARETYPE cond)
+{
+    switch(cond)
+    {
+    case CMPT_EQUALS:
+        if(fEqual(value1, value2))
+            return true;
+        break;
+    case CMPT_GREATER:
+        if(value1 > value2)
+            return true;
+        break;
+    case CMPT_LESS:
+        if(value1 < value2)
+            return true;
+        break;
+    case CMPT_NOTEQ:
+        if(!fEqual(value1, value2))
+            return true;
+        break;
+    default:
+        break;
+    }
+
+    return false;
+}
+
 // RUN SELF OPTION
 void Autocode::RunSelfOption()
 {
