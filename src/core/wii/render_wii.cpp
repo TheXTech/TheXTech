@@ -338,14 +338,24 @@ void minport_ApplyViewport()
     int phys_offset_x = g_viewport_x * g_screen_phys_w * 2 / ScreenW;
     int phys_width = g_viewport_w * g_screen_phys_w * 2 / ScreenW;
 
-    int phys_offset_y = (g_viewport_y + g_viewport_offset_y) * g_screen_phys_h * 2 / ScreenH;
-    int phys_height = (g_viewport_h) * g_screen_phys_h * 2 / ScreenH;
+    int phys_offset_y = g_viewport_y * g_screen_phys_h * 2 / ScreenH;
+    int phys_height = g_viewport_h * g_screen_phys_h * 2 / ScreenH;
+
+    if(g_screen_phys_x + phys_offset_x < 0)
+        phys_offset_x = -g_screen_phys_x;
+    if(g_screen_phys_y + phys_offset_y < 0)
+        phys_offset_y = -g_screen_phys_y;
 
     GX_SetViewport(g_screen_phys_x + phys_offset_x, g_screen_phys_y + phys_offset_y, phys_width, phys_height, 0, 1);
     GX_SetScissor(g_screen_phys_x + phys_offset_x, g_screen_phys_y + phys_offset_y, phys_width, phys_height);
 
     Mtx44 perspective;
-    guOrtho(perspective, 0, g_viewport_h, 0, g_viewport_w, -1.0f, 1.0f);
+
+    if(g_viewport_offset_ignore)
+        guOrtho(perspective, 0, g_viewport_h, 0, g_viewport_w, -1.0f, 1.0f);
+    else
+        guOrtho(perspective, 0, g_viewport_h, 0, g_viewport_w, -1.0f, 1.0f);
+
     GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 
     // int ox = g_viewport_x + g_viewport_offset_x;
@@ -788,8 +798,11 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         if(to_draw_2 != nullptr)
         {
             if(rotateAngle != 0.0)
+            {
+                // TODO: use correct center to support big textures being rotated
                 GX_DrawImage_Custom_Rotated(to_draw_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, center, rotateAngle, red, green, blue, alpha);
+            }
             else
                 GX_DrawImage_Custom(to_draw_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
