@@ -227,8 +227,21 @@ void quit()
 
 void setTargetTexture()
 {
-    // default to the screen plane target
-    setTargetLayer(2);
+    s_ensureInFrame();
+
+    if(!s_single_layer_mode)
+    {
+        // screen plane layer
+        C2D_SceneBegin(s_layer_targets[2]);
+        s_cur_target = s_layer_targets[2];
+    }
+    else
+    {
+        C2D_SceneBegin(s_layer_targets[0]);
+        s_cur_target = s_layer_targets[0];
+    }
+
+    C2D_ViewReset();
 }
 
 void setTargetScreen()
@@ -244,7 +257,7 @@ void setTargetMainScreen()
     C2D_SceneBegin(s_top_screen);
     s_cur_target = s_top_screen;
 
-    minport_ApplyViewport();
+    C2D_ViewReset();
 }
 
 void setTargetSubScreen()
@@ -256,7 +269,7 @@ void setTargetSubScreen()
     C2D_SceneBegin(s_bottom_screen);
     s_cur_target = s_bottom_screen;
 
-    minport_ApplyViewport();
+    C2D_ViewReset();
 }
 
 void setTargetLayer(int layer)
@@ -489,8 +502,8 @@ void minport_ApplyViewport()
         {
             hw_viewport_x = XStd::min(XStd::max(g_viewport_y, 0), s_cur_target->frameBuf.width - 1);
             hw_viewport_y = XStd::min(XStd::max(g_viewport_x, 0), s_cur_target->frameBuf.height - 1);
-            hw_viewport_w = XStd::min(s_cur_target->frameBuf.width - hw_viewport_y, g_viewport_h);
-            hw_viewport_h = XStd::min(s_cur_target->frameBuf.height - hw_viewport_x, g_viewport_w);
+            hw_viewport_w = XStd::min(s_cur_target->frameBuf.width - hw_viewport_x, g_viewport_h);
+            hw_viewport_h = XStd::min(s_cur_target->frameBuf.height - hw_viewport_y, g_viewport_w);
         }
         else
         {
@@ -500,9 +513,16 @@ void minport_ApplyViewport()
             hw_viewport_h = XStd::min(s_cur_target->frameBuf.height - hw_viewport_y, g_viewport_h);
         }
 
-        C3D_SetViewport(g_viewport_x, s_cur_target->frameBuf.height - hw_viewport_y - hw_viewport_h, hw_viewport_w, hw_viewport_h);
-
-        C2D_SceneSize(g_viewport_w, g_viewport_h, false);
+        if(s_cur_target->linked)
+        {
+            C3D_SetViewport(s_cur_target->frameBuf.width - hw_viewport_x - hw_viewport_w, hw_viewport_y, hw_viewport_w, hw_viewport_h);
+            C2D_SceneSize(g_viewport_h, g_viewport_w, s_cur_target->linked);
+        }
+        else
+        {
+            C3D_SetViewport(hw_viewport_x, s_cur_target->frameBuf.height - hw_viewport_y - hw_viewport_h, hw_viewport_w, hw_viewport_h);
+            C2D_SceneSize(g_viewport_w, g_viewport_h, s_cur_target->linked);
+        }
     }
 }
 
