@@ -52,6 +52,7 @@
 #include "lunacounter.h"
 #include "renderop_string.h"
 #include "mememu.h"
+#include "compat.h"
 
 
 static FIELDTYPE StrToFieldtype(std::string string)
@@ -452,6 +453,34 @@ void Autocode::Do(bool init)
                     RunSelfOption();
                     gAutoMan.ActivateCustomEvents(0, (int)Param3);
                 }
+            }
+            break;
+        }
+
+        case AT_IfCompatMode:
+        {
+            int varval = CompatGetLevel();
+            // Check if the value meets the criteria and activate event if so
+            switch((COMPARETYPE)(int)Param1)
+            {
+            case CMPT_EQUALS:
+                if(varval == (int)Param2)
+                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
+                break;
+            case CMPT_GREATER:
+                if(varval > (int)Param2)
+                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
+                break;
+            case CMPT_LESS:
+                if(varval < (int)Param2)
+                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
+                break;
+            case CMPT_NOTEQ:
+                if(varval != (int)Param2)
+                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
+                break;
+            default:
+                break;
             }
             break;
         }
@@ -1507,6 +1536,7 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"Timer", AT_Timer},
     {"IfNPC", AT_IfNPC},
     {"BlockTrigger", AT_BlockTrigger},
+    {"IfCompatMode", AT_IfCompatMode},
     {"TriggerRandom", AT_TriggerRandom},
     {"TriggerRandomRange", AT_TriggerRandomRange},
     {"TriggerZone", AT_TriggerZone},
