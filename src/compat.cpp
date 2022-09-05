@@ -199,7 +199,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
     compat.endGroup();
 
-    compat.beginGroup("death-counter");
+    if(!compat.beginGroup("fails-counter"))
+        compat.beginGroup("death-counter"); // Backup fallback
     {
         std::string buffer;
         compat.read("enabled", c.demos_counter_enable, c.demos_counter_enable);
