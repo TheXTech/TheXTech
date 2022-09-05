@@ -181,9 +181,11 @@ public:
     size_t FG_n;
     uint16_t Dropped[20];
     size_t Dropped_n;
+    uint16_t Warning[20];
+    size_t Warning_n;
     void reset()
     {
-        BG_n = Low_n = Iced_n = Normal_n = Chat_n = Held_n = FG_n = Dropped_n = 0;
+        BG_n = Low_n = Iced_n = Normal_n = Chat_n = Held_n = FG_n = Dropped_n = Warning_n = 0;
     }
     void add(uint16_t A)
     {
@@ -274,6 +276,16 @@ public:
             g_stats.renderedNPCs += 1;
         }
     }
+
+    void add_warning(uint16_t A)
+    {
+        if(Warning_n != sizeof(Warning)/sizeof(uint16_t))
+        {
+            Warning[Warning_n] = A;
+            Warning_n += 1;
+            g_stats.renderedNPCs += 1;
+        }
+    }
 };
 
 NPC_Draw_Queue_t NPC_Draw_Queue[2] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
@@ -348,6 +360,102 @@ inline void get_NPC_tint(int A, float& cn, float& an)
         cn = 1.0f;
         an = 1.0f;
     }
+}
+
+// draws a warning icon for offscreen active NPC A on vScreen Z
+void DrawWarningNPC(int Z, int A)
+{
+    float cn, an;
+    get_NPC_tint(A, cn, an);
+
+    double scr_x, scr_y, w, h;
+    if(NPCWidthGFX[NPC[A].Type] == 0)
+    {
+        scr_x = vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
+        scr_y = vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type];
+        w = NPC[A].Location.Width;
+        h = NPC[A].Location.Height;
+    }
+    else
+    {
+        scr_x = vScreenX[Z] + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0;
+        scr_y = vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height;
+        w = NPCWidthGFX[NPC[A].Type];
+        h = NPCHeightGFX[NPC[A].Type];
+    }
+
+    double left_x = -scr_x;
+    double right_x = scr_x + w - vScreen[Z].Width;
+
+    double add_x = (left_x > 0 ? left_x : (right_x > 0 ? -right_x : 0));
+
+    double top_y = -scr_y;
+    double bottom_y = scr_y + h - vScreen[Z].Height;
+
+    double add_y = (top_y > 0 ? top_y : (bottom_y > 0 ? -bottom_y : 0));
+
+    double total_off = (add_x > 0 ? add_x : -add_x)
+        + (add_y > 0 ? add_y : -add_y);
+
+    // don't worry if it's moving away from the screen
+    if((add_x > 0 && NPC[A].Location.SpeedX < 0)
+        || (add_x < 0 && NPC[A].Location.SpeedX > 0)
+        || (add_y > 0 && NPC[A].Location.SpeedY < 0)
+        || (add_y < 0 && NPC[A].Location.SpeedY > 0))
+    {
+        return;
+    }
+
+    an *= (250.0 - total_off) / 500.0;
+    if(an > 1.0f)
+        an = 1.0f;
+    if(an < 0.0f)
+        return;
+
+    double scale = 0.25 + (250.0 - total_off) / 500.0;
+
+    scr_x += w * (1 - scale) / 2;
+    scr_y += h * (1 - scale);
+
+    double exclam_x = 0.5;
+    double exclam_y = 0.5;
+
+    // push it onto the screen
+    if(scr_x < 0)
+    {
+        scr_x = 0;
+        exclam_x = 0.25;
+    }
+    else if(scr_x + w * scale > vScreen[Z].Width)
+    {
+        scr_x = vScreen[Z].Width - w * scale;
+        exclam_x = 0.75;
+    }
+
+    if(scr_y < 0)
+    {
+        scr_y = 0;
+        exclam_y = 0.25;
+    }
+    else if(scr_y + h * scale > vScreen[Z].Height)
+    {
+        scr_y = vScreen[Z].Height - h * scale;
+        exclam_y = 0.75;
+    }
+
+    XRender::renderTextureScaleEx(scr_x,
+        scr_y,
+        w * scale, h * scale,
+        GFXNPC[NPC[A].Type],
+        0, NPC[A].Frame * h,
+        w, h,
+        0, nullptr, X_FLIP_NONE,
+        cn, cn, cn, an);
+
+    XRender::renderTexture(scr_x + (w * scale - GFX.Chat.w) * exclam_x,
+        scr_y + (h * scale - GFX.Chat.h) * exclam_y,
+        GFX.Chat,
+        1.0f, 0.0f, 0.0f, an);
 }
 
 void GraphicsLazyPreLoad()
@@ -921,6 +1029,14 @@ void UpdateGraphics(bool skipRepaint)
                         {
                             NPCFrames(A);
                         }
+                    }
+                }
+                else if(!Do_FrameSkip && NPC[A].Active && cannot_reset && g_config.small_screen_camera_features)
+                {
+                    if(NPC[A].Location.SpeedX != 0 || NPC[A].Location.SpeedY != 0
+                        || (!NPC[A].Inert && !NPCWontHurt[NPC[A].Type] && !NPCIsACoin[NPC[A].Type] && !NPCIsABonus[NPC[A].Type]))
+                    {
+                        NPC_Draw_Queue_p.add_warning(A);
                     }
                 }
             }
@@ -2218,6 +2334,13 @@ void UpdateGraphics(bool skipRepaint)
             }
 //            End With
 //        Next A
+        }
+
+        // NPCs warnings
+        for(size_t i = 0; i < NPC_Draw_Queue_p.Warning_n; i++)
+        {
+            A = NPC_Draw_Queue_p.Warning[i];
+            DrawWarningNPC(Z, A);
         }
 
         // water
