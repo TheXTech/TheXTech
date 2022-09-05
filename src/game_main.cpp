@@ -1942,6 +1942,7 @@ void DeleteSave(int world, int save)
 
     AddFile("save{0}.savx");
     AddFile("timers{0}.ini");
+    AddFile("deaths-{0}.rip");
     AddFile("demos-{0}.dmo");
     // Old gamesaves
     AddFileW("save{0}.savx");
@@ -2004,6 +2005,7 @@ void CopySave(int world, int src, int dst)
     Files::copyFile(savePathDst, savePathSrc, true);
 
     copySaveFile(w, "timers{0}.ini", src, dst);
+    copySaveFile(w, "deaths-{0}.rip", src, dst);
     copySaveFile(w, "demos-{0}.dmo", src, dst);
 
 #ifdef __EMSCRIPTEN__
