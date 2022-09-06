@@ -259,6 +259,13 @@ bool InputMethod_Wii::Update(int player, Controls_t& c, CursorControls_t& m, Edi
             WPAD_Rumble(m_chn, 0);
     }
 
+    float shake_accum_target = fabs(data->gforce.z - 1.0f);
+
+    if(shake_accum_target > m_shake_accum)
+        m_shake_accum = shake_accum_target;
+    else if(m_shake_accum > 0.05)
+        m_shake_accum -= 0.05;
+
     m_battery_status = data->battery_level;
 
     bool probably_sideways = (!GameMenu && !LevelEditor && !MagicHand && (GamePaused == PauseCode::None || GamePaused == PauseCode::PauseScreen || GamePaused == PauseCode::Message));
@@ -351,9 +358,9 @@ bool InputMethod_Wii::Update(int player, Controls_t& c, CursorControls_t& m, Edi
                 *b = false;
             }
 
-            if(s_get_button(data, key, p->m_expansion))
+            if((key == WPAD_SHAKE && m_shake_accum > 1.0) || s_get_button(data, key, p->m_expansion))
                 *b = true;
-            else if(s_get_button(data, key2, p->m_expansion))
+            else if((key2 == WPAD_SHAKE && m_shake_accum > 1.0) || s_get_button(data, key2, p->m_expansion))
                 *b = true;
 
             if(a == 3 && *b)

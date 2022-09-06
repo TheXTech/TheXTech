@@ -17,6 +17,7 @@ public:
     int m_chn = 0;
     int m_rumble_ticks = 0;
     uint8_t m_battery_status = 0;
+    double m_shake_accum = 0.0;
 
     using InputMethod::Type;
     using InputMethod::Profile;
