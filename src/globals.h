@@ -1481,10 +1481,13 @@ extern RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrameCount;
 extern RangeArrI<int, 1, maxBlockType, 0> BlockFrame;
 //Public BlockFrame2(1 To maxBlockType) As Integer 'Counter to update the blocks frame
 extern RangeArrI<int, 1, maxBlockType, 0> BlockFrame2;
+
+// deprecated
 //Public sBlockArray(1 To 1000) As Integer 'sizable block array
-extern RangeArrI<int, 1, 1000, 0> sBlockArray;
+// extern RangeArrI<int, 1, 1000, 0> sBlockArray;
 //Public sBlockNum As Integer
-extern int sBlockNum;
+// extern int sBlockNum;
+
 //Public SceneFrame(1 To maxSceneType) As Integer 'What frame the scene is on
 extern RangeArrI<int, 1, maxSceneType, 0> SceneFrame;
 //Public SceneFrame2(1 To maxSceneType) As Integer 'Counter to update the scene frames
