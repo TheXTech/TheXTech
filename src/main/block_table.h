@@ -29,29 +29,34 @@
 
 #include "globals.h"
 
-struct BlockRef_t
+enum ContinuedRect
 {
-    int16_t index;
-
-    // conversions to and from underlying integer type
-    BlockRef_t(int16_t index): index(index) {}
-    operator int16_t() const { return index; }
-
-    Block_t& operator*() const { return Block[index]; }
-    Block_t* operator->() const { return &Block[index]; }
+    CONT_NONE = 0,
+    CONT_X = 1,
+    CONT_Y = 2,
+    CONT_XY = CONT_X | CONT_Y,
 };
 
-template<size_t node_size>
-struct block_node_t
+struct AugBlockRef_t
 {
+    BlockRef_t block;
+    uint8_t cont_axes;
+};
+
+struct node_t
+{
+    constexpr int node_size = 4;
+
     block_node_t<node_size>* next;
     int16_t index[node_size];
-    uint16_t filled;
+    uint8_t filled;
+    uint8_t cont_axes;
 
     inline block_node_t()
     {
         next = nullptr;
         filled = 0;
+        cont_axes = 0;
     }
 
     inline ~block_node_t()
@@ -62,7 +67,7 @@ struct block_node_t
 
     struct iterator
     {
-        block_node_t<node_size>* parent;
+        block_node_t* parent;
         uint16_t i;
 
         inline void check_linkage()
@@ -73,7 +78,7 @@ struct block_node_t
                 this->i = 0;
             }
         }
-        inline iterator(block_node_t<node_size>* parent, size_t i): parent(parent), i(i)
+        inline iterator(block_node_t* parent, size_t i): parent(parent), i(i)
         {
             this->check_linkage();
         }
@@ -90,9 +95,9 @@ struct block_node_t
         {
             return this->parent != other.parent || this->i != other.i;
         }
-        inline int16_t operator*() const
+        inline AugBlockRef_t operator*() const
         {
-            return this->parent->index[this->i];
+            return {this->parent->index[this->i], (this->parent->cont_axes >> (this->i * 2)) & 3};
         }
     };
 
@@ -106,11 +111,12 @@ struct block_node_t
         return iterator(nullptr, 0);
     }
 
-    inline void insert(int16_t i)
+    inline void insert(AugBlockRef_t b)
     {
         if(this->filled != node_size)
         {
             this->index[this->filled] = i;
+            this->cont_axes |= (b.cont_axes & 3) << (this->filled * 2);
             this->filled++;
         }
         else
@@ -125,14 +131,17 @@ struct block_node_t
     {
         it.parent->filled--;
         it.parent->index[it.i] = it.parent->index[it.parent->filled];
+        it.parent->cont_axes &= ~(3 << (it.i * 2));
+        it.parent->cont_axes |= ((it.parent->cont_axes >> (it.parent->filled * 2)) & 3) << (it.i * 2);
+        it.parent->cont_axes &= ~(3 << (it.parent->filled * 2));
     }
 
-    inline void erase(int16_t i)
+    inline void erase(BlockRef_t i)
     {
         iterator it = this->begin();
         while(it != this->end())
         {
-            if(*it == i)
+            if(*it.block == i)
                 break;
             ++it;
         }
@@ -140,6 +149,123 @@ struct block_node_t
             this->erase(it);
     }
 };
+
+struct AugLoc_t
+{
+    int16_t x, y;
+    uint8_t cont_axes;
+};
+
+struct rect_internal
+{
+    int16_t t, l, b, r;
+    uint8_t cont_axes;
+
+    class iterator
+    {
+    private:
+        const rect_2d& parent;
+        AugLoc_t cur_loc;
+    public:
+        inline iterator(const rect_2d& parent, loc_2d cur_loc): parent(parent), cur_loc(cur_loc) {}
+        inline iterator operator++()
+        {
+            this->cur_loc.x++;
+            this->cur_loc.cont_axes |= CONT_X;
+            if(this->cur_loc.x == this->parent.r)
+            {
+                this->cur_loc.y ++;
+
+                if(this->cur_loc.y != this->parent.br.y)
+                {
+                    this->cur_loc.cont_axes |= CONT_Y;
+                    this->cur_loc.cont_axes &= ~CONT_X | cont_axes & CONT_X;
+                    this->cur_loc.x = this->parent.tl.x;
+                }
+            }
+            return *this;
+        }
+        inline bool operator!=(const iterator& other) const
+        {
+            return this->cur_loc != other.cur_loc;
+        }
+        inline const AugLoc_t& operator*() const
+        {
+            return cur_loc;
+        }
+    };
+
+    inline iterator begin() const
+    {
+        if(t == b || l == r)
+            return end();
+
+        return iterator(*this, {t, l, cont_axes});
+    }
+
+    inline iterator end() const
+    {
+        return iterator(*this, {b, r, CONT_XY});
+    }
+};
+
+struct rect_external
+{
+    int32_t t, l, b, r;
+
+    rect_external(const Location_t& loc)
+    {
+        l = std::floor(loc.X);
+        t = std::floor(loc.Y);
+        b = std::ceil(loc.Y + loc.Height);
+        r = std::ceil(loc.X + loc.Width);
+    }
+};
+
+// a screen is 2048x2048.
+// it's made up of block_node_t's, which are 64x64 each.
+// soon it will be 2000x2000, so that there's some room for shifting the offset for performance
+struct screen_t
+{
+    std::array<node_t, 1024> nodes;
+    screen_t(double t, l) : t(t), l(l) {}
+
+    ~screen_t()
+    {
+        for(node_t* n : nodes)
+        {
+            if(n)
+                delete n;
+        }
+    }
+
+    void query(std::vector<BlockRef_t>& out, const rect_internal& rect)
+    {
+        for(const AugLoc_t& loc : rect)
+        {
+            for(AugBlockRef_t b : nodes[loc.x * 32 + loc.y])
+            {
+                // only want blocks that are new on all continued axes
+                if(b.cont_axes & loc.cont_axes == CONT_NONE)
+                    out.push_back(b.block);
+            }
+        }
+    }
+
+    void insert(BlockRef_t b, const rect_internal& rect)
+    {
+        for(const AugLoc_t& loc : rect)
+            nodes[loc.x * 32 + loc.y].insert({b, loc.cont_axes});
+    }
+
+    void erase(BlockRef_t b, const rect_internal& rect)
+    {
+        for(const AugLoc_t& loc : rect)
+            nodes[loc.x * 32 + loc.y].erase(b);
+    }
+};
+
+/// UPDATED TO HERE
 
 template<typename t>
 class BasicAllocator
@@ -196,7 +322,7 @@ struct BlockTable
     static constexpr size_t num_areas = screen_size / area_size;
     static constexpr size_t total_num_areas = num_zones * num_screens * num_areas;
 
-    using Area = std::set<BlockRef_t>;
+    using Area = block_node_t;
 
     struct Screen
     {

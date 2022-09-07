@@ -32,34 +32,32 @@ void treeLevelCleanBlockLayers()
         block_table[i].clear();
 }
 
-void treeBlockAddLayer(int layer, Block_t *obj)
+void treeBlockAddLayer(int layer, BlockRef_t block)
 {
     if(layer < 0)
         layer = maxLayers + 1;
-    block_table[layer].insert(obj - &Block[0]);
+    block_table[layer].insert(block);
 }
 
-void treeBlockUpdateLayer(int layer, Block_t *obj)
+void treeBlockUpdateLayer(int layer, BlockRef_t block)
 {
     if(layer < 0)
         layer = maxLayers + 1;
-    block_table[layer].update(obj - &Block[0]);
+    block_table[layer].update(block);
 }
 
-void treeBlockRemoveLayer(int layer, Block_t *obj)
+void treeBlockRemoveLayer(int layer, BlockRef_t block)
 {
     if(layer < 0)
         layer = maxLayers + 1;
-    block_table[layer].erase(obj - &Block[0]);
+    block_table[layer].erase(block);
 }
 
-TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
+TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
                          int sort_mode,
                          double margin)
 {
-    TreeResult_Sentinel<Block_t> result;
-
-    static std::set<BlockRef_t> temp_result;
+    TreeResult_Sentinel<BlockRef_t> result;
 
     for(int layer = 0; layer < maxLayers+2; layer++)
     {
@@ -83,21 +81,16 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
            (Right - Left) + margin * 2,
            (Bottom - Top) + margin * 2);
 
-        block_table[layer].query(loc, temp_result);
-
-        for(BlockRef_t member : temp_result)
-            result.i_vec->push_back(&*member);
-
-        temp_result.clear();
+        block_table[layer].query(loc, result);
     }
 
     if(sort_mode == SORTMODE_LOC)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
             [](void* a, void* b) {
-                return (((Block_t*)a)->Location.X < ((Block_t*)b)->Location.X
-                    || (((Block_t*)a)->Location.X == ((Block_t*)b)->Location.X
-                        && ((Block_t*)a)->Location.Y < ((Block_t*)b)->Location.Y));
+                return (((BlockRef_t*)a)->Location.X < ((BlockRef_t*)b)->Location.X
+                    || (((BlockRef_t*)a)->Location.X == ((BlockRef_t*)b)->Location.X
+                        && ((BlockRef_t*)a)->Location.Y < ((BlockRef_t*)b)->Location.Y));
             });
     }
     else if(sort_mode == SORTMODE_ID)
@@ -121,7 +114,7 @@ TreeResult_Sentinel<Block_t> treeBlockQuery(double Left, double Top, double Righ
     return result;
 }
 
-TreeResult_Sentinel<Block_t> treeBlockQuery(const Location_t &loc,
+TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
                          int sort_mode,
                          double margin)
 {
