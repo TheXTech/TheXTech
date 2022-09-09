@@ -173,17 +173,17 @@ struct rect_internal
         inline iterator(const rect_internal& parent, AugLoc_t cur_loc): parent(parent), cur_loc(cur_loc) {}
         inline iterator operator++()
         {
-            this->cur_loc.x++;
-            this->cur_loc.cont_axes |= CONT_X;
-            if(this->cur_loc.x == this->parent.r)
+            this->cur_loc.y++;
+            this->cur_loc.cont_axes |= CONT_Y;
+            if(this->cur_loc.y == this->parent.b)
             {
-                this->cur_loc.y ++;
+                this->cur_loc.x++;
 
-                if(this->cur_loc.y != this->parent.b)
+                if(this->cur_loc.x != this->parent.r)
                 {
-                    this->cur_loc.cont_axes |= CONT_Y;
-                    this->cur_loc.cont_axes &= ~CONT_X | (this->parent.cont_axes & CONT_X);
-                    this->cur_loc.x = this->parent.l;
+                    this->cur_loc.cont_axes |= CONT_X;
+                    this->cur_loc.cont_axes &= ~CONT_Y | (this->parent.cont_axes & CONT_Y);
+                    this->cur_loc.y = this->parent.t;
                 }
             }
             return *this;
