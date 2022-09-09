@@ -269,9 +269,9 @@ struct screen_t
 struct table_t
 {
     std::vector<std::vector<screen_t*>> columns;
-    std::vector<int32_t> col_first_row_index;
+    std::vector<int> col_first_row_index;
     std::unordered_map<BlockRef_t, rect_external> member_rects;
-    int32_t first_col_index;
+    int first_col_index;
 
     void query(std::vector<BaseRef_t>& out, const rect_external& rect)
     {
