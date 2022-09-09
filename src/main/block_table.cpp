@@ -24,7 +24,7 @@
 #include "trees.h"
 #include "layers.h"
 
-BlockTable block_table[maxLayers+2];
+table_t block_table[maxLayers+2];
 
 void treeLevelCleanBlockLayers()
 {
@@ -81,29 +81,29 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double R
            (Right - Left) + margin * 2,
            (Bottom - Top) + margin * 2);
 
-        block_table[layer].query(loc, result);
+        block_table[layer].query(*result.i_vec, loc);
     }
 
     if(sort_mode == SORTMODE_LOC)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
-                return (((BlockRef_t*)a)->Location.X < ((BlockRef_t*)b)->Location.X
-                    || (((BlockRef_t*)a)->Location.X == ((BlockRef_t*)b)->Location.X
-                        && ((BlockRef_t*)a)->Location.Y < ((BlockRef_t*)b)->Location.Y));
+            [](BaseRef_t a, BaseRef_t b) {
+                return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                    || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
+                        && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
             });
     }
     else if(sort_mode == SORTMODE_ID)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
+            [](BaseRef_t a, BaseRef_t b) {
                 return a < b;
             });
     }
     else if(sort_mode == SORTMODE_Z)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](void* a, void* b) {
+            [](BaseRef_t a, BaseRef_t b) {
                 // not implemented yet, might never be
                 // instead, just sort by the index
                 // (which is currently the same as z-order)

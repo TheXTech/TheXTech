@@ -26,6 +26,7 @@
 #include <iterator>
 #include <array>
 #include <set>
+#include <unordered_map>
 
 #include "globals.h"
 
@@ -45,21 +46,21 @@ struct AugBlockRef_t
 
 struct node_t
 {
-    constexpr int node_size = 4;
+    static constexpr int node_size = 4;
 
-    block_node_t<node_size>* next;
-    int16_t index[node_size];
-    uint8_t filled;
-    uint8_t cont_axes;
+    node_t* next = nullptr;
+    int16_t block[node_size];
+    uint8_t filled = 0;
+    uint8_t cont_axes = 0;
 
-    inline block_node_t()
+    inline node_t()
     {
         next = nullptr;
         filled = 0;
         cont_axes = 0;
     }
 
-    inline ~block_node_t()
+    inline ~node_t()
     {
         if(next)
             delete next;
@@ -67,8 +68,10 @@ struct node_t
 
     struct iterator
     {
-        block_node_t* parent;
+        node_t* parent;
         uint16_t i;
+
+        constexpr inline iterator(nullptr_t parent) : parent(parent), i(0) {}
 
         inline void check_linkage()
         {
@@ -78,7 +81,7 @@ struct node_t
                 this->i = 0;
             }
         }
-        inline iterator(block_node_t* parent, size_t i): parent(parent), i(i)
+        inline iterator(node_t* parent, size_t i): parent(parent), i(i)
         {
             this->check_linkage();
         }
@@ -97,7 +100,7 @@ struct node_t
         }
         inline AugBlockRef_t operator*() const
         {
-            return {this->parent->index[this->i], (this->parent->cont_axes >> (this->i * 2)) & 3};
+            return {this->parent->block[this->i], (uint8_t)((this->parent->cont_axes >> (this->i * 2)) & 3)};
         }
     };
 
@@ -106,42 +109,42 @@ struct node_t
         return iterator(this, 0);
     }
 
-    constexpr inline iterator end() const
+    static constexpr inline iterator end()
     {
-        return iterator(nullptr, 0);
+        return iterator(nullptr);
     }
 
     inline void insert(AugBlockRef_t b)
     {
-        if(this->filled != node_size)
+        if(this->filled < node_size)
         {
-            this->index[this->filled] = i;
+            this->block[this->filled] = b.block;
             this->cont_axes |= (b.cont_axes & 3) << (this->filled * 2);
             this->filled++;
         }
         else
         {
             if(!this->next)
-                this->next = new block_node_t<node_size>;
-            this->next->insert(i);
+                this->next = new node_t;
+            this->next->insert(b);
         }
     }
 
     inline void erase(iterator& it)
     {
         it.parent->filled--;
-        it.parent->index[it.i] = it.parent->index[it.parent->filled];
+        it.parent->block[it.i] = it.parent->block[it.parent->filled];
         it.parent->cont_axes &= ~(3 << (it.i * 2));
         it.parent->cont_axes |= ((it.parent->cont_axes >> (it.parent->filled * 2)) & 3) << (it.i * 2);
         it.parent->cont_axes &= ~(3 << (it.parent->filled * 2));
     }
 
-    inline void erase(BlockRef_t i)
+    inline void erase(BlockRef_t b)
     {
         iterator it = this->begin();
         while(it != this->end())
         {
-            if(*it.block == i)
+            if((*it).block == b)
                 break;
             ++it;
         }
@@ -164,10 +167,10 @@ struct rect_internal
     class iterator
     {
     private:
-        const rect_2d& parent;
+        const rect_internal& parent;
         AugLoc_t cur_loc;
     public:
-        inline iterator(const rect_2d& parent, loc_2d cur_loc): parent(parent), cur_loc(cur_loc) {}
+        inline iterator(const rect_internal& parent, AugLoc_t cur_loc): parent(parent), cur_loc(cur_loc) {}
         inline iterator operator++()
         {
             this->cur_loc.x++;
@@ -176,18 +179,18 @@ struct rect_internal
             {
                 this->cur_loc.y ++;
 
-                if(this->cur_loc.y != this->parent.br.y)
+                if(this->cur_loc.y != this->parent.b)
                 {
                     this->cur_loc.cont_axes |= CONT_Y;
-                    this->cur_loc.cont_axes &= ~CONT_X | cont_axes & CONT_X;
-                    this->cur_loc.x = this->parent.tl.x;
+                    this->cur_loc.cont_axes &= ~CONT_X | (this->parent.cont_axes & CONT_X);
+                    this->cur_loc.x = this->parent.l;
                 }
             }
             return *this;
         }
         inline bool operator!=(const iterator& other) const
         {
-            return this->cur_loc != other.cur_loc;
+            return this->cur_loc.y != other.cur_loc.y || this->cur_loc.x != other.cur_loc.x;
         }
         inline const AugLoc_t& operator*() const
         {
@@ -200,18 +203,20 @@ struct rect_internal
         if(t == b || l == r)
             return end();
 
-        return iterator(*this, {t, l, cont_axes});
+        return iterator(*this, {l, t, cont_axes});
     }
 
     inline iterator end() const
     {
-        return iterator(*this, {b, r, CONT_XY});
+        return iterator(*this, {r, b, CONT_XY});
     }
 };
 
 struct rect_external
 {
     int32_t t, l, b, r;
+
+    rect_external() {}
 
     rect_external(const Location_t& loc)
     {
@@ -223,30 +228,24 @@ struct rect_external
 };
 
 // a screen is 2048x2048.
-// it's made up of block_node_t's, which are 64x64 each.
-// soon it will be 2000x2000, so that there's some room for shifting the offset for performance
+// it's made up of node_t's, which are 64x64 each.
+// soon it will have 33x33 nodes instead of 32x32, so that there's some room for shifting the offset for performance
 struct screen_t
 {
     std::array<node_t, 1024> nodes;
-    screen_t(double t, l) : t(t), l(l) {}
 
-    ~screen_t()
+    screen_t()
     {
-        for(node_t* n : nodes)
-        {
-            if(n)
-                delete n;
-        }
     }
 
-    void query(std::vector<BlockRef_t>& out, const rect_internal& rect)
+    void query(std::vector<BaseRef_t>& out, const rect_internal& rect)
     {
         for(const AugLoc_t& loc : rect)
         {
             for(AugBlockRef_t b : nodes[loc.x * 32 + loc.y])
             {
                 // only want blocks that are new on all continued axes
-                if(b.cont_axes & loc.cont_axes == CONT_NONE)
+                if((b.cont_axes & loc.cont_axes) == CONT_NONE)
                     out.push_back(b.block);
             }
         }
@@ -265,8 +264,331 @@ struct screen_t
     }
 };
 
+// it's a bunch of stacks of screens, which are 2048x2048.
+// will be reallocated as needed
+struct table_t
+{
+    std::vector<std::vector<screen_t*>> columns;
+    std::vector<int32_t> col_first_row_index;
+    std::unordered_map<BlockRef_t, rect_external> member_rects;
+    int32_t first_col_index;
+
+    void query(std::vector<BaseRef_t>& out, const rect_external& rect)
+    {
+        int lcol = rect.l / 2048;
+        if(rect.l < 0 && (rect.l % 2048))
+            lcol -= 1;
+
+        int rcol = rect.r / 2048;
+        if(rect.r > 0 && (rect.r % 2048))
+            rcol += 1;
+
+        int trow = rect.t / 2048;
+        if(rect.t < 0 && (rect.t % 2048))
+            trow -= 1;
+
+        int brow = rect.b / 2048;
+        if(rect.b > 0 && (rect.b % 2048))
+            brow += 1;
+
+        int lcol_check = SDL_max(lcol, first_col_index);
+        int rcol_check = SDL_min(rcol, first_col_index + (int)columns.size());
+
+        rect_internal inner_rect;
+
+        inner_rect.cont_axes = CONT_NONE;
+        if(lcol_check != lcol)
+            inner_rect.cont_axes = CONT_X;
+
+        for(int col = lcol_check; col < rcol_check; col++)
+        {
+            int internal_col = col - first_col_index;
+
+            int inner_l = 0;
+            if(col == lcol)
+                inner_l = rect.l - lcol * 2048;
+
+            int inner_r = 2048;
+            if(col == rcol - 1)
+                inner_r = rect.r - (rcol - 1) * 2048;
+
+            // apply offset if needed
+            inner_rect.l = inner_l / 64;
+            inner_rect.r = inner_r / 64;
+            if(inner_r & 63)
+                inner_rect.r += 1;
+
+            int trow_check = SDL_max(trow, col_first_row_index[internal_col]);
+            int brow_check = SDL_min(brow, col_first_row_index[internal_col] + (int)columns[internal_col].size());
+            if(trow_check != trow)
+                inner_rect.cont_axes |= CONT_Y;
+
+            for(int row = trow_check; row < brow_check; row++)
+            {
+                int internal_row = row - col_first_row_index[internal_col];
+
+                int inner_t = 0;
+                if(row == trow)
+                    inner_t = rect.t - trow * 2048;
+
+                int inner_b = 2048;
+                if(row == brow - 1)
+                    inner_b = rect.b - (brow - 1) * 2048;
+
+                // apply offset if needed
+                inner_rect.t = inner_t / 64;
+                inner_rect.b = inner_b / 64;
+                if(inner_b & 63)
+                    inner_rect.b += 1;
+
+                columns[internal_col][internal_row]->query(out, inner_rect);
+
+                inner_rect.cont_axes |= CONT_Y;
+            }
+
+            inner_rect.cont_axes = CONT_X;
+        }
+    }
+
+    void insert(BlockRef_t b)
+    {
+        rect_external rect(b->LocationInLayer);
+        member_rects[b] = rect;
+        insert(b, rect);
+    }
+
+    void insert(BlockRef_t b, const rect_external& rect)
+    {
+        int lcol = rect.l / 2048;
+        if(rect.l < 0 && (rect.l % 2048))
+            lcol -= 1;
+
+        int rcol = rect.r / 2048;
+        if(rect.r > 0 && (rect.r % 2048))
+            rcol += 1;
+
+        int trow = rect.t / 2048;
+        if(rect.t < 0 && (rect.t % 2048))
+            trow -= 1;
+
+        int brow = rect.b / 2048;
+        if(rect.b > 0 && (rect.b % 2048))
+            brow += 1;
+
+        if(columns.size() == 0)
+        {
+            columns.emplace_back();
+            col_first_row_index.resize(1);
+            first_col_index = lcol;
+        }
+
+        if(lcol < first_col_index)
+        {
+            int to_add = first_col_index - lcol;
+            for(int i = 0; i < to_add; i++)
+                columns.emplace_back();
+
+            std::rotate(columns.rbegin(), columns.rbegin() + to_add, columns.rend());
+
+            col_first_row_index.resize(columns.size() + to_add);
+            std::rotate(col_first_row_index.rbegin(), col_first_row_index.rbegin() + to_add, col_first_row_index.rend());
+
+            first_col_index = lcol;
+        }
+
+        if(rcol > first_col_index + (int)columns.size())
+        {
+            for(int i = first_col_index + (int)columns.size(); i < rcol; i++)
+                columns.emplace_back();
+
+            col_first_row_index.resize(rcol - first_col_index);
+        }
+
+        rect_internal inner_rect;
+
+        inner_rect.cont_axes = CONT_NONE;
+
+        for(int col = lcol; col < rcol; col++)
+        {
+            int internal_col = col - first_col_index;
+
+            int inner_l = 0;
+            if(col == lcol)
+                inner_l = rect.l - lcol * 2048;
+
+            int inner_r = 2048;
+            if(col == rcol - 1)
+                inner_r = rect.r - (rcol - 1) * 2048;
+
+            // apply offset if needed
+            inner_rect.l = inner_l / 64;
+            inner_rect.r = inner_r / 64;
+            if(inner_r & 63)
+                inner_rect.r += 1;
+
+            if(columns[internal_col].size() == 0)
+            {
+                columns[internal_col].push_back(new screen_t);
+                col_first_row_index[internal_col] = trow;
+            }
+
+            if(trow < col_first_row_index[internal_col])
+            {
+                int to_add = col_first_row_index[internal_col] - trow;
+                for(int i = 0; i < to_add; i++)
+                    columns[internal_col].push_back(new screen_t);
+                std::rotate(columns[internal_col].rbegin(), columns[internal_col].rbegin() + to_add, columns[internal_col].rend());
+                col_first_row_index[internal_col] = trow;
+            }
+
+            if(brow > col_first_row_index[internal_col] + (int)columns[internal_col].size())
+            {
+                for(int i = col_first_row_index[internal_col] + (int)columns[internal_col].size(); i < brow; i++)
+                    columns[internal_col].push_back(new screen_t);
+            }
+
+            for(int row = trow; row < brow; row++)
+            {
+                int internal_row = row - col_first_row_index[internal_col];
+
+                int inner_t = 0;
+                if(row == trow)
+                    inner_t = rect.t - trow * 2048;
+
+                int inner_b = 2048;
+                if(row == brow - 1)
+                    inner_b = rect.b - (brow - 1) * 2048;
+
+                // apply offset if needed
+                inner_rect.t = inner_t / 64;
+                inner_rect.b = inner_b / 64;
+                if(inner_b & 63)
+                    inner_rect.b += 1;
+
+                columns[internal_col][internal_row]->insert(b, inner_rect);
+
+                inner_rect.cont_axes |= CONT_Y;
+            }
+
+            inner_rect.cont_axes = CONT_X;
+        }
+    }
+
+    void erase(BlockRef_t b)
+    {
+        auto it = member_rects.find(b);
+        if(it == member_rects.end())
+            return;
+
+        erase(b, it->second);
+        member_rects.erase(it);
+    }
+
+    void erase(BlockRef_t b, const rect_external& rect)
+    {
+        int lcol = rect.l / 2048;
+        if(rect.l < 0 && (rect.l % 2048))
+            lcol -= 1;
+
+        int rcol = rect.r / 2048;
+        if(rect.r > 0 && (rect.r % 2048))
+            rcol += 1;
+
+        int trow = rect.t / 2048;
+        if(rect.t < 0 && (rect.t % 2048))
+            trow -= 1;
+
+        int brow = rect.b / 2048;
+        if(rect.b > 0 && (rect.b % 2048))
+            brow += 1;
+
+        int lcol_check = SDL_max(lcol, first_col_index);
+        int rcol_check = SDL_min(rcol, first_col_index + (int)columns.size());
+
+        rect_internal inner_rect;
+
+        inner_rect.cont_axes = CONT_NONE;
+        if(lcol_check != lcol)
+            inner_rect.cont_axes = CONT_X;
+
+        for(int col = lcol_check; col < rcol_check; col++)
+        {
+            int internal_col = col - first_col_index;
+
+            int inner_l = 0;
+            if(col == lcol)
+                inner_l = rect.l - lcol * 2048;
+
+            int inner_r = 2048;
+            if(col == rcol - 1)
+                inner_r = rect.r - (rcol - 1) * 2048;
+
+            // apply offset if needed
+            inner_rect.l = inner_l / 64;
+            inner_rect.r = inner_r / 64;
+            if(inner_r & 63)
+                inner_rect.r += 1;
+
+            int trow_check = SDL_max(trow, col_first_row_index[internal_col]);
+            int brow_check = SDL_min(brow, col_first_row_index[internal_col] + (int)columns[internal_col].size());
+            if(trow_check != trow)
+                inner_rect.cont_axes |= CONT_Y;
+
+            for(int row = trow_check; row < brow_check; row++)
+            {
+                int internal_row = row - col_first_row_index[internal_col];
+
+                int inner_t = 0;
+                if(row == trow)
+                    inner_t = rect.t - trow * 2048;
+
+                int inner_b = 2048;
+                if(row == brow - 1)
+                    inner_b = rect.b - (brow - 1) * 2048;
+
+                // apply offset if needed
+                inner_rect.t = inner_t / 64;
+                inner_rect.b = inner_b / 64;
+                if(inner_b & 63)
+                    inner_rect.b += 1;
+
+                columns[internal_col][internal_row]->erase(b, inner_rect);
+
+                inner_rect.cont_axes |= CONT_Y;
+            }
+
+            inner_rect.cont_axes = CONT_X;
+        }
+    }
+
+    void update(BlockRef_t b)
+    {
+        auto it = member_rects.find(b);
+        if(it != member_rects.end())
+        {
+            erase(b, it->second);
+        }
+
+        insert(b);
+    }
+
+    void clear()
+    {
+        // can optimize later
+        for(auto col : columns)
+        {
+            for(screen_t* screen : col)
+                delete screen;
+        }
+        columns.clear();
+        col_first_row_index.clear();
+        member_rects.clear();
+    }
+};
+
 /// UPDATED TO HERE
 
+#if 0
 template<typename t>
 class BasicAllocator
 {
@@ -308,301 +630,6 @@ class BasicAllocator
         used_instances = 0;
     }
 };
-
-struct BlockTable
-{
-    static constexpr int32_t max_size = 320000.;
-    static constexpr int32_t zone_size = 32768;
-    static constexpr int32_t screen_size = 1024;
-    static constexpr int32_t area_size = 64;
-
-    static constexpr size_t num_zones_per_sign = ((max_size - 1) / zone_size) + 1;
-    static constexpr size_t num_zones = num_zones_per_sign * 2;
-    static constexpr size_t num_screens = zone_size / screen_size;
-    static constexpr size_t num_areas = screen_size / area_size;
-    static constexpr size_t total_num_areas = num_zones * num_screens * num_areas;
-
-    using Area = block_node_t;
-
-    struct Screen
-    {
-        std::array<Area*, num_areas * num_areas> areas{};
-    };
-
-    struct Zone
-    {
-        std::array<Screen*, num_screens * num_screens> screens{};
-    };
-
-    std::array<Zone*, num_zones * num_zones> zones{};
-
-    struct loc_1d
-    {
-        uint16_t i;
-        constexpr uint16_t zone()
-        {
-            return i / (num_screens*num_areas);
-        }
-        constexpr uint16_t screen()
-        {
-            return (i / num_areas) % num_screens;
-        }
-        constexpr uint16_t area()
-        {
-            return i % num_areas;
-        }
-        inline bool operator!=(const loc_1d& other) const
-        {
-            return this->i != other.i;
-        }
-    };
-
-    struct loc_2d
-    {
-        loc_1d x;
-        loc_1d y;
-
-        inline bool operator!=(const loc_2d& other) const
-        {
-            return this->x != other.x || this->y != other.y;
-        }
-    };
-
-    struct rect_2d
-    {
-        loc_2d tl;
-        loc_2d br;
-        bool has_trash;
-
-        class iterator
-        {
-        private:
-            const rect_2d& parent;
-            loc_2d cur_loc;
-        public:
-            inline iterator(const rect_2d& parent, loc_2d cur_loc): parent(parent), cur_loc(cur_loc) {}
-            inline iterator operator++()
-            {
-                this->cur_loc.x.i ++;
-                if(this->cur_loc.x.i == this->parent.br.x.i)
-                {
-                    this->cur_loc.y.i ++;
-                    if(this->cur_loc.y.i != this->parent.br.y.i)
-                        this->cur_loc.x.i = this->parent.tl.x.i;
-                }
-                return *this;
-            }
-            inline bool operator!=(const iterator& other) const
-            {
-                return this->cur_loc != other.cur_loc;
-            }
-            inline const loc_2d& operator*() const
-            {
-                return this->cur_loc;
-            }
-        };
-
-        inline iterator begin() const
-        {
-            return iterator(*this, this->tl);
-        }
-
-        inline iterator end() const
-        {
-            return iterator(*this, this->br);
-        }
-    };
-
-    std::set<BlockRef_t> members;
-    std::array<rect_2d, 30000> member_rects;
-
-    std::set<BlockRef_t> trash_bin;
-
-    BlockTable()
-    {
-        // table.resize(total_num_areas*total_num_areas);
-    }
-
-    static rect_2d loc_to_rect(const Location_t& loc)
-    {
-        int32_t left = loc.X;
-        int32_t top = loc.Y;
-        if(left <= 0)
-            left -= 1;
-        if(top <= 0)
-            top -= 1;
-        int32_t right = left + (int32_t)loc.Width + 2;
-        int32_t bottom = top + (int32_t)loc.Height + 2;
-
-        int32_t x_area_start = (left + max_size) / area_size;
-        int32_t x_area_limit = ((right + max_size - 1) / area_size) + 1;
-
-        int32_t y_area_start = (top + max_size) / area_size;
-        int32_t y_area_limit = ((bottom + max_size - 1) / area_size) + 1;
-
-        bool has_trash = false;
-        if(x_area_start < 0)
-        {
-            has_trash = true;
-            x_area_start = 0;
-        }
-        if(y_area_start < 0)
-        {
-            has_trash = true;
-            y_area_start = 0;
-        }
-        if(x_area_limit > (int32_t)total_num_areas)
-        {
-            has_trash = true;
-            x_area_limit = total_num_areas;
-        }
-        if(y_area_limit > (int32_t)total_num_areas)
-        {
-            has_trash = true;
-            y_area_limit = total_num_areas;
-        }
-
-        rect_2d ret;
-        ret.tl.x.i = x_area_start;
-        ret.br.x.i = x_area_limit;
-        ret.tl.y.i = y_area_start;
-        ret.br.y.i = y_area_limit;
-        ret.has_trash = has_trash;
-
-        return ret;
-    }
-
-    void insert(BlockRef_t member)
-    {
-        this->members.insert(member);
-        const rect_2d& rect = member_rects[member] = loc_to_rect(member->Location);
-
-        for(const loc_2d& loc : rect)
-        {
-            Zone*& z = this->zones[loc.y.zone() * num_zones + loc.x.zone()];
-            if(!z)
-                z = new Zone;
-            Screen*& s = z->screens[loc.y.screen() * num_screens + loc.x.screen()];
-            if(!s)
-                s = new Screen;
-            Area*& a = s->areas[loc.y.area() * num_areas + loc.x.area()];
-            if(!a)
-                a = new Area;
-            a->insert(member);
-        }
-
-        if(rect.has_trash)
-            this->trash_bin.insert(member);
-    }
-
-    void hard_erase(BlockRef_t member)
-    {
-        this->members.erase(member);
-        const rect_2d& rect = member_rects[member];
-
-        for(const loc_2d& loc : rect)
-        {
-            Zone*& z = this->zones[loc.y.zone() * num_zones + loc.x.zone()];
-            if(!z)
-                continue;
-            Screen*& s = z->screens[loc.y.screen() * num_screens + loc.x.screen()];
-            if(!s)
-                continue;
-            Area*& a = s->areas[loc.y.area() * num_areas + loc.x.area()];
-            if(!a)
-                continue;
-            a->erase(member);
-        }
-
-        if(rect.has_trash)
-            this->trash_bin.erase(member);
-    }
-
-    void erase(BlockRef_t member)
-    {
-        if(this->members.find(member) != this->members.end())
-            this->hard_erase(member);
-    }
-
-    void update(BlockRef_t member)
-    {
-        this->erase(member);
-        this->insert(member);
-    }
-
-    void clear()
-    {
-        for(BlockRef_t member : this->members)
-        {
-            const rect_2d& rect = member_rects[member];
-
-            for(const loc_2d& loc : rect)
-            {
-                Zone*& z = this->zones[loc.y.zone() * num_zones + loc.x.zone()];
-                // theoretically, should be able to safely remove these checks
-                if(!z)
-                    continue;
-                Screen*& s = z->screens[loc.y.screen() * num_screens + loc.x.screen()];
-                if(!s)
-                    continue;
-                Area*& a = s->areas[loc.y.area() * num_areas + loc.x.area()];
-                if(!a)
-                    continue;
-                a->erase(member);
-            }
-
-            if(rect.has_trash)
-                this->trash_bin.erase(member);
-        }
-
-        this->members.clear();
-    }
-
-    void query(const Location_t& loc, std::set<BlockRef_t>& out)
-    {
-        const rect_2d rect = loc_to_rect(loc);
-
-        loc_2d l = rect.tl;
-        while(true)
-        {
-            if(l.x.i >= rect.br.x.i)
-            {
-                l.y.i += 1;
-                if(l.y.i == rect.br.y.i)
-                    break;
-                l.x.i = rect.tl.x.i;
-            }
-            Zone*& z = this->zones[l.y.zone() * num_zones + l.x.zone()];
-            if(!z)
-            {
-                l.x.i = (l.x.zone() + 1) * num_screens * num_areas;
-                continue;
-            }
-            Screen*& s = z->screens[l.y.screen() * num_screens + l.x.screen()];
-            if(!s)
-            {
-                l.x.i = (l.x.zone() * num_screens + l.x.screen() + 1) * num_areas;
-                continue;
-            }
-            Area*& a = s->areas[l.y.area() * num_areas + l.x.area()];
-            if(!a)
-            {
-                l.x.i += 1;
-                continue;
-            }
-
-            for(BlockRef_t member : *a)
-                out.insert(member);
-
-            l.x.i += 1;
-        }
-
-        if(rect.has_trash)
-        {
-            for(BlockRef_t member : this->trash_bin)
-                out.insert(member);
-        }
-    }
-};
+#endif // #if 0
 
 #endif // #ifndef BLOCK_TABLE_H
