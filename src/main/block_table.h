@@ -75,7 +75,7 @@ struct node_t
 
         inline void check_linkage()
         {
-            if(this->parent && this->i == this->parent->filled)
+            while(this->parent && this->i == this->parent->filled)
             {
                 this->parent = this->parent->next;
                 this->i = 0;
