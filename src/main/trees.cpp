@@ -483,6 +483,7 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
 
 /* ================= Temp blocks ================= */
 
+#if 0
 void treeTempBlockStartFrame()
 {
     if(!s_tempBlockTree.get())
@@ -558,6 +559,7 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc,
                    loc.X + loc.Width,
                    loc.Y + loc.Height, sort_mode, margin);
 }
+#endif
 
 /* ================= Tile block search ================= */
 // removed in favor of block quadtree

@@ -275,6 +275,9 @@ struct table_t
 
     void query(std::vector<BaseRef_t>& out, const rect_external& rect)
     {
+        if(columns.size() == 0)
+            return;
+
         int lcol = rect.l / 2048;
         if(rect.l < 0 && (rect.l % 2048))
             lcol -= 1;
@@ -303,6 +306,12 @@ struct table_t
         for(int col = lcol_check; col < rcol_check; col++)
         {
             int internal_col = col - first_col_index;
+
+            if(columns[internal_col].size() == 0)
+            {
+                inner_rect.cont_axes |= CONT_Y;
+                continue;
+            }
 
             int inner_l = 0;
             if(col == lcol)
@@ -582,6 +591,14 @@ struct table_t
         }
         columns.clear();
         col_first_row_index.clear();
+        member_rects.clear();
+    }
+
+    void clear_light()
+    {
+        for(const auto& p : member_rects)
+            erase(p.first, p.second);
+
         member_rects.clear();
     }
 };
