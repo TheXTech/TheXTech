@@ -142,7 +142,7 @@ static void write_header()
     fprintf(record_file, "Seed %d\r\n", readSeed());
     fprintf(record_file, "Checkpoint %d\r\n", (Checkpoint == FullFileName) ? 1 : 0);
 
-    if(g_compatibility.enable_multipoints && Checkpoint == FullFileName)
+    if(g_compatibility.fix_vanilla_checkpoints && Checkpoint == FullFileName)
     {
         fprintf(record_file, "Multipoints %d: ", (int)CheckpointsList.size());
 
@@ -240,7 +240,7 @@ static void read_header()
 
     Checkpoint = n ? FullFileName : std::string();
 
-    if(g_compatibility.enable_multipoints && Checkpoint == FullFileName)
+    if(g_compatibility.fix_vanilla_checkpoints && Checkpoint == FullFileName)
     {
         CheckpointsList.clear();
         fscanf(replay_file, "Multipoints %d: ", &n);
