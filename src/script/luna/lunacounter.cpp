@@ -57,9 +57,23 @@ void DeathCounter::init()
             return;
         }
 
+        std::string oldFile = makeGameSavePath(SelectWorld[selWorld].WorldPath,
+                                               SelectWorld[selWorld].WorldFile,
+                                               fmt::format_ne("demos-{0}.dmo", selSave));
+
+        std::string oldFile2 = makeGameSavePath(SelectWorld[selWorld].WorldPath,
+                                               SelectWorld[selWorld].WorldFile,
+                                               fmt::format_ne("deaths-{0}.rip", selSave));
+
         counterFile = makeGameSavePath(SelectWorld[selWorld].WorldPath,
                                        SelectWorld[selWorld].WorldFile,
-                                       fmt::format_ne("demos-{0}.dmo", selSave));
+                                       fmt::format_ne("fails-{0}.rip", selSave));
+
+        if(Files::fileExists(oldFile)) // Rename old file ino the new name
+            Files::moveFile(counterFile, oldFile);
+        else if(Files::fileExists(oldFile2)) // Rename old file ino the new name
+            Files::moveFile(counterFile, oldFile2);
+
         if(!TryLoadStats())
             mEnabled = false;
     }

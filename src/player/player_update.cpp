@@ -1496,7 +1496,7 @@ void UpdatePlayer()
 
                         // START ALT JUMP - this code does the player's spin jump
                         if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4 ||
-                                                          (g_compatibility.fix_peach_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf)))
+                                                          (g_compatibility.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf)))
                         {
                             if(Player[A].Location.SpeedX > 0)
                                 tempSpeed = Player[A].Location.SpeedX * 0.2;
@@ -1787,8 +1787,8 @@ void UpdatePlayer()
                 {
                     if(Player[A].State == 4 || Player[A].State == 5)
                     {
-                        bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
-                                           !g_compatibility.fix_link_clowncar_fairy;
+                        bool hasNoMonts = (g_compatibility.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
+                                           !g_compatibility.fix_char5_vehicle_climb;
 
                         bool turnFairy = Player[A].FlyCount > 0 ||
                                         ((Player[A].Controls.AltJump || (Player[A].Controls.Jump && Player[A].FloatRelease)) &&
@@ -1891,6 +1891,8 @@ void UpdatePlayer()
                                     Player[A].FireBallCD2 = 25;
                                 if(Player[A].State == 6)
                                     PlaySound(SFX_ZeldaSwordBeam);
+                                if(Player[A].State == 7)
+                                    PlaySound(SFX_ZeldaIce);
                                 else
                                     PlaySound(SFX_ZeldaFire);
 
@@ -3128,8 +3130,8 @@ void UpdatePlayer()
                             {
                                 if(Player[A].Character == 5)
                                 {
-                                    bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
-                                                       !g_compatibility.fix_link_clowncar_fairy;
+                                    bool hasNoMonts = (g_compatibility.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
+                                                       !g_compatibility.fix_char5_vehicle_climb;
                                     if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                     {
                                         Player[A].FairyCD = 0;
@@ -3481,8 +3483,8 @@ void UpdatePlayer()
                                     {
                                         if(Player[A].Character == 5)
                                         {
-                                            bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
-                                                               !g_compatibility.fix_link_clowncar_fairy;
+                                            bool hasNoMonts = (g_compatibility.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
+                                                               !g_compatibility.fix_char5_vehicle_climb;
                                             if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                             {
                                                 Player[A].FairyCD = 0;
@@ -4241,7 +4243,7 @@ void UpdatePlayer()
                        (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
                     {
                         UnDuck(Player[A]);
-                        if(g_compatibility.fix_link_clowncar_fairy && Player[A].Fairy) // Avoid the mortal glitch
+                        if(g_compatibility.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
                         {
                             Player[A].Fairy = false;
                             PlaySound(SFX_ZeldaFairy);

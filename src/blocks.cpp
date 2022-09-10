@@ -2053,7 +2053,7 @@ void PSwitch(bool enabled)
         {
             bool transform = NPCIsACoin[NPC[A].Type] && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
 
-            if(NPC[A].Type == NPCID_DRAGONCOIN && g_compatibility.fix_pswitch_dragon_coin)
+            if(NPC[A].Type == NPCID_DRAGONCOIN && g_compatibility.fix_special_coin_switch)
                 transform = false;
 
             if(transform)
