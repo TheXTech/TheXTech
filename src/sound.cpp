@@ -1044,6 +1044,7 @@ static const std::unordered_map<int, int> s_soundFallback =
     {SFX_Icebreak, SFX_ShellHit},
     {SFX_SproutVine, SFX_Mushroom},
     {SFX_LudwigKilled, SFX_WartKilled},
+    {SFX_ZeldaIce, SFX_ZeldaFire},
 };
 
 static int getFallbackSfx(int A)
@@ -1066,6 +1067,8 @@ void PlaySound(int A, int loops, int volume)
         A = getFallbackSfx(A);
     else if(!s_useIceBallSfx && A == SFX_Iceball)
         A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
+    else if(!s_useIceBallSfx && A == SFX_ZeldaIce)
+        A = SFX_ZeldaFire;
     else if(!s_useNewIceSfx && (A == SFX_Freeze || A == SFX_Icebreak))
         A = SFX_ShellHit; // Restore the old behavior
 

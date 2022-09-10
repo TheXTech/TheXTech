@@ -1891,6 +1891,8 @@ void UpdatePlayer()
                                     Player[A].FireBallCD2 = 25;
                                 if(Player[A].State == 6)
                                     PlaySound(SFX_ZeldaSwordBeam);
+                                if(Player[A].State == 7)
+                                    PlaySound(SFX_ZeldaIce);
                                 else
                                     PlaySound(SFX_ZeldaFire);
 
