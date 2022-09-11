@@ -370,20 +370,60 @@ void DrawWarningNPC(int Z, int A)
     float cn, an;
     get_NPC_tint(A, cn, an);
 
-    double scr_x, scr_y, w, h;
-    if(NPCWidthGFX[NPC[A].Type] == 0)
+    double scr_x, scr_y, w, h, frame_h;
+    double frame_x = 0, frame_y = 0;
+
+    // some special cases: plants that come from below
+    if(NPC[A].Type == 8 || NPC[A].Type == 74 || NPC[A].Type == 93 || NPC[A].Type == 245 || NPC[A].Type == 256 || NPC[A].Type == 270)
     {
         scr_x = vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
         scr_y = vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type];
         w = NPC[A].Location.Width;
         h = NPC[A].Location.Height;
+        frame_h = NPCHeight[NPC[A].Type];
+    }
+    // plants from above
+    else if(NPC[A].Type == 51 || NPC[A].Type == 257)
+    {
+        scr_x = vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
+        scr_y = vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type],
+        w = NPC[A].Location.Width;
+        h = NPC[A].Location.Height;
+        frame_h = NPCHeight[NPC[A].Type];
+        frame_y = NPCHeight[NPC[A].Type] - NPC[A].Location.Height;
+    }
+    // plants from side
+    else if(NPC[A].Type == 52)
+    {
+        if(NPC[A].Direction == -1)
+        {
+            scr_x = vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
+            scr_y = vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type];
+            w = NPC[A].Location.Width;
+            frame_h = h = NPC[A].Location.Height;
+        }
+        else
+        {
+            scr_x = vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
+            scr_y = vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type];
+            w = NPC[A].Location.Width;
+            frame_x = NPCWidth[NPC[A].Type] - NPC[A].Location.Width;
+            frame_h = h = NPC[A].Location.Height;
+        }
+    }
+    else if(NPCWidthGFX[NPC[A].Type] == 0)
+    {
+        scr_x = vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type];
+        scr_y = vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type];
+        w = NPC[A].Location.Width;
+        frame_h = h = NPC[A].Location.Height;
     }
     else
     {
         scr_x = vScreenX[Z] + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0;
         scr_y = vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height;
         w = NPCWidthGFX[NPC[A].Type];
-        h = NPCHeightGFX[NPC[A].Type];
+        frame_h = h = NPCHeightGFX[NPC[A].Type];
     }
 
     double left_x = -scr_x;
@@ -452,7 +492,7 @@ void DrawWarningNPC(int Z, int A)
         scr_y,
         w * scale, h * scale,
         GFXNPC[NPC[A].Type],
-        0, NPC[A].Frame * h,
+        frame_x, NPC[A].Frame * frame_h + frame_y,
         w, h,
         0, nullptr, X_FLIP_NONE,
         cn, cn, cn, an);
