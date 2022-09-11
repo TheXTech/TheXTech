@@ -1031,10 +1031,10 @@ void UpdateGraphics(bool skipRepaint)
                         }
                     }
                 }
-                else if(!Do_FrameSkip && NPC[A].Active && cannot_reset && g_config.small_screen_camera_features)
+                else if(!Do_FrameSkip && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert)
                 {
                     if(NPC[A].Location.SpeedX != 0 || NPC[A].Location.SpeedY != 0
-                        || (!NPC[A].Inert && !NPCWontHurt[NPC[A].Type] && !NPCIsACoin[NPC[A].Type] && !NPCIsABonus[NPC[A].Type]))
+                        || (!NPCWontHurt[NPC[A].Type] && !NPCIsACoin[NPC[A].Type] && !NPCIsABonus[NPC[A].Type]))
                     {
                         NPC_Draw_Queue_p.add_warning(A);
                     }
