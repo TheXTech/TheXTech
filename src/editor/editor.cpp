@@ -472,7 +472,7 @@ void UpdateEditor()
                                 editorScreen.FocusBlock();
                                 MouseRelease = false;
                                 MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                                FindSBlocks();
+                                // FindSBlocks();
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
                                 if(IntProc::isEnabled()) // Report the taken block into the Editor
@@ -624,7 +624,7 @@ void UpdateEditor()
                                 editorScreen.FocusBlock();
                                 MouseRelease = false;
                                 MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
-                                FindSBlocks();
+                                // FindSBlocks();
 #ifdef THEXTECH_INTERPROC_SUPPORTED
                                 if(IntProc::isEnabled()) // Report the taken block into the Editor
                                 {
@@ -901,7 +901,7 @@ void UpdateEditor()
                             {
 //                                Netplay::sendData Netplay::EraseBlock[A];
                                 KillBlock(A); // Erase the block
-                                FindSBlocks();
+                                // FindSBlocks();
                                 MouseRelease = false;
                                 if(EditorCursor.SubMode == 0)
                                     EditorCursor.SubMode = OptCursor_t::LVL_BLOCKS;
@@ -993,7 +993,7 @@ void UpdateEditor()
                             {
 //                                Netplay::sendData Netplay::EraseBlock[A];
                                 KillBlock(A); // Erase the block
-                                FindSBlocks();
+                                // FindSBlocks();
                                 MouseRelease = false;
                                 if(EditorCursor.SubMode == 0)
                                     EditorCursor.SubMode = OptCursor_t::LVL_BLOCKS;
@@ -1263,7 +1263,7 @@ void UpdateEditor()
                             }
 #endif
                         }
-                        FindSBlocks();
+                        // FindSBlocks();
 //                        if(nPlay.Online == true)
 //                            Netplay::sendData Netplay::AddBlock(numBlock);
                     }

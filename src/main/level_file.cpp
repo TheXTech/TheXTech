@@ -776,7 +776,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     // FindBlocks();
     qSortBackgrounds(1, numBackground);
     UpdateBackgrounds();
-    FindSBlocks();
+    // FindSBlocks();
     syncLayersTrees_AllBlocks();
     syncLayers_AllBGOs();
 

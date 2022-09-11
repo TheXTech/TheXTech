@@ -149,7 +149,9 @@ enum
     SFX_SproutVine,
     SFX_LarryShell,
     SFX_LarryKilled = 100,
-    SFX_LudwigKilled
+    SFX_LudwigKilled,
+    SFX_ZeldaIce,
+    SFX_ZeldaFireRod
 };
 
 int CustomWorldMusicId();

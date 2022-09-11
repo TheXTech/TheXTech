@@ -1670,14 +1670,22 @@ void NPCHit(int A, int B, int C)
                 if(NPC[C].Type != 171)
                 {
                     // if(B != 6) // Always true
-                    PlaySound(SFX_BlockHit);
+                    if(fEqual(NPC[A].Special, 5) && HasSound(SFX_ZeldaFireRod))
+                        PlaySound(SFX_ZeldaFire);
+                    else
+                        PlaySound(SFX_BlockHit);
                     NPC[A].Killed = B;
                 }
             }
             else
             {
                 if(B != 6)
-                    PlaySound(SFX_BlockHit);
+                {
+                    if(fEqual(NPC[A].Special, 5) && HasSound(SFX_ZeldaFireRod))
+                        PlaySound(SFX_ZeldaFire);
+                    else
+                        PlaySound(SFX_BlockHit);
+                }
                 NPC[A].Killed = B;
             }
         }

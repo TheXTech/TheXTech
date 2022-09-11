@@ -115,7 +115,7 @@ static void setupCheckpoints()
     }
 
     pLogDebug("Trying to restore %zu checkpoints...", CheckpointsList.size());
-    if(!g_compatibility.enable_multipoints && CheckpointsList.empty())
+    if(!g_compatibility.fix_vanilla_checkpoints && CheckpointsList.empty())
     {
         pLogDebug("Using legacy algorithm");
         CheckpointsList.push_back(Checkpoint_t());
@@ -129,21 +129,21 @@ static void setupCheckpoints()
             if(NPC[A].Type != 192)
                 continue;
 
-            if(g_compatibility.enable_multipoints && cp.id != Maths::iRound(NPC[A].Special))
+            if(g_compatibility.fix_vanilla_checkpoints && cp.id != Maths::iRound(NPC[A].Special))
                 continue;
 
             NPC[A].Killed = 9;
 
             // found a last id, leave player here
-            if(!g_compatibility.enable_multipoints || cpId == int(CheckpointsList.size() - 1))
+            if(!g_compatibility.fix_vanilla_checkpoints || cpId == int(CheckpointsList.size() - 1))
             {
                 setupPlayerAtCheckpoints(NPC[A], cp);
-                if(g_compatibility.enable_multipoints)
+                if(g_compatibility.fix_vanilla_checkpoints)
                     break;// Stop to find NPCs
             }
         }// for NPCs
 
-        if(!g_compatibility.enable_multipoints)
+        if(!g_compatibility.fix_vanilla_checkpoints)
             break;
     } // for Check points
 }
@@ -2792,7 +2792,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
                 if(b.Hidden || b.Invis || BlockNoClipping[b.Type] || BlockIsSizable[b.Type])
                     continue;
 
-                if(g_compatibility.fix_dont_switch_player_by_clowncar && mount == 2 &&
+                if(g_compatibility.fix_vehicle_char_switch && mount == 2 &&
                     ((b.Type >= 622 && b.Type <= 625) || b.Type == 631))
                     continue; // Forbid playable character switch when riding a clown car
 
@@ -7381,7 +7381,7 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
 // returns whether a player is allowed to swap characters
 bool SwapCharAllowed()
 {
-    if(LevelSelect || GameMenu)
+    if(LevelSelect || GameMenu || (IsEpisodeIntro && NoMap && GamePaused == PauseCode::DropAdd))
         return true;
     else
         return false;

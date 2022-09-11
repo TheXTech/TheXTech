@@ -70,7 +70,7 @@
 //};
 
 
-struct SpcEcho
+typedef struct SpcEcho
 {
     int is_valid = 0;
     float echo_ram[ECHO_BUFFER_SIZE];
@@ -274,7 +274,7 @@ struct SpcEcho
         }
         while(--frames);
     }
-};
+} SpcEcho;
 
 
 SpcEcho *echoEffectInit(int rate, uint16_t format, int channels)
