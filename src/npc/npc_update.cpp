@@ -631,7 +631,6 @@ void UpdateNPCs()
     treeTempBlockStartFrame();
     for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
     {
-        Block[A].LocationInLayer = Block[A].Location;
         treeTempBlockAdd(&Block[A]);
     }
 
@@ -4085,12 +4084,6 @@ void UpdateNPCs()
                         }
 
                         // necessary for tree update
-                        Block[NPC[A].tempBlock].LocationInLayer = Block[NPC[A].tempBlock].Location;
-                        if(Block[NPC[A].tempBlock].Layer != LAYER_NONE)
-                        {
-                            Block[NPC[A].tempBlock].LocationInLayer.X -= Layer[Block[NPC[A].tempBlock].Layer].OffsetX;
-                            Block[NPC[A].tempBlock].LocationInLayer.Y -= Layer[Block[NPC[A].tempBlock].Layer].OffsetY;
-                        }
                         treeTempBlockUpdate(&Block[NPC[A].tempBlock]);
 
                         // no longer needed; maintaining the sort

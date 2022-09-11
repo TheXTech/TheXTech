@@ -50,10 +50,16 @@ class Tree_Extractor<BlockRef_t>
 public:
     static void ExtractBoundingBox(const BlockRef_t object, loose_quadtree::BoundingBox<double> *bbox)
     {
-        bbox->left      = object->LocationInLayer.X;
-        bbox->top       = object->LocationInLayer.Y;
-        bbox->width     = object->LocationInLayer.Width;
-        bbox->height    = object->LocationInLayer.Height;
+        bbox->left      = object->Location.X;
+        bbox->top       = object->Location.Y;
+        bbox->width     = object->Location.Width;
+        bbox->height    = object->Location.Height;
+
+        if(object->Layer != LAYER_NONE)
+        {
+            bbox->left -= Layer[object->Layer].OffsetX;
+            bbox->top -= Layer[object->Layer].OffsetY;
+        }
     }
 };
 

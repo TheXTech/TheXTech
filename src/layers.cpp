@@ -1367,19 +1367,9 @@ void syncLayersTrees_Block(int block)
     int layer = Block[block].Layer;
     if(block <= numBlock)
     {
+        treeBlockAddLayer(layer, &Block[block]);
         if(layer != LAYER_NONE)
-        {
-            Block[block].LocationInLayer = Block[block].Location;
-            Block[block].LocationInLayer.X = Block[block].Location.X - Layer[layer].OffsetX;
-            Block[block].LocationInLayer.Y = Block[block].Location.Y - Layer[layer].OffsetY;
-            treeBlockAddLayer(layer, &Block[block]);
             Layer[layer].blocks.insert(block);
-        }
-        else
-        {
-            Block[block].LocationInLayer = Block[block].Location;
-            treeBlockAddLayer(LAYER_NONE, &Block[block]);
-        }
     }
     else
     {

@@ -29,6 +29,7 @@
 #include <unordered_map>
 
 #include "globals.h"
+#include "layers.h"
 
 enum ContinuedRect
 {
@@ -38,9 +39,9 @@ enum ContinuedRect
     CONT_XY = CONT_X | CONT_Y,
 };
 
-struct AugBlockRef_t
+struct AugBaseRef_t
 {
-    BlockRef_t block;
+    BaseRef_t ref;
     uint8_t cont_axes;
 };
 
@@ -49,7 +50,7 @@ struct node_t
     static constexpr int node_size = 4;
 
     node_t* next = nullptr;
-    int16_t block[node_size];
+    int16_t refs[node_size];
     uint8_t filled = 0;
     uint8_t cont_axes = 0;
 
@@ -98,9 +99,9 @@ struct node_t
         {
             return this->parent != other.parent || this->i != other.i;
         }
-        inline AugBlockRef_t operator*() const
+        inline AugBaseRef_t operator*() const
         {
-            return {this->parent->block[this->i], (uint8_t)((this->parent->cont_axes >> (this->i * 2)) & 3)};
+            return {this->parent->refs[this->i], (uint8_t)((this->parent->cont_axes >> (this->i * 2)) & 3)};
         }
     };
 
@@ -114,11 +115,11 @@ struct node_t
         return iterator(nullptr);
     }
 
-    inline void insert(AugBlockRef_t b)
+    inline void insert(AugBaseRef_t b)
     {
         if(this->filled < node_size)
         {
-            this->block[this->filled] = b.block;
+            this->refs[this->filled] = b.ref;
             this->cont_axes |= (b.cont_axes & 3) << (this->filled * 2);
             this->filled++;
         }
@@ -133,18 +134,18 @@ struct node_t
     inline void erase(iterator& it)
     {
         it.parent->filled--;
-        it.parent->block[it.i] = it.parent->block[it.parent->filled];
+        it.parent->refs[it.i] = it.parent->refs[it.parent->filled];
         it.parent->cont_axes &= ~(3 << (it.i * 2));
         it.parent->cont_axes |= ((it.parent->cont_axes >> (it.parent->filled * 2)) & 3) << (it.i * 2);
         it.parent->cont_axes &= ~(3 << (it.parent->filled * 2));
     }
 
-    inline void erase(BlockRef_t b)
+    inline void erase(BaseRef_t o)
     {
         iterator it = this->begin();
         while(it != this->end())
         {
-            if((*it).block == b)
+            if((*it).ref == o)
                 break;
             ++it;
         }
@@ -242,35 +243,54 @@ struct screen_t
     {
         for(const AugLoc_t& loc : rect)
         {
-            for(AugBlockRef_t b : nodes[loc.x * 32 + loc.y])
+            for(AugBaseRef_t obj : nodes[loc.x * 32 + loc.y])
             {
-                // only want blocks that are new on all continued axes
-                if((b.cont_axes & loc.cont_axes) == CONT_NONE)
-                    out.push_back(b.block);
+                // only want objs that are new on all continued axes
+                if((obj.cont_axes & loc.cont_axes) == CONT_NONE)
+                    out.push_back(obj.ref);
             }
         }
     }
 
-    void insert(BlockRef_t b, const rect_internal& rect)
+    void insert(BaseRef_t obj, const rect_internal& rect)
     {
         for(const AugLoc_t& loc : rect)
-            nodes[loc.x * 32 + loc.y].insert({b, loc.cont_axes});
+            nodes[loc.x * 32 + loc.y].insert({obj, loc.cont_axes});
     }
 
-    void erase(BlockRef_t b, const rect_internal& rect)
+    void erase(BaseRef_t obj, const rect_internal& rect)
     {
         for(const AugLoc_t& loc : rect)
-            nodes[loc.x * 32 + loc.y].erase(b);
+            nodes[loc.x * 32 + loc.y].erase(obj);
     }
 };
 
+template<class MyRef_t>
+Location_t extract_loc(MyRef_t obj)
+{
+    return obj->Location;
+}
+
+template<>
+Location_t extract_loc<>(BlockRef_t obj)
+{
+    Location_t loc = obj->Location;
+    if(obj->Layer != LAYER_NONE)
+    {
+        loc.X -= Layer[obj->Layer].OffsetX;
+        loc.Y -= Layer[obj->Layer].OffsetY;
+    }
+    return loc;
+}
+
 // it's a bunch of stacks of screens, which are 2048x2048.
 // will be reallocated as needed
+template<class MyRef_t>
 struct table_t
 {
     std::vector<std::vector<screen_t*>> columns;
     std::vector<int> col_first_row_index;
-    std::unordered_map<BlockRef_t, rect_external> member_rects;
+    std::unordered_map<MyRef_t, rect_external> member_rects;
     int first_col_index;
 
     void query(std::vector<BaseRef_t>& out, const rect_external& rect)
@@ -359,14 +379,16 @@ struct table_t
         }
     }
 
-    void insert(BlockRef_t b)
+    void insert(MyRef_t b)
     {
-        rect_external rect(b->LocationInLayer);
+        Location_t loc = extract_loc<MyRef_t>(b);
+
+        rect_external rect(loc);
         member_rects[b] = rect;
         insert(b, rect);
     }
 
-    void insert(BlockRef_t b, const rect_external& rect)
+    void insert(MyRef_t b, const rect_external& rect)
     {
         int lcol = rect.l / 2048;
         if(rect.l < 0 && (rect.l % 2048))
@@ -483,7 +505,7 @@ struct table_t
         }
     }
 
-    void erase(BlockRef_t b)
+    void erase(MyRef_t b)
     {
         auto it = member_rects.find(b);
         if(it == member_rects.end())
@@ -493,7 +515,7 @@ struct table_t
         member_rects.erase(it);
     }
 
-    void erase(BlockRef_t b, const rect_external& rect)
+    void erase(MyRef_t b, const rect_external& rect)
     {
         int lcol = rect.l / 2048;
         if(rect.l < 0 && (rect.l % 2048))
@@ -570,7 +592,7 @@ struct table_t
         }
     }
 
-    void update(BlockRef_t b)
+    void update(MyRef_t b)
     {
         auto it = member_rects.find(b);
         if(it != member_rects.end())

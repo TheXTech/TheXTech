@@ -24,8 +24,8 @@
 #include "trees.h"
 #include "layers.h"
 
-table_t block_table[maxLayers+2];
-table_t s_tempBlockTree;
+table_t<BlockRef_t> block_table[maxLayers+2];
+table_t<BlockRef_t> s_tempBlockTree;
 
 void treeLevelCleanBlockLayers()
 {

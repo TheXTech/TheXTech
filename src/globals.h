@@ -738,7 +738,6 @@ struct Block_t
     int Type = 0;
 //    Location As Location
     Location_t Location;
-    Location_t LocationInLayer;
 //    Special As Integer 'what is in the block?
     int Special = 0;
 //! EXTRA: second special

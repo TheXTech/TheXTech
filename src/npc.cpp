@@ -2526,14 +2526,6 @@ void NPCSpecial(int A)
         // only update the quadtree if the tempBlock exists
         if(npc.tempBlock > 0)
         {
-            // necessary for tree update
-            Block[npc.tempBlock].LocationInLayer = Block[npc.tempBlock].Location;
-            if(Block[npc.tempBlock].Layer != LAYER_NONE)
-            {
-                Block[npc.tempBlock].LocationInLayer.X -= Layer[Block[npc.tempBlock].Layer].OffsetX;
-                Block[npc.tempBlock].LocationInLayer.Y -= Layer[Block[npc.tempBlock].Layer].OffsetY;
-            }
-
             treeTempBlockUpdate(npc.tempBlock);
         }
 
