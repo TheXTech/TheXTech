@@ -20,8 +20,8 @@
 
 #pragma once
 
-#ifndef BLOCK_TABLE_H
-#define BLOCK_TABLE_H
+#ifndef BLOCK_TABLE_HPP
+#define BLOCK_TABLE_HPP
 
 #include <iterator>
 #include <array>
@@ -671,4 +671,4 @@ class BasicAllocator
 };
 #endif // #if 0
 
-#endif // #ifndef BLOCK_TABLE_H
+#endif // #ifndef BLOCK_TABLE_HPP
