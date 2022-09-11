@@ -631,7 +631,7 @@ void UpdateNPCs()
     treeTempBlockStartFrame();
     for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
     {
-        treeTempBlockAdd(&Block[A]);
+        treeTempBlockAdd(A);
     }
 
     // if(numTempBlock > 1)
@@ -1902,9 +1902,9 @@ void UpdateNPCs()
                             // blockTileGet(loc, fBlock, lBlock);
                             bool stillCollide = false;
 
-                            for(Block_t* block : treeBlockQuery(loc, SORTMODE_NONE))
+                            for(BlockRef_t block : treeBlockQuery(loc, SORTMODE_NONE))
                             {
-                                B = block - &Block[1] + 1;
+                                B = block;
                                 if(!CheckCollision(loc, Block[B].Location))
                                     continue;
                                 if(NPC[A].Block == B || Block[B].noProjClipping ||
@@ -2048,9 +2048,9 @@ void UpdateNPCs()
                                     ? treeBlockQuery(NPC[A].Location, SORTMODE_COMPAT)
                                     : treeTempBlockQuery(NPC[A].Location, SORTMODE_LOC);
 
-                                for(Block_t* block : collBlockSentinel)
+                                for(BlockRef_t block : collBlockSentinel)
                                 {
-                                    B = block - &Block[1] + 1;
+                                    B = block;
                                     // If Not .Block = B And Not .tempBlock = B And Not (.Projectile = True And Block(B).noProjClipping = True) And BlockNoClipping(Block(B).Type) = False And Block(B).Hidden = False And Block(B).Hidden = False Then
 
 
@@ -3536,9 +3536,9 @@ void UpdateNPCs()
                                                                                             ? treeBlockQuery(NPC[B].Location, SORTMODE_COMPAT)
                                                                                             : treeTempBlockQuery(NPC[B].Location, SORTMODE_LOC);
 
-                                                                                        for(Block_t* block2 : collBlockSentinel2)
+                                                                                        for(BlockRef_t block2 : collBlockSentinel2)
                                                                                         {
-                                                                                            int C = block2 - &Block[1] + 1;
+                                                                                            int C = block2;
 
                                                                                             if(!BlockIsSizable[Block[C].Type] && !BlockOnlyHitspot1[Block[C].Type] && !Block[C].Hidden && BlockSlope[Block[C].Type] == 0)
                                                                                             {
@@ -3846,9 +3846,9 @@ void UpdateNPCs()
                                         ? treeBlockQuery(tempLocation, SORTMODE_NONE)
                                         : treeTempBlockQuery(tempLocation, SORTMODE_NONE);
 
-                                    for(Block_t* block : collBlockSentinel2)
+                                    for(BlockRef_t block : collBlockSentinel2)
                                     {
-                                        B = block - &Block[1] + 1;
+                                        B = block;
                                         //If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
 
                                         // Don't collapse Pokey during walking on slopes and other touching surfaces
@@ -3924,9 +3924,9 @@ void UpdateNPCs()
                                         ? treeBlockQuery(tempLocation, SORTMODE_NONE)
                                         : treeTempBlockQuery(tempLocation, SORTMODE_NONE);
 
-                                    for(Block_t* block : collBlockSentinel2)
+                                    for(BlockRef_t block : collBlockSentinel2)
                                     {
-                                        B = block - &Block[1] + 1;
+                                        B = block;
                                         if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 3))
                                         {
                                             if(CheckCollision(tempLocation, Block[B].Location))
@@ -3972,9 +3972,9 @@ void UpdateNPCs()
                                         ? treeBlockQuery(tempLocation, SORTMODE_NONE)
                                         : treeTempBlockQuery(tempLocation, SORTMODE_NONE);
 
-                                    for(Block_t* block : collBlockSentinel2)
+                                    for(BlockRef_t block : collBlockSentinel2)
                                     {
-                                        B = block - &Block[1] + 1;
+                                        B = block;
                                         if(!BlockNoClipping[Block[B].Type] && !Block[B].Invis && !Block[B].Hidden && !(BlockIsSizable[Block[B].Type] && Block[B].Location.Y < NPC[A].Location.Y + NPC[A].Location.Height - 1))
                                         {
                                             if(CheckCollision(tempLocation, Block[B].Location))
@@ -4084,7 +4084,7 @@ void UpdateNPCs()
                         }
 
                         // necessary for tree update
-                        treeTempBlockUpdate(&Block[NPC[A].tempBlock]);
+                        treeTempBlockUpdate(NPC[A].tempBlock);
 
                         // no longer needed; maintaining the sort
 #if 0
@@ -4519,9 +4519,9 @@ void UpdateNPCs()
                                 // lBlock = LastBlock[long((NPC[A].Location.X + NPC[A].Location.Width) / 32.0) + 1];
                                 // blockTileGet(NPC[A].Location, fBlock, lBlock);
 
-                                for(Block_t* block : treeBlockQuery(tempLocation, false))
+                                for(BlockRef_t block : treeBlockQuery(tempLocation, false))
                                 {
-                                    B = block - &Block[1] + 1;
+                                    B = block;
                                     if(Block[B].Type == 186 && CheckCollision(tempLocation, Block[B].Location) && !Block[B].Hidden)
                                         KillBlock(B);
                                 }
@@ -4551,9 +4551,9 @@ void UpdateNPCs()
                                         toShake.Width = (sec.Width - sec.X);
                                         toShake.Y = sec.Y;
                                         toShake.Height = (sec.Height - sec.Y);
-                                        for(Block_t* block : treeBlockQuery(toShake, false))
+                                        for(BlockRef_t block : treeBlockQuery(toShake, false))
                                         {
-                                            B = block - &Block[1] + 1;
+                                            B = block;
                                             BlockShakeUp(B);
                                         }
                                     }
@@ -5202,9 +5202,9 @@ void UpdateNPCs()
                             ? treeBlockQuery(NPC[A].Location, SORTMODE_COMPAT)
                             : treeTempBlockQuery(NPC[A].Location, SORTMODE_LOC);
 
-                        for(Block_t* block : collBlockSentinel)
+                        for(BlockRef_t block : collBlockSentinel)
                         {
-                            B = block - &Block[1] + 1;
+                            B = block;
 
                             if(!Block[B].Invis && !(BlockIsSizable[Block[B].Type] && NPC[A].Location.Y > Block[B].Location.Y) && !Block[B].Hidden)
                             {
