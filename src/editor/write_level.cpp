@@ -84,7 +84,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
     qSortBlocksY(B, A - 1);
     qSortBackgrounds(1, numBackground);
-    FindSBlocks();
+    // FindSBlocks();
 
     syncLayersTrees_AllBlocks();
     syncLayers_AllBGOs();

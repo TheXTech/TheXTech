@@ -880,7 +880,7 @@ void NPCSpecial(int A)
     {
         if(npc.Special == 0)
         {
-            if(!g_compatibility.fix_swooper_start_while_inactive || npc.Active)
+            if(!g_compatibility.fix_bat_start_while_inactive || npc.Active)
             {
                 for(int i = 1; i <= numPlayers; i++)
                 {

@@ -26,14 +26,18 @@
 #define SPC_ECHO_HHHH
 
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "fx_format.h"
 
-struct SpcEcho;
+typedef struct SpcEcho SpcEcho;
 
 extern SpcEcho *echoEffectInit(int rate, uint16_t format, int channels);
 extern void echoEffectFree(SpcEcho *context);
 
-enum EchoSetup
+typedef enum EchoSetup
 {
     ECHO_EON = 0,
     ECHO_EDL,
@@ -52,7 +56,7 @@ enum EchoSetup
     ECHO_FIR5,
     ECHO_FIR6,
     ECHO_FIR7
-};
+} EchoSetup;
 
 extern void spcEchoEffect(int chan, void *stream, int len, void *context);
 
@@ -61,5 +65,8 @@ extern void echoEffectResetDefaults(SpcEcho *out);
 
 extern void echoEffectSetReg(SpcEcho *out, EchoSetup key, int val);
 extern int  echoEffectGetReg(SpcEcho *out, EchoSetup key);
+#ifdef __cplusplus
+}
+#endif
 
 #endif // SPC_ECHO_HHHH

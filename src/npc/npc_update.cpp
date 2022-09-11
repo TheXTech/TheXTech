@@ -3753,7 +3753,7 @@ void UpdateNPCs()
                                         //If BlockNoClipping(Block(B).Type) = False And Block(B).Invis = False And Block(B).Hidden = False And Not (BlockIsSizable(Block(B).Type) And Block(B).Location.Y < .Location.Y + .Location.Height - 3) Then
 
                                         // Don't collapse Pokey during walking on slopes and other touching surfaces
-                                        if(g_compatibility.fix_pokey_collapse && isPokeyHead && Block[B].IsNPC != 247)
+                                        if(g_compatibility.fix_npc247_collapse && isPokeyHead && Block[B].IsNPC != 247)
                                             continue;
 
                                         if((tempLocation.X + tempLocation.Width >= Block[B].Location.X) &&
@@ -4719,8 +4719,7 @@ void UpdateNPCs()
                                 NPC[numNPCs].Inert = NPC[A].Inert;
                                 tempBool = false;
                                 NPC[numNPCs].Direction = NPC[A].Direction;
-                                if(g_compatibility.keep_bullet_bill_dir)
-                                    NPC[numNPCs].DefaultDirection = NPC[A].Direction;
+                                NPC[numNPCs].DefaultDirection = NPC[A].Direction;
                                 if(NPC[A].HoldingPlayer > 0 || NPC[A].standingOnPlayer > 0 || (NPC[A].Type == 22 && NPC[A].Projectile))
                                 {
                                     NPC[numNPCs].Projectile = true;

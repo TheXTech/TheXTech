@@ -55,7 +55,7 @@ static void compatInit(Compatibility_t &c)
     // 1.3.4
     c.enable_last_warp_hub_resume = true;
     c.fix_platforms_acceleration = true;
-    c.fix_pokey_collapse = true;
+    c.fix_npc247_collapse = true;
     c.fix_player_filter_bounce = true;
     c.fix_player_downward_clip = true;
     c.fix_npc_downward_clip = true;
@@ -65,23 +65,22 @@ static void compatInit(Compatibility_t &c)
     c.enable_climb_bgo_layer_move = true;
     c.fix_player_clip_wall_at_npc = true;
     c.fix_skull_raft = true;
-    c.fix_peach_escape_shell_surf = true;
+    c.fix_char3_escape_shell_surf = true;
     c.fix_keyhole_framerate = true;
     // 1.3.5
-    c.fix_link_clowncar_fairy = true;
-    c.fix_dont_switch_player_by_clowncar = true;
-    c.enable_multipoints = true;
+    c.fix_char5_vehicle_climb = true;
+    c.fix_vehicle_char_switch = true;
+    c.fix_vanilla_checkpoints = true;
     c.fix_autoscroll_speed = false;
     // 1.3.5.1
-    c.fix_blooper_stomp_effect = true;
-    c.keep_bullet_bill_dir = true;
-    c.fix_pswitch_dragon_coin = true;
+    c.fix_squid_stomp_effect = true;
+    c.fix_special_coin_switch = true;
     // 1.3.5.2
-    c.fix_swooper_start_while_inactive = true;
+    c.fix_bat_start_while_inactive = true;
     c.fix_FreezeNPCs_no_reset = false;
     c.world_map_stars_show_policy = Compatibility_t::STARS_UNSPECIFIED;
     // 1.3.5.3
-    c.require_ground_to_enter_warps = false;
+    // c.require_ground_to_enter_warps = false; // REMOVED SINCE 1.3.6
     c.fix_npc_activation_event_loop_bug = true;
     c.sfx_player_grow_with_got_item = Compatibility_t::SPGWGI_UNSPECIFIED;
     // 1.3.6
@@ -101,26 +100,25 @@ static void compatInit(Compatibility_t &c)
     {
         c.enable_last_warp_hub_resume = false;
         c.fix_platforms_acceleration = false;
-        c.fix_pokey_collapse = false;
+        c.fix_npc247_collapse = false;
         c.fix_npc_downward_clip = false;
         c.fix_npc55_kick_ice_blocks = false; //-V1048
         c.fix_climb_invisible_fences = false;
         c.fix_climb_bgo_speed_adding = false;
         c.enable_climb_bgo_layer_move = false;
         c.fix_skull_raft = false;
-        c.fix_peach_escape_shell_surf = false;
+        c.fix_char3_escape_shell_surf = false;
         // 1.3.5
         c.fix_keyhole_framerate = false;
-        c.fix_link_clowncar_fairy = false;
-        c.fix_dont_switch_player_by_clowncar = false;
-        c.enable_multipoints = false;
+        c.fix_char5_vehicle_climb = false;
+        c.fix_vehicle_char_switch = false;
+        c.fix_vanilla_checkpoints = false;
         c.fix_autoscroll_speed = false; //-V1048
         // 1.3.5.1
-        c.fix_blooper_stomp_effect = false;
-        c.keep_bullet_bill_dir = false;
-        c.fix_pswitch_dragon_coin = false;
+        c.fix_squid_stomp_effect = false;
+        c.fix_special_coin_switch = false;
         // 1.3.5.2
-        c.fix_swooper_start_while_inactive = false;
+        c.fix_bat_start_while_inactive = false;
         c.fix_FreezeNPCs_no_reset = false; //-V1048
         // 1.3.5.3
         c.fix_npc_activation_event_loop_bug = false;
@@ -145,6 +143,18 @@ static void compatInit(Compatibility_t &c)
     SDL_memset(c.speedrun_stop_timer_at, 0, sizeof(c.speedrun_stop_timer_at));
     SDL_strlcpy(c.speedrun_stop_timer_at, "Boss Dead", sizeof(c.speedrun_stop_timer_at));
     c.speedrun_blink_effect = SPEEDRUN_EFFECT_BLINK_OPAQUEONLY;
+}
+
+static void deprecatedWarning(IniProcessing &s, const char* fieldName, const char *newName)
+{
+    if(s.hasKey(fieldName))
+    {
+        pLogWarning("File %s contains the deprecated setting \"%s\" at the section [%s]. Please rename it into \"%s\".",
+                    s.fileName().c_str(),
+                    fieldName,
+                    s.group().c_str(),
+                    newName);
+    }
 }
 
 static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
@@ -199,7 +209,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
     compat.endGroup();
 
-    compat.beginGroup("death-counter");
+    if(!compat.beginGroup("fails-counter"))
+        compat.beginGroup("death-counter"); // Backup fallback
     {
         std::string buffer;
         compat.read("enabled", c.demos_counter_enable, c.demos_counter_enable);
@@ -236,26 +247,33 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // 1.3.4
         compat.read("enable-last-warp-hub-resume", c.enable_last_warp_hub_resume, c.enable_last_warp_hub_resume);
         compat.read("fix-platform-acceleration", c.fix_platforms_acceleration, c.fix_platforms_acceleration);
-        compat.read("fix-pokey-collapse", c.fix_pokey_collapse, c.fix_pokey_collapse);
+        compat.read("fix-pokey-collapse", c.fix_npc247_collapse, c.fix_npc247_collapse);// DEPRECATED since 1.3.6
+        deprecatedWarning(compat, "fix-pokey-collapse", "fix-npc247-collapse");
         compat.read("fix-npc55-kick-ice-blocks", c.fix_npc55_kick_ice_blocks, c.fix_npc55_kick_ice_blocks);
         compat.read("fix-climb-invisible-fences", c.fix_climb_invisible_fences, c.fix_climb_invisible_fences);
         compat.read("fix-climb-bgo-speed-adding", c.fix_climb_bgo_speed_adding, c.fix_climb_bgo_speed_adding);
         compat.read("enable-climb-bgo-layer-move", c.enable_climb_bgo_layer_move, c.enable_climb_bgo_layer_move);
         compat.read("fix-player-clip-wall-at-npc", c.fix_player_clip_wall_at_npc, c.fix_player_clip_wall_at_npc);
         compat.read("fix-skull-raft", c.fix_skull_raft, c.fix_skull_raft);
-        compat.read("fix-peach-escape-shell-surf", c.fix_peach_escape_shell_surf, c.fix_peach_escape_shell_surf);
+        compat.read("fix-peach-escape-shell-surf", c.fix_char3_escape_shell_surf, c.fix_char3_escape_shell_surf);// DEPRECATED since 1.3.6
+        deprecatedWarning(compat, "fix-peach-escape-shell-surf", "fix-char3-escape-shell-surf");
         compat.read("fix-keyhole-framerate", c.fix_keyhole_framerate, c.fix_keyhole_framerate);
         // 1.3.5
-        compat.read("fix-link-clowncar-fairy", c.fix_link_clowncar_fairy, c.fix_link_clowncar_fairy);
-        compat.read("fix-dont-switch-player-by-clowncar", c.fix_dont_switch_player_by_clowncar, c.fix_dont_switch_player_by_clowncar);
-        compat.read("enable-multipoints", c.enable_multipoints, c.enable_multipoints);
+        compat.read("fix-link-clowncar-fairy", c.fix_char5_vehicle_climb, c.fix_char5_vehicle_climb);// DEPRECATED since 1.3.6
+        deprecatedWarning(compat, "fix-link-clowncar-fairy", "fix-char5-vehicle-climb");
+        compat.read("fix-dont-switch-player-by-clowncar", c.fix_vehicle_char_switch, c.fix_vehicle_char_switch);// DEPRECATED since 1.3.6
+        deprecatedWarning(compat, "fix-dont-switch-player-by-clowncar", "fix-vehicle-char-switch");
+        compat.read("enable-multipoints", c.fix_vanilla_checkpoints, c.fix_vanilla_checkpoints);// DEPRECATED since 1.3.6
+        deprecatedWarning(compat, "enable-multipoints", "fix-vanilla-checkpoints");
         compat.read("fix-autoscroll-speed", c.fix_autoscroll_speed, c.fix_autoscroll_speed);
         // 1.3.5.1
-        compat.read("fix-blooper-stomp-effect", c.fix_blooper_stomp_effect, c.fix_blooper_stomp_effect);
-        compat.read("keep-bullet-bill-direction", c.keep_bullet_bill_dir, c.keep_bullet_bill_dir);
-        compat.read("fix-pswitch-dragon-coin", c.fix_pswitch_dragon_coin, c.fix_pswitch_dragon_coin);
+        compat.read("fix-blooper-stomp-effect", c.fix_squid_stomp_effect, c.fix_squid_stomp_effect);// DEPRECATED since 1.3.6
+        deprecatedWarning(compat, "fix-blooper-stomp-effect", "fix-squid-stomp-effect");
+        compat.read("fix-pswitch-dragon-coin", c.fix_special_coin_switch, c.fix_special_coin_switch);// DEPRECATED since 1.3.6
+        deprecatedWarning(compat, "fix-pswitch-dragon-coin", "fix-special-coin-switch");
         // 1.3.5.2
-        compat.read("fix-swooper-start-while-inactive", c.fix_swooper_start_while_inactive, c.fix_swooper_start_while_inactive);
+        compat.read("fix-swooper-start-while-inactive", c.fix_bat_start_while_inactive, c.fix_bat_start_while_inactive);// DEPRECATED since 1.3.6
+        deprecatedWarning(compat, "fix-swooper-start-while-inactive", "fix-bat-start-while-inactive");
         compat.read("fix-FreezeNPCs-no-reset", c.fix_FreezeNPCs_no_reset, c.fix_FreezeNPCs_no_reset);
         IniProcessing::StrEnumMap starsShowPolicy
         {
@@ -270,13 +288,22 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("allow-drop-add", c.allow_drop_add, c.allow_drop_add);
         compat.read("multiplayer-pause-controls", c.multiplayer_pause_controls, c.multiplayer_pause_controls);
         compat.read("fix-fairy-stuck-in-pipe", c.fix_fairy_stuck_in_pipe, c.fix_fairy_stuck_in_pipe);
+        // New names for old fields
+        compat.read("fix-vanilla-checkpoints", c.fix_vanilla_checkpoints, c.fix_vanilla_checkpoints);
+        compat.read("fix-squid-stomp-effect", c.fix_squid_stomp_effect, c.fix_squid_stomp_effect);
+        compat.read("fix-char3-escape-shell-surf", c.fix_char3_escape_shell_surf, c.fix_char3_escape_shell_surf);
+        compat.read("fix-char5-vehicle-climb", c.fix_char5_vehicle_climb, c.fix_char5_vehicle_climb);
+        compat.read("fix-vehicle-char-switch", c.fix_vehicle_char_switch, c.fix_vehicle_char_switch);
+        compat.read("fix-npc247-collapse", c.fix_npc247_collapse, c.fix_npc247_collapse);
+        compat.read("fix-special-coin-switch", c.fix_special_coin_switch, c.fix_special_coin_switch);
+        compat.read("fix-bat-start-while-inactive", c.fix_bat_start_while_inactive, c.fix_bat_start_while_inactive);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);
     compat.read("fix-player-downward-clip", c.fix_player_downward_clip, c.fix_player_downward_clip);
     compat.read("fix-npc-downward-clip", c.fix_npc_downward_clip, c.fix_npc_downward_clip);
     // 1.3.5.3
-    compat.read("require-ground-to-enter-warps", c.require_ground_to_enter_warps, c.require_ground_to_enter_warps);
+    // compat.read("require-ground-to-enter-warps", c.require_ground_to_enter_warps, c.require_ground_to_enter_warps); // REMOVED SINCE 1.3.6
     compat.read("fix-npc-activation-event-loop-bug", c.fix_npc_activation_event_loop_bug, c.fix_npc_activation_event_loop_bug);
     // 1.3.6
     compat.read("world-map-fast-move", c.world_map_fast_move, c.world_map_fast_move);

@@ -26,7 +26,7 @@ struct Compatibility_t
 {
     // 1.3.4
     bool enable_last_warp_hub_resume;
-    bool fix_pokey_collapse;
+    bool fix_npc247_collapse;
     bool fix_platforms_acceleration;
     bool fix_player_filter_bounce;
     bool fix_player_downward_clip;
@@ -37,19 +37,18 @@ struct Compatibility_t
     bool enable_climb_bgo_layer_move;
     bool fix_player_clip_wall_at_npc;
     bool fix_skull_raft;
-    bool fix_peach_escape_shell_surf;
+    bool fix_char3_escape_shell_surf;
     bool fix_keyhole_framerate;
     // 1.3.5
-    bool fix_link_clowncar_fairy;
-    bool fix_dont_switch_player_by_clowncar;
-    bool enable_multipoints;
+    bool fix_char5_vehicle_climb;
+    bool fix_vehicle_char_switch;
+    bool fix_vanilla_checkpoints;
     bool fix_autoscroll_speed;
     // 1.3.5.1
-    bool fix_blooper_stomp_effect;
-    bool keep_bullet_bill_dir;
-    bool fix_pswitch_dragon_coin;
+    bool fix_squid_stomp_effect;
+    bool fix_special_coin_switch;
     // 1.3.5.2
-    bool fix_swooper_start_while_inactive;
+    bool fix_bat_start_while_inactive;
     bool fix_FreezeNPCs_no_reset;
     enum StarsShowPolicy_t
     {
@@ -64,7 +63,7 @@ struct Compatibility_t
     };
     int world_map_stars_show_policy;
     // 1.3.5.3
-    bool require_ground_to_enter_warps;
+    // bool require_ground_to_enter_warps; // REMOVED SINCE 1.3.6
     bool fix_npc_activation_event_loop_bug;
     enum SfxPlayerGrowWithGetItem_t
     {
