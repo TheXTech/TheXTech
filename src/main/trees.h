@@ -122,7 +122,6 @@ public:
 };
 
 extern void treeWorldCleanAll();
-extern void treeLevelCleanBlockLayers();
 extern void treeLevelCleanAll();
 
 extern void treeWorldTileAdd(TileRef_t obj);
@@ -164,6 +163,9 @@ extern TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(double Left, dou
 extern TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
 
 
+// declared in block_table.cpp
+
+extern void treeLevelCleanBlockLayers();
 extern void treeBlockAddLayer(int layer, BlockRef_t obj);
 extern void treeBlockRemoveLayer(int layer, BlockRef_t obj);
 extern void treeBlockUpdateLayer(int layer, BlockRef_t obj);
@@ -177,6 +179,14 @@ extern void treeTempBlockUpdate(BlockRef_t obj);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 16.0);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+
+extern void treeLevelCleanBackgroundLayers();
+extern void treeBackgroundAddLayer(int layer, BackgroundRef_t obj);
+extern void treeBackgroundRemoveLayer(int layer, BackgroundRef_t obj);
+extern void treeBackgroundUpdateLayer(int layer, BackgroundRef_t obj);
+extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(double Left, double Top, double Right, double Bottom,
+                               int sort_mode, double margin = 16.0);
+extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
 
 // removed in favor of block quadtree
 

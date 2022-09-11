@@ -24,8 +24,14 @@
 #include "trees.h"
 #include "layers.h"
 
+#include "compat.h"
+
 table_t<BlockRef_t> block_table[maxLayers+2];
 table_t<BlockRef_t> s_tempBlockTree;
+
+table_t<BackgroundRef_t> background_table[maxLayers+2];
+
+/* ================= Level blocks ================= */
 
 void treeLevelCleanBlockLayers()
 {
@@ -36,21 +42,21 @@ void treeLevelCleanBlockLayers()
 
 void treeBlockAddLayer(int layer, BlockRef_t block)
 {
-    if(layer < 0)
+    if(layer < 0 || layer == LAYER_NONE)
         layer = maxLayers + 1;
     block_table[layer].insert(block);
 }
 
 void treeBlockUpdateLayer(int layer, BlockRef_t block)
 {
-    if(layer < 0)
+    if(layer < 0 || layer == LAYER_NONE)
         layer = maxLayers + 1;
     block_table[layer].update(block);
 }
 
 void treeBlockRemoveLayer(int layer, BlockRef_t block)
 {
-    if(layer < 0)
+    if(layer < 0 || layer == LAYER_NONE)
         layer = maxLayers + 1;
     block_table[layer].erase(block);
 }
@@ -63,7 +69,7 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double R
 
     for(int layer = 0; layer < maxLayers+2; layer++)
     {
-        // skip empty layers except the tempBlock layer
+        // skip empty layers except LAYER_NONE
         if(layer > numLayers && layer != maxLayers + 1)
             layer = maxLayers + 1;
 
@@ -84,6 +90,14 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double R
            (Bottom - Top) + margin * 2);
 
         block_table[layer].query(*result.i_vec, loc);
+    }
+
+    if(sort_mode == SORTMODE_COMPAT)
+    {
+        if(g_compatibility.emulate_classic_block_order)
+            sort_mode = SORTMODE_ID;
+        else
+            sort_mode = SORTMODE_LOC;
     }
 
     if(sort_mode == SORTMODE_LOC)
@@ -126,6 +140,8 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
                    loc.Y + loc.Height, sort_mode, margin);
 }
 
+/* ================= Temp blocks ================= */
+
 void treeTempBlockStartFrame()
 {
     s_tempBlockTree.clear_light();
@@ -152,6 +168,11 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, doub
                (Right - Left) + margin * 2,
                (Bottom - Top) + margin * 2);
     s_tempBlockTree.query(*result.i_vec, loc);
+
+    if(sort_mode == SORTMODE_COMPAT)
+    {
+        sort_mode = SORTMODE_LOC;
+    }
 
     if(sort_mode == SORTMODE_LOC)
     {
@@ -188,6 +209,106 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc,
                          double margin)
 {
     return treeTempBlockQuery(loc.X,
+                   loc.Y,
+                   loc.X + loc.Width,
+                   loc.Y + loc.Height, sort_mode, margin);
+}
+
+/* ================= Level Backgrounds ================= */
+
+void treeLevelCleanBackgroundLayers()
+{
+    for(int i = 0; i < maxLayers+2; i++)
+        background_table[i].clear();
+}
+
+void treeBackgroundAddLayer(int layer, BackgroundRef_t bgo)
+{
+    if(layer < 0 || layer == LAYER_NONE)
+        layer = maxLayers + 1;
+    background_table[layer].insert(bgo);
+}
+
+void treeBackgroundUpdateLayer(int layer, BackgroundRef_t bgo)
+{
+    if(layer < 0 || layer == LAYER_NONE)
+        layer = maxLayers + 1;
+    background_table[layer].update(bgo);
+}
+
+void treeBackgroundRemoveLayer(int layer, BackgroundRef_t bgo)
+{
+    if(layer < 0 || layer == LAYER_NONE)
+        layer = maxLayers + 1;
+    background_table[layer].erase(bgo);
+}
+
+TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(double Left, double Top, double Right, double Bottom,
+                         int sort_mode,
+                         double margin)
+{
+    TreeResult_Sentinel<BackgroundRef_t> result;
+
+    for(int layer = 0; layer < maxLayers + 2; layer++)
+    {
+        // skip empty layers except LAYER_NONE
+        if(layer > numLayers && layer != maxLayers + 1)
+            layer = maxLayers + 1;
+
+        double OffsetX, OffsetY;
+        if(layer == maxLayers + 1)
+        {
+            OffsetX = OffsetY = 0.0;
+        }
+        else
+        {
+            OffsetX = Layer[layer].OffsetX;
+            OffsetY = Layer[layer].OffsetY;
+        }
+
+        Location_t loc = newLoc(Left - OffsetX - margin,
+           Top - OffsetY - margin,
+           (Right - Left) + margin * 2,
+           (Bottom - Top) + margin * 2);
+
+        background_table[layer].query(*result.i_vec, loc);
+    }
+
+    if(sort_mode == SORTMODE_LOC)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+            [](BaseRef_t a, BaseRef_t b) {
+                return (((BackgroundRef_t)a)->Location.X < ((BackgroundRef_t)b)->Location.X
+                    || (((BackgroundRef_t)a)->Location.X == ((BackgroundRef_t)b)->Location.X
+                        && ((BackgroundRef_t)a)->Location.Y < ((BackgroundRef_t)b)->Location.Y));
+            });
+    }
+    else if(sort_mode == SORTMODE_ID)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+            [](BaseRef_t a, BaseRef_t b) {
+                return a < b;
+            });
+    }
+    else if(sort_mode == SORTMODE_Z)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+            [](BaseRef_t a, BaseRef_t b) {
+                // not implemented yet, might never be
+                // instead, just sort by the index
+                // (which is currently the same as z-order)
+                return a < b;
+            });
+    }
+
+    return result;
+}
+
+TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t &loc,
+                         int sort_mode,
+                         double margin)
+{
+    return treeBackgroundQuery(loc.X,
                    loc.Y,
                    loc.X + loc.Width,
                    loc.Y + loc.Height, sort_mode, margin);

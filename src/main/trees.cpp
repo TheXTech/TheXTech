@@ -23,7 +23,6 @@
 
 #include "trees.h"
 #include "layers.h"
-#include "compat.h"
 
 #include "QuadTree/LooseQuadtree.h"
 
@@ -99,17 +98,10 @@ void treeWorldCleanAll()
     clearTree(s_worldMusicTree);
 }
 
-#if 0
-void treeLevelCleanBlockLayers()
-{
-    for(int i = 0; i < maxLayers+2; i++)
-        clearTree(s_levelBlockTrees[i]);
-}
-#endif
-
 void treeLevelCleanAll()
 {
     treeLevelCleanBlockLayers();
+    treeLevelCleanBackgroundLayers();
 }
 
 template<class ItemRef_t, class Arr>
@@ -376,196 +368,6 @@ TreeResult_Sentinel<WorldMusicRef_t> treeWorldMusicQuery(const Location_t &loc,
                    loc.Y + loc.Height + margin,
                    sort_mode);
 }
-
-
-/* ================= Level blocks ================= */
-
-#if 0
-void treeBlockAddLayer(int layer, BlockRef_t obj)
-{
-    if(layer < 0 || layer == LAYER_NONE)
-        layer = maxLayers + 1;
-    treeInsert(s_levelBlockTrees[layer], obj);
-}
-
-void treeBlockUpdateLayer(int layer, BlockRef_t obj)
-{
-    if(layer < 0 || layer == LAYER_NONE)
-        layer = maxLayers + 1;
-    treeUpdate(s_levelBlockTrees[layer], obj);
-}
-
-void treeBlockRemoveLayer(int layer, BlockRef_t obj)
-{
-    if(layer < 0 || layer == LAYER_NONE)
-        layer = maxLayers + 1;
-    treeRemove(s_levelBlockTrees[layer], obj);
-}
-
-TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
-                         int sort_mode,
-                         double margin)
-{
-    TreeResult_Sentinel<BlockRef_t> result;
-
-    for(int layer = 0; layer < maxLayers+2; layer++)
-    {
-        // skip empty layers except LAYER_NONE
-        if(layer > numLayers && layer != maxLayers + 1)
-            layer = maxLayers + 1;
-
-        double OffsetX, OffsetY;
-        if(layer == maxLayers + 1)
-            OffsetX = OffsetY = 0.0;
-        else
-        {
-            OffsetX = Layer[layer].OffsetX;
-            OffsetY = Layer[layer].OffsetY;
-        }
-        std::unique_ptr<Tree_private<BlockRef_t>>& p = s_levelBlockTrees[layer];
-        if(!p.get())
-            continue;
-
-        auto q = p->tree.QueryIntersectsRegion(loose_quadtree::BoundingBox<double>(Left - OffsetX - margin - s_gridSize,
-                                                                                   Top - OffsetY - margin - s_gridSize,
-                                                                                   (Right - Left) + (margin + s_gridSize) * 2,
-                                                                                   (Bottom - Top) + (margin + s_gridSize) * 2));
-        while(!q.EndOfQuery())
-        {
-            BlockRef_t item = q.GetCurrent();
-            result.i_vec->push_back((BaseRef_t)item);
-            q.Next();
-        }
-    }
-
-    if(sort_mode == SORTMODE_COMPAT)
-    {
-        if(g_compatibility.emulate_classic_block_order)
-            sort_mode = SORTMODE_ID;
-        else
-            sort_mode = SORTMODE_LOC;
-    }
-
-    if(sort_mode == SORTMODE_LOC)
-    {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                    || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                        && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
-            });
-    }
-    else if(sort_mode == SORTMODE_ID)
-    {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                return a.index < b.index;
-            });
-    }
-    else if(sort_mode == SORTMODE_Z)
-    {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                // not implemented yet, might never be
-                // instead, just sort by the index
-                // (which is currently the same as z-order)
-                return a.index < b.index;
-            });
-    }
-
-    return result;
-}
-
-TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
-                         int sort_mode,
-                         double margin)
-{
-    return treeBlockQuery(loc.X,
-                   loc.Y,
-                   loc.X + loc.Width,
-                   loc.Y + loc.Height, sort_mode, margin);
-}
-#endif
-
-/* ================= Temp blocks ================= */
-
-#if 0
-void treeTempBlockStartFrame()
-{
-    if(!s_tempBlockTree.get())
-        s_tempBlockTree.reset(new Tree_private<BlockRef_t>());
-    s_tempBlockTree->tree.Clear();
-}
-
-void treeTempBlockAdd(BlockRef_t obj)
-{
-    treeInsert(s_tempBlockTree, obj);
-}
-
-void treeTempBlockUpdate(BlockRef_t obj)
-{
-    treeUpdate(s_tempBlockTree, obj);
-}
-
-TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
-                         int sort_mode,
-                         double margin)
-{
-    TreeResult_Sentinel<BlockRef_t> result;
-
-    std::unique_ptr<Tree_private<BlockRef_t>>& p = s_tempBlockTree;
-
-    auto q = p->tree.QueryIntersectsRegion(loose_quadtree::BoundingBox<double>(Left - margin - s_gridSize,
-                                                                               Top - margin - s_gridSize,
-                                                                               (Right - Left) + (margin + s_gridSize) * 2,
-                                                                               (Bottom - Top) + (margin + s_gridSize) * 2));
-    while(!q.EndOfQuery())
-    {
-        BlockRef_t item = q.GetCurrent();
-        result.i_vec->push_back((BaseRef_t)item);
-        q.Next();
-    }
-
-    if(sort_mode == SORTMODE_LOC)
-    {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                    || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                        && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
-            });
-    }
-    else if(sort_mode == SORTMODE_ID)
-    {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                return a.index < b.index;
-            });
-    }
-    else if(sort_mode == SORTMODE_Z)
-    {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                // not implemented yet, might never be
-                // instead, just sort by the index
-                // (which is currently the same as z-order)
-                return a.index < b.index;
-            });
-    }
-
-    return result;
-}
-
-TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc,
-                         int sort_mode,
-                         double margin)
-{
-    return treeTempBlockQuery(loc.X,
-                   loc.Y,
-                   loc.X + loc.Width,
-                   loc.Y + loc.Height, sort_mode, margin);
-}
-#endif
 
 /* ================= Tile block search ================= */
 // removed in favor of block quadtree
