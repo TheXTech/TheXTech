@@ -20,7 +20,7 @@
 
 #include <algorithm>
 
-#include "block_table.h"
+#include "block_table.hpp"
 #include "trees.h"
 #include "layers.h"
 
