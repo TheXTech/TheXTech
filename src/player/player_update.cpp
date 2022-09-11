@@ -1894,7 +1894,7 @@ void UpdatePlayer()
                                 if(Player[A].State == 7)
                                     PlaySound(SFX_ZeldaIce);
                                 else
-                                    PlaySound(SFX_ZeldaFire);
+                                    PlaySound(SFX_ZeldaFireRod);
 
                                 numNPCs++;
                                 NPC[numNPCs] = NPC_t();
