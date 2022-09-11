@@ -397,6 +397,8 @@ void DrawWarningNPC(int Z, int A)
     double total_off = (add_x > 0 ? add_x : -add_x)
         + (add_y > 0 ? add_y : -add_y);
 
+    // uncomment this code to disable warning when NPC is moving away from screen
+#if 0
     // don't worry if it's moving away from the screen
     if((add_x > 0 && NPC[A].Location.SpeedX < 0)
         || (add_x < 0 && NPC[A].Location.SpeedX > 0)
@@ -405,6 +407,7 @@ void DrawWarningNPC(int Z, int A)
     {
         return;
     }
+#endif
 
     an *= (250.0 - total_off) / 500.0;
     if(an > 1.0f)
