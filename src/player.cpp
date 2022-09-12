@@ -5016,7 +5016,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.HoldingNPC].Special2 = 0;
                     }
 
-                        PlaySound(SFX_ZeldaFireRod);
+                        PlaySound(SFX_FlameThrower);
 
                     // For B = 1 To 3
                         numNPCs++;
