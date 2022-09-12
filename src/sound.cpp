@@ -1045,6 +1045,8 @@ static const std::unordered_map<int, int> s_soundFallback =
     {SFX_SproutVine, SFX_Mushroom},
     {SFX_LudwigKilled, SFX_WartKilled},
     {SFX_ZeldaIce, SFX_ZeldaFire},
+    {SFX_ZeldaFireRod, SFX_ZeldaFire},
+    {SFX_FlameThrower, SFX_ZeldaFire},
 };
 
 static int getFallbackSfx(int A)

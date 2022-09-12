@@ -1193,9 +1193,20 @@ void UpdateLayers()
                     {
                         if(BackgroundFence[Background[B].Type])
                         {
-                            // @Wohlstand, should this be 0?
-                            Background[B].Location.SpeedX = double(Layer[A].SpeedX);
-                            Background[B].Location.SpeedY = double(Layer[A].SpeedY);
+                            Background[B].Location.SpeedX = 0;
+                            Background[B].Location.SpeedY = 0;
+                        }
+                    }
+                }
+
+                if(g_compatibility.enable_climb_bgo_layer_move)
+                {
+                    for(int B : Layer[A].NPCs)
+                    {
+                        if(NPC[B].Type == 91 || NPC[B].Type == 211 || NPCIsAVine[NPC[B].Type])
+                        {
+                            NPC[B].Location.SpeedX = 0;
+                            NPC[B].Location.SpeedY = 0;
                         }
                     }
                 }

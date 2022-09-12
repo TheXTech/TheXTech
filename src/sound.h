@@ -150,7 +150,9 @@ enum
     SFX_LarryShell,
     SFX_LarryKilled = 100,
     SFX_LudwigKilled,
-    SFX_ZeldaIce
+    SFX_ZeldaIce,
+    SFX_ZeldaFireRod,
+    SFX_FlameThrower
 };
 
 int CustomWorldMusicId();

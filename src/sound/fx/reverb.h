@@ -26,11 +26,16 @@
 #define REVERB_H
 
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "fx_format.h"
 
-struct FxReverb;
+typedef struct FxReverb FxReverb;
 
-struct ReverbSetup
+typedef struct ReverbSetup
 {
     float mode         = 0.0f; // Normal (0) or Freeze (>0.5)
     float roomSize     = 0.7f;
@@ -38,7 +43,7 @@ struct ReverbSetup
     float wetLevel     = 0.2f;
     float dryLevel     = 0.4f;
     float width        = 1.0f; // 0.0...1.0
-};
+} ReverbSetup;
 
 extern FxReverb *reverbEffectInit(int rate, uint16_t format, int channels);
 extern void reverbEffectFree(FxReverb *context);
@@ -56,5 +61,9 @@ extern void reverbUpdateDamping(FxReverb *context, float damping);
 extern void reverbUpdateWetLevel(FxReverb *context, float wet);
 extern void reverbUpdateDryLevel(FxReverb *context, float dry);
 extern void reverbUpdateWidth(FxReverb *context, float width);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // REVERB_H
