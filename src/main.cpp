@@ -159,7 +159,7 @@ int main(int argc, char**argv)
         testPlayer[i].Character = i;
     }
 
-#ifndef PGE_MIN_PORT
+#if !defined(__3DS__) && !defined(__WII__) && !defined(__NDS__)
     try
     {
         // Define the command line object.

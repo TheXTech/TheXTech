@@ -7,7 +7,7 @@ uint32_t XStd::GetTicks()
     return ++curTime;
 }
 
-uint64_t GetMicroTicks()
+uint64_t XStd::GetMicroTicks()
 {
     return curTime * 1000;
 }

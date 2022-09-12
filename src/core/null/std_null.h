@@ -36,6 +36,18 @@ inline int AtomicGet(const atomic_t* loc)
     return *loc;
 }
 
+inline size_t strlcpy(char* dst, const char* src, size_t maxlen)
+{
+    size_t srclen = strlen(src);
+    if(maxlen > 0)
+    {
+        size_t len = srclen < maxlen - 1 ? srclen : maxlen - 1;
+        memcpy(dst, src, len);
+        dst[len] = '\0';
+    }
+    return srclen;
+}
+
 }; // namespace XStd
 
 #endif // #ifndef STD_NULL_H

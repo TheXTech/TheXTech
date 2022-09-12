@@ -21,6 +21,7 @@ using atomic_t = SDL_atomic_t;
 
 TXT_IMPORT(AtomicSet);
 TXT_IMPORT(AtomicGet);
+TXT_IMPORT(strlcpy);
 
 inline uint32_t GetTicks()
 {

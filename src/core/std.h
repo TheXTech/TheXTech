@@ -15,6 +15,7 @@
 #endif
 
 #include <cstdint>
+#include <cstring>
 
 namespace XStd
 {
@@ -53,7 +54,6 @@ TXT_IMPORT(free);
 TXT_IMPORT(memset);
 TXT_IMPORT(memcpy);
 TXT_IMPORT(memcmp);
-TXT_IMPORT(strlcpy);
 TXT_IMPORT(strdup);
 TXT_IMPORT(strlen);
 TXT_IMPORT(strtol);

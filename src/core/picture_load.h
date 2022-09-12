@@ -20,7 +20,7 @@
 
 #pragma once
 
-#if defined(__3DS__) || defined(__WII__)
+#if defined(__3DS__) || defined(__WII__) || defined(PGE_MIN_PORT)
 #   include "core/3ds/picture_load.h"
 #endif
 

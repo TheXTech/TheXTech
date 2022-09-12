@@ -138,8 +138,37 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     // unload is essential because lazy load would save the address incorrectly.
     else
     {
-        pLogWarning("loadPicture: Couldn't open size file.");
-        target.inited = false;
+        // this will work if it's a PNG
+        FILE* fpng = fopen(path.c_str(), "rb");
+        if(!fpng)
+        {
+            pLogWarning("loadPicture: Couldn't open size file.");
+            target.inited = false;
+            return target;
+        }
+
+        fseek(fpng, 16, SEEK_SET);
+
+        uint32_t w, h;
+        if(fread(&w, 4, 1, fpng) == 1 && fread(&h, 4, 1, fpng) == 1)
+        {
+            w = XStd::SwapLE32(w);
+            h = XStd::SwapLE32(h);
+
+            w = static_cast<uint32_t>(((w << 24) | ((w << 8) & 0x00FF0000) |
+                ((w >> 8) & 0x0000FF00) | (w >> 24)));
+            h = static_cast<uint32_t>(((h << 24) | ((h << 8) & 0x00FF0000) |
+                ((h >> 8) & 0x0000FF00) | (h >> 24)));
+
+            target.w = w;
+            target.h = h;
+        }
+        else
+        {
+            target.inited = false;
+        }
+
+        fclose(fpng);
     }
 
     return target;
@@ -149,6 +178,48 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
 StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
 {
     return LoadPicture(path, maskPath, maskFallbackPath);
+}
+
+StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
+{
+    StdPicture target;
+    if(!GameIsActive)
+        return target; // do nothing when game is closed
+
+    int length;
+
+    char filename[256];
+    if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
+    {
+        pLogWarning("Could not load image path from load list");
+        return target;
+    }
+
+    if(length == 255)
+    {
+        pLogWarning("Image path %s was truncated in load list", filename);
+        return target;
+    }
+
+    target.inited = true;
+    target.l.path = dir;
+    target.l.path += filename;
+    target.l.lazyLoaded = true;
+
+    int w, h, flags;
+    if(fscanf(f, "%d\n%d\n%d\n", &w, &h, &flags) != 3 || w < 0 || w > 8192 || h < 0 || h > 8192)
+    {
+        pLogWarning("Could not load image %s dimensions from load list", filename);
+        target.inited = false;
+        return target;
+    }
+
+    // pLogDebug("Successfully loaded %s (%d %d)", target.l.path.c_str(), w, h);
+
+    target.w = w;
+    target.h = h;
+
+    return target;
 }
 
 void lazyLoad(StdPicture &target)

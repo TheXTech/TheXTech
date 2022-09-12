@@ -229,15 +229,17 @@ if(NINTENDO_3DS)
     set(GME_ENABLE_ZLIB OFF CACHE BOOL "" FORCE)
     set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
     add_subdirectory(3rdparty/AudioCodecs/libgme)
-endif()
-
-if(NINTENDO_WII)
+elseif(NINTENDO_WII)
     set(GME_YM2612_EMU "GENS" CACHE STRING "" FORCE)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
     set(BUILD_GME_STATIC ON CACHE BOOL "" FORCE)
     set(GME_ENABLE_ZLIB OFF CACHE BOOL "" FORCE)
     add_subdirectory(3rdparty/AudioCodecs/libgme)
+elseif(PGE_MIN_PORT)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
 endif()
 
 if(THEXTECH_ENABLE_LUA)
@@ -300,7 +302,7 @@ if(USE_SYSTEM_LIBS)
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
-elseif(NOT NINTENDO_3DS AND NOT NINTENDO_WII)
+elseif(NOT PGE_MIN_PORT)
     include(cmake/library_FreeImage.cmake)
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_LIBS PGE_FreeImage)
@@ -330,7 +332,7 @@ set(LIB_SRC
     ${LIB_SRC_EXTRA}
 )
 
-if(NOT NINTENDO_3DS AND NOT NINTENDO_WII)
+if(NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
         lib/Graphics/graphics_funcs.cpp
         lib/Graphics/image_size.cpp
@@ -345,7 +347,8 @@ if(NOT ANDROID
    AND NOT NINTENDO_3DS
    AND NOT NINTENDO_WII
    AND NOT NINTENDO_WIIU
-   AND NOT NINTENDO_SWITCH)
+   AND NOT NINTENDO_SWITCH
+   AND NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
         lib/InterProcess/editor_pipe.cpp
         lib/InterProcess/intproc.cpp
@@ -354,7 +357,7 @@ if(NOT ANDROID
 endif()
 
 
-if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT VITA)
+if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT VITA AND NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
         ${FILEMAPPER_SRCS}
         ${STACK_WALKER_SRCS}
@@ -496,7 +499,7 @@ if(THEXTECH_ENABLE_AUDIO_FX)
     )
 endif()
 
-if(NOT NINTENDO_3DS AND NOT NINTENDO_WII)
+if(NOT PGE_MIN_PORT)
     add_definitions(-DCORE_EVERYTHING_SDL)
     list(APPEND THEXTECH_SRC
         src/control/joystick.cpp
@@ -513,9 +516,7 @@ if(NOT NINTENDO_3DS AND NOT NINTENDO_WII)
         src/core/sdl/events_sdl.cpp
         src/core/sdl/mixer_mixerx.cpp
     )
-endif()
-
-if(NINTENDO_3DS)
+elseif(NINTENDO_3DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
     list(APPEND THEXTECH_SRC
         src/3ds/3ds-audio-lib.cpp
@@ -528,9 +529,7 @@ if(NINTENDO_3DS)
         src/core/3ds/msgbox_3ds.cpp
         src/core/3ds/events_3ds.cpp
     )
-endif()
-
-if(WII)
+elseif(WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
     list(APPEND THEXTECH_SRC
         src/control/input_wii.cpp
@@ -542,6 +541,16 @@ if(WII)
         src/core/wii/events_wii.cpp
 #        src/core/wii/mixer_wii.cpp
         src/core/wii/mixerx_wii.cpp
+    )
+elseif(PGE_MIN_PORT)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
+    list(APPEND THEXTECH_SRC
+        src/core/null/std_null.cpp
+        src/core/null/render_null.cpp
+        src/core/null/window_null.cpp
+        src/core/null/msgbox_null.cpp
+        src/core/null/events_null.cpp
+        src/core/null/mixer_null.cpp
     )
 endif()
 
@@ -652,6 +661,12 @@ elseif(WII)
     target_link_libraries(thextech PRIVATE asnd)
     target_link_libraries(thextech PRIVATE vorbisidec ogg)
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
+elseif(PGE_MIN_PORT)
+    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
+    pge_set_nopie(thextech)
+
+    target_link_libraries(thextech PRIVATE SDL2)
+    target_link_libraries(thextech PRIVATE pgefl)
 else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
@@ -734,10 +749,10 @@ endif()
 
 if(NINTENDO_3DS)
     target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__3DS__)
-endif()
-
-if(NINTENDO_WII)
-    target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__3DS__)
+elseif(NINTENDO_WII)
+    target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__WII__)
+elseif(PGE_MIN_PORT)
+    target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE)
 endif()
 
 if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")
@@ -812,7 +827,7 @@ else()
     )
 endif()
 
-if(NOT EMSCRIPTEN AND NOT NINTENDO_3DS AND NOT NINTENDO_WII)
+if(NOT EMSCRIPTEN AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT PGE_MIN_PORT)
     target_compile_definitions(thextech PRIVATE
         -DUSE_SCREENSHOTS_AND_RECS  # Built-in screenshots and GIF recording
     )
@@ -824,7 +839,7 @@ if(ANDROID)
     )
 endif()
 
-if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
+if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT)
     target_compile_definitions(thextech PRIVATE
         -DRENDER_FULLSCREEN_ALWAYS  # Game works always fullscreen
         -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
