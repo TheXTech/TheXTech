@@ -4960,8 +4960,11 @@ void UpdateNPCs()
                 {
                     if(NPC[A].HoldingPlayer > 0)
                     {
-                        for(B = 1; B <= numBackground; B++)
+                        for(int B : treeBackgroundQuery(NPC[A].Location, SORTMODE_NONE))
                         {
+                            if(B > numBackground)
+                                continue;
+
                             if(Background[B].Type == 35)
                             {
                                 tempLocation = Background[B].Location;
