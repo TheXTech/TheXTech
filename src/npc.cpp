@@ -2534,7 +2534,7 @@ void NPCSpecial(int A)
                 Block[npc.tempBlock].LocationInLayer.Y -= Layer[Block[npc.tempBlock].Layer].OffsetY;
             }
 
-            treeBlockUpdateLayer(Block[npc.tempBlock].Layer, &Block[npc.tempBlock]);
+            treeTempBlockUpdate(npc.tempBlock);
         }
 
         if(npc.Type == NPCID_SAW)
