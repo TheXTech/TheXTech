@@ -630,6 +630,450 @@ void GraphicsLazyPreLoad()
     }
 }
 
+// does the classic ("onscreen") NPC activation / reset logic for vScreen Z, directly based on the many NPC loops of the original game
+void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
+{
+    Location_t npcALoc;
+
+    for(int A = 1; A <= numNPCs; A++)
+    {
+        g_stats.checkedNPCs++;
+
+        bool has_ALoc = false;
+        bool check_both_reset = false;
+        bool check_long_life = false;
+        bool activate_conveyer = false;
+        bool kill_zero = false;
+        bool set_justactivated = true;
+        bool can_check = false;
+        bool reset_all = true;
+
+        if(((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] ||
+             NPC[A].Type == 209 || NPC[A].Type == 159 || NPC[A].Type == 245 ||
+             NPC[A].Type == 8 || NPC[A].Type == 93 || NPC[A].Type == 74 ||
+             NPC[A].Type == 256 || NPC[A].Type == 257 || NPC[A].Type == 51 ||
+             NPC[A].Type == 52 || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
+             NPC[A].Effect == 4 || (NPC[A].Type == 45 && NPC[A].Special == 0.0)) &&
+             (NPC[A].standingOnPlayer == 0 && (!NPC[A].Generator || LevelEditor))) ||
+             NPC[A].Type == 179 || NPC[A].Type == 270)
+        {
+            if(NPC[A].Effect != 2 && (!NPC[A].Generator || LevelEditor))
+            {
+                can_check = true;
+            }
+        }
+
+        if(NPC[A].Effect == 0 && ((NPC[A].HoldingPlayer == 0 && (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 ||
+                                   NPC[A].Type == 22 || NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160 ||
+                                   NPC[A].Type == 282 || NPCIsACoin[NPC[A].Type]) && (!NPC[A].Generator || LevelEditor))))
+        {
+            npcALoc = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
+                                  NPC[A].Location.Y,
+                                  static_cast<double>(NPCWidthGFX[NPC[A].Type]),
+                                  static_cast<double>(NPCHeight[NPC[A].Type]));
+            has_ALoc = true;
+            can_check = true;
+        }
+
+        if(NPC[A].Type == 263 && NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0)
+        {
+            npcALoc = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
+                                  NPC[A].Location.Y,
+                                  static_cast<double>(NPCWidthGFX[NPC[A].Type]),
+                                  static_cast<double>(NPCHeight[NPC[A].Type]));
+
+            has_ALoc = true;
+            can_check = true;
+        }
+
+
+        if(NPC[A].Effect == 0)
+        {
+            if(!(NPC[A].HoldingPlayer > 0 || NPCIsAVine[NPC[A].Type] || NPC[A].Type == 209 || NPC[A].Type == 282 ||
+                 NPC[A].Type == 270 || NPC[A].Type == 160 || NPC[A].Type == 159 || NPC[A].Type == 8 || NPC[A].Type == 245 ||
+                 NPC[A].Type == 93 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 256 ||
+                 NPC[A].Type == 257 || NPC[A].Type == 56 || NPC[A].Type == 22 || NPC[A].Type == 49 || NPC[A].Type == 91) &&
+               !(NPC[A].Type == 45 && NPC[A].Special == 0) && NPC[A].standingOnPlayer == 0 &&
+               !NPCForeground[NPC[A].Type] && (!NPC[A].Generator || LevelEditor) &&
+               NPC[A].Type != 179 && NPC[A].Type != 263)
+            {
+                if(!NPCIsACoin[NPC[A].Type])
+                {
+                    can_check = true;
+                    kill_zero = true;
+                    activate_conveyer = true;
+                    check_both_reset = true;
+                    check_long_life = true;
+                }
+            }
+        }
+
+
+        if(
+            (
+              (
+                (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
+                (NPC[A].Type == 50 && NPC[A].standingOnPlayer == 0) ||
+                (NPC[A].Type == 17 && NPC[A].CantHurt > 0)
+              ) || NPC[A].Effect == 5
+            ) && NPC[A].Type != 91 && !Player[NPC[A].HoldingPlayer].Dead
+        )
+        {
+            NPC_Draw_Queue_p.add(A);
+        }
+
+        if(NPC[A].Effect == 0)
+        {
+            if(NPCForeground[NPC[A].Type] && NPC[A].HoldingPlayer == 0 && (!NPC[A].Generator || LevelEditor))
+            {
+                if(!NPCIsACoin[NPC[A].Type])
+                {
+                    can_check = true;
+                    check_both_reset = true;
+                }
+            }
+        }
+
+        if(NPC[A].Generator)
+        {
+            if(vScreenCollision(Z, NPC[A].Location) && !NPC[A].Hidden)
+                NPC[A].GeneratorActive = true;
+        }
+
+        if(NPC[A].Effect == 2)
+        {
+            if(std::fmod(NPC[A].Effect2, 3) != 0.0)
+            {
+                can_check = true;
+                reset_all = false;
+                set_justactivated = false;
+            }
+        }
+
+        if(!can_check)
+        {
+            continue;
+        }
+
+        if((vScreenCollision(Z, NPC[A].Location) || (has_ALoc && vScreenCollision(Z, npcALoc))) && !NPC[A].Hidden)
+        {
+            if(kill_zero && NPC[A].Type == 0)
+            {
+                NPC[A].Killed = 9;
+                KillNPC(A, 9);
+            }
+            else if(NPC[A].Active && !Do_FrameSkip)
+            {
+                NPC_Draw_Queue_p.add(A);
+            }
+
+            if((NPC[A].Reset[Z] && (!check_both_reset || NPC[A].Reset[3 - Z])) || NPC[A].Active || (activate_conveyer && NPC[A].Type == 57))
+            {
+                if(set_justactivated && !NPC[A].Active)
+                {
+                    NPC[A].JustActivated = Z;
+                }
+                NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
+                if(check_long_life && (NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == 9 || NPC[A].Type == 14 || NPC[A].Type == 22 || NPC[A].Type == 90 || NPC[A].Type == 153 || NPC[A].Type == 169 || NPC[A].Type == 170 || NPC[A].Type == 182 || NPC[A].Type == 183 || NPC[A].Type == 184 || NPC[A].Type == 185 || NPC[A].Type == 186 || NPC[A].Type == 187 || NPC[A].Type == 188 || NPC[A].Type == 195 || NPC[A].Type == 104))
+                    NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
+
+                NPC[A].Active = true;
+            }
+            NPC[A].Reset[1] = false;
+            NPC[A].Reset[2] = false;
+        }
+        else
+        {
+            NPC[A].Reset[Z] = true;
+            if(reset_all)
+            {
+                if(numScreens == 1)
+                    NPC[A].Reset[2] = true;
+                if(SingleCoop == 1)
+                    NPC[A].Reset[2] = true;
+                else if(SingleCoop == 2)
+                    NPC[A].Reset[1] = true;
+            }
+        }
+    }
+}
+
+// does the modern NPC activation / reset logic for vScreen Z
+void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
+{
+    double X, Y;
+
+    if(ScreenType == 2 || ScreenType == 3)
+        GetvScreenAverageCanonical(&X, &Y);
+    else if(ScreenType == 5 && !vScreen[2].Visible)
+        GetvScreenAverageCanonical(&X, &Y);
+    else if(ScreenType == 7)
+        GetvScreenAverageCanonical(&X, &Y);
+    else
+        GetvScreenCanonical(Z, &X, &Y);
+
+    Location_t loc2;
+
+    for(int A = 1; A <= numNPCs; A++)
+    {
+        g_stats.checkedNPCs++;
+
+        // there are three related things we will determine:
+        // - is the NPC onscreen for rendering?
+        // - can we reset the NPC (respawn it to its original location)?
+        // - can we activate the NPC?
+
+        // they are normally the same thing -- onscreen -- but we need to separate them to support multiple resolutions.
+
+        bool loc2_exists;
+        if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0 && !NPC[A].Generator &&
+                (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 || NPC[A].Type == 22
+                    || NPC[A].Type == 49 || NPC[A].Type == 91 || NPC[A].Type == 160
+                    || NPC[A].Type == 282 || NPCIsACoin[NPC[A].Type] || NPC[A].Type == 263))
+        {
+            loc2_exists = true;
+            loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
+                NPC[A].Location.Y,
+                NPCWidthGFX[NPC[A].Type],
+                NPCHeight[NPC[A].Type]);
+            // not sure why loc2 does not consider NPCHeightGFX...
+        }
+        else
+            loc2_exists = false;
+
+        bool render, cannot_reset, can_activate;
+
+        if(NPC[A].Hidden)
+        {
+            render = cannot_reset = can_activate = false;
+        }
+        else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::smart)
+        {
+            render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
+
+            bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
+                || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
+
+            cannot_reset = (render || onscreen_canonical);
+
+            // Possible situations where we need to activate as original:
+            if(
+                   ForcedControls
+                || LevelMacro != LEVELMACRO_OFF
+                || qScreen
+                || NPC_MustBeCanonical(A)
+            )
+                can_activate = onscreen_canonical;
+            else
+                can_activate = render;
+        }
+        else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::orig)
+        {
+            render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
+
+            bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
+                || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
+
+            cannot_reset = (render || onscreen_canonical);
+            can_activate = onscreen_canonical;
+        }
+        else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::orig_with_despawn)
+        {
+            render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
+
+            bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
+                || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
+
+            cannot_reset = onscreen_canonical;
+            can_activate = onscreen_canonical;
+        }
+        else // if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
+        {
+            render = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
+        }
+
+        if(NPC[A].Generator)
+        {
+            NPC[A].GeneratorActive |= can_activate;
+            continue;
+        }
+
+        if(NPC[A].Type == 0)
+        {
+            render = false;
+        }
+
+        // track the NPC intro frames of this NPC
+        uint8_t NPC_intro_index;
+        for(NPC_intro_index = 0; NPC_intro_index < NPC_intro_count; NPC_intro_index++)
+        {
+            if(NPC_intro[NPC_intro_index] == A)
+                break;
+        }
+
+        // Handle the game's "conditional activation" state where NPC is activated *without* its events being triggered,
+        //   with TimeLeft = 0 by the time we get to rendering. In this case, "resetting" means "not activating",
+        //   so it's essential that we set cannot_reset to follow can_activate for this frame and the next one
+        //   (when Reset[1] and Reset[2] need to become true).
+
+        // Note that this condition, NPC[A].TimeLeft == 0 or 1, is practically never encountered when the NPC is onscreen,
+        //   except in the conditional activation code.
+        if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen && (NPC[A].TimeLeft == 0 || NPC[A].TimeLeft == 1))
+        {
+            if(render && !can_activate)
+            {
+                // add it to the set of NPCs in intro/conditional states
+                if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
+                {
+                    NPC_intro[NPC_intro_index] = A;
+                    NPC_intro_count++;
+                }
+
+                // if it was already in the set, or if it was successfully added,
+                // set its intro frame to -2 to give it 2 frames of allowing it to reset while onscreen
+                if(NPC_intro_index < NPC_intro_count)
+                    NPC_intro_frame[NPC_intro_index] = -2;
+            }
+        }
+
+        // if the NPC is in the "conditional activation" state but didn't activate, then allow it to reset even when onscreen
+        if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] < 0)
+        {
+            cannot_reset = can_activate;
+        }
+
+        // this section of the logic handles NPCs that are onscreen but not active yet
+        if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
+            && !NPC[A].Active && render)
+        {
+            // Don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
+            //   a piranha plant that hasn't emerged yet, etc. Also, don't do poofs for them, etc.
+            if(NPC_MustNotRenderInactive(NPC[A]))
+            {
+                render = false;
+            }
+
+            else if(g_config.render_inactive_NPC != Config_t::INACTIVE_NPC_SHOW && !NPC_MustRenderInactive(NPC[A]))
+            {
+                // add to queue of hidden NPCs
+                if(!can_activate)
+                {
+                    if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
+                    {
+                        NPC_intro[NPC_intro_index] = A;
+                        NPC_intro_frame[NPC_intro_index] = 0;
+                        NPC_intro_count++;
+                    }
+
+                    // keep it hidden
+                    if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0)
+                    {
+                        NPC_intro_frame[NPC_intro_index] = 0;
+                    }
+                }
+
+                // if in "poof" mode, render this effect here
+                if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_HIDE)
+                {
+                    if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
+                    {
+                        // if it was hidden, then add the poof effect!
+                        if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0)
+                        {
+                            Location_t tempLocation = NPC[A].Location;
+                            tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                            tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                            NewEffect(10, tempLocation);
+                        }
+                    }
+                    else
+                    {
+                        render = false;
+                    }
+                }
+            }
+        }
+
+
+        // activate the NPC if allowed
+        if(can_activate)
+        {
+            if(NPC[A].Type == 0) // what is this?
+            {
+                NPC[A].Killed = 9;
+                KillNPC(A, 9);
+            }
+            else if(!NPC[A].Active && NPC[A].Effect != 2
+                && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Type == NPCID_CONVEYOR))
+            {
+                NPC[A].Active = true;
+                NPC[A].JustActivated = Z;
+            }
+        }
+
+        // track the NPC's reset timer
+        if(cannot_reset)
+        {
+            if(NPC[A].Type != 0
+                && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
+            {
+                if(
+                       NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == NPCID_SHROOM_SMB3
+                    || NPC[A].Type == NPCID_FIREFLOWER_SMB3 || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_LIFE_SMB3
+                    || NPC[A].Type == 153 || NPC[A].Type == NPCID_TANOOKISUIT || NPC[A].Type == NPCID_HAMMERSUIT || NPC[A].Type == NPCID_FIREFLOWER_SMB
+                    || NPC[A].Type == NPCID_FIREFLOWER_SMW || NPC[A].Type == NPCID_SHROOM_SMB || NPC[A].Type == NPCID_SHROOM_SMW
+                    || NPC[A].Type == NPCID_LIFE_SMB || NPC[A].Type == NPCID_LIFE_SMW || NPC[A].Type == NPCID_MOON || NPC[A].Type == NPCID_FLIPPEDDISCO
+                    || NPC[A].Type == NPCID_PLATFORM_SMB3
+                )
+                    NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
+                else
+                    NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
+            }
+
+            if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen
+                || NPC[A].Active)
+            {
+                NPC[A].Reset[1] = false;
+                NPC[A].Reset[2] = false;
+            }
+        }
+        else
+        {
+            NPC[A].Reset[Z] = true;
+            if(numScreens == 1)
+                NPC[A].Reset[2] = true;
+            if(SingleCoop == 1)
+                NPC[A].Reset[2] = true;
+            else if(SingleCoop == 2)
+                NPC[A].Reset[1] = true;
+        }
+
+        if(!Do_FrameSkip && render && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
+        {
+            NPC_Draw_Queue_p.add(A);
+
+            // just for appearance, do the NPC's frames if it hasn't been activated yet and isn't in a shade / hidden mode
+            if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
+                && !NPC[A].Active && !FreezeNPCs)
+            {
+                bool in_hidden_mode = NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0;
+                if(!in_hidden_mode)
+                {
+                    NPCFrames(A);
+                }
+            }
+        }
+        else if(!Do_FrameSkip && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert)
+        {
+            if(NPC[A].Location.SpeedX != 0 || NPC[A].Location.SpeedY != 0
+                || (!NPCWontHurt[NPC[A].Type] && !NPCIsACoin[NPC[A].Type] && !NPCIsABonus[NPC[A].Type]))
+            {
+                NPC_Draw_Queue_p.add_warning(A);
+            }
+        }
+    }
+}
+
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
 void UpdateGraphics(bool skipRepaint)
 {
@@ -694,8 +1138,6 @@ void UpdateGraphics(bool skipRepaint)
         else
             S = Player[Z].Section;
 
-        double X, Y;
-
         // update vScreen location
         if(!LevelEditor)
         {
@@ -716,18 +1158,6 @@ void UpdateGraphics(bool skipRepaint)
         // the original code was badly written and made THIS happen (always exactly one frame of qScreen)
         if(Z == 2 && !g_compatibility.modern_section_change)
             continue_qScreen = false;
-
-        if(!LevelEditor)
-        {
-            if(ScreenType == 2 || ScreenType == 3)
-                GetvScreenAverageCanonical(&X, &Y);
-            else if(ScreenType == 5 && !vScreen[2].Visible)
-                GetvScreenAverageCanonical(&X, &Y);
-            else if(ScreenType == 7)
-                GetvScreenAverageCanonical(&X, &Y);
-            else
-                GetvScreenCanonical(Z, &X, &Y);
-        }
 
         // noturningback
         if(!LevelEditor && NoTurnBack[Player[Z].Section])
@@ -821,270 +1251,12 @@ void UpdateGraphics(bool skipRepaint)
             NPC_Draw_Queue_p.reset();
 
         // we'll check the NPCs and do some logic for the game,
-        // just check if we need to render them for the editor.
         if(!LevelEditor)
         {
-            for(A = 1; A <= numNPCs; A++)
-            {
-                g_stats.checkedNPCs++;
-
-                // there are three related things we will determine:
-                // - is the NPC onscreen for rendering?
-                // - can we reset the NPC (respawn it to its original location)?
-                // - can we activate the NPC?
-
-                // they are normally the same thing -- onscreen -- but we need to separate them to support multiple resolutions.
-
-                bool render, cannot_reset, can_activate;
-
-                Location_t loc2;
-                bool loc2_exists;
-                if(NPCWidthGFX[NPC[A].Type] != 0)
-                {
-                    loc2_exists = true;
-                    loc2 = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
-                        NPC[A].Location.Y,
-                        NPCWidthGFX[NPC[A].Type],
-                        NPCHeight[NPC[A].Type]);
-                    // not sure why loc2 does not consider NPCHeightGFX...
-                }
-                else
-                    loc2_exists = false;
-
-                if(NPC[A].Hidden)
-                {
-                    render = cannot_reset = can_activate = false;
-                }
-                else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::smart)
-                {
-                    render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
-
-                    bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
-                        || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
-
-                    cannot_reset = (render || onscreen_canonical);
-
-                    // Possible situations where we need to activate as original:
-                    // - ForcedControls: activate them when originally done,
-                    //                   there could be scripting going on (such as an NPC killing another NPC).
-                    // - qScreen is here just in case
-                    // - If the NPC triggers an event, naturally should be activated as original
-                    // - Generator NPCs, Jumping Cheeps, Thwomps, bullet shooters, and Bowser statues.
-                    // Think about bullet-like, missile-like, and tank-like items
-                    //      NPCID_BULLET_SMB3, NPCID_BULLET_SMW, NPCID_EERIE, etc...
-                    // Think more about NPCID_METALBARREL and other falling items
-                    if(
-                           ForcedControls
-                        || LevelMacro != LEVELMACRO_OFF
-                        || qScreen
-                        || NPC_MustBeCanonical(A)
-                    )
-                        can_activate = onscreen_canonical;
-                    else
-                        can_activate = render;
-                }
-                else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::orig)
-                {
-                    render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
-
-                    bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
-                        || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
-
-                    cannot_reset = (render || onscreen_canonical);
-                    can_activate = onscreen_canonical;
-                }
-                else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::orig_with_despawn)
-                {
-                    render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
-
-                    bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
-                        || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
-
-                    cannot_reset = onscreen_canonical;
-                    can_activate = onscreen_canonical;
-                }
-                else // if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
-                {
-                    render = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
-                }
-
-                if(NPC[A].Type == 0 || NPC[A].Generator)
-                {
-                    render = false;
-                }
-
-                // track the NPC intro frames of this NPC
-                uint8_t NPC_intro_index;
-                for(NPC_intro_index = 0; NPC_intro_index < NPC_intro_count; NPC_intro_index++)
-                {
-                    if(NPC_intro[NPC_intro_index] == A)
-                        break;
-                }
-
-                // Handle the game's "conditional activation" state where NPC is activated *without* its events being triggered,
-                //   with TimeLeft = 0 by the time we get to rendering. In this case, "resetting" means "not activating",
-                //   so it's essential that we set cannot_reset to follow can_activate for this frame and the next one
-                //   (when Reset[1] and Reset[2] need to become true).
-
-                // Note that this condition, NPC[A].TimeLeft == 0 or 1, is practically never encountered when the NPC is onscreen,
-                //   except in the conditional activation code.
-                if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen && (NPC[A].TimeLeft == 0 || NPC[A].TimeLeft == 1))
-                {
-                    if(render && !can_activate)
-                    {
-                        // add it to the set of NPCs in intro/conditional states
-                        if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
-                        {
-                            NPC_intro[NPC_intro_index] = A;
-                            NPC_intro_count++;
-                        }
-
-                        // if it was already in the set, or if it was successfully added,
-                        // set its intro frame to -2 to give it 2 frames of allowing it to reset while onscreen
-                        if(NPC_intro_index < NPC_intro_count)
-                            NPC_intro_frame[NPC_intro_index] = -2;
-                    }
-                }
-
-                // if the NPC is in the "conditional activation" state but didn't activate, then allow it to reset even when onscreen
-                if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] < 0)
-                {
-                    cannot_reset = can_activate;
-                }
-
-                // this section of the logic handles NPCs that are onscreen but not active yet
-                if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
-                    && !NPC[A].Active && render)
-                {
-                    // Don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
-                    //   a piranha plant that hasn't emerged yet, etc. Also, don't do poofs for them, etc.
-                    if(NPC_MustNotRenderInactive(NPC[A]))
-                    {
-                        render = false;
-                    }
-
-                    else if(g_config.render_inactive_NPC != Config_t::INACTIVE_NPC_SHOW && !NPC_MustRenderInactive(NPC[A]))
-                    {
-                        // add to queue of hidden NPCs
-                        if(!can_activate)
-                        {
-                            if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
-                            {
-                                NPC_intro[NPC_intro_index] = A;
-                                NPC_intro_frame[NPC_intro_index] = 0;
-                                NPC_intro_count++;
-                            }
-
-                            // keep it hidden
-                            if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0)
-                            {
-                                NPC_intro_frame[NPC_intro_index] = 0;
-                            }
-                        }
-
-                        // if in "poof" mode, render this effect here
-                        if(g_config.render_inactive_NPC == Config_t::INACTIVE_NPC_HIDE)
-                        {
-                            if(can_activate && (NPC[A].Reset[1] && NPC[A].Reset[2]))
-                            {
-                                // if it was hidden, then add the poof effect!
-                                if(NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] > 0)
-                                {
-                                    Location_t tempLocation = NPC[A].Location;
-                                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                                    NewEffect(10, tempLocation);
-                                }
-                            }
-                            else
-                            {
-                                render = false;
-                            }
-                        }
-                    }
-                }
-
-
-                // activate the NPC if allowed
-                if(can_activate)
-                {
-                    if(NPC[A].Type == 0) // what is this?
-                    {
-                        NPC[A].Killed = 9;
-                        KillNPC(A, 9);
-                    }
-                    else if(!NPC[A].Active
-                        && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Type == NPCID_CONVEYOR))
-                    {
-                        NPC[A].Active = true;
-                        NPC[A].JustActivated = Z;
-                    }
-
-                    if(NPC[A].Generator)
-                        NPC[A].GeneratorActive = true;
-                }
-
-                // track the NPC's reset timer
-                if(cannot_reset)
-                {
-                    if(NPC[A].Type != 0
-                        && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
-                    {
-                        if(
-                               NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == NPCID_SHROOM_SMB3
-                            || NPC[A].Type == NPCID_FIREFLOWER_SMB3 || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_LIFE_SMB3
-                            || NPC[A].Type == 153 || NPC[A].Type == NPCID_TANOOKISUIT || NPC[A].Type == NPCID_HAMMERSUIT || NPC[A].Type == NPCID_FIREFLOWER_SMB
-                            || NPC[A].Type == NPCID_FIREFLOWER_SMW || NPC[A].Type == NPCID_SHROOM_SMB || NPC[A].Type == NPCID_SHROOM_SMW
-                            || NPC[A].Type == NPCID_LIFE_SMB || NPC[A].Type == NPCID_LIFE_SMW || NPC[A].Type == NPCID_MOON || NPC[A].Type == NPCID_FLIPPEDDISCO
-                            || NPC[A].Type == NPCID_PLATFORM_SMB3
-                        )
-                            NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
-                        else
-                            NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-                    }
-
-                    if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen
-                        || NPC[A].Active)
-                    {
-                        NPC[A].Reset[1] = false;
-                        NPC[A].Reset[2] = false;
-                    }
-                }
-                else
-                {
-                    NPC[A].Reset[Z] = true;
-                    if(numScreens == 1)
-                        NPC[A].Reset[2] = true;
-                    if(SingleCoop == 1)
-                        NPC[A].Reset[2] = true;
-                    else if(SingleCoop == 2)
-                        NPC[A].Reset[1] = true;
-                }
-
-                if(!Do_FrameSkip && render && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
-                {
-                    NPC_Draw_Queue_p.add(A);
-
-                    // just for appearance, do the NPC's frames if it hasn't been activated yet and isn't in a shade / hidden mode
-                    if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
-                        && !NPC[A].Active && !FreezeNPCs)
-                    {
-                        bool in_hidden_mode = NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0;
-                        if(!in_hidden_mode)
-                        {
-                            NPCFrames(A);
-                        }
-                    }
-                }
-                else if(!Do_FrameSkip && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert)
-                {
-                    if(NPC[A].Location.SpeedX != 0 || NPC[A].Location.SpeedY != 0
-                        || (!NPCWontHurt[NPC[A].Type] && !NPCIsACoin[NPC[A].Type] && !NPCIsABonus[NPC[A].Type]))
-                    {
-                        NPC_Draw_Queue_p.add_warning(A);
-                    }
-                }
-            }
+            if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen || (ScreenW == 800 && ScreenH == 600))
+                ClassicNPCScreenLogic(Z, numScreens, Do_FrameSkip, NPC_Draw_Queue_p);
+            else
+                ModernNPCScreenLogic(Z, numScreens, Do_FrameSkip, NPC_Draw_Queue_p);
         }
         // fill the NPC render queue for the level editor
         else if(!Do_FrameSkip)
