@@ -49,7 +49,7 @@ static void loadCustomState()
         // run the 'test' function
         FS.syncfs(true, function (err) {
             assert(!err);
-            ccall('unlockLoadingCustomState', 'v', null, null, {async: true});
+            Module.ccall('unlockLoadingCustomState', 'v', null, null, {async: true});
         });
     );
 
@@ -63,7 +63,7 @@ static void saveCustomState()
     EM_ASM(
         FS.syncfs(function (err) {
             assert(!err);
-            ccall('unlockLoadingCustomState', 'v');
+            Module.ccall('unlockLoadingCustomState', 'v');
         });
     );
 
