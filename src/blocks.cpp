@@ -2128,7 +2128,7 @@ void PSwitch(bool enabled)
         }
 
         // make the NPCs
-        int numConverted = 0;
+        size_t numConverted = 0;
         for(; numConverted < PSwitchBlocks.size(); numConverted++)
         {
             A = PSwitchBlocks[numConverted];
@@ -2259,7 +2259,7 @@ void PSwitch(bool enabled)
         }
 
         // restore the NPCs
-        int numConverted = 0;
+        size_t numConverted = 0;
         for(; numConverted < PSwitchBlocks.size(); numConverted++)
         {
             A = PSwitchBlocks[numConverted];
