@@ -22,6 +22,9 @@
 #ifndef MIXER_HHHHH
 #define MIXER_HHHHH
 
+// for AudioSetup_t
+#include "sound.h"
+
 /* @{ */
 #define AUDIO_U8        0x0008
 #define AUDIO_S8        0x8008
@@ -62,7 +65,7 @@
 struct Mix_Music;
 struct Mix_Chunk;
 
-bool MixPlatform_Init();
+bool MixPlatform_Init(AudioSetup_t& obtained);
 void MixPlatform_Quit();
 
 int  MixPlatform_PlayStream(int channel, const char* path, int loops);

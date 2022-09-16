@@ -234,7 +234,7 @@ void InitMixerX()
     if(g_mixerLoaded)
         return;
 
-    if(MixPlatform_Init())
+    if(MixPlatform_Init(s_audioSetupObtained))
     {
         // Set channel finished callback to handle finished custom SFX
         Mix_ChannelFinished(&extSfxStopCallback);

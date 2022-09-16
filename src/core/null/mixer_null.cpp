@@ -32,8 +32,9 @@
 #include "core/mixer.h"
 #include "globals.h"
 
-bool MixPlatform_Init()
+bool MixPlatform_Init(AudioSetup_t& obtained)
 {
+    UNUSED(obtained);
     return true;
 }
 

@@ -40,8 +40,9 @@ static SoundId* cur_sound = nullptr;
 
 std::set<const std::string*> sound_stream_paths;
 
-bool MixPlatform_Init()
+bool MixPlatform_Init(AudioSetup_t& obtained)
 {
+    UNUSED(obtained);
     return audioInit();
 }
 

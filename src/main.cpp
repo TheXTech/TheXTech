@@ -480,10 +480,6 @@ int main(int argc, char**argv)
 
     OpenConfig_preSetup();
 
-#if __WII__
-    InitMixerX();
-#endif
-
     setup.verboseLogging = true;
     setup.frameSkip = false;
     setup.testShowFPS = true;
@@ -499,6 +495,10 @@ int main(int argc, char**argv)
         frmMain.freeSystem();
         return 1;
     }
+
+#if __WII__
+    InitMixerX();
+#endif
 
 #ifdef __APPLE__
     macosReceiveOpenFile();

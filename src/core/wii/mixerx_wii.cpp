@@ -40,7 +40,7 @@
 
 static const int maxSfxChannels = 91;
 
-bool MixPlatform_Init()
+bool MixPlatform_Init(AudioSetup_t& obtained)
 {
     if(SDL_Init(SDL_INIT_AUDIO) < 0)
     {
@@ -81,6 +81,20 @@ bool MixPlatform_Init()
         pLogCritical(msg.c_str());
         noSound = true;
         return false;
+    }
+
+    ret = Mix_QuerySpec(&obtained.sampleRate,
+                        &obtained.format,
+                        &obtained.channels);
+
+    if(ret == 0)
+    {
+        pLogCritical("Failed to call the Mix_QuerySpec!");
+        obtained = g_audioSetup;
+    }
+    else
+    {
+        pLogDebug("Initialized MixerX with obtained sample rate %d, format 0x%x, and %d channels", (int)obtained.sampleRate, (unsigned)obtained.format, (int)obtained.channels);
     }
 
     Mix_VolumeMusic(MIX_MAX_VOLUME);

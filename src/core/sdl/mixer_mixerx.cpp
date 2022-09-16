@@ -35,11 +35,46 @@
 
 static const int maxSfxChannels = 91;
 
-bool MixPlatform_Init()
+static const char *audio_format_to_string(SDL_AudioFormat f)
+{
+    switch(f)
+    {
+    default:
+        return "<unknown>";
+    case AUDIO_U8:
+        return "U8";
+    case AUDIO_S8:
+        return "S8";
+    case AUDIO_S16LSB:
+        return "S16-LE";
+    case AUDIO_S16MSB:
+        return "S16-BE";
+    case AUDIO_U16LSB:
+        return "U16-LE";
+    case AUDIO_U16MSB:
+        return "U16-BE";
+    case AUDIO_S32LSB:
+        return "S32-LE";
+    case AUDIO_S32MSB:
+        return "S32-BE";
+    case AUDIO_F32LSB:
+        return "F32-LE";
+    case AUDIO_F32MSB:
+        return "F32-BE";
+    }
+}
+
+bool MixPlatform_Init(AudioSetup_t& obtained)
 {
     int ret;
     const int initFlags = MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_FLAC | MIX_INIT_OGG | MIX_INIT_OPUS | MIX_INIT_MP3;
-    pLogDebug("Opening sound...");
+
+    pLogDebug("Opening sound (wanted: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
+              g_audioSetup.sampleRate,
+              audio_format_to_string(g_audioSetup.format),
+              g_audioSetup.channels,
+              g_audioSetup.bufferSize);
+
     ret = Mix_Init(initFlags);
 
     if(ret != initFlags)
@@ -70,6 +105,22 @@ bool MixPlatform_Init()
         pLogCritical(msg.c_str());
         XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "Sound opening error", msg.c_str());
         return false;
+    }
+
+    ret = Mix_QuerySpecEx(&obtained);
+
+    if(ret == 0)
+    {
+        pLogCritical("Failed to call the Mix_QuerySpec!");
+        obtained = g_audioSetup;
+    }
+    else
+    {
+        pLogDebug("Sound opened (obtained: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
+                  s_audioSetupObtained.sampleRate,
+                  audio_format_to_string(s_audioSetupObtained.format),
+                  s_audioSetupObtained.channels,
+                  s_audioSetupObtained.bufferSize);
     }
 
     Mix_VolumeMusic(MIX_MAX_VOLUME);
