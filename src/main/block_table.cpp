@@ -53,11 +53,6 @@ void treeLevelCleanBlockLayers()
     }
 
     s_num_active_block_tables = 0;
-
-    for(int i = 0; i < maxLayers + 1; i++)
-    {
-        treeBlockSplitLayer(i);
-    }
 }
 
 // splits a layer from the main block table

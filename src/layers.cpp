@@ -941,6 +941,15 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                     NPC[C].Location.SpeedY = 0;
                                 }
                             }
+
+                            // eventually, only re-join tables the first time the event has been triggered in a level
+                            treeBlockJoinLayer(B);
+                        }
+                        else
+                        {
+                            // these thresholds can be tweaked, but they balance the expense of querying more tables with the expense of updating locations in the main table
+                            if(Layer[B].blocks.size() > 80)
+                                treeBlockSplitLayer(B);
                         }
                     }
                 }
