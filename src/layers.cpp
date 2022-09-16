@@ -36,6 +36,7 @@
 #include "editor.h"
 #include "blocks.h"
 #include "main/trees.h"
+#include "main/block_table.h"
 
 int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
@@ -1238,6 +1239,9 @@ void UpdateLayers()
                         Block[B].Location.Y += double(Layer[A].SpeedY);
                         Block[B].Location.SpeedX = double(Layer[A].SpeedX);
                         Block[B].Location.SpeedY = double(Layer[A].SpeedY);
+
+                        if(!g_layer_block_table_active[A])
+                            treeBlockUpdateLayer(A, B);
                     }
                 }
 

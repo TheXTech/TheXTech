@@ -20,8 +20,8 @@
 
 #pragma once
 
-#ifndef BLOCK_TABLE_HPP
-#define BLOCK_TABLE_HPP
+#ifndef BLOCK_TABLE_IMPL_HPP
+#define BLOCK_TABLE_IMPL_HPP
 
 #include <iterator>
 #include <array>
@@ -271,8 +271,8 @@ Location_t extract_loc(MyRef_t obj)
     return obj->Location;
 }
 
-template<>
-Location_t extract_loc<>(BlockRef_t obj)
+template<class MyRef_t>
+Location_t extract_loc_layer(MyRef_t obj)
 {
     Location_t loc = obj->Location;
     if(obj->Layer != LAYER_NONE)
@@ -382,6 +382,15 @@ struct table_t
     void insert(MyRef_t b)
     {
         Location_t loc = extract_loc<MyRef_t>(b);
+
+        rect_external rect(loc);
+        member_rects[b] = rect;
+        insert(b, rect);
+    }
+
+    void insert_layer(MyRef_t b)
+    {
+        Location_t loc = extract_loc_layer<MyRef_t>(b);
 
         rect_external rect(loc);
         member_rects[b] = rect;
@@ -603,6 +612,17 @@ struct table_t
         insert(b);
     }
 
+    void update_layer(MyRef_t b)
+    {
+        auto it = member_rects.find(b);
+        if(it != member_rects.end())
+        {
+            erase(b, it->second);
+        }
+
+        insert_layer(b);
+    }
+
     void clear()
     {
         // can optimize later
@@ -671,4 +691,4 @@ class BasicAllocator
 };
 #endif // #if 0
 
-#endif // #ifndef BLOCK_TABLE_HPP
+#endif // #ifndef BLOCK_TABLE_IMPL_HPP
