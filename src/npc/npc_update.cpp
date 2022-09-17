@@ -3133,7 +3133,104 @@ void UpdateNPCs()
                             if(!NPCIsAParaTroopa[NPC[A].Type])
                             {
                                 NPC[A].Location.Y = Block[winningBlock].Location.Y + Block[winningBlock].Location.Height + 0.01;
-                                NPC[A].Location.SpeedY = 0.01 + Block[B].Location.SpeedY;
+
+                                if(g_compatibility.fix_npc_ceiling_speed)
+                                    NPC[A].Location.SpeedY = 0.01 + Block[winningBlock].Location.SpeedY;
+                                else
+                                {
+                                    // This is the original extremely buggy line, using an arbitrary B from the end of the old fBlock/lBlock or tempBlock query.
+                                    // NPC[A].Location.SpeedY = 0.01 + Block[B].Location.SpeedY;
+
+                                    // Unfortunately, we need to emulate it. We're lucky that NPCs don't frequently hit ceilings.
+
+                                    // our old... friends?
+                                    int fBlock, lBlock;
+
+                                    // if no temp blocks, then no second pass occurred in the check loops above where B was set
+                                    if(numTempBlock != 0)
+                                    {
+                                        fBlock = numBlock + 1 - numTempBlock;
+                                        lBlock = numBlock;
+                                    }
+                                    else
+                                    {
+                                        fBlock = 1;
+                                        lBlock = numBlock - numTempBlock;
+                                    }
+
+                                    // The first line contains the original condition that guarded the "break" in our loop above B.
+                                    // Note that this means the bug would be different during PSwitch or after a horiz layer has moved.
+                                    // The second line lets us find the Block that is accessed upon overflow of the original FLBlock column.
+                                    if((PSwitchTime == 0 && (BlocksSorted || numTempBlock != 0))
+                                        || (BlocksSorted && numTempBlock == 0))
+                                    {
+                                        // We could use a quadtree here, but this is a rare case. Just do it.
+
+                                        // Normally, need to find the first Block (in sorted order) which is to the right of the NPC.
+                                        double right_border = NPC[A].Location.X + NPC[A].Location.Width;
+
+                                        int first_after_block = -1;
+                                        double first_after_x, first_after_y;
+
+                                        // IF PSwitchTime != 0 but the blocks are sorted,
+                                        // then we would have iterated over the NPC's entire FLBlock column without breaking,
+                                        // and ended with B set to the first block after it.
+                                        // To emulate, move the right_border to the end of its FLBlock column.
+                                        if(PSwitchTime != 0)
+                                            right_border = ((int)SDL_floor((right_border) / 32.0) + 1) * 32;
+
+                                        // If the loop never invoked break and was not over a single column,
+                                        // then the game would have accessed numBlock + 1 here, but we won't.
+                                        // We'll assume it was properly deallocated and has SpeedY = 0.
+
+                                        for(int block = fBlock; block <= lBlock; block++)
+                                        {
+                                            // Old code checked coordinates first, then properties without affecting the loop.
+                                            // This means we don't need to touch any properties here.
+
+                                            const Block_t& b = Block[block];
+
+                                            double bx = b.Location.X;
+                                            double by = b.Location.Y;
+
+                                            // sort as they were in the original array
+                                            if(b.Layer != LAYER_NONE)
+                                            {
+                                                bx -= Layer[b.Layer].OffsetX;
+                                                by -= Layer[b.Layer].OffsetY;
+                                            }
+
+                                            if(b.Location.X > right_border)
+                                            {
+                                                if(first_after_block == -1 || bx < first_after_x || (bx == first_after_x && by < first_after_y))
+                                                {
+                                                    first_after_block = block;
+                                                    first_after_x = bx;
+                                                    first_after_y = by;
+                                                }
+                                            }
+                                        }
+
+                                        B = first_after_block;
+                                    }
+                                    else
+                                    {
+                                        // The game went through the full loop and B = numBlock + 1.
+                                        // We'll assume it was properly deallocated and has SpeedY = 0.
+                                        B = -1;
+                                    }
+
+                                    if(B != -1)
+                                    {
+                                        NPC[A].Location.SpeedY = 0.01 + Block[B].Location.SpeedY;
+                                        // pLogDebug("NPC %d hits ceiling, set SpeedY using block %d with speed %f\n", A, B, Block[B].Location.SpeedY, Block[B].Location.X, Block[B].Location.Y);
+                                    }
+                                    else
+                                    {
+                                        NPC[A].Location.SpeedY = 0.01;
+                                        // pLogDebug("NPC %d hits ceiling, set SpeedY using OOB block with speed 0\n", A, B);
+                                    }
+                                }
                             }
                         }
 

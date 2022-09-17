@@ -2333,6 +2333,24 @@ void PSwitch(bool enabled)
     // SO expensive, can't wait to get rid of this.
     // syncLayersTrees_AllBlocks();
 
+    if(!g_compatibility.fix_npc_ceiling_speed)
+    {
+        // Doing this just to replicate some unusual, unpredictable glitches
+        // that sometimes occur when blocks' relative order is changing during the level
+        BlocksSorted = true;
+
+        for(int layer = 0; layer <= numLayers; layer++)
+        {
+            for(int B : Layer[layer].blocks)
+                Block[B].LocationInLayer = Block[B].Location;
+
+            Layer[layer].OffsetX = 0;
+            Layer[layer].OffsetY = 0;
+        }
+
+        syncLayersTrees_AllBlocks();
+    }
+
     iBlocks = numBlock;
     for(A = 1; A <= numBlock; A++)
         iBlock[A] = A;
