@@ -94,6 +94,8 @@ static void compatInit(Compatibility_t &c)
     c.fix_fairy_stuck_in_pipe = true;
     c.world_map_fast_move = false;
     c.fix_flamethrower_gravity = true;
+    // 1.3.6-1
+    c.fix_npc_ceiling_speed = true;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -128,6 +130,8 @@ static void compatInit(Compatibility_t &c)
         c.multiplayer_pause_controls = false;
         c.fix_fairy_stuck_in_pipe = false;
         c.fix_flamethrower_gravity = false;
+        // 1.3.6-1
+        c.fix_npc_ceiling_speed = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -297,6 +301,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-npc247-collapse", c.fix_npc247_collapse, c.fix_npc247_collapse);
         compat.read("fix-special-coin-switch", c.fix_special_coin_switch, c.fix_special_coin_switch);
         compat.read("fix-bat-start-while-inactive", c.fix_bat_start_while_inactive, c.fix_bat_start_while_inactive);
+        // 1.3.6-1
+        compat.read("fix-npc-ceiling-speed", c.fix_npc_ceiling_speed, c.fix_npc_ceiling_speed);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);

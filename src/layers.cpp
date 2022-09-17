@@ -1220,22 +1220,15 @@ void UpdateLayers()
                 Layer[A].OffsetX += double(Layer[A].SpeedX);
                 Layer[A].OffsetY += double(Layer[A].SpeedY);
 
-                // no longer needed thanks to block quadtree
+                // no longer needed thanks to block quadtree, but used to reproduce some buggy behaviors
                 // move the sort invalidation out of the loop over blocks
-#if 0
                 if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f)
                 {
                     if(BlocksSorted)
                     {
-                        for(C = (int)(-FLBlocks); C <= FLBlocks; C++)
-                        {
-                            FirstBlock[C] = 1;
-                            LastBlock[C] = numBlock;
-                        }
                         BlocksSorted = false;
                     }
                 }
-#endif
 
                 for(int B : Layer[A].blocks)
                 {

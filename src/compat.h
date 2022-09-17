@@ -79,6 +79,8 @@ struct Compatibility_t
     bool fix_fairy_stuck_in_pipe;
     bool world_map_fast_move;
     bool fix_flamethrower_gravity;
+    // 1.3.6-1
+    bool fix_npc_ceiling_speed;
 
     // SpeedRun section
     enum

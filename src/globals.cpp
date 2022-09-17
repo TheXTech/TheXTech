@@ -330,7 +330,7 @@ bool MouseRelease = false;
 bool TestFullscreen = false;
 //bool keyDownAlt = false;
 //bool keyDownEnter = false;
-// bool BlocksSorted = false;
+bool BlocksSorted = false;
 int SingleCoop = 0;
 //std::string CheatString;
 bool GameOutro = false;
