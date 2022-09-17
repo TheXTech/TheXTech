@@ -1222,7 +1222,7 @@ void UpdateLayers()
 
                 // no longer needed thanks to block quadtree, but used to reproduce some buggy behaviors
                 // move the sort invalidation out of the loop over blocks
-                if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f)
+                if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f && g_compatibility.emulate_classic_block_order)
                 {
                     if(BlocksSorted)
                     {
