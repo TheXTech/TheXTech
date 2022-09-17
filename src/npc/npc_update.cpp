@@ -3174,8 +3174,9 @@ void UpdateNPCs()
                                         // then we would have iterated over the NPC's entire FLBlock column without breaking,
                                         // and ended with B set to the first block after it.
                                         // To emulate, move the right_border to the end of its FLBlock column.
+                                        // vb6 rounds its array indexes from doubles to integers
                                         if(PSwitchTime != 0)
-                                            right_border = ((int)SDL_floor((right_border) / 32.0) + 1) * 32;
+                                            right_border = vb6Round(right_border / 32.0 + 1) * 32;
 
                                         // If the loop never invoked break and was not over a single column,
                                         // then the game would have accessed numBlock + 1 here, but we won't.
@@ -3225,12 +3226,12 @@ void UpdateNPCs()
                                     if(B != -1)
                                     {
                                         NPC[A].Location.SpeedY = 0.01 + Block[B].Location.SpeedY;
-                                        // pLogDebug("NPC %d hits ceiling, set SpeedY using block %d with speed %f\n", A, B, Block[B].Location.SpeedY, Block[B].Location.X, Block[B].Location.Y);
+                                        // pLogDebug("NPC %d hits ceiling, set SpeedY using block %d with speed %f\n", A, B, Block[B].Location.SpeedY);
                                     }
                                     else
                                     {
                                         NPC[A].Location.SpeedY = 0.01;
-                                        // pLogDebug("NPC %d hits ceiling, set SpeedY using OOB block with speed 0\n", A, B);
+                                        // pLogDebug("NPC %d hits ceiling, set SpeedY using OOB block with speed 0\n", A);
                                     }
                                 }
                             }
