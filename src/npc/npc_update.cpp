@@ -2046,7 +2046,7 @@ void UpdateNPCs()
                                 //     lBlock = numBlock;
                                 // }
                                 auto collBlockSentinel = (bCheck == 1)
-                                    ? treeBlockQuery(NPC[A].Location, SORTMODE_LOC)
+                                    ? treeBlockQuery(NPC[A].Location, SORTMODE_COMPAT)
                                     : treeTempBlockQuery(NPC[A].Location, SORTMODE_LOC);
 
                                 for(Block_t* block : collBlockSentinel)
@@ -3081,9 +3081,7 @@ void UpdateNPCs()
                                     }
                                     else
                                     {
-                                        // the returned collision list is always sorted by location now
-                                        // if((bCheck == 2 || BlocksSorted) && PSwitchTime == 0)
-                                        if(PSwitchTime == 0)
+                                        if((bCheck == 2 || BlocksSorted) && PSwitchTime == 0)
                                             break;
                                     }
                                 }
@@ -3207,6 +3205,10 @@ void UpdateNPCs()
                                                     first_after_block = block;
                                                     first_after_x = bx;
                                                     first_after_y = by;
+
+                                                    // want the first one in the SMBX sorted order, which might not be accurate
+                                                    if(g_compatibility.emulate_classic_block_order && numTempBlock == 0)
+                                                        break;
                                                 }
                                             }
                                         }
@@ -3531,7 +3533,7 @@ void UpdateNPCs()
                                                                                         // }
 
                                                                                         auto collBlockSentinel2 = (bCheck2 == 1)
-                                                                                            ? treeBlockQuery(NPC[B].Location, SORTMODE_LOC)
+                                                                                            ? treeBlockQuery(NPC[B].Location, SORTMODE_COMPAT)
                                                                                             : treeTempBlockQuery(NPC[B].Location, SORTMODE_LOC);
 
                                                                                         for(Block_t* block2 : collBlockSentinel2)
@@ -5203,7 +5205,7 @@ void UpdateNPCs()
                         // }
 
                         auto collBlockSentinel = (bCheck == 1)
-                            ? treeBlockQuery(NPC[A].Location, SORTMODE_LOC)
+                            ? treeBlockQuery(NPC[A].Location, SORTMODE_COMPAT)
                             : treeTempBlockQuery(NPC[A].Location, SORTMODE_LOC);
 
                         for(Block_t* block : collBlockSentinel)

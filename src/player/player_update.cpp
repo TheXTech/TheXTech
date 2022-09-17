@@ -2161,7 +2161,7 @@ void UpdatePlayer()
                 // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
                 // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                for(Block_t* block : treeBlockQuery(Player[A].Location, SORTMODE_LOC))
+                for(Block_t* block : treeBlockQuery(Player[A].Location, SORTMODE_COMPAT))
                 {
                     B = block - &Block[1] + 1;
 
@@ -2689,13 +2689,14 @@ void UpdatePlayer()
                                                 tempLocation.Height = 0.1;
                                                 tempBool = false;
 
-                                                // this could have caused an unusual bug where lBlock would get overwritten
+                                                // this could have caused an unusual TheXTech bug where lBlock would get overwritten
+                                                // (this wouldn't affect VB6 because loop bounds are evaluated only on loop start)
 
                                                 // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                                                 // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                                                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                                                for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_LOC))
+                                                for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
                                                 {
                                                     int C = block - &Block[1] + 1;
 

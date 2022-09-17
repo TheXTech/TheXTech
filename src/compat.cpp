@@ -96,6 +96,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_flamethrower_gravity = true;
     // 1.3.6-1
     c.fix_npc_ceiling_speed = true;
+    c.emulate_classic_block_order = false;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -132,6 +133,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_flamethrower_gravity = false;
         // 1.3.6-1
         c.fix_npc_ceiling_speed = false;
+        c.emulate_classic_block_order = true;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -303,6 +305,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-bat-start-while-inactive", c.fix_bat_start_while_inactive, c.fix_bat_start_while_inactive);
         // 1.3.6-1
         compat.read("fix-npc-ceiling-speed", c.fix_npc_ceiling_speed, c.fix_npc_ceiling_speed);
+        compat.read("emulate-classic-block-order", c.emulate_classic_block_order, c.emulate_classic_block_order);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);

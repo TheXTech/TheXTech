@@ -33,7 +33,8 @@ enum SortMode
     SORTMODE_NONE = 0,
     SORTMODE_ID = 1,
     SORTMODE_LOC = 2,
-    SORTMODE_Z = 2,
+    SORTMODE_Z = 3,
+    SORTMODE_COMPAT = 4, // sort according to ID (location at last sort) in compat mode, and according to current location normally
 };
 
 template<class ItemRef_t>
