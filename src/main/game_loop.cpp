@@ -43,6 +43,7 @@
 #include "game_globals.h"
 #include "world_globals.h"
 #include "speedrunner.h"
+#include "main/record.h"
 #include "menu_main.h"
 #include "screen_pause.h"
 #include "screen_connect.h"
@@ -179,6 +180,11 @@ void GameLoop()
         speedRun_triggerLeave();
         NextLevel();
         // Controls::Update();
+
+        // Controls::Update() was commented out because the current screen state may be unpredictable,
+        // so it's not a reasonable time for the user to reconnect if something has happened.
+        // But, the classic game updates controls here so we need to Sync the recording.
+        Record::Sync();
     }
     else if(qScreen)
     {
