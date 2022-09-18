@@ -538,13 +538,25 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        // legacy SMBX64 NPC behavior tracking moved to npc_special_data.h
         if(compatModern && isSmbx64)
+        {
+            // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
             npc.Special7 = find_legacy_Special7(npc.Type, fVersion);
-        else if(compatModern)
-            npc.Special7 = n.special_data;
-        else
+        }
+        else if(isSmbx64)
+        {
+            // don't load anything for SMBX64 files
             npc.Special7 = 0.0;
+        }
+        else if(find_Special7_Data(npc.Type) /* && compatModern */)
+        {
+            // only load Special7 for NPCs that don't support it
+            npc.Special7 = n.special_data;
+        }
+        else
+        {
+            npc.Special7 = 0.0;
+        }
 
         // All of the following duplicate the new Special7 code.
         // That code should be updated instead, because doing so is required to update the in-game editor.
