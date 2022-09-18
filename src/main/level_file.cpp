@@ -538,27 +538,25 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
+        // legacy SMBX64 NPC behavior tracking moved to npc_special_data.h
         if(compatModern && isSmbx64)
-        {
-            // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
             npc.Special7 = find_legacy_Special7(npc.Type, fVersion);
-        }
-        else if(isSmbx64)
-        {
-            npc.Special7 = 0.0;
-        }
-        else
-        {
+        else if(compatModern)
             npc.Special7 = n.special_data;
-        }
+        else
+            npc.Special7 = 0.0;
 
+        // All of the following duplicate the new Special7 code.
+        // That code should be updated instead, because doing so is required to update the in-game editor.
+
+#if 0
         if(npc.Type == NPCID_CANNONITEM) // billy gun
         {
             if(compatModern && isSmbx64 && fVersion < 28)
                 npc.Special7 = 2.0; // SMBX 1.1.x and 1.0.x behavior
             else if(compatModern && isSmbx64 && fVersion < 51)
                 npc.Special7 = 1.0; // SMBX 1.2 behavior
-            else
+            else if(compatModern)
                 npc.Special7 = n.special_data; // SMBX 1.2.1 and newer behavior, customizable behavior
         }
 
@@ -566,7 +564,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         {
             if(compatModern && isSmbx64 && fVersion < 9)
                 npc.Special7 = 1.0; // Make twomps to fall always
-            else
+            else if(compatModern)
                 npc.Special7 = n.special_data;
         }
 
@@ -574,7 +572,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         {
             if(compatModern && isSmbx64 && fVersion < 30)
                 npc.Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
-            else
+            else if(compatModern)
                 npc.Special7 = n.special_data;
         }
 
@@ -588,13 +586,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         case NPCID_SAW:
             if(compatModern && isSmbx64 && fVersion < 30)
                 npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1 on the "Clown Car Parking" level
-            else
+            else if(compatModern)
                 npc.Special7 = n.special_data;
             break;
 
         default:
             break;
         }
+#endif
 
         npc.Generator = n.generator;
         if(npc.Generator)
