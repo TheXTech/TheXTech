@@ -354,7 +354,10 @@ void minport_ApplyViewport()
     if(g_viewport_offset_ignore)
         guOrtho(perspective, 0, g_viewport_h, 0, g_viewport_w, -1.0f, 1.0f);
     else
-        guOrtho(perspective, 0, g_viewport_h, 0, g_viewport_w, -1.0f, 1.0f);
+        guOrtho(perspective,
+            g_viewport_offset_y, g_viewport_h + g_viewport_offset_y,
+            g_viewport_offset_x, g_viewport_w + g_viewport_offset_x,
+            -1.0f, 1.0f);
 
     GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 
