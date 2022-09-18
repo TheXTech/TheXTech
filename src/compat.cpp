@@ -95,6 +95,10 @@ static void compatInit(Compatibility_t &c)
     c.fix_fairy_stuck_in_pipe = true;
     c.world_map_fast_move = false;
     c.fix_flamethrower_gravity = true;
+    // 1.3.6-1
+    c.fix_npc_ceiling_speed = true;
+    c.emulate_classic_block_order = false;
+    // 1.3.7
     c.free_level_res = true;
     c.free_world_res = true;
     c.NPC_activate_mode = NPC_activate_modes::smart;
@@ -133,6 +137,10 @@ static void compatInit(Compatibility_t &c)
         c.multiplayer_pause_controls = false;
         c.fix_fairy_stuck_in_pipe = false;
         c.fix_flamethrower_gravity = false;
+        // 1.3.6-1
+        c.fix_npc_ceiling_speed = false;
+        c.emulate_classic_block_order = true;
+        // 1.3.7
         c.free_level_res = false;
         c.free_world_res = false;
         c.NPC_activate_mode = NPC_activate_modes::onscreen;
@@ -306,6 +314,9 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-npc247-collapse", c.fix_npc247_collapse, c.fix_npc247_collapse);
         compat.read("fix-special-coin-switch", c.fix_special_coin_switch, c.fix_special_coin_switch);
         compat.read("fix-bat-start-while-inactive", c.fix_bat_start_while_inactive, c.fix_bat_start_while_inactive);
+        // 1.3.6-1
+        compat.read("fix-npc-ceiling-speed", c.fix_npc_ceiling_speed, c.fix_npc_ceiling_speed);
+        compat.read("emulate-classic-block-order", c.emulate_classic_block_order, c.emulate_classic_block_order);
         // 1.3.7 (but these will be changed in the Compat update)
         compat.read("free-level-res", c.free_level_res, c.free_level_res);
         compat.read("free-world-res", c.free_world_res, c.free_world_res);

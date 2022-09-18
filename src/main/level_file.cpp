@@ -895,7 +895,7 @@ void ClearLevel()
     LoadNPCDefaults();
     LoadPlayerDefaults();
     noUpdate = true;
-    // BlocksSorted = true;
+    BlocksSorted = true;
     qScreen = false;
 
     UnloadCustomGFX();

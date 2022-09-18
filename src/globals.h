@@ -1761,9 +1761,9 @@ extern bool TestFullscreen;
 ////Public keyDownEnter As Boolean
 //extern bool keyDownEnter;
 
-// no longer needed thanks to block quadtree
+// no longer needed thanks to block quadtree, BUT used to recreate one buggy behavior
 //Public BlocksSorted As Boolean 'if using block optimization it requires the locks to be sorted
-// extern bool BlocksSorted;
+extern bool BlocksSorted;
 
 //Public SingleCoop As Integer 'cheat code
 extern int SingleCoop;

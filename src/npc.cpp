@@ -5371,8 +5371,8 @@ bool npcHasFloor(const struct NPC_t &npc)
     for(int subCheck = 1; subCheck <= 2; subCheck++)
     {
         auto subQuery = (subCheck == 1)
-            ? treeBlockQuery(l, SORTMODE_LOC)
-            : treeTempBlockQuery(l, SORTMODE_LOC);
+            ? treeBlockQuery(checkLoc, SORTMODE_NONE)
+            : treeTempBlockQuery(checkLoc, SORTMODE_NONE);
 
         for(BlockRef_t sb : subQuery)
         {

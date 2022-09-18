@@ -20,8 +20,11 @@
 
 #include <memory>
 #include <algorithm>
+
 #include "trees.h"
 #include "layers.h"
+#include "compat.h"
+
 #include "QuadTree/LooseQuadtree.h"
 
 std::vector<BaseRef_t> treeresult_vec[MAX_TREEQUERY_DEPTH] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(50), std::vector<BaseRef_t>(50)};
@@ -424,6 +427,14 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double R
             result.i_vec->push_back((BaseRef_t)item);
             q.Next();
         }
+    }
+
+    if(sort_mode == SORTMODE_COMPAT)
+    {
+        if(g_compatibility.emulate_classic_block_order)
+            sort_mode = SORTMODE_ID;
+        else
+            sort_mode = SORTMODE_LOC;
     }
 
     if(sort_mode == SORTMODE_LOC)

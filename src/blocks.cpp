@@ -2333,6 +2333,30 @@ void PSwitch(bool enabled)
     // SO expensive, can't wait to get rid of this.
     // syncLayersTrees_AllBlocks();
 
+    if(g_compatibility.emulate_classic_block_order)
+    {
+        // Doing this just to replicate some unusual, unpredictable glitches
+        // that sometimes occur when blocks' relative order is changing during the level
+
+        qSortBlocksX(1, numBlock);
+        int B = 1;
+
+        for(A = 2; A <= numBlock; A++)
+        {
+            if(Block[A].Location.X > Block[B].Location.X)
+            {
+                qSortBlocksY(B, A - 1);
+                B = A;
+            }
+        }
+
+        qSortBlocksY(B, A - 1);
+
+        syncLayersTrees_AllBlocks();
+
+        BlocksSorted = true;
+    }
+
     iBlocks = numBlock;
     for(A = 1; A <= numBlock; A++)
         iBlock[A] = A;
