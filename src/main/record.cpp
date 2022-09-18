@@ -550,7 +550,7 @@ static void read_status()
 
     if(o_renderedBlocks != g_stats.renderedBlocks + g_stats.renderedSzBlocks)
     {
-        pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedNPCs, g_stats.renderedNPCs + g_stats.renderedSzBlocks, frame_no);
+        pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedBlocks, g_stats.renderedBlocks + g_stats.renderedSzBlocks, frame_no);
         diverged_minor = true;
     }
 
@@ -804,7 +804,7 @@ void EndRecording()
     {
         read_end();
 
-        if(!diverged_minor)
+        if(!diverged_minor && !diverged_major)
         {
             pLogDebug("CONGRATULATIONS! Your build's run did not diverge from the old run.");
             printf("CONGRATULATIONS! Your build's run did not diverge from the old run.\n");
