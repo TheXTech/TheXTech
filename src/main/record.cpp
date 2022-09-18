@@ -313,7 +313,7 @@ static void read_end()
         diverged_major = true;
     }
 
-    if(b != LevelBeatCode)
+    if(b != LevelBeatCode && !(b == -1 && LevelBeatCode == 0))
     {
         pLogWarning("LevelBeatCode diverged (old: %d, new: %d).", b, LevelBeatCode);
         diverged_major = true;
