@@ -550,8 +550,13 @@ bool Update_qScreen(int Z)
     double qFramesY = (camFramesY > resizeFramesY ? camFramesY : resizeFramesY);
 
     // don't continue after this frame if it would arrive next frame
-    // (this is equivalent to the <5 condition in the vanilla game)
+    // (this is the intent of the <5 condition in the vanilla game)
     if(qFramesX < 2.5 && qFramesY < 2.5)
+        continue_qScreen = false;
+
+    // but, the original condition occurred *after* adding/subtracting 2, so actually
+    // the original game would not continue if it would arrive the frame after next, too
+    if(!g_compatibility.modern_section_change && qFramesX < 3.5 && qFramesY < 3.5)
         continue_qScreen = false;
 
     if(qFramesX < 1)
