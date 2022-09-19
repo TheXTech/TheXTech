@@ -30,6 +30,7 @@
 // A user-loaded bitmap container
 class LunaImage
 {
+    static uint64_t p_uidCounter;
     static uint64_t getNewUID();
     uint64_t m_uid = 0;
 
