@@ -1018,8 +1018,9 @@ void InitSound()
         std::string group = fmt::format_ne("sound-{0}", i);
         AddSfx(SoundScope::global, sounds, alias, group);
 
-        if(i % 4 == 0)
+#ifdef __WII__
             UpdateLoad();
+#endif
     }
     UpdateLoad();
     Mix_ReserveChannels(g_reservedChannels);
