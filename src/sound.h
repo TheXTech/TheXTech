@@ -24,8 +24,6 @@
 
 #include <string>
 
-#include "global_constants.h"
-
 // Public musicPlaying As Boolean
 extern bool musicPlaying;
 // Public musicLoop As Integer
@@ -34,6 +32,14 @@ extern int musicLoop;
 extern std::string musicName;
 
 extern int playerHammerSFX;
+
+extern const struct AudioDefaults_t
+{
+    int sampleRate;
+    int channels;
+    int bufferSize;
+    uint16_t format;
+} g_audioDefaults;
 
 extern struct AudioSetup_t
 {
