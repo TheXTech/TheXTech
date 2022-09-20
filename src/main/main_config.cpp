@@ -114,6 +114,8 @@ void OpenConfig_preSetup()
 
     std::string configPath = AppPathManager::settingsFileSTD();
 
+    InitSoundDefaults();
+
     if(Files::fileExists(configPath))
     {
         IniProcessing config(configPath);

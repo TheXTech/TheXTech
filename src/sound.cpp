@@ -71,7 +71,7 @@ const AudioDefaults_t g_audioDefaults =
 {
     48000,
     2,
-    1024,
+    1280,
     (int)AUDIO_S16
 };
 #else /* Defaults for all other platforms */
@@ -183,6 +183,14 @@ static const int maxSfxChannels = 91;
 int CustomWorldMusicId()
 {
     return g_customWldMusicId;
+}
+
+void InitSoundDefaults()
+{
+    g_audioSetup.sampleRate = g_audioDefaults.sampleRate;
+    g_audioSetup.channels = g_audioDefaults.channels;
+    g_audioSetup.format = g_audioDefaults.format;
+    g_audioSetup.bufferSize = g_audioDefaults.bufferSize;
 }
 
 void InitMixerX()
@@ -1512,4 +1520,3 @@ void UpdateSoundFX(int recentSection)
     }
 #endif // THEXTECH_ENABLE_AUDIO_FX
 }
-
