@@ -28,7 +28,6 @@
 
 #include "load_gfx.h"
 #include "core/msgbox.h"
-#include "pge_delay.h"
 
 #include "sound.h"
 
@@ -43,8 +42,6 @@
 #include <Utils/strings.h>
 #include <unordered_map>
 #include <fmt_format_ne.h>
-
-#include "pseudo_vb.h"
 
 enum class SoundScope
 {
@@ -62,7 +59,32 @@ std::string musicName;
 
 int playerHammerSFX = SFX_Fireball;
 
+const AudioDefaults_t g_audioDefaults =
+#if defined(__WII__) /* Defaults for Nintendo Wii */
+{
+    32000,
+    2,
+    512,
+    (int)AUDIO_S16
+}
+#elif defined(__SWITCH__) /* Defaults for Nintendo Switch */
+{
+    32000,
+    2,
+    512,
+    (int)AUDIO_F32
+}
+#else /* Defaults for all other platforms */
+{
+    44100,
+    2,
+    512,
+    (int)AUDIO_F32
+};
+#endif
+
 AudioSetup_t g_audioSetup;
+
 static AudioSetup_t s_audioSetupObtained;
 
 static Mix_Music *g_curMusic = nullptr;
@@ -744,12 +766,6 @@ void PlayInitSound()
             {
                 Mix_PlayMusicStream(loadsfx, 0);
                 Mix_SetFreeOnStop(loadsfx, 1);
-//            do // Synchroniously play the loading sound to don't distort it during the SFX loading
-//            {
-//                PGE_Delay(15);
-//                UpdateLoadREAL();
-//            } while(Mix_PlayingMusicStream(loadsfx));
-//            Mix_FreeMusic(loadsfx);
             }
         }
     }
