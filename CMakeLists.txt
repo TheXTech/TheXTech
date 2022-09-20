@@ -492,6 +492,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/main/*.h
     src/main/QuadTree/*.h
     src/sound/fx/*.h
+    src/sound/fx/*.hpp
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
@@ -615,7 +616,7 @@ if(NINTENDO_SWITCH)
 
     # Set explicit flags for this project
     target_compile_definitions(thextech PRIVATE
-        -D__SWITCH__ -DNO_SCREENSHOT -DFIXED_RES -DNO_INTPTROC)
+        -D__SWITCH__ -DNO_SCREENSHOT -DFIXED_RES -DPRELOAD_LEVELS -DNO_INTPTROC)
 endif()
 
 if(VITA)
@@ -781,6 +782,8 @@ elseif(WIN32)
     install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
 elseif(VITA)
     include(cmake/package_vita.cmake)
+elseif(NINTENDO_SWITCH)
+    include(cmake/package_switch.cmake)
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
