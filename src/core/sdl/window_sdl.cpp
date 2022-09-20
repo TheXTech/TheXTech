@@ -90,8 +90,9 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
     SDL_GL_ResetAttributes();
 
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1280x720 */
-    const int initWindowW = 1280;
-    const int initWindowH = 720;
+    const int initWindowW = 1920;
+    const int initWindowH = 1080;
+    windowInitFlags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_SHOWN;
 #else
     const auto initWindowW = ScreenW;
     const auto initWindowH = ScreenH;
@@ -132,7 +133,7 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
-#if defined(__ANDROID__) || defined(VITA) || defined(__SWITCH__) // Use a full-screen on Android & PS Vita mode by default
+#if defined(__ANDROID__) || defined(VITA) // Use a full-screen on Android & PS Vita mode by default
     setFullScreen(true);
     show();
 #endif
