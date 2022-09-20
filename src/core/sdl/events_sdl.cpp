@@ -89,7 +89,7 @@ void EventsSDL::processEvent()
         case SDL_WINDOWEVENT_MOVED:
             eventResize();
             break;
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) && !defined(__SWITCH__) && !defined(__WII__)
+#if !defined(NO_WINDOW_FOCUS_TRACKING)
         case SDL_WINDOWEVENT_FOCUS_GAINED:
             if(!neverPause && !LoadingInProcess)
                 SoundPauseEngine(0);

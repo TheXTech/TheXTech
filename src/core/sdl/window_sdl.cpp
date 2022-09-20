@@ -92,20 +92,24 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1280x720 */
     const int initWindowW = 1920;
     const int initWindowH = 1080;
-    windowInitFlags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_SHOWN;
+
 #else
     const auto initWindowW = ScreenW;
     const auto initWindowH = ScreenH;
 #endif
 
+#if defined(RENDER_FULLSCREEN_ALWAYS)
+    windowInitFlags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_SHOWN;
+#endif
+
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
-                              SDL_WINDOWPOS_CENTERED,
-                              SDL_WINDOWPOS_CENTERED,
-                              initWindowW, initWindowH,
-                              SDL_WINDOW_RESIZABLE |
-                              SDL_WINDOW_HIDDEN |
-                              SDL_WINDOW_ALLOW_HIGHDPI |
-                              windowInitFlags);
+                                SDL_WINDOWPOS_CENTERED,
+                                SDL_WINDOWPOS_CENTERED,
+                                initWindowW, initWindowH,
+                                SDL_WINDOW_RESIZABLE |
+                                SDL_WINDOW_HIDDEN |
+                                SDL_WINDOW_ALLOW_HIGHDPI |
+                                windowInitFlags);
 
     if(m_window == nullptr)
     {
@@ -132,11 +136,6 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-
-#if defined(__ANDROID__) || defined(VITA) // Use a full-screen on Android & PS Vita mode by default
-    setFullScreen(true);
-    show();
-#endif
 
 #ifdef _WIN32
     FIBITMAP *img[2];

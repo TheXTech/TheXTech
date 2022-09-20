@@ -26,6 +26,7 @@
 #include "../sound.h"
 #include "../config.h"
 #include "../video.h"
+#include "../core/render.h"
 #include "../controls.h"
 
 #include "speedrunner.h"
@@ -263,7 +264,7 @@ void SaveConfig()
 
     config.beginGroup("main");
     config.setValue("release", curRelease);
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!
+#if !defined(RENDER_FULLSCREEN_ALWAYS) // Don't remember fullscreen
     config.setValue("full-screen", resChanged);
 #endif
     config.setValue("record-gameplay", g_config.RecordGameplayData);

@@ -30,6 +30,8 @@
 #   define USE_SCREENSHOTS_AND_RECS
 #   define USE_DRAW_BATTERY_STATUS
 struct GifRecorder;
+#else
+#   define NO_WINDOW_FOCUS_TRACKING // Don't track for the window focus
 #endif
 
 #ifdef __ANDROID__
@@ -37,7 +39,8 @@ struct GifRecorder;
 #endif
 
 #if defined(__ANDROID__) || defined(VITA) || defined(__SWITCH__) || defined(__WII__)
-#   define RENDER_FULLSCREEN_ALWAYS
+#   define RENDER_FULLSCREEN_ALWAYS // Game works always fullscreen
+#   define NO_WINDOW_FOCUS_TRACKING // Don't track for window focus
 #endif
 
 
