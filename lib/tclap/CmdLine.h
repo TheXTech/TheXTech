@@ -439,15 +439,8 @@ inline void CmdLine::parse(std::vector<std::string> &args) {
 
     try {
         if (args.empty()) {
-#if defined(__SWITCH__)
+            // Workaround for some platforms such as consoles
             _progName = "program";
-#else
-            // https://sourceforge.net/p/tclap/bugs/30/
-            throw CmdLineParseException(
-                "The args vector must not be empty, "
-                "the first entry should contain the "
-                "program's name.");
-#endif
         } else {
             // TODO(macbishop): Maybe store the full name somewhere?
             _progName = basename(args.front());
