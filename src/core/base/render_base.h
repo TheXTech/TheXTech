@@ -36,7 +36,7 @@ struct GifRecorder;
 #   define USE_RENDER_BLOCKING
 #endif
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) || defined(VITA) || defined(__SWITCH__) || defined(__WII__)
 #   define RENDER_FULLSCREEN_ALWAYS
 #endif
 

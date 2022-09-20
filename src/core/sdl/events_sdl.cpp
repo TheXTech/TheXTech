@@ -23,7 +23,6 @@
 #include <Logger/logger.h>
 
 #include "events_sdl.h"
-#include "core/render.h"
 #include "core/window.h"
 #include "frm_main.h"
 #include "game_main.h"
@@ -90,7 +89,7 @@ void EventsSDL::processEvent()
         case SDL_WINDOWEVENT_MOVED:
             eventResize();
             break;
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) && !defined(__SWITCH__) && !defined(__WII__)
         case SDL_WINDOWEVENT_FOCUS_GAINED:
             if(!neverPause && !LoadingInProcess)
                 SoundPauseEngine(0);
