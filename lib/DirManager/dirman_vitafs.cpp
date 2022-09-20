@@ -57,6 +57,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 static std::mutex g_dirManMutex;
+static constexpr const SceMode gSceDirMode = 0777;
 
 #define PUT_THREAD_GUARD() \
     std::lock_guard<std::mutex> guard(g_dirManMutex);\
@@ -316,15 +317,13 @@ bool DirMan::exists(const std::string &dirPath)
 bool DirMan::mkAbsDir(const std::string &dirPath)
 {
     PUT_THREAD_GUARD();
-    return (sceIoMkdir(dirPath.c_str(), SCE_S_IRWXU | SCE_S_IRWXG) == 0);
-    // return ::mkdir(dirPath.c_str(), S_IRWXU | S_IRWXG) == 0;
+    return (sceIoMkdir(dirPath.c_str(), gSceDirMode) == 0);
 }
 
 bool DirMan::rmAbsDir(const std::string &dirPath)
 {
     PUT_THREAD_GUARD();
     return (sceIoRmdir(dirPath.c_str()) == 0);
-    // return ::rmdir(dirPath.c_str()) == 0;
 }
 
 bool DirMan::mkAbsPath(const std::string &dirPath)
@@ -353,7 +352,7 @@ bool DirMan::mkAbsPath(const std::string &dirPath)
         if(*p == '/')
         {
             *p = 0;
-            int err = sceIoMkdir(tmp, SCE_S_IRWXU | SCE_S_IRWXG);
+            int err = sceIoMkdir(tmp, gSceDirMode);
             if((err != 0))
             {
                 pLogDebug("err != 0 when calling sceIoMkdir for mkabspath (%s was the path)", tmp);
@@ -364,8 +363,8 @@ bool DirMan::mkAbsPath(const std::string &dirPath)
         }
     }
 
-    bool rv = sceIoMkdir(tmp, SCE_S_IRWXU | SCE_S_IRWXG) == 0;
-    pLogDebug("    mkAbsPath: %s. Success: %s", tmp, (rv ? "TRUE" : "FALSE"));
+    bool rv = sceIoMkdir(tmp, gSceDirMode) == 0;
+    pLogDebug("    mkAbsPath: `%s`. Success: %s", tmp, (rv ? "TRUE" : "FALSE"));
     return rv;
 }
 
