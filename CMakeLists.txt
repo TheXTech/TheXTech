@@ -479,6 +479,8 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/CrashHandler/*.h
     lib/Graphics/*.h
     lib/InterProcess/*.h
+    lib/tclap/*.h
+    lib/fmt/*.h
     src/*.h
     src/*.hpp
     src/script/*.h
