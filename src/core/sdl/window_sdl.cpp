@@ -89,10 +89,18 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
     SDL_GL_ResetAttributes();
 
+#if defined(__SWITCH__) /* On Switch, expect the initial size 1280x720 */
+    const int initWindowW = 1280;
+    const int initWindowH = 720;
+#else
+    const auto initWindowW = ScreenW;
+    const auto initWindowH = ScreenH;
+#endif
+
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
                               SDL_WINDOWPOS_CENTERED,
                               SDL_WINDOWPOS_CENTERED,
-                              ScreenW, ScreenH,
+                              initWindowW, initWindowH,
                               SDL_WINDOW_RESIZABLE |
                               SDL_WINDOW_HIDDEN |
                               SDL_WINDOW_ALLOW_HIGHDPI |
@@ -114,7 +122,7 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
 #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
     SDL_SetWindowMinimumSize(m_window, ScreenW / 2, ScreenH / 2);
-#elif defined(__ANDROID__) // Set as small as possible
+#elif defined(__ANDROID__) || defined(__SWITCH__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #elif defined(VITA)
     SDL_SetWindowMinimumSize(m_window, 960, 544);
@@ -124,7 +132,7 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
 
-#if defined(__ANDROID__) || defined(VITA) // Use a full-screen on Android & PS Vita mode by default
+#if defined(__ANDROID__) || defined(VITA) || defined(__SWITCH__) // Use a full-screen on Android & PS Vita mode by default
     setFullScreen(true);
     show();
 #endif
