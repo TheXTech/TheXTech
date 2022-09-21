@@ -92,7 +92,6 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1280x720 */
     const int initWindowW = 1920;
     const int initWindowH = 1080;
-
 #else
     const auto initWindowW = ScreenW;
     const auto initWindowH = ScreenH;
