@@ -3,13 +3,13 @@ name: Vita CI
 on:
   push:
     branches:
-      - master
+      - main
       - devel
       - wip-vita-support
       - wip-vita-master
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
