@@ -3,12 +3,12 @@ name: Emscripten CI
 on:
   push:
     branches:
-      - master
+      - main
       - devel
       - versus-ci-emscripten
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
