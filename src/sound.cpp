@@ -725,6 +725,24 @@ void StartMusic(int A, int fadeInMs)
     musicPlaying = true;
 }
 
+void PauseMusic()
+{
+    if(!musicPlaying || noSound)
+        return;
+
+    if(g_curMusic && Mix_PlayingMusicStream(g_curMusic))
+        Mix_PauseMusicStream(g_curMusic);
+}
+
+void ResumeMusic()
+{
+    if(!musicPlaying || noSound)
+        return;
+
+    if(g_curMusic && Mix_PausedMusicStream(g_curMusic))
+        Mix_ResumeMusicStream(g_curMusic);
+}
+
 void StopMusic()
 {
     if(!musicPlaying || noSound)
