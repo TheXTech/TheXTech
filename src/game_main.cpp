@@ -52,7 +52,6 @@
 #include "load_gfx.h"
 #include "player.h"
 #include "sound.h"
-#include "video.h"
 #include "editor.h"
 #include "editor/new_editor.h"
 #include "custom.h"
