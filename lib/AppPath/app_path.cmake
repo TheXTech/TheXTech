@@ -28,6 +28,11 @@ elseif(VITA)
     list(APPEND APPPATH_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/app_path_vita.cpp
     )
+elseif(NINTENDO_SWITCH)
+    message("-- AppPath for Switch")
+    list(APPEND APPPATH_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/private/app_path_switch.cpp
+    )
 elseif(WIN32)
     message("-- AppPath for Windows")
     list(APPEND APPPATH_SRCS

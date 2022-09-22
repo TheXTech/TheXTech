@@ -52,7 +52,6 @@
 #include "load_gfx.h"
 #include "player.h"
 #include "sound.h"
-#include "video.h"
 #include "editor.h"
 #include "editor/new_editor.h"
 #include "custom.h"
@@ -1512,7 +1511,7 @@ void CheckActive()
 {
     // It's useless on Emscripten as no way to check activity (or just differently)
     // and on Android as it has built-in application pauser
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+#if !defined(NO_WINDOW_FOCUS_TRACKING)
 //    bool MusicPaused = false;
     bool focusLost = false;
 

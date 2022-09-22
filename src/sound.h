@@ -163,6 +163,8 @@ enum
 
 int CustomWorldMusicId();
 
+void InitSoundDefaults();
+
 // Public Sub InitMixerX()
 void InitMixerX();
 // Public Sub QuitMixerX()

@@ -2414,20 +2414,25 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         SuperPrintR(mode, "DELETING LAYER " + Layer[m_special_subpage].Name, 3, 60, 40);
         SuperPrintR(mode, "PRESERVE LAYER CONTENTS?", 3, 10, 60);
         SuperPrintR(mode, "YES: MOVE TO DEFAULT LAYER", 3, 60, 110);
+
         if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             DeleteLayer((layerindex_t)m_special_subpage, false);
             m_special_subpage = 0;
             m_special_page = SPECIAL_PAGE_LAYERS;
         }
+
         SuperPrintR(mode, "NO: *DELETE ALL CONTENTS*", 3, 60, 150);
+
         if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             DeleteLayer((layerindex_t)m_special_subpage, true);
             m_special_subpage = 0;
             m_special_page = SPECIAL_PAGE_LAYERS;
         }
+
         SuperPrintR(mode, "CANCEL: DO NOT DELETE " + Layer[m_special_subpage].Name, 3, 60, 190);
+
         if(UpdateButton(mode, 20 + 4, 180 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_subpage = 0;
@@ -2452,6 +2457,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_NONE;
         m_special_subpage = 0;
     }
+
     if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
         SuperPrintR(mode, "LAYER:", 3, e_ScreenW - 200, 200 + 2);
