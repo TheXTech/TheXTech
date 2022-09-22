@@ -1,5 +1,13 @@
 TheXTech Changelog.
 
+Changelog for 1.3.6.1
+-Fixed some of the performance slowdown problems (@ds-sloth)
+-Fixed the work of Sound FX on big-endian architectures (@Wohlstand)
+-Fixed directory creation flags on Vita (@suicvne)
+-Minor fixes to the gameplay recording system (@Wohlstand, @ds-sloth)
+-Changed the logic of the music pausing at the pause menu when P-Switch is active: don't suspend the entire sound stream, do suspend the music only (@Wohlstand)
+-Added experimental support for the Nintendo Switch homebrew platform (@Wohlstand)
+
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)
 -Added an ability to type cheats on touchscreen using special new cheats key (@Wohlstand, @ds-sloth)
