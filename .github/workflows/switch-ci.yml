@@ -28,7 +28,7 @@ jobs:
             os: ubuntu-20.04,
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Switch.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/switch",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip apt-transport-https",
-            generator: "Unix Makefiles",
+            generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "thextech",
             assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
@@ -39,7 +39,7 @@ jobs:
     steps:
     - uses: styfle/cancel-workflow-action@0.9.1
       with:
-        workflow_id: vita-ci.yml
+        workflow_id: switch-ci.yml
         all_but_latest: true
         access_token: ${{ github.token }}
 
@@ -60,6 +60,7 @@ jobs:
     - name: Install Devkit Pro
       run: |
         cd ..
+        sudo chmod 755 /opt
         if [[ ! -f /usr/local/share/keyring/devkitpro-pub.gpg ]]; then
             sudo mkdir -p /usr/local/share/keyring/
             sudo wget -O /usr/local/share/keyring/devkitpro-pub.gpg https://apt.devkitpro.org/devkitpro-pub.gpg
@@ -74,7 +75,7 @@ jobs:
 
         sudo dkp-pacman --noconfirm -Sy
         sudo dkp-pacman --noconfirm -Syu
-        sudo dkp-pacman --noconfirm -Sy switch-dev switch-libpng switch-libjpeg-turbo switch-zlib switch-tools switch-cmake
+        sudo dkp-pacman --noconfirm -Sy switch-dev switch-libpng switch-libjpeg-turbo switch-zlib switch-tools switch-cmake switch-mesa switch-libdrm_nouveau switch-glm switch-glad
 
     - name: Install modified SDL2
       run: |
