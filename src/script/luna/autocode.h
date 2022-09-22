@@ -64,6 +64,8 @@ enum AutocodeType
     AT_Timer,                   //1: Target 2: Effect       3: Display Y/N  4: Repeat?  5: Active time  6:
     AT_IfNPC,                   //1: NpcID  2: Condition    3: Argument     4: Event    5: Active time  6: Option
     AT_BlockTrigger,            //1: NpcID  2: Block Type   3: Argument     4: Event    5: Active time  6: Option
+    AT_IfCompatMode,            //1:        2: Condition    3: Mode         4: Event    5: Active time  6:
+    AT_IfSpeedRunMode,          //1:        2: Condition    3: Mode         4: Event    5: Active time  6:
     AT_TriggerRandom,           //1: Event  2: Event        3: Event        4: Event    5: Active time  6:
     AT_TriggerRandomRange,      //1: StartEv2: EndEv        3:              4:          5: Active time  6:
     AT_TriggerZone,             //1: Event  2: Top          3: Bottom       4: Left     5: Right        6: Option
@@ -73,6 +75,7 @@ enum AutocodeType
     AT_OnCustomCheat,           //1:        2:              3: Only once?   4: Event    5: Active time  6: Cheat string
     AT_OnPlayerMem,             //1: Offset 2: Value        3: Comparison   4: Event    5: Active time  6: Type (b, w, dw, f, qw/df)
     AT_OnGlobalMem,             //1: Addr   2: Value        3: Comparison   4: Event    5: Active time  6: Type (b, w, dw, f, qw/df)
+    AT_RunCheat,                //1:        2:              3:              4:          5: Delay        6: Cheat string
 
     AT_SetVar,                  //1:        2: Op           3: Value        4:          5: Active time  6:
     AT_LoadPlayerVar,           //1:        2: Offset       3: Op           4:          5: Active time  6: Type (b, w, dw, f, qw/df)
@@ -229,6 +232,8 @@ public:
     static void DoPredicate(int target, int predicate);
 
     static bool NPCConditional(int NPCID, int condition);
+    static bool CheckConditionI(int value1, int value2, COMPARETYPE cond);
+    static bool CheckConditionD(double value1, double value2, COMPARETYPE cond);
 
     static AutocodeType EnumerizeCommand(char *wbuf, int lineNumber = -1);
     static SpriteComponent GenerateComponent(const Autocode &obj_to_convert); // Convert an autocode object to a sprite component

@@ -19,6 +19,8 @@
  */
 
 
+#include <algorithm>
+
 #include <SDL2/SDL_timer.h>
 
 #include "globals.h"
@@ -34,6 +36,8 @@
 #include "sorting.h"
 #include "layers.h"
 #include "compat.h"
+
+#include "main/trees.h"
 
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
@@ -2044,7 +2048,7 @@ void UpdateBlocks()
 void PSwitch(bool enabled)
 {
     int A = 0;
-    int B = 0;
+    // int B = 0;
     Block_t blankBlock;
 
     if(enabled)
@@ -2053,7 +2057,7 @@ void PSwitch(bool enabled)
         {
             bool transform = NPCIsACoin[NPC[A].Type] && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
 
-            if(NPC[A].Type == NPCID_DRAGONCOIN && g_compatibility.fix_pswitch_dragon_coin)
+            if(NPC[A].Type == NPCID_DRAGONCOIN && g_compatibility.fix_special_coin_switch)
                 transform = false;
 
             if(transform)
@@ -2097,9 +2101,37 @@ void PSwitch(bool enabled)
             }
         }
 
+        // this has been made more complicated because the Blocks are no longer sorted like they were previously
+
+        // use one of the pre-allocated result vectors
+        TreeResult_Sentinel<BlockRef_t> sent;
+        std::vector<BaseRef_t>& PSwitchBlocks = *sent.i_vec;
+
+        // fill it with the PSwitch-affected blocks
         for(A = numBlock; A >= 1; A--)
         {
             if(BlockPSwitch[Block[A].Type] && Block[A].Special == 0 && Block[A].NPC == 0 && !Block[A].Hidden)
+            {
+                PSwitchBlocks.push_back(A);
+            }
+        }
+
+        // sort them in reverse location order
+        if(CompatGetLevel() == 1 || CompatGetLevel() == 2)
+        {
+            std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
+                [](BaseRef_t a, BaseRef_t b) {
+                    return (((BlockRef_t)a)->Location.X > ((BlockRef_t)b)->Location.X
+                        || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
+                            && ((BlockRef_t)a)->Location.Y > ((BlockRef_t)b)->Location.Y));
+                });
+        }
+
+        // make the NPCs
+        size_t numConverted = 0;
+        for(; numConverted < PSwitchBlocks.size(); numConverted++)
+        {
+            A = PSwitchBlocks[numConverted];
             {
                 if(numNPCs < maxNPCs)
                 {
@@ -2135,6 +2167,29 @@ void PSwitch(bool enabled)
                     nn.DefaultType = nn.Type;
                     syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
+                }
+                else
+                    break;
+            }
+        }
+
+        // remove blocks that didn't get converted from the list
+        PSwitchBlocks.resize(numConverted);
+
+        // return them to reverse index order
+        if(CompatGetLevel() == 1 || CompatGetLevel() == 2)
+        {
+            std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
+                [](BaseRef_t a, BaseRef_t b) {
+                    return a > b;
+                });
+        }
+
+        // kill the blocks
+        for(int A : PSwitchBlocks)
+        {
+            {
+                {
                     Block[A] = Block[numBlock];
                     Block[numBlock] = blankBlock;
                     numBlock--;
@@ -2177,10 +2232,37 @@ void PSwitch(bool enabled)
         }
 
 
-        // Stop
+        // this has been made more complicated because the Blocks are no longer sorted like they were previously
+
+        // use one of the pre-allocated result vectors
+        TreeResult_Sentinel<BlockRef_t> sent;
+        std::vector<BaseRef_t>& PSwitchBlocks = *sent.i_vec;
+
+        // fill it with the PSwitch-affected blocks
         for(A = numBlock; A >= 1; A--)
         {
             if(Block[A].NPC > 0 && !Block[A].Hidden)
+            {
+                PSwitchBlocks.push_back(A);
+            }
+        }
+
+        // sort them in reverse location order
+        if(CompatGetLevel() == 1 || CompatGetLevel() == 2)
+        {
+            std::sort(PSwitchBlocks.begin(), PSwitchBlocks.end(),
+                [](BaseRef_t a, BaseRef_t b) {
+                    return (((BlockRef_t)a)->Location.X > ((BlockRef_t)b)->Location.X
+                        || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
+                            && ((BlockRef_t)a)->Location.Y > ((BlockRef_t)b)->Location.Y));
+                });
+        }
+
+        // restore the NPCs
+        size_t numConverted = 0;
+        for(; numConverted < PSwitchBlocks.size(); numConverted++)
+        {
+            A = PSwitchBlocks[numConverted];
             {
                 if(numNPCs < maxNPCs)
                 {
@@ -2205,6 +2287,22 @@ void PSwitch(bool enabled)
                     syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     nn.Killed = 0;
+                }
+                else
+                    break;
+            }
+        }
+
+        // remove blocks that didn't get converted from the list
+        PSwitchBlocks.resize(numConverted);
+
+        // shouldn't actually return them to reverse index order: KillBlock might internally call events, so it should be called in reverse location order
+
+        // kill the blocks
+        for(int A : PSwitchBlocks)
+        {
+            {
+                {
                     KillBlock(A, false);
                     Block[A].Layer = LAYER_USED_P_SWITCH;
                     syncLayersTrees_Block(A);
@@ -2217,23 +2315,47 @@ void PSwitch(bool enabled)
         ProcEvent(EVENT_PSWITCH_END, true);
     }
 
-    qSortBlocksX(1, numBlock);
-    B = 1;
+    // qSortBlocksX(1, numBlock);
+    // B = 1;
 
-    for(A = 2; A <= numBlock; A++)
-    {
-        if(Block[A].Location.X > Block[B].Location.X)
-        {
-            qSortBlocksY(B, A - 1);
-            B = A;
-        }
-    }
+    // for(A = 2; A <= numBlock; A++)
+    // {
+    //     if(Block[A].Location.X > Block[B].Location.X)
+    //     {
+    //         qSortBlocksY(B, A - 1);
+    //         B = A;
+    //     }
+    // }
 
-    qSortBlocksY(B, A - 1);
-    FindSBlocks();
-    FindBlocks();
+    // qSortBlocksY(B, A - 1);
+    // FindSBlocks();
+    // FindBlocks();
     // SO expensive, can't wait to get rid of this.
-    syncLayersTrees_AllBlocks();
+    // syncLayersTrees_AllBlocks();
+
+    if(g_compatibility.emulate_classic_block_order)
+    {
+        // Doing this just to replicate some unusual, unpredictable glitches
+        // that sometimes occur when blocks' relative order is changing during the level
+
+        qSortBlocksX(1, numBlock);
+        int B = 1;
+
+        for(A = 2; A <= numBlock; A++)
+        {
+            if(Block[A].Location.X > Block[B].Location.X)
+            {
+                qSortBlocksY(B, A - 1);
+                B = A;
+            }
+        }
+
+        qSortBlocksY(B, A - 1);
+
+        syncLayersTrees_AllBlocks();
+
+        BlocksSorted = true;
+    }
 
     iBlocks = numBlock;
     for(A = 1; A <= numBlock; A++)

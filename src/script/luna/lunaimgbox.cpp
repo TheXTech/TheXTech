@@ -24,11 +24,11 @@
 #include "core/render.h"
 #include <Utils/files.h>
 
+uint64_t LunaImage::p_uidCounter = 1;
 
 uint64_t LunaImage::getNewUID()
 {
-    static std::atomic<uint64_t> uidCounter(1);
-    return uidCounter.fetch_add(1, std::memory_order_relaxed);
+    return p_uidCounter++;
 }
 
 LunaImage::LunaImage()

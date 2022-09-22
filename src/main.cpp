@@ -229,15 +229,16 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchTestShowFPS("m", "show-fps", "Show FPS counter on the screen", false);
         TCLAP::SwitchArg switchTestMaxFPS("x", "max-fps", "Run FPS as fast as possible", false);
         TCLAP::SwitchArg switchTestMagicHand("k", "magic-hand", "Enable magic hand functionality while level test running", false);
+        TCLAP::SwitchArg switchTestEditor("e", "editor", "Open level in the editor", false);
         TCLAP::SwitchArg switchTestInterprocess("i", "interprocessing", "Enable an interprocessing mode with Editor", false);
 
         TCLAP::ValueArg<std::string> compatLevel(std::string(), "compat-level",
-                                                   "Enforce the specific gameplay compatibiltiy level. Supported values:\n"
+                                                   "Enforce the specific gameplay compatibility level. Supported values:\n"
                                                    "  modern - TheXTech native, all features and fixes enabled [Default]\n"
                                                    "  smbx2  - Disables all features and bugfixes except fixed at SMBX2\n"
                                                    "  smbx13 - Enforces the full compatibility with the SMBX 1.3 behaviour\n"
                                                    "\n"
-                                                   "  Note: If speed-run mode is set, the compatibility level will be overriden by the speed-run mode",
+                                                   "  Note: If speed-run mode is set, the compatibility level will be overridden by the speed-run mode",
                                                     false, "modern",
                                                    "modern, smbx2, smbx3",
                                                    cmd);
@@ -289,6 +290,7 @@ int main(int argc, char**argv)
         cmd.add(&switchTestShowFPS);
         cmd.add(&switchTestMaxFPS);
         cmd.add(&switchTestMagicHand);
+        cmd.add(&switchTestEditor);
         cmd.add(&switchTestInterprocess);
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
@@ -398,6 +400,7 @@ int main(int argc, char**argv)
                                 g_videoSettings.showFrameRate;
         setup.testMaxFPS = switchTestMaxFPS.getValue();
         setup.testMagicHand = switchTestMagicHand.getValue();
+        setup.testEditor = switchTestEditor.getValue();
 
         if(compatLevel.isSet())
         {

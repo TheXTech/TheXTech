@@ -246,13 +246,13 @@ void KillNPC(int A, int B)
                     NewEffect(2, NPC[A].Location);
                 else if(NPC[A].Type == 242)
                     NewEffect(126, NPC[A].Location);
-                else if(NPC[A].Type == NPCID_BLOOPER && g_compatibility.fix_blooper_stomp_effect)
+                else if(NPC[A].Type == NPCID_BLOOPER && g_compatibility.fix_squid_stomp_effect)
                 {
                     NPC[A].Location.SpeedY = 0.123;
                     NewEffect(121, NPC[A].Location, NPC[A].Direction);
                     PlaySound(SFX_ShellHit);
                 }
-                else if(NPC[A].Type == NPCID_BLOOPER_SMB3 && g_compatibility.fix_blooper_stomp_effect)
+                else if(NPC[A].Type == NPCID_BLOOPER_SMB3 && g_compatibility.fix_squid_stomp_effect)
                 {
                     NPC[A].Location.SpeedY = 0.123;
                     NewEffect(117, NPC[A].Location, NPC[A].Direction);
@@ -1524,7 +1524,7 @@ void KillNPC(int A, int B)
     if(BattleMode)
         NPC[A].RespawnDelay = 65 * 30;
 
-    if(NPC[A].AttLayer != LAYER_NONE)
+    if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT)
     {
         // for(C = 1; C <= maxLayers; C++)
         {

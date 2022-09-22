@@ -30,8 +30,12 @@ I'll continue developing the Moondust Engine as I have yet to reach the second g
 Since it's foundation, the Moondust Project had two goals: 1) save SMBX; 2) give a flexible toolkit for new platform games. The opening of SMBX's source-code and introducing TheXTech has solved the first goal: SMBX has been saved and now it's free/opensource cross-platform software. Moondust Engine will be used for the second goal - giving a toolkit for new games. Unlike TheXTech, Moondust Engine gives a high degree of flexibility that allows anyone to build something new from scratch without inheriting an old game base. However, TheXTech is needed for Moondust Engine as a working research model to develop the new engine. It will be similar to GZDoom and Chocolate Doom ports of the Doom game: GZDoom is a powerful and functional engine, the best choice for modders; Chocolate Doom is an accurate port of the original game to a modern platform with the purpose to represent the original game including even bugs. The Moondust Engine intends to be like GZDoom while TheXTech is an analog of Chocolate Doom to represent an original game on modern platforms.
 
 
+## Can levels and episodes with LunaDLL Autocode work on this?
+Yes, can. Since the TheXTech version 1.3.6, there is a built-in implementation of the LunaDLL Autocode language, called LunaScript. This system allows the running of LunaDLL-episodes on any hardware including non-x86 processor architectures.
+
+
 ## Can LunaLua work on this?
-No, LunaLua won't work: this project is binary-incompatible with LunaLua. This also means that SMBX2 content is incompatible.
+No, LunaLua won't work: this project is binary-incompatible with LunaLua. This also means that SMBX2 content is incompatible. The planned lua-based scripting system won't guarantee compatibility. Therefore, after the possible appearance of the Lua scripts support, it will be reasonable to port, or create new from the ground up and target to TheXTech exclusively.
 
 
 ## Why is the code here so bad?

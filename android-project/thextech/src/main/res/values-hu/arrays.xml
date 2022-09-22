@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="batteryStatusShow1">Mutasd alacsony töltöttség esetén</string>
+    <string name="touchscreenControllerType0">Mindig engedélyezve</string>
+    <string name="touchscreenControllerType1">Letiltva, amikor fizikai billentyűzet csatlakoztatva van</string>
+    <string name="touchscreenControllerType2">Mindig letiltva</string>
+    <string name="speedRunMode0">Ki</string>
+    <string name="speedRunMode1">1-es mód (TheXTech natív)</string>
+    <string name="speedRunMode2">2-es mód (időnyerési funkciók letiltva)</string>
+    <string name="touchPadStyle0">Játékbeli műveletek</string>
+    <string name="touchPadStyle1">Nintendo/Xbox stílus (A,B,X,Y)</string>
+    <string name="touchPadStyle2">PlayStation stílus (X,O,D,A)</string>
+    <string name="batteryStatusShow0">Soha ne mutasd</string>
+    <string name="batteryStatusShow2">Mindig mutatsd</string>
+    <string name="speedRunMode3">3-as mód (nyers SMBX 1.3, minden bug engedélyezve)</string>
+</resources>

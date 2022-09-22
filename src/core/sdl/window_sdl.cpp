@@ -89,14 +89,26 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
     SDL_GL_ResetAttributes();
 
+#if defined(__SWITCH__) /* On Switch, expect the initial size 1920x1080 */
+    const int initWindowW = 1920;
+    const int initWindowH = 1080;
+#else
+    const auto initWindowW = ScreenW;
+    const auto initWindowH = ScreenH;
+#endif
+
+#if defined(RENDER_FULLSCREEN_ALWAYS)
+    windowInitFlags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_SHOWN;
+#endif
+
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
-                              SDL_WINDOWPOS_CENTERED,
-                              SDL_WINDOWPOS_CENTERED,
-                              ScreenW, ScreenH,
-                              SDL_WINDOW_RESIZABLE |
-                              SDL_WINDOW_HIDDEN |
-                              SDL_WINDOW_ALLOW_HIGHDPI |
-                              windowInitFlags);
+                                SDL_WINDOWPOS_CENTERED,
+                                SDL_WINDOWPOS_CENTERED,
+                                initWindowW, initWindowH,
+                                SDL_WINDOW_RESIZABLE |
+                                SDL_WINDOW_HIDDEN |
+                                SDL_WINDOW_ALLOW_HIGHDPI |
+                                windowInitFlags);
 
     if(m_window == nullptr)
     {
@@ -114,7 +126,7 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
 #ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
     SDL_SetWindowMinimumSize(m_window, ScreenW / 2, ScreenH / 2);
-#elif defined(__ANDROID__) // Set as small as possible
+#elif defined(__ANDROID__) || defined(__SWITCH__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #elif defined(VITA)
     SDL_SetWindowMinimumSize(m_window, 960, 544);
@@ -123,11 +135,6 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
-
-#if defined(__ANDROID__) || defined(VITA) // Use a full-screen on Android & PS Vita mode by default
-    setFullScreen(true);
-    show();
-#endif
 
 #ifdef _WIN32
     FIBITMAP *img[2];

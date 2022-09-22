@@ -20,6 +20,8 @@
 
 #include <SDL2/SDL_timer.h>
 
+#include <algorithm>
+
 #include "../globals.h"
 #include "../frame_timer.h"
 #include "../graphics.h"
@@ -254,15 +256,19 @@ void GraphicsLazyPreLoad()
                 XRender::lazyPreLoad(GFXBackgroundBMP[b.Type]);
         }
 
-        int64_t fBlock = 0;
-        int64_t lBlock = 0;
-        blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
+        // int64_t fBlock = 0;
+        // int64_t lBlock = 0;
+        // blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
+        TreeResult_Sentinel<BlockRef_t> screenBlocks = treeBlockQuery(
+            -vScreenX[Z], -vScreenY[Z],
+            -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
+            SORTMODE_ID);
 
-        For(A, fBlock, lBlock)
+        for(Block_t* block_p : screenBlocks)
         {
-            auto &b = Block[A];
+            auto &b = *block_p;
             if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBlockType))
-                XRender::lazyPreLoad(GFXBlock[Block[A].Type]);
+                XRender::lazyPreLoad(GFXBlock[b.Type]);
         }
 
         for(int A = 1; A <= numNPCs; A++)
@@ -397,8 +403,8 @@ void UpdateGraphics(bool skipRepaint)
 //    int e2 = 0;
 //    int X = 0;
     int Y = 0;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
     Location_t tempLocation;
     int S = 0; // Level section to display
 
@@ -812,22 +818,46 @@ void UpdateGraphics(bool skipRepaint)
         tempLocation.Width = 32;
         tempLocation.Height = 32;
 
-        For(A, 1, sBlockNum) // Display sizable blocks
+        // save a vector of all the onscreen blocks for use at multiple places
+        TreeResult_Sentinel<BlockRef_t> screenBlocks = treeBlockQuery(
+            -vScreenX[Z], -vScreenY[Z],
+            -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
+            SORTMODE_ID);
+
+
+        // first gather all sizable blocks and sort them according to the special sizable ordering
+        static std::vector<BlockRef_t> screenSBlocks(32);
+        screenSBlocks.clear();
+
+        for(BlockRef_t b : screenBlocks)
+        {
+            if(BlockIsSizable[b->Type])
+                screenSBlocks.push_back(b);
+        }
+
+        // cross-ref the dead code at sorting.cpp:qSortSBlocks
+        std::stable_sort(screenSBlocks.begin(), screenSBlocks.end(),
+            [](BlockRef_t a, BlockRef_t b) {
+                return a->Location.Y < b->Location.Y;
+            });
+
+
+        for(Block_t& b : screenSBlocks) // Display sizable blocks
         {
             g_stats.checkedSzBlocks++;
-            if(BlockIsSizable[Block[sBlockArray[A]].Type] && (!Block[sBlockArray[A]].Invis || LevelEditor))
+            if(BlockIsSizable[b.Type] && (!b.Invis || LevelEditor))
             {
-                if(vScreenCollision(Z, Block[sBlockArray[A]].Location) && !Block[sBlockArray[A]].Hidden)
+                if(vScreenCollision(Z, b.Location) && !b.Hidden)
                 {
                     g_stats.renderedSzBlocks++;
-                    int bHeight = Block[sBlockArray[A]].Location.Height / 32.0;
+                    int bHeight = b.Location.Height / 32.0;
                     for(B = 0; B < bHeight; B++)
                     {
-                        int bWidth = Block[sBlockArray[A]].Location.Width / 32.0;
+                        int bWidth = b.Location.Width / 32.0;
                         for(C = 0; C < bWidth; C++)
                         {
-                            tempLocation.X = Block[sBlockArray[A]].Location.X + C * 32;
-                            tempLocation.Y = Block[sBlockArray[A]].Location.Y + B * 32;
+                            tempLocation.X = b.Location.X + C * 32;
+                            tempLocation.Y = b.Location.Y + B * 32;
                             if(vScreenCollision(Z, tempLocation))
                             {
                                 D = C;
@@ -835,7 +865,7 @@ void UpdateGraphics(bool skipRepaint)
 
                                 if(D != 0)
                                 {
-                                    if(fEqual(D, (Block[sBlockArray[A]].Location.Width / 32.0) - 1))
+                                    if(fEqual(D, (b.Location.Width / 32.0) - 1))
                                         D = 2;
                                     else
                                     {
@@ -847,22 +877,22 @@ void UpdateGraphics(bool skipRepaint)
 
                                 if(E != 0)
                                 {
-                                    if(fEqual(E, (Block[sBlockArray[A]].Location.Height / 32.0) - 1))
+                                    if(fEqual(E, (b.Location.Height / 32.0) - 1))
                                         E = 2;
                                     else
                                         E = 1;
                                 }
 #if 0 // Simplified below
-                                if((D == 0 || D == 2) || (E == 0 || E == 2) || (Block[sBlockArray[A]].Type == 130 && (D == 0 || D == 2) && E == 1))
+                                if((D == 0 || D == 2) || (E == 0 || E == 2) || (b.Type == 130 && (D == 0 || D == 2) && E == 1))
                                 {
-                                    XRender::renderTexture(vScreenX[Z] + Block[sBlockArray[A]].Location.X + C * 32, vScreenY[Z] + Block[sBlockArray[A]].Location.Y + B * 32, 32, 32, GFXBlockBMP[Block[sBlockArray[A]].Type], D * 32, E * 32);
+                                    XRender::renderTexture(vScreenX[Z] + b.Location.X + C * 32, vScreenY[Z] + b.Location.Y + B * 32, 32, 32, GFXBlockBMP[b.Type], D * 32, E * 32);
                                 }
                                 else
                                 {
-                                    XRender::renderTexture(vScreenX[Z] + Block[sBlockArray[A]].Location.X + C * 32, vScreenY[Z] + Block[sBlockArray[A]].Location.Y + B * 32, 32, 32, GFXBlockBMP[Block[sBlockArray[A]].Type], D * 32, E * 32);
+                                    XRender::renderTexture(vScreenX[Z] + b.Location.X + C * 32, vScreenY[Z] + b.Location.Y + B * 32, 32, 32, GFXBlockBMP[b.Type], D * 32, E * 32);
                                 }
 #endif
-                                XRender::renderTexture(vScreenX[Z] + Block[sBlockArray[A]].Location.X + C * 32, vScreenY[Z] + Block[sBlockArray[A]].Location.Y + B * 32, 32, 32, GFXBlockBMP[Block[sBlockArray[A]].Type], D * 32, E * 32);
+                                XRender::renderTexture(vScreenX[Z] + b.Location.X + C * 32, vScreenY[Z] + b.Location.Y + B * 32, 32, 32, GFXBlockBMP[b.Type], D * 32, E * 32);
                             }
                         }
                     }
@@ -1415,38 +1445,39 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
-        if(LevelEditor)
-        {
-            fBlock = 1;
-            lBlock = numBlock;
-        }
-        else
-        {
-            //fBlock = FirstBlock[int(-vScreenX[Z] / 32) - 1];
-            //lBlock = LastBlock[int((-vScreenX[Z] + vScreen[Z].Width) / 32) + 1];
-            blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
-        }
-
+//        if(LevelEditor)
+//        {
+//            fBlock = 1;
+//            lBlock = numBlock;
+//        }
+//        else
+//        {
+//            //fBlock = FirstBlock[int(-vScreenX[Z] / 32) - 1];
+//            //lBlock = LastBlock[int((-vScreenX[Z] + vScreen[Z].Width) / 32) + 1];
+//            blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
+//        }
 
 //        For A = fBlock To lBlock 'Non-Sizable Blocks
-        For(A, fBlock, lBlock)
+        for(Block_t* block_p : screenBlocks)
         {
+            auto &block = *block_p;
             g_stats.checkedBlocks++;
-            if(!BlockIsSizable[Block[A].Type] && (!Block[A].Invis || (LevelEditor && BlockFlash <= 30)) && Block[A].Type != 0 && !BlockKills[Block[A].Type])
+
+            if(!BlockIsSizable[block.Type] && (!block.Invis || (LevelEditor && BlockFlash <= 30)) && block.Type != 0 && !BlockKills[block.Type])
             {
-                if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
+                if(vScreenCollision(Z, block.Location) && !block.Hidden)
                 {
                     g_stats.renderedBlocks++;
                     // Don't show a visual difference of hit-resized block in a comparison to original state
-                    double offX = Block[A].wasShrinkResized ? 0.05 : 0.0;
-                    double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
-                    XRender::renderTexture(vScreenX[Z] + Block[A].Location.X - offX,
-                                          vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
-                                          Block[A].Location.Width + offW,
-                                          Block[A].Location.Height,
-                                          GFXBlock[Block[A].Type],
+                    double offX = block.wasShrinkResized ? 0.05 : 0.0;
+                    double offW = block.wasShrinkResized ? 0.1 : 0.0;
+                    XRender::renderTexture(vScreenX[Z] + block.Location.X - offX,
+                                          vScreenY[Z] + block.Location.Y + block.ShakeY3,
+                                          block.Location.Width + offW,
+                                          block.Location.Height,
+                                          GFXBlock[block.Type],
                                           0,
-                                          BlockFrame[Block[A].Type] * 32);
+                                          BlockFrame[block.Type] * 32);
                 }
             }
         }
@@ -2035,24 +2066,27 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-        for(A = fBlock; A <= lBlock; A++) // Blocks in Front
+        // Blocks in Front
+        for(Block_t* block_p : screenBlocks)
         {
+            auto &block = *block_p;
             g_stats.checkedBlocks++;
-            if(BlockKills[Block[A].Type])
+
+            if(BlockKills[block.Type])
             {
-                if(vScreenCollision(Z, Block[A].Location) && !Block[A].Hidden)
+                if(vScreenCollision(Z, block.Location) && !block.Hidden)
                 {
                     g_stats.renderedBlocks++;
                     // Don't show a visual difference of hit-resized block in a comparison to original state
-                    double offX = Block[A].wasShrinkResized ? 0.05 : 0.0;
-                    double offW = Block[A].wasShrinkResized ? 0.1 : 0.0;
-                    XRender::renderTexture(vScreenX[Z] + Block[A].Location.X - offX,
-                                          vScreenY[Z] + Block[A].Location.Y + Block[A].ShakeY3,
-                                          Block[A].Location.Width + offW,
-                                          Block[A].Location.Height,
-                                          GFXBlock[Block[A].Type],
+                    double offX = block.wasShrinkResized ? 0.05 : 0.0;
+                    double offW = block.wasShrinkResized ? 0.1 : 0.0;
+                    XRender::renderTexture(vScreenX[Z] + block.Location.X - offX,
+                                          vScreenY[Z] + block.Location.Y + block.ShakeY3,
+                                          block.Location.Width + offW,
+                                          block.Location.Height,
+                                          GFXBlock[block.Type],
                                           0,
-                                          BlockFrame[Block[A].Type] * 32);
+                                          BlockFrame[block.Type] * 32);
                 }
             }
         }

@@ -1,20 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="touchscreenControllerTypes">
-        <item>Always enable</item>
-        <item>Disable when hardware keyboard is plugged</item>
-        <item>Always disable</item>
+        <item>@string/touchscreenControllerType0</item>
+        <item>@string/touchscreenControllerType1</item>
+        <item>@string/touchscreenControllerType2</item>
     </string-array>
     <string-array name="touchscreenControllerTypesValues">
         <item>2</item>
         <item>1</item>
         <item>0</item>
     </string-array>
-
+    <string name="touchscreenControllerType0">Always enable</string>
+    <string name="touchscreenControllerType1">Disable when hardware keyboard is plugged</string>
+    <string name="touchscreenControllerType2">Always disable</string>
     <string-array name="speedRunModes">
-        <item>Off</item>
-        <item>Mode 1 (TheXTech native)</item>
-        <item>Mode 2 (Disable time-winning features)</item>
-        <item>Mode 3 (Strict SMBX 1.3, all bugs enabled)</item>
+        <item>@string/speedRunMode0</item>
+        <item>@string/speedRunMode1</item>
+        <item>@string/speedRunMode2</item>
+        <item>@string/speedRunMode3</item>
     </string-array>
     <string-array name="speedRunModesValues">
         <item>0</item>
@@ -22,29 +25,36 @@
         <item>2</item>
         <item>3</item>
     </string-array>
-
+    <string name="speedRunMode0">Off</string>
+    <string name="speedRunMode1">Mode 1 (TheXTech native)</string>
+    <string name="speedRunMode2">Mode 2 (Disable time-winning features)</string>
+    <string name="speedRunMode3">Mode 3 (Strict SMBX 1.3, all bugs enabled)</string>
     <string-array name="touchPadStyles">
-        <item>In-Game Actions</item>
-        <item>Nintendo/Xbox style (A/B/X/Y)</item>
-        <item>PlayStation style (X/O/D/A)</item>
+        <item>@string/touchPadStyle0</item>
+        <item>@string/touchPadStyle1</item>
+        <item>@string/touchPadStyle2</item>
     </string-array>
     <string-array name="touchPadStylesValues">
         <item>0</item>
         <item>1</item>
         <item>2</item>
     </string-array>
-
+    <string name="touchPadStyle0">In-Game Actions</string>
+    <string name="touchPadStyle1">Nintendo/Xbox style (A/B/X/Y)</string>
+    <string name="touchPadStyle2">PlayStation style (X/O/D/A</string>
     <string-array name="batteryStatusShow">
-        <item>Never show</item>
-        <item>Show when low battery</item>
-        <item>Show always</item>
+        <item>@string/batteryStatusShow0</item>
+        <item>@string/batteryStatusShow1</item>
+        <item>@string/batteryStatusShow2</item>
     </string-array>
     <string-array name="batteryStatusShowValues">
         <item>0</item>
         <item>2</item>
         <item>4</item>
     </string-array>
-
+    <string name="batteryStatusShow0">Never show</string>
+    <string name="batteryStatusShow1">Show when low battery</string>
+    <string name="batteryStatusShow2">Show always</string>
     <string-array name="feedBackStrength">
         <item>0.1</item>
         <item>0.2</item>
@@ -69,7 +79,6 @@
         <item>0.9</item>
         <item>1.0</item>
     </string-array>
-
     <string-array name="feedBackLength">
         <item>5</item>
         <item>6</item>

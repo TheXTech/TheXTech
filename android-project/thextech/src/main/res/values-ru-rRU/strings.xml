@@ -33,4 +33,10 @@
     <string name="cheat_dialog_ok">Исполнить</string>
     <string name="cheat_dialog_title">Введите команду:</string>
     <string name="cheat_dialog_cancel">Отмена</string>
+    <string name="launcher_gameSelect_clearList">Очистить список</string>
+    <string name="launcher_gameSelect_pickTheDir">Указать директорию...</string>
+    <string name="launcher_gameselect_toast_selected">Выбрана игра: %s</string>
+    <string name="launcher_gameselect_toast_listclean">Список игр очищен.</string>
+    <string name="launcher_gameselect_clearlist_title">Очистить список игр</string>
+    <string name="launcher_gameselect_clearlist_question">Вы действительно хотите очистить список игр?</string>
 </resources>

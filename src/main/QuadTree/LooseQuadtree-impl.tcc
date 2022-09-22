@@ -232,11 +232,11 @@ struct TreeNode
 {
     using Object = ObjectT;
     using ObjectContainer =
-        std::forward_list<Object *, BlocksAllocatorAdaptor<Object *>>;
+        std::forward_list<Object, BlocksAllocatorAdaptor<Object>>;
 
     TreeNode(BlocksAllocator &allocator) :
         top_left(nullptr), top_right(nullptr), bottom_right(nullptr),
-        bottom_left(nullptr), objects(BlocksAllocatorAdaptor<Object*>(allocator))
+        bottom_left(nullptr), objects(BlocksAllocatorAdaptor<Object>(allocator))
     {}
 
     TreeNode<Object> *top_left;
@@ -329,7 +329,7 @@ public:
     void Release();
     bool IsAvailable() const;
     bool EndOfQuery() const;
-    Object *GetCurrent() const;
+    Object GetCurrent() const;
     void Next();
 
 private:
@@ -366,10 +366,10 @@ public:
     Impl(const Impl &) = delete;
     Impl &operator=(const Impl &) = delete;
 
-    bool Insert(Object *object);
-    bool Update(Object *object);
-    bool Remove(Object *object);
-    bool Contains(Object *object) const;
+    bool Insert(Object object);
+    bool Update(Object object);
+    bool Remove(Object object);
+    bool Contains(Object object) const;
     Query QueryIntersectsRegion(const BoundingBox<Number> &region);
     Query QueryInsideRegion(const BoundingBox<Number> &region);
     Query QueryContainsRegion(const BoundingBox<Number> &region);
@@ -381,15 +381,15 @@ public:
 private:
     friend class Query::Impl;
     using ObjectPointerContainer =
-        std::unordered_map<Object *, Object **,
-        std::hash<Object *>, std::equal_to<Object *>,
-        detail::BlocksAllocatorAdaptor<std::pair<Object *const, Object **>>>;
+        std::unordered_map<Object, Object *,
+        std::hash<Object>, std::equal_to<Object>,
+        detail::BlocksAllocatorAdaptor<std::pair<Object const, Object *>>>;
     using QueryPoolContainer =
         std::deque<typename LooseQuadtree<Number, Object, BoundingBoxExtractor>::Query::Impl>;
 
     void RecalculateMaximalDepth();
     void DeleteTree();
-    Object **InsertIntoTree(Object *object);
+    Object *InsertIntoTree(Object object);
     typename Query::Impl *GetAvailableQueryFromPool();
 
     detail::BlocksAllocator allocator_;
@@ -693,7 +693,7 @@ EndOfQuery() const
 
 
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
-ObjectT *
+ObjectT
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Query::Impl::
 GetCurrent() const
 {
@@ -952,8 +952,8 @@ template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
 Impl() :
     root_(nullptr), bounding_box_(0, 0, 0, 0),
-    object_pointers_(64, std::hash<Object*>(), std::equal_to<Object*>(),
-                     detail::BlocksAllocatorAdaptor<std::pair<const Object *, Object * *>>(allocator_)),
+    object_pointers_(64, std::hash<Object>(), std::equal_to<Object>(),
+                     detail::BlocksAllocatorAdaptor<std::pair<const Object, Object *>>(allocator_)),
     number_of_objects_(0), maximal_depth_(kInternalMinDepth),
     running_queries_(0)
 {
@@ -971,10 +971,10 @@ LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 bool
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
-Insert(Object *object)
+Insert(Object object)
 {
     bool was_removed = Remove(object);
-    Object **place = InsertIntoTree(object);
+    Object *place = InsertIntoTree(object);
     object_pointers_.emplace(object, place);
     number_of_objects_++;
     RecalculateMaximalDepth();
@@ -984,7 +984,7 @@ Insert(Object *object)
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 bool
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
-Update(Object *object)
+Update(Object object)
 {
     return !Insert(object);
 }
@@ -992,7 +992,7 @@ Update(Object *object)
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 bool
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
-Remove(Object *object)
+Remove(Object object)
 {
     auto it = object_pointers_.find(object);
     if(it != object_pointers_.end())
@@ -1010,7 +1010,7 @@ Remove(Object *object)
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 bool
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
-Contains(Object *object) const
+Contains(Object object) const
 {
     return object_pointers_.find(object) != object_pointers_.end();
 }
@@ -1165,9 +1165,9 @@ DeleteTree()
 }
 
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
-ObjectT **
+ObjectT *
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Impl::
-InsertIntoTree(Object *object)
+InsertIntoTree(Object object)
 {
     BoundingBox<Number> object_bounds(0, 0, 0, 0);
     BoundingBoxExtractor::ExtractBoundingBox(object, &object_bounds);
@@ -1353,7 +1353,7 @@ GetAvailableQueryFromPool() -> typename Query::Impl *
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 bool
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::
-Insert(Object *object)
+Insert(Object object)
 {
     return impl_.Insert(object);
 }
@@ -1361,7 +1361,7 @@ Insert(Object *object)
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 bool
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::
-Update(Object *object)
+Update(Object object)
 {
     return impl_.Update(object);
 }
@@ -1369,7 +1369,7 @@ Update(Object *object)
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 bool
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::
-Remove(Object *object)
+Remove(Object object)
 {
     return impl_.Remove(object);
 }
@@ -1377,7 +1377,7 @@ Remove(Object *object)
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
 bool
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::
-Contains(Object *object) const
+Contains(Object object) const
 {
     return impl_.Contains(object);
 }
@@ -1496,7 +1496,7 @@ EndOfQuery() const
 
 
 template <typename NumberT, typename ObjectT, typename BoundingBoxExtractorT>
-ObjectT *
+ObjectT
 LooseQuadtree<NumberT, ObjectT, BoundingBoxExtractorT>::Query::
 GetCurrent() const
 {

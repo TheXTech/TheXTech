@@ -26,11 +26,11 @@
 #include "../sound.h"
 #include "../config.h"
 #include "../video.h"
+#include "../core/render.h"
 #include "../controls.h"
 
 #include "speedrunner.h"
 #include "presetup.h"
-#include "record.h"
 
 #include <Utils/files.h>
 #include <Utils/strings.h>
@@ -114,6 +114,8 @@ void OpenConfig_preSetup()
 
     std::string configPath = AppPathManager::settingsFileSTD();
 
+    InitSoundDefaults();
+
     if(Files::fileExists(configPath))
     {
         IniProcessing config(configPath);
@@ -132,10 +134,11 @@ void OpenConfig_preSetup()
 
         config.beginGroup("sound");
         config.read("disable-sound", g_audioSetup.disableSound, false);
-        config.read("sample-rate", g_audioSetup.sampleRate, 44100);
-        config.read("channels", g_audioSetup.channels, 2);
-        config.readEnum("format", g_audioSetup.format, (uint16_t)AUDIO_F32, sampleFormats);
-        config.read("buffer-size", g_audioSetup.bufferSize, 512);
+        // Defaults for audio setum at sounds.cpp, at g_audioDefaults
+        config.read("sample-rate", g_audioSetup.sampleRate, g_audioDefaults.sampleRate);
+        config.read("channels", g_audioSetup.channels, g_audioDefaults.channels);
+        config.readEnum("format", g_audioSetup.format, g_audioDefaults.format, sampleFormats);
+        config.read("buffer-size", g_audioSetup.bufferSize, g_audioDefaults.bufferSize);
         config.endGroup();
 
         config.beginGroup("gameplay");
@@ -261,7 +264,7 @@ void SaveConfig()
 
     config.beginGroup("main");
     config.setValue("release", curRelease);
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__) // Don't remember fullscreen state for Emscripten!
+#if !defined(RENDER_FULLSCREEN_ALWAYS) // Don't remember fullscreen
     config.setValue("full-screen", resChanged);
 #endif
     config.setValue("record-gameplay", g_config.RecordGameplayData);

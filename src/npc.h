@@ -72,4 +72,6 @@ void CharStuff(int WhatNPC = 0, bool CheckEggs = false);
 // Public Function RandomBonus()
 int RandomBonus();
 
+bool npcHasFloor(const struct NPC_t &npc);
+
 #endif // NPC_H

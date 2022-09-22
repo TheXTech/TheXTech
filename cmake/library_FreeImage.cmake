@@ -2,12 +2,20 @@
 
 add_library(PGE_FreeImage INTERFACE)
 
+if(NINTENDO_SWITCH)
+    set(USE_FREEIMAGE_SYSTEM_LIBS_DEFAULT ON)
+    set(USE_PNG_HARDWARE_OPTIMIZATIONS_DEFAULT OFF)
+else()
+    set(USE_FREEIMAGE_SYSTEM_LIBS_DEFAULT OFF)
+    set(USE_PNG_HARDWARE_OPTIMIZATIONS_DEFAULT ON)
+endif()
+
 option(USE_SHARED_FREEIMAGE "Use shared build of FreeImage" OFF)
-option(USE_FREEIMAGE_SYSTEM_LIBS "Let FreeImage to use libPNG and libJPEG from the system" OFF)
-option(USE_PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations for the FreeImage internal build of libPNG" ON)
+option(USE_FREEIMAGE_SYSTEM_LIBS "Let FreeImage to use libPNG and libJPEG from the system" ${USE_FREEIMAGE_SYSTEM_LIBS_DEFAULT})
+option(USE_PNG_HARDWARE_OPTIMIZATIONS "Enable hardware optimizations for the FreeImage internal build of libPNG" ${USE_PNG_HARDWARE_OPTIMIZATIONS_DEFAULT})
 option(FREEIMAGE_PIC "Enable -fPIC flag for libFreeImage" ON)
 
-if(VITA)
+if(VITA OR NINTENDO_SWITCH)
     set(FREEIMAGE_PIC OFF)
 endif()
 

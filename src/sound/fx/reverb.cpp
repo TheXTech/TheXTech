@@ -551,7 +551,7 @@ private:
 };
 
 
-struct FxReverb
+typedef struct FxReverb
 {
     int         channels = 0;
     int         sampleRate = 0;
@@ -741,7 +741,7 @@ struct FxReverb
             }
         }
     }
-};
+} FxReverb;
 
 
 FxReverb* reverbEffectInit(int rate, uint16_t format, int channels)

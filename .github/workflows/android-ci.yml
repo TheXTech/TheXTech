@@ -3,12 +3,12 @@ name: Android CI
 on:
   push:
     branches:
-      - master
+      - main
       - devel
       - versus-ci-android
   pull_request:
     branches:
-      - master
+      - main
 
 defaults:
   run:
@@ -19,6 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     name: Build release-apk
     steps:
+      - uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          workflow_id: android-ci.yml
+          all_but_latest: true
+          access_token: ${{ github.token }}
+
       - uses: actions/checkout@v2
 
       - name: Set output

@@ -1135,7 +1135,7 @@ void UpdateLayers()
     // this is mainly for moving layers
     int A = 0;
     int B = 0;
-    int C = 0;
+    // int C = 0;
 
     bool FreezeLayers = false;
 
@@ -1193,9 +1193,20 @@ void UpdateLayers()
                     {
                         if(BackgroundFence[Background[B].Type])
                         {
-                            // @Wohlstand, should this be 0?
-                            Background[B].Location.SpeedX = double(Layer[A].SpeedX);
-                            Background[B].Location.SpeedY = double(Layer[A].SpeedY);
+                            Background[B].Location.SpeedX = 0;
+                            Background[B].Location.SpeedY = 0;
+                        }
+                    }
+                }
+
+                if(g_compatibility.enable_climb_bgo_layer_move)
+                {
+                    for(int B : Layer[A].NPCs)
+                    {
+                        if(NPC[B].Type == 91 || NPC[B].Type == 211 || NPCIsAVine[NPC[B].Type])
+                        {
+                            NPC[B].Location.SpeedX = 0;
+                            NPC[B].Location.SpeedY = 0;
                         }
                     }
                 }
@@ -1209,16 +1220,12 @@ void UpdateLayers()
                 Layer[A].OffsetX += double(Layer[A].SpeedX);
                 Layer[A].OffsetY += double(Layer[A].SpeedY);
 
+                // no longer needed thanks to block quadtree, but used to reproduce some buggy behaviors
                 // move the sort invalidation out of the loop over blocks
-                if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f)
+                if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f && g_compatibility.emulate_classic_block_order)
                 {
                     if(BlocksSorted)
                     {
-                        for(C = (int)(-FLBlocks); C <= FLBlocks; C++)
-                        {
-                            FirstBlock[C] = 1;
-                            LastBlock[C] = numBlock;
-                        }
                         BlocksSorted = false;
                     }
                 }
@@ -1310,7 +1317,7 @@ void UpdateLayers()
 
                             if(!NPC[B].Active)
                             {
-                                if(NPC[B].AttLayer != LAYER_NONE)
+                                if(NPC[B].AttLayer != LAYER_NONE && NPC[B].AttLayer != LAYER_DEFAULT)
                                 {
                                     Layer[NPC[B].AttLayer].SpeedX = Layer[A].SpeedX;
                                     Layer[NPC[B].AttLayer].SpeedY = Layer[A].SpeedY;
@@ -1354,7 +1361,7 @@ void syncLayersTrees_Block(int block)
         if(layer != Block[block].Layer)
         {
             Layer[layer].blocks.erase(block);
-            // treeBlockRemoveLayer(layer, &Block[block]);
+            treeBlockRemoveLayer(layer, &Block[block]);
         }
     }
     int layer = Block[block].Layer;
@@ -1365,25 +1372,25 @@ void syncLayersTrees_Block(int block)
             Block[block].LocationInLayer = Block[block].Location;
             Block[block].LocationInLayer.X = Block[block].Location.X - Layer[layer].OffsetX;
             Block[block].LocationInLayer.Y = Block[block].Location.Y - Layer[layer].OffsetY;
-            // treeBlockAddLayer(layer, &Block[block]);
+            treeBlockAddLayer(layer, &Block[block]);
             Layer[layer].blocks.insert(block);
         }
         else
         {
             Block[block].LocationInLayer = Block[block].Location;
-            // treeBlockAddLayer(-1, &Block[block]);
+            treeBlockAddLayer(LAYER_NONE, &Block[block]);
         }
     }
     else
     {
         if(layer != LAYER_NONE)
         {
-            // treeBlockRemoveLayer(layer, &Block[block]);
+            treeBlockRemoveLayer(layer, &Block[block]);
             Layer[layer].blocks.erase(block);
         }
         else
         {
-            // treeBlockRemoveLayer(-1, &Block[block]);
+            treeBlockRemoveLayer(LAYER_NONE, &Block[block]);
         }
     }
 }

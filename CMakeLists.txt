@@ -13,7 +13,7 @@ include(TestBigEndian)
 include(cmake/git_info.cmake)
 message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
 
-if(NOT WIN32 AND (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX))
+if(NOT WIN32 AND NOT NINTENDO_SWITCH AND (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX))
     check_cxx_compiler_flag("-no-pie" HAS_NO_PIE)
 endif()
 
@@ -93,6 +93,10 @@ configure_file(lib/CrashHandler/backtrace.h.in
                generated-include/lib/CrashHandler/backtrace.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated-include)
 
+if(NINTENDO_SWITCH)
+    include_directories($ENV{DEVKITPRO}/portlibs/switch/include)
+endif()
+
 #if(WIN32 OR EMSCRIPTEN OR HAIKU)
 #    set(USE_SYSTEM_LIBS_DEFAULT OFF)
 #else()
@@ -100,7 +104,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated-include)
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU OR VITA)
+if(HAIKU OR VITA OR NINTENDO_SWITCH)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
@@ -174,6 +178,13 @@ if(VITA)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
 endif()
 
+if(NINTENDO_SWITCH)
+    message("Enabling Nintendo Switch Support and fast-math flags.")
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -DNINTENDO_SWITCH -D__SWITCH__")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -DNINTENDO_SWITCH -D__SWITCH__")
+endif()
+
 # ============ Customization ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
@@ -188,7 +199,7 @@ endif()
 include(lib/Allocator/pool-allocator.cmake)
 include(lib/DirManager/dirman.cmake)
 
-if(NOT VITA)
+if(NOT VITA AND NOT NINTENDO_SWITCH)
     include(lib/FileMapper/FileMapper.cmake)
 endif()
 
@@ -226,11 +237,14 @@ if(EMSCRIPTEN)
     if(CMAKE_BUILD_TYPE_LOWER STREQUAL "debug")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s ASSERTIONS=1")
     endif()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -s USE_SDL=0")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=0")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s \"DEFAULT_LIBRARY_FUNCS_TO_INCLUDE=['\\$autoResumeAudioContext', '\\$dynCall']\"") #-s USE_SDL=2
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s LLD_REPORT_UNDEFINED -s ERROR_ON_UNDEFINED_SYMBOLS=1 -s ASYNCIFY=1 -lidbfs.js")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s \"EXPORTED_FUNCTIONS=['_main', '_unlockLoadingCustomState']\"")
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s 'BINARYEN_TRAP_MODE=\"clamp\"'")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s TOTAL_MEMORY=83886080 --no-heap-copy -s ALLOW_MEMORY_GROWTH=1")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s EXPORTED_RUNTIME_METHODS=ccall")
 #    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s \"EXTRA_EXPORTED_RUNTIME_METHODS=['Pointer_stringify']\"")
 #    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file \"${_LANGAUGES_TEMP_FOLDER}\"@\"languages/\"")
 #    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file \"${PGE_PRELOAD_CONFIG_PACK}\"@\"configs/${PGE_PRELOAD_CONFIG_PACK_NAME}/\"")
@@ -308,7 +322,7 @@ set(LIB_SRC
     ${LIB_SRC_EXTRA}
 )
 
-if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT VITA AND NOT 3DS)
+if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT VITA AND NOT 3DS AND NOT NINTENDO_SWITCH)
     list(APPEND LIB_SRC
         lib/InterProcess/editor_pipe.cpp
         lib/InterProcess/intproc.cpp
@@ -492,6 +506,8 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/CrashHandler/*.h
     lib/Graphics/*.h
     lib/InterProcess/*.h
+    lib/tclap/*.h
+    lib/fmt/*.h
     src/*.h
     src/*.hpp
     src/script/*.h
@@ -505,6 +521,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/main/*.h
     src/main/QuadTree/*.h
     src/sound/fx/*.h
+    src/sound/fx/*.hpp
     src/fontman/*.h
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
@@ -624,6 +641,13 @@ if(ANDROID)
     target_link_libraries(A2XT_Int INTERFACE log)
 endif()
 
+if(NINTENDO_SWITCH)
+    target_link_libraries(A2XT_Int INTERFACE nx)
+
+    # Set explicit flags for this project
+    target_compile_definitions(thextech PRIVATE -D__SWITCH__ -DNO_INTPTROC)
+endif()
+
 if(VITA)
     # Link Vita specific libraries to the generic interface.
     target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS})
@@ -701,7 +725,7 @@ endif()
 test_big_endian(THEXTECH_IS_BIG_ENDIAN)
 if(THEXTECH_IS_BIG_ENDIAN)
     message("== Target processor endianess: BIG ENDIAN")
-    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BIG_ENDIAN)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BIG_ENDIAN -DSOUND_FX_BIG_ENDIAN)
 else()
     message("== Target processor endianess: LITTLE ENDIAN")
 endif()
@@ -787,6 +811,8 @@ elseif(WIN32)
     install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
 elseif(VITA)
     include(cmake/package_vita.cmake)
+elseif(NINTENDO_SWITCH)
+    include(cmake/package_switch.cmake)
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

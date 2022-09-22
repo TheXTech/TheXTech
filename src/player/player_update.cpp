@@ -52,8 +52,8 @@ void UpdatePlayer()
     float D = 0;
 //    Controls_t blankControls;
     float speedVar = 0; // adjusts the players speed by percentages
-    int64_t fBlock = 0; // for collision detection optimizations
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0; // for collision detection optimizations
+    // int64_t lBlock = 0;
     double tempSpeed = 0;
     int HitSpot = 0;
     // the hitspot is used for collision detection to find out where to put the player after it collides with a block
@@ -497,10 +497,11 @@ void UpdatePlayer()
                         tempLocation.X += 64 - tempLocation.Width / 2.0;
                         // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                         // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                        blockTileGet(tempLocation, fBlock, lBlock);
+                        // blockTileGet(tempLocation, fBlock, lBlock);
 
-                        for(B = (int)fBlock; B <= lBlock; B++)
+                        for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
                         {
+                            B = block - &Block[1] + 1;
                             if(!Block[B].Invis && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type] &&
                                !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                             {
@@ -508,18 +509,22 @@ void UpdatePlayer()
                                 {
                                     tempBool = false;
                                     PlaySound(SFX_BlockHit);
+                                    break;
                                 }
                             }
                         }
 
                         for(int numNPCsMax2 = numNPCs, B = 1; B <= numNPCsMax2; B++)
                         {
+                            if(!tempBool)
+                                break;
                             if(NPCIsABlock[NPC[B].Type] && !NPCStandsOnPlayer[NPC[B].Type] && NPC[B].Active && NPC[B].Type != 56)
                             {
                                 if(CheckCollision(tempLocation, NPC[B].Location))
                                 {
                                     tempBool = false;
                                     PlaySound(SFX_BlockHit);
+                                    break;
                                 }
                             }
                         }
@@ -1491,7 +1496,7 @@ void UpdatePlayer()
 
                         // START ALT JUMP - this code does the player's spin jump
                         if(Player[A].Controls.AltJump && (Player[A].Character == 1 || Player[A].Character == 2 || Player[A].Character == 4 ||
-                                                          (g_compatibility.fix_peach_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf)))
+                                                          (g_compatibility.fix_char3_escape_shell_surf && Player[A].Character == 3 && Player[A].ShellSurf)))
                         {
                             if(Player[A].Location.SpeedX > 0)
                                 tempSpeed = Player[A].Location.SpeedX * 0.2;
@@ -1782,8 +1787,8 @@ void UpdatePlayer()
                 {
                     if(Player[A].State == 4 || Player[A].State == 5)
                     {
-                        bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
-                                           !g_compatibility.fix_link_clowncar_fairy;
+                        bool hasNoMonts = (g_compatibility.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
+                                           !g_compatibility.fix_char5_vehicle_climb;
 
                         bool turnFairy = Player[A].FlyCount > 0 ||
                                         ((Player[A].Controls.AltJump || (Player[A].Controls.Jump && Player[A].FloatRelease)) &&
@@ -1886,8 +1891,10 @@ void UpdatePlayer()
                                     Player[A].FireBallCD2 = 25;
                                 if(Player[A].State == 6)
                                     PlaySound(SFX_ZeldaSwordBeam);
+                                if(Player[A].State == 7)
+                                    PlaySound(SFX_ZeldaIce);
                                 else
-                                    PlaySound(SFX_ZeldaFire);
+                                    PlaySound(SFX_ZeldaFireRod);
 
                                 numNPCs++;
                                 NPC[numNPCs] = NPC_t();
@@ -2152,10 +2159,11 @@ void UpdatePlayer()
                 // block collision optimization
                 // fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
                 // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
-                blockTileGet(Player[A].Location, fBlock, lBlock);
+                // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                for(B = (int)fBlock; B <= lBlock; B++)
+                for(Block_t* block : treeBlockQuery(Player[A].Location, SORTMODE_COMPAT))
                 {
+                    B = block - &Block[1] + 1;
 
                     // checks to see if a collision happened
                     if(Player[A].Location.X + Player[A].Location.Width >= Block[B].Location.X)
@@ -2680,12 +2688,18 @@ void UpdatePlayer()
                                                 tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height;
                                                 tempLocation.Height = 0.1;
                                                 tempBool = false;
+
+                                                // this could have caused an unusual TheXTech bug where lBlock would get overwritten
+                                                // (this wouldn't affect VB6 because loop bounds are evaluated only on loop start)
+
                                                 // fBlock = FirstBlock[(tempLocation.X / 32) - 1];
                                                 // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
-                                                blockTileGet(tempLocation, fBlock, lBlock);
+                                                // blockTileGet(tempLocation, fBlock, lBlock);
 
-                                                for(auto C = fBlock; C <= lBlock; C++)
+                                                for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
                                                 {
+                                                    int C = block - &Block[1] + 1;
+
                                                     if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
                                                     {
                                                         if(BlockSlope[Block[C].Type] == 0)
@@ -3117,8 +3131,8 @@ void UpdatePlayer()
                             {
                                 if(Player[A].Character == 5)
                                 {
-                                    bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
-                                                       !g_compatibility.fix_link_clowncar_fairy;
+                                    bool hasNoMonts = (g_compatibility.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
+                                                       !g_compatibility.fix_char5_vehicle_climb;
                                     if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                     {
                                         Player[A].FairyCD = 0;
@@ -3470,8 +3484,8 @@ void UpdatePlayer()
                                     {
                                         if(Player[A].Character == 5)
                                         {
-                                            bool hasNoMonts = (g_compatibility.fix_link_clowncar_fairy && Player[A].Mount <= 0) ||
-                                                               !g_compatibility.fix_link_clowncar_fairy;
+                                            bool hasNoMonts = (g_compatibility.fix_char5_vehicle_climb && Player[A].Mount <= 0) ||
+                                                               !g_compatibility.fix_char5_vehicle_climb;
                                             if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                             {
                                                 Player[A].FairyCD = 0;
@@ -3906,14 +3920,18 @@ void UpdatePlayer()
 
                                                     // fBlock = FirstBlock[(Player[A].Location.X / 32) - 1];
                                                     // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
-                                                    blockTileGet(Player[A].Location, fBlock, lBlock);
+                                                    // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                                                    for(auto C = fBlock; C <= lBlock; C++)
+                                                    for(Block_t* block : treeBlockQuery(Player[A].Location, SORTMODE_NONE))
                                                     {
+                                                        int C = block - &Block[1] + 1;
                                                         if(CheckCollision(Player[A].Location, Block[C].Location) &&
                                                            !Block[C].Hidden && !BlockIsSizable[Block[C].Type] &&
                                                            !BlockOnlyHitspot1[Block[C].Type])
+                                                        {
                                                             Player[A].Location = tempLocation;
+                                                            break;
+                                                        }
                                                     }
 
                                                     PlaySound(SFX_BlockHit);
@@ -4226,7 +4244,7 @@ void UpdatePlayer()
                        (Player[A].HoldingNPC == 0 || Player[A].Character == 5))
                     {
                         UnDuck(Player[A]);
-                        if(g_compatibility.fix_link_clowncar_fairy && Player[A].Fairy) // Avoid the mortal glitch
+                        if(g_compatibility.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
                         {
                             Player[A].Fairy = false;
                             PlaySound(SFX_ZeldaFairy);

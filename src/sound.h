@@ -24,8 +24,6 @@
 
 #include <string>
 
-#include "global_constants.h"
-
 // Public musicPlaying As Boolean
 extern bool musicPlaying;
 // Public musicLoop As Integer
@@ -34,6 +32,14 @@ extern int musicLoop;
 extern std::string musicName;
 
 extern int playerHammerSFX;
+
+extern const struct AudioDefaults_t
+{
+    int sampleRate;
+    int channels;
+    int bufferSize;
+    uint16_t format;
+} g_audioDefaults;
 
 extern struct AudioSetup_t
 {
@@ -146,10 +152,18 @@ enum
     SFX_Freeze,
     SFX_Icebreak,
     SFX_PlayerHammer, // Reserved
-    SFX_SproutVine
+    SFX_SproutVine,
+    SFX_LarryShell,
+    SFX_LarryKilled = 100,
+    SFX_LudwigKilled,
+    SFX_ZeldaIce,
+    SFX_ZeldaFireRod,
+    SFX_FlameThrower
 };
 
 int CustomWorldMusicId();
+
+void InitSoundDefaults();
 
 // Public Sub InitMixerX()
 void InitMixerX();
@@ -176,6 +190,8 @@ bool delayMusicIsSet();
 // play music
 void StartMusic(int A, int fadeInMs = 0);
 // Public Sub StopMusic() 'stop playing music
+void PauseMusic();
+void ResumeMusic();
 // stop playing music
 void StopMusic();
 // Public Sub PlayInitSound()
@@ -186,6 +202,8 @@ void InitSound();
 // Public Sub PlaySound(A As Integer) 'play a sound
 // play a sound
 void PlaySound(int A, int loops = 0, int volume = 128);
+// Check does sound is defined at sounds.ini
+bool HasSound(int A);
 void PlaySoundMenu(int A, int loops = 0);
 // Public Sub BlockSound() 'stops all sound from being played for 10 cycles
 // stops all sound from being played for 10 cycles

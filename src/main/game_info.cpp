@@ -117,10 +117,12 @@ void initGameInfo()
         }
         config.endGroup();
 
-        config.beginGroup("death-counter");
+        if(!config.beginGroup("fails-counter"))
+            config.beginGroup("death-counter"); // Backup fallback
         {
             config.read("enabled", gEnableDemoCounter, false);
-            config.read("title", gDemoCounterTitle, "DEMOS");
+            config.read("title", gDemoCounterTitleDefault, "DEMOS");
+            gDemoCounterTitle = gDemoCounterTitleDefault;
         }
         config.endGroup();
 

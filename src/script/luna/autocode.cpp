@@ -52,6 +52,8 @@
 #include "lunacounter.h"
 #include "renderop_string.h"
 #include "mememu.h"
+#include "compat.h"
+#include "main/speedrunner.h"
 
 
 static FIELDTYPE StrToFieldtype(std::string string)
@@ -456,6 +458,20 @@ void Autocode::Do(bool init)
             break;
         }
 
+        case AT_IfCompatMode:
+        {
+            if(CheckConditionI(CompatGetLevel(), (int)Param2, (COMPARETYPE)(int)Param1))
+                gAutoMan.ActivateCustomEvents(0, (int)Param3);
+            break;
+        }
+
+        case AT_IfSpeedRunMode:
+        {
+            if(CheckConditionI(g_speedRunnerMode, (int)Param2, (COMPARETYPE)(int)Param1))
+                gAutoMan.ActivateCustomEvents(0, (int)Param3);
+            break;
+        }
+
         case AT_TriggerRandom:
         {
             int choice = iRand2(4);
@@ -702,27 +718,9 @@ void Autocode::Do(bool init)
                 varval = gAutoMan.m_UserVars[GetS(MyString)];
 
             // Check if the value meets the criteria and activate event if so
-            switch((COMPARETYPE)(int)Param1)
-            {
-            case CMPT_EQUALS:
-                if(varval == Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            case CMPT_GREATER:
-                if(varval > Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            case CMPT_LESS:
-                if(varval < Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            case CMPT_NOTEQ:
-                if(varval != Param2)
-                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                break;
-            default:
-                break;
-            }
+            if(CheckConditionD(varval, Param2, (COMPARETYPE)(int)Param1))
+                gAutoMan.ActivateCustomEvents(0, (int)Param3);
+
             break;
         }
 
@@ -731,36 +729,14 @@ void Autocode::Do(bool init)
             if(ReferenceOK())
             {
                 auto compare_type = (COMPARETYPE)(int)Param1;
-                // if(true)
-                //{
                 InitIfMissing(&gAutoMan.m_UserVars, GetS(MyString), 0);
                 InitIfMissing(&gAutoMan.m_UserVars, GetS(MyRef), 0);
 
                 double var1 = gAutoMan.m_UserVars[GetS(MyRef)];
                 double var2 = gAutoMan.m_UserVars[GetS(MyString)];
 
-                switch(compare_type)
-                {
-                case CMPT_EQUALS:
-                    if(var1 == var2)
-                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                    break;
-                case CMPT_GREATER:
-                    if(var1 > var2)
-                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                    break;
-                case CMPT_LESS:
-                    if(var1 < var2)
-                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                    break;
-                case CMPT_NOTEQ:
-                    if(var1 != var2)
-                        gAutoMan.ActivateCustomEvents(0, (int)Param3);
-                    break;
-                default:
-                    break;
-                }
-                //}
+                if(CheckConditionD(var1, var2, compare_type))
+                    gAutoMan.ActivateCustomEvents(0, (int)Param3);
             }
             break;
         }
@@ -865,6 +841,16 @@ void Autocode::Do(bool init)
         {
             //wchar_t* dbg = L"ClearInputString debug";
             cheats_clearBuffer();
+            break;
+        }
+
+        case AT_RunCheat:
+        {
+            if(this->Length <= 1) // Play once when delay runs out
+            {
+                cheats_setBuffer(GetS(MyString));
+                this->expire();
+            }
             break;
         }
 
@@ -1347,6 +1333,60 @@ bool Autocode::NPCConditional(int target, int cond)
     }
 }
 
+bool Autocode::CheckConditionI(int value1, int value2, COMPARETYPE cond)
+{
+    switch(cond)
+    {
+    case CMPT_EQUALS:
+        if(value1 == value2)
+            return true;
+        break;
+    case CMPT_GREATER:
+        if(value1 > value2)
+            return true;
+        break;
+    case CMPT_LESS:
+        if(value1 < value2)
+            return true;
+        break;
+    case CMPT_NOTEQ:
+        if(value1 != value2)
+            return true;
+        break;
+    default:
+        break;
+    }
+
+    return false;
+}
+
+bool Autocode::CheckConditionD(double value1, double value2, COMPARETYPE cond)
+{
+    switch(cond)
+    {
+    case CMPT_EQUALS:
+        if(fEqual(value1, value2))
+            return true;
+        break;
+    case CMPT_GREATER:
+        if(value1 > value2)
+            return true;
+        break;
+    case CMPT_LESS:
+        if(value1 < value2)
+            return true;
+        break;
+    case CMPT_NOTEQ:
+        if(!fEqual(value1, value2))
+            return true;
+        break;
+    default:
+        break;
+    }
+
+    return false;
+}
+
 // RUN SELF OPTION
 void Autocode::RunSelfOption()
 {
@@ -1497,6 +1537,8 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"Timer", AT_Timer},
     {"IfNPC", AT_IfNPC},
     {"BlockTrigger", AT_BlockTrigger},
+    {"IfCompatMode", AT_IfCompatMode},
+    {"IfSpeedRunMode", AT_IfSpeedRunMode},
     {"TriggerRandom", AT_TriggerRandom},
     {"TriggerRandomRange", AT_TriggerRandomRange},
     {"TriggerZone", AT_TriggerZone},
@@ -1505,6 +1547,7 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
     {"OnCustomCheat", AT_OnCustomCheat},
     {"OnPlayerMem", AT_OnPlayerMem},
     {"OnGlobalMem", AT_OnGlobalMem},
+    {"RunCheat", AT_RunCheat},
 
     {"SetVar", AT_SetVar},
     {"LoadPlayerVar", AT_LoadPlayerVar},

@@ -52,7 +52,6 @@
 #include "load_gfx.h"
 #include "player.h"
 #include "sound.h"
-#include "video.h"
 #include "editor.h"
 #include "editor/new_editor.h"
 #include "custom.h"
@@ -333,7 +332,19 @@ int GameMain(const CmdLineSetup_t &setup)
         GrabAll = setup.testGrabAll;
 
         editorScreen.ResetCursor();
-        zTestLevel(setup.testMagicHand, setup.interprocess);
+
+        if(setup.testReplay.empty() && setup.testEditor)
+        {
+            editorScreen.active = false;
+            MouseRelease = false;
+            LevelEditor = true;
+            OpenLevel(FullFileName);
+            EditorBackup();
+        }
+        else
+        {
+            zTestLevel(setup.testMagicHand, setup.interprocess);
+        }
     }
 
     do
@@ -918,10 +929,9 @@ int GameMain(const CmdLineSetup_t &setup)
 
             speedRun_triggerEnter();
 
+            clearScreenFaders(); // Reset all faders
             if(g_config.EnableInterLevelFade)
                 g_levelScreenFader.setupFader(2, 65, 0, ScreenFader::S_FADE);
-            else
-                clearScreenFaders();
 
             lunaLoad();
 
@@ -1269,6 +1279,7 @@ void UpdateMacro()
                     XEvents::doEvents();
 
                 speedRun_tick();
+                Controls::Update();
                 UpdateGraphics();
                 UpdateSound();
                 BlockFrames();
@@ -1500,7 +1511,7 @@ void CheckActive()
 {
     // It's useless on Emscripten as no way to check activity (or just differently)
     // and on Android as it has built-in application pauser
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+#if !defined(NO_WINDOW_FOCUS_TRACKING)
 //    bool MusicPaused = false;
     bool focusLost = false;
 
@@ -1904,6 +1915,8 @@ void DeleteSave(int world, int save)
 
     AddFile("save{0}.savx");
     AddFile("timers{0}.ini");
+    AddFile("deaths-{0}.rip");
+    AddFile("fails-{0}.rip");
     AddFile("demos-{0}.dmo");
     // Old gamesaves
     AddFileW("save{0}.savx");
@@ -1966,6 +1979,8 @@ void CopySave(int world, int src, int dst)
     Files::copyFile(savePathDst, savePathSrc, true);
 
     copySaveFile(w, "timers{0}.ini", src, dst);
+    copySaveFile(w, "fails-{0}.rip", src, dst);
+    copySaveFile(w, "deaths-{0}.rip", src, dst);
     copySaveFile(w, "demos-{0}.dmo", src, dst);
 
 #ifdef __EMSCRIPTEN__

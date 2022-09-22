@@ -97,8 +97,8 @@ bool NoMap = false;
 bool RestartLevel = false;
 int WorldStarsShowPolicy = -1;
 float LevelChop[maxSections + 1];
-RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
-RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
+// RangeArr<int, -FLBlocks, FLBlocks> FirstBlock;
+// RangeArr<int, -FLBlocks, FLBlocks> LastBlock;
 int MidBackground = 1;
 int LastBackground = 1;
 int iBlocks = 0;
@@ -229,8 +229,11 @@ RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrame;
 RangeArrI<int, 1, maxBackgroundType, 0> BackgroundFrameCount;
 RangeArrI<int, 1, maxBlockType, 0> BlockFrame;
 RangeArrI<int, 1, maxBlockType, 0> BlockFrame2;
-RangeArrI<int, 1, 1000, 0> sBlockArray;
-int sBlockNum = 0;
+
+// deprecated
+// RangeArrI<int, 1, 1000, 0> sBlockArray;
+// int sBlockNum = 0;
+
 RangeArrI<int, 1, maxSceneType, 0> SceneFrame;
 RangeArrI<int, 1, maxSceneType, 0> SceneFrame2;
 RangeArrI<int, 1, maxTileType, 0> TileWidth;
@@ -563,8 +566,8 @@ void initAll()
     AutoY.fill(0.f);
     Water.fill(Water_t());
     Star.fill(Star_t());
-    FirstBlock.fill(0);
-    LastBlock.fill(0);
+    // FirstBlock.fill(0);
+    // LastBlock.fill(0);
     iBlock.fill(0);
     CustomMusic.fill(std::string());
     level.fill(Location_t());

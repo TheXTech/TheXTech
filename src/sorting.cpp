@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "sorting.h"
 
+// these are now used only when saving levels
 void qSortBlocksY(int min, int max)
 {
     Block_t medBlock;
@@ -163,6 +164,9 @@ void qSortBackgrounds(int min, int max)
     qSortBackgrounds(lo + 1, max);
 }
 
+// deprecated by block quadtree
+
+#if 0
 void FindBlocks()
 {
     int A = 0;
@@ -198,7 +202,7 @@ void FindBlocks()
         }
         LastBlock[A] = curBlk;
     }
-    BlocksSorted = true;
+    // BlocksSorted = true;
 }
 
 void BlockSort()
@@ -281,6 +285,7 @@ void BlockSort2()
         }
     } while(sortAgain);
 }
+#endif
 
 void BackgroundSort()
 {
@@ -384,6 +389,8 @@ void NPCSort()
     }
 }
 
+// deprecated
+#if 0
 void FindSBlocks()
 {
     int A = 0;
@@ -445,6 +452,7 @@ void qSortSBlocks(int min, int max)
     qSortSBlocks(min, lo - 1);
     qSortSBlocks(lo + 1, max);
 }
+#endif
 
 void qSortNPCsY(int min, int max)
 {
@@ -518,6 +526,8 @@ void UpdateBackgrounds()
 //        Netplay::sendData "s" + std::to_string(numBackground) + LB;
 }
 
+// deprecated
+#if 0
 void qSortTempBlocksX(int min, int max)
 {
     Block_t medBlock;
@@ -567,3 +577,4 @@ void qSortTempBlocksX(int min, int max)
     qSortBlocksX(min, lo - 1);
     qSortBlocksX(lo + 1, max);
 }
+#endif

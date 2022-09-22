@@ -105,7 +105,7 @@ static void setupCheckpoints()
 {
     if(Checkpoint != FullFileName || Checkpoint.empty())
     {
-        if(StartLevel != FileNameFull)
+        if(StartLevel != FileNameFull && !LevelSelect)
         {
             pLogDebug("Clear check-points at SetupPlayers()");
             Checkpoint.clear();
@@ -115,7 +115,7 @@ static void setupCheckpoints()
     }
 
     pLogDebug("Trying to restore %zu checkpoints...", CheckpointsList.size());
-    if(!g_compatibility.enable_multipoints && CheckpointsList.empty())
+    if(!g_compatibility.fix_vanilla_checkpoints && CheckpointsList.empty())
     {
         pLogDebug("Using legacy algorithm");
         CheckpointsList.push_back(Checkpoint_t());
@@ -129,21 +129,21 @@ static void setupCheckpoints()
             if(NPC[A].Type != 192)
                 continue;
 
-            if(g_compatibility.enable_multipoints && cp.id != Maths::iRound(NPC[A].Special))
+            if(g_compatibility.fix_vanilla_checkpoints && cp.id != Maths::iRound(NPC[A].Special))
                 continue;
 
             NPC[A].Killed = 9;
 
             // found a last id, leave player here
-            if(!g_compatibility.enable_multipoints || cpId == int(CheckpointsList.size() - 1))
+            if(!g_compatibility.fix_vanilla_checkpoints || cpId == int(CheckpointsList.size() - 1))
             {
                 setupPlayerAtCheckpoints(NPC[A], cp);
-                if(g_compatibility.enable_multipoints)
+                if(g_compatibility.fix_vanilla_checkpoints)
                     break;// Stop to find NPCs
             }
         }// for NPCs
 
-        if(!g_compatibility.enable_multipoints)
+        if(!g_compatibility.fix_vanilla_checkpoints)
             break;
     } // for Check points
 }
@@ -2209,8 +2209,8 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
     int A = 0;
     long long B = 0;
     int C = 0;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
 
     if(Stab)
     {
@@ -2279,17 +2279,20 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
     {
         // fBlock = FirstBlock[(tailLoc.X / 32) - 1];
         // lBlock = LastBlock[((tailLoc.X + tailLoc.Width) / 32.0) + 1];
-        blockTileGet(tailLoc, fBlock, lBlock);
+        // blockTileGet(tailLoc, fBlock, lBlock);
 
-        for(A = (int)fBlock; A <= lBlock; A++)
+        for(BlockRef_t block_p : treeBlockQuery(tailLoc, SORTMODE_COMPAT))
         {
-            if(!BlockIsSizable[Block[A].Type] && !Block[A].Hidden && (Block[A].Type != 293 || Stab) && !Block[A].Invis && !BlockNoClipping[Block[A].Type])
+            Block_t& block = *block_p;
+            A = (int)block_p;
+
+            if(!BlockIsSizable[block.Type] && !block.Hidden && (block.Type != 293 || Stab) && !block.Invis && !BlockNoClipping[block.Type])
             {
-                if(CheckCollision(tailLoc, Block[A].Location))
+                if(CheckCollision(tailLoc, block.Location))
                 {
-                    if(Block[A].ShakeY == 0 && Block[A].ShakeY2 == 0 && Block[A].ShakeY3 == 0)
+                    if(block.ShakeY == 0 && block.ShakeY2 == 0 && block.ShakeY3 == 0)
                     {
-                        if(Block[A].Special > 0 || Block[A].Type == 55 || Block[A].Type == 159 || Block[A].Type == 90)
+                        if(block.Special > 0 || block.Type == 55 || block.Type == 159 || block.Type == 90)
                             PlaySound(SFX_BlockHit);
 //                        if(nPlay.Online && plr - 1 == nPlay.MySlot)
 //                            Netplay::sendData Netplay::PutPlayerLoc(nPlay.MySlot) + "1g" + std::to_string(plr) + "|" + p.TailCount - 1;
@@ -2310,10 +2313,10 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         BlockHitHard(A);
                         if(!Stab)
                         {
-                            if(Block[A].ShakeY != 0)
+                            if(block.ShakeY != 0)
                             {
-                                tempLoc.X = (Block[A].Location.X + tailLoc.X + (Block[A].Location.Width + tailLoc.Width) / 2.0) / 2 - 16;
-                                tempLoc.Y = (Block[A].Location.Y + tailLoc.Y + (Block[A].Location.Height + tailLoc.Height) / 2.0) / 2 - 16;
+                                tempLoc.X = (block.Location.X + tailLoc.X + (block.Location.Width + tailLoc.Width) / 2.0) / 2 - 16;
+                                tempLoc.Y = (block.Location.Y + tailLoc.Y + (block.Location.Height + tailLoc.Height) / 2.0) / 2 - 16;
                                 NewEffect(73, tempLoc);
                             }
                             break;
@@ -2322,9 +2325,9 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         {
                             if(StabDir == 2)
                             {
-                                if(Block[A].Type == 293 || Block[A].Type == 370 || Block[A].ShakeY != 0 || Block[A].ShakeY2 != 0 || Block[A].ShakeY3 != 0 || Block[A].Hidden || BlockHurts[Block[A].Type])
+                                if(block.Type == 293 || block.Type == 370 || block.ShakeY != 0 || block.ShakeY2 != 0 || block.ShakeY3 != 0 || block.Hidden || BlockHurts[block.Type])
                                 {
-                                    if(BlockHurts[Block[A].Type])
+                                    if(BlockHurts[block.Type])
                                         PlaySound(SFX_Spring);
                                     p.Location.Y -= 0.1;
                                     p.Location.SpeedY = Physics.PlayerJumpVelocity;
@@ -2333,17 +2336,17 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                         p.Jump = 10;
                                 }
                             }
-                            if(Block[A].Type == 370)
+                            if(block.Type == 370)
                             {
                                 PlaySound(SFX_ZeldaGrass);
-                                Block[A].Hidden = true;
-                                Block[A].Layer = LAYER_DESTROYED_BLOCKS;
+                                block.Hidden = true;
+                                block.Layer = LAYER_DESTROYED_BLOCKS;
                                 syncLayersTrees_Block(A);
-                                NewEffect(10, Block[A].Location);
+                                NewEffect(10, block.Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
 
-                            if(Block[A].Type == 457 && p.State == 6)
+                            if(block.Type == 457 && p.State == 6)
                             {
                                 KillBlock(A);
                             }
@@ -2789,7 +2792,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
                 if(b.Hidden || b.Invis || BlockNoClipping[b.Type] || BlockIsSizable[b.Type])
                     continue;
 
-                if(g_compatibility.fix_dont_switch_player_by_clowncar && mount == 2 &&
+                if(g_compatibility.fix_vehicle_char_switch && mount == 2 &&
                     ((b.Type >= 622 && b.Type <= 625) || b.Type == 631))
                     continue; // Forbid playable character switch when riding a clown car
 
@@ -3038,8 +3041,8 @@ void SwapCoop()
 void PlayerPush(const int A, int HitSpot)
 {
     Location_t tempLocation;
-    int64_t fBlock = 0;
-    int64_t lBlock = 0;
+    // int64_t fBlock = 0;
+    // int64_t lBlock = 0;
 
     if(ShadowMode)
         return;
@@ -3048,11 +3051,12 @@ void PlayerPush(const int A, int HitSpot)
 
     // fBlock = FirstBlock[(p.Location.X / 32) - 1];
     // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
-    blockTileGet(p.Location, fBlock, lBlock);
+    // blockTileGet(p.Location, fBlock, lBlock);
 
-    for(int B = int(fBlock); B <= lBlock; B++)
+    for(Block_t* block : treeBlockQuery(p.Location, SORTMODE_COMPAT))
     {
-        auto &b = Block[B];
+        int B = block - &Block[1] + 1;
+        Block_t& b = *block;
 
         if(b.Hidden || BlockIsSizable[b.Type])
             continue;
@@ -4406,8 +4410,7 @@ static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool
 {
     bool canWarp = false;
 
-    bool onGround = (!g_compatibility.require_ground_to_enter_warps && !warp.stoodRequired) ||
-                    (plr.Pinched1 == 2 || plr.Slope != 0 || plr.StandingOnNPC != 0);
+    bool onGround = !warp.stoodRequired || (plr.Pinched1 == 2 || plr.Slope != 0 || plr.StandingOnNPC != 0);
 
     auto &entrance      = backward ? warp.Exit        : warp.Entrance;
     auto &exit          = backward ? warp.Entrance    : warp.Exit;
@@ -5013,7 +5016,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.HoldingNPC].Special2 = 0;
                     }
 
-                        PlaySound(SFX_ZeldaFire);
+                        PlaySound(SFX_FlameThrower);
 
                     // For B = 1 To 3
                         numNPCs++;
@@ -5361,7 +5364,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
         int B = NPC[LayerNPC].AttLayer;
         // for(B = 1; B <= maxLayers; B++)
         {
-            if(B != LAYER_NONE)
+            if(B != LAYER_NONE && B != LAYER_DEFAULT)
             {
                 // if(Layer[B].Name == NPC[LayerNPC].AttLayer)
                 {
@@ -7378,7 +7381,7 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
 // returns whether a player is allowed to swap characters
 bool SwapCharAllowed()
 {
-    if(LevelSelect || GameMenu)
+    if(LevelSelect || GameMenu || (IsEpisodeIntro && NoMap && GamePaused == PauseCode::DropAdd))
         return true;
     else
         return false;

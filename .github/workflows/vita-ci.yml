@@ -3,13 +3,13 @@ name: Vita CI
 on:
   push:
     branches:
-      - master
+      - main
       - devel
       - wip-vita-support
       - wip-vita-master
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -35,6 +35,12 @@ jobs:
           }
 
     steps:
+    - uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        workflow_id: vita-ci.yml
+        all_but_latest: true
+        access_token: ${{ github.token }}
+
     - uses: actions/checkout@v1
 
     - uses: nelonoel/branch-name@v1.0.1
@@ -52,11 +58,12 @@ jobs:
     - name: Install Vita SDK
       run: |
         cd ..
+        export VITASDK=/usr/local/vitasdk
         export PATH=$VITASDK/bin:$PATH
         git clone https://github.com/vitasdk/vdpm
         cd vdpm
         ./bootstrap-vitasdk.sh
-        ./install-all.sh
+        ./install-all.sh || echo A library from vitasdk failed to install.
 
 # NOTE: 2/13/2022 Current Vita version does not use cglm or vitaGL renderer. All is handled by SDL2 at the moment.
 #    - name: Install cglm

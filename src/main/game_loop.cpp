@@ -43,6 +43,7 @@
 #include "game_globals.h"
 #include "world_globals.h"
 #include "speedrunner.h"
+#include "main/record.h"
 #include "menu_main.h"
 #include "screen_pause.h"
 #include "screen_connect.h"
@@ -179,6 +180,11 @@ void GameLoop()
         speedRun_triggerLeave();
         NextLevel();
         // Controls::Update();
+
+        // Controls::Update() was commented out because the current screen state may be unpredictable,
+        // so it's not a reasonable time for the user to reconnect if something has happened.
+        // But, the classic game updates controls here so we need to Sync the recording.
+        Record::Sync();
     }
     else if(qScreen)
     {
@@ -257,13 +263,13 @@ void GameLoop()
                         {
                             FreezeNPCs = false;
                             if(PSwitchTime > 0 && !noSound)
-                                SoundResumeAll();
+                                ResumeMusic();
                         }
                         else
                         {
                             FreezeNPCs = true;
                             if(PSwitchTime > 0 && !noSound)
-                                SoundPauseAll();
+                                PauseMusic();
                         }
                         PlaySound(SFX_Pause);
                     }
@@ -377,7 +383,7 @@ int PauseGame(PauseCode code, int plr)
     {
         // If noSound = False Then mciSendString "pause smusic", 0, 0, 0
         if(!noSound)
-            SoundPauseAll();
+            PauseMusic();
     }
 
     resetFrameTimer();
@@ -410,6 +416,10 @@ int PauseGame(PauseCode code, int plr)
                         PauseGame(PauseCode::Reconnect, 0);
                 }
             }
+
+            if(QuickReconnectScreen::g_active)
+                QuickReconnectScreen::Logic();
+
             UpdateSound();
             BlockFrames();
             UpdateEffects();
@@ -469,7 +479,7 @@ int PauseGame(PauseCode code, int plr)
     {
         // If noSound = False Then mciSendString "resume smusic", 0, 0, 0
         if(!noSound)
-            SoundResumeAll();
+            ResumeMusic();
     }
 
     resetFrameTimer();

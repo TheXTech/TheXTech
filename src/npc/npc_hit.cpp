@@ -395,6 +395,8 @@ void NPCHit(int A, int B, int C)
             NPC[A].Damage += 5;
             PlaySound(SFX_Stomp);
             NPC[A].Special = 5;
+            if(NPC[A].Type == NPCID_LARRY && NPC[A].Damage < 15)
+                PlaySound(SFX_LarryShell);
         }
         else if(B == 3 || B == 4 || B == 5)
         {
@@ -409,6 +411,8 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Special = 5;
                 NPC[A].Damage += 5;
                 PlaySound(SFX_BirdoHit);
+                if(NPC[A].Type == NPCID_LARRY && NPC[A].Damage < 15)
+                    PlaySound(SFX_LarryShell);
             }
         }
         else if(B == 10)
@@ -1666,14 +1670,22 @@ void NPCHit(int A, int B, int C)
                 if(NPC[C].Type != 171)
                 {
                     // if(B != 6) // Always true
-                    PlaySound(SFX_BlockHit);
+                    if(fEqual(NPC[A].Special, 5) && HasSound(SFX_ZeldaFireRod))
+                        PlaySound(SFX_ZeldaFire);
+                    else
+                        PlaySound(SFX_BlockHit);
                     NPC[A].Killed = B;
                 }
             }
             else
             {
                 if(B != 6)
-                    PlaySound(SFX_BlockHit);
+                {
+                    if(fEqual(NPC[A].Special, 5) && HasSound(SFX_ZeldaFireRod))
+                        PlaySound(SFX_ZeldaFire);
+                    else
+                        PlaySound(SFX_BlockHit);
+                }
                 NPC[A].Killed = B;
             }
         }

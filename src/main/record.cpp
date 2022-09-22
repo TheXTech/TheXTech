@@ -112,7 +112,7 @@ FILE* replay_file = nullptr;
 //! Externally providen level file path for the replay
 static std::string replayLevelFilePath;
 
-static const int c_recordVersion = 2;
+static const int c_recordVersion = 3;
 
 // private
 
@@ -142,7 +142,7 @@ static void write_header()
     fprintf(record_file, "Seed %d\r\n", readSeed());
     fprintf(record_file, "Checkpoint %d\r\n", (Checkpoint == FullFileName) ? 1 : 0);
 
-    if(g_compatibility.enable_multipoints && Checkpoint == FullFileName)
+    if(g_compatibility.fix_vanilla_checkpoints && Checkpoint == FullFileName)
     {
         fprintf(record_file, "Multipoints %d: ", (int)CheckpointsList.size());
 
@@ -174,9 +174,10 @@ static void write_header()
                 "Player\r\n"
                 "Char %d\r\n"
                 "State %d\r\n"
+                "Mount %d\r\n"
                 "MountType %d\r\n"
                 "HeldBonus %d\r\n",
-                Player[A].Character, Player[A].State, Player[A].MountType, Player[A].HeldBonus);
+                Player[A].Character, Player[A].State, Player[A].Mount, Player[A].MountType, Player[A].HeldBonus);
     }
 }
 
@@ -199,6 +200,8 @@ static void read_header()
     // read all necessary state variables!
     fgets(buffer, 1024, replay_file); // "Header"
     fscanf(replay_file, "RecordVersion %d\r\n", &recordVersion);
+
+    pLogDebug("Loading recording version %d", recordVersion);
 
     if(recordVersion < 2)
         pLogCritical("Record file is invalid! (version below than minimally supported: %d)", recordVersion);
@@ -240,7 +243,7 @@ static void read_header()
 
     Checkpoint = n ? FullFileName : std::string();
 
-    if(g_compatibility.enable_multipoints && Checkpoint == FullFileName)
+    if(g_compatibility.fix_vanilla_checkpoints && Checkpoint == FullFileName)
     {
         CheckpointsList.clear();
         fscanf(replay_file, "Multipoints %d: ", &n);
@@ -276,13 +279,23 @@ static void read_header()
 
     for(int A = 1; A <= numPlayers; A++)
     {
-        fscanf(replay_file,
-               "Player\r\n"
-               "Char %d\r\n"
-               "State %d\r\n"
-               "MountType %d\r\n"
-               "HeldBonus %d\r\n",
-            &Player[A].Character, &Player[A].State, &Player[A].MountType, &Player[A].HeldBonus);
+        if(recordVersion < 3)
+            fscanf(replay_file,
+                   "Player\r\n"
+                   "Char %d\r\n"
+                   "State %d\r\n"
+                   "MountType %d\r\n"
+                   "HeldBonus %d\r\n",
+                &Player[A].Character, &Player[A].State, &Player[A].MountType, &Player[A].HeldBonus);
+        else
+            fscanf(replay_file,
+                   "Player\r\n"
+                   "Char %d\r\n"
+                   "State %d\r\n"
+                   "Mount %d\r\n"
+                   "MountType %d\r\n"
+                   "HeldBonus %d\r\n",
+                &Player[A].Character, &Player[A].State, &Player[A].Mount, &Player[A].MountType, &Player[A].HeldBonus);
     }
 
     Cheater = true; // important to avoid losing player save data in replay mode.
@@ -313,7 +326,7 @@ static void read_end()
         diverged_major = true;
     }
 
-    if(b != LevelBeatCode)
+    if(b != LevelBeatCode && !(b == -1 && LevelBeatCode == 0))
     {
         pLogWarning("LevelBeatCode diverged (old: %d, new: %d).", b, LevelBeatCode);
         diverged_major = true;
@@ -550,7 +563,7 @@ static void read_status()
 
     if(o_renderedBlocks != g_stats.renderedBlocks + g_stats.renderedSzBlocks)
     {
-        pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedNPCs, g_stats.renderedNPCs + g_stats.renderedSzBlocks, frame_no);
+        pLogWarning("renderedBlocks diverged (old: %d, new: %d) at frame %" PRId64 ".", o_renderedBlocks, g_stats.renderedBlocks + g_stats.renderedSzBlocks, frame_no);
         diverged_minor = true;
     }
 
@@ -804,7 +817,7 @@ void EndRecording()
     {
         read_end();
 
-        if(!diverged_minor)
+        if(!diverged_minor && !diverged_major)
         {
             pLogDebug("CONGRATULATIONS! Your build's run did not diverge from the old run.");
             printf("CONGRATULATIONS! Your build's run did not diverge from the old run.\n");
