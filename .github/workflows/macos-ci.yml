@@ -3,12 +3,12 @@ name: macOS CI
 on:
   push:
     branches:
-      - master
+      - main
       - devel
       - versus-ci-macos
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:

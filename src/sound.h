@@ -163,6 +163,8 @@ enum
 
 int CustomWorldMusicId();
 
+void InitSoundDefaults();
+
 // Public Sub InitMixerX()
 void InitMixerX();
 // Public Sub QuitMixerX()
@@ -188,6 +190,8 @@ bool delayMusicIsSet();
 // play music
 void StartMusic(int A, int fadeInMs = 0);
 // Public Sub StopMusic() 'stop playing music
+void PauseMusic();
+void ResumeMusic();
 // stop playing music
 void StopMusic();
 // Public Sub PlayInitSound()

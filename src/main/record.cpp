@@ -112,7 +112,7 @@ FILE* replay_file = nullptr;
 //! Externally providen level file path for the replay
 static std::string replayLevelFilePath;
 
-static const int c_recordVersion = 2;
+static const int c_recordVersion = 3;
 
 // private
 
@@ -174,9 +174,10 @@ static void write_header()
                 "Player\r\n"
                 "Char %d\r\n"
                 "State %d\r\n"
+                "Mount %d\r\n"
                 "MountType %d\r\n"
                 "HeldBonus %d\r\n",
-                Player[A].Character, Player[A].State, Player[A].MountType, Player[A].HeldBonus);
+                Player[A].Character, Player[A].State, Player[A].Mount, Player[A].MountType, Player[A].HeldBonus);
     }
 }
 
@@ -199,6 +200,8 @@ static void read_header()
     // read all necessary state variables!
     fgets(buffer, 1024, replay_file); // "Header"
     fscanf(replay_file, "RecordVersion %d\r\n", &recordVersion);
+
+    pLogDebug("Loading recording version %d", recordVersion);
 
     if(recordVersion < 2)
         pLogCritical("Record file is invalid! (version below than minimally supported: %d)", recordVersion);
@@ -276,13 +279,23 @@ static void read_header()
 
     for(int A = 1; A <= numPlayers; A++)
     {
-        fscanf(replay_file,
-               "Player\r\n"
-               "Char %d\r\n"
-               "State %d\r\n"
-               "MountType %d\r\n"
-               "HeldBonus %d\r\n",
-            &Player[A].Character, &Player[A].State, &Player[A].MountType, &Player[A].HeldBonus);
+        if(recordVersion < 3)
+            fscanf(replay_file,
+                   "Player\r\n"
+                   "Char %d\r\n"
+                   "State %d\r\n"
+                   "MountType %d\r\n"
+                   "HeldBonus %d\r\n",
+                &Player[A].Character, &Player[A].State, &Player[A].MountType, &Player[A].HeldBonus);
+        else
+            fscanf(replay_file,
+                   "Player\r\n"
+                   "Char %d\r\n"
+                   "State %d\r\n"
+                   "Mount %d\r\n"
+                   "MountType %d\r\n"
+                   "HeldBonus %d\r\n",
+                &Player[A].Character, &Player[A].State, &Player[A].Mount, &Player[A].MountType, &Player[A].HeldBonus);
     }
 
     Cheater = true; // important to avoid losing player save data in replay mode.

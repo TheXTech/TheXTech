@@ -263,13 +263,13 @@ void GameLoop()
                         {
                             FreezeNPCs = false;
                             if(PSwitchTime > 0 && !noSound)
-                                SoundResumeAll();
+                                ResumeMusic();
                         }
                         else
                         {
                             FreezeNPCs = true;
                             if(PSwitchTime > 0 && !noSound)
-                                SoundPauseAll();
+                                PauseMusic();
                         }
                         PlaySound(SFX_Pause);
                     }
@@ -383,7 +383,7 @@ int PauseGame(PauseCode code, int plr)
     {
         // If noSound = False Then mciSendString "pause smusic", 0, 0, 0
         if(!noSound)
-            SoundPauseAll();
+            PauseMusic();
     }
 
     resetFrameTimer();
@@ -479,7 +479,7 @@ int PauseGame(PauseCode code, int plr)
     {
         // If noSound = False Then mciSendString "resume smusic", 0, 0, 0
         if(!noSound)
-            SoundResumeAll();
+            ResumeMusic();
     }
 
     resetFrameTimer();

@@ -1795,14 +1795,14 @@ void mainMenuDraw()
     else if(MenuMode == MENU_OPTIONS)
     {
         int i = 0;
-        SuperPrint(g_mainMenu.controlsTitle, 3, 300, 350 + 30*i++);
-#ifndef __ANDROID__
+        SuperPrint(g_mainMenu.controlsTitle, 3, 300, 350 + (30 * i++));
+#ifndef RENDER_FULLSCREEN_ALWAYS
         if(resChanged)
-            SuperPrint("WINDOWED MODE", 3, 300, 350 + 30*i++);
+            SuperPrint("WINDOWED MODE", 3, 300, 350 + (30 * i++));
         else
-            SuperPrint("FULLSCREEN MODE", 3, 300, 350 + 30*i++);
+            SuperPrint("FULLSCREEN MODE", 3, 300, 350 + (30 * i++));
 #endif
-        SuperPrint("VIEW CREDITS", 3, 300, 350 + 30*i++);
+        SuperPrint("VIEW CREDITS", 3, 300, 350 + (30 * i++));
         XRender::renderTexture(300 - 20, 350 + (MenuCursor * 30),
                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }

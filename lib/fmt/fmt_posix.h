@@ -309,7 +309,7 @@ class File {
 long getpagesize();
 
 #if (defined(LC_NUMERIC_MASK) || defined(_MSC_VER)) && \
-    !defined(__ANDROID__) && !defined(__CYGWIN__) && !defined(VITA)
+    !defined(__ANDROID__) && !defined(__CYGWIN__) && !defined(VITA) && !defined(__SWITCH__)
 # define FMT_LOCALE
 #endif
 
@@ -356,7 +356,7 @@ class Locale {
   // of the parsed input.
   double strtod(const char *&str) const {
     char *end = FMT_NULL;
-    
+
     double result = strtod_l(str, &end, locale_);
     str = end;
     return result;

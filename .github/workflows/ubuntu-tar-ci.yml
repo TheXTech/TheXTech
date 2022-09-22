@@ -3,12 +3,12 @@ name: Ubuntu TAR CI
 on:
   push:
     branches:
-      - master
+      - main
       - devel
       - versus-ci
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:

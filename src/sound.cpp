@@ -69,10 +69,10 @@ const AudioDefaults_t g_audioDefaults =
 };
 #elif defined(__SWITCH__) /* Defaults for Nintendo Switch */
 {
-    32000,
+    48000,
     2,
-    512,
-    (int)AUDIO_F32
+    1024,
+    (int)AUDIO_S16
 };
 #else /* Defaults for all other platforms */
 {
@@ -180,15 +180,54 @@ static void extSfxStopCallback(int channel);
 
 static const int maxSfxChannels = 91;
 
+static const char *audio_format_to_string(SDL_AudioFormat f)
+{
+    switch(f)
+    {
+    default:
+        return "<unknown>";
+    case AUDIO_U8:
+        return "U8";
+    case AUDIO_S8:
+        return "S8";
+    case AUDIO_S16LSB:
+        return "S16-LE";
+    case AUDIO_S16MSB:
+        return "S16-BE";
+    case AUDIO_U16LSB:
+        return "U16-LE";
+    case AUDIO_U16MSB:
+        return "U16-BE";
+    case AUDIO_S32LSB:
+        return "S32-LE";
+    case AUDIO_S32MSB:
+        return "S32-BE";
+    case AUDIO_F32LSB:
+        return "F32-LE";
+    case AUDIO_F32MSB:
+        return "F32-BE";
+    }
+}
+
+
 int CustomWorldMusicId()
 {
     return g_customWldMusicId;
+}
+
+void InitSoundDefaults()
+{
+    g_audioSetup.sampleRate = g_audioDefaults.sampleRate;
+    g_audioSetup.channels = g_audioDefaults.channels;
+    g_audioSetup.format = g_audioDefaults.format;
+    g_audioSetup.bufferSize = g_audioDefaults.bufferSize;
 }
 
 void InitMixerX()
 {
     int ret;
     const int initFlags = MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3;
+    SDL_AudioSpec obtained;
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 
@@ -197,7 +236,11 @@ void InitMixerX()
     if(g_mixerLoaded)
         return;
 
-    pLogDebug("Opening sound...");
+    pLogDebug("Opening sound (wanted: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
+              g_audioSetup.sampleRate,
+              audio_format_to_string(g_audioSetup.format),
+              g_audioSetup.channels,
+              g_audioSetup.bufferSize);
     ret = Mix_Init(initFlags);
 
     if(ret != initFlags)
@@ -230,15 +273,23 @@ void InitMixerX()
         noSound = true;
     }
 
-    ret = Mix_QuerySpec(&s_audioSetupObtained.sampleRate,
-                        &s_audioSetupObtained.format,
-                        &s_audioSetupObtained.channels);
-
+    ret = Mix_QuerySpecEx(&obtained);
     if(ret == 0)
     {
-        pLogCritical("Failed to call the Mix_QuerySpec!");
+        pLogCritical("Failed to call the Mix_QuerySpec: Audio is not open!");
         s_audioSetupObtained = g_audioSetup;
     }
+
+    s_audioSetupObtained.sampleRate = obtained.freq;
+    s_audioSetupObtained.format = obtained.format;
+    s_audioSetupObtained.channels = obtained.channels;
+    s_audioSetupObtained.bufferSize = obtained.samples;
+
+    pLogDebug("Sound opened (obtained: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
+              s_audioSetupObtained.sampleRate,
+              audio_format_to_string(s_audioSetupObtained.format),
+              s_audioSetupObtained.channels,
+              s_audioSetupObtained.bufferSize);
 
     Mix_VolumeMusic(MIX_MAX_VOLUME);
     Mix_AllocateChannels(maxSfxChannels);
@@ -715,6 +766,24 @@ void StartMusic(int A, int fadeInMs)
     }
 
     musicPlaying = true;
+}
+
+void PauseMusic()
+{
+    if(!musicPlaying || noSound)
+        return;
+
+    if(g_curMusic && Mix_PlayingMusicStream(g_curMusic))
+        Mix_PauseMusicStream(g_curMusic);
+}
+
+void ResumeMusic()
+{
+    if(!musicPlaying || noSound)
+        return;
+
+    if(g_curMusic && Mix_PausedMusicStream(g_curMusic))
+        Mix_ResumeMusicStream(g_curMusic);
 }
 
 void StopMusic()
@@ -1512,4 +1581,3 @@ void UpdateSoundFX(int recentSection)
     }
 #endif // THEXTECH_ENABLE_AUDIO_FX
 }
-

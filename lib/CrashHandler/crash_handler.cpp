@@ -53,6 +53,11 @@
 
 #endif //PGE_ENGINE_DEBUG
 
+#if !defined(_WIN32) && !defined(__SWITCH__) // Unsupported signals by Windows
+#   define HAS_SIG_INFO
+#endif
+
+
 #ifdef PGE_ENGINE_DEBUG
 static int isDebuggerPresent()
 {
@@ -276,7 +281,7 @@ static std::string getCurrentUserName()
     userName[nCnt] = '\0';
     user = std::string(userName);
 
-#elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__HAIKU__)
+#elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__HAIKU__) || defined(__SWITCH__)
     user = "user"; // No way to get user, here is SINGLE generic user
 
 #else
@@ -301,7 +306,7 @@ static std::string getCurrentHomePath()
     homeDir[nCnt] = '\0';
     homedir = std::string(homeDir);
 
-#elif defined(__EMSCRIPTEN__) || defined(__ANDROID__)
+#elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__SWITCH__)
     homedir = "/"; // No way to get user, here is SINGLE generic user
 
 #elif defined(__HAIKU__)
@@ -456,13 +461,13 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByFlood()
     abortEngine(-2);
 }
 
-#ifdef _WIN32 // Unsupported signals by Windows
+#if defined(_WIN32) // Unsupported signals by Windows
 struct siginfo_t;
 #endif
 
 static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
 {
-#ifdef _WIN32  // Unsupported signals by Windows
+#if !defined(_WIN32) || !defined(__SWITCH__)  // Unsupported signals by Windows and Switch
     (void)siginfo;
 #endif
 
@@ -498,6 +503,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     {
         std::string stack = getStacktrace();
 
+#if defined(HAS_SIG_INFO)
         if(siginfo)
         {
             switch(siginfo->si_code)
@@ -527,6 +533,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
             }
         }
         else
+#endif
         {
             pLogFatal("<Physical memory address error>\n"
                       STACK_FORMAT,
@@ -565,8 +572,8 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     case SIGFPE:
     {
         std::string stack = getStacktrace();
-#ifndef _WIN32  //Unsupported signals by Windows
 
+#if defined(HAS_SIG_INFO)  //Unsupported signals by Windows and Switch
         if(siginfo)
         {
             switch(siginfo->si_code)
@@ -638,7 +645,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
                       "(if log ends before \"DONE\" will be shown, seems also trouble in the backtracing function too...)");
         std::string stack = getStacktrace();
 
-#ifndef _WIN32  //Unsupported signals by Windows
+#if defined(HAS_SIG_INFO)  //Unsupported signals by Windows
         if(siginfo)
         {
             switch(siginfo->si_code)
@@ -698,10 +705,12 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     }
 }
 
-#ifndef _WIN32 // Unsupported signals by Windows
+#if defined(HAS_SIG_INFO)
 static struct sigaction act;
 #else
+#   if _WIN32
 struct siginfo_t;
+#   endif
 
 static void handle_signalWIN32(int signal)
 {
@@ -719,7 +728,7 @@ void CrashHandler::initSigs()
 
     std::set_new_handler(&crashByFlood);
     std::set_terminate(&crashByUnhandledException);
-#ifndef _WIN32 // Unsupported signals by Windows
+#if defined(HAS_SIG_INFO) // Unsupported signals by Windows
     memset(&act, 0, sizeof(struct sigaction));
     sigemptyset(&act.sa_mask);
     act.sa_sigaction = handle_signal;
@@ -743,6 +752,13 @@ void CrashHandler::initSigs()
     signal(SIGSEGV, &handle_signalWIN32);
     signal(SIGINT,  &handle_signalWIN32);
     signal(SIGABRT, &handle_signalWIN32);
+#   ifndef _WIN32
+    signal(SIGHUP, &handle_signalWIN32);
+    signal(SIGQUIT, &handle_signalWIN32);
+    signal(SIGALRM, &handle_signalWIN32);
+    signal(SIGBUS, &handle_signalWIN32);
+    signal(SIGURG, &handle_signalWIN32);
+#   endif
 #endif
 }
 /* Signals End */

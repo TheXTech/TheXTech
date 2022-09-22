@@ -15,7 +15,7 @@
     <string name="setup_show_framerate">Képráta mutatása</string>
     <string name="setup_max_framerate_mode">Maximális képráta mód</string>
     <string name="setup_touchscreen_mode">Kontroller mód</string>
-    <string name="setup_sr_speedrunMode">Speedrun mód</string>
+    <string name="setup_sr_speedrunMode">Sprintjáték mód</string>
     <string name="setup_sr_stopwatchSemiTransparent">Áttetsző stopperóra</string>
     <string name="setup_touchpad_style">Kontrollerstílus</string>
     <string name="managePermExplainTitle">Fájlhozzáférési jog szükséges</string>
@@ -32,4 +32,11 @@
     <string name="cheat_dialog_ok">Futtatás</string>
     <string name="cheat_dialog_title">Írj be parancsot:</string>
     <string name="managePermExplainText">Ez a játék olyan forrásokat (mint a pályák, epizódok, grafikák, zene, hangok, konfigurációk, stb...) használ, amiket a felhasználónak kell elhelyeznie közvetlenül a helyi tárolóba. Ez megengedi, hogy módosítsd és bővítsd a játék tartalmát, ahogyan az asztali verziójában is történik. Sajnos az Android 11-es verziójától nem lehet személyi hozzáférést nyerni néhány játékkönyvtárhoz vagy fájlhoz. Hogy futtasd ezt a játékot, hozzáférést kell nyerned az összes játékfájlhoz az említett okok miatt.</string>
+    <string name="launcher_gameSelect_pickTheDir">Könyvtár kiválasztása...</string>
+    <string name="launcher_gameSelect_clearList">Lista ürítése</string>
+    <string name="launcher_gameselect_clearlist_title">Játéklista ürítése</string>
+    <string name="launcher_gameselect_toast_listclean">A jétéklista ürítve.</string>
+    <string name="launcher_gameselect_clearlist_question">Biztosan szeretnéd üríteni a játéklistát\?</string>
+    <string name="setup_speedrunner">Sprintjáték</string>
+    <string name="launcher_gameselect_toast_selected">Játék váltva: %s</string>
 </resources>
