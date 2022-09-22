@@ -79,8 +79,17 @@ void treeBlockJoinLayer(int layer)
         return;
 
     g_layer_block_table_active[layer] = false;
+
+    // remove from queue of active tables
     s_num_active_block_tables--;
-    s_active_block_tables[layer] = s_active_block_tables[s_num_active_block_tables];
+    for(int i = 0; i < s_num_active_block_tables; i++)
+    {
+        if(s_active_block_tables[i] == layer)
+        {
+            s_active_block_tables[i] = s_active_block_tables[s_num_active_block_tables];
+            break;
+        }
+    }
 
     for(int b : Layer[layer].blocks)
     {
