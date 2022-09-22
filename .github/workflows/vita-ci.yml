@@ -52,11 +52,12 @@ jobs:
     - name: Install Vita SDK
       run: |
         cd ..
+        export VITASDK=/usr/local/vitasdk
         export PATH=$VITASDK/bin:$PATH
         git clone https://github.com/vitasdk/vdpm
         cd vdpm
         ./bootstrap-vitasdk.sh
-        ./install-all.sh
+        ./install-all.sh || echo A library from vitasdk failed to install.
 
 # NOTE: 2/13/2022 Current Vita version does not use cglm or vitaGL renderer. All is handled by SDL2 at the moment.
 #    - name: Install cglm
