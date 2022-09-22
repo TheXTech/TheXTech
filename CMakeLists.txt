@@ -617,8 +617,7 @@ if(NINTENDO_SWITCH)
     target_link_libraries(A2XT_Int INTERFACE nx)
 
     # Set explicit flags for this project
-    target_compile_definitions(thextech PRIVATE
-        -D__SWITCH__ -DNO_SCREENSHOT -DFIXED_RES -DPRELOAD_LEVELS -DNO_INTPTROC)
+    target_compile_definitions(thextech PRIVATE -D__SWITCH__ -DNO_INTPTROC)
 endif()
 
 if(VITA)
