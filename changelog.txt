@@ -1,5 +1,8 @@
 TheXTech Changelog.
 
+Changelog for 1.3.7-dev
+-<WIP>
+
 Changelog for 1.3.6.1
 -Fixed some of the performance slowdown problems (@ds-sloth)
 -Fixed the work of Sound FX on big-endian architectures (@Wohlstand)
