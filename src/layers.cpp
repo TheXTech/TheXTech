@@ -944,12 +944,16 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             // eventually, only re-join tables the first time the event has been triggered in a level
                             treeBlockJoinLayer(B);
+                            treeBackgroundJoinLayer(B);
                         }
                         else
                         {
                             // these thresholds can be tweaked, but they balance the expense of querying more tables with the expense of updating locations in the main table
                             if(Layer[B].blocks.size() > 80)
                                 treeBlockSplitLayer(B);
+
+                            if(Layer[B].BGOs.size() > 80)
+                                treeBackgroundSplitLayer(B);
                         }
                     }
                 }
@@ -1249,7 +1253,7 @@ void UpdateLayers()
                         Block[B].Location.SpeedX = double(Layer[A].SpeedX);
                         Block[B].Location.SpeedY = double(Layer[A].SpeedY);
 
-                        if(!g_layer_block_table_active[A])
+                        if(!treeBlockLayerActive(A))
                             treeBlockUpdateLayer(A, B);
                     }
                 }
@@ -1266,6 +1270,9 @@ void UpdateLayers()
                             Background[B].Location.SpeedX = double(Layer[A].SpeedX);
                             Background[B].Location.SpeedY = double(Layer[A].SpeedY);
                         }
+
+                        if(!treeBackgroundLayerActive(A))
+                            treeBackgroundUpdateLayer(A, B);
                     }
                 }
 

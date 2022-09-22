@@ -26,13 +26,14 @@
 #include "globals.h"
 #include "layers.h"
 
-extern bool g_layer_block_table_active[maxLayers+1];
-
 void treeBlockUpdateLayer(int layer, BlockRef_t block);
-
+bool treeBlockLayerActive(int layer);
 void treeBlockJoinLayer(int layer);
-
 void treeBlockSplitLayer(int layer);
 
+void treeBackgroundUpdateLayer(int layer, BackgroundRef_t block);
+bool treeBackgroundLayerActive(int layer);
+void treeBackgroundJoinLayer(int layer);
+void treeBackgroundSplitLayer(int layer);
 
 #endif // #ifndef BLOCK_TABLE_H

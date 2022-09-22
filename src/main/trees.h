@@ -170,23 +170,23 @@ extern void treeBlockAddLayer(int layer, BlockRef_t obj);
 extern void treeBlockRemoveLayer(int layer, BlockRef_t obj);
 extern void treeBlockUpdateLayer(int layer, BlockRef_t obj);
 extern TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+                               int sort_mode, double margin = 0.0);
+extern TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc, int sort_mode);
 
 extern void treeTempBlockStartFrame();
 extern void treeTempBlockAdd(BlockRef_t obj);
 extern void treeTempBlockUpdate(BlockRef_t obj);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+                               int sort_mode, double margin = 0.0);
+extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc, int sort_mode);
 
 extern void treeLevelCleanBackgroundLayers();
 extern void treeBackgroundAddLayer(int layer, BackgroundRef_t obj);
 extern void treeBackgroundRemoveLayer(int layer, BackgroundRef_t obj);
 extern void treeBackgroundUpdateLayer(int layer, BackgroundRef_t obj);
 extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 16.0);
-extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t &loc, int sort_mode, double margin = 16.0);
+                               int sort_mode, double margin = 0.0);
+extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t &loc, int sort_mode);
 
 // removed in favor of block quadtree
 
