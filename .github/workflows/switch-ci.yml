@@ -114,8 +114,6 @@ jobs:
         cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
         cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
         cat ../docs/README_SWITCH.md ../README.md >> "package/${{ matrix.config.subdir_name }}/README.md"
-#        cat ../docs/README_SWITCH.RUS.md ../README.RUS.md >> "package/${{ matrix.config.subdir_name }}/README.RUS.md"
-#        cat ../docs/README_SWITCH.ESP.md ../README.ESP.md >> "package/${{ matrix.config.subdir_name }}/README.ESP.md"
         cp output/bin/thextech.nro "package/${{ matrix.config.subdir_name }}/"
         cd package
         zip -9 -r "thextech-switch-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"
