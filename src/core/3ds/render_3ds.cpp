@@ -134,8 +134,8 @@ void s_ensureInFrame()
     {
         minport_initFrame();
 
-        if(g_screen_swapped != should_swap_screen())
-            UpdateInternalRes();
+        // if(g_screen_swapped != should_swap_screen())
+        //     UpdateInternalRes();
 
         C3D_FrameBegin(0);
 
@@ -469,9 +469,7 @@ void minport_ApplyPhysCoords()
 
     g_screen_swapped = should_swap_screen();
 
-    GPU_TEXTURE_FILTER_PARAM filter = (g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_FIXED_05X)
-        ? GPU_LINEAR
-        : GPU_NEAREST;
+    GPU_TEXTURE_FILTER_PARAM filter =  GPU_LINEAR;
 
     for(int layer = 0; layer < 4; layer++)
     {

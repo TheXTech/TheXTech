@@ -265,12 +265,14 @@ void repaint()
     g_microStats.start_sleep();
 
     // video settings: VSync
+    #if 0
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
     {
         VIDEO_WaitVSync();
         if(rmode->viTVMode & VI_NON_INTERLACE)
             VIDEO_WaitVSync();
     }
+    #endif
     g_microStats.start_task(MicroStats::Graphics);
 
     g_in_frame = false;

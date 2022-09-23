@@ -52,6 +52,11 @@ void audioExit();
 void audioPause();
 void audioResume();
 
+bool audioPauseSingle(SoundId soundId);
+bool audioResumeSingle(SoundId soundId);
+
+bool audioSoundPlaying(SoundId soundId);
+
 const char* get_filename_ext(const char* filename);
 
 SoundId playSoundWAV(const char* path, int loops=0);

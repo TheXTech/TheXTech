@@ -616,6 +616,27 @@ void audioResume() {
     }
 }
 
+bool audioPauseSingle(SoundId soundId)
+{
+    volatile SimpleChannel* channel = validateSoundId(soundId);
+    if(channel)
+        ndspChnSetPaused(channel->channel_id, true);
+    return channel;
+}
+
+bool audioResumeSingle(SoundId soundId)
+{
+    volatile SimpleChannel* channel = validateSoundId(soundId);
+    if(channel)
+        ndspChnSetPaused(channel->channel_id, false);
+    return channel;
+}
+
+bool audioSoundPlaying(SoundId soundId)
+{
+    return validateSoundId(soundId);
+}
+
 void killSound(SoundId soundId)
 {
     volatile SimpleChannel* channel = validateSoundId(soundId);

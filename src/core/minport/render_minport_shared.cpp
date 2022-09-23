@@ -26,8 +26,6 @@
 
 #include <malloc.h>
 
-#include <gccore.h>
-
 #include <set>
 
 #include <Logger/logger.h>
@@ -77,13 +75,9 @@ void updateViewport()
     hardware_w /= 2;
     hardware_h /= 2;
 
-#ifdef __3DS__
-    int ScreenW_Show = ScreenW - MAX_3D_OFFSET * 2;
-#else
     int ScreenW_Show = ScreenW;
-#endif
 
-    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
+    // if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
     {
         int res_h = hardware_h;
         int res_w = ScreenW_Show * hardware_h / ScreenH;
@@ -97,6 +91,13 @@ void updateViewport()
         g_screen_phys_w = res_w;
         g_screen_phys_h = res_h;
     }
+#ifdef __WII__
+    {
+        g_screen_phys_w = ScreenW_Show / 2;
+        g_screen_phys_h = ScreenH / 2;
+    }
+#endif
+#if 0
     else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
     {
         g_screen_phys_w = ScreenW_Show / 2;
@@ -127,6 +128,7 @@ void updateViewport()
             g_screen_phys_h -= ScreenH / 2;
         }
     }
+#endif
 
     pLogDebug("Phys screen is %d x %d", g_screen_phys_w, g_screen_phys_h);
 
@@ -206,7 +208,7 @@ inline float FLOORDIV2(float x)
 }
 
 #ifndef __WII__
-void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t alpha)
+void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
     minport_RenderBoxFilled(x1, y1, x1 + 1, y2, r, g, b, a);
     minport_RenderBoxFilled(x2 - 1, y1, x2, y2, r, g, b, a);

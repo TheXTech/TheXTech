@@ -42,7 +42,6 @@ std::set<const std::string*> sound_stream_paths;
 
 bool MixPlatform_Init(AudioSetup_t& obtained)
 {
-    UNUSED(obtained);
     return audioInit();
 }
 
@@ -216,9 +215,22 @@ int Mix_HaltChannel(int channel)
 
 int Mix_PlayingMusicStream(Mix_Music* music)
 {
-    (void)music;
-    // no problem on 3DS
-    return 0;
+    return audioSoundPlaying((SoundId)music);
+}
+
+int Mix_PausedMusicStream(Mix_Music* music)
+{
+    return audioSoundPlaying((SoundId)music);
+}
+
+int Mix_PauseMusicStream(Mix_Music* music)
+{
+    return (bool)audioPauseSingle((SoundId)music);
+}
+
+int Mix_ResumeMusicStream(Mix_Music* music)
+{
+    return (bool)audioResumeSingle((SoundId)music);
 }
 
 int Mix_PlayMusic(Mix_Music* music, int loops)
