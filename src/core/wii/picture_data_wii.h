@@ -26,7 +26,9 @@
 #include <cstdint>
 #include <gccore.h>
 
-#define X_IMG_EXT ".tpl"
+// this is the key line to toggle between TPL mode and PNG/GIF mode
+// also, if graphics lists are included, they can force MOST (but not all) assets to be read from TPL
+// #define X_IMG_EXT ".tpl"
 
 /*!
  * \brief Platform specific picture data. Fields should not be used directly
@@ -44,8 +46,6 @@ struct StdPictureData
     bool texture_init[6] = {false, false, false, false, false, false};
 
     GXTexObj texture[6];
-    uint16_t tex_w[3];
-    uint16_t tex_h[3];
 
     inline bool hasTexture()
     {
