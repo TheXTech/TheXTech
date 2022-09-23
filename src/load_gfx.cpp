@@ -546,8 +546,8 @@ static void restoreWorldBackupTextures()
 void LoadGFX()
 {
 #ifdef PGE_MIN_PORT
-    LoadGFXFromList(getGfxDir(), false, false);
-    return;
+    if(LoadGFXFromList(getGfxDir(), false, false))
+        return;
 #endif
 
     std::string p;
@@ -996,9 +996,8 @@ void LoadCustomGFX(bool include_world)
     loadCustomUIAssets();
 
 #ifdef PGE_MIN_PORT
-    LoadGFXFromList(g_dirEpisode.getCurDir(), true, !include_world);
-    LoadGFXFromList(g_dirCustom.getCurDir(), true, !include_world);
-    return;
+    if(LoadGFXFromList(g_dirEpisode.getCurDir(), true, !include_world) || LoadGFXFromList(g_dirCustom.getCurDir(), true, !include_world))
+        return;
 #endif
 
     for(int A = 1; A < maxBlockType; ++A)
