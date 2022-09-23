@@ -107,7 +107,8 @@ bool MixPlatform_Init(AudioSetup_t& obtained)
         return false;
     }
 
-    ret = Mix_QuerySpecEx(&obtained);
+    SDL_AudioSpec ob;
+    ret = Mix_QuerySpecEx(&ob);
 
     if(ret == 0)
     {
@@ -116,11 +117,16 @@ bool MixPlatform_Init(AudioSetup_t& obtained)
     }
     else
     {
+        obtained.sampleRate = ob.freq;
+        obtained.format = ob.format;
+        obtained.channels = ob.channels;
+        obtained.bufferSize = ob.samples;
+
         pLogDebug("Sound opened (obtained: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
-                  s_audioSetupObtained.sampleRate,
-                  audio_format_to_string(s_audioSetupObtained.format),
-                  s_audioSetupObtained.channels,
-                  s_audioSetupObtained.bufferSize);
+                  obtained.sampleRate,
+                  audio_format_to_string(obtained.format),
+                  obtained.channels,
+                  obtained.bufferSize);
     }
 
     Mix_VolumeMusic(MIX_MAX_VOLUME);

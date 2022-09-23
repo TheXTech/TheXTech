@@ -106,6 +106,10 @@ extern int Mix_FadeOutMusic(int fadeInMs);
 
 extern int Mix_PlayMusicStream(Mix_Music *music, int loops);
 
+extern int Mix_PausedMusicStream(Mix_Music *music);
+extern int Mix_PauseMusicStream(Mix_Music *music);
+extern int Mix_ResumeMusicStream(Mix_Music *music);
+
 extern int Mix_GetMusicTracks(Mix_Music* music);
 extern const char* Mix_GetMusicTitle(Mix_Music* music);
 

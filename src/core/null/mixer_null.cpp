@@ -145,6 +145,20 @@ int Mix_FadeInMusic(Mix_Music* music, int loops, int fadeInMs)
     return 0;
 }
 
+int Mix_PausedMusicStream(Mix_Music *music)
+{
+    return 0;
+}
+int Mix_PauseMusicStream(Mix_Music *music)
+{
+    return 0;
+}
+int Mix_ResumeMusicStream(Mix_Music *music)
+{
+    return 0;
+}
+
+
 const char* Mix_GetMusicTitle(Mix_Music* music)
 {
     (void)music;

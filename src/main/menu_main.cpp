@@ -1592,7 +1592,7 @@ void mainMenuDraw()
 #endif
 
     // Main menu
-    else if(MenuMode == MENU_MAIN)
+    if(MenuMode == MENU_MAIN)
     {
         int i = 0;
         SuperPrint(g_gameInfo.disableTwoPlayer ? g_mainMenu.mainStartGame : g_mainMenu.main1PlayerGame, 3, 300, 350+30*(i++));

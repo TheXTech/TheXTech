@@ -179,35 +179,6 @@ static void extSfxStopCallback(int channel);
 
 static const int maxSfxChannels = 91;
 
-static const char *audio_format_to_string(SDL_AudioFormat f)
-{
-    switch(f)
-    {
-    default:
-        return "<unknown>";
-    case AUDIO_U8:
-        return "U8";
-    case AUDIO_S8:
-        return "S8";
-    case AUDIO_S16LSB:
-        return "S16-LE";
-    case AUDIO_S16MSB:
-        return "S16-BE";
-    case AUDIO_U16LSB:
-        return "U16-LE";
-    case AUDIO_U16MSB:
-        return "U16-BE";
-    case AUDIO_S32LSB:
-        return "S32-LE";
-    case AUDIO_S32MSB:
-        return "S32-BE";
-    case AUDIO_F32LSB:
-        return "F32-LE";
-    case AUDIO_F32MSB:
-        return "F32-BE";
-    }
-}
-
 
 int CustomWorldMusicId()
 {
@@ -224,8 +195,6 @@ void InitSoundDefaults()
 
 void InitMixerX()
 {
-    int ret;
-    const int initFlags = MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3;
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 

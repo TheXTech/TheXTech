@@ -1118,17 +1118,6 @@ void UnloadCustomGFX()
         EffectHeight[A] = EffectDefaults.EffectHeight[A];
     }
 
-    if(s_custom_worldMapFrameBorderInfo)
-    {
-        g_worldMapFrameBorderInfo = s_backup_worldMapFrameBorderInfo;
-        s_custom_worldMapFrameBorderInfo = false;
-    }
-    if(s_custom_backdropBorderInfo)
-    {
-        g_backdropBorderInfo = s_backup_backdropBorderInfo;
-        s_custom_backdropBorderInfo = false;
-    }
-
     restoreLevelBackupTextures();
 }
 
