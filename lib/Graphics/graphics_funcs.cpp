@@ -201,6 +201,12 @@ void GraphicsHelps::getMaskFromRGBA(FIBITMAP *&image, FIBITMAP *&mask)
                                FreeImage_GetGreenMask(image),
                                FreeImage_GetBlueMask(image));
 
+    if(!mask)
+    {
+        pLogCritical("OOM when extracting mask!");
+        return;
+    }
+
     RGBQUAD Fpix;
     RGBQUAD Npix = {0x0, 0x0, 0x0, 0xFF};
 
@@ -244,7 +250,8 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image,
     if(!mask && !pathToMaskFallback.empty())
     {
         FIBITMAP *front = loadImage(pathToMaskFallback, true);
-        getMaskFromRGBA(front, mask);
+        if(front)
+            getMaskFromRGBA(front, mask);
         closeImage(front);
     }
 

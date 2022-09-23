@@ -20,9 +20,14 @@
 
 #pragma once
 
-#if defined(__3DS__) || defined(__WII__) || defined(PGE_MIN_PORT)
+#ifdef __WII__
+#   include "core/wii/picture_load.h"
+#elif defined(__3DS__) || defined(PGE_MIN_PORT)
 #   include "core/3ds/picture_load.h"
 #endif
+
+// each of the above defines STD_PICTURE_LOAD_H so they prevent the rest from running
+
 
 #ifndef STD_PICTURE_LOAD_H
 #define STD_PICTURE_LOAD_H

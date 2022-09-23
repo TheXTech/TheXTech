@@ -302,6 +302,13 @@ if(USE_SYSTEM_LIBS)
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
+elseif(WII)
+    set(USE_PNG_HARDWARE_OPTIMIZATIONS OFF)
+    include(cmake/library_FreeImage.cmake)
+    list(APPEND A2XT_LIBS PGE_FreeImage)
+    list(APPEND A2XT_DEPS FreeImage_Local)
+    list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include")
+    target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 elseif(NOT PGE_MIN_PORT)
     include(cmake/library_FreeImage.cmake)
     include(cmake/library_SDLMixerX.cmake)
@@ -332,7 +339,7 @@ set(LIB_SRC
     ${LIB_SRC_EXTRA}
 )
 
-if(NOT PGE_MIN_PORT)
+if(WII OR NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
         lib/Graphics/graphics_funcs.cpp
         lib/Graphics/image_size.cpp

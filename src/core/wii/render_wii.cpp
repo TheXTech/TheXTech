@@ -25,12 +25,18 @@
 
 
 #include <malloc.h>
+#include <set>
+
+// sigh...
+#define BOOL FI_BOOL
+#include <FreeImageLite.h>
+#undef BOOL
 
 #include <gccore.h>
 
-#include <set>
-
+#include <Graphics/graphics_funcs.h>
 #include <Logger/logger.h>
+#include <Utils/files.h>
 
 #include "globals.h"
 #include "video.h"
@@ -59,6 +65,91 @@ int s_num_textures_loaded = 0;
 int g_rmode_w = 640;
 int g_rmode_h = 480;
 
+/**
+ * Convert a raw BMP (ARGB) to 4x4RGBA.
+ * @author DragonMinded, modifications by ds-sloth
+*/
+static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height, uint32_t* wdst_out, uint32_t* hdst_out)
+{
+    // calculate destination dimensions, including required padding
+    uint32_t wdst = width;
+    uint32_t hdst = height;
+    if(wdst & 3)
+    {
+        wdst += 4;
+        wdst &= ~3;
+    }
+    if(hdst & 3)
+    {
+        hdst += 4;
+        hdst &= ~3;
+    }
+
+    void* dst = memalign(32, wdst * hdst * 4);
+
+    if(!dst)
+    {
+        pLogCritical("Memory allocation failed when converting texture to Wii hardware format");
+        return dst;
+    }
+
+    u8 *p = (u8*)dst;
+
+    for (u32 block = 0; block < height; block += 4)
+    {
+        for (u32 i = 0; i < width; i += 4)
+        {
+            // Alpha and Red
+            for (u8 c = 0; c < 4; ++c)
+            {
+                for (u8 argb = 0; argb < 4; ++argb)
+                {
+                    // new: padding
+                    if(i + argb > width || block + c > height)
+                    {
+                        *p++ = 0;
+                        *p++ = 0;
+                        continue;
+                    }
+
+                    // New: Alpha pixels
+                    *p++ = src[((i + argb) + ((block + c) * width)) * 4];
+                    // Red pixels
+                    *p++ = src[((i + argb) + ((block + c) * width)) * 4 + 1];
+                }
+            }
+
+            // Green and Blue
+            for (u8 c = 0; c < 4; ++c)
+            {
+                for (u8 argb = 0; argb < 4; ++argb)
+                {
+                    // new: padding
+                    if(i + argb > width || block + c > height)
+                    {
+                        *p++ = 0;
+                        *p++ = 0;
+                        continue;
+                    }
+
+                    // Green pixels
+                    *p++ = src[(((i + argb) + ((block + c) * width)) * 4) + 2];
+                    // Blue pixels
+                    *p++ = src[(((i + argb) + ((block + c) * width)) * 4) + 3];
+                }
+            }
+        }
+    }
+
+    if(dst && wdst_out)
+        *wdst_out = wdst;
+
+    if(dst && hdst_out)
+        *hdst_out = hdst;
+
+    return dst;
+}
+
 int robust_TPL_GetTexture(TPLFile* file, int i, GXTexObj* gxtex)
 {
     int ret = TPL_GetTexture(file, i, gxtex);
@@ -69,6 +160,87 @@ int robust_TPL_GetTexture(TPLFile* file, int i, GXTexObj* gxtex)
     minport_freeTextureMemory();
 
     return TPL_GetTexture(file, i, gxtex);
+}
+
+FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath)
+{
+    if(path.empty())
+        return nullptr;
+
+    // this is wasteful, but it lets us diagnose memory issue vs other issues
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileType(path.c_str(), 0);
+    if(formato == FIF_UNKNOWN)
+    {
+        return nullptr;
+    }
+
+    FIBITMAP* sourceImage = GraphicsHelps::loadImage(path);
+    if(!sourceImage)
+    {
+        pLogWarning("FreeImageLite failed to load image due to lack of memory, trying to free some memory");
+        minport_freeTextureMemory();
+        sourceImage = GraphicsHelps::loadImage(path);
+        if(!sourceImage)
+            return nullptr;
+    }
+
+    if(!maskPath.empty())
+        GraphicsHelps::mergeWithMask(sourceImage, "", maskPath);
+
+    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
+    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+
+    pLogDebug("loading %s, freeimage reports %u %u %u\n", path.c_str(), w, h, FreeImage_GetPitch(sourceImage));
+
+    if((w == 0) || (h == 0))
+    {
+        GraphicsHelps::closeImage(sourceImage);
+        pLogWarning("Error loading of image file:\n"
+                    "Reason: %s."
+                    "Zero image size!");
+        return nullptr;
+    }
+
+    FreeImage_FlipVertical(sourceImage);
+
+    FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w / 2), int(h / 2), FILTER_BOX);
+    GraphicsHelps::closeImage(sourceImage);
+
+    if(!d)
+    {
+        return nullptr;
+    }
+
+    return d;
+}
+
+void s_loadTexture(StdPicture& target, void* data, int width, int height, bool mask)
+{
+    for(int i = 0; i < 3; i++)
+    {
+        int start_y = i * 1024;
+        int end_y = height;
+
+        int h_i = end_y - start_y;
+        if(h_i > 1024)
+            h_i = 1024;
+
+        if(width > 0 && h_i > 0 && width <= 1024)
+        {
+            uint32_t wdst, hdst;
+            target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + start_y * width * 4, width, h_i, &wdst, &hdst);
+            if(target.d.backing_texture[i + 3 * mask])
+            {
+                DCFlushRange(target.d.backing_texture[i + 3 * mask], wdst * hdst * 4);
+                GX_InitTexObj(&target.d.texture[i], target.d.backing_texture[i + 3 * mask],
+                    wdst, hdst, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+                GX_InitTexObjFilterMode(&target.d.texture[i], GX_NEAR, GX_NEAR);
+                target.d.texture_init[i] = true;
+            }
+            else
+                break;
+        }
+    }
 }
 
 void s_loadTexture(StdPicture &target, int i)
@@ -158,7 +330,7 @@ bool init()
     GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
 
 
-    printf("%d %d\n", (int)rmode->viWidth, (int)rmode->viHeight);
+    printf("Initialized video with rMode %d x %d\n", (int)rmode->viWidth, (int)rmode->viHeight);
 
     g_rmode_w = rmode->fbWidth;
     g_rmode_h = rmode->efbHeight;
@@ -513,20 +685,65 @@ void lazyLoad(StdPicture &target)
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
         return;
 
+    pLogDebug("Loading %s", target.l.path.c_str());
+
     std::string suppPath;
 
     target.inited = true;
 
-    if(robust_OpenTPLFromFile(&target.d.texture_file[0], target.l.path.c_str()) != 1)
+    if(Files::hasSuffix(target.l.path, ".tpl"))
     {
-        pLogWarning("Permanently failed to load %s", target.l.path.c_str());
-        pLogWarning("Error: %d (%s)", errno, strerror(errno));
-        target.inited = false;
-        return;
-    }
+        if(robust_OpenTPLFromFile(&target.d.texture_file[0], target.l.path.c_str()) != 1)
+        {
+            pLogWarning("Permanently failed to load %s", target.l.path.c_str());
+            pLogWarning("Error: %d (%s)", errno, strerror(errno));
+            target.inited = false;
+            return;
+        }
 
-    target.d.texture_file_init[0] = true;
-    s_loadTexture(target, 0);
+        target.d.texture_file_init[0] = true;
+        s_loadTexture(target, 0);
+    }
+    else
+    {
+        FIBITMAP* FI_tex = nullptr;
+        FIBITMAP* FI_mask = nullptr;
+
+        if(Files::hasSuffix(target.l.mask_path, "m.gif"))
+        {
+            FI_tex = robust_FILoad(target.l.path, "");
+
+            if(FI_tex)
+                FI_mask = robust_FILoad(target.l.mask_path, "");
+        }
+        else
+        {
+            FI_tex = robust_FILoad(target.l.path, target.l.mask_path);
+        }
+
+        if(!FI_tex)
+        {
+            pLogWarning("Permanently failed to load %s", target.l.path.c_str());
+            pLogWarning("Error: %d (%s)", errno, strerror(errno));
+            target.inited = false;
+            return;
+        }
+
+        if(target.l.colorKey) // Apply transparent color for key pixels
+        {
+            PGE_Pix colSrc = {target.l.keyRgb[0],
+                              target.l.keyRgb[1],
+                              target.l.keyRgb[2], 0xFF};
+            PGE_Pix colDst = {target.l.keyRgb[0],
+                              target.l.keyRgb[1],
+                              target.l.keyRgb[2], 0x00};
+            GraphicsHelps::replaceColor(FI_tex, colSrc, colDst);
+        }
+
+        s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), false);
+        if(FI_mask)
+            s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), true);
+    }
 
     if(!target.d.hasTexture())
     {
@@ -537,9 +754,10 @@ void lazyLoad(StdPicture &target)
         return;
     }
 
-    if(target.h > 2048)
+    if(target.h > 2048 && target.d.texture_file_init[0])
     {
         suppPath = target.l.path + '1';
+
         if(robust_OpenTPLFromFile(&target.d.texture_file[1], suppPath.c_str()) != 1)
         {
             pLogWarning("Permanently failed to load %s", suppPath.c_str());
@@ -551,9 +769,11 @@ void lazyLoad(StdPicture &target)
             s_loadTexture(target, 1);
         }
     }
-    if(target.h > 4096)
+
+    if(target.h > 4096 && target.d.texture_file_init[0])
     {
         suppPath = target.l.path + '2';
+
         if(robust_OpenTPLFromFile(&target.d.texture_file[2], suppPath.c_str()) != 1)
         {
             pLogWarning("Permanently failed to load %s", suppPath.c_str());
@@ -565,6 +785,8 @@ void lazyLoad(StdPicture &target)
             s_loadTexture(target, 2);
         }
     }
+
+    pLogDebug("Done!");
 
     s_num_textures_loaded++;
 }
