@@ -3127,12 +3127,14 @@ void UpdatePlayer()
 
                     if(BackgroundFence[Background[B].Type] && (!g_compatibility.fix_climb_invisible_fences || !Background[B].Hidden))
                     {
+                        // FIXME: remove 4 spaces indention as soon as possible from this block below to the next commented brace
                         // if(CheckCollision(Player[A].Location, Background[B].Location))
-                        {
+                        //{
                             tempLocation = Background[B].Location;
                             tempLocation.Height -= 16;
                             tempLocation.Width -= 20;
                             tempLocation.X += 10;
+
                             if(CheckCollision(Player[A].Location, tempLocation))
                             {
                                 if(Player[A].Character == 5)
@@ -3142,6 +3144,7 @@ void UpdatePlayer()
                                     if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                     {
                                         Player[A].FairyCD = 0;
+
                                         if(!Player[A].Fairy)
                                         {
                                             Player[A].Fairy = true;
@@ -3152,6 +3155,7 @@ void UpdatePlayer()
                                             Player[A].Effect2 = 4;
                                             NewEffect(63, Player[A].Location);
                                         }
+
                                         if(Player[A].FairyTime != -1 && Player[A].FairyTime < 20)
                                             Player[A].FairyTime = 20;
                                     }
@@ -3196,7 +3200,7 @@ void UpdatePlayer()
                                     }
                                 } // !Fairy & !Stoned
                             } // Collide player and temp location
-                        }// Collide player and BGO
+                        // }// Collide player and BGO
                     } // Is BGO climbable and visible?
                 } // Next A
 
