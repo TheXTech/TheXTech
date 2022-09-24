@@ -36,6 +36,7 @@
 #include "editor.h"
 #include "blocks.h"
 #include "main/trees.h"
+#include "main/block_table.h"
 
 int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
@@ -940,6 +941,19 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                     NPC[C].Location.SpeedY = 0;
                                 }
                             }
+
+                            // eventually, only re-join tables the first time the event has been triggered in a level
+                            treeBlockJoinLayer(B);
+                            treeBackgroundJoinLayer(B);
+                        }
+                        else
+                        {
+                            // these thresholds can be tweaked, but they balance the expense of querying more tables with the expense of updating locations in the main table
+                            if(Layer[B].blocks.size() > 80)
+                                treeBlockSplitLayer(B);
+
+                            if(Layer[B].BGOs.size() > 80)
+                                treeBackgroundSplitLayer(B);
                         }
                     }
                 }
@@ -1238,6 +1252,9 @@ void UpdateLayers()
                         Block[B].Location.Y += double(Layer[A].SpeedY);
                         Block[B].Location.SpeedX = double(Layer[A].SpeedX);
                         Block[B].Location.SpeedY = double(Layer[A].SpeedY);
+
+                        if(!treeBlockLayerActive(A))
+                            treeBlockUpdateLayer(A, B);
                     }
                 }
 
@@ -1253,6 +1270,9 @@ void UpdateLayers()
                             Background[B].Location.SpeedX = double(Layer[A].SpeedX);
                             Background[B].Location.SpeedY = double(Layer[A].SpeedY);
                         }
+
+                        if(!treeBackgroundLayerActive(A))
+                            treeBackgroundUpdateLayer(A, B);
                     }
                 }
 
@@ -1361,36 +1381,23 @@ void syncLayersTrees_Block(int block)
         if(layer != Block[block].Layer)
         {
             Layer[layer].blocks.erase(block);
-            treeBlockRemoveLayer(layer, &Block[block]);
+            treeBlockRemoveLayer(layer, block);
         }
     }
+
     int layer = Block[block].Layer;
     if(block <= numBlock)
     {
+        treeBlockAddLayer(layer, block);
         if(layer != LAYER_NONE)
-        {
-            Block[block].LocationInLayer = Block[block].Location;
-            Block[block].LocationInLayer.X = Block[block].Location.X - Layer[layer].OffsetX;
-            Block[block].LocationInLayer.Y = Block[block].Location.Y - Layer[layer].OffsetY;
-            treeBlockAddLayer(layer, &Block[block]);
             Layer[layer].blocks.insert(block);
-        }
-        else
-        {
-            Block[block].LocationInLayer = Block[block].Location;
-            treeBlockAddLayer(LAYER_NONE, &Block[block]);
-        }
     }
     else
     {
+        treeBlockRemoveLayer(layer, block);
         if(layer != LAYER_NONE)
         {
-            treeBlockRemoveLayer(layer, &Block[block]);
             Layer[layer].blocks.erase(block);
-        }
-        else
-        {
-            treeBlockRemoveLayer(LAYER_NONE, &Block[block]);
         }
     }
 }
@@ -1433,9 +1440,24 @@ void syncLayers_BGO(int bgo)
 {
     for(int layer = 0; layer <= numLayers; layer++)
     {
-        if(bgo <= numBackground + numLocked && Background[bgo].Layer == layer)
+        if(layer != Background[bgo].Layer)
+        {
+            treeBackgroundRemoveLayer(layer, bgo);
+            Layer[layer].BGOs.erase(bgo);
+        }
+    }
+
+    int layer = Background[bgo].Layer;
+    if(bgo <= numBackground + numLocked)
+    {
+        treeBackgroundAddLayer(layer, bgo);
+        if(layer != LAYER_NONE)
             Layer[layer].BGOs.insert(bgo);
-        else
+    }
+    else
+    {
+        treeBackgroundRemoveLayer(layer, bgo);
+        if(layer != LAYER_NONE)
             Layer[layer].BGOs.erase(bgo);
     }
 }

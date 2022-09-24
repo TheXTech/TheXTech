@@ -638,9 +638,12 @@ void NPCSpecial(int A)
 
             if(!tempBool)
             {
-                for(int i = 1; i <= numBackground; i++)
+                for(BackgroundRef_t i : treeBackgroundQuery(tempLocation, SORTMODE_NONE))
                 {
-                    auto &b = Background[i];
+                    if((int)i > numBackground)
+                        continue;
+
+                    Background_t &b = i;
                     if(!b.Hidden && ((b.Type >= 174 && b.Type <= 186) || b.Type == 63) && CheckCollision(tempLocation, b.Location))
                     {
                         tempBool = true;
@@ -2385,8 +2388,11 @@ void NPCSpecial(int A)
             F = 0;
             tempNPC = npc;
 
-            for(int i = 1; i <= numBackground; i++)
+            for(int i : treeBackgroundQuery(tempLocation, SORTMODE_ID))
             {
+                if(i > numBackground)
+                    break;
+
                 // Any nearest BGO touched? (rails and reverse buffers)
                 if((Background[i].Type >= 70 && Background[i].Type <= 74) || Background[i].Type == 100)
                 {
@@ -2526,14 +2532,6 @@ void NPCSpecial(int A)
         // only update the quadtree if the tempBlock exists
         if(npc.tempBlock > 0)
         {
-            // necessary for tree update
-            Block[npc.tempBlock].LocationInLayer = Block[npc.tempBlock].Location;
-            if(Block[npc.tempBlock].Layer != LAYER_NONE)
-            {
-                Block[npc.tempBlock].LocationInLayer.X -= Layer[Block[npc.tempBlock].Layer].OffsetX;
-                Block[npc.tempBlock].LocationInLayer.Y -= Layer[Block[npc.tempBlock].Layer].OffsetY;
-            }
-
             treeTempBlockUpdate(npc.tempBlock);
         }
 

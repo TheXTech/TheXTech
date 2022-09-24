@@ -3294,8 +3294,11 @@ void YoshiEatCode(const int A)
         {
             if(NPC[p.YoshiNPC].Type == 31) // key check
             {
-                for(B = 1; B <= numBackground; B++)
+                for(int B : treeBackgroundQuery(p.Location, SORTMODE_ID))
                 {
+                    if(B > numBackground)
+                        break;
+
                     if(Background[B].Type == 35)
                     {
                         tempLocation = Background[B].Location;
@@ -6641,8 +6644,11 @@ void PlayerEffects(const int A)
             {
                 p.Effect2 = 130;
 
-                for(int c = 1; c <= numBackground; c++)
+                for(int c : treeBackgroundQuery(Warp[p.Warp].Exit, SORTMODE_NONE))
                 {
+                    if(c > numBackground)
+                        continue;
+
                     if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
                     {
                         if(Background[c].Type == 88)
@@ -6696,8 +6702,11 @@ void PlayerEffects(const int A)
 
             if(fEqual(p.Effect2, 1900))
             {
-                for(int c = 1; c <= numBackground; c++)
+                for(int c : treeBackgroundQuery(Warp[p.Warp].Exit, SORTMODE_NONE))
                 {
+                    if(c > numBackground)
+                        continue;
+
                     if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
                     {
                         if(Background[c].Type == 88)
