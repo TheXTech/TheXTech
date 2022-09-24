@@ -159,28 +159,31 @@ struct TableInterface
         if(sort_mode == SORTMODE_LOC)
         {
             std::sort(result.i_vec->begin(), result.i_vec->end(),
-                [](BaseRef_t a, BaseRef_t b) {
-                    return (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
-                        || (((ItemRef_t)a)->Location.X == ((ItemRef_t)b)->Location.X
-                            && ((ItemRef_t)a)->Location.Y < ((ItemRef_t)b)->Location.Y));
-                });
+            [](BaseRef_t a, BaseRef_t b)
+            {
+                return (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
+                    || (((ItemRef_t)a)->Location.X == ((ItemRef_t)b)->Location.X
+                        && ((ItemRef_t)a)->Location.Y < ((ItemRef_t)b)->Location.Y));
+            });
         }
         else if(sort_mode == SORTMODE_ID)
         {
             std::sort(result.i_vec->begin(), result.i_vec->end(),
-                [](BaseRef_t a, BaseRef_t b) {
-                    return a < b;
-                });
+            [](BaseRef_t a, BaseRef_t b)
+            {
+                return a < b;
+            });
         }
         else if(sort_mode == SORTMODE_Z)
         {
             std::sort(result.i_vec->begin(), result.i_vec->end(),
-                [](BaseRef_t a, BaseRef_t b) {
-                    // not implemented yet, might never be
-                    // instead, just sort by the index
-                    // (which is currently the same as z-order)
-                    return a < b;
-                });
+            [](BaseRef_t a, BaseRef_t b)
+            {
+                // not implemented yet, might never be
+                // instead, just sort by the index
+                // (which is currently the same as z-order)
+                return a < b;
+            });
         }
 
         return result;
@@ -190,10 +193,10 @@ struct TableInterface
                              int sort_mode,
                              double margin)
     {
-        Location_t loc = newLoc(Left - margin,
-           Top - margin,
-           (Right - Left) + margin * 2,
-           (Bottom - Top) + margin * 2);
+        auto loc = newLoc(Left - margin,
+                          Top - margin,
+                          (Right - Left) + margin * 2,
+                          (Bottom - Top) + margin * 2);
 
         return query(loc, sort_mode);
     }
@@ -295,28 +298,31 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc,
     if(sort_mode == SORTMODE_LOC)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                    || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                        && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
-            });
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
+                    && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
+        });
     }
     else if(sort_mode == SORTMODE_ID)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                return a.index < b.index;
-            });
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            return a.index < b.index;
+        });
     }
     else if(sort_mode == SORTMODE_Z)
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
-            [](BaseRef_t a, BaseRef_t b) {
-                // not implemented yet, might never be
-                // instead, just sort by the index
-                // (which is currently the same as z-order)
-                return a.index < b.index;
-            });
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            // not implemented yet, might never be
+            // instead, just sort by the index
+            // (which is currently the same as z-order)
+            return a.index < b.index;
+        });
     }
 
     return result;
@@ -326,10 +332,10 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, doub
                          int sort_mode,
                          double margin)
 {
-    Location_t loc = newLoc(Left - margin,
-               Top - margin,
-               (Right - Left) + margin * 2,
-               (Bottom - Top) + margin * 2);
+    auto loc = newLoc(Left - margin,
+                      Top - margin,
+                      (Right - Left) + margin * 2,
+                      (Bottom - Top) + margin * 2);
 
     return treeTempBlockQuery(loc, sort_mode);
 }

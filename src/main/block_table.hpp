@@ -82,10 +82,12 @@ struct node_t
                 this->i = 0;
             }
         }
+
         inline iterator(node_t* parent, size_t i): parent(parent), i(i)
         {
             this->check_linkage();
         }
+
         inline iterator operator++()
         {
             if(this->parent)
@@ -95,10 +97,12 @@ struct node_t
             }
             return *this;
         }
+
         inline bool operator!=(const iterator& other) const
         {
             return this->parent != other.parent || this->i != other.i;
         }
+
         inline AugBaseRef_t operator*() const
         {
             return {this->parent->refs[this->i], (uint8_t)((this->parent->cont_axes >> (this->i * 2)) & 3)};
@@ -143,12 +147,14 @@ struct node_t
     inline void erase(BaseRef_t o)
     {
         iterator it = this->begin();
+
         while(it != this->end())
         {
             if((*it).ref == o)
                 break;
             ++it;
         }
+
         if(it != this->end())
             this->erase(it);
     }
@@ -170,12 +176,16 @@ struct rect_internal
     private:
         const rect_internal& parent;
         AugLoc_t cur_loc;
+
     public:
-        inline iterator(const rect_internal& parent, AugLoc_t cur_loc): parent(parent), cur_loc(cur_loc) {}
+        inline iterator(const rect_internal& parent, AugLoc_t cur_loc): parent(parent), cur_loc(cur_loc)
+        {}
+
         inline iterator operator++()
         {
             this->cur_loc.y++;
             this->cur_loc.cont_axes |= CONT_Y;
+
             if(this->cur_loc.y == this->parent.b)
             {
                 this->cur_loc.x++;
@@ -187,12 +197,15 @@ struct rect_internal
                     this->cur_loc.y = this->parent.t;
                 }
             }
+
             return *this;
         }
+
         inline bool operator!=(const iterator& other) const
         {
             return this->cur_loc.y != other.cur_loc.y || this->cur_loc.x != other.cur_loc.x;
         }
+
         inline const AugLoc_t& operator*() const
         {
             return cur_loc;
@@ -236,8 +249,7 @@ struct screen_t
     std::array<node_t, 1024> nodes;
 
     screen_t()
-    {
-    }
+    {}
 
     void query(std::vector<BaseRef_t>& out, const rect_internal& rect)
     {
@@ -275,11 +287,13 @@ template<class MyRef_t>
 Location_t extract_loc_layer(MyRef_t obj)
 {
     Location_t loc = obj->Location;
+
     if(obj->Layer != LAYER_NONE)
     {
         loc.X -= Layer[obj->Layer].OffsetX;
         loc.Y -= Layer[obj->Layer].OffsetY;
     }
+
     return loc;
 }
 
@@ -288,7 +302,8 @@ Location_t extract_loc_layer(MyRef_t obj)
 template<class MyRef_t>
 struct table_t
 {
-    std::vector<std::vector<screen_t*>> columns;
+    typedef std::vector<screen_t*> screen_ptr_arr_t;
+    std::vector<screen_ptr_arr_t> columns;
     std::vector<int> col_first_row_index;
     std::unordered_map<MyRef_t, rect_external> member_rects;
     int first_col_index;
@@ -417,7 +432,7 @@ struct table_t
 
         if(columns.size() == 0)
         {
-            columns.emplace_back();
+            columns.emplace_back(screen_ptr_arr_t());
             col_first_row_index.resize(1);
             first_col_index = lcol;
         }
@@ -426,7 +441,7 @@ struct table_t
         {
             int to_add = first_col_index - lcol;
             for(int i = 0; i < to_add; i++)
-                columns.emplace_back();
+                columns.emplace_back(screen_ptr_arr_t());
 
             std::rotate(columns.rbegin(), columns.rbegin() + to_add, columns.rend());
 
@@ -439,7 +454,7 @@ struct table_t
         if(rcol > first_col_index + (int)columns.size())
         {
             for(int i = first_col_index + (int)columns.size(); i < rcol; i++)
-                columns.emplace_back();
+                columns.emplace_back(screen_ptr_arr_t());
 
             col_first_row_index.resize(rcol - first_col_index);
         }
@@ -605,9 +620,7 @@ struct table_t
     {
         auto it = member_rects.find(b);
         if(it != member_rects.end())
-        {
             erase(b, it->second);
-        }
 
         insert(b);
     }
@@ -616,9 +629,7 @@ struct table_t
     {
         auto it = member_rects.find(b);
         if(it != member_rects.end())
-        {
             erase(b, it->second);
-        }
 
         insert_layer(b);
     }
@@ -631,6 +642,7 @@ struct table_t
             for(screen_t* screen : col)
                 delete screen;
         }
+
         columns.clear();
         col_first_row_index.clear();
         member_rects.clear();
@@ -675,6 +687,7 @@ class BasicAllocator
             ret = alloc_instances[alloc_instances.size() - 1];
             used_instances++;
         }
+
         return ret;
     }
 

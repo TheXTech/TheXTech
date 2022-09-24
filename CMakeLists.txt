@@ -480,6 +480,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/sdl/*.h
     src/editor/*.h
     src/main/*.h
+    src/main/*.hpp
     src/main/QuadTree/*.h
     src/sound/fx/*.h
 )
