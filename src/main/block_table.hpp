@@ -72,7 +72,7 @@ struct node_t
         node_t* parent;
         uint16_t i;
 
-        constexpr inline iterator(nullptr_t parent) : parent(parent), i(0) {}
+        constexpr inline iterator(std::nullptr_t parent) : parent(parent), i(0) {}
 
         inline void check_linkage()
         {
