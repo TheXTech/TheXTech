@@ -3886,7 +3886,7 @@ void WaterCheck(const int A)
         }
     }
 
-    for(int numWaterMax = numWater, B = 1; B <= numWaterMax; B++)
+    for(int B : treeWaterQuery(p.Location, SORTMODE_NONE))
     {
         if(!Water[B].Hidden)
         {
@@ -3959,7 +3959,7 @@ void WaterCheck(const int A)
                 tempLocation = newLoc(p.Location.X - 8 + dRand() * 8, p.Location.Y + 4 + dRand() * 8, 8, 8);
             if(!UnderWater[p.Section])
             {
-                for(B = 1; B <= numWater; B++)
+                for(int B : treeWaterQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(CheckCollision(Water[B].Location, tempLocation))
                     {

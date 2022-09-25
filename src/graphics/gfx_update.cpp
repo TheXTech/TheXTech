@@ -2148,7 +2148,9 @@ void UpdateGraphics(bool skipRepaint)
         // water
         if(LevelEditor)
         {
-            for(B = 1; B <= numWater; B++)
+            for(int B : treeWaterQuery(-vScreenX[Z], -vScreenY[Z],
+                -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
+                SORTMODE_ID))
             {
                 if(!Water[B].Hidden && vScreenCollision(Z, Water[B].Location))
                 {
