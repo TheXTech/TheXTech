@@ -3053,9 +3053,9 @@ void PlayerPush(const int A, int HitSpot)
     // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
     // blockTileGet(p.Location, fBlock, lBlock);
 
-    for(Block_t* block : treeBlockQuery(p.Location, SORTMODE_COMPAT))
+    for(BlockRef_t block : treeBlockQuery(p.Location, SORTMODE_COMPAT))
     {
-        int B = block - &Block[1] + 1;
+        int B = block;
         Block_t& b = *block;
 
         if(b.Hidden || BlockIsSizable[b.Type])

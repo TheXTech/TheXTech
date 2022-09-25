@@ -264,9 +264,8 @@ void GraphicsLazyPreLoad()
             -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
             SORTMODE_ID);
 
-        for(Block_t* block_p : screenBlocks)
+        for(Block_t& b : screenBlocks)
         {
-            auto &b = *block_p;
             if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBlockType))
                 XRender::lazyPreLoad(GFXBlock[b.Type]);
         }
@@ -1479,9 +1478,8 @@ void UpdateGraphics(bool skipRepaint)
 //        }
 
 //        For A = fBlock To lBlock 'Non-Sizable Blocks
-        for(Block_t* block_p : screenBlocks)
+        for(Block_t& block : screenBlocks)
         {
-            auto &block = *block_p;
             g_stats.checkedBlocks++;
 
             if(!BlockIsSizable[block.Type] && (!block.Invis || (LevelEditor && BlockFlash <= 30)) && block.Type != 0 && !BlockKills[block.Type])
@@ -2093,9 +2091,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // Blocks in Front
-        for(Block_t* block_p : screenBlocks)
+        for(Block_t& block : screenBlocks)
         {
-            auto &block = *block_p;
             g_stats.checkedBlocks++;
 
             if(BlockKills[block.Type])
