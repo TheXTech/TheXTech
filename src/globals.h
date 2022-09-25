@@ -1171,6 +1171,7 @@ struct Star_t
 //Public nPlay As nPlay ' for online stuff
 //Public Water(0 To maxWater) As Water
 extern RangeArr<Water_t, 0, maxWater> Water;
+DECLREF_T(Water);
 //Public numWater As Integer 'number of water
 extern int numWater;
 //Public Star(1 To 1000) As Star
