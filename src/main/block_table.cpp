@@ -133,6 +133,23 @@ struct TableInterface
     {
         TreeResult_Sentinel<ItemRef_t> result;
 
+        // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
+        //   (such as, when an item is trapped inside a wall during !BlocksSorted)
+        if(!g_compatibility.emulate_classic_block_order)
+        {
+            loc.X -= 32;
+            loc.Y -= 32;
+            loc.Width += 64;
+            loc.Height += 64;
+        }
+        else
+        {
+            loc.X -= 2;
+            loc.Y -= 2;
+            loc.Width += 4;
+            loc.Height += 4;
+        }
+
         common_table.query(*result.i_vec, loc);
 
         for(int i = 0; i < num_active_tables; i++)
