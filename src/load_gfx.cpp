@@ -111,7 +111,6 @@ static void loadCGFX(const std::string &origPath,
         backup.width = *width;
     if(height)
         backup.height = *height;
-    backup.texture = texture;
 
     bool isGif = false;
 
@@ -178,7 +177,10 @@ static void loadCGFX(const std::string &origPath,
 
         pLogDebug("Loaded custom GFX: %s", loadedPath.c_str());
         isCustom = true;
+
+        backup.texture = texture;
         texture = newTexture;
+
         if(width)
             *width = newTexture.w;
         if(height)
