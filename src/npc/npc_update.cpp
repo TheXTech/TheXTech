@@ -791,7 +791,7 @@ void UpdateNPCs()
                 if(UnderWater[NPC[A].Section])
                     NPC[A].Wet = 2;
 
-                for(B = 1; B <= numWater; B++)
+                for(int B : treeWaterQuery(NPC[A].Location, SORTMODE_NONE))
                 {
                     if(!Water[B].Hidden)
                     {
