@@ -3848,7 +3848,7 @@ void ClownCar()
 void WaterCheck(const int A)
 {
     Location_t tempLocation;
-    int B = 0;
+    // int B = 0;
     auto &p = Player[A];
 
     if(p.Wet > 0)
