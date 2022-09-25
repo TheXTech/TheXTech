@@ -57,7 +57,7 @@ struct TableInterface
     // checks if a layer is currently split from the main table
     bool active(int layer)
     {
-        return !layer_table_active[layer];
+        return layer_table_active[layer];
     }
 
     // splits a layer from the main table
