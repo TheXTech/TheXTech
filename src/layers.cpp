@@ -945,6 +945,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             // eventually, only re-join tables the first time the event has been triggered in a level
                             treeBlockJoinLayer(B);
                             treeBackgroundJoinLayer(B);
+                            treeWaterJoinLayer(B);
                         }
                         else
                         {
@@ -954,6 +955,9 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             if(Layer[B].BGOs.size() > 80)
                                 treeBackgroundSplitLayer(B);
+
+                            if(Layer[B].waters.size() > 80)
+                                treeWaterSplitLayer(B);
                         }
                     }
                 }
@@ -1282,6 +1286,9 @@ void UpdateLayers()
                     {
                         Water[B].Location.X += double(Layer[A].SpeedX);
                         Water[B].Location.Y += double(Layer[A].SpeedY);
+
+                        if(!treeWaterLayerActive(A))
+                            treeWaterUpdateLayer(A, B);
                     }
                 }
 
@@ -1477,9 +1484,24 @@ void syncLayers_Water(int water)
 {
     for(int layer = 0; layer <= numLayers; layer++)
     {
-        if(water <= numWater && Water[water].Layer == layer)
+        if(layer != Water[water].Layer)
+        {
+            treeWaterRemoveLayer(layer, water);
+            Layer[layer].waters.erase(water);
+        }
+    }
+
+    int layer = Water[water].Layer;
+    if(water <= numWater)
+    {
+        treeWaterAddLayer(layer, water);
+        if(layer != LAYER_NONE)
             Layer[layer].waters.insert(water);
-        else
+    }
+    else
+    {
+        treeWaterRemoveLayer(layer, water);
+        if(layer != LAYER_NONE)
             Layer[layer].waters.erase(water);
     }
 }
