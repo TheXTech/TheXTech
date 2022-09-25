@@ -152,6 +152,9 @@ struct TableInterface
 
         common_table.query(*result.i_vec, loc);
 
+        double oX = loc.X;
+        double oY = loc.Y;
+
         for(int i = 0; i < num_active_tables; i++)
         {
             int layer = active_tables[i];
@@ -161,8 +164,8 @@ struct TableInterface
 
             layer_table[layer].query(*result.i_vec, loc);
 
-            loc.X += Layer[layer].OffsetX;
-            loc.Y += Layer[layer].OffsetY;
+            loc.X = oX;
+            loc.Y = oY;
         }
 
         if(sort_mode == SORTMODE_COMPAT)
