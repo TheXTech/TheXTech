@@ -36,4 +36,9 @@ bool treeBackgroundLayerActive(int layer);
 void treeBackgroundJoinLayer(int layer);
 void treeBackgroundSplitLayer(int layer);
 
+void treeWaterUpdateLayer(int layer, WaterRef_t block);
+bool treeWaterLayerActive(int layer);
+void treeWaterJoinLayer(int layer);
+void treeWaterSplitLayer(int layer);
+
 #endif // #ifndef BLOCK_TABLE_H

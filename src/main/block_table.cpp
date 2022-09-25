@@ -420,3 +420,65 @@ TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t &loc,
 {
     return s_background_tables.query(loc, sort_mode);
 }
+
+
+/* ================= Level PEZs ================= */
+
+template<>
+const std::set<int>& TableInterface<WaterRef_t>::layer_items(int layer)
+{
+    return Layer[layer].waters;
+}
+
+TableInterface<WaterRef_t> s_water_tables;
+
+void treeLevelCleanWaterLayers()
+{
+    s_water_tables.clear();
+}
+
+// checks if a layer is split from the main Water table
+bool treeWaterLayerActive(int layer)
+{
+    return s_water_tables.active(layer);
+}
+
+// splits a layer from the main Water table
+void treeWaterSplitLayer(int layer)
+{
+    s_water_tables.split(layer);
+}
+
+// joins a layer to the main Water table
+void treeWaterJoinLayer(int layer)
+{
+    s_water_tables.join(layer);
+}
+
+void treeWaterAddLayer(int layer, WaterRef_t Water)
+{
+    s_water_tables.add(layer, Water);
+}
+
+void treeWaterUpdateLayer(int layer, WaterRef_t Water)
+{
+    s_water_tables.update(layer, Water);
+}
+
+void treeWaterRemoveLayer(int layer, WaterRef_t Water)
+{
+    s_water_tables.erase(layer, Water);
+}
+
+TreeResult_Sentinel<WaterRef_t> treeWaterQuery(double Left, double Top, double Right, double Bottom,
+                         int sort_mode,
+                         double margin)
+{
+    return s_water_tables.query(Left, Top, Right, Bottom, sort_mode, margin);
+}
+
+TreeResult_Sentinel<WaterRef_t> treeWaterQuery(const Location_t &loc,
+                         int sort_mode)
+{
+    return s_water_tables.query(loc, sort_mode);
+}

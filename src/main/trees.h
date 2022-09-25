@@ -188,6 +188,14 @@ extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(double Left, dou
                                int sort_mode, double margin = 0.0);
 extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t &loc, int sort_mode);
 
+extern void treeLevelCleanWaterLayers();
+extern void treeWaterAddLayer(int layer, WaterRef_t obj);
+extern void treeWaterRemoveLayer(int layer, WaterRef_t obj);
+extern void treeWaterUpdateLayer(int layer, WaterRef_t obj);
+extern TreeResult_Sentinel<WaterRef_t> treeWaterQuery(double Left, double Top, double Right, double Bottom,
+                               int sort_mode, double margin = 0.0);
+extern TreeResult_Sentinel<WaterRef_t> treeWaterQuery(const Location_t &loc, int sort_mode);
+
 // removed in favor of block quadtree
 
 // extern void blockTileGet(const Location_t &loc, int64_t &fBlock, int64_t &lBlock);
