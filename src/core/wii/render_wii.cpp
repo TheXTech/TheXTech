@@ -71,9 +71,9 @@ int g_rmode_h = 480;
 */
 static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height, uint32_t* wdst_out, uint32_t* hdst_out)
 {
-    // calculate destination dimensions, including required padding
-    uint32_t wdst = width;
-    uint32_t hdst = height;
+    // calculate destination dimensions, including downscaling and required padding
+    uint32_t wdst = (width + 1) / 2;
+    uint32_t hdst = (height + 1) / 2;
     if(wdst & 3)
     {
         wdst += 4;
@@ -93,19 +93,19 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
         return dst;
     }
 
-    u8 *p = (u8*)dst;
+    u8* p = (u8*)dst;
 
-    for (u32 block = 0; block < height; block += 4)
+    for(u32 block = 0; block < hdst; block += 4)
     {
-        for (u32 i = 0; i < width; i += 4)
+        for(u32 i = 0; i < wdst; i += 4)
         {
             // Alpha and Red
-            for (u8 c = 0; c < 4; ++c)
+            for(u8 c = 0; c < 4; ++c)
             {
-                for (u8 argb = 0; argb < 4; ++argb)
+                for(u8 argb = 0; argb < 4; ++argb)
                 {
                     // new: padding
-                    if(i + argb > width || block + c > height)
+                    if((i + argb) * 2 > width || (block + c) * 2 > height)
                     {
                         *p++ = 0;
                         *p++ = 0;
@@ -113,19 +113,19 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                     }
 
                     // New: Alpha pixels
-                    *p++ = src[((i + argb) + ((block + c) * width)) * 4 + 3];
+                    *p++ = src[(((i + argb) * 2) + ((block + c) * 2 * width)) * 4 + 3];
                     // Red pixels
-                    *p++ = src[((i + argb) + ((block + c) * width)) * 4 + 0];
+                    *p++ = src[(((i + argb) * 2) + ((block + c) * 2 * width)) * 4 + 0];
                 }
             }
 
             // Green and Blue
-            for (u8 c = 0; c < 4; ++c)
+            for(u8 c = 0; c < 4; ++c)
             {
-                for (u8 argb = 0; argb < 4; ++argb)
+                for(u8 argb = 0; argb < 4; ++argb)
                 {
                     // new: padding
-                    if(i + argb > width || block + c > height)
+                    if((i + argb) * 2 > width || (block + c) * 2 > height)
                     {
                         *p++ = 0;
                         *p++ = 0;
@@ -133,9 +133,9 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                     }
 
                     // Green pixels
-                    *p++ = src[(((i + argb) + ((block + c) * width)) * 4) + 1];
+                    *p++ = src[((((i + argb) * 2) + ((block + c) * 2 * width)) * 4) + 1];
                     // Blue pixels
-                    *p++ = src[(((i + argb) + ((block + c) * width)) * 4) + 2];
+                    *p++ = src[((((i + argb) * 2) + ((block + c) * 2 * width)) * 4) + 2];
                 }
             }
         }
@@ -208,29 +208,21 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
 
     FreeImage_FlipVertical(sourceImage);
 
-    FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w / 2), int(h / 2), FILTER_BOX);
-    GraphicsHelps::closeImage(sourceImage);
-
-    if(!d)
-    {
-        return nullptr;
-    }
-
-    return d;
+    return sourceImage;
 }
 
 void s_loadTexture(StdPicture& target, void* data, int width, int height, bool mask)
 {
     for(int i = 0; i < 3; i++)
     {
-        int start_y = i * 1024;
+        int start_y = i * 2048;
         int end_y = height;
 
         int h_i = end_y - start_y;
-        if(h_i > 1024)
-            h_i = 1024;
+        if(h_i > 2048)
+            h_i = 2048;
 
-        if(width > 0 && h_i > 0 && width <= 1024)
+        if(width > 0 && h_i > 0 && width <= 2048)
         {
             uint32_t wdst, hdst;
             target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + start_y * width * 4, width, h_i, &wdst, &hdst);
