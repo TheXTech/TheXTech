@@ -218,13 +218,13 @@ int WindowSDL::showCursor(int show)
     return SDL_ShowCursor(show);
 }
 
-void WindowSDL::setCursor(Cursor_t cursor)
+void WindowSDL::setCursor(WindowCursor_t cursor)
 {
     m_cursor = cursor;
     // Do nothing, just remember the last cursor type was set
 }
 
-AbstractWindow_t::Cursor_t WindowSDL::getCursor()
+WindowCursor_t WindowSDL::getCursor()
 {
     return m_cursor;
 }

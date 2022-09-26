@@ -177,12 +177,13 @@ static void s_findRecentEpisode()
     MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 }
 
-
+#if !defined(THEXTECH_PRELOAD_LEVELS) && !defined(PGE_NO_THREADING)
 static int FindWorldsThread(void *)
 {
     FindWorlds();
     return 0;
 }
+#endif
 
 #if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
 #   define USER_WORLDS_NEEDED
@@ -464,9 +465,9 @@ bool mainMenuUpdate()
         menuDoPress = false;
 
     {
-        if(XWindow::getCursor() != AbstractWindow_t::CURSOR_NONE)
+        if(XWindow::getCursor() != CURSOR_NONE)
         {
-            XWindow::setCursor(AbstractWindow_t::CURSOR_NONE);
+            XWindow::setCursor(CURSOR_NONE);
             XWindow::showCursor(0);
         }
 

@@ -264,9 +264,8 @@ void GraphicsLazyPreLoad()
             -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
             SORTMODE_ID);
 
-        for(Block_t* block_p : screenBlocks)
+        for(Block_t& b : screenBlocks)
         {
-            auto &b = *block_p;
             if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBlockType))
                 XRender::lazyPreLoad(GFXBlock[b.Type]);
         }
@@ -757,10 +756,23 @@ void UpdateGraphics(bool skipRepaint)
 //        End If
         }
 
+        // save a vector of all the onscreen BGOs for use at multiple places
+        TreeResult_Sentinel<BackgroundRef_t> _screenBackgrounds = treeBackgroundQuery(
+            -vScreenX[Z], -vScreenY[Z],
+            -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
+            SORTMODE_ID);
+
+        std::vector<BaseRef_t>& screenBackgrounds = *(_screenBackgrounds.i_vec);
+
+        int nextBackground = 0;
+
         if(LevelEditor)
         {
-            For(A, 1, numBackground)
+            for(int A : screenBackgrounds)
             {
+                if(A > numBackground)
+                    break;
+
                 if(Background[A].Type == 11 || Background[A].Type == 12 || Background[A].Type == 60
                     || Background[A].Type == 61 || Background[A].Type == 75 || Background[A].Type == 76
                     || Background[A].Type == 77 || Background[A].Type == 78 || Background[A].Type == 79)
@@ -783,8 +795,9 @@ void UpdateGraphics(bool skipRepaint)
         else
         {
 //            For A = 1 To MidBackground - 1 'First backgrounds
-            For(A, 1, MidBackground - 1)  // First backgrounds
+            for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] < MidBackground; nextBackground++)  // First backgrounds
             {
+                A = screenBackgrounds[nextBackground];
                 g_stats.checkedBGOs++;
 //                if(BackgroundHasNoMask[Background[A].Type] == false) // Useless code
 //                {
@@ -902,8 +915,11 @@ void UpdateGraphics(bool skipRepaint)
 
         if(LevelEditor)
         {
-            For(A, 1, numBackground)
+            for(int A : screenBackgrounds)
             {
+                if(A > numBackground)
+                    break;
+
                 if(!(Background[A].Type == 11 || Background[A].Type == 12 || Background[A].Type == 60
                     || Background[A].Type == 61 || Background[A].Type == 75 || Background[A].Type == 76
                     || Background[A].Type == 77 || Background[A].Type == 78 || Background[A].Type == 79) && !Foreground[Background[A].Type])
@@ -924,8 +940,10 @@ void UpdateGraphics(bool skipRepaint)
         }
         else if(numBackground > 0)
         {
-            for(A = MidBackground; A <= LastBackground; A++) // Second backgrounds
+            for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= LastBackground; nextBackground++)  // Second backgrounds
             {
+                A = screenBackgrounds[nextBackground];
+
                 g_stats.checkedBGOs++;
                 if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
@@ -940,8 +958,10 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-        For(A, numBackground + 1, numBackground + numLocked) // Locked doors
+        for(int oBackground = screenBackgrounds.size() - 1; oBackground > 0 && (int)screenBackgrounds[oBackground] > numBackground; oBackground--)  // Locked doors
         {
+            A = screenBackgrounds[oBackground];
+
             g_stats.checkedBGOs++;
             if(vScreenCollision(Z, Background[A].Location) &&
                 (Background[A].Type == 98 || Background[A].Type == 160) && !Background[A].Hidden)
@@ -1458,9 +1478,8 @@ void UpdateGraphics(bool skipRepaint)
 //        }
 
 //        For A = fBlock To lBlock 'Non-Sizable Blocks
-        for(Block_t* block_p : screenBlocks)
+        for(Block_t& block : screenBlocks)
         {
-            auto &block = *block_p;
             g_stats.checkedBlocks++;
 
             if(!BlockIsSizable[block.Type] && (!block.Invis || (LevelEditor && BlockFlash <= 30)) && block.Type != 0 && !BlockKills[block.Type])
@@ -1976,8 +1995,11 @@ void UpdateGraphics(bool skipRepaint)
 
         if(LevelEditor)
         {
-            For(A, 1, numBackground)
+            for(int A : screenBackgrounds)
             {
+                if(A > numBackground)
+                    continue;
+
                 if(Foreground[Background[A].Type])
                 {
                     g_stats.checkedBGOs++;
@@ -1996,8 +2018,10 @@ void UpdateGraphics(bool skipRepaint)
         }
         else
         {
-            for(A = LastBackground + 1; A <= numBackground; A++) // Foreground objects
+            for(; nextBackground < (int)screenBackgrounds.size() && (int)screenBackgrounds[nextBackground] <= numBackground; nextBackground++)  // Foreground objects
             {
+                A = screenBackgrounds[nextBackground];
+
                 g_stats.checkedBGOs++;
                 if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
                 {
@@ -2067,9 +2091,8 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // Blocks in Front
-        for(Block_t* block_p : screenBlocks)
+        for(Block_t& block : screenBlocks)
         {
-            auto &block = *block_p;
             g_stats.checkedBlocks++;
 
             if(BlockKills[block.Type])
@@ -2125,7 +2148,9 @@ void UpdateGraphics(bool skipRepaint)
         // water
         if(LevelEditor)
         {
-            for(B = 1; B <= numWater; B++)
+            for(int B : treeWaterQuery(-vScreenX[Z], -vScreenY[Z],
+                -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
+                SORTMODE_ID))
             {
                 if(!Water[B].Hidden && vScreenCollision(Z, Water[B].Location))
                 {

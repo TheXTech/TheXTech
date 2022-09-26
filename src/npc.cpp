@@ -638,9 +638,12 @@ void NPCSpecial(int A)
 
             if(!tempBool)
             {
-                for(int i = 1; i <= numBackground; i++)
+                for(BackgroundRef_t i : treeBackgroundQuery(tempLocation, SORTMODE_NONE))
                 {
-                    auto &b = Background[i];
+                    if((int)i > numBackground)
+                        continue;
+
+                    Background_t &b = i;
                     if(!b.Hidden && ((b.Type >= 174 && b.Type <= 186) || b.Type == 63) && CheckCollision(tempLocation, b.Location))
                     {
                         tempBool = true;
@@ -1918,10 +1921,8 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(Block_t* block_p : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(Block_t& block : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
-                auto &block = *block_p;
-
                 if(!block.Hidden && !BlockNoClipping[block.Type] && !BlockIsSizable[block.Type] && !BlockOnlyHitspot1[block.Type])
                 {
                     if(CheckCollision(tempLocation, block.Location) && BlockSlope[block.Type] == 0)
@@ -2005,9 +2006,8 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
-                int i = block - &Block[1] + 1;
                 if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                 {
                     if(CheckCollision(tempLocation, Block[i].Location))
@@ -2038,9 +2038,8 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
                 {
-                    int i = block - &Block[1] + 1;
                     if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                     {
                         if(CheckCollision(tempLocation, Block[i].Location))
@@ -2079,9 +2078,8 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
-                int i = block - &Block[1] + 1;
                 if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                 {
                     if(CheckCollision(tempLocation, Block[i].Location) && BlockSlope2[Block[i].Type] == 0)
@@ -2112,9 +2110,8 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
                 {
-                    int i = block - &Block[1] + 1;
                     if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                     {
                         if(CheckCollision(tempLocation, Block[i].Location))
@@ -2154,9 +2151,8 @@ void NPCSpecial(int A)
             // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
             // blockTileGet(tempLocation, fBlock, lBlock);
 
-            for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
-                int i = block - &Block[1] + 1;
                 if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                 {
                     if(CheckCollision(tempLocation, Block[i].Location) && BlockSlope2[Block[i].Type] == 0)
@@ -2187,9 +2183,8 @@ void NPCSpecial(int A)
                 // lBlock = LastBlock[floor((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                for(int i : treeBlockQuery(tempLocation, SORTMODE_NONE))
                 {
-                    int i = block - &Block[1] + 1;
                     if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type] && !BlockIsSizable[Block[i].Type] && !BlockOnlyHitspot1[Block[i].Type])
                     {
                         if(CheckCollision(tempLocation, Block[i].Location))
@@ -2385,8 +2380,11 @@ void NPCSpecial(int A)
             F = 0;
             tempNPC = npc;
 
-            for(int i = 1; i <= numBackground; i++)
+            for(int i : treeBackgroundQuery(tempLocation, SORTMODE_ID))
             {
+                if(i > numBackground)
+                    break;
+
                 // Any nearest BGO touched? (rails and reverse buffers)
                 if((Background[i].Type >= 70 && Background[i].Type <= 74) || Background[i].Type == 100)
                 {
@@ -2526,14 +2524,6 @@ void NPCSpecial(int A)
         // only update the quadtree if the tempBlock exists
         if(npc.tempBlock > 0)
         {
-            // necessary for tree update
-            Block[npc.tempBlock].LocationInLayer = Block[npc.tempBlock].Location;
-            if(Block[npc.tempBlock].Layer != LAYER_NONE)
-            {
-                Block[npc.tempBlock].LocationInLayer.X -= Layer[Block[npc.tempBlock].Layer].OffsetX;
-                Block[npc.tempBlock].LocationInLayer.Y -= Layer[Block[npc.tempBlock].Layer].OffsetY;
-            }
-
             treeTempBlockUpdate(npc.tempBlock);
         }
 

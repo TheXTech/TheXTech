@@ -499,9 +499,8 @@ void UpdatePlayer()
                         // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                         // blockTileGet(tempLocation, fBlock, lBlock);
 
-                        for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+                        for(int B : treeBlockQuery(tempLocation, SORTMODE_NONE))
                         {
-                            B = block - &Block[1] + 1;
                             if(!Block[B].Invis && !BlockIsSizable[Block[B].Type] && !BlockOnlyHitspot1[Block[B].Type] &&
                                !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                             {
@@ -973,16 +972,17 @@ void UpdatePlayer()
                         Player[A].FairyTime -= 1;
                     if(Player[A].FairyTime != -1 && Player[A].FairyTime < 20 && Player[A].Character == 5)
                     {
+                        tempLocation = Player[A].Location;
+                        tempLocation.Width += 32;
+                        tempLocation.Height += 32;
+                        tempLocation.X -= 16;
+                        tempLocation.Y -= 16;
+
                         for(int numNPCsMax4 = numNPCs, Bi = 1; Bi <= numNPCsMax4; Bi++)
                         {
                             if(NPC[Bi].Active && !NPC[Bi].Hidden && NPCIsAVine[NPC[Bi].Type])
                             {
-                                tempLocation = NPC[Bi].Location;
-                                tempLocation.Width += 32;
-                                tempLocation.Height += 32;
-                                tempLocation.X -= 16;
-                                tempLocation.Y -= 16;
-                                if(CheckCollision(tempLocation, Player[A].Location))
+                                if(CheckCollision(tempLocation, NPC[Bi].Location))
                                 {
                                     Player[A].FairyTime = 20;
                                     Player[A].FairyCD = 0;
@@ -990,19 +990,18 @@ void UpdatePlayer()
                             }
                         }
 
-                        for(B = 1; B <= numBackground; B++)
+                        for(int B : treeBackgroundQuery(tempLocation, SORTMODE_NONE))
                         {
+                            if(B > numBackground)
+                                continue;
+
                             if(BackgroundFence[Background[B].Type] && !Background[B].Hidden)
                             {
-                                tempLocation = Background[B].Location;
-                                tempLocation.Width += 32;
-                                tempLocation.Height += 32;
-                                tempLocation.X -= 16;
-                                tempLocation.Y -= 16;
-                                if(CheckCollision(tempLocation, Player[A].Location))
+                                if(CheckCollision(tempLocation, Background[B].Location))
                                 {
                                     Player[A].FairyTime = 20;
                                     Player[A].FairyCD = 0;
+                                    break;
                                 }
                             }
                         }
@@ -1846,8 +1845,11 @@ void UpdatePlayer()
 
                     if(Player[A].HasKey)
                     {
-                        for(B = 1; B <= numBackground; B++)
+                        for(int B : treeBackgroundQuery(Player[A].Location, SORTMODE_NONE))
                         {
+                            if(B > numBackground)
+                                continue;
+
                             if(Background[B].Type == 35)
                             {
                                 tempLocation = Background[B].Location;
@@ -2161,10 +2163,8 @@ void UpdatePlayer()
                 // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
                 // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                for(Block_t* block : treeBlockQuery(Player[A].Location, SORTMODE_COMPAT))
+                for(int B : treeBlockQuery(Player[A].Location, SORTMODE_COMPAT))
                 {
-                    B = block - &Block[1] + 1;
-
                     // checks to see if a collision happened
                     if(Player[A].Location.X + Player[A].Location.Width >= Block[B].Location.X)
                     {
@@ -2696,10 +2696,8 @@ void UpdatePlayer()
                                                 // lBlock = LastBlock[((tempLocation.X + tempLocation.Width) / 32.0) + 1];
                                                 // blockTileGet(tempLocation, fBlock, lBlock);
 
-                                                for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
+                                                for(int C : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
                                                 {
-                                                    int C = block - &Block[1] + 1;
-
                                                     if(CheckCollision(tempLocation, Block[C].Location) && !Block[C].Hidden)
                                                     {
                                                         if(BlockSlope[Block[C].Type] == 0)
@@ -3117,16 +3115,21 @@ void UpdatePlayer()
 
 
                 // check vine backgrounds
-                for(B = 1; B <= numBackground; B++)
+                for(int B : treeBackgroundQuery(Player[A].Location, SORTMODE_NONE))
                 {
+                    if(B > numBackground)
+                        continue;
+
                     if(BackgroundFence[Background[B].Type] && (!g_compatibility.fix_climb_invisible_fences || !Background[B].Hidden))
                     {
-                        if(CheckCollision(Player[A].Location, Background[B].Location))
-                        {
+                        // FIXME: remove 4 spaces indention as soon as possible from this block below to the next commented brace
+                        // if(CheckCollision(Player[A].Location, Background[B].Location))
+                        //{
                             tempLocation = Background[B].Location;
                             tempLocation.Height -= 16;
                             tempLocation.Width -= 20;
                             tempLocation.X += 10;
+
                             if(CheckCollision(Player[A].Location, tempLocation))
                             {
                                 if(Player[A].Character == 5)
@@ -3136,6 +3139,7 @@ void UpdatePlayer()
                                     if(hasNoMonts && Player[A].Immune == 0 && Player[A].Controls.Up)
                                     {
                                         Player[A].FairyCD = 0;
+
                                         if(!Player[A].Fairy)
                                         {
                                             Player[A].Fairy = true;
@@ -3146,9 +3150,12 @@ void UpdatePlayer()
                                             Player[A].Effect2 = 4;
                                             NewEffect(63, Player[A].Location);
                                         }
+
                                         if(Player[A].FairyTime != -1 && Player[A].FairyTime < 20)
                                             Player[A].FairyTime = 20;
                                     }
+
+                                    break;
                                 }
                                 else if(!Player[A].Fairy && !Player[A].Stoned)
                                 {
@@ -3182,10 +3189,13 @@ void UpdatePlayer()
                                             if(g_compatibility.fix_climb_bgo_speed_adding)
                                                 Player[A].VineBGO = B;
                                         }
+
+                                        if(Player[A].Vine == 3)
+                                            break;
                                     }
                                 } // !Fairy & !Stoned
                             } // Collide player and temp location
-                        }// Collide player and BGO
+                        // }// Collide player and BGO
                     } // Is BGO climbable and visible?
                 } // Next A
 
@@ -3922,9 +3932,8 @@ void UpdatePlayer()
                                                     // lBlock = LastBlock[((Player[A].Location.X + Player[A].Location.Width) / 32.0) + 1];
                                                     // blockTileGet(Player[A].Location, fBlock, lBlock);
 
-                                                    for(Block_t* block : treeBlockQuery(Player[A].Location, SORTMODE_NONE))
+                                                    for(int C : treeBlockQuery(Player[A].Location, SORTMODE_NONE))
                                                     {
-                                                        int C = block - &Block[1] + 1;
                                                         if(CheckCollision(Player[A].Location, Block[C].Location) &&
                                                            !Block[C].Hidden && !BlockIsSizable[Block[C].Type] &&
                                                            !BlockOnlyHitspot1[Block[C].Type])

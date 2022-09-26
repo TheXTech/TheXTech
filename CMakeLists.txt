@@ -322,7 +322,13 @@ set(LIB_SRC
     ${LIB_SRC_EXTRA}
 )
 
-if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT VITA AND NOT 3DS AND NOT NINTENDO_SWITCH)
+if(NOT ANDROID
+   AND NOT EMSCRIPTEN
+   AND NOT VITA
+   AND NOT NINTENDO_3DS
+   AND NOT NINTENDO_WII
+   AND NOT NINTENDO_WIIU
+   AND NOT NINTENDO_SWITCH)
     list(APPEND LIB_SRC
         lib/InterProcess/editor_pipe.cpp
         lib/InterProcess/intproc.cpp
@@ -331,7 +337,7 @@ if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT VITA AND NOT 3DS AND NOT NINTENDO_SWIT
 endif()
 
 
-if(NOT 3DS AND NOT VITA)
+if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT VITA)
     list(APPEND LIB_SRC
         ${FILEMAPPER_SRCS}
         ${STACK_WALKER_SRCS}
@@ -379,11 +385,11 @@ set(THEXTECH_SRC
     src/main/screen_connect.cpp
     src/main/screen_quickreconnect.cpp
     src/main/screen_textentry.cpp
-    src/main/screen_cheats.cpp
     src/main/menu_controls.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
     src/main/trees.cpp
+    src/main/block_table.cpp
     src/main/QuadTree/LooseQuadtree-impl.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
@@ -519,6 +525,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/sdl/*.h
     src/editor/*.h
     src/main/*.h
+    src/main/*.hpp
     src/main/QuadTree/*.h
     src/sound/fx/*.h
     src/sound/fx/*.hpp
@@ -717,6 +724,32 @@ endif()
 if(THEXTECH_INTERPROC_SUPPORTED)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_INTERPROC_SUPPORTED)
 endif()
+
+# ======================= Render specific global macros ========================
+if(NOT EMSCRIPTEN)
+    target_compile_definitions(thextech PRIVATE
+        -DUSE_SCREENSHOTS_AND_RECS  # Built-in screenshots and GIF recording
+        -DUSE_DRAW_BATTERY_STATUS   # Battery status draw support
+    )
+else()
+    target_compile_definitions(thextech PRIVATE
+        -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
+    )
+endif()
+
+if(ANDROID)
+    target_compile_definitions(thextech PRIVATE
+        -DUSE_RENDER_BLOCKING
+    )
+endif()
+
+if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
+    target_compile_definitions(thextech PRIVATE
+        -DRENDER_FULLSCREEN_ALWAYS  # Game works always fullscreen
+        -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
+    )
+endif()
+# ==============================================================================
 
 if(NOT USE_SYSTEM_LIBS)
     add_dependencies(thextech ${A2XT_DEPS})

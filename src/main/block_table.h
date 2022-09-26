@@ -19,59 +19,25 @@
  */
 
 #pragma once
-#ifndef EVENTS_HHHHHHH
-#define EVENTS_HHHHHHH
 
-#ifndef EVENTS_CUSTOM
-#   include <SDL2/SDL_stdinc.h>
-#   include "base/events_base.h"
-#   define E_INLINE SDL_FORCE_INLINE
-#   define TAIL
-#else
-#   include <stdint.h>
-#   define E_INLINE    extern
-#   define TAIL ;
-#endif
+#ifndef BLOCK_TABLE_H
+#define BLOCK_TABLE_H
 
+#include "globals.h"
 
-/*!
- *  Events interface
- */
-namespace XEvents
-{
+void treeBlockUpdateLayer(int layer, BlockRef_t block);
+bool treeBlockLayerActive(int layer);
+void treeBlockJoinLayer(int layer);
+void treeBlockSplitLayer(int layer);
 
-/*!
- * \brief Process events
- */
-E_INLINE void doEvents() TAIL
+void treeBackgroundUpdateLayer(int layer, BackgroundRef_t block);
+bool treeBackgroundLayerActive(int layer);
+void treeBackgroundJoinLayer(int layer);
+void treeBackgroundSplitLayer(int layer);
 
-#ifndef EVENTS_CUSTOM
-{
-    g_events->doEvents();
-}
-#endif
+void treeWaterUpdateLayer(int layer, WaterRef_t block);
+bool treeWaterLayerActive(int layer);
+void treeWaterJoinLayer(int layer);
+void treeWaterSplitLayer(int layer);
 
-/*!
- * \brief Wait until any events will happen
- */
-E_INLINE void waitEvents() TAIL
-
-#ifndef EVENTS_CUSTOM
-{
-    g_events->waitEvents();
-}
-#endif
-
-SDL_FORCE_INLINE void eventResize()
-{
-    g_events->eventResize();
-}
-
-} // XEvents
-
-#ifndef EVENTS_CUSTOM
-#   undef E_INLINE
-#   undef TAIL
-#endif
-
-#endif // EVENTS_HHHHHHH
+#endif // #ifndef BLOCK_TABLE_H

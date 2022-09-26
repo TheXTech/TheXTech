@@ -26,7 +26,6 @@
 #include "../sound.h"
 #include "../config.h"
 #include "../video.h"
-#include "../core/render.h"
 #include "../controls.h"
 
 #include "speedrunner.h"
