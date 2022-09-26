@@ -7,20 +7,31 @@ add_library(PGE_SDLMixerX_static INTERFACE)
 set(SDL_BRANCH "release-2.0.12")
 set(SDL_GIT_BRANCH "origin/release-2.0.12")
 
-if(EMSCRIPTEN OR APPLE OR ANDROID OR VITA)
+if(EMSCRIPTEN OR APPLE OR ANDROID OR VITA OR NINTENDO_SWITCH)
     set(PGE_SHARED_SDLMIXER_DEFAULT OFF)
 else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
 endif()
 
+if(NINTENDO_SWITCH)
+    set(PGE_SYSTEM_ZLIB_DEFAULT ON)
+else()
+    set(PGE_SYSTEM_ZLIB_DEFAULT OFF)
+endif()
+
 option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
 
-if(NOT VITA AND NOT 3DS)
+if(NOT VITA AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU)
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
 else()
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." OFF)
 endif()
 
+option(USE_SYSTEM_ZLIB "Use zlib library from the system" ${PGE_SYSTEM_ZLIB_DEFAULT})
+
+if(USE_SYSTEM_ZLIB)
+    find_package(ZLIB REQUIRED)
+endif()
 
 #if(WIN32)
 #    if(MSVC)
@@ -62,6 +73,8 @@ if(USE_SYSTEM_SDL2)
         find_package(SDL2 REQUIRED)
         if(TARGET SDL2::SDL2)
             set(SDL2_LIBRARIES SDL2::SDL2main SDL2::SDL2)
+        elseif(TARGET SDL2::SDL2-static)
+            set(SDL2_LIBRARIES SDL2::SDL2main SDL2::SDL2-static)
         endif()
     endif()
 else()
@@ -71,13 +84,23 @@ endif()
 
 set(MixerX_SysLibs)
 
+if(USE_SYSTEM_ZLIB)
+    list(APPEND MixerX_SysLibs ${ZLIB_LIBRARIES})
+endif()
+
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND MixerX_SysLibs
         "version" opengl32 dbghelp advapi32 kernel32 winmm imm32 setupapi
     )
 endif()
 
-if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID)
+if(NINTENDO_SWITCH)
+    list(APPEND MixerX_SysLibs
+        EGL glapi drm_nouveau nx pthread
+    )
+endif()
+
+if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID AND NOT NINTENDO_SWITCH)
     find_library(_LIB_GL GL)
     if(_LIB_GL)
         list(APPEND MixerX_SysLibs ${_LIB_GL})
@@ -174,8 +197,13 @@ set(MixerX_CodecLibs
     "${AC_GME}"
     "${AC_LIBXMP}"
     "${AC_MODPLUG}"
-    "${AC_ZLIB}"
 )
+
+if(NOT USE_SYSTEM_ZLIB)
+    list(APPEND MixerX_CodecLibs
+        "${AC_ZLIB}"
+    )
+endif()
 
 if(VITA)
     set(VITA_AUDIOCODECS_CMAKE_FLAGS
@@ -210,7 +238,6 @@ if(VITA)
         "${AC_MODPLUG}"
         "${AC_ZLIB}"
     )
-
 endif()
 
 set(MixerX_Deps)
@@ -234,6 +261,7 @@ ExternalProject_Add(
         "-DBUILD_OGG_VORBIS=OFF"
         "-DBUILD_FLAC=OFF"
         "-DBUILD_MPG123=OFF"
+        "-DBUILD_GME_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
         ${ANDROID_CMAKE_FLAGS}
         ${VITA_CMAKE_FLAGS}
         ${VITA_AUDIOCODECS_CMAKE_FLAGS}
@@ -279,6 +307,7 @@ ExternalProject_Add(
         "-DUSE_OGG_VORBIS_STB=ON"
         "-DUSE_MP3_DRMP3=ON"
         "-DUSE_MP3_MPG123=OFF"
+        "-DUSE_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
         ${ANDROID_CMAKE_FLAGS}
         ${VITA_CMAKE_FLAGS}
         ${VITA_MIXERX_CMAKE_FLAGS}

@@ -24,7 +24,6 @@
 #include "../globals.h"
 #include "../game_main.h"
 #include "../core/render.h"
-#include "../core/events.h"
 #include "../controls.h"
 #include "../npc.h"
 #include "../blocks.h"
@@ -33,7 +32,6 @@
 #include "../player.h"
 #include "../graphics.h"
 #include "../sound.h"
-#include "../pseudo_vb.h"
 #include "../main/trees.h"
 #include "game_info.h"
 
@@ -182,9 +180,8 @@ void OutroLoop()
 
             bool doJump = true;
 
-            for(Block_t* block : treeBlockQuery(tempLocation, SORTMODE_NONE))
+            for(const Block_t& bb : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
-                const Block_t& bb = *block;
 //                if(tempLocation.X + tempLocation.Width >= Block[B].Location.X &&
 //                   tempLocation.X <= Block[B].Location.X + Block[B].Location.Width &&
 //                   tempLocation.Y + tempLocation.Height >= Block[B].Location.Y &&

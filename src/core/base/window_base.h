@@ -22,6 +22,7 @@
 #ifndef ABSTRACTWINDOW_T_H
 #define ABSTRACTWINDOW_T_H
 
+#include "window_types.h"
 
 class AbstractWindow_t
 {
@@ -54,27 +55,17 @@ public:
      */
     virtual int showCursor(int show) = 0;
 
-    // TODO: move out of AbstractWindow_t for custom implementations
-    /*!
-     * \brief Cursor type
-     */
-    enum Cursor_t
-    {
-        CURSOR_DEFAULT = 0,
-        CURSOR_NONE
-    };
-
     /*!
      * \brief Change the displayable cursor type
      * \param cursor cursor type
      */
-    virtual void setCursor(Cursor_t cursor) = 0;
+    virtual void setCursor(WindowCursor_t cursor) = 0;
 
     /*!
      * \brief Get the current cursor type
      * \return Cursor type
      */
-    virtual Cursor_t getCursor() = 0;
+    virtual WindowCursor_t getCursor() = 0;
 
     /*!
      * \brief Place cursor at desired window position

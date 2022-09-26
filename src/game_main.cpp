@@ -52,7 +52,6 @@
 #include "load_gfx.h"
 #include "player.h"
 #include "sound.h"
-#include "video.h"
 #include "editor.h"
 #include "editor/new_editor.h"
 #include "custom.h"
@@ -375,12 +374,12 @@ int GameMain(const CmdLineSetup_t &setup)
     {
         if(GameMenu || MagicHand || LevelEditor)
         {
-            XWindow::setCursor(AbstractWindow_t::CURSOR_NONE);
+            XWindow::setCursor(CURSOR_NONE);
             XWindow::showCursor(0);
         }
         else if(!resChanged)
         {
-            XWindow::setCursor(AbstractWindow_t::CURSOR_DEFAULT);
+            XWindow::setCursor(CURSOR_DEFAULT);
             XWindow::showCursor(1);
         }
 
@@ -1538,7 +1537,7 @@ void CheckActive()
 {
     // It's useless on Emscripten as no way to check activity (or just differently)
     // and on Android as it has built-in application pauser
-#if !defined(__EMSCRIPTEN__) && !defined(__ANDROID__)
+#if !defined(NO_WINDOW_FOCUS_TRACKING)
 //    bool MusicPaused = false;
     bool focusLost = false;
 

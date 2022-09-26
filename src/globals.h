@@ -738,7 +738,6 @@ struct Block_t
     int Type = 0;
 //    Location As Location
     Location_t Location;
-    Location_t LocationInLayer;
 //    Special As Integer 'what is in the block?
     int Special = 0;
 //! EXTRA: second special
@@ -1177,6 +1176,7 @@ struct Star_t
 //Public nPlay As nPlay ' for online stuff
 //Public Water(0 To maxWater) As Water
 extern RangeArr<Water_t, 0, maxWater> Water;
+DECLREF_T(Water);
 //Public numWater As Integer 'number of water
 extern int numWater;
 //Public Star(1 To 1000) As Star

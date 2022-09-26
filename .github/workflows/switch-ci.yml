@@ -1,12 +1,11 @@
-name: Vita CI
+name: Switch CI
 
 on:
   push:
     branches:
       - main
       - devel
-      - wip-vita-support
-      - wip-vita-master
+      - wip-switch-port
   pull_request:
     branches:
       - main
@@ -16,28 +15,31 @@ jobs:
     name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
     runs-on: ${{ matrix.config.os }}
     env:
-        VITASDK: /usr/local/vitasdk
+        DEVKITPRO: /opt/devkitpro
+        DEVKITARM: /opt/devkitpro/devkitARM
+        DEVKITPPC: /opt/devkitpro/devkitPPC
+        DEVKITA64: /opt/devkitpro/devkitA64
     strategy:
       fail-fast: false
       matrix:
         config:
         - {
-            name: "Vita build",
+            name: "Switch build",
             os: ubuntu-20.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake -DVITA_APP_NAME=\"TheXTech Vita\" -DVITA_TITLEID=\"THEXTECH0\" -DVITA_VERSION=\"01.05\"",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip",
-            generator: "Unix Makefiles",
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Switch.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/switch",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip apt-transport-https",
+            generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "thextech",
             assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
-            subdir_name: "thextech-vita",
-            upload_directory: "www/vita/"
+            subdir_name: "thextech-switch",
+            upload_directory: "www/switch/"
           }
 
     steps:
     - uses: styfle/cancel-workflow-action@0.9.1
       with:
-        workflow_id: vita-ci.yml
+        workflow_id: switch-ci.yml
         all_but_latest: true
         access_token: ${{ github.token }}
 
@@ -55,62 +57,45 @@ jobs:
         git submodule init
         git submodule update --recursive --remote
 
-    - name: Install Vita SDK
+    - name: Install Devkit Pro
       run: |
         cd ..
-        export VITASDK=/usr/local/vitasdk
-        export PATH=$VITASDK/bin:$PATH
-        git clone https://github.com/vitasdk/vdpm
-        cd vdpm
-        ./bootstrap-vitasdk.sh
-        ./install-all.sh || echo A library from vitasdk failed to install.
+        sudo chmod 755 /opt
+        if [[ ! -f /usr/local/share/keyring/devkitpro-pub.gpg ]]; then
+            sudo mkdir -p /usr/local/share/keyring/
+            sudo wget -O /usr/local/share/keyring/devkitpro-pub.gpg https://apt.devkitpro.org/devkitpro-pub.gpg
+        fi
 
-# NOTE: 2/13/2022 Current Vita version does not use cglm or vitaGL renderer. All is handled by SDL2 at the moment.
-#    - name: Install cglm
-#      run: |
-#        cd ..
-#        export PATH=$VITASDK/bin:$PATH
-#        git clone https://github.com/recp/cglm.git
-#        cd cglm
-#        sed -i "s|-Werror||g" CMakeLists.txt
-#        cmake -B build-vita -G Ninja -DCMAKE_INSTALL_PREFIX=$VITASDK/arm-vita-eabi -DCGLM_STATIC=ON -DCGLM_SHARED=OFF -DCMAKE_BUILD_TYPE=MinSizeRel -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake .
-#        cmake --build build-vita --target all
-#        cmake --build build-vita --target install
+        if [[ ! -f /etc/apt/sources.list.d/devkitpro.list ]]; then
+            echo "deb [signed-by=/usr/local/share/keyring/devkitpro-pub.gpg] https://apt.devkitpro.org stable main" | sudo tee -a /etc/apt/sources.list.d/devkitpro.list
+        fi
 
-#    - name: Install Latest vitaGL
-#      run: |
-#        cd ..
-#        export PATH=$VITASDK/bin:$PATH
-#        git clone https://github.com/Rinnegatamante/vitaGL.git
-#        cd vitaGL
-#        NO_DEBUG=1 NO_TEX_COMBINER=1 make
-#        make install
+        sudo apt-get update -qq
+        sudo apt-get install -qq devkitpro-pacman
 
-#    - name: Download assets
-#      uses: carlosperate/download-file-action@v1.0.3
-#      with:
-#        file-url: "${{ matrix.config.assets_url }}"
-#        file-name: assets.7z
-#
-#    - name: Unpack assets
-#      shell: bash
-#      run: |
-#        mkdir -p assets
-#        cd assets
-#        7z x ../assets.7z
-#        cd ..
-#        rm assets.7z
+        sudo dkp-pacman --noconfirm -Sy
+        sudo dkp-pacman --noconfirm -Syu
+        sudo dkp-pacman --noconfirm -Sy switch-dev switch-libpng switch-libjpeg-turbo switch-zlib switch-tools switch-cmake switch-mesa switch-libdrm_nouveau switch-glm switch-glad
+
+    - name: Install modified SDL2
+      run: |
+        cd ..
+        git clone https://github.com/Wohlstand/SDL.git -b switch-sdl2-2.0.14-dev --depth 1 SDL2
+        cd SDL2
+        mkdir build
+        cd build
+        cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Switch.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local ..
+        cmake --build . --target all -j4
+        sudo cmake --build . --target install
 
     - name: Configure
       shell: bash
       run: |
-        export PATH=$VITASDK/bin:$PATH
         cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
 
     - name: Build
       shell: bash
       run: |
-        export PATH=$VITASDK/bin:$PATH
         cmake --build build --target all -j4
 
     - name: Create Package
@@ -129,12 +114,10 @@ jobs:
         mkdir "package/${{ matrix.config.subdir_name }}"
         cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
         cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
-        cat ../docs/README_VITA.md ../README.md >> "package/${{ matrix.config.subdir_name }}/README.md"
-        cat ../docs/README_VITA.RUS.md ../README.RUS.md >> "package/${{ matrix.config.subdir_name }}/README.RUS.md"
-        cat ../docs/README_VITA.ESP.md ../README.ESP.md >> "package/${{ matrix.config.subdir_name }}/README.ESP.md"
-        cp thextech.vpk "package/${{ matrix.config.subdir_name }}/"
+        cat ../docs/README_SWITCH.md ../README.md >> "package/${{ matrix.config.subdir_name }}/README.md"
+        cp output/bin/thextech.nro "package/${{ matrix.config.subdir_name }}/"
         cd package
-        zip -9 -r "thextech-vita-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"
+        zip -9 -r "thextech-switch-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
         cd ../..
 

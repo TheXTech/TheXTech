@@ -646,6 +646,7 @@ void PlayerHurt(const int A)
                         return;
                     }
                 }
+
                 if(p.State > 1)
                 {
                     PlaySound(SFX_PlayerShrink);
@@ -3053,9 +3054,9 @@ void PlayerPush(const int A, int HitSpot)
     // lBlock = LastBlock[((p.Location.X + p.Location.Width) / 32.0) + 1];
     // blockTileGet(p.Location, fBlock, lBlock);
 
-    for(Block_t* block : treeBlockQuery(p.Location, SORTMODE_COMPAT))
+    for(BlockRef_t block : treeBlockQuery(p.Location, SORTMODE_COMPAT))
     {
-        int B = block - &Block[1] + 1;
+        int B = block;
         Block_t& b = *block;
 
         if(b.Hidden || BlockIsSizable[b.Type])
@@ -3294,8 +3295,11 @@ void YoshiEatCode(const int A)
         {
             if(NPC[p.YoshiNPC].Type == 31) // key check
             {
-                for(B = 1; B <= numBackground; B++)
+                for(int B : treeBackgroundQuery(p.Location, SORTMODE_ID))
                 {
+                    if(B > numBackground)
+                        break;
+
                     if(Background[B].Type == 35)
                     {
                         tempLocation = Background[B].Location;
@@ -3845,7 +3849,7 @@ void ClownCar()
 void WaterCheck(const int A)
 {
     Location_t tempLocation;
-    int B = 0;
+    // int B = 0;
     auto &p = Player[A];
 
     if(p.Wet > 0)
@@ -3883,7 +3887,7 @@ void WaterCheck(const int A)
         }
     }
 
-    for(int numWaterMax = numWater, B = 1; B <= numWaterMax; B++)
+    for(int B : treeWaterQuery(p.Location, SORTMODE_NONE))
     {
         if(!Water[B].Hidden)
         {
@@ -3956,7 +3960,7 @@ void WaterCheck(const int A)
                 tempLocation = newLoc(p.Location.X - 8 + dRand() * 8, p.Location.Y + 4 + dRand() * 8, 8, 8);
             if(!UnderWater[p.Section])
             {
-                for(B = 1; B <= numWater; B++)
+                for(int B : treeWaterQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(CheckCollision(Water[B].Location, tempLocation))
                     {
@@ -6641,8 +6645,11 @@ void PlayerEffects(const int A)
             {
                 p.Effect2 = 130;
 
-                for(int c = 1; c <= numBackground; c++)
+                for(int c : treeBackgroundQuery(Warp[p.Warp].Exit, SORTMODE_NONE))
                 {
+                    if(c > numBackground)
+                        continue;
+
                     if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
                     {
                         if(Background[c].Type == 88)
@@ -6696,8 +6703,11 @@ void PlayerEffects(const int A)
 
             if(fEqual(p.Effect2, 1900))
             {
-                for(int c = 1; c <= numBackground; c++)
+                for(int c : treeBackgroundQuery(Warp[p.Warp].Exit, SORTMODE_NONE))
                 {
+                    if(c > numBackground)
+                        continue;
+
                     if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
                     {
                         if(Background[c].Type == 88)

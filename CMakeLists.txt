@@ -13,7 +13,7 @@ include(TestBigEndian)
 include(cmake/git_info.cmake)
 message("== Current GIT hash [${GIT_COMMIT_HASH}], branch [${GIT_BRANCH}], package [${PACKAGE_SUFFIX}] ==")
 
-if(NOT WIN32 AND (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX))
+if(NOT WIN32 AND NOT NINTENDO_SWITCH AND (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX))
     check_cxx_compiler_flag("-no-pie" HAS_NO_PIE)
 endif()
 
@@ -93,6 +93,10 @@ configure_file(lib/CrashHandler/backtrace.h.in
                generated-include/lib/CrashHandler/backtrace.h)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated-include)
 
+if(NINTENDO_SWITCH)
+    include_directories($ENV{DEVKITPRO}/portlibs/switch/include)
+endif()
+
 #if(WIN32 OR EMSCRIPTEN OR HAIKU)
 #    set(USE_SYSTEM_LIBS_DEFAULT OFF)
 #else()
@@ -100,7 +104,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/generated-include)
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU OR VITA)
+if(HAIKU OR VITA OR NINTENDO_SWITCH)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
@@ -172,6 +176,13 @@ if(VITA)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-psabi")
 endif()
 
+if(NINTENDO_SWITCH)
+    message("Enabling Nintendo Switch Support and fast-math flags.")
+
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -DNINTENDO_SWITCH -D__SWITCH__")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -DNINTENDO_SWITCH -D__SWITCH__")
+endif()
+
 # ============ Customization ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
@@ -186,7 +197,7 @@ endif()
 include(lib/Allocator/pool-allocator.cmake)
 include(lib/DirManager/dirman.cmake)
 
-if(NOT VITA)
+if(NOT VITA AND NOT NINTENDO_SWITCH)
     include(lib/FileMapper/FileMapper.cmake)
 endif()
 
@@ -295,7 +306,13 @@ set(LIB_SRC
     ${LIB_SRC_EXTRA}
 )
 
-if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT VITA AND NOT 3DS)
+if(NOT ANDROID
+   AND NOT EMSCRIPTEN
+   AND NOT VITA
+   AND NOT NINTENDO_3DS
+   AND NOT NINTENDO_WII
+   AND NOT NINTENDO_WIIU
+   AND NOT NINTENDO_SWITCH)
     list(APPEND LIB_SRC
         lib/InterProcess/editor_pipe.cpp
         lib/InterProcess/intproc.cpp
@@ -304,7 +321,7 @@ if(NOT ANDROID AND NOT EMSCRIPTEN AND NOT VITA AND NOT 3DS)
 endif()
 
 
-if(NOT 3DS AND NOT VITA)
+if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT VITA)
     list(APPEND LIB_SRC
         ${FILEMAPPER_SRCS}
         ${STACK_WALKER_SRCS}
@@ -352,11 +369,11 @@ set(THEXTECH_SRC
     src/main/screen_connect.cpp
     src/main/screen_quickreconnect.cpp
     src/main/screen_textentry.cpp
-    src/main/screen_cheats.cpp
     src/main/menu_controls.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
     src/main/trees.cpp
+    src/main/block_table.cpp
     src/main/QuadTree/LooseQuadtree-impl.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
@@ -471,6 +488,8 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/CrashHandler/*.h
     lib/Graphics/*.h
     lib/InterProcess/*.h
+    lib/tclap/*.h
+    lib/fmt/*.h
     src/*.h
     src/*.hpp
     src/script/*.h
@@ -482,8 +501,10 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/sdl/*.h
     src/editor/*.h
     src/main/*.h
+    src/main/*.hpp
     src/main/QuadTree/*.h
     src/sound/fx/*.h
+    src/sound/fx/*.hpp
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
@@ -602,6 +623,13 @@ if(ANDROID)
     target_link_libraries(A2XT_Int INTERFACE log)
 endif()
 
+if(NINTENDO_SWITCH)
+    target_link_libraries(A2XT_Int INTERFACE nx)
+
+    # Set explicit flags for this project
+    target_compile_definitions(thextech PRIVATE -D__SWITCH__ -DNO_INTPTROC)
+endif()
+
 if(VITA)
     # Link Vita specific libraries to the generic interface.
     target_link_libraries(A2XT_Int INTERFACE ${VITA_ADDTL_LIBS})
@@ -671,6 +699,32 @@ endif()
 if(THEXTECH_INTERPROC_SUPPORTED)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_INTERPROC_SUPPORTED)
 endif()
+
+# ======================= Render specific global macros ========================
+if(NOT EMSCRIPTEN)
+    target_compile_definitions(thextech PRIVATE
+        -DUSE_SCREENSHOTS_AND_RECS  # Built-in screenshots and GIF recording
+        -DUSE_DRAW_BATTERY_STATUS   # Battery status draw support
+    )
+else()
+    target_compile_definitions(thextech PRIVATE
+        -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
+    )
+endif()
+
+if(ANDROID)
+    target_compile_definitions(thextech PRIVATE
+        -DUSE_RENDER_BLOCKING
+    )
+endif()
+
+if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
+    target_compile_definitions(thextech PRIVATE
+        -DRENDER_FULLSCREEN_ALWAYS  # Game works always fullscreen
+        -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
+    )
+endif()
+# ==============================================================================
 
 if(NOT USE_SYSTEM_LIBS)
     add_dependencies(thextech ${A2XT_DEPS})
@@ -765,6 +819,8 @@ elseif(WIN32)
     install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
 elseif(VITA)
     include(cmake/package_vita.cmake)
+elseif(NINTENDO_SWITCH)
+    include(cmake/package_switch.cmake)
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

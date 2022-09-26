@@ -3,12 +3,12 @@ name: Android CI
 on:
   push:
     branches:
-      - master
+      - main
       - devel
       - versus-ci-android
   pull_request:
     branches:
-      - master
+      - main
 
 defaults:
   run:

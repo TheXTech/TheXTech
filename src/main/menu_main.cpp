@@ -210,12 +210,13 @@ static void s_findRecentEpisode()
     MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 }
 
-
+#if !defined(THEXTECH_PRELOAD_LEVELS) && !defined(PGE_NO_THREADING)
 static int FindWorldsThread(void *)
 {
     FindWorlds();
     return 0;
 }
+#endif
 
 #if (defined(__APPLE__) && defined(USE_BUNDLED_ASSETS)) || defined(FIXED_ASSETS_PATH)
 #   define USER_WORLDS_NEEDED
@@ -500,9 +501,9 @@ bool mainMenuUpdate()
         menuDoPress = false;
 
     {
-        if(XWindow::getCursor() != AbstractWindow_t::CURSOR_NONE)
+        if(XWindow::getCursor() != CURSOR_NONE)
         {
-            XWindow::setCursor(AbstractWindow_t::CURSOR_NONE);
+            XWindow::setCursor(CURSOR_NONE);
             XWindow::showCursor(0);
         }
 
@@ -1242,7 +1243,7 @@ bool mainMenuUpdate()
                 MenuCursorCanMove = false;
                 dontWrap = true;
             }
-            
+
             if(MenuMode == MENU_1PLAYER_GAME || MenuMode == MENU_2PLAYER_GAME
                 || MenuMode == MENU_BATTLE_MODE || MenuMode == MENU_EDITOR)
             {
@@ -2039,14 +2040,14 @@ void mainMenuDraw()
     {
         int i = 0;
         SuperPrint(g_mainMenu.controlsTitle, 3, MenuX, MenuY + 30*i++);
-#ifndef __ANDROID__
+#ifndef RENDER_FULLSCREEN_ALWAYS
         if(resChanged)
-            SuperPrint("WINDOWED MODE", 3, MenuX, MenuY + 30*i++);
+            SuperPrint("WINDOWED MODE", 3, 300, 350 + (30 * i++));
         else
-            SuperPrint("FULLSCREEN MODE", 3, MenuX, MenuY + 30*i++);
+            SuperPrint("FULLSCREEN MODE", 3, 300, 350 + (30 * i++));
 #endif
 #if !defined(__3DS__) && !defined(VITA)
-        SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + 30*i++);
+        SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + (30 * i++));
 #endif
 #ifndef FIXED_RES
         std::string resString = fmt::format_ne("RES: {0}x{1}", g_config.InternalW, g_config.InternalH);
@@ -2074,9 +2075,9 @@ void mainMenuDraw()
             resString += " (CUSTOM)";
         SuperPrint(resString, 3, MenuX, MenuY + 30*i++);
 #endif
-        SuperPrint("VIEW CREDITS", 3, MenuX, MenuY + 30*i++);
+        SuperPrint("VIEW CREDITS", 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
-                              GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
+                               GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }
 
     // Player controls setup

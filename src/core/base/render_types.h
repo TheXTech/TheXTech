@@ -19,59 +19,20 @@
  */
 
 #pragma once
-#ifndef EVENTS_HHHHHHH
-#define EVENTS_HHHHHHH
+#ifndef ABTRACTRENDERTYPES_T_H
+#define ABTRACTRENDERTYPES_T_H
 
-#ifndef EVENTS_CUSTOM
-#   include <SDL2/SDL_stdinc.h>
-#   include "base/events_base.h"
-#   define E_INLINE SDL_FORCE_INLINE
-#   define TAIL
-#else
-#   include <stdint.h>
-#   define E_INLINE    extern
-#   define TAIL ;
-#endif
-
-
-/*!
- *  Events interface
- */
-namespace XEvents
+enum RendererFlip_t
 {
+    X_FLIP_NONE       = 0x00000000,    /**< Do not flip */
+    X_FLIP_HORIZONTAL = 0x00000001,    /**< flip horizontally */
+    X_FLIP_VERTICAL   = 0x00000002     /**< flip vertically */
+};
 
-/*!
- * \brief Process events
- */
-E_INLINE void doEvents() TAIL
-
-#ifndef EVENTS_CUSTOM
+struct FPoint_t
 {
-    g_events->doEvents();
-}
-#endif
+    float x;
+    float y;
+};
 
-/*!
- * \brief Wait until any events will happen
- */
-E_INLINE void waitEvents() TAIL
-
-#ifndef EVENTS_CUSTOM
-{
-    g_events->waitEvents();
-}
-#endif
-
-SDL_FORCE_INLINE void eventResize()
-{
-    g_events->eventResize();
-}
-
-} // XEvents
-
-#ifndef EVENTS_CUSTOM
-#   undef E_INLINE
-#   undef TAIL
-#endif
-
-#endif // EVENTS_HHHHHHH
+#endif // ABTRACTRENDERTYPES_T_H

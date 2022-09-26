@@ -33,7 +33,6 @@
 #include "../sound.h"
 #include "../gfx.h"
 #include "../graphics.h"
-#include "../frm_main.h"
 #include "../compat.h"
 #include "../config.h"
 #include "../core/render.h"
