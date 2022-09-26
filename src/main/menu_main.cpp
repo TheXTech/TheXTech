@@ -2042,9 +2042,9 @@ void mainMenuDraw()
         SuperPrint(g_mainMenu.controlsTitle, 3, MenuX, MenuY + 30*i++);
 #ifndef RENDER_FULLSCREEN_ALWAYS
         if(resChanged)
-            SuperPrint("WINDOWED MODE", 3, 300, 350 + (30 * i++));
+            SuperPrint("WINDOWED MODE", 3, MenuX, MenuY + (30 * i++));
         else
-            SuperPrint("FULLSCREEN MODE", 3, 300, 350 + (30 * i++));
+            SuperPrint("FULLSCREEN MODE", 3, MenuX, MenuY + (30 * i++));
 #endif
 #if !defined(__3DS__) && !defined(VITA)
         SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + (30 * i++));
