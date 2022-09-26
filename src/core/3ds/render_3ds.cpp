@@ -125,7 +125,8 @@ static void s_createSceneTargets()
             break;
     }
 
-    s_tex_show_w = s_tex_w - MAX_3D_OFFSET;
+    // s_tex_show_w = s_tex_w - MAX_3D_OFFSET;
+    s_tex_show_w = s_tex_w;
 }
 
 void s_ensureInFrame()
@@ -319,7 +320,8 @@ void repaint()
     if(!g_in_frame)
         return;
 
-    constexpr int shift = MAX_3D_OFFSET / 2;
+    constexpr int shift = 0;
+    // constexpr int shift = MAX_3D_OFFSET / 2;
     constexpr double shift_i[] = {shift, shift * 0.4, 0, shift * -0.4};
 
     s_depth_slider = osGet3DSliderState();
