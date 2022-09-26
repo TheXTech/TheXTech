@@ -37,14 +37,11 @@
 #include "../player.h"
 #include "../collision.h"
 #include "../controls.h"
-#include "level_file.h"
 #include "menu_main.h"
 #include "game_info.h"
-#include "speedrunner.h"
 #include "game_globals.h"
 #include "menu_controls.h"
 
-#include "../pseudo_vb.h"
 
 static void updateIntroLevelActivity()
 {

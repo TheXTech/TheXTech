@@ -10,7 +10,6 @@
 #include "../core/render.h"
 
 #include "screen_textentry.h"
-#include "../game_main.h"
 
 #include "speedrunner.h"
 #include "menu_main.h"
