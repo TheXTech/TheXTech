@@ -1,27 +1,36 @@
 [submodule "3rdparty/PGE_File_Formats"]
 	path = 3rdparty/PGE_File_Formats
 	url = https://github.com/WohlSoft/PGE-File-Library-STL.git
+	branch = master
 [submodule "3rdparty/LuaJIT"]
 	path = 3rdparty/LuaJIT
 	url = https://github.com/WohlSoft/LuaJIT.git
+	branch = v2.1
 [submodule "3rdparty/luabind"]
 	path = 3rdparty/luabind
 	url = https://github.com/WohlSoft/luabind-deboostified.git
+	branch = master
 [submodule "3rdparty/AudioCodecs"]
 	path = 3rdparty/AudioCodecs
 	url = https://github.com/WohlSoft/AudioCodecs.git
+	branch = master
 [submodule "3rdparty/SDL-Mixer-X"]
 	path = 3rdparty/SDL-Mixer-X
 	url = https://github.com/WohlSoft/SDL-Mixer-X.git
+	branch = master
 [submodule "3rdparty/FreeImageLite"]
 	path = 3rdparty/FreeImageLite
 	url = https://github.com/WohlSoft/libFreeImage.git
+	branch = master
 [submodule "3rdparty/tinyfiledialogs"]
 	path = 3rdparty/tinyfiledialogs
 	url = https://github.com/Wohlstand/tinyfiledialogs
+	branch = master
 [submodule "3rdparty/freetype"]
 	path = 3rdparty/freetype
 	url = https://github.com/Wohlstand/freetype.git
+	branch = master
 [submodule "3rdparty/harfbuzz"]
 	path = 3rdparty/harfbuzz
 	url = https://github.com/Wohlstand/harfbuzz.git
+    branch = main
