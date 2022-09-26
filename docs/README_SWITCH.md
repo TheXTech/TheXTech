@@ -29,8 +29,6 @@ The original was written in VB6, targeting Windows only and eating up 2-3Gb of r
 
 ### KNOWN ISSUES
 
-- Touchscreen doesn't work properly
-- Sound playback needs some more testing and polishing
 - LunaLua/LuaJIT episodes are not supported. (ATWE: A Tiny World Episode immediately comes to mind. The Episode shows in the world list, but upon trying to load the game will gracefully exit.)
 
 
