@@ -465,9 +465,9 @@ bool mainMenuUpdate()
         menuDoPress = false;
 
     {
-        if(XWindow::getCursor() != AbstractWindow_t::CURSOR_NONE)
+        if(XWindow::getCursor() != CURSOR_NONE)
         {
-            XWindow::setCursor(AbstractWindow_t::CURSOR_NONE);
+            XWindow::setCursor(CURSOR_NONE);
             XWindow::showCursor(0);
         }
 
