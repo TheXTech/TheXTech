@@ -24,7 +24,6 @@
 
 #include "events_sdl.h"
 #include "core/window.h"
-#include "core/base/render_base.h"
 #ifdef USE_RENDER_BLOCKING
 #include "core/render.h"
 #endif

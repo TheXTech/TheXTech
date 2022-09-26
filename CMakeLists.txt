@@ -698,6 +698,32 @@ if(THEXTECH_INTERPROC_SUPPORTED)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_INTERPROC_SUPPORTED)
 endif()
 
+# ======================= Render specific global macros ========================
+if(NOT EMSCRIPTEN)
+    target_compile_definitions(thextech PRIVATE
+        -DUSE_SCREENSHOTS_AND_RECS  # Built-in screenshots and GIF recording
+        -DUSE_DRAW_BATTERY_STATUS   # Battery status draw support
+    )
+else()
+    target_compile_definitions(thextech PRIVATE
+        -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
+    )
+endif()
+
+if(ANDROID)
+    target_compile_definitions(thextech PRIVATE
+        -DUSE_RENDER_BLOCKING
+    )
+endif()
+
+if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
+    target_compile_definitions(thextech PRIVATE
+        -DRENDER_FULLSCREEN_ALWAYS  # Game works always fullscreen
+        -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
+    )
+endif()
+# ==============================================================================
+
 if(NOT USE_SYSTEM_LIBS)
     add_dependencies(thextech ${A2XT_DEPS})
 endif()
