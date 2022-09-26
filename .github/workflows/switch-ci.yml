@@ -14,10 +14,9 @@ jobs:
   build:
     name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
     runs-on: ubuntu-latest
-    container: devkitpro/devkita64_devkitarm
+    container: devkitpro/devkita64
     env:
         DEVKITPRO: /opt/devkitpro
-        DEVKITARM: /opt/devkitpro/devkitARM
         DEVKITA64: /opt/devkitpro/devkitA64
     strategy:
       fail-fast: false
