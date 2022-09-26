@@ -31,7 +31,7 @@
 #include "globals.h"
 #include "layers.h"
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 enum ContinuedRect
 {
@@ -331,8 +331,8 @@ struct table_t
         if(rect.b > 0 && (rect.b % 2048))
             brow += 1;
 
-        int lcol_check = XStd::max(lcol, first_col_index);
-        int rcol_check = XStd::min(rcol, first_col_index + (int)columns.size());
+        int lcol_check = SDL_max(lcol, first_col_index);
+        int rcol_check = SDL_min(rcol, first_col_index + (int)columns.size());
 
         rect_internal inner_rect;
 
@@ -364,8 +364,8 @@ struct table_t
             if(inner_r & 63)
                 inner_rect.r += 1;
 
-            int trow_check = XStd::max(trow, col_first_row_index[internal_col]);
-            int brow_check = XStd::min(brow, col_first_row_index[internal_col] + (int)columns[internal_col].size());
+            int trow_check = SDL_max(trow, col_first_row_index[internal_col]);
+            int brow_check = SDL_min(brow, col_first_row_index[internal_col] + (int)columns[internal_col].size());
             if(trow_check != trow)
                 inner_rect.cont_axes |= CONT_Y;
 
@@ -559,8 +559,8 @@ struct table_t
         if(rect.b > 0 && (rect.b % 2048))
             brow += 1;
 
-        int lcol_check = XStd::max(lcol, first_col_index);
-        int rcol_check = XStd::min(rcol, first_col_index + (int)columns.size());
+        int lcol_check = SDL_max(lcol, first_col_index);
+        int rcol_check = SDL_min(rcol, first_col_index + (int)columns.size());
 
         rect_internal inner_rect;
 
@@ -586,8 +586,8 @@ struct table_t
             if(inner_r & 63)
                 inner_rect.r += 1;
 
-            int trow_check = XStd::max(trow, col_first_row_index[internal_col]);
-            int brow_check = XStd::min(brow, col_first_row_index[internal_col] + (int)columns[internal_col].size());
+            int trow_check = SDL_max(trow, col_first_row_index[internal_col]);
+            int brow_check = SDL_min(brow, col_first_row_index[internal_col] + (int)columns[internal_col].size());
             if(trow_check != trow)
                 inner_rect.cont_axes |= CONT_Y;
 

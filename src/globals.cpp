@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "core/events.h"
 #include "globals.h"
@@ -650,7 +650,7 @@ double vb6Round(double x, int decimals)
     if(decimals < 0 || decimals >= 22)
         decimals = 0;
 
-    if(XStd::fabs(x) < 1.0e16)
+    if(SDL_fabs(x) < 1.0e16)
     {
         decmul = power10[decimals];
         res = toNearest(x * decmul) / decmul;

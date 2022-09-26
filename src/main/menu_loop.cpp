@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include <AppPath/app_path.h>
 #include <Utils/files.h>

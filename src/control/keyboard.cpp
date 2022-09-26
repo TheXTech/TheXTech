@@ -1319,8 +1319,8 @@ bool InputMethodType_Keyboard::ConsumeEvent(const SDL_Event* ev)
     case SDL_MOUSEBUTTONUP:
         if(ev->button.button == SDL_BUTTON_LEFT && ev->button.which != SDL_TOUCH_MOUSEID)
         {
-            bool doubleClick = (this->m_lastMousePress + 300) >= XStd::GetTicks();
-            this->m_lastMousePress = XStd::GetTicks();
+            bool doubleClick = (this->m_lastMousePress + 300) >= SDL_GetTicks();
+            this->m_lastMousePress = SDL_GetTicks();
 
             if(doubleClick && !MagicHand && !LevelEditor)
             {

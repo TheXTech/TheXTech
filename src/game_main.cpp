@@ -37,7 +37,7 @@
 #include "xtech_lua_main.h"
 #endif
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "globals.h"
 #include "game_main.h"
@@ -1275,7 +1275,7 @@ void UpdateMacro()
         {
             // tempTime = Timer - Int(Timer)
 
-            tempTime = (float(XStd::GetTicks()) / 1000.0f) - std::floor(float(XStd::GetTicks()) / 1000.0f);
+            tempTime = (float(SDL_GetTicks()) / 1000.0f) - std::floor(float(SDL_GetTicks()) / 1000.0f);
 //            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
 
             if(g_compatibility.fix_keyhole_framerate)

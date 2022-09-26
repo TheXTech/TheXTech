@@ -28,7 +28,7 @@
 #include "main/speedrunner.h"
 #include "main/presetup.h"
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 
 static int s_compatLevel = COMPAT_MODERN;
@@ -90,7 +90,7 @@ static void compatInit(Compatibility_t &c)
     c.allow_drop_add = true;
     c.multiplayer_pause_controls = true;
     c.demos_counter_enable = false;
-    XStd::strlcpy(c.demos_counter_title, "", sizeof(c.demos_counter_title));
+    SDL_strlcpy(c.demos_counter_title, "", sizeof(c.demos_counter_title));
     c.luna_allow_level_codes = false;
     c.luna_enable_engine = Compatibility_t::LUNA_ENGINE_UNSPECIFIED;
     c.fix_fairy_stuck_in_pipe = true;
@@ -148,8 +148,8 @@ static void compatInit(Compatibility_t &c)
     }
 
     c.speedrun_stop_timer_by = Compatibility_t::SPEEDRUN_STOP_NONE;
-    XStd::memset(c.speedrun_stop_timer_at, 0, sizeof(c.speedrun_stop_timer_at));
-    XStd::strlcpy(c.speedrun_stop_timer_at, "Boss Dead", sizeof(c.speedrun_stop_timer_at));
+    SDL_memset(c.speedrun_stop_timer_at, 0, sizeof(c.speedrun_stop_timer_at));
+    SDL_strlcpy(c.speedrun_stop_timer_at, "Boss Dead", sizeof(c.speedrun_stop_timer_at));
     c.speedrun_blink_effect = SPEEDRUN_EFFECT_BLINK_OPAQUEONLY;
 }
 
@@ -198,7 +198,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
 
         compat.readEnum("stop-timer-by", c.speedrun_stop_timer_by, c.speedrun_stop_timer_by, stopBy);
         compat.read("stop-timer-at", buffer, std::string(c.speedrun_stop_timer_at));
-        XStd::strlcpy(c.speedrun_stop_timer_at, buffer.c_str(), sizeof(c.speedrun_stop_timer_at));
+        SDL_strlcpy(c.speedrun_stop_timer_at, buffer.c_str(), sizeof(c.speedrun_stop_timer_at));
         compat.readEnum("blink-effect", c.speedrun_blink_effect, c.speedrun_blink_effect, speedRunBlinkMode);
     }
     compat.endGroup();
@@ -223,7 +223,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         std::string buffer;
         compat.read("enabled", c.demos_counter_enable, c.demos_counter_enable);
         compat.read("title", buffer, std::string(c.demos_counter_title));
-        XStd::strlcpy(c.demos_counter_title, buffer.c_str(), sizeof(c.demos_counter_title));
+        SDL_strlcpy(c.demos_counter_title, buffer.c_str(), sizeof(c.demos_counter_title));
     }
     compat.endGroup();
 

@@ -499,17 +499,17 @@ void minport_ApplyViewport()
         // rotated 90deg clockwise
         if(s_cur_target->linked)
         {
-            hw_viewport_x = XStd::min(XStd::max(g_viewport_y, 0), s_cur_target->frameBuf.width - 1);
-            hw_viewport_y = XStd::min(XStd::max(g_viewport_x, 0), s_cur_target->frameBuf.height - 1);
-            hw_viewport_w = XStd::min(s_cur_target->frameBuf.width - hw_viewport_x, g_viewport_h);
-            hw_viewport_h = XStd::min(s_cur_target->frameBuf.height - hw_viewport_y, g_viewport_w);
+            hw_viewport_x = SDL_min(SDL_max(g_viewport_y, 0), s_cur_target->frameBuf.width - 1);
+            hw_viewport_y = SDL_min(SDL_max(g_viewport_x, 0), s_cur_target->frameBuf.height - 1);
+            hw_viewport_w = SDL_min(s_cur_target->frameBuf.width - hw_viewport_x, g_viewport_h);
+            hw_viewport_h = SDL_min(s_cur_target->frameBuf.height - hw_viewport_y, g_viewport_w);
         }
         else
         {
-            hw_viewport_x = XStd::min(XStd::max(g_viewport_x, 0), s_cur_target->frameBuf.width - 1);
-            hw_viewport_y = XStd::min(XStd::max(g_viewport_y, 0), s_cur_target->frameBuf.height - 1);
-            hw_viewport_w = XStd::min(s_cur_target->frameBuf.width - hw_viewport_x, g_viewport_w);
-            hw_viewport_h = XStd::min(s_cur_target->frameBuf.height - hw_viewport_y, g_viewport_h);
+            hw_viewport_x = SDL_min(SDL_max(g_viewport_x, 0), s_cur_target->frameBuf.width - 1);
+            hw_viewport_y = SDL_min(SDL_max(g_viewport_y, 0), s_cur_target->frameBuf.height - 1);
+            hw_viewport_w = SDL_min(s_cur_target->frameBuf.width - hw_viewport_x, g_viewport_w);
+            hw_viewport_h = SDL_min(s_cur_target->frameBuf.height - hw_viewport_y, g_viewport_h);
         }
 
         if(s_cur_target->linked)

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "../gfx.h"
 #include "../globals.h"
@@ -177,12 +177,12 @@ void GameThing(int waitms, int fadeSpeed)
     else
     {
         ScreenFader fader;
-        uint32_t targetTime = XStd::GetTicks() + waitms;
+        uint32_t targetTime = SDL_GetTicks() + waitms;
 
         if(g_config.EnableInterLevelFade && fadeSpeed > 0)
             fader.setupFader(fadeSpeed, 65, 0, ScreenFader::S_FADE);
 
-        while(XStd::GetTicks() < targetTime && GameIsActive)
+        while(SDL_GetTicks() < targetTime && GameIsActive)
         {
             XEvents::doEvents();
 

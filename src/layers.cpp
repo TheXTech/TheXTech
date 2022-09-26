@@ -52,12 +52,12 @@ static std::set<eventindex_t> recentlyTriggeredEvents;
 
 static inline bool equalCase(const std::string &x, const std::string &y)
 {
-    return (XStd::strcasecmp(x.c_str(), y.c_str()) == 0);
+    return (SDL_strcasecmp(x.c_str(), y.c_str()) == 0);
 }
 
 static inline bool equalCase(const char *x, const char *y)
 {
-    return (XStd::strcasecmp(x, y) == 0);
+    return (SDL_strcasecmp(x, y) == 0);
 }
 
 
@@ -976,7 +976,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         }
                     }
                 }
-                else if(IF_INRANGE(evt.AutoSection, 0, XStd::min(maxSections, maxEvents)))
+                else if(IF_INRANGE(evt.AutoSection, 0, SDL_min(maxSections, maxEvents)))
                 {
                     // Buggy behavior, see https://github.com/Wohlstand/TheXTech/issues/44
                     AutoX[evt.AutoSection] = Events[evt.AutoSection].AutoX;

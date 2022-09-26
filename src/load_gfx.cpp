@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/std.h"
+#include "core/sdl.h"
 #include "core/msgbox.h"
 
 #include "globals.h"
@@ -286,7 +286,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
         failed = true;
 
         // read the entry!
-        XStd::memset(type_buf, 0, sizeof(type_buf));
+        SDL_memset(type_buf, 0, sizeof(type_buf));
         if(fscanf(f, "%11s %d", type_buf, &A) != 2 || fgetc(f) != '\n')
         {
             if(feof(f))
@@ -518,7 +518,7 @@ static void restoreLevelBackupTextures()
             *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
-        TXT_assert_release(t.remote_texture);
+        SDL_assert_release(t.remote_texture);
         XRender::deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
@@ -537,7 +537,7 @@ static void restoreWorldBackupTextures()
             *t.remote_height = t.height;
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
-        TXT_assert_release(t.remote_texture);
+        SDL_assert_release(t.remote_texture);
         XRender::deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
@@ -1144,9 +1144,9 @@ void UpdateLoadREAL()
 
     static float alphaFader = 1.0f;
 
-    if(LoadCoinsT <= XStd::GetTicks())
+    if(LoadCoinsT <= SDL_GetTicks())
     {
-        LoadCoinsT = XStd::GetTicks() + 100;
+        LoadCoinsT = SDL_GetTicks() + 100;
         LoadCoins += 1;
         if(LoadCoins > 3)
             LoadCoins = 0;

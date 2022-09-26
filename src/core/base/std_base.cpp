@@ -1,11 +1,11 @@
 #include <Utils/elapsed_timer.h>
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 static ElapsedTimer s_timer;
 static bool s_init = false;
 
-uint64_t XStd::GetMicroTicks()
+uint64_t SDL_GetMicroTicks()
 {
     if(!s_init)
     {

@@ -21,7 +21,7 @@
 #include "globals.h"
 #include "global_dirs.h"
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "custom.h"
 #include "compat.h"
@@ -186,7 +186,7 @@ void LoadPlayerDefaults()
 /**
  * @brief Applies bug-fixes to default settings of NPC objects according to compatibility settings
  */
-TXT_FORCE_INLINE void loadNpcSetupFixes()
+SDL_FORCE_INLINE void loadNpcSetupFixes()
 {
     // TODO: Implement settings fixing logic here!
 }

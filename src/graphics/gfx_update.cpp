@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include <algorithm>
 #include <array>
@@ -1562,7 +1562,7 @@ void UpdateGraphics(bool skipRepaint)
                                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
                                             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - tempLocation.Height / 2.0;
 
-                                            B = EditorNPCFrame((int)XStd::floor(NPC[A].Special), NPC[A].Direction);
+                                            B = EditorNPCFrame((int)SDL_floor(NPC[A].Special), NPC[A].Direction);
                                             XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + tempLocation.Y, tempLocation.Width, tempLocation.Height, GFXNPC[NPC[A].Special], 0, B * tempLocation.Height);
                                         }
 
@@ -1674,10 +1674,10 @@ void UpdateGraphics(bool skipRepaint)
                                     // YoshiTX += 4
                                     g_stats.renderedNPCs++;
                                     // Yoshi's Body
-                                    XRender::renderTexture(vScreenX[Z] + XStd::floor(NPC[A].Location.X) + YoshiBX, vScreenY[Z] + NPC[A].Location.Y + YoshiBY, 32, 32, GFXYoshiB[B], 0, 32 * YoshiBFrame, cn, cn, cn);
+                                    XRender::renderTexture(vScreenX[Z] + SDL_floor(NPC[A].Location.X) + YoshiBX, vScreenY[Z] + NPC[A].Location.Y + YoshiBY, 32, 32, GFXYoshiB[B], 0, 32 * YoshiBFrame, cn, cn, cn);
 
                                     // Yoshi's Head
-                                    XRender::renderTexture(vScreenX[Z] + XStd::floor(NPC[A].Location.X) + YoshiTX, vScreenY[Z] + NPC[A].Location.Y + YoshiTY, 32, 32, GFXYoshiT[B], 0, 32 * YoshiTFrame, cn, cn, cn);
+                                    XRender::renderTexture(vScreenX[Z] + SDL_floor(NPC[A].Location.X) + YoshiTX, vScreenY[Z] + NPC[A].Location.Y + YoshiTY, 32, 32, GFXYoshiT[B], 0, 32 * YoshiTFrame, cn, cn, cn);
                                 }
                             }
                             if((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == 57)
@@ -1782,7 +1782,7 @@ void UpdateGraphics(bool skipRepaint)
                 }
 
                 XRender::renderTexture(
-                        vScreenX[Z] + XStd::floor(Player[A].Location.X) + pfrOffX(tx, p) - Physics.PlayerWidth[Player[A].Character][Player[A].State] / 2 + 64,
+                        vScreenX[Z] + SDL_floor(Player[A].Location.X) + pfrOffX(tx, p) - Physics.PlayerWidth[Player[A].Character][Player[A].State] / 2 + 64,
                         vScreenY[Z] + Player[A].Location.Y + pfrOffY(tx, p) + Player[A].MountOffsetY - Y,
                         pfrW(tx, p), // was 99, not 100, but not a big deal
                         Player[A].Location.Height - 20 - Player[A].MountOffsetY,
@@ -1791,7 +1791,7 @@ void UpdateGraphics(bool skipRepaint)
                         pfrY(tx, p),
                         c, c, c);
                 XRender::renderTexture(
-                        vScreenX[Z] + XStd::floor(Player[A].Location.X) + Player[A].Location.Width / 2.0 - 64,
+                        vScreenX[Z] + SDL_floor(Player[A].Location.X) + Player[A].Location.Width / 2.0 - 64,
                         vScreenY[Z] + Player[A].Location.Y + Player[A].Location.Height - 128,
                         128,
                         128,

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "../globals.h"
 #include "../frame_timer.h"
@@ -491,7 +491,7 @@ void FindWldStars()
 
                     for(int B = 1; B <= numStars; B++)
                     {
-                        if(XStd::strcasecmp(Star[B].level.c_str(), l.FileName.c_str()) == 0)
+                        if(SDL_strcasecmp(Star[B].level.c_str(), l.FileName.c_str()) == 0)
                             l.curStars++;
                     }
                 }

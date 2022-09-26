@@ -21,7 +21,7 @@
 
 #include <algorithm>
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "globals.h"
 #include "frame_timer.h"
@@ -1539,7 +1539,7 @@ void BlockFrames()
 
     bool pChar[maxPlayers] = {false};
     bool tempBool = false;
-    XStd::memset(pChar, 0, sizeof(pChar));
+    SDL_memset(pChar, 0, sizeof(pChar));
 
     if(FreezeNPCs)
         return;

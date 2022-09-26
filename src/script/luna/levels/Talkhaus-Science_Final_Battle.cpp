@@ -28,7 +28,7 @@
 
 #include <vector>
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "Talkhaus-Science_Final_Battle.h"
 #include "globals.h"
@@ -69,7 +69,7 @@ void ScienceCode()
         hurt_timer      = 0;
         throw_timer     = 0;
         demo            = PlayerF::Get(1);
-        TXT_assert_release(demo);
+        SDL_assert_release(demo);
     }
 
     hurt_npc = FindNPC(NPC_FIREBAR);

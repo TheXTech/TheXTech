@@ -23,9 +23,9 @@
 #define EVENTS_HHHHHHH
 
 #ifndef EVENTS_CUSTOM
-#   include "core/std.h"
+#   include "core/sdl.h"
 #   include "base/events_base.h"
-#   define E_INLINE TXT_FORCE_INLINE
+#   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
 #else
 #   include <stdint.h>

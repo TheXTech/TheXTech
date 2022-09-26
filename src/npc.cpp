@@ -382,13 +382,13 @@ static void s_alignRuftCell(NPC_t &me, const Location_t &alignAt)
         do
         {
             p -= w;
-        } while(XStd::fabs(p - me.Location.X) >= w / 2 && p > me.Location.X);
+        } while(SDL_fabs(p - me.Location.X) >= w / 2 && p > me.Location.X);
         me.Location.X = p;
     }
     else
     {
         auto p = alignAt.X + alignAt.Width;
-        while(XStd::fabs(p - me.Location.X) >= w / 2 && p < me.Location.X + me.Location.Width)
+        while(SDL_fabs(p - me.Location.X) >= w / 2 && p < me.Location.X + me.Location.Width)
         {
             p += w;
         }
@@ -3178,7 +3178,7 @@ void SpecialNPC(int A)
                     {
                         if(C == 0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                         {
-                            C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                            C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                             D = (float)B;
                         }
                     }
@@ -3244,7 +3244,7 @@ void SpecialNPC(int A)
                 {
                     if(C == 0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                     {
-                        C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                        C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                         D = (float)B;
                     }
                 }
@@ -3310,7 +3310,7 @@ void SpecialNPC(int A)
             {
                 if(C == 0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                 {
-                    C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                    C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                     if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
                         NPC[A].Direction = -1;
                     else
@@ -3999,7 +3999,7 @@ void SpecialNPC(int A)
                 {
                     if(C == 0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                     {
-                        C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                        C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                         D = (float)B;
                     }
                 }
@@ -4129,7 +4129,7 @@ void SpecialNPC(int A)
                 {
                     if(C == 0 || std::abs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                     {
-                        C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                        C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                         D = (float)B;
                     }
                 }
@@ -4171,9 +4171,9 @@ void SpecialNPC(int A)
         {
             if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
             {
-                if(C == 0 || XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                if(C == 0 || SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                 {
-                    C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                    C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                     if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
                         NPC[A].Direction = -1;
                     else
@@ -4235,9 +4235,9 @@ void SpecialNPC(int A)
         {
             if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
             {
-                if(C == 0.f || XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                if(C == 0.f || SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                 {
-                    C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                    C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                     if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
                         NPC[A].Direction = -1;
                     else
@@ -4388,9 +4388,9 @@ void SpecialNPC(int A)
         {
             if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer)
             {
-                if(C == 0 || (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                if(C == 0 || (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                 {
-                    C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                    C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                     D = (float)B;
                 }
             }
@@ -4401,8 +4401,8 @@ void SpecialNPC(int A)
             if(NPC[A].Special == 0)
             {
                 NPC[A].Location.SpeedX -= 0.2;
-                D = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) / 100;
-                D += (float)XStd::fabs(Player[C].Location.SpeedX) / 2;
+                D = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) / 100;
+                D += (float)SDL_fabs(Player[C].Location.SpeedX) / 2;
                 if(NPC[A].Location.SpeedX < -5 - D)
                     NPC[A].Location.SpeedX += 0.2;
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Player[C].Location.X + Player[C].Location.Width / 2.0 - 50 + (Player[C].Location.SpeedX * 15))
@@ -4411,8 +4411,8 @@ void SpecialNPC(int A)
             else
             {
                 NPC[A].Location.SpeedX += 0.2;
-                D = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) / 100;
-                D += (float)XStd::fabs(Player[C].Location.SpeedX) / 2;
+                D = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) / 100;
+                D += (float)SDL_fabs(Player[C].Location.SpeedX) / 2;
                 if(NPC[A].Location.SpeedX > 5 + D)
                     NPC[A].Location.SpeedX -= 0.2;
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[C].Location.X + Player[C].Location.Width / 2.0 + 50 + (Player[C].Location.SpeedX * 15))
@@ -4507,7 +4507,7 @@ void SpecialNPC(int A)
                 }
             }
 
-            if(XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) < 100)
+            if(SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) < 100)
             {
                 if(NPC[A].Special4 == 0)
                 {
@@ -4689,9 +4689,9 @@ void SpecialNPC(int A)
             {
                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer)
                 {
-                    if(C == 0 || XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                    if(C == 0 || SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                     {
-                        C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                        C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                         D = (float)B;
                     }
                 }
@@ -4849,9 +4849,9 @@ void SpecialNPC(int A)
             {
                 if(!Player[B].Dead && Player[B].Section == NPC[A].Section)
                 {
-                    if(C == 0 || XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                    if(C == 0 || SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                     {
-                        C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                        C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                         if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[B].Location.X + Player[B].Location.Width / 2.0)
                             NPC[A].Direction = -1;
                         else
@@ -4937,9 +4937,9 @@ void SpecialNPC(int A)
         {
             if(!Player[B].Dead && Player[B].Section == NPC[A].Section && B != NPC[A].CantHurtPlayer && Player[B].TimeToLive == 0)
             {
-                if(C == 0 || XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
+                if(C == 0 || SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0)) < C)
                 {
-                    C = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
+                    C = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - (Player[B].Location.X + Player[B].Location.Width / 2.0));
                     D = (float)B;
                 }
             }
@@ -4952,8 +4952,8 @@ void SpecialNPC(int A)
             if(NPC[A].Special6 == 0)
             {
                 NPC[A].Location.SpeedX -= 0.2;
-                D = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) / 100;
-                D += (float)XStd::fabs(Player[C].Location.SpeedX) / 2;
+                D = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) / 100;
+                D += (float)SDL_fabs(Player[C].Location.SpeedX) / 2;
                 if(NPC[A].Location.SpeedX < -5 - D)
                     NPC[A].Location.SpeedX += 0.2;
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Player[C].Location.X + Player[C].Location.Width / 2.0 - 50 + (Player[C].Location.SpeedX * 15))
@@ -4962,8 +4962,8 @@ void SpecialNPC(int A)
             else
             {
                 NPC[A].Location.SpeedX += 0.2;
-                D = (float)XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) / 100;
-                D += (float)XStd::fabs(Player[C].Location.SpeedX) / 2;
+                D = (float)SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) / 100;
+                D += (float)SDL_fabs(Player[C].Location.SpeedX) / 2;
                 if(NPC[A].Location.SpeedX > 5 + D)
                     NPC[A].Location.SpeedX -= 0.2;
                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 > Player[C].Location.X + Player[C].Location.Width / 2.0 + 50 + (Player[C].Location.SpeedX * 15))
@@ -5009,7 +5009,7 @@ void SpecialNPC(int A)
                     NPC[A].Special3 = 0;
             }
 
-            if(XStd::fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) < 100)
+            if(SDL_fabs(NPC[A].Location.X + NPC[A].Location.Width / 2.0 - Player[C].Location.X + Player[C].Location.Width / 2.0) < 100)
             {
                 if(NPC[A].Special4 == 0)
                 {

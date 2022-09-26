@@ -23,7 +23,7 @@
 #define RENDEROP_H
 
 #include "lunarender.h"
-#include "core/std.h"
+#include "core/sdl.h"
 
 
 static const double RENDEROP_PRIORITY_MIN = -100.0;
@@ -55,7 +55,7 @@ public:
     inline void* operator new(size_t size)
     {
         // Note: If you creating any chunks with a size bigger than current size, please increase it
-        TXT_assert_release(size < c_rAllocChunkSize);
+        SDL_assert_release(size < c_rAllocChunkSize);
         auto *ret = g_rAlloc.Allocate(c_rAllocChunkSize);
         return ret;
     }

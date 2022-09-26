@@ -1,4 +1,4 @@
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include <gccore.h>
 
@@ -11,7 +11,7 @@ extern "C"
 
 uint64_t startTime = -1;
 
-uint32_t XStd::GetTicks()
+uint32_t SDL_GetTicks()
 {
     if(startTime == (uint64_t)-1)
     {
@@ -21,7 +21,7 @@ uint32_t XStd::GetTicks()
     return diff_msec(startTime, gettime());
 }
 
-uint64_t XStd::GetMicroTicks()
+uint64_t SDL_GetMicroTicks()
 {
     if(startTime == (uint64_t)-1)
     {

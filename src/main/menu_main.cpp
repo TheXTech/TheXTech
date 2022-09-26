@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #ifndef PGE_NO_THREADING
 #include <SDL2/SDL_thread.h>
@@ -1266,7 +1266,7 @@ bool mainMenuUpdate()
                 }
                 else if(menuDoPress || MenuMouseClick)
                 {
-                    TXT_assert_release(IF_INRANGE(MenuCursor, 0, maxSaveSlots - 1));
+                    SDL_assert_release(IF_INRANGE(MenuCursor, 0, maxSaveSlots - 1));
                     int slot = MenuCursor + 1;
 
                     if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)

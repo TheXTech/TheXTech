@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "globals.h"
 #include "gfx.h"
@@ -137,8 +137,8 @@ bool GFX_t::load()
 
     // Add new optional assets here. Also update load_gfx.cpp:loadCustomUIAssets()
 
-    TXT_assert_release(m_loadedImages.size() <= m_isCustomVolume);
-    XStd::memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
+    SDL_assert_release(m_loadedImages.size() <= m_isCustomVolume);
+    SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
 
     return true;
 }
@@ -148,11 +148,11 @@ void GFX_t::unLoad()
     for(StdPicture *p : m_loadedImages)
         XRender::deleteTexture(*p);
     m_loadedImages.clear();
-    XStd::memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
+    SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
 }
 
 bool& GFX_t::isCustom(size_t i)
 {
-    TXT_assert_release(i < m_isCustomVolume);
+    SDL_assert_release(i < m_isCustomVolume);
     return m_isCustom[i];
 }

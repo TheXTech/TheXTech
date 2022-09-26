@@ -25,7 +25,7 @@
 #include <cstddef>
 #include <cstring>
 #ifndef RANGE_ARR_UNSAFE_MODE
-#include "core/std.h"
+#include "core/sdl.h"
 #endif
 
 #define For(A, From, To) for(int A = From; A <= To; ++A)
@@ -106,10 +106,10 @@ public:
     inline T& operator[](long index)
     {
 #   ifdef RANGE_ARR_USE_HEAP
-        TXT_assert_release(array); // When array won't initialize
+        SDL_assert_release(array); // When array won't initialize
 #   endif
-        TXT_assert_release(index <= end);
-        TXT_assert_release(index >= begin);
+        SDL_assert_release(index <= end);
+        SDL_assert_release(index >= begin);
         return *(array + index + offset);
     }
 #endif
@@ -193,10 +193,10 @@ public:
     inline T& operator[](long index)
     {
 #   ifdef RANGE_ARR_USE_HEAP
-        TXT_assert_release(array); // When array won't initialize
+        SDL_assert_release(array); // When array won't initialize
 #   endif
-        TXT_assert_release(index <= end);
-        TXT_assert_release(index >= begin);
+        SDL_assert_release(index <= end);
+        SDL_assert_release(index >= begin);
         return *(array + index + offset);
     }
 #endif

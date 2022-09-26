@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/std.h"
+#include "core/sdl.h"
 #include "core/mixer.h"
 
 #include "globals.h"
@@ -172,7 +172,7 @@ static std::unordered_map<std::string, Music_t> music;
 static std::unordered_map<std::string, SFX_t>   sound;
 
 //! Sounds played by scripts
-static XStd::atomic_t                              extSfxBusy;
+static SDL_atomic_t                              extSfxBusy;
 static std::unordered_map<std::string, Mix_Chunk*> extSfx;
 static std::unordered_map<int, std::string>        extSfxPlaying;
 static void extSfxStopCallback(int channel);
@@ -198,7 +198,7 @@ void InitMixerX()
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 
-    XStd::AtomicSet(&extSfxBusy, 0);
+    SDL_AtomicSet(&extSfxBusy, 0);
 
     if(g_mixerLoaded)
         return;
@@ -440,7 +440,7 @@ static void processPathArgs(std::string &path,
         {
             if(arg.compare(0, 3, "ym=") != 0)
                 continue;
-            *yoshiModeTrack = XStd::atoi(arg.substr(3).c_str());
+            *yoshiModeTrack = SDL_atoi(arg.substr(3).c_str());
         }
     }
 
@@ -1224,7 +1224,7 @@ void UnloadExtSounds()
     if(noSound)
         return;
 
-    XStd::AtomicSet(&extSfxBusy, 1);
+    SDL_AtomicSet(&extSfxBusy, 1);
 
     for(auto &f : extSfx)
         Mix_FreeChunk(f.second);
@@ -1232,7 +1232,7 @@ void UnloadExtSounds()
     extSfx.clear();
     extSfxPlaying.clear();
 
-    XStd::AtomicSet(&extSfxBusy, 0);
+    SDL_AtomicSet(&extSfxBusy, 0);
 }
 
 void PlayExtSound(const std::string &path, int loops, int volume)
@@ -1260,11 +1260,11 @@ void PlayExtSound(const std::string &path, int loops, int volume)
 
     if(play_ch >= 0)
     {
-        XStd::AtomicSet(&extSfxBusy, 1);
+        SDL_AtomicSet(&extSfxBusy, 1);
         // Never re-use the same channel!
-        TXT_assert_release(extSfxPlaying.find(play_ch) == extSfxPlaying.end());
+        SDL_assert_release(extSfxPlaying.find(play_ch) == extSfxPlaying.end());
         extSfxPlaying.insert({play_ch, path});
-        XStd::AtomicSet(&extSfxBusy, 0);
+        SDL_AtomicSet(&extSfxBusy, 0);
     }
     else
         pLogWarning("Can't play custom sound %s: %s", Mix_GetError());
@@ -1272,7 +1272,7 @@ void PlayExtSound(const std::string &path, int loops, int volume)
 
 static void extSfxStopCallback(int channel)
 {
-    if(XStd::AtomicGet(&extSfxBusy) == 1)
+    if(SDL_AtomicGet(&extSfxBusy) == 1)
         return; // Do nothing!
 
     auto i = extSfxPlaying.find(channel);
@@ -1285,7 +1285,7 @@ void StopExtSound(const std::string& path)
     if(noSound)
         return;
 
-    XStd::AtomicSet(&extSfxBusy, 1);
+    SDL_AtomicSet(&extSfxBusy, 1);
 
     for(auto i = extSfxPlaying.begin(); i != extSfxPlaying.end();)
     {
@@ -1298,7 +1298,7 @@ void StopExtSound(const std::string& path)
             ++i;
     }
 
-    XStd::AtomicSet(&extSfxBusy, 0);
+    SDL_AtomicSet(&extSfxBusy, 0);
 }
 
 void StopAllExtSounds()
@@ -1306,14 +1306,14 @@ void StopAllExtSounds()
     if(noSound)
         return;
 
-    XStd::AtomicSet(&extSfxBusy, 1);
+    SDL_AtomicSet(&extSfxBusy, 1);
 
     for(auto i = extSfxPlaying.begin(); i != extSfxPlaying.end(); ++i)
         Mix_HaltChannel(i->first);
 
     extSfxPlaying.clear();
 
-    XStd::AtomicSet(&extSfxBusy, 0);
+    SDL_AtomicSet(&extSfxBusy, 0);
 }
 
 void StopAllSounds()
@@ -1321,10 +1321,10 @@ void StopAllSounds()
     if(noSound)
         return;
 
-    XStd::AtomicSet(&extSfxBusy, 1);
+    SDL_AtomicSet(&extSfxBusy, 1);
     Mix_HaltChannel(-1);
     extSfxPlaying.clear();
-    XStd::AtomicSet(&extSfxBusy, 0);
+    SDL_AtomicSet(&extSfxBusy, 0);
 }
 
 #ifdef THEXTECH_ENABLE_AUDIO_FX
@@ -1481,7 +1481,7 @@ void UpdateSoundFX(int recentSection)
     if(noSound || LevelSelect)
         return;
 
-    TXT_assert_release(recentSection >= 0 && recentSection <= maxSections);
+    SDL_assert_release(recentSection >= 0 && recentSection <= maxSections);
     auto &s = s_sectionEffect[recentSection];
 
     s_musicDisableSpcEcho = s.disableSpcEcho;

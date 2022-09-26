@@ -614,7 +614,7 @@ void DrawFrozenNPC(int Z, int A)
         int content = int(n.Special);
         int contentFrame = int(n.Special2);
 
-        // TXT_assert_release(content >= 0 && content <= maxNPCType);
+        // SDL_assert_release(content >= 0 && content <= maxNPCType);
 
         // Draw frozen NPC body in only condition the content value is valid
         if(content > 0 && content <= maxNPCType)

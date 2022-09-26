@@ -20,7 +20,7 @@
 
 #include <algorithm>
 
-#include "core/std.h"
+#include "core/sdl.h"
 #include "core/render.h"
 
 #include "globals.h"
@@ -235,27 +235,27 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
 
 int SuperTextPixLen(const char* SuperChars, int Font)
 {
-    return SuperTextPixLen(XStd::strlen(SuperChars), SuperChars, Font);
+    return SuperTextPixLen(SDL_strlen(SuperChars), SuperChars, Font);
 }
 
 void SuperPrintRightAlign(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    SuperPrintRightAlign(XStd::strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrintRightAlign(SDL_strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
 }
 
 void SuperPrintCenter(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    SuperPrintCenter(XStd::strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrintCenter(SDL_strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
 }
 
 void SuperPrintScreenCenter(const char* SuperChars, int Font, float Y, float r, float g, float b, float a)
 {
-    SuperPrintScreenCenter(XStd::strlen(SuperChars), SuperChars, Font, Y, r, g, b, a);
+    SuperPrintScreenCenter(SDL_strlen(SuperChars), SuperChars, Font, Y, r, g, b, a);
 }
 
 void SuperPrint(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    SuperPrint(XStd::strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrint(SDL_strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
 }
 
 

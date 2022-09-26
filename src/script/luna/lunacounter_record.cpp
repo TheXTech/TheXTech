@@ -21,14 +21,14 @@
 #include "lunacounter_record.h"
 #include <Logger/logger.h>
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 void DeathRecord::Save(FILE *openfile)
 {
     // Write character count
     auto tempint = (uint32_t)m_levelName.size();
 
-    tempint = XStd::SwapLE32(tempint);
+    tempint = SDL_SwapLE32(tempint);
     std::fwrite(&tempint, 1, sizeof(uint32_t), openfile);
 
     // Write string data
@@ -37,7 +37,7 @@ void DeathRecord::Save(FILE *openfile)
     std::fwrite(&nullt, 1, sizeof(int16_t), openfile);
 
     // Write death count
-    int32_t tempsint = XStd::SwapLE32(m_deaths);
+    int32_t tempsint = SDL_SwapLE32(m_deaths);
     std::fwrite(&tempsint, 1, sizeof(int32_t), openfile);
 }
 
@@ -47,7 +47,7 @@ bool DeathRecord::Load(FILE *openfile)
     int32_t tempsint;
     size_t got;
     char buf[151];
-    XStd::memset(buf, 0, 151);
+    SDL_memset(buf, 0, 151);
 
     // Read string length
     uint32_t length;
@@ -60,7 +60,7 @@ bool DeathRecord::Load(FILE *openfile)
         return false;
     }
 
-    length = XStd::SwapLE32(tempint);
+    length = SDL_SwapLE32(tempint);
 
     if(length > 150)
     {
@@ -90,7 +90,7 @@ bool DeathRecord::Load(FILE *openfile)
         return false;
     }
 
-    m_deaths = XStd::SwapLE32(tempsint);
+    m_deaths = SDL_SwapLE32(tempsint);
 
     return true;
 }

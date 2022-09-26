@@ -22,7 +22,7 @@
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "luna.h"
 #include "lunacounter.h"
@@ -156,7 +156,7 @@ bool DeathCounter::TryLoadStats()
         return false;
     }
 
-    tempint = XStd::SwapLE32(tempint);
+    tempint = SDL_SwapLE32(tempint);
 
     if(tempint < 5)
     {
@@ -231,7 +231,7 @@ void DeathCounter::InitStatsFile(FILE *statsfile)
 // WRITE HEADER - Write the death counter file header at beginning of file
 void DeathCounter::WriteHeader(FILE *statsfile)
 {
-    int32_t writeint = XStd::SwapLE32(LUNA_VERSION);
+    int32_t writeint = SDL_SwapLE32(LUNA_VERSION);
 
     // Write dll version
     std::fseek(statsfile, 0, SEEK_SET);
@@ -271,7 +271,7 @@ void DeathCounter::ReadRecords(FILE *statsfile)
     if(tempint == 0)
         return;
 
-    tempint = XStd::SwapLE32(tempint);
+    tempint = SDL_SwapLE32(tempint);
 
     for(int i = 0; i < tempint; i++)
     {
@@ -285,7 +285,7 @@ void DeathCounter::ReadRecords(FILE *statsfile)
 // WRITE RECORDS - Writes death record count at pos 100 in the file followed by each record
 void DeathCounter::WriteRecords(FILE *statsfile)
 {
-    int32_t reccount = XStd::SwapLE32((int32_t)mDeathRecords.size());
+    int32_t reccount = SDL_SwapLE32((int32_t)mDeathRecords.size());
     std::fseek(statsfile, 100, SEEK_SET);
     std::fwrite(&reccount, 1, sizeof(reccount), statsfile);
 

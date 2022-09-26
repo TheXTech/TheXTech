@@ -152,8 +152,8 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         uint32_t w, h;
         if(fread(&w, 4, 1, fpng) == 1 && fread(&h, 4, 1, fpng) == 1)
         {
-            w = XStd::SwapLE32(w);
-            h = XStd::SwapLE32(h);
+            w = SDL_SwapLE32(w);
+            h = SDL_SwapLE32(h);
 
             w = static_cast<uint32_t>(((w << 24) | ((w << 8) & 0x00FF0000) |
                 ((w >> 8) & 0x0000FF00) | (w >> 24)));

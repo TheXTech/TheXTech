@@ -19,7 +19,7 @@
  */
 
 #include <SDL2/SDL_scancode.h>
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "events_base.h"
 #include "window_base.h"

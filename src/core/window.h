@@ -23,9 +23,9 @@
 #define WINDOW_HHHH
 
 #ifndef WINDOW_CUSTOM
-#   include "core/std.h"
+#   include "core/sdl.h"
 #   include "base/window_base.h"
-#   define E_INLINE TXT_FORCE_INLINE
+#   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
 #else
 #   include "base/window_types.h"

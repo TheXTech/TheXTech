@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include "../globals.h"
 #include "../frame_timer.h"
@@ -887,7 +887,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     }
 
     // If too much locks
-    TXT_assert_release(numBackground + numLocked <= (maxBackgrounds + maxWarps));
+    SDL_assert_release(numBackground + numLocked <= (maxBackgrounds + maxWarps));
 
     SoundPause[13] = 100;
     resetFrameTimer();
@@ -1106,7 +1106,7 @@ void FindStars()
 
                     for(int B = 1; B <= numStars; B++)
                     {
-                        if(XStd::strcasecmp(Star[B].level.c_str(), GetS(warp.level).c_str()) == 0)
+                        if(SDL_strcasecmp(Star[B].level.c_str(), GetS(warp.level).c_str()) == 0)
                             warp.curStars++;
                     }
                 }

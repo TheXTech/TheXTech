@@ -38,7 +38,7 @@
 #include "../config.h"
 #include "record.h"
 
-#include "core/std.h"
+#include "core/sdl.h"
 
 #include <chrono>
 #include <fmt_time_ne.h>
@@ -219,7 +219,7 @@ static void read_header()
 
     // now SET the filename
     FullFileName = replayLevelFilePath.empty() ? buffer : replayLevelFilePath;
-    // if(XStd::strcasecmp(buffer, FilefNameFull.c_str()))
+    // if(SDL_strcasecmp(buffer, FilefNameFull.c_str()))
     //     pLogWarning("FileName does not match.");
 
     pLogDebug("Attempt to load level file %s for the replay", FullFileName.c_str());
@@ -228,7 +228,7 @@ static void read_header()
     if(thisHash.empty())
         pLogCritical("Failed to retrieve the MD5 hash for %s file (probably, it doesn't exist)", FullFileName.c_str());
 
-    XStd::memset(md5hash, 0, sizeof(md5hash));
+    SDL_memset(md5hash, 0, sizeof(md5hash));
     fscanf(replay_file, "SumMD5 %s\r\n", md5hash); // File's hash
     pLogDebug("Replay file (loaded %s, expected %s)", thisHash.c_str(), md5hash);
     int hashCmp = thisHash.compare(md5hash);
@@ -443,8 +443,8 @@ static void write_status()
     }
 
     fprintf(record_file, " %" PRId64 " \r\nStatus\r\n", frame_no);
-    uint32_t status_tick = XStd::GetTicks();
-    fprintf(record_file, "Ticks %lu\r\n", (long unsigned)(XStd::GetTicks() - last_status_tick));
+    uint32_t status_tick = SDL_GetTicks();
+    fprintf(record_file, "Ticks %lu\r\n", (long unsigned)(SDL_GetTicks() - last_status_tick));
     last_status_tick = status_tick;
     fprintf(record_file, "randCalls %ld\r\n", random_ncalls());
     fprintf(record_file, "Score %d\r\n", Score);
@@ -584,16 +584,16 @@ static void read_status()
         }
 
         // quite non-strict because in a true divergence situation, it will get continually worse
-        if(XStd::fabs(px - Player[i].Location.X) > 0.01 ||
-           XStd::fabs(py - Player[i].Location.Y) > 0.01)
+        if(SDL_fabs(px - Player[i].Location.X) > 0.01 ||
+           SDL_fabs(py - Player[i].Location.Y) > 0.01)
         {
             pLogWarning("player %d position diverged (old x=%f new x=%f, old y=%f new y=%f) at frame %" PRId64 ".",
                         i,
                         px, Player[i].Location.X,
                         py, Player[i].Location.Y, frame_no);
             diverged_minor = true;
-            if(XStd::fabs(px - Player[i].Location.X) > 1 ||
-               XStd::fabs(py - Player[i].Location.Y) > 1)
+            if(SDL_fabs(px - Player[i].Location.X) > 1 ||
+               SDL_fabs(py - Player[i].Location.Y) > 1)
             {
                 pLogWarning("  this is a major divergence.");
                 diverged_major = true;
@@ -701,10 +701,10 @@ static void read_NPCs()
                 diverged_minor = true;
             }
 
-            if(XStd::fabs(X - n.Location.X) > 0.01 ||
-               XStd::fabs(Y - n.Location.Y) > 0.01 ||
-               XStd::fabs(W - n.Location.Width) > 0.01 ||
-               XStd::fabs(H - n.Location.Height) > 0.01)
+            if(SDL_fabs(X - n.Location.X) > 0.01 ||
+               SDL_fabs(Y - n.Location.Y) > 0.01 ||
+               SDL_fabs(W - n.Location.Width) > 0.01 ||
+               SDL_fabs(H - n.Location.Height) > 0.01)
             {
                 pLogWarning("NPC[%d].Location diverged (old %lf %lf %lf %lf, new %lf %lf %lf %lf; type %d) at frame %" PRId64 ".", i,
                     X, Y, W, H, n.Location.X, n.Location.Y, n.Location.Width, n.Location.Height, n.Type, frame_no);
@@ -754,7 +754,7 @@ void InitRecording()
     diverged_minor = false;
     frame_no = 0;
     next_record_frame = -1;
-    last_status_tick = XStd::GetTicks();
+    last_status_tick = SDL_GetTicks();
     g_stats.renderedNPCs = 0;
     g_stats.renderedBlocks = 0;
     g_stats.renderedBGOs = 0;
