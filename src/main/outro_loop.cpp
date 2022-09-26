@@ -24,7 +24,6 @@
 #include "../globals.h"
 #include "../game_main.h"
 #include "../core/render.h"
-#include "../core/events.h"
 #include "../controls.h"
 #include "../npc.h"
 #include "../blocks.h"
@@ -33,7 +32,6 @@
 #include "../player.h"
 #include "../graphics.h"
 #include "../sound.h"
-#include "../pseudo_vb.h"
 #include "../main/trees.h"
 #include "game_info.h"
 

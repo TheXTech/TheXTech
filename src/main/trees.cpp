@@ -26,6 +26,7 @@
 
 #include "QuadTree/LooseQuadtree.h"
 
+
 std::vector<BaseRef_t> treeresult_vec[MAX_TREEQUERY_DEPTH] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(50), std::vector<BaseRef_t>(50)};
 ptrdiff_t cur_treeresult_vec = 0;
 

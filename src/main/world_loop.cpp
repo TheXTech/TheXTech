@@ -29,7 +29,6 @@
 #include "../game_main.h"
 #include "../sound.h"
 #include "../controls.h"
-#include "../effect.h"
 #include "../graphics.h"
 #include "../collision.h"
 #include "../player.h"
@@ -42,8 +41,6 @@
 #include "speedrunner.h"
 #include "screen_quickreconnect.h"
 #include "screen_connect.h"
-
-#include "../pseudo_vb.h"
 
 #include "global_dirs.h"
 

@@ -20,7 +20,6 @@
 
 #include "../globals.h"
 #include "../frame_timer.h"
-#include "../game_main.h"
 #include "../npc.h"
 #include "../load_gfx.h"
 #include "../custom.h"
@@ -33,7 +32,6 @@
 #include "../npc_id.h"
 #include "level_file.h"
 #include "trees.h"
-#include "record.h"
 #include "npc_special_data.h"
 
 #include <DirManager/dirman.h>

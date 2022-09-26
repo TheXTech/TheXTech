@@ -37,8 +37,6 @@
 #include "../compat.h"
 #include "../config.h"
 #include "record.h"
-#include "speedrunner.h"
-#include "game_main.h"
 
 #include <SDL2/SDL.h>
 #include <chrono>

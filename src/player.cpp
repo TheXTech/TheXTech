@@ -646,6 +646,7 @@ void PlayerHurt(const int A)
                         return;
                     }
                 }
+
                 if(p.State > 1)
                 {
                     PlaySound(SFX_PlayerShrink);

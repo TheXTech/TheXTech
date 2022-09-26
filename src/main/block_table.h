@@ -24,7 +24,6 @@
 #define BLOCK_TABLE_H
 
 #include "globals.h"
-#include "layers.h"
 
 void treeBlockUpdateLayer(int layer, BlockRef_t block);
 bool treeBlockLayerActive(int layer);
