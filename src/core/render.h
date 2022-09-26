@@ -22,13 +22,13 @@
 #ifndef RENDER_HHHHHH
 #define RENDER_HHHHHH
 
+#ifndef RENDER_CUSTOM
 #   include <SDL2/SDL_stdinc.h>
 #   include "base/render_base.h"
-
-#ifndef RENDER_CUSTOM
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
 #else
+#   include "render_types.h"
 #   define E_INLINE    extern
 #   define TAIL ;
 #endif

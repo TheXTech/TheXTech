@@ -22,13 +22,13 @@
 #ifndef WINDOW_HHHH
 #define WINDOW_HHHH
 
-#include <SDL2/SDL_stdinc.h>
-#include "base/window_base.h"
-
 #ifndef WINDOW_CUSTOM
+#   include <SDL2/SDL_stdinc.h>
+#   include "base/window_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
 #else
+#   include "base/window_types.h"
 #   define E_INLINE    extern
 #   define TAIL ;
 #endif
@@ -79,7 +79,7 @@ E_INLINE int showCursor(int show) TAIL
  * \brief Change the displayable cursor type
  * \param cursor cursor type
  */
-E_INLINE void setCursor(AbstractWindow_t::Cursor_t cursor) TAIL
+E_INLINE void setCursor(WindowCursor_t cursor) TAIL
 #ifndef WINDOW_CUSTOM
 {
     g_window->setCursor(cursor);
@@ -90,7 +90,7 @@ E_INLINE void setCursor(AbstractWindow_t::Cursor_t cursor) TAIL
  * \brief Get the current cursor type
  * \return Cursor type
  */
-E_INLINE AbstractWindow_t::Cursor_t getCursor() TAIL
+E_INLINE WindowCursor_t getCursor() TAIL
 #ifndef WINDOW_CUSTOM
 {
     return g_window->getCursor();
