@@ -69,7 +69,7 @@ int g_rmode_h = 480;
  * Convert a raw BMP (ARGB) to 4x4RGBA.
  * @author DragonMinded, modifications by ds-sloth
 */
-static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height, uint32_t* wdst_out, uint32_t* hdst_out)
+static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height, uint32_t stride, uint32_t* wdst_out, uint32_t* hdst_out)
 {
     // calculate destination dimensions, including downscaling and required padding
     uint32_t wdst = (width + 1) / 2;
@@ -113,9 +113,9 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                     }
 
                     // New: Alpha pixels
-                    *p++ = src[(((i + argb) * 2) + ((block + c) * 2 * width)) * 4 + 3];
+                    *p++ = src[(((i + argb) * 2) + ((block + c) * 2 * stride)) * 4 + 3];
                     // Red pixels
-                    *p++ = src[(((i + argb) * 2) + ((block + c) * 2 * width)) * 4 + 0];
+                    *p++ = src[(((i + argb) * 2) + ((block + c) * 2 * stride)) * 4 + 0];
                 }
             }
 
@@ -133,9 +133,9 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                     }
 
                     // Green pixels
-                    *p++ = src[((((i + argb) * 2) + ((block + c) * 2 * width)) * 4) + 1];
+                    *p++ = src[((((i + argb) * 2) + ((block + c) * 2 * stride)) * 4) + 1];
                     // Blue pixels
-                    *p++ = src[((((i + argb) * 2) + ((block + c) * 2 * width)) * 4) + 2];
+                    *p++ = src[((((i + argb) * 2) + ((block + c) * 2 * stride)) * 4) + 2];
                 }
             }
         }
@@ -213,19 +213,34 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
 
 void s_loadTexture(StdPicture& target, void* data, int width, int height, bool mask)
 {
+    if(width > 2048 && height <= 2048)
+        target.d.multi_horizontal = true;
+
     for(int i = 0; i < 3; i++)
     {
-        int start_y = i * 2048;
-        int end_y = height;
+        int start_x, start_y;
+        if(target.d.multi_horizontal)
+        {
+            start_y = 0;
+            start_x = i * 2048;
+        }
+        else
+        {
+            start_x = 0;
+            start_y = i * 2048;
+        }
 
-        int h_i = end_y - start_y;
+        int w_i = width - start_x;
+        int h_i = height - start_y;
+        if(w_i > 2048)
+            w_i = 2048;
         if(h_i > 2048)
             h_i = 2048;
 
-        if(width > 0 && h_i > 0 && width <= 2048)
+        if(w_i > 0 && h_i > 0)
         {
             uint32_t wdst, hdst;
-            target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + start_y * width * 4, width, h_i, &wdst, &hdst);
+            target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + (start_y * width + start_x) * 4, w_i, h_i, width, &wdst, &hdst);
             if(target.d.backing_texture[i + 3 * mask])
             {
                 DCFlushRange(target.d.backing_texture[i + 3 * mask], wdst * hdst * 4);
@@ -233,7 +248,7 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, bool m
                     wdst, hdst, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
                 GX_InitTexObjFilterMode(&target.d.texture[i + 3 * mask], GX_NEAR, GX_NEAR);
 
-                printf("We initialized with %u %u\n", wdst, hdst);
+                // printf("We initialized with %u %u\n", wdst, hdst);
                 target.d.texture_init[i + 3 * mask] = true;
             }
             else
@@ -1088,7 +1103,78 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     GXTexObj* to_mask = nullptr;
     GXTexObj* to_mask_2 = nullptr;
 
-    if(ySrc + hSrc > 1024)
+    if(tx.d.multi_horizontal && xSrc + wSrc > 1024)
+    {
+        if(wSrc > 1024)
+        {
+            // reduce it to be on viewport
+            if(xDst < 0)
+            {
+                xSrc -= (int)xDst * wSrc / wDst;
+                wSrc += (int)xDst * wSrc / wDst;
+                wDst += xDst;
+                xDst = 0;
+            }
+            if(wSrc > 1024)
+            {
+                wDst = (int)wDst * 1024 / wSrc;
+                wSrc = 1024;
+            }
+        }
+        if(xSrc + wSrc > 2048)
+        {
+            if(tx.d.texture_init[2])
+            {
+                to_draw = &tx.d.texture[2];
+                if(tx.d.texture_init[5])
+                    to_mask = &tx.d.texture[5];
+            }
+            if(xSrc < 2048 && tx.d.texture_init[1])
+            {
+                to_draw_2 = &tx.d.texture[1];
+                if(tx.d.texture_init[4])
+                    to_mask_2 = &tx.d.texture[4];
+            }
+            xSrc -= 1024;
+        }
+        else
+        {
+            if(tx.d.texture_init[1])
+            {
+                to_draw = &tx.d.texture[1];
+                if(tx.d.texture_init[4])
+                    to_mask = &tx.d.texture[4];
+            }
+            if(xSrc < 1024)
+            {
+                to_draw_2 = &tx.d.texture[0];
+                if(tx.d.texture_init[3])
+                    to_mask_2 = &tx.d.texture[3];
+            }
+        }
+
+        // draw the left pic
+        if(to_draw_2 != nullptr)
+        {
+            if(rotateAngle != 0.0)
+            {
+                // TODO: use correct center to support big textures being rotated
+                GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
+                                    xSrc, ySrc, 1024 - xSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
+            }
+            else
+                GX_DrawImage_Custom(to_draw_2, to_mask_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
+                                    xSrc, ySrc, 1024 - xSrc, hSrc, flip, red, green, blue, alpha);
+
+            xDst += (1024 - xSrc) * wDst / wSrc;
+            wDst -= (1024 - xSrc) * wDst / wSrc;
+            wSrc -= (1024 - xSrc);
+            xSrc = 0;
+        }
+        else
+            xSrc -= 1024;
+    }
+    else if(!tx.d.multi_horizontal && ySrc + hSrc > 1024)
     {
         if(ySrc + hSrc > 2048)
         {
@@ -1121,6 +1207,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                     to_mask_2 = &tx.d.texture[3];
             }
         }
+
         // draw the top pic
         if(to_draw_2 != nullptr)
         {

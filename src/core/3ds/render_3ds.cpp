@@ -549,6 +549,7 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     sourceImage = C2D_SpriteSheetLoad(target.l.path.c_str());
     if(sourceImage)
     {
+        // Consider using https://github.com/xerpi/sf2dlib/blob/master/libsf2d/source/sf2d_texture.c to get some more advanced tex loads
         s_loadTexture(target, sourceImage);
 
         s_num_textures_loaded ++;

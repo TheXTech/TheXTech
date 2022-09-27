@@ -35,6 +35,7 @@
  */
 struct StdPictureData
 {
+    bool multi_horizontal = false;
 
     // possible backing data
     bool texture_file_init[3] = {false, false, false};
@@ -71,6 +72,8 @@ struct StdPictureData
 
             texture_init[i] = false;
         }
+
+        multi_horizontal = false;
     }
 
 };
