@@ -187,7 +187,7 @@ if(NINTENDO_SWITCH)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -DNINTENDO_SWITCH -D__SWITCH__")
 endif()
 
-if(WII OR 3DS)
+if(NINTENDO_WII OR NINTENDO_3DS)
     set(PGE_MIN_PORT ON)
     add_compile_definitions(PGE_MIN_PORT)
 endif()
@@ -302,7 +302,7 @@ if(USE_SYSTEM_LIBS)
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
-elseif(WII)
+elseif(NINTENDO_WII)
     set(USE_PNG_HARDWARE_OPTIMIZATIONS OFF)
     include(cmake/library_FreeImage.cmake)
     list(APPEND A2XT_LIBS PGE_FreeImage)
@@ -339,7 +339,7 @@ set(LIB_SRC
     ${LIB_SRC_EXTRA}
 )
 
-if(WII OR NOT PGE_MIN_PORT)
+if(NINTENDO_WII OR NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
         lib/Graphics/graphics_funcs.cpp
         lib/Graphics/image_size.cpp
@@ -536,7 +536,7 @@ elseif(NINTENDO_3DS)
         src/core/3ds/msgbox_3ds.cpp
         src/core/3ds/events_3ds.cpp
     )
-elseif(WII)
+elseif(NINTENDO_WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
     list(APPEND THEXTECH_SRC
         src/control/input_wii.cpp
