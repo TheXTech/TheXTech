@@ -13,13 +13,16 @@ jobs:
     name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
     runs-on: ubuntu-latest
     container: devkitpro/devkitppc
+    env:
+        DEVKITPRO: /opt/devkitpro
+        DEVKITPPC: /opt/devkitpro/devkitPPC
     strategy:
       fail-fast: false
       matrix:
         config:
         - {
             name: "Wii build",
-            extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake",
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wii",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake make lftp git-core python zip",
             generator: "Unix Makefiles",
             build_type: "MinSizeRel",
@@ -43,6 +46,17 @@ jobs:
         # Pull submodules
         git submodule init
         git submodule update --recursive --remote
+
+    - name: Install modified SDL2
+      run: |
+        cd ..
+        git clone https://github.com/Wohlstand/SDL.git -b wii-support --depth 1 SDL2
+        cd SDL2
+        mkdir build
+        cd build
+        cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local ..
+        cmake --build . --target all -j4
+        sudo cmake --build . --target install
 
     - name: Configure
       shell: bash
