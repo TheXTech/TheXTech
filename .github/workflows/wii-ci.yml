@@ -3,10 +3,10 @@ name: Wii CI
 on:
   push:
     branches:
-      - wip-3ds-port
+      - wip-ports
   pull_request:
     branches:
-      - wip-3ds-port
+      - wip-ports
 
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
         config:
         - {
             name: "Wii build",
-            extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake -DWII=On",
+            extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake make lftp git-core python zip",
             generator: "Unix Makefiles",
             build_type: "MinSizeRel",
