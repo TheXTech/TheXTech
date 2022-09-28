@@ -13,6 +13,9 @@ jobs:
     name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
     runs-on: ubuntu-latest
     container: devkitpro/devkitarm
+    env:
+        DEVKITPRO: /opt/devkitpro
+        DEVKITARM: /opt/devkitpro/devkitARM
     strategy:
       fail-fast: false
       matrix:
@@ -20,8 +23,8 @@ jobs:
         - {
             name: "3DS build",
             extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/3DS.cmake",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake make lftp git-core python zip",
-            generator: "Unix Makefiles",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip",
+            generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "thextech",
             assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
@@ -30,6 +33,12 @@ jobs:
           }
 
     steps:
+    - uses: styfle/cancel-workflow-action@0.9.1
+      with:
+        workflow_id: 3ds-ci.yml
+        all_but_latest: true
+        access_token: ${{ github.token }}
+
     - uses: actions/checkout@v1
 
     - uses: nelonoel/branch-name@v1.0.1
@@ -52,7 +61,7 @@ jobs:
     - name: Build
       shell: bash
       run: |
-        make -j4
+        cmake --build build --target all -j4
 
     - name: Create Package
       if: success()
