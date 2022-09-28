@@ -1212,7 +1212,7 @@ void PreloadExtSound(const std::string& path)
         auto *ch = Mix_LoadWAV(path.c_str());
         if(!ch)
         {
-            pLogWarning("Can't load custom sound: %s", Mix_GetError());
+            pLogWarning("Can't load custom sound [%s]: %s", path.c_str(), Mix_GetError());
             return;
         }
         extSfx.insert({path, ch});
