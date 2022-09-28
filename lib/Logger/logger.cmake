@@ -19,10 +19,10 @@ elseif(VITA)
     list(APPEND LOGGER_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/logger_vita.cpp
     )
-elseif(3DS OR WII OR PGE_MIN_PORT)
-    message("-- Logger for 3DS")
+elseif(NINTENDO_3DS OR NINTENDO_WII OR PGE_MIN_PORT)
+    message("-- Logger for Minimal Port")
     list(APPEND LOGGER_SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/private/logger_3ds.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/private/logger_min.cpp
     )
 else()
     message("-- Logger for Desktop")
