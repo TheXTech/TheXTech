@@ -22,28 +22,16 @@
 #ifndef WINDOW_HHHH
 #define WINDOW_HHHH
 
+#include "base/window_types.h"
+
 #ifndef WINDOW_CUSTOM
 #   include "core/sdl.h"
 #   include "base/window_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
 #else
-#   include "base/window_types.h"
 #   define E_INLINE    extern
 #   define TAIL ;
-
-namespace XWindow
-{
-    /*!
-     * \brief Cursor type
-     */
-    enum Cursor_t
-    {
-        CURSOR_DEFAULT = 0,
-        CURSOR_NONE
-    };
-};
-
 #endif
 
 

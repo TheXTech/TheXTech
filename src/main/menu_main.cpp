@@ -176,7 +176,7 @@ static void s_findRecentEpisode()
     MenuCursor = (menuRecentEpisode < 0) ? 0 : menuRecentEpisode;
 }
 
-#if !defined(THEXTECH_PRELOAD_LEVELS) && !defined(PGE_NO_THREADING)
+#if !defined(PGE_NO_THREADING)
 static int FindWorldsThread(void *)
 {
     FindWorlds();
@@ -327,11 +327,13 @@ void FindWorlds()
 #endif
 }
 
+#if !defined(THEXTECH_PRELOAD_LEVELS) && !defined(PGE_NO_THREADING)
 static int FindLevelsThread(void *)
 {
     FindLevels();
     return 0;
 }
+#endif
 
 void FindLevels()
 {

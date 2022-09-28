@@ -28,7 +28,7 @@
 
 #include "render_sdl.h"
 #include "video.h"
-#include "../window.h"
+#include "core/window.h"
 
 #include "core/sdl.h"
 #include <fmt_format_ne.h>

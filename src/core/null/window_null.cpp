@@ -39,8 +39,8 @@ void quit() {}
 void show() {}
 void hide() {}
 int showCursor(int show) { return show; }
-void setCursor(Cursor_t /*cursor*/) {}
-Cursor_t getCursor() { return CURSOR_NONE; }
+void setCursor(WindowCursor_t /*cursor*/) {}
+WindowCursor_t getCursor() { return CURSOR_NONE; }
 void placeCursor(int /*window_x*/, int /*window_y*/) {}
 bool isFullScreen() { return true; }
 int setFullScreen(bool /*fs*/) { return 1; }
