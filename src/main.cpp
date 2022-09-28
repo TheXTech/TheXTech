@@ -46,6 +46,8 @@
 #endif
 
 #ifdef __APPLE__
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_events.h>
 #include <Utils/files.h>
 #include <Logger/logger.h>
 
