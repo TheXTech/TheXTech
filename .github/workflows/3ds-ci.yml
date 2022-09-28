@@ -56,7 +56,7 @@ jobs:
     - name: Configure
       shell: bash
       run: |
-        cmake -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
 
     - name: Build
       shell: bash
@@ -74,10 +74,11 @@ jobs:
             BRANCH_NAME_RES=${BRANCH_NAME}
         fi
 
+        cd build
         mkdir package
         mkdir "package/${{ matrix.config.subdir_name }}"
-        cp changelog.txt "package/${{ matrix.config.subdir_name }}/"
-        cp LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
+        cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
+        cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
         cp thextech.3dsx "package/${{ matrix.config.subdir_name }}/"
         cd package
         zip -9 -r "thextech-3ds-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"
@@ -88,7 +89,7 @@ jobs:
       if: success()
       uses: actions/upload-artifact@v2
       with:
-        path: package/*.zip
+        path: build/package/*.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
@@ -99,7 +100,7 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        for q in ./package/*.zip; do
+        for q in ./build/package/*.zip; do
             UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
         done
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
@@ -109,4 +110,4 @@ jobs:
       shell: bash
       run: |
         git status
-        ls -lR output/bin
+        ls -lR build
