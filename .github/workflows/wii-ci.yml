@@ -23,7 +23,7 @@ jobs:
         - {
             name: "Wii build",
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wii",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake make lftp git-core python zip",
+            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip",
             generator: "Unix Makefiles",
             build_type: "MinSizeRel",
             executable_name: "thextech",
