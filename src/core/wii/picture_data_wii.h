@@ -28,7 +28,7 @@
 
 // this is the key line to toggle between TPL mode and PNG/GIF mode
 // also, if graphics lists are included, they can force MOST (but not all) assets to be read from TPL
-// #define X_IMG_EXT ".tpl"
+#define X_IMG_EXT ".tpl"
 
 /*!
  * \brief Platform specific picture data. Fields should not be used directly
@@ -78,4 +78,4 @@ struct StdPictureData
 
 };
 
-#endif // PICTURE_DATA_NULL_H
+#endif // PICTURE_DATA_WII_H

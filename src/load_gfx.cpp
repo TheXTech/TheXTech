@@ -114,8 +114,34 @@ static void loadCGFX(const std::string &origPath,
 
     bool isGif = false;
 
-    // look for the image file: png in custom, gif in custom, png in episode, gif in episode
-#ifdef X_IMG_EXT
+#if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
+    // look for the image file: ext in custom, png in custom, gif in custom, ext in episode, png in episode, gif in episode
+    std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".png");
+    }
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".gif");
+        isGif = true;
+    }
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
+        isGif = false;
+    }
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".png");
+    }
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".gif");
+        isGif = true;
+    }
+#elif defined(X_IMG_EXT)
+    // look for the image file: ext in custom, ext in episode
     std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
     if(imgToUse.empty())
     {
@@ -123,6 +149,7 @@ static void loadCGFX(const std::string &origPath,
         isGif = false;
     }
 #else
+    // look for the image file: png in custom, gif in custom, png in episode, gif in episode
     std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".png");
     if(imgToUse.empty())
     {
@@ -545,6 +572,27 @@ static void restoreWorldBackupTextures()
 }
 
 
+static inline void s_find_image(std::string& dest, DirListCI& CurDir, std::string basename)
+{
+#if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
+    int s = basename.size();
+    basename += X_IMG_EXT;
+    dest = CurDir.resolveFileCaseExistsAbs(basename);
+    if(dest.empty())
+    {
+        basename.resize(s);
+        basename += ".png";
+        dest = CurDir.resolveFileCaseExistsAbs(basename);
+    }
+#elif defined(X_IMG_EXT)
+    basename += X_IMG_EXT;
+    dest = CurDir.resolveFileCaseExistsAbs(basename);
+#else
+    basename += ".png";
+    dest = CurDir.resolveFileCaseExistsAbs(basename);
+#endif
+}
+
 void LoadGFX()
 {
 #ifdef PGE_MIN_PORT
@@ -561,11 +609,7 @@ void LoadGFX()
         CurDir.setCurDir(getGfxDir() + GFXPlayerNames[c]);
         For(A, 1, 10)
         {
-#ifdef X_IMG_EXT
-            p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("{1}-{0}" X_IMG_EXT, A, GFXPlayerNames[c]));
-#else
-            p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("{1}-{0}.png", A, GFXPlayerNames[c]));
-#endif
+            s_find_image(p, CurDir, fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]));
             if(!p.empty())
             {
                 (*GFXCharacterBMP[c])[A] = XRender::lazyLoadPicture(p);
@@ -580,11 +624,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "block/");
     for(int A = 1; A <= maxBlockType; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("block-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("block-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("block-{0}", A));
         if(!p.empty())
         {
             GFXBlockBMP[A] = XRender::lazyLoadPicture(p);
@@ -602,11 +642,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "background2/");
     for(int A = 1; A <= numBackground2; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("background2-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("background2-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("background2-{0}", A));
         if(!p.empty())
         {
             GFXBackground2BMP[A] = XRender::lazyLoadPicture(p);
@@ -627,11 +663,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "npc/");
     for(int A = 1; A <= maxNPCType; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("npc-{0}", A));
         if(!p.empty())
         {
             GFXNPCBMP[A] = XRender::lazyLoadPicture(p);
@@ -653,11 +685,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "effect/");
     for(int A = 1; A <= maxEffectType; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("effect-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("effect-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("effect-{0}", A));
         if(!p.empty())
         {
             GFXEffectBMP[A] = XRender::lazyLoadPicture(p);
@@ -679,11 +707,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "yoshi/");
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("yoshib-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("yoshib-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("yoshib-{0}", A));
         if(!p.empty())
         {
             GFXYoshiBBMP[A] = XRender::lazyLoadPicture(p);
@@ -699,11 +723,7 @@ void LoadGFX()
 
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("yoshit-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("yoshit-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("yoshit-{0}", A));
         if(!p.empty())
         {
             GFXYoshiTBMP[A] = XRender::lazyLoadPicture(p);
@@ -721,11 +741,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "background/");
     for(int A = 1; A <= maxBackgroundType; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("background-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("background-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("background-{0}", A));
         if(!p.empty())
         {
             GFXBackgroundBMP[A] = XRender::lazyLoadPicture(p);
@@ -749,11 +765,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "tile/");
     for(int A = 1; A <= maxTileType; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("tile-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("tile-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("tile-{0}", A));
         if(!p.empty())
         {
             GFXTileBMP[A] = XRender::lazyLoadPicture(p);
@@ -773,11 +785,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "level/");
     for(int A = 0; A <= maxLevelType; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("level-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("level-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("level-{0}", A));
         if(!p.empty())
         {
             GFXLevelBMP[A] = XRender::lazyLoadPicture(p);
@@ -797,11 +805,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "scene/");
     for(int A = 1; A <= maxSceneType; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("scene-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("scene-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("scene-{0}", A));
         if(!p.empty())
         {
             GFXSceneBMP[A] = XRender::lazyLoadPicture(p);
@@ -821,11 +825,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "player/");
     for(int A = 1; A <= numCharacters; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("player-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("player-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("player-{0}", A));
         if(!p.empty())
         {
             GFXPlayerBMP[A] = XRender::lazyLoadPicture(p);
@@ -845,11 +845,7 @@ void LoadGFX()
     CurDir.setCurDir(getGfxDir() + "path/");
     for(int A = 1; A <= maxPathType; ++A)
     {
-#ifdef X_IMG_EXT
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("path-{0}" X_IMG_EXT, A));
-#else
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("path-{0}.png", A));
-#endif
+        s_find_image(p, CurDir, fmt::format_ne("path-{0}", A));
         if(!p.empty())
         {
             GFXPathBMP[A] = XRender::lazyLoadPicture(p);

@@ -27,6 +27,7 @@
 #include <citro2d.h>
 
 #define X_IMG_EXT ".t3x"
+#define X_NO_PNG_GIF
 
 /*!
  * \brief Platform specific picture data. Fields should not be used directly

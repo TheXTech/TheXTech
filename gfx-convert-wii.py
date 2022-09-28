@@ -27,10 +27,13 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
             os.system(f'convert -sample 50% "{rfn}" "{bmpfn}"')
         elif fn.endswith('m.gif') and os.path.isfile(rfn[:-5]+'.gif'):
             continue
+        elif fn.endswith('m.gif'):
+            shutil.copy(rfn, destfn)
+            continue
         elif fn.endswith('.gif'):
             maskfn = rfn[:-4]+'m.gif'
             ftype = fn[:fn.rfind('-')]
-            altmaskfn_gif = os.path.join(graphicsdir, ftype, fn[:-4]+'m.gif')
+            altmaskfn_gif = os.path.join(graphicsdir, 'fallback', fn[:-4]+'m.gif')
             altmaskfn_png = os.path.join(graphicsdir, ftype, fn[:-4]+'.png')
             if os.path.isfile(maskfn):
                 os.system(f'convert "{rfn}" "{maskfn}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel -sample 50% "{bmpfn}"')
@@ -54,10 +57,6 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
         elif fn == 'sounds.ini':
             shutil.copy(rfn, destfn)
             os.system(f'sed \'s/\\.ogg"/\\.ogg.wav"/\' -i "{destfn}"')
-            continue
-        elif fn.endswith('.mp3'):
-            os.system(f'ffmpeg -i "{rfn}" -aq 1 "{destfn}.ogg"')
-            shutil.move(destfn+'.ogg', destfn)
             continue
         else:
             shutil.copy(rfn, destfn)
@@ -85,11 +84,17 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
                 tplfns.append(tplfn+'2')
                 bmpfns.append(bmpfn+'2.bmp')
         for tplfn_i, bmpfn_i in zip(tplfns, bmpfns):
+            colors = int(os.popen(f'identify -format %k "{bmpfn_i}"').read())
+
+            colfmt = 6
+
+            # PREVIEW = True
+
             if PREVIEW:
-                os.system(f'gxtexconv -i "{bmpfn_i}" -o "{tplfn_i}" colfmt=6 mipmap=no')
+                os.system(f'gxtexconv -i "{bmpfn_i}" -o "{tplfn_i}" colfmt={colfmt} mipmap=no')
                 os.remove(tplfn.replace('.tpl', '.h'))
             else:
-                if os.system(f'gxtexconv -i "{bmpfn_i}" -o "{tplfn_i}" colfmt=6 mipmap=no'):
+                if os.system(f'gxtexconv -i "{bmpfn_i}" -o "{tplfn_i}" colfmt={colfmt} mipmap=no'):
                     print(f"It didn't work and {tplfn_i} is missing. (Size: {w}x{h})")
                 else:
                     os.remove(tplfn.replace('.tpl', '.h'))
@@ -103,7 +108,7 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
         l = open(os.path.join(dirpath, 'graphics.list'), 'w')
 
         for d in dirs:
-            if d == 'touchscreen' or d == 'ui':
+            if d == 'touchscreen' or d == 'ui' or d == 'fallback':
                 continue
 
             for f in os.listdir(os.path.join(dirpath, d)):
@@ -130,6 +135,8 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
                 l.write(open(abs_f, 'r').read())
                 l.write('\n')
 
+                os.remove(abs_f)
+
         l.close()
         continue
     elif 'graphics' in os.path.split(dirpath):
@@ -140,10 +147,6 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
     for f in files:
         if not f.endswith('.size'):
             continue
-
-        if not opened:
-            l = open(os.path.join(dirpath, 'graphics.list'), 'w')
-            opened = True
 
         abs_f = os.path.join(dirpath, f)
 
@@ -159,12 +162,18 @@ for dirpath, dirs, files in os.walk(outdir, topdown=True):
                 'yoshib', 'yoshit'):
             continue
 
+        if not opened:
+            l = open(os.path.join(dirpath, 'graphics.list'), 'w')
+            opened = True
+
         fullname = f[:-5]
 
         l.write(basename+'\n')
         l.write(fullname+'\n')
         l.write(open(abs_f, 'r').read())
         l.write('\n')
+
+        os.remove(abs_f)
 
 
     if opened:

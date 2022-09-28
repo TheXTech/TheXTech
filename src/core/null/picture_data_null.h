@@ -23,8 +23,6 @@
 #ifndef PICTURE_DATA_NULL_H
 #define PICTURE_DATA_NULL_H
 
-#define X_IMG_EXT ".png"
-
 /*!
  * \brief Platform specific picture data. Fields should not be used directly
  */
