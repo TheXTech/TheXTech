@@ -37,6 +37,10 @@
 #include <Utils/files.h>
 #include <CrashHandler/crash_handler.h>
 
+#if defined(_WIN32) || defined(_WIN64)
+#include <SDL2/SDL_main.h>
+#endif
+
 #ifdef VITA
 #include "vita/vita_memory.h"
 #endif
