@@ -1261,8 +1261,8 @@ void UpdateGraphics(bool skipRepaint)
                     else
                     {
                         tempLocation = roundLoc(p.Location, 2.0);
-                        tempLocation.Height = w;
-                        tempLocation.Width = h;
+                        tempLocation.Height = h;
+                        tempLocation.Width = w;
                         tempLocation.X += offX;
                         tempLocation.Y += offY + p.MountOffsetY;
                         Y2 = 0;
