@@ -32,6 +32,9 @@
 #include "frame_timer.h"
 #include "core/render.h"
 
+#ifdef THEXTECH_CLI_BUILD
+#include <Graphics/image_size.h>
+#endif
 
 namespace XRender
 {
@@ -134,10 +137,22 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         if(fclose(fs))
             pLogWarning("loadPicture: Couldn't close file.");
     }
-    // lazy load and unload to read dimensions if it doesn't exist.
-    // unload is essential because lazy load would save the address incorrectly.
     else
     {
+#ifdef THEXTECH_CLI_BUILD
+        uint32_t w, h;
+        if(PGE_ImageInfo::getImageSize(path, &w, &h, nullptr))
+        {
+            target.w = w;
+            target.h = h;
+        }
+        else
+        {
+            pLogWarning("loadPicture: Couldn't open file.");
+            target.inited = false;
+            return target;
+        }
+#else
         // this will work if it's a PNG
         FILE* fpng = fopen(path.c_str(), "rb");
         if(!fpng)
@@ -169,6 +184,7 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         }
 
         fclose(fpng);
+#endif
     }
 
     return target;

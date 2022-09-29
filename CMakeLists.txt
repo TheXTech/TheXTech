@@ -129,6 +129,8 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
+option(THEXTECH_CLI_BUILD "Minimal CLI build for testing and benchmarking on desktop platforms" OFF)
+
 option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
@@ -187,7 +189,7 @@ if(NINTENDO_SWITCH)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -DNINTENDO_SWITCH -D__SWITCH__")
 endif()
 
-if(NINTENDO_WII OR NINTENDO_3DS)
+if(NINTENDO_WII OR NINTENDO_3DS OR THEXTECH_CLI_BUILD)
     set(PGE_MIN_PORT ON)
     add_compile_definitions(PGE_MIN_PORT)
 endif()
@@ -334,6 +336,12 @@ if(NINTENDO_WII OR NOT PGE_MIN_PORT)
         lib/Graphics/image_size.cpp
         lib/Graphics/size.cpp
         lib/Graphics/sizef.cpp
+    )
+endif()
+
+if(THEXTECH_CLI_BUILD)
+    list(APPEND LIB_SRC
+        lib/Graphics/image_size.cpp
     )
 endif()
 
@@ -640,11 +648,16 @@ elseif(NINTENDO_3DS)
 elseif(NINTENDO_WII)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
-elseif(PGE_MIN_PORT)
+elseif(THEXTECH_CLI_BUILD)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
 
     target_link_libraries(thextech PRIVATE SDL2)
+    target_link_libraries(thextech PRIVATE pgefl)
+elseif(PGE_MIN_PORT)
+    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
+    pge_set_nopie(thextech)
+
     target_link_libraries(thextech PRIVATE pgefl)
 else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
@@ -742,6 +755,10 @@ elseif(NINTENDO_WII)
     target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__WII__)
 elseif(PGE_MIN_PORT)
     target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE)
+endif()
+
+if(THEXTECH_CLI_BUILD)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_CLI_BUILD)
 endif()
 
 if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")
