@@ -108,7 +108,7 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                     if((i + argb) * 2 > width || (block + c) * 2 > height)
                     {
                         *p++ = 0;
-                        *p++ = 0;
+                        *p++ = 255;
                         continue;
                     }
 
@@ -127,8 +127,8 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                     // new: padding
                     if((i + argb) * 2 > width || (block + c) * 2 > height)
                     {
-                        *p++ = 0;
-                        *p++ = 0;
+                        *p++ = 255;
+                        *p++ = 255;
                         continue;
                     }
 
@@ -966,16 +966,6 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
     unsigned int flip,
     float _r, float _g, float _b, float _a)
 {
-    uint16_t u1 = src_x;
-    uint16_t u2 = src_x + src_w;
-    uint16_t v1 = src_y;
-    uint16_t v2 = src_y + src_h;
-
-    if(flip & X_FLIP_HORIZONTAL)
-        std::swap(u1, u2);
-    if(flip & X_FLIP_VERTICAL)
-        std::swap(v1, v2);
-
     uint8_t r = _r * 255.0f + 0.5f;
     uint8_t g = _g * 255.0f + 0.5f;
     uint8_t b = _b * 255.0f + 0.5f;
@@ -986,10 +976,37 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
 
     for(int i = 0; i < 2; i++)
     {
+        uint16_t u1 = src_x;
+        uint16_t u2 = src_x + src_w;
+        uint16_t v1 = src_y;
+        uint16_t v2 = src_y + src_h;
+
+        int16_t x1 = x;
+        int16_t x2 = x + w;
+        int16_t y1 = y;
+        int16_t y2 = y + h;
+
         if(mask && i == 0)
         {
             GX_SetBlendMode(GX_BM_LOGIC, GX_BL_ONE, GX_BL_ONE, GX_LO_AND);
             GX_LoadTexObj(mask, GX_TEXMAP0);
+            uint16_t mask_w = GX_GetTexObjWidth(mask);
+            uint16_t mask_h = GX_GetTexObjHeight(mask);
+
+            if(u1 > mask_w || v1 > mask_h)
+                continue;
+
+            if(u2 > mask_w)
+            {
+                u2 = mask_w;
+                x2 = x + (u2 - u1) * w / src_w;
+            }
+
+            if(v2 > mask_h)
+            {
+                v2 = mask_h;
+                y2 = y + (v2 - v1) * h / src_h;
+            }
         }
         else if(mask)
         {
@@ -1001,20 +1018,25 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
             GX_LoadTexObj(img, GX_TEXMAP0);
         }
 
+        if(flip & X_FLIP_HORIZONTAL)
+            std::swap(u1, u2);
+        if(flip & X_FLIP_VERTICAL)
+            std::swap(v1, v2);
+
         GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-            GX_Position3s16(x, y, 0);
+            GX_Position3s16(x1, y1, 0);
             GX_Color4u8(r, g, b, a);
             GX_TexCoord2u16(u1, v1);
 
-            GX_Position3s16(x + w, y, 0);
+            GX_Position3s16(x2, y1, 0);
             GX_Color4u8(r, g, b, a);
             GX_TexCoord2u16(u2, v1);
 
-            GX_Position3s16(x + w, y + h, 0);
+            GX_Position3s16(x2, y2, 0);
             GX_Color4u8(r, g, b, a);
             GX_TexCoord2u16(u2, v2);
 
-            GX_Position3s16(x, y + h, 0);
+            GX_Position3s16(x1, y2, 0);
             GX_Color4u8(r, g, b, a);
             GX_TexCoord2u16(u1, v2);
         GX_End();
