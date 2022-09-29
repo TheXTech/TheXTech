@@ -523,8 +523,6 @@ if(NOT PGE_MIN_PORT)
 elseif(NINTENDO_3DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
     list(APPEND THEXTECH_SRC
-        src/3ds/3ds-audio-lib.cpp
-        src/3ds/mixer_platform.cpp
         src/control/input_3ds.cpp
         src/core/3ds/std_3ds.cpp
         src/core/minport/render_minport_shared.cpp
@@ -532,6 +530,8 @@ elseif(NINTENDO_3DS)
         src/core/3ds/window_3ds.cpp
         src/core/3ds/msgbox_3ds.cpp
         src/core/3ds/events_3ds.cpp
+        src/core/3ds/mixer_3ds.cpp
+        src/core/3ds/3ds-audio-lib.cpp
     )
 elseif(NINTENDO_WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
