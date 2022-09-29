@@ -42,7 +42,7 @@
 #endif
 
 #ifdef VITA
-#include "vita/vita_memory.h"
+#include "core/vita/vita_memory.h"
 #endif
 
 #ifdef ENABLE_XTECH_LUA
