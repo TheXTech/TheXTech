@@ -1679,7 +1679,7 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
     if(!devices)
     {
         SDL_JoystickClose(joy);
-        pLogDebug("  could not allocate devices struct (OOM).");
+        pLogDebug("  could not allocate devices struct (out of memory).");
         return false;
     }
 
@@ -1984,7 +1984,7 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
             }
             else
             {
-                pLogWarning("Could not allocate legacy profile (OOM).");
+                pLogWarning("Could not allocate legacy profile (out of memory).");
             }
 
             ctl->endGroup();

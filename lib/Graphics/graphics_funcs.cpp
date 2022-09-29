@@ -203,7 +203,7 @@ void GraphicsHelps::getMaskFromRGBA(FIBITMAP *&image, FIBITMAP *&mask)
 
     if(!mask)
     {
-        pLogCritical("OOM when extracting mask!");
+        pLogCritical("Out of memory when extracting mask!");
         return;
     }
 
