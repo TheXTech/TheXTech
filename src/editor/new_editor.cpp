@@ -2558,7 +2558,8 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         if(l > maxLayers)
             continue;
 
-        if(l == -1 || (l == 0 && m_special_subpage == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1))
+        // separate None for Event layers
+        if(l == -1)
         {
             SuperPrintR(mode, "NONE", 3, 54, 80 + 40*i + 12);
 
@@ -2567,9 +2568,10 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             if(m_special_page == SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.EIcons, *layer_to_set == LAYER_NONE, 0, 32*Icon::move, 32, 32))
                 *layer_to_set = LAYER_NONE;
         }
-        // Default and None are the same for objects layers and for the editor cursor
+        // Default and None are the same for objects layers and for the editor cursor -- set to None if "Default".
         else if(l == 0 && (m_special_page == SPECIAL_PAGE_OBJ_LAYER || m_special_page == SPECIAL_PAGE_LAYERS))
         {
+            // AttLayer
             if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
                 SuperPrintR(mode, "NONE", 3, 54, 80 + 40*i + 12);
             else
