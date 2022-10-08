@@ -45,7 +45,7 @@ static std::mutex g_dirManMutex;
     (void)guard;
 
 #else
-#   define PUT_THREAD_GUARD() {}
+#   define PUT_THREAD_GUARD() (void)0
 #endif
 
 void DirMan::DirMan_private::setPath(const std::string &dirPath)
