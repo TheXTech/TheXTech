@@ -25,6 +25,7 @@
 
 #include "sound.h"
 
+#include <SDL2/SDL.h>
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_mixer_ext.h>
 #include <string>
@@ -66,6 +67,15 @@ static const char *audio_format_to_string(SDL_AudioFormat f)
 
 bool MixPlatform_Init(AudioSetup_t& obtained)
 {
+#ifdef __WII__
+    // Mixer is the only component using SDL on Wii
+    if(SDL_Init(SDL_INIT_AUDIO) < 0)
+    {
+        pLogWarning("Couldn't initialize SDL audio: %s\n", SDL_GetError());
+        return false;
+    }
+#endif
+
     int ret;
     const int initFlags = MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_FLAC | MIX_INIT_OGG | MIX_INIT_OPUS | MIX_INIT_MP3;
 
@@ -141,12 +151,6 @@ void MixPlatform_Quit()
     Mix_Quit();
 }
 
-bool MixPlatform_NoPreload(const char *path)
-{
-    (void)path;
-    return false;
-}
-
 int MixPlatform_PlayStream(int channel, const char *path, int loops)
 {
     int ret;
@@ -165,24 +169,4 @@ int MixPlatform_PlayStream(int channel, const char *path, int loops)
         Mix_SetFreeOnStop(mus, 1);
 
     return ret;
-}
-
-Mix_Chunk *MixPlatform_LoadWAV(const char *path)
-{
-    return Mix_LoadWAV(path);
-}
-
-const char *MixPlatform_GetError()
-{
-    return Mix_GetError();
-}
-
-int MixPlatform_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks)
-{
-    return Mix_PlayChannelTimed(channel, chunk, loops, ticks);
-}
-
-int MixPlatform_PlayChannelTimedVolume(int channel, Mix_Chunk *chunk, int loops, int ticks, int volume)
-{
-    return Mix_PlayChannelTimedVolume(channel, chunk, loops, ticks, volume);
 }

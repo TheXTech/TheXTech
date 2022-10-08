@@ -25,6 +25,14 @@
 // for AudioSetup_t
 #include "sound.h"
 
+bool MixPlatform_Init(AudioSetup_t& obtained);
+void MixPlatform_Quit();
+
+int  MixPlatform_PlayStream(int channel, const char* path, int loops);
+
+
+#ifdef NO_SDL
+
 /* @{ */
 #define AUDIO_U8        0x0008
 #define AUDIO_S8        0x8008
@@ -65,36 +73,24 @@
 struct Mix_Music;
 struct Mix_Chunk;
 
-bool MixPlatform_Init(AudioSetup_t& obtained);
-void MixPlatform_Quit();
-
-int  MixPlatform_PlayStream(int channel, const char* path, int loops);
-
-// need to do this because LoadWAV is not properly declared in MixerX.
-#define Mix_LoadWAV(file)   MixPlatform_LoadWAV(file);
-Mix_Chunk* MixPlatform_LoadWAV(const char* path);
-
-#define Mix_GetError MixPlatform_GetError
-const char* MixPlatform_GetError();
-
-#define Mix_PlayChannel(channel,chunk,loops) MixPlatform_PlayChannelTimed(channel,chunk,loops,-1)
-int MixPlatform_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks);
-
-#define Mix_PlayChannelVol(channel,chunk,loops,vol) MixPlatform_PlayChannelTimedVolume(channel,chunk,loops,-1,vol)
-int MixPlatform_PlayChannelTimedVolume(int which, Mix_Chunk *chunk, int loops, int ticks, int volume);
-
 extern "C" {
+
+extern const char* Mix_GetError();
 
 extern int Mix_ReserveChannels(int channels);
 extern void Mix_PauseAudio(int pause);
 
 
 extern Mix_Music* Mix_LoadMUS(const char* path);
+extern Mix_Chunk* Mix_LoadWAV(const char* path);
 
 extern int Mix_VolumeMusicStream(Mix_Music* music, int volume);
 extern int Mix_HaltMusicStream(Mix_Music* music);
 extern int Mix_FadeOutMusicStream(Mix_Music* music, int ms);
 extern int Mix_HaltChannel(int channel);
+
+extern int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops);
+extern int Mix_PlayChannelVol(int which, Mix_Chunk *chunk, int loops, int volume);
 
 extern int Mix_PlayingMusicStream(Mix_Music* music);
 
@@ -131,8 +127,14 @@ extern void Mix_GME_SetSpcEchoDisabled(Mix_Music* music, int disable);
 extern void Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix_EffectDone_t d, void *arg);
 extern void Mix_UnregisterEffect(int chan, Mix_EffectFunc_t f);
 
-#endif
+#endif // #ifdef THEXTECH_ENABLE_AUDIO_FX
 
 } // extern "C"
+
+#else // #ifdef NO_SDL
+
+#include <SDL2/SDL_mixer_ext.h>
+
+#endif
 
 #endif // #ifndef MIXER_HHHHH

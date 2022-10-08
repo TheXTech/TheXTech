@@ -540,8 +540,7 @@ elseif(NINTENDO_WII)
         src/core/wii/window_wii.cpp
         src/core/wii/msgbox_wii.cpp
         src/core/wii/events_wii.cpp
-#        src/core/wii/mixer_wii.cpp
-        src/core/wii/mixerx_wii.cpp
+        src/core/sdl/mixer_mixerx.cpp
     )
 elseif(PGE_MIN_PORT)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)

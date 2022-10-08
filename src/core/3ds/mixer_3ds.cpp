@@ -42,6 +42,7 @@ std::set<const std::string*> sound_stream_paths;
 
 bool MixPlatform_Init(AudioSetup_t& obtained)
 {
+    (void)obtained;
     return audioInit();
 }
 
@@ -79,7 +80,10 @@ int MixPlatform_PlayStream(int channel, const char* path, int loops)
     return 0;
 }
 
-Mix_Chunk* MixPlatform_LoadWAV(const char* path)
+extern "C"
+{
+
+Mix_Chunk* Mix_LoadWAV(const char* path)
 {
     // remove arguments from path
     char* path2 = strdup(path);
@@ -110,7 +114,7 @@ Mix_Chunk* MixPlatform_LoadWAV(const char* path)
     return ret;
 }
 
-const char* MixPlatform_GetError()
+const char* Mix_GetError()
 {
     return "";
 }
@@ -126,9 +130,8 @@ inline SoundId playSoundMaybeStream(Mix_Chunk* chunk, int loops)
     return playSoundMem((WaveObject*)chunk, loops);
 }
 
-int MixPlatform_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks)
+int Mix_PlayChannel(int channel, Mix_Chunk *chunk, int loops)
 {
-    (void)ticks;
     if(!cur_sound || channel < 0)
     {
         playSoundMaybeStream(chunk, loops);
@@ -139,14 +142,11 @@ int MixPlatform_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int t
     return 0;
 }
 
-int MixPlatform_PlayChannelTimedVolume(int channel, Mix_Chunk *chunk, int loops, int ticks, int volume)
+int Mix_PlayChannelVol(int channel, Mix_Chunk *chunk, int loops, int volume)
 {
     (void)volume;
-    return MixPlatform_PlayChannelTimed(channel, chunk, loops, ticks);
+    return Mix_PlayChannel(channel, chunk, loops);
 }
-
-
-extern "C" {
 
 int Mix_ReserveChannels(int channels)
 {
