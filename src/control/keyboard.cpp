@@ -30,6 +30,8 @@
 #include "core/window.h"
 #include "main/cheat_code.h"
 
+#include <Logger/logger.h>
+
 namespace Controls
 {
 
@@ -367,7 +369,7 @@ bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Keyboard primary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -459,7 +461,7 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Keyboard secondary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -543,7 +545,7 @@ bool InputMethodProfile_Keyboard::DeletePrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Attempted to delete Keyboard primary button with disallowed controls class %d\n", (int)c);
         return false;
     }
 

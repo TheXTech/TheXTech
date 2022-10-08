@@ -388,7 +388,7 @@ bool InputMethodProfile_3DS::PollPrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling 3DS primary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -482,7 +482,7 @@ bool InputMethodProfile_3DS::PollSecondaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling 3DS secondary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -566,7 +566,7 @@ bool InputMethodProfile_3DS::DeletePrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Attempted to delete 3DS input binding of disallowed controls class %d\n", (int)c);
         return false;
     }
 

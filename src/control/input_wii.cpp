@@ -658,7 +658,7 @@ bool InputMethodProfile_Wii::PollPrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Wii primary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -789,7 +789,7 @@ bool InputMethodProfile_Wii::PollSecondaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Wii secondary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -873,7 +873,7 @@ bool InputMethodProfile_Wii::DeletePrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Attempted to delete Wii primary button with disallowed controls class %d\n", (int)c);
         return false;
     }
 

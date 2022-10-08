@@ -896,7 +896,7 @@ bool InputMethodProfile_Joystick::PollPrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Joystick primary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -991,7 +991,7 @@ bool InputMethodProfile_Joystick::PollSecondaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Joystick secondary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -1076,7 +1076,7 @@ bool InputMethodProfile_Joystick::DeletePrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Attempted to delete Joystick primary button with disallowed controls class %d\n", (int)c);
         return false;
     }
 
