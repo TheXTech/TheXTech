@@ -30,41 +30,41 @@
 #include "control/input_3ds.h"
 
 const char* KEYNAMES[32] = {
- "A", "B", "SELECT", "START",
- "D-PAD RIGHT", "D-PAD LEFT", "D-PAD UP", "D-PAD DOWN",
- "R", "L", "X", "Y",
- "", "", "ZL", "ZR",
- "", "", "", "",
- "TOUCH", "", "", "",
- "C-STICK RIGHT", "C-STICK LEFT", "C-STICK UP", "C-STICK DOWN",
- "THUMB RIGHT", "THUMB LEFT", "THUMB UP", "THUMB DOWN"
+    "A", "B", "SELECT", "START",
+    "D-PAD RIGHT", "D-PAD LEFT", "D-PAD UP", "D-PAD DOWN",
+    "R", "L", "X", "Y",
+    "", "", "ZL", "ZR",
+    "", "", "", "",
+    "TOUCH", "", "", "",
+    "C-STICK RIGHT", "C-STICK LEFT", "C-STICK UP", "C-STICK DOWN",
+    "THUMB RIGHT", "THUMB LEFT", "THUMB UP", "THUMB DOWN"
 };
 
 enum KEYID {
- KEYID_A=0,
- KEYID_B=1,
- KEYID_SELECT=2,
- KEYID_START=3,
- KEYID_DRIGHT=4,
- KEYID_DLEFT=5,
- KEYID_DUP=6,
- KEYID_DDOWN=7,
- KEYID_R=8,
- KEYID_L=9,
- KEYID_X=10,
- KEYID_Y=11,
- KEYID_ZL=14,
- KEYID_ZR=15,
+    KEYID_A=0,
+    KEYID_B=1,
+    KEYID_SELECT=2,
+    KEYID_START=3,
+    KEYID_DRIGHT=4,
+    KEYID_DLEFT=5,
+    KEYID_DUP=6,
+    KEYID_DDOWN=7,
+    KEYID_R=8,
+    KEYID_L=9,
+    KEYID_X=10,
+    KEYID_Y=11,
+    KEYID_ZL=14,
+    KEYID_ZR=15,
 
- KEYID_TOUCH=20,
- KEYID_CSTICK_RIGHT=24,
- KEYID_CSTICK_LEFT=25,
- KEYID_CSTICK_UP=26,
- KEYID_CSTICK_DOWN=27,
- KEYID_PAD_RIGHT=28,
- KEYID_PAD_LEFT=29,
- KEYID_PAD_UP=30,
- KEYID_PAD_DOWN=31
+    KEYID_TOUCH=20,
+    KEYID_CSTICK_RIGHT=24,
+    KEYID_CSTICK_LEFT=25,
+    KEYID_CSTICK_UP=26,
+    KEYID_CSTICK_DOWN=27,
+    KEYID_PAD_RIGHT=28,
+    KEYID_PAD_LEFT=29,
+    KEYID_PAD_UP=30,
+    KEYID_PAD_DOWN=31
 };
 
 namespace Controls
