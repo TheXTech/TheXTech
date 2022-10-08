@@ -52,7 +52,7 @@ static std::string return_current_time_and_date()
 
 #ifdef PGE_MIN_PORT
     // chrono doesn't work reliably here
-    time( &in_time_t );
+    time(&in_time_t);
 #endif
 
     char out[24];
