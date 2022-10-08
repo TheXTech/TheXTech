@@ -29,6 +29,8 @@
 #include "controls.h"
 #include "control/input_3ds.h"
 
+#include <Logger/logger.h>
+
 const char* KEYNAMES[32] = {
     "A", "B", "SELECT", "START",
     "D-PAD RIGHT", "D-PAD LEFT", "D-PAD UP", "D-PAD DOWN",
