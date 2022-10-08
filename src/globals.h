@@ -1564,6 +1564,10 @@ extern int LevelMacro;
 
 //Public LevelMacroCounter As Integer
 extern int LevelMacroCounter;
+
+//EXTRA: which BGO caused the key exit?
+extern int LevelMacroWhich;
+
 //Public numJoysticks As Integer
 extern int numJoysticks;
 

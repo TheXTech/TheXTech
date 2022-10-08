@@ -45,6 +45,8 @@
 #include "../core/render.h"
 #include "../script/luna/luna.h"
 
+#include "graphics/gfx_keyhole.h"
+
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
 
@@ -1803,6 +1805,11 @@ void UpdateGraphics(bool skipRepaint)
         }
 
 
+        if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT && LevelMacroWhich != 0)
+        {
+            RenderKeyhole(Z);
+        }
+
         for(A = 1; A <= numNPCs; A++) // Put held NPCs on top
         {
             g_stats.checkedNPCs++;
@@ -1827,11 +1834,11 @@ void UpdateGraphics(bool skipRepaint)
                     g_stats.renderedNPCs++;
                     if(NPCWidthGFX[NPC[A].Type] == 0)
                     {
-                        XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
+                        RenderTexturePlayer(Z, vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
                     }
                     else
                     {
-                        XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn, cn, cn);
+                        RenderTexturePlayer(Z, vScreenX[Z] + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn, cn, cn);
                     }
                 }
             }

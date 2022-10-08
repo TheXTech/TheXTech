@@ -264,6 +264,7 @@ RangeArrI<int, 1, numSounds, 0> SoundPause;
 bool ErrorQuit = false;
 bool EndLevel = false;
 int LevelMacro = LEVELMACRO_OFF;
+int LevelMacroWhich = 0;
 int LevelMacroCounter = 0;
 int numJoysticks = 0;
 

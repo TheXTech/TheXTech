@@ -472,6 +472,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_draw_player.cpp
     src/graphics/gfx_special_frames.cpp
     src/graphics/gfx_screen.cpp
+    src/graphics/gfx_keyhole.cpp
     src/control/duplicate.cpp
     src/control/controls.cpp
     src/change_res.cpp
