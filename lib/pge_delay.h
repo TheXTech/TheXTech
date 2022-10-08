@@ -13,6 +13,7 @@ extern "C" void udelay(unsigned us);
 #elif defined(NO_SDL)
 #   define PGE_Delay(x) UNUSED(x)
 #else
+#include <SDL2/SDL_timer.h>
 #   define PGE_Delay(x) SDL_Delay(x)
 #endif
 

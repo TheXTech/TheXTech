@@ -100,6 +100,12 @@ if(NINTENDO_SWITCH)
     )
 endif()
 
+if(NINTENDO_WII)
+    list(APPEND MixerX_SysLibs
+        asnd ogc vorbisidec ogg
+    )
+endif()
+
 if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID AND NOT NINTENDO_SWITCH)
     find_library(_LIB_GL GL)
     if(_LIB_GL)

@@ -231,9 +231,6 @@ if(NINTENDO_3DS)
     set(GME_ENABLE_ZLIB OFF CACHE BOOL "" FORCE)
     set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
     add_subdirectory(3rdparty/AudioCodecs/libgme)
-elseif(NINTENDO_WII)
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-    set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
 elseif(PGE_MIN_PORT)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
@@ -534,7 +531,7 @@ elseif(NINTENDO_3DS)
         src/core/3ds/3ds-audio-lib.cpp
     )
 elseif(NINTENDO_WII)
-    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
         src/control/input_wii.cpp
         src/core/wii/std_wii.cpp
