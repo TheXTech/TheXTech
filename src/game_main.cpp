@@ -362,6 +362,7 @@ int GameMain(const CmdLineSetup_t &setup)
             MouseRelease = false;
             LevelEditor = true;
             OpenLevel(FullFileName);
+            editorScreen.ResetCursor();
             EditorBackup();
         }
         else

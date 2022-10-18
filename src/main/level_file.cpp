@@ -45,6 +45,8 @@
 
 #include "global_dirs.h"
 
+#include "editor/editor_custom.h"
+
 
 void bgoApplyZMode(Background_t *bgo, int smbx64sp)
 {
@@ -184,6 +186,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FindCustomNPCs();
     LoadCustomGFX();
     LoadCustomSound();
+
+    if(LevelEditor)
+        EditorCustom::Load();
+
 //    if(DirMan::exists(FileNamePath + FileName)) // Useless now
 //        LoadCustomGFX2(FileNamePath + FileName);
 // Blah
@@ -550,7 +556,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
         else if(find_Special7_Data(npc.Type) /* && compatModern */)
         {
-            // only load Special7 for NPCs that don't support it
+            // only load Special7 for NPCs that support it
             npc.Special7 = n.special_data;
         }
         else

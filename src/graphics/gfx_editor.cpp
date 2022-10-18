@@ -30,6 +30,7 @@
 
 #include "editor.h"
 #include "editor/new_editor.h"
+#include "editor/magic_block.h"
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #   include <InterProcess/intproc.h>
@@ -590,7 +591,11 @@ void DrawEditorLevel(int Z)
 
         else if(EditorCursor.Mode == 13 || EditorCursor.Mode == 14) // Selector
         {
-            XRender::renderTexture(curX, curY, GFX.ECursor[2]);
+            if(MagicBlock::enabled)
+                XRender::renderTexture(curX, curY, GFX.ECursor[2], 0.7f, 1.0f, 0.7f, 1.0f);
+            else
+                XRender::renderTexture(curX, curY, GFX.ECursor[2]);
+
         }
 
         // Section Resize
@@ -603,7 +608,11 @@ void DrawEditorLevel(int Z)
         else
         {
 //                    If .Mode = 5 Then
-            XRender::renderTexture(curX, curY, GFX.ECursor[2]);
+            if(MagicBlock::enabled)
+                XRender::renderTexture(curX, curY, GFX.ECursor[2], 0.7f, 1.0f, 0.7f, 1.0f);
+            else
+                XRender::renderTexture(curX, curY, GFX.ECursor[2]);
+
             if(e.Layer != LAYER_NONE && e.Layer != LAYER_DEFAULT)
             {
                 // there might be a tooltip in this case

@@ -8,6 +8,7 @@ include(CheckLibraryExists)
 include(GNUInstallDirs)
 include(FindBacktrace)
 include(TestBigEndian)
+include(CheckIncludeFile)
 
 
 include(cmake/git_info.cmake)
@@ -71,6 +72,10 @@ endif()
 
 if(WIN32 AND NOT EMSCRIPTEN)
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
+endif()
+
+if(UNIX)
+    check_include_file(/opt/vc/include/bcm_host.h BCMHOST_H)
 endif()
 
 if(POLICY CMP0058)
@@ -406,6 +411,8 @@ set(THEXTECH_SRC
     src/editor/write_common.cpp
     src/editor/write_level.cpp
     src/editor/write_world.cpp
+    src/editor/editor_custom.cpp
+    src/editor/magic_block.cpp
     src/main.cpp
     src/blocks.cpp
     src/gfx.cpp

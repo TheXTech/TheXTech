@@ -58,7 +58,10 @@
 
 #include "write_level.h"
 #include "write_world.h"
-#include "new_editor.h"
+#include "editor/new_editor.h"
+
+#include "editor/magic_block.h"
+#include "editor/editor_custom.h"
 
 #include <PGE_File_Formats/file_formats.h>
 
@@ -92,6 +95,9 @@ int editor_section_toast = 0;
 // buffer for scrolling since we can only scroll in 32-pixel increments
 int scroll_buffer_x = 0;
 int scroll_buffer_y = 0;
+
+// to prevent constant replacement of tiled items during "replace_existing" mode
+Location_t last_EC_loc;
 
 // the first f stands for "fixed"
 constexpr bool ffEqual(double i, double j)
@@ -468,7 +474,13 @@ void UpdateEditor()
                                 EditorCursor.Location.Height = Block[A].Location.Height;
                                 SetCursor();
 //                                Netplay::sendData Netplay::EraseBlock(A, 1);
+
+                                Location_t loc = Block[A].Location;
+                                int type = Block[A].Type;
                                 KillBlock(A, false);
+
+                                MagicBlock::MagicBlock(type, loc);
+
                                 editorScreen.FocusBlock();
                                 MouseRelease = false;
                                 MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
@@ -563,8 +575,13 @@ void UpdateEditor()
                             EditorCursor.Location.Y = Background[A].Location.Y;
                             SetCursor();
 //                            Netplay::sendData Netplay::EraseBackground(A, 1) + "p23" + LB;
+
+                            Location_t loc = Background[A].Location;
+                            int type = Background[A].Type;
+
                             Background[A] = Background[numBackground];
-                            numBackground -= 1;
+                            numBackground--;
+
                             editorScreen.FocusBGO();
                             if(MagicHand)
                             {
@@ -577,6 +594,9 @@ void UpdateEditor()
                                 syncLayers_BGO(A);
                                 syncLayers_BGO(numBackground+1);
                             }
+
+                            MagicBlock::MagicBackground(type, loc);
+
                             MouseRelease = false;
                             MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
 
@@ -815,13 +835,21 @@ void UpdateEditor()
                             EditorCursor.Location = Tile[A].Location;
                             EditorCursor.Tile = Tile[A];
                             SetCursor();
+
+                            Location_t loc = Tile[A].Location;
+                            int type = Tile[A].Type;
+
                             if(A != numTiles)
                             {
                                 Tile[A] = Tile[numTiles];
                                 treeWorldTileUpdate(&Tile[A]);
                             }
                             treeWorldTileRemove(&Tile[numTiles]);
+
                             numTiles--;
+
+                            MagicBlock::MagicTile(type, loc);
+
                             editorScreen.FocusTile();
                             MouseRelease = false;
                             MouseCancel = true; /* Simulate "Focus out" inside of SMBX Editor */
@@ -900,7 +928,13 @@ void UpdateEditor()
                             if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
                             {
 //                                Netplay::sendData Netplay::EraseBlock[A];
-                                KillBlock(A); // Erase the block
+
+                                Location_t loc = Block[A].Location;
+                                int type = Block[A].Type;
+                                KillBlock(A);
+
+                                MagicBlock::MagicBlock(type, loc);
+
                                 // FindSBlocks();
                                 MouseRelease = false;
                                 if(EditorCursor.SubMode == 0)
@@ -959,8 +993,13 @@ void UpdateEditor()
                             b.Location.Y += b.Location.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, b.Location);
                             PlaySound(SFX_Smash);
+
+                            Location_t loc = Background[A].Location;
+                            int type = Background[A].Type;
+
                             Background[A] = Background[numBackground];
                             numBackground--;
+
                             MouseRelease = false;
                             if(EditorCursor.SubMode == 0)
                                 EditorCursor.SubMode = OptCursor_t::LVL_BGOS;
@@ -976,6 +1015,9 @@ void UpdateEditor()
                                 syncLayers_BGO(A);
                                 syncLayers_BGO(numBackground + 1);
                             }
+
+                            MagicBlock::MagicBackground(type, loc);
+
                             break;
                         }
                     }
@@ -1159,13 +1201,21 @@ void UpdateEditor()
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
+
+                            Location_t loc = Tile[A].Location;
+                            int type = Tile[A].Type;
+
                             if(A != numTiles)
                             {
                                 Tile[A] = Tile[numTiles];
                                 treeWorldTileUpdate(&Tile[A]);
                             }
                             treeWorldTileRemove(&Tile[numTiles]);
+
                             numTiles--;
+
+                            MagicBlock::MagicTile(type, loc);
+
                             MouseRelease = false;
                             if(EditorCursor.SubMode == 0)
                                 EditorCursor.SubMode = OptCursor_t::WLD_TILES;
@@ -1176,14 +1226,24 @@ void UpdateEditor()
             }
             else if(EditorCursor.Mode == OptCursor_t::LVL_BLOCKS) // Blocks
             {
-                for(A = 1; A <= numBlock; A++)
+                for(A = numBlock; A >= 1; A--)
                 {
                     if(!MouseRelease || (!BlockIsSizable[Block[A].Type] && !BlockIsSizable[EditorCursor.Block.Type]))
                     {
                         if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
                         {
-                            CanPlace = false;
-                            break;
+                            if(!MagicBlock::replace_existing || (!MouseRelease && CheckCollision(Block[A].Location, last_EC_loc)))
+                            {
+                                CanPlace = false;
+                                break;
+                            }
+                            else
+                            {
+                                Location_t loc = Block[A].Location;
+                                int type = Block[A].Type;
+                                KillBlock(A, false);
+                                MagicBlock::MagicBlock(type, loc);
+                            }
                         }
                     }
                     else
@@ -1193,12 +1253,21 @@ void UpdateEditor()
                             if(ffEqual(EditorCursor.Location.X, Block[A].Location.X) &&
                                ffEqual(EditorCursor.Location.Y, Block[A].Location.Y))
                             {
-                                pLogDebug("Block was rejected at block at EC Loc (%f, %f), other block loc (%f, %f)", EditorCursor.Location.X, EditorCursor.Location.Y, Block[A].Location.X, Block[A].Location.Y);
+                                pLogDebug("Sizable block was rejected at block at EC Loc (%f, %f), other block loc (%f, %f)", EditorCursor.Location.X, EditorCursor.Location.Y, Block[A].Location.X, Block[A].Location.Y);
                                 CanPlace = false;
                                 break;
                             }
                         }
                     }
+                }
+
+                if(CanPlace)
+                {
+                    last_EC_loc = EditorCursor.Location;
+                    last_EC_loc.X += 1;
+                    last_EC_loc.Y += 1;
+                    last_EC_loc.Width -= 2;
+                    last_EC_loc.Height -= 2;
                 }
 
                 if(!BlockIsSizable[EditorCursor.Block.Type] && EditorCursor.Block.Type != 370 && CanPlace)
@@ -1251,6 +1320,8 @@ void UpdateEditor()
                             Block[numBlock].DefaultSpecial = Block[numBlock].Special;
                             Block[numBlock].DefaultSpecial2 = Block[numBlock].Special2;
                             syncLayersTrees_Block(numBlock);
+
+                            MagicBlock::MagicBlock(numBlock);
 #if 0
                             if(MagicHand)
                             {
@@ -1330,7 +1401,18 @@ void UpdateEditor()
             {
                 for(A = 1; A <= numBackground; A++)
                 {
-                    if(EditorCursor.Background.Type == Background[A].Type)
+                    const int ctype = EditorCursor.Background.Type;
+                    const int btype = Background[A].Type;
+                    bool same_type = (ctype == btype);
+
+                    if(MagicBlock::enabled && ctype > 0 && ctype <= maxBackgroundType && btype > 0 && btype <= maxBackgroundType
+                        && EditorCustom::bgo_family_by_type[ctype - 1] != EditorCustom::FAMILY_NONE
+                        && EditorCustom::bgo_family_by_type[ctype - 1] == EditorCustom::bgo_family_by_type[btype - 1])
+                    {
+                        same_type = true;
+                    }
+
+                    if(same_type)
                     {
                         if(CursorCollision(EditorCursor.Location, Background[A].Location) && !Background[A].Hidden)
                         {
@@ -1348,6 +1430,9 @@ void UpdateEditor()
                         EditorCursor.Background.uid = numBackground;
                         Background[numBackground] = EditorCursor.Background;
                         syncLayers_BGO(numBackground);
+
+                        MagicBlock::MagicBackground(numBackground);
+
                         if(MagicHand)
                         {
                             qSortBackgrounds(1, numBackground);
@@ -1505,22 +1590,50 @@ void UpdateEditor()
             }
             else if(EditorCursor.Mode == OptCursor_t::WLD_TILES) // Tiles
             {
-                for(A = 1; A <= numTiles; A++)
+                for(A = numTiles; A >= 1; A--)
                 {
                     if(CursorCollision(EditorCursor.Location, Tile[A].Location))
                     {
-                        CanPlace = false;
-                        break;
+                        if(!MagicBlock::replace_existing || (!MouseRelease && CheckCollision(Tile[A].Location, last_EC_loc)))
+                        {
+                            CanPlace = false;
+                            break;
+                        }
+                        else
+                        {
+                            Location_t loc = Tile[A].Location;
+                            int type = Tile[A].Type;
+
+                            if(A != numTiles)
+                            {
+                                Tile[A] = Tile[numTiles];
+                                treeWorldTileUpdate(&Tile[A]);
+                            }
+                            treeWorldTileRemove(&Tile[numTiles]);
+                            numTiles--;
+
+                            MagicBlock::MagicTile(type, loc);
+                        }
                     }
                 }
 
+                MouseRelease = false;
+
                 if(CanPlace) // Nothing is in the way
                 {
+                    last_EC_loc = EditorCursor.Location;
+                    last_EC_loc.X += 1;
+                    last_EC_loc.Y += 1;
+                    last_EC_loc.Width -= 2;
+                    last_EC_loc.Height -= 2;
+
                     if(numTiles < maxTiles) // Not out of blocks
                     {
                         numTiles++;
                         Tile[numTiles] = EditorCursor.Tile;
                         treeWorldTileAdd(&Tile[numTiles]);
+
+                        MagicBlock::MagicTile(numTiles);
                     }
                 }
             }
