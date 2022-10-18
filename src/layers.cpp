@@ -148,7 +148,7 @@ bool SwapLayers(layerindex_t index_1, layerindex_t index_2)
     }
 
     // swap event layer refs
-    for(int A = 0; A <= numEvents; A++)
+    for(int A = 0; A < numEvents; A++)
     {
         for(layerindex_t& l : Events[A].HideLayer)
         {
@@ -303,7 +303,7 @@ bool DeleteLayer(layerindex_t L, bool killall)
         }
     }
 
-    for(A = 0; A <= numEvents; A++)
+    for(A = 0; A < numEvents; A++)
     {
         for(auto it = Events[A].HideLayer.end(); it != Events[A].HideLayer.begin();)
         {
@@ -553,6 +553,8 @@ bool SwapEvents(eventindex_t index_1, eventindex_t index_2)
     if(index_1 == EVENT_NONE || index_2 == EVENT_NONE)
         return false;
 
+    std::swap(Events[index_1], Events[index_2]);
+
     int A = 0;
 
     // swap EVERYTHING
@@ -600,7 +602,7 @@ bool SwapEvents(eventindex_t index_1, eventindex_t index_2)
             Warp[A].eventEnter = index_1;
     }
 
-    for(A = 0; A <= numEvents; A++)
+    for(A = 0; A < numEvents; A++)
     {
         if(Events[A].TriggerEvent == index_1)
             Events[A].TriggerEvent = index_2;
@@ -652,23 +654,23 @@ bool DeleteEvent(eventindex_t index)
             Block[A].TriggerLast = EVENT_NONE;
     }
 
-    for(A = 0; A <= numWarps; A++)
+    for(A = 1; A <= numWarps; A++)
     {
         if(Warp[A].eventEnter == index)
             Warp[A].eventEnter = EVENT_NONE;
     }
 
-    for(A = 0; A <= numEvents; A++)
+    for(A = 0; A < numEvents; A++)
     {
         if(Events[A].TriggerEvent == index)
             Events[A].TriggerEvent = EVENT_NONE;
     }
 
-    for(int B = index; B <= numEvents - 1; B++)
+    for(int B = index; B < numEvents - 1; B++)
         SwapEvents(B, B+1);
 
+    numEvents--;
     Events[numEvents] = Events_t();
-    numEvents --;
 
     return true;
 }

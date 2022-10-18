@@ -112,6 +112,23 @@ if(NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID AND NOT NINTENDO_S
         list(APPEND MixerX_SysLibs ${_LIB_GL})
     endif()
 
+    if(BCMHOST_H) # Raspberry Pi dependencies
+        find_library(BCM_HOST_LIBRARY bcm_host)
+        if(BCM_HOST_LIBRARY)
+            list(APPEND MixerX_SysLibs ${BCM_HOST_LIBRARY})
+        endif()
+
+        find_library(VCOS_LIBRARY vcos)
+        if(VCOS_LIBRARY)
+            list(APPEND MixerX_SysLibs ${VCOS_LIBRARY})
+        endif()
+
+        find_library(VCHIQ_ARM_LIBRARY vchiq_arm)
+        if(VCHIQ_ARM_LIBRARY)
+            list(APPEND MixerX_SysLibs ${VCHIQ_ARM_LIBRARY})
+        endif()
+    endif()
+
     find_library(_lib_pthread pthread)
     if(_lib_pthread)
         list(APPEND MixerX_SysLibs ${_lib_pthread})

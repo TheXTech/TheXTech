@@ -1,14 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="touchscreenControllerType0">Activar siempre</string>
     <string name="touchscreenControllerType1">Desactivar si se ha conectado un teclado fisico</string>
     <string name="touchscreenControllerType2">Desactivar siempre</string>
-
-    <string name="speedRunMode0">Off</string>
+    <string name="speedRunMode0">Apagado</string>
     <string name="speedRunMode1">Modo 1 (Motor X-Tech nativo)</string>
     <string name="speedRunMode2">Modo 2 (Desactivar funciones que dan ventaja)</string>
-    <string name="speedRunMode3">Mode 3 (Simular SMBX 1.3 original, bugs incluidos)</string>
-
+    <string name="speedRunMode3">Modo 3 (Simular SMBX 1.3 original, errores incluidos)</string>
     <string name="touchPadStyle0">Acciones del juego</string>
     <string name="touchPadStyle1">Estilo Nintendo/Xbox (A/B/X/Y)</string>
     <string name="touchPadStyle2">Estilo PlayStation (X/O/D/A)</string>
+    <string name="batteryStatusShow0">Nunca mostrar</string>
+    <string name="batteryStatusShow1">Mostrar con batería baja</string>
+    <string name="batteryStatusShow2">Mostrar siempre</string>
 </resources>

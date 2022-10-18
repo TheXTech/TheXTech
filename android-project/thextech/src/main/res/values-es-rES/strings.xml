@@ -20,10 +20,23 @@
     <string name="setup_speedrunner">Speed-runner</string>
     <string name="setup_touchpad_style">Estilo de mando en pantalla</string>
     <string name="managePermExplainTitle">Se requiere acceso total al almacenamiento</string>
-    <string name="managePermExplainText">Este juego usa recursos (Niveles, gráficos, música, etc.) que han sido descargados por el usuario manualmente. Esto nos permite conservar todas las funciones de la versión de PC en movil. Sin embargo, desde Android 11 en adelante el acceso a los archivos está severamente limitado. Por eso, para poder disfrutar de este juego debes darle acceso a todos los archivos de tu sistema.</string>
+    <string name="managePermExplainText">Este juego usa recursos (Niveles, gráficos, música, etc.) que han sido descargados y ubicados en el sistema de archivos por el usuario manualmente. Este concepto permite al usuario modificar y extender el contenido para sus propios propósitos tal como en la versión de escritorio del juego. Desafortunadamente, Android +11 no otorga un permiso de lectura para el directorio especificado en lugar de un archivo. Para ejecutar este juego, debe garantizar acceso a todos los archivos para el juego.</string>
     <string name="setup_assets_path_label">Cambiar la ruta de los recursos</string>
-    <string name="launcher_no_resources_question">Ups, el juego no puede empezar porque no hay ningún directorio de recursos seleccionado. Este juego requiere que los descargues manualmente, y los selecciones en ajustes. Si los has descargado ya, por favor descomprimelos y selecciona el directorio que los contiene. Quieres seleccionar el directorio ahora?</string>
+    <string name="launcher_no_resources_question">El juego requiere un paquete de recursos para el trabajo. Por favor descargue los recursos y descomprimirlos en cualquier directorio conveniente. ¿Desea seleccionar una carpeta ya descomprimida\?</string>
     <string name="setup_feedback_enable_vibration">Activar la vibración</string>
     <string name="setup_feedback_vibration_strength">Fuerza de vibración</string>
     <string name="cheat_dialog_cancel">Cancelar</string>
+    <string name="cheat_dialog_ok">Ejecutar</string>
+    <string name="cheat_dialog_title">Escribir comando:</string>
+    <string name="setup_feedback">Retroalimentación</string>
+    <string name="setup_feedback_vibration_length">Duración de vibración</string>
+    <string name="touchscreen_vibration_test_label">Probar retroalimentación</string>
+    <string name="setup_show_battery_status_label">Estado de la batería</string>
+    <string name="setup_show_controller_state_label">Mostrar un estado de controlador</string>
+    <string name="launcher_gameselect_clearlist_title">Limpiar la lista de juegos</string>
+    <string name="launcher_gameSelect_clearList">Limpiar lista</string>
+    <string name="launcher_gameselect_toast_selected">Cambió el juego: %s</string>
+    <string name="launcher_gameSelect_pickTheDir">Seleccionar directorio...</string>
+    <string name="launcher_gameselect_toast_listclean">La lista de juegos fue limpiada.</string>
+    <string name="launcher_gameselect_clearlist_question">¿Desea limpiar la lista de juegos\?</string>
 </resources>

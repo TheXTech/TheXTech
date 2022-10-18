@@ -79,6 +79,7 @@ private:
     typedef enum
     {
         SPECIAL_PAGE_NONE,
+        SPECIAL_PAGE_MAGICBLOCK,
         SPECIAL_PAGE_BROWSER,
         SPECIAL_PAGE_BROWSER_CONFIRM,
         SPECIAL_PAGE_EVENTS,
@@ -101,7 +102,7 @@ private:
         SPECIAL_PAGE_WARP_TRANSITION,
         SPECIAL_PAGE_LEVEL_EXIT,
         SPECIAL_PAGE_WORLD_SETTINGS,
-        SPECIAL_PAGE_LEVELTEST,
+        SPECIAL_PAGE_EDITOR_SETTINGS,
         SPECIAL_PAGE_LEVELTEST_HELDNPC,
         SPECIAL_PAGE_FILE,
         SPECIAL_PAGE_FILE_CONFIRM,
@@ -182,14 +183,17 @@ private:
 
     bool UpdateCheckBox(CallMode mode, int x, int y, bool sel, const char* tooltip = nullptr);
 
+    bool UpdateNPCButton(CallMode mode, int x, int y, int type, bool sel);
     void UpdateNPC(CallMode mode, int x, int y, int type);
     void UpdateNPCGrid(CallMode mode, int x, int y, const int* types, int n_npcs, int n_cols);
     void UpdateNPCScreen(CallMode mode);
 
+    bool UpdateBlockButton(CallMode mode, int x, int y, int type, bool sel);
     void UpdateBlock(CallMode mode, int x, int y, int type);
     void UpdateBlockGrid(CallMode mode, int x, int y, const int* types, int n_blocks, int n_cols);
     void UpdateBlockScreen(CallMode mode);
 
+    bool UpdateBGOButton(CallMode mode, int x, int y, int type, bool sel);
     void UpdateBGO(CallMode mode, int x, int y, int type);
     void UpdateBGOGrid(CallMode mode, int x, int y, const int* types, int n_bgos, int n_cols);
     void UpdateBGOScreen(CallMode mode);
@@ -199,7 +203,7 @@ private:
 
     void UpdateSectionsScreen(CallMode mode);
 
-    void UpdateLevelTestScreen(CallMode mode);
+    void UpdateEditorSettingsScreen(CallMode mode);
 
     void UpdateWorldSettingsScreen(CallMode mode);
 
@@ -209,6 +213,7 @@ private:
     void UpdateEventSettingsScreen(CallMode mode);
     void UpdateEventsSubScreen(CallMode mode);
 
+    bool UpdateTileButton(CallMode mode, int x, int y, int type, bool sel);
     void UpdateTile(CallMode mode, int x, int y, int type);
     void UpdateTileGrid(CallMode mode, int x, int y, const int* types, int n_tiles, int n_cols);
     void UpdateTileScreen(CallMode mode);
@@ -229,6 +234,8 @@ private:
 
     void UpdateFileScreen(CallMode mode);
     void UpdateBrowserScreen(CallMode mode);
+
+    void UpdateMagicBlockScreen(CallMode mode);
 
 public:
     bool active = true;
