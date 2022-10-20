@@ -994,7 +994,9 @@ void LoadCustomGFX(bool include_world)
     loadCustomUIAssets();
 
 #ifdef PGE_MIN_PORT
-    if(LoadGFXFromList(g_dirEpisode.getCurDir(), true, !include_world) || LoadGFXFromList(g_dirCustom.getCurDir(), true, !include_world))
+    bool success = LoadGFXFromList(g_dirEpisode.getCurDir(), true, !include_world);
+    success |= LoadGFXFromList(g_dirCustom.getCurDir(), true, !include_world);
+    if(success)
         return;
 #endif
 
