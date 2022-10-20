@@ -3,9 +3,11 @@ name: 3DS CI
 on:
   push:
     branches:
+      - main
       - wip-ports
   pull_request:
     branches:
+      - main
       - wip-ports
 
 jobs:
