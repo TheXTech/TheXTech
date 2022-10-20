@@ -18,10 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef PGE_NO_THREADING
-#include <atomic>
-#endif
-
 #include "lunaimgbox.h"
 #include "core/render.h"
 #include <Utils/files.h>
