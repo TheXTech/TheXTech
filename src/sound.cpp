@@ -63,7 +63,7 @@ const AudioDefaults_t g_audioDefaults =
 {
     32000,
     2,
-    2048,
+    1536,
     (int)AUDIO_S16SYS
 };
 #elif defined(__SWITCH__) /* Defaults for Nintendo Switch */
