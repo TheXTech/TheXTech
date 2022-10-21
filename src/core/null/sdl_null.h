@@ -7,6 +7,19 @@
 #include <cmath>
 #include <cstring>
 
+#ifndef UNUSED // To avoid IDE-side errors
+#define UNUSED(x) (void)x
+#endif
+
+typedef int64_t Sint64;
+typedef uint64_t Uint64;
+typedef int32_t Sint32;
+typedef uint32_t Uint32;
+typedef int16_t Sint16;
+typedef uint16_t Uint16;
+typedef int8_t Sint8;
+typedef uint8_t Uint8;
+
 #define SDL_IMPORT(func) static constexpr auto& SDL_ ## func = func;
 #define SDL_IMPORT_MATH(func) inline double SDL_ ## func(double arg) { return std::func(arg); }
 
