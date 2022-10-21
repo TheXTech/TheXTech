@@ -308,6 +308,13 @@ bool init()
 
     rmode = VIDEO_GetPreferredMode(NULL);
 
+    if(CONF_GetAspectRatio())
+    {
+        rmode->viWidth = 480;
+        // MAX_WIDTH is 720 across all regions
+        rmode->viXOrigin = (VI_MAX_WIDTH_PAL - 480)/2;
+    }
+
     // allocate 2 framebuffers for double buffering
     frameBuffer[0] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
     frameBuffer[1] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
