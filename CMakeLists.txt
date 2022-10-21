@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 
 project(TheXTech LANGUAGES C CXX)
 
+include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 include(ExternalProject)
 include(CheckLibraryExists)
