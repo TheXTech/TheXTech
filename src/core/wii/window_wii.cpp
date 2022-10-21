@@ -57,7 +57,7 @@ void setWindowSize(int /*w*/, int /*h*/) {}
 void getWindowSize(int *w, int *h)
 {
     // widescreen_stretch || widescreen_zoom, or NOT fullscreen
-    int eff_h = (false) ? XRender::g_rmode_w * 9 / 16 : XRender::g_rmode_h;
+    int eff_h = (CONF_GetAspectRatio()) ? XRender::g_rmode_w * 9 / 16 : XRender::g_rmode_h;
     *w = XRender::g_rmode_w * 2;
     *h = eff_h * 2;
 }

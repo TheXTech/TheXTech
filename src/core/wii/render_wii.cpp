@@ -308,13 +308,6 @@ bool init()
 
     rmode = VIDEO_GetPreferredMode(NULL);
 
-    if(CONF_GetAspectRatio())
-    {
-        rmode->viWidth = 480;
-        // MAX_WIDTH is 720 across all regions
-        rmode->viXOrigin = (VI_MAX_WIDTH_PAL - 480)/2;
-    }
-
     // allocate 2 framebuffers for double buffering
     frameBuffer[0] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
     frameBuffer[1] = MEM_K0_TO_K1(SYS_AllocateFramebuffer(rmode));
@@ -492,7 +485,7 @@ void minport_TransformPhysCoords()
     hardware_w /= 2;
     hardware_h /= 2;
 
-    if(false) // widescreen_stretch
+    if(CONF_GetAspectRatio()) // widescreen_stretch
     {
         g_screen_phys_h = g_screen_phys_h * g_rmode_h / hardware_h;
         if(g_screen_phys_h > g_rmode_h)
