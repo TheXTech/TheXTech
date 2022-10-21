@@ -68,7 +68,6 @@ void updateViewport()
 
     pLogDebug("Updating viewport. Game screen is %d x %d", ScreenW, ScreenH);
 
-    // widescreen_stretch || widescreen_zoom
     int hardware_w, hardware_h;
     XWindow::getWindowSize(&hardware_w, &hardware_h);
 
@@ -91,12 +90,6 @@ void updateViewport()
         g_screen_phys_w = res_w;
         g_screen_phys_h = res_h;
     }
-#ifdef __WII__
-    {
-        g_screen_phys_w = ScreenW_Show / 2;
-        g_screen_phys_h = ScreenH / 2;
-    }
-#endif
 #if 0
     else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
     {

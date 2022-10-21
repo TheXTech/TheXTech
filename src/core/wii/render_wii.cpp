@@ -482,18 +482,21 @@ void minport_TransformPhysCoords()
     int hardware_w, hardware_h;
     XWindow::getWindowSize(&hardware_w, &hardware_h);
 
+    hardware_w /= 2;
+    hardware_h /= 2;
+
     if(false) // widescreen_stretch
     {
         g_screen_phys_h = g_screen_phys_h * g_rmode_h / hardware_h;
         if(g_screen_phys_h > g_rmode_h)
         {
-            g_screen_phys_w = g_screen_phys_w * g_screen_phys_h / g_rmode_h;
+            g_screen_phys_w = g_screen_phys_w * g_rmode_h / g_screen_phys_h;
             g_screen_phys_h = g_rmode_h;
         }
         if(g_screen_phys_w > g_rmode_w)
         {
+            g_screen_phys_h = g_screen_phys_h * g_rmode_w / g_screen_phys_w;
             g_screen_phys_w = g_rmode_w;
-            g_screen_phys_h = g_screen_phys_h * g_screen_phys_w / g_rmode_w;
         }
 
         pLogDebug("Phys screen stretched to %d x %d", g_screen_phys_w, g_screen_phys_h);
