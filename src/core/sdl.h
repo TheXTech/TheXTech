@@ -56,23 +56,23 @@ inline value_t SDL_max(value_t x, value_t y)
 uint32_t SDL_GetTicks();
 uint64_t SDL_GetMicroTicks();
 
-SDL_IMPORT(free);
+SDL_IMPORT(free)
 
-SDL_IMPORT(memset);
-SDL_IMPORT(memcpy);
-SDL_IMPORT(memcmp);
-SDL_IMPORT(strdup);
-SDL_IMPORT(strlen);
-SDL_IMPORT(strtol);
-SDL_IMPORT(atoi);
-SDL_IMPORT(atof);
-SDL_IMPORT(sscanf);
-SDL_IMPORT(strcasecmp);
-SDL_IMPORT(strncasecmp);
+SDL_IMPORT(memset)
+SDL_IMPORT(memcpy)
+SDL_IMPORT(memcmp)
+SDL_IMPORT(strdup)
+SDL_IMPORT(strlen)
+SDL_IMPORT(strtol)
+SDL_IMPORT(atoi)
+SDL_IMPORT(atof)
+SDL_IMPORT(sscanf)
+SDL_IMPORT(strcasecmp)
+SDL_IMPORT(strncasecmp)
 
-SDL_IMPORT_MATH(fabs);
-SDL_IMPORT_MATH(floor);
-SDL_IMPORT_MATH(ceil);
+SDL_IMPORT_MATH(fabs)
+SDL_IMPORT_MATH(floor)
+SDL_IMPORT_MATH(ceil)
 
 #undef SDL_IMPORT
 

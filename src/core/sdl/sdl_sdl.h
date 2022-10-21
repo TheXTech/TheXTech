@@ -19,11 +19,11 @@
 #define SDL_GetTicks SDL_GetTicks_Wii_
 #endif
 
-SDL_IMPORT(AtomicSet);
-SDL_IMPORT(AtomicGet);
-SDL_IMPORT(strlcpy);
-SDL_IMPORT(strstr);
+SDL_IMPORT(AtomicSet)
+SDL_IMPORT(AtomicGet)
+SDL_IMPORT(strlcpy)
+SDL_IMPORT(strstr)
 
-SDL_IMPORT(pow);
+SDL_IMPORT(pow)
 
 #endif // #ifndef SDL_SDL_H

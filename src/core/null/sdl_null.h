@@ -7,7 +7,7 @@
 #include <cmath>
 #include <cstring>
 
-#define SDL_IMPORT(func) static constexpr auto& SDL_ ## func = func
+#define SDL_IMPORT(func) static constexpr auto& SDL_ ## func = func;
 #define SDL_IMPORT_MATH(func) inline double SDL_ ## func(double arg) { return std::func(arg); }
 
 #define SDL_FORCE_INLINE inline

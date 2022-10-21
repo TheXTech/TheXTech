@@ -19,7 +19,6 @@
  */
 
 #include "../globals.h"
-#include "../frm_main.h"
 #include "../gfx.h"
 #include "../frame_timer.h"
 #include "../graphics.h"
@@ -65,7 +64,7 @@ void UpdateGraphics2(bool skipRepaint)
     g_stats.reset();
 
     int A = 0;
-    int B = 0;
+    // int B = 0;
     const int Z = 1;
     int WPHeight = 0;
 //    Location_t tempLocation;
