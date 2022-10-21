@@ -102,7 +102,9 @@ static int loadingThread(void *waiter_ptr)
     SetupVars(); //Setup Variables
 
 #ifdef THEXTECH_PRELOAD_LEVELS
+    LoaderUpdateDebugString("Worlds preload");
     FindWorlds();
+    LoaderUpdateDebugString("Levels preload");
     FindLevels();
 #endif
 
@@ -258,6 +260,8 @@ int GameMain(const CmdLineSetup_t &setup)
             PlayInitSound();
     }
 
+    LoaderInit();
+
 #ifndef PGE_NO_THREADING
     {
         SDL_Thread*     loadThread;
@@ -290,6 +294,8 @@ int GameMain(const CmdLineSetup_t &setup)
 #else
     loadingThread(nullptr);
 #endif
+
+    LoaderFinish();
 
     LevelSelect = true; // world map is to be shown
 

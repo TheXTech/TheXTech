@@ -121,6 +121,10 @@ void OpenConfig_preSetup()
     {
         IniProcessing config(configPath);
 
+        config.beginGroup("main");
+        config.read("loading-debug", g_config.loading_show_debug, true);
+        config.endGroup();
+
         config.beginGroup("video");
         config.readEnum("render", g_videoSettings.renderMode, (int)RENDER_ACCELERATED, renderMode);
         config.read("background-work", g_videoSettings.allowBgWork, false);
@@ -274,6 +278,7 @@ void SaveConfig()
     config.setValue("use-native-osk", g_config.use_native_osk);
     config.setValue("enable-editor", g_config.enable_editor);
     config.setValue("editor-edge-scroll", g_config.editor_edge_scroll);
+    config.setValue("loading-debug", g_config.loading_show_debug);
     config.endGroup();
 
     config.beginGroup("recent");

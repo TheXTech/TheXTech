@@ -19,7 +19,9 @@
  */
 
 #include "core/sdl.h"
-#include "core/msgbox.h"
+#ifndef PGE_NO_THREADING
+#include <SDL2/SDL_mutex.h>
+#endif
 
 #include "globals.h"
 #include "global_dirs.h"
@@ -44,6 +46,12 @@
 
 bool gfxLoaderTestMode = false;
 bool gfxLoaderThreadingMode = false;
+#ifndef PGE_NO_THREADING
+static SDL_mutex *gfxLoaderDebugMutex = nullptr;
+#endif
+static std::string gfxLoaderDebugString;
+static Sint64 gfxLoaderDebugStart = -1;
+static const Sint64 c_gfxLoaderShowInterval = 500;
 
 //// Private Sub cBlockGFX(A As Integer)
 //void cBlockGFX(int A);
@@ -604,8 +612,10 @@ void LoadGFX()
     DirListCI CurDir;
 
     pLogDebug("Loading character textures");
+    LoaderUpdateDebugString("Characters");
     for(int c = 0; c < numCharacters; ++c)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Character {0}", c));
         CurDir.setCurDir(getGfxDir() + GFXPlayerNames[c]);
         For(A, 1, 10)
         {
@@ -621,9 +631,11 @@ void LoadGFX()
     }
 
     pLogDebug("Loading block textures");
+    LoaderUpdateDebugString("Blocks");
     CurDir.setCurDir(getGfxDir() + "block/");
     for(int A = 1; A <= maxBlockType; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Block {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("block-{0}", A));
         if(!p.empty())
         {
@@ -639,9 +651,11 @@ void LoadGFX()
     UpdateLoad();
 
     pLogDebug("Loading BG2 textures");
+    LoaderUpdateDebugString("Backgrounds");
     CurDir.setCurDir(getGfxDir() + "background2/");
     for(int A = 1; A <= numBackground2; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Background {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("background2-{0}", A));
         if(!p.empty())
         {
@@ -660,9 +674,11 @@ void LoadGFX()
     UpdateLoad();
 
     pLogDebug("Loading NPC textures");
+    LoaderUpdateDebugString("NPC");
     CurDir.setCurDir(getGfxDir() + "npc/");
     for(int A = 1; A <= maxNPCType; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("NPC {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("npc-{0}", A));
         if(!p.empty())
         {
@@ -682,9 +698,11 @@ void LoadGFX()
     UpdateLoad();
 
     pLogDebug("Loading effect textures");
+    LoaderUpdateDebugString("Effects");
     CurDir.setCurDir(getGfxDir() + "effect/");
     for(int A = 1; A <= maxEffectType; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Effect {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("effect-{0}", A));
         if(!p.empty())
         {
@@ -704,9 +722,11 @@ void LoadGFX()
     UpdateLoad();
 
     pLogDebug("Loading mount textures");
+    LoaderUpdateDebugString("Mounts");
     CurDir.setCurDir(getGfxDir() + "yoshi/");
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Mount B {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("yoshib-{0}", A));
         if(!p.empty())
         {
@@ -723,6 +743,7 @@ void LoadGFX()
 
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Mount T {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("yoshit-{0}", A));
         if(!p.empty())
         {
@@ -738,9 +759,11 @@ void LoadGFX()
     UpdateLoad();
 
     pLogDebug("Loading background textures");
+    LoaderUpdateDebugString("BGO");
     CurDir.setCurDir(getGfxDir() + "background/");
     for(int A = 1; A <= maxBackgroundType; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("BGO {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("background-{0}", A));
         if(!p.empty())
         {
@@ -762,9 +785,11 @@ void LoadGFX()
 
 // 'world map
     pLogDebug("Loading tile textures");
+    LoaderUpdateDebugString("Terrain");
     CurDir.setCurDir(getGfxDir() + "tile/");
     for(int A = 1; A <= maxTileType; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Terrain {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("tile-{0}", A));
         if(!p.empty())
         {
@@ -782,9 +807,11 @@ void LoadGFX()
     UpdateLoad();
 
     pLogDebug("Loading level textures");
+    LoaderUpdateDebugString("Level entries");
     CurDir.setCurDir(getGfxDir() + "level/");
     for(int A = 0; A <= maxLevelType; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Level {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("level-{0}", A));
         if(!p.empty())
         {
@@ -802,9 +829,11 @@ void LoadGFX()
     UpdateLoad();
 
     pLogDebug("Loading scene textures");
+    LoaderUpdateDebugString("Scenery");
     CurDir.setCurDir(getGfxDir() + "scene/");
     for(int A = 1; A <= maxSceneType; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Scenery {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("scene-{0}", A));
         if(!p.empty())
         {
@@ -822,9 +851,11 @@ void LoadGFX()
     UpdateLoad();
 
     pLogDebug("Loading world player textures");
+    LoaderUpdateDebugString("World characters");
     CurDir.setCurDir(getGfxDir() + "player/");
     for(int A = 1; A <= numCharacters; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("World character {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("player-{0}", A));
         if(!p.empty())
         {
@@ -842,9 +873,11 @@ void LoadGFX()
     UpdateLoad();
 
     pLogDebug("Loading path textures");
+    LoaderUpdateDebugString("Path cells");
     CurDir.setCurDir(getGfxDir() + "path/");
     for(int A = 1; A <= maxPathType; ++A)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Path cell {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("path-{0}", A));
         if(!p.empty())
         {
@@ -1129,6 +1162,42 @@ void UnloadWorldCustomGFX()
     restoreWorldBackupTextures();
 }
 
+void LoaderInit()
+{
+    gfxLoaderDebugStart = SDL_GetTicks();
+    gfxLoaderDebugString.clear();
+#ifndef PGE_NO_THREADING
+    if(gfxLoaderDebugMutex)
+        gfxLoaderDebugMutex = SDL_CreateMutex();
+#endif
+}
+
+void LoaderFinish()
+{
+    gfxLoaderDebugStart = -1;
+    gfxLoaderDebugString.clear();
+#ifndef PGE_NO_THREADING
+    if(gfxLoaderDebugMutex)
+        SDL_DestroyMutex(gfxLoaderDebugMutex);
+    gfxLoaderDebugMutex = nullptr;
+#endif
+}
+
+void LoaderUpdateDebugString(const std::string &strig)
+{
+    if(gfxLoaderDebugStart == -1)
+        return;
+
+#ifndef PGE_NO_THREADING
+    SDL_LockMutex(gfxLoaderDebugMutex);
+#endif
+    gfxLoaderDebugString = "Load: " + strig;
+#ifndef PGE_NO_THREADING
+    SDL_UnlockMutex(gfxLoaderDebugMutex);
+#endif
+}
+
+
 void UpdateLoadREAL()
 {
     std::string state;
@@ -1183,6 +1252,20 @@ void UpdateLoadREAL()
 
         if(gfxLoaderThreadingMode && alphaFader >= 0.f)
             XRender::renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alphaFader);
+
+        if(!gfxLoaderDebugString.empty() && gfxLoaderDebugStart + c_gfxLoaderShowInterval < SDL_GetTicks())
+        {
+#ifndef PGE_NO_THREADING
+            SDL_LockMutex(gfxLoaderDebugMutex);
+#endif
+            SuperPrint(gfxLoaderDebugString.c_str(), 3,
+                       10, ScreenH - 24,
+                       1.f, 1.f, 0.f, 0.5f);
+
+#ifndef PGE_NO_THREADING
+            SDL_UnlockMutex(gfxLoaderDebugMutex);
+#endif
+        }
 
         XRender::repaint();
         XRender::setTargetScreen();

@@ -303,6 +303,8 @@ static void AddSfx(SoundScope root,
 
     if(!f.empty() || isSilent)
     {
+        LoaderUpdateDebugString(fmt::format_ne("sound {0}", f));
+
         if(isCustom)
         {
             auto s = sound.find(alias);
@@ -932,6 +934,8 @@ void InitSound()
 
     musicIni = AppPath + "music.ini";
     sfxIni = AppPath + "sounds.ini";
+
+    LoaderUpdateDebugString("Sound configs");
 
     UpdateLoad();
     if(!Files::fileExists(musicIni) && !Files::fileExists(sfxIni))

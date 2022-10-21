@@ -52,6 +52,10 @@ void UnloadWorldCustomGFX();
 // Private Sub cLevelGFX(A As Integer)
 // Private Sub cPathGFX(A As Integer)
 
+void LoaderInit();
+void LoaderFinish();
+void LoaderUpdateDebugString(const std::string &strig);
+
 // Public Sub UpdateLoad()
 void UpdateLoadREAL();
 void UpdateLoad();
