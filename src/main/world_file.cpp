@@ -39,6 +39,8 @@
 
 #include "global_dirs.h"
 
+#include "editor/editor_custom.h"
+
 bool OpenWorld(std::string FilePath)
 {
     // USE PGE-FL here
@@ -102,6 +104,9 @@ bool OpenWorld(std::string FilePath)
     LoadCustomCompat();
     FindCustomPlayers();
     LoadWorldCustomGFX();
+
+    if(LevelEditor || WorldEditor)
+        EditorCustom::Load();
 
     numTiles = 0;
     numScenes = 0;

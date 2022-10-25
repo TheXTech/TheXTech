@@ -68,13 +68,13 @@ jobs:
           }
 
     steps:
-    - uses: styfle/cancel-workflow-action@0.9.1
+    - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: ubuntu-tar-ci.yml
         all_but_latest: true
         access_token: ${{ github.token }}
 
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
 
     - uses: nelonoel/branch-name@v1.0.1
 
@@ -90,13 +90,13 @@ jobs:
         cmake --version
 
     - name: Download SMBX assets
-      uses: carlosperate/download-file-action@v1.0.3
+      uses: carlosperate/download-file-action@v2
       with:
         file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
         file-name: smbx13.7z
 
     - name: Download AoD assets
-      uses: carlosperate/download-file-action@v1.0.3
+      uses: carlosperate/download-file-action@v2
       with:
         file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
         file-name: aod.7z
@@ -179,14 +179,14 @@ jobs:
 
     - name: Upload artifact
       if: success() && runner.os == 'Linux'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.tar.gz
         name: TheXTech ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Upload artifact
       if: success() && runner.os == 'Windows'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.7z
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}

@@ -13,11 +13,10 @@ on:
 jobs:
   build:
     name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
-    runs-on: ${{ matrix.config.os }}
+    runs-on: ubuntu-latest
+    container: devkitpro/devkita64
     env:
         DEVKITPRO: /opt/devkitpro
-        DEVKITARM: /opt/devkitpro/devkitARM
-        DEVKITPPC: /opt/devkitpro/devkitPPC
         DEVKITA64: /opt/devkitpro/devkitA64
     strategy:
       fail-fast: false
@@ -25,7 +24,6 @@ jobs:
         config:
         - {
             name: "Switch build",
-            os: ubuntu-20.04,
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Switch.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/switch",
             deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip apt-transport-https",
             generator: "Ninja",
@@ -37,13 +35,13 @@ jobs:
           }
 
     steps:
-    - uses: styfle/cancel-workflow-action@0.9.1
+    - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: switch-ci.yml
         all_but_latest: true
         access_token: ${{ github.token }}
 
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
 
     - uses: nelonoel/branch-name@v1.0.1
 
@@ -57,25 +55,25 @@ jobs:
         git submodule init
         git submodule update --recursive --remote
 
-    - name: Install Devkit Pro
-      run: |
-        cd ..
-        sudo chmod 755 /opt
-        if [[ ! -f /usr/local/share/keyring/devkitpro-pub.gpg ]]; then
-            sudo mkdir -p /usr/local/share/keyring/
-            sudo wget -O /usr/local/share/keyring/devkitpro-pub.gpg https://apt.devkitpro.org/devkitpro-pub.gpg
-        fi
-
-        if [[ ! -f /etc/apt/sources.list.d/devkitpro.list ]]; then
-            echo "deb [signed-by=/usr/local/share/keyring/devkitpro-pub.gpg] https://apt.devkitpro.org stable main" | sudo tee -a /etc/apt/sources.list.d/devkitpro.list
-        fi
-
-        sudo apt-get update -qq
-        sudo apt-get install -qq devkitpro-pacman
-
-        sudo dkp-pacman --noconfirm -Sy
-        sudo dkp-pacman --noconfirm -Syu
-        sudo dkp-pacman --noconfirm -Sy switch-dev switch-libpng switch-libjpeg-turbo switch-zlib switch-tools switch-cmake switch-mesa switch-libdrm_nouveau switch-glm switch-glad
+#    - name: Install Devkit Pro
+#      run: |
+#        cd ..
+#        sudo chmod 755 /opt
+#        if [[ ! -f /usr/local/share/keyring/devkitpro-pub.gpg ]]; then
+#            sudo mkdir -p /usr/local/share/keyring/
+#            sudo wget -O /usr/local/share/keyring/devkitpro-pub.gpg https://apt.devkitpro.org/devkitpro-pub.gpg
+#        fi
+#
+#        if [[ ! -f /etc/apt/sources.list.d/devkitpro.list ]]; then
+#            echo "deb [signed-by=/usr/local/share/keyring/devkitpro-pub.gpg] https://apt.devkitpro.org stable main" | sudo tee -a /etc/apt/sources.list.d/devkitpro.list
+#        fi
+#
+#        sudo apt-get update -qq
+#        sudo apt-get install -qq devkitpro-pacman
+#
+#        sudo dkp-pacman --noconfirm -Sy
+#        sudo dkp-pacman --noconfirm -Syu
+#        sudo dkp-pacman --noconfirm -Sy switch-dev switch-libpng switch-libjpeg-turbo switch-zlib switch-tools switch-cmake switch-mesa switch-libdrm_nouveau switch-glm switch-glad
 
     - name: Install modified SDL2
       run: |
@@ -123,7 +121,7 @@ jobs:
 
     - name: Upload artifact
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}

@@ -62,13 +62,13 @@ jobs:
 
 
     steps:
-    - uses: styfle/cancel-workflow-action@0.9.1
+    - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: windows-ci.yml
         all_but_latest: true
         access_token: ${{ github.token }}
 
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
 
     - uses: nelonoel/branch-name@v1.0.1
 
@@ -85,7 +85,7 @@ jobs:
 
     - name: Download MinGW
       if: matrix.config.mingw_download
-      uses: carlosperate/download-file-action@v1.0.3
+      uses: carlosperate/download-file-action@v2
       with:
         file-url: "${{ matrix.config.mingw_download }}"
         file-name: mingw.7z
@@ -98,7 +98,7 @@ jobs:
 
     - name: Download Ninja
       if: matrix.config.ninja_download
-      uses: carlosperate/download-file-action@v1.0.3
+      uses: carlosperate/download-file-action@v2
       with:
         file-url: "${{ matrix.config.ninja_download }}"
         file-name: ninja.zip
@@ -111,7 +111,7 @@ jobs:
 
     - name: Download LFTP
       if: matrix.config.lftp_download
-      uses: carlosperate/download-file-action@v1.0.3
+      uses: carlosperate/download-file-action@v2
       with:
         file-url: "${{ matrix.config.lftp_download }}"
         file-name: lftp.7z
@@ -123,13 +123,13 @@ jobs:
         7z x lftp.7z bin etc -o"${{ matrix.config.lftp_install_dir }}"
 
     - name: Download SMBX assets
-      uses: carlosperate/download-file-action@v1.0.3
+      uses: carlosperate/download-file-action@v2
       with:
         file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
         file-name: smbx13.7z
 
     - name: Download AoD assets
-      uses: carlosperate/download-file-action@v1.0.3
+      uses: carlosperate/download-file-action@v2
       with:
         file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
         file-name: aod.7z
@@ -212,14 +212,14 @@ jobs:
 
     - name: Upload artifact
       if: success() && runner.os == 'Linux'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.tar.gz
         name: TheXTech ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Upload artifact
       if: success() && runner.os == 'Windows'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.7z
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
