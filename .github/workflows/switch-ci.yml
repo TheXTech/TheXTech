@@ -35,7 +35,7 @@ jobs:
           }
 
     steps:
-    - uses: styfle/cancel-workflow-action@0.9.1
+    - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: switch-ci.yml
         all_but_latest: true
@@ -121,7 +121,7 @@ jobs:
 
     - name: Upload artifact
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
