@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: styfle/cancel-workflow-action@0.9.1
+      - uses: styfle/cancel-workflow-action@0.11.0
         with:
           workflow_id: android-ci.yml, emscripten.yml, macos-ci.yml, ubuntu-tar-ci.yml, ubuntu-deb-aod-ci.yml, ubuntu-deb-smbx-ci.yml, windows-ci.yml
           all_but_latest: true
