@@ -35,13 +35,13 @@ jobs:
           }
 
     steps:
-    - uses: styfle/cancel-workflow-action@0.9.1
+    - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: 3ds-ci.yml
         all_but_latest: true
         access_token: ${{ github.token }}
 
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
 
     - uses: nelonoel/branch-name@v1.0.1
 
@@ -89,7 +89,7 @@ jobs:
 
     - name: Upload artifact
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
