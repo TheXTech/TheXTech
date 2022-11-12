@@ -81,7 +81,7 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
         if(strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
             continue;
 
-        if (dent->d_type == DT_DIR)
+        if(dent->d_type == DT_DIR)
         {
             if(matchSuffixFilters(dent->d_name, suffix_filters))
                 list.emplace_back(dent->d_name);
