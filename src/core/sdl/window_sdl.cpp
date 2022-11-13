@@ -74,11 +74,11 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
     sdlInitFlags |= SDL_INIT_EVENTS;
 #if !defined(SDL_JOYSTICK_DISABLED)
     sdlInitFlags |= SDL_INIT_JOYSTICK;
+    sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
 #endif
 #if !defined(SDL_HAPTIC_DISABLED)
     sdlInitFlags |= SDL_INIT_HAPTIC;
 #endif
-    sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
 
     // Initialize SDL
     res = (SDL_Init(sdlInitFlags) >= 0);
