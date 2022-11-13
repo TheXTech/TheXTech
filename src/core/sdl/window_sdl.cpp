@@ -64,14 +64,20 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
     Uint32 sdlInitFlags = 0;
     // Prepare flags for SDL initialization
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) && !defined(SDL_TIMERS_DISABLED)
     sdlInitFlags |= SDL_INIT_TIMER;
 #endif
+#if !defined(SDL_AUDIO_DISABLED)
     sdlInitFlags |= SDL_INIT_AUDIO;
+#endif
     sdlInitFlags |= SDL_INIT_VIDEO;
     sdlInitFlags |= SDL_INIT_EVENTS;
+#if !defined(SDL_JOYSTICK_DISABLED)
     sdlInitFlags |= SDL_INIT_JOYSTICK;
+#endif
+#if !defined(SDL_HAPTIC_DISABLED)
     sdlInitFlags |= SDL_INIT_HAPTIC;
+#endif
     sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
 
     // Initialize SDL
