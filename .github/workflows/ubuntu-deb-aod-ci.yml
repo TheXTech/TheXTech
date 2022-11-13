@@ -56,7 +56,8 @@ jobs:
             hashdeep dpkg debconf lintian \
             && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh \
             && chmod uog+x cmake-3.15.4-Linux-x86_64.sh \
-            && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr",
+            && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr \
+            && git config --global --add safe.directory '*'",
 
             executable_name: "thextech-aod",
             generator: "Ninja",
@@ -103,7 +104,8 @@ jobs:
             libpng-dev:i386 libjpeg-dev:i386 hashdeep dpkg debconf lintian \
             && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh \
             && chmod uog+x cmake-3.15.4-Linux-x86_64.sh \
-            && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr",
+            && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr \
+            && git config --global --add safe.directory '*'",
 
             executable_name: "thextech-aod",
             generator: "Ninja",
