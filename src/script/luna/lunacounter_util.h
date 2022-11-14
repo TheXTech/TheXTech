@@ -39,7 +39,7 @@ inline size_t writeIntLE(FILE *openfile, int32_t inValue)
     return std::fwrite(out, 1, 4, openfile);
 }
 
- inline size_t readIntLE(FILE *openfile, int32_t &outValue)
+inline size_t readIntLE(FILE *openfile, int32_t &outValue)
 {
     uint8_t in[4];
     size_t ret = std::fread(in, 1, 4, openfile);
