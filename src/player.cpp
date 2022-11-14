@@ -5932,7 +5932,7 @@ void PlayerEffects(const int A)
                 p.Location.SpeedX = 0;
             }
 
-            D_pLogDebug("Warping: %g (same section? %s!)", leftToGoal, SectionCollision(p.Section, warp_exit) ? "yes" : "no");
+            // D_pLogDebug("Warping: %g (same section? %s!)", leftToGoal, SectionCollision(p.Section, warp_exit) ? "yes" : "no");
             switch(warp.transitEffect)
             {
             default:

@@ -121,7 +121,8 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     if(!m_tBuffer)
     {
         pLogWarning("Unable to create texture render buffer: %s", SDL_GetError());
-        pLogDebug("Continue without of render to texture");
+        pLogDebug("Continue without of render to texture. The ability to resize the window will be disabled.");
+        SDL_SetWindowResizable(window, SDL_FALSE);
         m_tBufferDisabled = true;
     }
 

@@ -267,6 +267,9 @@ int WindowSDL::setFullScreen(bool fs)
     if(!m_window)
         return -1;
 
+    if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_RESIZABLE) == 0)
+        return -1; // Can't switch fullscreen mode when window is not resizable
+
     if(fs != isFullScreen())
     {
         if(fs)
