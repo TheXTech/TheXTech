@@ -42,8 +42,10 @@ endif()
 if(APPLE)
     if(CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
         set(XTECH_PLIST_NAME "thextech.plist.tiger.in")
+        set(XTECH_DEFAULT_ICNS "resources/tiger/thextech.icns")
     else()
         set(XTECH_PLIST_NAME "thextech.plist.in")
+        set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
     endif()
 
     if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
@@ -356,7 +358,7 @@ endif()
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
     list(APPEND LIB_SRC
-        resources/thextech.icns
+        ${XTECH_DEFAULT_ICNS}
         ${PGE_FILE_ICONS}
     )
 endif()
@@ -604,7 +606,7 @@ if(APPLE)
         CPACK_BUNDLE_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE_INFO_STRING "TheXTech classic game engine"
     )
-    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/thextech.icns" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/${XTECH_DEFAULT_ICNS}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
     if(THEXTECH_CUSTOM_ICON_PATH AND NOT THEXTECH_CUSTOM_ICON_PATH STREQUAL "")
