@@ -630,6 +630,10 @@ if(APPLE)
         target_compile_definitions(thextech PRIVATE -DUSERDATA_ROOT_NAME="${THEXTECH_CUSTOM_USERDATA_DIR_NAME}")
     endif()
 
+    if(XTECH_MACOSX_TIGER) # Use X11 mode on Mac OS X Tiger
+        target_compile_definitions(thextech PRIVATE -DUSE_APPLE_X11)
+    endif()
+
     check_library_exists(iconv iconv_open "" HAVE_LIBICONV)
     if(HAVE_LIBICONV)
         target_link_libraries(A2XT_Int INTERFACE iconv)
