@@ -51,10 +51,6 @@ private:
     friend struct DeathRecord;
     static void InitStatsFile(FILE *openfile);
     static void WriteHeader(FILE *openfile);
-    static size_t writeIntLE(FILE *openfile, int32_t inValue);
-    static size_t readIntLE(FILE *openfile, int32_t &outValue);
-    static size_t writeIntLE(FILE *openfile, uint32_t inValue);
-    static size_t readIntLE(FILE *openfile, uint32_t &outValue);
     void WriteRecords(FILE *statsfile);
     void ReadRecords(FILE *openfile);
     void Save(FILE *openfile);
