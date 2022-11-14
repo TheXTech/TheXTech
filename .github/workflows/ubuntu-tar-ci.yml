@@ -6,6 +6,7 @@ on:
       - main
       - devel
       - versus-ci
+      - versus-ci-ubuntu
   pull_request:
     branches:
       - main
@@ -23,8 +24,31 @@ jobs:
             name: "TAR Ubuntu 16.04 x86_64",
             os: ubuntu-latest,
             container: "ubuntu:16.04",
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
-            deps_cmdline: "apt-get update -qq && apt-get install -qq sudo git p7zip-full wget ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh && chmod uog+x cmake-3.15.4-Linux-x86_64.sh && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr",
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DUSE_STATIC_LIBC=ON \
+            -DUSE_SYSTEM_LIBS=OFF \
+            -DUSE_SYSTEM_SDL2=OFF \
+            -DUSE_SHARED_FREEIMAGE=OFF \
+            -DPGE_SHARED_SDLMIXER=OFF",
+
+            deps_cmdline: "echo 'Ubuntu 16 x86_64' \
+            && apt-get update --fix-missing -qq \
+            && apt-get install -y software-properties-common \
+            && add-apt-repository -y \"ppa:git-core/ppa\" \
+            && apt-get update -qq \
+            && apt-get install -qq sudo git p7zip-full wget ninja-build lftp \
+            \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev \
+            libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev \
+            libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev \
+            libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev \
+            libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa \
+            libgles2-mesa-dev libmirclient-dev libproxy-dev \
+            && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh \
+            && chmod uog+x cmake-3.15.4-Linux-x86_64.sh \
+            && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr \
+            && git config --global --add safe.directory '*'",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
@@ -35,8 +59,34 @@ jobs:
             name: "TAR Ubuntu 16.04 32bit",
             os: ubuntu-latest,
             container: "ubuntu:16.04",
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_x32.cmake",
-            deps_cmdline: "dpkg --add-architecture i386 && apt-get update -qq && apt-get install -y sudo git p7zip-full wget ninja-build lftp gcc-multilib g++-multilib libc6-dev:i386 \"^libxcb.*:i386\" libx11-dev:i386 libx11-xcb-dev:i386 libgtk-3-dev:i386 libxcursor-dev:i386 libxrender-dev:i386 libxrandr-dev:i386 libxext-dev:i386 libxi-dev:i386 libxss-dev:i386 libxt-dev:i386 libxv-dev:i386 libxxf86vm-dev:i386 libxinerama-dev:i386 libxkbcommon-dev:i386 libfontconfig1-dev:i386 libasound2-dev:i386 libpulse-dev:i386 libdbus-1-dev:i386 udev mtdev-tools webp libudev-dev:i386 libwayland-dev:i386 libegl1-mesa-dev:i386 mesa-common-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 libgles2-mesa:i386 libgles2-mesa-dev:i386 libproxy-dev:i386 && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh && chmod uog+x cmake-3.15.4-Linux-x86_64.sh && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr",
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DUSE_STATIC_LIBC=ON \
+            -DUSE_SYSTEM_LIBS=OFF \
+            -DUSE_SYSTEM_SDL2=OFF \
+            -DUSE_SHARED_FREEIMAGE=OFF \
+            -DPGE_SHARED_SDLMIXER=OFF \
+            -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_linux_gcc_toolchain_x32.cmake",
+
+            deps_cmdline: "echo 'Ubuntu 16 x86_32' \
+            && apt-get update --fix-missing -qq \
+            && apt-get install -y software-properties-common \
+            && add-apt-repository -y \"ppa:git-core/ppa\" \
+            && dpkg --add-architecture i386 \
+            && apt-get update -qq \
+            && apt-get install -y sudo git p7zip-full wget ninja-build lftp gcc-multilib g++-multilib \
+            libc6-dev:i386 \"^libxcb.*:i386\" libx11-dev:i386 libx11-xcb-dev:i386 libgtk-3-dev:i386 \
+            libxcursor-dev:i386 libxrender-dev:i386 libxrandr-dev:i386 libxext-dev:i386 libxi-dev:i386 \
+            libxss-dev:i386 libxt-dev:i386 libxv-dev:i386 libxxf86vm-dev:i386 libxinerama-dev:i386 \
+            libxkbcommon-dev:i386 libfontconfig1-dev:i386 libasound2-dev:i386 libpulse-dev:i386 \
+            libdbus-1-dev:i386 udev mtdev-tools webp libudev-dev:i386 libwayland-dev:i386 \
+            libegl1-mesa-dev:i386 mesa-common-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 \
+            libgles2-mesa:i386 libgles2-mesa-dev:i386 libproxy-dev:i386 \
+            && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh \
+            && chmod uog+x cmake-3.15.4-Linux-x86_64.sh \
+            && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr \
+            && git config --global --add safe.directory '*'",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
@@ -47,8 +97,32 @@ jobs:
             name: "TAR Ubuntu 18.04 x86_64",
             os: ubuntu-latest,
             container: "ubuntu:18.04",
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
-            deps_cmdline: "apt-get update --fix-missing -qq && apt install -f -qq && apt-get install -qq sudo git p7zip-full ninja-build wget lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh && chmod uog+x cmake-3.15.4-Linux-x86_64.sh && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr && git config --global --add safe.directory '*'",
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DUSE_STATIC_LIBC=ON \
+            -DUSE_SYSTEM_LIBS=OFF \
+            -DUSE_SYSTEM_SDL2=OFF \
+            -DUSE_SHARED_FREEIMAGE=OFF \
+            -DPGE_SHARED_SDLMIXER=OFF",
+
+            deps_cmdline: "echo 'Ubuntu 18' \
+            && apt-get update --fix-missing -qq \
+            && apt-get install -y software-properties-common \
+            && add-apt-repository -y \"ppa:git-core/ppa\" \
+            && apt-get update --fix-missing -qq \
+            && apt-get install -f -qq \
+            && apt-get install -qq sudo git p7zip-full ninja-build wget lftp \
+            \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev \
+            libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev \
+            libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev \
+            libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev \
+            libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa \
+            libgles2-mesa-dev libmirclient-dev libproxy-dev \
+            && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh \
+            && chmod uog+x cmake-3.15.4-Linux-x86_64.sh \
+            && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr \
+            && git config --global --add safe.directory '*'",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
@@ -58,8 +132,23 @@ jobs:
         - {
             name: "TAR Ubuntu 20.04 x86_64",
             os: ubuntu-20.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DUSE_STATIC_LIBC=ON -DUSE_SYSTEM_LIBS=OFF -DUSE_SYSTEM_SDL2=OFF -DUSE_SHARED_FREEIMAGE=OFF -DPGE_SHARED_SDLMIXER=OFF",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build lftp \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev",
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DUSE_STATIC_LIBC=ON \
+            -DUSE_SYSTEM_LIBS=OFF \
+            -DUSE_SYSTEM_SDL2=OFF \
+            -DUSE_SHARED_FREEIMAGE=OFF \
+            -DPGE_SHARED_SDLMIXER=OFF",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build lftp \
+            \"^libxcb.*\" libx11-dev libx11-xcb-dev libgtk-3-dev libgegl-dev libxcursor-dev \
+            libxrender-dev libxrandr-dev libxext-dev libxi-dev libxss-dev libxt-dev libxv-dev \
+            libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev \
+            libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev \
+            libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa \
+            libgles2-mesa-dev libmirclient-dev libproxy-dev",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name_suffix: "",
@@ -68,15 +157,11 @@ jobs:
           }
 
     steps:
-    - uses: styfle/cancel-workflow-action@0.9.1
+    - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: ubuntu-tar-ci.yml
         all_but_latest: true
         access_token: ${{ github.token }}
-
-    - uses: actions/checkout@v1
-
-    - uses: nelonoel/branch-name@v1.0.1
 
     - name: Install Dependencies
       shell: bash
@@ -84,19 +169,27 @@ jobs:
         if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
           eval ${{ matrix.config.deps_cmdline }}
         fi
-        # Pull submodules
-        git submodule init
-        git submodule update
         cmake --version
 
+    - uses: actions/checkout@v3
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+    - name: Pull submodules
+      shell: bash
+      run: |
+        git submodule init
+        git submodule update
+
     - name: Download SMBX assets
-      uses: carlosperate/download-file-action@v1.0.3
+      uses: carlosperate/download-file-action@v2
       with:
         file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
         file-name: smbx13.7z
 
     - name: Download AoD assets
-      uses: carlosperate/download-file-action@v1.0.3
+      uses: carlosperate/download-file-action@v2
       with:
         file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
         file-name: aod.7z
@@ -179,14 +272,14 @@ jobs:
 
     - name: Upload artifact
       if: success() && runner.os == 'Linux'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.tar.gz
         name: TheXTech ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Upload artifact
       if: success() && runner.os == 'Windows'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.7z
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}

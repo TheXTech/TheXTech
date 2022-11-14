@@ -24,8 +24,16 @@ jobs:
         - {
             name: "Vita build",
             os: ubuntu-20.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake -DVITA_APP_NAME=\"TheXTech Vita\" -DVITA_TITLEID=\"THEXTECH0\" -DVITA_VERSION=\"01.05\"",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip",
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake \
+            -DVITA_APP_NAME=\"TheXTech Vita\" \
+            -DVITA_TITLEID=\"THEXTECH0\" \
+            -DVITA_VERSION=\"01.05\"",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip",
+
             generator: "Unix Makefiles",
             build_type: "MinSizeRel",
             executable_name: "thextech",
@@ -35,15 +43,11 @@ jobs:
           }
 
     steps:
-    - uses: styfle/cancel-workflow-action@0.9.1
+    - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: vita-ci.yml
         all_but_latest: true
         access_token: ${{ github.token }}
-
-    - uses: actions/checkout@v1
-
-    - uses: nelonoel/branch-name@v1.0.1
 
     - name: Install Dependencies
       shell: bash
@@ -51,9 +55,18 @@ jobs:
         if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
           eval ${{ matrix.config.deps_cmdline }}
         fi
-        # Pull submodules
+        cmake --version
+
+    - uses: actions/checkout@v3
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+    - name: Pull submodules
+      shell: bash
+      run: |
         git submodule init
-        git submodule update --recursive --remote
+        git submodule update
 
     - name: Install Vita SDK
       run: |
@@ -87,7 +100,7 @@ jobs:
 #        make install
 
 #    - name: Download assets
-#      uses: carlosperate/download-file-action@v1.0.3
+#      uses: carlosperate/download-file-action@v2
 #      with:
 #        file-url: "${{ matrix.config.assets_url }}"
 #        file-name: assets.7z
@@ -140,7 +153,7 @@ jobs:
 
     - name: Upload artifact
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}

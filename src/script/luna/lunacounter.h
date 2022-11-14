@@ -48,6 +48,7 @@ struct DeathCounter
     void PrintDebug() const;
 
 private:
+    friend struct DeathRecord;
     static void InitStatsFile(FILE *openfile);
     static void WriteHeader(FILE *openfile);
     void WriteRecords(FILE *statsfile);

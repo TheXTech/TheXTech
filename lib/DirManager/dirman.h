@@ -1,7 +1,7 @@
 /*
 DirMan - A small crossplatform class to manage directories
 
-Copyright (c) 2017 Vitaliy Novichkov <admin@wohlnet.ru>
+Copyright (c) 2017-2022 Vitaliy Novichkov <admin@wohlnet.ru>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the "Software"),

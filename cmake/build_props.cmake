@@ -5,6 +5,60 @@ if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     unset(APPLE)
 endif()
 
+if(APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
+    message("-- MacOS X 10.4 Tiger detected!")
+    set(XTECH_MACOSX_TIGER TRUE)
+endif()
+
+
+# ========================= Macros and Functions ==============================
+
+macro(xtech_add_warning_flag WARNINGFLAG WARNING_VAR)
+    check_c_compiler_flag("${WARNINGFLAG}" HAVE_W_C_${WARNING_VAR})
+    if(HAVE_W_C_${WARNING_VAR})
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNINGFLAG}")
+    endif()
+
+    check_cxx_compiler_flag("${WARNINGFLAG}" HAVE_W_CXX_${WARNING_VAR})
+    if(HAVE_W_CXX_${WARNING_VAR})
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNINGFLAG}")
+    endif()
+endmacro()
+
+macro(xtech_disable_warning_flag WARNINGFLAG WARNING_VAR)
+    check_c_compiler_flag("-W${WARNINGFLAG}" HAVE_W_C_${WARNING_VAR})
+    if(HAVE_W_C_${WARNING_VAR})
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-${WARNINGFLAG}")
+    endif()
+
+    check_cxx_compiler_flag("-W${WARNINGFLAG}" HAVE_W_CXX_${WARNING_VAR})
+    if(HAVE_W_CXX_${WARNING_VAR})
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-${WARNINGFLAG}")
+    endif()
+endmacro()
+
+function(pge_cxx_standard STDVER)
+    if(NOT WIN32)
+        set(CMAKE_CXX_STANDARD ${STDVER} PARENT_SCOPE)
+    elseif(MSVC AND CMAKE_VERSION VERSION_LESS "3.9.0" AND MSVC_VERSION GREATER_EQUAL "1900")
+        include(CheckCXXCompilerFlag)
+        CHECK_CXX_COMPILER_FLAG("/std:c++${STDVER}" _cpp_stdxx_flag_supported)
+        if (_cpp_stdxx_flag_supported)
+            add_compile_options("/std:c++${STDVER}")
+        else()
+            CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
+            if (_cpp_latest_flag_supported)
+                add_compile_options("/std:c++latest")
+            endif()
+        endif()
+    else()
+        set(CMAKE_CXX_STANDARD ${STDVER} PARENT_SCOPE)
+    endif()
+endfunction()
+
+
+# ============================ Optimisations ==================================
+
 # Strip garbage
 if(APPLE)
     string(REGEX REPLACE "-O3" ""
@@ -99,6 +153,9 @@ else()
     set(PGE_LIBS_DEBUG_SUFFIX "")
 endif()
 
+
+# ============================= Warnings ======================================
+
 if(MSVC)
     # Force to always compile with W4
     if(CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
@@ -120,43 +177,30 @@ if(MSVC)
         string(REGEX REPLACE "/showIncludes" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
     endif()
 
-elseif(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-    # Update if necessary
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -Wno-variadic-macros")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -Wno-variadic-macros")
-endif()
-
-# Disable bogus MSVC warnings
-if(MSVC)
+    # Disable bogus MSVC warnings
     add_definitions(-D_CRT_SECURE_NO_WARNINGS -D_CRT_NONSTDC_NO_WARNINGS)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4244 /wd4551 /wd4276 /wd6388")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4244 /wd4551 /wd4276 /wd6388")
+
+else()
+    xtech_add_warning_flag("-Wall" ALL)
+    xtech_add_warning_flag("-Wextra" EXTRA)
+    if(NOT HAVE_W_EXTRA)
+        xtech_add_warning_flag("-W" W)
+    endif()
+    xtech_add_warning_flag("-Wpedantic" PEDANTIC_WARNING)
+    xtech_disable_warning_flag("variadic-macros" NO_VARIADIC_MACROS_WARNING)
+    xtech_disable_warning_flag("psabi" NO_PSABI_WARNING)
 endif()
+
+
+# ================================ Tweaks ====================================
 
 # -fPIC thing
 if(LIBRARY_PROJECT AND NOT WIN32 AND NOT VITA)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
-
-function(pge_cxx_standard STDVER)
-    if(NOT WIN32)
-        set(CMAKE_CXX_STANDARD ${STDVER} PARENT_SCOPE)
-    elseif(MSVC AND CMAKE_VERSION VERSION_LESS "3.9.0" AND MSVC_VERSION GREATER_EQUAL "1900")
-        include(CheckCXXCompilerFlag)
-        CHECK_CXX_COMPILER_FLAG("/std:c++${STDVER}" _cpp_stdxx_flag_supported)
-        if (_cpp_stdxx_flag_supported)
-            add_compile_options("/std:c++${STDVER}")
-        else()
-            CHECK_CXX_COMPILER_FLAG("/std:c++latest" _cpp_latest_flag_supported)
-            if (_cpp_latest_flag_supported)
-                add_compile_options("/std:c++latest")
-            endif()
-        endif()
-    else()
-        set(CMAKE_CXX_STANDARD ${STDVER} PARENT_SCOPE)
-    endif()
-endfunction()
 
 if(UNIX) # When include/library/binary directory name is not usual in a system, make symbolic links for them
     if(NOT "${CMAKE_INSTALL_LIBDIR}" STREQUAL "lib")

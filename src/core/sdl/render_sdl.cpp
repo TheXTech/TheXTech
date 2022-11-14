@@ -70,7 +70,7 @@ unsigned int RenderSDL::SDL_InitFlags()
 
 bool RenderSDL::isWorking()
 {
-    return m_gRenderer && m_tBuffer;
+    return m_gRenderer && (m_tBuffer || m_tBufferDisabled);
 }
 
 bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
@@ -128,8 +128,10 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScaleWidth, ScaleHeight);
     if(!m_tBuffer)
     {
-        pLogCritical("Unable to create texture render buffer!");
-        return false;
+        pLogWarning("Unable to create texture render buffer: %s", SDL_GetError());
+        pLogDebug("Continue without of render to texture. The ability to resize the window will be disabled.");
+        SDL_SetWindowResizable(window, SDL_FALSE);
+        m_tBufferDisabled = true;
     }
 
     // Clean-up from a possible start-up junk
@@ -189,6 +191,19 @@ void RenderSDL::repaint()
 
     // Get the size of surface where to draw the scene
     SDL_GetRendererOutputSize(m_gRenderer, &w, &h);
+
+    if(m_tBufferDisabled) /* Render-to-texture is not supported, draw the scene on the screen */
+    {
+        Controls::RenderTouchControls();
+
+        /* WORKAROUND: Draw a transparent rectangle over entire screen to prevent the white scene glitch */
+        SDL_Rect aRect = {0, 0, w, h};
+        SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 0);
+        SDL_RenderFillRect(m_gRenderer, &aRect);
+
+        SDL_RenderPresent(m_gRenderer);
+        return;
+    }
 
     // Calculate the size difference factor
     wDst = int(m_scale_x * ScaleWidth);
@@ -423,7 +438,7 @@ void RenderSDL::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y
 
 void RenderSDL::setTargetTexture()
 {
-    if(m_recentTarget == m_tBuffer)
+    if(m_tBufferDisabled || m_recentTarget == m_tBuffer)
         return;
     SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
     m_recentTarget = m_tBuffer;
@@ -431,7 +446,7 @@ void RenderSDL::setTargetTexture()
 
 void RenderSDL::setTargetScreen()
 {
-    if(m_recentTarget == nullptr)
+    if(m_tBufferDisabled || m_recentTarget == nullptr)
         return;
     SDL_SetRenderTarget(m_gRenderer, nullptr);
     m_recentTarget = nullptr;

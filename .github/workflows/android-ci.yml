@@ -19,30 +19,26 @@ jobs:
     runs-on: ubuntu-latest
     name: Build release-apk
     steps:
-      - uses: styfle/cancel-workflow-action@0.9.1
+      - uses: styfle/cancel-workflow-action@0.11.0
         with:
           workflow_id: android-ci.yml
           all_but_latest: true
           access_token: ${{ github.token }}
 
-      - uses: actions/checkout@v2
-
-      - name: Set output
-        id: vars
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-              echo ::set-output name=short_ref::pull-request
-              echo "Is Pull-Request"
-          else
-              echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-              echo "Is normal build at the branch"
-          fi
-
       - name: Install Dependencies
         shell: bash
         run: |
-          sudo apt-get update -qq && sudo apt-get install -qq lftp
-          # Pull submodules
+          sudo apt-get update -qq
+          sudo apt-get install -qq lftp
+
+      - uses: actions/checkout@v3
+
+#      - uses: nelonoel/branch-name@v1.0.1
+      - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+      - name: Pull submodules
+        shell: bash
+        run: |
           git submodule init
           git submodule update
 
@@ -76,21 +72,35 @@ jobs:
       - name: Rename APK
         shell: bash
         run: |
-          mv thextech/build/outputs/apk/releaseci/thextech-releaseci.apk thextech-android-${{ steps.vars.outputs.short_ref }}.apk
+          if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+              BRANCH_NAME_RES="pull-request"
+              echo "-- Pull-request detected!"
+          else
+              BRANCH_NAME_RES=${BRANCH_NAME}
+          fi
+
+          mv thextech/build/outputs/apk/releaseci/thextech-releaseci.apk thextech-android-${BRANCH_NAME_RES}.apk
 
       - name: Upload APK
         if: success()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
-          name: thextech-android-${{ steps.vars.outputs.short_ref }}
-          path: android-project/thextech-android-${{ steps.vars.outputs.short_ref }}.apk
+          name: thextech-android-${BRANCH_NAME_RES}
+          path: android-project/thextech-android-*.apk
 
       - name: Deploy to builds.wohlsoft.ru
         if: success() && github.event_name != 'pull_request'
         shell: bash
         run: |
+          if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+              BRANCH_NAME_RES="pull-request"
+              echo "-- Pull-request detected!"
+          else
+              BRANCH_NAME_RES=${BRANCH_NAME}
+          fi
+
           UPLOAD_LIST="set ssl:verify-certificate no;"
-          UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${{ steps.vars.outputs.short_ref }}.apk;"
+          UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${BRANCH_NAME_RES}.apk;"
           lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
       - name: List Build Directory

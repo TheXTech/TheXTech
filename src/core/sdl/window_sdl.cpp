@@ -67,15 +67,21 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
     Uint32 sdlInitFlags = 0;
     // Prepare flags for SDL initialization
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) && !defined(SDL_TIMERS_DISABLED)
     sdlInitFlags |= SDL_INIT_TIMER;
 #endif
+#if !defined(SDL_AUDIO_DISABLED)
     sdlInitFlags |= SDL_INIT_AUDIO;
+#endif
     sdlInitFlags |= SDL_INIT_VIDEO;
     sdlInitFlags |= SDL_INIT_EVENTS;
+#if !defined(SDL_JOYSTICK_DISABLED)
     sdlInitFlags |= SDL_INIT_JOYSTICK;
-    sdlInitFlags |= SDL_INIT_HAPTIC;
     sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
+#endif
+#if !defined(SDL_HAPTIC_DISABLED)
+    sdlInitFlags |= SDL_INIT_HAPTIC;
+#endif
 
     // Initialize SDL
     res = (SDL_Init(sdlInitFlags) >= 0);
@@ -270,6 +276,9 @@ int WindowSDL::setFullScreen(bool fs)
 {
     if(!m_window)
         return -1;
+
+    if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_RESIZABLE) == 0)
+        return -1; // Can't switch fullscreen mode when window is not resizable
 
     if(fs != isFullScreen())
     {

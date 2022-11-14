@@ -23,8 +23,15 @@ jobs:
         - {
             name: "Adventures of Demo",
             os: ubuntu-20.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=advdemo -DTHEXTECH_GAME_NAME_TITLE=\"Adventures of Demo - Web Edition\" -DTHEXTECH_CREDITS_URL=\"wohlsoft.ru\" -DTHEXTECH_CREDITS_TITLE=\"Adventures of Demo\"",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp",
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=advdemo \
+            -DTHEXTECH_GAME_NAME_TITLE=\"Adventures of Demo - Web Edition\" \
+            -DTHEXTECH_CREDITS_URL=\"wohlsoft.ru\" \
+            -DTHEXTECH_CREDITS_TITLE=\"Adventures of Demo\"",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "advdemo",
@@ -39,8 +46,15 @@ jobs:
         - {
             name: "Super Mario Bros. X",
             os: ubuntu-20.04,
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=smbx -DTHEXTECH_GAME_NAME_TITLE=\"Super Mario Bros. X - Web Edition\" -DTHEXTECH_CREDITS_URL=\"www.SuperMarioBrosX.org\" -DTHEXTECH_CREDITS_TITLE=\"Super Mario Bros. X\"",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp",
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=smbx \
+            -DTHEXTECH_GAME_NAME_TITLE=\"Super Mario Bros. X - Web Edition\" \
+            -DTHEXTECH_CREDITS_URL=\"www.SuperMarioBrosX.org\" \
+            -DTHEXTECH_CREDITS_TITLE=\"Super Mario Bros. X\"",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "smbx",
@@ -51,26 +65,11 @@ jobs:
           }
 
     steps:
-    - uses: styfle/cancel-workflow-action@0.9.1
+    - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: emscripten-ci.yml
         all_but_latest: true
         access_token: ${{ github.token }}
-
-    - uses: actions/checkout@v1
-
-    - uses: nelonoel/branch-name@v1.0.1
-
-#    - name: Set output
-#      id: vars
-#      run: |
-#        if [[ "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "push" ]]; then
-#            echo ::set-output name=short_ref::pull-request
-#            echo "Is Pull-Request"
-#        else
-#            echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-#            echo "Is normal build at the branch"
-#        fi
 
     - name: Install Dependencies
       shell: bash
@@ -78,6 +77,16 @@ jobs:
         if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
           eval ${{ matrix.config.deps_cmdline }}
         fi
+        cmake --version
+
+    - uses: actions/checkout@v3
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+    - name: Pull submodules
+      shell: bash
+      run: |
         # Pull submodules
         git submodule init
         git submodule update
@@ -91,7 +100,7 @@ jobs:
         ./emsdk activate latest
 
     - name: Download assets
-      uses: carlosperate/download-file-action@v1.0.3
+      uses: carlosperate/download-file-action@v2
       with:
         file-url: "${{ matrix.config.assets_url }}"
         file-name: assets.7z
@@ -109,7 +118,10 @@ jobs:
       shell: bash
       run: |
         source ../emsdk/emsdk_env.sh
-        emcmake cmake -B build -G "${{ matrix.config.generator }}" -DENABLE_LOGGING=OFF -DENABLE_ANTICHEAT_TRAP=ON -DPGE_PRELOAD_ENVIRONMENT="`pwd`/assets" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+        emcmake cmake -B build -G "${{ matrix.config.generator }}" \
+            -DENABLE_LOGGING=OFF -DENABLE_ANTICHEAT_TRAP=ON \
+            -DPGE_PRELOAD_ENVIRONMENT="`pwd`/assets" \
+            -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
 
     - name: Build
       shell: bash
@@ -144,7 +156,7 @@ jobs:
 
     - name: Upload artifact
       if: success()
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         path: build/package/*.tar.gz
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
@@ -154,7 +166,7 @@ jobs:
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
-          export PATH=${{ matrix.config.extra_path }}:${PATH}
+            export PATH=${{ matrix.config.extra_path }}:${PATH}
         fi
         UPLOAD_LIST="set ssl:verify-certificate no;"
         for q in ./build/package/*.tar.gz; do
