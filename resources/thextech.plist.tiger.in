@@ -62,7 +62,7 @@
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
-	<string>${MACOSX_BUNDLE_EXECUTABLE_NAME}</string>
+	<string>@THEXTECH_EXECUTABLE_NAME_OUT@</string>
 	<key>CFBundleIconFile</key>
 	<string>${MACOSX_BUNDLE_ICON_FILE}</string>
 	<key>CFBundleName</key>
@@ -78,7 +78,7 @@
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.arcade-games</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.4</string>
+	<string>@THEXTECH_MACOS_MIN_VERSION@</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>NSPrincipalClass</key>
