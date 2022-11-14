@@ -24,8 +24,12 @@ jobs:
         config:
         - {
             name: "3DS build",
+
             extra_options: "-DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/3DS.cmake",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "thextech",
@@ -41,19 +45,24 @@ jobs:
         all_but_latest: true
         access_token: ${{ github.token }}
 
-    - uses: actions/checkout@v3
-
-    - uses: nelonoel/branch-name@v1.0.1
-
     - name: Install Dependencies
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
           eval ${{ matrix.config.deps_cmdline }}
         fi
-        # Pull submodules
+        cmake --version
+
+    - uses: actions/checkout@v3
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+    - name: Pull submodules
+      shell: bash
+      run: |
         git submodule init
-        git submodule update --recursive --remote
+        git submodule update
 
     - name: Configure
       shell: bash

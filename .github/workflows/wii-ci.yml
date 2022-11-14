@@ -24,8 +24,15 @@ jobs:
         config:
         - {
             name: "Wii build",
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wii",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip",
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake \
+            -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local \
+            -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wii",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "thextech",
@@ -41,19 +48,24 @@ jobs:
         all_but_latest: true
         access_token: ${{ github.token }}
 
-    - uses: actions/checkout@v3
-
-    - uses: nelonoel/branch-name@v1.0.1
-
     - name: Install Dependencies
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
           eval ${{ matrix.config.deps_cmdline }}
         fi
-        # Pull submodules
+        cmake --version
+
+    - uses: actions/checkout@v3
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+    - name: Pull submodules
+      shell: bash
+      run: |
         git submodule init
-        git submodule update --recursive --remote
+        git submodule update
 
     - name: Install modified SDL2
       run: |
