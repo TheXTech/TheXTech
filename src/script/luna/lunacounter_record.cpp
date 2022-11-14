@@ -19,7 +19,7 @@
  */
 
 #include "lunacounter_record.h"
-#include "lunacounter.h"
+#include "lunacounter_util.h"
 #include <Logger/logger.h>
 
 #include "core/sdl.h"
@@ -28,7 +28,7 @@ void DeathRecord::Save(FILE *openfile)
 {
     // Write character count
     auto tempint = (uint32_t)m_levelName.size();
-    DeathCounter::writeIntLE(openfile, tempint);
+    LunaCounterUtil::writeUIntLE(openfile, tempint);
 
     // Write string data
     int16_t nullt = 0;
@@ -36,7 +36,7 @@ void DeathRecord::Save(FILE *openfile)
     std::fwrite(&nullt, 1, sizeof(int16_t), openfile);
 
     // Write death count
-    DeathCounter::writeIntLE(openfile, m_deaths);
+    LunaCounterUtil::writeIntLE(openfile, m_deaths);
 }
 
 bool DeathRecord::Load(FILE *openfile)
@@ -49,7 +49,7 @@ bool DeathRecord::Load(FILE *openfile)
     uint32_t length;
     uint32_t skip = 0;
 
-    got = DeathCounter::readIntLE(openfile, length);
+    got = LunaCounterUtil::readUIntLE(openfile, length);
     if(got != sizeof(uint32_t))
     {
         pLogWarning("Demos counter Record: Failed to read the length of the level name");
@@ -77,7 +77,7 @@ bool DeathRecord::Load(FILE *openfile)
     std::fseek(openfile, 2, SEEK_CUR);
 
     // Read death count
-    got = DeathCounter::readIntLE(openfile, m_deaths);
+    got = LunaCounterUtil::readIntLE(openfile, m_deaths);
     if(got != sizeof(int32_t))
     {
         pLogWarning("Demos counter Record: Failed to read the counter value");
