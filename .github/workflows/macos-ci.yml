@@ -37,28 +37,12 @@ jobs:
         all_but_latest: true
         access_token: ${{ github.token }}
 
-    - uses: actions/checkout@v3
-
-    - name: Set output
-      id: vars
-      run: |
-        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo ::set-output name=short_ref::pull-request
-            echo "Is Pull-Request"
-        else
-            echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
-            echo "Is normal build at the branch"
-        fi
-
     - name: Install Dependencies
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
           eval ${{ matrix.config.deps_cmdline }}
         fi
-        # Pull submodules
-        git submodule init
-        git submodule update
 
     - name: CI Server's network meta-info
       shell: bash
@@ -67,6 +51,17 @@ jobs:
         wget -q -O - ipinfo.io/ip
         printf "\n"
         wget -d ipinfo.io/ip -O/dev/null 2>&1 |grep ^User-Agent
+
+    - uses: actions/checkout@v3
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+    - name: Pull submodules
+      shell: bash
+      run: |
+        git submodule init
+        git submodule update
 
 #    - name: Download SMBX assets
 #      shell: bash
@@ -161,23 +156,30 @@ jobs:
       if: success()
       shell: bash
       run: |
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+            BRANCH_NAME_RES="pull-request"
+            echo "-- Pull-request detected!"
+        else
+            BRANCH_NAME_RES=${BRANCH_NAME}
+        fi
+
         bash .github/ci-helper/pack-game-macos.sh \
             aod \
             "assets/graphics/ui/icon/advdemo.icns" \
             "Adventures of Demo" \
-            "thextech-adventures-of-demo-macos-uni-${{ steps.vars.outputs.short_ref }}.dmg"
+            "thextech-adventures-of-demo-macos-uni-${BRANCH_NAME_RES}.dmg"
 
         bash .github/ci-helper/pack-game-macos.sh \
             smbx13 \
             "assets/graphics/ui/icon/smbx.icns" \
             "Super Mario Bros. X" \
-            "thextech-super-mario-bros-x-macos-uni-${{ steps.vars.outputs.short_ref }}.dmg"
+            "thextech-super-mario-bros-x-macos-uni-${BRANCH_NAME_RES}.dmg"
 
         bash .github/ci-helper/pack-game-macos.sh \
             none \
             "thextech.icns" \
             "TheXTech" \
-            "thextech-macos-uni-${{ steps.vars.outputs.short_ref }}.zip"
+            "thextech-macos-uni-${BRANCH_NAME_RES}.zip"
 
     - name: Upload DMG artifact
       if: success()

@@ -179,7 +179,6 @@ jobs:
     - name: Pull submodules
       shell: bash
       run: |
-        # Pull submodules
         git submodule init
         git submodule update
 
