@@ -1,0 +1,35 @@
+#!/bin/sh
+
+number=$(ps aux | grep -v grep | grep -ci X11)
+
+if [ $number -le 0 ]; then
+    hadHomeInit=false
+
+    if [ -f ~/.xinitrc ]; then
+        F=`mktemp -t ~/.xinitrc-XXXX`
+        cp -f ~/.xinitrc $F
+        hadHomeInit=true
+    else
+        F=/etc/X11/xinit/xinitrc
+        cp -f $F ~/.xinitrc
+    fi
+
+    sed -ie 's/^ *xterm/#xterm/' ~/.xinitrc
+
+    open /Applications/Utilities/X11.app
+
+    sleep 4
+
+    if $hadHomeInit ; then
+        mv -f $F ~/.xinitrc
+    else
+        rm -f ~/.xinitrc
+    fi
+fi
+
+SCRIPTPATH=`dirname "$0"`
+cd $SCRIPTPATH
+
+./@THEXTECH_BUNDLE_NAME@ &
+
+exit 0
