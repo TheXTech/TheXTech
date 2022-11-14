@@ -22,6 +22,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+#include <cstddef>
 #include <vector>
 #include <deque>
 #include <cmath>

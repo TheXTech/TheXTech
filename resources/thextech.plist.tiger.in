@@ -78,7 +78,7 @@
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.arcade-games</string>
 	<key>LSMinimumSystemVersion</key>
-	<string>10.7</string>
+	<string>10.4</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>NSPrincipalClass</key>

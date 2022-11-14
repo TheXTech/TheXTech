@@ -153,6 +153,12 @@ int main(int argc, char**argv)
     CmdLineSetup_t setup;
     FrmMain frmMain;
 
+#if defined(__APPLE__) && defined(USE_APPLE_X11)
+    char *x11_display_env = getenv("DISPLAY");
+    if(!x11_display_env || x11_display_env[0] == '\0')
+        setenv("DISPLAY", ":0", 1); // Automatically set the display to :0 if not defined
+#endif
+
 #if !defined(VITA) && !defined(PGE_MIN_PORT)
     CrashHandler::initSigs();
 #endif

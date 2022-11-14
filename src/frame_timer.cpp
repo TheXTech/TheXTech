@@ -463,6 +463,11 @@ static inline void computeFrameTime2Real_2()
         if(sleepTime > s_overhead)
         {
             nanotime_t adjustedSleepTime = sleepTime - s_overhead;
+            if(adjustedSleepTime > 500000000)
+            {
+                pLogWarning("frame_timer: Adjusted sleep time got a too big value: %ld", (long)adjustedSleepTime);
+                adjustedSleepTime = 500000000;
+            }
             xtech_nanosleep(adjustedSleepTime);
             auto e = getElapsedTime(start);
             nanotime_t overslept = e - adjustedSleepTime;

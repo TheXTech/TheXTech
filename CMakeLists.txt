@@ -34,16 +34,36 @@ set(CMAKE_POSITION_INDEPENDENT_CODE FALSE)
 
 set(CMAKE_INSTALL_RPATH ".")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 if(EMSCRIPTEN)
     set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 endif()
 
-set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11")
+if(APPLE)
+    if(CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
+        set(XTECH_PLIST_NAME "thextech.plist.tiger.in")
+        set(XTECH_DEFAULT_ICNS "resources/tiger/thextech.icns")
+    else()
+        set(XTECH_PLIST_NAME "thextech.plist.in")
+        set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
+    endif()
+
+    if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
+        if(CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
+            set(CMAKE_OSX_DEPLOYMENT_TARGET "10.4")
+        else()
+            set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11")
+        endif()
+    endif()
+    message("-> Mac OS X Deployment target version: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+endif()
+
 if(ANDROID)
     set(DEPENDENCIES_INSTALL_DIR ${CMAKE_BINARY_DIR}/output-deps)
 else()
     set(DEPENDENCIES_INSTALL_DIR ${CMAKE_BINARY_DIR}/output)
 endif()
+
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/output/bin)
@@ -110,7 +130,7 @@ endif()
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII)
+if(HAIKU OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR XTECH_MACOSX_TIGER)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
@@ -374,7 +394,7 @@ endif()
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
     list(APPEND LIB_SRC
-        resources/thextech.icns
+        ${XTECH_DEFAULT_ICNS}
         ${PGE_FILE_ICONS}
     )
 endif()
@@ -675,7 +695,7 @@ if(APPLE)
     set_target_properties(thextech PROPERTIES
         OUTPUT_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/thextech.plist.in"
+        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/${XTECH_PLIST_NAME}"
         MACOSX_BUNDLE_EXECUTABLE_NAME "${THEXTECH_EXECUTABLE_NAME}"
         MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.thextech"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${THEXTECH_VERSION_STRING}"
@@ -684,7 +704,7 @@ if(APPLE)
         CPACK_BUNDLE_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE_INFO_STRING "TheXTech classic game engine"
     )
-    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/resources/thextech.icns" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/${XTECH_DEFAULT_ICNS}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
     if(THEXTECH_CUSTOM_ICON_PATH AND NOT THEXTECH_CUSTOM_ICON_PATH STREQUAL "")
@@ -706,6 +726,10 @@ if(APPLE)
 
     if(THEXTECH_CUSTOM_USERDATA_DIR_NAME AND NOT THEXTECH_CUSTOM_USERDATA_DIR_NAME STREQUAL "")
         target_compile_definitions(thextech PRIVATE -DUSERDATA_ROOT_NAME="${THEXTECH_CUSTOM_USERDATA_DIR_NAME}")
+    endif()
+
+    if(XTECH_MACOSX_TIGER) # Use X11 mode on Mac OS X Tiger
+        target_compile_definitions(thextech PRIVATE -DUSE_APPLE_X11)
     endif()
 
     check_library_exists(iconv iconv_open "" HAVE_LIBICONV)

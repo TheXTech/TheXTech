@@ -24,8 +24,15 @@ jobs:
         config:
         - {
             name: "Switch build",
-            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Switch.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/switch",
-            deps_cmdline: "sudo apt-get update -qq && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip apt-transport-https",
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Switch.cmake \
+            -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/switch-local \
+            -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/switch",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip apt-transport-https",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             executable_name: "thextech",
@@ -41,19 +48,24 @@ jobs:
         all_but_latest: true
         access_token: ${{ github.token }}
 
-    - uses: actions/checkout@v3
-
-    - uses: nelonoel/branch-name@v1.0.1
-
     - name: Install Dependencies
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
           eval ${{ matrix.config.deps_cmdline }}
         fi
-        # Pull submodules
+        cmake --version
+
+    - uses: actions/checkout@v3
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+    - name: Pull submodules
+      shell: bash
+      run: |
         git submodule init
-        git submodule update --recursive --remote
+        git submodule update
 
 #    - name: Install Devkit Pro
 #      run: |

@@ -19,6 +19,7 @@
  */
 
 #include "lunacounter_record.h"
+#include "lunacounter.h"
 #include <Logger/logger.h>
 
 #include "core/sdl.h"
@@ -27,9 +28,7 @@ void DeathRecord::Save(FILE *openfile)
 {
     // Write character count
     auto tempint = (uint32_t)m_levelName.size();
-
-    tempint = SDL_SwapLE32(tempint);
-    std::fwrite(&tempint, 1, sizeof(uint32_t), openfile);
+    DeathCounter::writeIntLE(openfile, tempint);
 
     // Write string data
     int16_t nullt = 0;
@@ -37,14 +36,11 @@ void DeathRecord::Save(FILE *openfile)
     std::fwrite(&nullt, 1, sizeof(int16_t), openfile);
 
     // Write death count
-    int32_t tempsint = SDL_SwapLE32(m_deaths);
-    std::fwrite(&tempsint, 1, sizeof(int32_t), openfile);
+    DeathCounter::writeIntLE(openfile, m_deaths);
 }
 
 bool DeathRecord::Load(FILE *openfile)
 {
-    uint32_t tempint;
-    int32_t tempsint;
     size_t got;
     char buf[151];
     SDL_memset(buf, 0, 151);
@@ -53,14 +49,12 @@ bool DeathRecord::Load(FILE *openfile)
     uint32_t length;
     uint32_t skip = 0;
 
-    got = std::fread(&tempint, 1, sizeof(uint32_t), openfile);
+    got = DeathCounter::readIntLE(openfile, length);
     if(got != sizeof(uint32_t))
     {
         pLogWarning("Demos counter Record: Failed to read the length of the level name");
         return false;
     }
-
-    length = SDL_SwapLE32(tempint);
 
     if(length > 150)
     {
@@ -83,14 +77,12 @@ bool DeathRecord::Load(FILE *openfile)
     std::fseek(openfile, 2, SEEK_CUR);
 
     // Read death count
-    got = std::fread(&tempsint, 1, sizeof(int32_t), openfile);
+    got = DeathCounter::readIntLE(openfile, m_deaths);
     if(got != sizeof(int32_t))
     {
         pLogWarning("Demos counter Record: Failed to read the counter value");
         return false;
     }
-
-    m_deaths = SDL_SwapLE32(tempsint);
 
     return true;
 }

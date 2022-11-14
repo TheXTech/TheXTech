@@ -26,51 +26,63 @@
 #include "app_path_macos_dirs.h"
 
 char * getAppSupportDir(void)
-{ @autoreleasepool
 {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     char *retval = NULL;
+    NSString *str;
+    const char *base;
 
     NSArray *array = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES);
 
-    if ([array count] > 0)
-    {  /* we only want the first item in the list. */
-        NSString *str = [array objectAtIndex:0];
-        const char *base = [str fileSystemRepresentation];
-        if (base) {
+    if([array count] > 0) /* we only want the first item in the list. */
+    {
+        str = [array objectAtIndex:0];
+        base = [str fileSystemRepresentation];
+
+        if(base)
+        {
             const size_t len = SDL_strlen(base) + 4;
             retval = (char *)SDL_malloc(len);
-            if (retval == NULL) {
+
+            if(retval == NULL)
                 SDL_OutOfMemory();
-            } else {
+            else
                 SDL_snprintf(retval, len, "%s", base);
-            }
         }
     }
 
+    [pool drain];
     return retval;
-}}
+}
 
 char * getScreenCaptureDir(void)
-{ @autoreleasepool
 {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     char *retval = NULL;
+    NSUserDefaults *appUserDefaults;
+    NSDictionary *prefsDict;
+    NSString *str;
+    const char *base;
 
-    // Get current screencapture location
-    NSUserDefaults *appUserDefaults = [[NSUserDefaults alloc] init];
-        [appUserDefaults addSuiteNamed:@"com.apple.screencapture"];
-    NSDictionary *prefsDict = [appUserDefaults dictionaryRepresentation];
+    /* Get current screencapture location */
+    appUserDefaults = [[NSUserDefaults alloc] init];
+    [appUserDefaults addSuiteNamed:@"com.apple.screencapture"];
+    prefsDict = [appUserDefaults dictionaryRepresentation];
 
-    NSString *str = [prefsDict valueForKey:@"location"];
-    const char *base = [str fileSystemRepresentation];
-    if (base) {
+    str = [prefsDict valueForKey:@"location"];
+    base = [str fileSystemRepresentation];
+
+    if(base)
+    {
         const size_t len = SDL_strlen(base) + 4;
         retval = (char *)SDL_malloc(len);
-        if (retval == NULL) {
+
+        if(retval == NULL)
             SDL_OutOfMemory();
-        } else {
+        else
             SDL_snprintf(retval, len, "%s", base);
-        }
     }
 
+    [pool drain];
     return retval;
-}}
+}

@@ -36,6 +36,7 @@
 #include "sorting.h"
 #include "layers.h"
 #include "compat.h"
+#include "editor.h"
 
 #include "main/trees.h"
 
@@ -2165,6 +2166,14 @@ void PSwitch(bool enabled)
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
+
+                    if(NPCFrame[nn.Type] > 0)
+                    {
+                        nn.Direction = 1;
+                        nn.Frame = EditorNPCFrame(nn.Type, nn.Direction);
+                        nn.DefaultDirection = nn.Direction;
+                    }
+
                     syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                 }
@@ -2284,6 +2293,14 @@ void PSwitch(bool enabled)
                     nn.Location.X += (Block[A].Location.Width - nn.Location.Width) / 2.0;
                     nn.DefaultLocation = nn.Location;
                     nn.DefaultType = nn.Type;
+
+                    if(NPCFrame[nn.Type] > 0)
+                    {
+                        nn.Direction = 1;
+                        nn.Frame = EditorNPCFrame(nn.Type, nn.Direction);
+                        nn.DefaultDirection = nn.Direction;
+                    }
+
                     syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
                     nn.Killed = 0;

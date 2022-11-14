@@ -147,7 +147,7 @@ bool DeathCounter::TryLoadStats()
 //    }
 
     // Check version
-    got = std::fread(&tempint, 1, sizeof(int32_t), statsfile);
+    got = readIntLE(statsfile, tempint);
     if(got != sizeof(int32_t))
     {
         pLogWarning("Demos counter: Failed to read version numbe at the %s file", counterFile.c_str());
@@ -155,8 +155,6 @@ bool DeathCounter::TryLoadStats()
         mEnabled = false;
         return false;
     }
-
-    tempint = SDL_SwapLE32(tempint);
 
     if(tempint < 5)
     {
@@ -181,8 +179,6 @@ bool DeathCounter::TryLoadStats()
 // UPDATE DEATHS - Determine if the main player has died and update death counter state if so
 void DeathCounter::UpdateDeaths(bool write_save)
 {
-    std::wstring debuginfo(L"UpdateDeaths");
-
     Player_t *demo = PlayerF::Get(1);
     if(!demo)
         return;
@@ -231,11 +227,9 @@ void DeathCounter::InitStatsFile(FILE *statsfile)
 // WRITE HEADER - Write the death counter file header at beginning of file
 void DeathCounter::WriteHeader(FILE *statsfile)
 {
-    int32_t writeint = SDL_SwapLE32(LUNA_VERSION);
-
     // Write dll version
     std::fseek(statsfile, 0, SEEK_SET);
-    std::fwrite(&writeint, 1, sizeof(writeint), statsfile);
+    writeIntLE(statsfile, LUNA_VERSION);
 
     // Init reserved
     uint8_t writebyte = 0;
@@ -247,10 +241,61 @@ void DeathCounter::WriteHeader(FILE *statsfile)
     }
 
     // Write record count at 100 bytes (0 record count)
-    writeint = 0;
-    std::fwrite(&writeint, 1, sizeof(writeint), statsfile);
+    writeIntLE(statsfile, 0);
 }
 
+size_t DeathCounter::writeIntLE(FILE *openfile, int32_t inValue)
+{
+    uint8_t out[4];
+    out[0] = 0xFF & (static_cast<uint32_t>(inValue) >> 0);
+    out[1] = 0xFF & (static_cast<uint32_t>(inValue) >> 8);
+    out[2] = 0xFF & (static_cast<uint32_t>(inValue) >> 16);
+    out[3] = 0xFF & (static_cast<uint32_t>(inValue) >> 24);
+    return std::fwrite(out, 1, 4, openfile);
+}
+
+size_t DeathCounter::readIntLE(FILE *openfile, int32_t &outValue)
+{
+    uint8_t in[4];
+    size_t ret = std::fread(in, 1, 4, openfile);
+
+    if(ret != 4)
+        return ret;
+
+    outValue = (int32_t)
+               ((static_cast<uint32_t>(in[0]) << 0) & 0x000000FF)
+             | ((static_cast<uint32_t>(in[1]) << 8) & 0x0000FF00)
+             | ((static_cast<uint32_t>(in[2]) << 16) & 0x00FF0000)
+             | ((static_cast<uint32_t>(in[3]) << 24) & 0xFF000000);
+
+    return ret;
+}
+
+size_t DeathCounter::writeIntLE(FILE *openfile, uint32_t inValue)
+{
+    uint8_t out[4];
+    out[0] = 0xFF & (inValue >> 0);
+    out[1] = 0xFF & (inValue >> 8);
+    out[2] = 0xFF & (inValue >> 16);
+    out[3] = 0xFF & (inValue >> 24);
+    return std::fwrite(out, 1, 4, openfile);
+}
+
+size_t DeathCounter::readIntLE(FILE *openfile, uint32_t &outValue)
+{
+    uint8_t in[4];
+    size_t ret = std::fread(in, 1, 4, openfile);
+
+    if(ret != 4)
+        return ret;
+
+    outValue = ((static_cast<uint32_t>(in[0]) << 0) & 0x000000FF)
+             | ((static_cast<uint32_t>(in[1]) << 8) & 0x0000FF00)
+             | ((static_cast<uint32_t>(in[2]) << 16) & 0x00FF0000)
+             | ((static_cast<uint32_t>(in[3]) << 24) & 0xFF000000);
+
+    return ret;
+}
 
 // READ RECORDS - Add death records from file into death record list
 void DeathCounter::ReadRecords(FILE *statsfile)
@@ -260,7 +305,7 @@ void DeathCounter::ReadRecords(FILE *statsfile)
 
     // Read the record count at 100 bytes
     std::fseek(statsfile, 100, SEEK_SET);
-    got = std::fread(&tempint, 1, sizeof(tempint), statsfile);
+    got = readIntLE(statsfile, tempint);
 
     if(got != sizeof(tempint))
     {
@@ -270,8 +315,6 @@ void DeathCounter::ReadRecords(FILE *statsfile)
 
     if(tempint == 0)
         return;
-
-    tempint = SDL_SwapLE32(tempint);
 
     for(int i = 0; i < tempint; i++)
     {
@@ -285,9 +328,9 @@ void DeathCounter::ReadRecords(FILE *statsfile)
 // WRITE RECORDS - Writes death record count at pos 100 in the file followed by each record
 void DeathCounter::WriteRecords(FILE *statsfile)
 {
-    int32_t reccount = SDL_SwapLE32((int32_t)mDeathRecords.size());
+    int32_t reccount = (int32_t)mDeathRecords.size();
     std::fseek(statsfile, 100, SEEK_SET);
-    std::fwrite(&reccount, 1, sizeof(reccount), statsfile);
+    writeIntLE(statsfile, reccount);
 
     // Write each record, if any exist
     if(!mDeathRecords.empty())
