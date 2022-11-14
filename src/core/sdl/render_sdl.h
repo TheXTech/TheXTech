@@ -38,6 +38,7 @@ class RenderSDL final : public AbstractRender_t
 
     SDL_Renderer *m_gRenderer = nullptr;
     SDL_Texture  *m_tBuffer = nullptr;
+    bool          m_tBufferDisabled = false;
     SDL_Texture  *m_recentTarget = nullptr;
     std::set<SDL_Texture *> m_textureBank;
 

@@ -32,4 +32,4 @@ char * getScreenCaptureDir(void);
 }
 #endif
 
-#endif // APP_PATH_MACOSX_H
+#endif /* APP_PATH_MACOSX_H */

@@ -22,7 +22,11 @@ jobs:
         - {
             name: "Windows - 64-bit",
             os: windows-latest,
-            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw64 -DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x64.cmake",
+
+            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw64 \
+            -DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x64.cmake",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             extra_path: "/c/WohlMinGWw64/mingw64/bin",
@@ -36,7 +40,11 @@ jobs:
         - {
             name: "Windows - 32-bit",
             os: windows-latest,
-            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw32 -DTHEXTECH_EXECUTABLE_NAME=thextech -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x32.cmake",
+
+            extra_options: "-DCMAKE_PREFIX_PATH=C:/WohlMinGWw64/mingw32 \
+            -DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DCMAKE_TOOLCHAIN_FILE=`pwd`/cmake/ci_windows_mingw_toolchain_x32.cmake",
+
             generator: "Ninja",
             build_type: "MinSizeRel",
             extra_path: "/c/WohlMinGWw64/mingw32/bin",
@@ -68,20 +76,24 @@ jobs:
         all_but_latest: true
         access_token: ${{ github.token }}
 
-    - uses: actions/checkout@v3
-
-    - uses: nelonoel/branch-name@v1.0.1
-
     - name: Install Dependencies
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
           eval ${{ matrix.config.deps_cmdline }}
         fi
-        # Pull submodules
+        cmake --version
+
+    - uses: actions/checkout@v3
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+    - name: Pull submodules
+      shell: bash
+      run: |
         git submodule init
         git submodule update
-        cmake --version
 
     - name: Download MinGW
       if: matrix.config.mingw_download

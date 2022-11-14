@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_endian.h>
 #include <Utils/files.h>
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
 
 #include "luna.h"
 #include "lunacounter.h"
+#include "lunacounter_util.h"
 #include "lunaplayer.h"
 #include "lunarender.h"
 #include "renderop_string.h"
@@ -146,7 +146,7 @@ bool DeathCounter::TryLoadStats()
 //    }
 
     // Check version
-    got = std::fread(&tempint, 1, sizeof(int32_t), statsfile);
+    got = LunaCounterUtil::readIntLE(statsfile, tempint);
     if(got != sizeof(int32_t))
     {
         pLogWarning("Demos counter: Failed to read version numbe at the %s file", counterFile.c_str());
@@ -154,8 +154,6 @@ bool DeathCounter::TryLoadStats()
         mEnabled = false;
         return false;
     }
-
-    tempint = SDL_SwapLE32(tempint);
 
     if(tempint < 5)
     {
@@ -180,8 +178,6 @@ bool DeathCounter::TryLoadStats()
 // UPDATE DEATHS - Determine if the main player has died and update death counter state if so
 void DeathCounter::UpdateDeaths(bool write_save)
 {
-    std::wstring debuginfo(L"UpdateDeaths");
-
     Player_t *demo = PlayerF::Get(1);
     if(!demo)
         return;
@@ -230,11 +226,9 @@ void DeathCounter::InitStatsFile(FILE *statsfile)
 // WRITE HEADER - Write the death counter file header at beginning of file
 void DeathCounter::WriteHeader(FILE *statsfile)
 {
-    int32_t writeint = SDL_SwapLE32(LUNA_VERSION);
-
     // Write dll version
     std::fseek(statsfile, 0, SEEK_SET);
-    std::fwrite(&writeint, 1, sizeof(writeint), statsfile);
+    LunaCounterUtil::writeIntLE(statsfile, LUNA_VERSION);
 
     // Init reserved
     uint8_t writebyte = 0;
@@ -246,10 +240,8 @@ void DeathCounter::WriteHeader(FILE *statsfile)
     }
 
     // Write record count at 100 bytes (0 record count)
-    writeint = 0;
-    std::fwrite(&writeint, 1, sizeof(writeint), statsfile);
+    LunaCounterUtil::writeIntLE(statsfile, 0);
 }
-
 
 // READ RECORDS - Add death records from file into death record list
 void DeathCounter::ReadRecords(FILE *statsfile)
@@ -259,7 +251,7 @@ void DeathCounter::ReadRecords(FILE *statsfile)
 
     // Read the record count at 100 bytes
     std::fseek(statsfile, 100, SEEK_SET);
-    got = std::fread(&tempint, 1, sizeof(tempint), statsfile);
+    got = LunaCounterUtil::readIntLE(statsfile, tempint);
 
     if(got != sizeof(tempint))
     {
@@ -269,8 +261,6 @@ void DeathCounter::ReadRecords(FILE *statsfile)
 
     if(tempint == 0)
         return;
-
-    tempint = SDL_SwapLE32(tempint);
 
     for(int i = 0; i < tempint; i++)
     {
@@ -284,9 +274,9 @@ void DeathCounter::ReadRecords(FILE *statsfile)
 // WRITE RECORDS - Writes death record count at pos 100 in the file followed by each record
 void DeathCounter::WriteRecords(FILE *statsfile)
 {
-    int32_t reccount = SDL_SwapLE32((int32_t)mDeathRecords.size());
+    int32_t reccount = (int32_t)mDeathRecords.size();
     std::fseek(statsfile, 100, SEEK_SET);
-    std::fwrite(&reccount, 1, sizeof(reccount), statsfile);
+    LunaCounterUtil::writeIntLE(statsfile, reccount);
 
     // Write each record, if any exist
     if(!mDeathRecords.empty())
