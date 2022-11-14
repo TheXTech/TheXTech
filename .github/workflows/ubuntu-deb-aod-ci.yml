@@ -35,7 +35,8 @@ jobs:
             -DDESKTOP_COMMENT=\"An unofficial A2XT spin-off game\" \
             -DTHEXTECH_EXECUTABLE_NAME=\"thextech-aod\" \
             -DTHEXTECH_PACKAGE_NAME=\"thextech-aod\" \
-            -DCPACK_GENERATOR=DEB DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
+            -DCPACK_GENERATOR=DEB \
+            -DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
             -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
             -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64 \
             -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"\" \
@@ -81,7 +82,8 @@ jobs:
             -DDESKTOP_COMMENT=\"An unofficial A2XT spin-off game\" \
             -DTHEXTECH_EXECUTABLE_NAME=\"thextech-aod\" \
             -DTHEXTECH_PACKAGE_NAME=\"thextech-aod\" \
-            -DCPACK_GENERATOR=DEB DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
+            -DCPACK_GENERATOR=DEB \
+            -DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
             -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
             -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=i386 -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"\" \
             -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"The adventure of Demo, an armless cycloptic demon, and her friends. This game is a spin-off from the A2XT universe by Talkhaus.\" \
@@ -119,7 +121,22 @@ jobs:
             os: ubuntu-latest,
             container: "ubuntu:18.04",
 
-            extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/aod -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/aod\" -DTHEXTECH_USER_DIR_NAME=\".thextech-aod\" -DDESKTOP_NAME=\"Adventures of Demo\" -DDESKTOP_GENERIC_NAME=\"Adventures of Demo\" -DDESKTOP_COMMENT=\"An unofficial A2XT spin-off game\" -DTHEXTECH_EXECUTABLE_NAME=\"thextech-aod\" -DTHEXTECH_PACKAGE_NAME=\"thextech-aod\" -DCPACK_GENERATOR=DEB DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64 -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libsdl2-2.0-0\" -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"The adventure of Demo, an armless cycloptic demon, and her friends. This game is a spin-off from the A2XT universe by Talkhaus.\"",
+            extra_options: "-DPGE_SHARED_SDLMIXER=OFF -DUSE_SYSTEM_SDL2=ON -DUSE_FREEIMAGE_SYSTEM_LIBS=ON \
+            -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=MinSizeRel \
+            -DTHEXTECH_FIXED_ASSETS_PATH=/usr/share/games/aod \
+            -DTHEXTECH_SOURCE_ASSETS_PATH=\"${GITHUB_WORKSPACE}/aod\" \
+            -DTHEXTECH_USER_DIR_NAME=\".thextech-aod\" \
+            -DDESKTOP_NAME=\"Adventures of Demo\" \
+            -DDESKTOP_GENERIC_NAME=\"Adventures of Demo\" \
+            -DDESKTOP_COMMENT=\"An unofficial A2XT spin-off game\" \
+            -DTHEXTECH_EXECUTABLE_NAME=\"thextech-aod\" \
+            -DTHEXTECH_PACKAGE_NAME=\"thextech-aod\" \
+            -DCPACK_GENERATOR=DEB \
+            -DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
+            -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
+            -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64 \
+            -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libsdl2-2.0-0\" \
+            -DCPACK_DEBIAN_PACKAGE_DESCRIPTION=\"The adventure of Demo, an armless cycloptic demon, and her friends. This game is a spin-off from the A2XT universe by Talkhaus.\"",
 
             deps_cmdline: "echo 'Ubuntu 18' \
             && apt-get update --fix-missing -qq \
@@ -161,7 +178,8 @@ jobs:
             -DDESKTOP_COMMENT=\"An unofficial A2XT spin-off game\" \
             -DTHEXTECH_EXECUTABLE_NAME=\"thextech-aod\" \
             -DTHEXTECH_PACKAGE_NAME=\"thextech-aod\" \
-            -DCPACK_GENERATOR=DEB DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
+            -DCPACK_GENERATOR=DEB \
+            -DCPACK_DEBIAN_PACKAGE_HOMEPAGE=\"https://wohlsoft.ru\" \
             -DCPACK_DEBIAN_PACKAGE_RELEASE=${GITHUB_RUN_NUMBER} \
             -DCPACK_DEBIAN_PACKAGE_ARCHITECTURE=amd64 \
             -DCPACK_DEBIAN_PACKAGE_DEPENDS=\"libsdl2-2.0-0\" \
