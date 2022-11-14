@@ -46,7 +46,8 @@ jobs:
             libgles2-mesa-dev libmirclient-dev libproxy-dev \
             && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh \
             && chmod uog+x cmake-3.15.4-Linux-x86_64.sh \
-            && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr",
+            && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr \
+            && git config --global --add safe.directory '*'",
 
             generator: "Ninja",
             build_type: "MinSizeRel",
@@ -82,7 +83,9 @@ jobs:
             libegl1-mesa-dev:i386 mesa-common-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 \
             libgles2-mesa:i386 libgles2-mesa-dev:i386 libproxy-dev:i386 \
             && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh \
-            && chmod uog+x cmake-3.15.4-Linux-x86_64.sh && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr",
+            && chmod uog+x cmake-3.15.4-Linux-x86_64.sh \
+            && ./cmake-3.15.4-Linux-x86_64.sh --skip-license --prefix=/usr \
+            && git config --global --add safe.directory '*'",
 
             generator: "Ninja",
             build_type: "MinSizeRel",
