@@ -195,12 +195,6 @@ void RenderSDL::repaint()
     if(m_tBufferDisabled) /* Render-to-texture is not supported, draw the scene on the screen */
     {
         Controls::RenderTouchControls();
-
-        /* WORKAROUND: Draw a transparent rectangle over entire screen to prevent the white scene glitch */
-        SDL_Rect aRect = {0, 0, w, h};
-        SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 0);
-        SDL_RenderFillRect(m_gRenderer, &aRect);
-
         SDL_RenderPresent(m_gRenderer);
         return;
     }
@@ -494,6 +488,10 @@ void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height,
     m_textureBank.insert(texture);
 
     target.inited = true;
+
+#if defined(__APPLE__) && defined(USE_APPLE_X11)
+    SDL_GL_UnbindTexture(texture); // Unbind texture after it got been loaded (otherwise a white screen will happen)
+#endif
 }
 
 void RenderSDL::deleteTexture(StdPicture &tx, bool lazyUnload)
@@ -1006,6 +1004,10 @@ void RenderSDL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixel
     rect.y = y;
     rect.w = w;
     rect.h = h;
+
+#ifndef XTECH_SDL_NO_RECTF_SUPPORT
+    SDL_RenderFlush(m_gRenderer);
+#endif
     SDL_RenderReadPixels(m_gRenderer,
                          &rect,
                          SDL_PIXELFORMAT_BGR24,
@@ -1020,6 +1022,10 @@ void RenderSDL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *p
     rect.y = y;
     rect.w = w;
     rect.h = h;
+
+#ifndef XTECH_SDL_NO_RECTF_SUPPORT
+    SDL_RenderFlush(m_gRenderer);
+#endif
     SDL_RenderReadPixels(m_gRenderer,
                          &rect,
                          SDL_PIXELFORMAT_ABGR8888,
