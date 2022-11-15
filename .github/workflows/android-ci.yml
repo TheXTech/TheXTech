@@ -46,6 +46,7 @@ jobs:
         uses: actions/setup-java@v3.6.0
         with:
           java-version: 11
+          distribution: 'temurin'
 
       # Without NDK not compile and not normal error message. NDK is required
       - name: Install NDK
