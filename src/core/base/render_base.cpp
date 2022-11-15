@@ -24,6 +24,9 @@
 #include <SDL2/SDL_rwops.h>
 
 #define USE_SDL_POWER
+#ifdef THEXTECH_BIG_ENDIAN
+# define GIF_H_BIG_ENDIAN
+#endif
 
 #include <FreeImageLite.h>
 
@@ -704,10 +707,17 @@ static int makeShot_action(void *_pixels)
     {
         for(x = 0; x < w; ++x)
         {
+#if defined(THEXTECH_BIG_ENDIAN)
+            p.rgbRed = px[3];
+            p.rgbGreen = px[2];
+            p.rgbBlue = px[1];
+            p.rgbReserved = px[0];
+#else
             p.rgbRed = px[0];
             p.rgbGreen = px[1];
             p.rgbBlue = px[2];
             p.rgbReserved = px[3];
+#endif
             FreeImage_SetPixelColor(shotImg, x, (h - 1) - y, &p);
             px += 4;
         }

@@ -63,6 +63,18 @@ namespace GIF_H
 
 static const int kGifTransIndex = 0;
 
+#ifdef GIF_H_BIG_ENDIAN
+static const int PIX_R = 3;
+static const int PIX_G = 2;
+static const int PIX_B = 1;
+static const int PIX_I = 0;
+#else
+static const int PIX_R = 0;
+static const int PIX_G = 1;
+static const int PIX_B = 2;
+static const int PIX_I = 3;
+#endif
+
 struct GifPalette
 {
     int bitDepth;
@@ -229,9 +241,9 @@ static void GifSplitPalette(uint8_t* image, int numPixels, int firstElt, int las
                 uint32_t r=255, g=255, b=255;
                 for(int ii=0; ii<numPixels; ++ii)
                 {
-                    r = GifIMin(r, image[ii*4+0]);
-                    g = GifIMin(g, image[ii*4+1]);
-                    b = GifIMin(b, image[ii*4+2]);
+                    r = GifIMin(r, image[ii*4+PIX_R]);
+                    g = GifIMin(g, image[ii*4+PIX_G]);
+                    b = GifIMin(b, image[ii*4+PIX_B]);
                 }
 
                 pal->r[firstElt] = r;
@@ -247,9 +259,9 @@ static void GifSplitPalette(uint8_t* image, int numPixels, int firstElt, int las
                 uint32_t r=0, g=0, b=0;
                 for(int ii=0; ii<numPixels; ++ii)
                 {
-                    r = GifIMax(r, image[ii*4+0]);
-                    g = GifIMax(g, image[ii*4+1]);
-                    b = GifIMax(b, image[ii*4+2]);
+                    r = GifIMax(r, image[ii*4+PIX_R]);
+                    g = GifIMax(g, image[ii*4+PIX_G]);
+                    b = GifIMax(b, image[ii*4+PIX_B]);
                 }
 
                 pal->r[firstElt] = r;
@@ -264,9 +276,9 @@ static void GifSplitPalette(uint8_t* image, int numPixels, int firstElt, int las
         uint64_t r=0, g=0, b=0;
         for(int ii=0; ii<numPixels; ++ii)
         {
-            r += image[ii*4+0];
-            g += image[ii*4+1];
-            b += image[ii*4+2];
+            r += image[ii*4+PIX_R];
+            g += image[ii*4+PIX_G];
+            b += image[ii*4+PIX_B];
         }
 
         r += numPixels / 2;  // round to nearest
@@ -290,9 +302,9 @@ static void GifSplitPalette(uint8_t* image, int numPixels, int firstElt, int las
     int minB = 255, maxB = 0;
     for(int ii=0; ii<numPixels; ++ii)
     {
-        int r = image[ii*4+0];
-        int g = image[ii*4+1];
-        int b = image[ii*4+2];
+        int r = image[ii*4+PIX_R];
+        int g = image[ii*4+PIX_G];
+        int b = image[ii*4+PIX_B];
 
         if(r > maxR) maxR = r;
         if(r < minR) minR = r;
@@ -339,13 +351,13 @@ static int GifPickChangedPixels( const uint8_t* lastFrame, uint8_t* frame, int n
 
     for (int ii=0; ii<numPixels; ++ii)
     {
-        if(lastFrame[0] != frame[0] ||
-           lastFrame[1] != frame[1] ||
-           lastFrame[2] != frame[2])
+        if(lastFrame[PIX_R] != frame[PIX_R] ||
+           lastFrame[PIX_G] != frame[PIX_G] ||
+           lastFrame[PIX_B] != frame[PIX_B])
         {
-            writeIter[0] = frame[0];
-            writeIter[1] = frame[1];
-            writeIter[2] = frame[2];
+            writeIter[PIX_R] = frame[PIX_R];
+            writeIter[PIX_G] = frame[PIX_G];
+            writeIter[PIX_B] = frame[PIX_B];
             ++numChanged;
             writeIter += 4;
         }
@@ -421,9 +433,9 @@ static void GifDitherImage( const uint8_t* lastFrame, const uint8_t* nextFrame, 
             // if it happens that we want the color from last frame, then just write out
             // a transparent pixel
             if( lastFrame &&
-               lastPix[0] == rr &&
-               lastPix[1] == gg &&
-               lastPix[2] == bb )
+               lastPix[PIX_R] == rr &&
+               lastPix[PIX_G] == gg &&
+               lastPix[PIX_B] == bb )
             {
                 nextPix[0] = rr;
                 nextPix[1] = gg;
@@ -507,13 +519,13 @@ static void GifThresholdImage( const uint8_t* lastFrame, const uint8_t* nextFram
         // if a previous color is available, and it matches the current color,
         // set the pixel to transparent
         if(lastFrame &&
-           lastFrame[0] == nextFrame[0] &&
-           lastFrame[1] == nextFrame[1] &&
-           lastFrame[2] == nextFrame[2])
+           lastFrame[PIX_R] == nextFrame[PIX_R] &&
+           lastFrame[PIX_G] == nextFrame[PIX_G] &&
+           lastFrame[PIX_B] == nextFrame[PIX_B])
         {
-            outFrame[0] = lastFrame[0];
-            outFrame[1] = lastFrame[1];
-            outFrame[2] = lastFrame[2];
+            outFrame[0] = lastFrame[PIX_R];
+            outFrame[1] = lastFrame[PIX_G];
+            outFrame[2] = lastFrame[PIX_B];
             outFrame[3] = kGifTransIndex;
         }
         else
@@ -521,21 +533,21 @@ static void GifThresholdImage( const uint8_t* lastFrame, const uint8_t* nextFram
             // palettize the pixel
             int32_t bestDiff = 1000000;
             int32_t bestInd = 1;
-            GifGetClosestPaletteColor(pPal, nextFrame[0], nextFrame[1], nextFrame[2], bestInd, bestDiff);
+            GifGetClosestPaletteColor(pPal, nextFrame[PIX_R], nextFrame[PIX_G], nextFrame[PIX_B], bestInd, bestDiff);
 
             bool usedOld = false;
             if (lastFrame)
             {
                 // RED: If the chosen one is worse than the old one, don't go with it
-                int r_err = (int)lastFrame[0] - (int)nextFrame[0];
-                int g_err = (int)lastFrame[1] - (int)nextFrame[1];
-                int b_err = (int)lastFrame[2] - (int)nextFrame[2];
+                int r_err = (int)lastFrame[PIX_R] - (int)nextFrame[PIX_R];
+                int g_err = (int)lastFrame[PIX_G] - (int)nextFrame[PIX_G];
+                int b_err = (int)lastFrame[PIX_B] - (int)nextFrame[PIX_B];
                 int oldDiff = colorDimScales[0] * GifIAbs(r_err) + colorDimScales[1] * GifIAbs(g_err) + colorDimScales[2] * GifIAbs(b_err);
                 if (oldDiff <= bestDiff)
                 {
-                    outFrame[0] = lastFrame[0];
-                    outFrame[1] = lastFrame[1];
-                    outFrame[2] = lastFrame[2];
+                    outFrame[0] = lastFrame[PIX_R];
+                    outFrame[1] = lastFrame[PIX_G];
+                    outFrame[2] = lastFrame[PIX_B];
                     outFrame[3] = kGifTransIndex;
                     usedOld = true;
                 }
