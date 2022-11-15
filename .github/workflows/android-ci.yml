@@ -25,12 +25,6 @@ jobs:
           all_but_latest: true
           access_token: ${{ github.token }}
 
-      - name: Install Dependencies
-        shell: bash
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -qq lftp
-
       - uses: actions/checkout@v3
 
 #      - uses: nelonoel/branch-name@v1.0.1
@@ -41,6 +35,12 @@ jobs:
         run: |
           git submodule init
           git submodule update
+
+      - name: Install Dependencies
+        shell: bash
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -qq lftp
 
       - name: set up JDK 11
         uses: actions/setup-java@v1

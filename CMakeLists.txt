@@ -48,14 +48,17 @@ if(APPLE)
         set(XTECH_DEFAULT_ICNS "resources/thextech.icns")
     endif()
 
-    if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET)
+    if(NOT DEFINED CMAKE_OSX_DEPLOYMENT_TARGET OR CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
         if(CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
-            set(CMAKE_OSX_DEPLOYMENT_TARGET "10.4")
+            set(THEXTECH_MACOS_MIN_VERSION "10.4")
         else()
-            set(CMAKE_OSX_DEPLOYMENT_TARGET "10.11")
+            set(THEXTECH_MACOS_MIN_VERSION "10.11")
         endif()
+    else()
+        set(THEXTECH_MACOS_MIN_VERSION "${CMAKE_OSX_DEPLOYMENT_TARGET}")
     endif()
-    message("-> Mac OS X Deployment target version: ${CMAKE_OSX_DEPLOYMENT_TARGET}")
+
+    message("-> Mac OS X minimal version: ${THEXTECH_MACOS_MIN_VERSION}")
 endif()
 
 if(ANDROID)
@@ -376,7 +379,19 @@ if(APPLE)
     list(APPEND LIB_SRC
         ${XTECH_DEFAULT_ICNS}
         ${PGE_FILE_ICONS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo
     )
+
+    if(XTECH_MACOSX_TIGER)
+        set(THEXTECH_MAC_EXEX_GENERATED "${CMAKE_BINARY_DIR}/generated/TheXTechRun")
+        configure_file("${CMAKE_CURRENT_SOURCE_DIR}/resources/tiger/TheXTechRun.in" "${THEXTECH_MAC_EXEX_GENERATED}_tmp/TheXTechRun")
+        file(COPY
+            "${THEXTECH_MAC_EXEX_GENERATED}_tmp/TheXTechRun"
+            DESTINATION "${CMAKE_BINARY_DIR}/generated/"
+            FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE WORLD_READ WORLD_EXECUTE
+        )
+        list(APPEND LIB_SRC "${THEXTECH_MAC_EXEX_GENERATED}")
+    endif()
 endif()
 
 set(THEXTECH_SRC
@@ -535,6 +550,7 @@ list(APPEND THEXTECH_SRC
 
 # Add heads into the list
 file(GLOB THEXTECH_HEADS_SRC
+    *.h
     lib/*.h
     lib/AppPath/*.h
     lib/CrashHandler/*.h
@@ -560,6 +576,11 @@ file(GLOB THEXTECH_HEADS_SRC
     src/fontman/*.h
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
+
+# For every file that includes "version.h", call this:
+add_git_version_defs(src/main/game_info.cpp)
+add_git_version_defs(src/main/record.cpp)
+# ----------------------------------------------------
 
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
@@ -622,11 +643,18 @@ set_target_properties(thextech PROPERTIES
 )
 
 if(APPLE)
+    if(XTECH_MACOSX_TIGER)
+        set(THEXTECH_EXECUTABLE_NAME_OUT TheXTechRun)
+    else()
+        set(THEXTECH_EXECUTABLE_NAME_OUT ${THEXTECH_EXECUTABLE_NAME})
+    endif()
+
     set_target_properties(thextech PROPERTIES
         OUTPUT_NAME "${THEXTECH_BUNDLE_NAME}"
         MACOSX_BUNDLE TRUE
         MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/resources/${XTECH_PLIST_NAME}"
-        MACOSX_BUNDLE_EXECUTABLE_NAME "${THEXTECH_EXECUTABLE_NAME}"
+        MACOSX_BUNDLE_BUNDLE_NAME "${THEXTECH_BUNDLE_NAME}"
+        MACOSX_BUNDLE_EXECUTABLE_NAME "${THEXTECH_EXECUTABLE_NAME_OUT}"
         MACOSX_BUNDLE_GUI_IDENTIFIER "ru.wohlsoft.thextech"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${THEXTECH_VERSION_STRING}"
         MACOSX_BUNDLE_LONG_VERSION_STRING "${THEXTECH_VERSION_STRING}"
@@ -636,6 +664,10 @@ if(APPLE)
     )
     set_source_files_properties("${CMAKE_CURRENT_SOURCE_DIR}/${XTECH_DEFAULT_ICNS}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
     set_source_files_properties(${PGE_FILE_ICONS} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/resources/PkgInfo PROPERTIES MACOSX_PACKAGE_LOCATION "")
+    if(XTECH_MACOSX_TIGER)
+        set_source_files_properties("${THEXTECH_MAC_EXEX_GENERATED}" PROPERTIES MACOSX_PACKAGE_LOCATION "MacOS")
+    endif()
 
     if(THEXTECH_CUSTOM_ICON_PATH AND NOT THEXTECH_CUSTOM_ICON_PATH STREQUAL "")
         set_source_files_properties("${THEXTECH_CUSTOM_ICON_PATH}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
