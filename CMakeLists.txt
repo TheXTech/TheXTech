@@ -523,6 +523,7 @@ list(APPEND THEXTECH_SRC
 
 # Add heads into the list
 file(GLOB THEXTECH_HEADS_SRC
+    *.h
     lib/*.h
     lib/AppPath/*.h
     lib/CrashHandler/*.h
@@ -547,6 +548,11 @@ file(GLOB THEXTECH_HEADS_SRC
     src/sound/fx/*.hpp
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
+
+# For every file that includes "version.h", call this:
+add_git_version_defs(src/main/game_info.cpp)
+add_git_version_defs(src/main/record.cpp)
+# ----------------------------------------------------
 
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND THEXTECH_SRC resources/thextech.rc)
