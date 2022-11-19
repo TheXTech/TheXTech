@@ -1,3 +1,4 @@
+# ============================ Generic setup ==================================
 # If platform is Emscripten
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(EMSCRIPTEN 1 BOOLEAN)
@@ -10,6 +11,17 @@ if(APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
     set(XTECH_MACOSX_TIGER TRUE)
 endif()
 
+# =============================== Policies ====================================
+
+# Ninja requires custom command byproducts to be explicit.
+if(POLICY CMP0058)
+    cmake_policy(SET CMP0058 NEW)
+endif()
+
+# ExternalProject step targets fully adopt their steps.
+if(POLICY CMP0114)
+    cmake_policy(SET CMP0114 NEW)
+endif()
 
 # ========================= Macros and Functions ==============================
 

@@ -102,10 +102,6 @@ if(UNIX)
     check_include_file(/opt/vc/include/bcm_host.h BCMHOST_H)
 endif()
 
-if(POLICY CMP0058)
-    cmake_policy(SET CMP0058 NEW)
-endif()
-
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
 
 if(CMAKE_BUILD_TYPE_LOWER STREQUAL "debug")
