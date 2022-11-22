@@ -839,16 +839,13 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             int i;
             bool valid;
 
-            if(data)
-            {
-                i = data->find_current(EditorCursor.NPC.Special7);
-                valid = data->strings[i] != nullptr;
-            }
+            i = data->find_current(EditorCursor.NPC.Special7);
+            valid = data->strings[i] != nullptr;
 
             if(mode == CallMode::Render)
             {
                 SuperPrint("CUSTOM AI:", 3, e_ScreenW - 180, 220);
-                if(data && valid)
+                if(valid)
                     SuperPrint(data->strings[i], 3, e_ScreenW - 160, 242);
                 else
                     SuperPrint(std::to_string(EditorCursor.NPC.Special7), 3, e_ScreenW - 160, 242);
@@ -856,8 +853,8 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             // only show it if it will (i) reset, or (ii) have something to go to.
             // short-circuit evaluation keeps this from accessing outside of the valid range
-            bool show_prev_button = data && (!valid || i != 0);
-            bool show_next_button = data && (!valid || data->strings[i+1]);
+            bool show_prev_button = (!valid || i != 0);
+            bool show_next_button = (!valid || data->strings[i+1]);
             if(show_prev_button && UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             {
                 if(!valid)
@@ -1291,15 +1288,17 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
     for(int i = 0; i < 10; i++)
     {
         int e = m_events_page*10 + i;
-        if(!Events[e].Name.empty())
+        auto &eName = Events[e].Name;
+        if(!eName.empty())
         {
-            if(Events[e].Name.length() < 20)
-                SuperPrintR(mode, Events[e].Name, 3, 10, 80 + 40*i + 10);
+            if(eName.length() < 20)
+                SuperPrintR(mode, eName, 3, 10, 80 + 40*i + 10);
             else
             {
-                SuperPrintR(mode, Events[e].Name.substr(0,19), 3, 10, 80 + 40*i + 2);
-                SuperPrintR(mode, Events[e].Name.substr(19), 3, 10, 80 + 40*i + 20);
+                SuperPrintR(mode, eName.substr(0,19), 3, 10, 80 + 40*i + 2);
+                SuperPrintR(mode, eName.substr(19), 3, 10, 80 + 40*i + 20);
             }
+
             if(UpdateButton(mode, 360 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::page, 32, 32))
             {
                 m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
@@ -2064,10 +2063,10 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     constexpr int block_for_char[] = {622, 623, 624, 625, 631};
     for(int ch = 1; ch <= 5; ch++)
     {
-        bool active = testPlayer[m_special_subpage].Character == ch;
+        bool pPctive = testPlayer[m_special_subpage].Character == ch;
         int block = block_for_char[ch - 1];
 
-        if(UpdateButton(mode, e_ScreenW / 2 + 80 + 4 + 40*ch, 220 + 4, GFXBlock[block], active, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW / 2 + 80 + 4 + 40*ch, 220 + 4, GFXBlock[block], pPctive, 0, 0, 32, 32))
             testPlayer[m_special_subpage].Character = ch;
     }
 
@@ -2079,14 +2078,14 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     constexpr int NPC_for_state[] = {0, NPCID_SHROOM_SMB3, NPCID_FIREFLOWER_SMB3, NPCID_LEAF, NPCID_TANOOKISUIT, NPCID_HAMMERSUIT, NPCID_ICEFLOWER_SMB3};
     for(int state = 1; state <= 7; state++)
     {
-        bool active = testPlayer[m_special_subpage].State == state;
-        int NPC = NPC_for_state[state - 1];
+        bool pActive = testPlayer[m_special_subpage].State == state;
+        int sNPC = NPC_for_state[state - 1];
 
         bool selected;
-        if(!NPC)
-            selected = UpdateButton(mode, e_ScreenW / 2 + 120 + 4 + 40 * ((state - 1) % 5), 260 + 4 + ((state - 1) / 5) * 40, GFX.EIcons, active, 0, 0, 1, 1);
+        if(!sNPC)
+            selected = UpdateButton(mode, e_ScreenW / 2 + 120 + 4 + 40 * ((state - 1) % 5), 260 + 4 + ((state - 1) / 5) * 40, GFX.EIcons, pActive, 0, 0, 1, 1);
         else
-            selected = UpdateButton(mode, e_ScreenW / 2 + 120 + 4 + 40 * ((state - 1) % 5), 260 + 4 + ((state - 1) / 5) * 40, GFXNPC[NPC], active, 0, 0, 32, 32);
+            selected = UpdateButton(mode, e_ScreenW / 2 + 120 + 4 + 40 * ((state - 1) % 5), 260 + 4 + ((state - 1) / 5) * 40, GFXNPC[sNPC], pActive, 0, 0, 32, 32);
 
         if(selected)
             testPlayer[m_special_subpage].State = state;
@@ -2097,12 +2096,12 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     constexpr int NPC_for_boot[] = {NPCID_GRNBOOT, NPCID_REDBOOT, NPCID_BLUBOOT};
     for(int boot = 1; boot <= 3; boot++)
     {
-        bool active = testPlayer[m_special_subpage].Mount == 1 && testPlayer[m_special_subpage].MountType == boot;
-        int NPC = NPC_for_boot[boot - 1];
+        bool pActive = testPlayer[m_special_subpage].Mount == 1 && testPlayer[m_special_subpage].MountType == boot;
+        int pNPC = NPC_for_boot[boot - 1];
 
-        if(UpdateButton(mode, e_ScreenW / 2 + 80 + 4 + 40*boot, 340 + 4, GFXNPC[NPC], active, 0, 0, 32, 32))
+        if(UpdateButton(mode, e_ScreenW / 2 + 80 + 4 + 40*boot, 340 + 4, GFXNPC[pNPC], pActive, 0, 0, 32, 32))
         {
-            if(active)
+            if(pActive)
             {
                 testPlayer[m_special_subpage].Mount = 0;
             }
@@ -2119,12 +2118,12 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     constexpr int NPC_for_yoshi[] = {NPCID_YOSHI_GREEN, NPCID_YOSHI_BLUE, NPCID_YOSHI_YELLOW, NPCID_YOSHI_RED, NPCID_YOSHI_BLACK, NPCID_YOSHI_PURPLE, NPCID_YOSHI_PINK, NPCID_YOSHI_CYAN};
     for(int yoshi = 1; yoshi <= 8; yoshi++)
     {
-        bool active = testPlayer[m_special_subpage].Mount == 3 && testPlayer[m_special_subpage].MountType == yoshi;
-        int NPC = NPC_for_yoshi[yoshi - 1];
+        bool pActive = testPlayer[m_special_subpage].Mount == 3 && testPlayer[m_special_subpage].MountType == yoshi;
+        int pNPC = NPC_for_yoshi[yoshi - 1];
 
-        if(UpdateButton(mode, e_ScreenW / 2 + 120 + 4 + 40 * ((yoshi - 1) % 5), 380 + 4 + ((yoshi - 1) / 5) * 40, GFXNPC[NPC], active, 0, 0, 72, 56))
+        if(UpdateButton(mode, e_ScreenW / 2 + 120 + 4 + 40 * ((yoshi - 1) % 5), 380 + 4 + ((yoshi - 1) / 5) * 40, GFXNPC[pNPC], pActive, 0, 0, 72, 56))
         {
-            if(active)
+            if(pActive)
             {
                 testPlayer[m_special_subpage].Mount = 0;
             }
@@ -2144,8 +2143,9 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     {
         DisableCursorNew();
         WorldName = TextEntryScreen::Run("World name", WorldName);
-        MouseMove(SharedCursor.X, SharedCursor.Y);
+        MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
     }
+
     SuperPrintR(mode, "WORLD NAME:", 3, 54, 42);
     if(!WorldName.empty())
         SuperPrintR(mode, WorldName, 3, 54, 60);
@@ -2155,7 +2155,9 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     // auto start level
     if(UpdateButton(mode, 10 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
         StartFileBrowser(&StartLevel, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
+
     SuperPrintR(mode, "AUTO START LEVEL:", 3, 54, 102);
+
     if(!StartLevel.empty())
         SuperPrintR(mode, StartLevel, 3, 54, 120);
     else
@@ -2164,16 +2166,20 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     // no world map - NoMap
     if(UpdateCheckBox(mode, 10 + 4, 160 + 4, NoMap))
         NoMap = !NoMap;
+
     SuperPrintR(mode, "NO WORLD MAP", 3, 54, 170);
     // restart after death - RestartLevel
     if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 160 + 4, RestartLevel))
         RestartLevel = !RestartLevel;
+
     SuperPrintR(mode, "RESTART", 3, e_ScreenW/2 + 54, 162);
     SuperPrintR(mode, "ON DEATH", 3, e_ScreenW/2 + 54, 180);
 
     if(MaxWorldStars > 0 && UpdateButton(mode, 120 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         MaxWorldStars --;
+
     SuperPrintR(mode, "TOTAL STARS: " + std::to_string(MaxWorldStars), 3, 170, 230);
+
     if(UpdateButton(mode, 440 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         MaxWorldStars ++;
 
@@ -2196,12 +2202,14 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     // credits...
     if(m_special_subpage > 0 && UpdateButton(mode, 10 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_special_subpage --;
+
     if(UpdateButton(mode, 50 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
     {
         DisableCursorNew();
         WorldCredits[m_special_subpage+1] = TextEntryScreen::Run("Credits", WorldCredits[m_special_subpage+1]);
-        MouseMove(SharedCursor.X, SharedCursor.Y);
+        MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
     }
+
     if(m_special_subpage < 4 && UpdateButton(mode, 90 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_special_subpage ++;
     SuperPrintR(mode, "WORLD CREDITS LINE "+std::to_string(m_special_subpage+1)+":", 3, 144, 342);
@@ -2825,9 +2833,9 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         layer_name = "CURRENT LAYER:";
         layer_to_set = &EditorCursor.Layer;
     }
+
     // extra failsafe
-    if(layer_to_set == nullptr)
-        return;
+    SDL_assert(layer_to_set);
 
     // render description
     if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
@@ -2860,6 +2868,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             l = m_layers_page*10 + i - 1;
         else
             l = m_layers_page*10 + i;
+
         if(l > maxLayers)
             continue;
 
@@ -2921,7 +2930,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     std::string new_name = TextEntryScreen::Run("New layer name", Layer[l].Name);
                     if(!new_name.empty())
                         RenameLayer(l, new_name);
-                    MouseMove(SharedCursor.X, SharedCursor.Y);
+                    MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
                 }
 
                 // shift up
@@ -2944,12 +2953,13 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             else if(m_special_page == SPECIAL_PAGE_EVENT_LAYERS)
             {
                 // nothing, hide, show, toggle
-                std::vector<layerindex_t>::iterator hide_it = std::find(Events[m_current_event].HideLayer.begin(), Events[m_current_event].HideLayer.end(), l);
-                std::vector<layerindex_t>::iterator show_it = std::find(Events[m_current_event].ShowLayer.begin(), Events[m_current_event].ShowLayer.end(), l);
-                std::vector<layerindex_t>::iterator togg_it = std::find(Events[m_current_event].ToggleLayer.begin(), Events[m_current_event].ToggleLayer.end(), l);
+                auto hide_it = std::find(Events[m_current_event].HideLayer.begin(), Events[m_current_event].HideLayer.end(), l);
+                auto show_it = std::find(Events[m_current_event].ShowLayer.begin(), Events[m_current_event].ShowLayer.end(), l);
+                auto togg_it = std::find(Events[m_current_event].ToggleLayer.begin(), Events[m_current_event].ToggleLayer.end(), l);
                 bool cur_hide = hide_it != Events[m_current_event].HideLayer.end();
                 bool cur_show = show_it != Events[m_current_event].ShowLayer.end();
                 bool cur_togg = togg_it != Events[m_current_event].ToggleLayer.end();
+
                 // no change
                 if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, !cur_hide && !cur_show && !cur_togg, 0, 0, 1, 1))
                 {
@@ -2957,6 +2967,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     if(cur_show) Events[m_current_event].ShowLayer.erase(show_it);
                     if(cur_togg) Events[m_current_event].ToggleLayer.erase(togg_it);
                 }
+
                 // show layer
                 if(UpdateButton(mode, 440 + 4, 80 + 40*i + 4, GFX.EIcons, cur_show, 0, 32*Icon::show, 32, 32))
                 {
@@ -2964,6 +2975,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     if(!cur_show) Events[m_current_event].ShowLayer.push_back(l);
                     if(cur_togg) Events[m_current_event].ToggleLayer.erase(togg_it);
                 }
+
                 // hide layer
                 if(UpdateButton(mode, 480 + 4, 80 + 40*i + 4, GFX.EIcons, cur_hide, 0, 32*Icon::hide, 32, 32))
                 {
@@ -2971,6 +2983,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     if(cur_show) Events[m_current_event].ShowLayer.erase(show_it);
                     if(cur_togg) Events[m_current_event].ToggleLayer.erase(togg_it);
                 }
+
                 // togg layer
                 if(UpdateButton(mode, 520 + 4, 80 + 40*i + 4, GFX.EIcons, cur_togg, 0, 32*Icon::toggle, 32, 32))
                 {
@@ -2978,6 +2991,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     if(cur_show) Events[m_current_event].ShowLayer.erase(show_it);
                     if(!cur_togg) Events[m_current_event].ToggleLayer.push_back(l);
                 }
+
                 if(UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.EIcons, (*layer_to_set) == l, 0, 32*Icon::move, 32, 32))
                     *layer_to_set = l;
             }
@@ -2997,7 +3011,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                     Layer[l].Name = new_name;
                     numLayers ++;
                 }
-                MouseMove(SharedCursor.X, SharedCursor.Y);
+                MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
             }
         }
     }
@@ -3005,19 +3019,16 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
 
 bool EditorScreen::UpdateBlockButton(CallMode mode, int x, int y, int type, bool sel)
 {
-    int draw_width, draw_height;
-    if(BlockIsSizable[type])
-        draw_width = 32;
-    else if(BlockWidth[type] > 0)
-        draw_width = BlockWidth[type];
-    else
-        draw_width = 32;
-    if(BlockIsSizable[type])
-        draw_height = 32;
-    else if(BlockHeight[type] > 0)
-        draw_height = BlockHeight[type];
-    else
-        draw_height = 32;
+    int draw_width = 32, draw_height = 32;
+
+    if(!BlockIsSizable[type])
+    {
+        if(BlockWidth[type] > 0)
+            draw_width = BlockWidth[type];
+        if(BlockHeight[type] > 0)
+            draw_height = BlockHeight[type];
+    }
+
     return UpdateButton(mode, x, y, GFXBlock[type], sel, 0, BlockFrame[type] * 32, draw_width, draw_height) && !sel;
 }
 
@@ -4735,7 +4746,12 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
     }
 }
 
-void EditorScreen::StartFileBrowser(std::string* file_target, const std::string root_path, const std::string current_path, const std::vector<std::string> target_exts, BrowserMode_t browser_mode, BrowserCallback_t browser_callback)
+void EditorScreen::StartFileBrowser(std::string* file_target,
+                                    const std::string &root_path,
+                                    const std::string &current_path,
+                                    const std::vector<std::string> &target_exts,
+                                    BrowserMode_t browser_mode,
+                                    BrowserCallback_t browser_callback)
 {
     m_file_target = file_target;
     m_root_path = root_path;
