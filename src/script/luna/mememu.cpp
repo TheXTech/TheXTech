@@ -748,7 +748,7 @@ protected:
         v.field_i = field;
         v.type = VT_INT;
         v.baseType = VT_INT;
-        v.offset = 0;
+        v.offset = 0; //-V1048
         v.baseAddress = address;
         m_type[address] = v;
 

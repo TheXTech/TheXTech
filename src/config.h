@@ -50,7 +50,7 @@ extern struct Config_t
         EPISODE_TITLE_ON,
         EPISODE_TITLE_TRANSPARENT,
     };
-    int show_episode_title;
+    int show_episode_title = EPISODE_TITLE_OFF;
 
     /* ---- Gameplay ----*/
 

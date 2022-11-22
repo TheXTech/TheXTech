@@ -34,16 +34,16 @@ public:
     using InputMethodProfile::Name;
     using InputMethodProfile::Type;
 
-    int m_keys[PlayerControls::n_buttons] = {null_key};
-    int m_keys2[PlayerControls::n_buttons] = {null_key};
+    int m_keys[PlayerControls::n_buttons] = {null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key};
+    int m_keys2[PlayerControls::n_buttons] = {null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key};
 
-    int m_editor_keys[EditorControls::n_buttons] = {null_key};
-    int m_editor_keys2[EditorControls::n_buttons] = {null_key};
+    int m_editor_keys[EditorControls::n_buttons] = {null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key};
+    int m_editor_keys2[EditorControls::n_buttons] = {null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key, null_key};
 
-    int m_cursor_keys2[CursorControls::n_buttons] = {null_key};
+    int m_cursor_keys2[CursorControls::n_buttons] = {null_key, null_key, null_key, null_key, null_key, null_key, null_key};
 
-    int m_hotkeys[Hotkeys::n_buttons] = {null_key};
-    int m_hotkeys2[Hotkeys::n_buttons] = {null_key};
+    int m_hotkeys[Hotkeys::n_buttons] = {null_key, null_key, null_key, null_key, null_key, null_key, null_key};
+    int m_hotkeys2[Hotkeys::n_buttons] = {null_key, null_key, null_key, null_key, null_key, null_key, null_key};
 
     InputMethodProfile_Keyboard();
 
@@ -91,7 +91,7 @@ public:
     using InputMethodType::m_profiles;
 
     const uint8_t *m_keyboardState;
-    int m_keyboardStateSize;
+    int m_keyboardStateSize = 0;
 
     InputMethodType_Keyboard();
 
