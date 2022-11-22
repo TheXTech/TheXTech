@@ -104,6 +104,9 @@ public:
     static void mergeWithMask(FIBITMAP *image, std::vector<char> &maskRaw, bool maskIsPng = false);
     static void mergeWithMask(FIBITMAP *image, FIBITMAP *mask);
 
+    static void setBitBlitBG(uint8_t red, uint8_t green, uint8_t blue);
+    static void resetBitBlitBG();
+
     /*!
      * \brief Replaces one color with another
      * \param image Image
