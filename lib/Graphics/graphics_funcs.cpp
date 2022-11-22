@@ -302,7 +302,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
     BYTE *FPixP = nullptr;
     BYTE *SPixP = mask_bits;
     RGBQUAD Npix = {0x00, 0x00, 0x00, 0xFF};   //Destination pixel color
-    BYTE Bpix[] = {0x00, 0x00, 0x00, 0xFF};   //Dummy black pixel
+    BYTE Wpix[] = {0xFF, 0xFF, 0xFF, 0xFF};   //Dummy white pixel
     unsigned short newAlpha = 0xFF; //Calculated destination alpha-value
 
     bool endOfY = false;
@@ -342,7 +342,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
             FPixP += 4;
 
             if(x >= mask_w - 1 || endOfY)
-                SPixP = Bpix;
+                SPixP = Wpix;
             else
                 SPixP += 4;
         }
@@ -350,7 +350,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
         if(ym == 0)
         {
             endOfY = true;
-            SPixP = Bpix;
+            SPixP = Wpix;
         }
         else
             ym--;
