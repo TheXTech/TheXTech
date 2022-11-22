@@ -2834,9 +2834,6 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         layer_to_set = &EditorCursor.Layer;
     }
 
-    // extra failsafe
-    SDL_assert(layer_to_set);
-
     // render description
     if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
     {
