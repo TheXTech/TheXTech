@@ -98,9 +98,9 @@ static void compatInit(Compatibility_t &c)
     // 1.3.6-1
     c.fix_npc_ceiling_speed = true;
     c.emulate_classic_block_order = false;
-    c.bitblit_background_colour[0] = 0x7F;
-    c.bitblit_background_colour[1] = 0x7F;
-    c.bitblit_background_colour[2] = 0x7F;
+    c.bitblit_background_colour[0] = 0;
+    c.bitblit_background_colour[1] = 0;
+    c.bitblit_background_colour[2] = 0;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment

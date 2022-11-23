@@ -283,7 +283,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, std::vector<char> &maskRaw, b
 }
 
 
-static RGBQUAD s_bitblitBG = {0x7F, 0x7F, 0x7F, 0xFF};
+static RGBQUAD s_bitblitBG = {0, 0, 0, 0xFF};
 
 void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
 {
@@ -366,9 +366,9 @@ void GraphicsHelps::setBitBlitBG(uint8_t red, uint8_t green, uint8_t blue)
 
 void GraphicsHelps::resetBitBlitBG()
 {
-    s_bitblitBG.rgbRed = 0x7F;
-    s_bitblitBG.rgbGreen = 0x7F;
-    s_bitblitBG.rgbBlue = 0x7F;
+    s_bitblitBG.rgbRed = 0;
+    s_bitblitBG.rgbGreen = 0;
+    s_bitblitBG.rgbBlue = 0;
 }
 
 void GraphicsHelps::replaceColor(FIBITMAP* image, const PGE_Pix& src, const PGE_Pix& dst)
