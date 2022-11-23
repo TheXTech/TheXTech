@@ -22,6 +22,7 @@
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
+#include "Graphics/graphics_funcs.h"
 #include "globals.h"
 #include "global_dirs.h"
 #include "compat.h"
@@ -97,6 +98,9 @@ static void compatInit(Compatibility_t &c)
     // 1.3.6-1
     c.fix_npc_ceiling_speed = true;
     c.emulate_classic_block_order = false;
+    c.bitblit_background_colour[0] = 0;
+    c.bitblit_background_colour[1] = 0;
+    c.bitblit_background_colour[2] = 0;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -240,6 +244,12 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
     compat.endGroup();
 
+    compat.beginGroup("bitblit-bg-color");
+    compat.read("red", c.bitblit_background_colour[0], c.bitblit_background_colour[0]);
+    compat.read("green", c.bitblit_background_colour[1], c.bitblit_background_colour[1]);
+    compat.read("blue", c.bitblit_background_colour[2], c.bitblit_background_colour[2]);
+    compat.endGroup();
+
     if(s_compatLevel >= COMPAT_SMBX13)
     {
         if(g_speedRunnerMode >= SPEEDRUN_MODE_3)
@@ -338,11 +348,16 @@ void LoadCustomCompat()
         loadCompatIni(g_compatibility, episodeCompat);
     if(!customCompat.empty())
         loadCompatIni(g_compatibility, customCompat);
+
+    GraphicsHelps::setBitBlitBG((uint8_t)g_compatibility.bitblit_background_colour[0],
+                                (uint8_t)g_compatibility.bitblit_background_colour[1],
+                                (uint8_t)g_compatibility.bitblit_background_colour[2]);
 }
 
 void ResetCompat()
 {
     compatInit(g_compatibility);
+    GraphicsHelps::resetBitBlitBG();
 }
 
 void CompatSetEnforcedLevel(int cLevel)

@@ -618,7 +618,8 @@ void LoadCustomGFX()
     {
         loadCGFX(GfxRoot + fmt::format_ne("block/block-{0}.png", A),
                  fmt::format_ne("block-{0}", A),
-                 nullptr, nullptr, GFXBlockCustom[A], GFXBlockBMP[A]);
+                 nullptr, nullptr, GFXBlockCustom[A], GFXBlockBMP[A],
+                 false, BlockHasNoMask[A]);
     }
 
     for(int A = 1; A < numBackground2; ++A)
@@ -653,7 +654,8 @@ void LoadCustomGFX()
     {
         loadCGFX(GfxRoot + fmt::format_ne("background/background-{0}.png", A),
                  fmt::format_ne("background-{0}", A),
-                 &GFXBackgroundWidth[A], &GFXBackgroundHeight[A], GFXBackgroundCustom[A], GFXBackgroundBMP[A]);
+                 &GFXBackgroundWidth[A], &GFXBackgroundHeight[A], GFXBackgroundCustom[A], GFXBackgroundBMP[A],
+                 false, BackgroundHasNoMask[A]);
     }
 
     for(int A = 1; A < maxYoshiGfx; ++A)

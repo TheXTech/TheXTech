@@ -282,6 +282,9 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, std::vector<char> &maskRaw, b
     FreeImage_Unload(mask);
 }
 
+
+static RGBQUAD s_bitblitBG = {0, 0, 0, 0xFF};
+
 void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
 {
     unsigned int img_w = FreeImage_GetWidth(image);
@@ -295,7 +298,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
     BYTE *FPixP = nullptr;
     BYTE *SPixP = mask_bits;
     RGBQUAD Npix = {0x00, 0x00, 0x00, 0xFF};   //Destination pixel color
-    BYTE Bpix[] = {0x00, 0x00, 0x00, 0xFF};   //Dummy black pixel
+    BYTE Wpix[] = {0xFF, 0xFF, 0xFF, 0xFF};   //Dummy white pixel
     unsigned short newAlpha = 0xFF; //Calculated destination alpha-value
 
     bool endOfY = false;
@@ -310,9 +313,9 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
 
         for(unsigned int x = 0; (x < img_w); x++)
         {
-            Npix.rgbBlue = ((SPixP[FI_RGBA_BLUE] & 0x7F) | FPixP[FI_RGBA_BLUE]);
-            Npix.rgbGreen = ((SPixP[FI_RGBA_GREEN] & 0x7F) | FPixP[FI_RGBA_GREEN]);
-            Npix.rgbRed = ((SPixP[FI_RGBA_RED] & 0x7F) | FPixP[FI_RGBA_RED]);
+            Npix.rgbBlue = ((SPixP[FI_RGBA_BLUE] & s_bitblitBG.rgbBlue) | FPixP[FI_RGBA_BLUE]);
+            Npix.rgbGreen = ((SPixP[FI_RGBA_GREEN] & s_bitblitBG.rgbGreen) | FPixP[FI_RGBA_GREEN]);
+            Npix.rgbRed = ((SPixP[FI_RGBA_RED] & s_bitblitBG.rgbRed) | FPixP[FI_RGBA_RED]);
             newAlpha = 255 - ((static_cast<unsigned short>(SPixP[FI_RGBA_RED]) +
                                static_cast<unsigned short>(SPixP[FI_RGBA_GREEN]) +
                                static_cast<unsigned short>(SPixP[FI_RGBA_BLUE])) / 3);
@@ -335,7 +338,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
             FPixP += 4;
 
             if(x >= mask_w - 1 || endOfY)
-                SPixP = Bpix;
+                SPixP = Wpix;
             else
                 SPixP += 4;
         }
@@ -343,7 +346,7 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
         if(ym == 0)
         {
             endOfY = true;
-            SPixP = Bpix;
+            SPixP = Wpix;
         }
         else
             ym--;
@@ -352,6 +355,20 @@ void GraphicsHelps::mergeWithMask(FIBITMAP *image, FIBITMAP *mask)
             break;
         y--;
     }
+}
+
+void GraphicsHelps::setBitBlitBG(uint8_t red, uint8_t green, uint8_t blue)
+{
+    s_bitblitBG.rgbRed = red;
+    s_bitblitBG.rgbGreen = green;
+    s_bitblitBG.rgbBlue = blue;
+}
+
+void GraphicsHelps::resetBitBlitBG()
+{
+    s_bitblitBG.rgbRed = 0;
+    s_bitblitBG.rgbGreen = 0;
+    s_bitblitBG.rgbBlue = 0;
 }
 
 void GraphicsHelps::replaceColor(FIBITMAP* image, const PGE_Pix& src, const PGE_Pix& dst)
