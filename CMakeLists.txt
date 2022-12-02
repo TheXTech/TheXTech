@@ -352,6 +352,7 @@ if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT VITA)
         ${STACK_WALKER_SRCS}
         lib/CrashHandler/crash_handler.cpp
     )
+    add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
 endif()
 
 if(APPLE)
