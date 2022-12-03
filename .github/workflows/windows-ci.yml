@@ -33,7 +33,7 @@ jobs:
             executable_name_suffix: "-win64",
             package_filename_suffix: "win64",
             upload_directory: "www/win32/",
-            mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/x86_64-8.1.0-release-posix-seh-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
+            mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/x86_64-12.2.0-release-posix-seh-rt_v10-rev1", mingw_install_dir: "C:/WohlMinGWw64/",
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw64/bin",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw64/"
           }
@@ -51,7 +51,7 @@ jobs:
             executable_name_suffix: "",
             package_filename_suffix: "win32",
             upload_directory: "www/win32/",
-            mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/i686-8.1.0-release-posix-dwarf-rt_v6-rev0.7z", mingw_install_dir: "C:/WohlMinGWw64/",
+            mingw_download: "https://wohlsoft.ru/docs/Software/MinGW/i686-12.2.0-release-posix-dwarf-rt_v10-rev1.7z", mingw_install_dir: "C:/WohlMinGWw64/",
             ninja_download: "https://wohlsoft.ru/docs/Software/Ninja-Build/ninja-win.zip", ninja_install_dir: "C:/WohlMinGWw64/mingw32/bin",
             lftp_download: "https://wohlsoft.ru/docs/Software/lftp-4.4.15.win64-openssl-1.0.1g.7z", lftp_install_dir: "C:/WohlMinGWw64/mingw32/"
           }
