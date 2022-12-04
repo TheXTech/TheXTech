@@ -102,10 +102,6 @@ if(UNIX)
     check_include_file(/opt/vc/include/bcm_host.h BCMHOST_H)
 endif()
 
-if(POLICY CMP0058)
-    cmake_policy(SET CMP0058 NEW)
-endif()
-
 string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWER)
 
 if(CMAKE_BUILD_TYPE_LOWER STREQUAL "debug")
@@ -392,6 +388,7 @@ if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT VITA AND 
         ${STACK_WALKER_SRCS}
         lib/CrashHandler/crash_handler.cpp
     )
+    add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
 endif()
 
 if(APPLE)
