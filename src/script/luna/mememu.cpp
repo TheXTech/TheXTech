@@ -28,6 +28,8 @@
 
 #include <unordered_map>
 #include <functional>
+#include <type_traits>
+#include <limits>
 
 
 #if defined(arm) && !defined(__SOFTFP__) && !defined(__VFP_FP__) && !defined(__MAVERICK__)
@@ -112,6 +114,22 @@ SDL_FORCE_INLINE void fromX86Endian(const uint8_t in[8], double &out_d)
 }
 #endif
 
+
+template<class T>
+T f2i_cast(double in)
+{
+    if(std::is_same<T, uint64_t>::value)
+    {
+        if(in < std::numeric_limits<uint64_t>::min() || (in > 2.0 * 0x8000000000000000))
+            in = SDL_fmod(in, 2.0 * 0x8000000000000000);
+        return static_cast<T>(in);
+    }
+
+    if(in < std::numeric_limits<int64_t>::min() || in > std::numeric_limits<int64_t>::max())
+        in = SDL_fmod(in, 0x8000000000000000);
+
+    return static_cast<T>(static_cast<int64_t>(in));
+}
 
 SDL_FORCE_INLINE void modifyByteX86(double &dst, size_t byte, uint8_t data)
 {
@@ -199,13 +217,13 @@ SDL_FORCE_INLINE void memToValue(double &target, double value, FIELDTYPE ftype)
     switch(ftype)
     {
     case FT_BYTE:
-        target =static_cast<double>(static_cast<uint8_t>(value));
+        target =static_cast<double>(f2i_cast<uint8_t>(value));
         break;
     case FT_WORD:
-        target =static_cast<double>(static_cast<int16_t>(static_cast<uint16_t>(value)));
+        target =static_cast<double>(static_cast<int16_t>(f2i_cast<uint16_t>(value)));
         break;
     case FT_DWORD:
-        target =static_cast<double>(static_cast<int32_t>(value));
+        target =static_cast<double>(f2i_cast<int32_t>(value));
         break;
     case FT_FLOAT:
         target =static_cast<double>(static_cast<float>(value));
@@ -223,13 +241,13 @@ SDL_FORCE_INLINE void memToValue(float &target, double value, FIELDTYPE ftype)
     switch(ftype)
     {
     case FT_BYTE:
-        target = static_cast<float>(static_cast<uint8_t>(value));
+        target = static_cast<float>(f2i_cast<uint8_t>(value));
         break;
     case FT_WORD:
-        target = static_cast<float>(static_cast<int16_t>(static_cast<uint16_t>(value)));
+        target = static_cast<float>(static_cast<int16_t>(f2i_cast<uint16_t>(value)));
         break;
     case FT_DWORD:
-        target = static_cast<float>(static_cast<int32_t>(value));
+        target = static_cast<float>(f2i_cast<int32_t>(value));
         break;
     case FT_FLOAT:
         target = static_cast<float>(value);
@@ -247,16 +265,16 @@ SDL_FORCE_INLINE void memToValue(int &target, double value, FIELDTYPE ftype)
     switch(ftype)
     {
     case FT_BYTE:
-        target = static_cast<int32_t>(static_cast<uint8_t>(value));
+        target = static_cast<int32_t>(f2i_cast<uint8_t>(value));
         break;
     case FT_WORD:
-        target = static_cast<int32_t>(static_cast<int16_t>(static_cast<uint16_t>(value)));
+        target = static_cast<int32_t>(static_cast<int16_t>(f2i_cast<uint16_t>(value)));
         break;
     case FT_DWORD:
         target = static_cast<int32_t>(value);
         break;
     case FT_FLOAT:
-        target = static_cast<int32_t>(static_cast<float>(value));
+        target = static_cast<int32_t>(f2i_cast<float>(value));
         break;
     case FT_DFLOAT:
         target = static_cast<int32_t>(value);
@@ -1027,7 +1045,7 @@ public:
                 SDL_assert(bt.type == VT_DOUBLE && bt.field_d);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                modifyByteX86(obj->*(bt.field_d), t->offset, (uint8_t)(int64_t)value);
+                modifyByteX86(obj->*(bt.field_d), t->offset, f2i_cast<uint8_t>(value));
                 return;
             }
 
@@ -1037,7 +1055,7 @@ public:
                 SDL_assert(bt.type == VT_FLOAT && bt.field_f);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                modifyByteX86(obj->*(bt.field_f), t->offset, (uint8_t)(int64_t)value);
+                modifyByteX86(obj->*(bt.field_f), t->offset, f2i_cast<uint8_t>(value));
                 return;
             }
 
@@ -1048,7 +1066,7 @@ public:
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
                 int16_t s = static_cast<int16_t>(obj->*(bt.field_i));
-                modifyByteX86(s, t->offset, (uint8_t)(int64_t)value);
+                modifyByteX86(s, t->offset, f2i_cast<uint8_t>(value));
                 obj->*(bt.field_i) = static_cast<int>(s);
                 return;
             }
