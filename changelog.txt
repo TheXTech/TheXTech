@@ -13,6 +13,7 @@ Changelog for 1.3.6.1
 -In-Game Editor: added ability to customize block, BGO, NPC, tile, music, section BG, and sound layouts in editor (@ds-sloth)
 -In-Game Editor: added new Magic Block feature that automatically picks the right item given its context (@ds-sloth)
 -Adjusted the bitmask to the RGBA conversion algorithm to apply the compromise among different semi-transparent textures (@Wohlstand)
+-Fixed an invalid byte hacking behaviour at the memory emulator on x86_32 processors (@Wohlstand)
 
 
 Changelog for 1.3.6

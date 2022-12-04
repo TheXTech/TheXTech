@@ -835,7 +835,7 @@ protected:
 
 public:
     SMBXObjectMemoryEmulator() noexcept
-    {};
+    {}
 
     virtual double getValue(T *obj, size_t address, FIELDTYPE ftype)
     {
@@ -1027,7 +1027,7 @@ public:
                 SDL_assert(bt.type == VT_DOUBLE && bt.field_d);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                modifyByteX86(obj->*(bt.field_d), t->offset, (uint8_t)value);
+                modifyByteX86(obj->*(bt.field_d), t->offset, (uint8_t)(int64_t)value);
                 return;
             }
 
@@ -1037,7 +1037,7 @@ public:
                 SDL_assert(bt.type == VT_FLOAT && bt.field_f);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                modifyByteX86(obj->*(bt.field_f), t->offset, (uint8_t)value);
+                modifyByteX86(obj->*(bt.field_f), t->offset, (uint8_t)(int64_t)value);
                 return;
             }
 
@@ -1048,7 +1048,7 @@ public:
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
                 int16_t s = static_cast<int16_t>(obj->*(bt.field_i));
-                modifyByteX86(s, t->offset, (uint8_t)value);
+                modifyByteX86(s, t->offset, (uint8_t)(int64_t)value);
                 obj->*(bt.field_i) = static_cast<int>(s);
                 return;
             }
