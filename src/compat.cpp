@@ -244,7 +244,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
     compat.endGroup();
 
-#if 0 // FIXME: Don't enable this until a specific moment
+#ifdef DEBUG_BUILD // FIXME: Don't enable this at release builds until a specific moment
     compat.beginGroup("bitblit-bg-color");
     compat.read("red", c.bitblit_background_colour[0], c.bitblit_background_colour[0]);
     compat.read("green", c.bitblit_background_colour[1], c.bitblit_background_colour[1]);
