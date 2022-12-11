@@ -31,7 +31,7 @@ static std::vector<std::string> s_worldRootDirs;
 static std::string s_assetRoot;
 
 // special 3DS functions to handle fast romfs archives
-bool mountRomfsFile(const char* path, const char* mount_label)
+static bool mountRomfsFile(const char* path, const char* mount_label)
 {
     // for some reason dirent returns a very strange format that appears to be
     // utf-8 expressed as utf-16 and then converted back to utf-8.
@@ -64,7 +64,7 @@ bool mountRomfsFile(const char* path, const char* mount_label)
 }
 
 // find additional user worlds packaged in .romfs files
-void findUserWorlds()
+static void findUserWorlds()
 {
     std::vector<std::string> romfsFiles;
     static const std::vector<std::string> romfsExt = {".romfs"};
