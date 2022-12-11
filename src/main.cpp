@@ -508,10 +508,6 @@ int main(int argc, char**argv)
         return 1;
     }
 
-#if __WII__
-    InitMixerX();
-#endif
-
 #ifdef __APPLE__
     macosReceiveOpenFile();
     if(!g_fileToOpen.empty())

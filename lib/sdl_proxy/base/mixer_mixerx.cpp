@@ -67,15 +67,6 @@ static const char *audio_format_to_string(SDL_AudioFormat f)
 
 bool MixPlatform_Init(AudioSetup_t& obtained)
 {
-#ifdef __WII__
-    // Mixer is the only component using SDL on Wii
-    if(SDL_Init(SDL_INIT_AUDIO) < 0)
-    {
-        pLogWarning("Couldn't initialize SDL audio: %s\n", SDL_GetError());
-        return false;
-    }
-#endif
-
     int ret;
     const int initFlags = MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_FLAC | MIX_INIT_OGG | MIX_INIT_OPUS | MIX_INIT_MP3;
 

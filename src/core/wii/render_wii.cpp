@@ -55,9 +55,9 @@ bool g_in_frame = false;
 
 #define DEFAULT_FIFO_SIZE   (256*1024)
 
-void *frameBuffer[2] = { NULL, NULL};
+void* frameBuffer[2] = { NULL, NULL};
 int cur_buffer = 0;
-GXRModeObj *rmode = nullptr;
+GXRModeObj* rmode = nullptr;
 Mtx view;
 
 int s_num_textures_loaded = 0;
@@ -74,11 +74,13 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
     // calculate destination dimensions, including downscaling and required padding
     uint32_t wdst = (width + 1) / 2;
     uint32_t hdst = (height + 1) / 2;
+
     if(wdst & 3)
     {
         wdst += 4;
         wdst &= ~3;
     }
+
     if(hdst & 3)
     {
         hdst += 4;
@@ -153,6 +155,7 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
 int robust_TPL_GetTexture(TPLFile* file, int i, GXTexObj* gxtex)
 {
     int ret = TPL_GetTexture(file, i, gxtex);
+
     if(ret == 0 || errno != ENOMEM)
         return ret;
 
@@ -169,17 +172,20 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
 
     // this is wasteful, but it lets us diagnose memory issue vs other issues
     FREE_IMAGE_FORMAT formato = FreeImage_GetFileType(path.c_str(), 0);
+
     if(formato == FIF_UNKNOWN)
     {
         return nullptr;
     }
 
     FIBITMAP* sourceImage = GraphicsHelps::loadImage(path);
+
     if(!sourceImage)
     {
         pLogWarning("FreeImageLite failed to load image due to lack of memory, trying to free some memory");
         minport_freeTextureMemory();
         sourceImage = GraphicsHelps::loadImage(path);
+
         if(!sourceImage)
             return nullptr;
     }
@@ -194,6 +200,7 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
 
     if(orig_w)
         *orig_w = w;
+
     if(orig_h)
         *orig_h = h;
 
@@ -219,6 +226,7 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, bool m
     for(int i = 0; i < 3; i++)
     {
         int start_x, start_y;
+
         if(target.d.multi_horizontal)
         {
             start_y = 0;
@@ -232,8 +240,10 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, bool m
 
         int w_i = width - start_x;
         int h_i = height - start_y;
+
         if(w_i > 2048)
             w_i = 2048;
+
         if(h_i > 2048)
             h_i = 2048;
 
@@ -241,11 +251,12 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, bool m
         {
             uint32_t wdst, hdst;
             target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + (start_y * width + start_x) * 4, w_i, h_i, width, &wdst, &hdst);
+
             if(target.d.backing_texture[i + 3 * mask])
             {
                 DCFlushRange(target.d.backing_texture[i + 3 * mask], wdst * hdst * 4);
                 GX_InitTexObj(&target.d.texture[i + 3 * mask], target.d.backing_texture[i + 3 * mask],
-                    wdst, hdst, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
+                              wdst, hdst, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
                 GX_InitTexObjFilterMode(&target.d.texture[i + 3 * mask], GX_NEAR, GX_NEAR);
 
                 // printf("We initialized with %u %u\n", wdst, hdst);
@@ -257,7 +268,7 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, bool m
     }
 }
 
-void s_loadTexture(StdPicture &target, int i)
+void s_loadTexture(StdPicture& target, int i)
 {
     if(target.d.texture_file_init[i])
     {
@@ -317,29 +328,31 @@ bool init()
     VIDEO_SetBlack(FALSE);
     VIDEO_Flush();
     VIDEO_WaitVSync();
-    if(rmode->viTVMode&VI_NON_INTERLACE) VIDEO_WaitVSync();
+
+    if(rmode->viTVMode & VI_NON_INTERLACE) VIDEO_WaitVSync();
+
     VIDEO_SetPreRetraceCallback(videoPreTraceCB);
 
     // setup the fifo and then init the flipper
-    void *gp_fifo = NULL;
-    gp_fifo = memalign(32,DEFAULT_FIFO_SIZE);
-    memset(gp_fifo,0,DEFAULT_FIFO_SIZE);
+    void* gp_fifo = NULL;
+    gp_fifo = memalign(32, DEFAULT_FIFO_SIZE);
+    memset(gp_fifo, 0, DEFAULT_FIFO_SIZE);
 
-    GX_Init(gp_fifo,DEFAULT_FIFO_SIZE);
+    GX_Init(gp_fifo, DEFAULT_FIFO_SIZE);
 
     // clears the bg to color and clears the z buffer
     GX_SetCopyClear(background, 0x00ffffff);
     GX_SetDrawDoneCallback(gxDrawDoneCB);
 
     // other gx setup
-    GX_SetViewport(0,0,rmode->fbWidth,rmode->efbHeight,0,1);
-    yscale = GX_GetYScaleFactor(rmode->efbHeight,rmode->xfbHeight);
+    GX_SetViewport(0, 0, rmode->fbWidth, rmode->efbHeight, 0, 1);
+    yscale = GX_GetYScaleFactor(rmode->efbHeight, rmode->xfbHeight);
     xfbHeight = GX_SetDispCopyYScale(yscale);
-    GX_SetScissor(0,0,rmode->fbWidth,rmode->efbHeight);
-    GX_SetDispCopySrc(0,0,rmode->fbWidth,rmode->efbHeight);
-    GX_SetDispCopyDst(rmode->fbWidth,xfbHeight);
-    GX_SetCopyFilter(rmode->aa,rmode->sample_pattern,GX_TRUE,rmode->vfilter);
-    GX_SetFieldMode(rmode->field_rendering,((rmode->viHeight==2*rmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
+    GX_SetScissor(0, 0, rmode->fbWidth, rmode->efbHeight);
+    GX_SetDispCopySrc(0, 0, rmode->fbWidth, rmode->efbHeight);
+    GX_SetDispCopyDst(rmode->fbWidth, xfbHeight);
+    GX_SetCopyFilter(rmode->aa, rmode->sample_pattern, GX_TRUE, rmode->vfilter);
+    GX_SetFieldMode(rmode->field_rendering, ((rmode->viHeight == 2 * rmode->xfbHeight) ? GX_ENABLE : GX_DISABLE));
     GX_SetColorUpdate(1);
     GX_SetAlphaUpdate(1);
     GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_SET);
@@ -351,7 +364,7 @@ bool init()
     g_rmode_h = rmode->efbHeight;
 
     GX_SetCullMode(GX_CULL_NONE);
-    GX_CopyDisp(frameBuffer[cur_buffer],GX_TRUE);
+    GX_CopyDisp(frameBuffer[cur_buffer], GX_TRUE);
     GX_SetDispCopyGamma(GX_GM_1_0);
 
 
@@ -384,8 +397,8 @@ bool init()
     // setup our camera at the origin
     // looking down the -z axis with y up
     guVector cam = {0.0F, 0.0F, 0.0F},
-            up = {0.0F, 1.0F, 0.0F},
-          look = {0.0F, 0.0F, -1.0F};
+             up = {0.0F, 1.0F, 0.0F},
+             look = {0.0F, 0.0F, -1.0F};
     guLookAt(view, &cam, &up, &look);
 
     updateViewport();
@@ -444,7 +457,7 @@ void repaint()
     int next_buffer = cur_buffer ^ 1;
     GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
     GX_SetColorUpdate(GX_TRUE);
-    GX_CopyDisp(frameBuffer[next_buffer],GX_TRUE);
+    GX_CopyDisp(frameBuffer[next_buffer], GX_TRUE);
     GX_DrawDone();
 
     GX_Flush();
@@ -452,26 +465,29 @@ void repaint()
     g_microStats.start_sleep();
 
     // video settings: VSync
-    #if 0
+#if 0
+
     if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
     {
         VIDEO_WaitVSync();
+
         if(rmode->viTVMode & VI_NON_INTERLACE)
             VIDEO_WaitVSync();
     }
-    #endif
+
+#endif
     g_microStats.start_task(MicroStats::Graphics);
 
     g_in_frame = false;
 }
 
-void mapToScreen(int x, int y, int *dx, int *dy)
+void mapToScreen(int x, int y, int* dx, int* dy)
 {
     *dx = (x - g_screen_phys_x) * ScreenW / g_screen_phys_w;
     *dy = (y - g_screen_phys_y) * ScreenH / g_screen_phys_h;
 }
 
-void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
+void mapFromScreen(int scr_x, int scr_y, int* window_x, int* window_y)
 {
     *window_x = (scr_x * g_screen_phys_w / ScreenW) + g_screen_phys_x;
     *window_y = (scr_y * g_screen_phys_h / ScreenH) + g_screen_phys_y;
@@ -488,11 +504,13 @@ void minport_TransformPhysCoords()
     if(CONF_GetAspectRatio()) // widescreen_stretch
     {
         g_screen_phys_h = g_screen_phys_h * g_rmode_h / hardware_h;
+
         if(g_screen_phys_h > g_rmode_h)
         {
             g_screen_phys_w = g_screen_phys_w * g_rmode_h / g_screen_phys_h;
             g_screen_phys_h = g_rmode_h;
         }
+
         if(g_screen_phys_w > g_rmode_w)
         {
             g_screen_phys_h = g_screen_phys_h * g_rmode_w / g_screen_phys_w;
@@ -507,6 +525,7 @@ void minport_TransformPhysCoords()
 
     if(g_screen_phys_x < 0)
         g_screen_phys_x = 0;
+
     if(g_screen_phys_y < 0)
         g_screen_phys_y = 0;
 }
@@ -535,6 +554,7 @@ void minport_ApplyViewport()
 
     if(g_screen_phys_x + phys_offset_x < 0)
         phys_offset_x = -g_screen_phys_x;
+
     if(g_screen_phys_y + phys_offset_y < 0)
         phys_offset_y = -g_screen_phys_y;
 
@@ -547,9 +567,9 @@ void minport_ApplyViewport()
         guOrtho(perspective, 0, g_viewport_h, 0, g_viewport_w, -1.0f, 1.0f);
     else
         guOrtho(perspective,
-            g_viewport_offset_y, g_viewport_h + g_viewport_offset_y,
-            g_viewport_offset_x, g_viewport_w + g_viewport_offset_x,
-            -1.0f, 1.0f);
+                g_viewport_offset_y, g_viewport_h + g_viewport_offset_y,
+                g_viewport_offset_x, g_viewport_w + g_viewport_offset_x,
+                -1.0f, 1.0f);
 
     GX_LoadProjectionMtx(perspective, GX_ORTHOGRAPHIC);
 
@@ -574,6 +594,7 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
 
     target.inited = false;
     target.l.path = path;
+
     if(target.l.path.empty())
         return target;
 
@@ -615,6 +636,7 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         {
             s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), false);
             FreeImage_Unload(FI_tex);
+
             if(FI_mask)
             {
                 s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), true);
@@ -636,12 +658,14 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
 StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
 {
     StdPicture target;
+
     if(!GameIsActive)
         return target; // do nothing when game is closed
 
     int length;
 
     char filename[256];
+
     if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
     {
         pLogWarning("Could not load image path from load list");
@@ -660,6 +684,7 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     target.l.lazyLoaded = true;
 
     int w, h;
+
     if(fscanf(f, "%d\n%d\n", &w, &h) != 2 || w < 0 || w > 8192 || h < 0 || h > 8192)
     {
         pLogWarning("Could not load image %s dimensions from load list", filename);
@@ -678,11 +703,13 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
 StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
 {
     StdPicture target;
+
     if(!GameIsActive)
         return target; // do nothing when game is closed
 
     target.inited = false;
     target.l.path = path;
+
     if(target.l.path.empty())
         return target;
 
@@ -709,6 +736,7 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
         contents[9] = '\0';
         target.w = atoi(&contents[0]);
         target.h = atoi(&contents[5]);
+
         if(fclose(fs))
             pLogWarning("lazyLoadPicture: Couldn't close file.");
     }
@@ -719,6 +747,7 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
         pLogWarning("lazyLoadPicture: Couldn't open size file.");
 
         PGE_Size tSize;
+
         if(!GraphicsHelps::getImageMetrics(path, &tSize))
         {
             pLogWarning("Error loading of image file:\n"
@@ -740,6 +769,7 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
 int robust_OpenTPLFromFile(TPLFile* target, const char* path)
 {
     int ret = TPL_OpenTPLFromFile(target, path);
+
     if(ret == 1 || errno != ENOMEM)
         return ret;
 
@@ -749,7 +779,7 @@ int robust_OpenTPLFromFile(TPLFile* target, const char* path)
     return TPL_OpenTPLFromFile(target, path);
 }
 
-void lazyLoad(StdPicture &target)
+void lazyLoad(StdPicture& target)
 {
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
         return;
@@ -802,15 +832,18 @@ void lazyLoad(StdPicture &target)
         {
             PGE_Pix colSrc = {target.l.keyRgb[0],
                               target.l.keyRgb[1],
-                              target.l.keyRgb[2], 0xFF};
+                              target.l.keyRgb[2], 0xFF
+                             };
             PGE_Pix colDst = {target.l.keyRgb[0],
                               target.l.keyRgb[1],
-                              target.l.keyRgb[2], 0x00};
+                              target.l.keyRgb[2], 0x00
+                             };
             GraphicsHelps::replaceColor(FI_tex, colSrc, colDst);
         }
 
         s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), false);
         FreeImage_Unload(FI_tex);
+
         if(FI_mask)
         {
             s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), true);
@@ -864,12 +897,12 @@ void lazyLoad(StdPicture &target)
     s_num_textures_loaded++;
 }
 
-void lazyPreLoad(StdPicture &target)
+void lazyPreLoad(StdPicture& target)
 {
     lazyLoad(target);
 }
 
-void lazyUnLoad(StdPicture &target)
+void lazyUnLoad(StdPicture& target)
 {
     if(!target.inited || !target.l.lazyLoaded || !target.d.hasTexture())
         return;
@@ -877,7 +910,7 @@ void lazyUnLoad(StdPicture &target)
     deleteTexture(target, true);
 }
 
-void deleteTexture(StdPicture &tx, bool lazyUnload)
+void deleteTexture(StdPicture& tx, bool lazyUnload)
 {
     if(!tx.inited)
         return;
@@ -902,7 +935,7 @@ void deleteTexture(StdPicture &tx, bool lazyUnload)
 
 inline int ROUNDDIV2(int x)
 {
-    return (x<0)?(x - 1) / 2:x / 2;
+    return (x < 0) ? (x - 1) / 2 : x / 2;
 }
 
 inline float ROUNDDIV2(float x)
@@ -926,29 +959,30 @@ void wii_RenderBox(int x1, int y1, int x2, int y2, uint8_t r, uint8_t g, uint8_t
     GX_SetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
 
     GX_Begin(filled ? GX_QUADS : GX_LINESTRIP, GX_VTXFMT0, filled ? 4 : 5);
+    GX_Position3s16(x1, y1, 0);
+    GX_Color4u8(r, g, b, a);
+    GX_TexCoord2u16(0, 0);
+
+    GX_Position3s16(x2, y1, 0);
+    GX_Color4u8(r, g, b, a);
+    GX_TexCoord2u16(0, 0);
+
+    GX_Position3s16(x2, y2, 0);
+    GX_Color4u8(r, g, b, a);
+    GX_TexCoord2u16(0, 0);
+
+    GX_Position3s16(x1, y2, 0);
+    GX_Color4u8(r, g, b, a);
+    GX_TexCoord2u16(0, 0);
+
+    // complete the rect
+    if(!filled)
+    {
         GX_Position3s16(x1, y1, 0);
         GX_Color4u8(r, g, b, a);
         GX_TexCoord2u16(0, 0);
+    }
 
-        GX_Position3s16(x2, y1, 0);
-        GX_Color4u8(r, g, b, a);
-        GX_TexCoord2u16(0, 0);
-
-        GX_Position3s16(x2, y2, 0);
-        GX_Color4u8(r, g, b, a);
-        GX_TexCoord2u16(0, 0);
-
-        GX_Position3s16(x1, y2, 0);
-        GX_Color4u8(r, g, b, a);
-        GX_TexCoord2u16(0, 0);
-
-        // complete the rect
-        if(!filled)
-        {
-            GX_Position3s16(x1, y1, 0);
-            GX_Color4u8(r, g, b, a);
-            GX_TexCoord2u16(0, 0);
-        }
     GX_End();
 }
 
@@ -963,11 +997,11 @@ void minport_RenderBoxUnfilled(int x1, int y1, int x2, int y2, uint8_t r, uint8_
 }
 
 inline bool GX_DrawImage_Custom(GXTexObj* img,
-    GXTexObj* mask,
-    int16_t x, int16_t y, uint16_t w, uint16_t h,
-    uint16_t src_x, uint16_t src_y, uint16_t src_w, uint16_t src_h,
-    unsigned int flip,
-    float _r, float _g, float _b, float _a)
+                                GXTexObj* mask,
+                                int16_t x, int16_t y, uint16_t w, uint16_t h,
+                                uint16_t src_x, uint16_t src_y, uint16_t src_w, uint16_t src_h,
+                                unsigned int flip,
+                                float _r, float _g, float _b, float _a)
 {
     uint8_t r = _r * 255.0f + 0.5f;
     uint8_t g = _g * 255.0f + 0.5f;
@@ -1023,25 +1057,26 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
 
         if(flip & X_FLIP_HORIZONTAL)
             std::swap(u1, u2);
+
         if(flip & X_FLIP_VERTICAL)
             std::swap(v1, v2);
 
         GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-            GX_Position3s16(x1, y1, 0);
-            GX_Color4u8(r, g, b, a);
-            GX_TexCoord2u16(u1, v1);
+        GX_Position3s16(x1, y1, 0);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u1, v1);
 
-            GX_Position3s16(x2, y1, 0);
-            GX_Color4u8(r, g, b, a);
-            GX_TexCoord2u16(u2, v1);
+        GX_Position3s16(x2, y1, 0);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u2, v1);
 
-            GX_Position3s16(x2, y2, 0);
-            GX_Color4u8(r, g, b, a);
-            GX_TexCoord2u16(u2, v2);
+        GX_Position3s16(x2, y2, 0);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u2, v2);
 
-            GX_Position3s16(x1, y2, 0);
-            GX_Color4u8(r, g, b, a);
-            GX_TexCoord2u16(u1, v2);
+        GX_Position3s16(x1, y2, 0);
+        GX_Color4u8(r, g, b, a);
+        GX_TexCoord2u16(u1, v2);
         GX_End();
 
         if(!mask)
@@ -1055,15 +1090,16 @@ inline bool GX_DrawImage_Custom(GXTexObj* img,
 }
 
 inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
-    GXTexObj* mask,
-    float x, float y, float w, float h,
-    float src_x, float src_y, float src_w, float src_h,
-    unsigned int flip, FPoint_t *center, float angle,
-    float r, float g, float b, float a)
+                                        GXTexObj* mask,
+                                        float x, float y, float w, float h,
+                                        float src_x, float src_y, float src_w, float src_h,
+                                        unsigned int flip, FPoint_t* center, float angle,
+                                        float r, float g, float b, float a)
 {
     Mtx rotated;
 
     float cx, cy;
+
     if(center)
     {
         cx = center->x / 2.0f;
@@ -1087,11 +1123,11 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
     GX_LoadPosMtxImm(rotated, GX_PNMTX0);
 
     GX_DrawImage_Custom(img,
-        mask,
-        -cx, -cy, w, h,
-        src_x, src_y, src_w, src_h,
-        flip,
-        r, g, b, a);
+                        mask,
+                        -cx, -cy, w, h,
+                        src_x, src_y, src_w, src_h,
+                        flip,
+                        r, g, b, a);
 
     GX_LoadPosMtxImm(view, GX_PNMTX0);
 
@@ -1099,10 +1135,10 @@ inline bool GX_DrawImage_Custom_Rotated(GXTexObj* img,
 }
 
 void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
-                             StdPicture &tx,
-                             int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
-                             float rotateAngle, FPoint_t *center, unsigned int flip,
-                             float red, float green, float blue, float alpha)
+                                  StdPicture& tx,
+                                  int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
+                                  float rotateAngle, FPoint_t* center, unsigned int flip,
+                                  float red, float green, float blue, float alpha)
 {
     if(!tx.inited)
         return;
@@ -1115,11 +1151,13 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
 
     // automatic flipping based on SMBX style!
     unsigned int mode = 0;
+
     while(ySrc >= tx.h / 2 && mode < 3)
     {
         ySrc -= tx.h / 2;
         mode += 1;
     }
+
     flip ^= mode;
 
     GXTexObj* to_draw = nullptr;
@@ -1140,26 +1178,32 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
                 wDst += xDst;
                 xDst = 0;
             }
+
             if(wSrc > 1024)
             {
                 wDst = (int)wDst * 1024 / wSrc;
                 wSrc = 1024;
             }
         }
+
         if(xSrc + wSrc > 2048)
         {
             if(tx.d.texture_init[2])
             {
                 to_draw = &tx.d.texture[2];
+
                 if(tx.d.texture_init[5])
                     to_mask = &tx.d.texture[5];
             }
+
             if(xSrc < 2048 && tx.d.texture_init[1])
             {
                 to_draw_2 = &tx.d.texture[1];
+
                 if(tx.d.texture_init[4])
                     to_mask_2 = &tx.d.texture[4];
             }
+
             xSrc -= 1024;
         }
         else
@@ -1167,12 +1211,15 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(tx.d.texture_init[1])
             {
                 to_draw = &tx.d.texture[1];
+
                 if(tx.d.texture_init[4])
                     to_mask = &tx.d.texture[4];
             }
+
             if(xSrc < 1024)
             {
                 to_draw_2 = &tx.d.texture[0];
+
                 if(tx.d.texture_init[3])
                     to_mask_2 = &tx.d.texture[3];
             }
@@ -1185,7 +1232,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             {
                 // TODO: use correct center to support big textures being rotated
                 GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
-                                    xSrc, ySrc, 1024 - xSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
+                                            xSrc, ySrc, 1024 - xSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
             }
             else
                 GX_DrawImage_Custom(to_draw_2, to_mask_2, xDst, yDst, (1024 - xSrc) * wDst / wSrc, hDst,
@@ -1206,15 +1253,19 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(tx.d.texture_init[2])
             {
                 to_draw = &tx.d.texture[2];
+
                 if(tx.d.texture_init[5])
                     to_mask = &tx.d.texture[5];
             }
+
             if(ySrc < 2048 && tx.d.texture_init[1])
             {
                 to_draw_2 = &tx.d.texture[1];
+
                 if(tx.d.texture_init[4])
                     to_mask_2 = &tx.d.texture[4];
             }
+
             ySrc -= 1024;
         }
         else
@@ -1222,12 +1273,15 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(tx.d.texture_init[1])
             {
                 to_draw = &tx.d.texture[1];
+
                 if(tx.d.texture_init[4])
                     to_mask = &tx.d.texture[4];
             }
+
             if(ySrc < 1024)
             {
                 to_draw_2 = &tx.d.texture[0];
+
                 if(tx.d.texture_init[3])
                     to_mask_2 = &tx.d.texture[3];
             }
@@ -1240,11 +1294,12 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             {
                 // TODO: use correct center to support big textures being rotated
                 GX_DrawImage_Custom_Rotated(to_draw_2, to_mask_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
-                                    xSrc, ySrc, wSrc, 1024 - ySrc, flip, center, rotateAngle, red, green, blue, alpha);
+                                            xSrc, ySrc, wSrc, 1024 - ySrc, flip, center, rotateAngle, red, green, blue, alpha);
             }
             else
                 GX_DrawImage_Custom(to_draw_2, to_mask_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
+
             yDst += (1024 - ySrc) * hDst / hSrc;
             hDst -= (1024 - ySrc) * hDst / hSrc;
             hSrc -= (1024 - ySrc);
@@ -1256,6 +1311,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     else
     {
         to_draw = &tx.d.texture[0];
+
         if(tx.d.texture_init[3])
             to_mask = &tx.d.texture[3];
     }
@@ -1264,10 +1320,10 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
 
     if(rotateAngle != 0.0)
         GX_DrawImage_Custom_Rotated(to_draw, to_mask, xDst, yDst, wDst, hDst,
-                             xSrc, ySrc, wSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
+                                    xSrc, ySrc, wSrc, hSrc, flip, center, rotateAngle, red, green, blue, alpha);
     else
         GX_DrawImage_Custom(to_draw, to_mask, xDst, yDst, wDst, hDst,
                             xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
 }
 
-}; // namespace XRender
+} // namespace XRender

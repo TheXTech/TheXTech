@@ -27,17 +27,27 @@
 
 #include "globals.h"
 #include "core/window.h"
+#include "sdl_proxy/sdl_head.h"
+
+#include "Logger/logger.h"
 
 namespace XRender
 {
     extern int g_rmode_w, g_rmode_h;
-};
+}
 
 namespace XWindow
 {
 
 bool init()
 {
+    // Mixer is the only component using SDL on Wii
+    if(SDL_Init(SDL_INIT_AUDIO|SDL_INIT_TIMER) < 0)
+    {
+        pLogWarning("Couldn't initialize SDL audio: %s\n", SDL_GetError());
+        return false;
+    }
+
     return true;
 }
 
@@ -66,4 +76,4 @@ bool hasWindowInputFocus() { return true; }
 bool hasWindowMouseFocus() { return true; }
 
 
-}; // namespace XWindow
+} // namespace XWindow

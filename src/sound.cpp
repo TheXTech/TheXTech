@@ -20,6 +20,7 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_atomic.h"
+#include "sdl_proxy/sdl_assert.h"
 #include "sdl_proxy/mixer.h"
 
 #include "globals.h"
