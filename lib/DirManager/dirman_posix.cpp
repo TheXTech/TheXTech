@@ -42,7 +42,7 @@ static std::mutex g_dirManMutex;
 
 #   define PUT_THREAD_GUARD() \
     std::lock_guard<std::mutex> guard(g_dirManMutex);\
-    (void)guard;
+    (void)guard
 
 #else
 #   define PUT_THREAD_GUARD() (void)0
