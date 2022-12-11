@@ -156,6 +156,9 @@ option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support"
 
 option(THEXTECH_CLI_BUILD "Minimal CLI build for testing and benchmarking on desktop platforms" OFF)
 
+option(THEXTECH_ENABLE_WIP_FEATURES "Enable experimental and incomplete features (disabled by default)" OFF)
+mark_as_advanced(THEXTECH_ENABLE_WIP_FEATURES)
+
 option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
 
 option(ENABLE_ADDRESS_SANITIZER "Enable the Address Sanitizer GCC feature" OFF)
@@ -810,6 +813,10 @@ endif()
 
 if(THEXTECH_CLI_BUILD)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_CLI_BUILD)
+endif()
+
+if(THEXTECH_ENABLE_WIP_FEATURES)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_WIP_FEATURES)
 endif()
 
 if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")

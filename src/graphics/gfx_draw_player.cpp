@@ -29,6 +29,12 @@
 //! Get left pixel at the player sprite
 int pfrX(const StdPicture& tx, const Player_t& p)
 {
+#ifndef THEXTECH_WIP_FEATURES
+    return ((p.Frame * p.Direction + 49) / 10) * 100;
+
+#else
+    // FIXME: Replace this heuristic logic with a proper texture flags mechanism
+
     // will use internal flags (tx.flags & PLAYER_MODERN and tx.flags & PLAYER_CUSTOM) in future
     // if tx.flags & PLAYER_CUSTOM, then will use heap-allocated polymorphic CustomData_t* tx.custom_data,
     // which will include all frame bounding boxes and offsets
@@ -54,11 +60,17 @@ int pfrX(const StdPicture& tx, const Player_t& p)
         else
             return col_w * col;
     }
+#endif
 }
 
 //! Get top pixel at the player sprite
 int pfrY(const StdPicture& tx, const Player_t& p)
 {
+#ifndef THEXTECH_WIP_FEATURES
+    return ((p.Frame * p.Direction + 49) % 10) * 100;
+
+#else
+    // FIXME: Replace this heuristic logic with a proper texture flags mechanism
     if(tx.w == 1000)
         return ((p.Frame * p.Direction + 49) % 10) * 100;
     else
@@ -80,6 +92,7 @@ int pfrY(const StdPicture& tx, const Player_t& p)
         else
             return row_h * row;
     }
+#endif
 }
 
 //! Get width at the player sprite
@@ -109,7 +122,7 @@ int pfrOffX(const StdPicture& tx, const Player_t& p)
 {
     UNUSED(tx);
 
-    if(p.Character < 1 || p.Character > 5)
+    if((p.Character < 1) || (p.Character > 5))
         return 0;
 
     using plr_frame_off_arr = RangeArrI<int, 0, maxPlayerFrames, 0>;
@@ -124,7 +137,7 @@ int pfrOffY(const StdPicture& tx, const Player_t& p)
 {
     UNUSED(tx);
 
-    if(p.Character < 1 || p.Character > 5)
+    if((p.Character < 1) || (p.Character > 5))
         return 0;
 
     using plr_frame_off_arr = RangeArrI<int, 0, maxPlayerFrames, 0>;
