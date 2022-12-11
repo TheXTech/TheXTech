@@ -12,19 +12,21 @@
 
 typedef uintptr_t SoundId;
 
-typedef enum _CHANNEL_FORMAT {
- FORMAT_FREE = 1 << 0,
- FORMAT_LOADING = 1 << 1,
- FORMAT_PCM_FILE = 1 << 2,
- FORMAT_OGG_FILE = 1 << 3,
- FORMAT_PCM_MEM = 1 << 4,
- FORMAT_GME_FILE = 1 << 5,
+typedef enum _CHANNEL_FORMAT
+{
+    FORMAT_FREE = 1 << 0,
+    FORMAT_LOADING = 1 << 1,
+    FORMAT_PCM_FILE = 1 << 2,
+    FORMAT_OGG_FILE = 1 << 3,
+    FORMAT_PCM_MEM = 1 << 4,
+    FORMAT_GME_FILE = 1 << 5,
 } CHANNEL_FORMAT;
 
-typedef struct _SimpleChannel {
+typedef struct _SimpleChannel
+{
     int channel_id;
     CHANNEL_FORMAT format;
-    void *data_pointer;
+    void* data_pointer;
     size_t data_idx;
     size_t data_size;
     ndspWaveBuf wavebufs[NUM_BUFFERS];
@@ -34,7 +36,8 @@ typedef struct _SimpleChannel {
     SoundId index;
 } SimpleChannel;
 
-typedef struct _WaveObject {
+typedef struct _WaveObject
+{
     bool stereo;
     uint32_t sampleRate;
     const char* data;
@@ -59,15 +62,15 @@ bool audioSoundPlaying(SoundId soundId);
 
 const char* get_filename_ext(const char* filename);
 
-SoundId playSoundWAV(const char* path, int loops=0);
+SoundId playSoundWAV(const char* path, int loops = 0);
 
-SoundId playSoundMem(const WaveObject* wave, int loops=0);
+SoundId playSoundMem(const WaveObject* wave, int loops = 0);
 
-SoundId playSoundOGG(const char* path, int loops=-1);
+SoundId playSoundOGG(const char* path, int loops = -1);
 
-SoundId playSoundGME(const char* path, int loops=-1);
+SoundId playSoundGME(const char* path, int loops = -1);
 
-SoundId playSoundAuto(const char* path, int loops=-1);
+SoundId playSoundAuto(const char* path, int loops = -1);
 
 void killSound(SoundId soundId);
 
