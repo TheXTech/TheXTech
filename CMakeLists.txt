@@ -572,13 +572,11 @@ elseif(NINTENDO_WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
         src/control/input_wii.cpp
-        src/core/wii/std_wii.cpp
         src/core/minport/render_minport_shared.cpp
         src/core/wii/render_wii.cpp
         src/core/wii/window_wii.cpp
         src/core/wii/msgbox_wii.cpp
         src/core/wii/events_wii.cpp
-        src/core/sdl/mixer_mixerx.cpp
     )
 elseif(PGE_MIN_PORT)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
@@ -587,7 +585,6 @@ elseif(PGE_MIN_PORT)
         src/core/null/window_null.cpp
         src/core/null/msgbox_null.cpp
         src/core/null/events_null.cpp
-        src/core/null/mixer_null.cpp
     )
 endif()
 

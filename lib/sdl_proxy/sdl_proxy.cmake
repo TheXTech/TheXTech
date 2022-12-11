@@ -30,5 +30,6 @@ elseif(PGE_MIN_PORT)
     add_definitions(-DSDLRPOXY_NULL)
     list(APPEND SDLPROXY_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/null/std_null.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/null/mixer_null.cpp
     )
 endif()

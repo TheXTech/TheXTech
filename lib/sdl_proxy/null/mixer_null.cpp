@@ -29,7 +29,7 @@
 #include <cstring>
 #include <cstdlib>
 
-#include "core/mixer.h"
+#include "../mixer.h"
 #include "globals.h"
 
 bool MixPlatform_Init(AudioSetup_t& obtained)
