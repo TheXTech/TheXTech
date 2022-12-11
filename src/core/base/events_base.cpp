@@ -18,20 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_scancode.h>
-#include "core/sdl.h"
-
 #include "events_base.h"
-#include "window_base.h"
 #include "../render.h"
-#include "../window.h"
 #include "controls.h"
-#include "main/cheat_code.h"
-#include "globals.h"
 #include "graphics.h"
-#include "editor.h"
-#include "frame_timer.h"
-
 
 AbstractEvents_t *g_events = nullptr;
 

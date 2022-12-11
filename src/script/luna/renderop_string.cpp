@@ -20,7 +20,7 @@
 
 #include "renderop_string.h"
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 #include "core/render.h"
 
 RenderStringOp::RenderStringOp() :

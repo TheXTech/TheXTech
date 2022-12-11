@@ -23,7 +23,7 @@
 #define RENDEROP_H
 
 #include "lunarender.h"
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_assert.h"
 
 
 static const double RENDEROP_PRIORITY_MIN = -100.0;

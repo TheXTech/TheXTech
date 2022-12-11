@@ -25,7 +25,7 @@
 #include <string>
 
 #ifndef MSGBOX_CUSTOM
-#   include "core/sdl.h"
+#   include "sdl_proxy/sdl_stdinc.h"
 #   include "base/msgbox_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL

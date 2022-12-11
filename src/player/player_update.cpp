@@ -40,7 +40,6 @@
 #include "../graphics.h"
 #include "../controls.h"
 
-#include "core/sdl.h"
 #include "pge_delay.h"
 
 

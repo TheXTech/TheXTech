@@ -27,7 +27,7 @@
 #include "base/render_types.h"
 
 #ifndef RENDER_CUSTOM
-#   include "core/sdl.h"
+#   include "sdl_proxy/sdl_stdinc.h"
 #   include "base/render_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL

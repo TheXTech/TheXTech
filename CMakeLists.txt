@@ -244,6 +244,7 @@ include(lib/Logger/logger.cmake)
 include(lib/AppPath/app_path.cmake)
 include(lib/tclap/tclap.cmake)
 include(lib/md5/md5.cmake)
+include(lib/sdl_proxy/sdl_proxy.cmake)
 if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
@@ -349,6 +350,7 @@ set(LIB_SRC
     ${LOGGER_SRCS}
     ${UTILS_SRCS}
     ${LIB_SRC_EXTRA}
+    ${SDLPROXY_SRCS}
 )
 
 if(NINTENDO_WII OR NOT PGE_MIN_PORT)
@@ -549,18 +551,15 @@ if(NOT PGE_MIN_PORT)
         src/core/base/window_base.cpp
         src/core/base/msgbox_base.cpp
         src/core/base/events_base.cpp
-        src/core/base/std_base.cpp
         src/core/sdl/render_sdl.cpp
         src/core/sdl/window_sdl.cpp
         src/core/sdl/msgbox_sdl.cpp
         src/core/sdl/events_sdl.cpp
-        src/core/sdl/mixer_mixerx.cpp
     )
 elseif(NINTENDO_3DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
     list(APPEND THEXTECH_SRC
         src/control/input_3ds.cpp
-        src/core/3ds/std_3ds.cpp
         src/core/minport/render_minport_shared.cpp
         src/core/3ds/render_3ds.cpp
         src/core/3ds/window_3ds.cpp
@@ -584,7 +583,6 @@ elseif(NINTENDO_WII)
 elseif(PGE_MIN_PORT)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
     list(APPEND THEXTECH_SRC
-        src/core/null/std_null.cpp
         src/core/null/render_null.cpp
         src/core/null/window_null.cpp
         src/core/null/msgbox_null.cpp

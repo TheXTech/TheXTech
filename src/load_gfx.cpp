@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_timer.h"
 #ifndef PGE_NO_THREADING
 #include <SDL2/SDL_mutex.h>
 #endif

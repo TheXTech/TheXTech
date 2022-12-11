@@ -24,51 +24,14 @@
 
 // for AudioSetup_t
 #include "sound.h"
+#include "sdl_audio.h"
 
 bool MixPlatform_Init(AudioSetup_t& obtained);
 void MixPlatform_Quit();
 
 int  MixPlatform_PlayStream(int channel, const char* path, int loops);
 
-
 #ifdef NO_SDL
-
-/* @{ */
-#define AUDIO_U8        0x0008
-#define AUDIO_S8        0x8008
-#define AUDIO_U16LSB    0x0010
-#define AUDIO_S16LSB    0x8010
-#define AUDIO_U16MSB    0x1010
-#define AUDIO_S16MSB    0x9010
-#define AUDIO_U16       AUDIO_U16LSB
-#define AUDIO_S16       AUDIO_S16LSB
-/* @} */
-
-/* @{ */
-#define AUDIO_S32LSB    0x8020
-#define AUDIO_S32MSB    0x9020
-#define AUDIO_S32       AUDIO_S32LSB
-/* @} */
-
-/* @{ */
-#define AUDIO_F32LSB    0x8120
-#define AUDIO_F32MSB    0x9120
-#define AUDIO_F32       AUDIO_F32LSB
-/* @} */
-
-/* @{ */
-#ifndef THEXTECH_BIG_ENDIAN
-#define AUDIO_U16SYS    AUDIO_U16LSB
-#define AUDIO_S16SYS    AUDIO_S16LSB
-#define AUDIO_S32SYS    AUDIO_S32LSB
-#define AUDIO_F32SYS    AUDIO_F32LSB
-#else
-#define AUDIO_U16SYS    AUDIO_U16MSB
-#define AUDIO_S16SYS    AUDIO_S16MSB
-#define AUDIO_S32SYS    AUDIO_S32MSB
-#define AUDIO_F32SYS    AUDIO_F32MSB
-#endif
-/* @} */
 
 struct Mix_Music;
 struct Mix_Chunk;

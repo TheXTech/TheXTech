@@ -37,7 +37,7 @@
 #include "xtech_lua_main.h"
 #endif
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_timer.h"
 
 #include "globals.h"
 #include "game_main.h"

@@ -28,7 +28,7 @@
 
 #include <vector>
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_assert.h"
 
 #include "Talkhaus-Science_Final_Battle.h"
 #include "globals.h"

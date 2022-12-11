@@ -22,8 +22,6 @@
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
 
-#include "core/sdl.h"
-
 #include "luna.h"
 #include "lunacounter.h"
 #include "lunacounter_util.h"

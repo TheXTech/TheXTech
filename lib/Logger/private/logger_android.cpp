@@ -22,7 +22,7 @@
 #include "logger_private.h"
 
 #include <mutex>
-#include <SDL2/SDL_rwops.h>
+#include "sdl_proxy/sdl_rwops.h"
 
 #include <android/log.h>
 

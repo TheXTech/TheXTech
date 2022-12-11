@@ -32,7 +32,7 @@
 #include <fmt_format_ne.h>
 #include <fmt/fmt_printf.h>
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 
 std::string     LogWriter::m_logDirPath;

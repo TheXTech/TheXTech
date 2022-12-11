@@ -33,7 +33,7 @@
 #include <cstring>
 #include <cstdlib>
 
-#include "core/mixer.h"
+#include "../mixer.h"
 #include "3ds-audio-lib.h"
 
 static SoundId* cur_sound = nullptr;

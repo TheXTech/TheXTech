@@ -23,29 +23,8 @@ typedef uint8_t Uint8;
 #define SDL_IMPORT(func) static constexpr auto& SDL_ ## func = func;
 #define SDL_IMPORT_MATH(func) inline double SDL_ ## func(double arg) { return std::func(arg); }
 
-#define SDL_FORCE_INLINE inline
-
-inline void SDL_assert_release(bool arg)
-{
-    UNUSED(arg);
-}
-
-inline void SDL_assert(bool arg)
-{
-    UNUSED(arg);
-}
-
-using SDL_atomic_t = volatile int;
-
-inline void SDL_AtomicSet(SDL_atomic_t* loc, int value)
-{
-    *loc = value;
-}
-
-inline int SDL_AtomicGet(const SDL_atomic_t* loc)
-{
-    return *loc;
-}
+#define SDL_INLINE inline
+#define SDL_FORCE_INLINE static inline
 
 inline const char* SDL_strstr(const char* haystack, const char* needle)
 {

@@ -26,7 +26,7 @@
 #include "../video.h"
 #include "../controls.h"
 
-#include "core/mixer.h"
+#include "sdl_proxy/sdl_audio.h"
 
 #include "speedrunner.h"
 #include "presetup.h"

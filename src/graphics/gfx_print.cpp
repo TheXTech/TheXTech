@@ -20,7 +20,7 @@
 
 #include <algorithm>
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 #include "core/render.h"
 
 #include "globals.h"

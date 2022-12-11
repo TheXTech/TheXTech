@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <3ds.h>
 
-#include "core/sdl.h"
+#include "../sdl_timer.h"
 
 uint32_t __stacksize__ = 0x00020000;
 

@@ -22,7 +22,7 @@
 #include <fmt_format_ne.h>
 #include <IniProcessor/ini_processing.h>
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "gameplay_timer.h"
 #include "graphics.h"

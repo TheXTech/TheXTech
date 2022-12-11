@@ -24,7 +24,7 @@
 #include <fmt_format_ne.h>
 #include <pge_delay.h>
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "globals.h"
 #include "player.h"

@@ -23,7 +23,7 @@
 #define EVENTS_HHHHHHH
 
 #ifndef EVENTS_CUSTOM
-#   include "core/sdl.h"
+#   include "sdl_proxy/sdl_stdinc.h"
 #   include "base/events_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
