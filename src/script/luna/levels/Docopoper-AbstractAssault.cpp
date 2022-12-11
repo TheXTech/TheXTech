@@ -34,9 +34,9 @@
 #include "Docopoper-AbstractAssault.h"
 
 
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
-#define CLAMP(x, l, h) (((x) > (h)) ? (h) : (((x) < (l)) ? (l) : (x)))
+#define X_MAX(a, b) (((a) > (b)) ? (a) : (b))
+#define X_MIN(a, b) (((a) < (b)) ? (a) : (b))
+#define X_CLAMP(x, l, h) (((x) > (h)) ? (h) : (((x) < (l)) ? (l) : (x)))
 
 
 void AbstractAssaultCode()
@@ -86,7 +86,7 @@ void AbstractAssaultCode()
 
         demo -> SpinJump = false;
 
-        layerDefault -> SpeedX = (float) MAX(layerDefault -> SpeedX - 0.015, -2.5);
+        layerDefault -> SpeedX = (float) X_MAX(layerDefault -> SpeedX - 0.015, -2.5);
 
         if(demo -> Hearts > 1)
             powerup = 6;
@@ -96,8 +96,8 @@ void AbstractAssaultCode()
 
         if(noControlTimer == 0)
         {
-            vspeed = (float) CLAMP(vspeed + (press_down - press_up) * 0.5, -10, 10);
-            hspeed = (float) CLAMP(hspeed + (press_right - press_left) * 0.5, -10, 10);
+            vspeed = (float) X_CLAMP(vspeed + (press_down - press_up) * 0.5, -10, 10);
+            hspeed = (float) X_CLAMP(hspeed + (press_right - press_left) * 0.5, -10, 10);
         }
         else
             noControlTimer--;
