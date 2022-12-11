@@ -19,6 +19,7 @@
  */
 
 #include "sdl_proxy/sdl_timer.h"
+#include "sdl_proxy/sdl_assert.h"
 #ifndef PGE_NO_THREADING
 #include <SDL2/SDL_mutex.h>
 #endif

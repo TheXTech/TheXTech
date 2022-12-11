@@ -24,9 +24,9 @@
 
 #include <SDL2/SDL_timer.h>
 
-#ifdef __WII__
-#define SDL_GetTicks SDL_GetTicks_Wii_
-#endif
+//#ifdef __WII__
+//#define SDL_GetTicks SDL_GetTicks_Wii_
+//#endif
 
 #ifndef SDL_timer_h_
 extern uint32_t SDL_GetTicks();

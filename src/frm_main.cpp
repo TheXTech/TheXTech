@@ -21,7 +21,7 @@
 #include <Logger/logger.h>
 
 #if defined(__WII__) || !defined(RENDER_CUSTOM)
-#include <Graphics/graphics_funcs.h>
+#   include <Graphics/graphics_funcs.h>
 #endif
 
 #include "gfx.h"

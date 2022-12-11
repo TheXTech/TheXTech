@@ -35,15 +35,13 @@ bool init()
 }
 
 void quit()
-{
-}
+{}
 
 void doEvents()
-{
-}
+{}
 
 void waitEvents() {}
 
 void eventResize() {}
 
-}; // namespace XEvents
+} // namespace XEvents
