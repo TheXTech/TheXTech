@@ -1,4 +1,4 @@
-#include "core/sdl.h"
+#include "../sdl_timer.h"
 
 uint32_t curTime = 0u;
 

@@ -26,7 +26,7 @@
 #include "core/events.h"
 #endif
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include <Logger/logger.h>
 #ifdef ENABLE_ANTICHEAT_TRAP

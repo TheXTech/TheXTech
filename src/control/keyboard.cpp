@@ -18,7 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_scancode.h>
+#include <SDL2/SDL_power.h>
+#include <SDL2/SDL_keyboard.h>
+#include <SDL2/SDL_mouse.h>
+#include <SDL2/SDL_events.h>
+#include "sdl_proxy/sdl_timer.h"
 
 #include "../controls.h"
 #include "../globals.h"

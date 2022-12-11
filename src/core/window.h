@@ -25,7 +25,7 @@
 #include "base/window_types.h"
 
 #ifndef WINDOW_CUSTOM
-#   include "core/sdl.h"
+#   include "sdl_proxy/sdl_stdinc.h"
 #   include "base/window_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL

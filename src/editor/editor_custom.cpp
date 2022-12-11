@@ -23,7 +23,7 @@
 
 #include <fmt_format_ne.h>
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "editor/editor_custom.h"
 

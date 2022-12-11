@@ -1,6 +1,6 @@
 #include <Utils/elapsed_timer.h>
 
-#include "core/sdl.h"
+#include "../sdl_timer.h"
 
 static ElapsedTimer s_timer;
 static bool s_init = false;

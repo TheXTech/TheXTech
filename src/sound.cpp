@@ -18,8 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/sdl.h"
-#include "core/mixer.h"
+#include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_atomic.h"
+#include "sdl_proxy/mixer.h"
 
 #include "globals.h"
 #include "global_dirs.h"

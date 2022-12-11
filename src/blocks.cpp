@@ -21,7 +21,7 @@
 
 #include <algorithm>
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "globals.h"
 #include "frame_timer.h"

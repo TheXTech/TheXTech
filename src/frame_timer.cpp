@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_timer.h"
 
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>

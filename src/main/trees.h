@@ -22,7 +22,7 @@
 #ifndef TREES_HHHH
 #define TREES_HHHH
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_assert.h"
 
 #include "globals.h"
 
@@ -66,12 +66,12 @@ public:
         // Postfix decrement
         it operator--(int) { it tmp = *this; --(*this); return tmp; }
 
-        friend bool operator== (const it& a, const it& b) { return a.it_internal == b.it_internal; };
-        friend bool operator!= (const it& a, const it& b) { return a.it_internal != b.it_internal; };
-        friend bool operator<= (const it& a, const it& b) { return a.it_internal <= b.it_internal; };
-        friend bool operator>= (const it& a, const it& b) { return a.it_internal >= b.it_internal; };
-        friend bool operator< (const it& a, const it& b) { return a.it_internal < b.it_internal; };
-        friend bool operator> (const it& a, const it& b) { return a.it_internal > b.it_internal; };
+        friend bool operator== (const it& a, const it& b) { return a.it_internal == b.it_internal; }
+        friend bool operator!= (const it& a, const it& b) { return a.it_internal != b.it_internal; }
+        friend bool operator<= (const it& a, const it& b) { return a.it_internal <= b.it_internal; }
+        friend bool operator>= (const it& a, const it& b) { return a.it_internal >= b.it_internal; }
+        friend bool operator< (const it& a, const it& b) { return a.it_internal < b.it_internal; }
+        friend bool operator> (const it& a, const it& b) { return a.it_internal > b.it_internal; }
 
         std::vector<BaseRef_t>::iterator it_internal;
     };

@@ -24,7 +24,7 @@
 #include <algorithm>
 #include <cstdlib>
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #ifdef _WIN32
 #include <windows.h>

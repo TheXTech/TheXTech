@@ -20,6 +20,7 @@
 
 #include <set>
 
+#include "sdl_proxy/sdl_stdinc.h"
 #include "globals.h"
 #include "layers.h"
 #include "effect.h"
@@ -50,12 +51,12 @@ int newEventNum = 0;
 layerindex_t LAYER_USED_P_SWITCH = LAYER_NONE;
 static std::set<eventindex_t> recentlyTriggeredEvents;
 
-static inline bool equalCase(const std::string &x, const std::string &y)
+static SDL_INLINE bool equalCase(const std::string &x, const std::string &y)
 {
     return (SDL_strcasecmp(x.c_str(), y.c_str()) == 0);
 }
 
-static inline bool equalCase(const char *x, const char *y)
+static SDL_INLINE bool equalCase(const char *x, const char *y)
 {
     return (SDL_strcasecmp(x, y) == 0);
 }

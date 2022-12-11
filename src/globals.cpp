@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "core/events.h"
 #include "globals.h"
@@ -628,7 +628,7 @@ int vb6Round(double x)
 #ifdef USE_CUSTOM_TONEAREST
 #   define toNearest pge_toNearest
 #else
-static inline double toNearest(double x)
+static SDL_INLINE double toNearest(double x)
 {
     int round_old = std::fegetround();
     if(round_old == FE_TONEAREST)

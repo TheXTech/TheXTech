@@ -25,7 +25,7 @@
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "autocode.h"
 #include "autocode_manager.h"

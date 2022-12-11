@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_head.h"
 
 #include "game_main.h"
 #include "frm_main.h"

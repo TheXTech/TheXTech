@@ -38,7 +38,7 @@
 #include "../config.h"
 #include "record.h"
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_timer.h"
 
 #include <chrono>
 #include <fmt_time_ne.h>

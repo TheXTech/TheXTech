@@ -20,7 +20,6 @@
 
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_power.h>
-#include "core/sdl.h"
 #include <SDL2/SDL_rwops.h>
 
 #define USE_SDL_POWER

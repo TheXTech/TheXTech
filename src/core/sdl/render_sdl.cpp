@@ -30,7 +30,7 @@
 #include "video.h"
 #include "core/window.h"
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_stdinc.h"
 #include <fmt_format_ne.h>
 
 #include "controls.h"
@@ -596,7 +596,7 @@ void RenderSDL::renderCircleHole(int cx, int cy, int radius, float red, float gr
 
 
 
-static inline void txColorMod(StdPictureData &tx, float red, float green, float blue, float alpha)
+static SDL_INLINE void txColorMod(StdPictureData &tx, float red, float green, float blue, float alpha)
 {
     uint8_t modColor[4] = {static_cast<unsigned char>(255.f * red),
                            static_cast<unsigned char>(255.f * green),

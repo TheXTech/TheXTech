@@ -30,7 +30,7 @@ typedef union SDL_Event SDL_Event;
 
 #include <IniProcessor/ini_processing.h>
 
-#include "core/sdl.h"
+#include "sdl_proxy/sdl_assert.h"
 
 #include "globals.h"
 

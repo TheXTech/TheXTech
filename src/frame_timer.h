@@ -22,8 +22,6 @@
 #ifndef FRAME_TIMER_H
 #define FRAME_TIMER_H
 
-#include "core/sdl.h"
-
 #include <cstdint>
 #include <functional>
 

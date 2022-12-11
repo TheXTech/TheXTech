@@ -1,4 +1,4 @@
-#include "core/sdl.h"
+#include "../sdl_timer.h"
 
 #include <gccore.h>
 
