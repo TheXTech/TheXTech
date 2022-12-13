@@ -31,7 +31,11 @@
 #include <cstdio>
 
 #ifndef PGE_NO_THREADING
-#    include <mutex>
+#   ifdef PGE_SDL_MUTEX
+#       include <SDL2/SDL_mutex.h>
+#   else
+#       include <mutex>
+#   endif
 #endif
 
 #include <sstream>
@@ -47,24 +51,40 @@
 
 #ifdef PGE_NO_THREADING
 
-#   define MUTEXLOCK(mn) (void)mn
+#   define MUTEXLOCK(mn) (void)0
 
 #else
 
 class MutexLocker
 {
+#ifdef PGE_SDL_MUTEX
+    SDL_mutex *m_mutex;
+#else
     std::mutex *m_mutex;
+#endif
 
 public:
+#ifdef PGE_SDL_MUTEX
+    MutexLocker(SDL_mutex **mutex)
+    {
+        m_mutex = *mutex;
+        SDL_LockMutex(m_mutex);
+    }
+#else
     MutexLocker(std::mutex *mutex)
     {
         m_mutex = mutex;
         m_mutex->lock();
     }
+#endif
 
     ~MutexLocker()
     {
+#ifdef PGE_SDL_MUTEX
+        SDL_UnlockMutex(m_mutex);
+#else
         m_mutex->unlock();
+#endif
     }
 };
 

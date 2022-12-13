@@ -129,7 +129,7 @@ endif()
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR XTECH_MACOSX_TIGER)
+if(HAIKU OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_3DS OR XTECH_MACOSX_TIGER)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
@@ -252,15 +252,16 @@ if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
 
-if(NINTENDO_3DS)
-    set(GME_YM2612_EMU "GENS" CACHE STRING "" FORCE)
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-    set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
-    set(BUILD_GME_STATIC ON CACHE BOOL "" FORCE)
-    set(GME_ENABLE_ZLIB OFF CACHE BOOL "" FORCE)
-    set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
-    add_subdirectory(3rdparty/AudioCodecs/libgme)
-elseif(PGE_MIN_PORT)
+#if(NINTENDO_3DS)
+#    set(GME_YM2612_EMU "GENS" CACHE STRING "" FORCE)
+#    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+#    set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
+#    set(BUILD_GME_STATIC ON CACHE BOOL "" FORCE)
+#    set(GME_ENABLE_ZLIB OFF CACHE BOOL "" FORCE)
+#    set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
+#    add_subdirectory(3rdparty/AudioCodecs/libgme)
+#else
+if(PGE_MIN_PORT)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
 endif()
@@ -325,7 +326,7 @@ if(USE_SYSTEM_LIBS)
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
-elseif(NOT PGE_MIN_PORT OR NINTENDO_WII)
+elseif(NOT PGE_MIN_PORT OR NINTENDO_WII OR NINTENDO_3DS)
     include(cmake/library_FreeImage.cmake)
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_LIBS PGE_FreeImage)
@@ -356,7 +357,7 @@ set(LIB_SRC
     ${SDLPROXY_SRCS}
 )
 
-if(NINTENDO_WII OR NOT PGE_MIN_PORT)
+if(NINTENDO_WII OR NINTENDO_3DS OR NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
         lib/Graphics/graphics_funcs.cpp
         lib/Graphics/image_size.cpp
@@ -560,7 +561,7 @@ if(NOT PGE_MIN_PORT)
         src/core/sdl/events_sdl.cpp
     )
 elseif(NINTENDO_3DS)
-    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
         src/control/input_3ds.cpp
         src/core/minport/render_minport_shared.cpp
@@ -568,7 +569,7 @@ elseif(NINTENDO_3DS)
         src/core/3ds/window_3ds.cpp
         src/core/3ds/msgbox_3ds.cpp
         src/core/3ds/events_3ds.cpp
-        src/core/3ds/3ds-audio-lib.cpp
+#        src/core/3ds/3ds-audio-lib.cpp
     )
 elseif(NINTENDO_WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
@@ -674,16 +675,16 @@ if(ANDROID)
 #        DEPENDS SDL_ApkPackLibs_makeDir "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" AudioCodecs_Local
 #    )
 #    add_dependencies(thextech SDL_ApkPackLibs_hidapi)
-elseif(NINTENDO_3DS)
-    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
-    target_include_directories(thextech PRIVATE "3rdparty/AudioCodecs/libgme/include/" SYSTEM)
-    target_include_directories(thextech PRIVATE "/opt/devkitpro/portlibs/3ds/include/" SYSTEM)
-    target_link_libraries(thextech PRIVATE gme_static)
-    target_link_libraries(thextech PRIVATE pgefl)
-    target_link_libraries(thextech PRIVATE citro2d citro3d ctru)
-    target_link_libraries(thextech PRIVATE vorbisidec ogg)
-    set_target_properties(thextech PROPERTIES SUFFIX ".elf")
-elseif(NINTENDO_WII)
+
+#elseif(NINTENDO_3DS)
+#    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
+#    target_include_directories(thextech PRIVATE "3rdparty/AudioCodecs/libgme/include/" SYSTEM)
+#    target_include_directories(thextech PRIVATE "/opt/devkitpro/portlibs/3ds/include/" SYSTEM)
+#    target_link_libraries(thextech PRIVATE gme_static)
+#    target_link_libraries(thextech PRIVATE pgefl)
+#    target_link_libraries(thextech PRIVATE citro2d citro3d ctru)
+#    set_target_properties(thextech PROPERTIES SUFFIX ".elf")
+elseif(NINTENDO_WII OR NINTENDO_3DS)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
 elseif(THEXTECH_CLI_BUILD)
@@ -803,7 +804,7 @@ if(NINTENDO_WII)
 endif()
 
 if(NINTENDO_3DS)
-    target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__3DS__)
+    target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_SDL_MUTEX -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__3DS__)
 elseif(NINTENDO_WII)
     target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__WII__)
 elseif(PGE_MIN_PORT)

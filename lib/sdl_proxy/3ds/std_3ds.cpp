@@ -21,9 +21,9 @@ uint64_t SDL_GetMicroTicks()
     return (uint64_t)(svcGetSystemTick() - originalTime) * 1000000 / tr.sysclock_hz;
 }
 
-uint32_t SDL_GetTicks()
-{
-    if(originalTime == -1u)
-        originalTime = osGetTime();
-    return (uint32_t)((osGetTime() - originalTime));
-}
+//uint32_t SDL_GetTicks()
+//{
+//    if(originalTime == -1u)
+//        originalTime = osGetTime();
+//    return (uint32_t)((osGetTime() - originalTime));
+//}

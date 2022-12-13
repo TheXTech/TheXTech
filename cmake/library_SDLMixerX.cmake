@@ -7,7 +7,7 @@ add_library(PGE_SDLMixerX_static INTERFACE)
 set(SDL_BRANCH "release-2.0.12")
 set(SDL_GIT_BRANCH "origin/release-2.0.12")
 
-if(EMSCRIPTEN OR APPLE OR ANDROID OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII)
+if(EMSCRIPTEN OR APPLE OR ANDROID OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_3DS)
     set(PGE_SHARED_SDLMIXER_DEFAULT OFF)
 else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
@@ -103,6 +103,12 @@ endif()
 if(NINTENDO_WII)
     list(APPEND MixerX_SysLibs
         asnd ogc vorbisidec ogg
+    )
+endif()
+
+if(NINTENDO_3DS)
+    list(APPEND MixerX_SysLibs
+        citro2d citro3d ctru #vorbisidec ogg
     )
 endif()
 

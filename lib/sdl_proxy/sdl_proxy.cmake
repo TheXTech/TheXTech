@@ -12,7 +12,7 @@ list(APPEND SDLPROXY_SRCS ${SDLPROXY_HEADS})
 if(NINTENDO_3DS)
     add_definitions(-DSDLRPOXY_3DS)
     list(APPEND SDLPROXY_SRCS
-        ${CMAKE_CURRENT_LIST_DIR}/3ds/mixer_3ds.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/base/mixer_mixerx.cpp
         ${CMAKE_CURRENT_LIST_DIR}/3ds/std_3ds.cpp
     )
 elseif(NINTENDO_WII)

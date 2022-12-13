@@ -27,8 +27,20 @@
 static FILE* s_logout;
 #endif // #ifndef NO_FILE_LOGGING
 
+#ifndef PGE_NO_THREADING
+#   ifdef PGE_SDL_MUTEX
+    static SDL_mutex *g_lockLocker = nullptr;
+#   else
+    static std::mutex g_lockLocker;
+#   endif
+#endif
+
 void LogWriter::OpenLogFile()
 {
+#if !defined(PGE_NO_THREADING) && defined(PGE_SDL_MUTEX)
+    g_lockLocker = SDL_CreateMutex();
+#endif
+
     if(m_enabled)
     {
 #ifndef NO_FILE_LOGGING
@@ -39,6 +51,10 @@ void LogWriter::OpenLogFile()
 
 void LogWriter::CloseLog()
 {
+#if !defined(PGE_NO_THREADING) && defined(PGE_SDL_MUTEX)
+    SDL_DestroyMutex(g_lockLocker);
+    g_lockLocker = nullptr;
+#endif
 #ifndef NO_FILE_LOGGING
     if(s_logout)
         std::fclose(s_logout);
@@ -61,6 +77,7 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg)
 {
 #ifndef NO_FILE_LOGGING
+    MUTEXLOCK(mutex);
     if(!s_logout)
         return;
 

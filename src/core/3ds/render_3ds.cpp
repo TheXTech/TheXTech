@@ -29,6 +29,7 @@
 #include <set>
 
 #include <Logger/logger.h>
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "globals.h"
 #include "video.h"

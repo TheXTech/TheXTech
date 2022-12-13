@@ -68,6 +68,13 @@ const AudioDefaults_t g_audioDefaults =
     1536,
     (int)AUDIO_S16SYS
 };
+#elif defined(__3DS__)
+{
+    32000,
+    2,
+    2048,
+    (int)AUDIO_S16SYS
+};
 #elif defined(__SWITCH__) /* Defaults for Nintendo Switch */
 {
     48000,
@@ -750,16 +757,16 @@ void PlayInitSound()
 
         if(!p.empty())
         {
-#ifdef __3DS__
-            MixPlatform_PlayStream(-1, (SfxRoot + p).c_str(), 0);
-#else
+//#ifdef __3DS__
+//            MixPlatform_PlayStream(-1, (SfxRoot + p).c_str(), 0);
+//#else
             Mix_Music *loadsfx = Mix_LoadMUS((SfxRoot + p).c_str());
             if(loadsfx)
             {
                 Mix_PlayMusicStream(loadsfx, 0);
                 Mix_SetFreeOnStop(loadsfx, 1);
             }
-#endif
+//#endif
         }
     }
 }
@@ -993,8 +1000,8 @@ void InitSound()
         std::string group = fmt::format_ne("sound-{0}", i);
         AddSfx(SoundScope::global, sounds, alias, group);
 
-#ifdef __WII__
-            UpdateLoad();
+#ifdef PGE_NO_THREADING
+        UpdateLoad();
 #endif
     }
     UpdateLoad();
