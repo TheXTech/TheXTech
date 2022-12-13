@@ -21,7 +21,7 @@ endif()
 
 option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
 
-if(NOT VITA AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGER)
+if(NOT VITA AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGER)
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
 else()
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." OFF)
@@ -358,10 +358,16 @@ endif()
 
 message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
 
+if(NINTENDO_3DS)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_main_A_Lib}")
+endif()
+
 target_link_libraries(PGE_SDLMixerX_static INTERFACE
     "${SDL_MixerX_A_Lib}"
     ${MixerX_CodecLibs}
 )
+
+
 
 if(USE_SYSTEM_SDL2)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE ${SDL2_LIBRARIES})
