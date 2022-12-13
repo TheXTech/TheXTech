@@ -85,6 +85,38 @@ static void macosReceiveOpenFile()
 }
 #endif
 
+#ifdef __3DS__
+#include <3ds.h>
+int n3ds_clocked = 0; // eventually move elsewhere
+
+void InitClockSpeed()
+{
+    bool isN3DS;
+
+    APT_CheckNew3DS(&isN3DS);
+
+    if(!isN3DS)
+        n3ds_clocked = -1;
+
+    // I've made this configurable.
+    // if(isN3DS) // make this configurable...
+    // {
+    //     SwapClockSpeed();
+    //     printf("N3DS clock enabled\n");
+    // }
+}
+
+void SwapClockSpeed()
+{
+    if(n3ds_clocked == -1)
+        return;
+
+    n3ds_clocked = !n3ds_clocked;
+    osSetSpeedupEnable(n3ds_clocked);
+}
+
+#endif
+
 
 static void strToPlayerSetup(int player, const std::string &setupString)
 {
@@ -135,13 +167,13 @@ static void strToPlayerSetup(int player, const std::string &setupString)
     switch(p.Mount)
     {
     case 1:
-        if(p.MountType < 1 || p.MountType > 3) // Socks
+        if((p.MountType < 1) || (p.MountType > 3)) // Socks
             p.MountType = 1;
         break;
     default:
         break;
     case 3:
-        if(p.MountType < 1 || p.MountType > 8) // Cat Llamas
+        if((p.MountType < 1) || (p.MountType > 8)) // Cat Llamas
             p.MountType = 1;
         break;
     }
@@ -161,6 +193,11 @@ int main(int argc, char**argv)
 
 #if !defined(VITA) && !defined(PGE_MIN_PORT)
     CrashHandler::initSigs();
+#endif
+
+#ifdef __3DS__
+    InitClockSpeed();
+    SwapClockSpeed();
 #endif
 
     seedRandom(std::time(NULL));
