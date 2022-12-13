@@ -22,7 +22,7 @@
 #ifndef SDL_SDL_TYPES_H
 #define SDL_SDL_TYPES_H
 
-#if defined(SDLRPOXY_3DS) || defined(SDLRPOXY_NULL)
+#if defined(SDLRPOXY_NULL)
 #include <stdint>
 
 #ifndef UNUSED // To avoid IDE-side errors

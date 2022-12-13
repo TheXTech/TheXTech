@@ -22,7 +22,7 @@
 #ifndef SDL_HEAD_HHHHHH
 #define SDL_HEAD_HHHHHH
 
-#if defined(PGE_MIN_PORT) && !defined(__WII__)
+#if defined(PGE_MIN_PORT) && !defined(__WII__) && !defined(__3DS__)
 #include "sdl_common.h"
 #include "sdl_types.h"
 #include "sdl_stdinc.h"

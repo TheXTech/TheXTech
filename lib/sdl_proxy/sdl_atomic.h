@@ -23,7 +23,7 @@
 #define SDL_SDL_ATOMIC_H
 
 #include "sdl_common.h"
-#if defined(SDLRPOXY_3DS) || defined(SDLRPOXY_NULL)
+#if defined(SDLRPOXY_NULL)
 using SDL_atomic_t = volatile int;
 
 inline void SDL_AtomicSet(SDL_atomic_t* loc, int value)

@@ -130,6 +130,14 @@ bool MixPlatform_Init(AudioSetup_t& obtained)
                   obtained.bufferSize);
     }
 
+#ifdef __3DS__
+    // Set fastest emulators to be default
+    Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_GENS);
+    Mix_OPNMIDI_setChipsCount(2);
+    Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
+    Mix_ADLMIDI_setChipsCount(2);
+#endif
+
     Mix_VolumeMusic(MIX_MAX_VOLUME);
     Mix_AllocateChannels(maxSfxChannels);
 

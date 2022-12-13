@@ -22,7 +22,7 @@
 #ifndef SDL_SDL_ASSERT_H
 #define SDL_SDL_ASSERT_H
 
-#if defined(SDLRPOXY_3DS) || defined(SDLRPOXY_NULL)
+#if defined(SDLRPOXY_NULL)
 #   include <assert.h>
 #   define SDL_assert(x)         assert(x)
 // Doesn't work as intended (trigger a fail on release builds), this is just a dummy
