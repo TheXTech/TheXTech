@@ -31,7 +31,8 @@ jobs:
             -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wii",
 
             deps_cmdline: "sudo apt-get update -qq \
-            && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip",
+            && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip \
+            && git config --global --add safe.directory '*'",
 
             generator: "Ninja",
             build_type: "MinSizeRel",
