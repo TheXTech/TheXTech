@@ -70,7 +70,7 @@ const AudioDefaults_t g_audioDefaults =
 };
 #elif defined(__3DS__)
 {
-    32000,
+    32728,
     2,
     2048,
     (int)AUDIO_S16SYS
