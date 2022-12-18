@@ -33,6 +33,16 @@ if(USE_SYSTEM_ZLIB)
     find_package(ZLIB REQUIRED)
 endif()
 
+set(MIXER_USE_OGG_VORBIS_FILE OFF)
+set(MIXER_USE_OGG_VORBIS_STB ON)
+set(MIXER_USE_OGG_VORBIS_TREMOR OFF)
+
+if(NINTENDO_3DS AND THEXTECH_CUSTOM_AUDIO_LIBRARY)
+    set(MIXER_USE_OGG_VORBIS_FILE OFF)
+    set(MIXER_USE_OGG_VORBIS_STB OFF)
+    set(MIXER_USE_OGG_VORBIS_TREMOR ON)
+endif()
+
 #if(WIN32)
 #    if(MSVC)
 #        set(SDL_MixerX_SO_Lib "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_SHARED_LIBRARY_PREFIX}SDL2_mixer_ext${PGE_LIBS_DEBUG_SUFFIX}.lib")
@@ -187,6 +197,7 @@ endif()
 set_static_lib(AC_FLAC         "${CODECS_LIBRARIES_DIR}" FLAC)
 set_static_lib(AC_FLUIDLITE    "${CODECS_LIBRARIES_DIR}" fluidlite)
 set_static_lib(AC_VORBISFILE   "${CODECS_LIBRARIES_DIR}" vorbisfile)
+set_static_lib(AC_VORBISIDEC   "${CODECS_LIBRARIES_DIR}" vorbisidec)
 set_static_lib(AC_VORBIS       "${CODECS_LIBRARIES_DIR}" vorbis)
 set_static_lib(AC_OPUSFILE     "${CODECS_LIBRARIES_DIR}" opusfile)
 set_static_lib(AC_OPUS         "${CODECS_LIBRARIES_DIR}" opus)
@@ -207,8 +218,18 @@ set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)
 set(MixerX_CodecLibs
 #    "${AC_FLAC}"
     "${AC_FLUIDLITE}"
-#    "${AC_VORBISFILE}"
-#    "${AC_VORBIS}"
+)
+
+if(MIXER_USE_OGG_VORBIS_FILE)
+    list(APPEND MixerX_CodecLibs ${AC_VORBISFILE})
+    list(APPEND MixerX_CodecLibs ${AC_VORBIS})
+endif()
+
+if(MIXER_USE_OGG_VORBIS_TREMOR)
+    list(APPEND MixerX_CodecLibs ${AC_VORBISIDEC})
+endif()
+
+list(APPEND MixerX_CodecLibs
     "${AC_OPUSFILE}"
     "${AC_OPUS}"
     "${AC_OGG}"
@@ -280,7 +301,7 @@ ExternalProject_Add(
         "-DUSE_LOCAL_SDL2=${USE_LOCAL_SDL2}"
         "-DBUILD_SDL2_SHARED=${PGE_SHARED_SDLMIXER}"
         "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
-        "-DBUILD_OGG_VORBIS=OFF"
+        "-DBUILD_OGG_VORBIS=${MIXER_USE_OGG_VORBIS_TREMOR}"
         "-DBUILD_FLAC=OFF"
         "-DBUILD_MPG123=OFF"
         "-DBUILD_GME_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
@@ -326,7 +347,8 @@ ExternalProject_Add(
         "-DUSE_MIDI_FLUIDLITE_OGG_STB=ON"
         "-DUSE_DRFLAC=ON"
         "-DUSE_FLAC=OFF"
-        "-DUSE_OGG_VORBIS_STB=ON"
+        "-DUSE_OGG_VORBIS_STB=${MIXER_USE_OGG_VORBIS_STB}"
+        "-DUSE_OGG_VORBIS_TREMOR=${MIXER_USE_OGG_VORBIS_TREMOR}"
         "-DUSE_MP3_DRMP3=ON"
         "-DUSE_MP3_MPG123=OFF"
         "-DUSE_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
@@ -362,11 +384,13 @@ if(NINTENDO_3DS)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_main_A_Lib}")
 endif()
 
-target_link_libraries(PGE_SDLMixerX_static INTERFACE
-    "${SDL_MixerX_A_Lib}"
-    ${MixerX_CodecLibs}
-)
+if(NOT THEXTECH_NO_MIXER_X)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL_MixerX_A_Lib}")
+else()
+    set(EXCLUDE_FROM_ALL SDLMixerX_Local)
+endif()
 
+target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_CodecLibs})
 
 
 if(USE_SYSTEM_SDL2)

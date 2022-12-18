@@ -26,17 +26,75 @@
 #include "sound.h"
 #include "sdl_audio.h"
 
-bool MixPlatform_Init(AudioSetup_t& obtained);
-void MixPlatform_Quit();
-
-int  MixPlatform_PlayStream(int channel, const char* path, int loops);
-
-#ifdef NO_SDL
+#ifdef CUSTOM_AUDIO
 
 struct Mix_Music;
 struct Mix_Chunk;
 
+#ifndef MIX_CHANNELS
+#define MIX_CHANNELS    8
+#endif
+
+/* Good default values for a PC soundcard */
+#define MIX_DEFAULT_FREQUENCY   44100
+#if SDL_BYTEORDER == SDL_LIL_ENDIAN
+#define MIX_DEFAULT_FORMAT      AUDIO_S16LSB
+#else
+#define MIX_DEFAULT_FORMAT      AUDIO_S16MSB
+#endif
+#define MIX_DEFAULT_CHANNELS    2
+#define MIX_MAX_VOLUME          SDL_MIX_MAXVOLUME /* Volume of a chunk */
+
 extern "C" {
+
+/**
+ * Initialization flags
+ */
+typedef enum
+{
+    MIX_INIT_FLAC   = 0x00000001,
+    MIX_INIT_MOD    = 0x00000002,
+    MIX_INIT_MP3    = 0x00000008,
+    MIX_INIT_OGG    = 0x00000010,
+    MIX_INIT_MID    = 0x00000020,
+    MIX_INIT_OPUS   = 0x00000040
+} MIX_InitFlags;
+
+/* OPL3 chip emulators for ADLMIDI */
+typedef enum {
+    ADLMIDI_OPL3_EMU_DEFAULT = -1,
+    ADLMIDI_OPL3_EMU_NUKED = 0,
+    ADLMIDI_OPL3_EMU_NUKED_1_7_4,
+    ADLMIDI_OPL3_EMU_DOSBOX,
+    ADLMIDI_OPL3_EMU_OPAL,
+    ADLMIDI_OPL3_EMU_JAVA
+} Mix_ADLMIDI_Emulator;
+
+/* OPN2 chip emulators for OPNMIDI */
+typedef enum {
+    OPNMIDI_OPN2_EMU_DEFAULT = -1,
+    OPNMIDI_OPN2_EMU_MAME_OPN2 = 0,
+    OPNMIDI_OPN2_EMU_NUKED,
+    OPNMIDI_OPN2_EMU_GENS,
+    OPNMIDI_OPN2_EMU_GX, /* Caution: THIS emulator is inavailable by default */
+    OPNMIDI_OPN2_EMU_NP2,
+    OPNMIDI_OPN2_EMU_MAME_OPNA,
+    OPNMIDI_OPN2_EMU_PMDWIN,
+    /* Deprecated */
+    OPNMIDI_OPN2_EMU_MIME = 0 /*!!!TYPO!!!*/
+} Mix_OPNMIDI_Emulator;
+
+extern int Mix_Init(int flags);
+
+extern void Mix_Quit(void);
+
+extern int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize);
+extern void Mix_CloseAudio(void);
+
+extern int Mix_VolumeMusic(int volume);
+extern int Mix_AllocateChannels(int numchans);
+
+extern int Mix_QuerySpecEx(SDL_AudioSpec *out_spec);
 
 extern const char* Mix_GetError();
 
@@ -89,6 +147,12 @@ typedef void( *  Mix_EffectDone_t) (int chan, void *udata);
 extern void Mix_GME_SetSpcEchoDisabled(Mix_Music* music, int disable);
 extern void Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix_EffectDone_t d, void *arg);
 extern void Mix_UnregisterEffect(int chan, Mix_EffectFunc_t f);
+
+extern void Mix_ADLMIDI_setEmulator(int emu);
+extern void Mix_ADLMIDI_setChipsCount(int chips);
+
+extern void Mix_OPNMIDI_setEmulator(int emu);
+extern void Mix_OPNMIDI_setChipsCount(int chips);
 
 #endif // #ifdef THEXTECH_ENABLE_AUDIO_FX
 

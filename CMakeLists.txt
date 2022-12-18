@@ -144,6 +144,10 @@ if(NINTENDO_3DS OR NINTENDO_WII)
     set(USE_STATIC_LIBC ON)
 endif()
 
+if(NINTENDO_3DS)
+    option(THEXTECH_CUSTOM_AUDIO_LIBRARY "Use the custom audio library instead of MixerX" OFF)
+endif()
+
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
 

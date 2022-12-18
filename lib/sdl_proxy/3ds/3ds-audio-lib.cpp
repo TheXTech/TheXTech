@@ -4,7 +4,7 @@
 #include <tremor/ivorbisfile.h>
 #include <3ds.h>
 #include <cstdlib>
-#include "gme.h"
+#include <gme/gme.h>
 
 volatile SimpleChannel channels[NUM_CHANNELS];
 char* audio_buffer = NULL;

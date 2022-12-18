@@ -181,12 +181,41 @@ static std::unordered_map<std::string, Music_t> music;
 static std::unordered_map<std::string, SFX_t>   sound;
 
 //! Sounds played by scripts
-static SDL_atomic_t                              extSfxBusy;
+static SDL_atomic_t                                extSfxBusy;
 static std::unordered_map<std::string, Mix_Chunk*> extSfx;
 static std::unordered_map<int, std::string>        extSfxPlaying;
 static void extSfxStopCallback(int channel);
 
 static const int maxSfxChannels = 91;
+
+static const char *audio_format_to_string(SDL_AudioFormat f)
+{
+    switch(f)
+    {
+    default:
+        return "<unknown>";
+    case AUDIO_U8:
+        return "U8";
+    case AUDIO_S8:
+        return "S8";
+    case AUDIO_S16LSB:
+        return "S16-LE";
+    case AUDIO_S16MSB:
+        return "S16-BE";
+    case AUDIO_U16LSB:
+        return "U16-LE";
+    case AUDIO_U16MSB:
+        return "U16-BE";
+    case AUDIO_S32LSB:
+        return "S32-LE";
+    case AUDIO_S32MSB:
+        return "S32-BE";
+    case AUDIO_F32LSB:
+        return "F32-LE";
+    case AUDIO_F32MSB:
+        return "F32-BE";
+    }
+}
 
 
 int CustomWorldMusicId()
@@ -204,6 +233,9 @@ void InitSoundDefaults()
 
 void InitMixerX()
 {
+    int ret;
+    const int initFlags = MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_FLAC | MIX_INIT_OGG | MIX_INIT_OPUS | MIX_INIT_MP3;
+
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 
@@ -212,8 +244,78 @@ void InitMixerX()
     if(g_mixerLoaded)
         return;
 
-    if(MixPlatform_Init(s_audioSetupObtained))
+    pLogDebug("Opening sound (wanted: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
+              g_audioSetup.sampleRate,
+              audio_format_to_string(g_audioSetup.format),
+              g_audioSetup.channels,
+              g_audioSetup.bufferSize);
+
+    ret = Mix_Init(initFlags);
+
+    if(ret != initFlags)
     {
+        pLogWarning("MixerX: Some modules aren't properly initialized");
+        if((initFlags & MIX_INIT_MID) != MIX_INIT_MID)
+            pLogWarning("MixerX: Failed to initialize MIDI module");
+        if((initFlags & MIX_INIT_MOD) != MIX_INIT_MOD)
+            pLogWarning("MixerX: Failed to initialize Tracker music module");
+        if((initFlags & MIX_INIT_FLAC) != MIX_INIT_FLAC)
+            pLogWarning("MixerX: Failed to initialize FLAC module");
+        if((initFlags & MIX_INIT_OGG) != MIX_INIT_OGG)
+            pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
+        if((initFlags & MIX_INIT_OPUS) != MIX_INIT_OPUS)
+            pLogWarning("MixerX: Failed to initialize Opus module");
+        if((initFlags & MIX_INIT_MP3) != MIX_INIT_MP3)
+            pLogWarning("MixerX: Failed to initialize MP3 module");
+    }
+
+    ret = Mix_OpenAudio(g_audioSetup.sampleRate,
+                        g_audioSetup.format,
+                        g_audioSetup.channels,
+                        g_audioSetup.bufferSize);
+
+    if(ret < 0)
+    {
+        std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
+        pLogCritical(msg.c_str());
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "Sound opening error", msg.c_str());
+        noSound = true;
+    }
+    else
+    {
+        SDL_AudioSpec ob;
+        ret = Mix_QuerySpecEx(&ob);
+
+        if(ret == 0)
+        {
+            pLogCritical("Failed to call the Mix_QuerySpec!");
+            s_audioSetupObtained = g_audioSetup;
+        }
+        else
+        {
+            s_audioSetupObtained.sampleRate = ob.freq;
+            s_audioSetupObtained.format = ob.format;
+            s_audioSetupObtained.channels = ob.channels;
+            s_audioSetupObtained.bufferSize = ob.samples;
+
+            pLogDebug("Sound opened (obtained: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
+                      s_audioSetupObtained.sampleRate,
+                      audio_format_to_string(s_audioSetupObtained.format),
+                      s_audioSetupObtained.channels,
+                      s_audioSetupObtained.bufferSize);
+        }
+
+#ifdef __3DS__
+        // Set fastest emulators to be default
+        Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_GENS);
+        Mix_OPNMIDI_setChipsCount(2);
+        Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
+        Mix_ADLMIDI_setChipsCount(2);
+#endif
+
+        Mix_VolumeMusic(MIX_MAX_VOLUME);
+        Mix_AllocateChannels(maxSfxChannels);
+
         // Set channel finished callback to handle finished custom SFX
         Mix_ChannelFinished(&extSfxStopCallback);
 
@@ -243,7 +345,9 @@ void QuitMixerX()
     }
     sound.clear();
     music.clear();
-    MixPlatform_Quit();
+
+    Mix_CloseAudio();
+    Mix_Quit();
 
     g_mixerLoaded = false;
 }
@@ -757,16 +861,14 @@ void PlayInitSound()
 
         if(!p.empty())
         {
-//#ifdef __3DS__
-//            MixPlatform_PlayStream(-1, (SfxRoot + p).c_str(), 0);
-//#else
             Mix_Music *loadsfx = Mix_LoadMUS((SfxRoot + p).c_str());
             if(loadsfx)
             {
-                Mix_PlayMusicStream(loadsfx, 0);
-                Mix_SetFreeOnStop(loadsfx, 1);
+                if(Mix_PlayMusicStream(loadsfx, 0) < 0)
+                    Mix_FreeMusic(loadsfx);
+                else
+                    Mix_SetFreeOnStop(loadsfx, 1);
             }
-//#endif
         }
     }
 }
