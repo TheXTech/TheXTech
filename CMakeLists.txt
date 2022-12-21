@@ -674,6 +674,7 @@ if(ANDROID)
 elseif(NINTENDO_WII OR NINTENDO_3DS)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
+
 elseif(THEXTECH_CLI_BUILD)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
@@ -778,16 +779,6 @@ if(VITA)
     # Set explicit flags for this project
     target_compile_definitions(thextech PRIVATE
         -DVITA -DNO_SCREENSHOT -DTHEXTECH_FIXED_RES -DFIXED_RES -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DNO_INTPTROC)
-endif()
-
-if(NINTENDO_WII)
-    # Link Wii specific libraries to the generic interface.
-    target_link_libraries(A2XT_Int INTERFACE db)
-    target_link_libraries(A2XT_Int INTERFACE wiiuse)
-    target_link_libraries(A2XT_Int INTERFACE fat)
-    target_link_libraries(A2XT_Int INTERFACE asnd)
-    target_link_libraries(A2XT_Int INTERFACE ogc)
-    target_link_libraries(A2XT_Int INTERFACE vorbisidec ogg)
 endif()
 
 if(NINTENDO_3DS)

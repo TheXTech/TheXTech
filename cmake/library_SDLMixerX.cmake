@@ -111,8 +111,12 @@ if(NINTENDO_SWITCH)
 endif()
 
 if(NINTENDO_WII)
+    set(CMAKE_STANDARD_LIBRARIES "")
+    set(CMAKE_C_STANDARD_LIBRARIES "")
+    set(CMAKE_CXX_STANDARD_LIBRARIES "")
     list(APPEND MixerX_SysLibs
-        asnd ogc vorbisidec ogg
+        db wiiuse fat bte asnd ogc m
+        # vorbisidec ogg
     )
 endif()
 

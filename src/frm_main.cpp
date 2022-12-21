@@ -62,6 +62,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 
 #if defined(__WII__) || !defined(RENDER_CUSTOM)
     //Initialize FreeImage
+    D_pLogDebugNA("FrmMain: Loading FreeImage...");
     GraphicsHelps::initFreeImage();
 #endif
 
@@ -93,6 +94,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     // Initializing window
 
 #ifdef WINDOW_CUSTOM
+    D_pLogDebugNA("FrmMain: Loading XWindow...");
     res = XWindow::init();
 #elif defined(USE_CORE_WINDOW_SDL)
     res = window->initSDL(setup, render->SDL_InitFlags());
@@ -107,6 +109,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     // Initializing message box
 
 #ifdef MSGBOX_CUSTOM
+    D_pLogDebugNA("FrmMain: Loading XMsgBox...");
     res &= XMsgBox::init();
 #elif defined(USE_CORE_WINDOW_SDL) && defined(USE_CORE_MSGBOX_SDL)
     msgbox->init(window->getWindow());
@@ -119,6 +122,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     // Initializing events
 
 #ifdef EVENTS_CUSTOM
+    D_pLogDebugNA("FrmMain: Loading XEvents...");
     res &= XEvents::init();
 #else
     events->init(this);
@@ -129,6 +133,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     pLogDebug("Init renderer settings...");
 
 #ifdef RENDER_CUSTOM
+    D_pLogDebugNA("FrmMain: Loading XRender...");
     res &= XRender::init();
 #elif defined(USE_CORE_WINDOW_SDL) && defined(USE_CORE_RENDER_SDL)
     res = render->initRender(setup, window->getWindow());
@@ -138,6 +143,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 
     if(!res)
     {
+        D_pLogCriticalNA("FrmMain: Error has occured, exiting...");
         freeSystem();
         return true;
     }
