@@ -512,7 +512,6 @@ size_t lazyLoadedBytes()
 }
 
 void lazyLoadedBytesReset()
-{
-}
+{}
 
-}; // namespace XRender
+} // namespace XRender

@@ -57,4 +57,4 @@ bool hasWindowInputFocus() { return true; }
 bool hasWindowMouseFocus() { return true; }
 
 
-}; // namespace XWindow
+} // namespace XWindow

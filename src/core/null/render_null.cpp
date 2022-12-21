@@ -45,24 +45,19 @@ bool init()
 }
 
 void quit()
-{
-}
+{}
 
 void setTargetTexture()
-{
-}
+{}
 
 void setTargetScreen()
-{
-}
+{}
 
 void clearBuffer()
-{
-}
+{}
 
 void repaint()
-{
-}
+{}
 
 void mapToScreen(int x, int y, int *dx, int *dy)
 {
@@ -223,7 +218,7 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     target.l.lazyLoaded = true;
 
     int w, h, flags;
-    if(fscanf(f, "%d\n%d\n%d\n", &w, &h, &flags) != 3 || w < 0 || w > 8192 || h < 0 || h > 8192)
+    if((fscanf(f, "%d\n%d\n%d\n", &w, &h, &flags) != 3) || (w < 0) || (w > 8192) || (h < 0) || (h > 8192))
     {
         pLogWarning("Could not load image %s dimensions from load list", filename);
         target.inited = false;
@@ -458,4 +453,4 @@ void lazyLoadedBytesReset()
 {
 }
 
-}; // namespace XRender
+} // namespace XRender

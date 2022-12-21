@@ -104,6 +104,7 @@ static void s_createSceneTargets()
 
     if(s_tex_w > mem_w)
         s_tex_w = mem_w;
+
     if(s_tex_h > mem_h)
         s_tex_h = mem_h;
 
@@ -118,7 +119,7 @@ static void s_createSceneTargets()
     {
         C3D_TexInitVRAM(&s_layer_texs[i], mem_w, mem_h, GPU_RGBA8);
         s_layer_targets[i] = C3D_RenderTargetCreateFromTex(&s_layer_texs[i], GPU_TEXFACE_2D, 0, GPU_RB_DEPTH24_STENCIL8);
-        s_layer_subtexs[i] = {(uint16_t)s_tex_w, (uint16_t)s_tex_h, 0.0, 1.0, (float)((double)s_tex_w/(double)mem_w), 1.0f - (float)((double)s_tex_h/(double)mem_h)};
+        s_layer_subtexs[i] = {(uint16_t)s_tex_w, (uint16_t)s_tex_h, 0.0, 1.0, (float)((double)s_tex_w / (double)mem_w), 1.0f - (float)((double)s_tex_h / (double)mem_h)};
         s_layer_ims[i].tex = &s_layer_texs[i];
         s_layer_ims[i].subtex = &s_layer_subtexs[i];
 
@@ -161,20 +162,21 @@ void s_clearAllTextures()
         deleteTexture(*p);
 }
 
-void s_loadTexture(StdPicture &target, C2D_SpriteSheet &sheet)
+void s_loadTexture(StdPicture& target, C2D_SpriteSheet& sheet)
 {
     C2D_Image im = C2D_SpriteSheetGetImage(sheet, 0);
 
     target.d.texture = sheet;
     target.d.image = im;
+
     if(!target.w)
     {
-        target.w = im.subtex->width*2;
-        target.h = im.subtex->height*2;
+        target.w = im.subtex->width * 2;
+        target.h = im.subtex->height * 2;
     }
 }
 
-void s_loadTexture2(StdPicture &target, C2D_SpriteSheet &sheet)
+void s_loadTexture2(StdPicture& target, C2D_SpriteSheet& sheet)
 {
     C2D_Image im = C2D_SpriteSheetGetImage(sheet, 0);
 
@@ -182,7 +184,7 @@ void s_loadTexture2(StdPicture &target, C2D_SpriteSheet &sheet)
     target.d.image2 = im;
 }
 
-void s_loadTexture3(StdPicture &target, C2D_SpriteSheet &sheet)
+void s_loadTexture3(StdPicture& target, C2D_SpriteSheet& sheet)
 {
     C2D_Image im = C2D_SpriteSheetGetImage(sheet, 0);
 
@@ -335,12 +337,13 @@ void repaint()
     {
         C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);
+
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                g_screen_phys_x + 40, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
-                shift, 0, s_tex_show_w, s_tex_h,
-                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 g_screen_phys_x + 40, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
+                                 shift, 0, s_tex_show_w, s_tex_h,
+                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
 
             if(s_single_layer_mode)
                 break;
@@ -350,12 +353,13 @@ void repaint()
     {
         C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_bottom_screen);
+
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
-                shift, 0, s_tex_show_w, s_tex_h,
-                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
+                                 shift, 0, s_tex_show_w, s_tex_h,
+                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
 
             if(s_single_layer_mode)
                 break;
@@ -366,12 +370,13 @@ void repaint()
     {
         C2D_TargetClear(s_bottom_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_bottom_screen);
+
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                g_screen_phys_x - 40, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
-                shift, 0, s_tex_show_w, s_tex_h,
-                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 g_screen_phys_x - 40, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
+                                 shift, 0, s_tex_show_w, s_tex_h,
+                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
 
             if(s_single_layer_mode)
                 break;
@@ -381,12 +386,13 @@ void repaint()
     {
         C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);
+
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
-                shift, 0, s_tex_show_w, s_tex_h,
-                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
+                                 shift, 0, s_tex_show_w, s_tex_h,
+                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
 
             if(s_single_layer_mode)
                 break;
@@ -396,24 +402,27 @@ void repaint()
     {
         C2D_TargetClear(s_top_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_top_screen);
+
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
-                shift + (int)(shift_i[layer] * s_depth_slider), 0, s_tex_show_w, s_tex_h,
-                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
+                                 shift + (int)(shift_i[layer] * s_depth_slider), 0, s_tex_show_w, s_tex_h,
+                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
         }
 
         C2D_TargetClear(s_right_screen, C2D_Color32f(0.0f, 0.0f, 0.0f, 1.0f));
         C2D_SceneBegin(s_right_screen);
+
         for(int layer = 0; layer < 4; layer++)
         {
             C2D_DrawImage_Custom(s_layer_ims[layer],
-                g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
-                shift - (int)(shift_i[layer] * s_depth_slider), 0, s_tex_show_w, s_tex_h,
-                X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
+                                 g_screen_phys_x, g_screen_phys_y, g_screen_phys_w, g_screen_phys_h,
+                                 shift - (int)(shift_i[layer] * s_depth_slider), 0, s_tex_show_w, s_tex_h,
+                                 X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
         }
     }
+
     s_current_frame ++;
     g_in_frame = false;
 
@@ -426,7 +435,7 @@ void repaint()
     C3D_FrameEnd(0);
 }
 
-void mapToScreen(int x, int y, int *dx, int *dy)
+void mapToScreen(int x, int y, int* dx, int* dy)
 {
     // lower screen to upper screen conversion
     if((LevelEditor || MagicHand) && editorScreen.active)
@@ -443,7 +452,7 @@ void mapToScreen(int x, int y, int *dx, int *dy)
     *dy = (y - g_screen_phys_y) * ScreenH / g_screen_phys_h;
 }
 
-void mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
+void mapFromScreen(int scr_x, int scr_y, int* window_x, int* window_y)
 {
     // lower screen to upper screen conversion
     if((LevelEditor || MagicHand) && editorScreen.active)
@@ -477,6 +486,7 @@ void minport_ApplyPhysCoords()
     for(int layer = 0; layer < 4; layer++)
     {
         C3D_TexSetFilter(&s_layer_texs[layer], filter, filter);
+
         if(s_single_layer_mode)
             break;
     }
@@ -541,6 +551,7 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
 
     target.inited = false;
     target.l.path = path;
+
     if(target.l.path.empty())
         return target;
 
@@ -548,6 +559,7 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     target.l.lazyLoaded = false;
 
     sourceImage = C2D_SpriteSheetLoad(target.l.path.c_str());
+
     if(sourceImage)
     {
         // Consider using https://github.com/xerpi/sf2dlib/blob/master/libsf2d/source/sf2d_texture.c to get some more advanced tex loads
@@ -568,12 +580,14 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
 StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
 {
     StdPicture target;
+
     if(!GameIsActive)
         return target; // do nothing when game is closed
 
     int length;
 
     char filename[256];
+
     if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
     {
         pLogWarning("Could not load image path from load list");
@@ -592,6 +606,7 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     target.l.lazyLoaded = true;
 
     int w, h;
+
     if(fscanf(f, "%d\n%d\n", &w, &h) != 2 || w < 0 || w > 8192 || h < 0 || h > 8192)
     {
         pLogWarning("Could not load image %s dimensions from load list", filename);
@@ -614,11 +629,13 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
     (void)maskFallbackPath;
 
     StdPicture target;
+
     if(!GameIsActive)
         return target; // do nothing when game is closed
 
     target.inited = false;
     target.l.path = path;
+
     if(target.l.path.empty())
         return target;
 
@@ -640,6 +657,7 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
         contents[9] = '\0';
         target.w = atoi(&contents[0]);
         target.h = atoi(&contents[5]);
+
         if(fclose(fs))
             pLogWarning("lazyLoadPicture: Couldn't close file.");
     }
@@ -670,7 +688,7 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
     return sourceImage;
 }
 
-void lazyLoad(StdPicture &target)
+void lazyLoad(StdPicture& target)
 {
     if(!target.inited || !target.l.lazyLoaded || target.d.texture)
         return;
@@ -694,6 +712,7 @@ void lazyLoad(StdPicture &target)
     {
         suppPath = target.l.path + '1';
         sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str());
+
         if(!sourceImage)
         {
             pLogWarning("Permanently failed to load %s, %lu free", suppPath.c_str(), linearSpaceFree());
@@ -702,10 +721,12 @@ void lazyLoad(StdPicture &target)
         else
             s_loadTexture2(target, sourceImage);
     }
+
     if(target.h > 4096)
     {
         suppPath = target.l.path + '2';
         sourceImage = C2D_SpriteSheetLoad(suppPath.c_str());
+
         if(!sourceImage)
         {
             pLogWarning("Permanently failed to load %s, %lu free", suppPath.c_str(), linearSpaceFree());
@@ -724,12 +745,12 @@ void lazyLoad(StdPicture &target)
     }
 }
 
-void lazyPreLoad(StdPicture &target)
+void lazyPreLoad(StdPicture& target)
 {
     lazyLoad(target);
 }
 
-void lazyUnLoad(StdPicture &target)
+void lazyUnLoad(StdPicture& target)
 {
     if(!target.inited || !target.l.lazyLoaded || !target.d.texture)
         return;
@@ -737,7 +758,7 @@ void lazyUnLoad(StdPicture &target)
     deleteTexture(target, true);
 }
 
-void deleteTexture(StdPicture &tx, bool lazyUnload)
+void deleteTexture(StdPicture& tx, bool lazyUnload)
 {
     if(!tx.inited)
         return;
@@ -782,10 +803,10 @@ void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, uint8_t red, uint8_
 }
 
 void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
-                             StdPicture &tx,
-                             int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
-                             float rotateAngle, FPoint_t *center, unsigned int flip,
-                             float red, float green, float blue, float alpha)
+                                  StdPicture& tx,
+                                  int16_t xSrc, int16_t ySrc, int16_t wSrc, int16_t hSrc,
+                                  float rotateAngle, FPoint_t* center, unsigned int flip,
+                                  float red, float green, float blue, float alpha)
 {
     if(!tx.inited)
         return;
@@ -798,11 +819,13 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
 
     // automatic flipping based on SMBX style!
     unsigned int mode = 0;
+
     while(ySrc >= tx.h / 2 && mode < 3)
     {
         ySrc -= tx.h / 2;
         mode += 1;
     }
+
     flip ^= mode;
 
     C3D_Mtx prev_view;
@@ -851,17 +874,21 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         {
             if(tx.d.texture3)
                 to_draw = &tx.d.image3;
+
             if(ySrc < 2048 && tx.d.texture2)
                 to_draw_2 = &tx.d.image2;
+
             ySrc -= 1024;
         }
         else
         {
             if(tx.d.texture2)
                 to_draw = &tx.d.image2;
+
             if(ySrc < 1024)
                 to_draw_2 = &tx.d.image;
         }
+
         // draw the top pic
         if(to_draw_2 != nullptr)
         {
@@ -888,4 +915,4 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         C2D_ViewRestore(&prev_view);
 }
 
-}; // namespace XRender
+} // namespace XRender

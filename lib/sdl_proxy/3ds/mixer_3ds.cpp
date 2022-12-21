@@ -43,21 +43,6 @@ static std::set<const std::string*> sound_stream_paths;
 static std::set<const std::string*> music_stream_paths;
 static std::unordered_map<const std::string*, SoundId> sound_id_music_map;
 
-//bool MixPlatform_Init(AudioSetup_t& obtained)
-//{
-//    (void)obtained;
-//    return audioInit();
-//}
-
-//void MixPlatform_Quit()
-//{
-//    if(cur_sound)
-//    {
-//        free(cur_sound);
-//        cur_sound = nullptr;
-//    }
-//    audioExit();
-//}
 
 static bool MixPlatform_NoPreload(const char* path)
 {

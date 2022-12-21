@@ -36,8 +36,8 @@
 
 namespace XRender
 {
-    extern bool g_in_frame;
-};
+extern bool g_in_frame;
+}
 
 namespace XMsgBox
 {
@@ -82,4 +82,4 @@ void errorMsgBox(const std::string &title, const std::string &message)
 }
 
 
-}; // namespace XMsgBox
+} // namespace XMsgBox

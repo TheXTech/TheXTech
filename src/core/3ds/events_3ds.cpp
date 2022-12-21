@@ -59,4 +59,4 @@ void waitEvents() {}
 
 void eventResize() {}
 
-}; // namespace XEvents
+} // namespace XEvents

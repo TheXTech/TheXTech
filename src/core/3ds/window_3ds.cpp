@@ -67,5 +67,4 @@ void getWindowSize(int *w, int *h)
 bool hasWindowInputFocus() { return true; }
 bool hasWindowMouseFocus() { return true; }
 
-
-}; // namespace XWindow
+} // namespace XWindow
