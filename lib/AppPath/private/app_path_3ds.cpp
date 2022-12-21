@@ -35,28 +35,32 @@ static bool mountRomfsFile(const char* path, const char* mount_label)
 {
     // for some reason dirent returns a very strange format that appears to be
     // utf-8 expressed as utf-16 and then converted back to utf-8.
-    uint16_t utf16_buf[4096+1];
-    uint8_t utf8_buf[4096+1];
+    uint16_t utf16_buf[4096 + 1];
+    uint8_t utf8_buf[4096 + 1];
 
     ssize_t units = utf8_to_utf16(utf16_buf, (const uint8_t*)path, 4096);
-    if(units < 0 || units > 4096)
+
+    if((units < 0) || (units > 4096))
         return false;
+
     utf16_buf[units] = 0;
+
     for(int i = 0; i < units; i++)
-    {
-        utf8_buf[i] = (uint8_t) (0xff & utf16_buf[i]);
-    }
+        utf8_buf[i] = (uint8_t)(0xff & utf16_buf[i]);
+
     utf8_buf[units] = 0;
 
     Handle fd = 0;
     FS_Path archPath = { PATH_EMPTY, 1, "" };
-    FS_Path filePath = { PATH_ASCII, (size_t)units+1, utf8_buf };
+    FS_Path filePath = { PATH_ASCII, (size_t)units + 1, utf8_buf };
 
     Result rc = FSUSER_OpenFileDirectly(&fd, ARCHIVE_SDMC, archPath, filePath, FS_OPEN_READ, 0);
+
     if(R_FAILED(rc))
         return false;
 
     rc = romfsMountFromFile(fd, 0, mount_label);
+
     if(R_FAILED(rc))
         return false;
 
@@ -74,6 +78,7 @@ static void findUserWorlds()
 
     std::string fullPath;
     char mount_label[9] = "romfsA:/";
+
     for(std::string& s : romfsFiles)
     {
         if(s == "assets.romfs")
@@ -88,16 +93,18 @@ static void findUserWorlds()
         mount_label[6] = ':';
         s_worldRootDirs.push_back(std::string(mount_label));
         mount_label[5] ++;
+
         // from Z to a.
         if(mount_label[5] == 91)
             mount_label[5] = 97;
+
         // max of 52 mounts.
         if(mount_label[5] == 123)
             break;
     }
 }
 
-void AppPathP::initDefaultPaths(const std::string &userDirName)
+void AppPathP::initDefaultPaths(const std::string& userDirName)
 {
     (void)userDirName;
 
