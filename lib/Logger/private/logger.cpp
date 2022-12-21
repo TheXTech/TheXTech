@@ -20,12 +20,14 @@
 #include <stdarg.h>
 #include "../logger.h"
 #include "logger_sets.h"
+
 #ifndef NO_FILE_LOGGING
-#include <chrono>  // chrono::system_clock
-#include <ctime>   // localtime
-#include <DirManager/dirman.h>
-#include <Utils/files.h>
+#   include <chrono>  // chrono::system_clock
+#   include <ctime>   // localtime
+#   include <DirManager/dirman.h>
+#   include <Utils/files.h>
 #endif
+
 #include <IniProcessor/ini_processing.h>
 #include <AppPath/app_path.h>
 

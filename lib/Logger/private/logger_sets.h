@@ -46,6 +46,7 @@ public:
 };
 
 extern void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg);
+
 #ifndef NO_FILE_LOGGING
 extern void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg);
 #endif

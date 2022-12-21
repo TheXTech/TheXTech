@@ -55,6 +55,7 @@ void LogWriter::CloseLog()
     SDL_DestroyMutex(g_lockLocker);
     g_lockLocker = nullptr;
 #endif
+
 #ifndef NO_FILE_LOGGING
     if(s_logout)
         std::fclose(s_logout);
@@ -74,9 +75,9 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
     va_end(arg_in);
 }
 
+#ifndef NO_FILE_LOGGING
 void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg)
 {
-#ifndef NO_FILE_LOGGING
     MUTEXLOCK(mutex);
     if(!s_logout)
         return;
@@ -90,5 +91,5 @@ void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va
     std::fprintf(s_logout, OS_NEWLINE);
     std::fflush(s_logout);
     va_end(arg_in);
-#endif
 }
+#endif
