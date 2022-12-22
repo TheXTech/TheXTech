@@ -34,19 +34,6 @@ DEALINGS IN THE SOFTWARE.
 #include "dirman.h"
 #include "dirman_private.h"
 
-#ifndef PGE_NO_THREADING
-
-#   include <mutex>
-
-static std::mutex g_dirManMutex;
-
-#   define PUT_THREAD_GUARD() \
-    std::lock_guard<std::mutex> guard(g_dirManMutex);\
-    (void)guard
-
-#else
-#   define PUT_THREAD_GUARD() (void)0
-#endif
 
 void DirMan::DirMan_private::setPath(const std::string &dirPath)
 {

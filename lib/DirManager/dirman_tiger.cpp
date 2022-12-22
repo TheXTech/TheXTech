@@ -33,13 +33,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "dirman.h"
 #include "dirman_private.h"
-#include <mutex>
 
-static std::mutex g_dirManMutex;
-
-#define PUT_THREAD_GUARD() \
-    std::lock_guard<std::mutex> guard(g_dirManMutex);\
-    (void)guard
 
 void DirMan::DirMan_private::setPath(const std::string &dirPath)
 {
