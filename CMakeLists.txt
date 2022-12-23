@@ -223,6 +223,7 @@ endif()
 
 if(NINTENDO_WII OR NINTENDO_3DS)
     set(PGE_MIN_PORT ON)
+    set(THEXTECH_NO_ARGV_HANDLING ON)
     add_compile_definitions(PGE_MIN_PORT)
 endif()
 
@@ -352,14 +353,14 @@ set(LIB_SRC
     ${SDLPROXY_SRCS}
 )
 
-if(NOT PGE_MIN_PORT)
-    list(APPEND LIB_SRC
-        lib/Graphics/graphics_funcs.cpp
-        lib/Graphics/image_size.cpp
-        lib/Graphics/size.cpp
-        lib/Graphics/sizef.cpp
-    )
-endif()
+#if(NOT PGE_MIN_PORT)
+list(APPEND LIB_SRC
+    lib/Graphics/graphics_funcs.cpp
+    lib/Graphics/image_size.cpp
+    lib/Graphics/size.cpp
+    lib/Graphics/sizef.cpp
+)
+#endif()
 
 if(NOT ANDROID
    AND NOT EMSCRIPTEN
@@ -385,6 +386,7 @@ if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT VITA AND 
         lib/CrashHandler/crash_handler.cpp
     )
     add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
+    set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
 endif()
 
 if(APPLE)
@@ -851,8 +853,16 @@ if(EMSCRIPTEN)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DNO_FILE_LOGGING)
 endif()
 
+if(THEXTECH_NO_ARGV_HANDLING)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_NO_ARGV_HANDLING)
+endif()
+
 if(THEXTECH_INTERPROC_SUPPORTED)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_INTERPROC_SUPPORTED)
+endif()
+
+if(THEXTECH_CRASHHANDLER_SUPPORTED)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_CRASHHANDLER_SUPPORTED)
 endif()
 
 # ======================= Render specific global macros ========================

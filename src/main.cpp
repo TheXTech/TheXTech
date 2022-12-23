@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <ctime>
 #include "sdl_proxy/sdl_head.h"
 
 #include "game_main.h"
@@ -32,10 +33,17 @@
 #include "compat.h"
 #include "controls.h"
 #include <AppPath/app_path.h>
-#include <tclap/CmdLine.h>
+
+#ifndef THEXTECH_NO_ARGV_HANDLING
+#   include <tclap/CmdLine.h>
+#endif
+
 #include <Utils/strings.h>
 #include <Utils/files.h>
-#include <CrashHandler/crash_handler.h>
+
+#ifdef THEXTECH_CRASHHANDLER_SUPPORTED
+#   include <CrashHandler/crash_handler.h>
+#endif
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <SDL2/SDL_main.h>
@@ -191,7 +199,7 @@ int main(int argc, char**argv)
         setenv("DISPLAY", ":0", 1); // Automatically set the display to :0 if not defined
 #endif
 
-#if !defined(VITA) && !defined(PGE_MIN_PORT)
+#ifdef THEXTECH_CRASHHANDLER_SUPPORTED
     CrashHandler::initSigs();
 #endif
 
@@ -208,7 +216,7 @@ int main(int argc, char**argv)
         testPlayer[i].Character = i;
     }
 
-#if !defined(__3DS__) && !defined(__WII__) && !defined(__NDS__)
+#ifndef THEXTECH_NO_ARGV_HANDLING
     try
     {
         // Define the command line object.
