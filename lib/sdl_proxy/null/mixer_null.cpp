@@ -32,49 +32,93 @@
 #include "../mixer.h"
 #include "globals.h"
 
-bool MixPlatform_Init(AudioSetup_t& obtained)
+int Mix_Init(int flags)
 {
-    UNUSED(obtained);
-    return true;
+    UNUSED(flags);
+    return 0; // Always fail
 }
 
-void MixPlatform_Quit()
+void Mix_Quit()
+{}
+
+int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
 {
+    (void)frequency;
+    (void)format;
+    (void)channels;
+    (void)chunksize;
+
+    return -1; // Always fail
 }
 
-int MixPlatform_PlayStream(int channel, const char* path, int loops)
+int Mix_QuerySpecEx(SDL_AudioSpec* out_spec)
 {
+    SDL_memset(out_spec, 0, sizeof(SDL_AudioSpec));
+    out_spec->channels = 2;
+    out_spec->samples = 2048;
+    out_spec->freq = 32728;
+    out_spec->format = AUDIO_S16SYS;
     return 0;
 }
 
-Mix_Chunk* MixPlatform_LoadWAV(const char* path)
+void Mix_CloseAudio()
+{}
+
+int Mix_VolumeMusic(int volume)
 {
-    return (Mix_Chunk*)1;
+    (void)volume;
+    return volume;
 }
 
-const char* MixPlatform_GetError()
+int Mix_AllocateChannels(int numchans)
+{
+    (void)numchans;
+    return 0;
+}
+
+Mix_Chunk* Mix_LoadWAV(const char* path)
+{
+    UNUSED(path);
+    return nullptr; // Always fail
+}
+
+const char* Mix_GetError()
 {
     return "";
 }
 
-int MixPlatform_PlayChannelTimed(int channel, Mix_Chunk *chunk, int loops, int ticks)
+int Mix_PlayChannel(int channel, Mix_Chunk* chunk, int loops)
 {
+    UNUSED(channel);
+    UNUSED(chunk);
+    UNUSED(loops);
     return 0;
 }
 
-int MixPlatform_PlayChannelTimedVolume(int channel, Mix_Chunk *chunk, int loops, int ticks, int volume)
+#ifndef Mix_PlayChannelVol
+int Mix_PlayChannelVol(int channel, Mix_Chunk* chunk, int loops, int volume)
 {
-    (void)volume;
-    return MixPlatform_PlayChannelTimed(channel, chunk, loops, ticks);
+    UNUSED(channel);
+    UNUSED(chunk);
+    UNUSED(loops);
+    UNUSED(volume);
+    return -1;
 }
-
-
-extern "C" {
+#else
+int Mix_PlayChannelTimedVolume(int channel, Mix_Chunk* chunk, int loops, int ticks, int volume)
+{
+    UNUSED(channel);
+    UNUSED(chunk);
+    UNUSED(loops);
+    UNUSED(ticks);
+    UNUSED(volume);
+    return -1;
+}
+#endif
 
 int Mix_ReserveChannels(int channels)
 {
     UNUSED(channels);
-
     return 0;
 }
 
@@ -86,7 +130,7 @@ void Mix_PauseAudio(int pause)
 Mix_Music* Mix_LoadMUS(const char* path)
 {
     UNUSED(path);
-    return (Mix_Music*)1;
+    return nullptr; // Always fail
 }
 
 int Mix_VolumeMusicStream(Mix_Music* music, int volume)
@@ -103,8 +147,8 @@ int Mix_HaltMusicStream(Mix_Music* music)
 }
 int Mix_FadeOutMusicStream(Mix_Music* music, int ms)
 {
+    UNUSED(ms);
     UNUSED(music);
-    (void)ms;
     return 0;
 }
 int Mix_HaltChannel(int channel)
@@ -115,59 +159,66 @@ int Mix_HaltChannel(int channel)
 
 int Mix_PlayingMusicStream(Mix_Music* music)
 {
-    (void)music;
+    UNUSED(music);
+    return -1;
+}
+
+int Mix_PausedMusicStream(Mix_Music* music)
+{
+    UNUSED(music);
+    return -1;
+}
+
+int Mix_PauseMusicStream(Mix_Music* music)
+{
+    UNUSED(music);
+    return 0;
+}
+
+int Mix_ResumeMusicStream(Mix_Music* music)
+{
+    UNUSED(music);
     return 0;
 }
 
 int Mix_PlayMusic(Mix_Music* music, int loops)
 {
-    (void)music;
-    (void)loops;
+    UNUSED(music);
+    UNUSED(loops);
     return 0;
 }
+
 int Mix_PlayMusicStream(Mix_Music* music, int loops)
 {
-    (void)music;
-    (void)loops;
-    return 0;
+    UNUSED(music);
+    UNUSED(loops);
+    return -1;
 }
-int Mix_SetFreeOnStop(Mix_Music* music, int loops)
+
+int Mix_SetFreeOnStop(Mix_Music* music, int free_on_stop)
 {
-    (void)music;
-    (void)loops;
+    UNUSED(music);
+    UNUSED(free_on_stop);
     return 0;
 }
+
 int Mix_FadeInMusic(Mix_Music* music, int loops, int fadeInMs)
 {
-    (void)music;
-    (void)loops;
-    (void)fadeInMs;
-    return 0;
+    UNUSED(music);
+    UNUSED(loops);
+    UNUSED(fadeInMs);
+    return -1;
 }
-
-int Mix_PausedMusicStream(Mix_Music *music)
-{
-    return 0;
-}
-int Mix_PauseMusicStream(Mix_Music *music)
-{
-    return 0;
-}
-int Mix_ResumeMusicStream(Mix_Music *music)
-{
-    return 0;
-}
-
 
 const char* Mix_GetMusicTitle(Mix_Music* music)
 {
-    (void)music;
+    UNUSED(music);
     return "";
 }
 
 int Mix_GetMusicTracks(Mix_Music* music)
 {
-    (void)music;
+    UNUSED(music);
     return 1;
 }
 
@@ -181,16 +232,55 @@ int Mix_SetMusicTrackMute(Mix_Music* music, int track, int mute)
 
 void Mix_FreeMusic(Mix_Music* music)
 {
-    (void)music;
+    UNUSED(music);
 }
+
 void Mix_FreeChunk(Mix_Chunk* chunk)
 {
-    (void)chunk;
+    UNUSED(chunk);
+}
+
+void Mix_GME_SetSpcEchoDisabled(Mix_Music* music, int disable)
+{
+    (void)music;
+    (void)disable;
+}
+
+void Mix_RegisterEffect(int chan, Mix_EffectFunc_t f, Mix_EffectDone_t d, void* arg)
+{
+    (void)chan;
+    (void)f;
+    (void)d;
+    (void)arg;
+}
+
+void Mix_UnregisterEffect(int chan, Mix_EffectFunc_t f)
+{
+    (void)chan;
+    (void)f;
 }
 
 void Mix_ChannelFinished(void (*cb)(int))
 {
-    (void)cb;
+    UNUSED(cb);
 }
 
-} // extern "C"
+void Mix_ADLMIDI_setEmulator(int emu)
+{
+    (void)emu;
+}
+
+void Mix_ADLMIDI_setChipsCount(int chips)
+{
+    (void)chips;
+}
+
+void Mix_OPNMIDI_setEmulator(int emu)
+{
+    (void)emu;
+}
+
+void Mix_OPNMIDI_setChipsCount(int chips)
+{
+    (void)chips;
+}

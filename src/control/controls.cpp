@@ -41,7 +41,7 @@
 #include "input_3ds.h"
 #elif defined(__WII__)
 #include "input_wii.h"
-#elif !defined(PGE_MIN_PORT)
+#elif !defined(PGE_MIN_PORT) && !defined(THEXTECH_CLI_BUILD)
 #include "keyboard.h"
 #include "joystick.h"
 #include "touchscreen.h"

@@ -23,22 +23,23 @@
 #define SDL_SDL_ATOMIC_H
 
 #include "sdl_common.h"
-#if defined(SDLRPOXY_NULL)
-using SDL_atomic_t = volatile int;
 
-inline void SDL_AtomicSet(SDL_atomic_t* loc, int value)
-{
-    *loc = value;
-}
+//#if defined(SDLRPOXY_NULL)
+//using SDL_atomic_t = volatile int;
 
-inline int SDL_AtomicGet(const SDL_atomic_t* loc)
-{
-    return *loc;
-}
+//inline void SDL_AtomicSet(SDL_atomic_t* loc, int value)
+//{
+//    *loc = value;
+//}
 
-#else
+//inline int SDL_AtomicGet(const SDL_atomic_t* loc)
+//{
+//    return *loc;
+//}
+
+//#else
 #   include <SDL2/SDL_atomic.h>
-#endif
+//#endif
 
 SDL_IMPORT(AtomicSet)
 SDL_IMPORT(AtomicGet)

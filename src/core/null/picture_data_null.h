@@ -28,12 +28,10 @@
  */
 struct StdPictureData
 {
-
     inline bool hasTexture()
     {
         return true;
     }
-
 };
 
 #endif // PICTURE_DATA_NULL_H

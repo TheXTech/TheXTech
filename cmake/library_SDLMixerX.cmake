@@ -7,8 +7,10 @@ add_library(PGE_SDLMixerX_static INTERFACE)
 set(SDL_BRANCH "release-2.0.12")
 set(SDL_GIT_BRANCH "origin/release-2.0.12")
 
-if(EMSCRIPTEN OR APPLE OR ANDROID OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_3DS)
+if(APPLE)
     set(PGE_SHARED_SDLMIXER_DEFAULT OFF)
+elseif(EMSCRIPTEN OR ANDROID OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_3DS)
+    set(PGE_SHARED_SDLMIXER_FORCE_OFF ON)
 else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
 endif()
@@ -19,7 +21,11 @@ else()
     set(PGE_SYSTEM_ZLIB_DEFAULT OFF)
 endif()
 
-option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
+if(PGE_SHARED_SDLMIXER_FORCE_OFF)
+    option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
+else()
+    set(PGE_SHARED_SDLMIXER OFF)
+endif()
 
 if(NOT VITA AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGER)
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
@@ -206,6 +212,7 @@ set_static_lib(AC_VORBIS       "${CODECS_LIBRARIES_DIR}" vorbis)
 set_static_lib(AC_OPUSFILE     "${CODECS_LIBRARIES_DIR}" opusfile)
 set_static_lib(AC_OPUS         "${CODECS_LIBRARIES_DIR}" opus)
 set_static_lib(AC_OGG          "${CODECS_LIBRARIES_DIR}" ogg)
+set_static_lib(AC_WAVPACK      "${CODECS_LIBRARIES_DIR}" wavpack)
 set_static_lib(AC_ADLMIDI      "${CODECS_LIBRARIES_DIR}" ADLMIDI)
 set_static_lib(AC_OPNMIDI      "${CODECS_LIBRARIES_DIR}" OPNMIDI)
 set_static_lib(AC_EDMIDI       "${CODECS_LIBRARIES_DIR}" EDMIDI)
@@ -237,6 +244,7 @@ list(APPEND MixerX_CodecLibs
     "${AC_OPUSFILE}"
     "${AC_OPUS}"
     "${AC_OGG}"
+    "${AC_WAVPACK}"
     "${AC_ADLMIDI}"
     "${AC_OPNMIDI}"
     "${AC_EDMIDI}"
@@ -276,6 +284,7 @@ if(VITA)
 
     set(MixerX_CodecLibs # Minimal list of libraries to link
         "${AC_FLUIDLITE}"
+        "${AC_WAVPACK}"
         "${AC_ADLMIDI}"
         "${AC_OPNMIDI}"
         "${AC_EDMIDI}"
@@ -403,7 +412,9 @@ else()
     target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_A_Lib}")
 endif()
 
-target_link_libraries(PGE_SDLMixerX_static INTERFACE "${MixerX_SysLibs}")
+if(NOT THEXTECH_CLI_BUILD)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${MixerX_SysLibs}")
+endif()
 
 #if(ANDROID) # No longer required since SDL 2.0.18
 #    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDLHIDAPI_SO_Lib}")

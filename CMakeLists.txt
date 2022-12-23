@@ -221,7 +221,7 @@ if(NINTENDO_SWITCH)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -DNINTENDO_SWITCH -D__SWITCH__")
 endif()
 
-if(NINTENDO_WII OR NINTENDO_3DS OR THEXTECH_CLI_BUILD)
+if(NINTENDO_WII OR NINTENDO_3DS)
     set(PGE_MIN_PORT ON)
     add_compile_definitions(PGE_MIN_PORT)
 endif()
@@ -321,7 +321,7 @@ if(USE_SYSTEM_LIBS)
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
-elseif(NOT PGE_MIN_PORT OR NINTENDO_WII OR NINTENDO_3DS)
+elseif(NOT PGE_MIN_PORT OR NINTENDO_WII OR NINTENDO_3DS OR THEXTECH_CLI_BUILD)
     include(cmake/library_FreeImage.cmake)
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_LIBS PGE_FreeImage)
@@ -352,18 +352,12 @@ set(LIB_SRC
     ${SDLPROXY_SRCS}
 )
 
-if(NINTENDO_WII OR NINTENDO_3DS OR NOT PGE_MIN_PORT)
+if(NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
         lib/Graphics/graphics_funcs.cpp
         lib/Graphics/image_size.cpp
         lib/Graphics/size.cpp
         lib/Graphics/sizef.cpp
-    )
-endif()
-
-if(THEXTECH_CLI_BUILD)
-    list(APPEND LIB_SRC
-        lib/Graphics/image_size.cpp
     )
 endif()
 
@@ -374,6 +368,7 @@ if(NOT ANDROID
    AND NOT NINTENDO_WII
    AND NOT NINTENDO_WIIU
    AND NOT NINTENDO_SWITCH
+   AND NOT THEXTECH_CLI_BUILD
    AND NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
         lib/InterProcess/editor_pipe.cpp
@@ -540,22 +535,7 @@ if(THEXTECH_ENABLE_AUDIO_FX)
     )
 endif()
 
-if(NOT PGE_MIN_PORT)
-    add_definitions(-DCORE_EVERYTHING_SDL)
-    list(APPEND THEXTECH_SRC
-        src/control/joystick.cpp
-        src/control/keyboard.cpp
-        src/control/touchscreen.cpp
-        src/core/base/render_base.cpp
-        src/core/base/window_base.cpp
-        src/core/base/msgbox_base.cpp
-        src/core/base/events_base.cpp
-        src/core/sdl/render_sdl.cpp
-        src/core/sdl/window_sdl.cpp
-        src/core/sdl/msgbox_sdl.cpp
-        src/core/sdl/events_sdl.cpp
-    )
-elseif(NINTENDO_3DS)
+if(NINTENDO_3DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
         src/control/input_3ds.cpp
@@ -576,6 +556,14 @@ elseif(NINTENDO_WII)
         src/core/wii/msgbox_wii.cpp
         src/core/wii/events_wii.cpp
     )
+elseif(THEXTECH_CLI_BUILD)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
+    list(APPEND THEXTECH_SRC
+        src/core/null/render_null.cpp
+        src/core/null/window_null.cpp
+        src/core/null/msgbox_null.cpp
+        src/core/null/events_null.cpp
+    )
 elseif(PGE_MIN_PORT)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
     list(APPEND THEXTECH_SRC
@@ -583,6 +571,21 @@ elseif(PGE_MIN_PORT)
         src/core/null/window_null.cpp
         src/core/null/msgbox_null.cpp
         src/core/null/events_null.cpp
+    )
+else()
+    add_definitions(-DCORE_EVERYTHING_SDL)
+    list(APPEND THEXTECH_SRC
+        src/control/joystick.cpp
+        src/control/keyboard.cpp
+        src/control/touchscreen.cpp
+        src/core/base/render_base.cpp
+        src/core/base/window_base.cpp
+        src/core/base/msgbox_base.cpp
+        src/core/base/events_base.cpp
+        src/core/sdl/render_sdl.cpp
+        src/core/sdl/window_sdl.cpp
+        src/core/sdl/msgbox_sdl.cpp
+        src/core/sdl/events_sdl.cpp
     )
 endif()
 
@@ -675,12 +678,6 @@ elseif(NINTENDO_WII OR NINTENDO_3DS)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
 
-elseif(THEXTECH_CLI_BUILD)
-    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
-    pge_set_nopie(thextech)
-
-    target_link_libraries(thextech PRIVATE SDL2)
-    target_link_libraries(thextech PRIVATE pgefl)
 elseif(PGE_MIN_PORT)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
@@ -869,7 +866,12 @@ else()
     )
 endif()
 
-if(NOT EMSCRIPTEN AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT PGE_MIN_PORT)
+if(NOT EMSCRIPTEN AND
+   NOT NINTENDO_3DS AND
+   NOT NINTENDO_WII AND
+   NOT NINTENDO_WIIU AND
+   NOT PGE_MIN_PORT AND
+   NOT THEXTECH_CLI_BUILD)
     target_compile_definitions(thextech PRIVATE
         -DUSE_SCREENSHOTS_AND_RECS  # Built-in screenshots and GIF recording
     )

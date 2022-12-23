@@ -22,27 +22,27 @@
 #ifndef SDL_SDL_TYPES_H
 #define SDL_SDL_TYPES_H
 
-#if defined(SDLRPOXY_NULL)
-#include <stdint>
+//#if defined(SDLRPOXY_NULL)
+//#include <cstdint>
 
-#ifndef UNUSED // To avoid IDE-side errors
-#   define UNUSED(x) (void)x
-#endif
+//#ifndef UNUSED // To avoid IDE-side errors
+//#   define UNUSED(x) (void)x
+//#endif
 
-typedef int64_t Sint64;
-typedef uint64_t Uint64;
-typedef int32_t Sint32;
-typedef uint32_t Uint32;
-typedef int16_t Sint16;
-typedef uint16_t Uint16;
-typedef int8_t Sint8;
-typedef uint8_t Uint8;
+//typedef int64_t Sint64;
+//typedef uint64_t Uint64;
+//typedef int32_t Sint32;
+//typedef uint32_t Uint32;
+//typedef int16_t Sint16;
+//typedef uint16_t Uint16;
+//typedef int8_t Sint8;
+//typedef uint8_t Uint8;
 
-#define SDL_INLINE inline
-#define SDL_FORCE_INLINE static inline
+//#define SDL_INLINE inline
+//#define SDL_FORCE_INLINE static inline
 
-#else
-#   include <SDL2/SDL_types.h>
-#endif
+//#else
+#include <SDL2/SDL_types.h>
+//#endif
 
 #endif // #ifndef SDL_SDL_TYPES_H
