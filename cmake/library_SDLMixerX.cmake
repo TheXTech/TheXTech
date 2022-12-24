@@ -244,7 +244,7 @@ list(APPEND MixerX_CodecLibs
     "${AC_OPUSFILE}"
     "${AC_OPUS}"
     "${AC_OGG}"
-    "${AC_WAVPACK}"
+#    "${AC_WAVPACK}"
     "${AC_ADLMIDI}"
     "${AC_OPNMIDI}"
     "${AC_EDMIDI}"
@@ -264,8 +264,7 @@ if(VITA)
     set(VITA_AUDIOCODECS_CMAKE_FLAGS
         -DBUILD_OGG_VORBIS=OFF
         -DBUILD_FLAC=OFF
-        -DBUILD_OPUS=ON
-        -DBUILD_MPG123=OFF)
+        -DBUILD_OPUS=ON)
 
     set(VITA_MIXERX_CMAKE_FLAGS
         "-DUSE_OGG_VORBIS_TREMOR=OFF"
@@ -284,7 +283,7 @@ if(VITA)
 
     set(MixerX_CodecLibs # Minimal list of libraries to link
         "${AC_FLUIDLITE}"
-        "${AC_WAVPACK}"
+#        "${AC_WAVPACK}"
         "${AC_ADLMIDI}"
         "${AC_OPNMIDI}"
         "${AC_EDMIDI}"
@@ -318,8 +317,7 @@ ExternalProject_Add(
         "-DBUILD_FLAC=OFF"
         "-DBUILD_MPG123=OFF"
         "-DBUILD_GME_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
-        "-DWAVPACK_ENABLE_ASM=OFF"
-        "-DCMAKE_ASM-ATT_COMPILE_OBJECT=${CMAKE_ASM-ATT_COMPILE_OBJECT}"
+#        "-DBUILD_WAVPACK=ON"
         ${ANDROID_CMAKE_FLAGS}
         ${VITA_CMAKE_FLAGS}
         ${VITA_AUDIOCODECS_CMAKE_FLAGS}
@@ -362,6 +360,7 @@ ExternalProject_Add(
         "-DUSE_MIDI_FLUIDLITE_OGG_STB=ON"
         "-DUSE_DRFLAC=ON"
         "-DUSE_FLAC=OFF"
+        "-DUSE_WAVPACK=OFF"
         "-DUSE_OGG_VORBIS_STB=${MIXER_USE_OGG_VORBIS_STB}"
         "-DUSE_OGG_VORBIS_TREMOR=${MIXER_USE_OGG_VORBIS_TREMOR}"
         "-DUSE_MP3_DRMP3=ON"
