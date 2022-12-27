@@ -159,6 +159,7 @@ option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
 option(THEXTECH_CLI_BUILD "Minimal CLI build for testing and benchmarking on desktop platforms" OFF)
+option(THEXTECH_NO_SDL_BUILD "Do not use SDL in the CLI build; useful as a starting point for new ports" OFF)
 
 option(THEXTECH_ENABLE_WIP_FEATURES "Enable experimental and incomplete features (disabled by default)" OFF)
 mark_as_advanced(THEXTECH_ENABLE_WIP_FEATURES)
@@ -225,6 +226,10 @@ if(NINTENDO_WII OR NINTENDO_3DS)
     set(PGE_MIN_PORT ON)
     set(THEXTECH_NO_ARGV_HANDLING ON)
     add_compile_definitions(PGE_MIN_PORT)
+endif()
+
+if(THEXTECH_CLI_BUILD OR PGE_MIN_PORT)
+    set(RANGE_ARR_UNSAFE_MODE ON)
 endif()
 
 # ============ Customization ==end=========
@@ -322,18 +327,27 @@ if(USE_SYSTEM_LIBS)
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
-elseif(NOT PGE_MIN_PORT OR NINTENDO_WII OR NINTENDO_3DS OR THEXTECH_CLI_BUILD)
+elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_FreeImage.cmake)
-    include(cmake/library_SDLMixerX.cmake)
+    list(APPEND A2XT_DEPS FreeImage_Local)
+
     list(APPEND A2XT_LIBS PGE_FreeImage)
-    if(PGE_SHARED_SDLMIXER)
-        list(APPEND A2XT_LIBS PGE_SDLMixerX)
-    else()
-        list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
-    endif()
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
+
+    if(NOT THEXTECH_CLI_BUILD)
+        include(cmake/library_SDLMixerX.cmake)
+        list(APPEND A2XT_DEPS SDLMixerX_Local)
+
+        if(PGE_SHARED_SDLMIXER)
+            list(APPEND A2XT_LIBS PGE_SDLMixerX)
+        else()
+            list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
+        endif()
+    else()
+        list(APPEND A2XT_LIBS SDL2)
+    endif()
+
     target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
-    list(APPEND A2XT_DEPS FreeImage_Local SDLMixerX_Local)
 endif()
 
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
@@ -341,6 +355,7 @@ target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 set(LIB_SRC
     lib/util.cpp
     lib/fader.cpp
+    lib/Graphics/image_size.cpp
     ${APPPATH_SRCS}
     ${DIRMANAGER_SRCS}
     ${FMT_SRCS}
@@ -353,14 +368,13 @@ set(LIB_SRC
     ${SDLPROXY_SRCS}
 )
 
-#if(NOT PGE_MIN_PORT)
+if(NOT THEXTECH_NO_SDL_BUILD)
 list(APPEND LIB_SRC
     lib/Graphics/graphics_funcs.cpp
-    lib/Graphics/image_size.cpp
     lib/Graphics/size.cpp
     lib/Graphics/sizef.cpp
 )
-#endif()
+endif()
 
 if(NOT ANDROID
    AND NOT EMSCRIPTEN
@@ -566,8 +580,8 @@ elseif(THEXTECH_CLI_BUILD)
         src/core/null/msgbox_null.cpp
         src/core/null/events_null.cpp
     )
-elseif(PGE_MIN_PORT)
-    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DNO_SDL)
+elseif(THEXTECH_NO_SDL_BUILD)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
         src/core/null/render_null.cpp
         src/core/null/window_null.cpp
@@ -680,11 +694,6 @@ elseif(NINTENDO_WII OR NINTENDO_3DS)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
 
-elseif(PGE_MIN_PORT)
-    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
-    pge_set_nopie(thextech)
-
-    target_link_libraries(thextech PRIVATE pgefl)
 else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
@@ -781,11 +790,15 @@ if(VITA)
 endif()
 
 if(NINTENDO_3DS)
-    target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_SDL_MUTEX -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__3DS__)
+    target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__3DS__)
 elseif(NINTENDO_WII)
-    target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE -D__WII__)
+    target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__WII__)
 elseif(PGE_MIN_PORT)
-    target_compile_definitions(thextech PRIVATE -DPGE_MIN_PORT -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DRANGE_ARR_UNSAFE_MODE)
+    target_compile_definitions(thextech PRIVATE -DLOW_MEM)
+endif()
+
+if(THEXTECH_NO_SDL_BUILD)
+    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DTHEXTECH_NO_SDL_BUILD)
 endif()
 
 if(THEXTECH_CLI_BUILD)
@@ -893,7 +906,7 @@ if(ANDROID)
     )
 endif()
 
-if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT)
+if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT OR THEXTECH_NO_SDL_BUILD)
     target_compile_definitions(thextech PRIVATE
         -DRENDER_FULLSCREEN_ALWAYS  # Game works always fullscreen
         -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus

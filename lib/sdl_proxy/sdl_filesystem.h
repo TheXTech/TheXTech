@@ -18,16 +18,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../sdl_timer.h"
+#pragma once
+#ifndef SDL_SDL_FILESYSTEM_H
+#define SDL_SDL_FILESYSTEM_H
 
-uint32_t curTime = 0u;
+#if !defined(SDLRPOXY_NULL)
 
-uint32_t SDL_GetTicks()
+#include <SDL2/SDL_filesystem.h>
+
+#else
+
+inline char* SDL_GetBasePath()
 {
-   return ++curTime;
+    return nullptr;
 }
 
-uint64_t SDL_GetMicroTicks()
-{
-    return curTime * 1000;
-}
+#endif
+
+#endif // #ifndef SDL_SDL_FILESYSTEM_H

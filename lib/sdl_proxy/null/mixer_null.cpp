@@ -53,7 +53,7 @@ int Mix_OpenAudio(int frequency, Uint16 format, int channels, int chunksize)
 
 int Mix_QuerySpecEx(SDL_AudioSpec* out_spec)
 {
-    SDL_memset(out_spec, 0, sizeof(SDL_AudioSpec));
+    memset(out_spec, 0, sizeof(SDL_AudioSpec));
     out_spec->channels = 2;
     out_spec->samples = 2048;
     out_spec->freq = 32728;

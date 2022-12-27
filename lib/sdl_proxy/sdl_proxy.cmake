@@ -28,12 +28,20 @@ elseif(NINTENDO_WII)
     list(APPEND SDLPROXY_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/wii/std_wii.cpp
     )
-elseif(THEXTECH_CLI_BUILD)
+elseif(THEXTECH_NO_SDL_BUILD)
     add_definitions(-DSDLRPOXY_NULL)
     add_definitions(-DCUSTOM_AUDIO)
     set(THEXTECH_NO_MIXER_X ON)
     list(APPEND SDLPROXY_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/null/std_null.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/null/mixer_null.cpp
+    )
+elseif(THEXTECH_CLI_BUILD)
+    add_definitions(-DSDLRPOXY_SDL2)
+    add_definitions(-DCUSTOM_AUDIO)
+    set(THEXTECH_NO_MIXER_X ON)
+    list(APPEND SDLPROXY_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/base/std_base.cpp
         ${CMAKE_CURRENT_LIST_DIR}/null/mixer_null.cpp
     )
 else()

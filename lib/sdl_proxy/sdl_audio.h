@@ -22,12 +22,14 @@
 #ifndef SDL_SDL_AUDIO_H
 #define SDL_SDL_AUDIO_H
 
-#ifndef NO_SDL
+#ifndef SDLRPOXY_NULL
 #   include <SDL2/SDL_audio.h>
 #endif
 
 
-#ifdef NO_SDL
+#ifdef SDLRPOXY_NULL
+
+#include "sdl_types.h"
 
 /* @{ */
 #define AUDIO_U8        0x0008
@@ -66,6 +68,11 @@
 #endif
 /* @} */
 
+#define SDL_AudioFormat Uint16
+typedef void* SDL_AudioCallback;
+
+#define SDL_MIX_MAXVOLUME 1
+
 /**
  *  The calculated values in this structure are calculated by SDL_OpenAudio().
  *
@@ -90,6 +97,6 @@ typedef struct SDL_AudioSpec
     SDL_AudioCallback callback; /**< Callback that feeds the audio device (NULL to use SDL_QueueAudio()). */
     void *userdata;             /**< Userdata passed to callback (ignored for NULL callbacks). */
 } SDL_AudioSpec;
-#endif /* NO_SDL */
+#endif /* SDLRPOXY_NULL */
 
 #endif // #ifndef SDL_SDL_AUDIO_H

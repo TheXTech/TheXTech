@@ -22,7 +22,75 @@
 #ifndef SDL_SDL_RWOPS_H
 #define SDL_SDL_RWOPS_H
 
-#include "sdl_common.h"
+#if defined(SDLRPOXY_NULL)
+
+#include <cstdio>
+
+#define RW_SEEK_CUR SEEK_CUR
+#define RW_SEEK_SET SEEK_SET
+#define RW_SEEK_END SEEK_END
+
+struct SDL_RWops
+{
+    FILE* f = nullptr;
+};
+
+inline size_t SDL_RWread(SDL_RWops* stream, void* ptr, size_t size, size_t nmemb)
+{
+    return fread(ptr, size, nmemb, stream->f);
+}
+
+inline long SDL_RWtell(SDL_RWops* stream)
+{
+    return ftell(stream->f);
+}
+
+inline int SDL_RWseek(SDL_RWops* stream, long offset, int whence)
+{
+    return fseek(stream->f, offset, whence);
+}
+
+inline SDL_RWops* SDL_RWFromFile(const char* pathname, const char* mode)
+{
+    FILE* f = fopen(pathname, mode);
+    if(!f)
+        return nullptr;
+
+    SDL_RWops* ret = new(std::nothrow) SDL_RWops;
+
+    if(!ret)
+    {
+        fclose(f);
+        return nullptr;
+    }
+
+    ret->f = f;
+
+    return ret;
+}
+
+inline SDL_RWops* SDL_RWFromMem(char* mem, int size)
+{
+    return nullptr;
+}
+
+inline SDL_RWops* SDL_RWFromConstMem(const char* mem, int size)
+{
+    return nullptr;
+}
+
+inline int SDL_RWclose(SDL_RWops* stream)
+{
+    fclose(stream->f);
+    delete stream;
+
+    return 0;
+}
+
+#else
+
 #include <SDL2/SDL_rwops.h>
+
+#endif
 
 #endif // #ifndef SDL_SDL_RWOPS_H

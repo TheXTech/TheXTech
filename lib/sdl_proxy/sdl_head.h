@@ -22,15 +22,13 @@
 #ifndef SDL_HEAD_HHHHHH
 #define SDL_HEAD_HHHHHH
 
-#if defined(PGE_MIN_PORT) && !defined(__WII__) && !defined(__3DS__)
-#include "sdl_common.h"
+#if defined(SDLRPOXY_NULL)
 #include "sdl_types.h"
 #include "sdl_stdinc.h"
 #include "sdl_timer.h"
 #include "sdl_assert.h"
 #include "sdl_atomic.h"
 #include "sdl_audio.h"
-#include "sdl_rwops.h"
 #else
 #include <SDL2/SDL.h>
 #endif

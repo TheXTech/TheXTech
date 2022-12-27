@@ -22,13 +22,19 @@
 #ifndef SDL_SDL_ASSERT_H
 #define SDL_SDL_ASSERT_H
 
-//#if defined(SDLRPOXY_NULL)
-//#   include <assert.h>
-//#   define SDL_assert(x)         assert(x)
-//// Doesn't work as intended (trigger a fail on release builds), this is just a dummy
-//#   define SDL_assert_release(x) assert(x)
-//#else
+#if defined(SDLRPOXY_NULL)
+
+#   include <assert.h>
+
+#   define SDL_assert(x)         assert(x)
+
+// Doesn't work as intended (trigger a fail on release builds), this is just a dummy
+#   define SDL_assert_release(x) assert(x)
+
+#else
+
 #include <SDL2/SDL_assert.h>
-//#endif
+
+#endif
 
 #endif // #ifndef SDL_SDL_ASSERT_H

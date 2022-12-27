@@ -158,7 +158,7 @@ extern void Mix_OPNMIDI_setChipsCount(int chips);
 
 } // extern "C"
 
-#else // #ifdef NO_SDL
+#else // #ifdef CUSTOM_AUDIO
 
 #include <SDL2/SDL_mixer_ext.h>
 

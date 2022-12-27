@@ -22,7 +22,13 @@
 #ifndef SDL_SDL_TIMER_H
 #define SDL_SDL_TIMER_H
 
+#ifndef SDLRPOXY_NULL
+
 #include <SDL2/SDL_timer.h>
+
+#else
+
+#include <cstdint>
 
 //#ifdef __WII__
 //#define SDL_GetTicks SDL_GetTicks_Wii_
@@ -31,6 +37,11 @@
 #ifndef SDL_timer_h_
 extern uint32_t SDL_GetTicks();
 #endif
+
+inline void SDL_Delay(int x) {}
+
+#endif
+
 extern uint64_t SDL_GetMicroTicks();
 
 #endif // #ifndef SDL_SDL_TIMER_H

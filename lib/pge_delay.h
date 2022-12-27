@@ -10,10 +10,8 @@
 #elif defined(__WII__)
 extern "C" void udelay(unsigned us);
 #   define PGE_Delay(x) udelay((x) * 1000)
-#elif defined(NO_SDL)
-#   define PGE_Delay(x) UNUSED(x)
 #else
-#   include <SDL2/SDL_timer.h>
+#   include "sdl_proxy/sdl_timer.h"
 #   define PGE_Delay(x) SDL_Delay(x)
 #endif
 
