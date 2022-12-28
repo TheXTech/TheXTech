@@ -317,7 +317,7 @@ ExternalProject_Add(
         "-DBUILD_FLAC=OFF"
         "-DBUILD_MPG123=OFF"
         "-DBUILD_GME_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
-#        "-DBUILD_WAVPACK=ON"
+        "-DBUILD_WAVPACK=OFF"
         ${ANDROID_CMAKE_FLAGS}
         ${VITA_CMAKE_FLAGS}
         ${VITA_AUDIOCODECS_CMAKE_FLAGS}
