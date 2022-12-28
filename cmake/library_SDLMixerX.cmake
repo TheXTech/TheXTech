@@ -341,6 +341,13 @@ set(AUDIO_CODECS_BUILD_ARGS
     ${VITA_AUDIOCODECS_CMAKE_FLAGS}
 )
 
+if(USE_SYSTEM_SDL2)
+    # Ensure the SAME SDL2 directory will be used
+    list(APPEND AUDIO_CODECS_BUILD_ARGS
+        "-DSDL2_DIR=${SDL2_DIR}"
+    )
+endif()
+
 list(REMOVE_DUPLICATES AUDIO_CODECS_BUILD_ARGS)
 
 #message("DEBUG: Audio Codecs CMake: arguments: ${AUDIO_CODECS_BUILD_ARGS}")
@@ -373,6 +380,14 @@ ExternalProject_Add(
 list(APPEND MixerX_Deps AudioCodecs_Local)
 
 if(NOT THEXTECH_NO_MIXER_X)
+    set(MIXERX_CMAKE_FLAGS)
+    if(USE_SYSTEM_SDL2)
+        # Ensure the SAME SDL2 directory will be used
+        list(APPEND MIXERX_CMAKE_FLAGS
+            "-DSDL2_DIR=${SDL2_DIR}"
+        )
+    endif()
+
     # SDL Mixer X - an audio library, fork of SDL Mixer
     ExternalProject_Add(
         SDLMixerX_Local
@@ -404,6 +419,7 @@ if(NOT THEXTECH_NO_MIXER_X)
             "-DUSE_MP3_DRMP3=ON"
             "-DUSE_MP3_MPG123=OFF"
             "-DUSE_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
+            ${MIXERX_CMAKE_FLAGS}
             ${ANDROID_CMAKE_FLAGS}
             ${VITA_CMAKE_FLAGS}
             ${VITA_MIXERX_CMAKE_FLAGS}
