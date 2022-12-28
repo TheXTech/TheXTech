@@ -417,6 +417,7 @@ if(NOT THEXTECH_NO_MIXER_X)
     )
 
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL_MixerX_SO_Lib}")
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL_MixerX_A_Lib}")
 endif()
 
 if(USE_SYSTEM_SDL2)
@@ -429,18 +430,11 @@ else()
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}")
 endif()
 
+
 message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
-
-if(NINTENDO_3DS)
-    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_A_Lib}")
+if(NOT THEXTECH_CLI_BUILD)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_CodecLibs})
 endif()
-
-if(NOT THEXTECH_NO_MIXER_X)
-    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL_MixerX_A_Lib}")
-endif()
-
-target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_CodecLibs})
-
 
 if(USE_SYSTEM_SDL2)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE ${SDL2_LIBRARIES})
@@ -452,9 +446,7 @@ else()
     target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_A_Lib}")
 endif()
 
-if(NOT THEXTECH_CLI_BUILD)
-    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${MixerX_SysLibs}")
-endif()
+target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_SysLibs})
 
 #if(ANDROID) # No longer required since SDL 2.0.18
 #    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDLHIDAPI_SO_Lib}")
