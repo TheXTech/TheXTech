@@ -332,9 +332,10 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     list(APPEND A2XT_DEPS FreeImage_Local)
 
     list(APPEND A2XT_LIBS PGE_FreeImage)
+    include(cmake/library_SDLMixerX.cmake)
+
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
 
-    include(cmake/library_SDLMixerX.cmake)
     if(NOT THEXTECH_NO_MIXER_X)
         list(APPEND A2XT_DEPS SDLMixerX_Local)
     else()
