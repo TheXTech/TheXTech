@@ -230,6 +230,7 @@ endif()
 
 if(THEXTECH_CLI_BUILD OR PGE_MIN_PORT)
     set(RANGE_ARR_UNSAFE_MODE ON)
+    set(THEXTECH_NO_SDL_BUILD ON)
 endif()
 
 # ============ Customization ==end=========
@@ -326,7 +327,6 @@ if(USE_SYSTEM_LIBS)
 
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
-    target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_FreeImage.cmake)
     list(APPEND A2XT_DEPS FreeImage_Local)
@@ -347,10 +347,9 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     else()
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
-
-    target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 endif()
 
+target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
 set(LIB_SRC
