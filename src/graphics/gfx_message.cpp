@@ -5,7 +5,7 @@
 #include "fontman/font_manager_private.h"
 #include "fontman/font_manager.h"
 
-// #define USE_OLD_TEXT_PARSER
+//#define USE_OLD_TEXT_PARSER
 
 // based on Wohlstand's improved algorithm, but screen-size aware
 void DrawMessage(const std::string& SuperText)
@@ -22,13 +22,14 @@ void DrawMessage(const std::string& SuperText)
         TextBoxW = ScreenW - 50;
         UseGFX = false;
     }
+
 #endif
 
     const int charWidth = 18;
     const int lineHeight = 16;
 
     int BoxY = 0;
-    int BoxY_Start = ScreenH/2 - 150;
+    int BoxY_Start = ScreenH / 2 - 150;
 
     if(BoxY_Start < 60)
         BoxY_Start = 60;
@@ -39,29 +40,35 @@ void DrawMessage(const std::string& SuperText)
     int lastWord = 0; // planned start of next line
     int numLines = 0; // n lines
     const int maxChars = ((TextBoxW - 24) / charWidth) + 1; // 27 by default
-    const int textSize = static_cast<int>(SuperText.size());
 
-#ifndef USE_OLD_TEXT_PARSER
-    const int textSizeU = FontManager::utf8_strlen(SuperText);
-    int lineStartU = 0;
-    int lastWordU = 0;
-#endif
+    // Build map
+    std::vector<const char*> SuperTextMap;
+    const char* mapBuildIt = SuperText.c_str();
+    const char* mapBuildEnd = mapBuildIt + SuperText.size();
+
+    for(; mapBuildIt < mapBuildEnd; mapBuildIt++)
+    {
+        SuperTextMap.push_back(mapBuildIt);
+        UTF8 ucx = static_cast<unsigned char>(*mapBuildIt);
+        mapBuildIt += static_cast<size_t>(trailingBytesForUTF8[ucx]);
+    }
+
+    const int textSize = static_cast<int>(SuperTextMap.size());
+
 
     // PASS ONE: determine the number of lines
     // Wohlstand's updated algorithm, no substrings, reasonably fast
     while(lineStart < textSize)
     {
         lastWord = lineStart;
-#ifndef USE_OLD_TEXT_PARSER
-        lastWordU = lineStartU;
-#endif
 
 #ifdef USE_OLD_TEXT_PARSER
-        for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
+
+        for(int i = lineStart + 1; i <= lineStart + maxChars; i++)
         {
             auto c = SuperText[size_t(i) - 1];
 
-            if((lastWord == lineStart && i == lineStart+maxChars) || i == textSize || c == '\n')
+            if((lastWord == lineStart && i == lineStart + maxChars) || i == textSize || c == '\n')
             {
                 lastWord = i;
                 break;
@@ -71,112 +78,74 @@ void DrawMessage(const std::string& SuperText)
                 lastWord = i;
             }
         }
+
 #else
-        const char *strIt  = SuperText.c_str() + lineStart;
-        const char *strEnd = strIt + SuperText.size();
-        int count = lineStart;
 
-        for(; strIt < strEnd; strIt++)
+        for(int i = lineStart + 1; i <= lineStart + maxChars; i++)
         {
-            const char &cx = *strIt;
-            UTF8 ucx = static_cast<unsigned char>(cx);
+            auto c = *(SuperTextMap[size_t(i) - 1]);
 
-            if(count == maxChars || cx == '\n')
+            if((lastWord == lineStart && i == lineStart + maxChars) || i == textSize || c == '\n')
             {
-                lastWord = count;
+                lastWord = i;
                 break;
             }
-            count++;
-
-            if(cx == ' ')
-                lastWord = count;
-
-            strIt += static_cast<size_t>(trailingBytesForUTF8[ucx]);
+            else if(c == ' ')
+            {
+                lastWord = i;
+            }
         }
 
-        if(strIt >= strEnd)
-        {
-            lastWord = count;
-        }
-
-//        for(int i = lineStart + 1 + b1, iU = lineStartU + 1;
-//            iU <= lineStartU + maxChars;
-//            i++, iU++)
-//        {
-//            SDL_assert(i <= textSize);
-//            auto c = SuperText[size_t(i - (1 + b1))];
-//            uint8_t b = trailingBytesForUTF8[static_cast<UTF8>(c)];
-
-//            if(
-//                (lastWordU == lineStartU && iU == lineStartU + maxChars) ||
-//                (iU == textSizeU) ||
-//                (b == 0 && c == '\n')
-//            )
-//            {
-//                lastWord = i;//i + 1;
-//                lastWordU = iU;
-//                break;
-//            }
-//            else if(b == 0 && c == ' ')
-//            {
-//                lastWord = i;
-//                lastWordU = iU;
-//            }
-
-//            i += b;
-//            b1 = b;
-//        }
 #endif
 
         numLines ++;
         lineStart = lastWord;
-#ifndef USE_OLD_TEXT_PARSER
-        lineStartU = lastWordU;
-#endif
     }
 
     // Draw the background now we know how many lines there are.
-    int totalHeight = numLines*lineHeight + 20;
+    int totalHeight = numLines * lineHeight + 20;
 
     if(!UseGFX)
     {
-        XRender::renderRect(ScreenW/2 - TextBoxW / 2 ,
-                              BoxY_Start,
-                              TextBoxW, totalHeight, 0.f, 0.f, 0.f, 1.f);
-        XRender::renderRect(ScreenW/2 - TextBoxW / 2 + 2,
-                              BoxY_Start + 2,
-                              TextBoxW - 4, totalHeight - 4, 1.f, 1.f, 1.f, 1.f);
-        XRender::renderRect(ScreenW/2 - TextBoxW / 2 + 4,
-                              BoxY_Start + 4,
-                              TextBoxW - 8, totalHeight - 8, 8.f/255.f, 96.f/255.f, 168.f/255.f, 1.f);
+        XRender::renderRect(ScreenW / 2 - TextBoxW / 2,
+                            BoxY_Start,
+                            TextBoxW, totalHeight, 0.f, 0.f, 0.f, 1.f);
+        XRender::renderRect(ScreenW / 2 - TextBoxW / 2 + 2,
+                            BoxY_Start + 2,
+                            TextBoxW - 4, totalHeight - 4, 1.f, 1.f, 1.f, 1.f);
+        XRender::renderRect(ScreenW / 2 - TextBoxW / 2 + 4,
+                            BoxY_Start + 4,
+                            TextBoxW - 8, totalHeight - 8, 8.f / 255.f, 96.f / 255.f, 168.f / 255.f, 1.f);
     }
+
 #ifndef BUILT_IN_TEXTBOX
     else
     {
         // carefully render the background image...
         XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
-                              BoxY_Start,
-                              TextBoxW, 20, GFX.TextBox, 0, 0);
+                               BoxY_Start,
+                               TextBoxW, 20, GFX.TextBox, 0, 0);
         int rndMidH = totalHeight - 20 - 20;
         int gfxMidH = GFX.TextBox.h - 20 - 20;
         int vertReps = rndMidH / gfxMidH + 1;
 
         for(int i = 0; i < vertReps; i++)
         {
-            if((i+1) * gfxMidH <= rndMidH)
+            if((i + 1) * gfxMidH <= rndMidH)
                 XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
-                                      BoxY_Start + 20 + i*gfxMidH,
-                                      TextBoxW, gfxMidH, GFX.TextBox, 0, 20);
+                                       BoxY_Start + 20 + i * gfxMidH,
+                                       TextBoxW, gfxMidH, GFX.TextBox, 0, 20);
             else
                 XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
-                                      BoxY_Start + 20 + i*gfxMidH,
-                                      TextBoxW, rndMidH - i*gfxMidH, GFX.TextBox, 0, 20);
+                                       BoxY_Start + 20 + i * gfxMidH,
+                                       TextBoxW, rndMidH - i * gfxMidH, GFX.TextBox, 0, 20);
         }
 
         XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
-                              BoxY_Start + 20 + rndMidH,
-                              TextBoxW, 20, GFX.TextBox, 0, GFX.TextBox.h - 20);
+                               BoxY_Start + 20 + rndMidH,
+                               TextBoxW, 20, GFX.TextBox, 0, GFX.TextBox.h - 20);
     }
+
 #endif
 
     // PASS TWO: draw the lines
@@ -185,23 +154,18 @@ void DrawMessage(const std::string& SuperText)
     bool firstLine = true;
     BoxY = BoxY_Start + 10;
     lineStart = 0; // start of current line
-#ifndef USE_OLD_TEXT_PARSER
-    lineStartU = 0;
-#endif
 
     while(lineStart < textSize)
     {
         lastWord = lineStart;
-#ifndef USE_OLD_TEXT_PARSER
-        lastWordU = lineStartU;
-#endif
 
 #ifdef USE_OLD_TEXT_PARSER
-        for(int i = lineStart + 1; i <= lineStart+maxChars; i++)
+
+        for(int i = lineStart + 1; i <= lineStart + maxChars; i++)
         {
             auto c = SuperText[size_t(i) - 1];
 
-            if((lastWord == lineStart && i == lineStart+maxChars) || i == textSize || c == '\n')
+            if((lastWord == lineStart && i == lineStart + maxChars) || i == textSize || c == '\n')
             {
                 lastWord = i;
                 break;
@@ -215,71 +179,55 @@ void DrawMessage(const std::string& SuperText)
         if(lastWord == int(SuperText.size()) && firstLine)
         {
             SuperPrint(size_t(lastWord) - size_t(lineStart), SuperText.c_str() + size_t(lineStart),
-                4,
-                ScreenW/2 - ((lastWord - lineStart) * charWidth)/2,
-                BoxY);
+                       4,
+                       ScreenW / 2 - ((lastWord - lineStart) * charWidth) / 2,
+                       BoxY);
         }
         else
         {
             SuperPrint(size_t(lastWord) - size_t(lineStart), SuperText.c_str() + size_t(lineStart),
-                4,
-                ScreenW/2 - TextBoxW / 2 + 12,
-                BoxY);
-        }
-#else
-        auto c1 = SuperText[0];
-        uint8_t b1 = trailingBytesForUTF8[static_cast<UTF8>(c1)];
-
-        for(int i = lineStart + 1 + b1, iU = lineStartU + 1;
-            iU <= lineStartU + maxChars;
-            i++, iU++)
-        {
-            SDL_assert(i <= textSize);
-            auto c = SuperText[size_t(i - (1 + b1))];
-            uint8_t b = trailingBytesForUTF8[static_cast<UTF8>(c)];
-
-            if(
-                (lastWordU == lineStartU && iU == lineStartU + maxChars) ||
-                (iU == textSizeU) ||
-                (b == 0 && c == '\n')
-            )
-            {
-                lastWord = i;//i + 1;
-                lastWordU = iU;
-                break;
-            }
-            else if(b == 0 && c == ' ')
-            {
-                lastWord = i;
-                lastWordU = iU;
-            }
-
-            i += b;
-            b1 = b;
-        }
-
-        if(lastWord == textSize && firstLine)
-        {
-            SuperPrint(size_t(lastWordU) - size_t(lineStartU),
-                       SuperText.c_str() + size_t(lineStart),
-                       4,
-                       ScreenW / 2 - ((lastWordU - lineStartU) * charWidth) / 2,
-                       BoxY);
-        }
-        else
-        {
-            SuperPrint(size_t(lastWordU) - size_t(lineStartU),
-                       SuperText.c_str() + size_t(lineStart),
                        4,
                        ScreenW / 2 - TextBoxW / 2 + 12,
                        BoxY);
         }
+
+#else
+
+        for(int i = lineStart + 1; i <= lineStart + maxChars; i++)
+        {
+            auto c = *(SuperTextMap[size_t(i) - 1]);
+
+            if((lastWord == lineStart && i == lineStart + maxChars) || i == textSize || c == '\n')
+            {
+                lastWord = i;
+                break;
+            }
+            else if(c == ' ')
+            {
+                lastWord = i;
+            }
+        }
+
+        if(lastWord == int(SuperTextMap.size()) && firstLine)
+        {
+            int lineLenU = (SuperTextMap[lastWord] - SuperTextMap[lineStart]);
+            SuperPrint(lineLenU, SuperTextMap[lineStart],
+                       4,
+                       ScreenW / 2 - ((lastWord - lineStart) * charWidth) / 2,
+                       BoxY);
+        }
+        else
+        {
+            int lineLenU = (SuperTextMap[lastWord] - SuperTextMap[lineStart]);
+            SuperPrint(lineLenU, SuperTextMap[lineStart],
+                       4,
+                       ScreenW / 2 - TextBoxW / 2 + 12,
+                       BoxY);
+        }
+
 #endif
 
         lineStart = lastWord;
-#ifndef USE_OLD_TEXT_PARSER
-        lineStartU = lastWordU;
-#endif
         BoxY += lineHeight;
         firstLine = false;
     }
