@@ -244,9 +244,6 @@ void TtfFont::printText(const std::string &text,
     if(text.empty())
         return;
 
-    // Fix the alignment (make it match to the old font engine)
-    x -= 2;
-
     uint32_t offsetX = 0;
     uint32_t offsetY = 0;
     bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;

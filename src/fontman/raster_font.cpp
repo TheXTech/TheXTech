@@ -39,6 +39,8 @@ RasterFont::RasterFont() : BaseFontEngine()
     m_spaceWidth     = 0;
     m_interLetterSpace = 0;
     m_newlineOffset  = 0;
+    m_glyphOffsetX   = 0;
+    m_glyphOffsetY   = 0;
     m_matrixWidth    = 0;
     m_matrixHeight   = 0;
     m_isReady        = false;
@@ -53,6 +55,8 @@ RasterFont::RasterFont(const RasterFont &rf) : BaseFontEngine(rf)
     m_interLetterSpace = rf.m_interLetterSpace;
     m_spaceWidth       = rf.m_spaceWidth;
     m_newlineOffset    = rf.m_newlineOffset;
+    m_glyphOffsetX     = rf.m_glyphOffsetX;
+    m_glyphOffsetY     = rf.m_glyphOffsetY;
     m_matrixWidth      = rf.m_matrixWidth;
     m_matrixHeight     = rf.m_matrixHeight;
     m_isReady          = rf.m_isReady;
@@ -88,6 +92,8 @@ void RasterFont::loadFont(std::string font_ini)
     font.read("space-width", m_spaceWidth, 0);
     font.read("interletter-space", m_interLetterSpace, 0);
     font.read("newline-offset", m_newlineOffset, 0);
+    font.read("glyph-offset-x", m_glyphOffsetX, 0);
+    font.read("glyph-offset-y", m_glyphOffsetY, 0);
     font.endGroup();
     std::vector<std::string> tables_list;
     tables_list.reserve(tables);
@@ -407,9 +413,6 @@ void RasterFont::printText(const std::string &text,
     bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;
 #endif
 
-    // Fix the alignment (make it match to the old font engine)
-    x -= 2;
-
     const char *strIt  = text.c_str();
     const char *strEnd = strIt + text.size();
     for(; strIt < strEnd; strIt++)
@@ -437,8 +440,8 @@ void RasterFont::printText(const std::string &text,
         RasChar rch = m_charMap[get_utf8_char(strIt)];
         if(rch.valid)
         {
-            XRender::renderTexture(x + static_cast<int32_t>(offsetX - rch.padding_left),
-                                   y + static_cast<int32_t>(offsetY),
+            XRender::renderTexture(x + static_cast<int32_t>(offsetX - rch.padding_left + m_glyphOffsetX),
+                                   y + static_cast<int32_t>(offsetY + m_glyphOffsetY),
                                    w, h,
                                    *rch.tx,
                                    rch.x, rch.y,
@@ -455,8 +458,8 @@ void RasterFont::printText(const std::string &text,
                 uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (m_letterWidth >> 2);
 
                 font->drawGlyph(&cx,
-                                x + static_cast<int32_t>(offsetX),
-                                y + static_cast<int32_t>(offsetY) - 2,
+                                x + static_cast<int32_t>(offsetX + m_glyphOffsetX),
+                                y + static_cast<int32_t>(offsetY + m_glyphOffsetY) - 2,
                                 (doublePixel ? (glyph_width / 2) : glyph_width),
                                 (doublePixel ? 2.0 : 1.0),
                                 Red, Green, Blue, Alpha);

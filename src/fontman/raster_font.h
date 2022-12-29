@@ -69,6 +69,11 @@ private:
     //! Distance between top of one line and top of next
     uint32_t m_newlineOffset;
 
+    //! Offset all characters by X
+    int32_t m_glyphOffsetX;
+    //! Offset all characters by Y
+    int32_t m_glyphOffsetY;
+
     //! Width of font matrix
     uint32_t m_matrixWidth;
     //! Width of font matrix
