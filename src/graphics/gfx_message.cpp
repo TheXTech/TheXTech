@@ -46,14 +46,16 @@ void DrawMessage(const std::string& SuperText)
     const char* mapBuildIt = SuperText.c_str();
     const char* mapBuildEnd = mapBuildIt + SuperText.size();
 
-    for(; mapBuildIt < mapBuildEnd; mapBuildIt++)
+    // Scan the whole line including the NULL terminator
+    for(; mapBuildIt <= mapBuildEnd; mapBuildIt++)
     {
         SuperTextMap.push_back(mapBuildIt);
         UTF8 ucx = static_cast<unsigned char>(*mapBuildIt);
         mapBuildIt += static_cast<size_t>(trailingBytesForUTF8[ucx]);
     }
 
-    const int textSize = static_cast<int>(SuperTextMap.size());
+    // Text size without a NULL terminator
+    const int textSize = static_cast<int>(SuperTextMap.size() - 1);
 
 
     // PASS ONE: determine the number of lines
@@ -61,25 +63,6 @@ void DrawMessage(const std::string& SuperText)
     while(lineStart < textSize)
     {
         lastWord = lineStart;
-
-#ifdef USE_OLD_TEXT_PARSER
-
-        for(int i = lineStart + 1; i <= lineStart + maxChars; i++)
-        {
-            auto c = SuperText[size_t(i) - 1];
-
-            if((lastWord == lineStart && i == lineStart + maxChars) || i == textSize || c == '\n')
-            {
-                lastWord = i;
-                break;
-            }
-            else if(c == ' ')
-            {
-                lastWord = i;
-            }
-        }
-
-#else
 
         for(int i = lineStart + 1; i <= lineStart + maxChars; i++)
         {
@@ -95,8 +78,6 @@ void DrawMessage(const std::string& SuperText)
                 lastWord = i;
             }
         }
-
-#endif
 
         numLines ++;
         lineStart = lastWord;
@@ -159,40 +140,6 @@ void DrawMessage(const std::string& SuperText)
     {
         lastWord = lineStart;
 
-#ifdef USE_OLD_TEXT_PARSER
-
-        for(int i = lineStart + 1; i <= lineStart + maxChars; i++)
-        {
-            auto c = SuperText[size_t(i) - 1];
-
-            if((lastWord == lineStart && i == lineStart + maxChars) || i == textSize || c == '\n')
-            {
-                lastWord = i;
-                break;
-            }
-            else if(c == ' ')
-            {
-                lastWord = i;
-            }
-        }
-
-        if(lastWord == int(SuperText.size()) && firstLine)
-        {
-            SuperPrint(size_t(lastWord) - size_t(lineStart), SuperText.c_str() + size_t(lineStart),
-                       4,
-                       ScreenW / 2 - ((lastWord - lineStart) * charWidth) / 2,
-                       BoxY);
-        }
-        else
-        {
-            SuperPrint(size_t(lastWord) - size_t(lineStart), SuperText.c_str() + size_t(lineStart),
-                       4,
-                       ScreenW / 2 - TextBoxW / 2 + 12,
-                       BoxY);
-        }
-
-#else
-
         for(int i = lineStart + 1; i <= lineStart + maxChars; i++)
         {
             auto c = *(SuperTextMap[size_t(i) - 1]);
@@ -208,9 +155,14 @@ void DrawMessage(const std::string& SuperText)
             }
         }
 
-        if(lastWord == int(SuperTextMap.size()) && firstLine)
+        intptr_t lastWordPtr = intptr_t(SuperTextMap[lastWord]);
+        intptr_t lineStartPtr = intptr_t(SuperTextMap[lineStart]);
+        std::ptrdiff_t lineLenU = lastWordPtr - lineStartPtr;
+
+        SDL_assert_release(lastWordPtr >= lineStartPtr);
+
+        if(lastWord == textSize && firstLine)
         {
-            int lineLenU = (SuperTextMap[lastWord] - SuperTextMap[lineStart]);
             SuperPrint(lineLenU, SuperTextMap[lineStart],
                        4,
                        ScreenW / 2 - ((lastWord - lineStart) * charWidth) / 2,
@@ -218,14 +170,11 @@ void DrawMessage(const std::string& SuperText)
         }
         else
         {
-            int lineLenU = (SuperTextMap[lastWord] - SuperTextMap[lineStart]);
             SuperPrint(lineLenU, SuperTextMap[lineStart],
                        4,
                        ScreenW / 2 - TextBoxW / 2 + 12,
                        BoxY);
         }
-
-#endif
 
         lineStart = lastWord;
         BoxY += lineHeight;

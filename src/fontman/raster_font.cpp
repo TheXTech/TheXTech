@@ -407,6 +407,9 @@ void RasterFont::printText(const std::string &text,
     bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;
 #endif
 
+    // Fix the alignment (make it match to the old font engine)
+    x -= 2;
+
     const char *strIt  = text.c_str();
     const char *strEnd = strIt + text.size();
     for(; strIt < strEnd; strIt++)
