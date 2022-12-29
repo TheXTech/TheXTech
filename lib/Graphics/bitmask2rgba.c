@@ -34,7 +34,7 @@ void bitmask_to_rgba(FIBITMAP *front, FIBITMAP *mask)
 
     BYTE *img_bits, *mask_bits, *FPixP, *SPixP;
     RGBQUAD Npix = {0x00, 0x00, 0x00, 0xFF};   /* Destination pixel color */
-    BYTE Bpix[] = {0x00, 0x0, 0x00, 0xFF};   /* Dummy black pixel */
+    BYTE Wpix[] = {0xFF, 0xFF, 0xFF, 0xFF};   /* Dummy white pixel */
     unsigned short newAlpha = 0xFF; /* Calculated destination alpha-value*/
 
     BOOL endOfY = FALSE;
@@ -91,7 +91,7 @@ void bitmask_to_rgba(FIBITMAP *front, FIBITMAP *mask)
             FPixP += 4;
 
             if(x >= mask_w - 1 || endOfY)
-                SPixP = Bpix;
+                SPixP = Wpix;
             else
                 SPixP += 4;
         }
@@ -99,7 +99,7 @@ void bitmask_to_rgba(FIBITMAP *front, FIBITMAP *mask)
         if(ym == 0)
         {
             endOfY = TRUE;
-            SPixP = Bpix;
+            SPixP = Wpix;
         }
         else
             ym--;

@@ -18,7 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL.h>
+#include <SDL2/SDL_scancode.h>
+#include <SDL2/SDL_power.h>
+#include <SDL2/SDL_keyboard.h>
+#include <SDL2/SDL_mouse.h>
+#include <SDL2/SDL_events.h>
+#include "sdl_proxy/sdl_timer.h"
 
 #include "../controls.h"
 #include "../globals.h"
@@ -29,6 +34,8 @@
 #include "core/render.h"
 #include "core/window.h"
 #include "main/cheat_code.h"
+
+#include <Logger/logger.h>
 
 namespace Controls
 {
@@ -368,7 +375,7 @@ bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Keyboard primary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -460,7 +467,7 @@ bool InputMethodProfile_Keyboard::PollSecondaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Keyboard secondary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -544,7 +551,7 @@ bool InputMethodProfile_Keyboard::DeletePrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Attempted to delete Keyboard primary button with disallowed controls class %d\n", (int)c);
         return false;
     }
 

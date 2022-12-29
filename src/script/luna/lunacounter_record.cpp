@@ -21,7 +21,9 @@
 #include "lunacounter_record.h"
 #include "lunacounter_util.h"
 #include <Logger/logger.h>
-#include <SDL2/SDL_stdinc.h>
+
+#include "sdl_proxy/sdl_stdinc.h"
+
 
 void DeathRecord::Save(FILE *openfile)
 {

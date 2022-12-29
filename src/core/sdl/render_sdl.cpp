@@ -28,9 +28,10 @@
 
 #include "render_sdl.h"
 #include "video.h"
-#include "../window.h"
+#include "core/window.h"
 
-#include <SDL2/SDL_assert.h>
+#include "sdl_proxy/sdl_stdinc.h"
+#include <fmt_format_ne.h>
 
 #include "controls.h"
 

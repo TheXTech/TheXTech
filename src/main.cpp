@@ -18,7 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL.h>
+#include <ctime>
+#include "sdl_proxy/sdl_head.h"
 
 #include "game_main.h"
 #include "frm_main.h"
@@ -32,13 +33,24 @@
 #include "compat.h"
 #include "controls.h"
 #include <AppPath/app_path.h>
-#include <tclap/CmdLine.h>
+
+#ifndef THEXTECH_NO_ARGV_HANDLING
+#   include <tclap/CmdLine.h>
+#endif
+
 #include <Utils/strings.h>
 #include <Utils/files.h>
-#include <CrashHandler/crash_handler.h>
+
+#ifdef THEXTECH_CRASHHANDLER_SUPPORTED
+#   include <CrashHandler/crash_handler.h>
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+#include <SDL2/SDL_main.h>
+#endif
 
 #ifdef VITA
-#include "vita/vita_memory.h"
+#include "core/vita/vita_memory.h"
 #endif
 
 #ifdef ENABLE_XTECH_LUA
@@ -46,6 +58,8 @@
 #endif
 
 #ifdef __APPLE__
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_events.h>
 #include <Utils/files.h>
 #include <Logger/logger.h>
 
@@ -77,6 +91,38 @@ static void macosReceiveOpenFile()
         SDL_EventState(SDL_DROPFILE, SDL_DISABLE);
     }
 }
+#endif
+
+#ifdef __3DS__
+#include <3ds.h>
+int n3ds_clocked = 0; // eventually move elsewhere
+
+void InitClockSpeed()
+{
+    bool isN3DS;
+
+    APT_CheckNew3DS(&isN3DS);
+
+    if(!isN3DS)
+        n3ds_clocked = -1;
+
+    // I've made this configurable.
+    // if(isN3DS) // make this configurable...
+    // {
+    //     SwapClockSpeed();
+    //     printf("N3DS clock enabled\n");
+    // }
+}
+
+void SwapClockSpeed()
+{
+    if(n3ds_clocked == -1)
+        return;
+
+    n3ds_clocked = !n3ds_clocked;
+    osSetSpeedupEnable(n3ds_clocked);
+}
+
 #endif
 
 
@@ -129,13 +175,13 @@ static void strToPlayerSetup(int player, const std::string &setupString)
     switch(p.Mount)
     {
     case 1:
-        if(p.MountType < 1 || p.MountType > 3) // Socks
+        if((p.MountType < 1) || (p.MountType > 3)) // Socks
             p.MountType = 1;
         break;
     default:
         break;
     case 3:
-        if(p.MountType < 1 || p.MountType > 8) // Cat Llamas
+        if((p.MountType < 1) || (p.MountType > 8)) // Cat Llamas
             p.MountType = 1;
         break;
     }
@@ -153,8 +199,13 @@ int main(int argc, char**argv)
         setenv("DISPLAY", ":0", 1); // Automatically set the display to :0 if not defined
 #endif
 
-#if !defined(__3DS__) && !defined(VITA)
+#ifdef THEXTECH_CRASHHANDLER_SUPPORTED
     CrashHandler::initSigs();
+#endif
+
+#ifdef __3DS__
+    InitClockSpeed();
+    SwapClockSpeed();
 #endif
 
     seedRandom(std::time(NULL));
@@ -165,6 +216,7 @@ int main(int argc, char**argv)
         testPlayer[i].Character = i;
     }
 
+#ifndef THEXTECH_NO_ARGV_HANDLING
     try
     {
         // Define the command line object.
@@ -476,6 +528,19 @@ int main(int argc, char**argv)
         std::cerr.flush();
         return 2;
     }
+#else
+
+    printf("Launching AppPath...\n");
+    AppPathManager::initAppPath();
+    AppPath = AppPathManager::assetsRoot();
+    printf("Will load from %s...\n", AppPath.c_str());
+
+    OpenConfig_preSetup();
+
+    setup.verboseLogging = true;
+    setup.frameSkip = false;
+    setup.testShowFPS = true;
+#endif
 
     initGameInfo();
 

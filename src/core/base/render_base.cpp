@@ -20,7 +20,6 @@
 
 #include <SDL2/SDL_thread.h>
 #include <SDL2/SDL_power.h>
-#include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_rwops.h>
 
 #define USE_SDL_POWER
@@ -256,7 +255,7 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     target.frame_h = static_cast<int>(h);
 
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
-    XRender::loadTexture(target, w, h, textura, pitch);
+    g_render->loadTexture(target, w, h, textura, pitch);
 
 #ifdef DEBUG_BUILD
     bindElapsed = bindingTime.nanoelapsed();
@@ -496,7 +495,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
 
-    XRender::loadTexture(target, w, h, textura, pitch);
+    g_render->loadTexture(target, w, h, textura, pitch);
 
     GraphicsHelps::closeImage(sourceImage);
 }
@@ -668,7 +667,7 @@ void AbstractRender_t::makeShot()
 
     const int w = ScaleWidth, h = ScaleHeight;
     uint8_t *pixels = new uint8_t[size_t(4 * w * h)];
-    XRender::getScreenPixelsRGBA(0, 0, w, h, pixels);
+    g_render->getScreenPixelsRGBA(0, 0, w, h, pixels);
     PGE_GL_shoot *shoot = new PGE_GL_shoot();
     shoot->pixels = pixels;
     shoot->w = w;
@@ -829,7 +828,7 @@ void AbstractRender_t::processRecorder()
         return; // Drop frame (out of memory)
     }
 
-    XRender::getScreenPixelsRGBA(0, 0, w, h, pixels);
+    g_render->getScreenPixelsRGBA(0, 0, w, h, pixels);
 
     PGE_GL_shoot shoot;
     shoot.pixels = pixels;

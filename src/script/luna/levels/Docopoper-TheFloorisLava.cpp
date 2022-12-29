@@ -25,6 +25,8 @@
  *  Author:     Docopoper                        *
  *************************************************/
 
+#include "sdl_proxy/sdl_assert.h"
+
 #include "globals.h"
 #include "../lunaplayer.h"
 #include "../lunalayer.h"

@@ -18,7 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
+#include "sdl_proxy/sdl_timer.h"
+#include "sdl_proxy/sdl_assert.h"
+#include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_types.h"
+
+#ifndef PGE_NO_THREADING
+#include <SDL2/SDL_mutex.h>
+#endif
 
 #include "globals.h"
 #include "global_dirs.h"
@@ -43,6 +50,12 @@
 
 bool gfxLoaderTestMode = false;
 bool gfxLoaderThreadingMode = false;
+#ifndef PGE_NO_THREADING
+static SDL_mutex *gfxLoaderDebugMutex = nullptr;
+#endif
+static std::string gfxLoaderDebugString;
+static Sint64 gfxLoaderDebugStart = -1;
+static const Sint64 c_gfxLoaderShowInterval = 500;
 
 //// Private Sub cBlockGFX(A As Integer)
 //void cBlockGFX(int A);
@@ -71,10 +84,7 @@ struct GFXBackup_t
 };
 
 static std::vector<GFXBackup_t> g_defaultLevelGfxBackup;
-static std::set<std::string> g_customLevelCGFXPathsCache;
-
 static std::vector<GFXBackup_t> g_defaultWorldGfxBackup;
-static std::set<std::string> g_customWorldCGFXPathsCache;
 
 static DirListCI s_dirFallback;
 
@@ -100,8 +110,6 @@ static void loadCGFX(const std::string &origPath,
                      bool world = false,
                      bool skipMask = false)
 {
-    bool alreadyLoaded = false;
-
     std::string loadedPath;
     bool success = false;
     StdPicture newTexture;
@@ -115,10 +123,44 @@ static void loadCGFX(const std::string &origPath,
         backup.width = *width;
     if(height)
         backup.height = *height;
-    backup.texture = texture;
 
     bool isGif = false;
 
+#if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
+    // look for the image file: ext in custom, png in custom, gif in custom, ext in episode, png in episode, gif in episode
+    std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".png");
+    }
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".gif");
+        isGif = true;
+    }
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
+        isGif = false;
+    }
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".png");
+    }
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".gif");
+        isGif = true;
+    }
+#elif defined(X_IMG_EXT)
+    // look for the image file: ext in custom, ext in episode
+    std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
+    if(imgToUse.empty())
+    {
+        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
+        isGif = false;
+    }
+#else
     // look for the image file: png in custom, gif in custom, png in episode, gif in episode
     std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".png");
     if(imgToUse.empty())
@@ -136,17 +178,10 @@ static void loadCGFX(const std::string &origPath,
         imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".gif");
         isGif = true;
     }
+#endif
 
     if(imgToUse.empty())
         return; // Nothing to do
-
-    if(world)
-        alreadyLoaded = g_customWorldCGFXPathsCache.find(imgToUse) != g_customWorldCGFXPathsCache.end();
-    else
-        alreadyLoaded = g_customLevelCGFXPathsCache.find(imgToUse) != g_customLevelCGFXPathsCache.end();
-
-    if(alreadyLoaded)
-        return; // This texture is already loaded
 
     if(isGif && !skipMask)
     {
@@ -176,30 +211,346 @@ static void loadCGFX(const std::string &origPath,
 
     if(success)
     {
+        // don't allow texture to be incorrectly tracked as loaded
+        XRender::lazyUnLoad(texture);
+
         pLogDebug("Loaded custom GFX: %s", loadedPath.c_str());
         isCustom = true;
+
+        backup.texture = texture;
         texture = newTexture;
+
         if(width)
             *width = newTexture.w;
         if(height)
             *height = newTexture.h;
+
         if(world)
-        {
             g_defaultWorldGfxBackup.push_back(backup);
-            g_customWorldCGFXPathsCache.insert(loadedPath);
-        }
         else
-        {
             g_defaultLevelGfxBackup.push_back(backup);
-            g_customLevelCGFXPathsCache.insert(loadedPath);
-        }
     }
 }
 
+#ifdef PGE_MIN_PORT
+/*!
+ * \brief Load the custom GFX from a load list
+ * \param f The load list
+ * \param dir The directory to which paths are relative
+ * \param texture Target texture to modify
+ * \param width Reference to width field (optional)
+ * \param height Reference to height field (optional)
+ * \param is_custom_ref Reference to the "is custom" boolean
+ * \param world Is a world map
+ * \param this_is_custom Is custom in the current load context
+ */
+static void loadImageFromList(FILE* f, const std::string& dir,
+                    StdPicture &texture,
+                    int *width, int *height, bool &is_custom_loc,
+                    bool world = false, bool this_is_custom = false)
+{
+    StdPicture newTexture = XRender::lazyLoadPictureFromList(f, dir);
+
+    if(!newTexture.inited)
+        return;
+
+    if(this_is_custom)
+    {
+        GFXBackup_t backup;
+        backup.remote_width = width;
+        backup.remote_height = height;
+        backup.remote_isCustom = &is_custom_loc;
+        backup.remote_texture = &texture;
+        XRender::lazyUnLoad(texture);
+        if(width)
+            backup.width = *width;
+        if(height)
+            backup.height = *height;
+        backup.texture = texture;
+
+        if(world)
+            g_defaultWorldGfxBackup.push_back(backup);
+        else
+            g_defaultLevelGfxBackup.push_back(backup);
+    }
+
+    if(this_is_custom)
+    {
+        // pLogDebug("Loaded custom GFX: %s", newTexture.l.path.c_str());
+        is_custom_loc = true;
+    }
+
+    texture = newTexture;
+    if(width)
+        *width = newTexture.w;
+    if(height)
+        *height = newTexture.h;
+}
+
+bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
+{
+    std::string path = source_dir + "graphics.list";
+
+    FILE* f = fopen(path.c_str(), "r");
+
+    if(!f)
+        return false;
+
+    char type_buf[12];
+    int A;
+
+    bool failed = false;
+
+    while(true)
+    {
+        // advance the file to the next entry
+        if(failed)
+        {
+            char out = '\n';
+
+            while(out == '\n')
+            {
+                // pLogDebug("skipping failed lines at %d", ftell(f));
+                if(fscanf(f, "%*[^\n]%c", &out) != 1)
+                    break;
+            }
+
+            if(fgetc(f) != '\n')
+            {
+                pLogWarning("No more entries after failure");
+                break;
+            }
+        }
+
+        failed = true;
+
+        // read the entry!
+        SDL_memset(type_buf, 0, sizeof(type_buf));
+        if(fscanf(f, "%11s %d", type_buf, &A) != 2 || fgetc(f) != '\n')
+        {
+            if(feof(f))
+                break;
+            else
+            {
+                pLogDebug("Failed to read entry header of the load list");
+                continue;
+            }
+        }
+
+
+        // load the entry
+        if(type_buf[10] == '2')
+        {
+            if(A > numBackground2)
+            {
+                pLogWarning("Received load request for invalid bg2 %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXBackground2BMP[A], &GFXBackground2Width[A], &GFXBackground2Height[A], GFXBackground2Custom[A],
+                false, custom);
+        }
+        else if(type_buf[9] == 'd')
+        {
+            if(A > maxBackgroundType)
+            {
+                pLogWarning("Received load request for invalid background %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXBackgroundBMP[A], &GFXBackgroundWidth[A], &GFXBackgroundHeight[A], GFXBackgroundCustom[A],
+                false, custom);
+
+            if(!custom)
+            {
+                BackgroundWidth[A] = GFXBackgroundWidth[A];
+                BackgroundHeight[A] = GFXBackgroundHeight[A];
+            }
+        }
+        else if(type_buf[0] == 'b')
+        {
+            if(A > maxBlockType)
+            {
+                pLogWarning("Received load request for invalid block %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXBlockBMP[A], nullptr, nullptr, GFXBlockCustom[A],
+                false, custom);
+        }
+        else if(type_buf[0] == 'n')
+        {
+            if(A > maxNPCType)
+            {
+                pLogWarning("Received load request for invalid NPC %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXNPCBMP[A], &GFXNPCWidth[A], &GFXNPCHeight[A], GFXNPCCustom[A],
+                false, custom);
+        }
+        else if(type_buf[0] == 'e')
+        {
+            if(A > maxEffectType)
+            {
+                pLogWarning("Received load request for invalid effect %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXEffectBMP[A], &GFXEffectWidth[A], &GFXEffectHeight[A], GFXEffectCustom[A],
+                false, custom);
+        }
+        else if(type_buf[0] == 'y' && type_buf[5] == 't')
+        {
+            if(A > maxYoshiGfx)
+            {
+                pLogWarning("Received load request for invalid yoshitop %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXYoshiTBMP[A], nullptr, nullptr, GFXYoshiTCustom[A],
+                false, custom);
+        }
+        else if(type_buf[0] == 'y')
+        {
+            if(A > maxYoshiGfx)
+            {
+                pLogWarning("Received load request for invalid yoshib %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXYoshiBBMP[A], nullptr, nullptr, GFXYoshiBCustom[A],
+                false, custom);
+        }
+        else if(type_buf[0] == 'l' && type_buf[1] == 'e')
+        {
+            if(skip_world)
+                continue;
+
+            if(A > maxLevelType)
+            {
+                pLogWarning("Received load request for invalid level %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXLevelBMP[A], &GFXLevelWidth[A], &GFXLevelHeight[A], GFXLevelCustom[A],
+                true, custom);
+        }
+        else if(type_buf[0] == 't' && type_buf[1] == 'i')
+        {
+            if(skip_world)
+                continue;
+
+            if(A > maxTileType)
+            {
+                pLogWarning("Received load request for invalid tile %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXTileBMP[A], &GFXTileWidth[A], &GFXTileHeight[A], GFXTileCustom[A],
+                true, custom);
+        }
+        else if(type_buf[0] == 's')
+        {
+            if(skip_world)
+                continue;
+
+            if(A > maxSceneType)
+            {
+                pLogWarning("Received load request for invalid scene %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXSceneBMP[A], &GFXSceneWidth[A], &GFXSceneHeight[A], GFXSceneCustom[A],
+                true, custom);
+        }
+        else if(type_buf[0] == 'p' && type_buf[1] == 'l')
+        {
+            if(skip_world)
+                continue;
+
+            if(A > numCharacters)
+            {
+                pLogWarning("Received load request for invalid worldplayer %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXPlayerBMP[A], &GFXPlayerWidth[A], &GFXPlayerHeight[A], GFXPlayerCustom[A],
+                true, custom);
+        }
+        else if(type_buf[0] == 'p' && type_buf[1] == 'a')
+        {
+            if(skip_world)
+                continue;
+
+            if(A > maxPathType)
+            {
+                pLogWarning("Received load request for invalid path %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                GFXPathBMP[A], &GFXPathWidth[A], &GFXPathHeight[A], GFXPathCustom[A],
+                true, custom);
+        }
+        // character graphics
+        else
+        {
+            int c;
+            if(type_buf[0] == 'l' && type_buf[4] == '\0')
+                c = 4;
+            else if(type_buf[0] == 'l')
+                c = 1;
+            else if(type_buf[0] == 't')
+                c = 3;
+            else if(type_buf[0] == 'm')
+                c = 0;
+            else if(type_buf[0] == 'p')
+                c = 2;
+            else
+            {
+                pLogWarning("Received unrecognized load request category %s", type_buf);
+                continue;
+            }
+
+            if(A > numStates)
+            {
+                pLogWarning("Received load request for invalid player state %s %d", type_buf, A);
+                continue;
+            }
+
+            loadImageFromList(f, source_dir,
+                (*GFXCharacterBMP[c])[A], &(*GFXCharacterWidth[c])[A], &(*GFXCharacterHeight[c])[A], (*GFXCharacterCustom[c])[A],
+                true, custom);
+        }
+
+        failed = false;
+    }
+
+    fclose(f);
+
+    return true;
+}
+
+#endif // #ifdef PGE_MIN_PORT
+
 static void restoreLevelBackupTextures()
 {
-    for(auto &t : g_defaultLevelGfxBackup)
+    for(auto it = g_defaultLevelGfxBackup.rbegin(); it != g_defaultLevelGfxBackup.rend(); ++it)
     {
+        auto &t = *it;
+
         if(t.remote_width)
             *t.remote_width = t.width;
         if(t.remote_height)
@@ -210,14 +561,15 @@ static void restoreLevelBackupTextures()
         XRender::deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
-    g_customLevelCGFXPathsCache.clear();
     g_defaultLevelGfxBackup.clear();
 }
 
 static void restoreWorldBackupTextures()
 {
-    for(auto &t : g_defaultWorldGfxBackup)
+    for(auto it = g_defaultWorldGfxBackup.rbegin(); it != g_defaultWorldGfxBackup.rend(); ++it)
     {
+        auto &t = *it;
+
         if(t.remote_width)
             *t.remote_width = t.width;
         if(t.remote_height)
@@ -228,36 +580,67 @@ static void restoreWorldBackupTextures()
         XRender::deleteTexture(*t.remote_texture);
         *t.remote_texture = t.texture;
     }
-    g_customWorldCGFXPathsCache.clear();
     g_defaultWorldGfxBackup.clear();
 }
 
 
+static inline void s_find_image(std::string& dest, DirListCI& CurDir, std::string basename)
+{
+#if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
+    int s = basename.size();
+    basename += X_IMG_EXT;
+    dest = CurDir.resolveFileCaseExistsAbs(basename);
+    if(dest.empty())
+    {
+        basename.resize(s);
+        basename += ".png";
+        dest = CurDir.resolveFileCaseExistsAbs(basename);
+    }
+#elif defined(X_IMG_EXT)
+    basename += X_IMG_EXT;
+    dest = CurDir.resolveFileCaseExistsAbs(basename);
+#else
+    basename += ".png";
+    dest = CurDir.resolveFileCaseExistsAbs(basename);
+#endif
+}
+
 void LoadGFX()
 {
+#ifdef PGE_MIN_PORT
+    if(LoadGFXFromList(getGfxDir(), false, false))
+        return;
+#endif
+
     std::string p;
     DirListCI CurDir;
 
+    pLogDebug("Loading character textures");
+    LoaderUpdateDebugString("Characters");
     for(int c = 0; c < numCharacters; ++c)
     {
+        LoaderUpdateDebugString(fmt::format_ne("Character {0}", c));
         CurDir.setCurDir(getGfxDir() + GFXPlayerNames[c]);
         For(A, 1, 10)
         {
-            p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("{1}-{0}.png", A, GFXPlayerNames[c]));
+            s_find_image(p, CurDir, fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]));
             if(!p.empty())
             {
                 (*GFXCharacterBMP[c])[A] = XRender::lazyLoadPicture(p);
-                (*GFXCharacterWidth[c])[A] = GFXMarioBMP[A].w;
-                (*GFXCharacterHeight[c])[A] = GFXMarioBMP[A].h;
+                (*GFXCharacterWidth[c])[A] = (*GFXCharacterBMP[c])[A].w;
+                (*GFXCharacterHeight[c])[A] = (*GFXCharacterBMP[c])[A].h;
             }
         }
         UpdateLoad();
     }
 
+    pLogDebug("Loading block textures");
+    LoaderUpdateDebugString("Blocks");
     CurDir.setCurDir(getGfxDir() + "block/");
     for(int A = 1; A <= maxBlockType; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("block-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("Block {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("block-{0}", A));
         if(!p.empty())
         {
             GFXBlockBMP[A] = XRender::lazyLoadPicture(p);
@@ -271,10 +654,13 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading BG2 textures");
+    LoaderUpdateDebugString("Backgrounds");
     CurDir.setCurDir(getGfxDir() + "background2/");
     for(int A = 1; A <= numBackground2; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("background2-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("Background {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("background2-{0}", A));
         if(!p.empty())
         {
             GFXBackground2BMP[A] = XRender::lazyLoadPicture(p);
@@ -291,10 +677,13 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading NPC textures");
+    LoaderUpdateDebugString("NPC");
     CurDir.setCurDir(getGfxDir() + "npc/");
     for(int A = 1; A <= maxNPCType; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("npc-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("NPC {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("npc-{0}", A));
         if(!p.empty())
         {
             GFXNPCBMP[A] = XRender::lazyLoadPicture(p);
@@ -312,10 +701,13 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading effect textures");
+    LoaderUpdateDebugString("Effects");
     CurDir.setCurDir(getGfxDir() + "effect/");
     for(int A = 1; A <= maxEffectType; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("effect-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("Effect {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("effect-{0}", A));
         if(!p.empty())
         {
             GFXEffectBMP[A] = XRender::lazyLoadPicture(p);
@@ -333,10 +725,13 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading mount textures");
+    LoaderUpdateDebugString("Mounts");
     CurDir.setCurDir(getGfxDir() + "yoshi/");
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("yoshib-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("Mount B {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("yoshib-{0}", A));
         if(!p.empty())
         {
             GFXYoshiBBMP[A] = XRender::lazyLoadPicture(p);
@@ -352,7 +747,8 @@ void LoadGFX()
 
     for(int A = 1; A <= maxYoshiGfx; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("yoshit-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("Mount T {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("yoshit-{0}", A));
         if(!p.empty())
         {
             GFXYoshiTBMP[A] = XRender::lazyLoadPicture(p);
@@ -366,10 +762,13 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading background textures");
+    LoaderUpdateDebugString("BGO");
     CurDir.setCurDir(getGfxDir() + "background/");
     for(int A = 1; A <= maxBackgroundType; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("background-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("BGO {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("background-{0}", A));
         if(!p.empty())
         {
             GFXBackgroundBMP[A] = XRender::lazyLoadPicture(p);
@@ -389,10 +788,13 @@ void LoadGFX()
 
 
 // 'world map
+    pLogDebug("Loading tile textures");
+    LoaderUpdateDebugString("Terrain");
     CurDir.setCurDir(getGfxDir() + "tile/");
     for(int A = 1; A <= maxTileType; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("tile-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("Terrain {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("tile-{0}", A));
         if(!p.empty())
         {
             GFXTileBMP[A] = XRender::lazyLoadPicture(p);
@@ -408,10 +810,13 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading level textures");
+    LoaderUpdateDebugString("Level entries");
     CurDir.setCurDir(getGfxDir() + "level/");
     for(int A = 0; A <= maxLevelType; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("level-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("Level {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("level-{0}", A));
         if(!p.empty())
         {
             GFXLevelBMP[A] = XRender::lazyLoadPicture(p);
@@ -427,10 +832,13 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading scene textures");
+    LoaderUpdateDebugString("Scenery");
     CurDir.setCurDir(getGfxDir() + "scene/");
     for(int A = 1; A <= maxSceneType; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("scene-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("Scenery {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("scene-{0}", A));
         if(!p.empty())
         {
             GFXSceneBMP[A] = XRender::lazyLoadPicture(p);
@@ -446,10 +854,13 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading world player textures");
+    LoaderUpdateDebugString("World characters");
     CurDir.setCurDir(getGfxDir() + "player/");
     for(int A = 1; A <= numCharacters; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("player-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("World character {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("player-{0}", A));
         if(!p.empty())
         {
             GFXPlayerBMP[A] = XRender::lazyLoadPicture(p);
@@ -465,10 +876,13 @@ void LoadGFX()
     }
     UpdateLoad();
 
+    pLogDebug("Loading path textures");
+    LoaderUpdateDebugString("Path cells");
     CurDir.setCurDir(getGfxDir() + "path/");
     for(int A = 1; A <= maxPathType; ++A)
     {
-        p = CurDir.resolveFileCaseExistsAbs(fmt::format_ne("path-{0}.png", A));
+        LoaderUpdateDebugString(fmt::format_ne("Path cell {0}", A));
+        s_find_image(p, CurDir, fmt::format_ne("path-{0}", A));
         if(!p.empty())
         {
             GFXPathBMP[A] = XRender::lazyLoadPicture(p);
@@ -605,7 +1019,7 @@ static void loadCustomUIAssets()
              nullptr, nullptr, GFX.isCustom(ci++), GFX.EIcons, false, true);
 }
 
-void LoadCustomGFX()
+void LoadCustomGFX(bool include_world)
 {
     std::string GfxRoot = AppPath + "graphics/";
 
@@ -614,11 +1028,21 @@ void LoadCustomGFX()
     g_dirCustom.setCurDir(FileNamePath + FileName);
     s_dirFallback.setCurDir(getGfxDir() + "fallback");
 
+    loadCustomUIAssets();
+
+#ifdef PGE_MIN_PORT
+    bool success = LoadGFXFromList(g_dirEpisode.getCurDir(), true, !include_world);
+    success |= LoadGFXFromList(g_dirCustom.getCurDir(), true, !include_world);
+    if(success)
+        return;
+#endif
+
     for(int A = 1; A < maxBlockType; ++A)
     {
         loadCGFX(GfxRoot + fmt::format_ne("block/block-{0}.png", A),
                  fmt::format_ne("block-{0}", A),
-                 nullptr, nullptr, GFXBlockCustom[A], GFXBlockBMP[A]);
+                 nullptr, nullptr, GFXBlockCustom[A], GFXBlockBMP[A],
+                 false, BlockHasNoMask[A]);
     }
 
     for(int A = 1; A < numBackground2; ++A)
@@ -653,7 +1077,8 @@ void LoadCustomGFX()
     {
         loadCGFX(GfxRoot + fmt::format_ne("background/background-{0}.png", A),
                  fmt::format_ne("background-{0}", A),
-                 &GFXBackgroundWidth[A], &GFXBackgroundHeight[A], GFXBackgroundCustom[A], GFXBackgroundBMP[A]);
+                 &GFXBackgroundWidth[A], &GFXBackgroundHeight[A], GFXBackgroundCustom[A], GFXBackgroundBMP[A],
+                 false, BackgroundHasNoMask[A]);
     }
 
     for(int A = 1; A < maxYoshiGfx; ++A)
@@ -681,32 +1106,9 @@ void LoadCustomGFX()
         }
     }
 
-    loadCustomUIAssets();
-}
+    if(!include_world)
+        return;
 
-
-void UnloadCustomGFX()
-{
-    // Restore default sizes of custom effects
-    for(int A = 1; A < maxEffectType; ++A)
-    {
-        EffectWidth[A] = EffectDefaults.EffectWidth[A];
-        EffectHeight[A] = EffectDefaults.EffectHeight[A];
-    }
-
-    restoreLevelBackupTextures();
-}
-
-
-
-void LoadWorldCustomGFX()
-{
-    std::string GfxRoot = AppPath + "graphics/";
-
-    // these should all have been set previously, but will do no harm
-    g_dirEpisode.setCurDir(FileNamePath);
-    g_dirCustom.setCurDir(FileNamePath + FileName);
-    s_dirFallback.setCurDir(getGfxDir() + "fallback");
 
     for(int A = 1; A < maxTileType; ++A)
     {
@@ -744,10 +1146,61 @@ void LoadWorldCustomGFX()
     }
 }
 
+
+void UnloadCustomGFX()
+{
+    // Restore default sizes of custom effects
+    for(int A = 1; A < maxEffectType; ++A)
+    {
+        EffectWidth[A] = EffectDefaults.EffectWidth[A];
+        EffectHeight[A] = EffectDefaults.EffectHeight[A];
+    }
+
+    restoreLevelBackupTextures();
+}
+
+
+
 void UnloadWorldCustomGFX()
 {
     restoreWorldBackupTextures();
 }
+
+void LoaderInit()
+{
+    gfxLoaderDebugStart = SDL_GetTicks();
+    gfxLoaderDebugString.clear();
+#ifndef PGE_NO_THREADING
+    if(gfxLoaderDebugMutex)
+        gfxLoaderDebugMutex = SDL_CreateMutex();
+#endif
+}
+
+void LoaderFinish()
+{
+    gfxLoaderDebugStart = -1;
+    gfxLoaderDebugString.clear();
+#ifndef PGE_NO_THREADING
+    if(gfxLoaderDebugMutex)
+        SDL_DestroyMutex(gfxLoaderDebugMutex);
+    gfxLoaderDebugMutex = nullptr;
+#endif
+}
+
+void LoaderUpdateDebugString(const std::string &strig)
+{
+    if(gfxLoaderDebugStart == -1)
+        return;
+
+#ifndef PGE_NO_THREADING
+    SDL_LockMutex(gfxLoaderDebugMutex);
+#endif
+    gfxLoaderDebugString = "Load: " + strig;
+#ifndef PGE_NO_THREADING
+    SDL_UnlockMutex(gfxLoaderDebugMutex);
+#endif
+}
+
 
 void UpdateLoadREAL()
 {
@@ -803,6 +1256,20 @@ void UpdateLoadREAL()
 
         if(gfxLoaderThreadingMode && alphaFader >= 0.f)
             XRender::renderRect(0, 0, ScreenW, ScreenH, 0.f, 0.f, 0.f, alphaFader);
+
+        if(!gfxLoaderDebugString.empty() && gfxLoaderDebugStart + c_gfxLoaderShowInterval < SDL_GetTicks())
+        {
+#ifndef PGE_NO_THREADING
+            SDL_LockMutex(gfxLoaderDebugMutex);
+#endif
+            SuperPrint(gfxLoaderDebugString.c_str(), 3,
+                       10, ScreenH - 24,
+                       1.f, 1.f, 0.f, 0.5f);
+
+#ifndef PGE_NO_THREADING
+            SDL_UnlockMutex(gfxLoaderDebugMutex);
+#endif
+        }
 
         XRender::repaint();
         XRender::setTargetScreen();

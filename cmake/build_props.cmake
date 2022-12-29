@@ -1,3 +1,4 @@
+# ============================ Generic setup ==================================
 # If platform is Emscripten
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(EMSCRIPTEN 1 BOOLEAN)
@@ -10,6 +11,17 @@ if(APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
     set(XTECH_MACOSX_TIGER TRUE)
 endif()
 
+# =============================== Policies ====================================
+
+# Ninja requires custom command byproducts to be explicit.
+if(POLICY CMP0058)
+    cmake_policy(SET CMP0058 NEW)
+endif()
+
+# ExternalProject step targets fully adopt their steps.
+if(POLICY CMP0114)
+    cmake_policy(SET CMP0114 NEW)
+endif()
 
 # ========================= Macros and Functions ==============================
 
@@ -102,6 +114,10 @@ elseif(NOT MSVC)
         if(ANDROID)
             set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -funwind-tables")
             set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -funwind-tables")
+        elseif(NINTENDO_3DS OR NINTENDO_WII)
+            set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -Wl,--gc-sections")
+            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Wl,--gc-sections")
+            set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -g -Wl,--gc-sections")
         elseif(VITA)
             # VitaSDK specifies -O2 for release configurations. PS Vita Support - Axiom 2022
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1 -fcompare-debug-second")
@@ -231,7 +247,7 @@ if(APPLE)
     set(CMAKE_BUNDLE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin)
 endif()
 
-if(WIN32)
+if(CMAKE_STATIC_LIBRARY_PREFIX STREQUAL "" AND CMAKE_STATIC_LIBRARY_SUFFIX STREQUAL ".lib")
     set(LIBRARY_STATIC_NAME_SUFFIX "-static")
 else()
     set(LIBRARY_STATIC_NAME_SUFFIX "")

@@ -1,5 +1,3 @@
-#include <SDL2/SDL_stdinc.h>
-
 #include "../DirManager/dirman.h"
 #include "strings.h"
 #include "dir_list_ci.h"

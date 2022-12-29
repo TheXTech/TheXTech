@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 #include "dirman.h"
 #include "dirman_private.h"
 
+
 void DirMan::DirMan_private::setPath(const std::string &dirPath)
 {
     m_dirPath = dirPath;
@@ -93,6 +94,7 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
 
 bool DirMan::DirMan_private::fetchListFromWalker(std::string &curPath, std::vector<std::string> &list)
 {
+    PUT_THREAD_GUARD();
     if(m_walkerState.digStack.empty())
         return false;
 
@@ -127,6 +129,7 @@ bool DirMan::DirMan_private::fetchListFromWalker(std::string &curPath, std::vect
 
 bool DirMan::exists(const std::string &dirPath)
 {
+    PUT_THREAD_GUARD();
     DIR *dir = opendir(dirPath.c_str());
     if(dir)
     {
@@ -139,16 +142,19 @@ bool DirMan::exists(const std::string &dirPath)
 
 bool DirMan::mkAbsDir(const std::string &dirPath)
 {
+    PUT_THREAD_GUARD();
     return ::mkdir(dirPath.c_str(), S_IRWXU | S_IRWXG) == 0;
 }
 
 bool DirMan::rmAbsDir(const std::string &dirPath)
 {
+    PUT_THREAD_GUARD();
     return ::rmdir(dirPath.c_str()) == 0;
 }
 
 bool DirMan::mkAbsPath(const std::string &dirPath)
 {
+    PUT_THREAD_GUARD();
     char tmp[PATH_MAX + 1];
     char *p = nullptr;
     size_t len;
@@ -179,6 +185,7 @@ bool DirMan::mkAbsPath(const std::string &dirPath)
 
 bool DirMan::rmAbsPath(const std::string &dirPath)
 {
+    PUT_THREAD_GUARD();
     int ret = 0;
     struct DirStackEntry
     {

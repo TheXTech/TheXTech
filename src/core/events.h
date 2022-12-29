@@ -23,7 +23,7 @@
 #define EVENTS_HHHHHHH
 
 #ifndef EVENTS_CUSTOM
-#   include <SDL2/SDL_stdinc.h>
+#   include "sdl_proxy/sdl_stdinc.h"
 #   include "base/events_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
@@ -39,6 +39,13 @@
  */
 namespace XEvents
 {
+
+#ifdef EVENTS_CUSTOM
+
+extern bool init();
+extern void quit();
+
+#endif
 
 /*!
  * \brief Process events
@@ -62,10 +69,13 @@ E_INLINE void waitEvents() TAIL
 }
 #endif
 
-SDL_FORCE_INLINE void eventResize()
+E_INLINE void eventResize() TAIL
+
+#ifndef EVENTS_CUSTOM
 {
     g_events->eventResize();
 }
+#endif
 
 } // XEvents
 

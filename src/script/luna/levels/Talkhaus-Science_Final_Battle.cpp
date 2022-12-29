@@ -28,6 +28,8 @@
 
 #include <vector>
 
+#include "sdl_proxy/sdl_assert.h"
+
 #include "Talkhaus-Science_Final_Battle.h"
 #include "globals.h"
 #include "../lunanpc.h"

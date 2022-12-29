@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
+#include "sdl_proxy/sdl_timer.h"
 
 #include "../gfx.h"
 #include "../globals.h"
@@ -177,7 +177,7 @@ void GameThing(int waitms, int fadeSpeed)
     else
     {
         ScreenFader fader;
-        Uint32 targetTime = SDL_GetTicks() + waitms;
+        uint32_t targetTime = SDL_GetTicks() + waitms;
 
         if(g_config.EnableInterLevelFade && fadeSpeed > 0)
             fader.setupFader(fadeSpeed, 65, 0, ScreenFader::S_FADE);
@@ -208,6 +208,5 @@ void GameThing(int waitms, int fadeSpeed)
             }
             PGE_Delay(1);
         }
-
     }
 }

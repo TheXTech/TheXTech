@@ -896,7 +896,7 @@ bool InputMethodProfile_Joystick::PollPrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Joystick primary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -991,7 +991,7 @@ bool InputMethodProfile_Joystick::PollSecondaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Joystick secondary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -1076,7 +1076,7 @@ bool InputMethodProfile_Joystick::DeletePrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Attempted to delete Joystick primary button with disallowed controls class %d\n", (int)c);
         return false;
     }
 
@@ -1587,8 +1587,8 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
             if(!p)
                 continue;
 
-            if((active_joystick->ctrl && p->m_controllerProfile)
-               || (!active_joystick->ctrl && !p->m_controllerProfile))
+            // if((active_joystick->ctrl && p->m_controllerProfile) || (!active_joystick->ctrl && !p->m_controllerProfile))
+            if((active_joystick->ctrl != nullptr) == p->m_controllerProfile)
             {
                 method->Profile = p_;
                 break;
@@ -1679,12 +1679,12 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
     if(!devices)
     {
         SDL_JoystickClose(joy);
-        pLogDebug("  could not allocate devices struct (OOM).");
+        pLogDebug("  could not allocate devices struct (out of memory).");
         return false;
     }
 
     devices->joy = joy;
-    devices->guid = guid;
+    devices->guid = std::move(guid);
 
     if(SDL_IsGameController(joystick_index))
     {
@@ -1733,8 +1733,7 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
 bool InputMethodType_Joystick::CloseJoystick(int instance_id)
 {
     pLogDebug("joystick with ID %d removed.", instance_id);
-    std::unordered_map<int, JoystickDevices*>::iterator found
-        = this->m_availableJoysticks.find(instance_id);
+    auto found = this->m_availableJoysticks.find(instance_id);
 
     if(found == this->m_availableJoysticks.end())
     {
@@ -1746,7 +1745,7 @@ bool InputMethodType_Joystick::CloseJoystick(int instance_id)
 
     for(InputMethod* method : g_InputMethods)
     {
-        InputMethod_Joystick* m = dynamic_cast<InputMethod_Joystick*>(method);
+        auto* m = dynamic_cast<InputMethod_Joystick*>(method);
 
         if(!m)
             continue;
@@ -1775,7 +1774,7 @@ bool InputMethodType_Joystick::CloseJoystick(int instance_id)
 InputMethodProfile* InputMethodType_Joystick::AddOldJoystickProfile()
 {
     InputMethodProfile* p_ = this->AddProfile();
-    InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(p_);
+    auto* p = dynamic_cast<InputMethodProfile_Joystick*>(p_);
 
     if(!p)
         return nullptr;
@@ -1796,8 +1795,8 @@ bool InputMethodType_Joystick::SetProfile_Custom(InputMethod* method, int player
 {
     (void)active_methods;
 
-    InputMethod_Joystick* m = dynamic_cast<InputMethod_Joystick*>(method);
-    InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(profile);
+    auto* m = dynamic_cast<InputMethod_Joystick*>(method);
+    auto* p = dynamic_cast<InputMethodProfile_Joystick*>(profile);
 
     if(!m || !p || !m->m_devices)
         return false;
@@ -1900,18 +1899,18 @@ bool InputMethodType_Joystick::OptionChange(size_t i)
 void InputMethodType_Joystick::SaveConfig_Custom(IniProcessing* ctl)
 {
     std::string name = "last-profile-";
-    int uuid_begin = name.size();
+    int uuid_begin = (int)name.size();
 
     // set all default controller profiles
     for(auto it = m_lastProfileByGUID.begin(); it != m_lastProfileByGUID.end(); ++it)
     {
-        std::vector<InputMethodProfile*>::iterator loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), it->second);
+        auto loc = std::find(this->m_profiles.begin(), this->m_profiles.end(), it->second);
         size_t index = loc - this->m_profiles.begin();
 
         if(index == this->m_profiles.size())
         {
             // this probably a legacy profile, let's check.
-            InputMethodProfile_Joystick* p = dynamic_cast<InputMethodProfile_Joystick*>(it->second);
+            auto* p = dynamic_cast<InputMethodProfile_Joystick*>(it->second);
 
             if(p && p->m_legacyProfile)
             {
@@ -1984,7 +1983,7 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
             }
             else
             {
-                pLogWarning("Could not allocate legacy profile (OOM).");
+                pLogWarning("Could not allocate legacy profile (out of memory).");
             }
 
             ctl->endGroup();

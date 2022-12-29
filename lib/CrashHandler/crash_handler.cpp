@@ -17,9 +17,16 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL.h>
+
+#include "sdl_proxy/sdl_head.h"
+
+#ifndef THEXTECH_NO_SDL_BUILD
 #include <SDL2/SDL_version.h>
-#include <SDL2/SDL_mixer_ext.h>
+
+#   ifndef THEXTECH_CLI_BUILD
+#   include <SDL2/SDL_mixer_ext.h>
+#   endif
+#endif
 
 #include <exception>
 #include <cstdlib>
@@ -165,8 +172,12 @@ static const char *g_messageToUser =
     "GIT branch: " V_BUILD_BRANCH "\n"
     "Build date: " V_DATE_OF_BUILD "\n"
     "================================================\n"
+#ifndef THEXTECH_NO_SDL_BUILD
     "SDL2 " STR(SDL_MAJOR_VERSION) "." STR(SDL_MINOR_VERSION) "." STR(SDL_PATCHLEVEL) "\n"
+#endif
+#if !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD)
     "SDL Mixer X " STR(SDL_MIXER_MAJOR_VERSION) "." STR(SDL_MIXER_MINOR_VERSION) "." STR(SDL_MIXER_PATCHLEVEL) "\n"
+#endif
     "================================================\n"
     " Please send this log file to the developers by one of ways:\n"
     " - Via contact form:          http://wohlsoft.ru/forum/memberlist.php?mode=contactadmin\n"
@@ -410,7 +421,9 @@ static std::string getStacktrace()
 
 static LLVM_ATTRIBUTE_NORETURN void abortEngine(int signal)
 {
+#ifndef THEXTECH_NO_SDL_BUILD
     SDL_Quit();
+#endif
     CloseLog();
     exit(signal);
 }

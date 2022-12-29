@@ -21,6 +21,8 @@
 #include "globals.h"
 #include "global_dirs.h"
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "custom.h"
 #include "compat.h"
 

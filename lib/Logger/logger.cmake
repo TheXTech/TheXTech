@@ -19,6 +19,11 @@ elseif(VITA)
     list(APPEND LOGGER_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/logger_vita.cpp
     )
+elseif(NINTENDO_3DS OR NINTENDO_WII OR THEXTECH_NO_SDL_BUILD OR PGE_MIN_PORT)
+    message("-- Logger for Minimal Port (no SDL)")
+    list(APPEND LOGGER_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/private/logger_min.cpp
+    )
 else()
     message("-- Logger for Desktop")
     list(APPEND LOGGER_SRCS

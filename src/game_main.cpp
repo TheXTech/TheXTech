@@ -18,9 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
+#ifndef PGE_NO_THREADING
 #include <SDL2/SDL_atomic.h>
 #include <SDL2/SDL_thread.h>
+#endif
 
 #include <Logger/logger.h>
 #include <Utils/files.h>
@@ -35,6 +36,8 @@
 #ifdef ENABLE_XTECH_LUA
 #include "xtech_lua_main.h"
 #endif
+
+#include "sdl_proxy/sdl_timer.h"
 
 #include "globals.h"
 #include "game_main.h"
@@ -99,7 +102,9 @@ static int loadingThread(void *waiter_ptr)
     SetupVars(); //Setup Variables
 
 #ifdef THEXTECH_PRELOAD_LEVELS
+    LoaderUpdateDebugString("Worlds preload");
     FindWorlds();
+    LoaderUpdateDebugString("Levels preload");
     FindLevels();
 #endif
 
@@ -255,6 +260,8 @@ int GameMain(const CmdLineSetup_t &setup)
             PlayInitSound();
     }
 
+    LoaderInit();
+
 #ifndef PGE_NO_THREADING
     {
         SDL_Thread*     loadThread;
@@ -287,6 +294,8 @@ int GameMain(const CmdLineSetup_t &setup)
 #else
     loadingThread(nullptr);
 #endif
+
+    LoaderFinish();
 
     LevelSelect = true; // world map is to be shown
 
@@ -419,6 +428,10 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[A] = blankPlayer;
 
             numPlayers = g_gameInfo.outroMaxPlayersCount;
+#ifdef __NDS__
+            if(numPlayers > 3)
+                numPlayers = 3;
+#endif
             if(g_gameInfo.outroDeadMode)
                 numPlayers = 1; // Deadman mode
             GameMenu = false;
@@ -589,6 +602,10 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             numPlayers = g_gameInfo.introMaxPlayersCount;
+#ifdef __NDS__
+            if(numPlayers > 3)
+                numPlayers = 3;
+#endif
             if(g_gameInfo.introDeadMode)
                 numPlayers = 1;// one deadman should be
 
@@ -716,8 +733,10 @@ int GameMain(const CmdLineSetup_t &setup)
             LoadCustomSound();
             SetupPlayers();
 
+#ifndef PGE_MIN_PORT
             if(!NoMap)
                 FindWldStars();
+#endif
 
             if((!StartLevel.empty() && NoMap) || !GoToLevel.empty())
             {
@@ -996,6 +1015,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                     TestLevel = false;
                     LevelEditor = true;
+                    SetupPlayers();
 
                     // reopen the temporary level (FullFileName)
                     OpenLevel(FullFileName);

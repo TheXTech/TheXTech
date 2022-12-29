@@ -21,10 +21,12 @@
 #include <algorithm>
 
 #include <Logger/logger.h>
-#include "../globals.h"
-#include "../graphics.h"
-#include "../core/render.h"
-#include "../gfx.h"
+#include "sdl_proxy/sdl_stdinc.h"
+#include "core/render.h"
+
+#include "globals.h"
+#include "graphics.h"
+#include "gfx.h"
 #include "../fontman/font_manager.h"
 #include "../fontman/font_manager_private.h"
 

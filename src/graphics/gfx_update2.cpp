@@ -19,7 +19,6 @@
  */
 
 #include "../globals.h"
-#include "../frm_main.h"
 #include "../gfx.h"
 #include "../frame_timer.h"
 #include "../graphics.h"
@@ -52,7 +51,6 @@ void UpdateGraphics2(bool skipRepaint)
         return;
 #endif
 
-    float c = ShadowMode ? 0.f : 1.f;
     cycleNextInc();
 
     if(FrameSkip && frameSkipNeeded())
@@ -66,7 +64,7 @@ void UpdateGraphics2(bool skipRepaint)
     g_stats.reset();
 
     int A = 0;
-    int B = 0;
+    // int B = 0;
     const int Z = 1;
     int WPHeight = 0;
 //    Location_t tempLocation;
@@ -183,6 +181,11 @@ void UpdateGraphics2(bool skipRepaint)
 //    {
 //        XRender::renderTexture(0, 0, ScreenW, ScreenH, 0, 0, 0);
 //    }
+
+#ifdef __3DS__
+        XRender::setTargetLayer(0);
+#endif
+
     XRender::clearBuffer();
 
 //    if(TakeScreen == true)
@@ -385,6 +388,10 @@ void UpdateGraphics2(bool skipRepaint)
             }
         }
 
+#ifdef __3DS__
+        XRender::setTargetLayer(3);
+#endif
+
         DrawEditorWorld();
     }
     else
@@ -440,6 +447,10 @@ void UpdateGraphics2(bool skipRepaint)
              }
         }
 
+#ifdef __3DS__
+        XRender::setTargetLayer(2);
+#endif
+
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
 
         XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
@@ -447,222 +458,55 @@ void UpdateGraphics2(bool skipRepaint)
         XRender::renderTexture(0, 130, 66, 404, GFX.Interface[4], 0, 130);
         XRender::renderTexture(734, 130, 66, 404, GFX.Interface[4], 734, 130);
 
+#ifdef __3DS__
+        XRender::setTargetLayer(3);
+#endif
+
         for(A = 1; A <= numPlayers; A++)
         {
-            Player[A].Direction = -1;
-            Player[A].Location.SpeedY = 0;
-            Player[A].Location.SpeedX = -1;
-            Player[A].Controls.Left = false;
-            Player[A].Controls.Right = false;
-            if(Player[A].Duck)
-                UnDuck(Player[A]);
-            PlayerFrame(Player[A]);
+            int pX = 32 + 48 * A;
+            int pY = 124;
 
-            if(Player[A].Mount == 3)
+            Player_t& p = Player[A];
+
+            p.Direction = -1;
+            p.Location.SpeedY = 0;
+            p.Location.SpeedX = -1;
+            p.Controls.Left = false;
+            p.Controls.Right = false;
+            p.SpinJump = false;
+            p.Dead = false;
+            p.Immune2 = false;
+            p.Fairy = false;
+            p.TimeToLive = 0;
+            p.Effect = 0;
+            p.MountSpecial = 0;
+            p.HoldingNPC = 0;
+            if(p.Duck)
+                UnDuck(p);
+            PlayerFrame(p);
+
+            p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+            p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+            SizeCheck(p);
+            p.Location.X = pX - vScreenX[1];
+            p.Location.Y = pY - vScreenY[1] - p.Location.Height;
+
+            if(p.MountType == 3)
             {
-                if(Player[A].MountType == 0)
-                    Player[A].MountType = 1;
-                B = Player[A].MountType;
-                // Yoshi's Body
-                XRender::renderTexture(32 + (48 * A) + Player[A].YoshiBX, 124 - Player[A].Location.Height + Player[A].YoshiBY,
-                                      32, 32, GFXYoshiBBMP[B], 0, 32 * Player[A].YoshiBFrame, c, c, c);
-
-                // Yoshi's Head
-                XRender::renderTexture(32 + (48 * A) + Player[A].YoshiTX,
-                                      124 - Player[A].Location.Height + Player[A].YoshiTY,
-                                      32, 32, GFXYoshiTBMP[B], 0, 32 * Player[A].YoshiTFrame, c, c, c);
+                p.YoshiWingsFrameCount += 1;
+                p.YoshiWingsFrame = 0;
+                if(p.YoshiWingsFrameCount <= 12)
+                    p.YoshiWingsFrame = 1;
+                else if(p.YoshiWingsFrameCount >= 24)
+                    p.YoshiWingsFrameCount = 0;
+                if(p.Direction == 1)
+                    p.YoshiWingsFrame += 2;
             }
 
-            if(Player[A].Character == 1)
-            {
-                if(Player[A].Mount == 0 || Player[A].Mount == 3)
-                {
-                    XRender::renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          124 - Player[A].Location.Height + MarioFrameY[(Player[A].State * 100) +
-                                            (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
-                                          100, 100,
-                                          GFXMarioBMP[Player[A].State],
-                                          pfrX(Player[A].Frame * Player[A].Direction),
-                                          pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
-                }
-                else if(Player[A].Mount == 1)
-                {
-                    int height;
-                    if(Player[A].State == 1)
-                        height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                    else
-                        height = Player[A].Location.Height - MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
-                    XRender::renderTexture(32 + (48 * A) + MarioFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          124 - Player[A].Location.Height + MarioFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          100,
-                                          height,
-                                          GFXMarioBMP[Player[A].State],
-                                          pfrX(Player[A].Frame * Player[A].Direction),
-                                          pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
-
-                    XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32,
-                                          GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
-
-                    if(Player[A].MountType == 3)
-                    {
-                        Player[A].YoshiWingsFrameCount += 1;
-                        Player[A].YoshiWingsFrame = 0;
-                        if(Player[A].YoshiWingsFrameCount <= 12)
-                            Player[A].YoshiWingsFrame = 1;
-                        else if(Player[A].YoshiWingsFrameCount >= 24)
-                            Player[A].YoshiWingsFrameCount = 0;
-
-                        XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32,
-                                              GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame);
-                    }
-                }
-            }
-            else if(Player[A].Character == 2)
-            {
-                if(Player[A].Mount == 0 || Player[A].Mount == 3)
-                {
-                    XRender::renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) +
-                                            (Player[A].Frame * Player[A].Direction)],
-                                          124 - Player[A].Location.Height + LuigiFrameY[(Player[A].State * 100) +
-                                            (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY, 100, 100,
-                                          GFXLuigiBMP[Player[A].State],
-                                          pfrX(Player[A].Frame * Player[A].Direction),
-                                          pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
-                }
-                else if(Player[A].Mount == 1)
-                {
-                    int height;
-                    if(Player[A].State == 1)
-                        height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                    else
-                        height = Player[A].Location.Height - LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
-                    XRender::renderTexture(32 + (48 * A) + LuigiFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          124 - Player[A].Location.Height + LuigiFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          100,
-                                          height,
-                                          GFXLuigiBMP[Player[A].State],
-                                          pfrX(Player[A].Frame * Player[A].Direction),
-                                          pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
-
-                    XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
-
-                    if(Player[A].MountType == 3)
-                    {
-                        Player[A].YoshiWingsFrameCount += 1;
-                        Player[A].YoshiWingsFrame = 0;
-                        if(Player[A].YoshiWingsFrameCount <= 12)
-                            Player[A].YoshiWingsFrame = 1;
-                        else if(Player[A].YoshiWingsFrameCount >= 24)
-                            Player[A].YoshiWingsFrameCount = 0;
-
-                        XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
-                    }
-                }
-            }
-            else if(Player[A].Character == 3)
-            {
-                if(Player[A].Mount == 0 || Player[A].Mount == 3)
-                {
-                    XRender::renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
-                                          100, 100,
-                                          GFXPeachBMP[Player[A].State],
-                                          pfrX(Player[A].Frame * Player[A].Direction),
-                                          pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
-                }
-                else if(Player[A].Mount == 1)
-                {
-                    int height;
-                    if(Player[A].State == 1)
-                        height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                    else
-                        height = Player[A].Location.Height - PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 30;
-                    XRender::renderTexture(32 + (48 * A) + PeachFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          124 - Player[A].Location.Height + PeachFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          100,
-                                          height,
-                                          GFXPeachBMP[Player[A].State],
-                                          pfrX(Player[A].Frame * Player[A].Direction),
-                                          pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
-
-                    XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
-
-                    if(Player[A].MountType == 3)
-                    {
-                        Player[A].YoshiWingsFrameCount += 1;
-                        Player[A].YoshiWingsFrame = 0;
-                        if(Player[A].YoshiWingsFrameCount <= 12)
-                            Player[A].YoshiWingsFrame = 1;
-                        else if(Player[A].YoshiWingsFrameCount >= 24)
-                            Player[A].YoshiWingsFrameCount = 0;
-
-                        XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
-                    }
-                }
-            }
-            else if(Player[A].Character == 4)
-            {
-                if(Player[A].Mount == 0 || Player[A].Mount == 3)
-                {
-                    XRender::renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                          124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] + Player[A].MountOffsetY,
-                                          100, 100,
-                                          GFXToadBMP[Player[A].State],
-                                          pfrX(Player[A].Frame * Player[A].Direction),
-                                          pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
-                }
-                else if(Player[A].Mount == 1)
-                {
-                    if(Player[A].State == 1)
-                    {
-                        XRender::renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                              6 + 124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                              100,
-                                              Player[A].Location.Height - 24,
-                                              GFXToadBMP[Player[A].State],
-                                              pfrX(Player[A].Frame * Player[A].Direction),
-                                              pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
-                    }
-                    else
-                    {
-                        int height;
-                        if(Player[A].State == 1)
-                            height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)];
-                        else
-                            height = Player[A].Location.Height - ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)] - 26;
-                        XRender::renderTexture(32 + (48 * A) + ToadFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                              124 - Player[A].Location.Height + ToadFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                              100,
-                                              height,
-                                              GFXToadBMP[Player[A].State],
-                                              pfrX(Player[A].Frame * Player[A].Direction),
-                                              pfrY(Player[A].Frame * Player[A].Direction), c, c, c);
-                    }
-                    XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16, 124 - 30, 32, 32, GFX.Boot[Player[A].MountType], 0, 32 * Player[A].MountFrame, c, c, c);
-
-                    if(Player[A].MountType == 3)
-                    {
-                        Player[A].YoshiWingsFrameCount += 1;
-                        Player[A].YoshiWingsFrame = 0;
-                        if(Player[A].YoshiWingsFrameCount <= 12)
-                            Player[A].YoshiWingsFrame = 1;
-                        else if(Player[A].YoshiWingsFrameCount >= 24)
-                            Player[A].YoshiWingsFrameCount = 0;
-                        XRender::renderTexture(32 + (48 * A) + Player[A].Location.Width / 2.0 - 16 + 20, 124 - 30 - 10, 32, 32, GFX.YoshiWings, 0, 0 + 32 * Player[A].YoshiWingsFrame, c, c, c);
-                    }
-                }
-            }
-            else if(Player[A].Character == 5)
-            {
-                XRender::renderTexture(32 + (48 * A) + LinkFrameX[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                      124 - Player[A].Location.Height + LinkFrameY[(Player[A].State * 100) + (Player[A].Frame * Player[A].Direction)],
-                                      100, 100,
-                                      GFXLinkBMP[Player[A].State],
-                                      pfrX(Player[A].Frame * Player[A].Direction),
-                                      pfrY(Player[A].Frame * Player[A].Direction),
-                                      c, c, c);
-            }
+            DrawPlayer(p, 1);
         }
+
         A = numPlayers + 1;
 
         // Print lives on the screen

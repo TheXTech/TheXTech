@@ -7,8 +7,10 @@ add_library(PGE_SDLMixerX_static INTERFACE)
 set(SDL_BRANCH "release-2.0.12")
 set(SDL_GIT_BRANCH "origin/release-2.0.12")
 
-if(EMSCRIPTEN OR APPLE OR ANDROID OR VITA OR NINTENDO_SWITCH)
+if(APPLE)
     set(PGE_SHARED_SDLMIXER_DEFAULT OFF)
+elseif(EMSCRIPTEN OR ANDROID OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_3DS)
+    set(PGE_SHARED_SDLMIXER_FORCE_OFF ON)
 else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
 endif()
@@ -19,9 +21,13 @@ else()
     set(PGE_SYSTEM_ZLIB_DEFAULT OFF)
 endif()
 
-option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
+if(NOT PGE_SHARED_SDLMIXER_FORCE_OFF)
+    option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
+else()
+    set(PGE_SHARED_SDLMIXER OFF)
+endif()
 
-if(NOT VITA AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGER)
+if(NOT VITA AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGER)
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
 else()
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." OFF)
@@ -31,6 +37,16 @@ option(USE_SYSTEM_ZLIB "Use zlib library from the system" ${PGE_SYSTEM_ZLIB_DEFA
 
 if(USE_SYSTEM_ZLIB)
     find_package(ZLIB REQUIRED)
+endif()
+
+set(MIXER_USE_OGG_VORBIS_FILE OFF)
+set(MIXER_USE_OGG_VORBIS_STB ON)
+set(MIXER_USE_OGG_VORBIS_TREMOR OFF)
+
+if(NINTENDO_3DS AND THEXTECH_CUSTOM_AUDIO_LIBRARY)
+    set(MIXER_USE_OGG_VORBIS_FILE OFF)
+    set(MIXER_USE_OGG_VORBIS_STB OFF)
+    set(MIXER_USE_OGG_VORBIS_TREMOR ON)
 endif()
 
 #if(WIN32)
@@ -97,6 +113,22 @@ endif()
 if(NINTENDO_SWITCH)
     list(APPEND MixerX_SysLibs
         EGL glapi drm_nouveau nx pthread
+    )
+endif()
+
+if(NINTENDO_WII)
+    set(CMAKE_STANDARD_LIBRARIES "")
+    set(CMAKE_C_STANDARD_LIBRARIES "")
+    set(CMAKE_CXX_STANDARD_LIBRARIES "")
+    list(APPEND MixerX_SysLibs
+        db wiiuse fat bte asnd ogc m
+        # vorbisidec ogg
+    )
+endif()
+
+if(NINTENDO_3DS)
+    list(APPEND MixerX_SysLibs
+        citro2d citro3d ctru #vorbisidec ogg
     )
 endif()
 
@@ -175,10 +207,12 @@ endif()
 set_static_lib(AC_FLAC         "${CODECS_LIBRARIES_DIR}" FLAC)
 set_static_lib(AC_FLUIDLITE    "${CODECS_LIBRARIES_DIR}" fluidlite)
 set_static_lib(AC_VORBISFILE   "${CODECS_LIBRARIES_DIR}" vorbisfile)
+set_static_lib(AC_VORBISIDEC   "${CODECS_LIBRARIES_DIR}" vorbisidec)
 set_static_lib(AC_VORBIS       "${CODECS_LIBRARIES_DIR}" vorbis)
 set_static_lib(AC_OPUSFILE     "${CODECS_LIBRARIES_DIR}" opusfile)
 set_static_lib(AC_OPUS         "${CODECS_LIBRARIES_DIR}" opus)
 set_static_lib(AC_OGG          "${CODECS_LIBRARIES_DIR}" ogg)
+set_static_lib(AC_WAVPACK      "${CODECS_LIBRARIES_DIR}" wavpack)
 set_static_lib(AC_ADLMIDI      "${CODECS_LIBRARIES_DIR}" ADLMIDI)
 set_static_lib(AC_OPNMIDI      "${CODECS_LIBRARIES_DIR}" OPNMIDI)
 set_static_lib(AC_EDMIDI       "${CODECS_LIBRARIES_DIR}" EDMIDI)
@@ -195,11 +229,22 @@ set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)
 set(MixerX_CodecLibs
 #    "${AC_FLAC}"
     "${AC_FLUIDLITE}"
-#    "${AC_VORBISFILE}"
-#    "${AC_VORBIS}"
+)
+
+if(MIXER_USE_OGG_VORBIS_FILE)
+    list(APPEND MixerX_CodecLibs ${AC_VORBISFILE})
+    list(APPEND MixerX_CodecLibs ${AC_VORBIS})
+endif()
+
+if(MIXER_USE_OGG_VORBIS_TREMOR)
+    list(APPEND MixerX_CodecLibs ${AC_VORBISIDEC})
+endif()
+
+list(APPEND MixerX_CodecLibs
     "${AC_OPUSFILE}"
     "${AC_OPUS}"
     "${AC_OGG}"
+#    "${AC_WAVPACK}"
     "${AC_ADLMIDI}"
     "${AC_OPNMIDI}"
     "${AC_EDMIDI}"
@@ -217,10 +262,10 @@ endif()
 
 if(VITA)
     set(VITA_AUDIOCODECS_CMAKE_FLAGS
-        -DBUILD_OGG_VORBIS=OFF
-        -DBUILD_FLAC=OFF
-        -DBUILD_OPUS=ON
-        -DBUILD_MPG123=OFF)
+        "-DBUILD_OGG_VORBIS=OFF"
+        "-DBUILD_FLAC=OFF"
+        "-DBUILD_OPUS=ON"
+    )
 
     set(VITA_MIXERX_CMAKE_FLAGS
         "-DUSE_OGG_VORBIS_TREMOR=OFF"
@@ -239,6 +284,7 @@ if(VITA)
 
     set(MixerX_CodecLibs # Minimal list of libraries to link
         "${AC_FLUIDLITE}"
+#        "${AC_WAVPACK}"
         "${AC_ADLMIDI}"
         "${AC_OPNMIDI}"
         "${AC_EDMIDI}"
@@ -252,6 +298,59 @@ endif()
 
 set(MixerX_Deps)
 set(AudioCodecs_Deps)
+set(AUDIO_CODECS_BUILD_ARGS)
+
+if(THEXTECH_NO_MIXER_X)
+    # Disable everything except of SDL2
+    list(APPEND AUDIO_CODECS_BUILD_ARGS
+        "-DBUILD_FLAC=OFF"
+        "-DBUILD_MPG123=OFF"
+        "-DBUILD_MODPLUG=OFF"
+        "-DBUILD_LIBXMP=OFF"
+        "-DBUILD_OPUS=OFF"
+        "-DBUILD_WAVPACK=OFF"
+        "-DBUILD_FLUIDLITE=OFF"
+        "-DBUILD_ADLMIDI=OFF"
+        "-DBUILD_OPNMIDI=OFF"
+        "-DBUILD_EDMIDI=OFF"
+    )
+
+    if(NOT NINTENDO_3DS)
+        list(APPEND AUDIO_CODECS_BUILD_ARGS
+            "-DBUILD_GME=OFF"
+            "-DBUILD_OGG_VORBIS=OFF"
+        )
+    endif()
+else()
+    list(APPEND AUDIO_CODECS_BUILD_ARGS
+        "-DBUILD_OGG_VORBIS=${MIXER_USE_OGG_VORBIS_TREMOR}"
+        "-DBUILD_FLAC=OFF"
+        "-DBUILD_MPG123=OFF"
+        "-DBUILD_GME_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
+        "-DBUILD_WAVPACK=OFF"
+    )
+endif()
+
+set(AUDIO_CODECS_BUILD_ARGS
+    "-DUSE_LOCAL_SDL2=${USE_LOCAL_SDL2}"
+    "-DBUILD_SDL2_SHARED=${PGE_SHARED_SDLMIXER}"
+    "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
+    ${AUDIO_CODECS_BUILD_ARGS}
+    ${ANDROID_CMAKE_FLAGS}
+    ${VITA_CMAKE_FLAGS}
+    ${VITA_AUDIOCODECS_CMAKE_FLAGS}
+)
+
+if(USE_SYSTEM_SDL2)
+    # Ensure the SAME SDL2 directory will be used
+    list(APPEND AUDIO_CODECS_BUILD_ARGS
+        "-DSDL2_DIR=${SDL2_DIR}"
+    )
+endif()
+
+list(REMOVE_DUPLICATES AUDIO_CODECS_BUILD_ARGS)
+
+#message("DEBUG: Audio Codecs CMake: arguments: ${AUDIO_CODECS_BUILD_ARGS}")
 
 ExternalProject_Add(
     AudioCodecs_Local
@@ -265,16 +364,7 @@ ExternalProject_Add(
         "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
         "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-        "-DUSE_LOCAL_SDL2=${USE_LOCAL_SDL2}"
-        "-DBUILD_SDL2_SHARED=${PGE_SHARED_SDLMIXER}"
-        "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
-        "-DBUILD_OGG_VORBIS=OFF"
-        "-DBUILD_FLAC=OFF"
-        "-DBUILD_MPG123=OFF"
-        "-DBUILD_GME_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
-        ${ANDROID_CMAKE_FLAGS}
-        ${VITA_CMAKE_FLAGS}
-        ${VITA_AUDIOCODECS_CMAKE_FLAGS}
+        ${AUDIO_CODECS_BUILD_ARGS}
         $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
         $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
         $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
@@ -289,48 +379,62 @@ ExternalProject_Add(
 
 list(APPEND MixerX_Deps AudioCodecs_Local)
 
-# SDL Mixer X - an audio library, fork of SDL Mixer
-ExternalProject_Add(
-    SDLMixerX_Local
-    PREFIX ${CMAKE_BINARY_DIR}/external/SDLMixerX
-#    GIT_REPOSITORY https://github.com/WohlSoft/SDL-Mixer-X.git
-#    UPDATE_COMMAND ""
-    DOWNLOAD_COMMAND ""
-    SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/SDL-Mixer-X
-    CMAKE_ARGS
-        "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
-        "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
-        "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-        "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
-        "-DAUDIO_CODECS_REPO_PATH=${CMAKE_BINARY_DIR}/external/AudioCodecs"
-        "-DAUDIO_CODECS_INSTALL_PATH=${DEPENDENCIES_INSTALL_DIR}"
-        "-DUSE_SYSTEM_SDL2=${USE_SYSTEM_SDL2}"
-        "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
-        "-DSDL_MIXER_X_SHARED=${PGE_SHARED_SDLMIXER}"
-        "-DAUDIO_CODECS_SDL2_HG_BRANCH=${SDL_BRANCH}"
-        "-DAUDIO_CODECS_SDL2_GIT_BRANCH=${SDL_GIT_BRANCH}"
-        "-DMIXERX_ENABLE_GPL=ON"
-        "-DWITH_SDL2_WASAPI=ON"
-        "-DUSE_MIDI_FLUIDLITE_OGG_STB=ON"
-        "-DUSE_DRFLAC=ON"
-        "-DUSE_FLAC=OFF"
-        "-DUSE_OGG_VORBIS_STB=ON"
-        "-DUSE_MP3_DRMP3=ON"
-        "-DUSE_MP3_MPG123=OFF"
-        "-DUSE_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
-        ${ANDROID_CMAKE_FLAGS}
-        ${VITA_CMAKE_FLAGS}
-        ${VITA_MIXERX_CMAKE_FLAGS}
-        $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
-        $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
-        $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
-    DEPENDS ${MixerX_Deps}
-    BUILD_BYPRODUCTS
-        "${SDL_MixerX_SO_Lib}"
-        "${SDL_MixerX_A_Lib}"
-)
+if(NOT THEXTECH_NO_MIXER_X)
+    set(MIXERX_CMAKE_FLAGS)
+    if(USE_SYSTEM_SDL2)
+        # Ensure the SAME SDL2 directory will be used
+        list(APPEND MIXERX_CMAKE_FLAGS
+            "-DSDL2_DIR=${SDL2_DIR}"
+        )
+    endif()
 
-target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL_MixerX_SO_Lib}")
+    # SDL Mixer X - an audio library, fork of SDL Mixer
+    ExternalProject_Add(
+        SDLMixerX_Local
+        PREFIX ${CMAKE_BINARY_DIR}/external/SDLMixerX
+    #    GIT_REPOSITORY https://github.com/WohlSoft/SDL-Mixer-X.git
+    #    UPDATE_COMMAND ""
+        DOWNLOAD_COMMAND ""
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdparty/SDL-Mixer-X
+        CMAKE_ARGS
+            "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}"
+            "-DCMAKE_INSTALL_PREFIX=${DEPENDENCIES_INSTALL_DIR}"
+            "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+            "-DCMAKE_MAKE_PROGRAM=${CMAKE_MAKE_PROGRAM}"
+            "-DAUDIO_CODECS_REPO_PATH=${CMAKE_BINARY_DIR}/external/AudioCodecs"
+            "-DAUDIO_CODECS_INSTALL_PATH=${DEPENDENCIES_INSTALL_DIR}"
+            "-DUSE_SYSTEM_SDL2=${USE_SYSTEM_SDL2}"
+            "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
+            "-DSDL_MIXER_X_SHARED=${PGE_SHARED_SDLMIXER}"
+            "-DAUDIO_CODECS_SDL2_HG_BRANCH=${SDL_BRANCH}"
+            "-DAUDIO_CODECS_SDL2_GIT_BRANCH=${SDL_GIT_BRANCH}"
+            "-DMIXERX_ENABLE_GPL=ON"
+            "-DWITH_SDL2_WASAPI=ON"
+            "-DUSE_MIDI_FLUIDLITE_OGG_STB=ON"
+            "-DUSE_DRFLAC=ON"
+            "-DUSE_FLAC=OFF"
+            "-DUSE_WAVPACK=OFF"
+            "-DUSE_OGG_VORBIS_STB=${MIXER_USE_OGG_VORBIS_STB}"
+            "-DUSE_OGG_VORBIS_TREMOR=${MIXER_USE_OGG_VORBIS_TREMOR}"
+            "-DUSE_MP3_DRMP3=ON"
+            "-DUSE_MP3_MPG123=OFF"
+            "-DUSE_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
+            ${MIXERX_CMAKE_FLAGS}
+            ${ANDROID_CMAKE_FLAGS}
+            ${VITA_CMAKE_FLAGS}
+            ${VITA_MIXERX_CMAKE_FLAGS}
+            $<$<BOOL:APPLE>:-DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET}>
+            $<$<BOOL:APPLE>:-DCMAKE_OSX_ARCHITECTURES=${CMAKE_OSX_ARCHITECTURES}>
+            $<$<BOOL:WIN32>:-DCMAKE_SHARED_LIBRARY_PREFIX="">
+        DEPENDS ${MixerX_Deps}
+        BUILD_BYPRODUCTS
+            "${SDL_MixerX_SO_Lib}"
+            "${SDL_MixerX_A_Lib}"
+    )
+
+    target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL_MixerX_SO_Lib}")
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL_MixerX_A_Lib}")
+endif()
 
 if(USE_SYSTEM_SDL2)
     target_link_libraries(PGE_SDLMixerX INTERFACE ${SDL2_LIBRARIES})
@@ -338,26 +442,27 @@ elseif(WIN32 AND MINGW)
     target_link_libraries(PGE_SDLMixerX INTERFACE mingw32 "${SDL2_main_A_Lib}" "${SDL2_SO_Lib}" )
 elseif(WIN32 AND MSVC)
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_main_A_Lib}" "${SDL2_SO_Lib}")
-elseif(ANDROID)
-    target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}") #  "${SDLHIDAPI_SO_Lib}" (No longer required since SDL 2.0.18)
 else()
     target_link_libraries(PGE_SDLMixerX INTERFACE "${SDL2_SO_Lib}")
 endif()
 
-message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
 
-target_link_libraries(PGE_SDLMixerX_static INTERFACE
-    "${SDL_MixerX_A_Lib}"
-    ${MixerX_CodecLibs}
-)
+message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
+if(NOT THEXTECH_CLI_BUILD)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_CodecLibs})
+endif()
 
 if(USE_SYSTEM_SDL2)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE ${SDL2_LIBRARIES})
+elseif(WIN32 AND MINGW)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE mingw32 "${SDL2_main_A_Lib}" "${SDL2_A_Lib}" )
+elseif((WIN32 AND MSVC) OR NINTENDO_3DS)
+    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_main_A_Lib}" "${SDL2_A_Lib}")
 else()
     target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDL2_A_Lib}")
 endif()
 
-target_link_libraries(PGE_SDLMixerX_static INTERFACE "${MixerX_SysLibs}")
+target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_SysLibs})
 
 #if(ANDROID) # No longer required since SDL 2.0.18
 #    target_link_libraries(PGE_SDLMixerX_static INTERFACE "${SDLHIDAPI_SO_Lib}")

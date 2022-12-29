@@ -109,3 +109,10 @@ To build it, you need to have the following things:
 
 ## Localization
 Some parts of TheXTech (such as Android launcher) can be localized into many languages, you may help to translate them using WebLate platform: https://hosted.weblate.org/projects/thextech/
+
+
+## Used software
+* GCC, MinGW и Clang - main compilers used during the development of the game. The MSVC is used sometimes which is used for Windows builds for ARM64 processors.
+* [Qt Creator](https://www.qt.io/product/development-tools) - IDE from the Qt toolkit, mainly used during the development.
+* [JetBrans CLion](https://www.jetbrains.com/ru-ru/clion/) - Intelliji Idea based C/C++ IDE, free for the [Open Source development](https://www.jetbrains.com/ru-ru/community/opensource/).
+* [PVS-Studio](https://pvs-studio.com/ru/pvs-studio/?utm_source=github&utm_medium=organic&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code. Is used for periodical checking of the code for possible bugs. It's free for the [Open Source development](https://pvs-studio.com/en/order/open-source-license/).

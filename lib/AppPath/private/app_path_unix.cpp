@@ -21,8 +21,8 @@
 #include <sys/types.h>
 #include <pwd.h>
 
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_filesystem.h>
+#include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_filesystem.h"
 
 #include "app_path_private.h"
 

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "sdl_proxy/sdl_stdinc.h"
 #include "../globals.h"
 #include "../graphics.h"
 #include "../config.h"
@@ -49,6 +50,42 @@ static void s_textEntry_callDialog()
 }
 
 #endif // #ifdef __ANDROID__
+
+#ifdef __3DS__
+
+#include <3ds.h>
+
+#include "sound.h"
+
+namespace XRender
+{
+    extern bool g_in_frame;
+};
+
+static const std::string s_GetTextInput(const std::string& prompt, const std::string& init = "")
+{
+    static SwkbdState keystate;
+    static char input_buffer[240];
+
+    if(XRender::g_in_frame)
+        C3D_FrameEnd(0);
+    SoundPauseAll();
+
+    swkbdInit(&keystate, SWKBD_TYPE_QWERTY, 1, 120);
+    swkbdSetHintText(&keystate, prompt.c_str());
+    swkbdSetInitialText(&keystate, init.c_str());
+    swkbdSetFeatures(&keystate, SWKBD_DARKEN_TOP_SCREEN);
+
+    swkbdInputText(&keystate, input_buffer, sizeof(input_buffer));
+
+    if(XRender::g_in_frame)
+        C3D_FrameBegin(0);
+    SoundResumeAll();
+
+    return std::string(input_buffer);
+}
+
+#endif // #ifdef __3DS__
 
 namespace TextEntryScreen
 {
@@ -500,6 +537,15 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
         return Text;
     }
 #endif
+
+#ifdef __3DS__
+    if(g_config.use_native_osk)
+    {
+        Text = s_GetTextInput(Prompt, Value);
+        return Text;
+    }
+#endif
+
     s_Prompt = Prompt;
     Text = Value;
     s_cursor = Text.size();

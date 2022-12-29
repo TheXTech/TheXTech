@@ -20,16 +20,16 @@
 
 #include <vector>
 
-#include <SDL2/SDL_stdinc.h>
 #ifdef ENABLE_ANTICHEAT_TRAP
 #include "core/msgbox.h"
 #include "core/render.h"
 #include "core/events.h"
 #endif
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include <Logger/logger.h>
 #ifdef ENABLE_ANTICHEAT_TRAP
-#include <SDL2/SDL_timer.h>
 #include <pge_delay.h>
 #endif
 
@@ -82,7 +82,7 @@ static void dieCheater()
     }
     else
     {
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                               "Die, cheater!",
                               "       Die, cheater!       \n"
                               "Now play the game all over \n"

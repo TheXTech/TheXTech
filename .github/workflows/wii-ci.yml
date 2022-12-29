@@ -1,0 +1,139 @@
+name: Wii CI
+
+on:
+  push:
+    branches:
+      - main
+      - wip-ports
+  pull_request:
+    branches:
+      - main
+      - wip-ports
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
+    runs-on: ubuntu-latest
+    container: devkitpro/devkitppc
+    env:
+        DEVKITPRO: /opt/devkitpro
+        DEVKITPPC: /opt/devkitpro/devkitPPC
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - {
+            name: "Wii build",
+
+            extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
+            -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake \
+            -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local \
+            -DCMAKE_INSTALL_PREFIX=$DEVKITPRO/portlibs/wii",
+
+            deps_cmdline: "sudo apt-get update -qq \
+            && sudo apt-get install -qq cmake ninja-build make lftp git-core python zip \
+            && git config --global --add safe.directory '*'",
+
+            generator: "Ninja",
+            build_type: "MinSizeRel",
+            executable_name: "thextech",
+            assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+            subdir_name: "thextech-wii",
+            upload_directory: "www/wii/"
+          }
+
+    steps:
+    - uses: styfle/cancel-workflow-action@0.11.0
+      with:
+        workflow_id: wii-ci.yml
+        all_but_latest: true
+        access_token: ${{ github.token }}
+
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.deps_cmdline }}" ]]; then
+          eval ${{ matrix.config.deps_cmdline }}
+        fi
+        cmake --version
+
+    - uses: actions/checkout@v3
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+    - name: Pull submodules
+      shell: bash
+      run: |
+        git submodule init
+        git submodule update
+
+    - name: Install modified SDL2
+      run: |
+        cd ..
+        git clone https://github.com/Wohlstand/SDL.git -b wii-support --depth 1 SDL2
+        cd SDL2
+        mkdir build
+        cd build
+        cmake -G Ninja -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local ..
+        cmake --build . --target all -j4
+        sudo cmake --build . --target install
+
+    - name: Configure
+      shell: bash
+      run: |
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+
+    - name: Build
+      shell: bash
+      run: |
+        cmake --build build --target all -j4
+
+    - name: Create Package
+      if: success()
+      shell: bash
+      run: |
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+            BRANCH_NAME_RES="pull-request"
+            echo "-- Pull-request detected!"
+        else
+            BRANCH_NAME_RES=${BRANCH_NAME}
+        fi
+
+        cd build
+        mkdir package
+        mkdir "package/${{ matrix.config.subdir_name }}"
+        cp ../changelog.txt "package/${{ matrix.config.subdir_name }}/"
+        cp ../LICENSE "package/${{ matrix.config.subdir_name }}/License.TheXTech.txt"
+        cp thextech.dol "package/${{ matrix.config.subdir_name }}/"
+        cd package
+        zip -9 -r "thextech-wii-${BRANCH_NAME_RES}.zip" "${{ matrix.config.subdir_name }}"
+        rm -Rf "${{ matrix.config.subdir_name }}"
+        cd ../..
+
+    - name: Upload artifact
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        path: build/package/*.zip
+        name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
+
+    - name: Deploy to builds.wohlsoft.ru
+      if: success() && github.event_name != 'pull_request'
+      shell: bash
+      run: |
+        if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then
+          export PATH=${{ matrix.config.extra_path }}:${PATH}
+        fi
+        UPLOAD_LIST="set ssl:verify-certificate no;"
+        for q in ./build/package/*.zip; do
+            UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.config.upload_directory }} $q;"
+        done
+        lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
+
+    - name: List Build Directory
+      if: always()
+      shell: bash
+      run: |
+        git status
+        ls -lR build

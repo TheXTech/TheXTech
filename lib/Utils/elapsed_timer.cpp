@@ -31,6 +31,7 @@ ElapsedTimer::~ElapsedTimer()
 
 ElapsedTimer & ElapsedTimer::operator=(const ElapsedTimer &et)
 {
+    assert(this != &et);
     p = new ElapsedTimer_p;
     assert(p);
     p->recent = et.p->recent;
