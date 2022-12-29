@@ -230,7 +230,6 @@ endif()
 
 if(THEXTECH_CLI_BUILD OR PGE_MIN_PORT)
     set(RANGE_ARR_UNSAFE_MODE ON)
-    set(THEXTECH_NO_SDL_BUILD ON)
 endif()
 
 # ============ Customization ==end=========
@@ -330,10 +329,9 @@ if(USE_SYSTEM_LIBS)
 elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_FreeImage.cmake)
     list(APPEND A2XT_DEPS FreeImage_Local)
-
     list(APPEND A2XT_LIBS PGE_FreeImage)
-    include(cmake/library_SDLMixerX.cmake)
 
+    include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
 
     if(NOT THEXTECH_NO_MIXER_X)
