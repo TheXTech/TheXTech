@@ -19,9 +19,10 @@
  */
 
 
-#include <SDL2/SDL_stdinc.h>
 #include <fmt_format_ne.h>
 #include <IniProcessor/ini_processing.h>
+
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "gameplay_timer.h"
 #include "graphics.h"

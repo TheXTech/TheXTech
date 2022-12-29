@@ -27,18 +27,39 @@
 
 #include "cmd_line_setup.h"
 
+#ifndef RENDER_CUSTOM
 #include "core/base/render_base.h"
-#include "core/base/window_base.h"
-#include "core/base/msgbox_base.h"
-#include "core/base/events_base.h"
+#endif
 
+#ifndef RENDER_CUSTOM
+#include "core/base/window_base.h"
+#endif
+
+#ifndef MSGBOX_CUSTOM
+#include "core/base/msgbox_base.h"
+#endif
+
+#ifndef EVENTS_CUSTOM
+#include "core/base/events_base.h"
+#endif
 
 class FrmMain
 {
+#ifndef WINDOW_CUSTOM
     std::unique_ptr<AbstractWindow_t> m_window;
+#endif
+
+#ifndef RENDER_CUSTOM
     std::unique_ptr<AbstractRender_t> m_render;
+#endif
+
+#ifndef MSGBOX_CUSTOM
     std::unique_ptr<AbstractMsgBox_t> m_msgbox;
+#endif
+
+#ifndef EVENTS_CUSTOM
     std::unique_ptr<AbstractEvents_t> m_events;
+#endif
 
 public:
     FrmMain() noexcept = default;

@@ -19,10 +19,6 @@
  */
 
 
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_rwops.h>
-#include <SDL2/SDL_filesystem.h>
-
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
 #include <IniProcessor/ini_processing.h>
@@ -52,6 +48,10 @@ bool AppPathManager::m_isPortable = false;
 #   define UserDirName "/" USER_DIR_NAME
 #elif defined(__ANDROID__) || defined(__APPLE__) || defined(__HAIKU__)
 #   define UserDirName "/PGE Project/thextech/"
+#elif defined(__3DS__)
+#   define UserDirName "/3ds/thextech/"
+#elif defined(__WII__)
+#   define UserDirName "/thextech/"
 #else
 #   define UserDirName "/.PGE_Project/thextech/"
 #endif

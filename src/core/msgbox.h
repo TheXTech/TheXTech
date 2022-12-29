@@ -22,8 +22,10 @@
 #ifndef MSGBOX_HHHHH
 #define MSGBOX_HHHHH
 
+#include <string>
+
 #ifndef MSGBOX_CUSTOM
-#   include <SDL2/SDL_stdinc.h>
+#   include "sdl_proxy/sdl_stdinc.h"
 #   include "base/msgbox_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
@@ -38,6 +40,25 @@
  */
 namespace XMsgBox
 {
+
+
+enum MessageBoxFlags
+{
+    MESSAGEBOX_ERROR                 = 0x00000010,   /**< error dialog */
+    MESSAGEBOX_WARNING               = 0x00000020,   /**< warning dialog */
+    MESSAGEBOX_INFORMATION           = 0x00000040,   /**< informational dialog */
+    MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT = 0x00000080,   /**< buttons placed left to right */
+    MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT = 0x00000100    /**< buttons placed right to left */
+};
+
+
+#ifdef MSGBOX_CUSTOM
+
+extern bool init();
+extern void quit();
+
+#endif
+
 /*!
  * \brief Show the simple message box
  * \param flags Message box flags

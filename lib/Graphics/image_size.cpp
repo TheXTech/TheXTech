@@ -18,7 +18,11 @@
  */
 
 #include "image_size.h"
-#include <SDL2/SDL_rwops.h>
+
+#include "sdl_proxy/sdl_rwops.h"
+#include "sdl_proxy/sdl_stdinc.h"
+
+
 #include <Utils/files.h>
 
 static bool tryGIF(SDL_RWops* file, uint32_t *w, uint32_t *h)

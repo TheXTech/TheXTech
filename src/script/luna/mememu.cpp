@@ -20,6 +20,9 @@
 
 #include <Logger/logger.h>
 
+#include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_assert.h"
+
 #include "mememu.h"
 #include "globals.h"
 #include "global_constants.h"

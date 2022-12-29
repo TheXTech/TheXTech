@@ -18,13 +18,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
-
 #include <cmath>
 #include <ctime>
 #include <Utils/maths.h>
 #include <fmt_format_ne.h>
 #include <pge_delay.h>
+
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "globals.h"
 #include "player.h"
@@ -4410,7 +4410,7 @@ void PowerUps(const int A)
 }
 
 
-static SDL_INLINE bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
+static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool backward)
 {
     bool canWarp = false;
 

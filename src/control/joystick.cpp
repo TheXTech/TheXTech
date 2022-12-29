@@ -896,7 +896,7 @@ bool InputMethodProfile_Joystick::PollPrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Joystick primary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -991,7 +991,7 @@ bool InputMethodProfile_Joystick::PollSecondaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Polling Joystick secondary button with disallowed controls class %d\n", (int)c);
         return true;
     }
 
@@ -1076,7 +1076,7 @@ bool InputMethodProfile_Joystick::DeletePrimaryButton(ControlsClass c, size_t i)
     }
     else
     {
-        // BAD!
+        D_pLogWarning("Attempted to delete Joystick primary button with disallowed controls class %d\n", (int)c);
         return false;
     }
 
@@ -1679,7 +1679,7 @@ bool InputMethodType_Joystick::OpenJoystick(int joystick_index)
     if(!devices)
     {
         SDL_JoystickClose(joy);
-        pLogDebug("  could not allocate devices struct (OOM).");
+        pLogDebug("  could not allocate devices struct (out of memory).");
         return false;
     }
 
@@ -1983,7 +1983,7 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
             }
             else
             {
-                pLogWarning("Could not allocate legacy profile (OOM).");
+                pLogWarning("Could not allocate legacy profile (out of memory).");
             }
 
             ctl->endGroup();

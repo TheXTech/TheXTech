@@ -22,13 +22,14 @@
 #ifndef WINDOW_HHHH
 #define WINDOW_HHHH
 
+#include "base/window_types.h"
+
 #ifndef WINDOW_CUSTOM
-#   include <SDL2/SDL_stdinc.h>
+#   include "sdl_proxy/sdl_stdinc.h"
 #   include "base/window_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
 #else
-#   include "base/window_types.h"
 #   define E_INLINE    extern
 #   define TAIL ;
 #endif
@@ -39,6 +40,13 @@
  */
 namespace XWindow
 {
+
+#ifdef WINDOW_CUSTOM
+
+extern bool init();
+extern void quit();
+
+#endif
 
 /*!
  * \brief Show the window

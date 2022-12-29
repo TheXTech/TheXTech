@@ -31,6 +31,8 @@
 #include "globals.h"
 #include "layers.h"
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 enum ContinuedRect
 {
     CONT_NONE = 0,

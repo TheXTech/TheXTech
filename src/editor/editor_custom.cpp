@@ -23,6 +23,8 @@
 
 #include <fmt_format_ne.h>
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "editor/editor_custom.h"
 
 #include "sound.h"

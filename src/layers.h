@@ -142,12 +142,22 @@ struct Events_t
 };
 
 //Public Layer(0 To 100) As Layer
+#ifdef LOW_MEM
+const int maxLayers = 100; // 100
+#else
 const int maxLayers = 254; // 100
+#endif
+
 extern int numLayers;
 extern RangeArr<Layer_t, 0, maxLayers> Layer;
 
 //Public Events(0 To 100) As Events
+#ifdef LOW_MEM
+const int maxEvents = 100; // 100
+#else
 const int maxEvents = 254; // 100
+#endif
+
 extern int numEvents;
 extern RangeArr<Events_t, 0, maxEvents> Events;
 

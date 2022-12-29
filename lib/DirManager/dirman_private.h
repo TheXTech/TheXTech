@@ -38,6 +38,48 @@ typedef std::wstring    PathString;
 typedef std::string     PathString;
 #endif
 
+#ifndef PGE_NO_THREADING
+#   ifdef PGE_SDL_MUTEX
+#   include <SDL2/SDL_mutex.h>
+#   include <SDL2/SDL_atomic.h>
+static SDL_mutex *g_dirManMutex = nullptr;
+static SDL_atomic_t g_dirManCounter = {0};
+
+class MutexLocker
+{
+    SDL_mutex *m_mutex;
+
+public:
+    MutexLocker(SDL_mutex *mutex)
+    {
+        m_mutex = mutex;
+        SDL_LockMutex(m_mutex);
+    }
+
+    ~MutexLocker()
+    {
+        SDL_UnlockMutex(m_mutex);
+    }
+};
+
+#define PUT_THREAD_GUARD() \
+    MutexLocker guard(g_dirManMutex); \
+    (void)guard
+
+#   else /*PGE_SDL_MUTEX*/
+#   include <mutex>
+static std::mutex g_dirManMutex;
+
+#define PUT_THREAD_GUARD() \
+    std::lock_guard<std::mutex> guard(g_dirManMutex);\
+    (void)guard
+
+#   endif /*PGE_SDL_MUTEX*/
+#else /*PGE_NO_THREADING*/
+#   define PUT_THREAD_GUARD() (void)0
+#endif /*PGE_NO_THREADING*/
+
+
 template<class CHAR>
 static inline void delEnd(std::basic_string<CHAR> &dirPath, CHAR ch)
 {
@@ -72,8 +114,38 @@ class DirMan::DirMan_private
     bool fetchListFromWalker(std::string &curPath, std::vector<std::string> &list);
 
 public:
+#if !defined(PGE_NO_THREADING) && defined(PGE_SDL_MUTEX)
+    DirMan_private()
+    {
+        if(SDL_AtomicGet(&g_dirManCounter) == 0 && g_dirManMutex == nullptr)
+            g_dirManMutex = SDL_CreateMutex();
+        SDL_AtomicAdd(&g_dirManCounter, 1);
+    }
+
+    DirMan_private(const DirMan_private &o)
+    {
+        m_dirPath = o.m_dirPath;
+#ifdef _WIN32
+        m_dirPathW = o.m_dirPathW;
+#endif
+        m_walkerState = o.m_walkerState;
+        SDL_AtomicAdd(&g_dirManCounter, 1);
+    }
+
+    ~DirMan_private()
+    {
+        SDL_AtomicAdd(&g_dirManCounter, -1);
+        if(SDL_AtomicGet(&g_dirManCounter) <= 0 && g_dirManMutex != nullptr)
+        {
+            SDL_DestroyMutex(g_dirManMutex);
+            g_dirManMutex = nullptr;
+        }
+    }
+#else
     DirMan_private() = default;
     DirMan_private(const DirMan_private &) = default;
+    ~DirMan_private() = default;
+#endif
 };
 
 #endif // DIRMAN_PRIVATE_H

@@ -22,7 +22,59 @@
 #ifndef FRAME_TIMER_H
 #define FRAME_TIMER_H
 
+#include <cstdint>
 #include <functional>
+
+struct MicroStats
+{
+public:
+    enum Task
+    {
+        Script,
+        Controls,
+        Layers,
+        NPCs,
+        Blocks,
+        Effects,
+        Player,
+        Graphics,
+        Sound,
+        Events,
+        TASK_END
+    };
+
+    const char* const task_names[TASK_END] =
+    {
+        "Sct",
+        "Ctl",
+        "Lay",
+        "NPC",
+        "Blk",
+        "Eff",
+        "Plr",
+        "Gfx",
+        "Snd",
+        "Evt",
+    };
+
+private:
+    uint8_t m_cur_task = TASK_END;
+    uint8_t m_cur_frame = 0;
+    uint64_t m_level_frame = 0;
+    uint64_t m_cur_time = 0;
+    uint64_t m_cur_timer[TASK_END] = {0};
+
+public:
+    uint64_t level_timer[TASK_END] = {0};
+    int view_timer[TASK_END] = {0};
+    int view_total = 0;
+
+    void reset();
+    void start_task(Task task);
+    void start_sleep();
+    void end_frame();
+
+};
 
 struct PerformanceStats_t
 {
@@ -65,6 +117,7 @@ struct PerformanceStats_t
     void print();
 };
 
+extern MicroStats g_microStats;
 extern PerformanceStats_t g_stats;
 
 void resetFrameTimer();

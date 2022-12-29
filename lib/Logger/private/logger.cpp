@@ -20,18 +20,21 @@
 #include <stdarg.h>
 #include "../logger.h"
 #include "logger_sets.h"
+
 #ifndef NO_FILE_LOGGING
-#include <SDL2/SDL_rwops.h>
-#include <chrono>  // chrono::system_clock
-#include <ctime>   // localtime
-#include <DirManager/dirman.h>
-#include <Utils/files.h>
+#   include <chrono>  // chrono::system_clock
+#   include <ctime>   // localtime
+#   include <DirManager/dirman.h>
+#   include <Utils/files.h>
 #endif
+
 #include <IniProcessor/ini_processing.h>
 #include <AppPath/app_path.h>
 
 #include <fmt_format_ne.h>
 #include <fmt/fmt_printf.h>
+
+#include "sdl_proxy/sdl_stdinc.h"
 
 
 std::string     LogWriter::m_logDirPath;
@@ -48,6 +51,12 @@ static std::string return_current_time_and_date()
 {
     auto now = std::chrono::system_clock::now();
     auto in_time_t = std::chrono::system_clock::to_time_t(now);
+
+#ifdef PGE_MIN_PORT
+    // chrono doesn't work reliably here
+    time(&in_time_t);
+#endif
+
     char out[24];
     SDL_memset(out, 0, sizeof(out));
     if(0 < strftime(out, sizeof(out), "%Y_%m_%d_%H_%M_%S", std::localtime(&in_time_t)))

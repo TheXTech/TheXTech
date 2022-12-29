@@ -129,7 +129,7 @@ endif()
 #endif()
 set(USE_SYSTEM_LIBS_DEFAULT OFF)
 
-if(HAIKU OR VITA OR NINTENDO_SWITCH OR XTECH_MACOSX_TIGER)
+if(HAIKU OR VITA OR NINTENDO_SWITCH OR NINTENDO_WII OR XTECH_MACOSX_TIGER)
     set(USE_SYSTEM_SDL2_DEFAULT ON)  # Should be used on Haiku, own SDL2 Haiku build on CMake is broken
 else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
@@ -140,6 +140,14 @@ option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" 
 
 option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
 
+if(NINTENDO_3DS OR NINTENDO_WII)
+    set(USE_STATIC_LIBC ON)
+endif()
+
+if(NINTENDO_3DS)
+    option(THEXTECH_CUSTOM_AUDIO_LIBRARY "Use the custom audio library instead of MixerX" OFF)
+endif()
+
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
 
@@ -149,6 +157,12 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
+
+option(THEXTECH_CLI_BUILD "Minimal CLI build for testing and benchmarking on desktop platforms" OFF)
+option(THEXTECH_NO_SDL_BUILD "Do not use SDL in the CLI build; useful as a starting point for new ports" OFF)
+
+option(THEXTECH_ENABLE_WIP_FEATURES "Enable experimental and incomplete features (disabled by default)" OFF)
+mark_as_advanced(THEXTECH_ENABLE_WIP_FEATURES)
 
 option(THEXTECH_ENABLE_AUDIO_FX "Enable real-time audio effects support" ON)
 
@@ -208,6 +222,16 @@ if(NINTENDO_SWITCH)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -DNINTENDO_SWITCH -D__SWITCH__")
 endif()
 
+if(NINTENDO_WII OR NINTENDO_3DS)
+    set(PGE_MIN_PORT ON)
+    set(THEXTECH_NO_ARGV_HANDLING ON)
+    add_compile_definitions(PGE_MIN_PORT)
+endif()
+
+if(THEXTECH_CLI_BUILD OR PGE_MIN_PORT)
+    set(RANGE_ARR_UNSAFE_MODE ON)
+endif()
+
 # ============ Customization ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
@@ -222,7 +246,7 @@ endif()
 include(lib/Allocator/pool-allocator.cmake)
 include(lib/DirManager/dirman.cmake)
 
-if(NOT VITA AND NOT NINTENDO_SWITCH)
+if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII)
     include(lib/FileMapper/FileMapper.cmake)
 endif()
 
@@ -233,8 +257,14 @@ include(lib/Logger/logger.cmake)
 include(lib/AppPath/app_path.cmake)
 include(lib/tclap/tclap.cmake)
 include(lib/md5/md5.cmake)
+include(lib/sdl_proxy/sdl_proxy.cmake)
 if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
+endif()
+
+if(PGE_MIN_PORT)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
 endif()
 
 if(THEXTECH_ENABLE_LUA)
@@ -296,40 +326,53 @@ if(USE_SYSTEM_LIBS)
 
     list(APPEND A2XT_LIBS ${FREEIMAGELITE_LIB} ${MIXERX_LIB} "${SDL2_LIBRARIES}")
     list(APPEND A2XT_INCS ${SDL2_INCLUDE_DIRS} ${MIXERX_HEAD_DIR} ${FREEIMAGELITE_HEAD_DIR})
-    target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
-else()
+elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_FreeImage.cmake)
-    include(cmake/library_SDLMixerX.cmake)
+    list(APPEND A2XT_DEPS FreeImage_Local)
     list(APPEND A2XT_LIBS PGE_FreeImage)
+
+    include(cmake/library_SDLMixerX.cmake)
+    list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
+
+    if(NOT THEXTECH_NO_MIXER_X)
+        list(APPEND A2XT_DEPS SDLMixerX_Local)
+    else()
+        list(APPEND A2XT_DEPS AudioCodecs_Local)
+    endif()
+
     if(PGE_SHARED_SDLMIXER)
         list(APPEND A2XT_LIBS PGE_SDLMixerX)
     else()
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
-    list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
-    target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
-    list(APPEND A2XT_DEPS FreeImage_Local SDLMixerX_Local)
 endif()
 
+target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
 set(LIB_SRC
     lib/util.cpp
     lib/fader.cpp
+    lib/Graphics/image_size.cpp
     ${APPPATH_SRCS}
     ${DIRMANAGER_SRCS}
     ${FMT_SRCS}
     ${MD5_SRCS}
     ${POOLALLOC_SRCS}
-    lib/Graphics/graphics_funcs.cpp
-    lib/Graphics/image_size.cpp
-    lib/Graphics/size.cpp
-    lib/Graphics/sizef.cpp
     ${INIPROCESSOR_SRCS}
     ${LOGGER_SRCS}
     ${UTILS_SRCS}
     ${LIB_SRC_EXTRA}
+    ${SDLPROXY_SRCS}
 )
+
+if(NOT THEXTECH_NO_SDL_BUILD)
+list(APPEND LIB_SRC
+    lib/Graphics/graphics_funcs.cpp
+    lib/Graphics/size.cpp
+    lib/Graphics/sizef.cpp
+)
+endif()
 
 if(NOT ANDROID
    AND NOT EMSCRIPTEN
@@ -337,7 +380,9 @@ if(NOT ANDROID
    AND NOT NINTENDO_3DS
    AND NOT NINTENDO_WII
    AND NOT NINTENDO_WIIU
-   AND NOT NINTENDO_SWITCH)
+   AND NOT NINTENDO_SWITCH
+   AND NOT THEXTECH_CLI_BUILD
+   AND NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
         lib/InterProcess/editor_pipe.cpp
         lib/InterProcess/intproc.cpp
@@ -346,13 +391,14 @@ if(NOT ANDROID
 endif()
 
 
-if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT VITA)
+if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT VITA AND NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
         ${FILEMAPPER_SRCS}
         ${STACK_WALKER_SRCS}
         lib/CrashHandler/crash_handler.cpp
     )
     add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
+    set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
 endif()
 
 if(APPLE)
@@ -384,10 +430,6 @@ set(THEXTECH_SRC
     src/frame_timer.cpp
     src/global_dirs.cpp
     src/global_strings.cpp
-    src/core/base/render_base.cpp
-    src/core/base/window_base.cpp
-    src/core/base/msgbox_base.cpp
-    src/core/base/events_base.cpp
     src/main/world_loop.cpp
     src/main/world_file.cpp
     src/main/game_info.cpp
@@ -425,9 +467,6 @@ set(THEXTECH_SRC
     src/graphics/gfx_draw_player.cpp
     src/graphics/gfx_special_frames.cpp
     src/graphics/gfx_screen.cpp
-    src/control/joystick.cpp
-    src/control/keyboard.cpp
-    src/control/touchscreen.cpp
     src/control/duplicate.cpp
     src/control/controls.cpp
     src/change_res.cpp
@@ -510,13 +549,59 @@ if(THEXTECH_ENABLE_AUDIO_FX)
     )
 endif()
 
-add_definitions(-DCORE_EVERYTHING_SDL)
-list(APPEND THEXTECH_SRC
-    src/core/sdl/render_sdl.cpp
-    src/core/sdl/window_sdl.cpp
-    src/core/sdl/msgbox_sdl.cpp
-    src/core/sdl/events_sdl.cpp
-)
+if(NINTENDO_3DS)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
+    list(APPEND THEXTECH_SRC
+        src/control/input_3ds.cpp
+        src/core/minport/render_minport_shared.cpp
+        src/core/3ds/render_3ds.cpp
+        src/core/3ds/window_3ds.cpp
+        src/core/3ds/msgbox_3ds.cpp
+        src/core/3ds/events_3ds.cpp
+#        src/core/3ds/3ds-audio-lib.cpp
+    )
+elseif(NINTENDO_WII)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
+    list(APPEND THEXTECH_SRC
+        src/control/input_wii.cpp
+        src/core/minport/render_minport_shared.cpp
+        src/core/wii/render_wii.cpp
+        src/core/wii/window_wii.cpp
+        src/core/wii/msgbox_wii.cpp
+        src/core/wii/events_wii.cpp
+    )
+elseif(THEXTECH_CLI_BUILD)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
+    list(APPEND THEXTECH_SRC
+        src/core/null/render_null.cpp
+        src/core/null/window_null.cpp
+        src/core/null/msgbox_null.cpp
+        src/core/null/events_null.cpp
+    )
+elseif(THEXTECH_NO_SDL_BUILD)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
+    list(APPEND THEXTECH_SRC
+        src/core/null/render_null.cpp
+        src/core/null/window_null.cpp
+        src/core/null/msgbox_null.cpp
+        src/core/null/events_null.cpp
+    )
+else()
+    add_definitions(-DCORE_EVERYTHING_SDL)
+    list(APPEND THEXTECH_SRC
+        src/control/joystick.cpp
+        src/control/keyboard.cpp
+        src/control/touchscreen.cpp
+        src/core/base/render_base.cpp
+        src/core/base/window_base.cpp
+        src/core/base/msgbox_base.cpp
+        src/core/base/events_base.cpp
+        src/core/sdl/render_sdl.cpp
+        src/core/sdl/window_sdl.cpp
+        src/core/sdl/msgbox_sdl.cpp
+        src/core/sdl/events_sdl.cpp
+    )
+endif()
 
 # Add heads into the list
 file(GLOB THEXTECH_HEADS_SRC
@@ -602,6 +687,11 @@ if(ANDROID)
 #        DEPENDS SDL_ApkPackLibs_makeDir "${DEPENDENCIES_INSTALL_DIR}/lib/libhidapi.so" AudioCodecs_Local
 #    )
 #    add_dependencies(thextech SDL_ApkPackLibs_hidapi)
+
+elseif(NINTENDO_WII OR NINTENDO_3DS)
+    add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
+    set_target_properties(thextech PROPERTIES SUFFIX ".elf")
+
 else()
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     pge_set_nopie(thextech)
@@ -694,7 +784,27 @@ if(VITA)
 
     # Set explicit flags for this project
     target_compile_definitions(thextech PRIVATE
-        -DVITA -DNO_SCREENSHOT -DFIXED_RES -DLOW_MEM -DPRELOAD_LEVELS -DNO_INTPTROC)
+        -DVITA -DNO_SCREENSHOT -DTHEXTECH_FIXED_RES -DFIXED_RES -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -DNO_INTPTROC)
+endif()
+
+if(NINTENDO_3DS)
+    target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__3DS__)
+elseif(NINTENDO_WII)
+    target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__WII__)
+elseif(PGE_MIN_PORT)
+    target_compile_definitions(thextech PRIVATE -DLOW_MEM)
+endif()
+
+if(THEXTECH_NO_SDL_BUILD)
+    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DTHEXTECH_NO_SDL_BUILD)
+endif()
+
+if(THEXTECH_CLI_BUILD)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_CLI_BUILD)
+endif()
+
+if(THEXTECH_ENABLE_WIP_FEATURES)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_WIP_FEATURES)
 endif()
 
 if(THEXTECH_FIXED_ASSETS_PATH AND NOT THEXTECH_FIXED_ASSETS_PATH STREQUAL "")
@@ -754,19 +864,37 @@ if(EMSCRIPTEN)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DNO_FILE_LOGGING)
 endif()
 
+if(THEXTECH_NO_ARGV_HANDLING)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_NO_ARGV_HANDLING)
+endif()
+
 if(THEXTECH_INTERPROC_SUPPORTED)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_INTERPROC_SUPPORTED)
+endif()
+
+if(THEXTECH_CRASHHANDLER_SUPPORTED)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_CRASHHANDLER_SUPPORTED)
 endif()
 
 # ======================= Render specific global macros ========================
 if(NOT EMSCRIPTEN)
     target_compile_definitions(thextech PRIVATE
-        -DUSE_SCREENSHOTS_AND_RECS  # Built-in screenshots and GIF recording
         -DUSE_DRAW_BATTERY_STATUS   # Battery status draw support
     )
 else()
     target_compile_definitions(thextech PRIVATE
         -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
+    )
+endif()
+
+if(NOT EMSCRIPTEN AND
+   NOT NINTENDO_3DS AND
+   NOT NINTENDO_WII AND
+   NOT NINTENDO_WIIU AND
+   NOT PGE_MIN_PORT AND
+   NOT THEXTECH_CLI_BUILD)
+    target_compile_definitions(thextech PRIVATE
+        -DUSE_SCREENSHOTS_AND_RECS  # Built-in screenshots and GIF recording
     )
 endif()
 
@@ -776,15 +904,16 @@ if(ANDROID)
     )
 endif()
 
-if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
+if(ANDROID OR VITA OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH OR PGE_MIN_PORT OR THEXTECH_NO_SDL_BUILD)
     target_compile_definitions(thextech PRIVATE
         -DRENDER_FULLSCREEN_ALWAYS  # Game works always fullscreen
         -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
     )
 endif()
+
 # ==============================================================================
 
-if(NOT USE_SYSTEM_LIBS)
+if(NOT USE_SYSTEM_LIBS AND A2XT_DEPS)
     add_dependencies(thextech ${A2XT_DEPS})
 endif()
 
@@ -877,6 +1006,10 @@ elseif(WIN32)
     install(FILES LICENSE DESTINATION . RENAME License.TheXTech.txt)
 elseif(VITA)
     include(cmake/package_vita.cmake)
+elseif(NINTENDO_3DS)
+    ctr_create_3dsx(thextech)
+elseif(NINTENDO_WII)
+    ogc_create_dol(thextech)
 elseif(NINTENDO_SWITCH)
     include(cmake/package_switch.cmake)
 else()

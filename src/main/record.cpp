@@ -38,7 +38,9 @@
 #include "../config.h"
 #include "record.h"
 
-#include <SDL2/SDL.h>
+#include "sdl_proxy/sdl_timer.h"
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include <chrono>
 #include <fmt_time_ne.h>
 #include <fmt_format_ne.h>
@@ -443,7 +445,7 @@ static void write_status()
 
     fprintf(record_file, " %" PRId64 " \r\nStatus\r\n", frame_no);
     uint32_t status_tick = SDL_GetTicks();
-    fprintf(record_file, "Ticks %d\r\n", SDL_GetTicks() - last_status_tick);
+    fprintf(record_file, "Ticks %lu\r\n", (long unsigned)(SDL_GetTicks() - last_status_tick));
     last_status_tick = status_tick;
     fprintf(record_file, "randCalls %ld\r\n", random_ncalls());
     fprintf(record_file, "Score %d\r\n", Score);

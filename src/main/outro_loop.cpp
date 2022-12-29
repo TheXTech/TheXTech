@@ -275,6 +275,27 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
 #endif
+#ifdef __3DS__
+    AddCredit("3DS port By:");
+    AddCredit("");
+    AddCredit("'ds-sloth'");
+    AddCredit("");
+    AddCredit("");
+#endif
+#ifdef __WII__
+    AddCredit("Wii port By:");
+    AddCredit("");
+    AddCredit("'ds-sloth'");
+    AddCredit("");
+    AddCredit("");
+#endif
+#ifdef VITA
+    AddCredit("PS Vita Port By:");
+    AddCredit("");
+    AddCredit("Axiom");
+    AddCredit("");
+    AddCredit("");
+#endif
 
     if(!WorldCredits[1].empty())
     {

@@ -19,7 +19,8 @@
  */
 
 #include <cmath>
-#include <SDL2/SDL_stdinc.h>
+
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "global_constants.h"
 #include "range_arr.hpp"

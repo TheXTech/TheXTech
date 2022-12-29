@@ -22,8 +22,10 @@
 #include <Utils/dir_list_ci.h>
 #include <AppPath/app_path.h>
 #include <Logger/logger.h>
-#include "core/msgbox.h"
 #include <fmt_format_ne.h>
+
+#include "sdl_proxy/sdl_stdinc.h"
+#include "core/msgbox.h"
 
 #include "autocode_manager.h"
 #include "globals.h"
@@ -678,7 +680,7 @@ void AutocodeManager::showErrors(const std::string &file)
         }
     }
 
-    XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "Autocode script parse errors", out);
+    XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "Autocode script parse errors", out);
 }
 
 // VAR EXISTS

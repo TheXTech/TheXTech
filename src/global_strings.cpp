@@ -21,6 +21,8 @@
 #include "globals.h"
 #include "global_strings.h"
 
+#include "sdl_proxy/sdl_assert.h"
+
 #define STRS_UNIQUENESS_TRACKING
 
 

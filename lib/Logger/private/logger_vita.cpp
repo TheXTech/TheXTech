@@ -23,17 +23,15 @@
 #include <cstdio>
 
 #ifdef DEBUG_BUILD
-#include <debugnet.h>
-#ifndef NETDBG_IP_SERVER
-#define NETDBG_IP_SERVER "192.168.1.183"
-#endif
+#   include <debugnet.h>
+#   ifndef NETDBG_IP_SERVER
+#       define NETDBG_IP_SERVER "192.168.1.183"
+#   endif
+#   ifndef NETDBG_PORT_SERVER
+#       define NETDBG_PORT_SERVER 18194
+#   endif
 
-#ifndef NETDBG_PORT_SERVER
-#define NETDBG_PORT_SERVER 18194
-#endif
-
-
-#define VITA_TEMP_BUFFER_SIZE (1024 * 1024)
+#   define VITA_TEMP_BUFFER_SIZE (1024 * 1024)
 
 static char __string_buffer[VITA_TEMP_BUFFER_SIZE];
 static char __string_buffer2[VITA_TEMP_BUFFER_SIZE];
@@ -47,12 +45,10 @@ static FILE* s_logout;
 
 void LogWriter::OpenLogFile()
 {
-    if(m_enabled)
-    {
 #ifndef NO_FILE_LOGGING
+    if(m_enabled)
         s_logout = std::fopen(m_logFilePath.c_str(), "a");
 #endif // #ifndef NO_FILE_LOGGING
-    }
 }
 
 void LogWriter::CloseLog()
@@ -67,10 +63,11 @@ void LogWriter::CloseLog()
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
 {
 #ifdef DEBUG_BUILD
+    (void)level;
+    (void)label;
+
     if(__vita_debug_setup == 0)
-    {
         debugNetInit(NETDBG_IP_SERVER, NETDBG_PORT_SERVER, DEBUG);
-    }
 
     // Print arg list to first string buffer.
     vsnprintf(__string_buffer, VITA_TEMP_BUFFER_SIZE - 4, format, arg);
@@ -79,16 +76,17 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
     
     // Print to network.
     debugNetPrintf(DEBUG, __string_buffer2);
-#endif
+#else
     (void)level;
     (void)label;
     (void)format;
     (void)arg;
+#endif
 }
 
+#ifndef NO_FILE_LOGGING
 void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg)
 {
-#ifndef NO_FILE_LOGGING
     if(!s_logout)
         return;
 
@@ -101,5 +99,5 @@ void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va
     std::fprintf(s_logout, OS_NEWLINE);
     std::fflush(s_logout);
     va_end(arg_in);
-#endif
 }
+#endif

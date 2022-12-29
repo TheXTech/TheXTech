@@ -25,15 +25,19 @@
 #include "logger_sets.h"
 #endif
 
-#ifndef NO_FILE_LOGGING
-#include <SDL2/SDL_rwops.h>
-#endif
-
 #include <fmt_format_ne.h>
 #include <fmt/fmt_printf.h>
 #include <stdarg.h>
 #include <cstdio>
-#include <mutex>
+
+#ifndef PGE_NO_THREADING
+#   ifdef PGE_SDL_MUTEX
+#       include <SDL2/SDL_mutex.h>
+#   else
+#       include <mutex>
+#   endif
+#endif
+
 #include <sstream>
 #include <algorithm>
 
@@ -45,23 +49,47 @@
 #define OS_NEWLINE_LEN 1
 #endif
 
+#ifdef PGE_NO_THREADING
+
+#   define MUTEXLOCK(mn) (void)0
+
+#else
+
 class MutexLocker
 {
+#ifdef PGE_SDL_MUTEX
+    SDL_mutex *m_mutex;
+#else
     std::mutex *m_mutex;
+#endif
 
 public:
+#ifdef PGE_SDL_MUTEX
+    MutexLocker(SDL_mutex **mutex)
+    {
+        m_mutex = *mutex;
+        SDL_LockMutex(m_mutex);
+    }
+#else
     MutexLocker(std::mutex *mutex)
     {
         m_mutex = mutex;
         m_mutex->lock();
     }
+#endif
 
     ~MutexLocker()
     {
+#ifdef PGE_SDL_MUTEX
+        SDL_UnlockMutex(m_mutex);
+#else
         m_mutex->unlock();
+#endif
     }
 };
 
-#define MUTEXLOCK(mn) \
+#   define MUTEXLOCK(mn) \
     MutexLocker mn(&g_lockLocker); \
     (void)mn
+
+#endif

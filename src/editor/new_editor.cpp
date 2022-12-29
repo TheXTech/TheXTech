@@ -2073,7 +2073,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     SuperPrintR(mode, "POWER", 3, e_ScreenW / 2 + 10, 274);
 
     if(testPlayer[m_special_subpage].State == 0)
-        testPlayer[m_special_subpage].State = 1;
+        testPlayer[m_special_subpage].State = 2;
 
     constexpr int NPC_for_state[] = {0, NPCID_SHROOM_SMB3, NPCID_FIREFLOWER_SMB3, NPCID_LEAF, NPCID_TANOOKISUIT, NPCID_HAMMERSUIT, NPCID_ICEFLOWER_SMB3};
     for(int state = 1; state <= 7; state++)
@@ -5066,7 +5066,21 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
 
 inline void swap_screens()
 {
+#ifdef __3DS__
+    int win_x, win_y;
+    XRender::mapFromScreen(SharedCursor.X, SharedCursor.Y, &win_x, &win_y);
+#endif
+
     editorScreen.active = !editorScreen.active;
+
+#ifdef __3DS__
+    int m_x, m_y;
+    XRender::mapToScreen(win_x, win_y, &m_x, &m_y);
+    SharedCursor.X = m_x;
+    SharedCursor.Y = m_y;
+    MouseMove(m_x, m_y);
+#endif
+
     HasCursor = false;
     MouseRelease = false;
     MenuMouseRelease = false;
@@ -5081,12 +5095,10 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
     int sx;
     if(select_bar_only)
     {
-#ifndef __3DS__
         e_CursorX = EditorCursor.X;
         e_CursorY = EditorCursor.Y;
         // if(WorldEditor)
         //     e_CursorY += 8;
-#endif
         sx = (ScreenW - e_ScreenW)/2;
     }
     else
@@ -5355,7 +5367,10 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
                 Y = ScreenH - 36;
         }
 
-#ifndef __3DS__
+#ifdef __3DS__
+        if(select_bar_only)
+            XRender::renderTexture(X, Y, GFX.ECursor[2]);
+#else
         XRender::renderTexture(X, Y, GFX.ECursor[2]);
 #endif
         if(e_tooltip)
@@ -5368,6 +5383,9 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     // second screen is like the upper screen of the 3DS or the TV of the Wii U -- any screen without a direct pointing device
     if(second_screen && mode == CallMode::Logic)
         return;
+
+    if(MagicHand && !LevelEditor)
+        m_special_page = SPECIAL_PAGE_NONE;
 
     if(mode == CallMode::Logic)
     {
@@ -5392,20 +5410,33 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
     }
 
     MessageText.clear();
+
 #ifdef __3DS__
-    if(mode == CallMode::Render)
-        XRender::initDraw(1);
+    if(mode == CallMode::Render && active)
+        XRender::setTargetSubScreen();
+    else if(mode == CallMode::Render)
+    {
+        XRender::setTargetMainScreen();
+        XRender::setViewport(800/2 - e_ScreenW/2, 0, e_ScreenW, e_ScreenH);
+    }
 #else
-
-    e_CursorX = EditorCursor.X;
-    e_CursorY = EditorCursor.Y;
-    e_CursorX -= ScreenW/2-e_ScreenW/2;
-    // if(WorldEditor)
-    //     e_CursorY += 8;
-
     if(mode == CallMode::Render)
         XRender::setViewport(ScreenW/2-e_ScreenW/2, 0, e_ScreenW, e_ScreenH);
 #endif
+
+    e_CursorX = EditorCursor.X;
+    e_CursorY = EditorCursor.Y;
+
+#ifdef __3DS__
+    if(!editorScreen.active)
+        e_CursorX -= ScreenW/2-e_ScreenW/2;
+#else
+    e_CursorX -= ScreenW/2-e_ScreenW/2;
+#endif
+
+    // if(WorldEditor)
+    //     e_CursorY += 8;
+
     if(mode == CallMode::Render)
         XRender::renderRect(0, 0, e_ScreenW, e_ScreenH, 0.4f, 0.4f, 0.8f, 0.75f, true);
 

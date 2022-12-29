@@ -34,6 +34,7 @@ struct GifRecorder;
 typedef struct SDL_Thread SDL_Thread;
 typedef struct SDL_mutex SDL_mutex;
 
+
 class AbstractRender_t
 {
     friend class FrmMain;

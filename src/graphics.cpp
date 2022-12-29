@@ -165,6 +165,15 @@ void GetvScreenAverage()
     if(-vScreenY[A] + ScreenH > level[Player[1].Section].Height)
         vScreenY[A] = -(level[Player[1].Section].Height - ScreenH);
 
+    // keep vScreen boundary even (on 1x platforms)
+#ifdef PGE_MIN_PORT
+    vScreenX[A] += 1;
+    if(vScreenX[A] > 0)
+        vScreenX[A] -= std::fmod(vScreenX[A], 2.);
+    else
+        vScreenX[A] += std::fmod(vScreenX[A], 2.);
+#endif
+
     if(GameMenu)
     {
         if(vScreenX[1] > OldX)
@@ -512,6 +521,10 @@ void GetvScreenCredits()
         vScreenY[A] = -(level[Player[1].Section].Height - ScreenH) - 100;
 }
 
+#if 0
+// old, 100x100-based functions
+// now defined at gfx_draw_player.cpp
+
 int pfrXo(int plrFrame)
 {
 #if 1
@@ -576,6 +589,7 @@ int pfrY(int plrFrame)
 {
     return ((plrFrame + 49) % 10) * 100;
 }
+#endif
 
 void ScreenShot()
 {

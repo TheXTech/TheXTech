@@ -18,9 +18,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
-#include <SDL2/SDL_atomic.h>
-#include <SDL2/SDL_mixer_ext.h>
+#include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_atomic.h"
+#include "sdl_proxy/sdl_assert.h"
+#include "sdl_proxy/mixer.h"
 
 #include "globals.h"
 #include "global_dirs.h"
@@ -64,22 +65,29 @@ const AudioDefaults_t g_audioDefaults =
 {
     32000,
     2,
-    512,
-    (int)AUDIO_S16
+    1536,
+    (int)AUDIO_S16SYS
+};
+#elif defined(__3DS__)
+{
+    32728,
+    2,
+    2048,
+    (int)AUDIO_S16SYS
 };
 #elif defined(__SWITCH__) /* Defaults for Nintendo Switch */
 {
     48000,
     2,
     1024,
-    (int)AUDIO_S16
+    (int)AUDIO_S16SYS
 };
 #else /* Defaults for all other platforms */
 {
     44100,
     2,
     512,
-    (int)AUDIO_F32
+    (int)AUDIO_F32SYS
 };
 #endif
 
@@ -226,8 +234,8 @@ void InitSoundDefaults()
 void InitMixerX()
 {
     int ret;
-    const int initFlags = MIX_INIT_MID|MIX_INIT_MOD|MIX_INIT_FLAC|MIX_INIT_OGG|MIX_INIT_OPUS|MIX_INIT_MP3;
-    SDL_AudioSpec obtained;
+    const int initFlags = MIX_INIT_MID | MIX_INIT_MOD | MIX_INIT_FLAC | MIX_INIT_OGG | MIX_INIT_OPUS | MIX_INIT_MP3;
+
     MusicRoot = AppPath + "music/";
     SfxRoot = AppPath + "sound/";
 
@@ -241,22 +249,23 @@ void InitMixerX()
               audio_format_to_string(g_audioSetup.format),
               g_audioSetup.channels,
               g_audioSetup.bufferSize);
+
     ret = Mix_Init(initFlags);
 
     if(ret != initFlags)
     {
         pLogWarning("MixerX: Some modules aren't properly initialized");
-        if((ret & MIX_INIT_MID) != MIX_INIT_MID)
+        if((initFlags & MIX_INIT_MID) != MIX_INIT_MID)
             pLogWarning("MixerX: Failed to initialize MIDI module");
-        if((ret & MIX_INIT_MOD) != MIX_INIT_MOD)
+        if((initFlags & MIX_INIT_MOD) != MIX_INIT_MOD)
             pLogWarning("MixerX: Failed to initialize Tracker music module");
-        if((ret & MIX_INIT_FLAC) != MIX_INIT_FLAC)
+        if((initFlags & MIX_INIT_FLAC) != MIX_INIT_FLAC)
             pLogWarning("MixerX: Failed to initialize FLAC module");
-        if((ret & MIX_INIT_OGG) != MIX_INIT_OGG)
+        if((initFlags & MIX_INIT_OGG) != MIX_INIT_OGG)
             pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
-        if((ret & MIX_INIT_OPUS) != MIX_INIT_OPUS)
+        if((initFlags & MIX_INIT_OPUS) != MIX_INIT_OPUS)
             pLogWarning("MixerX: Failed to initialize Opus module");
-        if((ret & MIX_INIT_MP3) != MIX_INIT_MP3)
+        if((initFlags & MIX_INIT_MP3) != MIX_INIT_MP3)
             pLogWarning("MixerX: Failed to initialize MP3 module");
     }
 
@@ -269,35 +278,49 @@ void InitMixerX()
     {
         std::string msg = fmt::format_ne("Can't open audio stream, continuing without audio: ({0})", Mix_GetError());
         pLogCritical(msg.c_str());
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR, "Sound opening error", msg);
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR, "Sound opening error", msg.c_str());
         noSound = true;
     }
-
-    ret = Mix_QuerySpecEx(&obtained);
-    if(ret == 0)
+    else
     {
-        pLogCritical("Failed to call the Mix_QuerySpec: Audio is not open!");
-        s_audioSetupObtained = g_audioSetup;
+        SDL_AudioSpec ob;
+        ret = Mix_QuerySpecEx(&ob);
+
+        if(ret == 0)
+        {
+            pLogCritical("Failed to call the Mix_QuerySpec!");
+            s_audioSetupObtained = g_audioSetup;
+        }
+        else
+        {
+            s_audioSetupObtained.sampleRate = ob.freq;
+            s_audioSetupObtained.format = ob.format;
+            s_audioSetupObtained.channels = ob.channels;
+            s_audioSetupObtained.bufferSize = ob.samples;
+
+            pLogDebug("Sound opened (obtained: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
+                      s_audioSetupObtained.sampleRate,
+                      audio_format_to_string(s_audioSetupObtained.format),
+                      s_audioSetupObtained.channels,
+                      s_audioSetupObtained.bufferSize);
+        }
+
+#ifdef __3DS__
+        // Set fastest emulators to be default
+        Mix_OPNMIDI_setEmulator(OPNMIDI_OPN2_EMU_GENS);
+        Mix_OPNMIDI_setChipsCount(2);
+        Mix_ADLMIDI_setEmulator(ADLMIDI_OPL3_EMU_DOSBOX);
+        Mix_ADLMIDI_setChipsCount(2);
+#endif
+
+        Mix_VolumeMusic(MIX_MAX_VOLUME);
+        Mix_AllocateChannels(maxSfxChannels);
+
+        // Set channel finished callback to handle finished custom SFX
+        Mix_ChannelFinished(&extSfxStopCallback);
+
+        g_mixerLoaded = true;
     }
-
-    s_audioSetupObtained.sampleRate = obtained.freq;
-    s_audioSetupObtained.format = obtained.format;
-    s_audioSetupObtained.channels = obtained.channels;
-    s_audioSetupObtained.bufferSize = obtained.samples;
-
-    pLogDebug("Sound opened (obtained: rate=%d hz, format=%s, channels=%d, buffer=%d frames)...",
-              s_audioSetupObtained.sampleRate,
-              audio_format_to_string(s_audioSetupObtained.format),
-              s_audioSetupObtained.channels,
-              s_audioSetupObtained.bufferSize);
-
-    Mix_VolumeMusic(MIX_MAX_VOLUME);
-    Mix_AllocateChannels(maxSfxChannels);
-
-    // Set channel finished callback to handle finished custom SFX
-    Mix_ChannelFinished(&extSfxStopCallback);
-
-    g_mixerLoaded = true;
 }
 
 void QuitMixerX()
@@ -317,11 +340,16 @@ void QuitMixerX()
         auto &s = it.second;
         if(s.chunk)
             Mix_FreeChunk(s.chunk);
+        if(s.chunkOrig)
+            Mix_FreeChunk(s.chunkOrig);
     }
     sound.clear();
     music.clear();
+
     Mix_CloseAudio();
     Mix_Quit();
+
+    g_mixerLoaded = false;
 }
 
 static void AddMusic(SoundScope root,
@@ -388,6 +416,8 @@ static void AddSfx(SoundScope root,
 
     if(!f.empty() || isSilent)
     {
+        LoaderUpdateDebugString(fmt::format_ne("sound {0}", f));
+
         if(isCustom)
         {
             auto s = sound.find(alias);
@@ -487,8 +517,7 @@ void SoundPauseAll()
         return;
 
     pLogDebug("Pause all sound");
-    Mix_Pause(-1);
-    Mix_PauseMusic();
+    Mix_PauseAudio(1);
 }
 
 void SoundResumeAll()
@@ -497,8 +526,7 @@ void SoundResumeAll()
         return;
 
     pLogDebug("Resume all sound");
-    Mix_Resume(-1);
-    Mix_ResumeMusic();
+    Mix_PauseAudio(0);
 }
 
 void SoundPauseEngine(int paused)
@@ -544,7 +572,7 @@ void PlayMusic(const std::string &Alias, int fadeInMs)
 
     if(g_curMusic)
     {
-        Mix_HaltMusic();
+        Mix_HaltMusicStream(g_curMusic);
         Mix_FreeMusic(g_curMusic);
         g_curMusic = nullptr;
         g_stats.currentMusic.clear();
@@ -793,9 +821,11 @@ void StopMusic()
 
     pLogDebug("Stopping music");
 
-    Mix_HaltMusic();
     if(g_curMusic)
+    {
+        Mix_HaltMusicStream(g_curMusic);
         Mix_FreeMusic(g_curMusic);
+    }
     g_curMusic = nullptr;
     musicPlaying = false;
     g_stats.currentMusic.clear();
@@ -807,7 +837,8 @@ void FadeOutMusic(int ms)
     if(!musicPlaying || noSound)
         return;
     pLogDebug("Fading out music");
-    Mix_FadeOutMusic(ms);
+    if(g_curMusic)
+        Mix_FadeOutMusicStream(g_curMusic, ms);
     musicPlaying = false;
 }
 
@@ -833,8 +864,10 @@ void PlayInitSound()
             Mix_Music *loadsfx = Mix_LoadMUS((SfxRoot + p).c_str());
             if(loadsfx)
             {
-                Mix_PlayMusicStream(loadsfx, 0);
-                Mix_SetFreeOnStop(loadsfx, 1);
+                if(Mix_PlayMusicStream(loadsfx, 0) < 0)
+                    Mix_FreeMusic(loadsfx);
+                else
+                    Mix_SetFreeOnStop(loadsfx, 1);
             }
         }
     }
@@ -1013,11 +1046,13 @@ void InitSound()
     musicIni = AppPath + "music.ini";
     sfxIni = AppPath + "sounds.ini";
 
+    LoaderUpdateDebugString("Sound configs");
+
     UpdateLoad();
     if(!Files::fileExists(musicIni) && !Files::fileExists(sfxIni))
     {
         pLogWarning("music.ini and sounds.ini are missing");
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                      "music.ini and sounds.ini are missing",
                      "Files music.ini and sounds.ini are not exist, game will work without default music and SFX.");
         g_customLvlMusicId = 24;
@@ -1027,14 +1062,14 @@ void InitSound()
     else if(!Files::fileExists(musicIni))
     {
         pLogWarning("music.ini is missing");
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                      "music.ini is missing",
                      "File music.ini is not exist, game will work without default music.");
     }
     else if(!Files::fileExists(sfxIni))
     {
         pLogWarning("sounds.ini is missing");
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                      "sounds.ini is missing",
                      "File sounds.ini is not exist, game will work without SFX.");
     }
@@ -1066,13 +1101,17 @@ void InitSound()
         std::string alias = fmt::format_ne("sound{0}", i);
         std::string group = fmt::format_ne("sound-{0}", i);
         AddSfx(SoundScope::global, sounds, alias, group);
+
+#ifdef PGE_NO_THREADING
+        UpdateLoad();
+#endif
     }
     UpdateLoad();
     Mix_ReserveChannels(g_reservedChannels);
 
     if(g_errorsSfx > 0)
     {
-        XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_ERROR,
+        XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_ERROR,
                               "Sounds loading error",
                               fmt::format_ne("Failed to load some SFX assets. Loo a log file to get more details:\n{0}", getLogFilePath()));
     }
@@ -1288,7 +1327,7 @@ void PreloadExtSound(const std::string& path)
         auto *ch = Mix_LoadWAV(path.c_str());
         if(!ch)
         {
-            pLogWarning("Can't load custom sound: %s", Mix_GetError());
+            pLogWarning("Can't load custom sound [%s]: %s", path.c_str(), Mix_GetError());
             return;
         }
         extSfx.insert({path, ch});

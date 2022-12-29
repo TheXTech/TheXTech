@@ -29,6 +29,8 @@
 #include "main/speedrunner.h"
 #include "main/presetup.h"
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 
 static int s_compatLevel = COMPAT_MODERN;
 
@@ -351,15 +353,20 @@ void LoadCustomCompat()
     if(!customCompat.empty())
         loadCompatIni(g_compatibility, customCompat);
 
+#ifndef SDLRPOXY_NULL
     GraphicsHelps::setBitBlitBG((uint8_t)g_compatibility.bitblit_background_colour[0],
                                 (uint8_t)g_compatibility.bitblit_background_colour[1],
                                 (uint8_t)g_compatibility.bitblit_background_colour[2]);
+#endif
 }
 
 void ResetCompat()
 {
     compatInit(g_compatibility);
+
+#ifndef SDLRPOXY_NULL
     GraphicsHelps::resetBitBlitBG();
+#endif
 }
 
 void CompatSetEnforcedLevel(int cLevel)
