@@ -457,7 +457,7 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
     texture.l.w_scale = float(width) / float(texture.l.w_orig);
     texture.l.h_scale = float(width) / float(texture.l.h_orig);
 
-    XRender::loadTexture(texture, width, height, image, pitch);
+    g_render->loadTexture(texture, width, height, image, pitch);
     t_glyph.tx      = &texture;
     t_glyph.width   = width;
     t_glyph.height  = height;

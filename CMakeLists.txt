@@ -265,7 +265,11 @@ if(WIN32)
 endif()
 
 if(THEXTECH_ENABLE_TTF_SUPPORT)
-    include(cmake/library_HarfBuzz.cmake)
+    if(NOT NINTENDO_3DS)
+        include(cmake/library_HarfBuzz.cmake)
+    else()
+        set(FT_DISABLE_HARFBUZZ ON)
+    endif()
     include(cmake/library_FreeType.cmake)
 endif()
 
@@ -314,8 +318,12 @@ set(A2XT_DEPS)
 add_library(A2XT_Int INTERFACE)
 
 if(THEXTECH_ENABLE_TTF_SUPPORT)
-    list(APPEND A2XT_DEPS FREETYPE_Local HARFBUZZ_Local)
-    list(APPEND A2XT_LIBS PGE_FreeType PGE_HarfBuzz)
+    list(APPEND A2XT_DEPS FREETYPE_Local)
+    list(APPEND A2XT_LIBS PGE_FreeType)
+    if(TARGET PGE_HarfBuzz)
+        list(APPEND A2XT_DEPS HARFBUZZ_Local)
+        list(APPEND A2XT_LIBS PGE_HarfBuzz)
+    endif()
 endif()
 
 if(THEXTECH_ENABLE_LUA)
@@ -345,6 +353,10 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
 
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
+
+    if(THEXTECH_ENABLE_TTF_SUPPORT)
+        add_dependencies(FREETYPE_Local AudioCodecs_Local)
+    endif()
 
     if(NOT THEXTECH_NO_MIXER_X)
         list(APPEND A2XT_DEPS SDLMixerX_Local)

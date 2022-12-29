@@ -159,6 +159,7 @@ void FontManager::initFull()
         g_defaultRasterFont = &g_rasterFonts.front();
 
     /***************Load TTF font support****************/
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
     IniProcessing overrider(fonts_root + "/overrides.ini");
 
     if(overrider.beginGroup("ttf-fonts"))
@@ -212,6 +213,7 @@ void FontManager::initFull()
 
         overrider.endGroup();
     }
+#endif
 
     g_fontManagerIsInit = true;
 }
