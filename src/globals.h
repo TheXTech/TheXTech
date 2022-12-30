@@ -404,6 +404,8 @@ struct NPC_t
     int Block = 0;
 //    tempBlock As Integer
     int tempBlock = 0;
+//    EXTRA: does the tempBlock have its own tree entry?
+    bool tempBlockInTree = false;
 //    onWall As Boolean
     bool onWall = false;
 //    TurnBackWipe As Boolean

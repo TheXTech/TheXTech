@@ -40,6 +40,8 @@
 #include "game_globals.h"
 #include "menu_controls.h"
 
+#include "main/trees.h"
+
 #include "npc/npc_queues.h"
 
 

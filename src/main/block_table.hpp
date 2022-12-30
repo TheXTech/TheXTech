@@ -285,6 +285,30 @@ Location_t extract_loc(MyRef_t obj)
     return obj->Location;
 }
 
+template<>
+Location_t extract_loc(NPCRef_t obj)
+{
+    Location_t ret = obj->Location;
+
+    if(ret.Height < NPCHeight[obj->Type])
+        ret.Height = NPCHeight[obj->Type];
+
+    if(ret.Width < NPCWidthGFX[obj->Type])
+    {
+        ret.X -= (NPCWidthGFX[obj->Type] - ret.Width) / 2.0;
+        ret.Width = NPCWidthGFX[obj->Type];
+    }
+
+    // for tempBlock queries
+    if(obj->Type == 26)
+    {
+        ret.Y -= 16;
+        ret.Height += 16;
+    }
+
+    return ret;
+}
+
 template<class MyRef_t>
 Location_t extract_loc_layer(MyRef_t obj)
 {

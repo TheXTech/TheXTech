@@ -1355,6 +1355,8 @@ void UpdateLayers()
                                     Layer[NPC[B].AttLayer].SpeedY = Layer[A].SpeedY;
                                 }
                             }
+
+                            treeNPCUpdate(B);
                         }
                     }
                 }
@@ -1400,7 +1402,7 @@ void syncLayersTrees_Block(int block)
     int layer = Block[block].Layer;
     if(block <= numBlock)
     {
-        treeBlockAddLayer(layer, block);
+        treeBlockUpdateLayer(layer, block);
         if(layer != LAYER_NONE)
             Layer[layer].blocks.insert(block);
     }
@@ -1442,6 +1444,11 @@ void syncLayers_NPC(int npc)
     }
 
     NPCQueues::update(npc);
+
+    if(npc <= numNPCs)
+        treeNPCUpdate(npc);
+    else
+        treeNPCRemove(npc);
 }
 
 void syncLayers_AllBGOs()
@@ -1466,7 +1473,7 @@ void syncLayers_BGO(int bgo)
     int layer = Background[bgo].Layer;
     if(bgo <= numBackground + numLocked)
     {
-        treeBackgroundAddLayer(layer, bgo);
+        treeBackgroundUpdateLayer(layer, bgo);
         if(layer != LAYER_NONE)
             Layer[layer].BGOs.insert(bgo);
     }
@@ -1503,7 +1510,7 @@ void syncLayers_Water(int water)
     int layer = Water[water].Layer;
     if(water <= numWater)
     {
-        treeWaterAddLayer(layer, water);
+        treeWaterUpdateLayer(layer, water);
         if(layer != LAYER_NONE)
             Layer[layer].waters.insert(water);
     }

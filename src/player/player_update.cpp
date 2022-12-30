@@ -3488,6 +3488,8 @@ void UpdatePlayer()
                                             NPC[B].Location.X += NPC[B].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                                             NPC[B].Location.Y += NPC[B].Location.Height / 2.0 - EffectHeight[10] / 2.0;
                                             NewEffect(10, NPC[B].Location);
+
+                                            treeNPCUpdate(B);
                                         }
                                     }
 
@@ -4038,7 +4040,10 @@ void UpdatePlayer()
                                                         for(int C = 1; C <= numNPCs; C++)
                                                         {
                                                             if(NPC[C].standingOnPlayer == A)
+                                                            {
                                                                 NPC[C].Location.X += D;
+                                                                treeNPCUpdate(C);
+                                                            }
                                                         }
                                                         for(int C = 1; C <= numPlayers; C++)
                                                         {

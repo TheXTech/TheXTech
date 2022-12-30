@@ -31,12 +31,16 @@
 #include "../layers.h"
 
 #include "npc/npc_queues.h"
+#include "main/trees.h"
+
 #include <Logger/logger.h>
 
 void NPCHit(int A, int B, int C)
 {
     NPC_t tempNPC;
     Location_t tempLocation;
+
+    // NEWLY used to check when NPC's tree location needs to be updated
     NPC_t oldNPC = NPC[A];
 
     // if(B == 1 && C != 0)
@@ -172,6 +176,10 @@ void NPCHit(int A, int B, int C)
 
             PlaySound(SFX_Freeze);
             // NPCHit C, 3, C
+
+            treeNPCUpdate(A);
+            if(NPC[A].tempBlock > 0)
+                treeNPCSplitTempBlock(A);
             return;
         }
     }
@@ -461,7 +469,12 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
 
+            // update now because oldNPC (which we use to check for deferred update later) has been updated
             NPCQueues::Unchecked.push_back(A);
+            treeNPCUpdate(A);
+            if(NPC[A].tempBlock > 0)
+                treeNPCSplitTempBlock(A);
+
             oldNPC = NPC[A];
         }
 
@@ -2298,6 +2311,21 @@ void NPCHit(int A, int B, int C)
     }
 
     if(NPC[A].Location.Width != oldNPC.Location.Width)
+    {
+        treeNPCUpdate(A);
+        if(NPC[A].tempBlock > 0)
+            treeNPCSplitTempBlock(A);
+
         NPCQueues::Unchecked.push_back(A);
+    }
+    else if(NPC[A].Location.Height != oldNPC.Location.Height
+        || NPC[A].Location.X != oldNPC.Location.X
+        || NPC[A].Location.X != oldNPC.Location.Y)
+    {
+        treeNPCUpdate(A);
+        if(NPC[A].tempBlock > 0)
+            treeNPCSplitTempBlock(A);
+    }
+
     StopHit = 0;
 }

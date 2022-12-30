@@ -24,6 +24,8 @@
 #include "../collision.h"
 #include "../effect.h"
 
+#include "main/trees.h"
+
 
 void NPCFrames(int A)
 {
@@ -899,6 +901,10 @@ void NPCFrames(int A)
                 NPC[A].Frame = 0;
             else if(NPC[A].Frame < 0)
                 NPC[A].Frame = 3;
+
+            treeNPCUpdate(A);
+            if(NPC[A].tempBlock > 0)
+                treeNPCSplitTempBlock(A);
         }
 
         if(iRand(4) == 0)
@@ -950,7 +956,9 @@ void NPCFrames(int A)
             Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
         }
 
-
+        treeNPCUpdate(A);
+        if(NPC[A].tempBlock > 0)
+            treeNPCSplitTempBlock(A);
     }
     else if(NPC[A].Type == 167) // smw paragoomba
     {

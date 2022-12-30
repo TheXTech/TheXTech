@@ -658,6 +658,7 @@ void UpdateNPCs()
 
         // construct tempBlock tree
         NPC[A].tempBlock = 0;
+        NPC[A].tempBlockInTree = false;
 
         if(NPC[A].Active && NPC[A].TimeLeft > 1)
         {
@@ -717,6 +718,9 @@ void UpdateNPCs()
         }
     }
 
+    // only need to add NPC temp blocks to the quadtree when they are at a diff loc than the NPC
+    treeTempBlockEnable();
+
     for(A = 1; A <= numPlayers; A++)
     {
         if(Player[A].Mount == 2)
@@ -729,16 +733,10 @@ void UpdateNPCs()
             Block[numBlock].Location.Y = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Y))) + 1;
             Block[numBlock].Location.Width = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Width))) + 1;
             Block[numBlock].IsPlayer = A;
-            // not syncing the block layer here because we'll sync all of them together later
+
+            treeTempBlockAdd(numBlock);
             numTempBlock++;
         }
-    }
-
-    // add the NPC temp blocks to the quadtree
-    treeTempBlockStartFrame();
-    for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
-    {
-        treeTempBlockAdd(A);
     }
 
     // if(numTempBlock > 1)
@@ -830,10 +828,19 @@ void UpdateNPCs()
                         NPC[A].Special2 = Block[C].Location.Y + 4;
                         NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height;
                         NPC[A].Special = 1;
+
+                        treeNPCUpdate(A);
+                        if(NPC[A].tempBlock > 0)
+                            treeNPCSplitTempBlock(A);
                     }
                 }
                 else if(NPC[A].Type == 199) // blaarg
+                {
                     NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A].Location.Height + 36;
+                    treeNPCUpdate(A);
+                    if(NPC[A].tempBlock > 0)
+                        treeNPCSplitTempBlock(A);
+                }
 
 
 
@@ -862,6 +869,9 @@ void UpdateNPCs()
                         NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1;
                         NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) * 0.005) * NPC[A].Direction;
                         NPC[A].Special5 = 1;
+                        treeNPCUpdate(A);
+                        if(NPC[A].tempBlock > 0)
+                            treeNPCSplitTempBlock(A);
                     }
                     else if(NPC[A].Type != 42)
                         PlaySound(SFX_Bullet);
@@ -3753,6 +3763,10 @@ void UpdateNPCs()
                                                                                             }
                                                                                         }
                                                                                     }
+
+                                                                                    treeNPCUpdate(B);
+                                                                                    if(NPC[B].tempBlock > 0)
+                                                                                        treeNPCSplitTempBlock(B);
                                                                                 }
                                                                                 else if(NPC[A].Type == 78)
                                                                                     NPCHit(B, 8, A);
@@ -4274,12 +4288,30 @@ void UpdateNPCs()
                         Block[NPC[A].tempBlock].Location = NPC[A].Location;
                         if(NPC[A].Type == 26)
                         {
+                            // the NPC tree accounts for this; no need to split tempBlock
                             Block[NPC[A].tempBlock].Location.Y -= 16;
                             Block[NPC[A].tempBlock].Location.Height += 16;
                         }
 
-                        // necessary for tree update
-                        treeTempBlockUpdate(NPC[A].tempBlock);
+                        // tempBlock comes back in sync with NPC
+                        if(NPC[A].Location.X != prevX
+                            || NPC[A].Location.Y != prevY
+                            || NPC[A].Location.Width != prevW
+                            || NPC[A].Location.Height != prevH)
+                        {
+                            prevX = NPC[A].Location.X;
+                            prevY = NPC[A].Location.Y;
+                            prevW = NPC[A].Location.Width;
+                            prevH = NPC[A].Location.Height;
+
+                            treeNPCUpdate(A);
+
+                            if(NPC[A].tempBlockInTree)
+                            {
+                                NPC[A].tempBlockInTree = false;
+                                treeTempBlockRemove(NPC[A].tempBlock);
+                            }
+                        }
 
                         // no longer needed; maintaining the sort
 #if 0
@@ -5151,6 +5183,10 @@ void UpdateNPCs()
                         else
                             NPC[(int)NPC[A].Special2].Location.X = NPC[A].Location.X - NPC[(int)NPC[A].Special2].Location.Width;
                         NPC[(int)NPC[A].Special2].Location.Y = NPC[A].Location.Y;
+
+                        treeNPCUpdate((int)NPC[A].Special2);
+                        if(NPC[(int)NPC[A].Special2].tempBlock != 0)
+                            treeNPCSplitTempBlock((int)NPC[A].Special2);
                     }
 
                     if(NPC[A].standingOnPlayer > 0 && !Player[NPC[A].standingOnPlayer].Controls.Run)
@@ -5529,6 +5565,18 @@ void UpdateNPCs()
                 NPC[A].RealSpeedX = float(NPC[A].Location.SpeedX);
                 NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * double(speedVar);
             }
+
+            // finally update NPC's tree status if needed, and split the tempBlock (since it has not been updated)
+            if(NPC[A].Location.X != prevX
+                || NPC[A].Location.Y != prevY
+                || NPC[A].Location.Width != prevW
+                || NPC[A].Location.Height != prevH)
+            {
+                treeNPCUpdate(A);
+
+                if(NPC[A].tempBlock > 0)
+                    treeNPCSplitTempBlock(A);
+            }
         }
 
         if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT && NPC[A].HoldingPlayer == 0)
@@ -5590,7 +5638,8 @@ void UpdateNPCs()
 
     numBlock -= numTempBlock; // clean up the temp npc blocks
 
-    // temp block tree is cleared immediately before fill
+    treeTempBlockClear();
+
 
     // kill the NPCs, from last to first
     std::sort(NPCQueues::Killed.begin(), NPCQueues::Killed.end(),

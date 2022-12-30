@@ -80,6 +80,8 @@
 #include "config.h"
 #include "main/screen_connect.h"
 
+#include "main/trees.h"
+
 void CheckActive();
 // set up sizable blocks
 void SizableBlocks();
@@ -1524,6 +1526,7 @@ void NPCyFix()
             else
                 XnHfix = std::abs(8 - ((int(XnH * 100) % 800) / 100));
             NPC[A].Location.Y += XnHfix;
+            treeNPCUpdate(A);
         }
     }
 }

@@ -104,6 +104,8 @@ void treeLevelCleanAll()
     treeLevelCleanBlockLayers();
     treeLevelCleanBackgroundLayers();
     treeLevelCleanWaterLayers();
+    treeTempBlockFullClear();
+    treeNPCClear();
 }
 
 template<class ItemRef_t, class Arr>

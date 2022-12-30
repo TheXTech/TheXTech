@@ -146,6 +146,9 @@ void Deactivate(int A)
 
             // NEW now that we have the new NPC Queues
             NPCQueues::update(A);
+            treeNPCUpdate(A);
+            if(NPC[A].tempBlock > 0)
+                treeNPCSplitTempBlock(A);
         }
     }
     else if(NPCIsAnExit[NPC[A].Type])
@@ -341,6 +344,10 @@ void TurnNPCsIntoCoins()
                         NPCQueues::Active.erase(A);
 
                     NPC[A].Active = false;
+
+                    treeNPCUpdate(A);
+                    if(NPC[A].tempBlock != 0)
+                        treeNPCSplitTempBlock(A);
                 }
                 else if(NPC[A].Type == 197 || NPC[A].Type == 260 || NPC[A].Type == 259)
                 {
@@ -418,6 +425,9 @@ static void s_alignRuftCell(NPC_t &me, const Location_t &alignAt)
     }
 
     me.Special3 = me.Location.X;
+    treeNPCUpdate(&me);
+    if(me.tempBlock != 0)
+        treeNPCSplitTempBlock(&me);
 }
 
 void SkullRideDone(int A, const Location_t &alignAt)
@@ -2583,11 +2593,10 @@ void NPCSpecial(int A)
         if(npc.Location.SpeedY < 0)
             Block[npc.tempBlock].Location.Y += npc.Location.SpeedY;
 
-        // only update the quadtree if the tempBlock exists
-        if(npc.tempBlock > 0)
-        {
-            treeTempBlockUpdate(npc.tempBlock);
-        }
+        // The tempBlock has been moved, above, and the NPC hasn't.
+        // So, the tempBlock goes out of sync with the NPC and joins the tree.
+        if(npc.tempBlock > 0 && (npc.Location.SpeedX != 0 || npc.Location.SpeedY < 0))
+            treeNPCUpdateTempBlock(&npc);
 
         if(npc.Type == NPCID_SAW)
         {
@@ -3136,6 +3145,11 @@ void SpecialNPC(int A)
                         NPC[B].Location.Y = npcVCenter - NPC[B].Location.Height / 2.0;
                         NPC[B].Special = 0;
                         NPC[B].Projectile = false;
+
+                        // must update now because B won't be checked later
+                        treeNPCUpdate(B);
+                        if(NPC[B].tempBlock > 0)
+                            treeNPCSplitTempBlock(B);
                     }
                 }
             }
@@ -3163,6 +3177,11 @@ void SpecialNPC(int A)
                                 NPC[B].Location.X = playerHCenter - NPC[B].Location.Width / 2.0;
                                 NPC[B].Location.Y = playerVCenter - NPC[B].Location.Height / 2.0;
                                 TouchBonus(vb6Round(NPC[A].Special5), B);
+
+                                // must update now because B won't be checked later
+                                treeNPCUpdate(B);
+                                if(NPC[B].tempBlock > 0)
+                                    treeNPCSplitTempBlock(B);
                             }
                         }
                     }
@@ -5440,6 +5459,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
                     NPC[A].Location.Height = 32;
 
                     NPCQueues::Unchecked.push_back(A);
+                    treeNPCUpdate(A);
                 }
                 else if(NPC[A].Type == 10 || NPC[A].Type == 33 || NPC[A].Type == 88 || NPC[A].Type == 138 || NPC[A].Type == 258) // turn coins into rupees
                 {
@@ -5454,6 +5474,7 @@ void CharStuff(int WhatNPC, bool CheckEggs)
                     NPC[A].Frame = 0;
 
                     NPCQueues::Unchecked.push_back(A);
+                    treeNPCUpdate(A);
                 }
             }
 
