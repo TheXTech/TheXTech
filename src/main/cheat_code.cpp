@@ -46,6 +46,7 @@
 #include "game_info.h"
 #include "screen_quickreconnect.h"
 
+#include "npc/npc_queues.h"
 #include "cheat_code.h"
 
 
@@ -1155,6 +1156,7 @@ static void warioTime()
                 NPC[B].Location.X += -NPC[B].Location.Width / 2.0;
                 NPC[B].Location.SpeedX = 0;
                 NPC[B].Location.SpeedY = 0;
+                NPCQueues::Unchecked.push_back(B);
             }
         }
     }

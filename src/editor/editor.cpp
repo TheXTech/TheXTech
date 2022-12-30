@@ -1510,7 +1510,6 @@ void UpdateEditor()
                             NPC[numNPCs].Text = STRINGINDEX_NONE;
                             SetS(NPC[numNPCs].Text, GetS(EditorCursor.NPC.Text));
                         }
-                        syncLayers_NPC(numNPCs);
 //                        Netplay::sendData Netplay::AddNPC(numNPCs);
                         if(!MagicHand)
                         {
@@ -1530,6 +1529,7 @@ void UpdateEditor()
                             n.DefaultSpecial = int(n.Special);
                             CheckSectionNPC(numNPCs);
                         }
+                        syncLayers_NPC(numNPCs);
                     }
                 }
             }

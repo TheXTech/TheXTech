@@ -40,6 +40,8 @@
 #include "game_globals.h"
 #include "menu_controls.h"
 
+#include "npc/npc_queues.h"
+
 
 static void updateIntroLevelActivity()
 {
@@ -545,6 +547,7 @@ void MenuLoop()
                     {
                         NewEffect(78, NPC[A].Location);
                         NPC[A].Killed = 9;
+                        NPCQueues::Killed.push_back(A);
                     }
                 }
             }

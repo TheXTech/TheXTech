@@ -496,6 +496,7 @@ set(THEXTECH_SRC
     src/npc/npc_update.cpp
     src/npc/npc_frames.cpp
     src/npc/npc_bonus.cpp
+    src/npc/npc_queues.cpp
     src/player/player_update.cpp
 )
 
@@ -626,6 +627,8 @@ file(GLOB THEXTECH_HEADS_SRC
     src/main/*.h
     src/main/*.hpp
     src/main/QuadTree/*.h
+    src/npc/*.h
+    src/npc/*.hpp
     src/sound/fx/*.h
     src/sound/fx/*.hpp
 )

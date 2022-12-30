@@ -40,6 +40,8 @@
 #include "../graphics.h"
 #include "../controls.h"
 
+#include "npc/npc_queues.h"
+
 #include "pge_delay.h"
 
 
@@ -3472,6 +3474,7 @@ void UpdatePlayer()
                                             PlaySound(SFX_BlockHit);
                                             HitSpot = 0;
                                             NPC[B].Killed = 9;
+                                            NPCQueues::Killed.push_back(B);
                                             for(C = 1; C <= 10; ++C)
                                             {
                                                 NewEffect(77, NPC[B].Location, static_cast<float>(NPC[B].Special));
@@ -3556,6 +3559,7 @@ void UpdatePlayer()
                                         if(NPC[B].Special2 >= 0)
                                         {
                                             NPC[B].Killed = 9;
+                                            NPCQueues::Killed.push_back(B);
                                             PlaySound(SFX_Door);
                                             Player[A].Effect = 7;
                                             Player[A].Warp = numWarps + 1;
@@ -3595,6 +3599,7 @@ void UpdatePlayer()
                                         Player[A].HasKey = false;
                                         HitSpot = 0;
                                         NPC[B].Killed = 3;
+                                        NPCQueues::Killed.push_back(B);
                                     }
 
                                     if(NPC[B].Type == 45 && NPC[B].Projectile != 0 && HitSpot > 1)
@@ -3638,6 +3643,7 @@ void UpdatePlayer()
                                                 {
                                                     UnDuck(Player[A]);
                                                     NPC[B].Killed = 9;
+                                                    NPCQueues::Killed.push_back(B);
                                                     if(Player[A].State == 1)
                                                     {
                                                         Player[A].Location.Height = Physics.PlayerHeight[1][2];
@@ -3656,6 +3662,7 @@ void UpdatePlayer()
                                                 {
                                                     UnDuck(Player[A]);
                                                     NPC[B].Killed = 9;
+                                                    NPCQueues::Killed.push_back(B);
                                                     Player[A].Mount = 3;
                                                     if(NPC[B].Type == 95)
                                                         Player[A].MountType = 1;
@@ -4261,6 +4268,7 @@ void UpdatePlayer()
                         Player[A].Location = NPC[B].Location;
                         Player[A].Mount = 2;
                         NPC[B].Killed = 9;
+                        NPCQueues::Killed.push_back(B);
                         Player[A].HoldingNPC = 0;
                         Player[A].StandingOnNPC = 0;
                         PlaySound(SFX_Stomp);
@@ -4466,8 +4474,23 @@ void UpdatePlayer()
     }
 
     // int C = 0;
-    for(A = numNPCs; A >= 1; A--)
+
+    // kill the player temp NPCs, from last to first
+    std::sort(NPCQueues::PlayerTemp.begin(), NPCQueues::PlayerTemp.end(),
+    [](NPCRef_t a, NPCRef_t b)
     {
+        return a > b;
+    });
+
+
+    // for(A = numNPCs; A >= 1; A--)
+    int last_NPC = numNPCs + 1;
+    for(int A : NPCQueues::PlayerTemp)
+    {
+        // duplicated entry, no problem
+        if(A == last_NPC)
+            continue;
+
         if(NPC[A].playerTemp)
         {
             for(B = 1; B <= numPlayers; B++)
@@ -4479,4 +4502,6 @@ void UpdatePlayer()
             KillNPC(A, 9);
         }
     }
+
+    NPCQueues::PlayerTemp.clear();
 }

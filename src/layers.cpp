@@ -38,6 +38,7 @@
 #include "main/trees.h"
 #include "main/block_table.h"
 
+#include "npc/npc_queues.h"
 int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
 
@@ -397,6 +398,8 @@ void ShowLayer(layerindex_t L, bool NoEffect)
             {
                 NPC[A].Active = true;
                 NPC[A].TimeLeft = 1;
+
+                NPCQueues::Active.insert(A);
             }
             CheckSectionNPC(A);
     }
@@ -1420,6 +1423,8 @@ void syncLayersTrees_Block_SetHidden(int block) // set block hidden based on lay
 
 void syncLayers_AllNPCs()
 {
+    NPCQueues::clear();
+
     for(int npc = 1; npc <= numNPCs; npc++)
     {
         syncLayers_NPC(npc);
@@ -1435,6 +1440,8 @@ void syncLayers_NPC(int npc)
         else
             Layer[layer].NPCs.erase(npc);
     }
+
+    NPCQueues::update(npc);
 }
 
 void syncLayers_AllBGOs()

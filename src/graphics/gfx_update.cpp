@@ -48,6 +48,8 @@
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
 
+#include "npc/npc_queues.h"
+
 struct ScreenShake_t
 {
     double forceX = 0;
@@ -290,6 +292,9 @@ void UpdateGraphics(bool skipRepaint)
     int Z = 0;
     int numScreens = 0;
 
+    // just until NPC draw logic updated
+    NPCQueues::NoReset.clear();
+
     if(!GameIsActive)
         return;
 
@@ -362,6 +367,7 @@ void UpdateGraphics(bool skipRepaint)
 //                            if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
 //                                timeStr += "2b" + std::to_string(A) + LB;
                             NPC[A].Active = true;
+                            NPCQueues::Active.insert(A);
                         }
                         NPC[A].Reset[1] = false;
                         NPC[A].Reset[2] = false;
@@ -1066,6 +1072,7 @@ void UpdateGraphics(bool skipRepaint)
 //                            if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
 //                                timeStr += "2b" + std::to_string(A) + LB;
                             NPC[A].Active = true;
+                            NPCQueues::Active.insert(A);
                         }
                         NPC[A].Reset[1] = false;
                         NPC[A].Reset[2] = false;
@@ -1443,6 +1450,7 @@ void UpdateGraphics(bool skipRepaint)
 //                                if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
 //                                    timeStr += "2b" + std::to_string(A) + LB;
                             NPC[A].Active = true;
+                            NPCQueues::Active.insert(A);
                         }
 
                         NPC[A].Reset[1] = false;
@@ -1494,6 +1502,7 @@ void UpdateGraphics(bool skipRepaint)
 //                        if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
 //                            timeStr += "2b" + std::to_string(A) + LB;
                         NPC[A].Active = true;
+                        NPCQueues::Active.insert(A);
                     }
                     NPC[A].Reset[1] = false;
                     NPC[A].Reset[2] = false;
@@ -1698,6 +1707,7 @@ void UpdateGraphics(bool skipRepaint)
 //                                if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
 //                                    timeStr += "2b" + std::to_string(A) + LB;
                                 NPC[A].Active = true;
+                                NPCQueues::Active.insert(A);
                             }
                             NPC[A].Reset[1] = false;
                             NPC[A].Reset[2] = false;
@@ -1930,6 +1940,7 @@ void UpdateGraphics(bool skipRepaint)
 //                                if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
 //                                    timeStr += "2b" + std::to_string(A) + LB;
                                 NPC[A].Active = true;
+                                NPCQueues::Active.insert(A);
                             }
                             NPC[A].Reset[1] = false;
                             NPC[A].Reset[2] = false;
@@ -2136,6 +2147,7 @@ void UpdateGraphics(bool skipRepaint)
 //                                    if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
 //                                        timeStr += "2b" + std::to_string(A) + LB;
                                     NPC[A].Active = true;
+                                    NPCQueues::Active.insert(A);
                                 }
 
                                 NPC[A].Reset[1] = false;

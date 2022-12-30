@@ -38,6 +38,7 @@
 #include "compat.h"
 #include "editor.h"
 
+#include "npc/npc_queues.h"
 #include "main/trees.h"
 
 void BlockHit(int A, bool HitDown, int whatPlayer)
@@ -2098,7 +2099,9 @@ void PSwitch(bool enabled)
                     nb.NPC = NPC[A].Type;
                     syncLayersTrees_Block(numBlock);
                 }
+
                 NPC[A].Killed = 9;
+                NPCQueues::Killed.push_back(A);
             }
         }
 
@@ -2237,6 +2240,7 @@ void PSwitch(bool enabled)
                     syncLayersTrees_Block(numBlock);
                 }
                 NPC[A].Killed = 9;
+                NPCQueues::Killed.push_back(A);
             }
         }
 
@@ -2424,7 +2428,7 @@ void PowBlock()
         }
     }
 
-    for(A = 1; A <= numNPCs; A++)
+    for(int A : NPCQueues::Active.no_change)
     {
         if(NPC[A].Active)
         {

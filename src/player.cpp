@@ -46,6 +46,8 @@
 #include "core/events.h"
 #include "compat.h"
 
+#include "npc/npc_queues.h"
+
 #include "controls.h"
 
 
@@ -133,6 +135,7 @@ static void setupCheckpoints()
                 continue;
 
             NPC[A].Killed = 9;
+            NPCQueues::Killed.push_back(A);
 
             // found a last id, leave player here
             if(!g_compatibility.fix_vanilla_checkpoints || cpId == int(CheckpointsList.size() - 1))
@@ -698,6 +701,7 @@ void PlayerHurt(const int A)
                                 if(NPC[B].Type == 50)
                                 {
                                     NPC[B].Killed = 9;
+                                    NPCQueues::Killed.push_back(B);
                                     NPC[B].Special = 0;
                                 }
                                 else if(NPC[B].Type == 49)
@@ -2532,6 +2536,7 @@ void YoshiEat(const int A)
 
             if(CheckCollision(p.YoshiTongue, tempLocation))
             {
+                // dead code, check n.Type != 91 condition above
                 if(n.Type == 91)
                 {
                     if(!NPCNoYoshi[(int)n.Special])
@@ -2557,6 +2562,8 @@ void YoshiEat(const int A)
                         n.Effect = 5;
                         n.Effect2 = A;
                         p.YoshiNPC = B;
+
+                        NPCQueues::Unchecked.push_back(B);
                     }
                 }
                 else if(n.Type == 283)
@@ -2582,6 +2589,8 @@ void YoshiEat(const int A)
                     n.Location.Height = NPCHeight[n.Type];
                     n.Location.X += -n.Location.Width / 2.0;
                     n.Location.Y += -n.Location.Height / 2.0;
+
+                    NPCQueues::Unchecked.push_back(B);
                 }
                 break;
             }
@@ -2650,6 +2659,7 @@ void YoshiSpit(const int A)
            NPC[p.YoshiNPC].Type != 24 && p.YoshiRed)
         {
             NPC[p.YoshiNPC].Killed = 9;
+            NPCQueues::Killed.push_back(p.YoshiNPC);
             PlaySound(SFX_BigFireball);
             for(B = 1; B <= 3; B++)
             {
@@ -2706,6 +2716,8 @@ void YoshiSpit(const int A)
             NPC[p.YoshiNPC].Location.SpeedX = 0;
             NPC[p.YoshiNPC].Location.SpeedY = 0;
 
+            NPCQueues::Active.insert(p.YoshiNPC);
+            NPCQueues::Unchecked.push_back(p.YoshiNPC);
 
 
             if(NPC[p.YoshiNPC].Type == 45)
@@ -2943,6 +2955,7 @@ void PlayerDismount(const int A)
                 {
                     NPC[B].Killed = 9;
                     NPC[B].Special = 0;
+                    NPCQueues::Killed.push_back(B);
                 }
                 else if(NPC[B].Type == 49)
                     NPC[B].Special = 0;
@@ -3074,7 +3087,10 @@ void PlayerPush(const int A, int HitSpot)
                 if(!BlockOnlyHitspot1[b.Type] && !BlockNoClipping[b.Type])
                 {
                     if(HitSpot == 2)
+                    {
+                        // TODO: investigate this vanilla bug and see if it's worth making a fix
                         p.Location.X = b.Location.X - p.Location.Height - 0.01;
+                    }
                     else if(HitSpot == 3)
                         p.Location.Y = b.Location.Y + b.Location.Height + 0.01;
                     else if(HitSpot == 4)
@@ -3494,7 +3510,12 @@ void YoshiEatCode(const int A)
 
                 NPC[p.YoshiNPC].Effect = 6;
                 NPC[p.YoshiNPC].Effect2 = A;
-                NPC[p.YoshiNPC].Active = false;
+
+                if(NPC[p.YoshiNPC].Active)
+                {
+                    NPC[p.YoshiNPC].Active = false;
+                    NPCQueues::update(p.YoshiNPC);
+                }
 
                 if(NPC[p.YoshiNPC].Type == 49)
                 {
@@ -3516,7 +3537,14 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
                 NPC[p.YoshiNPC].Effect = 6;
                 NPC[p.YoshiNPC].Effect2 = A;
-                NPC[p.YoshiNPC].Active = false;
+
+                NPCQueues::Unchecked.push_back(p.YoshiNPC);
+
+                if(NPC[p.YoshiNPC].Active)
+                {
+                    NPC[p.YoshiNPC].Active = false;
+                    NPCQueues::update(p.YoshiNPC);
+                }
             }
             else if(p.MountType == 8 && !NPCIsABonus[NPC[p.YoshiNPC].Type])
             {
@@ -3529,7 +3557,14 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
                 NPC[p.YoshiNPC].Effect = 6;
                 NPC[p.YoshiNPC].Effect2 = A;
-                NPC[p.YoshiNPC].Active = false;
+
+                NPCQueues::Unchecked.push_back(p.YoshiNPC);
+
+                if(NPC[p.YoshiNPC].Active)
+                {
+                    NPC[p.YoshiNPC].Active = false;
+                    NPCQueues::update(p.YoshiNPC);
+                }
             }
             else
             {
@@ -3542,6 +3577,8 @@ void YoshiEatCode(const int A)
                 {
                     MoreScore(NPCScore[NPC[p.YoshiNPC].Type], NPC[p.YoshiNPC].Location, p.Multiplier);
                     NPC[p.YoshiNPC].Killed = 9;
+                    NPCQueues::Killed.push_back(p.YoshiNPC);
+
                     p.YoshiNPC = 0;
                     p.FireBallCD = 30;
                     Coins += 1;
@@ -3561,6 +3598,8 @@ void YoshiEatCode(const int A)
                     PlaySound(SFX_YoshiSwallow);
                 }
             }
+
+            NPCQueues::Unchecked.push_back(p.YoshiNPC);
         }
         else if(p.MountSpecial == 0 && p.YoshiPlayer > 0)
         {
@@ -4480,6 +4519,8 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == 31)
             {
                 NPC[plr.HoldingNPC].Killed = 9;
+                NPCQueues::Killed.push_back(plr.HoldingNPC);
+
                 NewEffect(10, NPC[plr.HoldingNPC].Location);
                 warp.Locked = false;
                 int allBGOs = numBackground + numLocked;
@@ -4501,6 +4542,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == 31)
             {
                 NPC[plr.YoshiNPC].Killed = 9;
+                NPCQueues::Killed.push_back(plr.YoshiNPC);
                 plr.YoshiNPC = 0;
 
                 warp.Locked = false;
@@ -4947,6 +4989,12 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.StandingOnNPC].Location.Y += -NPC[p.StandingOnNPC].Location.Height / 2.0;
                         }
                         NPCFrames(p.StandingOnNPC);
+
+                        if(p.StandingOnNPC > 0)
+                        {
+                            NPCQueues::Unchecked.push_back(p.StandingOnNPC);
+                        }
+
                         p.StandingOnNPC = 0;
                     }
                 }
@@ -4974,8 +5022,10 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
     }
     else if(!DontResetGrabTime)
         p.GrabTime = 0;
+
     if(p.HoldingNPC > numNPCs) // Can't hold an NPC that is dead
         p.HoldingNPC = 0;
+
     if(p.HoldingNPC > 0)
     {
         lyrX = NPC[p.HoldingNPC].Location.X;
