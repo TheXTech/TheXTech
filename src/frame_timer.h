@@ -64,10 +64,14 @@ private:
     uint64_t m_cur_time = 0;
     uint64_t m_cur_timer[TASK_END] = {0};
 
+    uint64_t m_frame_time = 0;
+    uint64_t m_slow_frame_time = 0;
+
 public:
     uint64_t level_timer[TASK_END] = {0};
     int view_timer[TASK_END] = {0};
     int view_total = 0;
+    int view_slow_frame_time = 0;
 
     void reset();
     void start_task(Task task);

@@ -2167,6 +2167,33 @@ void UpdateGraphics(bool skipRepaint)
             {
                 XRender::offsetViewportIgnore(true);
                 SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
+
+                for(int i = 0; i < 2; i++)
+                {
+                    int val = (i == 0 ? g_microStats.view_total : g_microStats.view_slow_frame_time);
+
+                    int x = val < 95 ? 36 : val < 995 ? 18 : 0;
+                    int y = 24 + i * 16;
+
+                    float r, g, a;
+                    if(val < 500)
+                    {
+                        r = 0.0f; g = 1.0f; a = 0.25f;
+                    }
+                    else if(val < 1000)
+                    {
+                        r = 1.0f; g = 1.0f; a = 0.5f;
+                    }
+                    else
+                    {
+                        r = 1.0f; g = 0.0f; a = 1.0f;
+                    }
+
+                    std::string display = (i == 0
+                        ? fmt::sprintf_ne("%d%%", (val + 5) / 10)
+                        : fmt::sprintf_ne("%d%% (max)", (val + 5) / 10));
+                    SuperPrint(display, 3, x, y, r, g, 0.f, a);
+                }
                 XRender::offsetViewportIgnore(false);
             }
 

@@ -45,6 +45,9 @@ void MicroStats::reset()
 
     view_total = 0;
 
+    m_slow_frame_time = 0;
+    m_frame_time = 0;
+
     m_cur_task = TASK_END;
     m_cur_frame = 0;
 }
@@ -57,6 +60,7 @@ void MicroStats::start_task(Task task)
     {
         m_cur_timer[m_cur_task] += next_time - m_cur_time;
         level_timer[m_cur_task] += next_time - m_cur_time;
+        m_frame_time += next_time - m_cur_time;
     }
 
     m_cur_time = next_time;
@@ -75,6 +79,11 @@ void MicroStats::end_frame()
     m_cur_frame++;
     m_level_frame++;
 
+    if(m_frame_time > m_slow_frame_time)
+        m_slow_frame_time = m_frame_time;
+
+    m_frame_time = 0;
+
     if(m_cur_frame == 66)
     {
         m_cur_frame = 0;
@@ -86,6 +95,9 @@ void MicroStats::end_frame()
             view_total += (m_cur_timer[i] + 500) / 1000;
             m_cur_timer[i] = 0;
         }
+
+        view_slow_frame_time = (m_slow_frame_time * 66 + 500) / 1000;
+        m_slow_frame_time = 0;
     }
 }
 
