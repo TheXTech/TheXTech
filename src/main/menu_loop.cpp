@@ -52,7 +52,10 @@ static void updateIntroLevelActivity()
 
     SingleCoop = 0;
 
-    if(CheckLiving() == 0)
+    static bool restore_done = false;
+
+    bool any_living = CheckLiving();
+    if(!any_living && !restore_done)
     {
         ShowLayer(LAYER_DESTROYED_BLOCKS);
 
@@ -63,6 +66,12 @@ static void updateIntroLevelActivity()
                 if(NPC[A].TimeLeft > 10) NPC[A].TimeLeft = 10;
             }
         }
+
+        restore_done = true;
+    }
+    else if(any_living)
+    {
+        restore_done = false;
     }
 
     For(A, 1, numPlayers)
