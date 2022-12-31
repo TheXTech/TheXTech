@@ -954,57 +954,63 @@ void UpdateGraphics(bool skipRepaint)
         for(Block_t& b : screenSBlocks) // Display sizable blocks
         {
             g_stats.checkedSzBlocks++;
-            if(BlockIsSizable[b.Type] && (!b.Invis || LevelEditor))
+            if(/*BlockIsSizable[b.Type] &&*/ (!b.Invis || LevelEditor))
             {
-                if(vScreenCollision(Z, b.Location) && !b.Hidden)
+                double bLeftOnscreen = vScreenX[Z] + b.Location.X;
+                if(bLeftOnscreen > vScreen[Z].Width)
+                    continue;
+                double bRightOnscreen = bLeftOnscreen + b.Location.Width;
+                if(bRightOnscreen < 0)
+                    continue;
+
+                double bTopOnscreen = vScreenY[Z] + b.Location.Y;
+                if(bTopOnscreen > vScreen[Z].Height)
+                    continue;
+                double bBottomOnscreen = bTopOnscreen + b.Location.Height;
+                if(bBottomOnscreen < 0)
+                    continue;
+
+                g_stats.renderedSzBlocks++;
+
+                bool show_left = true;
+                if(bLeftOnscreen <= -32)
                 {
-                    g_stats.renderedSzBlocks++;
-                    int bHeight = b.Location.Height / 32.0;
-                    for(B = 0; B < bHeight; B++)
+                    show_left = false;
+                    bLeftOnscreen = std::fmod(bLeftOnscreen, 32);
+                }
+
+                bool show_top = true;
+                if(bTopOnscreen <= -32)
+                {
+                    show_top = false;
+                    bTopOnscreen = std::fmod(bTopOnscreen, 32);
+                }
+
+                double colLast = bRightOnscreen - 32;
+                double rowLast = bBottomOnscreen - 32;
+
+                if(bRightOnscreen > vScreen[Z].Width)
+                    bRightOnscreen = vScreen[Z].Width;
+                if(bBottomOnscreen > vScreen[Z].Height)
+                    bBottomOnscreen = vScreen[Z].Height;
+
+                int src_y = show_top ? 0 : 32;
+                for(double dst_y = bTopOnscreen; dst_y < bBottomOnscreen; dst_y += 32.0)
+                {
+                    if(dst_y >= rowLast)
+                        src_y = 64;
+
+                    int src_x = show_left ? 0 : 32;
+                    for(double dst_x = bLeftOnscreen; dst_x < bRightOnscreen; dst_x += 32.0)
                     {
-                        int bWidth = b.Location.Width / 32.0;
-                        for(C = 0; C < bWidth; C++)
-                        {
-                            tempLocation.X = b.Location.X + C * 32;
-                            tempLocation.Y = b.Location.Y + B * 32;
-                            if(vScreenCollision(Z, tempLocation))
-                            {
-                                D = C;
-                                E = B;
+                        if(dst_x >= colLast)
+                            src_x = 64;
 
-                                if(D != 0)
-                                {
-                                    if(fEqual(D, (b.Location.Width / 32.0) - 1))
-                                        D = 2;
-                                    else
-                                    {
-                                        D = 1;
-                                        d2 = 0.5;
-                                        UNUSED(d2);
-                                    }
-                                }
+                        XRender::renderTexture(dst_x, dst_y, 32, 32, GFXBlockBMP[b.Type], src_x, src_y);
 
-                                if(E != 0)
-                                {
-                                    if(fEqual(E, (b.Location.Height / 32.0) - 1))
-                                        E = 2;
-                                    else
-                                        E = 1;
-                                }
-#if 0 // Simplified below
-                                if((D == 0 || D == 2) || (E == 0 || E == 2) || (b.Type == 130 && (D == 0 || D == 2) && E == 1))
-                                {
-                                    XRender::renderTexture(vScreenX[Z] + b.Location.X + C * 32, vScreenY[Z] + b.Location.Y + B * 32, 32, 32, GFXBlockBMP[b.Type], D * 32, E * 32);
-                                }
-                                else
-                                {
-                                    XRender::renderTexture(vScreenX[Z] + b.Location.X + C * 32, vScreenY[Z] + b.Location.Y + B * 32, 32, 32, GFXBlockBMP[b.Type], D * 32, E * 32);
-                                }
-#endif
-                                XRender::renderTexture(vScreenX[Z] + b.Location.X + C * 32, vScreenY[Z] + b.Location.Y + B * 32, 32, 32, GFXBlockBMP[b.Type], D * 32, E * 32);
-                            }
-                        }
+                        src_x = 32;
                     }
+                    src_y = 32;
                 }
             }
         }
