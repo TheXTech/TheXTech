@@ -265,7 +265,9 @@ if(WIN32)
 endif()
 
 if(THEXTECH_ENABLE_TTF_SUPPORT)
-    if(NOT NINTENDO_3DS)
+    option(THEXTECH_ENABLE_TTF_HARFBUZZ "Enable the HarfBuzz library use" OFF)
+    mark_as_advanced(THEXTECH_ENABLE_TTF_HARFBUZZ) # Temporarily disable
+    if(THEXTECH_ENABLE_TTF_HARFBUZZ AND NOT NINTENDO_3DS)
         include(cmake/library_HarfBuzz.cmake)
     else()
         set(FT_DISABLE_HARFBUZZ ON)
@@ -354,8 +356,9 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
 
-    if(THEXTECH_ENABLE_TTF_SUPPORT)
+    if(THEXTECH_ENABLE_TTF_SUPPORT) # for ZLib
         add_dependencies(FREETYPE_Local AudioCodecs_Local)
+        add_dependencies(FreeImage_Local AudioCodecs_Local)
     endif()
 
     if(NOT THEXTECH_NO_MIXER_X)

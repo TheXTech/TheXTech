@@ -19,6 +19,13 @@ if(USE_SYSTEM_LIBS)
 else()
     set(libFreeType_Libs "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}freetype${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
+    if(NOT THEXTECH_NO_SDL_BUILD)
+        set(USE_FREEIMAGE_SYSTEM_ZLIB ON)
+        # Use Zlib from AudioCodecs kit
+        set(FREETYPE_ZLIB_INCLUDE "${DEPENDENCIES_INSTALL_DIR}/include")
+        set_static_lib(FT_ZLIB      "${DEPENDENCIES_INSTALL_DIR}/lib" zlib)
+    endif()
+
     if(NOT DEFINED FT_DISABLE_HARFBUZZ)
         set(FT_DISABLE_HARFBUZZ OFF)
     endif()
@@ -42,12 +49,13 @@ else()
             "-DDISABLE_FORCE_DEBUG_POSTFIX=ON"
             "-DCMAKE_DEBUG_POSTFIX=${PGE_LIBS_DEBUG_SUFFIX}"
             ${ANDROID_CMAKE_FLAGS}
-            -DFT_DISABLE_ZLIB=ON
+            -DFT_DISABLE_ZLIB=OFF
             -DFT_DISABLE_BZIP2=ON
             -DFT_DISABLE_BROTLI=ON
             -DFT_DISABLE_PNG=ON
-            "-DZLIB_INCLUDE_DIR=${CMAKE_BINARY_DIR}/include"
-            "-DZLIB_LIBRARY=${libZLib_A_Lib}"
+            -DFT_DISABLE_BROTLI=ON
+            "-DZLIB_INCLUDE_DIR=${FREETYPE_ZLIB_INCLUDE}"
+            "-DZLIB_LIBRARY=${FT_ZLIB}"
             -DFT_DISABLE_HARFBUZZ=${FT_DISABLE_HARFBUZZ}
             "-DHARFBUZZ_LIBRARIES=${libHarfBuzz_Libs}"
             -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE
