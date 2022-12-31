@@ -513,9 +513,37 @@ std::vector<NPCRef_t> NoReset_NPCs_LastFrame;
 // does the classic ("onscreen") NPC activation / reset logic for vScreen Z, directly based on the many NPC loops of the original game
 void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
 {
+    // using bitset here instead of simpler set for checkNPCs because I benchmarked it to be faster -- ds-sloth
+    static std::bitset<maxNPCs> NPC_present;
+
+    TreeResult_Sentinel<NPCRef_t> _screenNPCs = treeNPCQuery(-vScreenX[Z], -vScreenY[Z],
+        -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
+        SORTMODE_NONE);
+
+    // combine the onscreen NPCs with the no-reset NPCs
+    std::vector<BaseRef_t>& checkNPCs = *_screenNPCs.i_vec;
+
+    int tree_size = checkNPCs.size();
+
+    for(int16_t n : checkNPCs)
+    {
+        NPC_present[n] = true;
+    }
+
+    for(int16_t n : NoReset_NPCs_LastFrame)
+    {
+        if(n <= numNPCs && !NPC_present[n])
+            checkNPCs.push_back(n);
+    }
+
+    for(int i = 0; i < tree_size; ++i)
+    {
+        NPC_present[(int16_t)checkNPCs[i]] = false;
+    }
+
     Location_t npcALoc;
 
-    for(int A = 1; A <= numNPCs; A++)
+    for(int A : checkNPCs)
     {
         g_stats.checkedNPCs++;
 
