@@ -25,6 +25,7 @@
 #include "game_main.h"
 #include "collision.h"
 #include "layers.h"
+#include "graphics/gfx_update.h"
 
 #include "main/trees.h"
 
@@ -510,6 +511,7 @@ void UpdateEffects()
                     e.Life = 0;
                     e.Frame = 3;
                     Block[e.NewNpc].Hidden = false;
+                    invalidateDrawBlocks();
                 }
                 else
                     e.Life = 10;

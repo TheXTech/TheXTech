@@ -158,6 +158,98 @@ void doShakeScreenClear()
     s_shakeScreen.clear();
 }
 
+// code to facilitate cached values for the onscreen blocks and BGOs
+static std::vector<BlockRef_t> s_drawMainBlocks[2] = {std::vector<BlockRef_t>(400), std::vector<BlockRef_t>(400)};
+static std::vector<BlockRef_t> s_drawLavaBlocks[2] = {std::vector<BlockRef_t>(100), std::vector<BlockRef_t>(100)};
+static std::vector<BlockRef_t> s_drawSBlocks[2] = {std::vector<BlockRef_t>(40), std::vector<BlockRef_t>(40)};
+static std::vector<BaseRef_t> s_drawBGOs[2] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400)};
+static Location_t s_drawBlocks_bounds[2];
+static Location_t s_drawBGOs_bounds[2];
+static double s_drawBlocks_valid_timer[2] = {0, 0};
+static double s_drawBGOs_valid_timer[2] = {0, 0};
+
+bool g_drawBlocks_valid[2] = {false, false};
+bool g_drawBGOs_valid[2] = {false, false};
+
+double g_drawBlocks_invalidate_rate = 0;
+double g_drawBGOs_invalidate_rate = 0;
+
+constexpr double i_drawBlocks_margin = 64;
+constexpr double i_drawBGOs_margin = 128;
+
+void s_UpdateDrawItems(int Z)
+{
+    int i = Z - 1;
+    if(i < 0 || i >= 2)
+        return;
+
+    s_drawBlocks_valid_timer[i] -= g_drawBlocks_invalidate_rate;
+    s_drawBGOs_valid_timer[i] -= g_drawBGOs_invalidate_rate;
+
+    if(!g_drawBlocks_valid[i]
+        || s_drawBlocks_valid_timer[i] <= 0
+        || -vScreenX[Z]                     < s_drawBlocks_bounds[i].X
+        || -vScreenX[Z] + vScreen[Z].Width  > s_drawBlocks_bounds[i].X + s_drawBlocks_bounds[i].Width
+        || -vScreenY[Z]                     < s_drawBlocks_bounds[i].Y
+        || -vScreenY[Z] + vScreen[Z].Height > s_drawBlocks_bounds[i].Y + s_drawBlocks_bounds[i].Height)
+    {
+        g_drawBlocks_valid[i] = true;
+        s_drawBlocks_valid_timer[i] = i_drawBlocks_margin;
+
+        s_drawBlocks_bounds[i] = newLoc(-vScreenX[Z] - i_drawBlocks_margin,
+            -vScreenY[Z] - i_drawBlocks_margin,
+            vScreen[Z].Width + i_drawBlocks_margin * 2,
+            vScreen[Z].Height + i_drawBlocks_margin * 2);
+
+        TreeResult_Sentinel<BlockRef_t> areaBlocks = treeBlockQuery(s_drawBlocks_bounds[i], SORTMODE_ID);
+
+        s_drawSBlocks[i].clear();
+        s_drawMainBlocks[i].clear();
+        s_drawLavaBlocks[i].clear();
+
+        for(BlockRef_t b : areaBlocks)
+        {
+            if(b->Hidden)
+                continue;
+            if(b->Type == 0)
+                continue;
+
+            if(BlockIsSizable[b->Type])
+                s_drawSBlocks[i].push_back(b);
+            else if(BlockKills[b->Type])
+                s_drawLavaBlocks[i].push_back(b);
+            else
+                s_drawMainBlocks[i].push_back(b);
+        }
+
+        // sort the Sizable blocks
+        // cross-ref the dead code at sorting.cpp:qSortSBlocks
+        std::stable_sort(s_drawSBlocks[i].begin(), s_drawSBlocks[i].end(),
+            [](BlockRef_t a, BlockRef_t b) {
+                return a->Location.Y < b->Location.Y;
+            });
+    }
+
+    if(!g_drawBGOs_valid[i]
+        || s_drawBGOs_valid_timer[i] <= 0
+        || -vScreenX[Z]                     < s_drawBGOs_bounds[i].X
+        || -vScreenX[Z] + vScreen[Z].Width  > s_drawBGOs_bounds[i].X + s_drawBGOs_bounds[i].Width
+        || -vScreenY[Z]                     < s_drawBGOs_bounds[i].Y
+        || -vScreenY[Z] + vScreen[Z].Height > s_drawBGOs_bounds[i].Y + s_drawBGOs_bounds[i].Height)
+    {
+        g_drawBGOs_valid[i] = true;
+        s_drawBGOs_valid_timer[i] = i_drawBGOs_margin;
+
+        s_drawBGOs_bounds[i] = newLoc(-vScreenX[Z] - i_drawBGOs_margin,
+            -vScreenY[Z] - i_drawBGOs_margin,
+            vScreen[Z].Width + i_drawBGOs_margin * 2,
+            vScreen[Z].Height + i_drawBGOs_margin * 2);
+
+        s_drawBGOs[i].clear();
+        treeBackgroundQuery(s_drawBGOs[i], s_drawBGOs_bounds[i], SORTMODE_ID);
+    }
+}
+
 void GraphicsLazyPreLoad()
 {
     // TODO: check if this is needed at caller
@@ -252,25 +344,34 @@ void GraphicsLazyPreLoad()
             }
         }
 
-        For(A, 1, numBackground)
-        {
-            auto &b = Background[A];
-            if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBackgroundType))
-                XRender::lazyPreLoad(GFXBackgroundBMP[b.Type]);
-        }
-
         // int64_t fBlock = 0;
         // int64_t lBlock = 0;
         // blockTileGet(-vScreenX[Z], vScreen[Z].Width, fBlock, lBlock);
-        TreeResult_Sentinel<BlockRef_t> screenBlocks = treeBlockQuery(
-            -vScreenX[Z], -vScreenY[Z],
-            -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
-            SORTMODE_ID);
+        s_UpdateDrawItems(Z);
 
-        for(Block_t& b : screenBlocks)
+        for(Block_t& b : s_drawSBlocks[Z - 1])
         {
             if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBlockType))
                 XRender::lazyPreLoad(GFXBlock[b.Type]);
+        }
+
+        for(Block_t& b : s_drawMainBlocks[Z - 1])
+        {
+            if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBlockType))
+                XRender::lazyPreLoad(GFXBlock[b.Type]);
+        }
+
+        for(Block_t& b : s_drawLavaBlocks[Z - 1])
+        {
+            if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBlockType))
+                XRender::lazyPreLoad(GFXBlock[b.Type]);
+        }
+
+        for(BackgroundRef_t bgo : s_drawBGOs[Z - 1])
+        {
+            Background_t& b = bgo;
+            if(vScreenCollision(Z, b.Location) && !b.Hidden && IF_INRANGE(b.Type, 1, maxBackgroundType))
+                XRender::lazyPreLoad(GFXBackgroundBMP[b.Type]);
         }
 
         for(int A = 1; A <= numNPCs; A++)
@@ -776,13 +877,12 @@ void UpdateGraphics(bool skipRepaint)
         XRender::setTargetLayer(1);
 #endif
 
-        // save a vector of all the onscreen BGOs for use at multiple places
-        TreeResult_Sentinel<BackgroundRef_t> _screenBackgrounds = treeBackgroundQuery(
-            -vScreenX[Z], -vScreenY[Z],
-            -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
-            SORTMODE_ID);
-
-        std::vector<BaseRef_t>& screenBackgrounds = *(_screenBackgrounds.i_vec);
+        // update the vectors of all the onscreen blocks and backgrounds for use at multiple places
+        s_UpdateDrawItems(Z);
+        const std::vector<BlockRef_t>& screenMainBlocks = s_drawMainBlocks[Z - 1];
+        const std::vector<BlockRef_t>& screenLavaBlocks = s_drawLavaBlocks[Z - 1];
+        const std::vector<BlockRef_t>& screenSBlocks = s_drawSBlocks[Z - 1];
+        const std::vector<BaseRef_t>& screenBackgrounds = s_drawBGOs[Z - 1];
 
         int nextBackground = 0;
 
@@ -850,30 +950,6 @@ void UpdateGraphics(bool skipRepaint)
 
         tempLocation.Width = 32;
         tempLocation.Height = 32;
-
-        // save a vector of all the onscreen blocks for use at multiple places
-        TreeResult_Sentinel<BlockRef_t> screenBlocks = treeBlockQuery(
-            -vScreenX[Z], -vScreenY[Z],
-            -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
-            SORTMODE_ID);
-
-
-        // first gather all sizable blocks and sort them according to the special sizable ordering
-        static std::vector<BlockRef_t> screenSBlocks(32);
-        screenSBlocks.clear();
-
-        for(BlockRef_t b : screenBlocks)
-        {
-            if(BlockIsSizable[b->Type])
-                screenSBlocks.push_back(b);
-        }
-
-        // cross-ref the dead code at sorting.cpp:qSortSBlocks
-        std::stable_sort(screenSBlocks.begin(), screenSBlocks.end(),
-            [](BlockRef_t a, BlockRef_t b) {
-                return a->Location.Y < b->Location.Y;
-            });
-
 
         for(Block_t& b : screenSBlocks) // Display sizable blocks
         {
@@ -1355,7 +1431,7 @@ void UpdateGraphics(bool skipRepaint)
 //        }
 
 //        For A = fBlock To lBlock 'Non-Sizable Blocks
-        for(Block_t& block : screenBlocks)
+        for(Block_t& block : screenMainBlocks)
         {
             g_stats.checkedBlocks++;
 
@@ -1961,7 +2037,7 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // Blocks in Front
-        for(Block_t& block : screenBlocks)
+        for(Block_t& block : screenLavaBlocks)
         {
             g_stats.checkedBlocks++;
 

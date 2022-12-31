@@ -39,6 +39,8 @@
 #include "main/block_table.h"
 
 #include "npc/npc_queues.h"
+#include "graphics/gfx_update.h"
+
 int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
 
@@ -404,6 +406,9 @@ void ShowLayer(layerindex_t L, bool NoEffect)
             CheckSectionNPC(A);
     }
 
+    if(!Layer[L].blocks.empty())
+        invalidateDrawBlocks();
+
     for(int A : Layer[L].blocks)
     {
             // If Not (Block(A).DefaultType = 0 And Block(A).Layer = "Destroyed Blocks") Then
@@ -492,6 +497,9 @@ void HideLayer(layerindex_t L, bool NoEffect)
                 Deactivate(A);
             }
     }
+
+    if(!Layer[L].blocks.empty())
+        invalidateDrawBlocks();
 
     for(int A : Layer[L].blocks)
     {
@@ -1191,6 +1199,10 @@ void UpdateLayers()
         }
     }
 
+    // set invalidate rate
+    g_drawBlocks_invalidate_rate = 0;
+    g_drawBGOs_invalidate_rate = 0;
+
     for(A = 0; A <= numLayers; A++)
     {
         // only consider non-empty, moving layers
@@ -1255,6 +1267,14 @@ void UpdateLayers()
 
                 bool inactive = !treeBlockLayerActive(A);
 
+                if(!Layer[A].blocks.empty())
+                {
+                    if(std::abs(Layer[A].SpeedX) > g_drawBlocks_invalidate_rate)
+                        g_drawBlocks_invalidate_rate = std::abs(Layer[A].SpeedX);
+                    if(std::abs(Layer[A].SpeedY) > g_drawBlocks_invalidate_rate)
+                        g_drawBlocks_invalidate_rate = std::abs(Layer[A].SpeedY);
+                }
+
                 for(int B : Layer[A].blocks)
                 {
                     // if(Block[B].Layer == Layer[A].Name)
@@ -1270,6 +1290,14 @@ void UpdateLayers()
                 }
 
                 inactive = !treeBackgroundLayerActive(A);
+
+                if(!Layer[A].BGOs.empty())
+                {
+                    if(std::abs(Layer[A].SpeedX) > g_drawBGOs_invalidate_rate)
+                        g_drawBGOs_invalidate_rate = std::abs(Layer[A].SpeedX);
+                    if(std::abs(Layer[A].SpeedY) > g_drawBGOs_invalidate_rate)
+                        g_drawBGOs_invalidate_rate = std::abs(Layer[A].SpeedY);
+                }
 
                 // int allBGOs = numBackground + numLocked;
                 for(int B : Layer[A].BGOs)
@@ -1396,6 +1424,8 @@ void syncLayersTrees_AllBlocks()
 
 void syncLayersTrees_Block(int block)
 {
+    invalidateDrawBlocks();
+
     for(int layer = 0; layer <= numLayers; layer++)
     {
         if(layer != Block[block].Layer)
@@ -1467,6 +1497,8 @@ void syncLayers_AllBGOs()
 
 void syncLayers_BGO(int bgo)
 {
+    invalidateDrawBGOs();
+
     for(int layer = 0; layer <= numLayers; layer++)
     {
         if(layer != Background[bgo].Layer)
