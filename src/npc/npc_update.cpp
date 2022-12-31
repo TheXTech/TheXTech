@@ -316,39 +316,56 @@ void UpdateNPCs()
                     if(NPC[A].GeneratorTime >= NPC[A].GeneratorTimeMax * 6.5f)
                     {
                         tempBool = false;
-                        for(B = 1; B <= numNPCs; B++)
+
+                        if(numNPCs == maxNPCs - 100)
+                            tempBool = true;
+
+                        if(NPC[A].Type != 91 && !tempBool)
                         {
-                            if(B != A && NPC[B].Active && NPC[B].Type != 57)
+                            for(B = 1; B <= numPlayers; B++)
                             {
-                                if(CheckCollision(NPC[A].Location, NPC[B].Location))
-                                    tempBool = true;
+                                if(!Player[B].Dead && Player[B].TimeToLive == 0)
+                                {
+                                    if(CheckCollision(NPC[A].Location, Player[B].Location))
+                                    {
+                                        tempBool = true;
+                                        break;
+                                    }
+                                }
                             }
                         }
 
-                        if(NPC[A].Type != 91)
+                        if(NPC[A].Type != 91 && !tempBool)
                         {
-                            for(B = 1; B <= numBlock; B++)
+                            for(int B : treeBlockQuery(NPC[A].Location, SORTMODE_NONE))
                             {
                                 if(!Block[B].Hidden && !BlockIsSizable[Block[B].Type])
                                 {
                                     if(CheckCollision(NPC[A].Location,
                                                       newLoc(Block[B].Location.X + 0.1, Block[B].Location.Y + 0.1,
                                                              Block[B].Location.Width - 0.2, Block[B].Location.Height - 0.2)))
+                                    {
                                         tempBool = true;
-                                }
-                            }
-                            for(B = 1; B <= numPlayers; B++)
-                            {
-                                if(!Player[B].Dead && Player[B].TimeToLive == 0)
-                                {
-                                    if(CheckCollision(NPC[A].Location, Player[B].Location))
-                                        tempBool = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
 
-                        if(numNPCs == maxNPCs - 100)
-                            tempBool = true;
+                        if(!tempBool)
+                        {
+                            for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
+                            {
+                                if(B != A && NPC[B].Active && NPC[B].Type != 57)
+                                {
+                                    if(CheckCollision(NPC[A].Location, NPC[B].Location))
+                                    {
+                                        tempBool = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 
                         if(tempBool)
                             NPC[A].GeneratorTime = NPC[A].GeneratorTimeMax;
