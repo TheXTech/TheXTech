@@ -49,6 +49,7 @@ struct AugBaseRef_t
 
 struct node_t
 {
+    // not safe to change this
     static constexpr int node_size = 4;
 
     node_t* next = nullptr;
@@ -94,8 +95,13 @@ struct node_t
         {
             if(this->parent)
             {
-                this->i += 1;
-                this->check_linkage();
+                this->i++;
+                if(this->i == this->parent->filled)
+                {
+                    this->parent = this->parent->next;
+                    this->i = 0;
+                    this->check_linkage();
+                }
             }
             return *this;
         }
@@ -216,6 +222,9 @@ struct rect_internal
 
     inline iterator begin() const
     {
+        // could consider an optimization where != is only properly implemented for != end(),
+        // removing this condition and replacing the `||` in != with `&&`.
+
         if(t == b || l == r)
             return end();
 
@@ -336,7 +345,7 @@ struct table_t
 
     void query(std::vector<BaseRef_t>& out, const rect_external& rect)
     {
-        if(columns.size() == 0)
+        if(columns.size() == 0 || member_rects.size() == 0)
             return;
 
         int lcol = rect.l / 2048;
