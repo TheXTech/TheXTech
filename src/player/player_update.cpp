@@ -4223,7 +4223,7 @@ void UpdatePlayer()
                             YoshiPound(A, Player[A].Mount, true);
                             Block[numBlock].Location.Y = 0;
                             numBlock--;
-                            syncLayersTrees_Block(numBlock);
+                            syncLayersTrees_Block(numBlock + 1);
                             Player[A].GroundPound = false;
                         }
                         else if(Player[A].YoshiYellow)
@@ -4235,7 +4235,7 @@ void UpdatePlayer()
                             YoshiPound(A, Player[A].Mount);
                             Block[numBlock].Location.Y = 0;
                             numBlock--;
-                            syncLayersTrees_Block(numBlock);
+                            syncLayersTrees_Block(numBlock + 1);
                         }
                     }
                     if(NPC[B].playerTemp == 0)
