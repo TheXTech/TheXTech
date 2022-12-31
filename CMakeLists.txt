@@ -135,6 +135,12 @@ else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
 endif()
 
+if(NINTENDO_WII OR NINTENDO_3DS)
+    set(THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT OFF)
+else()
+    set(THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT ON)
+endif()
+
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
 option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_SDL2_DEFAULT})
 
@@ -158,7 +164,7 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
-option(THEXTECH_ENABLE_TTF_SUPPORT "Enable TTF fonts support (FreeType required)" ON)
+option(THEXTECH_ENABLE_TTF_SUPPORT "Enable TTF fonts support (FreeType required)" ${THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT})
 
 option(THEXTECH_CLI_BUILD "Minimal CLI build for testing and benchmarking on desktop platforms" OFF)
 option(THEXTECH_NO_SDL_BUILD "Do not use SDL in the CLI build; useful as a starting point for new ports" OFF)
@@ -359,7 +365,9 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
 
     if(NOT USE_SYSTEM_ZLIB) # Depend on ZLib at AudioCodecs
-        add_dependencies(FREETYPE_Local AudioCodecs_Local)
+        if(TARGET FREETYPE_Local)
+            add_dependencies(FREETYPE_Local AudioCodecs_Local)
+        endif()
         add_dependencies(FreeImage_Local AudioCodecs_Local)
     endif()
 

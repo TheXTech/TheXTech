@@ -25,12 +25,16 @@
 // TODO: Implement here branching between platform specific StdPictureData variants
 
 #ifdef __3DS__
+#   define PICTURE_DATA_3DS
 #   include "3ds/picture_data_3ds.h"
 #elif defined(__WII__)
+#   define PICTURE_DATA_WII
 #   include "wii/picture_data_wii.h"
 #elif defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
+#   define PICTURE_DATA_NULL
 #   include "null/picture_data_null.h"
 #else
+#   define PICTURE_DATA_NORMAL
 #   include "sdl/picture_data_sdl.h"
 #endif
 

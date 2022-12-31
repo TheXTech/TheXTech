@@ -24,6 +24,7 @@
 #define PICTURE_DATA_WII_H
 
 #include <cstdint>
+#include <cstdlib>
 #include <gccore.h>
 
 // this is the key line to toggle between TPL mode and PNG/GIF mode
