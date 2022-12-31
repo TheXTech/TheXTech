@@ -73,7 +73,7 @@ static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
     tempLocation.Height = 600;
 
     C = 0;
-    for(B = 1; B <= numBlock; B++)
+    for(int B : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
     {
         if(CheckCollision(tempLocation, Block[B].Location))
         {
@@ -126,7 +126,7 @@ static void setupCheckpoints()
     {
         auto &cp = CheckpointsList[size_t(cpId)];
 
-        for(int numNPCsMax = numNPCs, A = 1; A <= numNPCsMax; A++)
+        for(int A = 1; A <= numNPCs; A++)
         {
             if(NPC[A].Type != 192)
                 continue;
@@ -2366,8 +2366,14 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
         }
     }
 
-    for(int numNPCsMax5 = numNPCs, A = 1; A <= numNPCsMax5; A++)
+    int numNPCsMax5 = numNPCs;
+
+    // need this complex loop syntax because Active can be modified within it
+    for(int A : NPCQueues::Active.may_erase)
     {
+        if(A > numNPCsMax5)
+            continue;
+
         if(NPC[A].Active && NPC[A].Effect == 0 && !(NPCIsAnExit[NPC[A].Type] || (NPCIsACoin[NPC[A].Type] && !Stab)) &&
             NPC[A].CantHurtPlayer != plr && !(p.StandingOnNPC == A && p.ShellSurf))
         {
@@ -2526,7 +2532,7 @@ void YoshiEat(const int A)
         }
     }
 
-    for(int numNPCsMax6 = numNPCs, B = 1; B <= numNPCsMax6; B++)
+    for(int B : treeNPCQuery(p.YoshiTongue, SORTMODE_ID))
     {
         auto &n = NPC[B];
         if(((NPCIsACoin[n.Type] && n.Special == 1) || !NPCNoYoshi[n.Type]) &&
@@ -2778,7 +2784,7 @@ void YoshiSpit(const int A)
 
 void YoshiPound(const int A, int mount, bool BreakBlocks)
 {
-    int B = 0;
+    // int B = 0;
     Location_t tempLocation;
     Location_t tempLocation2;
     auto &p = Player[A];
@@ -2791,7 +2797,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
         tempLocation.Height = 32;
         tempLocation.Y = p.Location.Y + p.Location.Height - 16;
 
-        for(int numNPCsMax7 = numNPCs, B = 1; B <= numNPCsMax7; B++)
+        for(int B : NPCQueues::Active.may_erase)
         {
             if(!NPC[B].Hidden && NPC[B].Active && NPC[B].Effect == 0)
             {
@@ -2808,9 +2814,11 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
 
         if(BreakBlocks)
         {
-            for(B = 1; B <= numBlock; B++)
+            for(BlockRef_t block : treeBlockQuery(p.Location, SORTMODE_COMPAT))
             {
-                auto &b = Block[B];
+                Block_t& b = block;
+                int B = block;
+
                 if(b.Hidden || b.Invis || BlockNoClipping[b.Type] || BlockIsSizable[b.Type])
                     continue;
 
@@ -3879,12 +3887,15 @@ void ClownCar()
                     tempLocation.Width -= 1;
                     tempLocation.Height = 1;
 
-                    for(int numNPCsMax10 = numNPCs, C = 1; C <= numNPCsMax10; C++)
+                    for(int C : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
                         if(B != C && (NPC[C].standingOnPlayer == A || NPC[C].playerTemp))
                         {
                             if(CheckCollision(tempLocation, NPC[C].Location))
+                            {
                                 tempBool = true;
+                                break;
+                            }
                         }
                     }
 
@@ -4101,14 +4112,17 @@ void PowerUps(const int A)
 
     if(p.State == 6 && p.Character == 4 && p.Controls.Run && p.RunRelease)
     {
-        for(int numNPCsMax11 = numNPCs, B = 1; B <= numNPCsMax11; B++)
+        for(int B : NPCQueues::Active.no_change)
         {
             if(NPC[B].Active)
             {
                 if(NPC[B].Type == 292)
                 {
                     if(Maths::iRound(NPC[B].Special5) == A)
+                    {
                         BoomOut = true;
+                        break;
+                    }
                 }
             }
         }

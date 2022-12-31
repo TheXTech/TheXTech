@@ -656,7 +656,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 do
                 {
                     tempBool = true;
-                    for(int B = 1; B <= numBlock; ++B)
+                    for(int B : treeBlockQuery(p.Location, SORTMODE_NONE))
                     {
                         if(CheckCollision(p.Location, Block[B].Location))
                         {

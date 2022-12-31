@@ -108,13 +108,16 @@ static void updateIntroLevelActivity()
                 tempLocation.Y = p.Location.Y + p.Location.Height - 22;
                 tempLocation.X = p.Location.X + p.Location.Width;
 
-                For(B, 1, numNPCs)
+                for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
                        !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
                     {
                         if(CheckCollision(tempLocation, NPC[B].Location))
+                        {
                             p.Controls.Run = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -139,7 +142,7 @@ static void updateIntroLevelActivity()
                 tempLocation.Y = p.Location.Y + 4;
                 tempLocation.X = p.Location.X + p.Location.Width;
 
-                For(B, 1, numNPCs)
+                for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
                       !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
@@ -164,7 +167,7 @@ static void updateIntroLevelActivity()
                     tempLocation.Y = level[0].Y;
                     tempLocation.X = p.Location.X;
 
-                    For(B, 1, numNPCs)
+                    for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
                         if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
                            !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
@@ -185,7 +188,7 @@ static void updateIntroLevelActivity()
                     tempLocation.Y = p.Location.Y;
                     tempLocation.X = p.Location.X;
 
-                    For(B, 1, numNPCs)
+                    for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
                         if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
                            !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
@@ -270,12 +273,13 @@ static void updateIntroLevelActivity()
             do
             {
                 tempBool = true;
-                For(B, 1, numBlock)
+                for(int B : treeBlockQuery(p.Location, SORTMODE_NONE))
                 {
                     if(CheckCollision(p.Location, Block[B].Location))
                     {
                         p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
                         tempBool = false;
+                        break;
                     }
                 }
             } while(!tempBool);
@@ -424,7 +428,7 @@ static void updateIntroLevelActivity()
             tempLocation.Width = 95;
             tempLocation.Height -= 1;
 
-            for(auto B = 1; B <= numBlock; B++)
+            for(int B : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
                 if(BlockSlope[Block[B].Type] == 0 && !BlockIsSizable[Block[B].Type] &&
                    !BlockOnlyHitspot1[Block[B].Type] && !Block[B].Hidden)
@@ -449,7 +453,7 @@ static void updateIntroLevelActivity()
             tempLocation.X = Player[A].Location.X + Player[A].Location.Width;
             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height;
 
-            for(auto B = 1; B <= numBlock; B++)
+            for(int B : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
                 if((!BlockIsSizable[Block[B].Type] || Block[B].Location.Y > Player[A].Location.Y + Player[A].Location.Height - 1) &&
                    !BlockOnlyHitspot1[Block[B].Type] && !Block[B].Hidden)
@@ -525,18 +529,20 @@ void MenuLoop()
 
     if(SharedCursor.Primary)
     {
+        Location_t mouseLoc = newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]);
+
         if(iRand(5) >= 2)
         {
-            NewEffect(80, newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]));
+            NewEffect(80, mouseLoc);
             Effect[numEffects].Location.SpeedX = dRand() * 4 - 2;
             Effect[numEffects].Location.SpeedY = dRand() * 4 - 2;
         }
 
-        For(A, 1, numNPCs)
+        for(int A : treeNPCQuery(mouseLoc, SORTMODE_NONE))
         {
             if(NPC[A].Active)
             {
-                if(CheckCollision(newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]), NPC[A].Location))
+                if(CheckCollision(mouseLoc, NPC[A].Location))
                 {
                     if(!NPCIsACoin[NPC[A].Type])
                     {
@@ -555,11 +561,11 @@ void MenuLoop()
             }
         }
 
-        For(A, 1, numBlock)
+        for(int A : treeBlockQuery(mouseLoc, SORTMODE_COMPAT))
         {
             if(!Block[A].Hidden)
             {
-                if(CheckCollision(newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]), Block[A].Location))
+                if(CheckCollision(mouseLoc, Block[A].Location))
                 {
                     BlockHit(A);
                     BlockHitHard(A);

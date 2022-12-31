@@ -522,7 +522,7 @@ void UpdateNPCs()
                 tempLocation.Width += 64;
                 tempLocation.Height += 64;
 
-                for(B = 1; B <= numNPCs; B++)
+                for(int B : treeNPCQuery(tempLocation, SORTMODE_ID))
                 {
                     if(!NPC[B].Active && B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
                     {
@@ -569,7 +569,8 @@ void UpdateNPCs()
                         tempLocation.X -= 32;
                         tempLocation.Width += 64;
                         tempLocation.Height += 64;
-                        for(B = 1; B <= numNPCs; B++)
+
+                        for(int B : treeNPCQuery(tempLocation, SORTMODE_ID))
                         {
                             if(!NPC[B].Active &&
                               (!NPC[B].Hidden || !g_compatibility.fix_npc_activation_event_loop_bug) &&
@@ -602,7 +603,7 @@ void UpdateNPCs()
 
             if(NPC[A].Type == 208)
             {
-                for(B = 1; B <= numNPCs; B++)
+                for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
                 {
                     if(NPC[B].Type != 208 && NPC[B].Effect == 0 && NPC[B].Active)
                     {
@@ -810,7 +811,7 @@ void UpdateNPCs()
                     tempLocation = NPC[A].Location;
                     tempLocation.Height = 8000;
                     int C = 0;
-                    for(B = 1; B <= numBlock; B++)
+                    for(int B : treeBlockQueryWithTemp(tempLocation, SORTMODE_COMPAT))
                     {
                         if(CheckCollision(tempLocation, Block[B].Location))
                         {
@@ -1269,7 +1270,7 @@ void UpdateNPCs()
                              NPC[A].Type == 49 || NPC[A].Type == 134 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) ||
                              NPC[A].Type == 31 || NPC[A].Type == 240 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 292))
                         {
-                            for(B = 1; B <= numNPCs; B++)
+                            for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
                             {
                                 if(B != A && NPC[B].Active &&
                                    (NPC[B].HoldingPlayer == 0 || (BattleMode && NPC[B].HoldingPlayer != NPC[A].HoldingPlayer)) &&
@@ -3492,7 +3493,7 @@ void UpdateNPCs()
 
                             if(!(NPC[A].Type >= 79 && NPC[A].Type <= 83) && !NPC[A].Inert)
                             {
-                                for(int C = 1; C <= numNPCs; C++)
+                                for(int C : treeNPCQuery(tempLocation, SORTMODE_NONE))
                                 {
                                     if(A != C && NPC[C].Active && !NPC[C].Projectile)
                                     {
@@ -3575,7 +3576,7 @@ void UpdateNPCs()
                                 NPC[A].Type != 282 && NPC[A].Type != 288 && NPC[A].Type != 289)
                             {
 
-                                for(B = 1; B <= numNPCs; B++)
+                                for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
                                 {
                                     if(B != A && NPC[B].Active)
                                     {

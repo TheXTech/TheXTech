@@ -577,11 +577,11 @@ void NPCHit(int A, int B, int C)
     // Mother Brain
     else if(NPC[A].Type == NPCID_MOTHERBRAIN)
     {
-        int D = 0;
+        // int D = 0;
         bool tempBool;
         tempBool = false;
 
-        for(D = 1; D <= numNPCs; D++)
+        for(int D : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
         {
             if(NPC[D].Type == 208)
             {

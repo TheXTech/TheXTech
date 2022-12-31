@@ -195,7 +195,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     X = Location.X + Location.Width / 2.0;
     Y = Location.Y + Location.Height / 2.0;
 
-    for(i = 1; i <= numNPCs; i++)
+    for(int i : treeNPCQuery(newLoc(X - Radius, Y - Radius, Radius * 2, Radius * 2), SORTMODE_ID))
     {
         if(!NPC[i].Hidden && NPC[i].Active && !NPC[i].Inert && !NPC[i].Generator && !NPCIsABonus[NPC[i].Type])
         {
@@ -220,7 +220,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
         }
     }
 
-    for(i = 1; i <= numBlock; i++)
+    for(int i : treeBlockQueryWithTemp(newLoc(X - Radius, Y - Radius, Radius * 2, Radius * 2), SORTMODE_COMPAT))
     {
         if(!Block[i].Hidden && !BlockNoClipping[Block[i].Type])
         {
@@ -379,7 +379,7 @@ void SkullRide(int A, bool reEnable)
 
     int spec = reEnable ? 2 : 0;
 
-    for(int B = 1; B <= numNPCs; B++) // Recursively activate all neihbour skull-ride segments
+    for(int B : treeNPCQuery(loc, SORTMODE_ID)) // Recursively activate all neihbour skull-ride segments
     {
         auto &npc = NPC[B];
         if(npc.Type == 190)
@@ -440,7 +440,7 @@ void SkullRideDone(int A, const Location_t &alignAt)
     loc.Height += 30;
     loc.Y -= 15;
 
-    for(int B = 1; B <= numNPCs; B++) // Recursively DE-activate all neighbour skull-ride segments
+    for(int B : treeNPCQuery(loc, SORTMODE_ID)) // Recursively DE-activate all neighbour skull-ride segments
     {
         auto &npc = NPC[B];
         if(npc.Type == 190)
@@ -663,7 +663,7 @@ void NPCSpecial(int A)
             tempLocation.Height = 1;
             tempBool = false;
 
-            for(int i = 1; i <= numNPCs; i++)
+            for(int i : treeNPCQuery(tempLocation, SORTMODE_NONE))
             {
                 auto &n = NPC[i];
                 if(n.Active && !n.Hidden && NPCIsAVine[n.Type] && CheckCollision(tempLocation, n.Location))
@@ -1829,7 +1829,7 @@ void NPCSpecial(int A)
     }
     else if(npc.Type == NPCID_LOCKDOOR)
     {
-        for(int i = 1; i <= numNPCs; i++)
+        for(int i : treeNPCQuery(npc.Location, SORTMODE_NONE))
         {
             auto &n = NPC[i];
             if(n.Type == NPCID_KEY && n.Active && n.HoldingPlayer != 0 && CheckCollision(npc.Location, n.Location))
@@ -2762,7 +2762,7 @@ void NPCSpecial(int A)
             tempLocation = npc.Location;
             tempLocation.Height = 8000;
             int C = 0;
-            for(int i = 1; i <= numBlock; i++)
+            for(int i : treeBlockQueryWithTemp(tempLocation, SORTMODE_COMPAT))
             {
                 if(CheckCollision(tempLocation, Block[i].Location))
                 {
@@ -3133,7 +3133,7 @@ void SpecialNPC(int A)
         NPC[A].Location.SpeedY += (playerVCenter - NPC[A].Location.Y + NPC[A].Location.Height / 2.0) * 0.004;
 
 
-        for(B = 1; B <= numNPCs; B++)
+        for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
         {
             if(NPC[B].Active)
             {
@@ -3166,7 +3166,7 @@ void SpecialNPC(int A)
                 NPCQueues::Killed.push_back(A);
                 Player[NPC[A].Special5].FrameCount = 115;
                 PlaySound(SFX_Grab2);
-                for(B = 1; B <= numNPCs; B++)
+                for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
                 {
                     if(NPC[B].Active)
                     {
@@ -4686,7 +4686,7 @@ void SpecialNPC(int A)
                 D = 1;
             else
             {
-                for(int Ei = 1; Ei <= numBlock; Ei++)
+                for(int Ei : treeBlockQueryWithTemp(tempLocation, SORTMODE_NONE))
                 {
                     if(!BlockNoClipping[Block[Ei].Type] &&
                        !BlockIsSizable[Block[Ei].Type] &&
@@ -5241,7 +5241,7 @@ void SpecialNPC(int A)
                 D = 1;
             else
             {
-                for(int Ei = 1; Ei <= numBlock; Ei++)
+                for(int Ei : treeBlockQueryWithTemp(tempLocation, SORTMODE_NONE))
                 {
                     if(CheckCollision(tempLocation, Block[Ei].Location) && !BlockNoClipping[Block[Ei].Type])
                     {
@@ -5346,7 +5346,7 @@ void SpecialNPC(int A)
                     tempLocation.Width += 32;
                     tempLocation.X -= 16;
 
-                    for(B = 1; B <= numNPCs; B++)
+                    for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
                         if(NPC[B].Active && NPC[B].Section == NPC[A].Section && !NPC[B].Hidden && NPC[B].HoldingPlayer == 0)
                         {
@@ -5382,7 +5382,7 @@ void SpecialNPC(int A)
         NPC[A].Projectile = false;
     else if(NPC[A].Type == 50) // killer plant destroys blocks
     {
-        for(B = 1; B <= numBlock; B++)
+        for(int B : treeBlockQueryWithTemp(NPC[A].Location, SORTMODE_COMPAT))
         {
             if(CheckCollision(NPC[A].Location, Block[B].Location))
             {

@@ -47,7 +47,7 @@
 
 void UpdatePlayer()
 {
-    int A = 0;
+    // int A = 0;
     int B = 0;
     float C = 0;
     float D = 0;
@@ -514,10 +514,8 @@ void UpdatePlayer()
                             }
                         }
 
-                        for(int numNPCsMax2 = numNPCs, B = 1; B <= numNPCsMax2; B++)
+                        if(!tempBool) for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                         {
-                            if(!tempBool)
-                                break;
                             if(NPCIsABlock[NPC[B].Type] && !NPCStandsOnPlayer[NPC[B].Type] && NPC[B].Active && NPC[B].Type != 56)
                             {
                                 if(CheckCollision(tempLocation, NPC[B].Location))
@@ -979,7 +977,7 @@ void UpdatePlayer()
                         tempLocation.X -= 16;
                         tempLocation.Y -= 16;
 
-                        for(int numNPCsMax4 = numNPCs, Bi = 1; Bi <= numNPCsMax4; Bi++)
+                        for(int Bi : treeNPCQuery(tempLocation, SORTMODE_NONE))
                         {
                             if(NPC[Bi].Active && !NPC[Bi].Hidden && NPCIsAVine[NPC[Bi].Type])
                             {
@@ -987,6 +985,7 @@ void UpdatePlayer()
                                 {
                                     Player[A].FairyTime = 20;
                                     Player[A].FairyCD = 0;
+                                    break;
                                 }
                             }
                         }
@@ -3211,7 +3210,7 @@ void UpdatePlayer()
                 tempHit = false; // Used for JUMP detection
                 tempHit2 = false;
 
-                for(int tempNumNPCsMax = numNPCs, B = 1; B <= tempNumNPCsMax; B++)
+                for(int B : treeNPCQuery(Player[A].Location, SORTMODE_ID))
                 {
                     if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect != 5 && NPC[B].Effect != 6)
                     {
