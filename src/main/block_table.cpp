@@ -813,11 +813,23 @@ TreeResult_Sentinel<WaterRef_t> treeWaterQuery(double Left, double Top, double R
                          int sort_mode,
                          double margin)
 {
+    if(numWater == 0)
+    {
+        TreeResult_Sentinel<WaterRef_t> empty;
+        return empty;
+    }
+
     return s_water_tables.query(Left, Top, Right, Bottom, sort_mode, margin);
 }
 
 TreeResult_Sentinel<WaterRef_t> treeWaterQuery(const Location_t &loc,
                          int sort_mode)
 {
+    if(numWater == 0)
+    {
+        TreeResult_Sentinel<WaterRef_t> empty;
+        return empty;
+    }
+
     return s_water_tables.query(loc, sort_mode);
 }
