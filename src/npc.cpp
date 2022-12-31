@@ -47,7 +47,6 @@
 
 void CheckSectionNPC(int A)
 {
-    int B = 0;
     if(GameMenu)
         return;
 
@@ -58,6 +57,8 @@ void CheckSectionNPC(int A)
         NPC[A].Section = Player[NPC[A].HoldingPlayer].Section;
     }
 
+    // Previously, it optimized for section 0. Now, it optimizes for NPC's current section.
+    int B = NPC[A].Section;
     if(NPC[A].Location.X >= level[B].X)
     {
         if(NPC[A].Location.X + NPC[A].Location.Width <= level[B].Width)
@@ -66,12 +67,12 @@ void CheckSectionNPC(int A)
             {
                 if(NPC[A].Location.Y + NPC[A].Location.Height <= level[B].Height)
                 {
-                    NPC[A].Section = B;
                     return;
                 }
             }
         }
     }
+
     for(B = 0; B <= numSections; B++)
     {
         if(NPC[A].Location.X >= level[B].X)
