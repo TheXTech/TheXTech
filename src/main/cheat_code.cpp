@@ -2264,3 +2264,10 @@ bool cheats_contains(const std::string &needle)
     auto bufLen = s_buffer.getBugLen();
     return cheatCompare(bufLen, buf, needle.size(), needle.c_str());
 }
+
+bool cheats_contains(const char *needle)
+{
+    const char *buf = s_buffer.getString();
+    auto bufLen = s_buffer.getBugLen();
+    return cheatCompare(bufLen, buf, SDL_strlen(needle), needle);
+}
