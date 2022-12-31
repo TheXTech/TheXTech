@@ -20,10 +20,14 @@ else()
     set(libFreeType_Libs "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}freetype${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
 
     if(NOT THEXTECH_NO_SDL_BUILD)
-        set(USE_FREEIMAGE_SYSTEM_ZLIB ON)
         # Use Zlib from AudioCodecs kit
-        set(FREETYPE_ZLIB_INCLUDE "${DEPENDENCIES_INSTALL_DIR}/include")
-        set_static_lib(FT_ZLIB      "${DEPENDENCIES_INSTALL_DIR}/lib" zlib)
+        if(USE_SYSTEM_ZLIB)
+            set(FREETYPE_ZLIB_INCLUDE ${ZLIB_INCLUDE_DIRS})
+            set(FREETYPE_ZLIB_LIBS ${ZLIB_LIBRARIES})
+        else()
+            set(FREETYPE_ZLIB_INCLUDE "${DEPENDENCIES_INSTALL_DIR}/include")
+            set(FREETYPE_ZLIB_LIBS ${AC_ZLIB})
+        endif()
     endif()
 
     if(NOT DEFINED FT_DISABLE_HARFBUZZ)
@@ -55,7 +59,7 @@ else()
             -DFT_DISABLE_PNG=ON
             -DFT_DISABLE_BROTLI=ON
             "-DZLIB_INCLUDE_DIR=${FREETYPE_ZLIB_INCLUDE}"
-            "-DZLIB_LIBRARY=${FT_ZLIB}"
+            "-DZLIB_LIBRARY=${AC_ZLIB}"
             -DFT_DISABLE_HARFBUZZ=${FT_DISABLE_HARFBUZZ}
             "-DHARFBUZZ_LIBRARIES=${libHarfBuzz_Libs}"
             -DCMAKE_DISABLE_FIND_PACKAGE_PNG=TRUE

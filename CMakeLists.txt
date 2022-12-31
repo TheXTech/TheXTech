@@ -264,6 +264,8 @@ if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
 
+include(cmake/library_zlib.cmake)
+
 if(THEXTECH_ENABLE_TTF_SUPPORT)
     option(THEXTECH_ENABLE_TTF_HARFBUZZ "Enable the HarfBuzz library use" OFF)
     mark_as_advanced(THEXTECH_ENABLE_TTF_HARFBUZZ) # Temporarily disable
@@ -356,7 +358,7 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
 
-    if(THEXTECH_ENABLE_TTF_SUPPORT) # for ZLib
+    if(NOT USE_SYSTEM_ZLIB) # Depend on ZLib at AudioCodecs
         add_dependencies(FREETYPE_Local AudioCodecs_Local)
         add_dependencies(FreeImage_Local AudioCodecs_Local)
     endif()

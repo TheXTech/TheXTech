@@ -15,12 +15,6 @@ else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
 endif()
 
-if(NINTENDO_SWITCH OR XTECH_MACOSX_TIGER)
-    set(PGE_SYSTEM_ZLIB_DEFAULT ON)
-else()
-    set(PGE_SYSTEM_ZLIB_DEFAULT OFF)
-endif()
-
 if(NOT PGE_SHARED_SDLMIXER_FORCE_OFF)
     option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
 else()
@@ -31,12 +25,6 @@ if(NOT VITA AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGE
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
 else()
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." OFF)
-endif()
-
-option(USE_SYSTEM_ZLIB "Use zlib library from the system" ${PGE_SYSTEM_ZLIB_DEFAULT})
-
-if(USE_SYSTEM_ZLIB)
-    find_package(ZLIB REQUIRED)
 endif()
 
 set(MIXER_USE_OGG_VORBIS_FILE OFF)
