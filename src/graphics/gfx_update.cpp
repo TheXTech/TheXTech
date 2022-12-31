@@ -1047,11 +1047,23 @@ void UpdateGraphics(bool skipRepaint)
                 A = screenBackgrounds[nextBackground];
 
                 g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+
+                if(Background[A].Hidden)
+                    continue;
+
+                double sX = vScreenX[Z] + Background[A].Location.X;
+                if(sX > vScreen[Z].Width)
+                    continue;
+
+                double sY = vScreenY[Z] + Background[A].Location.Y;
+                if(sY > vScreen[Z].Height)
+                    continue;
+
+                if(sX + Background[A].Location.Width >= 0 && sY + Background[A].Location.Height >= 0 /*&& !Background[A].Hidden*/)
                 {
                     g_stats.renderedBGOs++;
-                    XRender::renderTexture(vScreenX[Z] + Background[A].Location.X,
-                                          vScreenY[Z] + Background[A].Location.Y,
+                    XRender::renderTexture(sX,
+                                          sY,
                                           BackgroundWidth[Background[A].Type],
                                           BackgroundHeight[Background[A].Type],
                                           GFXBackgroundBMP[Background[A].Type],
@@ -1441,16 +1453,24 @@ void UpdateGraphics(bool skipRepaint)
         {
             g_stats.checkedBlocks++;
 
-            if(!BlockIsSizable[block.Type] && (!block.Invis || (LevelEditor && BlockFlash <= 30)) && block.Type != 0 && !BlockKills[block.Type])
+            if(/*!BlockIsSizable[block.Type] &&*/ (!block.Invis || (LevelEditor && BlockFlash <= 30)) /*&& block.Type != 0 && !BlockKills[block.Type]*/)
             {
-                if(vScreenCollision(Z, block.Location) && !block.Hidden)
+                double sX = vScreenX[Z] + block.Location.X;
+                if(sX > vScreen[Z].Width)
+                    continue;
+
+                double sY = vScreenY[Z] + block.Location.Y;
+                if(sY > vScreen[Z].Height)
+                    continue;
+
+                if(sX + block.Location.Width >= 0 && sY + block.Location.Height >= 0 /*&& !block.Hidden*/)
                 {
                     g_stats.renderedBlocks++;
                     // Don't show a visual difference of hit-resized block in a comparison to original state
                     double offX = block.wasShrinkResized ? 0.05 : 0.0;
                     double offW = block.wasShrinkResized ? 0.1 : 0.0;
-                    XRender::renderTexture(vScreenX[Z] + block.Location.X - offX,
-                                          vScreenY[Z] + block.Location.Y + block.ShakeY3,
+                    XRender::renderTexture(sX - offX,
+                                          sY + block.ShakeY3,
                                           block.Location.Width + offW,
                                           block.Location.Height,
                                           GFXBlock[block.Type],
@@ -1974,10 +1994,22 @@ void UpdateGraphics(bool skipRepaint)
                 A = screenBackgrounds[nextBackground];
 
                 g_stats.checkedBGOs++;
-                if(vScreenCollision(Z, Background[A].Location) && !Background[A].Hidden)
+
+                if(Background[A].Hidden)
+                    continue;
+
+                double sX = vScreenX[Z] + Background[A].Location.X;
+                if(sX > vScreen[Z].Width)
+                    continue;
+
+                double sY = vScreenY[Z] + Background[A].Location.Y;
+                if(sY > vScreen[Z].Height)
+                    continue;
+
+                if(sX + Background[A].Location.Width >= 0 && sY + Background[A].Location.Height >= 0 /*&& !Background[A].Hidden*/)
                 {
                     g_stats.renderedBGOs++;
-                    XRender::renderTexture(vScreenX[Z] + Background[A].Location.X, vScreenY[Z] + Background[A].Location.Y, GFXBackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type], GFXBackground[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
+                    XRender::renderTexture(sX, sY, GFXBackgroundWidth[Background[A].Type], BackgroundHeight[Background[A].Type], GFXBackground[Background[A].Type], 0, BackgroundHeight[Background[A].Type] * BackgroundFrame[Background[A].Type]);
                 }
             }
 //        End If
@@ -2047,9 +2079,9 @@ void UpdateGraphics(bool skipRepaint)
         {
             g_stats.checkedBlocks++;
 
-            if(BlockKills[block.Type])
+            // if(BlockKills[block.Type])
             {
-                if(vScreenCollision(Z, block.Location) && !block.Hidden)
+                if(vScreenCollision(Z, block.Location) /*&& !block.Hidden*/)
                 {
                     g_stats.renderedBlocks++;
                     // Don't show a visual difference of hit-resized block in a comparison to original state
