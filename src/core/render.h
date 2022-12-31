@@ -22,19 +22,36 @@
 #ifndef RENDER_HHHHHH
 #define RENDER_HHHHHH
 
+#include <string>
+#include "std_picture.h"
+#include "base/render_types.h"
+
 #ifndef RENDER_CUSTOM
-#   include <SDL2/SDL_stdinc.h>
+#   include "sdl_proxy/sdl_stdinc.h"
 #   include "base/render_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
 #else
-#   include "render_types.h"
 #   define E_INLINE    extern
 #   define TAIL ;
 #endif
 
+
 namespace XRender
 {
+
+#ifdef __3DS__
+
+constexpr int MAX_3D_OFFSET = 20;
+
+#endif
+
+#ifdef RENDER_CUSTOM
+
+extern bool init();
+extern void quit();
+
+#endif
 
 
 /*!
@@ -168,64 +185,87 @@ E_INLINE void setTargetScreen() TAIL
 }
 #endif
 
+#ifdef __3DS__
+/*!
+ * \brief Set render target to a certain layer of the in-game screen
+ */
+E_INLINE void setTargetLayer(int layer) TAIL
+
+/*!
+ * \brief Set render target to directly render to the 3DS top screen
+ */
+E_INLINE void setTargetMainScreen() TAIL
+
+/*!
+ * \brief Set render target to directly render to the 3DS subscreen
+ */
+E_INLINE void setTargetSubScreen() TAIL
+#endif
 
 
-SDL_FORCE_INLINE StdPicture LoadPicture(const std::string &path,
-                                        const std::string &maskPath = std::string(),
-                                        const std::string &maskFallbackPath = std::string())
+E_INLINE StdPicture LoadPicture(const std::string &path,
+                                const std::string &maskPath = std::string(),
+                                const std::string &maskFallbackPath = std::string()) TAIL
+#ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::LoadPicture(path, maskPath, maskFallbackPath);
 }
+#endif
 
-SDL_FORCE_INLINE StdPicture lazyLoadPicture(const std::string &path,
-                                            const std::string &maskPath = std::string(),
-                                            const std::string &maskFallbackPath = std::string())
+E_INLINE StdPicture lazyLoadPicture(const std::string &path,
+                                    const std::string &maskPath = std::string(),
+                                    const std::string &maskFallbackPath = std::string()) TAIL
+#ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::lazyLoadPicture(path, maskPath, maskFallbackPath);
 }
+#endif
 
-SDL_FORCE_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb)
+#ifdef PGE_MIN_PORT
+E_INLINE StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir);
+#endif
+
+E_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb) TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::setTransparentColor(target, rgb);
 }
-
-
-
-E_INLINE void loadTexture(StdPicture &target,
-                          uint32_t width,
-                          uint32_t height,
-                          uint8_t *RGBApixels,
-                          uint32_t pitch) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->loadTexture(target, width, height, RGBApixels, pitch);
-}
 #endif
 
-SDL_FORCE_INLINE void lazyLoad(StdPicture &target)
+E_INLINE void lazyLoad(StdPicture &target) TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::lazyLoad(target);
 }
+#endif
 
-SDL_FORCE_INLINE void lazyUnLoad(StdPicture &target)
+E_INLINE void lazyUnLoad(StdPicture &target) TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::lazyUnLoad(target);
 }
+#endif
 
-SDL_FORCE_INLINE void lazyPreLoad(StdPicture &target)
+E_INLINE void lazyPreLoad(StdPicture &target) TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::lazyPreLoad(target);
 }
+#endif
 
-SDL_FORCE_INLINE size_t lazyLoadedBytes()
+E_INLINE size_t lazyLoadedBytes() TAIL
+#ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::lazyLoadedBytes();
 }
+#endif
 
-SDL_FORCE_INLINE void lazyLoadedBytesReset()
+E_INLINE void lazyLoadedBytesReset() TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::lazyLoadedBytesReset();
 }
+#endif
 
 
 
@@ -233,13 +273,6 @@ E_INLINE void deleteTexture(StdPicture &tx, bool lazyUnload = false) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->deleteTexture(tx, lazyUnload);
-}
-#endif
-
-E_INLINE void clearAllTextures() TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->clearAllTextures();
 }
 #endif
 
@@ -367,66 +400,45 @@ E_INLINE void renderTexture(float xDst, float yDst, StdPicture &tx,
 #endif
 
 
-
-// Retrieve raw pixel data
-
-E_INLINE void getScreenPixels(int x, int y, int w, int h, unsigned char *pixels) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->getScreenPixels(x, y, w, h, pixels);
-}
-#endif
-
-E_INLINE void getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->getScreenPixelsRGBA(x, y, w, h, pixels);
-}
-#endif
-
-E_INLINE int  getPixelDataSize(const StdPicture &tx) TAIL
-#ifndef RENDER_CUSTOM
-{
-    return g_render->getPixelDataSize(tx);
-}
-#endif
-
-E_INLINE void getPixelData(const StdPicture &tx, unsigned char *pixelData) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->getPixelData(tx, pixelData);
-}
-#endif
-
 #ifdef USE_RENDER_BLOCKING
-SDL_FORCE_INLINE bool renderBlocked()
+E_INLINE bool renderBlocked() TAIL
+#   ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::renderBlocked();
 }
+#   endif
 
-SDL_FORCE_INLINE void setBlockRender(bool b)
+E_INLINE void setBlockRender(bool b) TAIL
+#   ifndef RENDER_CUSTOM
 {
     AbstractRender_t::setBlockRender(b);
 }
+#   endif
 #endif // USE_RENDER_BLOCKING
 
 
 #ifdef USE_SCREENSHOTS_AND_RECS
 
-SDL_FORCE_INLINE void makeShot()
+E_INLINE void makeShot() TAIL
+#   ifndef RENDER_CUSTOM
 {
     AbstractRender_t::makeShot();
 }
+#   endif
 
-SDL_FORCE_INLINE void toggleGifRecorder()
+E_INLINE void toggleGifRecorder() TAIL
+#   ifndef RENDER_CUSTOM
 {
     AbstractRender_t::toggleGifRecorder();
 }
+#   endif
 
-SDL_FORCE_INLINE void processRecorder()
+E_INLINE void processRecorder() TAIL
+#   ifndef RENDER_CUSTOM
 {
     AbstractRender_t::processRecorder();
 }
+#   endif
 
 #endif // USE_SCREENSHOTS_AND_RECS
 

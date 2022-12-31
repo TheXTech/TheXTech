@@ -90,6 +90,7 @@ struct Compatibility_t
     // 1.3.6-1
     bool fix_npc_ceiling_speed; // when an NPC hits a ceiling block, it takes its SpeedY from that block, not from an arbitrary one
     bool emulate_classic_block_order; // the quadtree should return blocks in the order they had at the beginning of the level, not their current order
+    unsigned int bitblit_background_colour[3];
     // 1.3.7
     bool free_level_res;
     bool free_world_res;

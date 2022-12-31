@@ -18,9 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
 #include <set>
 
+#include "sdl_proxy/sdl_stdinc.h"
 #include "globals.h"
 #include "layers.h"
 #include "effect.h"

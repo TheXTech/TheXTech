@@ -173,7 +173,12 @@ private:
     void GoToSuper();
     void ValidateExt(std::string& cur_file);
     bool FileExists(const std::string& cur_file);
-    void StartFileBrowser(std::string* file_target, const std::string root_path, const std::string current_path, const std::vector<std::string> target_exts, BrowserMode_t browser_mode = BROWSER_MODE_OPEN, BrowserCallback_t browser_callback = BROWSER_CALLBACK_NONE);
+    void StartFileBrowser(std::string* file_target,
+                          const std::string &root_path,
+                          const std::string &current_path,
+                          const std::vector<std::string> &target_exts,
+                          BrowserMode_t browser_mode = BROWSER_MODE_OPEN,
+                          BrowserCallback_t browser_callback = BROWSER_CALLBACK_NONE);
     void FileBrowserSuccess();
     void FileBrowserFailure();
     void FileBrowserCleanup();

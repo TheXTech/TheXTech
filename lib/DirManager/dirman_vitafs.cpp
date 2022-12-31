@@ -54,18 +54,12 @@ DEALINGS IN THE SOFTWARE.
 #define MAX_PATH_LENGTH PATH_MAX
 #endif
 
-
-
-static std::mutex g_dirManMutex;
 static constexpr const SceMode gSceDirMode = 0777;
 
-#define PUT_THREAD_GUARD() \
-    std::lock_guard<std::mutex> guard(g_dirManMutex);\
-    (void)guard;
 
 void DirMan::DirMan_private::setPath(const std::string &dirPath)
 {
-    PUT_THREAD_GUARD()
+    PUT_THREAD_GUARD();
 #ifdef VITA
     if(dirPath.empty())
     {
@@ -74,6 +68,8 @@ void DirMan::DirMan_private::setPath(const std::string &dirPath)
     }
     m_dirPath = dirPath;
     delEnd(m_dirPath, '/');
+#else
+    (void)dirPath;
 #endif
 }
 
@@ -85,7 +81,7 @@ static inline int hasEndSlash(char* string)
 
 bool DirMan::DirMan_private::getListOfFiles(std::vector<std::string> &list, const std::vector<std::string> &suffix_filters)
 {
-    PUT_THREAD_GUARD()
+    PUT_THREAD_GUARD();
     list.clear();
 
     // open directory fd
@@ -166,7 +162,7 @@ static inline int quick_stat_folders(
 
 bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, const std::vector<std::string>& suffix_filters)
 {
-    PUT_THREAD_GUARD()
+    PUT_THREAD_GUARD();
     list.clear();
     
     SceUID dfd = sceIoDopen(m_dirPath.c_str());

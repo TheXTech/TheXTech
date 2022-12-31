@@ -10,7 +10,7 @@ list(APPEND DIRMANAGER_SRCS
 if(WIN32)
     message("-- DirMan for Windows")
     list(APPEND DIRMANAGER_SRCS ${CMAKE_CURRENT_LIST_DIR}/dirman_winapi.cpp)
-elseif(NINTENDO_SWITCH OR NINTENDO_3DS)
+elseif(NINTENDO_SWITCH OR NINTENDO_3DS OR NINTENDO_WII OR PGE_MIN_PORT)
     message("-- DirMan for Devkit Pro")
     list(APPEND DIRMANAGER_SRCS ${CMAKE_CURRENT_LIST_DIR}/dirman_dkp.cpp)
 elseif(VITA)

@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_audio.h>
-
 #include "../globals.h"
 #include "../game_main.h"
 #include "../graphics.h"
@@ -27,6 +25,8 @@
 #include "../config.h"
 #include "../video.h"
 #include "../controls.h"
+
+#include "sdl_proxy/sdl_audio.h"
 
 #include "speedrunner.h"
 #include "presetup.h"
@@ -55,6 +55,7 @@ void OpenConfig_preSetup()
         {"2", RENDER_ACCELERATED_VSYNC}
     };
 
+#ifndef PGE_MIN_PORT
     const IniProcessing::StrEnumMap sampleFormats =
     {
         {"s8", AUDIO_S8},
@@ -86,6 +87,7 @@ void OpenConfig_preSetup()
         {"float32be", AUDIO_F32MSB},
         {"pcm_f32be", AUDIO_F32MSB}
     };
+#endif
 
     const IniProcessing::StrEnumMap compatMode =
     {
@@ -118,6 +120,10 @@ void OpenConfig_preSetup()
     if(Files::fileExists(configPath))
     {
         IniProcessing config(configPath);
+
+        config.beginGroup("main");
+        config.read("loading-debug", g_config.loading_show_debug, true);
+        config.endGroup();
 
         config.beginGroup("video");
         config.readEnum("render", g_videoSettings.renderMode, (int)RENDER_ACCELERATED, renderMode);
@@ -161,7 +167,9 @@ void OpenConfig_preSetup()
         // Defaults for audio setum at sounds.cpp, at g_audioDefaults
         config.read("sample-rate", g_audioSetup.sampleRate, g_audioDefaults.sampleRate);
         config.read("channels", g_audioSetup.channels, g_audioDefaults.channels);
+#ifndef PGE_MIN_PORT
         config.readEnum("format", g_audioSetup.format, g_audioDefaults.format, sampleFormats);
+#endif
         config.read("buffer-size", g_audioSetup.bufferSize, g_audioDefaults.bufferSize);
         config.endGroup();
 
@@ -321,6 +329,7 @@ void SaveConfig()
     config.setValue("use-native-osk", g_config.use_native_osk);
     config.setValue("enable-editor", g_config.enable_editor);
     config.setValue("editor-edge-scroll", g_config.editor_edge_scroll);
+    config.setValue("loading-debug", g_config.loading_show_debug);
     config.endGroup();
 
     config.beginGroup("recent");
@@ -388,6 +397,7 @@ void SaveConfig()
     config.setValue("sample-rate", g_audioSetup.sampleRate);
     config.setValue("channels", g_audioSetup.channels);
     config.setValue("buffer-size", g_audioSetup.bufferSize);
+#ifndef PGE_MIN_PORT
     static const std::unordered_map<int, std::string> formats_back = {
         {AUDIO_S8 , "s8"},
         {AUDIO_U8 , "u8"},
@@ -401,6 +411,7 @@ void SaveConfig()
         {AUDIO_F32MSB, "float32be"}
     };
     config.setValue("format", formats_back.at(g_audioSetup.format));
+#endif
     config.endGroup();
 
     config.beginGroup("gameplay");

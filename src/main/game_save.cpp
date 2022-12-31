@@ -39,9 +39,16 @@ std::string makeGameSavePath(std::string episode, std::string world, std::string
     std::string gameSaveDir = AppPathManager::gameSaveRootDir() + Files::basename(Files::dirname(episode + world));
 
     if(!DirMan::exists(gameSaveDir))
+    {
+        pLogDebug("Creating directory [%s]", gameSaveDir.c_str());
         DirMan::mkAbsPath(gameSaveDir);
+    }
 
-    return gameSaveDir + "/"+ world + "-" + saveFile;
+    std::string ret = gameSaveDir + "/"+ world + "-" + saveFile;
+
+    pLogDebug("Save data path for ep [%s], wld [%s], file [%s] -> [%s]", episode.c_str(), world.c_str(), saveFile.c_str(), ret.c_str());
+
+    return ret;
 }
 
 void SaveGame()

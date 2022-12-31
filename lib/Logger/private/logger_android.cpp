@@ -21,6 +21,9 @@
 #include "logger_sets.h"
 #include "logger_private.h"
 
+#include <mutex>
+#include "sdl_proxy/sdl_rwops.h"
+
 #include <android/log.h>
 
 #ifndef NO_FILE_LOGGING

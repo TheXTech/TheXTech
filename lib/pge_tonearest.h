@@ -11,11 +11,7 @@
 // https://github.com/llvm/llvm-project/blob/main/libc/utils/FPUtil/NearestIntegerOperations.h
 
 #include <cstdint>
-#ifndef NO_SDL
-#include <SDL2/SDL_version.h>
-#else
-#include "SDL_supplement.h"
-#endif
+#include "sdl_proxy/sdl_stdinc.h"
 
 #if defined(arm) && !defined(__SOFTFP__) && !defined(__VFP_FP__) && !defined(__MAVERICK__)
 inline void swap_halfes(uint64_t &x)
@@ -183,7 +179,7 @@ union PgeFPBits
 };
 
 
-static SDL_INLINE double pge_toNearest(double x)
+SDL_FORCE_INLINE double pge_toNearest(double x)
 {
     PgeFPBits bits(x);
 

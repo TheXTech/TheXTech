@@ -36,6 +36,8 @@ extern struct Config_t
     bool    editor_edge_scroll = false;
     //! Preferred file format for editor (0 is Moondust engine lvlx format)
     int     editor_preferred_file_format = 0;
+    //! Show debug string during the loading process
+    bool    loading_show_debug = false;
 
     /* ---- Video ----*/
 

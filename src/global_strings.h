@@ -29,7 +29,6 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
-#include <SDL2/SDL_assert.h>
 
 extern const std::string g_emptyString;
 

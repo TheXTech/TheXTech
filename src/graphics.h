@@ -139,6 +139,10 @@ void DrawEditorLevel(int Z);
 void DrawEditorLevel_UI();
 // NEW: draws the world editor interface
 void DrawEditorWorld();
+
+#if 0
+// old, 100x100-based functions
+
 // Public Function pfrX(plrFrame As Integer) As Integer
 //! Get X offset at the player sprite (old call, required to add 100 into source value)
 int pfrXo(int plrFrame);
@@ -149,6 +153,23 @@ int pfrYo(int plrFrame);
 int pfrX(int plrFrame);
 //! Get Y offset at the player sprite
 int pfrY(int plrFrame);
+#endif
+
+// NEW: defined in gfx_draw_player.cpp
+
+//! Get left pixel at the player sprite
+int pfrX(const StdPicture& tx, const Player_t& p);
+//! Get top pixel at the player sprite
+int pfrY(const StdPicture& tx, const Player_t& p);
+//! Get width at the player sprite
+int pfrW(const StdPicture& tx, const Player_t& p);
+//! Get height at the player sprite
+int pfrH(const StdPicture& tx, const Player_t& p);
+//! Get x offset that should be ADDED to the player position to draw the sprite
+int pfrOffX(const StdPicture& tx, const Player_t& p);
+//! Get y offset that should be ADDED to the player position to draw the sprite
+int pfrOffY(const StdPicture& tx, const Player_t& p);
+
 // Public Sub GameThing()
 /*!
  * \brief Draw the level enter scene

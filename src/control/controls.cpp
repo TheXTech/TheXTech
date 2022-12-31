@@ -37,10 +37,17 @@
 
 // Control methods
 
+#ifdef __3DS__
+#include "input_3ds.h"
+#elif defined(__WII__)
+#include "input_wii.h"
+#elif !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD)
 #include "keyboard.h"
 #include "joystick.h"
-#include "duplicate.h"
 #include "touchscreen.h"
+#endif
+
+#include "duplicate.h"
 
 #include <Logger/logger.h>
 
@@ -678,8 +685,18 @@ void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 // allocate InputMethodTypes according to system configuration
 void Init()
 {
+#ifdef INPUT_3DS_H
+    g_InputMethodTypes.push_back(new InputMethodType_3DS);
+#endif
+#ifdef INPUT_WII_H
+    g_InputMethodTypes.push_back(new InputMethodType_Wii);
+#endif
+#ifdef KEYBOARD_H
     g_InputMethodTypes.push_back(new InputMethodType_Keyboard);
+#endif
+#ifdef JOYSTICK_H
     g_InputMethodTypes.push_back(new InputMethodType_Joystick);
+#endif
 #ifdef TOUCHSCREEN_H
     g_InputMethodTypes.push_back(new InputMethodType_TouchScreen);
 #endif

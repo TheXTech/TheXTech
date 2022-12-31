@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "../globals.h"
 #include "../frame_timer.h"
@@ -103,7 +103,7 @@ bool OpenWorld(std::string FilePath)
 
     LoadCustomCompat();
     FindCustomPlayers();
-    LoadWorldCustomGFX();
+    LoadCustomGFX(true);
 
     if(LevelEditor || WorldEditor)
         EditorCustom::Load();
@@ -337,7 +337,6 @@ bool OpenWorld(std::string FilePath)
         treeWorldMusicAdd(&box);
     }
 
-    LoadCustomGFX();
     LoadCustomSound();
 
     if(!LevelEditor)

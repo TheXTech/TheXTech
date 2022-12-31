@@ -18,7 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
+#include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_timer.h"
 
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
@@ -30,8 +31,63 @@
 #include "core/render.h"
 #include "core/events.h"
 
-
+MicroStats g_microStats;
 PerformanceStats_t g_stats;
+
+void MicroStats::reset()
+{
+    for(uint8_t i = 0; i < TASK_END; i++)
+    {
+        level_timer[i] = 0;
+        view_timer[i] = 0;
+        m_cur_timer[i] = 0;
+    }
+
+    view_total = 0;
+
+    m_cur_task = TASK_END;
+    m_cur_frame = 0;
+}
+
+void MicroStats::start_task(Task task)
+{
+    uint64_t next_time = SDL_GetMicroTicks();
+
+    if(m_cur_task < TASK_END)
+    {
+        m_cur_timer[m_cur_task] += next_time - m_cur_time;
+        level_timer[m_cur_task] += next_time - m_cur_time;
+    }
+
+    m_cur_time = next_time;
+    m_cur_task = task;
+}
+
+void MicroStats::start_sleep()
+{
+    start_task(TASK_END);
+}
+
+void MicroStats::end_frame()
+{
+    start_task(TASK_END);
+
+    m_cur_frame++;
+    m_level_frame++;
+
+    if(m_cur_frame == 66)
+    {
+        m_cur_frame = 0;
+        view_total = 0;
+
+        for(uint8_t i = 0; i < TASK_END; i++)
+        {
+            view_timer[i] = (m_cur_timer[i] + 500) / 1000;
+            view_total += (m_cur_timer[i] + 500) / 1000;
+            m_cur_timer[i] = 0;
+        }
+    }
+}
 
 void PerformanceStats_t::reset()
 {
@@ -98,6 +154,8 @@ void PerformanceStats_t::print()
     else
     {
         items = 7;
+        if(!GameMenu)
+            items += 3;
         if(GameMenu)
             items++;
 
@@ -121,6 +179,29 @@ void PerformanceStats_t::print()
                    3, 45, YLINE, 0.5f, 1.f, 1.f);
         SuperPrint(fmt::sprintf_ne("CHEK: SUMM=%d", (checkedBlocks + checkedSzBlocks+ checkedBGOs + checkedNPCs + checkedEffects)),
                    3, 45, YLINE, 0.5f, 1.f, 1.f);
+
+        // MicroStats
+        if(!GameMenu)
+        {
+            SuperPrint(fmt::sprintf_ne("PROC TIME: %05dms/s",
+                                       g_microStats.view_total),
+                       3, 45, YLINE, 1.f, 1.f, 1.f);
+            SuperPrint(fmt::sprintf_ne("%s %04d %s %04d %s %04d %s %04d %s %04d",
+                                       g_microStats.task_names[0], g_microStats.view_timer[0],
+                                       g_microStats.task_names[1], g_microStats.view_timer[1],
+                                       g_microStats.task_names[2], g_microStats.view_timer[2],
+                                       g_microStats.task_names[3], g_microStats.view_timer[3],
+                                       g_microStats.task_names[4], g_microStats.view_timer[4]),
+                       3, 45, YLINE, 0.5f, 1.f, 1.f);
+            SuperPrint(fmt::sprintf_ne("%s %04d %s %04d %s %04d %s %04d %s %04d",
+                                       g_microStats.task_names[5], g_microStats.view_timer[5],
+                                       g_microStats.task_names[6], g_microStats.view_timer[6],
+                                       g_microStats.task_names[7], g_microStats.view_timer[7],
+                                       g_microStats.task_names[8], g_microStats.view_timer[8],
+                                       g_microStats.task_names[9], g_microStats.view_timer[9]),
+                       3, 45, YLINE, 0.5f, 1.f, 1.f);
+        }
+
         // WIP
 //        SuperPrint(fmt::sprintf_ne("PHYS: B%03d G%03d N%03d, S:%03d",
 //                                   physScannedBlocks, physScannedBGOs, physScannedNPCs,
@@ -158,26 +239,26 @@ void PerformanceStats_t::print()
 
 typedef int64_t nanotime_t;
 
-static SDL_INLINE nanotime_t getNanoTime()
+static inline nanotime_t getNanoTime()
 {
     return static_cast<nanotime_t>(SDL_GetTicks()) * 1000000;
 }
 
-static SDL_INLINE nanotime_t getElapsedTime(nanotime_t oldTime)
+static inline nanotime_t getElapsedTime(nanotime_t oldTime)
 {
     return getNanoTime() - oldTime;
 }
 
-static SDL_INLINE nanotime_t getSleepTime(nanotime_t oldTime, nanotime_t target)
+static inline nanotime_t getSleepTime(nanotime_t oldTime, nanotime_t target)
 {
     return target - getElapsedTime(oldTime);
 }
 
-static SDL_INLINE void xtech_nanosleep(nanotime_t sleepTime)
+static inline void xtech_nanosleep(nanotime_t sleepTime)
 {
     if(sleepTime <= 0)
         return;
-    PGE_Delay((Uint32)SDL_ceil(sleepTime / 1000000.0));
+    PGE_Delay((uint32_t)SDL_ceil(sleepTime / 1000000.0));
 }
 
 
@@ -277,7 +358,7 @@ void cycleNextInc()
 
 extern void CheckActive(); // game_main.cpp
 
-static SDL_INLINE bool canProcessFrameCond()
+static inline bool canProcessFrameCond()
 {
     bool ret = s_currentTicks >= s_gameTime + c_frameRate || s_currentTicks < s_gameTime || MaxFPS;
 #ifdef USE_NEW_FRAMESKIP
@@ -294,7 +375,7 @@ bool canProceedFrame()
 }
 
 #ifndef USE_NEW_TIMER
-static SDL_INLINE void computeFrameTime1Real()
+static inline void computeFrameTime1Real()
 {
     if(s_fpsCount >= 32000)
         s_fpsCount = 0; // Fixes Overflow bug
@@ -316,7 +397,7 @@ static SDL_INLINE void computeFrameTime1Real()
     s_overTime -= (s_currentTicks - s_gameTime);
 }
 
-static SDL_INLINE void computeFrameTime2Real()
+static inline void computeFrameTime2Real()
 {
     if(SDL_GetTicks() > s_fpsTime)
     {
@@ -339,7 +420,7 @@ static SDL_INLINE void computeFrameTime2Real()
 
 
 #ifdef USE_NEW_TIMER
-static SDL_INLINE void computeFrameTime1Real_2()
+static inline void computeFrameTime1Real_2()
 {
     if(s_fpsCount >= 32000)
         s_fpsCount = 0; // Fixes Overflow bug
@@ -348,7 +429,7 @@ static SDL_INLINE void computeFrameTime1Real_2()
         s_cycleCount = 0; // Fixes Overflow bug
 }
 
-static SDL_INLINE void computeFrameTime2Real_2()
+static inline void computeFrameTime2Real_2()
 {
 #ifdef USE_NEW_FRAMESKIP
     if(s_doUpdate > 0)

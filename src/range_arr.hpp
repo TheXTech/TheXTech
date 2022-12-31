@@ -25,7 +25,7 @@
 #include <cstddef>
 #include <cstring>
 #ifndef RANGE_ARR_UNSAFE_MODE
-#include <SDL2/SDL_assert.h>
+#include "sdl_proxy/sdl_assert.h"
 #endif
 
 #define For(A, From, To) for(int A = From; A <= To; ++A)

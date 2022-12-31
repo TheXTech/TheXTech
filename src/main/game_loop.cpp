@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_timer.h>
 
 #include <Logger/logger.h>
 #include <pge_delay.h>
@@ -120,7 +119,10 @@ void CheckActive();//in game_main.cpp
 
 void GameLoop()
 {
+    g_microStats.start_task(MicroStats::Script);
     lunaLoop();
+
+    g_microStats.start_task(MicroStats::Controls);
 
     if(!Controls::Update())
     {
@@ -132,6 +134,8 @@ void GameLoop()
 
     if(QuickReconnectScreen::g_active)
         QuickReconnectScreen::Logic();
+
+    g_microStats.start_task(MicroStats::Layers);
 
     if(LevelMacro > LEVELMACRO_OFF)
         UpdateMacro();
@@ -188,17 +192,22 @@ void GameLoop()
     }
     else if(qScreen)
     {
+        g_microStats.start_task(MicroStats::Effects);
         UpdateEffects();
         if(CompatGetLevel() >= COMPAT_SMBX2)
             speedRun_tick();
+        g_microStats.start_task(MicroStats::Graphics);
         UpdateGraphics();
         updateScreenFaders();
     }
     else if(BattleIntro > 0)
     {
+        g_microStats.start_task(MicroStats::Graphics);
         UpdateGraphics();
         BlockFrames();
+        g_microStats.start_task(MicroStats::Sound);
         UpdateSound();
+        g_microStats.start_task(MicroStats::NPCs);
         For(A, 1, numNPCs)
             NPCFrames(A);
         BattleIntro--;
@@ -213,18 +222,26 @@ void GameLoop()
 
         ClearTriggeredEvents();
         UpdateLayers(); // layers before/after npcs
+
+        g_microStats.start_task(MicroStats::NPCs);
         UpdateNPCs();
 
         if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
             return; // stop on key exit
 
+        g_microStats.start_task(MicroStats::Blocks);
         UpdateBlocks();
+        g_microStats.start_task(MicroStats::Effects);
         UpdateEffects();
+        g_microStats.start_task(MicroStats::Player);
         UpdatePlayer();
         speedRun_tick();
+        g_microStats.start_task(MicroStats::Graphics);
         if(LivingPlayers() || BattleMode)
             UpdateGraphics();
+        g_microStats.start_task(MicroStats::Sound);
         UpdateSound();
+        g_microStats.start_task(MicroStats::Events);
         UpdateEvents();
 //        If MagicHand = True Then UpdateEditor
 
@@ -285,6 +302,8 @@ void GameLoop()
             }
         }
     }
+
+    g_microStats.end_frame();
 }
 
 void MessageScreen_Init()
@@ -399,14 +418,21 @@ int PauseGame(PauseCode code, int plr)
             computeFrameTime1();
             computeFrameTime2();
 
+            g_microStats.start_task(MicroStats::Controls);
+
             XEvents::doEvents();
             CheckActive();
+
+            g_microStats.start_task(MicroStats::Graphics);
 
             speedRun_tick();
             if((LevelSelect && !GameMenu) || WorldEditor)
                 UpdateGraphics2();
             else
                 UpdateGraphics();
+
+            g_microStats.start_task(MicroStats::Controls);
+
             if(!Controls::Update())
             {
                 if(code != PauseCode::Reconnect)
@@ -421,8 +447,13 @@ int PauseGame(PauseCode code, int plr)
             if(QuickReconnectScreen::g_active)
                 QuickReconnectScreen::Logic();
 
+            g_microStats.start_task(MicroStats::Sound);
+
             UpdateSound();
             BlockFrames();
+
+            g_microStats.start_task(MicroStats::Effects);
+
             UpdateEffects();
 
             if(LevelSelect)
@@ -433,6 +464,8 @@ int PauseGame(PauseCode code, int plr)
             // reset the active player if it is no longer present
             if(plr > numPlayers)
                 plr = 0;
+
+            g_microStats.start_task(MicroStats::Script);
 
             // run the appropriate pause logic
             if(qScreen)
@@ -460,6 +493,8 @@ int PauseGame(PauseCode code, int plr)
                 if(TextEntryScreen::Logic())
                     break;
             }
+
+            g_microStats.end_frame();
         }
 
         PGE_Delay(1);

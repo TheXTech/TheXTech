@@ -22,12 +22,15 @@
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
+#include "Graphics/graphics_funcs.h"
 #include "globals.h"
 #include "global_dirs.h"
 #include "compat.h"
 #include "change_res.h"
 #include "main/speedrunner.h"
 #include "main/presetup.h"
+
+#include "sdl_proxy/sdl_stdinc.h"
 
 
 static int s_compatLevel = COMPAT_MODERN;
@@ -98,6 +101,9 @@ static void compatInit(Compatibility_t &c)
     // 1.3.6-1
     c.fix_npc_ceiling_speed = true;
     c.emulate_classic_block_order = false;
+    c.bitblit_background_colour[0] = 0;
+    c.bitblit_background_colour[1] = 0;
+    c.bitblit_background_colour[2] = 0;
     // 1.3.7
     c.free_level_res = true;
     c.free_world_res = true;
@@ -251,6 +257,14 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     }
     compat.endGroup();
 
+#ifdef DEBUG_BUILD // FIXME: Don't enable this at release builds until a specific moment
+    compat.beginGroup("bitblit-bg-color");
+    compat.read("red", c.bitblit_background_colour[0], c.bitblit_background_colour[0]);
+    compat.read("green", c.bitblit_background_colour[1], c.bitblit_background_colour[1]);
+    compat.read("blue", c.bitblit_background_colour[2], c.bitblit_background_colour[2]);
+    compat.endGroup();
+#endif
+
     if(s_compatLevel >= COMPAT_SMBX13)
     {
         if(g_speedRunnerMode >= SPEEDRUN_MODE_3)
@@ -363,12 +377,23 @@ void LoadCustomCompat()
     if(!customCompat.empty())
         loadCompatIni(g_compatibility, customCompat);
 
+#ifndef SDLRPOXY_NULL
+    GraphicsHelps::setBitBlitBG((uint8_t)g_compatibility.bitblit_background_colour[0],
+                                (uint8_t)g_compatibility.bitblit_background_colour[1],
+                                (uint8_t)g_compatibility.bitblit_background_colour[2]);
+#endif
+
     UpdateInternalRes();
 }
 
 void ResetCompat()
 {
     compatInit(g_compatibility);
+
+#ifndef SDLRPOXY_NULL
+    GraphicsHelps::resetBitBlitBG();
+#endif
+
     UpdateInternalRes();
 }
 

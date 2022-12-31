@@ -97,8 +97,14 @@ const int maxSceneType = 100;
 const int maxNPCType = 302;
 //Public Const maxEffectType As Integer = 200 'Maximum number of effect types
 const int maxEffectType = 200;
+
 //Public Const maxWarps As Integer = 200 'Maximum number of warps
+#ifdef LOW_MEM
+const int maxWarps = 200; // 200
+#else
 const int maxWarps = 2000; // 200
+#endif
+
 //Public Const numBackground2 As Integer = 100  'Total # of backgrounds
 const int numBackground2 = 100;
 //Public Const numCharacters As Integer = 5 'Maximum number of player characters
@@ -116,7 +122,11 @@ const int maxWorldMusic = 1000;
 //Public Const numSounds As Integer = 100
 const int numSounds = 200;
 //Public Const maxSections As Integer = 20
+#ifdef LOW_MEM
+const int maxSections = 20;
+#else
 const int maxSections = 200;
+#endif
 //Public Const maxTileType As Integer = 400
 const int maxTileType = 400;
 //Public Const maxLevelType As Integer = 100

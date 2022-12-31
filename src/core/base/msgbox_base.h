@@ -36,15 +36,6 @@ public:
      */
     virtual void close() = 0;
 
-    enum MessageBoxFlags
-    {
-        MESSAGEBOX_ERROR                 = 0x00000010,   /**< error dialog */
-        MESSAGEBOX_WARNING               = 0x00000020,   /**< warning dialog */
-        MESSAGEBOX_INFORMATION           = 0x00000040,   /**< informational dialog */
-        MESSAGEBOX_BUTTONS_LEFT_TO_RIGHT = 0x00000080,   /**< buttons placed left to right */
-        MESSAGEBOX_BUTTONS_RIGHT_TO_LEFT = 0x00000100    /**< buttons placed right to left */
-    };
-
     /*!
      * \brief Show the simple message box
      * \param flags Message box flags

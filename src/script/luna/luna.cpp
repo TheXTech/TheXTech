@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "luna.h"
 #include "autocode.h"
 #include "autocode_manager.h"

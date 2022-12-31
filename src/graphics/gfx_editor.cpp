@@ -27,6 +27,7 @@
 #include "gfx.h"
 #include "config.h"
 #include "npc_id.h"
+#include "player.h"
 
 #include "editor.h"
 #include "editor/new_editor.h"
@@ -46,9 +47,9 @@ void DrawEditorLevel(int Z)
     Location_t tempLocation;
     int S = curSection; // Level section to display
 
-// #ifdef __3DS__
-//     XRender::setLayer(2);
-// #endif
+#ifdef __3DS__
+    XRender::setTargetLayer(2);
+#endif
     if(Z == 1)
         BlockFlash += 1;
 
@@ -175,38 +176,56 @@ void DrawEditorLevel(int Z)
             if(!(PlayerStart[A].Width > 0)) continue;
             if(vScreenCollision(Z, PlayerStart[A]))
             {
-                int ch = testPlayer[A].Character;
-                if(ch == 0)
-                    ch = A;
-                C = Physics.PlayerHeight[ch][2] - Physics.PlayerHeight[A][2];
-                switch (ch)
+                Player_t& p = Player[A];
+
+                p.Character = testPlayer[A].Character;
+                p.State = testPlayer[A].State;
+                p.Mount = testPlayer[A].Mount;
+                p.MountType = testPlayer[A].MountType;
+
+                if(p.Character < 1 || p.Character > 5)
+                    p.Character = A;
+                if(p.State < 1 || p.State > 7)
+                    p.State = 2;
+
+                p.Direction = 1;
+                p.Location.SpeedY = 0;
+                p.Location.SpeedX = 0;
+                p.Controls.Left = false;
+                p.Controls.Right = false;
+                p.SpinJump = false;
+                p.Dead = false;
+                p.Immune2 = false;
+                p.Fairy = false;
+                p.TimeToLive = 0;
+                p.Effect = 0;
+                p.MountSpecial = 0;
+                p.HoldingNPC = 0;
+                if(p.Duck)
+                    UnDuck(p);
+                PlayerFrame(p);
+
+                if(p.MountType == 3)
                 {
-                case 1:
-                    XRender::renderTexture(vScreenX[Z] + PlayerStart[A].X + MarioFrameX[201],
-                            vScreenY[Z] + PlayerStart[A].Y + MarioFrameY[201] - C,
-                            99, 99, GFXMario[2], 500, 0);
-                    break;
-                case 2:
-                    XRender::renderTexture(vScreenX[Z] + PlayerStart[A].X + LuigiFrameX[201],
-                            vScreenY[Z] + PlayerStart[A].Y + LuigiFrameY[201] - C,
-                            99, 99, GFXLuigi[2], 500, 0);
-                    break;
-                case 3:
-                    XRender::renderTexture(vScreenX[Z] + PlayerStart[A].X + PeachFrameX[201],
-                            vScreenY[Z] + PlayerStart[A].Y + PeachFrameY[201] - C,
-                            99, 99, GFXPeach[2], 500, 0);
-                    break;
-                case 4:
-                    XRender::renderTexture(vScreenX[Z] + PlayerStart[A].X + ToadFrameX[201],
-                            vScreenY[Z] + PlayerStart[A].Y + ToadFrameY[201] - C,
-                            99, 99, GFXToad[2], 500, 0);
-                    break;
-                case 5:
-                    XRender::renderTexture(vScreenX[Z] + PlayerStart[A].X + LinkFrameX[201],
-                            vScreenY[Z] + PlayerStart[A].Y + LinkFrameY[201] - C,
-                            99, 99, GFXLink[2], 500, 0);
-                    break;
+                    p.YoshiWingsFrameCount += 1;
+                    p.YoshiWingsFrame = 0;
+                    if(p.YoshiWingsFrameCount <= 12)
+                        p.YoshiWingsFrame = 1;
+                    else if(p.YoshiWingsFrameCount >= 24)
+                        p.YoshiWingsFrameCount = 0;
+                    if(p.Direction == 1)
+                        p.YoshiWingsFrame += 2;
                 }
+
+                C = Physics.PlayerHeight[p.Character][p.State] - Physics.PlayerHeight[A][2];
+
+                p.Location.X = PlayerStart[A].X;
+                p.Location.Y = PlayerStart[A].Y - C;
+                p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+                SizeCheck(p);
+
+                DrawPlayer(p, Z);
             }
         }
 
@@ -243,9 +262,9 @@ void DrawEditorLevel(int Z)
         }
     }
 
-// #ifdef __3DS__
-//     XRender::setLayer(0);
-// #endif
+#ifdef __3DS__
+    XRender::setTargetLayer(0);
+#endif
     // render section boundary
     if(LevelEditor)
     {
@@ -277,9 +296,9 @@ void DrawEditorLevel(int Z)
         }
     }
 
-// #ifdef __3DS__
-//     XRender::setLayer(3);
-// #endif
+#ifdef __3DS__
+    XRender::setTargetLayer(3);
+#endif
 
     // In-Editor message box preview
     if(editorScreen.active && !MessageText.empty())
@@ -287,6 +306,10 @@ void DrawEditorLevel(int Z)
         DrawMessage(MessageText);
     }
 
+#ifdef __3DS__
+    // disable cursor rendering on main screen when editor screen is active
+    if(!editorScreen.active)
+#endif
     // Display the cursor
     {
         auto &e = EditorCursor;
@@ -396,39 +419,56 @@ void DrawEditorLevel(int Z)
             {
                 A = e.SubMode - 3;
 
-                int ch = testPlayer[A].Character;
-                if(ch == 0)
-                    ch = A;
+                Player_t& p = Player[A];
 
-                C = Physics.PlayerHeight[ch][2] - Physics.PlayerHeight[A][2];
-                switch (ch)
+                p.Character = testPlayer[A].Character;
+                p.State = testPlayer[A].State;
+                p.Mount = testPlayer[A].Mount;
+                p.MountType = testPlayer[A].MountType;
+
+                if(p.Character < 1 || p.Character > 5)
+                    p.Character = A;
+                if(p.State < 1 || p.State > 7)
+                    p.State = 2;
+
+                p.Direction = 1;
+                p.Location.SpeedY = 0;
+                p.Location.SpeedX = 0;
+                p.Controls.Left = false;
+                p.Controls.Right = false;
+                p.SpinJump = false;
+                p.Dead = false;
+                p.Immune2 = false;
+                p.Fairy = false;
+                p.TimeToLive = 0;
+                p.Effect = 0;
+                p.MountSpecial = 0;
+                p.HoldingNPC = 0;
+                if(p.Duck)
+                    UnDuck(p);
+                PlayerFrame(p);
+
+                if(p.MountType == 3)
                 {
-                case 1:
-                    XRender::renderTexture(vScreenX[Z] + e.Location.X + MarioFrameX[201],
-                            vScreenY[Z] + e.Location.Y + MarioFrameY[201] - C,
-                            99, 99, GFXMario[2], 500, 0);
-                    break;
-                case 2:
-                    XRender::renderTexture(vScreenX[Z] + e.Location.X + LuigiFrameX[201],
-                            vScreenY[Z] + e.Location.Y + LuigiFrameY[201] - C,
-                            99, 99, GFXLuigi[2], 500, 0);
-                    break;
-                case 3:
-                    XRender::renderTexture(vScreenX[Z] + e.Location.X + PeachFrameX[201],
-                            vScreenY[Z] + e.Location.Y + PeachFrameY[201] - C,
-                            99, 99, GFXPeach[2], 500, 0);
-                    break;
-                case 4:
-                    XRender::renderTexture(vScreenX[Z] + e.Location.X + ToadFrameX[201],
-                            vScreenY[Z] + e.Location.Y + ToadFrameY[201] - C,
-                            99, 99, GFXToad[2], 500, 0);
-                    break;
-                case 5:
-                    XRender::renderTexture(vScreenX[Z] + e.Location.X + LinkFrameX[201],
-                            vScreenY[Z] + e.Location.Y + LinkFrameY[201] - C,
-                            99, 99, GFXLink[2], 500, 0);
-                    break;
+                    p.YoshiWingsFrameCount += 1;
+                    p.YoshiWingsFrame = 0;
+                    if(p.YoshiWingsFrameCount <= 12)
+                        p.YoshiWingsFrame = 1;
+                    else if(p.YoshiWingsFrameCount >= 24)
+                        p.YoshiWingsFrameCount = 0;
+                    if(p.Direction == 1)
+                        p.YoshiWingsFrame += 2;
                 }
+
+                C = Physics.PlayerHeight[p.Character][p.State] - Physics.PlayerHeight[A][2];
+
+                p.Location.X = e.Location.X;
+                p.Location.Y = e.Location.Y - C;
+                p.Location.Width = Physics.PlayerWidth[p.Character][p.State];
+                p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
+                SizeCheck(p);
+
+                DrawPlayer(p, Z);
             }
         }
 
@@ -642,6 +682,15 @@ void DrawEditorLevel_UI()
         editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
         XRender::resetViewport();
     }
+
+#ifdef __3DS__
+    if(!editorScreen.active)
+    {
+        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render, true);
+        XRender::resetViewport();
+        XRender::setTargetLayer(3);
+    }
+#endif
 }
 
 void DrawEditorWorld()
@@ -652,6 +701,12 @@ void DrawEditorWorld()
 
     if(BlockFlash > 45)
         BlockFlash = 0;
+
+#ifdef __3DS__
+    // disable cursor rendering on inactive screen of 3DS
+    if(editorScreen.active) {}
+    else
+#endif
 
     if(BlockFlash < 10)
     {
@@ -741,6 +796,12 @@ void DrawEditorWorld()
             Y = ScreenH - 36;
     }
 
+#ifdef __3DS__
+    // disable cursor rendering on inactive screen of 3DS
+    if(editorScreen.active) {}
+    else
+#endif
+
     if(EditorCursor.Mode == OptCursor_t::LVL_ERASER || EditorCursor.Mode == OptCursor_t::LVL_ERASER0)
     {
         if(EditorCursor.SubMode == -1)
@@ -761,4 +822,14 @@ void DrawEditorWorld()
     }
 
     editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render);
+    XRender::resetViewport();
+
+#ifdef __3DS__
+    if(!editorScreen.active)
+    {
+        editorScreen.UpdateEditorScreen(EditorScreen::CallMode::Render, true);
+        XRender::resetViewport();
+        XRender::setTargetLayer(3);
+    }
+#endif
 }

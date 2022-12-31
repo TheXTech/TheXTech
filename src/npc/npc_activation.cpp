@@ -19,6 +19,8 @@
  */
 
 #include <bitset>
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "globals.h"
 #include "layers.h"
 #include "compat.h"

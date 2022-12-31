@@ -100,7 +100,9 @@ public class GameSettings extends AppCompatActivity
         if(!isDirectoryExist(path + "/music"))
             return false;
 
-        if(!isFileExist(path + "/intro.lvlx") && !isFileExist(path + "/intro.lvl"))
+        if(!isFileExist(path + "/intro.lvlx") &&
+           !isFileExist(path + "/intro.lvl") &&
+           !isDirectoryExist(path + "/introset"))
             return false;
 
         return true;

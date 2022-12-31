@@ -21,7 +21,7 @@
 
 #include <algorithm>
 
-#include <SDL2/SDL_timer.h>
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "globals.h"
 #include "frame_timer.h"

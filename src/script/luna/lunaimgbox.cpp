@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <atomic>
-
 #include "lunaimgbox.h"
 #include "core/render.h"
 #include <Utils/files.h>

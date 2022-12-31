@@ -25,6 +25,8 @@
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "autocode.h"
 #include "autocode_manager.h"
 #include "lunamisc.h"
@@ -1182,7 +1184,7 @@ void Autocode::Do(bool init)
 
         case AT_DebugWindow:
         {
-            XMsgBox::simpleMsgBox(AbstractMsgBox_t::MESSAGEBOX_INFORMATION, "LunaScript debug message", GetS(MyString));
+            XMsgBox::simpleMsgBox(XMsgBox::MESSAGEBOX_INFORMATION, "LunaScript debug message", GetS(MyString));
             expire();
             break;
         }

@@ -17,7 +17,7 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_stdinc.h>
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include <string>
 #include <vector>
@@ -103,6 +103,9 @@ public:
                               const std::string &pathToMaskFallback = std::string());
     static void mergeWithMask(FIBITMAP *image, std::vector<char> &maskRaw, bool maskIsPng = false);
     static void mergeWithMask(FIBITMAP *image, FIBITMAP *mask);
+
+    static void setBitBlitBG(uint8_t red, uint8_t green, uint8_t blue);
+    static void resetBitBlitBG();
 
     /*!
      * \brief Replaces one color with another

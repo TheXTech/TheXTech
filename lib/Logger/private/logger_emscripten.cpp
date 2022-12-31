@@ -26,7 +26,10 @@
 #define LOG_CHANNEL "Application"
 #endif // __EMSCRIPTEN__
 
+#ifndef PGE_NO_THREADING
 static std::mutex g_lockLocker;
+#endif
+
 #define OUT_BUFFER_SIZE 10240
 static char       g_outputBuffer[OUT_BUFFER_SIZE];
 
@@ -41,7 +44,10 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 {
     va_list arg_in;
     (void)level;
+
+#ifndef PGE_NO_THREADING
     MUTEXLOCK(mutex);
+#endif
 
     va_copy(arg_in, arg);
     int len = std::vsnprintf(g_outputBuffer, OUT_BUFFER_SIZE, format, arg_in);

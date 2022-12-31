@@ -21,6 +21,7 @@
 #define APP_PATH_H
 
 #include <string>
+#include <vector>
 
 class AppPathManager
 {
@@ -114,6 +115,10 @@ public:
     static std::string userWorldsRootDir(); // Read-Only, appears at writable directory
 
     static std::string userBattleRootDir(); // Read-Only, appears at writable directory
+
+#ifdef __3DS__
+    static const std::vector<std::string>& worldRootDirs(); // Read-Only, appears at writable directory
+#endif
 
     static void install();
     static bool userDirIsAvailable();
