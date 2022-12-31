@@ -955,13 +955,13 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         else
                         {
                             // these thresholds can be tweaked, but they balance the expense of querying more tables with the expense of updating locations in the main table
-                            if(Layer[B].blocks.size() > 80)
+                            if(Layer[B].blocks.size() > 2)
                                 treeBlockSplitLayer(B);
 
-                            if(Layer[B].BGOs.size() > 80)
+                            if(Layer[B].BGOs.size() > 2)
                                 treeBackgroundSplitLayer(B);
 
-                            if(Layer[B].waters.size() > 80)
+                            if(Layer[B].waters.size() > 2)
                                 treeWaterSplitLayer(B);
                         }
                     }
@@ -1191,7 +1191,7 @@ void UpdateLayers()
         }
     }
 
-    for(A = 0; A <= maxLayers; A++)
+    for(A = 0; A <= numLayers; A++)
     {
         // only consider non-empty, moving layers
         if(Layer[A].Name.empty() || (Layer[A].SpeedX == 0.f && Layer[A].SpeedY == 0.f))
@@ -1253,6 +1253,8 @@ void UpdateLayers()
                     }
                 }
 
+                bool inactive = !treeBlockLayerActive(A);
+
                 for(int B : Layer[A].blocks)
                 {
                     // if(Block[B].Layer == Layer[A].Name)
@@ -1262,10 +1264,12 @@ void UpdateLayers()
                         Block[B].Location.SpeedX = double(Layer[A].SpeedX);
                         Block[B].Location.SpeedY = double(Layer[A].SpeedY);
 
-                        if(!treeBlockLayerActive(A))
+                        if(inactive)
                             treeBlockUpdateLayer(A, B);
                     }
                 }
+
+                inactive = !treeBackgroundLayerActive(A);
 
                 // int allBGOs = numBackground + numLocked;
                 for(int B : Layer[A].BGOs)
@@ -1280,10 +1284,12 @@ void UpdateLayers()
                             Background[B].Location.SpeedY = double(Layer[A].SpeedY);
                         }
 
-                        if(!treeBackgroundLayerActive(A))
+                        if(inactive)
                             treeBackgroundUpdateLayer(A, B);
                     }
                 }
+
+                inactive = !treeWaterLayerActive(A);
 
                 for(int B : Layer[A].waters)
                 {
@@ -1292,7 +1298,7 @@ void UpdateLayers()
                         Water[B].Location.X += double(Layer[A].SpeedX);
                         Water[B].Location.Y += double(Layer[A].SpeedY);
 
-                        if(!treeWaterLayerActive(A))
+                        if(inactive)
                             treeWaterUpdateLayer(A, B);
                     }
                 }
