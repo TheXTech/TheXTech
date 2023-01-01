@@ -1439,10 +1439,8 @@ bool mainMenuUpdate()
 #ifndef RENDER_FULLSCREEN_ALWAYS
             optionsMenuLength++;
 #endif
-#if !defined(__3DS__) && !defined(VITA)
-            optionsMenuLength ++; // ScaleMode
-#endif
 #ifndef FIXED_RES
+            optionsMenuLength ++; // ScaleMode
             optionsMenuLength ++; // resolution
 #endif
 
@@ -1464,11 +1462,9 @@ bool mainMenuUpdate()
                                 menuLen = 18 * 15; // std::strlen("fullscreen mode")
                         }
 #endif
-#if !defined(__3DS__) && !defined(VITA)
+#if !defined(FIXED_RES)
                         else if(A == i++)
                             menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
-#endif
-#if !defined(FIXED_RES)
                         else if(A == i++)
                             menuLen = 18 * std::strlen("res: WWWxHHH (word)");
 #endif
@@ -1525,7 +1521,7 @@ bool mainMenuUpdate()
                         ChangeScreen();
                     }
 #endif
-#if !defined(__3DS__) && !defined(VITA)
+#if !defined(FIXED_RES)
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
@@ -1540,8 +1536,6 @@ bool mainMenuUpdate()
                         UpdateWindowRes();
                         UpdateInternalRes();
                     }
-#endif
-#ifndef FIXED_RES
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
@@ -2059,10 +2053,8 @@ void mainMenuDraw()
         else
             SuperPrint("FULLSCREEN MODE", 3, MenuX, MenuY + (30 * i++));
 #endif
-#if !defined(__3DS__) && !defined(VITA)
+#if !defined(FIXED_RES)
         SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + (30 * i++));
-#endif
-#ifndef FIXED_RES
         std::string resString = fmt::format_ne("RES: {0}x{1}", g_config.InternalW, g_config.InternalH);
         if (g_config.InternalW == 480 && g_config.InternalH == 320)
             resString += " (GBA)";
