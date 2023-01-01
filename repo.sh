@@ -48,6 +48,11 @@ do
         update-submodules)
             PATH=${PATH}:$PWD/utils
             git submodule foreach submodule-update.sh
+
+            # EXTRA update Java files of Android project
+            printf "\n\n"
+            echo "Synchronize SDL Java headers..."
+            cp -v 3rdparty/AudioCodecs/SDL2/android-java-files/*.java android-project/thextech/src/main/java/org/libsdl/app
             exit 0
             ;;
 
