@@ -41,6 +41,8 @@
 #include "input_3ds.h"
 #elif defined(__WII__)
 #include "input_wii.h"
+#elif defined(__16M__)
+#include "input_16m.h"
 #elif !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD)
 #include "keyboard.h"
 #include "joystick.h"
@@ -690,6 +692,9 @@ void Init()
 #endif
 #ifdef INPUT_WII_H
     g_InputMethodTypes.push_back(new InputMethodType_Wii);
+#endif
+#ifdef INPUT_16M_H
+    g_InputMethodTypes.push_back(new InputMethodType_16M);
 #endif
 #ifdef KEYBOARD_H
     g_InputMethodTypes.push_back(new InputMethodType_Keyboard);

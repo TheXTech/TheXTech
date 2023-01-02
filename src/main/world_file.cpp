@@ -19,6 +19,7 @@
  */
 
 #include "sdl_proxy/sdl_stdinc.h"
+#include "core/render.h"
 
 #include "../globals.h"
 #include "../frame_timer.h"
@@ -429,6 +430,10 @@ void ClearWorld(bool quick)
 
     if(!quick)
     {
+#ifdef __16M__
+        XRender::clearAllTextures();
+#endif
+
         ClearStringsBank();
         UnloadCustomGFX();
         UnloadWorldCustomGFX();

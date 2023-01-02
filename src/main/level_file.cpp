@@ -20,6 +20,8 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+#include "core/render.h"
+
 #include "../globals.h"
 #include "../frame_timer.h"
 #include "../npc.h"
@@ -920,6 +922,10 @@ void ClearLevel()
     noUpdate = true;
     BlocksSorted = true;
     qScreen = false;
+
+#ifdef __16M__
+    XRender::clearAllTextures();
+#endif
 
     UnloadCustomGFX();
     doShakeScreenClear();

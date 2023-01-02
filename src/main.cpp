@@ -53,6 +53,10 @@
 #include "core/vita/vita_memory.h"
 #endif
 
+#ifdef __16M__
+#include <nds.h>
+#endif
+
 #ifdef ENABLE_XTECH_LUA
 #include "xtech_lua_main.h"
 #endif
@@ -190,6 +194,21 @@ static void strToPlayerSetup(int player, const std::string &setupString)
 extern "C"
 int main(int argc, char**argv)
 {
+#ifdef __16M__
+    // install the default exception handler
+    defaultExceptionHandler();
+
+    videoSetModeSub(MODE_0_2D);
+    vramSetBankH(VRAM_H_SUB_BG);
+    vramSetBankI(VRAM_I_SUB_BG_0x06208000);
+
+    PrintConsole* defaultConsole = consoleGetDefault();
+
+    consoleInit(nullptr, defaultConsole->bgLayer, BgType_Text4bpp, BgSize_T_256x256, defaultConsole->mapBase, defaultConsole->gfxBase, false, true);
+
+    printf("Hello, 16MB world!\n");
+#endif
+
     CmdLineSetup_t setup;
     FrmMain frmMain;
 
@@ -540,6 +559,11 @@ int main(int argc, char**argv)
     setup.verboseLogging = true;
     setup.frameSkip = false;
     setup.testShowFPS = true;
+#endif
+
+#ifdef __16M__
+    // setup.testMaxFPS = true;
+    setCpuClock(true);
 #endif
 
     initGameInfo();

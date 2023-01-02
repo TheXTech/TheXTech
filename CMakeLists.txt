@@ -140,7 +140,7 @@ option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" 
 
 option(USE_STATIC_LIBC "Link libc and libstdc++ statically" OFF)
 
-if(NINTENDO_3DS OR NINTENDO_WII)
+if(NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_DS)
     set(USE_STATIC_LIBC ON)
 endif()
 
@@ -222,7 +222,7 @@ if(NINTENDO_SWITCH)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE -DNINTENDO_SWITCH -D__SWITCH__")
 endif()
 
-if(NINTENDO_WII OR NINTENDO_3DS)
+if(NINTENDO_WII OR NINTENDO_3DS OR NINTENDO_DS)
     set(PGE_MIN_PORT ON)
     set(THEXTECH_NO_ARGV_HANDLING ON)
     add_compile_definitions(PGE_MIN_PORT)
@@ -230,6 +230,11 @@ endif()
 
 if(THEXTECH_CLI_BUILD OR PGE_MIN_PORT)
     set(RANGE_ARR_UNSAFE_MODE ON)
+endif()
+
+if(NINTENDO_DS)
+    set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_NO_SDL_BUILD ON CACHE BOOL "" FORCE)
 endif()
 
 # ============ Customization ==end=========
@@ -246,7 +251,7 @@ endif()
 include(lib/Allocator/pool-allocator.cmake)
 include(lib/DirManager/dirman.cmake)
 
-if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII)
+if(NOT VITA AND NOT NINTENDO_SWITCH AND NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_DS)
     include(lib/FileMapper/FileMapper.cmake)
 endif()
 
@@ -570,6 +575,19 @@ elseif(NINTENDO_WII)
         src/core/wii/msgbox_wii.cpp
         src/core/wii/events_wii.cpp
     )
+elseif(NINTENDO_DS)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
+    list(REMOVE_ITEM THEXTECH_SRC src/sound.cpp)
+
+    list(APPEND THEXTECH_SRC
+        src/control/input_16m.cpp
+        src/core/minport/render_minport_shared.cpp
+        src/core/16m/render_16m.cpp
+        src/core/16m/msgbox_16m.cpp
+        src/core/16m/window_16m.cpp
+        src/core/null/events_null.cpp
+        src/core/16m/sound_16m.cpp
+    )
 elseif(THEXTECH_CLI_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
@@ -688,7 +706,7 @@ if(ANDROID)
 #    )
 #    add_dependencies(thextech SDL_ApkPackLibs_hidapi)
 
-elseif(NINTENDO_WII OR NINTENDO_3DS)
+elseif(NINTENDO_WII OR NINTENDO_3DS OR NINTENDO_DS)
     add_executable(thextech ${THEXTECH_SRC} ${LIB_SRC})
     set_target_properties(thextech PROPERTIES SUFFIX ".elf")
 
@@ -791,6 +809,13 @@ if(NINTENDO_3DS)
     target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__3DS__)
 elseif(NINTENDO_WII)
     target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__WII__)
+elseif(NINTENDO_DS)
+    target_link_libraries(thextech PRIVATE filesystem)
+    target_link_libraries(thextech PRIVATE fat)
+    target_link_libraries(thextech PRIVATE mm9)
+    target_link_libraries(thextech PRIVATE nds9)
+    target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__16M__)
+    set(CMAKE_EXE_LINKER_FLAGS "-L${NDS_ROOT}/lib -specs=dsi_arm9.specs")
 elseif(PGE_MIN_PORT)
     target_compile_definitions(thextech PRIVATE -DLOW_MEM)
 endif()
@@ -1010,6 +1035,8 @@ elseif(NINTENDO_3DS)
     ctr_create_3dsx(thextech)
 elseif(NINTENDO_WII)
     ogc_create_dol(thextech)
+elseif(NINTENDO_DS)
+    nds_create_rom(thextech)
 elseif(NINTENDO_SWITCH)
     include(cmake/package_switch.cmake)
 else()
