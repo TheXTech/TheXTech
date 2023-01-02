@@ -19,7 +19,11 @@
  */
 
 #include "sdl_proxy/sdl_stdinc.h"
+
+#ifdef __16M__
+// used to clear loaded textures on level/world load
 #include "core/render.h"
+#endif
 
 #include "../globals.h"
 #include "../frame_timer.h"

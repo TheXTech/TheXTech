@@ -449,10 +449,6 @@ static inline void computeFrameTime2Real_2()
         s_fpsTime = SDL_GetTicks() + 1000;
         s_goalTime = s_fpsTime;
 
-#ifdef __16M__
-        pLogDebug("Current FPS: %d (%d ms/s)", (int)s_fpsCount, (int)g_microStats.view_total);
-#endif
-
         if(ShowFPS)
             PrintFPS = s_fpsCount;
         s_fpsCount = 0;
