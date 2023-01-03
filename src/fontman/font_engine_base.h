@@ -29,10 +29,29 @@ class BaseFontEngine
 public:
     virtual ~BaseFontEngine();
 
+    /*!
+     * \brief Measure the size of the multiline text block in pixels
+     * \param text Multi-line text string
+     * \param max_line_length maximum length of the line in characters
+     * \param cut Cut the part of string after the line length and put the "..." to the end (Note: input string will remina unmodified)
+     * \param fontSize The size of the TTF font glyph
+     * \return Width and height of the text block in pixels
+     */
     virtual PGE_Size textSize(const std::string &text,
                               uint32_t max_line_lenght = 0,
                               bool cut = false, uint32_t fontSize = 14) = 0;
 
+    /*!
+     * \brief Print the multiline text block on the screen
+     * \param text Multi-line text string
+     * \param x Hotizontal screen position (at left-top corner of the block)
+     * \param y Vertical screen position (at left-top corner of the block)
+     * \param Red Red channel colour
+     * \param Green Green channel colour
+     * \param Blue Blue channel colour
+     * \param Alpha Alpha channel level
+     * \param fontSize The size of the TTF font glyph
+     */
     virtual void printText(const std::string &text,
                            int32_t x, int32_t y,
                            float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f,
