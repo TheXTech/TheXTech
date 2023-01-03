@@ -34,7 +34,10 @@ class RasterFont : public BaseFontEngine
 {
 public:
     RasterFont();
-    RasterFont(const RasterFont &rf);
+    RasterFont(const RasterFont &rf) = delete;
+    RasterFont &operator=(const RasterFont &tf) = delete;
+    RasterFont(RasterFont &&tf) = default;
+
     virtual ~RasterFont();
 
     void  loadFont(std::string font_ini);

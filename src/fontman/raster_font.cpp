@@ -48,24 +48,6 @@ RasterFont::RasterFont() : BaseFontEngine()
     m_fontName       = fmt::format_ne("font{0}", fontNumberCount++);
 }
 
-RasterFont::RasterFont(const RasterFont &rf) : BaseFontEngine(rf)
-{
-    m_letterWidth      = rf.m_letterWidth;
-    m_letterHeight     = rf.m_letterHeight;
-    m_interLetterSpace = rf.m_interLetterSpace;
-    m_spaceWidth       = rf.m_spaceWidth;
-    m_newlineOffset    = rf.m_newlineOffset;
-    m_glyphOffsetX     = rf.m_glyphOffsetX;
-    m_glyphOffsetY     = rf.m_glyphOffsetY;
-    m_matrixWidth      = rf.m_matrixWidth;
-    m_matrixHeight     = rf.m_matrixHeight;
-    m_isReady          = rf.m_isReady;
-    m_ttfBorders       = rf.m_ttfBorders;
-    m_charMap          = rf.m_charMap;
-    m_texturesBank     = rf.m_texturesBank;
-    m_fontName         = rf.m_fontName;
-}
-
 RasterFont::~RasterFont()
 {
     for(StdPicture &t : m_texturesBank)
