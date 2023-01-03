@@ -414,9 +414,10 @@ void RasterFont::printText(const std::string &text,
             continue;
         }
 
-        RasChar rch = m_charMap[get_utf8_char(strIt)];
-        if(rch.valid)
+        auto rch_f = m_charMap.find(get_utf8_char(strIt));
+        if(rch_f != m_charMap.end() && rch_f->second.valid)
         {
+            auto &rch = rch_f->second;
             XRender::renderTexture(x + static_cast<int32_t>(offsetX - rch.padding_left + m_glyphOffsetX),
                                    y + static_cast<int32_t>(offsetY + m_glyphOffsetY),
                                    w, h,
