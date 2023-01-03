@@ -4102,10 +4102,10 @@ void PowerUps(const int A)
                             NPC[numNPCs].Type = 292;
                             NPC[numNPCs].Special5 = A;
                             NPC[numNPCs].Special6 = p.Direction;
-                            PlaySound(playerHammerSFX);
+                            PlaySound(SFX_Throw);
                         }
                         else
-                            PlaySound(SFX_Throw);
+                            PlaySound(playerHammerSFX);
 
                         NPC[numNPCs].Projectile = true;
                         NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
