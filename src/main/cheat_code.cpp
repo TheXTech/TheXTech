@@ -1773,6 +1773,34 @@ static void theEssentials()
     ahippinAndAHopping();
 }
 
+static void foundMyCarKeys()
+{
+    PlaySound(SFX_Key);
+    StopMusic();
+    LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
+}
+
+static void myLifeGoals()
+{
+    LevelMacro = LEVELMACRO_GOAL_TAPE_EXIT;
+    StopMusic();
+    PlaySound(SFX_TapeExit);
+}
+
+static void mysteryBall()
+{
+    LevelMacro = LEVELMACRO_QUESTION_SPHERE_EXIT;
+    StopMusic();
+    PlaySound(SFX_DungeonClear);
+}
+
+static void itsVegas()
+{
+    LevelMacro = LEVELMACRO_CARD_ROULETTE_EXIT;
+    StopMusic();
+    PlaySound(SFX_CardRouletteClear);
+}
+
 
 
 
@@ -1861,7 +1889,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"2player", twoPlayer, true},
 
     {"wariotime", warioTime, true},
-    {"carkeys", carKeys, true},
+    {"wherearemycarkeys", carKeys, true},
     {"boingyboing", boingyBoing, true},
     {"bombsaway", bombsAway, true},
     {"firemissiles", fireMissiles, true},
@@ -1895,6 +1923,12 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"theessentials", theEssentials, true}, {"theessenjls", theEssentials, true},
     {"newleaf", newLeaf, true},
+    
+    {"foundmycarkeys", foundMyCarKeys, true},
+    {"mylifegoals", myLifeGoals, true},
+    {"mysteryball", mysteryBall, true},
+    {"itsvegas", itsVegas, true},
+    
     {nullptr, nullptr, false}
 };
 

@@ -243,7 +243,7 @@ void Init(bool LegacyPause)
         
         if(IsOnLevel)
         {
-            s_items.push_back(MenuItem{"RETURN TO MAP OR HUB", s_ExitLevel});
+            s_items.push_back(MenuItem{"RETURN TO MAP/HUB", s_ExitLevel});
         }
         
         s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
