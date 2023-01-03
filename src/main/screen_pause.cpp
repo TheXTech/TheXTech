@@ -153,30 +153,58 @@ static bool s_RestartLevelNonEditor()
 
 static bool s_SaveAndContinue()
 {
-    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap || !LevelSelect)) && !Cheater;
-
-    if(CanSave)
+    if (g_compatibility.enableSEEFeatures)
     {
-        SaveGame();
-        PlaySound(SFX_Checkpoint);
+        bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap || !LevelSelect)) && !Cheater;
+        if(CanSave)
+        {
+            SaveGame();
+            PlaySound(SFX_Checkpoint);
+        }
+        else
+        {
+            // player tried to cheat, scare them
+            PlaySound(SFX_BowserKilled);
+        }
     }
     else
     {
-        // player tried to cheat, scare them
-        PlaySound(SFX_BowserKilled);
+        bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
+        if(CanSave)
+        {
+            SaveGame();
+            PlaySound(SFX_Checkpoint);
+        }
+        else
+        {
+            // player tried to cheat, scare them
+            PlaySound(SFX_BowserKilled);
+        }
     }
+
+    
 
     return true;
 }
 
 static bool s_Quit()
 {
-    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap || !LevelSelect)) && !Cheater;
-
-    if(CanSave)
-        SaveGame(); // "Save & Quit"
+    if (g_compatibility.enableSEEFeatures)
+    {
+        bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap || !LevelSelect)) && !Cheater;
+        if(CanSave)
+            SaveGame(); // "Save & Quit"
+        else
+            speedRun_saveStats();
+    }
     else
-        speedRun_saveStats();
+    {
+        bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
+        if(CanSave)
+            SaveGame(); // "Save & Quit"
+        else
+            speedRun_saveStats();
+    }
 
     GameMenu = true;
 
@@ -208,7 +236,7 @@ void Init(bool LegacyPause)
 
     // do a context-aware initialization of s_items
     s_items.clear();
-
+    
     bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
     bool IsOnLevel = !LevelSelect && !Cheater;
 
@@ -250,13 +278,28 @@ void Init(bool LegacyPause)
         if(g_config.enter_cheats_menu_item && !LegacyPause)
             s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
         
-        if(IsOnLevel)
+        if(IsOnLevel and g_compatibility.enableSEEFeatures)
         {
             s_items.push_back(MenuItem{"RETURN TO MAP/HUB", s_ExitLevel});
         }
         
-        s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
-        s_items.push_back(MenuItem{"SAVE & QUIT", s_Quit});
+        if (g_compatibility.enableSEEFeatures)
+        {
+            s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
+            s_items.push_back(MenuItem{"SAVE & QUIT", s_Quit});
+        }
+        else
+        {
+            if(CanSave)
+            {
+                s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
+                s_items.push_back(MenuItem{"SAVE & QUIT", s_Quit});
+            }
+            else
+            {
+                s_items.push_back(MenuItem{"QUIT", s_Quit});
+            }
+        }
     }
 }
 
