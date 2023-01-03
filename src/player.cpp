@@ -4271,7 +4271,14 @@ void PowerUps(const int A)
 
                             if(p.StandingOnNPC != 0)
                                 NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;
-                            PlaySound(SFX_Fireball);
+                            if(p.State == 3)
+                            {    
+                                PlaySound(SFX_Fireball);
+                            }
+                            if(p.State == 6)
+                            {    
+                                PlaySound(SFX_PlayerHammer);
+                            }
                         }
                     }
                 }

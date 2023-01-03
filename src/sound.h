@@ -158,7 +158,14 @@ enum
     SFX_LudwigKilled,
     SFX_ZeldaIce,
     SFX_ZeldaFireRod,
-    SFX_FlameThrower
+    SFX_FlameThrower,
+    SFX_Combo1,
+    SFX_Combo2,
+    SFX_Combo3,
+    SFX_Combo4,
+    SFX_Combo5,
+    SFX_Combo6 = 110,
+    SFX_Combo7
 };
 
 int CustomWorldMusicId();
