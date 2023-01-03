@@ -44,6 +44,7 @@
 #include "screen_textentry.h"
 #include "speedrunner.h"
 #include "cheat_code.h"
+#include "level_file.h"
 
 #include "editor.h"
 
@@ -139,6 +140,14 @@ static bool s_ExitLevel()
     LevelMacroCounter = 0;
     EndLevel = true;
 
+    return true;
+}
+
+static bool s_RestartLevelNonEditor()
+{
+    OpenLevel(FullFileName);
+    LevelSelect = false;
+    LevelRestartRequested = true;
     return true;
 }
 
