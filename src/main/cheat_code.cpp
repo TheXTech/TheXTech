@@ -43,7 +43,6 @@
 #include "../layers.h"
 #include "../controls.h"
 #include "../game_main.h"
-#include "../compat.h"
 #include "game_info.h"
 #include "screen_quickreconnect.h"
 
@@ -2326,7 +2325,7 @@ static void processCheats()
 
     if(cheated)
     {
-        pLogDebug("Cheating detected!!!! [%s]\n", oldString.c_str());
+        pLogDebug("Cheating detected!!! [%s]\n", oldString.c_str());
         Cheater = true;
     }
 }
