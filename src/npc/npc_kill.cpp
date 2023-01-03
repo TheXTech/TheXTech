@@ -250,47 +250,13 @@ void KillNPC(int A, int B)
                 {
                     NPC[A].Location.SpeedY = 0.123;
                     NewEffect(121, NPC[A].Location, NPC[A].Direction);
-                    if(NPCScore[NPC[A].Type] == 1)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 2)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 3)
-                        PlaySound(SFX_Combo1);
-                    else if(NPCScore[NPC[A].Type] == 4)
-                        PlaySound(SFX_Combo2);
-                    else if(NPCScore[NPC[A].Type] == 5)
-                        PlaySound(SFX_Combo3);
-                    else if(NPCScore[NPC[A].Type] == 6)
-                        PlaySound(SFX_Combo4);
-                    else if(NPCScore[NPC[A].Type] == 7)
-                        PlaySound(SFX_Combo5);
-                    else if(NPCScore[NPC[A].Type] == 8)
-                        PlaySound(SFX_Combo6);
-                    else if(NPCScore[NPC[A].Type] >= 9)
-                        PlaySound(SFX_Combo7);
+                    PlayComboHitSound(NPCScore[NPC[A].Type]);
                 }
                 else if(NPC[A].Type == NPCID_BLOOPER_SMB3 && g_compatibility.fix_squid_stomp_effect)
                 {
                     NPC[A].Location.SpeedY = 0.123;
                     NewEffect(117, NPC[A].Location, NPC[A].Direction);
-                    if(NPCScore[NPC[A].Type] == 1)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 2)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 3)
-                        PlaySound(SFX_Combo1);
-                    else if(NPCScore[NPC[A].Type] == 4)
-                        PlaySound(SFX_Combo2);
-                    else if(NPCScore[NPC[A].Type] == 5)
-                        PlaySound(SFX_Combo3);
-                    else if(NPCScore[NPC[A].Type] == 6)
-                        PlaySound(SFX_Combo4);
-                    else if(NPCScore[NPC[A].Type] == 7)
-                        PlaySound(SFX_Combo5);
-                    else if(NPCScore[NPC[A].Type] == 8)
-                        PlaySound(SFX_Combo6);
-                    else if(NPCScore[NPC[A].Type] >= 9)
-                        PlaySound(SFX_Combo7);
+                    PlayComboHitSound(NPCScore[NPC[A].Type]);
                 }
                 else
                     NewEffect(84, NPC[A].Location, NPC[A].Direction);
@@ -319,24 +285,7 @@ void KillNPC(int A, int B)
                 if(NPC[A].Type == 237) // Yoshi's ice break
                     PlaySound(SFX_Icebreak);
                 else
-                    if(NPCScore[NPC[A].Type] == 1)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 2)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 3)
-                        PlaySound(SFX_Combo1);
-                    else if(NPCScore[NPC[A].Type] == 4)
-                        PlaySound(SFX_Combo2);
-                    else if(NPCScore[NPC[A].Type] == 5)
-                        PlaySound(SFX_Combo3);
-                    else if(NPCScore[NPC[A].Type] == 6)
-                        PlaySound(SFX_Combo4);
-                    else if(NPCScore[NPC[A].Type] == 7)
-                        PlaySound(SFX_Combo5);
-                    else if(NPCScore[NPC[A].Type] == 8)
-                        PlaySound(SFX_Combo6);
-                    else if(NPCScore[NPC[A].Type] >= 9)
-                        PlaySound(SFX_Combo7);
+                    PlayComboHitSound(NPCScore[NPC[A].Type]);
                 if(NPC[A].Type == 1 || NPC[A].Type == 244)
                     NewEffect(4, NPC[A].Location);
                 else if(NPC[A].Type == 242 || NPC[A].Type == 243)
@@ -433,24 +382,7 @@ void KillNPC(int A, int B)
         }
         else if(NPC[A].Type == 38 || NPC[A].Type == 42 || NPC[A].Type == 43 || NPC[A].Type == 44 || NPC[A].Type == 206 || NPC[A].Type == 259)
         {
-            if(NPCScore[NPC[A].Type] == 1)
-                PlaySound(SFX_ShellHit);
-            else if(NPCScore[NPC[A].Type] == 2)
-                PlaySound(SFX_ShellHit);
-            else if(NPCScore[NPC[A].Type] == 3)
-                PlaySound(SFX_Combo1);
-            else if(NPCScore[NPC[A].Type] == 4)
-                PlaySound(SFX_Combo2);
-            else if(NPCScore[NPC[A].Type] == 5)
-                PlaySound(SFX_Combo3);
-            else if(NPCScore[NPC[A].Type] == 6)
-                PlaySound(SFX_Combo4);
-            else if(NPCScore[NPC[A].Type] == 7)
-                PlaySound(SFX_Combo5);
-            else if(NPCScore[NPC[A].Type] == 8)
-                PlaySound(SFX_Combo6);
-            else if(NPCScore[NPC[A].Type] >= 9)
-                PlaySound(SFX_Combo7);
+            PlayComboHitSound(NPCScore[NPC[A].Type]);
             NPC[A].Location.SpeedY = -10;
             if(NPC[A].Type == 38)
                 NewEffect(94, NPC[A].Location, NPC[A].Direction);
@@ -492,24 +424,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(89, NPC[A].Location, NPC[A].Direction);
             }
 
@@ -539,24 +454,7 @@ void KillNPC(int A, int B)
             }
             else if(B == 2)
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(10 , NPC[A].Location);
             }
         }
@@ -569,24 +467,7 @@ void KillNPC(int A, int B)
             }
             else if(B == 2)
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(10 , NPC[A].Location);
             }
         }
@@ -599,24 +480,7 @@ void KillNPC(int A, int B)
             }
             else if(B == 2)
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(10 , NPC[A].Location);
             }
         }
@@ -635,24 +499,7 @@ void KillNPC(int A, int B)
         {
             if(B == 3 || B == 4 || B == 2)
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NPC[A].Location.SpeedY = -10;
                 if(NPC[A].Type == 37)
                     NewEffect(90 , NPC[A].Location);
@@ -680,24 +527,7 @@ void KillNPC(int A, int B)
             }
             else if(NPC[A].Type == 179)
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NPC[A].Location.SpeedY = -10;
                 NPC[A].Location.Width = 64;
                 NPC[A].Location.Height = 64;
@@ -724,24 +554,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NPC[A].Location.SpeedY = -11;
                 NewEffect(72, NPC[A].Location, NPC[A].Direction);
             }
@@ -766,24 +579,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(53 , NPC[A].Location);
             }
         // Zelda NPCs
@@ -820,24 +616,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(NPC[A].Type - 21, NPC[A].Location);
             }
 
@@ -969,24 +748,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(7 , NPC[A].Location);
             }
         }
@@ -1004,24 +766,7 @@ void KillNPC(int A, int B)
                 }
                 else
                 {
-                    if(NPCScore[NPC[A].Type] == 1)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 2)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 3)
-                        PlaySound(SFX_Combo1);
-                    else if(NPCScore[NPC[A].Type] == 4)
-                        PlaySound(SFX_Combo2);
-                    else if(NPCScore[NPC[A].Type] == 5)
-                        PlaySound(SFX_Combo3);
-                    else if(NPCScore[NPC[A].Type] == 6)
-                        PlaySound(SFX_Combo4);
-                    else if(NPCScore[NPC[A].Type] == 7)
-                        PlaySound(SFX_Combo5);
-                    else if(NPCScore[NPC[A].Type] == 8)
-                        PlaySound(SFX_Combo6);
-                    else if(NPCScore[NPC[A].Type] >= 9)
-                        PlaySound(SFX_Combo7);
+                    PlayComboHitSound(NPCScore[NPC[A].Type]);
                     NewEffect(48, NPC[A].Location, NPC[A].Direction);
                 }
             }
@@ -1072,24 +817,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(46 , NPC[A].Location);
             }
         }
@@ -1113,24 +841,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 if(B != 5)
                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                 NewEffect(22 , NPC[A].Location);
@@ -1156,24 +867,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 if(B != 5)
                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                 NewEffect(36, NPC[A].Location, NPC[A].Direction);
@@ -1196,24 +890,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(97, NPC[A].Location, NPC[A].Direction);
             }
         }
@@ -1240,24 +917,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 if(B != 5)
                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                 NewEffect(61, NPC[A].Location, NPC[A].Direction);
@@ -1286,24 +946,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(8 , NPC[A].Location);
             }
         }
@@ -1327,24 +970,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(109, NPC[A].Location, static_cast<double>(NPC[A].Frame));
             }
         }
@@ -1368,24 +994,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(95 , NPC[A].Location);
             }
         }
@@ -1409,24 +1018,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(96 , NPC[A].Location);
             }
         }
@@ -1468,24 +1060,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(47 , NPC[A].Location);
             }
         }
@@ -1564,24 +1139,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(9 , NPC[A].Location);
             }
 
@@ -1602,24 +1160,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(60 , NPC[A].Location);
                 if(NPC[A].Type <= 112)
                     Effect[numEffects].Frame = NPC[A].Type - 109;
@@ -1649,24 +1190,7 @@ void KillNPC(int A, int B)
             }
             else
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 if(NPC[A].Type == 36)
                     NewEffect(27, NPC[A].Location, NPC[A].Direction);
                 else if(NPC[A].Type == 285 || NPC[A].Type == 286)
@@ -1683,24 +1207,7 @@ void KillNPC(int A, int B)
         {
             if(B == 3)
             {
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
                 NewEffect(10 , NPC[A].Location);
             }
         }
@@ -1732,24 +1239,7 @@ void KillNPC(int A, int B)
                     }
                 }
             }
-            if(NPCScore[NPC[A].Type] == 1)
-                PlaySound(SFX_ShellHit);
-            else if(NPCScore[NPC[A].Type] == 2)
-                PlaySound(SFX_ShellHit);
-            else if(NPCScore[NPC[A].Type] == 3)
-                PlaySound(SFX_Combo1);
-            else if(NPCScore[NPC[A].Type] == 4)
-                PlaySound(SFX_Combo2);
-            else if(NPCScore[NPC[A].Type] == 5)
-                PlaySound(SFX_Combo3);
-            else if(NPCScore[NPC[A].Type] == 6)
-                PlaySound(SFX_Combo4);
-            else if(NPCScore[NPC[A].Type] == 7)
-                PlaySound(SFX_Combo5);
-            else if(NPCScore[NPC[A].Type] == 8)
-                PlaySound(SFX_Combo6);
-            else if(NPCScore[NPC[A].Type] >= 9)
-                PlaySound(SFX_Combo7);
+            PlayComboHitSound(NPCScore[NPC[A].Type]);
         }
         else if(NPC[A].Type == 8 || NPC[A].Type == 275 || NPC[A].Type == 93 || NPC[A].Type == 12 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 37 || NPC[A].Type == 38 || NPC[A].Type == 42 || NPC[A].Type == 43 || NPC[A].Type == 44 || NPC[A].Type == 245 || NPC[A].Type == 270) // Piranha Plant / Fireball
         {
@@ -1759,24 +1249,7 @@ void KillNPC(int A, int B)
             if(B == 8)
                 PlaySound(SFX_Smash);
             else
-                if(NPCScore[NPC[A].Type] == 1)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 2)
-                    PlaySound(SFX_ShellHit);
-                else if(NPCScore[NPC[A].Type] == 3)
-                    PlaySound(SFX_Combo1);
-                else if(NPCScore[NPC[A].Type] == 4)
-                    PlaySound(SFX_Combo2);
-                else if(NPCScore[NPC[A].Type] == 5)
-                    PlaySound(SFX_Combo3);
-                else if(NPCScore[NPC[A].Type] == 6)
-                    PlaySound(SFX_Combo4);
-                else if(NPCScore[NPC[A].Type] == 7)
-                    PlaySound(SFX_Combo5);
-                else if(NPCScore[NPC[A].Type] == 8)
-                    PlaySound(SFX_Combo6);
-                else if(NPCScore[NPC[A].Type] >= 9)
-                    PlaySound(SFX_Combo7);
+                PlayComboHitSound(NPCScore[NPC[A].Type]);
         }
         else if(NPC[A].Type == 13 || NPC[A].Type == 108 || NPC[A].Type == 265) // Small Fireball / Yoshi Fireball
         {
@@ -1871,24 +1344,7 @@ void KillNPC(int A, int B)
             else
             {
                 if(B == 3 || B == 2)
-                    if(NPCScore[NPC[A].Type] == 1)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 2)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 3)
-                        PlaySound(SFX_Combo1);
-                    else if(NPCScore[NPC[A].Type] == 4)
-                        PlaySound(SFX_Combo2);
-                    else if(NPCScore[NPC[A].Type] == 5)
-                        PlaySound(SFX_Combo3);
-                    else if(NPCScore[NPC[A].Type] == 6)
-                        PlaySound(SFX_Combo4);
-                    else if(NPCScore[NPC[A].Type] == 7)
-                        PlaySound(SFX_Combo5);
-                    else if(NPCScore[NPC[A].Type] == 8)
-                        PlaySound(SFX_Combo6);
-                    else if(NPCScore[NPC[A].Type] >= 9)
-                        PlaySound(SFX_Combo7);
+                    PlayComboHitSound(NPCScore[NPC[A].Type]);
                 if(NPC[A].Type == 17)
                     NewEffect(15, NPC[A].Location, NPC[A].Direction);
                 else
@@ -1948,24 +1404,7 @@ void KillNPC(int A, int B)
                     else
                     {
                         NPC[A].Location.SpeedY = -11;
-                        if(NPCScore[NPC[A].Type] == 1)
-                            PlaySound(SFX_ShellHit);
-                        else if(NPCScore[NPC[A].Type] == 2)
-                            PlaySound(SFX_ShellHit);
-                        else if(NPCScore[NPC[A].Type] == 3)
-                            PlaySound(SFX_Combo1);
-                        else if(NPCScore[NPC[A].Type] == 4)
-                            PlaySound(SFX_Combo2);
-                        else if(NPCScore[NPC[A].Type] == 5)
-                            PlaySound(SFX_Combo3);
-                        else if(NPCScore[NPC[A].Type] == 6)
-                            PlaySound(SFX_Combo4);
-                        else if(NPCScore[NPC[A].Type] == 7)
-                            PlaySound(SFX_Combo5);
-                        else if(NPCScore[NPC[A].Type] == 8)
-                            PlaySound(SFX_Combo6);
-                        else if(NPCScore[NPC[A].Type] >= 9)
-                            PlaySound(SFX_Combo7);
+                        PlayComboHitSound(NPCScore[NPC[A].Type]);
                     }
 
                     NewEffect(49, NPC[A].Location, NPC[A].Direction);
@@ -1980,24 +1419,7 @@ void KillNPC(int A, int B)
                     else
                     {
                         NPC[A].Location.SpeedY = -11;
-                        if(NPCScore[NPC[A].Type] == 1)
-                            PlaySound(SFX_ShellHit);
-                        else if(NPCScore[NPC[A].Type] == 2)
-                            PlaySound(SFX_ShellHit);
-                        else if(NPCScore[NPC[A].Type] == 3)
-                            PlaySound(SFX_Combo1);
-                        else if(NPCScore[NPC[A].Type] == 4)
-                            PlaySound(SFX_Combo2);
-                        else if(NPCScore[NPC[A].Type] == 5)
-                            PlaySound(SFX_Combo3);
-                        else if(NPCScore[NPC[A].Type] == 6)
-                            PlaySound(SFX_Combo4);
-                        else if(NPCScore[NPC[A].Type] == 7)
-                            PlaySound(SFX_Combo5);
-                        else if(NPCScore[NPC[A].Type] == 8)
-                            PlaySound(SFX_Combo6);
-                        else if(NPCScore[NPC[A].Type] >= 9)
-                            PlaySound(SFX_Combo7);
+                        PlayComboHitSound(NPCScore[NPC[A].Type]);
                     }
 
                     NewEffect(141, NPC[A].Location, NPC[A].Direction);
@@ -2013,24 +1435,7 @@ void KillNPC(int A, int B)
                     else
                     {
                         NPC[A].Location.SpeedY = -11;
-                        if(NPCScore[NPC[A].Type] == 1)
-                            PlaySound(SFX_ShellHit);
-                        else if(NPCScore[NPC[A].Type] == 2)
-                            PlaySound(SFX_ShellHit);
-                        else if(NPCScore[NPC[A].Type] == 3)
-                            PlaySound(SFX_Combo1);
-                        else if(NPCScore[NPC[A].Type] == 4)
-                            PlaySound(SFX_Combo2);
-                        else if(NPCScore[NPC[A].Type] == 5)
-                            PlaySound(SFX_Combo3);
-                        else if(NPCScore[NPC[A].Type] == 6)
-                            PlaySound(SFX_Combo4);
-                        else if(NPCScore[NPC[A].Type] == 7)
-                            PlaySound(SFX_Combo5);
-                        else if(NPCScore[NPC[A].Type] == 8)
-                            PlaySound(SFX_Combo6);
-                        else if(NPCScore[NPC[A].Type] >= 9)
-                            PlaySound(SFX_Combo7);
+                        PlayComboHitSound(NPCScore[NPC[A].Type]);
                     }
 
                     NewEffect(25, NPC[A].Location, NPC[A].Direction);
@@ -2053,24 +1458,7 @@ void KillNPC(int A, int B)
                     else
                     {
                         NPC[A].Location.SpeedY = -11;
-                        if(NPCScore[NPC[A].Type] == 1)
-                            PlaySound(SFX_ShellHit);
-                        else if(NPCScore[NPC[A].Type] == 2)
-                            PlaySound(SFX_ShellHit);
-                        else if(NPCScore[NPC[A].Type] == 3)
-                            PlaySound(SFX_Combo1);
-                        else if(NPCScore[NPC[A].Type] == 4)
-                            PlaySound(SFX_Combo2);
-                        else if(NPCScore[NPC[A].Type] == 5)
-                            PlaySound(SFX_Combo3);
-                        else if(NPCScore[NPC[A].Type] == 6)
-                            PlaySound(SFX_Combo4);
-                        else if(NPCScore[NPC[A].Type] == 7)
-                            PlaySound(SFX_Combo5);
-                        else if(NPCScore[NPC[A].Type] == 8)
-                            PlaySound(SFX_Combo6);
-                        else if(NPCScore[NPC[A].Type] >= 9)
-                            PlaySound(SFX_Combo7);
+                        PlayComboHitSound(NPCScore[NPC[A].Type]);
                     }
 
                     if(NPC[A].Type == 284)
@@ -2083,24 +1471,7 @@ void KillNPC(int A, int B)
                 }
 
                 if(NPC[A].Type != 29 && NPC[A].Type != 47 && NPC[A].Type != 77)
-                    if(NPCScore[NPC[A].Type] == 1)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 2)
-                        PlaySound(SFX_ShellHit);
-                    else if(NPCScore[NPC[A].Type] == 3)
-                        PlaySound(SFX_Combo1);
-                    else if(NPCScore[NPC[A].Type] == 4)
-                        PlaySound(SFX_Combo2);
-                    else if(NPCScore[NPC[A].Type] == 5)
-                        PlaySound(SFX_Combo3);
-                    else if(NPCScore[NPC[A].Type] == 6)
-                        PlaySound(SFX_Combo4);
-                    else if(NPCScore[NPC[A].Type] == 7)
-                        PlaySound(SFX_Combo5);
-                    else if(NPCScore[NPC[A].Type] == 8)
-                        PlaySound(SFX_Combo6);
-                    else if(NPCScore[NPC[A].Type] >= 9)
-                        PlaySound(SFX_Combo7);
+                    PlayComboHitSound(NPCScore[NPC[A].Type]);
             }
         }
         else if(NPC[A].Type == 45) // ice block

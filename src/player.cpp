@@ -343,6 +343,9 @@ void SetupPlayers()
         Player[A].Duck = false;
         Player[A].MountSpecial = 0;
         Player[A].YoshiTongueLength = 0;
+        
+        //Player[A].Starman = false;
+        //Player[A].StarmanLength = 752;
 
 //        Player[A].Direction = 1; // Moved to above
         Player[A].Location.SpeedX = 0;
@@ -4088,7 +4091,7 @@ void PowerUps(const int A)
                                 PlaySound(SFX_Grab2);
                             }
                             else
-                                PlaySound(SFX_PlayerHammer);
+                                PlaySound(SFX_Throw);
                         }
                         else if(p.Character == 4)
                         {
@@ -4099,10 +4102,10 @@ void PowerUps(const int A)
                             NPC[numNPCs].Type = 292;
                             NPC[numNPCs].Special5 = A;
                             NPC[numNPCs].Special6 = p.Direction;
-                            PlaySound(SFX_PlayerHammer);
+                            PlaySound(playerHammerSFX);
                         }
                         else
-                            PlaySound(SFX_PlayerHammer);
+                            PlaySound(SFX_Throw);
 
                         NPC[numNPCs].Projectile = true;
                         NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];

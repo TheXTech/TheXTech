@@ -234,6 +234,8 @@ void StopExtSound(const std::string &path);
 void StopAllExtSounds();
 void StopAllSounds();
 
+void PlayComboHitSound(int scoreMult);
+
 #ifdef THEXTECH_ENABLE_AUDIO_FX
 struct SoundFXEchoSetup
 {

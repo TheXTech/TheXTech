@@ -477,6 +477,18 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
         }
+        
+        //else if(NPC[B].Type == 293) // Bonus is a Starman
+        //{
+            //UpdatePlayerBonus(A, NPC[B].Type);
+            //Player[A].StateNPC = NPC[B].Type;
+            //PlaySound(SFX_PlayerGrow);
+            //Player[A].Starman = true;
+            //Player[A].StarmanLength = 752;
+            //if(NPC[B].Effect != 2)
+                //MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
+        //}
+        
         else if(NPCIsACoin[NPC[B].Type]) // Bonus is a coin
         {
             if(NPC[B].Type == 152)

@@ -1920,9 +1920,10 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"speeddemon", speedDemon, true},
     
     {"getmeouttahere", getMeOuttaHere, true},
+    {"newleaf", newLeaf, true},
+    
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"theessentials", theEssentials, true}, {"theessenjls", theEssentials, true},
-    {"newleaf", newLeaf, true},
     
     {"foundmycarkeys", foundMyCarKeys, true},
     {"mylifegoals", myLifeGoals, true},

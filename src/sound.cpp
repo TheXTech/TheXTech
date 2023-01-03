@@ -1620,3 +1620,37 @@ void UpdateSoundFX(int recentSection)
     }
 #endif // THEXTECH_ENABLE_AUDIO_FX
 }
+
+void PlayComboHitSound(int scoreMult)
+{
+    if(scoreMult < 2)
+        scoreMult = 2; // 2 is minimum possible
+
+    switch(scoreMult)
+    {
+    case 2: // everything that is 2 or lesser
+        PlaySound(SFX_ShellHit);
+        break;
+    case 3:
+        PlaySound(SFX_Combo1);
+        break;
+    case 4:
+        PlaySound(SFX_Combo2);
+        break;
+    case 5:
+        PlaySound(SFX_Combo3);
+        break;
+    case 6:
+        PlaySound(SFX_Combo4);
+        break;
+    case 7:
+        PlaySound(SFX_Combo5);
+        break;
+    case 8:
+        PlaySound(SFX_Combo6);
+        break;
+    default: // everything that is 9 or bigger
+        PlaySound(SFX_Combo7);
+        break;
+    }
+}
