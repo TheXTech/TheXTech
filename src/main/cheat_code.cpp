@@ -1760,17 +1760,67 @@ static void getMeOuttaHere()
 
 static void holyTrinity()
 {
-    shadowStar();
-    godMode();
-    ahippinAndAHopping();
+    HolyTrinity = !HolyTrinity
+    
+    Location_t tempLocation;
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Immune = 50;
+        tempLocation = Player[B].Location;
+        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
+        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+    }
+    
+    if HolyTrinity
+    {
+        ShadowMode = true;
+        GodMode = true;
+        MultiHop = true;
+    }
+    else
+    {
+        ShadowMode = false;
+        GodMode = false;
+        MultiHop = false;
+    }
+    PlaySound(HolyTrinity ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
 static void theEssentials()
 {
-    tooSlow();
-    shadowStar();
-    godMode();
-    ahippinAndAHopping();
+    TheEssentials = !TheEssentials
+    Location_t tempLocation;
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Immune = 50;
+        tempLocation = Player[B].Location;
+        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
+        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+    }
+    
+    if TheEssentials
+    {
+        SuperSpeed = true;
+        ShadowMode = true;
+        GodMode = true;
+        MultiHop = true;
+    }
+    else
+    {
+        SuperSpeed = false;
+        ShadowMode = false;
+        GodMode = false;
+        MultiHop = false;
+    }
+    PlaySound(TheEssentials ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
 static void foundMyCarKey()

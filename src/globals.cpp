@@ -352,6 +352,8 @@ bool WorldUnlock = false;
 bool MaxFPS = false;
 bool GodMode = false;
 bool GrabAll = false;
+bool HolyTrinity = false;
+bool TheEssentials = false;
 bool Cheater = false;
 RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 int Score = 0;

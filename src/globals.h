@@ -1800,6 +1800,10 @@ extern bool MaxFPS;
 extern bool GodMode;
 //Public GrabAll As Boolean
 extern bool GrabAll;
+//Public HolyTrinity As Boolean
+extern bool HolyTrinity;
+//Public TheEssentials As Boolean
+extern bool TheEssentials;
 //Public Cheater As Boolean 'if the player is a cheater
 extern bool Cheater;
 //'--------------------------------
