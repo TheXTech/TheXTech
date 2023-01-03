@@ -827,6 +827,32 @@ static void superbDemo128()
     }
 }
 
+static void superbDemo200()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 200;
+
+        SetupScreens();
+
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+        Player[B].Immune = 1;
+
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
+            {
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * 24 - 12;
+            }
+        }
+
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
 static void superbDemo64()
 {
     int B = CheckLiving();
@@ -1006,6 +1032,14 @@ static void superbDemo2()
 
         Bomb(Player[B].Location, iRand(2) + 2);
     }
+}
+
+static void getMeOuttaHere()
+{
+    LevelBeatCode = 0;
+    LevelMacro = LEVELMACRO_OFF;
+    LevelMacroCounter = 0;
+    EndLevel = true;
 }
 
 static void onePlayer()
@@ -1783,7 +1817,8 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"iamerror", becomeAsLink, true}, {"itsamelink", becomeAsLink, true},
     {"itsamemario", becomeAsMario, true}, {"plumberboy", becomeAsMario, true}, {"moustacheman", becomeAsMario, true},
     {"itsameluigi", becomeAsLuigi, true}, {"greenmario", becomeAsLuigi, true},
-
+    
+    {"supermario200", superbDemo200, true},
     {"supermario128", superbDemo128, true},
     {"supermario64", superbDemo64, true},
     {"supermario32", superbDemo32, true},
@@ -1824,6 +1859,8 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"ahippinandahoppin", ahippinAndAHopping, true}, {"jumpman", ahippinAndAHopping, true},
     {"framerate", frameRate, false},
     {"speeddemon", speedDemon, true},
+    
+    {"getmeouttahere", getMeOuttaHere, true},
     {nullptr, nullptr, false}
 };
 
@@ -2219,8 +2256,8 @@ static void processCheats()
 
     if(cheated)
     {
-        pLogDebug("Cheating detected!!! [%s]\n", oldString.c_str());
-        Cheater = true;
+        pLogDebug("Cheating detected! The game can still save though. [%s]\n", oldString.c_str());
+        Cheater = false;
     }
 }
 

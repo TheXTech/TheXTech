@@ -287,7 +287,24 @@ void NPCHit(int A, int B, int C)
     }
     else if(B == 10 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 241 || NPC[A].Type == 96 || NPC[A].Type == 22 || NPC[A].Type == 134))
     {
-        PlaySound(SFX_ShellHit);
+        if(NPCScore[NPC[A].Type] == 1)
+            PlaySound(SFX_ShellHit);
+        else if(NPCScore[NPC[A].Type] == 2)
+            PlaySound(SFX_ShellHit);
+        else if(NPCScore[NPC[A].Type] == 3)
+            PlaySound(SFX_Combo1);
+        else if(NPCScore[NPC[A].Type] == 4)
+            PlaySound(SFX_Combo2);
+        else if(NPCScore[NPC[A].Type] == 5)
+            PlaySound(SFX_Combo3);
+        else if(NPCScore[NPC[A].Type] == 6)
+            PlaySound(SFX_Combo4);
+        else if(NPCScore[NPC[A].Type] == 7)
+            PlaySound(SFX_Combo5);
+        else if(NPCScore[NPC[A].Type] == 8)
+            PlaySound(SFX_Combo6);
+        else if(NPCScore[NPC[A].Type] >= 9)
+            PlaySound(SFX_Combo7);
         NPC[A].Bouce = true;
         if((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 22)
         {
@@ -404,7 +421,24 @@ void NPCHit(int A, int B, int C)
             if(NPC[C].Type == 13 || NPC[C].Type == 108)
             {
                 NPC[A].Damage += 1;
-                PlaySound(SFX_ShellHit);
+                if(NPCScore[NPC[A].Type] == 1)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 2)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 3)
+                    PlaySound(SFX_Combo1);
+                else if(NPCScore[NPC[A].Type] == 4)
+                    PlaySound(SFX_Combo2);
+                else if(NPCScore[NPC[A].Type] == 5)
+                    PlaySound(SFX_Combo3);
+                else if(NPCScore[NPC[A].Type] == 6)
+                    PlaySound(SFX_Combo4);
+                else if(NPCScore[NPC[A].Type] == 7)
+                    PlaySound(SFX_Combo5);
+                else if(NPCScore[NPC[A].Type] == 8)
+                    PlaySound(SFX_Combo6);
+                else if(NPCScore[NPC[A].Type] >= 9)
+                    PlaySound(SFX_Combo7);
             }
             else
             {
@@ -883,7 +917,24 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_GALOOMBA;
                 if(!NPC[A].Projectile)
                 {
-                    PlaySound(SFX_ShellHit);
+                    if(NPCScore[NPC[A].Type] == 1)
+                        PlaySound(SFX_ShellHit);
+                    else if(NPCScore[NPC[A].Type] == 2)
+                        PlaySound(SFX_ShellHit);
+                    else if(NPCScore[NPC[A].Type] == 3)
+                        PlaySound(SFX_Combo1);
+                    else if(NPCScore[NPC[A].Type] == 4)
+                        PlaySound(SFX_Combo2);
+                    else if(NPCScore[NPC[A].Type] == 5)
+                        PlaySound(SFX_Combo3);
+                    else if(NPCScore[NPC[A].Type] == 6)
+                        PlaySound(SFX_Combo4);
+                    else if(NPCScore[NPC[A].Type] == 7)
+                        PlaySound(SFX_Combo5);
+                    else if(NPCScore[NPC[A].Type] == 8)
+                        PlaySound(SFX_Combo6);
+                    else if(NPCScore[NPC[A].Type] >= 9)
+                        PlaySound(SFX_Combo7);
                     NPC[A].Projectile = true;
                 }
             }
@@ -899,7 +950,24 @@ void NPCHit(int A, int B, int C)
             }
             else if(NPC[A].Type == NPCID_GALOOMBA)
             {
-                PlaySound(SFX_ShellHit);
+                if(NPCScore[NPC[A].Type] == 1)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 2)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 3)
+                    PlaySound(SFX_Combo1);
+                else if(NPCScore[NPC[A].Type] == 4)
+                    PlaySound(SFX_Combo2);
+                else if(NPCScore[NPC[A].Type] == 5)
+                    PlaySound(SFX_Combo3);
+                else if(NPCScore[NPC[A].Type] == 6)
+                    PlaySound(SFX_Combo4);
+                else if(NPCScore[NPC[A].Type] == 7)
+                    PlaySound(SFX_Combo5);
+                else if(NPCScore[NPC[A].Type] == 8)
+                    PlaySound(SFX_Combo6);
+                else if(NPCScore[NPC[A].Type] >= 9)
+                    PlaySound(SFX_Combo7);
                 NPC[A].Projectile = true;
                 NPC[A].Type = NPCID_GALOOMBA_STOMPED;
             }
@@ -909,7 +977,24 @@ void NPCHit(int A, int B, int C)
                 {
                     NPC[A].CantHurtPlayer = C;
                     NPC[A].CantHurt = 10;
-                    PlaySound(SFX_ShellHit);
+                    if(NPCScore[NPC[A].Type] == 1)
+                        PlaySound(SFX_ShellHit);
+                    else if(NPCScore[NPC[A].Type] == 2)
+                        PlaySound(SFX_ShellHit);
+                    else if(NPCScore[NPC[A].Type] == 3)
+                        PlaySound(SFX_Combo1);
+                    else if(NPCScore[NPC[A].Type] == 4)
+                        PlaySound(SFX_Combo2);
+                    else if(NPCScore[NPC[A].Type] == 5)
+                        PlaySound(SFX_Combo3);
+                    else if(NPCScore[NPC[A].Type] == 6)
+                        PlaySound(SFX_Combo4);
+                    else if(NPCScore[NPC[A].Type] == 7)
+                        PlaySound(SFX_Combo5);
+                    else if(NPCScore[NPC[A].Type] == 8)
+                        PlaySound(SFX_Combo6);
+                    else if(NPCScore[NPC[A].Type] >= 9)
+                        PlaySound(SFX_Combo7);
                     NPC[A].Projectile = true;
                     if(Player[C].Location.X + Player[C].Location.Width / 2.0 > NPC[A].Location.X + NPC[A].Location.Width / 2.0)
                         NPC[A].Direction = -1;
@@ -1326,7 +1411,25 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 2 || B == 7)
         {
-            PlaySound(SFX_ShellHit);
+            pLogDebug("Score value: ", NPCScore[NPC[A].Type]);
+            if(NPCScore[NPC[A].Type] == 1)
+                PlaySound(SFX_ShellHit);
+            else if(NPCScore[NPC[A].Type] == 2)
+                PlaySound(SFX_ShellHit);
+            else if(NPCScore[NPC[A].Type] == 3)
+                PlaySound(SFX_Combo1);
+            else if(NPCScore[NPC[A].Type] == 4)
+                PlaySound(SFX_Combo2);
+            else if(NPCScore[NPC[A].Type] == 5)
+                PlaySound(SFX_Combo3);
+            else if(NPCScore[NPC[A].Type] == 6)
+                PlaySound(SFX_Combo4);
+            else if(NPCScore[NPC[A].Type] == 7)
+                PlaySound(SFX_Combo5);
+            else if(NPCScore[NPC[A].Type] == 8)
+                PlaySound(SFX_Combo6);
+            else if(NPCScore[NPC[A].Type] >= 9)
+                PlaySound(SFX_Combo7);
             NPC[A].Projectile = true;
             NPC[A].Location.Y += NPC[A].Location.Height;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
@@ -1477,7 +1580,24 @@ void NPCHit(int A, int B, int C)
             PlaySound(SFX_Stomp);
         else if(B == 2 || B == 7)
         {
-            PlaySound(SFX_ShellHit);
+            if(NPCScore[NPC[A].Type] == 1)
+                PlaySound(SFX_ShellHit);
+            else if(NPCScore[NPC[A].Type] == 2)
+                PlaySound(SFX_ShellHit);
+            else if(NPCScore[NPC[A].Type] == 3)
+                PlaySound(SFX_Combo1);
+            else if(NPCScore[NPC[A].Type] == 4)
+                PlaySound(SFX_Combo2);
+            else if(NPCScore[NPC[A].Type] == 5)
+                PlaySound(SFX_Combo3);
+            else if(NPCScore[NPC[A].Type] == 6)
+                PlaySound(SFX_Combo4);
+            else if(NPCScore[NPC[A].Type] == 7)
+                PlaySound(SFX_Combo5);
+            else if(NPCScore[NPC[A].Type] == 8)
+                PlaySound(SFX_Combo6);
+            else if(NPCScore[NPC[A].Type] >= 9)
+                PlaySound(SFX_Combo7);
             NPC[A].Location.SpeedY = -5;
             if(B == 7)
             {
@@ -1509,7 +1629,24 @@ void NPCHit(int A, int B, int C)
             {
                 if(NPC[A].Location.SpeedX == 0.0 && NPC[A].CantHurtPlayer != C)
                 {
-                    PlaySound(SFX_ShellHit);
+                    if(NPCScore[NPC[A].Type] == 1)
+                        PlaySound(SFX_ShellHit);
+                    else if(NPCScore[NPC[A].Type] == 2)
+                        PlaySound(SFX_ShellHit);
+                    else if(NPCScore[NPC[A].Type] == 3)
+                        PlaySound(SFX_Combo1);
+                    else if(NPCScore[NPC[A].Type] == 4)
+                        PlaySound(SFX_Combo2);
+                    else if(NPCScore[NPC[A].Type] == 5)
+                        PlaySound(SFX_Combo3);
+                    else if(NPCScore[NPC[A].Type] == 6)
+                        PlaySound(SFX_Combo4);
+                    else if(NPCScore[NPC[A].Type] == 7)
+                        PlaySound(SFX_Combo5);
+                    else if(NPCScore[NPC[A].Type] == 8)
+                        PlaySound(SFX_Combo6);
+                    else if(NPCScore[NPC[A].Type] >= 9)
+                        PlaySound(SFX_Combo7);
                     NPC[A].Location.SpeedX = double(Physics.NPCShellSpeed * Player[C].Direction);
                     NPC[A].CantHurt = Physics.NPCCanHurtWait;
                     NPC[A].CantHurtPlayer = C;
@@ -1531,7 +1668,24 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 2 || B == 7)
         {
-            PlaySound(SFX_ShellHit);
+            if(NPCScore[NPC[A].Type] == 1)
+                PlaySound(SFX_ShellHit);
+            else if(NPCScore[NPC[A].Type] == 2)
+                PlaySound(SFX_ShellHit);
+            else if(NPCScore[NPC[A].Type] == 3)
+                PlaySound(SFX_Combo1);
+            else if(NPCScore[NPC[A].Type] == 4)
+                PlaySound(SFX_Combo2);
+            else if(NPCScore[NPC[A].Type] == 5)
+                PlaySound(SFX_Combo3);
+            else if(NPCScore[NPC[A].Type] == 6)
+                PlaySound(SFX_Combo4);
+            else if(NPCScore[NPC[A].Type] == 7)
+                PlaySound(SFX_Combo5);
+            else if(NPCScore[NPC[A].Type] == 8)
+                PlaySound(SFX_Combo6);
+            else if(NPCScore[NPC[A].Type] >= 9)
+                PlaySound(SFX_Combo7);
             NPC[A].Projectile = true;
             NPC[A].Location.SpeedY = -5;
             NPC[A].Location.SpeedX = 0;
@@ -1577,7 +1731,24 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = 0;
             if(B == 5)
             {
-                PlaySound(SFX_ShellHit);
+                if(NPCScore[NPC[A].Type] == 1)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 2)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 3)
+                    PlaySound(SFX_Combo1);
+                else if(NPCScore[NPC[A].Type] == 4)
+                    PlaySound(SFX_Combo2);
+                else if(NPCScore[NPC[A].Type] == 5)
+                    PlaySound(SFX_Combo3);
+                else if(NPCScore[NPC[A].Type] == 6)
+                    PlaySound(SFX_Combo4);
+                else if(NPCScore[NPC[A].Type] == 7)
+                    PlaySound(SFX_Combo5);
+                else if(NPCScore[NPC[A].Type] == 8)
+                    PlaySound(SFX_Combo6);
+                else if(NPCScore[NPC[A].Type] >= 9)
+                    PlaySound(SFX_Combo7);
                 NPC[A].Location.SpeedX = Physics.NPCShellSpeed * -NPC[A].Direction;
                 NPC[A].Location.X += NPC[A].Location.SpeedX;
                 NPC[A].CantHurt = Physics.NPCCanHurtWait;
@@ -1635,7 +1806,24 @@ void NPCHit(int A, int B, int C)
         if(!(B == 1 || B == 2 || B == 6))
         {
             if(B != 8 && B != 10)
-                PlaySound(SFX_ShellHit);
+                if(NPCScore[NPC[A].Type] == 1)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 2)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 3)
+                    PlaySound(SFX_Combo1);
+                else if(NPCScore[NPC[A].Type] == 4)
+                    PlaySound(SFX_Combo2);
+                else if(NPCScore[NPC[A].Type] == 5)
+                    PlaySound(SFX_Combo3);
+                else if(NPCScore[NPC[A].Type] == 6)
+                    PlaySound(SFX_Combo4);
+                else if(NPCScore[NPC[A].Type] == 7)
+                    PlaySound(SFX_Combo5);
+                else if(NPCScore[NPC[A].Type] == 8)
+                    PlaySound(SFX_Combo6);
+                else if(NPCScore[NPC[A].Type] >= 9)
+                    PlaySound(SFX_Combo7);
             NPC[A].Killed = B;
         }
     }
@@ -1649,14 +1837,48 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
         else if(B == 3 || B == 5 || B == 7)
         {
-            PlaySound(SFX_ShellHit);
+            if(NPCScore[NPC[A].Type] == 1)
+                PlaySound(SFX_ShellHit);
+            else if(NPCScore[NPC[A].Type] == 2)
+                PlaySound(SFX_ShellHit);
+            else if(NPCScore[NPC[A].Type] == 3)
+                PlaySound(SFX_Combo1);
+            else if(NPCScore[NPC[A].Type] == 4)
+                PlaySound(SFX_Combo2);
+            else if(NPCScore[NPC[A].Type] == 5)
+                PlaySound(SFX_Combo3);
+            else if(NPCScore[NPC[A].Type] == 6)
+                PlaySound(SFX_Combo4);
+            else if(NPCScore[NPC[A].Type] == 7)
+                PlaySound(SFX_Combo5);
+            else if(NPCScore[NPC[A].Type] == 8)
+                PlaySound(SFX_Combo6);
+            else if(NPCScore[NPC[A].Type] >= 9)
+                PlaySound(SFX_Combo7);
             NPC[A].Killed = B;
         }
         else if(B == 4 && C > 0)
         {
             if(NPC[C].Projectile)
             {
-                PlaySound(SFX_ShellHit);
+                if(NPCScore[NPC[A].Type] == 1)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 2)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 3)
+                    PlaySound(SFX_Combo1);
+                else if(NPCScore[NPC[A].Type] == 4)
+                    PlaySound(SFX_Combo2);
+                else if(NPCScore[NPC[A].Type] == 5)
+                    PlaySound(SFX_Combo3);
+                else if(NPCScore[NPC[A].Type] == 6)
+                    PlaySound(SFX_Combo4);
+                else if(NPCScore[NPC[A].Type] == 7)
+                    PlaySound(SFX_Combo5);
+                else if(NPCScore[NPC[A].Type] == 8)
+                    PlaySound(SFX_Combo6);
+                else if(NPCScore[NPC[A].Type] >= 9)
+                    PlaySound(SFX_Combo7);
                 NPC[A].Killed = 3;
             }
         }
@@ -1732,12 +1954,46 @@ void NPCHit(int A, int B, int C)
                 if(C > 0)
                     NPCHit(C, 3, A);
                 NPC[A].Damage++;
-                PlaySound(SFX_ShellHit);
+                if(NPCScore[NPC[A].Type] == 1)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 2)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 3)
+                    PlaySound(SFX_Combo1);
+                else if(NPCScore[NPC[A].Type] == 4)
+                    PlaySound(SFX_Combo2);
+                else if(NPCScore[NPC[A].Type] == 5)
+                    PlaySound(SFX_Combo3);
+                else if(NPCScore[NPC[A].Type] == 6)
+                    PlaySound(SFX_Combo4);
+                else if(NPCScore[NPC[A].Type] == 7)
+                    PlaySound(SFX_Combo5);
+                else if(NPCScore[NPC[A].Type] == 8)
+                    PlaySound(SFX_Combo6);
+                else if(NPCScore[NPC[A].Type] >= 9)
+                    PlaySound(SFX_Combo7);
             }
             else if(B == 6)
             {
                 NPC[A].Killed = B;
-                PlaySound(SFX_ShellHit);
+                if(NPCScore[NPC[A].Type] == 1)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 2)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 3)
+                    PlaySound(SFX_Combo1);
+                else if(NPCScore[NPC[A].Type] == 4)
+                    PlaySound(SFX_Combo2);
+                else if(NPCScore[NPC[A].Type] == 5)
+                    PlaySound(SFX_Combo3);
+                else if(NPCScore[NPC[A].Type] == 6)
+                    PlaySound(SFX_Combo4);
+                else if(NPCScore[NPC[A].Type] == 7)
+                    PlaySound(SFX_Combo5);
+                else if(NPCScore[NPC[A].Type] == 8)
+                    PlaySound(SFX_Combo6);
+                else if(NPCScore[NPC[A].Type] >= 9)
+                    PlaySound(SFX_Combo7);
             }
             else if(B == 10)
             {
@@ -1770,7 +2026,24 @@ void NPCHit(int A, int B, int C)
                             {
                                 NPC[A].Killed = B;
                                 if(A != C && B != 8 && B != 10)
-                                    PlaySound(SFX_ShellHit);
+                                    if(NPCScore[NPC[A].Type] == 1)
+                                        PlaySound(SFX_ShellHit);
+                                    else if(NPCScore[NPC[A].Type] == 2)
+                                        PlaySound(SFX_ShellHit);
+                                    else if(NPCScore[NPC[A].Type] == 3)
+                                        PlaySound(SFX_Combo1);
+                                    else if(NPCScore[NPC[A].Type] == 4)
+                                        PlaySound(SFX_Combo2);
+                                    else if(NPCScore[NPC[A].Type] == 5)
+                                        PlaySound(SFX_Combo3);
+                                    else if(NPCScore[NPC[A].Type] == 6)
+                                        PlaySound(SFX_Combo4);
+                                    else if(NPCScore[NPC[A].Type] == 7)
+                                        PlaySound(SFX_Combo5);
+                                    else if(NPCScore[NPC[A].Type] == 8)
+                                        PlaySound(SFX_Combo6);
+                                    else if(NPCScore[NPC[A].Type] >= 9)
+                                        PlaySound(SFX_Combo7);
                             }
                         }
                     }
@@ -1829,7 +2102,24 @@ void NPCHit(int A, int B, int C)
             else
             {
                 NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.6;
-                PlaySound(SFX_ShellHit);
+                if(NPCScore[NPC[A].Type] == 1)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 2)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 3)
+                    PlaySound(SFX_Combo1);
+                else if(NPCScore[NPC[A].Type] == 4)
+                    PlaySound(SFX_Combo2);
+                else if(NPCScore[NPC[A].Type] == 5)
+                    PlaySound(SFX_Combo3);
+                else if(NPCScore[NPC[A].Type] == 6)
+                    PlaySound(SFX_Combo4);
+                else if(NPCScore[NPC[A].Type] == 7)
+                    PlaySound(SFX_Combo5);
+                else if(NPCScore[NPC[A].Type] == 8)
+                    PlaySound(SFX_Combo6);
+                else if(NPCScore[NPC[A].Type] >= 9)
+                    PlaySound(SFX_Combo7);
             }
 
             NPC[A].Killed = B;
@@ -1958,7 +2248,24 @@ void NPCHit(int A, int B, int C)
                         else
                             NPC[A].Location.SpeedX = -3;
                     }
-                    PlaySound(SFX_ShellHit);
+                    if(NPCScore[NPC[A].Type] == 1)
+                        PlaySound(SFX_ShellHit);
+                    else if(NPCScore[NPC[A].Type] == 2)
+                        PlaySound(SFX_ShellHit);
+                    else if(NPCScore[NPC[A].Type] == 3)
+                        PlaySound(SFX_Combo1);
+                    else if(NPCScore[NPC[A].Type] == 4)
+                        PlaySound(SFX_Combo2);
+                    else if(NPCScore[NPC[A].Type] == 5)
+                        PlaySound(SFX_Combo3);
+                    else if(NPCScore[NPC[A].Type] == 6)
+                        PlaySound(SFX_Combo4);
+                    else if(NPCScore[NPC[A].Type] == 7)
+                        PlaySound(SFX_Combo5);
+                    else if(NPCScore[NPC[A].Type] == 8)
+                        PlaySound(SFX_Combo6);
+                    else if(NPCScore[NPC[A].Type] >= 9)
+                        PlaySound(SFX_Combo7);
                 }
             }
             else if(NPC[A].Type == 158 && B == 10)
@@ -1967,7 +2274,24 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Projectile = true;
                 NPC[A].Location.SpeedY = -5;
                 NPC[A].Location.SpeedX = Player[C].Location.SpeedX + 4 * Player[C].Direction;
-                PlaySound(SFX_ShellHit);
+                if(NPCScore[NPC[A].Type] == 1)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 2)
+                    PlaySound(SFX_ShellHit);
+                else if(NPCScore[NPC[A].Type] == 3)
+                    PlaySound(SFX_Combo1);
+                else if(NPCScore[NPC[A].Type] == 4)
+                    PlaySound(SFX_Combo2);
+                else if(NPCScore[NPC[A].Type] == 5)
+                    PlaySound(SFX_Combo3);
+                else if(NPCScore[NPC[A].Type] == 6)
+                    PlaySound(SFX_Combo4);
+                else if(NPCScore[NPC[A].Type] == 7)
+                    PlaySound(SFX_Combo5);
+                else if(NPCScore[NPC[A].Type] == 8)
+                    PlaySound(SFX_Combo6);
+                else if(NPCScore[NPC[A].Type] >= 9)
+                    PlaySound(SFX_Combo7);
             }
             else if(!(NPC[A].Type == 158 && (B == 4 || B == 8 || (B == 3 && NPC[C].Type == 13))))
             {
