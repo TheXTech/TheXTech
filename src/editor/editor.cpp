@@ -2786,6 +2786,7 @@ void zTestLevel(bool magicHand, bool interProcess)
 
     GamePaused = PauseCode::None;
     MessageText.clear();
+    MessageTextMap.clear();
 //  frmNPCs::chkMessage.Value = 0;
     BattleLives[1] = 3;
     BattleLives[2] = 3;

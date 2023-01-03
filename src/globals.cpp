@@ -65,6 +65,7 @@ bool resChanged = false;
 // PauseCode GamePaused = PauseCode::None;
 
 std::string MessageText;
+UTF8CharMap_t MessageTextMap;
 
 // int NumSelectWorld  = 0;
 // std::vector<SelectWorld_t> SelectWorld;

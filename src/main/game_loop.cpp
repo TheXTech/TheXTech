@@ -310,6 +310,7 @@ void MessageScreen_Init()
     SoundPause[SFX_Message] = 0;
     PlaySound(SFX_Message);
     MenuCursorCanMove = false;
+    BuildUTF8CharMap(MessageText, MessageTextMap);
 }
 
 bool MessageScreen_Logic(int plr)
@@ -357,6 +358,7 @@ bool MessageScreen_Logic(int plr)
     if(MenuCursorCanMove && (menuDoPress || menuBackPress))
     {
         MessageText.clear();
+        MessageTextMap.clear();
         return true;
     }
 

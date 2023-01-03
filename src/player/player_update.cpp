@@ -4348,7 +4348,8 @@ void UpdatePlayer()
                 {
                     MessageText = GetS(NPC[MessageNPC].Text);
                     PauseGame(PauseCode::Message, A);
-                    MessageText = "";
+                    MessageText.clear();
+                    MessageTextMap.clear();
                     if(NPC[MessageNPC].TriggerTalk != EVENT_NONE)
                         ProcEvent(NPC[MessageNPC].TriggerTalk);
                     MessageNPC = 0;

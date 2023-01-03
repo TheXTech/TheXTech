@@ -5,10 +5,32 @@
 #include "fontman/font_manager_private.h"
 #include "fontman/font_manager.h"
 
-//#define USE_OLD_TEXT_PARSER
+
+void BuildUTF8CharMap(const std::string& SuperText, std::vector<const char*> &outMap)
+{
+    const char* mapBuildIt = SuperText.c_str();
+    const char* mapBuildEnd = mapBuildIt + SuperText.size();
+
+    outMap.clear();
+
+    // Scan the whole line including the NULL terminator
+    for(; mapBuildIt <= mapBuildEnd; mapBuildIt++)
+    {
+        outMap.push_back(mapBuildIt);
+        UTF8 ucx = static_cast<unsigned char>(*mapBuildIt);
+        mapBuildIt += static_cast<size_t>(trailingBytesForUTF8[ucx]);
+    }
+}
+
+void DrawMessage(const std::string& SuperText)
+{
+    std::vector<const char*> SuperTextMap;
+    BuildUTF8CharMap(SuperText, SuperTextMap);
+    DrawMessage(SuperTextMap);
+}
 
 // based on Wohlstand's improved algorithm, but screen-size aware
-void DrawMessage(const std::string& SuperText)
+void DrawMessage(std::vector<const char*> &SuperTextMap)
 {
 #ifdef BUILT_IN_TEXTBOX
     const int TextBoxW = 500;
@@ -40,20 +62,6 @@ void DrawMessage(const std::string& SuperText)
     int lastWord = 0; // planned start of next line
     int numLines = 0; // n lines
     const int maxChars = ((TextBoxW - 24) / charWidth) + 1; // 27 by default
-
-    // Build map
-    std::vector<const char*> SuperTextMap;
-    const char* mapBuildIt = SuperText.c_str();
-    const char* mapBuildEnd = mapBuildIt + SuperText.size();
-
-    // Scan the whole line including the NULL terminator
-    for(; mapBuildIt <= mapBuildEnd; mapBuildIt++)
-    {
-        SuperTextMap.push_back(mapBuildIt);
-        UTF8 ucx = static_cast<unsigned char>(*mapBuildIt);
-        mapBuildIt += static_cast<size_t>(trailingBytesForUTF8[ucx]);
-    }
-
     // Text size without a NULL terminator
     const int textSize = static_cast<int>(SuperTextMap.size() - 1);
 

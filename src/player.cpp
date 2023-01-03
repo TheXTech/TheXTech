@@ -4465,6 +4465,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
         PauseGame(PauseCode::Message, A);
         MessageText.clear();
+        MessageTextMap.clear();
         canWarp = false;
     }
 

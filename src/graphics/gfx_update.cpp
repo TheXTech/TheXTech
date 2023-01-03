@@ -2224,7 +2224,12 @@ void UpdateGraphics(bool skipRepaint)
         PauseScreen::Render();
 
     if(GamePaused == PauseCode::Message)
-        DrawMessage(MessageText);
+    {
+        if(MessageTextMap.empty())
+            DrawMessage(MessageText);
+        else
+            DrawMessage(MessageTextMap);
+    }
 
     if(QuickReconnectScreen::g_active)
         QuickReconnectScreen::Render();

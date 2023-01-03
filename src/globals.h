@@ -147,6 +147,7 @@ extern bool ScrollRelease;
 extern bool TakeScreen;
 // EXTRA: Show any on-screen meta (HUD, debug prints, etc.)
 extern bool ShowOnScreenHUD;
+// EXTRA: Enable the new font engine
 extern bool NewFontRender;
 //Public LB As String  ' Line Break
 //extern std::string LB;
@@ -1095,6 +1096,8 @@ extern bool resChanged;
 
 //Public MessageText As String 'when talking to an npc
 extern std::string MessageText;
+typedef std::vector<const char*> UTF8CharMap_t;
+extern UTF8CharMap_t MessageTextMap;
 
 // moved to menu_main.h
 
