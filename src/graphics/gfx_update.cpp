@@ -29,6 +29,7 @@
 #include "../collision.h"
 #include "../editor.h"
 #include "../npc.h"
+#include "../player.h"
 #include "../gfx.h"
 #include "../layers.h"
 #include "../main/menu_main.h"
@@ -802,14 +803,36 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
 void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
 {
     double X, Y;
+    GetvScreenAverageCanonical(&X, &Y);
 
-    if(ScreenType == 2 || ScreenType == 3)
-        GetvScreenAverageCanonical(&X, &Y);
-    else if(ScreenType == 5 && !vScreen[2].Visible)
-        GetvScreenAverageCanonical(&X, &Y);
-    else if(ScreenType == 7)
-        GetvScreenAverageCanonical(&X, &Y);
-    else
+    // use DynamicScreen logic to check what numScreens would have been in the canonical field
+    int canonicalNumScreens = numScreens;
+
+    if(ScreenType == 5 && CheckDead() == 0)
+    {
+        if(Player[1].Section != Player[2].Section)
+            canonicalNumScreens = 2;
+        else if(level[Player[1].Section].Width - level[Player[1].Section].X > 800 && (Player[2].Location.X + X >= 800 * 0.75 - Player[2].Location.Width / 2.0) && (Player[1].Location.X < level[Player[1].Section].Width - 800 * 0.75 - Player[1].Location.Width / 2.0))
+            canonicalNumScreens = 2;
+        else if(level[Player[1].Section].Width - level[Player[1].Section].X > 800 && (Player[1].Location.X + X >= 800 * 0.75 - Player[1].Location.Width / 2.0) && (Player[2].Location.X < level[Player[1].Section].Width - 800 * 0.75 - Player[2].Location.Width / 2.0))
+            canonicalNumScreens = 2;
+        else if(level[Player[1].Section].Height - level[Player[1].Section].Y > 600 && (Player[1].Location.Y + Y >= 600 * 0.75 - vScreenYOffset - Player[1].Location.Height) && (Player[2].Location.Y < level[Player[1].Section].Height - 600 * 0.75 - vScreenYOffset - Player[2].Location.Height))
+            canonicalNumScreens = 2;
+        else if(level[Player[1].Section].Height - level[Player[1].Section].Y > 600 && (Player[2].Location.Y + Y >= 600 * 0.75 - vScreenYOffset - Player[2].Location.Height) && (Player[1].Location.Y < level[Player[1].Section].Height - 600 * 0.75 - vScreenYOffset - Player[1].Location.Height))
+            canonicalNumScreens = 2;
+        else
+            canonicalNumScreens = 1;
+    }
+    else if(ScreenType == 5)
+    {
+        canonicalNumScreens = 1;
+    }
+
+    // if the screen mode is different from the original game, don't even try to match original game behavior.
+    bool ignore_canonical = (numScreens != canonicalNumScreens);
+
+    // if appropriate, replace with player-centered vScreen
+    if(!ignore_canonical && ScreenType != 2 && ScreenType != 3 && ScreenType != 7 && (ScreenType != 5 || vScreen[2].Visible))
         GetvScreenCanonical(Z, &X, &Y);
 
     Location_t loc2;
@@ -846,6 +869,10 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
         if(NPC[A].Hidden)
         {
             render = cannot_reset = can_activate = false;
+        }
+        else if(ignore_canonical)
+        {
+            render = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
         }
         else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::smart)
         {
