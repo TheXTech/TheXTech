@@ -104,7 +104,10 @@ static void compatInit(Compatibility_t &c)
     c.bitblit_background_colour[1] = 0;
     c.bitblit_background_colour[2] = 0;
     
-    c.enableSEEFeatures = true;
+    c.enable_anti_cheat = true;
+    c.pause_and_exit_to_map = false;
+    c.save_anywhere = false;
+    c.switch_characters_on_the_fly = false;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -334,7 +337,10 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.read("world-map-fast-move", c.world_map_fast_move, c.world_map_fast_move);
     compat.read("fix-framethrower-gravity", c.fix_flamethrower_gravity, c.fix_flamethrower_gravity);
     
-    compat.read("enable-see-features", c.enableSEEFeatures, c.enableSEEFeatures);
+    compat.read("enable-anti-cheat", c.enable_anti_cheat, c.enable_anti_cheat);
+    compat.read("pause-and-exit-to-map", c.pause_and_exit_to_map, c.pause_and_exit_to_map);
+    compat.read("save-anywhere", c.save_anywhere, c.save_anywhere);
+    compat.read("switch-characters-on-the-fly", c.switch_characters_on_the_fly, c.switch_characters_on_the_fly);
     compat.endGroup();
 }
 

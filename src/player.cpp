@@ -7394,8 +7394,18 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
 // returns whether a player is allowed to swap characters
 bool SwapCharAllowed()
 {
-    if(LevelSelect || GameMenu || (IsEpisodeIntro && NoMap && GamePaused == PauseCode::DropAdd) || !LevelSelect)
-        return true;
+    if (g_compatibility.switch_characters_on_the_fly)
+        {
+            if(LevelSelect || GameMenu || (IsEpisodeIntro && NoMap && GamePaused == PauseCode::DropAdd) || !LevelSelect)
+                return true;
+            else
+                return false;
+        }
     else
-        return false;
+        {
+            if(LevelSelect || GameMenu || (IsEpisodeIntro && NoMap && GamePaused == PauseCode::DropAdd))
+                return true;
+            else
+                return false;
+        }
 }

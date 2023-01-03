@@ -83,7 +83,10 @@ struct Compatibility_t
     bool fix_npc_ceiling_speed; // when an NPC hits a ceiling block, it takes its SpeedY from that block, not from an arbitrary one
     bool emulate_classic_block_order; // the quadtree should return blocks in the order they had at the beginning of the level, not their current order
     
-    bool enableSEEFeatures; //Enables certain things, like disabling the disabling of saving while cheating, exiting to the map/hub while on a level, etc.
+    bool enable_anti_cheat; //Enables the anti-cheat feature, found in all SMBX versions
+    bool pause_and_exit_to_map; //Enables a feature to exit to the map while paused
+    bool save_anywhere; //Enables the ability to save anywhere
+    bool switch_characters_on_the_fly; //Whether to switch characters during levels or not
     
     unsigned int bitblit_background_colour[3];
 

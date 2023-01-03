@@ -153,7 +153,7 @@ static bool s_RestartLevelNonEditor()
 
 static bool s_SaveAndContinue()
 {
-    if (g_compatibility.enableSEEFeatures)
+    if (g_compatibility.save_anywhere)
     {
         bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap || !LevelSelect)) && !Cheater;
         if(CanSave)
@@ -189,7 +189,7 @@ static bool s_SaveAndContinue()
 
 static bool s_Quit()
 {
-    if (g_compatibility.enableSEEFeatures)
+    if (g_compatibility.save_anywhere)
     {
         bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap || !LevelSelect)) && !Cheater;
         if(CanSave)
@@ -278,12 +278,12 @@ void Init(bool LegacyPause)
         if(g_config.enter_cheats_menu_item && !LegacyPause)
             s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
         
-        if(IsOnLevel and g_compatibility.enableSEEFeatures)
+        if(IsOnLevel and g_compatibility.pause_and_exit_to_map)
         {
             s_items.push_back(MenuItem{"RETURN TO MAP/HUB", s_ExitLevel});
         }
         
-        if (g_compatibility.enableSEEFeatures)
+        if (g_compatibility.save_anywhere)
         {
             s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
             s_items.push_back(MenuItem{"SAVE & QUIT", s_Quit});
