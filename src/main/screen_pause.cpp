@@ -132,9 +132,19 @@ static bool s_QuitTesting()
     return true;
 }
 
+static bool s_ExitLevel()
+{
+    LevelBeatCode = 0;
+    LevelMacro = LEVELMACRO_OFF;
+    LevelMacroCounter = 0;
+    EndLevel = true;
+
+    return true;
+}
+
 static bool s_SaveAndContinue()
 {
-    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
+    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap || !LevelSelect)) && !Cheater;
 
     if(CanSave)
     {
@@ -152,7 +162,7 @@ static bool s_SaveAndContinue()
 
 static bool s_Quit()
 {
-    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
+    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap || !LevelSelect)) && !Cheater;
 
     if(CanSave)
         SaveGame(); // "Save & Quit"
@@ -191,6 +201,7 @@ void Init(bool LegacyPause)
     s_items.clear();
 
     bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
+    bool IsOnLevel = !LevelSelect && !Cheater;
 
     // pause
     if(TestLevel && LevelBeatCode == -2)
@@ -223,22 +234,20 @@ void Init(bool LegacyPause)
     else
     {
         s_items.push_back(MenuItem{"CONTINUE", s_Continue});
-
+        
         if(g_compatibility.allow_drop_add && !LegacyPause)
             s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
 
         if(g_config.enter_cheats_menu_item && !LegacyPause)
             s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
-
-        if(CanSave)
+        
+        if(IsOnLevel)
         {
-            s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
-            s_items.push_back(MenuItem{"SAVE & QUIT", s_Quit});
+            s_items.push_back(MenuItem{"RETURN TO MAP OR HUB", s_ExitLevel});
         }
-        else
-        {
-            s_items.push_back(MenuItem{"QUIT", s_Quit});
-        }
+        
+        s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
+        s_items.push_back(MenuItem{"SAVE & QUIT", s_Quit});
     }
 }
 
