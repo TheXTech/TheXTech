@@ -275,6 +275,16 @@ E_INLINE void lazyLoadedBytesReset() TAIL
 #endif
 
 
+E_INLINE void loadTexture(StdPicture &target,
+                          uint32_t width,
+                          uint32_t height,
+                          uint8_t *RGBApixels,
+                          uint32_t pitch) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->loadTexture(target, width, height, RGBApixels, pitch);
+}
+#endif
 
 E_INLINE void deleteTexture(StdPicture &tx, bool lazyUnload = false) TAIL
 #ifndef RENDER_CUSTOM

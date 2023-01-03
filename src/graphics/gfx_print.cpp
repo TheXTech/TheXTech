@@ -22,6 +22,7 @@
 
 #include <Logger/logger.h>
 #include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_assert.h"
 #include "core/render.h"
 
 #include "globals.h"

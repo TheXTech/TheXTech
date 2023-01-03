@@ -1,7 +1,10 @@
-﻿#include "globals.h"
+﻿#include "sdl_proxy/sdl_assert.h"
+
+#include "globals.h"
 #include "../graphics.h"
 #include "core/render.h"
 #include "../gfx.h"
+
 #include "fontman/font_manager_private.h"
 #include "fontman/font_manager.h"
 

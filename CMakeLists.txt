@@ -135,7 +135,7 @@ else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
 endif()
 
-if(NINTENDO_WII OR NINTENDO_3DS)
+if(NINTENDO_WII OR NINTENDO_3DS OR NINTENDO_DS)
     set(THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT OFF)
 else()
     set(THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT ON)
@@ -396,6 +396,7 @@ set(LIB_SRC
     lib/util.cpp
     lib/fader.cpp
     lib/Graphics/image_size.cpp
+    lib/Graphics/size.cpp
     ${APPPATH_SRCS}
     ${DIRMANAGER_SRCS}
     ${FMT_SRCS}
@@ -411,7 +412,6 @@ set(LIB_SRC
 if(NOT THEXTECH_NO_SDL_BUILD)
 list(APPEND LIB_SRC
     lib/Graphics/graphics_funcs.cpp
-    lib/Graphics/size.cpp
     lib/Graphics/sizef.cpp
     lib/Graphics/rect.cpp
     lib/Graphics/rectf.cpp

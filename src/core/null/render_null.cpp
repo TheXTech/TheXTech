@@ -249,6 +249,9 @@ void lazyUnLoad(StdPicture &target)
     deleteTexture(target, true);
 }
 
+
+void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch) {}
+
 void deleteTexture(StdPicture &tx, bool lazyUnload)
 {
     if(!lazyUnload)
@@ -396,7 +399,7 @@ void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, f
         red, green, blue, alpha);
 }
 
-void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
+void renderTextureScale(double xDst, double yDst, double wDst, double hDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
     i_renderTexturePrivate(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), tx.w / 2, tx.h / 2,

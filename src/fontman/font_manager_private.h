@@ -24,7 +24,6 @@
 #include <PGE_File_Formats/ConvertUTF.h>
 #include <stdint.h>
 #include <string>
-#include <SDL2/SDL_assert.h>
 
 inline uint32_t char2int(const char32_t &ch)
 {

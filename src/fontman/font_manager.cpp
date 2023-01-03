@@ -17,6 +17,8 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include "sdl_proxy/sdl_assert.h"
+
 #include "font_manager.h"
 #include "font_manager_private.h"
 #include "raster_font.h"

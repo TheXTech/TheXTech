@@ -18,7 +18,7 @@
  */
 
 #include "ttf_font.h"
-#include <SDL2/SDL_assert.h>
+#include "sdl_proxy/sdl_assert.h"
 #include "core/render.h"
 #include <Logger/logger.h>
 #include <unordered_set>
@@ -471,12 +471,8 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
     texture.frame_w = width;
     texture.frame_h = height;
     texture.inited = true;
-    texture.l.w_orig = int(texture.w);
-    texture.l.h_orig = int(texture.h);
-    texture.l.w_scale = float(width) / float(texture.l.w_orig);
-    texture.l.h_scale = float(width) / float(texture.l.h_orig);
 
-    g_render->loadTexture(texture, width, height, image, pitch);
+    XRender::loadTexture(texture, width, height, image, pitch);
     t_glyph.tx      = &texture;
     t_glyph.width   = width;
     t_glyph.height  = height;
