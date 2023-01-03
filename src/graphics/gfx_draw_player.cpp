@@ -29,7 +29,7 @@
 //! Get left pixel at the player sprite
 int pfrX(const StdPicture& tx, const Player_t& p)
 {
-#ifndef THEXTECH_WIP_FEATURES
+#if !defined(THEXTECH_WIP_FEATURES) && !defined(__16M__)
     return ((p.Frame * p.Direction + 49) / 10) * 100;
 
 #else
@@ -66,7 +66,7 @@ int pfrX(const StdPicture& tx, const Player_t& p)
 //! Get top pixel at the player sprite
 int pfrY(const StdPicture& tx, const Player_t& p)
 {
-#ifndef THEXTECH_WIP_FEATURES
+#if !defined(THEXTECH_WIP_FEATURES) && !defined(__16M__)
     return ((p.Frame * p.Direction + 49) % 10) * 100;
 
 #else

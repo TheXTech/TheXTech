@@ -28,6 +28,11 @@ elseif(NINTENDO_WII)
     list(APPEND SDLPROXY_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/wii/std_wii.cpp
     )
+elseif(NINTENDO_DS)
+    add_definitions(-DSDLRPOXY_NULL)
+    list(APPEND SDLPROXY_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/16m/std_16m.cpp
+    )
 elseif(THEXTECH_NO_SDL_BUILD)
     add_definitions(-DSDLRPOXY_NULL)
     add_definitions(-DCUSTOM_AUDIO)
