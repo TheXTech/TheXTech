@@ -96,9 +96,8 @@ void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X,
     int dFont = FontManager::fontIdFromSmbxFont(Font);
     if(NewFontRender && dFont >= 0)
     {
-        const auto out = std::string(SuperChars).substr(0, SuperN);
-        X -= FontManager::textSize(out, dFont).w();
-        FontManager::printText(out, X, Y, dFont, r, g, b, a);
+        X -= FontManager::textSize(SuperChars, SuperN, dFont).w();
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a);
         return;
     }
 
@@ -111,9 +110,8 @@ void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, flo
     int dFont = FontManager::fontIdFromSmbxFont(Font);
     if(NewFontRender && dFont >= 0)
     {
-        const auto out = std::string(SuperChars).substr(0, SuperN);
-        X -= FontManager::textSize(out, dFont).w() / 2;
-        FontManager::printText(out, X, Y, dFont, r, g, b, a);
+        X -= FontManager::textSize(SuperChars, SuperN, dFont).w() / 2;
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a);
         return;
     }
 
@@ -126,9 +124,8 @@ void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float 
     int dFont = FontManager::fontIdFromSmbxFont(Font);
     if(NewFontRender && dFont >= 0)
     {
-        const auto out = std::string(SuperChars).substr(0, SuperN);
-        float X = (ScreenW / 2) - (FontManager::textSize(out, dFont).w() / 2);
-        FontManager::printText(out, X, Y, dFont, r, g, b, a);
+        float X = (ScreenW / 2) - (FontManager::textSize(SuperChars, SuperN, dFont).w() / 2);
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a);
         return;
     }
 
@@ -142,7 +139,7 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
     int dFont = FontManager::fontIdFromSmbxFont(Font);
     if(NewFontRender && dFont >= 0)
     {
-        FontManager::printText(std::string(SuperChars).substr(0, SuperN), X, Y, dFont, r, g, b, a);
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a);
         return;
     }
 
@@ -300,48 +297,54 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
 
 int SuperTextPixLen(const char* SuperChars, int Font)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
-    {
-        return FontManager::textSize(SuperChars, dFont).w();
-    }
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+    int len = SDL_strlen(SuperChars);
 
-    return SuperTextPixLen(FontManager::utf8_strlen(SuperChars), SuperChars, Font);
+    if(dFont >= 0)
+        return FontManager::textSize(SuperChars, len, dFont).w();
+
+    return SuperTextPixLen(len, SuperChars, Font);
 }
 
 void SuperPrintRightAlign(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+    int len = SDL_strlen(SuperChars);
+
+    if(dFont >= 0)
     {
-        X -= FontManager::textSize(SuperChars, dFont).w();
-        FontManager::printText(SuperChars, X, Y, dFont, r, g, b, a);
+        X -= FontManager::textSize(SuperChars, len, dFont).w();
+        FontManager::printText(SuperChars, len, X, Y, dFont, r, g, b, a);
         return;
     }
 
-    SuperPrintRightAlign(SDL_strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrintRightAlign(len, SuperChars, Font, X, Y, r, g, b, a);
 }
 
 void SuperPrintCenter(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+    int len = SDL_strlen(SuperChars);
+
+    if(dFont >= 0)
     {
-        X -= FontManager::textSize(SuperChars, dFont).w() / 2;
-        FontManager::printText(SuperChars, X, Y, dFont, r, g, b, a);
+        X -= FontManager::textSize(SuperChars, len, dFont).w() / 2;
+        FontManager::printText(SuperChars, len, X, Y, dFont, r, g, b, a);
         return;
     }
 
-    SuperPrintCenter(SDL_strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrintCenter(len, SuperChars, Font, X, Y, r, g, b, a);
 }
 
 void SuperPrintScreenCenter(const char* SuperChars, int Font, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+    int len = SDL_strlen(SuperChars);
+
+    if(dFont >= 0)
     {
-        float X = (ScreenW / 2) - (FontManager::textSize(SuperChars, dFont).w() / 2);
-        FontManager::printText(SuperChars, X, Y, dFont, r, g, b, a);
+        float X = (ScreenW / 2) - (FontManager::textSize(SuperChars, len, dFont).w() / 2);
+        FontManager::printText(SuperChars, len, X, Y, dFont, r, g, b, a);
         return;
     }
 
@@ -350,14 +353,16 @@ void SuperPrintScreenCenter(const char* SuperChars, int Font, float Y, float r, 
 
 void SuperPrint(const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+    int len = SDL_strlen(SuperChars);
+
+    if(dFont >= 0)
     {
-        FontManager::printText(SuperChars, X, Y, dFont, r, g, b, a);
+        FontManager::printText(SuperChars, len, X, Y, dFont, r, g, b, a);
         return;
     }
 
-    SuperPrint(SDL_strlen(SuperChars), SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrint(len, SuperChars, Font, X, Y, r, g, b, a);
 }
 
 
@@ -365,22 +370,22 @@ void SuperPrint(const char* SuperChars, int Font, float X, float Y, float r, flo
 
 int SuperTextPixLen(const std::string& SuperWords, int Font)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
-    {
-        return FontManager::textSize(SuperWords, dFont).w();
-    }
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+
+    if(dFont >= 0)
+        return FontManager::textSize(SuperWords.c_str(), SuperWords.size(), dFont).w();
 
     return SuperTextPixLen(SuperWords.size(), SuperWords.c_str(), Font);
 }
 
 void SuperPrintRightAlign(const std::string& SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+
+    if(dFont >= 0)
     {
-        X -= FontManager::textSize(SuperWords, dFont).w();
-        FontManager::printText(SuperWords, X, Y, dFont, r, g, b, a);
+        X -= FontManager::textSize(SuperWords.c_str(), SuperWords.size(), dFont).w();
+        FontManager::printText(SuperWords.c_str(), SuperWords.size(), X, Y, dFont, r, g, b, a);
         return;
     }
 
@@ -389,11 +394,12 @@ void SuperPrintRightAlign(const std::string& SuperWords, int Font, float X, floa
 
 void SuperPrintCenter(const std::string& SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+
+    if(dFont >= 0)
     {
-        X -= FontManager::textSize(SuperWords, dFont).w() / 2;
-        FontManager::printText(SuperWords, X, Y, dFont, r, g, b, a);
+        X -= FontManager::textSize(SuperWords.c_str(), SuperWords.size(), dFont).w() / 2;
+        FontManager::printText(SuperWords.c_str(), SuperWords.size(), X, Y, dFont, r, g, b, a);
         return;
     }
 
@@ -402,11 +408,12 @@ void SuperPrintCenter(const std::string& SuperWords, int Font, float X, float Y,
 
 void SuperPrintScreenCenter(const std::string& SuperWords, int Font, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+
+    if(dFont >= 0)
     {
-        float X = (ScreenW / 2) - (FontManager::textSize(SuperWords, dFont).w() / 2);
-        FontManager::printText(SuperWords, X, Y, dFont, r, g, b, a);
+        float X = (ScreenW / 2) - (FontManager::textSize(SuperWords.c_str(), SuperWords.size(), dFont).w() / 2);
+        FontManager::printText(SuperWords.c_str(), SuperWords.size(), X, Y, dFont, r, g, b, a);
         return;
     }
 
@@ -415,10 +422,11 @@ void SuperPrintScreenCenter(const std::string& SuperWords, int Font, float Y, fl
 
 void SuperPrint(const std::string& SuperWords, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+
+    if(dFont >= 0)
     {
-        FontManager::printText(SuperWords, X, Y, dFont, r, g, b, a);
+        FontManager::printText(SuperWords.c_str(), SuperWords.size(), X, Y, dFont, r, g, b, a);
         return;
     }
 

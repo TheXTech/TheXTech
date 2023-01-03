@@ -46,18 +46,20 @@ public:
     /*!
      * \brief Measure the size of the multiline text block in pixels
      * \param text Multi-line text string
+     * \param text_size The byte size of the text string to print
      * \param max_line_length maximum length of the line in characters
      * \param cut Cut the part of string after the line length and put the "..." to the end (Note: input string will remina unmodified)
      * \param fontSize The size of the TTF font glyph (unused for raster fonts)
      * \return Width and height of the text block in pixels
      */
-    PGE_Size textSize(const std::string& text,
+    PGE_Size textSize(const char* text, size_t text_size,
                       uint32_t max_line_lenght = 0,
                       bool  cut = false, uint32_t fontSize = 14);
 
     /*!
      * \brief Print the multiline text block on the screen
      * \param text Multi-line text string
+     * \param text_size The byte size of the text string to print
      * \param x Hotizontal screen position (at left-top corner of the block)
      * \param y Vertical screen position (at left-top corner of the block)
      * \param Red Red channel colour
@@ -66,7 +68,7 @@ public:
      * \param Alpha Alpha channel level
      * \param fontSize The size of the TTF font glyph (unused for raster fonts)
      */
-    void printText(const std::string &text,
+    void printText(const char* text, size_t text_size,
                    int32_t x, int32_t y,
                    float Red=1.f, float Green=1.f, float Blue=1.f, float Alpha=1.f,
                    uint32_t fontSize = 0);

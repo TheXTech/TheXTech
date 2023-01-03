@@ -126,15 +126,16 @@ bool TtfFont::loadFont(const char *mem, size_t size)
     return true;
 }
 
-PGE_Size TtfFont::textSize(const std::string &text,
+PGE_Size TtfFont::textSize(const char *text, size_t text_size,
                            uint32_t max_line_length,
                            bool cut, uint32_t fontSize)
 {
-    const std::string *t = &text;
+    const char* t = text;
+    size_t t_size = text_size;
     std::string modText;
 
     SDL_assert_release(g_ft);
-    if(text.empty())
+    if(!text || text_size == 0)
         return PGE_Size(0, 0);
 
     //! index of last found space character
@@ -149,18 +150,19 @@ PGE_Size TtfFont::textSize(const std::string &text,
 
     if(cut)
     {
-        modText = text;
+        modText = std::string(text, text_size);
         std::string::size_type i = modText.find('\n');
         if(i != std::string::npos)
             modText.erase(i, modText.size() - i);
-        t = &modText;
+        t = modText.c_str();
+        t_size = modText.size();
     }
 
     /****************Word wrap*********************/
     uint32_t x = 0;
-    for(size_t i = 0; i < t->size(); i++, x++)
+    for(size_t i = 0; i < t_size; i++, x++)
     {
-        const char &cx = (*t)[i];
+        const char &cx = t[i];
         UTF8 uch = static_cast<unsigned char>(cx);
 
         switch(cx)
@@ -172,6 +174,8 @@ PGE_Size TtfFont::textSize(const std::string &text,
         {
             //Fake tabulation
             size_t space = (4 * fontSize);
+            if(space == 0)
+                space = 1; // Don't divide by zero
             widthSumm += (space - ((widthSumm / space) % 4));
             if(widthSumm > widthSummMax)
                 widthSummMax = widthSumm;
@@ -206,10 +210,11 @@ PGE_Size TtfFont::textSize(const std::string &text,
         {
             maxWidth = x;
 
-            if(t != &modText)
+            if(t != modText.c_str())
             {
                 modText = text;
-                t = &modText;
+                t = modText.c_str();
+                t_size = modText.size();
             }
 
             if(lastspace > 0)
@@ -221,6 +226,8 @@ PGE_Size TtfFont::textSize(const std::string &text,
             else
             {
                 modText.insert(i, 1, '\n');
+                t = modText.c_str();
+                t_size = modText.size();
                 x = 0;
                 count++;
             }
@@ -228,28 +235,29 @@ PGE_Size TtfFont::textSize(const std::string &text,
         i += static_cast<size_t>(trailingBytesForUTF8[uch]);
     }
 
-    if(count == 1)
-        maxWidth = static_cast<uint32_t>(text.length());
+    // Unused later
+//    if(count == 1)
+//        maxWidth = static_cast<uint32_t>(t_size);
 
     /****************Word wrap*end*****************/
     return PGE_Size(static_cast<int32_t>(widthSummMax), static_cast<int32_t>((fontSize * 1.5) * count));
 }
 
-void TtfFont::printText(const std::string &text,
+void TtfFont::printText(const char *text, size_t text_size,
                         int32_t x, int32_t y,
                         float Red, float Green, float Blue, float Alpha,
                         uint32_t fontSize)
 {
     SDL_assert_release(g_ft);
-    if(text.empty())
+    if(!text || text_size == 0)
         return;
 
     uint32_t offsetX = 0;
     uint32_t offsetY = 0;
     bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;
 
-    const char *strIt  = text.c_str();
-    const char *strEnd = strIt + text.size();
+    const char *strIt  = text;
+    const char *strEnd = strIt + text_size;
     for(; strIt < strEnd; strIt++)
     {
         const char &cx = *strIt;

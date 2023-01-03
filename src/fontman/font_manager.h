@@ -77,16 +77,18 @@ enum DefaultFont
 /**
  * @brief Get pixel metrics of the text block
  * @param text Text fragment to measure
+ * @param text_size The byte size of the text fragment to print
  * @param fontID Font-ID
  * @param max_line_lenght max line width
  * @param cut First line only, ignore all next lines
  * @param ttfFontPixelSize Point size for the TTF fonts
  * @return
  */
-PGE_Size textSize(const std::string &text, int    fontID,
-                  uint32_t max_line_lenght = 0,
-                  bool   cut = false,
-                  uint32_t ttfFontSize = 14);
+PGE_Size textSize(const char *text, size_t text_size,
+                  int       fontID,
+                  uint32_t  max_line_lenght = 0,
+                  bool      cut = false,
+                  uint32_t  ttfFontSize = 14);
 
 /**
  * @brief Retreive Font-ID from the font name
@@ -98,6 +100,7 @@ int      getFontID(std::string fontName);
 /**
  * @brief Print the text fragment to the screen
  * @param text Text fragment to print
+ * @param text_size The byte size of the text fragment to print
  * @param x X position on the screen
  * @param y Y position on the screen
  * @param font Font-ID
@@ -107,14 +110,10 @@ int      getFontID(std::string fontName);
  * @param Alpha Alpha-channel level from 0.0 to 1.0
  * @param ttf_FontSize Point size for the TTF fonts
  */
-void printText(const std::string& text,
-               int x, int y, int font = DefaultRaster,
-               float Red=1.0, float Green=1.0, float Blue=1.0, float Alpha=1.0,
-               uint32_t ttf_FontSize = 14);
-
-void printText(const char* text,
-               int x, int y, int font = DefaultRaster,
-               float Red=1.0, float Green=1.0, float Blue=1.0, float Alpha=1.0,
+void printText(const char* text, size_t text_size,
+               int x, int y,
+               int font = DefaultRaster,
+               float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
                uint32_t ttf_FontSize = 14);
 
 /**

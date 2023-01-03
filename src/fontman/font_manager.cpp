@@ -219,7 +219,7 @@ void FontManager::quit()
 }
 
 
-PGE_Size FontManager::textSize(const std::string& text, int fontID,
+PGE_Size FontManager::textSize(const char* text, size_t text_size, int fontID,
                                uint32_t max_line_lenght,
                                bool cut,
                                uint32_t ttfFontSize)
@@ -229,12 +229,10 @@ PGE_Size FontManager::textSize(const std::string& text, int fontID,
     (void)ttfFontSize;
 #endif
 
-    (void)cut;
-
     if(!g_fontManagerIsInit)
-        return PGE_Size(27 * 20, static_cast<int>(std::count(text.begin(), text.end(), '\n') + 1) * 20);
+        return PGE_Size(27 * 20, static_cast<int>(std::count(text, text + text_size, '\n') + 1) * 20);
 
-    if(text.empty())
+    if(!text || text_size == 0)
         return PGE_Size(0, 0);
 
     if(max_line_lenght <= 0)
@@ -248,18 +246,18 @@ PGE_Size FontManager::textSize(const std::string& text, int fontID,
 //    }
 
     //Use one of loaded fonts
-    if((fontID >= 0) && (static_cast<size_t>(fontID) < g_anyFonts.size()))
+    if((fontID >= 0) && (static_cast<size_t>(fontID) < g_anyFonts.size()) && g_anyFonts[fontID])
     {
         if(g_anyFonts[fontID]->isLoaded())
-            return g_anyFonts[fontID]->textSize(text, max_line_lenght);
+            return g_anyFonts[fontID]->textSize(text, text_size, max_line_lenght, cut);
     }
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-    if(g_defaultTtfFont->isLoaded())
-        return g_defaultTtfFont->textSize(text, max_line_lenght, false, ttfFontSize);
+    if(g_defaultTtfFont && g_defaultTtfFont->isLoaded())
+        return g_defaultTtfFont->textSize(text, text_size, max_line_lenght, cut, ttfFontSize);
 #endif
 
-    return PGE_Size(27 * 20, static_cast<int>(std::count(text.begin(), text.end(), '\n') + 1) * 20);
+    return PGE_Size(27 * 20, static_cast<int>(std::count(text, text + text_size, '\n') + 1) * 20);
 }
 
 int FontManager::getFontID(std::string fontName)
@@ -271,24 +269,23 @@ int FontManager::getFontID(std::string fontName)
         return i->second;
 }
 
-
-
-void FontManager::printText(const std::string &text,
-                            int x, int y, int font,
+void FontManager::printText(const char* text, size_t text_size,
+                            int x, int y,
+                            int font,
                             float Red, float Green, float Blue, float Alpha,
                             uint32_t ttf_FontSize)
 {
     if(!g_fontManagerIsInit)
         return;
 
-    if(text.empty())
+    if(!text || text_size == 0)
         return;
 
-    if((font >= 0) && (static_cast<size_t>(font) < g_anyFonts.size()))
+    if((font >= 0) && (static_cast<size_t>(font) < g_anyFonts.size()) && g_anyFonts[font])
     {
         if(g_anyFonts[font]->isLoaded())
         {
-            g_anyFonts[font]->printText(text, x, y, Red, Green, Blue, Alpha);
+            g_anyFonts[font]->printText(text, text_size, x, y, Red, Green, Blue, Alpha);
             return;
         }
     }
@@ -298,49 +295,14 @@ void FontManager::printText(const std::string &text,
     case DefaultRaster:
         if(g_defaultRasterFont && g_defaultRasterFont->isLoaded())
         {
-            g_defaultRasterFont->printText(text, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
+            g_defaultRasterFont->printText(text, text_size, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
             break;
         } /*fallthrough*/
     case DefaultTTF_Font:
     default:
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-        if(g_defaultTtfFont->isLoaded())
-            g_defaultTtfFont->printText(text, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
-#endif
-        break;
-    }
-}
-
-void FontManager::printText(const char* text, int x, int y, int font, float Red, float Green, float Blue, float Alpha, uint32_t ttf_FontSize)
-{
-    if(!g_fontManagerIsInit)
-        return;
-
-    if(!text)
-        return;
-
-    if((font >= 0) && (static_cast<size_t>(font) < g_anyFonts.size()))
-    {
-        if(g_anyFonts[font]->isLoaded())
-        {
-            g_anyFonts[font]->printText(text, x, y, Red, Green, Blue, Alpha);
-            return;
-        }
-    }
-
-    switch(font)
-    {
-    case DefaultRaster:
-        if(g_defaultRasterFont && g_defaultRasterFont->isLoaded())
-        {
-            g_defaultRasterFont->printText(text, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
-            break;
-        } /*fallthrough*/
-    case DefaultTTF_Font:
-    default:
-#ifdef THEXTECH_ENABLE_TTF_SUPPORT
-        if(g_defaultTtfFont->isLoaded())
-            g_defaultTtfFont->printText(text, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
+        if(g_defaultTtfFont && g_defaultTtfFont->isLoaded())
+            g_defaultTtfFont->printText(text, text_size, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
 #endif
         break;
     }

@@ -233,12 +233,13 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
 }
 
 
-PGE_Size RasterFont::textSize(const std::string &text, uint32_t max_line_lenght, bool cut, uint32_t)
+PGE_Size RasterFont::textSize(const char* text, size_t text_size, uint32_t max_line_lenght, bool cut, uint32_t)
 {
-    const std::string *t = &text;
+    const char* t = text;
+    size_t t_size = text_size;
     std::string modText;
 
-    if(text.empty())
+    if(!text || text_size == 0)
         return PGE_Size(0, 0);
 
     size_t lastspace = 0; //!< index of last found space character
@@ -250,18 +251,19 @@ PGE_Size RasterFont::textSize(const std::string &text, uint32_t max_line_lenght,
 
     if(cut)
     {
-        modText = text;
+        modText = std::string(text, text_size);
         std::string::size_type i = modText.find('\n');
         if(i != std::string::npos)
             modText.erase(i, modText.size() - i);
-        t = &modText;
+        t = modText.c_str();
+        t_size = modText.size();
     }
 
     /****************Word wrap*********************/
     uint32_t x = 0;
-    for(size_t i = 0; i < t->size(); i++, x++)
+    for(size_t i = 0; i < t_size; i++, x++)
     {
-        const char &cx = (*t)[i];
+        const char &cx = t[i];
         UTF8 uch = static_cast<unsigned char>(cx);
 
         switch(cx)
@@ -273,6 +275,8 @@ PGE_Size RasterFont::textSize(const std::string &text, uint32_t max_line_lenght,
         {
             lastspace = i;
             size_t spaceSize = m_spaceWidth + m_interLetterSpace / 2;
+            if(spaceSize == 0)
+                spaceSize = 1; // Don't divide by zero
             size_t tabMult = 4 - ((widthSumm / spaceSize) % 4);
             widthSumm += static_cast<size_t>(m_spaceWidth + m_interLetterSpace / 2) * tabMult;
             if(widthSumm > widthSummMax)
@@ -344,10 +348,11 @@ PGE_Size RasterFont::textSize(const std::string &text, uint32_t max_line_lenght,
         if((max_line_lenght > 0) && (x >= max_line_lenght)) //If lenght more than allowed
         {
             maxWidth = x;
-            if(t != &modText)
+            if(t != modText.c_str())
             {
                 modText = text;
-                t = &modText;
+                t = modText.c_str();
+                t_size = modText.size();
             }
 
             if(lastspace > 0)
@@ -359,6 +364,8 @@ PGE_Size RasterFont::textSize(const std::string &text, uint32_t max_line_lenght,
             else
             {
                 modText.insert(i, 1, '\n');
+                t = modText.c_str();
+                t_size = modText.size();
                 x = 0;
                 count++;
             }
@@ -366,19 +373,20 @@ PGE_Size RasterFont::textSize(const std::string &text, uint32_t max_line_lenght,
         i += static_cast<size_t>(trailingBytesForUTF8[uch]);
     }
 
-    if(count == 1)
-        maxWidth = static_cast<uint32_t>(text.length());
+    // Unused later
+//    if(count == 1)
+//        maxWidth = static_cast<uint32_t>(t_size);
 
     /****************Word wrap*end*****************/
     return PGE_Size(static_cast<int32_t>(widthSummMax), static_cast<int32_t>(m_newlineOffset * count));
 }
 
-void RasterFont::printText(const std::string &text,
+void RasterFont::printText(const char* text, size_t text_size,
                            int32_t x, int32_t y,
                            float Red, float Green, float Blue, float Alpha,
                            uint32_t)
 {
-    if(m_charMap.empty() || text.empty())
+    if(m_charMap.empty() || !text || text_size == 0)
         return;
 
     uint32_t offsetX = 0;
@@ -390,8 +398,8 @@ void RasterFont::printText(const std::string &text,
     bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;
 #endif
 
-    const char *strIt  = text.c_str();
-    const char *strEnd = strIt + text.size();
+    const char *strIt  = text;
+    const char *strEnd = strIt + text_size;
     for(; strIt < strEnd; strIt++)
     {
         const char &cx = *strIt;
