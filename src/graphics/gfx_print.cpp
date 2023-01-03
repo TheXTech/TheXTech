@@ -41,6 +41,10 @@ namespace std
 int SuperTextPixLen(int SuperN, const char* SuperChars, int Font)
 {
     int len = 0;
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+
+    if(dFont >= 0)
+        return FontManager::textSize(SuperChars, SuperN, dFont).w();
 
     switch(Font)
     {
@@ -93,8 +97,9 @@ int SuperTextPixLen(int SuperN, const char* SuperChars, int Font)
 
 void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+
+    if(dFont >= 0)
     {
         X -= FontManager::textSize(SuperChars, SuperN, dFont).w();
         FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a);
@@ -107,8 +112,9 @@ void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X,
 
 void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+
+    if(dFont >= 0)
     {
         X -= FontManager::textSize(SuperChars, SuperN, dFont).w() / 2;
         FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a);
@@ -121,8 +127,9 @@ void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, flo
 
 void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float Y, float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+
+    if(dFont >= 0)
     {
         float X = (ScreenW / 2) - (FontManager::textSize(SuperChars, SuperN, dFont).w() / 2);
         FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a);
@@ -136,8 +143,9 @@ void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float 
 void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
                 float r, float g, float b, float a)
 {
-    int dFont = FontManager::fontIdFromSmbxFont(Font);
-    if(NewFontRender && dFont >= 0)
+    int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
+
+    if(dFont >= 0)
     {
         FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a);
         return;
