@@ -2325,12 +2325,16 @@ static void processCheats()
 
     if(cheated)
     {
-        if g_compatibility.enableSEEFeatures then
+        if g_compatibility.enableSEEFeatures == true
+        {
             pLogDebug("Cheating detected! The game can still save though. [%s]\n", oldString.c_str());
             Cheater = false;
-        else if not g_compatibility.enableSEEFeatures then
+        }
+        else if g_compatibility.enableSEEFeatures == false
+        {
             pLogDebug("Cheating detected!!!! [%s]\n", oldString.c_str());
             Cheater = true;
+        }
     }
 }
 
