@@ -471,6 +471,12 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
     texture.frame_w = width;
     texture.frame_h = height;
     texture.inited = true;
+#ifdef PICTURE_LOAD_NORMAL
+    texture.l.w_orig = int(texture.w);
+    texture.l.h_orig = int(texture.h);
+    texture.l.w_scale = float(width) / float(texture.l.w_orig);
+    texture.l.h_scale = float(width) / float(texture.l.h_orig);
+#endif
 
     XRender::loadTexture(texture, width, height, image, pitch);
     t_glyph.tx      = &texture;
