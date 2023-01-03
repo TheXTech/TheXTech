@@ -19,25 +19,54 @@
  */
 
 #pragma once
-#ifndef PICTURE_DATA_H
-#define PICTURE_DATA_H
 
-// TODO: Implement here branching between platform specific StdPictureData variants
+#ifndef PICTURE_DATA_16M_H
+#define PICTURE_DATA_16M_H
 
-#ifdef __3DS__
-#   define PICTURE_DATA_3DS
-#   include "3ds/picture_data_3ds.h"
-#elif defined(__WII__)
-#   define PICTURE_DATA_WII
-#   include "wii/picture_data_wii.h"
-#elif defined(__16M__)
-#   include "16m/picture_data_16m.h"
-#elif defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
-#   define PICTURE_DATA_NULL
-#   include "null/picture_data_null.h"
-#else
-#   define PICTURE_DATA_NORMAL
-#   include "sdl/picture_data_sdl.h"
-#endif
+#include <cstdint>
+#include <nds.h>
 
-#endif // PICTURE_DATA_H
+#define X_IMG_EXT ".dsg"
+#define X_NO_PNG_GIF
+
+/*!
+ * \brief Platform specific picture data. Fields should not be used directly
+ */
+struct StdPictureData
+{
+
+    bool attempted_load = false;
+
+    int flags = 0;
+
+    int texture[3] = {0, 0, 0};
+    uint16_t tex_w[3] = {0, 0, 0};
+    uint16_t tex_h[3] = {0, 0, 0};
+
+    inline bool reallyHasTexture()
+    {
+        return texture[0];
+    }
+
+    inline bool hasTexture()
+    {
+        return attempted_load;
+    }
+
+    inline void destroy()
+    {
+        glDeleteTextures(3, texture);
+
+        for(int i = 0; i < 3; i++)
+        {
+            texture[i] = 0;
+            tex_w[i] = 0;
+            tex_h[i] = 0;
+        }
+
+        attempted_load = false;
+    }
+
+};
+
+#endif // PICTURE_DATA_16M_H
