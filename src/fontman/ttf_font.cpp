@@ -415,7 +415,18 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
     if((width == 0) || (height == 0))
         return dummyGlyph;
 
-    auto *image = new uint8_t[4 * width * height];
+    uint8_t *image = nullptr;
+
+    try
+    {
+        image = new uint8_t[4 * width * height];
+    }
+    catch(const std::bad_alloc &e)
+    {
+        pLogCritical("TtfFont::TheGlyph: Out of memory: %s", e.what());
+        return dummyGlyph;
+    }
+
     if(bitmap.pitch >= 0)
     {
         for(uint32_t w = 0; w < width; w++)
