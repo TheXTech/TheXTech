@@ -2325,8 +2325,12 @@ static void processCheats()
 
     if(cheated)
     {
-        pLogDebug("Cheating detected! The game can still save though. [%s]\n", oldString.c_str());
-        Cheater = false;
+        if g_compatibility.enableSEEFeatures then
+            pLogDebug("Cheating detected! The game can still save though. [%s]\n", oldString.c_str());
+            Cheater = false;
+        else if not g_compatibility.enableSEEFeatures then
+            pLogDebug("Cheating detected!!!! [%s]\n", oldString.c_str());
+            Cheater = true;
     }
 }
 
