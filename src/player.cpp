@@ -4088,7 +4088,7 @@ void PowerUps(const int A)
                                 PlaySound(SFX_Grab2);
                             }
                             else
-                                PlaySound(SFX_Throw);
+                                PlaySound(SFX_PlayerHammer);
                         }
                         else if(p.Character == 4)
                         {
@@ -4099,10 +4099,10 @@ void PowerUps(const int A)
                             NPC[numNPCs].Type = 292;
                             NPC[numNPCs].Special5 = A;
                             NPC[numNPCs].Special6 = p.Direction;
-                            PlaySound(SFX_Throw);
+                            PlaySound(SFX_PlayerHammer);
                         }
                         else
-                            PlaySound(playerHammerSFX);
+                            PlaySound(SFX_PlayerHammer);
 
                         NPC[numNPCs].Projectile = true;
                         NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -4270,15 +4270,8 @@ void PowerUps(const int A)
                             }
 
                             if(p.StandingOnNPC != 0)
-                                NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;
-                            if(p.State == 3)
-                            {    
-                                PlaySound(SFX_Fireball);
-                            }
-                            if(p.State == 6)
-                            {    
-                                PlaySound(SFX_PlayerHammer);
-                            }
+                                NPC[numNPCs].Location.SpeedX = 5 * p.Direction + (p.Location.SpeedX / 3.5) + NPC[p.StandingOnNPC].Location.SpeedX / 3.5;  
+                            PlaySound(SFX_Fireball);
                         }
                     }
                 }

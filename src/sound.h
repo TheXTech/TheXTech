@@ -151,7 +151,7 @@ enum
     SFX_Iceball,
     SFX_Freeze,
     SFX_Icebreak,
-    SFX_PlayerHammer, // Reserved
+    SFX_PlayerHammer,
     SFX_SproutVine,
     SFX_LarryShell,
     SFX_LarryKilled = 100,

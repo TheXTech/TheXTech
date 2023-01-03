@@ -52,6 +52,7 @@ void NPCHit(int A, int B, int C)
     // B = 8      Stomped by Boot
     // B = 9      Fell of a cliff
     // B = 10     Link stab
+    // B = 11     Tanooki stomp
     // Frost Bolt check
     if(B == 3 && NPC[A].Type != NPCID_ICE_CUBE && NPC[A].Type != NPCID_PLAYERICEBALL)
     {
