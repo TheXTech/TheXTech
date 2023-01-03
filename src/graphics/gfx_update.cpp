@@ -1090,7 +1090,7 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
                 }
             }
         }
-        else if(!Do_FrameSkip && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert)
+        else if(!Do_FrameSkip && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert && NPC[A].Type != NPCID_CONVEYOR)
         {
             if(NPC[A].Location.SpeedX != 0 || NPC[A].Location.SpeedY != 0
                 || (!NPCWontHurt[NPC[A].Type] && !NPCIsACoin[NPC[A].Type] && !NPCIsABonus[NPC[A].Type]))
