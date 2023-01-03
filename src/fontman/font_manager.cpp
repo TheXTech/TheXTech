@@ -180,6 +180,8 @@ void FontManager::initFull()
             }
         }
     }
+
+    overrider.endGroup();
 #endif
 
     if(overrider.beginGroup("font-overrides"))
@@ -196,9 +198,9 @@ void FontManager::initFull()
             if(iKey >= 0 && iKey < c_smbxFontsMapMax)            
                 s_smbxFontsMap[iKey] = getFontID(name);
         }
-
-        overrider.endGroup();
     }
+
+    overrider.endGroup();
 
     g_fontManagerIsInit = true;
 }
