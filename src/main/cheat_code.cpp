@@ -1890,7 +1890,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"2player", twoPlayer, true},
 
     {"wariotime", warioTime, true},
-    {"wherearemycarkeys", carKeys, true},
+    {"carkeys", carKeys, true},
     {"boingyboing", boingyBoing, true},
     {"bombsaway", bombsAway, true},
     {"firemissiles", fireMissiles, true},
@@ -1926,7 +1926,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"theessentials", theEssentials, true}, {"theessenjls", theEssentials, true},
     
-    {"foundmycarkeys", foundMyCarKeys, true},
+    {"foundmycarkey", foundMyCarKeys, true},
     {"mylifegoals", myLifeGoals, true},
     {"mysteryball", mysteryBall, true},
     {"itsvegas", itsVegas, true},
