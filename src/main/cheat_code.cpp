@@ -801,12 +801,12 @@ static void becomeAsLuigi()
     UpdateYoshiMusic();
 }
 
-static void superbDemo128()
+static void superbDemo200()
 {
     int B = CheckLiving();
     if(B > 0)
     {
-        numPlayers = 128;
+        numPlayers = 200;
 
         SetupScreens();
 
@@ -827,12 +827,12 @@ static void superbDemo128()
     }
 }
 
-static void superbDemo200()
+static void superbDemo128()
 {
     int B = CheckLiving();
     if(B > 0)
     {
-        numPlayers = 200;
+        numPlayers = 128;
 
         SetupScreens();
 
@@ -1032,14 +1032,6 @@ static void superbDemo2()
 
         Bomb(Player[B].Location, iRand(2) + 2);
     }
-}
-
-static void getMeOuttaHere()
-{
-    LevelBeatCode = 0;
-    LevelMacro = LEVELMACRO_OFF;
-    LevelMacroCounter = 0;
-    EndLevel = true;
 }
 
 static void onePlayer()
@@ -1742,6 +1734,45 @@ static void speedDemon()
     PlaySound(MaxFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
+static void newLeaf()
+{
+    GodMode = false;
+    MaxFPS = false;
+    ShowFPS = false;
+    MultiHop = false;
+    SuperSpeed = false;
+    FlyForever = false;
+    CoinMode = false;
+    FlameThrower = false;
+    CaptainN = false;
+    GrabAll = false;
+    ShadowMode = false;
+    PlaySound(SFX_BowserKilled);
+}
+
+static void getMeOuttaHere()
+{
+    LevelBeatCode = 0;
+    LevelMacro = LEVELMACRO_OFF;
+    LevelMacroCounter = 0;
+    EndLevel = true;
+}
+
+static void holyTrinity()
+{
+    shadowStar();
+    godMode();
+    ahippinAndAHopping();
+}
+
+static void theEssentials()
+{
+    tooSlow();
+    shadowStar();
+    godMode();
+    ahippinAndAHopping();
+}
+
 
 
 
@@ -1861,6 +1892,9 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"speeddemon", speedDemon, true},
     
     {"getmeouttahere", getMeOuttaHere, true},
+    {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
+    {"theessentials", theEssentials, true}, {"theessenjls", theEssentials, true},
+    {"newleaf", newLeaf, true},
     {nullptr, nullptr, false}
 };
 
