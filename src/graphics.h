@@ -90,8 +90,16 @@ void SuperPrintScreenCenter(const std::string &SuperWords, int Font, float Y, fl
  * \param outMap Output character positions map
  */
 void BuildUTF8CharMap(const std::string& SuperText, std::vector<const char*> &outMap);
+/*!
+ * \brief Print the message box with a multi-line text inside using a plain string itself
+ * \param SuperText The multi-line string
+ */
 void DrawMessage(const std::string& SuperText);
 void DrawMessage(std::vector<const char*>& SuperTextMap);
+/*!
+ * \brief Print the mssage box with a multi-line text inside using a pre-built character positions map
+ * \param SuperTextMap The UTF8 character positions map of a multi-line string
+ */
 // Public Sub SetRes()
 void SetRes();
 // Public Function CheckKey(newStrizzle As String) As String

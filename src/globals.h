@@ -1096,7 +1096,11 @@ extern bool resChanged;
 
 //Public MessageText As String 'when talking to an npc
 extern std::string MessageText;
+/*!
+ * \brief UTF8CharMap_t The array of character pointers to track a begining of every UTF8 character in the string
+ */
 typedef std::vector<const char*> UTF8CharMap_t;
+//EXTRA: The UTF8 character positions map for the MessateText string that simplifies the text processing during its printing.
 extern UTF8CharMap_t MessageTextMap;
 
 // moved to menu_main.h
