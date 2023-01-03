@@ -68,9 +68,12 @@ extern char32_t get_utf8_char(const char *str);
  */
 extern std::u32string std_to_utf32(const std::string &src);
 
+
+class BaseFontEngine;
+
 namespace FontManager
 {
-    void *getDefaultTtfFont();
+    BaseFontEngine* getDefaultTtfFont();
 }
 
 #endif // FONT_MANAGER_PRIVATE_H

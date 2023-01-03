@@ -51,7 +51,7 @@ static VPtrList<BaseFontEngine*>    g_anyFonts;
 static RasterFont      *g_defaultRasterFont = nullptr;
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-//! Default raster font to render text
+//! Default TTF font to render text
 static TtfFont         *g_defaultTtfFont = nullptr;
 #endif
 
@@ -81,10 +81,10 @@ int FontManager::fontIdFromSmbxFont(int font)
 }
 
 
-void *FontManager::getDefaultTtfFont()
+BaseFontEngine *FontManager::getDefaultTtfFont()
 {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-    return reinterpret_cast<void*>(g_defaultTtfFont);
+    return g_defaultTtfFont;
 #else
     return nullptr;
 #endif
@@ -95,24 +95,9 @@ void FontManager::initBasic()
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     if(!g_ft)
         initializeFreeType();
-#endif
-
-//    unsigned char *memory = nullptr;
-//    size_t  fileSize = 0;
-//    bool ok = RES_getMem("fonts/UKIJTuzB.ttf", memory, fileSize);
-//    SDL_assert_release(ok);
-
-//    g_ttfFonts.emplace_back();
-//    TtfFont &mainFont = g_ttfFonts.back();
-
-//    ok = mainFont.loadFont(reinterpret_cast<const char*>(memory), fileSize);
-//    SDL_assert_release(ok);
-//    g_defaultTtfFont = &mainFont;
-//    registerFont(g_defaultTtfFont);
-
-#ifdef THEXTECH_ENABLE_TTF_SUPPORT
     g_defaultTtfFont = nullptr;
 #endif
+
     g_double_pixled = false;
     g_fontManagerIsInit = true;
 }
@@ -124,6 +109,7 @@ void FontManager::initFull()
         initializeFreeType();
     g_defaultTtfFont = nullptr;
 #endif
+
     g_double_pixled = false; //ConfigManager::setup_fonts.double_pixled;
 
     std::memset(s_smbxFontsMap, 0, sizeof(s_smbxFontsMap));
@@ -159,9 +145,9 @@ void FontManager::initFull()
         g_defaultRasterFont = &g_rasterFonts.front();
 
     /***************Load TTF font support****************/
-#ifdef THEXTECH_ENABLE_TTF_SUPPORT
     IniProcessing overrider(fonts_root + "/overrides.ini");
 
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
     if(overrider.beginGroup("ttf-fonts"))
     {
         auto k = overrider.allKeys();
@@ -194,6 +180,7 @@ void FontManager::initFull()
             }
         }
     }
+#endif
 
     if(overrider.beginGroup("font-overrides"))
     {
@@ -204,16 +191,14 @@ void FontManager::initFull()
             overrider.read(key.c_str(), name, "");
             if(name.empty())
                 continue;
+
             int iKey = std::atoi(key.c_str());
-            if(iKey >= 0 && iKey < c_smbxFontsMapMax)
-            {
+            if(iKey >= 0 && iKey < c_smbxFontsMapMax)            
                 s_smbxFontsMap[iKey] = getFontID(name);
-            }
         }
 
         overrider.endGroup();
     }
-#endif
 
     g_fontManagerIsInit = true;
 }

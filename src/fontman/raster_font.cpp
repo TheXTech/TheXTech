@@ -340,7 +340,7 @@ PGE_Size RasterFont::textSize(const std::string &text, uint32_t max_line_lenght,
             if(need_a_ttf)
             {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-                TtfFont *font = reinterpret_cast<TtfFont*>(FontManager::getDefaultTtfFont());
+                TtfFont *font = dynamic_cast<TtfFont*>(FontManager::getDefaultTtfFont());
                 if(font)
                 {
                     TtfFont::TheGlyphInfo glyph = font->getGlyphInfo(&cx, m_letterWidth);
