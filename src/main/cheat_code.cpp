@@ -43,6 +43,7 @@
 #include "../layers.h"
 #include "../controls.h"
 #include "../game_main.h"
+#include "../compat.h"
 #include "game_info.h"
 #include "screen_quickreconnect.h"
 
@@ -2325,12 +2326,12 @@ static void processCheats()
 
     if(cheated)
     {
-        if g_compatibility.enableSEEFeatures == true
+        if (g_compatibility.enableSEEFeatures)
         {
             pLogDebug("Cheating detected! The game can still save though. [%s]\n", oldString.c_str());
             Cheater = false;
         }
-        else if g_compatibility.enableSEEFeatures == false
+        else
         {
             pLogDebug("Cheating detected!!!! [%s]\n", oldString.c_str());
             Cheater = true;
