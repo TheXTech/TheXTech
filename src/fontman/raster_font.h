@@ -112,10 +112,6 @@ private:
         uint32_t padding_right   = 0; //!< Crop right
         int32_t x = 0;//!< X pixel offset
         int32_t y = 0;//!< Y pixel offset
-        float l = 1.0f;//!< left
-        float t = 1.0f;//!< top
-        float b = 1.0f;//!< bottom
-        float r = 1.0f;//!< right
     };
 
     typedef std::unordered_map<char32_t, RasChar > CharMap;

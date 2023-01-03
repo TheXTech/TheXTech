@@ -206,27 +206,22 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
         char32_t ch = ucharX[0];
         //qDebug()<<"=char=" << ch << "=id="<<charPosX.toInt()<<charPosY.toInt()<<"=";
         RasChar rch;
-#ifndef DEBUG_BUILD
+        float l, t;
         try
         {
-#endif
             rch.tx              =  loadedTexture;
-            rch.l               =  std::stof(charPosY.c_str()) / m_matrixWidth;
-            rch.r               = (std::stof(charPosY.c_str()) + 1.0f) / m_matrixWidth;
+            l                   =  std::stof(charPosY.c_str()) / m_matrixWidth;
             rch.padding_left    = (ucharX.size() > 1) ? char2int(ucharX[1]) : 0;
             rch.padding_right   = (ucharX.size() > 2) ? char2int(ucharX[2]) : 0;
-            rch.t               =  std::stof(charPosX.c_str()) / m_matrixHeight;
-            rch.b               = (std::stof(charPosX.c_str()) + 1.0f) / m_matrixHeight;
-            rch.x               = static_cast<int32_t>(loadedTexture->w * rch.l);
-            rch.y               = static_cast<int32_t>(loadedTexture->h * rch.t);
+            t                   =  std::stof(charPosX.c_str()) / m_matrixHeight;
+            rch.x               =  static_cast<int32_t>(loadedTexture->w * l);
+            rch.y               =  static_cast<int32_t>(loadedTexture->h * t);
             rch.valid = true;
-#ifndef DEBUG_BUILD
         }
         catch(std::exception &e)
         {
             pLogWarning("Invalid entry of font map: entry: %s, reason: %s, file: %s", x.c_str(), e.what(), fontmap_ini.c_str());
         }
-#endif
 
         m_charMap[ch] = rch;
     }
