@@ -6,7 +6,7 @@
 #include "fontman/font_manager.h"
 
 
-void BuildUTF8CharMap(const std::string& SuperText, std::vector<const char*> &outMap)
+void BuildUTF8CharMap(const std::string& SuperText, UTF8CharMap_t& outMap)
 {
     const char* mapBuildIt = SuperText.c_str();
     const char* mapBuildEnd = mapBuildIt + SuperText.size();
@@ -24,13 +24,13 @@ void BuildUTF8CharMap(const std::string& SuperText, std::vector<const char*> &ou
 
 void DrawMessage(const std::string& SuperText)
 {
-    std::vector<const char*> SuperTextMap;
+    UTF8CharMap_t SuperTextMap;
     BuildUTF8CharMap(SuperText, SuperTextMap);
     DrawMessage(SuperTextMap);
 }
 
 // based on Wohlstand's improved algorithm, but screen-size aware
-void DrawMessage(std::vector<const char*> &SuperTextMap)
+void DrawMessage(const UTF8CharMap_t &SuperTextMap)
 {
 #ifdef BUILT_IN_TEXTBOX
     const int TextBoxW = 500;
