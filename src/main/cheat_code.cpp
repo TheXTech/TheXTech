@@ -1760,7 +1760,7 @@ static void getMeOuttaHere()
 
 static void holyTrinity()
 {
-    HolyTrinity = !HolyTrinity
+    HolyTrinity = !HolyTrinity;
     
     Location_t tempLocation;
 
@@ -1792,7 +1792,7 @@ static void holyTrinity()
 
 static void theEssentials()
 {
-    TheEssentials = !TheEssentials
+    TheEssentials = !TheEssentials;
     Location_t tempLocation;
 
     PlaySound(SFX_Raccoon);
