@@ -1773,7 +1773,7 @@ static void theEssentials()
     ahippinAndAHopping();
 }
 
-static void foundMyCarKeys()
+static void foundMyCarKey()
 {
     PlaySound(SFX_Key);
     StopMusic();
@@ -1925,7 +1925,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"theessentials", theEssentials, true}, {"theessenjls", theEssentials, true},
     
-    {"foundmycarkey", foundMyCarKeys, true},
+    {"foundmycarkey", foundMyCarKey, true},
     {"mylifegoals", myLifeGoals, true},
     {"mysteryball", mysteryBall, true},
     {"itsvegas", itsVegas, true},
