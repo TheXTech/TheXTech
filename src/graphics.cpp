@@ -59,6 +59,9 @@ static void s_ProcessSmallScreenFeatures(int A)
     if(g_config.small_screen_camera_features && ScreenW < 800)
     {
         int16_t max_offsetX = 360;
+        if(max_offsetX > vScreen[A].Width - Player[A].Location.Width * 4)
+            max_offsetX = vScreen[A].Width - Player[A].Location.Width * 4;
+
         int16_t lookX_target = max_offsetX * Player[A].Location.SpeedX * 1.5 / Physics.PlayerRunSpeed;
         if(lookX_target > max_offsetX)
             lookX_target = max_offsetX;
