@@ -99,6 +99,7 @@ public:
      * @param y Y position do draw
      * @param fontSize Size of font
      * @param scaleSize Scale rendered texture
+     * @param drawOutlines Draw the outline at every glyph
      * @param Red Red color level from 0.0 to 1.0
      * @param Green Green color level from 0.0 to 1.0
      * @param Blue Blue color level from 0.0 to 1.0
@@ -107,6 +108,7 @@ public:
      */
     uint32_t drawGlyph(const char* u8char,
                        int32_t x, int32_t y, uint32_t fontSize, double scaleSize = 1.0,
+                       bool drawOutlines = false,
                        float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f);
 
     struct TheGlyphInfo

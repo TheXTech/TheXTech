@@ -337,8 +337,9 @@ std::string TtfFont::getFontName()
 }
 
 uint32_t TtfFont::drawGlyph(const char *u8char,
-                           int32_t x, int32_t y, uint32_t fontSize, double scaleSize,
-                           float Red, float Green, float Blue, float Alpha)
+                            int32_t x, int32_t y, uint32_t fontSize, double scaleSize,
+                            bool drawOutlines,
+                            float Red, float Green, float Blue, float Alpha)
 {
     (void)(scaleSize);
 
@@ -347,6 +348,30 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
     {
         int32_t glyph_x = x;
         int32_t glyph_y = y + static_cast<int32_t>(fontSize);
+
+        if(drawOutlines)
+        {
+            const float offsets[4][2] =
+            {
+                {-1.f, -1.f},
+                {+1.f, -1.f},
+                {-1.f, +1.f},
+                {+1.f, +1.f}
+            };
+
+            for(size_t i = 0; i < 4; ++i)
+            {
+                XRender::renderTextureScale(
+                    static_cast<float>(glyph_x + glyph.left + offsets[i][0]),
+                    static_cast<float>(glyph_y - glyph.top + offsets[i][1]),
+                    glyph.width * static_cast<float>(scaleSize),
+                    glyph.height * static_cast<float>(scaleSize),
+                    *glyph.tx,
+                    0.f, 0.f, 0.f, Alpha
+                );
+            }
+        }
+
         XRender::renderTextureScale(
             static_cast<float>(glyph_x + glyph.left),
             static_cast<float>(glyph_y - glyph.top),
@@ -355,8 +380,10 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
             *glyph.tx,
             Red, Green, Blue, Alpha
         );
+
         return glyph.width;
     }
+
     return fontSize;
 }
 

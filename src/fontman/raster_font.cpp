@@ -465,6 +465,7 @@ void RasterFont::printText(const char* text, size_t text_size,
                                 y + static_cast<int32_t>(offsetY + m_glyphOffsetY) - 2,
                                 (doublePixel ? (glyph_width / 2) : glyph_width),
                                 (doublePixel ? 2.0 : 1.0),
+                                m_ttfBorders,
                                 Red, Green, Blue, Alpha);
 
                 auto lw = w + m_interLetterSpace;
