@@ -475,9 +475,9 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
 
         if(bitmap.pitch >= 0)
         {
-            for(uint32_t b = 0; b < bsize; ++b)
+            for(uint32_t h = 0; h < height; ++h)
             {
-                for(uint32_t h = 0; h < height; ++h)
+                for(uint32_t b = 0; b < bsize; ++b)
                 {
                     uint8_t block = bitmap.buffer[(static_cast<uint32_t>(bitmap.pitch) * ((height - 1) - h)) + b];
                     uint32_t* dest = reinterpret_cast<uint32_t*>(&(image[((4 * width) * (height - 1 - h)) + (32 * b)]));
@@ -493,9 +493,9 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
         }
         else if(bitmap.pitch < 0)
         {
-            for(uint32_t b = 0; b < bsize; ++b)
+            for(uint32_t h = 0; h < height; ++h)
             {
-                for(uint32_t h = 0; h < height; ++h)
+                for(uint32_t b = 0; b < bsize; ++b)
                 {
                     uint8_t block = *(bitmap.buffer - (static_cast<uint32_t>(bitmap.pitch) * h) + b);
                     uint32_t* dest = reinterpret_cast<uint32_t*>(&(image[((4 * width) * h) + (32 * b)]));
@@ -515,9 +515,9 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
     {
         if(bitmap.pitch >= 0)
         {
-            for(uint32_t w = 0; w < width; ++w)
+            for(uint32_t h = 0; h < height; ++h)
             {
-                for(uint32_t h = 0; h < height; ++h)
+                for(uint32_t w = 0; w < width; ++w)
                 {
                     uint8_t color = bitmap.buffer[static_cast<uint32_t>(bitmap.pitch) * ((height - 1) - h) + w];
                     size_t hp = (4 * width) * (height - 1 - h);
@@ -531,9 +531,9 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
         }
         else if(bitmap.pitch < 0)
         {
-            for(uint32_t w = 0; w < width; ++w)
+            for(uint32_t h = 0; h < height; ++h)
             {
-                for(uint32_t h = 0; h < height; ++h)
+                for(uint32_t w = 0; w < width; ++w)
                 {
                     uint8_t color = *(bitmap.buffer - (static_cast<uint32_t>(bitmap.pitch) * h) + w);
                     size_t hp = (4 * width) * h;
