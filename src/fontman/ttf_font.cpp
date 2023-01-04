@@ -491,7 +491,7 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
                 }
             }
         }
-        else if(bitmap.pitch >= 0)
+        else if(bitmap.pitch < 0)
         {
             for(uint32_t b = 0; b < bsize; ++b)
             {
