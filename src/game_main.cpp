@@ -430,7 +430,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 Player[A] = blankPlayer;
 
             numPlayers = g_gameInfo.outroMaxPlayersCount;
-#ifdef __NDS__
+#ifdef __16M__
             if(numPlayers > 3)
                 numPlayers = 3;
 #endif
@@ -604,7 +604,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             numPlayers = g_gameInfo.introMaxPlayersCount;
-#ifdef __NDS__
+#ifdef __16M__
             if(numPlayers > 3)
                 numPlayers = 3;
 #endif

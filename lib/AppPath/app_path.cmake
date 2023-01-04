@@ -33,6 +33,11 @@ elseif(NINTENDO_3DS)
     list(APPEND APPPATH_SRCS
         ${CMAKE_CURRENT_LIST_DIR}/private/app_path_3ds.cpp
     )
+elseif(NINTENDO_DS)
+    message("-- AppPath for 16M")
+    list(APPEND APPPATH_SRCS
+        ${CMAKE_CURRENT_LIST_DIR}/private/app_path_16m.cpp
+    )
 elseif(NINTENDO_WII)
     message("-- AppPath for Wii")
     list(APPEND APPPATH_SRCS
