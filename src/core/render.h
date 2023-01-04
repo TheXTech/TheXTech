@@ -185,6 +185,13 @@ E_INLINE void setTargetScreen() TAIL
 }
 #endif
 
+#ifdef __16M__
+/*!
+ * \brief Clear all currently loaded textures
+ */
+E_INLINE void clearAllTextures() TAIL
+#endif
+
 #ifdef __3DS__
 /*!
  * \brief Set render target to a certain layer of the in-game screen

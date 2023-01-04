@@ -55,7 +55,7 @@ void OpenConfig_preSetup()
         {"2", RENDER_ACCELERATED_VSYNC}
     };
 
-#ifndef PGE_MIN_PORT
+#ifndef THEXTECH_NO_SDL_BUILD
     const IniProcessing::StrEnumMap sampleFormats =
     {
         {"s8", AUDIO_S8},
@@ -162,16 +162,16 @@ void OpenConfig_preSetup()
         config.readEnum("scale-mode", g_videoSettings.scaleMode, (int)SCALE_DYNAMIC_NEAREST, scaleModes);
         config.endGroup();
 
+#ifndef THEXTECH_NO_SDL_BUILD
         config.beginGroup("sound");
         config.read("disable-sound", g_audioSetup.disableSound, false);
         // Defaults for audio setum at sounds.cpp, at g_audioDefaults
         config.read("sample-rate", g_audioSetup.sampleRate, g_audioDefaults.sampleRate);
         config.read("channels", g_audioSetup.channels, g_audioDefaults.channels);
-#ifndef PGE_MIN_PORT
         config.readEnum("format", g_audioSetup.format, g_audioDefaults.format, sampleFormats);
-#endif
         config.read("buffer-size", g_audioSetup.bufferSize, g_audioDefaults.bufferSize);
         config.endGroup();
+#endif
 
         config.beginGroup("gameplay");
         config.readEnum("compatibility-mode", g_preSetup.compatibilityMode, 0, compatMode);
@@ -392,12 +392,12 @@ void SaveConfig()
     }
     config.endGroup();
 
+#ifndef THEXTECH_NO_SDL_BUILD
     config.beginGroup("sound");
     config.setValue("disable-sound", g_audioSetup.disableSound);
     config.setValue("sample-rate", g_audioSetup.sampleRate);
     config.setValue("channels", g_audioSetup.channels);
     config.setValue("buffer-size", g_audioSetup.bufferSize);
-#ifndef PGE_MIN_PORT
     static const std::unordered_map<int, std::string> formats_back = {
         {AUDIO_S8 , "s8"},
         {AUDIO_U8 , "u8"},
@@ -411,8 +411,8 @@ void SaveConfig()
         {AUDIO_F32MSB, "float32be"}
     };
     config.setValue("format", formats_back.at(g_audioSetup.format));
-#endif
     config.endGroup();
+#endif
 
     config.beginGroup("gameplay");
     {
