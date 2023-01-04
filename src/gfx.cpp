@@ -143,8 +143,8 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
-    loadImage(Backdrop, uiPath + "Backdrop.png");
-    loadImage(Backdrop_Border, uiPath + "Backdrop_Border.png");
+    loadImage(Backdrop, uiPath + "Backdrop");
+    loadImage(Backdrop_Border, uiPath + "Backdrop_Border");
 
     IniProcessing ini;
     ini.open(uiPath + "Backdrop_Border.ini");
@@ -166,9 +166,9 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
-    loadImage(WorldMapFrame_Tile, uiPath + "WorldMapFrame_Tile.png");
-    loadImage(WorldMapFrame_Border, uiPath + "WorldMapFrame_Border.png");
-    loadImage(WorldMapFog, uiPath + "WorldMapFog.png");
+    loadImage(WorldMapFrame_Tile, uiPath + "WorldMapFrame_Tile");
+    loadImage(WorldMapFrame_Border, uiPath + "WorldMapFrame_Border");
+    loadImage(WorldMapFog, uiPath + "WorldMapFog");
 
     ini.open(uiPath + "WorldMapFrame_Border.ini");
     loadFrameInfo(ini, g_worldMapFrameBorderInfo);
@@ -189,7 +189,7 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
-    loadImage(Camera, uiPath + "Camera.png");
+    loadImage(Camera, uiPath + "Camera");
 
     if(m_loadErrors > 0)
     {
