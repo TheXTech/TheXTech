@@ -79,17 +79,24 @@ bool TtfFont::loadFont(const std::string &path)
 {
     SDL_assert_release(g_ft);
     FT_Error error = FT_New_Face(g_ft, path.c_str(), 0, &m_face);
-    SDL_assert(error == 0);
     if(error)
+    {
+        pLogWarning("Failed to load the font: %s", FT_Error_String(error));
         return false;
+    }
+
     error = FT_Set_Pixel_Sizes(m_face, 0, m_recentPixelSize);
-    SDL_assert(error == 0);
     if(error)
-        return false;
+        pLogWarning("Failed to set the pixel sizes %u for the font %s: %s", m_recentPixelSize, path.c_str(), FT_Error_String(error));
+
     error = FT_Select_Charmap(m_face, FT_ENCODING_UNICODE);
-    SDL_assert(error == 0);
     if(error)
+    {
+        pLogWarning("Failed to select the charmap for the font %s: %s", path.c_str(), FT_Error_String(error));
+        FT_Done_Face(m_face);
+        m_face = nullptr;
         return false;
+    }
 
     g_loadedFaces_mutex.lock();
     g_loadedFaces.insert(this);
@@ -391,7 +398,8 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
     {
         g_loadedFaces_mutex.lock();
         error = FT_Set_Pixel_Sizes(cur_font, 0, fontSize);
-        SDL_assert_release(error == 0);
+        if(error)
+            pLogWarning("TheGlyph::loadGlyph (1) Failed to set the pixel sizes %u for the font %s: %s", fontSize, cur_font->family_name, FT_Error_String(error));
         m_recentPixelSize = fontSize;
         g_loadedFaces_mutex.unlock();
     }
@@ -405,7 +413,8 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
             if(fb_font->m_recentPixelSize != fontSize)
             {
                 error = FT_Set_Pixel_Sizes(fb_font->m_face, 0, fontSize);
-                SDL_assert_release(error == 0);
+                if(error)
+                    pLogWarning("TheGlyph::loadGlyph (2) Failed to set the pixel sizes %u for the font %s: %s", fontSize, cur_font->family_name, FT_Error_String(error));
                 fb_font->m_recentPixelSize = fontSize;
             }
 
