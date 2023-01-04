@@ -409,7 +409,12 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
         g_loadedFaces_mutex.unlock();
     }
 
-    error = FT_Load_Glyph(cur_font, t_glyphIndex, FT_LOAD_RENDER);
+    // FIXME: also should be configurable
+    bool antialiased = true;
+    if(antialiased)
+        error = FT_Load_Glyph(cur_font, t_glyphIndex, FT_LOAD_RENDER);
+    else
+        error = FT_Load_Glyph(cur_font, t_glyphIndex, FT_LOAD_RENDER | FT_LOAD_MONOCHROME | FT_LOAD_TARGET_MONO);
     if(error != 0)
         return dummyGlyph;
 
@@ -435,7 +440,31 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
         return dummyGlyph;
     }
 
-    if(bitmap.pitch >= 0)
+    if(bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
+    {
+        for(uint32_t b = 0; b < (width + 7) / 8; b++)
+        {
+            for(uint32_t h = 0; h < height; h++)
+            {
+                uint8_t block = bitmap.pitch >= 0
+                    ? bitmap.buffer[static_cast<uint32_t>(bitmap.pitch) * ((height - 1) - h) + b]
+                    : *(bitmap.buffer - (static_cast<uint32_t>(bitmap.pitch) * (h)) + b);
+
+                uint32_t* dest = reinterpret_cast<uint32_t*>(bitmap.pitch >= 0
+                    ? &(image[(4 * width) * (height - 1 - h) + (32 * b)])
+                    : &(image[(4 * width)*h + (32 * b)]));
+
+                for(int x = 0; x < 8 && (b * 8 + x) < width; x++)
+                {
+                    if(block & (1 << (7 - x)))
+                        dest[x] = 0xFFFFFFFF;
+                    else
+                        dest[x] = 0;
+                }
+            }
+        }
+    }
+    else if(bitmap.pitch >= 0)
     {
         for(uint32_t w = 0; w < width; w++)
         {
