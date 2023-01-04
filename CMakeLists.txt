@@ -370,7 +370,6 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
 
     if(NOT USE_SYSTEM_ZLIB) # Depend on ZLib at AudioCodecs
-        add_dependencies(FREETYPE_Local AudioCodecs_Local)
         if(TARGET FREETYPE_Local)
             add_dependencies(FREETYPE_Local AudioCodecs_Local)
         endif()
