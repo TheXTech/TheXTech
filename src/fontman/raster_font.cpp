@@ -109,8 +109,10 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
     IniProcessing font(fontmap_ini);
     std::string texFile;
     uint32_t w = m_letterWidth, h = m_letterHeight;
+    int texture_scale_factor = 1;
     font.beginGroup("font-map");
     font.read("texture", texFile, "");
+    font.read("texture-scale", texture_scale_factor, 1);
     font.read("width", w, 0);
     font.read("height", h, 0);
     m_matrixWidth = w;
@@ -133,6 +135,21 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
 
     if(!fontTexture.inited)
         pLogWarning("Failed to load font texture! Invalid image!");
+
+    if(texture_scale_factor > 1)
+    {
+        pLogDebug("RasterFont::loadFontMap: Force texture upscale with factor %d", texture_scale_factor);
+#ifdef PICTURE_LOAD_NORMAL
+        fontTexture.l.w_orig = fontTexture.w;
+        fontTexture.l.h_orig = fontTexture.h;
+        fontTexture.l.w_scale = 1.0f / float(texture_scale_factor);
+        fontTexture.l.h_scale = 1.0f / float(texture_scale_factor);
+#endif
+        fontTexture.w *= texture_scale_factor;
+        fontTexture.h *= texture_scale_factor;
+        fontTexture.frame_w *= texture_scale_factor;
+        fontTexture.frame_h *= texture_scale_factor;
+    }
 
     m_texturesBank.push_back(fontTexture);
     StdPicture *loadedTexture = &m_texturesBank.back();
