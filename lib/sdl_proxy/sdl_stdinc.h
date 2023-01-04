@@ -100,6 +100,7 @@ SDL_IMPORT(strcasecmp)
 SDL_IMPORT(strncasecmp)
 SDL_IMPORT(getenv)
 
+SDL_IMPORT_MATH(abs)
 SDL_IMPORT_MATH(fabs)
 SDL_IMPORT(fmod)
 SDL_IMPORT_MATH(floor)

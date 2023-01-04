@@ -35,7 +35,7 @@
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <IniProcessor/ini_processing.h>
-#include <fmt/fmt_format.h>
+#include <fmt_format_ne.h>
 
 #include <vector>
 
@@ -152,19 +152,29 @@ void FontManager::initFull()
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     if(overrider.beginGroup("ttf-fonts"))
     {
-        auto k = overrider.allKeys();
-        for(auto &key : k)
+        for(int i = 1; ;++i)
         {
+            std::string key = fmt::format_ne("file{0}", i);
+            std::string keyAntiAlias = fmt::format_ne("file{0}-antialias", i);
+
+            if(!overrider.hasKey(key))
+                break; // Stop look up on a first missing key
+
             std::string fontFile;
             overrider.read(key.c_str(), fontFile, "");
 
             if(fontFile.empty())
                 continue;
 
+            bool antiAlias;
+            overrider.read(keyAntiAlias.c_str(), antiAlias, true);
+
             std::string fontPath = fontsDir.absolutePath() + "/" + fontFile;
 
             g_ttfFonts.emplace_back();
             TtfFont& tf = g_ttfFonts.back();
+
+            tf.setAntiAlias(antiAlias);
 
             pLogDebug("Loading TTF font %s...", fontPath.c_str());
             tf.loadFont(fontPath);

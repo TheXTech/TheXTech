@@ -55,6 +55,9 @@ public:
     bool loadFont(const std::string &path);
     bool loadFont(const char* mem, size_t size);
 
+    void setAntiAlias(bool enable);
+    bool antiAlias() const;
+
     /*!
      * \brief Measure the size of the multiline text block in pixels
      * \param text Multi-line text string
@@ -127,8 +130,10 @@ private:
     //! Recently used pixel size of the font
     uint32_t     m_recentPixelSize = 10;
 
-    //! Загруженное лицо шрифта
+    //! Loaded font face
     FT_Face      m_face = nullptr;
+
+    bool         m_enableAntialias = true;
 
     struct TheGlyph
     {
