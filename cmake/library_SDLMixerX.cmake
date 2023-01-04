@@ -350,6 +350,7 @@ ExternalProject_Add(
         "${SDL2_SO_Lib}"
         "${SDL2_A_Lib}"
         "${SDL2_main_A_Lib}"
+        "${AC_ZLIB}"
 #        "${SDLHIDAPI_SO_Lib}" # No longer needed since SDL 2.0.18
         ${MixerX_CodecLibs}
 )
