@@ -1760,8 +1760,6 @@ static void getMeOuttaHere()
 
 static void holyTrinity()
 {
-    HolyTrinity = !HolyTrinity;
-    
     Location_t tempLocation;
 
     PlaySound(SFX_Raccoon);
@@ -1775,7 +1773,7 @@ static void holyTrinity()
         NewEffect(10, tempLocation);
     }
     
-    if(HolyTrinity)
+    if(!ShadowMode && !GodMode && !MultiHop)
     {
         ShadowMode = true;
         GodMode = true;
@@ -1787,12 +1785,10 @@ static void holyTrinity()
         GodMode = false;
         MultiHop = false;
     }
-    PlaySound(HolyTrinity ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
 static void theEssentials()
 {
-    TheEssentials = !TheEssentials;
     Location_t tempLocation;
 
     PlaySound(SFX_Raccoon);
@@ -1806,7 +1802,7 @@ static void theEssentials()
         NewEffect(10, tempLocation);
     }
     
-    if(TheEssentials)
+    if(!ShadowMode && !GodMode && !MultiHop && !SuperSpeed)
     {
         SuperSpeed = true;
         ShadowMode = true;
@@ -1820,7 +1816,6 @@ static void theEssentials()
         GodMode = false;
         MultiHop = false;
     }
-    PlaySound(TheEssentials ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
 static void foundMyCarKey()
