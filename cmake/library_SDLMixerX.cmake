@@ -88,10 +88,6 @@ endif()
 
 set(MixerX_SysLibs)
 
-if(USE_SYSTEM_ZLIB)
-    list(APPEND MixerX_SysLibs ${ZLIB_LIBRARIES})
-endif()
-
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND MixerX_SysLibs
         "version" opengl32 dbghelp advapi32 kernel32 winmm imm32 setupapi
@@ -212,7 +208,7 @@ else()
     set_static_lib(AC_LIBXMP       "${CODECS_LIBRARIES_DIR}" xmp)
 endif()
 set_static_lib(AC_MODPLUG      "${CODECS_LIBRARIES_DIR}" modplug)
-set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)
+# set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)   # Moved to own ZLib header
 
 set(MixerX_CodecLibs
 #    "${AC_FLAC}"
@@ -241,12 +237,6 @@ list(APPEND MixerX_CodecLibs
     "${AC_LIBXMP}"
     "${AC_MODPLUG}"
 )
-
-if(NOT USE_SYSTEM_ZLIB)
-    list(APPEND MixerX_CodecLibs
-        "${AC_ZLIB}"
-    )
-endif()
 
 if(VITA)
     set(VITA_AUDIOCODECS_CMAKE_FLAGS
@@ -280,7 +270,6 @@ if(VITA)
         "${AC_GME}"
         "${AC_LIBXMP}"
         "${AC_MODPLUG}"
-        "${AC_ZLIB}"
     )
 endif()
 
