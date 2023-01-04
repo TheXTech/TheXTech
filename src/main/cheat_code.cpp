@@ -1775,7 +1775,7 @@ static void holyTrinity()
         NewEffect(10, tempLocation);
     }
     
-    if (HolyTrinity)
+    if(HolyTrinity)
     {
         ShadowMode = true;
         GodMode = true;
@@ -1806,7 +1806,7 @@ static void theEssentials()
         NewEffect(10, tempLocation);
     }
     
-    if (TheEssentials)
+    if(TheEssentials)
     {
         SuperSpeed = true;
         ShadowMode = true;
