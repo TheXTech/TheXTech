@@ -445,7 +445,9 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
 
     try
     {
-        image = new uint8_t[4 * width * height];
+        size_t image_size = 4 * width * height;
+        image = new uint8_t[image_size];
+        SDL_memset(image, 0, image_size);
     }
     catch(const std::bad_alloc &e)
     {
@@ -453,57 +455,93 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
         return dummyGlyph;
     }
 
-    if(bitmap.pixel_mode == FT_PIXEL_MODE_MONO)
+    switch(bitmap.pixel_mode)
     {
-        for(uint32_t b = 0; b < (width + 7) / 8; b++)
+    case FT_PIXEL_MODE_NONE:
+        break;
+
+    case FT_PIXEL_MODE_MONO:
+    {
+        uint32_t bsize = (width + 7) / 8;
+
+        if(bitmap.pitch >= 0)
         {
-            for(uint32_t h = 0; h < height; h++)
+            for(uint32_t b = 0; b < bsize; ++b)
             {
-                uint8_t block = bitmap.pitch >= 0
-                    ? bitmap.buffer[(static_cast<uint32_t>(bitmap.pitch) * ((height - 1) - h)) + b]
-                    : *(bitmap.buffer - (static_cast<uint32_t>(bitmap.pitch) * h) + b);
-
-                uint32_t* dest = reinterpret_cast<uint32_t*>(bitmap.pitch >= 0
-                    ? &(image[((4 * width) * (height - 1 - h)) + (32 * b)])
-                    : &(image[((4 * width) * h) + (32 * b)]));
-
-                for(int x = 0; x < 8 && (b * 8 + x) < width; x++)
+                for(uint32_t h = 0; h < height; ++h)
                 {
-                    if(block & (1 << (7 - x)))
-                        dest[x] = 0xFFFFFFFF;
-                    else
-                        dest[x] = 0;
+                    uint8_t block = bitmap.buffer[(static_cast<uint32_t>(bitmap.pitch) * ((height - 1) - h)) + b];
+                    uint32_t* dest = reinterpret_cast<uint32_t*>(&(image[((4 * width) * (height - 1 - h)) + (32 * b)]));
+                    for(int x = 0; x < 8 && (b * 8 + x) < width; x++)
+                    {
+                        if(block & (1 << (7 - x)))
+                            dest[x] = 0xFFFFFFFF;
+                        else
+                            dest[x] = 0;
+                    }
                 }
             }
         }
-    }
-    else if(bitmap.pitch >= 0)
-    {
-        for(uint32_t w = 0; w < width; w++)
+        else if(bitmap.pitch >= 0)
         {
-            for(uint32_t h = 0; h < height; h++)
+            for(uint32_t b = 0; b < bsize; ++b)
             {
-                uint8_t color = bitmap.buffer[static_cast<uint32_t>(bitmap.pitch) * ((height - 1) - h) + w];
-                size_t hp = (4 * width) * (height - 1 - h);
-                uint8_t *dst = image + hp + (4 * w);
-                for(int i = 0; i < 4; ++i)
-                    *(dst++) = color;
+                for(uint32_t h = 0; h < height; ++h)
+                {
+                    uint8_t block = *(bitmap.buffer - (static_cast<uint32_t>(bitmap.pitch) * h) + b);
+                    uint32_t* dest = reinterpret_cast<uint32_t*>(&(image[((4 * width) * h) + (32 * b)]));
+                    for(int x = 0; x < 8 && (b * 8 + x) < width; x++)
+                    {
+                        if(block & (1 << (7 - x)))
+                            dest[x] = 0xFFFFFFFF;
+                        else
+                            dest[x] = 0;
+                    }
+                }
             }
         }
+        break;
     }
-    else if(bitmap.pitch < 0)
+    case FT_PIXEL_MODE_GRAY:
     {
-        for(uint32_t w = 0; w < width; w++)
+        if(bitmap.pitch >= 0)
         {
-            for(uint32_t h = 0; h < height; h++)
+            for(uint32_t w = 0; w < width; ++w)
             {
-                uint8_t color = *(bitmap.buffer - (static_cast<uint32_t>(bitmap.pitch) * (h)) + w);
-                size_t hp = (4 * width) * h;
-                uint8_t *dst = image + hp + (4 * w);
-                for(int i = 0; i < 4; ++i)
-                    *(dst++) = color;
+                for(uint32_t h = 0; h < height; ++h)
+                {
+                    uint8_t color = bitmap.buffer[static_cast<uint32_t>(bitmap.pitch) * ((height - 1) - h) + w];
+                    size_t hp = (4 * width) * (height - 1 - h);
+                    uint32_t *dst = reinterpret_cast<uint32_t*>(image + hp + (4 * w));
+                    *dst = (uint32_t(color) << 0) |
+                           (uint32_t(color) << 8) |
+                           (uint32_t(color) << 16) |
+                           (uint32_t(color) << 24);
+                }
             }
         }
+        else if(bitmap.pitch < 0)
+        {
+            for(uint32_t w = 0; w < width; ++w)
+            {
+                for(uint32_t h = 0; h < height; ++h)
+                {
+                    uint8_t color = *(bitmap.buffer - (static_cast<uint32_t>(bitmap.pitch) * h) + w);
+                    size_t hp = (4 * width) * h;
+                    uint32_t *dst = reinterpret_cast<uint32_t*>(image + hp + (4 * w));
+                    *dst = (uint32_t(color) << 0) |
+                           (uint32_t(color) << 8) |
+                           (uint32_t(color) << 16) |
+                           (uint32_t(color) << 24);
+                }
+            }
+        }
+        break;
+    }
+
+    default:
+        pLogWarning("TtfFont::TheGlyph: FIXME: The pixel mode %d is not supported yet!", bitmap.pixel_mode);
+        break;
     }
 
     m_texturesBank.emplace_back();
