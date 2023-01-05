@@ -311,19 +311,18 @@ void AbstractRender_t::loadTexture_1x(StdPicture &target,
                          uint32_t pitch)
 {
     loadTexture(target, width, height, RGBApixels, pitch);
+//    if(target.inited)
+//    {
+//        target.l.w_orig = target.w;
+//        target.l.h_orig = target.h;
+//        target.l.w_scale /= 2;
+//        target.l.h_scale /= 2;
 
-    if(target.inited)
-    {
-        target.l.w_orig = target.w;
-        target.l.h_orig = target.h;
-        target.l.w_scale /= 2;
-        target.l.h_scale /= 2;
-
-        target.w *= 2;
-        target.h *= 2;
-        target.frame_w *= 2;
-        target.frame_h *= 2;
-    }
+//        target.w *= 2;
+//        target.h *= 2;
+//        target.frame_w *= 2;
+//        target.frame_h *= 2;
+//    }
 }
 
 static void dumpFullFile(std::vector<char> &dst, const std::string &path)

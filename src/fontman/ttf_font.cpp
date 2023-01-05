@@ -608,6 +608,16 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
 
     m_texturesBank.emplace_back();
     StdPicture &texture = m_texturesBank.back();
+    texture.w = width;
+    texture.h = height;
+    texture.frame_w = width;
+    texture.frame_h = height;
+#ifdef PICTURE_LOAD_NORMAL
+    texture.l.w_orig = 0;
+    texture.l.h_orig = 0;
+    texture.l.w_scale = 1.f;
+    texture.l.h_scale = 1.f;
+#endif
 
     // This is accurate for doublePixel, and inaccurate otherwise. But the glyphs are always rendered scaled so it doesn't make a difference.
     // For now, always mark it as 1x to indicate to XRender that it's not safe to downscale it, but if we tracked doublePixel, it would be fine to specialize here.
