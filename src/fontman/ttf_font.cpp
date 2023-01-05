@@ -379,12 +379,12 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
 
         if(drawOutlines)
         {
-            const float offsets[4][2] =
+            const double offsets[4][2] =
             {
-                {-1.f, -1.f},
-                {+1.f, -1.f},
-                {-1.f, +1.f},
-                {+1.f, +1.f}
+                {-scaleSize, 0.f},
+                { scaleSize, 0.f},
+                {0.f, -scaleSize},
+                {0.f,  scaleSize}
             };
 
             for(size_t i = 0; i < 4; ++i)
