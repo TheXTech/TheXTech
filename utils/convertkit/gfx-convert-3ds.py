@@ -15,16 +15,56 @@ outdir = sys.argv[2]
 for dirpath, _, files in os.walk(datadir, topdown=True):
     outpath = outdir+dirpath[len(datadir):]
     os.makedirs(outpath, exist_ok=True)
+
+    if dirpath.endswith('fonts/'):
+        print('found fonts dir', dirpath)
+        is_fonts_dir = True
+        texture_1x = set()
+
+        for fn in files:
+            if fn.endswith('.ini'):
+                rfn = os.path.join(dirpath, fn)
+
+                text = open(rfn, 'r').read()
+                if 'texture-1x' in text or 'texture-scale' in text.replace(' ','').replace('"',''):
+                    texture = text.find('texture =')
+                    if texture == -1:
+                        texture = text.find('texture=')
+                        if texture == -1:
+                            continue
+                        else:
+                            texture += 8
+                    else:
+                        texture += 9
+
+                    while text[texture] == ' ':
+                        texture += 1
+                    tex_end = text.find(' ', texture)
+                    tex_string = text[texture:tex_end].replace('"', '')
+                    print(f"{tex_string} is 1x")
+                    texture_1x.add(tex_string)
+    else:
+        is_fonts_dir = False
+
     for fn in files:
         rfn = os.path.join(dirpath, fn)
         if not os.path.isfile(rfn): continue
         destfn = os.path.join(outpath, fn)
         bmpfn = os.path.join(outpath, fn[:-3]+'bmp')
         t3xfn = os.path.join(outpath, fn[:-3]+'t3x')
-        if not REDO and (os.path.isfile(destfn) or os.path.isfile(destfn+'.wav') or ((fn.endswith('.gif') or fn.endswith('.png')) and os.path.isfile(t3xfn))): continue
+
+        is_1x = is_fonts_dir and fn in texture_1x
+
+        if is_1x:
+            downscale = "-sample 100%"
+        else:
+            downscale = "-sample 50%"
+
+        if not REDO and not is_fonts_dir and (os.path.isfile(destfn) or os.path.isfile(destfn+'.wav') or ((fn.endswith('.gif') or fn.endswith('.png')) and os.path.isfile(t3xfn))): continue
+
         print(rfn)
         if fn.endswith('.png'):
-            os.system(f'convert -sample 50% "{rfn}" "{bmpfn}"')
+            os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
         elif fn.endswith('m.gif') and os.path.isfile(rfn[:-5]+'.gif'):
             continue
         elif fn.endswith('.gif'):
@@ -33,23 +73,27 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
             altmaskfn_gif = os.path.join(graphicsdir, ftype, fn[:-4]+'m.gif')
             altmaskfn_png = os.path.join(graphicsdir, ftype, fn[:-4]+'.png')
             if os.path.isfile(maskfn):
-                os.system(f'convert "{rfn}" "{maskfn}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel -sample 50% "{bmpfn}"')
+                os.system(f'convert "{rfn}" "{maskfn}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel {downscale} "{bmpfn}"')
             elif os.path.isfile(altmaskfn_gif):
                 if os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{rfn}"').read() == os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{altmaskfn_gif}"').read():
-                    os.system(f'convert "{rfn}" "{altmaskfn_gif}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel -sample 50% "{bmpfn}"')
+                    os.system(f'convert "{rfn}" "{altmaskfn_gif}" -alpha Off -compose CopyOpacity -composite -channel a -negate +channel {downscale} "{bmpfn}"')
                 else:
-                    os.system(f'convert -sample 50% "{rfn}" "{bmpfn}"')
+                    os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
             elif os.path.isfile(altmaskfn_png):
                 if os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{rfn}"').read() == os.popen(f'identify -format "%[fx:w*2],%[fx:h*2]" "{altmaskfn_png}"').read():
-                    os.system(f'convert "{rfn}" "{altmaskfn_png}" -alpha On -compose CopyOpacity -composite -sample 50% "{bmpfn}"')
+                    os.system(f'convert "{rfn}" "{altmaskfn_png}" -alpha On -compose CopyOpacity -composite {downscale} "{bmpfn}"')
                 else:
-                    os.system(f'convert -sample 50% "{rfn}" "{bmpfn}"')
+                    os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
             else:
-                os.system(f'convert -sample 50% "{rfn}" "{bmpfn}"')
+                os.system(f'convert {downscale} "{rfn}" "{bmpfn}"')
         elif fn.endswith('.db'):
             continue
         elif fn.endswith('.ogg') and '/sound/' in rfn:
             os.system(f'ffmpeg -i "{rfn}" "{destfn}.wav"')
+            continue
+        elif is_fonts_dir and fn.endswith('.ini'):
+            shutil.copy(rfn, destfn)
+            os.system(f'sed \'s/\\.png/\\.t3x/\' -i "{destfn}"')
             continue
         elif fn == 'sounds.ini':
             shutil.copy(rfn, destfn)
