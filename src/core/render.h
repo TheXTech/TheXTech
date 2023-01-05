@@ -285,8 +285,19 @@ E_INLINE void lazyLoadedBytesReset() TAIL
 }
 #endif
 
-
-// load a texture whose logical size is the same as its texture size (the texture normally would have 2x2 pixels)
+/*!
+ * \brief Load a texture whose logical size is the same as its texture size (the texture normally would have 2x2 pixels)
+ * \param target Destination texture entry
+ * \param width Width of the input texture in pixels
+ * \param height Height of the input texture in pixels
+ * \param RGBApixels Pointer to the RGBA pixel data
+ * \param pitch Width of the line in bytes
+ *
+ * Important note: All internal data of the target texture
+ * (such as .w, .h, .frame_w, .frame_h, .l.w_orig, .l.h_orig,
+ * .l.w_scale, .l.h_scale) must be filled externally BEFORE loading
+ * the texture.
+ */
 E_INLINE void loadTexture(StdPicture &target,
                           uint32_t width,
                           uint32_t height,
@@ -298,7 +309,19 @@ E_INLINE void loadTexture(StdPicture &target,
 }
 #endif
 
-// load a texture whose logical size is the twice its texture size (the texture has 1x1 pixels)
+/*!
+ * \brief load an RGBA texture whose logical size is the twice its texture size (the texture has 1x1 pixels)
+ * \param target Destination texture entry
+ * \param width Width of the input texture in pixels
+ * \param height Height of the input texture in pixels
+ * \param RGBApixels Pointer to the RGBA pixel data
+ * \param pitch Width of the line in bytes
+ *
+ * Important note: All internal data of the target texture
+ * (such as .w, .h, .frame_w, .frame_h, .l.w_orig, .l.h_orig,
+ * .l.w_scale, .l.h_scale) must be filled externally BEFORE loading
+ * the texture.
+ */
 E_INLINE void loadTexture_1x(StdPicture &target,
                           uint32_t width,
                           uint32_t height,
