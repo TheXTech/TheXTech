@@ -187,6 +187,16 @@ int TtfFont::bitmapSize() const
     return m_bitmapSize;
 }
 
+void TtfFont::setDoublePixel(bool enable)
+{
+    m_doublePixel = enable;
+}
+
+bool TtfFont::doublePixel() const
+{
+    return m_doublePixel;
+}
+
 PGE_Size TtfFont::textSize(const char *text, size_t text_size,
                            uint32_t max_line_length,
                            bool cut, uint32_t fontSize)
@@ -315,12 +325,6 @@ void TtfFont::printText(const char *text, size_t text_size,
 
     uint32_t offsetX = 0;
     uint32_t offsetY = 0;
-    bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;
-
-    // FIXME: add XRender::RENDER_1X flag, use that instead
-#ifdef __WII__
-    doublePixel = true;
-#endif
 
     const char *strIt  = text;
     const char *strEnd = strIt + text_size;
@@ -347,7 +351,7 @@ void TtfFont::printText(const char *text, size_t text_size,
             break;
         }
 
-        const TheGlyph &glyph = getGlyph(doublePixel ? (fontSize / 2) : fontSize, get_utf8_char(&cx));
+        const TheGlyph &glyph = getGlyph(m_doublePixel ? (fontSize / 2) : fontSize, get_utf8_char(&cx));
         if(glyph.tx)
         {
             // GlRenderer::setTextureColor(Red, Green, Blue, Alpha);
@@ -356,16 +360,16 @@ void TtfFont::printText(const char *text, size_t text_size,
             XRender::renderTextureScale(
                 static_cast<float>(glyph_x + glyph.left),
                 static_cast<float>(glyph_y - glyph.top),
-                (doublePixel ? (glyph.width * 2) : glyph.width),
-                (doublePixel ? (glyph.height * 2) : glyph.height),
+                (m_doublePixel ? (glyph.width * 2) : glyph.width),
+                (m_doublePixel ? (glyph.height * 2) : glyph.height),
                 *glyph.tx,
                 Red, Green, Blue, Alpha
             );
 //            GlRenderer::renderTexture(glyph.tx,
 //                                      static_cast<float>(glyph_x + glyph.left),
 //                                      static_cast<float>(glyph_y - glyph.top),
-//                                      (doublePixel ? (glyph.width * 2) : glyph.width),
-//                                      (doublePixel ? (glyph.height * 2) : glyph.height)
+//                                      (m_doublePixel ? (glyph.width * 2) : glyph.width),
+//                                      (m_doublePixel ? (glyph.height * 2) : glyph.height)
 //                                      );
         }
         offsetX += glyph.tx ? uint32_t(glyph.advance >> 6) : (fontSize >> 2);
@@ -389,8 +393,6 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
                             bool drawOutlines,
                             float Red, float Green, float Blue, float Alpha)
 {
-    (void)(scaleSize);
-
     const TheGlyph &glyph = getGlyph(fontSize, get_utf8_char(u8char));
     if(glyph.tx)
     {
@@ -401,10 +403,10 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
         {
             const double offsets[4][2] =
             {
-                {-scaleSize, 0.f},
-                { scaleSize, 0.f},
-                {0.f, -scaleSize},
-                {0.f,  scaleSize}
+                {-scaleSize, 0.0},
+                { scaleSize, 0.0},
+                {0.0, -scaleSize},
+                {0.0,  scaleSize}
             };
 
             for(size_t i = 0; i < 4; ++i)

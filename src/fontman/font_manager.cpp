@@ -157,6 +157,7 @@ void FontManager::initFull()
             std::string key = fmt::format_ne("file{0}", i);
             std::string keyAntiAlias = fmt::format_ne("file{0}-antialias", i);
             std::string keyBitmapSize = fmt::format_ne("file{0}-bitmap-size", i);
+            std::string keyDoublePixel = fmt::format_ne("file{0}-double-pixel", i);
 
             if(!overrider.hasKey(key))
                 break; // Stop look up on a first missing key
@@ -173,6 +174,15 @@ void FontManager::initFull()
             int bitmapSize;
             overrider.read(keyBitmapSize.c_str(), bitmapSize, 0);
 
+            bool doublePixel;
+            // FIXME: add XRender::RENDER_1X flag, use that instead
+#ifdef __WII__
+            const bool doublePixelDefault = true;
+#else
+            const bool doublePixelDefault = false;
+#endif
+            overrider.read(keyDoublePixel.c_str(), doublePixel, doublePixelDefault);
+
             std::string fontPath = fontsDir.absolutePath() + "/" + fontFile;
 
             g_ttfFonts.emplace_back();
@@ -180,6 +190,7 @@ void FontManager::initFull()
 
             tf.setAntiAlias(antiAlias);
             tf.setBitmapSize(bitmapSize);
+            tf.setDoublePixel(doublePixel);
 
             pLogDebug("Loading TTF font %s...", fontPath.c_str());
             tf.loadFont(fontPath);

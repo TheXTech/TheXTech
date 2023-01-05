@@ -61,6 +61,9 @@ public:
     void setBitmapSize(int size);
     int bitmapSize() const;
 
+    void setDoublePixel(bool enable);
+    bool doublePixel() const;
+
     /*!
      * \brief Measure the size of the multiline text block in pixels
      * \param text Multi-line text string
@@ -138,7 +141,11 @@ private:
     //! Loaded font face
     FT_Face      m_face = nullptr;
 
+    //! Load anti-aliased glyphs
     bool         m_enableAntialias = true;
+
+    //! Make pixelized glyphs: load them with a smaller size, and then, upscale them during a render
+    bool         m_doublePixel     = false;
 
     //! Font face preferred bitmap size, 0 to disable
     int          m_bitmapSize = 0;
