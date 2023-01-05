@@ -20,6 +20,8 @@
 #include "raster_font.h"
 
 #include "../core/render.h"
+
+#include "sdl_proxy/sdl_stdinc.h"
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
 #include <IniProcessor/ini_processing.h>
@@ -333,11 +335,33 @@ PGE_Size RasterFont::textSize(const char* text, size_t text_size, uint32_t max_l
                 TtfFont *font = dynamic_cast<TtfFont*>(FontManager::getDefaultTtfFont());
                 if(font)
                 {
-                    TtfFont::TheGlyphInfo glyph = font->getGlyphInfo(&cx, m_letterWidth);
-                    uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (m_letterWidth >> 2);
-                    auto lw = m_letterWidth + m_interLetterSpace;
+                    uint32_t font_size_use = m_letterWidth;
+
+                    int y_offset = 0;
+
+                    bool doublePixel = false;
+#   if defined(__WII__)
+                    doublePixel = true;
+#   endif
+
+                    if(font->bitmapSize())
+                    {
+                        if(font_size_use > font->bitmapSize() * 1.5)
+                            doublePixel = true;
+
+                        font_size_use = font->bitmapSize();
+                    }
+                    else if(doublePixel)
+                        font_size_use /= 2;
+
+                    TtfFont::TheGlyphInfo glyph = font->getGlyphInfo(&cx, font_size_use);
+                    uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (font_size_use >> 2);
+                    if(doublePixel)
+                        glyph_width *= 2;
+
                     // Raster fonts are monospace fonts. TTF glyphs shoudn't break mono-width until they are wider than a cell
-                    widthSumm += glyph_width > lw ? glyph_width : lw;
+                    auto lw = SDL_max(glyph_width, m_letterWidth);
+                    widthSumm += lw + m_interLetterSpace;
                 }
                 else
 #endif
@@ -451,25 +475,50 @@ void RasterFont::printText(const char* text, size_t text_size,
         else
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
         {
-            // fixme: allow TTF fonts to have preferred size (needed for bitmap fonts) and center them on that size
-            TtfFont *font = reinterpret_cast<TtfFont*>(FontManager::getDefaultTtfFont());
+            TtfFont *font = dynamic_cast<TtfFont*>(FontManager::getDefaultTtfFont());
             if(font)
             {
-                TtfFont::TheGlyphInfo glyph = font->getGlyphInfo(&cx, m_letterWidth);
-                uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (m_letterWidth >> 2);
+                uint32_t font_size_use = m_letterWidth;
+
+                int y_offset = 0;
+
+                if(font->bitmapSize())
+                {
+                    if(font_size_use > font->bitmapSize() * 1.5)
+                        doublePixel = true;
+
+                    if(doublePixel)
+                        y_offset = ((int)m_letterWidth - (font->bitmapSize() * 2)) / 2;
+                    else
+                        y_offset = ((int)m_letterWidth - font->bitmapSize()) / 2;
+
+                    font_size_use = font->bitmapSize();
+                }
+                else if(doublePixel)
+                    font_size_use /= 2;
+
+                TtfFont::TheGlyphInfo glyph = font->getGlyphInfo(&cx, font_size_use);
+                uint32_t glyph_width = glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (font_size_use >> 2);
+                if(doublePixel)
+                    glyph_width *= 2;
+
+                if(m_ttfBorders)
+                    offsetX += (doublePixel ? 2 : 1);
 
                 font->drawGlyph(&cx,
                                 x + static_cast<int32_t>(offsetX + m_glyphOffsetX),
-                                y + static_cast<int32_t>(offsetY + m_glyphOffsetY) - 2,
-                                (doublePixel ? (glyph_width / 2) : glyph_width),
+                                y + static_cast<int32_t>(offsetY + m_glyphOffsetY) - 2 + y_offset,
+                                font_size_use,
                                 (doublePixel ? 2.0 : 1.0),
                                 m_ttfBorders,
                                 Red, Green, Blue, Alpha);
 
-                auto lw = w + m_interLetterSpace;
-                offsetX += glyph_width > lw ? glyph_width : lw;
-            } else {
-                offsetX += m_interLetterSpace;
+                auto lw = SDL_max(glyph_width, m_letterWidth);
+                offsetX += lw + m_interLetterSpace;
+            }
+            else
+            {
+                offsetX += m_letterWidth + m_interLetterSpace;
             }
         }
 #else
