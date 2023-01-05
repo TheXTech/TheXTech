@@ -109,10 +109,17 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
     IniProcessing font(fontmap_ini);
     std::string texFile;
     uint32_t w = m_letterWidth, h = m_letterHeight;
-    int texture_scale_factor = 1;
+    bool texture_1x = false;
     font.beginGroup("font-map");
     font.read("texture", texFile, "");
-    font.read("texture-scale", texture_scale_factor, 1);
+    font.read("texture-1x", texture_1x, false);
+    {
+        // temporary hack for previous assets
+        int texture_scale_factor;
+        font.read("texture-scale", texture_scale_factor, 1);
+        if(texture_scale_factor == 2)
+            texture_1x = true;
+    }
     font.read("width", w, 0);
     font.read("height", h, 0);
     m_matrixWidth = w;
@@ -131,25 +138,10 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
         return;
     }
 
-    StdPicture fontTexture = XRender::LoadPicture(root + texFile);
+    StdPicture fontTexture = (texture_1x ? XRender::LoadPicture_1x(root + texFile) : XRender::LoadPicture(root + texFile));
 
     if(!fontTexture.inited)
         pLogWarning("Failed to load font texture! Invalid image!");
-
-    if(texture_scale_factor > 1)
-    {
-        pLogDebug("RasterFont::loadFontMap: Force texture upscale with factor %d", texture_scale_factor);
-#ifdef PICTURE_LOAD_NORMAL
-        fontTexture.l.w_orig = fontTexture.w;
-        fontTexture.l.h_orig = fontTexture.h;
-        fontTexture.l.w_scale = 1.0f / float(texture_scale_factor);
-        fontTexture.l.h_scale = 1.0f / float(texture_scale_factor);
-#endif
-        fontTexture.w *= texture_scale_factor;
-        fontTexture.h *= texture_scale_factor;
-        fontTexture.frame_w *= texture_scale_factor;
-        fontTexture.frame_h *= texture_scale_factor;
-    }
 
     m_texturesBank.push_back(fontTexture);
     StdPicture *loadedTexture = &m_texturesBank.back();
@@ -415,6 +407,11 @@ void RasterFont::printText(const char* text, size_t text_size,
     bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;
 #endif
 
+    // FIXME: add XRender::RENDER_1X flag, use that instead
+#ifdef __WII__
+    doublePixel = true;
+#endif
+
     const char *strIt  = text;
     const char *strEnd = strIt + text_size;
     for(; strIt < strEnd; strIt++)
@@ -454,6 +451,7 @@ void RasterFont::printText(const char* text, size_t text_size,
         else
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
         {
+            // fixme: allow TTF fonts to have preferred size (needed for bitmap fonts) and center them on that size
             TtfFont *font = reinterpret_cast<TtfFont*>(FontManager::getDefaultTtfFont());
             if(font)
             {

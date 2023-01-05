@@ -185,6 +185,13 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     return target;
 }
 
+StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+{
+    StdPicture target = LoadPicture(path, maskPath, maskFallbackPath);
+    target.w *= 2;
+    target.h *= 2;
+}
+
 
 StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
 {
@@ -250,7 +257,17 @@ void lazyUnLoad(StdPicture &target)
 }
 
 
-void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch) {}
+void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    target.w = width;
+    target.h = height;
+}
+
+void loadTexture_1x(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    target.w = width * 2;
+    target.h = height * 2;
+}
 
 void deleteTexture(StdPicture &tx, bool lazyUnload)
 {

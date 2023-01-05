@@ -34,6 +34,11 @@ FT_Library  g_ft = nullptr;
 static std::unordered_set<TtfFont*> g_loadedFaces;
 static std::mutex                   g_loadedFaces_mutex;
 
+#ifdef __WII__
+// std::mutex crashes program on Wii. It's possible that SDL_mutex will do better but I remember encountering problems with it.
+#define PGE_NO_THREADING
+#endif
+
 bool initializeFreeType()
 {
     FT_Error error = FT_Init_FreeType(&g_ft);
@@ -64,13 +69,17 @@ TtfFont::~TtfFont()
         XRender::deleteTexture(t);
     m_texturesBank.clear();
 
+#if !defined(PGE_NO_THREADING)
     g_loadedFaces_mutex.lock();
+#endif
     if(m_face)
     {
         g_loadedFaces.erase(this);
         FT_Done_Face(m_face);
     }
+#if !defined(PGE_NO_THREADING)
     g_loadedFaces_mutex.unlock();
+#endif
 
     m_face = nullptr;
 }
@@ -98,9 +107,13 @@ bool TtfFont::loadFont(const std::string &path)
         return false;
     }
 
+#if !defined(PGE_NO_THREADING)
     g_loadedFaces_mutex.lock();
+#endif
     g_loadedFaces.insert(this);
+#if !defined(PGE_NO_THREADING)
     g_loadedFaces_mutex.unlock();
+#endif
 
     m_fontName.append(m_face->family_name);
     m_fontName.push_back(' ');
@@ -274,6 +287,11 @@ void TtfFont::printText(const char *text, size_t text_size,
     uint32_t offsetY = 0;
     bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;
 
+    // FIXME: add XRender::RENDER_1X flag, use that instead
+#ifdef __WII__
+    doublePixel = true;
+#endif
+
     const char *strIt  = text;
     const char *strEnd = strIt + text_size;
     for(; strIt < strEnd; strIt++)
@@ -423,18 +441,24 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
 
     if(m_recentPixelSize != fontSize)
     {
+#if !defined(PGE_NO_THREADING)
         g_loadedFaces_mutex.lock();
+#endif
         error = FT_Set_Pixel_Sizes(cur_font, 0, fontSize);
         if(error)
             pLogWarning("TheGlyph::loadGlyph (1) Failed to set the pixel sizes %u for the font %s: %s", fontSize, cur_font->family_name, FT_Error_String(error));
         m_recentPixelSize = fontSize;
+#if !defined(PGE_NO_THREADING)
         g_loadedFaces_mutex.unlock();
+#endif
     }
 
     t_glyphIndex = FT_Get_Char_Index(cur_font, character);
     if(t_glyphIndex == 0)//Attempt to find a fallback
     {
+#if !defined(PGE_NO_THREADING)
         g_loadedFaces_mutex.lock();
+#endif
         for(TtfFont *fb_font : g_loadedFaces)
         {
             if(fb_font->m_recentPixelSize != fontSize)
@@ -453,7 +477,9 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
                 break;
             }
         }
+#if !defined(PGE_NO_THREADING)
         g_loadedFaces_mutex.unlock();
+#endif
     }
 
     FT_Int32 ftLoadFlags = FT_LOAD_RENDER;
@@ -582,19 +608,11 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
 
     m_texturesBank.emplace_back();
     StdPicture &texture = m_texturesBank.back();
-    texture.w = width;
-    texture.h = height;
-    texture.frame_w = width;
-    texture.frame_h = height;
-    texture.inited = true;
-#ifdef PICTURE_LOAD_NORMAL
-    texture.l.w_orig = int(texture.w);
-    texture.l.h_orig = int(texture.h);
-    texture.l.w_scale = float(width) / float(texture.l.w_orig);
-    texture.l.h_scale = float(width) / float(texture.l.h_orig);
-#endif
 
-    XRender::loadTexture(texture, width, height, image, pitch);
+    // This is accurate for doublePixel, and inaccurate otherwise. But the glyphs are always rendered scaled so it doesn't make a difference.
+    // For now, always mark it as 1x to indicate to XRender that it's not safe to downscale it, but if we tracked doublePixel, it would be fine to specialize here.
+    XRender::loadTexture_1x(texture, width, height, image, pitch);
+
     t_glyph.tx      = &texture;
     t_glyph.width   = width;
     t_glyph.height  = height;

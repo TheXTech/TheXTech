@@ -210,12 +210,23 @@ E_INLINE void setTargetSubScreen() TAIL
 #endif
 
 
+// load a picture whose logical size is the same as its texture size (the texture normally would have 2x2 pixels)
 E_INLINE StdPicture LoadPicture(const std::string &path,
                                 const std::string &maskPath = std::string(),
                                 const std::string &maskFallbackPath = std::string()) TAIL
 #ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::LoadPicture(path, maskPath, maskFallbackPath);
+}
+#endif
+
+// load a picture whose logical size is twice its texture size (the texture has 1x1 pixels)
+E_INLINE StdPicture LoadPicture_1x(const std::string &path,
+                                const std::string &maskPath = std::string(),
+                                const std::string &maskFallbackPath = std::string()) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return AbstractRender_t::LoadPicture_1x(path, maskPath, maskFallbackPath);
 }
 #endif
 
@@ -275,6 +286,7 @@ E_INLINE void lazyLoadedBytesReset() TAIL
 #endif
 
 
+// load a texture whose logical size is the same as its texture size (the texture normally would have 2x2 pixels)
 E_INLINE void loadTexture(StdPicture &target,
                           uint32_t width,
                           uint32_t height,
@@ -283,6 +295,18 @@ E_INLINE void loadTexture(StdPicture &target,
 #ifndef RENDER_CUSTOM
 {
     g_render->loadTexture(target, width, height, RGBApixels, pitch);
+}
+#endif
+
+// load a texture whose logical size is the twice its texture size (the texture has 1x1 pixels)
+E_INLINE void loadTexture_1x(StdPicture &target,
+                          uint32_t width,
+                          uint32_t height,
+                          uint8_t *RGBApixels,
+                          uint32_t pitch) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->loadTexture_1x(target, width, height, RGBApixels, pitch);
 }
 #endif
 

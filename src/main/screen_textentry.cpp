@@ -156,16 +156,15 @@ static const char* s_keymap_JP =
     "\x12ゴゾド\x12ボポ５０＋ー"
     "\x0e\x11\x11　\x11\x11\x11\x1d\x1c\n\x11";
 
-// please help add more useful keymaps as soon as we have more printable characters.
-
-static const char* s_current_keymap = s_keymap_EN;
-
 // used to support UTF-8 characters
 static std::vector<int16_t> s_current_keymap_UTF_offsets;
+
+static const char* s_current_keymap = s_keymap_EN;
 static int s_current_keymap_rows = 5;
 static int s_current_keymap_cols = 12;
 static int s_current_keymap_levels = 3;
 
+// static const char* s_current_keymap = s_keymap_JP;
 // static int s_current_keymap_rows = 6;
 // static int s_current_keymap_cols = 11;
 // static int s_current_keymap_levels = 4;
