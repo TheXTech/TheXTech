@@ -20,10 +20,16 @@
 #include "ttf_font.h"
 #include "sdl_proxy/sdl_stdinc.h"
 #include "sdl_proxy/sdl_assert.h"
+#if !defined(PGE_NO_THREADING)
+#   ifdef PGE_SDL_MUTEX
+#       include <SDL2/SDL_mutex.h>
+#   else
+#       include <mutex>
+#   endif
+#endif
 #include "core/render.h"
 #include <Logger/logger.h>
 #include <unordered_set>
-#include <mutex>
 
 #include "font_manager_private.h"
 
@@ -32,17 +38,31 @@ FT_Library  g_ft = nullptr;
 
 //! Loaded TTF fonts set used as fallback for missing glyphs
 static std::unordered_set<TtfFont*> g_loadedFaces;
-static std::mutex                   g_loadedFaces_mutex;
 
-#ifdef __WII__
-// std::mutex crashes program on Wii. It's possible that SDL_mutex will do better but I remember encountering problems with it.
-#define PGE_NO_THREADING
+#ifndef PGE_NO_THREADING
+#   ifdef PGE_SDL_MUTEX
+static SDL_mutex                   *g_loadedFaces_mutex = nullptr;
+#   define TTF_MUTEX_LOCK()         SDL_LockMutex(g_loadedFaces_mutex)
+#   define TTF_MUTEX_UNLOCK()       SDL_UnlockMutex(g_loadedFaces_mutex)
+#   else
+static std::mutex                   g_loadedFaces_mutex;
+#   define TTF_MUTEX_LOCK()         g_loadedFaces_mutex.lock()
+#   define TTF_MUTEX_UNLOCK()       g_loadedFaces_mutex.unlock()
+#   endif
+#else
+#   define TTF_MUTEX_LOCK()         (void)0
+#   define TTF_MUTEX_UNLOCK()       (void)0
 #endif
+
 
 bool initializeFreeType()
 {
     FT_Error error = FT_Init_FreeType(&g_ft);
     SDL_assert_release(error == 0);
+#if !defined(PGE_NO_THREADING) && defined(PGE_SDL_MUTEX)
+    if(!g_loadedFaces_mutex)
+        g_loadedFaces_mutex = SDL_CreateMutex();
+#endif
     return true;
 }
 
@@ -53,6 +73,14 @@ void closeFreeType()
         FT_Done_FreeType(g_ft);
         g_ft = nullptr;
     }
+
+#if !defined(PGE_NO_THREADING) && defined(PGE_SDL_MUTEX)
+    if(g_loadedFaces_mutex)
+    {
+        SDL_DestroyMutex(g_loadedFaces_mutex);
+        g_loadedFaces_mutex = nullptr;
+    }
+#endif
 }
 
 // Default dummy glyph
@@ -69,17 +97,13 @@ TtfFont::~TtfFont()
         XRender::deleteTexture(t);
     m_texturesBank.clear();
 
-#if !defined(PGE_NO_THREADING)
-    g_loadedFaces_mutex.lock();
-#endif
+    TTF_MUTEX_LOCK();
     if(m_face)
     {
         g_loadedFaces.erase(this);
         FT_Done_Face(m_face);
     }
-#if !defined(PGE_NO_THREADING)
-    g_loadedFaces_mutex.unlock();
-#endif
+    TTF_MUTEX_UNLOCK();
 
     m_face = nullptr;
 }
@@ -107,13 +131,9 @@ bool TtfFont::loadFont(const std::string &path)
         return false;
     }
 
-#if !defined(PGE_NO_THREADING)
-    g_loadedFaces_mutex.lock();
-#endif
+    TTF_MUTEX_LOCK();
     g_loadedFaces.insert(this);
-#if !defined(PGE_NO_THREADING)
-    g_loadedFaces_mutex.unlock();
-#endif
+    TTF_MUTEX_UNLOCK();
 
     m_fontName.append(m_face->family_name);
     m_fontName.push_back(' ');
@@ -139,9 +159,9 @@ bool TtfFont::loadFont(const char *mem, size_t size)
     if(error)
         return false;
 
-    g_loadedFaces_mutex.lock();
+    TTF_MUTEX_LOCK();
     g_loadedFaces.insert(this);
-    g_loadedFaces_mutex.unlock();
+    TTF_MUTEX_UNLOCK();
 
     m_isReady = true;
     return true;
@@ -451,24 +471,19 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
 
     if(m_recentPixelSize != fontSize)
     {
-#if !defined(PGE_NO_THREADING)
-        g_loadedFaces_mutex.lock();
-#endif
+        TTF_MUTEX_LOCK();
         error = FT_Set_Pixel_Sizes(cur_font, 0, fontSize);
         if(error)
             pLogWarning("TheGlyph::loadGlyph (1) Failed to set the pixel sizes %u for the font %s: %s", fontSize, cur_font->family_name, FT_Error_String(error));
         m_recentPixelSize = fontSize;
-#if !defined(PGE_NO_THREADING)
-        g_loadedFaces_mutex.unlock();
-#endif
+        TTF_MUTEX_UNLOCK();
     }
 
     t_glyphIndex = FT_Get_Char_Index(cur_font, character);
+
     if(t_glyphIndex == 0)//Attempt to find a fallback
     {
-#if !defined(PGE_NO_THREADING)
-        g_loadedFaces_mutex.lock();
-#endif
+        TTF_MUTEX_LOCK();
         for(TtfFont *fb_font : g_loadedFaces)
         {
             if(fb_font->m_recentPixelSize != fontSize)
@@ -487,9 +502,7 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
                 break;
             }
         }
-#if !defined(PGE_NO_THREADING)
-        g_loadedFaces_mutex.unlock();
-#endif
+        TTF_MUTEX_UNLOCK();
     }
 
     FT_Int32 ftLoadFlags = FT_LOAD_RENDER;
