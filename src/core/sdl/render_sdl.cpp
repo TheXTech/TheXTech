@@ -400,15 +400,6 @@ void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height,
     m_textureBank.insert(texture);
 
     target.inited = true;
-    target.w = width;
-    target.h = height;
-    target.frame_w = width;
-    target.frame_h = height;
-
-    target.l.w_orig = width;
-    target.l.h_orig = height;
-    target.l.w_scale = 1.0f;
-    target.l.h_scale = 1.0f;
 
 #if defined(__APPLE__) && defined(USE_APPLE_X11)
     SDL_GL_UnbindTexture(texture); // Unbind texture after it got been loaded (otherwise a white screen will happen)
