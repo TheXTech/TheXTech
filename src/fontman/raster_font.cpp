@@ -405,11 +405,11 @@ void RasterFont::printText(const char* text, size_t text_size,
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     //! FIXME: Add the config option for TTF fonts here
     bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;
-#endif
 
     // FIXME: add XRender::RENDER_1X flag, use that instead
-#ifdef __WII__
+#   if defined(__WII__)
     doublePixel = true;
+#   endif
 #endif
 
     const char *strIt  = text;
