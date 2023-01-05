@@ -157,6 +157,16 @@ bool TtfFont::antiAlias() const
     return m_enableAntialias;
 }
 
+void TtfFont::setBitmapSize(int size)
+{
+    m_bitmapSize = size;
+}
+
+int TtfFont::bitmapSize() const
+{
+    return m_bitmapSize;
+}
+
 PGE_Size TtfFont::textSize(const char *text, size_t text_size,
                            uint32_t max_line_length,
                            bool cut, uint32_t fontSize)

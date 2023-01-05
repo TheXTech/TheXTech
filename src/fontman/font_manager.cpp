@@ -156,6 +156,7 @@ void FontManager::initFull()
         {
             std::string key = fmt::format_ne("file{0}", i);
             std::string keyAntiAlias = fmt::format_ne("file{0}-antialias", i);
+            std::string keyBitmapSize = fmt::format_ne("file{0}-bitmap-size", i);
 
             if(!overrider.hasKey(key))
                 break; // Stop look up on a first missing key
@@ -169,12 +170,16 @@ void FontManager::initFull()
             bool antiAlias;
             overrider.read(keyAntiAlias.c_str(), antiAlias, true);
 
+            int bitmapSize;
+            overrider.read(keyBitmapSize.c_str(), bitmapSize, 0);
+
             std::string fontPath = fontsDir.absolutePath() + "/" + fontFile;
 
             g_ttfFonts.emplace_back();
             TtfFont& tf = g_ttfFonts.back();
 
             tf.setAntiAlias(antiAlias);
+            tf.setBitmapSize(bitmapSize);
 
             pLogDebug("Loading TTF font %s...", fontPath.c_str());
             tf.loadFont(fontPath);

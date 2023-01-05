@@ -58,6 +58,9 @@ public:
     void setAntiAlias(bool enable);
     bool antiAlias() const;
 
+    void setBitmapSize(int size);
+    int bitmapSize() const;
+
     /*!
      * \brief Measure the size of the multiline text block in pixels
      * \param text Multi-line text string
@@ -136,6 +139,9 @@ private:
     FT_Face      m_face = nullptr;
 
     bool         m_enableAntialias = true;
+
+    //! Font face preferred bitmap size, 0 to disable
+    int          m_bitmapSize = 0;
 
     struct TheGlyph
     {
