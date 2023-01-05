@@ -302,14 +302,14 @@ void GoLeft()
 {
     int break_col = s_cur_col;
     if(s_cur_col == 0)
-        s_cur_col = 11;
+        s_cur_col = s_current_keymap_cols - 1;
     else
         s_cur_col --;
 
     while(*get_char() == '\x11' || *get_char() == '\x12')
     {
         if(s_cur_col == 0)
-            s_cur_col = 11;
+            s_cur_col = s_current_keymap_cols - 1;
         else
             s_cur_col --;
         if(s_cur_col == break_col)
@@ -321,14 +321,14 @@ void GoRight()
 {
     int break_col = s_cur_col;
 
-    if(s_cur_col == 11)
+    if(s_cur_col == s_current_keymap_cols - 1)
         s_cur_col = 0;
     else
         s_cur_col ++;
 
     while(*get_char() == '\x11' || *get_char() == '\x12')
     {
-        if(s_cur_col == 11)
+        if(s_cur_col == s_current_keymap_cols - 1)
             s_cur_col = 0;
         else
             s_cur_col ++;
@@ -341,14 +341,14 @@ void GoDown()
 {
     int break_row = s_cur_row;
 
-    if(s_cur_row == 4)
+    if(s_cur_row == s_current_keymap_rows - 1)
         s_cur_row = 0;
     else
         s_cur_row ++;
 
     while(*get_char() == '\x12')
     {
-        if(s_cur_row == 4)
+        if(s_cur_row == s_current_keymap_rows - 1)
             s_cur_row = 0;
         else
             s_cur_row ++;
@@ -365,14 +365,14 @@ void GoUp()
     int break_row = s_cur_row;
 
     if(s_cur_row == 0)
-        s_cur_row = 4;
+        s_cur_row = s_current_keymap_rows - 1;
     else
         s_cur_row --;
 
     while(*get_char() == '\x12')
     {
         if(s_cur_row == 0)
-            s_cur_row = 4;
+            s_cur_row = s_current_keymap_rows - 1;
         else
             s_cur_row --;
         if(s_cur_row == break_row)
@@ -484,7 +484,7 @@ bool KeyboardMouseRender(bool mouse, bool render)
     int key_size = 40;
     if(g_config.osk_fill_screen)
     {
-        key_size = (ScreenW - 40) / 12;
+        key_size = (ScreenW - 40) / s_current_keymap_cols;
         // force even
         key_size &= ~1;
     }
@@ -495,8 +495,11 @@ bool KeyboardMouseRender(bool mouse, bool render)
     int win_width = kb_width + 20;
     int win_height = kb_height + 20;
 
-    int n_prompt_lines = ((s_Prompt.size() + 26) / 27);
-    int n_text_lines = ((s_Text_UTF_offsets.size() + 23) / 25);
+    int n_text_chars = s_current_keymap_cols * 2 + 1;
+    int n_prompt_chars = n_text_chars + 2;
+
+    int n_prompt_lines = ((s_Prompt.size() + n_prompt_chars - 1) / n_prompt_chars);
+    int n_text_lines = ((s_Text_UTF_offsets.size() - 1 + n_text_chars - 1) / n_text_chars);
     if(n_text_lines == 0)
         n_text_lines = 1;
 
@@ -510,30 +513,29 @@ bool KeyboardMouseRender(bool mouse, bool render)
     int win_y = ScreenH / 1.25 - win_height / 1.25;
     // force even
     win_y &= ~1;
-    int kb_y = win_y + 10 + n_prompt_lines*20+n_text_lines*20;
+    int kb_y = win_y + 10 + n_prompt_lines * 20 + n_text_lines * 20;
 
     if(render)
     {
         XRender::renderRect(win_x, win_y, win_width, win_height, 0.6f, 0.6f, 1.f, 0.8f);
         for(int i = 0; i < n_prompt_lines; i ++)
         {
-            SuperPrint(s_Prompt.substr(27*i, 27), 4, win_x + 10, win_y + 6 + 20*i);
+            SuperPrint(s_Prompt.substr(n_prompt_chars * i, n_prompt_chars), 4, win_x + 10, win_y + 6 + 20*i);
         }
 
-        XRender::renderRect(win_x + 20, win_y+n_prompt_lines*20+4, win_width - 40, n_text_lines*20, 0.f, 0.f, 0.f, 0.8f);
+        XRender::renderRect(win_x + 20, win_y + n_prompt_lines * 20 + 4, win_width - 40, n_text_lines * 20, 0.f, 0.f, 0.f, 0.8f);
         for(int i = 0; i < n_text_lines; i ++)
         {
-            if(25 * i + 25 < s_Text_UTF_offsets.size())
-                SuperPrint(Text.substr(s_Text_UTF_offsets[25 * i], s_Text_UTF_offsets[25 * i + 25] - s_Text_UTF_offsets[25 * i]), 4, win_x + 10 + 16, win_y + 6 + 20*(n_prompt_lines+i));
+            if(n_text_chars * i + n_text_chars < s_Text_UTF_offsets.size())
+                SuperPrint(s_Text_UTF_offsets[n_text_chars * i + n_text_chars] - s_Text_UTF_offsets[n_text_chars * i], Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4, win_x + 10 + 16, win_y + 6 + 20 * (n_prompt_lines + i));
             else
-                SuperPrint(Text.substr(s_Text_UTF_offsets[25 * i]), 4, win_x + 10 + 16, win_y + 6 + 20*(n_prompt_lines+i));
+                SuperPrint(Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4, win_x + 10 + 16, win_y + 6 + 20 * (n_prompt_lines + i));
             // render cursor if it is on this line
-            if((s_cursor >= i*25 && s_cursor < (i+1)*25) || (s_cursor == (i+1)*25 && s_cursor == s_Text_UTF_offsets.size() - 1))
+            if((s_cursor >= i * n_text_chars && s_cursor < (i + 1) * n_text_chars) || (s_cursor == (i + 1) * n_text_chars && s_cursor == s_Text_UTF_offsets.size() - 1))
             {
                 // do something else if we ever have var-length strings
-                // int cursor_offset = PrintLength(Text.substr(25*i, s_cursor - i*25))
-                int cursor_offset = (s_cursor - i*25) * 18;
-                XRender::renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20*(n_prompt_lines+i), 2, 20, 1.f, 1.f, 1.f, 0.5f);
+                int cursor_offset = SuperTextPixLen(s_Text_UTF_offsets[s_cursor] - s_Text_UTF_offsets[n_text_chars * i], Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4);
+                XRender::renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20 * (n_prompt_lines + i), 2, 20, 1.f, 1.f, 1.f, 0.5f);
             }
         }
 
