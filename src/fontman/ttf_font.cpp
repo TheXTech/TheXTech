@@ -139,6 +139,9 @@ bool TtfFont::loadFont(const std::string &path)
     m_fontName.push_back(' ');
     m_fontName.append(m_face->style_name);
     m_isReady = true;
+
+    pLogDebug("Loaded TTF font with name: [%s]", m_fontName.c_str());
+
     return true;
 }
 

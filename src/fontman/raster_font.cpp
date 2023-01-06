@@ -96,6 +96,8 @@ void RasterFont::loadFont(std::string font_ini)
 
     for(std::string &tbl : tables_list)
         loadFontMap(root + tbl);
+
+    pLogDebug("Loaded raster font with name: [%s]", m_fontName.c_str());
 }
 
 void RasterFont::loadFontMap(std::string fontmap_ini)
