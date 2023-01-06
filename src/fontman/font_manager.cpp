@@ -107,7 +107,7 @@ TtfFont* FontManager::getTtfFontByName(const std::string& fontName)
 {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     if(fontName.empty())
-        return nullptr;
+        return FontManager::getDefaultTtfFont();
 
     FontsHash::iterator i = g_fontNameToId.find(fontName);
     if(i == g_fontNameToId.end())
