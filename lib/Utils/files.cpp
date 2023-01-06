@@ -141,28 +141,28 @@ int Files::skipBom(FILE* file, const char** charset)
         {
             if(charset)
                 *charset = "[UTF16-BE BOM]";
-            std::fseek(file, pos + 2, SEEK_SET);
+            ::fseek(file, pos + 2, SEEK_SET);
             return CHARSET_UTF16BE;
         }
         else if(::memcmp(buf, "\xFF\xFE", 2) == 0)
         {
             if(charset)
                 *charset = "[UTF16-LE BOM]";
-            std::fseek(file, pos + 2, SEEK_SET);
+            ::fseek(file, pos + 2, SEEK_SET);
             return CHARSET_UTF16LE;
         }
         else if(::memcmp(buf, "\x00\x00\xFE\xFF", 4) == 0)
         {
             if(charset)
                 *charset = "[UTF32-BE BOM]";
-            std::fseek(file, pos + 4, SEEK_SET);
+            ::fseek(file, pos + 4, SEEK_SET);
             return CHARSET_UTF32BE;
         }
         else if(::memcmp(buf, "\x00\x00\xFF\xFE", 4) == 0)
         {
             if(charset)
                 *charset = "[UTF32-LE BOM]";
-            std::fseek(file, pos + 4, SEEK_SET);
+            ::fseek(file, pos + 4, SEEK_SET);
             return CHARSET_UTF32LE;
         }
     }
@@ -171,7 +171,7 @@ int Files::skipBom(FILE* file, const char** charset)
         *charset = "[NO BOM]";
 
     // No BOM detected, seek to begining of the file
-    std::fseek(file, pos, SEEK_SET);
+    ::fseek(file, pos, SEEK_SET);
 
     return CHARSET_UTF8;
 }
