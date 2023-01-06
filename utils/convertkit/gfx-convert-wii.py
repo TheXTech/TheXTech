@@ -5,6 +5,7 @@
 import os
 import sys
 import shutil
+import configparser
 
 PREVIEW = False
 REDO = False
@@ -25,24 +26,16 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
             if fn.endswith('.ini'):
                 rfn = os.path.join(dirpath, fn)
 
-                text = open(rfn, 'r').read()
-                if 'texture-1x' in text or 'texture-scale' in text.replace(' ','').replace('"',''):
-                    texture = text.find('texture =')
-                    if texture == -1:
-                        texture = text.find('texture=')
-                        if texture == -1:
-                            continue
-                        else:
-                            texture += 8
-                    else:
-                        texture += 9
+                font = configparser.ConfigParser(inline_comment_prefixes=';')
+                font.read(rfn)
 
-                    while text[texture] == ' ':
-                        texture += 1
-                    tex_end = text.find(' ', texture)
-                    tex_string = text[texture:tex_end].replace('"', '')
-                    print(f"{tex_string} is 1x")
-                    texture_1x.add(tex_string)
+                if 'font-map' in font:
+                    if 'texture-scale' in font['font-map'] and font['font-map']['texture-scale'].strip != '1':
+                        if 'texture' in font['font-map']:
+                            tex_string = font['font-map']['texture'].strip().strip('\"')
+                            print(f"{tex_string} is 1x")
+                            texture_1x.add(tex_string)
+
     else:
         is_fonts_dir = False
 
