@@ -206,6 +206,7 @@ PGE_Size TtfFont::textSize(const char *text, size_t text_size,
 {
     const char* t = text;
     size_t t_size = text_size;
+    // TODO: Get rid this string: use integer hints instead of making a modded string copy when performing a cut behaviour
     std::string modText;
 
     SDL_assert_release(g_ft);
@@ -381,14 +382,19 @@ void TtfFont::printText(const char *text, size_t text_size,
     }
 }
 
-bool TtfFont::isLoaded()
+bool TtfFont::isLoaded() const
 {
     return m_isReady;
 }
 
-std::string TtfFont::getFontName()
+std::string TtfFont::getFontName() const
 {
     return m_fontName;
+}
+
+BaseFontEngine::FontType TtfFont::getFontType() const
+{
+    return FONT_TTF;
 }
 
 uint32_t TtfFont::drawGlyph(const char *u8char,

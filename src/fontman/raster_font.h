@@ -38,7 +38,7 @@ public:
     RasterFont &operator=(const RasterFont &tf) = delete;
     RasterFont(RasterFont &&tf) = default;
 
-    virtual ~RasterFont();
+    virtual ~RasterFont() override;
 
     void  loadFont(std::string font_ini);
     void  loadFontMap(std::string fontmap_ini);
@@ -54,7 +54,7 @@ public:
      */
     PGE_Size textSize(const char* text, size_t text_size,
                       uint32_t max_line_lenght = 0,
-                      bool  cut = false, uint32_t fontSize = 14);
+                      bool  cut = false, uint32_t fontSize = 14) override;
 
     /*!
      * \brief Print the multiline text block on the screen
@@ -71,37 +71,42 @@ public:
     void printText(const char* text, size_t text_size,
                    int32_t x, int32_t y,
                    float Red=1.f, float Green=1.f, float Blue=1.f, float Alpha=1.f,
-                   uint32_t fontSize = 0);
+                   uint32_t fontSize = 0) override;
 
-    bool isLoaded();
+    bool isLoaded() const override;
 
-    std::string getFontName();
+    std::string getFontName() const override;
+    FontType getFontType() const override;
 
 private:
     //! font is fine
-    bool m_isReady;
-    //! Enable borders on backup ttf font render [all unknown characters will be rendered as TTF]
-    bool m_ttfBorders;
+    bool m_isReady = false;
+    //! The fallback TTF name to prefer to render a missing character [all unknown characters will be rendered as TTF]
+    std::string m_ttfFallback;
+    //! Enable outline borders on backup ttf font render
+    bool m_ttfOutlines = false;
+    //! The fallback TTF size of the glyph to request
+    int  m_ttfSize = -1;
     //! Width of one letter
-    uint32_t m_letterWidth;
+    uint32_t m_letterWidth = 0;
     //! Height of one letter
-    uint32_t m_letterHeight;
+    uint32_t m_letterHeight = 0;
     //! Space between printing letters
-    uint32_t m_interLetterSpace;
+    uint32_t m_interLetterSpace = 0;
     //! Width of space symbol
-    uint32_t m_spaceWidth;
+    uint32_t m_spaceWidth = 0;
     //! Distance between top of one line and top of next
-    uint32_t m_newlineOffset;
+    uint32_t m_newlineOffset = 0;
 
     //! Offset all characters by X
-    int32_t m_glyphOffsetX;
+    int32_t m_glyphOffsetX = 0;
     //! Offset all characters by Y
-    int32_t m_glyphOffsetY;
+    int32_t m_glyphOffsetY = 0;
 
     //! Width of font matrix
-    uint32_t m_matrixWidth;
+    uint32_t m_matrixWidth = 0;
     //! Width of font matrix
-    uint32_t m_matrixHeight;
+    uint32_t m_matrixHeight = 0;
 
     //! Handalable name of the font
     std::string m_fontName;

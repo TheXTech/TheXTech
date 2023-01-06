@@ -29,6 +29,12 @@ class BaseFontEngine
 public:
     virtual ~BaseFontEngine();
 
+    enum FontType
+    {
+        FONT_RASTER = 0,
+        FONT_TTF
+    };
+
     /*!
      * \brief Measure the size of the multiline text block in pixels
      * \param text Multi-line text string
@@ -59,9 +65,10 @@ public:
                            float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f,
                            uint32_t fontSize = 14) = 0;
 
-    virtual bool isLoaded() = 0;
+    virtual bool isLoaded() const = 0;
 
-    virtual std::string getFontName() = 0;
+    virtual std::string getFontName() const = 0;
+    virtual FontType getFontType() const = 0;
 };
 
 #endif // FONT_ENGINE_BASE_H

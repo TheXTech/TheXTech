@@ -33,6 +33,7 @@
 #endif
 #include "font_manager_private.h"
 
+
 RasterFont::RasterFont() : BaseFontEngine()
 {
     static uint64_t fontNumberCount = 0;//This number will be used as default font name
@@ -46,7 +47,7 @@ RasterFont::RasterFont() : BaseFontEngine()
     m_matrixWidth    = 0;
     m_matrixHeight   = 0;
     m_isReady        = false;
-    m_ttfBorders     = false;
+    m_ttfOutlines     = false;
     m_fontName       = fmt::format_ne("font{0}", fontNumberCount++);
 }
 
@@ -72,7 +73,10 @@ void RasterFont::loadFont(std::string font_ini)
     font.beginGroup("font");
     font.read("tables", tables, 0);
     font.read("name", m_fontName, m_fontName);
-    font.read("ttf-borders", m_ttfBorders, false);
+    font.read("ttf-outlines", m_ttfOutlines, false);
+    font.read("ttf-borders", m_ttfOutlines, m_ttfOutlines); // Alias, Deprecated
+    font.read("ttf-fallback", m_ttfFallback, "");
+    font.read("ttf-size", m_ttfSize, -1);
     font.read("space-width", m_spaceWidth, 0);
     font.read("interletter-space", m_interLetterSpace, 0);
     font.read("newline-offset", m_newlineOffset, 0);
@@ -267,6 +271,7 @@ PGE_Size RasterFont::textSize(const char* text, size_t text_size, uint32_t max_l
 {
     const char* t = text;
     size_t t_size = text_size;
+    // TODO: Get rid this string: use integer hints instead of making a modded string copy when performing a cut behaviour
     std::string modText;
 
     if(!text || text_size == 0)
@@ -351,21 +356,18 @@ PGE_Size RasterFont::textSize(const char* text, size_t text_size, uint32_t max_l
             if(need_a_ttf)
             {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-                TtfFont *font = dynamic_cast<TtfFont*>(FontManager::getDefaultTtfFont());
+                TtfFont *font = dynamic_cast<TtfFont*>(FontManager::getTtfFontByName(m_ttfFallback));
                 if(font)
                 {
-                    uint32_t font_size_use = m_letterWidth;
+                    uint32_t font_size_use = m_ttfSize > 0 ? m_ttfSize : m_letterWidth;
 
-                    int y_offset = 0;
+                    // int y_offset = 0; // UNUSED
 
                     bool doublePixel = false;
-#   if defined(__WII__)
-                    doublePixel = true;
-#   endif
 
                     if(font->bitmapSize())
                     {
-                        if(font_size_use > font->bitmapSize() * 1.5)
+                        if(font->doublePixel() || font_size_use > font->bitmapSize() * 1.5)
                             doublePixel = true;
 
                         font_size_use = font->bitmapSize();
@@ -446,13 +448,7 @@ void RasterFont::printText(const char* text, size_t text_size,
     uint32_t w = m_letterWidth;
     uint32_t h = m_letterHeight;
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-    //! FIXME: Add the config option for TTF fonts here
-    bool    doublePixel = false; //ConfigManager::setup_fonts.double_pixled;
-
-    // FIXME: add XRender::RENDER_1X flag, use that instead
-#   if defined(__WII__)
-    doublePixel = true;
-#   endif
+    bool     doublePixel = false;
 #endif
 
     const char *strIt  = text;
@@ -494,10 +490,10 @@ void RasterFont::printText(const char* text, size_t text_size,
         else
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
         {
-            TtfFont *font = dynamic_cast<TtfFont*>(FontManager::getDefaultTtfFont());
+            TtfFont *font = dynamic_cast<TtfFont*>(FontManager::getTtfFontByName(m_ttfFallback));
             if(font)
             {
-                uint32_t font_size_use = m_letterWidth;
+                uint32_t font_size_use = m_ttfSize > 0 ? m_ttfSize : m_letterWidth;
 
                 int y_offset = 0;
 
@@ -521,7 +517,7 @@ void RasterFont::printText(const char* text, size_t text_size,
                 if(doublePixel)
                     glyph_width *= 2;
 
-                if(m_ttfBorders)
+                if(m_ttfOutlines)
                     offsetX += (doublePixel ? 2 : 1);
 
                 font->drawGlyph(&cx,
@@ -529,7 +525,7 @@ void RasterFont::printText(const char* text, size_t text_size,
                                 y + static_cast<int32_t>(offsetY + m_glyphOffsetY) - 2 + y_offset,
                                 font_size_use,
                                 (doublePixel ? 2.0 : 1.0),
-                                m_ttfBorders,
+                                m_ttfOutlines,
                                 Red, Green, Blue, Alpha);
 
                 auto lw = SDL_max(glyph_width, m_letterWidth);
@@ -549,12 +545,17 @@ void RasterFont::printText(const char* text, size_t text_size,
     }
 }
 
-bool RasterFont::isLoaded()
+bool RasterFont::isLoaded() const
 {
     return m_isReady;
 }
 
-std::string RasterFont::getFontName()
+std::string RasterFont::getFontName() const
 {
     return m_fontName;
+}
+
+BaseFontEngine::FontType RasterFont::getFontType() const
+{
+    return FONT_RASTER;
 }

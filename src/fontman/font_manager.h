@@ -62,6 +62,7 @@ void quit();
 
 
 int fontIdFromSmbxFont(int font);
+uint32_t fontSizeFromSmbxFont(int font);
 
 /**
  * @brief Automatical font choice

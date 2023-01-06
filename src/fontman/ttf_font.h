@@ -50,7 +50,7 @@ public:
     TtfFont(const TtfFont &tf) = delete;
     TtfFont &operator=(const TtfFont &tf) = delete;
     TtfFont(TtfFont &&tf) = default;
-    virtual ~TtfFont();
+    virtual ~TtfFont() override;
 
     bool loadFont(const std::string &path);
     bool loadFont(const char* mem, size_t size);
@@ -75,7 +75,7 @@ public:
      */
     PGE_Size textSize(const char *text, size_t text_size,
                       uint32_t max_line_length = 0,
-                      bool cut = false, uint32_t fontSize = 14);
+                      bool cut = false, uint32_t fontSize = 14) override;
 
     /*!
      * \brief Print the multiline text block on the screen
@@ -92,11 +92,12 @@ public:
     void printText(const char *text, size_t text_size,
                    int32_t x, int32_t y,
                    float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f,
-                   uint32_t fontSize = 14);
+                   uint32_t fontSize = 14) override;
 
-    bool isLoaded();
+    bool isLoaded() const override;
 
-    std::string getFontName();
+    std::string getFontName() const override;
+    FontType getFontType() const override;
 
     /**
      * @brief Draw a single glyph

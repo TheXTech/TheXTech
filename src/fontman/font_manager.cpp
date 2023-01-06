@@ -74,6 +74,8 @@ static void registerFont(BaseFontEngine* font)
 
 static const int c_smbxFontsMapMax = 100;
 static int s_smbxFontsMap[c_smbxFontsMapMax];
+static int s_smbxFontsSizesMap[c_smbxFontsMapMax];
+static const uint32_t c_defaultFontSize = 14;
 
 int FontManager::fontIdFromSmbxFont(int font)
 {
@@ -82,12 +84,41 @@ int FontManager::fontIdFromSmbxFont(int font)
     return s_smbxFontsMap[font];
 }
 
+uint32_t FontManager::fontSizeFromSmbxFont(int font)
+{
+    if(font >= c_smbxFontsMapMax || font < 0)
+        return c_defaultFontSize;
+
+    int ret = s_smbxFontsSizesMap[font];
+    return (ret <= 0) ? c_defaultFontSize : static_cast<uint32_t>(ret);
+}
+
 
 BaseFontEngine *FontManager::getDefaultTtfFont()
 {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     return g_defaultTtfFont;
 #else
+    return nullptr;
+#endif
+}
+
+BaseFontEngine* FontManager::getTtfFontByName(const std::string& fontName)
+{
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
+    if(fontName.empty())
+        return nullptr;
+
+    FontsHash::iterator i = g_fontNameToId.find(fontName);
+    if(i == g_fontNameToId.end())
+        return FontManager::getDefaultTtfFont();
+
+    if(g_anyFonts[i->second]->getFontType() == BaseFontEngine::FONT_TTF) // Ensure requested font IS TTF
+        return g_anyFonts[i->second];
+
+    return FontManager::getDefaultTtfFont();
+#else
+    (void)fontName;
     return nullptr;
 #endif
 }
@@ -115,8 +146,13 @@ void FontManager::initFull()
     g_double_pixled = false; //ConfigManager::setup_fonts.double_pixled;
 
     std::memset(s_smbxFontsMap, 0, sizeof(s_smbxFontsMap));
+    std::memset(s_smbxFontsSizesMap, 0, sizeof(s_smbxFontsSizesMap));
+
     for(int i = 0; i < c_smbxFontsMapMax; ++i)
+    {
         s_smbxFontsMap[i] = -1;
+        s_smbxFontsSizesMap[i] = -1;
+    }
 
     const std::string fonts_root = AppPathManager::assetsRoot() + "fonts";
 
@@ -218,13 +254,21 @@ void FontManager::initFull()
         for(auto &key : k)
         {
             std::string name;
+
+            if(key.find("-size") != std::string::npos)
+                continue; // Skil the size key
+
             overrider.read(key.c_str(), name, "");
             if(name.empty())
                 continue;
 
             int iKey = std::atoi(key.c_str());
-            if(iKey >= 0 && iKey < c_smbxFontsMapMax)            
+            if(iKey >= 0 && iKey < c_smbxFontsMapMax)
                 s_smbxFontsMap[iKey] = getFontID(name);
+
+            std::string size_key = fmt::format_ne("{0}-size", iKey);
+            if(overrider.hasKey(size_key))
+                overrider.read(size_key.c_str(), s_smbxFontsSizesMap[iKey], -1);
         }
     }
 
@@ -266,18 +310,11 @@ PGE_Size FontManager::textSize(const char* text, size_t text_size, int fontID,
     if(max_line_lenght <= 0)
         max_line_lenght = 1000;
 
-//    if(cut)
-//    {
-//        std::string::size_type i = text.find('\n');
-//        if(i != std::string::npos)
-//            text.erase(i, text.size() - i);
-//    }
-
     //Use one of loaded fonts
     if((fontID >= 0) && (static_cast<size_t>(fontID) < g_anyFonts.size()) && g_anyFonts[fontID])
     {
         if(g_anyFonts[fontID]->isLoaded())
-            return g_anyFonts[fontID]->textSize(text, text_size, max_line_lenght, cut);
+            return g_anyFonts[fontID]->textSize(text, text_size, max_line_lenght, cut, ttfFontSize);
     }
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
@@ -313,7 +350,7 @@ void FontManager::printText(const char* text, size_t text_size,
     {
         if(g_anyFonts[font]->isLoaded())
         {
-            g_anyFonts[font]->printText(text, text_size, x, y, Red, Green, Blue, Alpha);
+            g_anyFonts[font]->printText(text, text_size, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
             return;
         }
     }

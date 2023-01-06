@@ -73,6 +73,7 @@ class BaseFontEngine;
 namespace FontManager
 {
     BaseFontEngine* getDefaultTtfFont();
+    BaseFontEngine* getTtfFontByName(const std::string &fontName);
 }
 
 #endif // FONT_MANAGER_PRIVATE_H
