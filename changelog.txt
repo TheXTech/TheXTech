@@ -20,6 +20,7 @@ Changelog for 1.3.6.1
 -Fixed an invalid byte hacking behaviour at the memory emulator on x86_32 processors (@Wohlstand)
 -Fixed the validation of  assets packages on Android where "introset"-based assets were treated as invalid (@Wohlstand)
 -The new font engine based on the Moondust Engine implementation has been added. Now,  the game can print Unicode text in a condition where the assets package contains the necessary font resources. (@Wohlstand, @ds-sloth)
+-Added animation for keyhole exit. (@ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)

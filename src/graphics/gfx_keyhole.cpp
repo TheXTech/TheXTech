@@ -26,6 +26,9 @@
 
 void RenderKeyhole(int Z)
 {
+    if(!g_compatibility.fix_keyhole_framerate)
+        return;
+
     int keyholeMax = g_compatibility.fix_keyhole_framerate ? 192 : 300;
     int keyholeDone = keyholeMax - 65;
     int ratio = 256 * LevelMacroCounter / keyholeDone;
@@ -64,7 +67,7 @@ void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double
                          StdPicture& tex,
                          int src_x, int src_y, float r, float g, float b, float a)
 {
-    if(LevelMacro != LEVELMACRO_KEYHOLE_EXIT || LevelMacroWhich == 0)
+    if(LevelMacro != LEVELMACRO_KEYHOLE_EXIT || LevelMacroWhich == 0 || !g_compatibility.fix_keyhole_framerate)
         return XRender::renderTexture(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, r, g, b, a);
 
     int keyholeMax = g_compatibility.fix_keyhole_framerate ? 192 : 300;
