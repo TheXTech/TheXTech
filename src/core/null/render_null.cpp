@@ -185,6 +185,13 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     return target;
 }
 
+StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+{
+    StdPicture target = LoadPicture(path, maskPath, maskFallbackPath);
+    target.w *= 2;
+    target.h *= 2;
+}
+
 
 StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
 {
@@ -247,6 +254,19 @@ void lazyPreLoad(StdPicture &target)
 void lazyUnLoad(StdPicture &target)
 {
     deleteTexture(target, true);
+}
+
+
+void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    target.w = width;
+    target.h = height;
+}
+
+void loadTexture_1x(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    target.w = width * 2;
+    target.h = height * 2;
 }
 
 void deleteTexture(StdPicture &tx, bool lazyUnload)
@@ -396,7 +416,7 @@ void renderTexture(int xDst, int yDst, StdPicture &tx, float red, float green, f
         red, green, blue, alpha);
 }
 
-void renderTextureScale(int xDst, int yDst, int wDst, int hDst, StdPicture &tx, float red, float green, float blue, float alpha)
+void renderTextureScale(double xDst, double yDst, double wDst, double hDst, StdPicture &tx, float red, float green, float blue, float alpha)
 {
     i_renderTexturePrivate(
         ROUNDDIV2(xDst), ROUNDDIV2(yDst), tx.w / 2, tx.h / 2,

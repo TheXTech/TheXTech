@@ -210,12 +210,23 @@ E_INLINE void setTargetSubScreen() TAIL
 #endif
 
 
+// load a picture whose logical size is the same as its texture size (the texture normally would have 2x2 pixels)
 E_INLINE StdPicture LoadPicture(const std::string &path,
                                 const std::string &maskPath = std::string(),
                                 const std::string &maskFallbackPath = std::string()) TAIL
 #ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::LoadPicture(path, maskPath, maskFallbackPath);
+}
+#endif
+
+// load a picture whose logical size is twice its texture size (the texture has 1x1 pixels)
+E_INLINE StdPicture LoadPicture_1x(const std::string &path,
+                                const std::string &maskPath = std::string(),
+                                const std::string &maskFallbackPath = std::string()) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return AbstractRender_t::LoadPicture_1x(path, maskPath, maskFallbackPath);
 }
 #endif
 
@@ -274,7 +285,53 @@ E_INLINE void lazyLoadedBytesReset() TAIL
 }
 #endif
 
+/*!
+ * \brief Load a texture whose logical size is the same as its texture size (the texture normally would have 2x2 pixels)
+ * \param target Destination texture entry
+ * \param width Width of the input texture in pixels
+ * \param height Height of the input texture in pixels
+ * \param RGBApixels Pointer to the RGBA pixel data
+ * \param pitch Width of the line in bytes
+ *
+ * Important note: All internal data of the target texture
+ * (such as .w, .h, .frame_w, .frame_h, .l.w_orig, .l.h_orig,
+ * .l.w_scale, .l.h_scale) must be filled externally BEFORE loading
+ * the texture.
+ */
+E_INLINE void loadTexture(StdPicture &target,
+                          uint32_t width,
+                          uint32_t height,
+                          uint8_t *RGBApixels,
+                          uint32_t pitch) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->loadTexture(target, width, height, RGBApixels, pitch);
+}
+#endif
 
+/*!
+ * \brief load an RGBA texture whose logical size is the twice its texture size (the texture has 1x1 pixels)
+ * \param target Destination texture entry
+ * \param width Width of the input texture in pixels
+ * \param height Height of the input texture in pixels
+ * \param RGBApixels Pointer to the RGBA pixel data
+ * \param pitch Width of the line in bytes
+ *
+ * Important note: All internal data of the target texture
+ * (such as .w, .h, .frame_w, .frame_h, .l.w_orig, .l.h_orig,
+ * .l.w_scale, .l.h_scale) must be filled externally BEFORE loading
+ * the texture.
+ */
+E_INLINE void loadTexture_1x(StdPicture &target,
+                          uint32_t width,
+                          uint32_t height,
+                          uint8_t *RGBApixels,
+                          uint32_t pitch) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->loadTexture_1x(target, width, height, RGBApixels, pitch);
+}
+#endif
 
 E_INLINE void deleteTexture(StdPicture &tx, bool lazyUnload = false) TAIL
 #ifndef RENDER_CUSTOM

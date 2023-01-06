@@ -577,6 +577,12 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     return target;
 }
 
+StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+{
+    // The asset converter should have known not to downscale this image. Let's hope it was right.
+    return LoadPicture(path, maskPath, maskFallbackPath);
+}
+
 StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
 {
     StdPicture target;

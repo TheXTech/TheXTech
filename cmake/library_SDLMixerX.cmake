@@ -15,12 +15,6 @@ else()
     set(PGE_SHARED_SDLMIXER_DEFAULT ON)
 endif()
 
-if(NINTENDO_SWITCH OR XTECH_MACOSX_TIGER)
-    set(PGE_SYSTEM_ZLIB_DEFAULT ON)
-else()
-    set(PGE_SYSTEM_ZLIB_DEFAULT OFF)
-endif()
-
 if(NOT PGE_SHARED_SDLMIXER_FORCE_OFF)
     option(PGE_SHARED_SDLMIXER "Link MixerX as a shared library (dll/so/dylib)" ${PGE_SHARED_SDLMIXER_DEFAULT})
 else()
@@ -31,12 +25,6 @@ if(NOT VITA AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGE
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
 else()
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." OFF)
-endif()
-
-option(USE_SYSTEM_ZLIB "Use zlib library from the system" ${PGE_SYSTEM_ZLIB_DEFAULT})
-
-if(USE_SYSTEM_ZLIB)
-    find_package(ZLIB REQUIRED)
 endif()
 
 set(MIXER_USE_OGG_VORBIS_FILE OFF)
@@ -99,10 +87,6 @@ else()
 endif()
 
 set(MixerX_SysLibs)
-
-if(USE_SYSTEM_ZLIB)
-    list(APPEND MixerX_SysLibs ${ZLIB_LIBRARIES})
-endif()
 
 if(WIN32 AND NOT EMSCRIPTEN)
     list(APPEND MixerX_SysLibs
@@ -224,7 +208,7 @@ else()
     set_static_lib(AC_LIBXMP       "${CODECS_LIBRARIES_DIR}" xmp)
 endif()
 set_static_lib(AC_MODPLUG      "${CODECS_LIBRARIES_DIR}" modplug)
-set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)
+# set_static_lib(AC_ZLIB         "${CODECS_LIBRARIES_DIR}" zlib)   # Moved to own ZLib header
 
 set(MixerX_CodecLibs
 #    "${AC_FLAC}"
@@ -253,12 +237,6 @@ list(APPEND MixerX_CodecLibs
     "${AC_LIBXMP}"
     "${AC_MODPLUG}"
 )
-
-if(NOT USE_SYSTEM_ZLIB)
-    list(APPEND MixerX_CodecLibs
-        "${AC_ZLIB}"
-    )
-endif()
 
 if(VITA)
     set(VITA_AUDIOCODECS_CMAKE_FLAGS
@@ -292,7 +270,6 @@ if(VITA)
         "${AC_GME}"
         "${AC_LIBXMP}"
         "${AC_MODPLUG}"
-        "${AC_ZLIB}"
     )
 endif()
 
@@ -373,6 +350,7 @@ ExternalProject_Add(
         "${SDL2_SO_Lib}"
         "${SDL2_A_Lib}"
         "${SDL2_main_A_Lib}"
+        "${AC_ZLIB}"
 #        "${SDLHIDAPI_SO_Lib}" # No longer needed since SDL 2.0.18
         ${MixerX_CodecLibs}
 )

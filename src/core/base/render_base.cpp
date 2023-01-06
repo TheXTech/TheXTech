@@ -282,6 +282,49 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     return target;
 }
 
+StdPicture AbstractRender_t::LoadPicture_1x(const std::string &path,
+                                         const std::string &maskPath,
+                                         const std::string &maskFallbackPath)
+{
+    StdPicture target = LoadPicture(path, maskPath, maskFallbackPath);
+
+    if(target.inited)
+    {
+        target.l.w_orig = target.w;
+        target.l.h_orig = target.h;
+        target.l.w_scale /= 2;
+        target.l.h_scale /= 2;
+
+        target.w *= 2;
+        target.h *= 2;
+        target.frame_w *= 2;
+        target.frame_h *= 2;
+    }
+
+    return target;
+}
+
+void AbstractRender_t::loadTexture_1x(StdPicture &target,
+                         uint32_t width,
+                         uint32_t height,
+                         uint8_t *RGBApixels,
+                         uint32_t pitch)
+{
+    loadTexture(target, width, height, RGBApixels, pitch);
+//    if(target.inited)
+//    {
+//        target.l.w_orig = target.w;
+//        target.l.h_orig = target.h;
+//        target.l.w_scale /= 2;
+//        target.l.h_scale /= 2;
+
+//        target.w *= 2;
+//        target.h *= 2;
+//        target.frame_w *= 2;
+//        target.frame_h *= 2;
+//    }
+}
+
 static void dumpFullFile(std::vector<char> &dst, const std::string &path)
 {
     dst.clear();

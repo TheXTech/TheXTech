@@ -17,7 +17,7 @@ Changelog for 1.3.6.1
 -Changed the logic of the music pausing at the pause menu when P-Switch is active: don't suspend the entire sound stream, do suspend the music only (@Wohlstand)
 -Added experimental support for the Nintendo Switch homebrew platform (@Wohlstand)
 -Added experimental support for the Nintendo Wii homebrew platform (@ds-sloth - graphics and controls, @Wohlstand - audio and threading)
--Added CLI build of the application with very minimal dependencies, suitable for CI testing of game logic (@ds-sloth)
+-Added CLI build of the application with very minimal dependencies, suitable for CI testing of the game logic (@ds-sloth)
 -Added incomplete version of the Nintendo 3DS port (locked to 400x300 resolution until 1.3.7) (@ds-sloth)
 -Added performance statistics (in debug info HUD) for level designers and developers to check CPU time spent on each game task (@ds-sloth)
 -In-Game Editor: added ability to customize block, BGO, NPC, tile, music, section BG, and sound layouts in the editor (@ds-sloth)
@@ -25,6 +25,7 @@ Changelog for 1.3.6.1
 -Adjusted the bitmask to the RGBA conversion algorithm to apply the compromise among different semi-transparent textures (@Wohlstand)
 -Fixed an invalid byte hacking behaviour at the memory emulator on x86_32 processors (@Wohlstand)
 -Fixed the validation of  assets packages on Android where "introset"-based assets were treated as invalid (@Wohlstand)
+-The new font engine based on the Moondust Engine implementation has been added. Now,  the game can print Unicode text in a condition where the assets package contains the necessary font resources. (@Wohlstand, @ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)

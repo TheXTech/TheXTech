@@ -21,8 +21,10 @@
 #pragma once
 
 #ifdef __WII__
+#   define PICTURE_LOAD_WII
 #   include "core/wii/picture_load.h"
 #elif defined(__3DS__) || defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
+#   define PICTURE_LOAD_3DS
 #   include "core/3ds/picture_load.h"
 #endif
 
@@ -30,6 +32,8 @@
 
 #ifndef STD_PICTURE_LOAD_H
 #define STD_PICTURE_LOAD_H
+
+#define PICTURE_LOAD_NORMAL
 
 #include <cstdint>
 #include <vector>

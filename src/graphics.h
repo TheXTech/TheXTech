@@ -102,7 +102,23 @@ void SuperPrintRightAlign(const std::string &SuperWords, int Font, float X, floa
 void SuperPrintCenter(const std::string &SuperWords, int Font, float X, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
 void SuperPrintScreenCenter(const std::string &SuperWords, int Font, float Y, float r = 1.f, float g = 1.f, float b = 1.f, float a = 1.f);
 
+/*!
+ * \brief Builds a UTF8 character positions map to simplify the text processing.
+ * \param SuperText Input text line
+ * \param outMap Output character positions map
+ */
+void BuildUTF8CharMap(const std::string& SuperText, UTF8CharMap_t &outMap);
+/*!
+ * \brief Print the message box with a multi-line text inside using a plain string itself
+ * \param SuperText The multi-line string
+ */
 void DrawMessage(const std::string& SuperText);
+/*!
+ * \brief Print the mssage box with a multi-line text inside using a pre-built character positions map
+ * \param SuperTextMap The UTF8 character positions map of a multi-line string
+ */
+void DrawMessage(const UTF8CharMap_t& SuperTextMap);
+
 // Public Sub SetRes()
 void SetRes();
 // Public Function CheckKey(newStrizzle As String) As String
