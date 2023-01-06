@@ -113,17 +113,10 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
     IniProcessing font(fontmap_ini);
     std::string texFile;
     uint32_t w = m_letterWidth, h = m_letterHeight;
-    bool texture_1x = false;
+    int texture_scale_factor;
     font.beginGroup("font-map");
     font.read("texture", texFile, "");
-    font.read("texture-1x", texture_1x, false);
-    {
-        // temporary hack for previous assets
-        int texture_scale_factor;
-        font.read("texture-scale", texture_scale_factor, 1);
-        if(texture_scale_factor == 2)
-            texture_1x = true;
-    }
+    font.read("texture-scale", texture_scale_factor, 1);
     font.read("width", w, 0);
     font.read("height", h, 0);
     m_matrixWidth = w;
@@ -142,7 +135,31 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
         return;
     }
 
-    StdPicture fontTexture = (texture_1x ? XRender::LoadPicture_1x(root + texFile) : XRender::LoadPicture(root + texFile));
+    // if scale factor is 1, then it's a "2x" texture meaning that (in standard image format) the image is made of 2x2 pixels
+    StdPicture fontTexture = (texture_scale_factor == 1 ? XRender::LoadPicture(root + texFile) : XRender::LoadPicture_1x(root + texFile));
+
+    // don't allow odd scale factors other than 1
+    if(texture_scale_factor > 1 && texture_scale_factor & 1)
+    {
+        pLogWarning("Font texture uses odd scale factor, rounding down");
+        texture_scale_factor &= ~1;
+    }
+
+    if(texture_scale_factor > 2)
+    {
+        // was loaded as 2x the original image, now it's Nx.
+        fontTexture.w *= texture_scale_factor;
+        fontTexture.w /= 2;
+        fontTexture.h *= texture_scale_factor;
+        fontTexture.h /= 2;
+        fontTexture.frame_w = fontTexture.w;
+        fontTexture.frame_h = fontTexture.h;
+
+#ifdef PICTURE_LOAD_NORMAL
+        fontTexture.l.w_scale *= 2.0 / texture_scale_factor;
+        fontTexture.l.h_scale *= 2.0 / texture_scale_factor;
+#endif
+    }
 
     if(!fontTexture.inited)
         pLogWarning("Failed to load font texture! Invalid image!");
