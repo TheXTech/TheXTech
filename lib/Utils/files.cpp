@@ -121,6 +121,61 @@ FILE *Files::utf8_fopen(const char *filePath, const char *modes)
 #endif
 }
 
+int Files::skipBom(FILE* file, const char** charset)
+{
+    char buf[4];
+    auto pos = ::ftell(file);
+
+    // Check for a BOM marker
+    if(::fread(buf, 1, 4, file) == 4)
+    {
+        if(::memcmp(buf, "\xEF\xBB\xBF", 3) == 0) // UTF-8 is only supported
+        {
+            if(charset)
+                *charset = "[UTF-8 BOM]";
+            ::fseek(file, pos + 3, SEEK_SET);
+            return CHARSET_UTF8;
+        }
+        // Unsupported charsets
+        else if(::memcmp(buf, "\xFE\xFF", 2) == 0)
+        {
+            if(charset)
+                *charset = "[UTF16-BE BOM]";
+            std::fseek(file, pos + 2, SEEK_SET);
+            return CHARSET_UTF16BE;
+        }
+        else if(::memcmp(buf, "\xFF\xFE", 2) == 0)
+        {
+            if(charset)
+                *charset = "[UTF16-LE BOM]";
+            std::fseek(file, pos + 2, SEEK_SET);
+            return CHARSET_UTF16LE;
+        }
+        else if(::memcmp(buf, "\x00\x00\xFE\xFF", 4) == 0)
+        {
+            if(charset)
+                *charset = "[UTF32-BE BOM]";
+            std::fseek(file, pos + 4, SEEK_SET);
+            return CHARSET_UTF32BE;
+        }
+        else if(::memcmp(buf, "\x00\x00\xFF\xFE", 4) == 0)
+        {
+            if(charset)
+                *charset = "[UTF32-LE BOM]";
+            std::fseek(file, pos + 4, SEEK_SET);
+            return CHARSET_UTF32LE;
+        }
+    }
+
+    if(charset)
+        *charset = "[NO BOM]";
+
+    // No BOM detected, seek to begining of the file
+    std::fseek(file, pos, SEEK_SET);
+
+    return CHARSET_UTF8;
+}
+
 bool Files::fileExists(const std::string &path)
 {
 #ifdef _WIN32
@@ -282,4 +337,3 @@ void Files::getGifMask(std::string& mask, const std::string& front)
     else
         mask.insert(mask.begin() + dotPos, 'm');
 }
-
