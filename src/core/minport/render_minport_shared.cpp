@@ -393,6 +393,20 @@ inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t w
 
 void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,
+                            float red, float green, float blue, float alpha)
+{
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+
+    minport_RenderTexturePrivate_2(
+        div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
+        tx,
+        0.0f, 0.0f, tx.w / 2, tx.h / 2,
+        0.0f, nullptr, X_FLIP_NONE,
+        red, green, blue, alpha);
+}
+
+void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+                            StdPicture &tx,
                             int xSrc, int ySrc, int wSrc, int hSrc,
                             float red, float green, float blue, float alpha)
 {

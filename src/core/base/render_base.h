@@ -161,6 +161,10 @@ public:
                                   const std::string &maskPath = std::string(),
                                   const std::string &maskFallbackPath = std::string());
 
+    static StdPicture LoadPicture_1x(const std::string &path,
+                                  const std::string &maskPath = std::string(),
+                                  const std::string &maskFallbackPath = std::string());
+
     static StdPicture lazyLoadPicture(const std::string &path,
                                       const std::string &maskPath = std::string(),
                                       const std::string &maskFallbackPath = std::string());
@@ -172,6 +176,12 @@ public:
                              uint32_t height,
                              uint8_t *RGBApixels,
                              uint32_t pitch) = 0;
+
+    void loadTexture_1x(StdPicture &target,
+                             uint32_t width,
+                             uint32_t height,
+                             uint8_t *RGBApixels,
+                             uint32_t pitch);
 
     static void lazyLoad(StdPicture &target);
     static void lazyUnLoad(StdPicture &target);

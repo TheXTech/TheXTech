@@ -27,6 +27,9 @@
 #include "controls.h"
 #include "gfx.h"
 
+#include "fontman/font_manager_private.h"
+#include "fontman/font_manager.h"
+
 #ifdef __ANDROID__
 
 #   include <SDL2/SDL_system.h>
@@ -91,6 +94,8 @@ namespace TextEntryScreen
 {
 
 std::string Text;
+static std::vector<int16_t> s_Text_UTF_offsets;
+
 static std::string s_Prompt;
 static int s_cursor = 0;
 static int s_mouse_up = 2;
@@ -100,16 +105,10 @@ static bool s_committed = false;
 // KEYMAP!
 // we are assumed to be operating on a Nx5x12 (levels, rows, columns) grid.
 // special characters: \b is backspace, \x0e and \x0f are shift up and shift down (a grid level)
-// you will likely produce a segfault if you allow the user to shift into a grid level that you did not define.
 // \n is a newline (actually, accept), and \x1d and \x1c are left and right.
 // special control character meanings: \x11 is "last button wider" and \x12 is "empty"
 
-// the UTF-8 character length encoding is not supported yet, but is being explored.
-// first bit unset: single char
-// first two bits set: 2 chars / one character
-// first three bits set: 3 chars / one character
-// first four bits set: 4 chars / one character
-static const char* s_keymap_US = "1234567890-\b"
+static const char* s_keymap_EN = "1234567890-\b"
     "qwertyuiop[]"
     "asdfghjkl;'="
     "`zxcvbnm,./\\"
@@ -120,19 +119,81 @@ static const char* s_keymap_US = "1234567890-\b"
     "~ZXCVBNM<>?|"
     "\x0f\x11\x11 \x11\x11\x11\x11\x1d\x1c\n\x11";
 
-// please help add more useful keymaps as soon as we have more printable characters.
+static const char* s_keymap_RU = "1234567890-\b"
+    "йцукенгшщзхъ"
+    "фывапролджэ:"
+    "ячсмитьбюё,."
+    "\x0e\x11\x11 \x11\x11\x11\x11\x1d\x1c\n\x11"
+    "!\"№;%:?*()_\b"
+    "ЙЦУКЕНГШЩЗХЪ"
+    "ФЫВАПРОЛДЖЭ+"
+    "ЯЧСМИТЬБЮЁ«»"
+    "\x0f\x11\x11 \x11\x11\x11\x11\x1d\x1c\n\x11";
 
-static const char* s_current_keymap = s_keymap_US;
-// will eventually be used to support UTF-8 characters
-// static const char** s_current_keymap_locs;
+static const char* s_keymap_JP =
+    "あかさたなはまやらわ\b"
+    "いきしちにひみ　りゃん"
+    "うくすつぬふむゆるょ！"
+    "えけせてねへめ　れゅ？"
+    "おこそとのほもよろを。"
+    "\x0e\x11\x11　\x11\x11\x11\x1d\x1c\n\x11"
+    "\x12がざだ\x12ばぱ１６「\b"
+    "\x12ぎじぢ\x12びぴ２７」～"
+    "\x12ぐずづ\x12ぶぷ３８’、"
+    "\x12げぜで\x12べぺ４９”・"
+    "\x12ごぞど\x12ぼぽ５０＋ー"
+    "\x0e\x11\x11　\x11\x11\x11\x1d\x1c\n\x11"
+    "アカサタナハマヤラワ\b"
+    "イキシチニヒミ　リャン"
+    "ウクスツヌフムユルョ！"
+    "エケセテネヘメ　レュ？"
+    "オコソトノホモヨロウ。"
+    "\x0e\x11\x11　\x11\x11\x11\x1d\x1c\n\x11"
+    "\x12ガザダ\x12バパ１６「\b"
+    "\x12ギジヂ\x12ビピ２７」～"
+    "\x12グズヅ\x12ブプ３８’、"
+    "\x12ゲゼデ\x12ベペ４９”・"
+    "\x12ゴゾド\x12ボポ５０＋ー"
+    "\x0e\x11\x11　\x11\x11\x11\x1d\x1c\n\x11";
+
+// used to support UTF-8 characters
+static std::vector<int16_t> s_current_keymap_UTF_offsets;
+
+static const char* s_current_keymap = s_keymap_EN;
+static int s_current_keymap_rows = 5;
+static int s_current_keymap_cols = 12;
+static int s_current_keymap_levels = 3;
+
+// static const char* s_current_keymap = s_keymap_JP;
+// static int s_current_keymap_rows = 6;
+// static int s_current_keymap_cols = 11;
+// static int s_current_keymap_levels = 4;
+
+// selected button location
 static int s_cur_level = 0;
 static int s_cur_row = 0;
 static int s_cur_col = 0;
 static bool s_render_sel = false;
 
+inline void find_utf_offsets(const char* str, std::vector<int16_t>& out)
+{
+    out.clear();
+
+    int16_t offset;
+
+    for(offset = 0; str[offset] != '\0' && offset >= 0; offset++)
+    {
+        out.push_back(offset);
+        UTF8 ucx = static_cast<unsigned char>(str[offset]);
+        offset += static_cast<size_t>(trailingBytesForUTF8[ucx]);
+    }
+
+    out.push_back(offset);
+}
+
 inline const char* get_char(int level, int row, int col)
 {
-    return &s_current_keymap[level*5*12 + row*12 + col];
+    return s_current_keymap + s_current_keymap_UTF_offsets[(level * s_current_keymap_rows * s_current_keymap_cols) + (row * s_current_keymap_cols) + col];
 }
 
 inline const char* get_char()
@@ -241,14 +302,14 @@ void GoLeft()
 {
     int break_col = s_cur_col;
     if(s_cur_col == 0)
-        s_cur_col = 11;
+        s_cur_col = s_current_keymap_cols - 1;
     else
         s_cur_col --;
 
     while(*get_char() == '\x11' || *get_char() == '\x12')
     {
         if(s_cur_col == 0)
-            s_cur_col = 11;
+            s_cur_col = s_current_keymap_cols - 1;
         else
             s_cur_col --;
         if(s_cur_col == break_col)
@@ -260,14 +321,14 @@ void GoRight()
 {
     int break_col = s_cur_col;
 
-    if(s_cur_col == 11)
+    if(s_cur_col == s_current_keymap_cols - 1)
         s_cur_col = 0;
     else
         s_cur_col ++;
 
     while(*get_char() == '\x11' || *get_char() == '\x12')
     {
-        if(s_cur_col == 11)
+        if(s_cur_col == s_current_keymap_cols - 1)
             s_cur_col = 0;
         else
             s_cur_col ++;
@@ -280,14 +341,14 @@ void GoDown()
 {
     int break_row = s_cur_row;
 
-    if(s_cur_row == 4)
+    if(s_cur_row == s_current_keymap_rows - 1)
         s_cur_row = 0;
     else
         s_cur_row ++;
 
     while(*get_char() == '\x12')
     {
-        if(s_cur_row == 4)
+        if(s_cur_row == s_current_keymap_rows - 1)
             s_cur_row = 0;
         else
             s_cur_row ++;
@@ -304,14 +365,14 @@ void GoUp()
     int break_row = s_cur_row;
 
     if(s_cur_row == 0)
-        s_cur_row = 4;
+        s_cur_row = s_current_keymap_rows - 1;
     else
         s_cur_row --;
 
     while(*get_char() == '\x12')
     {
         if(s_cur_row == 0)
-            s_cur_row = 4;
+            s_cur_row = s_current_keymap_rows - 1;
         else
             s_cur_row --;
         if(s_cur_row == break_row)
@@ -322,80 +383,50 @@ void GoUp()
         s_cur_col --;
 }
 
+void Insert(const char* c, int size)
+{
+    Text.insert(s_Text_UTF_offsets[s_cursor], c, size);
+
+    int16_t new_pos = s_Text_UTF_offsets[s_cursor] + size;
+
+    find_utf_offsets(Text.c_str(), s_Text_UTF_offsets);
+
+    while(s_cursor + 1 < s_Text_UTF_offsets.size() && s_Text_UTF_offsets[s_cursor] < new_pos)
+        s_cursor ++;
+}
+
 void Insert(const char* c)
 {
-    Text.insert(s_cursor, c);
-    s_cursor += SDL_strlen(c);
+    Insert(c, SDL_strlen(c));
 }
 
 inline void InsertUnicodeChar(const char* c)
 {
-    char unicode[5];
-    unicode[0] = c[0];
-
-    if(c[0] & 1<<7)
-    {
-        unicode[1] = c[1];
-        if(c[0] & 1<<5)
-        {
-            unicode[2] = c[2];
-            if(c[0] & 1<<4)
-            {
-                unicode[3] = c[3];
-                unicode[4] = '\0';
-            }
-            else
-                unicode[3] = '\0';
-        }
-        else
-            unicode[2] = '\0';
-    }
-    else
-    {
-        unicode[1] = '\0';
-    }
-
-    Insert(unicode);
+    UTF8 ucx = static_cast<unsigned char>(*c);
+    Insert(c, 1 + trailingBytesForUTF8[ucx]);
 }
 
 void CursorLeft()
 {
-    while(s_cursor > 0)
-    {
+    if(s_cursor > 0)
         s_cursor --;
-        if(s_cursor == 0)
-            break;
-        // break if not a continuation char (NOT 10bbbbbb)
-        if(!(Text[s_cursor] & 1<<7) || (Text[s_cursor] & 1<<6))
-            break;
-    }
 }
 
 void CursorRight()
 {
-    while(s_cursor < (int)Text.size())
-    {
+    if(s_cursor + 1 < (int)s_Text_UTF_offsets.size())
         s_cursor ++;
-        if(s_cursor == (int)Text.size())
-            break;
-        // break if not a continuation char (NOT 10bbbbbb)
-        if(!(Text[s_cursor] & 1<<7) || (Text[s_cursor] & 1<<6))
-            break;
-    }
 }
 
 void Backspace()
 {
-    while(s_cursor > 0)
-    {
-        s_cursor --;
-        Text.erase(s_cursor, 1);
-        if(s_cursor == 0)
-            break;
-        // break if not a continuation char (NOT 10bbbbbb)
-        if(!(Text[s_cursor] & 1<<7) || (Text[s_cursor] & 1<<6))
-            break;
-    }
+    int old_cursor = s_cursor;
+
+    CursorLeft();
+
+    Text.erase(Text.begin() + s_Text_UTF_offsets[s_cursor], Text.begin() + s_Text_UTF_offsets[old_cursor]);
+
+    find_utf_offsets(Text.c_str(), s_Text_UTF_offsets);
 }
 
 void Commit()
@@ -406,7 +437,6 @@ void Commit()
 // returns true if the string is complete
 bool DoAction()
 {
-    // for now, no unicode processing, but wouldn't be hard at all...
     const char* c = get_char(s_cur_level, s_cur_row, s_cur_col);
 
     switch(*c)
@@ -429,9 +459,13 @@ bool DoAction()
     // shift up
     case '\x0e':
         s_cur_level ++;
+        if(s_cur_level == s_current_keymap_levels)
+            s_cur_level = 0;
         break;
     // shift down
     case '\x0f':
+        if(s_cur_level == 0)
+            s_cur_level = s_current_keymap_levels;
         s_cur_level --;
         break;
     // backspace
@@ -450,19 +484,22 @@ bool KeyboardMouseRender(bool mouse, bool render)
     int key_size = 40;
     if(g_config.osk_fill_screen)
     {
-        key_size = (ScreenW - 40) / 12;
+        key_size = (ScreenW - 40) / s_current_keymap_cols;
         // force even
         key_size &= ~1;
     }
 
-    int kb_height = 5*key_size;
-    int kb_width = 12*key_size;
+    int kb_height = s_current_keymap_rows*key_size;
+    int kb_width = s_current_keymap_cols*key_size;
 
     int win_width = kb_width + 20;
     int win_height = kb_height + 20;
 
-    int n_prompt_lines = ((s_Prompt.size() + 26) / 27);
-    int n_text_lines = ((Text.size() + 24) / 25);
+    int n_text_chars = s_current_keymap_cols * 2 + 1;
+    int n_prompt_chars = n_text_chars + 2;
+
+    int n_prompt_lines = ((s_Prompt.size() + n_prompt_chars - 1) / n_prompt_chars);
+    int n_text_lines = ((s_Text_UTF_offsets.size() - 1 + n_text_chars - 1) / n_text_chars);
     if(n_text_lines == 0)
         n_text_lines = 1;
 
@@ -476,36 +513,38 @@ bool KeyboardMouseRender(bool mouse, bool render)
     int win_y = ScreenH / 1.25 - win_height / 1.25;
     // force even
     win_y &= ~1;
-    int kb_y = win_y + 10 + n_prompt_lines*20+n_text_lines*20;
+    int kb_y = win_y + 10 + n_prompt_lines * 20 + n_text_lines * 20;
 
     if(render)
     {
         XRender::renderRect(win_x, win_y, win_width, win_height, 0.6f, 0.6f, 1.f, 0.8f);
         for(int i = 0; i < n_prompt_lines; i ++)
         {
-            SuperPrint(s_Prompt.substr(27*i, 27), 4, win_x + 10, win_y + 6 + 20*i);
+            SuperPrint(s_Prompt.substr(n_prompt_chars * i, n_prompt_chars), 4, win_x + 10, win_y + 6 + 20*i);
         }
 
-        XRender::renderRect(win_x + 20, win_y+n_prompt_lines*20+4, win_width - 40, n_text_lines*20, 0.f, 0.f, 0.f, 0.8f);
+        XRender::renderRect(win_x + 20, win_y + n_prompt_lines * 20 + 4, win_width - 40, n_text_lines * 20, 0.f, 0.f, 0.f, 0.8f);
         for(int i = 0; i < n_text_lines; i ++)
         {
-            SuperPrint(Text.substr(25*i, 25), 4, win_x + 10 + 16, win_y + 6 + 20*(n_prompt_lines+i));
+            if(n_text_chars * i + n_text_chars < s_Text_UTF_offsets.size())
+                SuperPrint(s_Text_UTF_offsets[n_text_chars * i + n_text_chars] - s_Text_UTF_offsets[n_text_chars * i], Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4, win_x + 10 + 16, win_y + 6 + 20 * (n_prompt_lines + i));
+            else
+                SuperPrint(Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4, win_x + 10 + 16, win_y + 6 + 20 * (n_prompt_lines + i));
             // render cursor if it is on this line
-            if(s_cursor >= i*25 && s_cursor < (i+1)*25)
+            if((s_cursor >= i * n_text_chars && s_cursor < (i + 1) * n_text_chars) || (s_cursor == (i + 1) * n_text_chars && s_cursor == s_Text_UTF_offsets.size() - 1))
             {
-                // after merging in, use the appropriate print library here.
-                // int cursor_offset = PrintLength(Text.substr(25*i, s_cursor - i*25))
-                int cursor_offset = (s_cursor - i*25) * 18;
-                XRender::renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20*(n_prompt_lines+i), 2, 20, 1.f, 1.f, 1.f, 0.5f);
+                // do something else if we ever have var-length strings
+                int cursor_offset = SuperTextPixLen(s_Text_UTF_offsets[s_cursor] - s_Text_UTF_offsets[n_text_chars * i], Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4);
+                XRender::renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20 * (n_prompt_lines + i), 2, 20, 1.f, 1.f, 1.f, 0.5f);
             }
         }
 
         XRender::renderRect(kb_x, kb_y, kb_width, kb_height, 0.f, 0.f, 0.f, 0.2f);
     }
 
-    for(int row = 0; row < 5; row ++)
+    for(int row = 0; row < s_current_keymap_rows; row ++)
     {
-        for(int col = 0; col < 12; col ++)
+        for(int col = 0; col < s_current_keymap_cols; col ++)
         {
             bool sel = false;
             if(s_render_sel && s_cur_row == row && s_cur_col == col)
@@ -546,9 +585,12 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     }
 #endif
 
+    find_utf_offsets(s_current_keymap, s_current_keymap_UTF_offsets);
+
     s_Prompt = Prompt;
     Text = Value;
-    s_cursor = Text.size();
+    find_utf_offsets(Text.c_str(), s_Text_UTF_offsets);
+    s_cursor = s_Text_UTF_offsets.size() - 1;
     s_mouse_up = 2;
     s_cur_level = 0;
     s_cur_row = 0;

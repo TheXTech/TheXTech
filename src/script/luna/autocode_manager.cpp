@@ -187,6 +187,14 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
 
     std::fseek(code_file, 0, SEEK_SET);
 
+    // Check and skip a BOM marker
+    const char *charset;
+    if(Files::skipBom(code_file, &charset) != Files::CHARSET_UTF8)
+    {
+        addError(lineNum, charset, "File uses an unsupported charset. Please save it as UTF-8.");
+        return;
+    }
+
     //char* dbg = "ParseDbgEOF";
     while(!std::feof(code_file))
     {
