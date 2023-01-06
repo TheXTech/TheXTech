@@ -85,6 +85,8 @@ private:
     std::string m_ttfFallback;
     //! Enable outline borders on backup ttf font render
     bool m_ttfOutlines = false;
+    uint32_t m_ttfOutLinesColour = 0x000000FF;
+    float    m_ttfOutlinesColourF[4] = {0.f, 0.f, 0.f, 1.f};
     //! The fallback TTF size of the glyph to request
     int  m_ttfSize = -1;
     //! Width of one letter

@@ -74,6 +74,7 @@ void RasterFont::loadFont(std::string font_ini)
     font.read("tables", tables, 0);
     font.read("name", m_fontName, m_fontName);
     font.read("ttf-outlines", m_ttfOutlines, false);
+    font.read("ttf-outlines-colour", m_ttfOutLinesColour, 0x000000FF);
     font.read("ttf-borders", m_ttfOutlines, m_ttfOutlines); // Alias, Deprecated
     font.read("ttf-fallback", m_ttfFallback, "");
     font.read("ttf-size", m_ttfSize, -1);
@@ -85,6 +86,11 @@ void RasterFont::loadFont(std::string font_ini)
     font.endGroup();
     std::vector<std::string> tables_list;
     tables_list.reserve(tables);
+
+    m_ttfOutlinesColourF[0] = float((m_ttfOutLinesColour >> 24) & 0xFF) / 255.f;
+    m_ttfOutlinesColourF[1] = float((m_ttfOutLinesColour >> 16) & 0xFF) / 255.f;
+    m_ttfOutlinesColourF[2] = float((m_ttfOutLinesColour >> 8) & 0xFF) / 255.f;
+    m_ttfOutlinesColourF[3] = float((m_ttfOutLinesColour >> 0) & 0xFF) / 255.f;
 
     font.beginGroup("tables");
 
@@ -526,7 +532,11 @@ void RasterFont::printText(const char* text, size_t text_size,
                                 font_size_use,
                                 (doublePixel ? 2.0 : 1.0),
                                 m_ttfOutlines,
-                                Red, Green, Blue, Alpha);
+                                Red, Green, Blue, Alpha,
+                                m_ttfOutlinesColourF[0],
+                                m_ttfOutlinesColourF[1],
+                                m_ttfOutlinesColourF[2],
+                                m_ttfOutlinesColourF[3]);
 
                 auto lw = SDL_max(glyph_width, m_letterWidth);
                 offsetX += lw + m_interLetterSpace;

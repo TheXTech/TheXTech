@@ -400,7 +400,8 @@ BaseFontEngine::FontType TtfFont::getFontType() const
 uint32_t TtfFont::drawGlyph(const char *u8char,
                             int32_t x, int32_t y, uint32_t fontSize, double scaleSize,
                             bool drawOutlines,
-                            float Red, float Green, float Blue, float Alpha)
+                            float Red, float Green, float Blue, float Alpha,
+                            float OL_Red, float OL_Green, float OL_Blue, float OL_Alpha)
 {
     const TheGlyph &glyph = getGlyph(fontSize, get_utf8_char(u8char));
     if(glyph.tx)
@@ -426,7 +427,7 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
                     glyph.width * static_cast<float>(scaleSize),
                     glyph.height * static_cast<float>(scaleSize),
                     *glyph.tx,
-                    0.f, 0.f, 0.f, Alpha
+                    OL_Red, OL_Green, OL_Blue, OL_Alpha
                 );
             }
         }

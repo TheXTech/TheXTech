@@ -116,7 +116,8 @@ public:
     uint32_t drawGlyph(const char* u8char,
                        int32_t x, int32_t y, uint32_t fontSize, double scaleSize = 1.0,
                        bool drawOutlines = false,
-                       float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f);
+                       float Red = 1.f, float Green = 1.f, float Blue = 1.f, float Alpha = 1.f,
+                       float OL_Red = 0.f, float OL_Green = 0.f, float OL_Blue = 0.f, float OL_Alpha = 1.f);
 
     struct TheGlyphInfo
     {
