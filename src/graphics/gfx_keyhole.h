@@ -22,7 +22,13 @@
 #ifndef GFX_KEYHOLE_H
 #define GFX_KEYHOLE_H
 
+#include "std_picture.h"
+
 void RenderKeyhole(int Z);
-void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h, StdPicture& tex, int src_x = 0, int src_y = 0, float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f);
+
+void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
+                         StdPicture& tex,
+                         int src_x = 0, int src_y = 0,
+                         float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f);
 
 #endif // GFX_KEYHOLE_H

@@ -38,9 +38,12 @@ void RenderKeyhole(int Z)
     double idealKeyholeBottom = 32 * std::ceil(realKeyholeBottom / 32);
 
     double keyholeGrowthCoord = (double)ratio / 100;
+
     if(keyholeGrowthCoord > 1.0)
         keyholeGrowthCoord = 1.0;
+
     double keyholeScale = keyholeGrowthCoord * 12;
+
     if(ratio < 128)
         keyholeScale += (1 - keyholeGrowthCoord);
 
@@ -57,7 +60,9 @@ void RenderKeyhole(int Z)
         keyhole.Hidden = true;
 }
 
-void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h, StdPicture& tex, int src_x, int src_y, float r, float g, float b, float a)
+void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
+                         StdPicture& tex,
+                         int src_x, int src_y, float r, float g, float b, float a)
 {
     if(LevelMacro != LEVELMACRO_KEYHOLE_EXIT || LevelMacroWhich == 0)
         return XRender::renderTexture(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, r, g, b, a);
