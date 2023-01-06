@@ -484,7 +484,7 @@ void RasterFont::printText(const char* text, size_t text_size,
 
                 if(font->bitmapSize())
                 {
-                    if(font_size_use > font->bitmapSize() * 1.5)
+                    if(font->doublePixel() || font_size_use > font->bitmapSize() * 1.5)
                         doublePixel = true;
 
                     if(doublePixel)
