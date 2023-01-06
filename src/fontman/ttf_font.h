@@ -96,6 +96,8 @@ public:
 
     bool isLoaded() const override;
 
+    void setFontName(const std::string &name);
+
     std::string getFontName() const override;
     FontType getFontType() const override;
 

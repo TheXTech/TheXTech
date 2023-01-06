@@ -192,6 +192,7 @@ void FontManager::initFull()
             std::string key = fmt::format_ne("file{0}", i);
             std::string keyAntiAlias = fmt::format_ne("file{0}-antialias", i);
             std::string keyBitmapSize = fmt::format_ne("file{0}-bitmap-size", i);
+            std::string keyFontName = fmt::format_ne("file{0}-font-name", i);
             std::string keyDoublePixel = fmt::format_ne("file{0}-double-pixel", i);
 
             if(!overrider.hasKey(key))
@@ -208,6 +209,9 @@ void FontManager::initFull()
 
             int bitmapSize;
             overrider.read(keyBitmapSize.c_str(), bitmapSize, 0);
+
+            std::string fontName;
+            overrider.read(keyFontName.c_str(), fontName, "");
 
             bool doublePixel;
             // FIXME: add XRender::RENDER_1X flag, use that instead
@@ -236,6 +240,9 @@ void FontManager::initFull()
             }
             else   //Register font name in a table
             {
+                if(!fontName.empty()) // Set the custom font name
+                    tf.setFontName(fontName);
+
                 registerFont(&tf);
                 // Set the default TTF font (as a fallback)
                 if(!g_defaultTtfFont)

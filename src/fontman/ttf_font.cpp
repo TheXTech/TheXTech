@@ -387,6 +387,11 @@ bool TtfFont::isLoaded() const
     return m_isReady;
 }
 
+void TtfFont::setFontName(const std::string& name)
+{
+    m_fontName = name;
+}
+
 std::string TtfFont::getFontName() const
 {
     return m_fontName;
