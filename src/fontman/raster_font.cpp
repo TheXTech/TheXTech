@@ -365,14 +365,12 @@ PGE_Size RasterFont::textSize(const char* text, size_t text_size, uint32_t max_l
                 if(font)
                 {
                     uint32_t font_size_use = m_ttfSize > 0 ? m_ttfSize : m_letterWidth;
-
                     // int y_offset = 0; // UNUSED
-
-                    bool doublePixel = false;
+                    bool doublePixel = font->doublePixel();
 
                     if(font->bitmapSize())
                     {
-                        if(font->doublePixel() || font_size_use > font->bitmapSize() * 1.5)
+                        if(font_size_use > font->bitmapSize() * 1.5)
                             doublePixel = true;
 
                         font_size_use = font->bitmapSize();
@@ -452,9 +450,6 @@ void RasterFont::printText(const char* text, size_t text_size,
     uint32_t offsetY = 0;
     uint32_t w = m_letterWidth;
     uint32_t h = m_letterHeight;
-#ifdef THEXTECH_ENABLE_TTF_SUPPORT
-    bool     doublePixel = false;
-#endif
 
     const char *strIt  = text;
     const char *strEnd = strIt + text_size;
@@ -501,6 +496,7 @@ void RasterFont::printText(const char* text, size_t text_size,
                 uint32_t font_size_use = m_ttfSize > 0 ? m_ttfSize : m_letterWidth;
 
                 int y_offset = 0;
+                bool doublePixel = font->doublePixel();
 
                 if(font->bitmapSize())
                 {
