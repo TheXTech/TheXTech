@@ -308,7 +308,11 @@ void UpdateGraphics(bool skipRepaint)
 
     if(FrameSkip && !TakeScreen)
     {
-        if(frameSkipNeeded()) // Don't draw this frame
+        if(!g_compatibility.fix_keyhole_framerate && LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
+        {
+            // never frame skip in this case, because the legacy code doesn't update the fields used by frameSkipNeeded()
+        }
+        else if(frameSkipNeeded()) // Don't draw this frame
         {
             numScreens = 1;
             if(!LevelEditor)
