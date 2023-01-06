@@ -427,7 +427,7 @@ uint32_t TtfFont::drawGlyph(const char *u8char,
                     glyph.width * static_cast<float>(scaleSize),
                     glyph.height * static_cast<float>(scaleSize),
                     *glyph.tx,
-                    OL_Red, OL_Green, OL_Blue, OL_Alpha
+                    OL_Red, OL_Green, OL_Blue, (OL_Alpha * Alpha)
                 );
             }
         }

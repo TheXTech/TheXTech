@@ -69,11 +69,12 @@ extern std::u32string std_to_utf32(const std::string &src);
 
 
 class BaseFontEngine;
+class TtfFont;
 
 namespace FontManager
 {
-    BaseFontEngine* getDefaultTtfFont();
-    BaseFontEngine* getTtfFontByName(const std::string &fontName);
+    TtfFont* getDefaultTtfFont();
+    TtfFont* getTtfFontByName(const std::string &fontName);
 }
 
 #endif // FONT_MANAGER_PRIVATE_H

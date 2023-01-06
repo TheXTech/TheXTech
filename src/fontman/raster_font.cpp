@@ -75,7 +75,6 @@ void RasterFont::loadFont(std::string font_ini)
     font.read("name", m_fontName, m_fontName);
     font.read("ttf-outlines", m_ttfOutlines, false);
     font.read("ttf-outlines-colour", m_ttfOutLinesColour, 0x000000FF);
-    font.read("ttf-borders", m_ttfOutlines, m_ttfOutlines); // Alias, Deprecated
     font.read("ttf-fallback", m_ttfFallback, "");
     font.read("ttf-size", m_ttfSize, -1);
     font.read("space-width", m_spaceWidth, 0);
@@ -362,7 +361,7 @@ PGE_Size RasterFont::textSize(const char* text, size_t text_size, uint32_t max_l
             if(need_a_ttf)
             {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-                TtfFont *font = dynamic_cast<TtfFont*>(FontManager::getTtfFontByName(m_ttfFallback));
+                TtfFont *font = FontManager::getTtfFontByName(m_ttfFallback);
                 if(font)
                 {
                     uint32_t font_size_use = m_ttfSize > 0 ? m_ttfSize : m_letterWidth;
@@ -496,7 +495,7 @@ void RasterFont::printText(const char* text, size_t text_size,
         else
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
         {
-            TtfFont *font = dynamic_cast<TtfFont*>(FontManager::getTtfFontByName(m_ttfFallback));
+            TtfFont *font = FontManager::getTtfFontByName(m_ttfFallback);
             if(font)
             {
                 uint32_t font_size_use = m_ttfSize > 0 ? m_ttfSize : m_letterWidth;

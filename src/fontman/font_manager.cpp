@@ -94,7 +94,7 @@ uint32_t FontManager::fontSizeFromSmbxFont(int font)
 }
 
 
-BaseFontEngine *FontManager::getDefaultTtfFont()
+TtfFont* FontManager::getDefaultTtfFont()
 {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     return g_defaultTtfFont;
@@ -103,7 +103,7 @@ BaseFontEngine *FontManager::getDefaultTtfFont()
 #endif
 }
 
-BaseFontEngine* FontManager::getTtfFontByName(const std::string& fontName)
+TtfFont* FontManager::getTtfFontByName(const std::string& fontName)
 {
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     if(fontName.empty())
@@ -113,10 +113,9 @@ BaseFontEngine* FontManager::getTtfFontByName(const std::string& fontName)
     if(i == g_fontNameToId.end())
         return FontManager::getDefaultTtfFont();
 
-    if(g_anyFonts[i->second]->getFontType() == BaseFontEngine::FONT_TTF) // Ensure requested font IS TTF
-        return g_anyFonts[i->second];
+    auto *ret = dynamic_cast<TtfFont*>(g_anyFonts[i->second]);
 
-    return FontManager::getDefaultTtfFont();
+    return ret ? ret : FontManager::getDefaultTtfFont();
 #else
     (void)fontName;
     return nullptr;
