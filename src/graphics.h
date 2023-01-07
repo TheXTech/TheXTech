@@ -53,6 +53,9 @@ void GetvScreenAverage(vScreen_t& vscreen);
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2(vScreen_t& vscreen);
+//  EXTRA: Get the average screen position for all players in shared screen mode.
+//   The main difference is that it uses the average of the further players to each side, instead of the true average
+void GetvScreenAverage3(vScreen_t& vscreen);
 
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
 void GetvScreenAuto(vScreen_t& vscreen);

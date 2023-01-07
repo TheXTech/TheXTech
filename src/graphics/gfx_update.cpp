@@ -856,8 +856,10 @@ void UpdateGraphics(bool skipRepaint)
         // update vScreen location
         if(!LevelEditor)
         {
-            if(ScreenType == 2 || ScreenType == 3)
+            if(ScreenType == 2)
                 GetvScreenAverage(vScreen[1]);
+            else if(ScreenType == 3)
+                GetvScreenAverage3(vScreen[1]);
             else if(ScreenType == 5 && !vScreen[2].Visible)
                 GetvScreenAverage(vScreen[1]);
             else if(ScreenType == 7)

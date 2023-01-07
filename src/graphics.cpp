@@ -193,12 +193,96 @@ void GetvScreenAverage2(vScreen_t& vscreen)
     vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
 }
 
+// Get the average screen position for all players for ScreenType 3
+// Uses only the furthest left and right players for the X position
+// Doubles the weight of the top player for the Y position
+void GetvScreenAverage3(vScreen_t& vscreen)
+{
+    bool horiz_bounds_inited = false;
+    int plr_count = 0;
+    double OldX = 0;
+    double OldY = 0;
+
+    OldX = vscreen.X;
+    OldY = vscreen.Y;
+
+    // calculate average Y position
+    vscreen.Y = 0;
+
+    // find furthest left, right, top, and bottom players
+    double l, r, t, b;
+
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+
+    int section_idx = Player[1].Section;
+
+    for(int i = 0; i < screen.player_count; i++)
+    {
+        const Player_t& plr = Player[screen.players[i]];
+
+        if(plr.Dead)
+            continue;
+
+        if(plr_count == 0)
+            section_idx = plr.Section;
+
+        double cx = plr.Location.X + plr.Location.Width / 2.0;
+        double by = plr.Location.Y + plr.Location.Height;
+
+        if(plr.Effect != 6)
+        {
+            vscreen.Y -= by;
+
+            if(plr_count == 0 || by < t)
+                t = by;
+            if(plr_count == 0 || b < by)
+                b = by;
+
+            plr_count += 1;
+        }
+
+        // still set left and right bounds for respawning players
+        if(!horiz_bounds_inited || cx < l)
+            l = cx;
+        if(!horiz_bounds_inited || r < cx)
+            r = cx;
+
+        horiz_bounds_inited = true;
+    }
+
+    if(plr_count == 0)
+    {
+        vscreen.X = OldX;
+        vscreen.Y = OldY;
+        return;
+    }
+
+    // double the contribution of the top player to the result
+    vscreen.Y -= t;
+
+    const Location_t& section = level[section_idx];
+
+    vscreen.X = -(l + r) / 2 + (screen.W * 0.5);
+    vscreen.Y = vscreen.Y / (plr_count + 1) + (screen.H * 0.5) - vScreenYOffset;
+
+    if(-vscreen.X < section.X)
+        vscreen.X = -section.X;
+    if(-vscreen.X + screen.W > section.Width)
+        vscreen.X = -(section.Width - screen.W);
+    if(-vscreen.Y < section.Y)
+        vscreen.Y = -section.Y;
+    if(-vscreen.Y + screen.H > section.Height)
+        vscreen.Y = -(section.Height - screen.H);
+}
+
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
 void GetvScreenAuto(vScreen_t& vscreen)
 {
     const Screen_t& screen = Screens[vscreen.screen_ref];
 
-    if(screen.Type == 2 || screen.Type == 3 || (screen.Type == 5 && !screen.vScreen(2).Visible))
+    if(screen.Type == 3)
+        GetvScreenAverage3(vscreen);
+    else if(screen.Type == 2 || (screen.Type == 5 && !screen.vScreen(2).Visible))
         GetvScreenAverage(vscreen);
     else if(screen.Type == 7)
         GetvScreenCredits(vscreen);
