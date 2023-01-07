@@ -135,6 +135,12 @@ else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
 endif()
 
+if(NINTENDO_3DS OR NINTENDO_DS)
+    set(THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT OFF)
+else()
+    set(THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT ON)
+endif()
+
 option(USE_SYSTEM_LIBS "Use dependent libraries like SDL2, FreeImageLite and MixerX, installed in the system" ${USE_SYSTEM_LIBS_DEFAULT})
 option(USE_SYSTEM_SDL2 "Use SDL2 from a system even prefering system libraries" ${USE_SYSTEM_SDL2_DEFAULT})
 
@@ -157,6 +163,8 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
+
+option(THEXTECH_ENABLE_TTF_SUPPORT "Enable TTF fonts support (FreeType required)" ${THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT})
 
 option(THEXTECH_CLI_BUILD "Minimal CLI build for testing and benchmarking on desktop platforms" OFF)
 option(THEXTECH_NO_SDL_BUILD "Do not use SDL in the CLI build; useful as a starting point for new ports" OFF)
@@ -267,6 +275,19 @@ if(WIN32)
     include(lib/CrashHandler/StackWalker/StackWalker.cmake)
 endif()
 
+include(cmake/library_zlib.cmake)
+
+if(THEXTECH_ENABLE_TTF_SUPPORT)
+    option(THEXTECH_ENABLE_TTF_HARFBUZZ "Enable the HarfBuzz library use" OFF)
+    mark_as_advanced(THEXTECH_ENABLE_TTF_HARFBUZZ) # Temporarily disable
+    if(THEXTECH_ENABLE_TTF_HARFBUZZ AND NOT NINTENDO_3DS)
+        include(cmake/library_HarfBuzz.cmake)
+    else()
+        set(FT_DISABLE_HARFBUZZ ON)
+    endif()
+    include(cmake/library_FreeType.cmake)
+endif()
+
 if(PGE_MIN_PORT)
     set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
     set(ENABLE_UBSAN OFF CACHE BOOL "" FORCE)
@@ -311,6 +332,15 @@ set(A2XT_DEPS)
 
 add_library(A2XT_Int INTERFACE)
 
+if(THEXTECH_ENABLE_TTF_SUPPORT)
+    list(APPEND A2XT_DEPS FREETYPE_Local)
+    list(APPEND A2XT_LIBS PGE_FreeType)
+    if(TARGET PGE_HarfBuzz)
+        list(APPEND A2XT_DEPS HARFBUZZ_Local)
+        list(APPEND A2XT_LIBS PGE_HarfBuzz)
+    endif()
+endif()
+
 if(THEXTECH_ENABLE_LUA)
     list(APPEND A2XT_DEPS LuaBind_Local)
     list(APPEND A2XT_INCS script/include)
@@ -339,6 +369,13 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     include(cmake/library_SDLMixerX.cmake)
     list(APPEND A2XT_INCS "${DEPENDENCIES_INSTALL_DIR}/include" ${SDL2_INCLUDE_DIRS})
 
+    if(NOT USE_SYSTEM_ZLIB) # Depend on ZLib at AudioCodecs
+        if(TARGET FREETYPE_Local)
+            add_dependencies(FREETYPE_Local AudioCodecs_Local)
+        endif()
+        add_dependencies(FreeImage_Local AudioCodecs_Local)
+    endif()
+
     if(NOT THEXTECH_NO_MIXER_X)
         list(APPEND A2XT_DEPS SDLMixerX_Local)
     else()
@@ -350,6 +387,8 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     else()
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
+
+    list(APPEND A2XT_LIBS PGE_ZLib)
 endif()
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
@@ -359,6 +398,7 @@ set(LIB_SRC
     lib/util.cpp
     lib/fader.cpp
     lib/Graphics/image_size.cpp
+    lib/Graphics/size.cpp
     ${APPPATH_SRCS}
     ${DIRMANAGER_SRCS}
     ${FMT_SRCS}
@@ -374,8 +414,11 @@ set(LIB_SRC
 if(NOT THEXTECH_NO_SDL_BUILD)
 list(APPEND LIB_SRC
     lib/Graphics/graphics_funcs.cpp
-    lib/Graphics/size.cpp
     lib/Graphics/sizef.cpp
+    lib/Graphics/rect.cpp
+    lib/Graphics/rectf.cpp
+    lib/Graphics/point.cpp
+    lib/Graphics/pointf.cpp
 )
 endif()
 
@@ -503,7 +546,18 @@ set(THEXTECH_SRC
     src/npc/npc_bonus.cpp
     src/npc/npc_queues.cpp
     src/player/player_update.cpp
+    src/fontman/font_manager.cpp
+    src/fontman/font_manager_private.cpp
+    src/fontman/raster_font.cpp
+    src/fontman/utf8_helpers.cpp
 )
+
+if(THEXTECH_ENABLE_TTF_SUPPORT)
+    add_definitions(-DTHEXTECH_ENABLE_TTF_SUPPORT)
+    list(APPEND THEXTECH_SRC
+        src/fontman/ttf_font.cpp
+    )
+endif()
 
 # Luna Autocode script engine
 list(APPEND THEXTECH_SRC src/script/luna/lunaglobals.cpp)
@@ -649,6 +703,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/npc/*.hpp
     src/sound/fx/*.h
     src/sound/fx/*.hpp
+    src/fontman/*.h
 )
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 

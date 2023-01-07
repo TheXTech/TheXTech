@@ -143,6 +143,7 @@ android {
     lint {
         abortOnError false
     }
+    namespace 'ru.wohlsoft.thextech'
 
     if (!project.hasProperty('EXCLUDE_NATIVE_LIBS')) {
         sourceSets {

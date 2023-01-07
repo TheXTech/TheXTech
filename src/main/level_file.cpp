@@ -1003,6 +1003,7 @@ void ClearLevel()
     {
 //        MessageText = ""
         MessageText.clear();
+        MessageTextMap.clear();
 //        frmNPCs.chkMessage.Value = 0
 //        frmBlocks.chkFill.Value = 0
 //        frmEvents.txtEvent.Text = ""

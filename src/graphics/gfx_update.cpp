@@ -2372,7 +2372,7 @@ void UpdateGraphics(bool skipRepaint)
 
             g_stats.print();
 
-            if(!BattleMode && !GameMenu && g_config.show_episode_title)
+            if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
             {
                 int y = (ScreenH >= 640) ? 20 : ScreenH - 60;
                 if(g_config.show_episode_title == Config_t::EPISODE_TITLE_TRANSPARENT)
@@ -2436,7 +2436,12 @@ void UpdateGraphics(bool skipRepaint)
         PauseScreen::Render();
 
     if(GamePaused == PauseCode::Message)
-        DrawMessage(MessageText);
+    {
+        if(MessageTextMap.empty())
+            DrawMessage(MessageText);
+        else
+            DrawMessage(MessageTextMap);
+    }
 
     if(QuickReconnectScreen::g_active)
         QuickReconnectScreen::Render();
