@@ -2690,7 +2690,7 @@ void UpdateGraphics(bool skipRepaint)
 
     g_stats.print();
 
-    if(!BattleMode && !GameMenu && g_config.show_episode_title)
+    if(!BattleMode && !GameMenu && !GameOutro && g_config.show_episode_title)
     {
         int y;
         float alpha;

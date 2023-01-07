@@ -69,6 +69,11 @@ void RasterFont::loadFont(std::string font_ini)
     std::string root = DirMan(Files::dirname(font_ini)).absolutePath() + "/";
     IniProcessing font(font_ini);
 
+// FIXME: Define it at CMake rather than here
+#if defined(__3DS__) || defined(__WII__) || defined(__16M__)
+#   define THEXTECH_USE_1X_FONT_MODE
+#endif
+
     size_t tables = 0;
     font.beginGroup("font");
     font.read("tables", tables, 0);
@@ -77,12 +82,17 @@ void RasterFont::loadFont(std::string font_ini)
     font.read("ttf-outlines-colour", m_ttfOutLinesColour, 0x000000FF);
     font.read("ttf-fallback", m_ttfFallback, "");
     font.read("ttf-size", m_ttfSize, -1);
+#if defined(THEXTECH_USE_1X_FONT_MODE) // Use special fonts targeted to smaller screen resolutions
+    font.read("ttf-fallback-1x", m_ttfFallback, m_ttfFallback);
+    font.read("ttf-size-1x", m_ttfSize, m_ttfSize);
+#endif
     font.read("space-width", m_spaceWidth, 0);
     font.read("interletter-space", m_interLetterSpace, 0);
     font.read("newline-offset", m_newlineOffset, 0);
     font.read("glyph-offset-x", m_glyphOffsetX, 0);
     font.read("glyph-offset-y", m_glyphOffsetY, 0);
     font.endGroup();
+
     std::vector<std::string> tables_list;
     tables_list.reserve(tables);
 
