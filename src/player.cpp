@@ -4884,7 +4884,7 @@ void PlayerCollide(const int A)
                     HitSpot = 0;
                 if(HitSpot == 2 || HitSpot == 4)
                 {
-                    if(numPlayers < 3 /*|| nPlay.Online*/)
+                    if(!g_ClonedPlayerMode)
                         PlaySound(SFX_Skid);
                     tempLocation = p1.Location;
                     p1.Location.SpeedX = p2.Location.SpeedX;
@@ -4894,7 +4894,7 @@ void PlayerCollide(const int A)
                 }
                 else if(HitSpot == 1)
                 {
-                    if(numPlayers < 3 /*|| nPlay.Online*/)
+                    if(!g_ClonedPlayerMode)
                         PlaySound(SFX_Stomp);
                     p1.Location.Y = p2.Location.Y - p1.Location.Height - 0.1;
                     PlayerPush(A, 3);
@@ -4912,7 +4912,7 @@ void PlayerCollide(const int A)
                 }
                 else if(HitSpot == 3)
                 {
-                    if(numPlayers < 3/* || nPlay.Online*/)
+                    if(!g_ClonedPlayerMode)
                         PlaySound(SFX_Stomp);
                     p2.Location.Y = p1.Location.Y - p2.Location.Height - 0.1;
                     PlayerPush(B, 3);
