@@ -535,7 +535,8 @@ void GraphicsLazyPreLoad()
     }
 }
 
-std::vector<NPCRef_t> NoReset_NPCs_LastFrame;
+// swappable buffer for previous frame's NoReset NPCs
+static std::vector<NPCRef_t> s_NoReset_NPCs_LastFrame;
 
 // does the classic ("onscreen") NPC activation / reset logic for vScreen Z, directly based on the many NPC loops of the original game
 void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
@@ -543,6 +544,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
     // using bitset here instead of simpler set for checkNPCs because I benchmarked it to be faster -- ds-sloth
     static std::bitset<maxNPCs> NPC_present;
 
+    // find the onscreen NPCs
     TreeResult_Sentinel<NPCRef_t> _screenNPCs = treeNPCQuery(-vScreenX[Z], -vScreenY[Z],
         -vScreenX[Z] + vScreen[Z].Width, -vScreenY[Z] + vScreen[Z].Height,
         SORTMODE_NONE);
@@ -550,23 +552,23 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
     // combine the onscreen NPCs with the no-reset NPCs
     std::vector<BaseRef_t>& checkNPCs = *_screenNPCs.i_vec;
 
-    int tree_size = checkNPCs.size();
-
+    // mark previous ones as checked
     for(int16_t n : checkNPCs)
-    {
         NPC_present[n] = true;
-    }
 
-    for(int16_t n : NoReset_NPCs_LastFrame)
+    // add the previous frame's no-reset NPCs
+    for(int16_t n : s_NoReset_NPCs_LastFrame)
     {
         if(n <= numNPCs && !NPC_present[n])
+        {
             checkNPCs.push_back(n);
+            NPC_present[n] = true;
+        }
     }
 
-    for(int i = 0; i < tree_size; ++i)
-    {
-        NPC_present[(int16_t)checkNPCs[i]] = false;
-    }
+    // cleanup the checked NPCs
+    for(int16_t n : checkNPCs)
+        NPC_present[n] = false;
 
     Location_t npcALoc;
 
@@ -789,7 +791,8 @@ void UpdateGraphics(bool skipRepaint)
 
     g_stats.reset();
 
-    std::swap(NPCQueues::NoReset, NoReset_NPCs_LastFrame);
+    // prepare to fill this frame's NoReset queue
+    std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
     NPCQueues::NoReset.clear();
 
     for(Z = 1; Z <= numScreens; Z++)
