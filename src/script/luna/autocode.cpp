@@ -300,11 +300,12 @@ void Autocode::Do(bool init)
             break;
         }
 
-        // SHOW TEXT
+        // Show level's internal name (or show the filename if empty)
         case AT_ShowLevelName:
             Renderer::Get().AddOp(new RenderStringOp(LevelName.empty() ? FileName : LevelName, (int)Param3, (float)Param1, (float)Param2));
             break;
 
+        // Show level's file name (without extension)
         case AT_ShowLevelFile:
             Renderer::Get().AddOp(new RenderStringOp(FileName, (int)Param3, (float)Param1, (float)Param2));
             break;
