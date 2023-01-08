@@ -289,13 +289,13 @@ struct screen_t
 };
 
 template<class MyRef_t>
-Location_t extract_loc(MyRef_t obj)
+inline Location_t extract_loc(MyRef_t obj)
 {
     return obj->Location;
 }
 
 template<>
-Location_t extract_loc(NPCRef_t obj)
+inline Location_t extract_loc(NPCRef_t obj)
 {
     Location_t ret = obj->Location;
 
@@ -319,7 +319,7 @@ Location_t extract_loc(NPCRef_t obj)
 }
 
 template<class MyRef_t>
-Location_t extract_loc_layer(MyRef_t obj)
+inline Location_t extract_loc_layer(MyRef_t obj)
 {
     Location_t loc = obj->Location;
 
@@ -342,6 +342,11 @@ struct table_t
     std::vector<int> col_first_row_index;
     std::unordered_map<MyRef_t, rect_external> member_rects;
     int first_col_index;
+
+    ~table_t()
+    {
+        clear();
+    }
 
     void query(std::vector<BaseRef_t>& out, const rect_external& rect)
     {

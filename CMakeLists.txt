@@ -502,7 +502,6 @@ set(THEXTECH_SRC
     src/main/outro_loop.cpp
     src/main/trees.cpp
     src/main/block_table.cpp
-    src/main/QuadTree/LooseQuadtree-impl.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
@@ -698,7 +697,6 @@ file(GLOB THEXTECH_HEADS_SRC
     src/editor/*.h
     src/main/*.h
     src/main/*.hpp
-    src/main/QuadTree/*.h
     src/npc/*.h
     src/npc/*.hpp
     src/sound/fx/*.h
