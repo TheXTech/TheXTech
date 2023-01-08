@@ -300,6 +300,15 @@ void Autocode::Do(bool init)
             break;
         }
 
+        // SHOW TEXT
+        case AT_ShowLevelName:
+            Renderer::Get().AddOp(new RenderStringOp(LevelName.empty() ? FileName : LevelName, (int)Param3, (float)Param1, (float)Param2));
+            break;
+
+        case AT_ShowLevelFile:
+            Renderer::Get().AddOp(new RenderStringOp(FileName, (int)Param3, (float)Param1, (float)Param2));
+            break;
+
         // AUDIO
         case AT_SFX:
         {
@@ -1534,6 +1543,8 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
 
     {"ShowText", AT_ShowText},
     {"ShowNPCLifeLeft", AT_ShowNPCLifeLeft},
+    {"ShowLevelName", AT_ShowLevelName},
+    {"ShowLevelFile", AT_ShowLevelFile},
 
     {"Trigger", AT_Trigger},
     {"Timer", AT_Timer},
