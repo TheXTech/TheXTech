@@ -407,6 +407,12 @@ struct NPC_t
 //    tempBlock As Integer
     int tempBlock = 0;
 //    EXTRA: does the tempBlock have its own tree entry?
+    // To explain further: when an NPC is at the same location as its tempBlock,
+    //   its temp block is *not* added to the temp block quadtree
+    //   (saves time by only keeping one tree).
+    // Whenever the NPC is moved and temp block isn't, they split and the temp block needs to be added to the tree if it has not already been added. (treeNPCSplitTempBlock)
+    // Whenever the temp block is moved and the NPC isn't, they split and the temp block needs to be updated even if it is already added. (treeNPCUpdateTempBlock)
+    // Whenever the temp block is moved *to* the NPC's position, they re-join, and the temp block is removed if it was added.
     bool tempBlockInTree = false;
 //    onWall As Boolean
     bool onWall = false;

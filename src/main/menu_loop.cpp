@@ -52,6 +52,7 @@ static void updateIntroLevelActivity()
 
     SingleCoop = 0;
 
+    // only restore the level on the first frame that all players are dead
     static bool restore_done = false;
 
     bool any_living = CheckLiving();

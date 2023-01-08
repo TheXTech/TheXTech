@@ -570,8 +570,11 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
     for(int16_t n : checkNPCs)
         NPC_present[n] = false;
 
+    // allocate it outside the loop; use it only when needed
     Location_t npcALoc;
 
+    // following logic is somewhat difficult to read but includes the precise conditions
+    // from each NPC check in the original UpdateGraphics to determine how to handle each NPC
     for(int A : checkNPCs)
     {
         g_stats.checkedNPCs++;

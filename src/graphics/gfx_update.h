@@ -25,15 +25,18 @@
 extern bool g_drawBlocks_valid[2];
 extern bool g_drawBGOs_valid[2];
 
+// should equal the largest X or Y move rate of any layer containing blocks / BGOs
 extern double g_drawBlocks_invalidate_rate;
 extern double g_drawBGOs_invalidate_rate;
 
+// call when a block is added, moved, or its Hidden attribute is changed
 inline void invalidateDrawBlocks()
 {
     g_drawBlocks_valid[0] = false;
     g_drawBlocks_valid[1] = false;
 }
 
+// call when a BGO is added, moved, or its Hidden attribute is changed
 inline void invalidateDrawBGOs()
 {
     g_drawBGOs_valid[0] = false;
