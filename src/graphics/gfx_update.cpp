@@ -284,50 +284,67 @@ public:
 NPC_Draw_Queue_t NPC_Draw_Queue[2] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
 
 // code to facilitate cached values for the onscreen blocks and BGOs
+// query results of last update
 static std::vector<BlockRef_t> s_drawMainBlocks[2] = {std::vector<BlockRef_t>(400), std::vector<BlockRef_t>(400)};
 static std::vector<BlockRef_t> s_drawLavaBlocks[2] = {std::vector<BlockRef_t>(100), std::vector<BlockRef_t>(100)};
 static std::vector<BlockRef_t> s_drawSBlocks[2] = {std::vector<BlockRef_t>(40), std::vector<BlockRef_t>(40)};
 static std::vector<BaseRef_t> s_drawBGOs[2] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400)};
+
+// query location of last update
 static Location_t s_drawBlocks_bounds[2];
 static Location_t s_drawBGOs_bounds[2];
-static double s_drawBlocks_valid_timer[2] = {0, 0};
-static double s_drawBGOs_valid_timer[2] = {0, 0};
 
+// maximum amount of layer movement since last update
+static double s_drawBlocks_invalidate_timer[2] = {0, 0};
+static double s_drawBGOs_invalidate_timer[2] = {0, 0};
+
+// global: force-invalidate the cache when the blocks themselves change
 bool g_drawBlocks_valid[2] = {false, false};
 bool g_drawBGOs_valid[2] = {false, false};
 
+// global: based on layer movement speed, set in layers.cpp
 double g_drawBlocks_invalidate_rate = 0;
 double g_drawBGOs_invalidate_rate = 0;
 
+
+// Performance-tweakable code. This is the margin away from the vScreen that is filled when onscreen blocks and BGOs are calculated.
+//   Larger values result in more offscreen blocks / BGOs being checked.
+//   Smaller values result in more frequent block / BGO table queries.
 constexpr double i_drawBlocks_margin = 64;
 constexpr double i_drawBGOs_margin = 128;
 
+// updates the lists of blocks and BGOs to draw on vScreen Z
 void s_UpdateDrawItems(int Z)
 {
     int i = Z - 1;
     if(i < 0 || i >= 2)
         return;
 
-    s_drawBlocks_valid_timer[i] -= g_drawBlocks_invalidate_rate;
-    s_drawBGOs_valid_timer[i] -= g_drawBGOs_invalidate_rate;
+    // based on layer movement speed
+    s_drawBlocks_invalidate_timer[i] += g_drawBlocks_invalidate_rate;
+    s_drawBGOs_invalidate_timer[i] += g_drawBGOs_invalidate_rate;
 
+
+    // update draw blocks if needed
     if(!g_drawBlocks_valid[i]
-        || s_drawBlocks_valid_timer[i] <= 0
-        || -vScreenX[Z]                     < s_drawBlocks_bounds[i].X
-        || -vScreenX[Z] + vScreen[Z].Width  > s_drawBlocks_bounds[i].X + s_drawBlocks_bounds[i].Width
-        || -vScreenY[Z]                     < s_drawBlocks_bounds[i].Y
-        || -vScreenY[Z] + vScreen[Z].Height > s_drawBlocks_bounds[i].Y + s_drawBlocks_bounds[i].Height)
+        || -vScreenX[Z]                     < s_drawBlocks_bounds[i].X                                 + s_drawBlocks_invalidate_timer[i]
+        || -vScreenX[Z] + vScreen[Z].Width  > s_drawBlocks_bounds[i].X + s_drawBlocks_bounds[i].Width  - s_drawBlocks_invalidate_timer[i]
+        || -vScreenY[Z]                     < s_drawBlocks_bounds[i].Y                                 + s_drawBlocks_invalidate_timer[i]
+        || -vScreenY[Z] + vScreen[Z].Height > s_drawBlocks_bounds[i].Y + s_drawBlocks_bounds[i].Height - s_drawBlocks_invalidate_timer[i])
     {
         g_drawBlocks_valid[i] = true;
-        s_drawBlocks_valid_timer[i] = i_drawBlocks_margin;
+        s_drawBlocks_invalidate_timer[i] = 0;
 
+        // form query location
         s_drawBlocks_bounds[i] = newLoc(-vScreenX[Z] - i_drawBlocks_margin,
             -vScreenY[Z] - i_drawBlocks_margin,
             vScreen[Z].Width + i_drawBlocks_margin * 2,
             vScreen[Z].Height + i_drawBlocks_margin * 2);
 
+        // make query (sort by ID as done in vanilla)
         TreeResult_Sentinel<BlockRef_t> areaBlocks = treeBlockQuery(s_drawBlocks_bounds[i], SORTMODE_ID);
 
+        // load query results into different sets of blocks
         s_drawSBlocks[i].clear();
         s_drawMainBlocks[i].clear();
         s_drawLavaBlocks[i].clear();
@@ -355,21 +372,23 @@ void s_UpdateDrawItems(int Z)
             });
     }
 
+    // update draw BGOs if needed
     if(!g_drawBGOs_valid[i]
-        || s_drawBGOs_valid_timer[i] <= 0
-        || -vScreenX[Z]                     < s_drawBGOs_bounds[i].X
-        || -vScreenX[Z] + vScreen[Z].Width  > s_drawBGOs_bounds[i].X + s_drawBGOs_bounds[i].Width
-        || -vScreenY[Z]                     < s_drawBGOs_bounds[i].Y
-        || -vScreenY[Z] + vScreen[Z].Height > s_drawBGOs_bounds[i].Y + s_drawBGOs_bounds[i].Height)
+        || -vScreenX[Z]                     < s_drawBGOs_bounds[i].X                               + s_drawBGOs_invalidate_timer[i]
+        || -vScreenX[Z] + vScreen[Z].Width  > s_drawBGOs_bounds[i].X + s_drawBGOs_bounds[i].Width  - s_drawBGOs_invalidate_timer[i]
+        || -vScreenY[Z]                     < s_drawBGOs_bounds[i].Y                               + s_drawBGOs_invalidate_timer[i]
+        || -vScreenY[Z] + vScreen[Z].Height > s_drawBGOs_bounds[i].Y + s_drawBGOs_bounds[i].Height - s_drawBGOs_invalidate_timer[i])
     {
         g_drawBGOs_valid[i] = true;
-        s_drawBGOs_valid_timer[i] = i_drawBGOs_margin;
+        s_drawBGOs_invalidate_timer[i] = 0;
 
+        // form query location
         s_drawBGOs_bounds[i] = newLoc(-vScreenX[Z] - i_drawBGOs_margin,
             -vScreenY[Z] - i_drawBGOs_margin,
             vScreen[Z].Width + i_drawBGOs_margin * 2,
             vScreen[Z].Height + i_drawBGOs_margin * 2);
 
+        // make query (sort by ID as done in vanilla)
         s_drawBGOs[i].clear();
         treeBackgroundQuery(s_drawBGOs[i], s_drawBGOs_bounds[i], SORTMODE_ID);
     }

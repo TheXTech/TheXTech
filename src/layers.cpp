@@ -427,6 +427,9 @@ void ShowLayer(layerindex_t L, bool NoEffect)
             // moved code to restore all hit blocks below
     }
 
+    if(!Layer[L].BGOs.empty())
+        invalidateDrawBGOs();
+
     for(int A : Layer[L].BGOs)
     {
             if(Background[A].Hidden)
@@ -515,6 +518,9 @@ void HideLayer(layerindex_t L, bool NoEffect)
             }
             Block[A].Hidden = true;
     }
+
+    if(!Layer[L].BGOs.empty())
+        invalidateDrawBGOs();
 
     for(int A : Layer[L].BGOs)
     {
@@ -1265,8 +1271,6 @@ void UpdateLayers()
                     }
                 }
 
-                bool inactive = !treeBlockLayerActive(A);
-
                 if(!Layer[A].blocks.empty())
                 {
                     if(std::abs(Layer[A].SpeedX) > g_drawBlocks_invalidate_rate)
@@ -1274,6 +1278,17 @@ void UpdateLayers()
                     if(std::abs(Layer[A].SpeedY) > g_drawBlocks_invalidate_rate)
                         g_drawBlocks_invalidate_rate = std::abs(Layer[A].SpeedY);
                 }
+
+                if(!Layer[A].BGOs.empty())
+                {
+                    if(std::abs(Layer[A].SpeedX) > g_drawBGOs_invalidate_rate)
+                        g_drawBGOs_invalidate_rate = std::abs(Layer[A].SpeedX);
+                    if(std::abs(Layer[A].SpeedY) > g_drawBGOs_invalidate_rate)
+                        g_drawBGOs_invalidate_rate = std::abs(Layer[A].SpeedY);
+                }
+
+                // is the layer currently included in the main block quadtree?
+                bool inactive = !treeBlockLayerActive(A);
 
                 for(int B : Layer[A].blocks)
                 {
@@ -1289,15 +1304,8 @@ void UpdateLayers()
                     }
                 }
 
+                // is the layer currently included in the main BGO quadtree?
                 inactive = !treeBackgroundLayerActive(A);
-
-                if(!Layer[A].BGOs.empty())
-                {
-                    if(std::abs(Layer[A].SpeedX) > g_drawBGOs_invalidate_rate)
-                        g_drawBGOs_invalidate_rate = std::abs(Layer[A].SpeedX);
-                    if(std::abs(Layer[A].SpeedY) > g_drawBGOs_invalidate_rate)
-                        g_drawBGOs_invalidate_rate = std::abs(Layer[A].SpeedY);
-                }
 
                 // int allBGOs = numBackground + numLocked;
                 for(int B : Layer[A].BGOs)
@@ -1317,6 +1325,7 @@ void UpdateLayers()
                     }
                 }
 
+                // is the layer currently included in the main water quadtree?
                 inactive = !treeWaterLayerActive(A);
 
                 for(int B : Layer[A].waters)
