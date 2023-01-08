@@ -166,7 +166,11 @@ void doShakeScreenClear()
 // this organizes all of the NPC draw conditions into one queue
 class NPC_Draw_Queue_t
 {
+#ifndef LOW_MEM
+    static constexpr int maxDrawNPCs = maxNPCs;
+#else
     static constexpr int maxDrawNPCs = 512;
+#endif
 public:
     uint16_t BG[maxDrawNPCs];
     size_t BG_n;
@@ -184,12 +188,16 @@ public:
     size_t FG_n;
     uint16_t Dropped[20];
     size_t Dropped_n;
-    uint16_t Warning[20];
+    uint16_t Warning[32];
     size_t Warning_n;
+
+    // reset the draw queue for the frame
     void reset()
     {
         BG_n = Low_n = Iced_n = Normal_n = Chat_n = Held_n = FG_n = Dropped_n = Warning_n = 0;
     }
+
+    // add NPC with index A to the draw queue, according to its type properties
     void add(uint16_t A)
     {
         if(NPC[A].Chat)
