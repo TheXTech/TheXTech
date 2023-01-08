@@ -291,6 +291,7 @@ void UpdateGraphics(bool skipRepaint)
 //    std::string timeStr;
     int Z = 0;
     int numScreens = 0;
+    bool doSkip;
 
     if(!GameIsActive)
         return;
@@ -306,86 +307,93 @@ void UpdateGraphics(bool skipRepaint)
     // frame skip code
     cycleNextInc();
 
-    if(FrameSkip && !TakeScreen)
+    // Skip frame condition
+    doSkip = FrameSkip && !TakeScreen;
+
+    // Note: never frame skip in this case, because the legacy code doesn't update the fields used by frameSkipNeeded()
+    if(!g_compatibility.fix_keyhole_framerate && LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
+        doSkip = false;
+
+    if(doSkip && frameSkipNeeded()) // Don't draw this frame
     {
-        if(!g_compatibility.fix_keyhole_framerate && LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
+        numScreens = 1;
+
+        if(!LevelEditor)
         {
-            // never frame skip in this case, because the legacy code doesn't update the fields used by frameSkipNeeded()
-        }
-        else if(frameSkipNeeded()) // Don't draw this frame
-        {
-            numScreens = 1;
-            if(!LevelEditor)
+            if(ScreenType == 1)
+                numScreens = 2;
+
+            if(ScreenType == 4)
+                numScreens = 2;
+
+            if(ScreenType == 5)
             {
-                if(ScreenType == 1)
+                DynamicScreen();
+
+                if(vScreen[2].Visible)
                     numScreens = 2;
-                if(ScreenType == 4)
-                    numScreens = 2;
-                if(ScreenType == 5)
-                {
-                    DynamicScreen();
-                    if(vScreen[2].Visible)
-                        numScreens = 2;
-                    else
-                        numScreens = 1;
-                }
-                if(ScreenType == 8)
+                else
                     numScreens = 1;
             }
 
-            for(Z = 1; Z <= numScreens; Z++)
-            {
-                if(!LevelEditor)
-                {
-                    if(ScreenType == 2 || ScreenType == 3)
-                        GetvScreenAverage();
-                    else if(ScreenType == 5 && !vScreen[2].Visible)
-                        GetvScreenAverage();
-                    else if(ScreenType == 7)
-                        GetvScreenCredits();
-                    else
-                    {
-                        GetvScreen(Z);
-                    }
-                }
+            if(ScreenType == 8)
+                numScreens = 1;
+        }
 
-                for(A = 1; A <= numNPCs; A++)
+        for(Z = 1; Z <= numScreens; Z++)
+        {
+            if(!LevelEditor)
+            {
+                if(ScreenType == 2 || ScreenType == 3)
+                    GetvScreenAverage();
+                else if(ScreenType == 5 && !vScreen[2].Visible)
+                    GetvScreenAverage();
+                else if(ScreenType == 7)
+                    GetvScreenCredits();
+                else
+                    GetvScreen(Z);
+            }
+
+            for(A = 1; A <= numNPCs; A++)
+            {
+                if(vScreenCollision(Z, NPC[A].Location) && !NPC[A].Hidden)
                 {
-                    if(vScreenCollision(Z, NPC[A].Location) && !NPC[A].Hidden)
+                    if(NPC[A].Reset[Z] || NPC[A].Active)
                     {
-                        if(NPC[A].Reset[Z] || NPC[A].Active)
+                        if(!NPC[A].Active)
                         {
-                            if(!NPC[A].Active)
-                            {
-                                NPC[A].JustActivated = Z;
-//                                if(nPlay.Online == true)
-//                                {
-//                                    Netplay::sendData "2a" + std::to_string(A) + "|" + (nPlay.MySlot + 1) + LB;
-//                                    NPC[A].JustActivated = nPlay.MySlot + 1;
-//                                }
-                            }
-                            NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-//                            if(nPlay.Online == true && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
-//                                timeStr += "2b" + std::to_string(A) + LB;
-                            NPC[A].Active = true;
+                            NPC[A].JustActivated = Z;
+//                            if(nPlay.Online)
+//                            {
+//                                 Netplay::sendData "2a" + std::to_string(A) + "|" + (nPlay.MySlot + 1) + LB;
+//                                 NPC[A].JustActivated = nPlay.MySlot + 1;
+//                            }
                         }
-                        NPC[A].Reset[1] = false;
-                        NPC[A].Reset[2] = false;
+
+                        NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
+//                        if(nPlay.Online && nPlay.NPCWaitCount >= 10 && nPlay.Mode == 0)
+//                            timeStr += "2b" + std::to_string(A) + LB;
+                        NPC[A].Active = true;
                     }
-                    else
-                    {
-                        NPC[A].Reset[Z] = true;
-                        if(numScreens == 1)
-                            NPC[A].Reset[2] = true;
-                        if(SingleCoop == 1)
-                            NPC[A].Reset[2] = true;
-                        else if(SingleCoop == 2)
-                            NPC[A].Reset[1] = true;
-                    }
+
+                    NPC[A].Reset[1] = false;
+                    NPC[A].Reset[2] = false;
+                }
+                else
+                {
+                    NPC[A].Reset[Z] = true;
+
+                    if(numScreens == 1)
+                        NPC[A].Reset[2] = true;
+
+                    if(SingleCoop == 1)
+                        NPC[A].Reset[2] = true;
+                    else if(SingleCoop == 2)
+                        NPC[A].Reset[1] = true;
                 }
             }
-            return;
         }
+        return;
     }
 
     XRender::setTargetTexture();
@@ -396,8 +404,8 @@ void UpdateGraphics(bool skipRepaint)
 
     g_stats.reset();
 
-    std::string SuperText;
-    std::string tempText;
+    // std::string SuperText;
+    // std::string tempText;
     // int BoxY = 0;
     // bool tempBool = false;
     int B = 0;
