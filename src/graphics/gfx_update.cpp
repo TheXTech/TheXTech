@@ -970,7 +970,6 @@ void UpdateGraphics(bool skipRepaint)
                 }
             }
         }
-        return;
     }
 
     // we've now done all the logic that UpdateGraphics can do.
