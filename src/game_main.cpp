@@ -1136,6 +1136,7 @@ void NextLevel()
 
     LevelMacro = LEVELMACRO_OFF;
     LevelMacroCounter = 0;
+    LevelMacroWhich = 0;
     StopMusic();
     lunaReset();
     ResetSoundFX();
@@ -1336,6 +1337,7 @@ void UpdateMacro()
         LevelBeatCode = 4;
         EndLevel = true;
         LevelMacro = LEVELMACRO_OFF;
+        LevelMacroWhich = 0;
         LevelMacroCounter = 0;
         XRender::clearBuffer();
     }

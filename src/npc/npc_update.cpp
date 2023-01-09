@@ -5232,6 +5232,7 @@ void UpdateNPCs()
                                     PlaySound(SFX_Key);
                                     StopMusic();
                                     LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
+                                    LevelMacroWhich = B;
                                     break;
                                 }
                             }

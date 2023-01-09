@@ -49,6 +49,8 @@
 #include "effect.h"
 #include "npc_id.h"
 
+#include "graphics/gfx_keyhole.h"
+
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
 
@@ -767,28 +769,41 @@ void UpdateGraphics(bool skipRepaint)
     // frame skip code
     cycleNextInc();
 
-    bool Do_FrameSkip = FrameSkip && !TakeScreen && frameSkipNeeded();
+    bool Do_FrameSkip = FrameSkip && !TakeScreen;
+
+    // Note: never frame skip in this case, because the legacy code doesn't update the fields used by frameSkipNeeded()
+    if(!g_compatibility.fix_keyhole_framerate && LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
+        Do_FrameSkip = false;
+
+    if(Do_FrameSkip)
+        Do_FrameSkip = frameSkipNeeded();
 
     // ALL graphics-based logic code has been moved here, separate from rendering.
     // (This code is a combination of the FrameSkip logic from before with the
     //   logic components of the full rendering code.)
     // NPC render queue formation is also here.
     SetupScreens();
+
     int numScreens = 1;
     if(ScreenType == 1)
         numScreens = 2;
+
     if(ScreenType == 4)
         numScreens = 2;
+
     if(ScreenType == 5)
     {
         DynamicScreen();
+
         if(vScreen[2].Visible)
             numScreens = 2;
         else
             numScreens = 1;
     }
+
     if(ScreenType == 8)
         numScreens = 1;
+
     if(SingleCoop == 2)
         numScreens = 2;
 
@@ -955,19 +970,21 @@ void UpdateGraphics(bool skipRepaint)
                 }
             }
         }
+        return;
     }
 
     // we've now done all the logic that UpdateGraphics can do.
     if(Do_FrameSkip)
         return;
+
     XRender::setTargetTexture();
 
     frameNextInc();
     frameRenderStart();
     lunaRenderStart();
 
-    std::string SuperText;
-    std::string tempText;
+    // std::string SuperText;
+    // std::string tempText;
     // int BoxY = 0;
     // bool tempBool = false;
     int B = 0;
@@ -2081,6 +2098,10 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
+        if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT && LevelMacroWhich != 0)
+        {
+            RenderKeyhole(Z);
+        }
 
         // Put held NPCs on top
         for(size_t i = 0; i < NPC_Draw_Queue_p.Held_n; i++)
@@ -2096,11 +2117,11 @@ void UpdateGraphics(bool skipRepaint)
                 {
                     if(NPCWidthGFX[NPC[A].Type] == 0)
                     {
-                        XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
+                        RenderTexturePlayer(Z, vScreenX[Z] + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPC[A].Location.Height, cn, cn, cn);
                     }
                     else
                     {
-                        XRender::renderTexture(vScreenX[Z] + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn, cn, cn);
+                        RenderTexturePlayer(Z, vScreenX[Z] + NPC[A].Location.X + (NPCFrameOffsetX[NPC[A].Type] * -NPC[A].Direction) - NPCWidthGFX[NPC[A].Type] / 2.0 + NPC[A].Location.Width / 2.0, vScreenY[Z] + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type] - NPCHeightGFX[NPC[A].Type] + NPC[A].Location.Height, NPCWidthGFX[NPC[A].Type], NPCHeightGFX[NPC[A].Type], GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeightGFX[NPC[A].Type], cn, cn, cn);
                     }
                 }
             }
