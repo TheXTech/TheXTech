@@ -568,19 +568,8 @@ void SetupVars()
     NPCHeight[9] = 32;
     NPCFrameOffsetY[9] =2;
 
-    NPCScore[9] = 6; // Set Default Scores for PowerUps (6=1000)
-    NPCScore[184] = 6; // Mushrooms
-    NPCScore[185] = 6;
-    NPCScore[249] = 6;
-    NPCScore[250] = 6;
-    NPCScore[14] = 6; // Fire Flowers
-    NPCScore[182] = 6;
-    NPCScore[183] = 6;
-    NPCScore[34] = 6; // Leaf
-    NPCScore[169] = 6; // Tanooki
-    NPCScore[170] = 6; // Hammer Suit
-    NPCScore[264] = 6; // Ice Flowers
-    NPCScore[277] = 6;
+    // Reversed incompatible powerup score customizability implementation at v1.3.6.1.
+    // These scores are now found in loadNpcSetupFixes();
 
     NPCWidth[273] = 32; // ? Mushroom
     NPCHeight[273] = 32;
