@@ -1584,6 +1584,7 @@ void KillNPC(int A, int B)
                 Player[B].VineNPC = A;
         }
 
+        SDL_assert_release(A > 0);
         NPC[A] = NPC[numNPCs];
         NPC[numNPCs] = blankNPC;
         numNPCs--;

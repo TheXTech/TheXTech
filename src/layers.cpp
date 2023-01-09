@@ -1490,6 +1490,8 @@ void syncLayers_NPC(int npc)
 
     NPCQueues::update(npc);
 
+    SDL_assert_release(npc > 0);
+
     if(npc <= numNPCs)
         treeNPCUpdate(npc);
     else

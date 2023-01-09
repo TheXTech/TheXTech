@@ -3620,8 +3620,11 @@ void YoshiEatCode(const int A)
                 }
             }
 
-            NPCQueues::Unchecked.push_back(p.YoshiNPC);
-            treeNPCUpdate(p.YoshiNPC);
+            if(p.YoshiNPC != 0)
+            {
+                NPCQueues::Unchecked.push_back(p.YoshiNPC);
+                treeNPCUpdate(p.YoshiNPC);
+            }
         }
         else if(p.MountSpecial == 0 && p.YoshiPlayer > 0)
         {
