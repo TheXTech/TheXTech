@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,6 +48,8 @@ typedef MsgBoxSDL MsgBoxUsed;
 typedef EventsSDL EventsUsed;
 #   define USE_CORE_EVENTS_SDL
 #endif
+
+#include "fontman/font_manager.h"
 
 #include "frm_main.h"
 
@@ -148,11 +150,15 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         return true;
     }
 
+    FontManager::initFull();
+
     return !res;
 }
 
 void FrmMain::freeSystem()
 {
+    FontManager::quit();
+
     GFX.unLoad();
 
 #ifdef RENDER_CUSTOM

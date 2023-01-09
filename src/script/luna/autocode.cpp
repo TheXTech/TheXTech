@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -299,6 +299,16 @@ void Autocode::Do(bool init)
                 Renderer::Get().AddOp(new RenderStringOp("?", 3, (float)Param1, (float)Param2));
             break;
         }
+
+        // Show level's internal name (or show the filename if empty)
+        case AT_ShowLevelName:
+            Renderer::Get().AddOp(new RenderStringOp(LevelName.empty() ? FileName : LevelName, (int)Param3, (float)Param1, (float)Param2));
+            break;
+
+        // Show level's file name (without extension)
+        case AT_ShowLevelFile:
+            Renderer::Get().AddOp(new RenderStringOp(FileName, (int)Param3, (float)Param1, (float)Param2));
+            break;
 
         // AUDIO
         case AT_SFX:
@@ -1534,6 +1544,8 @@ static const std::unordered_map<std::string, AutocodeType> s_commandMap =
 
     {"ShowText", AT_ShowText},
     {"ShowNPCLifeLeft", AT_ShowNPCLifeLeft},
+    {"ShowLevelName", AT_ShowLevelName},
+    {"ShowLevelFile", AT_ShowLevelFile},
 
     {"Trigger", AT_Trigger},
     {"Timer", AT_Timer},

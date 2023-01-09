@@ -3,7 +3,7 @@
  * a black background) and mask (a dark shape of image on a white background)
  * into RGBA with a transparent background
  *
- * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation files (the "Software"), to deal in the Software

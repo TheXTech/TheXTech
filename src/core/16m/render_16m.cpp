@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -248,6 +248,7 @@ static bool s_loadTexture(const std::string& path, int* tex_out, uint16_t* tex_w
 
 // sourced from gl2d
 static v16 s_depth;
+static uint8_t s_poly_id;
 
 static inline void s_gxTexcoord2i(t16 u, t16 v)
 {
@@ -273,7 +274,7 @@ void minport_RenderBoxFilled( int x1, int y1, int x2, int y2, uint8_t r, uint8_t
 
     glBindTexture(0, 0);
     if((a >> 3) < 31)
-        glPolyFmt(POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE);
+        glPolyFmt(POLY_ID(s_poly_id++) | POLY_ALPHA((a >> 3) + 1) | POLY_CULL_NONE);
     glColor3b(r, g, b);
 
     glBegin( GL_QUADS );
@@ -399,6 +400,7 @@ void setTargetTexture()
 
     glBegin2D();
     s_depth = 0;
+    s_poly_id = 0;
     s_glBoxFilledGradient( 0, 0, 255, 191,
                          RGB15( 0, 0, 0 ),
                          RGB15( 0, 0, 0 ),
@@ -512,6 +514,11 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     return ret;
 }
 
+StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+{
+    // The asset converter should have known not to downscale this image. Let's hope it was right.
+    return LoadPicture(path, maskPath, maskFallbackPath);
+}
 
 StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
 {

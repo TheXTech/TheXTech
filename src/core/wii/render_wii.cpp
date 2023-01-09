@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -69,11 +69,16 @@ int g_rmode_h = 480;
  * Convert a raw BMP (ARGB) to 4x4RGBA.
  * @author DragonMinded, modifications by ds-sloth
 */
-static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height, uint32_t stride, uint32_t* wdst_out, uint32_t* hdst_out)
+static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height, uint32_t stride, uint32_t* wdst_out, uint32_t* hdst_out, bool downscale = true)
 {
     // calculate destination dimensions, including downscaling and required padding
-    uint32_t wdst = (width + 1) / 2;
-    uint32_t hdst = (height + 1) / 2;
+    uint32_t wdst = width + 1;
+    uint32_t hdst = height + 1;
+
+    // define scaling factor
+    int sf = (downscale ? 2 : 1);
+    wdst /= sf;
+    hdst /= sf;
 
     if(wdst & 3)
     {
@@ -107,7 +112,7 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                 for(u8 argb = 0; argb < 4; ++argb)
                 {
                     // new: padding
-                    if((i + argb) * 2 > width || (block + c) * 2 > height)
+                    if((i + argb) * sf > width || (block + c) * sf > height)
                     {
                         *p++ = 0;
                         *p++ = 255;
@@ -115,9 +120,9 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                     }
 
                     // New: Alpha pixels
-                    *p++ = src[(((i + argb) * 2) + ((block + c) * 2 * stride)) * 4 + 3];
+                    *p++ = src[(((i + argb) * sf) + ((block + c) * sf * stride)) * 4 + 3];
                     // Red pixels
-                    *p++ = src[(((i + argb) * 2) + ((block + c) * 2 * stride)) * 4 + 0];
+                    *p++ = src[(((i + argb) * sf) + ((block + c) * sf * stride)) * 4 + 0];
                 }
             }
 
@@ -127,7 +132,7 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                 for(u8 argb = 0; argb < 4; ++argb)
                 {
                     // new: padding
-                    if((i + argb) * 2 > width || (block + c) * 2 > height)
+                    if((i + argb) * sf > width || (block + c) * sf > height)
                     {
                         *p++ = 255;
                         *p++ = 255;
@@ -135,9 +140,9 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                     }
 
                     // Green pixels
-                    *p++ = src[((((i + argb) * 2) + ((block + c) * 2 * stride)) * 4) + 1];
+                    *p++ = src[((((i + argb) * sf) + ((block + c) * sf * stride)) * 4) + 1];
                     // Blue pixels
-                    *p++ = src[((((i + argb) * 2) + ((block + c) * 2 * stride)) * 4) + 2];
+                    *p++ = src[((((i + argb) * sf) + ((block + c) * sf * stride)) * 4) + 2];
                 }
             }
         }
@@ -218,9 +223,11 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
     return sourceImage;
 }
 
-void s_loadTexture(StdPicture& target, void* data, int width, int height, bool mask)
+void s_loadTexture(StdPicture& target, void* data, int width, int height, bool mask, bool downscale = true)
 {
-    if(width > 2048 && height <= 2048)
+    int max_size = (downscale ? 2048 : 1024);
+
+    if(width > max_size && height <= max_size)
         target.d.multi_horizontal = true;
 
     for(int i = 0; i < 3; i++)
@@ -230,27 +237,27 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, bool m
         if(target.d.multi_horizontal)
         {
             start_y = 0;
-            start_x = i * 2048;
+            start_x = i * max_size;
         }
         else
         {
             start_x = 0;
-            start_y = i * 2048;
+            start_y = i * max_size;
         }
 
         int w_i = width - start_x;
         int h_i = height - start_y;
 
-        if(w_i > 2048)
-            w_i = 2048;
+        if(w_i > max_size)
+            w_i = max_size;
 
-        if(h_i > 2048)
-            h_i = 2048;
+        if(h_i > max_size)
+            h_i = max_size;
 
         if(w_i > 0 && h_i > 0)
         {
             uint32_t wdst, hdst;
-            target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + (start_y * width + start_x) * 4, w_i, h_i, width, &wdst, &hdst);
+            target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + (start_y * width + start_x) * 4, w_i, h_i, width, &wdst, &hdst, downscale);
 
             if(target.d.backing_texture[i + 3 * mask])
             {
@@ -582,7 +589,7 @@ void minport_ApplyViewport()
     // GX_SetScissorBoxOffset(-ox, -oy);
 }
 
-StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath, bool downscale)
 {
     (void)maskPath;
     (void)maskFallbackPath;
@@ -627,6 +634,12 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
             FI_tex = robust_FILoad(target.l.path, target.l.mask_path, &target.w, &target.h);
         }
 
+        if(!downscale)
+        {
+            target.w *= 2;
+            target.h *= 2;
+        }
+
         if(!FI_tex)
         {
             pLogWarning("Permanently failed to load %s", target.l.path.c_str());
@@ -634,12 +647,12 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         }
         else
         {
-            s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), false);
+            s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), false, downscale);
             FreeImage_Unload(FI_tex);
 
             if(FI_mask)
             {
-                s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), true);
+                s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), true, downscale);
                 FreeImage_Unload(FI_mask);
             }
         }
@@ -653,6 +666,16 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     }
 
     return target;
+}
+
+StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+{
+    return LoadPicture(path, maskPath, maskFallbackPath, true);
+}
+
+StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+{
+    return LoadPicture(path, maskPath, maskFallbackPath, false);
 }
 
 StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
@@ -908,6 +931,28 @@ void lazyUnLoad(StdPicture& target)
         return;
 
     deleteTexture(target, true);
+}
+
+void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    s_loadTexture(target, RGBApixels, width, height, false, true);
+    target.inited = true;
+    target.l.lazyLoaded = false;
+    target.w = width;
+    target.h = height;
+    target.frame_w = width;
+    target.frame_h = height;
+}
+
+void loadTexture_1x(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    s_loadTexture(target, RGBApixels, width, height, false, false);
+    target.inited = true;
+    target.l.lazyLoaded = false;
+    target.w = width * 2;
+    target.h = height * 2;
+    target.frame_w = width * 2;
+    target.frame_h = height * 2;
 }
 
 void deleteTexture(StdPicture& tx, bool lazyUnload)

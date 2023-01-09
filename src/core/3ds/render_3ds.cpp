@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -575,6 +575,12 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     }
 
     return target;
+}
+
+StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+{
+    // The asset converter should have known not to downscale this image. Let's hope it was right.
+    return LoadPicture(path, maskPath, maskFallbackPath);
 }
 
 StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)

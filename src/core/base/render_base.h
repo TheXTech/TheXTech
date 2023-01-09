@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -161,6 +161,10 @@ public:
                                   const std::string &maskPath = std::string(),
                                   const std::string &maskFallbackPath = std::string());
 
+    static StdPicture LoadPicture_1x(const std::string &path,
+                                  const std::string &maskPath = std::string(),
+                                  const std::string &maskFallbackPath = std::string());
+
     static StdPicture lazyLoadPicture(const std::string &path,
                                       const std::string &maskPath = std::string(),
                                       const std::string &maskFallbackPath = std::string());
@@ -172,6 +176,12 @@ public:
                              uint32_t height,
                              uint8_t *RGBApixels,
                              uint32_t pitch) = 0;
+
+    void loadTexture_1x(StdPicture &target,
+                             uint32_t width,
+                             uint32_t height,
+                             uint8_t *RGBApixels,
+                             uint32_t pitch);
 
     static void lazyLoad(StdPicture &target);
     static void lazyUnLoad(StdPicture &target);

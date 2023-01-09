@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -3313,6 +3313,7 @@ void YoshiEatCode(const int A)
                             PlaySound(SFX_Key);
                             StopMusic();
                             LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
+                            LevelMacroWhich = B;
                             break;
                         }
                     }
@@ -4465,6 +4466,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
         PauseGame(PauseCode::Message, A);
         MessageText.clear();
+        MessageTextMap.clear();
         canWarp = false;
     }
 

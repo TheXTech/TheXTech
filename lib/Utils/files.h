@@ -2,7 +2,7 @@
  * A small crossplatform set of file manipulation functions.
  * All input/output strings are UTF-8 encoded, even on Windows!
  *
- * Copyright (c) 2017-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2017-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this
  * software and associated documentation files (the "Software"), to deal in the Software
@@ -30,6 +30,16 @@
 namespace Files
 {
     FILE *utf8_fopen(const char *filePath, const char *modes);
+    enum Charsets
+    {
+        CHARSET_UTF8 = 0,
+        CHARSET_UTF16BE,
+        CHARSET_UTF16LE,
+        CHARSET_UTF32BE,
+        CHARSET_UTF32LE
+    };
+
+    int skipBom(FILE *file, const char **charset = nullptr);
     bool fileExists(const std::string &path);
     bool deleteFile(const std::string &path);
     bool copyFile(const std::string &to, const std::string &from, bool override = false);

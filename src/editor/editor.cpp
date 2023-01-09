@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -2786,6 +2786,7 @@ void zTestLevel(bool magicHand, bool interProcess)
 
     GamePaused = PauseCode::None;
     MessageText.clear();
+    MessageTextMap.clear();
 //  frmNPCs::chkMessage.Value = 0;
     BattleLives[1] = 3;
     BattleLives[2] = 3;

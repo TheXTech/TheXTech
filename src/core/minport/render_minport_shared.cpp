@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2020 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the "Software"),
@@ -390,6 +390,20 @@ inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t w
 }
 
 // public draw methods
+
+void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
+                            StdPicture &tx,
+                            float red, float green, float blue, float alpha)
+{
+    auto div_x = ROUNDDIV2(xDst), div_y = ROUNDDIV2(yDst);
+
+    minport_RenderTexturePrivate_2(
+        div_x, div_y, ROUNDDIV2(xDst + wDst) - div_x, ROUNDDIV2(yDst + hDst) - div_y,
+        tx,
+        0.0f, 0.0f, tx.w / 2, tx.h / 2,
+        0.0f, nullptr, X_FLIP_NONE,
+        red, green, blue, alpha);
+}
 
 void renderTextureScale(double xDst, double yDst, double wDst, double hDst,
                             StdPicture &tx,

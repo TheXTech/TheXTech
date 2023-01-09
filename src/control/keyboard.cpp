@@ -2,7 +2,7 @@
  * TheXTech - A platform game engine ported from old source code for VB6
  *
  * Copyright (c) 2009-2011 Andrew Spinks, original VB6 code
- * Copyright (c) 2020-2022 Vitaly Novichkov <admin@wohlnet.ru>
+ * Copyright (c) 2020-2023 Vitaly Novichkov <admin@wohlnet.ru>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -313,6 +313,12 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
 #endif
     this->m_hotkeys[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F12;
     this->m_hotkeys2[Hotkeys::Buttons::Screenshot] = SDL_SCANCODE_F2;
+#ifdef DEBUG_BUILD
+    // This is a DEBUG ONLY hot key that can kill the overlook on localized versions
+    // It's primary use is a debugging of the font engine itself, comparing with the
+    // old font engine on the fly
+    this->m_hotkeys[Hotkeys::Buttons::ToggleFontRender] = SDL_SCANCODE_F4;
+#endif
 }
 
 bool InputMethodProfile_Keyboard::PollPrimaryButton(ControlsClass c, size_t i)
