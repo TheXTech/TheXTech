@@ -190,6 +190,7 @@ StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, 
     StdPicture target = LoadPicture(path, maskPath, maskFallbackPath);
     target.w *= 2;
     target.h *= 2;
+    return target;
 }
 
 
