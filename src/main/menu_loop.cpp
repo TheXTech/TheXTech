@@ -571,7 +571,8 @@ void MenuLoop()
 void FindSaves()
 {
 //    std::string newInput;
-    std::string episode = SelectWorld[selWorld].WorldPath;
+    const auto &w = SelectWorld[selWorld];
+    std::string episode = w.WorldPath;
     GamesaveData f;
 
     for(auto A = 1; A <= maxSaveSlots; A++)
@@ -579,15 +580,22 @@ void FindSaves()
         SaveSlot[A] = -1;
         SaveStars[A] = 0;
 
+        // Modern gamesave file
         std::string saveFile = makeGameSavePath(episode,
-                                                SelectWorld[selWorld].WorldFile,
+                                                w.WorldFile,
                                                 fmt::format_ne("save{0}.savx", A));
-        std::string saveFileOld = episode + fmt::format_ne("save{0}.savx", A);
-        std::string saveFileAncient = episode + fmt::format_ne("save{0}.sav", A);
+        // Old gamesave location at episode's read-only directory
+        std::string saveFileOld = episode + fmt::format_ne("save{0}.sav", A);
+        // Gamesave locker to make an illusion of absence of the gamesave
+        std::string saveFileOldLocker = makeGameSavePath(w.WorldPath,
+                                                         w.WorldFile,
+                                                         fmt::format_ne("save{0}.nosave", A));
+
+        if(Files::fileExists(saveFileOldLocker))
+            continue; // Skip the blocked gamesave
 
         if((Files::fileExists(saveFile) && FileFormats::ReadExtendedSaveFileF(saveFile, f)) ||
-           (Files::fileExists(saveFileOld) && FileFormats::ReadExtendedSaveFileF(saveFileOld, f)) ||
-           (Files::fileExists(saveFileAncient) && FileFormats::ReadSMBX64SavFileF(saveFileAncient, f)))
+           (Files::fileExists(saveFileOld) && FileFormats::ReadSMBX64SavFileF(saveFileOld, f)))
         {
             int curActive = 0;
             int maxActive = 0;

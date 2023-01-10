@@ -54,8 +54,10 @@ std::string makeGameSavePath(std::string episode, std::string world, std::string
 void SaveGame()
 {
     int A = 0;
+
     if(Cheater)
         return;
+
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
     for(A = numStars; A >= 1; A--)
@@ -72,11 +74,16 @@ void SaveGame()
         }
     }
 
+    const auto &w = SelectWorld[selWorld];
+
     GamesaveData sav;
 //    std::string savePath = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
-    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
-                                            SelectWorld[selWorld].WorldFile,
+    std::string savePath = makeGameSavePath(w.WorldPath,
+                                            w.WorldFile,
                                             fmt::format_ne("save{0}.savx", selSave));
+    std::string legacyGamesaveLocker = makeGameSavePath(w.WorldPath,
+                                                        w.WorldFile,
+                                                        fmt::format_ne("save{0}.nosave", selSave));
 
 //    Open SelectWorld[selWorld].WorldPath + "save" + selSave + ".sav" For Output As #1;
     sav.lives = int(Lives);
@@ -124,6 +131,9 @@ void SaveGame()
 #endif
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
+
+    if(Files::fileExists(legacyGamesaveLocker))
+        Files::deleteFile(legacyGamesaveLocker); // Remove the gamesave locker of legacy file
 
     // Also, save the speed-running states
     speedRun_saveStats();
