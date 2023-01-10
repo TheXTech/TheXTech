@@ -147,16 +147,17 @@ void LoadGame()
 {
     int A = 0;
     size_t i = 0;
+    const auto &w = SelectWorld[selWorld];
 //    std::string newInput;
 
     GamesaveData sav;
-    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
-                                            SelectWorld[selWorld].WorldFile,
+    std::string savePath = makeGameSavePath(w.WorldPath,
+                                            w.WorldFile,
                                             fmt::format_ne("save{0}.savx", selSave));
-    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
+    std::string savePathOld = w.WorldPath + fmt::format_ne("save{0}.sav", selSave);
     std::string legacySaveLocker = makeGameSavePath(w.WorldPath,
                                                     w.WorldFile,
-                                                    fmt::format_ne("save{0}.nosave", save));
+                                                    fmt::format_ne("save{0}.nosave", selSave));
 
     if(Files::fileExists(savePath))
         FileFormats::ReadExtendedSaveFileF(savePath, sav);
