@@ -107,6 +107,8 @@ constexpr bool ffEqual(double i, double j)
 
 void ResetSectionScrolls()
 {
+    int p1_section = 0;
+
     for(int i = 0; i <= maxSections; i++)
     {
         // initialize the section
@@ -130,18 +132,54 @@ void ResetSectionScrolls()
             }
         }
 
+        // normally start at bottom-left
         last_vScreenY[i] = -(level[i].Height - ScreenH);
         last_vScreenX[i] = -(level[i].X);
+
+        // if player start is in section, start there instead
+        for(int p = 1; p <= 2; p++)
+        {
+            if(PlayerStart[p].X >= level[i].X && PlayerStart[p].X + PlayerStart[p].Width <= level[i].Width
+                && PlayerStart[p].Y >= level[i].Y && PlayerStart[p].Y + PlayerStart[p].Height <= level[i].Height)
+            {
+                // center on player
+                last_vScreenX[i] = -(PlayerStart[p].X + PlayerStart[p].Width / 2 - ScreenW / 2);
+                last_vScreenY[i] = -(PlayerStart[p].Y + PlayerStart[p].Height / 2 - ScreenH / 2);
+
+                // check section bounds
+                if(-last_vScreenX[i] < level[i].X)
+                    last_vScreenX[i] = -level[i].X;
+                else if(-last_vScreenX[i] + ScreenW > level[i].Width)
+                    last_vScreenX[i] = -(level[i].Width - ScreenW);
+
+                if(-last_vScreenY[i] < level[i].Y)
+                    last_vScreenY[i] = -level[i].Y;
+                else if(-last_vScreenY[i] + ScreenH > level[i].Height)
+                    last_vScreenY[i] = -(level[i].Height - ScreenH);
+
+                // save P1 section
+                if(p == 1)
+                    p1_section = i;
+
+                // don't check other player
+                break;
+            }
+        }
+
+        // center on section if screen bigger
         if(level[i].Width - level[i].X < ScreenW)
             last_vScreenX[i] += ScreenW / 2 - (level[i].Width - level[i].X) / 2;
         if(level[i].Height - level[i].Y < ScreenH)
             last_vScreenY[i] = -level[i].Y + ScreenH / 2 - (level[i].Height - level[i].Y) / 2;
+
+        // align to grid
         if(std::fmod((last_vScreenY[i] + 8), 32) != 0.0)
             last_vScreenY[i] = static_cast<int>(round((last_vScreenY[i] + 8) / 32)) * 32 - 8;
         if(std::fmod(last_vScreenX[i], 32) != 0.0)
             last_vScreenX[i] = static_cast<int>(round(last_vScreenX[i] / 32)) * 32;
     }
-    curSection = 0;
+
+    curSection = p1_section;
     vScreenY[1] = last_vScreenY[curSection];
     vScreenX[1] = last_vScreenX[curSection];
 }
