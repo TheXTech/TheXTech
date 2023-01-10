@@ -381,7 +381,7 @@ int PauseGame(PauseCode code, int plr)
     if(code == PauseCode::Message)
         MessageScreen_Init();
     else if(code == PauseCode::PauseScreen)
-        PauseScreen::Init(SharedControls.LegacyPause);
+        PauseScreen::Init(plr, SharedControls.LegacyPause);
     else if(code == PauseCode::Reconnect)
     {
         ConnectScreen::Reconnect_Start();

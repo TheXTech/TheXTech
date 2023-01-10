@@ -25,7 +25,7 @@
 namespace PauseScreen
 {
 
-void Init(bool LegacyPause);
+void Init(int plr, bool LegacyPause);
 
 bool Logic(int plr);
 void Render();

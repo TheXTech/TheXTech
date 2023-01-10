@@ -57,6 +57,8 @@ struct MenuItem
     MenuItem(std::string n, bool(*cb)()) : name(n), callback(cb) {};
 };
 
+static bool s_is_legacy = false;
+static int s_pause_plr = 0;
 static std::vector<MenuItem> s_items;
 
 static bool s_Continue()
@@ -181,11 +183,14 @@ static bool s_Quit()
     return true;
 }
 
-void Init(bool LegacyPause)
+void Init(int plr, bool LegacyPause)
 {
     PlaySound(SFX_Pause);
     MenuCursor = 0;
     MenuCursorCanMove = false;
+
+    s_is_legacy = LegacyPause;
+    s_pause_plr = plr;
 
     // do a context-aware initialization of s_items
     s_items.clear();
@@ -272,7 +277,10 @@ void Render()
         SuperPrint(s_items[i].name, 3, menu_left_X, menu_top_Y + (i * 36));
     }
 
-    XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[0], 0, 0);
+    if(s_pause_plr == 2 && !s_is_legacy)
+        XRender::renderTextureFL(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE, 0.0, 1.0, 0.0);
+    else
+        XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[0], 0, 0);
 }
 
 bool Logic(int plr)
