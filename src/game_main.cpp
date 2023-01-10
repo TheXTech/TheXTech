@@ -1926,24 +1926,19 @@ void StartBattleMode()
 
 void DeleteSave(int world, int save)
 {
-    auto &w = SelectWorld[world];
+    const auto &w = SelectWorld[world];
     std::vector<std::string> deleteList;
 
 #define AddFile(f) \
     deleteList.push_back(makeGameSavePath(w.WorldPath, \
                                           w.WorldFile,\
                                           fmt::format_ne(f, save)));
-#define AddFileW(f) \
-    deleteList.push_back(w.WorldPath + fmt::format_ne(f, save));
 
     AddFile("save{0}.savx");
     AddFile("timers{0}.ini");
     AddFile("deaths-{0}.rip");
     AddFile("fails-{0}.rip");
     AddFile("demos-{0}.dmo");
-    // Old gamesaves
-    AddFileW("save{0}.savx");
-    AddFileW("save{0}.sav");
 
     // Clear all files in list
     for(auto &s : deleteList)
@@ -1952,8 +1947,23 @@ void DeleteSave(int world, int save)
             Files::deleteFile(s);
     }
 
+    std::string legacySave = w.WorldPath + fmt::format_ne("save{0}.sav", save);
+    std::string legacySaveLocker = makeGameSavePath(w.WorldPath,
+                                                    w.WorldFile,
+                                                    fmt::format_ne("save{0}.nosave", save));
+
+    // If legacy gamesave file exists, make the locker file to make illusion that old file got been removed
+    if(Files::fileExists(legacySave))
+    {
+        auto *f = Files::utf8_fopen(legacySaveLocker.c_str(), "wb");
+        if(f)
+        {
+            std::fprintf(f, "If this file exists, save%d.sav file is ignored.", save);
+            std::fclose(f);
+        }
+    }
+
 #undef AddFile
-#undef AddFileW
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
@@ -1973,7 +1983,7 @@ static void copySaveFile(const SelectWorld_t& w, const char*file_mask, int src, 
 
 void CopySave(int world, int src, int dst)
 {
-    auto &w = SelectWorld[world];
+    const auto &w = SelectWorld[world];
 
     std::string savePathSrc = makeGameSavePath(w.WorldPath,
                                                w.WorldFile,
@@ -1981,22 +1991,26 @@ void CopySave(int world, int src, int dst)
     std::string savePathDst = makeGameSavePath(w.WorldPath,
                                                w.WorldFile,
                                                fmt::format_ne("save{0}.savx", dst));
+    std::string legacySaveLocker = makeGameSavePath(w.WorldPath,
+                                                    w.WorldFile,
+                                                    fmt::format_ne("save{0}.nosave", dst));
 
-    if(!Files::fileExists(savePathSrc)) // Attempt to import an old game-save from the episode directory
+    if(!Files::fileExists(savePathSrc))
     {
-        std::string savePathOld     = w.WorldPath + fmt::format_ne("save{0}.savx", src);
-        std::string savePathAncient = w.WorldPath + fmt::format_ne("save{0}.sav", src);
+        // Attempt to import an old game-save from the episode directory
+        std::string savePathOld = w.WorldPath + fmt::format_ne("save{0}.sav", src);
 
         GamesaveData sav;
         bool succ = false;
 
         if(Files::fileExists(savePathOld))
-            succ = FileFormats::ReadExtendedSaveFileF(savePathOld, sav);
-        else if(Files::fileExists(savePathAncient))
-            succ = FileFormats::ReadSMBX64SavFileF(savePathAncient, sav);
+            succ = FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
 
         if(succ)
             FileFormats::WriteExtendedSaveFileF(savePathSrc, sav);
+
+        if(Files::fileExists(legacySaveLocker))
+            Files::deleteFile(legacySaveLocker);
     }
 
     Files::copyFile(savePathDst, savePathSrc, true);
