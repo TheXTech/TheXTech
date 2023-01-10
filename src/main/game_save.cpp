@@ -217,11 +217,11 @@ void LoadGame()
 
     for(auto &s : sav.characterStates)
     {
-        if(s.id < 1 || s.id > 5)
+        if((s.id < 1) || (s.id > 5))
             continue;
         A = int(s.id);
 
-        if(s.state < 1 || s.state > 10)
+        if((s.state < 1) || (s.state > 10))
             SavedChar[A].State = 1;
         else
             SavedChar[A].State = int(s.state);
@@ -243,13 +243,13 @@ void LoadGame()
         switch(s.mountID)
         {
         case 1:
-            if(s.mountType < 1 || s.mountType > 3)
+            if((s.mountType < 1) || (s.mountType > 3))
                 SavedChar[A].MountType = 1;
             break;
         default:
             break;
         case 3:
-            if(s.mountType < 1 || s.mountType > 8)
+            if((s.mountType < 1) || (s.mountType > 8))
                 SavedChar[A].MountType = 1;
             break;
         }
