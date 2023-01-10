@@ -189,6 +189,22 @@ void LoadPlayerDefaults()
 SDL_FORCE_INLINE void loadNpcSetupFixes()
 {
     // TODO: Implement settings fixing logic here!
+    if(g_compatibility.custom_powerup_collect_score)
+    {
+        NPCScore[9] = 6; // Set Default Scores for PowerUps (6=1000)
+        NPCScore[184] = 6; // Mushrooms
+        NPCScore[185] = 6;
+        NPCScore[249] = 6;
+        NPCScore[250] = 6;
+        NPCScore[14] = 6; // Fire Flowers
+        NPCScore[182] = 6;
+        NPCScore[183] = 6;
+        NPCScore[34] = 6; // Leaf
+        NPCScore[169] = 6; // Tanooki
+        NPCScore[170] = 6; // Hammer Suit
+        NPCScore[264] = 6; // Ice Flowers
+        NPCScore[277] = 6;
+    }
 }
 
 void SaveNPCDefaults()

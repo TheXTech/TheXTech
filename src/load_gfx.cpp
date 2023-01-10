@@ -1017,6 +1017,10 @@ static void loadCustomUIAssets()
     loadCGFX(uiRoot + "EditorIcons.png",
              "EditorIcons",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.EIcons, false, true);
+
+    loadCGFX(uiRoot + "PCursor.png",
+             "PCursor",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.PCursor, false, true);
 }
 
 void LoadCustomGFX(bool include_world)

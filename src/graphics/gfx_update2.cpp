@@ -555,6 +555,8 @@ void UpdateGraphics2(bool skipRepaint)
         }
 
         speedRun_renderControls(1, -1);
+        if(numPlayers >= 2)
+            speedRun_renderControls(2, -1);
 
 
         speedRun_renderTimer();
