@@ -591,11 +591,8 @@ void FindSaves()
                                                          w.WorldFile,
                                                          fmt::format_ne("save{0}.nosave", A));
 
-        if(Files::fileExists(saveFileOldLocker))
-            continue; // Skip the blocked gamesave
-
         if((Files::fileExists(saveFile) && FileFormats::ReadExtendedSaveFileF(saveFile, f)) ||
-           (Files::fileExists(saveFileOld) && FileFormats::ReadSMBX64SavFileF(saveFileOld, f)))
+           (!Files::fileExists(saveFileOldLocker) && Files::fileExists(saveFileOld) && FileFormats::ReadSMBX64SavFileF(saveFileOld, f)))
         {
             int curActive = 0;
             int maxActive = 0;
