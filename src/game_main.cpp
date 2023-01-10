@@ -1926,7 +1926,7 @@ void StartBattleMode()
 
 void DeleteSave(int world, int save)
 {
-    auto &w = SelectWorld[world];
+    const auto &w = SelectWorld[world];
     std::vector<std::string> deleteList;
 
 #define AddFile(f) \
@@ -1983,7 +1983,7 @@ static void copySaveFile(const SelectWorld_t& w, const char*file_mask, int src, 
 
 void CopySave(int world, int src, int dst)
 {
-    auto &w = SelectWorld[world];
+    const auto &w = SelectWorld[world];
 
     std::string savePathSrc = makeGameSavePath(w.WorldPath,
                                                w.WorldFile,
@@ -1991,6 +1991,9 @@ void CopySave(int world, int src, int dst)
     std::string savePathDst = makeGameSavePath(w.WorldPath,
                                                w.WorldFile,
                                                fmt::format_ne("save{0}.savx", dst));
+    std::string legacySaveLocker = makeGameSavePath(w.WorldPath,
+                                                    w.WorldFile,
+                                                    fmt::format_ne("save{0}.nosave", dst));
 
     if(!Files::fileExists(savePathSrc))
     {
@@ -2005,6 +2008,9 @@ void CopySave(int world, int src, int dst)
 
         if(succ)
             FileFormats::WriteExtendedSaveFileF(savePathSrc, sav);
+
+        if(Files::fileExists(legacySaveLocker))
+            Files::deleteFile(legacySaveLocker);
     }
 
     Files::copyFile(savePathDst, savePathSrc, true);

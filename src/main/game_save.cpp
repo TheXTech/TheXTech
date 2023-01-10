@@ -153,15 +153,15 @@ void LoadGame()
     std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
                                             SelectWorld[selWorld].WorldFile,
                                             fmt::format_ne("save{0}.savx", selSave));
-    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
-    std::string savePathAncient = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
+    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
+    std::string legacySaveLocker = makeGameSavePath(w.WorldPath,
+                                                    w.WorldFile,
+                                                    fmt::format_ne("save{0}.nosave", save));
 
     if(Files::fileExists(savePath))
         FileFormats::ReadExtendedSaveFileF(savePath, sav);
-    else if(Files::fileExists(savePathOld))
-        FileFormats::ReadExtendedSaveFileF(savePathOld, sav);
-    else if(Files::fileExists(savePathAncient))
-        FileFormats::ReadSMBX64SavFileF(savePathAncient, sav);
+    if(!Files::fileExists(legacySaveLocker) && Files::fileExists(savePathOld))
+        FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
     else
     {
         pLogDebug("Game save file not found: %s", savePath.c_str());
