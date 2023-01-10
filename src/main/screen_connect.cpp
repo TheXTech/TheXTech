@@ -838,9 +838,16 @@ bool Player_MenuItem_Mouse_Render(int p, int i, const std::string& label, int X,
     return false;
 }
 
-inline void Render_PCursor(int x, int y, float r, float g, float b)
+inline void Render_PCursor(int x, int y, int p, float r, float g, float b)
 {
-    XRender::renderTextureFL(x, y, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE, r, g, b);
+    if(GFX.PCursor.inited)
+        XRender::renderTexture(x, y, GFX.PCursor, r, g, b);
+    else if(p == 0)
+        XRender::renderTexture(x, y, GFX.MCursor[0]);
+    else if(p == 1)
+        XRender::renderTexture(x, y, GFX.MCursor[3]);
+    else
+        XRender::renderTextureFL(x, y, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE, r, g, b);
 }
 
 // render the character select screen
@@ -904,7 +911,7 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
                     act_select_char = false;
                 if(act_select_char && s_menuItem[p] == c)
                 {
-                    Render_PCursor(menu_x - 20, y+c*line, pr, pg, pb);
+                    Render_PCursor(menu_x - 20, y+c*line, p, pr, pg, pb);
 
                     // do the fun player transformation thing!
                     // This WILL switch certain entities back and forth
@@ -1030,7 +1037,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
 
         // show the menu cursor for the player
         if(render && s_menuItem[p] >= 0)
-            Render_PCursor(pX - 20, start_y + (s_menuItem[p]-scroll_start)*line, r, g, b);
+            Render_PCursor(pX - 20, start_y + (s_menuItem[p]-scroll_start)*line, p, r, g, b);
 
         for(int i = scroll_start; i < scroll_end; i++)
         {
@@ -1077,7 +1084,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         int i = 0;
         // show the cursor for the player
         if(render && s_menuItem[p] >= 0)
-            Render_PCursor(pX - 20, pY + (1+s_menuItem[p])*line, r, g, b);
+            Render_PCursor(pX - 20, pY + (1+s_menuItem[p])*line, p, r, g, b);
 
         ret |= Player_MenuItem_Mouse_Render(p, 0, "SET CONTROLS",
             pX, pY+(1)*line, mouse, render);
@@ -1102,7 +1109,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         if(CheckDone() && render)
         {
             SuperPrint(g_mainMenu.playerSelStartGame, 3, pX, pY+2*line);
-            Render_PCursor(pX - 20, pY + 2*line, r, g, b);
+            Render_PCursor(pX - 20, pY + 2*line, p, r, g, b);
         }
         else
         {
@@ -1117,7 +1124,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
             {
                 // show the cursor for the player
                 if(render && s_menuItem[p] >= 0)
-                    Render_PCursor(pX - 20, pY + (2+s_menuItem[p])*line, r, g, b);
+                    Render_PCursor(pX - 20, pY + (2+s_menuItem[p])*line, p, r, g, b);
                 if(g_compatibility.allow_drop_add && numPlayers > s_minPlayers)
                 {
                     // figure out which player would be dropped...
@@ -1146,7 +1153,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
             SuperPrintCenter(Controls::g_InputMethods[p]->Name, 3, cX, pY + line);
 
             // show the menu cursor for the player
-            Render_PCursor(pX - 20, pY + (2+s_menuItem[p])*line, r, g, b);
+            Render_PCursor(pX - 20, pY + (2+s_menuItem[p])*line, p, r, g, b);
         }
 
         // should never be null
