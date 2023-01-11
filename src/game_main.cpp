@@ -1958,7 +1958,7 @@ void DeleteSave(int world, int save)
         auto *f = Files::utf8_fopen(legacySaveLocker.c_str(), "wb");
         if(f)
         {
-            std::fprintf(f, "If this file exists, save%d.sav file is ignored.", save);
+            std::fprintf(f, "If this file exists, the Vanilla \"save%d.sav\" inside the episode folder is ignored.", save);
             std::fclose(f);
         }
     }
