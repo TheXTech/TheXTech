@@ -227,7 +227,7 @@ void LoadGame()
 
     if(Files::fileExists(savePath))
         FileFormats::ReadExtendedSaveFileF(savePath, sav);
-    if(!Files::fileExists(legacySaveLocker) && Files::fileExists(savePathOld))
+    else if(!Files::fileExists(legacySaveLocker) && Files::fileExists(savePathOld))
         FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
     else
     {
