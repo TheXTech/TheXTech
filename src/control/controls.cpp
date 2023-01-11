@@ -216,10 +216,10 @@ const char* InputMethodProfile::GetOptionName(size_t i)
         return "RUMBLE";
     else if(i == CommonOptions::ground_pound_by_alt_run)
         return "GROUND POUND BUTTON";
-    else // if(i == CommonOptions::show_power_status) // ALWAYS TRUE
+    else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
         return "BATTERY STATUS";
-//    else
-//        return nullptr;
+    else
+        return nullptr;
 }
 // get a char* describing the current option value
 // must be allocated in static or instance memory
@@ -246,15 +246,15 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
         else
             return "DOWN";
     }
-    else // if(i == CommonOptions::show_power_status) // ALWAYS TRUE
+    else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
     {
         if(this->m_showPowerStatus)
             return "SHOW";
         else
             return "HIDE";
     }
-//    else
-//        return nullptr;
+    else
+        return nullptr;
 }
 // called when A is pressed; allowed to interrupt main game loop
 bool InputMethodProfile::OptionChange(size_t i)
@@ -285,15 +285,15 @@ bool InputMethodProfile::OptionChange(size_t i)
         this->m_groundPoundByAltRun = !this->m_groundPoundByAltRun;
         return true;
     }
-    else // if(i == CommonOptions::show_power_status) // ALWAYS TRUE
+    else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
     {
         this->m_showPowerStatus = !this->m_showPowerStatus;
         return true;
     }
-//    else
-//    {
-//        return false;
-//    }
+    else
+    {
+        return false;
+    }
 }
 // called when left is pressed
 bool InputMethodProfile::OptionRotateLeft(size_t i)
