@@ -843,7 +843,6 @@ struct WorldLevel_t
     bool Visible = false;
 //End Type
     int64_t Z = 0;
-    int index = 0;
 
 // Display number of stars (if available)
     int curStars = 0;
@@ -945,7 +944,6 @@ struct WorldPath_t
     int Type = 0;
 //End Type
     int64_t Z = 0;
-    int index = 0;
 };
 
 //Public Type WorldMusic 'World Music

@@ -241,7 +241,6 @@ bool OpenWorld(std::string FilePath)
 
         pp = WorldPath_t();
 
-        pp.index = numWorldPaths;
         pp.Location.X = p.x;
         pp.Location.Y = p.y;
         pp.Type = int(p.id);
@@ -274,7 +273,6 @@ bool OpenWorld(std::string FilePath)
 
         ll = WorldLevel_t();
 
-        ll.index = numWorldLevels;
         ll.Location.X = l.x;
         ll.Location.Y = l.y;
         ll.Type = int(l.id);
