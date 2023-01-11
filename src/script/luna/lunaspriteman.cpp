@@ -131,12 +131,13 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest *req, bool center_coords)
                 comp.func = SpriteFunc::PlayerCollectible;
                 spr->AddBehaviorComponent(comp);
 
-                if(str_arg > 21)                        // Add trigger event on death
-                {
-                    comp.func = SpriteFunc::TriggerLunaEvent;
-                    comp.data1 = str_arg;
-                    spr->AddDeathComponent(comp);
-                }
+//                if(str_arg > 21) // Useless condition as it's already true from above
+//                {
+                // Add trigger event on death
+                comp.func = SpriteFunc::TriggerLunaEvent;
+                comp.data1 = str_arg;
+                spr->AddDeathComponent(comp);
+//                }
 
             }
             break;
@@ -148,8 +149,10 @@ void CSpriteManager::InstantiateSprite(CSpriteRequest *req, bool center_coords)
             //spr = new CSprite;
             //TODO: MAKE IT
             spr = nullptr;
-            spr->m_Xpos = req->x;
-            spr->m_Ypos = req->y;
+            // WHO ATTEMPTED TO USE THE NULL POINTER? EXECUTE!
+            // (Joke! It's all my fault that I left this code piece taken from LunaDLL being uncommented)
+            //spr->m_Xpos = req->x;
+            //spr->m_Ypos = req->y;
             break;
         }
 
