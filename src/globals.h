@@ -1130,7 +1130,7 @@ extern bool LevelEditor;
 //Public WorldEditor As Boolean
 extern bool WorldEditor;
 //Public PlayerStart(1 To 2) As Location
-extern RangeArr<Location_t, 1, 2> PlayerStart;
+extern RangeArr<PlayerStart_t, 1, 2> PlayerStart;
 
 //Public blockCharacter(0 To 20) As Boolean
 extern RangeArrI<bool, 0, 20, false> blockCharacter;
