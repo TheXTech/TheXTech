@@ -22,16 +22,10 @@
 #include <math.h>
 #include <Utils/maths.h>
 
-PGE_Fader::PGE_Fader()
-{}
-
 PGE_Fader::PGE_Fader(const PGE_Fader &f)
 {
     this->operator=(f);
 }
-
-PGE_Fader::~PGE_Fader()
-{}
 
 PGE_Fader &PGE_Fader::operator=(const PGE_Fader &f)
 {

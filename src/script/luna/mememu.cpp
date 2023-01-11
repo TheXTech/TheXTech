@@ -274,14 +274,15 @@ SDL_FORCE_INLINE void memToValue(int &target, double value, FIELDTYPE ftype)
         target = static_cast<int32_t>(static_cast<int16_t>(f2i_cast<uint16_t>(value)));
         break;
     case FT_DWORD:
+    case FT_DFLOAT:
         target = static_cast<int32_t>(value);
         break;
     case FT_FLOAT:
         target = static_cast<int32_t>(f2i_cast<float>(value));
         break;
-    case FT_DFLOAT:
-        target = static_cast<int32_t>(value);
-        break;
+//    case FT_DFLOAT: // United with FT_DWORD
+//        target = static_cast<int32_t>(value);
+//        break;
     default: //Don't change
         break;
     }
@@ -846,7 +847,7 @@ protected:
         Value v;
 
         // Normal field
-        v.field_s = field;
+        v.field_s = field; // -V820 // False positive, it's a pointer, not a std::string
         v.type = VT_STRING;
         v.baseType = VT_STRING;
         v.offset = 0;

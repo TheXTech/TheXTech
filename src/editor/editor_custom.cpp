@@ -121,12 +121,16 @@ void ItemType_t::set_adj(const char* sides)
 // implementation for LayoutPod_t
 LayoutPod_t::LayoutPod_t()
 {
+    x = 0;
+    y = 0;
     rows = 0;
     cols = 0;
 }
 
 LayoutPod_t::LayoutPod_t(int rows, int cols)
 {
+    x = 0;
+    y = 0;
     resize(rows, cols);
 }
 

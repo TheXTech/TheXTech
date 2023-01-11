@@ -37,9 +37,6 @@ PGE_Point::PGE_Point(int x, int y)
     m_y = y;
 }
 
-PGE_Point::~PGE_Point()
-{}
-
 void PGE_Point::setPoint(int x, int y)
 {
     m_x = x;

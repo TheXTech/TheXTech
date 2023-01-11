@@ -1938,7 +1938,7 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
     {
         std::string::size_type r = k.find(keyNeed);
 
-        if(r != std::string::npos && r == 0)
+        if(/*r != std::string::npos &&*/ r == 0)
         {
             std::string guid = k.substr(13); // length of "last-profile-"
             int index;
@@ -1962,7 +1962,7 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
     {
         std::string::size_type r = k.find(keyNeed);
 
-        if(r != std::string::npos && r == 0)
+        if(/*r != std::string::npos &&*/ r == 0)
         {
             std::string guid = k.substr(14); // length of "joystick-uuid-"
 
@@ -1971,7 +1971,7 @@ void InputMethodType_Joystick::LoadConfig_Custom(IniProcessing* ctl)
                 continue;
 
             ctl->beginGroup(k);
-            InputMethodProfile_Joystick* profile = new(std::nothrow) InputMethodProfile_Joystick;
+            auto* profile = new(std::nothrow) InputMethodProfile_Joystick;
 
             if(profile)
             {

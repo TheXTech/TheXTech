@@ -25,7 +25,7 @@ void DirListCI::setCurDir(const std::string &path)
 
     if(nPath != m_curDir)
     {
-        m_curDir = nPath;
+        m_curDir = std::move(nPath);
         rescan();
     }
 }
@@ -72,7 +72,7 @@ bool DirListCI::existsCI(const std::string &in_name)
         auto sdName = resolveDirCase(name.substr(0, subDir));
         auto file = name.substr(subDir + 1);
         auto sdf = m_subDirs.find(sdName);
-        std::string found;
+        // std::string found;
 
         if(sdf == m_subDirs.end())
         {
@@ -250,7 +250,7 @@ void DirListCI::rescan()
         uppercase_string.resize(file.length());
         std::transform(file.begin(), file.end(), uppercase_string.begin(),
             [](unsigned char c){ return std::toupper(c); });
-        m_fileMap.insert(std::make_pair(uppercase_string, file));
+        m_fileMap.emplace(std::make_pair(uppercase_string, file));
     }
 
     for(std::string& dir : dirList)
@@ -258,6 +258,6 @@ void DirListCI::rescan()
         uppercase_string.resize(dir.length());
         std::transform(dir.begin(), dir.end(), uppercase_string.begin(),
             [](unsigned char c){ return std::toupper(c); });
-        m_dirMap.insert(std::make_pair(uppercase_string, dir));
+        m_dirMap.emplace(std::make_pair(uppercase_string, dir));
     }
 }

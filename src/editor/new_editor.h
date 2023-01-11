@@ -136,7 +136,7 @@ private:
     // current pages
     SpecialPage_t m_special_page = SPECIAL_PAGE_NONE;
     int m_special_subpage = 0;
-    int m_last_mode;
+    int m_last_mode = 0;
     int m_NPC_page = 0;
     int m_Block_page = 0;
     int m_BGO_page = 0;

@@ -1191,7 +1191,7 @@ void TouchScreenController::processTouchDevice(TouchDevice_t& dev)
                 }
                 else if(fs.heldKey[key]) // set key on and keep alive
                 {
-                    if(!fs.heldKeyPrev[key] && fs.heldKey[key])
+                    if(!fs.heldKeyPrev[key] /*&& fs.heldKey[key]*/) // Already true because of condition from above
                         doVibration(); // Vibrate when key gets on
 
                     updateFingerKeyState(fs, current_keys, key, true, current_extra_keys);
@@ -1257,7 +1257,7 @@ void TouchScreenController::processTouchDevice(TouchDevice_t& dev)
             continue;
         }
 
-        it++;
+        ++it;
     }
 
     if(n_real_fingers > 1 && LevelEditor && !editorScreen.active)
