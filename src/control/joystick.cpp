@@ -634,7 +634,7 @@ StatusInfo InputMethod_Joystick::GetStatus()
 InputMethodProfile_Joystick::InputMethodProfile_Joystick()
 {
     this->InitAsController();
-    this->m_showPowerStatus = g_config.JoystickEnableBatteryStatus;
+    // this->m_showPowerStatus = g_config.JoystickEnableBatteryStatus;
 }
 
 void InputMethodProfile_Joystick::InitAsJoystick()

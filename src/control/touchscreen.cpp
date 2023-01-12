@@ -1719,7 +1719,7 @@ StatusInfo InputMethod_TouchScreen::GetStatus()
 // the job of this function is to initialize the class in a consistent state
 InputMethodProfile_TouchScreen::InputMethodProfile_TouchScreen()
 {
-    this->m_showPowerStatus = g_config.JoystickEnableBatteryStatus;
+    // this->m_showPowerStatus = g_config.JoystickEnableBatteryStatus;
 
 #ifdef __ANDROID__
     if(s_screenSize >= 9.0) // Big tablets
