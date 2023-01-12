@@ -84,7 +84,7 @@ double SavedVariableBank::GetVar(const std::string &key)
 }
 
 // VAR EXISTS
-bool SavedVariableBank::VarExists(std::string k)
+bool SavedVariableBank::VarExists(const std::string &k)
 {
     if(m_VarBank.find(k) == m_VarBank.end())
         return false;

@@ -51,11 +51,79 @@ std::string makeGameSavePath(std::string episode, std::string world, std::string
     return ret;
 }
 
+
+void FindSaves()
+{
+//    std::string newInput;
+    const auto &w = SelectWorld[selWorld];
+    std::string episode = w.WorldPath;
+    GamesaveData f;
+
+    for(auto A = 1; A <= maxSaveSlots; A++)
+    {
+        SaveSlot[A] = -1;
+        SaveStars[A] = 0;
+
+        // Modern gamesave file
+        std::string saveFile = makeGameSavePath(episode,
+                                                w.WorldFile,
+                                                fmt::format_ne("save{0}.savx", A));
+        // Old gamesave location at episode's read-only directory
+        std::string saveFileOld = episode + fmt::format_ne("save{0}.sav", A);
+        // Gamesave locker to make an illusion of absence of the gamesave
+        std::string saveFileOldLocker = makeGameSavePath(w.WorldPath,
+                                                         w.WorldFile,
+                                                         fmt::format_ne("save{0}.nosave", A));
+
+        if((Files::fileExists(saveFile) && FileFormats::ReadExtendedSaveFileF(saveFile, f)) ||
+           (!Files::fileExists(saveFileOldLocker) && Files::fileExists(saveFileOld) && FileFormats::ReadSMBX64SavFileF(saveFileOld, f)))
+        {
+            int curActive = 0;
+            int maxActive = 0;
+
+            // "game beat flag"
+            maxActive++;
+            if(f.gameCompleted)
+                curActive++;
+
+            // How much paths open
+            maxActive += f.visiblePaths.size();
+            for(auto &p : f.visiblePaths)
+            {
+                if(p.second)
+                    curActive++;
+            }
+
+            // How much levels opened
+            maxActive += f.visibleLevels.size();
+            for(auto &p : f.visibleLevels)
+            {
+                if(p.second)
+                    curActive++;
+            }
+
+            // How many stars collected
+            maxActive += (int(f.totalStars) * 4);
+            SaveStars[A] = int(f.gottenStars.size());
+
+            curActive += (SaveStars[A] * 4);
+
+            if(maxActive > 0)
+                SaveSlot[A] = int((float(curActive) / float(maxActive)) * 100);
+            else
+                SaveSlot[A] = 100;
+        }
+    }
+}
+
+
 void SaveGame()
 {
     int A = 0;
+
     if(Cheater)
         return;
+
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
     for(A = numStars; A >= 1; A--)
@@ -72,11 +140,16 @@ void SaveGame()
         }
     }
 
+    const auto &w = SelectWorld[selWorld];
+
     GamesaveData sav;
 //    std::string savePath = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
-    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
-                                            SelectWorld[selWorld].WorldFile,
+    std::string savePath = makeGameSavePath(w.WorldPath,
+                                            w.WorldFile,
                                             fmt::format_ne("save{0}.savx", selSave));
+    std::string legacyGamesaveLocker = makeGameSavePath(w.WorldPath,
+                                                        w.WorldFile,
+                                                        fmt::format_ne("save{0}.nosave", selSave));
 
 //    Open SelectWorld[selWorld].WorldPath + "save" + selSave + ".sav" For Output As #1;
     sav.lives = int(Lives);
@@ -125,6 +198,9 @@ void SaveGame()
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
 
+    if(Files::fileExists(legacyGamesaveLocker))
+        Files::deleteFile(legacyGamesaveLocker); // Remove the gamesave locker of legacy file
+
     // Also, save the speed-running states
     speedRun_saveStats();
 
@@ -137,21 +213,22 @@ void LoadGame()
 {
     int A = 0;
     size_t i = 0;
+    const auto &w = SelectWorld[selWorld];
 //    std::string newInput;
 
     GamesaveData sav;
-    std::string savePath = makeGameSavePath(SelectWorld[selWorld].WorldPath,
-                                            SelectWorld[selWorld].WorldFile,
+    std::string savePath = makeGameSavePath(w.WorldPath,
+                                            w.WorldFile,
                                             fmt::format_ne("save{0}.savx", selSave));
-    std::string savePathOld = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.savx", selSave);
-    std::string savePathAncient = SelectWorld[selWorld].WorldPath + fmt::format_ne("save{0}.sav", selSave);
+    std::string savePathOld = w.WorldPath + fmt::format_ne("save{0}.sav", selSave);
+    std::string legacySaveLocker = makeGameSavePath(w.WorldPath,
+                                                    w.WorldFile,
+                                                    fmt::format_ne("save{0}.nosave", selSave));
 
     if(Files::fileExists(savePath))
         FileFormats::ReadExtendedSaveFileF(savePath, sav);
-    else if(Files::fileExists(savePathOld))
-        FileFormats::ReadExtendedSaveFileF(savePathOld, sav);
-    else if(Files::fileExists(savePathAncient))
-        FileFormats::ReadSMBX64SavFileF(savePathAncient, sav);
+    else if(!Files::fileExists(legacySaveLocker) && Files::fileExists(savePathOld))
+        FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
     else
     {
         pLogDebug("Game save file not found: %s", savePath.c_str());
@@ -207,11 +284,11 @@ void LoadGame()
 
     for(auto &s : sav.characterStates)
     {
-        if(s.id < 1 || s.id > 5)
+        if((s.id < 1) || (s.id > 5))
             continue;
         A = int(s.id);
 
-        if(s.state < 1 || s.state > 10)
+        if((s.state < 1) || (s.state > 10))
             SavedChar[A].State = 1;
         else
             SavedChar[A].State = int(s.state);
@@ -233,13 +310,13 @@ void LoadGame()
         switch(s.mountID)
         {
         case 1:
-            if(s.mountType < 1 || s.mountType > 3)
+            if((s.mountType < 1) || (s.mountType > 3))
                 SavedChar[A].MountType = 1;
             break;
         default:
             break;
         case 3:
-            if(s.mountType < 1 || s.mountType > 8)
+            if((s.mountType < 1) || (s.mountType > 8))
                 SavedChar[A].MountType = 1;
             break;
         }
@@ -344,4 +421,107 @@ void ClearGame(bool punnish)
 
     if(punnish) // Remove gamesave of user who was used a trap cheat
         DeleteSave(selWorld, selSave);
+}
+
+
+void DeleteSave(int world, int save)
+{
+    const auto &w = SelectWorld[world];
+    std::vector<std::string> deleteList;
+
+#define AddFile(f) \
+    deleteList.push_back(makeGameSavePath(w.WorldPath, \
+                                          w.WorldFile,\
+                                          fmt::format_ne(f, save)));
+
+    AddFile("save{0}.savx");
+    AddFile("timers{0}.ini");
+    AddFile("deaths-{0}.rip");
+    AddFile("fails-{0}.rip");
+    AddFile("demos-{0}.dmo");
+
+    // Clear all files in list
+    for(auto &s : deleteList)
+    {
+        if(Files::fileExists(s))
+            Files::deleteFile(s);
+    }
+
+    std::string legacySave = w.WorldPath + fmt::format_ne("save{0}.sav", save);
+    std::string legacySaveLocker = makeGameSavePath(w.WorldPath,
+                                                    w.WorldFile,
+                                                    fmt::format_ne("save{0}.nosave", save));
+
+    // If legacy gamesave file exists, make the locker file to make illusion that old file got been removed
+    if(Files::fileExists(legacySave))
+    {
+        auto *f = Files::utf8_fopen(legacySaveLocker.c_str(), "wb");
+        if(f)
+        {
+            std::fprintf(f, "If this file exists, the Vanilla \"save%d.sav\" inside the episode folder is ignored.", save);
+            std::fclose(f);
+        }
+    }
+
+#undef AddFile
+
+#ifdef __EMSCRIPTEN__
+    AppPathManager::syncFs();
+#endif
+}
+
+
+static void copySaveFile(const SelectWorld_t& w, const char*file_mask, int src, int dst)
+{
+    std::string filePathSrc = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne(file_mask, src));
+    std::string filePathDst = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne(file_mask, dst));
+    Files::copyFile(filePathDst, filePathSrc, true);
+}
+
+void CopySave(int world, int src, int dst)
+{
+    const auto &w = SelectWorld[world];
+
+    std::string savePathSrc = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne("save{0}.savx", src));
+    std::string savePathDst = makeGameSavePath(w.WorldPath,
+                                               w.WorldFile,
+                                               fmt::format_ne("save{0}.savx", dst));
+    std::string legacySaveLocker = makeGameSavePath(w.WorldPath,
+                                                    w.WorldFile,
+                                                    fmt::format_ne("save{0}.nosave", dst));
+
+    if(!Files::fileExists(savePathSrc))
+    {
+        // Attempt to import an old game-save from the episode directory
+        std::string savePathOld = w.WorldPath + fmt::format_ne("save{0}.sav", src);
+
+        GamesaveData sav;
+        bool succ = false;
+
+        if(Files::fileExists(savePathOld))
+            succ = FileFormats::ReadSMBX64SavFileF(savePathOld, sav);
+
+        if(succ)
+            FileFormats::WriteExtendedSaveFileF(savePathSrc, sav);
+
+        if(Files::fileExists(legacySaveLocker))
+            Files::deleteFile(legacySaveLocker);
+    }
+
+    Files::copyFile(savePathDst, savePathSrc, true);
+
+    copySaveFile(w, "timers{0}.ini", src, dst);
+    copySaveFile(w, "fails-{0}.rip", src, dst);
+    copySaveFile(w, "deaths-{0}.rip", src, dst);
+    copySaveFile(w, "demos-{0}.dmo", src, dst);
+
+#ifdef __EMSCRIPTEN__
+    AppPathManager::syncFs();
+#endif
 }

@@ -1822,7 +1822,7 @@ void UpdateBlocks()
                             {
                                 syncLayersTrees_Block_SetHidden(A);
 
-                                if(!b.Hidden)
+                                if(!b.Hidden) // -V547 // False positive: the b.Hidden gets changed inside syncLayersTrees_Block_SetHidden() call
                                     NewEffect(10, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
                             }
                             else

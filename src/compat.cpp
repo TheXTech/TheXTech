@@ -103,6 +103,7 @@ static void compatInit(Compatibility_t &c)
     c.bitblit_background_colour[0] = 0;
     c.bitblit_background_colour[1] = 0;
     c.bitblit_background_colour[2] = 0;
+    c.custom_powerup_collect_score = true;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -140,6 +141,7 @@ static void compatInit(Compatibility_t &c)
         // 1.3.6-1
         c.fix_npc_ceiling_speed = false;
         c.emulate_classic_block_order = true;
+        c.custom_powerup_collect_score = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -320,6 +322,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // 1.3.6-1
         compat.read("fix-npc-ceiling-speed", c.fix_npc_ceiling_speed, c.fix_npc_ceiling_speed);
         compat.read("emulate-classic-block-order", c.emulate_classic_block_order, c.emulate_classic_block_order);
+        // compat.read("custom-powerup-collect-score", c.custom_powerup_collect_score, c.custom_powerup_collect_score);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);

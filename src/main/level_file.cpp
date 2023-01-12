@@ -824,8 +824,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     if(LevelEditor)
     {
         ResetSectionScrolls();
-        curSection = 0; // suppresses SFX and visual feedback
-        SetSection(0);
+        SetSection(curSection);
     }
     else
     {

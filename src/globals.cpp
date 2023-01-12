@@ -80,7 +80,7 @@ int ScreenType = 0;
 int DScreenType = 0;
 bool LevelEditor = false;
 bool WorldEditor = false;
-RangeArr<Location_t, 1, 2> PlayerStart;
+RangeArr<PlayerStart_t, 1, 2> PlayerStart;
 RangeArrI<bool, 0, 20, false> blockCharacter;
 RangeArrI<int, 0, maxPlayers, 0> OwedMount;
 RangeArrI<int, 0, maxPlayers, 0> OwedMountType;
