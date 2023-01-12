@@ -797,6 +797,7 @@ void UpdateGraphics2(bool skipRepaint)
         }
 
         speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
+        speedRun_renderControls(2, -1, SPEEDRUN_ALIGN_RIGHT);
 
         speedRun_renderTimer();
     }

@@ -20,11 +20,15 @@
 
 #include <array>
 
-#include "../globals.h"
-#include "../graphics.h"
-#include "../collision.h"
-#include "../core/render.h"
-#include "../gfx.h"
+#include "globals.h"
+#include "graphics.h"
+#include "collision.h"
+#include "core/render.h"
+#include "gfx.h"
+
+#include "graphics/gfx_keyhole.h"
+
+#include "compat.h"
 
 //! Get left pixel at the player sprite
 int pfrX(const StdPicture& tx, const Player_t& p)
@@ -174,7 +178,7 @@ void DrawPlayer(Player_t &p, const int Z)
                     if(p.Direction == -1)
                         C = p.YoshiTongueLength;
 
-                    XRender::renderTexture(vScreenX[Z] + double(p.YoshiTongueX) - C - 1,
+                    RenderTexturePlayer(Z, vScreenX[Z] + double(p.YoshiTongueX) - C - 1,
                                           vScreenY[Z] + p.YoshiTongue.Y,
                                           p.YoshiTongueLength + 2,
                                           16,
@@ -186,7 +190,7 @@ void DrawPlayer(Player_t &p, const int Z)
                     if(p.Direction == 1)
                         C = 0;
 
-                    XRender::renderTexture(vScreenX[Z] + p.YoshiTongue.X,
+                    RenderTexturePlayer(Z, vScreenX[Z] + p.YoshiTongue.X,
                                           vScreenY[Z] + p.YoshiTongue.Y,
                                           16, 16,
                                           GFX.Tongue[1],
@@ -196,13 +200,13 @@ void DrawPlayer(Player_t &p, const int Z)
                 }
 
                 // Yoshi's Body
-                XRender::renderTexture(vScreenX[Z] + p.Location.X + p.YoshiBX,
+                RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X + p.YoshiBX,
                                       vScreenY[Z] + p.Location.Y + p.YoshiBY,
                                       32, 32,
                                       GFXYoshiB[B], 0, 32 * p.YoshiBFrame, s, s, s);
 
                 // Yoshi's Head
-                XRender::renderTexture(vScreenX[Z] + p.Location.X + p.YoshiTX,
+                RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X + p.YoshiTX,
                                       vScreenY[Z] + p.Location.Y + p.YoshiTY,
                                       32, 32,
                                       GFXYoshiT[B], 0, 32 * p.YoshiTFrame, s, s, s);
@@ -214,7 +218,7 @@ void DrawPlayer(Player_t &p, const int Z)
 
                 //if(!p.Immune2) // Always true because of covered condition above
                 {
-                    XRender::renderTexture(vScreenX[Z] + p.Location.X - 5,
+                    RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X - 5,
                                           vScreenY[Z] + p.Location.Y - 2,
                                           32, 32,
                                           GFXNPC[254],
@@ -223,11 +227,11 @@ void DrawPlayer(Player_t &p, const int Z)
                                           s, s, s);
 //                    if(p.Direction == 1)
 //                    {
-//                        XRender::renderTexture(vScreenX[Z] + p.Location.X - 5, vScreenY[Z] + p.Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 1) * 32, s, s, s);
+//                        RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X - 5, vScreenY[Z] + p.Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 1) * 32, s, s, s);
 //                    }
 //                    else
 //                    {
-//                        XRender::renderTexture(vScreenX[Z] + p.Location.X - 5, vScreenY[Z] + p.Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 3) * 32, s, s, s);
+//                        RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X - 5, vScreenY[Z] + p.Location.Y - 2, 32, 32, GFXNPC[254], 0, (SpecialFrame[9] + 3) * 32, s, s, s);
 //                    }
                 }
             }
@@ -242,7 +246,7 @@ void DrawPlayer(Player_t &p, const int Z)
 
                 if(p.Mount == 0)
                 {
-                    XRender::renderTexture(
+                    RenderTexturePlayer(Z,
                                 vScreenX[Z] + p.Location.X + offX,
                                 vScreenY[Z] + p.Location.Y + offY,
                                 pfrW(tx, p),
@@ -266,7 +270,7 @@ void DrawPlayer(Player_t &p, const int Z)
                             ? -2
                             : 0;
 
-                        XRender::renderTexture(
+                        RenderTexturePlayer(Z,
                                     vScreenX[Z] + p.Location.X + offX,
                                     small_toad_oy_corr + vScreenY[Z] + p.Location.Y + offY,
                                     pfrW(tx, p),
@@ -277,7 +281,7 @@ void DrawPlayer(Player_t &p, const int Z)
                                     s, s, s);
                     }
 
-                    XRender::renderTexture(vScreenX[Z] + p.Location.X + p.Location.Width / 2.0 - 16,
+                    RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X + p.Location.Width / 2.0 - 16,
                                           vScreenY[Z] + p.Location.Y + p.Location.Height - 30,
                                           32, 32,
                                           GFX.Boot[p.MountType],
@@ -287,7 +291,7 @@ void DrawPlayer(Player_t &p, const int Z)
                 }
                 else if(p.Mount == 3)
                 {
-                    XRender::renderTexture(vScreenX[Z] + p.Location.X + offX,
+                    RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X + offX,
                                           vScreenY[Z] + p.Location.Y + offY + p.MountOffsetY,
                                           pfrW(tx, p),
                                           pfrH(tx, p),
@@ -323,7 +327,7 @@ void DrawPlayer(Player_t &p, const int Z)
                         {
                             if(NPCWidthGFX[NPC[p.HoldingNPC].Type] == 0)
                             {
-                                XRender::renderTexture(vScreenX[Z] + NPC[p.HoldingNPC].Location.X + NPCFrameOffsetX[NPC[p.HoldingNPC].Type],
+                                RenderTexturePlayer(Z, vScreenX[Z] + NPC[p.HoldingNPC].Location.X + NPCFrameOffsetX[NPC[p.HoldingNPC].Type],
                                                       vScreenY[Z] + NPC[p.HoldingNPC].Location.Y + NPCFrameOffsetY[NPC[p.HoldingNPC].Type],
                                                       NPC[p.HoldingNPC].Location.Width,
                                                       NPC[p.HoldingNPC].Location.Height,
@@ -333,7 +337,7 @@ void DrawPlayer(Player_t &p, const int Z)
                             }
                             else
                             {
-                                XRender::renderTexture(vScreenX[Z] + NPC[p.HoldingNPC].Location.X + (NPCFrameOffsetX[NPC[p.HoldingNPC].Type] * -NPC[p.HoldingNPC].Direction) - NPCWidthGFX[NPC[p.HoldingNPC].Type] / 2.0 + NPC[p.HoldingNPC].Location.Width / 2.0,
+                                RenderTexturePlayer(Z, vScreenX[Z] + NPC[p.HoldingNPC].Location.X + (NPCFrameOffsetX[NPC[p.HoldingNPC].Type] * -NPC[p.HoldingNPC].Direction) - NPCWidthGFX[NPC[p.HoldingNPC].Type] / 2.0 + NPC[p.HoldingNPC].Location.Width / 2.0,
                                                       vScreenY[Z] + NPC[p.HoldingNPC].Location.Y + NPCFrameOffsetY[NPC[p.HoldingNPC].Type] - NPCHeightGFX[NPC[p.HoldingNPC].Type] + NPC[p.HoldingNPC].Location.Height,
                                                       NPCWidthGFX[NPC[p.HoldingNPC].Type],
                                                       NPCHeightGFX[NPC[p.HoldingNPC].Type],
@@ -356,13 +360,13 @@ void DrawPlayer(Player_t &p, const int Z)
                 {
                     if(p.Direction == 1)
                     {
-                        XRender::renderTexture(vScreenX[Z] + p.Location.X + p.YoshiBX - 12,
+                        RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X + p.YoshiBX - 12,
                                               vScreenY[Z] + p.Location.Y + p.YoshiBY - 16,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s, s, s);
                     }
                     else
                     {
-                        XRender::renderTexture(vScreenX[Z] + p.Location.X + p.YoshiBX + 12,
+                        RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X + p.YoshiBX + 12,
                                               vScreenY[Z] + p.Location.Y + p.YoshiBY - 16,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s, s, s);
                     }
@@ -371,13 +375,13 @@ void DrawPlayer(Player_t &p, const int Z)
                 {
                     if(p.Direction == 1)
                     {
-                        XRender::renderTexture(vScreenX[Z] + p.Location.X - 24,
+                        RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X - 24,
                                               vScreenY[Z] + p.Location.Y + p.Location.Height - 40,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s, s, s);
                     }
                     else
                     {
-                        XRender::renderTexture(vScreenX[Z] + p.Location.X + 16,
+                        RenderTexturePlayer(Z, vScreenX[Z] + p.Location.X + 16,
                                               vScreenY[Z] + p.Location.Y + p.Location.Height - 40,
                                               32, 32, GFX.YoshiWings, 0, 0 + 32 * p.YoshiWingsFrame, s, s, s);
                     }

@@ -104,12 +104,14 @@ static void compatInit(Compatibility_t &c)
     c.bitblit_background_colour[0] = 0;
     c.bitblit_background_colour[1] = 0;
     c.bitblit_background_colour[2] = 0;
+    c.custom_powerup_collect_score = true;
     // 1.3.7
     c.free_level_res = true;
     c.free_world_res = true;
     c.NPC_activate_mode = NPC_activate_modes::smart;
     c.disable_background2_tiling = false;
     c.modern_section_change = true;
+
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
@@ -146,6 +148,7 @@ static void compatInit(Compatibility_t &c)
         // 1.3.6-1
         c.fix_npc_ceiling_speed = false;
         c.emulate_classic_block_order = true;
+        c.custom_powerup_collect_score = false;
         // 1.3.7
         c.free_level_res = false;
         c.free_world_res = false;
@@ -331,6 +334,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // 1.3.6-1
         compat.read("fix-npc-ceiling-speed", c.fix_npc_ceiling_speed, c.fix_npc_ceiling_speed);
         compat.read("emulate-classic-block-order", c.emulate_classic_block_order, c.emulate_classic_block_order);
+        // compat.read("custom-powerup-collect-score", c.custom_powerup_collect_score, c.custom_powerup_collect_score);
         // 1.3.7 (but these will be changed in the Compat update)
         compat.read("free-level-res", c.free_level_res, c.free_level_res);
         compat.read("free-world-res", c.free_world_res, c.free_world_res);

@@ -56,7 +56,7 @@ public:
      * \param key Key
      * \return true if exists
      */
-    bool VarExists(std::string key);
+    bool VarExists(const std::string &key);
 
     /*!
      * \brief Get value of a key, or 0 if key not found

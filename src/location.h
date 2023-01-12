@@ -37,9 +37,37 @@ struct Location_t
     double SpeedX = 0.0;
 //    SpeedY As Double
     double SpeedY = 0.0;
-    //! Initial direction [New-added]
+//End Type
+};
+
+//NEW: 'Holds location information for player start location, including Direction
+struct PlayerStart_t
+{
+//    X As Double
+    double X = 0.0;
+//    Y As Double
+    double Y = 0.0;
+//    Height As Double
+    double Height = 0.0;
+//    Width As Double
+    double Width = 0.0;
+//! Initial direction [New-added]
     int Direction = 1;
 //End Type
+
+    inline PlayerStart_t() = default;
+    inline PlayerStart_t(const Location_t& loc) : X(loc.X), Y(loc.Y), Height(loc.Height), Width(loc.Width) {}
+
+    inline operator Location_t() const
+    {
+        Location_t ret;
+        ret.X = X;
+        ret.Y = Y;
+        ret.Height = Height;
+        ret.Width = Width;
+
+        return ret;
+    }
 };
 
 // creates a temp Location

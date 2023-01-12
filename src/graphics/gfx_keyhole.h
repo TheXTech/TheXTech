@@ -19,17 +19,16 @@
  */
 
 #pragma once
-#ifndef SCREEN_PAUSE_H
-#define SCREEN_PAUSE_H
+#ifndef GFX_KEYHOLE_H
+#define GFX_KEYHOLE_H
 
-namespace PauseScreen
-{
+#include "std_picture.h"
 
-void Init(int plr, bool LegacyPause);
+void RenderKeyhole(int Z);
 
-bool Logic(int plr);
-void Render();
+void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
+                         StdPicture& tex,
+                         int src_x = 0, int src_y = 0,
+                         float r = 1.0f, float g = 1.0f, float b = 1.0f, float a = 1.0f);
 
-} // namespace PauseScreen
-
-#endif // #ifndef SCREEN_PAUSE_H
+#endif // GFX_KEYHOLE_H

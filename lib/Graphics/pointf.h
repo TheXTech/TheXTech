@@ -40,7 +40,7 @@ public:
         m_y = y;
     }
 
-    inline ~PGE_PointF() {}
+    inline ~PGE_PointF() = default;
 
     inline void setPoint(double x, double y)
     {

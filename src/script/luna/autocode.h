@@ -59,6 +59,8 @@ enum AutocodeType
 
     AT_ShowText,                //1:        2: Xpos         3: Ypos         4: Font #   5: Active time  6: Text
     AT_ShowNPCLifeLeft,         //1: NpcID  2: Xpos         3: Ypos         4: Section  5: Active time  6: Base health
+    AT_ShowLevelName,           //1:        2: Xpos         3: Ypos         4: Font #   5: Active time  6:
+    AT_ShowLevelFile,           //1:        2: Xpos         3: Ypos         4: Font #   5: Active time  6:
 
     AT_Trigger,                 //1: Newsec 2: Event        3:              4:          5: Active time  6:
     AT_Timer,                   //1: Target 2: Effect       3: Display Y/N  4: Repeat?  5: Active time  6:

@@ -848,7 +848,6 @@ struct WorldLevel_t
     bool Visible = false;
 //End Type
     int64_t Z = 0;
-    int index = 0;
 
 // Display number of stars (if available)
     int curStars = 0;
@@ -950,7 +949,6 @@ struct WorldPath_t
     int Type = 0;
 //End Type
     int64_t Z = 0;
-    int index = 0;
 };
 
 //Public Type WorldMusic 'World Music
@@ -1135,7 +1133,7 @@ extern bool LevelEditor;
 //Public WorldEditor As Boolean
 extern bool WorldEditor;
 //Public PlayerStart(1 To 2) As Location
-extern RangeArr<Location_t, 1, 2> PlayerStart;
+extern RangeArr<PlayerStart_t, 1, 2> PlayerStart;
 
 //Public blockCharacter(0 To 20) As Boolean
 extern RangeArrI<bool, 0, 20, false> blockCharacter;
@@ -1577,6 +1575,10 @@ extern int LevelMacro;
 
 //Public LevelMacroCounter As Integer
 extern int LevelMacroCounter;
+
+//EXTRA: which BGO caused the key exit?
+extern int LevelMacroWhich;
+
 //Public numJoysticks As Integer
 extern int numJoysticks;
 

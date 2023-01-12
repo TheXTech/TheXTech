@@ -54,6 +54,14 @@ static bool doPlayGrowWithGotItem()
     }
 }
 
+static void s_PowerupScore(NPCRef_t n)
+{
+    if(g_compatibility.custom_powerup_collect_score)
+        MoreScore(NPCScore[n->Type], n->Location);
+    else
+        MoreScore(6, n->Location);
+}
+
 
 inline void RumbleForPowerup(int A)
 {
@@ -341,7 +349,7 @@ void TouchBonus(int A, int B)
                 PlaySound(SFX_GotItem);
             }
             if(NPC[B].Effect != 2)
-                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
+                s_PowerupScore(B);
         }
         else if(NPC[B].Type == 14 || NPC[B].Type == 182 || NPC[B].Type == 183) // Bonus is a fire flower
         {
@@ -377,7 +385,7 @@ void TouchBonus(int A, int B)
                 }
             }
             if(NPC[B].Effect != 2)
-                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
+                s_PowerupScore(B);
         }
         else if(NPC[B].Type == 264 || NPC[B].Type == 277) // Bonus is an ice flower
         {
@@ -414,7 +422,7 @@ void TouchBonus(int A, int B)
                 }
             }
             if(NPC[B].Effect != 2)
-                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
+                s_PowerupScore(B);
         }
         else if(NPC[B].Type == 34) // Bonus is a leaf
         {
@@ -445,7 +453,7 @@ void TouchBonus(int A, int B)
                 }
             }
             if(NPC[B].Effect != 2)
-                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
+                s_PowerupScore(B);
         }
         else if(NPC[B].Type == 169) // Bonus is a Tanooki Suit
         {
@@ -476,7 +484,7 @@ void TouchBonus(int A, int B)
                 }
             }
             if(NPC[B].Effect != 2)
-                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
+                s_PowerupScore(B);
         }
         else if(NPC[B].Type == 170) // Bonus is a Hammer Suit
         {
@@ -507,7 +515,7 @@ void TouchBonus(int A, int B)
                 }
             }
             if(NPC[B].Effect != 2)
-                MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
+                s_PowerupScore(B);
         }
         else if(NPCIsACoin[NPC[B].Type]) // Bonus is a coin
         {

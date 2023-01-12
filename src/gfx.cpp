@@ -143,6 +143,14 @@ bool GFX_t::load()
         m_loadErrors = 0;
     }
 
+    loadImage(PCursor, uiPath + "PCursor");
+
+    if(m_loadErrors > 0)
+    {
+        pLogWarning("Missing new player cursor.");
+        m_loadErrors = 0;
+    }
+
     loadImage(Backdrop, uiPath + "Backdrop");
     loadImage(Backdrop_Border, uiPath + "Backdrop_Border");
 

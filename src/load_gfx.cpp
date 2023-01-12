@@ -1026,6 +1026,10 @@ static void loadCustomUIAssets()
              "EditorIcons",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.EIcons, false, true);
 
+    loadCGFX(uiRoot + "PCursor.png",
+             "PCursor",
+             nullptr, nullptr, GFX.isCustom(ci++), GFX.PCursor, false, true);
+
     loadCGFX(uiRoot + "Backdrop.png",
              "Backdrop",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Backdrop, false, true);

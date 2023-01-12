@@ -150,7 +150,7 @@ inline bool &GetButton(Controls_t &c, size_t i)
     case Buttons::Start:
         return c.Start;
     default:
-        SDL_assert(false);
+        SDL_assert(false); // -V654 // Made especially to fail on abnormal value
         return c.Start;
     }
 }
@@ -238,7 +238,7 @@ inline bool &GetButton(CursorControls_t &c, size_t i)
     case Buttons::CursorLeft:
     case Buttons::CursorRight:
     default:
-        SDL_assert(false);
+        SDL_assert(false); // -V654 // Made especially to fail on abnormal value
         return c.Primary;
     }
 }
@@ -348,7 +348,7 @@ inline bool &GetButton(EditorControls_t &c, size_t i)
     case Buttons::ScrollLeft:
     case Buttons::ScrollRight:
     default:
-        SDL_assert(false);
+        SDL_assert(false); // -V654 // Made especially to fail on abnormal value
         return c.FastScroll;
     }
 }
