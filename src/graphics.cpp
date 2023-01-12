@@ -56,7 +56,7 @@ void ResetCameraPanning()
 
 static void s_ProcessSmallScreenFeatures(int A)
 {
-    if(g_config.small_screen_camera_features && ScreenW < 800)
+    if(g_config.small_screen_camera_features && ScreenW < 800 && !NoTurnBack[Player[A].Section])
     {
         int16_t max_offsetX = 360;
         if(max_offsetX > vScreen[A].Width - Player[A].Location.Width * 4)
