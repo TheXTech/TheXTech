@@ -530,6 +530,8 @@ static void read_status()
         for(int i = 0; i < g_random_calls.size(); i++)
             printf("%p\n", g_random_calls[i]);
 #endif
+        pLogWarning("  Resetting random engine to match.");
+        random_set_ncalls(o_randCalls);
     }
 #ifdef DEBUG_RANDOM_CALLS
     g_random_calls.clear();
