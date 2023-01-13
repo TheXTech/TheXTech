@@ -1577,7 +1577,10 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
         }
     }
 
-    // 2. find first profile appropriate to the controller-ness of the controller
+#if 0
+    // Inappropriate method that causes different types of controllers to share a profile
+
+    // 2. find first profile appropriate to the controller-ness (controller vs joystick) of the controller
     if(!method->Profile)
     {
         for(InputMethodProfile* p_ : this->m_profiles)
@@ -1595,11 +1598,21 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
             }
         }
 
-        // 3. make appropriate new profile (note that allocs could fail, that will be cleaned up later)
-        if(!method->Profile && active_joystick->ctrl)
+        // the following block (2) was previously a backup for this block
+
+    }
+#endif
+
+    // 2. make appropriate new profile (note that allocs could fail, that will be cleaned up later)
+    if(!method->Profile)
+    {
+        if(active_joystick->ctrl)
             method->Profile = this->AddProfile();
-        else if(!method->Profile)
+        else
             method->Profile = this->AddOldJoystickProfile();
+
+        if(method->Profile)
+            method->Profile->Name = SDL_JoystickName(active_joystick->joy);
     }
 
     return (InputMethod*)method;

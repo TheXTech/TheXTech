@@ -173,9 +173,6 @@ public:
     using InputMethodType::Name;
     using InputMethodType::m_profiles;
 
-    const uint8_t *m_JoystickState;
-    int m_JoystickStateSize;
-
     InputMethodType_Joystick();
     ~InputMethodType_Joystick();
 
