@@ -310,6 +310,11 @@ struct table_t
     std::unordered_map<MyRef_t, rect_external> member_rects;
     int first_col_index;
 
+    ~table_t()
+    {
+        clear();
+    }
+
     void query(std::vector<BaseRef_t>& out, const rect_external& rect)
     {
         if(columns.size() == 0)
