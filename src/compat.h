@@ -38,6 +38,7 @@ struct Compatibility_t
     bool fix_player_clip_wall_at_npc;
     bool fix_skull_raft;
     bool fix_char3_escape_shell_surf;
+    bool fix_plant_wobble;
     bool fix_keyhole_framerate;
     // 1.3.5
     bool fix_char5_vehicle_climb;

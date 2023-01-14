@@ -3563,14 +3563,19 @@ void SpecialNPC(int A)
                 NPC[A].Special2 = 4;
                 NPC[A].Special = 70;
             }
+
             if(NPC[A].Special2 == 1)
             {
                 NPC[A].Special += 1;
                 NPC[A].Location.Y -= 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Y = vb6Round(NPC[A].Location.Y);
-                    NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                    if(g_compatibility.fix_plant_wobble)
+                    {
+                        NPC[A].Location.Y = vb6Round(NPC[A].Location.Y);
+                        NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                    }
+
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -3662,7 +3667,9 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height += 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+                    if(g_compatibility.fix_plant_wobble)
+                        NPC[A].Location.Height = NPCHeight[NPC[A].Type];
+
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -3684,7 +3691,9 @@ void SpecialNPC(int A)
                 NPC[A].Location.Height -= 1.5;
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Height = 0;
+                    if(g_compatibility.fix_plant_wobble)
+                        NPC[A].Location.Height = 0;
+
                     NPC[A].Special2 = 4;
                 }
             }
@@ -3729,13 +3738,17 @@ void SpecialNPC(int A)
             else if(NPC[A].Special2 == 1)
             {
                 NPC[A].Special += 1;
+
                 if(NPC[A].Direction == -1)
                     NPC[A].Location.X += 1.5 * NPC[A].Direction;
                 else
                     NPC[A].Location.Width += 1.5 * NPC[A].Direction;
+
                 if(NPC[A].Special >= NPCWidth[NPC[A].Type] * 0.65 + 1)
                 {
-                    NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+                    if(g_compatibility.fix_plant_wobble)
+                        NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+
                     NPC[A].Special2 = 2;
                     NPC[A].Special = 0;
                 }
@@ -3743,6 +3756,7 @@ void SpecialNPC(int A)
             else if(NPC[A].Special2 == 2)
             {
                 NPC[A].Special += 1;
+
                 if(NPC[A].Special >= 50)
                 {
                     NPC[A].Special2 = 3;
@@ -3752,14 +3766,18 @@ void SpecialNPC(int A)
             else if(NPC[A].Special2 == 3)
             {
                 NPC[A].Special += 1;
+
                 if(NPC[A].Direction == -1)
                     NPC[A].Location.X -= 1.5 * NPC[A].Direction;
                 else
                     NPC[A].Location.Width -= 1.5 * NPC[A].Direction;
+
                 if(NPC[A].Special >= NPCWidth[NPC[A].Type] * 0.65 + 1)
                 {
                     NPC[A].Special2 = 4;
-                    NPC[A].Location.Width = 0;
+
+                    if(g_compatibility.fix_plant_wobble)
+                        NPC[A].Location.Width = 0;
                 }
             }
             else if(NPC[A].Special2 == 4)
