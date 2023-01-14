@@ -239,7 +239,7 @@ E_INLINE StdPicture lazyLoadPicture(const std::string &path,
 }
 #endif
 
-#ifdef PGE_MIN_PORT
+#if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
 E_INLINE StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir);
 #endif
 
