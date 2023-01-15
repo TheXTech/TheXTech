@@ -19,6 +19,7 @@
  */
 
 #include "globals.h"
+#include "compat.h"
 #include "effect.h"
 #include "npc.h"
 #include "sound.h"

@@ -132,7 +132,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_vehicle_char_switch = false;
         c.fix_vanilla_checkpoints = false;
         c.fix_autoscroll_speed = false; //-V1048
-        g.fix_submerged_splash_effect = false;
+        c.fix_submerged_splash_effect = false;
         // 1.3.5.1
         c.fix_squid_stomp_effect = false;
         c.fix_special_coin_switch = false;
