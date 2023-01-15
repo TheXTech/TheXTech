@@ -672,7 +672,10 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
             if(fEqual(b.Location.Width, 32)/* && !b.getShrinkResized()*/) // moved check above so that the width is not reset to 32 in the first place
             {
-                b.Location.Width -= 0.1;
+                // make sure Location.Width == 31.9 heuristic works on low-mem builds
+                // b.Location.Width -= 0.1;
+                b.Location.Width = 31.9;
+
                 b.Location.X += 0.05;
                 b.setShrinkResized();
             }
