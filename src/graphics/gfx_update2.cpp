@@ -796,8 +796,10 @@ void UpdateGraphics2(bool skipRepaint)
             SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, alpha);
         }
 
-        speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
-        speedRun_renderControls(2, -1, SPEEDRUN_ALIGN_RIGHT);
+        speedRun_renderControls(1, -1);
+        if(numPlayers >= 2)
+            speedRun_renderControls(2, -1);
+
 
         speedRun_renderTimer();
     }

@@ -1279,7 +1279,7 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
         {
             if(SharedCursor.Move)
-                s_handleMouseMove(4, MenuX, MenuY, MenuX, 30);
+                s_handleMouseMove(4, MenuX, MenuY, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
@@ -1335,7 +1335,7 @@ bool mainMenuUpdate()
                 MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
             if(SharedCursor.Move)
-                s_handleMouseMove(2, MenuX, MenuY, MenuX, 30);
+                s_handleMouseMove(2, MenuX, MenuY, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
@@ -1402,7 +1402,7 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_SELECT_SLOT_1P_DELETE || MenuMode == MENU_SELECT_SLOT_2P_DELETE)
         {
             if(SharedCursor.Move)
-                s_handleMouseMove(2, MenuX, MenuY, MenuX, 30);
+                s_handleMouseMove(2, MenuX, MenuY, 300, 30);
 
             if(MenuCursorCanMove || MenuMouseClick)
             {
@@ -1598,7 +1598,7 @@ bool mainMenuUpdate()
                         PlaySoundMenu(SFX_Do);
                         GameMenu = false;
                         GameOutro = true;
-                        CreditChop = MenuX;
+                        CreditChop = ScreenH / 2;
                         EndCredits = 0;
                         SetupCredits();
                     }

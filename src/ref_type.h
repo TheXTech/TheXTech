@@ -37,7 +37,6 @@ struct BaseRef_t
 
     inline operator int() const { return index; }
     inline operator int16_t() const { return index; }
-    inline operator size_t() const { return index; }
     inline operator bool() const { return *this != nullptr; }
 
     inline BaseRef_t& operator=(const BaseRef_t& o) { index = o.index; return *this; }
@@ -75,7 +74,6 @@ struct Ref_t : public BaseRef_t
 
     inline operator int() const { return index; }
     inline operator int16_t() const { return index; }
-    inline operator size_t() const { return index; }
     inline operator bool() const { return *this != nullptr; }
     inline operator T*() const { return &target[index]; }
     inline operator T&() const { return target[index]; }

@@ -241,7 +241,6 @@ void GetvScreen(const int A)
         }
 
         // there is some 3DS-specific code to ensure the screen boundaries work with the 3D effect, not ported yet.
-        // also to ensure the vScreen boundary occurs on an even pixel
 
         if(vScreen[A].TempDelay > 0)
             vScreen[A].TempDelay -= 1;
@@ -257,12 +256,6 @@ void GetvScreen(const int A)
                 vScreen[A].TempY += 1;
         }
     }
-
-    // keep vScreen boundary even on 3DS
-#ifdef __3DS__
-    vScreenX[A] -= std::fmod(vScreenX[A], 2.);
-    vScreenY[A] -= std::fmod(vScreenY[A], 2.);
-#endif
 }
 
 // NEW: get the vScreen position if it were 800x600, and write the top-left coordinate to (left, top)
@@ -387,12 +380,6 @@ void GetvScreenAverage()
         // on menu, bottom of screen always tracks bottom of level
         vScreenY[A] = -(level[Player[1].Section].Height - vScreen[A].Height);
     }
-
-    // keep vScreen boundary even on 3DS
-#ifdef __3DS__
-    vScreenX[A] -= std::fmod(vScreenX[A], 2.);
-    vScreenY[A] -= std::fmod(vScreenY[A], 2.);
-#endif
 }
 
 // NEW: get the average screen position for all players if it were 800x600, and write the top-left coordinate to (left, top)
@@ -479,11 +466,6 @@ void GetvScreenAverage2()
 
     vScreenX[1] = (vScreenX[1] / B) + (ScreenW * 0.5);
     vScreenY[1] = (vScreenY[1] / B) + (ScreenH * 0.5) - vScreenYOffset;
-
-#ifdef __3DS__
-    vScreenX[1] -= std::fmod(vScreenX[1], 2.);
-    vScreenY[1] -= std::fmod(vScreenY[1], 2.);
-#endif
 }
 
 // NEW: Get the average screen position for all players with no level edge detection if it were 800x600, and write the top-left coordinate to (left, top)

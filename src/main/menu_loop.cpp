@@ -521,7 +521,7 @@ void MenuLoop()
 
     if(SharedCursor.Primary)
     {
-        Location_t cursorLoc = newLoc(SharedCursor.X - vScreenX[1] - vScreen[1].ScreenLeft, SharedCursor.Y - vScreenY[1] - vScreen[1].ScreenTop);
+        const Location_t cursorLoc = newLoc(SharedCursor.X - vScreenX[1] - vScreen[1].ScreenLeft, SharedCursor.Y - vScreenY[1] - vScreen[1].ScreenTop);
         if(iRand(5) >= 2)
         {
             NewEffect(80, cursorLoc);

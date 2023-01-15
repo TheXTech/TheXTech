@@ -3116,8 +3116,6 @@ void MouseMove(float X, float Y, bool /*nCur*/)
 
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
     {
-        Layer[EditorCursor.Layer].OffsetX;
-        Layer[EditorCursor.Layer].OffsetY;
         EditorCursor.Location.X += Layer[EditorCursor.Layer].OffsetX;
         EditorCursor.Location.Y += Layer[EditorCursor.Layer].OffsetY;
     }
