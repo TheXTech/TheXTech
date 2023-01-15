@@ -1165,15 +1165,8 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
                 pX, pY + 2*line, mouse, render);
         Player_MenuItem_Mouse_Render(p, 1, g_mainMenu.phraseTestControls,
             pX, pY + 3*line, mouse, render);
-        if(s_context != Context::MainMenu)
-            Player_MenuItem_Mouse_Render(p, 2, "RECONNECT",
-                pX, pY + 4*line, mouse, render);
-        else if(Controls::g_InputMethods.size() > 1)
-            Player_MenuItem_Mouse_Render(p, 2, g_mainMenu.wordDisconnect,
-                pX, pY + 4*line, mouse, render);
-        else
-            Player_MenuItem_Mouse_Render(p, 2, "RECONNECT",
-                pX, pY + 4*line, mouse, render);
+        Player_MenuItem_Mouse_Render(p, 2, "RECONNECT",
+            pX, pY + 4*line, mouse, render);
     }
 
     // don't process any of the controls stuff when the player is connecting
@@ -1519,14 +1512,20 @@ int Logic()
         if(p >= (int)Controls::g_InputMethods.size()
             || (!Controls::g_InputMethods[p] && s_context != Context::MainMenu))
         {
-            s_playerState[p] = PlayerState::Disconnected;
             s_inputReady[p] = false;
+
+            if(s_playerState[p] != PlayerState::Reconnecting)
+                s_playerState[p] = PlayerState::Disconnected;
+
             continue;
         }
 
         // if player was lost (necessarily on menu screen) remove them
         if(!Controls::g_InputMethods[p])
         {
+            if(s_playerState[p] == PlayerState::Reconnecting)
+                continue;
+
             // if Player is last player, return to previous menu screen
             if(Player_Remove(p))
             {
@@ -1549,17 +1548,16 @@ int Logic()
             {
                 // because P1's UI is shown in 1 player mode on the main menu,
                 // allow the first controller to immediately act upon connection
-                if(p == 0 && s_minPlayers == 1)
+                if(s_playerState[p] == PlayerState::Reconnecting) // requested reconnect
+                {
+                    s_playerState[p] = PlayerState::ControlsMenu;
+                    s_menuItem[p] = 2;
+                    PlaySoundMenu(SFX_Yoshi);
+                }
+                else if(p == 0 && s_minPlayers == 1)
                 {
                     s_inputReady[p] = true;
-                    if(s_playerState[p] == PlayerState::Reconnecting) // requested reconnect
-                    {
-                        s_playerState[p] = PlayerState::ControlsMenu;
-                        s_menuItem[p] = 2;
-                        s_inputReady[p] = false;
-                        PlaySoundMenu(SFX_Yoshi);
-                    }
-                    else if(g_charSelect[p] != 0)
+                    if(g_charSelect[p] != 0)
                     {
                         s_playerState[p] = PlayerState::StartGame;
                         s_menuItem[p] = -4;
@@ -1572,6 +1570,7 @@ int Logic()
                 }
                 else
                 {
+                    PlaySoundMenu(SFX_DropItem);
                     s_menuItem[p] = 0;
                     s_playerState[p] = PlayerState::SelectChar;
                     Player_ValidateChar(p);
@@ -1582,6 +1581,7 @@ int Logic()
                 // this is an Add situation (wouldn't happen if s_context == Context::Reconnect)
                 if(p >= numPlayers)
                 {
+                    PlaySoundMenu(SFX_DropItem);
                     s_menuItem[p] = 0;
                     g_charSelect[p] = 0;
                     s_playerState[p] = PlayerState::SelectChar;
@@ -1591,9 +1591,11 @@ int Logic()
                 {
                     s_playerState[p] = PlayerState::ControlsMenu;
                     s_menuItem[p] = 2;
+                    PlaySoundMenu(SFX_Yoshi);
                 }
                 else
                 {
+                    PlaySoundMenu(SFX_DropItem);
                     s_playerState[p] = PlayerState::DropAddMain;
                     s_menuItem[p] = 0;
                 }
@@ -1604,11 +1606,13 @@ int Logic()
                 {
                     s_playerState[p] = PlayerState::ControlsMenu;
                     s_menuItem[p] = 2;
+                    PlaySoundMenu(SFX_Yoshi);
                 }
                 else
                 {
                     s_playerState[p] = PlayerState::ReconnectMain;
                     s_menuItem[p] = 0;
+                    PlaySoundMenu(SFX_Yoshi);
                 }
             }
             // okay to continue processing them because Controls are now updated
@@ -1761,13 +1765,8 @@ int Logic()
         if(s_playerState[p] == PlayerState::TestControls || s_playerState[p] == PlayerState::ConfirmProfile)
             block_poll = true;
     }
-    if(!block_poll && Controls::PollInputMethod())
-    {
-        if((int)Controls::g_InputMethods.size() > 1 || !(s_context == Context::MainMenu && s_minPlayers == 1))
-        {
-            PlaySoundMenu(SFX_DropItem);
-        }
-    }
+    if(!block_poll)
+        Controls::PollInputMethod();
 
     return ret;
 }
