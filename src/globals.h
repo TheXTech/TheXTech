@@ -767,7 +767,7 @@ struct Block_t
     int IsReally = 0;
 
 // EXTRA: Indicate the fact that block was resized by a hit
-#if 1
+#if LOW_MEM
     inline void setShrinkResized() {}
     inline bool getShrinkResized()
     {
@@ -787,7 +787,7 @@ public:
     }
     inline bool getShrinkResized()
     {
-        return wasShrinkResized;
+        return _wasShrinkResized;
     }
 #endif
 
