@@ -74,13 +74,13 @@ void GetvScreen(const int A)
 //    }
 //    else
     {
-        if(p.Mount == 2)
-            pLoc.Height = 0;
+        double pHeight = (p.Mount != 2) ? pLoc.Height : 0;
+
         // this guard is new because players can now respawn in 1P mode through DropAdd
         if(Player[A].Effect != 6)
         {
             vScreenX[A] = -pLoc.X + (vScreen[A].Width * 0.5) - pLoc.Width / 2.0;
-            vScreenY[A] = -pLoc.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - pLoc.Height;
+            vScreenY[A] = -pLoc.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - pHeight;
             vScreenX[A] += -vScreen[A].tempX;
             vScreenY[A] += -vScreen[A].TempY;
             if(-vScreenX[A] < level[p.Section].X)
@@ -105,8 +105,6 @@ void GetvScreen(const int A)
             if(vScreen[A].TempY < 0)
                 vScreen[A].TempY += 1;
         }
-        if(p.Mount == 2)
-            pLoc.Height = 128;
     }
 }
 
