@@ -768,7 +768,9 @@ struct Block_t
 
 // EXTRA: Indicate the fact that block was resized by a hit
 #if LOW_MEM
+
     inline void setShrinkResized() {}
+
     inline bool getShrinkResized()
     {
         // Because the initial block width is stored as an integer, the only way the width could be 31.9 is if it was shrink-resized from 32.
@@ -777,18 +779,23 @@ struct Block_t
         // If it fails in some case, we can switch to the below implementation, or we could use this implementation only when LOW_MEM is set.
         return Location.Width == 31.9;
     }
+
 #else
+
 private:
-    bool _wasShrinkResized = false;
+    bool m_wasShrinkResized = false;
+
 public:
     inline void setShrinkResized()
     {
-        _wasShrinkResized = true;
+        m_wasShrinkResized = true;
     }
+
     inline bool getShrinkResized()
     {
-        return _wasShrinkResized;
+        return m_wasShrinkResized;
     }
+
 #endif
 
 //End Type
