@@ -3006,6 +3006,15 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     else
         A = 1;
 
+    X -= vScreen[A].Left;
+    Y -= vScreen[A].Top;
+
+    if(MagicHand && EditorCursor.Layer != LAYER_NONE)
+    {
+        X -= Layer[EditorCursor.Layer].OffsetX;
+        Y -= Layer[EditorCursor.Layer].OffsetY;
+    }
+
     if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6 || EditorCursor.Mode == 13 || EditorCursor.Mode == 14 /*|| frmLevelEditor::chkAlign.Value == 0*/)
     {
         EditorCursor.Location.X = double(X) - vScreenX[A];
@@ -3094,8 +3103,6 @@ void MouseMove(float X, float Y, bool /*nCur*/)
             PositionCursor();
         }
     }
-    EditorCursor.Location.X += -vScreen[A].Left;
-    EditorCursor.Location.Y += -vScreen[A].Top;
 //    if(nPlay.Online == true && nCur == true)
 //    {
 //        if(nPlay.Mode == 0)
@@ -3106,6 +3113,12 @@ void MouseMove(float X, float Y, bool /*nCur*/)
 //            Netplay::sendData std::string("f") + "0|" + std::to_string(X) - vScreenX(A) + "|" + std::to_string(Y) - vScreenY(A); // Netplay
 //        }
 //    }
+
+    if(MagicHand && EditorCursor.Layer != LAYER_NONE)
+    {
+        EditorCursor.Location.X += Layer[EditorCursor.Layer].OffsetX;
+        EditorCursor.Location.Y += Layer[EditorCursor.Layer].OffsetY;
+    }
 }
 
 void ResetNPC(int A)
