@@ -509,6 +509,7 @@ int PauseGame(PauseCode code, int plr)
         Player[i].UnStart = false;
         Player[i].CanJump = false;
     }
+    MenuCursorCanMove = false;
 
     XWindow::showCursor(prev_cursor);
 
