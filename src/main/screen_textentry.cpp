@@ -397,6 +397,12 @@ void Insert(const char* c, int size)
 
 void Insert(const char* c)
 {
+    // don't allow keyboard insertions until event loop has properly started
+    // (this is the input repetition timer, which is initialized first time
+    // no input is pressed.)
+    if(s_timer < 0)
+        return;
+
     Insert(c, SDL_strlen(c));
 }
 
