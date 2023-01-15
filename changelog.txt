@@ -25,6 +25,7 @@ Changelog for 1.3.6.1
 -An uncolored PCursor.png is now automatically colored and used for indicating player menu selections; MCursor0.png and MCursor3.png are used as fallbacks. (@ds-sloth)
 -The pause menu cursor is now colored based on which player is in control of the pause menu. (@ds-sloth)
 -If controller inputs are displayed onscreen, Player 2's controller is now shown at the world map screen. (@ds-sloth, @0lhi)
+-Controls: don't continuously rumble on player hurt after getting level exit NPC. (@ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)
