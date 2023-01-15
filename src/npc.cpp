@@ -474,7 +474,7 @@ void NPCSpecial(int A)
             }
         }
 
-        // ====== TODO: Is this dead code really needed? ==============
+        // this block had no effect because the inner `tempBool = True` was commented in the original VB6 code
 #if 0
         if(!tempBool)
         {
