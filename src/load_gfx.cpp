@@ -232,7 +232,7 @@ static void loadCGFX(const std::string &origPath,
     }
 }
 
-#ifdef PGE_MIN_PORT
+#if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
 /*!
  * \brief Load the custom GFX from a load list
  * \param f The load list
@@ -543,7 +543,7 @@ bool LoadGFXFromList(std::string source_dir, bool custom, bool skip_world)
     return true;
 }
 
-#endif // #ifdef PGE_MIN_PORT
+#endif // #if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
 
 static void restoreLevelBackupTextures()
 {
@@ -607,7 +607,7 @@ static inline void s_find_image(std::string& dest, DirListCI& CurDir, std::strin
 
 void LoadGFX()
 {
-#ifdef PGE_MIN_PORT
+#if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
     if(LoadGFXFromList(getGfxDir(), false, false))
         return;
 #endif
@@ -1034,7 +1034,7 @@ void LoadCustomGFX(bool include_world)
 
     loadCustomUIAssets();
 
-#ifdef PGE_MIN_PORT
+#if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
     bool success = LoadGFXFromList(g_dirEpisode.getCurDir(), true, !include_world);
     success |= LoadGFXFromList(g_dirCustom.getCurDir(), true, !include_world);
     if(success)

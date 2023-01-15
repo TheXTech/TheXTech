@@ -207,7 +207,15 @@ static void read_header()
         pLogCritical("Record file is invalid! (version below than minimally supported: %d)", recordVersion);
 
     fgets(buffer, 1024, replay_file); // game version / commit
+
+    pLogDebug("Recording made with %s", buffer);
+
     fscanf(replay_file, "CompatLevel %d\r\n", &n); // compatibility mode
+
+    pLogDebug("  at compat level %d", n);
+
+    if(n == 3)
+        n = 2;
 
     CompatSetEnforcedLevel(n);
 
@@ -522,6 +530,8 @@ static void read_status()
         for(int i = 0; i < g_random_calls.size(); i++)
             printf("%p\n", g_random_calls[i]);
 #endif
+        pLogWarning("  Resetting random engine to match.");
+        random_set_ncalls(o_randCalls);
     }
 #ifdef DEBUG_RANDOM_CALLS
     g_random_calls.clear();

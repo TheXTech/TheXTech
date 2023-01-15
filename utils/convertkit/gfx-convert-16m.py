@@ -61,7 +61,7 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
         else:
             downscale = "-sample 50%"
 
-        if not REDO and not is_fonts_dir and (os.path.isfile(destfn) or os.path.isfile(destfn+'.wav') or ((fn.endswith('.gif') or fn.endswith('.png')) and os.path.isfile(tplfn))): continue
+        if not REDO and not is_fonts_dir and (os.path.isfile(destfn) or os.path.isfile(destfn+'.wav') or ((fn.endswith('.gif') or fn.endswith('.png')) and os.path.isfile(dsgfn))): continue
 
         is_image = fn.endswith('.png') or fn.endswith('.gif')
         if fn.startswith('link') and is_image:
@@ -104,19 +104,19 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
             continue
         elif fn.endswith('.ogg') and '/sound/' in rfn:
             # os.system(f'ffmpeg -i "{rfn}" "{destfn}.wav"')
-            os.system(f'ffmpeg -i "{rfn}" -acodec pcm_u8 -ar 16000 "{destfn}.wav"')
+            # os.system(f'ffmpeg -i "{rfn}" -acodec pcm_u8 -ar 16000 "{destfn}.wav"')
             continue
         elif is_fonts_dir and fn.endswith('.ini'):
             shutil.copy(rfn, destfn)
             os.system(f'sed \'s/\\.png/\\.dsg/\' -i "{destfn}"')
             continue
         elif fn == 'sounds.ini':
-            shutil.copy(rfn, destfn)
-            os.system(f'sed \'s/\\.ogg"/\\.ogg.wav"/\' -i "{destfn}"')
+            # shutil.copy(rfn, destfn)
+            # os.system(f'sed \'s/\\.ogg"/\\.ogg.wav"/\' -i "{destfn}"')
             continue
         elif fn.endswith('.mp3'):
-            os.system(f'ffmpeg -i "{rfn}" -aq 1 "{destfn}.ogg"')
-            shutil.move(destfn+'.ogg', destfn)
+            # os.system(f'ffmpeg -i "{rfn}" -aq 1 "{destfn}.ogg"')
+            # shutil.move(destfn+'.ogg', destfn)
             continue
         else:
             shutil.copy(rfn, destfn)

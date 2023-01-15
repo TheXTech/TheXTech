@@ -2441,10 +2441,11 @@ void UpdatePlayer()
                                                             NPC[-A].Special2 = BlockSlope[Block[B].Type];
                                                             Player[A].StandingOnNPC = -A;
                                                             movingBlock = true;
+                                                            // NOTE: Here was a bug that makes compare bool with 0 is always false
                                                             if(
-                                                                // NOTE: Here was a bug that makes compare bool with 0 is always false
-                                                                    (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX < 0 &&
-                                                                     BlockSlope[Block[B].Type] < 0) ||
+                                                                    (g_compatibility.fix_player_slope_speed &&
+                                                                     Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX < 0 &&
+                                                                     BlockSlope[Block[B].Type]/*)*/ < 0) ||
                                                                     (Player[A].Location.SpeedX - NPC[Player[A].StandingOnNPC].Location.SpeedX > 0 &&
                                                                      BlockSlope[Block[B].Type] > 0)
                                                                     )

@@ -55,6 +55,8 @@ static void compatInit(Compatibility_t &c)
         }
     }
 
+    c.fix_restored_block_move = true;
+    c.fix_player_slope_speed = true;
     // 1.3.4
     c.enable_last_warp_hub_resume = true;
     c.fix_platforms_acceleration = true;
@@ -69,12 +71,15 @@ static void compatInit(Compatibility_t &c)
     c.fix_player_clip_wall_at_npc = true;
     c.fix_skull_raft = true;
     c.fix_char3_escape_shell_surf = true;
+    c.fix_plant_wobble = true;
+    c.fix_powerup_lava_bug = true;
     c.fix_keyhole_framerate = true;
     // 1.3.5
     c.fix_char5_vehicle_climb = true;
     c.fix_vehicle_char_switch = true;
     c.fix_vanilla_checkpoints = true;
     c.fix_autoscroll_speed = false;
+    c.fix_submerged_splash_effect = true;
     // 1.3.5.1
     c.fix_squid_stomp_effect = true;
     c.fix_special_coin_switch = true;
@@ -108,6 +113,9 @@ static void compatInit(Compatibility_t &c)
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
+        c.fix_restored_block_move = false;
+        c.fix_player_slope_speed = false;
+        // 1.3.4
         c.enable_last_warp_hub_resume = false;
         c.fix_platforms_acceleration = false;
         c.fix_npc247_collapse = false;
@@ -117,6 +125,8 @@ static void compatInit(Compatibility_t &c)
         c.fix_climb_bgo_speed_adding = false;
         c.enable_climb_bgo_layer_move = false;
         c.fix_skull_raft = false;
+        c.fix_plant_wobble = false;
+        c.fix_powerup_lava_bug = false;
         c.fix_char3_escape_shell_surf = false;
         // 1.3.5
         c.fix_keyhole_framerate = false;
@@ -124,6 +134,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_vehicle_char_switch = false;
         c.fix_vanilla_checkpoints = false;
         c.fix_autoscroll_speed = false; //-V1048
+        c.fix_submerged_splash_effect = false;
         // 1.3.5.1
         c.fix_squid_stomp_effect = false;
         c.fix_special_coin_switch = false;
@@ -266,6 +277,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.beginGroup("compatibility");
     if(s_compatLevel < COMPAT_SMBX2) // Ignore options are still not been fixed at the SMBX2
     {
+        compat.read("fix-restored-block-move", c.fix_restored_block_move, c.fix_restored_block_move);
+        compat.read("fix-player-slope-speed", c.fix_player_slope_speed, c.fix_player_slope_speed);
         // 1.3.4
         compat.read("enable-last-warp-hub-resume", c.enable_last_warp_hub_resume, c.enable_last_warp_hub_resume);
         compat.read("fix-platform-acceleration", c.fix_platforms_acceleration, c.fix_platforms_acceleration);
@@ -279,6 +292,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-skull-raft", c.fix_skull_raft, c.fix_skull_raft);
         compat.read("fix-peach-escape-shell-surf", c.fix_char3_escape_shell_surf, c.fix_char3_escape_shell_surf);// DEPRECATED since 1.3.6
         deprecatedWarning(compat, "fix-peach-escape-shell-surf", "fix-char3-escape-shell-surf");
+        compat.read("fix-plant-wobble", c.fix_plant_wobble, c.fix_plant_wobble);
+        compat.read("fix-powerup-lava-bug", c.fix_powerup_lava_bug, c.fix_powerup_lava_bug);
         compat.read("fix-keyhole-framerate", c.fix_keyhole_framerate, c.fix_keyhole_framerate);
         // 1.3.5
         compat.read("fix-link-clowncar-fairy", c.fix_char5_vehicle_climb, c.fix_char5_vehicle_climb);// DEPRECATED since 1.3.6
@@ -288,6 +303,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("enable-multipoints", c.fix_vanilla_checkpoints, c.fix_vanilla_checkpoints);// DEPRECATED since 1.3.6
         deprecatedWarning(compat, "enable-multipoints", "fix-vanilla-checkpoints");
         compat.read("fix-autoscroll-speed", c.fix_autoscroll_speed, c.fix_autoscroll_speed);
+        compat.read("fix-submerged-splash-effect", c.fix_submerged_splash_effect, c.fix_submerged_splash_effect);
         // 1.3.5.1
         compat.read("fix-blooper-stomp-effect", c.fix_squid_stomp_effect, c.fix_squid_stomp_effect);// DEPRECATED since 1.3.6
         deprecatedWarning(compat, "fix-blooper-stomp-effect", "fix-squid-stomp-effect");
