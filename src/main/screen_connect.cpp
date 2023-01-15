@@ -1247,6 +1247,9 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
 
 int Mouse_Render(bool mouse, bool render)
 {
+    int MenuX, MenuY;
+    GetMenuPos(&MenuX, &MenuY);
+
     if(mouse && !SharedCursor.Move && !render && !SharedCursor.Primary && !SharedCursor.Secondary)
         return 0;
 
@@ -1342,6 +1345,17 @@ int Mouse_Render(bool mouse, bool render)
         sW = p_width*n;
     }
 
+    /*------------------------------------*\
+    || Special modifications for P1 start ||
+    \*------------------------------------*/
+    if(s_context == Context::MainMenu && s_minPlayers == 1)
+    {
+        sX = MenuX;
+        sW = 200;
+        sY = MenuY;
+    }
+
+
     if(render && !(s_context == Context::MainMenu && s_minPlayers == 1))
     {
         XRender::renderRect(sX, sY - (line-16), p_width*n, line*max_line + line-16, 0, 0, 0, .5);
@@ -1355,8 +1369,8 @@ int Mouse_Render(bool mouse, bool render)
     {
         if(s_context == Context::MainMenu && s_minPlayers == 1)
         {
-            SuperPrint(g_mainMenu.main1PlayerGame, 3, 300, 280, 1.0f, 0.3f, 0.3f);
-            SuperPrint(SelectWorld[selWorld].WorldName, 3, 300, 310, 0.6f, 1.f, 1.f);
+            SuperPrint(g_mainMenu.main1PlayerGame, 3, MenuX, MenuY - 70, 1.0f, 0.3f, 0.3f);
+            SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
         }
         else if(s_context == Context::MainMenu)
             SuperPrintScreenCenter(g_mainMenu.charSelTitle, 3, sY);
@@ -1369,7 +1383,7 @@ int Mouse_Render(bool mouse, bool render)
     if(s_context == Context::MainMenu && s_minPlayers == 1)
     {
         if(s_playerState[0] == PlayerState::Disconnected || s_playerState[0] == PlayerState::SelectChar)
-            Chars_Mouse_Render(300, 200, 350, 150, mouse, render);
+            Chars_Mouse_Render(MenuX, 200, MenuY, 150, mouse, render);
     }
     else
         Chars_Mouse_Render(sX, sW, sY+line*2, line*5, mouse, render);
@@ -1416,23 +1430,34 @@ int Mouse_Render(bool mouse, bool render)
             // reconnecting
             if(s_playerState[p] == PlayerState::Reconnecting)
             {
-                XRender::renderRect(250, 350, 300, 200, 0, 0, 0, 0.5);
-                if(BlockFlash < 45)
-                    SuperPrintScreenCenter(g_mainMenu.phrasePressAButton, 3, 440);
+                if(render)
+                {
+                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, 0, 0, 0, 0.5);
+                    if(BlockFlash < 45)
+                        SuperPrintScreenCenter(g_mainMenu.phrasePressAButton, 3, MenuY + 90);
+                }
             }
             else if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::SelectChar)
             {
-                Player_Mouse_Render(p, 300, 400, 420, 30, mouse, render);
+                Player_Mouse_Render(p, MenuX, ScreenW / 2, MenuY + 70, 30, mouse, render);
             }
             else if(s_playerState[p] == PlayerState::ControlsMenu || s_playerState[p] == PlayerState::TestControls)
             {
-                XRender::renderRect(250, 350, 300, 200, 0, 0, 0, 0.5);
-                Player_Mouse_Render(p, 300, 400, 350, 30, mouse, render);
+                int l = ScreenW/2 - 150;
+                if(l < 0)
+                    l = 0;
+                if(render)
+                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, 0, 0, 0, 0.5);
+                Player_Mouse_Render(p, l + 24, ScreenW / 2, MenuY, 30, mouse, render);
             }
             else
             {
-                XRender::renderRect(250, 350, 300, 200, 0, 0, 0, 0.5);
-                Player_Mouse_Render(p, 300, 400, 380, 30, mouse, render);
+                int l = ScreenW/2 - 150;
+                if(l < 0)
+                    l = 0;
+                if(render)
+                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, 0, 0, 0, 0.5);
+                Player_Mouse_Render(p, l + 24, ScreenW / 2, MenuY + 30, 30, mouse, render);
             }
         }
         else
