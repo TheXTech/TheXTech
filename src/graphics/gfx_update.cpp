@@ -1372,8 +1372,9 @@ void UpdateGraphics(bool skipRepaint)
                 {
                     g_stats.renderedBlocks++;
                     // Don't show a visual difference of hit-resized block in a comparison to original state
-                    double offX = block.wasShrinkResized ? 0.05 : 0.0;
-                    double offW = block.wasShrinkResized ? 0.1 : 0.0;
+                    bool wasShrinkResized = block.getShrinkResized();
+                    double offX = wasShrinkResized ? 0.05 : 0.0;
+                    double offW = wasShrinkResized ? 0.1 : 0.0;
                     XRender::renderTexture(vScreenX[Z] + block.Location.X - offX,
                                           vScreenY[Z] + block.Location.Y + block.ShakeY3,
                                           block.Location.Width + offW,
@@ -1979,8 +1980,9 @@ void UpdateGraphics(bool skipRepaint)
                 {
                     g_stats.renderedBlocks++;
                     // Don't show a visual difference of hit-resized block in a comparison to original state
-                    double offX = block.wasShrinkResized ? 0.05 : 0.0;
-                    double offW = block.wasShrinkResized ? 0.1 : 0.0;
+                    bool wasShrinkResized = block.getShrinkResized();
+                    double offX = wasShrinkResized ? 0.05 : 0.0;
+                    double offW = wasShrinkResized ? 0.1 : 0.0;
                     XRender::renderTexture(vScreenX[Z] + block.Location.X - offX,
                                           vScreenY[Z] + block.Location.Y + block.ShakeY3,
                                           block.Location.Width + offW,

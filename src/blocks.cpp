@@ -551,7 +551,10 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         {
             b.Type = newBlock;
             b.Location.Height = BlockHeight[newBlock];
-            b.Location.Width = BlockWidth[newBlock];
+
+            // Doing this check here keeps the easy bonus pickup. -- ds-sloth
+            if(!g_compatibility.fix_restored_block_move || !b.getShrinkResized())
+                b.Location.Width = BlockWidth[newBlock];
         }
 
 #if 0 // Completely disable the DEAD the code that spawns the player
@@ -667,11 +670,14 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             nn.Location.Width = NPCWidth[C];
 
             // Make block a bit smaller to allow player take a bonus easier (Redigit's idea)
-            if(fEqual(b.Location.Width, 32) && !b.wasShrinkResized)
+            if(fEqual(b.Location.Width, 32)/* && !b.getShrinkResized()*/) // moved check above so that the width is not reset to 32 in the first place
             {
-                b.Location.Width -= 0.1;
+                // make sure Location.Width == 31.9 heuristic works on low-mem builds
+                // b.Location.Width -= 0.1;
+                b.Location.Width = 31.9;
+
                 b.Location.X += 0.05;
-                b.wasShrinkResized = true; // Don't move it!!!
+                b.setShrinkResized();
             }
 
             nn.Location.Height = 0;
