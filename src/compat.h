@@ -47,6 +47,7 @@ struct Compatibility_t
     bool fix_vehicle_char_switch;
     bool fix_vanilla_checkpoints;
     bool fix_autoscroll_speed;
+    bool fix_submerged_splash_effect;
     // 1.3.5.1
     bool fix_squid_stomp_effect;
     bool fix_special_coin_switch;

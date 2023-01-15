@@ -78,6 +78,7 @@ static void compatInit(Compatibility_t &c)
     c.fix_vehicle_char_switch = true;
     c.fix_vanilla_checkpoints = true;
     c.fix_autoscroll_speed = false;
+    c.fix_submerged_splash_effect = true;
     // 1.3.5.1
     c.fix_squid_stomp_effect = true;
     c.fix_special_coin_switch = true;
@@ -131,6 +132,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_vehicle_char_switch = false;
         c.fix_vanilla_checkpoints = false;
         c.fix_autoscroll_speed = false; //-V1048
+        g.fix_submerged_splash_effect = false;
         // 1.3.5.1
         c.fix_squid_stomp_effect = false;
         c.fix_special_coin_switch = false;
@@ -298,6 +300,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("enable-multipoints", c.fix_vanilla_checkpoints, c.fix_vanilla_checkpoints);// DEPRECATED since 1.3.6
         deprecatedWarning(compat, "enable-multipoints", "fix-vanilla-checkpoints");
         compat.read("fix-autoscroll-speed", c.fix_autoscroll_speed, c.fix_autoscroll_speed);
+        compat.read("fix-submerged-splash-effect", c.fix_submerged_splash_effect, c.fix_submerged_splash_effect);
         // 1.3.5.1
         compat.read("fix-blooper-stomp-effect", c.fix_squid_stomp_effect, c.fix_squid_stomp_effect);// DEPRECATED since 1.3.6
         deprecatedWarning(compat, "fix-blooper-stomp-effect", "fix-squid-stomp-effect");

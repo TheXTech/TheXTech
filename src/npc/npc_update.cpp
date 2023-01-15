@@ -799,7 +799,7 @@ void UpdateNPCs()
                         {
                             if(NPC[A].Wet == 0 && !NPCIsACoin[NPC[A].Type])
                             {
-                                if(NPC[A].Location.SpeedY >= 1 && !CheckCollisionIntersect(NPC[A].Location, Water[B].Location))
+                                if(NPC[A].Location.SpeedY >= 1 && (!g_compatibility.fix_submerged_splash_effect || !CheckCollisionIntersect(NPC[A].Location, Water[B].Location)))
                                 {
                                     tempLocation.Width = 32;
                                     tempLocation.Height = 32;
