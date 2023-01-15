@@ -1005,6 +1005,10 @@ InputMethod* PollInputMethod() noexcept
     else
         g_InputMethods.push_back(new_method);
 
+    // if a profile has already been assigned, activate any hooks possible
+    if(new_method->Profile)
+        SetInputMethodProfile(player_no, new_method->Profile);
+
     // try a number of ways of assigning a profile if one has not already been assigned
     std::vector<InputMethodProfile*> profiles = new_method->Type->GetProfiles();
 

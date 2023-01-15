@@ -19,6 +19,7 @@
  */
 
 #include "globals.h"
+#include "compat.h"
 #include "effect.h"
 #include "npc.h"
 #include "sound.h"
@@ -1091,8 +1092,9 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
                 auto &b = Background[B];
                 if(b.Type == 82 || b.Type == 26 || b.Type == 65 || b.Type == 159 || b.Type == 166 || b.Type == 168)
                 {
+                    // note: NOT a reference
                     auto t = b.Location;
-                    if(t.Height > 8)
+                    if(t.Height > 8 && g_compatibility.fix_submerged_splash_effect)
                         t.Height = 8; // Limit the height
                     if(CheckCollision(ne.Location, t))
                     {

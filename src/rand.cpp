@@ -58,6 +58,16 @@ long random_ncalls()
     return g_random_n_calls;
 }
 
+void random_set_ncalls(long ncalls)
+{
+    g_random_engine.seed(last_seed);
+
+    for(long i = 0; i < ncalls; i++)
+        g_random_engine();
+
+    g_random_n_calls = ncalls;
+}
+
 // Also note that many VB6 calls use dRand * x
 // and then assign the result to an Integer.
 // The result is NOT iRand(x) but rather vb6Round(dRand()*x),

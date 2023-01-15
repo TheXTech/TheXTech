@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "compat.h"
+
 #include "../globals.h"
 #include "../npc.h"
 #include "../sound.h"
@@ -2077,13 +2079,19 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.SpeedY = -5;
             NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height - 0.01;
         }
-        else if(B == 6)
+        // B == 6 - touched a lava block, C is a block, not NPC!!!
+        else if(B == 6 && g_compatibility.fix_powerup_lava_bug)
         {
             NPC[A].Killed = B;
         }
-        else if(B == 5 || B == 4)
+        else if(B == 6 && C > maxNPCs)
         {
-            // B == 6 - touched a lava block, C is a block, not NPC!!!
+            pLogWarning("SMBX64 engine would have crashed on illegal index to NPC %d (maximum legal index %d)", C, maxNPCs);
+            NPC[A].Killed = B;
+        }
+        // B == 6 - old behavior, access index C as an NPC
+        else if(B == 6 || B == 5 || B == 4)
+        {
             if(!(NPC[C].Type == 13 || NPC[C].Type == 108 || NPC[C].Type == 171 || NPCIsVeggie[NPC[C].Type]))
                 NPC[A].Killed = B;
         }

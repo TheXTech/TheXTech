@@ -50,6 +50,11 @@ extern int readSeed();
 extern long random_ncalls();
 
 /**
+ * @brief Resets the random state to simulate the requested number of calls since the seed was set
+ */
+extern void random_set_ncalls(long ncalls);
+
+/**
  * @brief Random number generator in double format, between 0.0 to 1.0 (exclusive)
  * @return random double value
  */

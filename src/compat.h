@@ -32,6 +32,7 @@ enum class NPC_activate_modes : int
 
 struct Compatibility_t
 {
+    bool fix_player_slope_speed;
     // 1.3.4
     bool enable_last_warp_hub_resume;
     bool fix_npc247_collapse;
@@ -46,12 +47,15 @@ struct Compatibility_t
     bool fix_player_clip_wall_at_npc;
     bool fix_skull_raft;
     bool fix_char3_escape_shell_surf;
+    bool fix_plant_wobble;
+    bool fix_powerup_lava_bug;
     bool fix_keyhole_framerate;
     // 1.3.5
     bool fix_char5_vehicle_climb;
     bool fix_vehicle_char_switch;
     bool fix_vanilla_checkpoints;
     bool fix_autoscroll_speed;
+    bool fix_submerged_splash_effect;
     // 1.3.5.1
     bool fix_squid_stomp_effect;
     bool fix_special_coin_switch;
