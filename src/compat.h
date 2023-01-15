@@ -24,6 +24,7 @@
 
 struct Compatibility_t
 {
+    bool fix_player_slope_speed;
     // 1.3.4
     bool enable_last_warp_hub_resume;
     bool fix_npc247_collapse;

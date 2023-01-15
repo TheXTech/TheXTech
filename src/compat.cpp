@@ -55,6 +55,7 @@ static void compatInit(Compatibility_t &c)
         }
     }
 
+    c.fix_player_slope_speed = true;
     // 1.3.4
     c.enable_last_warp_hub_resume = true;
     c.fix_platforms_acceleration = true;
@@ -110,6 +111,8 @@ static void compatInit(Compatibility_t &c)
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
     {
+        c.fix_player_slope_speed = false;
+        // 1.3.4
         c.enable_last_warp_hub_resume = false;
         c.fix_platforms_acceleration = false;
         c.fix_npc247_collapse = false;
@@ -270,6 +273,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
     compat.beginGroup("compatibility");
     if(s_compatLevel < COMPAT_SMBX2) // Ignore options are still not been fixed at the SMBX2
     {
+        compat.read("fix-player-slope-speed", c.fix_player_slope_speed, c.fix_player_slope_speed);
         // 1.3.4
         compat.read("enable-last-warp-hub-resume", c.enable_last_warp_hub_resume, c.enable_last_warp_hub_resume);
         compat.read("fix-platform-acceleration", c.fix_platforms_acceleration, c.fix_platforms_acceleration);
