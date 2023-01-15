@@ -32,6 +32,7 @@ enum class NPC_activate_modes : int
 
 struct Compatibility_t
 {
+    bool fix_restored_block_move; // don't move powerup blocks to the right when they are hit after restoring
     bool fix_player_slope_speed;
     // 1.3.4
     bool enable_last_warp_hub_resume;
@@ -47,8 +48,8 @@ struct Compatibility_t
     bool fix_player_clip_wall_at_npc;
     bool fix_skull_raft;
     bool fix_char3_escape_shell_surf;
-    bool fix_plant_wobble;
-    bool fix_powerup_lava_bug;
+    bool fix_plant_wobble; // improves visual appearance of plants
+    bool fix_powerup_lava_bug; // powerups always die when hitting lava, instead of checking the types of arbitrary NPCs
     bool fix_keyhole_framerate;
     // 1.3.5
     bool fix_char5_vehicle_climb;

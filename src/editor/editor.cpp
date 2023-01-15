@@ -3009,6 +3009,7 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     X -= vScreen[A].ScreenLeft;
     Y -= vScreen[A].ScreenTop;
 
+    // translate into layer coordinates to snap to layer's grid
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
     {
         X -= Layer[EditorCursor.Layer].OffsetX;
@@ -3114,6 +3115,7 @@ void MouseMove(float X, float Y, bool /*nCur*/)
 //        }
 //    }
 
+    // translate from layer coordinates to screen coordinates
     if(MagicHand && EditorCursor.Layer != LAYER_NONE)
     {
         EditorCursor.Location.X += Layer[EditorCursor.Layer].OffsetX;
