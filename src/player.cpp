@@ -448,7 +448,6 @@ void PlayerHurt(const int A)
     if(p.Dead || p.TimeToLive > 0 || p.Stoned || p.Immune > 0 || p.Effect > 0)
         return;
 
-    Controls::Rumble(A, 250, 0.5);
 //    if(nPlay.Online) // netplay stuffs
 //    {
 //        if(nPlay.Allow == false && A != nPlay.MySlot + 1)
@@ -506,6 +505,8 @@ void PlayerHurt(const int A)
     {
         if(p.Immune == 0)
         {
+            Controls::Rumble(A, 250, 0.5);
+
             if(p.Mount == 1)
             {
                 p.Mount = 0;
