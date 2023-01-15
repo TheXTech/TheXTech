@@ -200,10 +200,10 @@ static void updateIntroLevelActivity()
         if(p.Location.X < -vScreenX[1] - p.Location.Width && -vScreenX[1] > level[0].X)
             p.Dead = true;
 
-        if(p.Location.X > -vScreenX[1] + 1000)
+        if(p.Location.X > -vScreenX[1] + vScreen[1].Width + 200)
             p.Dead = true;
 
-        if(p.Location.X > -vScreenX[1] + 600 && -vScreenX[1] + 850 < level[0].Width)
+        if(p.Location.X > -vScreenX[1] + vScreen[1].Width * 0.75 && -vScreenX[1] + vScreen[1].Width + 50 < level[0].Width)
             p.Controls.Run = false;
 
         if(-vScreenX[1] <= level[0].X && (p.Dead || p.TimeToLive > 0) && g_gameInfo.introMaxPlayersCount > 0)
@@ -521,9 +521,10 @@ void MenuLoop()
 
     if(SharedCursor.Primary)
     {
+        const Location_t cursorLoc = newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]);
         if(iRand(5) >= 2)
         {
-            NewEffect(80, newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]));
+            NewEffect(80, cursorLoc);
             Effect[numEffects].Location.SpeedX = dRand() * 4 - 2;
             Effect[numEffects].Location.SpeedY = dRand() * 4 - 2;
         }
@@ -532,7 +533,7 @@ void MenuLoop()
         {
             if(NPC[A].Active)
             {
-                if(CheckCollision(newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]), NPC[A].Location))
+                if(CheckCollision(cursorLoc, NPC[A].Location))
                 {
                     if(!NPCIsACoin[NPC[A].Type])
                     {
@@ -554,7 +555,7 @@ void MenuLoop()
         {
             if(!Block[A].Hidden)
             {
-                if(CheckCollision(newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]), Block[A].Location))
+                if(CheckCollision(cursorLoc, Block[A].Location))
                 {
                     BlockHit(A);
                     BlockHitHard(A);
