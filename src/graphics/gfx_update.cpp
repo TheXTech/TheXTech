@@ -1347,31 +1347,38 @@ void UpdateGraphics(bool skipRepaint)
                     bTopOnscreen = std::fmod(bTopOnscreen, 32);
                 }
 
-                double colLast = bRightOnscreen - 32;
-                double rowLast = bBottomOnscreen - 32;
+                double colSemiLast = bRightOnscreen - 64;
+                double rowSemiLast = bBottomOnscreen - 64;
 
                 if(bRightOnscreen > vScreen[Z].Width)
                     bRightOnscreen = vScreen[Z].Width;
                 if(bBottomOnscreen > vScreen[Z].Height)
                     bBottomOnscreen = vScreen[Z].Height;
 
+                // first row source
                 int src_y = show_top ? 0 : 32;
+
                 for(double dst_y = bTopOnscreen; dst_y < bBottomOnscreen; dst_y += 32.0)
                 {
-                    if(dst_y >= rowLast)
-                        src_y = 64;
-
+                    // first col source
                     int src_x = show_left ? 0 : 32;
+
                     for(double dst_x = bLeftOnscreen; dst_x < bRightOnscreen; dst_x += 32.0)
                     {
-                        if(dst_x >= colLast)
-                            src_x = 64;
-
                         XRender::renderTexture(dst_x, dst_y, 32, 32, GFXBlockBMP[b.Type], src_x, src_y);
 
-                        src_x = 32;
+                        // next col source
+                        if(dst_x >= colSemiLast)
+                            src_x = 64;
+                        else
+                            src_x = 32;
                     }
-                    src_y = 32;
+
+                    // next row source
+                    if(dst_y >= rowSemiLast)
+                        src_y = 64;
+                    else
+                        src_y = 32;
                 }
             }
         }
