@@ -37,8 +37,6 @@
 #include "../core/render.h"
 #include "../screen_fader.h"
 
-#include "logic/world_map_fog.h"
-
 #include "graphics/gfx_frame.h"
 
 #include "gfx_special_frames.h"
@@ -542,50 +540,6 @@ void UpdateGraphics2(bool skipRepaint)
                               vScreenY[Z] + WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - WPHeight,
                               WorldPlayer[1].Location.Width, WPHeight,
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
-
-        // render the fog-of-war effect
-        if(g_worldMapFog.m_active && !WalkAnywhere)
-        {
-            // render fog map
-            for(int row = 0; row < g_worldMapFog.m_map_rows; row++)
-            {
-                double y = g_worldMapFog.m_map_top + g_worldMapFog.m_tile_size * row + vScreenY[Z];
-                if(y + g_worldMapFog.m_tile_size < marginTop || y >= sH - marginBottom)
-                    continue;
-
-                for(int col = 0; col < g_worldMapFog.m_map_cols; col++)
-                {
-                    double x = g_worldMapFog.m_map_left + g_worldMapFog.m_tile_size * col + vScreenX[Z];
-                    if(x + g_worldMapFog.m_tile_size < margin || x >= sW - margin)
-                        continue;
-
-                    int8_t fog_alpha = g_worldMapFog.m_fog_alpha[row * g_worldMapFog.m_map_cols + col];
-                    if(fog_alpha != 0)
-                    {
-                        if(GFX.WorldMapFog.inited)
-                        {
-                            DrawTextureTiled(x,
-                                y,
-                                g_worldMapFog.m_tile_size,
-                                g_worldMapFog.m_tile_size,
-                                GFX.WorldMapFog,
-                                0, 0, -1, -1,
-                                g_worldMapFog.m_map_left + g_worldMapFog.m_tile_size * col,
-                                g_worldMapFog.m_map_top + g_worldMapFog.m_tile_size * row,
-                                fog_alpha / (float)g_worldMapFog.m_fog_levels);
-                        }
-                        else
-                        {
-                            XRender::renderRect(x,
-                                y,
-                                g_worldMapFog.m_tile_size,
-                                g_worldMapFog.m_tile_size,
-                                0.8f, 0.8f, 0.8f, fog_alpha / (float)g_worldMapFog.m_fog_levels);
-                        }
-                    }
-                }
-            }
-        }
 
         if(!WorldPlayer[1].LevelName.empty())
         {

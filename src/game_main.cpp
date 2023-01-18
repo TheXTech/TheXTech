@@ -72,7 +72,6 @@
 #include "core/events.h"
 #include "core/msgbox.h"
 #include "script/luna/luna.h"
-#include "logic/world_map_fog.h"
 
 #include "pseudo_vb.h"
 
@@ -836,8 +835,6 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 // WorldLoop will automatically resume the music as needed
                 // delayedMusicStart(); // Allow music being started
-
-                g_worldMapFog.Update();
 
                 // 'level select loop
                 runFrameLoop(nullptr, &WorldLoop,

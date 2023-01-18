@@ -39,7 +39,6 @@
 #include "speedrunner.h"
 #include "screen_quickreconnect.h"
 #include "screen_connect.h"
-#include "logic/world_map_fog.h"
 
 #include "global_dirs.h"
 
@@ -185,18 +184,8 @@ void WorldLoop()
     if(SingleCoop > 0)
         SingleCoop = 1;
 
-    if(g_config.world_map_smart_pan && g_worldMapFog.m_ready && !WalkAnywhere)
-    {
-        std::pair<double, double> c = g_worldMapFog.GetPan(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0, WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0);
-
-        vScreenX[1] = -c.first + vScreen[1].Width / 2.0;
-        vScreenY[1] = -c.second + vScreen[1].Height / 2.0 + 32.0;
-    }
-    else
-    {
-        vScreenX[1] = -(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0) + vScreen[1].Width / 2.0;
-        vScreenY[1] = -(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0) + vScreen[1].Height / 2.0 + 32;
-    }
+    vScreenX[1] = -(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0) + vScreen[1].Width / 2.0;
+    vScreenY[1] = -(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0) + vScreen[1].Height / 2.0 + 32;
 
     if(numPlayers > 2)
         numPlayers = 1;
@@ -365,22 +354,6 @@ void WorldLoop()
             // only allow P1 to pause if multiplayer pause controls disabled
             if(!g_compatibility.multiplayer_pause_controls)
                 break;
-        }
-
-        // check whether the player is currently on a path (important for parkinglot workaround)
-        // second part of workaround is after this big clause for all the possible player actions.
-        // if player wasn't on a path and is about to start moving, then update the world map fog based on the player's next destination.
-        bool currently_on_path = false;
-        if(Player[1].Controls.Up || Player[1].Controls.Down || Player[1].Controls.Left || Player[1].Controls.Right)
-        {
-            for(WorldPath_t &path : treeWorldPathQuery(tempLocation, SORTMODE_ID))
-            {
-                if(CheckCollision(tempLocation, path.Location) && path.Active)
-                {
-                    currently_on_path = true;
-                    break;
-                }
-            }
         }
 
         if(Player[1].Controls.Up)
@@ -639,8 +612,6 @@ void WorldLoop()
                         if(int(level.WarpY) != -1)
                             WorldPlayer[1].Location.Y = level.WarpY;
 
-                        g_worldMapFog.Update();
-
                         LevelBeatCode = 6;
 
                         //for(B = 1; B <= numWorldLevels; B++)
@@ -675,30 +646,6 @@ void WorldLoop()
                 WorldPlayer[1].Move3 = false;
                 PlaySound(SFX_Slide);
             }
-        }
-
-        // second part of parkinglot workaround: update the fog based on the path the player is about to go onto
-        if(WorldPlayer[1].Move && !currently_on_path)
-        {
-            if(WorldPlayer[1].Move == 1)
-                WorldPlayer[1].Location.Y -= 32;
-            else if(WorldPlayer[1].Move == 2)
-                WorldPlayer[1].Location.X -= 32;
-            else if(WorldPlayer[1].Move == 3)
-                WorldPlayer[1].Location.Y += 32;
-            else if(WorldPlayer[1].Move == 4)
-                WorldPlayer[1].Location.X += 32;
-
-            g_worldMapFog.Update();
-
-            if(WorldPlayer[1].Move == 1)
-                WorldPlayer[1].Location.Y += 32;
-            else if(WorldPlayer[1].Move == 2)
-                WorldPlayer[1].Location.X += 32;
-            else if(WorldPlayer[1].Move == 3)
-                WorldPlayer[1].Location.Y -= 32;
-            else if(WorldPlayer[1].Move == 4)
-                WorldPlayer[1].Location.X -= 32;
         }
 
         if(WorldPlayer[1].Move == 0)
@@ -1015,7 +962,6 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         vScreenX[1] = -(Pth.Location.X + Pth.Location.Width / 2.0) + vScreen[1].Width / 2.0;
         vScreenY[1] = -(Pth.Location.Y + Pth.Location.Height / 2.0) + vScreen[1].Height / 2.0;
         PlaySound(SFX_NewPath);
-        g_worldMapFog.Update();
         PathWait();
     }
 

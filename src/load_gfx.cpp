@@ -1116,10 +1116,6 @@ static void loadCustomUIAssets()
             pLogWarning("Invalid border: total internal/external height is %d but WorldMapFrame_Border.png is only %dpx wide.", i.te + i.ti + i.bi + i.be, GFX.WorldMapFrame_Border.h);
     }
 
-    loadCGFX(uiRoot + "WorldMapFog.png",
-             "WorldMapFog",
-             nullptr, nullptr, GFX.isCustom(ci++), GFX.WorldMapFog, false, true);
-
     loadCGFX(uiRoot + "Camera.png",
              "Camera",
              nullptr, nullptr, GFX.isCustom(ci++), GFX.Camera, false, true);

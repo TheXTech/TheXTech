@@ -104,16 +104,6 @@ extern struct Config_t
     //! Allow the view to grow beyond 800x600 in the world map (nearly duplicates Compatibility_t::free_world_res),
     //  but does not enforce at least 800x600 render resolution when off.
     bool world_map_expand_view = false;
-    //! Show fog on canonically hidden portions of the world map
-    enum
-    {
-        WORLD_MAP_FOG_OFF = 0,
-        WORLD_MAP_FOG_NORMAL,
-        WORLD_MAP_FOG_SPOILERS,
-    };
-    int world_map_fog = WORLD_MAP_FOG_OFF;
-    //! Intelligently pan the world map to focus on the path
-    bool world_map_smart_pan = false;
     //! Translate the coordinates of autocode screen-space objects based on the HUD location
     bool autocode_translate_coords = true;
     //! Camera optimizations that improve the experience at low resolutions

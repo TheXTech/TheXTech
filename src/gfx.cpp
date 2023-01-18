@@ -176,7 +176,6 @@ bool GFX_t::load()
 
     loadImage(WorldMapFrame_Tile, uiPath + "WorldMapFrame_Tile");
     loadImage(WorldMapFrame_Border, uiPath + "WorldMapFrame_Border");
-    loadImage(WorldMapFog, uiPath + "WorldMapFog");
 
     ini.open(uiPath + "WorldMapFrame_Border.ini");
     loadFrameInfo(ini, g_worldMapFrameBorderInfo);
