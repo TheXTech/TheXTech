@@ -71,8 +71,6 @@ extern struct Config_t
     bool    enter_cheats_menu_item = false;
     //! Allow player quickly move through paths on the world map (works for compatibility Mode 1 only)
     bool    worldMapFastMove = false;
-    //! Show number of dragon coins collected so far in level
-    bool    ShowDragonCoins = false;
     //! Enter the pause menu after dying while testing a level
     bool    editor_pause_on_death = true;
     //! Internal gameplay resolution (0 means that Renderer may set on window resize)

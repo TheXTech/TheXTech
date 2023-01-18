@@ -164,15 +164,6 @@ void DrawInterface(int Z, int numScreens)
                            float(-80 + (CenterX) - (GFX.Container[1].w / 2) + C - 122 + 12 + 18 + GFX.Interface[5].w),
                            ScreenTop + 16 + 11);
 
-                // Show dragon coins
-                if(g_config.ShowDragonCoins)
-                {
-                    for(int i = 0; i < NPCScore[NPCID_DRAGONCOIN] - 6; i++)
-                    {
-                        XRender::renderTexture(40 + 20 + CenterX - GFX.Container[1].w / 2 + 96 + 16*i, ScreenTop + 16 + 51, GFX.Interface[2]);
-                    }
-                }
-
                 // Print stars on the screen
                 if(numStars > 0)
                 {
@@ -258,15 +249,6 @@ void DrawInterface(int Z, int numScreens)
                            1,
                            float(20 - int(scoreStr.size()) * 18 + CenterX - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w),
                            ScreenTop + 16 + 31);
-
-                // Show dragon coins
-                if(g_config.ShowDragonCoins)
-                {
-                    for(int i = 0; i < NPCScore[NPCID_DRAGONCOIN] - 6; i++)
-                    {
-                        XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96 + 16*i, ScreenTop + 16 + 51, GFX.Interface[2]);
-                    }
-                }
 
                 // Print lives on the screen
 
@@ -406,15 +388,6 @@ void DrawInterface(int Z, int numScreens)
                    20 - int(scoreStr.size()) * 18 +
                    CenterX - GFX.Container[1].w / 2 + 80 + 12 + 4 + 18 + 32 + GFX.Interface[3].w,
                    ScreenTop + 16 + 31);
-
-        // Show dragon coins
-        if(g_config.ShowDragonCoins)
-        {
-            for(int i = 0; i < NPCScore[NPCID_DRAGONCOIN] - 6; i++)
-            {
-                XRender::renderTexture(20 + CenterX - GFX.Container[1].w / 2 + 96 + 16*i, ScreenTop + 16 + 51, GFX.Interface[2]);
-            }
-        }
 
         // Print lives on the screen
         XRender::renderTexture(CenterX - GFX.Container[1].w / 2 + C - 122 - 16, ScreenTop + 16 + 10, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
