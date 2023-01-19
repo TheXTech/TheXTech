@@ -135,7 +135,7 @@ struct TableInterface
 
         // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
         //   (such as, when an item is trapped inside a wall during !BlocksSorted)
-        if(!g_compatibility.emulate_classic_block_order)
+        if(g_compatibility.emulate_classic_block_order)
         {
             loc.X -= 32;
             loc.Y -= 32;

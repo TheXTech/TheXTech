@@ -379,6 +379,7 @@ static void GifMakePalette( const uint8_t* lastFrame, const uint8_t* nextFrame, 
     int imageSize = width*height*4*sizeof(uint8_t);
     uint8_t* destroyableImage = (uint8_t*)GIF_TEMP_MALLOC(imageSize);
     assert(destroyableImage);
+    assert(nextFrame);
     memcpy(destroyableImage, nextFrame, imageSize);
 
     int numPixels = width*height;

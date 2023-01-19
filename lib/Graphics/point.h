@@ -29,7 +29,7 @@ public:
     PGE_Point(const PGE_Point &p) = default;
     PGE_Point(const PGE_PointF &p);
     PGE_Point(int x, int y);
-    ~PGE_Point();
+    ~PGE_Point() = default;
     void setPoint(int x, int y);
     void setX(int x);
     void setY(int y);

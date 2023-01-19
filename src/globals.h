@@ -763,10 +763,41 @@ struct Block_t
     int standingOnPlayerY = 0;
 //    noProjClipping As Boolean
     bool noProjClipping = false;
-// EXTRA: Indicate the fact that block was resized by a hit
-    bool wasShrinkResized = false;
 //    IsReally As Integer 'the NPC that is this block
     int IsReally = 0;
+
+// EXTRA: Indicate the fact that block was resized by a hit
+#if LOW_MEM
+
+    inline void setShrinkResized() {}
+
+    inline bool getShrinkResized()
+    {
+        // Because the initial block width is stored as an integer, the only way the width could be 31.9 is if it was shrink-resized from 32.
+        // The block location width isn't set to a non-integer anywhere else in the game, so this is safe.
+        // This is a heuristic and has a small CPU tradeoff, but it saves memory.
+        // If it fails in some case, we can switch to the below implementation, or we could use this implementation only when LOW_MEM is set.
+        return Location.Width == 31.9;
+    }
+
+#else
+
+private:
+    bool m_wasShrinkResized = false;
+
+public:
+    inline void setShrinkResized()
+    {
+        m_wasShrinkResized = true;
+    }
+
+    inline bool getShrinkResized()
+    {
+        return m_wasShrinkResized;
+    }
+
+#endif
+
 //End Type
 };
 
@@ -843,7 +874,6 @@ struct WorldLevel_t
     bool Visible = false;
 //End Type
     int64_t Z = 0;
-    int index = 0;
 
 // Display number of stars (if available)
     int curStars = 0;
@@ -945,7 +975,6 @@ struct WorldPath_t
     int Type = 0;
 //End Type
     int64_t Z = 0;
-    int index = 0;
 };
 
 //Public Type WorldMusic 'World Music
@@ -1130,7 +1159,7 @@ extern bool LevelEditor;
 //Public WorldEditor As Boolean
 extern bool WorldEditor;
 //Public PlayerStart(1 To 2) As Location
-extern RangeArr<Location_t, 1, 2> PlayerStart;
+extern RangeArr<PlayerStart_t, 1, 2> PlayerStart;
 
 //Public blockCharacter(0 To 20) As Boolean
 extern RangeArrI<bool, 0, 20, false> blockCharacter;

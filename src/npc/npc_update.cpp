@@ -799,7 +799,7 @@ void UpdateNPCs()
                         {
                             if(NPC[A].Wet == 0 && !NPCIsACoin[NPC[A].Type])
                             {
-                                if(NPC[A].Location.SpeedY >= 1 && !CheckCollisionIntersect(NPC[A].Location, Water[B].Location))
+                                if(NPC[A].Location.SpeedY >= 1 && (!g_compatibility.fix_submerged_splash_effect || !CheckCollisionIntersect(NPC[A].Location, Water[B].Location)))
                                 {
                                     tempLocation.Width = 32;
                                     tempLocation.Height = 32;
@@ -4911,8 +4911,10 @@ void UpdateNPCs()
                         NPC[(int)NPC[A].Special2].Direction = NPC[A].Direction;
                     if(Player[NPC[A].HoldingPlayer].Effect != 0)
                         NPC[A].Special = 0;
-#if 1
-                    // FIXME: In original game, this is a dead code because of "And 0" condition at end.
+#if 0
+                    // Important: this also makes a thrown handheld plant harm NPCs, so it is a major balance change.
+                    // Since it was disabled in SMBX code, better not to change it. -- ds-sloth
+                    // In original game, this is a dead code because of "And 0" condition at end.
                     // In this sample, the "& false" was been commented
                     // This code makes Toothy shown off the pipe when the pipe is a projectile, shooted by generator
                     if(NPC[A].Projectile && NPC[A].Special2 == 0.0 && NPC[A].Special == 0.0 /*&& false*/)

@@ -110,9 +110,11 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 #endif
 
+#ifdef DEBUG_BUILD
     case Buttons::ToggleFontRender:
         NewFontRender = !NewFontRender;
         return;
+#endif
 
     case Buttons::DebugInfo:
         g_stats.enabled = !g_stats.enabled;
@@ -216,7 +218,7 @@ const char* InputMethodProfile::GetOptionName(size_t i)
         return "RUMBLE";
     else if(i == CommonOptions::ground_pound_by_alt_run)
         return "GROUND POUND BUTTON";
-    else if(i == CommonOptions::show_power_status)
+    else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
         return "BATTERY STATUS";
     else
         return nullptr;
@@ -246,7 +248,7 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
         else
             return "DOWN";
     }
-    else if(i == CommonOptions::show_power_status)
+    else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
     {
         if(this->m_showPowerStatus)
             return "SHOW";
@@ -285,7 +287,7 @@ bool InputMethodProfile::OptionChange(size_t i)
         this->m_groundPoundByAltRun = !this->m_groundPoundByAltRun;
         return true;
     }
-    else if(i == CommonOptions::show_power_status)
+    else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
     {
         this->m_showPowerStatus = !this->m_showPowerStatus;
         return true;
@@ -1004,6 +1006,10 @@ InputMethod* PollInputMethod() noexcept
         g_InputMethods[player_no] = new_method;
     else
         g_InputMethods.push_back(new_method);
+
+    // if a profile has already been assigned, activate any hooks possible
+    if(new_method->Profile)
+        SetInputMethodProfile(player_no, new_method->Profile);
 
     // try a number of ways of assigning a profile if one has not already been assigned
     std::vector<InputMethodProfile*> profiles = new_method->Type->GetProfiles();

@@ -242,12 +242,12 @@ void WorldLoop()
             s_worldUpdateMusic(WorldPlayer[1].Location);
 
             //for(A = 1; A <= numWorldLevels; A++)
-            for(auto t : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_NONE))
+            for(WorldLevelRef_t t : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_NONE))
             {
                 WorldLevel_t &l = *t;
                 if(CheckCollision(WorldPlayer[1].Location, l.Location))
                 {
-                    curWorldLevel = l.index;
+                    curWorldLevel = t;
                     WorldPlayer[1].LevelName = l.LevelName;
                     auto &s = WorldPlayer[1].stars;
                     s.cur = l.curStars;
@@ -510,7 +510,7 @@ void WorldLoop()
         else if(Player[1].Controls.Jump && Player[1].UnStart)
         {
             //for(A = 1; A <= numWorldLevels; A++)
-            for(auto t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
+            for(WorldLevelRef_t t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
                 WorldLevel_t &level = *t;
                 if(CheckCollision(tempLocation, level.Location))
@@ -532,7 +532,7 @@ void WorldLoop()
                             if(CheckCollision(WorldPlayer[1].Location, level2.Location))
                             {
                                 level2.Active = true;
-                                curWorldLevel = level2.index;
+                                curWorldLevel = t2;
                             }
                         }
                     }
@@ -561,7 +561,7 @@ void WorldLoop()
                             worldWaitForFade();
 
                             SoundPause[26] = 200;
-                            curWorldLevel = level.index;
+                            curWorldLevel = t;
                             LevelSelect = false;
 
                             delayedMusicReset(); // Reset delayed music to prevent unexpected behaviour at loaded level
@@ -615,13 +615,13 @@ void WorldLoop()
                         LevelBeatCode = 6;
 
                         //for(B = 1; B <= numWorldLevels; B++)
-                        for(auto t2 : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_ID))
+                        for(WorldLevelRef_t t2 : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_ID))
                         {
                             WorldLevel_t &level2 = *t2;
                             if(CheckCollision(WorldPlayer[1].Location, level2.Location))
                             {
                                 level2.Active = true;
-                                curWorldLevel = level2.index;
+                                curWorldLevel = t2;
                             }
                         }
                         // -----------------------

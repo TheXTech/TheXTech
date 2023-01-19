@@ -90,7 +90,7 @@ public:
     TreeResult_Sentinel(const TreeResult_Sentinel& other)
     {
         UNUSED(other);
-        SDL_assert(false); // can't have two sentinels for same results
+        SDL_assert(false); // -V654 // can't have two sentinels for same results
     }
 
     TreeResult_Sentinel(TreeResult_Sentinel&& other)

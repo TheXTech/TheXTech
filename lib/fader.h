@@ -23,9 +23,9 @@
 class PGE_Fader
 {
 public:
-    PGE_Fader();
+    PGE_Fader() = default;
     PGE_Fader(const PGE_Fader &f);
-    ~PGE_Fader();
+    ~PGE_Fader() = default;
 
     PGE_Fader &operator=(const PGE_Fader &f);
 

@@ -150,7 +150,7 @@ inline bool &GetButton(Controls_t &c, size_t i)
     case Buttons::Start:
         return c.Start;
     default:
-        SDL_assert(false);
+        SDL_assert(false); // -V654 // Made especially to fail on abnormal value
         return c.Start;
     }
 }
@@ -238,7 +238,7 @@ inline bool &GetButton(CursorControls_t &c, size_t i)
     case Buttons::CursorLeft:
     case Buttons::CursorRight:
     default:
-        SDL_assert(false);
+        SDL_assert(false); // -V654 // Made especially to fail on abnormal value
         return c.Primary;
     }
 }
@@ -348,7 +348,7 @@ inline bool &GetButton(EditorControls_t &c, size_t i)
     case Buttons::ScrollLeft:
     case Buttons::ScrollRight:
     default:
-        SDL_assert(false);
+        SDL_assert(false); // -V654 // Made especially to fail on abnormal value
         return c.FastScroll;
     }
 }
@@ -363,7 +363,14 @@ namespace Hotkeys
 // enumerate of the Hotkey indices (which are almost never used)
 enum Buttons : size_t
 {
-    Fullscreen = 0, Screenshot, RecordGif, DebugInfo, EnterCheats, ToggleHUD, LegacyPause, ToggleFontRender, MAX
+    Fullscreen = 0,
+    Screenshot, RecordGif,
+    DebugInfo, EnterCheats,
+    ToggleHUD, LegacyPause,
+#ifdef DEBUG_BUILD
+    ToggleFontRender,
+#endif
+    MAX
 };
 
 constexpr size_t n_buttons = Buttons::MAX;
@@ -387,8 +394,10 @@ inline const char *GetButtonName_INI(size_t i)
         return "toggle-hud";
     case Buttons::LegacyPause:
         return "legacy-pause";
+#ifdef DEBUG_BUILD
     case Buttons::ToggleFontRender:
         return "toggle-font-render";
+#endif
     default:
         return "NULL";
     }
@@ -413,8 +422,10 @@ inline const char *GetButtonName_UI(size_t i)
         return "Toggle HUD";
     case Buttons::LegacyPause:
         return "Old Pause";
+#ifdef DEBUG_BUILD
     case Buttons::ToggleFontRender:
         return "Toggle font renderer";
+#endif
     default:
         return "NULL";
     }

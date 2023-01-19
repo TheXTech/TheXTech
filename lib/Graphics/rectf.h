@@ -32,7 +32,7 @@ public:
     PGE_RectF(double x, double y, double w, double h);
     PGE_RectF(const PGE_RectF &r) = default;
     PGE_RectF(const PGE_Rect &r);
-    ~PGE_RectF();
+    ~PGE_RectF() = default;
     void setRect(double x, double y, double w, double h);
     void setPos(double x, double y);
     void setSize(double w, double h);

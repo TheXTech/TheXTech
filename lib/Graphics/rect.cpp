@@ -42,9 +42,6 @@ PGE_Rect::PGE_Rect(const PGE_RectF &r)
     m_b = static_cast<int>(r.m_b);
 }
 
-PGE_Rect::~PGE_Rect()
-{}
-
 void PGE_Rect::setRect(int x, int y, int w, int h)
 {
     m_x = x;
