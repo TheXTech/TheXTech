@@ -1226,14 +1226,18 @@ void UpdateMacro()
             }
         }
 
-        if(!OnScreen)
+        // !OnScreen requires Player to leave Screen during normal play.
+        // ExitCheat Bool ensures the ItsVegas Cheat doesn't Softlock the game.
+        if(!OnScreen || ExitCheat)
         {
             LevelMacroCounter++;
 
-            if(g_config.EnableInterLevelFade && LevelMacroCounter == 34)
+            if(g_config.EnableInterLevelFade &&
+                ((LevelMacroCounter == 34 && !ExitCheat) 
+                || (LevelMacroCounter == 250 && ExitCheat)))
                 g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
 
-            if(LevelMacroCounter >= 100)
+            if((!ExitCheat && LevelMacroCounter >= 100) || (ExitCheat && LevelMacroCounter >= 300))
             {
                 LevelBeatCode = 1;
                 LevelMacro = LEVELMACRO_OFF;
@@ -1241,6 +1245,7 @@ void UpdateMacro()
                 EndLevel = true;
             }
         }
+            
     }
     else if(LevelMacro == LEVELMACRO_QUESTION_SPHERE_EXIT)
     {

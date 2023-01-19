@@ -1752,10 +1752,11 @@ static void newLeaf()
 
 static void getMeOuttaHere()
 {
-    LevelBeatCode = 0;
+    if(!ExitCheat)
+    {LevelBeatCode = 0;
     LevelMacro = LEVELMACRO_OFF;
     LevelMacroCounter = 0;
-    EndLevel = true;
+    EndLevel = true;}
 }
 
 static void holyTrinity()
@@ -1773,21 +1774,21 @@ static void holyTrinity()
         NewEffect(10, tempLocation);
     }
     
-    if(!ShadowMode && !GodMode && !MultiHop)
-    {
-        ShadowMode = true;
-        GodMode = true;
-        MultiHop = true;
-    }
-    else
+    if(ShadowMode && GodMode && MultiHop)
     {
         ShadowMode = false;
         GodMode = false;
         MultiHop = false;
     }
+    else
+    {
+        ShadowMode = true;
+        GodMode = true;
+        MultiHop = true;
+    }
 }
 
-static void theEssentials()
+static void essentials()
 {
     Location_t tempLocation;
 
@@ -1802,48 +1803,56 @@ static void theEssentials()
         NewEffect(10, tempLocation);
     }
     
-    if(!ShadowMode && !GodMode && !MultiHop && !SuperSpeed)
-    {
-        SuperSpeed = true;
-        ShadowMode = true;
-        GodMode = true;
-        MultiHop = true;
-    }
-    else
+    if(ShadowMode && GodMode && MultiHop && SuperSpeed)
     {
         SuperSpeed = false;
         ShadowMode = false;
         GodMode = false;
         MultiHop = false;
     }
+    else
+    {
+        SuperSpeed = true;
+        ShadowMode = true;
+        GodMode = true;
+        MultiHop = true;
+    }
 }
 
 static void foundMyCarKey()
 {
+    if(!ExitCheat)
+    {ExitCheat = true;
     PlaySound(SFX_Key);
     StopMusic();
-    LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
+    LevelMacro = LEVELMACRO_KEYHOLE_EXIT;}
 }
 
-static void myLifeGoals()
+static void lifeGoals()
 {
+    if(!ExitCheat)
+    {ExitCheat = true;
     LevelMacro = LEVELMACRO_GOAL_TAPE_EXIT;
     StopMusic();
-    PlaySound(SFX_TapeExit);
+    PlaySound(SFX_TapeExit);}
 }
 
 static void mysteryBall()
 {
+    if(!ExitCheat)
+    {ExitCheat = true;
     LevelMacro = LEVELMACRO_QUESTION_SPHERE_EXIT;
     StopMusic();
-    PlaySound(SFX_DungeonClear);
+    PlaySound(SFX_DungeonClear);}
 }
 
 static void itsVegas()
 {
+    if(!ExitCheat)
+    {ExitCheat = true;
     LevelMacro = LEVELMACRO_CARD_ROULETTE_EXIT;
     StopMusic();
-    PlaySound(SFX_CardRouletteClear);
+    PlaySound(SFX_CardRouletteClear);}
 }
 
 
@@ -1968,10 +1977,10 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"newleaf", newLeaf, true},
     
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
-    {"theessentials", theEssentials, true}, {"theessenjls", theEssentials, true},
+    {"essentials", essentials, true}, {"holyfour", essentials, true},
     
     {"foundmycarkey", foundMyCarKey, true},
-    {"mylifegoals", myLifeGoals, true},
+    {"lifegoals", lifeGoals, true},
     {"mysteryball", mysteryBall, true},
     {"itsvegas", itsVegas, true},
     
