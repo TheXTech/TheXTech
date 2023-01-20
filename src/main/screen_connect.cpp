@@ -13,6 +13,8 @@
 #include "config.h"
 #include "npc_id.h"
 
+#include "graphics/gfx_marquee.h"
+
 #include "main/game_info.h"
 
 #include "main/screen_connect.h"
@@ -27,95 +29,341 @@ namespace ConnectScreen
 
 enum class PlayerState
 {
-    Disconnected,
-    Reconnecting,
-    SelectChar,
-    SelectProfile,
-    ConfirmProfile,
-    TestControls,
-    DropAddMain,
-    ReconnectMain,
-    ControlsMenu,
-    StartGame,
+    Disconnected,   // missing controller for player
+    SelectChar,     // left side of main screen
+    ControlsMenu,   // right side of main screen
+    Reconnecting,   // player requested to reconnect controller
+    SelectProfile,  // selecting controls profile
+    ConfirmProfile, // checking that player understands controls profile
+    StartGame,      // player is waiting for others to start game
+    ForceDrop,      // player wants to force disconnected other players to drop (to leave drop/add screen)
 };
 
 enum class Context
 {
     MainMenu,
-    Reconnect,
+    LegacyMenu,
     DropAdd,
 };
 
 struct CharInfo
 {
-    int max_players;
-    int dead_count;
-    bool char_present[5];
+private:
+    bool char_present[numCharacters];
 
-    bool accept(int c)
+public:
+    int dead_count = 0;
+    int max_players = 0;
+
+    bool accept(int c, int p, uint8_t current_add)
     {
+        if(c < 1 || c > numCharacters)
+            return false;
+
+        // don't accept a blocked char, unless it has been present before
+        if(blockCharacter[c] && !this->char_present[c - 1])
+            return false;
+
+        // allow everything if char swap is allowed
         if(SwapCharAllowed())
             return true;
-        bool novel_add = numPlayers >= this->max_players;
-        novel_add &= numPlayers < maxLocalPlayers;
-        if(!novel_add && !this->char_present[c])
+
+        // automatically recognize novel adds
+        if(p >= this->max_players)
+            current_add = 2;
+
+        // if not a current add, don't allow changing character
+        if(!current_add)
             return false;
+
+        bool novel_add = (current_add >= 2);
+
+        // require the character to have been selected previously if the player is not a novel add
+        if(!novel_add && !this->char_present[c - 1])
+            return false;
+
         return true;
     }
+
+    void reset()
+    {
+        for(int c = 0; c < numCharacters; c++)
+            char_present[c] = false;
+
+        max_players = numPlayers;
+        dead_count = 0;
+    }
+
+    void mark_present()
+    {
+        for(int A = 1; A <= numPlayers; A++)
+        {
+            int c = Player[A].Character - 1;
+
+            if(0 <= c && c < numCharacters)
+                char_present[c] = true;
+        }
+
+        if(max_players < numPlayers)
+            max_players = numPlayers;
+    }
+
+    // checks if the active players' characters have been changed by gameplay logic (not drop/add)
+    bool chars_changed()
+    {
+        for(int A = 1; A <= numPlayers; A++)
+        {
+            int c = Player[A].Character - 1;
+
+            if(0 <= c && c < numCharacters)
+            {
+                if(!char_present[c])
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    // checks if a character has been present
+    bool char_was_present(int c)
+    {
+        if(c < 1 || c > numCharacters)
+            return false;
+
+        return this->char_present[c - 1];
+    }
+
+    // marks a single character as present
+    void mark_char_present(int c)
+    {
+        if(c < 1 || c > numCharacters)
+            return;
+
+        this->char_present[c - 1] = true;
+    }
+};
+
+struct PlayerBox
+{
+    PlayerState m_state = PlayerState::Disconnected;
+    bool m_input_ready = false;
+
+    // set if the player was added during this invocation of the Drop/Add screen; set to 2 if a novel add (the number of players is greater than it had been previously)
+    uint8_t m_current_add = 0;
+
+private:
+    //! multiuse tracker for current menu item / action confirm progress
+    int m_menu_item = 0;
+
+    // just added a player in multiplayer menu char select: play DropItem if appropriate, and block the start and back keys for non-P1 players
+    bool m_just_added = false;
+
+    // state of hint text marquee
+    MarqueeState m_marquee_state;
+
+    Controls::InputMethodProfile* m_last_profile = nullptr;
+
+    // calculates the player index using pointer arithmetic
+    int CalcIndex() const;
+
+    // checks if a character is validly available for this player
+    bool CharAvailable(int c, bool ghost_mode = false);
+
+    // adds player if not present, and updates player's character
+    void UpdatePlayer();
+
+    // makes sure that g_charSelect[p] is valid
+    void ValidateChar(bool ghost_mode = false);
+
+    // does logic for an item the mouse is currently over
+    bool MouseItem(int i);
+
+    // do all mouse logic and rendering for an item at a certain location
+    bool MenuItem_Mouse_Render(int i, const std::string& label, int X, int Y, bool mouse, bool render, int end_X = 0);
+
+    // draws the selected character at a location
+    bool DrawChar(int x, int w, int y, int h);
+
+    // do rendering and mouse logic for SinglePlayer char select
+    // returns -1 if player is ready to return, +1 if player is ready to proceed
+    int Mouse_Render_1P(bool render);
+
+public:
+    // initialize the state for the current context
+    void Init();
+
+    // do rendering and mouse logic
+    // returns -1 if player is ready to return, +1 if player is ready to proceed
+    int Mouse_Render(bool render, int x, int y, int w, int h);
+
+    // returns -1 if player is ready to return, +1 if player is ready to proceed
+    int Logic();
+
+    // check if it is possible to rotate char
+    bool CanChangeChar();
+
+    // rotate character
+    void PrevChar();
+    void NextChar();
+
+    // registers the appropriate cursor input
+    void Left();
+    void Right();
+
+    void Up();
+    void Down();
+
+    // returns true if this player is ready to return to previous menu
+    bool Back();
+
+    // returns true if this player is ready to proceed
+    bool Do();
+
+    // returns true if this player is ready to proceed
+    bool Ready() const;
 };
 
 static Context s_context;
 static int s_minPlayers = 1;
 
-static bool s_inputReady[maxLocalPlayers] = {false};
-
-static PlayerState s_playerState[maxLocalPlayers] = {PlayerState::Disconnected};
-static int s_menuItem[maxLocalPlayers] = {0};
-static Controls::InputMethodProfile* s_savedProfile[maxLocalPlayers];
+static std::array<PlayerBox, maxLocalPlayers> s_players;
 
 static CharInfo s_char_info;
 
-void Player_ValidateChar(int p);
+static inline void Render_PCursor(int x, int y)
+{
+    if(GFX.PCursor.inited)
+        XRender::renderTexture(x, y, GFX.PCursor);
+    else
+        XRender::renderTextureFL(x, y, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE);
+}
+
+static inline void Render_PCursorDownwards(int x, int y, XTColor color = XTColor())
+{
+    if(GFX.PCursor.inited)
+        XRender::renderTextureFL(x - GFX.PCursor.h / 2, y - GFX.PCursor.w, GFX.PCursor.w, GFX.PCursor.h, GFX.PCursor, 0, 0, 90.0, nullptr, X_FLIP_NONE, color);
+    else
+        XRender::renderTexture(x - GFX.MCursor[2].w / 2, y - GFX.MCursor[2].h, GFX.MCursor[2], color);
+}
+
+static inline bool Is1P()
+{
+    return s_context == Context::LegacyMenu;
+}
+
+static inline bool IsMenu()
+{
+    return (s_context == Context::MainMenu || s_context == Context::LegacyMenu);
+}
+
+// check if PlayerBox p (zero-indexed) can drop self
+static inline bool ControlsMenu_ShowDrop(int p)
+{
+    // don't allow dropping below required player count
+    if(s_context == Context::DropAdd && numPlayers <= s_minPlayers)
+        return false;
+
+    // never show drop icon at main menu
+    if(s_context == Context::MainMenu)
+        return false;
+
+    int plr_A = p + 1;
+
+    // check that there is a different living player
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        if(B == plr_A)
+            continue;
+
+        if(!Player[B].Dead && Player[B].TimeToLive == 0)
+            return true;
+    }
+
+    return false;
+}
+
+static inline int BoxCount()
+{
+    int n = (int)Controls::g_InputMethods.size();
+
+    n += 1;
+
+    if(n < s_minPlayers)
+        n = s_minPlayers;
+
+    if(n > maxLocalPlayers)
+        n = maxLocalPlayers;
+
+    if(s_context == Context::MainMenu && n < 2)
+        n = 2;
+
+    // disable entering >2P by mistake (for now)
+    if(n > 2 && Controls::g_InputMethods.size() == 2)
+        n = 2;
+
+    // disable entering >1P from legacy menu
+    if(s_context == Context::LegacyMenu)
+        n = 1;
+
+    if(g_gameInfo.disableTwoPlayer)
+        n = 1;
+
+    if(BattleMode && n > 2)
+        n = 2;
+
+    return n;
+}
 
 void MainMenu_Start(int minPlayers)
 {
     Controls::ClearInputMethods();
+
     s_minPlayers = minPlayers;
+    s_context = Context::MainMenu;
+
+    for(int i = 0; i < maxLocalPlayers; i++)
+        g_charSelect[i] = 0;
+
     for(int i = 0; i < maxLocalPlayers; i++)
     {
-        g_charSelect[i] = 0;
-        s_playerState[i] = PlayerState::Disconnected;
-        s_menuItem[i] = 0;
-        s_inputReady[i] = false;
+        s_players[i] = PlayerBox();
+        s_players[i].Init();
     }
-    s_context = Context::MainMenu;
 
     MenuMouseRelease = false;
     MenuCursorCanMove = false;
 
+    s_char_info.reset();
+
     // prepare for first frame
-    if(minPlayers == 1)
-        Player_ValidateChar(0);
     Logic();
 }
 
-void Reconnect_Start()
+void LegacyMenu_Start()
 {
-    if(BattleMode)
-        s_minPlayers = 2;
-    else
-        s_minPlayers = 1;
+    if(Controls::g_InputMethods.size() != 1)
+        Controls::ClearInputMethods();
+
+    s_minPlayers = 1;
+    s_context = Context::LegacyMenu;
+
     for(int i = 0; i < maxLocalPlayers; i++)
     {
-        s_playerState[i] = PlayerState::Disconnected;
-        s_menuItem[i] = 0;
-        s_inputReady[i] = false;
-        g_charSelect[i] = Player[i + 1].Character;
+        s_players[i] = PlayerBox();
+        s_players[i].Init();
     }
-    s_context = Context::Reconnect;
+
+    // create an empty input slot
+    if(Controls::g_InputMethods.size() == 0)
+        Controls::g_InputMethods.push_back(nullptr);
+
+    s_players[0].m_state = PlayerState::SelectChar;
 
     MenuMouseRelease = false;
     MenuCursorCanMove = false;
+
+    s_char_info.reset();
 
     // prepare for first frame
     Logic();
@@ -127,28 +375,113 @@ void DropAdd_Start()
         s_minPlayers = 2;
     else
         s_minPlayers = 1;
+
+    s_context = Context::DropAdd;
+
     for(int i = 0; i < maxLocalPlayers; i++)
     {
-        if(i < numPlayers)
-            s_playerState[i] = PlayerState::DropAddMain;
-        else
-            s_playerState[i] = PlayerState::Disconnected;
-        s_menuItem[i] = 0;
-        s_inputReady[i] = false;
-        g_charSelect[i] = Player[i + 1].Character;
+        s_players[i] = PlayerBox();
+        s_players[i].Init();
     }
-    s_context = Context::DropAdd;
 
     MenuMouseRelease = false;
     MenuCursorCanMove = false;
+
+    // update the present characters, IF they got changed by level logic
+    if(s_char_info.chars_changed())
+        SaveChars();
 
     // prepare for first frame
     Logic();
 }
 
-// find the first player that isn't done (receives MenuControls)
-int GetMenuPlayer()
+int PlayerBox::CalcIndex() const
 {
+    if(this >= &s_players[0] && this < &s_players[maxLocalPlayers])
+    {
+        return this - &s_players[0];
+    }
+
+    return 0;
+}
+
+bool PlayerBox::Ready() const
+{
+    int p = CalcIndex();
+
+    switch(m_state)
+    {
+    case PlayerState::StartGame:
+        if(p >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[p])
+            return false;
+
+        return true;
+
+    case PlayerState::Disconnected:
+    case PlayerState::Reconnecting:
+    case PlayerState::SelectProfile:
+    case PlayerState::ConfirmProfile:
+        return false;
+
+    default:
+        return true;
+    }
+}
+
+void PlayerBox::Init()
+{
+    int p = CalcIndex();
+
+    if(s_context == Context::DropAdd)
+    {
+        if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
+            m_state = PlayerState::SelectChar;
+        else
+            m_state = PlayerState::Disconnected;
+
+        g_charSelect[p] = Player[p + 1].Character;
+    }
+    else
+    {
+        g_charSelect[p] = 1;
+        ValidateChar(true);
+    }
+}
+
+bool PlayerBox::CharAvailable(int c, bool ghost_mode)
+{
+    // check if invalid
+    if(c < 1 || c > numCharacters)
+        return false;
+
+    int p = CalcIndex();
+
+    // check if blocked for use in the level (blocked in episode, or a different character was previously dropped in the level)
+    if(!s_char_info.accept(c, p, ghost_mode ? 1 : m_current_add))
+        return false;
+
+    int max_check = ghost_mode ? BoxCount() : (int)Controls::g_InputMethods.size();
+
+    // check if a different player has selected or is currently selecting the character
+    for(int i = 0; i < maxLocalPlayers; i++)
+    {
+        if(i == max_check)
+            break;
+
+        // fine if self
+        if(i == p)
+            continue;
+
+        if(g_charSelect[i] == c)
+            return false;
+    }
+
+    return true;
+}
+
+static bool CheckDone()
+{
+    // What is the first player that is not done?
     int n = (int)Controls::g_InputMethods.size();
     if(n < s_minPlayers)
         n = s_minPlayers;
@@ -156,105 +489,77 @@ int GetMenuPlayer()
         n = maxLocalPlayers;
 
     // What is the first player that is not done?
-    int menuPlayer;
-    for(menuPlayer = 0; menuPlayer < n; menuPlayer++)
+    int notDone;
+    for(notDone = 0; notDone < n; notDone++)
     {
-        if(menuPlayer == (int)Controls::g_InputMethods.size())
+        if(notDone == (int)Controls::g_InputMethods.size())
             break;
-        if(s_playerState[menuPlayer] != PlayerState::StartGame && s_playerState[menuPlayer] != PlayerState::DropAddMain && s_playerState[menuPlayer] != PlayerState::ReconnectMain)
+
+        if(!s_players[notDone].Ready())
             break;
     }
-    return menuPlayer;
-}
 
-bool CharAvailable(int c, int p = 0)
-{
-    if(c < 1 || c > 5)
+    // not enough players / controllers -> not done
+    if(notDone < s_minPlayers || (int)Controls::g_InputMethods.size() < s_minPlayers)
         return false;
-    if(blockCharacter[c])
-        return false;
-    if(!s_char_info.accept(c-1))
-        return false;
-    for(int i = 0; i < maxLocalPlayers; i++)
-    {
-        if(i == (int)Controls::g_InputMethods.size())
-            break;
-        if(i == p)
-            continue;
-        if(s_playerState[i] == PlayerState::SelectChar && s_menuItem[i]+1 == c)
-            return false;
-        if(g_charSelect[i] == c)
-            return false;
-    }
-    return true;
-}
 
-bool CheckDone()
-{
-    // What is the first player that is not done?
-    int menuPlayer = GetMenuPlayer();
-
-    if(menuPlayer >= s_minPlayers && (int)Controls::g_InputMethods.size() >= s_minPlayers
-        && (menuPlayer == (int)Controls::g_InputMethods.size() || menuPlayer == maxLocalPlayers))
-    {
-        // everyone is done!
+    // need all connected players to be done
+    if(notDone == (int)Controls::g_InputMethods.size() || notDone == maxLocalPlayers)
         return true;
-    }
 
     return false;
 }
 
-inline int DropAddMain_ItemCount()
+
+// helper function when trying to force exit the drop/add screen
+// returns zero-indexed player that can be dropped (is currently disconnected), or -1 if dropping a player will not allow exiting the drop/add menu
+static int CheckCanDrop()
 {
-    int i = 1; // change controls
-    if(SwapCharAllowed())
-        i ++; // change char
-    if(numPlayers > s_minPlayers)
-        i ++; // drop me
-    return i;
+    // What is the first player that is not done?
+    int n = (int)Controls::g_InputMethods.size();
+    if(n < s_minPlayers)
+        n = s_minPlayers;
+    if(n > maxLocalPlayers)
+        n = maxLocalPlayers;
+
+    int are_present = 0;
+    int can_drop = -1;
+
+    // What is the first player that is not done?
+    for(int notDone = 0; notDone < n; notDone++)
+    {
+        if(s_players[notDone].Ready())
+            are_present++;
+        else if(s_players[notDone].m_state == PlayerState::Disconnected || s_players[notDone].m_state == PlayerState::Reconnecting)
+            can_drop = notDone;
+    }
+
+    // not enough players / controllers -> can't drop to exit
+    if(are_present < s_minPlayers)
+        return -1;
+
+    return can_drop;
 }
 
-void Player_ValidateChar(int p)
+static void Player_Remove(int p)
 {
-    // ensure that each character's selection is still valid
-    // i is a dummy variable so that if invalid, end up where we started
-    int i;
-    for(i = 0; i < 5; i++)
-    {
-        if(s_menuItem[p] < 0 || CharAvailable(s_menuItem[p]+1, p))
-            break;
-        s_menuItem[p] ++;
-        if(s_menuItem[p] == 5)
-            s_menuItem[p] = 0;
-    }
-    // if we failed (total block), first try to find an unblock char
-    if(i == 5)
-    {
-        for(i = 0; i < 5; i++)
-        {
-            if(!blockCharacter[i + 1] && s_char_info.accept(i))
-            {
-                s_menuItem[p] = i;
-                break;
-            }
-        }
-        // just do char 1
-        if(i == 5)
-            s_menuItem[p] = 0;
-    }
-}
+    // if it was a novel add, mark their character as allowed
+    if(s_players[p].m_current_add == 2)
+        s_char_info.mark_char_present(g_charSelect[p]);
 
-bool Player_Remove(int p)
-{
     Controls::DeleteInputMethodSlot(p);
-    for(int p2 = p; p2+1 < maxLocalPlayers; p2++)
+
+    // move all player boxes back, and reset final box
+    for(int p2 = p; p2 + 1 < maxLocalPlayers; p2++)
     {
-        g_charSelect[p2] = g_charSelect[p2+1];
-        s_playerState[p2] = s_playerState[p2+1];
-        s_menuItem[p2] = s_menuItem[p2+1];
-        s_inputReady[p2] = s_inputReady[p2+1];
+        s_players[p2] = s_players[p2 + 1];
+        s_players[p2].m_input_ready = false;
+        g_charSelect[p2] = g_charSelect[p2 + 1];
     }
-    // in drop-add, remove the Player officially
+
+    s_players[maxLocalPlayers - 1] = PlayerBox();
+
+    // in drop-add, remove the Player officially in main game engine
     if(p + 1 <= numPlayers && s_context == Context::DropAdd)
     {
         if(Player[p + 1].Dead || Player[p + 1].TimeToLive > 0)
@@ -262,44 +567,114 @@ bool Player_Remove(int p)
 
         DropPlayer(p + 1);
     }
-
-    if(Controls::g_InputMethods.empty())
-        return true;
-    return false;
 }
 
-void DropNotDone(bool strict)
+static void Player_Swap(int p1, int p2)
 {
-    int n = (int)Controls::g_InputMethods.size() - 1;
-    if(n >= maxLocalPlayers)
-        n = maxLocalPlayers-1;
-    // remove all not fully added players
-    for(; n >= numPlayers; n--)
-        Player_Remove(n);
-    // if strict, remove all unfinished players
-    for(; n >= 0 && numPlayers > s_minPlayers; n--)
+    if(p1 == p2)
+        return;
+
+    if(p1 >= (int)Controls::g_InputMethods.size() || p2 >= (int)Controls::g_InputMethods.size())
+        return;
+
+    std::swap(s_players[p1], s_players[p2]);
+
+    std::swap(g_charSelect[p1], g_charSelect[p2]);
+
+    s_players[p1].m_input_ready = false;
+    s_players[p2].m_input_ready = false;
+}
+
+// transform players and items based on character
+static void DoTransform(int p, int ch)
+{
+    for(int A = 1; A <= numPlayers; A++)
     {
-        if(strict && s_playerState[n] != PlayerState::StartGame
-            && s_playerState[n] != PlayerState::DropAddMain
-            && s_playerState[n] != PlayerState::ReconnectMain)
+        if(A % (p + 1) == 0)
         {
-            Player_Remove(n);
+            if(Player[A].Character != ch)
+            {
+                Player[A].Character = ch;
+                SizeCheck(Player[A]);
+            }
+        }
+    }
+
+    for(int A = 1; A <= numNPCs; A++)
+    {
+        if(A % (p + 1) == 0 && NPC[A].Type == NPCID_PLR_FIREBALL)
+            NPC[A].Special = ch;
+    }
+}
+
+void PlayerBox::UpdatePlayer()
+{
+    int p = CalcIndex();
+
+    // if initialized, then update character
+    if(p + 1 <= numPlayers)
+    {
+        if(g_charSelect[p] != Player[p + 1].Character)
+            SwapCharacter(p + 1, g_charSelect[p]);
+    }
+    // otherwise, add new player!
+    else
+    {
+        // swap p with the first non-existent player slot
+        Player_Swap(numPlayers, p);
+
+        // AddPlayer increments numPlayers by 1
+        AddPlayer(g_charSelect[numPlayers]);
+
+        // add as dead if dead player was dropped in this level
+        if(s_char_info.dead_count > 0)
+        {
+            s_char_info.dead_count--;
+            Player[numPlayers].Dead = true;
+            PlaySound(SFX_ShellHit);
+        }
+        else
+        {
+            PlaySound(SFX_DropItem);
         }
     }
 }
 
-void Player_Swap(int p1, int p2)
+void PlayerBox::ValidateChar(bool ghost_mode)
 {
-    if(p1 == p2)
-        return;
-    if(p1 >= (int)Controls::g_InputMethods.size() || p2 >= (int)Controls::g_InputMethods.size())
-        return;
-    std::swap(Controls::g_InputMethods[p1], Controls::g_InputMethods[p2]);
-    std::swap(g_charSelect[p1], g_charSelect[p2]);
-    std::swap(s_playerState[p1], s_playerState[p2]);
-    std::swap(s_menuItem[p1], s_menuItem[p2]);
-    s_inputReady[p1] = false;
-    s_inputReady[p2] = false;
+    int p = CalcIndex();
+
+    int& sel = g_charSelect[p];
+
+    // ensure that character selection is still valid
+
+    // bounds check
+    if(sel < 1 || sel > numCharacters)
+        sel = 1;
+
+    // i is a dummy variable so that if invalid, end up where we started
+    for(int i = 0; i < numCharacters; i++)
+    {
+        if(CharAvailable(sel, ghost_mode))
+            return;
+
+        sel ++;
+        if(sel > numCharacters)
+            sel = 1;
+    }
+
+    // if we failed (total block), first try to find an unblocked char
+    for(int i = 1; i <= numCharacters; i++)
+    {
+        if(s_char_info.accept(i, p, m_current_add))
+        {
+            sel = i;
+            return;
+        }
+    }
+
+    // failed again? just do char 1
+    sel = 1;
 }
 
 struct PlayDoSentinel
@@ -313,354 +688,210 @@ struct PlayDoSentinel
 };
 
 // returns true to signal exit from menu
-bool Player_Back(int p)
+bool PlayerBox::Back()
 {
-    s_inputReady[p] = false;
+    int p = CalcIndex();
+
+    m_input_ready = false;
+
     // first screen of main menu
-    if(s_playerState[p] == PlayerState::Disconnected && s_context == Context::MainMenu)
+    if(m_state == PlayerState::Disconnected && IsMenu())
     {
         PlaySoundMenu(SFX_Slide);
         return true;
     }
-    // adding player at main menu
-    else if(s_playerState[p] == PlayerState::SelectChar && s_context == Context::MainMenu)
+    // primary menu areas
+    else if(m_state == PlayerState::SelectChar || m_state == PlayerState::ControlsMenu)
     {
-        // remove the player's slot and quit if there aren't any other players
-        if(Controls::g_InputMethods.size() <= 1)
+        // adding player at main menu
+        if(IsMenu())
         {
+            // remove the player's slot
             Player_Remove(p);
-            PlaySoundMenu(SFX_Slide);
-            return true;
-        }
 
-        // otherwise, disconnect its input method (slot will be deleted later)
-        if(p < (int)Controls::g_InputMethods.size())
-            Controls::DeleteInputMethod(Controls::g_InputMethods[p]);
-        s_playerState[p] = PlayerState::Disconnected;
-        g_charSelect[p] = 0;
-        return false;
-    }
-    // adding player at drop/add
-    else if(s_playerState[p] == PlayerState::SelectChar && p >= numPlayers)
-    {
-        Player_Remove(p);
-        return false;
-    }
-    // changing char at drop/add
-    else if(s_playerState[p] == PlayerState::SelectChar)
-    {
-        // restore old character
-        s_menuItem[p] = Player[p+1].Character-1;
-        Player_ValidateChar(p);
-        g_charSelect[p] = s_menuItem[p]+1;
-        // (unless this has become impossible)
-        if(g_charSelect[p] != Player[p+1].Character)
-        {
-            SwapCharacter(p+1, g_charSelect[p], false);
-            PlaySound(SFX_Transform);
-        }
-        s_playerState[p] = PlayerState::DropAddMain;
-        s_menuItem[p] = 1;
-    }
+            // quit if there aren't any other players
+            if(Controls::g_InputMethods.empty())
+            {
+                PlaySoundMenu(SFX_Slide);
+                return true;
+            }
 
-    // escape the drop/add menu
-    if(s_playerState[p] == PlayerState::DropAddMain || s_playerState[p] == PlayerState::ReconnectMain)
-    {
-        s_playerState[p] = PlayerState::StartGame;
-        s_menuItem[p] = 0;
-        if(CheckDone())
-        {
-            PlaySoundMenu(SFX_Slide);
-            return true;
-        }
-        else
+            PlaySoundMenu(SFX_PlayerDied2);
+
             return false;
+        }
+        // escape the drop/add menu
+        else
+        {
+            if(CheckDone())
+            {
+                PlaySoundMenu(SFX_Slide);
+                return true;
+            }
+            else if(CheckCanDrop() != -1)
+            {
+                m_state = PlayerState::ForceDrop;
+                m_menu_item = 0;
+                m_input_ready = true;
+                m_marquee_state.reset_width();
+                return false;
+            }
+            else
+            {
+                // m_back_requested = true;
+                PlaySoundMenu(SFX_BlockHit);
+                return false;
+            }
+        }
     }
 
     PlaySoundMenu(SFX_Slide);
 
-    // the fake back for P1 on the Main Menu
-    if(s_context == Context::MainMenu && p == 0 && s_playerState[p] == PlayerState::Disconnected)
+    if(m_state == PlayerState::StartGame)
     {
-        if(g_charSelect[p] == 0)
-            return true;
-        else
-        {
-            g_charSelect[p] = 0;
-            return false;
-        }
+        m_state = PlayerState::SelectChar;
     }
-
-    if(s_playerState[p] == PlayerState::StartGame)
+    else if(Is1P() && m_state == PlayerState::SelectProfile)
     {
-        if(s_context == Context::MainMenu)
-        {
-            s_playerState[p] = PlayerState::SelectChar;
-            s_menuItem[p] = g_charSelect[p] - 1;
-            g_charSelect[p] = 0;
-        }
-        else if(s_context == Context::DropAdd)
-        {
-            s_playerState[p] = PlayerState::DropAddMain;
-            s_menuItem[p] = 0;
-        }
-        else if(s_context == Context::Reconnect)
-        {
-            s_playerState[p] = PlayerState::ReconnectMain;
-            s_menuItem[p] = 0;
-        }
+        m_state = PlayerState::SelectChar;
+        m_menu_item = 0;
     }
-    else if(s_playerState[p] == PlayerState::ControlsMenu)
+    else if(m_state == PlayerState::SelectProfile)
     {
-        if(s_context == Context::MainMenu || (s_context == Context::DropAdd && p >= numPlayers))
-        {
-            s_playerState[p] = PlayerState::SelectChar;
-            s_menuItem[p] = 0;
-            Player_ValidateChar(p);
-        }
-        else if(s_context == Context::DropAdd)
-        {
-            s_playerState[p] = PlayerState::DropAddMain;
-            s_menuItem[p] = 0;
-        }
-        else if(s_context == Context::Reconnect)
-        {
-            s_playerState[p] = PlayerState::ReconnectMain;
-            s_menuItem[p] = 0;
-        }
-    }
-    else if(s_playerState[p] == PlayerState::SelectProfile)
-    {
-        s_playerState[p] = PlayerState::ControlsMenu;
-        s_menuItem[p] = 0;
+        m_state = PlayerState::ControlsMenu;
+        m_menu_item = 1;
+        m_marquee_state.reset_width();
     }
 
     return false;
 }
 
-bool Player_Select(int p)
+bool PlayerBox::Do()
 {
-    s_inputReady[p] = false;
+    int p = CalcIndex();
+
+    m_input_ready = false;
 
     // plays SFX_Do at end of scope unless inactivated
     PlayDoSentinel do_sentinel;
 
     // controls menu
-    if(s_playerState[p] == PlayerState::ControlsMenu)
+    if(m_state == PlayerState::ControlsMenu && p < (int)Controls::g_InputMethods.size())
     {
-        if(s_menuItem[p] == 2)
+        // drop me
+        if(ControlsMenu_ShowDrop(p) && m_menu_item == -1)
         {
-            Controls::DeleteInputMethod(Controls::g_InputMethods[p]);
-            s_playerState[p] = PlayerState::Reconnecting;
-            s_menuItem[p] = 0;
-            if(s_context == Context::MainMenu && s_minPlayers == 1)
-            {
-                Controls::DeleteInputMethodSlot(p);
-                if(g_charSelect[p] == 0)
-                    Player_ValidateChar(p);
-            }
-            else if(s_context == Context::MainMenu)
-                g_charSelect[p] = 0;
             do_sentinel.active = false;
+
+            Player_Remove(p);
+
+            // quit if there aren't any other players
+            if(s_context == Context::MainMenu && Controls::g_InputMethods.empty())
+            {
+                PlaySoundMenu(SFX_Slide);
+                return true;
+            }
+
+            PlaySoundMenu(SFX_PlayerDied2);
             return false;
         }
-        else if(s_menuItem[p] == 1)
+        // reconnect controller
+        else if(m_menu_item == 0)
         {
-            s_playerState[p] = PlayerState::TestControls;
+            // does set Controls::g_InputMethods[p] to null
+            Controls::DeleteInputMethod(Controls::g_InputMethods[p]);
+
+            m_state = PlayerState::Reconnecting;
+            m_marquee_state.reset_width();
+
+            do_sentinel.active = false;
+
+            PlaySoundMenu(SFX_PetHurt);
+
             return false;
         }
-        else if(s_menuItem[p] == 0)
+        // select a profile
+        else if(m_menu_item == 1)
         {
             // only enter the profile select screen if safe to do so.
             if(Controls::g_InputMethods[p])
             {
-                s_playerState[p] = PlayerState::SelectProfile;
+                m_state = PlayerState::SelectProfile;
+                m_marquee_state.reset_width();
 
                 // set the current menu item to the current profile.
                 std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
                 std::vector<Controls::InputMethodProfile*>::iterator p_profile
                     = std::find(profiles.begin(), profiles.end(), Controls::g_InputMethods[p]->Profile);
+
                 if(profiles.size() > 1 && p_profile != profiles.end())
-                    s_menuItem[p] = p_profile - profiles.begin();
+                    m_menu_item = p_profile - profiles.begin();
                 else
-                    s_menuItem[p] = 0;
+                    m_menu_item = 0;
             }
         }
         return false;
     }
 
-    // allow mouse to work for P1 in main menu
-    if(s_context == Context::MainMenu && s_minPlayers == 1 && p == 0 && s_playerState[p] == PlayerState::Disconnected)
+    // select char
+    if(m_state == PlayerState::SelectChar)
     {
-        if(g_charSelect[p] == 0)
+        if(IsMenu())
         {
-            g_charSelect[p] = s_menuItem[p]+1;
-            // signal to reset player state to Disconnected
-            s_playerState[p] = PlayerState::SelectChar;
-            s_menuItem[p] = -1;
-        }
-        else
-        {
-            do_sentinel.active = false;
-            return false;
-        }
-    }
+            m_state = PlayerState::StartGame;
+            m_menu_item = 0;
+            m_marquee_state.reset_width();
+            m_input_ready = true;
 
-    if(s_playerState[p] == PlayerState::SelectChar)
-    {
-        if(s_menuItem[p] != -1)
-            g_charSelect[p] = s_menuItem[p]+1;
-        if(s_context == Context::MainMenu)
-        {
-            if(s_menuItem[p] == -1)
-            {
-                s_playerState[p] = PlayerState::Disconnected;
-                s_menuItem[p] = 0;
-            }
-            else
-            {
-                s_playerState[p] = PlayerState::StartGame;
-                s_menuItem[p] = -4;
-            }
-            if(CheckDone() && (s_minPlayers == 1 || numPlayers == maxLocalPlayers))
+            if(Is1P() && CheckDone())
                 return true;
         }
-        else
-        {
-            // set this player as having been selected
-            if(0 <= s_menuItem[p] && s_menuItem[p] < 5)
-                s_char_info.char_present[s_menuItem[p]] = true;
-
-            s_playerState[p] = PlayerState::DropAddMain;
-            if(p+1 <= numPlayers)
-            {
-                s_menuItem[p] = 1;
-                if(g_charSelect[p] != Player[p+1].Character)
-                {
-                    SwapCharacter(p+1, g_charSelect[p], !SwapCharAllowed());
-                    if(SwapCharAllowed())
-                        PlaySound(SFX_Transform);
-                }
-                do_sentinel.active = false;
-            }
-            else
-            {
-                // swap p with the first non-existent player slot
-                s_menuItem[p] = 0;
-                Player_Swap(numPlayers, p);
-
-                // AddPlayer increments numPlayers by 1
-                AddPlayer(g_charSelect[numPlayers]);
-                s_char_info.max_players = numPlayers;
-
-                // add as dead if dead player was dropped in this level
-                if(s_char_info.dead_count > 0)
-                {
-                    s_char_info.dead_count--;
-                    Player[numPlayers].Dead = true;
-                    PlaySound(SFX_ShellHit);
-                }
-                else
-                {
-                    PlaySound(SFX_ItemEmerge);
-                }
-
-                do_sentinel.active = false;
-            }
-        }
-    }
-    else if(s_playerState[p] == PlayerState::ReconnectMain)
-    {
-        s_playerState[p] = PlayerState::StartGame;
-        if(CheckDone())
-        {
-            PlaySound(SFX_Pause);
-            do_sentinel.active = false;
-            return true;
-        }
-        s_menuItem[p] = 0;
-    }
-    else if(s_playerState[p] == PlayerState::DropAddMain)
-    {
-        int i = 0;
-        if(s_menuItem[p] == i++)
-        {
-            s_playerState[p] = PlayerState::ControlsMenu;
-        }
-        else if(SwapCharAllowed() && s_menuItem[p] == i++)
-        {
-            s_playerState[p] = PlayerState::SelectChar;
-            s_menuItem[p] = g_charSelect[p] - 1;
-            g_charSelect[p] = 0;
-        }
-        else if(numPlayers > s_minPlayers && s_menuItem[p] == i++)
-        {
-            Player_Remove(p);
-            do_sentinel.active = false;
-        }
+        // nothing to do in drop/add
         else
         {
             do_sentinel.active = false;
         }
     }
-    else if(s_playerState[p] == PlayerState::StartGame)
+    // waiting for start
+    else if(m_state == PlayerState::StartGame)
     {
         if(CheckDone())
             return true;
-        if(s_menuItem[p] == -4 && s_context != Context::MainMenu)
-        {
-            do_sentinel.active = false;
-            s_menuItem[p] = 0;
-        }
-        else if(s_menuItem[p] == -4)
-        {
-            do_sentinel.active = false;
-        }
-        else if(s_context == Context::DropAdd || (s_context == Context::Reconnect && g_compatibility.allow_drop_add))
-        {
-            if(s_menuItem[p] == 0 && numPlayers > s_minPlayers) // DROP NOT DONE
-            {
-                Context c = s_context;
-                s_context = Context::DropAdd;
-                DropNotDone(true);
-                s_context = c;
-                return true;
-            }
-            else if(s_menuItem[p] == 0) // FORCE RESUME
-            {
-                DropNotDone(false);
-                return true;
-            }
-        }
-        else if(s_context == Context::Reconnect)
-        {
-            if(s_menuItem[p] == 0) // FORCE RESUME
-                return true;
-        }
+
+        PlaySoundMenu(SFX_BlockHit);
+        do_sentinel.active = false;
     }
-    else if(s_playerState[p] == PlayerState::SelectProfile)
+    // select profile
+    else if(m_state == PlayerState::SelectProfile)
     {
-        if(Controls::g_InputMethods[p])
+        m_marquee_state.reset_width();
+
+        if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
         {
-            std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
-            s_savedProfile[p] = Controls::g_InputMethods[p]->Profile;
+            const std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
+            // store profile
+            m_last_profile = Controls::g_InputMethods[p]->Profile;
 
             int back_index = (int)profiles.size();
-            if(s_menuItem[p] < 0 || s_menuItem[p] >= back_index)
+            // if not possible, just go back
+            if(m_menu_item < 0 || m_menu_item >= back_index)
             {
-                Player_Back(p);
+                Back();
                 do_sentinel.active = false;
             }
-            else if(s_savedProfile[p] == profiles[s_menuItem[p]])
+            // don't do confirmation screen if just setting current profile
+            else if(m_last_profile == profiles[m_menu_item])
             {
-                Player_Back(p);
+                Back();
                 do_sentinel.active = false;
             }
-            else if(Controls::SetInputMethodProfile(p, profiles[s_menuItem[p]]))
+            // advance to the confirmation screen if successful
+            else if(Controls::SetInputMethodProfile(p, profiles[m_menu_item]))
             {
-                s_playerState[p] = PlayerState::ConfirmProfile;
-                s_menuItem[p] = 66*3;
+                m_state = PlayerState::ConfirmProfile;
+                m_menu_item = 66 * 3;
             }
+            // indicate that profile couldn't be bound
             else
             {
                 PlaySoundMenu(SFX_BlockHit);
@@ -672,182 +903,283 @@ bool Player_Select(int p)
     return false;
 }
 
-void Player_Up(int p)
+bool PlayerBox::CanChangeChar()
 {
-    s_inputReady[p] = false;
+    // if(!SwapCharAllowed() && !m_current_add)
+    //     return false;
 
-    if(s_playerState[p] == PlayerState::SelectChar)
+    int p = CalcIndex();
+
+    // see if any other character is totally free for self
+    for(int ch = 1; ch <= numCharacters; ch++)
     {
-        PlaySoundMenu(SFX_Slide);
-        int i = 0;
-        for(i = 0; i < 5; i++)
-        {
-            if(s_menuItem[p] == 0)
-                s_menuItem[p] = 5;
-            s_menuItem[p] --;
-            if(CharAvailable(s_menuItem[p]+1, p))
-                break;
-        }
+        if(ch == g_charSelect[p])
+            continue;
 
-        // if can't traverse normally, allow duplicates
-        if(i == 5)
-        {
-            for(i = 0; i < 5; i++)
-            {
-                if(s_menuItem[p] == 0)
-                    s_menuItem[p] = 5;
-                s_menuItem[p] --;
-                if(!blockCharacter[s_menuItem[p]+1] && s_char_info.accept(s_menuItem[p]))
-                    break;
-            }
-        }
+        if(CharAvailable(ch))
+            return true;
     }
 
-    if(s_playerState[p] == PlayerState::SelectProfile)
+    // if own character is okay, then it'll be kept. return false here.
+    if(CharAvailable(g_charSelect[p]))
+        return false;
+
+    // if even own character not totally free, see if any character is allowed by the s_char_info state
+    for(int ch = 1; ch <= numCharacters; ch++)
     {
-        PlaySoundMenu(SFX_Slide);
+        if(ch == g_charSelect[p])
+            continue;
 
-        if(s_menuItem[p] == 0)
-        {
-            if(Controls::g_InputMethods[p])
-            {
-                std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
-                int back_index = (int)profiles.size();
-                s_menuItem[p] = back_index;
-            }
-        }
-        else
-            s_menuItem[p] --;
-    }
-
-    if(s_playerState[p] == PlayerState::DropAddMain)
-    {
-        PlaySoundMenu(SFX_Slide);
-
-        if(s_menuItem[p] == 0)
-            s_menuItem[p] = DropAddMain_ItemCount() - 1;
-        else
-            s_menuItem[p] --;
-    }
-
-    if(s_playerState[p] == PlayerState::StartGame && s_context != Context::MainMenu)
-    {
-        if(s_menuItem[p] == -4)
-        {
-            s_menuItem[p] = 0;
-            return;
-        }
-    }
-
-    if(s_playerState[p] == PlayerState::ControlsMenu)
-    {
-        PlaySoundMenu(SFX_Slide);
-        if(s_menuItem[p] == 0)
-            s_menuItem[p] = 2;
-        else
-            s_menuItem[p] --;
-    }
-}
-
-void Player_Down(int p)
-{
-    s_inputReady[p] = false;
-
-    if(s_playerState[p] == PlayerState::SelectChar)
-    {
-        PlaySoundMenu(SFX_Slide);
-        int i;
-
-        for(i = 0; i < 5; i++)
-        {
-            s_menuItem[p] ++;
-
-            if(s_menuItem[p] == 5)
-                s_menuItem[p] = 0;
-
-            if(CharAvailable(s_menuItem[p]+1, p))
-                break;
-        }
-
-        // if can't traverse normally, allow duplicates
-        if(i == 5)
-        {
-            for(i = 0; i < 5; i++)
-            {
-                s_menuItem[p] ++;
-
-                if(s_menuItem[p] == 5)
-                    s_menuItem[p] = 0;
-
-                if(!blockCharacter[s_menuItem[p]+1] && s_char_info.accept(s_menuItem[p]))
-                    break;
-            }
-        }
-    }
-
-    if(s_playerState[p] == PlayerState::SelectProfile)
-    {
-        PlaySoundMenu(SFX_Slide);
-
-        if(Controls::g_InputMethods[p])
-        {
-            std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
-            int back_index = (int)profiles.size();
-            if(s_menuItem[p] == back_index)
-                s_menuItem[p] = -1;
-        }
-
-        s_menuItem[p] ++;
-    }
-
-    if(s_playerState[p] == PlayerState::DropAddMain)
-    {
-        PlaySoundMenu(SFX_Slide);
-
-        if(s_menuItem[p] == DropAddMain_ItemCount() - 1)
-            s_menuItem[p] = 0;
-        else
-            s_menuItem[p] ++;
-    }
-
-    if(s_playerState[p] == PlayerState::StartGame && s_context != Context::MainMenu)
-    {
-        if(s_menuItem[p] == -4)
-        {
-            s_menuItem[p] = 0;
-            return;
-        }
-    }
-
-    if(s_playerState[p] == PlayerState::ControlsMenu)
-    {
-        PlaySoundMenu(SFX_Slide);
-
-        if(s_menuItem[p] == 2)
-            s_menuItem[p] = 0;
-        else
-            s_menuItem[p] ++;
-    }
-}
-
-bool Player_MouseItem(int p, int i)
-{
-    if(s_menuItem[p] != i)
-    {
-        PlaySoundMenu(SFX_Slide);
-        s_menuItem[p] = i;
-    }
-
-    if(MenuMouseRelease && SharedCursor.Primary)
-    {
-        MenuMouseRelease = false;
-        return Player_Select(p);
+        if(s_char_info.accept(g_charSelect[p], p, m_current_add))
+            return true;
     }
 
     return false;
 }
 
-bool Player_MenuItem_Mouse_Render(int p, int i, const std::string& label, int X, int Y, bool mouse, bool render)
+void PlayerBox::PrevChar()
+{
+    // if(!SwapCharAllowed() && !m_current_add)
+    // {
+    //     PlaySoundMenu(SFX_BlockHit);
+    //     return;
+    // }
+
+    int p = CalcIndex();
+    int old_ch = g_charSelect[p];
+
+    int i = 0;
+    for(i = 0; i < numCharacters; i++)
+    {
+        g_charSelect[p] --;
+
+        if(g_charSelect[p] < 1)
+            g_charSelect[p] = numCharacters;
+
+        if(CharAvailable(g_charSelect[p]))
+            break;
+    }
+
+    // if can't traverse normally, allow duplicates
+    if(i == numCharacters)
+    {
+        for(i = 0; i < numCharacters; i++)
+        {
+            g_charSelect[p] --;
+
+            if(g_charSelect[p] < 1)
+                g_charSelect[p] = numCharacters;
+
+            if(s_char_info.accept(g_charSelect[p], p, m_current_add))
+                break;
+        }
+    }
+
+    // eventually changed character, update the player
+    if(g_charSelect[p] != old_ch)
+    {
+        PlaySoundMenu(SFX_Slide);
+        UpdatePlayer();
+    }
+    else
+        PlaySoundMenu(SFX_BlockHit);
+}
+
+void PlayerBox::NextChar()
+{
+    // if(!SwapCharAllowed() && !m_current_add)
+    // {
+    //     PlaySoundMenu(SFX_BlockHit);
+    //     return;
+    // }
+
+    int p = CalcIndex();
+    int old_ch = g_charSelect[p];
+
+    int i;
+    for(i = 0; i < numCharacters; i++)
+    {
+        g_charSelect[p] ++;
+
+        if(g_charSelect[p] > numCharacters)
+            g_charSelect[p] = 1;
+
+        if(CharAvailable(g_charSelect[p]))
+            break;
+    }
+
+    // if can't traverse normally, allow duplicates
+    if(i == numCharacters)
+    {
+        for(i = 0; i < numCharacters; i++)
+        {
+            g_charSelect[p] ++;
+
+            if(g_charSelect[p] > numCharacters)
+                g_charSelect[p] = 1;
+
+            if(s_char_info.accept(g_charSelect[p], p, m_current_add))
+                break;
+        }
+    }
+
+    // eventually changed character, update the player
+    if(g_charSelect[p] != old_ch)
+    {
+        PlaySoundMenu(SFX_Slide);
+        UpdatePlayer();
+    }
+    else
+        PlaySoundMenu(SFX_BlockHit);
+}
+
+void PlayerBox::Up()
+{
+    int p = CalcIndex();
+
+    m_input_ready = false;
+
+    if(m_state == PlayerState::SelectProfile)
+    {
+        PlaySoundMenu(SFX_Slide);
+
+        if(m_menu_item == 0)
+        {
+            if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
+            {
+                std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
+                int back_index = (int)profiles.size();
+                m_menu_item = back_index;
+            }
+        }
+        else
+            m_menu_item --;
+
+        m_marquee_state.reset_width();
+    }
+
+    if(m_state == PlayerState::ControlsMenu)
+    {
+        PlaySoundMenu(SFX_Slide);
+        m_state = PlayerState::SelectChar;
+        m_marquee_state.reset_width();
+    }
+
+    // rotate char backwards in 1P menu
+    if(m_state == PlayerState::SelectChar && Is1P())
+        PrevChar();
+}
+
+void PlayerBox::Down()
+{
+    int p = CalcIndex();
+
+    m_input_ready = false;
+
+    if(m_state == PlayerState::SelectProfile)
+    {
+        PlaySoundMenu(SFX_Slide);
+
+        if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
+        {
+            std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
+            int back_index = (int)profiles.size();
+            if(m_menu_item == back_index)
+                m_menu_item = -1;
+        }
+
+        m_menu_item ++;
+
+        m_marquee_state.reset_width();
+    }
+
+    // go to controls menu in non-1P
+    if(m_state == PlayerState::SelectChar && !Is1P())
+    {
+        PlaySoundMenu(SFX_Slide);
+        m_state = PlayerState::ControlsMenu;
+
+        if(ControlsMenu_ShowDrop(p))
+            m_menu_item = -1;
+        else
+            m_menu_item = 0;
+
+        m_marquee_state.reset_width();
+    }
+
+    // rotate char forwards in 1P menu
+    if(m_state == PlayerState::SelectChar && Is1P())
+        NextChar();
+}
+
+void PlayerBox::Left()
+{
+    m_input_ready = false;
+
+    // rotate char backwards in non-1P
+    if(m_state == PlayerState::SelectChar && !Is1P())
+        PrevChar();
+
+    if(m_state == PlayerState::ControlsMenu)
+    {
+        int p = CalcIndex();
+
+        // don't auto-rotate for clarity
+        if(m_menu_item > 0 || (ControlsMenu_ShowDrop(p) && m_menu_item == 0))
+        {
+            PlaySoundMenu(SFX_Slide);
+            m_menu_item --;
+            m_marquee_state.reset_width();
+        }
+    }
+}
+
+void PlayerBox::Right()
+{
+    m_input_ready = false;
+
+    // rotate char forwards in non-1P
+    if(m_state == PlayerState::SelectChar && !Is1P())
+        NextChar();
+
+    if(m_state == PlayerState::ControlsMenu)
+    {
+        if(m_menu_item < 1)
+        {
+            PlaySoundMenu(SFX_Slide);
+            m_menu_item ++;
+            m_marquee_state.reset_width();
+        }
+    }
+}
+
+bool PlayerBox::MouseItem(int i)
+{
+    if(!Is1P() && m_state == PlayerState::SelectChar)
+    {
+        m_state = PlayerState::ControlsMenu;
+        PlaySoundMenu(SFX_Slide);
+    }
+
+    int& sel = m_state == PlayerState::SelectChar ? g_charSelect[0] : m_menu_item;
+
+    if(sel != i)
+    {
+        PlaySoundMenu(SFX_Slide);
+        sel = i;
+        m_marquee_state.reset_width();
+    }
+
+    if(MenuMouseRelease && SharedCursor.Primary)
+    {
+        MenuMouseRelease = false;
+        return Do();
+    }
+
+    return false;
+}
+
+bool PlayerBox::MenuItem_Mouse_Render(int i, const std::string& label, int X, int Y, bool mouse, bool render, int end_X)
 {
     if(mouse)
     {
@@ -855,404 +1187,264 @@ bool Player_MenuItem_Mouse_Render(int p, int i, const std::string& label, int X,
         if(SharedCursor.X >= X && SharedCursor.X <= X + menuLen
             && SharedCursor.Y >= Y && SharedCursor.Y <= Y + 16)
         {
-            return Player_MouseItem(p, i);
+            return MouseItem(i);
         }
     }
 
     if(render)
-        SuperPrint(label, 3, X, Y);
+    {
+        if(m_state != PlayerState::SelectProfile)
+        {
+            if(GFX.CharSelIcons.inited && label.size() == 1)
+            {
+                if(label[0] == 'X')
+                {
+                    XRender::renderTexture(X, Y, 24, 24, GFX.CharSelIcons, 0, 0);
+                    return false;
+                }
+                else if(label[0] == 'O')
+                {
+                    XRender::renderTexture(X, Y, 24, 24, GFX.CharSelIcons, 24, 0);
+                    return false;
+                }
+                else if(label[0] == '?')
+                {
+                    XRender::renderTexture(X, Y, 24, 24, GFX.CharSelIcons, 48, 0);
+                    return false;
+                }
+            }
+            else if(label.size() == 1)
+                X += 4;
+        }
+
+        if(end_X != 0)
+        {
+            bool cur_item = (m_menu_item == i);
+
+            MarqueeState null_marquee;
+            MarqueeSpec item_spec(end_X - X, 10, 32, 32, -1);
+
+            if(m_menu_item == i)
+                m_marquee_state.advance(item_spec);
+
+            SuperPrintMarquee(label, 5, X, Y, item_spec, (cur_item) ? m_marquee_state : null_marquee);
+        }
+        else
+            SuperPrint(label, 3, X, Y);
+    }
 
     return false;
 }
 
-inline void Render_PCursor(int x, int y, int p, XTColor color)
+// render the selected character for player P
+bool PlayerBox::DrawChar(int x, int w, int y, int h)
 {
-    if(GFX.PCursor.inited)
-        XRender::renderTexture(x, y, GFX.PCursor, color);
-    else if(p == 0)
-        XRender::renderTexture(x, y, GFX.MCursor[0]);
-    else if(p == 1)
-        XRender::renderTexture(x, y, GFX.MCursor[3]);
+    // don't render character box in certain states
+    if(m_state == PlayerState::SelectProfile || m_state == PlayerState::ConfirmProfile)
+        return false;
+
+    int p = CalcIndex();
+
+    // player hasn't been added yet
+    bool inactive = m_state == PlayerState::Disconnected && (IsMenu() || p >= numPlayers);
+    bool inactive_vis = inactive && p != 0;
+
+    // alpha for most uses
+    uint8_t alpha = (inactive_vis) ? 127 : 255;
+
+    // verify that character is valid
+    int ch = g_charSelect[p];
+    if(ch < 1 || ch > numCharacters)
+        return false;
+
+    // do the fun player transformation thing!
+    if(s_context == Context::MainMenu)
+        DoTransform(p, ch);
+
+    // draw frame
+    if(GFX.CharSelFrame.tex.inited && false)
+        RenderFrameFill(newLoc(x, y, w, h), GFX.CharSelFrame, XTAlpha(alpha));
     else
-        XRender::renderTextureFL(x, y, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE, color);
+    {
+        uint8_t alpha_border = (inactive_vis) ?  64 : 255;
+
+        XRender::renderRect(x, y, w, h, {0, 0, 0, alpha_border});
+        XRender::renderRect(x + 2, y + 2, w - 4, h - 4, {255, 255, 255, alpha});
+    }
+
+    // draw arrows
+    if(m_state == PlayerState::SelectChar || (s_context == Context::MainMenu && inactive))
+    {
+        XTColor arrow_color;
+
+        // show grayed out scroll indicator if can't change char
+        if(!CanChangeChar())
+            arrow_color.a = 127;
+        // otherwise, hide half of the time
+        else if(CommonFrame % 90 >= 45)
+            arrow_color.a = 0;
+        // never show full opacity when inactive
+        else if(inactive_vis)
+            arrow_color.a = 127;
+
+        if(arrow_color.a == 0)
+        {
+            // don't render
+        }
+        else if(GFX.CharSelIcons.inited)
+        {
+            XRender::renderTextureFL(x - 24 - 4, y + h / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, 0.0, nullptr, X_FLIP_HORIZONTAL, arrow_color);
+            XRender::renderTexture(x + w + 4, y + h / 2 - 24 / 2, 24, 24, GFX.CharSelIcons, 72, 0, arrow_color);
+        }
+        else
+        {
+            XRender::renderTextureFL(x - GFX.MCursor[1].h - 4, y + h / 2 - GFX.MCursor[1].w / 2, GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, -90.0, nullptr, X_FLIP_NONE, arrow_color);
+            XRender::renderTextureFL(x + w + 4, y + h / 2 - GFX.MCursor[2].w / 2, GFX.MCursor[2].w, GFX.MCursor[2].h, GFX.MCursor[2], 0, 0, -90.0, nullptr, X_FLIP_NONE, arrow_color);
+        }
+    }
+
+    // flash if player is currently disconnected
+    bool player_flash = (!inactive && m_state == PlayerState::Disconnected);
+
+    if(!player_flash || (CommonFrame % 60) < 30)
+    {
+        // always walk in Drop / Add, walk only after finalizing selection at main menu
+        bool player_walk = (s_context == Context::DropAdd || m_state == PlayerState::StartGame);
+
+        // find a spare player to edit
+        int scratch_index = maxPlayers - maxLocalPlayers + 1 + p;
+        Player_t& scratch_player = Player[scratch_index];
+
+        // back up some info to the stack
+        int Frame = scratch_player.Frame;
+        int FrameCount = scratch_player.FrameCount;
+        int YoshiTFrameCount = scratch_player.YoshiTFrameCount;
+        int YoshiBFrameCount = scratch_player.YoshiBFrameCount;
+        int YoshiWingsFrameCount = scratch_player.YoshiWingsFrameCount;
+
+        // initialize player based on saved data (unless in Battle Mode)
+        if(s_context == Context::MainMenu && MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
+        {
+            scratch_player = Player_t();
+            scratch_player.Character = ch;
+            scratch_player.State = 2;
+            scratch_player.Hearts = 2;
+        }
+        // empty save
+        else if(s_context == Context::MainMenu && SaveSlotInfo[selSave].Progress < 0)
+        {
+            scratch_player = Player_t();
+            scratch_player.Character = ch;
+            scratch_player.State = 1;
+            scratch_player.Hearts = 1;
+        }
+        else if(s_context == Context::MainMenu)
+            scratch_player = SaveSlotInfo[selSave].SavedChar[ch];
+        else
+            scratch_player = SavedChar[ch];
+
+        // restore data
+        scratch_player.Frame = Frame;
+        scratch_player.FrameCount = FrameCount;
+        scratch_player.YoshiTFrameCount = YoshiTFrameCount;
+        scratch_player.YoshiBFrameCount = YoshiBFrameCount;
+        scratch_player.YoshiWingsFrameCount = YoshiWingsFrameCount;
+
+        // process height and frames
+        scratch_player.Location.Height = Physics.PlayerHeight[scratch_player.Character][scratch_player.State];
+        YoshiHeight(scratch_index);
+
+        scratch_player.Direction = 1;
+        scratch_player.Location.SpeedY = 0;
+        if(player_walk)
+            scratch_player.Location.SpeedX = 1;
+
+        PlayerFrame(scratch_player);
+
+        // set up location and place player
+        scratch_player.Location.Width = Physics.PlayerWidth[scratch_player.Character][scratch_player.State];
+        scratch_player.Location.Height = Physics.PlayerHeight[scratch_player.Character][scratch_player.State];
+        SizeCheck(scratch_player);
+        scratch_player.Location.X = x + w / 2 - scratch_player.Location.Width / 2 - vScreen[0].X;
+        scratch_player.Location.Y = y + h / 2 + Physics.PlayerHeight[5][2] / 4 - scratch_player.Location.Height * 3 / 4 + 4 - vScreen[0].Y;
+
+        // animate winged boot
+        if(scratch_player.Mount == 1 && scratch_player.MountType == 3)
+        {
+            scratch_player.YoshiWingsFrameCount += 1;
+            scratch_player.YoshiWingsFrame = 0;
+
+            if(scratch_player.YoshiWingsFrameCount <= 12)
+                scratch_player.YoshiWingsFrame = 1;
+            else if(scratch_player.YoshiWingsFrameCount >= 24)
+                scratch_player.YoshiWingsFrameCount = 0;
+
+            if(scratch_player.Direction == 1)
+                scratch_player.YoshiWingsFrame += 2;
+        }
+
+        DrawPlayer(scratch_player, 0, XTAlpha(alpha));
+    }
+
+    // finish with character name
+    SuperPrintCenter(g_gameInfo.characterName[g_charSelect[p]], 3, x + w / 2, y + h + 12, XTAlpha(alpha));
+
+    return true;
 }
 
-// render the character select screen
-void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
+// special the mouse logic and rendering 1P char select
+int PlayerBox::Mouse_Render_1P(bool render)
 {
-    int menu_w = 200;
-    if(menu_w > w)
-        menu_w = w;
-    int menu_x = x + w/2 - menu_w/2;
+    int p = CalcIndex();
+    bool mouse = !render;
 
-    int line = h/5;
+    if(mouse && !render && !SharedCursor.Move && !SharedCursor.Primary && !SharedCursor.Secondary && !SharedCursor.ScrollUp && !SharedCursor.ScrollDown)
+        return 0;
 
-    int menuPlayer = GetMenuPlayer();
-
-    // render character by character
-    for(int c = 0; c < 5; c++)
+    if(mouse && SharedCursor.Secondary && MenuMouseRelease)
     {
-        // enable mousing only if the menu player is on the char select screen
-        bool menuPlayer_active;
-        if(menuPlayer < (int)Controls::g_InputMethods.size() && s_playerState[menuPlayer] == PlayerState::SelectChar)
-            menuPlayer_active = true;
-        else if(menuPlayer == 0 && s_context == Context::MainMenu && s_minPlayers == 1
-            && s_playerState[menuPlayer] == PlayerState::Disconnected && g_charSelect[menuPlayer] == 0)
+        MenuMouseRelease = false;
+
+        if(Back())
+            return -1;
+    }
+
+    // don't do any mouse logic in StartGame state (except for the global "Do" trigger)
+    if(m_state == PlayerState::StartGame && !render)
+        return 0;
+
+    int MenuX, MenuY;
+    GetMenuPos(&MenuX, &MenuY);
+
+    int y_pos = MenuY;
+
+    for(int i = 1; i <= numCharacters; i++)
+    {
+        if(!blockCharacter[i])
         {
-            menuPlayer_active = true;
+            if(MenuItem_Mouse_Render(i, fmt::format_ne(g_mainMenu.selectCharacter, g_gameInfo.characterName[i]), MenuX, y_pos, mouse, render))
+                return 1;
+
+            if(render && g_charSelect[p] == i)
+                XRender::renderTexture(MenuX - 20, y_pos, GFX.MCursor[0]);
+
+            y_pos += 30;
+        }
+    }
+
+    // show controls info
+    if(render)
+    {
+        int infobox_y = MenuY + 145;
+
+        XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, XTColorF(0, 0, 0, 0.5));
+
+        // disconnection hint
+        if(p >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[p])
+        {
+            SuperPrintScreenCenter(g_gameStrings.connectWaitingForInputDevice, 3, infobox_y + 4, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
         }
         else
-            menuPlayer_active = false;
-
-        // only mouse available chars
-        if(mouse && menuPlayer_active && CharAvailable(c+1, menuPlayer))
-        {
-            Player_MenuItem_Mouse_Render(menuPlayer, c, fmt::format_ne(g_mainMenu.selectCharacter, g_gameInfo.characterName[c + 1]),
-                menu_x, y+c*line, mouse, false);
-        }
-        if(render)
-        {
-            // determine if it belongs to a character
-            XTColor color;
-
-            if(blockCharacter[c+1] || !s_char_info.accept(c))
-                color.a = XTColor::from_float(0.2f);
-
-            for(int p = 0; p < maxLocalPlayers; p++)
-            {
-                // player's color
-                XTColor pcolor;
-                pcolor.r = (p == 0 ? 255 : 0);
-                pcolor.g = (p == 1 ? 255 : 0);
-                pcolor.b = (p >= 2 ? 255 : 0);
-
-                // render cursor if a player is currently (or pretend) selecting it
-                bool act_select_char;
-                if(s_playerState[p] == PlayerState::SelectChar)
-                    act_select_char = true;
-                else if(p == 0 && s_context == Context::MainMenu && s_minPlayers == 1 && s_playerState[p] == PlayerState::Disconnected && g_charSelect[p] == 0)
-                    act_select_char = true;
-                else
-                    act_select_char = false;
-
-                if(act_select_char && s_menuItem[p] == c)
-                {
-                    Render_PCursor(menu_x - 20, y+c*line, p, pcolor);
-
-                    // do the fun player transformation thing!
-                    // This WILL switch certain entities back and forth
-                    //   over the course of this function when multiple
-                    //   players are selecting their character.
-                    if(s_context == Context::MainMenu)
-                    {
-                        for(int A = 1; A <= numPlayers; A++)
-                        {
-                            if(A % (p + 1) == 0)
-                            {
-                                if(Player[A].Character != c+1)
-                                {
-                                    Player[A].Character = c+1;
-                                    SizeCheck(Player[A]);
-                                }
-                            }
-                        }
-
-                        for(int A = 1; A <= numNPCs; A++)
-                        {
-                            if(A % (p + 1) == 0 && NPC[A].Type == NPCID_PLR_FIREBALL)
-                                NPC[A].Special = c + 1;
-                        }
-                    }
-                }
-
-                // also signal if some player has already selected it
-                bool player_okay = (s_playerState[p] != PlayerState::Disconnected);
-                if(p == 0 && s_context == Context::MainMenu && s_minPlayers == 1 && s_playerState[p] == PlayerState::Disconnected)
-                    player_okay = true;
-                // render disconnected players as transparent
-                if(!player_okay && p < numPlayers
-                    && (s_context == Context::DropAdd || s_context == Context::Reconnect))
-                {
-                    player_okay = true;
-                    if((CommonFrame % 45) < 25)
-                        pcolor.a = 127;
-                }
-
-                if(player_okay && g_charSelect[p] == c+1)
-                    color = pcolor;
-            }
-
-            SuperPrint(fmt::format_ne(g_mainMenu.selectCharacter, g_gameInfo.characterName[c + 1]), 3, menu_x, y + (c * line), color);
-        }
-    }
-}
-
-// each player gets a precious 5 lines to display and handle as much unique info as possible
-bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bool render)
-{
-    bool ret = false;
-
-    // player's color
-    XTColor color;
-    color.r = (p == 0 ? 255 : 0);
-    color.g = (p == 1 ? 255 : 0);
-    color.b = (p >= 2 ? 255 : 0);
-
-    // note that all cursor rendering is done using MCursor[1] (the scroll-up indicator), rotated,
-    //   because the standard cursor icons are already tinted.
-
-    // render the player's header
-    if(render && s_playerState[p] != PlayerState::SelectProfile && !(s_context == Context::MainMenu && s_minPlayers == 1))
-        SuperPrintCenter(fmt::format_ne("{0} {1}", g_mainMenu.wordPlayer, p+1), 3, cX, pY, color);
-
-    // now render / process the player's menu as appropriate to its case
-
-    // render the profile select screen
-    if(s_playerState[p] == PlayerState::SelectProfile)
-    {
-        if(!Controls::g_InputMethods[p])
-        {
-            Player_Back(p);
-            return ret;
-        }
-        // set the current menu item to the current profile.
-        std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
-        if(profiles.empty())
-        {
-            Player_Back(p);
-            return ret;
-        }
-
-        if(render)
-            SuperPrintCenter(g_mainMenu.wordProfiles, 3, cX, pY);
-
-        int start_y = pY + 1*line;
-
-        // calculate scroll (top rendered index) here
-        int total_lines = (int)profiles.size() + 1;
-        int avail_lines = 4;
-
-        int scroll_start = 0;
-        int scroll_end = total_lines;
-
-        if(avail_lines < total_lines)
-        {
-            if(s_menuItem[p] >= 0)
-                scroll_start = s_menuItem[p] - avail_lines/2;
-            if(scroll_start < 0)
-                scroll_start = 0;
-            scroll_end = scroll_start + avail_lines;
-            if(scroll_end > total_lines)
-            {
-                scroll_end = total_lines;
-                scroll_start = scroll_end - avail_lines;
-            }
-        }
-
-        // render the scroll indicators
-        if(render)
-        {
-            if(scroll_start > 0)
-                XRender::renderTexture(cX - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
-
-            if(scroll_end < total_lines)
-                XRender::renderTexture(cX - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
-        }
-
-        // show the menu cursor for the player
-        if(render && s_menuItem[p] >= 0)
-            Render_PCursor(pX - 20, start_y + (s_menuItem[p]-scroll_start)*line, p, color);
-
-        for(int i = scroll_start; i < scroll_end; i++)
-        {
-            std::string* name = &g_mainMenu.wordBack;
-            if(i != (int)profiles.size())
-                name = &(profiles[i]->Name);
-            ret |= Player_MenuItem_Mouse_Render(p, i, *name,
-                pX, start_y + (i-scroll_start)*line, mouse, render);
-        }
-    }
-
-    // render the profile confirmation and test controls screens
-    if(s_playerState[p] == PlayerState::ConfirmProfile || s_playerState[p] == PlayerState::TestControls)
-    {
-        if(render)
-        {
-            RenderControls(p + 1, cX - 38, pY + (1.25 * line), 76, 30, false, 1.0f);
-            SuperPrintCenter(g_gameStrings.connectHoldStart, 3, cX, pY + (3 * line));
-            int n_stars;
-            int n_empty;
-            if(s_playerState[p] == PlayerState::ConfirmProfile && s_menuItem[p] < 66*3)
-            {
-                n_stars = (s_menuItem[p] + 65) / 66;
-                n_empty = 6 - n_stars;
-            }
-            else if(s_playerState[p] == PlayerState::ConfirmProfile)
-            {
-                n_stars = 3 + (s_menuItem[p] - 66*3)/22;
-                n_empty = 6 - n_stars;
-            }
-            else
-            {
-                n_stars = s_menuItem[p]/11;
-                n_empty = 6 - n_stars;
-            }
-            const std::string squeeze = std::string(n_empty, '-') + std::string(n_stars*2, '*') + std::string(n_empty, '-');
-            SuperPrintCenter(squeeze, 4, cX, pY+4*line);
-        }
-    }
-
-    // render the main DropAdd screen
-    if(s_playerState[p] == PlayerState::DropAddMain)
-    {
-        int i = 0;
-        // show the cursor for the player
-        if(render && s_menuItem[p] >= 0)
-            Render_PCursor(pX - 20, pY + (1+s_menuItem[p])*line, p, color);
-
-        ret |= Player_MenuItem_Mouse_Render(p, 0, g_gameStrings.connectSetControls,
-            pX, pY+(1)*line, mouse, render);
-        i++;
-        if(SwapCharAllowed())
-        {
-            ret |= Player_MenuItem_Mouse_Render(p, i, g_gameStrings.connectChangeChar,
-                pX, pY+(1+i)*line, mouse, render);
-            i++;
-        }
-        if(numPlayers > s_minPlayers)
-        {
-            ret |= Player_MenuItem_Mouse_Render(p, i, g_gameStrings.connectDropMe,
-                pX, pY+(1+i)*line, mouse, render);
-            i++;
-        }
-    }
-
-    // render the (waiting for other players / game start screen)
-    if(s_playerState[p] == PlayerState::StartGame)
-    {
-        if(CheckDone() && render)
-        {
-            SuperPrint(g_mainMenu.connectStartGame, 3, pX, pY+2*line);
-            Render_PCursor(pX - 20, pY + 2*line, p, color);
-        }
-        else
-        {
-            // make the "Waiting" text flash
-            if(render && s_menuItem[p] == -4)
-            {
-                if((CommonFrame % 90) < 45)
-                    SuperPrintCenter(g_mainMenu.wordWaiting, 3, cX, pY+2*line);
-            }
-
-            if(s_menuItem[p] != -4)
-            {
-                // show the cursor for the player
-                if(render && s_menuItem[p] >= 0)
-                    Render_PCursor(pX - 20, pY + (2+s_menuItem[p])*line, p, color);
-                if(g_compatibility.allow_drop_add && numPlayers > s_minPlayers)
-                {
-                    // figure out which player would be dropped...
-                    int x = GetMenuPlayer();
-                    std::string msg = fmt::format_ne(g_gameStrings.connectDropPX, x);
-                    ret |= Player_MenuItem_Mouse_Render(p, 0, msg,
-                        pX, pY+(2)*line, mouse, render);
-                }
-                else
-                {
-                    ret |= Player_MenuItem_Mouse_Render(p, 0, g_gameStrings.connectForceResume,
-                        pX, pY+(2)*line, mouse, render);
-                }
-            }
-        }
-    }
-
-    // render the controls menu
-    if(s_playerState[p] == PlayerState::ControlsMenu)
-    {
-        // render the controls stuff for the player
-        if(render)
-        {
-            // global information about controller
-            SuperPrintCenter(Controls::g_InputMethods[p]->Name, 3, cX, pY + line);
-
-            // show the menu cursor for the player
-            Render_PCursor(pX - 20, pY + (2+s_menuItem[p])*line, p, color);
-        }
-
-        // should never be null
-        if(Controls::g_InputMethods[p]->Profile != nullptr)
-            Player_MenuItem_Mouse_Render(p, 0, Controls::g_InputMethods[p]->Profile->Name,
-                pX, pY + 2*line, mouse, render);
-        else
-            Player_MenuItem_Mouse_Render(p, 0, g_mainMenu.wordProfile,
-                pX, pY + 2*line, mouse, render);
-        Player_MenuItem_Mouse_Render(p, 1, g_gameStrings.connectTestControls,
-            pX, pY + 3*line, mouse, render);
-        Player_MenuItem_Mouse_Render(p, 2, g_gameStrings.connectReconnectTitle,
-            pX, pY + 4*line, mouse, render);
-    }
-
-    // don't process any of the controls stuff when the player is connecting
-    if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::Reconnecting
-        || p >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[p])
-    {
-        if(render)
-        {
-            if(s_context == Context::MainMenu && s_minPlayers == 1 && s_playerState[p] == PlayerState::Disconnected)
-            {
-                // MenuY + 145
-                int infobox_y = pY + 75;
-
-                XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, {0, 0, 0, 127});
-
-                SuperPrintScreenCenter(g_gameStrings.connectWaitingForInputDevice, 3, infobox_y + 4, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
-                SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
-                SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
-            }
-            else if((CommonFrame % 90) < 45)
-                SuperPrintCenter(g_gameStrings.connectPressAButton, 3, cX, pY+2*line);
-        }
-        return ret;
-    }
-
-    if(s_playerState[p] == PlayerState::SelectChar && s_context != Context::MainMenu && p < numPlayers)
-    {
-        SuperPrint(g_gameStrings.connectChangeChar, 3, pX, pY+2*line, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
-        return ret;
-    }
-
-    // don't process any of the controls stuff if already rendering something there
-    if(s_playerState[p] != PlayerState::ReconnectMain && s_playerState[p] != PlayerState::SelectChar)
-        return ret;
-
-    // show the controls info and SELECT TO CHANGE message
-    if(render && !(s_context == Context::MainMenu && s_minPlayers == 1))
-    {
-        if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
-        {
-            // global information about controller
-            SuperPrintCenter(Controls::g_InputMethods[p]->Name, 3, cX, pY + line);
-
-            // Profile should never be null
-            if(Controls::g_InputMethods[p]->Profile != nullptr)
-                SuperPrintCenter(Controls::g_InputMethods[p]->Profile->Name,
-                    3, cX, pY + 2*line);
-            else
-                SuperPrintCenter(g_mainMenu.wordProfile, 3, cX, pY + 2*line);
-        }
-
-        SuperPrintCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, cX, pY + 3*line, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
-        SuperPrintCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, cX, pY + 4*line, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
-    }
-    // show the squashed info for 1P mode
-    else if(render)
-    {
-        // MenuY + 145
-        int infobox_y = pY + 75;
-
-        XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, {0, 0, 0, 127});
-
-        if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
         {
             // global information about controller
             // Profile should never be null
@@ -1266,7 +1458,391 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
     }
 
-    return ret;
+    // do char transform thing!
+    if(render && g_charSelect[p] >= 1 && g_charSelect[p] <= numCharacters)
+        DoTransform(p, g_charSelect[p]);
+
+    return 0;
+}
+
+// do the mouse logic and rendering for each player
+int PlayerBox::Mouse_Render(bool render, int x, int y, int w, int h)
+{
+    if(Is1P() && (m_state == PlayerState::SelectChar || m_state == PlayerState::StartGame))
+        return Mouse_Render_1P(render);
+
+    int p = CalcIndex();
+    bool mouse = !render;
+    const auto* input_method = (p < (int)Controls::g_InputMethods.size()) ? Controls::g_InputMethods[p] : nullptr;
+
+
+    // calculate positions
+    int cx = x + w / 2;
+
+    // controls / info pane
+    const int info_height = 80;
+    int info_y = y + h - info_height;
+
+    // icons column
+    const int icons_height = 22;
+    int icons_x = x + 8 + 76 + 8;
+    int icons_y = info_y + (GFX.PCursor.inited ? GFX.PCursor.w : GFX.MCursor[2].h) + 8;
+    int infotext_y = icons_y + icons_height + 8;
+
+    // main char select pane
+    int main_x = x + 4;
+    int main_y = y + 6;
+    int main_width = w - 8;
+    int main_height = h - info_height - 6;
+    int total_height = h - 12;
+
+    // not-yet-added player
+    bool inactive = m_state == PlayerState::Disconnected && (s_context == Context::MainMenu || p >= numPlayers);
+
+    if(inactive)
+        ValidateChar(true);
+
+    // check currently selected character
+    int ch = g_charSelect[p];
+
+    // verify that character is valid
+    if(ch < 1 || ch > numCharacters)
+        ch = 0;
+
+    // calculate box color
+    XTColor color = XTColorF(0.4f, 0.4f, 0.4f);
+
+    switch(ch)
+    {
+    case 1:
+        color = XTColorF(1.0f, 0.0f, 0.0f);
+        break;
+    case 2:
+        color = XTColorF(0.0f, 1.0f, 0.0f);
+        break;
+    case 3:
+        color = XTColorF(1.0f, 0.4f, 0.5f);
+        break;
+    case 4:
+        color = XTColorF(0.0f, 0.4f, 1.0f);
+        break;
+    case 5:
+        color = {255, 204, 0};
+        break;
+    }
+
+    if(inactive && p != 0)
+    {
+        color.r = color.r / 4 + 127;
+        color.g = color.g / 4 + 127;
+        color.b = color.b / 4 + 127;
+    }
+
+    // render background
+    if(render)
+    {
+        // background
+        XRender::renderRect(x + 0, y + 0, w - 0, h - 0, {0, 0, 0});
+        XRender::renderRect(x + 2, y + 2, w - 4, h - 4, color * 0.95f);
+        XRender::renderRect(x + 4, y + 4, w - 8, h - 8, color * 0.75f);
+
+        if(m_state != PlayerState::SelectProfile)
+        {
+            // middle dividing line (bg)
+            XRender::renderRect(x + 2, info_y - 2, w - 4, 6, color * 0.95f);
+
+            // middle dividing line (fg)
+            XRender::renderRect(x, info_y, w, 2, {0, 0, 0});
+        }
+
+        // confirmation progress
+        if(m_state == PlayerState::ConfirmProfile || m_state == PlayerState::StartGame || m_state == PlayerState::ForceDrop)
+        {
+            int menu_progress = m_menu_item;
+            int menu_max = 66 * 2;
+
+            // special asymmetric setup for confirming controls profile
+            if(m_state == PlayerState::ConfirmProfile)
+            {
+                menu_progress = SDL_min(m_menu_item, 66 * 3) * 2 + SDL_max(m_menu_item - 66 * 3, 0) * 3;
+                menu_max = 66 * 12;
+            }
+
+            XRender::renderRect(x + 4, info_y + 4, (w - 8) * menu_progress / menu_max, info_height - 8, color * 0.95f);
+
+            // move infotext y up a bit, since controls will be drawn in main box (if at all)
+            infotext_y = info_y + info_height / 2 - 8;
+        }
+    }
+
+    // render the player box (if appropriate)
+    const int pbox_w = 88;
+    const int pbox_h = 88;
+    const int pbox_h_full = pbox_h + 16 + 32;
+    int pbox_x = main_x + main_width / 2 - pbox_w / 2;
+    int pbox_y = main_y + main_height / 2 - pbox_h_full / 2 + 16;
+
+    // draw character box
+    if(render)
+        DrawChar(pbox_x, pbox_w, pbox_y, pbox_h);
+
+    // allow mouse to select char
+    if(mouse && (m_state == PlayerState::ControlsMenu || m_state == PlayerState::SelectChar))
+    {
+        if(SharedCursor.X >= pbox_x && SharedCursor.X <= pbox_x + pbox_w
+            && SharedCursor.Y >= pbox_y && SharedCursor.Y <= pbox_y + pbox_h)
+        {
+            if(m_state != PlayerState::SelectChar)
+            {
+                m_state = PlayerState::SelectChar;
+                PlaySoundMenu(SFX_Slide);
+            }
+
+            if(m_input_ready && SharedCursor.ScrollUp)
+                Left();
+
+            if(m_input_ready && SharedCursor.ScrollDown)
+                Right();
+
+            if(MenuMouseRelease && SharedCursor.Primary)
+            {
+                MenuMouseRelease = false;
+                return Do();
+            }
+        }
+    }
+
+    // draw cursor above char box
+    if(render)
+    {
+        if(m_state == PlayerState::SelectChar || (inactive && p == 0))
+            Render_PCursorDownwards(pbox_x + pbox_w / 2, pbox_y - 2);
+        else if(inactive && s_context == Context::MainMenu)
+            Render_PCursorDownwards(pbox_x + pbox_w / 2, pbox_y - 2, XTAlpha(127));
+    }
+
+    // now render / process the player's menu as appropriate to its case
+
+    // render the profile selection menu
+    if(m_state == PlayerState::SelectProfile)
+    {
+        if(!input_method)
+        {
+            Back();
+            return 0;
+        }
+
+        // set the current menu item to the current profile.
+        std::vector<Controls::InputMethodProfile*> profiles = input_method->Type->GetProfiles();
+
+        if(profiles.empty())
+        {
+            Back();
+            return 0;
+        }
+
+        if(render)
+            SuperPrintCenter(g_mainMenu.wordProfiles, 3, cx, main_y);
+
+        int line = 20;
+
+        int start_y = main_y + 16 + 1 * line;
+        int end_y = main_y + total_height - 8;
+
+        // calculate scroll (top rendered index) here
+        int total_lines = (int)profiles.size() + 1;
+        int avail_lines = (end_y - start_y) / line;
+
+        int scroll_start = 0;
+        int scroll_end = total_lines;
+
+        if(avail_lines < total_lines)
+        {
+            if(m_menu_item >= 0)
+                scroll_start = m_menu_item - avail_lines/2;
+            if(scroll_start < 0)
+                scroll_start = 0;
+
+            scroll_end = scroll_start + avail_lines;
+            if(scroll_end > total_lines)
+            {
+                scroll_end = total_lines;
+                scroll_start = scroll_end - avail_lines;
+            }
+        }
+
+        // render the scroll indicators
+        if(render)
+        {
+            if(scroll_start > 0)
+                XRender::renderTexture(cx - GFX.MCursor[1].w / 2, start_y - GFX.MCursor[1].h, GFX.MCursor[1]);
+
+            if(scroll_end < total_lines)
+                XRender::renderTexture(cx - GFX.MCursor[2].w / 2, start_y + (avail_lines)*line - line + 18, GFX.MCursor[2]);
+        }
+
+        // show the menu cursor for the player
+        if(render && m_menu_item >= 0)
+            Render_PCursor(x + 6, start_y + (m_menu_item-scroll_start)*line);
+
+        // render the profile names and "Back"
+        for(int i = scroll_start; i < scroll_end; i++)
+        {
+            std::string* name = &g_mainMenu.wordBack;
+
+            if(i != (int)profiles.size())
+                name = &(profiles[i]->Name);
+
+            MenuItem_Mouse_Render(i, *name,
+                x + 6 + 16 + 2, start_y + (i-scroll_start)*line, mouse, render, x + w - 6);
+        }
+    }
+
+    // render the profile confirmation screen
+    if(render && m_state == PlayerState::ConfirmProfile)
+    {
+        SuperPrintCenter(g_gameStrings.connectTestProfile, 3, cx, main_y);
+
+        if(input_method && input_method->Profile != nullptr)
+        {
+            MarqueeSpec profile_spec(w - 12, 10, 64, 32, 0);
+            m_marquee_state.advance(profile_spec);
+            SuperPrintMarquee(input_method->Profile->Name, 5, x + 6, main_y + 20, profile_spec, m_marquee_state);
+        }
+    }
+
+    // draw the controls box in the appropriate place
+    if(render)
+    {
+        int controls_x = 0;
+        int controls_y = 0;
+
+        if(m_state == PlayerState::SelectProfile || m_state == PlayerState::StartGame || m_state == PlayerState::ForceDrop)
+        {
+            // don't draw at all
+        }
+        else if(m_state == PlayerState::ConfirmProfile)
+        {
+            controls_x = main_x + main_width / 2 - 76 / 2;
+            controls_y = main_y + main_height / 2 - 16;
+        }
+        else if(m_state == PlayerState::Disconnected || m_state == PlayerState::Reconnecting)
+        {
+            controls_x = main_x + main_width / 2 - 76 / 2;
+            controls_y = icons_y - 6;
+        }
+        else
+        {
+            controls_x = icons_x - 84;
+            controls_y = icons_y - 6;
+        }
+
+        if(controls_x != 0)
+        {
+            if(inactive)
+                speedRun_syncControlKeys(p, Controls_t());
+
+            RenderControls(p + 1, controls_x, controls_y, 76, 30, !input_method, 255, true);
+        }
+    }
+
+    // render the controls menu main icons
+    if(m_state == PlayerState::SelectChar || m_state == PlayerState::ControlsMenu)
+    {
+        int col_spacer = (x + w - 4 - icons_x) / 3;
+        int base_col = icons_x + col_spacer;
+
+        // show the cursor for the player
+        if(render && m_state == PlayerState::ControlsMenu)
+            Render_PCursorDownwards(base_col + 12 + m_menu_item * col_spacer, icons_y);
+
+        // drop me
+        if(ControlsMenu_ShowDrop(p))
+        {
+            // this one returns true when no players are left
+            if(MenuItem_Mouse_Render(-1, "X",
+                base_col - col_spacer, icons_y, mouse, render))
+            {
+                return -1;
+            }
+        }
+
+        // reconnect controller
+        MenuItem_Mouse_Render(0, "O",
+            base_col, icons_y, mouse, render);
+
+        // switch profile
+        MenuItem_Mouse_Render(1, "?",
+            base_col + col_spacer, icons_y, mouse, render);
+    }
+
+    // hint string
+    if(render)
+    {
+        const std::string* message = nullptr;
+        std::string temporary;
+        XTColor message_color;
+
+        if(m_state == PlayerState::SelectChar)
+        {
+            if(input_method && input_method->Profile != nullptr)
+            {
+                message = &input_method->Profile->Name;
+                message_color = XTAlphaF(0.75);
+            }
+        }
+        else if(m_state == PlayerState::ControlsMenu)
+        {
+            if(m_menu_item == -1)
+                message = &g_gameStrings.connectDropMe;
+            else if(m_menu_item == 0)
+                message = &g_gameStrings.connectReconnectTitle;
+            else if(m_menu_item == 1)
+                message = &g_mainMenu.wordProfiles;
+        }
+        else if(m_state == PlayerState::ConfirmProfile)
+        {
+            // using marquee for profile name
+            SuperPrintCenter(g_gameStrings.connectHoldStart, 5, cx, infotext_y, message_color);
+        }
+        else if(m_state == PlayerState::StartGame)
+        {
+            if(CheckDone())
+                message = &g_mainMenu.connectStartGame;
+            else if((CommonFrame % 60) < 30)
+                SuperPrintCenter(g_mainMenu.wordWaiting, 5, cx, infotext_y, XTAlphaF(0.75));
+        }
+        else if(m_state == PlayerState::ForceDrop)
+        {
+            int index = CheckCanDrop() + 1;
+
+            if(index != 0)
+                message = &(temporary = fmt::format_ne(g_gameStrings.connectDropPX, index));
+        }
+        else if(m_state == PlayerState::Reconnecting)
+            message = &g_gameStrings.connectReconnectTitle;
+        else if(m_state == PlayerState::Disconnected)
+            message = &g_gameStrings.connectPressAButton;
+
+        if(message)
+        {
+            MarqueeSpec print_spec = MarqueeSpec(main_width - 8, 10, 16, 32, 0);
+
+            m_marquee_state.advance(print_spec);
+            SuperPrintMarquee(*message, 5, main_x + 4, infotext_y, print_spec, m_marquee_state, message_color);
+        }
+    }
+
+    if(MenuMouseRelease && SharedCursor.Secondary
+        && SharedCursor.X >= x && SharedCursor.X <= x + w
+        && SharedCursor.Y >= y && SharedCursor.Y <= y + h)
+    {
+        MenuMouseRelease = false;
+        if(Back())
+            return -1;
+    }
+
+    return 0;
 }
 
 int Mouse_Render(bool mouse, bool render)
@@ -1274,232 +1850,401 @@ int Mouse_Render(bool mouse, bool render)
     int MenuX, MenuY;
     GetMenuPos(&MenuX, &MenuY);
 
-    if(mouse && !SharedCursor.Move && !render && !SharedCursor.Primary && !SharedCursor.Secondary)
+    if(mouse && !SharedCursor.Move && !render && !SharedCursor.Primary && !SharedCursor.Secondary && !SharedCursor.ScrollUp && !SharedCursor.ScrollDown)
         return 0;
 
-    int n = (int)Controls::g_InputMethods.size();
-
-    if(s_context == Context::DropAdd || (s_context == Context::MainMenu && s_minPlayers != 1))
-        n += 1;
-
-    if(n < s_minPlayers)
-        n = s_minPlayers;
-
-    if(n > maxLocalPlayers)
-        n = maxLocalPlayers;
-
-    if(s_context == Context::DropAdd && g_gameInfo.disableTwoPlayer)
-        n = 1;
-
-    if(n > 2 && (int)Controls::g_InputMethods.size() <= 2)
-        n = 2;
-
-
-    // What is the first player that is not done?
-    int menuPlayer = GetMenuPlayer();
-
-    // call their Player_Back routine in the correct circumstances
-    if(mouse && SharedCursor.Secondary && MenuMouseRelease)
-    {
-        // normally want to cancel the thing that the previous player did
-        MenuMouseRelease = false;
-        if(menuPlayer == 0)
-        {
-            if(Player_Back(menuPlayer))
-                return -1;
-        }
-        else
-        {
-            if(Player_Back(menuPlayer-1))
-                return -1;
-        }
-    }
-
+    int n = BoxCount();
 
     /*--------------------*\
-    || Get screen pos     ||
+    || Arrange screen     ||
     \*--------------------*/
 
-    // there are 15 rows of text; 30px each by default.
-    // line height is scaled so that these fit onscreen
-    // with at least 30px of padding on either side
-    int max_line = 15;
-    int line = (ScreenH - 60) / max_line;
+    const int header_height = (s_context == Context::DropAdd) ? 32 : 0;
+    int box_width = 220;
+    const int box_height = 240;
+    int padding = 16;
 
-    if(line > 30)
-        line = 30;
+    // number of columns per row
+    int n_cols[2] = {n, 0};
 
-    if(line < 18)
+    // do drop/add in 2 rows when >2P
+    if(n > 2 && s_context != Context::MainMenu)
     {
-        line = 18;
-        max_line = (ScreenH - 60) / line;
+        n_cols[1] = n / 2;
+        n_cols[0] = n - n_cols[1];
     }
 
-    line -= line & 1;
-
-
-    // vertical start of the menu
-    int sY = ScreenH/2 - (line*max_line)/2;
-    sY -= sY & 1;
-
-    // Assume that the controller profile name is up to 15 characters.
-    // This means that each player should have up to 270px horizontal space
-    // to themselves. Each player absolutely needs 144px to themselves
-    // (enough to spell "player 1").
-
-    // Automatically set up the screen to enable this, with minimum width 144px
-    // and maximum width 270px per player.
-    int p_width = (ScreenW-20)/n;
-    const int min_width = 200;
-    const int max_width = 320;
-
-    if(p_width > max_width)
-        p_width = max_width;
-
-    // horizontal start and width of the menu
-    int sX;
-    int sW;
-
-    // center players on screen
-    sX = ScreenW/2 - (p_width*n)/2;
-    sX -= sX & 1;
-    sW = p_width*n;
-
-    /*------------------------------------*\
-    || Special modifications for P1 start ||
-    \*------------------------------------*/
-    if(s_context == Context::MainMenu && s_minPlayers == 1)
+    // shrink boxes when there are more than 3 columns
+    if(n_cols[0] > 3)
     {
-        sX = MenuX;
-        sW = 200;
-        sY = MenuY;
+        box_width = 168;
+        padding = 8;
     }
 
+    int full_height = header_height + box_height + padding;
+    int full_width = padding + (box_width + padding) * n_cols[0];
 
-    if(render && !(s_context == Context::MainMenu && s_minPlayers == 1))
+    if(n_cols[1])
+        full_height += padding + box_height;
+
+    // vertical / horizontal start of the menu
+    int start_x = ScreenW / 2 - full_width / 2;
+    int draw_y = ScreenH / 2 - full_height / 2;
+
+    if(IsMenu())
+        GetMenuPos(nullptr, &draw_y);
+
+    // make sure they are even
+    start_x &= ~1;
+    draw_y &= ~1;
+
+    /*-----------------------*\
+    || Background and header ||
+    \*-----------------------*/
+
+    if(s_context == Context::DropAdd)
     {
-        XRender::renderRect(sX, sY - (line-16), p_width*n, line*max_line + line-16, {0, 0, 0, 127});
-    }
-
-    /*--------------------*\
-    || Render menu        ||
-    \*--------------------*/
-
-    if(render)
-    {
-        if(s_context == Context::MainMenu && s_minPlayers == 1)
+        if(render)
         {
-            SuperPrint(g_mainMenu.main1PlayerGame, 3, MenuX, MenuY - 70, XTColorF(1.0f, 0.3f, 0.3f));
-            SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
+            XRender::renderRect(start_x, draw_y, full_width, full_height, XTColorF(0.0f, 0.0f, 0.0f, 0.5f));
+            SuperPrintScreenCenter(g_gameStrings.connectDropAddTitle, 3, draw_y + 8);
         }
-        else if(s_context == Context::MainMenu)
-            SuperPrintScreenCenter(g_mainMenu.connectCharSelTitle, 3, sY);
-        else if(s_context == Context::DropAdd)
-            SuperPrintScreenCenter(g_gameStrings.connectDropAddTitle, 3, sY);
-        else if(s_context == Context::Reconnect)
-            SuperPrintScreenCenter(g_gameStrings.connectReconnectTitle, 3, sY);
+
+        draw_y += header_height;
     }
 
-    if(s_context == Context::MainMenu && s_minPlayers == 1)
-    {
-        if(s_playerState[0] == PlayerState::Disconnected || s_playerState[0] == PlayerState::SelectChar)
-            Chars_Mouse_Render(MenuX, 200, MenuY, 150, mouse, render);
-    }
-    else
-        Chars_Mouse_Render(sX, sW, sY+line*2, line*5, mouse, render);
+    int ret = 0;
 
-    if(s_context == Context::Reconnect || s_context == Context::DropAdd)
-    {
-        if(CheckDone())
-        {
-            if(s_context == Context::Reconnect)
-                SuperPrintScreenCenter(g_gameStrings.connectPressStartToResume, 3, sY+line*8);
-            else
-                SuperPrintScreenCenter(g_gameStrings.connectPressStartToResume, 3, sY+line*8, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
-        }
-        else
-        {
-            // if any players connected, show the force resume text
-            int p;
-            for(p = 0; p < n; p++)
-            {
-                if(s_playerState[p] == PlayerState::ReconnectMain || s_playerState[p] == PlayerState::DropAddMain)
-                    break;
-            }
-            if(p != n)
-                SuperPrintScreenCenter(g_gameStrings.connectPressStartToForceResume, 3, sY+line*8, XTColorF(0.8f, 0.8f, 0.8f, 0.8f));
-        }
-    }
+    // start drawing player boxes
+    int draw_x = start_x + padding;
 
     for(int p = 0; p < n; p++)
     {
-        // locate player's screen
-        // lX is the position of aligned text
-        // cX is the position of centered (possibly long) text
-        int lX = sX + p * p_width;
-        int cX = lX + p_width / 2;
-        if(p_width > min_width)
+        // start new row if needed
+        if(p == n_cols[0])
         {
-            lX += (p_width - min_width) / 2;
+            draw_x = start_x + padding;
+            draw_y += box_height + padding;
         }
-        lX -= lX & 1;
-        cX -= cX & 1;
 
-        if(s_context == Context::MainMenu && s_minPlayers == 1)
-        {
-            // reconnecting
-            if(s_playerState[p] == PlayerState::Reconnecting)
-            {
-                if(render)
-                {
-                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
-                    if((CommonFrame % 90) < 45)
-                        SuperPrintScreenCenter(g_gameStrings.connectPressAButton, 3, MenuY + 90);
-                }
-            }
-            else if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::SelectChar)
-            {
-                Player_Mouse_Render(p, MenuX, ScreenW / 2, MenuY + 70, 30, mouse, render);
-            }
-            else if(s_playerState[p] == PlayerState::ControlsMenu || s_playerState[p] == PlayerState::TestControls)
-            {
-                int l = ScreenW/2 - 150;
-                if(l < 0)
-                    l = 0;
-                if(render)
-                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
-                Player_Mouse_Render(p, l + 24, ScreenW / 2, MenuY, 30, mouse, render);
-            }
-            else
-            {
-                int l = ScreenW/2 - 150;
-                if(l < 0)
-                    l = 0;
-                if(render)
-                    XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, {0, 0, 0, 127});
-                Player_Mouse_Render(p, l + 24, ScreenW / 2, MenuY + 30, 30, mouse, render);
-            }
-        }
-        else
-            Player_Mouse_Render(p, lX, cX, sY+line*(max_line-5), line, mouse, render);
+        int p_ret = s_players[p].Mouse_Render(render, draw_x, draw_y, box_width, box_height);
+
+        if(p_ret != 0)
+            ret = p_ret;
+
+        draw_x += box_width + padding;
     }
 
-    if(CheckDone())
+    // reset selected characters for non-added players
+    for(int p = 0; p < n; p++)
     {
-        if(mouse && MenuMouseRelease && SharedCursor.Primary)
-        {
-            PlaySoundMenu(SFX_Do);
-            MenuMouseRelease = false;
-            return 1;
-        }
+        if(s_players[p].m_state == PlayerState::Disconnected && (s_context == Context::MainMenu || p >= numPlayers))
+            g_charSelect[p] = 0;
     }
 
-    return 0;
+    return ret;
 }
 
 int MouseLogic()
 {
+    // check mouse release if not in main menu
+    if(s_context == Context::DropAdd)
+    {
+        if(!SharedCursor.Primary && !SharedCursor.Secondary)
+            MenuMouseRelease = true;
+    }
+
     return Mouse_Render(true, false);
+}
+
+int PlayerBox::Logic()
+{
+    int p = CalcIndex();
+    auto* input_method = (p < (int)Controls::g_InputMethods.size()) ? Controls::g_InputMethods[p] : nullptr;
+
+
+    // hide "Drop Me", if it is no longer allowed
+    if(m_state == PlayerState::ControlsMenu
+        && m_menu_item == -1 && !ControlsMenu_ShowDrop(p))
+    {
+        m_menu_item = 0;
+        m_marquee_state.reset_width();
+    }
+
+    // if player's input was lost, mark disconnected and return (unless in 1P menu)
+    if(!Is1P() && !input_method)
+    {
+        m_input_ready = false;
+
+        if(m_state != PlayerState::Reconnecting && m_state != PlayerState::Disconnected)
+        {
+            m_state = PlayerState::Disconnected;
+            m_marquee_state.reset_width();
+        }
+
+        return 0;
+    }
+
+    // if the player has a controller and was previously disconnected, mark them as connected
+    if(m_state == PlayerState::Disconnected || m_state == PlayerState::Reconnecting)
+    {
+        m_marquee_state.reset_width();
+        m_input_ready = false;
+
+        if(IsMenu())
+        {
+            if(m_state == PlayerState::Reconnecting) // requested reconnect
+            {
+                m_state = PlayerState::SelectChar;
+                m_menu_item = 0;
+                PlaySoundMenu(SFX_Pet);
+            }
+            else
+            {
+                m_input_ready = true;
+                m_just_added = true;
+
+                m_menu_item = 0;
+                g_charSelect[p] = 1;
+                m_state = PlayerState::SelectChar;
+                ValidateChar();
+            }
+        }
+        else if(s_context == Context::DropAdd)
+        {
+            // this is an Add situation
+            if(p >= numPlayers)
+            {
+                m_menu_item = 0;
+                g_charSelect[p] = 1;
+                m_state = PlayerState::SelectChar;
+
+                // check whether a novel add
+                if(p >= s_char_info.max_players)
+                {
+                    m_current_add = 2;
+                    s_char_info.max_players = p + 1;
+                }
+                else
+                {
+                    m_current_add = 1;
+                }
+
+                // validate character
+                ValidateChar();
+
+                // add the player immediately
+                UpdatePlayer();
+            }
+            else // was disconnected
+            {
+                m_state = PlayerState::SelectChar;
+                m_menu_item = 0;
+                PlaySoundMenu(SFX_Pet);
+            }
+        }
+
+        // wait in case controls are not yet updated
+        return 0;
+    }
+
+    const Controls_t& c = Player[p+1].Controls;
+
+    if(m_just_added)
+    {
+        // play drop item noise?
+        bool play_noise = (s_context != Context::LegacyMenu);
+
+        // block start and back if not 1P
+        if(Controls::g_InputMethods.size() > 1 && (c.Jump || c.Start || c.Run || SharedControls.MenuBack))
+            m_input_ready = false;
+        // if pressing back, don't play drop item noise
+        else if(c.Run || SharedControls.MenuBack)
+            play_noise = false;
+
+        // if about to move cursor, don't play drop item noise
+        if(m_input_ready && (c.Down || c.Up || c.Left || c.Right))
+            play_noise = false;
+
+        // if about to go forwards (at menu screen), don't play drop item noise
+        if(s_context == Context::MainMenu && m_input_ready && (c.Jump || c.Start))
+            play_noise = false;
+
+        if(play_noise)
+            PlaySoundMenu(SFX_DropItem);
+
+        m_just_added = false;
+    }
+
+    // don't do any logic until all buttons have been released
+    if(!m_input_ready)
+    {
+        if(!SharedControls.MenuDo && !SharedControls.MenuBack && !SharedControls.MenuDown
+            && !SharedControls.MenuUp && !SharedControls.MenuLeft && !SharedControls.MenuRight
+            && !c.Jump && !c.Start && !c.Run && !c.Down && !c.Up && !c.Left && !c.Right && !c.Drop)
+        {
+            m_input_ready = true;
+        }
+
+        return 0;
+    }
+
+    if(m_state == PlayerState::ConfirmProfile)
+    {
+        bool no_buttons = !c.Run && !c.Jump && !c.AltRun && !c.AltJump && !c.Start && !c.Drop && !c.Down && !c.Up && !c.Left && !c.Right;
+
+        if(!no_buttons && m_menu_item < 66 * 3)
+            m_menu_item = (4 * m_menu_item + 66 * 3) / 5;
+
+        if(c.Start)
+            m_menu_item += 2;
+        else if(m_menu_item > 66 * 3 || no_buttons)
+            m_menu_item--;
+
+        if(m_menu_item < 0)
+        {
+            // Go back to profile select screen, if possible
+            if(input_method)
+            {
+                m_state = PlayerState::SelectProfile;
+
+                // set the current menu item to the profile that the player tried to activate.
+                std::vector<Controls::InputMethodProfile*> profiles = input_method->Type->GetProfiles();
+                std::vector<Controls::InputMethodProfile*>::iterator p_profile
+                    = std::find(profiles.begin(), profiles.end(), input_method->Profile);
+
+                if(profiles.size() > 1 && p_profile != profiles.end())
+                    m_menu_item = p_profile - profiles.begin();
+                else
+                    m_menu_item = 0;
+
+                Controls::SetInputMethodProfile(input_method, m_last_profile);
+            }
+            else
+            {
+                m_state = PlayerState::ControlsMenu;
+                m_menu_item = 1;
+            }
+
+            m_last_profile = nullptr;
+            m_input_ready = false;
+            m_marquee_state.reset_width();
+            PlaySoundMenu(SFX_Slide);
+        }
+        else if(m_menu_item > 66 * 5)
+        {
+            PlaySoundMenu(SFX_Do);
+
+            if(Is1P())
+            {
+                m_menu_item = 0;
+                m_state = PlayerState::SelectChar;
+            }
+            else
+            {
+                m_menu_item = 1;
+                m_state = PlayerState::ControlsMenu;
+            }
+
+            m_last_profile = nullptr;
+            m_input_ready = false;
+            m_marquee_state.reset_width();
+        }
+
+        return 0;
+    }
+
+    if(m_state == PlayerState::ForceDrop)
+    {
+        int to_drop = CheckCanDrop();
+
+        if(to_drop == -1)
+        {
+            PlaySoundMenu(SFX_BlockHit);
+            m_state = PlayerState::ControlsMenu;
+            m_menu_item = 0;
+            m_marquee_state.reset_width();
+            m_input_ready = false;
+        }
+        else if(c.Run)
+            m_menu_item += 1;
+        else if(m_menu_item >= 0)
+            m_menu_item -= 2;
+
+        if(m_menu_item > 66 * 2)
+        {
+            Player_Remove(to_drop);
+
+            if(CheckDone())
+            {
+                PlaySoundMenu(SFX_Slide);
+                return -1;
+            }
+
+            m_menu_item = 0;
+        }
+        else if(m_menu_item < 0)
+        {
+            m_state = PlayerState::ControlsMenu;
+            m_menu_item = 0;
+            m_marquee_state.reset_width();
+            m_input_ready = false;
+        }
+
+        return 0;
+    }
+    else if(c.Run || (Is1P() && SharedControls.MenuBack))
+    {
+        if(Back())
+            return -1;
+    }
+    else if(m_state == PlayerState::StartGame)
+    {
+        if(CheckDone() && (c.Start || c.Jump))
+            m_menu_item += 2;
+        else if(m_menu_item > 0)
+            m_menu_item -= 2;
+
+        if(m_menu_item > 66 * 2)
+            return Do();
+
+        return 0;
+    }
+    else if(c.Jump || c.Start || (Is1P() && SharedControls.MenuDo))
+    {
+        if(Do())
+        {
+            if(Controls::g_InputMethods.empty())
+                return -1;
+
+            return 1;
+        }
+    }
+    else if(c.Down || (Is1P() && SharedControls.MenuDown))
+    {
+        Down();
+    }
+    else if(c.Up || (Is1P() && SharedControls.MenuUp))
+    {
+        Up();
+    }
+    else if(c.Left || (Is1P() && SharedControls.MenuLeft))
+    {
+        Left();
+    }
+    else if(c.Right || (Is1P() && SharedControls.MenuRight))
+    {
+        Right();
+    }
+    else if(Is1P() && m_state == PlayerState::SelectChar && c.Drop)
+    {
+        // force Select Profile mode
+        m_state = PlayerState::ControlsMenu;
+        m_menu_item = 1;
+        Do();
+    }
+
+    return 0;
 }
 
 int Logic()
@@ -1511,7 +2256,8 @@ int Logic()
     {
         if(!SharedControls.MenuBack)
             MenuCursorCanMove = true;
-        if(SharedControls.MenuBack && MenuCursorCanMove)
+
+        if((SharedControls.MenuBack && MenuCursorCanMove) || (SharedCursor.Secondary && MenuMouseRelease))
         {
             PlaySoundMenu(SFX_Slide);
             MenuCursorCanMove = false;
@@ -1523,287 +2269,44 @@ int Logic()
     ||   per-player logic    ||
     \*-----------------------*/
 
-    // What is the first player that is not done?
-    int menuPlayer = GetMenuPlayer();
-
     for(int p = 0; p < maxLocalPlayers; p++)
     {
-        // hide "Drop Me", etc, if it is no longer allowed
-        if(s_context == Context::DropAdd && s_playerState[p] == PlayerState::DropAddMain
-            && s_menuItem[p] >= DropAddMain_ItemCount())
+        int p_ret = s_players[p].Logic();
+        if(p_ret)
         {
-            s_menuItem[p] = DropAddMain_ItemCount() - 1;
-        }
-
-        // if player doesn't exist, or was lost *not on menu screen*
-        if(p >= (int)Controls::g_InputMethods.size()
-            || (!Controls::g_InputMethods[p] && s_context != Context::MainMenu))
-        {
-            s_inputReady[p] = false;
-
-            if(s_playerState[p] != PlayerState::Reconnecting)
-                s_playerState[p] = PlayerState::Disconnected;
-
-            continue;
-        }
-
-        // if player was lost (necessarily on menu screen) remove them
-        if(!Controls::g_InputMethods[p])
-        {
-            if(s_playerState[p] == PlayerState::Reconnecting)
-                continue;
-
-            // if Player is last player, return to previous menu screen
-            if(Player_Remove(p))
-            {
-                PlaySoundMenu(SFX_Slide);
-                return -1;
-            }
-            else
-            {
-                PlaySoundMenu(SFX_PlayerDied2);
-            }
-            // either way, other players' controls invalidated
-            break;
-        }
-
-        // if the player has a controller and was disconnected, mark them as connected
-        if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::Reconnecting)
-        {
-            s_inputReady[p] = false;
-            if(s_context == Context::MainMenu)
-            {
-                // because P1's UI is shown in 1 player mode on the main menu,
-                // allow the first controller to immediately act upon connection
-                if(s_playerState[p] == PlayerState::Reconnecting) // requested reconnect
-                {
-                    s_playerState[p] = PlayerState::ControlsMenu;
-                    s_menuItem[p] = 2;
-                    PlaySoundMenu(SFX_Pet);
-                }
-                else if(p == 0 && s_minPlayers == 1)
-                {
-                    s_inputReady[p] = true;
-                    if(g_charSelect[p] != 0)
-                    {
-                        s_playerState[p] = PlayerState::StartGame;
-                        s_menuItem[p] = -4;
-                    }
-                    else
-                    {
-                        s_playerState[p] = PlayerState::SelectChar;
-                        Player_ValidateChar(p);
-                    }
-                }
-                else
-                {
-                    PlaySoundMenu(SFX_DropItem);
-                    s_menuItem[p] = 0;
-                    s_playerState[p] = PlayerState::SelectChar;
-                    Player_ValidateChar(p);
-                }
-            }
-            else if(s_context == Context::DropAdd)
-            {
-                // this is an Add situation (wouldn't happen if s_context == Context::Reconnect)
-                if(p >= numPlayers)
-                {
-                    PlaySoundMenu(SFX_DropItem);
-                    s_menuItem[p] = 0;
-                    g_charSelect[p] = 0;
-                    s_playerState[p] = PlayerState::SelectChar;
-                    Player_ValidateChar(p);
-                }
-                else if(s_playerState[p] == PlayerState::Reconnecting) // requested Reconnect
-                {
-                    s_playerState[p] = PlayerState::ControlsMenu;
-                    s_menuItem[p] = 2;
-                    PlaySoundMenu(SFX_Pet);
-                }
-                else
-                {
-                    PlaySoundMenu(SFX_DropItem);
-                    s_playerState[p] = PlayerState::DropAddMain;
-                    s_menuItem[p] = 0;
-                }
-            }
-            else if(s_context == Context::Reconnect)
-            {
-                if(s_playerState[p] == PlayerState::Reconnecting) // requested Reconnect
-                {
-                    s_playerState[p] = PlayerState::ControlsMenu;
-                    s_menuItem[p] = 2;
-                    PlaySoundMenu(SFX_Pet);
-                }
-                else
-                {
-                    s_playerState[p] = PlayerState::ReconnectMain;
-                    s_menuItem[p] = 0;
-                    PlaySoundMenu(SFX_Pet);
-                }
-            }
-            // okay to continue processing them because Controls are now updated
-        }
-
-        const Controls_t& c = Player[p+1].Controls;
-
-        if(!s_inputReady[p])
-        {
-            if(!SharedControls.MenuDo && !SharedControls.MenuBack && !SharedControls.MenuDown
-                && !SharedControls.MenuUp && !SharedControls.MenuLeft && !SharedControls.MenuRight
-                && !c.Jump && !c.Start && !c.Run && !c.Down && !c.Up && !c.Left && !c.Right && !c.Drop)
-            {
-                s_inputReady[p] = true;
-            }
-            continue;
-        }
-
-        // enter the controls menu, given Select pressed and in ReconnectMain or in an Add situation
-        if(s_playerState[p] == PlayerState::ReconnectMain || (s_playerState[p] == PlayerState::SelectChar && (s_context == Context::MainMenu || p >= numPlayers)))
-        {
-            if(c.Drop)
-            {
-                s_playerState[p] = PlayerState::ControlsMenu;
-                s_menuItem[p] = 0;
-                continue;
-            }
-        }
-
-        if(s_playerState[p] == PlayerState::ConfirmProfile || s_playerState[p] == PlayerState::TestControls)
-        {
-            if(s_playerState[p] == PlayerState::ConfirmProfile)
-            {
-                if(!c.Run && !c.Jump && !c.AltRun && !c.AltJump && !c.Start && !c.Drop && !c.Down && !c.Up && !c.Left && !c.Right)
-                {
-                    s_menuItem[p] --;
-                }
-                else if(s_menuItem[p] < 66*3)
-                    s_menuItem[p] = 66*3;
-            }
-            if(s_playerState[p] == PlayerState::TestControls || s_menuItem[p] > 66*3)
-            {
-                if(!c.Start)
-                {
-                    s_menuItem[p] --;
-                }
-            }
-            if(c.Start)
-            {
-                s_menuItem[p] ++;
-            }
-            if(s_menuItem[p] < 0)
-            {
-                if(s_playerState[p] == PlayerState::TestControls)
-                    s_menuItem[p] = 0;
-                if(s_playerState[p] == PlayerState::ConfirmProfile)
-                {
-                    Controls::SetInputMethodProfile(Controls::g_InputMethods[p], s_savedProfile[p]);
-                    s_playerState[p] = PlayerState::ControlsMenu;
-                    s_savedProfile[p] = nullptr;
-                    s_menuItem[p] = 0;
-                    s_inputReady[p] = false;
-                    PlaySoundMenu(SFX_Slide);
-                }
-            }
-            else if((s_playerState[p] == PlayerState::TestControls && s_menuItem[p] > 66*1)
-                || (s_playerState[p] == PlayerState::ConfirmProfile && s_menuItem[p] > 66*4))
-            {
-                PlaySoundMenu(SFX_Do);
-                if(s_playerState[p] == PlayerState::TestControls)
-                    s_menuItem[p] = 1;
-                else
-                    s_menuItem[p] = 0;
-                s_playerState[p] = PlayerState::ControlsMenu;
-                s_savedProfile[p] = nullptr;
-                s_inputReady[p] = false;
-            }
-            continue;
-        }
-
-        if(SharedControls.MenuDo || SharedControls.MenuBack || SharedControls.MenuDown
-            || SharedControls.MenuUp || SharedControls.MenuLeft || SharedControls.MenuRight)
-        {
-            s_inputReady[p] = false;
-        }
-
-        if(c.Start && s_context == Context::DropAdd && s_playerState[p] == PlayerState::DropAddMain)
-        {
-            // Press Start to Resume
-            s_playerState[p] = PlayerState::ReconnectMain;
-            if(Player_Select(p))
-                return 1;
-        }
-        else if(c.Run || (p == menuPlayer-1 && SharedControls.MenuBack)
-            || (p == 0 && p == menuPlayer && SharedControls.MenuBack))
-        {
-            if(Player_Back(p))
-                return -1;
-        }
-        else if(c.Jump || c.Start || (p == menuPlayer && SharedControls.MenuDo))
-        {
-            if(Player_Select(p))
-                return 1;
-        }
-        else if(c.Down || (p == menuPlayer && SharedControls.MenuDown))
-        {
-            Player_Down(p);
-        }
-        else if(c.Up || (p == menuPlayer && SharedControls.MenuUp))
-        {
-            Player_Up(p);
+            s_char_info.mark_present();
+            return p_ret;
         }
     }
 
     int ret = MouseLogic();
+    if(ret)
+    {
+        s_char_info.mark_present();
+        return ret;
+    }
 
     /*-----------------------*\
     || polling input methods ||
     \*-----------------------*/
     bool block_poll = false;
-    // do not allow more players than previously existed to reconnect
-    if(s_context == Context::Reconnect)
-    {
-        if((int)Controls::g_InputMethods.size() < s_minPlayers)
-            block_poll = false;
-        else
-        {
-            block_poll = true;
-            for(Controls::InputMethod* method : Controls::g_InputMethods)
-            {
-                if(!method)
-                    block_poll = false;
-            }
-        }
-    }
 
-    // in 1-player mode, only allow a single player to connect
-    if(s_context == Context::MainMenu && s_minPlayers == 1)
-    {
-        if((int)Controls::g_InputMethods.size() >= s_minPlayers)
-            block_poll = true;
-    }
-
+    // only allow the correct number of players to connect
     int first_not_connected = std::find(Controls::g_InputMethods.begin(), Controls::g_InputMethods.end(), nullptr) - Controls::g_InputMethods.begin();
-
-    // if the game has disabled 2-player mode, only allow a single player to connect
-    if(g_gameInfo.disableTwoPlayer && first_not_connected == 1)
+    if(first_not_connected >= BoxCount())
         block_poll = true;
 
-    // only allow 2 players to connect for now
-    if(first_not_connected == 2 && Controls::g_InputMethods.size() <= 2)
-        block_poll = true;
-
-    // block polling if a player is hitting random buttons
+    // block polling if a player might need to restore their previous profile
     for(int p = 0; p < maxLocalPlayers; p++)
     {
-        if(s_playerState[p] == PlayerState::TestControls || s_playerState[p] == PlayerState::ConfirmProfile)
+        if(s_players[p].m_state == PlayerState::ConfirmProfile)
             block_poll = true;
     }
 
     if(!block_poll)
         Controls::PollInputMethod();
 
-    return ret;
+    return 0;
 }
 
 void Render()
@@ -1814,18 +2317,8 @@ void Render()
 // reset allowed char tracking
 void SaveChars()
 {
-    for(int c = 0; c < 5; c++)
-        s_char_info.char_present[c] = false;
-
-    s_char_info.max_players = numPlayers;
-    s_char_info.dead_count = 0;
-
-    for(int A = 1; A <= numPlayers; A++)
-    {
-        int c = Player[A].Character - 1;
-        if(0 <= c && c < 5)
-            s_char_info.char_present[c] = true;
-    }
+    s_char_info.reset();
+    s_char_info.mark_present();
 }
 
 } // namespace ConnectScreen

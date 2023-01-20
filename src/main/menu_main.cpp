@@ -1396,9 +1396,9 @@ bool mainMenuUpdate()
                     {
                         selSave = MenuCursor + 1;
                         if(MenuMode == MENU_SELECT_SLOT_2P)
-                            ConnectScreen::MainMenu_Start(2);
-                        else
                             ConnectScreen::MainMenu_Start(1);
+                        else
+                            ConnectScreen::LegacyMenu_Start();
                         MenuMode = MENU_CHARACTER_SELECT_NEW;
                         MenuCursorCanMove = false;
                     }
@@ -2017,6 +2017,10 @@ void mainMenuDraw()
     else if(MenuMode == MENU_CHARACTER_SELECT_NEW ||
             MenuMode == MENU_CHARACTER_SELECT_NEW_BM)
     {
+        s_drawGameTypeTitle(MenuX, MenuY - 70);
+        const auto& world_list = (MenuMode == MENU_CHARACTER_SELECT_NEW) ? SelectWorld : SelectBattle;
+        SuperPrint(world_list[selWorld].WorldName, 3, MenuX, MenuY - 40, XTColorF(0.6f, 1.f, 1.f));
+
         ConnectScreen::Render();
     }
 #if 0 // dead now
