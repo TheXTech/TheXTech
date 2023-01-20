@@ -26,7 +26,6 @@
 
 class GameplayTimer
 {
-    static std::string formatTime(int64_t t);
     bool    m_cyclesInt = false;
     bool    m_cyclesFin = false;
     int64_t m_cyclesCurrent = 0;
@@ -47,6 +46,8 @@ class GameplayTimer
     bool    m_semiTransparent = false;
 
 public:
+    static std::string formatTime(int64_t t);
+
     GameplayTimer();
 
     void setSemitransparent(bool t);
