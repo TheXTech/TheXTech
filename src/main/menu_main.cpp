@@ -1574,25 +1574,26 @@ static void s_drawGameSaves()
 
     // recenter if single row
     if(info.Time <= 0 && !gEnableDemoCounter)
-        row_1 = 26;
+        row_1 = infobox_y + 26;
 
     XRender::renderRect(infobox_x, infobox_y, 480, 68, 0, 0, 0, 0.5f);
 
+    // Score
     std::string t;
     SuperPrint(t = fmt::format_ne("Score: {0}", info.Score), 3, infobox_x + 10, row_1);
 
-    // Print lives on the screen
+    // Print lives on the screen (from gfx_update2.cpp)
     XRender::renderTexture(infobox_x + 272, row_1 + 2 + 14 - GFX.Interface[3].h, GFX.Interface[3]);
     XRender::renderTexture(infobox_x + 272 + 40, row_1 + 2 + 16 - GFX.Interface[3].h, GFX.Interface[1]);
     SuperPrint(t = std::to_string(info.Lives), 1, infobox_x + 272 + 62, row_1 + 2);
 
-    // Print coins on the screen
+    // Print coins on the screen (from gfx_update2.cpp)
     int coins_x = infobox_x + 480 - 10 - 36 - 62;
     XRender::renderTexture(coins_x + 16, row_1, GFX.Interface[2]);
     XRender::renderTexture(coins_x + 40, row_1 + 2, GFX.Interface[1]);
-
     SuperPrintRightAlign(t = std::to_string(info.Coins), 1, coins_x + 62 + 36, row_1 + 2);
 
+    // Gameplay Timer
     if(info.Time > 0)
     {
         std::string t = GameplayTimer::formatTime(info.Time);
@@ -1603,6 +1604,7 @@ static void s_drawGameSaves()
         SuperPrint(fmt::format_ne("Time: {0}", t), 3, infobox_x + 10, row_2);
     }
 
+    // Fails Counter
     if(gEnableDemoCounter)
         SuperPrintRightAlign(fmt::format_ne("{0}: {1}", gDemoCounterTitle, info.Fails), 3, infobox_x + 480 - 10, row_2);
 }
