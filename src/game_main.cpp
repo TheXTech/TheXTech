@@ -1780,7 +1780,7 @@ void StartEpisode()
 
     OpenWorld(wPath);
 
-    if(SaveSlot[selSave] >= 0)
+    if(SaveSlotInfo[selSave].Progress >= 0)
     {
         if(!NoMap)
             StartLevel.clear();

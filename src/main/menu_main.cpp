@@ -1274,7 +1274,7 @@ bool mainMenuUpdate()
 
                     if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
                     {
-                        if(SaveSlot[slot] < 0)
+                        if(SaveSlotInfo[slot].Progress < 0)
                             PlaySoundMenu(SFX_BlockHit);
                         else
                         {
@@ -1531,10 +1531,10 @@ static void s_drawGameSaves()
 
     for(A = 1; A <= maxSaveSlots; A++)
     {
-        if(SaveSlot[A] >= 0)
+        if(SaveSlotInfo[A].Progress >= 0)
         {
-            SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlot[A]), 3, 300, 320 + (A * 30));
-            if(SaveStars[A] > 0)
+            SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlotInfo[A].Progress), 3, 300, 320 + (A * 30));
+            if(SaveSlotInfo[A].Stars > 0)
             {
                 XRender::renderTexture(560, 320 + (A * 30) + 1,
                                       GFX.Interface[5].w, GFX.Interface[5].h,
@@ -1542,7 +1542,7 @@ static void s_drawGameSaves()
                 XRender::renderTexture(560 + 24, 320 + (A * 30) + 2,
                                       GFX.Interface[1].w, GFX.Interface[1].h,
                                       GFX.Interface[1], 0, 0);
-                SuperPrint(fmt::format_ne(" {0}", SaveStars[A]), 3, 588, 320 + (A * 30));
+                SuperPrint(fmt::format_ne(" {0}", SaveSlotInfo[A].Stars), 3, 588, 320 + (A * 30));
             }
         }
         else
