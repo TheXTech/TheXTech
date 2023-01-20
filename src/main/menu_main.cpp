@@ -40,6 +40,7 @@
 #include "menu_controls.h"
 
 #include "speedrunner.h"
+#include "main/gameplay_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
 #include "../player.h"
@@ -58,6 +59,7 @@
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
 #include "editor/write_world.h"
+#include "script/luna/luna.h"
 
 MainMenuContent g_mainMenu;
 
@@ -1557,6 +1559,54 @@ static void s_drawGameSaves()
         A++;
         SuperPrint("ERASE SAVE", 3, 300, 320 + (A * 30));
     }
+
+    if(MenuCursor < 0 || MenuCursor >= maxSaveSlots || (MenuMode != MENU_SELECT_SLOT_1P && MenuMode != MENU_SELECT_SLOT_2P) || SaveSlotInfo[MenuCursor + 1].Progress < 0)
+        return;
+
+    const auto& info = SaveSlotInfo[MenuCursor + 1];
+
+    int infobox_x = ScreenW / 2 - 240;
+    int MenuY = ScreenH - 250;
+    int infobox_y = MenuY + 145;
+
+    int row_1 = infobox_y + 10;
+    int row_2 = infobox_y + 42;
+
+    // recenter if single row
+    if(info.Time <= 0 && !gEnableDemoCounter)
+        row_1 = 26;
+
+    XRender::renderRect(infobox_x, infobox_y, 480, 68, 0, 0, 0, 0.5f);
+
+    std::string t;
+    SuperPrint(t = fmt::format_ne("Score: {0}", info.Score), 3, infobox_x + 10, row_1);
+
+    // 1-UP
+    XRender::renderTexture(infobox_x + 280, row_1, GFX.Interface[3]);
+    // times
+    XRender::renderTexture(infobox_x + 280 + 4 + GFX.Interface[3].w, row_1 + 1, GFX.Interface[1]);
+    // Lives
+    SuperPrintRightAlign(t = std::to_string(info.Lives), 1, infobox_x + 280 + 4 + 56 + GFX.Interface[3].w, row_1 + 1);
+
+    // coin
+    XRender::renderTexture(infobox_x + 480 - 10 - 56 - 4 - GFX.Interface[2].w, row_1, GFX.Interface[2]);
+    // times
+    XRender::renderTexture(infobox_x + 480 - 10 - 56, row_1 + 1, GFX.Interface[1]);
+    // coins
+    SuperPrintRightAlign(t = std::to_string(info.Coins), 1, infobox_x + 480 - 10, row_1 + 1);
+
+    if(info.Time > 0)
+    {
+        std::string t = GameplayTimer::formatTime(info.Time);
+
+        if(t.size() > 9)
+            t = t.substr(0, t.size() - 4);
+
+        SuperPrint(fmt::format_ne("Time: {0}", t), 3, infobox_x + 10, row_2);
+    }
+
+    if(gEnableDemoCounter)
+        SuperPrintRightAlign(fmt::format_ne("{0}: {1}", gDemoCounterTitle, info.Fails), 3, infobox_x + 480 - 10, row_2);
 }
 
 void mainMenuDraw()
