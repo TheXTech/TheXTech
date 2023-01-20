@@ -805,6 +805,32 @@ static void becomeAsLuigi()
     UpdateYoshiMusic();
 }
 
+static void superbDemo200()
+{
+    int B = CheckLiving();
+    if(B > 0)
+    {
+        numPlayers = 200;
+
+        SetupScreens();
+
+        if(Player[B].Effect == 9)
+            Player[B].Effect = 0;
+        Player[B].Immune = 1;
+
+        for(int C = 1; C <= numPlayers; C++)
+        {
+            if(C != B)
+            {
+                Player[C] = Player[B];
+                Player[C].Location.SpeedY = dRand() * 24 - 12;
+            }
+        }
+
+        Bomb(Player[B].Location, iRand(2) + 2);
+    }
+}
+
 static void superbDemo128()
 {
     int B = CheckLiving();
@@ -1712,6 +1738,160 @@ static void speedDemon()
     PlaySound(MaxFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
+static void newLeaf()
+{
+    GodMode = false;
+    MaxFPS = false;
+    ShowFPS = false;
+    MultiHop = false;
+    SuperSpeed = false;
+    FlyForever = false;
+    CoinMode = false;
+    FlameThrower = false;
+    CaptainN = false;
+    GrabAll = false;
+    ShadowMode = false;
+    PlaySound(SFX_BowserKilled);
+}
+
+static void getMeOuttaHere()
+{
+    // in non-cheat variant, LevelMacroCounter is stuck at 0 if player never leaves section
+    bool possible_softlock = (LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT && LevelMacroCounter == 0);
+
+    if(LevelMacro != LEVELMACRO_OFF && !possible_softlock)
+        return;
+
+    LevelBeatCode = 0;
+    LevelMacro = LEVELMACRO_OFF;
+    LevelMacroCounter = 0;
+    EndLevel = true;
+}
+
+static void holyTrinity()
+{
+    Location_t tempLocation;
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Immune = 50;
+        tempLocation = Player[B].Location;
+        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
+        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+    }
+
+    if(ShadowMode && GodMode && MultiHop)
+    {
+        ShadowMode = false;
+        GodMode = false;
+        MultiHop = false;
+    }
+    else
+    {
+        ShadowMode = true;
+        GodMode = true;
+        MultiHop = true;
+    }
+}
+
+static void essentials()
+{
+    Location_t tempLocation;
+
+    PlaySound(SFX_Raccoon);
+
+    for(int B = 1; B <= numPlayers; B++)
+    {
+        Player[B].Immune = 50;
+        tempLocation = Player[B].Location;
+        tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
+        tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
+        NewEffect(10, tempLocation);
+    }
+
+    if(ShadowMode && GodMode && MultiHop && SuperSpeed)
+    {
+        SuperSpeed = false;
+        ShadowMode = false;
+        GodMode = false;
+        MultiHop = false;
+    }
+    else
+    {
+        SuperSpeed = true;
+        ShadowMode = true;
+        GodMode = true;
+        MultiHop = true;
+    }
+}
+
+static void foundMyCarKey()
+{
+    if(LevelMacro != LEVELMACRO_OFF)
+        return;
+
+    PlaySound(SFX_Key);
+    StopMusic();
+    LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
+
+    int player = CheckLiving();
+    if(player && numBackground + numLocked < maxBackgrounds)
+    {
+        const Location_t& pLoc = Player[player].Location;
+
+        // can't properly add a background because they need to be sorted, but can at least trigger the animation.
+        Background_t& bgo = Background[numBackground + numLocked + 1];
+        bgo = Background_t();
+
+        bgo.Type = 35;
+
+        bgo.Location.Width = BackgroundWidth[35];
+        bgo.Location.Height = BackgroundHeight[35];
+        bgo.Location.X = pLoc.X + pLoc.Width / 2 - bgo.Location.Width / 2;
+        bgo.Location.Y = pLoc.Y + pLoc.Height - bgo.Location.Height;
+
+        LevelMacroWhich = numBackground + numLocked + 1;
+    }
+}
+
+static void lifeGoals()
+{
+    if(LevelMacro != LEVELMACRO_OFF)
+        return;
+
+    LevelMacro = LEVELMACRO_GOAL_TAPE_EXIT;
+    StopMusic();
+    PlaySound(SFX_TapeExit);
+}
+
+static void mysteryBall()
+{
+    if(LevelMacro != LEVELMACRO_OFF)
+        return;
+
+    LevelMacro = LEVELMACRO_QUESTION_SPHERE_EXIT;
+    StopMusic();
+    PlaySound(SFX_DungeonClear);
+}
+
+static void itsVegas()
+{
+    // in non-cheat variant, LevelMacroCounter is stuck at 0 if player never leaves section
+    bool possible_softlock = (LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT && LevelMacroCounter == 0);
+
+    if(LevelMacro != LEVELMACRO_OFF && !possible_softlock)
+        return;
+
+    LevelMacro = LEVELMACRO_CARD_ROULETTE_EXIT;
+    // mark as cheat variant to prevent softlocks
+    LevelMacroWhich = -1;
+    StopMusic();
+    PlaySound(SFX_CardRouletteClear);
+}
+
 static void setRes(int w, int h)
 {
     g_config.InternalW = w;
@@ -1896,7 +2076,8 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"iamerror", becomeAsLink, true}, {"itsamelink", becomeAsLink, true},
     {"itsamemario", becomeAsMario, true}, {"plumberboy", becomeAsMario, true}, {"moustacheman", becomeAsMario, true},
     {"itsameluigi", becomeAsLuigi, true}, {"greenmario", becomeAsLuigi, true},
-
+    
+    {"supermario200", superbDemo200, true},
     {"supermario128", superbDemo128, true},
     {"supermario64", superbDemo64, true},
     {"supermario32", superbDemo32, true},
@@ -1937,6 +2118,18 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"ahippinandahoppin", ahippinAndAHopping, true}, {"jumpman", ahippinAndAHopping, true},
     {"framerate", frameRate, false},
     {"speeddemon", speedDemon, true},
+    
+    {"getmeouttahere", getMeOuttaHere, true},
+    {"newleaf", newLeaf, true},
+    
+    {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
+    {"essentials", essentials, true}, {"holyfour", essentials, true},
+    
+    {"foundmycarkey", foundMyCarKey, true},
+    {"lifegoals", lifeGoals, true},
+    {"mysteryball", mysteryBall, true},
+    {"itsvegas", itsVegas, true},
+    
     {nullptr, nullptr, false}
 };
 

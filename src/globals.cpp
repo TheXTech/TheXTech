@@ -356,6 +356,7 @@ bool MaxFPS = false;
 bool GodMode = false;
 bool GrabAll = false;
 bool Cheater = false;
+
 RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
 int Score = 0;
 RangeArrI<int, 1, 13, 0> Points;

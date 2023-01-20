@@ -183,6 +183,7 @@ void GameLoop()
 
         speedRun_triggerLeave();
         NextLevel();
+
         // Controls::Update();
 
         // Controls::Update() was commented out because the current screen state may be unpredictable,
