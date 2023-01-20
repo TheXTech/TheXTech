@@ -1239,7 +1239,7 @@ void UpdateMacro()
                 g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
             }
 
-            if((!ExitCheat && LevelMacroCounter >= 100) || (ExitCheat && LevelMacroCounter >= 300))
+            if((!ExitCheat && LevelMacroCounter >= 100) || (ExitCheat && LevelMacroCounter >= 316))
             {
                 LevelBeatCode = 1;
                 LevelMacro = LEVELMACRO_OFF;
