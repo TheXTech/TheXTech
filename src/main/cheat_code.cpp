@@ -1752,7 +1752,10 @@ static void newLeaf()
 
 static void getMeOuttaHere()
 {
-    if(ExitCheat)
+    // in non-cheat variant, LevelMacroCounter is stuck at 0 if player never leaves section
+    bool possible_softlock = (LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT && LevelMacroCounter == 0);
+
+    if(LevelMacro != LEVELMACRO_OFF && !possible_softlock)
         return;
 
     LevelBeatCode = 0;
@@ -1823,10 +1826,9 @@ static void essentials()
 
 static void foundMyCarKey()
 {
-    if(ExitCheat)
+    if(LevelMacro != LEVELMACRO_OFF)
         return;
 
-    ExitCheat = true;
     PlaySound(SFX_Key);
     StopMusic();
     LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
@@ -1853,10 +1855,9 @@ static void foundMyCarKey()
 
 static void lifeGoals()
 {
-    if(ExitCheat)
+    if(LevelMacro != LEVELMACRO_OFF)
         return;
 
-    ExitCheat = true;
     LevelMacro = LEVELMACRO_GOAL_TAPE_EXIT;
     StopMusic();
     PlaySound(SFX_TapeExit);
@@ -1864,10 +1865,9 @@ static void lifeGoals()
 
 static void mysteryBall()
 {
-    if(ExitCheat)
+    if(LevelMacro != LEVELMACRO_OFF)
         return;
 
-    ExitCheat = true;
     LevelMacro = LEVELMACRO_QUESTION_SPHERE_EXIT;
     StopMusic();
     PlaySound(SFX_DungeonClear);
@@ -1875,11 +1875,15 @@ static void mysteryBall()
 
 static void itsVegas()
 {
-    if(ExitCheat)
+    // in non-cheat variant, LevelMacroCounter is stuck at 0 if player never leaves section
+    bool possible_softlock = (LevelMacro == LEVELMACRO_CARD_ROULETTE_EXIT && LevelMacroCounter == 0);
+
+    if(LevelMacro != LEVELMACRO_OFF && !possible_softlock)
         return;
 
-    ExitCheat = true;
     LevelMacro = LEVELMACRO_CARD_ROULETTE_EXIT;
+    // mark as cheat variant to prevent softlocks
+    LevelMacroWhich = -1;
     StopMusic();
     PlaySound(SFX_CardRouletteClear);
 }

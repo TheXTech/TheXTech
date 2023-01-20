@@ -1602,7 +1602,9 @@ extern int LevelMacro;
 //Public LevelMacroCounter As Integer
 extern int LevelMacroCounter;
 
-//EXTRA: which BGO caused the key exit?
+//EXTRA: variant for level macro.
+// Keyhole exit: which BGO caused the key exit?
+// Card roulette exit: negative value indicates triggered by cheat
 extern int LevelMacroWhich;
 
 //Public numJoysticks As Integer
@@ -1843,9 +1845,6 @@ extern bool GodMode;
 extern bool GrabAll;
 //Public Cheater As Boolean 'if the player is a cheater
 extern bool Cheater;
-
-// NEW: Prevents "ItsVegas" Softlock and triggering multiple Macros at once.
-extern bool ExitCheat;
 
 //'--------------------------------
 //Public WorldCredits(1 To 5) As String

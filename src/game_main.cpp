@@ -1227,19 +1227,21 @@ void UpdateMacro()
         }
 
         // !OnScreen requires Player to leave Screen during normal play.
-        // ExitCheat Bool ensures the ItsVegas Cheat doesn't Softlock the game.
-        if(!OnScreen || ExitCheat)
+        // is_cheat ensures the ItsVegas Cheat doesn't Softlock the game.
+        bool is_cheat = (LevelMacroWhich == -1);
+
+        if(!OnScreen || is_cheat)
         {
             LevelMacroCounter++;
 
             if(g_config.EnableInterLevelFade &&
-                ((LevelMacroCounter == 34 && !ExitCheat)
-                || (LevelMacroCounter == 250 && ExitCheat)))
+                ((LevelMacroCounter == 34 && !is_cheat)
+                || (LevelMacroCounter == 250 && is_cheat)))
             {
                 g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
             }
 
-            if((!ExitCheat && LevelMacroCounter >= 100) || (ExitCheat && LevelMacroCounter >= 316))
+            if((!is_cheat && LevelMacroCounter >= 100) || (is_cheat && LevelMacroCounter >= 316))
             {
                 LevelBeatCode = 1;
                 LevelMacro = LEVELMACRO_OFF;
