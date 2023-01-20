@@ -1843,9 +1843,10 @@ extern bool GodMode;
 extern bool GrabAll;
 //Public Cheater As Boolean 'if the player is a cheater
 extern bool Cheater;
-//Public ExitCheat As Boolean
-//Prevents "ItsVegas" Softlock and triggering multiple Macros at once. 
+
+// NEW: Prevents "ItsVegas" Softlock and triggering multiple Macros at once.
 extern bool ExitCheat;
+
 //'--------------------------------
 //Public WorldCredits(1 To 5) As String
 extern RangeArr<std::string, 1, maxWorldCredits> WorldCredits;

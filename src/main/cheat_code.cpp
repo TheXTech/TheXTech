@@ -1752,11 +1752,13 @@ static void newLeaf()
 
 static void getMeOuttaHere()
 {
-    if(!ExitCheat)
-    {LevelBeatCode = 0;
+    if(ExitCheat)
+        return;
+
+    LevelBeatCode = 0;
     LevelMacro = LEVELMACRO_OFF;
     LevelMacroCounter = 0;
-    EndLevel = true;}
+    EndLevel = true;
 }
 
 static void holyTrinity()
@@ -1773,7 +1775,7 @@ static void holyTrinity()
         tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
         NewEffect(10, tempLocation);
     }
-    
+
     if(ShadowMode && GodMode && MultiHop)
     {
         ShadowMode = false;
@@ -1802,7 +1804,7 @@ static void essentials()
         tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
         NewEffect(10, tempLocation);
     }
-    
+
     if(ShadowMode && GodMode && MultiHop && SuperSpeed)
     {
         SuperSpeed = false;
@@ -1821,38 +1823,46 @@ static void essentials()
 
 static void foundMyCarKey()
 {
-    if(!ExitCheat)
-    {ExitCheat = true;
+    if(ExitCheat)
+        return;
+
+    ExitCheat = true;
     PlaySound(SFX_Key);
     StopMusic();
-    LevelMacro = LEVELMACRO_KEYHOLE_EXIT;}
+    LevelMacro = LEVELMACRO_KEYHOLE_EXIT;
 }
 
 static void lifeGoals()
 {
-    if(!ExitCheat)
-    {ExitCheat = true;
+    if(ExitCheat)
+        return;
+
+    ExitCheat = true;
     LevelMacro = LEVELMACRO_GOAL_TAPE_EXIT;
     StopMusic();
-    PlaySound(SFX_TapeExit);}
+    PlaySound(SFX_TapeExit);
 }
 
 static void mysteryBall()
 {
-    if(!ExitCheat)
-    {ExitCheat = true;
+    if(ExitCheat)
+        return;
+
+    ExitCheat = true;
     LevelMacro = LEVELMACRO_QUESTION_SPHERE_EXIT;
     StopMusic();
-    PlaySound(SFX_DungeonClear);}
+    PlaySound(SFX_DungeonClear);
 }
 
 static void itsVegas()
 {
-    if(!ExitCheat)
-    {ExitCheat = true;
+    if(ExitCheat)
+        return;
+
+    ExitCheat = true;
     LevelMacro = LEVELMACRO_CARD_ROULETTE_EXIT;
     StopMusic();
-    PlaySound(SFX_CardRouletteClear);}
+    PlaySound(SFX_CardRouletteClear);
 }
 
 

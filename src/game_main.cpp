@@ -1233,9 +1233,11 @@ void UpdateMacro()
             LevelMacroCounter++;
 
             if(g_config.EnableInterLevelFade &&
-                ((LevelMacroCounter == 34 && !ExitCheat) 
+                ((LevelMacroCounter == 34 && !ExitCheat)
                 || (LevelMacroCounter == 250 && ExitCheat)))
+            {
                 g_levelScreenFader.setupFader(1, 0, 65, ScreenFader::S_FADE);
+            }
 
             if((!ExitCheat && LevelMacroCounter >= 100) || (ExitCheat && LevelMacroCounter >= 300))
             {
@@ -1245,7 +1247,6 @@ void UpdateMacro()
                 EndLevel = true;
             }
         }
-            
     }
     else if(LevelMacro == LEVELMACRO_QUESTION_SPHERE_EXIT)
     {

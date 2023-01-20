@@ -183,7 +183,10 @@ void GameLoop()
 
         speedRun_triggerLeave();
         NextLevel();
-        ExitCheat = false; //Unlocks Exit Cheats.
+
+        // Unlocks Exit Cheats.
+        ExitCheat = false;
+
         // Controls::Update();
 
         // Controls::Update() was commented out because the current screen state may be unpredictable,
