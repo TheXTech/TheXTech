@@ -21,7 +21,6 @@
 #include <AppPath/app_path.h>
 #include <Utils/files.h>
 #include <PGE_File_Formats/file_formats.h>
-#include <pge_delay.h>
 #include <fmt_format_ne.h>
 
 #include "../globals.h"

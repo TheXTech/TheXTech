@@ -1146,7 +1146,7 @@ void NextLevel()
     XRender::repaint();
     XEvents::doEvents();
 
-    if(!TestLevel && GoToLevel.empty() && !NoMap)
+    if(!TestLevel && GoToLevel.empty() && !NoMap && !MaxFPS)
         PGE_Delay(500);
 
     if(BattleMode && !LevelEditor && !TestLevel)
@@ -1339,7 +1339,8 @@ void UpdateMacro()
                 return;
             }
 
-            PGE_Delay(1);
+            if(!MaxFPS)
+                PGE_Delay(1);
         } while(true);
 
         LevelBeatCode = 4;
@@ -1772,8 +1773,11 @@ void StartEpisode()
     XRender::repaint();
     StopMusic();
     XEvents::doEvents();
+
     // Note: this causes the rendered touchscreen controller to freeze with button pressed.
-    PGE_Delay(500);
+    if(!MaxFPS)
+        PGE_Delay(500);
+
     ClearGame();
 
     std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
@@ -1904,7 +1908,10 @@ void StartBattleMode()
     XRender::repaint();
     StopMusic();
     XEvents::doEvents();
-    PGE_Delay(500);
+
+    if(!MaxFPS)
+        PGE_Delay(500);
+
     lunaReset();
     ResetSoundFX();
     ClearLevel();

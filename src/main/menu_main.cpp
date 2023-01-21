@@ -685,7 +685,10 @@ bool mainMenuUpdate()
                     StopMusic();
                     XRender::repaint();
                     XEvents::doEvents();
-                    PGE_Delay(500);
+
+                    if(!MaxFPS)
+                        PGE_Delay(500);
+
                     KillIt();
                     return true;
                 }

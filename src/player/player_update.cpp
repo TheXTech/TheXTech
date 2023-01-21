@@ -42,8 +42,6 @@
 
 #include "npc/npc_queues.h"
 
-#include "pge_delay.h"
-
 
 void UpdatePlayer()
 {

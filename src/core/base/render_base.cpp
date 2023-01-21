@@ -895,7 +895,7 @@ static int processRecorder_action(void *_recorder)
         {
             if(recorder->doFinalize)
                 break;
-            SDL_Delay(1);
+            PGE_Delay(1);
             continue;
         }
 
