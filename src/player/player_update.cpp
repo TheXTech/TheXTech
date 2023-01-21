@@ -40,8 +40,6 @@
 #include "../graphics.h"
 #include "../controls.h"
 
-#include "pge_delay.h"
-
 
 void UpdatePlayer()
 {

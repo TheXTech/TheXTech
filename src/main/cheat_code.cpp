@@ -112,7 +112,9 @@ static void dieCheater()
         XRender::repaint();
         StopMusic();
         XEvents::doEvents();
-        PGE_Delay(500);
+
+        if(!MaxFPS)
+            PGE_Delay(500);
     }
 }
 #endif
