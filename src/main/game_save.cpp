@@ -57,7 +57,7 @@ static void s_LoadCharacter(SavedChar_t& dest, const saveCharState& s)
 {
     dest = SavedChar_t();
 
-    if((s.state < 1) || (s.state > 10))
+    if((s.state < 1) || (s.state > numStates))
         dest.State = 1;
     else
         dest.State = int(s.state);
