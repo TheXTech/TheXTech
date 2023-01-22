@@ -154,6 +154,7 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
 {
     StdPicture target;
     FIBITMAP *sourceImage;
+    FIBITMAP *maskImage = nullptr;
     bool useMask = true;
 
     if(!GameIsActive)
@@ -197,13 +198,21 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     //Apply Alpha mask
     if(useMask && !maskPath.empty() && Files::fileExists(maskPath))
     {
+        if(g_render->textureMaskSupported())
+        {
+            maskImage = GraphicsHelps::loadImage(maskPath);
+            FreeImage_FlipVertical(maskImage);
+        }
+        else
+        {
 #ifdef DEBUG_BUILD
-        maskMergingTime.start();
+            maskMergingTime.start();
 #endif
-        GraphicsHelps::mergeWithMask(sourceImage, maskPath);
+            GraphicsHelps::mergeWithMask(sourceImage, maskPath);
 #ifdef DEBUG_BUILD
-        maskElapsed = maskMergingTime.nanoelapsed();
+            maskElapsed = maskMergingTime.nanoelapsed();
 #endif
+        }
     }
     else if(useMask && !maskFallbackPath.empty())
     {
@@ -268,6 +277,17 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     unloadElapsed = unloadTime.nanoelapsed();
 #endif
 
+    if(maskImage)
+    {
+        uint32_t w_mask = static_cast<uint32_t>(FreeImage_GetWidth(maskImage));
+        uint32_t h_mask = static_cast<uint32_t>(FreeImage_GetHeight(maskImage));
+        uint32_t pitch_mask = static_cast<uint32_t>(FreeImage_GetPitch(maskImage));
+
+        textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(maskImage));
+        g_render->loadTextureMask(target, w_mask, h_mask, textura, pitch_mask, w, h);
+        GraphicsHelps::closeImage(maskImage);
+    }
+
 #ifdef DEBUG_BUILD
     pLogDebug("Mask merging of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(maskElapsed));
     pLogDebug("Binding time of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(bindElapsed));
@@ -302,6 +322,22 @@ StdPicture AbstractRender_t::LoadPicture_1x(const std::string &path,
     }
 
     return target;
+}
+
+void AbstractRender_t::loadTextureMask(StdPicture &target,
+                         uint32_t mask_width,
+                         uint32_t mask_height,
+                         uint8_t *RGBApixels,
+                         uint32_t pitch,
+                         uint32_t image_width,
+                         uint32_t image_height)
+{
+    /* unimplemented */
+}
+
+bool AbstractRender_t::textureMaskSupported()
+{
+    return false;
 }
 
 void AbstractRender_t::loadTexture_1x(StdPicture &target,
@@ -426,8 +462,17 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         return;
     }
 
+    FIBITMAP *maskImage = nullptr;
     if(!target.l.rawMask.empty())
-        GraphicsHelps::mergeWithMask(sourceImage, target.l.rawMask, target.l.isMaskPng);
+    {
+        if(g_render->textureMaskSupported() && !target.l.isMaskPng)
+        {
+            maskImage = GraphicsHelps::loadImage(target.l.rawMask);
+            FreeImage_FlipVertical(maskImage);
+        }
+        else
+            GraphicsHelps::mergeWithMask(sourceImage, target.l.rawMask, target.l.isMaskPng);
+    }
 
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
@@ -484,6 +529,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         break;
     case VideoSettings_t::SCALE_SAFE:
         shrink2x = GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target));
+        if(maskImage)
+            shrink2x &= GraphicsHelps::validateFor2xScaleDown(maskImage, StdPictureGetOrigPath(target));
         break;
     case VideoSettings_t::SCALE_NONE:
     default:
@@ -534,6 +581,16 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         target.l.w_scale = float(w) / float(target.l.w_orig);
         target.l.h_scale = float(h) / float(target.l.h_orig);
         pitch = FreeImage_GetPitch(d);
+
+        if(maskImage)
+        {
+            d = FreeImage_Rescale(maskImage, int(w), int(h), FILTER_BOX);
+            if(d)
+            {
+                GraphicsHelps::closeImage(maskImage);
+                maskImage = d;
+            }
+        }
     }
 
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
@@ -541,6 +598,19 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     g_render->loadTexture(target, w, h, textura, pitch);
 
     GraphicsHelps::closeImage(sourceImage);
+
+    if(maskImage)
+    {
+        uint32_t w_mask = static_cast<uint32_t>(FreeImage_GetWidth(maskImage));
+        uint32_t h_mask = static_cast<uint32_t>(FreeImage_GetHeight(maskImage));
+        uint32_t pitch_mask = static_cast<uint32_t>(FreeImage_GetPitch(maskImage));
+
+        textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(maskImage));
+
+        g_render->loadTextureMask(target, w_mask, h_mask, textura, pitch_mask, w, h);
+
+        GraphicsHelps::closeImage(maskImage);
+    }
 }
 
 void AbstractRender_t::lazyUnLoad(StdPicture &target)
