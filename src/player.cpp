@@ -4655,7 +4655,9 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
               (plr.Character == 4 && warp.Effect == 1 && direction == 1))
             {
                 NPC[plr.HoldingNPC].Location.Y = entrance.Y;
-                treeNPCUpdate(plr.HoldingNPC);
+
+                if(plr.HoldingNPC > 0)
+                    treeNPCUpdate(plr.HoldingNPC);
             }
             plr.HoldingNPC = 0;
             if(plr.YoshiNPC > 0)
@@ -6720,6 +6722,8 @@ void PlayerEffects(const int A)
 
                             if(p.HoldingNPC > 0)
                                 treeNPCUpdate(p.HoldingNPC);
+
+                            // already checked this one above
                             treeNPCUpdate(Player[B].HoldingNPC);
                         }
                     }
