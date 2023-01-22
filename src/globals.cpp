@@ -306,9 +306,6 @@ int PSwitchTime = 0;
 int PSwitchStop = 0;
 int PSwitchPlayer = 0;
 
-// RangeArrI<int, 1, maxSaveSlots, 0> SaveSlot;
-// RangeArrI<int, 1, maxSaveSlots, 0> SaveStars;
-
 RangeArr<SaveSlotInfo_t, 1, maxSaveSlots> SaveSlotInfo;
 
 int BeltDirection = 0;
