@@ -531,7 +531,9 @@ void runFrameLoop(LoopCall_t doLoopCallbackPre,
                 break;
         }
 
-        PGE_Delay(1);
+        if(!MaxFPS)
+            PGE_Delay(1);
+
         if(!GameIsActive)
             break;// Break on quit
     }

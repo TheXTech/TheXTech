@@ -1602,7 +1602,9 @@ extern int LevelMacro;
 //Public LevelMacroCounter As Integer
 extern int LevelMacroCounter;
 
-//EXTRA: which BGO caused the key exit?
+//EXTRA: variant for level macro.
+// Keyhole exit: which BGO caused the key exit?
+// Card roulette exit: negative value indicates triggered by cheat
 extern int LevelMacroWhich;
 
 //Public numJoysticks As Integer
@@ -1843,6 +1845,7 @@ extern bool GodMode;
 extern bool GrabAll;
 //Public Cheater As Boolean 'if the player is a cheater
 extern bool Cheater;
+
 //'--------------------------------
 //Public WorldCredits(1 To 5) As String
 extern RangeArr<std::string, 1, maxWorldCredits> WorldCredits;
