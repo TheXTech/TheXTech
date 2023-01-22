@@ -654,7 +654,7 @@ void treeNPCAdd(NPCRef_t obj)
 
 void treeNPCUpdate(NPCRef_t obj)
 {
-    SDL_assert((int)obj > 0);
+    SDL_assert_release((int)obj > 0);
 
     s_npc_table.update(obj);
 }
