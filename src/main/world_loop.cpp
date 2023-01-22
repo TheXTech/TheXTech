@@ -64,7 +64,8 @@ void worldWaitForFade(int waitTicks)
                 waitTicks--;
         }
 
-        PGE_Delay(1);
+        if(!MaxFPS)
+            PGE_Delay(1);
     }
 }
 
@@ -1055,7 +1056,9 @@ void PathWait()
             XEvents::doEvents();
             computeFrameTime2();
         }
-        PGE_Delay(1);
+
+        if(!MaxFPS)
+            PGE_Delay(1);
     } while(C < 24);
 
     resetFrameTimer();

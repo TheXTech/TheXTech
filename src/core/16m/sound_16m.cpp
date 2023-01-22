@@ -30,7 +30,6 @@
 
 #include "load_gfx.h"
 #include "core/msgbox.h"
-#include "pge_delay.h"
 
 #include "sound.h"
 

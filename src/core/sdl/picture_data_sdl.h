@@ -40,8 +40,13 @@ struct StdPictureData
 
     //! Texture instance pointer for SDL Render
     SDL_Texture *texture = nullptr;
+    //! Mask texture instance pointer for SDL Render
+    SDL_Texture *mask_texture = nullptr;
+
     //! texture ID for OpenGL and other render engines
-    GLint        texture_id = 0;
+    GLuint       texture_id = 0;
+    //! mask texture ID for OpenGL and other render engines
+    GLuint       mask_texture_id = 0;
 
     //! Texture format at OpenGL-renderer
     GLenum      format = 0;

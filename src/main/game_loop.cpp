@@ -88,7 +88,9 @@ void levelWaitForFade()
             computeFrameTime2();
             updateScreenFaders();
         }
-        PGE_Delay(1);
+
+        if(!MaxFPS)
+            PGE_Delay(1);
     }
 }
 
@@ -110,7 +112,9 @@ void editorWaitForFade()
             computeFrameTime2();
             updateScreenFaders();
         }
-        PGE_Delay(1);
+
+        if(!MaxFPS)
+            PGE_Delay(1);
     }
 }
 
@@ -183,6 +187,7 @@ void GameLoop()
 
         speedRun_triggerLeave();
         NextLevel();
+
         // Controls::Update();
 
         // Controls::Update() was commented out because the current screen state may be unpredictable,
@@ -498,7 +503,9 @@ int PauseGame(PauseCode code, int plr)
             g_microStats.end_frame();
         }
 
-        PGE_Delay(1);
+        if(!MaxFPS)
+            PGE_Delay(1);
+
         if(!GameIsActive)
             break;
     } while(true);
