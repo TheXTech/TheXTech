@@ -406,6 +406,76 @@ void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height,
 #endif
 }
 
+void RenderSDL::loadTextureMask(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch, uint32_t image_width, uint32_t image_height)
+{
+    SDL_Surface *surface;
+    SDL_Texture *texture = nullptr;
+
+    surface = SDL_CreateRGBSurfaceFrom(RGBApixels,
+                                       static_cast<int>(width),
+                                       static_cast<int>(height),
+                                       32,
+                                       static_cast<int>(pitch),
+                                       FI_RGBA_RED_MASK,
+                                       FI_RGBA_GREEN_MASK,
+                                       FI_RGBA_BLUE_MASK,
+                                       FI_RGBA_ALPHA_MASK);
+    if(surface)
+        texture = SDL_CreateTextureFromSurface(m_gRenderer, surface);
+
+    SDL_FreeSurface(surface);
+
+    if(!texture)
+    {
+        pLogWarning("Render SDL: Failed to load mask texture! (%s)", SDL_GetError());
+        return;
+    }
+
+    target.d.mask_texture = texture;
+    m_textureBank.insert(texture);
+
+    // set mask's render mode (minimum)
+    SDL_BlendMode blend_mask = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MINIMUM,
+        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MINIMUM);
+
+    if(SDL_SetTextureBlendMode(target.d.mask_texture, blend_mask) != 0)
+    {
+        // fallback render mode (multiply) -- this should never occur because we've already tested textureMaskSupported()
+        SDL_SetTextureBlendMode(target.d.mask_texture, SDL_BLENDMODE_MOD);
+    }
+
+    // set image's render mode (maximum)
+    SDL_BlendMode blend_image = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MAXIMUM,
+        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MAXIMUM);
+
+    if(SDL_SetTextureBlendMode(target.d.texture, blend_image))
+    {
+        // fallback render mode (add) -- this should never occur because we've already tested textureMaskSupported()
+        SDL_SetTextureBlendMode(target.d.texture, SDL_BLENDMODE_ADD);
+    }
+
+#if defined(__APPLE__) && defined(USE_APPLE_X11)
+    SDL_GL_UnbindTexture(texture); // Unbind texture after it got been loaded (otherwise a white screen will happen)
+#endif
+}
+
+bool RenderSDL::textureMaskSupported()
+{
+    SDL_BlendMode blend_mask = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MINIMUM,
+        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MINIMUM);
+
+    SDL_BlendMode blend_image = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MAXIMUM,
+        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MAXIMUM);
+
+    // check that both blend modes are supported
+    bool okay = !(SDL_SetRenderDrawBlendMode(m_gRenderer, blend_mask) || SDL_SetRenderDrawBlendMode(m_gRenderer, blend_image));
+
+    // restore previous blend mode
+    SDL_SetRenderDrawBlendMode(m_gRenderer, SDL_BLENDMODE_BLEND);
+
+    return okay;
+}
+
 void RenderSDL::deleteTexture(StdPicture &tx, bool lazyUnload)
 {
     if(!tx.inited || !tx.d.texture)
@@ -606,6 +676,10 @@ static SDL_INLINE void txColorMod(StdPictureData &tx, float red, float green, fl
     if(SDL_memcmp(tx.modColor, modColor, 3) != 0)
     {
         SDL_SetTextureColorMod(tx.texture, modColor[0], modColor[1], modColor[2]);
+
+        if(tx.mask_texture)
+            SDL_SetTextureColorMod(tx.mask_texture, modColor[0], modColor[1], modColor[2]);
+
         tx.modColor[0] = modColor[0];
         tx.modColor[1] = modColor[1];
         tx.modColor[2] = modColor[2];
@@ -614,6 +688,10 @@ static SDL_INLINE void txColorMod(StdPictureData &tx, float red, float green, fl
     if(tx.modColor[3] != modColor[3])
     {
         SDL_SetTextureAlphaMod(tx.texture, modColor[3]);
+
+        if(tx.mask_texture)
+            SDL_SetTextureAlphaMod(tx.mask_texture, modColor[3]);
+
         tx.modColor[3] = modColor[3];
     }
 }
@@ -685,6 +763,13 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
                       int(tx.l.w_scale * wSrc), int(tx.l.h_scale * hSrc)};
 
     txColorMod(tx.d, red, green, blue, alpha);
+
+    if(tx.d.mask_texture)
+    {
+        SDL_RenderCopyExF(m_gRenderer, tx.d.mask_texture, &sourceRect, &destRect,
+                          rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
+    }
+
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
                       rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
 }
@@ -729,6 +814,13 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
         sourceRect = {0, 0, tx.l.w_orig, tx.l.h_orig};
 
     txColorMod(tx.d, red, green, blue, alpha);
+
+    if(tx.d.mask_texture)
+    {
+        SDL_RenderCopyExF(m_gRenderer, tx.d.mask_texture, &sourceRect, &destRect,
+                          0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+    }
+
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
                       0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
 }
@@ -796,6 +888,10 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
                       int(tx.l.w_scale * wDst), int(tx.l.h_scale * hDst)};
 
     txColorMod(tx.d, red, green, blue, alpha);
+
+    if(tx.d.mask_texture)
+        SDL_RenderCopyF(m_gRenderer, tx.d.mask_texture, &sourceRect, &destRect);
+
     SDL_RenderCopyF(m_gRenderer, tx.d.texture, &sourceRect, &destRect);
 }
 
@@ -867,6 +963,13 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
                       int(tx.l.w_scale * wDst), int(tx.l.h_scale * hDst)};
 
     txColorMod(tx.d, red, green, blue, alpha);
+
+    if(tx.d.mask_texture)
+    {
+        SDL_RenderCopyExF(m_gRenderer, tx.d.mask_texture, &sourceRect, &destRect,
+                          rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
+    }
+
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
                       rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
 }
@@ -905,6 +1008,13 @@ void RenderSDL::renderTexture(float xDst, float yDst,
         sourceRect = {0, 0, tx.l.w_orig, tx.l.h_orig};
 
     txColorMod(tx.d, red, green, blue, alpha);
+
+    if(tx.d.mask_texture)
+    {
+        SDL_RenderCopyExF(m_gRenderer, tx.d.mask_texture, &sourceRect, &destRect,
+                          0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+    }
+
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
                       0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
 }
