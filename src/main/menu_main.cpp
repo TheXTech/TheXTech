@@ -519,6 +519,7 @@ bool mainMenuUpdate()
                     MenuCursor += 1;
                     cursorDelta = +1;
                 }
+
                 MenuCursorCanMove = false;
             }
 
@@ -547,6 +548,7 @@ bool mainMenuUpdate()
         {
             if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
                 PlaySoundMenu(SFX_BlockHit);
+
             if(MenuCursor != 0)
                 MenuCursor = 0;
         }
@@ -754,6 +756,7 @@ bool mainMenuUpdate()
                     else
                         MenuMode = MENU_SELECT_SLOT_2P;
                 }
+
                 MenuCursorCanMove = false;
             }
             else if(ret == 1)
@@ -1309,6 +1312,7 @@ bool mainMenuUpdate()
                             menuCopySaveSrc = slot;
                             MenuMode += MENU_SELECT_SLOT_COPY_S1_ADD;
                         }
+
                         MenuCursorCanMove = false;
                     }
                     else if(menuCopySaveSrc == slot)

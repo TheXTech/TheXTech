@@ -511,11 +511,14 @@ int PauseGame(PauseCode code, int plr)
     } while(true);
 
     GamePaused = old_code;
+
+    // prevent unexpected button presses
     for(int i = 1; i <= numPlayers; i++)
     {
         Player[i].UnStart = false;
         Player[i].CanJump = false;
     }
+
     MenuCursorCanMove = false;
 
     XWindow::showCursor(prev_cursor);
