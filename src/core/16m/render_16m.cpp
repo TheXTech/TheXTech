@@ -223,11 +223,7 @@ private:
         if(!m_data.data || !m_tex)
             return false;
 
-        const std::string&& path = (m_current_index == 0) ? m_tex->l.path       :
-                                  ((m_current_index == 1) ? m_tex->l.path + '1' :
-                                                            m_tex->l.path + '2');
-
-        m_file = fopen(path.c_str(), "r");
+        m_file = PackLoader::getf(*m_tex, m_current_index);
         if(!m_file)
         {
             pLogWarning("Failed to open file");
@@ -265,7 +261,7 @@ private:
 
     bool load_data()
     {
-        if(!m_data.data || !m_file)
+        if(!m_data.data || !m_file || !m_tex)
             return false;
 
         // load image data
@@ -285,7 +281,7 @@ private:
             m_bytes_read += bytes_read;
         }
 
-        fclose(m_file);
+        PackLoader::finalizef(m_file, *m_tex);
         m_file = nullptr;
 
         return true;
@@ -759,14 +755,34 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
 
     if(length == 255)
     {
-        pLogWarning("Image path %s was truncated in load list", filename);
+        pLogWarning("Image path %s was truncated in load list, aborting", filename);
         return target;
     }
 
     target.inited = true;
-    target.l.path = dir;
-    target.l.path += filename;
     target.l.lazyLoaded = true;
+    target.l.pack = PackLoader::PACK_NONE;
+    target.l.path.clear();
+
+    // clear optional endline
+    fscanf(f, "\n");
+
+    int has_offset = 0;
+    fscanf(f, "pack_offset %n", &has_offset);
+
+    uint32_t pack_offset;
+
+    if(has_offset && fscanf(f, "%lu\n", &pack_offset) == 1)
+    {
+        std::string pack_path = dir;
+        pack_path += filename;
+        PackLoader::setup(target, pack_path, pack_offset);
+    }
+    else
+    {
+        target.l.path = dir;
+        target.l.path += filename;
+    }
 
     int w, h, flags;
     if(fscanf(f, "%d\n%d\n%d\n", &w, &h, &flags) != 3 || w < 0 || w > 8192 || h < 0 || h > 8192)
