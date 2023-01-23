@@ -1576,7 +1576,7 @@ static void s_drawGameSaves()
     int row_2 = infobox_y + 42;
 
     // recenter if single row
-    if(info.Time <= 0 && !gEnableDemoCounter)
+    if((info.Time <= 0 || g_speedRunnerMode == SPEEDRUN_MODE_OFF) && !gEnableDemoCounter)
         row_1 = infobox_y + 26;
 
     XRender::renderRect(infobox_x, infobox_y, 480, 68, 0, 0, 0, 0.5f);
@@ -1597,7 +1597,7 @@ static void s_drawGameSaves()
     SuperPrintRightAlign(t = std::to_string(info.Coins), 1, coins_x + 62 + 36, row_1 + 2);
 
     // Gameplay Timer
-    if(info.Time > 0)
+    if(info.Time > 0 && g_speedRunnerMode != SPEEDRUN_MODE_OFF)
     {
         std::string t = GameplayTimer::formatTime(info.Time);
 
