@@ -32,8 +32,8 @@
 #include "core/events.h"
 
 #ifdef CORE_EVERYTHING_SDL
-#   include "core/sdl/render_sdl.h"
-typedef RenderSDL RenderUsed;
+#   include "core/sdl/render_gl11.h"
+typedef RenderGL11 RenderUsed;
 #   define USE_CORE_RENDER_SDL
 
 #   include "core/sdl/window_sdl.h"
