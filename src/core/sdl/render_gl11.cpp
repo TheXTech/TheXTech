@@ -24,6 +24,8 @@
 // #include <SDL2/SDL_opengles2.h>
 
 #include <FreeImageLite.h>
+#include <Graphics/graphics_funcs.h>
+
 #include <Logger/logger.h>
 #include <Utils/maths.h>
 
@@ -326,20 +328,20 @@ void RenderGL11::prepareDrawMask()
 {
     if(m_draw_mask_mode == 0)
     {
+        // bitwise and
+        glEnable(GL_COLOR_LOGIC_OP);
+        glLogicOp(GL_AND);
+    }
+    else if(m_draw_mask_mode == 1)
+    {
         // min
         glBlendEquation(GL_MIN);
     }
-    else if(m_draw_mask_mode == 1)
+    else
     {
         // multiply
         glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
         // glBlendFunc(GL_ZERO, GL_SRC_COLOR);
-    }
-    else
-    {
-        // bitwise and
-        glEnable(GL_COLOR_LOGIC_OP);
-        glLogicOp(GL_AND);
     }
 }
 
@@ -347,18 +349,18 @@ void RenderGL11::prepareDrawImage()
 {
     if(m_draw_mask_mode == 0)
     {
-        // max
-        glBlendEquation(GL_MAX);
+        // bitwise or
+        glLogicOp(GL_OR);
     }
     else if(m_draw_mask_mode == 1)
     {
-        // add
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        // max
+        glBlendEquation(GL_MAX);
     }
     else
     {
-        // bitwise or
-        glLogicOp(GL_OR);
+        // add
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     }
 }
 
@@ -366,18 +368,18 @@ void RenderGL11::leaveMaskContext()
 {
     if(m_draw_mask_mode == 0)
     {
-        // normal
-        glBlendEquation(GL_FUNC_ADD);
+        // no bitwise op
+        glDisable(GL_COLOR_LOGIC_OP);
     }
     else if(m_draw_mask_mode == 1)
     {
         // normal
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendEquation(GL_FUNC_ADD);
     }
     else
     {
-        // no bitwise op
-        glDisable(GL_COLOR_LOGIC_OP);
+        // normal
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 }
 
@@ -1127,38 +1129,84 @@ void RenderGL11::renderTexture(float xDst, float yDst,
 
 void RenderGL11::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
 {
-    SDL_Rect rect;
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
+    glFlush();
 
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    // SDL_RenderFlush(m_gRenderer);
-#endif
-    // SDL_RenderReadPixels(m_gRenderer,
-    //                      &rect,
-    //                      SDL_PIXELFORMAT_BGR24,
-    //                      pixels,
-    //                      w * 3 + (w % 4));
+    int phys_x, phys_y;
+
+    mapFromScreen(x, y, &phys_x, &phys_y);
+
+    int phys_w = w * m_phys_w / ScreenW;
+    int phys_h = h * m_phys_h / ScreenH;
+
+    // allocate buffer for screen-space pixels
+    uint8_t* phys_pixels = (uint8_t*)malloc(phys_w * phys_h * 3);
+    if(!phys_pixels)
+        return;
+
+    // read screen-space pixels
+    glReadPixels(phys_x, phys_y, phys_w, phys_h,
+        GL_RGB, GL_UNSIGNED_BYTE, phys_pixels);
+
+    // rescale and move to target
+    for(int r = 0; r < h; r++)
+    {
+        int phys_r_max = phys_h - 1;
+        int phys_r_ind = r * m_phys_h / ScreenH;
+
+        // vertical flip from OpenGL to image
+        int phys_r = phys_r_max - phys_r_ind;
+
+        for(int c = 0; c < w; c++)
+        {
+            int phys_c = c * m_phys_w / ScreenW;
+
+            pixels[(r * w + c) * 3 + 0] = phys_pixels[(phys_r * phys_w + phys_c) * 3 + 0];
+            pixels[(r * w + c) * 3 + 1] = phys_pixels[(phys_r * phys_w + phys_c) * 3 + 1];
+            pixels[(r * w + c) * 3 + 2] = phys_pixels[(phys_r * phys_w + phys_c) * 3 + 2];
+        }
+    }
+
+    free(phys_pixels);
 }
 
 void RenderGL11::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
 {
-    SDL_Rect rect;
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
+    glFlush();
 
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    // SDL_RenderFlush(m_gRenderer);
-#endif
-    // SDL_RenderReadPixels(m_gRenderer,
-    //                      &rect,
-    //                      SDL_PIXELFORMAT_ABGR8888,
-    //                      pixels,
-    //                      w * 4);
+    int phys_x, phys_y;
+
+    mapFromScreen(x, y, &phys_x, &phys_y);
+
+    int phys_w = w * m_phys_w / ScreenW;
+    int phys_h = h * m_phys_h / ScreenH;
+
+    // allocate buffer for screen-space pixels
+    uint8_t* phys_pixels = (uint8_t*)malloc(phys_w * phys_h * 4);
+    if(!phys_pixels)
+        return;
+
+    // read screen-space pixels
+    glReadPixels(phys_x, phys_y, phys_w, phys_h,
+        GL_RGBA, GL_UNSIGNED_BYTE, phys_pixels);
+
+    // rescale and move to target
+    for(int r = 0; r < h; r++)
+    {
+        int phys_r_max = phys_h - 1;
+        int phys_r_ind = r * m_phys_h / ScreenH;
+
+        // vertical flip from OpenGL to image
+        int phys_r = phys_r_max - phys_r_ind;
+
+        for(int c = 0; c < w; c++)
+        {
+            int phys_c = c * m_phys_w / ScreenW;
+
+            ((uint32_t*) pixels)[r * w + c] = ((uint32_t*) phys_pixels)[phys_r * phys_w + phys_c];
+        }
+    }
+
+    free(phys_pixels);
 }
 
 int RenderGL11::getPixelDataSize(const StdPicture &tx)
