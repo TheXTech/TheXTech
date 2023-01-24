@@ -1722,6 +1722,7 @@ struct SavedChar_t
 struct SaveSlotInfo_t
 {
     int64_t Time = 0;
+    bool    FailsEnabled = false;
     int32_t Fails = 0;
     int32_t Score = 0;
 

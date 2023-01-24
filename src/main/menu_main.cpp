@@ -1576,8 +1576,10 @@ static void s_drawGameSaves()
     int row_2 = infobox_y + 42;
     int row_c = infobox_y + 26;
 
+    bool hasFails = (gEnableDemoCounter || info.FailsEnabled);
+
     // recenter if single row
-    if((info.Time <= 0 || g_speedRunnerMode == SPEEDRUN_MODE_OFF) && !gEnableDemoCounter)
+    if((info.Time <= 0 || g_speedRunnerMode == SPEEDRUN_MODE_OFF) && !hasFails)
         row_1 = infobox_y + 26;
 
     XRender::renderRect(infobox_x, infobox_y, 480, 68, 0, 0, 0, 0.5f);
@@ -1602,7 +1604,7 @@ static void s_drawGameSaves()
     }
 
     // If demos off, put (l)ives and (c)oins on center
-    int row_lc = (gEnableDemoCounter) ? row_1 : row_c;
+    int row_lc = (hasFails) ? row_1 : row_c;
 
     // Print lives on the screen (from gfx_update2.cpp)
     XRender::renderTexture(infobox_x + 272, row_lc + 2 + 14 - GFX.Interface[3].h, GFX.Interface[3]);
@@ -1616,7 +1618,7 @@ static void s_drawGameSaves()
     SuperPrintRightAlign(t = std::to_string(info.Coins), 1, coins_x + 62 + 36, row_lc + 2);
 
     // Fails Counter
-    if(gEnableDemoCounter)
+    if(hasFails)
         SuperPrintRightAlign(fmt::format_ne("{0}: {1}", gDemoCounterTitle, info.Fails), 3, infobox_x + 480 - 10, row_2);
 }
 

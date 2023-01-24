@@ -201,6 +201,7 @@ void FindSaves()
                 gDeathCounter.counterFile = savePath;
                 gDeathCounter.TryLoadStats();
                 gDeathCounter.Recount();
+                info.FailsEnabled = true;
                 info.Fails = gDeathCounter.mCurTotalDeaths;
             }
         }
