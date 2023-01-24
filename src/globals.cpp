@@ -305,8 +305,9 @@ int selSave = 0;
 int PSwitchTime = 0;
 int PSwitchStop = 0;
 int PSwitchPlayer = 0;
-RangeArrI<int, 1, 3, 0> SaveSlot;
-RangeArrI<int, 1, 3, 0> SaveStars;
+
+RangeArr<SaveSlotInfo_t, 1, maxSaveSlots> SaveSlotInfo;
+
 int BeltDirection = 0;
 bool BeatTheGame = false;
 //int cycleCount = 0;
@@ -362,7 +363,7 @@ int Score = 0;
 RangeArrI<int, 1, 13, 0> Points;
 int MaxWorldStars = 0;
 bool Debugger = false;
-RangeArr<Player_t, 0, 10> SavedChar;
+RangeArr<SavedChar_t, 0, 10> SavedChar;
 
 bool LoadingInProcess = false;
 int LoadCoins = 0;

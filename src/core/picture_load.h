@@ -23,6 +23,9 @@
 #ifdef __WII__
 #   define PICTURE_LOAD_WII
 #   include "core/wii/picture_load.h"
+#elif defined(__16M__)
+#   define PICTURE_LOAD_16M
+#   include "core/16m/picture_load_16m.h"
 #elif defined(__3DS__) || defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
 #   define PICTURE_LOAD_3DS
 #   include "core/3ds/picture_load.h"

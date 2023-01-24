@@ -1685,10 +1685,71 @@ extern int PSwitchTime;
 extern int PSwitchStop;
 //Public PSwitchPlayer As Integer
 extern int PSwitchPlayer;
+
+// newly extended
+
+struct SavedChar_t
+{
+    uint16_t HeldBonus = 0;
+    uint8_t State = 1;
+    uint8_t Mount = 0;
+    uint8_t MountType = 0;
+    uint8_t Hearts = 1;
+    uint8_t Character = 1;
+
+    inline SavedChar_t& operator=(const SavedChar_t& ch) = default;
+    inline SavedChar_t& operator=(const Player_t& p)
+    {
+        HeldBonus = p.HeldBonus;
+        State = p.State;
+        Mount = p.Mount;
+        MountType = p.MountType;
+        Hearts = p.Hearts;
+        Character = p.Character;
+
+        return *this;
+    }
+    inline operator Player_t() const
+    {
+        Player_t p;
+
+        p.HeldBonus = HeldBonus;
+        p.State = State;
+        p.Mount = Mount;
+        p.MountType = MountType;
+        p.Hearts = Hearts;
+        p.Character = Character;
+
+        return p;
+    }
+};
+
+struct SaveSlotInfo_t
+{
+    int64_t Time = 0;
+    bool    FailsEnabled = false;
+    int32_t Fails = 0;
+    int32_t Score = 0;
+
+    RangeArr<SavedChar_t, 1, 5> SavedChar;
+
+    // Save progress percent, displayed at title. <0 value denotes uninitialized saves
+    int Progress = -1;
+    int Stars = 0;
+    int Lives = 3;
+    int Coins = 0;
+};
+
+// new: all save info
+extern RangeArr<SaveSlotInfo_t, 1, maxSaveSlots> SaveSlotInfo;
+
+// deprecated
 //Public SaveSlot(1 To 3) As Integer
-extern RangeArrI<int, 1, maxSaveSlots, 0> SaveSlot;
+// extern RangeArrI<int, 1, maxSaveSlots, 0> SaveSlot;
 //Public SaveStars(1 To 3) As Integer
-extern RangeArrI<int, 1, maxSaveSlots, 0> SaveStars;
+// extern RangeArrI<int, 1, maxSaveSlots, 0> SaveStars;
+
+
 //Public BeltDirection As Integer 'direction of the converyer belt blocks
 extern int BeltDirection;
 //Public BeatTheGame As Boolean 'true if the game has been beaten
@@ -1868,7 +1929,7 @@ extern int MaxWorldStars;
 //Public Debugger As Boolean 'if the debugger window is open
 extern bool Debugger;
 //Public SavedChar(0 To 10) As Player 'Saves the Player's Status
-extern RangeArr<Player_t, 0, 10> SavedChar;
+extern RangeArr<SavedChar_t, 0, 10> SavedChar;
 
 extern bool LoadingInProcess;
 //Public LoadCoins As Integer

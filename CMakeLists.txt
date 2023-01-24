@@ -644,6 +644,7 @@ elseif(NINTENDO_DS)
         src/core/16m/window_16m.cpp
         src/core/null/events_null.cpp
         src/core/16m/sound_16m.cpp
+        src/core/16m/packloader.cpp
     )
 elseif(THEXTECH_CLI_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
@@ -869,7 +870,7 @@ elseif(NINTENDO_WII)
     target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__WII__)
 elseif(NINTENDO_DS)
     target_link_libraries(thextech PRIVATE filesystem)
-    target_link_libraries(thextech PRIVATE fat)
+    target_link_libraries(thextech PRIVATE slim)
     target_link_libraries(thextech PRIVATE mm9)
     target_link_libraries(thextech PRIVATE nds9)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__16M__)

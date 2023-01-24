@@ -1177,10 +1177,14 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         {
             if(s_context == Context::MainMenu && s_minPlayers == 1 && s_playerState[p] == PlayerState::Disconnected)
             {
-                XRender::renderRect(ScreenW / 2 - 320, pY + 2.5 * line, 640, 2.5 * line, 0, 0, 0, 0.5);
+                // MenuY + 145
+                int infobox_y = pY + 75;
 
-                SuperPrintCenter("WAITING FOR INPUT DEVICE...", 3, cX, pY + 3*line, 0.8f, 0.8f, 0.8f, 0.8f);
-                SuperPrintCenter("PRESS SELECT FOR CONTROLS OPTIONS", 3, cX, pY + 4*line, 0.8f, 0.8f, 0.8f, 0.8f);
+                XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, 0, 0, 0, 0.5);
+
+                SuperPrintScreenCenter("WAITING FOR INPUT DEVICE...", 3, infobox_y + 4, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintScreenCenter("PRESS SELECT FOR", 3, infobox_y + 24, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintScreenCenter("CONTROLS OPTIONS", 3, infobox_y + 44, 0.8f, 0.8f, 0.8f, 0.8f);
             }
             else if(BlockFlash < 45)
                 SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, pY+2*line);
@@ -1220,19 +1224,23 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
     // show the squashed info for 1P mode
     else if(render)
     {
-        XRender::renderRect(ScreenW / 2 - 320, pY + 2.5 * line, 640, 2.5 * line, 0, 0, 0, 0.5);
+        // MenuY + 145
+        int infobox_y = pY + 75;
+
+        XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, 0, 0, 0, 0.5);
 
         if(p < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[p])
         {
             // global information about controller
             // Profile should never be null
             if(Controls::g_InputMethods[p]->Profile != nullptr)
-                SuperPrintCenter(Controls::g_InputMethods[p]->Name + " - " + Controls::g_InputMethods[p]->Profile->Name, 3, cX, pY + 3*line);
+                SuperPrintScreenCenter(Controls::g_InputMethods[p]->Name + " - " + Controls::g_InputMethods[p]->Profile->Name, 3, infobox_y + 4);
             else
-                SuperPrintCenter(Controls::g_InputMethods[p]->Name, 3, cX, pY + 3*line);
+                SuperPrintScreenCenter(Controls::g_InputMethods[p]->Name, 3, infobox_y + 4);
         }
 
-        SuperPrintCenter("PRESS SELECT FOR CONTROLS OPTIONS", 3, cX, pY + 4*line, 0.8f, 0.8f, 0.8f, 0.8f);
+        SuperPrintScreenCenter("PRESS SELECT FOR", 3, infobox_y + 24, 0.8f, 0.8f, 0.8f, 0.8f);
+        SuperPrintScreenCenter("CONTROLS OPTIONS", 3, infobox_y + 44, 0.8f, 0.8f, 0.8f, 0.8f);
     }
 
     return ret;

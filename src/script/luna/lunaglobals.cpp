@@ -27,8 +27,8 @@ bool gLunaEnabled = true;
 bool gShowDemoCounter = true;
 bool gEnableDemoCounter = true;
 bool gEnableDemoCounterByLC = false;
-std::string gDemoCounterTitle = "DEMOS";
-std::string gDemoCounterTitleDefault = "DEMOS";
+std::string gDemoCounterTitle = "FAILS";
+std::string gDemoCounterTitleDefault = "FAILS";
 
 
 /* Fallback dummy calls for the case when Luna Autocode has been disabled */

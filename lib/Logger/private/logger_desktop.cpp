@@ -24,7 +24,11 @@
 #include "logger_private.h"
 
 #ifndef NO_FILE_LOGGING
+
+#ifndef PGE_NO_THREADING
 static std::mutex g_lockLocker;
+#endif
+
 #   define OUT_BUFFER_SIZE 10240
 static char       g_outputBuffer[OUT_BUFFER_SIZE];
 #   define OUT_BUFFER_STRING_SIZE 10239

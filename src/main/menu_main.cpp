@@ -40,6 +40,7 @@
 #include "menu_controls.h"
 
 #include "speedrunner.h"
+#include "main/gameplay_timer.h"
 #include "../game_main.h"
 #include "../sound.h"
 #include "../player.h"
@@ -61,6 +62,7 @@
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
 #include "editor/write_world.h"
+#include "script/luna/luna.h"
 
 MainMenuContent g_mainMenu;
 
@@ -546,6 +548,7 @@ bool mainMenuUpdate()
                     MenuCursor += 1;
                     cursorDelta = +1;
                 }
+
                 MenuCursorCanMove = false;
             }
 
@@ -577,6 +580,7 @@ bool mainMenuUpdate()
         {
             if((menuDoPress && MenuCursorCanMove) || MenuMouseClick)
                 PlaySoundMenu(SFX_BlockHit);
+
             if(MenuCursor != 0)
                 MenuCursor = 0;
         }
@@ -773,7 +777,10 @@ bool mainMenuUpdate()
                     StopMusic();
                     XRender::repaint();
                     XEvents::doEvents();
-                    PGE_Delay(500);
+
+                    if(!MaxFPS)
+                        PGE_Delay(500);
+
                     KillIt();
                     return true;
                 }
@@ -815,6 +822,7 @@ bool mainMenuUpdate()
                     else
                         MenuMode = MENU_SELECT_SLOT_2P;
                 }
+
                 MenuCursorCanMove = false;
             }
             else if(ret == 1)
@@ -1362,7 +1370,7 @@ bool mainMenuUpdate()
 
                     if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
                     {
-                        if(SaveSlot[slot] < 0)
+                        if(SaveSlotInfo[slot].Progress < 0)
                             PlaySoundMenu(SFX_BlockHit);
                         else
                         {
@@ -1370,6 +1378,7 @@ bool mainMenuUpdate()
                             menuCopySaveSrc = slot;
                             MenuMode += MENU_SELECT_SLOT_COPY_S1_ADD;
                         }
+
                         MenuCursorCanMove = false;
                     }
                     else if(menuCopySaveSrc == slot)
@@ -1702,10 +1711,10 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
     for(A = 1; A <= maxSaveSlots; A++)
     {
-        if(SaveSlot[A] >= 0)
+        if(SaveSlotInfo[A].Progress >= 0)
         {
-            SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlot[A]), 3, MenuX, MenuY - 30 + (A * 30));
-            if(SaveStars[A] > 0)
+            SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlotInfo[A].Progress), 3, MenuX, MenuY - 30 + (A * 30));
+            if(SaveSlotInfo[A].Stars > 0)
             {
                 XRender::renderTexture(MenuX + 260, MenuY - 30 + (A * 30) + 1,
                                       GFX.Interface[5].w, GFX.Interface[5].h,
@@ -1713,7 +1722,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
                 XRender::renderTexture(MenuX + 260 + 24, MenuY - 30 + (A * 30) + 2,
                                       GFX.Interface[1].w, GFX.Interface[1].h,
                                       GFX.Interface[1], 0, 0);
-                SuperPrint(fmt::format_ne(" {0}", SaveStars[A]), 3, MenuX + 288, MenuY - 30 + (A * 30));
+                SuperPrint(fmt::format_ne(" {0}", SaveSlotInfo[A].Stars), 3, MenuX + 288, MenuY - 30 + (A * 30));
             }
         }
         else
@@ -1728,6 +1737,63 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         A++;
         SuperPrint("ERASE SAVE", 3, MenuX, MenuY - 30 + (A * 30));
     }
+
+    if(MenuCursor < 0 || MenuCursor >= maxSaveSlots || (MenuMode != MENU_SELECT_SLOT_1P && MenuMode != MENU_SELECT_SLOT_2P) || SaveSlotInfo[MenuCursor + 1].Progress < 0)
+        return;
+
+    const auto& info = SaveSlotInfo[MenuCursor + 1];
+
+    int infobox_x = ScreenW / 2 - 240;
+    int infobox_y = MenuY + 145;
+
+    int row_1 = infobox_y + 10;
+    int row_2 = infobox_y + 42;
+    int row_c = infobox_y + 26;
+
+    bool hasFails = (gEnableDemoCounter || info.FailsEnabled);
+
+    // recenter if single row
+    if((info.Time <= 0 || g_speedRunnerMode == SPEEDRUN_MODE_OFF) && !hasFails)
+        row_1 = infobox_y + 26;
+
+    XRender::renderRect(infobox_x, infobox_y, 480, 68, 0, 0, 0, 0.5f);
+
+    // Temp string
+    std::string t;
+
+    // Score
+    bool show_timer = info.Time > 0 && g_speedRunnerMode != SPEEDRUN_MODE_OFF;
+    int row_score = show_timer ? row_1 : row_c;
+    SuperPrint(t = fmt::format_ne("Score: {0}", info.Score), 3, infobox_x + 10, row_score);
+
+    // Gameplay Timer
+    if(show_timer)
+    {
+        std::string t = GameplayTimer::formatTime(info.Time);
+
+        if(t.size() > 9)
+            t = t.substr(0, t.size() - 4);
+
+        SuperPrint(fmt::format_ne("Time: {0}", t), 3, infobox_x + 10, row_2);
+    }
+
+    // If demos off, put (l)ives and (c)oins on center
+    int row_lc = (hasFails) ? row_1 : row_c;
+
+    // Print lives on the screen (from gfx_update2.cpp)
+    XRender::renderTexture(infobox_x + 272, row_lc + 2 + 14 - GFX.Interface[3].h, GFX.Interface[3]);
+    XRender::renderTexture(infobox_x + 272 + 40, row_lc + 2 + 16 - GFX.Interface[3].h, GFX.Interface[1]);
+    SuperPrint(t = std::to_string(info.Lives), 1, infobox_x + 272 + 62, row_lc + 2);
+
+    // Print coins on the screen (from gfx_update2.cpp)
+    int coins_x = infobox_x + 480 - 10 - 36 - 62;
+    XRender::renderTexture(coins_x + 16, row_lc, GFX.Interface[2]);
+    XRender::renderTexture(coins_x + 40, row_lc + 2, GFX.Interface[1]);
+    SuperPrintRightAlign(t = std::to_string(info.Coins), 1, coins_x + 62 + 36, row_lc + 2);
+
+    // Fails Counter
+    if(hasFails)
+        SuperPrintRightAlign(fmt::format_ne("{0}: {1}", gDemoCounterTitle, info.Fails), 3, infobox_x + 480 - 10, row_2);
 }
 
 void mainMenuDraw()

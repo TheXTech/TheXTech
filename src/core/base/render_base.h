@@ -177,6 +177,16 @@ public:
                              uint8_t *RGBApixels,
                              uint32_t pitch) = 0;
 
+    virtual void loadTextureMask(StdPicture &target,
+                             uint32_t mask_width,
+                             uint32_t mask_height,
+                             uint8_t *RGBApixels,
+                             uint32_t pitch,
+                             uint32_t image_width,
+                             uint32_t image_height);
+
+    virtual bool textureMaskSupported();
+
     void loadTexture_1x(StdPicture &target,
                              uint32_t width,
                              uint32_t height,

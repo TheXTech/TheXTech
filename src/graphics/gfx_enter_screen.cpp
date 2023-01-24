@@ -206,7 +206,8 @@ void GameThing(int waitms, int fadeSpeed)
                 XEvents::doEvents();
                 computeFrameTime2();
             }
-            PGE_Delay(1);
+            if(!MaxFPS)
+                PGE_Delay(1);
         }
     }
 }

@@ -28,6 +28,7 @@
 #include "global_constants.h"
 #include "layers.h"
 #include "game_main.h" // GamePaused
+#include "main/cheat_code.h"
 
 #include <unordered_map>
 #include <functional>
@@ -400,6 +401,10 @@ class SMBXMemoryEmulator
     typedef std::function<void(double,FIELDTYPE)> Setter;
     std::unordered_map<size_t, std::pair<Getter, Setter>> m_lff;
 
+    typedef std::function<std::string()> StrGetter;
+    typedef std::function<void(const std::string&)> StrSetter;
+    std::unordered_map<size_t, std::pair<StrGetter, StrSetter>> m_sff;
+
     enum ValueType
     {
         VT_UNKNOWN = 0,
@@ -408,7 +413,8 @@ class SMBXMemoryEmulator
         VT_INT,
         VT_BOOL,
         VT_STRING,
-        VT_LAMBDA
+        VT_LAMBDA,
+        VT_STRLAMBDA
     };
 
     std::unordered_map<int, ValueType> m_type;
@@ -447,6 +453,12 @@ class SMBXMemoryEmulator
     {
         m_lff.insert({address, {g, s}});
         m_type.insert({address, VT_LAMBDA});
+    }
+
+    void insert(size_t address, StrGetter g, StrSetter s)
+    {
+        m_sff.insert({address, {g, s}});
+        m_type.insert({address, VT_STRLAMBDA});
     }
 
 public:
@@ -522,12 +534,48 @@ public:
                             "(BlocksSorted) with value %g as %s", in, FieldtypeToStr(ftype));
             }
         );
+
+        insert(0x00B2C896, &SingleCoop);
+        insert(0x00B2C898,
+            []()->std::string
+            {
+                return cheats_get();
+            },
+            [](const std::string &in)->void
+            {
+                cheats_setBuffer(in);
+            }
+        );
+
+        insert(0x00B2C89C, &GameOutro);
+        insert(0x00B2C8A0, &CreditChop);
+        insert(0x00B2C8A4, &EndCredits);
+
+        insert(0x00B2C8A6, &curStars);
+        insert(0x00B2C8A8, &maxStars);
+
+        insert(0x00B2C8AA, &ShadowMode);
+        insert(0x00B2C8AC, &MultiHop);
+        insert(0x00B2C8AE, &SuperSpeed);
+        insert(0x00B2C8B0, &WalkAnywhere);
+        insert(0x00B2C8B2, &FlyForever);
         insert(0x00B2C8B4, &FreezeNPCs);
+        insert(0x00B2C8B6, &CaptainN);
+        insert(0x00B2C8B8, &FlameThrower);
+        insert(0x00B2C8BA, &CoinMode);
+        insert(0x00B2C8BE, &MaxFPS);
+        insert(0x00B2C8C0, &GodMode);
+        insert(0x00B2C8C2, &GrabAll);
 
         insert(0x00B2C8C4, &Cheater);
 
         insert(0x00B2C8E4, &Score); // HUD points count
-        insert(0x00B2C906, &maxStars); // Max stars at episode
+        insert(0x00B2C906, &MaxWorldStars); // Max stars at episode
+
+        insert(0x00B2C908, &Debugger);
+
+        insert(0x00B2D6B8, &PlayerCharacter);
+        insert(0x00B2D6BA, &PlayerCharacter2);
 
         insert(0x00B2D6BC, &SharedCursor.X); // Mouse cursor X
         insert(0x00B2D6C4, &SharedCursor.Y); // Mouse cursor Y

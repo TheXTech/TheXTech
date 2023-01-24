@@ -30,6 +30,8 @@
 
 #include <Logger/logger.h>
 
+#include "sdl_proxy/sdl_timer.h"
+
 #include "globals.h"
 #include "video.h"
 #include "frame_timer.h"
@@ -50,201 +52,437 @@ struct tex_load_data
 {
     uint8_t* data = nullptr;
     uint16_t palette[16];
-    GL_TEXTURE_SIZE_ENUM w, h;
+    GL_TEXTURE_SIZE_ENUM w = TEXTURE_SIZE_8;
+    GL_TEXTURE_SIZE_ENUM h = TEXTURE_SIZE_8;
 
     inline ~tex_load_data()
     {
         if(data)
             free(data);
     }
+
+    inline uint32_t data_size()
+    {
+        // calculate number of bytes desired
+        // TEXTURE_SIZE_8 is an int with value 0
+        uint16_t w_px = 1 << (3 + w);
+        uint16_t h_px = 1 << (3 + h);
+
+        // 16-color = 4bpp
+        return w_px * h_px / 2;
+    }
 };
 
-static bool s_loadTextureToRAM(tex_load_data& tex, const std::string& path, int logical_w, int logical_h, int flags)
+
+class TexLoader_t
 {
-    if(tex.data != nullptr)
-        return false;
+public:
+    bool m_awaiting_free = false;
+    bool m_did_free = false;
+    bool m_active = false;
+    bool m_awaiting_vblank = false;
 
-    logical_w >>= (1 + (flags & 15));
-    logical_h >>= (1 + (flags & 15));
+    uint64_t m_total_load_time[3] = {0};
+    uint64_t m_total_load_count = 0;
 
-    if(logical_w > 1024)
-        return false;
-    else if(logical_w > 512)
-        tex.w = TEXTURE_SIZE_1024;
-    else if(logical_w > 256)
-        tex.w = TEXTURE_SIZE_512;
-    else if(logical_w > 128)
-        tex.w = TEXTURE_SIZE_256;
-    else if(logical_w > 64)
-        tex.w = TEXTURE_SIZE_128;
-    else if(logical_w > 32)
-        tex.w = TEXTURE_SIZE_64;
-    else if(logical_w > 16)
-        tex.w = TEXTURE_SIZE_32;
-    else if(logical_w > 8)
-        tex.w = TEXTURE_SIZE_16;
-    else
-        tex.w = TEXTURE_SIZE_8;
+private:
+    StdPicture* m_tex = nullptr;
+    int m_current_index = 0;
 
-    if(logical_h > 1024)
-        return false;
-    else if(logical_h > 512)
-        tex.h = TEXTURE_SIZE_1024;
-    else if(logical_h > 256)
-        tex.h = TEXTURE_SIZE_512;
-    else if(logical_h > 128)
-        tex.h = TEXTURE_SIZE_256;
-    else if(logical_h > 64)
-        tex.h = TEXTURE_SIZE_128;
-    else if(logical_h > 32)
-        tex.h = TEXTURE_SIZE_64;
-    else if(logical_h > 16)
-        tex.h = TEXTURE_SIZE_32;
-    else if(logical_h > 8)
-        tex.h = TEXTURE_SIZE_16;
-    else
-        tex.h = TEXTURE_SIZE_8;
+    int m_texname = -1;
+    FILE* m_file = nullptr;
+    tex_load_data m_data;
+    int m_bytes_read = 0;
 
+    int m_step = 0;
 
-    // calculate number of bytes desired
-    // TEXTURE_SIZE_8 is an int with value 0
-    uint16_t w_px = 1 << (3 + tex.w);
-    uint16_t h_px = 1 << (3 + tex.h);
-    uint32_t data_size = w_px * h_px / 2;
-
-
-    // don't even try to load a texture that would require >=25% of VRAM
-    if(data_size > 65536)
+    void cleanup()
     {
-        pLogWarning("Refused to allocate %d bytes", data_size);
-        return false;
+        m_awaiting_vblank = false;
+
+        if(m_texname != -1)
+        {
+            glDeleteTextures(1, &m_texname);
+            m_texname = -1;
+        }
+
+        if(m_file)
+        {
+            fclose(m_file);
+            m_file = nullptr;
+        }
+
+        if(m_data.data)
+        {
+            free(m_data.data);
+            m_data.data = nullptr;
+        }
+
+        if(m_tex)
+        {
+            m_tex->d.destroy();
+            m_tex = nullptr;
+        }
+
+        m_bytes_read = 0;
+        m_step = 0;
+
+        m_awaiting_free = false;
+        m_did_free = false;
+        m_active = false;
     }
 
-
-    // could be allocating up to 64 KiB (excluded 128 KiB case)
-    uint8_t* pixels = (uint8_t*) malloc(data_size);
-    if(!pixels)
+    bool init()
     {
-        pLogWarning("Failed to allocate %d bytes", data_size);
-        return false;
+        if(!m_tex || m_texname != -1)
+            return false;
+
+        if(m_current_index > 2 || m_current_index > (m_tex->h - 1) / 2048)
+        {
+            // don't need to unload it, we're just done.
+            m_tex = nullptr;
+            m_step = -1;
+            m_active = false;
+            return false;
+        }
+
+        if(!glGenTextures(1, &m_texname))
+        {
+            pLogWarning("Max texture count exceeded");
+            m_texname = -1;
+            return false;
+        }
+
+        int logical_w = m_tex->w;
+        int logical_h = m_tex->h;
+        logical_h -= m_current_index * 2048;
+
+        if(logical_h > 2048)
+            logical_h = 2048;
+
+        // scale down by power of two
+        logical_w >>= (1 + (m_tex->d.flags & 15));
+        logical_h >>= (1 + (m_tex->d.flags & 15));
+
+        if(logical_w > 1024)
+            return false;
+        else if(logical_w > 512)
+            m_data.w = TEXTURE_SIZE_1024;
+        else if(logical_w > 256)
+            m_data.w = TEXTURE_SIZE_512;
+        else if(logical_w > 128)
+            m_data.w = TEXTURE_SIZE_256;
+        else if(logical_w > 64)
+            m_data.w = TEXTURE_SIZE_128;
+        else if(logical_w > 32)
+            m_data.w = TEXTURE_SIZE_64;
+        else if(logical_w > 16)
+            m_data.w = TEXTURE_SIZE_32;
+        else if(logical_w > 8)
+            m_data.w = TEXTURE_SIZE_16;
+        else
+            m_data.w = TEXTURE_SIZE_8;
+
+        if(logical_h > 1024)
+            return false;
+        else if(logical_h > 512)
+            m_data.h = TEXTURE_SIZE_1024;
+        else if(logical_h > 256)
+            m_data.h = TEXTURE_SIZE_512;
+        else if(logical_h > 128)
+            m_data.h = TEXTURE_SIZE_256;
+        else if(logical_h > 64)
+            m_data.h = TEXTURE_SIZE_128;
+        else if(logical_h > 32)
+            m_data.h = TEXTURE_SIZE_64;
+        else if(logical_h > 16)
+            m_data.h = TEXTURE_SIZE_32;
+        else if(logical_h > 8)
+            m_data.h = TEXTURE_SIZE_16;
+        else
+            m_data.h = TEXTURE_SIZE_8;
+
+        return true;
     }
 
+    bool alloc()
+    {
+        if(m_data.data)
+            return false;
+
+        uint32_t data_size = m_data.data_size();
+
+        // don't even try to load a texture that would require >=25% of VRAM
+        if(data_size > 65536)
+        {
+            pLogWarning("Refused to allocate %d bytes", data_size);
+            return false;
+        }
+
+        // could be allocating up to 64 KiB (excluded 128 KiB case)
+        m_data.data = (uint8_t*) malloc(data_size);
+        if(!m_data.data)
+        {
+            pLogWarning("Failed to allocate %d bytes", data_size);
+            return false;
+        }
+
+        return true;
+    }
 
     // open the file after checking the malloc (allocator cheaper than filesystem)
-    FILE* texfile = fopen(path.c_str(), "r");
-    if(!texfile)
+    bool open()
     {
-        pLogWarning("Failed to open file", data_size);
-        free(pixels);
-        return false;
-    }
+        if(!m_data.data || !m_tex)
+            return false;
 
-
-    // load palette
-    uint32_t to_read = 32;
-    uint8_t* target = (uint8_t*)(tex.palette);
-
-    while(to_read)
-    {
-        unsigned int bytes_read = fread(target, 1, to_read, texfile);
-        if(!bytes_read)
+        m_file = PackLoader::getf(*m_tex, m_current_index);
+        if(!m_file)
         {
-            pLogWarning("Not enough palette data (needed %d more out of 32)", to_read);
-            free(pixels);
-            fclose(texfile);
+            pLogWarning("Failed to open file");
             return false;
         }
-        to_read -= bytes_read;
-        target += bytes_read;
+
+        m_bytes_read = 0;
+
+        return true;
     }
 
-
-    // load image data
-    to_read = data_size;
-    target = pixels;
-
-    while(to_read)
+    bool load_palette()
     {
-        unsigned int bytes_read = fread(target, 1, to_read, texfile);
-        if(!bytes_read)
-        {
-            pLogWarning("Not enough texture data (needed %d more out of %d; logical w %d, h %d; texture w %d, h %d)", to_read, data_size, logical_w, logical_h, w_px, h_px);
-            free(pixels);
-            fclose(texfile);
+        if(!m_data.data || !m_file)
             return false;
+
+        // load palette
+        uint32_t to_read = 32;
+        uint8_t* target = (uint8_t*)(m_data.palette);
+
+        while(to_read)
+        {
+            unsigned int bytes_read = fread(target, 1, to_read, m_file);
+            if(!bytes_read)
+            {
+                pLogWarning("Not enough palette data (needed %d more out of 32)", to_read);
+                return false;
+            }
+            to_read -= bytes_read;
+            target += bytes_read;
         }
-        to_read -= bytes_read;
-        target += bytes_read;
+
+        return true;
     }
 
-    fclose(texfile);
+    bool load_data()
+    {
+        if(!m_data.data || !m_file || !m_tex)
+            return false;
 
-    tex.data = pixels;
+        // load image data
+        uint32_t to_read = m_data.data_size() - m_bytes_read;
+        uint8_t* target = (uint8_t*)(m_data.data) + m_bytes_read;
 
-    return true;
-}
+        while(to_read)
+        {
+            unsigned int bytes_read = fread(target, 1, to_read, m_file);
+            if(!bytes_read)
+            {
+                pLogWarning("Not enough texture data (needed %d more out of %d; texture w %d, h %d)", to_read, m_data.data_size(), m_data.w, m_data.h);
+                return false;
+            }
+            to_read -= bytes_read;
+            target += bytes_read;
+            m_bytes_read += bytes_read;
+        }
 
-static bool s_loadTexture(const std::string& path, int* tex_out, uint16_t* tex_w, uint16_t* tex_h, int logical_w, int logical_h, int flags)
+        PackLoader::finalizef(m_file, *m_tex);
+        m_file = nullptr;
+
+        return true;
+    }
+
+    bool to_vram()
+    {
+        if(!m_data.data || m_texname == -1 || !m_tex)
+            return false;
+
+        int tex_params = TEXGEN_OFF;
+        if((m_tex->d.flags & 16) == 0)
+            tex_params |= GL_TEXTURE_COLOR0_TRANSPARENT;
+
+        glBindTexture(0, m_texname);
+        if(!glTexImage2D(0, 0, GL_RGB16, m_data.w, m_data.h, 0, tex_params, m_data.data))
+        {
+            if(m_did_free)
+            {
+                pLogWarning("Still could not load texture (%u bytes) to VRAM (%u/524288 used).", m_data.data_size(), s_loadedVRAM);
+                return false;
+            }
+            else
+            {
+                pLogWarning("Could not load texture (%u bytes at %p) to VRAM (%u/524288 used), requesting free.", m_data.data_size(), m_data.data, s_loadedVRAM);
+                m_awaiting_free = true;
+                return false;
+            }
+        }
+
+        glColorTableEXT(0, 0, 16, 0, 0, m_data.palette);
+
+        s_loadedVRAM += m_data.data_size();
+
+        // don't touch malloc
+        // free(m_data.data);
+        // m_data.data = nullptr;
+
+        uint16_t w_px = 1 << (3 + m_data.w);
+        uint16_t h_px = 1 << (3 + m_data.h);
+
+        m_tex->d.tex_w[m_current_index] = w_px;
+        m_tex->d.tex_h[m_current_index] = h_px;
+        m_tex->d.texture[m_current_index] = m_texname;
+
+        m_texname = -1;
+
+        m_awaiting_vblank = false;
+
+        return true;
+    }
+
+    bool step0_init_fopen()
+    {
+        return init() && alloc() && open();
+    }
+
+    bool step1_load()
+    {
+        if(!load_palette() || !load_data())
+            return false;
+
+        return true;
+    }
+
+    bool step2_vram()
+    {
+        return to_vram();
+    }
+
+    typedef bool (XRender::TexLoader_t::* const stepfunc_t)();
+    static constexpr stepfunc_t step_table[] = { &TexLoader_t::step0_init_fopen, &TexLoader_t::step1_load, &TexLoader_t::step2_vram };
+
+public:
+    void initialize(StdPicture& tex)
+    {
+        cleanup();
+
+        m_current_index = 0;
+        m_step = 0;
+        m_tex = &tex;
+        m_active = true;
+    }
+
+    void reset()
+    {
+        cleanup();
+    }
+
+    void on_vblank()
+    {
+        if(m_awaiting_vblank && m_tex && m_step == 2 && !m_awaiting_free)
+        {
+            int step = m_step;
+            uint64_t start_time = SDL_GetMicroTicks();
+
+            // success!
+            if(to_vram())
+            {
+                m_step = 3;
+                m_awaiting_vblank = false;
+            }
+            // mark failure
+            else if(!m_awaiting_free)
+            {
+                m_step = 9;
+
+                m_awaiting_vblank = false;
+            }
+
+            m_total_load_time[step] += SDL_GetMicroTicks() - start_time;
+        }
+    }
+
+    void next_step()
+    {
+        // pLogDebug("Called with tex %p index %d step %d", m_tex, m_current_index, m_step);
+
+        if(!m_tex || m_step < 0 || m_awaiting_free || m_awaiting_vblank)
+            return;
+
+        // leftover data from interrupt needs to be freed
+        if(m_step == 0 && m_data.data)
+        {
+            free(m_data.data);
+            m_data.data = nullptr;
+        }
+
+        // texture was destroyed
+        if(!m_tex->d.attempted_load)
+        {
+            cleanup();
+            return;
+        }
+
+        // load to VRAM failed
+        if(m_step == 9)
+        {
+            cleanup();
+            return;
+        }
+
+        if(m_step >= 3)
+        {
+            m_total_load_count++;
+            m_current_index++;
+            m_step = 0;
+
+#if 0
+            // debug texture load stats
+            printf("Averages: ");
+
+            for(int i = 0; i < 3; i++)
+                printf("%6llu ", m_total_load_time[i] / m_total_load_count);
+
+            printf("\n");
+
+            // logMemUse();
+#endif
+        }
+
+        int step = m_step;
+        uint64_t start_time = SDL_GetMicroTicks();
+
+        if((this->*TexLoader_t::step_table[m_step])())
+        {
+            m_step++;
+        }
+        else if(!m_awaiting_free)
+        {
+            cleanup();
+        }
+
+        m_total_load_time[step] += SDL_GetMicroTicks() - start_time;
+
+        if(m_step == 2)
+            m_awaiting_vblank = true;
+    }
+};
+
+static TexLoader_t s_texture_loader;
+constexpr TexLoader_t::stepfunc_t TexLoader_t::step_table[];
+
+void g_on_vblank()
 {
-    if(!tex_out || !tex_w || !tex_h)
-    {
-        pLogWarning("Got a null pointer to s_loadTexture");
-        return false;
-    }
-
-    tex_load_data tex;
-
-    if(logical_h > 2048)
-        logical_h = 2048;
-
-    int name;
-
-    if(!glGenTextures(1, &name))
-    {
-        pLogWarning("Could not generate texture");
-        return false;
-    }
-
-    if(!s_loadTextureToRAM(tex, path, logical_w, logical_h, flags))
-    {
-        glDeleteTextures(1, &name);
-        return false;
-    }
-
-    uint16_t w_px = 1 << (3 + tex.w);
-    uint16_t h_px = 1 << (3 + tex.h);
-    uint32_t data_size = w_px * h_px / 2;
-
-    int tex_params = TEXGEN_OFF;
-    if((flags & 16) == 0)
-        tex_params |= GL_TEXTURE_COLOR0_TRANSPARENT;
-
-    glBindTexture(0, name);
-    if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex_params, tex.data))
-    {
-        pLogWarning("Could not load texture (%u bytes) to VRAM (%u/524288 used). Requesting free texture memory.", data_size, s_loadedVRAM);
-        minport_freeTextureMemory();
-    }
-
-    if(!glTexImage2D(0, 0, GL_RGB16, tex.w, tex.h, 0, tex_params, tex.data))
-    {
-        pLogWarning("Still could not load texture (%u bytes) to VRAM (%u/524288 used).", data_size, s_loadedVRAM);
-        glDeleteTextures(1, &name);
-        return false;
-    }
-
-    glColorTableEXT(0, 0, 16, 0, 0, tex.palette);
-
-    *tex_out = name;
-    *tex_w = w_px;
-    *tex_h = h_px;
-
-    s_loadedVRAM += data_size;
-
-    // pLogDebug("Loaded tex from %s!", path.c_str());
-
-    return true;
+    s_texture_loader.on_vblank();
 }
+
 
 // sourced from gl2d
 static v16 s_depth;
@@ -379,6 +617,8 @@ bool init()
 
     updateViewport();
 
+    irqSet(IRQ_VBLANK, g_on_vblank);
+
     return true;
 }
 
@@ -395,6 +635,18 @@ void setTargetTexture()
     }
 
     g_in_frame = true;
+
+    if(s_texture_loader.m_active)
+    {
+        s_texture_loader.next_step();
+
+        if(s_texture_loader.m_awaiting_free)
+        {
+            minport_freeTextureMemory();
+            s_texture_loader.m_awaiting_free = false;
+            s_texture_loader.m_did_free = true;
+        }
+    }
 
     minport_initFrame();
 
@@ -581,14 +833,34 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
 
     if(length == 255)
     {
-        pLogWarning("Image path %s was truncated in load list", filename);
+        pLogWarning("Image path %s was truncated in load list, aborting", filename);
         return target;
     }
 
     target.inited = true;
-    target.l.path = dir;
-    target.l.path += filename;
     target.l.lazyLoaded = true;
+    target.l.pack = PackLoader::PACK_NONE;
+    target.l.path.clear();
+
+    // clear optional endline
+    fscanf(f, "\n");
+
+    int has_offset = 0;
+    fscanf(f, "pack_offset %n", &has_offset);
+
+    uint32_t pack_offset;
+
+    if(has_offset && fscanf(f, "%lu\n", &pack_offset) == 1)
+    {
+        std::string pack_path = dir;
+        pack_path += filename;
+        PackLoader::setup(target, pack_path, pack_offset);
+    }
+    else
+    {
+        target.l.path = dir;
+        target.l.path += filename;
+    }
 
     int w, h, flags;
     if(fscanf(f, "%d\n%d\n%d\n", &w, &h, &flags) != 3 || w < 0 || w > 8192 || h < 0 || h > 8192)
@@ -609,38 +881,13 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
 
 void lazyLoad(StdPicture &target)
 {
-    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture() || s_texture_loader.m_active)
         return;
 
     target.d.attempted_load = true;
     s_texture_bank.insert(&target);
 
-    std::string suppPath;
-
-    if(!s_loadTexture(target.l.path, &target.d.texture[0], &target.d.tex_w[0], &target.d.tex_h[0], target.w, target.h, target.d.flags))
-    {
-        pLogWarning("Permanently failed to load %s", target.l.path.c_str());
-        return;
-    }
-
-    if(target.h > 2048)
-    {
-        suppPath = target.l.path + '1';
-        if(!s_loadTexture(suppPath, &target.d.texture[1], &target.d.tex_w[1], &target.d.tex_h[1], target.w, target.h - 2048, target.d.flags))
-        {
-            pLogWarning("Permanently failed to load %s", suppPath.c_str());
-            return;
-        }
-    }
-    if(target.h > 4096)
-    {
-        suppPath = target.l.path + '2';
-        if(!s_loadTexture(suppPath, &target.d.texture[2], &target.d.tex_w[2], &target.d.tex_h[2], target.w, target.h - 4096, target.d.flags))
-        {
-            pLogWarning("Permanently failed to load %s", suppPath.c_str());
-            return;
-        }
-    }
+    s_texture_loader.initialize(target);
 
     return;
 }
@@ -648,6 +895,14 @@ void lazyLoad(StdPicture &target)
 void lazyPreLoad(StdPicture &target)
 {
     lazyLoad(target);
+
+    while(s_texture_loader.m_active)
+    {
+        s_texture_loader.next_step();
+
+        if(s_texture_loader.m_awaiting_vblank)
+            s_texture_loader.on_vblank();
+    }
 }
 
 void lazyUnLoad(StdPicture &target)
@@ -657,6 +912,8 @@ void lazyUnLoad(StdPicture &target)
 
 void clearAllTextures()
 {
+    s_texture_loader.reset();
+
     for(StdPicture* tx : s_texture_bank)
     {
         s_loadedVRAM -= (tx->d.tex_w[0] * tx->d.tex_h[0]

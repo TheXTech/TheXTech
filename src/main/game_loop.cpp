@@ -88,7 +88,9 @@ void levelWaitForFade()
             computeFrameTime2();
             updateScreenFaders();
         }
-        PGE_Delay(1);
+
+        if(!MaxFPS)
+            PGE_Delay(1);
     }
 }
 
@@ -110,7 +112,9 @@ void editorWaitForFade()
             computeFrameTime2();
             updateScreenFaders();
         }
-        PGE_Delay(1);
+
+        if(!MaxFPS)
+            PGE_Delay(1);
     }
 }
 
@@ -500,17 +504,22 @@ int PauseGame(PauseCode code, int plr)
             g_microStats.end_frame();
         }
 
-        PGE_Delay(1);
+        if(!MaxFPS)
+            PGE_Delay(1);
+
         if(!GameIsActive)
             break;
     } while(true);
 
     GamePaused = old_code;
+
+    // prevent unexpected button presses
     for(int i = 1; i <= numPlayers; i++)
     {
         Player[i].UnStart = false;
         Player[i].CanJump = false;
     }
+
     MenuCursorCanMove = false;
 
     XWindow::showCursor(prev_cursor);
