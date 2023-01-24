@@ -2269,12 +2269,6 @@ void UpdateGraphics(bool skipRepaint)
     if(!skipRepaint)
         XRender::repaint();
 
-    XRender::setTargetScreen();
-
-//    If TakeScreen = True Then ScreenShot
-    if(TakeScreen)
-        ScreenShot();
-
     // Update Coin Frames
     CoinFrame2[1] += 1;
     if(CoinFrame2[1] >= 6)

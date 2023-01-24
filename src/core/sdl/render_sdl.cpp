@@ -34,6 +34,7 @@
 #include <fmt_format_ne.h>
 
 #include "controls.h"
+#include "sound.h"
 
 #ifndef UNUSED
 #define UNUSED(x) (void)x
@@ -168,6 +169,15 @@ void RenderSDL::repaint()
 
     int w, h, off_x, off_y, wDst, hDst;
     float scale_x, scale_y;
+
+    #ifdef USE_SCREENSHOTS_AND_RECS
+        if(TakeScreen)
+        {
+            makeShot();
+            PlaySoundMenu(SFX_GotItem);
+            TakeScreen = false;
+        }
+    #endif
 
     setTargetScreen();
 

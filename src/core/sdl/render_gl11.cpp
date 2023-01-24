@@ -37,6 +37,7 @@
 #include <fmt_format_ne.h>
 
 #include "controls.h"
+#include "sound.h"
 
 #ifndef UNUSED
 #define UNUSED(x) (void)x
@@ -145,6 +146,15 @@ void RenderGL11::repaint()
 #ifdef USE_RENDER_BLOCKING
     if(m_blockRender)
         return;
+#endif
+
+#ifdef USE_SCREENSHOTS_AND_RECS
+    if(TakeScreen)
+    {
+        makeShot();
+        PlaySoundMenu(SFX_GotItem);
+        TakeScreen = false;
+    }
 #endif
 
     setTargetScreen();

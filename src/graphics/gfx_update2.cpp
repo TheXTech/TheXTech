@@ -584,12 +584,7 @@ void UpdateGraphics2(bool skipRepaint)
 
         if(!skipRepaint)
             XRender::repaint();
-
-        XRender::setTargetScreen();
     }
-
-    if(TakeScreen)
-        ScreenShot();
 
     frameRenderEnd();
 
