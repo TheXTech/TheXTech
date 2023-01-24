@@ -30,7 +30,7 @@
 #include <SDL2/SDL_render.h>
 
 
-struct TexObj_t;
+struct StdPicture;
 struct SDL_Window;
 
 class RenderGL11 final : public AbstractRender_t
@@ -38,10 +38,8 @@ class RenderGL11 final : public AbstractRender_t
     SDL_Window    *m_window = nullptr;
 
     SDL_GLContext m_gContext = nullptr;
-    // SDL_Texture   *m_tBuffer = nullptr;
-    bool           m_tBufferDisabled = false;
-    // SDL_Texture   *m_recentTarget = nullptr;
-    std::set<TexObj_t *> m_textureBank;
+    bool           m_recentTargetScreen = false;
+    std::set<StdPicture *> m_textureBank;
 
     // Offset to shake screen
     int m_viewport_offset_x = 0;

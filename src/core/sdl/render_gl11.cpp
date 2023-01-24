@@ -62,7 +62,7 @@ unsigned int RenderGL11::SDL_InitFlags()
 
 bool RenderGL11::isWorking()
 {
-    return m_gContext && (m_tBufferDisabled);
+    return m_gContext;
 }
 
 bool RenderGL11::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
@@ -107,12 +107,6 @@ bool RenderGL11::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     m_maxTextureWidth = maxTextureSize;
     m_maxTextureHeight = maxTextureSize;
-
-    // m_tBuffer = nullptr; //SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScaleWidth, ScaleHeight);
-    // if(!m_tBuffer)
-    {
-        m_tBufferDisabled = true;
-    }
 
     // Clean-up from a possible start-up junk
     clearBuffer();
@@ -167,10 +161,14 @@ void RenderGL11::repaint()
 
     glFlush();
     SDL_GL_SwapWindow(m_window);
+    clearBuffer();
 }
 
 void RenderGL11::applyViewport()
 {
+    if(m_recentTargetScreen)
+        return;
+
     int phys_offset_x = m_viewport_x * m_phys_w / ScreenW;
     int phys_width = m_viewport_w * m_phys_w / ScreenW;
 
@@ -310,18 +308,32 @@ void RenderGL11::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_
 
 void RenderGL11::setTargetTexture()
 {
-    // if(m_tBufferDisabled || m_recentTarget == m_tBuffer)
+    if(!m_recentTargetScreen)
         return;
-    // SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
-    // m_recentTarget = m_tBuffer;
+
+    m_recentTargetScreen = false;
+    applyViewport();
 }
 
 void RenderGL11::setTargetScreen()
 {
-    // if(m_tBufferDisabled || m_recentTarget == nullptr)
+    if(m_recentTargetScreen)
         return;
-    // SDL_SetRenderTarget(m_gRenderer, nullptr);
-    // m_recentTarget = nullptr;
+
+    m_recentTargetScreen = true;
+
+    int hardware_w, hardware_h;
+    XWindow::getWindowSize(&hardware_w, &hardware_h);
+
+    glViewport(0,
+            0,
+            hardware_w - 1,
+            hardware_h - 1);
+
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+
+    glOrtho(0, hardware_w, hardware_h, 0, -1, 1);
 }
 
 void RenderGL11::prepareDrawMask()
@@ -409,6 +421,7 @@ void RenderGL11::loadTexture(StdPicture &target, uint32_t width, uint32_t height
 
     pitch /= 4;
 
+    // can't do because of pixel substitution
     // if(pad_w == pitch && height == pad_h)
     // {
         // use_pixels = RGBApixels;
@@ -515,14 +528,6 @@ void RenderGL11::loadTexture(StdPicture &target, uint32_t width, uint32_t height
         return;
     }
 
-    // if(!texture)
-    // {
-    //     pLogWarning("Render SDL: Failed to load texture! (%s)", SDL_GetError());
-    //     target.d.clear();
-    //     target.inited = false;
-    //     return;
-    // }
-
     if(is_mask)
         target.d.mask_texture_id = tex_id;
     else
@@ -530,7 +535,7 @@ void RenderGL11::loadTexture(StdPicture &target, uint32_t width, uint32_t height
         target.d.texture_id = tex_id;
         target.inited = true;
     }
-    // m_textureBank.insert(texture);
+    m_textureBank.insert(&target);
 
 #if defined(__APPLE__) && defined(USE_APPLE_X11)
     // SDL_GL_UnbindTexture(texture); // Unbind texture after it got been loaded (otherwise a white screen will happen)
@@ -561,26 +566,15 @@ void RenderGL11::deleteTexture(StdPicture &tx, bool lazyUnload)
         return;
     }
 
-    // auto corpseIt = m_textureBank.find(tx.d.texture_id);
-    // if(corpseIt == m_textureBank.end())
-    // {
-    //     SDL_DestroyTexture(tx.d.texture_id);
-    //     tx.d.texture_id = nullptr;
-    //     if(!lazyUnload)
-    //         tx.inited = false;
-    //     return;
-    // }
-
-    // SDL_Texture *corpse = *corpseIt;
-    // if(corpse)
-    //     SDL_DestroyTexture(corpse);
-    // m_textureBank.erase(corpse);
-
-    if(tx.inited)
+    auto corpseIt = m_textureBank.find(&tx);
+    if(corpseIt != m_textureBank.end())
     {
-        GLuint tex_id = tx.d.texture_id;
-        glDeleteTextures(1, &tex_id);
+        m_textureBank.erase(corpseIt);
+        return;
     }
+
+    if(tx.d.texture_id)
+        glDeleteTextures(1, &tx.d.texture_id);
 
     if(tx.d.mask_texture_id)
         glDeleteTextures(1, &tx.d.mask_texture_id);
@@ -599,8 +593,9 @@ void RenderGL11::deleteTexture(StdPicture &tx, bool lazyUnload)
 
 void RenderGL11::clearAllTextures()
 {
-    // for(SDL_Texture *tx : m_textureBank)
-    //     SDL_DestroyTexture(tx);
+    for(StdPicture *tx : m_textureBank)
+        deleteTexture(*tx, false);
+
     m_textureBank.clear();
 }
 
