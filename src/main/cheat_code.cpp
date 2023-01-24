@@ -2367,7 +2367,7 @@ struct CheatBuffer_t
         return buffer[t];
     }
 
-    size_t getBugLen() const
+    size_t getBufLen() const
     {
         return bufLen;
     }
@@ -2389,7 +2389,7 @@ static void processCheats()
 {
     std::string oldString;
     const char *buf = s_buffer.getString();
-    auto bufLen = s_buffer.getBugLen();
+    auto bufLen = s_buffer.getBufLen();
     bool cheated = false;
 
     // D_pLogDebug("Cheat buffer [%s]\n", buf);
@@ -2456,13 +2456,18 @@ void CheatCode(char sym)
 bool cheats_contains(const std::string &needle)
 {
     const char *buf = s_buffer.getString();
-    auto bufLen = s_buffer.getBugLen();
+    auto bufLen = s_buffer.getBufLen();
     return cheatCompare(bufLen, buf, needle.size(), needle.c_str());
 }
 
 bool cheats_contains(const char *needle)
 {
     const char *buf = s_buffer.getString();
-    auto bufLen = s_buffer.getBugLen();
+    auto bufLen = s_buffer.getBufLen();
     return cheatCompare(bufLen, buf, SDL_strlen(needle), needle);
+}
+
+std::string cheats_get()
+{
+    return std::string(s_buffer.getString(), s_buffer.getBufLen());
 }
