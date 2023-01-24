@@ -69,6 +69,8 @@ extern void cheats_setBuffer(const std::string &line);
 
 extern bool cheats_contains(const std::string &needle);
 
+extern std::string cheats_get();
+
 extern void cheats_clearBuffer();
 
 /*!

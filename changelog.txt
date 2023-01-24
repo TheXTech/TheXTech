@@ -29,6 +29,7 @@ Changelog for 1.3.6.1
 -Added compatibility flags for multiple early vanilla bugfixes. (@ds-sloth)
 -Added level exit cheats from SMBX2. (@SpencerEverly, @0lhi, @ds-sloth)
 -Fixed an unexpected disappear of LunaScript-drawn text and graphics when a pause menu or a message box was open. (@Wohlstand)
+-Added game save info (score, lives, coins, etc) display to the main menu screen. (@ds-sloth)
 -Allow a single player to reconnect their controls at the menu screen. (@ds-sloth)
 -In Magic Hand mode, cursor now snaps to current layer's grid, instead of global grid. (@ds-sloth)
 
