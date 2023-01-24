@@ -289,6 +289,20 @@ public:
             g_stats.renderedNPCs += 1;
         }
     }
+
+    // sort each queue properly
+    void sort()
+    {
+        std::sort(&BG[0], &BG[BG_n]);
+        std::sort(&Low[0], &Low[Low_n]);
+        std::sort(&Iced[0], &Iced[Iced_n]);
+        std::sort(&Normal[0], &Normal[Normal_n]);
+        std::sort(&Chat[0], &Chat[Chat_n]);
+        std::sort(&Held[0], &Held[Held_n]);
+        std::sort(&FG[0], &FG[FG_n]);
+        std::sort(&Dropped[0], &Dropped[Dropped_n]);
+        std::sort(&Warning[0], &Warning[Warning_n]);
+    }
 };
 
 NPC_Draw_Queue_t NPC_Draw_Queue[2] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
@@ -745,6 +759,8 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
             }
         }
     }
+
+    NPC_Draw_Queue_p.sort();
 }
 
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
