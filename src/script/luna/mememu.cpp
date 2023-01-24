@@ -28,6 +28,7 @@
 #include "global_constants.h"
 #include "layers.h"
 #include "game_main.h" // GamePaused
+#include "main/cheat_code.h"
 
 #include <unordered_map>
 #include <functional>
@@ -400,6 +401,10 @@ class SMBXMemoryEmulator
     typedef std::function<void(double,FIELDTYPE)> Setter;
     std::unordered_map<size_t, std::pair<Getter, Setter>> m_lff;
 
+    typedef std::function<std::string()> StrGetter;
+    typedef std::function<void(const std::string&)> StrSetter;
+    std::unordered_map<size_t, std::pair<StrGetter, StrSetter>> m_sff;
+
     enum ValueType
     {
         VT_UNKNOWN = 0,
@@ -408,7 +413,8 @@ class SMBXMemoryEmulator
         VT_INT,
         VT_BOOL,
         VT_STRING,
-        VT_LAMBDA
+        VT_LAMBDA,
+        VT_STRLAMBDA
     };
 
     std::unordered_map<int, ValueType> m_type;
@@ -447,6 +453,12 @@ class SMBXMemoryEmulator
     {
         m_lff.insert({address, {g, s}});
         m_type.insert({address, VT_LAMBDA});
+    }
+
+    void insert(size_t address, StrGetter g, StrSetter s)
+    {
+        m_sff.insert({address, {g, s}});
+        m_type.insert({address, VT_STRLAMBDA});
     }
 
 public:
@@ -524,20 +536,16 @@ public:
         );
 
         insert(0x00B2C896, &SingleCoop);
-
-        // String-typed field
-        //insert(0x00B2C898,
-        //    [](FIELDTYPE ftype)->std::string
-        //    {
-        //        (void)ftype;
-        //        return cheats_get();
-        //    },
-        //    [](const std::string &in, FIELDTYPE ftype)->void
-        //    {
-        //        (void)ftype;
-        //        cheats_setBuffer(in);
-        //    }
-        //);
+        insert(0x00B2C898,
+            []()->std::string
+            {
+                return cheats_get();
+            },
+            [](const std::string &in)->void
+            {
+                cheats_setBuffer(in);
+            }
+        );
 
         insert(0x00B2C89C, &GameOutro);
         insert(0x00B2C8A0, &CreditChop);
