@@ -52,7 +52,8 @@ struct tex_load_data
 {
     uint8_t* data = nullptr;
     uint16_t palette[16];
-    GL_TEXTURE_SIZE_ENUM w, h;
+    GL_TEXTURE_SIZE_ENUM w = TEXTURE_SIZE_8;
+    GL_TEXTURE_SIZE_ENUM h = TEXTURE_SIZE_8;
 
     inline ~tex_load_data()
     {
@@ -114,11 +115,18 @@ private:
             m_data.data = nullptr;
         }
 
+        if(m_tex)
+        {
+            m_tex->d.destroy();
+            m_tex = nullptr;
+        }
+
         m_bytes_read = 0;
         m_step = 0;
 
         m_awaiting_free = false;
         m_did_free = false;
+        m_active = false;
     }
 
     bool init()
@@ -128,6 +136,7 @@ private:
 
         if(m_current_index > 2 || m_current_index > (m_tex->h - 1) / 2048)
         {
+            // don't need to unload it, we're just done.
             m_tex = nullptr;
             m_step = -1;
             m_active = false;
@@ -137,6 +146,7 @@ private:
         if(!glGenTextures(1, &m_texname))
         {
             pLogWarning("Max texture count exceeded");
+            m_texname = -1;
             return false;
         }
 
@@ -306,7 +316,7 @@ private:
             }
             else
             {
-                pLogWarning("Could not load texture (%u bytes) to VRAM (%u/524288 used). Requesting free texture memory.", m_data.data_size(), s_loadedVRAM);
+                pLogWarning("Could not load texture (%u bytes at %p) to VRAM (%u/524288 used), requesting free.", m_data.data_size(), m_data.data, s_loadedVRAM);
                 m_awaiting_free = true;
                 return false;
             }
@@ -360,12 +370,24 @@ public:
         m_active = true;
     }
 
+    void reset()
+    {
+        cleanup();
+    }
+
     void next_step()
     {
         // pLogDebug("Called with tex %p index %d step %d", m_tex, m_current_index, m_step);
 
         if(!m_tex || m_step < 0 || m_awaiting_free)
             return;
+
+        // texture was destroyed
+        if(!m_tex->d.attempted_load)
+        {
+            cleanup();
+            return;
+        }
 
         if(m_step >= 3)
         {
@@ -397,8 +419,6 @@ public:
         else if(!m_awaiting_free)
         {
             cleanup();
-            m_current_index++;
-            m_step = 0;
         }
 
         m_total_load_time[step] += SDL_GetMicroTicks() - start_time;
@@ -826,6 +846,8 @@ void lazyUnLoad(StdPicture &target)
 
 void clearAllTextures()
 {
+    s_texture_loader.reset();
+
     for(StdPicture* tx : s_texture_bank)
     {
         s_loadedVRAM -= (tx->d.tex_w[0] * tx->d.tex_h[0]
