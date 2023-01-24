@@ -179,39 +179,51 @@ void RenderGL11::applyViewport()
     if(m_recentTargetScreen)
         return;
 
-    int phys_offset_x = m_viewport_x * m_phys_w / ScreenW;
-    int phys_width = m_viewport_w * m_phys_w / ScreenW;
+    int off_x = m_viewport_offset_ignore ? 0 : m_viewport_offset_x;
+    int off_y = m_viewport_offset_ignore ? 0 : m_viewport_offset_y;
 
-    int phys_offset_y = m_viewport_y * m_phys_h / ScreenH;
-    int phys_height = m_viewport_h * m_phys_h / ScreenH;
+    // fix offscreen coordinates
+    int viewport_x = m_viewport_x;
+    int viewport_y = m_viewport_y;
+    int viewport_w = m_viewport_w;
+    int viewport_h = m_viewport_h;
 
-    if(m_phys_x + phys_offset_x < 0)
-        phys_offset_x = -m_phys_x;
-    if(m_phys_y + phys_offset_y < 0)
-        phys_offset_y = -m_phys_y;
+    if(viewport_x < 0)
+    {
+        off_x += viewport_x;
+        viewport_w += viewport_x;
+        viewport_x = 0;
+    }
 
-    if(m_phys_x + phys_offset_x + phys_width >= m_phys_w)
-        phys_width = m_phys_w - (m_phys_x + phys_offset_x);
-    if(m_phys_y + phys_offset_y + phys_height >= m_phys_h)
-        phys_height = m_phys_h - (m_phys_y + phys_offset_y);
+    if(viewport_y < 0)
+    {
+        off_y += viewport_y;
+        viewport_h += viewport_y;
+        viewport_y = 0;
+    }
 
-    // pLogDebug("Setting viewport to %d %d %d %d", m_phys_x + phys_offset_x,
-    //         m_phys_h - (m_phys_y + phys_offset_y + phys_height),
-    //         m_phys_x + phys_offset_x + phys_width - 1,
-    //         m_phys_h - (m_phys_y + phys_offset_y) - 1);
+    if(viewport_y + viewport_h > ScreenH)
+        viewport_h = ScreenH - viewport_y;
+
+    if(viewport_x + viewport_w > ScreenW)
+        viewport_w = ScreenW - viewport_x;
+
+    int phys_offset_x = viewport_x * m_phys_w / ScreenW;
+    int phys_width = viewport_w * m_phys_w / ScreenW;
+
+    int phys_offset_y = viewport_y * m_phys_h / ScreenH;
+    int phys_height = viewport_h * m_phys_h / ScreenH;
+
     glViewport(m_phys_x + phys_offset_x,
-            m_phys_h - (m_phys_y + phys_offset_y + phys_height),
-            m_phys_x + phys_offset_x + phys_width - 1,
-            m_phys_h - (m_phys_y + phys_offset_y) - 1);
+            m_phys_y + m_phys_h - phys_height - phys_offset_y, // relies on fact that m_phys_y is a symmetric border
+            phys_width - 1,
+            phys_height - 1);
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
 
-    int off_x = m_viewport_offset_ignore ? 0 : m_viewport_offset_x;
-    int off_y = m_viewport_offset_ignore ? 0 : m_viewport_offset_y;
-
     // pLogDebug("Setting projection to %d %d %d %d", off_x, m_viewport_w + off_x, m_viewport_h + off_y, off_y);
-    glOrtho( off_x, m_viewport_w + off_x, m_viewport_h + off_y, off_y, -1, 1);
+    glOrtho( off_x, viewport_w + off_x, viewport_h + off_y, off_y, -1, 1);
 }
 
 void RenderGL11::updateViewport()
