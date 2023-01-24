@@ -80,6 +80,7 @@ public:
     bool m_awaiting_free = false;
     bool m_did_free = false;
     bool m_active = false;
+    bool m_awaiting_vblank = false;
 
     uint64_t m_total_load_time[3] = {0};
     uint64_t m_total_load_count = 0;
@@ -97,6 +98,8 @@ private:
 
     void cleanup()
     {
+        m_awaiting_vblank = false;
+
         if(m_texname != -1)
         {
             glDeleteTextures(1, &m_texname);
@@ -326,8 +329,9 @@ private:
 
         s_loadedVRAM += m_data.data_size();
 
-        free(m_data.data);
-        m_data.data = nullptr;
+        // don't touch malloc
+        // free(m_data.data);
+        // m_data.data = nullptr;
 
         uint16_t w_px = 1 << (3 + m_data.w);
         uint16_t h_px = 1 << (3 + m_data.h);
@@ -337,6 +341,8 @@ private:
         m_tex->d.texture[m_current_index] = m_texname;
 
         m_texname = -1;
+
+        m_awaiting_vblank = false;
 
         return true;
     }
@@ -348,7 +354,10 @@ private:
 
     bool step1_load()
     {
-        return load_palette() && load_data();
+        if(!load_palette() || !load_data())
+            return false;
+
+        return true;
     }
 
     bool step2_vram()
@@ -375,12 +384,44 @@ public:
         cleanup();
     }
 
+    void on_vblank()
+    {
+        if(m_awaiting_vblank && m_tex && m_step == 2 && !m_awaiting_free)
+        {
+            int step = m_step;
+            uint64_t start_time = SDL_GetMicroTicks();
+
+            // success!
+            if(to_vram())
+            {
+                m_step = 3;
+                m_awaiting_vblank = false;
+            }
+            // mark failure
+            else if(!m_awaiting_free)
+            {
+                m_step = 9;
+
+                m_awaiting_vblank = false;
+            }
+
+            m_total_load_time[step] += SDL_GetMicroTicks() - start_time;
+        }
+    }
+
     void next_step()
     {
         // pLogDebug("Called with tex %p index %d step %d", m_tex, m_current_index, m_step);
 
-        if(!m_tex || m_step < 0 || m_awaiting_free)
+        if(!m_tex || m_step < 0 || m_awaiting_free || m_awaiting_vblank)
             return;
+
+        // leftover data from interrupt needs to be freed
+        if(m_step == 0 && m_data.data)
+        {
+            free(m_data.data);
+            m_data.data = nullptr;
+        }
 
         // texture was destroyed
         if(!m_tex->d.attempted_load)
@@ -389,9 +430,18 @@ public:
             return;
         }
 
+        // load to VRAM failed
+        if(m_step == 9)
+        {
+            cleanup();
+            return;
+        }
+
         if(m_step >= 3)
         {
-            m_total_load_count += 1;
+            m_total_load_count++;
+            m_current_index++;
+            m_step = 0;
 
 #if 0
             // debug texture load stats
@@ -404,9 +454,6 @@ public:
 
             // logMemUse();
 #endif
-
-            m_current_index++;
-            m_step = 0;
         }
 
         int step = m_step;
@@ -422,11 +469,20 @@ public:
         }
 
         m_total_load_time[step] += SDL_GetMicroTicks() - start_time;
+
+        if(m_step == 2)
+            m_awaiting_vblank = true;
     }
 };
 
 static TexLoader_t s_texture_loader;
 constexpr TexLoader_t::stepfunc_t TexLoader_t::step_table[];
+
+void g_on_vblank()
+{
+    s_texture_loader.on_vblank();
+}
+
 
 // sourced from gl2d
 static v16 s_depth;
@@ -560,6 +616,8 @@ bool init()
     glScreen2D();
 
     updateViewport();
+
+    irqSet(IRQ_VBLANK, g_on_vblank);
 
     return true;
 }
@@ -837,6 +895,14 @@ void lazyLoad(StdPicture &target)
 void lazyPreLoad(StdPicture &target)
 {
     lazyLoad(target);
+
+    while(s_texture_loader.m_active)
+    {
+        s_texture_loader.next_step();
+
+        if(s_texture_loader.m_awaiting_vblank)
+            s_texture_loader.on_vblank();
+    }
 }
 
 void lazyUnLoad(StdPicture &target)
