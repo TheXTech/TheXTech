@@ -249,38 +249,15 @@ void RenderGL11::updateViewport()
     m_phys_y = hardware_h / 2 - m_phys_h / 2;
 
     applyViewport();
-
-    // clearBuffer();
 }
 
 void RenderGL11::resetViewport()
 {
-    // FIXME: Clarify the version of SDL2 with the buggy viewport
-//#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 22)
-    // set to an alt viewport as a workaround for SDL bug (doesn't allow resizing viewport without changing position)
-    // SDL_Rect altViewport = {m_viewport_x + 1, m_viewport_y + 1, 1, 1};
-    // SDL_RenderSetViewport(m_gRenderer, &altViewport);
-//#endif
-
     updateViewport();
-    // SDL_RenderSetViewport(m_gRenderer, nullptr);
-
 }
 
 void RenderGL11::setViewport(int x, int y, int w, int h)
 {
-    // SDL_Rect topLeftViewport;
-
-    // FIXME: Clarify the version of SDL2 with the buggy viewport
-//#if SDL_COMPILEDVERSION < SDL_VERSIONNUM(2, 0, 22)
-    // set to an alt viewport as a workaround for SDL bug (doesn't allow resizing viewport without changing position)
-    // topLeftViewport = {m_viewport_x + 1, m_viewport_y + 1, 1, 1};
-    // SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
-//#endif
-
-    // topLeftViewport = {x, y, w, h};
-    // SDL_RenderSetViewport(m_gRenderer, &topLeftViewport);
-
     m_viewport_x = x;
     m_viewport_y = y;
     m_viewport_w = w;
@@ -803,46 +780,57 @@ void RenderGL11::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
             hSrc = 0;
     }
 
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {(float)xDst + m_viewport_offset_x,
-                          (float)yDst + m_viewport_offset_y,
-                          (float)wDst,
-                          (float)hDst};
-    SDL_FPoint *centerD = (SDL_FPoint*)center;
-#else
-    SDL_Rect destRect = {(int)xDst + m_viewport_offset_x,
-                         (int)yDst + m_viewport_offset_y,
-                         (int)wDst,
-                         (int)hDst};
-    SDL_Point centerI = {center ? Maths::iRound(center->x) : 0,
-                         center ? Maths::iRound(center->y) : 0};
-    SDL_Point *centerD = center ? &centerI : nullptr;
-#endif
+    float x1 = xDst;
+    float x2 = xDst + wDst;
+    float y1 = yDst;
+    float y2 = yDst + hDst;
 
     float u1 = tx.l.w_scale * xSrc;
     float u2 = tx.l.w_scale * (xSrc + wSrc);
     float v1 = tx.l.h_scale * ySrc;
     float v2 = tx.l.h_scale * (ySrc + hSrc);
 
-    // txColorMod(tx.d, red, green, blue, alpha);
-    // SDL_RenderCopyExF(m_gRenderer, tx.d.texture_id, &sourceRect, &destRect,
-    //                   rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
+    if(flip & X_FLIP_HORIZONTAL)
+        std::swap(u1, u2);
 
-    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+    if(flip & X_FLIP_VERTICAL)
+        std::swap(v1, v2);
+
+    const float world_coords[] = {x1, y1,
+        x1, y2,
+        x2, y2,
+        x2, y1};
+
+    const float tex_coords[] = {u1, v1,
+        u1, v2,
+        u2, v2,
+        u2, v1};
+
     glColor4f(red, green, blue, alpha);
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(u1, v1);
-    glVertex2f(destRect.x, destRect.y);
-    glTexCoord2f(u1, v2);
-    glVertex2f(destRect.x, destRect.y + destRect.h);
-    glTexCoord2f(u2, v2);
-    glVertex2f(destRect.x + destRect.w, destRect.y + destRect.h);
-    glTexCoord2f(u2, v1);
-    glVertex2f(destRect.x + destRect.w, destRect.y);
-    glEnd();
+    if(tx.d.mask_texture_id)
+    {
+        prepareDrawMask();
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
+        glVertexPointer(2, GL_FLOAT, 0, world_coords);
+        glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+
+        glDrawArrays(GL_QUADS, 0, 4);
+
+        prepareDrawImage();
+    }
+
+    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+
+    glVertexPointer(2, GL_FLOAT, 0, world_coords);
+    glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    if(tx.d.mask_texture_id)
+    {
+        leaveMaskContext();
+    }
 }
 
 void RenderGL11::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
@@ -852,7 +840,6 @@ void RenderGL11::renderTextureScale(double xDst, double yDst, double wDst, doubl
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
-    const unsigned int flip = SDL_FLIP_NONE;
 
     if(!tx.inited)
         return;
@@ -866,42 +853,51 @@ void RenderGL11::renderTextureScale(double xDst, double yDst, double wDst, doubl
         return;
     }
 
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {Maths::fRound(xDst) + m_viewport_offset_x,
-                          Maths::fRound(yDst) + m_viewport_offset_y,
-                          (float)wDst,
-                          (float)hDst};
-#else
-    SDL_Rect destRect = {Maths::iRound(xDst) + m_viewport_offset_x,
-                         Maths::iRound(yDst) + m_viewport_offset_y,
-                         (int)wDst,
-                         (int)hDst};
-#endif
+    float x1 = xDst;
+    float x2 = xDst + wDst;
+    float y1 = yDst;
+    float y2 = yDst + hDst;
 
-    float u1 = 0;
-    float u2 = tx.l.w_scale * tx.w;
-    float v1 = 0;
-    float v2 = tx.l.h_scale * tx.h;
+    float u1 = tx.l.w_scale * 0;
+    float u2 = tx.l.w_scale * (tx.w);
+    float v1 = tx.l.h_scale * 0;
+    float v2 = tx.l.h_scale * (tx.h);
 
-    // txColorMod(tx.d, red, green, blue, alpha);
-    // SDL_RenderCopyExF(m_gRenderer, tx.d.texture_id, &sourceRect, &destRect,
-    //                   0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+    const float world_coords[] = {x1, y1,
+        x1, y2,
+        x2, y2,
+        x2, y1};
 
-    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+    const float tex_coords[] = {u1, v1,
+        u1, v2,
+        u2, v2,
+        u2, v1};
+
     glColor4f(red, green, blue, alpha);
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(u1, v1);
-    glVertex2f(destRect.x, destRect.y);
-    glTexCoord2f(u1, v2);
-    glVertex2f(destRect.x, destRect.y + destRect.h);
-    glTexCoord2f(u2, v2);
-    glVertex2f(destRect.x + destRect.w, destRect.y + destRect.h);
-    glTexCoord2f(u2, v1);
-    glVertex2f(destRect.x + destRect.w, destRect.y);
-    glEnd();
+    if(tx.d.mask_texture_id)
+    {
+        prepareDrawMask();
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
+        glVertexPointer(2, GL_FLOAT, 0, world_coords);
+        glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+
+        glDrawArrays(GL_QUADS, 0, 4);
+
+        prepareDrawImage();
+    }
+
+    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+
+    glVertexPointer(2, GL_FLOAT, 0, world_coords);
+    glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    if(tx.d.mask_texture_id)
+    {
+        leaveMaskContext();
+    }
 }
 
 void RenderGL11::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
@@ -1038,45 +1034,64 @@ void RenderGL11::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
     }
 
 #ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {(float)xDst + m_viewport_offset_x,
-                          (float)yDst + m_viewport_offset_y,
-                          (float)wDst,
-                          (float)hDst};
     SDL_FPoint *centerD = (SDL_FPoint*)center;
 #else
-    SDL_Rect destRect = {(int)xDst + m_viewport_offset_x,
-                         (int)yDst + m_viewport_offset_y,
-                         (int)wDst,
-                         (int)hDst};
     SDL_Point centerI = {center ? Maths::iRound(center->x) : 0,
                          center ? Maths::iRound(center->y) : 0};
     SDL_Point *centerD = center ? &centerI : nullptr;
 #endif
+
+    float x1 = xDst;
+    float x2 = xDst + wDst;
+    float y1 = yDst;
+    float y2 = yDst + hDst;
 
     float u1 = tx.l.w_scale * xSrc;
     float u2 = tx.l.w_scale * (xSrc + wDst);
     float v1 = tx.l.h_scale * ySrc;
     float v2 = tx.l.h_scale * (ySrc + hDst);
 
-    // txColorMod(tx.d, red, green, blue, alpha);
-    // SDL_RenderCopyExF(m_gRenderer, tx.d.texture_id, &sourceRect, &destRect,
-    //                   rotateAngle, centerD, static_cast<SDL_RendererFlip>(flip));
+    if(flip & X_FLIP_HORIZONTAL)
+        std::swap(u1, u2);
 
-    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+    if(flip & X_FLIP_VERTICAL)
+        std::swap(v1, v2);
+
+    const float world_coords[] = {x1, y1,
+        x1, y2,
+        x2, y2,
+        x2, y1};
+
+    const float tex_coords[] = {u1, v1,
+        u1, v2,
+        u2, v2,
+        u2, v1};
+
     glColor4f(red, green, blue, alpha);
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(u1, v1);
-    glVertex2f(destRect.x, destRect.y);
-    glTexCoord2f(u1, v2);
-    glVertex2f(destRect.x, destRect.y + destRect.h);
-    glTexCoord2f(u2, v2);
-    glVertex2f(destRect.x + destRect.w, destRect.y + destRect.h);
-    glTexCoord2f(u2, v1);
-    glVertex2f(destRect.x + destRect.w, destRect.y);
-    glEnd();
+    if(tx.d.mask_texture_id)
+    {
+        prepareDrawMask();
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
+        glVertexPointer(2, GL_FLOAT, 0, world_coords);
+        glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+
+        glDrawArrays(GL_QUADS, 0, 4);
+
+        prepareDrawImage();
+    }
+
+    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+
+    glVertexPointer(2, GL_FLOAT, 0, world_coords);
+    glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    if(tx.d.mask_texture_id)
+    {
+        leaveMaskContext();
+    }
 }
 
 void RenderGL11::renderTexture(float xDst, float yDst,
@@ -1086,7 +1101,6 @@ void RenderGL11::renderTexture(float xDst, float yDst,
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
-    const unsigned int flip = SDL_FLIP_NONE;
 
     if(!tx.inited)
         return;
@@ -1100,36 +1114,51 @@ void RenderGL11::renderTexture(float xDst, float yDst,
         return;
     }
 
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FRect destRect = {Maths::fRound(xDst), Maths::fRound(yDst), (float)tx.w, (float)tx.h};
-#else
-    SDL_Rect destRect = {Maths::iRound(xDst), Maths::iRound(yDst), tx.w, tx.h};
-#endif
+    float x1 = xDst;
+    float x2 = xDst + tx.w;
+    float y1 = yDst;
+    float y2 = yDst + tx.h;
 
-    float u1 = 0;
-    float u2 = tx.l.w_scale * tx.w;
-    float v1 = 0;
-    float v2 = tx.l.h_scale * tx.h;
+    float u1 = tx.l.w_scale * 0;
+    float u2 = tx.l.w_scale * (tx.w);
+    float v1 = tx.l.h_scale * 0;
+    float v2 = tx.l.h_scale * (tx.h);
 
-    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+    const float world_coords[] = {x1, y1,
+        x1, y2,
+        x2, y2,
+        x2, y1};
+
+    const float tex_coords[] = {u1, v1,
+        u1, v2,
+        u2, v2,
+        u2, v1};
+
     glColor4f(red, green, blue, alpha);
 
-    glBegin(GL_QUADS);
-    glTexCoord2f(u1, v1);
-    glVertex2f(destRect.x, destRect.y);
-    glTexCoord2f(u1, v2);
-    glVertex2f(destRect.x, destRect.y + destRect.h);
-    glTexCoord2f(u2, v2);
-    glVertex2f(destRect.x + destRect.w, destRect.y + destRect.h);
-    glTexCoord2f(u2, v1);
-    glVertex2f(destRect.x + destRect.w, destRect.y);
-    glEnd();
+    if(tx.d.mask_texture_id)
+    {
+        prepareDrawMask();
 
-    glBindTexture(GL_TEXTURE_2D, 0);
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
+        glVertexPointer(2, GL_FLOAT, 0, world_coords);
+        glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
 
-    // txColorMod(tx.d, red, green, blue, alpha);
-    // SDL_RenderCopyExF(m_gRenderer, tx.d.texture_id, &sourceRect, &destRect,
-    //                   0.0, nullptr, static_cast<SDL_RendererFlip>(flip));
+        glDrawArrays(GL_QUADS, 0, 4);
+
+        prepareDrawImage();
+    }
+
+    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+
+    glVertexPointer(2, GL_FLOAT, 0, world_coords);
+    glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+    glDrawArrays(GL_QUADS, 0, 4);
+
+    if(tx.d.mask_texture_id)
+    {
+        leaveMaskContext();
+    }
 }
 
 void RenderGL11::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
