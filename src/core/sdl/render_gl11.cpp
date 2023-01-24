@@ -604,20 +604,36 @@ void RenderGL11::renderRect(int x, int y, int w, int h, float red, float green, 
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
-    SDL_Rect aRect = {x + m_viewport_offset_x,
-                      y + m_viewport_offset_y,
-                      w, h};
-    // SDL_SetRenderDrawColor(m_gRenderer,
-    //                        static_cast<unsigned char>(255.f * red),
-    //                        static_cast<unsigned char>(255.f * green),
-    //                        static_cast<unsigned char>(255.f * blue),
-    //                        static_cast<unsigned char>(255.f * alpha)
-    //                       );
 
-    // if(filled)
-    //     SDL_RenderFillRect(m_gRenderer, &aRect);
-    // else
-    //     SDL_RenderDrawRect(m_gRenderer, &aRect);
+    float x1 = x;
+    float x2 = x + w;
+    float y1 = y;
+    float y2 = y + h;
+
+    glColor4f(red, green, blue, alpha);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    if(filled)
+    {
+        const float world_coords[] = {x1, y1,
+                                      x1, y2,
+                                      x2, y2,
+                                      x2, y1};
+        glVertexPointer(2, GL_FLOAT, 0, world_coords);
+        glDrawArrays(GL_QUADS, 0, 4);
+    }
+    else
+    {
+        // enforce 1px wide
+        const float world_coords[] =
+            {x1, y1,  x1, y2,  x1 + 1, y2,  x1 + 1, y1,
+             x2 - 1, y1,  x2 - 1, y2,  x2, y2,  x2, y1,
+             x1, y1,  x1, y1 + 1,  x2, y1 + 1,  x2, y1,
+             x1, y2 - 1,  x1, y2,  x2, y2,  x2, y2 - 1};
+        glVertexPointer(2, GL_FLOAT, 0, world_coords);
+        glDrawArrays(GL_QUADS, 0, 16);
+    }
 }
 
 void RenderGL11::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
@@ -625,17 +641,27 @@ void RenderGL11::renderRectBR(int _left, int _top, int _right, int _bottom, floa
 #ifdef USE_RENDER_BLOCKING
     SDL_assert(!m_blockRender);
 #endif
-    SDL_Rect aRect = {_left + m_viewport_offset_x,
-                      _top + m_viewport_offset_y,
-                      _right - _left, _bottom - _top};
-//     SDL_SetRenderDrawColor(m_gRenderer,
-//                            static_cast<unsigned char>(255.f * red),
-//                            static_cast<unsigned char>(255.f * green),
-//                            static_cast<unsigned char>(255.f * blue),
-//                            static_cast<unsigned char>(255.f * alpha)
-//                           );
-//     SDL_RenderFillRect(m_gRenderer, &aRect);
+
+    float x1 = _left;
+    float x2 = _right;
+    float y1 = _top;
+    float y2 = _bottom;
+
+    const float world_coords[] = {x1, y1,
+        x1, y2,
+        x2, y2,
+        x2, y1};
+
+    glColor4f(red, green, blue, alpha);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glVertexPointer(2, GL_FLOAT, 0, world_coords);
+    glDrawArrays(GL_QUADS, 0, 4);
+
 }
+
+#define PI 3.1415926535897932384626433832795
 
 void RenderGL11::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
 {
@@ -647,37 +673,29 @@ void RenderGL11::renderCircle(int cx, int cy, int radius, float red, float green
     if(radius <= 0)
         return; // Nothing to draw
 
-    // SDL_SetRenderDrawColor(m_gRenderer,
-    //                            static_cast<unsigned char>(255.f * red),
-    //                            static_cast<unsigned char>(255.f * green),
-    //                            static_cast<unsigned char>(255.f * blue),
-    //                            static_cast<unsigned char>(255.f * alpha)
-    //                       );
+    double line_size = 2;
+    double dy = line_size;
 
-    cx += m_viewport_offset_x;
-    cy += m_viewport_offset_y;
+    const int verts = 16;
 
-    // double dy = 1;
-    // do //for(double dy = 1; dy <= radius; dy += 1.0)
-    // {
-    //     double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
-    //     SDL_RenderDrawLine(m_gRenderer,
-    //                        int(cx - dx),
-    //                        int(cy + dy - radius),
-    //                        int(cx + dx),
-    //                        int(cy + dy - radius));
+    float world_coords[verts * 2];
 
-    //     if(dy < radius) // Don't cross lines
-    //     {
-    //         SDL_RenderDrawLine(m_gRenderer,
-    //                            int(cx - dx),
-    //                            int(cy - dy + radius),
-    //                            int(cx + dx),
-    //                            int(cy - dy + radius));
-    //     }
+    for(int i = 0; i < verts; i++)
+    {
+        float theta = i * (float)PI * 2 / verts;
+        float x = cx + radius * cosf(theta);
+        float y = cy + radius * sinf(theta);
 
-    //     dy += 1.0;
-    // } while(dy <= radius);
+        world_coords[2 * i] = x;
+        world_coords[2 * i + 1] = y;
+    }
+
+    glColor4f(red, green, blue, alpha);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glVertexPointer(2, GL_FLOAT, 0, world_coords);
+    glDrawArrays(GL_POLYGON, 0, verts);
 }
 
 void RenderGL11::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
@@ -689,51 +707,30 @@ void RenderGL11::renderCircleHole(int cx, int cy, int radius, float red, float g
     if(radius <= 0)
         return; // Nothing to draw
 
-    // SDL_SetRenderDrawColor(m_gRenderer,
-    //                            static_cast<unsigned char>(255.f * red),
-    //                            static_cast<unsigned char>(255.f * green),
-    //                            static_cast<unsigned char>(255.f * blue),
-    //                            static_cast<unsigned char>(255.f * alpha)
-    //                       );
+    double line_size = 2;
+    double dy = line_size;
 
-    cx += m_viewport_offset_x;
-    cy += m_viewport_offset_y;
+    do
+    {
+        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
 
-    // double dy = 1;
-    // do //for(double dy = 1; dy <= radius; dy += 1.0)
-    // {
-    //     double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
+        renderRectBR(cx - radius, cy + dy - radius - line_size, cx - dx, cy + dy - radius + line_size,
+            red, green, blue, alpha);
 
-    //     SDL_RenderDrawLine(m_gRenderer,
-    //                        int(cx - radius),
-    //                        int(cy + dy - radius),
-    //                        int(cx - dx),
-    //                        int(cy + dy - radius));
+        renderRectBR(cx + dx, cy + dy - radius - line_size, cx + radius, cy + dy - radius + line_size,
+            red, green, blue, alpha);
 
-    //     SDL_RenderDrawLine(m_gRenderer,
-    //                        int(cx + dx),
-    //                        int(cy + dy - radius),
-    //                        int(cx + radius),
-    //                        int(cy + dy - radius));
+        if(dy < radius) // Don't cross lines
+        {
+            renderRectBR(cx - radius, cy - dy + radius - line_size, cx - dx, cy - dy + radius + line_size,
+                red, green, blue, alpha);
 
+            renderRectBR(cx + dx, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
+                red, green, blue, alpha);
+        }
 
-    //     if(dy < radius) // Don't cross lines
-    //     {
-    //         SDL_RenderDrawLine(m_gRenderer,
-    //                            int(cx - radius),
-    //                            int(cy - dy + radius),
-    //                            int(cx - dx),
-    //                            int(cy - dy + radius));
-
-    //         SDL_RenderDrawLine(m_gRenderer,
-    //                            int(cx + dx),
-    //                            int(cy - dy + radius),
-    //                            int(cx + radius),
-    //                            int(cy - dy + radius));
-    //     }
-
-    //     dy += 1.0;
-    // } while(dy <= radius);
+        dy += line_size * 2;
+    } while(dy + line_size <= radius);
 }
 
 
