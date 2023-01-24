@@ -604,6 +604,7 @@ void RenderGL11::clearBuffer()
     SDL_assert(!m_blockRender);
 #endif
 
+    glBindTexture(GL_TEXTURE_2D, 0);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -1042,18 +1043,18 @@ void RenderGL11::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
             hDst = 0;
     }
 
-#ifndef XTECH_SDL_NO_RECTF_SUPPORT
-    SDL_FPoint *centerD = (SDL_FPoint*)center;
-#else
-    SDL_Point centerI = {center ? Maths::iRound(center->x) : 0,
-                         center ? Maths::iRound(center->y) : 0};
-    SDL_Point *centerD = center ? &centerI : nullptr;
-#endif
+    float cx = center ? center->x : wDst / 2.0f;
+    float cy = center ? center->y : hDst / 2.0f;
 
-    float x1 = xDst;
-    float x2 = xDst + wDst;
-    float y1 = yDst;
-    float y2 = yDst + hDst;
+    glPushMatrix();
+
+    glTranslatef(xDst + cx, yDst + cy, 0);
+    glRotatef(rotateAngle, 0, 0, 1);
+
+    float x1 = -cx;
+    float x2 = -cx + wDst;
+    float y1 = -cy;
+    float y2 = -cy + hDst;
 
     float u1 = tx.l.w_scale * xSrc;
     float u2 = tx.l.w_scale * (xSrc + wDst);
@@ -1101,6 +1102,8 @@ void RenderGL11::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
     {
         leaveMaskContext();
     }
+
+    glPopMatrix();
 }
 
 void RenderGL11::renderTexture(float xDst, float yDst,
