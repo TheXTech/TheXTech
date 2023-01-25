@@ -32,6 +32,8 @@
 #include "render_gl11.h"
 #include "video.h"
 #include "core/window.h"
+#include "graphics.h"
+
 
 #include "sdl_proxy/sdl_stdinc.h"
 #include <fmt_format_ne.h>
@@ -112,17 +114,7 @@ bool RenderGL11::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     // Clean-up from a possible start-up junk
     clearBuffer();
 
-    setTargetTexture();
-    // SDL_SetRenderDrawBlendMode(m_gRenderer, SDL_BLENDMODE_BLEND);
-
     updateViewport();
-
-    // Clean-up the texture buffer from the same start-up junk
-    clearBuffer();
-
-    setTargetScreen();
-
-    repaint();
 
     return true;
 }
@@ -141,12 +133,38 @@ void RenderGL11::close()
     m_gContext = nullptr;
 }
 
+void RenderGL11::togglehud()
+{
+    if(m_draw_mask_mode == 0)
+    {
+        m_draw_mask_mode = 1;
+        PlaySoundMenu(SFX_PlayerShrink);
+    }
+    else if(m_draw_mask_mode == 1)
+    {
+        m_draw_mask_mode = 2;
+        PlaySoundMenu(SFX_PlayerDied2);
+    }
+    else
+    {
+        m_draw_mask_mode = 0;
+        PlaySoundMenu(SFX_PlayerGrow);
+    }
+}
+
 void RenderGL11::repaint()
 {
 #ifdef USE_RENDER_BLOCKING
     if(m_blockRender)
         return;
 #endif
+
+    if(m_draw_mask_mode == 0)
+        SuperPrintScreenCenter("Logic Op Render", 3, 0);
+    else if(m_draw_mask_mode == 1)
+        SuperPrintScreenCenter("Min/Max Render", 3, 0);
+    else
+        SuperPrintScreenCenter("Mul/Add Render", 3, 0);
 
 #ifdef USE_SCREENSHOTS_AND_RECS
     if(TakeScreen)
