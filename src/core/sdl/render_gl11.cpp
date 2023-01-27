@@ -241,7 +241,7 @@ void RenderGL11::applyViewport()
     glLoadIdentity();
 
     // pLogDebug("Setting projection to %d %d %d %d", off_x, m_viewport_w + off_x, m_viewport_h + off_y, off_y);
-    glOrtho( off_x, viewport_w + off_x, viewport_h + off_y, off_y, -1, 1);
+    glOrtho( off_x + 0.5f, viewport_w + off_x + 0.5f, viewport_h + off_y + 0.5f, off_y + 0.5f, -1, 1);
 }
 
 void RenderGL11::updateViewport()
