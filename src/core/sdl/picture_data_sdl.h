@@ -61,7 +61,7 @@ struct StdPictureData
 
     inline bool hasTexture()
     {
-        return texture != nullptr;
+        return texture != nullptr || texture_id != 0;
     }
 
     inline void clear()
