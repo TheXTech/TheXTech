@@ -1,2 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="touchscreenControllerType0">Her zaman açık</string>
+    <string name="touchscreenControllerType1">Klavye takılı olduğu zaman kapat</string>
+    <string name="touchscreenControllerType2">Her zaman kapalı</string>
+    <string name="speedRunMode0">Kapat</string>
+    <string name="speedRunMode2">Mod 2 (zaman-kazanan özellikeri kapat)</string>
+    <string name="touchPadStyle2">PlayStation tarzı (X/O/D/A)</string>
+    <string name="touchPadStyle1">Nintendo/Xbox tarzı (A/B/X/Y)</string>
+    <string name="batteryStatusShow1">Batarya düşükken göster</string>
+    <string name="batteryStatusShow0">Asla gösterme</string>
+    <string name="batteryStatusShow2">Her zaman göster</string>
+    <string name="speedRunMode1">Mode 1 (TheXTech native)</string>
+    <string name="touchPadStyle0">Oyun İçi Aksiyon</string>
+    <string name="speedRunMode3">Mod 3 (SMBX 1.3 kodu, bütün buglar açık)</string>
+</resources>
