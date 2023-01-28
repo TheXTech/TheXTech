@@ -148,6 +148,11 @@ void RenderGL11::togglehud()
     else if(m_draw_mask_mode == 2)
     {
         m_draw_mask_mode = 3;
+        PlaySoundMenu(SFX_Raccoon);
+    }
+    else if(m_draw_mask_mode == 3)
+    {
+        m_draw_mask_mode = 4;
         PlaySoundMenu(SFX_PlayerDied2);
     }
     else
@@ -170,6 +175,8 @@ void RenderGL11::repaint()
         SuperPrintScreenCenter("Min/Max Render", 3, 0);
     else if(m_draw_mask_mode == 2)
         SuperPrintScreenCenter("Mul/Max Render (X2)", 3, 0);
+    else if(m_draw_mask_mode == 3)
+        SuperPrintScreenCenter("Min/Add Render (new)", 3, 0);
     else
         SuperPrintScreenCenter("Mul/Add Render", 3, 0);
 
@@ -368,7 +375,7 @@ void RenderGL11::prepareDrawMask()
         glEnable(GL_COLOR_LOGIC_OP);
         glLogicOp(GL_AND);
     }
-    else if(m_draw_mask_mode == 1)
+    else if(m_draw_mask_mode == 1 || m_draw_mask_mode == 3)
     {
         // min
         glBlendEquation(GL_MIN);
@@ -399,6 +406,13 @@ void RenderGL11::prepareDrawImage()
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         // max
         glBlendEquation(GL_MAX);
+    }
+    else if(m_draw_mask_mode == 3)
+    {
+        // unset min
+        glBlendEquation(GL_FUNC_ADD);
+        // add
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     }
     else
     {
