@@ -94,6 +94,16 @@ bool RenderGL11::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         return false;
     }
 
+    int mask, maj_ver, min_ver;
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &mask);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &maj_ver);
+    SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &min_ver);
+
+    pLogDebug("Initialized OpenGL %d.%d with profile %d", maj_ver, min_ver, mask);
+    pLogDebug("OpenGL driver version: %s", glGetString(GL_VERSION));
+    pLogDebug("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    pLogDebug("OpenGL renderer: %s", glGetString(GL_RENDERER));
+
     SDL_GL_SetSwapInterval(0);
 
     // SDL_RendererInfo ri;
@@ -248,14 +258,14 @@ void RenderGL11::applyViewport()
 
     glViewport(m_phys_x + phys_offset_x,
             m_phys_y + m_phys_h - phys_height - phys_offset_y, // relies on fact that m_phys_y is a symmetric border
-            phys_width - 1,
-            phys_height - 1);
+            phys_width,
+            phys_height);
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
 
     // pLogDebug("Setting projection to %d %d %d %d", off_x, m_viewport_w + off_x, m_viewport_h + off_y, off_y);
-    glOrtho( off_x + 0.5f, viewport_w + off_x + 0.5f, viewport_h + off_y + 0.5f, off_y + 0.5f, -1, 1);
+    glOrtho( off_x, viewport_w + off_x, viewport_h + off_y, off_y, -1, 1);
 }
 
 void RenderGL11::updateViewport()
@@ -358,8 +368,8 @@ void RenderGL11::setTargetScreen()
 
     glViewport(0,
             0,
-            hardware_w - 1,
-            hardware_h - 1);
+            hardware_w,
+            hardware_h);
 
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
