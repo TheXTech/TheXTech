@@ -140,13 +140,16 @@ void RenderGL11::togglehud()
         m_draw_mask_mode = 1;
         PlaySoundMenu(SFX_PlayerShrink);
     }
-    else if(m_draw_mask_mode == 4)
+    // else if(m_draw_mask_mode == 4)
+    // {
+    //     m_draw_mask_mode++;
+    //     PlaySoundMenu(SFX_PlayerDied2);
+    // }
+    else if(m_draw_mask_mode != 4)
     {
-        m_draw_mask_mode++;
-        PlaySoundMenu(SFX_PlayerDied2);
-    }
-    else if(m_draw_mask_mode != 5)
-    {
+        if(m_draw_mask_mode == 1)
+            m_draw_mask_mode++;
+
         m_draw_mask_mode++;
         PlaySoundMenu(SFX_Raccoon);
     }
