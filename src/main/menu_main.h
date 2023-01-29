@@ -99,7 +99,24 @@ struct MainMenuContent
 
     std::string loading;
 
+    std::string languageName;
+
     RangeArr<std::string, 1, numCharacters> selectPlayer;
+
+    std::string gameSlotContinue;
+    std::string gameSlotNew;
+
+    std::string gameCopySave;
+    std::string gameEraseSave;
+
+    std::string gameSourceSlot;
+    std::string gameTargetSlot;
+    std::string gameEraseSlot;
+
+    // Options
+    std::string optionsModeFullScreen;
+    std::string optionsModeWindowed;
+    std::string optionsViewCredits;
 
     // ConnectScreen
     std::string charSelTitle;

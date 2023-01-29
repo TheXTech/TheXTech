@@ -102,8 +102,22 @@ void initMainMenu(bool forceResetAtomics)
 
     g_mainMenu.loading = "Loading...";
 
+    g_mainMenu.languageName = "English";
+
     for(int i = 1; i <= numCharacters; ++i)
         g_mainMenu.selectPlayer[i] = fmt::format_ne("{0} game", g_gameInfo.characterName[i]);
+
+    g_mainMenu.gameSlotContinue = "SLOT {0} ... {1}%";
+    g_mainMenu.gameSlotNew = "SLOT {0} ... NEW GAME";
+    g_mainMenu.gameCopySave = "Copy save";
+    g_mainMenu.gameEraseSave = "Erase save";
+    g_mainMenu.gameSourceSlot = "Select the source slot";
+    g_mainMenu.gameTargetSlot = "Now select the target";
+    g_mainMenu.gameEraseSlot = "Select the slot to erase";
+
+    g_mainMenu.optionsModeFullScreen = "Fullscreen mode";
+    g_mainMenu.optionsModeWindowed = "Windowed mode";
+    g_mainMenu.optionsViewCredits = "View credits";
 
     g_mainMenu.charSelTitle = "Character Select";
     g_mainMenu.reconnectTitle = "Reconnect";
@@ -1571,7 +1585,8 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     {
         if(SaveSlotInfo[A].Progress >= 0)
         {
-            SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlotInfo[A].Progress), 3, MenuX, MenuY - 30 + (A * 30));
+            // "SLOT {0} ... {1}%"
+            SuperPrint(fmt::format_ne(g_mainMenu.gameSlotContinue, A, SaveSlotInfo[A].Progress), 3, MenuX, MenuY - 30 + (A * 30));
             if(SaveSlotInfo[A].Stars > 0)
             {
                 XRender::renderTexture(MenuX + 260, MenuY - 30 + (A * 30) + 1,
@@ -1585,15 +1600,16 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         }
         else
         {
-            SuperPrint(fmt::format_ne("SLOT {0} ... NEW GAME", A), 3, MenuX, MenuY - 30 + (A * 30));
+            // "SLOT {0} ... NEW GAME"
+            SuperPrint(fmt::format_ne(g_mainMenu.gameSlotNew, A), 3, MenuX, MenuY - 30 + (A * 30));
         }
     }
 
     if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
     {
-        SuperPrint("COPY SAVE", 3, MenuX, MenuY - 30 + (A * 30));
+        SuperPrint(g_mainMenu.gameCopySave, 3, MenuX, MenuY - 30 + (A * 30));
         A++;
-        SuperPrint("ERASE SAVE", 3, MenuX, MenuY - 30 + (A * 30));
+        SuperPrint(g_mainMenu.gameEraseSave, 3, MenuX, MenuY - 30 + (A * 30));
     }
 
     if(MenuCursor < 0 || MenuCursor >= maxSaveSlots || (MenuMode != MENU_SELECT_SLOT_1P && MenuMode != MENU_SELECT_SLOT_2P) || SaveSlotInfo[MenuCursor + 1].Progress < 0)
@@ -1881,9 +1897,9 @@ void mainMenuDraw()
         s_drawGameSaves(MenuX, MenuY);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
-            SuperPrint("Select the source slot", 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 0.7f, 1.0f);
+            SuperPrint(g_mainMenu.gameSourceSlot, 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 0.7f, 1.0f);
         else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
-            SuperPrint("Now select the target", 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 1.0f, 0.7f);
+            SuperPrint(g_mainMenu.gameTargetSlot, 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 1.0f, 0.7f);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
@@ -1900,7 +1916,7 @@ void mainMenuDraw()
         SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
         s_drawGameSaves(MenuX, MenuY);
 
-        SuperPrint("Select the slot to erase", 3, MenuX, MenuY - 30 + (5 * 30), 1.0f, 0.7f, 0.7f);
+        SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY - 30 + (5 * 30), 1.0f, 0.7f, 0.7f);
 
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
@@ -1912,11 +1928,11 @@ void mainMenuDraw()
         SuperPrint(g_mainMenu.controlsTitle, 3, MenuX, MenuY + 30*i++);
 #ifndef RENDER_FULLSCREEN_ALWAYS
         if(resChanged)
-            SuperPrint("WINDOWED MODE", 3, MenuX, MenuY + (30 * i++));
+            SuperPrint(g_mainMenu.optionsModeWindowed, 3, MenuX, MenuY + (30 * i++));
         else
-            SuperPrint("FULLSCREEN MODE", 3, MenuX, MenuY + (30 * i++));
+            SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
 #endif
-        SuperPrint("VIEW CREDITS", 3, MenuX, MenuY + (30 * i++));
+        SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
                                GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }

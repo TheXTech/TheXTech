@@ -48,12 +48,38 @@ static std::string getJsonValue(nlohmann::json &j, const std::string &key, const
     auto dot = key.find(".");
     if(dot == std::string::npos)
     {
+        if(!j.contains(key))
+            return defVal;
         auto out = j.value(key, defVal);
         return out;
     }
 
     std::string subKey = key.substr(0, dot);
     return getJsonValue(j[subKey], key.substr(dot + 1), defVal);
+}
+
+static bool dumpFile(const std::string &inPath, std::string &outData)
+{
+    off_t end;
+    bool ret = true;
+    FILE *in = Files::utf8_fopen(inPath.c_str(), "r");
+    if(!in)
+        return false;
+
+    outData.clear();
+
+    std::fseek(in, 0, SEEK_END);
+    end = std::ftell(in);
+    std::fseek(in, 0, SEEK_SET);
+
+    outData.resize(end);
+
+    if(std::fread((void*)outData.data(), 1, outData.size(), in) != outData.size())
+        ret = false;
+
+    std::fclose(in);
+
+    return ret;
 }
 
 
@@ -74,7 +100,23 @@ XTechTranslate::XTechTranslate()
 
         {"menu.loading",                   &g_mainMenu.loading},
 
+        {"languageName",                   &g_mainMenu.languageName},
+
         {"menu.character.charSelTitle",    &g_mainMenu.charSelTitle},
+
+        {"menu.game.gameSlotContinue",     &g_mainMenu.gameSlotContinue},
+        {"menu.game.gameSlotNew",          &g_mainMenu.gameSlotNew},
+
+        {"menu.game.gameCopySave",         &g_mainMenu.gameCopySave},
+        {"menu.game.gameEraseSave",        &g_mainMenu.gameEraseSave},
+
+        {"menu.game.gameSourceSlot",       &g_mainMenu.gameSourceSlot},
+        {"menu.game.gameTargetSlot",       &g_mainMenu.gameTargetSlot},
+        {"menu.game.gameEraseSlot",        &g_mainMenu.gameEraseSlot},
+
+        {"menu.options.optionsModeFullScreen",   &g_mainMenu.optionsModeFullScreen},
+        {"menu.options.optionsModeWindowed",     &g_mainMenu.optionsModeWindowed},
+        {"menu.options.optionsViewCredits",      &g_mainMenu.optionsViewCredits},
 
         {"menu.wordPlayer",                &g_mainMenu.wordPlayer},
         {"menu.wordProfile",               &g_mainMenu.wordProfile},
@@ -132,7 +174,9 @@ void XTechTranslate::exportTemplate()
 
         for(auto &k : m_translationsMap)
         {
+#ifdef DEBUG_BUILD
             std::printf("-- writing %s -> %s\n", k.first.c_str(), k.second->c_str());
+#endif
             setJsonValue(langFile, k.first, *k.second);
         }
 
@@ -155,21 +199,13 @@ bool XTechTranslate::translate()
 
     try
     {
-        off_t end;
         std::string data;
-        FILE *in = Files::utf8_fopen(langFilePath.c_str(), "r");
-        if(!in)
+
+        if(!dumpFile(langFilePath, data))
         {
             pLogWarning("Failed to load the translation file %s: can't open file", langFilePath.c_str());
             return false;
         }
-
-        std::fseek(in, 0, SEEK_END);
-        end = std::ftell(in);
-        std::fseek(in, 0, SEEK_SET);
-        data.resize(end);
-        std::fread((void*)data.data(), 1, data.size(), in);
-        std::fclose(in);
 
         nlohmann::json langFile = nlohmann::json::parse(data);
 
