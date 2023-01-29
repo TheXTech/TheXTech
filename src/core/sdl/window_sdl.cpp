@@ -310,6 +310,18 @@ void WindowSDL::restoreWindow()
 
 void WindowSDL::setWindowSize(int w, int h)
 {
+    // try to figure out whether requested size is bigger than the screen
+    int display = SDL_GetWindowDisplayIndex(m_window);
+    if(display >= 0)
+    {
+        SDL_Rect bounds;
+        if(SDL_GetDisplayUsableBounds(display, &bounds) == 0)
+        {
+            if(w > bounds.w || h > bounds.h)
+                return;
+        }
+    }
+
     SDL_SetWindowSize(m_window, w, h);
 }
 
