@@ -1,6 +1,7 @@
 TheXTech Changelog.
 
 Changelog for 1.3.7-dev
+-Deep revision of the game's internal NPC and render logic, with up to 2x higher framerates on very large levels. (@ds-sloth)
 -<WIP>
 
 Changelog for 1.3.6.1
