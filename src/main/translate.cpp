@@ -70,7 +70,12 @@ static std::string getJsonValue(nlohmann::json &j, const std::string &key, const
     {
         if(!j.contains(key))
             return defVal;
+
         auto out = j.value(key, defVal);
+
+        if(out.empty()) // For empty lines, return default value
+            return defVal;
+
         return out;
     }
 
