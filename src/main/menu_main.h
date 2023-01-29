@@ -138,7 +138,7 @@ struct MainMenuContent
 
 extern MainMenuContent g_mainMenu;
 
-extern void initMainMenu();
+extern void initMainMenu(bool forceResetAtomics = false);
 
 extern bool mainMenuUpdate();
 extern void mainMenuDraw();

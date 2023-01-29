@@ -1,0 +1,61 @@
+{
+    "charcter": {
+        "name1": "Mario",
+        "name2": "Luigi",
+        "name3": "Peach",
+        "name4": "Toad",
+        "name5": "Link"
+    },
+    "menu": {
+        "character": {
+            "charSelTitle": "Character Select"
+        },
+        "controls": {
+            "controlsConnected": "Connected:",
+            "controlsDeleteKey": "(Alt Jump to Delete)",
+            "controlsDeviceTypes": "Device Types",
+            "controlsInUse": "(In Use)",
+            "controlsNewProfile": "<New Profile>",
+            "controlsNotInUse": "(Not In Use)",
+            "controlsReallyDeleteProfile": "Really delete profile?",
+            "controlsTitle": "Controls",
+            "wordButtons": "Buttons",
+            "wordProfiles": "Profiles"
+        },
+        "dropAddTitle": "Drop/Add Players",
+        "loading": "Loading...",
+        "main": {
+            "main1PlayerGame": "1 Player Game",
+            "mainBattleGame": "Battle Game",
+            "mainEditor": "Editor",
+            "mainExit": "Exit",
+            "mainMultiplayerGame": "2 Player Game",
+            "mainOptions": "Options",
+            "mainStartGame": "Start Game"
+        },
+        "phraseChangeChar": "Change Character",
+        "phraseDropOthers": "Drop Others",
+        "phraseDropSelf": "Drop Self",
+        "phraseForceResume": "Force Resume",
+        "phraseHoldStartToReturn": "Hold Start",
+        "phrasePressAButton": "Press A Button",
+        "phraseTestControls": "Test Controls",
+        "player": {
+            "selectPlayer1": "Mario game",
+            "selectPlayer2": "Luigi game",
+            "selectPlayer3": "Peach game",
+            "selectPlayer4": "Toad game",
+            "selectPlayer5": "Link game"
+        },
+        "playerSelStartGame": "Start Game",
+        "reconnectTitle": "Reconnect",
+        "wordBack": "Back",
+        "wordDisconnect": "Disconnect",
+        "wordNo": "No",
+        "wordPlayer": "Player",
+        "wordProfile": "Profile",
+        "wordResume": "Resume",
+        "wordWaiting": "Waiting",
+        "wordYes": "Yes"
+    }
+}

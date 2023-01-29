@@ -1,0 +1,61 @@
+{
+    "charcter": {
+        "name1": "Марио",
+        "name2": "Луиджи",
+        "name3": "Пич",
+        "name4": "Тоад",
+        "name5": "Линк"
+    },
+    "menu": {
+        "character": {
+            "charSelTitle": "Выбор персонажа"
+        },
+        "controls": {
+            "controlsConnected": "Подключено:",
+            "controlsDeleteKey": "(Альт-Прыжок чтобы удалить)",
+            "controlsDeviceTypes": "Типы устройств",
+            "controlsInUse": "(Используется)",
+            "controlsNewProfile": "<Новый профиль>",
+            "controlsNotInUse": "(Не используется)",
+            "controlsReallyDeleteProfile": "Действительно удалить профиль?",
+            "controlsTitle": "Управление",
+            "wordButtons": "Кнопки",
+            "wordProfiles": "Профили"
+        },
+        "dropAddTitle": "Доб./Убрать игроков",
+        "loading": "Загрузка...",
+        "main": {
+            "main1PlayerGame": "Одиночная игра",
+            "mainBattleGame": "Режим битвы",
+            "mainEditor": "Редактор",
+            "mainExit": "Выйти",
+            "mainMultiplayerGame": "Игра вдвоём",
+            "mainOptions": "Настройки",
+            "mainStartGame": "Начать игру"
+        },
+        "phraseChangeChar": "Сменить персонажа",
+        "phraseDropOthers": "Убрать всех",
+        "phraseDropSelf": "Убрать себя",
+        "phraseForceResume": "Принуд. возобновить",
+        "phraseHoldStartToReturn": "Удерж. Старт",
+        "phrasePressAButton": "Нажмите кнопку A",
+        "phraseTestControls": "Проверить управление",
+        "player": {
+            "selectPlayer1": "Игра за Марио",
+            "selectPlayer2": "Игра за Луиджи",
+            "selectPlayer3": "Игра за Пич",
+            "selectPlayer4": "Игра за Тоада",
+            "selectPlayer5": "Игра за Линка"
+        },
+        "playerSelStartGame": "Начать игру",
+        "reconnectTitle": "Переподключить",
+        "wordBack": "Назад",
+        "wordDisconnect": "Отключить",
+        "wordNo": "Нет",
+        "wordPlayer": "Игрок",
+        "wordProfile": "Профиль",
+        "wordResume": "Возобновить",
+        "wordWaiting": "Ждём",
+        "wordYes": "Да"
+    }
+}

@@ -64,9 +64,10 @@
 MainMenuContent g_mainMenu;
 
 #ifndef PGE_NO_THREADING
-static SDL_atomic_t         loading;
-static SDL_atomic_t         loadingProgrss;
-static SDL_atomic_t         loadingProgrssMax;
+static bool                 s_atomicsInited = false;
+static SDL_atomic_t         loading = {};
+static SDL_atomic_t         loadingProgrss = {};
+static SDL_atomic_t         loadingProgrssMax = {};
 
 static SDL_Thread*          loadingThread = nullptr;
 #endif
@@ -79,12 +80,16 @@ std::vector<SelectWorld_t> SelectWorld;
 std::vector<SelectWorld_t> SelectWorldEditable;
 std::vector<SelectWorld_t> SelectBattle;
 
-void initMainMenu()
+void initMainMenu(bool forceResetAtomics)
 {
 #ifndef PGE_NO_THREADING
-    SDL_AtomicSet(&loading, 0);
-    SDL_AtomicSet(&loadingProgrss, 0);
-    SDL_AtomicSet(&loadingProgrssMax, 0);
+    if(!s_atomicsInited || forceResetAtomics)
+    {
+        SDL_AtomicSet(&loading, 0);
+        SDL_AtomicSet(&loadingProgrss, 0);
+        SDL_AtomicSet(&loadingProgrssMax, 0);
+        s_atomicsInited = true;
+    }
 #endif
 
     g_mainMenu.mainStartGame = "Start Game";

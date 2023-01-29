@@ -2254,5 +2254,7 @@ extern std::string LevelName;
 //Public Const curRelease As Integer = 64
 const int curRelease = 64;
 
+//EXTRA: Language
+extern std::string CurrentLanguage;
 
 #endif // GLOBALS_H

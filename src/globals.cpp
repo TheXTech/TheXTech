@@ -531,6 +531,7 @@ RangeArrI<int, 1, maxPlayers, 0> BattleLives;
 int BattleIntro = 0;
 int BattleOutro = 0;
 std::string LevelName;
+std::string CurrentLanguage;
 
 //void DoEvents()
 //{

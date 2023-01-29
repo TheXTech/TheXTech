@@ -66,6 +66,7 @@
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/game_info.h"
+#include "main/translate.h"
 #include "main/record.h"
 #include "core/render.h"
 #include "core/window.h"
@@ -202,8 +203,15 @@ int GameMain(const CmdLineSetup_t &setup)
     //        DoEvents
     //    Loop While StartMenu = False 'wait until the player clicks a button
 
-    initMainMenu();
+    initMainMenu(true);
     StartMenu = true;
+
+    if(!CurrentLanguage.empty())
+    {
+        XTechTranslate translator;
+        if(translator.translate())
+            pLogDebug("Loaded translation for language %s", CurrentLanguage.c_str());
+    }
 
     initAll();
 
