@@ -49,6 +49,7 @@
 #include "effect.h"
 #include "npc_id.h"
 
+#include "graphics/gfx_special_frames.h"
 #include "graphics/gfx_keyhole.h"
 
 #include <fmt_format_ne.h>
@@ -1035,135 +1036,11 @@ void UpdateGraphics(bool skipRepaint)
     // Background frames
     if(!FreezeNPCs)
     {
-        BackgroundFrameCount[26]++;
-        if(BackgroundFrameCount[26] >= 8)
-        {
-            BackgroundFrame[26]++;
-            if(BackgroundFrame[26] >= 8)
-                BackgroundFrame[26] = 0;
-            BackgroundFrameCount[26] = 0;
-        }
-
-        BackgroundFrameCount[18]++;
-        if(BackgroundFrameCount[18] >= 12)
-        {
-            BackgroundFrame[18]++;
-            if(BackgroundFrame[18] >= 4)
-                BackgroundFrame[18] = 0;
-            BackgroundFrame[19] = BackgroundFrame[18];
-            BackgroundFrame[20] = BackgroundFrame[18];
-            BackgroundFrame[161] = BackgroundFrame[18];
-            BackgroundFrameCount[18] = 0;
-        }
-
-        BackgroundFrameCount[36] += 1;
-        if(BackgroundFrameCount[36] >= 2)
-        {
-            BackgroundFrame[36] += 1;
-            if(BackgroundFrame[36] >= 4)
-                BackgroundFrame[36] = 0;
-            BackgroundFrameCount[36] = 0;
-        }
-
-        BackgroundFrame[68] = BackgroundFrame[36];
-        BackgroundFrameCount[65] += 1;
-        if(BackgroundFrameCount[65] >= 8)
-        {
-            BackgroundFrame[65] += 1;
-            if(BackgroundFrame[65] >= 4)
-                BackgroundFrame[65] = 0;
-            BackgroundFrameCount[65] = 0;
-        }
-
-        BackgroundFrame[66] = BackgroundFrame[65];
-
-        BackgroundFrame[70] = BackgroundFrame[65];
-        BackgroundFrame[100] = BackgroundFrame[65];
-
-        BackgroundFrame[134] = BackgroundFrame[65];
-        BackgroundFrame[135] = BackgroundFrame[65];
-        BackgroundFrame[136] = BackgroundFrame[65];
-        BackgroundFrame[137] = BackgroundFrame[65];
-        BackgroundFrame[138] = BackgroundFrame[65];
-
-
-        BackgroundFrameCount[82] += 1;
-        if(BackgroundFrameCount[82] >= 10)
-        {
-            BackgroundFrame[82] += 1;
-            if(BackgroundFrame[82] >= 4)
-                BackgroundFrame[82] = 0;
-            BackgroundFrameCount[82] = 0;
-        }
-
-        BackgroundFrameCount[170] += 1;
-        if(BackgroundFrameCount[170] >= 8)
-        {
-            BackgroundFrame[170] += 1;
-            if(BackgroundFrame[170] >= 4)
-                BackgroundFrame[170] = 0;
-            BackgroundFrame[171] = BackgroundFrame[170];
-            BackgroundFrameCount[170] = 0;
-        }
-
-        BackgroundFrameCount[125] += 1;
-        if(BackgroundFrameCount[125] >= 4)
-        {
-            if(BackgroundFrame[125] == 0)
-                BackgroundFrame[125] = 1;
-            else
-                BackgroundFrame[125] = 0;
-            BackgroundFrameCount[125] = 0;
-        }
-
+        LevelFramesNotFrozen();
         SpecialFrames();
     }
 
-    BackgroundFrame[172] = BackgroundFrame[66];
-    BackgroundFrameCount[158] += 1;
-
-    if(BackgroundFrameCount[158] >= 6)
-    {
-        BackgroundFrameCount[158] = 0;
-        BackgroundFrame[158] += 1;
-        BackgroundFrame[159] += 1;
-        if(BackgroundFrame[158] >= 4)
-            BackgroundFrame[158] = 0;
-        if(BackgroundFrame[159] >= 8)
-            BackgroundFrame[159] = 0;
-    }
-
-    BackgroundFrameCount[168] += 1;
-    if(BackgroundFrameCount[168] >= 8)
-    {
-        BackgroundFrame[168] += 1;
-        if(BackgroundFrame[168] >= 8)
-            BackgroundFrame[168] = 0;
-        BackgroundFrameCount[168] = 0;
-    }
-
-    BackgroundFrameCount[173] += 1;
-    if(BackgroundFrameCount[173] >= 8)
-    {
-        BackgroundFrameCount[173] = 0;
-        if(BackgroundFrame[173] == 0)
-            BackgroundFrame[173] = 1;
-        else
-            BackgroundFrame[173] = 0;
-    }
-
-    BackgroundFrameCount[187] += 1;
-    if(BackgroundFrameCount[187] >= 6)
-    {
-        BackgroundFrame[187] += 1;
-        if(BackgroundFrame[187] >= 4)
-            BackgroundFrame[187] = 0;
-        BackgroundFrame[188] = BackgroundFrame[187];
-        BackgroundFrame[189] = BackgroundFrame[187];
-        BackgroundFrame[190] = BackgroundFrame[187];
-        BackgroundFrameCount[187] = 0;
-    }
-
+    LevelFramesAlways();
 
     if(ClearBuffer)
     {
