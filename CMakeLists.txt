@@ -687,6 +687,7 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/InterProcess/*.h
     lib/tclap/*.h
     lib/fmt/*.h
+    lib/json/*.hpp
     src/*.h
     src/*.hpp
     src/script/*.h
