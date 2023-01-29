@@ -43,6 +43,11 @@ public:
     void exportTemplate();
 
     /*!
+     * \brief Fetch all translation files and update their content (add any missing entries)
+     */
+    void updateLanguages();
+
+    /*!
      * \brief Switch the language of the engine
      * \return True if language was been successfully loaded
      */

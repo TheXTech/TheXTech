@@ -354,6 +354,7 @@ int main(int argc, char**argv)
                                                    cmd);
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
         TCLAP::SwitchArg switchMakeLangTemplate(std::string(), "export-lang", "Exports the default language template", false);
+        TCLAP::SwitchArg switchLangUpdate(std::string(), "lang-update", "Updated all language of assets package: missing lines will be added", false);
 #endif
         TCLAP::ValueArg<std::string> lang(std::string(), "lang", "Set the engine's language by code", false, "", "en, ru, zh-cn, etc.");
 
@@ -380,6 +381,7 @@ int main(int argc, char**argv)
         cmd.add(&switchDisplayControls);
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
         cmd.add(&switchMakeLangTemplate);
+        cmd.add(&switchLangUpdate);
 #endif
         cmd.add(&lang);
         cmd.add(&inputFileNames);
@@ -411,6 +413,14 @@ int main(int argc, char**argv)
             return 0;
         }
 
+        // Update all translation files at current assets pack
+        if(switchLangUpdate.isSet() && switchLangUpdate.getValue())
+        {
+            initGameInfo();
+            XTechTranslate translate;
+            translate.updateLanguages();
+            return 0;
+        }
 #endif
 
         OpenConfig_preSetup();
