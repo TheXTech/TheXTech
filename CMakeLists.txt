@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 
+if(POLICY CMP0069) # Allow CMAKE_INTERPROCEDURAL_OPTIMIZATION (lto) to be set
+    cmake_policy(SET CMP0069 NEW)
+endif()
+
 project(TheXTech LANGUAGES C CXX)
 
 include(CheckCCompilerFlag)
@@ -212,6 +216,10 @@ if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
     set(THEXTECH_UNIX_INSTALL TRUE)
 endif()
 
+# ============ Customization ==end=========
+
+# ============ Platform-conf ==============
+
 if(VITA)
     message("Enabling PS Vita Support and fast-math flags.")
 
@@ -245,7 +253,7 @@ if(NINTENDO_DS)
     set(THEXTECH_NO_SDL_BUILD ON CACHE BOOL "" FORCE)
 endif()
 
-# ============ Customization ==end=========
+# ============ Platform-conf ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
 set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libraries
