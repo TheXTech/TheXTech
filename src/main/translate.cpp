@@ -123,6 +123,7 @@ void XTechTranslate::reset()
 
 void XTechTranslate::exportTemplate()
 {
+#ifndef THEXTECH_DISABLE_LANG_TOOLS
     reset();
 
     try
@@ -143,6 +144,7 @@ void XTechTranslate::exportTemplate()
         std::printf("JSON: Caught an exception: %s", e.what());
         std::fflush(stdout);
     }
+#endif
 }
 
 bool XTechTranslate::translate()

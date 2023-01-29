@@ -352,8 +352,9 @@ int main(int argc, char**argv)
                                                     false, 0u,
                                                    "0, 1, 2, 3, or 4",
                                                    cmd);
-
+#ifndef THEXTECH_DISABLE_LANG_TOOLS
         TCLAP::SwitchArg switchMakeLangTemplate(std::string(), "export-lang", "Exports the default language template", false);
+#endif
         TCLAP::ValueArg<std::string> lang(std::string(), "lang", "Set the engine's language by code", false, "", "en, ru, zh-cn, etc.");
 
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
@@ -377,7 +378,9 @@ int main(int argc, char**argv)
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
         cmd.add(&switchDisplayControls);
+#ifndef THEXTECH_DISABLE_LANG_TOOLS
         cmd.add(&switchMakeLangTemplate);
+#endif
         cmd.add(&lang);
         cmd.add(&inputFileNames);
 
@@ -398,6 +401,8 @@ int main(int argc, char**argv)
             AppPath = AppPathManager::assetsRoot();
         }
 
+#ifndef THEXTECH_DISABLE_LANG_TOOLS
+        // Print the language template to the screen
         if(switchMakeLangTemplate.isSet() && switchMakeLangTemplate.getValue())
         {
             initGameInfo();
@@ -405,6 +410,8 @@ int main(int argc, char**argv)
             translate.exportTemplate();
             return 0;
         }
+
+#endif
 
         OpenConfig_preSetup();
 

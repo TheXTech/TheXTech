@@ -38,7 +38,7 @@ public:
     void reset();
 
     /*!
-     * \brief Re-generate the default translation file
+     * \brief Print the content of default translation file to the terminal
      */
     void exportTemplate();
 

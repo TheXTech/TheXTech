@@ -888,6 +888,11 @@ elseif(PGE_MIN_PORT)
     target_compile_definitions(thextech PRIVATE -DLOW_MEM)
 endif()
 
+if(NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_SWITCH OR ANDROID OR EMSCRIPTEN)
+    # Disable language tools at non-desktop platforms
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_DISABLE_LANG_TOOLS)
+endif()
+
 if(THEXTECH_NO_SDL_BUILD)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DTHEXTECH_NO_SDL_BUILD)
 endif()
