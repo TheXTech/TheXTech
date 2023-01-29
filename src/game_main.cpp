@@ -80,6 +80,8 @@
 #include "config.h"
 #include "main/screen_connect.h"
 
+#include "main/trees.h"
+
 void CheckActive();
 // set up sizable blocks
 void SizableBlocks();
@@ -654,7 +656,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 do
                 {
                     tempBool = true;
-                    for(int B = 1; B <= numBlock; ++B)
+                    for(int B : treeBlockQuery(p.Location, SORTMODE_NONE))
                     {
                         if(CheckCollision(p.Location, Block[B].Location))
                         {
@@ -1535,6 +1537,7 @@ void NPCyFix()
             else
                 XnHfix = std::abs(8 - ((int(XnH * 100) % 800) / 100));
             NPC[A].Location.Y += XnHfix;
+            treeNPCUpdate(A);
         }
     }
 }

@@ -18,6 +18,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+#include <array>
+
 #include "../globals.h"
 #include "../npc.h"
 #include "../sound.h"
@@ -34,10 +37,49 @@
 #include "../npc_id.h"
 #include "../layers.h"
 
+#include "npc/npc_queues.h"
+
 #include <Utils/maths.h>
 
-static RangeArr<int, 0, maxNPCs> newAct;
+// moved into the function, as a static array
+// static RangeArr<int, 0, maxNPCs> newAct;
 // Why this array is here? to don't reallocate it every call of UpdateNPCs()
+
+void CheckNPCWidth(NPC_t& n)
+{
+    if(fEqual(n.Location.Width, 32.0))
+    {
+        if(n.Type != 57 && n.Type != 84)
+        {
+            // If .Type = 58 Or .Type = 21 Then
+            if(!(NPCIsAnExit[n.Type] || n.Type == 8 || n.Type == 51 ||
+                 n.Type == 52 || n.Type == 74 || n.Type == 256 ||
+                 n.Type == 257 || n.Type == 93 || n.Type == 245))
+            {
+                n.Location.X += 0.015;
+            }
+
+            n.Location.Width -= 0.03;
+        }
+    }
+    else if(fEqual(n.Location.Width, 256.0))
+        n.Location.Width = 255.9;
+    else if(fEqual(n.Location.Width, 128.0))
+        n.Location.Width = 127.9;
+
+    // unset a bunch of variables that would normally decay for inactive NPCs
+    if(!n.Active)
+    {
+        n.tempBlock = 0;
+
+        n.TailCD = 0;
+        n.Immune = 0;
+        n.RealSpeedX = 0;
+
+        if(!n.Projectile || n.Type == 50 || n.Type == 78)
+            n.Multiplier = 0;
+    }
+}
 
 void UpdateNPCs()
 {
@@ -92,7 +134,7 @@ void UpdateNPCs()
     int bCheck2 = 0;
     int bCheck = 0;
     float addBelt = 0;
-    int numAct = 0;
+    // int numAct = 0;
     bool beltClear = false; // stops belt movement when on a wall
     bool resetBeltSpeed = false;
     double PlrMid = 0;
@@ -103,7 +145,7 @@ void UpdateNPCs()
     double lyrX = 0; // for attaching to layers
     double lyrY = 0; // for attaching to layers
 
-    newAct.fill(0);
+    // newAct.fill(0);
 
     NPC[0].Location.SpeedX = 0;
     NPC[0].Location.SpeedY = 0;
@@ -150,18 +192,28 @@ void UpdateNPCs()
                         NPC[A].CantHurtPlayer = 0;
                 }
             }
+
             if(NPC[A].TimeLeft > 0)
                 NPC[A].TimeLeft -= 1;
+
             if(NPC[A].Immune > 0)
                 NPC[A].Immune -= 1;
-            NPC[A].JustActivated = 0;
+
             NPC[A].Chat = false;
+
             if(NPC[A].TimeLeft == 0)
             {
                 Deactivate(A);
                 if(g_compatibility.fix_FreezeNPCs_no_reset)
                     NPC[A].TimeLeft = -1;
             }
+
+            if(NPC[A].JustActivated)
+            {
+                NPC[A].JustActivated = 0;
+                NPCQueues::update(A);
+            }
+
             if(NPC[A].Killed > 0)
             {
                 if(NPC[A].Location.SpeedX == 0.0)
@@ -175,6 +227,9 @@ void UpdateNPCs()
                 KillNPC(A, NPC[A].Killed);
             }
         }
+
+        NPCQueues::Killed.clear();
+
         CharStuff();
         return;
     }
@@ -204,28 +259,55 @@ void UpdateNPCs()
 
 
 
-    for(A = 1; A <= numNPCs; A++)
+    // need this complex loop syntax because RespawnDelay can be modified within it
+    for(auto it = NPCQueues::RespawnDelay.begin(); it != NPCQueues::RespawnDelay.end();)
     {
+        A = *(it++);
+
         if(NPC[A].RespawnDelay > 0)
         {
             NPC[A].Reset[1] = false;
             NPC[A].Reset[2] = false;
             NPC[A].RespawnDelay -= 1;
+
+            NPCQueues::NoReset.push_back(A);
         }
 
+        if(NPC[A].RespawnDelay == 0)
+            NPCQueues::RespawnDelay.erase(A);
+    }
+
+    for(int A = maxNPCs - 100 + 1; A <= numNPCs; A++)
+    {
+        // if(A > maxNPCs - 100)
+        NPC[A].Killed = 9;
+        NPCQueues::Killed.push_back(A);
+    }
+
+    for(int A : NPCQueues::Unchecked)
+        CheckNPCWidth(NPC[A]);
+
+    int numNPCsMax = numNPCs;
+
+    // need this complex loop syntax because Active can be modified within it
+    for(int A : NPCQueues::Active.may_erase)
+    {
+        if(A > numNPCsMax)
+            break;
+
         if(NPC[A].Hidden)
+        {
             Deactivate(A);
-
-        if(NPC[A].TailCD > 0)
+            CheckNPCWidth(NPC[A]);
+        }
+        else if(NPC[A].TailCD > 0)
             NPC[A].TailCD -= 1;
-
-        if(A > maxNPCs - 100)
-            NPC[A].Killed = 9;
 
         // generator code
         if(NPC[A].Generator)
         {
             NPC[A].Active = false;
+
             if(!NPC[A].Hidden)
             {
                 NPC[A].TimeLeft = 0;
@@ -240,39 +322,56 @@ void UpdateNPCs()
                     if(NPC[A].GeneratorTime >= NPC[A].GeneratorTimeMax * 6.5f)
                     {
                         tempBool = false;
-                        for(B = 1; B <= numNPCs; B++)
+
+                        if(numNPCs == maxNPCs - 100)
+                            tempBool = true;
+
+                        if(NPC[A].Type != 91 && !tempBool)
                         {
-                            if(B != A && NPC[B].Active && NPC[B].Type != 57)
+                            for(B = 1; B <= numPlayers; B++)
                             {
-                                if(CheckCollision(NPC[A].Location, NPC[B].Location))
-                                    tempBool = true;
+                                if(!Player[B].Dead && Player[B].TimeToLive == 0)
+                                {
+                                    if(CheckCollision(NPC[A].Location, Player[B].Location))
+                                    {
+                                        tempBool = true;
+                                        break;
+                                    }
+                                }
                             }
                         }
 
-                        if(NPC[A].Type != 91)
+                        if(NPC[A].Type != 91 && !tempBool)
                         {
-                            for(B = 1; B <= numBlock; B++)
+                            for(int B : treeBlockQuery(NPC[A].Location, SORTMODE_NONE))
                             {
                                 if(!Block[B].Hidden && !BlockIsSizable[Block[B].Type])
                                 {
                                     if(CheckCollision(NPC[A].Location,
                                                       newLoc(Block[B].Location.X + 0.1, Block[B].Location.Y + 0.1,
                                                              Block[B].Location.Width - 0.2, Block[B].Location.Height - 0.2)))
+                                    {
                                         tempBool = true;
-                                }
-                            }
-                            for(B = 1; B <= numPlayers; B++)
-                            {
-                                if(!Player[B].Dead && Player[B].TimeToLive == 0)
-                                {
-                                    if(CheckCollision(NPC[A].Location, Player[B].Location))
-                                        tempBool = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
 
-                        if(numNPCs == maxNPCs - 100)
-                            tempBool = true;
+                        if(!tempBool)
+                        {
+                            for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
+                            {
+                                if(B != A && NPC[B].Active && NPC[B].Type != 57)
+                                {
+                                    if(CheckCollision(NPC[A].Location, NPC[B].Location))
+                                    {
+                                        tempBool = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
 
                         if(tempBool)
                             NPC[A].GeneratorTime = NPC[A].GeneratorTimeMax;
@@ -383,12 +482,16 @@ void UpdateNPCs()
                             if(NPC[numNPCs].Type == 287)
                                 NPC[numNPCs].Type = RandomBonus();
                             syncLayers_NPC(numNPCs);
+                            CheckNPCWidth(NPC[numNPCs]);
                         }
                     }
                 }
             }
+
+            continue;
         }
 
+        // Force-active NPCs
         if(NPC[A].Type == 57 && !NPC[A].Hidden)
         {
             CheckSectionNPC(A);
@@ -401,12 +504,21 @@ void UpdateNPCs()
 
             if(sameSection)
             {
+                if(!NPC[A].Active)
+                    NPCQueues::Active.insert(A);
+
                 NPC[A].TimeLeft = 100;
                 NPC[A].Active = true;
                 NPC[A].JustActivated = 0;
             }
+            else if(!NPC[A].Active)
+                NPCQueues::Active.erase(A);
         }
-        numAct = 0;
+        else if(NPC[A].Type == 60 || NPC[A].Type == 62 || NPC[A].Type == 64 || NPC[A].Type == 66)
+        {
+            NPC[A].Active = true;
+            NPC[A].TimeLeft = 100;
+        }
 
         if(NPC[A].TimeLeft == 1 || NPC[A].JustActivated != 0)
         {
@@ -414,8 +526,12 @@ void UpdateNPCs()
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction, A);
         }
 
+        // process chain activations
         if(NPC[A].JustActivated != 0)
         {
+            static std::array<int, maxNPCs> newAct;
+            int numAct = 0;
+
             if(NPC[A].Active && NPC[A].TimeLeft > 1 &&
                NPC[A].Type != 57 && NPC[A].Type != 46 &&
                NPC[A].Type != 212 && !NPCIsACoin[NPC[A].Type]) // And .Type <> 47
@@ -429,24 +545,28 @@ void UpdateNPCs()
                 tempLocation.Width += 64;
                 tempLocation.Height += 64;
 
-                for(B = 1; B <= numNPCs; B++)
+                for(int B : treeNPCQuery(tempLocation, SORTMODE_ID))
                 {
                     if(!NPC[B].Active && B != A && NPC[B].Reset[1] && NPC[B].Reset[2])
                     {
                         if(CheckCollision(tempLocation, NPC[B].Location))
                         {
-                            numAct++;
-                            SDL_assert_release(numAct <= maxNPCs);
+                            SDL_assert_release(numAct < maxNPCs);
                             newAct[numAct] = B;
+                            numAct++;
+
                             NPC[B].Active = true;
                             NPC[B].TimeLeft = NPC[A].TimeLeft;
                             NPC[B].JustActivated = 1;
                             NPC[B].Section = NPC[A].Section;
+
                             if(B < A)
                             {
                                 if(NPC[B].TriggerActivate != EVENT_NONE)
                                     ProcEvent(NPC[B].TriggerActivate);
                             }
+
+                            NPCQueues::Active.insert(B);
                         }
                     }
                     else if(B != A && NPC[B].Active && NPC[B].TimeLeft < NPC[A].TimeLeft - 1)
@@ -456,11 +576,13 @@ void UpdateNPCs()
                     }
                 }
 
-                int C = 0;
+                // int C = 0;
 
-                while(numAct > C)
+                // while(numAct > C)
+                // {
+                //     C++;
+                for(int C = 0; C < numAct; C++)
                 {
-                    C++;
                     if(NPC[newAct[C]].Type != 57 && NPC[newAct[C]].Type != 46 &&
                        NPC[newAct[C]].Type != 212 && NPC[newAct[C]].Type != 47 &&
                        !NPCIsACoin[NPC[newAct[C]].Type])
@@ -470,7 +592,8 @@ void UpdateNPCs()
                         tempLocation.X -= 32;
                         tempLocation.Width += 64;
                         tempLocation.Height += 64;
-                        for(B = 1; B <= numNPCs; B++)
+
+                        for(int B : treeNPCQuery(tempLocation, SORTMODE_ID))
                         {
                             if(!NPC[B].Active &&
                               (!NPC[B].Hidden || !g_compatibility.fix_npc_activation_event_loop_bug) &&
@@ -478,19 +601,22 @@ void UpdateNPCs()
                             {
                                 if(CheckCollision(tempLocation, NPC[B].Location))
                                 {
-                                    numAct += 1;
-                                    SDL_assert_release(numAct <= maxNPCs);
+                                    SDL_assert_release(numAct < maxNPCs);
                                     newAct[numAct] = B;
+                                    numAct++;
+
                                     NPC[B].Active = true;
                                     NPC[B].TimeLeft = NPC[newAct[C]].TimeLeft;
                                     NPC[B].JustActivated = 1;
                                     NPC[B].Section = NPC[newAct[C]].Section;
+
                                     if(B < A)
                                     {
                                         if(NPC[B].TriggerActivate != EVENT_NONE)
                                             ProcEvent(NPC[B].TriggerActivate);
                                     }
 
+                                    NPCQueues::Active.insert(B);
                                 }
                             }
                         }
@@ -500,12 +626,13 @@ void UpdateNPCs()
 
             if(NPC[A].Type == 208)
             {
-                for(B = 1; B <= numNPCs; B++)
+                for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
                 {
                     if(NPC[B].Type != 208 && NPC[B].Effect == 0 && NPC[B].Active)
                     {
                         if(!NPCNoClipping[NPC[B].Type])
                         {
+                            // checks if A contains B
                             if(NPC[A].Location.Y < NPC[B].Location.Y)
                             {
                                 if(NPC[A].Location.Y + NPC[A].Location.Height > NPC[B].Location.Y + NPC[B].Location.Height)
@@ -526,13 +653,8 @@ void UpdateNPCs()
             } // 208
         } // .JustActivated != 0
 
-        NPC[A].tempBlock = 0;
-        if(NPC[A].Type == 60 || NPC[A].Type == 62 || NPC[A].Type == 64 || NPC[A].Type == 66)
-        {
-            NPC[A].Active = true;
-            NPC[A].TimeLeft = 100;
-        }
-
+#if 0
+        // this code became the function CheckNPCWidth above
         if(fEqual(NPC[A].Location.Width, 32.0))
         {
             if(NPC[A].Type != 57 && NPC[A].Type != 84)
@@ -549,13 +671,21 @@ void UpdateNPCs()
             }
         }
         else if(fEqual(NPC[A].Location.Width, 256.0))
+        {
             NPC[A].Location.Width = 255.9;
+        }
         else if(fEqual(NPC[A].Location.Width, 128.0))
+        {
             NPC[A].Location.Width = 127.9;
+        }
+#endif
+
+        // construct tempBlock tree
+        NPC[A].tempBlock = 0;
+        NPC[A].tempBlockInTree = false;
 
         if(NPC[A].Active && NPC[A].TimeLeft > 1)
         {
-
             if(NPC[A].Type == 45 && NPC[A].Special == 1)
             {
                 if(NPC[A].Projectile)
@@ -567,6 +697,7 @@ void UpdateNPCs()
                     {
                         NewEffect(10, NPC[A].Location);
                         NPC[A].Killed = 9;
+                        NPCQueues::Killed.push_back(A);
                     }
                 }
             }
@@ -610,6 +741,10 @@ void UpdateNPCs()
             }
         }
     }
+
+    // only need to add NPC temp blocks to the quadtree when they are at a diff loc than the NPC
+    treeTempBlockEnable();
+
     for(A = 1; A <= numPlayers; A++)
     {
         if(Player[A].Mount == 2)
@@ -622,16 +757,10 @@ void UpdateNPCs()
             Block[numBlock].Location.Y = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Y))) + 1;
             Block[numBlock].Location.Width = static_cast<int>(floor(static_cast<double>(Block[numBlock].Location.Width))) + 1;
             Block[numBlock].IsPlayer = A;
-            // not syncing the block layer here because we'll sync all of them together later
+
+            treeTempBlockAdd(numBlock);
             numTempBlock++;
         }
-    }
-
-    // add the NPC temp blocks to the quadtree
-    treeTempBlockStartFrame();
-    for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
-    {
-        treeTempBlockAdd(A);
     }
 
     // if(numTempBlock > 1)
@@ -639,8 +768,41 @@ void UpdateNPCs()
     // for(A = numBlock + 1 - numTempBlock; A <= numBlock; A++)
     //     NPC[Block[A].IsReally].tempBlock = A;
 
-    for(A = 1; A <= numNPCs; A++)
+    for(int A : NPCQueues::Unchecked)
     {
+        if(NPC[A].Active)
+            continue;
+
+        CheckNPCWidth(NPC[A]);
+
+        if(NPCQueues::check_active(NPC[A]))
+            continue;
+
+        // check for inactive NPCs that are falling off
+        if(NPC[A].JustActivated == 0 && !(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != 12)
+        {
+            if(!GameMenu && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
+            {
+                StopHit = 0;
+                NPCHit(A, 9);
+            }
+        }
+    }
+
+    NPCQueues::Unchecked.clear();
+
+
+    // need this complex loop syntax because Active can be modified within it
+    for(int A : NPCQueues::Active.may_insert_erase)
+    {
+        if(NPC[A].AttLayer != LAYER_NONE)
+        {
+            lyrX = NPC[A].Location.X;
+            lyrY = NPC[A].Location.Y;
+        }
+
+        // all of these are moved into the Active section
+#if 0
         Physics.NPCGravity = Physics.NPCGravityReal;
 
         lyrX = NPC[A].Location.X;
@@ -660,6 +822,9 @@ void UpdateNPCs()
             NPC[A].Immune -= 1;
         if(NPC[A].Type == 56 && NPC[A].TimeLeft > 1)
             NPC[A].TimeLeft = 100;
+#endif
+
+        // Activation collisions
         if(NPC[A].JustActivated != 0)
         {
             if(NPC[A].Active)
@@ -669,7 +834,7 @@ void UpdateNPCs()
                     tempLocation = NPC[A].Location;
                     tempLocation.Height = 8000;
                     int C = 0;
-                    for(B = 1; B <= numBlock; B++)
+                    for(int B : treeBlockQueryWithTemp(tempLocation, SORTMODE_COMPAT))
                     {
                         if(CheckCollision(tempLocation, Block[B].Location))
                         {
@@ -687,10 +852,19 @@ void UpdateNPCs()
                         NPC[A].Special2 = Block[C].Location.Y + 4;
                         NPC[A].Location.Y = Block[C].Location.Y - NPC[A].Location.Height;
                         NPC[A].Special = 1;
+
+                        treeNPCUpdate(A);
+                        if(NPC[A].tempBlock > 0)
+                            treeNPCSplitTempBlock(A);
                     }
                 }
                 else if(NPC[A].Type == 199) // blaarg
+                {
                     NPC[A].Location.Y = NPC[A].DefaultLocation.Y + NPC[A].Location.Height + 36;
+                    treeNPCUpdate(A);
+                    if(NPC[A].tempBlock > 0)
+                        treeNPCSplitTempBlock(A);
+                }
 
 
 
@@ -698,16 +872,19 @@ void UpdateNPCs()
                 {
                     if(NPC[A].TimeLeft <= 1)
                     {
+                        NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
                     else if(Maths::iRound(NPC[A].Direction) == -1 && NPC[A].Location.X < Player[NPC[A].JustActivated].Location.X)
                     {
+                        NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
                     else if(Maths::iRound(NPC[A].Direction) == 1 && NPC[A].Location.X > Player[NPC[A].JustActivated].Location.X)
                     {
+                        NPCQueues::Active.erase(A);
                         NPC[A].Active = false;
                         NPC[A].TimeLeft = 0;
                     }
@@ -716,6 +893,9 @@ void UpdateNPCs()
                         NPC[A].Location.Y = level[Player[NPC[A].JustActivated].Section].Height - 0.1;
                         NPC[A].Location.SpeedX = (1 + (NPC[A].Location.Y - NPC[A].DefaultLocation.Y) * 0.005) * NPC[A].Direction;
                         NPC[A].Special5 = 1;
+                        treeNPCUpdate(A);
+                        if(NPC[A].tempBlock > 0)
+                            treeNPCSplitTempBlock(A);
                     }
                     else if(NPC[A].Type != 42)
                         PlaySound(SFX_Bullet);
@@ -723,6 +903,9 @@ void UpdateNPCs()
                 else if(NPC[A].Type == 21)
                     NPC[A].Special = 100;
             }
+            else if(!NPC[A].Generator && !NPCQueues::check_active_type(NPC[A]))
+                NPCQueues::Active.erase(A);
+
             if(NPC[A].Type == 84 || NPC[A].Type == 181)
                 NPC[A].Special = iRand(200);
             NPC[A].JustActivated = 0;
@@ -733,9 +916,10 @@ void UpdateNPCs()
             if(NPC[A].Type == 22)
                 NPC[A].Projectile = false;
         }
-        else if(!(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != 12)
+        // check for active NPCs that are falling off
+        else if(NPC[A].Location.Y > level[NPC[A].Section].Height && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
         {
-            if(!GameMenu && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
+            if(!GameMenu && !(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != 12)
                 NPCHit(A, 9);
         }
 
@@ -753,10 +937,34 @@ void UpdateNPCs()
                 NPC[A].Frame = BlockFrame[5];
             else if(NPC[A].Type >= 215 && NPC[A].Type <= 220)
                 NPC[A].Frame = SpecialFrame[7];
-
         }
+/////////////// BEGIN ACTIVE CODE /////////////////////////////////////////////////////////////
         else if(NPC[A].Active && NPC[A].Killed == 0 && !NPC[A].Generator)
         {
+            // don't worry about updating A's tree within this block -- it is done at the end if needed.
+            double prevX = NPC[A].Location.X;
+            double prevY = NPC[A].Location.Y;
+            double prevW = NPC[A].Location.Width;
+            double prevH = NPC[A].Location.Height;
+
+            // all this cleanup code was moved here from the top of the loop
+            Physics.NPCGravity = Physics.NPCGravityReal;
+
+            StopHit = 0;
+
+            if(NPC[A].RealSpeedX != 0)
+            {
+                NPC[A].Location.SpeedX = NPC[A].RealSpeedX;
+                NPC[A].RealSpeedX = 0;
+            }
+
+            if(!NPC[A].Projectile || NPC[A].Type == 50 || NPC[A].Type == 78)
+                NPC[A].Multiplier = 0;
+            if(NPC[A].Immune > 0)
+                NPC[A].Immune -= 1;
+            if(NPC[A].Type == 56 && NPC[A].TimeLeft > 1)
+                NPC[A].TimeLeft = 100;
+
             speedVar = 1;
             if(NPC[A].Slope > 0 && !(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == 45 && NPC[A].Special == 1)))
             {
@@ -904,6 +1112,7 @@ void UpdateNPCs()
                 NPC[A].Location.Height = NPCHeight[NPC[A].Type];
                 NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                 NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
+                NPCQueues::Unchecked.push_back(A);
             }
 
             if(NPC[A].Text != STRINGINDEX_NONE)
@@ -992,6 +1201,7 @@ void UpdateNPCs()
                             Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
                             NPC[A].HoldingPlayer = 0;
                             NPC[A].Killed = 9;
+                            NPCQueues::Killed.push_back(A);
                             NewEffect(10, NPC[A].Location);
                         }
 
@@ -1006,7 +1216,12 @@ void UpdateNPCs()
                             if(NPC[A].Special == 0.0)
                                 NPC[A].Special = 147;
 
-                            NPC[A].Generator = false;
+                            if(NPC[A].Generator)
+                            {
+                                NPC[A].Generator = false;
+                                NPCQueues::update(A);
+                            }
+
                             NPC[A].Frame = 0;
                             NPC[A].Type = NPC[A].Special;
                             NPC[A].Special = 0;
@@ -1041,6 +1256,8 @@ void UpdateNPCs()
                                 NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                                 NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
                             }
+
+                            NPCQueues::Unchecked.push_back(A);
                         }
 
                         if(NPC[A].Type == 45)
@@ -1055,6 +1272,8 @@ void UpdateNPCs()
                             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
                             NPC[A].Location.X += -NPC[A].Location.Width / 2.0;
                             NPC[A].Location.Y += -NPC[A].Location.Height / 2.0;
+
+                            NPCQueues::Unchecked.push_back(A);
                         }
 
                         NPC[A].TimeLeft = 100;
@@ -1074,7 +1293,7 @@ void UpdateNPCs()
                              NPC[A].Type == 49 || NPC[A].Type == 134 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) ||
                              NPC[A].Type == 31 || NPC[A].Type == 240 || NPC[A].Type == 278 || NPC[A].Type == 279 || NPC[A].Type == 292))
                         {
-                            for(B = 1; B <= numNPCs; B++)
+                            for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
                             {
                                 if(B != A && NPC[B].Active &&
                                    (NPC[B].HoldingPlayer == 0 || (BattleMode && NPC[B].HoldingPlayer != NPC[A].HoldingPlayer)) &&
@@ -1107,6 +1326,7 @@ void UpdateNPCs()
                                 }
                             }
                         }
+
                         if(NPC[A].Type == 237 || NPC[A].Type == 263) // Yoshi Ice
                         {
                             if(iRand(100) >= 93)
@@ -1131,6 +1351,7 @@ void UpdateNPCs()
                         if(NPC[A].Type == 29)
                         {
                             NPC[A].Killed = 3;
+                            NPCQueues::Killed.push_back(A);
                             NPC[A].Direction = -NPC[A].Direction;
                         }
                         if(NPC[A].Type == 17)
@@ -2240,7 +2461,10 @@ void UpdateNPCs()
                                                         if(NPC[A].Type == 15 && HitSpot == 5)
                                                         {
                                                             if(NPC[A].WallDeath >= 5)
+                                                            {
                                                                 NPC[A].Killed = 3;
+                                                                NPCQueues::Killed.push_back(A);
+                                                            }
                                                             else
                                                                 HitSpot = 3;
                                                         }
@@ -2255,7 +2479,10 @@ void UpdateNPCs()
                                                         }
 
                                                         if(NPC[A].Type == 133 && HitSpot > 0)
+                                                        {
                                                             NPC[A].Killed = 4;
+                                                            NPCQueues::Killed.push_back(A);
+                                                        }
 
                                                         if(NPC[A].Type == 134 && NPC[A].Projectile && HitSpot != 0)
                                                             NPC[A].Special = 1000;
@@ -3013,6 +3240,7 @@ void UpdateNPCs()
                                                                 {
                                                                     NewEffect(75, NPC[A].Location);
                                                                     NPC[A].Killed = 3;
+                                                                    NPCQueues::Killed.push_back(A);
                                                                 }
                                                             }
                                                             else if(NPC[A].Type != 48 && !(NPCIsABlock[NPC[A].Type] && Block[B].IsNPC > 0) && Block[B].IsNPC != 57)
@@ -3288,7 +3516,7 @@ void UpdateNPCs()
 
                             if(!(NPC[A].Type >= 79 && NPC[A].Type <= 83) && !NPC[A].Inert)
                             {
-                                for(int C = 1; C <= numNPCs; C++)
+                                for(int C : treeNPCQuery(tempLocation, SORTMODE_NONE))
                                 {
                                     if(A != C && NPC[C].Active && !NPC[C].Projectile)
                                     {
@@ -3371,15 +3599,15 @@ void UpdateNPCs()
                                 NPC[A].Type != 282 && NPC[A].Type != 288 && NPC[A].Type != 289)
                             {
 
-                                for(B = 1; B <= numNPCs; B++)
+                                for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
                                 {
-                                    if(NPC[B].Active)
+                                    if(B != A && NPC[B].Active)
                                     {
                                         if(!NPCIsACoin[NPC[B].Type])
                                         {
                                             if(CheckCollision(NPC[A].Location, NPC[B].Location))
                                             {
-                                                if(B != A)
+                                                // if(B != A)
                                                 {
                                                     if(!(NPC[B].Type == 15 && NPC[B].Special == 4) && !(NPCIsToad[NPC[B].Type]) &&
                                                        !(NPC[B].Type >= 104 && NPC[B].Type <= 106) && !(NPC[B].Type >= 154 && NPC[B].Type <= 157) &&
@@ -3460,6 +3688,7 @@ void UpdateNPCs()
                                                                             if(NPC[B].Type == 112)
                                                                                 NPC[B].Type = 194;
                                                                             NPC[A].Killed = 9;
+                                                                            NPCQueues::Killed.push_back(A);
                                                                             NPC[B].Direction = NPC[A].Direction;
                                                                             NPC[B].Frame = EditorNPCFrame(NPC[B].Type, NPC[B].Direction);
                                                                         }
@@ -3558,6 +3787,10 @@ void UpdateNPCs()
                                                                                             }
                                                                                         }
                                                                                     }
+
+                                                                                    treeNPCUpdate(B);
+                                                                                    if(NPC[B].tempBlock > 0)
+                                                                                        treeNPCSplitTempBlock(B);
                                                                                 }
                                                                                 else if(NPC[A].Type == 78)
                                                                                     NPCHit(B, 8, A);
@@ -4079,12 +4312,30 @@ void UpdateNPCs()
                         Block[NPC[A].tempBlock].Location = NPC[A].Location;
                         if(NPC[A].Type == 26)
                         {
+                            // the NPC tree accounts for this; no need to split tempBlock
                             Block[NPC[A].tempBlock].Location.Y -= 16;
                             Block[NPC[A].tempBlock].Location.Height += 16;
                         }
 
-                        // necessary for tree update
-                        treeTempBlockUpdate(NPC[A].tempBlock);
+                        // tempBlock comes back in sync with NPC
+                        if(NPC[A].Location.X != prevX
+                            || NPC[A].Location.Y != prevY
+                            || NPC[A].Location.Width != prevW
+                            || NPC[A].Location.Height != prevH)
+                        {
+                            prevX = NPC[A].Location.X;
+                            prevY = NPC[A].Location.Y;
+                            prevW = NPC[A].Location.Width;
+                            prevH = NPC[A].Location.Height;
+
+                            treeNPCUpdate(A);
+
+                            if(NPC[A].tempBlockInTree)
+                            {
+                                NPC[A].tempBlockInTree = false;
+                                treeTempBlockRemove(NPC[A].tempBlock);
+                            }
+                        }
 
                         // no longer needed; maintaining the sort
 #if 0
@@ -4157,6 +4408,7 @@ void UpdateNPCs()
                     {
                         Bomb(NPC[A].Location, 2);
                         NPC[A].Killed = 9;
+                        NPCQueues::Killed.push_back(A);
                     }
                 }
                 else if(NPC[A].Type == 135) // SMB2 Bob-om
@@ -4168,6 +4420,7 @@ void UpdateNPCs()
                     {
                         Bomb(NPC[A].Location, 2);
                         NPC[A].Killed = 9;
+                        NPCQueues::Killed.push_back(A);
                     }
                 }
                 else if(NPC[A].Type == 137) // SMB3 Bomb
@@ -4901,7 +5154,10 @@ void UpdateNPCs()
                     }
 
                     if(B == 0)
+                    {
                         NPC[A].Killed = 9;
+                        NPCQueues::Killed.push_back(A);
+                    }
                 }
                 else if(NPC[A].Type == NPCID_TOOTHYPIPE)
                 {
@@ -4953,6 +5209,10 @@ void UpdateNPCs()
                         else
                             NPC[(int)NPC[A].Special2].Location.X = NPC[A].Location.X - NPC[(int)NPC[A].Special2].Location.Width;
                         NPC[(int)NPC[A].Special2].Location.Y = NPC[A].Location.Y;
+
+                        treeNPCUpdate((int)NPC[A].Special2);
+                        if(NPC[(int)NPC[A].Special2].tempBlock != 0)
+                            treeNPCSplitTempBlock((int)NPC[A].Special2);
                     }
 
                     if(NPC[A].standingOnPlayer > 0 && !Player[NPC[A].standingOnPlayer].Controls.Run)
@@ -5289,9 +5549,10 @@ void UpdateNPCs()
                 NPCFrames(A);
 
                 if(NPC[A].Effect == 0 && NPC[A].Type != 91)
+                {
                     NPC[A].Layer = LAYER_SPAWNED_NPCS;
-                syncLayers_NPC(A);
-
+                    syncLayers_NPC(A);
+                }
             }
             else if(NPC[A].Effect == 5) // Grabbed by Yoshi
             {
@@ -5324,12 +5585,25 @@ void UpdateNPCs()
                     NPC[A].Effect3 = 0;
                 }
             }
-        }
 
-        if(!fEqual(speedVar, 1) && !fEqual(speedVar, 0))
-        {
-            NPC[A].RealSpeedX = float(NPC[A].Location.SpeedX);
-            NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * double(speedVar);
+            // moved here because speedVar can only be validly set here
+            if(!fEqual(speedVar, 1) && !fEqual(speedVar, 0))
+            {
+                NPC[A].RealSpeedX = float(NPC[A].Location.SpeedX);
+                NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * double(speedVar);
+            }
+
+            // finally update NPC's tree status if needed, and split the tempBlock (since it has not been updated)
+            if(NPC[A].Location.X != prevX
+                || NPC[A].Location.Y != prevY
+                || NPC[A].Location.Width != prevW
+                || NPC[A].Location.Height != prevH)
+            {
+                treeNPCUpdate(A);
+
+                if(NPC[A].tempBlock > 0)
+                    treeNPCSplitTempBlock(A);
+            }
         }
 
         if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT && NPC[A].HoldingPlayer == 0)
@@ -5391,10 +5665,27 @@ void UpdateNPCs()
 
     numBlock -= numTempBlock; // clean up the temp npc blocks
 
-    // temp block tree is cleared immediately before fill
+    treeTempBlockClear();
 
-    for(A = numNPCs; A >= 1; A--) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
+
+    // kill the NPCs, from last to first
+    std::sort(NPCQueues::Killed.begin(), NPCQueues::Killed.end(),
+    [](NPCRef_t a, NPCRef_t b)
     {
+        return a > b;
+    });
+
+    int last_NPC = numNPCs + 1;
+    for(int A : NPCQueues::Killed) // KILL THE NPCS <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><
+    {
+        // duplicated entry, no problem
+        if(A == last_NPC)
+            continue;
+
+        // something's wrong in the sort order
+        if(A > last_NPC)
+            break;
+
         if(NPC[A].Killed > 0)
         {
             if(NPC[A].Location.SpeedX == 0.0)
@@ -5408,6 +5699,9 @@ void UpdateNPCs()
             KillNPC(A, NPC[A].Killed);
         }
     }
+
+    NPCQueues::Killed.clear();
+
     //    if(nPlay.Online == true)
     //    {
     //        if(nPlay.Mode == 1)

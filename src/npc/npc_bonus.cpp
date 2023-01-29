@@ -31,6 +31,8 @@
 #include "../config.h"
 #include "../layers.h"
 
+#include "npc/npc_queues.h"
+
 #include "../controls.h"
 
 #include <Utils/maths.h>
@@ -215,6 +217,7 @@ void TouchBonus(int A, int B)
                 if(Player[2].Immune < 10)
                     Player[2].Immune = 10;
                 NPC[B].Killed = 9;
+                NPCQueues::Killed.push_back(B);
                 PlaySound(SFX_BossBeat);
                 return;
             }
@@ -238,11 +241,13 @@ void TouchBonus(int A, int B)
                 PlaySound(SFX_ZeldaFairy);
                 Player[A].FairyTime = -1;
                 NPC[B].Killed = 9;
+                NPCQueues::Killed.push_back(B);
             }
         }
         if(NPC[B].Type == 90 || NPC[B].Type == 187 || NPC[B].Type == 186) // player touched a 1up mushroom
         {
             NPC[B].Killed = 9;
+            NPCQueues::Killed.push_back(B);
             MoreScore(10, NPC[B].Location);
             return;
         }
@@ -250,6 +255,7 @@ void TouchBonus(int A, int B)
         {
             Player[A].HeldBonus = 248;
             NPC[B].Killed = 9;
+            NPCQueues::Killed.push_back(B);
             PlaySound(SFX_GotItem);
             return;
         }
@@ -259,6 +265,7 @@ void TouchBonus(int A, int B)
             FreezeNPCs = true;
             PSwitchPlayer = A;
             NPC[B].Killed = 9;
+            NPCQueues::Killed.push_back(B);
             return;
         }
         if(NPC[B].Type == 192) // player touched the chekpoint
@@ -270,6 +277,7 @@ void TouchBonus(int A, int B)
                 Player[A].Hearts = 2;
             SizeCheck(Player[A]);
             NPC[B].Killed = 9;
+            NPCQueues::Killed.push_back(B);
             PlaySound(SFX_Checkpoint);
             Checkpoint = FullFileName;
             Checkpoint_t cp;
@@ -281,12 +289,14 @@ void TouchBonus(int A, int B)
         if(NPC[B].Type == 188) // player touched the 3up moon
         {
             NPC[B].Killed = 9;
+            NPCQueues::Killed.push_back(B);
             MoreScore(12, NPC[B].Location);
             return;
         }
         if(NPC[B].Type == 178)
         {
             NPC[B].Killed = 9;
+            NPCQueues::Killed.push_back(B);
             return;
         }
         if(NPCIsToad[NPC[B].Type])
@@ -652,6 +662,7 @@ void TouchBonus(int A, int B)
         if(toadBool > 0)
             NPC[B].Type = toadBool;
         NPC[B].Killed = 9;
+        NPCQueues::Killed.push_back(B);
         //        if(nPlay.Online == true && A == nPlay.MySlot + 1)
         //            Netplay::sendData Netplay::PutPlayerControls(nPlay.MySlot) + "1c" + std::to_string(A) + "|" + Player[A].Effect + "|" + Player[A].Effect2 + "1h" + std::to_string(A) + "|" + Player[A].State + LB;
     }

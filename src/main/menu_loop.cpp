@@ -39,6 +39,10 @@
 #include "game_globals.h"
 #include "menu_controls.h"
 
+#include "main/trees.h"
+
+#include "npc/npc_queues.h"
+
 
 static void updateIntroLevelActivity()
 {
@@ -47,7 +51,11 @@ static void updateIntroLevelActivity()
 
     SingleCoop = 0;
 
-    if(CheckLiving() == 0)
+    // only restore the level on the first frame that all players are dead
+    static bool restore_done = false;
+
+    bool any_living = CheckLiving();
+    if(!any_living && !restore_done)
     {
         ShowLayer(LAYER_DESTROYED_BLOCKS);
 
@@ -58,6 +66,12 @@ static void updateIntroLevelActivity()
                 if(NPC[A].TimeLeft > 10) NPC[A].TimeLeft = 10;
             }
         }
+
+        restore_done = true;
+    }
+    else if(any_living)
+    {
+        restore_done = false;
     }
 
     For(A, 1, numPlayers)
@@ -103,13 +117,16 @@ static void updateIntroLevelActivity()
                 tempLocation.Y = p.Location.Y + p.Location.Height - 22;
                 tempLocation.X = p.Location.X + p.Location.Width;
 
-                For(B, 1, numNPCs)
+                for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
                        !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
                     {
                         if(CheckCollision(tempLocation, NPC[B].Location))
+                        {
                             p.Controls.Run = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -134,7 +151,7 @@ static void updateIntroLevelActivity()
                 tempLocation.Y = p.Location.Y + 4;
                 tempLocation.X = p.Location.X + p.Location.Width;
 
-                For(B, 1, numNPCs)
+                for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                 {
                     if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
                       !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
@@ -159,7 +176,7 @@ static void updateIntroLevelActivity()
                     tempLocation.Y = level[0].Y;
                     tempLocation.X = p.Location.X;
 
-                    For(B, 1, numNPCs)
+                    for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
                         if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
                            !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
@@ -180,7 +197,7 @@ static void updateIntroLevelActivity()
                     tempLocation.Y = p.Location.Y;
                     tempLocation.X = p.Location.X;
 
-                    For(B, 1, numNPCs)
+                    for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
                         if(NPC[B].Active && !NPCIsABonus[NPC[B].Type] &&
                            !NPCWontHurt[NPC[B].Type] && NPC[B].HoldingPlayer == 0)
@@ -265,12 +282,13 @@ static void updateIntroLevelActivity()
             do
             {
                 tempBool = true;
-                For(B, 1, numBlock)
+                for(int B : treeBlockQuery(p.Location, SORTMODE_NONE))
                 {
                     if(CheckCollision(p.Location, Block[B].Location))
                     {
                         p.Location.Y = Block[B].Location.Y - p.Location.Height - 0.1;
                         tempBool = false;
+                        break;
                     }
                 }
             } while(!tempBool);
@@ -419,7 +437,7 @@ static void updateIntroLevelActivity()
             tempLocation.Width = 95;
             tempLocation.Height -= 1;
 
-            for(auto B = 1; B <= numBlock; B++)
+            for(int B : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
                 if(BlockSlope[Block[B].Type] == 0 && !BlockIsSizable[Block[B].Type] &&
                    !BlockOnlyHitspot1[Block[B].Type] && !Block[B].Hidden)
@@ -444,7 +462,7 @@ static void updateIntroLevelActivity()
             tempLocation.X = Player[A].Location.X + Player[A].Location.Width;
             tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height;
 
-            for(auto B = 1; B <= numBlock; B++)
+            for(int B : treeBlockQuery(tempLocation, SORTMODE_NONE))
             {
                 if((!BlockIsSizable[Block[B].Type] || Block[B].Location.Y > Player[A].Location.Y + Player[A].Location.Height - 1) &&
                    !BlockOnlyHitspot1[Block[B].Type] && !Block[B].Hidden)
@@ -528,7 +546,7 @@ void MenuLoop()
             Effect[numEffects].Location.SpeedY = dRand() * 4 - 2;
         }
 
-        For(A, 1, numNPCs)
+        for(int A : treeNPCQuery(cursorLoc, SORTMODE_NONE))
         {
             if(NPC[A].Active)
             {
@@ -545,12 +563,13 @@ void MenuLoop()
                     {
                         NewEffect(78, NPC[A].Location);
                         NPC[A].Killed = 9;
+                        NPCQueues::Killed.push_back(A);
                     }
                 }
             }
         }
 
-        For(A, 1, numBlock)
+        for(int A : treeBlockQuery(cursorLoc, SORTMODE_COMPAT))
         {
             if(!Block[A].Hidden)
             {

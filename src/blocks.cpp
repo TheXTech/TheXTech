@@ -38,6 +38,8 @@
 #include "compat.h"
 #include "editor.h"
 
+#include "graphics/gfx_update.h"
+#include "npc/npc_queues.h"
 #include "main/trees.h"
 
 void BlockHit(int A, bool HitDown, int whatPlayer)
@@ -1885,6 +1887,7 @@ void UpdateBlocks()
                 if(ib.Type == 90 && ib.Special == 0 && ib.Special2 != 1)
                 {
                     ib.Hidden = true;
+                    invalidateDrawBlocks();
                     NewEffect(82, ib.Location, 1, iBlock[A]);
                     ib.ShakeY = 0;
                     ib.ShakeY2 = 0;
@@ -1910,6 +1913,7 @@ void UpdateBlocks()
                 if(ib.Type == 90)
                 {
                     ib.Hidden = true;
+                    invalidateDrawBlocks();
                     NewEffect(82, ib.Location, 1, iBlock[A]);
                     ib.ShakeY = 0;
                     ib.ShakeY2 = 0;
@@ -2104,7 +2108,9 @@ void PSwitch(bool enabled)
                     nb.NPC = NPC[A].Type;
                     syncLayersTrees_Block(numBlock);
                 }
+
                 NPC[A].Killed = 9;
+                NPCQueues::Killed.push_back(A);
             }
         }
 
@@ -2243,6 +2249,7 @@ void PSwitch(bool enabled)
                     syncLayersTrees_Block(numBlock);
                 }
                 NPC[A].Killed = 9;
+                NPCQueues::Killed.push_back(A);
             }
         }
 
@@ -2430,7 +2437,7 @@ void PowBlock()
         }
     }
 
-    for(A = 1; A <= numNPCs; A++)
+    for(int A : NPCQueues::Active.no_change)
     {
         if(NPC[A].Active)
         {

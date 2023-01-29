@@ -189,11 +189,11 @@ void Input::UpdateKeyRecords(Player_t *pPlayer)
     }
 }
 
-#define FULL_LUNA_TOGGLE_CHT    "thouartdamned"
-#define TOGGLE_DEMO_COUNTER_CHT "toggledemocounter"
-#define DELETE_ALL_RECORDS_CHT  "formatcdrive"
-#define LUNA_DEBUG_CHT          "lunadebug"
-#define LUNA_LONG_DEBUG_CHT     "lunalongdebug"
+static const std::string FULL_LUNA_TOGGLE_CHT    = "thouartdamned";
+static const std::string TOGGLE_DEMO_COUNTER_CHT = "toggledemocounter";
+static const std::string DELETE_ALL_RECORDS_CHT  = "formatcdrive";
+static const std::string LUNA_DEBUG_CHT          = "lunadebug";
+static const std::string LUNA_LONG_DEBUG_CHT     = "lunalongdebug";
 
 void Input::CheckSpecialCheats()
 {

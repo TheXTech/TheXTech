@@ -128,11 +128,8 @@ struct TableInterface
             layer_table[layer].erase(item);
     }
 
-    TreeResult_Sentinel<ItemRef_t> query(Location_t loc,
-                             int sort_mode)
+    inline void query(std::vector<BaseRef_t>& out, Location_t loc, int sort_mode)
     {
-        TreeResult_Sentinel<ItemRef_t> result;
-
         // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
         //   (such as, when an item is trapped inside a wall during !BlocksSorted)
         if(g_compatibility.emulate_classic_block_order)
@@ -150,7 +147,7 @@ struct TableInterface
             loc.Height += 4;
         }
 
-        common_table.query(*result.i_vec, loc);
+        common_table.query(out, loc);
 
         double oX = loc.X;
         double oY = loc.Y;
@@ -162,7 +159,7 @@ struct TableInterface
             loc.X -= Layer[layer].OffsetX;
             loc.Y -= Layer[layer].OffsetY;
 
-            layer_table[layer].query(*result.i_vec, loc);
+            layer_table[layer].query(out, loc);
 
             loc.X = oX;
             loc.Y = oY;
@@ -178,7 +175,7 @@ struct TableInterface
 
         if(sort_mode == SORTMODE_LOC)
         {
-            std::sort(result.i_vec->begin(), result.i_vec->end(),
+            std::sort(out.begin(), out.end(),
             [](BaseRef_t a, BaseRef_t b)
             {
                 return (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
@@ -188,7 +185,7 @@ struct TableInterface
         }
         else if(sort_mode == SORTMODE_ID)
         {
-            std::sort(result.i_vec->begin(), result.i_vec->end(),
+            std::sort(out.begin(), out.end(),
             [](BaseRef_t a, BaseRef_t b)
             {
                 return a < b;
@@ -196,7 +193,7 @@ struct TableInterface
         }
         else if(sort_mode == SORTMODE_Z)
         {
-            std::sort(result.i_vec->begin(), result.i_vec->end(),
+            std::sort(out.begin(), out.end(),
             [](BaseRef_t a, BaseRef_t b)
             {
                 // not implemented yet, might never be
@@ -205,13 +202,31 @@ struct TableInterface
                 return a < b;
             });
         }
+    }
+
+    void query(std::vector<BaseRef_t>& out, double Left, double Top, double Right, double Bottom,
+               int sort_mode, double margin)
+    {
+        auto loc = newLoc(Left - margin,
+                          Top - margin,
+                          (Right - Left) + margin * 2,
+                          (Bottom - Top) + margin * 2);
+
+        query(out, loc, sort_mode);
+    }
+
+    TreeResult_Sentinel<ItemRef_t> query(Location_t loc,
+                             int sort_mode)
+    {
+        TreeResult_Sentinel<ItemRef_t> result;
+
+        query(*result.i_vec, loc, sort_mode);
 
         return result;
     }
 
     TreeResult_Sentinel<ItemRef_t> query(double Left, double Top, double Right, double Bottom,
-                             int sort_mode,
-                             double margin)
+                             int sort_mode, double margin)
     {
         auto loc = newLoc(Left - margin,
                           Top - margin,
@@ -223,6 +238,9 @@ struct TableInterface
 };
 
 table_t<BlockRef_t> s_temp_block_table;
+table_t<NPCRef_t> s_npc_table;
+bool s_temp_blocks_enabled = false;
+
 
 /* ================= Level blocks ================= */
 
@@ -280,6 +298,11 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double R
     return s_block_tables.query(Left, Top, Right, Bottom, sort_mode, margin);
 }
 
+void treeBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode)
+{
+    s_block_tables.query(out, loc, sort_mode);
+}
+
 TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
                          int sort_mode)
 {
@@ -288,27 +311,108 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
 
 /* ================= Temp blocks ================= */
 
-void treeTempBlockStartFrame()
+static void s_NPCsToTempBlocks(std::vector<BaseRef_t>& out, size_t begin)
+{
+    for(auto it = out.begin() + begin; it != out.end();)
+    {
+        // some NPCs' tempBlocks are at a different place than their location,
+        // and those tempBlocks get added to the dedicated tree.
+
+        const NPC_t& n = (NPCRef_t) *it;
+        if(!n.tempBlockInTree && n.tempBlock != 0 && n.tempBlock <= numBlock)
+        {
+            *it = n.tempBlock;
+            ++it;
+        }
+        else
+        {
+            *it = *(out.end() - 1);
+            out.resize(out.size() - 1);
+        }
+    }
+}
+
+static void s_NPCsToTempBlocks(std::vector<BaseRef_t>& out)
+{
+    s_NPCsToTempBlocks(out, 0);
+}
+
+
+void treeTempBlockEnable()
+{
+    s_temp_blocks_enabled = true;
+}
+
+void treeTempBlockFullClear()
+{
+    s_temp_block_table.clear();
+    s_temp_blocks_enabled = false;
+}
+
+void treeTempBlockClear()
 {
     s_temp_block_table.clear_light();
+    s_temp_blocks_enabled = false;
 }
 
 void treeTempBlockAdd(BlockRef_t obj)
 {
+    if(!s_temp_blocks_enabled)
+        return;
+
     s_temp_block_table.insert(obj);
 }
 
 void treeTempBlockUpdate(BlockRef_t obj)
 {
+    if(!s_temp_blocks_enabled)
+        return;
+
     s_temp_block_table.update(obj);
 }
 
-TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc,
+void treeTempBlockRemove(BlockRef_t obj)
+{
+    if(!s_temp_blocks_enabled)
+        return;
+
+    s_temp_block_table.erase(obj);
+}
+
+TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
                          int sort_mode)
 {
     TreeResult_Sentinel<BlockRef_t> result;
 
+    if(!s_temp_blocks_enabled)
+        return result;
+
+    // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
+    //   (such as, when an item is trapped inside a wall during !BlocksSorted)
+    Location_t loc = _loc;
+
+    if(g_compatibility.emulate_classic_block_order)
+    {
+        loc.X -= 32;
+        loc.Y -= 32;
+        loc.Width += 64;
+        loc.Height += 64;
+    }
+    else
+    {
+        loc.X -= 2;
+        loc.Y -= 2;
+        loc.Width += 4;
+        loc.Height += 4;
+    }
+
+
+    s_npc_table.query(*result.i_vec, loc);
+
+    s_NPCsToTempBlocks(*result.i_vec);
+
     s_temp_block_table.query(*result.i_vec, loc);
+
 
     if(sort_mode == SORTMODE_COMPAT)
     {
@@ -358,6 +462,116 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, doub
                       (Bottom - Top) + margin * 2);
 
     return treeTempBlockQuery(loc, sort_mode);
+}
+
+/* ================= Combined Block Query ============== */
+
+TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
+                         int sort_mode)
+{
+    TreeResult_Sentinel<BlockRef_t> result;
+
+    // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
+    //   (such as, when an item is trapped inside a wall during !BlocksSorted)
+    Location_t loc = _loc;
+
+    if(g_compatibility.emulate_classic_block_order)
+    {
+        loc.X -= 32;
+        loc.Y -= 32;
+        loc.Width += 64;
+        loc.Height += 64;
+    }
+    else
+    {
+        loc.X -= 2;
+        loc.Y -= 2;
+        loc.Width += 4;
+        loc.Height += 4;
+    }
+
+
+    s_block_tables.common_table.query(*result.i_vec, loc);
+
+    double oX = loc.X;
+    double oY = loc.Y;
+
+    for(int i = 0; i < s_block_tables.num_active_tables; i++)
+    {
+        int layer = s_block_tables.active_tables[i];
+
+        loc.X -= Layer[layer].OffsetX;
+        loc.Y -= Layer[layer].OffsetY;
+
+        s_block_tables.layer_table[layer].query(*result.i_vec, loc);
+
+        loc.X = oX;
+        loc.Y = oY;
+    }
+
+    auto pre_temp_size = result.i_vec->size();
+
+
+    if(s_temp_blocks_enabled)
+    {
+        s_npc_table.query(*result.i_vec, loc);
+
+        s_NPCsToTempBlocks(*result.i_vec, pre_temp_size);
+
+        s_temp_block_table.query(*result.i_vec, loc);
+    }
+
+
+    // sort real ones by ID, temp ones by loc, and have them arranged this way
+    if(sort_mode == SORTMODE_COMPAT)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->begin() + pre_temp_size,
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            return a.index < b.index;
+        });
+
+        std::sort(result.i_vec->begin() + pre_temp_size, result.i_vec->end(),
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
+                    && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
+        });
+    }
+
+
+    if(sort_mode == SORTMODE_LOC)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
+                    && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
+        });
+    }
+    else if(sort_mode == SORTMODE_ID)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            return a.index < b.index;
+        });
+    }
+    else if(sort_mode == SORTMODE_Z)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            // not implemented yet, might never be
+            // instead, just sort by the index
+            // (which is currently the same as z-order)
+            return a.index < b.index;
+        });
+    }
+
+    return result;
 }
 
 /* ================= Level Backgrounds ================= */
@@ -415,10 +629,137 @@ TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(double Left, double Top
     return s_background_tables.query(Left, Top, Right, Bottom, sort_mode, margin);
 }
 
-TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t &loc,
-                         int sort_mode)
+void treeBackgroundQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode)
+{
+    s_background_tables.query(out, loc, sort_mode);
+}
+
+TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t &loc, int sort_mode)
 {
     return s_background_tables.query(loc, sort_mode);
+}
+
+
+/* ================= Level NPCs ================= */
+
+void treeNPCClear()
+{
+    s_npc_table.clear();
+}
+
+void treeNPCAdd(NPCRef_t obj)
+{
+    s_npc_table.insert(obj);
+}
+
+void treeNPCUpdate(NPCRef_t obj)
+{
+    SDL_assert_release((int)obj > 0);
+
+    s_npc_table.update(obj);
+}
+
+void treeNPCSplitTempBlock(NPCRef_t obj)
+{
+    if(!obj->tempBlockInTree)
+    {
+        obj->tempBlockInTree = true;
+        treeTempBlockAdd(obj->tempBlock);
+    }
+}
+
+void treeNPCUpdateTempBlock(NPCRef_t obj)
+{
+    if(!obj->tempBlockInTree)
+    {
+        obj->tempBlockInTree = true;
+        treeTempBlockAdd(obj->tempBlock);
+    }
+    else
+    {
+        treeTempBlockUpdate(obj->tempBlock);
+    }
+}
+
+void treeNPCRemove(NPCRef_t obj)
+{
+    s_npc_table.erase(obj);
+}
+
+TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
+                         int sort_mode)
+{
+    TreeResult_Sentinel<NPCRef_t> result;
+
+    // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
+    //   (such as, when an item is trapped inside a wall during !BlocksSorted)
+    Location_t loc = _loc;
+
+    if(g_compatibility.emulate_classic_block_order)
+    {
+        loc.X -= 32;
+        loc.Y -= 32;
+        loc.Width += 64;
+        loc.Height += 64;
+    }
+    else
+    {
+        loc.X -= 2;
+        loc.Y -= 2;
+        loc.Width += 4;
+        loc.Height += 4;
+    }
+
+    s_npc_table.query(*result.i_vec, loc);
+
+    if(sort_mode == SORTMODE_COMPAT)
+    {
+        sort_mode = SORTMODE_ID;
+    }
+
+    if(sort_mode == SORTMODE_LOC)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            return (((NPCRef_t)a)->Location.X < ((NPCRef_t)b)->Location.X
+                || (((NPCRef_t)a)->Location.X == ((NPCRef_t)b)->Location.X
+                    && ((NPCRef_t)a)->Location.Y < ((NPCRef_t)b)->Location.Y));
+        });
+    }
+    else if(sort_mode == SORTMODE_ID)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            return a.index < b.index;
+        });
+    }
+    else if(sort_mode == SORTMODE_Z)
+    {
+        std::sort(result.i_vec->begin(), result.i_vec->end(),
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            // not implemented yet, might never be
+            // instead, just sort by the index
+            // (which is currently the same as z-order)
+            return a.index < b.index;
+        });
+    }
+
+    return result;
+}
+
+TreeResult_Sentinel<NPCRef_t> treeNPCQuery(double Left, double Top, double Right, double Bottom,
+                         int sort_mode,
+                         double margin)
+{
+    auto loc = newLoc(Left - margin,
+                      Top - margin,
+                      (Right - Left) + margin * 2,
+                      (Bottom - Top) + margin * 2);
+
+    return treeNPCQuery(loc, sort_mode);
 }
 
 
@@ -474,11 +815,23 @@ TreeResult_Sentinel<WaterRef_t> treeWaterQuery(double Left, double Top, double R
                          int sort_mode,
                          double margin)
 {
+    if(numWater == 0)
+    {
+        TreeResult_Sentinel<WaterRef_t> empty;
+        return empty;
+    }
+
     return s_water_tables.query(Left, Top, Right, Bottom, sort_mode, margin);
 }
 
 TreeResult_Sentinel<WaterRef_t> treeWaterQuery(const Location_t &loc,
                          int sort_mode)
 {
+    if(numWater == 0)
+    {
+        TreeResult_Sentinel<WaterRef_t> empty;
+        return empty;
+    }
+
     return s_water_tables.query(loc, sort_mode);
 }
