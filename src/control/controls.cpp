@@ -23,7 +23,6 @@
 #include "../main/record.h"
 #include "../main/speedrunner.h"
 
-#include "core/sdl/render_gl11.h"
 #include "core/render.h"
 #include "core/window.h"
 
@@ -127,7 +126,7 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::ToggleHUD:
-        ((RenderGL11*)g_render)->togglehud();
+        g_render->togglehud();
         // ShowOnScreenHUD = !ShowOnScreenHUD;
         return;
 

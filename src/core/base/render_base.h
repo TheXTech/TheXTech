@@ -83,6 +83,8 @@ public:
      */
     virtual void close();
 
+    virtual void togglehud() = 0;
+
     /*!
      * \brief Call the repaint
      */
