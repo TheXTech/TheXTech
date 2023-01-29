@@ -114,10 +114,38 @@ elseif(NOT MSVC)
         if(ANDROID)
             set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -funwind-tables")
             set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -funwind-tables")
-        elseif(NINTENDO_3DS OR NINTENDO_WII)
+        elseif(NINTENDO_DS)
+            # use -Os by default for all build types
+            string(REGEX REPLACE "-O3" "-Os"
+                CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
+            string(REGEX REPLACE "-O3" "-Os"
+                CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}")
+            string(REGEX REPLACE "-O2" "-Os"
+                CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO}")
+            string(REGEX REPLACE "-O2" "-Os"
+                CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+
+            # use --gc-sections for all build types
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -Wl,--gc-sections")
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Wl,--gc-sections")
             set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -g -Wl,--gc-sections")
+            set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -Wl,--gc-sections")
+            set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Wl,--gc-sections")
+            set(LINK_FLAGS_RELWITHDEBINFO  "${LINK_FLAGS_RELWITHDEBINFO} -Wl,--gc-sections")
+            set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
+            set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
+            set(LINK_FLAGS_MINSIZEREL  "${LINK_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
+        elseif(NINTENDO_3DS OR NINTENDO_WII)
+            # use --gc-sections for all build types
+            set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -Wl,--gc-sections")
+            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Wl,--gc-sections")
+            set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -g -Wl,--gc-sections")
+            set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} -Wl,--gc-sections")
+            set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -Wl,--gc-sections")
+            set(LINK_FLAGS_RELWITHDEBINFO  "${LINK_FLAGS_RELWITHDEBINFO} -Wl,--gc-sections")
+            set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
+            set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
+            set(LINK_FLAGS_MINSIZEREL  "${LINK_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
         elseif(VITA)
             # VitaSDK specifies -O2 for release configurations. PS Vita Support - Axiom 2022
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1 -fcompare-debug-second")
