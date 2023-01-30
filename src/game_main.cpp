@@ -66,6 +66,7 @@
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/game_info.h"
+#include "main/outro_loop.h"
 #include "main/translate.h"
 #include "main/record.h"
 #include "core/render.h"
@@ -203,6 +204,7 @@ int GameMain(const CmdLineSetup_t &setup)
     //        DoEvents
     //    Loop While StartMenu = False 'wait until the player clicks a button
 
+    initOutroContent();
     initMainMenu(true);
     StartMenu = true;
 

@@ -80,5 +80,19 @@
         "wordResume": "Возобновить",
         "wordWaiting": "Ждём",
         "wordYes": "Да"
+    },
+    "outro": {
+        "cppPortBy": "Автор C++-порта:",
+        "customSprites": "Доп-спрайты:",
+        "d3dsPortBy": "Автор порта на 3DS:",
+        "engineCredits": "Создатели движка:",
+        "gameCredits": "Создатели игры:",
+        "levelDesign": "Дизайн уровней:",
+        "nameAndrewSpinks": "Эндрю Спинкс",
+        "nameVitalyNovichkov": "Новичков Виталий",
+        "originalBy": "Автор оригинала на VB6:",
+        "psVitaPortBy": "Автор порта на PS Vita:",
+        "specialThanks": "Особые благодарности:",
+        "wiiPortBy": "Автор порта на Wii:"
     }
 }
