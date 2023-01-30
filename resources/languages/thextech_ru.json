@@ -6,6 +6,7 @@
         "name4": "Тоад",
         "name5": "Линк"
     },
+    "languageName": "Русский",
     "menu": {
         "character": {
             "charSelTitle": "Выбор персонажа"
@@ -23,6 +24,23 @@
             "wordProfiles": "Профили"
         },
         "dropAddTitle": "Доб./Убрать игроков",
+        "editor": {
+            "editorErrorMissingResources": "Извините, но для встроенного редактора не хватает файла EditorIcons.png.",
+            "editorErrorResolution": "Извините, но встроенный редактор не поддерживает ваше текущее разрешение.",
+            "editorNewWorld": "<Новый мир>"
+        },
+        "game": {
+            "gameBattleRandom": "Случайный уровень",
+            "gameCopySave": "Скопир. сохранение",
+            "gameEraseSave": "Стереть сохранение",
+            "gameEraseSlot": "Какое сохранение стереть?",
+            "gameNoBattleLevels": "<Нету уровней битвы>",
+            "gameNoEpisodesToPlay": "<Эпизоды отсутствуют>",
+            "gameSlotContinue": "Слот {0} ... {1}%",
+            "gameSlotNew": "Слот {0} ... Новая игра",
+            "gameSourceSlot": "Что скопировать?",
+            "gameTargetSlot": "Куда скопировать?"
+        },
         "loading": "Загрузка...",
         "main": {
             "main1PlayerGame": "Одиночная игра",
@@ -32,6 +50,11 @@
             "mainMultiplayerGame": "Игра вдвоём",
             "mainOptions": "Настройки",
             "mainStartGame": "Начать игру"
+        },
+        "options": {
+            "optionsModeFullScreen": "Полноэкранный режим",
+            "optionsModeWindowed": "Оконный режим",
+            "optionsViewCredits": "Посмотреть титры"
         },
         "phraseChangeChar": "Сменить персонажа",
         "phraseDropOthers": "Убрать всех",

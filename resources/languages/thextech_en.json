@@ -6,6 +6,7 @@
         "name4": "Toad",
         "name5": "Link"
     },
+    "languageName": "English",
     "menu": {
         "character": {
             "charSelTitle": "Character Select"
@@ -23,6 +24,23 @@
             "wordProfiles": "Profiles"
         },
         "dropAddTitle": "Drop/Add Players",
+        "editor": {
+            "editorErrorMissingResources": "Sorry! You are missing EditorIcons.png, the icons for the in-game editor.",
+            "editorErrorResolution": "Sorry! The in-game editor is not supported at your current resolution.",
+            "editorNewWorld": "<New World>"
+        },
+        "game": {
+            "gameBattleRandom": "Random Level",
+            "gameCopySave": "Copy save",
+            "gameEraseSave": "Erase save",
+            "gameEraseSlot": "Select the slot to erase",
+            "gameNoBattleLevels": "<No battle levels>",
+            "gameNoEpisodesToPlay": "<No episodes to play>",
+            "gameSlotContinue": "SLOT {0} ... {1}%",
+            "gameSlotNew": "SLOT {0} ... NEW GAME",
+            "gameSourceSlot": "Select the source slot",
+            "gameTargetSlot": "Now select the target"
+        },
         "loading": "Loading...",
         "main": {
             "main1PlayerGame": "1 Player Game",
@@ -32,6 +50,11 @@
             "mainMultiplayerGame": "2 Player Game",
             "mainOptions": "Options",
             "mainStartGame": "Start Game"
+        },
+        "options": {
+            "optionsModeFullScreen": "Fullscreen mode",
+            "optionsModeWindowed": "Windowed mode",
+            "optionsViewCredits": "View credits"
         },
         "phraseChangeChar": "Change Character",
         "phraseDropOthers": "Drop Others",
