@@ -424,7 +424,7 @@ void SetupCredits()
     for(A = 1; A <= numCredits; A++)
     {
         auto &cr = Credit[A];
-        cr.Location.Width = GetS(cr.Text).size() * 18;
+        cr.Location.Width = SuperTextPixLen(GetS(cr.Text), g_gameInfo.creditsFont);
         cr.Location.Height = 16;
         cr.Location.X = (double(ScreenW) / 2) - (cr.Location.Width / 2.0);
         cr.Location.Y = 32 * A;
