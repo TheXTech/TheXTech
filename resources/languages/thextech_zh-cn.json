@@ -1,0 +1,98 @@
+﻿{
+    "charcter": {
+        "name1": "马力欧",
+        "name2": "路易吉",
+        "name3": "碧姬公主",
+        "name4": "奇诺比奥",
+        "name5": "林克"
+    },
+    "languageName": "简体中文",
+    "menu": {
+        "character": {
+            "charSelTitle": "选择角色"
+        },
+        "controls": {
+            "controlsConnected": "已连接：",
+            "controlsDeleteKey": "（按第二奔跑键清除）",
+            "controlsDeviceTypes": "设备类型",
+            "controlsInUse": "（已使用）",
+            "controlsNewProfile": "<新建配置>",
+            "controlsNotInUse": "（未使用）",
+            "controlsReallyDeleteProfile": "确定删除配置？",
+            "controlsTitle": "控制",
+            "wordButtons": "按键",
+            "wordProfiles": "配置"
+        },
+        "dropAddTitle": "添加/删除玩家",
+        "editor": {
+            "editorErrorMissingResources": "抱歉，需要 EditorIcons.png，即编辑器图标文件，才能启动编辑器。",
+            "editorErrorResolution": "抱歉，编辑器不支持当前设置的分辨率。",
+            "editorNewWorld": "<新地图>"
+        },
+        "game": {
+            "gameBattleRandom": "随机关卡",
+            "gameCopySave": "复制存档",
+            "gameEraseSave": "删除存档",
+            "gameEraseSlot": "选择要删除的存档",
+            "gameNoBattleLevels": "<对战关卡列表为空>",
+            "gameNoEpisodesToPlay": "<地图列表为空>",
+            "gameSlotContinue": "存档 {0} ... {1}%",
+            "gameSlotNew": "存档 {0} ... 新游戏",
+            "gameSourceSlot": "选择源存档",
+            "gameTargetSlot": "选择目标存档"
+        },
+        "loading": "加载中...",
+        "main": {
+            "main1PlayerGame": "单人游戏",
+            "mainBattleGame": "对战",
+            "mainEditor": "编辑器",
+            "mainExit": "退出",
+            "mainMultiplayerGame": "双人游戏",
+            "mainOptions": "设置",
+            "mainStartGame": "开始游戏"
+        },
+        "options": {
+            "optionsModeFullScreen": "全屏模式",
+            "optionsModeWindowed": "窗口模式",
+            "optionsViewCredits": "查看制作团队"
+        },
+        "phraseChangeChar": "更换角色",
+        "phraseDropOthers": "移除其他角色",
+        "phraseDropSelf": "移除当前角色",
+        "phraseForceResume": "强制恢复",
+        "phraseHoldStartToReturn": "按住开始键",
+        "phrasePressAButton": "按下一个按键",
+        "phraseTestControls": "测试按键",
+        "player": {
+            "selectPlayer1": "马力欧游戏",
+            "selectPlayer2": "路易吉游戏",
+            "selectPlayer3": "碧姬公主游戏",
+            "selectPlayer4": "奇诺比奥游戏",
+            "selectPlayer5": "林克游戏"
+        },
+        "playerSelStartGame": "开始游戏",
+        "reconnectTitle": "重新连接",
+        "wordBack": "返回",
+        "wordDisconnect": "断开",
+        "wordNo": "否",
+        "wordPlayer": "玩家",
+        "wordProfile": "配置",
+        "wordResume": "恢复",
+        "wordWaiting": "等待",
+        "wordYes": "是"
+    },
+    "outro": {
+        "cppPortBy": "C++ 移植：",
+        "customSprites": "自定义素材：",
+        "d3dsPortBy": "3DS 移植：",
+        "engineCredits": "引擎制作人员：",
+        "gameCredits": "游戏制作人员：:",
+        "levelDesign": "关卡设计：",
+        "nameAndrewSpinks": "Andrew Spinks",
+        "nameVitalyNovichkov": "Vitaly Novichkov",
+        "originalBy": "原始 VB6 代码：",
+        "psVitaPortBy": "PS Vita 移植：",
+        "specialThanks": "特别鸣谢：",
+        "wiiPortBy": "Wii 移植："
+    }
+}
