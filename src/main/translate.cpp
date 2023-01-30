@@ -115,9 +115,7 @@ static bool saveFile(const std::string &inPath, const std::string &inData)
     if(!in)
         return false;
 
-    if(std::fwrite((void*)inData.data(), 1, inData.size(), in) != inData.size())
-        ret = false;
-
+    std::fprintf(in, "%s\n", inData.c_str());
     std::fclose(in);
 
     return ret;
