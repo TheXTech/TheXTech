@@ -82,7 +82,7 @@
         "wordYes": "Yes"
     },
     "outro": {
-        "cppPortBy": "C++ port By:",
+        "cppPortDevelopers": "C++ port developers:",
         "customSprites": "Custom Sprites:",
         "d3dsPortBy": "3DS port By:",
         "engineCredits": "Engine credits:",

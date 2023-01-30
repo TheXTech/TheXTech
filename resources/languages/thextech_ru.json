@@ -82,7 +82,7 @@
         "wordYes": "Да"
     },
     "outro": {
-        "cppPortBy": "Автор C++-порта:",
+        "cppPortDevelopers": "Разработчики C++-порта:",
         "customSprites": "Доп-спрайты:",
         "d3dsPortBy": "Автор порта на 3DS:",
         "engineCredits": "Создатели движка:",

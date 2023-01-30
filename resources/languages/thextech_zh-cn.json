@@ -82,7 +82,7 @@
         "wordYes": "是"
     },
     "outro": {
-        "cppPortBy": "C++ 移植：",
+        "cppPortDevelopers": "",
         "customSprites": "自定义素材：",
         "d3dsPortBy": "3DS 移植：",
         "engineCredits": "引擎制作人员名单：",
