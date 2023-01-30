@@ -80,5 +80,19 @@
         "wordResume": "恢复",
         "wordWaiting": "等待",
         "wordYes": "是"
+    },
+    "outro": {
+        "cppPortBy": "C++ 移植：",
+        "customSprites": "自定义素材：",
+        "d3dsPortBy": "3DS 移植：",
+        "engineCredits": "引擎制作人员名单：",
+        "gameCredits": "游戏制作人员名单:",
+        "levelDesign": "关卡设计：",
+        "nameAndrewSpinks": "安德鲁·斯宾克斯",
+        "nameVitalyNovichkov": "维塔利·诺维奇科夫",
+        "originalBy": "原始 VB6 代码：",
+        "psVitaPortBy": "PS Vita 移植：",
+        "specialThanks": "特别鸣谢：",
+        "wiiPortBy": "Wii 移植："
     }
 }
