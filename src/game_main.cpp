@@ -205,7 +205,7 @@ int GameMain(const CmdLineSetup_t &setup)
     //    Loop While StartMenu = False 'wait until the player clicks a button
 
     initOutroContent();
-    initMainMenu(true);
+    initMainMenu();
     StartMenu = true;
 
     if(!CurrentLanguage.empty())

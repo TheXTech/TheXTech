@@ -80,10 +80,10 @@ std::vector<SelectWorld_t> SelectWorld;
 std::vector<SelectWorld_t> SelectWorldEditable;
 std::vector<SelectWorld_t> SelectBattle;
 
-void initMainMenu(bool forceResetAtomics)
+void initMainMenu()
 {
 #ifndef PGE_NO_THREADING
-    if(!s_atomicsInited || forceResetAtomics)
+    if(!s_atomicsInited)
     {
         SDL_AtomicSet(&loading, 0);
         SDL_AtomicSet(&loadingProgrss, 0);
