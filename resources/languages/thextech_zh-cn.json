@@ -25,9 +25,9 @@
         },
         "dropAddTitle": "Drop/Add Players",
         "editor": {
-            "editorErrorMissingResources": "Sorry! You are missing EditorIcons.png, the icons for the in-game editor.",
-            "editorErrorResolution": "Sorry! The in-game editor is not supported at your current resolution.",
-            "editorNewWorld": "<New World>"
+            "editorErrorMissingResources": "抱歉，由于缺失 EditorIcons.png（即编辑器图标文件）因此无法启动编辑器。",
+            "editorErrorResolution": "抱歉，编辑器不支持当前设置的分辨率。",
+            "editorNewWorld": "<新地图>"
         },
         "game": {
             "gameBattleRandom": "Random Level",
