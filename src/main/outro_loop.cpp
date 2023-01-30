@@ -46,11 +46,9 @@ void initOutroContent()
     g_outroScreen.originalBy = "Original VB6 code By:";
     g_outroScreen.nameAndrewSpinks = "Andrew Spinks";
 
-    g_outroScreen.cppPortBy = "C++ port By:";
+    g_outroScreen.cppPortDevelopers = "C++ port developers:";
     g_outroScreen.nameVitalyNovichkov = "Vitaly Novichkov";
 
-    g_outroScreen.d3dsPortBy = "3DS port By:";
-    g_outroScreen.wiiPortBy = "Wii port By:";
     g_outroScreen.psVitaPortBy = "PS Vita Port By:";
 
     g_outroScreen.levelDesign = "Level Design:";
@@ -293,25 +291,12 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
 #ifndef ENABLE_OLD_CREDITS
-    AddCredit(g_outroScreen.cppPortBy);
+    AddCredit(g_outroScreen.cppPortDevelopers);
     AddCredit("");
     AddCredit(g_outroScreen.nameVitalyNovichkov);
     AddCredit("'Wohlstand'");
     AddCredit("");
-    AddCredit("");
-#endif
-#ifdef __3DS__
-    AddCredit(g_outroScreen.d3dsPortBy);
-    AddCredit("");
     AddCredit("'ds-sloth'");
-    AddCredit("");
-    AddCredit("");
-#endif
-#ifdef __WII__
-    AddCredit(g_outroScreen.wiiPortBy);
-    AddCredit("");
-    AddCredit("'ds-sloth'");
-    AddCredit("");
     AddCredit("");
 #endif
 #ifdef VITA

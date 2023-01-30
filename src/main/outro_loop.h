@@ -32,11 +32,9 @@ struct OutroContent
     std::string originalBy;
     std::string nameAndrewSpinks;
 
-    std::string cppPortBy;
+    std::string cppPortDevelopers;
     std::string nameVitalyNovichkov;
 
-    std::string d3dsPortBy;
-    std::string wiiPortBy;
     std::string psVitaPortBy;
 
     std::string levelDesign;
