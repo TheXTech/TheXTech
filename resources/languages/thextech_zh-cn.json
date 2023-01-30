@@ -1,1 +1,84 @@
-(Placeholder)
+{
+    "charcter": {
+        "name1": "马力欧",
+        "name2": "路易吉",
+        "name3": "碧姬公主",
+        "name4": "奇诺比奥",
+        "name5": "林克"
+    },
+    "languageName": "简体中文",
+    "menu": {
+        "character": {
+            "charSelTitle": "选择角色"
+        },
+        "controls": {
+            "controlsConnected": "已连接：",
+            "controlsDeleteKey": "(Alt Jump to Delete)",
+            "controlsDeviceTypes": "Device Types",
+            "controlsInUse": "(In Use)",
+            "controlsNewProfile": "<New Profile>",
+            "controlsNotInUse": "(Not In Use)",
+            "controlsReallyDeleteProfile": "Really delete profile?",
+            "controlsTitle": "Controls",
+            "wordButtons": "Buttons",
+            "wordProfiles": "Profiles"
+        },
+        "dropAddTitle": "Drop/Add Players",
+        "editor": {
+            "editorErrorMissingResources": "Sorry! You are missing EditorIcons.png, the icons for the in-game editor.",
+            "editorErrorResolution": "Sorry! The in-game editor is not supported at your current resolution.",
+            "editorNewWorld": "<New World>"
+        },
+        "game": {
+            "gameBattleRandom": "Random Level",
+            "gameCopySave": "Copy save",
+            "gameEraseSave": "Erase save",
+            "gameEraseSlot": "Select the slot to erase",
+            "gameNoBattleLevels": "<No battle levels>",
+            "gameNoEpisodesToPlay": "<No episodes to play>",
+            "gameSlotContinue": "SLOT {0} ... {1}%",
+            "gameSlotNew": "SLOT {0} ... NEW GAME",
+            "gameSourceSlot": "Select the source slot",
+            "gameTargetSlot": "Now select the target"
+        },
+        "loading": "Loading...",
+        "main": {
+            "main1PlayerGame": "1 Player Game",
+            "mainBattleGame": "Battle Game",
+            "mainEditor": "Editor",
+            "mainExit": "Exit",
+            "mainMultiplayerGame": "2 Player Game",
+            "mainOptions": "Options",
+            "mainStartGame": "Start Game"
+        },
+        "options": {
+            "optionsModeFullScreen": "Fullscreen mode",
+            "optionsModeWindowed": "Windowed mode",
+            "optionsViewCredits": "View credits"
+        },
+        "phraseChangeChar": "Change Character",
+        "phraseDropOthers": "Drop Others",
+        "phraseDropSelf": "Drop Self",
+        "phraseForceResume": "Force Resume",
+        "phraseHoldStartToReturn": "Hold Start",
+        "phrasePressAButton": "Press A Button",
+        "phraseTestControls": "Test Controls",
+        "player": {
+            "selectPlayer1": "Mario game",
+            "selectPlayer2": "Luigi game",
+            "selectPlayer3": "Peach game",
+            "selectPlayer4": "Toad game",
+            "selectPlayer5": "Link game"
+        },
+        "playerSelStartGame": "Start Game",
+        "reconnectTitle": "Reconnect",
+        "wordBack": "Back",
+        "wordDisconnect": "Disconnect",
+        "wordNo": "No",
+        "wordPlayer": "Player",
+        "wordProfile": "Profile",
+        "wordResume": "Resume",
+        "wordWaiting": "Waiting",
+        "wordYes": "Yes"
+    }
+}
