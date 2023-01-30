@@ -44,7 +44,7 @@
         "loading": "Загрузка...",
         "main": {
             "main1PlayerGame": "Одиночная игра",
-            "mainBattleGame": "Режим битвы",
+            "mainBattleGame": "Битва",
             "mainEditor": "Редактор",
             "mainExit": "Выйти",
             "mainMultiplayerGame": "Игра вдвоём",
@@ -52,9 +52,9 @@
             "mainStartGame": "Начать игру"
         },
         "options": {
-            "optionsModeFullScreen": "Полноэкранный режим",
+            "optionsModeFullScreen": "На весь экран",
             "optionsModeWindowed": "Оконный режим",
-            "optionsViewCredits": "Посмотреть титры"
+            "optionsViewCredits": "Титры"
         },
         "phraseChangeChar": "Сменить персонажа",
         "phraseDropOthers": "Убрать всех",
@@ -63,9 +63,9 @@
         "phraseHoldStartToReturn": "Удерж. Старт",
         "phrasePressAButton": "Нажмите кнопку A",
         "phraseTestControls": "Проверить управление",
-        "selectCharacter": "Игра за {0}",
         "playerSelStartGame": "Начать игру",
         "reconnectTitle": "Переподключить",
+        "selectCharacter": "{0}",
         "wordBack": "Назад",
         "wordDisconnect": "Отключить",
         "wordNo": "Нет",
