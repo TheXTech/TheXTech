@@ -880,7 +880,7 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
         // only mouse available chars
         if(mouse && menuPlayer_active && CharAvailable(c+1, menuPlayer))
         {
-            Player_MenuItem_Mouse_Render(menuPlayer, c, g_mainMenu.selectPlayer[c+1],
+            Player_MenuItem_Mouse_Render(menuPlayer, c, fmt::format_ne(g_mainMenu.selectCharacter, g_gameInfo.characterName[c + 1]),
                 menu_x, y+c*line, mouse, false);
         }
         if(render)
@@ -959,7 +959,7 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
                     a = pa;
                 }
             }
-            SuperPrint(g_mainMenu.selectPlayer[c+1], 3, menu_x, y+c*line, r, g, b, a);
+            SuperPrint(fmt::format_ne(g_mainMenu.selectCharacter, g_gameInfo.characterName[c + 1]), 3, menu_x, y + (c * line), r, g, b, a);
         }
     }
 }

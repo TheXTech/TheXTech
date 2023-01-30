@@ -104,8 +104,7 @@ void initMainMenu()
 
     g_mainMenu.languageName = "English";
 
-    for(int i = 1; i <= numCharacters; ++i)
-        g_mainMenu.selectPlayer[i] = fmt::format_ne("{0} game", g_gameInfo.characterName[i]);
+    g_mainMenu.selectCharacter = "{0} game";
 
     g_mainMenu.editorNewWorld = "<New World>";
     g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";

@@ -63,13 +63,7 @@
         "phraseHoldStartToReturn": "按住开始键",
         "phrasePressAButton": "按下一个按键",
         "phraseTestControls": "测试按键",
-        "player": {
-            "selectPlayer1": "马力欧游戏",
-            "selectPlayer2": "路易吉游戏",
-            "selectPlayer3": "碧姬公主游戏",
-            "selectPlayer4": "奇诺比奥游戏",
-            "selectPlayer5": "林克游戏"
-        },
+        "selectCharacter": "{0}游戏",
         "playerSelStartGame": "开始游戏",
         "reconnectTitle": "重新连接",
         "wordBack": "返回",

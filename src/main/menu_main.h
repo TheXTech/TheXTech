@@ -101,7 +101,7 @@ struct MainMenuContent
 
     std::string languageName;
 
-    RangeArr<std::string, 1, numCharacters> selectPlayer;
+    std::string selectCharacter;
 
     std::string editorNewWorld;
     std::string editorErrorResolution;

@@ -181,6 +181,7 @@ XTechTranslate::XTechTranslate()
         {"menu.phraseDropOthers",          &g_mainMenu.phraseDropOthers},
         {"menu.phraseDropSelf",            &g_mainMenu.phraseDropSelf},
         {"menu.phraseChangeChar",          &g_mainMenu.phraseChangeChar},
+        {"menu.selectCharacter",           &g_mainMenu.selectCharacter},
 
         {"menu.controls.controlsTitle",     &g_mainMenu.controlsTitle},
         {"menu.controls.controlsConnected", &g_mainMenu.controlsConnected},
@@ -212,7 +213,6 @@ XTechTranslate::XTechTranslate()
     for(int i = 1; i <= numCharacters; ++i)
     {
         m_translationsMap.insert({fmt::format_ne("charcter.name{0}", i), &g_gameInfo.characterName[i]});
-        m_translationsMap.insert({fmt::format_ne("menu.player.selectPlayer{0}", i), &g_mainMenu.selectPlayer[i]});
     }
 }
 

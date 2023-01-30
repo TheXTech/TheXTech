@@ -63,13 +63,7 @@
         "phraseHoldStartToReturn": "Hold Start",
         "phrasePressAButton": "Press A Button",
         "phraseTestControls": "Test Controls",
-        "player": {
-            "selectPlayer1": "Mario game",
-            "selectPlayer2": "Luigi game",
-            "selectPlayer3": "Peach game",
-            "selectPlayer4": "Toad game",
-            "selectPlayer5": "Link game"
-        },
+        "selectCharacter": "{0} game",
         "playerSelStartGame": "Start Game",
         "reconnectTitle": "Reconnect",
         "wordBack": "Back",

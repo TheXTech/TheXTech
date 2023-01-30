@@ -63,13 +63,7 @@
         "phraseHoldStartToReturn": "Удерж. Старт",
         "phrasePressAButton": "Нажмите кнопку A",
         "phraseTestControls": "Проверить управление",
-        "player": {
-            "selectPlayer1": "Игра за Марио",
-            "selectPlayer2": "Игра за Луиджи",
-            "selectPlayer3": "Игра за Пич",
-            "selectPlayer4": "Игра за Тоада",
-            "selectPlayer5": "Игра за Линка"
-        },
+        "selectCharacter": "Игра за {0}",
         "playerSelStartGame": "Начать игру",
         "reconnectTitle": "Переподключить",
         "wordBack": "Назад",
