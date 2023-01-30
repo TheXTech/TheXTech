@@ -26,8 +26,12 @@
 
 class XTechTranslate
 {
-    //! Map of the translation key and the actual string container, used to simplify the maintenance
-    std::map<std::string, std::string*> m_translationsMap;
+    typedef std::map<std::string, std::string*> TrList;
+    //! Map of the engine specific translation key and the actual string container, used to simplify the maintenance
+    TrList m_engineMap;
+
+    //! Map of the assets specific translation key and the actual string container, used to simplify the maintenance
+    TrList m_assetsMap;
 
 public:
     XTechTranslate();
@@ -52,6 +56,9 @@ public:
      * \return True if language was been successfully loaded
      */
     bool translate();
+
+private:
+    bool translateFile(const std::string &file, TrList &list, const char* trTypeName);
 };
 
 #endif // TRANSLATE_H

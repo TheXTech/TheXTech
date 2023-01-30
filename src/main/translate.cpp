@@ -22,6 +22,7 @@
 #include <AppPath/app_path.h>
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
+#include <Utils/strings.h>
 #include <json/json.hpp>
 #include <fmt_format_ne.h>
 
@@ -125,7 +126,7 @@ static bool saveFile(const std::string &inPath, const std::string &inData)
 XTechTranslate::XTechTranslate()
 {
     // List of all translatable strings of the engine
-    m_translationsMap =
+    m_engineMap =
     {
         {"menu.main.mainStartGame",        &g_mainMenu.mainStartGame},
         {"menu.main.main1PlayerGame",      &g_mainMenu.main1PlayerGame},
@@ -212,8 +213,14 @@ XTechTranslate::XTechTranslate()
 
     for(int i = 1; i <= numCharacters; ++i)
     {
-        m_translationsMap.insert({fmt::format_ne("charcter.name{0}", i), &g_gameInfo.characterName[i]});
+        m_engineMap.insert({fmt::format_ne("charcter.name{0}", i), &g_gameInfo.characterName[i]});
     }
+
+
+    m_assetsMap =
+    {
+        {"languageName", &g_mainMenu.languageName},
+    };
 }
 
 void XTechTranslate::reset()
@@ -231,7 +238,7 @@ void XTechTranslate::exportTemplate()
     {
         nlohmann::json langFile;
 
-        for(auto &k : m_translationsMap)
+        for(auto &k : m_engineMap)
         {
 #ifdef DEBUG_BUILD
             std::printf("-- writing %s -> %s\n", k.first.c_str(), k.second->c_str());
@@ -239,7 +246,20 @@ void XTechTranslate::exportTemplate()
             setJsonValue(langFile, k.first, *k.second);
         }
 
-        std::printf("Lang file data: \n\n%s\n\n", langFile.dump(4, ' ', false).c_str());
+        std::printf("Lang file data (Engine): \n\n%s\n\n", langFile.dump(4, ' ', false).c_str());
+        std::fflush(stdout);
+
+        langFile.clear();
+
+        for(auto &k : m_assetsMap)
+        {
+#ifdef DEBUG_BUILD
+            std::printf("-- writing %s -> %s\n", k.first.c_str(), k.second->c_str());
+#endif
+            setJsonValue(langFile, k.first, *k.second);
+        }
+
+        std::printf("Lang file data (Assets): \n\n%s\n\n", langFile.dump(4, ' ', false).c_str());
         std::fflush(stdout);
     }
     catch(const std::exception &e)
@@ -274,10 +294,12 @@ void XTechTranslate::updateLanguages()
 
     for(auto &f : list)
     {
-        bool isEnglish = (f == "thextech_en.json");
+        bool isEnglish = Strings::endsWith(f, "_en.json");
         std::printf("-- Processing file %s...\n", f.c_str());
         std::string fullFilePath = langs.absolutePath() + "/" + f;
         bool changed = false;
+
+        TrList &trList = Strings::startsWith(f, "thextech_") ? m_engineMap : m_assetsMap;
 
         try
         {
@@ -291,7 +313,7 @@ void XTechTranslate::updateLanguages()
 
             nlohmann::json langFile = nlohmann::json::parse(data);
 
-            for(const auto &k : m_translationsMap)
+            for(const auto &k : trList)
             {
                 const std::string &res = *k.second;
                 changed |= setJsonValueIfNotExist(langFile, k.first, isEnglish ? res : std::string());
@@ -325,34 +347,62 @@ void XTechTranslate::updateLanguages()
 #endif
 }
 
+
+
 bool XTechTranslate::translate()
 {
-    std::string langFilePath = AppPathManager::languagesDir() + fmt::format_ne("thextech_{0}.json", CurrentLanguage.c_str());
-    if(!Files::fileExists(langFilePath))
-        return false; // File is not exists, do nothing
+    std::string langEngineFile = AppPathManager::languagesDir() + fmt::format_ne("thextech_{0}.json", CurrentLanguage.c_str());
+    std::string langAssetsFile = AppPathManager::languagesDir() + fmt::format_ne("assets_{0}.json", CurrentLanguage.c_str());
 
+    if(!Files::fileExists(langEngineFile) && !Files::fileExists(langAssetsFile))
+        return false; // Files are not exists, do nothing
+
+    if(Files::fileExists(langEngineFile))
+    {
+        // Engine translations
+        if(!translateFile(langEngineFile, m_engineMap, "engine"))
+            pLogWarning("Failed to apply the engine translation file %s", langEngineFile.c_str());
+    }
+
+    if(Files::fileExists(langAssetsFile))
+    {
+        // assets translations
+        if(!translateFile(langAssetsFile, m_assetsMap, "assets"))
+            pLogWarning("Failed to apply the assets translation file %s", langAssetsFile.c_str());
+    }
+
+    return true;
+}
+
+bool XTechTranslate::translateFile(const std::string& file, TrList& list, const char *trTypeName)
+{
     try
     {
         std::string data;
+        nlohmann::json langFile;
 
-        if(!dumpFile(langFilePath, data))
+        if(Files::fileExists(file))
         {
-            pLogWarning("Failed to load the translation file %s: can't open file", langFilePath.c_str());
-            return false;
-        }
+            // Engine translations
+            if(!dumpFile(file, data))
+            {
+                pLogWarning("Failed to load the %s translation file %s: can't open file", trTypeName, file.c_str());
+                return false;
+            }
 
-        nlohmann::json langFile = nlohmann::json::parse(data);
+            langFile = nlohmann::json::parse(data);
 
-        for(auto &k : m_translationsMap)
-        {
-            std::string &res = *k.second;
-            res = getJsonValue(langFile, k.first, *k.second);
+            for(auto &k : list)
+            {
+                std::string &res = *k.second;
+                res = getJsonValue(langFile, k.first, *k.second);
+            }
         }
     }
     catch(const std::exception &e)
     {
         reset();
-        pLogWarning("Failed to load the translation file %s: %s", langFilePath.c_str(), e.what());
+        pLogWarning("Failed to load the %s translation file %s: %s", trTypeName, file.c_str(), e.what());
         return false;
     }
 
