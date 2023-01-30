@@ -80,5 +80,19 @@
         "wordResume": "Resume",
         "wordWaiting": "Waiting",
         "wordYes": "Yes"
+    },
+    "outro": {
+        "cppPortBy": "C++ port By:",
+        "customSprites": "Custom Sprites:",
+        "d3dsPortBy": "3DS port By:",
+        "engineCredits": "Engine credits:",
+        "gameCredits": "Game credits:",
+        "levelDesign": "Level Design:",
+        "nameAndrewSpinks": "Andrew Spinks",
+        "nameVitalyNovichkov": "Vitaly Novichkov",
+        "originalBy": "Original VB6 code By:",
+        "psVitaPortBy": "PS Vita Port By:",
+        "specialThanks": "Special Thanks:",
+        "wiiPortBy": "Wii port By:"
     }
 }

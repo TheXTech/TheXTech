@@ -29,6 +29,7 @@
 #include "translate.h"
 #include "menu_main.h"
 #include "game_info.h"
+#include "outro_loop.h"
 
 
 static void setJsonValue(nlohmann::json &j, const std::string &key, const std::string &value)
@@ -197,6 +198,19 @@ XTechTranslate::XTechTranslate()
 
         {"menu.wordNo", &g_mainMenu.wordNo},
         {"menu.wordYes", &g_mainMenu.wordYes},
+
+        {"outro.gameCredits",           &g_outroScreen.gameCredits},
+        {"outro.engineCredits",         &g_outroScreen.engineCredits},
+        {"outro.originalBy",            &g_outroScreen.originalBy},
+        {"outro.nameAndrewSpinks",      &g_outroScreen.nameAndrewSpinks},
+        {"outro.cppPortBy",             &g_outroScreen.cppPortBy},
+        {"outro.nameVitalyNovichkov",   &g_outroScreen.nameVitalyNovichkov},
+        {"outro.d3dsPortBy",            &g_outroScreen.d3dsPortBy},
+        {"outro.wiiPortBy",             &g_outroScreen.wiiPortBy},
+        {"outro.psVitaPortBy",          &g_outroScreen.psVitaPortBy},
+        {"outro.levelDesign",           &g_outroScreen.levelDesign},
+        {"outro.customSprites",         &g_outroScreen.customSprites},
+        {"outro.specialThanks",         &g_outroScreen.specialThanks},
     };
 
     for(int i = 1; i <= numCharacters; ++i)
@@ -208,6 +222,7 @@ XTechTranslate::XTechTranslate()
 
 void XTechTranslate::reset()
 {
+    initOutroContent();
     initMainMenu();
 }
 
