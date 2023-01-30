@@ -142,7 +142,15 @@ XTechTranslate::XTechTranslate()
 
         {"languageName",                   &g_mainMenu.languageName},
 
+        {"menu.editor.editorNewWorld",     &g_mainMenu.editorNewWorld},
+        {"menu.editor.editorErrorResolution",       &g_mainMenu.editorErrorResolution},
+        {"menu.editor.editorErrorMissingResources", &g_mainMenu.editorErrorMissingResources},
+
         {"menu.character.charSelTitle",    &g_mainMenu.charSelTitle},
+
+        {"menu.game.gameNoEpisodesToPlay", &g_mainMenu.gameNoEpisodesToPlay},
+        {"menu.game.gameNoBattleLevels",   &g_mainMenu.gameNoBattleLevels},
+        {"menu.game.gameBattleRandom",     &g_mainMenu.gameBattleRandom},
 
         {"menu.game.gameSlotContinue",     &g_mainMenu.gameSlotContinue},
         {"menu.game.gameSlotNew",          &g_mainMenu.gameSlotNew},

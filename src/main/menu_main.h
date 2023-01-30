@@ -103,6 +103,14 @@ struct MainMenuContent
 
     RangeArr<std::string, 1, numCharacters> selectPlayer;
 
+    std::string editorNewWorld;
+    std::string editorErrorResolution;
+    std::string editorErrorMissingResources;
+
+    std::string gameNoEpisodesToPlay;
+    std::string gameNoBattleLevels;
+    std::string gameBattleRandom;
+
     std::string gameSlotContinue;
     std::string gameSlotNew;
 

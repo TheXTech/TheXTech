@@ -107,6 +107,14 @@ void initMainMenu(bool forceResetAtomics)
     for(int i = 1; i <= numCharacters; ++i)
         g_mainMenu.selectPlayer[i] = fmt::format_ne("{0} game", g_gameInfo.characterName[i]);
 
+    g_mainMenu.editorNewWorld = "<New World>";
+    g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";
+    g_mainMenu.editorErrorMissingResources = "Sorry! You are missing EditorIcons.png, the icons for the in-game editor.";
+
+    g_mainMenu.gameNoEpisodesToPlay = "<No episodes to play>";
+    g_mainMenu.gameNoBattleLevels = "<No battle levels>";
+    g_mainMenu.gameBattleRandom = "Random Level";
+
     g_mainMenu.gameSlotContinue = "SLOT {0} ... {1}%";
     g_mainMenu.gameSlotNew = "SLOT {0} ... NEW GAME";
     g_mainMenu.gameCopySave = "Copy save";
@@ -324,7 +332,7 @@ void FindWorlds()
         SelectWorld.clear();
         SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
         SelectWorld.emplace_back(SelectWorld_t()); // "no battle levels" entry
-        SelectWorld[1].WorldName = "<No episodes to play>";
+        SelectWorld[1].WorldName = g_mainMenu.gameNoEpisodesToPlay;
         SelectWorld[1].disabled = true;
     }
 
@@ -344,7 +352,7 @@ void FindWorlds()
     NumSelectWorld = (int)(SelectWorld.size() - 1);
 
     SelectWorld_t createWorld = SelectWorld_t();
-    createWorld.WorldName = "<New World>";
+    createWorld.WorldName = g_mainMenu.editorNewWorld;
     SelectWorldEditable.push_back(createWorld);
     NumSelectWorldEditable = (SelectWorldEditable.size() - 1);
 
@@ -378,7 +386,7 @@ void FindLevels()
 
     NumSelectBattle = 1;
     SelectBattle.emplace_back(SelectWorld_t()); // "random level" entry
-    SelectBattle[1].WorldName = "Random Level";
+    SelectBattle[1].WorldName = g_mainMenu.gameBattleRandom;
     LevelData head;
 
 #ifndef PGE_NO_THREADING
@@ -430,7 +438,7 @@ void FindLevels()
 
         NumSelectBattle = 1;
         SelectBattle.emplace_back(SelectWorld_t()); // "no battle levels" entry
-        SelectBattle[1].WorldName = "<No battle levels>";
+        SelectBattle[1].WorldName = g_mainMenu.gameNoBattleLevels;
         SelectBattle[1].disabled = true;
     }
 }
@@ -692,13 +700,13 @@ bool mainMenuUpdate()
                     if(ScreenW < 640 || ScreenH < 480)
                     {
                         PlaySoundMenu(SFX_BlockHit);
-                        MessageText = "Sorry! The in-game editor is not supported at your current resolution.";
+                        MessageText = g_mainMenu.editorErrorResolution;
                         PauseGame(PauseCode::Message);
                     }
                     else if(!GFX.EIcons.inited)
                     {
                         PlaySoundMenu(SFX_BlockHit);
-                        MessageText = "Sorry! You are missing EditorIcons.png, the icons for the in-game editor.";
+                        MessageText = g_mainMenu.editorErrorMissingResources;
                         PauseGame(PauseCode::Message);
                     }
                     else
