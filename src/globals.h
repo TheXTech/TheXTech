@@ -29,6 +29,7 @@
 #include "std_picture.h"
 
 #include "location.h"
+#include "pinched_info.h"
 #include "range_arr.hpp"
 #include "ref_type.h"
 #include "rand.h"
@@ -252,16 +253,21 @@ struct NPC_t
     int RespawnDelay = 0;
 //    Bouce As Boolean
     bool Bouce = false;
+
 //    Pinched1 As Integer  'getting smashed by a block
-    int Pinched1 = 0;
+    // int Pinched1 = 0;
 //    Pinched2 As Integer
-    int Pinched2 = 0;
+    // int Pinched2 = 0;
 //    Pinched3 As Integer
-    int Pinched3 = 0;
+    // int Pinched3 = 0;
 //    Pinched4 As Integer
-    int Pinched4 = 0;
+    // int Pinched4 = 0;
 //    MovingPinched As Integer 'required to be smashed
-    int MovingPinched = 0;
+    // int MovingPinched = 0;
+
+    // NEW: replaces above with bitfield
+    PinchedInfo_t Pinched = PinchedInfo_t();
+
 //    NetTimeout As Integer 'for online
     // int NetTimeout = 0;    // unused since SMBX64, removed
 //    RealSpeedX As Single 'the real speed of the NPC
@@ -618,17 +624,21 @@ struct Player_t
     bool Immune2 = false;
 //    ForceHitSpot3 As Boolean 'force hitspot 3 for collision detection
     bool ForceHitSpot3 = false;
+
 //'for getting smashed by a block
 //    Pinched1 As Integer
-    int Pinched1 = 0;
+    // int Pinched1 = 0;
 //    Pinched2 As Integer
-    int Pinched2 = 0;
+    // int Pinched2 = 0;
 //    Pinched3 As Integer
-    int Pinched3 = 0;
+    // int Pinched3 = 0;
 //    Pinched4 As Integer
-    int Pinched4 = 0;
+    // int Pinched4 = 0;
 //    NPCPinched As Integer 'must be > 0 for the player to get crushed
-    int NPCPinched = 0;
+    // int NPCPinched = 0;
+
+    PinchedInfo_t Pinched = PinchedInfo_t();
+
 //    m2Speed As Single
     float m2Speed = 0.0f;
 //    HoldingNPC As Integer 'What NPC is being held

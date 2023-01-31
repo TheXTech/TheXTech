@@ -1329,11 +1329,14 @@ public:
         insert(0x00000140, &Player_t::Immune);
         insert(0x00000142, &Player_t::Immune2);
         insert(0x00000144, &Player_t::ForceHitSpot3);
-        insert(0x00000146, &Player_t::Pinched1);
-        insert(0x00000148, &Player_t::Pinched2);
-        insert(0x0000014a, &Player_t::Pinched3);
-        insert(0x0000014c, &Player_t::Pinched4);
-        insert(0x0000014e, &Player_t::NPCPinched);
+
+        // handlers below
+        // insert(0x00000146, &Player_t::Pinched1);
+        // insert(0x00000148, &Player_t::Pinched2);
+        // insert(0x0000014a, &Player_t::Pinched3);
+        // insert(0x0000014c, &Player_t::Pinched4);
+        // insert(0x0000014e, &Player_t::NPCPinched);
+
         insert(0x00000150, &Player_t::m2Speed);
         insert(0x00000154, &Player_t::HoldingNPC);
         insert(0x00000156, &Player_t::CanGrabNPCs);
@@ -1365,6 +1368,25 @@ public:
             return s_locMem.getValue(&obj->Location, address - 0xC0, ftype);
         else if(address >= 0xF2 && address < 0x106) // Controls
             return s_conMem.getValue(&obj->Controls, address - 0xF2, ftype);
+        else if(address >= 0x146 && address < 0x150) // Pinched
+        {
+            switch(address)
+            {
+            case 0x146: // Pinched1
+                return valueToMem((int)obj->Pinched.Bottom1, ftype);
+            case 0x148: // Pinched2
+                return valueToMem((int)obj->Pinched.Left2, ftype);
+            case 0x14a: // Pinched3
+                return valueToMem((int)obj->Pinched.Top3, ftype);
+            case 0x14c: // Pinched4
+                return valueToMem((int)obj->Pinched.Right4, ftype);
+            case 0x14e: // NPCPinched
+                return valueToMem((int)obj->Pinched.Moving, ftype);
+            default:
+                // use default handler
+                break;
+            }
+        }
         return PlayerParent::getValue(obj, address, ftype);
     }
 
@@ -1384,6 +1406,44 @@ public:
         {
             s_conMem.setValue(&obj->Controls, address - 0xF2, value, ftype);
             return;
+        }
+        else if(address >= 0x146 && address < 0x150) // Pinched
+        {
+            int in;
+
+            memToValue(in, value, ftype);
+
+            // clamp to range
+            if(in < 0)
+                in = 0;
+            else if(in > 3)
+                in = 3;
+
+            switch(address)
+            {
+            case 0x146: // Pinched1
+                obj->Pinched.Bottom1 = in;
+                return;
+            case 0x148: // Pinched2
+                obj->Pinched.Left2 = in;
+                return;
+            case 0x14a: // Pinched3
+                obj->Pinched.Top3 = in;
+                return;
+            case 0x14c: // Pinched4
+                obj->Pinched.Right4 = in;
+                return;
+            case 0x14e: // NPCPinched
+                obj->Pinched.Moving = in;
+
+                obj->Pinched.MovingLR = (bool)in;
+                obj->Pinched.MovingUD = (bool)in;
+
+                return;
+            default:
+                // use default handler
+                break;
+            }
         }
 
         PlayerParent::setValue(obj, address, value, ftype);
@@ -1409,11 +1469,14 @@ public:
         insert(0x00000004, &NPC_t::Quicksand);
         insert(0x00000006, &NPC_t::RespawnDelay);
         insert(0x00000008, &NPC_t::Bouce);
-        insert(0x0000000a, &NPC_t::Pinched1);
-        insert(0x0000000c, &NPC_t::Pinched2);
-        insert(0x0000000e, &NPC_t::Pinched3);
-        insert(0x00000010, &NPC_t::Pinched4);
-        insert(0x00000012, &NPC_t::MovingPinched);
+
+        // handler below
+        // insert(0x0000000a, &NPC_t::Pinched1);
+        // insert(0x0000000c, &NPC_t::Pinched2);
+        // insert(0x0000000e, &NPC_t::Pinched3);
+        // insert(0x00000010, &NPC_t::Pinched4);
+        // insert(0x00000012, &NPC_t::MovingPinched);
+
         // insert(0x00000014, &NPC_t::NetTimeout); // unused since SMBX64, now removed
         insert(0x00000018, &NPC_t::RealSpeedX);
         insert(0x0000001c, &NPC_t::Wet);
@@ -1499,7 +1562,25 @@ public:
             return obj->Reset[1] ? 0xFFFF : 0;
         else if(address == 0x128)
             return obj->Reset[2] ? 0xFFFF : 0;
-
+        else if(address >= 0x0A && address < 0x14) // Pinched
+        {
+            switch(address)
+            {
+            case 0x0A: // Pinched1
+                return valueToMem((int)obj->Pinched.Bottom1, ftype);
+            case 0x0C: // Pinched2
+                return valueToMem((int)obj->Pinched.Left2, ftype);
+            case 0x0E: // Pinched3
+                return valueToMem((int)obj->Pinched.Top3, ftype);
+            case 0x10: // Pinched4
+                return valueToMem((int)obj->Pinched.Right4, ftype);
+            case 0x12: // MovingPinched
+                return valueToMem((int)obj->Pinched.Moving, ftype);
+            default:
+                // use default handler
+                break;
+            }
+        }
         return NpcParent::getValue(obj, address, ftype);
     }
 
@@ -1523,6 +1604,40 @@ public:
         else if(address == 0x128)
         {
             obj->Reset[2] = value != 0;
+        }
+        else if(address >= 0x0A && address < 0x14) // Pinched
+        {
+            int in;
+
+            memToValue(in, value, ftype);
+
+            // clamp to range
+            if(in < 0)
+                in = 0;
+            else if(in > 3)
+                in = 3;
+
+            switch(address)
+            {
+            case 0x0A: // Pinched1
+                obj->Pinched.Bottom1 = in;
+                return;
+            case 0x0C: // Pinched2
+                obj->Pinched.Left2 = in;
+                return;
+            case 0x0E: // Pinched3
+                obj->Pinched.Top3 = in;
+                return;
+            case 0x10: // Pinched4
+                obj->Pinched.Right4 = in;
+                return;
+            case 0x12: // MovingPinched
+                obj->Pinched.Moving = in;
+                return;
+            default:
+                // use default handler
+                break;
+            }
         }
 
         NpcParent::setValue(obj, address, value, ftype);
