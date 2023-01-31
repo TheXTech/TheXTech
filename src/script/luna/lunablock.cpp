@@ -21,6 +21,7 @@
 #include "lunablock.h"
 #include "collision.h"
 
+#include "main/trees.h"
 
 Block_t *BlocksF::Get(int index)
 {
@@ -73,18 +74,15 @@ void BlocksF::HideAll(int type)
 bool BlocksF::IsPlayerTouchingType(int type, int sought, Player_t *demo)
 {
     //    Block* blocks = Blocks::GetBase();
-    Block_t *block = nullptr;
     double playerX = demo->Location.X - 0.20;
     double playerY = demo->Location.Y - 0.20;
     double playerX2 = demo->Location.X + demo->Location.Width + 0.20;
     double playerY2 = demo->Location.Y + demo->Location.Height + 0.20;
 
-    for(int i = 1; i <= numBlock; i++)
+    for(Block_t* block : treeBlockQuery(demo->Location, SORTMODE_NONE))
     {
-        if(Block[i].Type == type)
+        if(block->Type == type)
         {
-            block = &Block[i];
-
             if(playerX > block->Location.X + block->Location.Width ||
                playerX2 < block->Location.X  ||
                playerY > block->Location.Y + block->Location.Height ||

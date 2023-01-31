@@ -657,7 +657,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         npc.Active = true;
         npc.JustActivated = 1;
 
-        syncLayers_NPC(numNPCs);
         CheckSectionNPC(numNPCs);
 
         if(npc.Type == NPCID_CHECKPOINT) // Is a checkpoint
@@ -686,6 +685,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                     npc.Killed = 9;
             }
         }
+
+        syncLayers_NPC(numNPCs);
     }
 
 

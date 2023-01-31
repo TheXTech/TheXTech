@@ -293,22 +293,19 @@ void CSpriteManager::RunSprites()
     ClearInvalidSprites();
     Player_t *demo = PlayerF::Get(1);
 
-    if(demo)
+    if(demo && GamePaused == PauseCode::None)
     {
         // Process each
-        if(GamePaused == PauseCode::None)
+        for(auto &iter : m_SpriteList)
         {
-            for(auto &iter : m_SpriteList)
+            if(!iter->m_Invalidated)  // Don't process invalids
             {
-                if(!iter->m_Invalidated)  // Don't process invalids
-                {
-                    if(ComputeLevelSection((int)iter->m_Xpos, (int)iter->m_Ypos) == demo->Section + 1 ||
-                       iter->m_AlwaysProcess || iter->m_StaticScreenPos)   // Valid level section to process in?
-                        iter->Process();
-                }
-                else
-                    m_hasInvalid = true;
+                if(ComputeLevelSection((int)iter->m_Xpos, (int)iter->m_Ypos) == demo->Section + 1 ||
+                   iter->m_AlwaysProcess || iter->m_StaticScreenPos)   // Valid level section to process in?
+                    iter->Process();
             }
+            else
+                m_hasInvalid = true;
         }
 
         // Draw each

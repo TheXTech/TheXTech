@@ -161,20 +161,22 @@ void GetMenuPos(int* MenuX, int* MenuY)
 {
     *MenuX = ScreenW / 2 - 100;
     *MenuY = ScreenH - 250;
+
     if(ScreenW < TinyScreenW)
     {
         *MenuX = ScreenW / 2 - 240;
         if(*MenuX < 24)
             *MenuX = 24;
     }
+
     if(ScreenH < TinyScreenH)
         *MenuY = 100;
     else if(ScreenH < SmallScreenH)
         *MenuY = ScreenH - 180;
+
     if(MenuMode == MENU_CHARACTER_SELECT_NEW)
     {
-        if(ScreenH < TinyScreenH);
-        else if(ScreenH < SmallScreenH)
+        if(ScreenH >= TinyScreenH && ScreenH < SmallScreenH)
             *MenuY -= 40;
     }
 }
@@ -2121,7 +2123,9 @@ void mainMenuDraw()
 #endif
 #if !defined(FIXED_RES)
         SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + (30 * i++));
+
         std::string resString = fmt::format_ne("RES: {0}x{1}", g_config.InternalW, g_config.InternalH);
+
         if (g_config.InternalW == 480 && g_config.InternalH == 320)
             resString += " (GBA)";
         else if (g_config.InternalW == 512 && g_config.InternalH == 384)
@@ -2144,7 +2148,8 @@ void mainMenuDraw()
             resString = "RES: DYNAMIC";
         else
             resString += " (CUSTOM)";
-        SuperPrint(resString, 3, MenuX, MenuY + 30*i++);
+
+        SuperPrint(resString, 3, MenuX, MenuY + (30 * i++));
 #endif
         SuperPrint("VIEW CREDITS", 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
