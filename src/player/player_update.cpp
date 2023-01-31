@@ -2069,7 +2069,10 @@ void UpdatePlayer()
                             Player[A].Location.SpeedX = 0;
                         Player[A].Pinched.Left2 = 2;
                         if(AutoX[Player[A].Section] != 0.0f)
+                        {
                             Player[A].Pinched.Moving = 2;
+                            Player[A].Pinched.MovingLR = true;
+                        }
                     }
                     else if(Player[A].Location.X + Player[A].Location.Width > level[Player[A].Section].Width)
                     {
@@ -2078,7 +2081,10 @@ void UpdatePlayer()
                             Player[A].Location.SpeedX = 0;
                         Player[A].Pinched.Right4 = 2;
                         if(AutoX[Player[A].Section] != 0.f)
+                        {
                             Player[A].Pinched.Moving = 2;
+                            Player[A].Pinched.MovingLR = true;
+                        }
                     }
                 }
 
@@ -2086,7 +2092,10 @@ void UpdatePlayer()
                 {
                     Player[A].Location.Y = level[Player[A].Section].Y - Player[A].Location.Height - 32;
                     if(AutoY[Player[A].Section] != 0.f)
+                    {
                         Player[A].Pinched.Moving = 3;
+                        Player[A].Pinched.MovingUD = true;
+                    }
                 }
 
                 // gives the players the sparkles when he is flying
@@ -2148,7 +2157,15 @@ void UpdatePlayer()
                 if(Player[A].Pinched.Right4 > 0)
                     Player[A].Pinched.Right4 -= 1;
                 if(Player[A].Pinched.Moving > 0)
+                {
                     Player[A].Pinched.Moving -= 1;
+
+                    if(Player[A].Pinched.Moving == 0)
+                    {
+                        Player[A].Pinched.MovingLR = false;
+                        Player[A].Pinched.MovingUD = false;
+                    }
+                }
 
                 if(Player[A].Character == 5 && Player[A].Duck && (Player[A].Location.SpeedY == Physics.PlayerGravity || Player[A].StandingOnNPC != 0 || Player[A].Slope != 0))
                 {
@@ -2547,7 +2564,10 @@ void UpdatePlayer()
                                                 Player[A].FairyTime = 0;
                                             Player[A].Pinched.Bottom1 = 2; // for players getting squashed
                                             if(Block[B].Location.SpeedY != 0)
+                                            {
                                                 Player[A].Pinched.Moving = 2;
+                                                Player[A].Pinched.MovingUD = true;
+                                            }
                                             Player[A].Vine = 0; // stop climbing because you are now walking
                                             if(Player[A].Mount == 2) // for the clown car, make a niose and pound the ground if moving down fast enough
                                             {
@@ -2628,7 +2648,10 @@ void UpdatePlayer()
                                                     Player[A].mountBump = -Player[A].mountBump + Player[A].Location.X;
                                                 Player[A].Pinched.Left2 = 2;
                                                 if(Block[B].Location.SpeedX != 0)
+                                                {
                                                     Player[A].Pinched.Moving = 2;
+                                                    Player[A].Pinched.MovingLR = true;
+                                                }
                                             }
                                         }
                                         else if(HitSpot == 4) // hit the block from the left -------.
@@ -2644,14 +2667,20 @@ void UpdatePlayer()
                                                 Player[A].mountBump = -Player[A].mountBump + Player[A].Location.X;
                                             Player[A].Pinched.Right4 = 2;
                                             if(Block[B].Location.SpeedX != 0)
+                                            {
                                                 Player[A].Pinched.Moving = 2;
+                                                Player[A].Pinched.MovingLR = true;
+                                            }
                                         }
                                         else if(HitSpot == 3) // hit the block from below
                                         {
                                             if(!Player[A].ForceHitSpot3 && !Player[A].StandUp)
                                                 Player[A].Pinched.Top3 = 2;
                                             if(Block[B].Location.SpeedY != 0)
+                                            {
                                                 Player[A].Pinched.Moving = 2;
+                                                Player[A].Pinched.MovingUD = true;
+                                            }
                                             tempHit = true;
                                             if(tempBlockHit[1] == 0)
                                                 tempBlockHit[1] = B;
@@ -2683,7 +2712,15 @@ void UpdatePlayer()
                                                 else
                                                     Player[A].Pinched.Left2 = 2;
                                                 if(Block[B].Location.SpeedX != 0 || Block[B].Location.SpeedY != 0)
+                                                {
                                                     Player[A].Pinched.Moving = 2;
+
+                                                    if(Block[B].Location.SpeedX != 0)
+                                                        Player[A].Pinched.MovingLR = true;
+
+                                                    if(Block[B].Location.SpeedY != 0)
+                                                        Player[A].Pinched.MovingUD = true;
+                                                }
                                                 tempLocation.X = Player[A].Location.X;
                                                 tempLocation.Width = Player[A].Location.Width;
                                                 tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height;
@@ -3980,7 +4017,13 @@ void UpdatePlayer()
                                                         Player[A].Pinched.Right4 = 2;
 
                                                         if(NPC[B].Type != 31 && NPC[B].Type != 32 && NPC[B].Type != 57 && (NPC[B].Location.SpeedX != 0 || NPC[B].Location.SpeedY != 0 || NPC[B].BeltSpeed))
+                                                        {
                                                             Player[A].Pinched.Moving = 2;
+
+                                                            if(NPC[B].Location.SpeedX != 0 || NPC[B].BeltSpeed)
+                                                                Player[A].Pinched.MovingLR = true;
+                                                        }
+
                                                         Player[A].Location.X = NPC[B].Location.X - Player[A].Location.Width - 0.1;
                                                         tempHit2 = true;
                                                         Player[A].RunCount = 0;
@@ -4011,8 +4054,15 @@ void UpdatePlayer()
                                                     else
                                                     {
                                                         Player[A].Pinched.Left2 = 2;
+
                                                         if(NPC[B].Type != 31 && NPC[B].Type != 32 && NPC[B].Type != 57 && (NPC[B].Location.SpeedX != 0 || NPC[B].Location.SpeedY != 0 || NPC[B].BeltSpeed))
+                                                        {
                                                             Player[A].Pinched.Moving = 2;
+
+                                                            if(NPC[B].Location.SpeedX != 0 || NPC[B].BeltSpeed)
+                                                                Player[A].Pinched.MovingLR = true;
+                                                        }
+
                                                         Player[A].Location.X = NPC[B].Location.X + NPC[B].Location.Width + 0.01;
                                                         tempHit2 = true;
                                                         Player[A].RunCount = 0;
@@ -4376,7 +4426,11 @@ void UpdatePlayer()
                 // pinch code
                 if(!GodMode)
                 {
-                    if(((Player[A].Pinched.Bottom1 > 0 && Player[A].Pinched.Top3 > 0) || (Player[A].Pinched.Left2 > 0 && Player[A].Pinched.Right4 > 0)) && Player[A].Pinched.Moving > 0 && Player[A].Mount != 2)
+                    bool pinch_death = (g_compatibility.fix_player_crush_death)
+                        ? ((Player[A].Pinched.Bottom1 > 0 && Player[A].Pinched.Top3 > 0 && Player[A].Pinched.MovingUD) || (Player[A].Pinched.Left2 > 0 && Player[A].Pinched.Right4 > 0 && Player[A].Pinched.MovingLR))
+                        : (((Player[A].Pinched.Bottom1 > 0 && Player[A].Pinched.Top3 > 0) || (Player[A].Pinched.Left2 > 0 && Player[A].Pinched.Right4 > 0)) && Player[A].Pinched.Moving > 0);
+
+                    if(pinch_death && Player[A].Mount != 2)
                     {
                         if(Player[A].Mount != 2)
                             Player[A].Mount = 0;
