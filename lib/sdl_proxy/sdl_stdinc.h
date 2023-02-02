@@ -84,6 +84,7 @@ inline value_t SDL_max(value_t x, value_t y)
     return x > y ? x : y;
 }
 
+SDL_IMPORT(malloc)
 SDL_IMPORT(free)
 
 SDL_IMPORT(memset)
