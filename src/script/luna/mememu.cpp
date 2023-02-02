@@ -28,6 +28,8 @@
 #include "global_constants.h"
 #include "layers.h"
 #include "game_main.h" // GamePaused
+#include "main/trees.h" // treeNPCUpdate
+#include "npc/npc_queues.h"
 #include "main/cheat_code.h"
 
 #include <unordered_map>
@@ -544,6 +546,7 @@ public:
         insert(0x00B25728, &NoMap);
         insert(0x00B2572A, &RestartLevel);
 
+        // should all be read-only
         insert(0x00B257A4, &numTiles);
         insert(0x00B257A6, &numScenes);
         insert(0x00B258E0, &numWorldPaths);
@@ -1610,7 +1613,21 @@ public:
 
         // insert(0x00000000, &NPC_t::AttLayer);
         insert(0x00000004, &NPC_t::Quicksand);
-        insert(0x00000006, &NPC_t::RespawnDelay);
+        insert(0x00000006, // RespawnDelay
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.RespawnDelay, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                memToValue(n.RespawnDelay, in, ftype);
+
+                if(n.RespawnDelay)
+                    NPCQueues::RespawnDelay.insert(n);
+                else
+                    NPCQueues::RespawnDelay.erase(n);
+            }
+        );
         insert(0x00000008, &NPC_t::Bouce);
 
         // handler below
@@ -1621,13 +1638,43 @@ public:
         // insert(0x00000012, &NPC_t::MovingPinched);
 
         // insert(0x00000014, &NPC_t::NetTimeout); // unused since SMBX64, now removed
-        insert(0x00000018, &NPC_t::RealSpeedX);
+        insert(0x00000018, // RealSpeedX
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.RealSpeedX, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                memToValue(n.RealSpeedX, in, ftype);
+                NPCQueues::Unchecked.push_back(n);
+            }
+        );
         insert(0x0000001c, &NPC_t::Wet);
         // insert(0x0000001e, &NPC_t::Settings); // unused since SMBX64, now removed
         insert(0x00000020, &NPC_t::NoLavaSplash);
         insert(0x00000022, &NPC_t::Slope);
-        insert(0x00000024, &NPC_t::Multiplier);
-        insert(0x00000026, &NPC_t::TailCD);
+        insert(0x00000024, // Multiplier
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.Multiplier, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                memToValue(n.Multiplier, in, ftype);
+                NPCQueues::Unchecked.push_back(n);
+            }
+        );
+        insert(0x00000026, // TailCD
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.TailCD, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                memToValue(n.TailCD, in, ftype);
+                NPCQueues::Unchecked.push_back(n);
+            }
+        );
         insert(0x00000028, &NPC_t::Shadow);
         // insert(0x0000002c, &NPC_t::TriggerActivate);
         // insert(0x00000030, &NPC_t::TriggerDeath);
@@ -1648,20 +1695,63 @@ public:
         insert(0x0000005c, &NPC_t::BeltSpeed);
         insert(0x00000060, &NPC_t::standingOnPlayer);
         insert(0x00000062, &NPC_t::standingOnPlayerY);
-        insert(0x00000064, &NPC_t::Generator);
+        insert(0x00000064, // Generator
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.Generator, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                memToValue(n.Generator, in, ftype);
+
+                if(n.Generator)
+                    NPCQueues::Active.insert(n);
+                else if(!NPCQueues::check_active(n))
+                    NPCQueues::Active.erase(n);
+            }
+        );
         insert(0x00000068, &NPC_t::GeneratorTimeMax);
         insert(0x0000006c, &NPC_t::GeneratorTime);
         insert(0x00000070, &NPC_t::GeneratorDirection);
         insert(0x00000072, &NPC_t::GeneratorEffect);
         insert(0x00000074, &NPC_t::GeneratorActive);
-        insert(0x00000076, &NPC_t::playerTemp);
+        insert(0x00000076, // playerTemp
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.playerTemp, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool prev = n.playerTemp;
+
+                memToValue(n.playerTemp, in, ftype);
+
+                if(!prev && n.playerTemp)
+                    NPCQueues::PlayerTemp.push_back(n);
+            }
+        );
         // insert(0x00000078, &NPC_t::Location); // between 0x78 and 0xA8
         // insert(0x000000a8, &NPC_t::DefaultLocation); // between 0xA8 and 0xD8
         insert(0x000000d8, &NPC_t::DefaultDirection);
         insert(0x000000dc, &NPC_t::DefaultType);
         insert(0x000000de, &NPC_t::DefaultSpecial);
         insert(0x000000e0, &NPC_t::DefaultSpecial2);
-        insert(0x000000e2, &NPC_t::Type);
+        insert(0x000000e2, // Type
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.Type, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                memToValue(n.Type, in, ftype);
+
+                // may have switched to/from an always-active type
+                if(NPCQueues::check_active(n))
+                    NPCQueues::Active.insert(n);
+                else
+                    NPCQueues::Active.erase(n);
+            }
+        );
         insert(0x000000e4, &NPC_t::Frame);
         insert(0x000000e8, &NPC_t::FrameCount);
         insert(0x000000ec, &NPC_t::Direction);
@@ -1672,8 +1762,39 @@ public:
         insert(0x00000110, &NPC_t::Special5);
         insert(0x00000118, &NPC_t::Special6);
         insert(0x00000120, &NPC_t::TurnAround);
-        insert(0x00000122, &NPC_t::Killed);
-        insert(0x00000124, &NPC_t::Active);
+        insert(0x00000122, // Killed
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.Killed, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                bool prev = (n.Killed != 0);
+
+                memToValue(n.Killed, in, ftype);
+
+                if(!prev && n.Killed != 0)
+                    NPCQueues::Killed.push_back(n);
+            }
+        );
+        insert(0x00000124, // Active
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.Active, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                memToValue(n.Active, in, ftype);
+
+                if(n.Active)
+                    NPCQueues::Active.insert(n);
+                else if(!NPCQueues::check_active(n))
+                {
+                    NPCQueues::Active.erase(n);
+                    NPCQueues::Unchecked.push_back(n);
+                }
+            }
+        );
         // insert(0x00000126, &NPC_t::Reset);
         insert(0x0000012a, &NPC_t::TimeLeft);
         insert(0x0000012c, &NPC_t::HoldingPlayer);
@@ -1687,12 +1808,36 @@ public:
         insert(0x00000144, &NPC_t::Effect3);
         insert(0x00000146, &NPC_t::Section);
         insert(0x00000148, &NPC_t::Damage);
-        insert(0x0000014c, &NPC_t::JustActivated);
+        insert(0x0000014c, // JustActivated
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.JustActivated, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                memToValue(n.JustActivated, in, ftype);
+
+                if(n.JustActivated)
+                    NPCQueues::Active.insert(n);
+                else if(!NPCQueues::check_active(n))
+                    NPCQueues::Active.erase(n);
+            }
+        );
         insert(0x0000014e, &NPC_t::Block);
         insert(0x00000150, &NPC_t::tempBlock);
         insert(0x00000152, &NPC_t::onWall);
         insert(0x00000154, &NPC_t::TurnBackWipe);
-        insert(0x00000156, &NPC_t::Immune);
+        insert(0x00000156, // Immune
+            [](const NPC_t& n, FIELDTYPE ftype)->double
+            {
+                return valueToMem(n.Immune, ftype);
+            },
+            [](NPC_t& n, double in, FIELDTYPE ftype)->void
+            {
+                memToValue(n.Immune, in, ftype);
+                NPCQueues::Unchecked.push_back(n);
+            }
+        );
     }
 
     double getValue(NPC_t *obj, size_t address, FIELDTYPE ftype) override
@@ -1732,7 +1877,9 @@ public:
         if(address >= 0x78 && address < 0xA8) // Location
         {
             s_locMem.setValue(&obj->Location, address - 0x78, value, ftype);
-            // sync trees for NPC eventually
+
+            NPCQueues::Unchecked.push_back(obj);
+            treeNPCUpdate(obj);
             return;
         }
         else if(address >= 0xA8 && address < 0xD8) // DefaultLocation
@@ -1743,10 +1890,20 @@ public:
         else if(address == 0x126)
         {
             obj->Reset[1] = value != 0;
+
+            if(value == 0)
+                NPCQueues::NoReset.push_back(obj);
+
+            return;
         }
         else if(address == 0x128)
         {
             obj->Reset[2] = value != 0;
+
+            if(value == 0)
+                NPCQueues::NoReset.push_back(obj);
+
+            return;
         }
         else if(address >= 0x0A && address < 0x14) // Pinched
         {
