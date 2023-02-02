@@ -2562,12 +2562,21 @@ void UpdatePlayer()
                                         {
                                             if(Player[A].Fairy && (Player[A].FairyCD > 0 || Player[A].Location.SpeedY > 0))
                                                 Player[A].FairyTime = 0;
-                                            Player[A].Pinched.Bottom1 = 2; // for players getting squashed
-                                            if(Block[B].Location.SpeedY != 0)
+
+                                            // add more generous margin to prevent unfair crush death with sloped floor
+                                            bool ignore = (g_compatibility.fix_player_crush_death
+                                                && (Block[B].Location.X + Block[B].Location.Width - 2 < Player[A].Location.X
+                                                    || Player[A].Location.X + Player[A].Location.Width - 2 < Block[B].Location.X));
+
+                                            if(!ignore)
+                                                Player[A].Pinched.Bottom1 = 2; // for players getting squashed
+
+                                            if(Block[B].Location.SpeedY != 0 && !ignore)
                                             {
                                                 Player[A].Pinched.Moving = 2;
                                                 Player[A].Pinched.MovingUD = true;
                                             }
+
                                             Player[A].Vine = 0; // stop climbing because you are now walking
                                             if(Player[A].Mount == 2) // for the clown car, make a niose and pound the ground if moving down fast enough
                                             {
@@ -2674,13 +2683,20 @@ void UpdatePlayer()
                                         }
                                         else if(HitSpot == 3) // hit the block from below
                                         {
-                                            if(!Player[A].ForceHitSpot3 && !Player[A].StandUp)
+                                            // add more generous margin to prevent unfair crush death with sloped ceiling
+                                            bool ignore = (g_compatibility.fix_player_crush_death
+                                                && (Block[B].Location.X + Block[B].Location.Width - 2 < Player[A].Location.X
+                                                    || Player[A].Location.X + Player[A].Location.Width - 2 < Block[B].Location.X));
+
+                                            if(!Player[A].ForceHitSpot3 && !Player[A].StandUp && !ignore)
                                                 Player[A].Pinched.Top3 = 2;
-                                            if(Block[B].Location.SpeedY != 0)
+
+                                            if(Block[B].Location.SpeedY != 0 && !ignore)
                                             {
                                                 Player[A].Pinched.Moving = 2;
                                                 Player[A].Pinched.MovingUD = true;
                                             }
+
                                             tempHit = true;
                                             if(tempBlockHit[1] == 0)
                                                 tempBlockHit[1] = B;
