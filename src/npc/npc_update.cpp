@@ -914,7 +914,7 @@ void UpdateNPCs()
                 else if(NPC[A].Type == 21)
                     NPC[A].Special = 100;
             }
-            else if(!NPC[A].Generator && !NPCQueues::check_active_type(NPC[A]))
+            else if(!NPC[A].Generator && !NPCQueues::check_active(NPC[A]))
                 NPCQueues::Active.erase(A);
 
             if(NPC[A].Type == 84 || NPC[A].Type == 181)
