@@ -117,7 +117,7 @@ RangeArrI<int, 0, maxSections, 0> bgMusicREAL;
 RangeArrI<int, 0, maxSections, 0> Background2REAL;
 RangeArr<Location_t, 0, maxSections> LevelREAL;
 int curMusic = 0;
-RangeArrI<long, 0, maxSections, 0> bgColor;
+// RangeArrI<long, 0, maxSections, 0> bgColor;    // unused since SMBX64, removed
 RangeArrI<int, 0, maxSections, 0> Background2;
 RangeArr<WorldPath_t, 1, maxWorldPaths> WorldPath;
 int numWorldPaths = 0;

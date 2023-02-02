@@ -112,7 +112,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         section.size_right = s.Width;
         section.size_bottom  = s.Height;
         section.music_id = bgMusic[i];
-        section.bgcolor = bgColor[i];
+        // section.bgcolor = bgColor[i];    // unused since SMBX64, removed
         section.wrap_h = LevelWrap[i];
         section.wrap_v = LevelVWrap[i];
         section.OffScreenEn = OffScreenExit[i];

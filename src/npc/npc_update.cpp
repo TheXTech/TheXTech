@@ -4390,6 +4390,9 @@ void UpdateNPCs()
                     if(NPC[A].Type == 179 || NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70 || (NPC[A].Type >= 78 && NPC[A].Type <= 83))
                         NPC[A].Projectile = false;
                 }
+
+                // obsolete code commented out in SMBX64
+
                 // Pinched code
                 // If .Direction <> oldDirection Then
                 // .PinchCount += 10
@@ -4407,7 +4410,9 @@ void UpdateNPCs()
                 // ElseIf .PinchCount = 0 Then
                 // .Pinched = False
                 // End If
-                NPC[A].Pinched = false;
+
+                // NPC[A].Pinched = false;    // never set to true since SMBX64, removed
+
                 // Special Code for things that work while held
                 if(NPC[A].Type == 134) // SMB2 Bomb
                 {

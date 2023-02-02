@@ -1414,10 +1414,10 @@ public:
         insert(0x0000000e, &NPC_t::Pinched3);
         insert(0x00000010, &NPC_t::Pinched4);
         insert(0x00000012, &NPC_t::MovingPinched);
-        insert(0x00000014, &NPC_t::NetTimeout);
+        // insert(0x00000014, &NPC_t::NetTimeout); // unused since SMBX64, now removed
         insert(0x00000018, &NPC_t::RealSpeedX);
         insert(0x0000001c, &NPC_t::Wet);
-        insert(0x0000001e, &NPC_t::Settings);
+        // insert(0x0000001e, &NPC_t::Settings); // unused since SMBX64, now removed
         insert(0x00000020, &NPC_t::NoLavaSplash);
         insert(0x00000022, &NPC_t::Slope);
         insert(0x00000024, &NPC_t::Multiplier);
@@ -1436,9 +1436,9 @@ public:
         insert(0x0000004a, &NPC_t::DefaultStuck);
         // insert(0x0000004c, &NPC_t::Text);
         insert(0x00000050, &NPC_t::oldAddBelt);
-        insert(0x00000054, &NPC_t::PinchCount);
-        insert(0x00000056, &NPC_t::Pinched);
-        insert(0x00000058, &NPC_t::PinchedDirection);
+        // insert(0x00000054, &NPC_t::PinchCount); // unused since SMBX64, now removed
+        // insert(0x00000056, &NPC_t::Pinched); // unused since SMBX64, now removed
+        // insert(0x00000058, &NPC_t::PinchedDirection); // unused since SMBX64, now removed
         insert(0x0000005c, &NPC_t::BeltSpeed);
         insert(0x00000060, &NPC_t::standingOnPlayer);
         insert(0x00000062, &NPC_t::standingOnPlayerY);
