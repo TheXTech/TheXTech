@@ -33,6 +33,8 @@ Changelog for 1.3.6.1
 -Added game save info (score, lives, coins, etc) display to the main menu screen. (@ds-sloth)
 -Allow a single player to reconnect their controls at the menu screen. (@ds-sloth)
 -In Magic Hand mode, cursor now snaps to current layer's grid, instead of global grid. (@ds-sloth)
+-Fixed vanilla bug where player could be crushed by a sloped ceiling (@ds-sloth)
+-Fixed vanilla bug where player could be crushed by a horizontally (not vertically) moving ceiling (@ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)
