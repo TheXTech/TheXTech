@@ -27,12 +27,16 @@
 #include <fmt_format_ne.h>
 
 #include "globals.h"
-#include "translate.h"
+
 #include "fontman/font_manager.h"
 #include "core/language.h"
-#include "menu_main.h"
-#include "game_info.h"
-#include "outro_loop.h"
+
+#include "main/translate.h"
+#include "main/menu_main.h"
+#include "main/game_info.h"
+#include "main/outro_loop.h"
+
+#include "editor/editor_strings.h"
 
 
 static void setJsonValue(nlohmann::json &j, const std::string &key, const std::string &value)
@@ -211,6 +215,48 @@ XTechTranslate::XTechTranslate()
         {"outro.levelDesign",           &g_outroScreen.levelDesign},
         {"outro.customSprites",         &g_outroScreen.customSprites},
         {"outro.specialThanks",         &g_outroScreen.specialThanks},
+
+
+        {"editor.block.pickContents1",      &g_editorStrings.pickBlockContents1},
+        {"editor.block.pickContents2",      &g_editorStrings.pickBlockContents2},
+
+        {"editor.npc.inContainer",          &g_editorStrings.npcInContainer},
+        {"editor.npc.inertNice",            &g_editorStrings.npcInertNice},
+        {"editor.npc.stuckStop",            &g_editorStrings.npcStuckStop},
+        {"editor.npc.abbrevGen",            &g_editorStrings.npcAbbrevGen},
+
+        {"editor.npc.ai.aiIs",              &g_editorStrings.npcAiIs},
+        {"editor.npc.ai.target",            &g_editorStrings.npcAiTarget},
+        {"editor.npc.ai.jump",              &g_editorStrings.npcAiJump},
+        {"editor.npc.ai.leap",              &g_editorStrings.npcAiLeap},
+        {"editor.npc.ai.swim",              &g_editorStrings.npcAiSwim},
+        {"editor.npc.ai.LR",                &g_editorStrings.npcAiLR},
+        {"editor.npc.ai.UD",                &g_editorStrings.npcAiUD},
+
+        {"editor.npc.ai.headerCustomAi",    &g_editorStrings.npcCustomAi},
+
+        {"editor.npc.ai.use1_0Ai",          &g_editorStrings.npcUse1_0Ai},
+        {"editor.npc.tooltipExpandSection", &g_editorStrings.npcTooltipExpandSection},
+
+        {"editor.wordNPC.nominative",       &g_editorStrings.wordNPC},
+        {"editor.wordNPC.genitive",         &g_editorStrings.wordNPCGenitive},
+
+        {"editor.wordEvent.nominative",     &g_editorStrings.wordEvent},
+        {"editor.wordEvent.genitive",       &g_editorStrings.wordEventGenitive},
+
+        {"editor.wordText",                 &g_editorStrings.wordText},
+        {"editor.phraseTextOf",             &g_editorStrings.phraseTextOf},
+        {"editor.phraseSectionIndex",       &g_editorStrings.phraseSectionIndex},
+        {"editor.phraseRadiusIndex",        &g_editorStrings.phraseRadiusIndex},
+
+        {"editor.events.header",            &g_editorStrings.eventsHeader},
+        {"editor.events.letterActivate",    &g_editorStrings.eventsLetterActivate},
+        {"editor.events.letterDeath",       &g_editorStrings.eventsLetterDeath},
+        {"editor.events.letterTalk",        &g_editorStrings.eventsLetterTalk},
+        {"editor.events.letterLayerClear",  &g_editorStrings.eventsLetterLayerClear},
+
+        {"editor.layer.label",              &g_editorStrings.labelLayer},
+        {"editor.layer.labelAbbrevAttLayer", &g_editorStrings.labelAbbrevAttLayer},
     };
 
     for(int i = 1; i <= numCharacters; ++i)
@@ -229,6 +275,7 @@ void XTechTranslate::reset()
 {
     initOutroContent();
     initMainMenu();
+    initEditorStrings();
 }
 
 void XTechTranslate::exportTemplate()

@@ -67,6 +67,7 @@
 #include "main/menu_main.h"
 #include "main/game_info.h"
 #include "main/outro_loop.h"
+#include "editor/editor_strings.h"
 #include "main/translate.h"
 #include "main/record.h"
 #include "core/render.h"
@@ -206,6 +207,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
     initOutroContent();
     initMainMenu();
+    initEditorStrings();
     StartMenu = true;
 
     if(!CurrentLanguage.empty())

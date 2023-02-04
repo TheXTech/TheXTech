@@ -22,6 +22,7 @@
 
 #include <PGE_File_Formats/file_formats.h>
 #include <Logger/logger.h>
+#include <fmt_format_ne.h>
 
 #include "core/render.h"
 
@@ -47,6 +48,7 @@
 
 #include "editor/magic_block.h"
 #include "editor/editor_custom.h"
+#include "editor/editor_strings.h"
 
 #include "main/screen_textentry.h"
 
@@ -541,30 +543,6 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             m_NPC_page = index;
     }
 
-    if(EditorCustom::npc_pages.empty())
-    {
-        if(UpdateNPCButton(mode, 4, 40 + 4, 89, m_NPC_page == 1))
-            m_NPC_page = 1;
-        if(UpdateNPCButton(mode, 4, 80 + 4, 19, m_NPC_page == 2))
-            m_NPC_page = 2;
-        if(UpdateNPCButton(mode, 4, 120 + 4, 1, m_NPC_page == 3))
-            m_NPC_page = 3;
-        if(UpdateNPCButton(mode, 4, 160 + 4, 165, m_NPC_page == 4))
-            m_NPC_page = 4;
-        if(UpdateNPCButton(mode, 4, 200 + 4, 128, m_NPC_page == 5))
-            m_NPC_page = 5;
-
-        if(mode == CallMode::Render)
-        {
-            XRender::renderRect(0, 80 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 120 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 160 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 200 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-        }
-
-        index = 5;
-    }
-
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && mode == CallMode::Render)
         XRender::renderRect(0, (40 * index) + 40 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
 
@@ -574,14 +552,14 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && mode == CallMode::Render)
     {
-        SuperPrint("PICK BLOCK", 3, e_ScreenW - 200, 90);
-        SuperPrint("CONTENTS", 3, e_ScreenW - 200, 110);
+        SuperPrint(g_editorStrings.pickBlockContents1, 3, e_ScreenW - 200, 90);
+        SuperPrint(g_editorStrings.pickBlockContents2, 3, e_ScreenW - 200, 110);
     }
 
     if(m_special_page != SPECIAL_PAGE_BLOCK_CONTENTS)
     {
         // Containers
-        SuperPrintR(mode, "IN", 3, e_ScreenW - 40, 40);
+        SuperPrintR(mode, g_editorStrings.npcInContainer, 3, e_ScreenW - 40, 40);
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFXNPC[91], EditorCursor.NPC.Type == 91, 0, 0, NPCWidth[91], NPCHeight[91]))
         {
             if(EditorCursor.NPC.Type == 91)
@@ -665,8 +643,8 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         else
             type = EditorCursor.NPC.Type;
         // Direction
-        int dir_neg_frame = 1;
-        int dir_pos_frame = 2;
+        Icon::Icons dir_neg_icon = Icon::left;
+        Icon::Icons dir_pos_icon = Icon::right;
 
         bool show_random = true;
         if(type == 57 || type == 60 || type == 62 || type == 64 || type == 66)
@@ -677,31 +655,31 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             if(type == 60 || type == 62 || type == 64 || type == 66 || type == 104)
             {
                 SuperPrint("ACTIVE", 3, e_ScreenW - 174, 40);
-                dir_neg_frame = 8;
-                dir_pos_frame = 7;
+                dir_neg_icon = Icon::x;
+                dir_pos_icon = Icon::check;
             }
             else if(type == 259 || type == 260)
             {
                 SuperPrint("ATTACH", 3, e_ScreenW - 174, 40);
-                dir_neg_frame = 5;
-                dir_pos_frame = 6;
+                dir_neg_icon = Icon::bottom;
+                dir_pos_icon = Icon::top;
             }
             else
             {
                 SuperPrint("FACING", 3, e_ScreenW - 174, 40);
                 if(type == 106 || (NPCIsAParaTroopa[type] && EditorCursor.NPC.Special == 3))
                 {
-                    dir_neg_frame = 3;
-                    dir_pos_frame = 4;
+                    dir_neg_icon = Icon::up;
+                    dir_pos_icon = Icon::down;
                 }
             }
         }
 
-        if(UpdateButton(mode, e_ScreenW - 180 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == -1, 0, 32*dir_neg_frame, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 180 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == -1, 0, 32 * dir_neg_icon, 32, 32))
             EditorCursor.NPC.Direction = -1;
-        if(show_random && UpdateButton(mode, e_ScreenW - 140 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == 0, 0, 0, 32, 32))
+        if(show_random && UpdateButton(mode, e_ScreenW - 140 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == 0, 0, 32 * Icon::unk, 32, 32))
             EditorCursor.NPC.Direction = 0;
-        if(UpdateButton(mode, e_ScreenW - 100 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == 1, 0, 32*dir_pos_frame, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 100 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == 1, 0, 32 * dir_pos_icon, 32, 32))
             EditorCursor.NPC.Direction = 1;
 
         // Inert ("nice") and Stuck ("stop")
@@ -710,12 +688,12 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             EditorCursor.NPC.Inert = true;
         else
         {
-            SuperPrintR(mode, "NICE", 3, e_ScreenW - 200, 100);
+            SuperPrintR(mode, g_editorStrings.npcInertNice, 3, e_ScreenW - 200, 100);
             if(UpdateCheckBox(mode, e_ScreenW - 160 + 4, 120 + 4, EditorCursor.NPC.Inert))
                 EditorCursor.NPC.Inert = !EditorCursor.NPC.Inert;
         }
 
-        SuperPrintR(mode, "STOP", 3, e_ScreenW - 110, 100);
+        SuperPrintR(mode, g_editorStrings.npcStuckStop, 3, e_ScreenW - 110, 100);
         if(UpdateCheckBox(mode, e_ScreenW - 120 + 4, 120 + 4, EditorCursor.NPC.Stuck))
             EditorCursor.NPC.Stuck = !EditorCursor.NPC.Stuck;
 
@@ -724,17 +702,20 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         {
             MessageText = GetS(EditorCursor.NPC.Text);
             BuildUTF8CharMap(MessageText, MessageTextMap);
-            SuperPrintR(mode, "TEXT", 3, e_ScreenW - 200, 160);
+            SuperPrintR(mode, g_editorStrings.wordText, 3, e_ScreenW - 200, 160);
             if(UpdateButton(mode, e_ScreenW - 160 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.Text != STRINGINDEX_NONE, 0, 32*Icon::pencil, 32, 32))
             {
                 DisableCursorNew();
-                SetS(EditorCursor.NPC.Text, TextEntryScreen::Run("NPC text", GetS(EditorCursor.NPC.Text)));
+
+                std::string&& prompt = fmt::format_ne(g_editorStrings.phraseTextOf, g_editorStrings.wordNPCGenitive);
+                SetS(EditorCursor.NPC.Text, TextEntryScreen::Run(prompt, GetS(EditorCursor.NPC.Text)));
+
                 MouseMove(SharedCursor.X, SharedCursor.Y);
             }
         }
 
         // Generator
-        SuperPrintR(mode, "GEN", 3, e_ScreenW - 110, 160);
+        SuperPrintR(mode, g_editorStrings.npcAbbrevGen, 3, e_ScreenW - 110, 160);
         if(UpdateButton(mode, e_ScreenW - 120 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.Generator, 0, 32*Icon::subscreen, 32, 32))
             m_NPC_page = -2;
 
@@ -744,16 +725,25 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             // Describe current AI if valid
             if(mode == CallMode::Render)
             {
-                if(EditorCursor.NPC.Special == 0)
-                    SuperPrint("AI: TARGET", 3, e_ScreenW - 200, 220);
-                else if(EditorCursor.NPC.Special == 1)
-                    SuperPrint("AI: JUMP", 3, e_ScreenW - 200, 220);
-                else if(EditorCursor.NPC.Special == 2)
-                    SuperPrint("AI: L-R", 3, e_ScreenW - 200, 220);
-                else if(EditorCursor.NPC.Special == 3)
-                    SuperPrint("AI: U-D", 3, e_ScreenW - 200, 220);
-                else
-                    SuperPrint("AI", 3, e_ScreenW - 200, 220);
+                std::string ai_invalid;
+                const std::string* ai_name = &ai_invalid;
+
+                int index = (int)EditorCursor.NPC.Special;
+
+                if(index >= 0 && index < 4)
+                {
+                    const std::string* map[] = {
+                        &g_editorStrings.npcAiTarget,
+                        &g_editorStrings.npcAiJump,
+                        &g_editorStrings.npcAiLR,
+                        &g_editorStrings.npcAiUD,
+                    };
+                    ai_name = map[index];
+                }
+
+                std::string&& ai_is = fmt::format_ne(g_editorStrings.npcAiIs, *ai_name);
+
+                SuperPrint(ai_is, 3, e_ScreenW - 200, 220);
             }
 
             if(UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 1, 0, 32*Icon::hop, 32, 32))
@@ -765,26 +755,36 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             if(UpdateButton(mode, e_ScreenW - 80 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 3, 0, 32*Icon::ud, 32, 32))
                 EditorCursor.NPC.Special = 3;
         }
+
         if(NPCIsCheep[EditorCursor.NPC.Type])
         {
             // Describe current AI if valid
             if(mode == CallMode::Render)
             {
-                if(EditorCursor.NPC.Special == 0)
-                    SuperPrint("AI: SWIM", 3, e_ScreenW - 200, 220);
-                else if(EditorCursor.NPC.Special == 1)
-                    SuperPrint("AI: JUMP", 3, e_ScreenW - 200, 220);
-                else if(EditorCursor.NPC.Special == 2)
-                    SuperPrint("AI: LEAP", 3, e_ScreenW - 200, 220);
-                else if(EditorCursor.NPC.Special == 3)
-                    SuperPrint("AI: L-R", 3, e_ScreenW - 200, 220);
-                else if(EditorCursor.NPC.Special == 4)
-                    SuperPrint("AI: U-D", 3, e_ScreenW - 200, 220);
-                else
-                    SuperPrint("AI", 3, e_ScreenW - 200, 220);
+                std::string ai_invalid;
+                const std::string* ai_name = &ai_invalid;
+
+                int index = (int)EditorCursor.NPC.Special;
+
+                if(index >= 0 && index < 5)
+                {
+                    const std::string* map[] =
+                    {
+                        &g_editorStrings.npcAiSwim,
+                        &g_editorStrings.npcAiJump,
+                        &g_editorStrings.npcAiLeap,
+                        &g_editorStrings.npcAiLR,
+                        &g_editorStrings.npcAiUD,
+                    };
+                    ai_name = map[index];
+                }
+
+                std::string&& ai_is = fmt::format_ne(g_editorStrings.npcAiIs, *ai_name);
+
+                SuperPrint(ai_is, 3, e_ScreenW - 200, 220);
             }
 
-            if(UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 0, 0, 32*Icon::target, 32, 32))
+            if(UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 0, 0, 32*Icon::wave, 32, 32))
                 EditorCursor.NPC.Special = 0;
             if(UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 1, 0, 32*Icon::hop, 32, 32))
                 EditorCursor.NPC.Special = 1;
@@ -795,26 +795,32 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             if(UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Special == 4, 0, 32*Icon::ud, 32, 32))
                 EditorCursor.NPC.Special = 4;
         }
+
         if(type == NPCID_BOOMBOOM || type == NPCID_BIRDO || type == NPCID_BOWSER_SMB3)
         {
-            SuperPrintR(mode, "USE 1.0 AI?", 3, e_ScreenW - 200, 220);
+            SuperPrintR(mode, g_editorStrings.npcUse1_0Ai, 3, e_ScreenW - 200, 220);
             if(UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Legacy, 0, 32*Icon::_10, 32, 32))
                 EditorCursor.NPC.Legacy = true;
             if(UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, !EditorCursor.NPC.Legacy, 0, 32*Icon::_1x, 32, 32))
                 EditorCursor.NPC.Legacy = false;
         }
-        if(EditorCursor.NPC.Type == 260)
+
+        if(EditorCursor.NPC.Type == NPCID_FIREBAR)
         {
-            SuperPrintR(mode, "NUMBER " + std::to_string((int)EditorCursor.NPC.Special), 3, e_ScreenW - 200, 220);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseRadiusIndex, (int)EditorCursor.NPC.Special), 3, e_ScreenW - 200, 220);
+
             if(EditorCursor.NPC.Special > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.Special --;
             if(UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                 EditorCursor.NPC.Special ++;
         }
-        if(EditorCursor.NPC.Type == 289 || EditorCursor.NPC.Type == 288
-            || (EditorCursor.NPC.Type == 91 && EditorCursor.NPC.Special == 288))
+
+        if(EditorCursor.NPC.Type == NPCID_POTIONDOOR || EditorCursor.NPC.Type == NPCID_POTION
+            || (EditorCursor.NPC.Type == NPCID_BURIEDPLANT && EditorCursor.NPC.Special == NPCID_POTION))
         {
-            SuperPrintR(mode, "SECTION " + std::to_string((int)EditorCursor.NPC.Special2+1), 3, e_ScreenW - 200, 220);
+            std::string&& dest_section = fmt::format_ne(g_editorStrings.phraseSectionIndex, (int)(EditorCursor.NPC.Special2) + 1);
+            SuperPrintR(mode, dest_section, 3, e_ScreenW - 200, 220);
+
             if(EditorCursor.NPC.Special2 > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.Special2 --;
             if(EditorCursor.NPC.Special2 < 20 && UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -827,7 +833,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         if(EditorCursor.NPC.Type == NPCID_BOWSER_SMB3 && FileFormat == FileFormats::LVL_PGEX)
         {
             if(UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFXBlock[4], fiEqual(EditorCursor.NPC.Special7, 1),
-                0, 32*BlockFrame[4], 32, 32, "Custom: expand section"))
+                0, 32 * BlockFrame[4], 32, 32, g_editorStrings.npcTooltipExpandSection.c_str()))
             {
                 if(EditorCursor.NPC.Special7 == 0.)
                     EditorCursor.NPC.Special7 = 1.;
@@ -845,7 +851,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
             if(mode == CallMode::Render)
             {
-                SuperPrint("CUSTOM AI:", 3, e_ScreenW - 180, 220);
+                SuperPrint(g_editorStrings.npcCustomAi, 3, e_ScreenW - 180, 220);
                 if(valid)
                     SuperPrint(data->strings[i], 3, e_ScreenW - 160, 242);
                 else
@@ -875,11 +881,11 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         // Events
         if(mode == CallMode::Render)
         {
-            SuperPrint("EVENTS:", 3, e_ScreenW - 200, 294);
-            SuperPrint("A:" + GetE(EditorCursor.NPC.TriggerActivate), 3, e_ScreenW - 200, 320);
-            SuperPrint("D:" + GetE(EditorCursor.NPC.TriggerDeath), 3, e_ScreenW - 200, 340);
-            SuperPrint("T:" + GetE(EditorCursor.NPC.TriggerTalk), 3, e_ScreenW - 200, 360);
-            SuperPrint("L:" + GetE(EditorCursor.NPC.TriggerLast), 3, e_ScreenW - 200, 380);
+            SuperPrint(g_editorStrings.eventsHeader, 3, e_ScreenW - 200, 294);
+            SuperPrint(g_editorStrings.eventsLetterActivate   + GetE(EditorCursor.NPC.TriggerActivate), 3, e_ScreenW - 200, 320);
+            SuperPrint(g_editorStrings.eventsLetterDeath      + GetE(EditorCursor.NPC.TriggerDeath), 3, e_ScreenW - 200, 340);
+            SuperPrint(g_editorStrings.eventsLetterTalk       + GetE(EditorCursor.NPC.TriggerTalk), 3, e_ScreenW - 200, 360);
+            SuperPrint(g_editorStrings.eventsLetterLayerClear + GetE(EditorCursor.NPC.TriggerLast), 3, e_ScreenW - 200, 380);
         }
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
@@ -887,13 +893,13 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         // Layers
         if(mode == CallMode::Render)
         {
-            SuperPrint("LAYER:", 3, e_ScreenW - 200, 414);
+            SuperPrint(g_editorStrings.labelLayer, 3, e_ScreenW - 200, 414);
             if(EditorCursor.NPC.Layer == LAYER_NONE)
                 SuperPrint("DEFAULT", 3, e_ScreenW - 200, 440);
             else
                 SuperPrint(GetL(EditorCursor.NPC.Layer), 3, e_ScreenW - 200, 440);
             if(EditorCursor.NPC.AttLayer != LAYER_NONE && EditorCursor.NPC.AttLayer != LAYER_DEFAULT)
-                SuperPrint("ATT: " + GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 200, 460);
+                SuperPrint(g_editorStrings.labelAbbrevAttLayer + GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 200, 460);
         }
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 400 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_LAYER;
@@ -918,181 +924,6 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 SuperPrintR(mode, family.name, 3, 40 + family.X * 40 - 8, 40 + family.Y * 20);
             UpdateNPCGrid(mode, 40 + family.X * 40, 60 + family.Y * 20, family.layout_pod.types.data(), family.layout_pod.types.size(), family.layout_pod.cols);
         }
-    }
-
-    // SMB 1
-    else if(m_NPC_page == 1)
-    {
-        SuperPrintR(mode, "ENEMIES", 3, 40 + 10, 40);
-        static const int p1_enemies[] = {28, 233, 235, 260, 177, 176, 175, 173, 153, 93, 89, 29, 27};
-        UpdateNPCGrid(mode, 40, 60, p1_enemies, sizeof(p1_enemies)/sizeof(int), 5);
-
-        SuperPrintR(mode, "VINE", 3, 40 + 240, 320);
-        static const int p1_vines[] = {223, 222};
-        UpdateNPCGrid(mode, 40 + 240, 340, p1_vines, sizeof(p1_vines)/sizeof(int), 2);
-
-        SuperPrintR(mode, "SHELL", 3, 40 + 275, 220);
-        static const int p1_shells[] = {174, 172};
-        UpdateNPCGrid(mode, 40 + 280, 240, p1_shells, sizeof(p1_shells)/sizeof(int), 5);
-
-        SuperPrintR(mode, "PLAT", 3, 40 + 325, 380);
-        static const int p1_platforms[] = {106};
-        UpdateNPCGrid(mode, 40 + 320, 400, p1_platforms, sizeof(p1_platforms)/sizeof(int), 1);
-
-        SuperPrintR(mode, "ITEMS", 3, 40 + 10, 340);
-        static const int p1_items[] = {186, 182, 184, 178, 88};
-        UpdateNPCGrid(mode, 40, 360, p1_items, sizeof(p1_items)/sizeof(int), 6);
-
-        SuperPrintR(mode, "BOSS", 3, 40 + 324, 40);
-        static const int p1_boss[] = {200};
-        UpdateNPCGrid(mode, 40 + 360, 60, p1_boss, sizeof(p1_boss)/sizeof(int), 1);
-    }
-
-    // SMB 2
-    else if(m_NPC_page == 2)
-    {
-        SuperPrintR(mode, "WARP", 3, 40 + 10, 260);
-        static const int p2_warps[] = {289, 288};
-        UpdateNPCGrid(mode, 40, 280, p2_warps, sizeof(p2_warps)/sizeof(int), 2);
-
-        SuperPrintR(mode, "VINE", 3, 40 + 240, 300);
-        static const int p2_vines[] = {215, 216, 217, 218, 219, 220, 221};
-        UpdateNPCGrid(mode, 40 + 240, 320, p2_vines, sizeof(p2_vines)/sizeof(int), 2);
-
-        SuperPrintR(mode, "VEG", 3, 40 + 320, 260);
-        static const int p2_veg[] = {147, 146, 145, 144, 143, 141, 140, 139, 142, 92};
-        UpdateNPCGrid(mode, 40 + 320, 280, p2_veg, sizeof(p2_veg)/sizeof(int), 2);
-
-        SuperPrintR(mode, "BLOCKS", 3, 40 + 10, 180);
-        static const int p2_blocks[] = {157, 156, 155, 154};
-        UpdateNPCGrid(mode, 40, 200, p2_blocks, sizeof(p2_blocks)/sizeof(int), 4);
-
-        SuperPrintR(mode, "ITEMS", 3, 40 + 10, 340);
-        static const int p2_items[] = {249, 241, 240, 138, 134};
-        UpdateNPCGrid(mode, 40, 360, p2_items, sizeof(p2_items)/sizeof(int), 6);
-
-        SuperPrintR(mode, "EXIT", 3, 40 + 324, 180);
-        static const int p2_exit[] = {41};
-        UpdateNPCGrid(mode, 40 + 360, 200, p2_exit, sizeof(p2_exit)/sizeof(int), 1);
-
-        SuperPrintR(mode, "BOSS", 3, 40 + 324, 40);
-        static const int p2_boss[] = {262, 201, 39};
-        UpdateNPCGrid(mode, 40 + 360, 60, p2_boss, sizeof(p2_boss)/sizeof(int), 1);
-
-        SuperPrintR(mode, "ENEMIES", 3, 40 + 10, 40);
-        static const int p2_enemies[] = {272, 247, 206, 135, 132, 131, 130, 129, 25, 19, 20};
-        UpdateNPCGrid(mode, 40, 60, p2_enemies, sizeof(p2_enemies)/sizeof(int), 5);
-    }
-
-    // SMB 3
-    else if(m_NPC_page == 3)
-    {
-        SuperPrintR(mode, "VINE", 3, 40 + 240, 320);
-        static const int p3_vines[] = {226, 225, 214, 213};
-        UpdateNPCGrid(mode, 40 + 240, 340, p3_vines, sizeof(p3_vines)/sizeof(int), 4);
-
-        SuperPrintR(mode, "EXIT", 3, 40 + 324, 180);
-        static const int p3_exit[] = {11, 16, 97};
-        UpdateNPCGrid(mode, 40 + 360, 200, p3_exit, sizeof(p3_exit)/sizeof(int), 1);
-
-        SuperPrintR(mode, "PLAT", 3, 40 + 324, 380);
-        static const int p3_platforms[] = {212, 57, 46, 104};
-        UpdateNPCGrid(mode, 40 + 320, 400, p3_platforms, sizeof(p3_platforms)/sizeof(int), 2);
-
-        SuperPrintR(mode, "CHAR", 3, 40 + 240, 380);
-        static const int p3_people[] = {198, 101, 75, 94};
-        UpdateNPCGrid(mode, 40 + 240, 400, p3_people, sizeof(p3_people)/sizeof(int), 2);
-
-        SuperPrintR(mode, "PLANT", 3, 40 + 200, 180);
-        static const int p3_plants[] = {261, 245, 74, 52, 8, 51};
-        UpdateNPCGrid(mode, 40 + 200, 200, p3_plants, sizeof(p3_plants)/sizeof(int), 2);
-
-        SuperPrintR(mode, "SHELL", 3, 40 + 274, 220);
-        static const int p3_shells[] = {5, 7, 24, 73};
-        UpdateNPCGrid(mode, 40 + 280, 240, p3_shells, sizeof(p3_shells)/sizeof(int), 2);
-
-        SuperPrintR(mode, "BLOCKS", 3, 40 + 10, 180);
-        static const int p3_blocks[] = {45, 160, 84, 21, 79, 80, 83, 82, 78, 81, 70, 69, 68, 58, 67};
-        UpdateNPCGrid(mode, 40, 200, p3_blocks, sizeof(p3_blocks)/sizeof(int), 5);
-
-        SuperPrintR(mode, "BOSS", 3, 40 + 324, 40);
-        static const int p3_boss[] = {267, 86, 15};
-        UpdateNPCGrid(mode, 40 + 360, 60, p3_boss, sizeof(p3_boss)/sizeof(int), 1);
-
-        SuperPrintR(mode, "ITEMS", 3, 40 + 10, 340);
-        static const int p3_items[] = {287, 273, 264, 238, 248, 49, 193, 191, 170, 169, 103, 34, 90, 35, 22, 14, 10, 9};
-        UpdateNPCGrid(mode, 40, 360, p3_items, sizeof(p3_items)/sizeof(int), 6);
-
-        SuperPrintR(mode, "ENEMIES", 3, 40 + 10, 40);
-        static const int p3_enemies[] = {259, 244, 161, 137, 136, 76, 72, 71, 54, 53, 48, 47, 38, 37, 36, 23, 17, 12, 6, 2, 1, 3, 4, 231, 230, 229};
-        UpdateNPCGrid(mode, 40, 60, p3_enemies, sizeof(p3_enemies)/sizeof(int), 9);
-    }
-
-    // SMW
-    else if(m_NPC_page == 4)
-    {
-        SuperPrintR(mode, "BOSS", 3, 40 + 324, 40);
-        static const int p4_boss[] = {280};
-        UpdateNPCGrid(mode, 40 + 360, 60, p4_boss, sizeof(p4_boss)/sizeof(int), 1);
-
-        SuperPrintR(mode, "VINE", 3, 40 + 240, 300);
-        static const int p4_vines[] = {227, 224};
-        UpdateNPCGrid(mode, 40 + 240, 320, p4_vines, sizeof(p4_vines)/sizeof(int), 2);
-
-        SuperPrintR(mode, "CKPT", 3, 40 + 280, 80);
-        UpdateNPC(mode, 324, 104, 192);
-
-        // The sign
-        SuperPrintR(mode, "SIGN", 3, 40 + 324, 120);
-        UpdateNPC(mode, 404, 144, 151);
-
-        SuperPrintR(mode, "PET", 3, 40 + 170, 380);
-        static const int p4_yoshi[] = {228, 150, 149, 148, 95, 98, 99, 100};
-        UpdateNPCGrid(mode, 40 + 160, 400, p4_yoshi, sizeof(p4_yoshi)/sizeof(int), 4);
-
-        SuperPrintR(mode, "PLAT", 3, 40 + 324, 340);
-        static const int p4_platforms[] = {190, 105, 66, 64, 62, 60};
-        UpdateNPCGrid(mode, 40 + 320, 360, p4_platforms, sizeof(p4_platforms)/sizeof(int), 2);
-
-        SuperPrintR(mode, "EXIT", 3, 40 + 324, 180);
-        static const int p4_exit[] = {196, 197, 31};
-        UpdateNPCGrid(mode, 40 + 360, 200, p4_exit, sizeof(p4_exit)/sizeof(int), 1);
-
-        SuperPrintR(mode, "ITEMS", 3, 40 + 10, 300);
-        static const int p4_items[] = {279, 278, 277, 274, 258, 239, 195, 188, 187, 183, 185, 96, 56, 33, 32, 26};
-        UpdateNPCGrid(mode, 40, 320, p4_items, sizeof(p4_items)/sizeof(int), 4);
-
-        SuperPrintR(mode, "ENEMIES", 3, 40 + 10, 40);
-        static const int p4_enemies[] = {236, 232, 234, 286, 285, 275, 271,
-            270, 207, 199, 189, 179, 181, 180, 167, 166, 165, 164, 163, 162,
-            77, 43, 42, 44, 18, 194, 124, 123, 122, 121, 120, 119, 118, 117,
-            116, 115, 114, 113, 112, 111, 110, 109};
-        UpdateNPCGrid(mode, 40, 60, p4_enemies, sizeof(p4_enemies)/sizeof(int), 7);
-    }
-
-    // MISC
-    else if(m_NPC_page == 5)
-    {
-        SuperPrintR(mode, "BOSS", 3, 40 + 324, 40);
-        static const int p5_boss[] = {209, 208};
-        UpdateNPCGrid(mode, 40 + 360, 60, p5_boss, sizeof(p5_boss)/sizeof(int), 1);
-
-        SuperPrintR(mode, "SWITCH", 3, 40 + 10, 180);
-        static const int p5_switch[] = {65, 63, 61, 59};
-        UpdateNPCGrid(mode, 40, 200, p5_switch, sizeof(p5_switch)/sizeof(int), 2);
-
-        SuperPrintR(mode, "ITEMS", 3, 40 + 10, 340);
-        static const int p5_items[] = {255, 254, 253, 252, 251, 250, 158, 152};
-        UpdateNPCGrid(mode, 40, 360, p5_items, sizeof(p5_items)/sizeof(int), 4);
-
-        SuperPrintR(mode, "ENEMIES", 3, 40 + 10, 40);
-        static const int p5_enemies[] = {257, 256, 243, 242, 211, 205, 204,
-            203, 168, 128, 127, 126, 125};
-        UpdateNPCGrid(mode, 40, 60, p5_enemies, sizeof(p5_enemies)/sizeof(int), 5);
-
-        SuperPrintR(mode, "CHAR", 3, 40 + 240, 380);
-        static const int p5_char[] = {107, 102};
-        UpdateNPCGrid(mode, 40 + 40 + 240, 400, p5_char, sizeof(p5_char)/sizeof(int), 2);
     }
 
     // GENERATOR SETTINGS SCREEN

@@ -539,6 +539,7 @@ set(THEXTECH_SRC
     src/editor/write_level.cpp
     src/editor/write_world.cpp
     src/editor/editor_custom.cpp
+    src/editor/editor_strings.cpp
     src/editor/magic_block.cpp
     src/main.cpp
     src/blocks.cpp
