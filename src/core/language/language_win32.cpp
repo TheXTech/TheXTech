@@ -35,15 +35,19 @@ void XLanguagePriv::detectOSLanguage()
 
     LCID locale = GetSystemDefaultLCID();
     char langStr[21];
+
     std::memset(langStr, 0, 21);
     GetLocaleInfoA(locale, LOCALE_SISO639LANGNAME, langStr, 20);
     CurrentLanguage.clear();
     CurrentLanguage.append(langStr);
 
-    std::transform(CurrentLanguage.begin(),
-                   CurrentLanguage.end(),
-                   CurrentLanguage.begin(),
-                   [](unsigned char c) { return std::tolower(c); });
+    std::memset(langStr, 0, 21);
+    GetLocaleInfoA(locale, LOCALE_SISO3166CTRYNAME, langStr, 20);
+    CurrentLangDialect.clear();
+    CurrentLangDialect.append(langStr);
 
-    XLanguage::splitRegion('_');
+    std::transform(CurrentLangDialect.begin(),
+                   CurrentLangDialect.end(),
+                   CurrentLangDialect.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
 }
