@@ -532,6 +532,7 @@ int BattleIntro = 0;
 int BattleOutro = 0;
 std::string LevelName;
 std::string CurrentLanguage;
+std::string CurrentLangDialect;
 
 //void DoEvents()
 //{

@@ -62,13 +62,14 @@ public class thextechActivity extends SDLActivity
         };
     }
 
-    private String detectLanguage()
+    private void detectLanguage()
     {
         String lang = Locale.getDefault().toString();
         String[] langD = lang.split("_");
-        if(langD.length >= 1)
-            return langD[0];
-        return "";
+        if(langD.length >= 2)
+            setLanguageCodes(langD[0], langD[1]);
+        else if(langD.length >= 1)
+            setLanguageCodes(langD[0], "");
     }
 
     protected String[] getArguments()
@@ -76,11 +77,6 @@ public class thextechActivity extends SDLActivity
         List<String> args = new ArrayList<>();
         args.add("thextech"); // fake %0
 
-        // Detect current language of the system
-        String lang = detectLanguage();
-        // TODO: NOT IMPLEMENTED YET
-//        if(lang.length() >= 1)
-//            args.add("--lang=" + lang);
         SharedPreferences setup = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         if(setup.getBoolean("enable_frame_skip", false))
             args.add("--frameskip");
@@ -135,6 +131,8 @@ public class thextechActivity extends SDLActivity
         super.onStart();
         gameRunning = true;
         levelToRun = "";
+        // Detect current language of the system
+        detectLanguage();
         Intent intent = getIntent();
         Bundle extras = intent.getExtras();
         if(extras != null)
@@ -245,4 +243,6 @@ public class thextechActivity extends SDLActivity
     public static native void setGameAssetsPath(String path);
     // Send the cheat buffer line
     public static native void textentry_setBuffer(String line);
+    // set language settings
+    public static native void setLanguageCodes(String lang, String country);
 }

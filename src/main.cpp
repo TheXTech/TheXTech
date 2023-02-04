@@ -31,6 +31,7 @@
 #include "main/game_info.h"
 #include "main/speedrunner.h"
 #include "main/translate.h"
+#include "core/language.h"
 #include "compat.h"
 #include "controls.h"
 #include <AppPath/app_path.h>
@@ -423,6 +424,8 @@ int main(int argc, char**argv)
         }
 #endif
 
+        XLanguage::init();
+
         OpenConfig_preSetup();
 
 
@@ -572,11 +575,14 @@ int main(int argc, char**argv)
             setup.neverPause = true;
         }
 
-        if(lang.isSet())
+        if(lang.isSet()) // Note: this part of code must be BEFORE the XLanguage::init() call
         {
             CurrentLanguage = lang.getValue();
+            CurrentLangDialect.clear();
+            XLanguage::splitRegion('-');
+            XLanguage::splitRegion('_');
 #ifdef DEBUG_BUILD
-            std::cerr << "Debug: Manually selected language: " << CurrentLanguage << std::endl;
+            std::cerr << "Debug: Manually selected language: " << CurrentLanguage << (CurrentLangDialect.empty() ? "" : "-" + CurrentLangDialect) << std::endl;
             std::cerr.flush();
 #endif
         }
@@ -593,6 +599,8 @@ int main(int argc, char**argv)
     AppPathManager::initAppPath();
     AppPath = AppPathManager::assetsRoot();
     printf("Will load from %s...\n", AppPath.c_str());
+
+    XLanguage::init();
 
     OpenConfig_preSetup();
 

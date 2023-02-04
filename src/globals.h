@@ -2256,5 +2256,6 @@ const int curRelease = 64;
 
 //EXTRA: Language
 extern std::string CurrentLanguage;
+extern std::string CurrentLangDialect;
 
 #endif // GLOBALS_H

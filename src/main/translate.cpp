@@ -19,8 +19,8 @@
  */
 
 #include <Logger/logger.h>
-#include <AppPath/app_path.h>
 #include <DirManager/dirman.h>
+#include <AppPath/app_path.h>
 #include <Utils/files.h>
 #include <Utils/strings.h>
 #include <json/json.hpp>
@@ -28,6 +28,8 @@
 
 #include "globals.h"
 #include "translate.h"
+#include "fontman/font_manager.h"
+#include "core/language.h"
 #include "menu_main.h"
 #include "game_info.h"
 #include "outro_loop.h"
@@ -351,25 +353,34 @@ void XTechTranslate::updateLanguages()
 
 bool XTechTranslate::translate()
 {
-    std::string langEngineFile = AppPathManager::languagesDir() + fmt::format_ne("thextech_{0}.json", CurrentLanguage.c_str());
-    std::string langAssetsFile = AppPathManager::languagesDir() + fmt::format_ne("assets_{0}.json", CurrentLanguage.c_str());
+    if(!FontManager::isInitied())
+    {
+        pLogWarning("Translations aren't supported without new font engine loaded (the 'fonts' directory is required)");
+        return false;
+    }
 
-    if(!Files::fileExists(langEngineFile) && !Files::fileExists(langAssetsFile))
-        return false; // Files are not exists, do nothing
+    const std::string &langEngineFile = XLanguage::getEngineFile();
+    const std::string &langAssetsFile = XLanguage::getAssetsFile();
 
-    if(Files::fileExists(langEngineFile))
+    if(!langEngineFile.empty() && Files::fileExists(langEngineFile))
     {
         // Engine translations
         if(!translateFile(langEngineFile, m_engineMap, "engine"))
             pLogWarning("Failed to apply the engine translation file %s", langEngineFile.c_str());
     }
 
-    if(Files::fileExists(langAssetsFile))
+    if(!langAssetsFile.empty() && Files::fileExists(langAssetsFile))
     {
         // assets translations
         if(!translateFile(langAssetsFile, m_assetsMap, "assets"))
             pLogWarning("Failed to apply the assets translation file %s", langAssetsFile.c_str());
     }
+
+    if(langEngineFile.empty() && langAssetsFile.empty())
+        return false; // No language was found at all
+
+    if(!Files::fileExists(langEngineFile) && !Files::fileExists(langAssetsFile))
+        return false; // Files are not exists, do nothing
 
     return true;
 }

@@ -686,6 +686,51 @@ else()
     )
 endif()
 
+
+list(APPEND THEXTECH_SRC src/core/language/language_common.cpp)
+
+# Notes:
+# - First, algorithm will try to detect language using SDL's method if available (Supported by SDL 2.0.14 and newer)
+# - Then, falls to the system specific code to detect the language
+# If there is a necessary to disable use of SDL-based language detection,
+# define the macro `XTECH_DISABLE_SDL_LOCALE` which will completely disable the SDL-based language detector
+
+if(WIN32)
+    list(APPEND THEXTECH_SRC src/core/language/language_win32.cpp)
+elseif(APPLE)
+    list(APPEND THEXTECH_SRC src/core/language/language_apple.cpp)
+elseif(ANDROID)
+    list(APPEND THEXTECH_SRC src/core/language/language_android.cpp)
+elseif(NINTENDO_DS)
+    # FIXME: Implement the Nintendo DS language initializer
+    add_definitions(-DXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+elseif(NINTENDO_3DS)
+    add_definitions(-DXTECH_DISABLE_SDL_LOCALE) # SDL for 3DS doesn't support language detection
+    list(APPEND THEXTECH_SRC src/core/language/language_3ds.cpp)
+elseif(NINTENDO_WII)
+    # FIXME: Implement the Nintendo WII language initializer
+    add_definitions(-DXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+elseif(NINTENDO_WIIU)
+    # FIXME: Implement the Nintendo WII U language initializer
+    add_definitions(-DXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+elseif(NINTENDO_SWITCH)
+    add_definitions(-DXTECH_DISABLE_SDL_LOCALE) # SDL for Switch doesn't support language detection
+    list(APPEND THEXTECH_SRC src/core/language/language_switch.cpp)
+elseif(VITA)
+    # FIXME: Implement the PS Vita language initializer
+    add_definitions(-DXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+elseif(UNIX)
+    list(APPEND THEXTECH_SRC src/core/language/language_unix.cpp)
+else()
+    add_definitions(-DXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+endif()
+
+
 # Add heads into the list
 file(GLOB THEXTECH_HEADS_SRC
     *.h

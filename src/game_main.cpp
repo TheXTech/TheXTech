@@ -212,7 +212,11 @@ int GameMain(const CmdLineSetup_t &setup)
     {
         XTechTranslate translator;
         if(translator.translate())
-            pLogDebug("Loaded translation for language %s", CurrentLanguage.c_str());
+        {
+            pLogDebug("Loaded translation for language %s-%s",
+                      CurrentLanguage.c_str(),
+                      CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
+        }
     }
 
     initAll();
