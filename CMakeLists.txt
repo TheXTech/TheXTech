@@ -751,6 +751,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/*.h
     src/core/base/*.h
     src/core/sdl/*.h
+    src/core/language/*.h
     src/editor/*.h
     src/main/*.h
     src/main/*.hpp
