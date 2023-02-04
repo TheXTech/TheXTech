@@ -79,16 +79,14 @@ void DisableCursorNew()
     e_CursorY = -50;
 }
 
-static const std::vector<std::string> list_sounds_names = {"None", "Jump", "Stomp", "Block Hit", "Block Smashed", "Shrink", "Grow", "Mushroom", "Player Died", "Shell Kick", "Skid", "Drop Item", "Got Item", "Camera", "Coin", "1up", "Lava", "Warp", "Fireball", "Roulette Exit", "Defeat Boss", "Dungeon Clear", "Bullet Bill", "Grab", "Spring", "Hammer Toss", "Slide", "New Path", "Level Select", "Do", "Pause", "Key", "Switch", "Tail", "Racoon", "Boot", "Smash", "Crusher", "Bird Spit", "Bird Hit", "Orb Exit", "Bird Beat", "Big Fireball", "Fireworks", "Turtle Killed", "Game Beat", "Door", "Message", "Pet Mount", "Pet Hurt", "Pet Tongue", "Egg Hatch", "Star Exit", "Zelda Kill", "Player Died 2", "Pet Swallow", "Ring", "Skeleton", "Checkpoint", "Collectible", "Bar Exit", "Lava Creature", "Frog Bubbles", "Frog Killed", "Space Block Hit", "Space NPC Killed", "Space NPC Hurt", "Glass Breaks", "Space Boss Hit", "Space Boss Cry", "Space Boss Explode", "Climbing", "Swim", "Light Grab", "Saw", "Throw Veggie", "Lose Heart", "Hero Stab", "Hero Hurt", "Hero Heart", "Hero Died", "Hero Rupee", "Hero Fire", "Hero Item", "Hero Key", "Hero Shield", "Hero Dash", "Hero Fairy", "Hero Grass"};
+// static const std::vector<std::string> list_backgrounds_names = {"None", "Set 1", "Underground", "Night", "Night 2", "Overworld", "Castle", "Mushrooms", "Desert", "", "Set 2", "Trees", "Underground", "Castle", "Clouds", "Night - Hills", "Night - Desert", "Cliff", "Warehouse", "Dungeon", "Set 3", "Blocks", "Hills", "Dungeon", "Pipes", "Bonus", "Clouds", "Desert", "Dungeon 2", "Ship", "Forest", "Battle", "Waterfall", "Tanks", "Final Boss", "Shroom Dealer", "Castle", "Snow Trees", "Clouds 2", "Snow Hills", "Cave", "Cave 2", "Underwater", "World", "Trees", "Mansion", "Forest", "Bonus", "Night", "Cave", "Clouds", "Hills", "Hills 2", "Hills 4", "Hills 3", "Castle", "Castle 2", "Underwater", "Desert Night", "", "Misc.", "Space Base", "Space Ship", "Space Swamp", "Space Crater", "Secret Mine"};
+// static const std::vector<int16_t> list_backgrounds_indices = {0, -1, 7, 8, 9, 10, 41, 50, 51, -1, -1, 5, 25, 44, 48, 49, 52, 53, 54, 57, -1, 1, 2, 3, 4, 6, 13, 14, 15, 17, 20, 21, 22, 23, 24, 26, 27, 35, 36, 37, 38, 39, 56, -1, 12, 18, 19, 28, 29, 30, 31, 11, 32, 33, 34, 42, 43, 55, 58, -1, -1, 47, 46, 45, 16, 40};
 
-static const std::vector<std::string> list_backgrounds_names = {"None", "Set 1", "Underground", "Night", "Night 2", "Overworld", "Castle", "Mushrooms", "Desert", "", "Set 2", "Trees", "Underground", "Castle", "Clouds", "Night - Hills", "Night - Desert", "Cliff", "Warehouse", "Dungeon", "Set 3", "Blocks", "Hills", "Dungeon", "Pipes", "Bonus", "Clouds", "Desert", "Dungeon 2", "Ship", "Forest", "Battle", "Waterfall", "Tanks", "Final Boss", "Shroom Dealer", "Castle", "Snow Trees", "Clouds 2", "Snow Hills", "Cave", "Cave 2", "Underwater", "World", "Trees", "Mansion", "Forest", "Bonus", "Night", "Cave", "Clouds", "Hills", "Hills 2", "Hills 4", "Hills 3", "Castle", "Castle 2", "Underwater", "Desert Night", "", "Misc.", "Space Base", "Space Ship", "Space Swamp", "Space Crater", "Secret Mine"};
-static const std::vector<int16_t> list_backgrounds_indices = {0, -1, 7, 8, 9, 10, 41, 50, 51, -1, -1, 5, 25, 44, 48, 49, 52, 53, 54, 57, -1, 1, 2, 3, 4, 6, 13, 14, 15, 17, 20, 21, 22, 23, 24, 26, 27, 35, 36, 37, 38, 39, 56, -1, 12, 18, 19, 28, 29, 30, 31, 11, 32, 33, 34, 42, 43, 55, 58, -1, -1, 47, 46, 45, 16, 40};
+// static const std::vector<std::string> list_music_names = {"None", "Custom", "Set 1", "Overworld", "Underground", "Dungeon", "Water", "Set 2", "Overworld", "Underground", "Boss", "Final Boss", "Set 3", "Overworld", "Sky", "Underground", "Dungeon", "Water", "Roaming Enemy", "Boss", "World", "Overworld", "Mansion", "Sky", "Cave", "Dungeon", "Water", "Boss", "RPG", "Bachelor Pad", "Town", "Forest", "Seaside", "Pond", "Clouds", "Battle", "64", "Main Theme", "Cave", "Snow", "Desert", "Water", "Castle", "Boss", "Fight", "Knight", "Underground", "Temple", "Steampunk", "Pinball", "Space", "Red Swamp", "Crater", "Item Room", "Final Boss", "Remake", "Misc.", "Jungle Village", "Ice Mountain", "Title Theme", "Beach", "Fusion Reactor", "Bouncy Race", "Remake", "Heroic Woods", "Cornered!"};
+// static const std::vector<int16_t> list_music_indices = {0, 24, -1, 9, 7, 42, 46, -1, 5, 25, 15, 43, -1, 1, 2, 4, 3, 47, 54, 6, -1, 10, 17, 28, 29, 41, 48, 51, -1, 30, 34, 16, 31, 32, 33, 21, -1, 27, 50, 35, 14, 49, 26, 36, -1, 40, 52, 39, 19, 53, -1, 11, 12, 44, 45, 22, -1, 38, 37, 55, 18, 20, 56, 13, 23, 8};
 
-static const std::vector<std::string> list_music_names = {"None", "Custom", "Set 1", "Overworld", "Underground", "Dungeon", "Water", "Set 2", "Overworld", "Underground", "Boss", "Final Boss", "Set 3", "Overworld", "Sky", "Underground", "Dungeon", "Water", "Roaming Enemy", "Boss", "World", "Overworld", "Mansion", "Sky", "Cave", "Dungeon", "Water", "Boss", "RPG", "Bachelor Pad", "Town", "Forest", "Seaside", "Pond", "Clouds", "Battle", "64", "Main Theme", "Cave", "Snow", "Desert", "Water", "Castle", "Boss", "Fight", "Knight", "Underground", "Temple", "Steampunk", "Pinball", "Space", "Red Swamp", "Crater", "Item Room", "Final Boss", "Remake", "Misc.", "Jungle Village", "Ice Mountain", "Title Theme", "Beach", "Fusion Reactor", "Bouncy Race", "Remake", "Heroic Woods", "Cornered!"};
-static const std::vector<int16_t> list_music_indices = {0, 24, -1, 9, 7, 42, 46, -1, 5, 25, 15, 43, -1, 1, 2, 4, 3, 47, 54, 6, -1, 10, 17, 28, 29, 41, 48, 51, -1, 30, 34, 16, 31, 32, 33, 21, -1, 27, 50, 35, 14, 49, 26, 36, -1, 40, 52, 39, 19, 53, -1, 11, 12, 44, 45, 22, -1, 38, 37, 55, 18, 20, 56, 13, 23, 8};
-
-static const std::vector<std::string> list_world_music_names = {"None", "SET 3", "World 1", "World 2", "World 3", "World 4", "World 5", "World 6", "World 7", "World 8", "WORLD", "Theme", "Cave", "Island", "Forest", "Dungeon", "Sky", "Special", "NEW", "Theme"};
-static const std::vector<int16_t> list_world_music_indices = {0, -1, 1, 6, 8, 2, 11, 10, 3, 9, -1, 4, 16, 15, 7, 13, 14, 12, -1, 5};
+// static const std::vector<std::string> list_world_music_names = {"None", "SET 3", "World 1", "World 2", "World 3", "World 4", "World 5", "World 6", "World 7", "World 8", "WORLD", "Theme", "Cave", "Island", "Forest", "Dungeon", "Sky", "Special", "NEW", "Theme"};
+// static const std::vector<int16_t> list_world_music_indices = {0, -1, 1, 6, 8, 2, 11, 10, 3, 9, -1, 4, 16, 15, 7, 13, 14, 12, -1, 5};
 
 static const std::vector<std::string> list_level_exit_names = {"ANY", "NONE", "ROULETTE", "? ORB", "LEAVE", "KEYHOLE", "CLEAR ORB", "WARP", "STAR", "BAR END"};
 static const std::vector<std::string> list_warp_transit_names = {"NONE", "SCROLL", "FADE", "CIRCLE", "FLIP (H)", "FLIP (V)"};
@@ -256,6 +254,7 @@ void SetEditorBlockType(int type)
         EditorCursor.Block.Location.Width = 0.;
         EditorCursor.Block.Location.Height = 0.;
     }
+
     if(type == 5 || type == 88 || type == 193 || type == 224)
     {
         if(EditorCursor.Block.Special == 0)
@@ -266,7 +265,9 @@ void SetEditorBlockType(int type)
         && type != 174 && type != 175 && type != 176 && type != 177 && type != 178 && type != 179 && type != 180
         && type != 181 && type != 622 && type != 623 && type != 624 && type != 625 && type != 626 && type != 627
         && type != 628 && type != 629 && type != 631 && type != 632)
+    {
         EditorCursor.Block.Special = 0;
+    }
 
     // only update slipperiness if it is currently what you would expect.
     if(EditorCursor.Block.Slippy ==
@@ -295,16 +296,6 @@ void EditorScreen::FocusNPC()
         m_NPC_page = -1;
     else if(!EditorCustom::npc_families.empty() && type >= 1 && type <= maxNPCType && EditorCustom::npc_family_by_type[type - 1] != EditorCustom::FAMILY_NONE)
         m_NPC_page = EditorCustom::npc_families[EditorCustom::npc_family_by_type[type - 1]].page;
-    else if((type == 28) || (type == 233) || (type == 235) || (type == 260) || (type == 177) || (type == 176) || (type == 175) || (type == 173) || (type == 153) || (type == 93) || (type == 89) || (type == 29) || (type == 27) || (type == 223) || (type == 222) || (type == 174) || (type == 172) || (type == 106) || (type == 186) || (type == 182) || (type == 184) || (type == 178) || (type == 88) || (type == 200))
-        m_NPC_page = 1;
-    else if((type == 289) || (type == 288) || (type == 215) || (type == 216) || (type == 217) || (type == 218) || (type == 219) || (type == 220) || (type == 221) || (type == 147) || (type == 146) || (type == 145) || (type == 144) || (type == 143) || (type == 141) || (type == 140) || (type == 139) || (type == 142) || (type == 92) || (type == 157) || (type == 156) || (type == 155) || (type == 154) || (type == 249) || (type == 241) || (type == 240) || (type == 138) || (type == 134) || (type == 41) || (type == 262) || (type == 201) || (type == 39) || (type == 272) || (type == 247) || (type == 206) || (type == 135) || (type == 132) || (type == 131) || (type == 130) || (type == 129) || (type == 25) || (type == 19) || (type == 20))
-        m_NPC_page = 2;
-    else if((type == 226) || (type == 225) || (type == 214) || (type == 213) || (type == 11) || (type == 16) || (type == 97) || (type == 212) || (type == 57) || (type == 46) || (type == 104) || (type == 198) || (type == 101) || (type == 75) || (type == 94) || (type == 261) || (type == 245) || (type == 74) || (type == 52) || (type == 8) || (type == 51) || (type == 5) || (type == 7) || (type == 24) || (type == 73) || (type == 45) || (type == 160) || (type == 84) || (type == 21) || (type == 79) || (type == 80) || (type == 83) || (type == 82) || (type == 78) || (type == 81) || (type == 70) || (type == 69) || (type == 68) || (type == 58) || (type == 67) || (type == 267) || (type == 86) || (type == 15) || (type == 287) || (type == 273) || (type == 264) || (type == 238) || (type == 248) || (type == 49) || (type == 193) || (type == 191) || (type == 170) || (type == 169) || (type == 103) || (type == 34) || (type == 90) || (type == 35) || (type == 22) || (type == 14) || (type == 10) || (type == 9) || (type == 259) || (type == 244) || (type == 161) || (type == 137) || (type == 136) || (type == 76) || (type == 72) || (type == 71) || (type == 54) || (type == 53) || (type == 48) || (type == 47) || (type == 38) || (type == 37) || (type == 36) || (type == 23) || (type == 17) || (type == 12) || (type == 6) || (type == 2) || (type == 1) || (type == 3) || (type == 4) || (type == 231) || (type == 230) || (type == 229))
-        m_NPC_page = 3;
-    else if((type == 280) || (type == 227) || (type == 224) || (type == 192) || (type == 151) || (type == 228) || (type == 150) || (type == 149) || (type == 148) || (type == 95) || (type == 98) || (type == 99) || (type == 100) || (type == 190) || (type == 105) || (type == 66) || (type == 64) || (type == 62) || (type == 60) || (type == 196) || (type == 197) || (type == 31) || (type == 279) || (type == 278) || (type == 277) || (type == 274) || (type == 258) || (type == 239) || (type == 195) || (type == 188) || (type == 187) || (type == 183) || (type == 185) || (type == 96) || (type == 56) || (type == 33) || (type == 32) || (type == 26) || (type == 236) || (type == 232) || (type == 234) || (type == 286) || (type == 285) || (type == 275) || (type == 271) || (type == 270) || (type == 207) || (type == 199) || (type == 189) || (type == 179) || (type == 181) || (type == 180) || (type == 167) || (type == 166) || (type == 165) || (type == 164) || (type == 163) || (type == 162) || (type == 77) || (type == 43) || (type == 42) || (type == 44) || (type == 18) || (type == 194) || (type == 124) || (type == 123) || (type == 122) || (type == 121) || (type == 120) || (type == 119) || (type == 118) || (type == 117) || (type == 116) || (type == 115) || (type == 114) || (type == 113) || (type == 112) || (type == 111) || (type == 110) || (type == 109))
-        m_NPC_page = 4;
-    else if((type == 209) || (type == 208) || (type == 65) || (type == 63) || (type == 61) || (type == 59) || (type == 255) || (type == 254) || (type == 253) || (type == 252) || (type == 251) || (type == 250) || (type == 158) || (type == 152) || (type == 257) || (type == 256) || (type == 243) || (type == 242) || (type == 211) || (type == 205) || (type == 204) || (type == 203) || (type == 168) || (type == 128) || (type == 127) || (type == 126) || (type == 125) || (type == 107) || (type == 102))
-        m_NPC_page = 5;
     else if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS)
         m_NPC_page = -1;
     else
@@ -316,24 +307,6 @@ void EditorScreen::FocusBlock()
     int type = EditorCursor.Block.Type;
     if(!EditorCustom::block_families.empty() && type >= 1 && type <= maxBlockType && EditorCustom::block_family_by_type[type - 1] != EditorCustom::FAMILY_NONE)
         m_Block_page = EditorCustom::block_families[EditorCustom::block_family_by_type[type - 1]].page;
-    else if(type == 335 || type == 334 || type == 333 || type == 332 || type == 64 || type == 62 || type == 63 || type == 65 || type == 93 || type == 189 || type == 190 || type == 191 || type == 331 || type == 330 || type == 329 || type == 328 || type == 327 || type == 326 || type == 325 || type == 324 || type == 323 || type == 56 || type == 57 || type == 58 || type == 59 || type == 61 || type == 405 || type == 371 || type == 403 || type == 402 || type == 401 || type == 400 || type == 399 || type == 398 || type == 397 || type == 396 || type == 395 || type == 394 || type == 393 || type == 390 || type == 387 || type == 386 || type == 385 || type == 384 || type == 383 || type == 376 || type == 378 || type == 197 || type == 196 || type == 377 || type == 194 || type == 195 || type == 372 || type == 382 || type == 381 || type == 380 || type == 379 || type == 375 || type == 374 || type == 373 || type == 577 || type == 576 || type == 388 || type == 369 || type == 69 || type == 66 || type == 67 || type == 68 || type == 192 || type == 60 || type == 188 || type == 193 || type == 287)
-        m_Block_page = 1;
-    else if(type == 343 || type == 342 || type == 341 || type == 340 || type == 339 || type == 338 || type == 337 || type == 336 || type == 44 || type == 43 || type == 42 || type == 46 || type == 45 || type == 41 || type == 39 || type == 40 || type == 198 || type == 199 || type == 200 || type == 206 || type == 201 || type == 203 || type == 204 || type == 205 || type == 207 || type == 208 || type == 211 || type == 212 || type == 213 || type == 214 || type == 215 || type == 216 || type == 511 || type == 510 || type == 508 || type == 507 || type == 506 || type == 504 || type == 503 || type == 502 || type == 501 || type == 500 || type == 499 || type == 498 || type == 497 || type == 496 || type == 495 || type == 494 || type == 493 || type == 492 || type == 491 || type == 490 || type == 574 || type == 573 || type == 505 || type == 509 || type == 392 || type == 391 || type == 389 || type == 298 || type == 297 || type == 131 || type == 202 || type == 209 || type == 210 || type == 370 || type == 293 || type == 288 || type == 243 || type == 242 || type == 38)
-        m_Block_page = 2;
-    else if(type == 305 || type == 306 || type == 307 || type == 308 || type == 314 || type == 311 || type == 312 || type == 313 || type == 278 || type == 277 || type == 279 || type == 20 || type == 19 || type == 18 || type == 14 || type == 13 || type == 12 || type == 11 || type == 9 || type == 10 || type == 364 || type == 363 || type == 362 || type == 361 || type == 360 || type == 359 || type == 358 || type == 357 || type == 356 || type == 355 || type == 354 || type == 353 || type == 352 || type == 351 || type == 350 || type == 349 || type == 348 || type == 347 || type == 346 || type == 345 || type == 344 || type == 630 || type == 91 || type == 136 || type == 126 || type == 29 || type == 579 || type == 575 || type == 568 || type == 130 || type == 108 || type == 260 || type == 240 || type == 241 || type == 26 || type == 25 || type == 27 || type == 28 || type == 621 || type == 620 || type == 186 || type == 225 || type == 224 || type == 226 || type == 159 || type == 55 || type == 2 || type == 4 || type == 5 || type == 406 || type == 267 || type == 268 || type == 269 || type == 30 || type == 110 || type == 109)
-        m_Block_page = 3;
-    else if(type == 607 || type == 606 || type == 605 || type == 604 || type == 603 || type == 602 || type == 601 || type == 600 || type == 596 || type == 595 || type == 597 || type == 275 || type == 274 || type == 276 || type == 1 || type == 129 || type == 128 || type == 127 || type == 92 || type == 17 || type == 16 || type == 15 || type == 3 || type == 6 || type == 7 || type == 634 || type == 633 || type == 270 || type == 271 || type == 272 || type == 638 || type == 637 || type == 636 || type == 635 || type == 286 || type == 285 || type == 284 || type == 167 || type == 162 || type == 163 || type == 164 || type == 165 || type == 166 || type == 102 || type == 101 || type == 100 || type == 99 || type == 98 || type == 97 || type == 96 || type == 95 || type == 94 || type == 221 || type == 220 || type == 219 || type == 218 || type == 217 || type == 222 || type == 612 || type == 611 || type == 610 || type == 609 || type == 608 || type == 54 || type == 53 || type == 52 || type == 51 || type == 50 || type == 49 || type == 48 || type == 47)
-        m_Block_page = 4;
-    else if(type == 571 || type == 570 || type == 569 || type == 296 || type == 295 || type == 294 || type == 182 || type == 103 || type == 104 || type == 36 || type == 35 || type == 34 || type == 37 || type == 32 || type == 31 || type == 33 || type == 24 || type == 23 || type == 22 || type == 21 || type == 599 || type == 598 || type == 578 || type == 594 || type == 593 || type == 592 || type == 591 || type == 590 || type == 589 || type == 588 || type == 587 || type == 586 || type == 585 || type == 584 || type == 583 || type == 582 || type == 581 || type == 580 || type == 614 || type == 613 || type == 185 || type == 77 || type == 76 || type == 75 || type == 74 || type == 73 || type == 72 || type == 71 || type == 70 || type == 78 || type == 132 || type == 572 || type == 457 || type == 458 || type == 168 || type == 8 || type == 290 || type == 289 || type == 280 || type == 107 || type == 106 || type == 105 || type == 184 || type == 223 || type == 187 || type == 160 || type == 112 || type == 111)
-        m_Block_page = 5;
-    else if(type == 619 || type == 618 || type == 617 || type == 616 || type == 489 || type == 488 || type == 300 || type == 299 || type == 304 || type == 301 || type == 302 || type == 303 || type == 310 || type == 309 || type == 266 || type == 265 || type == 264 || type == 263 || type == 273 || type == 80 || type == 81 || type == 82 || type == 83 || type == 84 || type == 85 || type == 86 || type == 87 || type == 322 || type == 319 || type == 320 || type == 321 || type == 315 || type == 316 || type == 317 || type == 318 || type == 368 || type == 365 || type == 366 || type == 367 || type == 246 || type == 247 || type == 248 || type == 249 || type == 250 || type == 251 || type == 252 || type == 253 || type == 254 || type == 262 || type == 255 || type == 256 || type == 257 || type == 258 || type == 445 || type == 444 || type == 443 || type == 442 || type == 441 || type == 440 || type == 439 || type == 438 || type == 437 || type == 161 || type == 79 || type == 244 || type == 259 || type == 245 || type == 261 || type == 615 || type == 283 || type == 282 || type == 281 || type == 169 || type == 89 || type == 88 || type == 90)
-        m_Block_page = 6;
-    else if(type == 454 || type == 455 || type == 456 || type == 453 || type == 452 || type == 451 || type == 450 || type == 449 || type == 418 || type == 417 || type == 416 || type == 415 || type == 436 || type == 427 || type == 426 || type == 425 || type == 424 || type == 423 || type == 422 || type == 421 || type == 419 || type == 435 || type == 434 || type == 433 || type == 432 || type == 414 || type == 413 || type == 412 || type == 411 || type == 410 || type == 404 || type == 420 || type == 487 || type == 484 || type == 483 || type == 481 || type == 473 || type == 475 || type == 477 || type == 478 || type == 486 || type == 485 || type == 482 || type == 472 || type == 474 || type == 476 || type == 479 || type == 480 || type == 459 || type == 460 || type == 461 || type == 462 || type == 463 || type == 464 || type == 465 || type == 466 || type == 467 || type == 468 || type == 469 || type == 470 || type == 471 || type == 431 || type == 430 || type == 429 || type == 428 || type == 409 || type == 408 || type == 407 || type == 121 || type == 122 || type == 123 || type == 124 || type == 125 || type == 181 || type == 180 || type == 179 || type == 178 || type == 177 || type == 176 || type == 175 || type == 174 || type == 173 || type == 171 || type == 170 || type == 172)
-        m_Block_page = 7;
-    else if(type == 139 || type == 140 || type == 141 || type == 144 || type == 145 || type == 146 || type == 148 || type == 149 || type == 150 || type == 154 || type == 155 || type == 156 || type == 158 || type == 157 || type == 153 || type == 152 || type == 151 || type == 147 || type == 143 || type == 142 || type == 138 || type == 137 || type == 113 || type == 114 || type == 448 || type == 447 || type == 446 || type == 115 || type == 135 || type == 134 || type == 133 || type == 227 || type == 228 || type == 229 || type == 230 || type == 231 || type == 232 || type == 233 || type == 234 || type == 235 || type == 236 || type == 237 || type == 238 || type == 239 || type == 116 || type == 117 || type == 118 || type == 119 || type == 120)
-        m_Block_page = 8;
-    else if(type == 632 || type == 631 || type == 629 || type == 628 || type == 627 || type == 626 || type == 625 || type == 624 || type == 623 || type == 622 || type == 567 || type == 566 || type == 565 || type == 564 || type == 563 || type == 562 || type == 561 || type == 560 || type == 559 || type == 558 || type == 557 || type == 556 || type == 555 || type == 554 || type == 553 || type == 552 || type == 551 || type == 550 || type == 549 || type == 548 || type == 547 || type == 546 || type == 545 || type == 512 || type == 513 || type == 514 || type == 515 || type == 516 || type == 517 || type == 518 || type == 519 || type == 520 || type == 521 || type == 522 || type == 523 || type == 524 || type == 525 || type == 526 || type == 527 || type == 528 || type == 529 || type == 530 || type == 531 || type == 532 || type == 533 || type == 534 || type == 535 || type == 536 || type == 537 || type == 538 || type == 539 || type == 540 || type == 541 || type == 542 || type == 543 || type == 544 || type == 291 || type == 292)
-        m_Block_page = 9;
     else
         m_Block_page = 0;
 }
@@ -343,16 +316,6 @@ void EditorScreen::FocusBGO()
     int type = EditorCursor.Background.Type;
     if(!EditorCustom::bgo_families.empty() && type >= 1 && type <= maxBackgroundType && EditorCustom::bgo_family_by_type[type - 1] != EditorCustom::FAMILY_NONE)
         m_BGO_page = EditorCustom::bgo_families[EditorCustom::bgo_family_by_type[type - 1]].page;
-    else if(type == 147 || type == 161 || type == 131 || type == 130 || type == 129 || type == 128 || type == 127 || type == 86 || type == 84 || type == 85 || type == 25 || type == 23 || type == 24 || type == 22 || type == 21 || type == 147 || type == 20 || type == 18 || type == 19 || type == 169 || type == 168 || type == 164 || type == 26 || type == 16 || type == 17)
-        m_BGO_page = 1;
-    else if(type == 159 || type == 158 || type == 148 || type == 149 || type == 150 || type == 112 || type == 111 || type == 113 || type == 110 || type == 108 || type == 109 || type == 63 || type == 62 || type == 87 || type == 88)
-        m_BGO_page = 2;
-    else if(type == 163 || type == 162 || type == 103 || type == 102 || type == 101 || type == 99 || type == 106 || type == 67 || type == 80 || type == 81 || type == 37 || type == 38 || type == 36 || type == 68 || type == 89 || type == 90 || type == 91 || type == 69 || type == 97 || type == 93 || type == 45 || type == 46 || type == 94 || type == 95 || type == 96 || type == 114 || type == 1 || type == 9 || type == 10 || type == 4 || type == 5 || type == 6 || type == 2 || type == 8 || type == 7 || type == 3 || type == 172 || type == 171 || type == 170 || type == 165 || type == 65 || type == 66 || type == 82 || type == 83 || type == 75 || type == 76 || type == 77 || type == 78 || type == 33 || type == 34 || type == 13 || type == 61 || type == 60 || type == 12 || type == 11 || type == 79 || type == 40 || type == 39 || type == 64 || type == 15 || type == 14 || type == 190 || type == 189 || type == 187 || type == 188 || type == 100 || type == 107)
-        m_BGO_page = 3;
-    else if(type == 186 || type == 185 || type == 184 || type == 183 || type == 182 || type == 181 || type == 180 || type == 179 || type == 178 || type == 177 || type == 176 || type == 175 || type == 174 || type == 173 || type == 167 || type == 166 || type == 59 || type == 52 || type == 53 || type == 54 || type == 55 || type == 56 || type == 57 || type == 58 || type == 59 || type == 52 || type == 53 || type == 54 || type == 55 || type == 56 || type == 57 || type == 58 || type == 32 || type == 31 || type == 28 || type == 27 || type == 145 || type == 144 || type == 143 || type == 142 || type == 138 || type == 137 || type == 136 || type == 135 || type == 134 || type == 146 || type == 140 || type == 139 || type == 43 || type == 44 || type == 47 || type == 48 || type == 49 || type == 50 || type == 51 || type == 133 || type == 132 || type == 29 || type == 42 || type == 41 || type == 30 || type == 35 || type == 70 || type == 71 || type == 72 || type == 73 || type == 74 || type == 141 || type == 104 || type == 105 || type == 92)
-        m_BGO_page = 4;
-    else if(type == 157 || type == 156 || type == 155 || type == 154 || type == 153 || type == 152 || type == 151 || type == 115 || type == 116 || type == 117 || type == 118 || type == 119 || type == 120 || type == 121 || type == 122 || type == 123 || type == 124 || type == 125 || type == 126)
-        m_BGO_page = 5;
     else
         m_BGO_page = 0;
 }
@@ -362,14 +325,6 @@ void EditorScreen::FocusTile()
     int type = EditorCursor.Tile.Type;
     if(!EditorCustom::tile_families.empty() && type >= 1 && type <= maxTileType && EditorCustom::tile_family_by_type[type - 1] != EditorCustom::FAMILY_NONE)
         m_tile_page = EditorCustom::tile_families[EditorCustom::tile_family_by_type[type - 1]].page;
-    else if(type == 20 || type == 21 || type == 22 || type == 15 || type == 16 || type == 12 || type == 23 || type == 11 || type == 24 || type == 18 || type == 19 || type == 13 || type == 25 || type == 26 || type == 17 || type == 40 || type == 41 || type == 28 || type == 32 || type == 29 || type == 5 || type == 6 || type == 3 || type == 36 || type == 37 || type == 8 || type == 33 || type ==  1 || type == 35 || type == 7 || type == 42 || type == 7 || type == 39 || type == 38 || type == 9 || type == 30 || type == 34 || type == 31 || type == 2 || type == 6 || type == 4 || type == 48 || type == 53 || type == 49 || type == 43 || type == 45 || type == 52 || type == 10 || type == 54 || type == 44 || type == 46 || type == 50 || type == 55 || type == 51 || type == 47)
-        m_tile_page = 1;
-    else if(type == 79 || type == 80 || type == 81 || type == 82 || type == 83 || type == 96 || type == 94 || type == 106 || type == 105 || type == 109 || type == 101 || type == 110 || type == 72 || type == 57 || type == 89 || type == 102 || type == 61 || type == 107 || type == 108 || type == 104 || type == 103 || type == 97 || type == 98 || type == 70 || type == 74 || type == 68 || type == 76 || type == 59 || type == 95 || type == 92 || type == 93 || type == 77 || type == 63 || type == 60 || type == 78 || type == 75 || type == 67 || type == 56 || type == 73 || type == 69 || type == 66 || type == 90 || type == 91 || type == 84 || type == 85 || type == 86 || type == 87 || type == 88 || type == 65 || type == 71 || type == 62 || type == 64 || type == 58 || type == 99 || type == 100 || type == 137 || type == 144 || type == 126 || type == 125 || type == 132 || type == 139 || type == 141 || type == 27 || type == 122 || type == 114 || type == 134 || type == 119 || type == 121 || type == 131 || type == 140 || type == 14 || type == 127 || type == 112 || type == 143 || type == 135 || type == 116 || type == 123 || type == 124 || type == 240 || type == 145 || type == 138 || type == 118 || type == 133 || type == 115 || type == 136 || type == 142 || type == 120 || type == 128 || type == 117 || type == 111 || type == 113 || type == 129 || type == 130)
-        m_tile_page = 2;
-    else if(type == 170 || type == 171 || type == 180 || type == 172 || type == 173 || type == 255 || type == 251 || type == 256 || type == 254 || type == 253 || type == 252 || type == 244 || type == 152 || type == 155 || type == 179 || type == 197 || type == 147 || type == 250 || type == 249 || type == 248 || type == 247 || type == 246 || type == 243 || type == 245 || type == 165 || type == 158 || type == 162 || type == 167 || type == 163 || type == 238 || type == 239 || type == 235 || type == 237 || type == 236 || type == 196 || type == 182 || type == 168 || type == 149 || type == 146 || type == 169 || type == 166 || type == 161 || type == 154 || type == 157 || type == 164 || type == 159 || type == 181 || type == 183 || type == 174 || type == 175 || type == 176 || type == 177 || type == 178 || type == 156 || type == 151 || type == 148 || type == 153 || type == 160 || type == 188 || type == 194 || type == 216 || type == 233 || type == 207 || type == 221 || type == 227 || type == 229 || type == 150 || type == 185 || type == 184 || type == 241 || type == 257 || type == 261 || type == 213 || type == 214 || type == 225 || type == 204 || type == 215 || type == 220 || type == 230 || type == 192 || type == 193 || type == 242 || type == 259 || type == 260 || type == 206 || type == 210 || type == 232 || type == 224 || type == 203 || type == 219 || type == 218 || type == 189 || type == 198 || type == 195 || type == 262 || type == 258 || type == 234 || type == 223 || type == 201 || type == 226 || type == 200 || type == 228 || type == 231 || type == 191 || type == 190 || type == 205 || type == 264 || type == 208 || type == 212 || type == 202 || type == 211 || type == 209 || type == 217 || type == 222 || type == 186 || type == 187 || type == 199 || type == 263)
-        m_tile_page = 3;
-    else if(type == 279 || type == 285 || type == 284 || type == 291 || type == 288 || type == 318 || type == 319 || type == 323 || type == 320 || type == 322 || type == 324 || type == 321 || type == 280 || type == 267 || type == 286 || type == 302 || type == 283 || type == 272 || type == 268 || type == 298 || type == 278 || type == 271 || type == 293 || type == 309 || type == 289 || type == 287 || type == 273 || type == 275 || type == 265 || type == 270 || type == 281 || type == 290 || type == 269 || type == 266 || type == 292 || type == 294 || type == 277 || type == 307 || type == 276 || type == 282 || type == 274 || type == 306 || type == 314 || type == 313 || type == 312 || type == 317 || type == 297 || type == 303 || type == 296 || type == 300 || type == 299 || type == 308 || type == 310 || type == 304 || type == 305 || type == 301 || type == 295 || type == 311 || type == 315 || type == 316 || type == 326 || type == 325 || type == 327 || type == 328)
-        m_tile_page = 4;
     else
         m_tile_page = 0;
 }
@@ -905,6 +860,8 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_OBJ_LAYER;
     }
 
+
+    // NPC selector
     if(!EditorCustom::npc_pages.empty() && m_NPC_page > 0 && m_NPC_page <= (int)EditorCustom::npc_pages.size())
     {
         const EditorCustom::ItemPage_t& page = EditorCustom::npc_pages[m_NPC_page - 1];
@@ -925,6 +882,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             UpdateNPCGrid(mode, 40 + family.X * 40, 60 + family.Y * 20, family.layout_pod.types.data(), family.layout_pod.types.size(), family.layout_pod.cols);
         }
     }
+
 
     // GENERATOR SETTINGS SCREEN
     if(m_NPC_page == -2 && m_special_page != SPECIAL_PAGE_BLOCK_CONTENTS)
@@ -1655,8 +1613,8 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
 
     if(mode == CallMode::Render)
     {
-        const auto& indices = EditorCustom::music_list.indices.empty() ? list_music_indices : EditorCustom::music_list.indices;
-        const auto& names = EditorCustom::music_list.indices.empty() ? list_music_names : EditorCustom::music_list.names;
+        const auto& indices = EditorCustom::music_list.indices;
+        const auto& names = EditorCustom::music_list.names;
 
         size_t i;
         for(i = 0; i < indices.size(); i++)
@@ -1690,8 +1648,8 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
 
     if(mode == CallMode::Render)
     {
-        const auto& indices = EditorCustom::bg2_list.indices.empty() ? list_backgrounds_indices : EditorCustom::bg2_list.indices;
-        const auto& names = EditorCustom::bg2_list.indices.empty() ? list_backgrounds_names : EditorCustom::bg2_list.names;
+        const auto& indices = EditorCustom::bg2_list.indices;
+        const auto& names = EditorCustom::bg2_list.names;
 
         size_t i;
         for(i = 0; i < indices.size(); i++)
@@ -2073,16 +2031,8 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         target = &Events[m_current_event].Sound;
         current_page = &m_sounds_page;
 
-        if(!EditorCustom::sound_list.indices.empty())
-        {
-            source = &EditorCustom::sound_list.names;
-            source_indices = &EditorCustom::sound_list.indices;
-        }
-        else
-        {
-            source = &list_sounds_names;
-            source_indices = nullptr;
-        }
+        source = &EditorCustom::sound_list.names;
+        source_indices = &EditorCustom::sound_list.indices;
     }
     else if(m_special_page == SPECIAL_PAGE_EVENT_BACKGROUND)
     {
@@ -2099,16 +2049,8 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
         current_page = &m_background_page;
 
-        if(!EditorCustom::bg2_list.indices.empty())
-        {
-            source = &EditorCustom::bg2_list.names;
-            source_indices = &EditorCustom::bg2_list.indices;
-        }
-        else
-        {
-            source = &list_backgrounds_names;
-            source_indices = &list_backgrounds_indices;
-        }
+        source = &EditorCustom::bg2_list.names;
+        source_indices = &EditorCustom::bg2_list.indices;
     }
     else if(m_special_page == SPECIAL_PAGE_EVENT_MUSIC)
     {
@@ -2125,16 +2067,8 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
         current_page = &m_music_page;
 
-        if(!EditorCustom::music_list.indices.empty())
-        {
-            source = &EditorCustom::music_list.names;
-            source_indices = &EditorCustom::music_list.indices;
-        }
-        else
-        {
-            source = &list_music_names;
-            source_indices = &list_music_indices;
-        }
+        source = &EditorCustom::music_list.names;
+        source_indices = &EditorCustom::music_list.indices;
     }
     else if(m_special_page == SPECIAL_PAGE_SECTION_BACKGROUND)
     {
@@ -2142,16 +2076,8 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         target = &Background2[curSection];
         current_page = &m_background_page;
 
-        if(!EditorCustom::bg2_list.indices.empty())
-        {
-            source = &EditorCustom::bg2_list.names;
-            source_indices = &EditorCustom::bg2_list.indices;
-        }
-        else
-        {
-            source = &list_backgrounds_names;
-            source_indices = &list_backgrounds_indices;
-        }
+        source = &EditorCustom::bg2_list.names;
+        source_indices = &EditorCustom::bg2_list.indices;
     }
     else if(m_special_page == SPECIAL_PAGE_SECTION_MUSIC)
     {
@@ -2159,16 +2085,8 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         target = &bgMusic[curSection];
         current_page = &m_music_page;
 
-        if(!EditorCustom::music_list.indices.empty())
-        {
-            source = &EditorCustom::music_list.names;
-            source_indices = &EditorCustom::music_list.indices;
-        }
-        else
-        {
-            source = &list_music_names;
-            source_indices = &list_music_indices;
-        }
+        source = &EditorCustom::music_list.names;
+        source_indices = &EditorCustom::music_list.indices;
     }
     else if(m_special_page == SPECIAL_PAGE_LEVEL_EXIT)
     {
@@ -2182,6 +2100,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
             SuperPrintR(mode, "RIGHT PATH UNLOCK", 3, 10, 50);
         else
             return;
+
         target = &EditorCursor.WorldLevel.LevelExit[m_special_subpage];
         current_page = nullptr;
         source = &list_level_exit_names;
@@ -2202,16 +2121,8 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         target = &EditorCursor.WorldMusic.Type;
         current_page = &m_music_page;
 
-        if(!EditorCustom::wmusic_list.indices.empty())
-        {
-            source = &EditorCustom::wmusic_list.names;
-            source_indices = &EditorCustom::wmusic_list.indices;
-        }
-        else
-        {
-            source = &list_world_music_names;
-            source_indices = &list_world_music_indices;
-        }
+        source = &EditorCustom::wmusic_list.names;
+        source_indices = &EditorCustom::wmusic_list.indices;
     }
     else
     {
@@ -2919,36 +2830,6 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
             m_Block_page = index;
     }
 
-    if(EditorCustom::block_pages.empty())
-    {
-        if(UpdateBlockButton(mode, 4, 40 + 4, 63, m_Block_page == 1))
-            m_Block_page = 1;
-        if(UpdateBlockButton(mode, 4, 80 + 4, 45, m_Block_page == 2))
-            m_Block_page = 2;
-        if(UpdateBlockButton(mode, 4, 120 + 4, 10, m_Block_page == 3))
-            m_Block_page = 3;
-        if(UpdateBlockButton(mode, 4, 160 + 4, 3, m_Block_page == 4))
-            m_Block_page = 4;
-        if(UpdateBlockButton(mode, 4, 200 + 4, 294, m_Block_page == 5))
-            m_Block_page = 5;
-        if(UpdateBlockButton(mode, 4, 240 + 4, 81, m_Block_page == 6))
-            m_Block_page = 6;
-        if(UpdateBlockButton(mode, 4, 280 + 4, 424, m_Block_page == 7))
-            m_Block_page = 7;
-        if(UpdateBlockButton(mode, 4, 320 + 4, 448, m_Block_page == 8))
-            m_Block_page = 8;
-        if(UpdateBlockButton(mode, 4, 360 + 4, 557, m_Block_page == 9))
-            m_Block_page = 9;
-
-        if(mode == CallMode::Render)
-        {
-            XRender::renderRect(0, 80 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 120 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 240 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 360 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-        }
-    }
-
     // Resizing
     if(BlockIsSizable[EditorCursor.Block.Type])
     {
@@ -3043,211 +2924,6 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
             UpdateBlockGrid(mode, 40 + family.X * 40, 60 + family.Y * 20, family.layout_pod.types.data(), family.layout_pod.types.size(), family.layout_pod.cols);
         }
     }
-    // SET 1: 63
-    else if(m_Block_page == 1)
-    {
-        SuperPrintR(mode, "OVERWORLD", 3, 40 + 10, 40);
-        static const int p1_overworld[] = {62, 63, 64, 65, 332, 333, 189, 190, 191, 93, 334, 335};
-        UpdateBlockGrid(mode, 40, 60, p1_overworld, sizeof(p1_overworld)/sizeof(int), 6);
-
-        SuperPrintR(mode, "UNDERGROUND", 3, 40 + 10, 140);
-        static const int p1_underground[] = {56, 57, 58, 324, 325, 326, 327, 331, 323, 330, 59, 61, 328, 329};
-        UpdateBlockGrid(mode, 40, 160, p1_underground, sizeof(p1_underground)/sizeof(int), 7);
-
-        SuperPrintR(mode, "DUNGEON", 3, 40 + 10, 240);
-        static const int p1_dungeon[] = {396, 387, 402, 385, 403, 371, 401, 395, 394, 393, 384, 383, 405, 397, 386, 0, 390, 399, 398, 400};
-        UpdateBlockGrid(mode, 40, 260, p1_dungeon, sizeof(p1_dungeon)/sizeof(int), 7);
-
-        SuperPrintR(mode, "PIPES", 3, 40 + 210, 380);
-        static const int p1_pipes[] = {194, 196, 376, 377, 195, 197, 378};
-        UpdateBlockGrid(mode, 240, 400, p1_pipes, sizeof(p1_pipes)/sizeof(int), 4);
-
-        SuperPrintR(mode, "CLOUDS", 3, 40 + 10, 380);
-        static const int p1_clouds[] = {372, 373, 374, 375, 379, 380, 381, 382};
-        UpdateBlockGrid(mode, 40, 400, p1_clouds, sizeof(p1_clouds)/sizeof(int), 4);
-
-        SuperPrintR(mode, "SPECIAL", 3, 40 + 274, 40);
-        static const int p1_special[] = {192, 60, 188, 193};
-        UpdateBlockGrid(mode, 360, 60, p1_special, sizeof(p1_special)/sizeof(int), 2);
-
-        SuperPrintR(mode, "MISC", 3, 40 + 320, 140);
-        static const int p1_misc[] = {66, 67, 68, 69, 369, 576, 388, 577};
-        UpdateBlockGrid(mode, 360, 160, p1_misc, sizeof(p1_misc)/sizeof(int), 2);
-
-        SuperPrintR(mode, "SIZED", 3, 40 + 300, 320);
-        static const int p1_sizable[] = {287};
-        UpdateBlockGrid(mode, 360, 340, p1_sizable, sizeof(p1_sizable)/sizeof(int), 1);
-    }
-    // SET 2: 45
-    else if(m_Block_page == 2)
-    {
-        SuperPrintR(mode, "OVERWORLD", 3, 40 + 10, 40);
-        static const int p2_overworld[] = {39, 40, 41, 340, 341, 342, 343, 42, 43, 44, 198, 200, 199, 336, 337, 338, 339, 45, 46};
-        UpdateBlockGrid(mode, 40, 60, p2_overworld, sizeof(p2_overworld)/sizeof(int), 10);
-
-        SuperPrintR(mode, "UNDERGROUND", 3, 40 + 10, 140);
-        static const int p2_underground[] = {207, 201, 208, 211, 212, 203, 205, 204, 216, 206, 214, 213, 215};
-        UpdateBlockGrid(mode, 40, 160, p2_underground, sizeof(p2_underground)/sizeof(int), 5);
-
-        SuperPrintR(mode, "CASTLE", 3, 40 + 10, 280);
-        static const int p2_dungeon[] = {491, 498, 490, 495, 496, 497, 500, 502, 493, 494, 492, 499, 501, 503, 504, 506, 507, 508, 510, 511};
-        UpdateBlockGrid(mode, 40, 300, p2_dungeon, sizeof(p2_dungeon)/sizeof(int), 7);
-
-        SuperPrintR(mode, "SPECIAL", 3, 40 + 180, 420);
-        static const int p2_special[] = {370, 293};
-        UpdateBlockGrid(mode, 240, 440, p2_special, sizeof(p2_special)/sizeof(int), 2);
-
-        SuperPrintR(mode, "MISC", 3, 40 + 320, 140);
-        static const int p2_misc[] = {573, 131, 574, 505, 209, 297, 298, 202, 509, 210, 391, 392, 389};
-        UpdateBlockGrid(mode, 360, 160, p2_misc, sizeof(p2_misc)/sizeof(int), 2);
-
-        SuperPrintR(mode, "SIZED", 3, 40 + 10, 420);
-        static const int p2_sizable[] = {288, 243, 242, 38};
-        UpdateBlockGrid(mode, 40, 440, p2_sizable, sizeof(p2_sizable)/sizeof(int), 4);
-    }
-    // SET 3 - Page 1: 10
-    else if(m_Block_page == 3)
-    {
-        SuperPrintR(mode, "GRASS", 3, 40 + 10, 40);
-        static const int p3_overworld[] = {9, 10, 11, 305, 306, 308, 307, 18, 19, 20, 311, 312, 314, 313, 279, 278, 277, 12, 13, 14};
-        UpdateBlockGrid(mode, 40, 60, p3_overworld, sizeof(p3_overworld)/sizeof(int), 7);
-
-        SuperPrintR(mode, "CAVE", 3, 40 + 10, 180);
-        static const int p3_cave[] = {344, 345, 346, 358, 357, 360, 359, 347, 348, 349, 362, 361, 364, 363, 350, 351, 352, 353, 354, 355, 356};
-        UpdateBlockGrid(mode, 40, 200, p3_cave, sizeof(p3_cave)/sizeof(int), 7);
-
-        SuperPrintR(mode, "DUNGEON", 3, 40 + 10, 320);
-        static const int p3_dungeon[] = {630, 91, 136, 126, 29};
-        UpdateBlockGrid(mode, 40, 340, p3_dungeon, sizeof(p3_dungeon)/sizeof(int), 5);
-
-        SuperPrintR(mode, "SPECIAL", 3, 40 + 280, 300);
-        static const int p3_special[] = {2, 4, 5, 55, 159, 186, 224, 225, 226, 620, 621};
-        UpdateBlockGrid(mode, 320, 320, p3_special, sizeof(p3_special)/sizeof(int), 3);
-
-        SuperPrintR(mode, "HURTS", 3, 40 + 310, 40);
-        static const int p3_hurts[] = {406, 267, 268, 269, 30, 110, 109};
-        UpdateBlockGrid(mode, 360, 60, p3_hurts, sizeof(p3_hurts)/sizeof(int), 2);
-
-        SuperPrintR(mode, "SIZED", 3, 40 + 10, 380);
-        static const int p3_sizable[] = {579, 575, 568, 130, 108, 260, 240, 241, 26, 25, 27, 28};
-        UpdateBlockGrid(mode, 40, 400, p3_sizable, sizeof(p3_sizable)/sizeof(int), 6);
-    }
-    // SET 3 - Page 2: 3
-    else if(m_Block_page == 4)
-    {
-        SuperPrintR(mode, "WOOD AND SNOW", 3, 40 + 10, 40);
-        static const int p4_wood[] = {7, 3, 6, 600, 604, 605, 601, 270, 272, 271, 15, 16, 17, 602, 606, 607, 603, 128, 127, 129, 274, 276, 275, 1, 92, 633, 634, 595, 596, 597};
-        UpdateBlockGrid(mode, 40, 60, p4_wood, sizeof(p4_wood)/sizeof(int), 10);
-
-        SuperPrintR(mode, "DESERT", 3, 40 + 10, 180);
-        static const int p4_desert[] = {94, 95, 96, 162, 163, 164, 97, 98, 99, 165, 166, 167, 100, 101, 102, 286, 285, 284, 635, 636, 638, 637};
-        UpdateBlockGrid(mode, 40, 200, p4_desert, sizeof(p4_desert)/sizeof(int), 6);
-
-        SuperPrintR(mode, "HOUSE", 3, 40 + 10, 360);
-        static const int p4_house[] = {217, 219, 220, 218, 221, 222};
-        UpdateBlockGrid(mode, 40, 380, p4_house, sizeof(p4_house)/sizeof(int), 3);
-
-        SuperPrintR(mode, "BONUS", 3, 40 + 290, 180);
-        static const int p4_bonus[] = {49, 52, 610, 50, 54, 47, 608, 48, 609, 611, 612, 0, 51, 53};
-        UpdateBlockGrid(mode, 320, 200, p4_bonus, sizeof(p4_bonus)/sizeof(int), 3);
-    }
-    // SET 3 - Page 3: 294
-    else if(m_Block_page == 5)
-    {
-        SuperPrintR(mode, "PIPES", 3, 40 + 10, 40);
-        static const int p5_pipes[] = {21, 34, 36, 103, 31, 32, 33, 294, 295, 296, 22, 35, 37, 104, 23, 24, 569, 570, 182, 571};
-        UpdateBlockGrid(mode, 40, 60, p5_pipes, sizeof(p5_pipes)/sizeof(int), 10);
-
-        SuperPrintR(mode, "WATER", 3, 40 + 10, 140);
-        static const int p5_water[] = {586, 587, 588, 580, 581, 582, 589, 590, 591, 583, 584, 585, 592, 593, 594, 578, 599, 598};
-        UpdateBlockGrid(mode, 40, 160, p5_water, sizeof(p5_water)/sizeof(int), 6);
-
-        SuperPrintR(mode, "MISC", 3, 40 + 10, 280);
-        static const int p5_misc[] = {132, 572, 457, 458, 168, 8, 290, 289, 280, 107, 106, 105, 184, 223, 187, 160, 112, 111};
-        UpdateBlockGrid(mode, 40, 300, p5_misc, sizeof(p5_misc)/sizeof(int), 6);
-
-        SuperPrintR(mode, "AIRSHIP", 3, 40 + 270, 140);
-        static const int p5_airship[] = {70, 71, 72, 73, 74, 75, 76, 77, 78, 185, 613, 614};
-        UpdateBlockGrid(mode, 320, 160, p5_airship, sizeof(p5_airship)/sizeof(int), 3);
-    }
-    // W - Page 1: 81
-    else if(m_Block_page == 6)
-    {
-        SuperPrintR(mode, "GRASS", 3, 40 + 10, 40);
-        static const int p6_grass[] = {80, 81, 82, 299, 616, 302, 301, 617, 300, 83, 87, 84, 86, 618, 304, 303, 619, 85, 265, 264, 266, 309, 263, 273, 310, 488, 489};
-        UpdateBlockGrid(mode, 40, 60, p6_grass, sizeof(p6_grass)/sizeof(int), 9);
-
-        SuperPrintR(mode, "CAVE", 3, 40 + 10, 180);
-        static const int p6_cave[] = {246, 250, 247, 316, 365, 321, 319, 366, 315,
-            252, 251, 253, 258, 255, 322, 320, 256, 257,
-            248, 254, 249, 317, 368, 367, 318, 262};
-        UpdateBlockGrid(mode, 40, 200, p6_cave, sizeof(p6_cave)/sizeof(int), 9);
-
-        SuperPrintR(mode, "SIZED", 3, 40 + 10, 320);
-        static const int p6_sizable[] = {79, 161, 244, 245, 259, 261, 437, 438, 439, 440, 441, 442, 443, 444, 445};
-        UpdateBlockGrid(mode, 40, 340, p6_sizable, sizeof(p6_sizable)/sizeof(int), 5);
-
-        SuperPrintR(mode, "SPECIAL", 3, 40 + 250, 320);
-        static const int p6_special[] = {88, 89, 90, 169, 281, 282, 283, 615};
-        UpdateBlockGrid(mode, 280, 340, p6_special, sizeof(p6_special)/sizeof(int), 4);
-    }
-    // W - Page 2: 424
-    else if(m_Block_page == 7)
-    {
-        SuperPrintR(mode, "CASTLE", 3, 40 + 10, 40);
-        static const int p7_castle[] = {435, 414, 434, 425, 424, 426, 416, 415, 418, 417, 412, 413, 411, 423, 422, 421, 453, 450, 452, 454, 433, 410, 432, 427, 419, 436, 456, 451, 449, 455};
-        UpdateBlockGrid(mode, 40, 60, p7_castle, sizeof(p7_castle)/sizeof(int), 10);
-
-        SuperPrintR(mode, "LAVA AND HURTS", 3, 40 + 10, 180);
-        static const int p7_hurts[] = {408, 466, 459, 460, 469, 470, 480, 472, 474, 482, 409, 463, 467, 461, 468, 471, 481, 473, 475, 483, 407, 465, 462, 464, 404, -1, 487, 477, 478, 484, 429, 428, 430, 431, 420, -1, 486, 476, 479, 485};
-        UpdateBlockGrid(mode, 40, 200, p7_hurts, sizeof(p7_hurts)/sizeof(int), 10);
-
-        SuperPrintR(mode, "MANSION", 3, 40 + 10, 360);
-        static const int p7_ghost[] = {121, 122, 123, 124, 125};
-        UpdateBlockGrid(mode, 40, 380, p7_ghost, sizeof(p7_ghost)/sizeof(int), 3);
-
-        SuperPrintR(mode, "SWITCH", 3, 40 + 170, 360);
-        static const int p7_switch[] = {170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181};
-        UpdateBlockGrid(mode, 200, 380, p7_switch, sizeof(p7_switch)/sizeof(int), 6);
-    }
-    // W - Page 3: 447
-    else if(m_Block_page == 8)
-    {
-        SuperPrintR(mode, "PIPES", 3, 40 + 10, 40);
-        static const int p8_pipes[] = {139, 140, 141, 138, 137, 113, 144, 145, 146, 143, 142, 114, 148, 154, 149, 155, 150, 156, 147, 153, 151, 157, 152, 158};
-        UpdateBlockGrid(mode, 40, 60, p8_pipes, sizeof(p8_pipes)/sizeof(int), 6);
-
-        SuperPrintR(mode, "BONUS", 3, 40 + 10, 220);
-        static const int p8_bonus[] = {227, 228, 229, 238, 239,230, 231, 232, 237, 236, 233, 234, 235};
-        UpdateBlockGrid(mode, 40, 240, p8_bonus, sizeof(p8_bonus)/sizeof(int), 5);
-
-        SuperPrintR(mode, "MISC", 3, 40 + 270, 40);
-        static const int p8_misc[] = {133, 134, 135, 115, 446, 447, 448};
-        UpdateBlockGrid(mode, 320, 60, p8_misc, sizeof(p8_misc)/sizeof(int), 3);
-
-        SuperPrintR(mode, "WOODS", 3, 40 + 10, 360);
-        static const int p8_woods[] = {116, 119, 117, 120, 0, 118};
-        UpdateBlockGrid(mode, 40, 380, p8_woods, sizeof(p8_woods)/sizeof(int), 3);
-    }
-    // Misc: 557
-    else if(m_Block_page == 9)
-    {
-        SuperPrintR(mode, "SPACE (A)", 3, 40 + 10, 40);
-        static const int p9_space_a[] = {515, 513, 533, 517, 514, 518, 512, 516, 528, 519, 520, 521, 522, 523, 532, 524, 525, 526, 530, 527, 529, 531, 534, 535, 536, 537, 540, 540, 539, 538, 542, 543, 544};
-        UpdateBlockGrid(mode, 40, 60, p9_space_a, sizeof(p9_space_a)/sizeof(int), 7);
-
-        SuperPrintR(mode, "SPACE (B)", 3, 40 + 10, 260);
-        static const int p9_space_b[] = {564, 557, 550, 556, 545, 546, 555, 558, 553, 554, 547, 548, 552, 566, 565, 567, 549, 562, 559, 551, 560, 563, 561};
-        UpdateBlockGrid(mode, 40, 280, p9_space_b, sizeof(p9_space_b)/sizeof(int), 6);
-
-        SuperPrintR(mode, "PLAYER", 3, 40 + 284, 40);
-        static const int p9_player[] = {622, 626, 623, 627, 624, 628, 625, 629, 631, 632};
-        UpdateBlockGrid(mode, 360, 60, p9_player, sizeof(p9_player)/sizeof(int), 2);
-
-        SuperPrintR(mode, "HERO", 3, 40 + 270, 260);
-        static const int p9_hero[] = {291, 292};
-        UpdateBlockGrid(mode, 360, 280, p9_hero, sizeof(p9_hero)/sizeof(int), 2);
-    }
 }
 
 bool EditorScreen::UpdateBGOButton(CallMode mode, int x, int y, int type, bool sel)
@@ -3287,29 +2963,6 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
         XRender::renderRect(38, 40, 2, e_ScreenH - 40, 0.25f, 0.0f, 0.5f, 1.0f, true);
     }
 
-    // Page selector
-    if(EditorCustom::bgo_pages.empty())
-    {
-        if(UpdateBlockButton(mode, 4, 40 + 4, 63, m_BGO_page == 1))
-            m_BGO_page = 1;
-        if(UpdateBlockButton(mode, 4, 80 + 4, 45, m_BGO_page == 2))
-            m_BGO_page = 2;
-        if(UpdateBlockButton(mode, 4, 120 + 4, 10, m_BGO_page == 3))
-            m_BGO_page = 3;
-        if(UpdateBlockButton(mode, 4, 160 + 4, 81, m_BGO_page == 4))
-            m_BGO_page = 4;
-        if(UpdateBlockButton(mode, 4, 200 + 4, 557, m_BGO_page == 5))
-            m_BGO_page = 5;
-
-        if(mode == CallMode::Render)
-        {
-            XRender::renderRect(0, 80 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 120 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 160 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 200 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-        }
-    }
-
 
     // Page selector
     int last_category = -1;
@@ -3330,6 +2983,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
         if(UpdateBGOButton(mode, 4, 4 + (40 * index), page.icon, m_BGO_page == index))
             m_BGO_page = index;
     }
+
 
     // Layers
     SuperPrintR(mode, "LAYER:", 3, e_ScreenW - 160, 434);
@@ -3359,130 +3013,6 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
                 SuperPrintR(mode, family.name, 3, 40 + family.X * 40 - 8, 40 + family.Y * 20);
             UpdateBGOGrid(mode, 40 + family.X * 40, 60 + family.Y * 20, family.layout_pod.types.data(), family.layout_pod.types.size(), family.layout_pod.cols);
         }
-    }
-    // SMB 1: 63
-    else if(m_BGO_page == 1)
-    {
-        SuperPrintR(mode, "FENCES", 3, 40 + 10, 40);
-        static const int p1_fences[] = {23, 24, 25, 86, 129, 130, 131, 147};
-        UpdateBGOGrid(mode, 40, 60, p1_fences, sizeof(p1_fences)/sizeof(int), 4);
-
-        SuperPrintR(mode, "BUILDINGS", 3, 40 + 10, 360);
-        static const int p1_buildings[] = {16, 17};
-        UpdateBGOGrid(mode, 40, 380, p1_buildings, sizeof(p1_buildings)/sizeof(int), 2);
-
-        SuperPrintR(mode, "PLANTS", 3, 40 + 10, 220);
-        static const int p1_plants[] = {21, 127, 128, 20, 18, 22, 84, 85, 19,};
-        UpdateBGOGrid(mode, 40, 240, p1_plants, sizeof(p1_plants)/sizeof(int), 5);
-
-        SuperPrintR(mode, "WATER", 3, 40 + 210, 380);
-        static const int p1_water[] = {168, 26, 169, 164};
-        UpdateBGOGrid(mode, 240, 400, p1_water, sizeof(p1_water)/sizeof(int), 2);
-
-        SuperPrintR(mode, "CLOUDS", 3, 40 + 210, 280);
-        static const int p1_clouds[] = {161};
-        UpdateBGOGrid(mode, 240, 300, p1_clouds, sizeof(p1_clouds)/sizeof(int), 2);
-    }
-    // SMB 2: 45
-    else if(m_BGO_page == 2)
-    {
-        SuperPrintR(mode, "STRUCTURES", 3, 40 + 10, 40);
-        static const int p2_structures[] = {148, 149, 150};
-        UpdateBGOGrid(mode, 40, 60, p2_structures, sizeof(p2_structures)/sizeof(int), 10);
-
-        SuperPrintR(mode, "DOORS", 3, 40 + 10, 140);
-        static const int p2_doors[] = {87, 88};
-        UpdateBGOGrid(mode, 40, 160, p2_doors, sizeof(p2_doors)/sizeof(int), 7);
-
-        SuperPrintR(mode, "PLANTS", 3, 40 + 10, 220);
-        static const int p2_plants[] = {111, 112, 113, 110, 62, 108, 109, 63};
-        UpdateBGOGrid(mode, 40, 240, p2_plants, sizeof(p2_plants)/sizeof(int), 4);
-
-        SuperPrintR(mode, "WATER", 3, 40 + 210, 380);
-        static const int p2_water[] = {159, 158};
-        UpdateBGOGrid(mode, 240, 400, p2_water, sizeof(p2_water)/sizeof(int), 1);
-    }
-    // SMB 3 - Page 1: 10
-    else if(m_BGO_page == 3)
-    {
-        SuperPrintR(mode, "STRUCTURES", 3, 40 + 10, 40);
-        static const int p3_fences[] = {89, 94, 80, 67, 81, 46, 91, 95, 106, 101, 102, 45, 90, 96, 36, 68, 69, 93, 97, 99, 162, 163, 103, 107};
-        UpdateBGOGrid(mode, 40, 60, p3_fences, sizeof(p3_fences)/sizeof(int), 6);
-
-        SuperPrintR(mode, "PLATFORM", 3, 40 + 250, 180);
-        static const int p3_platform[] = {100};
-        UpdateBGOGrid(mode, 400, 200, p3_platform, sizeof(p3_platform)/sizeof(int), 3);
-
-        SuperPrintR(mode, "EXIT", 3, 40 + 290, 40);
-        static const int p3_exit[] = {33, 34, 13, 61, 60, 12, 11};
-        UpdateBGOGrid(mode, 320, 60, p3_exit, sizeof(p3_exit)/sizeof(int), 3);
-
-        SuperPrintR(mode, "TILES", 3, 40 + 10, 380);
-        static const int p3_tiles[] = {75, 76, 77, 78, 79, 40, 39, 64, 15, 14};
-        UpdateBGOGrid(mode, 40, 400, p3_tiles, sizeof(p3_tiles)/sizeof(int), 5);
-
-        SuperPrintR(mode, "PLANTS", 3, 40 + 10, 240);
-        static const int p3_plants[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 114, 37, 38};
-        UpdateBGOGrid(mode, 40, 260, p3_plants, sizeof(p3_plants)/sizeof(int), 7);
-
-        SuperPrintR(mode, "WATER", 3, 40 + 250, 380);
-        static const int p3_water[] = {172, 170, 65, 82, 66, 171, 165, 83};
-        UpdateBGOGrid(mode, 280, 400, p3_water, sizeof(p3_water)/sizeof(int), 4);
-
-        SuperPrintR(mode, "SAND", 3, 40 + 320, 260);
-        SuperPrintR(mode, "BG/FG", 3, 40 + 310, 280);
-        static const int p3_sand[] = {189, 188, 190, 187};
-        UpdateBGOGrid(mode, 360, 300, p3_sand, sizeof(p3_sand)/sizeof(int), 2);
-    }
-    // W: 3
-    else if(m_BGO_page == 4)
-    {
-        SuperPrintR(mode, "FENCES", 3, 40 + 10, 40);
-        static const int p4_fences[] = {178, 179, 180, 174, 175, 181, 182, 183, 176, 177, 184, 185, 186};
-        UpdateBGOGrid(mode, 40, 60, p4_fences, sizeof(p4_fences)/sizeof(int), 5);
-
-        SuperPrintR(mode, "BARS", 3, 40 + 250, 40);
-        static const int p4_bars[] = {136, 138, 142, 143, 135, 137, 144, 145, 134};
-        UpdateBGOGrid(mode, 280, 60, p4_bars, sizeof(p4_bars)/sizeof(int), 4);
-
-        SuperPrintR(mode, "PLANTS", 3, 40 + 10, 180);
-        static const int p4_plants[] = {59, 52, 53, 54, 55, 56, 57, 58, 32, 31, 28, 27};
-        UpdateBGOGrid(mode, 40, 200, p4_plants, sizeof(p4_plants)/sizeof(int), 6);
-
-        SuperPrintR(mode, "GHOST", 3, 40 + 10, 280);
-        static const int p4_ghost[] = {146, 140, 139, 43, 44, 47, 48, 49, 50, 51};
-        UpdateBGOGrid(mode, 40, 300, p4_ghost, sizeof(p4_ghost)/sizeof(int), 5);
-
-        SuperPrintR(mode, "WATER", 3, 40 + 290, 380);
-        static const int p4_water[] = {166, 173, 167};
-        UpdateBGOGrid(mode, 320, 400, p4_water, sizeof(p4_water)/sizeof(int), 2);
-
-        SuperPrintR(mode, "MISC", 3, 40 + 10, 380);
-        static const int p4_misc[] = {133, 132, 29, 42, 41, 30};
-        UpdateBGOGrid(mode, 40, 400, p4_misc, sizeof(p4_misc)/sizeof(int), 3);
-
-        SuperPrintR(mode, "PLATFORM", 3, 40 + 250, 180);
-        static const int p4_platform[] = {71, 72, 70, 73, 74};
-        UpdateBGOGrid(mode, 320, 200, p4_platform, sizeof(p4_platform)/sizeof(int), 3);
-
-        SuperPrintR(mode, "DOORS", 3, 40 + 170, 380);
-        static const int p4_doors[] = {141, 104, 105, 92};
-        UpdateBGOGrid(mode, 200, 400, p4_doors, sizeof(p4_doors)/sizeof(int), 2);
-
-        SuperPrintR(mode, "KEY", 3, 40 + 290, 280);
-        static const int p4_key[] = {35};
-        UpdateBGOGrid(mode, 320, 300, p4_key, sizeof(p4_key)/sizeof(int), 1);
-    }
-    // MISC: 294
-    else if(m_BGO_page == 5)
-    {
-        SuperPrintR(mode, "SPACE", 3, 40 + 10, 40);
-        static const int p5_space[] = {153, 155, 154, 151, 156, 157, 152};
-        UpdateBGOGrid(mode, 40, 60, p5_space, sizeof(p5_space)/sizeof(int), 3);
-
-        SuperPrintR(mode, "HERO", 3, 40 + 10, 240);
-        static const int p5_hero[] = {122, 121, 115, 116, 117, 123, 119, 118, 126, 125, 124, 120};
-        UpdateBGOGrid(mode, 40, 260, p5_hero, sizeof(p5_hero)/sizeof(int), 5);
     }
 }
 
@@ -3902,25 +3432,6 @@ void EditorScreen::UpdateTileScreen(CallMode mode)
         XRender::renderRect(38, 40, 2, e_ScreenH - 40, 0.25f, 0.0f, 0.5f, 1.0f, true);
     }
 
-    // Page selector
-    if(EditorCustom::tile_pages.empty())
-    {
-        if(UpdateTileButton(mode, 4, 40 + 4, 11, m_tile_page == 1))
-            m_tile_page = 1;
-        if(UpdateTileButton(mode, 4, 80 + 4, 14, m_tile_page == 2))
-            m_tile_page = 2;
-        if(UpdateTileButton(mode, 4, 120 + 4, 241, m_tile_page == 3))
-            m_tile_page = 3;
-        if(UpdateTileButton(mode, 4, 160 + 4, 326, m_tile_page == 4))
-            m_tile_page = 4;
-
-        if(mode == CallMode::Render)
-        {
-            XRender::renderRect(0, 80 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 120 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-            XRender::renderRect(0, 160 + -2, 40, 4, 0.25f, 0.0f, 0.5f, 1.0f, true);
-        }
-    }
 
     // Page selector
     int last_category = -1;
@@ -3942,6 +3453,8 @@ void EditorScreen::UpdateTileScreen(CallMode mode)
             m_tile_page = index;
     }
 
+
+    // Tile selector
     if(m_tile_page > 0 && m_tile_page <= (int)EditorCustom::tile_pages.size())
     {
         const EditorCustom::ItemPage_t& page = EditorCustom::tile_pages[m_tile_page - 1];
@@ -3961,70 +3474,6 @@ void EditorScreen::UpdateTileScreen(CallMode mode)
                 SuperPrintR(mode, family.name, 3, 40 + family.X * 40 - 8, 40 + family.Y * 20);
             UpdateTileGrid(mode, 40 + family.X * 40, 60 + family.Y * 20, family.layout_pod.types.data(), family.layout_pod.types.size(), family.layout_pod.cols);
         }
-    }
-
-    // SMB 3
-    else if(m_tile_page == 1)
-    {
-        SuperPrintR(mode, "GRASS", 3, 50, 40);
-        static const int p1_grass[] = {20, 21, 22, 15, 16, 12,
-            23, 11, 24, 18, 19, 13,
-            25, 26, 17, 40, 41,};
-        UpdateTileGrid(mode, 40, 60, p1_grass, sizeof(p1_grass)/sizeof(int), 6);
-
-        SuperPrintR(mode, "DESERT", 3, 50, 180);
-        static const int p1_desert[] = {28, 32, 29, 5, 6, 3, 36, 37, 8,
-            33,  1, 35, 7, 42, 7, 39, 38, 9,
-            30, 34, 31, 2, 6, 4,};
-        UpdateTileGrid(mode, 40, 200, p1_desert, sizeof(p1_desert)/sizeof(int), 9);
-
-        SuperPrintR(mode, "SNOW", 3, 50, 320);
-        static const int p1_snow[] = {48, 53, 49, 43, 45,
-            52, 10, 54, 44, 46,
-            50, 55, 51, 47};
-        UpdateTileGrid(mode, 40, 340, p1_snow, sizeof(p1_snow)/sizeof(int), 5);
-    }
-
-    // SMW A
-    else if(m_tile_page == 2)
-    {
-        SuperPrintR(mode, "16-bit A", 3, 50, 40);
-        static const int p2_smw_a1[] =
-            {79, 80, 81, 82, 83, 96, 94, 106, 105, 109, 101, 110,
-                72, 57, 89, 102, 61, 107, 108, 104, 103, -1, 97, 98,
-                70, 74, 68, 76, 59, -1, -1, 95, -1, -1, 92, 93,
-                77, 63, 60, 78, 75, 67, 56, 73, 69, 66, 90, 91,
-                84, 85, 86, 87, 88, 65, 71, 62, 64, 58, 99, 100};
-        UpdateTileGrid(mode, 40, 60, p2_smw_a1, sizeof(p2_smw_a1)/sizeof(int), 12);
-
-        static const int p2_smw_a2[] =
-        {137, 144, 126, 125, 132, 139, 141, 27,
-            122, 114, 134, 119, 121, 131, 140, 14,
-            127, 112, 143, 135, 116, 123, 124, 240,
-            145, 138, 118, 133, 115, 136, 142, -1,
-            120, 128, 117, 111, 113, 129, 130};
-        UpdateTileGrid(mode, 40, 260, p2_smw_a2, sizeof(p2_smw_a2)/sizeof(int), 8);
-    }
-
-    // SMW B1
-    else if(m_tile_page == 3)
-    {
-        SuperPrintR(mode, "16-bit B", 3, 50, 40);
-        static const int p3_smw_b[] = {170, 171, 180, 172, 173, 255, 251, 256, 254, 253, 252, 244, 152, 155, 179, 197, 147, 250, 249, 248, 247, 246, 243, 245, 165, 158, 162, 167, 163, 238, 239, 235, 237, 236, 196, 182, 168, 149, 146, 169, 166, 161, 154, 157, 164, 159, 181, 183, 174, 175, 176, 177, 178, 156, 151, 148, 153, 160, 188, 194, 216, 233, 207, 221, 227, 229, 150, 185, 184, 241, 257, 261, 213, 214, 225, 204, 215, 220, 230, 192, 193, 242, 259, 260, 206, 210, 232, 224, 203, 219, 218, 189, 198, 195, 262, 258, 234, 223, 201, 226, 200, 228, 231, 191, 190, 205, 264, -1, 208, 212, 202, 211, 209, 217, 222, 186, 187, 199, 263};
-        UpdateTileGrid(mode, 40, 60, p3_smw_b, sizeof(p3_smw_b)/sizeof(int), 12);
-    }
-
-    // SMW C
-    else if(m_tile_page == 4)
-    {
-        SuperPrintR(mode, "16-bit C", 3, 50, 40);
-        static const int p3_smw_c[] = {279, 285, 284, 291, 288, 318, 319, 323, 320, 322, 324, 321,
-            280, 267, 286, 302, 283, 272, 268, 298, 278, 271, 293, 309,
-            289, 287, 273, 275, 265, 270, 281, 290, 269, 266, 292, 294,
-            277, 307, 276, 282, 274, 306, 314, 313, 312, 317, 297, 303,
-            296, 300, 299, 308, 310, 304, 305, 301, 295, 311, 315, 316,
-            326, 325, 327, 328,};
-        UpdateTileGrid(mode, 40, 60, p3_smw_c, sizeof(p3_smw_c)/sizeof(int), 12);
     }
 }
 
