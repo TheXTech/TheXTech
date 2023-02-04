@@ -18,16 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cstdlib>
-#include <cstdio>
-#include <algorithm>
-
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreServices/CoreServices.h>
 
-#include "globals.h"
+#include <cstdlib>
+#include <cstdio>
+#include <algorithm>
+#include <string>
+
 #include "language_private.h"
-#include "../language.h"
+
+// Duplicate from globals.h due to conflict with system-wide headers
+extern std::string CurrentLanguage;
+extern std::string CurrentLangDialect;
 
 
 void XLanguagePriv::detectOSLanguage()

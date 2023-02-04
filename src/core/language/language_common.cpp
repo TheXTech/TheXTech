@@ -44,6 +44,9 @@ static std::string langAssetsFile;
 
 static bool detectSetup()
 {
+    if(CurrentLanguage.empty())
+        return false; // Language code is required!
+
     if(!CurrentLangDialect.empty())
     {
         langEngineFile = AppPathManager::languagesDir() + fmt::format_ne("thextech_{0}-{1}.json", CurrentLanguage.c_str(), CurrentLangDialect.c_str());
@@ -72,19 +75,25 @@ void XLanguage::init()
 {
 #ifndef XTECH_DISABLE_SDL_LOCALE
     SDL_Locale *loc = SDL_GetPreferredLocales();
-    if(loc)
+    CurrentLanguage.clear();
+    CurrentLangDialect.clear();
+
+    for(; loc; ++loc)
     {
-        for(; loc; ++loc)
-        {
+        if(loc->language)
             CurrentLanguage = loc->language;
+
+        if(loc->country)
+        {
             CurrentLangDialect = loc->country;
             std::transform(CurrentLangDialect.begin(),
                            CurrentLangDialect.end(),
                            CurrentLangDialect.begin(),
                            [](unsigned char c) { return std::tolower(c); });
-            if(detectSetup())
-                return; // Found!
         }
+
+        if(detectSetup())
+            return; // Found!
     }
 #endif
 
