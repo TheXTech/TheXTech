@@ -80,6 +80,9 @@ void XLanguage::init()
 
     for(; loc; ++loc)
     {
+        if(!loc->language && !loc->country)
+            break; // Empty entry
+
         if(loc->language)
             CurrentLanguage = loc->language;
 
