@@ -82,9 +82,10 @@
         },
         "dropAddTitle": "Доб./Убрать игроков",
         "editor": {
-            "editorErrorMissingResources": "Извините, но для встроенного редактора не хватает файла EditorIcons.png.",
-            "editorErrorResolution": "Извините, но встроенный редактор не поддерживает ваше текущее разрешение.",
-            "editorNewWorld": "<Новый мир>"
+            "errorMissingResources": "Извините, но для встроенного редактора не хватает файла {0}.",
+            "errorResolution": "Извините, но встроенный редактор не поддерживает ваше текущее разрешение.",
+            "newWorld": "<Новый мир>",
+            "promptNewWorldName": ""
         },
         "game": {
             "gameBattleRandom": "Случайный уровень",
@@ -96,7 +97,9 @@
             "gameSlotContinue": "Слот {0} ... {1}%",
             "gameSlotNew": "Слот {0} ... Новая игра",
             "gameSourceSlot": "Что скопировать?",
-            "gameTargetSlot": "Куда скопировать?"
+            "gameTargetSlot": "Куда скопировать?",
+            "phraseScore": "",
+            "phraseTime": ""
         },
         "loading": "Загрузка...",
         "main": {

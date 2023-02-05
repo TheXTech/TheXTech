@@ -149,9 +149,10 @@ XTechTranslate::XTechTranslate()
 
         {"languageName",                   &g_mainMenu.languageName},
 
-        {"menu.editor.editorNewWorld",     &g_mainMenu.editorNewWorld},
-        {"menu.editor.editorErrorResolution",       &g_mainMenu.editorErrorResolution},
-        {"menu.editor.editorErrorMissingResources", &g_mainMenu.editorErrorMissingResources},
+        {"menu.editor.newWorld",           &g_mainMenu.editorNewWorld},
+        {"menu.editor.errorResolution",    &g_mainMenu.editorErrorResolution},
+        {"menu.editor.errorMissingResources", &g_mainMenu.editorErrorMissingResources},
+        {"menu.editor.promptNewWorldName", &g_mainMenu.editorPromptNewWorldName},
 
         {"menu.character.charSelTitle",    &g_mainMenu.charSelTitle},
 
@@ -168,6 +169,9 @@ XTechTranslate::XTechTranslate()
         {"menu.game.gameSourceSlot",       &g_mainMenu.gameSourceSlot},
         {"menu.game.gameTargetSlot",       &g_mainMenu.gameTargetSlot},
         {"menu.game.gameEraseSlot",        &g_mainMenu.gameEraseSlot},
+
+        {"menu.game.phraseScore",          &g_mainMenu.phraseScore},
+        {"menu.game.phraseTime",           &g_mainMenu.phraseTime},
 
         {"menu.options.optionsModeFullScreen",   &g_mainMenu.optionsModeFullScreen},
         {"menu.options.optionsModeWindowed",     &g_mainMenu.optionsModeWindowed},
