@@ -6,6 +6,53 @@
         "name4": "奇诺比奥",
         "name5": "林克"
     },
+    "editor": {
+        "block": {
+            "pickContents1": "",
+            "pickContents2": ""
+        },
+        "events": {
+            "header": "",
+            "letterActivate": "",
+            "letterDeath": "",
+            "letterLayerClear": "",
+            "letterTalk": ""
+        },
+        "layer": {
+            "label": "",
+            "labelAbbrevAttLayer": ""
+        },
+        "npc": {
+            "abbrevGen": "",
+            "ai": {
+                "LR": "",
+                "UD": "",
+                "aiIs": "",
+                "headerCustomAi": "",
+                "jump": "",
+                "leap": "",
+                "swim": "",
+                "target": "",
+                "use1_0Ai": ""
+            },
+            "inContainer": "",
+            "inertNice": "",
+            "stuckStop": "",
+            "tooltipExpandSection": ""
+        },
+        "phraseRadiusIndex": "",
+        "phraseSectionIndex": "",
+        "phraseTextOf": "",
+        "wordEvent": {
+            "genitive": "",
+            "nominative": ""
+        },
+        "wordNPC": {
+            "genitive": "",
+            "nominative": ""
+        },
+        "wordText": ""
+    },
     "languageName": "简体中文",
     "menu": {
         "character": {

@@ -6,6 +6,53 @@
         "name4": "Toad",
         "name5": "Link"
     },
+    "editor": {
+        "block": {
+            "pickContents1": "Pick block",
+            "pickContents2": "contents"
+        },
+        "events": {
+            "header": "Events:",
+            "letterActivate": "A:",
+            "letterDeath": "D:",
+            "letterLayerClear": "L:",
+            "letterTalk": "T:"
+        },
+        "layer": {
+            "label": "Layer:",
+            "labelAbbrevAttLayer": "Att: "
+        },
+        "npc": {
+            "abbrevGen": "Gen",
+            "ai": {
+                "LR": "LR",
+                "UD": "UD",
+                "aiIs": "AI: {0}",
+                "headerCustomAi": "Custom AI:",
+                "jump": "Jump",
+                "leap": "Leap",
+                "swim": "Swim",
+                "target": "Target",
+                "use1_0Ai": "Use 1.0 AI?"
+            },
+            "inContainer": "In",
+            "inertNice": "Nice",
+            "stuckStop": "Stop",
+            "tooltipExpandSection": "Expand section"
+        },
+        "phraseRadiusIndex": "Radius {0}",
+        "phraseSectionIndex": "Section {0}",
+        "phraseTextOf": "{0} Text",
+        "wordEvent": {
+            "genitive": "Event",
+            "nominative": "Event"
+        },
+        "wordNPC": {
+            "genitive": "NPC",
+            "nominative": "NPC"
+        },
+        "wordText": "Text"
+    },
     "languageName": "English",
     "menu": {
         "character": {
