@@ -74,6 +74,7 @@
 #include "core/window.h"
 #include "core/events.h"
 #include "core/msgbox.h"
+#include "core/language.h"
 #include "script/luna/luna.h"
 
 #include "pseudo_vb.h"
@@ -209,6 +210,8 @@ int GameMain(const CmdLineSetup_t &setup)
     initMainMenu();
     initEditorStrings();
     StartMenu = true;
+
+    XLanguage::init();
 
     if(!CurrentLanguage.empty())
     {

@@ -67,12 +67,20 @@ static bool detectSetup()
     if(!Files::fileExists(langAssetsFile))
         langAssetsFile.clear();
 
+    pLogDebug("Trying localization %s-%s -> found files [%s] and [%s]", CurrentLanguage.c_str(), CurrentLangDialect.c_str(), langEngineFile.c_str(), langAssetsFile.c_str());
+
     return !langEngineFile.empty() || !langAssetsFile.empty();
 }
 
 
 void XLanguage::init()
 {
+    pLogDebug("Selecting best localization...");
+
+    // try command-line set language first
+    if(!CurrentLanguage.empty() && detectSetup())
+        return;
+
 #ifndef XTECH_DISABLE_SDL_LOCALE
     SDL_Locale *loc = SDL_GetPreferredLocales();
     CurrentLanguage.clear();
