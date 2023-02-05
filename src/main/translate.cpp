@@ -262,16 +262,23 @@ XTechTranslate::XTechTranslate()
 #endif // THEXTECH_ENABLE_EDITOR
     };
 
-    for(int i = 1; i <= numCharacters; ++i)
+#ifdef THEXTECH_ENABLE_EDITOR
+    for(int i = 0; i < 6; ++i)
     {
-        m_engineMap.insert({fmt::format_ne("charcter.name{0}", i), &g_gameInfo.characterName[i]});
+        m_engineMap.insert({fmt::format_ne("editor.warp.transit.name{0}", i), &g_editorStrings.listWarpTransitNames[i]});
     }
+#endif
 
 
     m_assetsMap =
     {
         {"languageName", &g_mainMenu.languageName},
     };
+
+    for(int i = 1; i <= numCharacters; ++i)
+    {
+        m_assetsMap.insert({fmt::format_ne("character.name{0}", i), &g_gameInfo.characterName[i]});
+    }
 
 #ifdef THEXTECH_ENABLE_EDITOR
     EditorCustom::Load(this);

@@ -64,4 +64,6 @@ void initEditorStrings()
 
     g_editorStrings.labelLayer = "Layer:";
     g_editorStrings.labelAbbrevAttLayer = "Att: ";
+
+    g_editorStrings.listWarpTransitNames = {"NONE", "SCROLL", "FADE", "CIRCLE", "FLIP (H)", "FLIP (V)"};
 }

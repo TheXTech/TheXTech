@@ -43,6 +43,16 @@
         "phraseRadiusIndex": "Radius {0}",
         "phraseSectionIndex": "Section {0}",
         "phraseTextOf": "{0} Text",
+        "warp": {
+            "transit": {
+                "name0": "NONE",
+                "name1": "SCROLL",
+                "name2": "FADE",
+                "name3": "CIRCLE",
+                "name4": "FLIP (H)",
+                "name5": "FLIP (V)"
+            }
+        },
         "wordEvent": {
             "genitive": "Event",
             "nominative": "Event"

@@ -170,6 +170,10 @@ extern ItemList_t music_list;
 extern ItemList_t wmusic_list;
 extern ItemList_t bg2_list;
 
+
+// has fixed size of 10
+extern std::vector<std::string> list_level_exit_names;
+
 } // namespace EditorCustom
 
 #endif // EDITOR_CUSTOM_H

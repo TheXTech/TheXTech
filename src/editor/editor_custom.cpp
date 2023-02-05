@@ -63,6 +63,8 @@ ItemList_t music_list;
 ItemList_t wmusic_list;
 ItemList_t bg2_list;
 
+std::vector<std::string> list_level_exit_names(10);
+
 
 // implementation for ItemType_t
 ItemType_t::ItemType_t(int type, const char* sides, slope_t slope, int width, int height, int group)
@@ -1048,6 +1050,10 @@ void Load(XTechTranslate* translate)
             prefix = "bg2";
             bg2_families[bg2_families.size() - 1].second = group.c_str() + prefix_length;
         }
+        else if(SDL_strcasecmp(group.c_str(), "exit-codes") == 0)
+        {
+            // handled above to ensure we get failsafes
+        }
         else
         {
             pLogWarning("Ignoring invalid group %s.", group.c_str());
@@ -1471,6 +1477,25 @@ void Load(XTechTranslate* translate)
     {
         pLogWarning("Can't find editor.ini, falling back on hardcoded block_families.");
     }
+
+
+    // Process exit codes
+    editor.beginGroup("exit-codes");
+
+    editor.read("any", list_level_exit_names[0], "Any");
+    editor.read("none", list_level_exit_names[1], "None");
+
+    translate->m_assetsMap.insert({fmt::format_ne("editor.exit-codes.{0}", "any"), &(list_level_exit_names[0])});
+    translate->m_assetsMap.insert({fmt::format_ne("editor.exit-codes.{0}", "none"), &(list_level_exit_names[1])});
+
+    for(size_t i = 1; i + 1 < list_level_exit_names.size(); i++)
+    {
+        const std::string s = fmt::format_ne("code{0}", i);
+        editor.read(s.c_str(), list_level_exit_names[i + 1], s);
+        translate->m_assetsMap.insert({fmt::format_ne("editor.exit-codes.{0}", i), &(list_level_exit_names[i + 1])});
+    }
+
+    editor.endGroup();
 
 
     // process Blocks

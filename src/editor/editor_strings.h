@@ -23,6 +23,7 @@
 #define EDITOR_STRINGS_H
 
 #include <string>
+#include <vector>
 
 struct EditorContent
 {
@@ -66,6 +67,8 @@ struct EditorContent
 
     std::string labelLayer;
     std::string labelAbbrevAttLayer;
+
+    std::vector<std::string> listWarpTransitNames{6};
 };
 
 extern EditorContent g_editorStrings;

@@ -88,8 +88,7 @@ void DisableCursorNew()
 // static const std::vector<std::string> list_world_music_names = {"None", "SET 3", "World 1", "World 2", "World 3", "World 4", "World 5", "World 6", "World 7", "World 8", "WORLD", "Theme", "Cave", "Island", "Forest", "Dungeon", "Sky", "Special", "NEW", "Theme"};
 // static const std::vector<int16_t> list_world_music_indices = {0, -1, 1, 6, 8, 2, 11, 10, 3, 9, -1, 4, 16, 15, 7, 13, 14, 12, -1, 5};
 
-static const std::vector<std::string> list_level_exit_names = {"ANY", "NONE", "ROULETTE", "? ORB", "LEAVE", "KEYHOLE", "CLEAR ORB", "WARP", "STAR", "BAR END"};
-static const std::vector<std::string> list_warp_transit_names = {"NONE", "SCROLL", "FADE", "CIRCLE", "FLIP (H)", "FLIP (V)"};
+// static const std::array<std::string, 10> list_level_exit_names = {"ANY", "NONE", "ROULETTE", "? ORB", "LEAVE", "KEYHOLE", "CLEAR ORB", "WARP", "STAR", "BAR END"};
 
 const char* e_tooltip = nullptr;
 
@@ -2103,7 +2102,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
 
         target = &EditorCursor.WorldLevel.LevelExit[m_special_subpage];
         current_page = nullptr;
-        source = &list_level_exit_names;
+        source = &EditorCustom::list_level_exit_names;
         source_indices = nullptr;
     }
     else if(m_special_page == SPECIAL_PAGE_WARP_TRANSITION)
@@ -2112,7 +2111,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
 
         target = &EditorCursor.Warp.transitEffect;
         current_page = nullptr;
-        source = &list_warp_transit_names;
+        source = &g_editorStrings.listWarpTransitNames;
         source_indices = nullptr;
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC)
@@ -3201,12 +3200,12 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
         // fade effect
         if(FileFormat == FileFormats::LVL_PGEX)
         {
-            if(EditorCursor.Warp.transitEffect < 0 || EditorCursor.Warp.transitEffect >= (int)list_warp_transit_names.size())
+            if(EditorCursor.Warp.transitEffect < 0 || EditorCursor.Warp.transitEffect >= (int)g_editorStrings.listWarpTransitNames.size())
                 EditorCursor.Warp.transitEffect = 0;
 
             SuperPrintR(mode, " FADE:", 3, 6, 234);
             if(mode == CallMode::Render)
-                SuperPrintRightAlign(list_warp_transit_names[EditorCursor.Warp.transitEffect], 3, 296, 234);
+                SuperPrintRightAlign(g_editorStrings.listWarpTransitNames[EditorCursor.Warp.transitEffect], 3, 296, 234);
 
             if(UpdateButton(mode, 300 + 4, 220 + 4, GFX.EIcons, EditorCursor.Warp.transitEffect, 0, 32*Icon::subscreen, 32, 32))
                 m_special_page = SPECIAL_PAGE_WARP_TRANSITION;
@@ -3663,7 +3662,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
             m_special_subpage = 1;
         }
         SuperPrintR(mode, "UP", 3, 10 + 44, e_ScreenH - 180 + 102);
-        SuperPrintR(mode, list_level_exit_names[EditorCursor.WorldLevel.LevelExit[1]+1], 3, 10 + 44, e_ScreenH - 180 + 120);
+        SuperPrintR(mode, EditorCustom::list_level_exit_names[EditorCursor.WorldLevel.LevelExit[1]+1], 3, 10 + 44, e_ScreenH - 180 + 120);
 
         if(UpdateButton(mode, (e_ScreenW - 240)/2 + 10 + 4, e_ScreenH - 180 + 100 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         {
@@ -3671,7 +3670,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
             m_special_subpage = 3;
         }
         SuperPrintR(mode, "DOWN", 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 102);
-        SuperPrintR(mode, list_level_exit_names[EditorCursor.WorldLevel.LevelExit[3]+1], 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 120);
+        SuperPrintR(mode, EditorCustom::list_level_exit_names[EditorCursor.WorldLevel.LevelExit[3]+1], 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 120);
 
         if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 140 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         {
@@ -3679,7 +3678,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
             m_special_subpage = 2;
         }
         SuperPrintR(mode, "LEFT", 3, 10 + 44, e_ScreenH - 180 + 142);
-        SuperPrintR(mode, list_level_exit_names[EditorCursor.WorldLevel.LevelExit[2]+1], 3, 10 + 44, e_ScreenH - 180 + 160);
+        SuperPrintR(mode, EditorCustom::list_level_exit_names[EditorCursor.WorldLevel.LevelExit[2]+1], 3, 10 + 44, e_ScreenH - 180 + 160);
 
         if(UpdateButton(mode, (e_ScreenW - 240)/2 + 10 + 4, e_ScreenH - 180 + 140 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         {
@@ -3687,7 +3686,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
             m_special_subpage = 4;
         }
         SuperPrintR(mode, "RIGHT", 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 142);
-        SuperPrintR(mode, list_level_exit_names[EditorCursor.WorldLevel.LevelExit[4]+1], 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 160);
+        SuperPrintR(mode, EditorCustom::list_level_exit_names[EditorCursor.WorldLevel.LevelExit[4]+1], 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 160);
     }
 
 }
