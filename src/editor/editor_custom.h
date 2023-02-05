@@ -27,6 +27,10 @@
 
 #include "globals.h"
 
+
+class XTechTranslate;
+
+
 namespace EditorCustom
 {
 
@@ -134,9 +138,11 @@ struct ItemList_t
     }
 
     void make_layout(int rows);
+
+    void make_translation(XTechTranslate& translate, const char* group, const char* prefix, const std::vector<std::pair<ListItemFamily_t, std::string>>& families);
 };
 
-void Load();
+void Load(XTechTranslate* translate = nullptr);
 
 constexpr uint8_t PAGE_NONE = 255;
 constexpr uint8_t FAMILY_NONE = 255;

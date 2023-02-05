@@ -168,6 +168,8 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
 
+option(THEXTECH_ENABLE_EDITOR "Enable runtime support for editor features" ON)
+
 option(THEXTECH_ENABLE_TTF_SUPPORT "Enable TTF fonts support (FreeType required)" ${THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT})
 
 option(THEXTECH_CLI_BUILD "Minimal CLI build for testing and benchmarking on desktop platforms" OFF)
@@ -533,14 +535,6 @@ set(THEXTECH_SRC
     src/layers.cpp
     src/custom.cpp
     src/graphics.cpp
-    src/editor/editor.cpp
-    src/editor/new_editor.cpp
-    src/editor/write_common.cpp
-    src/editor/write_level.cpp
-    src/editor/write_world.cpp
-    src/editor/editor_custom.cpp
-    src/editor/editor_strings.cpp
-    src/editor/magic_block.cpp
     src/main.cpp
     src/blocks.cpp
     src/gfx.cpp
@@ -616,6 +610,20 @@ if(THEXTECH_ENABLE_AUDIO_FX)
     list(APPEND THEXTECH_SRC
         src/sound/fx/spc_echo.cpp
         src/sound/fx/reverb.cpp
+    )
+endif()
+
+if(THEXTECH_ENABLE_EDITOR)
+    add_definitions(-DTHEXTECH_ENABLE_EDITOR)
+    list(APPEND THEXTECH_SRC
+        src/editor/editor.cpp
+        src/editor/new_editor.cpp
+        src/editor/write_common.cpp
+        src/editor/write_level.cpp
+        src/editor/write_world.cpp
+        src/editor/editor_custom.cpp
+        src/editor/editor_strings.cpp
+        src/editor/magic_block.cpp
     )
 endif()
 

@@ -24,6 +24,9 @@
 
 #include <map>
 
+#include "editor/editor_custom.h"
+
+
 class XTechTranslate
 {
     typedef std::map<std::string, std::string*> TrList;
@@ -56,6 +59,11 @@ public:
      * \return True if language was been successfully loaded
      */
     bool translate();
+
+#ifdef THEXTECH_ENABLE_EDITOR
+    friend void EditorCustom::Load(XTechTranslate* translate);
+    friend class EditorCustom::ItemList_t;
+#endif
 
 private:
     bool translateFile(const std::string &file, TrList &list, const char* trTypeName);

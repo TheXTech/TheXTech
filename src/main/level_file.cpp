@@ -192,9 +192,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     LoadCustomGFX();
     LoadCustomSound();
 
-    if(LevelEditor)
-        EditorCustom::Load();
-
 //    if(DirMan::exists(FileNamePath + FileName)) // Useless now
 //        LoadCustomGFX2(FileNamePath + FileName);
 // Blah

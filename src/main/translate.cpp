@@ -37,6 +37,7 @@
 #include "main/outro_loop.h"
 
 #include "editor/editor_strings.h"
+#include "editor/editor_custom.h"
 
 
 static void setJsonValue(nlohmann::json &j, const std::string &key, const std::string &value)
@@ -217,6 +218,7 @@ XTechTranslate::XTechTranslate()
         {"outro.specialThanks",         &g_outroScreen.specialThanks},
 
 
+#ifdef THEXTECH_ENABLE_EDITOR
         {"editor.block.pickContents1",      &g_editorStrings.pickBlockContents1},
         {"editor.block.pickContents2",      &g_editorStrings.pickBlockContents2},
 
@@ -257,6 +259,7 @@ XTechTranslate::XTechTranslate()
 
         {"editor.layer.label",              &g_editorStrings.labelLayer},
         {"editor.layer.labelAbbrevAttLayer", &g_editorStrings.labelAbbrevAttLayer},
+#endif // THEXTECH_ENABLE_EDITOR
     };
 
     for(int i = 1; i <= numCharacters; ++i)
@@ -269,13 +272,23 @@ XTechTranslate::XTechTranslate()
     {
         {"languageName", &g_mainMenu.languageName},
     };
+
+#ifdef THEXTECH_ENABLE_EDITOR
+    EditorCustom::Load(this);
+#endif
 }
 
 void XTechTranslate::reset()
 {
     initOutroContent();
     initMainMenu();
+
+#ifdef THEXTECH_ENABLE_EDITOR
     initEditorStrings();
+
+    // don't need to reset EditorCustom because we reloaded it in the initializer
+    // it would be dangerous to reload it here because it would invalidate a lot of references
+#endif
 }
 
 void XTechTranslate::exportTemplate()

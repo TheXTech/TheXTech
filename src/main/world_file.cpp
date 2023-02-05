@@ -110,9 +110,6 @@ bool OpenWorld(std::string FilePath)
     FindCustomPlayers();
     LoadCustomGFX(true);
 
-    if(LevelEditor || WorldEditor)
-        EditorCustom::Load();
-
     numTiles = 0;
     numScenes = 0;
     numWorldLevels = 0;
