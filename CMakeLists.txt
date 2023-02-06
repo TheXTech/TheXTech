@@ -705,6 +705,10 @@ list(APPEND THEXTECH_SRC src/core/language/language_common.cpp)
 # If there is a necessary to disable use of SDL-based language detection,
 # define the macro `THEXTECH_DISABLE_SDL_LOCALE` which will completely disable the SDL-based language detector
 
+if(THEXTECH_NO_SDL_BUILD)
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
+endif()
+
 if(WIN32)
     list(APPEND THEXTECH_SRC src/core/language/language_win32.cpp)
 elseif(APPLE)
