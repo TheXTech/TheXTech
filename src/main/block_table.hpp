@@ -243,6 +243,8 @@ struct rect_external
 
     rect_external() {}
 
+    rect_external(int32_t l, int32_t r, int32_t t, int32_t b) : l(l), r(r), t(t), b(b) {}
+
     rect_external(const Location_t& loc)
     {
         l = std::floor(loc.X);
