@@ -8,27 +8,27 @@
     },
     "editor": {
         "block": {
-            "pickContents1": "",
-            "pickContents2": ""
+            "pickContents1": "选择砖块",
+            "pickContents2": "包含"
         },
         "events": {
-            "header": "",
-            "letterActivate": "",
-            "letterDeath": "",
-            "letterLayerClear": "",
-            "letterTalk": ""
+            "header": "事件：",
+            "letterActivate": "出：",
+            "letterDeath": "死：",
+            "letterLayerClear": "空：",
+            "letterTalk": "话："
         },
         "layer": {
-            "label": "",
-            "labelAbbrevAttLayer": ""
+            "label": "图层：",
+            "labelAbbrevAttLayer": "跟随："
         },
         "npc": {
-            "abbrevGen": "",
+            "abbrevGen": "连续",
             "ai": {
-                "LR": "",
-                "UD": "",
-                "aiIs": "",
-                "headerCustomAi": "",
+                "LR": "左右",
+                "UD": "上下",
+                "aiIs": "AI：{0}",
+                "headerCustomAi": "自定义 AI：",
                 "jump": "",
                 "leap": "",
                 "swim": "",
