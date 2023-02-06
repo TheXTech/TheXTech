@@ -142,7 +142,9 @@ void Deactivate(int A)
             NPC[A].Pinched2 = 0;
             NPC[A].Pinched3 = 0;
             NPC[A].Pinched4 = 0;
-            NPC[A].Pinched = 0;
+
+            // NPC[A].Pinched = 0;    // unused since SMBX64, removed
+
             NPC[A].MovingPinched = 0;
 
             // NEW now that we have the new NPC Queues

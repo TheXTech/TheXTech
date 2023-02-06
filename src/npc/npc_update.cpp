@@ -74,7 +74,18 @@ void CheckNPCWidth(NPC_t& n)
 
         n.TailCD = 0;
         n.Immune = 0;
-        n.RealSpeedX = 0;
+
+        // Failing to update Location.SpeedX causes inaccurate initial movement speed of some NPCs, including squids
+        //   (cross-ref UpdateNPCs condition RealSpeedX != 0 for Active NPCs.)
+        // Technically, the final values should depend on the value of speedVar,
+        //   which invalidly exchanged information between loop iterations,
+        //   but in the valid case this is the outcome.
+        //   (cross-ref UpdateNPCs clause updating RealSpeedX for Active, formerly all, NPCs)
+        if(n.RealSpeedX != 0)
+        {
+            n.Location.SpeedX = n.RealSpeedX;
+            n.RealSpeedX = 0;
+        }
 
         if(!n.Projectile || n.Type == 50 || n.Type == 78)
             n.Multiplier = 0;
@@ -903,7 +914,7 @@ void UpdateNPCs()
                 else if(NPC[A].Type == 21)
                     NPC[A].Special = 100;
             }
-            else if(!NPC[A].Generator && !NPCQueues::check_active_type(NPC[A]))
+            else if(!NPC[A].Generator && !NPCQueues::check_active(NPC[A]))
                 NPCQueues::Active.erase(A);
 
             if(NPC[A].Type == 84 || NPC[A].Type == 181)
@@ -4379,6 +4390,9 @@ void UpdateNPCs()
                     if(NPC[A].Type == 179 || NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70 || (NPC[A].Type >= 78 && NPC[A].Type <= 83))
                         NPC[A].Projectile = false;
                 }
+
+                // obsolete code commented out in SMBX64
+
                 // Pinched code
                 // If .Direction <> oldDirection Then
                 // .PinchCount += 10
@@ -4396,7 +4410,9 @@ void UpdateNPCs()
                 // ElseIf .PinchCount = 0 Then
                 // .Pinched = False
                 // End If
-                NPC[A].Pinched = false;
+
+                // NPC[A].Pinched = false;    // never set to true since SMBX64, removed
+
                 // Special Code for things that work while held
                 if(NPC[A].Type == 134) // SMB2 Bomb
                 {
@@ -5586,7 +5602,8 @@ void UpdateNPCs()
                 }
             }
 
-            // moved here because speedVar can only be validly set here
+            // Originally applied for all NPCs, even if inactive.
+            // Moved here because speedVar is only validly set here.
             if(!fEqual(speedVar, 1) && !fEqual(speedVar, 0))
             {
                 NPC[A].RealSpeedX = float(NPC[A].Location.SpeedX);

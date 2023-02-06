@@ -78,6 +78,7 @@ extern std::vector<NPCRef_t> Killed;
 extern std::vector<NPCRef_t> PlayerTemp;
 
 // NPC[A].Location.Width modified or NPC A deactivated -> NPCQueues::Unchecked.push_back(A);
+//   Also add if certain fields (RealSpeedX and various counters) are unexpectedly modified while NPC inactive
 extern std::vector<NPCRef_t> Unchecked;
 
 // Contained in any of the following cases:

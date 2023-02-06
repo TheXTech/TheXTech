@@ -1023,7 +1023,8 @@ void UpdatePlayer()
                     Player[A].FairyCD -= 1;
 
 
-                if(Player[A].StandingOnNPC != 0 && !NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                // the pinched variable has been always false since SMBX64
+                if(Player[A].StandingOnNPC != 0 && /*!NPC[Player[A].StandingOnNPC].Pinched && */ !FreezeNPCs)
                 {
                     if(Player[A].StandingOnNPC < 0)
                         NPC[Player[A].StandingOnNPC].Location = Block[(int)NPC[Player[A].StandingOnNPC].Special].Location;
@@ -2933,7 +2934,9 @@ void UpdatePlayer()
                         if(Player[A].StandingOnNPC != 0 && !movingBlock)
                         {
                             Player[A].Location.SpeedY = 1;
-                            if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                            // the Pinched variable has always been false since SMBX64
+                            // if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                            if(!FreezeNPCs)
                                 Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed;
                             Player[A].StandingOnNPC = 0;
                         }
@@ -3203,7 +3206,9 @@ void UpdatePlayer()
                 {
                     if(!tempHit2)
                     {
-                        if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                        // the Pinched variable has always been false since SMBX64
+                        // if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                        if(!FreezeNPCs)
                             Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed;
                     }
                 }
