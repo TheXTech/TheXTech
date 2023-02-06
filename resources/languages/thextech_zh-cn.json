@@ -83,7 +83,7 @@
         "dropAddTitle": "添加/删除玩家",
         "editor": {
             "editorErrorMissingResources": "抱歉，需要EditorIcons.png，即编辑器图标文件，才能启动编辑器。",
-            "editorErrorResolution": "抱歉，编辑器不支持当前设置的分辨率。",
+            "editorErrorResolution": "抱歉，在当前设置的分辨率下，无法启动编辑器。",
             "editorNewWorld": "<新地图>"
         },
         "game": {
