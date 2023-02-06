@@ -28,29 +28,29 @@
                 "LR": "左右",
                 "UD": "上下",
                 "aiIs": "AI：{0}",
-                "headerCustomAi": "自定义 AI：",
-                "jump": "",
-                "leap": "",
-                "swim": "",
-                "target": "",
-                "use1_0Ai": ""
+                "headerCustomAi": "自定义AI：",
+                "jump": "跳跃",
+                "leap": "飞跃",
+                "swim": "游泳",
+                "target": "目标",
+                "use1_0Ai": "使用1.0 AI？"
             },
-            "inContainer": "",
-            "inertNice": "",
-            "stuckStop": "",
-            "tooltipExpandSection": ""
+            "inContainer": "包含",
+            "inertNice": "友好",
+            "stuckStop": "静止",
+            "tooltipExpandSection": "扩展场景"
         },
-        "phraseRadiusIndex": "",
-        "phraseSectionIndex": "",
+        "phraseRadiusIndex": "半径{0}",
+        "phraseSectionIndex": "场景{0}",
         "phraseTextOf": "",
         "warp": {
             "transit": {
-                "name0": "",
-                "name1": "",
-                "name2": "",
-                "name3": "",
-                "name4": "",
-                "name5": ""
+                "name0": "无",
+                "name1": "滚动",
+                "name2": "淡入淡出",
+                "name3": "圆形",
+                "name4": "水平翻转",
+                "name5": "垂直翻转"
             }
         },
         "wordEvent": {
@@ -82,7 +82,7 @@
         },
         "dropAddTitle": "添加/删除玩家",
         "editor": {
-            "editorErrorMissingResources": "抱歉，需要 EditorIcons.png，即编辑器图标文件，才能启动编辑器。",
+            "editorErrorMissingResources": "抱歉，需要EditorIcons.png，即编辑器图标文件，才能启动编辑器。",
             "editorErrorResolution": "抱歉，编辑器不支持当前设置的分辨率。",
             "editorNewWorld": "<新地图>"
         },
@@ -133,17 +133,17 @@
         "wordYes": "是"
     },
     "outro": {
-        "cppPortDevelopers": "",
+        "cppPortDevelopers": "C++移植开发人员：",
         "customSprites": "自定义素材：",
-        "d3dsPortBy": "3DS 移植：",
+        "d3dsPortBy": "3DS移植：",
         "engineCredits": "引擎制作人员名单：",
         "gameCredits": "游戏制作人员名单:",
         "levelDesign": "关卡设计：",
         "nameAndrewSpinks": "安德鲁·斯宾克斯",
         "nameVitalyNovichkov": "维塔利·诺维奇科夫",
-        "originalBy": "原始 VB6 代码：",
-        "psVitaPortBy": "PS Vita 移植：",
+        "originalBy": "原始VB6代码：",
+        "psVitaPortBy": "PS Vita移植：",
         "specialThanks": "特别鸣谢：",
-        "wiiPortBy": "Wii 移植："
+        "wiiPortBy": "Wii移植："
     }
 }
