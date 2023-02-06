@@ -54,14 +54,14 @@
             }
         },
         "wordEvent": {
-            "genitive": "",
-            "nominative": ""
+            "genitive": "事件",
+            "nominative": "事件"
         },
         "wordNPC": {
-            "genitive": "",
-            "nominative": ""
+            "genitive": "NPC",
+            "nominative": "NPC"
         },
-        "wordText": ""
+        "wordText": "文字"
     },
     "languageName": "简体中文",
     "menu": {
