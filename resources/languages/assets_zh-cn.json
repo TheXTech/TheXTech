@@ -86,7 +86,7 @@
             }
         },
         "bgo": {
-             "fam-art2": "家具",
+            "fam-art2": "家具",
             "fam-bars4": "栏杆",
             "fam-clouds1": "云朵",
             "fam-doors2": "门",
@@ -115,11 +115,11 @@
             "fam-water4": "水"
         },
         "block": {
-            "fam-bonus3": "",
-            "fam-bonus4": "",
+            "fam-bonus3": "奖励",
+            "fam-bonus4": "奖励",
             "fam-bricks5": "",
-            "fam-castle2": "",
-            "fam-castle4": "",
+            "fam-castle2": "城堡",
+            "fam-castle4": "城堡",
             "fam-cave3": "",
             "fam-cave4": "",
             "fam-char5": "",
@@ -139,11 +139,11 @@
             "fam-misc2": "",
             "fam-misc3": "",
             "fam-misc4": "",
-            "fam-overworld1": "",
-            "fam-overworld2": "",
-            "fam-pipes1": "",
-            "fam-pipes3": "",
-            "fam-pipes4": "",
+            "fam-overworld1": "地面",
+            "fam-overworld2": "地面",
+            "fam-pipes1": "水管",
+            "fam-pipes3": "水管",
+            "fam-pipes4": "水管",
             "fam-pipes5-2": "",
             "fam-pipes5-3": "",
             "fam-ruins5": "",
@@ -178,8 +178,8 @@
         },
         "music": {
             "auto": {
-                "music0": "",
-                "music24": ""
+                "music0": "无音乐",
+                "music24": "自定义"
             },
             "fam-64": {
                 "header": "",
