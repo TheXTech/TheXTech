@@ -178,9 +178,9 @@ struct TableInterface
             std::sort(out.begin(), out.end(),
             [](BaseRef_t a, BaseRef_t b)
             {
-                return (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
-                    || (((ItemRef_t)a)->Location.X == ((ItemRef_t)b)->Location.X
-                        && ((ItemRef_t)a)->Location.Y < ((ItemRef_t)b)->Location.Y));
+                return (((ItemRef_t)a)->Location.X <= ((ItemRef_t)b)->Location.X
+                    && (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
+                        || ((ItemRef_t)a)->Location.Y < ((ItemRef_t)b)->Location.Y));
             });
         }
         else if(sort_mode == SORTMODE_ID)
@@ -424,9 +424,9 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
         std::sort(result.i_vec->begin(), result.i_vec->end(),
         [](BaseRef_t a, BaseRef_t b)
         {
-            return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                    && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
+            return (((BlockRef_t)a)->Location.X <= ((BlockRef_t)b)->Location.X
+                && (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                    || ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
         });
     }
     else if(sort_mode == SORTMODE_ID)
@@ -534,9 +534,9 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
         std::sort(result.i_vec->begin() + pre_temp_size, result.i_vec->end(),
         [](BaseRef_t a, BaseRef_t b)
         {
-            return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                    && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
+            return (((BlockRef_t)a)->Location.X <= ((BlockRef_t)b)->Location.X
+                && (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                    || ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
         });
     }
 
@@ -546,9 +546,9 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
         std::sort(result.i_vec->begin(), result.i_vec->end(),
         [](BaseRef_t a, BaseRef_t b)
         {
-            return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                    && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
+            return (((BlockRef_t)a)->Location.X <= ((BlockRef_t)b)->Location.X
+                && (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                    || ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
         });
     }
     else if(sort_mode == SORTMODE_ID)
@@ -722,9 +722,9 @@ TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
         std::sort(result.i_vec->begin(), result.i_vec->end(),
         [](BaseRef_t a, BaseRef_t b)
         {
-            return (((NPCRef_t)a)->Location.X < ((NPCRef_t)b)->Location.X
-                || (((NPCRef_t)a)->Location.X == ((NPCRef_t)b)->Location.X
-                    && ((NPCRef_t)a)->Location.Y < ((NPCRef_t)b)->Location.Y));
+            return (((NPCRef_t)a)->Location.X <= ((NPCRef_t)b)->Location.X
+                && (((NPCRef_t)a)->Location.X < ((NPCRef_t)b)->Location.X
+                    || ((NPCRef_t)a)->Location.Y < ((NPCRef_t)b)->Location.Y));
         });
     }
     else if(sort_mode == SORTMODE_ID)
