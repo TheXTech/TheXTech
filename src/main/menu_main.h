@@ -163,6 +163,7 @@ struct MainMenuContent
 
     std::string wordYes;
     std::string wordNo;
+    std::string caseNone;
 };
 
 extern MainMenuContent g_mainMenu;

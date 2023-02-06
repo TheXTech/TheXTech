@@ -63,8 +63,15 @@
         },
         "wordText": ""
     },
+    "game": {
+        "controls": {
+            "phrasePlayerConnected": "",
+            "phrasePlayerDisconnected": ""
+        }
+    },
     "languageName": "Русский",
     "menu": {
+        "caseNone": "",
         "character": {
             "charSelTitle": "Выбор персонажа"
         },

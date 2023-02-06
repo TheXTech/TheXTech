@@ -162,6 +162,7 @@ void initMainMenu()
 
     g_mainMenu.wordNo = "No";
     g_mainMenu.wordYes = "Yes";
+    g_mainMenu.caseNone = "<None>";
 }
 
 

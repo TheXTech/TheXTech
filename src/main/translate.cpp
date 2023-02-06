@@ -35,6 +35,7 @@
 #include "main/menu_main.h"
 #include "main/game_info.h"
 #include "main/outro_loop.h"
+#include "main/game_strings.h"
 
 #include "editor/editor_strings.h"
 #include "editor/editor_custom.h"
@@ -209,6 +210,8 @@ XTechTranslate::XTechTranslate()
 
         {"menu.wordNo", &g_mainMenu.wordNo},
         {"menu.wordYes", &g_mainMenu.wordYes},
+        {"menu.caseNone", &g_mainMenu.caseNone},
+
 
         {"outro.gameCredits",           &g_outroScreen.gameCredits},
         {"outro.engineCredits",         &g_outroScreen.engineCredits},
@@ -220,6 +223,10 @@ XTechTranslate::XTechTranslate()
         {"outro.levelDesign",           &g_outroScreen.levelDesign},
         {"outro.customSprites",         &g_outroScreen.customSprites},
         {"outro.specialThanks",         &g_outroScreen.specialThanks},
+
+
+        {"game.controls.phrasePlayerDisconnected",  &g_gameStrings.controlsPhrasePlayerDisconnected},
+        {"game.controls.phrasePlayerConnected",     &g_gameStrings.controlsPhrasePlayerConnected},
 
 
 #ifdef THEXTECH_ENABLE_EDITOR
@@ -293,6 +300,7 @@ void XTechTranslate::reset()
 {
     initOutroContent();
     initMainMenu();
+    initGameStrings();
 
 #ifdef THEXTECH_ENABLE_EDITOR
     initEditorStrings();

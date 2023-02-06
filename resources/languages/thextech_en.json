@@ -63,8 +63,15 @@
         },
         "wordText": "Text"
     },
+    "game": {
+        "controls": {
+            "phrasePlayerConnected": "P{0} connected {1}, Profile: {2}",
+            "phrasePlayerDisconnected": "P{0} disconnected"
+        }
+    },
     "languageName": "English",
     "menu": {
+        "caseNone": "<None>",
         "character": {
             "charSelTitle": "Character Select"
         },
