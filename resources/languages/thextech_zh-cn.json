@@ -16,7 +16,7 @@
             "letterActivate": "出：",
             "letterDeath": "死：",
             "letterLayerClear": "空：",
-            "letterTalk": "话："
+            "letterTalk": "对："
         },
         "layer": {
             "label": "图层：",
@@ -101,7 +101,7 @@
         "loading": "加载中...",
         "main": {
             "main1PlayerGame": "单人游戏",
-            "mainBattleGame": "对战",
+            "mainBattleGame": "对战模式",
             "mainEditor": "编辑器",
             "mainExit": "退出",
             "mainMultiplayerGame": "双人游戏",
