@@ -3139,12 +3139,12 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     if(FileFormat == FileFormats::LVL_PGEX && EditorCursor.Block.Type == 90)
     {
         SuperPrintR(mode, "CAN BREAK", 3, e_ScreenW - 160, 106);
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 120 + 4, GFXBlock[188], EditorCursor.Block.Special2, 0, 0, 32, 32, "LEGACY: BREAKS WHEN HIT"))
-            EditorCursor.Block.Special2 = (EditorCursor.Block.Special2 ? 0 : 1);
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 120 + 4, GFXBlock[188], EditorCursor.Block.forceSmashable, 0, 0, 32, 32, "LEGACY: BREAKS WHEN HIT"))
+            EditorCursor.Block.forceSmashable = !EditorCursor.Block.forceSmashable;
     }
     else
     {
-        EditorCursor.Block.Special2 = 0;
+        EditorCursor.Block.forceSmashable = 0;
     }
 
     // Slippy ("SLICK") and Invis

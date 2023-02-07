@@ -719,6 +719,8 @@ struct Water_t
 //Public Type Block   'Blocks
 struct Block_t
 {
+//! EXTRA: temporary workaround: is it a smashable block of type 90 (normally not smashable)? (previously Special2)
+    bool forceSmashable = false;
 //    Slippy As Boolean
     bool Slippy = false;
 //    RespawnDelay As Integer
@@ -729,8 +731,6 @@ struct Block_t
     int DefaultType = 0;
 //    DefaultSpecial As Integer
     int DefaultSpecial = 0;
-//! EXTRA: second special
-    int DefaultSpecial2 = 0;
 //'for event triggers
 //    TriggerHit As String
     eventindex_t TriggerHit = EVENT_NONE;
@@ -748,8 +748,6 @@ struct Block_t
     Location_t Location;
 //    Special As Integer 'what is in the block?
     int Special = 0;
-//! EXTRA: second special
-    int Special2 = 0;
 //'for the shake effect after hitting ablock
 //    ShakeY As Integer
     int ShakeY = 0;

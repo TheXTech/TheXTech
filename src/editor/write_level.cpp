@@ -172,7 +172,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
         // NEW: legacy behavior for spin block
         if(b.Type == 90)
-            block.special_data = b.Special2;
+            block.special_data = (int)b.forceSmashable;
 
         block.meta.array_id = (out.blocks_array_id++);
 

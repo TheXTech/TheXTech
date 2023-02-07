@@ -1432,7 +1432,7 @@ void BlockHitHard(int A)
     if(Block[A].Hidden)
         return;
 
-    if(Block[A].Type == 90 && Block[A].Special2 != 1)
+    if(Block[A].Type == 90 && !Block[A].forceSmashable)
     {
         // Block(A).Hidden = True
         // NewEffect 82, Block(A).Location, , A
@@ -1841,7 +1841,6 @@ void UpdateBlocks()
                                 if(b.Type != b.DefaultType)
                                     NewEffect(10, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
                                 b.Special = b.DefaultSpecial;
-                                b.Special2 = b.DefaultSpecial2;
                                 b.Type = b.DefaultType;
                             }
 
@@ -1884,7 +1883,7 @@ void UpdateBlocks()
                     ib.Type = 283;
                 else if(ib.Type == 283)
                     ib.Type = 282;
-                if(ib.Type == 90 && ib.Special == 0 && ib.Special2 != 1)
+                if(ib.Type == 90 && ib.Special == 0 && !ib.forceSmashable)
                 {
                     ib.Hidden = true;
                     invalidateDrawBlocks();

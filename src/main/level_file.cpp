@@ -430,16 +430,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             block.Special = 1095;
         block.DefaultSpecial = block.Special;
 
-        block.Special2 = 0;
+        block.forceSmashable = false;
         if(b.id == 90)
         {
             if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 20)
-                block.Special2 = 1; // Restore bricks algorithm for turn blocks for SMBX19 and lower
+                block.forceSmashable = true; // Restore bricks algorithm for turn blocks for SMBX19 and lower
             else
-                block.Special2 = b.special_data; // load it if set in the modern format
+                block.forceSmashable = (bool)b.special_data; // load it if set in the modern format
         }
-
-        block.DefaultSpecial2 = block.Special2;
 
         block.Invis = b.invisible;
         block.Slippy = b.slippery;
@@ -1268,11 +1266,11 @@ bool CanConvertLevel(int format, std::string* reasons)
 
     for(int i = 1; i <= numBlock; i++)
     {
-        if(Block[i].Type == 90 && Block[i].Special2 == 1)
+        if(Block[i].Type == 90 && Block[i].forceSmashable)
         {
             can_convert = false;
             if(reasons)
-                *reasons += "A spin block uses ancient behavior.\n";
+                *reasons += "A spin block uses ancient smashable behavior.\n";
             break;
         }
     }
@@ -1338,6 +1336,6 @@ void ConvertLevel(int format)
 
     for(int i = 1; i <= numBlock; i++)
     {
-        Block[i].Special2 = 0;
+        Block[i].forceSmashable = 0;
     }
 }

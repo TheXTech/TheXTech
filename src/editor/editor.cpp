@@ -1359,7 +1359,6 @@ void UpdateEditor()
                             Block[numBlock] = EditorCursor.Block;
                             Block[numBlock].DefaultType = Block[numBlock].Type;
                             Block[numBlock].DefaultSpecial = Block[numBlock].Special;
-                            Block[numBlock].DefaultSpecial2 = Block[numBlock].Special2;
                             syncLayersTrees_Block(numBlock);
 
                             MagicBlock::MagicBlock(numBlock);
@@ -3171,7 +3170,6 @@ void BlockFill(const Location_t &Loc)
         Block[numBlock] = EditorCursor.Block;
         Block[numBlock].DefaultType = Block[numBlock].Type;
         Block[numBlock].DefaultSpecial = Block[numBlock].Special;
-        Block[numBlock].DefaultSpecial2 = Block[numBlock].Special2;
         Block[numBlock].Location = Loc;
         syncLayersTrees_Block(numBlock);
         tempLoc = Loc;

@@ -465,7 +465,6 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 if(Block[A].Layer == L)
                     Block[A].Layer = LAYER_DEFAULT;
                 Block[A].Special = Block[A].DefaultSpecial;
-                Block[A].Special2 = Block[A].DefaultSpecial2;
                 Block[A].Type = Block[A].DefaultType;
                 syncLayersTrees_Block(A);
             }
