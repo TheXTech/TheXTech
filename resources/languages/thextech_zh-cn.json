@@ -8,60 +8,66 @@
     },
     "editor": {
         "block": {
-            "pickContents1": "",
-            "pickContents2": ""
+            "pickContents1": "选择砖块",
+            "pickContents2": "包含"
         },
         "events": {
-            "header": "",
-            "letterActivate": "",
-            "letterDeath": "",
-            "letterLayerClear": "",
-            "letterTalk": ""
+            "header": "事件：",
+            "letterActivate": "出：",
+            "letterDeath": "死：",
+            "letterLayerClear": "空：",
+            "letterTalk": "对："
         },
         "layer": {
-            "label": "",
-            "labelAbbrevAttLayer": ""
+            "label": "图层：",
+            "labelAbbrevAttLayer": "跟随："
         },
         "npc": {
-            "abbrevGen": "",
+            "abbrevGen": "连续",
             "ai": {
-                "LR": "",
-                "UD": "",
-                "aiIs": "",
-                "headerCustomAi": "",
-                "jump": "",
-                "leap": "",
-                "swim": "",
-                "target": "",
-                "use1_0Ai": ""
+                "LR": "左右",
+                "UD": "上下",
+                "aiIs": "AI：{0}",
+                "headerCustomAi": "自定义AI：",
+                "jump": "跳跃",
+                "leap": "飞跃",
+                "swim": "游泳",
+                "target": "目标",
+                "use1_0Ai": "使用1.0 AI？"
             },
-            "inContainer": "",
-            "inertNice": "",
-            "stuckStop": "",
-            "tooltipExpandSection": ""
+            "inContainer": "包含",
+            "inertNice": "友好",
+            "stuckStop": "静止",
+            "tooltipExpandSection": "扩展场景"
         },
-        "phraseRadiusIndex": "",
-        "phraseSectionIndex": "",
+        "phraseRadiusIndex": "半径{0}",
+        "phraseSectionIndex": "场景{0}",
         "phraseTextOf": "",
         "warp": {
             "transit": {
-                "name0": "",
-                "name1": "",
-                "name2": "",
-                "name3": "",
-                "name4": "",
-                "name5": ""
+                "name0": "无",
+                "name1": "滚动",
+                "name2": "淡入淡出",
+                "name3": "圆形",
+                "name4": "水平翻转",
+                "name5": "垂直翻转"
             }
         },
         "wordEvent": {
-            "genitive": "",
-            "nominative": ""
+            "genitive": "事件",
+            "nominative": "事件"
         },
         "wordNPC": {
-            "genitive": "",
-            "nominative": ""
+            "genitive": "NPC",
+            "nominative": "NPC"
         },
-        "wordText": ""
+        "wordText": "文字"
+    },
+    "game": {
+        "controls": {
+            "phrasePlayerConnected": "玩家{0}已连接{1}，配置：{2}",
+            "phrasePlayerDisconnected": "玩家{0}未连接"
+        }
     },
     "game": {
         "controls": {
@@ -71,7 +77,7 @@
     },
     "languageName": "简体中文",
     "menu": {
-        "caseNone": "",
+        "caseNone": "<无>",
         "character": {
             "charSelTitle": "选择角色"
         },
@@ -79,7 +85,7 @@
             "controlsConnected": "已连接：",
             "controlsDeleteKey": "（按第二奔跑键清除）",
             "controlsDeviceTypes": "设备类型",
-            "controlsInUse": "（已使用）",
+            "controlsInUse": "（使用中）",
             "controlsNewProfile": "<新建配置>",
             "controlsNotInUse": "（未使用）",
             "controlsReallyDeleteProfile": "确定删除配置？",
@@ -89,10 +95,10 @@
         },
         "dropAddTitle": "添加/删除玩家",
         "editor": {
-            "errorMissingResources": "抱歉，需要 {0}，即编辑器图标文件，才能启动编辑器。",
-            "errorResolution": "抱歉，编辑器不支持当前设置的分辨率。",
+            "errorMissingResources": "抱歉，需要{0}，即编辑器图标文件，才能启动编辑器。",
+            "errorResolution": "抱歉，在当前设置的分辨率下，无法启动编辑器。",
             "newWorld": "<新地图>",
-            "promptNewWorldName": "心地图的名"
+            "promptNewWorldName": "新地图名称"
         },
         "game": {
             "gameBattleRandom": "随机关卡",
@@ -105,13 +111,13 @@
             "gameSlotNew": "存档 {0} ... 新游戏",
             "gameSourceSlot": "选择源存档",
             "gameTargetSlot": "选择目标存档",
-            "phraseScore": "",
-            "phraseTime": ""
+            "phraseScore": "得分：",
+            "phraseTime": "时间："
         },
         "loading": "加载中...",
         "main": {
             "main1PlayerGame": "单人游戏",
-            "mainBattleGame": "对战",
+            "mainBattleGame": "对战模式",
             "mainEditor": "编辑器",
             "mainExit": "退出",
             "mainMultiplayerGame": "双人游戏",
@@ -143,17 +149,17 @@
         "wordYes": "是"
     },
     "outro": {
-        "cppPortDevelopers": "",
+        "cppPortDevelopers": "C++移植开发人员：",
         "customSprites": "自定义素材：",
-        "d3dsPortBy": "3DS 移植：",
+        "d3dsPortBy": "3DS移植：",
         "engineCredits": "引擎制作人员名单：",
         "gameCredits": "游戏制作人员名单:",
         "levelDesign": "关卡设计：",
         "nameAndrewSpinks": "安德鲁·斯宾克斯",
         "nameVitalyNovichkov": "维塔利·诺维奇科夫",
-        "originalBy": "原始 VB6 代码：",
-        "psVitaPortBy": "PS Vita 移植：",
+        "originalBy": "原始VB6代码：",
+        "psVitaPortBy": "PS Vita移植：",
         "specialThanks": "特别鸣谢：",
-        "wiiPortBy": "Wii 移植："
+        "wiiPortBy": "Wii移植："
     }
 }
