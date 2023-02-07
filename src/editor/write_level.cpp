@@ -227,9 +227,9 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
             npc.special_data = n.Special;
         }
         // Legacy and custom behaviors
-        else if(find_Special7_Data(n.Type) != nullptr)
+        else if(find_Variant_Data(n.Type) != nullptr)
         {
-            npc.special_data = n.Special7;
+            npc.special_data = n.Variant;
         }
 
         npc.generator = n.Generator;

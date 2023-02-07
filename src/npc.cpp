@@ -2390,7 +2390,7 @@ void NPCSpecial(int A)
                 tempBool = true;
         }
 
-        int railAlgo = int(npc.Special7);
+        int railAlgo = int(npc.Variant);
 
         if(npc.Type == NPCID_SAW && railAlgo != 2) // Grinder
         {
@@ -4791,7 +4791,7 @@ void SpecialNPC(int A)
                 {
                     bool playerLower = Player[B].Location.Y >= NPC[A].Location.Y;
                     // When mode 1, simulate older behavior and do always fall
-                    playerLower |= fEqual(NPC[A].Special7, 1.0);
+                    playerLower |= (NPC[A].Variant == 1);
                     if(!CanComeOut(NPC[A].Location, Player[B].Location) && playerLower)
                         C = B;
                 }

@@ -550,21 +550,24 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(compatModern && isSmbx64)
         {
             // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
-            npc.Special7 = find_legacy_Special7(npc.Type, fVersion);
+            npc.Variant = find_legacy_Variant(npc.Type, fVersion);
         }
         else if(isSmbx64)
         {
             // don't load anything for SMBX64 files
-            npc.Special7 = 0.0;
+            npc.Variant = 0;
         }
-        else if(find_Special7_Data(npc.Type) /* && compatModern */)
+        else if(find_Variant_Data(npc.Type) /* && compatModern */)
         {
             // only load Special7 for NPCs that support it
-            npc.Special7 = n.special_data;
+            if((n.special_data < 0) || (n.special_data >= 256))
+                pLogWarning("Attempted to load npc Type %d with out-of-range variant index %f", npc.Type, n.special_data);
+            else
+                npc.Variant = (uint8_t)n.special_data;
         }
         else
         {
-            npc.Special7 = 0.0;
+            npc.Variant = 0;
         }
 
         // All of the following duplicate the new Special7 code.
@@ -1251,7 +1254,7 @@ bool CanConvertLevel(int format, std::string* reasons)
 
     for(int i = 1; i <= numNPCs; i++)
     {
-        if(NPC[i].Special7 != 0)
+        if(NPC[i].Variant != 0)
         {
             can_convert = false;
             if(reasons)
@@ -1331,7 +1334,7 @@ void ConvertLevel(int format)
 
     for(int i = 1; i <= numNPCs; i++)
     {
-        NPC[i].Special7 = 0;
+        NPC[i].Variant = 0;
     }
 
     for(int i = 1; i <= numBlock; i++)
