@@ -89,9 +89,10 @@
         },
         "dropAddTitle": "添加/删除玩家",
         "editor": {
-            "editorErrorMissingResources": "抱歉，需要EditorIcons.png，即编辑器图标文件，才能启动编辑器。",
-            "editorErrorResolution": "抱歉，在当前设置的分辨率下，无法启动编辑器。",
-            "editorNewWorld": "<新地图>"
+            "errorMissingResources": "抱歉，需要{0}，即编辑器图标文件，才能启动编辑器。",
+            "errorResolution": "抱歉，编辑器不支持当前设置的分辨率。",
+            "newWorld": "<新地图>",
+            "promptNewWorldName": "新地图名称"
         },
         "game": {
             "gameBattleRandom": "随机关卡",
@@ -103,12 +104,14 @@
             "gameSlotContinue": "存档 {0} ... {1}%",
             "gameSlotNew": "存档 {0} ... 新游戏",
             "gameSourceSlot": "选择源存档",
-            "gameTargetSlot": "选择目标存档"
+            "gameTargetSlot": "选择目标存档",
+            "phraseScore": "",
+            "phraseTime": ""
         },
         "loading": "加载中...",
         "main": {
             "main1PlayerGame": "单人游戏",
-            "mainBattleGame": "对战模式",
+            "mainBattleGame": "对战",
             "mainEditor": "编辑器",
             "mainExit": "退出",
             "mainMultiplayerGame": "双人游戏",
