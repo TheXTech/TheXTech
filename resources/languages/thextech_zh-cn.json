@@ -79,7 +79,7 @@
             "controlsConnected": "已连接：",
             "controlsDeleteKey": "（按第二奔跑键清除）",
             "controlsDeviceTypes": "设备类型",
-            "controlsInUse": "（已使用）",
+            "controlsInUse": "（使用中）",
             "controlsNewProfile": "<新建配置>",
             "controlsNotInUse": "（未使用）",
             "controlsReallyDeleteProfile": "确定删除配置？",
@@ -90,7 +90,7 @@
         "dropAddTitle": "添加/删除玩家",
         "editor": {
             "errorMissingResources": "抱歉，需要{0}，即编辑器图标文件，才能启动编辑器。",
-            "errorResolution": "抱歉，编辑器不支持当前设置的分辨率。",
+            "errorResolution": "抱歉，在当前设置的分辨率下，无法启动编辑器。",
             "newWorld": "<新地图>",
             "promptNewWorldName": "新地图名称"
         },
@@ -105,13 +105,13 @@
             "gameSlotNew": "存档 {0} ... 新游戏",
             "gameSourceSlot": "选择源存档",
             "gameTargetSlot": "选择目标存档",
-            "phraseScore": "",
-            "phraseTime": ""
+            "phraseScore": "得分：",
+            "phraseTime": "时间："
         },
         "loading": "加载中...",
         "main": {
             "main1PlayerGame": "单人游戏",
-            "mainBattleGame": "对战",
+            "mainBattleGame": "对战模式",
             "mainEditor": "编辑器",
             "mainExit": "退出",
             "mainMultiplayerGame": "双人游戏",
