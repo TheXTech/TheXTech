@@ -239,16 +239,18 @@ struct rect_internal
 
 struct rect_external
 {
-    int32_t t, l, b, r;
+    int32_t l, r, t, b;
 
     rect_external() {}
+
+    rect_external(int32_t l, int32_t r, int32_t t, int32_t b) : l(l), r(r), t(t), b(b) {}
 
     rect_external(const Location_t& loc)
     {
         l = std::floor(loc.X);
+        r = std::ceil(loc.X + loc.Width);
         t = std::floor(loc.Y);
         b = std::ceil(loc.Y + loc.Height);
-        r = std::ceil(loc.X + loc.Width);
     }
 };
 
@@ -658,11 +660,27 @@ struct table_t
 
     void update(MyRef_t b)
     {
+        Location_t loc = extract_loc<MyRef_t>(b);
+
+        rect_external rect(loc);
+
         auto it = member_rects.find(b);
         if(it != member_rects.end())
-            erase(b, it->second);
+        {
+            // no-change optimization
+            if(it->second.l == rect.l
+                && it->second.r == rect.r
+                && it->second.t == rect.t
+                && it->second.b == rect.b)
+            {
+                return;
+            }
 
-        insert(b);
+            erase(b, it->second);
+        }
+
+        member_rects[b] = rect;
+        insert(b, rect);
     }
 
     void update_layer(MyRef_t b)

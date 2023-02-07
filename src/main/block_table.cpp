@@ -128,41 +128,46 @@ struct TableInterface
             layer_table[layer].erase(item);
     }
 
-    inline void query(std::vector<BaseRef_t>& out, Location_t loc, int sort_mode)
+    inline void query(std::vector<BaseRef_t>& out, const Location_t& _loc, int sort_mode)
     {
+        rect_external loc = _loc;
+
         // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
         //   (such as, when an item is trapped inside a wall during !BlocksSorted)
         if(g_compatibility.emulate_classic_block_order)
         {
-            loc.X -= 32;
-            loc.Y -= 32;
-            loc.Width += 64;
-            loc.Height += 64;
+            loc.l -= 32;
+            loc.r += 32;
+            loc.t -= 32;
+            loc.b += 32;
         }
         else
         {
-            loc.X -= 2;
-            loc.Y -= 2;
-            loc.Width += 4;
-            loc.Height += 4;
+            loc.l -= 2;
+            loc.r += 2;
+            loc.t -= 2;
+            loc.b += 2;
         }
 
         common_table.query(out, loc);
 
-        double oX = loc.X;
-        double oY = loc.Y;
-
-        for(int i = 0; i < num_active_tables; i++)
+        // bigger offset for r/b because of layer offset rounding issues
+        if(num_active_tables > 0)
         {
-            int layer = active_tables[i];
+            loc.r += 1;
+            loc.b += 1;
 
-            loc.X -= Layer[layer].OffsetX;
-            loc.Y -= Layer[layer].OffsetY;
+            for(int i = 0; i < num_active_tables; i++)
+            {
+                int layer = active_tables[i];
 
-            layer_table[layer].query(out, loc);
+                int32_t offX = std::ceil(Layer[layer].OffsetX);
+                int32_t offY = std::ceil(Layer[layer].OffsetY);
 
-            loc.X = oX;
-            loc.Y = oY;
+                rect_external layer_loc{loc.l - offX, loc.r - offX, loc.t - offY, loc.b - offY};
+
+                layer_table[layer].query(out, layer_loc);
+            }
         }
 
         if(sort_mode == SORTMODE_COMPAT)
@@ -178,9 +183,9 @@ struct TableInterface
             std::sort(out.begin(), out.end(),
             [](BaseRef_t a, BaseRef_t b)
             {
-                return (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
-                    || (((ItemRef_t)a)->Location.X == ((ItemRef_t)b)->Location.X
-                        && ((ItemRef_t)a)->Location.Y < ((ItemRef_t)b)->Location.Y));
+                return (((ItemRef_t)a)->Location.X <= ((ItemRef_t)b)->Location.X
+                    && (((ItemRef_t)a)->Location.X < ((ItemRef_t)b)->Location.X
+                        || ((ItemRef_t)a)->Location.Y < ((ItemRef_t)b)->Location.Y));
             });
         }
         else if(sort_mode == SORTMODE_ID)
@@ -389,21 +394,21 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
 
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
-    Location_t loc = _loc;
+    rect_external loc = _loc;
 
     if(g_compatibility.emulate_classic_block_order)
     {
-        loc.X -= 32;
-        loc.Y -= 32;
-        loc.Width += 64;
-        loc.Height += 64;
+        loc.l -= 32;
+        loc.r += 32;
+        loc.t -= 32;
+        loc.b += 32;
     }
     else
     {
-        loc.X -= 2;
-        loc.Y -= 2;
-        loc.Width += 4;
-        loc.Height += 4;
+        loc.l -= 2;
+        loc.r += 2;
+        loc.t -= 2;
+        loc.b += 2;
     }
 
 
@@ -424,9 +429,9 @@ TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &_loc,
         std::sort(result.i_vec->begin(), result.i_vec->end(),
         [](BaseRef_t a, BaseRef_t b)
         {
-            return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                    && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
+            return (((BlockRef_t)a)->Location.X <= ((BlockRef_t)b)->Location.X
+                && (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                    || ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
         });
     }
     else if(sort_mode == SORTMODE_ID)
@@ -534,9 +539,9 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
         std::sort(result.i_vec->begin() + pre_temp_size, result.i_vec->end(),
         [](BaseRef_t a, BaseRef_t b)
         {
-            return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                    && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
+            return (((BlockRef_t)a)->Location.X <= ((BlockRef_t)b)->Location.X
+                && (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                    || ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
         });
     }
 
@@ -546,9 +551,9 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &_loc,
         std::sort(result.i_vec->begin(), result.i_vec->end(),
         [](BaseRef_t a, BaseRef_t b)
         {
-            return (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
-                || (((BlockRef_t)a)->Location.X == ((BlockRef_t)b)->Location.X
-                    && ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
+            return (((BlockRef_t)a)->Location.X <= ((BlockRef_t)b)->Location.X
+                && (((BlockRef_t)a)->Location.X < ((BlockRef_t)b)->Location.X
+                    || ((BlockRef_t)a)->Location.Y < ((BlockRef_t)b)->Location.Y));
         });
     }
     else if(sort_mode == SORTMODE_ID)
@@ -693,21 +698,21 @@ TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
 
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
-    Location_t loc = _loc;
+    rect_external loc = _loc;
 
     if(g_compatibility.emulate_classic_block_order)
     {
-        loc.X -= 32;
-        loc.Y -= 32;
-        loc.Width += 64;
-        loc.Height += 64;
+        loc.l -= 32;
+        loc.r += 32;
+        loc.t -= 32;
+        loc.b += 32;
     }
     else
     {
-        loc.X -= 2;
-        loc.Y -= 2;
-        loc.Width += 4;
-        loc.Height += 4;
+        loc.l -= 2;
+        loc.r += 2;
+        loc.t -= 2;
+        loc.b += 2;
     }
 
     s_npc_table.query(*result.i_vec, loc);
@@ -722,9 +727,9 @@ TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
         std::sort(result.i_vec->begin(), result.i_vec->end(),
         [](BaseRef_t a, BaseRef_t b)
         {
-            return (((NPCRef_t)a)->Location.X < ((NPCRef_t)b)->Location.X
-                || (((NPCRef_t)a)->Location.X == ((NPCRef_t)b)->Location.X
-                    && ((NPCRef_t)a)->Location.Y < ((NPCRef_t)b)->Location.Y));
+            return (((NPCRef_t)a)->Location.X <= ((NPCRef_t)b)->Location.X
+                && (((NPCRef_t)a)->Location.X < ((NPCRef_t)b)->Location.X
+                    || ((NPCRef_t)a)->Location.Y < ((NPCRef_t)b)->Location.Y));
         });
     }
     else if(sort_mode == SORTMODE_ID)

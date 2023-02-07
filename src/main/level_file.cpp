@@ -213,7 +213,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         LevelREAL[B] = level[B];
         bgMusic[B] = int(s.music_id);
         bgMusicREAL[B] = bgMusic[B];
-        bgColor[B] = s.bgcolor;
+        // bgColor[B] = s.bgcolor;    // unused since SMBX64, removed
         LevelWrap[B] = s.wrap_h;
         LevelVWrap[B] = s.wrap_v; // EXTRA
         OffScreenExit[B] = s.OffScreenEn;
@@ -1023,7 +1023,7 @@ void ClearLevel()
     for(A = 0; A <= maxSections; A++)
     {
         Background2[A] = 0;
-        bgColor[A] = 0xF89868;
+        // bgColor[A] = 0xF89868;    // unused since SMBX64, removed
         bgMusic[A] = 0;
         level[A] = BlankLocation;
         LevelWrap[A] = false;

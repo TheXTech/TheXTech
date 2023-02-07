@@ -263,13 +263,13 @@ struct NPC_t
 //    MovingPinched As Integer 'required to be smashed
     int MovingPinched = 0;
 //    NetTimeout As Integer 'for online
-    int NetTimeout = 0;
+    // int NetTimeout = 0;    // unused since SMBX64, removed
 //    RealSpeedX As Single 'the real speed of the NPC
     float RealSpeedX = 0.0f;
 //    Wet As Integer ' greater then 0 of the NPC is in water
     int Wet = 0;
 //    Settings As Integer
-    int Settings = 0;
+    // int Settings = 0;    // unused since SMBX64, removed
 //    NoLavaSplash As Boolean 'true for no lava splash
     bool NoLavaSplash = false;
 //    Slope As Integer 'the block that the NPC is on a slope with
@@ -307,11 +307,11 @@ struct NPC_t
 //    oldAddBelt As Single
     float oldAddBelt = 0.0f;
 //    PinchCount As Integer 'obsolete
-    int PinchCount = 0;
+    // int PinchCount = 0;    // unused since SMBX64, removed
 //    Pinched As Boolean 'obsolete
-    bool Pinched = false;
+    // bool Pinched = false;    // unused since SMBX64, removed
 //    PinchedDirection As Integer 'obsolete
-    int PinchedDirection = 0;
+    // int PinchedDirection = 0;    // unused since SMBX64, removed
 //    BeltSpeed As Single 'The speed of the object this NPC is standing on
     float BeltSpeed = 0.0f;
 //    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
@@ -1279,7 +1279,7 @@ extern RangeArr<Location_t, 0, maxSections> LevelREAL;
 //Public curMusic As Integer 'current music playing
 extern int curMusic;
 //Public bgColor(0 To maxSections) As Long 'obsolete
-extern RangeArrI<long, 0, maxSections, 0> bgColor;
+// extern RangeArrI<long, 0, maxSections, 0> bgColor;    // unused since SMBX64, removed
 //Public Background2(0 To maxSections) As Integer 'level background
 extern RangeArrI<int, 0, maxSections, 0> Background2;
 //Public WorldPath(1 To maxWorldPaths) As WorldPath
