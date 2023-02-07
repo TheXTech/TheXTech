@@ -63,8 +63,15 @@
         },
         "wordText": "Text"
     },
+    "game": {
+        "controls": {
+            "phrasePlayerConnected": "P{0} connected {1}, Profile: {2}",
+            "phrasePlayerDisconnected": "P{0} disconnected"
+        }
+    },
     "languageName": "English",
     "menu": {
+        "caseNone": "<None>",
         "character": {
             "charSelTitle": "Character Select"
         },
@@ -82,9 +89,10 @@
         },
         "dropAddTitle": "Drop/Add Players",
         "editor": {
-            "editorErrorMissingResources": "Sorry! You are missing EditorIcons.png, the icons for the in-game editor.",
-            "editorErrorResolution": "Sorry! The in-game editor is not supported at your current resolution.",
-            "editorNewWorld": "<New World>"
+            "errorMissingResources": "Sorry! You are missing {0}, required for the in-game editor.",
+            "errorResolution": "Sorry! The in-game editor is not supported at your current resolution.",
+            "newWorld": "<New World>",
+            "promptNewWorldName": "New world name"
         },
         "game": {
             "gameBattleRandom": "Random Level",
@@ -96,7 +104,9 @@
             "gameSlotContinue": "SLOT {0} ... {1}%",
             "gameSlotNew": "SLOT {0} ... NEW GAME",
             "gameSourceSlot": "Select the source slot",
-            "gameTargetSlot": "Now select the target"
+            "gameTargetSlot": "Now select the target",
+            "phraseScore": "Score: {0}",
+            "phraseTime": "Time: {0}"
         },
         "loading": "Loading...",
         "main": {

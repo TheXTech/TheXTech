@@ -108,7 +108,8 @@ void initMainMenu()
 
     g_mainMenu.editorNewWorld = "<New World>";
     g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";
-    g_mainMenu.editorErrorMissingResources = "Sorry! You are missing EditorIcons.png, the icons for the in-game editor.";
+    g_mainMenu.editorErrorMissingResources = "Sorry! You are missing {0}, required for the in-game editor.";
+    g_mainMenu.editorPromptNewWorldName = "New world name";
 
     g_mainMenu.gameNoEpisodesToPlay = "<No episodes to play>";
     g_mainMenu.gameNoBattleLevels = "<No battle levels>";
@@ -121,6 +122,9 @@ void initMainMenu()
     g_mainMenu.gameSourceSlot = "Select the source slot";
     g_mainMenu.gameTargetSlot = "Now select the target";
     g_mainMenu.gameEraseSlot = "Select the slot to erase";
+
+    g_mainMenu.phraseScore = "Score: {0}";
+    g_mainMenu.phraseTime = "Time: {0}";
 
     g_mainMenu.optionsModeFullScreen = "Fullscreen mode";
     g_mainMenu.optionsModeWindowed = "Windowed mode";
@@ -158,6 +162,7 @@ void initMainMenu()
 
     g_mainMenu.wordNo = "No";
     g_mainMenu.wordYes = "Yes";
+    g_mainMenu.caseNone = "<None>";
 }
 
 
@@ -705,7 +710,7 @@ bool mainMenuUpdate()
                     else if(!GFX.EIcons.inited)
                     {
                         PlaySoundMenu(SFX_BlockHit);
-                        MessageText = g_mainMenu.editorErrorMissingResources;
+                        MessageText = fmt::format_ne(g_mainMenu.editorErrorMissingResources, "EditorIcons.png");
                         PauseGame(PauseCode::Message);
                     }
                     else
@@ -1084,7 +1089,7 @@ bool mainMenuUpdate()
                         if(selWorld == NumSelectWorldEditable)
                         {
                             ClearWorld(true);
-                            WorldName = TextEntryScreen::Run("New world name");
+                            WorldName = TextEntryScreen::Run(g_mainMenu.editorPromptNewWorldName);
                             if(!WorldName.empty())
                             {
                                 std::string fn = WorldName;
@@ -1645,7 +1650,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     // Score
     bool show_timer = info.Time > 0 && g_speedRunnerMode != SPEEDRUN_MODE_OFF;
     int row_score = show_timer ? row_1 : row_c;
-    SuperPrint(t = fmt::format_ne("Score: {0}", info.Score), 3, infobox_x + 10, row_score);
+    SuperPrint(t = fmt::format_ne(g_mainMenu.phraseScore, info.Score), 3, infobox_x + 10, row_score);
 
     // Gameplay Timer
     if(show_timer)
@@ -1655,7 +1660,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         if(t.size() > 9)
             t = t.substr(0, t.size() - 4);
 
-        SuperPrint(fmt::format_ne("Time: {0}", t), 3, infobox_x + 10, row_2);
+        SuperPrint(fmt::format_ne(g_mainMenu.phraseTime, t), 3, infobox_x + 10, row_2);
     }
 
     // If demos off, put (l)ives and (c)oins on center

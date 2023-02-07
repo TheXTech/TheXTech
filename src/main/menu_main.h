@@ -106,6 +106,7 @@ struct MainMenuContent
     std::string editorNewWorld;
     std::string editorErrorResolution;
     std::string editorErrorMissingResources;
+    std::string editorPromptNewWorldName;
 
     std::string gameNoEpisodesToPlay;
     std::string gameNoBattleLevels;
@@ -120,6 +121,9 @@ struct MainMenuContent
     std::string gameSourceSlot;
     std::string gameTargetSlot;
     std::string gameEraseSlot;
+
+    std::string phraseScore;
+    std::string phraseTime;
 
     // Options
     std::string optionsModeFullScreen;
@@ -159,6 +163,7 @@ struct MainMenuContent
 
     std::string wordYes;
     std::string wordNo;
+    std::string caseNone;
 };
 
 extern MainMenuContent g_mainMenu;

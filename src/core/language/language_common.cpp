@@ -25,12 +25,12 @@
 #include "language_private.h"
 #include <fmt_format_ne.h>
 
-#ifndef XTECH_DISABLE_SDL_LOCALE
+#ifndef THEXTECH_DISABLE_SDL_LOCALE
 #   include <SDL2/SDL_version.h>
 #   if SDL_COMPILEDVERSION >= SDL_VERSIONNUM(2, 0, 14)
 #       include <SDL2/SDL_locale.h>
 #   else
-#       define XTECH_DISABLE_SDL_LOCALE
+#       define THEXTECH_DISABLE_SDL_LOCALE
 #   endif
 #endif
 
@@ -81,7 +81,7 @@ void XLanguage::init()
     if(!CurrentLanguage.empty() && detectSetup())
         return;
 
-#ifndef XTECH_DISABLE_SDL_LOCALE
+#ifndef THEXTECH_DISABLE_SDL_LOCALE
     SDL_Locale *loc = SDL_GetPreferredLocales();
     CurrentLanguage.clear();
     CurrentLangDialect.clear();

@@ -69,6 +69,12 @@
             "phrasePlayerDisconnected": "玩家{0}未连接"
         }
     },
+    "game": {
+        "controls": {
+            "phrasePlayerConnected": "",
+            "phrasePlayerDisconnected": ""
+        }
+    },
     "languageName": "简体中文",
     "menu": {
         "caseNone": "<无>",
