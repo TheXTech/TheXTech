@@ -703,16 +703,16 @@ struct Background_t
 //Public Type Water
 struct Water_t
 {
+//    Location As Location
+    SpeedlessLocation_t Location;
+//    Buoy As Single 'not used
+    float Buoy = 0.0f;
 //    Layer As String
     layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
-//    Buoy As Single 'not used
-    float Buoy = 0.0f;
 //    Quicksand As Boolean
     bool Quicksand = false;
-//    Location As Location
-    Location_t Location;
 //End Type
 };
 
@@ -853,7 +853,7 @@ struct vScreen_t
 struct WorldLevel_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
     int Type = 0;
 //    FileName As String 'level's file
@@ -890,6 +890,10 @@ struct WorldLevel_t
 //Public Type Warp 'warps such as pipes and doors
 struct Warp_t
 {
+//    Entrance As Location 'location of warp entrance
+    SpeedlessLocation_t Entrance;
+//    Exit As Location 'location of warp exit
+    SpeedlessLocation_t Exit;
 //    Locked As Boolean 'requires a key NPC
     bool Locked = false;
 //    WarpNPC As Boolean 'allows NPC through the warp
@@ -906,10 +910,6 @@ struct Warp_t
     bool PlacedExit = false;
 //    Stars As Integer 'number of stars required to enter
     int Stars = 0;
-//    Entrance As Location 'location of warp entrance
-    Location_t Entrance;
-//    Exit As Location 'location of warp exit
-    Location_t Exit;
 //    Effect As Integer 'style of warp. door/
     int Effect = 0;
 //    level As String 'filename of the level it should warp to
@@ -949,7 +949,7 @@ struct Warp_t
 struct Tile_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
     int Type = 0;
 //End Type
@@ -961,7 +961,7 @@ struct Tile_t
 struct Scene_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
     int Type = 0;
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
@@ -974,7 +974,7 @@ struct Scene_t
 struct WorldPath_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Active As Boolean
     bool Active = false;
 //    Type As Integer
@@ -987,7 +987,7 @@ struct WorldPath_t
 struct WorldMusic_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
     int Type = 0;
 //    EXTRA: Custom Music
@@ -1081,7 +1081,7 @@ struct WorldPlayer_t
 struct CreditLine_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Text As String
     stringindex_t Text = STRINGINDEX_NONE;
 //End Type
