@@ -24,62 +24,34 @@
 // 'Normal collisions
 bool CheckCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
-    if(
-        (Loc1.Y + Loc1.Height >= Loc2.Y) &&
-        (Loc1.Y <= Loc2.Y + Loc2.Height) &&
-        (Loc1.X <= Loc2.X + Loc2.Width) &&
-        (Loc1.X + Loc1.Width >= Loc2.X)
-    )
-    {
-        return true;
-    }
-
-    return false;
+    return (Loc1.Y + Loc1.Height >= Loc2.Y) &&
+           (Loc1.Y <= Loc2.Y + Loc2.Height) &&
+           (Loc1.X <= Loc2.X + Loc2.Width) &&
+           (Loc1.X + Loc1.Width >= Loc2.X);
 }
 
 bool CheckCollision(const SpeedlessLocation_t &Loc1, const Location_t &Loc2)
 {
-    if(
-        (Loc1.Y + Loc1.Height >= Loc2.Y) &&
-        (Loc1.Y <= Loc2.Y + Loc2.Height) &&
-        (Loc1.X <= Loc2.X + Loc2.Width) &&
-        (Loc1.X + Loc1.Width >= Loc2.X)
-    )
-    {
-        return true;
-    }
-
-    return false;
+    return (Loc1.Y + Loc1.Height >= Loc2.Y) &&
+           (Loc1.Y <= Loc2.Y + Loc2.Height) &&
+           (Loc1.X <= Loc2.X + Loc2.Width) &&
+           (Loc1.X + Loc1.Width >= Loc2.X);
 }
 
 bool CheckCollision(const Location_t &Loc1, const SpeedlessLocation_t &Loc2)
 {
-    if(
-        (Loc1.Y + Loc1.Height >= Loc2.Y) &&
-        (Loc1.Y <= Loc2.Y + Loc2.Height) &&
-        (Loc1.X <= Loc2.X + Loc2.Width) &&
-        (Loc1.X + Loc1.Width >= Loc2.X)
-    )
-    {
-        return true;
-    }
-
-    return false;
+    return (Loc1.Y + Loc1.Height >= Loc2.Y) &&
+           (Loc1.Y <= Loc2.Y + Loc2.Height) &&
+           (Loc1.X <= Loc2.X + Loc2.Width) &&
+           (Loc1.X + Loc1.Width >= Loc2.X);
 }
 
 bool CheckCollision(const SpeedlessLocation_t &Loc1, const SpeedlessLocation_t &Loc2)
 {
-    if(
-        (Loc1.Y + Loc1.Height >= Loc2.Y) &&
-        (Loc1.Y <= Loc2.Y + Loc2.Height) &&
-        (Loc1.X <= Loc2.X + Loc2.Width) &&
-        (Loc1.X + Loc1.Width >= Loc2.X)
-    )
-    {
-        return true;
-    }
-
-    return false;
+    return (Loc1.Y + Loc1.Height >= Loc2.Y) &&
+           (Loc1.Y <= Loc2.Y + Loc2.Height) &&
+           (Loc1.X <= Loc2.X + Loc2.Width) &&
+           (Loc1.X + Loc1.Width >= Loc2.X);
 }
 
 // Intersect collisions
@@ -424,43 +396,17 @@ int BootCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn)
 // Cursor collision
 bool CursorCollision(const Location_t &Loc1, const Location_t &Loc2)
 {
-    bool tempCursorCollision = false;
-
-    if(Loc1.X <= Loc2.X + Loc2.Width - 1)
-    {
-        if(Loc1.X + Loc1.Width >= Loc2.X + 1)
-        {
-            if(Loc1.Y <= Loc2.Y + Loc2.Height - 1)
-            {
-                if(Loc1.Y + Loc1.Height >= Loc2.Y + 1)
-                {
-                    tempCursorCollision = true;
-                }
-            }
-        }
-    }
-
-    return tempCursorCollision;
+    return (Loc1.X <= Loc2.X + Loc2.Width - 1) &&
+           (Loc1.X + Loc1.Width >= Loc2.X + 1) &&
+           (Loc1.Y <= Loc2.Y + Loc2.Height - 1) &&
+           (Loc1.Y + Loc1.Height >= Loc2.Y + 1);
 }
 bool CursorCollision(const Location_t &Loc1, const SpeedlessLocation_t &Loc2)
 {
-    bool tempCursorCollision = false;
-
-    if(Loc1.X <= Loc2.X + Loc2.Width - 1)
-    {
-        if(Loc1.X + Loc1.Width >= Loc2.X + 1)
-        {
-            if(Loc1.Y <= Loc2.Y + Loc2.Height - 1)
-            {
-                if(Loc1.Y + Loc1.Height >= Loc2.Y + 1)
-                {
-                    tempCursorCollision = true;
-                }
-            }
-        }
-    }
-
-    return tempCursorCollision;
+    return (Loc1.X <= Loc2.X + Loc2.Width - 1) &&
+           (Loc1.X + Loc1.Width >= Loc2.X + 1) &&
+           (Loc1.Y <= Loc2.Y + Loc2.Height - 1) &&
+           (Loc1.Y + Loc1.Height >= Loc2.Y + 1);
 }
 
 // Shakey block collision
@@ -488,97 +434,41 @@ bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3)
 // vScreen collisions
 bool vScreenCollision(int A, const Location_t &Loc2)
 {
-    bool tempvScreenCollision = false;
-
     if(A == 0)
-    {
         return true;
-    }
-    if(-vScreenX[A] <= Loc2.X + Loc2.Width)
-    {
-        if(-vScreenX[A] + vScreen[A].Width >= Loc2.X)
-        {
-            if(-vScreenY[A] <= Loc2.Y + Loc2.Height)
-            {
-                if(-vScreenY[A] + vScreen[A].Height >= Loc2.Y)
-                {
-                    tempvScreenCollision = true;
-                }
-            }
-        }
-    }
 
-    return tempvScreenCollision;
-
+    return (-vScreenX[A] <= Loc2.X + Loc2.Width) &&
+           (-vScreenX[A] + vScreen[A].Width >= Loc2.X) &&
+           (-vScreenY[A] <= Loc2.Y + Loc2.Height) &&
+           (-vScreenY[A] + vScreen[A].Height >= Loc2.Y);
 }
 
 bool vScreenCollision(int A, const SpeedlessLocation_t &Loc2)
 {
-    bool tempvScreenCollision = false;
-
     if(A == 0)
-    {
         return true;
-    }
-    if(-vScreenX[A] <= Loc2.X + Loc2.Width)
-    {
-        if(-vScreenX[A] + vScreen[A].Width >= Loc2.X)
-        {
-            if(-vScreenY[A] <= Loc2.Y + Loc2.Height)
-            {
-                if(-vScreenY[A] + vScreen[A].Height >= Loc2.Y)
-                {
-                    tempvScreenCollision = true;
-                }
-            }
-        }
-    }
 
-    return tempvScreenCollision;
-
+    return (-vScreenX[A] <= Loc2.X + Loc2.Width) &&
+           (-vScreenX[A] + vScreen[A].Width >= Loc2.X) &&
+           (-vScreenY[A] <= Loc2.Y + Loc2.Height) &&
+           (-vScreenY[A] + vScreen[A].Height >= Loc2.Y);
 }
 
 // vScreen collisions 2
 bool vScreenCollision2(int A, const Location_t &Loc2)
 {
-    bool tempvScreenCollision2 = false;
-
-    if(-vScreenX[A] + 64 <= Loc2.X + Loc2.Width)
-    {
-        if(-vScreenX[A] + vScreen[A].Width - 64 >= Loc2.X)
-        {
-            if(-vScreenY[A] + 96 <= Loc2.Y + Loc2.Height)
-            {
-                if(-vScreenY[A] + vScreen[A].Height - 64 >= Loc2.Y)
-                {
-                    tempvScreenCollision2 = true;
-                }
-            }
-        }
-    }
-
-    return tempvScreenCollision2;
+    return (-vScreenX[A] + 64 <= Loc2.X + Loc2.Width) &&
+           (-vScreenX[A] + vScreen[A].Width - 64 >= Loc2.X) &&
+           (-vScreenY[A] + 96 <= Loc2.Y + Loc2.Height) &&
+           (-vScreenY[A] + vScreen[A].Height - 64 >= Loc2.Y);
 }
 
 bool vScreenCollision2(int A, const SpeedlessLocation_t &Loc2)
 {
-    bool tempvScreenCollision2 = false;
-
-    if(-vScreenX[A] + 64 <= Loc2.X + Loc2.Width)
-    {
-        if(-vScreenX[A] + vScreen[A].Width - 64 >= Loc2.X)
-        {
-            if(-vScreenY[A] + 96 <= Loc2.Y + Loc2.Height)
-            {
-                if(-vScreenY[A] + vScreen[A].Height - 64 >= Loc2.Y)
-                {
-                    tempvScreenCollision2 = true;
-                }
-            }
-        }
-    }
-
-    return tempvScreenCollision2;
+    return (-vScreenX[A] + 64 <= Loc2.X + Loc2.Width) &&
+           (-vScreenX[A] + vScreen[A].Width - 64 >= Loc2.X) &&
+           (-vScreenY[A] + 96 <= Loc2.Y + Loc2.Height) &&
+           (-vScreenY[A] + vScreen[A].Height - 64 >= Loc2.Y);
 }
 
 // Collision detection for blocks. Prevents walking on walls.
