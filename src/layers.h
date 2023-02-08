@@ -75,7 +75,7 @@ struct EventSection_t
     int background_id = LESet_Nothing;
 
     //! Change section borders if not (-1 - do nothing, -2 set default, any other values - set X position of left section boundary)
-    Location_t position;
+    SpeedlessLocation_t position;
 
     //! Do override current autoscroll
     bool  autoscroll = false;

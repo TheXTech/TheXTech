@@ -1373,10 +1373,10 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             if(m_special_subpage == 0)
             {
                 for(int s = 0; s <= maxSections; s++)
-                    Events[m_current_event].section[s].position = level[s];
+                    Events[m_current_event].section[s].position = (SpeedlessLocation_t)level[s];
             }
             else
-                Events[m_current_event].section[m_special_subpage-1].position = level[m_special_subpage-1];
+                Events[m_current_event].section[m_special_subpage-1].position = (SpeedlessLocation_t)level[m_special_subpage-1];
             m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
         }
         SuperPrintR(mode, "NO", 3, 60, 150);
@@ -1778,7 +1778,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 void UpdateStartLevelEventBounds()
 {
     Events[0].AutoSection = 0;
-    Events[0].section[0].position = level[0];
+    Events[0].section[0].position = (SpeedlessLocation_t)level[0];
     // not sure why 800 is also used for height in the default code, but I will stick with it.
     if(Events[0].AutoX < 0)
         Events[0].section[0].position.X = Events[0].section[0].position.Width - 800;
