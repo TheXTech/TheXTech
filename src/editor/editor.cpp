@@ -472,7 +472,7 @@ void UpdateEditor()
                                     n.special_data = (long)EditorCursor.NPC.Special;
 
                                 if(n.id == 86)
-                                    n.special_data = (long)EditorCursor.NPC.Special7;
+                                    n.special_data = (long)EditorCursor.NPC.Variant;
 
                                 n.msg = GetS(EditorCursor.NPC.Text);
                                 n.friendly = EditorCursor.NPC.Inert;
@@ -2028,7 +2028,12 @@ void UpdateInterprocess()
             }
 
             if(EditorCursor.NPC.Type == 86)
-                EditorCursor.NPC.Special7 = n.special_data;
+            {
+                if(n.special_data >= 0 && n.special_data < 256)
+                    EditorCursor.NPC.Variant = (uint8_t)n.special_data;
+                else
+                    pLogWarning("Out of range Variant value %ld from IntProc", (long)n.special_data);
+            }
 
             EditorCursor.NPC.Generator = n.generator;
             if(EditorCursor.NPC.Generator)
