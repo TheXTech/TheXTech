@@ -3570,11 +3570,11 @@ void UpdatePlayer()
                                             Player[A].Effect = 7;
                                             Player[A].Warp = numWarps + 1;
                                             Player[A].WarpBackward = false;
-                                            Warp[numWarps + 1].Entrance = (SpeedlessLocation_t)NPC[B].Location;
+                                            Warp[numWarps + 1].Entrance = static_cast<SpeedlessLocation_t>(NPC[B].Location);
                                             tempLocation = NPC[B].Location;
                                             tempLocation.X = NPC[B].Location.X - level[Player[A].Section].X + level[NPC[B].Special2].X;
                                             tempLocation.Y = NPC[B].Location.Y - level[Player[A].Section].Y + level[NPC[B].Special2].Y;
-                                            Warp[numWarps + 1].Exit = (SpeedlessLocation_t)tempLocation;
+                                            Warp[numWarps + 1].Exit = static_cast<SpeedlessLocation_t>(tempLocation);
                                             Warp[numWarps + 1].Hidden = false;
                                             Warp[numWarps + 1].NoYoshi = false;
                                             Warp[numWarps + 1].WarpNPC = true;
@@ -3585,11 +3585,11 @@ void UpdatePlayer()
                                             // Stop
                                             Player[A].Location.X = Warp[Player[A].Warp].Entrance.X + Warp[Player[A].Warp].Entrance.Width / 2.0 - Player[A].Location.Width / 2.0;
                                             Player[A].Location.Y = Warp[Player[A].Warp].Entrance.Y + Warp[Player[A].Warp].Entrance.Height - Player[A].Location.Height;
-                                            tempLocation = (Location_t)Warp[numWarps + 1].Entrance;
+                                            tempLocation = static_cast<Location_t>(Warp[numWarps + 1].Entrance);
                                             tempLocation.Y -= 32;
                                             tempLocation.Height = 64;
                                             NewEffect(54, tempLocation);
-                                            tempLocation = (Location_t)Warp[numWarps + 1].Exit;
+                                            tempLocation = static_cast<Location_t>(Warp[numWarps + 1].Exit);
                                             tempLocation.Y -= 32;
                                             tempLocation.Height = 64;
                                             NewEffect(54, tempLocation);

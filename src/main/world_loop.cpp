@@ -762,7 +762,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Up
     if(Direction == 1 || Direction == 5)
     {
-        tempLocation = (Location_t)Lvl.Location;
+        tempLocation = static_cast<Location_t>(Lvl.Location);
         tempLocation.X +=  4;
         tempLocation.Y +=  4;
         tempLocation.Width -= 8;
@@ -786,7 +786,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Left
     if(Direction == 2 || Direction == 5)
     {
-        tempLocation = (Location_t)Lvl.Location;
+        tempLocation = static_cast<Location_t>(Lvl.Location);
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;
@@ -810,7 +810,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Down
     if(Direction == 3 || Direction == 5)
     {
-        tempLocation = (Location_t)Lvl.Location;
+        tempLocation = static_cast<Location_t>(Lvl.Location);
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;
@@ -834,7 +834,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Right
     if(Direction == 4 || Direction == 5)
     {
-        tempLocation = (Location_t)Lvl.Location;
+        tempLocation = static_cast<Location_t>(Lvl.Location);
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;
@@ -940,7 +940,7 @@ void PathPath(WorldPath_t &Pth, bool Skp)
     int B = 0;
 
     Location_t tempLocation;
-    tempLocation = (Location_t)Pth.Location;
+    tempLocation = static_cast<Location_t>(Pth.Location);
     tempLocation.X += 4;
     tempLocation.Y += 4;
     tempLocation.Width -= 8;

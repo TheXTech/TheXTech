@@ -869,7 +869,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 bgo = Background_t();
                 bgo.Layer = w.Layer;
                 bgo.Hidden = w.Hidden;
-                bgo.Location = (Location_t)w.Entrance;
+                bgo.Location = static_cast<Location_t>(w.Entrance);
                 bgo.Type = 98;
                 bgo.Location.Width = 16;
                 syncLayers_BGO(B);
@@ -880,7 +880,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                     numLocked++;
                     auto &bgo2 = Background[B];
                     bgo2 = bgo;
-                    bgo2.Location = (Location_t)w.Exit;
+                    bgo2.Location = static_cast<Location_t>(w.Exit);
                     bgo2.Location.Width = 16;
                     syncLayers_BGO(B);
                 }

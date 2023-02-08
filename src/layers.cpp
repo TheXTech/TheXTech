@@ -763,7 +763,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                 else if(int(s.position.X) != EventSection_t::LESet_Nothing)
                 {
                     tempLevel = level[B];
-                    level[B] = (Location_t)s.position;
+                    level[B] = static_cast<Location_t>(s.position);
 
                     if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start"))
                     {
@@ -856,7 +856,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                 qScreenY[1] = -level[Player[C].Section].Y;
                             if(-qScreenY[1] + ScreenH /*FrmMain.ScaleHeight*/ > level[Player[C].Section].Height)
                                 qScreenY[1] = -(level[Player[C].Section].Height - ScreenH);
-                            level[B] = (Location_t)s.position;
+                            level[B] = static_cast<Location_t>(s.position);
                         }
                         else
                         {

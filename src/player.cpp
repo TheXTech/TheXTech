@@ -5920,8 +5920,8 @@ void PlayerEffects(const int A)
 
         bool backward = p.WarpBackward;
         auto &warp = Warp[p.Warp];
-        Location_t warp_enter = Location_t(backward ? warp.Exit : warp.Entrance);
-        Location_t warp_exit = Location_t(backward ? warp.Entrance : warp.Exit);
+        Location_t warp_enter = static_cast<Location_t>(backward ? warp.Exit : warp.Entrance);
+        Location_t warp_exit = static_cast<Location_t>(backward ? warp.Entrance : warp.Exit);
         auto &warp_dir_enter = backward ? warp.Direction2 : warp.Direction;
         auto &warp_dir_exit = backward ? warp.Direction : warp.Direction2;
 
@@ -6538,8 +6538,8 @@ void PlayerEffects(const int A)
     {
         bool backward = p.WarpBackward;
         auto &warp = Warp[p.Warp];
-        Location_t warp_enter = Location_t(backward ? warp.Exit : warp.Entrance);
-        Location_t warp_exit = Location_t(backward ? warp.Entrance : warp.Exit);
+        Location_t warp_enter = static_cast<Location_t>(backward ? warp.Exit : warp.Entrance);
+        Location_t warp_exit = static_cast<Location_t>(backward ? warp.Entrance : warp.Exit);
 
         if(p.HoldingNPC > 0)
         {
@@ -6762,7 +6762,7 @@ void PlayerEffects(const int A)
             {
                 p.Effect2 = 130;
 
-                for(int c : treeBackgroundQuery((Location_t)Warp[p.Warp].Exit, SORTMODE_NONE))
+                for(int c : treeBackgroundQuery(static_cast<Location_t>(Warp[p.Warp].Exit), SORTMODE_NONE))
                 {
                     if(c > numBackground)
                         continue;
@@ -6820,7 +6820,7 @@ void PlayerEffects(const int A)
 
             if(fEqual(p.Effect2, 1900))
             {
-                for(int c : treeBackgroundQuery((Location_t)Warp[p.Warp].Exit, SORTMODE_NONE))
+                for(int c : treeBackgroundQuery(static_cast<Location_t>(Warp[p.Warp].Exit), SORTMODE_NONE))
                 {
                     if(c > numBackground)
                         continue;

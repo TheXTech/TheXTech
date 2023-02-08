@@ -256,7 +256,7 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
         }
     }
 
-    Location_t tempLoc = (Location_t)A->Location;
+    Location_t tempLoc = static_cast<Location_t>(A->Location);
 
     // 7 (top-left)
     tempLoc.X -= 31;
@@ -650,7 +650,7 @@ void MagicItem(ItemRef_t A)
     }
 
     // first, transform all nearby blocks, then transform the block itself
-    Location_t tempLoc = (Location_t)A->Location;
+    Location_t tempLoc = static_cast<Location_t>(A->Location);
     tempLoc.X -= 31;
     tempLoc.Y -= 31;
     tempLoc.Width += 62;
