@@ -810,10 +810,10 @@ public:
 //Public Type Effect  'Special effects
 struct Effect_t
 {
-//    Type As Integer
-    int Type = 0;
 //    Location As Location
     Location_t Location;
+//    Type As Integer
+    int Type = 0;
 //    Frame As Integer
     int Frame = 0;
 //    FrameCount As Single
