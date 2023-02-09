@@ -1242,22 +1242,31 @@ void UpdateGraphics(bool skipRepaint)
 
                 g_stats.renderedSzBlocks++;
 
-                bool show_left = true;
+                int left_sx = 0;
                 if(bLeftOnscreen <= -32)
                 {
-                    show_left = false;
+                    left_sx = 32;
                     bLeftOnscreen = std::fmod(bLeftOnscreen, 32);
+
+                    // go straight to right if less than 33 pixels in total
+                    if(bRightOnscreen - bLeftOnscreen < 33)
+                        left_sx = 64;
                 }
 
-                bool show_top = true;
+                int top_sy = 0;
                 if(bTopOnscreen <= -32)
                 {
-                    show_top = false;
+                    top_sy = 32;
                     bTopOnscreen = std::fmod(bTopOnscreen, 32);
+
+                    // go straight to bottom if less than 33 pixels in total
+                    if(bBottomOnscreen - bTopOnscreen < 33)
+                        top_sy = 64;
                 }
 
-                double colSemiLast = bRightOnscreen - 64;
-                double rowSemiLast = bBottomOnscreen - 64;
+                // logically, offset should be -64. use -65 for double precision safety.
+                double colSemiLast = bRightOnscreen - 65;
+                double rowSemiLast = bBottomOnscreen - 65;
 
                 if(bRightOnscreen > vScreen[Z].Width)
                     bRightOnscreen = vScreen[Z].Width;
@@ -1266,12 +1275,12 @@ void UpdateGraphics(bool skipRepaint)
                     bBottomOnscreen = vScreen[Z].Height;
 
                 // first row source
-                int src_y = show_top ? 0 : 32;
+                int src_y = top_sy;
 
                 for(double dst_y = bTopOnscreen; dst_y < bBottomOnscreen; dst_y += 32.0)
                 {
                     // first col source
-                    int src_x = show_left ? 0 : 32;
+                    int src_x = left_sx;
 
                     for(double dst_x = bLeftOnscreen; dst_x < bRightOnscreen; dst_x += 32.0)
                     {
