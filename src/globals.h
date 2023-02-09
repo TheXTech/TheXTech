@@ -719,6 +719,8 @@ struct Water_t
 //Public Type Block   'Blocks
 struct Block_t
 {
+//    Location As Location
+    Location_t Location;
 //! EXTRA: temporary workaround: is it a smashable block of type 90 (normally not smashable)? (previously Special2)
     bool forceSmashable = false;
 //    Slippy As Boolean
@@ -744,8 +746,6 @@ struct Block_t
     bool Hidden = false;
 //    Type As Integer 'the block's type
     int Type = 0;
-//    Location As Location
-    Location_t Location;
 //    Special As Integer 'what is in the block?
     int Special = 0;
 //'for the shake effect after hitting ablock
