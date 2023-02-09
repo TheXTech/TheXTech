@@ -472,7 +472,7 @@ void UpdateEditor()
                                     n.special_data = (long)EditorCursor.NPC.Special;
 
                                 if(n.id == 86)
-                                    n.special_data = (long)EditorCursor.NPC.Special7;
+                                    n.special_data = (long)EditorCursor.NPC.Variant;
 
                                 n.msg = GetS(EditorCursor.NPC.Text);
                                 n.friendly = EditorCursor.NPC.Inert;
@@ -1359,7 +1359,6 @@ void UpdateEditor()
                             Block[numBlock] = EditorCursor.Block;
                             Block[numBlock].DefaultType = Block[numBlock].Type;
                             Block[numBlock].DefaultSpecial = Block[numBlock].Special;
-                            Block[numBlock].DefaultSpecial2 = Block[numBlock].Special2;
                             syncLayersTrees_Block(numBlock);
 
                             MagicBlock::MagicBlock(numBlock);
@@ -1548,7 +1547,6 @@ void UpdateEditor()
                             NPC[numNPCs].Text = STRINGINDEX_NONE;
                             SetS(NPC[numNPCs].Text, GetS(EditorCursor.NPC.Text));
                         }
-                        syncLayers_NPC(numNPCs);
 //                        Netplay::sendData Netplay::AddNPC(numNPCs);
                         if(!MagicHand)
                         {
@@ -1568,6 +1566,7 @@ void UpdateEditor()
                             n.DefaultSpecial = int(n.Special);
                             CheckSectionNPC(numNPCs);
                         }
+                        syncLayers_NPC(numNPCs);
                     }
                 }
             }
@@ -2029,7 +2028,12 @@ void UpdateInterprocess()
             }
 
             if(EditorCursor.NPC.Type == 86)
-                EditorCursor.NPC.Special7 = n.special_data;
+            {
+                if(n.special_data >= 0 && n.special_data < 256)
+                    EditorCursor.NPC.Variant = (uint8_t)n.special_data;
+                else
+                    pLogWarning("Out of range Variant value %ld from IntProc", (long)n.special_data);
+            }
 
             EditorCursor.NPC.Generator = n.generator;
             if(EditorCursor.NPC.Generator)
@@ -3006,6 +3010,16 @@ void MouseMove(float X, float Y, bool /*nCur*/)
     else
         A = 1;
 
+    X -= vScreen[A].Left;
+    Y -= vScreen[A].Top;
+
+    // translate into layer coordinates to snap to layer's grid
+    if(MagicHand && EditorCursor.Layer != LAYER_NONE)
+    {
+        X -= Layer[EditorCursor.Layer].OffsetX;
+        Y -= Layer[EditorCursor.Layer].OffsetY;
+    }
+
     if(EditorCursor.Mode == 0 || EditorCursor.Mode == 6 || EditorCursor.Mode == 13 || EditorCursor.Mode == 14 /*|| frmLevelEditor::chkAlign.Value == 0*/)
     {
         EditorCursor.Location.X = double(X) - vScreenX[A];
@@ -3094,8 +3108,6 @@ void MouseMove(float X, float Y, bool /*nCur*/)
             PositionCursor();
         }
     }
-    EditorCursor.Location.X += -vScreen[A].Left;
-    EditorCursor.Location.Y += -vScreen[A].Top;
 //    if(nPlay.Online == true && nCur == true)
 //    {
 //        if(nPlay.Mode == 0)
@@ -3106,6 +3118,13 @@ void MouseMove(float X, float Y, bool /*nCur*/)
 //            Netplay::sendData std::string("f") + "0|" + std::to_string(X) - vScreenX(A) + "|" + std::to_string(Y) - vScreenY(A); // Netplay
 //        }
 //    }
+
+    // translate from layer coordinates to screen coordinates
+    if(MagicHand && EditorCursor.Layer != LAYER_NONE)
+    {
+        EditorCursor.Location.X += Layer[EditorCursor.Layer].OffsetX;
+        EditorCursor.Location.Y += Layer[EditorCursor.Layer].OffsetY;
+    }
 }
 
 void ResetNPC(int A)
@@ -3156,7 +3175,6 @@ void BlockFill(const Location_t &Loc)
         Block[numBlock] = EditorCursor.Block;
         Block[numBlock].DefaultType = Block[numBlock].Type;
         Block[numBlock].DefaultSpecial = Block[numBlock].Special;
-        Block[numBlock].DefaultSpecial2 = Block[numBlock].Special2;
         Block[numBlock].Location = Loc;
         syncLayersTrees_Block(numBlock);
         tempLoc = Loc;

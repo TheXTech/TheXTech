@@ -1402,12 +1402,12 @@ int menuControls_Logic()
             return 0;
 
         // back and forward nav
-    	if(menuBackPress)
-    	{
+        if(menuBackPress)
+        {
             PlaySoundMenu(SFX_Slide);
             MenuCursorCanMove = false;
-    		return -1;
-    	}
+            return -1;
+        }
         if(menuDoPress && MenuCursor >= 0 && MenuCursor < n_types)
         {
             s_curType = MenuCursor;
@@ -1484,6 +1484,7 @@ int menuControls_Logic()
                     PlaySoundMenu(SFX_Slide);
                 else
                     PlaySoundMenu(SFX_BlockHit);
+
                 MenuCursorCanMove = false;
             }
             else if(leftPressed)
@@ -1492,6 +1493,7 @@ int menuControls_Logic()
                     PlaySoundMenu(SFX_Slide);
                 else
                     PlaySoundMenu(SFX_BlockHit);
+
                 MenuCursorCanMove = false;
             }
             else if(rightPressed)
@@ -1500,6 +1502,7 @@ int menuControls_Logic()
                     PlaySoundMenu(SFX_Slide);
                 else
                     PlaySoundMenu(SFX_BlockHit);
+
                 MenuCursorCanMove = false;
             }
         }
@@ -1569,6 +1572,7 @@ int menuControls_Logic()
                     PlaySoundMenu(SFX_Slide);
                 else
                     PlaySoundMenu(SFX_BlockHit);
+
                 MenuCursorCanMove = false;
             }
             else if(leftPressed)
@@ -1577,6 +1581,7 @@ int menuControls_Logic()
                     PlaySoundMenu(SFX_Slide);
                 else
                     PlaySoundMenu(SFX_BlockHit);
+
                 MenuCursorCanMove = false;
             }
             else if(rightPressed)
@@ -1585,6 +1590,7 @@ int menuControls_Logic()
                     PlaySoundMenu(SFX_Slide);
                 else
                     PlaySoundMenu(SFX_BlockHit);
+
                 MenuCursorCanMove = false;
             }
         }
@@ -1637,6 +1643,7 @@ int menuControls_Logic()
         // why didn't I write MenuCursor %= n_buttons?
         while(MenuCursor < 0)
             MenuCursor += n_buttons;
+
         while(MenuCursor >= n_buttons)
             MenuCursor -= n_buttons;
 
@@ -1647,6 +1654,7 @@ int menuControls_Logic()
         if(menuBackPress)
         {
             PlaySoundMenu(SFX_Slide);
+
             if(s_profileTab == Controls::ControlsClass::Player)
                 MenuCursor = 3;
             else if(s_profileTab == Controls::ControlsClass::Cursor)
@@ -1655,9 +1663,11 @@ int menuControls_Logic()
                 MenuCursor = 5;
             else if(s_profileTab == Controls::ControlsClass::Hotkey)
                 MenuCursor = 6;
+
             s_profileTab = Controls::ControlsClass::None;
             s_secondaryInput = false;
             MenuCursorCanMove = false;
+
             return 0;
         }
 
@@ -1683,6 +1693,7 @@ int menuControls_Logic()
                     PlaySoundMenu(SFX_PlayerDied2);
                 else
                     PlaySoundMenu(SFX_BlockHit);
+
                 MenuCursorCanMove = false;
             }
             else if(delPressed)
@@ -1691,6 +1702,7 @@ int menuControls_Logic()
                     PlaySoundMenu(SFX_PlayerDied2);
                 else
                     PlaySoundMenu(SFX_BlockHit);
+
                 MenuCursorCanMove = false;
             }
         }

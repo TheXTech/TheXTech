@@ -26,6 +26,9 @@
 #include "game_main.h"
 #include "collision.h"
 #include "layers.h"
+#include "graphics/gfx_update.h"
+
+#include "main/trees.h"
 
 // Updates the effects
 void UpdateEffects()
@@ -509,6 +512,7 @@ void UpdateEffects()
                     e.Life = 0;
                     e.Frame = 3;
                     Block[e.NewNpc].Hidden = false;
+                    invalidateDrawBlocks();
                 }
                 else
                     e.Life = 10;
@@ -1087,9 +1091,8 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
 
         if(A == 114) // Change height for the background
         {
-            for(B = 1; B <= numBackground; B++)
+            for(const Background_t& b : treeBackgroundQuery(ne.Location, SORTMODE_ID))
             {
-                auto &b = Background[B];
                 if(b.Type == 82 || b.Type == 26 || b.Type == 65 || b.Type == 159 || b.Type == 166 || b.Type == 168)
                 {
                     // note: NOT a reference

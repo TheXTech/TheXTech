@@ -49,6 +49,7 @@ struct AugBaseRef_t
 
 struct node_t
 {
+    // not safe to change this
     static constexpr int node_size = 4;
 
     node_t* next = nullptr;
@@ -94,8 +95,13 @@ struct node_t
         {
             if(this->parent)
             {
-                this->i += 1;
-                this->check_linkage();
+                this->i++;
+                if(this->i == this->parent->filled)
+                {
+                    this->parent = this->parent->next;
+                    this->i = 0;
+                    this->check_linkage();
+                }
             }
             return *this;
         }
@@ -216,6 +222,9 @@ struct rect_internal
 
     inline iterator begin() const
     {
+        // could consider an optimization where != is only properly implemented for != end(),
+        // removing this condition and replacing the `||` in != with `&&`.
+
         if(t == b || l == r)
             return end();
 
@@ -230,16 +239,18 @@ struct rect_internal
 
 struct rect_external
 {
-    int32_t t, l, b, r;
+    int32_t l, r, t, b;
 
     rect_external() {}
+
+    rect_external(int32_t l, int32_t r, int32_t t, int32_t b) : l(l), r(r), t(t), b(b) {}
 
     rect_external(const Location_t& loc)
     {
         l = std::floor(loc.X);
+        r = std::ceil(loc.X + loc.Width);
         t = std::floor(loc.Y);
         b = std::ceil(loc.Y + loc.Height);
-        r = std::ceil(loc.X + loc.Width);
     }
 };
 
@@ -280,13 +291,37 @@ struct screen_t
 };
 
 template<class MyRef_t>
-Location_t extract_loc(MyRef_t obj)
+inline Location_t extract_loc(MyRef_t obj)
 {
     return obj->Location;
 }
 
+template<>
+inline Location_t extract_loc(NPCRef_t obj)
+{
+    Location_t ret = obj->Location;
+
+    if(ret.Height < NPCHeight[obj->Type])
+        ret.Height = NPCHeight[obj->Type];
+
+    if(ret.Width < NPCWidthGFX[obj->Type])
+    {
+        ret.X -= (NPCWidthGFX[obj->Type] - ret.Width) / 2.0;
+        ret.Width = NPCWidthGFX[obj->Type];
+    }
+
+    // for tempBlock queries
+    if(obj->Type == 26)
+    {
+        ret.Y -= 16;
+        ret.Height += 16;
+    }
+
+    return ret;
+}
+
 template<class MyRef_t>
-Location_t extract_loc_layer(MyRef_t obj)
+inline Location_t extract_loc_layer(MyRef_t obj)
 {
     Location_t loc = obj->Location;
 
@@ -317,7 +352,7 @@ struct table_t
 
     void query(std::vector<BaseRef_t>& out, const rect_external& rect)
     {
-        if(columns.size() == 0)
+        if(columns.size() == 0 || member_rects.size() == 0)
             return;
 
         int lcol = rect.l / 2048;
@@ -625,11 +660,27 @@ struct table_t
 
     void update(MyRef_t b)
     {
+        Location_t loc = extract_loc<MyRef_t>(b);
+
+        rect_external rect(loc);
+
         auto it = member_rects.find(b);
         if(it != member_rects.end())
-            erase(b, it->second);
+        {
+            // no-change optimization
+            if(it->second.l == rect.l
+                && it->second.r == rect.r
+                && it->second.t == rect.t
+                && it->second.b == rect.b)
+            {
+                return;
+            }
 
-        insert(b);
+            erase(b, it->second);
+        }
+
+        member_rects[b] = rect;
+        insert(b, rect);
     }
 
     void update_layer(MyRef_t b)

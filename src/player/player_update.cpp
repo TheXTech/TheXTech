@@ -40,10 +40,12 @@
 #include "../graphics.h"
 #include "../controls.h"
 
+#include "npc/npc_queues.h"
+
 
 void UpdatePlayer()
 {
-    int A = 0;
+    // int A = 0;
     int B = 0;
     float C = 0;
     float D = 0;
@@ -510,10 +512,8 @@ void UpdatePlayer()
                             }
                         }
 
-                        for(int numNPCsMax2 = numNPCs, B = 1; B <= numNPCsMax2; B++)
+                        if(!tempBool) for(int B : treeNPCQuery(tempLocation, SORTMODE_NONE))
                         {
-                            if(!tempBool)
-                                break;
                             if(NPCIsABlock[NPC[B].Type] && !NPCStandsOnPlayer[NPC[B].Type] && NPC[B].Active && NPC[B].Type != 56)
                             {
                                 if(CheckCollision(tempLocation, NPC[B].Location))
@@ -975,7 +975,7 @@ void UpdatePlayer()
                         tempLocation.X -= 16;
                         tempLocation.Y -= 16;
 
-                        for(int numNPCsMax4 = numNPCs, Bi = 1; Bi <= numNPCsMax4; Bi++)
+                        for(int Bi : treeNPCQuery(tempLocation, SORTMODE_NONE))
                         {
                             if(NPC[Bi].Active && !NPC[Bi].Hidden && NPCIsAVine[NPC[Bi].Type])
                             {
@@ -983,6 +983,7 @@ void UpdatePlayer()
                                 {
                                     Player[A].FairyTime = 20;
                                     Player[A].FairyCD = 0;
+                                    break;
                                 }
                             }
                         }
@@ -1022,7 +1023,8 @@ void UpdatePlayer()
                     Player[A].FairyCD -= 1;
 
 
-                if(Player[A].StandingOnNPC != 0 && !NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                // the pinched variable has been always false since SMBX64
+                if(Player[A].StandingOnNPC != 0 && /*!NPC[Player[A].StandingOnNPC].Pinched && */ !FreezeNPCs)
                 {
                     if(Player[A].StandingOnNPC < 0)
                         NPC[Player[A].StandingOnNPC].Location = Block[(int)NPC[Player[A].StandingOnNPC].Special].Location;
@@ -2932,7 +2934,9 @@ void UpdatePlayer()
                         if(Player[A].StandingOnNPC != 0 && !movingBlock)
                         {
                             Player[A].Location.SpeedY = 1;
-                            if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                            // the Pinched variable has always been false since SMBX64
+                            // if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                            if(!FreezeNPCs)
                                 Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed;
                             Player[A].StandingOnNPC = 0;
                         }
@@ -3202,14 +3206,16 @@ void UpdatePlayer()
                 {
                     if(!tempHit2)
                     {
-                        if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                        // the Pinched variable has always been false since SMBX64
+                        // if(!NPC[Player[A].StandingOnNPC].Pinched && !FreezeNPCs)
+                        if(!FreezeNPCs)
                             Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX - NPC[Player[A].StandingOnNPC].BeltSpeed;
                     }
                 }
                 tempHit = false; // Used for JUMP detection
                 tempHit2 = false;
 
-                for(int tempNumNPCsMax = numNPCs, B = 1; B <= tempNumNPCsMax; B++)
+                for(int B : treeNPCQuery(Player[A].Location, SORTMODE_ID))
                 {
                     if(NPC[B].Active && NPC[B].Killed == 0 && NPC[B].Effect != 5 && NPC[B].Effect != 6)
                     {
@@ -3472,6 +3478,7 @@ void UpdatePlayer()
                                             PlaySound(SFX_BlockHit);
                                             HitSpot = 0;
                                             NPC[B].Killed = 9;
+                                            NPCQueues::Killed.push_back(B);
                                             for(C = 1; C <= 10; ++C)
                                             {
                                                 NewEffect(77, NPC[B].Location, static_cast<float>(NPC[B].Special));
@@ -3485,6 +3492,8 @@ void UpdatePlayer()
                                             NPC[B].Location.X += NPC[B].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                                             NPC[B].Location.Y += NPC[B].Location.Height / 2.0 - EffectHeight[10] / 2.0;
                                             NewEffect(10, NPC[B].Location);
+
+                                            treeNPCUpdate(B);
                                         }
                                     }
 
@@ -3556,6 +3565,7 @@ void UpdatePlayer()
                                         if(NPC[B].Special2 >= 0)
                                         {
                                             NPC[B].Killed = 9;
+                                            NPCQueues::Killed.push_back(B);
                                             PlaySound(SFX_Door);
                                             Player[A].Effect = 7;
                                             Player[A].Warp = numWarps + 1;
@@ -3595,6 +3605,7 @@ void UpdatePlayer()
                                         Player[A].HasKey = false;
                                         HitSpot = 0;
                                         NPC[B].Killed = 3;
+                                        NPCQueues::Killed.push_back(B);
                                     }
 
                                     if(NPC[B].Type == 45 && NPC[B].Projectile != 0 && HitSpot > 1)
@@ -3638,6 +3649,7 @@ void UpdatePlayer()
                                                 {
                                                     UnDuck(Player[A]);
                                                     NPC[B].Killed = 9;
+                                                    NPCQueues::Killed.push_back(B);
                                                     if(Player[A].State == 1)
                                                     {
                                                         Player[A].Location.Height = Physics.PlayerHeight[1][2];
@@ -3656,6 +3668,7 @@ void UpdatePlayer()
                                                 {
                                                     UnDuck(Player[A]);
                                                     NPC[B].Killed = 9;
+                                                    NPCQueues::Killed.push_back(B);
                                                     Player[A].Mount = 3;
                                                     if(NPC[B].Type == 95)
                                                         Player[A].MountType = 1;
@@ -4031,7 +4044,10 @@ void UpdatePlayer()
                                                         for(int C = 1; C <= numNPCs; C++)
                                                         {
                                                             if(NPC[C].standingOnPlayer == A)
+                                                            {
                                                                 NPC[C].Location.X += D;
+                                                                treeNPCUpdate(C);
+                                                            }
                                                         }
                                                         for(int C = 1; C <= numPlayers; C++)
                                                         {
@@ -4261,6 +4277,7 @@ void UpdatePlayer()
                         Player[A].Location = NPC[B].Location;
                         Player[A].Mount = 2;
                         NPC[B].Killed = 9;
+                        NPCQueues::Killed.push_back(B);
                         Player[A].HoldingNPC = 0;
                         Player[A].StandingOnNPC = 0;
                         PlaySound(SFX_Stomp);
@@ -4467,8 +4484,23 @@ void UpdatePlayer()
     }
 
     // int C = 0;
-    for(A = numNPCs; A >= 1; A--)
+
+    // kill the player temp NPCs, from last to first
+    std::sort(NPCQueues::PlayerTemp.begin(), NPCQueues::PlayerTemp.end(),
+    [](NPCRef_t a, NPCRef_t b)
     {
+        return a > b;
+    });
+
+
+    // for(A = numNPCs; A >= 1; A--)
+    int last_NPC = numNPCs + 1;
+    for(int A : NPCQueues::PlayerTemp)
+    {
+        // duplicated entry, no problem
+        if(A == last_NPC)
+            continue;
+
         if(NPC[A].playerTemp)
         {
             for(B = 1; B <= numPlayers; B++)
@@ -4480,4 +4512,6 @@ void UpdatePlayer()
             KillNPC(A, 9);
         }
     }
+
+    NPCQueues::PlayerTemp.clear();
 }

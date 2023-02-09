@@ -87,11 +87,7 @@ public:
         cur_treeresult_vec ++;
     }
 
-    TreeResult_Sentinel(const TreeResult_Sentinel& other)
-    {
-        UNUSED(other);
-        SDL_assert(false); // -V654 // can't have two sentinels for same results
-    }
+    TreeResult_Sentinel(const TreeResult_Sentinel& other) = delete;
 
     TreeResult_Sentinel(TreeResult_Sentinel&& other)
     {
@@ -173,30 +169,48 @@ extern void treeBlockAddLayer(int layer, BlockRef_t obj);
 extern void treeBlockRemoveLayer(int layer, BlockRef_t obj);
 extern void treeBlockUpdateLayer(int layer, BlockRef_t obj);
 extern TreeResult_Sentinel<BlockRef_t> treeBlockQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 0.0);
+                               int sort_mode, double margin = 2.0);
+extern void treeBlockQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
 extern TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc, int sort_mode);
 
-extern void treeTempBlockStartFrame();
+extern void treeTempBlockFullClear();
+extern void treeTempBlockEnable();
+extern void treeTempBlockClear();
 extern void treeTempBlockAdd(BlockRef_t obj);
 extern void treeTempBlockUpdate(BlockRef_t obj);
+extern void treeTempBlockRemove(BlockRef_t obj);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 0.0);
+                               int sort_mode, double margin = 2.0);
 extern TreeResult_Sentinel<BlockRef_t> treeTempBlockQuery(const Location_t &loc, int sort_mode);
+
+extern TreeResult_Sentinel<BlockRef_t> treeBlockQueryWithTemp(const Location_t &loc, int sort_mode);
 
 extern void treeLevelCleanBackgroundLayers();
 extern void treeBackgroundAddLayer(int layer, BackgroundRef_t obj);
 extern void treeBackgroundRemoveLayer(int layer, BackgroundRef_t obj);
 extern void treeBackgroundUpdateLayer(int layer, BackgroundRef_t obj);
 extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 0.0);
+                               int sort_mode, double margin = 2.0);
+extern void treeBackgroundQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
 extern TreeResult_Sentinel<BackgroundRef_t> treeBackgroundQuery(const Location_t &loc, int sort_mode);
+
+extern void treeNPCClear();
+extern void treeNPCAdd(NPCRef_t obj);
+extern void treeNPCRemove(NPCRef_t obj);
+extern void treeNPCUpdate(NPCRef_t obj);
+extern void treeNPCSplitTempBlock(NPCRef_t obj);
+extern void treeNPCUpdateTempBlock(NPCRef_t obj);
+extern TreeResult_Sentinel<NPCRef_t> treeNPCQuery(double Left, double Top, double Right, double Bottom,
+                               int sort_mode, double margin = 2.0);
+extern void treeNPCQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
+extern TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &loc, int sort_mode);
 
 extern void treeLevelCleanWaterLayers();
 extern void treeWaterAddLayer(int layer, WaterRef_t obj);
 extern void treeWaterRemoveLayer(int layer, WaterRef_t obj);
 extern void treeWaterUpdateLayer(int layer, WaterRef_t obj);
 extern TreeResult_Sentinel<WaterRef_t> treeWaterQuery(double Left, double Top, double Right, double Bottom,
-                               int sort_mode, double margin = 0.0);
+                               int sort_mode, double margin = 2.0);
 extern TreeResult_Sentinel<WaterRef_t> treeWaterQuery(const Location_t &loc, int sort_mode);
 
 // removed in favor of block quadtree

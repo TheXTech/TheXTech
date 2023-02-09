@@ -8,14 +8,17 @@ public:
     struct Node
     {
         T data;
-        Node* next;
+        Node* next = nullptr;
     };
 
-    Node* head;
+    Node* head = nullptr;
+    Node* front = nullptr;
+    Node* back = nullptr;
 
 public:
     StackLinkedList() = default;
     StackLinkedList(StackLinkedList& stackLinkedList) = delete;
+    void set_edges(Node *front, Node *back);
     void push(Node* newNode);
     Node* pop();
 };
@@ -23,4 +26,3 @@ public:
 #include "StackLinkedListImpl.h"
 
 #endif /* STACKLINKEDLIST_H */
-

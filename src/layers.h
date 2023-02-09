@@ -54,8 +54,8 @@ struct Layer_t
     std::set<int> warps;
     std::set<int> waters;
 // NEW: track the layer offset so we don't need to update the block/BGO trees
-    double OffsetX = 0.f;
-    double OffsetY = 0.f;
+    double OffsetX = 0.0;
+    double OffsetY = 0.0;
 };
 
 struct EventSection_t

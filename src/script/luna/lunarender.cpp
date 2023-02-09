@@ -24,6 +24,7 @@
 #include "globals.h"
 #include "lunamisc.h"
 #include "renderop_string.h"
+#include "game_main.h"
 #include <fmt_format_ne.h>
 
 #include <algorithm>
@@ -263,6 +264,26 @@ void Renderer::StartFrameRender()
 {
     m_queueState.m_curCamIdx = 0;
     m_queueState.m_InFrameRender = true;
+
+    // Remove cleared operations
+    if(GamePaused == PauseCode::None)
+    {
+        std::vector<RenderOp *> nonExpiredOps;
+        for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
+        {
+            RenderOp *pOp = m_currentRenderOp;
+            if(pOp->m_FramesLeft <= 0)
+            {
+                m_currentRenderOp = nullptr;
+                delete pOp;
+            }
+            else
+                nonExpiredOps.push_back(pOp);
+        }
+
+        m_queueState.m_currentRenderOps.swap(nonExpiredOps);
+        m_queueState.m_renderOpsSortedCount = m_queueState.m_currentRenderOps.size();
+    }
 }
 
 void Renderer::EndFrameRender()
@@ -272,23 +293,13 @@ void Renderer::EndFrameRender()
     m_queueState.m_curCamIdx = 0;
 
     // Remove cleared operations
-    std::vector<RenderOp *> nonExpiredOps;
-    for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
+    if(GamePaused == PauseCode::None)
     {
-        RenderOp *pOp = m_currentRenderOp;
-        pOp->m_FramesLeft--;
-        if(pOp->m_FramesLeft <= 0)
-        {
-            m_currentRenderOp = nullptr;
-            delete pOp;
-        }
-        else
-            nonExpiredOps.push_back(pOp);
+        for(auto &m_currentRenderOp : m_queueState.m_currentRenderOps)
+            m_currentRenderOp->m_FramesLeft--;
     }
 
-    m_queueState.m_currentRenderOps.swap(nonExpiredOps);
     m_queueState.m_renderOpsProcessedCount = 0;
-    m_queueState.m_renderOpsSortedCount = m_queueState.m_currentRenderOps.size();
     m_queueState.m_InFrameRender = false;
 }
 
@@ -306,7 +317,7 @@ void Renderer::ClearQueue()
 
 void Renderer::DrawOp(RenderOp &op)
 {
-    if((op.m_selectedCamera == 0 || op.m_selectedCamera == m_queueState.m_curCamIdx) && (op.m_FramesLeft >= 1))
+    if((op.m_selectedCamera == 0 || op.m_selectedCamera == m_queueState.m_curCamIdx) && (op.m_FramesLeft >= 1 || GamePaused != PauseCode::None))
         op.Draw(this);
 }
 

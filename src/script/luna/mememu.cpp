@@ -28,6 +28,7 @@
 #include "global_constants.h"
 #include "layers.h"
 #include "game_main.h" // GamePaused
+#include "main/cheat_code.h"
 
 #include <unordered_map>
 #include <functional>
@@ -299,7 +300,7 @@ SDL_FORCE_INLINE void memToValue(bool &target, double value, FIELDTYPE ftype)
  *           Read memory value                  *
  *----------------------------------------------*/
 
-SDL_FORCE_INLINE double valueToMem(double &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE double valueToMem(const double &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -317,7 +318,7 @@ SDL_FORCE_INLINE double valueToMem(double &source, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE double valueToMem(float &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE double valueToMem(const float &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -334,7 +335,7 @@ SDL_FORCE_INLINE double valueToMem(float &source, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE double valueToMem(int &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE double valueToMem(const int &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -352,7 +353,7 @@ SDL_FORCE_INLINE double valueToMem(int &source, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE double valueToMem(bool &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE double valueToMem(const bool &source, FIELDTYPE ftype)
 {
     UNUSED(ftype);
     return source ? 0xFFFF : 0;
@@ -400,6 +401,10 @@ class SMBXMemoryEmulator
     typedef std::function<void(double,FIELDTYPE)> Setter;
     std::unordered_map<size_t, std::pair<Getter, Setter>> m_lff;
 
+    typedef std::function<std::string()> StrGetter;
+    typedef std::function<void(const std::string&)> StrSetter;
+    std::unordered_map<size_t, std::pair<StrGetter, StrSetter>> m_sff;
+
     enum ValueType
     {
         VT_UNKNOWN = 0,
@@ -408,7 +413,8 @@ class SMBXMemoryEmulator
         VT_INT,
         VT_BOOL,
         VT_STRING,
-        VT_LAMBDA
+        VT_LAMBDA,
+        VT_STRLAMBDA
     };
 
     std::unordered_map<int, ValueType> m_type;
@@ -447,6 +453,12 @@ class SMBXMemoryEmulator
     {
         m_lff.insert({address, {g, s}});
         m_type.insert({address, VT_LAMBDA});
+    }
+
+    void insert(size_t address, StrGetter g, StrSetter s)
+    {
+        m_sff.insert({address, {g, s}});
+        m_type.insert({address, VT_STRLAMBDA});
     }
 
 public:
@@ -522,12 +534,48 @@ public:
                             "(BlocksSorted) with value %g as %s", in, FieldtypeToStr(ftype));
             }
         );
+
+        insert(0x00B2C896, &SingleCoop);
+        insert(0x00B2C898,
+            []()->std::string
+            {
+                return cheats_get();
+            },
+            [](const std::string &in)->void
+            {
+                cheats_setBuffer(in);
+            }
+        );
+
+        insert(0x00B2C89C, &GameOutro);
+        insert(0x00B2C8A0, &CreditChop);
+        insert(0x00B2C8A4, &EndCredits);
+
+        insert(0x00B2C8A6, &curStars);
+        insert(0x00B2C8A8, &maxStars);
+
+        insert(0x00B2C8AA, &ShadowMode);
+        insert(0x00B2C8AC, &MultiHop);
+        insert(0x00B2C8AE, &SuperSpeed);
+        insert(0x00B2C8B0, &WalkAnywhere);
+        insert(0x00B2C8B2, &FlyForever);
         insert(0x00B2C8B4, &FreezeNPCs);
+        insert(0x00B2C8B6, &CaptainN);
+        insert(0x00B2C8B8, &FlameThrower);
+        insert(0x00B2C8BA, &CoinMode);
+        insert(0x00B2C8BE, &MaxFPS);
+        insert(0x00B2C8C0, &GodMode);
+        insert(0x00B2C8C2, &GrabAll);
 
         insert(0x00B2C8C4, &Cheater);
 
         insert(0x00B2C8E4, &Score); // HUD points count
-        insert(0x00B2C906, &maxStars); // Max stars at episode
+        insert(0x00B2C906, &MaxWorldStars); // Max stars at episode
+
+        insert(0x00B2C908, &Debugger);
+
+        insert(0x00B2D6B8, &PlayerCharacter);
+        insert(0x00B2D6BA, &PlayerCharacter2);
 
         insert(0x00B2D6BC, &SharedCursor.X); // Mouse cursor X
         insert(0x00B2D6C4, &SharedCursor.Y); // Mouse cursor Y
@@ -721,6 +769,12 @@ class SMBXObjectMemoryEmulator
 {
 protected:
 
+    typedef std::function<double(const T&,FIELDTYPE)> Getter;
+    typedef std::function<void(T&,double,FIELDTYPE)> Setter;
+
+    // typedef std::function<std::string(const T&)> StrGetter;
+    // typedef std::function<void(T&,const std::string&)> StrSetter;
+
     enum ValueType
     {
         VT_UNKNOWN = 0,
@@ -729,7 +783,8 @@ protected:
         VT_INT,
         VT_BOOL,
         VT_STRING,
-        VT_BYTE_HACK
+        VT_BYTE_HACK,
+        VT_LAMBDA,
     };
 
     struct Value
@@ -753,6 +808,8 @@ protected:
         bool        T::* field_b = nullptr;
         //! String-type field pointer
         std::string T::* field_s = nullptr;
+        //! Lambda-type field pointer
+        std::pair<Getter, Setter> field_lf;
     };
 
     //! Basic map of addresses
@@ -855,6 +912,19 @@ protected:
         m_type[address] = v;
     }
 
+    void insert(size_t address, Getter g, Setter s)
+    {
+        Value v;
+
+        // Normal field
+        v.field_lf = {g, s};
+        v.type = VT_LAMBDA;
+        v.baseType = VT_LAMBDA;
+        v.offset = 0;
+        v.baseAddress = address;
+        m_type[address] = v;
+    }
+
 public:
     SMBXObjectMemoryEmulator() noexcept
     {}
@@ -922,6 +992,11 @@ public:
             if(ftype != FT_WORD && ftype != FT_BYTE)
                 pLogWarning("MemEmu: Read type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             return valueToMem(obj->*(t->field_b), ftype);
+        }
+
+        case VT_LAMBDA:
+        {
+            return t->field_lf.first(*obj, ftype);
         }
 
         case VT_BYTE_HACK:
@@ -1036,6 +1111,12 @@ public:
             if(ftype != FT_WORD && ftype != FT_BYTE)
                 pLogWarning("MemEmu: Write type missmatched at %s 0x%x (Sint16 or Uint8 as boolean expected, %s actually)", objName, address, FieldtypeToStr(ftype));
             memToValue(obj->*(t->field_b), value, ftype);
+            return;
+        }
+
+        case VT_LAMBDA:
+        {
+            t->field_lf.second(*obj, value, ftype);
             return;
         }
 
@@ -1333,10 +1414,10 @@ public:
         insert(0x0000000e, &NPC_t::Pinched3);
         insert(0x00000010, &NPC_t::Pinched4);
         insert(0x00000012, &NPC_t::MovingPinched);
-        insert(0x00000014, &NPC_t::NetTimeout);
+        // insert(0x00000014, &NPC_t::NetTimeout); // unused since SMBX64, now removed
         insert(0x00000018, &NPC_t::RealSpeedX);
         insert(0x0000001c, &NPC_t::Wet);
-        insert(0x0000001e, &NPC_t::Settings);
+        // insert(0x0000001e, &NPC_t::Settings); // unused since SMBX64, now removed
         insert(0x00000020, &NPC_t::NoLavaSplash);
         insert(0x00000022, &NPC_t::Slope);
         insert(0x00000024, &NPC_t::Multiplier);
@@ -1355,9 +1436,9 @@ public:
         insert(0x0000004a, &NPC_t::DefaultStuck);
         // insert(0x0000004c, &NPC_t::Text);
         insert(0x00000050, &NPC_t::oldAddBelt);
-        insert(0x00000054, &NPC_t::PinchCount);
-        insert(0x00000056, &NPC_t::Pinched);
-        insert(0x00000058, &NPC_t::PinchedDirection);
+        // insert(0x00000054, &NPC_t::PinchCount); // unused since SMBX64, now removed
+        // insert(0x00000056, &NPC_t::Pinched); // unused since SMBX64, now removed
+        // insert(0x00000058, &NPC_t::PinchedDirection); // unused since SMBX64, now removed
         insert(0x0000005c, &NPC_t::BeltSpeed);
         insert(0x00000060, &NPC_t::standingOnPlayer);
         insert(0x00000062, &NPC_t::standingOnPlayerY);

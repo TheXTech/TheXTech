@@ -38,6 +38,9 @@
 #include "main/trees.h"
 #include "main/block_table.h"
 
+#include "npc/npc_queues.h"
+#include "graphics/gfx_update.h"
+
 int numLayers = 0;
 RangeArr<Layer_t, 0, maxLayers> Layer;
 
@@ -397,9 +400,14 @@ void ShowLayer(layerindex_t L, bool NoEffect)
             {
                 NPC[A].Active = true;
                 NPC[A].TimeLeft = 1;
+
+                NPCQueues::Active.insert(A);
             }
             CheckSectionNPC(A);
     }
+
+    if(!Layer[L].blocks.empty())
+        invalidateDrawBlocks();
 
     for(int A : Layer[L].blocks)
     {
@@ -418,6 +426,9 @@ void ShowLayer(layerindex_t L, bool NoEffect)
 
             // moved code to restore all hit blocks below
     }
+
+    if(!Layer[L].BGOs.empty())
+        invalidateDrawBGOs();
 
     for(int A : Layer[L].BGOs)
     {
@@ -454,7 +465,6 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 if(Block[A].Layer == L)
                     Block[A].Layer = LAYER_DEFAULT;
                 Block[A].Special = Block[A].DefaultSpecial;
-                Block[A].Special2 = Block[A].DefaultSpecial2;
                 Block[A].Type = Block[A].DefaultType;
                 syncLayersTrees_Block(A);
             }
@@ -490,6 +500,9 @@ void HideLayer(layerindex_t L, bool NoEffect)
             }
     }
 
+    if(!Layer[L].blocks.empty())
+        invalidateDrawBlocks();
+
     for(int A : Layer[L].blocks)
     {
             if(!Block[A].Hidden)
@@ -504,6 +517,9 @@ void HideLayer(layerindex_t L, bool NoEffect)
             }
             Block[A].Hidden = true;
     }
+
+    if(!Layer[L].BGOs.empty())
+        invalidateDrawBGOs();
 
     for(int A : Layer[L].BGOs)
     {
@@ -952,13 +968,13 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         else
                         {
                             // these thresholds can be tweaked, but they balance the expense of querying more tables with the expense of updating locations in the main table
-                            if(Layer[B].blocks.size() > 80)
+                            if(Layer[B].blocks.size() > 2)
                                 treeBlockSplitLayer(B);
 
-                            if(Layer[B].BGOs.size() > 80)
+                            if(Layer[B].BGOs.size() > 2)
                                 treeBackgroundSplitLayer(B);
 
-                            if(Layer[B].waters.size() > 80)
+                            if(Layer[B].waters.size() > 2)
                                 treeWaterSplitLayer(B);
                         }
                     }
@@ -1188,7 +1204,11 @@ void UpdateLayers()
         }
     }
 
-    for(A = 0; A <= maxLayers; A++)
+    // set invalidate rate
+    g_drawBlocks_invalidate_rate = 0;
+    g_drawBGOs_invalidate_rate = 0;
+
+    for(A = 0; A <= numLayers; A++)
     {
         // only consider non-empty, moving layers
         if(Layer[A].Name.empty() || (Layer[A].SpeedX == 0.f && Layer[A].SpeedY == 0.f))
@@ -1250,6 +1270,25 @@ void UpdateLayers()
                     }
                 }
 
+                if(!Layer[A].blocks.empty())
+                {
+                    if(std::abs(Layer[A].SpeedX) > g_drawBlocks_invalidate_rate)
+                        g_drawBlocks_invalidate_rate = std::abs(Layer[A].SpeedX);
+                    if(std::abs(Layer[A].SpeedY) > g_drawBlocks_invalidate_rate)
+                        g_drawBlocks_invalidate_rate = std::abs(Layer[A].SpeedY);
+                }
+
+                if(!Layer[A].BGOs.empty())
+                {
+                    if(std::abs(Layer[A].SpeedX) > g_drawBGOs_invalidate_rate)
+                        g_drawBGOs_invalidate_rate = std::abs(Layer[A].SpeedX);
+                    if(std::abs(Layer[A].SpeedY) > g_drawBGOs_invalidate_rate)
+                        g_drawBGOs_invalidate_rate = std::abs(Layer[A].SpeedY);
+                }
+
+                // is the layer currently included in the main block quadtree?
+                bool inactive = !treeBlockLayerActive(A);
+
                 for(int B : Layer[A].blocks)
                 {
                     // if(Block[B].Layer == Layer[A].Name)
@@ -1259,10 +1298,13 @@ void UpdateLayers()
                         Block[B].Location.SpeedX = double(Layer[A].SpeedX);
                         Block[B].Location.SpeedY = double(Layer[A].SpeedY);
 
-                        if(!treeBlockLayerActive(A))
+                        if(inactive)
                             treeBlockUpdateLayer(A, B);
                     }
                 }
+
+                // is the layer currently included in the main BGO quadtree?
+                inactive = !treeBackgroundLayerActive(A);
 
                 // int allBGOs = numBackground + numLocked;
                 for(int B : Layer[A].BGOs)
@@ -1277,10 +1319,13 @@ void UpdateLayers()
                             Background[B].Location.SpeedY = double(Layer[A].SpeedY);
                         }
 
-                        if(!treeBackgroundLayerActive(A))
+                        if(inactive)
                             treeBackgroundUpdateLayer(A, B);
                     }
                 }
+
+                // is the layer currently included in the main water quadtree?
+                inactive = !treeWaterLayerActive(A);
 
                 for(int B : Layer[A].waters)
                 {
@@ -1289,7 +1334,7 @@ void UpdateLayers()
                         Water[B].Location.X += double(Layer[A].SpeedX);
                         Water[B].Location.Y += double(Layer[A].SpeedY);
 
-                        if(!treeWaterLayerActive(A))
+                        if(inactive)
                             treeWaterUpdateLayer(A, B);
                     }
                 }
@@ -1352,6 +1397,8 @@ void UpdateLayers()
                                     Layer[NPC[B].AttLayer].SpeedY = Layer[A].SpeedY;
                                 }
                             }
+
+                            treeNPCUpdate(B);
                         }
                     }
                 }
@@ -1385,6 +1432,8 @@ void syncLayersTrees_AllBlocks()
 
 void syncLayersTrees_Block(int block)
 {
+    invalidateDrawBlocks();
+
     for(int layer = 0; layer <= numLayers; layer++)
     {
         if(layer != Block[block].Layer)
@@ -1397,7 +1446,7 @@ void syncLayersTrees_Block(int block)
     int layer = Block[block].Layer;
     if(block <= numBlock)
     {
-        treeBlockAddLayer(layer, block);
+        treeBlockUpdateLayer(layer, block);
         if(layer != LAYER_NONE)
             Layer[layer].blocks.insert(block);
     }
@@ -1420,6 +1469,8 @@ void syncLayersTrees_Block_SetHidden(int block) // set block hidden based on lay
 
 void syncLayers_AllNPCs()
 {
+    NPCQueues::clear();
+
     for(int npc = 1; npc <= numNPCs; npc++)
     {
         syncLayers_NPC(npc);
@@ -1435,6 +1486,15 @@ void syncLayers_NPC(int npc)
         else
             Layer[layer].NPCs.erase(npc);
     }
+
+    NPCQueues::update(npc);
+
+    SDL_assert_release(npc > 0);
+
+    if(npc <= numNPCs)
+        treeNPCUpdate(npc);
+    else
+        treeNPCRemove(npc);
 }
 
 void syncLayers_AllBGOs()
@@ -1447,6 +1507,8 @@ void syncLayers_AllBGOs()
 
 void syncLayers_BGO(int bgo)
 {
+    invalidateDrawBGOs();
+
     for(int layer = 0; layer <= numLayers; layer++)
     {
         if(layer != Background[bgo].Layer)
@@ -1459,7 +1521,7 @@ void syncLayers_BGO(int bgo)
     int layer = Background[bgo].Layer;
     if(bgo <= numBackground + numLocked)
     {
-        treeBackgroundAddLayer(layer, bgo);
+        treeBackgroundUpdateLayer(layer, bgo);
         if(layer != LAYER_NONE)
             Layer[layer].BGOs.insert(bgo);
     }
@@ -1496,7 +1558,7 @@ void syncLayers_Water(int water)
     int layer = Water[water].Layer;
     if(water <= numWater)
     {
-        treeWaterAddLayer(layer, water);
+        treeWaterUpdateLayer(layer, water);
         if(layer != LAYER_NONE)
             Layer[layer].waters.insert(water);
     }

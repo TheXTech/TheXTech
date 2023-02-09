@@ -30,6 +30,8 @@
 #include "../controls.h"
 #include "../layers.h"
 
+#include "npc/npc_queues.h"
+
 void KillNPC(int A, int B)
 {
     // ------+  KILL CODES  +-------
@@ -49,6 +51,8 @@ void KillNPC(int A, int B)
     int C = 0;
     Location_t tempLocation;
 
+    // don't need to worry about updating NPC A's tree because that will certainly happen in either the syncLayersNPC or the Deactivate call at the end of the procedure
+
     if(NPC[A].Type == 263 && NPC[A].Special > 0 && NPC[A].Killed != 9)
     {
         NewEffect(10, NPC[A].Location);
@@ -67,6 +71,8 @@ void KillNPC(int A, int B)
         }
         PlaySound(SFX_Icebreak);
         NPC[A].Type = NPC[A].Special;
+
+        NPCQueues::update(A);
 
         if(B != 10)
         {
@@ -88,7 +94,10 @@ void KillNPC(int A, int B)
         for(C = 1; C <= numNPCs; C++)
         {
             if(NPC[C].Type == NPC[A].Type && NPC[C].Section == NPC[A].Section && C != A)
+            {
                 tempBool = true;
+                break;
+            }
         }
 
         if(LevelEditor)
@@ -717,7 +726,10 @@ void KillNPC(int A, int B)
                 for(B = 1; B <= numNPCs; B++)
                 {
                     if(B != A && NPC[B].Type == 86)
+                    {
                         tempBool = true;
+                        break;
+                    }
                 }
 
                 if(!tempBool)
@@ -1072,7 +1084,10 @@ void KillNPC(int A, int B)
                 for(C = 1; C <= numNPCs; C++)
                 {
                     if(NPC[C].Type == 39 && C != A)
+                    {
                         DontSpawnExit = true;
+                        break;
+                    }
                 }
 
                 if(!DontSpawnExit)
@@ -1094,10 +1109,13 @@ void KillNPC(int A, int B)
                 }
                 else
                 {
-                    for(C = 1; C <= numNPCs; C++)
+                    for(int C : NPCQueues::Active.no_change)
                     {
                         if(NPC[C].Type == 39 && NPC[C].Active && C != A)
+                        {
                             DontResetMusic = true;
+                            break;
+                        }
                     }
 
                     if(!DontResetMusic)
@@ -1292,7 +1310,10 @@ void KillNPC(int A, int B)
                 for(B = 1; B <= numNPCs; B++)
                 {
                     if(NPC[B].Type == 15 && NPC[B].Killed == 0 && B != A)
+                    {
                         DontSpawnExit = true;
+                        break;
+                    }
                 }
 
                 if(LevelEditor)
@@ -1304,10 +1325,13 @@ void KillNPC(int A, int B)
                 {
                     NewEffect(14 , NPC[A].Location);
 
-                    for(B = 1; B <= numNPCs; B++)
+                    for(int B : NPCQueues::Active.no_change)
                     {
                         if(NPC[B].Type == 15 && NPC[B].Active && B != A && NPC[B].Killed == 0)
+                        {
                             DontResetMusic = true;
+                            break;
+                        }
                     }
 
                     if(!DontResetMusic)
@@ -1522,7 +1546,10 @@ void KillNPC(int A, int B)
     }
 
     if(BattleMode)
+    {
         NPC[A].RespawnDelay = 65 * 30;
+        NPCQueues::RespawnDelay.insert(A);
+    }
 
     if(NPC[A].AttLayer != LAYER_NONE && NPC[A].AttLayer != LAYER_DEFAULT)
     {
@@ -1557,6 +1584,7 @@ void KillNPC(int A, int B)
                 Player[B].VineNPC = A;
         }
 
+        SDL_assert_release(A > 0);
         NPC[A] = NPC[numNPCs];
         NPC[numNPCs] = blankNPC;
         numNPCs--;

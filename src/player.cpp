@@ -46,6 +46,8 @@
 #include "core/events.h"
 #include "compat.h"
 
+#include "npc/npc_queues.h"
+
 #include "controls.h"
 
 
@@ -71,7 +73,7 @@ static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
     tempLocation.Height = 600;
 
     C = 0;
-    for(B = 1; B <= numBlock; B++)
+    for(int B : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
     {
         if(CheckCollision(tempLocation, Block[B].Location))
         {
@@ -124,7 +126,7 @@ static void setupCheckpoints()
     {
         auto &cp = CheckpointsList[size_t(cpId)];
 
-        for(int numNPCsMax = numNPCs, A = 1; A <= numNPCsMax; A++)
+        for(int A = 1; A <= numNPCs; A++)
         {
             if(NPC[A].Type != 192)
                 continue;
@@ -133,6 +135,7 @@ static void setupCheckpoints()
                 continue;
 
             NPC[A].Killed = 9;
+            NPCQueues::Killed.push_back(A);
 
             // found a last id, leave player here
             if(!g_compatibility.fix_vanilla_checkpoints || cpId == int(CheckpointsList.size() - 1))
@@ -693,12 +696,17 @@ void PlayerHurt(const int A)
                                 NPC[B].standingOnPlayer = 0;
                                 NPC[B].Location.SpeedY = 0;
                                 NPC[B].Location.Y = NPC[numNPCs].Location.Y - 0.1 - NPC[B].standingOnPlayerY;
+                                treeNPCUpdate(B);
+                                if(NPC[B].tempBlock > 0)
+                                    treeNPCSplitTempBlock(B);
+
                                 NPC[B].standingOnPlayerY = 0;
                                 if(NPC[B].Type == 22)
                                     NPC[B].Special = 0;
                                 if(NPC[B].Type == 50)
                                 {
                                     NPC[B].Killed = 9;
+                                    NPCQueues::Killed.push_back(B);
                                     NPC[B].Special = 0;
                                 }
                                 else if(NPC[B].Type == 49)
@@ -2360,8 +2368,14 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
         }
     }
 
-    for(int numNPCsMax5 = numNPCs, A = 1; A <= numNPCsMax5; A++)
+    int numNPCsMax5 = numNPCs;
+
+    // need this complex loop syntax because Active can be modified within it
+    for(int A : NPCQueues::Active.may_erase)
     {
+        if(A > numNPCsMax5)
+            continue;
+
         if(NPC[A].Active && NPC[A].Effect == 0 && !(NPCIsAnExit[NPC[A].Type] || (NPCIsACoin[NPC[A].Type] && !Stab)) &&
             NPC[A].CantHurtPlayer != plr && !(p.StandingOnNPC == A && p.ShellSurf))
         {
@@ -2520,7 +2534,7 @@ void YoshiEat(const int A)
         }
     }
 
-    for(int numNPCsMax6 = numNPCs, B = 1; B <= numNPCsMax6; B++)
+    for(int B : treeNPCQuery(p.YoshiTongue, SORTMODE_ID))
     {
         auto &n = NPC[B];
         if(((NPCIsACoin[n.Type] && n.Special == 1) || !NPCNoYoshi[n.Type]) &&
@@ -2534,6 +2548,7 @@ void YoshiEat(const int A)
 
             if(CheckCollision(p.YoshiTongue, tempLocation))
             {
+                // dead code, check n.Type != 91 condition above
                 if(n.Type == 91)
                 {
                     if(!NPCNoYoshi[(int)n.Special])
@@ -2559,6 +2574,9 @@ void YoshiEat(const int A)
                         n.Effect = 5;
                         n.Effect2 = A;
                         p.YoshiNPC = B;
+
+                        NPCQueues::Unchecked.push_back(B);
+                        treeNPCUpdate(B);
                     }
                 }
                 else if(n.Type == 283)
@@ -2571,6 +2589,7 @@ void YoshiEat(const int A)
                     n.Effect2 = A;
                     n.Location.Height = NPCHeight[n.Type];
                     p.YoshiNPC = B;
+                    treeNPCUpdate(B);
                 }
 
                 if(n.Type == 147)
@@ -2584,6 +2603,9 @@ void YoshiEat(const int A)
                     n.Location.Height = NPCHeight[n.Type];
                     n.Location.X += -n.Location.Width / 2.0;
                     n.Location.Y += -n.Location.Height / 2.0;
+
+                    NPCQueues::Unchecked.push_back(B);
+                    treeNPCUpdate(B);
                 }
                 break;
             }
@@ -2652,6 +2674,7 @@ void YoshiSpit(const int A)
            NPC[p.YoshiNPC].Type != 24 && p.YoshiRed)
         {
             NPC[p.YoshiNPC].Killed = 9;
+            NPCQueues::Killed.push_back(p.YoshiNPC);
             PlaySound(SFX_BigFireball);
             for(B = 1; B <= 3; B++)
             {
@@ -2708,6 +2731,10 @@ void YoshiSpit(const int A)
             NPC[p.YoshiNPC].Location.SpeedX = 0;
             NPC[p.YoshiNPC].Location.SpeedY = 0;
 
+            NPCQueues::Active.insert(p.YoshiNPC);
+            NPCQueues::Unchecked.push_back(p.YoshiNPC);
+            treeNPCUpdate(p.YoshiNPC);
+
 
 
             if(NPC[p.YoshiNPC].Type == 45)
@@ -2759,7 +2786,7 @@ void YoshiSpit(const int A)
 
 void YoshiPound(const int A, int mount, bool BreakBlocks)
 {
-    int B = 0;
+    // int B = 0;
     Location_t tempLocation;
     Location_t tempLocation2;
     auto &p = Player[A];
@@ -2772,7 +2799,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
         tempLocation.Height = 32;
         tempLocation.Y = p.Location.Y + p.Location.Height - 16;
 
-        for(int numNPCsMax7 = numNPCs, B = 1; B <= numNPCsMax7; B++)
+        for(int B : NPCQueues::Active.may_erase)
         {
             if(!NPC[B].Hidden && NPC[B].Active && NPC[B].Effect == 0)
             {
@@ -2789,9 +2816,11 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
 
         if(BreakBlocks)
         {
-            for(B = 1; B <= numBlock; B++)
+            for(BlockRef_t block : treeBlockQuery(p.Location, SORTMODE_COMPAT))
             {
-                auto &b = Block[B];
+                Block_t& b = block;
+                int B = block;
+
                 if(b.Hidden || b.Invis || BlockNoClipping[b.Type] || BlockIsSizable[b.Type])
                     continue;
 
@@ -2938,6 +2967,8 @@ void PlayerDismount(const int A)
                 NPC[B].standingOnPlayer = 0;
                 NPC[B].Location.SpeedY = 0;
                 NPC[B].Location.Y = NPC[numNPCs].Location.Y - 0.1 - NPC[B].standingOnPlayerY;
+                treeNPCUpdate(B);
+
                 NPC[B].standingOnPlayerY = 0;
                 if(NPC[B].Type == 22)
                     NPC[B].Special = 0;
@@ -2945,6 +2976,7 @@ void PlayerDismount(const int A)
                 {
                     NPC[B].Killed = 9;
                     NPC[B].Special = 0;
+                    NPCQueues::Killed.push_back(B);
                 }
                 else if(NPC[B].Type == 49)
                     NPC[B].Special = 0;
@@ -3076,7 +3108,10 @@ void PlayerPush(const int A, int HitSpot)
                 if(!BlockOnlyHitspot1[b.Type] && !BlockNoClipping[b.Type])
                 {
                     if(HitSpot == 2)
+                    {
+                        // TODO: investigate this vanilla bug and see if it's worth making a fix
                         p.Location.X = b.Location.X - p.Location.Height - 0.01;
+                    }
                     else if(HitSpot == 3)
                         p.Location.Y = b.Location.Y + b.Location.Height + 0.01;
                     else if(HitSpot == 4)
@@ -3439,6 +3474,7 @@ void YoshiEatCode(const int A)
                     p.YoshiTonugeBool = true;
                 NPC[p.YoshiNPC].Location.X = p.YoshiTongue.X - NPC[p.YoshiNPC].Location.Width / 2.0 + 8 + 4 * p.Direction;
                 NPC[p.YoshiNPC].Location.Y = p.YoshiTongue.Y - NPC[p.YoshiNPC].Location.Height / 2.0 + 6;
+                treeNPCUpdate(p.YoshiNPC);
             }
 
             if(p.YoshiPlayer > 0)
@@ -3497,7 +3533,12 @@ void YoshiEatCode(const int A)
 
                 NPC[p.YoshiNPC].Effect = 6;
                 NPC[p.YoshiNPC].Effect2 = A;
-                NPC[p.YoshiNPC].Active = false;
+
+                if(NPC[p.YoshiNPC].Active)
+                {
+                    NPC[p.YoshiNPC].Active = false;
+                    NPCQueues::update(p.YoshiNPC);
+                }
 
                 if(NPC[p.YoshiNPC].Type == 49)
                 {
@@ -3519,7 +3560,14 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
                 NPC[p.YoshiNPC].Effect = 6;
                 NPC[p.YoshiNPC].Effect2 = A;
-                NPC[p.YoshiNPC].Active = false;
+
+                NPCQueues::Unchecked.push_back(p.YoshiNPC);
+
+                if(NPC[p.YoshiNPC].Active)
+                {
+                    NPC[p.YoshiNPC].Active = false;
+                    NPCQueues::update(p.YoshiNPC);
+                }
             }
             else if(p.MountType == 8 && !NPCIsABonus[NPC[p.YoshiNPC].Type])
             {
@@ -3532,7 +3580,14 @@ void YoshiEatCode(const int A)
                 NPC[p.YoshiNPC].Location.Y += -NPC[p.YoshiNPC].Location.Height / 2.0;
                 NPC[p.YoshiNPC].Effect = 6;
                 NPC[p.YoshiNPC].Effect2 = A;
-                NPC[p.YoshiNPC].Active = false;
+
+                NPCQueues::Unchecked.push_back(p.YoshiNPC);
+
+                if(NPC[p.YoshiNPC].Active)
+                {
+                    NPC[p.YoshiNPC].Active = false;
+                    NPCQueues::update(p.YoshiNPC);
+                }
             }
             else
             {
@@ -3545,6 +3600,8 @@ void YoshiEatCode(const int A)
                 {
                     MoreScore(NPCScore[NPC[p.YoshiNPC].Type], NPC[p.YoshiNPC].Location, p.Multiplier);
                     NPC[p.YoshiNPC].Killed = 9;
+                    NPCQueues::Killed.push_back(p.YoshiNPC);
+
                     p.YoshiNPC = 0;
                     p.FireBallCD = 30;
                     Coins += 1;
@@ -3563,6 +3620,12 @@ void YoshiEatCode(const int A)
 
                     PlaySound(SFX_YoshiSwallow);
                 }
+            }
+
+            if(p.YoshiNPC != 0)
+            {
+                NPCQueues::Unchecked.push_back(p.YoshiNPC);
+                treeNPCUpdate(p.YoshiNPC);
             }
         }
         else if(p.MountSpecial == 0 && p.YoshiPlayer > 0)
@@ -3777,6 +3840,8 @@ void ClownCar()
                     if(Player[A].Effect != 0)
                         NPC[B].Location.SpeedY = 0;
                     NPC[B].Location.Y = Player[A].Location.Y + NPC[B].Location.SpeedY + 0.1 - NPC[B].standingOnPlayerY;
+                    treeNPCUpdate(B);
+
                     if(Player[A].Controls.Run)
                     {
                         if(NPC[B].Type == 49)
@@ -3814,6 +3879,7 @@ void ClownCar()
                                         NPC[C].Location.X = NPC[B].Location.X - NPC[C].Location.Width;
                                     NPC[C].Location.Y = NPC[B].Location.Y;
                                     NPC[C].TimeLeft = 100;
+                                    treeNPCUpdate(C);
                                     break;
                                 }
                             }
@@ -3827,12 +3893,15 @@ void ClownCar()
                     tempLocation.Width -= 1;
                     tempLocation.Height = 1;
 
-                    for(int numNPCsMax10 = numNPCs, C = 1; C <= numNPCsMax10; C++)
+                    for(int C : treeNPCQuery(tempLocation, SORTMODE_NONE))
                     {
                         if(B != C && (NPC[C].standingOnPlayer == A || NPC[C].playerTemp))
                         {
                             if(CheckCollision(tempLocation, NPC[C].Location))
+                            {
                                 tempBool = true;
+                                break;
+                            }
                         }
                     }
 
@@ -4049,14 +4118,17 @@ void PowerUps(const int A)
 
     if(p.State == 6 && p.Character == 4 && p.Controls.Run && p.RunRelease)
     {
-        for(int numNPCsMax11 = numNPCs, B = 1; B <= numNPCsMax11; B++)
+        for(int B : NPCQueues::Active.no_change)
         {
             if(NPC[B].Active)
             {
                 if(NPC[B].Type == 292)
                 {
                     if(Maths::iRound(NPC[B].Special5) == A)
+                    {
                         BoomOut = true;
+                        break;
+                    }
                 }
             }
         }
@@ -4484,6 +4556,8 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == 31)
             {
                 NPC[plr.HoldingNPC].Killed = 9;
+                NPCQueues::Killed.push_back(plr.HoldingNPC);
+
                 NewEffect(10, NPC[plr.HoldingNPC].Location);
                 warp.Locked = false;
                 int allBGOs = numBackground + numLocked;
@@ -4505,6 +4579,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == 31)
             {
                 NPC[plr.YoshiNPC].Killed = 9;
+                NPCQueues::Killed.push_back(plr.YoshiNPC);
                 plr.YoshiNPC = 0;
 
                 warp.Locked = false;
@@ -4578,7 +4653,12 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
             }
             if(plr.Character == 3 ||
               (plr.Character == 4 && warp.Effect == 1 && direction == 1))
+            {
                 NPC[plr.HoldingNPC].Location.Y = entrance.Y;
+
+                if(plr.HoldingNPC > 0)
+                    treeNPCUpdate(plr.HoldingNPC);
+            }
             plr.HoldingNPC = 0;
             if(plr.YoshiNPC > 0)
             {
@@ -4951,6 +5031,13 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.StandingOnNPC].Location.Y += -NPC[p.StandingOnNPC].Location.Height / 2.0;
                         }
                         NPCFrames(p.StandingOnNPC);
+
+                        if(p.StandingOnNPC > 0)
+                        {
+                            NPCQueues::Unchecked.push_back(p.StandingOnNPC);
+                            treeNPCUpdate(p.StandingOnNPC);
+                        }
+
                         p.StandingOnNPC = 0;
                     }
                 }
@@ -4978,8 +5065,10 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
     }
     else if(!DontResetGrabTime)
         p.GrabTime = 0;
+
     if(p.HoldingNPC > numNPCs) // Can't hold an NPC that is dead
         p.HoldingNPC = 0;
+
     if(p.HoldingNPC > 0)
     {
         lyrX = NPC[p.HoldingNPC].Location.X;
@@ -5352,19 +5441,23 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].Location.SpeedX += p.Location.SpeedX * 0.5;
             }
 
-        if(NPC[p.HoldingNPC].Type == 292)
-        {
-            NPC[p.HoldingNPC].Special5 = A;
-            NPC[p.HoldingNPC].Special6 = p.Direction;
-            NPC[p.HoldingNPC].Location.SpeedY = -8;
-            NPC[p.HoldingNPC].Location.SpeedX = 12 * p.Direction + p.Location.SpeedX;
-            NPC[p.HoldingNPC].Projectile = true;
-        }
+            // this block was misleadingly left-indented in VB6, but its nesting in C++ is accurate to its nesting in VB6, and now I'm fixing the indentation to match the nesting -- ds-sloth
+            if(NPC[p.HoldingNPC].Type == 292)
+            {
+                NPC[p.HoldingNPC].Special5 = A;
+                NPC[p.HoldingNPC].Special6 = p.Direction;
+                NPC[p.HoldingNPC].Location.SpeedY = -8;
+                NPC[p.HoldingNPC].Location.SpeedX = 12 * p.Direction + p.Location.SpeedX;
+                NPC[p.HoldingNPC].Projectile = true;
+            }
 
 
             NPC[p.HoldingNPC].HoldingPlayer = 0;
             p.HoldingNPC = 0;
         }
+
+        if(LayerNPC > 0 && (NPC[LayerNPC].Location.X != lyrX || NPC[LayerNPC].Location.Y != lyrY))
+            treeNPCUpdate(LayerNPC);
     }
 
     if(LayerNPC > 0)
@@ -5855,6 +5948,7 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                    treeNPCUpdate(p.HoldingNPC);
                 }
             }
             else if(warp_dir_enter == 1)
@@ -5872,6 +5966,7 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                    treeNPCUpdate(p.HoldingNPC);
                 }
                 if(p.Mount == 0)
                     p.Frame = 15;
@@ -5901,6 +5996,7 @@ void PlayerEffects(const int A)
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
 //                    else
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                    treeNPCUpdate(p.HoldingNPC);
                 }
                 p.Location.SpeedX = -0.5;
                 PlayerFrame(p);
@@ -5930,6 +6026,7 @@ void PlayerEffects(const int A)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
 //                    else
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                    treeNPCUpdate(p.HoldingNPC);
                 }
                 p.Location.SpeedX = 0.5;
                 PlayerFrame(p);
@@ -6002,6 +6099,7 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                    treeNPCUpdate(p.HoldingNPC);
                 }
             }
             else if(warp_dir_exit == 3)
@@ -6014,6 +6112,7 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                    treeNPCUpdate(p.HoldingNPC);
                 }
             }
             else if(warp_dir_exit == 2)
@@ -6040,6 +6139,7 @@ void PlayerEffects(const int A)
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
 //                    else
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                    treeNPCUpdate(p.HoldingNPC);
                 }
             }
             else if(warp_dir_exit == 4)
@@ -6066,6 +6166,7 @@ void PlayerEffects(const int A)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + Physics.PlayerGrabSpotX[p.Character][p.State];
 //                    else
 //                        NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
+                    treeNPCUpdate(p.HoldingNPC);
                 }
             }
 
@@ -6226,6 +6327,7 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                    treeNPCUpdate(p.HoldingNPC);
                 }
 
                 if(p.Mount == 0)
@@ -6242,6 +6344,7 @@ void PlayerEffects(const int A)
                 {
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+                    treeNPCUpdate(p.HoldingNPC);
                 }
 
                 if(p.Mount == 0)
@@ -6284,6 +6387,7 @@ void PlayerEffects(const int A)
 //                        else
 //                            NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                     }
+                    treeNPCUpdate(p.HoldingNPC);
                 }
                 else
                 {
@@ -6329,6 +6433,7 @@ void PlayerEffects(const int A)
 //                        else
                         NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                     }
+                    treeNPCUpdate(p.HoldingNPC);
                 }
                 else
                 {
@@ -6440,6 +6545,7 @@ void PlayerEffects(const int A)
         {
             NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
             NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
+            treeNPCUpdate(p.HoldingNPC);
         }
 
         p.Effect2 += 1;
@@ -6610,8 +6716,15 @@ void PlayerEffects(const int A)
                             else
                                 NPC[Player[B].HoldingNPC].Location.X = Player[B].Location.X + Player[B].Location.Width - Physics.PlayerGrabSpotX[Player[B].Character][Player[B].State] - NPC[p.HoldingNPC].Location.Width;
 
+                            // TODO: investigate this possible crashing bug (should be Player[B].HoldingNPC)
                             NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
                             NPC[Player[B].HoldingNPC].Section = Player[B].Section;
+
+                            if(p.HoldingNPC > 0)
+                                treeNPCUpdate(p.HoldingNPC);
+
+                            // already checked this one above
+                            treeNPCUpdate(Player[B].HoldingNPC);
                         }
                     }
                 }
@@ -7059,6 +7172,7 @@ void PlayerEffects(const int A)
                 NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
 
             NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
+            treeNPCUpdate(p.HoldingNPC);
         }
 
         p.MountSpecial = 0;

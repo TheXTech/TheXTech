@@ -38,6 +38,8 @@
 #include "compat.h"
 #include "editor.h"
 
+#include "graphics/gfx_update.h"
+#include "npc/npc_queues.h"
 #include "main/trees.h"
 
 void BlockHit(int A, bool HitDown, int whatPlayer)
@@ -1430,7 +1432,7 @@ void BlockHitHard(int A)
     if(Block[A].Hidden)
         return;
 
-    if(Block[A].Type == 90 && Block[A].Special2 != 1)
+    if(Block[A].Type == 90 && !Block[A].forceSmashable)
     {
         // Block(A).Hidden = True
         // NewEffect 82, Block(A).Location, , A
@@ -1839,7 +1841,6 @@ void UpdateBlocks()
                                 if(b.Type != b.DefaultType)
                                     NewEffect(10, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
                                 b.Special = b.DefaultSpecial;
-                                b.Special2 = b.DefaultSpecial2;
                                 b.Type = b.DefaultType;
                             }
 
@@ -1882,9 +1883,10 @@ void UpdateBlocks()
                     ib.Type = 283;
                 else if(ib.Type == 283)
                     ib.Type = 282;
-                if(ib.Type == 90 && ib.Special == 0 && ib.Special2 != 1)
+                if(ib.Type == 90 && ib.Special == 0 && !ib.forceSmashable)
                 {
                     ib.Hidden = true;
+                    invalidateDrawBlocks();
                     NewEffect(82, ib.Location, 1, iBlock[A]);
                     ib.ShakeY = 0;
                     ib.ShakeY2 = 0;
@@ -1910,6 +1912,7 @@ void UpdateBlocks()
                 if(ib.Type == 90)
                 {
                     ib.Hidden = true;
+                    invalidateDrawBlocks();
                     NewEffect(82, ib.Location, 1, iBlock[A]);
                     ib.ShakeY = 0;
                     ib.ShakeY2 = 0;
@@ -2104,7 +2107,9 @@ void PSwitch(bool enabled)
                     nb.NPC = NPC[A].Type;
                     syncLayersTrees_Block(numBlock);
                 }
+
                 NPC[A].Killed = 9;
+                NPCQueues::Killed.push_back(A);
             }
         }
 
@@ -2243,6 +2248,7 @@ void PSwitch(bool enabled)
                     syncLayersTrees_Block(numBlock);
                 }
                 NPC[A].Killed = 9;
+                NPCQueues::Killed.push_back(A);
             }
         }
 
@@ -2430,7 +2436,7 @@ void PowBlock()
         }
     }
 
-    for(A = 1; A <= numNPCs; A++)
+    for(int A : NPCQueues::Active.no_change)
     {
         if(NPC[A].Active)
         {

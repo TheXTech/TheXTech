@@ -37,6 +37,8 @@
 #include "../core/render.h"
 #include "../screen_fader.h"
 
+#include "gfx_special_frames.h"
+
 #include <fmt_format_ne.h>
 
 

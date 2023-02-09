@@ -263,13 +263,13 @@ struct NPC_t
 //    MovingPinched As Integer 'required to be smashed
     int MovingPinched = 0;
 //    NetTimeout As Integer 'for online
-    int NetTimeout = 0;
+    // int NetTimeout = 0;    // unused since SMBX64, removed
 //    RealSpeedX As Single 'the real speed of the NPC
     float RealSpeedX = 0.0f;
 //    Wet As Integer ' greater then 0 of the NPC is in water
     int Wet = 0;
 //    Settings As Integer
-    int Settings = 0;
+    // int Settings = 0;    // unused since SMBX64, removed
 //    NoLavaSplash As Boolean 'true for no lava splash
     bool NoLavaSplash = false;
 //    Slope As Integer 'the block that the NPC is on a slope with
@@ -307,11 +307,11 @@ struct NPC_t
 //    oldAddBelt As Single
     float oldAddBelt = 0.0f;
 //    PinchCount As Integer 'obsolete
-    int PinchCount = 0;
+    // int PinchCount = 0;    // unused since SMBX64, removed
 //    Pinched As Boolean 'obsolete
-    bool Pinched = false;
+    // bool Pinched = false;    // unused since SMBX64, removed
 //    PinchedDirection As Integer 'obsolete
-    int PinchedDirection = 0;
+    // int PinchedDirection = 0;    // unused since SMBX64, removed
 //    BeltSpeed As Single 'The speed of the object this NPC is standing on
     float BeltSpeed = 0.0f;
 //    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
@@ -366,8 +366,8 @@ struct NPC_t
     double Special5 = 0.0;
 //    Special6 As Double
     double Special6 = 0.0;
-// EXTRA: Special7 As Double
-    double Special7 = 0.0;
+// EXTRA: Variant (previously Special7)
+    uint8_t Variant = 0;
 //    TurnAround As Boolean 'if the NPC needs to turn around
     bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.
@@ -406,6 +406,14 @@ struct NPC_t
     int Block = 0;
 //    tempBlock As Integer
     int tempBlock = 0;
+//    EXTRA: does the tempBlock have its own tree entry?
+    // To explain further: when an NPC is at the same location as its tempBlock,
+    //   its temp block is *not* added to the temp block quadtree
+    //   (saves time by only keeping one tree).
+    // Whenever the NPC is moved and temp block isn't, they split and the temp block needs to be added to the tree if it has not already been added. (treeNPCSplitTempBlock)
+    // Whenever the temp block is moved and the NPC isn't, they split and the temp block needs to be updated even if it is already added. (treeNPCUpdateTempBlock)
+    // Whenever the temp block is moved *to* the NPC's position, they re-join, and the temp block is removed if it was added.
+    bool tempBlockInTree = false;
 //    onWall As Boolean
     bool onWall = false;
 //    TurnBackWipe As Boolean
@@ -711,6 +719,10 @@ struct Water_t
 //Public Type Block   'Blocks
 struct Block_t
 {
+//    Location As Location
+    Location_t Location;
+//! EXTRA: temporary workaround: is it a smashable block of type 90 (normally not smashable)? (previously Special2)
+    bool forceSmashable = false;
 //    Slippy As Boolean
     bool Slippy = false;
 //    RespawnDelay As Integer
@@ -721,8 +733,6 @@ struct Block_t
     int DefaultType = 0;
 //    DefaultSpecial As Integer
     int DefaultSpecial = 0;
-//! EXTRA: second special
-    int DefaultSpecial2 = 0;
 //'for event triggers
 //    TriggerHit As String
     eventindex_t TriggerHit = EVENT_NONE;
@@ -736,12 +746,8 @@ struct Block_t
     bool Hidden = false;
 //    Type As Integer 'the block's type
     int Type = 0;
-//    Location As Location
-    Location_t Location;
 //    Special As Integer 'what is in the block?
     int Special = 0;
-//! EXTRA: second special
-    int Special2 = 0;
 //'for the shake effect after hitting ablock
 //    ShakeY As Integer
     int ShakeY = 0;
@@ -804,10 +810,10 @@ public:
 //Public Type Effect  'Special effects
 struct Effect_t
 {
-//    Type As Integer
-    int Type = 0;
 //    Location As Location
     Location_t Location;
+//    Type As Integer
+    int Type = 0;
 //    Frame As Integer
     int Frame = 0;
 //    FrameCount As Single
@@ -1271,7 +1277,7 @@ extern RangeArr<Location_t, 0, maxSections> LevelREAL;
 //Public curMusic As Integer 'current music playing
 extern int curMusic;
 //Public bgColor(0 To maxSections) As Long 'obsolete
-extern RangeArrI<long, 0, maxSections, 0> bgColor;
+// extern RangeArrI<long, 0, maxSections, 0> bgColor;    // unused since SMBX64, removed
 //Public Background2(0 To maxSections) As Integer 'level background
 extern RangeArrI<int, 0, maxSections, 0> Background2;
 //Public WorldPath(1 To maxWorldPaths) As WorldPath
@@ -1680,10 +1686,71 @@ extern int PSwitchTime;
 extern int PSwitchStop;
 //Public PSwitchPlayer As Integer
 extern int PSwitchPlayer;
+
+// newly extended
+
+struct SavedChar_t
+{
+    uint16_t HeldBonus = 0;
+    uint8_t State = 1;
+    uint8_t Mount = 0;
+    uint8_t MountType = 0;
+    uint8_t Hearts = 1;
+    uint8_t Character = 1;
+
+    inline SavedChar_t& operator=(const SavedChar_t& ch) = default;
+    inline SavedChar_t& operator=(const Player_t& p)
+    {
+        HeldBonus = p.HeldBonus;
+        State = p.State;
+        Mount = p.Mount;
+        MountType = p.MountType;
+        Hearts = p.Hearts;
+        Character = p.Character;
+
+        return *this;
+    }
+    inline operator Player_t() const
+    {
+        Player_t p;
+
+        p.HeldBonus = HeldBonus;
+        p.State = State;
+        p.Mount = Mount;
+        p.MountType = MountType;
+        p.Hearts = Hearts;
+        p.Character = Character;
+
+        return p;
+    }
+};
+
+struct SaveSlotInfo_t
+{
+    int64_t Time = 0;
+    bool    FailsEnabled = false;
+    int32_t Fails = 0;
+    int32_t Score = 0;
+
+    RangeArr<SavedChar_t, 1, 5> SavedChar;
+
+    // Save progress percent, displayed at title. <0 value denotes uninitialized saves
+    int Progress = -1;
+    int Stars = 0;
+    int Lives = 3;
+    int Coins = 0;
+};
+
+// new: all save info
+extern RangeArr<SaveSlotInfo_t, 1, maxSaveSlots> SaveSlotInfo;
+
+// deprecated
 //Public SaveSlot(1 To 3) As Integer
-extern RangeArrI<int, 1, maxSaveSlots, 0> SaveSlot;
+// extern RangeArrI<int, 1, maxSaveSlots, 0> SaveSlot;
 //Public SaveStars(1 To 3) As Integer
-extern RangeArrI<int, 1, maxSaveSlots, 0> SaveStars;
+// extern RangeArrI<int, 1, maxSaveSlots, 0> SaveStars;
+
+
 //Public BeltDirection As Integer 'direction of the converyer belt blocks
 extern int BeltDirection;
 //Public BeatTheGame As Boolean 'true if the game has been beaten
@@ -1863,7 +1930,7 @@ extern int MaxWorldStars;
 //Public Debugger As Boolean 'if the debugger window is open
 extern bool Debugger;
 //Public SavedChar(0 To 10) As Player 'Saves the Player's Status
-extern RangeArr<Player_t, 0, 10> SavedChar;
+extern RangeArr<SavedChar_t, 0, 10> SavedChar;
 
 extern bool LoadingInProcess;
 //Public LoadCoins As Integer

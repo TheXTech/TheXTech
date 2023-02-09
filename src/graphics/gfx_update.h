@@ -18,42 +18,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "luna.h"
+#pragma once
+#ifndef GFX_UPDATE_H
+#define GFX_UPDATE_H
 
-SMBXHUDSettings gSMBXHUDSettings;
+extern bool g_drawBlocks_valid[2];
+extern bool g_drawBGOs_valid[2];
 
-bool gLunaEnabledGlobally = true;
-bool gLunaEnabled = true;
-bool gShowDemoCounter = true;
-bool gEnableDemoCounter = true;
-bool gEnableDemoCounterByLC = false;
-std::string gDemoCounterTitle = "FAILS";
-std::string gDemoCounterTitleDefault = "FAILS";
+// should equal the largest X or Y move rate of any layer containing blocks / BGOs
+extern double g_drawBlocks_invalidate_rate;
+extern double g_drawBGOs_invalidate_rate;
 
+// call when a block is added, moved, or its Hidden attribute is changed
+inline void invalidateDrawBlocks()
+{
+    g_drawBlocks_valid[0] = false;
+    g_drawBlocks_valid[1] = false;
+}
 
-/* Fallback dummy calls for the case when Luna Autocode has been disabled */
+// call when a BGO is added, moved, or its Hidden attribute is changed
+inline void invalidateDrawBGOs()
+{
+    g_drawBGOs_valid[0] = false;
+    g_drawBGOs_valid[1] = false;
+}
 
-#ifndef THEXTECH_ENABLE_LUNA_AUTOCODE
-
-void lunaReset()
-{}
-
-void lunaLoad()
-{}
-
-void lunaLoop()
-{}
-
-void lunaRenderStart()
-{}
-
-void lunaRenderHud()
-{}
-
-void lunaRender(int)
-{}
-
-void lunaRenderEnd()
-{}
-
-#endif
+#endif // #ifdef GFX_UPDATE_H

@@ -112,7 +112,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         section.size_right = s.Width;
         section.size_bottom  = s.Height;
         section.music_id = bgMusic[i];
-        section.bgcolor = bgColor[i];
+        // section.bgcolor = bgColor[i];    // unused since SMBX64, removed
         section.wrap_h = LevelWrap[i];
         section.wrap_v = LevelVWrap[i];
         section.OffScreenEn = OffScreenExit[i];
@@ -172,7 +172,7 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
 
         // NEW: legacy behavior for spin block
         if(b.Type == 90)
-            block.special_data = b.Special2;
+            block.special_data = (int)b.forceSmashable;
 
         block.meta.array_id = (out.blocks_array_id++);
 
@@ -227,9 +227,9 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
             npc.special_data = n.Special;
         }
         // Legacy and custom behaviors
-        else if(find_Special7_Data(n.Type) != nullptr)
+        else if(find_Variant_Data(n.Type) != nullptr)
         {
-            npc.special_data = n.Special7;
+            npc.special_data = n.Variant;
         }
 
         npc.generator = n.Generator;

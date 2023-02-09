@@ -32,12 +32,17 @@
 #include "../npc_id.h"
 #include "../layers.h"
 
+#include "npc/npc_queues.h"
+#include "main/trees.h"
+
 #include <Logger/logger.h>
 
 void NPCHit(int A, int B, int C)
 {
     NPC_t tempNPC;
     Location_t tempLocation;
+
+    // NEWLY used to check when NPC's tree location needs to be updated
     NPC_t oldNPC = NPC[A];
 
     // if(B == 1 && C != 0)
@@ -146,6 +151,8 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Location.Width = static_cast<int>(floor(static_cast<double>(NPC[A].Location.Width))) - 0.01;
                 else
                     NPC[A].Location.X = static_cast<int>(floor(static_cast<double>(NPC[A].Location.X))) + 0.01;
+
+                NPCQueues::Unchecked.push_back(A);
             }
 
             NPC[A].Location.Height = static_cast<int>(floor(static_cast<double>(NPC[A].Location.Height)));
@@ -171,6 +178,10 @@ void NPCHit(int A, int B, int C)
 
             PlaySound(SFX_Freeze);
             // NPCHit C, 3, C
+
+            treeNPCUpdate(A);
+            if(NPC[A].tempBlock > 0)
+                treeNPCSplitTempBlock(A);
             return;
         }
     }
@@ -224,6 +235,9 @@ void NPCHit(int A, int B, int C)
 
     if(B == 1 && NPCJumpHurt[NPC[A].Type] && NPC[A].Type != 283) // Things that don't die from jumping
         return;
+
+    // Add it to the queue, no matter whether it will happen. Reduces code size and increases maintainability.
+    NPCQueues::Killed.push_back(A);
 
     if(B == 10 && NPC[A].Type == 31)
     {
@@ -324,7 +338,13 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Y += NPC[A].Location.Height;
         }
         NPC[A].Direction = Player[C].Direction;
-        NPC[A].Generator = false;
+
+        if(NPC[A].Generator)
+        {
+            NPC[A].Generator = false;
+            NPCQueues::update(A);
+        }
+
         NPC[A].Frame = 0;
         NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
         CharStuff(A);
@@ -367,7 +387,11 @@ void NPCHit(int A, int B, int C)
         }
         if(NPCIsAShell[NPC[A].Type])
             NPC[A].Location.SpeedX = Physics.NPCShellSpeed * Player[C].Direction;
+
+        NPCQueues::Unchecked.push_back(A);
+
         NPCFrames(A);
+
         if(!NPCIsACoin[NPC[A].Type])
             NPC[A].Projectile = true;
         else
@@ -446,6 +470,13 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Y += -NPC[A].Location.Height;
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
+
+            // update now because oldNPC (which we use to check for deferred update later) has been updated
+            NPCQueues::Unchecked.push_back(A);
+            treeNPCUpdate(A);
+            if(NPC[A].tempBlock > 0)
+                treeNPCSplitTempBlock(A);
+
             oldNPC = NPC[A];
         }
 
@@ -548,11 +579,11 @@ void NPCHit(int A, int B, int C)
     // Mother Brain
     else if(NPC[A].Type == NPCID_MOTHERBRAIN)
     {
-        int D = 0;
+        // int D = 0;
         bool tempBool;
         tempBool = false;
 
-        for(D = 1; D <= numNPCs; D++)
+        for(int D : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
         {
             if(NPC[D].Type == 208)
             {
@@ -1314,6 +1345,9 @@ void NPCHit(int A, int B, int C)
             }
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
             NPC[A].Location.Width = NPCWidth[NPC[A].Type];
+
+            NPCQueues::Unchecked.push_back(A);
+
             NPC[A].Location.Y -= NPC[A].Location.Height;
             NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
             NPC[A].Location.SpeedX = 0;
@@ -1392,6 +1426,9 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Y -= NPC[A].Location.Height;
             NPC[A].Location.X += -(NPC[A].Location.Width / 2.0) - double(NPC[A].Direction * 2.f);
             NPC[A].Location.SpeedX = 0;
+
+            NPCQueues::Unchecked.push_back(A);
+
             NPC[A].Special = 0;
             NPC[A].Frame = 0;
             NPC[A].Location.SpeedY = -5;
@@ -1902,7 +1939,19 @@ void NPCHit(int A, int B, int C)
                         NewEffect(13, NPC[A].Location);
                     PlaySound(SFX_Lava);
                     NPC[A].Location = NPC[A].DefaultLocation;
-                    NPC[A].Active = false;
+
+                    if(NPC[A].Active)
+                    {
+                        NPC[A].Active = false;
+                        NPCQueues::update(A);
+                    }
+                    else
+                    {
+                        NPCQueues::Unchecked.push_back(A);
+                    }
+
+                    // TODO: any other hooks for inactive?
+
                     NPC[A].TimeLeft = 0;
                     NPC[A].Projectile = false;
                     NPC[A].Direction = NPC[A].DefaultDirection;
@@ -1910,6 +1959,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].CantHurtPlayer = 0;
                     NPC[A].Reset[1] = false;
                     NPC[A].Reset[2] = false;
+                    NPCQueues::NoReset.push_back(A);
                 }
             }
         }
@@ -2012,6 +2062,7 @@ void NPCHit(int A, int B, int C)
             NewEffect(13, NPC[A].Location);
             PlaySound(SFX_Lava);
             NPC[A].Location = NPC[A].DefaultLocation;
+            NPCQueues::Unchecked.push_back(A);
         }
     }
     // Coins
@@ -2265,6 +2316,23 @@ void NPCHit(int A, int B, int C)
         NPC[A].Location.X += (NPC[A].Location.Width / 2.0);
         NPC[A].Location.Width = NPCWidth[NPC[A].Type];
         NPC[A].Location.X -= (NPC[A].Location.Width / 2.0);
+    }
+
+    if(NPC[A].Location.Width != oldNPC.Location.Width)
+    {
+        treeNPCUpdate(A);
+        if(NPC[A].tempBlock > 0)
+            treeNPCSplitTempBlock(A);
+
+        NPCQueues::Unchecked.push_back(A);
+    }
+    else if(NPC[A].Location.Height != oldNPC.Location.Height
+        || NPC[A].Location.X != oldNPC.Location.X
+        || NPC[A].Location.X != oldNPC.Location.Y)
+    {
+        treeNPCUpdate(A);
+        if(NPC[A].tempBlock > 0)
+            treeNPCSplitTempBlock(A);
     }
 
     StopHit = 0;

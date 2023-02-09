@@ -31,6 +31,8 @@
 #include <AppPath/app_path.h>
 #include <PGE_File_Formats/file_formats.h>
 #include <fmt_format_ne.h>
+#include <IniProcessor/ini_processing.h>
+#include <script/luna/lunacounter.h>
 
 #include "menu_main.h"
 
@@ -51,18 +53,60 @@ std::string makeGameSavePath(std::string episode, std::string world, std::string
     return ret;
 }
 
+static void s_LoadCharacter(SavedChar_t& dest, const saveCharState& s)
+{
+    dest = SavedChar_t();
+
+    if((s.state < 1) || (s.state > numStates))
+        dest.State = 1;
+    else
+        dest.State = int(s.state);
+
+    dest.HeldBonus = int(s.itemID);
+
+    switch(s.mountID)
+    {
+    default:
+    case 0:
+        dest.Mount = 0;
+        dest.MountType = 0;
+        break;
+    case 1: case 2: case 3:
+        dest.Mount = int(s.mountID);
+    }
+
+    dest.MountType = int(s.mountType);
+    switch(s.mountID)
+    {
+    case 1:
+        if((s.mountType < 1) || (s.mountType > 3))
+            dest.MountType = 1;
+        break;
+    default:
+        break;
+    case 3:
+        if((s.mountType < 1) || (s.mountType > 8))
+            dest.MountType = 1;
+        break;
+    }
+
+    dest.Hearts = int(s.health);
+    dest.Character = int(s.id);
+}
+
 
 void FindSaves()
 {
 //    std::string newInput;
     const auto &w = SelectWorld[selWorld];
-    std::string episode = w.WorldPath;
+    const std::string& episode = w.WorldPath;
     GamesaveData f;
 
     for(auto A = 1; A <= maxSaveSlots; A++)
     {
-        SaveSlot[A] = -1;
-        SaveStars[A] = 0;
+        auto& info = SaveSlotInfo[A];
+
+        info = SaveSlotInfo_t();
 
         // Modern gamesave file
         std::string saveFile = makeGameSavePath(episode,
@@ -104,14 +148,62 @@ void FindSaves()
 
             // How many stars collected
             maxActive += (int(f.totalStars) * 4);
-            SaveStars[A] = int(f.gottenStars.size());
+            info.Stars = int(f.gottenStars.size());
 
-            curActive += (SaveStars[A] * 4);
+            curActive += (info.Stars * 4);
 
+            // calculate progress
             if(maxActive > 0)
-                SaveSlot[A] = int((float(curActive) / float(maxActive)) * 100);
+                info.Progress = int((float(curActive) / float(maxActive)) * 100);
             else
-                SaveSlot[A] = 100;
+                info.Progress = 100;
+
+            // load normal stats
+            info.Lives = f.lives;
+            info.Coins = f.coins;
+            info.Score = f.points;
+
+            // load saved chars
+            for(int i = 1; i <= 5; i++)
+            {
+                info.SavedChar[i] = SavedChar_t();
+                info.SavedChar[i].Character = i;
+            }
+
+            for(auto &s : f.characterStates)
+            {
+                if((s.id < 1) || (s.id > 5))
+                    continue;
+                int i = int(s.id);
+                s_LoadCharacter(info.SavedChar[i], s);
+            }
+
+            // load timer info for existing save
+            std::string savePath = makeGameSavePath(episode,
+                                                     w.WorldFile,
+                                                     fmt::format_ne("timers{0}.ini", A));
+
+            if(Files::fileExists(savePath))
+            {
+                IniProcessing timer(savePath);
+                timer.beginGroup("timers");
+                timer.read("total", info.Time, 0);
+                timer.endGroup();
+            }
+
+            // load fails for existing save
+            savePath = makeGameSavePath(episode,
+                                        w.WorldFile,
+                                        fmt::format_ne("fails-{0}.rip", A));
+
+            if(Files::fileExists(savePath))
+            {
+                gDeathCounter.counterFile = savePath;
+                gDeathCounter.TryLoadStats();
+                gDeathCounter.Recount();
+                info.FailsEnabled = true;
+                info.Fails = gDeathCounter.mCurTotalDeaths;
+            }
         }
     }
 }
@@ -274,11 +366,7 @@ void LoadGame()
 
     for(A = 1, i = 0; A <= 5; A++, i++)
     {
-        SavedChar[A].State = 1;
-        SavedChar[A].HeldBonus = 0;
-        SavedChar[A].Mount = 0;
-        SavedChar[A].MountType = 0;
-        SavedChar[A].Hearts = 1;
+        SavedChar[A] = SavedChar_t();
         SavedChar[A].Character = A;
     }
 
@@ -288,41 +376,7 @@ void LoadGame()
             continue;
         A = int(s.id);
 
-        if((s.state < 1) || (s.state > 10))
-            SavedChar[A].State = 1;
-        else
-            SavedChar[A].State = int(s.state);
-
-        SavedChar[A].HeldBonus = int(s.itemID);
-
-        switch(s.mountID)
-        {
-        default:
-        case 0:
-            SavedChar[A].Mount = 0;
-            SavedChar[A].MountType = 0;
-            break;
-        case 1: case 2: case 3:
-            SavedChar[A].Mount = int(s.mountID);
-        }
-
-        SavedChar[A].MountType = int(s.mountType);
-        switch(s.mountID)
-        {
-        case 1:
-            if((s.mountType < 1) || (s.mountType > 3))
-                SavedChar[A].MountType = 1;
-            break;
-        default:
-            break;
-        case 3:
-            if((s.mountType < 1) || (s.mountType > 8))
-                SavedChar[A].MountType = 1;
-            break;
-        }
-
-        SavedChar[A].Hearts = int(s.health);
-        SavedChar[A].Character = A;
+        s_LoadCharacter(SavedChar[A], s);
     }
 
 

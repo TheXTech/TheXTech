@@ -18,42 +18,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "luna.h"
+#pragma once
+#ifndef GFX_SPECIAL_FRAMES_H
+#define GFX_SPECIAL_FRAMES_H
 
-SMBXHUDSettings gSMBXHUDSettings;
+// Private Sub SpecialFrames() 'update frames for special things such as coins and kuribo's shoe
+extern void SpecialFrames();//PRIVATE
+// update frames for special things such as coins and kuribo's shoe
 
-bool gLunaEnabledGlobally = true;
-bool gLunaEnabled = true;
-bool gShowDemoCounter = true;
-bool gEnableDemoCounter = true;
-bool gEnableDemoCounterByLC = false;
-std::string gDemoCounterTitle = "FAILS";
-std::string gDemoCounterTitleDefault = "FAILS";
+// NEW: update level frames that keep going during
+void LevelFramesAlways();
 
+// NEW: update level frames that stop during FreezeNPCs
+void LevelFramesNotFrozen();
 
-/* Fallback dummy calls for the case when Luna Autocode has been disabled */
-
-#ifndef THEXTECH_ENABLE_LUNA_AUTOCODE
-
-void lunaReset()
-{}
-
-void lunaLoad()
-{}
-
-void lunaLoop()
-{}
-
-void lunaRenderStart()
-{}
-
-void lunaRenderHud()
-{}
-
-void lunaRender(int)
-{}
-
-void lunaRenderEnd()
-{}
-
-#endif
+#endif // #ifndef GFX_SPECIAL_FRAMES_H

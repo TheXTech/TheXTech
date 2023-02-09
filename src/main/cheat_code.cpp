@@ -46,6 +46,9 @@
 #include "game_info.h"
 #include "screen_quickreconnect.h"
 
+#include "npc/npc_queues.h"
+#include "main/trees.h"
+
 #include "cheat_code.h"
 
 
@@ -1156,7 +1159,7 @@ static void warioTime()
 {
     Location_t tempLocation;
 
-    for(int B = 1; B <= numNPCs; B++)
+    for(int B : NPCQueues::Active.no_change)
     {
         if(NPC[B].Active)
         {
@@ -1183,6 +1186,9 @@ static void warioTime()
                 NPC[B].Location.X += -NPC[B].Location.Width / 2.0;
                 NPC[B].Location.SpeedX = 0;
                 NPC[B].Location.SpeedY = 0;
+
+                treeNPCUpdate(B);
+                NPCQueues::Unchecked.push_back(B);
             }
         }
     }
@@ -2361,7 +2367,7 @@ struct CheatBuffer_t
         return buffer[t];
     }
 
-    size_t getBugLen() const
+    size_t getBufLen() const
     {
         return bufLen;
     }
@@ -2383,7 +2389,7 @@ static void processCheats()
 {
     std::string oldString;
     const char *buf = s_buffer.getString();
-    auto bufLen = s_buffer.getBugLen();
+    auto bufLen = s_buffer.getBufLen();
     bool cheated = false;
 
     // D_pLogDebug("Cheat buffer [%s]\n", buf);
@@ -2450,6 +2456,18 @@ void CheatCode(char sym)
 bool cheats_contains(const std::string &needle)
 {
     const char *buf = s_buffer.getString();
-    auto bufLen = s_buffer.getBugLen();
+    auto bufLen = s_buffer.getBufLen();
     return cheatCompare(bufLen, buf, needle.size(), needle.c_str());
+}
+
+bool cheats_contains(const char *needle)
+{
+    const char *buf = s_buffer.getString();
+    auto bufLen = s_buffer.getBufLen();
+    return cheatCompare(bufLen, buf, SDL_strlen(needle), needle);
+}
+
+std::string cheats_get()
+{
+    return std::string(s_buffer.getString(), s_buffer.getBufLen());
 }

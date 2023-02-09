@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.5)
 
+if(POLICY CMP0069) # Allow CMAKE_INTERPROCEDURAL_OPTIMIZATION (lto) to be set
+    cmake_policy(SET CMP0069 NEW)
+endif()
+
 project(TheXTech LANGUAGES C CXX)
 
 include(CheckCCompilerFlag)
@@ -212,6 +216,10 @@ if(NOT APPLE AND NOT ANDROID AND NOT EMSCRIPTEN)
     set(THEXTECH_UNIX_INSTALL TRUE)
 endif()
 
+# ============ Customization ==end=========
+
+# ============ Platform-conf ==============
+
 if(VITA)
     message("Enabling PS Vita Support and fast-math flags.")
 
@@ -245,7 +253,7 @@ if(NINTENDO_DS)
     set(THEXTECH_NO_SDL_BUILD ON CACHE BOOL "" FORCE)
 endif()
 
-# ============ Customization ==end=========
+# ============ Platform-conf ==end=========
 
 option(PGEFL_QT_SUPPORT "Build PGE-FL with Qt support [Unneeded]" OFF)
 set(Moondust_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}) # Don't install PGE-FL libraries
@@ -502,7 +510,6 @@ set(THEXTECH_SRC
     src/main/outro_loop.cpp
     src/main/trees.cpp
     src/main/block_table.cpp
-    src/main/QuadTree/LooseQuadtree-impl.cpp
     src/graphics/gfx_update2.cpp
     src/graphics/gfx_update.cpp
     src/graphics/gfx_background.cpp
@@ -545,6 +552,7 @@ set(THEXTECH_SRC
     src/npc/npc_update.cpp
     src/npc/npc_frames.cpp
     src/npc/npc_bonus.cpp
+    src/npc/npc_queues.cpp
     src/player/player_update.cpp
     src/fontman/font_manager.cpp
     src/fontman/font_manager_private.cpp
@@ -642,6 +650,7 @@ elseif(NINTENDO_DS)
         src/core/16m/window_16m.cpp
         src/core/null/events_null.cpp
         src/core/16m/sound_16m.cpp
+        src/core/16m/packloader.cpp
     )
 elseif(THEXTECH_CLI_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
@@ -700,7 +709,8 @@ file(GLOB THEXTECH_HEADS_SRC
     src/editor/*.h
     src/main/*.h
     src/main/*.hpp
-    src/main/QuadTree/*.h
+    src/npc/*.h
+    src/npc/*.hpp
     src/sound/fx/*.h
     src/sound/fx/*.hpp
     src/fontman/*.h
@@ -869,7 +879,7 @@ elseif(NINTENDO_WII)
     target_compile_definitions(thextech PRIVATE -DPGE_SDL_MUTEX -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__WII__)
 elseif(NINTENDO_DS)
     target_link_libraries(thextech PRIVATE filesystem)
-    target_link_libraries(thextech PRIVATE fat)
+    target_link_libraries(thextech PRIVATE slim)
     target_link_libraries(thextech PRIVATE mm9)
     target_link_libraries(thextech PRIVATE nds9)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DLOW_MEM -DTHEXTECH_PRELOAD_LEVELS -D__16M__)

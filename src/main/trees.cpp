@@ -24,68 +24,27 @@
 #include "trees.h"
 #include "layers.h"
 
-#include "QuadTree/LooseQuadtree.h"
+#include "main/block_table.h"
+#include "main/block_table.hpp"
 
 
 std::vector<BaseRef_t> treeresult_vec[MAX_TREEQUERY_DEPTH] = {std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(400), std::vector<BaseRef_t>(50), std::vector<BaseRef_t>(50)};
 ptrdiff_t cur_treeresult_vec = 0;
 
-template<class ItemRef_t>
-class Tree_Extractor
-{
-public:
-    static void ExtractBoundingBox(const ItemRef_t object, loose_quadtree::BoundingBox<double> *bbox)
-    {
-        bbox->left      = object->Location.X;
-        bbox->top       = object->Location.Y;
-        bbox->width     = object->Location.Width;
-        bbox->height    = object->Location.Height;
-    }
-};
-
-
-template<>
-class Tree_Extractor<BlockRef_t>
-{
-public:
-    static void ExtractBoundingBox(const BlockRef_t object, loose_quadtree::BoundingBox<double> *bbox)
-    {
-        bbox->left      = object->Location.X;
-        bbox->top       = object->Location.Y;
-        bbox->width     = object->Location.Width;
-        bbox->height    = object->Location.Height;
-
-        if(object->Layer != LAYER_NONE)
-        {
-            bbox->left -= Layer[object->Layer].OffsetX;
-            bbox->top -= Layer[object->Layer].OffsetY;
-        }
-    }
-};
-
-template<class ItemRef_t>
-struct Tree_private
-{
-    typedef loose_quadtree::LooseQuadtree<double, ItemRef_t, Tree_Extractor<ItemRef_t>> IndexTreeQ;
-    IndexTreeQ tree;
-};
-
 const double s_gridSize = 4;
 
-static std::unique_ptr<Tree_private<TileRef_t>> s_worldTilesTree;
-static std::unique_ptr<Tree_private<SceneRef_t>> s_worldSceneTree;
-static std::unique_ptr<Tree_private<WorldPathRef_t>> s_worldPathTree;
-static std::unique_ptr<Tree_private<WorldLevelRef_t>> s_worldLevelTree;
-static std::unique_ptr<Tree_private<WorldMusicRef_t>> s_worldMusicTree;
-static std::unique_ptr<Tree_private<BlockRef_t>> s_levelBlockTrees[maxLayers+2];
-static std::unique_ptr<Tree_private<BlockRef_t>> s_tempBlockTree;
+static std::unique_ptr<table_t<TileRef_t>> s_worldTilesTree;
+static std::unique_ptr<table_t<SceneRef_t>> s_worldSceneTree;
+static std::unique_ptr<table_t<WorldPathRef_t>> s_worldPathTree;
+static std::unique_ptr<table_t<WorldLevelRef_t>> s_worldLevelTree;
+static std::unique_ptr<table_t<WorldMusicRef_t>> s_worldMusicTree;
 
 template<class Q>
 void clearTree(Q &tree)
 {
     if(tree.get())
     {
-        tree->tree.Clear();
+        tree->clear();
         tree.reset();
     }
 }
@@ -104,32 +63,34 @@ void treeLevelCleanAll()
     treeLevelCleanBlockLayers();
     treeLevelCleanBackgroundLayers();
     treeLevelCleanWaterLayers();
+    treeTempBlockFullClear();
+    treeNPCClear();
 }
 
 template<class ItemRef_t, class Arr>
 void treeInsert(Arr &p, ItemRef_t obj)
 {
     if(!p.get())
-        p.reset(new Tree_private<ItemRef_t>());
-    p->tree.Insert(obj);
+        p.reset(new table_t<ItemRef_t>());
+    p->insert(obj);
 }
 
 template<class ItemRef_t, class Arr>
 void treeUpdate(Arr &p, ItemRef_t obj)
 {
     if(p.get())
-        p->tree.Update(obj);
+        p->update(obj);
 }
 
 template<class ItemRef_t, class Arr>
 void treeRemove(Arr &p, ItemRef_t obj)
 {
     if(p.get())
-        p->tree.Remove(obj);
+        p->erase(obj);
 }
 
 template<class ItemRef_t>
-TreeResult_Sentinel<ItemRef_t> treeWorldQuery(std::unique_ptr<Tree_private<ItemRef_t>> &p,
+TreeResult_Sentinel<ItemRef_t> treeWorldQuery(std::unique_ptr<table_t<ItemRef_t>> &p,
     double Left, double Top, double Right, double Bottom, int sort_mode)
 {
     TreeResult_Sentinel<ItemRef_t> result;
@@ -137,17 +98,10 @@ TreeResult_Sentinel<ItemRef_t> treeWorldQuery(std::unique_ptr<Tree_private<ItemR
     if(!p.get())
         return result;
 
-    auto q = p->tree.QueryIntersectsRegion(loose_quadtree::BoundingBox<double>(Left - s_gridSize,
-                                                                               Top - s_gridSize,
-                                                                               (Right - Left) + s_gridSize * 2,
-                                                                               (Bottom - Top) + s_gridSize * 2));
-
-    while(!q.EndOfQuery())
-    {
-        ItemRef_t item = q.GetCurrent();
-        result.i_vec->push_back((BaseRef_t)item);
-        q.Next();
-    }
+    p->query(*result.i_vec, newLoc(Left - s_gridSize,
+                                  Top - s_gridSize,
+                                  (Right - Left) + s_gridSize * 2,
+                                  (Bottom - Top) + s_gridSize * 2));
 
     if(sort_mode == SORTMODE_ID)
     {
