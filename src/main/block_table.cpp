@@ -691,11 +691,8 @@ void treeNPCRemove(NPCRef_t obj)
     s_npc_table.erase(obj);
 }
 
-TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
-                         int sort_mode)
+void treeNPCQuery(std::vector<BaseRef_t>& out, const Location_t &_loc, int sort_mode)
 {
-    TreeResult_Sentinel<NPCRef_t> result;
-
     // NOTE: there are extremely rare cases when these margins are not sufficient for full compatibility
     //   (such as, when an item is trapped inside a wall during !BlocksSorted)
     rect_external loc = _loc;
@@ -715,7 +712,7 @@ TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
         loc.b += 2;
     }
 
-    s_npc_table.query(*result.i_vec, loc);
+    s_npc_table.query(out, loc);
 
     if(sort_mode == SORTMODE_COMPAT)
     {
@@ -724,7 +721,7 @@ TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
 
     if(sort_mode == SORTMODE_LOC)
     {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
+        std::sort(out.begin(), out.end(),
         [](BaseRef_t a, BaseRef_t b)
         {
             return (((NPCRef_t)a)->Location.X <= ((NPCRef_t)b)->Location.X
@@ -734,7 +731,7 @@ TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
     }
     else if(sort_mode == SORTMODE_ID)
     {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
+        std::sort(out.begin(), out.end(),
         [](BaseRef_t a, BaseRef_t b)
         {
             return a.index < b.index;
@@ -742,7 +739,7 @@ TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
     }
     else if(sort_mode == SORTMODE_Z)
     {
-        std::sort(result.i_vec->begin(), result.i_vec->end(),
+        std::sort(out.begin(), out.end(),
         [](BaseRef_t a, BaseRef_t b)
         {
             // not implemented yet, might never be
@@ -751,6 +748,14 @@ TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
             return a.index < b.index;
         });
     }
+}
+
+TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &_loc,
+                         int sort_mode)
+{
+    TreeResult_Sentinel<NPCRef_t> result;
+
+    treeNPCQuery(*result.i_vec, _loc, sort_mode);
 
     return result;
 }
