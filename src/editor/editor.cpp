@@ -725,7 +725,7 @@ void UpdateEditor()
                             optCursor.current = OptCursor_t::LVL_WATER;
                             OptCursorSync();
                             EditorCursor.Mode = OptCursor_t::LVL_WATER;
-                            EditorCursor.Location = Water[A].Location;
+                            EditorCursor.Location = static_cast<Location_t>(Water[A].Location);
                             EditorCursor.Layer = Water[A].Layer;
                             EditorCursor.Water = Water[A];
                             Water[A] = Water[numWater];
@@ -749,7 +749,7 @@ void UpdateEditor()
                             optCursor.current = OptCursor_t::WLD_MUSIC;
                             OptCursorSync();
                             EditorCursor.Mode = OptCursor_t::WLD_MUSIC;
-                            EditorCursor.Location = WorldMusic[A].Location;
+                            EditorCursor.Location = static_cast<Location_t>(WorldMusic[A].Location);
                             SetCursor();
 //                            frmMusic::optMusic(WorldMusic[A].Type).Value = true;
                             EditorCursor.WorldMusic = WorldMusic[A];
@@ -779,7 +779,7 @@ void UpdateEditor()
                             OptCursorSync();
 //                            frmPaths::WorldPath(WorldPath[A].Type).Value = true;
                             EditorCursor.Mode = OptCursor_t::WLD_PATHS;
-                            EditorCursor.Location = WorldPath[A].Location;
+                            EditorCursor.Location = static_cast<Location_t>(WorldPath[A].Location);
                             EditorCursor.WorldPath = WorldPath[A];
                             SetCursor();
                             if(A != numWorldPaths)
@@ -816,7 +816,7 @@ void UpdateEditor()
                             OptCursorSync();
 //                            frmScene::Scene(Scene[A].Type).Value = true;
                             EditorCursor.Mode = OptCursor_t::WLD_SCENES;
-                            EditorCursor.Location = Scene[A].Location;
+                            EditorCursor.Location = static_cast<Location_t>(Scene[A].Location);
                             EditorCursor.Scene = Scene[A];
                             SetCursor();
                             MouseMove(EditorCursor.X, EditorCursor.Y);
@@ -846,7 +846,7 @@ void UpdateEditor()
                             optCursor.current = OptCursor_t::WLD_LEVELS;
                             OptCursorSync();
                             EditorCursor.Mode = OptCursor_t::WLD_LEVELS;
-                            EditorCursor.Location = WorldLevel[A].Location;
+                            EditorCursor.Location = static_cast<Location_t>(WorldLevel[A].Location);
                             EditorCursor.WorldLevel = WorldLevel[A];
                             SetCursor();
                             if(A != numWorldLevels)
@@ -873,11 +873,11 @@ void UpdateEditor()
                             optCursor.current = OptCursor_t::WLD_TILES;
                             OptCursorSync();
                             EditorCursor.Mode = OptCursor_t::WLD_TILES;
-                            EditorCursor.Location = Tile[A].Location;
+                            EditorCursor.Location = static_cast<Location_t>(Tile[A].Location);
                             EditorCursor.Tile = Tile[A];
                             SetCursor();
 
-                            Location_t loc = Tile[A].Location;
+                            Location_t loc = static_cast<Location_t>(Tile[A].Location);
                             int type = Tile[A].Type;
 
                             if(A != numTiles)
@@ -992,7 +992,7 @@ void UpdateEditor()
                 {
                     for(A = 1; A <= numWarps; A++)
                     {
-                        tempLocation = Warp[A].Entrance;
+                        tempLocation = static_cast<Location_t>(Warp[A].Entrance);
                         tempLocation.Height = 32;
                         tempLocation.Width = 32;
                         if(CursorCollision(EditorCursor.Location, tempLocation))
@@ -1005,7 +1005,7 @@ void UpdateEditor()
                                 EditorCursor.SubMode = OptCursor_t::LVL_WARPS;
                             break;
                         }
-                        tempLocation = Warp[A].Exit;
+                        tempLocation = static_cast<Location_t>(Warp[A].Exit);
                         tempLocation.Height = 32;
                         tempLocation.Width = 32;
                         if(CursorCollision(EditorCursor.Location, tempLocation))
@@ -1092,7 +1092,7 @@ void UpdateEditor()
                 {
                     for(int numWaterMax = numWater, A = 1; A <= numWaterMax; A++)
                     {
-                        tempLocation = Water[A].Location;
+                        tempLocation = static_cast<Location_t>(Water[A].Location);
                         if(CursorCollision(EditorCursor.Location, tempLocation) && !Water[A].Hidden)
                         {
                             PlaySound(SFX_Smash);
@@ -1119,7 +1119,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, WorldMusic[A].Location))
                         {
-                            tempLocation = WorldMusic[A].Location;
+                            tempLocation = static_cast<Location_t>(WorldMusic[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
@@ -1148,7 +1148,7 @@ void UpdateEditor()
 
                         if(CursorCollision(EditorCursor.Location, WorldPath[A].Location))
                         {
-                            tempLocation = WorldPath[A].Location;
+                            tempLocation = static_cast<Location_t>(WorldPath[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
@@ -1181,7 +1181,7 @@ void UpdateEditor()
                         A = (*i - &Scene[1]) + 1;
                         if(CursorCollision(EditorCursor.Location, Scene[A].Location))
                         {
-                            tempLocation = Scene[A].Location;
+                            tempLocation = static_cast<Location_t>(Scene[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
@@ -1209,7 +1209,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, WorldLevel[A].Location))
                         {
-                            tempLocation = WorldLevel[A].Location;
+                            tempLocation = static_cast<Location_t>(WorldLevel[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
@@ -1237,13 +1237,13 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, Tile[A].Location))
                         {
-                            tempLocation = Tile[A].Location;
+                            tempLocation = static_cast<Location_t>(Tile[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
                             NewEffect(10, tempLocation);
                             PlaySound(SFX_ShellHit);
 
-                            Location_t loc = Tile[A].Location;
+                            Location_t loc = static_cast<Location_t>(Tile[A].Location);
                             int type = Tile[A].Type;
 
                             if(A != numTiles)
@@ -1585,14 +1585,14 @@ void UpdateEditor()
 
                 if(EditorCursor.SubMode == 1 || EditorCursor.Warp.level != STRINGINDEX_NONE || EditorCursor.Warp.LevelEnt || EditorCursor.Warp.MapWarp)
                 {
-                    EditorCursor.Warp.Entrance = EditorCursor.Location;
+                    EditorCursor.Warp.Entrance = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
                     MouseCancel = true;
                     MouseRelease = false;
                     EditorCursor.Warp.PlacedEnt = true;
                 }
                 if(EditorCursor.SubMode == 2 || EditorCursor.Warp.level != STRINGINDEX_NONE || EditorCursor.Warp.LevelEnt || EditorCursor.Warp.MapWarp)
                 {
-                    EditorCursor.Warp.Exit = EditorCursor.Location;
+                    EditorCursor.Warp.Exit = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
                     MouseCancel = true;
                     MouseRelease = false;
                     EditorCursor.Warp.PlacedExit = true;
@@ -1641,7 +1641,7 @@ void UpdateEditor()
                         }
                         else
                         {
-                            Location_t loc = Tile[A].Location;
+                            Location_t loc = static_cast<Location_t>(Tile[A].Location);
                             int type = Tile[A].Type;
 
                             if(A != numTiles)
@@ -1802,7 +1802,7 @@ void UpdateEditor()
 
                 if(CanPlace)
                 {
-                    EditorCursor.WorldMusic.Location = EditorCursor.Location;
+                    EditorCursor.WorldMusic.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
                     numWorldMusic++;
                     WorldMusic[numWorldMusic] = EditorCursor.WorldMusic;
                     // de-duplicate music file
@@ -2569,7 +2569,7 @@ void SetCursor()
             EditorCursor.Tile.Type = 1;
         EditorCursor.Location.Width = TileWidth[EditorCursor.Tile.Type];
         EditorCursor.Location.Height = TileHeight[EditorCursor.Tile.Type];
-        EditorCursor.Tile.Location = EditorCursor.Location;
+        EditorCursor.Tile.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
     }
     else if(EditorCursor.Mode == 8) // Scene
     {
@@ -2588,7 +2588,7 @@ void SetCursor()
             EditorCursor.Scene.Type = 1;
         EditorCursor.Location.Width = SceneWidth[EditorCursor.Scene.Type];
         EditorCursor.Location.Height = SceneHeight[EditorCursor.Scene.Type];
-        EditorCursor.Scene.Location = EditorCursor.Location;
+        EditorCursor.Scene.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
     }
     else if(EditorCursor.Mode == 9) // Levels
     {
@@ -2605,7 +2605,7 @@ void SetCursor()
             EditorCursor.WorldLevel.Type = 1;
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
-        EditorCursor.WorldLevel.Location = EditorCursor.Location;
+        EditorCursor.WorldLevel.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
 //        EditorCursor.WorldLevel.FileName = frmLevels::txtFilename.Text;
 //        if(EditorCursor.WorldLevel::FileName != "" && EditorCursor.WorldLevel::FileName.substr(EditorCursor.WorldLevel::FileName.Length - 4) != StringHelper::toLower(".lvl"))
 //            EditorCursor.WorldLevel.FileName = EditorCursor.WorldLevel::FileName + ".lvl";
@@ -2655,13 +2655,13 @@ void SetCursor()
             EditorCursor.WorldPath.Type = 1;
         EditorCursor.Location.Width = 32;
         EditorCursor.Location.Height = 32;
-        EditorCursor.WorldPath.Location = EditorCursor.Location;
+        EditorCursor.WorldPath.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC) // World Music
     {
         EditorCursor.Location.Height = 32;
         EditorCursor.Location.Width = 32;
-        EditorCursor.WorldMusic.Location = EditorCursor.Location;
+        EditorCursor.WorldMusic.Location = static_cast<SpeedlessLocation_t>(EditorCursor.Location);
         // make it play the music
         if(g_isWorldMusicNotSame(EditorCursor.WorldMusic))
             g_playWorldMusic(EditorCursor.WorldMusic);
