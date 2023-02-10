@@ -646,3 +646,18 @@ void DrawFrozenNPC(int Z, int A)
                                 128 - 6, 128 - 6, c, c, c);
     }
 }
+
+Location_t WorldLevel_t::LocationGFX()
+{
+    Location_t ret = static_cast<Location_t>(Location);
+
+    if(Type >= 1 && Type <= maxLevelType && GFXLevelBig[Type])
+    {
+        ret.X -= (GFXLevelWidth[Type] - ret.Width) / 2;
+        ret.Y -= (GFXLevelHeight[Type] - ret.Height);
+        ret.Width = GFXLevelWidth[Type];
+        ret.Height = GFXLevelHeight[Type];
+    }
+
+    return ret;
+}

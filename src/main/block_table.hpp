@@ -297,6 +297,12 @@ inline Location_t extract_loc(MyRef_t obj)
 }
 
 template<>
+inline Location_t extract_loc(WorldLevelRef_t obj)
+{
+    return obj->LocationGFX();
+}
+
+template<>
 inline Location_t extract_loc(NPCRef_t obj)
 {
     Location_t ret = obj->Location;

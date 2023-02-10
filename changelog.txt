@@ -34,6 +34,7 @@ Changelog for 1.3.6.1
 -Allow a single player to reconnect their controls at the menu screen. (@ds-sloth)
 -In Magic Hand mode, cursor now snaps to current layer's grid, instead of global grid. (@ds-sloth)
 -Fixed crash that could occur if player warped with >2P cheat active. (@ds-sloth)
+-Correctly render large level graphics at the edge of the screen. (@Wohlstand, @ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)

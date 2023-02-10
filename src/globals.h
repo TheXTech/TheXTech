@@ -885,6 +885,10 @@ struct WorldLevel_t
     int curStars = 0;
     int maxStars = 0;
     int starsShowPolicy = -1;
+
+    // NEW: returns graphical location extent (based on whether GFXLevelBig is set)
+    //   defined in graphics.cpp
+    Location_t LocationGFX();
 };
 
 //Public Type Warp 'warps such as pipes and doors

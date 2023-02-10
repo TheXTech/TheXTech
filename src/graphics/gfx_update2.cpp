@@ -331,9 +331,13 @@ void UpdateGraphics2(bool skipRepaint)
             SDL_assert(IF_INRANGE(level.Type, 0, maxLevelType));
 
             g_stats.checkedLevels++;
-            if(CheckCollision(sView, level.Location) && (WorldEditor || level.Active))
+
+            Location_t locGFX = level.LocationGFX();
+
+            if(CheckCollision(sView, locGFX) && (WorldEditor || level.Active))
             {
                 g_stats.renderedLevels++;
+
                 if(level.Path)
                 {
                     XRender::renderTexture(vScreenX[Z] + level.Location.X,
@@ -342,6 +346,7 @@ void UpdateGraphics2(bool skipRepaint)
                                           level.Location.Height,
                                           GFXLevelBMP[0], 0, 0);
                 }
+
                 if(level.Path2)
                 {
                     XRender::renderTexture(vScreenX[Z] + level.Location.X - 16,
@@ -349,20 +354,11 @@ void UpdateGraphics2(bool skipRepaint)
                                           64, 32,
                                           GFXLevelBMP[29], 0, 0);
                 }
-                if(GFXLevelBig[level.Type])
-                {
-                    XRender::renderTexture(vScreenX[Z] + level.Location.X - (GFXLevelWidth[level.Type] - 32) / 2.0,
-                                          vScreenY[Z] + level.Location.Y - GFXLevelHeight[level.Type] + 32,
-                                          GFXLevelWidth[level.Type], GFXLevelHeight[level.Type],
-                                          GFXLevelBMP[level.Type], 0, 32 * LevelFrame[level.Type]);
-                }
-                else
-                {
-                    XRender::renderTexture(vScreenX[Z] + level.Location.X,
-                                          vScreenY[Z] + level.Location.Y,
-                                          level.Location.Width, level.Location.Height,
-                                          GFXLevelBMP[level.Type], 0, 32 * LevelFrame[level.Type]);
-                }
+
+                XRender::renderTexture(vScreenX[Z] + locGFX.X,
+                                      vScreenY[Z] + locGFX.Y,
+                                      locGFX.Width, locGFX.Height,
+                                      GFXLevelBMP[level.Type], 0, 32 * LevelFrame[level.Type]);
             }
         }
     }
