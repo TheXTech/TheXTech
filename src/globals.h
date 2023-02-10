@@ -372,8 +372,8 @@ struct NPC_t
     double Special5 = 0.0;
 //    Special6 As Double
     double Special6 = 0.0;
-// EXTRA: Special7 As Double
-    double Special7 = 0.0;
+// EXTRA: Variant (previously Special7)
+    uint8_t Variant = 0;
 //    TurnAround As Boolean 'if the NPC needs to turn around
     bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.
@@ -713,22 +713,26 @@ struct Background_t
 //Public Type Water
 struct Water_t
 {
+//    Location As Location
+    SpeedlessLocation_t Location;
+//    Buoy As Single 'not used
+    float Buoy = 0.0f;
 //    Layer As String
     layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
-//    Buoy As Single 'not used
-    float Buoy = 0.0f;
 //    Quicksand As Boolean
     bool Quicksand = false;
-//    Location As Location
-    Location_t Location;
 //End Type
 };
 
 //Public Type Block   'Blocks
 struct Block_t
 {
+//    Location As Location
+    Location_t Location;
+//! EXTRA: temporary workaround: is it a smashable block of type 90 (normally not smashable)? (previously Special2)
+    bool forceSmashable = false;
 //    Slippy As Boolean
     bool Slippy = false;
 //    RespawnDelay As Integer
@@ -739,8 +743,6 @@ struct Block_t
     int DefaultType = 0;
 //    DefaultSpecial As Integer
     int DefaultSpecial = 0;
-//! EXTRA: second special
-    int DefaultSpecial2 = 0;
 //'for event triggers
 //    TriggerHit As String
     eventindex_t TriggerHit = EVENT_NONE;
@@ -754,12 +756,8 @@ struct Block_t
     bool Hidden = false;
 //    Type As Integer 'the block's type
     int Type = 0;
-//    Location As Location
-    Location_t Location;
 //    Special As Integer 'what is in the block?
     int Special = 0;
-//! EXTRA: second special
-    int Special2 = 0;
 //'for the shake effect after hitting ablock
 //    ShakeY As Integer
     int ShakeY = 0;
@@ -822,10 +820,10 @@ public:
 //Public Type Effect  'Special effects
 struct Effect_t
 {
-//    Type As Integer
-    int Type = 0;
 //    Location As Location
     Location_t Location;
+//    Type As Integer
+    int Type = 0;
 //    Frame As Integer
     int Frame = 0;
 //    FrameCount As Single
@@ -865,7 +863,7 @@ struct vScreen_t
 struct WorldLevel_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
     int Type = 0;
 //    FileName As String 'level's file
@@ -902,6 +900,10 @@ struct WorldLevel_t
 //Public Type Warp 'warps such as pipes and doors
 struct Warp_t
 {
+//    Entrance As Location 'location of warp entrance
+    SpeedlessLocation_t Entrance;
+//    Exit As Location 'location of warp exit
+    SpeedlessLocation_t Exit;
 //    Locked As Boolean 'requires a key NPC
     bool Locked = false;
 //    WarpNPC As Boolean 'allows NPC through the warp
@@ -918,10 +920,6 @@ struct Warp_t
     bool PlacedExit = false;
 //    Stars As Integer 'number of stars required to enter
     int Stars = 0;
-//    Entrance As Location 'location of warp entrance
-    Location_t Entrance;
-//    Exit As Location 'location of warp exit
-    Location_t Exit;
 //    Effect As Integer 'style of warp. door/
     int Effect = 0;
 //    level As String 'filename of the level it should warp to
@@ -961,7 +959,7 @@ struct Warp_t
 struct Tile_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
     int Type = 0;
 //End Type
@@ -973,7 +971,7 @@ struct Tile_t
 struct Scene_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
     int Type = 0;
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
@@ -986,7 +984,7 @@ struct Scene_t
 struct WorldPath_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Active As Boolean
     bool Active = false;
 //    Type As Integer
@@ -999,7 +997,7 @@ struct WorldPath_t
 struct WorldMusic_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
     int Type = 0;
 //    EXTRA: Custom Music
@@ -1093,7 +1091,7 @@ struct WorldPlayer_t
 struct CreditLine_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Text As String
     stringindex_t Text = STRINGINDEX_NONE;
 //End Type

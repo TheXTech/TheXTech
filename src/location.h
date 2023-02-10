@@ -40,6 +40,33 @@ struct Location_t
 //End Type
 };
 
+//NEW: 'Holds location information for an object without speed
+struct SpeedlessLocation_t
+{
+//    X As Double
+    double X = 0.0;
+//    Y As Double
+    double Y = 0.0;
+//    Height As Double
+    double Height = 0.0;
+//    Width As Double
+    double Width = 0.0;
+
+    inline SpeedlessLocation_t() = default;
+    inline explicit SpeedlessLocation_t(const Location_t& loc) : X(loc.X), Y(loc.Y), Height(loc.Height), Width(loc.Width) {}
+
+    inline explicit operator Location_t() const
+    {
+        Location_t ret;
+        ret.X = X;
+        ret.Y = Y;
+        ret.Height = Height;
+        ret.Width = Width;
+
+        return ret;
+    }
+};
+
 //NEW: 'Holds location information for player start location, including Direction
 struct PlayerStart_t
 {

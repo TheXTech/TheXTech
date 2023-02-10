@@ -137,7 +137,7 @@ static void moonWalk()
 
     for(int B = 1; B <= numWorldPaths; B++)
     {
-        tempLocation = WorldPath[B].Location;
+        tempLocation = static_cast<Location_t>(WorldPath[B].Location);
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;

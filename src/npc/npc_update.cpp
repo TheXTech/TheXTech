@@ -1018,7 +1018,7 @@ void UpdateNPCs()
                         {
                             if(NPC[A].Wet == 0 && !NPCIsACoin[NPC[A].Type])
                             {
-                                if(NPC[A].Location.SpeedY >= 1 && (!g_compatibility.fix_submerged_splash_effect || !CheckCollisionIntersect(NPC[A].Location, Water[B].Location)))
+                                if(NPC[A].Location.SpeedY >= 1 && (!g_compatibility.fix_submerged_splash_effect || !CheckCollisionIntersect(NPC[A].Location, static_cast<Location_t>(Water[B].Location))))
                                 {
                                     tempLocation.Width = 32;
                                     tempLocation.Height = 32;
@@ -4771,7 +4771,7 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedY = 10;
                             else
                             {
-                                bool legacy = /*NPC[A].Legacy &&*/ fiEqual(NPC[A].Special7, 1);
+                                bool legacy = /*NPC[A].Legacy &&*/ (NPC[A].Variant == 1);
                                 PlaySound(SFX_Twomp);
                                 NPC[A].Special3 = 30;
                                 NPC[A].Frame = 11;
@@ -4996,7 +4996,7 @@ void UpdateNPCs()
                         int shootStepCar = 5;
                         bool keepProjectile = false;
 
-                        int shootBehavior = int(NPC[A].Special7);
+                        int shootBehavior = NPC[A].Variant;
 
                         switch(shootBehavior)
                         {
