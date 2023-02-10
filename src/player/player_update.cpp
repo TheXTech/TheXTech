@@ -2563,15 +2563,9 @@ void UpdatePlayer()
                                             if(Player[A].Fairy && (Player[A].FairyCD > 0 || Player[A].Location.SpeedY > 0))
                                                 Player[A].FairyTime = 0;
 
-                                            // add more generous margin to prevent unfair crush death with sloped floor
-                                            bool ignore = (g_compatibility.fix_player_crush_death
-                                                && (Block[B].Location.X + Block[B].Location.Width - 2 < Player[A].Location.X
-                                                    || Player[A].Location.X + Player[A].Location.Width - 2 < Block[B].Location.X));
+                                            Player[A].Pinched.Bottom1 = 2; // for players getting squashed
 
-                                            if(!ignore)
-                                                Player[A].Pinched.Bottom1 = 2; // for players getting squashed
-
-                                            if(Block[B].Location.SpeedY != 0 && !ignore)
+                                            if(Block[B].Location.SpeedY != 0)
                                             {
                                                 Player[A].Pinched.Moving = 2;
                                                 Player[A].Pinched.MovingUD = true;
