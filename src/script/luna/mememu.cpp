@@ -1383,7 +1383,7 @@ public:
             case 0x14e: // NPCPinched
                 return valueToMem((int)obj->Pinched.Moving, ftype);
             default:
-                // use default handler
+                pLogWarning("MemEmu: Attempt to read player address 0x%x (invalid byte hacking)", address);
                 break;
             }
         }
@@ -1441,7 +1441,7 @@ public:
 
                 return;
             default:
-                // use default handler
+                pLogWarning("MemEmu: Attempt to set player address 0x%x to %d (invalid byte hacking)", address, in);
                 break;
             }
         }
@@ -1577,7 +1577,7 @@ public:
             case 0x12: // MovingPinched
                 return valueToMem((int)obj->Pinched.Moving, ftype);
             default:
-                // use default handler
+                pLogWarning("MemEmu: Attempt to read NPC address 0x%x (invalid byte hacking)", address);
                 break;
             }
         }
@@ -1635,8 +1635,8 @@ public:
                 obj->Pinched.Moving = in;
                 return;
             default:
-                // use default handler
-                break;
+                pLogWarning("MemEmu: Attempt to set NPC address 0x%x to %d (invalid byte hacking)", address, in);
+                return;
             }
         }
 
