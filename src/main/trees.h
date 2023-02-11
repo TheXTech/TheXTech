@@ -87,11 +87,7 @@ public:
         cur_treeresult_vec ++;
     }
 
-    TreeResult_Sentinel(const TreeResult_Sentinel& other)
-    {
-        UNUSED(other);
-        SDL_assert(false); // -V654 // can't have two sentinels for same results
-    }
+    TreeResult_Sentinel(const TreeResult_Sentinel& other) = delete;
 
     TreeResult_Sentinel(TreeResult_Sentinel&& other)
     {
@@ -206,6 +202,7 @@ extern void treeNPCSplitTempBlock(NPCRef_t obj);
 extern void treeNPCUpdateTempBlock(NPCRef_t obj);
 extern TreeResult_Sentinel<NPCRef_t> treeNPCQuery(double Left, double Top, double Right, double Bottom,
                                int sort_mode, double margin = 2.0);
+extern void treeNPCQuery(std::vector<BaseRef_t>& out, const Location_t &loc, int sort_mode);
 extern TreeResult_Sentinel<NPCRef_t> treeNPCQuery(const Location_t &loc, int sort_mode);
 
 extern void treeLevelCleanWaterLayers();

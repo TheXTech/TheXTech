@@ -39,6 +39,9 @@ enum CollisionSpot
 // Public Function CheckCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Normal collisions
 // Normal collisions
 bool CheckCollision(const Location_t &Loc1, const Location_t &Loc2);
+bool CheckCollision(const SpeedlessLocation_t &Loc1, const Location_t &Loc2);
+bool CheckCollision(const Location_t &Loc1, const SpeedlessLocation_t &Loc2);
+bool CheckCollision(const SpeedlessLocation_t &Loc1, const SpeedlessLocation_t &Loc2);
 // Intersect collision
 bool CheckCollisionIntersect(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function n00bCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Make the game easier for the people who whine about the detection being 'off'
@@ -49,7 +52,7 @@ bool n00bCollision(const Location_t &Loc1, const Location_t &Loc2);
 bool NPCStartCollision(const Location_t &Loc1, const Location_t &Loc2);
 // Public Function WarpCollision(Loc1 As Location, A As Integer) As Boolean  'Warp point collisions
 // Warp point collisions
-bool WarpCollision(const Location_t &Loc1, const Location_t &entrance, int direction);
+bool WarpCollision(const Location_t &Loc1, const SpeedlessLocation_t &entrance, int direction);
 // Public Function FindCollision(Loc1 As Location, Loc2 As Location) As Integer 'Whats side the collision happened
 // Whats side the collision happened
 int FindCollision(const Location_t &Loc1, const Location_t &Loc2);
@@ -68,15 +71,18 @@ int BootCollision(const Location_t &Loc1, const Location_t &Loc2, bool StandOn);
 // Public Function CursorCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Cursor collision
 // Cursor collision
 bool CursorCollision(const Location_t &Loc1, const Location_t &Loc2);
+bool CursorCollision(const Location_t &Loc1, const SpeedlessLocation_t &Loc2);
 // Public Function ShakeCollision(Loc1 As Location, Loc2 As Location, ShakeY3 As Integer) As Boolean 'Shakey block collision
 // Shakey block collision
 bool ShakeCollision(const Location_t &Loc1, const Location_t &Loc2, int ShakeY3);
 // Public Function vScreenCollision(A As Integer, Loc2 As Location) As Boolean  'vScreen collisions
 // vScreen collisions
 bool vScreenCollision(int A, const Location_t &Loc2);
+bool vScreenCollision(int A, const SpeedlessLocation_t &Loc2);
 // Public Function vScreenCollision2(A As Integer, Loc2 As Location) As Boolean  'vScreen collisions 2
 // vScreen collisions 2
 bool vScreenCollision2(int A, const Location_t &Loc2);
+bool vScreenCollision2(int A, const SpeedlessLocation_t &Loc2);
 // Public Function WalkingCollision(Loc1 As Location, Loc2 As Location) As Boolean 'Collision detection for blocks. Prevents walking on walls.
 // Collision detection for blocks. Prevents walking on walls.
 bool WalkingCollision(const Location_t &Loc1, const Location_t &Loc2);
