@@ -264,7 +264,7 @@ SDL_FORCE_INLINE void memToValue(float &target, double value, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE void memToValue(int32_t &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(int &target, double value, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -289,7 +289,7 @@ SDL_FORCE_INLINE void memToValue(int32_t &target, double value, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE void memToValue(int16_t &target, double value, FIELDTYPE ftype)
+SDL_FORCE_INLINE void memToValue(short &target, double value, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -360,7 +360,7 @@ SDL_FORCE_INLINE double valueToMem(const float &source, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE double valueToMem(const int32_t &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE double valueToMem(const int &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -378,7 +378,7 @@ SDL_FORCE_INLINE double valueToMem(const int32_t &source, FIELDTYPE ftype)
     }
 }
 
-SDL_FORCE_INLINE double valueToMem(const int16_t &source, FIELDTYPE ftype)
+SDL_FORCE_INLINE double valueToMem(const short &source, FIELDTYPE ftype)
 {
     switch(ftype)
     {
@@ -436,8 +436,8 @@ class SMBXMemoryEmulator
 {
     std::unordered_map<size_t, double *> m_df;
     std::unordered_map<size_t, float *>  m_ff;
-    std::unordered_map<size_t, int16_t *>       m_i16f;
-    std::unordered_map<size_t, int32_t *>       m_i32f;
+    std::unordered_map<size_t, short *>  m_i16f;
+    std::unordered_map<size_t, int *>    m_i32f;
     std::unordered_map<size_t, bool *>   m_bf;
     std::unordered_map<size_t, std::string *>   m_sf;
 
@@ -464,13 +464,13 @@ class SMBXMemoryEmulator
 
     std::unordered_map<int, ValueType> m_type;
 
-    void insert(size_t address, int16_t *field)
+    void insert(size_t address, short *field)
     {
         m_i16f.insert({address, field});
         m_type.insert({address, VT_INT16});
     }
 
-    void insert(size_t address, int32_t *field)
+    void insert(size_t address, int *field)
     {
         m_i32f.insert({address, field});
         m_type.insert({address, VT_INT32});
@@ -882,9 +882,9 @@ protected:
         //! Float-type field pointer
         float       T::* field_f = nullptr;
         //! Int-type field pointer
-        int16_t     T::* field_i16 = nullptr;
+        short       T::* field_i16 = nullptr;
         //! Int-type field pointer
-        int32_t     T::* field_i32 = nullptr;
+        int         T::* field_i32 = nullptr;
         //! Boolean type field pointer
         bool        T::* field_b = nullptr;
         //! String-type field pointer
@@ -898,7 +898,7 @@ protected:
     //! Byte map of addresses
     Value m_byte[maxAddr];
 
-    void insert(size_t address, int16_t T::*field)
+    void insert(size_t address, short T::*field)
     {
         Value v;
 
@@ -921,7 +921,7 @@ protected:
         }
     }
 
-    void insert(size_t address, int32_t T::*field)
+    void insert(size_t address, int T::*field)
     {
         Value v;
 
@@ -1710,15 +1710,15 @@ public:
             switch(address)
             {
             case 0x0A: // Pinched1
-                return valueToMem((int)obj->Pinched.Bottom1, ftype);
+                return valueToMem((short)obj->Pinched.Bottom1, ftype);
             case 0x0C: // Pinched2
-                return valueToMem((int)obj->Pinched.Left2, ftype);
+                return valueToMem((short)obj->Pinched.Left2, ftype);
             case 0x0E: // Pinched3
-                return valueToMem((int)obj->Pinched.Top3, ftype);
+                return valueToMem((short)obj->Pinched.Top3, ftype);
             case 0x10: // Pinched4
-                return valueToMem((int)obj->Pinched.Right4, ftype);
+                return valueToMem((short)obj->Pinched.Right4, ftype);
             case 0x12: // MovingPinched
-                return valueToMem((int)obj->Pinched.Moving, ftype);
+                return valueToMem((short)obj->Pinched.Moving, ftype);
             default:
                 pLogWarning("MemEmu: Attempt to read NPC address 0x%x (invalid byte hacking)", address);
                 break;
