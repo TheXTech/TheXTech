@@ -352,13 +352,16 @@ void SetupPlayers()
         Player[A].Location.SpeedY = 2;
         Player[A].Frame = 1;
         Player[A].FrameCount = 0;
-        Player[A].NPCPinched = 0;
-        Player[A].Pinched1 = 0;
-        Player[A].Pinched2 = 0;
-        Player[A].Pinched3 = 0;
+
+        // Player[A].NPCPinched = 0;
+        // Player[A].Pinched1 = 0;
+        // Player[A].Pinched2 = 0;
+        // Player[A].Pinched3 = 0;
+        // Player[A].Pinched4 = 0;
+        Player[A].Pinched = PinchedInfo_t();
+
         Player[A].StandingOnNPC = 0;
         Player[A].StandingOnTempNPC = 0;
-        Player[A].Pinched4 = 0;
         Player[A].HoldingNPC = 0;
         Player[A].Dead = false;
         //        if(nPlay.Online && nPlay.Mode == 0)
@@ -846,11 +849,14 @@ void KillPlayer(const int A)
     p.Location.SpeedY = 0;
     p.State = 1;
     p.Stoned = false;
-    p.Pinched1 = 0;
-    p.Pinched2 = 0;
-    p.Pinched3 = 0;
-    p.Pinched4 = 0;
-    p.NPCPinched = 0;
+
+    // p.Pinched1 = 0;
+    // p.Pinched2 = 0;
+    // p.Pinched3 = 0;
+    // p.Pinched4 = 0;
+    // p.NPCPinched = 0;
+    p.Pinched = PinchedInfo_t();
+
     p.TimeToLive = 0;
     p.Direction = 1;
     p.Frame = 1;
@@ -4489,7 +4495,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 {
     bool canWarp = false;
 
-    bool onGround = !warp.stoodRequired || (plr.Pinched1 == 2 || plr.Slope != 0 || plr.StandingOnNPC != 0);
+    bool onGround = !warp.stoodRequired || (plr.Pinched.Bottom1 == 2 || plr.Slope != 0 || plr.StandingOnNPC != 0);
 
     auto &entrance      = backward ? warp.Exit        : warp.Entrance;
     auto &exit          = backward ? warp.Entrance    : warp.Exit;
@@ -5714,11 +5720,12 @@ void PlayerEffects(const int A)
     }
 
     p.TailCount = 0;
-    p.Pinched1 = 0;
-    p.Pinched2 = 0;
-    p.Pinched3 = 0;
-    p.Pinched4 = 0;
-    p.NPCPinched = 0;
+    // p.Pinched1 = 0;
+    // p.Pinched2 = 0;
+    // p.Pinched3 = 0;
+    // p.Pinched4 = 0;
+    // p.NPCPinched = 0;
+    p.Pinched = PinchedInfo_t();
     p.SwordPoke = 0;
 
     if(!p.YoshiBlue && p.Effect != 500)

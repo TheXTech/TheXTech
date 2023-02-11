@@ -2219,16 +2219,16 @@ void UpdateNPCs()
                     if(NPC[A].Type == 179)
                         NPC[A].Location.Height = 24;
 
-                    if(NPC[A].Pinched1 > 0)
-                        NPC[A].Pinched1 -= 1;
-                    if(NPC[A].Pinched2 > 0)
-                        NPC[A].Pinched2 -= 1;
-                    if(NPC[A].Pinched3 > 0)
-                        NPC[A].Pinched3 -= 1;
-                    if(NPC[A].Pinched4 > 0)
-                        NPC[A].Pinched4 -= 1;
-                    if(NPC[A].MovingPinched > 0)
-                        NPC[A].MovingPinched -= 1;
+                    if(NPC[A].Pinched.Bottom1 > 0)
+                        NPC[A].Pinched.Bottom1 -= 1;
+                    if(NPC[A].Pinched.Left2 > 0)
+                        NPC[A].Pinched.Left2 -= 1;
+                    if(NPC[A].Pinched.Top3 > 0)
+                        NPC[A].Pinched.Top3 -= 1;
+                    if(NPC[A].Pinched.Right4 > 0)
+                        NPC[A].Pinched.Right4 -= 1;
+                    if(NPC[A].Pinched.Moving > 0)
+                        NPC[A].Pinched.Moving -= 1;
 
                     newY = 0;
                     UNUSED(newY);
@@ -2833,20 +2833,20 @@ void UpdateNPCs()
                                                             NPCHit(A, 3, A);
 
                                                         if(Block[B].Location.SpeedX != 0 && (HitSpot == 2 || HitSpot == 4))
-                                                            NPC[A].MovingPinched = 2;
+                                                            NPC[A].Pinched.Moving = 2;
                                                         if(Block[B].Location.SpeedY != 0 && (HitSpot == 1 || HitSpot == 3))
-                                                            NPC[A].MovingPinched = 2;
+                                                            NPC[A].Pinched.Moving = 2;
 
                                                         if(NPC[A].TimeLeft > 1)
                                                         {
                                                             if(HitSpot == 1)
-                                                                NPC[A].Pinched1 = 2;
+                                                                NPC[A].Pinched.Bottom1 = 2;
                                                             else if(HitSpot == 2)
-                                                                NPC[A].Pinched2 = 2;
+                                                                NPC[A].Pinched.Left2 = 2;
                                                             else if(HitSpot == 3)
-                                                                NPC[A].Pinched3 = 2;
+                                                                NPC[A].Pinched.Top3 = 2;
                                                             else if(HitSpot == 4)
-                                                                NPC[A].Pinched4 = 2;
+                                                                NPC[A].Pinched.Right4 = 2;
                                                             else if(HitSpot == 5)
                                                             {
                                                                 double C = 0;
@@ -2875,18 +2875,18 @@ void UpdateNPCs()
                                                                 }
 
                                                                 if(D == 1)
-                                                                    NPC[A].Pinched1 = 2;
+                                                                    NPC[A].Pinched.Bottom1 = 2;
                                                                 if(D == 2)
-                                                                    NPC[A].Pinched2 = 2;
+                                                                    NPC[A].Pinched.Left2 = 2;
                                                                 if(D == 3)
-                                                                    NPC[A].Pinched3 = 2;
+                                                                    NPC[A].Pinched.Top3 = 2;
                                                                 if(D == 4)
-                                                                    NPC[A].Pinched4 = 2;
+                                                                    NPC[A].Pinched.Right4 = 2;
 
                                                                 if(Block[B].Location.SpeedX != 0.0 && (D == 2 || D == 4))
-                                                                    NPC[A].MovingPinched = 2;
+                                                                    NPC[A].Pinched.Moving = 2;
                                                                 if(Block[B].Location.SpeedY != 0.0 && (D == 1 || D == 3))
-                                                                    NPC[A].MovingPinched = 2;
+                                                                    NPC[A].Pinched.Moving = 2;
 
 
 
@@ -2895,9 +2895,9 @@ void UpdateNPCs()
                                                                 // If Not (.Location.X + .Location.Width - .Location.SpeedX <= Block(B).Location.X - Block(B).Location.SpeedX) Then .Pinched2 = 2
                                                                 // If Not (.Location.X - .Location.SpeedX >= Block(B).Location.X + Block(B).Location.Width - Block(B).Location.SpeedX) Then .Pinched4 = 2
                                                             }
-                                                            if(NPC[A].MovingPinched > 0)
+                                                            if(NPC[A].Pinched.Moving > 0)
                                                             {
-                                                                if((NPC[A].Pinched1 > 0 && NPC[A].Pinched3 > 0) || (NPC[A].Pinched2 > 0 && NPC[A].Pinched4 > 0))
+                                                                if((NPC[A].Pinched.Bottom1 > 0 && NPC[A].Pinched.Top3 > 0) || (NPC[A].Pinched.Left2 > 0 && NPC[A].Pinched.Right4 > 0))
                                                                 {
                                                                     if(HitSpot > 1)
                                                                         HitSpot = 0;
