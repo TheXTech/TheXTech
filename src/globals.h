@@ -864,30 +864,37 @@ struct WorldLevel_t
 {
 //    Location As Location
     SpeedlessLocation_t Location;
-//    Type As Integer
-    vbint_t Type = 0;
+
 //    FileName As String 'level's file
     std::string FileName;
-//    LevelExit(1 To 4) As Integer ' For the direction each type of exit opens the path
-    RangeArrI<vbint_t, 1, 4, 0> LevelExit;
-//    Active As Boolean
-    bool Active = false;
 //    LevelName As String 'The name of the level
     std::string LevelName;
+
+//    LevelExit(1 To 4) As Integer ' For the direction each type of exit opens the path
+    RangeArrI<vbint_t, 1, 4, 0> LevelExit;
+
+//    Type As Integer
+    vbint_t Type = 0;
 //    StartWarp As Integer 'If the level should start with a player exiting a warp
     vbint_t StartWarp = 0;
-//    WarpX As Double 'for warping to another location on the world map
-    double WarpX = 0.0;
-//    WarpY As Double
-    double WarpY = 0.0;
+
+//    Active As Boolean
+    bool Active = false;
 //    Path As Boolean 'for drawing a small path background
     bool Path = false;
 //    Path2 As Boolean 'big path background
     bool Path2 = false;
 //    Start As Boolean 'true if the game starts here
     bool Start = false;
+
+//    WarpX As Double 'for warping to another location on the world map
+    double WarpX = 0.0;
+//    WarpY As Double
+    double WarpY = 0.0;
+
 //    Visible As Boolean 'true if it should be shown on the map
     bool Visible = false;
+
 //End Type
 
     // int64_t Z = 0;
