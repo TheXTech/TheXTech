@@ -889,7 +889,8 @@ struct WorldLevel_t
 //    Visible As Boolean 'true if it should be shown on the map
     bool Visible = false;
 //End Type
-    int64_t Z = 0;
+
+    // int64_t Z = 0;
 
 // Display number of stars (if available)
     vbint_t curStars = 0;
@@ -967,8 +968,10 @@ struct Tile_t
 //    Type As Integer
     vbint_t Type = 0;
 //End Type
-    int64_t Z = 0;
+
     bool Active = true;
+
+    // int64_t Z = 0;
 };
 
 //Public Type Scene 'World Scenery
@@ -981,7 +984,8 @@ struct Scene_t
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
     bool Active = false;
 //End Type
-    int64_t Z = 0;
+
+    // int64_t Z = 0;
 };
 
 //Public Type WorldPath 'World Paths
@@ -994,7 +998,8 @@ struct WorldPath_t
 //    Type As Integer
     vbint_t Type = 0;
 //End Type
-    int64_t Z = 0;
+
+    // int64_t Z = 0;
 };
 
 //Public Type WorldMusic 'World Music
@@ -1007,8 +1012,10 @@ struct WorldMusic_t
 //    EXTRA: Custom Music
     stringindex_t MusicFile = STRINGINDEX_NONE;
 //End Type
-    int64_t Z = 0;
+
     bool Active = true;
+
+    // int64_t Z = 0;
 };
 
 //Public Type EditorCursor 'The editor's cursor
