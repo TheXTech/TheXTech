@@ -26,6 +26,8 @@
 
 extern ScreenFader g_worldScreenFader;
 
+extern void worldResetSection();
+
 extern void worldWaitForFade(int waitTicks = -1);
 
 #endif // WORLD_GLOBALS_H

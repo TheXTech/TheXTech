@@ -45,6 +45,10 @@
 //! Holds the screen overlay for the world map
 ScreenFader g_worldScreenFader;
 
+// world music index of the current world section
+static int s_currentWorldSection = 0;
+static bool s_playSound = false;
+
 void worldWaitForFade(int waitTicks)
 {
     bool ticks = waitTicks > 0;
@@ -118,15 +122,47 @@ void g_playWorldMusic(WorldMusic_t &mus)
     StartMusic(mus.Type);
 }
 
+// returns size of largest box centered around loc contained in s
+static inline double s_worldSectionArea(WorldMusicRef_t s, const Location_t& loc)
+{
+    double cx = loc.X + loc.Width / 2;
+    double cy = loc.Y + loc.Height / 2;
+
+    double side_x = SDL_min(cx - s->Location.X, s->Location.X + s->Location.Width - cx);
+    double side_y = SDL_min(cy - s->Location.Y, s->Location.Y + s->Location.Height - cy);
+
+    return side_x * side_y;
+}
+
 static inline bool s_worldUpdateMusic(const Location_t &loc)
 {
     bool ret = false;
 
-    for(auto t : treeWorldMusicQuery(loc, false))
+    int best_section = 0;
+    double best_section_area = 0;
+    double best_wasted_area = 0;
+
+    for(WorldMusicRef_t t : treeWorldMusicQuery(loc, false))
     {
         WorldMusic_t &mus = *t;
         if(CheckCollision(loc, mus.Location))
         {
+            if(mus.Location.Width >= 64 && mus.Location.Height >= 64)
+            {
+                double section_area = s_worldSectionArea(t, loc);
+                double wasted_area = mus.Location.Width * mus.Location.Height - section_area;
+
+                if(section_area >= best_section_area && (section_area > best_section_area || wasted_area < best_wasted_area))
+                {
+                    best_section = (int)t;
+                    best_section_area = section_area;
+                    best_wasted_area = wasted_area;
+                }
+
+                if(mus.Type == 0)
+                    continue;
+            }
+
             if(g_isWorldMusicNotSame(mus))
             {
                 g_playWorldMusic(mus);
@@ -135,7 +171,27 @@ static inline bool s_worldUpdateMusic(const Location_t &loc)
         }
     }
 
+    if(best_section != s_currentWorldSection)
+    {
+        s_currentWorldSection = best_section;
+
+        if(!qScreen)
+        {
+            qScreen = true;
+            s_playSound = true;
+            qScreenX[1] = vScreenX[1];
+            qScreenY[1] = vScreenY[1];
+            qScreenLoc[1] = vScreen[1];
+        }
+    }
+
     return ret;
+}
+
+void worldResetSection()
+{
+    s_worldUpdateMusic(WorldPlayer[1].Location);
+    qScreen = false;
 }
 
 static inline double getWPHeight()
@@ -174,6 +230,72 @@ static inline double getWorldPlayerCenterY()
     return WorldPlayer[1].Location.Y - 10 + WorldPlayer[1].Location.Height - getWPHeight() / 2;
 }
 
+static void s_SetvScreenWorld(double fx, double fy)
+{
+    double margin = 66;
+    double marginTop = 130;
+    double marginBottom = 66;
+
+    if(ScreenH < 400)
+    {
+        marginBottom = 24;
+        marginTop = 72;
+    }
+    else if(ScreenH < 500)
+    {
+        marginBottom = 32;
+        marginTop = 96;
+    }
+
+    if(ScreenW < 400)
+        margin = 24;
+    else if(ScreenW < 600)
+        margin = 32;
+    else if(ScreenW < 800)
+        margin = 48;
+
+    vScreen[1].Top = marginTop;
+    vScreen[1].Height = ScreenH - marginBottom - marginTop;
+    vScreen[1].Left = margin;
+    vScreen[1].Width = ScreenW - (margin * 2);
+
+
+    vScreenX[1] = -fx + vScreen[1].Width / 2.0;
+    vScreenY[1] = -fy + vScreen[1].Height / 2.0;
+
+    if(s_currentWorldSection != 0 || !g_config.world_map_expand_view || !g_compatibility.free_world_res)
+    {
+        const Location_t& sLoc = ((s_currentWorldSection != 0)
+            ? WorldMusic[s_currentWorldSection].Location
+            : newLoc(fx - 334, fy - 202, 668, 404));
+
+        if(sLoc.Width < vScreen[1].Width)
+        {
+            vScreen[1].Left += (vScreen[1].Width - sLoc.Width) / 2;
+            vScreen[1].Width = sLoc.Width;
+            vScreenX[1] = -sLoc.X;
+        }
+        else if(-vScreenX[1] < sLoc.X)
+            vScreenX[1] = -sLoc.X;
+        else if(-vScreenX[1] > sLoc.X + sLoc.Width - vScreen[1].Width)
+            vScreenX[1] = -(sLoc.X + sLoc.Width - vScreen[1].Width);
+
+        if(sLoc.Height < vScreen[1].Height)
+        {
+            vScreen[1].Top += (vScreen[1].Height - sLoc.Height) / 2;
+            vScreen[1].Height = sLoc.Height;
+            vScreenY[1] = -sLoc.Y;
+        }
+        else if(-vScreenY[1] < sLoc.Y)
+            vScreenY[1] = -sLoc.Y;
+        else if(-vScreenY[1] > sLoc.Y + sLoc.Height - vScreen[1].Height)
+            vScreenY[1] = -(sLoc.Y + sLoc.Height - vScreen[1].Height);
+    }
+
+    vScreen[1].ScreenTop = vScreen[1].Top;
+    vScreen[1].ScreenLeft = vScreen[1].Left;
+}
+
 void WorldLoop()
 {
     bool musicReset = false;
@@ -185,8 +307,17 @@ void WorldLoop()
     if(SingleCoop > 0)
         SingleCoop = 1;
 
-    vScreenX[1] = -(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0) + vScreen[1].Width / 2.0;
-    vScreenY[1] = -(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0) + vScreen[1].Height / 2.0 + 32;
+    s_SetvScreenWorld(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0, WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0);
+
+    if(qScreen)
+    {
+        qScreen = Update_qScreen(1, 4, 4);
+
+        if(qScreen && s_playSound)
+            PlaySound(SFX_Camera);
+
+        s_playSound = false;
+    }
 
     if(numPlayers > 2)
         numPlayers = 1;
@@ -220,6 +351,7 @@ void WorldLoop()
         if(LevelBeatCode > 0)
         {
             s_worldUpdateMusic(WorldPlayer[1].Location);
+            qScreen = false;
 
             for(A = 1; A <= 4; A++)
             {
@@ -241,6 +373,7 @@ void WorldLoop()
         else if(LevelBeatCode == -1)
         {
             s_worldUpdateMusic(WorldPlayer[1].Location);
+            qScreen = false;
 
             //for(A = 1; A <= numWorldLevels; A++)
             for(WorldLevelRef_t t : treeWorldLevelQuery(WorldPlayer[1].Location, SORTMODE_NONE))

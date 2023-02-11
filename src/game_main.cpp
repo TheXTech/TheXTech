@@ -837,6 +837,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 // WorldLoop will automatically resume the music as needed
                 // delayedMusicStart(); // Allow music being started
+                worldResetSection();
 
                 // 'level select loop
                 runFrameLoop(nullptr, &WorldLoop,

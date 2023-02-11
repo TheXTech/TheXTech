@@ -340,6 +340,39 @@ bool OpenWorld(std::string FilePath)
         treeWorldMusicAdd(&box);
     }
 
+    for(auto &m : wld.arearects)
+    {
+        numWorldMusic++;
+        if(numWorldMusic > maxWorldMusic)
+        {
+            numWorldMusic = maxWorldMusic;
+            break;
+        }
+
+        auto &box = WorldMusic[numWorldMusic];
+
+        box = WorldMusic_t();
+
+        box.Location.X = m.x;
+        box.Location.Y = m.y;
+        box.Location.Width = m.w;
+        box.Location.Height = m.h;
+
+        box.Type = 0;
+
+        if(m.flags & WorldAreaRect::SETUP_CHANGE_MUSIC)
+        {
+            box.Type = int(m.music_id);
+
+            // new:
+            std::string music_file = g_dirEpisode.resolveFileCase(m.music_file);
+            if(!music_file.empty())
+                SetS(box.MusicFile, music_file); // adds to LevelString
+        }
+
+        treeWorldMusicAdd(&box);
+    }
+
     LoadCustomSound();
 
     if(!LevelEditor)

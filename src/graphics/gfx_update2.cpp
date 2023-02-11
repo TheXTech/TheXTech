@@ -140,11 +140,15 @@ void UpdateGraphics2(bool skipRepaint)
 //    Location_t tempLocation;
     //Z = 1;
 
-    vScreen[Z].Left = 0;
-    vScreen[Z].Top = 0;
-    vScreen[Z].Width = ScreenW;
-    vScreen[Z].Height = ScreenH;
-    CenterScreens();
+    if(WorldEditor)
+    {
+        vScreen[Z].Left = 0;
+        vScreen[Z].ScreenLeft = 0;
+        vScreen[Z].Top = 0;
+        vScreen[Z].ScreenTop = 0;
+        vScreen[Z].Width = ScreenW;
+        vScreen[Z].Height = ScreenH;
+    }
 
     SpecialFrames();
     SceneFrame2[1] += 1;
@@ -261,10 +265,6 @@ void UpdateGraphics2(bool skipRepaint)
     XRender::clearBuffer();
     DrawBackdrop();
 
-    XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
-        vScreen[Z].Width, vScreen[Z].Height);
-    XRender::renderRect(0, 0, vScreen[Z].Width, vScreen[Z].Height, 0, 0, 0);
-
 //    if(TakeScreen == true)
 //    {
 //        if(LevelEditor == true || MagicHand == true)
@@ -319,65 +319,15 @@ void UpdateGraphics2(bool skipRepaint)
 //            End With
 //        Next A
 //    Else
-    double sLeft, sTop, sRight, sBottom, sW, sH;
-    double margin, marginTop, marginBottom;
+
+    XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height);
+
+    double sLeft = -vScreenX[1];
+    double sTop = -vScreenY[1];
+    double sRight = -vScreenX[1] + vScreen[1].Width;
+    double sBottom = -vScreenY[1] + vScreen[1].Height;
+
     {
-
-        sW = vScreen[Z].Width;
-        sH = vScreen[Z].Height;
-
-        margin = 66;
-        marginTop = 130;
-        marginBottom = 66;
-
-        if(WorldEditor)
-        {
-            marginBottom = 0;
-            marginTop = 0;
-        }
-        else if(sH < 400)
-        {
-            marginBottom = 24;
-            marginTop = 72;
-        }
-        else if(sH < 500)
-        {
-            marginBottom = 32;
-            marginTop = 96;
-        }
-
-        if(WorldEditor)
-        {
-            margin = 0;
-        }
-        else if(sW < 400)
-        {
-            margin = 24;
-        }
-        else if(sW < 600)
-        {
-            margin = 32;
-        }
-        else if(sW < 800)
-        {
-            margin = 48;
-        }
-
-        if(WorldEditor)
-        {
-            sLeft = -vScreenX[1];
-            sTop = -vScreenY[1];
-            sRight = -vScreenX[1] + vScreen[1].Width;
-            sBottom = -vScreenY[1] + vScreen[1].Height;
-        }
-        else
-        {
-            sLeft = -vScreenX[1] + margin - 2;
-            sTop = -vScreenY[1] + (marginTop - 34);
-            sRight = -vScreenX[1] + vScreen[1].Width - (margin - 2);
-            sBottom = -vScreenY[1] + vScreen[1].Height - (marginBottom - 2);
-        }
-
         Location_t sView;
         sView.X = sLeft;
         sView.Y = sTop;
@@ -567,6 +517,8 @@ void UpdateGraphics2(bool skipRepaint)
              }
         }
 
+        XRender::resetViewport();
+
 #ifdef __3DS__
         XRender::setTargetLayer(2);
 #endif
@@ -576,47 +528,50 @@ void UpdateGraphics2(bool skipRepaint)
         {
             bool border_valid = GFX.WorldMapFrame_Border.inited && (!GFX.isCustom(69) || GFX.isCustom(70));
 
-            XRender::resetViewport();
-
-            RenderFrame(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft + margin, vScreen[Z].ScreenTop + marginTop, sW - margin - margin, sH - marginTop - marginBottom),
+            RenderFrame(newLoc(0, 0, ScreenW, ScreenH), newLoc(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop, vScreen[Z].Width, vScreen[Z].Height),
                 GFX.WorldMapFrame_Tile, border_valid ? &GFX.WorldMapFrame_Border : nullptr, &g_worldMapFrameBorderInfo);
 
-            XRender::setViewport(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop,
-                vScreen[Z].Width, vScreen[Z].Height);
         }
         else
         {
             // render a legacy background, in MANY careful segments...
 
             // top-left
-            XRender::renderTexture(0, 0, margin, marginTop, GFX.Interface[4], 66-margin, 130-marginTop);
+            XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop - 130, 66, 130, GFX.Interface[4], 0, 0);
+
             // top
-            A = GFX.Interface[4].w-66-66;
-            for(int B = 0; B < (sW-margin*2)/A+1; B++)
-                XRender::renderTexture(margin+B*A, 0, A, marginTop, GFX.Interface[4], 66, 130-marginTop);
+            A = GFX.Interface[4].w - 66 - 66;
+            for(int B = 0; B < (vScreen[Z].Width / A) + 1; B++)
+                XRender::renderTexture(vScreen[Z].ScreenLeft + (B * A), vScreen[Z].ScreenTop - 130, A, 130, GFX.Interface[4], 66, 0);
+
             // top-right
-            XRender::renderTexture(sW-margin, 0, margin, marginTop+20, GFX.Interface[4], GFX.Interface[4].w-66, 130-marginTop);
+            XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, 0, 66, 130 + 20, GFX.Interface[4], GFX.Interface[4].w - 66, 0);
+
             // left
-            A = GFX.Interface[4].h-130-66;
-            for(int B = 0; B < (sH-marginTop-marginBottom)/A+1; B++)
-                XRender::renderTexture(0, marginTop+B*A, margin, A, GFX.Interface[4], 66-margin, 130);
+            A = GFX.Interface[4].h - 130 - 66;
+            for(int B = 0; B < (vScreen[Z].Height / A) + 1; B++)
+                XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop + (B * A), 66, A, GFX.Interface[4], 0, 130);
+
             // right
-            A = GFX.Interface[4].h-(130+20)-66;
-            for(int B = 0; B < (sH-(marginTop+20)-marginBottom)/A+1; B++)
-                XRender::renderTexture(sW-margin, (marginTop+20)+B*A, margin, A, GFX.Interface[4], GFX.Interface[4].w-66, 150);
+            A = GFX.Interface[4].h - (130 + 20) - 66;
+            for(int B = 0; B < ((vScreen[Z].Height - 20) / A) + 1; B++)
+                XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, (vScreen[Z].ScreenTop + 20) + (B * A), 66, A, GFX.Interface[4], GFX.Interface[4].w - 66, 130 + 20);
+
             // bottom-left
-            XRender::renderTexture(0, sH-marginBottom, margin+34, marginBottom, GFX.Interface[4], 66-margin, GFX.Interface[4].h-66);
+            XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop + vScreen[Z].Height, 66 + 34, 66, GFX.Interface[4], 0, GFX.Interface[4].h - 66);
+
             // bottom
-            A = GFX.Interface[4].w-100-66;
-            for(int B = 0; B < (sW-(margin+34)-margin)/A+1; B++)
-                XRender::renderTexture((margin+34)+B*A, sH-marginBottom, A, marginBottom, GFX.Interface[4], 100, GFX.Interface[4].h-66);
+            A = GFX.Interface[4].w - 100 - 66;
+            for(int B = 0; B < ((vScreen[Z].Width - 34) / A) + 1; B++)
+                XRender::renderTexture((vScreen[Z].ScreenLeft + 34) + (B * A), vScreen[Z].ScreenTop + vScreen[Z].Height, A, 66, GFX.Interface[4], 100, GFX.Interface[4].h - 66);
+
             // bottom-right
-            XRender::renderTexture(sW-margin, sH-marginBottom, margin, marginBottom, GFX.Interface[4], GFX.Interface[4].w-66, GFX.Interface[4].h-66);
+            XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, vScreen[Z].ScreenTop + vScreen[Z].Height, 66, 66, GFX.Interface[4], GFX.Interface[4].w - 66, GFX.Interface[4].h - 66);
         }
 
 
-        int pX, pY;
-        pY = marginTop - 6;
+        int pX = vScreen[Z].ScreenLeft + 32 - 64 + 48;
+        int pY = vScreen[Z].ScreenTop - 6;
 
 #ifdef __3DS__
         XRender::setTargetLayer(3);
@@ -624,8 +579,6 @@ void UpdateGraphics2(bool skipRepaint)
 
         for(A = 1; A <= numPlayers; A++)
         {
-            pX = margin * 1.5 - 64 + 48 * A;
-
             Player_t& p = Player[A];
 
             p.Direction = -1;
@@ -664,37 +617,36 @@ void UpdateGraphics2(bool skipRepaint)
             }
 
             DrawPlayer(p, 1);
+
+            pX += 48;
         }
 
         A = numPlayers + 1;
-        pX = margin * 1.5 - 64 + 48 * A;
         // Print lives on the screen
-        XRender::renderTexture(pX, marginTop - 4 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
-        XRender::renderTexture(pX + 40, marginTop - 2 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        XRender::renderTexture(pX, vScreen[Z].ScreenTop - 4 - GFX.Interface[3].h, GFX.Interface[3].w, GFX.Interface[3].h, GFX.Interface[3], 0, 0);
+        XRender::renderTexture(pX + 40, vScreen[Z].ScreenTop - 2 - GFX.Interface[3].h, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
-        SuperPrint(std::to_string(int(Lives)), 1, pX + 62, marginTop-18);
+        SuperPrint(std::to_string(int(Lives)), 1, pX + 62, vScreen[Z].ScreenTop - 18);
         // Print coins on the screen
         auto& coin_icon = (Player[1].Character == 5) ? GFX.Interface[6] : GFX.Interface[2];
-        XRender::renderTexture(pX + 16, marginTop - 42, coin_icon.w, coin_icon.h, coin_icon, 0, 0);
+        XRender::renderTexture(pX + 16, vScreen[Z].ScreenTop - 42, coin_icon.w, coin_icon.h, coin_icon, 0, 0);
 
-        XRender::renderTexture(pX + 40, marginTop - 40, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        XRender::renderTexture(pX + 40, vScreen[Z].ScreenTop - 40, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
 
-        SuperPrint(std::to_string(Coins), 1, pX + 62, marginTop - 40);
+        SuperPrint(std::to_string(Coins), 1, pX + 62, vScreen[Z].ScreenTop - 40);
         // Print stars on the screen
         if(numStars > 0)
         {
-            XRender::renderTexture(pX + 16, marginTop - 64, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-            XRender::renderTexture(pX + 40, marginTop - 62, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-            SuperPrint(std::to_string(numStars), 1, pX + 62, marginTop - 62);
+            XRender::renderTexture(pX + 16, vScreen[Z].ScreenTop - 64, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
+            XRender::renderTexture(pX + 40, vScreen[Z].ScreenTop - 62, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+            SuperPrint(std::to_string(numStars), 1, pX + 62, vScreen[Z].ScreenTop - 62);
         }
 
         // Print the level's name
         if(!WorldPlayer[1].LevelName.empty())
         {
-            s_DrawLevelName(WorldPlayer[1].LevelName, pX + 116, marginTop - 21, sW - margin - (pX + 116));
+            s_DrawLevelName(WorldPlayer[1].LevelName, pX + 116, vScreen[Z].ScreenTop - 21, vScreen[Z].ScreenLeft + vScreen[Z].Width - (pX + 116));
         }
-
-        XRender::setViewport(0, 0, ScreenW, ScreenH);
 
         g_worldScreenFader.draw();
 
@@ -757,8 +709,6 @@ void UpdateGraphics2(bool skipRepaint)
 
         speedRun_renderTimer();
     }
-
-    XRender::setViewport(0, 0, ScreenW, ScreenH);
 
     // this code is for both non-editor and editor cases
     {
