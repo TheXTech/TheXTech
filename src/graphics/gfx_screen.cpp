@@ -523,7 +523,7 @@ void CenterScreens()
 }
 
 // NEW: moves qScreen towards vScreen, now including the screen size
-bool Update_qScreen(int Z)
+bool Update_qScreen(int Z, int camRate, int resizeRate)
 {
     if(Z == 2 && !g_compatibility.modern_section_change)
         return false;
@@ -532,11 +532,11 @@ bool Update_qScreen(int Z)
 
     // take the slower option of 2px per second camera (vanilla)
     //   or 2px per second resize, then scale the speed of the faster one to match
-    double camRateX = 2;
-    double camRateY = 2;
+    double camRateX = camRate;
+    double camRateY = camRate;
 
-    double resizeRateX = 2;
-    double resizeRateY = 2;
+    double resizeRateX = resizeRate;
+    double resizeRateY = resizeRate;
 
     double camFramesX = std::abs(vScreenX[Z] - qScreenX[Z])/camRateX;
     double camFramesY = std::abs(vScreenY[Z] - qScreenY[Z])/camRateY;
@@ -574,16 +574,16 @@ bool Update_qScreen(int Z)
     resizeRateY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop)/qFramesY;
 
     if(vScreenX[Z] < qScreenX[Z] - camRateX)
-        qScreenX[Z] = qScreenX[Z] - camRateX;
+        qScreenX[Z] -= camRateX;
     else if(vScreenX[Z] > qScreenX[Z] + camRateX)
-        qScreenX[Z] = qScreenX[Z] + camRateX;
+        qScreenX[Z] += camRateX;
     else
         qScreenX[Z] = vScreenX[Z];
 
     if(vScreenY[Z] < qScreenY[Z] - camRateY)
-        qScreenY[Z] = qScreenY[Z] - camRateY;
+        qScreenY[Z] -= camRateY;
     else if(vScreenY[Z] > qScreenY[Z] + camRateY)
-        qScreenY[Z] = qScreenY[Z] + camRateY;
+        qScreenY[Z] += camRateY;
     else
         qScreenY[Z] = vScreenY[Z];
 
