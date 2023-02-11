@@ -1651,11 +1651,11 @@ Location_t roundLoc(const Location_t &inLoc, double grid)
 
 void MoreScore(int addScore, const Location_t &Loc)
 {
-    int mult = 0; // dummy
+    vbint_t mult = 0; // dummy
     MoreScore(addScore, Loc, mult);
 }
 
-void MoreScore(int addScore, const Location_t &Loc, int &Multiplier)
+void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
 {
     //int oldM = 0;
     int A = 0;
