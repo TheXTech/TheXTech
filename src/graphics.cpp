@@ -99,7 +99,7 @@ static void s_ProcessSmallScreenFeatures(int A)
 
         int16_t lookY_target = max_offsetY;
 
-        bool on_ground = Player[A].Pinched1 || Player[A].Slope || Player[A].StandingOnNPC || Player[A].Wet || Player[A].Quicksand;
+        bool on_ground = Player[A].Pinched.Bottom1 || Player[A].Slope || Player[A].StandingOnNPC || Player[A].Wet || Player[A].Quicksand;
         // bool duck_jump = !on_ground && Player[A].Duck;
         bool prevent_unlock = g_vScreenOffsetY_hold[A - 1] != 0 && (Player[A].Vine || !on_ground || Player[A].GrabTime);
 
@@ -942,6 +942,21 @@ void DrawFrozenNPC(int Z, int A)
                                 6, 6, GFXNPCBMP[n.Type],
                                 128 - 6, 128 - 6, c, c, c);
     }
+}
+
+Location_t WorldLevel_t::LocationGFX()
+{
+    Location_t ret = static_cast<Location_t>(Location);
+
+    if(Type >= 1 && Type <= maxLevelType && GFXLevelBig[Type])
+    {
+        ret.X -= (GFXLevelWidth[Type] - ret.Width) / 2;
+        ret.Y -= (GFXLevelHeight[Type] - ret.Height);
+        ret.Width = GFXLevelWidth[Type];
+        ret.Height = GFXLevelHeight[Type];
+    }
+
+    return ret;
 }
 
 void DrawBackdrop()

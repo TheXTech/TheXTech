@@ -570,7 +570,12 @@ if(THEXTECH_ENABLE_TTF_SUPPORT)
 endif()
 
 # Luna Autocode script engine
-list(APPEND THEXTECH_SRC src/script/luna/lunaglobals.cpp)
+list(APPEND THEXTECH_SRC
+    src/script/luna/lunaglobals.cpp
+    src/script/luna/lunacounter.cpp
+    src/script/luna/lunacounter_record.cpp
+)
+
 if(THEXTECH_ENABLE_LUNA_AUTOCODE)
     add_definitions(-DTHEXTECH_ENABLE_LUNA_AUTOCODE)
     list(APPEND THEXTECH_SRC
@@ -593,8 +598,6 @@ if(THEXTECH_ENABLE_LUNA_AUTOCODE)
         src/script/luna/lunarender.cpp
         src/script/luna/lunacell.cpp
         src/script/luna/lunainput.cpp
-        src/script/luna/lunacounter.cpp
-        src/script/luna/lunacounter_record.cpp
         src/script/luna/lunavarbank.cpp
         src/script/luna/renderop_bitmap.cpp
         src/script/luna/renderop_rect.cpp

@@ -216,14 +216,14 @@ void SetEditorNPCType(int type)
     if(!(type == NPCID_BOOMBOOM || type == NPCID_BIRDO || type == NPCID_BOWSER_SMB3))
         EditorCursor.NPC.Legacy = false;
 
-    if(find_Special7_Data(prev_type) != find_Special7_Data(type))
+    if(find_Variant_Data(prev_type) != find_Variant_Data(type))
     {
         if(FileFormat == FileFormats::LVL_PGEX)
         {
-            EditorCursor.NPC.Special7 = find_modern_Special7(type);
+            EditorCursor.NPC.Variant = find_modern_Variant(type);
         }
         else
-            EditorCursor.NPC.Special7 = 0.;
+            EditorCursor.NPC.Variant = 0;
     }
 
     // turn into new type if can't be in bubble anymore
@@ -821,18 +821,18 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Special2 ++;
         }
 
-        const NPC_Special7_Data_t* data = find_Special7_Data(EditorCursor.NPC.Type);
+        const NPC_Variant_Data_t* data = find_Variant_Data(EditorCursor.NPC.Type);
 
         // special case for NPCID_BOWSER_SMB3 since it also has the Legacy button
         if(EditorCursor.NPC.Type == NPCID_BOWSER_SMB3 && FileFormat == FileFormats::LVL_PGEX)
         {
-            if(UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFXBlock[4], fiEqual(EditorCursor.NPC.Special7, 1),
+            if(UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFXBlock[4], EditorCursor.NPC.Variant == 1,
                 0, 32*BlockFrame[4], 32, 32, "Custom: expand section"))
             {
-                if(EditorCursor.NPC.Special7 == 0.)
-                    EditorCursor.NPC.Special7 = 1.;
+                if(EditorCursor.NPC.Variant == 0)
+                    EditorCursor.NPC.Variant = 1;
                 else
-                    EditorCursor.NPC.Special7 = 0.;
+                    EditorCursor.NPC.Variant = 0;
             }
         }
         else if(data && FileFormat == FileFormats::LVL_PGEX)
@@ -840,7 +840,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             int i;
             bool valid;
 
-            i = data->find_current(EditorCursor.NPC.Special7);
+            i = data->find_current(EditorCursor.NPC.Variant);
             valid = data->strings[i] != nullptr;
 
             if(mode == CallMode::Render)
@@ -849,7 +849,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 if(valid)
                     SuperPrint(data->strings[i], 3, e_ScreenW - 160, 242);
                 else
-                    SuperPrint(std::to_string(EditorCursor.NPC.Special7), 3, e_ScreenW - 160, 242);
+                    SuperPrint(std::to_string(EditorCursor.NPC.Variant), 3, e_ScreenW - 160, 242);
             }
 
             // only show it if it will (i) reset, or (ii) have something to go to.
@@ -859,16 +859,16 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             if(show_prev_button && UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             {
                 if(!valid)
-                    EditorCursor.NPC.Special7 = data->values[0];
+                    EditorCursor.NPC.Variant = data->values[0];
                 else
-                    EditorCursor.NPC.Special7 = data->values[i-1];
+                    EditorCursor.NPC.Variant = data->values[i-1];
             }
             if(show_next_button && UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             {
                 if(!valid)
-                    EditorCursor.NPC.Special7 = data->values[0];
+                    EditorCursor.NPC.Variant = data->values[0];
                 else
-                    EditorCursor.NPC.Special7 = data->values[i+1];
+                    EditorCursor.NPC.Variant = data->values[i+1];
             }
         }
 
@@ -1373,10 +1373,10 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             if(m_special_subpage == 0)
             {
                 for(int s = 0; s <= maxSections; s++)
-                    Events[m_current_event].section[s].position = level[s];
+                    Events[m_current_event].section[s].position = static_cast<SpeedlessLocation_t>(level[s]);
             }
             else
-                Events[m_current_event].section[m_special_subpage-1].position = level[m_special_subpage-1];
+                Events[m_current_event].section[m_special_subpage-1].position = static_cast<SpeedlessLocation_t>(level[m_special_subpage-1]);
             m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
         }
         SuperPrintR(mode, "NO", 3, 60, 150);
@@ -1778,7 +1778,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 void UpdateStartLevelEventBounds()
 {
     Events[0].AutoSection = 0;
-    Events[0].section[0].position = level[0];
+    Events[0].section[0].position = static_cast<SpeedlessLocation_t>(level[0]);
     // not sure why 800 is also used for height in the default code, but I will stick with it.
     if(Events[0].AutoX < 0)
         Events[0].section[0].position.X = Events[0].section[0].position.Width - 800;
@@ -2231,7 +2231,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         else
             m_special_page = SPECIAL_PAGE_NONE;
     }
-    int* target;
+    vbint_t* target;
     int* current_page;
     const std::vector<std::string>* source;
     const std::vector<int16_t>* source_indices;
@@ -3139,12 +3139,12 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     if(FileFormat == FileFormats::LVL_PGEX && EditorCursor.Block.Type == 90)
     {
         SuperPrintR(mode, "CAN BREAK", 3, e_ScreenW - 160, 106);
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 120 + 4, GFXBlock[188], EditorCursor.Block.Special2, 0, 0, 32, 32, "LEGACY: BREAKS WHEN HIT"))
-            EditorCursor.Block.Special2 = (EditorCursor.Block.Special2 ? 0 : 1);
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 120 + 4, GFXBlock[188], EditorCursor.Block.forceSmashable, 0, 0, 32, 32, "LEGACY: BREAKS WHEN HIT"))
+            EditorCursor.Block.forceSmashable = !EditorCursor.Block.forceSmashable;
     }
     else
     {
-        EditorCursor.Block.Special2 = 0;
+        EditorCursor.Block.forceSmashable = 0;
     }
 
     // Slippy ("SLICK") and Invis

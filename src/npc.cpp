@@ -138,12 +138,15 @@ void Deactivate(int A)
             NPC[A].Special6 = 0;
             NPC[A].Damage = 0;
             NPC[A].HoldingPlayer = 0;
-            NPC[A].Pinched1 = 0;
-            NPC[A].Pinched2 = 0;
-            NPC[A].Pinched3 = 0;
-            NPC[A].Pinched4 = 0;
-            NPC[A].Pinched = 0;
-            NPC[A].MovingPinched = 0;
+
+            // NPC[A].Pinched1 = 0;
+            // NPC[A].Pinched2 = 0;
+            // NPC[A].Pinched3 = 0;
+            // NPC[A].Pinched4 = 0;
+            // NPC[A].Pinched = 0;
+            // NPC[A].MovingPinched = 0;
+
+            NPC[A].Pinched = PinchedInfo_t();
 
             // NEW now that we have the new NPC Queues
             NPCQueues::update(A);
@@ -367,6 +370,9 @@ void TurnNPCsIntoCoins()
     }
 }
 
+#if 0
+// previous recursive version of the function
+
 void SkullRide(int A, bool reEnable)
 {
     Location_t loc = NPC[A].Location;
@@ -380,7 +386,7 @@ void SkullRide(int A, bool reEnable)
 
     int spec = reEnable ? 2 : 0;
 
-    for(int B : treeNPCQuery(loc, SORTMODE_ID)) // Recursively activate all neihbour skull-ride segments
+    for(int B = 1; B <= numNPCs; B++) // Recursively activate all neihbour skull-ride segments
     {
         auto &npc = NPC[B];
         if(npc.Type == 190)
@@ -397,6 +403,76 @@ void SkullRide(int A, bool reEnable)
                 }
             }
         }
+    }
+}
+#endif
+
+
+// this mimics the above function and should match it in all cases
+void SkullRide(int A, bool reEnable)
+{
+    int spec = reEnable ? 2 : 0;
+
+    // allocates and guards a vector of BaseRef_t in its i_vec.
+    TreeResult_Sentinel<NPCRef_t> frontier;
+
+    // LIFO stack of NPCs to trigger, imitates recursion from old SkullRide
+    std::vector<BaseRef_t>& vec = *frontier.i_vec;
+
+    vec.push_back(A);
+
+    while(!vec.empty())
+    {
+        // pop from top of stack
+        const NPC_t& npc_A = static_cast<NPCRef_t>(vec.back());
+        vec.pop_back();
+
+        // construct location query (head of original SkullRide)
+        Location_t loc = npc_A.Location;
+        loc.Width += 16;
+        loc.X -= 8;
+
+        if(g_compatibility.fix_skull_raft) // Detect by height in condition skull ruft cells were on slopes
+        {
+            loc.Height += 30;
+            loc.Y -= 15;
+        }
+
+        // add all queried NPCs to the frontier's internal vector (but check them, and remove them if invalid)
+        size_t current_frontier_size = vec.size();
+
+        treeNPCQuery(vec, loc, SORTMODE_NONE);
+
+        size_t unchecked = current_frontier_size;
+        while(unchecked < vec.size())
+        {
+            NPC_t& npc = static_cast<NPCRef_t>(vec[unchecked]);
+
+            // conditions from inside of loop in original SkullRide
+            if(npc.Type == 190 && npc.Active && npc.Special == spec && CheckCollision(loc, npc.Location))
+            {
+                // set active flag
+                npc.Special = 1;
+
+                // previously, used recursion
+                // SkullRide(B, reEnable);
+
+                // this will preserve the NPC in the stack
+                unchecked++;
+                continue;
+            }
+
+            // remove the NPC from the stack if conditions fail
+            vec[unchecked] = vec[vec.size() - 1];
+            vec.pop_back();
+        }
+
+        // reverse sort the frontier of the stack because this is a depth-first approach
+        std::sort(vec.begin() + current_frontier_size, vec.end(),
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            return a.index > b.index;
+        });
     }
 }
 
@@ -431,6 +507,9 @@ static void s_alignRuftCell(NPC_t &me, const Location_t &alignAt)
         treeNPCSplitTempBlock(&me);
 }
 
+#if 0
+// previous recursive version of the function
+
 void SkullRideDone(int A, const Location_t &alignAt)
 {
     auto &me = NPC[A];
@@ -441,7 +520,7 @@ void SkullRideDone(int A, const Location_t &alignAt)
     loc.Height += 30;
     loc.Y -= 15;
 
-    for(int B : treeNPCQuery(loc, SORTMODE_ID)) // Recursively DE-activate all neighbour skull-ride segments
+    for(int B = 1; B <= numNPCs; B++) // Recursively DE-activate all neighbour skull-ride segments
     {
         auto &npc = NPC[B];
         if(npc.Type == 190)
@@ -460,6 +539,72 @@ void SkullRideDone(int A, const Location_t &alignAt)
                 }
             }
         }
+    }
+}
+#endif
+
+
+// this mimics the above function and should match it in all cases
+void SkullRideDone(int A, const Location_t &alignAt)
+{
+    // allocates and guards a vector of BaseRef_t in its i_vec.
+    TreeResult_Sentinel<NPCRef_t> frontier;
+
+    // LIFO stack of NPCs to trigger, imitates recursion from old SkullRideDone
+    std::vector<BaseRef_t>& vec = *frontier.i_vec;
+
+    vec.push_back(A);
+
+    while(!vec.empty())
+    {
+        // pop from top of stack
+        const NPC_t& me = static_cast<NPCRef_t>(vec.back());
+        vec.pop_back();
+
+        // construct location query (head of original SkullRideDone)
+        Location_t loc = me.Location;
+        loc.Width += 16;
+        loc.X -= 8;
+        loc.Height += 30;
+        loc.Y -= 15;
+
+
+        // add all queried NPCs to the frontier's internal vector (but check them, and remove them if invalid)
+        size_t current_frontier_size = vec.size();
+
+        treeNPCQuery(vec, loc, SORTMODE_NONE);
+
+        size_t unchecked = current_frontier_size;
+        while(unchecked < vec.size())
+        {
+            NPC_t& npc = static_cast<NPCRef_t>(vec[unchecked]);
+
+            // conditions from inside of loop in original SkullRideDone
+            if(npc.Type == 190 && npc.Active && npc.Special == 1 && CheckCollision(loc, npc.Location))
+            {
+                npc.Special = 2;
+                npc.Location.SpeedX = 0.0;
+                s_alignRuftCell(npc, alignAt);
+
+                // previously, used recursion
+                // SkullRideDone(B, alignAt);
+
+                // this will preserve the NPC in the stack
+                unchecked++;
+                continue;
+            }
+
+            // remove the NPC from the stack if conditions fail
+            vec[unchecked] = vec[vec.size() - 1];
+            vec.pop_back();
+        }
+
+        // reverse sort the frontier of the stack because this is a depth-first approach
+        std::sort(vec.begin() + current_frontier_size, vec.end(),
+        [](BaseRef_t a, BaseRef_t b)
+        {
+            return a.index > b.index;
+        });
     }
 }
 
@@ -2388,7 +2533,7 @@ void NPCSpecial(int A)
                 tempBool = true;
         }
 
-        int railAlgo = int(npc.Special7);
+        int railAlgo = int(npc.Variant);
 
         if(npc.Type == NPCID_SAW && railAlgo != 2) // Grinder
         {
@@ -4789,7 +4934,7 @@ void SpecialNPC(int A)
                 {
                     bool playerLower = Player[B].Location.Y >= NPC[A].Location.Y;
                     // When mode 1, simulate older behavior and do always fall
-                    playerLower |= fEqual(NPC[A].Special7, 1.0);
+                    playerLower |= (NPC[A].Variant == 1);
                     if(!CanComeOut(NPC[A].Location, Player[B].Location) && playerLower)
                         C = B;
                 }

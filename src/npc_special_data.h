@@ -19,7 +19,7 @@
  */
 
 // the purpose of this header is define the configurable
-// Special7 values for NPCs in the PGE-X standard.
+// Variant values for NPCs in the PGE-X standard.
 
 // these are generally used in TheXTech to indicate unique
 // modifications to the NPC's behavior / AI.
@@ -33,7 +33,7 @@
 
 // the first value listed is assumed to be the modern default.
 // the string array must be nullptr-terminated.
-struct NPC_Special7_Data_t
+struct NPC_Variant_Data_t
 {
     // strings to describe behaviors in the editor
     // may be two lines of up to 7 characters each
@@ -41,8 +41,8 @@ struct NPC_Special7_Data_t
     // MUST have an extra nullptr at the end
     const char* const * strings;
 
-    // initial Special7 values for each behavior
-    const double* values;
+    // initial Variant values for each behavior
+    const uint8_t* values;
 
     // first version of VB6 game that did NOT use a legacy behavior
     // special values:
@@ -54,7 +54,7 @@ struct NPC_Special7_Data_t
     const int* active_below;
 
     // returns the limit i (with strings[i] == nullptr) if not found
-    inline size_t find_current(double value) const
+    inline size_t find_current(uint8_t value) const
     {
         size_t i;
 
@@ -91,84 +91,84 @@ struct NPC_Special7_Data_t
     }
 };
 
-// when multiple NPC types share the same NPC_Special7, we don't
-//   need to reinitialize Special7 when switching between them
-struct NPC_Special7_Map_t
+// when multiple NPC types share the same NPC_Variant, we don't
+//   need to reinitialize Variant when switching between them
+struct NPC_Variant_Map_t
 {
     int Type;
-    const NPC_Special7_Data_t* data;
+    const NPC_Variant_Data_t* data;
 };
 
 // NPCID_CANNONITEM // billy gun
 constexpr const char* cannon_strings[] = {"1.2.1+", "1.2.0", "Pre-1.2", nullptr};
-constexpr double cannon_values[] = {0., 1., 2.};
+constexpr uint8_t cannon_values[] = {0, 1, 2};
 constexpr int cannon_active_below[] = {66, 51, 28};
-constexpr NPC_Special7_Data_t Special7_cannon = {cannon_strings, cannon_values, cannon_active_below};
+constexpr NPC_Variant_Data_t Variant_cannon = {cannon_strings, cannon_values, cannon_active_below};
 
 // NPCID_THWOMP_SMB3
 constexpr const char* thwomp_strings[] = {"Modern", "Fall\nAlways", nullptr};
-constexpr double thwomp_values[] = {0., 1.};
+constexpr uint8_t thwomp_values[] = {0, 1};
 constexpr int thwomp_active_below[] = {66, 9};
-constexpr NPC_Special7_Data_t Special7_thwomp = {thwomp_strings, thwomp_values, thwomp_active_below};
+constexpr NPC_Variant_Data_t Variant_thwomp = {thwomp_strings, thwomp_values, thwomp_active_below};
 
 // NPCID_BOWSER_SMB3
 constexpr const char* bowser3_strings[] = {"Modern", "Section\nExpand", nullptr};
-constexpr double bowser3_values[] = {0., 1.};
+constexpr uint8_t bowser3_values[] = {0, 1};
 constexpr int bowser3_active_below[] = {66, 30};
-constexpr NPC_Special7_Data_t Special7_bowser3 = {bowser3_strings, bowser3_values, bowser3_active_below};
+constexpr NPC_Variant_Data_t Variant_bowser3 = {bowser3_strings, bowser3_values, bowser3_active_below};
 
 // NPCID_YELBLOCKS, NPCID_BLUBLOCKS, NPCID_GRNBLOCKS, NPCID_REDBLOCKS, NPCID_PLATFORM_SMB3, NPCID_SAW
 constexpr const char* platform_strings[] = {"XTech", "1.3", "Pre-1.2", nullptr};
-constexpr double platform_values[] = {2., 0., 1.};
+constexpr uint8_t platform_values[] = {2, 0, 1};
 constexpr int platform_active_below[] = {-1, 66, 30};
-constexpr NPC_Special7_Data_t Special7_platform = {platform_strings, platform_values, platform_active_below};
+constexpr NPC_Variant_Data_t Variant_platform = {platform_strings, platform_values, platform_active_below};
 
-constexpr NPC_Special7_Map_t NPC_Special7_map[] =
+constexpr NPC_Variant_Map_t NPC_Variant_map[] =
 {
-    {NPCID_CANNONITEM, &Special7_cannon},
-    {NPCID_THWOMP_SMB3, &Special7_thwomp},
-    {NPCID_BOWSER_SMB3, &Special7_bowser3},
-    {NPCID_YELBLOCKS, &Special7_platform},
-    {NPCID_BLUBLOCKS, &Special7_platform},
-    {NPCID_GRNBLOCKS, &Special7_platform},
-    {NPCID_REDBLOCKS, &Special7_platform},
-    {NPCID_PLATFORM_SMB3, &Special7_platform},
-    {NPCID_SAW, &Special7_platform},
+    {NPCID_CANNONITEM, &Variant_cannon},
+    {NPCID_THWOMP_SMB3, &Variant_thwomp},
+    {NPCID_BOWSER_SMB3, &Variant_bowser3},
+    {NPCID_YELBLOCKS, &Variant_platform},
+    {NPCID_BLUBLOCKS, &Variant_platform},
+    {NPCID_GRNBLOCKS, &Variant_platform},
+    {NPCID_REDBLOCKS, &Variant_platform},
+    {NPCID_PLATFORM_SMB3, &Variant_platform},
+    {NPCID_SAW, &Variant_platform},
 };
 
-constexpr size_t NPC_Special7_count = sizeof(NPC_Special7_map) / sizeof(NPC_Special7_Map_t);
+constexpr size_t NPC_Variant_count = sizeof(NPC_Variant_map) / sizeof(NPC_Variant_Map_t);
 
-inline const NPC_Special7_Data_t* find_Special7_Data(int Type)
+inline const NPC_Variant_Data_t* find_Variant_Data(int Type)
 {
-    for(size_t i = 0; i < NPC_Special7_count; i++)
+    for(size_t i = 0; i < NPC_Variant_count; i++)
     {
-        if(NPC_Special7_map[i].Type == Type)
-            return NPC_Special7_map[i].data;
+        if(NPC_Variant_map[i].Type == Type)
+            return NPC_Variant_map[i].data;
     }
     return nullptr;
 }
 
-inline double find_modern_Special7(int Type)
+inline uint8_t find_modern_Variant(int Type)
 {
-    const NPC_Special7_Data_t* data = find_Special7_Data(Type);
+    const NPC_Variant_Data_t* data = find_Variant_Data(Type);
 
     if(!data)
-        return 0.;
+        return 0;
 
     return data->values[0];
 }
 
-inline double find_legacy_Special7(int Type, int version)
+inline uint8_t find_legacy_Variant(int Type, int version)
 {
-    const NPC_Special7_Data_t* data = find_Special7_Data(Type);
+    const NPC_Variant_Data_t* data = find_Variant_Data(Type);
 
     if(!data)
-        return 0.;
+        return 0;
 
     size_t legacy_index = data->find_legacy(version);
 
     if(data->strings[legacy_index] == nullptr)
-        return 0.;
+        return 0;
 
     return data->values[legacy_index];
 }

@@ -21,6 +21,7 @@
 #include <Utils/files.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
+#include <sdl_proxy/sdl_stdinc.h>
 
 #include "../globals.h"
 #include "../frame_timer.h"
@@ -266,7 +267,7 @@ static void s_SetvScreenWorld(double fx, double fy)
     if(s_currentWorldSection != 0 || !g_config.world_map_expand_view || !g_compatibility.free_world_res)
     {
         const Location_t& sLoc = ((s_currentWorldSection != 0)
-            ? WorldMusic[s_currentWorldSection].Location
+            ? static_cast<Location_t>(WorldMusic[s_currentWorldSection].Location)
             : newLoc(fx - 334, fy - 202, 668, 404));
 
         if(sLoc.Width < vScreen[1].Width)
@@ -895,7 +896,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Up
     if(Direction == 1 || Direction == 5)
     {
-        tempLocation = Lvl.Location;
+        tempLocation = static_cast<Location_t>(Lvl.Location);
         tempLocation.X +=  4;
         tempLocation.Y +=  4;
         tempLocation.Width -= 8;
@@ -919,7 +920,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Left
     if(Direction == 2 || Direction == 5)
     {
-        tempLocation = Lvl.Location;
+        tempLocation = static_cast<Location_t>(Lvl.Location);
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;
@@ -943,7 +944,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Down
     if(Direction == 3 || Direction == 5)
     {
-        tempLocation = Lvl.Location;
+        tempLocation = static_cast<Location_t>(Lvl.Location);
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;
@@ -967,7 +968,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     // Right
     if(Direction == 4 || Direction == 5)
     {
-        tempLocation = Lvl.Location;
+        tempLocation = static_cast<Location_t>(Lvl.Location);
         tempLocation.X += 4;
         tempLocation.Y += 4;
         tempLocation.Width -= 8;
@@ -1073,7 +1074,7 @@ void PathPath(WorldPath_t &Pth, bool Skp)
     int B = 0;
 
     Location_t tempLocation;
-    tempLocation = Pth.Location;
+    tempLocation = static_cast<Location_t>(Pth.Location);
     tempLocation.X += 4;
     tempLocation.Y += 4;
     tempLocation.Width -= 8;

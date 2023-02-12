@@ -96,6 +96,7 @@ struct Compatibility_t
     bool fix_npc_ceiling_speed; // when an NPC hits a ceiling block, it takes its SpeedY from that block, not from an arbitrary one
     bool emulate_classic_block_order; // the quadtree should return blocks in the order they had at the beginning of the level, not their current order
     bool custom_powerup_collect_score; // collected powerups give score from npc-X.txt
+    bool fix_player_crush_death; // player should not be crushed by corners of slopes or by hitting a horizontally moving ceiling
     unsigned int bitblit_background_colour[3];
     // 1.3.7
     bool free_level_res;

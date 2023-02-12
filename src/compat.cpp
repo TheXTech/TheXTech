@@ -111,6 +111,7 @@ static void compatInit(Compatibility_t &c)
     c.bitblit_background_colour[2] = 0;
     c.custom_powerup_collect_score = true;
     // 1.3.7
+    c.fix_player_crush_death = true;
     c.free_level_res = true;
     c.free_world_res = true;
     c.NPC_activate_mode = NPC_activate_modes::smart;
@@ -161,6 +162,7 @@ static void compatInit(Compatibility_t &c)
         c.emulate_classic_block_order = true;
         c.custom_powerup_collect_score = false;
         // 1.3.7
+        c.fix_player_crush_death = false;
         c.free_level_res = false;
         c.free_world_res = false;
         c.NPC_activate_mode = NPC_activate_modes::onscreen;
@@ -352,6 +354,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("emulate-classic-block-order", c.emulate_classic_block_order, c.emulate_classic_block_order);
         // compat.read("custom-powerup-collect-score", c.custom_powerup_collect_score, c.custom_powerup_collect_score);
         // 1.3.7 (but these will be changed in the Compat update)
+        compat.read("fix-player-crush-death", c.fix_player_crush_death, c.fix_player_crush_death);
         compat.read("free-level-res", c.free_level_res, c.free_level_res);
         compat.read("free-world-res", c.free_world_res, c.free_world_res);
         const IniProcessing::StrEnumMap activModes =

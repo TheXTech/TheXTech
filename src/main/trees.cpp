@@ -123,7 +123,7 @@ TreeResult_Sentinel<ItemRef_t> treeWorldQuery(std::unique_ptr<table_t<ItemRef_t>
     {
         std::sort(result.i_vec->begin(), result.i_vec->end(),
             [](BaseRef_t a, BaseRef_t b) {
-                return ((ItemRef_t)a)->Z < ((ItemRef_t)b)->Z;
+                return a < b;
             });
     }
 

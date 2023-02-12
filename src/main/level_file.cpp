@@ -41,6 +41,7 @@
 #include "trees.h"
 #include "npc_special_data.h"
 #include "graphics/gfx_camera.h"
+#include "graphics/gfx_update.h"
 #include "npc/npc_activation.h"
 
 #include <DirManager/dirman.h>
@@ -218,7 +219,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         LevelREAL[B] = level[B];
         bgMusic[B] = int(s.music_id);
         bgMusicREAL[B] = bgMusic[B];
-        bgColor[B] = s.bgcolor;
+        // bgColor[B] = s.bgcolor;    // unused since SMBX64, removed
         LevelWrap[B] = s.wrap_h;
         LevelVWrap[B] = s.wrap_v; // EXTRA
         OffScreenExit[B] = s.OffScreenEn;
@@ -432,16 +433,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             block.Special = 1095;
         block.DefaultSpecial = block.Special;
 
-        block.Special2 = 0;
+        block.forceSmashable = false;
         if(b.id == 90)
         {
             if(lvl.meta.RecentFormat == LevelData::SMBX64 && lvl.meta.RecentFormatVersion < 20)
-                block.Special2 = 1; // Restore bricks algorithm for turn blocks for SMBX19 and lower
+                block.forceSmashable = true; // Restore bricks algorithm for turn blocks for SMBX19 and lower
             else
-                block.Special2 = b.special_data; // load it if set in the modern format
+                block.forceSmashable = (bool)b.special_data; // load it if set in the modern format
         }
-
-        block.DefaultSpecial2 = block.Special2;
 
         block.Invis = b.invisible;
         block.Slippy = b.slippery;
@@ -554,21 +553,24 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         if(compatModern && isSmbx64)
         {
             // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
-            npc.Special7 = find_legacy_Special7(npc.Type, fVersion);
+            npc.Variant = find_legacy_Variant(npc.Type, fVersion);
         }
         else if(isSmbx64)
         {
             // don't load anything for SMBX64 files
-            npc.Special7 = 0.0;
+            npc.Variant = 0;
         }
-        else if(find_Special7_Data(npc.Type) /* && compatModern */)
+        else if(find_Variant_Data(npc.Type) /* && compatModern */)
         {
             // only load Special7 for NPCs that support it
-            npc.Special7 = n.special_data;
+            if((n.special_data < 0) || (n.special_data >= 256))
+                pLogWarning("Attempted to load npc Type %d with out-of-range variant index %f", npc.Type, n.special_data);
+            else
+                npc.Variant = (uint8_t)n.special_data;
         }
         else
         {
-            npc.Special7 = 0.0;
+            npc.Variant = 0;
         }
 
         // All of the following duplicate the new Special7 code.
@@ -872,7 +874,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 bgo = Background_t();
                 bgo.Layer = w.Layer;
                 bgo.Hidden = w.Hidden;
-                bgo.Location = w.Entrance;
+                bgo.Location = static_cast<Location_t>(w.Entrance);
                 bgo.Type = 98;
                 bgo.Location.Width = 16;
                 syncLayers_BGO(B);
@@ -883,7 +885,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                     numLocked++;
                     auto &bgo2 = Background[B];
                     bgo2 = bgo;
-                    bgo2.Location = w.Exit;
+                    bgo2.Location = static_cast<Location_t>(w.Exit);
                     bgo2.Location.Width = 16;
                     syncLayers_BGO(B);
                 }
@@ -928,6 +930,9 @@ void ClearLevel()
     doShakeScreenClear();
     ResetCameraPanning();
     treeLevelCleanAll();
+
+    invalidateDrawBlocks();
+    invalidateDrawBGOs();
 
     AutoUseModern = false;
 
@@ -1031,7 +1036,7 @@ void ClearLevel()
     for(A = 0; A <= maxSections; A++)
     {
         Background2[A] = 0;
-        bgColor[A] = 0xF89868;
+        // bgColor[A] = 0xF89868;    // unused since SMBX64, removed
         bgMusic[A] = 0;
         level[A] = BlankLocation;
         LevelWrap[A] = false;
@@ -1258,7 +1263,7 @@ bool CanConvertLevel(int format, std::string* reasons)
 
     for(int i = 1; i <= numNPCs; i++)
     {
-        if(NPC[i].Special7 != 0)
+        if(NPC[i].Variant != 0)
         {
             can_convert = false;
             if(reasons)
@@ -1273,11 +1278,11 @@ bool CanConvertLevel(int format, std::string* reasons)
 
     for(int i = 1; i <= numBlock; i++)
     {
-        if(Block[i].Type == 90 && Block[i].Special2 == 1)
+        if(Block[i].Type == 90 && Block[i].forceSmashable)
         {
             can_convert = false;
             if(reasons)
-                *reasons += "A spin block uses ancient behavior.\n";
+                *reasons += "A spin block uses ancient smashable behavior.\n";
             break;
         }
     }
@@ -1338,11 +1343,11 @@ void ConvertLevel(int format)
 
     for(int i = 1; i <= numNPCs; i++)
     {
-        NPC[i].Special7 = 0;
+        NPC[i].Variant = 0;
     }
 
     for(int i = 1; i <= numBlock; i++)
     {
-        Block[i].Special2 = 0;
+        Block[i].forceSmashable = 0;
     }
 }

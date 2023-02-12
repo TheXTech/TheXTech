@@ -465,7 +465,6 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 if(Block[A].Layer == L)
                     Block[A].Layer = LAYER_DEFAULT;
                 Block[A].Special = Block[A].DefaultSpecial;
-                Block[A].Special2 = Block[A].DefaultSpecial2;
                 Block[A].Type = Block[A].DefaultType;
                 syncLayersTrees_Block(A);
             }
@@ -770,7 +769,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                     if(int(s.position.X) == EventSection_t::LESet_ResetDefault)
                         newLevel = LevelREAL[B];
                     else
-                        newLevel = s.position;
+                        newLevel = static_cast<Location_t>(s.position);
                     level[B] = newLevel;
 
                     // warp other players to resized section, if not a reset
@@ -1047,7 +1046,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             if(-qScreenY[1] + vScreen[1].Height > level[Player[C].Section].Height)
                                 qScreenY[1] = -(level[Player[C].Section].Height - vScreen[1].Height);
 
-                            level[B] = s.position;
+                            level[B] = static_cast<Location_t>(s.position);
                         }
                         else
                         {
