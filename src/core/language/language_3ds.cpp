@@ -39,24 +39,24 @@ void XLanguagePriv::detectOSLanguage()
     res = CFGU_GetSystemLanguage(&language);
     if(res != 0)
     {
-        std::fprintf(stderr, "CFGU_GetSystemLanguage() failed: 0x%x.\n", rc);
+        std::fprintf(stderr, "CFGU_GetSystemLanguage() failed: 0x%x.\n", res);
         std::fflush(stderr);
-        setExit();
+        cfguExit();
         return;
     }
 
     res = CFGU_SecureInfoGetRegion(&region);
     if(res != 0)
     {
-        std::fprintf(stderr, "CFGU_SecureInfoGetRegion() failed: 0x%x.\n", rc);
+        std::fprintf(stderr, "CFGU_SecureInfoGetRegion() failed: 0x%x.\n", res);
         std::fflush(stderr);
-        setExit();
+        cfguExit();
         return;
     }
 
     cfguExit();
 
-    switch(Language)
+    switch(language)
     {
     case CFG_LANGUAGE_JP:
         CurrentLanguage = "ja";
