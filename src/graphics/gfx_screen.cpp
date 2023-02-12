@@ -538,8 +538,15 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     double resizeRateX = resizeRate;
     double resizeRateY = resizeRate;
 
-    double camFramesX = std::abs(vScreenX[Z] - qScreenX[Z])/camRateX;
-    double camFramesY = std::abs(vScreenY[Z] - qScreenY[Z])/camRateY;
+    double camFramesX_l = std::abs(vScreenX[Z] - qScreenX[Z])/camRateX;
+    double camFramesY_t = std::abs(vScreenY[Z] - qScreenY[Z])/camRateY;
+
+    double camFramesX_r = std::abs(vScreenX[Z] - vScreen[Z].Width - qScreenX[Z] + qScreenLoc[Z].Width)/camRateX;
+    double camFramesY_b = std::abs(vScreenY[Z] - vScreen[Z].Height - qScreenY[Z] + qScreenLoc[Z].Height)/camRateY;
+
+    double camFramesX = SDL_min(camFramesX_l, camFramesX_r);
+    double camFramesY = SDL_min(camFramesY_t, camFramesY_b);
+
     double resizeFramesX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft)/resizeRateX;
     double resizeFramesY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop)/resizeRateY;
 
