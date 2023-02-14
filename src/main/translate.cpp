@@ -251,12 +251,22 @@ XTechTranslate::XTechTranslate()
         {"editor.npc.ai.use1_0Ai",          &g_editorStrings.npcUse1_0Ai},
         {"editor.npc.tooltipExpandSection", &g_editorStrings.npcTooltipExpandSection},
 
+        {"editor.npc.gen.header",           &g_editorStrings.npcGenHeader},
+        {"editor.npc.gen.direction",        &g_editorStrings.npcGenDirection},
+        {"editor.npc.gen.effectIs",         &g_editorStrings.npcGenEffectIs},
+        {"editor.npc.gen.effectWarp",       &g_editorStrings.npcGenEffectWarp},
+        {"editor.npc.gen.effectShoot",      &g_editorStrings.npcGenEffectShoot},
+        {"editor.npc.gen.delayIsMs",        &g_editorStrings.npcGenDelayIsMs},
+
         {"editor.wordNPC.nominative",       &g_editorStrings.wordNPC},
         {"editor.wordNPC.genitive",         &g_editorStrings.wordNPCGenitive},
 
         {"editor.wordEvent.nominative",     &g_editorStrings.wordEvent},
         {"editor.wordEvent.genitive",       &g_editorStrings.wordEventGenitive},
 
+        {"editor.wordCoins",                &g_editorStrings.wordCoins},
+
+        {"editor.wordEnabled",              &g_editorStrings.wordEnabled},
         {"editor.wordText",                 &g_editorStrings.wordText},
         {"editor.phraseTextOf",             &g_editorStrings.phraseTextOf},
         {"editor.phraseSectionIndex",       &g_editorStrings.phraseSectionIndex},

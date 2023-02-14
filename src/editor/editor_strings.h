@@ -48,12 +48,22 @@ struct EditorContent
     std::string npcUse1_0Ai;
     std::string npcTooltipExpandSection;
 
+    std::string npcGenHeader;
+    std::string npcGenDirection;
+    std::string npcGenEffectIs;
+    std::string npcGenEffectWarp;
+    std::string npcGenEffectShoot;
+    std::string npcGenDelayIsMs;
+
     std::string wordNPC;
     std::string wordNPCGenitive;
 
     std::string wordEvent;
     std::string wordEventGenitive;
 
+    std::string wordCoins;
+
+    std::string wordEnabled;
     std::string wordText;
     std::string phraseTextOf;
     std::string phraseSectionIndex;

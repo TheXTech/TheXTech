@@ -35,6 +35,14 @@
                 "target": "目标",
                 "use1_0Ai": "使用1.0 AI？"
             },
+            "gen": {
+                "delayIsMs": "",
+                "direction": "",
+                "effectIs": "",
+                "effectShoot": "",
+                "effectWarp": "",
+                "header": ""
+            },
             "inContainer": "包含",
             "inertNice": "友好",
             "stuckStop": "静止",
@@ -53,6 +61,8 @@
                 "name5": "垂直翻转"
             }
         },
+        "wordCoins": "",
+        "wordEnabled": "",
         "wordEvent": {
             "genitive": "事件",
             "nominative": "事件"

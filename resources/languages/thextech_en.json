@@ -35,6 +35,14 @@
                 "target": "Target",
                 "use1_0Ai": "Use 1.0 AI?"
             },
+            "gen": {
+                "delayIsMs": "Delay: {0} ms",
+                "direction": "Direction",
+                "effectIs": "Effect: {0}",
+                "effectShoot": "Shoot",
+                "effectWarp": "Warp",
+                "header": "Generator Settings"
+            },
             "inContainer": "In",
             "inertNice": "Nice",
             "stuckStop": "Stop",
@@ -53,6 +61,8 @@
                 "name5": "FLIP (V)"
             }
         },
+        "wordCoins": "Coins",
+        "wordEnabled": "Enabled",
         "wordEvent": {
             "genitive": "Event",
             "nominative": "Event"

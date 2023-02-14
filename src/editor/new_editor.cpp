@@ -50,6 +50,7 @@
 #include "editor/editor_custom.h"
 #include "editor/editor_strings.h"
 
+#include "main/menu_main.h"
 #include "main/screen_textentry.h"
 
 template<typename... Args>
@@ -886,11 +887,14 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
     // GENERATOR SETTINGS SCREEN
     if(m_NPC_page == -2 && m_special_page != SPECIAL_PAGE_BLOCK_CONTENTS)
     {
-        SuperPrintR(mode, "GENERATOR SETTINGS", 3, 50, 44);
+        SuperPrintR(mode, g_editorStrings.npcGenHeader, 3, 50, 44);
+
         if(UpdateButton(mode, e_ScreenW - 200 - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
             FocusNPC();
-        SuperPrintR(mode, "ENABLED", 3, 50, 110);
-        if(UpdateCheckBox(mode, 260 + 4, 100 + 4, EditorCursor.NPC.Generator))
+
+        SuperPrintR(mode, g_editorStrings.wordEnabled, 3, 50, 110);
+
+        if(UpdateCheckBox(mode, 280 + 4, 100 + 4, EditorCursor.NPC.Generator))
         {
             EditorCursor.NPC.Generator = true;
             if(!EditorCursor.NPC.GeneratorDirection)
@@ -900,35 +904,42 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             if(EditorCursor.NPC.GeneratorTimeMax < 1.f)
                 EditorCursor.NPC.GeneratorTimeMax = 1.f;
         }
-        if(UpdateButton(mode, 300 + 4, 100 + 4, GFX.EIcons, !EditorCursor.NPC.Generator, 0, 32*Icon::x, 32, 32))
+
+        if(UpdateButton(mode, 320 + 4, 100 + 4, GFX.EIcons, !EditorCursor.NPC.Generator, 0, 32*Icon::x, 32, 32))
             EditorCursor.NPC.Generator = false;
+
         if(EditorCursor.NPC.Generator)
         {
-            SuperPrintR(mode, "DIRECTION", 3, 50, 150);
-            if(UpdateButton(mode, 260 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 1, 0, 32*Icon::up, 32, 32))
+            // direction change
+            SuperPrintR(mode, g_editorStrings.npcGenDirection, 3, 50, 150);
+
+            if(UpdateButton(mode, 280 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 1, 0, 32*Icon::up, 32, 32))
                 EditorCursor.NPC.GeneratorDirection = 1;
-            if(UpdateButton(mode, 300 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 3, 0, 32*Icon::down, 32, 32))
+            if(UpdateButton(mode, 320 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 3, 0, 32*Icon::down, 32, 32))
                 EditorCursor.NPC.GeneratorDirection = 3;
-            if(UpdateButton(mode, 340 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 2, 0, 32*Icon::left, 32, 32))
+            if(UpdateButton(mode, 360 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 2, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.GeneratorDirection = 2;
-            if(UpdateButton(mode, 380 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 4, 0, 32*Icon::right, 32, 32))
+            if(UpdateButton(mode, 400 + 4, 140 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorDirection == 4, 0, 32*Icon::right, 32, 32))
                 EditorCursor.NPC.GeneratorDirection = 4;
 
-            if(EditorCursor.NPC.GeneratorEffect == 1)
-                SuperPrintR(mode, "EFFECT WARP", 3, 50, 190);
-            else if(EditorCursor.NPC.GeneratorEffect == 2)
-                SuperPrintR(mode, "EFFECT SHOOT", 3, 50, 190);
-            else
-                SuperPrintR(mode, "EFFECT", 3, 50, 190);
-            if(UpdateButton(mode, 260 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorEffect == 1, 0, 32*Icon::bottom, 32, 32))
+            // effect change
+            const std::string& effect =
+                   (EditorCursor.NPC.GeneratorEffect == 1) ? g_editorStrings.npcGenEffectWarp
+                : ((EditorCursor.NPC.GeneratorEffect == 2) ? g_editorStrings.npcGenEffectShoot
+                : g_mainMenu.caseNone);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.npcGenEffectIs, effect), 3, 50, 190);
+
+            if(UpdateButton(mode, 280 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorEffect == 1, 0, 32*Icon::bottom, 32, 32))
                 EditorCursor.NPC.GeneratorEffect = 1;
-            if(UpdateButton(mode, 300 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorEffect == 2, 0, 32*Icon::up, 32, 32))
+            if(UpdateButton(mode, 320 + 4, 180 + 4, GFX.EIcons, EditorCursor.NPC.GeneratorEffect == 2, 0, 32*Icon::up, 32, 32))
                 EditorCursor.NPC.GeneratorEffect = 2;
 
-            SuperPrintR(mode, "DELAY " + std::to_string(((int)EditorCursor.NPC.GeneratorTimeMax)*100) + "MS", 3, 50, 230);
-            if(EditorCursor.NPC.GeneratorTimeMax > 1.f && UpdateButton(mode, 260 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+            // delay change
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.npcGenDelayIsMs, ((int)EditorCursor.NPC.GeneratorTimeMax) * 100), 3, 50, 230);
+
+            if(EditorCursor.NPC.GeneratorTimeMax > 1.f && UpdateButton(mode, 280 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.GeneratorTimeMax --;
-            if(UpdateButton(mode, 300 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+            if(UpdateButton(mode, 320 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                 EditorCursor.NPC.GeneratorTimeMax ++;
         }
     }
@@ -936,24 +947,24 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
     // COMMON CONTENTS
     if(m_NPC_page == -1 && m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS)
     {
-        SuperPrintR(mode, "COINS", 3, 70, 40);
+        SuperPrintR(mode, g_editorStrings.wordCoins, 3, 70, 40);
+
+        bool currently_coins = EditorCursor.Block.Special > 0 && EditorCursor.Block.Special < 1000;
+        if(UpdateButton(mode, 60 + 4, 60 + 4, GFXNPC[10], currently_coins, 0, 0, 32, 32) && !currently_coins)
         {
-            bool currently_coins = EditorCursor.Block.Special > 0 && EditorCursor.Block.Special < 1000;
-            if(UpdateButton(mode, 60 + 4, 60 + 4, GFXNPC[10], currently_coins, 0, 0, 32, 32) && !currently_coins)
-            {
-                EditorCursor.Block.Special = 1;
-                currently_coins = true;
-            }
-            if(currently_coins)
-            {
-                SuperPrint("x" + std::to_string(EditorCursor.Block.Special), 3, 100, 74);
-                if(EditorCursor.Block.Special > 0 && UpdateButton(mode, 180 + 4, 60 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
-                    EditorCursor.Block.Special --;
-                if(EditorCursor.Block.Special < 99 && UpdateButton(mode, 220 + 4, 60 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
-                    EditorCursor.Block.Special ++;
-            }
+            EditorCursor.Block.Special = 1;
+            currently_coins = true;
         }
-        SuperPrintR(mode, "NOTHING", 3, 40 + 260, 40);
+        if(currently_coins)
+        {
+            SuperPrint("x" + std::to_string(EditorCursor.Block.Special), 3, 100, 74);
+            if(EditorCursor.Block.Special > 0 && UpdateButton(mode, 180 + 4, 60 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+                EditorCursor.Block.Special --;
+            if(EditorCursor.Block.Special < 99 && UpdateButton(mode, 220 + 4, 60 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+                EditorCursor.Block.Special ++;
+        }
+
+        SuperPrintR(mode, g_mainMenu.caseNone, 3, 40 + 260, 40);
         if(UpdateButton(mode, 360 + 4, 60 + 4, GFXBlock[2], EditorCursor.Block.Special == 0, 0, 0, 32, 32))
             EditorCursor.Block.Special = 0;
 

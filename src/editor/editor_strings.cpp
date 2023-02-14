@@ -45,12 +45,22 @@ void initEditorStrings()
     g_editorStrings.npcUse1_0Ai = "Use 1.0 AI?";
     g_editorStrings.npcTooltipExpandSection = "Expand section";
 
+    g_editorStrings.npcGenHeader = "Generator Settings";
+    g_editorStrings.npcGenDirection = "Direction";
+    g_editorStrings.npcGenEffectIs = "Effect: {0}";
+    g_editorStrings.npcGenEffectWarp = "Warp";
+    g_editorStrings.npcGenEffectShoot = "Shoot";
+    g_editorStrings.npcGenDelayIsMs = "Delay: {0} ms";
+
     g_editorStrings.wordNPC = "NPC";
     g_editorStrings.wordNPCGenitive = "NPC";
 
     g_editorStrings.wordEvent = "Event";
     g_editorStrings.wordEventGenitive = "Event";
 
+    g_editorStrings.wordCoins = "Coins";
+
+    g_editorStrings.wordEnabled = "Enabled";
     g_editorStrings.wordText = "Text";
     g_editorStrings.phraseTextOf = "{0} Text";
     g_editorStrings.phraseSectionIndex = "Section {0}";

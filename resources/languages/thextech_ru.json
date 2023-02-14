@@ -35,6 +35,14 @@
                 "target": "",
                 "use1_0Ai": ""
             },
+            "gen": {
+                "delayIsMs": "",
+                "direction": "",
+                "effectIs": "",
+                "effectShoot": "",
+                "effectWarp": "",
+                "header": ""
+            },
             "inContainer": "",
             "inertNice": "",
             "stuckStop": "",
@@ -53,6 +61,8 @@
                 "name5": ""
             }
         },
+        "wordCoins": "",
+        "wordEnabled": "",
         "wordEvent": {
             "genitive": "",
             "nominative": ""
