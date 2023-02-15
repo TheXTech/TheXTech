@@ -36,12 +36,12 @@
                 "use1_0Ai": "使用1.0 AI？"
             },
             "gen": {
-                "delayIsMs": "",
-                "direction": "",
-                "effectIs": "",
-                "effectShoot": "",
-                "effectWarp": "",
-                "header": ""
+                "delayIsMs": "延迟：{0}毫秒",
+                "direction": "方向",
+                "effectIs": "特效：{0}",
+                "effectShoot": "喷射",
+                "effectWarp": "水管",
+                "header": "生成器设置"
             },
             "inContainer": "包含",
             "inertNice": "友好",
@@ -50,7 +50,7 @@
         },
         "phraseRadiusIndex": "半径{0}",
         "phraseSectionIndex": "场景{0}",
-        "phraseTextOf": "",
+        "phraseTextOf": "{0}文字",
         "warp": {
             "transit": {
                 "name0": "无",
@@ -61,8 +61,8 @@
                 "name5": "垂直翻转"
             }
         },
-        "wordCoins": "",
-        "wordEnabled": "",
+        "wordCoins": "金币",
+        "wordEnabled": "已启用",
         "wordEvent": {
             "genitive": "事件",
             "nominative": "事件"
@@ -79,13 +79,13 @@
             "phrasePlayerDisconnected": "玩家{0}未连接"
         },
         "error": {
-            "openFileFailed": ""
+            "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。"
         }
     },
     "languageName": "简体中文",
     "menu": {
         "battle": {
-            "errorNoLevels": ""
+            "errorNoLevels": "对战关卡列表为空，无法启动对战模式。"
         },
         "caseNone": "<无>",
         "character": {
@@ -95,7 +95,7 @@
             "controlsConnected": "已连接：",
             "controlsDeleteKey": "（按第二奔跑键清除）",
             "controlsDeviceTypes": "设备类型",
-            "controlsInUse": "（使用中）",
+            "controlsInUse": "（已使用）",
             "controlsNewProfile": "<新建配置>",
             "controlsNotInUse": "（未使用）",
             "controlsReallyDeleteProfile": "确定删除配置？",
