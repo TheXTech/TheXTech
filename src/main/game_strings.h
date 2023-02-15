@@ -29,6 +29,10 @@ struct GameContent
 {
     std::string controlsPhrasePlayerDisconnected;
     std::string controlsPhrasePlayerConnected;
+
+    std::string errorOpenFileFailed;
+
+    std::string warpNeedStarCount;
 };
 
 extern GameContent g_gameStrings;

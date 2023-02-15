@@ -126,6 +126,8 @@ void initMainMenu()
     g_mainMenu.phraseScore = "Score: {0}";
     g_mainMenu.phraseTime = "Time: {0}";
 
+    g_mainMenu.errorBattleNoLevels = "Can't start battle because of no levels available";
+
     g_mainMenu.optionsModeFullScreen = "Fullscreen mode";
     g_mainMenu.optionsModeWindowed = "Windowed mode";
     g_mainMenu.optionsViewCredits = "View credits";

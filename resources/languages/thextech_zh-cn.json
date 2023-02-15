@@ -77,16 +77,16 @@
         "controls": {
             "phrasePlayerConnected": "玩家{0}已连接{1}，配置：{2}",
             "phrasePlayerDisconnected": "玩家{0}未连接"
-        }
-    },
-    "game": {
-        "controls": {
-            "phrasePlayerConnected": "",
-            "phrasePlayerDisconnected": ""
+        },
+        "error": {
+            "openFileFailed": ""
         }
     },
     "languageName": "简体中文",
     "menu": {
+        "battle": {
+            "errorNoLevels": ""
+        },
         "caseNone": "<无>",
         "character": {
             "charSelTitle": "选择角色"

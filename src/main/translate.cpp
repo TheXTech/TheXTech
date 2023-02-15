@@ -174,6 +174,8 @@ XTechTranslate::XTechTranslate()
         {"menu.game.phraseScore",          &g_mainMenu.phraseScore},
         {"menu.game.phraseTime",           &g_mainMenu.phraseTime},
 
+        {"menu.battle.errorNoLevels",      &g_mainMenu.errorBattleNoLevels},
+
         {"menu.options.optionsModeFullScreen",   &g_mainMenu.optionsModeFullScreen},
         {"menu.options.optionsModeWindowed",     &g_mainMenu.optionsModeWindowed},
         {"menu.options.optionsViewCredits",      &g_mainMenu.optionsViewCredits},
@@ -227,6 +229,11 @@ XTechTranslate::XTechTranslate()
 
         {"game.controls.phrasePlayerDisconnected",  &g_gameStrings.controlsPhrasePlayerDisconnected},
         {"game.controls.phrasePlayerConnected",     &g_gameStrings.controlsPhrasePlayerConnected},
+
+        {"game.error.openFileFailed",               &g_gameStrings.errorOpenFileFailed},
+
+        // FIXME: wait until we have a generic name for stars / leeks
+        // {"game.error.warpNeedStarLeekCount",            &g_gameStrings.warpNeedStarCount},
 
 
 #ifdef THEXTECH_ENABLE_EDITOR
@@ -294,14 +301,17 @@ XTechTranslate::XTechTranslate()
     m_assetsMap =
     {
         {"languageName", &g_mainMenu.languageName},
+
+        // FIXME: wait until we have a generic name for stars / leeks
+        // {"objects.wordStarLeekAccusativeSingle", &g_gameInfo.wordStarAccusativeSingle},
+        // {"objects.wordStarLeekAccusativePlural", &g_gameInfo.wordStarAccusativePlural},
     };
 
     for(int i = 1; i <= numCharacters; ++i)
-    {
         m_assetsMap.insert({fmt::format_ne("character.name{0}", i), &g_gameInfo.characterName[i]});
-    }
 
 #ifdef THEXTECH_ENABLE_EDITOR
+    // adds dynamic fields to the asset map
     EditorCustom::Load(this);
 #endif
 }

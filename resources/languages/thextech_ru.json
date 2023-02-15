@@ -77,10 +77,16 @@
         "controls": {
             "phrasePlayerConnected": "",
             "phrasePlayerDisconnected": ""
+        },
+        "error": {
+            "openFileFailed": ""
         }
     },
     "languageName": "Русский",
     "menu": {
+        "battle": {
+            "errorNoLevels": ""
+        },
         "caseNone": "",
         "character": {
             "charSelTitle": "Выбор персонажа"

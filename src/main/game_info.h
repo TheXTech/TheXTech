@@ -34,6 +34,9 @@ struct GameInfo
     std::string titleCredits;
     RangeArr<std::string, 1, numCharacters> characterName;
 
+    std::string wordStarAccusativeSingle;
+    std::string wordStarAccusativePlural;
+
     bool disableBattleMode = true;
     bool disableTwoPlayer = true;
 

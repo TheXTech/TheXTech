@@ -125,6 +125,9 @@ struct MainMenuContent
     std::string phraseScore;
     std::string phraseTime;
 
+    // Battle
+    std::string errorBattleNoLevels;
+
     // Options
     std::string optionsModeFullScreen;
     std::string optionsModeWindowed;

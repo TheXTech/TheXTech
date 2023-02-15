@@ -794,7 +794,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 if(!OpenLevel(levelPath))
                 {
-                    MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", levelPath);
+                    MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, levelPath);
                     PauseGame(PauseCode::Message);
                     ErrorQuit = true;
                 }
@@ -1865,7 +1865,7 @@ void StartEpisode()
         std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
         if(!OpenLevel(levelPath))
         {
-            MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", StartLevel);
+            MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, StartLevel);
             PauseGame(PauseCode::Message);
             ErrorQuit = true;
         }
@@ -1939,7 +1939,7 @@ void StartBattleMode()
 
     if(NumSelectBattle <= 1)
     {
-        MessageText = "Can't start battle because of no levels available";
+        MessageText = g_mainMenu.errorBattleNoLevels;
         PauseGame(PauseCode::Message);
         ErrorQuit = true;
     }
@@ -1952,7 +1952,7 @@ void StartBattleMode()
     std::string levelPath = SelectBattle[selWorld].WorldPath + SelectBattle[selWorld].WorldFile;
     if(!OpenLevel(levelPath))
     {
-        MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", SelectBattle[selWorld].WorldFile);
+        MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, SelectBattle[selWorld].WorldFile);
         PauseGame(PauseCode::Message);
         ErrorQuit = true;
     }

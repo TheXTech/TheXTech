@@ -26,4 +26,8 @@ void initGameStrings()
 {
     g_gameStrings.controlsPhrasePlayerDisconnected = "P{0} disconnected";
     g_gameStrings.controlsPhrasePlayerConnected = "P{0} connected {1}, Profile: {2}";
+
+    g_gameStrings.errorOpenFileFailed = "ERROR: Can't open \"{0}\": file doesn't exist or corrupted.";
+
+    g_gameStrings.warpNeedStarCount = "You need {0} {1} to enter.";
 }

@@ -70,6 +70,9 @@ void initGameInfo()
     g_gameInfo.characterName[4] = "Toad";
     g_gameInfo.characterName[5] = "Link";
 
+    g_gameInfo.wordStarAccusativeSingle = "star";
+    g_gameInfo.wordStarAccusativePlural = "stars";
+
     g_gameInfo.creditsFont = 4;
 
 #ifdef CUSTOM_CREDITS_URL
@@ -128,6 +131,14 @@ void initGameInfo()
         config.beginGroup("luna-script");
         {
             config.read("enable-engine", gLunaEnabledGlobally, true);
+        }
+        config.endGroup();
+
+        // FIXME: make stars name readable after deciding on generic name
+        config.beginGroup("objects");
+        {
+            // config.read("generic-star-leek-single", wordStarAccusativeSingle, "leek");
+            // config.read("generic-star-leek-plural", wordStarAccusativePlural, "leeks");
         }
         config.endGroup();
 
