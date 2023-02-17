@@ -179,6 +179,10 @@ void setTransparentColor(StdPicture &target, uint32_t rgb)
     UNUSED(rgb);
 }
 
+void getRenderSize(int* w, int* h)
+{
+    return XWindow::getWindowSize(w, h);
+}
 
 inline int ROUNDDIV2(int x)
 {
