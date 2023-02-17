@@ -531,35 +531,80 @@ void UpdateGraphics2(bool skipRepaint)
         else
         {
             // render a legacy background, in MANY careful segments...
+            constexpr bool do_stretch = false;
 
             // top-left
             XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop - 130, 66, 130, GFX.Interface[4], 0, 0);
 
             // top
-            A = GFX.Interface[4].w - 66 - 66;
-            for(int B = 0; B < (vScreen[Z].Width / A) + 1; B++)
-                XRender::renderTexture(vScreen[Z].ScreenLeft + (B * A), vScreen[Z].ScreenTop - 130, A, 130, GFX.Interface[4], 66, 0);
+            int orig_width = GFX.Interface[4].w - 66 - 66;
+            if(do_stretch)
+            {
+                XRender::renderTextureScaleEx(vScreen[Z].ScreenLeft, vScreen[Z].ScreenTop - 130,
+                    vScreen[Z].Width, 130,
+                    GFX.Interface[4], 66, 0, orig_width, 130);
+            }
+            else
+                for(int offset = 0; offset < vScreen[Z].Width; offset += orig_width)
+            {
+                XRender::renderTexture(vScreen[Z].ScreenLeft + offset, vScreen[Z].ScreenTop - 130,
+                    SDL_min(vScreen[Z].Width - offset, orig_width), 130,
+                    GFX.Interface[4], 66, 0);
+            }
 
             // top-right
-            XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, 0, 66, 130 + 20, GFX.Interface[4], GFX.Interface[4].w - 66, 0);
+            XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, vScreen[Z].ScreenTop - 130, 66, 130 + 20, GFX.Interface[4], GFX.Interface[4].w - 66, 0);
 
             // left
-            A = GFX.Interface[4].h - 130 - 66;
-            for(int B = 0; B < (vScreen[Z].Height / A) + 1; B++)
-                XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop + (B * A), 66, A, GFX.Interface[4], 0, 130);
+            int orig_height = GFX.Interface[4].h - 130 - 66;
+            if(do_stretch)
+            {
+                XRender::renderTextureScaleEx(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop,
+                    66, vScreen[Z].Height,
+                    GFX.Interface[4], 0, 130, 66, orig_height);
+            }
+            else
+                for(int offset = 0; offset < vScreen[Z].Height; offset += orig_height)
+            {
+                XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop + offset,
+                    66, SDL_min(vScreen[Z].Height - offset, orig_height),
+                    GFX.Interface[4], 0, 130);
+            }
 
             // right
-            A = GFX.Interface[4].h - (130 + 20) - 66;
-            for(int B = 0; B < ((vScreen[Z].Height - 20) / A) + 1; B++)
-                XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, (vScreen[Z].ScreenTop + 20) + (B * A), 66, A, GFX.Interface[4], GFX.Interface[4].w - 66, 130 + 20);
+            orig_height = GFX.Interface[4].h - (130 + 20) - 66;
+            if(do_stretch)
+            {
+                XRender::renderTextureScaleEx(vScreen[Z].ScreenLeft + vScreen[Z].Width, vScreen[Z].ScreenTop + 20,
+                    66, vScreen[Z].Height - 20,
+                    GFX.Interface[4], GFX.Interface[4].w - 66, 130 + 20, 66, orig_height);
+            }
+            else
+                for(int offset = 20; offset < vScreen[Z].Height; offset += orig_height)
+            {
+                XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, vScreen[Z].ScreenTop + offset,
+                    66, SDL_min(vScreen[Z].Height - offset, orig_height),
+                    GFX.Interface[4], GFX.Interface[4].w - 66, 130 + 20);
+            }
 
             // bottom-left
             XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop + vScreen[Z].Height, 66 + 34, 66, GFX.Interface[4], 0, GFX.Interface[4].h - 66);
 
             // bottom
-            A = GFX.Interface[4].w - 100 - 66;
-            for(int B = 0; B < ((vScreen[Z].Width - 34) / A) + 1; B++)
-                XRender::renderTexture((vScreen[Z].ScreenLeft + 34) + (B * A), vScreen[Z].ScreenTop + vScreen[Z].Height, A, 66, GFX.Interface[4], 100, GFX.Interface[4].h - 66);
+            orig_width = GFX.Interface[4].w - (66 + 34) - 66;
+            if(do_stretch)
+            {
+                XRender::renderTextureScaleEx(vScreen[Z].ScreenLeft + 34, vScreen[Z].ScreenTop + vScreen[Z].Height,
+                    vScreen[Z].Width - 34, 66,
+                    GFX.Interface[4], 100, GFX.Interface[4].h - 66, orig_width, 66);
+            }
+            else
+                for(int offset = 34; offset < vScreen[Z].Width; offset += orig_width)
+            {
+                XRender::renderTexture(vScreen[Z].ScreenLeft + offset, vScreen[Z].ScreenTop + vScreen[Z].Height,
+                    SDL_min(vScreen[Z].Width - offset, orig_width), 66,
+                    GFX.Interface[4], 100, GFX.Interface[4].h - 66);
+            }
 
             // bottom-right
             XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, vScreen[Z].ScreenTop + vScreen[Z].Height, 66, 66, GFX.Interface[4], GFX.Interface[4].w - 66, GFX.Interface[4].h - 66);
