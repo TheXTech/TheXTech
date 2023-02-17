@@ -466,5 +466,10 @@
             }
         }
     },
-    "languageName": "简体中文"
+    "languageName": "简体中文",
+    "objects": {
+        "wordStarAccusativeDual": "",
+        "wordStarAccusativePlural": "",
+        "wordStarAccusativeSingular": ""
+    }
 }

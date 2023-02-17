@@ -41,6 +41,35 @@
 #include "editor/editor_custom.h"
 
 
+enum class PluralRules
+{
+    SingularOnly,
+    OneIsSingular,
+    Slavic,
+};
+
+static PluralRules s_CurrentPluralRules = PluralRules::OneIsSingular;
+
+const std::string& LanguageFormatSlavic(int number, const std::string& singular, const std::string& dual, const std::string& plural)
+{
+    if(((number % 100) != 11) && ((number % 10) == 1))
+        return singular;
+    else if((number % 10) >= 2 && (number % 10) <= 4 && (number % 100 < 10 || number % 100 > 20))
+        return dual;
+    else
+        return plural;
+}
+
+const std::string& LanguageFormatNumber(int number, const std::string& singular, const std::string& dual, const std::string& plural)
+{
+    if(s_CurrentPluralRules == PluralRules::OneIsSingular)
+        return (number == 1) ? singular : plural;
+    else if(s_CurrentPluralRules == PluralRules::Slavic)
+        return LanguageFormatSlavic(number, singular, dual, plural);
+    else // if(s_CurrentPluralRules == PluralRules::SingularOnly)
+        return singular;
+}
+
 static void setJsonValue(nlohmann::json &j, const std::string &key, const std::string &value)
 {
     auto dot = key.find(".");
@@ -232,8 +261,7 @@ XTechTranslate::XTechTranslate()
 
         {"game.error.openFileFailed",               &g_gameStrings.errorOpenFileFailed},
 
-        // FIXME: wait until we have a generic name for stars / leeks
-        // {"game.error.warpNeedStarLeekCount",            &g_gameStrings.warpNeedStarCount},
+        {"game.error.warpNeedStarCount",            &g_gameStrings.warpNeedStarCount},
 
 
 #ifdef THEXTECH_ENABLE_EDITOR
@@ -302,9 +330,9 @@ XTechTranslate::XTechTranslate()
     {
         {"languageName", &g_mainMenu.languageName},
 
-        // FIXME: wait until we have a generic name for stars / leeks
-        // {"objects.wordStarLeekAccusativeSingle", &g_gameInfo.wordStarAccusativeSingle},
-        // {"objects.wordStarLeekAccusativePlural", &g_gameInfo.wordStarAccusativePlural},
+        {"objects.wordStarAccusativeSingular", &g_gameInfo.wordStarAccusativeSingular},
+        {"objects.wordStarAccusativeDual", &g_gameInfo.wordStarAccusativeDual},
+        {"objects.wordStarAccusativePlural", &g_gameInfo.wordStarAccusativePlural},
     };
 
     for(int i = 1; i <= numCharacters; ++i)
@@ -328,6 +356,8 @@ void XTechTranslate::reset()
     // don't need to reset EditorCustom because we reloaded it in the initializer
     // it would be dangerous to reload it here because it would invalidate a lot of references
 #endif
+
+    s_CurrentPluralRules = PluralRules::OneIsSingular;
 }
 
 void XTechTranslate::exportTemplate()
@@ -457,6 +487,11 @@ bool XTechTranslate::translate()
         pLogWarning("Translations aren't supported without new font engine loaded (the 'fonts' directory is required)");
         return false;
     }
+
+    if(SDL_strcasecmp(CurrentLanguage.c_str(), "ru") == 0)
+        s_CurrentPluralRules = PluralRules::Slavic;
+    else
+        s_CurrentPluralRules = PluralRules::OneIsSingular;
 
     const std::string &langEngineFile = XLanguage::getEngineFile();
     const std::string &langAssetsFile = XLanguage::getAssetsFile();

@@ -79,7 +79,8 @@
             "phrasePlayerDisconnected": ""
         },
         "error": {
-            "openFileFailed": ""
+            "openFileFailed": "",
+            "warpNeedStarCount": ""
         }
     },
     "languageName": "Русский",

@@ -44,6 +44,7 @@
 #include "main/menu_main.h"
 #include "main/game_strings.h"
 #include "main/game_info.h"
+#include "main/translate.h"
 #include "core/render.h"
 #include "core/events.h"
 #include "compat.h"
@@ -4540,7 +4541,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     if(warp.Stars > numStars && canWarp)
     {
         if(warp.StarsMsg == STRINGINDEX_NONE)
-            MessageText = fmt::format_ne(g_gameStrings.warpNeedStarCount, warp.Stars, (warp.Stars == 1) ? g_gameInfo.wordStarAccusativeSingle : g_gameInfo.wordStarAccusativePlural);
+            MessageText = fmt::format_ne(g_gameStrings.warpNeedStarCount, warp.Stars, LanguageFormatNumber(warp.Stars, g_gameInfo.wordStarAccusativeSingular, g_gameInfo.wordStarAccusativeDual, g_gameInfo.wordStarAccusativePlural));
         else
             MessageText = GetS(warp.StarsMsg);
 

@@ -23,9 +23,11 @@
 #define TRANSLATE_H
 
 #include <map>
+#include <string>
 
 #include "editor/editor_custom.h"
 
+const std::string& LanguageFormatNumber(int number, const std::string& singular, const std::string& dual, const std::string& plural);
 
 class XTechTranslate
 {

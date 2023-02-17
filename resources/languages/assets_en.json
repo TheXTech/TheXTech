@@ -466,5 +466,10 @@
             }
         }
     },
-    "languageName": "English"
+    "languageName": "English",
+    "objects": {
+        "wordStarAccusativeDual": "",
+        "wordStarAccusativePlural": "stars",
+        "wordStarAccusativeSingular": "star"
+    }
 }

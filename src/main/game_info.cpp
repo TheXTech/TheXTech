@@ -70,7 +70,8 @@ void initGameInfo()
     g_gameInfo.characterName[4] = "Toad";
     g_gameInfo.characterName[5] = "Link";
 
-    g_gameInfo.wordStarAccusativeSingle = "star";
+    g_gameInfo.wordStarAccusativeSingular = "star";
+    g_gameInfo.wordStarAccusativeDual = "";
     g_gameInfo.wordStarAccusativePlural = "stars";
 
     g_gameInfo.creditsFont = 4;
@@ -134,11 +135,11 @@ void initGameInfo()
         }
         config.endGroup();
 
-        // FIXME: make stars name readable after deciding on generic name
         config.beginGroup("objects");
         {
-            // config.read("generic-star-leek-single", wordStarAccusativeSingle, "leek");
-            // config.read("generic-star-leek-plural", wordStarAccusativePlural, "leeks");
+            config.read("star", g_gameInfo.wordStarAccusativeSingular, "star");
+            config.read("star-singular", g_gameInfo.wordStarAccusativeSingular, g_gameInfo.wordStarAccusativeSingular);
+            config.read("star-plural", g_gameInfo.wordStarAccusativePlural, g_gameInfo.wordStarAccusativeSingular + "s");
         }
         config.endGroup();
 
