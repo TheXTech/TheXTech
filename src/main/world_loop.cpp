@@ -35,6 +35,7 @@
 #include "../core/events.h"
 #include "../compat.h"
 #include "../config.h"
+#include "gfx.h"
 #include "world_globals.h"
 #include "level_file.h"
 #include "speedrunner.h"
@@ -74,6 +75,11 @@ void worldWaitForFade(int waitTicks)
     }
 }
 
+
+bool worldHasFrameAssets()
+{
+    return GFX.WorldMapFrame_Tile.inited && (!GFX.Interface[4].inited || !GFX.isCustom(37) || GFX.isCustom(69));
+}
 
 static inline int computeStarsShowingPolicy(int ll, int cur)
 {
@@ -264,9 +270,10 @@ static void s_SetvScreenWorld(double fx, double fy)
     vScreenX[1] = -fx + vScreen[1].Width / 2.0;
     vScreenY[1] = -fy + vScreen[1].Height / 2.0;
 
-    if(s_currentWorldSection != 0 || !g_config.world_map_expand_view || !g_compatibility.free_world_res)
+    bool allowExpandedFrame = worldHasFrameAssets() /* || g_gameInfo.interface4_stretch*/;
+    if(s_currentWorldSection != 0 || !g_config.world_map_expand_view || !g_compatibility.free_world_res || !allowExpandedFrame)
     {
-        const Location_t& sLoc = ((s_currentWorldSection != 0)
+        const Location_t& sLoc = ((s_currentWorldSection != 0 && allowExpandedFrame)
             ? static_cast<Location_t>(WorldMusic[s_currentWorldSection].Location)
             : newLoc(fx - 334, fy - 202, 668, 404));
 

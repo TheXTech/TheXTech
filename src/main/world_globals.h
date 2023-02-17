@@ -30,4 +30,6 @@ extern void worldResetSection();
 
 extern void worldWaitForFade(int waitTicks = -1);
 
+extern bool worldHasFrameAssets();
+
 #endif // WORLD_GLOBALS_H

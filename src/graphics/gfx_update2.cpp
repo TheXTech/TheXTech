@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <sdl_proxy/sdl_stdinc.h>
+
 #include "../globals.h"
 #include "../gfx.h"
 #include "../frame_timer.h"
@@ -520,7 +522,7 @@ void UpdateGraphics2(bool skipRepaint)
 #endif
 
 //        XRender::renderTexture(0, 0, 800, 130, GFX.Interface[4], 0, 0);
-        if(GFX.WorldMapFrame_Tile.inited && (!GFX.Interface[4].inited || !GFX.isCustom(37) || GFX.isCustom(69)))
+        if(worldHasFrameAssets())
         {
             bool border_valid = GFX.WorldMapFrame_Border.inited && (!GFX.isCustom(69) || GFX.isCustom(70));
 
@@ -531,7 +533,7 @@ void UpdateGraphics2(bool skipRepaint)
         else
         {
             // render a legacy background, in MANY careful segments...
-            constexpr bool do_stretch = false;
+            constexpr bool do_stretch = true;
 
             // top-left
             XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop - 130, 66, 130, GFX.Interface[4], 0, 0);
@@ -548,7 +550,7 @@ void UpdateGraphics2(bool skipRepaint)
                 for(int offset = 0; offset < vScreen[Z].Width; offset += orig_width)
             {
                 XRender::renderTexture(vScreen[Z].ScreenLeft + offset, vScreen[Z].ScreenTop - 130,
-                    SDL_min(vScreen[Z].Width - offset, orig_width), 130,
+                    SDL_min((int)vScreen[Z].Width - offset, orig_width), 130,
                     GFX.Interface[4], 66, 0);
             }
 
@@ -567,7 +569,7 @@ void UpdateGraphics2(bool skipRepaint)
                 for(int offset = 0; offset < vScreen[Z].Height; offset += orig_height)
             {
                 XRender::renderTexture(vScreen[Z].ScreenLeft - 66, vScreen[Z].ScreenTop + offset,
-                    66, SDL_min(vScreen[Z].Height - offset, orig_height),
+                    66, SDL_min((int)vScreen[Z].Height - offset, orig_height),
                     GFX.Interface[4], 0, 130);
             }
 
@@ -583,7 +585,7 @@ void UpdateGraphics2(bool skipRepaint)
                 for(int offset = 20; offset < vScreen[Z].Height; offset += orig_height)
             {
                 XRender::renderTexture(vScreen[Z].ScreenLeft + vScreen[Z].Width, vScreen[Z].ScreenTop + offset,
-                    66, SDL_min(vScreen[Z].Height - offset, orig_height),
+                    66, SDL_min((int)vScreen[Z].Height - offset, orig_height),
                     GFX.Interface[4], GFX.Interface[4].w - 66, 130 + 20);
             }
 
@@ -602,7 +604,7 @@ void UpdateGraphics2(bool skipRepaint)
                 for(int offset = 34; offset < vScreen[Z].Width; offset += orig_width)
             {
                 XRender::renderTexture(vScreen[Z].ScreenLeft + offset, vScreen[Z].ScreenTop + vScreen[Z].Height,
-                    SDL_min(vScreen[Z].Width - offset, orig_width), 66,
+                    SDL_min((int)vScreen[Z].Width - offset, orig_width), 66,
                     GFX.Interface[4], 100, GFX.Interface[4].h - 66);
             }
 
