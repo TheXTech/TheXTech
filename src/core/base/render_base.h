@@ -125,7 +125,14 @@ public:
     virtual void offsetViewportIgnore(bool en) = 0;
 
     /*!
-     * \brief Map absolute point coordinate into screen relative
+     * \brief Get the current size of the window in render pixels
+     * \param w Width
+     * \param h Height
+     */
+    virtual void getRenderSize(int *w, int *h) = 0;
+
+    /*!
+     * \brief Map cursor point coordinate into screen relative
      * \param x Window X position
      * \param y Window Y position
      * \param dx Destinition on-screen X position
@@ -134,7 +141,7 @@ public:
     virtual void mapToScreen(int x, int y, int *dx, int *dy) = 0;
 
     /*!
-     * \brief Map screen relative coordinate into physical canvas
+     * \brief Map screen relative coordinate into cursor coordinate
      * \param x On-screen X position
      * \param y On-screen Y position
      * \param dx Destinition window X position

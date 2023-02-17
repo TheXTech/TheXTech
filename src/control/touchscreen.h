@@ -120,10 +120,14 @@ class TouchScreenController
 {
     //! Count of touch devices
     int m_touchDevicesCount = 0;
-    //! Physical screen width
+    //! Physical screen width (touchscreen coords)
     int m_screenWidth = 0;
-    //! Physical screen height
+    //! Physical screen height (touchscreen coords)
     int m_screenHeight = 0;
+    //! Physical screen width (render coords)
+    int m_renderWidth = 0;
+    //! Physical screen height (render coords)
+    int m_renderHeight = 0;
     //! Graphics for controller
     TouchScreenGFX_t m_GFX;
 

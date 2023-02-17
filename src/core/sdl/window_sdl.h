@@ -104,14 +104,14 @@ public:
     void restoreWindow() override;
 
     /**
-     * @brief Change window size
+     * @brief Change window size in cursor pixels
      * @param w Width
      * @param h Height
      */
     void setWindowSize(int w, int h) override;
 
     /*!
-     * \brief Get the current size of the window
+     * \brief Get the current size of the window in cursor pixels
      * \param w Width
      * \param h Height
      */

@@ -95,7 +95,7 @@ void UpdateInternalRes()
     {
         int int_w, int_h, orig_int_h;
 
-        XWindow::getWindowSize(&int_w, &int_h);
+        XRender::getRenderSize(&int_w, &int_h);
         orig_int_h = int_h;
 
         // set internal height first
