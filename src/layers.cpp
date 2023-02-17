@@ -360,50 +360,51 @@ void ShowLayer(layerindex_t L, bool NoEffect)
     int B = 0;
     Location_t tempLocation;
 
-    {
+    Layer[L].Hidden = false;
+    if(L == LAYER_DESTROYED_BLOCKS)
+        Layer[L].Hidden = true;
+
+    if(L == LAYER_SPAWNED_NPCS)
         Layer[L].Hidden = false;
-        if(L == LAYER_DESTROYED_BLOCKS)
-            Layer[L].Hidden = true;
-        if(L == LAYER_SPAWNED_NPCS)
-            Layer[L].Hidden = false;
-    }
 
     for(int A : Layer[L].NPCs)
     {
-            if(NPC[A].Hidden)
+        if(NPC[A].Hidden)
+        {
+            if(!NoEffect && !NPC[A].Generator)
             {
-                if(!NoEffect && !NPC[A].Generator)
-                {
-                    tempLocation = NPC[A].Location;
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                    NewEffect(10, tempLocation);
-                }
+                tempLocation = NPC[A].Location;
+                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                NewEffect(10, tempLocation);
+            }
 
-                if(!LevelEditor)
+            if(!LevelEditor)
+            {
+                if(!NPCWontHurt[NPC[A].Type] && !NPCIsABonus[NPC[A].Type] && NPC[A].Active)
                 {
-                    if(!NPCWontHurt[NPC[A].Type] && !NPCIsABonus[NPC[A].Type] && NPC[A].Active)
+                    for(B = 1; B <= numPlayers; B++)
                     {
-                        for(B = 1; B <= numPlayers; B++)
-                        {
-                            if(CheckCollision(Player[B].Location, NPC[A].Location))
-                                Player[B].Immune = 120;
-                        }
+                        if(CheckCollision(Player[B].Location, NPC[A].Location))
+                            Player[B].Immune = 120;
                     }
                 }
             }
-            NPC[A].Hidden = false;
-            NPC[A].GeneratorActive = true;
-            NPC[A].Reset[1] = true;
-            NPC[A].Reset[2] = true;
-            if(!NPC[A].Generator)
-            {
-                NPC[A].Active = true;
-                NPC[A].TimeLeft = 1;
+        }
+        NPC[A].Hidden = false;
+        NPC[A].GeneratorActive = true;
+        NPC[A].Reset[1] = true;
+        NPC[A].Reset[2] = true;
 
-                NPCQueues::Active.insert(A);
-            }
-            CheckSectionNPC(A);
+        if(!NPC[A].Generator)
+        {
+            NPC[A].Active = true;
+            NPC[A].TimeLeft = 1;
+
+            NPCQueues::Active.insert(A);
+        }
+
+        CheckSectionNPC(A);
     }
 
     if(!Layer[L].blocks.empty())
@@ -411,20 +412,20 @@ void ShowLayer(layerindex_t L, bool NoEffect)
 
     for(int A : Layer[L].blocks)
     {
-            // If Not (Block(A).DefaultType = 0 And Block(A).Layer = "Destroyed Blocks") Then
-            if(Block[A].Hidden)
+        // If Not (Block(A).DefaultType = 0 And Block(A).Layer = "Destroyed Blocks") Then
+        if(Block[A].Hidden)
+        {
+            if(!NoEffect && !Block[A].Invis)
             {
-                if(!NoEffect && !Block[A].Invis)
-                {
-                    tempLocation = Block[A].Location;
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                    NewEffect(10, tempLocation);
-                }
+                tempLocation = Block[A].Location;
+                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                NewEffect(10, tempLocation);
             }
-            Block[A].Hidden = false;
+        }
+        Block[A].Hidden = false;
 
-            // moved code to restore all hit blocks below
+        // moved code to restore all hit blocks below
     }
 
     if(!Layer[L].BGOs.empty())
@@ -432,17 +433,17 @@ void ShowLayer(layerindex_t L, bool NoEffect)
 
     for(int A : Layer[L].BGOs)
     {
-            if(Background[A].Hidden)
+        if(Background[A].Hidden)
+        {
+            if(!NoEffect)
             {
-                if(!NoEffect)
-                {
-                    tempLocation = Background[A].Location;
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                    NewEffect(10, tempLocation);
-                }
+                tempLocation = Background[A].Location;
+                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                NewEffect(10, tempLocation);
             }
-            Background[A].Hidden = false;
+        }
+        Background[A].Hidden = false;
     }
 
     for(int A : Layer[L].warps)
@@ -483,21 +484,23 @@ void HideLayer(layerindex_t L, bool NoEffect)
 
     for(int A : Layer[L].NPCs)
     {
-            if(!NPC[A].Hidden)
+        if(!NPC[A].Hidden)
+        {
+            if(!NoEffect && !NPC[A].Generator)
             {
-                if(!NoEffect && !NPC[A].Generator)
-                {
-                    tempLocation = NPC[A].Location;
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                    NewEffect(10, tempLocation);
-                }
+                tempLocation = NPC[A].Location;
+                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                NewEffect(10, tempLocation);
             }
-            NPC[A].Hidden = true;
-            if(!NPC[A].Generator)
-            {
-                Deactivate(A);
-            }
+        }
+
+        NPC[A].Hidden = true;
+
+        if(!NPC[A].Generator)
+        {
+            Deactivate(A);
+        }
     }
 
     if(!Layer[L].blocks.empty())
@@ -505,17 +508,17 @@ void HideLayer(layerindex_t L, bool NoEffect)
 
     for(int A : Layer[L].blocks)
     {
-            if(!Block[A].Hidden)
+        if(!Block[A].Hidden)
+        {
+            if(!NoEffect && !Block[A].Invis)
             {
-                if(!NoEffect && !Block[A].Invis)
-                {
-                    tempLocation = Block[A].Location;
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                    NewEffect(10, tempLocation);
-                }
+                tempLocation = Block[A].Location;
+                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                NewEffect(10, tempLocation);
             }
-            Block[A].Hidden = true;
+        }
+        Block[A].Hidden = true;
     }
 
     if(!Layer[L].BGOs.empty())
@@ -523,17 +526,17 @@ void HideLayer(layerindex_t L, bool NoEffect)
 
     for(int A : Layer[L].BGOs)
     {
-            if(!Background[A].Hidden)
+        if(!Background[A].Hidden)
+        {
+            if(!NoEffect)
             {
-                if(!NoEffect)
-                {
-                    tempLocation = Background[A].Location;
-                    tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
-                    tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                    NewEffect(10, tempLocation);
-                }
+                tempLocation = Background[A].Location;
+                tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
+                tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
+                NewEffect(10, tempLocation);
             }
-            Background[A].Hidden = true;
+        }
+        Background[A].Hidden = true;
     }
 
     for(int A : Layer[L].warps)
@@ -581,14 +584,17 @@ bool SwapEvents(eventindex_t index_1, eventindex_t index_2)
             NPC[A].TriggerTalk = index_2;
         else if(NPC[A].TriggerTalk == index_2)
             NPC[A].TriggerTalk = index_1;
+
         if(NPC[A].TriggerDeath == index_1)
             NPC[A].TriggerDeath = index_2;
         else if(NPC[A].TriggerDeath == index_2)
             NPC[A].TriggerDeath = index_1;
+
         if(NPC[A].TriggerLast == index_1)
             NPC[A].TriggerLast = index_2;
         else if(NPC[A].TriggerLast == index_2)
             NPC[A].TriggerLast = index_1;
+
         if(NPC[A].TriggerActivate == index_1)
             NPC[A].TriggerActivate = index_2;
         else if(NPC[A].TriggerActivate == index_2)
@@ -601,10 +607,12 @@ bool SwapEvents(eventindex_t index_1, eventindex_t index_2)
             Block[A].TriggerHit = index_2;
         else if(Block[A].TriggerHit == index_2)
             Block[A].TriggerHit = index_1;
+
         if(Block[A].TriggerDeath == index_1)
             Block[A].TriggerDeath = index_2;
         else if(Block[A].TriggerDeath == index_2)
             Block[A].TriggerDeath = index_1;
+
         if(Block[A].TriggerLast == index_1)
             Block[A].TriggerLast = index_2;
         else if(Block[A].TriggerLast == index_2)
@@ -632,9 +640,7 @@ bool SwapEvents(eventindex_t index_1, eventindex_t index_2)
 
 bool RenameEvent(eventindex_t index, const std::string& NewName)
 {
-    if(index == EVENT_NONE)
-        return false;
-    if(NewName.empty())
+    if(index == EVENT_NONE || NewName.empty())
         return false;
 
     Events[index].Name = NewName;
@@ -797,6 +803,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                     }
                                 }
                             }
+
                             if(!tempBool)
                             {
                                 for(D = 1; D <= numPlayers; D++)
@@ -1063,14 +1070,10 @@ void ProcEvent(eventindex_t index, bool NoEffect)
             }
 
             for(auto &l : evt.HideLayer)
-            {
                 HideLayer(l, NoEffect ? true : evt.LayerSmoke);
-            }
 
             for(auto &l : evt.ShowLayer)
-            {
                 ShowLayer(l, NoEffect ? true : evt.LayerSmoke);
-            }
 
             for(auto &l : evt.ToggleLayer)
             {
@@ -1116,59 +1119,60 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
             if(evt.MoveLayer != LAYER_NONE)
             {
+
+                B = evt.MoveLayer;
+
+                Layer[B].EffectStop = true;
+                Layer[B].SpeedX = evt.SpeedX;
+                Layer[B].SpeedY = evt.SpeedY;
+
+                if(Layer[B].SpeedX == 0.f && Layer[B].SpeedY == 0.f)
                 {
-                    B = evt.MoveLayer;
+                    // stop layer
+                    Layer[B].EffectStop = false;
+                    for(int C : Layer[B].blocks)
                     {
-                        Layer[B].EffectStop = true;
-                        Layer[B].SpeedX = evt.SpeedX;
-                        Layer[B].SpeedY = evt.SpeedY;
-                        if(Layer[B].SpeedX == 0.f && Layer[B].SpeedY == 0.f)
+                        Block[C].Location.SpeedX = double(Layer[B].SpeedX);
+                        Block[C].Location.SpeedY = double(Layer[B].SpeedY);
+                    }
+
+                    if(g_compatibility.enable_climb_bgo_layer_move)
+                    {
+                        for(int C : Layer[B].BGOs)
                         {
-                            // stop layer
-                            Layer[B].EffectStop = false;
-                            for(int C : Layer[B].blocks)
+                            if(BackgroundFence[Background[C].Type])
                             {
-                                Block[C].Location.SpeedX = double(Layer[B].SpeedX);
-                                Block[C].Location.SpeedY = double(Layer[B].SpeedY);
+                                Background[C].Location.SpeedX = double(Layer[B].SpeedX);
+                                Background[C].Location.SpeedY = double(Layer[B].SpeedY);
                             }
-                            if(g_compatibility.enable_climb_bgo_layer_move)
-                            {
-                                for(int C : Layer[B].BGOs)
-                                {
-                                    if(BackgroundFence[Background[C].Type])
-                                    {
-                                        Background[C].Location.SpeedX = double(Layer[B].SpeedX);
-                                        Background[C].Location.SpeedY = double(Layer[B].SpeedY);
-                                    }
-                                }
-                            }
-                            for(int C : Layer[B].NPCs)
-                            {
-                                if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
-                                {
-                                    NPC[C].Location.SpeedX = 0;
-                                    NPC[C].Location.SpeedY = 0;
-                                }
-                            }
-
-                            // eventually, only re-join tables the first time the event has been triggered in a level
-                            treeBlockJoinLayer(B);
-                            treeBackgroundJoinLayer(B);
-                            treeWaterJoinLayer(B);
-                        }
-                        else
-                        {
-                            // these thresholds can be tweaked, but they balance the expense of querying more tables with the expense of updating locations in the main table
-                            if(Layer[B].blocks.size() > 2)
-                                treeBlockSplitLayer(B);
-
-                            if(Layer[B].BGOs.size() > 2)
-                                treeBackgroundSplitLayer(B);
-
-                            if(Layer[B].waters.size() > 2)
-                                treeWaterSplitLayer(B);
                         }
                     }
+
+                    for(int C : Layer[B].NPCs)
+                    {
+                        if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
+                        {
+                            NPC[C].Location.SpeedX = 0;
+                            NPC[C].Location.SpeedY = 0;
+                        }
+                    }
+
+                    // eventually, only re-join tables the first time the event has been triggered in a level
+                    treeBlockJoinLayer(B);
+                    treeBackgroundJoinLayer(B);
+                    treeWaterJoinLayer(B);
+                }
+                else
+                {
+                    // these thresholds can be tweaked, but they balance the expense of querying more tables with the expense of updating locations in the main table
+                    if(Layer[B].blocks.size() > 2)
+                        treeBlockSplitLayer(B);
+
+                    if(Layer[B].BGOs.size() > 2)
+                        treeBackgroundSplitLayer(B);
+
+                    if(Layer[B].waters.size() > 2)
+                        treeWaterSplitLayer(B);
                 }
             }
 
@@ -1412,10 +1416,8 @@ void UpdateLayers()
                 // Block-stopping code from earlier. Now together with the compat BGO layer move code.
                 for(int B : Layer[A].blocks)
                 {
-                    {
-                        Block[B].Location.SpeedX = 0;
-                        Block[B].Location.SpeedY = 0;
-                    }
+                    Block[B].Location.SpeedX = 0;
+                    Block[B].Location.SpeedY = 0;
                 }
 
                 if(g_compatibility.enable_climb_bgo_layer_move)
@@ -1456,9 +1458,7 @@ void UpdateLayers()
                 if(!Layer[A].blocks.empty() && Layer[A].SpeedX != 0.f && g_compatibility.emulate_classic_block_order)
                 {
                     if(BlocksSorted)
-                    {
                         BlocksSorted = false;
-                    }
                 }
 
                 if(!Layer[A].blocks.empty())
@@ -1483,15 +1483,15 @@ void UpdateLayers()
                 for(int B : Layer[A].blocks)
                 {
                     // if(Block[B].Layer == Layer[A].Name)
-                    {
-                        Block[B].Location.X += double(Layer[A].SpeedX);
-                        Block[B].Location.Y += double(Layer[A].SpeedY);
-                        Block[B].Location.SpeedX = double(Layer[A].SpeedX);
-                        Block[B].Location.SpeedY = double(Layer[A].SpeedY);
+                    //{
+                    Block[B].Location.X += double(Layer[A].SpeedX);
+                    Block[B].Location.Y += double(Layer[A].SpeedY);
+                    Block[B].Location.SpeedX = double(Layer[A].SpeedX);
+                    Block[B].Location.SpeedY = double(Layer[A].SpeedY);
 
-                        if(inactive)
-                            treeBlockUpdateLayer(A, B);
-                    }
+                    if(inactive)
+                        treeBlockUpdateLayer(A, B);
+                    //}
                 }
 
                 // is the layer currently included in the main BGO quadtree?
@@ -1501,18 +1501,18 @@ void UpdateLayers()
                 for(int B : Layer[A].BGOs)
                 {
                     // if(Background[B].Layer == Layer[A].Name)
+                    //{
+                    Background[B].Location.X += double(Layer[A].SpeedX);
+                    Background[B].Location.Y += double(Layer[A].SpeedY);
+                    if(g_compatibility.enable_climb_bgo_layer_move && BackgroundFence[Background[B].Type])
                     {
-                        Background[B].Location.X += double(Layer[A].SpeedX);
-                        Background[B].Location.Y += double(Layer[A].SpeedY);
-                        if(g_compatibility.enable_climb_bgo_layer_move && BackgroundFence[Background[B].Type])
-                        {
-                            Background[B].Location.SpeedX = double(Layer[A].SpeedX);
-                            Background[B].Location.SpeedY = double(Layer[A].SpeedY);
-                        }
-
-                        if(inactive)
-                            treeBackgroundUpdateLayer(A, B);
+                        Background[B].Location.SpeedX = double(Layer[A].SpeedX);
+                        Background[B].Location.SpeedY = double(Layer[A].SpeedY);
                     }
+
+                    if(inactive)
+                        treeBackgroundUpdateLayer(A, B);
+                    //}
                 }
 
                 // is the layer currently included in the main water quadtree?
@@ -1521,13 +1521,13 @@ void UpdateLayers()
                 for(int B : Layer[A].waters)
                 {
                     // if(Water[B].Layer == Layer[A].Name)
-                    {
-                        Water[B].Location.X += double(Layer[A].SpeedX);
-                        Water[B].Location.Y += double(Layer[A].SpeedY);
+                    //{
+                    Water[B].Location.X += double(Layer[A].SpeedX);
+                    Water[B].Location.Y += double(Layer[A].SpeedY);
 
-                        if(inactive)
-                            treeWaterUpdateLayer(A, B);
-                    }
+                    if(inactive)
+                        treeWaterUpdateLayer(A, B);
+                    //}
                 }
 
                 for(int B : Layer[A].NPCs)
@@ -1596,12 +1596,10 @@ void UpdateLayers()
 
                 for(int B : Layer[A].warps)
                 {
-                    {
-                        Warp[B].Entrance.X += double(Layer[A].SpeedX);
-                        Warp[B].Entrance.Y += double(Layer[A].SpeedY);
-                        Warp[B].Exit.X += double(Layer[A].SpeedX);
-                        Warp[B].Exit.Y += double(Layer[A].SpeedY);
-                    }
+                    Warp[B].Entrance.X += double(Layer[A].SpeedX);
+                    Warp[B].Entrance.Y += double(Layer[A].SpeedY);
+                    Warp[B].Exit.X += double(Layer[A].SpeedX);
+                    Warp[B].Exit.Y += double(Layer[A].SpeedY);
                 }
             }
         }
