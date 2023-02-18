@@ -468,8 +468,8 @@
     },
     "languageName": "简体中文",
     "objects": {
-        "wordStarAccusativeDual": "",
-        "wordStarAccusativePlural": "",
-        "wordStarAccusativeSingular": ""
+        "wordStarAccusativeDual": "星星",
+        "wordStarAccusativePlural": "星星",
+        "wordStarAccusativeSingular": "星星"
     }
 }
