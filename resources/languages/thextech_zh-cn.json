@@ -80,7 +80,7 @@
         },
         "error": {
             "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。",
-            "warpNeedStarCount": ""
+            "warpNeedStarCount": "你需要{0}颗{1}才能进入此传送点。"
         }
     },
     "languageName": "简体中文",
