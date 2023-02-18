@@ -49,9 +49,11 @@ ScreenFader g_worldScreenFader;
 
 // world music index of the current world section
 static int s_currentWorldSection = 0;
-static bool s_playSound = false;
+static bool s_playCamSound = false;
+static int s_camMult = 1;
 static double s_pathX = 0;
 static double s_pathY = 0;
+
 
 void worldWaitForFade(int waitTicks)
 {
@@ -187,7 +189,7 @@ static inline bool s_worldUpdateMusic(const Location_t &loc, bool section_only =
         if(!qScreen)
         {
             qScreen = true;
-            s_playSound = true;
+            s_playCamSound = true;
             qScreenX[1] = vScreenX[1];
             qScreenY[1] = vScreenY[1];
             qScreenLoc[1] = vScreen[1];
@@ -327,12 +329,15 @@ void WorldLoop()
 
     if(qScreen)
     {
-        qScreen = Update_qScreen(1, 4, 4);
+        qScreen = Update_qScreen(1, 4 * s_camMult, 4 * s_camMult);
 
-        if(qScreen && s_playSound)
+        if(qScreen && s_playCamSound)
             PlaySound(SFX_Camera);
 
-        s_playSound = false;
+        if(!qScreen)
+            s_camMult = 1;
+
+        s_playCamSound = false;
     }
 
     if(numPlayers > 2)
@@ -381,10 +386,6 @@ void WorldLoop()
                     s.max = l.maxStars;
                     s.displayPolicy = computeStarsShowingPolicy(l.starsShowPolicy, s.cur);
                     LevelPath(l, A);
-                    qScreen = true;
-                    qScreenX[1] = vScreenX[1];
-                    qScreenY[1] = vScreenY[1];
-                    qScreenLoc[1] = vScreen[1];
                 }
             }
 
@@ -414,13 +415,7 @@ void WorldLoop()
             }
 
             if(curWorldLevel > 0)
-            {
                 LevelPath(WorldLevel[curWorldLevel], 5);
-                qScreen = true;
-                qScreenX[1] = vScreenX[1];
-                qScreenY[1] = vScreenY[1];
-                qScreenLoc[1] = vScreen[1];
-            }
 
             SaveGame();
             LevelBeatCode = 0;
@@ -939,6 +934,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
+                    s_camMult = 3;
                 }
             }
         }
@@ -963,6 +959,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
+                    s_camMult = 3;
                 }
             }
         }
@@ -987,6 +984,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
+                    s_camMult = 3;
                 }
             }
         }
@@ -1011,10 +1009,16 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
                 if(CheckCollision(tempLocation, path.Location))
                 {
                     PathPath(path, Skp);
+                    s_camMult = 3;
                 }
             }
         }
     }
+
+    qScreen = true;
+    qScreenX[1] = vScreenX[1];
+    qScreenY[1] = vScreenY[1];
+    qScreenLoc[1] = vScreen[1];
 }
 
 void PlayerPath(WorldPlayer_t &p)
@@ -1124,7 +1128,7 @@ void PathPath(WorldPath_t &Pth, bool Skp)
 
         s_worldUpdateMusic(static_cast<Location_t>(Pth.Location), true);
 
-        s_playSound = false;
+        s_playCamSound = false;
 
         if(g_compatibility.modern_section_change)
         {
@@ -1202,7 +1206,7 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                     {
                         s_worldUpdateMusic(static_cast<Location_t>(lev.Location), true);
 
-                        s_playSound = false;
+                        s_playCamSound = false;
 
                         if(g_compatibility.modern_section_change)
                         {
@@ -1242,8 +1246,15 @@ void PathWait()
             speedRun_tick();
 
             s_SetvScreenWorld(s_pathX, s_pathY);
+
             if(qScreen)
-                qScreen = Update_qScreen(1, 2, 4);
+            {
+                pLogDebug("Mult %d", s_camMult);
+                qScreen = Update_qScreen(1, 2 * s_camMult, 2 * s_camMult);
+
+                if(!qScreen)
+                    s_camMult = 1;
+            }
 
             UpdateGraphics2();
             UpdateSound();

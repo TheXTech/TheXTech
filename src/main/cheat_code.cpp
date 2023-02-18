@@ -176,13 +176,7 @@ static void openSesame()
             found = true;
 
             for(int A = 1; A <= 4; A++)
-            {
                 LevelPath(lev, A);
-                qScreen = true;
-                qScreenX[1] = vScreenX[1];
-                qScreenY[1] = vScreenY[1];
-                qScreenLoc[1] = vScreen[1];
-            }
         }
     }
 
