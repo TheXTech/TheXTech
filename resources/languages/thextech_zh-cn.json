@@ -82,6 +82,7 @@
             "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。",
             "counterWordStar": "颗",
             "counterWordLeek": "根",
+            "counterWordCustom": "",
             "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。"
         }
     },
