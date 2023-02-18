@@ -4541,7 +4541,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     if(warp.Stars > numStars && canWarp)
     {
         if(warp.StarsMsg == STRINGINDEX_NONE)
-            MessageText = fmt::format_ne(g_gameStrings.warpNeedStarCount, warp.Stars, LanguageFormatNumber(warp.Stars, g_gameInfo.wordStarAccusativeSingular, g_gameInfo.wordStarAccusativeDual, g_gameInfo.wordStarAccusativePlural));
+            MessageText = fmt::format_ne(g_gameStrings.warpNeedStarCount, warp.Stars, LanguageFormatNumber(warp.Stars, g_gameInfo.wordStarAccusativeSingular, g_gameInfo.wordStarAccusativeDual_Cnt, g_gameInfo.wordStarAccusativePlural), g_gameInfo.wordStarAccusativeDual_Cnt);
         else
             MessageText = GetS(warp.StarsMsg);
 

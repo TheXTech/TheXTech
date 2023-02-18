@@ -35,7 +35,7 @@ struct GameInfo
     RangeArr<std::string, 1, numCharacters> characterName;
 
     std::string wordStarAccusativeSingular;
-    std::string wordStarAccusativeDual;
+    std::string wordStarAccusativeDual_Cnt;
     std::string wordStarAccusativePlural;
 
     bool disableBattleMode = true;

@@ -468,7 +468,7 @@
     },
     "languageName": "Русский",
     "objects": {
-        "wordStarAccusativeDual": "",
+        "wordStarAccusativeDualOrCounter": "",
         "wordStarAccusativePlural": "",
         "wordStarAccusativeSingular": ""
     }

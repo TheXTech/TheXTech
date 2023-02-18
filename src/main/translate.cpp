@@ -331,7 +331,7 @@ XTechTranslate::XTechTranslate()
         {"languageName", &g_mainMenu.languageName},
 
         {"objects.wordStarAccusativeSingular", &g_gameInfo.wordStarAccusativeSingular},
-        {"objects.wordStarAccusativeDual", &g_gameInfo.wordStarAccusativeDual},
+        {"objects.wordStarAccusativeDualOrCounter", &g_gameInfo.wordStarAccusativeDual_Cnt},
         {"objects.wordStarAccusativePlural", &g_gameInfo.wordStarAccusativePlural},
     };
 

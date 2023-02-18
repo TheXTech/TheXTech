@@ -71,7 +71,7 @@ void initGameInfo()
     g_gameInfo.characterName[5] = "Link";
 
     g_gameInfo.wordStarAccusativeSingular = "star";
-    g_gameInfo.wordStarAccusativeDual = "";
+    g_gameInfo.wordStarAccusativeDual_Cnt = "";
     g_gameInfo.wordStarAccusativePlural = "stars";
 
     g_gameInfo.creditsFont = 4;
