@@ -460,7 +460,11 @@ bool Logic(int plr)
                         SwapCharacter(A, target);
 
                         if(LevelSelect)
+                        {
+                            vScreen_t backup = vScreen[1];
                             SetupPlayers();
+                            vScreen[1] = backup;
+                        }
                     }
                 }
             }
