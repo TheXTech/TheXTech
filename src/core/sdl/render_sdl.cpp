@@ -160,6 +160,11 @@ void RenderSDL::close()
     m_gRenderer = nullptr;
 }
 
+void RenderSDL::togglehud()
+{
+    // empty
+}
+
 void RenderSDL::repaint()
 {
 #ifdef USE_RENDER_BLOCKING
@@ -454,9 +459,9 @@ void RenderSDL::loadTextureMask(StdPicture &target, uint32_t width, uint32_t hei
         SDL_SetTextureBlendMode(target.d.mask_texture, SDL_BLENDMODE_MOD);
     }
 
-    // set image's render mode (maximum)
-    SDL_BlendMode blend_image = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MAXIMUM,
-        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MAXIMUM);
+    // set image's render mode (soft-add)
+    SDL_BlendMode blend_image = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,
+        SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
 
     if(SDL_SetTextureBlendMode(target.d.texture, blend_image))
     {
@@ -474,8 +479,8 @@ bool RenderSDL::textureMaskSupported()
     SDL_BlendMode blend_mask = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MINIMUM,
         SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MINIMUM);
 
-    SDL_BlendMode blend_image = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MAXIMUM,
-        SDL_BLENDFACTOR_SRC_ALPHA, SDL_BLENDFACTOR_ONE_MINUS_SRC_ALPHA, SDL_BLENDOPERATION_MAXIMUM);
+    SDL_BlendMode blend_image = SDL_ComposeCustomBlendMode(SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD,
+        SDL_BLENDFACTOR_ONE_MINUS_DST_COLOR, SDL_BLENDFACTOR_ONE, SDL_BLENDOPERATION_ADD);
 
     // check that both blend modes are supported
     bool okay = !(SDL_SetRenderDrawBlendMode(m_gRenderer, blend_mask) || SDL_SetRenderDrawBlendMode(m_gRenderer, blend_image));
