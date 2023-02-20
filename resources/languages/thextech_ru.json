@@ -8,87 +8,87 @@
     },
     "editor": {
         "block": {
-            "pickContents1": "",
-            "pickContents2": ""
+            "pickContents1": "Взять блок",
+            "pickContents2": "содержимое"
         },
         "events": {
-            "header": "",
-            "letterActivate": "",
-            "letterDeath": "",
-            "letterLayerClear": "",
-            "letterTalk": ""
+            "header": "События:",
+            "letterActivate": "Ак:",
+            "letterDeath": "См:",
+            "letterLayerClear": "Сл:",
+            "letterTalk": "Гв:"
         },
         "layer": {
-            "label": "",
-            "labelAbbrevAttLayer": ""
+            "label": "Слой:",
+            "labelAbbrevAttLayer": "Прис.: "
         },
         "npc": {
-            "abbrevGen": "",
+            "abbrevGen": "Ген.",
             "ai": {
-                "LR": "",
-                "UD": "",
-                "aiIs": "",
-                "headerCustomAi": "",
-                "jump": "",
-                "leap": "",
-                "swim": "",
-                "target": "",
-                "use1_0Ai": ""
+                "LR": "ЛП",
+                "UD": "ВН",
+                "aiIs": "ИИ: {0}",
+                "headerCustomAi": "Свой ИИ:",
+                "jump": "Прыг",
+                "leap": "Скок",
+                "swim": "Плав.",
+                "target": "Цель",
+                "use1_0Ai": "Исп. ИИ 1.0?"
             },
             "gen": {
-                "delayIsMs": "",
-                "direction": "",
-                "effectIs": "",
-                "effectShoot": "",
-                "effectWarp": "",
-                "header": ""
+                "delayIsMs": "Период: {0} мс",
+                "direction": "Направление",
+                "effectIs": "Эффект: {0}",
+                "effectShoot": "Выстрел",
+                "effectWarp": "Выползание",
+                "header": "Настройки генератора"
             },
-            "inContainer": "",
-            "inertNice": "",
-            "stuckStop": "",
-            "tooltipExpandSection": ""
+            "inContainer": "В",
+            "inertNice": "Чувств.",
+            "stuckStop": "Стоп",
+            "tooltipExpandSection": "Расширить секцию"
         },
-        "phraseRadiusIndex": "",
-        "phraseSectionIndex": "",
-        "phraseTextOf": "",
+        "phraseRadiusIndex": "Радиус {0}",
+        "phraseSectionIndex": "Секция {0}",
+        "phraseTextOf": "Текст \"{0}\"",
         "warp": {
             "transit": {
-                "name0": "",
-                "name1": "",
-                "name2": "",
-                "name3": "",
-                "name4": "",
-                "name5": ""
+                "name0": "НЕТ",
+                "name1": "ПРОКРУТКА",
+                "name2": "ПЕРЕХОД",
+                "name3": "КРУГ",
+                "name4": "ОТРАЖ. (Г)",
+                "name5": "ОТРАЖ. (В)"
             }
         },
-        "wordCoins": "",
-        "wordEnabled": "",
+        "wordCoins": "Монетки",
+        "wordEnabled": "Включено",
         "wordEvent": {
-            "genitive": "",
-            "nominative": ""
+            "genitive": "События",
+            "nominative": "Событие"
         },
         "wordNPC": {
-            "genitive": "",
-            "nominative": ""
+            "genitive": "НИПа",
+            "nominative": "НИП"
         },
-        "wordText": ""
+        "wordText": "Текст"
     },
     "game": {
         "controls": {
-            "phrasePlayerConnected": "",
-            "phrasePlayerDisconnected": ""
+            "phrasePlayerConnected": "И{0} подключил(а) {0}, Профиль: {2}",
+            "phrasePlayerDisconnected": "И{0} отключился(лась)"
         },
         "error": {
-            "openFileFailed": "",
-            "warpNeedStarCount": ""
+            "openFileFailed": "ОШИБКА: Не удаётся открыть \"{0}\": файл не существует или повреждён.",
+            "warpNeedStarCount": "Требуется {0} {1}, чтобы войти."
         }
     },
     "languageName": "Русский",
     "menu": {
         "battle": {
-            "errorNoLevels": ""
+            "errorNoLevels": "Невозможно начать битву потому что нету доступных уровней"
         },
-        "caseNone": "",
+        "caseNone": "<Нет>",
         "character": {
             "charSelTitle": "Выбор персонажа"
         },
@@ -109,7 +109,7 @@
             "errorMissingResources": "Извините, но для встроенного редактора не хватает файла {0}.",
             "errorResolution": "Извините, но встроенный редактор не поддерживает ваше текущее разрешение.",
             "newWorld": "<Новый мир>",
-            "promptNewWorldName": ""
+            "promptNewWorldName": "Имя нового мира"
         },
         "game": {
             "gameBattleRandom": "Случайный уровень",
@@ -122,8 +122,8 @@
             "gameSlotNew": "Слот {0} ... Новая игра",
             "gameSourceSlot": "Что скопировать?",
             "gameTargetSlot": "Куда скопировать?",
-            "phraseScore": "",
-            "phraseTime": ""
+            "phraseScore": "Счёт: {0}",
+            "phraseTime": "Время: {0}"
         },
         "loading": "Загрузка...",
         "main": {
@@ -149,7 +149,7 @@
         "phraseTestControls": "Проверить управление",
         "playerSelStartGame": "Начать игру",
         "reconnectTitle": "Переподключить",
-        "selectCharacter": "{0}",
+        "selectCharacter": "Играть, как {0}",
         "wordBack": "Назад",
         "wordDisconnect": "Отключить",
         "wordNo": "Нет",
