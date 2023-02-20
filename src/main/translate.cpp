@@ -62,6 +62,9 @@ const std::string& LanguageFormatSlavic(int number, const std::string& singular,
 
 const std::string& LanguageFormatNumber(int number, const std::string& singular, const std::string& dual, const std::string& plural)
 {
+    // Ensure it's always positive number
+    number = SDL_abs(number);
+
     if(s_CurrentPluralRules == PluralRules::OneIsSingular)
         return (number == 1) ? singular : plural;
     else if(s_CurrentPluralRules == PluralRules::Slavic)
