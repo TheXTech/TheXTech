@@ -77,7 +77,6 @@ static GLuint s_game_texture_fb = 0;
 
 static constexpr int s_num_buffers = 16;
 static GLuint s_vertex_buffer[s_num_buffers] = {0};
-static GLuint s_texcoord_buffer[s_num_buffers] = {0};
 static int s_cur_buffer_index = 0;
 
 static GLfloat s_transform_matrix[16];
@@ -240,9 +239,8 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     while(err = glGetError())
         pLogWarning("Render GL 230: initing got GL error code %d", (int)err);
 
-    // initialize vertex and texcoord buffers
+    // initialize vertex buffers
     glGenBuffers(s_num_buffers, s_vertex_buffer);
-    glGenBuffers(s_num_buffers, s_texcoord_buffer);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
@@ -250,10 +248,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     for(int i = 0; i < s_num_buffers; i++)
     {
         glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[i]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 8, nullptr, GL_STREAM_DRAW);
-
-        glBindBuffer(GL_ARRAY_BUFFER, s_texcoord_buffer[i]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 8, nullptr, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16, nullptr, GL_STREAM_DRAW);
     }
 
     while(err = glGetError())
@@ -289,13 +284,6 @@ void RenderGLES::close()
         glDeleteBuffers(s_num_buffers, s_vertex_buffer);
         for(int i = 0; i < s_num_buffers; i++)
             s_vertex_buffer[i] = 0;
-    }
-
-    if(s_texcoord_buffer[0])
-    {
-        glDeleteBuffers(s_num_buffers, s_texcoord_buffer);
-        for(int i = 0; i < s_num_buffers; i++)
-            s_texcoord_buffer[i] = 0;
     }
 
     if(m_gContext)
@@ -380,15 +368,20 @@ void RenderGLES::repaint()
         float y1 = 0;
         float y2 = 600;
 
-        const GLfloat world_coords[] = {x1, y1,
+        const GLfloat vertex_attribs[] =
+        {
+            // positions
+            x1, y1,
             x1, y2,
             x2, y1,
-            x2, y2};
+            x2, y2,
 
-        const GLfloat tex_coords[] = {0.0f, 1.0f,
+            // texcoords
+            0.0f, 1.0f,
             0.0f, 0.0f,
             1.0f, 1.0f,
-            1.0f, 0.0f};
+            1.0f, 0.0f
+        };
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, s_game_texture);
@@ -399,12 +392,9 @@ void RenderGLES::repaint()
             s_cur_buffer_index = 0;
 
         glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(world_coords), world_coords);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-        glBindBuffer(GL_ARRAY_BUFFER, s_texcoord_buffer[s_cur_buffer_index]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tex_coords), tex_coords);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
 
 #if 0
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -1270,13 +1260,17 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
     if(s_cur_buffer_index >= s_num_buffers)
         s_cur_buffer_index = 0;
 
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(world_coords), world_coords);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, world_coords);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, tex_coords);
 
-    glBindBuffer(GL_ARRAY_BUFFER, s_texcoord_buffer[s_cur_buffer_index]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tex_coords), tex_coords);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    // glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+    // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(world_coords), world_coords);
+    // glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    // glBindBuffer(GL_ARRAY_BUFFER, s_texcoord_buffer[s_cur_buffer_index]);
+    // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tex_coords), tex_coords);
+    // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     if(tx.d.mask_texture_id)
     {
