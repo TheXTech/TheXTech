@@ -31,6 +31,8 @@
 #include <Utils/maths.h>
 
 #include "core/sdl/render_gles.h"
+#include "core/sdl/gl_program_object.h"
+
 #include "video.h"
 #include "core/window.h"
 #include "graphics.h"
@@ -45,99 +47,6 @@
 #ifndef UNUSED
 #define UNUSED(x) (void)x
 #endif
-
-GLuint compile_shader(GLenum type, const char* src)
-{
-    // Create the shader object
-    GLuint shader = glCreateShader(type);
-
-    if(!shader)
-    {
-        pLogDebug("Could not allocate shader");
-        return 0;
-    }
-
-    // Load the shader source
-    glShaderSource(shader, 1, &src, nullptr);
-
-    // Compile the shader
-    glCompileShader(shader);
-
-    // Check the compile status
-    GLint status;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
-
-    if(!status)
-    {
-        GLint len = 0;
-
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
-
-        if(len > 1)
-        {
-            char* log = (char*)malloc(len);
-
-            if(log)
-            {
-                glGetShaderInfoLog(shader, len, NULL, log);
-                pLogDebug("Error compiling shader: %s", log);
-                free(log);
-            }
-        }
-
-        glDeleteShader(shader);
-
-        return 0;
-    }
-
-    return shader;
-}
-
-GLuint link_program(GLuint vertex_shader, GLuint fragment_shader)
-{
-    if(!vertex_shader || !fragment_shader)
-        return 0;
-
-    // Create the program object
-    GLuint program = glCreateProgram();
-
-    if(!program)
-        return 0;
-
-    // attach the shaders
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-
-    // Link the program
-    glLinkProgram(program);
-
-    // Check the link status
-    GLint status;
-    glGetProgramiv(program, GL_LINK_STATUS, &status);
-
-    if(!status)
-    {
-        GLint len = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
-
-        if(len > 1)
-        {
-            char* log = (char*)malloc(len);
-
-            if(log)
-            {
-                glGetProgramInfoLog(program, len, NULL, log);
-                pLogDebug("Error linking program: %s", log);
-                free(log);
-            }
-        }
-
-        glDeleteProgram(program);
-        return 0;
-    }
-
-    return program;
-}
 
 
 RenderGLES::RenderGLES() :
@@ -160,9 +69,18 @@ bool RenderGLES::isWorking()
     return m_gContext;
 }
 
-static GLuint s_program = 0;
+// GL values (migrate to RenderGLES class members soon)
+static GLProgramObject s_program;
+
 static GLuint s_game_texture = 0;
 static GLuint s_game_texture_fb = 0;
+
+static constexpr int s_num_buffers = 16;
+static GLuint s_vertex_buffer[s_num_buffers] = {0};
+static GLuint s_texcoord_buffer[s_num_buffers] = {0};
+static int s_cur_buffer_index = 0;
+
+static GLfloat s_transform_matrix[16];
 
 bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 {
@@ -190,6 +108,8 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         return false;
     }
 
+    GLenum err;
+
     int mask, maj_ver, min_ver;
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &mask);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &maj_ver);
@@ -206,8 +126,6 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     // SDL_GetRendererInfo(m_gRenderer, &ri);
 
     glEnable(GL_BLEND);
-    // glEnableClientState(GL_VERTEX_ARRAY);
-    // glEnableClientState(GL_TEXTURE_COORD_ARRAY);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     GLint maxTextureSize = 256;
@@ -219,6 +137,9 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     {
         glGenTextures(1, &s_game_texture);
     }
+
+    while(err = glGetError())
+        pLogWarning("Render GL 138: initing got GL error code %d", (int)err);
 
     if(s_game_texture_fb && s_game_texture)
     {
@@ -240,6 +161,9 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             pLogWarning("Render GL: could not allocate game screen texture (%d). Falling back to screen-space scaling.", (int)err);
             glDeleteTextures(1, &s_game_texture);
             s_game_texture = 0;
+
+            glDeleteFramebuffers(1, &s_game_texture_fb);
+            s_game_texture_fb = 0;
         }
     }
 
@@ -254,6 +178,9 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             glDeleteTextures(1, &s_game_texture);
             s_game_texture = 0;
 
+            glDeleteFramebuffers(1, &s_game_texture_fb);
+            s_game_texture_fb = 0;
+
             pLogWarning("Render GL: could not bind framebuffer texture target (%d). Falling back to screen-space scaling.", (int)status);
         }
         else
@@ -263,47 +190,74 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    while(err = glGetError())
+        pLogWarning("Render GL 187: initing got GL error code %d", (int)err);
+
     glActiveTexture(GL_TEXTURE0);
 
     m_maxTextureWidth = maxTextureSize;
     m_maxTextureHeight = maxTextureSize;
 
-    s_program = link_program(
-        compile_shader(GL_VERTEX_SHADER,
-            "#version 100                  \n"
-            "attribute vec2 a_position;    \n"
-            "attribute vec2 a_texcoord;     \n"
-            "varying   vec2 v_texcoord;     \n"
+    while(err = glGetError())
+        pLogWarning("Render GL 198: initing got GL error code %d", (int)err);
+
+    s_program = GLProgramObject(
+        (
+            "#version 100                 \n"
+            "uniform   mat4 u_transform;  \n"
+            "attribute vec2 a_position;   \n"
+            "attribute vec2 a_texcoord;   \n"
+            "varying   vec2 v_texcoord;   \n"
             "void main()                  \n"
             "{                            \n"
-            "   gl_Position = vec4(a_position.x * 2.0 / 800.0 - 1.0, a_position.y * 2.0 / -600.0 + 1.0, 0, 1);  \n"
+            "   gl_Position = vec4(a_position.x * 2.0 / 800.0 - 1.0, "
+            "        a_position.y * 2.0 / -600.0 + 1.0, 0, 1);  \n"
             "   v_texcoord = a_texcoord;  \n"
             "}                            \n"
         ),
-        compile_shader(GL_FRAGMENT_SHADER,
+        (
             "#version 100                  \n"
             "precision mediump float;\n"
             "varying   vec2      v_texcoord;     \n"
             "uniform   sampler2D u_texture;  \n"
+            "uniform   vec4      u_tint;     \n"
             "void main()                                  \n"
             "{                                            \n"
             "  vec4 l_color = texture2D(u_texture, v_texcoord);\n"
             // "  l_color.r += v_texcoord.x;\n"
             // "  l_color.g += v_texcoord.y;\n"
             // "  l_color.a *= 0.5;\n"
-            "  gl_FragColor = l_color;\n"
+            "  gl_FragColor = u_tint * l_color;\n"
             "}                                            \n"
         )
     );
 
-    GLint posloc = glGetAttribLocation(s_program, "a_position");
-    GLint poscoord = glGetAttribLocation(s_program, "a_texcoord");
-    GLint postex = glGetUniformLocation(s_program, "u_texture");
-    pLogDebug("Compiled with locations at %d %d %d", posloc, poscoord, postex);
+    while(err = glGetError())
+        pLogWarning("Render GL 225: initing got GL error code %d", (int)err);
 
-    GLenum err = glGetError();
-    if(err)
-        pLogWarning("Render GL: initing got GL error code %d", (int)err);
+    s_program.use_program();
+
+    while(err = glGetError())
+        pLogWarning("Render GL 230: initing got GL error code %d", (int)err);
+
+    // initialize vertex and texcoord buffers
+    glGenBuffers(s_num_buffers, s_vertex_buffer);
+    glGenBuffers(s_num_buffers, s_texcoord_buffer);
+
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+
+    for(int i = 0; i < s_num_buffers; i++)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[i]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 8, nullptr, GL_STREAM_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, s_texcoord_buffer[i]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 8, nullptr, GL_STREAM_DRAW);
+    }
+
+    while(err = glGetError())
+        pLogWarning("Render GL 238: initing got GL error code %d", (int)err);
 
     // Clean-up from a possible start-up junk
     clearBuffer();
@@ -318,12 +272,35 @@ void RenderGLES::close()
     RenderGLES::clearAllTextures();
     AbstractRender_t::close();
 
-    // if(m_tBuffer)
-    //     SDL_DestroyTexture(m_tBuffer);
-    // m_tBuffer = nullptr;
+    if(s_game_texture_fb)
+    {
+        glDeleteFramebuffers(1, &s_game_texture_fb);
+        s_game_texture_fb = 0;
+    }
+
+    if(s_game_texture)
+    {
+        glDeleteTextures(1, &s_game_texture);
+        s_game_texture = 0;
+    }
+
+    if(s_vertex_buffer[0])
+    {
+        glDeleteBuffers(s_num_buffers, s_vertex_buffer);
+        for(int i = 0; i < s_num_buffers; i++)
+            s_vertex_buffer[i] = 0;
+    }
+
+    if(s_texcoord_buffer[0])
+    {
+        glDeleteBuffers(s_num_buffers, s_texcoord_buffer);
+        for(int i = 0; i < s_num_buffers; i++)
+            s_texcoord_buffer[i] = 0;
+    }
 
     if(m_gContext)
         SDL_GL_DeleteContext(m_gContext);
+
     m_gContext = nullptr;
 }
 
@@ -353,6 +330,9 @@ void RenderGLES::togglehud()
 
 void RenderGLES::repaint()
 {
+    while(GLint err = glGetError())
+        pLogWarning("Render GL rp1: initing got GL error code %d", (int)err);
+
 #ifdef USE_RENDER_BLOCKING
     if(m_blockRender)
         return;
@@ -400,19 +380,34 @@ void RenderGLES::repaint()
         float y1 = 0;
         float y2 = 600;
 
-        const float world_coords[] = {x1, y1,
+        const GLfloat world_coords[] = {x1, y1,
             x1, y2,
             x2, y1,
             x2, y2};
 
-        const float tex_coords[] = {0.0f, 1.0f,
+        const GLfloat tex_coords[] = {0.0f, 1.0f,
             0.0f, 0.0f,
             1.0f, 1.0f,
             1.0f, 0.0f};
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, s_game_texture);
+        s_program.update_tint(false, nullptr);
 
+        s_cur_buffer_index++;
+        if(s_cur_buffer_index >= s_num_buffers)
+            s_cur_buffer_index = 0;
+
+        glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(world_coords), world_coords);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+        glBindBuffer(GL_ARRAY_BUFFER, s_texcoord_buffer[s_cur_buffer_index]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tex_coords), tex_coords);
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+#if 0
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glUseProgram(s_program);
@@ -420,11 +415,15 @@ void RenderGLES::repaint()
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, world_coords);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, tex_coords);
         glUniform1i(0, 0);
+#endif
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         glBindTexture(GL_TEXTURE_2D, 0);
     }
+
+    while(GLint err = glGetError())
+        pLogWarning("Render GL rp2: initing got GL error code %d", (int)err);
 
     Controls::RenderTouchControls();
 
@@ -494,6 +493,7 @@ void RenderGLES::applyViewport()
 
     // pLogDebug("Setting projection to %d %d %d %d", off_x, m_viewport_w + off_x, m_viewport_h + off_y, off_y);
     // glOrtho( off_x + 0.5f, viewport_w + off_x + 0.5f, viewport_h + off_y + 0.5f, off_y + 0.5f, -1, 1);
+    // s_transform_matrix
 }
 
 void RenderGLES::updateViewport()
@@ -1251,26 +1251,38 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
     float v1 = tx.l.h_scale * ySrc;
     float v2 = tx.l.h_scale * (ySrc + hDst);
 
-    const float world_coords[] = {x1, y1,
+    const GLfloat world_coords[] = {x1, y1,
         x1, y2,
         x2, y1,
         x2, y2};
 
-    const float tex_coords[] = {u1, v1,
+    const GLfloat tex_coords[] = {u1, v1,
         u1, v2,
         u2, v1,
         u2, v2};
 
+    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
+    const GLfloat tint[] = {red, green, blue, alpha};
+
     // glColor4f(red, green, blue, alpha);
+
+    s_cur_buffer_index++;
+    if(s_cur_buffer_index >= s_num_buffers)
+        s_cur_buffer_index = 0;
+
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(world_coords), world_coords);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+    glBindBuffer(GL_ARRAY_BUFFER, s_texcoord_buffer[s_cur_buffer_index]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tex_coords), tex_coords);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
     if(tx.d.mask_texture_id)
     {
         prepareDrawMask();
 
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, world_coords);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, tex_coords);
-        glUniform1i(0, 0);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1279,14 +1291,19 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     // glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+    s_program.update_tint(tint_enabled, tint);
 
+#if 0
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glUseProgram(s_program);
+    s_program.use_program();
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, world_coords);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, tex_coords);
     glUniform1i(0, 0);
+#endif
 
     // glVertexPointer(2, GL_FLOAT, 0, world_coords);
     // glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);

@@ -680,6 +680,7 @@ else()
         src/core/base/events_base.cpp
         src/core/sdl/render_sdl.cpp
         src/core/sdl/render_gl11.cpp
+        src/core/sdl/gl_program_object.cpp
         src/core/sdl/render_gles.cpp
         src/core/sdl/window_sdl.cpp
         src/core/sdl/msgbox_sdl.cpp
