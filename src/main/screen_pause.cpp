@@ -458,13 +458,7 @@ bool Logic(int plr)
                     if(target != Player[A].Character)
                     {
                         SwapCharacter(A, target);
-
-                        if(LevelSelect)
-                        {
-                            vScreen_t backup = vScreen[1];
-                            SetupPlayers();
-                            vScreen[1] = backup;
-                        }
+                        SetupPlayers();
                     }
                 }
             }

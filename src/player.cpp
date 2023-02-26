@@ -438,7 +438,8 @@ void SetupPlayers()
     //        StartMusic Player[nPlay.MySlot + 1].Section;
     //    }
     UpdateYoshiMusic();
-    SetupScreens(); // setup the screen depending on how many players there are
+    if(!LevelSelect)
+        SetupScreens(); // setup the screen depending on how many players there are
     setupCheckpoints(); // setup the checkpoint and restpore the player at it if needed
 }
 
@@ -7371,7 +7372,8 @@ void AddPlayer(int Character)
     p.Section = Player[alivePlayer].Section;
     RespawnPlayerTo(numPlayers, alivePlayer);
 
-    SetupScreens();
+    if(!LevelSelect)
+        SetupScreens();
 }
 
 void DropPlayer(const int A)
