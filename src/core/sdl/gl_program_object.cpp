@@ -210,6 +210,8 @@ GLProgramObject::~GLProgramObject()
         glDeleteProgram(m_program);
 
     m_program = 0;
+
+    m_u_custom_loc.clear();
 }
 
 const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
@@ -237,4 +239,28 @@ const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
 void GLProgramObject::use_program()
 {
     glUseProgram(m_program);
+}
+
+/*!
+ * \brief Registers a custom uniform variable in the next available index
+ */
+void GLProgramObject::register_uniform(const std::string& name)
+{
+    m_u_custom_loc.push_back(get_uniform_loc(name));
+}
+
+/*!
+ * \brief Gets location of custom uniform variable by registered index
+ */
+GLint GLProgramObject::get_uniform_loc(int index)
+{
+    return m_u_custom_loc[index];
+}
+
+/*!
+ * \brief Gets location of custom uniform variable by querying GL (slow)
+ */
+GLint GLProgramObject::get_uniform_loc(const std::string& name)
+{
+    return glGetUniformLocation(m_program, name.c_str());
 }

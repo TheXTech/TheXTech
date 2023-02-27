@@ -22,6 +22,7 @@
 #ifndef GL_PROGRAM_OBJECT_H
 
 #include <SDL2/SDL_opengl.h>
+#include <vector>
 
 class GLProgramObject
 {
@@ -30,6 +31,8 @@ private:
 
     GLint m_u_transform_loc = -1;
     GLint m_u_tint_loc      = -1;
+
+    std::vector<GLint> m_u_custom_loc;
 
     bool m_transform_dirty = true;
     bool m_tint_applied    = true;
@@ -113,6 +116,20 @@ public:
         return m_program != 0;
     }
 
+    /*!
+     * \brief Registers a custom uniform variable in the next available index
+     */
+    void register_uniform(const std::string& name);
+
+    /*!
+     * \brief Gets location of custom uniform variable by registered index
+     */
+    GLint get_uniform_loc(int index);
+
+    /*!
+     * \brief Gets location of custom uniform variable by querying GL (slow)
+     */
+    GLint get_uniform_loc(const std::string& name);
 };
 
 #endif // #ifndef GL_PROGRAM_OBJECT_H
