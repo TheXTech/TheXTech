@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <fstream>
+
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_opengl.h>
@@ -48,6 +50,29 @@
 #define UNUSED(x) (void)x
 #endif
 
+static std::string s_read_file(const char* filename)
+{
+    std::ifstream is(filename, std::ios::binary);
+
+    if(!is)
+        return "";
+
+    int length;
+    is.seekg(0, is.end);
+    length = is.tellg();
+    is.seekg(0, is.beg);
+
+    std::string out;
+    out.resize(length);
+
+    // read data as a block:
+    is.read(&out[0], length);
+
+    if(!is)
+        return "";
+
+    return out;
+}
 
 RenderGLES::RenderGLES() :
     AbstractRender_t()
@@ -71,6 +96,7 @@ bool RenderGLES::isWorking()
 
 // GL values (migrate to RenderGLES class members soon)
 static GLProgramObject s_program;
+static GLProgramObject s_output_program;
 
 static GLuint s_game_texture = 0;
 static GLuint s_game_texture_fb = 0;
@@ -79,7 +105,7 @@ static constexpr int s_num_buffers = 16;
 static GLuint s_vertex_buffer[s_num_buffers] = {0};
 static int s_cur_buffer_index = 0;
 
-static GLfloat s_transform_matrix[16];
+static std::array<GLfloat, 16> s_transform_matrix;
 
 bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 {
@@ -204,13 +230,12 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         (
             "#version 100                 \n"
             "uniform   mat4 u_transform;  \n"
-            "attribute vec2 a_position;   \n"
+            "attribute vec4 a_position;   \n"
             "attribute vec2 a_texcoord;   \n"
             "varying   vec2 v_texcoord;   \n"
             "void main()                  \n"
             "{                            \n"
-            "   gl_Position = vec4(a_position.x * 2.0 / 800.0 - 1.0, "
-            "        a_position.y * 2.0 / -600.0 + 1.0, 0, 1);  \n"
+            "   gl_Position = u_transform * a_position;  \n"
             "   v_texcoord = a_texcoord;  \n"
             "}                            \n"
         ),
@@ -223,13 +248,61 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             "void main()                                  \n"
             "{                                            \n"
             "  vec4 l_color = texture2D(u_texture, v_texcoord);\n"
-            // "  l_color.r += v_texcoord.x;\n"
-            // "  l_color.g += v_texcoord.y;\n"
-            // "  l_color.a *= 0.5;\n"
             "  gl_FragColor = u_tint * l_color;\n"
             "}                                            \n"
         )
     );
+
+    std::string shader_contents = s_read_file((AppPath + "/test.frag").c_str());
+
+    if(!shader_contents.empty())
+    {
+        pLogDebug("Loading screen fragment shader from test.frag...");
+        s_output_program = GLProgramObject(
+            (
+                "#version 100                 \n"
+                "uniform   mat4 u_transform;  \n"
+                "attribute vec4 a_position;   \n"
+                "attribute vec2 a_texcoord;   \n"
+                "varying   vec2 v_texcoord;   \n"
+                "void main()                  \n"
+                "{                            \n"
+                "   gl_Position = u_transform * a_position;  \n"
+                "   v_texcoord = a_texcoord;  \n"
+                "}                            \n"
+            ),
+            shader_contents.c_str()
+        );
+    }
+    else
+    {
+        s_output_program = GLProgramObject(
+            (
+                "#version 100                 \n"
+                "uniform   mat4 u_transform;  \n"
+                "attribute vec4 a_position;   \n"
+                "attribute vec2 a_texcoord;   \n"
+                "varying   vec2 v_texcoord;   \n"
+                "void main()                  \n"
+                "{                            \n"
+                "   gl_Position = u_transform * a_position;  \n"
+                "   v_texcoord = a_texcoord;  \n"
+                "}                            \n"
+            ),
+            (
+                "#version 100                  \n"
+                "precision mediump float;\n"
+                "varying   vec2      v_texcoord;     \n"
+                "uniform   sampler2D u_texture;  \n"
+                "uniform   vec4      u_tint;     \n"
+                "void main()                                  \n"
+                "{                                            \n"
+                "  vec4 l_color = texture2D(u_texture, v_texcoord);\n"
+                "  gl_FragColor = u_tint * l_color;\n"
+                "}                                            \n"
+            )
+        );
+    }
 
     while(err = glGetError())
         pLogWarning("Render GL 225: initing got GL error code %d", (int)err);
@@ -363,10 +436,10 @@ void RenderGLES::repaint()
         XWindow::getWindowSize(&hardware_w, &hardware_h);
 
         // draw screen at correct physical coordinates
-        float x1 = 0;
-        float x2 = 800;
-        float y1 = 0;
-        float y2 = 600;
+        float x1 = m_phys_x;
+        float x2 = m_phys_x + m_phys_w;
+        float y1 = m_phys_y;
+        float y2 = m_phys_y + m_phys_h;
 
         const GLfloat vertex_attribs[] =
         {
@@ -385,7 +458,10 @@ void RenderGLES::repaint()
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, s_game_texture);
-        s_program.update_tint(false, nullptr);
+
+        s_output_program.use_program();
+        s_output_program.update_transform(s_transform_matrix.data());
+        s_output_program.update_tint(false, nullptr);
 
         s_cur_buffer_index++;
         if(s_cur_buffer_index >= s_num_buffers)
@@ -464,6 +540,16 @@ void RenderGLES::applyViewport()
         glViewport(viewport_x, ScreenH - (viewport_y + viewport_h),
             viewport_w, viewport_h);
 
+        s_transform_matrix = {
+            2.0f / viewport_w, 0.0f, 0.0f, 0.0f,
+            0.0f, -2.0f / viewport_h, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f, 0.0f,
+            -float(viewport_w + off_x + off_x) / (viewport_w), float(viewport_h + off_y + off_y) / (viewport_h), 0.0f, 1.0f,
+        };
+
+        s_program.set_transform_dirty();
+        s_output_program.set_transform_dirty();
+
         return;
     }
 
@@ -483,7 +569,15 @@ void RenderGLES::applyViewport()
 
     // pLogDebug("Setting projection to %d %d %d %d", off_x, m_viewport_w + off_x, m_viewport_h + off_y, off_y);
     // glOrtho( off_x + 0.5f, viewport_w + off_x + 0.5f, viewport_h + off_y + 0.5f, off_y + 0.5f, -1, 1);
-    // s_transform_matrix
+    s_transform_matrix = {
+        2.0f / viewport_w, 0.0f, 0.0f, 0.0f,
+        0.0f, -2.0f / viewport_h, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        -(viewport_w + off_x + 0.5f + off_x + 0.5f) / (viewport_w), (viewport_h + off_y + 0.5f + off_y + 0.5f) / (viewport_h), 0.0f, 1.0f,
+    };
+
+    s_program.set_transform_dirty();
+    s_output_program.set_transform_dirty();
 }
 
 void RenderGLES::updateViewport()
@@ -598,6 +692,15 @@ void RenderGLES::setTargetScreen()
     // glLoadIdentity();
 
     // glOrtho(0, hardware_w, hardware_h, 0, -1, 1);
+    s_transform_matrix = {
+        2.0f / hardware_w, 0.0f, 0.0f, 0.0f,
+        0.0f, -2.0f / hardware_h, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f, 0.0f,
+        -1.0f, 1.0f, 0.0f, 1.0f,
+    };
+
+    s_program.set_transform_dirty();
+    s_output_program.set_transform_dirty();
 }
 
 void RenderGLES::prepareDrawMask()
@@ -883,7 +986,7 @@ void RenderGLES::clearBuffer()
 #endif
 
     glBindTexture(GL_TEXTURE_2D, 0);
-    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     // SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
@@ -1084,41 +1187,56 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    const float world_coords[] = {x1, y1,
+    const GLfloat vertex_attribs[] =
+    {
+        // positions
+        x1, y1,
         x1, y2,
+        x2, y1,
         x2, y2,
-        x2, y1};
 
-    const float tex_coords[] = {u1, v1,
+        // texcoords
+        u1, v1,
         u1, v2,
+        u2, v1,
         u2, v2,
-        u2, v1};
+    };
 
-    // glColor4f(red, green, blue, alpha);
+    s_cur_buffer_index++;
+    if(s_cur_buffer_index >= s_num_buffers)
+        s_cur_buffer_index = 0;
 
-    // if(tx.d.mask_texture_id)
-    // {
-    //     prepareDrawMask();
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
 
-    //     glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-    //     glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    //     glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
+    const GLfloat tint[] = {red, green, blue, alpha};
 
-    //     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    if(tx.d.mask_texture_id)
+    {
+        prepareDrawMask();
 
-    //     prepareDrawImage();
-    // }
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
 
-    // glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    // glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    // glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
-    // glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        prepareDrawImage();
+    }
 
-    // if(tx.d.mask_texture_id)
-    // {
-    //     leaveMaskContext();
-    // }
+    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data());
+    s_program.update_tint(tint_enabled, tint);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    if(tx.d.mask_texture_id)
+    {
+        leaveMaskContext();
+    }
 }
 
 void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
@@ -1151,41 +1269,56 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
     float v1 = tx.l.h_scale * 0;
     float v2 = tx.l.h_scale * (tx.h);
 
-    const float world_coords[] = {x1, y1,
+    const GLfloat vertex_attribs[] =
+    {
+        // positions
+        x1, y1,
         x1, y2,
+        x2, y1,
         x2, y2,
-        x2, y1};
 
-    const float tex_coords[] = {u1, v1,
+        // texcoords
+        u1, v1,
         u1, v2,
+        u2, v1,
         u2, v2,
-        u2, v1};
+    };
 
-    // glColor4f(red, green, blue, alpha);
+    s_cur_buffer_index++;
+    if(s_cur_buffer_index >= s_num_buffers)
+        s_cur_buffer_index = 0;
 
-    // if(tx.d.mask_texture_id)
-    // {
-    //     prepareDrawMask();
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
 
-    //     glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-    //     glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    //     glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
+    const GLfloat tint[] = {red, green, blue, alpha};
 
-    //     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    if(tx.d.mask_texture_id)
+    {
+        prepareDrawMask();
 
-    //     prepareDrawImage();
-    // }
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
 
-    // glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    // glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    // glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
-    // glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        prepareDrawImage();
+    }
 
-    // if(tx.d.mask_texture_id)
-    // {
-    //     leaveMaskContext();
-    // }
+    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data());
+    s_program.update_tint(tint_enabled, tint);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    if(tx.d.mask_texture_id)
+    {
+        leaveMaskContext();
+    }
 }
 
 void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
@@ -1241,36 +1374,32 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
     float v1 = tx.l.h_scale * ySrc;
     float v2 = tx.l.h_scale * (ySrc + hDst);
 
-    const GLfloat world_coords[] = {x1, y1,
+    const GLfloat vertex_attribs[] =
+    {
+        // positions
+        x1, y1,
         x1, y2,
         x2, y1,
-        x2, y2};
+        x2, y2,
 
-    const GLfloat tex_coords[] = {u1, v1,
+        // texcoords
+        u1, v1,
         u1, v2,
         u2, v1,
-        u2, v2};
-
-    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
-    const GLfloat tint[] = {red, green, blue, alpha};
-
-    // glColor4f(red, green, blue, alpha);
+        u2, v2,
+    };
 
     s_cur_buffer_index++;
     if(s_cur_buffer_index >= s_num_buffers)
         s_cur_buffer_index = 0;
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, world_coords);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, tex_coords);
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
 
-    // glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-    // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(world_coords), world_coords);
-    // glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
-
-    // glBindBuffer(GL_ARRAY_BUFFER, s_texcoord_buffer[s_cur_buffer_index]);
-    // glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(tex_coords), tex_coords);
-    // glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
+    const GLfloat tint[] = {red, green, blue, alpha};
 
     if(tx.d.mask_texture_id)
     {
@@ -1283,24 +1412,12 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
         prepareDrawImage();
     }
 
-    // glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data());
     s_program.update_tint(tint_enabled, tint);
 
-#if 0
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    s_program.use_program();
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, world_coords);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, tex_coords);
-    glUniform1i(0, 0);
-#endif
-
-    // glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    // glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     if(tx.d.mask_texture_id)
@@ -1376,41 +1493,56 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    const float world_coords[] = {x1, y1,
+    const GLfloat vertex_attribs[] =
+    {
+        // positions
+        x1, y1,
         x1, y2,
+        x2, y1,
         x2, y2,
-        x2, y1};
 
-    const float tex_coords[] = {u1, v1,
+        // texcoords
+        u1, v1,
         u1, v2,
+        u2, v1,
         u2, v2,
-        u2, v1};
+    };
 
-    // glColor4f(red, green, blue, alpha);
+    s_cur_buffer_index++;
+    if(s_cur_buffer_index >= s_num_buffers)
+        s_cur_buffer_index = 0;
 
-    // if(tx.d.mask_texture_id)
-    // {
-    //     prepareDrawMask();
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
 
-    //     glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-    //     glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    //     glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
+    const GLfloat tint[] = {red, green, blue, alpha};
 
-    //     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    if(tx.d.mask_texture_id)
+    {
+        prepareDrawMask();
 
-    //     prepareDrawImage();
-    // }
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
 
-    // glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    // glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    // glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
-    // glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        prepareDrawImage();
+    }
 
-    // if(tx.d.mask_texture_id)
-    // {
-    //     leaveMaskContext();
-    // }
+    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data());
+    s_program.update_tint(tint_enabled, tint);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    if(tx.d.mask_texture_id)
+    {
+        leaveMaskContext();
+    }
 
     // glPopMatrix();
 }
@@ -1445,41 +1577,56 @@ void RenderGLES::renderTexture(float xDst, float yDst,
     float v1 = tx.l.h_scale * 0;
     float v2 = tx.l.h_scale * (tx.h);
 
-    const float world_coords[] = {x1, y1,
+    const GLfloat vertex_attribs[] =
+    {
+        // positions
+        x1, y1,
         x1, y2,
+        x2, y1,
         x2, y2,
-        x2, y1};
 
-    const float tex_coords[] = {u1, v1,
+        // texcoords
+        u1, v1,
         u1, v2,
+        u2, v1,
         u2, v2,
-        u2, v1};
+    };
 
-    // glColor4f(red, green, blue, alpha);
+    s_cur_buffer_index++;
+    if(s_cur_buffer_index >= s_num_buffers)
+        s_cur_buffer_index = 0;
 
-    // if(tx.d.mask_texture_id)
-    // {
-    //     prepareDrawMask();
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
 
-    //     glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-    //     glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    //     glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
+    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
+    const GLfloat tint[] = {red, green, blue, alpha};
 
-    //     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    if(tx.d.mask_texture_id)
+    {
+        prepareDrawMask();
 
-    //     prepareDrawImage();
-    // }
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
 
-    // glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    // glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    // glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
-    // glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        prepareDrawImage();
+    }
 
-    // if(tx.d.mask_texture_id)
-    // {
-    //     leaveMaskContext();
-    // }
+    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data());
+    s_program.update_tint(tint_enabled, tint);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    if(tx.d.mask_texture_id)
+    {
+        leaveMaskContext();
+    }
 }
 
 void RenderGLES::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
