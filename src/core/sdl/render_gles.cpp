@@ -145,7 +145,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         // try to allocate texture memory
         glBindTexture(GL_TEXTURE_2D, s_game_texture);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
             ScreenW, ScreenH,
             0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
