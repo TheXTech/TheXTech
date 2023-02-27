@@ -95,8 +95,13 @@ bool RenderGLES::isWorking()
 }
 
 // GL values (migrate to RenderGLES class members soon)
+static std::vector<GLProgramObject*> s_program_bank;
 static GLProgramObject s_program;
 static GLProgramObject s_output_program;
+static GLProgramObject s_program_rect_filled;
+static GLProgramObject s_program_rect_unfilled;
+static GLProgramObject s_program_circle;
+static GLProgramObject s_program_circle_hole;
 
 static GLuint s_game_texture = 0;
 static GLuint s_game_texture_fb = 0;
@@ -226,19 +231,21 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     while(err = glGetError())
         pLogWarning("Render GL 198: initing got GL error code %d", (int)err);
 
+    const char* vertex_src = (
+        "#version 100                 \n"
+        "uniform   mat4 u_transform;  \n"
+        "attribute vec4 a_position;   \n"
+        "attribute vec2 a_texcoord;   \n"
+        "varying   vec2 v_texcoord;   \n"
+        "void main()                  \n"
+        "{                            \n"
+        "   gl_Position = u_transform * a_position;  \n"
+        "   v_texcoord = a_texcoord;  \n"
+        "}                            \n"
+    );
+
     s_program = GLProgramObject(
-        (
-            "#version 100                 \n"
-            "uniform   mat4 u_transform;  \n"
-            "attribute vec4 a_position;   \n"
-            "attribute vec2 a_texcoord;   \n"
-            "varying   vec2 v_texcoord;   \n"
-            "void main()                  \n"
-            "{                            \n"
-            "   gl_Position = u_transform * a_position;  \n"
-            "   v_texcoord = a_texcoord;  \n"
-            "}                            \n"
-        ),
+        vertex_src,
         (
             "#version 100                  \n"
             "precision mediump float;\n"
@@ -253,42 +260,87 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         )
     );
 
+    s_program_rect_filled = GLProgramObject(
+        vertex_src,
+        (
+            "#version 100                  \n"
+            "precision mediump float;\n"
+            "varying   vec2      v_texcoord;     \n"
+            "uniform   vec4      u_tint;     \n"
+            "void main()                                  \n"
+            "{                                            \n"
+            "  gl_FragColor = u_tint;\n"
+            "}                                            \n"
+        )
+    );
+
+    s_program_rect_unfilled = GLProgramObject(
+        vertex_src,
+        (
+            "#version 100                                 \n"
+            "precision mediump float;                     \n"
+            "varying   vec2      v_texcoord;              \n"
+            "uniform   vec4      u_tint;                  \n"
+            "uniform   vec2      u_size;                  \n"
+            "void main()                                  \n"
+            "{                                            \n"
+            "  if(v_texcoord.x * u_size.x >= 1.0 && v_texcoord.x * u_size.x < u_size.x - 1.0 \n"
+            "     && v_texcoord.y * u_size.y >= 1.0 && v_texcoord.y * u_size.y < u_size.y - 1.0) \n"
+            "    discard;                                 \n"
+            "  gl_FragColor = u_tint;                     \n"
+            "}                                            \n"
+        )
+    );
+    s_program_rect_unfilled.register_uniform("u_size");
+
+    s_program_circle = GLProgramObject(
+        vertex_src,
+        (
+            "#version 100                  \n"
+            "precision mediump float;\n"
+            "varying   vec2      v_texcoord;     \n"
+            "uniform   vec4      u_tint;     \n"
+            "void main()                                  \n"
+            "{                                            \n"
+            "  if((v_texcoord.x - 0.5) * (v_texcoord.x - 0.5) \n"
+            "    + (v_texcoord.y - 0.5) * (v_texcoord.y - 0.5) > 0.25)\n"
+            "      discard;\n"
+            "  gl_FragColor = u_tint;\n"
+            "}                                            \n"
+        )
+    );
+
+    s_program_circle_hole = GLProgramObject(
+        vertex_src,
+        (
+            "#version 100                  \n"
+            "precision mediump float;\n"
+            "varying   vec2      v_texcoord;     \n"
+            "uniform   vec4      u_tint;     \n"
+            "void main()                                  \n"
+            "{                                            \n"
+            "  if((v_texcoord.x - 0.5) * (v_texcoord.x - 0.5) \n"
+            "    + (v_texcoord.y - 0.5) * (v_texcoord.y - 0.5) <= 0.25)\n"
+            "      discard;\n"
+            "  gl_FragColor = u_tint;\n"
+            "}                                            \n"
+        )
+    );
+
     std::string shader_contents = s_read_file((AppPath + "/test.frag").c_str());
 
     if(!shader_contents.empty())
     {
         pLogDebug("Loading screen fragment shader from test.frag...");
         s_output_program = GLProgramObject(
-            (
-                "#version 100                 \n"
-                "uniform   mat4 u_transform;  \n"
-                "attribute vec4 a_position;   \n"
-                "attribute vec2 a_texcoord;   \n"
-                "varying   vec2 v_texcoord;   \n"
-                "void main()                  \n"
-                "{                            \n"
-                "   gl_Position = u_transform * a_position;  \n"
-                "   v_texcoord = a_texcoord;  \n"
-                "}                            \n"
-            ),
+            vertex_src,
             shader_contents.c_str()
         );
     }
     else
     {
         s_output_program = GLProgramObject(
-            (
-                "#version 100                 \n"
-                "uniform   mat4 u_transform;  \n"
-                "attribute vec4 a_position;   \n"
-                "attribute vec2 a_texcoord;   \n"
-                "varying   vec2 v_texcoord;   \n"
-                "void main()                  \n"
-                "{                            \n"
-                "   gl_Position = u_transform * a_position;  \n"
-                "   v_texcoord = a_texcoord;  \n"
-                "}                            \n"
-            ),
+            vertex_src,
             (
                 "#version 100                  \n"
                 "precision mediump float;\n"
@@ -306,11 +358,6 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     while(err = glGetError())
         pLogWarning("Render GL 225: initing got GL error code %d", (int)err);
-
-    s_program.use_program();
-
-    while(err = glGetError())
-        pLogWarning("Render GL 230: initing got GL error code %d", (int)err);
 
     // initialize vertex buffers
     glGenBuffers(s_num_buffers, s_vertex_buffer);
@@ -472,17 +519,6 @@ void RenderGLES::repaint()
         glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
 
-#if 0
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glUseProgram(s_program);
-
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, world_coords);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, tex_coords);
-        glUniform1i(0, 0);
-#endif
-
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -549,6 +585,10 @@ void RenderGLES::applyViewport()
 
         s_program.set_transform_dirty();
         s_output_program.set_transform_dirty();
+        s_program_rect_filled.set_transform_dirty();
+        s_program_rect_unfilled.set_transform_dirty();
+        s_program_circle.set_transform_dirty();
+        s_program_circle_hole.set_transform_dirty();
 
         return;
     }
@@ -578,6 +618,10 @@ void RenderGLES::applyViewport()
 
     s_program.set_transform_dirty();
     s_output_program.set_transform_dirty();
+    s_program_rect_filled.set_transform_dirty();
+    s_program_rect_unfilled.set_transform_dirty();
+    s_program_circle.set_transform_dirty();
+    s_program_circle_hole.set_transform_dirty();
 }
 
 void RenderGLES::updateViewport()
@@ -701,6 +745,10 @@ void RenderGLES::setTargetScreen()
 
     s_program.set_transform_dirty();
     s_output_program.set_transform_dirty();
+    s_program_rect_filled.set_transform_dirty();
+    s_program_rect_unfilled.set_transform_dirty();
+    s_program_circle.set_transform_dirty();
+    s_program_circle_hole.set_transform_dirty();
 }
 
 void RenderGLES::prepareDrawMask()
@@ -1004,30 +1052,47 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
     float y1 = y;
     float y2 = y + h;
 
-    // glColor4f(red, green, blue, alpha);
+    const GLfloat vertex_attribs[] =
+    {
+        // positions
+        x1, y1,
+        x1, y2,
+        x2, y1,
+        x2, y2,
+        // texcoords
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 0.0,
+        1.0, 1.0,
+    };
 
-    // glBindTexture(GL_TEXTURE_2D, 0);
+    s_cur_buffer_index++;
+    if(s_cur_buffer_index >= s_num_buffers)
+        s_cur_buffer_index = 0;
 
-    // if(filled)
-    // {
-    //     const float world_coords[] = {x1, y1,
-    //                                   x1, y2,
-    //                                   x2, y2,
-    //                                   x2, y1};
-    //     glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    //     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    // }
-    // else
-    // {
-    //     // enforce 1px wide
-    //     const float world_coords[] =
-    //         {x1, y1,  x1, y2,  x1 + 1, y2,  x1 + 1, y1,
-    //          x2 - 1, y1,  x2 - 1, y2,  x2, y2,  x2, y1,
-    //          x1, y1,  x1, y1 + 1,  x2, y1 + 1,  x2, y1,
-    //          x1, y2 - 1,  x1, y2,  x2, y2,  x2, y2 - 1};
-    //     glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    //     glDrawArrays(GL_TRIANGLE_STRIP, 0, 16);
-    // }
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
+
+    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
+    const GLfloat tint[] = {red, green, blue, alpha};
+
+    if(filled)
+    {
+        s_program_rect_filled.use_program();
+        s_program_rect_filled.update_tint(tint_enabled, tint);
+        s_program_rect_filled.update_transform(s_transform_matrix.data());
+    }
+    else
+    {
+        s_program_rect_unfilled.use_program();
+        s_program_rect_unfilled.update_tint(tint_enabled, tint);
+        s_program_rect_unfilled.update_transform(s_transform_matrix.data());
+        glUniform2f(s_program_rect_unfilled.get_uniform_loc(0), w, h);
+    }
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void RenderGLES::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
@@ -1036,26 +1101,8 @@ void RenderGLES::renderRectBR(int _left, int _top, int _right, int _bottom, floa
     SDL_assert(!m_blockRender);
 #endif
 
-    float x1 = _left;
-    float x2 = _right;
-    float y1 = _top;
-    float y2 = _bottom;
-
-    const float world_coords[] = {x1, y1,
-        x1, y2,
-        x2, y2,
-        x2, y1};
-
-    // glColor4f(red, green, blue, alpha);
-
-    // glBindTexture(GL_TEXTURE_2D, 0);
-
-    // glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    // glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
+    renderRectBR(_left, _top, _right - _left, _bottom - _top, red, green, blue, alpha);
 }
-
-#define PI 3.1415926535897932384626433832795
 
 void RenderGLES::renderCircle(int cx, int cy, int radius, float red, float green, float blue, float alpha, bool filled)
 {
@@ -1067,29 +1114,42 @@ void RenderGLES::renderCircle(int cx, int cy, int radius, float red, float green
     if(radius <= 0)
         return; // Nothing to draw
 
-    double line_size = 2;
-    double dy = line_size;
+    float x1 = cx - radius;
+    float x2 = cx + radius;
+    float y1 = cy - radius;
+    float y2 = cy + radius;
 
-    const int verts = 16;
-
-    float world_coords[verts * 2];
-
-    for(int i = 0; i < verts; i++)
+    const GLfloat vertex_attribs[] =
     {
-        float theta = i * (float)PI * 2 / verts;
-        float x = cx + radius * cosf(theta);
-        float y = cy + radius * sinf(theta);
+        // positions
+        x1, y1,
+        x1, y2,
+        x2, y1,
+        x2, y2,
+        // texcoords
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 0.0,
+        1.0, 1.0,
+    };
 
-        world_coords[2 * i] = x;
-        world_coords[2 * i + 1] = y;
-    }
+    s_cur_buffer_index++;
+    if(s_cur_buffer_index >= s_num_buffers)
+        s_cur_buffer_index = 0;
 
-    // glColor4f(red, green, blue, alpha);
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
 
-    // glBindTexture(GL_TEXTURE_2D, 0);
+    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
+    const GLfloat tint[] = {red, green, blue, alpha};
 
-    // glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    // glDrawArrays(GL_POLYGON, 0, verts);
+    s_program_circle.use_program();
+    s_program_circle.update_tint(tint_enabled, tint);
+    s_program_circle.update_transform(s_transform_matrix.data());
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
@@ -1101,30 +1161,42 @@ void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float g
     if(radius <= 0)
         return; // Nothing to draw
 
-    double line_size = 2;
-    double dy = line_size;
+    float x1 = cx - radius;
+    float x2 = cx + radius;
+    float y1 = cy - radius;
+    float y2 = cy + radius;
 
-    do
+    const GLfloat vertex_attribs[] =
     {
-        double dx = std::floor(std::sqrt((2.0 * radius * dy) - (dy * dy)));
+        // positions
+        x1, y1,
+        x1, y2,
+        x2, y1,
+        x2, y2,
+        // texcoords
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 0.0,
+        1.0, 1.0,
+    };
 
-        renderRectBR(cx - radius, cy + dy - radius - line_size, cx - dx, cy + dy - radius + line_size,
-            red, green, blue, alpha);
+    s_cur_buffer_index++;
+    if(s_cur_buffer_index >= s_num_buffers)
+        s_cur_buffer_index = 0;
 
-        renderRectBR(cx + dx, cy + dy - radius - line_size, cx + radius, cy + dy - radius + line_size,
-            red, green, blue, alpha);
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
 
-        if(dy < radius) // Don't cross lines
-        {
-            renderRectBR(cx - radius, cy - dy + radius - line_size, cx - dx, cy - dy + radius + line_size,
-                red, green, blue, alpha);
+    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
+    const GLfloat tint[] = {red, green, blue, alpha};
 
-            renderRectBR(cx + dx, cy - dy + radius - line_size, cx + radius, cy - dy + radius + line_size,
-                red, green, blue, alpha);
-        }
+    s_program_circle_hole.use_program();
+    s_program_circle_hole.update_tint(tint_enabled, tint);
+    s_program_circle_hole.update_transform(s_transform_matrix.data());
 
-        dy += line_size * 2;
-    } while(dy + line_size <= radius);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 
