@@ -95,13 +95,19 @@ bool RenderGLES::isWorking()
 }
 
 // GL values (migrate to RenderGLES class members soon)
+static bool s_emulate_logic_ops = true;
+
 static std::vector<GLProgramObject*> s_program_bank;
 static GLProgramObject s_program;
+static GLProgramObject s_special_program;
 static GLProgramObject s_output_program;
 static GLProgramObject s_program_rect_filled;
 static GLProgramObject s_program_rect_unfilled;
 static GLProgramObject s_program_circle;
 static GLProgramObject s_program_circle_hole;
+
+static GLuint s_fb_read_texture = 0;
+static GLuint s_const_fbcoord_buffer = 0;
 
 static GLuint s_game_texture = 0;
 static GLuint s_game_texture_fb = 0;
@@ -223,6 +229,16 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     while(err = glGetError())
         pLogWarning("Render GL 187: initing got GL error code %d", (int)err);
 
+    glGenTextures(1, &s_fb_read_texture);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, s_fb_read_texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     glActiveTexture(GL_TEXTURE0);
 
     m_maxTextureWidth = maxTextureSize;
@@ -258,6 +274,149 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             "  gl_FragColor = u_tint * l_color;\n"
             "}                                            \n"
         )
+    );
+
+    std::string logic_contents = s_read_file((AppPath + "/logic.frag").c_str());
+
+    if(logic_contents.empty())
+    {
+        logic_contents =
+R"RAW(#version 100
+
+precision mediump float;
+
+varying   vec2      v_texcoord;
+varying   vec2      v_fbcoord;
+
+uniform   sampler2D u_texture;
+uniform   sampler2D u_framebuffer;
+uniform   sampler2D u_mask;
+uniform   vec4      u_tint;
+
+vec3 bitwise_ops(vec3 x, vec3 y, vec3 z)
+{
+    x *= 255.0;
+    x /= 2.0;
+    vec3 x_1 = fract(x);
+    x -= x_1;
+    x /= 2.0;
+    vec3 x_2 = fract(x);
+    x -= x_2;
+    x /= 2.0;
+    vec3 x_4 = fract(x);
+    x -= x_4;
+    x /= 2.0;
+    vec3 x_8 = fract(x);
+    x -= x_8;
+    x /= 2.0;
+    vec3 x_16 = fract(x);
+    x -= x_16;
+    x /= 2.0;
+    vec3 x_32 = fract(x);
+    x -= x_32;
+    x /= 2.0;
+    vec3 x_64 = fract(x);
+    x -= x_64;
+    x /= 2.0;
+    vec3 x_128 = x;
+
+    y *= 255.0;
+    y /= 2.0;
+    vec3 y_1 = fract(y);
+    y -= y_1;
+    y /= 2.0;
+    vec3 y_2 = fract(y);
+    y -= y_2;
+    y /= 2.0;
+    vec3 y_4 = fract(y);
+    y -= y_4;
+    y /= 2.0;
+    vec3 y_8 = fract(y);
+    y -= y_8;
+    y /= 2.0;
+    vec3 y_16 = fract(y);
+    y -= y_16;
+    y /= 2.0;
+    vec3 y_32 = fract(y);
+    y -= y_32;
+    y /= 2.0;
+    vec3 y_64 = fract(y);
+    y -= y_64;
+    y /= 2.0;
+    vec3 y_128 = y;
+
+    z *= 255.0;
+    z /= 2.0;
+    vec3 z_1 = fract(z);
+    z -= z_1;
+    z /= 2.0;
+    vec3 z_2 = fract(z);
+    z -= z_2;
+    z /= 2.0;
+    vec3 z_4 = fract(z);
+    z -= z_4;
+    z /= 2.0;
+    vec3 z_8 = fract(z);
+    z -= z_8;
+    z /= 2.0;
+    vec3 z_16 = fract(z);
+    z -= z_16;
+    z /= 2.0;
+    vec3 z_32 = fract(z);
+    z -= z_32;
+    z /= 2.0;
+    vec3 z_64 = fract(z);
+    z -= z_64;
+    z /= 2.0;
+    vec3 z_128 = z;
+
+    vec3 o_1 = max(min(x_1, y_1), z_1);
+    vec3 o_2 = max(min(x_2, y_2), z_2);
+    vec3 o_4 = max(min(x_4, y_4), z_4);
+    vec3 o_8 = max(min(x_8, y_8), z_8);
+    vec3 o_16 = max(min(x_16, y_16), z_16);
+    vec3 o_32 = max(min(x_32, y_32), z_32);
+    vec3 o_64 = max(min(x_64, y_64), z_64);
+    vec3 o_128 = max(min(x_128, y_128), z_128);
+
+    return (o_1 + o_2 * 2.0 + o_4 * 4.0 + o_8 * 8.0 + o_16 * 16.0 + o_32 * 32.0 + o_64 * 64.0 + o_128 * 128.0) * 2.0 / 255.0;
+}
+
+void main()
+{
+  vec3 l_image = texture2D(u_texture, v_texcoord).rgb;
+  vec3 l_mask = texture2D(u_mask, v_texcoord).rgb;
+
+  l_image *= u_tint.rgb;
+
+  vec2 src = v_fbcoord.xy;
+  // src.y += sin(v_fbcoord.x * 6.0 + l_mask.r + l_mask.g + l_mask.b) * (l_image.r + l_image.g + l_image.b + 3.0 - l_mask.r - l_mask.g - l_mask.b) / 9.0;
+
+  vec3 l_bg = texture2D(u_framebuffer, src).rgb;
+
+  gl_FragColor.rgb = bitwise_ops(l_bg, l_mask, l_image);
+  gl_FragColor.a = 1.0;
+}
+)RAW";
+    }
+
+    s_special_program = GLProgramObject(
+        (
+            "#version 100                 \n"
+            "uniform   mat4 u_transform;  \n"
+            "attribute vec4 a_position;   \n"
+            "attribute vec2 a_texcoord;   \n"
+            "attribute vec2 a_fbcoord;   \n"
+            "varying   vec2 v_texcoord;   \n"
+            "varying   vec2 v_fbcoord;   \n"
+            "void main()                  \n"
+            "{                            \n"
+            "   gl_Position = u_transform * a_position;  \n"
+            "   v_texcoord = a_texcoord;  \n"
+            "   v_fbcoord = a_fbcoord;  \n"
+            "}                            \n"
+        ),
+        logic_contents.c_str()
     );
 
     s_program_rect_filled = GLProgramObject(
@@ -361,15 +520,29 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     // initialize vertex buffers
     glGenBuffers(s_num_buffers, s_vertex_buffer);
+    glGenBuffers(1, &s_const_fbcoord_buffer);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
     for(int i = 0; i < s_num_buffers; i++)
     {
         glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[i]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16, nullptr, GL_STREAM_DRAW);
     }
+
+    GLfloat fbcoords[] =
+    {
+        // fbcoords
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f
+    };
+    glBindBuffer(GL_ARRAY_BUFFER, s_const_fbcoord_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(fbcoords), fbcoords, GL_STATIC_DRAW);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     while(err = glGetError())
         pLogWarning("Render GL 238: initing got GL error code %d", (int)err);
@@ -399,11 +572,23 @@ void RenderGLES::close()
         s_game_texture = 0;
     }
 
+    if(s_fb_read_texture)
+    {
+        glDeleteTextures(1, &s_fb_read_texture);
+        s_fb_read_texture = 0;
+    }
+
     if(s_vertex_buffer[0])
     {
         glDeleteBuffers(s_num_buffers, s_vertex_buffer);
         for(int i = 0; i < s_num_buffers; i++)
             s_vertex_buffer[i] = 0;
+    }
+
+    if(s_const_fbcoord_buffer)
+    {
+        glDeleteBuffers(1, &s_const_fbcoord_buffer);
+        s_const_fbcoord_buffer = 0;
     }
 
     if(m_gContext)
@@ -1286,6 +1471,10 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
 
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data());
+    s_program.update_tint(tint_enabled, tint);
+
     if(tx.d.mask_texture_id)
     {
         prepareDrawMask();
@@ -1298,10 +1487,6 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
     }
 
     glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-    s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data());
-    s_program.update_tint(tint_enabled, tint);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1368,6 +1553,10 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
 
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data());
+    s_program.update_tint(tint_enabled, tint);
+
     if(tx.d.mask_texture_id)
     {
         prepareDrawMask();
@@ -1380,10 +1569,6 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
     }
 
     glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-    s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data());
-    s_program.update_tint(tint_enabled, tint);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1473,6 +1658,36 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
 
+    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
+
+    if(tx.d.mask_texture_id && s_emulate_logic_ops)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glCopyTexImage2D(GL_TEXTURE_2D,
+            0,
+            GL_RGB,
+            xDst,
+            ScreenH - (yDst + hDst),
+            wDst,
+            hDst,
+            0);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
+        glActiveTexture(GL_TEXTURE0);
+
+        s_special_program.use_program();
+        s_special_program.update_transform(s_transform_matrix.data());
+        s_special_program.update_tint(tint_enabled, tint);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        return;
+    }
+
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data());
+    s_program.update_tint(tint_enabled, tint);
+
     if(tx.d.mask_texture_id)
     {
         prepareDrawMask();
@@ -1485,10 +1700,6 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
     }
 
     glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-    s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data());
-    s_program.update_tint(tint_enabled, tint);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1592,6 +1803,10 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
 
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data());
+    s_program.update_tint(tint_enabled, tint);
+
     if(tx.d.mask_texture_id)
     {
         prepareDrawMask();
@@ -1604,10 +1819,6 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
     }
 
     glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-    s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data());
-    s_program.update_tint(tint_enabled, tint);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1676,6 +1887,10 @@ void RenderGLES::renderTexture(float xDst, float yDst,
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
 
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data());
+    s_program.update_tint(tint_enabled, tint);
+
     if(tx.d.mask_texture_id)
     {
         prepareDrawMask();
@@ -1688,10 +1903,6 @@ void RenderGLES::renderTexture(float xDst, float yDst,
     }
 
     glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-    s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data());
-    s_program.update_tint(tint_enabled, tint);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 

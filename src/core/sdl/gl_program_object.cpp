@@ -117,6 +117,7 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     // set the builtin vertex attribute locations
     glBindAttribLocation(program, 0, "a_position");
     glBindAttribLocation(program, 1, "a_texcoord");
+    glBindAttribLocation(program, 2, "a_fbcoord");
 
     // Link the program
     glLinkProgram(program);
@@ -159,16 +160,13 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
 
     // set sampler texture index to 0 (fixed for all programs)
     GLint u_texture_loc = glGetUniformLocation(m_program, "u_texture");
-
-    GLint a_position_loc = glGetAttribLocation(m_program, "a_position");
-    GLint a_texcoord_loc = glGetAttribLocation(m_program, "a_texcoord");
-
-    pLogDebug("Linked with these locations: %d %d %d %d %d",
-        (int)a_position_loc, (int)a_texcoord_loc, (int)u_texture_loc,
-        (int)m_u_transform_loc, (int)m_u_tint_loc);
+    GLint u_framebuffer_loc = glGetUniformLocation(m_program, "u_framebuffer");
+    GLint u_mask_loc = glGetUniformLocation(m_program, "u_mask");
 
     glUseProgram(m_program);
     glUniform1i(u_texture_loc, 0);
+    glUniform1i(u_framebuffer_loc, 1);
+    glUniform1i(u_mask_loc, 2);
 }
 
 
