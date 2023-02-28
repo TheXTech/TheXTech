@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_opengl.h>
-#include <SDL2/SDL_opengl_glext.h>
 #include <SDL2/SDL_opengles2.h>
 
 #include <Logger/logger.h>

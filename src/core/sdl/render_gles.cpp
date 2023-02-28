@@ -18,13 +18,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(__ANDROID__) || defined(__EMSCRIPTEN__)
+#define THEXTECH_ES_ONLY_BUILD
+#endif
+
 #include <fstream>
 
-#define GL_GLEXT_PROTOTYPES 1
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
-#include <SDL2/SDL_opengl.h>
-#include <SDL2/SDL_opengl_glext.h>
+
+#ifndef THEXTECH_ES_ONLY_BUILD
+#    define GL_GLEXT_PROTOTYPES 1
+#    include <SDL2/SDL_opengl.h>
+#    include <SDL2/SDL_opengl_glext.h>
+#endif
+
 #include <SDL2/SDL_opengles2.h>
 
 #include <FreeImageLite.h>
@@ -96,9 +104,13 @@ bool RenderGLES::isWorking()
 }
 
 // GL values (migrate to RenderGLES class members soon)
+#ifndef THEXTECH_ES_ONLY_BUILD
 static bool s_emulate_logic_ops = false;
 
 static GLuint s_glcore_vao = 0;
+#else
+static constexpr bool s_emulate_logic_ops = true;
+#endif
 
 static std::vector<GLProgramObject*> s_program_bank;
 static GLProgramObject s_program;
@@ -165,6 +177,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     pLogDebug("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
     pLogDebug("OpenGL renderer: %s", glGetString(GL_RENDERER));
 
+#ifndef THEXTECH_ES_ONLY_BUILD
     if(mask == SDL_GL_CONTEXT_PROFILE_CORE)
     {
         glGenVertexArrays(1, &s_glcore_vao);
@@ -174,6 +187,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     {
         s_emulate_logic_ops = true;
     }
+#endif // #ifndef THEXTECH_ES_ONLY_BUILD
 
     SDL_GL_SetSwapInterval(0);
 
@@ -211,6 +225,8 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         while(err = glGetError())
             pLogWarning("Render GL 208: initing got GL error code %d", (int)err);
 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
@@ -633,11 +649,13 @@ void RenderGLES::close()
         s_const_fbcoord_buffer = 0;
     }
 
+#ifndef THEXTECH_ES_ONLY_BUILD
     if(s_glcore_vao)
     {
         glDeleteVertexArrays(1, &s_glcore_vao);
         s_glcore_vao = 0;
     }
+#endif
 
     if(m_gContext)
         SDL_GL_DeleteContext(m_gContext);
@@ -766,7 +784,6 @@ void RenderGLES::repaint()
 
     glFlush();
     SDL_GL_SwapWindow(m_window);
-    clearBuffer();
 }
 
 void RenderGLES::applyViewport()
@@ -988,6 +1005,7 @@ void RenderGLES::setTargetScreen()
 
 void RenderGLES::prepareDrawMask()
 {
+#ifndef THEXTECH_ES_ONLY_BUILD
     if(m_draw_mask_mode == 0)
     {
         // bitwise and
@@ -1005,10 +1023,12 @@ void RenderGLES::prepareDrawMask()
         glBlendFunc(GL_DST_COLOR, GL_ONE_MINUS_SRC_ALPHA);
         // glBlendFunc(GL_ZERO, GL_SRC_COLOR);
     }
+#endif // #ifndef THEXTECH_ES_ONLY_BUILD
 }
 
 void RenderGLES::prepareDrawImage()
 {
+#ifndef THEXTECH_ES_ONLY_BUILD
     if(m_draw_mask_mode == 0)
     {
         // bitwise or
@@ -1031,10 +1051,12 @@ void RenderGLES::prepareDrawImage()
         // add
         glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     }
+#endif // #ifndef THEXTECH_ES_ONLY_BUILD
 }
 
 void RenderGLES::leaveMaskContext()
 {
+#ifndef THEXTECH_ES_ONLY_BUILD
     if(m_draw_mask_mode == 0)
     {
         // no bitwise op
@@ -1055,6 +1077,7 @@ void RenderGLES::leaveMaskContext()
         // normal
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
+#endif // #ifndef THEXTECH_ES_ONLY_BUILD
 }
 
 static int s_nextPowerOfTwo(int val)

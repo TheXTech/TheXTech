@@ -21,7 +21,7 @@
 #pragma once
 #ifndef GL_PROGRAM_OBJECT_H
 
-#include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_opengles2.h>
 #include <vector>
 
 class GLProgramObject

@@ -65,7 +65,7 @@ public:
     RenderGL11();
     ~RenderGL11() override;
 
-    void togglehud();
+    void togglehud() override;
 
 
     unsigned int SDL_InitFlags() override;

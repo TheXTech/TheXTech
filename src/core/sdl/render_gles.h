@@ -65,7 +65,7 @@ public:
     RenderGLES();
     ~RenderGLES() override;
 
-    void togglehud();
+    void togglehud() override;
 
 
     unsigned int SDL_InitFlags() override;
