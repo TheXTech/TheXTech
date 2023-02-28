@@ -20,6 +20,7 @@
 
 #include <fstream>
 
+#define GL_GLEXT_PROTOTYPES 1
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_opengl.h>
@@ -97,6 +98,8 @@ bool RenderGLES::isWorking()
 // GL values (migrate to RenderGLES class members soon)
 static bool s_emulate_logic_ops = true;
 
+static GLuint s_glcore_vao = 0;
+
 static std::vector<GLProgramObject*> s_program_bank;
 static GLProgramObject s_program;
 static GLProgramObject s_special_program;
@@ -129,9 +132,15 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     Uint32 renderFlags = 0;
 
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+#if defined(__ANDROID__) || defined(__EMSCRIPTEN__) || 1
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#else
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+#endif
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
@@ -155,6 +164,12 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     pLogDebug("OpenGL version: %s", glGetString(GL_VERSION));
     pLogDebug("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
     pLogDebug("OpenGL renderer: %s", glGetString(GL_RENDERER));
+
+    if(mask == SDL_GL_CONTEXT_PROFILE_CORE)
+    {
+        glGenVertexArrays(1, &s_glcore_vao);
+        glBindVertexArray(s_glcore_vao);
+    }
 
     SDL_GL_SetSwapInterval(0);
 
@@ -182,14 +197,26 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         // try to allocate texture memory
         glBindTexture(GL_TEXTURE_2D, s_game_texture);
 
+        while(err = glGetError())
+            pLogWarning("Render GL 201: initing got GL error code %d", (int)err);
+
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
             ScreenW, ScreenH,
-            0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+            0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+
+        while(err = glGetError())
+            pLogWarning("Render GL 208: initing got GL error code %d", (int)err);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
+        while(err = glGetError())
+            pLogWarning("Render GL 214: initing got GL error code %d", (int)err);
+
         glBindTexture(GL_TEXTURE_2D, 0);
+
+        while(err = glGetError())
+            pLogWarning("Render GL 219: initing got GL error code %d", (int)err);
 
         GLenum err = glGetError();
         if(err)
@@ -532,6 +559,9 @@ void main()
         glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16, nullptr, GL_STREAM_DRAW);
     }
 
+    while(err = glGetError())
+        pLogWarning("Render GL 200: initing got GL error code %d", (int)err);
+
     GLfloat fbcoords[] =
     {
         // fbcoords
@@ -541,7 +571,15 @@ void main()
         1.0f, 0.0f
     };
     glBindBuffer(GL_ARRAY_BUFFER, s_const_fbcoord_buffer);
+
+    while(err = glGetError())
+        pLogWarning("Render GL 201: initing got GL error code %d", (int)err);
+
     glBufferData(GL_ARRAY_BUFFER, sizeof(fbcoords), fbcoords, GL_STATIC_DRAW);
+
+    while(err = glGetError())
+        pLogWarning("Render GL 202: initing got GL error code %d", (int)err);
+
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     while(err = glGetError())
@@ -589,6 +627,12 @@ void RenderGLES::close()
     {
         glDeleteBuffers(1, &s_const_fbcoord_buffer);
         s_const_fbcoord_buffer = 0;
+    }
+
+    if(s_glcore_vao)
+    {
+        glDeleteVertexArrays(1, &s_glcore_vao);
+        s_glcore_vao = 0;
     }
 
     if(m_gContext)
