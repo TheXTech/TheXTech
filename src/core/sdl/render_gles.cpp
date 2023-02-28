@@ -96,7 +96,7 @@ bool RenderGLES::isWorking()
 }
 
 // GL values (migrate to RenderGLES class members soon)
-static bool s_emulate_logic_ops = true;
+static bool s_emulate_logic_ops = false;
 
 static GLuint s_glcore_vao = 0;
 
@@ -169,6 +169,10 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     {
         glGenVertexArrays(1, &s_glcore_vao);
         glBindVertexArray(s_glcore_vao);
+    }
+    else if(mask == SDL_GL_CONTEXT_PROFILE_ES)
+    {
+        s_emulate_logic_ops = true;
     }
 
     SDL_GL_SetSwapInterval(0);
@@ -675,7 +679,9 @@ void RenderGLES::repaint()
         return;
 #endif
 
-    if(m_draw_mask_mode == 0)
+    if(s_emulate_logic_ops)
+        SuperPrintScreenCenter("Logic Op Shader (ES)", 3, 0);
+    else if(m_draw_mask_mode == 0)
         SuperPrintScreenCenter("Logic Op Render (X64)", 3, 0);
     else if(m_draw_mask_mode == 1)
         SuperPrintScreenCenter("Min/Max Render", 3, 0);
@@ -1515,6 +1521,30 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
 
+    if(tx.d.mask_texture_id && s_emulate_logic_ops)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glCopyTexImage2D(GL_TEXTURE_2D,
+            0,
+            GL_RGB,
+            xDst,
+            ScreenH - (yDst + hDst),
+            wDst,
+            hDst,
+            0);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
+        glActiveTexture(GL_TEXTURE0);
+
+        s_special_program.use_program();
+        s_special_program.update_transform(s_transform_matrix.data());
+        s_special_program.update_tint(tint_enabled, tint);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        return;
+    }
+
     s_program.use_program();
     s_program.update_transform(s_transform_matrix.data());
     s_program.update_tint(tint_enabled, tint);
@@ -1596,6 +1626,30 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
+
+    if(tx.d.mask_texture_id && s_emulate_logic_ops)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glCopyTexImage2D(GL_TEXTURE_2D,
+            0,
+            GL_RGB,
+            xDst,
+            ScreenH - (yDst + hDst),
+            wDst,
+            hDst,
+            0);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
+        glActiveTexture(GL_TEXTURE0);
+
+        s_special_program.use_program();
+        s_special_program.update_transform(s_transform_matrix.data());
+        s_special_program.update_tint(tint_enabled, tint);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        return;
+    }
 
     s_program.use_program();
     s_program.update_transform(s_transform_matrix.data());
@@ -1847,6 +1901,30 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
 
+    if(tx.d.mask_texture_id && s_emulate_logic_ops)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glCopyTexImage2D(GL_TEXTURE_2D,
+            0,
+            GL_RGB,
+            xDst,
+            ScreenH - (yDst + hDst),
+            wDst,
+            hDst,
+            0);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
+        glActiveTexture(GL_TEXTURE0);
+
+        s_special_program.use_program();
+        s_special_program.update_transform(s_transform_matrix.data());
+        s_special_program.update_tint(tint_enabled, tint);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        return;
+    }
+
     s_program.use_program();
     s_program.update_transform(s_transform_matrix.data());
     s_program.update_tint(tint_enabled, tint);
@@ -1930,6 +2008,30 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
+
+    if(tx.d.mask_texture_id && s_emulate_logic_ops)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glCopyTexImage2D(GL_TEXTURE_2D,
+            0,
+            GL_RGB,
+            xDst,
+            ScreenH - (yDst + tx.h),
+            tx.w,
+            tx.h,
+            0);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
+        glActiveTexture(GL_TEXTURE0);
+
+        s_special_program.use_program();
+        s_special_program.update_transform(s_transform_matrix.data());
+        s_special_program.update_tint(tint_enabled, tint);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        return;
+    }
 
     s_program.use_program();
     s_program.update_transform(s_transform_matrix.data());
