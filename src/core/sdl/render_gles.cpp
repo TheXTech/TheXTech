@@ -105,6 +105,7 @@ bool RenderGLES::isWorking()
 
 // GL values (migrate to RenderGLES class members soon)
 #ifndef THEXTECH_ES_ONLY_BUILD
+static bool s_gles_mode = false;
 static bool s_emulate_logic_ops = false;
 
 static GLuint s_glcore_vao = 0;
@@ -144,7 +145,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     Uint32 renderFlags = 0;
 
-#if defined(__ANDROID__) || defined(__EMSCRIPTEN__) || 1
+#if defined(__ANDROID__) || defined(__EMSCRIPTEN__)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -185,6 +186,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     }
     else if(mask == SDL_GL_CONTEXT_PROFILE_ES)
     {
+        s_gles_mode = true;
         s_emulate_logic_ops = true;
     }
 #endif // #ifndef THEXTECH_ES_ONLY_BUILD
@@ -665,26 +667,15 @@ void RenderGLES::close()
 
 void RenderGLES::togglehud()
 {
-    if(m_draw_mask_mode == 0)
+#ifndef THEXTECH_ES_ONLY_BUILD
+    if(!s_gles_mode)
     {
-        m_draw_mask_mode = 1;
-        PlaySoundMenu(SFX_PlayerShrink);
-    }
-    else if(m_draw_mask_mode == 1)
-    {
-        m_draw_mask_mode = 2;
+        s_emulate_logic_ops = !s_emulate_logic_ops;
         PlaySoundMenu(SFX_Raccoon);
     }
-    else if(m_draw_mask_mode == 2)
-    {
-        m_draw_mask_mode = 3;
-        PlaySoundMenu(SFX_PlayerDied2);
-    }
     else
-    {
-        m_draw_mask_mode = 0;
-        PlaySoundMenu(SFX_PlayerGrow);
-    }
+#endif
+        PlaySoundMenu(SFX_BlockHit);
 }
 
 void RenderGLES::repaint()
@@ -699,14 +690,8 @@ void RenderGLES::repaint()
 
     if(s_emulate_logic_ops)
         SuperPrintScreenCenter("Logic Op Shader (ES)", 3, 0);
-    else if(m_draw_mask_mode == 0)
-        SuperPrintScreenCenter("Logic Op Render (X64)", 3, 0);
-    else if(m_draw_mask_mode == 1)
-        SuperPrintScreenCenter("Min/Max Render", 3, 0);
-    else if(m_draw_mask_mode == 2)
-        SuperPrintScreenCenter("Mul/Max Render (X2)", 3, 0);
     else
-        SuperPrintScreenCenter("Mul/Add Render", 3, 0);
+        SuperPrintScreenCenter("Logic Op Render (X64)", 3, 0);
 
 #ifdef USE_SCREENSHOTS_AND_RECS
     if(TakeScreen)
