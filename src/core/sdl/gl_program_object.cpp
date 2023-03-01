@@ -202,18 +202,13 @@ GLProgramObject::GLProgramObject(const char* vertex_src, const char* fragment_sr
 
 GLProgramObject::~GLProgramObject()
 {
-    if(m_program)
-        glDeleteProgram(m_program);
-
-    m_program = 0;
-
-    m_u_custom_loc.clear();
+    reset();
 }
 
 const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
 {
     if(inited())
-        GLProgramObject::~GLProgramObject();
+        reset();
 
     m_program = other.m_program;
 
@@ -227,6 +222,16 @@ const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
     other.m_program = 0;
 
     return *this;
+}
+
+void GLProgramObject::reset()
+{
+    if(m_program)
+        glDeleteProgram(m_program);
+
+    m_program = 0;
+
+    m_u_custom_loc.clear();
 }
 
 /*!

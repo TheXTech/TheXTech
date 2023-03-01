@@ -58,6 +58,11 @@ public:
     const GLProgramObject& operator=(GLProgramObject&& other);
 
     /*!
+     * \brief Resets program object and unloads in OpenGL
+     */
+    void reset();
+
+    /*!
      * \brief Activate program in OpenGL state
      */
     void use_program();
