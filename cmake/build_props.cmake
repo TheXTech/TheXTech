@@ -33,7 +33,7 @@ macro(xtech_add_warning_flag WARNINGFLAG WARNING_VAR)
 
     check_cxx_compiler_flag("${WARNINGFLAG}" HAVE_W_CXX_${WARNING_VAR})
     if(HAVE_W_CXX_${WARNING_VAR})
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${WARNINGFLAG}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARNINGFLAG}")
     endif()
 endmacro()
 
@@ -45,7 +45,7 @@ macro(xtech_disable_warning_flag WARNINGFLAG WARNING_VAR)
 
     check_cxx_compiler_flag("-W${WARNINGFLAG}" HAVE_W_CXX_${WARNING_VAR})
     if(HAVE_W_CXX_${WARNING_VAR})
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-${WARNINGFLAG}")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-${WARNINGFLAG}")
     endif()
 endmacro()
 
