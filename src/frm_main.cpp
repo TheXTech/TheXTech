@@ -35,7 +35,15 @@
 #   include "core/sdl/render_sdl.h"
 #   include "core/sdl/render_gl11.h"
 #   include "core/sdl/render_gles.h"
+
+#   if defined(THEXTECH_BUILD_GL_MODERN)
 typedef RenderGLES RenderUsed;
+#   elif defined(THEXTECH_BUILD_GL_LEGACY)
+typedef RenderGL11 RenderUsed;
+#   else
+typedef RenderSDL RenderUsed;
+#   endif
+
 #   define USE_CORE_RENDER_SDL
 
 #   include "core/sdl/window_sdl.h"

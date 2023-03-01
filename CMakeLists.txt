@@ -158,6 +158,12 @@ if(NINTENDO_3DS)
     option(THEXTECH_CUSTOM_AUDIO_LIBRARY "Use the custom audio library instead of MixerX" OFF)
 endif()
 
+option(THEXTECH_BUILD_GL_LEGACY "On SDL builds, include the legacy OpenGL 1.1/2.0 renderer" ON)
+option(THEXTECH_BUILD_GL_MODERN "On SDL builds, include the modern OpenGL Core/ES renderer" ON)
+
+option(THEXTECH_GL_ES_ONLY "Force the modern OpenGL renderer to use ES mode only" OFF)
+mark_as_advanced(THEXTECH_GL_ES_ONLY)
+
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
 
@@ -251,6 +257,11 @@ endif()
 if(NINTENDO_DS)
     set(THEXTECH_ENABLE_AUDIO_FX OFF CACHE BOOL "" FORCE)
     set(THEXTECH_NO_SDL_BUILD ON CACHE BOOL "" FORCE)
+endif()
+
+if(ANDROID OR EMSCRIPTEN)
+    set(THEXTECH_BUILD_GL_LEGACY OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_GL_ES_ONLY ON CACHE BOOL "" FORCE)
 endif()
 
 # ============ Platform-conf ==end=========
@@ -679,13 +690,23 @@ else()
         src/core/base/msgbox_base.cpp
         src/core/base/events_base.cpp
         src/core/sdl/render_sdl.cpp
-        src/core/sdl/render_gl11.cpp
-        src/core/sdl/gl_program_object.cpp
-        src/core/sdl/render_gles.cpp
         src/core/sdl/window_sdl.cpp
         src/core/sdl/msgbox_sdl.cpp
         src/core/sdl/events_sdl.cpp
     )
+
+    if(THEXTECH_BUILD_GL_LEGACY)
+        list(APPEND THEXTECH_SRC
+            src/core/sdl/render_gl11.cpp
+        )
+    endif()
+
+    if(THEXTECH_BUILD_GL_MODERN)
+        list(APPEND THEXTECH_SRC
+            src/core/sdl/gl_program_object.cpp
+            src/core/sdl/render_gles.cpp
+        )
+    endif()
 endif()
 
 # Add heads into the list
@@ -895,6 +916,18 @@ endif()
 
 if(THEXTECH_CLI_BUILD)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_CLI_BUILD)
+endif()
+
+if(THEXTECH_BUILD_GL_LEGACY)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_LEGACY)
+endif()
+
+if(THEXTECH_BUILD_GL_MODERN)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_MODERN)
+endif()
+
+if(THEXTECH_GL_ES_ONLY)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_GL_ES_ONLY)
 endif()
 
 if(THEXTECH_ENABLE_WIP_FEATURES)
