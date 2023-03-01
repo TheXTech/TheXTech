@@ -26,6 +26,8 @@
 #include <json/json.hpp>
 #include <fmt_format_ne.h>
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "globals.h"
 
 #include "fontman/font_manager.h"
