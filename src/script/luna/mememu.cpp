@@ -1409,7 +1409,7 @@ public:
         }
         else if(address >= 0x146 && address < 0x150) // Pinched
         {
-            int in;
+            int in = 0;
 
             memToValue(in, value, ftype);
 
@@ -1607,7 +1607,7 @@ public:
         }
         else if(address >= 0x0A && address < 0x14) // Pinched
         {
-            int in;
+            int in = 0;
 
             memToValue(in, value, ftype);
 
