@@ -39,7 +39,7 @@ void XLanguagePriv::detectOSLanguage()
     res = CFGU_GetSystemLanguage(&language);
     if(res != 0)
     {
-        std::fprintf(stderr, "CFGU_GetSystemLanguage() failed: 0x%x.\n", res);
+        std::fprintf(stderr, "CFGU_GetSystemLanguage() failed: 0x%x.\n", (unsigned int)res);
         std::fflush(stderr);
         cfguExit();
         return;
@@ -48,7 +48,7 @@ void XLanguagePriv::detectOSLanguage()
     res = CFGU_SecureInfoGetRegion(&region);
     if(res != 0)
     {
-        std::fprintf(stderr, "CFGU_SecureInfoGetRegion() failed: 0x%x.\n", res);
+        std::fprintf(stderr, "CFGU_SecureInfoGetRegion() failed: 0x%x.\n", (unsigned int)res);
         std::fflush(stderr);
         cfguExit();
         return;

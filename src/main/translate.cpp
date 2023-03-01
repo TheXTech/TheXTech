@@ -151,6 +151,7 @@ static bool dumpFile(const std::string &inPath, std::string &outData)
     return ret;
 }
 
+#ifndef THEXTECH_DISABLE_LANG_TOOLS
 static bool saveFile(const std::string &inPath, const std::string &inData)
 {
     bool ret = true;
@@ -163,6 +164,7 @@ static bool saveFile(const std::string &inPath, const std::string &inData)
 
     return ret;
 }
+#endif
 
 
 XTechTranslate::XTechTranslate()
