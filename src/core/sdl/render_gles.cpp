@@ -119,7 +119,6 @@ static GLProgramObject s_program_circle;
 static GLProgramObject s_program_circle_hole;
 
 static GLuint s_fb_read_texture = 0;
-static GLuint s_const_fbcoord_buffer = 0;
 
 static GLuint s_game_texture = 0;
 static GLuint s_game_texture_fb = 0;
@@ -129,6 +128,40 @@ static GLuint s_vertex_buffer[s_num_buffers] = {0};
 static int s_cur_buffer_index = 0;
 
 static std::array<GLfloat, 16> s_transform_matrix;
+
+static void s_update_fb_read_texture(int x, int y, int w, int h)
+{
+    if(x >= ScreenW || y >= ScreenH)
+        return;
+
+    if(x < 0)
+    {
+        w += x;
+        x = 0;
+    }
+
+    if(y < 0)
+    {
+        h += y;
+        y = 0;
+    }
+
+    if(x + w >= ScreenW)
+        w = ScreenW - x;
+
+    if(y + h >= ScreenH)
+        h = ScreenH - y;
+
+    glActiveTexture(GL_TEXTURE1);
+    glCopyTexSubImage2D(GL_TEXTURE_2D,
+        0,
+        x,
+        ScreenH - (y + h),
+        x,
+        ScreenH - (y + h),
+        w,
+        h);
+}
 
 bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 {
@@ -278,6 +311,10 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, s_fb_read_texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+        ScreenW, ScreenH,
+        0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -451,14 +488,17 @@ void main()
             "uniform   mat4 u_transform;  \n"
             "attribute vec4 a_position;   \n"
             "attribute vec2 a_texcoord;   \n"
-            "attribute vec2 a_fbcoord;   \n"
             "varying   vec2 v_texcoord;   \n"
             "varying   vec2 v_fbcoord;   \n"
             "void main()                  \n"
             "{                            \n"
             "   gl_Position = u_transform * a_position;  \n"
             "   v_texcoord = a_texcoord;  \n"
-            "   v_fbcoord = a_fbcoord;  \n"
+            "   v_fbcoord = vec2(u_transform * a_position);  \n"
+            "   v_fbcoord.x += 1.0;  \n"
+            "   v_fbcoord.x /= 2.0;  \n"
+            "   v_fbcoord.y += 1.0;  \n"
+            "   v_fbcoord.y /= 2.0;  \n"
             "}                            \n"
         ),
         logic_contents.c_str()
@@ -565,11 +605,9 @@ void main()
 
     // initialize vertex buffers
     glGenBuffers(s_num_buffers, s_vertex_buffer);
-    glGenBuffers(1, &s_const_fbcoord_buffer);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
 
     for(int i = 0; i < s_num_buffers; i++)
     {
@@ -579,26 +617,6 @@ void main()
 
     while(err = glGetError())
         pLogWarning("Render GL 200: initing got GL error code %d", (int)err);
-
-    GLfloat fbcoords[] =
-    {
-        // fbcoords
-        0.0f, 1.0f,
-        0.0f, 0.0f,
-        1.0f, 1.0f,
-        1.0f, 0.0f
-    };
-    glBindBuffer(GL_ARRAY_BUFFER, s_const_fbcoord_buffer);
-
-    while(err = glGetError())
-        pLogWarning("Render GL 201: initing got GL error code %d", (int)err);
-
-    glBufferData(GL_ARRAY_BUFFER, sizeof(fbcoords), fbcoords, GL_STATIC_DRAW);
-
-    while(err = glGetError())
-        pLogWarning("Render GL 202: initing got GL error code %d", (int)err);
-
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
     while(err = glGetError())
         pLogWarning("Render GL 238: initing got GL error code %d", (int)err);
@@ -639,12 +657,6 @@ void RenderGLES::close()
         glDeleteBuffers(s_num_buffers, s_vertex_buffer);
         for(int i = 0; i < s_num_buffers; i++)
             s_vertex_buffer[i] = 0;
-    }
-
-    if(s_const_fbcoord_buffer)
-    {
-        glDeleteBuffers(1, &s_const_fbcoord_buffer);
-        s_const_fbcoord_buffer = 0;
     }
 
 #ifndef THEXTECH_GL_ES_ONLY
@@ -1527,15 +1539,8 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
 
     if(tx.d.mask_texture_id && s_emulate_logic_ops)
     {
-        glActiveTexture(GL_TEXTURE1);
-        glCopyTexImage2D(GL_TEXTURE_2D,
-            0,
-            GL_RGB,
-            xDst,
-            ScreenH - (yDst + hDst),
-            wDst,
-            hDst,
-            0);
+        s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
+
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
         glActiveTexture(GL_TEXTURE0);
@@ -1633,15 +1638,8 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
     if(tx.d.mask_texture_id && s_emulate_logic_ops)
     {
-        glActiveTexture(GL_TEXTURE1);
-        glCopyTexImage2D(GL_TEXTURE_2D,
-            0,
-            GL_RGB,
-            xDst,
-            ScreenH - (yDst + hDst),
-            wDst,
-            hDst,
-            0);
+        s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
+
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
         glActiveTexture(GL_TEXTURE0);
@@ -1764,15 +1762,8 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     if(tx.d.mask_texture_id && s_emulate_logic_ops)
     {
-        glActiveTexture(GL_TEXTURE1);
-        glCopyTexImage2D(GL_TEXTURE_2D,
-            0,
-            GL_RGB,
-            xDst,
-            ScreenH - (yDst + hDst),
-            wDst,
-            hDst,
-            0);
+        s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
+
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
         glActiveTexture(GL_TEXTURE0);
@@ -1907,15 +1898,8 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
 
     if(tx.d.mask_texture_id && s_emulate_logic_ops)
     {
-        glActiveTexture(GL_TEXTURE1);
-        glCopyTexImage2D(GL_TEXTURE_2D,
-            0,
-            GL_RGB,
-            xDst,
-            ScreenH - (yDst + hDst),
-            wDst,
-            hDst,
-            0);
+        s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
+
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
         glActiveTexture(GL_TEXTURE0);
@@ -2015,15 +1999,8 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
     if(tx.d.mask_texture_id && s_emulate_logic_ops)
     {
-        glActiveTexture(GL_TEXTURE1);
-        glCopyTexImage2D(GL_TEXTURE_2D,
-            0,
-            GL_RGB,
-            xDst,
-            ScreenH - (yDst + tx.h),
-            tx.w,
-            tx.h,
-            0);
+        s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
+
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
         glActiveTexture(GL_TEXTURE0);
