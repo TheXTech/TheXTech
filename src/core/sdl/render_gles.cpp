@@ -238,7 +238,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         glGenTextures(1, &s_game_texture);
     }
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 138: initing got GL error code %d", (int)err);
 
     if(s_game_texture_fb && s_game_texture)
@@ -246,14 +246,14 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         // try to allocate texture memory
         glBindTexture(GL_TEXTURE_2D, s_game_texture);
 
-        while(err = glGetError())
+        while((err = glGetError()) != 0)
             pLogWarning("Render GL 201: initing got GL error code %d", (int)err);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
             ScreenW, ScreenH,
             0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
-        while(err = glGetError())
+        while((err = glGetError()) != 0)
             pLogWarning("Render GL 208: initing got GL error code %d", (int)err);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -261,15 +261,15 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-        while(err = glGetError())
+        while((err = glGetError()) != 0)
             pLogWarning("Render GL 214: initing got GL error code %d", (int)err);
 
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        while(err = glGetError())
+        while((err = glGetError()) != 0)
             pLogWarning("Render GL 219: initing got GL error code %d", (int)err);
 
-        GLenum err = glGetError();
+        err = glGetError();
         if(err)
         {
             pLogWarning("Render GL: could not allocate game screen texture (%d). Falling back to screen-space scaling.", (int)err);
@@ -304,7 +304,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 187: initing got GL error code %d", (int)err);
 
     glGenTextures(1, &s_fb_read_texture);
@@ -326,7 +326,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     m_maxTextureWidth = maxTextureSize;
     m_maxTextureHeight = maxTextureSize;
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 198: initing got GL error code %d", (int)err);
 
     const char* vertex_src = (
@@ -600,7 +600,7 @@ void main()
         );
     }
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 225: initing got GL error code %d", (int)err);
 
     // initialize vertex buffers
@@ -615,10 +615,10 @@ void main()
         glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16, nullptr, GL_STREAM_DRAW);
     }
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 200: initing got GL error code %d", (int)err);
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 238: initing got GL error code %d", (int)err);
 
     // Clean-up from a possible start-up junk
@@ -688,7 +688,8 @@ void RenderGLES::togglehud()
 
 void RenderGLES::repaint()
 {
-    while(GLint err = glGetError())
+    GLuint err;
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL rp1: initing got GL error code %d", (int)err);
 
 #ifdef USE_RENDER_BLOCKING
@@ -770,7 +771,7 @@ void RenderGLES::repaint()
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    while(GLint err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL rp2: initing got GL error code %d", (int)err);
 
     Controls::RenderTouchControls();
@@ -822,8 +823,8 @@ void RenderGLES::applyViewport()
             viewport_w, viewport_h);
 
         s_transform_matrix = {
-            2.0f / viewport_w, 0.0f, 0.0f, 0.0f,
-            0.0f, -2.0f / viewport_h, 0.0f, 0.0f,
+            2.0f / (float)viewport_w, 0.0f, 0.0f, 0.0f,
+            0.0f, -2.0f / (float)viewport_h, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f, 0.0f,
             -float(viewport_w + off_x + off_x) / (viewport_w), float(viewport_h + off_y + off_y) / (viewport_h), 0.0f, 1.0f,
         };
