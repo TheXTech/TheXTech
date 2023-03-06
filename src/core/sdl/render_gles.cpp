@@ -531,17 +531,15 @@ void main()
             "precision mediump float;                     \n"
             "varying   vec2      v_texcoord;              \n"
             "varying   vec4      v_tint;                  \n"
-            "uniform   vec2      u_size;                  \n"
             "void main()                                  \n"
             "{                                            \n"
-            "  if(v_texcoord.x * u_size.x >= 1.0 && v_texcoord.x * u_size.x < u_size.x - 1.0 \n"
-            "     && v_texcoord.y * u_size.y >= 1.0 && v_texcoord.y * u_size.y < u_size.y - 1.0) \n"
+            "  if(v_texcoord.x >= 0.0 && v_texcoord.x < 1.0 \n"
+            "     && v_texcoord.y >= 0.0 && v_texcoord.y < 1.0) \n"
             "    discard;                                 \n"
             "  gl_FragColor = v_tint;                     \n"
             "}                                            \n"
         )
     );
-    s_program_rect_unfilled.register_uniform("u_size");
 
     s_program_circle = GLProgramObject(
         vertex_src,
@@ -1303,12 +1301,19 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
     float y1 = y;
     float y2 = y + h;
 
+    // want interpolated value to be <= 0 for first two pixels, >= 1 for last two pixels
+    float u1 = -2.0f / w;
+    float u2 = (w + 2.0f) / w;
+
+    float v1 = -2.0f / h;
+    float v2 = (h + 2.0f) / h;
+
     const Vertex_t vertex_attribs[] =
     {
-        {{x1, y1, 0}, {red, green, blue, alpha}, {0.0, 0.0}},
-        {{x1, y2, 0}, {red, green, blue, alpha}, {0.0, 1.0}},
-        {{x2, y1, 0}, {red, green, blue, alpha}, {1.0, 0.0}},
-        {{x2, y2, 0}, {red, green, blue, alpha}, {1.0, 1.0}},
+        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}},
     };
 
     s_cur_buffer_index++;
@@ -1321,9 +1326,6 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
-    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
-    const GLfloat tint[] = {red, green, blue, alpha};
-
     if(filled)
     {
         s_program_rect_filled.use_program();
@@ -1333,7 +1335,6 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
     {
         s_program_rect_unfilled.use_program();
         s_program_rect_unfilled.update_transform(s_transform_matrix.data());
-        glUniform2f(s_program_rect_unfilled.get_uniform_loc(0), w, h);
     }
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
