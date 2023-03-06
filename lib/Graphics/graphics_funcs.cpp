@@ -614,6 +614,36 @@ bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, con
     return false;
 }
 
+bool GraphicsHelps::validateForDepthTest(FIBITMAP *image, const std::string &origPath)
+{
+    if(!image)
+        return false;
+
+    (void)origPath; // supress warning when build the release build
+
+    auto w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    auto pitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
+    BYTE *img_bits  = FreeImage_GetBits(image);
+
+    for(uint32_t y = 0; y < h; ++y)
+    {
+        for(uint32_t x = 0; x < w; ++x)
+        {
+            BYTE *alpha = img_bits + (y * pitch) + (x * 4) + 3;
+
+            if(*alpha == 0 || *alpha == 255)
+                continue;
+
+            D_pLogDebug("Texture CANNOT use depth test (%s)", origPath.c_str());
+            return false;
+        }
+    }
+
+    D_pLogDebug("Texture can use depth test (%s)", origPath.c_str());
+    return true;
+}
+
 bool GraphicsHelps::setWindowIcon(SDL_Window *window, FIBITMAP *img, int iconSize)
 {
 #ifdef _WIN32

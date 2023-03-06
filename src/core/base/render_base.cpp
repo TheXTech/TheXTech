@@ -276,6 +276,9 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
     g_render->loadTexture(target, w, h, textura, pitch);
 
+    if(maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, path))
+        target.d.invalidateDepthTest();
+
 #ifdef DEBUG_BUILD
     bindElapsed = bindingTime.nanoelapsed();
     unloadTime.start();
@@ -613,6 +616,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
 
     g_render->loadTexture(target, w, h, textura, pitch);
+    if(maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
+        target.d.invalidateDepthTest();
 
     GraphicsHelps::closeImage(sourceImage);
 

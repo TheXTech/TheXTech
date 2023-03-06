@@ -162,6 +162,16 @@ public:
     static bool validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, const std::string &origPath = std::string());
 
     /*!
+     * \brief Checks the possibility to render the image using a depth test without losses
+     * There are next conditions required:
+     * - Every pixel in the image must be either fully transparent or fully opaque
+     * \param image Image to check
+     * \param origPath The optional original path to the texture, needed for log printing
+     * \return true - image may be included in draws using the depth test
+     */
+    static bool validateForDepthTest(FIBITMAP *image, const std::string &origPath = std::string());
+
+    /*!
      * \brief Set the icon for the SDL Window
      * \param window Target window instance
      * \param img Icon image to set

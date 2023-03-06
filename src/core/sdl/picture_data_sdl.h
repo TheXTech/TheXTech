@@ -59,6 +59,9 @@ private:
     //! Cached color modifier
     uint8_t     modColor[4] = {255,255,255,255};
 
+    //! Can use depth test for out-of-order rendering
+    bool        use_depth_test = true;
+
 // Public API
 public:
 
@@ -70,6 +73,12 @@ public:
     inline void clear()
     {
         texture = nullptr;
+        use_depth_test = true;
+    }
+
+    inline void invalidateDepthTest()
+    {
+        use_depth_test = false;
     }
 };
 
