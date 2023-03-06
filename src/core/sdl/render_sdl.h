@@ -66,6 +66,8 @@ class RenderSDL final : public AbstractRender_t
     int m_viewport_w = 0;
     int m_viewport_h = 0;
 
+    static SDL_INLINE void txColorMod(StdPictureData &tx, float red, float green, float blue, float alpha);
+
 public:
     RenderSDL();
     ~RenderSDL() override;

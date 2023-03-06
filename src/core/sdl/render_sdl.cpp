@@ -681,7 +681,7 @@ void RenderSDL::renderCircleHole(int cx, int cy, int radius, float red, float gr
 
 
 
-static SDL_INLINE void txColorMod(StdPictureData &tx, float red, float green, float blue, float alpha)
+SDL_INLINE void RenderSDL::txColorMod(StdPictureData &tx, float red, float green, float blue, float alpha)
 {
     uint8_t modColor[4] = {static_cast<unsigned char>(255.f * red),
                            static_cast<unsigned char>(255.f * green),

@@ -36,6 +36,7 @@ struct SDL_Texture;
 struct StdPictureData
 {
 // Compatible backend is only can use these internals
+private:
     friend class RenderSDL;
     friend class RenderGL11;
     friend class RenderGLES;
@@ -59,6 +60,7 @@ struct StdPictureData
     uint8_t     modColor[4] = {255,255,255,255};
 
 // Public API
+public:
 
     inline bool hasTexture()
     {
