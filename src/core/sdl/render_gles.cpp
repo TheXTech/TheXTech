@@ -164,6 +164,31 @@ static void s_update_fb_read_texture(int x, int y, int w, int h)
         h);
 }
 
+static void s_fill_buffer(const RenderGLES::Vertex_t* vertex_attribs, int count)
+{
+    s_cur_buffer_index++;
+    if(s_cur_buffer_index >= s_num_buffers)
+        s_cur_buffer_index = 0;
+
+    GLsizeiptr buffer_size = sizeof(RenderGLES::Vertex_t) * count;
+
+    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+
+    if(s_vertex_buffer_size[s_cur_buffer_index] < buffer_size)
+    {
+        glBufferData(GL_ARRAY_BUFFER, buffer_size, vertex_attribs, GL_STREAM_DRAW);
+        s_vertex_buffer_size[s_cur_buffer_index] = buffer_size;
+    }
+    else
+    {
+        glBufferSubData(GL_ARRAY_BUFFER, 0, buffer_size, vertex_attribs);
+    }
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), (void*)offsetof(RenderGLES::Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), (void*)offsetof(RenderGLES::Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE,  sizeof(RenderGLES::Vertex_t), (void*)offsetof(RenderGLES::Vertex_t, tint));
+}
+
 bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 {
     pLogDebug("Init renderer settings...");
@@ -749,21 +774,13 @@ void RenderGLES::repaint()
             {{x2, y2, 0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 0.0}},
         };
 
+        s_fill_buffer(vertex_attribs, 4);
+
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, s_game_texture);
 
         s_output_program.use_program();
         s_output_program.update_transform(s_transform_matrix.data());
-
-        s_cur_buffer_index++;
-        if(s_cur_buffer_index >= s_num_buffers)
-            s_cur_buffer_index = 0;
-
-        glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1318,15 +1335,7 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
         {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}},
     };
 
-    s_cur_buffer_index++;
-    if(s_cur_buffer_index >= s_num_buffers)
-        s_cur_buffer_index = 0;
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
+    s_fill_buffer(vertex_attribs, 4);
 
     if(filled)
     {
@@ -1374,18 +1383,7 @@ void RenderGLES::renderCircle(int cx, int cy, int radius, float red, float green
         {{x2, y2, 0}, {red, green, blue, alpha}, {1.0, 1.0}},
     };
 
-    s_cur_buffer_index++;
-    if(s_cur_buffer_index >= s_num_buffers)
-        s_cur_buffer_index = 0;
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
-
-    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
-    const GLfloat tint[] = {red, green, blue, alpha};
+    s_fill_buffer(vertex_attribs, 4);
 
     s_program_circle.use_program();
     s_program_circle.update_transform(s_transform_matrix.data());
@@ -1415,18 +1413,7 @@ void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float g
         {{x2, y2, 0}, {red, green, blue, alpha}, {1.0, 1.0}},
     };
 
-    s_cur_buffer_index++;
-    if(s_cur_buffer_index >= s_num_buffers)
-        s_cur_buffer_index = 0;
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
-
-    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
-    const GLfloat tint[] = {red, green, blue, alpha};
+    s_fill_buffer(vertex_attribs, 4);
 
     s_program_circle_hole.use_program();
     s_program_circle_hole.update_transform(s_transform_matrix.data());
@@ -1502,18 +1489,7 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
         {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
     };
 
-    s_cur_buffer_index++;
-    if(s_cur_buffer_index >= s_num_buffers)
-        s_cur_buffer_index = 0;
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
-
-    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
-    const GLfloat tint[] = {red, green, blue, alpha};
+    s_fill_buffer(vertex_attribs, 4);
 
     if(tx.d.mask_texture_id && s_emulate_logic_ops)
     {
@@ -1593,18 +1569,7 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
         {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
     };
 
-    s_cur_buffer_index++;
-    if(s_cur_buffer_index >= s_num_buffers)
-        s_cur_buffer_index = 0;
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
-
-    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
-    const GLfloat tint[] = {red, green, blue, alpha};
+    s_fill_buffer(vertex_attribs, 4);
 
     if(tx.d.mask_texture_id && s_emulate_logic_ops)
     {
@@ -1707,18 +1672,7 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
         {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
     };
 
-    s_cur_buffer_index++;
-    if(s_cur_buffer_index >= s_num_buffers)
-        s_cur_buffer_index = 0;
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
-
-    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
-    const GLfloat tint[] = {red, green, blue, alpha};
+    s_fill_buffer(vertex_attribs, 4);
 
     glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
 
@@ -1837,18 +1791,7 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
         {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
     };
 
-    s_cur_buffer_index++;
-    if(s_cur_buffer_index >= s_num_buffers)
-        s_cur_buffer_index = 0;
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
-
-    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
-    const GLfloat tint[] = {red, green, blue, alpha};
+    s_fill_buffer(vertex_attribs, 4);
 
     if(tx.d.mask_texture_id && s_emulate_logic_ops)
     {
@@ -1930,18 +1873,7 @@ void RenderGLES::renderTexture(float xDst, float yDst,
         {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
     };
 
-    s_cur_buffer_index++;
-    if(s_cur_buffer_index >= s_num_buffers)
-        s_cur_buffer_index = 0;
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
-
-    bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
-    const GLfloat tint[] = {red, green, blue, alpha};
+    s_fill_buffer(vertex_attribs, 4);
 
     if(tx.d.mask_texture_id && s_emulate_logic_ops)
     {

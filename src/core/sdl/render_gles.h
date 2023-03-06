@@ -41,6 +41,14 @@ struct SDL_Window;
 
 class RenderGLES final : public AbstractRender_t
 {
+public:
+    struct Vertex_t
+    {
+        GLfloat position[3];
+        GLfloat tint[4];
+        GLfloat texcoord[2];
+    };
+
     struct DrawContext_t
     {
         StdPicture* texture;
@@ -57,19 +65,13 @@ class RenderGLES final : public AbstractRender_t
         }
     };
 
+private:
     struct hash_DrawContext
     {
         std::size_t operator()(const RenderGLES::DrawContext_t& c) const noexcept
         {
             return std::hash<GLProgramObject*>()(c.program) ^ (std::hash<StdPicture*>()(c.texture) >> 1);
         }
-    };
-
-    struct Vertex_t
-    {
-        GLfloat position[3];
-        GLfloat tint[4];
-        GLfloat texcoord[2];
     };
 
     std::unordered_map<DrawContext_t, std::vector<Vertex_t>, hash_DrawContext> m_depth_test_queue;
