@@ -1498,6 +1498,7 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
 
         s_special_program.use_program();
         s_special_program.update_transform(s_transform_matrix.data());
@@ -1578,6 +1579,7 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
 
         s_special_program.use_program();
         s_special_program.update_transform(s_transform_matrix.data());
@@ -1674,8 +1676,6 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     s_fill_buffer(vertex_attribs, 4);
 
-    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
     if(tx.d.mask_texture_id && s_emulate_logic_ops)
     {
         s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
@@ -1683,6 +1683,7 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
 
         s_special_program.use_program();
         s_special_program.update_transform(s_transform_matrix.data());
@@ -1800,6 +1801,7 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
 
         s_special_program.use_program();
         s_special_program.update_transform(s_transform_matrix.data());
@@ -1882,6 +1884,7 @@ void RenderGLES::renderTexture(float xDst, float yDst,
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
 
         s_special_program.use_program();
         s_special_program.update_transform(s_transform_matrix.data());
