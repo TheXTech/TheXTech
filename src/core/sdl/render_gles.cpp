@@ -129,6 +129,7 @@ static GLsizeiptr s_vertex_buffer_size[s_num_buffers] = {0};
 static int s_cur_buffer_index = 0;
 
 static std::array<GLfloat, 16> s_transform_matrix;
+static GLushort s_cur_depth = 0;
 
 static void s_update_fb_read_texture(int x, int y, int w, int h)
 {
@@ -187,6 +188,54 @@ static void s_fill_buffer(const RenderGLES::Vertex_t* vertex_attribs, int count)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), (void*)offsetof(RenderGLES::Vertex_t, position));
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), (void*)offsetof(RenderGLES::Vertex_t, texcoord));
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE,  sizeof(RenderGLES::Vertex_t), (void*)offsetof(RenderGLES::Vertex_t, tint));
+}
+
+void RenderGLES::clearDrawQueues()
+{
+    m_unordered_draw_queue.clear();
+    m_ordered_draw_queue.clear();
+
+    s_cur_depth = 0;
+    glClear(GL_DEPTH_BUFFER_BIT);
+}
+
+void RenderGLES::flushDrawQueues()
+{
+    for(const auto& i : m_unordered_draw_queue)
+    {
+        const DrawContext_t& context = i.first;
+        const std::vector<Vertex_t>& vertex_attribs = i.second;
+
+        s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
+
+        context.program->use_program();
+        context.program->update_transform(s_transform_matrix.data());
+
+        if(context.texture)
+            glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
+
+#if 0
+        if(context.texture && context.texture->d.mask_texture_id && s_emulate_logic_ops)
+        {
+            // s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
+
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+            glActiveTexture(GL_TEXTURE0);
+
+            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+            return;
+        }
+#endif
+
+        glDrawArrays(GL_QUADS, 0, vertex_attribs.size());
+    }
+
+    glDepthMask(GL_FALSE);
+    glDepthMask(GL_TRUE);
+
+    clearDrawQueues();
 }
 
 bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
@@ -250,6 +299,10 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     // SDL_RendererInfo ri;
     // SDL_GetRendererInfo(m_gRenderer, &ri);
+
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_GEQUAL);
+    glDepthMask(GL_TRUE);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -750,7 +803,7 @@ void RenderGLES::repaint()
     drawBatteryStatus();
 #endif
 
-    glFlush();
+    flushDrawQueues();
 
     setTargetScreen();
     clearBuffer();
@@ -792,7 +845,8 @@ void RenderGLES::repaint()
 
     Controls::RenderTouchControls();
 
-    glFlush();
+    flushDrawQueues();
+
     SDL_GL_SwapWindow(m_window);
 }
 
@@ -800,6 +854,8 @@ void RenderGLES::applyViewport()
 {
     if(m_recentTargetScreen)
         return;
+
+    flushDrawQueues();
 
     int off_x = m_viewport_offset_ignore ? 0 : m_viewport_offset_x;
     int off_y = m_viewport_offset_ignore ? 0 : m_viewport_offset_y;
@@ -841,7 +897,7 @@ void RenderGLES::applyViewport()
         s_transform_matrix = {
             2.0f / viewport_w, 0.0f, 0.0f, 0.0f,
             0.0f, -2.0f / viewport_h, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f, 0.0f,
+            0.0f, 0.0f, 1.0f / (1 << 15), 0.0f,
             -float(viewport_w + off_x + off_x) / (viewport_w), float(viewport_h + off_y + off_y) / (viewport_h), 0.0f, 1.0f,
         };
 
@@ -874,7 +930,7 @@ void RenderGLES::applyViewport()
     s_transform_matrix = {
         2.0f / viewport_w, 0.0f, 0.0f, 0.0f,
         0.0f, -2.0f / viewport_h, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f / (1 << 15), 0.0f,
         -(viewport_w + off_x + 0.5f + off_x + 0.5f) / (viewport_w), (viewport_h + off_y + 0.5f + off_y + 0.5f) / (viewport_h), 0.0f, 1.0f,
     };
 
@@ -970,6 +1026,8 @@ void RenderGLES::setTargetTexture()
     if(!m_recentTargetScreen)
         return;
 
+    flushDrawQueues();
+
     if(s_game_texture_fb && s_game_texture)
         glBindFramebuffer(GL_FRAMEBUFFER, s_game_texture_fb);
 
@@ -981,6 +1039,8 @@ void RenderGLES::setTargetScreen()
 {
     if(m_recentTargetScreen)
         return;
+
+    flushDrawQueues();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -1001,7 +1061,7 @@ void RenderGLES::setTargetScreen()
     s_transform_matrix = {
         2.0f / hardware_w, 0.0f, 0.0f, 0.0f,
         0.0f, -2.0f / hardware_h, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f / (1 << 15), 0.0f,
         -1.0f, 1.0f, 0.0f, 1.0f,
     };
 
@@ -1301,12 +1361,12 @@ void RenderGLES::clearBuffer()
     SDL_assert(!m_blockRender);
 #endif
 
+    clearDrawQueues();
+
     glBindTexture(GL_TEXTURE_2D, 0);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    // SDL_SetRenderDrawColor(m_gRenderer, 0, 0, 0, 255);
-    // SDL_RenderClear(m_gRenderer);
+    glClearDepth(0.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
@@ -1329,11 +1389,13 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
 
     const Vertex_t vertex_attribs[] =
     {
-        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}},
+        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}},
     };
+
+    s_cur_depth++;
 
     s_fill_buffer(vertex_attribs, 4);
 
@@ -1377,11 +1439,13 @@ void RenderGLES::renderCircle(int cx, int cy, int radius, float red, float green
 
     const Vertex_t vertex_attribs[] =
     {
-        {{x1, y1, 0}, {red, green, blue, alpha}, {0.0, 0.0}},
-        {{x1, y2, 0}, {red, green, blue, alpha}, {0.0, 1.0}},
-        {{x2, y1, 0}, {red, green, blue, alpha}, {1.0, 0.0}},
-        {{x2, y2, 0}, {red, green, blue, alpha}, {1.0, 1.0}},
+        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}},
+        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}},
+        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}},
+        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 1.0}},
     };
+
+    s_cur_depth++;
 
     s_fill_buffer(vertex_attribs, 4);
 
@@ -1407,11 +1471,13 @@ void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float g
 
     const Vertex_t vertex_attribs[] =
     {
-        {{x1, y1, 0}, {red, green, blue, alpha}, {0.0, 0.0}},
-        {{x1, y2, 0}, {red, green, blue, alpha}, {0.0, 1.0}},
-        {{x2, y1, 0}, {red, green, blue, alpha}, {1.0, 0.0}},
-        {{x2, y2, 0}, {red, green, blue, alpha}, {1.0, 1.0}},
+        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}},
+        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}},
+        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}},
+        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 1.0}},
     };
+
+    s_cur_depth++;
 
     s_fill_buffer(vertex_attribs, 4);
 
@@ -1483,11 +1549,13 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
 
     const Vertex_t vertex_attribs[] =
     {
-        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
+        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}}
     };
+
+    s_cur_depth++;
 
     s_fill_buffer(vertex_attribs, 4);
 
@@ -1564,11 +1632,13 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
     const Vertex_t vertex_attribs[] =
     {
-        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
+        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}}
     };
+
+    s_cur_depth++;
 
     s_fill_buffer(vertex_attribs, 4);
 
@@ -1668,11 +1738,13 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     const Vertex_t vertex_attribs[] =
     {
-        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
+        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}}
     };
+
+    s_cur_depth++;
 
     s_fill_buffer(vertex_attribs, 4);
 
@@ -1786,11 +1858,13 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
 
     const Vertex_t vertex_attribs[] =
     {
-        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
+        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}}
     };
+
+    s_cur_depth++;
 
     s_fill_buffer(vertex_attribs, 4);
 
@@ -1869,11 +1943,13 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
     const Vertex_t vertex_attribs[] =
     {
-        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
+        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}}
     };
+
+    s_cur_depth++;
 
     s_fill_buffer(vertex_attribs, 4);
 
