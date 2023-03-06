@@ -582,23 +582,27 @@ bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, con
     BYTE black[3] = {0x00, 0x00, 0x00};
     BYTE white[3] = {0xFF, 0xFF, 0xFF};
 
-    for(uint32_t y = 0; y < fh && y < bh; ++y)
+    for(uint32_t y = 0; y < fh || y < bh; ++y)
     {
-        for(uint32_t x = 0; x < fw && x < bw; ++x)
+        for(uint32_t x = 0; x < fw || x < bw; ++x)
         {
             BYTE *fp = line1 + (y * fpitch) + (x * 4);
             BYTE *bp = line2 + (y * bpitch) + (x * 4);
 
-            // pixel is black
-            if(SDL_memcmp(bp, black, 3) == 0)
+            // mask pixel is black: buffer replaced with front pixel
+            if(y < bh && x < bw && SDL_memcmp(bp, black, 3) == 0)
                 continue;
 
-            // pixel is white
-            if(SDL_memcmp(bp, white, 3) == 0)
+            // front pixel is white: buffer replaced with front pixel
+            if(y < fh && x < fh && SDL_memcmp(fp, white, 3) == 0)
+                continue;
+
+            // back pixel is white and front pixel is black: buffer preserved
+            if((y >= bh || x >= bh || SDL_memcmp(bp, white, 3) == 0) && (y >= fh || x >= fh || SDL_memcmp(fp, black, 3) == 0))
                 continue;
 
             // pixel is matching with the front (i.e. is not an example of the lazily-made sprite)
-            if(SDL_memcmp(bp, fp, 3) == 0)
+            if(y < bh && x < bh && y < fh && x < fh && SDL_memcmp(bp, fp, 3) == 0)
                 continue;
 
             D_pLogDebug("Texture REQUIRES the bitmask render (%s)", origPath.c_str());
