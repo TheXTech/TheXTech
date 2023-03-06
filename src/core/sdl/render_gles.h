@@ -22,26 +22,58 @@
 #ifndef RENDERGLES_T_H
 #define RENDERGLES_T_H
 
+#include <utility>
+#include <vector>
 #include <set>
-
-#include "../base/render_base.h"
-#include "cmd_line_setup.h"
+#include <map>
+#include <unordered_map>
 
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_opengles2.h>
 
+#include "core/base/render_base.h"
+#include "cmd_line_setup.h"
+
+#include "core/sdl/gl_program_object.h"
 
 struct StdPicture;
 struct SDL_Window;
 
 class RenderGLES final : public AbstractRender_t
 {
+    struct DrawContext_t
+    {
+        StdPicture* texture;
+        GLProgramObject* program;
+
+        constexpr bool operator==(const DrawContext_t& o) const noexcept
+        {
+            return texture == o.texture && program == o.program;
+        }
+
+        constexpr bool operator<(const DrawContext_t& o) const noexcept
+        {
+            return texture < o.texture || (texture == o.texture && program < o.program);
+        }
+    };
+
+    struct hash_DrawContext
+    {
+        std::size_t operator()(const RenderGLES::DrawContext_t& c) const noexcept
+        {
+            return std::hash<GLProgramObject*>()(c.program) ^ (std::hash<StdPicture*>()(c.texture) >> 1);
+        }
+    };
+
     struct Vertex_t
     {
         GLfloat position[3];
         GLfloat tint[4];
         GLfloat texcoord[2];
     };
+
+    std::unordered_map<DrawContext_t, std::vector<Vertex_t>, hash_DrawContext> m_depth_test_queue;
+    std::map<std::pair<int, DrawContext_t>, std::vector<Vertex_t>> m_ordered_draw_queue;
 
     SDL_Window    *m_window = nullptr;
 

@@ -125,6 +125,7 @@ static GLuint s_game_texture_fb = 0;
 
 static constexpr int s_num_buffers = 16;
 static GLuint s_vertex_buffer[s_num_buffers] = {0};
+static GLsizeiptr s_vertex_buffer_size[s_num_buffers] = {0};
 static int s_cur_buffer_index = 0;
 
 static std::array<GLfloat, 16> s_transform_matrix;
@@ -618,6 +619,7 @@ void main()
     {
         glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[i]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex_t) * 4, nullptr, GL_STREAM_DRAW);
+        s_vertex_buffer_size[i] = sizeof(Vertex_t) * 4;
     }
 
     while(err = glGetError())
