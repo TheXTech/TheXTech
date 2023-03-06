@@ -30,15 +30,10 @@ private:
     GLuint m_program = 0;
 
     GLint m_u_transform_loc = -1;
-    GLint m_u_tint_loc      = -1;
 
     std::vector<GLint> m_u_custom_loc;
 
     bool m_transform_dirty = true;
-    bool m_tint_applied    = true;
-
-    void m_update_tint(const GLfloat* tint);
-    void m_clear_tint();
 
     void m_update_transform(const GLfloat* value);
 
@@ -89,27 +84,6 @@ public:
         {
             m_update_transform(value);
             m_transform_dirty = false;
-        }
-    }
-
-    /*!
-     * \brief If the program's tint state does not match the provided state, update it.
-     * \param enabled States whether any tint should be enabled for following draw call (tint may be null if this is false).
-     * \param tint pointer to GLfloat array of size 4, the tint that should be set if needed.
-     *
-     * Important note: may only be called while program has been activated by use_program()
-     */
-    inline void update_tint(bool enabled, const GLfloat* tint)
-    {
-        if(enabled)
-        {
-            m_update_tint(tint);
-            m_tint_applied = true;
-        }
-        else if(m_tint_applied)
-        {
-            m_clear_tint();
-            m_tint_applied = false;
         }
     }
 

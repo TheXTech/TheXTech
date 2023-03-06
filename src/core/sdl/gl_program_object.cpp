@@ -80,16 +80,6 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
  *** Private methods ***
  ***********************/
 
-void GLProgramObject::m_update_tint(const GLfloat* tint)
-{
-    glUniform4fv(m_u_tint_loc, 1, tint);
-}
-
-void GLProgramObject::m_clear_tint()
-{
-    glUniform4f(m_u_tint_loc, 1, 1, 1, 1);
-}
-
 void GLProgramObject::m_update_transform(const GLfloat* value)
 {
     glUniformMatrix4fv(m_u_transform_loc, 1, GL_FALSE, value);
@@ -115,7 +105,7 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     // set the builtin vertex attribute locations
     glBindAttribLocation(program, 0, "a_position");
     glBindAttribLocation(program, 1, "a_texcoord");
-    glBindAttribLocation(program, 2, "a_fbcoord");
+    glBindAttribLocation(program, 2, "a_tint");
 
     // Link the program
     glLinkProgram(program);
@@ -154,7 +144,6 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     // load all builtin uniform variable locations
 
     m_u_transform_loc = glGetUniformLocation(m_program, "u_transform");
-    m_u_tint_loc = glGetUniformLocation(m_program, "u_tint");
 
     // set sampler texture index to 0 (fixed for all programs)
     GLint u_texture_loc = glGetUniformLocation(m_program, "u_texture");
@@ -213,10 +202,8 @@ const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
     m_program = other.m_program;
 
     m_u_transform_loc = other.m_u_transform_loc;
-    m_u_tint_loc = other.m_u_tint_loc;
 
     m_transform_dirty = other.m_transform_dirty;
-    m_tint_applied = other.m_tint_applied;
 
     // prevent erasure
     other.m_program = 0;

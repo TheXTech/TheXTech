@@ -334,11 +334,14 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         "uniform   mat4 u_transform;  \n"
         "attribute vec4 a_position;   \n"
         "attribute vec2 a_texcoord;   \n"
+        "attribute vec4 a_tint;   \n"
         "varying   vec2 v_texcoord;   \n"
+        "varying   vec4 v_tint;       \n"
         "void main()                  \n"
         "{                            \n"
         "   gl_Position = u_transform * a_position;  \n"
         "   v_texcoord = a_texcoord;  \n"
+        "   v_tint = a_tint;  \n"
         "}                            \n"
     );
 
@@ -349,11 +352,11 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             "precision mediump float;\n"
             "varying   vec2      v_texcoord;     \n"
             "uniform   sampler2D u_texture;  \n"
-            "uniform   vec4      u_tint;     \n"
+            "varying   vec4      v_tint;     \n"
             "void main()                                  \n"
             "{                                            \n"
             "  vec4 l_color = texture2D(u_texture, v_texcoord);\n"
-            "  gl_FragColor = u_tint * l_color;\n"
+            "  gl_FragColor = v_tint * l_color;\n"
             "}                                            \n"
         )
     );
@@ -369,11 +372,11 @@ precision mediump float;
 
 varying   vec2      v_texcoord;
 varying   vec2      v_fbcoord;
+varying   vec4      v_tint;
 
 uniform   sampler2D u_texture;
 uniform   sampler2D u_framebuffer;
 uniform   sampler2D u_mask;
-uniform   vec4      u_tint;
 
 vec3 bitwise_ops(vec3 x, vec3 y, vec3 z)
 {
@@ -469,7 +472,7 @@ void main()
   vec3 l_image = texture2D(u_texture, v_texcoord).rgb;
   vec3 l_mask = texture2D(u_mask, v_texcoord).rgb;
 
-  l_image *= u_tint.rgb;
+  l_image *= v_tint.rgb;
 
   vec2 src = v_fbcoord.xy;
   // src.y += sin(v_fbcoord.x * 6.0 + l_mask.r + l_mask.g + l_mask.b) * (l_image.r + l_image.g + l_image.b + 3.0 - l_mask.r - l_mask.g - l_mask.b) / 9.0;
@@ -488,13 +491,16 @@ void main()
             "uniform   mat4 u_transform;  \n"
             "attribute vec4 a_position;   \n"
             "attribute vec2 a_texcoord;   \n"
+            "attribute vec4 a_tint;       \n"
             "varying   vec2 v_texcoord;   \n"
-            "varying   vec2 v_fbcoord;   \n"
+            "varying   vec2 v_fbcoord;    \n"
+            "varying   vec4 v_tint;       \n"
             "void main()                  \n"
             "{                            \n"
             "   gl_Position = u_transform * a_position;  \n"
             "   v_texcoord = a_texcoord;  \n"
-            "   v_fbcoord = vec2(u_transform * a_position);  \n"
+            "   v_tint = a_tint;     \n"
+            "   v_fbcoord = vec2(gl_Position);  \n"
             "   v_fbcoord.x += 1.0;  \n"
             "   v_fbcoord.x /= 2.0;  \n"
             "   v_fbcoord.y += 1.0;  \n"
@@ -510,10 +516,10 @@ void main()
             "#version 100                  \n"
             "precision mediump float;\n"
             "varying   vec2      v_texcoord;     \n"
-            "uniform   vec4      u_tint;     \n"
+            "varying   vec4      v_tint;         \n"
             "void main()                                  \n"
             "{                                            \n"
-            "  gl_FragColor = u_tint;\n"
+            "  gl_FragColor = v_tint;\n"
             "}                                            \n"
         )
     );
@@ -524,14 +530,14 @@ void main()
             "#version 100                                 \n"
             "precision mediump float;                     \n"
             "varying   vec2      v_texcoord;              \n"
-            "uniform   vec4      u_tint;                  \n"
+            "varying   vec4      v_tint;                  \n"
             "uniform   vec2      u_size;                  \n"
             "void main()                                  \n"
             "{                                            \n"
             "  if(v_texcoord.x * u_size.x >= 1.0 && v_texcoord.x * u_size.x < u_size.x - 1.0 \n"
             "     && v_texcoord.y * u_size.y >= 1.0 && v_texcoord.y * u_size.y < u_size.y - 1.0) \n"
             "    discard;                                 \n"
-            "  gl_FragColor = u_tint;                     \n"
+            "  gl_FragColor = v_tint;                     \n"
             "}                                            \n"
         )
     );
@@ -543,13 +549,13 @@ void main()
             "#version 100                  \n"
             "precision mediump float;\n"
             "varying   vec2      v_texcoord;     \n"
-            "uniform   vec4      u_tint;     \n"
+            "varying   vec4      v_tint;     \n"
             "void main()                                  \n"
             "{                                            \n"
             "  if((v_texcoord.x - 0.5) * (v_texcoord.x - 0.5) \n"
             "    + (v_texcoord.y - 0.5) * (v_texcoord.y - 0.5) > 0.25)\n"
             "      discard;\n"
-            "  gl_FragColor = u_tint;\n"
+            "  gl_FragColor = v_tint;\n"
             "}                                            \n"
         )
     );
@@ -560,13 +566,13 @@ void main()
             "#version 100                  \n"
             "precision mediump float;\n"
             "varying   vec2      v_texcoord;     \n"
-            "uniform   vec4      u_tint;     \n"
+            "varying   vec4      v_tint;     \n"
             "void main()                                  \n"
             "{                                            \n"
             "  if((v_texcoord.x - 0.5) * (v_texcoord.x - 0.5) \n"
             "    + (v_texcoord.y - 0.5) * (v_texcoord.y - 0.5) <= 0.25)\n"
             "      discard;\n"
-            "  gl_FragColor = u_tint;\n"
+            "  gl_FragColor = v_tint;\n"
             "}                                            \n"
         )
     );
@@ -590,11 +596,11 @@ void main()
                 "precision mediump float;\n"
                 "varying   vec2      v_texcoord;     \n"
                 "uniform   sampler2D u_texture;  \n"
-                "uniform   vec4      u_tint;     \n"
+                "varying   vec4      v_tint;     \n"
                 "void main()                                  \n"
                 "{                                            \n"
                 "  vec4 l_color = texture2D(u_texture, v_texcoord);\n"
-                "  gl_FragColor = u_tint * l_color;\n"
+                "  gl_FragColor = v_tint * l_color;\n"
                 "}                                            \n"
             )
         );
@@ -608,11 +614,12 @@ void main()
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
     for(int i = 0; i < s_num_buffers; i++)
     {
         glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[i]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 16, nullptr, GL_STREAM_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex_t) * 4, nullptr, GL_STREAM_DRAW);
     }
 
     while(err = glGetError())
@@ -734,19 +741,12 @@ void RenderGLES::repaint()
         float y1 = m_phys_y;
         float y2 = m_phys_y + m_phys_h;
 
-        const GLfloat vertex_attribs[] =
+        const Vertex_t vertex_attribs[] =
         {
-            // positions
-            x1, y1,
-            x1, y2,
-            x2, y1,
-            x2, y2,
-
-            // texcoords
-            0.0f, 1.0f,
-            0.0f, 0.0f,
-            1.0f, 1.0f,
-            1.0f, 0.0f
+            {{x1, y1, 0}, {1.0, 1.0, 1.0, 1.0}, {0.0, 1.0}},
+            {{x1, y2, 0}, {1.0, 1.0, 1.0, 1.0}, {0.0, 0.0}},
+            {{x2, y1, 0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 1.0}},
+            {{x2, y2, 0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 0.0}},
         };
 
         glActiveTexture(GL_TEXTURE0);
@@ -754,7 +754,6 @@ void RenderGLES::repaint()
 
         s_output_program.use_program();
         s_output_program.update_transform(s_transform_matrix.data());
-        s_output_program.update_tint(false, nullptr);
 
         s_cur_buffer_index++;
         if(s_cur_buffer_index >= s_num_buffers)
@@ -762,8 +761,9 @@ void RenderGLES::repaint()
 
         glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1303,18 +1303,12 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
     float y1 = y;
     float y2 = y + h;
 
-    const GLfloat vertex_attribs[] =
+    const Vertex_t vertex_attribs[] =
     {
-        // positions
-        x1, y1,
-        x1, y2,
-        x2, y1,
-        x2, y2,
-        // texcoords
-        0.0, 0.0,
-        0.0, 1.0,
-        1.0, 0.0,
-        1.0, 1.0,
+        {{x1, y1, 0}, {red, green, blue, alpha}, {0.0, 0.0}},
+        {{x1, y2, 0}, {red, green, blue, alpha}, {0.0, 1.0}},
+        {{x2, y1, 0}, {red, green, blue, alpha}, {1.0, 0.0}},
+        {{x2, y2, 0}, {red, green, blue, alpha}, {1.0, 1.0}},
     };
 
     s_cur_buffer_index++;
@@ -1323,8 +1317,9 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
 
     glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
@@ -1332,13 +1327,11 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
     if(filled)
     {
         s_program_rect_filled.use_program();
-        s_program_rect_filled.update_tint(tint_enabled, tint);
         s_program_rect_filled.update_transform(s_transform_matrix.data());
     }
     else
     {
         s_program_rect_unfilled.use_program();
-        s_program_rect_unfilled.update_tint(tint_enabled, tint);
         s_program_rect_unfilled.update_transform(s_transform_matrix.data());
         glUniform2f(s_program_rect_unfilled.get_uniform_loc(0), w, h);
     }
@@ -1370,18 +1363,12 @@ void RenderGLES::renderCircle(int cx, int cy, int radius, float red, float green
     float y1 = cy - radius;
     float y2 = cy + radius;
 
-    const GLfloat vertex_attribs[] =
+    const Vertex_t vertex_attribs[] =
     {
-        // positions
-        x1, y1,
-        x1, y2,
-        x2, y1,
-        x2, y2,
-        // texcoords
-        0.0, 0.0,
-        0.0, 1.0,
-        1.0, 0.0,
-        1.0, 1.0,
+        {{x1, y1, 0}, {red, green, blue, alpha}, {0.0, 0.0}},
+        {{x1, y2, 0}, {red, green, blue, alpha}, {0.0, 1.0}},
+        {{x2, y1, 0}, {red, green, blue, alpha}, {1.0, 0.0}},
+        {{x2, y2, 0}, {red, green, blue, alpha}, {1.0, 1.0}},
     };
 
     s_cur_buffer_index++;
@@ -1390,14 +1377,14 @@ void RenderGLES::renderCircle(int cx, int cy, int radius, float red, float green
 
     glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
 
     s_program_circle.use_program();
-    s_program_circle.update_tint(tint_enabled, tint);
     s_program_circle.update_transform(s_transform_matrix.data());
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -1417,18 +1404,12 @@ void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float g
     float y1 = cy - radius;
     float y2 = cy + radius;
 
-    const GLfloat vertex_attribs[] =
+    const Vertex_t vertex_attribs[] =
     {
-        // positions
-        x1, y1,
-        x1, y2,
-        x2, y1,
-        x2, y2,
-        // texcoords
-        0.0, 0.0,
-        0.0, 1.0,
-        1.0, 0.0,
-        1.0, 1.0,
+        {{x1, y1, 0}, {red, green, blue, alpha}, {0.0, 0.0}},
+        {{x1, y2, 0}, {red, green, blue, alpha}, {0.0, 1.0}},
+        {{x2, y1, 0}, {red, green, blue, alpha}, {1.0, 0.0}},
+        {{x2, y2, 0}, {red, green, blue, alpha}, {1.0, 1.0}},
     };
 
     s_cur_buffer_index++;
@@ -1437,14 +1418,14 @@ void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float g
 
     glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
 
     s_program_circle_hole.use_program();
-    s_program_circle_hole.update_tint(tint_enabled, tint);
     s_program_circle_hole.update_transform(s_transform_matrix.data());
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -1510,19 +1491,12 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    const GLfloat vertex_attribs[] =
+    const Vertex_t vertex_attribs[] =
     {
-        // positions
-        x1, y1,
-        x1, y2,
-        x2, y1,
-        x2, y2,
-
-        // texcoords
-        u1, v1,
-        u1, v2,
-        u2, v1,
-        u2, v2,
+        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
     };
 
     s_cur_buffer_index++;
@@ -1531,8 +1505,9 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
 
     glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
@@ -1547,7 +1522,6 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
 
         s_special_program.use_program();
         s_special_program.update_transform(s_transform_matrix.data());
-        s_special_program.update_tint(tint_enabled, tint);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1556,7 +1530,6 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
 
     s_program.use_program();
     s_program.update_transform(s_transform_matrix.data());
-    s_program.update_tint(tint_enabled, tint);
 
     if(tx.d.mask_texture_id)
     {
@@ -1609,19 +1582,12 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
     float v1 = tx.l.h_scale * 0;
     float v2 = tx.l.h_scale * (tx.h);
 
-    const GLfloat vertex_attribs[] =
+    const Vertex_t vertex_attribs[] =
     {
-        // positions
-        x1, y1,
-        x1, y2,
-        x2, y1,
-        x2, y2,
-
-        // texcoords
-        u1, v1,
-        u1, v2,
-        u2, v1,
-        u2, v2,
+        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
     };
 
     s_cur_buffer_index++;
@@ -1630,8 +1596,9 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
     glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
@@ -1646,7 +1613,6 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
         s_special_program.use_program();
         s_special_program.update_transform(s_transform_matrix.data());
-        s_special_program.update_tint(tint_enabled, tint);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1655,7 +1621,6 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
     s_program.use_program();
     s_program.update_transform(s_transform_matrix.data());
-    s_program.update_tint(tint_enabled, tint);
 
     if(tx.d.mask_texture_id)
     {
@@ -1731,19 +1696,12 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
     float v1 = tx.l.h_scale * ySrc;
     float v2 = tx.l.h_scale * (ySrc + hDst);
 
-    const GLfloat vertex_attribs[] =
+    const Vertex_t vertex_attribs[] =
     {
-        // positions
-        x1, y1,
-        x1, y2,
-        x2, y1,
-        x2, y2,
-
-        // texcoords
-        u1, v1,
-        u1, v2,
-        u2, v1,
-        u2, v2,
+        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
     };
 
     s_cur_buffer_index++;
@@ -1752,8 +1710,9 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
@@ -1770,7 +1729,6 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
         s_special_program.use_program();
         s_special_program.update_transform(s_transform_matrix.data());
-        s_special_program.update_tint(tint_enabled, tint);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1779,7 +1737,6 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     s_program.use_program();
     s_program.update_transform(s_transform_matrix.data());
-    s_program.update_tint(tint_enabled, tint);
 
     if(tx.d.mask_texture_id)
     {
@@ -1869,19 +1826,12 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    const GLfloat vertex_attribs[] =
+    const Vertex_t vertex_attribs[] =
     {
-        // positions
-        x1, y1,
-        x1, y2,
-        x2, y1,
-        x2, y2,
-
-        // texcoords
-        u1, v1,
-        u1, v2,
-        u2, v1,
-        u2, v2,
+        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
     };
 
     s_cur_buffer_index++;
@@ -1890,8 +1840,9 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
 
     glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
@@ -1906,7 +1857,6 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
 
         s_special_program.use_program();
         s_special_program.update_transform(s_transform_matrix.data());
-        s_special_program.update_tint(tint_enabled, tint);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1915,7 +1865,6 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
 
     s_program.use_program();
     s_program.update_transform(s_transform_matrix.data());
-    s_program.update_tint(tint_enabled, tint);
 
     if(tx.d.mask_texture_id)
     {
@@ -1970,19 +1919,12 @@ void RenderGLES::renderTexture(float xDst, float yDst,
     float v1 = tx.l.h_scale * 0;
     float v2 = tx.l.h_scale * (tx.h);
 
-    const GLfloat vertex_attribs[] =
+    const Vertex_t vertex_attribs[] =
     {
-        // positions
-        x1, y1,
-        x1, y2,
-        x2, y1,
-        x2, y2,
-
-        // texcoords
-        u1, v1,
-        u1, v2,
-        u2, v1,
-        u2, v2,
+        {{x1, y1, 0}, {red, green, blue, alpha}, {u1, v1}},
+        {{x1, y2, 0}, {red, green, blue, alpha}, {u1, v2}},
+        {{x2, y1, 0}, {red, green, blue, alpha}, {u2, v1}},
+        {{x2, y2, 0}, {red, green, blue, alpha}, {u2, v2}}
     };
 
     s_cur_buffer_index++;
@@ -1991,8 +1933,9 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
     glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertex_attribs), vertex_attribs);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const void*) (8 * sizeof(GLfloat)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE, sizeof(Vertex_t), (void*)offsetof(Vertex_t, tint));
 
     bool tint_enabled = (red != 1.0 || green != 1.0 || blue != 1.0 || alpha != 1.0);
     const GLfloat tint[] = {red, green, blue, alpha};
@@ -2007,7 +1950,6 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
         s_special_program.use_program();
         s_special_program.update_transform(s_transform_matrix.data());
-        s_special_program.update_tint(tint_enabled, tint);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -2016,7 +1958,6 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
     s_program.use_program();
     s_program.update_transform(s_transform_matrix.data());
-    s_program.update_tint(tint_enabled, tint);
 
     if(tx.d.mask_texture_id)
     {

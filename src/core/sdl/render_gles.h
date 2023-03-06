@@ -28,6 +28,7 @@
 #include "cmd_line_setup.h"
 
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_opengles2.h>
 
 
 struct StdPicture;
@@ -35,6 +36,13 @@ struct SDL_Window;
 
 class RenderGLES final : public AbstractRender_t
 {
+    struct Vertex_t
+    {
+        GLfloat position[3];
+        GLfloat tint[4];
+        GLfloat texcoord[2];
+    };
+
     SDL_Window    *m_window = nullptr;
 
     SDL_GLContext m_gContext = nullptr;
