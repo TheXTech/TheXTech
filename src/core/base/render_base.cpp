@@ -198,28 +198,35 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     //Apply Alpha mask
     if(useMask && !maskPath.empty() && Files::fileExists(maskPath))
     {
-        if(g_render->textureMaskSupported())
-        {
-            maskImage = GraphicsHelps::loadImage(maskPath);
-            FreeImage_FlipVertical(maskImage);
-        }
-        else
-        {
+        // load mask
+        maskImage = GraphicsHelps::loadMask(maskPath, false);
+
 #ifdef DEBUG_BUILD
             maskMergingTime.start();
 #endif
-            GraphicsHelps::mergeWithMask(sourceImage, maskPath);
+
+        // merge it with image if masks are unsupported or the mask could be properly represented with RGBA
+        if(!g_render->textureMaskSupported()
+            || !GraphicsHelps::validateBitmaskRequired(sourceImage, maskImage, path))
+        {
+            GraphicsHelps::mergeWithMask(sourceImage, maskImage);
+            GraphicsHelps::closeImage(maskImage);
+            maskImage = nullptr;
+        }
+
 #ifdef DEBUG_BUILD
             maskElapsed = maskMergingTime.nanoelapsed();
 #endif
-        }
     }
+    //Use fallback PNG mask
     else if(useMask && !maskFallbackPath.empty())
     {
 #ifdef DEBUG_BUILD
         maskMergingTime.start();
 #endif
+
         GraphicsHelps::mergeWithMask(sourceImage, "", maskFallbackPath);
+
 #ifdef DEBUG_BUILD
         maskElapsed = maskMergingTime.nanoelapsed();
 #endif
@@ -258,6 +265,9 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     target.ColorLower.g = lowerColor.rgbGreen / 255.0f;
 
     FreeImage_FlipVertical(sourceImage);
+    if(maskImage)
+        FreeImage_FlipVertical(maskImage);
+
     target.w = static_cast<int>(w);
     target.h = static_cast<int>(h);
     target.frame_w = static_cast<int>(w);
@@ -465,13 +475,17 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     FIBITMAP *maskImage = nullptr;
     if(!target.l.rawMask.empty())
     {
-        if(g_render->textureMaskSupported() && !target.l.isMaskPng)
+        // load mask
+        maskImage = GraphicsHelps::loadMask(target.l.rawMask, target.l.isMaskPng);
+
+        // merge it with image if PNG, masks are unsupported, or the mask could be properly represented with RGBA
+        if(target.l.isMaskPng || !g_render->textureMaskSupported()
+            || !GraphicsHelps::validateBitmaskRequired(sourceImage, maskImage, StdPictureGetOrigPath(target)))
         {
-            maskImage = GraphicsHelps::loadImage(target.l.rawMask);
-            FreeImage_FlipVertical(maskImage);
+            GraphicsHelps::mergeWithMask(sourceImage, maskImage);
+            GraphicsHelps::closeImage(maskImage);
+            maskImage = nullptr;
         }
-        else
-            GraphicsHelps::mergeWithMask(sourceImage, target.l.rawMask, target.l.isMaskPng);
     }
 
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
@@ -516,6 +530,9 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     }
 
     FreeImage_FlipVertical(sourceImage);
+    if(maskImage)
+        FreeImage_FlipVertical(maskImage);
+
     target.w = static_cast<int>(w);
     target.h = static_cast<int>(h);
     target.frame_w = static_cast<int>(w);
