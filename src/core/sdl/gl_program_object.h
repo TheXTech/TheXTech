@@ -27,6 +27,8 @@
 class GLProgramObject
 {
 private:
+    static GLuint s_last_program;
+
     GLuint m_program = 0;
 
     GLint m_u_transform_loc = -1;

@@ -24,6 +24,8 @@
 
 #include "core/sdl/gl_program_object.h"
 
+GLuint GLProgramObject::s_last_program = 0;
+
 /*******************************
  *** Static helper functions ***
  *******************************/
@@ -226,7 +228,11 @@ void GLProgramObject::reset()
  */
 void GLProgramObject::use_program()
 {
+    if(m_program == s_last_program)
+        return;
+
     glUseProgram(m_program);
+    s_last_program = m_program;
 }
 
 /*!
