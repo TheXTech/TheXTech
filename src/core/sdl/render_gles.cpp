@@ -648,7 +648,10 @@ void main()
   vec3 l_image = texture2D(u_texture, v_texcoord).rgb;
   vec3 l_mask = texture2D(u_mask, v_texcoord).rgb;
 
-  l_image *= v_tint.rgb;
+  if(l_image.r == 0.0 && l_image.g == 0.0 && l_image.b == 0.0 && l_mask.r == 1.0 && l_mask.g == 1.0 && l_mask.b == 1.0)
+    discard;
+
+  // l_image *= v_tint.rgb;
 
   vec2 src = v_fbcoord.xy;
   // src.y += sin(v_fbcoord.x * 6.0 + l_mask.r + l_mask.g + l_mask.b) * (l_image.r + l_image.g + l_image.b + 3.0 - l_mask.r - l_mask.g - l_mask.b) / 9.0;
