@@ -120,7 +120,7 @@ static GLProgramObject s_program_circle_hole;
 
 static GLuint s_fb_read_texture = 0;
 
-static GLuint s_game_texture = 0;
+static GLuint s_game_texture[2] = {0};
 static GLuint s_game_texture_fb = 0;
 
 static constexpr int s_num_buffers = 16;
@@ -201,6 +201,7 @@ void RenderGLES::clearDrawQueues()
 
 void RenderGLES::flushDrawQueues()
 {
+    // pass 1: opaque textures
     for(const auto& i : m_unordered_draw_queue)
     {
         const DrawContext_t& context = i.first;
@@ -229,10 +230,61 @@ void RenderGLES::flushDrawQueues()
         }
 #endif
 
-        glDrawArrays(GL_QUADS, 0, vertex_attribs.size());
+        glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
     }
 
+    // pass 2: translucent / interesting textures
     glDepthMask(GL_FALSE);
+
+    for(const auto& i : m_ordered_draw_queue)
+    {
+        // depth is i.first.first
+
+        const DrawContext_t& context = i.first.second;
+        const std::vector<Vertex_t>& vertex_attribs = i.second;
+
+        s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
+
+        if(context.texture && context.texture->d.mask_texture_id && s_emulate_logic_ops)
+        {
+            if(vertex_attribs.size() > 6)
+                s_update_fb_read_texture(m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+            else if(vertex_attribs.size() == 6)
+                s_update_fb_read_texture(vertex_attribs[0].position[0], vertex_attribs[0].position[1], vertex_attribs[5].position[0] - vertex_attribs[0].position[0], vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
+
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
+
+            s_special_program.use_program();
+            s_special_program.update_transform(s_transform_matrix.data());
+
+            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+
+            continue;
+        }
+
+        context.program->use_program();
+        context.program->update_transform(s_transform_matrix.data());
+
+        if(context.texture && context.texture->d.mask_texture_id)
+        {
+            prepareDrawMask();
+            glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+            prepareDrawImage();
+        }
+
+        if(context.texture)
+            glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
+
+        glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+
+        if(context.texture && context.texture->d.mask_texture_id)
+            leaveMaskContext();
+    }
+
     glDepthMask(GL_TRUE);
 
     clearDrawQueues();
@@ -300,6 +352,9 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     // SDL_RendererInfo ri;
     // SDL_GetRendererInfo(m_gRenderer, &ri);
 
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearDepth(0.0f);
+
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_GEQUAL);
     glDepthMask(GL_TRUE);
@@ -314,62 +369,57 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     if(s_game_texture_fb)
     {
-        glGenTextures(1, &s_game_texture);
+        glGenTextures(2, s_game_texture);
     }
 
     while(err = glGetError())
         pLogWarning("Render GL 138: initing got GL error code %d", (int)err);
 
-    if(s_game_texture_fb && s_game_texture)
+    if(s_game_texture_fb && s_game_texture[0] && s_game_texture[1])
     {
-        // try to allocate texture memory
-        glBindTexture(GL_TEXTURE_2D, s_game_texture);
+        for(int i = 0; i < 2; i++)
+        {
+            // try to allocate texture memory
+            glBindTexture(GL_TEXTURE_2D, s_game_texture[i]);
 
-        while(err = glGetError())
-            pLogWarning("Render GL 201: initing got GL error code %d", (int)err);
+            glTexImage2D(GL_TEXTURE_2D, 0, (i == 0) ? GL_RGB8 : GL_DEPTH24_STENCIL8,
+                ScreenW, ScreenH,
+                0, (i == 0) ? GL_RGB : GL_DEPTH_STENCIL, (i == 0) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_INT_24_8, nullptr);
 
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-            ScreenW, ScreenH,
-            0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-        while(err = glGetError())
-            pLogWarning("Render GL 208: initing got GL error code %d", (int)err);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-        while(err = glGetError())
-            pLogWarning("Render GL 214: initing got GL error code %d", (int)err);
-
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        while(err = glGetError())
-            pLogWarning("Render GL 219: initing got GL error code %d", (int)err);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
 
         GLenum err = glGetError();
         if(err)
         {
             pLogWarning("Render GL: could not allocate game screen texture (%d). Falling back to screen-space scaling.", (int)err);
-            glDeleteTextures(1, &s_game_texture);
-            s_game_texture = 0;
+            glDeleteTextures(2, s_game_texture);
+            s_game_texture[0] = 0;
+            s_game_texture[1] = 0;
 
             glDeleteFramebuffers(1, &s_game_texture_fb);
             s_game_texture_fb = 0;
         }
     }
 
-    if(s_game_texture_fb && s_game_texture)
+    if(s_game_texture_fb && s_game_texture[0] && s_game_texture[1])
     {
         glBindFramebuffer(GL_FRAMEBUFFER, s_game_texture_fb);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, s_game_texture, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, s_game_texture[0], 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, s_game_texture[1], 0);
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if(status !=  GL_FRAMEBUFFER_COMPLETE)
         {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-            glDeleteTextures(1, &s_game_texture);
-            s_game_texture = 0;
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
+            glDeleteTextures(2, s_game_texture);
+            s_game_texture[0] = 0;
+            s_game_texture[1] = 0;
 
             glDeleteFramebuffers(1, &s_game_texture_fb);
             s_game_texture_fb = 0;
@@ -391,7 +441,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, s_fb_read_texture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8,
         ScreenW, ScreenH,
         0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
@@ -435,6 +485,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             "void main()                                  \n"
             "{                                            \n"
             "  vec4 l_color = texture2D(u_texture, v_texcoord);\n"
+            "  if(l_color.a == 0.0) discard;\n"
             "  gl_FragColor = v_tint * l_color;\n"
             "}                                            \n"
         )
@@ -725,10 +776,11 @@ void RenderGLES::close()
         s_game_texture_fb = 0;
     }
 
-    if(s_game_texture)
+    if(s_game_texture[0] || s_game_texture[1])
     {
-        glDeleteTextures(1, &s_game_texture);
-        s_game_texture = 0;
+        glDeleteTextures(2, s_game_texture);
+        s_game_texture[0] = 0;
+        s_game_texture[1] = 0;
     }
 
     if(s_fb_read_texture)
@@ -830,7 +882,7 @@ void RenderGLES::repaint()
         s_fill_buffer(vertex_attribs, 4);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, s_game_texture);
+        glBindTexture(GL_TEXTURE_2D, s_game_texture[0]);
 
         s_output_program.use_program();
         s_output_program.update_transform(s_transform_matrix.data());
@@ -1364,8 +1416,6 @@ void RenderGLES::clearBuffer()
     clearDrawQueues();
 
     glBindTexture(GL_TEXTURE_2D, 0);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClearDepth(0.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -1387,30 +1437,18 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
     float v1 = -2.0f / h;
     float v2 = (h + 2.0f) / h;
 
-    const Vertex_t vertex_attribs[] =
-    {
-        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}},
-    };
+    DrawContext_t context = {nullptr, (filled) ? &s_program_rect_filled : &s_program_rect_unfilled};
+
+    auto& vertex_attribs = (alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
 
     s_cur_depth++;
-
-    s_fill_buffer(vertex_attribs, 4);
-
-    if(filled)
-    {
-        s_program_rect_filled.use_program();
-        s_program_rect_filled.update_transform(s_transform_matrix.data());
-    }
-    else
-    {
-        s_program_rect_unfilled.use_program();
-        s_program_rect_unfilled.update_transform(s_transform_matrix.data());
-    }
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void RenderGLES::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
@@ -1437,22 +1475,18 @@ void RenderGLES::renderCircle(int cx, int cy, int radius, float red, float green
     float y1 = cy - radius;
     float y2 = cy + radius;
 
-    const Vertex_t vertex_attribs[] =
-    {
-        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}},
-        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}},
-        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}},
-        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 1.0}},
-    };
+    DrawContext_t context = {nullptr, &s_program_circle};
+
+    auto& vertex_attribs = (alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 1.0}});
 
     s_cur_depth++;
-
-    s_fill_buffer(vertex_attribs, 4);
-
-    s_program_circle.use_program();
-    s_program_circle.update_transform(s_transform_matrix.data());
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
@@ -1469,22 +1503,18 @@ void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float g
     float y1 = cy - radius;
     float y2 = cy + radius;
 
-    const Vertex_t vertex_attribs[] =
-    {
-        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}},
-        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}},
-        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}},
-        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 1.0}},
-    };
+    DrawContext_t context = {nullptr, &s_program_circle_hole};
+
+    auto& vertex_attribs = (alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 1.0}});
 
     s_cur_depth++;
-
-    s_fill_buffer(vertex_attribs, 4);
-
-    s_program_circle_hole.use_program();
-    s_program_circle_hole.update_transform(s_transform_matrix.data());
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 
@@ -1547,57 +1577,18 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    const Vertex_t vertex_attribs[] =
-    {
-        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}}
-    };
+    DrawContext_t context = {&tx, &s_program};
+
+    auto& vertex_attribs = (tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
 
     s_cur_depth++;
-
-    s_fill_buffer(vertex_attribs, 4);
-
-    if(tx.d.mask_texture_id && s_emulate_logic_ops)
-    {
-        s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
-
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-        s_special_program.use_program();
-        s_special_program.update_transform(s_transform_matrix.data());
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        return;
-    }
-
-    s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data());
-
-    if(tx.d.mask_texture_id)
-    {
-        prepareDrawMask();
-
-        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        prepareDrawImage();
-    }
-
-    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    if(tx.d.mask_texture_id)
-    {
-        leaveMaskContext();
-    }
 }
 
 void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
@@ -1630,57 +1621,18 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
     float v1 = tx.l.h_scale * 0;
     float v2 = tx.l.h_scale * (tx.h);
 
-    const Vertex_t vertex_attribs[] =
-    {
-        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}}
-    };
+    DrawContext_t context = {&tx, &s_program};
+
+    auto& vertex_attribs = (tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
 
     s_cur_depth++;
-
-    s_fill_buffer(vertex_attribs, 4);
-
-    if(tx.d.mask_texture_id && s_emulate_logic_ops)
-    {
-        s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
-
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-        s_special_program.use_program();
-        s_special_program.update_transform(s_transform_matrix.data());
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        return;
-    }
-
-    s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data());
-
-    if(tx.d.mask_texture_id)
-    {
-        prepareDrawMask();
-
-        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        prepareDrawImage();
-    }
-
-    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    if(tx.d.mask_texture_id)
-    {
-        leaveMaskContext();
-    }
 }
 
 void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
@@ -1736,57 +1688,18 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
     float v1 = tx.l.h_scale * ySrc;
     float v2 = tx.l.h_scale * (ySrc + hDst);
 
-    const Vertex_t vertex_attribs[] =
-    {
-        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}}
-    };
+    DrawContext_t context = {&tx, &s_program};
+
+    auto& vertex_attribs = (tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
 
     s_cur_depth++;
-
-    s_fill_buffer(vertex_attribs, 4);
-
-    if(tx.d.mask_texture_id && s_emulate_logic_ops)
-    {
-        s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
-
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-        s_special_program.use_program();
-        s_special_program.update_transform(s_transform_matrix.data());
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        return;
-    }
-
-    s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data());
-
-    if(tx.d.mask_texture_id)
-    {
-        prepareDrawMask();
-
-        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        prepareDrawImage();
-    }
-
-    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    if(tx.d.mask_texture_id)
-    {
-        leaveMaskContext();
-    }
 }
 
 void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, double hDstD,
@@ -1856,59 +1769,18 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    const Vertex_t vertex_attribs[] =
-    {
-        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}}
-    };
+    DrawContext_t context = {&tx, &s_program};
+
+    auto& vertex_attribs = (tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
 
     s_cur_depth++;
-
-    s_fill_buffer(vertex_attribs, 4);
-
-    if(tx.d.mask_texture_id && s_emulate_logic_ops)
-    {
-        s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
-
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-        s_special_program.use_program();
-        s_special_program.update_transform(s_transform_matrix.data());
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        return;
-    }
-
-    s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data());
-
-    if(tx.d.mask_texture_id)
-    {
-        prepareDrawMask();
-
-        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        prepareDrawImage();
-    }
-
-    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    if(tx.d.mask_texture_id)
-    {
-        leaveMaskContext();
-    }
-
-    // glPopMatrix();
 }
 
 void RenderGLES::renderTexture(float xDst, float yDst,
@@ -1941,57 +1813,18 @@ void RenderGLES::renderTexture(float xDst, float yDst,
     float v1 = tx.l.h_scale * 0;
     float v2 = tx.l.h_scale * (tx.h);
 
-    const Vertex_t vertex_attribs[] =
-    {
-        {{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}},
-        {{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}},
-        {{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}},
-        {{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}}
-    };
+    DrawContext_t context = {&tx, &s_program};
+
+    auto& vertex_attribs = (tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
 
     s_cur_depth++;
-
-    s_fill_buffer(vertex_attribs, 4);
-
-    if(tx.d.mask_texture_id && s_emulate_logic_ops)
-    {
-        s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
-
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-        s_special_program.use_program();
-        s_special_program.update_transform(s_transform_matrix.data());
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        return;
-    }
-
-    s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data());
-
-    if(tx.d.mask_texture_id)
-    {
-        prepareDrawMask();
-
-        glBindTexture(GL_TEXTURE_2D, tx.d.mask_texture_id);
-
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-        prepareDrawImage();
-    }
-
-    glBindTexture(GL_TEXTURE_2D, tx.d.texture_id);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-    if(tx.d.mask_texture_id)
-    {
-        leaveMaskContext();
-    }
 }
 
 void RenderGLES::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
