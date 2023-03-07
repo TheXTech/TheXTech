@@ -44,7 +44,7 @@ class RenderGLES final : public AbstractRender_t
 public:
     struct Vertex_t
     {
-        GLfloat position[3];
+        GLshort position[3];
         GLubyte tint[4];
         GLfloat texcoord[2];
     };
