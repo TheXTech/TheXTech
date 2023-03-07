@@ -342,7 +342,8 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 #endif
 
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    // note: we don't currently use the depth buffer on the main window
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 
     m_gContext = SDL_GL_CreateContext(m_window);
 
