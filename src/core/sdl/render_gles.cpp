@@ -372,7 +372,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         glGenTextures(2, s_game_texture);
     }
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 138: initing got GL error code %d", (int)err);
 
     if(s_game_texture_fb && s_game_texture[0] && s_game_texture[1])
@@ -394,7 +394,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             glBindTexture(GL_TEXTURE_2D, 0);
         }
 
-        GLenum err = glGetError();
+        err = glGetError();
         if(err)
         {
             pLogWarning("Render GL: could not allocate game screen texture (%d). Falling back to screen-space scaling.", (int)err);
@@ -433,7 +433,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 187: initing got GL error code %d", (int)err);
 
     glGenTextures(1, &s_fb_read_texture);
@@ -455,7 +455,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     m_maxTextureWidth = maxTextureSize;
     m_maxTextureHeight = maxTextureSize;
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 198: initing got GL error code %d", (int)err);
 
     const char* vertex_src = (
@@ -734,7 +734,7 @@ void main()
         );
     }
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 225: initing got GL error code %d", (int)err);
 
     // initialize vertex buffers
@@ -751,10 +751,10 @@ void main()
         s_vertex_buffer_size[i] = sizeof(Vertex_t) * 4;
     }
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 200: initing got GL error code %d", (int)err);
 
-    while(err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL 238: initing got GL error code %d", (int)err);
 
     // Clean-up from a possible start-up junk
@@ -825,7 +825,8 @@ void RenderGLES::togglehud()
 
 void RenderGLES::repaint()
 {
-    while(GLint err = glGetError())
+    GLuint err;
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL rp1: initing got GL error code %d", (int)err);
 
 #ifdef USE_RENDER_BLOCKING
@@ -892,7 +893,7 @@ void RenderGLES::repaint()
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    while(GLint err = glGetError())
+    while((err = glGetError()) != 0)
         pLogWarning("Render GL rp2: initing got GL error code %d", (int)err);
 
     Controls::RenderTouchControls();
@@ -947,9 +948,9 @@ void RenderGLES::applyViewport()
             viewport_w, viewport_h);
 
         s_transform_matrix = {
-            2.0f / viewport_w, 0.0f, 0.0f, 0.0f,
-            0.0f, -2.0f / viewport_h, 0.0f, 0.0f,
-            0.0f, 0.0f, 1.0f / (1 << 15), 0.0f,
+            2.0f / (float)viewport_w, 0.0f, 0.0f, 0.0f,
+            0.0f, -2.0f / (float)viewport_h, 0.0f, 0.0f,
+            0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
             -float(viewport_w + off_x + off_x) / (viewport_w), float(viewport_h + off_y + off_y) / (viewport_h), 0.0f, 1.0f,
         };
 
@@ -980,9 +981,9 @@ void RenderGLES::applyViewport()
     // pLogDebug("Setting projection to %d %d %d %d", off_x, m_viewport_w + off_x, m_viewport_h + off_y, off_y);
     // glOrtho( off_x + 0.5f, viewport_w + off_x + 0.5f, viewport_h + off_y + 0.5f, off_y + 0.5f, -1, 1);
     s_transform_matrix = {
-        2.0f / viewport_w, 0.0f, 0.0f, 0.0f,
-        0.0f, -2.0f / viewport_h, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f / (1 << 15), 0.0f,
+        2.0f / (float)viewport_w, 0.0f, 0.0f, 0.0f,
+        0.0f, -2.0f / (float)viewport_h, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
         -(viewport_w + off_x + 0.5f + off_x + 0.5f) / (viewport_w), (viewport_h + off_y + 0.5f + off_y + 0.5f) / (viewport_h), 0.0f, 1.0f,
     };
 
@@ -1111,9 +1112,9 @@ void RenderGLES::setTargetScreen()
 
     // glOrtho(0, hardware_w, hardware_h, 0, -1, 1);
     s_transform_matrix = {
-        2.0f / hardware_w, 0.0f, 0.0f, 0.0f,
-        0.0f, -2.0f / hardware_h, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f / (1 << 15), 0.0f,
+        2.0f / (float)hardware_w, 0.0f, 0.0f, 0.0f,
+        0.0f, -2.0f / (float)hardware_h, 0.0f, 0.0f,
+        0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
         -1.0f, 1.0f, 0.0f, 1.0f,
     };
 
