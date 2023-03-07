@@ -230,9 +230,6 @@ void RenderGLES::clearDrawQueues()
         i.second.vertices.clear();
 
     m_ordered_draw_context_depth.clear();
-
-    s_cur_depth = 1;
-    glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderGLES::flushDrawQueues()
@@ -321,9 +318,6 @@ void RenderGLES::flushDrawQueues()
     }
 
     glDepthMask(GL_TRUE);
-
-    s_cur_depth = 0;
-    glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
@@ -913,6 +907,9 @@ void RenderGLES::repaint()
 
     flushDrawQueues();
 
+    s_cur_depth = 1;
+    glClear(GL_DEPTH_BUFFER_BIT);
+
     setTargetScreen();
     clearBuffer();
 
@@ -958,6 +955,7 @@ void RenderGLES::repaint()
     flushDrawQueues();
 
     glEnable(GL_DEPTH_TEST);
+    s_cur_depth = 1;
 
     SDL_GL_SwapWindow(m_window);
 
@@ -1480,7 +1478,7 @@ void RenderGLES::clearBuffer()
     clearDrawQueues();
 
     glBindTexture(GL_TEXTURE_2D, 0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
