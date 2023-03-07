@@ -229,7 +229,9 @@ void RenderGLES::clearDrawQueues()
     for(auto& i : m_ordered_draw_queue)
         i.second.vertices.clear();
 
-    s_cur_depth = 0;
+    m_ordered_draw_context_depth.clear();
+
+    s_cur_depth = 1;
     glClear(GL_DEPTH_BUFFER_BIT);
 }
 
@@ -1493,7 +1495,19 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
 
     DrawContext_t context = {nullptr, (filled) ? &s_program_rect_filled : &s_program_rect_unfilled};
 
-    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
+    int context_depth = 0;
+
+    if(alpha != 1.0f)
+    {
+        int& saved_context_depth = m_ordered_draw_context_depth[context];
+
+        if(saved_context_depth == 0)
+            context_depth = saved_context_depth = s_cur_depth;
+        else
+            context_depth = saved_context_depth;
+    }
+
+    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
@@ -1531,7 +1545,19 @@ void RenderGLES::renderCircle(int cx, int cy, int radius, float red, float green
 
     DrawContext_t context = {nullptr, &s_program_circle};
 
-    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
+    int context_depth = 0;
+
+    if(alpha != 1.0f)
+    {
+        int& saved_context_depth = m_ordered_draw_context_depth[context];
+
+        if(saved_context_depth == 0)
+            context_depth = saved_context_depth = s_cur_depth;
+        else
+            context_depth = saved_context_depth;
+    }
+
+    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
@@ -1559,7 +1585,19 @@ void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float g
 
     DrawContext_t context = {nullptr, &s_program_circle_hole};
 
-    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
+    int context_depth = 0;
+
+    if(alpha != 1.0f)
+    {
+        int& saved_context_depth = m_ordered_draw_context_depth[context];
+
+        if(saved_context_depth == 0)
+            context_depth = saved_context_depth = s_cur_depth;
+        else
+            context_depth = saved_context_depth;
+    }
+
+    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
@@ -1633,7 +1671,19 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
 
     DrawContext_t context = {&tx, &s_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
+    int context_depth = 0;
+
+    if(!tx.d.use_depth_test || alpha != 1.0f)
+    {
+        int& saved_context_depth = m_ordered_draw_context_depth[context];
+
+        if(saved_context_depth == 0)
+            context_depth = saved_context_depth = s_cur_depth;
+        else
+            context_depth = saved_context_depth;
+    }
+
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
@@ -1677,7 +1727,19 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
     DrawContext_t context = {&tx, &s_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
+    int context_depth = 0;
+
+    if(!tx.d.use_depth_test || alpha != 1.0f)
+    {
+        int& saved_context_depth = m_ordered_draw_context_depth[context];
+
+        if(saved_context_depth == 0)
+            context_depth = saved_context_depth = s_cur_depth;
+        else
+            context_depth = saved_context_depth;
+    }
+
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
@@ -1744,7 +1806,19 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     DrawContext_t context = {&tx, &s_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
+    int context_depth = 0;
+
+    if(!tx.d.use_depth_test || alpha != 1.0f)
+    {
+        int& saved_context_depth = m_ordered_draw_context_depth[context];
+
+        if(saved_context_depth == 0)
+            context_depth = saved_context_depth = s_cur_depth;
+        else
+            context_depth = saved_context_depth;
+    }
+
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
@@ -1825,7 +1899,19 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
 
     DrawContext_t context = {&tx, &s_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
+    int context_depth = 0;
+
+    if(!tx.d.use_depth_test || alpha != 1.0f)
+    {
+        int& saved_context_depth = m_ordered_draw_context_depth[context];
+
+        if(saved_context_depth == 0)
+            context_depth = saved_context_depth = s_cur_depth;
+        else
+            context_depth = saved_context_depth;
+    }
+
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
@@ -1869,7 +1955,19 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
     DrawContext_t context = {&tx, &s_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
+    int context_depth = 0;
+
+    if(!tx.d.use_depth_test || alpha != 1.0f)
+    {
+        int& saved_context_depth = m_ordered_draw_context_depth[context];
+
+        if(saved_context_depth == 0)
+            context_depth = saved_context_depth = s_cur_depth;
+        else
+            context_depth = saved_context_depth;
+    }
+
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});

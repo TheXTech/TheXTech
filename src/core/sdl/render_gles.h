@@ -82,6 +82,7 @@ private:
 
     std::unordered_map<DrawContext_t, VertexList, hash_DrawContext> m_unordered_draw_queue;
     std::map<std::pair<int, DrawContext_t>, VertexList> m_ordered_draw_queue;
+    std::unordered_map<DrawContext_t, int, hash_DrawContext> m_ordered_draw_context_depth;
 
     SDL_Window    *m_window = nullptr;
 
