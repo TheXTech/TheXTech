@@ -401,7 +401,11 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     // SDL_GetRendererInfo(m_gRenderer, &ri);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+#ifdef THEXTECH_GL_ES_ONLY
+    glClearDepthf(0.0f);
+#else
     glClearDepth(0.0f);
+#endif
 
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_GEQUAL);
@@ -430,7 +434,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             // try to allocate texture memory
             glBindTexture(GL_TEXTURE_2D, s_game_texture[i]);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, (i == 0) ? GL_RGB8 : GL_DEPTH_COMPONENT16,
+            glTexImage2D(GL_TEXTURE_2D, 0, (i == 0) ? GL_RGB : GL_DEPTH_COMPONENT16,
                 ScreenW, ScreenH,
                 0, (i == 0) ? GL_RGB : GL_DEPTH_COMPONENT, (i == 0) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_INT, nullptr);
 
@@ -489,7 +493,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, s_fb_read_texture);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
         ScreenW, ScreenH,
         0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
