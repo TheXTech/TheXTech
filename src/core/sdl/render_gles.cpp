@@ -249,60 +249,8 @@ void RenderGLES::clearDrawQueues()
     m_ordered_draw_context_depth.clear();
 }
 
-static std::vector<RenderGLES::Vertex_t> s_contiguous_buffer;
-
 void RenderGLES::flushDrawQueues()
 {
-    s_contiguous_buffer.clear();
-
-    int vertex_count = 0;
-
-    // allocate buffer
-    for(auto& i : m_unordered_draw_queue)
-        vertex_count += i.second.vertices.size();
-
-    for(auto& i : m_ordered_draw_queue)
-        vertex_count += i.second.vertices.size();
-
-    s_contiguous_buffer.resize(vertex_count);
-
-    Vertex_t* fill_pos = s_contiguous_buffer.data();
-
-    // fill buffer
-    for(auto& i : m_unordered_draw_queue)
-    {
-        memcpy(fill_pos, i.second.vertices.data(), sizeof(Vertex_t) * i.second.vertices.size());
-        fill_pos += i.second.vertices.size();
-    }
-
-    for(auto& i : m_ordered_draw_queue)
-    {
-        memcpy(fill_pos, i.second.vertices.data(), sizeof(Vertex_t) * i.second.vertices.size());
-        fill_pos += i.second.vertices.size();
-    }
-
-    // upload buffer to GPU
-    s_cur_buffer_index++;
-    if(s_cur_buffer_index >= s_num_buffers)
-        s_cur_buffer_index = 0;
-
-    GLsizeiptr buffer_size = sizeof(RenderGLES::Vertex_t) * vertex_count;
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-
-    if(s_vertex_buffer_size[s_cur_buffer_index] < buffer_size)
-    {
-        glBufferData(GL_ARRAY_BUFFER, buffer_size, s_contiguous_buffer.data(), GL_STREAM_DRAW);
-        s_vertex_buffer_size[s_cur_buffer_index] = buffer_size;
-    }
-    else
-    {
-        glBufferSubData(GL_ARRAY_BUFFER, 0, buffer_size, s_contiguous_buffer.data());
-    }
-
-    // draw vertices from buffer
-    uint8_t* offset = 0;
-
     // pass 1: opaque textures
     for(auto& i : m_unordered_draw_queue)
     {
@@ -314,10 +262,7 @@ void RenderGLES::flushDrawQueues()
         else
             continue;
 
-        // s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), offset + offsetof(RenderGLES::Vertex_t, position));
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), offset + offsetof(RenderGLES::Vertex_t, texcoord));
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE,  sizeof(RenderGLES::Vertex_t), offset + offsetof(RenderGLES::Vertex_t, tint));
+        s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
         context.program->use_program();
         context.program->update_transform(s_transform_matrix.data());
@@ -327,7 +272,6 @@ void RenderGLES::flushDrawQueues()
 
         glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
 
-        offset += vertex_attribs.size() * sizeof(Vertex_t);
         vertex_attribs.clear();
     }
 
@@ -345,10 +289,7 @@ void RenderGLES::flushDrawQueues()
         else
             continue;
 
-        // s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), offset + offsetof(RenderGLES::Vertex_t, position));
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), offset + offsetof(RenderGLES::Vertex_t, texcoord));
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE,  sizeof(RenderGLES::Vertex_t), offset + offsetof(RenderGLES::Vertex_t, tint));
+        s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
         if(context.texture && context.texture->d.mask_texture_id && s_emulate_logic_ops)
         {
@@ -367,7 +308,6 @@ void RenderGLES::flushDrawQueues()
 
             glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
 
-            offset += vertex_attribs.size() * sizeof(Vertex_t);
             vertex_attribs.clear();
             continue;
         }
@@ -391,7 +331,6 @@ void RenderGLES::flushDrawQueues()
         if(context.texture && context.texture->d.mask_texture_id)
             leaveMaskContext();
 
-        offset += vertex_attribs.size() * sizeof(Vertex_t);
         vertex_attribs.clear();
     }
 
