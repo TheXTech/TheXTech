@@ -74,8 +74,14 @@ private:
         }
     };
 
-    std::unordered_map<DrawContext_t, std::vector<Vertex_t>, hash_DrawContext> m_unordered_draw_queue;
-    std::map<std::pair<int, DrawContext_t>, std::vector<Vertex_t>> m_ordered_draw_queue;
+    struct VertexList
+    {
+        std::vector<Vertex_t> vertices;
+        bool active = false;
+    };
+
+    std::unordered_map<DrawContext_t, VertexList, hash_DrawContext> m_unordered_draw_queue;
+    std::map<std::pair<int, DrawContext_t>, VertexList> m_ordered_draw_queue;
 
     SDL_Window    *m_window = nullptr;
 
@@ -104,7 +110,11 @@ private:
     int m_draw_mask_mode = 0;
 
 private:
+    // deallocate queues unused since previous call
+    void refreshDrawQueues();
+    // clear queues without drawing or deallocating
     void clearDrawQueues();
+    // render and clear queues
     void flushDrawQueues();
 
 public:

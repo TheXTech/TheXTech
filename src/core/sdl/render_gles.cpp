@@ -131,6 +131,8 @@ static int s_cur_buffer_index = 0;
 static std::array<GLfloat, 16> s_transform_matrix;
 static GLushort s_cur_depth = 0;
 
+static uint64_t s_current_frame = 0;
+
 static void s_update_fb_read_texture(int x, int y, int w, int h)
 {
     if(x >= ScreenW || y >= ScreenH)
@@ -190,10 +192,42 @@ static void s_fill_buffer(const RenderGLES::Vertex_t* vertex_attribs, int count)
     glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE,  sizeof(RenderGLES::Vertex_t), (void*)offsetof(RenderGLES::Vertex_t, tint));
 }
 
+void RenderGLES::refreshDrawQueues()
+{
+    for(auto it = m_unordered_draw_queue.begin(); it != m_unordered_draw_queue.end();)
+    {
+        if(!it->second.active)
+        {
+            it = m_unordered_draw_queue.erase(it);
+        }
+        else
+        {
+            it->second.active = false;
+            ++it;
+        }
+    }
+
+    for(auto it = m_ordered_draw_queue.begin(); it != m_ordered_draw_queue.end();)
+    {
+        if(!it->second.active)
+        {
+            it = m_ordered_draw_queue.erase(it);
+        }
+        else
+        {
+            it->second.active = false;
+            ++it;
+        }
+    }
+}
+
 void RenderGLES::clearDrawQueues()
 {
-    m_unordered_draw_queue.clear();
-    m_ordered_draw_queue.clear();
+    for(auto& i : m_unordered_draw_queue)
+        i.second.vertices.clear();
+
+    for(auto& i : m_ordered_draw_queue)
+        i.second.vertices.clear();
 
     s_cur_depth = 0;
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -202,10 +236,15 @@ void RenderGLES::clearDrawQueues()
 void RenderGLES::flushDrawQueues()
 {
     // pass 1: opaque textures
-    for(const auto& i : m_unordered_draw_queue)
+    for(auto& i : m_unordered_draw_queue)
     {
         const DrawContext_t& context = i.first;
-        const std::vector<Vertex_t>& vertex_attribs = i.second;
+        std::vector<Vertex_t>& vertex_attribs = i.second.vertices;
+
+        if(!vertex_attribs.empty())
+            i.second.active = true;
+        else
+            continue;
 
         s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
@@ -215,33 +254,24 @@ void RenderGLES::flushDrawQueues()
         if(context.texture)
             glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
 
-#if 0
-        if(context.texture && context.texture->d.mask_texture_id && s_emulate_logic_ops)
-        {
-            // s_update_fb_read_texture(xDst, yDst, tx.w, tx.h);
-
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
-            glActiveTexture(GL_TEXTURE0);
-
-            glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-            return;
-        }
-#endif
-
         glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+
+        vertex_attribs.clear();
     }
 
     // pass 2: translucent / interesting textures
     glDepthMask(GL_FALSE);
 
-    for(const auto& i : m_ordered_draw_queue)
+    for(auto& i : m_ordered_draw_queue)
     {
         // depth is i.first.first
-
         const DrawContext_t& context = i.first.second;
-        const std::vector<Vertex_t>& vertex_attribs = i.second;
+        std::vector<Vertex_t>& vertex_attribs = i.second.vertices;
+
+        if(!vertex_attribs.empty())
+            i.second.active = true;
+        else
+            continue;
 
         s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
@@ -262,6 +292,7 @@ void RenderGLES::flushDrawQueues()
 
             glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
 
+            vertex_attribs.clear();
             continue;
         }
 
@@ -283,11 +314,14 @@ void RenderGLES::flushDrawQueues()
 
         if(context.texture && context.texture->d.mask_texture_id)
             leaveMaskContext();
+
+        vertex_attribs.clear();
     }
 
     glDepthMask(GL_TRUE);
 
-    clearDrawQueues();
+    s_cur_depth = 0;
+    glClear(GL_DEPTH_BUFFER_BIT);
 }
 
 bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
@@ -901,6 +935,10 @@ void RenderGLES::repaint()
     flushDrawQueues();
 
     SDL_GL_SwapWindow(m_window);
+
+    s_current_frame++;
+    if(s_current_frame % 512 == 0)
+        refreshDrawQueues();
 }
 
 void RenderGLES::applyViewport()
@@ -1440,7 +1478,7 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
 
     DrawContext_t context = {nullptr, (filled) ? &s_program_rect_filled : &s_program_rect_unfilled};
 
-    auto& vertex_attribs = (alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
@@ -1478,7 +1516,7 @@ void RenderGLES::renderCircle(int cx, int cy, int radius, float red, float green
 
     DrawContext_t context = {nullptr, &s_program_circle};
 
-    auto& vertex_attribs = (alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
@@ -1506,7 +1544,7 @@ void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float g
 
     DrawContext_t context = {nullptr, &s_program_circle_hole};
 
-    auto& vertex_attribs = (alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
@@ -1580,7 +1618,7 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
 
     DrawContext_t context = {&tx, &s_program};
 
-    auto& vertex_attribs = (tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
@@ -1624,7 +1662,7 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
     DrawContext_t context = {&tx, &s_program};
 
-    auto& vertex_attribs = (tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
@@ -1691,7 +1729,7 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     DrawContext_t context = {&tx, &s_program};
 
-    auto& vertex_attribs = (tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
@@ -1772,7 +1810,7 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
 
     DrawContext_t context = {&tx, &s_program};
 
-    auto& vertex_attribs = (tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
@@ -1816,7 +1854,7 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
     DrawContext_t context = {&tx, &s_program};
 
-    auto& vertex_attribs = (tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}];
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{0, context}]).vertices;
 
     vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
     vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
