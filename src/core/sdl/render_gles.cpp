@@ -473,14 +473,13 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-            glBindTexture(GL_TEXTURE_2D, 0);
         }
+        glBindTexture(GL_TEXTURE_2D, 0);
 
         err = glGetError();
         if(err)
         {
-            pLogWarning("Render GL: could not allocate game screen texture (%d). Falling back to screen-space scaling.", (int)err);
+            pLogWarning("Render GL: could not allocate game screen texture for render-to-texture (GL error %d). Falling back to direct rendering.", (int)err);
             glDeleteTextures(2, s_game_texture);
             s_game_texture[0] = 0;
             s_game_texture[1] = 0;
@@ -496,7 +495,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, s_game_texture[0], 0);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, s_game_texture[1], 0);
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        if(status !=  GL_FRAMEBUFFER_COMPLETE)
+        if(status != GL_FRAMEBUFFER_COMPLETE)
         {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
@@ -507,7 +506,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             glDeleteFramebuffers(1, &s_game_texture_fb);
             s_game_texture_fb = 0;
 
-            pLogWarning("Render GL: could not bind framebuffer texture target (%d). Falling back to screen-space scaling.", (int)status);
+            pLogWarning("Render GL: could not bind framebuffer texture target for render-to-texture (GL error %d). Falling back to direct rendering.", (int)status);
         }
         else
         {
@@ -948,12 +947,13 @@ void RenderGLES::repaint()
     glClear(GL_DEPTH_BUFFER_BIT);
 
     setTargetScreen();
-    clearBuffer();
 
     glDisable(GL_DEPTH_TEST);
 
     if(s_game_texture_fb && s_game_texture)
     {
+        clearBuffer();
+
         int hardware_w, hardware_h;
         XWindow::getWindowSize(&hardware_w, &hardware_h);
 
@@ -1082,7 +1082,7 @@ void RenderGLES::applyViewport()
         2.0f / (float)viewport_w, 0.0f, 0.0f, 0.0f,
         0.0f, -2.0f / (float)viewport_h, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
-        -(viewport_w + off_x + 0.5f + off_x + 0.5f) / (viewport_w), (viewport_h + off_y + 0.5f + off_y + 0.5f) / (viewport_h), 0.0f, 1.0f,
+        -(viewport_w + off_x + off_x + 0.5f) / (viewport_w), (viewport_h + off_y + off_y + 0.5f) / (viewport_h), 0.0f, 1.0f,
     };
 
     s_program.set_transform_dirty();
