@@ -109,6 +109,12 @@ static GLuint s_glcore_vao = 0;
 static constexpr bool s_emulate_logic_ops = true;
 #endif
 
+#ifdef __EMSCRIPTEN__
+static constexpr bool s_client_side_arrays = false;
+#else
+static bool s_client_side_arrays = true;
+#endif
+
 static std::vector<GLProgramObject*> s_program_bank;
 static GLProgramObject s_program;
 static GLProgramObject s_special_program;
@@ -169,27 +175,38 @@ static void s_update_fb_read_texture(int x, int y, int w, int h)
 
 static void s_fill_buffer(const RenderGLES::Vertex_t* vertex_attribs, int count)
 {
-    s_cur_buffer_index++;
-    if(s_cur_buffer_index >= s_num_buffers)
-        s_cur_buffer_index = 0;
+    const uint8_t* array_start = 0;
 
-    GLsizeiptr buffer_size = sizeof(RenderGLES::Vertex_t) * count;
-
-    glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
-
-    if(s_vertex_buffer_size[s_cur_buffer_index] < buffer_size)
+    if(s_client_side_arrays)
     {
-        glBufferData(GL_ARRAY_BUFFER, buffer_size, vertex_attribs, GL_STREAM_DRAW);
-        s_vertex_buffer_size[s_cur_buffer_index] = buffer_size;
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        array_start = reinterpret_cast<const uint8_t*>(vertex_attribs);
     }
     else
     {
-        glBufferSubData(GL_ARRAY_BUFFER, 0, buffer_size, vertex_attribs);
+        s_cur_buffer_index++;
+        if(s_cur_buffer_index >= s_num_buffers)
+            s_cur_buffer_index = 0;
+
+        GLsizeiptr buffer_size = sizeof(RenderGLES::Vertex_t) * count;
+
+        glBindBuffer(GL_ARRAY_BUFFER, s_vertex_buffer[s_cur_buffer_index]);
+
+        if(s_vertex_buffer_size[s_cur_buffer_index] < buffer_size)
+        {
+            glBufferData(GL_ARRAY_BUFFER, buffer_size, vertex_attribs, GL_STREAM_DRAW);
+            s_vertex_buffer_size[s_cur_buffer_index] = buffer_size;
+        }
+        else
+        {
+            glBufferSubData(GL_ARRAY_BUFFER, 0, buffer_size, vertex_attribs);
+        }
     }
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), (void*)offsetof(RenderGLES::Vertex_t, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), (void*)offsetof(RenderGLES::Vertex_t, texcoord));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE,  sizeof(RenderGLES::Vertex_t), (void*)offsetof(RenderGLES::Vertex_t, tint));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), array_start + offsetof(RenderGLES::Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), array_start + offsetof(RenderGLES::Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE,  sizeof(RenderGLES::Vertex_t), array_start + offsetof(RenderGLES::Vertex_t, tint));
 }
 
 void RenderGLES::refreshDrawQueues()
@@ -336,7 +353,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #else
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 #endif
@@ -348,6 +365,16 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     m_gContext = SDL_GL_CreateContext(m_window);
 
 #ifndef THEXTECH_GL_ES_ONLY
+    if(!m_gContext)
+    {
+        pLogWarning("Unable to create GL compatibility 4.3 profile, attempting GL core 4.3.");
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+
+        m_gContext = SDL_GL_CreateContext(m_window);
+    }
+
     if(!m_gContext)
     {
         pLogWarning("Unable to create GL core 4.3 profile, attempting GL compatibility 2.1.");
@@ -389,6 +416,13 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         s_emulate_logic_ops = true;
     }
 #endif // #ifndef THEXTECH_GL_ES_ONLY
+
+#ifndef __EMSCRIPTEN__
+    if(mask == SDL_GL_CONTEXT_PROFILE_CORE)
+        s_client_side_arrays = false;
+    else
+        s_client_side_arrays = true;
+#endif // #ifndef __EMSCRIPTEN__
 
     SDL_GL_SetSwapInterval(0);
 
