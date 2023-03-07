@@ -430,9 +430,9 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             // try to allocate texture memory
             glBindTexture(GL_TEXTURE_2D, s_game_texture[i]);
 
-            glTexImage2D(GL_TEXTURE_2D, 0, (i == 0) ? GL_RGB8 : GL_DEPTH24_STENCIL8,
+            glTexImage2D(GL_TEXTURE_2D, 0, (i == 0) ? GL_RGB8 : GL_DEPTH_COMPONENT16,
                 ScreenW, ScreenH,
-                0, (i == 0) ? GL_RGB : GL_DEPTH_STENCIL, (i == 0) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_INT_24_8, nullptr);
+                0, (i == 0) ? GL_RGB : GL_DEPTH_COMPONENT, (i == 0) ? GL_UNSIGNED_BYTE : GL_UNSIGNED_INT, nullptr);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -459,12 +459,12 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, s_game_texture_fb);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, s_game_texture[0], 0);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, s_game_texture[1], 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, s_game_texture[1], 0);
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if(status !=  GL_FRAMEBUFFER_COMPLETE)
         {
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
             glDeleteTextures(2, s_game_texture);
             s_game_texture[0] = 0;
             s_game_texture[1] = 0;
