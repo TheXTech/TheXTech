@@ -55,6 +55,8 @@
 #define UNUSED(x) (void)x
 #endif
 
+#define F_TO_B(r, g, b, a) {static_cast<GLubyte>((r) * 255.0f), static_cast<GLubyte>((g) * 255.0f), static_cast<GLubyte>((b) * 255.0f), static_cast<GLubyte>((a) * 255.0f)}
+
 static std::string s_read_file(const char* filename)
 {
     std::ifstream is(filename, std::ios::binary);
@@ -204,9 +206,9 @@ static void s_fill_buffer(const RenderGLES::Vertex_t* vertex_attribs, int count)
         }
     }
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), array_start + offsetof(RenderGLES::Vertex_t, position));
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(RenderGLES::Vertex_t), array_start + offsetof(RenderGLES::Vertex_t, texcoord));
-    glVertexAttribPointer(2, 4, GL_FLOAT, GL_TRUE,  sizeof(RenderGLES::Vertex_t), array_start + offsetof(RenderGLES::Vertex_t, tint));
+    glVertexAttribPointer(0, 3, GL_FLOAT,         GL_FALSE, sizeof(RenderGLES::Vertex_t), array_start + offsetof(RenderGLES::Vertex_t, position));
+    glVertexAttribPointer(1, 2, GL_FLOAT,         GL_FALSE, sizeof(RenderGLES::Vertex_t), array_start + offsetof(RenderGLES::Vertex_t, texcoord));
+    glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE,  sizeof(RenderGLES::Vertex_t), array_start + offsetof(RenderGLES::Vertex_t, tint));
 }
 
 void RenderGLES::refreshDrawQueues()
@@ -963,10 +965,10 @@ void RenderGLES::repaint()
 
         const Vertex_t vertex_attribs[] =
         {
-            {{x1, y1, 0}, {1.0, 1.0, 1.0, 1.0}, {0.0, 1.0}},
-            {{x1, y2, 0}, {1.0, 1.0, 1.0, 1.0}, {0.0, 0.0}},
-            {{x2, y1, 0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 1.0}},
-            {{x2, y2, 0}, {1.0, 1.0, 1.0, 1.0}, {1.0, 0.0}},
+            {{x1, y1, 0}, {255, 255, 255, 255}, {0.0, 1.0}},
+            {{x1, y2, 0}, {255, 255, 255, 255}, {0.0, 0.0}},
+            {{x2, y1, 0}, {255, 255, 255, 255}, {1.0, 1.0}},
+            {{x2, y2, 0}, {255, 255, 255, 255}, {1.0, 0.0}},
         };
 
         s_fill_buffer(vertex_attribs, 4);
@@ -1550,12 +1552,12 @@ void RenderGLES::renderRect(int x, int y, int w, int h, float red, float green, 
 
     auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
-    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
 
     s_cur_depth++;
 }
@@ -1600,12 +1602,12 @@ void RenderGLES::renderCircle(int cx, int cy, int radius, float red, float green
 
     auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
-    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}});
-    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 1.0}});
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 1.0}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 0.0}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 1.0}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 0.0}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 1.0}});
 
     s_cur_depth++;
 }
@@ -1640,12 +1642,12 @@ void RenderGLES::renderCircleHole(int cx, int cy, int radius, float red, float g
 
     auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
-    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 0.0}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {0.0, 1.0}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 0.0}});
-    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {1.0, 1.0}});
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 1.0}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 0.0}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 1.0}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 0.0}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 1.0}});
 
     s_cur_depth++;
 }
@@ -1726,12 +1728,12 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
 
     auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
-    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
 
     s_cur_depth++;
 }
@@ -1782,12 +1784,12 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
     auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
-    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
 
     s_cur_depth++;
 }
@@ -1861,12 +1863,12 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
-    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
 
     s_cur_depth++;
 }
@@ -1954,12 +1956,12 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
 
     auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
-    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
 
     s_cur_depth++;
 }
@@ -2010,12 +2012,12 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
     auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : m_ordered_draw_queue[{context_depth, context}]).vertices;
 
-    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, {red, green, blue, alpha}, {u2, v2}});
+    vertex_attribs.push_back({{x1, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, (GLfloat)s_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
 
     s_cur_depth++;
 }

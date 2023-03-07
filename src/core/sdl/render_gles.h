@@ -45,7 +45,7 @@ public:
     struct Vertex_t
     {
         GLfloat position[3];
-        GLfloat tint[4];
+        GLubyte tint[4];
         GLfloat texcoord[2];
     };
 
