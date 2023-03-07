@@ -598,7 +598,8 @@ bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, con
                 continue;
 
             // back pixel is white and front pixel is black: buffer preserved
-            if((y >= bh || x >= bh || SDL_memcmp(bp, white, 3) == 0) && (y >= fh || x >= fh || SDL_memcmp(fp, black, 3) == 0))
+            // BUGFIX: detect vanilla masks that use 0xf8 as their "white" color
+            if((y >= bh || x >= bh || (bp[0] >= 0xf8 && bp[1] >= 0xf8 && bp[2] >= 0xf8)) && (y >= fh || x >= fh || SDL_memcmp(fp, black, 3) == 0))
                 continue;
 
             // pixel is matching with the front (i.e. is not an example of the lazily-made sprite)
