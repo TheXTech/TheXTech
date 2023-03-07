@@ -912,6 +912,8 @@ void RenderGLES::repaint()
     setTargetScreen();
     clearBuffer();
 
+    glDisable(GL_DEPTH_TEST);
+
     if(s_game_texture_fb && s_game_texture)
     {
         int hardware_w, hardware_h;
@@ -950,6 +952,8 @@ void RenderGLES::repaint()
     Controls::RenderTouchControls();
 
     flushDrawQueues();
+
+    glEnable(GL_DEPTH_TEST);
 
     SDL_GL_SwapWindow(m_window);
 
