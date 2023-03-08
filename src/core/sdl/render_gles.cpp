@@ -1331,6 +1331,11 @@ static int s_nextPowerOfTwo(int val)
 
 void RenderGLES::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch, bool is_mask, uint32_t least_width, uint32_t least_height)
 {
+    // clear pre-existing errors
+    GLuint err;
+    while((err = glGetError()) != 0)
+        pLogWarning("Render GL: got GL error code %d prior to texture load", (int)err);
+
     // SDL_Surface *surface;
     // SDL_Texture *texture = nullptr;
 
@@ -1438,7 +1443,8 @@ void RenderGLES::loadTexture(StdPicture &target, uint32_t width, uint32_t height
         target.l.h_scale /= pad_h;
     }
 
-    GLenum err = glGetError();
+    // check for errors as a result of texture load
+    err = glGetError();
     if(err != GL_NO_ERROR && is_mask)
     {
         glDeleteTextures(1, &tex_id);
