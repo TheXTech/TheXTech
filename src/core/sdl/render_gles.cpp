@@ -117,6 +117,9 @@ static constexpr bool s_client_side_arrays = false;
 static bool s_client_side_arrays = true;
 #endif
 
+// doesn't work on GL ES for now due to limited SDL support
+static bool s_enable_debug_output = false;
+
 static std::vector<GLProgramObject*> s_program_bank;
 static GLProgramObject s_program;
 static GLProgramObject s_special_program;
@@ -140,6 +143,11 @@ static std::array<GLfloat, 16> s_transform_matrix;
 static GLshort s_cur_depth = 0;
 
 static uint64_t s_current_frame = 0;
+
+static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam)
+{
+    pLogWarning("Got GL error %s", message);
+}
 
 static void s_update_fb_read_texture(int x, int y, int w, int h)
 {
@@ -406,6 +414,21 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     pLogDebug("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
     pLogDebug("OpenGL renderer: %s", glGetString(GL_RENDERER));
 
+    if(s_enable_debug_output)
+    {
+#ifndef THEXTECH_GL_ES_ONLY
+        if(mask != SDL_GL_CONTEXT_PROFILE_ES)
+        {
+            pLogDebug("Enabling GL debug output...");
+
+            glEnable(GL_DEBUG_OUTPUT);
+            glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+            glDebugMessageCallback(s_HandleGLDebugMessage, nullptr);
+            glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE);
+        }
+#endif
+    }
+
 #ifndef THEXTECH_GL_ES_ONLY
     if(mask == SDL_GL_CONTEXT_PROFILE_CORE)
     {
@@ -506,7 +529,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             glDeleteFramebuffers(1, &s_game_texture_fb);
             s_game_texture_fb = 0;
 
-            pLogWarning("Render GL: could not bind framebuffer texture target for render-to-texture (GL error %d). Falling back to direct rendering.", (int)status);
+            pLogWarning("Render GL: could not bind framebuffer texture target for render-to-texture (FB status %d). Falling back to direct rendering.", (int)status);
         }
         else
         {
@@ -910,10 +933,6 @@ void RenderGLES::togglehud()
 
 void RenderGLES::repaint()
 {
-    GLuint err;
-    while((err = glGetError()) != 0)
-        pLogWarning("Render GL rp1: initing got GL error code %d", (int)err);
-
 #ifdef USE_RENDER_BLOCKING
     if(m_blockRender)
         return;
@@ -984,9 +1003,6 @@ void RenderGLES::repaint()
         glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-    while((err = glGetError()) != 0)
-        pLogWarning("Render GL rp2: initing got GL error code %d", (int)err);
-
     Controls::RenderTouchControls();
 
     flushDrawQueues();
@@ -999,6 +1015,10 @@ void RenderGLES::repaint()
     s_current_frame++;
     if(s_current_frame % 512 == 0)
         refreshDrawQueues();
+
+    GLuint err;
+    while((err = glGetError()) != 0)
+        pLogWarning("Render GL: got GL error code %d on repaint", (int)err);
 }
 
 void RenderGLES::applyViewport()
