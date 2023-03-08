@@ -32,12 +32,13 @@ private:
     GLuint m_program = 0;
 
     GLint m_u_transform_loc = -1;
+    GLint m_u_read_viewport_loc = -1;
 
     std::vector<GLint> m_u_custom_loc;
 
     bool m_transform_dirty = true;
 
-    void m_update_transform(const GLfloat* value);
+    void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport);
 
     static GLuint s_compile_shader(GLenum type, const char* src);
 
@@ -80,11 +81,11 @@ public:
      *
      * Important note: may only be called while program has been activated by use_program()
      */
-    inline void update_transform(const GLfloat* value)
+    inline void update_transform(const GLfloat* transform, const GLfloat* read_viewport)
     {
         if(m_transform_dirty)
         {
-            m_update_transform(value);
+            m_update_transform(transform, read_viewport);
             m_transform_dirty = false;
         }
     }

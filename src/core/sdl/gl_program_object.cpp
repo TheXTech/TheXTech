@@ -82,9 +82,10 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
  *** Private methods ***
  ***********************/
 
-void GLProgramObject::m_update_transform(const GLfloat* value)
+void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat* read_viewport)
 {
-    glUniformMatrix4fv(m_u_transform_loc, 1, GL_FALSE, value);
+    glUniformMatrix4fv(m_u_transform_loc, 1, GL_FALSE, transform);
+    glUniform4fv(m_u_read_viewport_loc, 1, read_viewport);
 }
 
 void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shader)
@@ -146,6 +147,7 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     // load all builtin uniform variable locations
 
     m_u_transform_loc = glGetUniformLocation(m_program, "u_transform");
+    m_u_read_viewport_loc = glGetUniformLocation(m_program, "u_read_viewport");
 
     // set sampler texture index to 0 (fixed for all programs)
     GLint u_texture_loc = glGetUniformLocation(m_program, "u_texture");
@@ -204,6 +206,7 @@ const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
     m_program = other.m_program;
 
     m_u_transform_loc = other.m_u_transform_loc;
+    m_u_read_viewport_loc = other.m_u_read_viewport_loc;
 
     m_transform_dirty = other.m_transform_dirty;
 

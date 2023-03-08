@@ -141,6 +141,7 @@ static GLsizeiptr s_vertex_buffer_size[s_num_buffers] = {0};
 static int s_cur_buffer_index = 0;
 
 static std::array<GLfloat, 16> s_transform_matrix;
+static std::array<GLfloat, 4> s_shader_read_viewport;
 static GLshort s_cur_depth = 0;
 
 static uint64_t s_current_frame = 0;
@@ -276,7 +277,7 @@ void RenderGLES::flushDrawQueues()
         s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
         context.program->use_program();
-        context.program->update_transform(s_transform_matrix.data());
+        context.program->update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
 
         if(context.texture)
             glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
@@ -307,7 +308,7 @@ void RenderGLES::flushDrawQueues()
             if(vertex_attribs.size() > 6)
                 s_update_fb_read_texture(m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
             else if(vertex_attribs.size() == 6)
-                s_update_fb_read_texture(vertex_attribs[0].position[0], vertex_attribs[0].position[1], vertex_attribs[5].position[0] - vertex_attribs[0].position[0], vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
+                s_update_fb_read_texture(m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0], m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1], vertex_attribs[5].position[0] - vertex_attribs[0].position[0], vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
 
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
@@ -315,7 +316,7 @@ void RenderGLES::flushDrawQueues()
             glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
 
             s_special_program.use_program();
-            s_special_program.update_transform(s_transform_matrix.data());
+            s_special_program.update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
 
             glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
 
@@ -324,7 +325,7 @@ void RenderGLES::flushDrawQueues()
         }
 
         context.program->use_program();
-        context.program->update_transform(s_transform_matrix.data());
+        context.program->update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
 
         if(context.texture && context.texture->d.mask_texture_id)
         {
@@ -735,6 +736,7 @@ void main()
         (
             "#version 100                 \n"
             "uniform   mat4 u_transform;  \n"
+            "uniform   vec4 u_read_viewport;   \n"
             "attribute vec4 a_position;   \n"
             "attribute vec2 a_texcoord;   \n"
             "attribute vec4 a_tint;       \n"
@@ -747,10 +749,8 @@ void main()
             "   v_texcoord = a_texcoord;  \n"
             "   v_tint = a_tint;     \n"
             "   v_fbcoord = vec2(gl_Position);  \n"
-            "   v_fbcoord.x += 1.0;  \n"
-            "   v_fbcoord.x /= 2.0;  \n"
-            "   v_fbcoord.y += 1.0;  \n"
-            "   v_fbcoord.y /= 2.0;  \n"
+            "   v_fbcoord *= u_read_viewport.xy;     \n"
+            "   v_fbcoord += u_read_viewport.zw;     \n"
             "}                            \n"
         ),
         logic_contents.c_str()
@@ -1009,7 +1009,7 @@ void RenderGLES::repaint()
         glBindTexture(GL_TEXTURE_2D, s_game_texture);
 
         s_output_program.use_program();
-        s_output_program.update_transform(s_transform_matrix.data());
+        s_output_program.update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1085,8 +1085,19 @@ void RenderGLES::applyViewport()
             -float(viewport_w + off_x + off_x) / (viewport_w), float(viewport_h + off_y + off_y) / (viewport_h), 0.0f, 1.0f,
         };
 
+        s_shader_read_viewport = {
+            // multiply
+            0.5f * (float)viewport_w / (float)ScreenW,
+            0.5f * (float)viewport_h / (float)ScreenH,
+
+            // add
+            ((float)(viewport_x + off_x) + 0.5f * (float)viewport_w) / (float)ScreenW,
+            ((float)(ScreenH - (viewport_y + viewport_h + off_y)) + 0.5f * (float)viewport_h) / (float)ScreenH,
+        };
+
         s_program.set_transform_dirty();
         s_output_program.set_transform_dirty();
+        s_special_program.set_transform_dirty();
         s_program_rect_filled.set_transform_dirty();
         s_program_rect_unfilled.set_transform_dirty();
         s_program_circle.set_transform_dirty();
@@ -1118,8 +1129,13 @@ void RenderGLES::applyViewport()
         -(viewport_w + off_x + off_x + 0.5f) / (viewport_w), (viewport_h + off_y + off_y + 0.5f) / (viewport_h), 0.0f, 1.0f,
     };
 
+    s_shader_read_viewport = {
+        0.0f, 0.0f, 0.0f, 0.0f,
+    };
+
     s_program.set_transform_dirty();
     s_output_program.set_transform_dirty();
+    s_special_program.set_transform_dirty();
     s_program_rect_filled.set_transform_dirty();
     s_program_rect_unfilled.set_transform_dirty();
     s_program_circle.set_transform_dirty();
@@ -1249,8 +1265,13 @@ void RenderGLES::setTargetScreen()
         -1.0f, 1.0f, 0.0f, 1.0f,
     };
 
+    s_shader_read_viewport = {
+        0.0f, 0.0f, 0.0f, 0.0f,
+    };
+
     s_program.set_transform_dirty();
     s_output_program.set_transform_dirty();
+    s_special_program.set_transform_dirty();
     s_program_rect_filled.set_transform_dirty();
     s_program_rect_unfilled.set_transform_dirty();
     s_program_circle.set_transform_dirty();
