@@ -82,7 +82,10 @@ private:
 
     std::unordered_map<DrawContext_t, VertexList, hash_DrawContext> m_unordered_draw_queue;
     std::map<std::pair<int, DrawContext_t>, VertexList> m_ordered_draw_queue;
-    std::unordered_map<DrawContext_t, int, hash_DrawContext> m_ordered_draw_context_depth;
+
+    std::unordered_map<DrawContext_t, int, hash_DrawContext> m_mask_draw_context_depth;
+    DrawContext_t m_recent_draw_context;
+    int m_recent_draw_context_depth = 0;
 
     SDL_Window    *m_window = nullptr;
 
@@ -117,6 +120,8 @@ private:
     void clearDrawQueues();
     // render and clear queues
     void flushDrawQueues();
+    // Choose vertex list for given context and depth pair. Prevents splitting groups for masked draws.
+    VertexList& getOrderedDrawVertexList(DrawContext_t context, int depth);
 
 public:
     RenderGLES();
