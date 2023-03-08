@@ -962,6 +962,9 @@ void RenderGLES::repaint()
 
     flushDrawQueues();
 
+    s_cur_depth = 1;
+    glClear(GL_DEPTH_BUFFER_BIT);
+
 #ifdef USE_SCREENSHOTS_AND_RECS
     if(TakeScreen)
     {
@@ -974,9 +977,6 @@ void RenderGLES::repaint()
 #ifdef USE_SCREENSHOTS_AND_RECS
     processRecorder();
 #endif
-
-    s_cur_depth = 1;
-    glClear(GL_DEPTH_BUFFER_BIT);
 
     setTargetScreen();
 
@@ -2084,6 +2084,7 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
 void RenderGLES::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
 {
+    return;
     glFlush();
 
     int phys_x, phys_y;
@@ -2126,6 +2127,7 @@ void RenderGLES::getScreenPixels(int x, int y, int w, int h, unsigned char *pixe
 
 void RenderGLES::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
 {
+    return;
     glFlush();
 
     int phys_x, phys_y, phys_w, phys_h;
