@@ -596,10 +596,11 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
             "varying   vec2      v_texcoord;     \n"
             "uniform   sampler2D u_texture;  \n"
             "varying   vec4      v_tint;     \n"
+            "const     float     c_alpha_test_thresh = (8.0 / 255.0);\n"
             "void main()                                  \n"
             "{                                            \n"
             "  vec4 l_color = texture2D(u_texture, v_texcoord);\n"
-            "  if(l_color.a == 0.0) discard;\n"
+            "  if(l_color.a < c_alpha_test_thresh) discard;\n"
             "  gl_FragColor = v_tint * l_color;\n"
             "}                                            \n"
         )

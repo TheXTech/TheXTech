@@ -633,7 +633,8 @@ bool GraphicsHelps::validateForDepthTest(FIBITMAP *image, const std::string &ori
         {
             BYTE *alpha = img_bits + (y * pitch) + (x * 4) + 3;
 
-            if(*alpha == 0 || *alpha == 255)
+            // vanilla game used 5 bits per channel
+            if(*alpha < 0x08 || *alpha >= 0xf8)
                 continue;
 
             D_pLogDebug("Texture CANNOT use depth test (%s)", origPath.c_str());
