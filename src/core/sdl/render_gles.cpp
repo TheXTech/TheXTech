@@ -982,10 +982,6 @@ void RenderGLES::repaint()
     else
         SuperPrintScreenCenter("Logic Op Render (X64)", 3, 0);
 
-#ifdef USE_DRAW_BATTERY_STATUS
-    drawBatteryStatus();
-#endif
-
     flushDrawQueues();
 
     s_cur_depth = 1;
@@ -1002,6 +998,10 @@ void RenderGLES::repaint()
 
 #ifdef USE_SCREENSHOTS_AND_RECS
     processRecorder();
+#endif
+
+#ifdef USE_DRAW_BATTERY_STATUS
+    drawBatteryStatus();
 #endif
 
     setTargetScreen();
