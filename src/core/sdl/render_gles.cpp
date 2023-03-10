@@ -302,14 +302,14 @@ void RenderGLES::flushDrawQueues()
         else
             continue;
 
-        s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
-
         if(context.texture && context.texture->d.mask_texture_id && s_emulate_logic_ops)
         {
             if(vertex_attribs.size() > 6)
                 s_update_fb_read_texture(m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
             else if(vertex_attribs.size() == 6)
                 s_update_fb_read_texture(m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0], m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1], vertex_attribs[5].position[0] - vertex_attribs[0].position[0], vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
+
+            s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
@@ -324,6 +324,8 @@ void RenderGLES::flushDrawQueues()
             vertex_attribs.clear();
             continue;
         }
+
+        s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
         context.program->use_program();
         context.program->update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
