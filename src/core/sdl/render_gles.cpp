@@ -117,6 +117,9 @@ static constexpr bool s_client_side_arrays = false;
 static bool s_client_side_arrays = true;
 #endif
 
+static constexpr bool s_prefer_fb_to_fb_render = true;
+static bool s_use_fb_to_fb_render = false;
+
 // doesn't work on GL ES for now due to limited SDL support
 static bool s_enable_debug_output = false;
 
@@ -130,6 +133,7 @@ static GLProgramObject s_program_circle;
 static GLProgramObject s_program_circle_hole;
 
 static GLuint s_fb_read_texture = 0;
+static GLuint s_fb_copy_fb = 0;
 
 static GLuint s_game_texture = 0;
 static GLuint s_game_depth_rb = 0;
@@ -150,6 +154,8 @@ static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint i
 {
     pLogWarning("Got GL error %s", message);
 }
+
+static void s_fill_buffer(const RenderGLES::Vertex_t* vertex_attribs, int count);
 
 static void s_update_fb_read_texture(int x, int y, int w, int h)
 {
@@ -174,15 +180,52 @@ static void s_update_fb_read_texture(int x, int y, int w, int h)
     if(y + h >= ScreenH)
         h = ScreenH - y;
 
-    glActiveTexture(GL_TEXTURE1);
-    glCopyTexSubImage2D(GL_TEXTURE_2D,
-        0,
-        x,
-        ScreenH - (y + h),
-        x,
-        ScreenH - (y + h),
-        w,
-        h);
+    if(!s_use_fb_to_fb_render)
+    {
+        glActiveTexture(GL_TEXTURE1);
+        glCopyTexSubImage2D(GL_TEXTURE_2D,
+            0,
+            x,
+            ScreenH - (y + h),
+            x,
+            ScreenH - (y + h),
+            w,
+            h);
+
+        return;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, s_fb_copy_fb);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, s_game_texture);
+
+    s_program.use_program();
+    s_program.update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
+
+    GLshort x1 = x;
+    GLshort x2 = x + w;
+    GLshort y1 = y;
+    GLshort y2 = y + h;
+
+    GLfloat u1 = (float)x1 / ScreenW;
+    GLfloat u2 = (float)x2 / ScreenW;
+    GLfloat v1 = (float)(ScreenH - y1) / ScreenH;
+    GLfloat v2 = (float)(ScreenH - y2) / ScreenH;
+
+    RenderGLES::Vertex_t copy_triangle_strip[] =
+    {
+        {{x1, y1, 0}, {255, 255, 255, 255}, {u1, v1}},
+        {{x1, y2, 0}, {255, 255, 255, 255}, {u1, v2}},
+        {{x2, y1, 0}, {255, 255, 255, 255}, {u2, v1}},
+        {{x2, y2, 0}, {255, 255, 255, 255}, {u2, v2}},
+    };
+
+    s_fill_buffer(copy_triangle_strip, 4);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, s_game_texture_fb);
 }
 
 static void s_fill_buffer(const RenderGLES::Vertex_t* vertex_attribs, int count)
@@ -550,7 +593,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, s_game_texture_fb);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, s_game_texture, 0);
-            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, s_game_depth_rb);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, s_game_depth_rb);
         GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         if(status != GL_FRAMEBUFFER_COMPLETE)
         {
@@ -577,6 +620,7 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     while((err = glGetError()) != 0)
         pLogWarning("Render GL 187: initing got GL error code %d", (int)err);
 
+    // texture for reading from FB
     glGenTextures(1, &s_fb_read_texture);
 
     glActiveTexture(GL_TEXTURE1);
@@ -592,6 +636,27 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glActiveTexture(GL_TEXTURE0);
+
+
+    // framebuffer for fb->texture copy
+    if(s_prefer_fb_to_fb_render)
+    {
+        glGenFramebuffers(1, &s_fb_copy_fb);
+        glBindFramebuffer(GL_FRAMEBUFFER, s_fb_copy_fb);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, s_fb_read_texture, 0);
+        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if(status != GL_FRAMEBUFFER_COMPLETE)
+            pLogWarning("Render GL: could not bind framebuffer texture target for fb-to-fb copy (FB status %d). Falling back to glCopyTexSubImage2D.", (int)status);
+        else
+            s_use_fb_to_fb_render = true;
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    if(s_use_fb_to_fb_render)
+        pLogDebug("Render GL: Will perform screen-space effects using framebuffer texture-to-framebuffer render");
+    else
+        pLogDebug("Render GL: Will perform screen-space effects using framebuffer-to-texture copy (glCopyTexSubImage2D)");
+
 
     m_maxTextureWidth = maxTextureSize;
     m_maxTextureHeight = maxTextureSize;
@@ -918,6 +983,12 @@ void RenderGLES::close()
     {
         glDeleteFramebuffers(1, &s_game_texture_fb);
         s_game_texture_fb = 0;
+    }
+
+    if(s_fb_copy_fb)
+    {
+        glDeleteFramebuffers(1, &s_fb_copy_fb);
+        s_fb_copy_fb = 0;
     }
 
     if(s_game_depth_rb)
