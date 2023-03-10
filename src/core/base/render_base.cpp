@@ -345,10 +345,30 @@ void AbstractRender_t::loadTextureMask(StdPicture &target,
                          uint32_t image_width,
                          uint32_t image_height)
 {
+    UNUSED(target);
+    UNUSED(mask_width);
+    UNUSED(mask_height);
+    UNUSED(RGBApixels);
+    UNUSED(pitch);
+    UNUSED(image_width);
+    UNUSED(image_height);
+
+    /* unimplemented */
+}
+
+void AbstractRender_t::compileShaders(StdPicture &target)
+{
+    UNUSED(target);
+
     /* unimplemented */
 }
 
 bool AbstractRender_t::textureMaskSupported()
+{
+    return false;
+}
+
+bool AbstractRender_t::userShadersSupported()
 {
     return false;
 }
@@ -451,6 +471,16 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
     target.inited = true;
     target.l.lazyLoaded = true;
     target.d.clear();
+
+    // load fragment shader to vector
+    if(g_render->userShadersSupported() && Files::fileExists(path + ".frag"))
+    {
+        pLogDebug("Loading user shader [%s%s]...", path.c_str(), ".frag");
+        dumpFullFile(target.l.fragmentShaderSource, path + ".frag");
+        // must be null-terminated
+        target.l.fragmentShaderSource.push_back('\0');
+        g_render->compileShaders(target);
+    }
 
     return target;
 }

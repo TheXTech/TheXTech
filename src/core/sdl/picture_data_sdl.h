@@ -22,7 +22,10 @@
 #ifndef PICTURE_DATA_SDL_H
 #define PICTURE_DATA_SDL_H
 
+#include <memory>
 #include <stdint.h>
+
+#include "core/sdl/gl_program_object.h"
 
 typedef unsigned int    GLenum;
 typedef int             GLint;
@@ -46,6 +49,8 @@ private:
     //! Mask texture instance pointer for SDL Render
     SDL_Texture *mask_texture = nullptr;
 
+    //! GLProgramObject wrapper for texture's shader program
+    std::shared_ptr<GLProgramObject> shader_program = nullptr;
     //! texture ID for OpenGL and other render engines
     GLuint       texture_id = 0;
     //! mask texture ID for OpenGL and other render engines
@@ -74,6 +79,9 @@ public:
     {
         texture = nullptr;
         use_depth_test = true;
+
+        if(shader_program)
+            shader_program.reset();
     }
 
     inline void invalidateDepthTest()

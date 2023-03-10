@@ -37,7 +37,7 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
 
     if(!shader)
     {
-        pLogDebug("Could not allocate shader");
+        pLogDebug("GLProgramObject: could not allocate %s shader", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
         return 0;
     }
 
@@ -53,26 +53,35 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
 
     if(!status)
     {
-        GLint len = 0;
+        pLogWarning("GLProgramObject: error compiling %s shader", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
+        pLogDebug("shader source:\n%s", src);
+    }
 
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
+    GLint len = 0;
 
-        if(len > 1)
+    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
+
+    if(len > 1)
+    {
+        char* log = (char*)malloc(len);
+
+        if(log)
         {
-            char* log = (char*)malloc(len);
+            glGetShaderInfoLog(shader, len, NULL, log);
+            pLogDebug("GLProgramObject: %s shader compilation log:\n%s", type == GL_VERTEX_SHADER ? "vertex" : "fragment", log);
 
-            if(log)
-            {
-                glGetShaderInfoLog(shader, len, NULL, log);
-                pLogWarning("Error compiling shader: %s", log);
-                free(log);
-            }
+            free(log);
         }
+    }
 
+    if(!status)
+    {
         glDeleteShader(shader);
 
         return 0;
     }
+
+    D_pLogDebug("GLProgramObject: %s shader successfully compiled", type == GL_VERTEX_SHADER ? "vertex" : "fragment");
 
     return shader;
 }
@@ -122,22 +131,25 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     glGetProgramiv(program, GL_LINK_STATUS, &status);
 
     if(!status)
+        pLogWarning("GLProgramObject: error linking program");
+
+    GLint len = 0;
+    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+
+    if(len > 1)
     {
-        GLint len = 0;
-        glGetProgramiv(program, GL_INFO_LOG_LENGTH, &len);
+        char* log = (char*)malloc(len);
 
-        if(len > 1)
+        if(log)
         {
-            char* log = (char*)malloc(len);
-
-            if(log)
-            {
-                glGetProgramInfoLog(program, len, NULL, log);
-                pLogDebug("Error linking program: %s", log);
-                free(log);
-            }
+            glGetProgramInfoLog(program, len, NULL, log);
+            pLogDebug("GLProgramObject: program link log:\n%s", log);
+            free(log);
         }
+    }
 
+    if(!status)
+    {
         glDeleteProgram(program);
         return;
     }
@@ -148,16 +160,27 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
 
     m_u_transform_loc = glGetUniformLocation(m_program, "u_transform");
     m_u_read_viewport_loc = glGetUniformLocation(m_program, "u_read_viewport");
+    // m_u_fb_pixsize_loc = glGetUniformLocation(m_program, "u_fb_pixsize");
+    // m_u_texture_pixsize_loc = glGetUniformLocation(m_program, "u_texture_pixsize");
 
     // set sampler texture index to 0 (fixed for all programs)
     GLint u_texture_loc = glGetUniformLocation(m_program, "u_texture");
     GLint u_framebuffer_loc = glGetUniformLocation(m_program, "u_framebuffer");
     GLint u_mask_loc = glGetUniformLocation(m_program, "u_mask");
+    // GLint u_previous_pass_loc = glGetUniformLocation(m_program, "u_previous_pass");
 
     glUseProgram(m_program);
     glUniform1i(u_texture_loc, 0);
     glUniform1i(u_framebuffer_loc, 1);
     glUniform1i(u_mask_loc, 2);
+    // glUniform1i(u_previous_pass_loc, 3);
+
+    if(u_framebuffer_loc != -1)
+        m_type = Type::read_buffer;
+    else
+        m_type = Type::translucent;
+
+    D_pLogDebugNA("GLProgramObject: program successfully linked");
 }
 
 
@@ -209,6 +232,7 @@ const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
     m_u_read_viewport_loc = other.m_u_read_viewport_loc;
 
     m_transform_tick = other.m_transform_tick;
+    m_type = other.m_type;
 
     // prevent erasure
     other.m_program = 0;

@@ -57,6 +57,9 @@ struct StdPictureLoad
     //! Was mask restored from the PNG at default graphics?
     bool isMaskPng = false;
 
+    //! Original fragment shader source (if presented)
+    std::vector<char> fragmentShaderSource;
+
     // Original size (if texture got scaled while loading)
     //! Original width
     int w_orig = 0;
@@ -82,6 +85,7 @@ struct StdPictureLoad
     {
         raw.clear();
         rawMask.clear();
+        fragmentShaderSource.clear();
         lazyLoaded = false;
         isMaskPng = false;
         w_orig = 0;

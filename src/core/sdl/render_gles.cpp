@@ -57,6 +57,53 @@
 
 #define F_TO_B(r, g, b, a) {static_cast<GLubyte>((r) * 255.0f), static_cast<GLubyte>((g) * 255.0f), static_cast<GLubyte>((b) * 255.0f), static_cast<GLubyte>((a) * 255.0f)}
 
+// shaders
+static const char* s_vertex_shader_src =
+R"RAW(#version 100
+uniform   mat4 u_transform;
+
+attribute vec4 a_position;
+attribute vec2 a_texcoord;
+attribute vec4 a_tint;
+
+varying   vec2 v_texcoord;
+varying   vec4 v_tint;
+
+void main()
+{
+    gl_Position = u_transform * a_position;
+    v_texcoord = a_texcoord;
+    v_tint = a_tint;
+}
+)RAW";
+
+
+static const char* s_vertex_shader_fb_src =
+R"RAW(#version 100
+uniform   mat4 u_transform;
+uniform   vec4 u_read_viewport;
+
+attribute vec4 a_position;
+attribute vec2 a_texcoord;
+attribute vec4 a_tint;
+
+varying   vec2 v_texcoord;
+varying   vec2 v_fbcoord;
+varying   vec4 v_tint;
+
+void main()
+{
+    gl_Position = u_transform * a_position;
+    v_texcoord = a_texcoord;
+    v_tint = a_tint;
+    v_fbcoord = vec2(gl_Position);
+    v_fbcoord *= u_read_viewport.xy;
+    v_fbcoord += u_read_viewport.zw;
+}
+)RAW";
+
+
+
 static std::string s_read_file(const char* filename)
 {
     std::ifstream is(filename, std::ios::binary);
@@ -346,35 +393,35 @@ void RenderGLES::flushDrawQueues()
         else
             continue;
 
-        if(context.texture && context.texture->d.mask_texture_id && s_emulate_logic_ops)
+        SDL_assert(context.program && context.program->inited());
+        GLProgramObject* program = context.program;
+
+        if(s_emulate_logic_ops && (program == &s_program) && context.texture && context.texture->d.mask_texture_id)
+            program = &s_special_program;
+
+        if(program->get_type() >= GLProgramObject::read_buffer)
         {
             if(vertex_attribs.size() > 6)
                 s_update_fb_read_texture(m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
             else if(vertex_attribs.size() == 6)
                 s_update_fb_read_texture(m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0], m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1], vertex_attribs[5].position[0] - vertex_attribs[0].position[0], vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
 
-            s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
+            // only program allowed to use mask texture
+            if(program == &s_special_program)
+            {
+                glActiveTexture(GL_TEXTURE2);
+                glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+            }
 
-            glActiveTexture(GL_TEXTURE2);
-            glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
             glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
-
-            s_special_program.use_program();
-            s_special_program.update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
-
-            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
-
-            vertex_attribs.clear();
-            continue;
         }
 
         s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
-        context.program->use_program();
-        context.program->update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
+        program->use_program();
+        program->update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
 
-        if(context.texture && context.texture->d.mask_texture_id)
+        if(context.texture && context.texture->d.mask_texture_id && program == &s_program)
         {
             prepareDrawMask();
             glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
@@ -387,7 +434,7 @@ void RenderGLES::flushDrawQueues()
 
         glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
 
-        if(context.texture && context.texture->d.mask_texture_id)
+        if(context.texture && context.texture->d.mask_texture_id && program == &s_program)
             leaveMaskContext();
 
         vertex_attribs.clear();
@@ -665,24 +712,8 @@ bool RenderGLES::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     while((err = glGetError()) != 0)
         pLogWarning("Render GL 198: initing got GL error code %d", (int)err);
 
-    const char* vertex_src = (
-        "#version 100                 \n"
-        "uniform   mat4 u_transform;  \n"
-        "attribute vec4 a_position;   \n"
-        "attribute vec2 a_texcoord;   \n"
-        "attribute vec4 a_tint;   \n"
-        "varying   vec2 v_texcoord;   \n"
-        "varying   vec4 v_tint;       \n"
-        "void main()                  \n"
-        "{                            \n"
-        "   gl_Position = u_transform * a_position;  \n"
-        "   v_texcoord = a_texcoord;  \n"
-        "   v_tint = a_tint;  \n"
-        "}                            \n"
-    );
-
     s_program = GLProgramObject(
-        vertex_src,
+        s_vertex_shader_src,
         (
             "#version 100                  \n"
             "precision mediump float;\n"
@@ -827,31 +858,12 @@ void main()
     }
 
     s_special_program = GLProgramObject(
-        (
-            "#version 100                 \n"
-            "uniform   mat4 u_transform;  \n"
-            "uniform   vec4 u_read_viewport;   \n"
-            "attribute vec4 a_position;   \n"
-            "attribute vec2 a_texcoord;   \n"
-            "attribute vec4 a_tint;       \n"
-            "varying   vec2 v_texcoord;   \n"
-            "varying   vec2 v_fbcoord;    \n"
-            "varying   vec4 v_tint;       \n"
-            "void main()                  \n"
-            "{                            \n"
-            "   gl_Position = u_transform * a_position;  \n"
-            "   v_texcoord = a_texcoord;  \n"
-            "   v_tint = a_tint;     \n"
-            "   v_fbcoord = vec2(gl_Position);  \n"
-            "   v_fbcoord *= u_read_viewport.xy;     \n"
-            "   v_fbcoord += u_read_viewport.zw;     \n"
-            "}                            \n"
-        ),
+        s_vertex_shader_fb_src,
         logic_contents.c_str()
     );
 
     s_program_rect_filled = GLProgramObject(
-        vertex_src,
+        s_vertex_shader_src,
         (
             "#version 100                  \n"
             "precision mediump float;\n"
@@ -865,7 +877,7 @@ void main()
     );
 
     s_program_rect_unfilled = GLProgramObject(
-        vertex_src,
+        s_vertex_shader_src,
         (
             "#version 100                                 \n"
             "precision mediump float;                     \n"
@@ -882,7 +894,7 @@ void main()
     );
 
     s_program_circle = GLProgramObject(
-        vertex_src,
+        s_vertex_shader_src,
         (
             "#version 100                  \n"
             "precision mediump float;\n"
@@ -899,7 +911,7 @@ void main()
     );
 
     s_program_circle_hole = GLProgramObject(
-        vertex_src,
+        s_vertex_shader_src,
         (
             "#version 100                  \n"
             "precision mediump float;\n"
@@ -921,14 +933,14 @@ void main()
     {
         pLogDebug("Loading screen fragment shader from test.frag...");
         s_output_program = GLProgramObject(
-            vertex_src,
+            s_vertex_shader_src,
             shader_contents.c_str()
         );
     }
     else
     {
         s_output_program = GLProgramObject(
-            vertex_src,
+            s_vertex_shader_src,
             (
                 "#version 100                  \n"
                 "precision mediump float;\n"
@@ -1601,8 +1613,30 @@ void RenderGLES::loadTextureMask(StdPicture &target, uint32_t mask_width, uint32
     loadTexture(target, mask_width, mask_height, RGBApixels, pitch, true, image_width, image_height);
 }
 
+void RenderGLES::compileShaders(StdPicture &target)
+{
+    pLogDebug("Render GL: compiling shader...");
+
+    target.d.shader_program = std::make_shared<GLProgramObject>(
+        s_vertex_shader_fb_src,
+        target.l.fragmentShaderSource.data()
+    );
+
+    if(target.d.shader_program && !target.d.shader_program->inited())
+    {
+        target.d.shader_program.reset();
+        pLogDebug("Render GL: using default program due to failed compile/link...");
+    }
+}
+
 bool RenderGLES::textureMaskSupported()
 {
+    return true;
+}
+
+bool RenderGLES::userShadersSupported()
+{
+    // should check for GLES 2/3
     return true;
 }
 
@@ -1818,9 +1852,9 @@ void RenderGLES::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    DrawContext_t context = {&tx, &s_program};
+    DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &s_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, s_cur_depth)).vertices;
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, s_cur_depth)).vertices;
 
     vertex_attribs.push_back({{x1, y1, s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
     vertex_attribs.push_back({{x1, y2, s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
@@ -1862,9 +1896,9 @@ void RenderGLES::renderTextureScale(double xDst, double yDst, double wDst, doubl
     float v1 = tx.l.h_scale * 0;
     float v2 = tx.l.h_scale * (tx.h);
 
-    DrawContext_t context = {&tx, &s_program};
+    DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &s_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, s_cur_depth)).vertices;
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, s_cur_depth)).vertices;
 
     vertex_attribs.push_back({{x1, y1, s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
     vertex_attribs.push_back({{x1, y2, s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
@@ -1929,9 +1963,9 @@ void RenderGLES::renderTexture(double xDstD, double yDstD, double wDstD, double 
     float v1 = tx.l.h_scale * ySrc;
     float v2 = tx.l.h_scale * (ySrc + hDst);
 
-    DrawContext_t context = {&tx, &s_program};
+    DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &s_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, s_cur_depth)).vertices;
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, s_cur_depth)).vertices;
 
     vertex_attribs.push_back({{x1, y1, s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
     vertex_attribs.push_back({{x1, y2, s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
@@ -2010,9 +2044,9 @@ void RenderGLES::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    DrawContext_t context = {&tx, &s_program};
+    DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &s_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, s_cur_depth)).vertices;
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, s_cur_depth)).vertices;
 
     vertex_attribs.push_back({{x1, y1, s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
     vertex_attribs.push_back({{x1, y2, s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
@@ -2054,9 +2088,9 @@ void RenderGLES::renderTexture(float xDst, float yDst,
     float v1 = tx.l.h_scale * 0;
     float v2 = tx.l.h_scale * (tx.h);
 
-    DrawContext_t context = {&tx, &s_program};
+    DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &s_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, s_cur_depth)).vertices;
+    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, s_cur_depth)).vertices;
 
     vertex_attribs.push_back({{x1, y1, s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
     vertex_attribs.push_back({{x1, y2, s_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});

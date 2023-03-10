@@ -187,7 +187,11 @@ public:
                              uint32_t image_width,
                              uint32_t image_height);
 
+    virtual void compileShaders(StdPicture &target);
+
     virtual bool textureMaskSupported();
+
+    virtual bool userShadersSupported();
 
     void loadTexture_1x(StdPicture &target,
                              uint32_t width,
@@ -206,7 +210,6 @@ public:
     virtual void clearAllTextures() = 0;
 
     virtual void clearBuffer() = 0;
-
 
 
 

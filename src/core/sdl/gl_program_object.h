@@ -26,10 +26,20 @@
 
 class GLProgramObject
 {
+public:
+    enum Type
+    {
+        opaque = 0,
+        translucent,
+        read_buffer,
+        multipass,
+    };
+
 private:
     static GLuint s_last_program;
 
     GLuint m_program = 0;
+    Type m_type = translucent;
 
     GLint m_u_transform_loc = -1;
     GLint m_u_read_viewport_loc = -1;
@@ -90,6 +100,14 @@ public:
     inline bool inited()
     {
         return m_program != 0;
+    }
+
+    /*!
+     * \brief Reports the program type for multipass rendering
+     */
+    inline Type get_type()
+    {
+        return m_type;
     }
 
     /*!

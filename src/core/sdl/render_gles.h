@@ -225,7 +225,11 @@ public:
                      uint32_t image_width,
                      uint32_t image_height) override;
 
+    void compileShaders(StdPicture &target);
+
     bool textureMaskSupported() override;
+
+    bool userShadersSupported() override;
 
     void deleteTexture(StdPicture &tx, bool lazyUnload = false) override;
     void clearAllTextures() override;
