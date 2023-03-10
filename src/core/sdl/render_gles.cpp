@@ -149,6 +149,7 @@ static std::array<GLfloat, 4> s_shader_read_viewport;
 static GLshort s_cur_depth = 0;
 
 static uint64_t s_current_frame = 0;
+static uint64_t s_transform_tick = 0;
 
 static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam)
 {
@@ -201,7 +202,7 @@ static void s_update_fb_read_texture(int x, int y, int w, int h)
     glBindTexture(GL_TEXTURE_2D, s_game_texture);
 
     s_program.use_program();
-    s_program.update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
+    s_program.update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
 
     GLshort x1 = x;
     GLshort x2 = x + w;
@@ -321,7 +322,7 @@ void RenderGLES::flushDrawQueues()
         s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
         context.program->use_program();
-        context.program->update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
+        context.program->update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
 
         if(context.texture)
             glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
@@ -360,7 +361,7 @@ void RenderGLES::flushDrawQueues()
             glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
 
             s_special_program.use_program();
-            s_special_program.update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
+            s_special_program.update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
 
             glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
 
@@ -371,7 +372,7 @@ void RenderGLES::flushDrawQueues()
         s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
         context.program->use_program();
-        context.program->update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
+        context.program->update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
 
         if(context.texture && context.texture->d.mask_texture_id)
         {
@@ -1108,7 +1109,7 @@ void RenderGLES::repaint()
         glBindTexture(GL_TEXTURE_2D, s_game_texture);
 
         s_output_program.use_program();
-        s_output_program.update_transform(s_transform_matrix.data(), s_shader_read_viewport.data());
+        s_output_program.update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -1194,13 +1195,7 @@ void RenderGLES::applyViewport()
             ((float)(ScreenH - (viewport_y + viewport_h + off_y)) + 0.5f * (float)viewport_h) / (float)ScreenH,
         };
 
-        s_program.set_transform_dirty();
-        s_output_program.set_transform_dirty();
-        s_special_program.set_transform_dirty();
-        s_program_rect_filled.set_transform_dirty();
-        s_program_rect_unfilled.set_transform_dirty();
-        s_program_circle.set_transform_dirty();
-        s_program_circle_hole.set_transform_dirty();
+        s_transform_tick++;
 
         return;
     }
@@ -1232,13 +1227,7 @@ void RenderGLES::applyViewport()
         0.0f, 0.0f, 0.0f, 0.0f,
     };
 
-    s_program.set_transform_dirty();
-    s_output_program.set_transform_dirty();
-    s_special_program.set_transform_dirty();
-    s_program_rect_filled.set_transform_dirty();
-    s_program_rect_unfilled.set_transform_dirty();
-    s_program_circle.set_transform_dirty();
-    s_program_circle_hole.set_transform_dirty();
+    s_transform_tick++;
 }
 
 void RenderGLES::updateViewport()
@@ -1368,13 +1357,7 @@ void RenderGLES::setTargetScreen()
         0.0f, 0.0f, 0.0f, 0.0f,
     };
 
-    s_program.set_transform_dirty();
-    s_output_program.set_transform_dirty();
-    s_special_program.set_transform_dirty();
-    s_program_rect_filled.set_transform_dirty();
-    s_program_rect_unfilled.set_transform_dirty();
-    s_program_circle.set_transform_dirty();
-    s_program_circle_hole.set_transform_dirty();
+    s_transform_tick++;
 }
 
 void RenderGLES::prepareDrawMask()

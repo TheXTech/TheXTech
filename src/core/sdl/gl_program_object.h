@@ -36,7 +36,7 @@ private:
 
     std::vector<GLint> m_u_custom_loc;
 
-    bool m_transform_dirty = true;
+    uint64_t m_transform_tick = 0;
 
     void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport);
 
@@ -68,25 +68,19 @@ public:
     // inline functions for fast paths
 
     /*!
-     * \brief Mark that the program's transform matrix should be updated on next call
-     */
-    inline void set_transform_dirty()
-    {
-        m_transform_dirty = true;
-    }
-
-    /*!
-     * \brief If the program's transform matrix is dirty, update it with the matrix provided.
-     * \param value pointer to GLfloat array of size 16, the projection matrix that should be used if necessary.
+     * \brief If the program's transform matrix was not updated this tick, update it with the matrix provided.
+     * \param transform_tick    the number of times the transform matrix has been changed since game start.
+     * \param transform         pointer to GLfloat array of size 16, the projection matrix that should be used if necessary.
+     * \param read_viewport     pointer to GLfloat array of size 4, an additional multiply-and-add transform for fb read shaders.
      *
      * Important note: may only be called while program has been activated by use_program()
      */
-    inline void update_transform(const GLfloat* transform, const GLfloat* read_viewport)
+    inline void update_transform(uint64_t transform_tick, const GLfloat* transform, const GLfloat* read_viewport)
     {
-        if(m_transform_dirty)
+        if(transform_tick != m_transform_tick)
         {
+            m_transform_tick = transform_tick;
             m_update_transform(transform, read_viewport);
-            m_transform_dirty = false;
         }
     }
 

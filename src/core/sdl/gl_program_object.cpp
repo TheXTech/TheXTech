@@ -208,7 +208,7 @@ const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
     m_u_transform_loc = other.m_u_transform_loc;
     m_u_read_viewport_loc = other.m_u_read_viewport_loc;
 
-    m_transform_dirty = other.m_transform_dirty;
+    m_transform_tick = other.m_transform_tick;
 
     // prevent erasure
     other.m_program = 0;
