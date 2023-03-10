@@ -2087,7 +2087,6 @@ void RenderGLES::renderTexture(float xDst, float yDst,
 
 void RenderGLES::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
 {
-    return;
     glFlush();
 
     int phys_x, phys_y;
@@ -2130,7 +2129,6 @@ void RenderGLES::getScreenPixels(int x, int y, int w, int h, unsigned char *pixe
 
 void RenderGLES::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
 {
-    return;
     glFlush();
 
     int phys_x, phys_y, phys_w, phys_h;
