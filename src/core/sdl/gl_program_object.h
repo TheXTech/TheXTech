@@ -43,12 +43,13 @@ private:
 
     GLint m_u_transform_loc = -1;
     GLint m_u_read_viewport_loc = -1;
+    GLint m_u_clock_loc = -1;
 
     std::vector<GLint> m_u_custom_loc;
 
     uint64_t m_transform_tick = 0;
 
-    void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport);
+    void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock);
 
     static GLuint s_compile_shader(GLenum type, const char* src);
 
@@ -85,12 +86,12 @@ public:
      *
      * Important note: may only be called while program has been activated by use_program()
      */
-    inline void update_transform(uint64_t transform_tick, const GLfloat* transform, const GLfloat* read_viewport)
+    inline void update_transform(uint64_t transform_tick, const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock)
     {
         if(transform_tick != m_transform_tick)
         {
             m_transform_tick = transform_tick;
-            m_update_transform(transform, read_viewport);
+            m_update_transform(transform, read_viewport, clock);
         }
     }
 

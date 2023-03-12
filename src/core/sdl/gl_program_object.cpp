@@ -91,10 +91,11 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
  *** Private methods ***
  ***********************/
 
-void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat* read_viewport)
+void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock)
 {
     glUniformMatrix4fv(m_u_transform_loc, 1, GL_FALSE, transform);
     glUniform4fv(m_u_read_viewport_loc, 1, read_viewport);
+    glUniform1f(m_u_clock_loc, clock);
 }
 
 void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shader)
@@ -160,6 +161,7 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
 
     m_u_transform_loc = glGetUniformLocation(m_program, "u_transform");
     m_u_read_viewport_loc = glGetUniformLocation(m_program, "u_read_viewport");
+    m_u_clock_loc = glGetUniformLocation(m_program, "u_clock");
     // m_u_fb_pixsize_loc = glGetUniformLocation(m_program, "u_fb_pixsize");
     // m_u_texture_pixsize_loc = glGetUniformLocation(m_program, "u_texture_pixsize");
 
@@ -230,6 +232,7 @@ const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
 
     m_u_transform_loc = other.m_u_transform_loc;
     m_u_read_viewport_loc = other.m_u_read_viewport_loc;
+    m_u_clock_loc = other.m_u_clock_loc;
 
     m_transform_tick = other.m_transform_tick;
     m_type = other.m_type;

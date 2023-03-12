@@ -266,7 +266,7 @@ static void s_update_fb_read_texture(BufferIndex_t dest, BufferIndex_t source, i
     glBindTexture(GL_TEXTURE_2D, s_buffer_texture[source]);
 
     s_program.use_program();
-    s_program.update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
+    s_program.update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data(), (GLfloat)((s_transform_tick / 3) % (65 * 60)) / 65.0f);
 
     GLshort x1 = x;
     GLshort x2 = x + w;
@@ -387,7 +387,7 @@ void RenderGLES::flushDrawQueues()
         s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
         context.program->use_program();
-        context.program->update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
+        context.program->update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data(), (GLfloat)((s_transform_tick / 3) % (65 * 60)) / 65.0f);
 
         if(context.texture)
             glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
@@ -439,7 +439,7 @@ void RenderGLES::flushDrawQueues()
         s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
         program->use_program();
-        program->update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
+        program->update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data(), (GLfloat)((s_transform_tick / 3) % (65 * 60)) / 65.0f);
 
         if(context.texture && context.texture->d.mask_texture_id && program == &s_program)
         {
@@ -1159,7 +1159,7 @@ void RenderGLES::repaint()
         glBindTexture(GL_TEXTURE_2D, s_game_texture);
 
         s_output_program.use_program();
-        s_output_program.update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data());
+        s_output_program.update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data(), (GLfloat)((s_transform_tick / 3) % (65 * 60)) / 65.0f);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
