@@ -468,8 +468,8 @@ RenderGLES::VertexList& RenderGLES::getOrderedDrawVertexList(RenderGLES::DrawCon
     if(context == m_recent_draw_context)
         return m_ordered_draw_queue[{m_recent_draw_context_depth, context}];
 
-    // optimization for masked textures: only use a single depth per frame
-    if(s_emulate_logic_ops && context.texture && context.texture->d.mask_texture_id)
+    // optimization for buffer-read shaders: only use a single depth per frame
+    if((context.program && context.program->get_type() >= GLProgramObject::read_buffer) || (s_emulate_logic_ops && context.program == &s_program && context.texture && context.texture->d.mask_texture_id))
     {
         int& saved_context_depth = m_mask_draw_context_depth[context];
 
