@@ -169,15 +169,17 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     GLint u_texture_loc = glGetUniformLocation(m_program, "u_texture");
     GLint u_framebuffer_loc = glGetUniformLocation(m_program, "u_framebuffer");
     GLint u_mask_loc = glGetUniformLocation(m_program, "u_mask");
-    // GLint u_previous_pass_loc = glGetUniformLocation(m_program, "u_previous_pass");
+    GLint u_previous_pass_loc = glGetUniformLocation(m_program, "u_previous_pass");
 
     glUseProgram(m_program);
     glUniform1i(u_texture_loc, 0);
     glUniform1i(u_framebuffer_loc, 1);
     glUniform1i(u_mask_loc, 2);
-    // glUniform1i(u_previous_pass_loc, 3);
+    glUniform1i(u_previous_pass_loc, 3);
 
-    if(u_framebuffer_loc != -1)
+    if(u_previous_pass_loc != -1)
+        m_type = Type::multipass;
+    else if(u_framebuffer_loc != -1)
         m_type = Type::read_buffer;
     else
         m_type = Type::translucent;

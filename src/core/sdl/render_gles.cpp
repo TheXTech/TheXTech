@@ -207,6 +207,8 @@ static GLshort s_cur_depth = 0;
 static uint64_t s_current_frame = 0;
 static uint64_t s_transform_tick = 0;
 
+static int s_num_pass = 2;
+
 static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam)
 {
     pLogWarning("Got GL error %s", message);
@@ -400,64 +402,94 @@ void RenderGLES::flushDrawQueues()
     // pass 2: translucent / interesting textures
     glDepthMask(GL_FALSE);
 
-    // save the opaque state
+    int num_pass = 1;
 
+    // save the opaque state if there are any multipass shaders
     for(auto& i : m_ordered_draw_queue)
     {
-        // depth is i.first.first
-        const DrawContext_t& context = i.first.second;
-        std::vector<Vertex_t>& vertex_attribs = i.second.vertices;
-
-        if(!vertex_attribs.empty())
-            i.second.active = true;
-        else
-            continue;
-
-        SDL_assert(context.program && context.program->inited());
-        GLProgramObject* program = context.program;
-
-        if(s_emulate_logic_ops && (program == &s_program) && context.texture && context.texture->d.mask_texture_id)
-            program = &s_special_program;
-
-        if(program->get_type() >= GLProgramObject::read_buffer)
+        if(i.first.second.program && i.first.second.program->get_type() >= GLProgramObject::multipass)
         {
-            if(vertex_attribs.size() > 6)
-                s_update_fb_read_texture(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
-            else if(vertex_attribs.size() == 6)
-                s_update_fb_read_texture(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0], m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1], vertex_attribs[5].position[0] - vertex_attribs[0].position[0], vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
+            num_pass = s_num_pass;
+            s_update_fb_read_texture(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+            break;
+        }
+    }
 
-            // only program allowed to use mask texture
-            if(program == &s_special_program)
+    for(int pass = 0; pass < num_pass; pass++)
+    {
+        if(pass != 0)
+        {
+            s_update_fb_read_texture(BUFFER_PREV_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+            s_update_fb_read_texture(BUFFER_GAME, BUFFER_INIT_PASS, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, s_buffer_texture[BUFFER_PREV_PASS]);
+        }
+        else if(pass != num_pass - 1)
+        {
+            glActiveTexture(GL_TEXTURE3);
+            glBindTexture(GL_TEXTURE_2D, s_buffer_texture[BUFFER_INIT_PASS]);
+        }
+
+        glActiveTexture(GL_TEXTURE0);
+
+        for(auto& i : m_ordered_draw_queue)
+        {
+            // depth is i.first.first
+            const DrawContext_t& context = i.first.second;
+            std::vector<Vertex_t>& vertex_attribs = i.second.vertices;
+
+            if(!vertex_attribs.empty())
+                i.second.active = true;
+            else
+                continue;
+
+            SDL_assert(context.program && context.program->inited());
+            GLProgramObject* program = context.program;
+
+            if(s_emulate_logic_ops && (program == &s_program) && context.texture && context.texture->d.mask_texture_id)
+                program = &s_special_program;
+
+            if(program->get_type() >= GLProgramObject::read_buffer)
             {
-                glActiveTexture(GL_TEXTURE2);
-                glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+                if(vertex_attribs.size() > 6)
+                    s_update_fb_read_texture(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+                else if(vertex_attribs.size() == 6)
+                    s_update_fb_read_texture(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0], m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1], vertex_attribs[5].position[0] - vertex_attribs[0].position[0], vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
+
+                // only program allowed to use mask texture
+                if(program == &s_special_program)
+                {
+                    glActiveTexture(GL_TEXTURE2);
+                    glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+                }
+
+                glActiveTexture(GL_TEXTURE0);
             }
 
-            glActiveTexture(GL_TEXTURE0);
-        }
+            s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
 
-        s_fill_buffer(vertex_attribs.data(), vertex_attribs.size());
+            program->use_program();
+            program->update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data(), (GLfloat)((s_transform_tick / 3) % (65 * 60)) / 65.0f);
 
-        program->use_program();
-        program->update_transform(s_transform_tick, s_transform_matrix.data(), s_shader_read_viewport.data(), (GLfloat)((s_transform_tick / 3) % (65 * 60)) / 65.0f);
+            if(context.texture && context.texture->d.mask_texture_id && program == &s_program)
+            {
+                prepareDrawMask();
+                glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+                glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+                prepareDrawImage();
+            }
 
-        if(context.texture && context.texture->d.mask_texture_id && program == &s_program)
-        {
-            prepareDrawMask();
-            glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+            if(context.texture)
+                glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
+
             glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
-            prepareDrawImage();
+
+            if(context.texture && context.texture->d.mask_texture_id && program == &s_program)
+                leaveMaskContext();
+
+            if(pass == num_pass - 1)
+                vertex_attribs.clear();
         }
-
-        if(context.texture)
-            glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
-
-        glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
-
-        if(context.texture && context.texture->d.mask_texture_id && program == &s_program)
-            leaveMaskContext();
-
-        vertex_attribs.clear();
     }
 
     glDepthMask(GL_TRUE);
