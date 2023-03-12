@@ -996,11 +996,11 @@ void main()
         )
     );
 
-    std::string shader_contents = s_read_file((AppPath + "/test.frag").c_str());
+    std::string shader_contents = s_read_file((AppPath + "/output.frag").c_str());
 
     if(!shader_contents.empty())
     {
-        pLogDebug("Loading screen fragment shader from test.frag...");
+        pLogDebug("Loading screen fragment shader from output.frag...");
         s_output_program = GLProgramObject(
             s_vertex_shader_src,
             shader_contents.c_str()
