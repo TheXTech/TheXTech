@@ -39,6 +39,15 @@
 struct StdPicture;
 struct SDL_Window;
 
+enum BufferIndex_t
+{
+    BUFFER_GAME,
+    BUFFER_FB_READ,
+    BUFFER_INIT_PASS,
+    BUFFER_PREV_PASS,
+    BUFFER_MAX,
+};
+
 class RenderGLES final : public AbstractRender_t
 {
 public:
@@ -114,6 +123,9 @@ private:
     int m_draw_mask_mode = 0;
 
 private:
+    // perform a buffer->buffer copy
+    void update_fb_read_texture(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h);
+
     // deallocate queues unused since previous call
     void refreshDrawQueues();
     // clear queues without drawing or deallocating

@@ -179,15 +179,6 @@ static GLProgramObject s_program_rect_unfilled;
 static GLProgramObject s_program_circle;
 static GLProgramObject s_program_circle_hole;
 
-enum BufferIndex_t
-{
-    BUFFER_GAME,
-    BUFFER_FB_READ,
-    BUFFER_INIT_PASS,
-    BUFFER_PREV_PASS,
-    BUFFER_MAX,
-};
-
 static std::array<GLuint, BUFFER_MAX> s_buffer_texture = {0};
 static std::array<GLuint, BUFFER_MAX> s_buffer_fb = {0};
 
@@ -216,11 +207,8 @@ static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint i
 
 static void s_fill_buffer(const RenderGLES::Vertex_t* vertex_attribs, int count);
 
-static void s_update_fb_read_texture(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h)
+void RenderGLES::update_fb_read_texture(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h)
 {
-    if(x >= ScreenW || y >= ScreenH)
-        return;
-
     if(x < 0)
     {
         w += x;
@@ -239,7 +227,10 @@ static void s_update_fb_read_texture(BufferIndex_t dest, BufferIndex_t source, i
     if(y + h >= ScreenH)
         h = ScreenH - y;
 
-    if(!s_use_fb_to_fb_render)
+    if(w <= 0 || h <= 0)
+        return;
+
+    if(!s_use_fb_to_fb_render && source == BUFFER_GAME)
     {
         if(source != BUFFER_GAME)
             glBindFramebuffer(GL_FRAMEBUFFER, s_buffer_fb[source]);
@@ -258,6 +249,11 @@ static void s_update_fb_read_texture(BufferIndex_t dest, BufferIndex_t source, i
         if(source != BUFFER_GAME)
             glBindFramebuffer(GL_FRAMEBUFFER, s_game_texture_fb);
 
+        return;
+    }
+    else if(!s_use_fb_to_fb_render && dest != BUFFER_GAME)
+    {
+        pLogCritical("Render GL: invalid buffer copy called");
         return;
     }
 
@@ -279,6 +275,11 @@ static void s_update_fb_read_texture(BufferIndex_t dest, BufferIndex_t source, i
     GLfloat u2 = (float)x2 / ScreenW;
     GLfloat v1 = (float)(ScreenH - y1) / ScreenH;
     GLfloat v2 = (float)(ScreenH - y2) / ScreenH;
+
+    x1 -= m_viewport_x;
+    x2 -= m_viewport_x;
+    y1 -= m_viewport_y;
+    y2 -= m_viewport_y;
 
     RenderGLES::Vertex_t copy_triangle_strip[] =
     {
@@ -407,10 +408,10 @@ void RenderGLES::flushDrawQueues()
     // save the opaque state if there are any multipass shaders
     for(auto& i : m_ordered_draw_queue)
     {
-        if(i.first.second.program && i.first.second.program->get_type() >= GLProgramObject::multipass)
+        if(!i.second.vertices.empty() && i.first.second.program && i.first.second.program->get_type() >= GLProgramObject::multipass)
         {
             num_pass = s_num_pass;
-            s_update_fb_read_texture(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+            update_fb_read_texture(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
             break;
         }
     }
@@ -419,8 +420,8 @@ void RenderGLES::flushDrawQueues()
     {
         if(pass != 0)
         {
-            s_update_fb_read_texture(BUFFER_PREV_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
-            s_update_fb_read_texture(BUFFER_GAME, BUFFER_INIT_PASS, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+            update_fb_read_texture(BUFFER_PREV_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+            update_fb_read_texture(BUFFER_GAME, BUFFER_INIT_PASS, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
             glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, s_buffer_texture[BUFFER_PREV_PASS]);
         }
@@ -452,9 +453,9 @@ void RenderGLES::flushDrawQueues()
             if(program->get_type() >= GLProgramObject::read_buffer)
             {
                 if(vertex_attribs.size() > 6)
-                    s_update_fb_read_texture(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+                    update_fb_read_texture(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
                 else if(vertex_attribs.size() == 6)
-                    s_update_fb_read_texture(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0], m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1], vertex_attribs[5].position[0] - vertex_attribs[0].position[0], vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
+                    update_fb_read_texture(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0], m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1], vertex_attribs[5].position[0] - vertex_attribs[0].position[0], vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
 
                 // only program allowed to use mask texture
                 if(program == &s_special_program)
@@ -1221,8 +1222,6 @@ void RenderGLES::applyViewport()
     if(m_recentTargetScreen)
         return;
 
-    flushDrawQueues();
-
     int off_x = m_viewport_offset_ignore ? 0 : m_viewport_offset_x;
     int off_y = m_viewport_offset_ignore ? 0 : m_viewport_offset_y;
 
@@ -1314,6 +1313,8 @@ void RenderGLES::applyViewport()
 
 void RenderGLES::updateViewport()
 {
+    flushDrawQueues();
+
     int hardware_w, hardware_h;
     XWindow::getWindowSize(&hardware_w, &hardware_h);
 
@@ -1356,6 +1357,8 @@ void RenderGLES::resetViewport()
 
 void RenderGLES::setViewport(int x, int y, int w, int h)
 {
+    flushDrawQueues();
+
     m_viewport_x = x;
     m_viewport_y = y;
     m_viewport_w = w;
@@ -1366,6 +1369,8 @@ void RenderGLES::setViewport(int x, int y, int w, int h)
 
 void RenderGLES::offsetViewport(int x, int y)
 {
+    flushDrawQueues();
+
     m_viewport_offset_x = x;
     m_viewport_offset_y = y;
 
@@ -1374,6 +1379,8 @@ void RenderGLES::offsetViewport(int x, int y)
 
 void RenderGLES::offsetViewportIgnore(bool en)
 {
+    flushDrawQueues();
+
     m_viewport_offset_ignore = en;
 
     applyViewport();
