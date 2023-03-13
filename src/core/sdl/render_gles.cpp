@@ -425,7 +425,7 @@ void RenderGLES::flushDrawQueues()
             glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, s_buffer_texture[BUFFER_PREV_PASS]);
         }
-        else if(pass != num_pass - 1)
+        else
         {
             glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, s_buffer_texture[BUFFER_INIT_PASS]);
