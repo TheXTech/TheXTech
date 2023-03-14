@@ -31,6 +31,7 @@
 #include "video.h"
 #include "frame_timer.h"
 #include "core/render.h"
+#include "core/window.h"
 
 #ifdef THEXTECH_CLI_BUILD
 #include <Graphics/image_size.h>
@@ -58,6 +59,11 @@ void clearBuffer()
 
 void repaint()
 {}
+
+void getRenderSize(int* w, int* h)
+{
+    return XWindow::getWindowSize(w, h);
+}
 
 void mapToScreen(int x, int y, int *dx, int *dy)
 {

@@ -289,6 +289,31 @@ SDL_FORCE_INLINE void memToValue(int &target, double value, FIELDTYPE ftype)
     }
 }
 
+SDL_FORCE_INLINE void memToValue(short &target, double value, FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        target = static_cast<int16_t>(f2i_cast<uint8_t>(value));
+        break;
+    case FT_WORD:
+        target = static_cast<int16_t>(static_cast<int16_t>(f2i_cast<uint16_t>(value)));
+        break;
+    case FT_DWORD:
+    case FT_DFLOAT:
+        target = static_cast<int16_t>(value);
+        break;
+    case FT_FLOAT:
+        target = static_cast<int16_t>(f2i_cast<float>(value));
+        break;
+//    case FT_DFLOAT: // United with FT_DWORD
+//        target = static_cast<int32_t>(value);
+//        break;
+    default: //Don't change
+        break;
+    }
+}
+
 SDL_FORCE_INLINE void memToValue(bool &target, double value, FIELDTYPE ftype)
 {
     UNUSED(ftype);
@@ -353,6 +378,24 @@ SDL_FORCE_INLINE double valueToMem(const int &source, FIELDTYPE ftype)
     }
 }
 
+SDL_FORCE_INLINE double valueToMem(const short &source, FIELDTYPE ftype)
+{
+    switch(ftype)
+    {
+    case FT_BYTE:
+        return static_cast<double>(static_cast<uint8_t>(source));
+    case FT_WORD:
+        return static_cast<double>(static_cast<int16_t>(source));
+    default:
+    case FT_DWORD:
+        return static_cast<double>(source);
+    case FT_FLOAT:
+        return static_cast<double>(static_cast<float>(source));
+    case FT_DFLOAT:
+        return static_cast<double>(source);
+    }
+}
+
 SDL_FORCE_INLINE double valueToMem(const bool &source, FIELDTYPE ftype)
 {
     UNUSED(ftype);
@@ -393,7 +436,8 @@ class SMBXMemoryEmulator
 {
     std::unordered_map<size_t, double *> m_df;
     std::unordered_map<size_t, float *>  m_ff;
-    std::unordered_map<size_t, int *>    m_if;
+    std::unordered_map<size_t, short *>  m_i16f;
+    std::unordered_map<size_t, int *>    m_i32f;
     std::unordered_map<size_t, bool *>   m_bf;
     std::unordered_map<size_t, std::string *>   m_sf;
 
@@ -410,7 +454,8 @@ class SMBXMemoryEmulator
         VT_UNKNOWN = 0,
         VT_DOUBLE,
         VT_FLOAT,
-        VT_INT,
+        VT_INT16,
+        VT_INT32,
         VT_BOOL,
         VT_STRING,
         VT_LAMBDA,
@@ -419,10 +464,16 @@ class SMBXMemoryEmulator
 
     std::unordered_map<int, ValueType> m_type;
 
+    void insert(size_t address, short *field)
+    {
+        m_i16f.insert({address, field});
+        m_type.insert({address, VT_INT16});
+    }
+
     void insert(size_t address, int *field)
     {
-        m_if.insert({address, field});
-        m_type.insert({address, VT_INT});
+        m_i32f.insert({address, field});
+        m_type.insert({address, VT_INT32});
     }
 
     void insert(size_t address, double *field)
@@ -629,13 +680,26 @@ public:
             break;
         }
 
-        case VT_INT:
+        case VT_INT32:
         {
-            auto ires = m_if.find(address);
-            if(ires != m_if.end())
+            auto ires = m_i32f.find(address);
+            if(ires != m_i32f.end())
             {
                 if(ftype != FT_DWORD && ftype != FT_WORD)
                     pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
+
+                return valueToMem(*ires->second, ftype);
+            }
+            break;
+        }
+
+        case VT_INT16:
+        {
+            auto ires = m_i16f.find(address);
+            if(ires != m_i16f.end())
+            {
+                if(ftype != FT_WORD)
+                    pLogWarning("MemEmu: Read type missmatched at 0x%x (SInt16 expected, %s actually)", address, FieldtypeToStr(ftype));
 
                 return valueToMem(*ires->second, ftype);
             }
@@ -717,13 +781,27 @@ public:
             break;
         }
 
-        case VT_INT:
+        case VT_INT32:
         {
-            auto ires = m_if.find(address);
-            if(ires != m_if.end())
+            auto ires = m_i32f.find(address);
+            if(ires != m_i32f.end())
             {
                 if(ftype != FT_DWORD && ftype != FT_WORD)
                     pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 or SInt32 expected, %s actually)", address, FieldtypeToStr(ftype));
+
+                memToValue(*ires->second, value, ftype);
+                return;
+            }
+            break;
+        }
+
+        case VT_INT16:
+        {
+            auto ires = m_i16f.find(address);
+            if(ires != m_i16f.end())
+            {
+                if(ftype != FT_WORD)
+                    pLogWarning("MemEmu: Write type missmatched at 0x%x (SInt16 expected, %s actually)", address, FieldtypeToStr(ftype));
 
                 memToValue(*ires->second, value, ftype);
                 return;
@@ -780,7 +858,8 @@ protected:
         VT_UNKNOWN = 0,
         VT_DOUBLE,
         VT_FLOAT,
-        VT_INT,
+        VT_INT16,
+        VT_INT32,
         VT_BOOL,
         VT_STRING,
         VT_BYTE_HACK,
@@ -803,7 +882,9 @@ protected:
         //! Float-type field pointer
         float       T::* field_f = nullptr;
         //! Int-type field pointer
-        int         T::* field_i = nullptr;
+        short       T::* field_i16 = nullptr;
+        //! Int-type field pointer
+        int         T::* field_i32 = nullptr;
         //! Boolean type field pointer
         bool        T::* field_b = nullptr;
         //! String-type field pointer
@@ -817,14 +898,37 @@ protected:
     //! Byte map of addresses
     Value m_byte[maxAddr];
 
+    void insert(size_t address, short T::*field)
+    {
+        Value v;
+
+        // Normal field
+        v.field_i16 = field;
+        v.type = VT_INT16;
+        v.baseType = VT_INT16;
+        v.offset = 0; //-V1048
+        v.baseAddress = address;
+        m_type[address] = v;
+
+        // Byte hack fields
+        v.type = VT_BYTE_HACK;
+        for(int i = 0; i < 2; ++i)
+        {
+            v.offset = i;
+            m_byte[address + i] = v;
+            if(i > 0)
+                m_type[address + i] = v;
+        }
+    }
+
     void insert(size_t address, int T::*field)
     {
         Value v;
 
         // Normal field
-        v.field_i = field;
-        v.type = VT_INT;
-        v.baseType = VT_INT;
+        v.field_i32 = field;
+        v.type = VT_INT32;
+        v.baseType = VT_INT32;
         v.offset = 0; //-V1048
         v.baseAddress = address;
         m_type[address] = v;
@@ -978,12 +1082,20 @@ public:
             return valueToMem(obj->*(t->field_f), ftype);
         }
 
-        case VT_INT:
+        case VT_INT32:
         {
-            SDL_assert(t->field_i);
+            SDL_assert(t->field_i32);
             if(ftype != FT_DWORD && ftype != FT_WORD)
                 pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-            return valueToMem(obj->*(t->field_i), ftype);
+            return valueToMem(obj->*(t->field_i32), ftype);
+        }
+
+        case VT_INT16:
+        {
+            SDL_assert(t->field_i16);
+            if(ftype != FT_WORD)
+                pLogWarning("MemEmu: Read type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            return valueToMem(obj->*(t->field_i16), ftype);
         }
 
         case VT_BOOL:
@@ -1021,13 +1133,23 @@ public:
                 return (double)getByteX86(obj->*(bt.field_f), t->offset);
             }
 
-            case VT_INT:
+            case VT_INT16:
             {
                 auto &bt = m_type[t->baseAddress];
-                SDL_assert(bt.type == VT_INT && bt.field_i);
+                SDL_assert(bt.type == VT_INT16 && bt.field_i16);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                int16_t s = static_cast<int16_t>(obj->*(bt.field_i));
+                int16_t s = static_cast<int16_t>(obj->*(bt.field_i16));
+                return (double)getByteX86(s, t->offset);
+            }
+
+            case VT_INT32:
+            {
+                auto &bt = m_type[t->baseAddress];
+                SDL_assert(bt.type == VT_INT32 && bt.field_i32);
+                if(ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Read type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                int16_t s = static_cast<int16_t>(obj->*(bt.field_i32));
                 return (double)getByteX86(s, t->offset);
             }
 
@@ -1096,12 +1218,21 @@ public:
             return;
         }
 
-        case VT_INT:
+        case VT_INT32:
         {
-            SDL_assert(t->field_i);
+            SDL_assert(t->field_i32);
             if(ftype != FT_DWORD && ftype != FT_WORD)
                 pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 or SInt32 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-            memToValue(obj->*(t->field_i), value, ftype);
+            memToValue(obj->*(t->field_i32), value, ftype);
+            return;
+        }
+
+        case VT_INT16:
+        {
+            SDL_assert(t->field_i16);
+            if(ftype != FT_WORD)
+                pLogWarning("MemEmu: Write type missmatched at %s 0x%x (SInt16 expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+            memToValue(obj->*(t->field_i16), value, ftype);
             return;
         }
 
@@ -1144,15 +1275,27 @@ public:
                 return;
             }
 
-            case VT_INT:
+            case VT_INT16:
             {
                 auto &bt = m_type[t->baseAddress];
-                SDL_assert(bt.type == VT_INT && bt.field_i);
+                SDL_assert(bt.type == VT_INT16 && bt.field_i16);
                 if(ftype != FT_BYTE)
                     pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
-                int16_t s = static_cast<int16_t>(obj->*(bt.field_i));
+                int16_t s = static_cast<int16_t>(obj->*(bt.field_i16));
                 modifyByteX86(s, t->offset, f2i_cast<uint8_t>(value));
-                obj->*(bt.field_i) = static_cast<int>(s);
+                obj->*(bt.field_i16) = static_cast<int>(s);
+                return;
+            }
+
+            case VT_INT32:
+            {
+                auto &bt = m_type[t->baseAddress];
+                SDL_assert(bt.type == VT_INT32 && bt.field_i32);
+                if(ftype != FT_BYTE)
+                    pLogWarning("MemEmu: Write type missmatched at %s 0x%x (byte expected, %s actually)", objName, address, FieldtypeToStr(ftype));
+                int16_t s = static_cast<int16_t>(obj->*(bt.field_i32));
+                modifyByteX86(s, t->offset, f2i_cast<uint8_t>(value));
+                obj->*(bt.field_i32) = static_cast<int>(s);
                 return;
             }
 
@@ -1567,15 +1710,15 @@ public:
             switch(address)
             {
             case 0x0A: // Pinched1
-                return valueToMem((int)obj->Pinched.Bottom1, ftype);
+                return valueToMem((short)obj->Pinched.Bottom1, ftype);
             case 0x0C: // Pinched2
-                return valueToMem((int)obj->Pinched.Left2, ftype);
+                return valueToMem((short)obj->Pinched.Left2, ftype);
             case 0x0E: // Pinched3
-                return valueToMem((int)obj->Pinched.Top3, ftype);
+                return valueToMem((short)obj->Pinched.Top3, ftype);
             case 0x10: // Pinched4
-                return valueToMem((int)obj->Pinched.Right4, ftype);
+                return valueToMem((short)obj->Pinched.Right4, ftype);
             case 0x12: // MovingPinched
-                return valueToMem((int)obj->Pinched.Moving, ftype);
+                return valueToMem((short)obj->Pinched.Moving, ftype);
             default:
                 pLogWarning("MemEmu: Attempt to read NPC address 0x%x (invalid byte hacking)", address);
                 break;

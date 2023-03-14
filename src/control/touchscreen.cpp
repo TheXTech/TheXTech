@@ -1015,6 +1015,7 @@ void TouchScreenController::scanTouchDevices()
 void TouchScreenController::updateScreenSize()
 {
     XWindow::getWindowSize(&m_screenWidth, &m_screenHeight);
+    XRender::getRenderSize(&m_renderWidth, &m_renderHeight);
 
     updateTouchMap(m_layout,
                    m_screenWidth, m_screenHeight,
@@ -1436,10 +1437,10 @@ void TouchScreenController::render(int player_no)
             continue;
 
         const auto& k = g_touchKeyMap.touchKeysMap[key];
-        int x1 = Maths::iRound((k.x1 / g_touchKeyMap.touchCanvasWidth) * float(m_screenWidth));
-        int y1 = Maths::iRound((k.y1 / g_touchKeyMap.touchCanvasHeight) * float(m_screenHeight));
-        int x2 = Maths::iRound((k.x2 / g_touchKeyMap.touchCanvasWidth) * float(m_screenWidth));
-        int y2 = Maths::iRound((k.y2 / g_touchKeyMap.touchCanvasHeight) * float(m_screenHeight));
+        int x1 = Maths::iRound((k.x1 / g_touchKeyMap.touchCanvasWidth) * float(m_renderWidth));
+        int y1 = Maths::iRound((k.y1 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
+        int x2 = Maths::iRound((k.x2 / g_touchKeyMap.touchCanvasWidth) * float(m_renderWidth));
+        int y2 = Maths::iRound((k.y2 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
 #ifdef __EMSCRIPTEN__
         x1 *= 2;
         y1 *= 2;

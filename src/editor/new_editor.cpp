@@ -2030,7 +2030,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         else
             m_special_page = SPECIAL_PAGE_NONE;
     }
-    int* target;
+    vbint_t* target;
     int* current_page;
     const std::vector<std::string>* source;
     const std::vector<int16_t>* source_indices;

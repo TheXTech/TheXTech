@@ -54,7 +54,7 @@ bool OpenWorld(std::string FilePath)
     bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     int A = 0;
     int B = 0;
-    long long zCounter = 0;
+    // long long zCounter = 0;
     WorldData wld;
 
     ClearWorld();
@@ -165,7 +165,7 @@ bool OpenWorld(std::string FilePath)
         }
     }
 
-    zCounter = 0;
+    // zCounter = 0;
     for(auto &t : wld.tiles)
     {
         numTiles++;
@@ -184,7 +184,7 @@ bool OpenWorld(std::string FilePath)
         terra.Type = int(t.id);
         terra.Location.Width = TileWidth[terra.Type];
         terra.Location.Height = TileHeight[terra.Type];
-        terra.Z = zCounter++;
+        // terra.Z = zCounter++;
         treeWorldTileAdd(&terra);
 
         if(IF_OUTRANGE(terra.Type, 1, maxTileType)) // Drop ID to 1 for Tiles of out of range IDs
@@ -194,7 +194,7 @@ bool OpenWorld(std::string FilePath)
         }
     }
 
-    zCounter = 0;
+    // zCounter = 0;
     for(auto &s : wld.scenery)
     {
         numScenes++;
@@ -214,7 +214,7 @@ bool OpenWorld(std::string FilePath)
         scene.Location.Width = SceneWidth[scene.Type];
         scene.Location.Height = SceneHeight[scene.Type];
         scene.Active = true;
-        scene.Z = zCounter++;
+        // scene.Z = zCounter++;
         treeWorldSceneAdd(&scene);
 
         if(IF_OUTRANGE(scene.Type, 1, maxSceneType)) // Drop ID to 1 for Scenery of out of range IDs
@@ -224,7 +224,7 @@ bool OpenWorld(std::string FilePath)
         }
     }
 
-    zCounter = 0;
+    // zCounter = 0;
     for(auto &p : wld.paths)
     {
         numWorldPaths++;
@@ -244,7 +244,7 @@ bool OpenWorld(std::string FilePath)
         pp.Location.Width = 32;
         pp.Location.Height = 32;
         pp.Active = false;
-        pp.Z = zCounter++;
+        // pp.Z = zCounter++;
         treeWorldPathAdd(&pp);
 //        if(LevelEditor == true)
 //            pp.Active = true;
@@ -256,7 +256,7 @@ bool OpenWorld(std::string FilePath)
         }
     }
 
-    zCounter = 0;
+    // zCounter = 0;
     for(auto &l : wld.levels)
     {
         numWorldLevels++;
@@ -293,7 +293,7 @@ bool OpenWorld(std::string FilePath)
         // new:
         ll.starsShowPolicy = l.starsShowPolicy;
 
-        ll.Z = zCounter++;
+        // ll.Z = zCounter++;
         treeWorldLevelAdd(&ll);
 
         if(IF_OUTRANGE(ll.Type, 0, maxLevelType)) // Drop ID to 1 for Levels of out of range IDs
@@ -303,7 +303,7 @@ bool OpenWorld(std::string FilePath)
         }
     }
 
-    zCounter = 0;
+    // zCounter = 0;
     for(auto &m : wld.music)
     {
         numWorldMusic++;
@@ -333,7 +333,7 @@ bool OpenWorld(std::string FilePath)
         box.Location.Height = 30;
         box.Location.Y += 1;
         box.Location.X += 1;
-        box.Z = zCounter++;
+        // box.Z = zCounter++;
         treeWorldMusicAdd(&box);
     }
 

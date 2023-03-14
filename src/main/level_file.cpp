@@ -40,6 +40,7 @@
 #include "level_file.h"
 #include "trees.h"
 #include "npc_special_data.h"
+#include "graphics/gfx_update.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -921,6 +922,9 @@ void ClearLevel()
     UnloadCustomGFX();
     doShakeScreenClear();
     treeLevelCleanAll();
+
+    invalidateDrawBlocks();
+    invalidateDrawBGOs();
 
     AutoUseModern = false;
 
