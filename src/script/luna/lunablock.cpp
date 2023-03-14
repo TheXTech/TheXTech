@@ -89,10 +89,14 @@ bool BlocksF::IsPlayerTouchingType(int type, int sought, Player_t *demo)
                playerY2 < block->Location.Y)
                 continue;
 
-            if(TestCollision(demo, block) == sought)
+            int ret = TestCollision(demo, block);
+
+            if(sought != 0 && ret == sought)
                 return true;
+            else if(sought == 0 && ret != 0)
+                return false;
         }
     }
 
-    return false; // no collision
+    return (sought == 0); // no collision
 }
