@@ -12,16 +12,58 @@
             "pickContents2": "contents"
         },
         "events": {
+            "bounds": {
+                "changeAllSectionBoundsToCurrent": "Change all section bounds to current?",
+                "changeSectionBoundsToCurrent": "Change section {0} bounds to current?",
+                "shouldEvent": "Should Event {0}"
+            },
+            "controlsForEvent": "Controls for event",
+            "deletion": {
+                "cancel": "No: do not delete event",
+                "confirm": "Yes: delete event",
+                "deletingEvent": "Deleting event {0}"
+            },
             "header": "Events:",
+            "headerTriggerEvent": "Trigger:",
+            "itemNewEvent": "<New Event>",
+            "layers": {
+                "headerHide": "Hide:",
+                "headerMove": "Move:",
+                "headerShow": "Show:",
+                "headerToggle": "Toggle:"
+            },
             "letterActivate": "A:",
             "letterDeath": "D:",
             "letterLayerClear": "L:",
-            "letterTalk": "T:"
+            "letterTalk": "T:",
+            "promptEventName": "Event name",
+            "promptEventText": "Event text",
+            "props": {
+                "autostart": "Autostart",
+                "controls": "Controls",
+                "endGame": "End Game",
+                "sound": "Sound"
+            },
+            "sections": {
+                "actionKeep": "Keep",
+                "actionReset": "Reset",
+                "actionSet": "Set",
+                "phraseAllSections": "All Sections",
+                "propBackground": "BG",
+                "propBounds": "Bounds",
+                "propMusic": "Music"
+            },
+            "settingsForEvent": "Settings for event"
         },
-        "layer": {
+        "layers": {
+            "header": "Layers:",
             "label": "Layer:",
             "labelAbbrevAttLayer": "Att: "
         },
+        "letterDown": "D",
+        "letterLeft": "L",
+        "letterRight": "R",
+        "letterUp": "U",
         "npc": {
             "abbrevGen": "Gen",
             "ai": {
@@ -36,7 +78,6 @@
                 "use1_0Ai": "Use 1.0 AI?"
             },
             "gen": {
-                "delayIsMs": "Delay: {0} ms",
                 "direction": "Direction",
                 "effectIs": "Effect: {0}",
                 "effectShoot": "Shoot",
@@ -48,6 +89,10 @@
             "stuckStop": "Stop",
             "tooltipExpandSection": "Expand section"
         },
+        "pageBlankOfBlank": "",
+        "phraseAreYouSure": "",
+        "phraseCountMore": "{0} More",
+        "phraseDelayIsMs": "Delay: {0} ms",
         "phraseRadiusIndex": "Radius {0}",
         "phraseSectionIndex": "Section {0}",
         "phraseTextOf": "{0} Text",
@@ -67,6 +112,7 @@
             "genitive": "Event",
             "nominative": "Event"
         },
+        "wordInstant": "Instant",
         "wordNPC": {
             "genitive": "NPC",
             "nominative": "NPC"
@@ -93,6 +139,18 @@
             "charSelTitle": "Character Select"
         },
         "controls": {
+            "buttons": {
+                "altJump": "Alt Jump",
+                "altRun": "Alt Run",
+                "down": "Down",
+                "drop": "Drop",
+                "jump": "Jump",
+                "left": "Left",
+                "right": "Right",
+                "run": "Run",
+                "start": "Start",
+                "up": "Up"
+            },
             "controlsConnected": "Connected:",
             "controlsDeleteKey": "(Alt Jump to Delete)",
             "controlsDeviceTypes": "Device Types",

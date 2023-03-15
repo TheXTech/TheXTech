@@ -935,7 +935,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.GeneratorEffect = 2;
 
             // delay change
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.npcGenDelayIsMs, ((int)EditorCursor.NPC.GeneratorTimeMax) * 100), 3, 50, 230);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, ((int)EditorCursor.NPC.GeneratorTimeMax) * 100), 3, 50, 230);
 
             if(EditorCursor.NPC.GeneratorTimeMax > 1.f && UpdateButton(mode, 280 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.NPC.GeneratorTimeMax --;
@@ -968,23 +968,23 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         if(UpdateButton(mode, 360 + 4, 60 + 4, GFXBlock[2], EditorCursor.Block.Special == 0, 0, 0, 32, 32))
             EditorCursor.Block.Special = 0;
 
-        SuperPrintR(mode, "SET 3", 3, 40 + 10, 140);
+        SuperPrintR(mode, "3", 3, 40 + 10, 140);
         static const int p7_common[] = {10, 9, 90, 14, 264, 34, 169, 170, 226, 287};
         UpdateNPCGrid(mode, 40, 160, p7_common, sizeof(p7_common)/sizeof(int), 10);
 
-        SuperPrintR(mode, "SET 4", 3, 40 + 10, 200);
+        SuperPrintR(mode, "4", 3, 40 + 10, 200);
         static const int p7_smw[] = {33, 185, 187, 183, 188, 277, 95, 31, 227};
         UpdateNPCGrid(mode, 40, 220, p7_smw, sizeof(p7_smw)/sizeof(int), 10);
 
-        SuperPrintR(mode, "SET 1", 3, 40 + 10, 260);
+        SuperPrintR(mode, "1", 3, 40 + 10, 260);
         static const int p7_smb1[] = {88, 184, 186, 182, 153};
         UpdateNPCGrid(mode, 40, 280, p7_smb1, sizeof(p7_smb1)/sizeof(int), 5);
 
-        SuperPrintR(mode, "SET 2", 3, 40 + 10, 320);
+        SuperPrintR(mode, "2", 3, 40 + 10, 320);
         static const int p7_smb2[] = {138, 249, 134, 241, 240};
         UpdateNPCGrid(mode, 40, 340, p7_smb2, sizeof(p7_smb2)/sizeof(int), 5);
 
-        SuperPrintR(mode, "MISC", 3, 40 + 10, 380);
+        SuperPrintR(mode, "*", 3, 40 + 10, 380);
         static const int p7_misc[] = {152, 250, 254, 251, 252, 253};
         UpdateNPCGrid(mode, 40, 400, p7_misc, sizeof(p7_misc)/sizeof(int), 10);
     }
@@ -1057,16 +1057,16 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
 {
     if(m_special_page == SPECIAL_PAGE_EVENT_DELETION)
     {
-        SuperPrintR(mode, "DELETING EVENT " + Events[m_current_event].Name, 3, 60, 40);
-        SuperPrintR(mode, "ARE YOU SURE?", 3, 10, 60);
-        SuperPrintR(mode, "YES: DELETE EVENT", 3, 60, 110);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.eventsDeletingEvent, Events[m_current_event].Name), 3, 60, 40);
+        SuperPrintR(mode, g_editorStrings.phraseAreYouSure, 3, 10, 60);
+        SuperPrintR(mode, g_editorStrings.eventsDeletionConfirm, 3, 60, 110);
         if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             DeleteEvent((eventindex_t)m_current_event);
             m_special_page = SPECIAL_PAGE_EVENTS;
             m_current_event = 0;
         }
-        SuperPrintR(mode, "NO: DO NOT DELETE EVENT", 3, 60, 150);
+        SuperPrintR(mode, g_editorStrings.eventsDeletionCancel, 3, 60, 150);
         if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_EVENTS;
@@ -1076,9 +1076,9 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
     }
 
     // render general GUI
-    SuperPrintR(mode, "EVENTS", 3, 60, 40);
+    SuperPrintR(mode, g_editorStrings.eventsHeader, 3, 60, 40);
     int page_max = numEvents / 10;
-    SuperPrintR(mode, "PAGE " + std::to_string(m_events_page+1) + " OF " + std::to_string(page_max+1), 3, e_ScreenW - 330, 40);
+    SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, m_events_page + 1, page_max + 1), 3, e_ScreenW - 330, 40);
     if(m_events_page > 0 && UpdateButton(mode, e_ScreenW - 120 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_events_page --;
     if(m_events_page < page_max && UpdateButton(mode, e_ScreenW - 80 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -1114,7 +1114,7 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
             if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
                 DisableCursorNew();
-                std::string new_name = TextEntryScreen::Run("New event name", Events[e].Name);
+                std::string new_name = TextEntryScreen::Run(g_editorStrings.eventsPromptEventName, Events[e].Name);
                 if(!new_name.empty())
                     RenameEvent((eventindex_t)e, new_name);
                 MouseMove(SharedCursor.X, SharedCursor.Y);
@@ -1139,12 +1139,12 @@ void EditorScreen::UpdateEventsScreen(CallMode mode)
         // create a new event!
         else if(e != 0 && !Events[e - 1].Name.empty())
         {
-            SuperPrintR(mode, "<NEW EVENT>", 3, 54, 80 + 40*i + 10);
+            SuperPrintR(mode, g_editorStrings.eventsItemNewEvent, 3, 54, 80 + 40*i + 10);
             // rename only
             if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
                 DisableCursorNew();
-                std::string new_name = TextEntryScreen::Run("New event name", "");
+                std::string new_name = TextEntryScreen::Run(g_editorStrings.eventsPromptEventName, "");
                 MouseMove(SharedCursor.X, SharedCursor.Y);
                 if(!new_name.empty() && FindEvent(new_name) == EVENT_NONE)
                 {
@@ -1161,12 +1161,14 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 {
     if(m_special_page == SPECIAL_PAGE_EVENT_BOUNDS)
     {
-        SuperPrintR(mode, "SHOULD EVENT " + Events[m_current_event].Name, 3, 60, 40);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.eventsShouldEvent, Events[m_current_event].Name), 3, 60, 40);
+
         if(m_special_subpage != 0)
-            SuperPrintR(mode, "CHANGE SECTION " + std::to_string(m_special_subpage) + " BOUNDS TO CURRENT?", 3, 10, 60);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.eventsChangeSectionBoundsToCurrent, m_special_subpage), 3, 10, 60);
         else
-            SuperPrintR(mode, "CHANGE ALL SECTION BOUNDS TO CURRENT?", 3, 10, 60);
-        SuperPrintR(mode, "YES", 3, 60, 110);
+            SuperPrintR(mode, g_editorStrings.eventsChangeAllSectionBoundsToCurrent, 3, 10, 60);
+
+        SuperPrintR(mode, g_mainMenu.wordYes, 3, 60, 110);
         if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             if(m_special_subpage == 0)
@@ -1178,17 +1180,19 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
                 Events[m_current_event].section[m_special_subpage-1].position = static_cast<SpeedlessLocation_t>(level[m_special_subpage-1]);
             m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
         }
-        SuperPrintR(mode, "NO", 3, 60, 150);
+
+        SuperPrintR(mode, g_mainMenu.wordNo, 3, 60, 150);
         if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
         }
+
         return;
     }
 
     if(m_special_page == SPECIAL_PAGE_EVENT_CONTROLS)
     {
-        SuperPrintR(mode, "CONTROLS FOR EVENT", 3, 60, 40);
+        SuperPrintR(mode, g_editorStrings.eventsControlsForEvent, 3, 60, 40);
         SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
 
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 8*32, 32, 32))
@@ -1198,42 +1202,42 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 
         if(UpdateButton(mode, 10 + 4, 80 + 4, GFX.EIcons, Events[m_current_event].Controls.Up, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Up = !Events[m_current_event].Controls.Up;
-        SuperPrintR(mode, "UP", 3, 54, 90);
+        SuperPrintR(mode, g_mainMenu.buttonUp, 3, 54, 90);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 80 + 4, GFX.EIcons, Events[m_current_event].Controls.Down, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Down = !Events[m_current_event].Controls.Down;
-        SuperPrintR(mode, "DOWN", 3, e_ScreenW/2 + 54, 90);
+        SuperPrintR(mode, g_mainMenu.buttonDown, 3, e_ScreenW/2 + 54, 90);
 
         if(UpdateButton(mode, 10 + 4, 120 + 4, GFX.EIcons, Events[m_current_event].Controls.Left, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Left = !Events[m_current_event].Controls.Left;
-        SuperPrintR(mode, "LEFT", 3, 54, 130);
+        SuperPrintR(mode, g_mainMenu.buttonLeft, 3, 54, 130);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 120 + 4, GFX.EIcons, Events[m_current_event].Controls.Right, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Right = !Events[m_current_event].Controls.Right;
-        SuperPrintR(mode, "RIGHT", 3, e_ScreenW/2 + 54, 130);
+        SuperPrintR(mode, g_mainMenu.buttonRight, 3, e_ScreenW/2 + 54, 130);
 
         if(UpdateButton(mode, 10 + 4, 160 + 4, GFX.EIcons, Events[m_current_event].Controls.Jump, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Jump = !Events[m_current_event].Controls.Jump;
-        SuperPrintR(mode, "JUMP", 3, 54, 170);
+        SuperPrintR(mode, g_mainMenu.buttonJump, 3, 54, 170);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 160 + 4, GFX.EIcons, Events[m_current_event].Controls.Run, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Run = !Events[m_current_event].Controls.Run;
-        SuperPrintR(mode, "RUN", 3, e_ScreenW/2 + 54, 170);
+        SuperPrintR(mode, g_mainMenu.buttonRun, 3, e_ScreenW/2 + 54, 170);
 
         if(UpdateButton(mode, 10 + 4, 200 + 4, GFX.EIcons, Events[m_current_event].Controls.AltJump, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.AltJump = !Events[m_current_event].Controls.AltJump;
-        SuperPrintR(mode, "ALT JUMP", 3, 54, 210);
+        SuperPrintR(mode, g_mainMenu.buttonAltJump, 3, 54, 210);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 200 + 4, GFX.EIcons, Events[m_current_event].Controls.AltRun, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.AltRun = !Events[m_current_event].Controls.AltRun;
-        SuperPrintR(mode, "ALT RUN", 3, e_ScreenW/2 + 54, 210);
+        SuperPrintR(mode, g_mainMenu.buttonAltRun, 3, e_ScreenW/2 + 54, 210);
 
         if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, Events[m_current_event].Controls.Start, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Start = !Events[m_current_event].Controls.Start;
-        SuperPrintR(mode, "START", 3, 54, 250);
+        SuperPrintR(mode, g_mainMenu.buttonStart, 3, 54, 250);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 240 + 4, GFX.EIcons, Events[m_current_event].Controls.Drop, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Drop = !Events[m_current_event].Controls.Drop;
-        SuperPrintR(mode, "DROP", 3, e_ScreenW/2 + 54, 250);
+        SuperPrintR(mode, g_mainMenu.buttonDrop, 3, e_ScreenW/2 + 54, 250);
         return;
     }
 
-    SuperPrintR(mode, "SETTINGS FOR EVENT", 3, 60, 40);
+    SuperPrintR(mode, g_editorStrings.eventsSettingsForEvent, 3, 60, 40);
     SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
 
     // RIGHT PANE: layers
@@ -1249,69 +1253,73 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     if(!Events[m_current_event].ShowLayer.empty())
     {
         layer_line ++;
-        SuperPrintR(mode, "SHOW:", 3, e_ScreenW-200, 40 + 20*layer_line);
+        SuperPrintR(mode, g_editorStrings.eventsHeaderMove, 3, e_ScreenW - 200, 40 + (20 * layer_line));
         layer_line ++;
-        SuperPrintR(mode, GetL(Events[m_current_event].ShowLayer[0]), 3, e_ScreenW-240, 40 + 20*layer_line);
+        SuperPrintR(mode, GetL(Events[m_current_event].ShowLayer[0]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
         layer_line ++;
+
         if(Events[m_current_event].ShowLayer.size() >= 2)
         {
-            SuperPrintR(mode, GetL(Events[m_current_event].ShowLayer[1]), 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, GetL(Events[m_current_event].ShowLayer[1]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
             layer_line ++;
         }
+
         if(Events[m_current_event].ShowLayer.size() == 3)
         {
-            SuperPrintR(mode, GetL(Events[m_current_event].ShowLayer[2]), 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, GetL(Events[m_current_event].ShowLayer[2]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
             layer_line ++;
         }
         else if(Events[m_current_event].ShowLayer.size() > 3)
         {
-            SuperPrintR(mode, std::to_string(Events[m_current_event].ShowLayer.size() - 2) + " MORE", 3, e_ScreenW-220, 40 + 20*layer_line);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseCountMore, Events[m_current_event].ShowLayer.size() - 2), 3, e_ScreenW - 220, 40 + (20 * layer_line));
             layer_line ++;
         }
     }
     if(!Events[m_current_event].HideLayer.empty())
     {
         layer_line ++;
-        SuperPrintR(mode, "HIDE:", 3, e_ScreenW-200, 40 + 20*layer_line);
+        SuperPrintR(mode, g_editorStrings.eventsHeaderHide, 3, e_ScreenW - 200, 40 + (20 * layer_line));
         layer_line ++;
-        SuperPrintR(mode, GetL(Events[m_current_event].HideLayer[0]), 3, e_ScreenW-240, 40 + 20*layer_line);
+        SuperPrintR(mode, GetL(Events[m_current_event].HideLayer[0]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
         layer_line ++;
+
         if(Events[m_current_event].HideLayer.size() >= 2)
         {
-            SuperPrintR(mode, GetL(Events[m_current_event].HideLayer[1]), 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, GetL(Events[m_current_event].HideLayer[1]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
             layer_line ++;
         }
+
         if(Events[m_current_event].HideLayer.size() == 3)
         {
-            SuperPrintR(mode, GetL(Events[m_current_event].HideLayer[2]), 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, GetL(Events[m_current_event].HideLayer[2]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
             layer_line ++;
         }
         else if(Events[m_current_event].HideLayer.size() > 3)
         {
-            SuperPrintR(mode, std::to_string(Events[m_current_event].HideLayer.size() - 2) + " MORE", 3, e_ScreenW-220, 40 + 20*layer_line);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseCountMore, Events[m_current_event].HideLayer.size() - 2), 3, e_ScreenW - 220, 40 + (20 * layer_line));
             layer_line ++;
         }
     }
     if(!Events[m_current_event].ToggleLayer.empty())
     {
         layer_line ++;
-        SuperPrintR(mode, "TOGGLE:", 3, e_ScreenW-200, 40 + 20*layer_line);
+        SuperPrintR(mode, g_editorStrings.eventsHeaderToggle, 3, e_ScreenW - 200, 40 + (20 * layer_line));
         layer_line ++;
-        SuperPrintR(mode, GetL(Events[m_current_event].ToggleLayer[0]), 3, e_ScreenW-240, 40 + 20*layer_line);
+        SuperPrintR(mode, GetL(Events[m_current_event].ToggleLayer[0]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
         layer_line ++;
         if(Events[m_current_event].ToggleLayer.size() >= 2)
         {
-            SuperPrintR(mode, GetL(Events[m_current_event].ToggleLayer[1]), 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, GetL(Events[m_current_event].ToggleLayer[1]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
             layer_line ++;
         }
         if(Events[m_current_event].ToggleLayer.size() == 3)
         {
-            SuperPrintR(mode, GetL(Events[m_current_event].ToggleLayer[2]), 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, GetL(Events[m_current_event].ToggleLayer[2]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
             layer_line ++;
         }
         else if(Events[m_current_event].ToggleLayer.size() > 3)
         {
-            SuperPrintR(mode, std::to_string(Events[m_current_event].ToggleLayer.size() - 2) + " MORE", 3, e_ScreenW-220, 40 + 20*layer_line);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseCountMore, Events[m_current_event].ToggleLayer.size() - 2), 3, e_ScreenW - 220, 40 + (20 * layer_line));
             layer_line ++;
         }
     }
@@ -1319,45 +1327,53 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     if(Events[m_current_event].MoveLayer != LAYER_NONE)
     {
         layer_line ++;
-        SuperPrintR(mode, "MOVE:", 3, e_ScreenW-200, 40 + 20*layer_line);
+        SuperPrintR(mode, g_editorStrings.eventsHeaderMove, 3, e_ScreenW - 200, 40 + (20 * layer_line));
         layer_line ++;
-        SuperPrintR(mode, GetL(Events[m_current_event].MoveLayer), 3, e_ScreenW-240, 40 + 20*layer_line);
+        SuperPrintR(mode, GetL(Events[m_current_event].MoveLayer), 3, e_ScreenW - 240, 40 + (20 * layer_line));
         layer_line ++;
+
         // settings for this...
-        int sy = (vb6Round)(Events[m_current_event].SpeedY*10);
-        int sx = (vb6Round)(Events[m_current_event].SpeedX*10);
+        int sy = vb6Round(Events[m_current_event].SpeedY*10);
+        int sx = vb6Round(Events[m_current_event].SpeedX*10);
+
         if(sy < 0)
-            SuperPrintR(mode, "U"+std::to_string(-sy), 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, g_editorStrings.letterUp + std::to_string(-sy), 3, e_ScreenW - 240, 40 + (20 * layer_line));
         else if(sy > 0)
-            SuperPrintR(mode, "D"+std::to_string(sy), 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, g_editorStrings.letterDown + std::to_string(sy), 3, e_ScreenW - 240, 40 + (20 * layer_line));
         else
-            SuperPrintR(mode, "-", 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, "-", 3, e_ScreenW - 240, 40 + (20 * layer_line));
+
         layer_line ++;
+
         if(sx < 0)
-            SuperPrintR(mode, "L"+std::to_string(-sx), 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, g_editorStrings.letterLeft + std::to_string(-sx), 3, e_ScreenW - 240, 40 + (20 * layer_line));
         else if(sx > 0)
-            SuperPrintR(mode, "R"+std::to_string(sx), 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, g_editorStrings.letterRight + std::to_string(sx), 3, e_ScreenW - 240, 40 + (20 * layer_line));
         else
-            SuperPrintR(mode, "-", 3, e_ScreenW-240, 40 + 20*layer_line);
+            SuperPrintR(mode, "-", 3, e_ScreenW - 240, 40 + (20 * layer_line));
+
         layer_line --;
-        if(UpdateButton(mode, e_ScreenW-160 + 4, 40 + 20*layer_line + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
+
+        if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
             Events[m_current_event].SpeedY = 0.1f*(sy+1);
-        if(UpdateButton(mode, e_ScreenW-120 + 4, 40 + 20*layer_line + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 120 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
             Events[m_current_event].SpeedY = 0.1f*(sy-1);
-        if(UpdateButton(mode, e_ScreenW-80 + 4, 40 + 20*layer_line + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 80 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             Events[m_current_event].SpeedX = 0.1f*(sx-1);
-        if(UpdateButton(mode, e_ScreenW-40 + 4, 40 + 20*layer_line + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + (20 * layer_line) + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             Events[m_current_event].SpeedX = 0.1f*(sx+1);
     }
+
     if(layer_line == 1)
     {
-        SuperPrintR(mode, "LAYERS:", 3, e_ScreenW-200, 40);
-        SuperPrintR(mode, "NONE", 3, e_ScreenW-200, 40 + 20*layer_line);
+        SuperPrintR(mode, g_editorStrings.layersHeader, 3, e_ScreenW - 200, 40);
+        SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 40 + (20 * layer_line));
     }
     else
     {
-        SuperPrintR(mode, "LAYERS:", 3, e_ScreenW-200, 50);
+        SuperPrintR(mode, g_editorStrings.layersHeader, 3, e_ScreenW - 200, 50);
     }
+
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_LAYERS;
 
@@ -1368,18 +1384,21 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         m_special_subpage --;
     if(m_special_subpage < maxSections + 1 && UpdateButton(mode, 320 + 4, e_ScreenH - 180 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_special_subpage ++;
-    // description of possibilities
-    SuperPrintR(mode, "KEEP", 3, 132, e_ScreenH - 140);
-    SuperPrintR(mode, "RESET", 3, 226, e_ScreenH - 140);
-    SuperPrintR(mode, "SET", 3, 340, e_ScreenH - 140);
 
-    SuperPrintR(mode, "MUSIC", 3, 4, e_ScreenH - 110);
-    SuperPrintR(mode, "BG", 3, 4, e_ScreenH - 70);
-    SuperPrintR(mode, "BOUNDS", 3, 4, e_ScreenH - 30);
+    // description of possibilities
+    SuperPrintR(mode, g_editorStrings.eventsActionKeep, 3, 132, e_ScreenH - 140);
+    SuperPrintR(mode, g_editorStrings.eventsActionReset, 3, 226, e_ScreenH - 140);
+    SuperPrintR(mode, g_editorStrings.eventsActionSet, 3, 340, e_ScreenH - 140);
+
+    SuperPrintR(mode, g_editorStrings.eventsCaseMusic, 3, 4, e_ScreenH - 110);
+    SuperPrintR(mode, g_editorStrings.eventsCaseBackground, 3, 4, e_ScreenH - 70);
+    SuperPrintR(mode, g_editorStrings.eventsCaseBounds, 3, 4, e_ScreenH - 30);
+
     // subpage - 1 is the internal section ID; subpage 0 is all sections.
     if(m_special_subpage == 0)
     {
-        SuperPrintR(mode, "ALL SECTIONS", 3, 90, e_ScreenH - 174);
+        SuperPrintR(mode, g_editorStrings.eventsPhraseAllSections, 3, 90, e_ScreenH - 174);
+
         // music
         bool all_keep = true;
         bool all_reset = true;
@@ -1410,6 +1429,8 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         }
         if(UpdateButton(mode, 350 + 4, e_ScreenH - 120 + 4, GFX.EIcons, all_set, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_MUSIC;
+
+        // background
         all_keep = true;
         all_reset = true;
         all_set = true;
@@ -1439,6 +1460,8 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         }
         if(UpdateButton(mode, 350 + 4, e_ScreenH - 80 + 4, GFX.EIcons, all_set, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_BACKGROUND;
+
+        // bounds
         all_keep = true;
         all_reset = true;
         all_set = true;
@@ -1475,49 +1498,49 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     }
     else
     {
-        SuperPrintR(mode, "SECTION "+std::to_string(m_special_subpage), 3, 120, e_ScreenH - 174);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseSectionIndex, m_special_subpage), 3, 120, e_ScreenH - 174);
+
+        // music
         if(UpdateButton(mode, 150 + 4, e_ScreenH - 120 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].music_id == LESet_Nothing, 0, 0, 1, 1))
-        {
             Events[m_current_event].section[m_special_subpage-1].music_id = LESet_Nothing;
-        }
+
         if(UpdateButton(mode, 250 + 4, e_ScreenH - 120 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].music_id == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
-        {
             Events[m_current_event].section[m_special_subpage-1].music_id = LESet_ResetDefault;
-        }
+
         if(UpdateButton(mode, 350 + 4, e_ScreenH - 120 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].music_id >= 0, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_MUSIC;
+
+        // background
         if(UpdateButton(mode, 150 + 4, e_ScreenH - 80 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].background_id == LESet_Nothing, 0, 0, 1, 1))
-        {
             Events[m_current_event].section[m_special_subpage-1].background_id = LESet_Nothing;
-        }
+
         if(UpdateButton(mode, 250 + 4, e_ScreenH - 80 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].background_id == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
-        {
             Events[m_current_event].section[m_special_subpage-1].background_id = LESet_ResetDefault;
-        }
+
         if(UpdateButton(mode, 350 + 4, e_ScreenH - 80 + 4, GFX.EIcons, Events[m_current_event].section[m_special_subpage-1].background_id >= 0, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_BACKGROUND;
+
+        // bounds
         if(UpdateButton(mode, 150 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)Events[m_current_event].section[m_special_subpage-1].position.X == LESet_Nothing, 0, 0, 1, 1))
-        {
             Events[m_current_event].section[m_special_subpage-1].position.X = LESet_Nothing;
-        }
+
         if(UpdateButton(mode, 250 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)Events[m_current_event].section[m_special_subpage-1].position.X == LESet_ResetDefault, 0, 32*Icon::x, 32, 32))
-        {
             Events[m_current_event].section[m_special_subpage-1].position.X = LESet_ResetDefault;
-        }
+
         if(UpdateButton(mode, 350 + 4, e_ScreenH - 40 + 4, GFX.EIcons, (int)Events[m_current_event].section[m_special_subpage-1].position.X != LESet_Nothing && (int)Events[m_current_event].section[m_special_subpage-1].position.X != LESet_ResetDefault, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_BOUNDS;
     }
 
     // autostart
-    SuperPrintR(mode, "AUTOSTART", 3, 54, 90);
+    SuperPrintR(mode, g_editorStrings.eventsPropAutostart, 3, 54, 90);
     if(UpdateCheckBox(mode, 10 + 4, 80 + 4, Events[m_current_event].AutoStart))
         Events[m_current_event].AutoStart = !Events[m_current_event].AutoStart;
     // sound
-    SuperPrintR(mode, "SOUND", 3, 254, 90);
+    SuperPrintR(mode, g_editorStrings.eventsPropSound, 3, 254, 90);
     if(UpdateButton(mode, 210 + 4, 80 + 4, GFX.EIcons, Events[m_current_event].Sound != 0, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_SOUND;
     // end game
-    SuperPrintR(mode, "END GAME", 3, 54, 130);
+    SuperPrintR(mode, g_editorStrings.eventsPropEndGame, 3, 54, 130);
     if(UpdateCheckBox(mode, 10 + 4, 120 + 4, Events[m_current_event].EndGame == 1))
         Events[m_current_event].EndGame ^= 1;
     // control lock
@@ -1531,7 +1554,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         Events[m_current_event].Controls.Run ||
         Events[m_current_event].Controls.Start ||
         Events[m_current_event].Controls.Up);
-    SuperPrintR(mode, "CONTROLS", 3, 254, 130);
+    SuperPrintR(mode, g_editorStrings.eventsPropControls, 3, 254, 130);
     if(UpdateButton(mode, 210 + 4, 120 + 4, GFX.EIcons, controls_set, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_CONTROLS;
 
@@ -1542,35 +1565,38 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         BuildUTF8CharMap(MessageText, MessageTextMap);
     }
 
-    SuperPrintR(mode, "TEXT", 3, 54, 170);
+    SuperPrintR(mode, g_editorStrings.wordText, 3, 54, 170);
     if(UpdateButton(mode, 10 + 4, 160 + 4, GFX.EIcons, !GetS(Events[m_current_event].Text).empty(), 0, 32*Icon::pencil, 32, 32))
     {
         DisableCursorNew();
-        SetS(Events[m_current_event].Text, TextEntryScreen::Run("Event text", GetS(Events[m_current_event].Text)));
+        SetS(Events[m_current_event].Text, TextEntryScreen::Run(g_editorStrings.eventsPromptEventText, GetS(Events[m_current_event].Text)));
         MouseMove(SharedCursor.X, SharedCursor.Y);
     }
 
     // trigger event
-    SuperPrintR(mode, "TRIGGER:", 3, 54, 220);
+    SuperPrintR(mode, g_editorStrings.eventsHeaderTriggerEvent, 3, 54, 220);
     if(UpdateButton(mode, 10 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_EVENT_TRIGGER;
+
     if(Events[m_current_event].TriggerEvent != EVENT_NONE)
     {
         SuperPrintR(mode, GetE(Events[m_current_event].TriggerEvent).substr(0,19), 3, 54, 240);
+
         if(Events[m_current_event].TriggerDelay > 0)
         {
-            SuperPrintR(mode, "AFTER", 3, 54, 260);
-            SuperPrintR(mode, std::to_string((int)Events[m_current_event].TriggerDelay*100) + "MS", 3, 54, 280);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * (int)Events[m_current_event].TriggerDelay), 3, 54, 272);
         }
         else
-            SuperPrintR(mode, "INSTANT", 3, 54, 260);
-        if(Events[m_current_event].TriggerDelay > 0 && UpdateButton(mode, 170 + 4, 260 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+            SuperPrintR(mode, g_editorStrings.wordInstant, 3, 54, 272);
+
+        if(Events[m_current_event].TriggerDelay > 0 && UpdateButton(mode, 10 + 4, 260 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             Events[m_current_event].TriggerDelay --;
-        if(UpdateButton(mode, 210 + 4, 260 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+
+        if(UpdateButton(mode, 290 + 4, 260 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             Events[m_current_event].TriggerDelay ++;
     }
     else
-        SuperPrintR(mode, "NONE", 3, 54, 240);
+        SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 240);
 }
 
 // updates the bounds for Section 0 in level start event according to its autoscroll
@@ -2143,7 +2169,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     {
         int page_max = (source->size() - 1) / 20;
         if(!(page_max == 0 && *current_page == 0))
-        SuperPrintR(mode, "PAGE " + std::to_string(*current_page+1) + " OF " + std::to_string(page_max+1), 3, e_ScreenW - 320, 50);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, *current_page + 1, page_max + 1), 3, e_ScreenW - 320, 50);
         if(*current_page > 0 && UpdateButton(mode, e_ScreenW - 120 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             *current_page = *current_page - 1;
         if(*current_page < page_max && UpdateButton(mode, e_ScreenW - 80 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -2258,70 +2284,85 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         m_special_subpage = 0;
         return;
     }
-    if(m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
-    {
-        if(Events[m_current_event].TriggerDelay > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 200 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
-            Events[m_current_event].TriggerDelay --;
-        if(UpdateButton(mode, e_ScreenW - 120 + 4, 200 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
-            Events[m_current_event].TriggerDelay ++;
-    }
+
     else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
+        // activate event
         SuperPrintR(mode, "ACTIVATE:", 3, e_ScreenW - 200, 200 + 2);
+
         if(EditorCursor.NPC.TriggerActivate != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerActivate), 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 220 + 2);
+
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
 
+        // death event
         SuperPrintR(mode, "DEATH:", 3, e_ScreenW - 200, 240 + 2);
+
         if(EditorCursor.NPC.TriggerDeath != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerDeath), 3, e_ScreenW - 200, 260 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 260 + 2);
+
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 240 + 4, GFX.EIcons, m_special_subpage == 2, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 2;
 
+        // talk event
         SuperPrintR(mode, "TALK:", 3, e_ScreenW - 200, 280 + 2);
+
         if(EditorCursor.NPC.TriggerTalk != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerTalk), 3, e_ScreenW - 200, 300 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 300 + 2);
+
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 280 + 4, GFX.EIcons, m_special_subpage == 3, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 3;
 
+        // layer clear event
         SuperPrintR(mode, "LAYER CLEAR:", 3, e_ScreenW - 200, 320 + 2);
+
         if(EditorCursor.NPC.TriggerLast != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerLast), 3, e_ScreenW - 200, 340 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 340 + 2);
+
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 320 + 4, GFX.EIcons, m_special_subpage == 4, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 4;
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_BLOCKS)
     {
+        // block hit event
         SuperPrintR(mode, "HIT:", 3, e_ScreenW - 200, 200 + 2);
+
         if(EditorCursor.Block.TriggerHit != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 220 + 2);
+
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
 
+        // block destroy event
         SuperPrintR(mode, "DESTROY:", 3, e_ScreenW - 200, 240 + 2);
+
         if(EditorCursor.Block.TriggerDeath != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 200, 260 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 260 + 2);
+
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 240 + 4, GFX.EIcons, m_special_subpage == 2, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 2;
 
+        // layer clear event
         SuperPrintR(mode, "LAYER CLEAR:", 3, e_ScreenW - 200, 280 + 2);
+
         if(EditorCursor.Block.TriggerLast != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 200, 300 + 2);
         else
             SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 300 + 2);
+
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 280 + 4, GFX.EIcons, m_special_subpage == 3, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 3;
     }
@@ -2339,8 +2380,9 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     }
     else
         return;
+
     int page_max = numEvents / 10;
-    SuperPrintR(mode, "PAGE " + std::to_string(m_events_page+1) + " OF " + std::to_string(page_max+1), 3, e_ScreenW - 228, e_ScreenH - 60);
+    SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, m_events_page + 1, page_max + 1), 3, e_ScreenW - 228, e_ScreenH - 60);
     if(m_events_page > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, e_ScreenH - 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_events_page --;
     if(m_events_page < page_max && UpdateButton(mode, e_ScreenW - 120 + 4, e_ScreenH - 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -2355,12 +2397,6 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     if(m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
     {
         event_name = "NEXT";
-        if(Events[m_current_event].TriggerDelay == 0)
-            event_desc = "JUST AFTER";
-        else
-            event_desc = std::to_string((int)Events[m_current_event].TriggerDelay*100) + "MS AFTER";
-        event_desc_2 = Events[m_current_event].Name;
-        event_desc_3 = "OCCURS";
         event_to_set = &Events[m_current_event].TriggerEvent;
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS)
@@ -2558,7 +2594,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
     // different location for layers and event layers page because they has so many options
     if(m_special_page == SPECIAL_PAGE_LAYERS || m_special_page == SPECIAL_PAGE_EVENT_LAYERS)
     {
-        SuperPrintR(mode, "PAGE " + std::to_string(m_layers_page+1) + " OF " + std::to_string(page_max+1), 3, e_ScreenW - 330, 40);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, m_layers_page + 1, page_max + 1), 3, e_ScreenW - 330, 40);
         if(m_layers_page > 0 && UpdateButton(mode, e_ScreenW - 120 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             m_layers_page --;
         if(m_layers_page < page_max && UpdateButton(mode, e_ScreenW - 80 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -2566,7 +2602,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
     }
     else
     {
-        SuperPrintR(mode, "PAGE " + std::to_string(m_layers_page+1) + " OF " + std::to_string(page_max+1), 3, e_ScreenW - 228, e_ScreenH - 60);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, m_layers_page + 1, page_max + 1), 3, e_ScreenW - 228, e_ScreenH - 60);
         if(m_layers_page > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, e_ScreenH - 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             m_layers_page --;
         if(m_layers_page < page_max && UpdateButton(mode, e_ScreenW - 120 + 4, e_ScreenH - 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -4244,7 +4280,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
         dir_length = 0;
     int page_max = (dir_length + file_length - 1) / 20;
     if(!(page_max == 0 && m_special_subpage == 0))
-        SuperPrintR(mode, "PAGE " + std::to_string(m_special_subpage+1) + " OF " + std::to_string(page_max+1), 3, e_ScreenW - 320, 40);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, m_special_subpage + 1, page_max + 1), 3, e_ScreenW - 320, 40);
     if(m_special_subpage > 0 && UpdateButton(mode, e_ScreenW - 120 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_special_subpage --;
     if(m_special_subpage < page_max && UpdateButton(mode, e_ScreenW - 80 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))

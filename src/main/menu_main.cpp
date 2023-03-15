@@ -158,6 +158,16 @@ void initMainMenu()
     g_mainMenu.controlsNotInUse = "(Not In Use)";
     g_mainMenu.wordProfiles = "Profiles";
     g_mainMenu.wordButtons = "Buttons";
+    g_mainMenu.buttonUp = "Up";
+    g_mainMenu.buttonDown = "Down";
+    g_mainMenu.buttonLeft = "Left";
+    g_mainMenu.buttonRight = "Right";
+    g_mainMenu.buttonJump = "Jump";
+    g_mainMenu.buttonRun = "Run";
+    g_mainMenu.buttonAltJump = "Alt Jump";
+    g_mainMenu.buttonAltRun = "Alt Run";
+    g_mainMenu.buttonStart = "Start";
+    g_mainMenu.buttonDrop = "Drop";
 
     g_mainMenu.controlsReallyDeleteProfile = "Really delete profile?";
     g_mainMenu.controlsNewProfile = "<New Profile>";

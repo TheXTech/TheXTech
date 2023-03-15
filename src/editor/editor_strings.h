@@ -27,6 +27,9 @@
 
 struct EditorContent
 {
+    std::string phraseAreYouSure;
+    std::string pageBlankOfBlank;
+
     std::string pickBlockContents1;
     std::string pickBlockContents2;
 
@@ -53,7 +56,6 @@ struct EditorContent
     std::string npcGenEffectIs;
     std::string npcGenEffectWarp;
     std::string npcGenEffectShoot;
-    std::string npcGenDelayIsMs;
 
     std::string wordNPC;
     std::string wordNPCGenitive;
@@ -65,15 +67,61 @@ struct EditorContent
 
     std::string wordEnabled;
     std::string wordText;
+    std::string wordInstant;
     std::string phraseTextOf;
     std::string phraseSectionIndex;
     std::string phraseRadiusIndex;
+    std::string phraseCountMore;
+    std::string phraseDelayIsMs;
+
+    std::string letterUp;
+    std::string letterDown;
+    std::string letterLeft;
+    std::string letterRight;
 
     std::string eventsHeader;
     std::string eventsLetterActivate;
     std::string eventsLetterDeath;
     std::string eventsLetterTalk;
     std::string eventsLetterLayerClear;
+
+    std::string eventsDeletingEvent;
+    std::string eventsDeletionConfirm;
+    std::string eventsDeletionCancel;
+
+    std::string eventsPromptEventText;
+    std::string eventsPromptEventName;
+    std::string eventsItemNewEvent;
+
+    std::string eventsShouldEvent;
+    std::string eventsChangeSectionBoundsToCurrent;
+    std::string eventsChangeAllSectionBoundsToCurrent;
+
+    std::string eventsControlsForEvent;
+    std::string eventsSettingsForEvent;
+    std::string eventsHeaderShow;
+    std::string eventsHeaderHide;
+    std::string eventsHeaderToggle;
+    std::string eventsHeaderMove;
+
+    std::string eventsActionKeep;
+    std::string eventsActionReset;
+    std::string eventsActionSet;
+
+    std::string eventsCaseMusic;
+    std::string eventsCaseBackground;
+    std::string eventsCaseBounds;
+
+    std::string eventsPhraseAllSections;
+
+    std::string eventsPropAutostart;
+    std::string eventsPropSound;
+    std::string eventsPropEndGame;
+    std::string eventsPropControls;
+
+    std::string eventsHeaderTriggerEvent;
+
+    std::string layersHeader;
 
     std::string labelLayer;
     std::string labelAbbrevAttLayer;

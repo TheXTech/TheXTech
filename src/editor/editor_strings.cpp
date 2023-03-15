@@ -50,7 +50,6 @@ void initEditorStrings()
     g_editorStrings.npcGenEffectIs = "Effect: {0}";
     g_editorStrings.npcGenEffectWarp = "Warp";
     g_editorStrings.npcGenEffectShoot = "Shoot";
-    g_editorStrings.npcGenDelayIsMs = "Delay: {0} ms";
 
     g_editorStrings.wordNPC = "NPC";
     g_editorStrings.wordNPCGenitive = "NPC";
@@ -62,15 +61,61 @@ void initEditorStrings()
 
     g_editorStrings.wordEnabled = "Enabled";
     g_editorStrings.wordText = "Text";
+    g_editorStrings.wordInstant = "Instant";
     g_editorStrings.phraseTextOf = "{0} Text";
     g_editorStrings.phraseSectionIndex = "Section {0}";
     g_editorStrings.phraseRadiusIndex = "Radius {0}";
+    g_editorStrings.phraseCountMore = "{0} More";
+    g_editorStrings.phraseDelayIsMs = "Delay: {0} ms";
+
+    g_editorStrings.letterUp = "U";
+    g_editorStrings.letterDown = "D";
+    g_editorStrings.letterLeft = "L";
+    g_editorStrings.letterRight = "R";
 
     g_editorStrings.eventsHeader = "Events:";
     g_editorStrings.eventsLetterActivate = "A:";
     g_editorStrings.eventsLetterDeath = "D:";
     g_editorStrings.eventsLetterTalk = "T:";
     g_editorStrings.eventsLetterLayerClear = "L:";
+
+    g_editorStrings.eventsDeletingEvent = "Deleting event {0}";
+    g_editorStrings.eventsDeletionConfirm = "Yes: delete event";
+    g_editorStrings.eventsDeletionCancel = "No: do not delete event";
+
+    g_editorStrings.eventsPromptEventText = "Event text";
+    g_editorStrings.eventsPromptEventName = "Event name";
+    g_editorStrings.eventsItemNewEvent = "<New Event>";
+
+    g_editorStrings.eventsShouldEvent = "Should Event {0}";
+    g_editorStrings.eventsChangeSectionBoundsToCurrent = "Change section {0} bounds to current?";
+    g_editorStrings.eventsChangeAllSectionBoundsToCurrent = "Change all section bounds to current?";
+
+    g_editorStrings.eventsControlsForEvent = "Controls for event";
+    g_editorStrings.eventsSettingsForEvent = "Settings for event";
+    g_editorStrings.eventsHeaderShow = "Show:";
+    g_editorStrings.eventsHeaderHide = "Hide:";
+    g_editorStrings.eventsHeaderToggle = "Toggle:";
+    g_editorStrings.eventsHeaderMove = "Move:";
+
+    g_editorStrings.eventsActionKeep = "Keep";
+    g_editorStrings.eventsActionReset = "Reset";
+    g_editorStrings.eventsActionSet = "Set";
+
+    g_editorStrings.eventsCaseMusic = "Music";
+    g_editorStrings.eventsCaseBackground = "BG";
+    g_editorStrings.eventsCaseBounds = "Bounds";
+
+    g_editorStrings.eventsPhraseAllSections = "All Sections";
+
+    g_editorStrings.eventsPropAutostart = "Autostart";
+    g_editorStrings.eventsPropSound = "Sound";
+    g_editorStrings.eventsPropEndGame = "End Game";
+    g_editorStrings.eventsPropControls = "Controls";
+
+    g_editorStrings.eventsHeaderTriggerEvent = "Trigger:";
+
+    g_editorStrings.layersHeader = "Layers:";
 
     g_editorStrings.labelLayer = "Layer:";
     g_editorStrings.labelAbbrevAttLayer = "Att: ";

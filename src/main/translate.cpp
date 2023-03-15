@@ -243,6 +243,17 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.wordProfiles", &g_mainMenu.wordProfiles},
         {"menu.controls.wordButtons", &g_mainMenu.wordButtons},
 
+        {"menu.controls.buttons.up", &g_mainMenu.buttonUp},
+        {"menu.controls.buttons.down", &g_mainMenu.buttonDown},
+        {"menu.controls.buttons.left", &g_mainMenu.buttonLeft},
+        {"menu.controls.buttons.right", &g_mainMenu.buttonRight},
+        {"menu.controls.buttons.jump", &g_mainMenu.buttonJump},
+        {"menu.controls.buttons.run", &g_mainMenu.buttonRun},
+        {"menu.controls.buttons.altJump", &g_mainMenu.buttonAltJump},
+        {"menu.controls.buttons.altRun", &g_mainMenu.buttonAltRun},
+        {"menu.controls.buttons.start", &g_mainMenu.buttonStart},
+        {"menu.controls.buttons.drop", &g_mainMenu.buttonDrop},
+
         {"menu.controls.controlsReallyDeleteProfile", &g_mainMenu.controlsReallyDeleteProfile},
         {"menu.controls.controlsNewProfile", &g_mainMenu.controlsNewProfile},
 
@@ -298,7 +309,6 @@ XTechTranslate::XTechTranslate()
         {"editor.npc.gen.effectIs",         &g_editorStrings.npcGenEffectIs},
         {"editor.npc.gen.effectWarp",       &g_editorStrings.npcGenEffectWarp},
         {"editor.npc.gen.effectShoot",      &g_editorStrings.npcGenEffectShoot},
-        {"editor.npc.gen.delayIsMs",        &g_editorStrings.npcGenDelayIsMs},
 
         {"editor.wordNPC.nominative",       &g_editorStrings.wordNPC},
         {"editor.wordNPC.genitive",         &g_editorStrings.wordNPCGenitive},
@@ -310,9 +320,19 @@ XTechTranslate::XTechTranslate()
 
         {"editor.wordEnabled",              &g_editorStrings.wordEnabled},
         {"editor.wordText",                 &g_editorStrings.wordText},
+        {"editor.wordInstant",              &g_editorStrings.wordInstant},
         {"editor.phraseTextOf",             &g_editorStrings.phraseTextOf},
         {"editor.phraseSectionIndex",       &g_editorStrings.phraseSectionIndex},
         {"editor.phraseRadiusIndex",        &g_editorStrings.phraseRadiusIndex},
+        {"editor.phraseDelayIsMs",          &g_editorStrings.phraseDelayIsMs},
+        {"editor.phraseCountMore",          &g_editorStrings.phraseCountMore},
+        {"editor.phraseAreYouSure",         &g_editorStrings.phraseAreYouSure},
+        {"editor.pageBlankOfBlank",         &g_editorStrings.pageBlankOfBlank},
+
+        {"editor.letterUp",                 &g_editorStrings.letterUp},
+        {"editor.letterDown",               &g_editorStrings.letterDown},
+        {"editor.letterLeft",               &g_editorStrings.letterLeft},
+        {"editor.letterRight",              &g_editorStrings.letterRight},
 
         {"editor.events.header",            &g_editorStrings.eventsHeader},
         {"editor.events.letterActivate",    &g_editorStrings.eventsLetterActivate},
@@ -320,8 +340,47 @@ XTechTranslate::XTechTranslate()
         {"editor.events.letterTalk",        &g_editorStrings.eventsLetterTalk},
         {"editor.events.letterLayerClear",  &g_editorStrings.eventsLetterLayerClear},
 
-        {"editor.layer.label",              &g_editorStrings.labelLayer},
-        {"editor.layer.labelAbbrevAttLayer", &g_editorStrings.labelAbbrevAttLayer},
+        {"editor.events.deletion.deletingEvent",    &g_editorStrings.eventsDeletingEvent},
+        {"editor.events.deletion.confirm",          &g_editorStrings.eventsDeletionConfirm},
+        {"editor.events.deletion.cancel",           &g_editorStrings.eventsDeletionCancel},
+
+        {"editor.events.promptEventText",  &g_editorStrings.eventsPromptEventText},
+        {"editor.events.promptEventName",  &g_editorStrings.eventsPromptEventName},
+        {"editor.events.itemNewEvent",     &g_editorStrings.eventsItemNewEvent},
+
+        {"editor.events.bounds.shouldEvent",     &g_editorStrings.eventsShouldEvent},
+        {"editor.events.bounds.changeSectionBoundsToCurrent",     &g_editorStrings.eventsChangeSectionBoundsToCurrent},
+        {"editor.events.bounds.changeAllSectionBoundsToCurrent",     &g_editorStrings.eventsChangeAllSectionBoundsToCurrent},
+
+        {"editor.events.controlsForEvent",     &g_editorStrings.eventsControlsForEvent},
+        {"editor.events.settingsForEvent",     &g_editorStrings.eventsSettingsForEvent},
+
+        {"editor.events.layers.headerShow",     &g_editorStrings.eventsHeaderShow},
+        {"editor.events.layers.headerHide",     &g_editorStrings.eventsHeaderHide},
+        {"editor.events.layers.headerToggle",     &g_editorStrings.eventsHeaderToggle},
+        {"editor.events.layers.headerMove",     &g_editorStrings.eventsHeaderMove},
+
+        {"editor.events.sections.actionKeep",     &g_editorStrings.eventsActionKeep},
+        {"editor.events.sections.actionReset",     &g_editorStrings.eventsActionReset},
+        {"editor.events.sections.actionSet",     &g_editorStrings.eventsActionSet},
+
+        {"editor.events.sections.propMusic",     &g_editorStrings.eventsCaseMusic},
+        {"editor.events.sections.propBackground",     &g_editorStrings.eventsCaseBackground},
+        {"editor.events.sections.propBounds",     &g_editorStrings.eventsCaseBounds},
+
+        {"editor.events.sections.phraseAllSections",     &g_editorStrings.eventsPhraseAllSections},
+
+        {"editor.events.props.autostart",     &g_editorStrings.eventsPropAutostart},
+        {"editor.events.props.sound",         &g_editorStrings.eventsPropSound},
+        {"editor.events.props.endGame",       &g_editorStrings.eventsPropEndGame},
+        {"editor.events.props.controls",      &g_editorStrings.eventsPropControls},
+
+        {"editor.events.headerTriggerEvent",  &g_editorStrings.eventsHeaderTriggerEvent},
+
+        {"editor.layers.header",              &g_editorStrings.layersHeader},
+
+        {"editor.layers.label",               &g_editorStrings.labelLayer},
+        {"editor.layers.labelAbbrevAttLayer", &g_editorStrings.labelAbbrevAttLayer},
 #endif // THEXTECH_ENABLE_EDITOR
     };
 
