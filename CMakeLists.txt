@@ -259,9 +259,12 @@ if(NINTENDO_DS)
     set(THEXTECH_NO_SDL_BUILD ON CACHE BOOL "" FORCE)
 endif()
 
-if(ANDROID OR EMSCRIPTEN)
-    set(THEXTECH_BUILD_GL_LEGACY OFF CACHE BOOL "" FORCE)
+if(ANDROID OR EMSCRIPTEN OR NINTENDO_SWITCH)
     set(THEXTECH_GL_ES_ONLY ON CACHE BOOL "" FORCE)
+endif()
+
+if(EMSCRIPTEN OR NINTENDO_SWITCh)
+    set(THEXTECH_BUILD_GL_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
 
 # ============ Platform-conf ==end=========
@@ -881,6 +884,10 @@ endif()
 
 if(NINTENDO_SWITCH)
     target_link_libraries(A2XT_Int INTERFACE nx)
+
+    if(THEXTECH_BUILD_GL_MODERN)
+        target_link_libraries(A2XT_Int INTERFACE GLESv2)
+    endif()
 
     # Set explicit flags for this project
     target_compile_definitions(thextech PRIVATE -D__SWITCH__ -DNO_INTPTROC)

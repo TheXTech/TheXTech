@@ -20,8 +20,12 @@
 
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
+
+#ifndef THEXTECH_GL_ES_ONLY
 #include <SDL2/SDL_opengl.h>
-// #include <SDL2/SDL_opengles2.h>
+#endif
+
+#include <SDL2/SDL_opengles.h>
 
 #include <FreeImageLite.h>
 #include <Graphics/graphics_funcs.h>
@@ -45,7 +49,11 @@
 #define UNUSED(x) (void)x
 #endif
 
-
+#ifdef THEXTECH_GL_ES_ONLY
+static constexpr bool s_gles_mode = true;
+#else
+static bool s_gles_mode = false;
+#endif
 
 
 RenderGL11::RenderGL11() :
@@ -79,14 +87,32 @@ bool RenderGL11::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     Uint32 renderFlags = 0;
 
-    // SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#ifndef THEXTECH_GL_ES_ONLY
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+    s_gles_mode = false;
+#else
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+#endif
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 
     m_gContext = SDL_GL_CreateContext(m_window);
+
+#ifndef THEXTECH_GL_ES_ONLY
+    if(!m_gContext)
+    {
+        pLogWarning("Unable to create GL compatibility 1.1 profile, attempting GLES 1.1.");
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
+        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
+
+        m_gContext = SDL_GL_CreateContext(m_window);
+        s_gles_mode = true;
+    }
+#endif
 
     if(!m_gContext)
     {
@@ -265,7 +291,14 @@ void RenderGL11::applyViewport()
     glLoadIdentity();
 
     // pLogDebug("Setting projection to %d %d %d %d", off_x, m_viewport_w + off_x, m_viewport_h + off_y, off_y);
-    glOrtho( off_x, viewport_w + off_x, viewport_h + off_y, off_y, -1, 1);
+#ifndef THEXTECH_GL_ES_ONLY
+    if(s_gles_mode)
+        glOrthof( off_x, viewport_w + off_x, viewport_h + off_y, off_y, -1, 1);
+    else
+        glOrtho( off_x, viewport_w + off_x, viewport_h + off_y, off_y, -1, 1);
+#else
+    glOrthof( off_x, viewport_w + off_x, viewport_h + off_y, off_y, -1, 1);
+#endif
 }
 
 void RenderGL11::updateViewport()
@@ -374,7 +407,14 @@ void RenderGL11::setTargetScreen()
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
 
-    glOrtho(0, hardware_w, hardware_h, 0, -1, 1);
+#ifndef THEXTECH_GL_ES_ONLY
+    if(s_gles_mode)
+        glOrthof(0, hardware_w, hardware_h, 0, -1, 1);
+    else
+        glOrtho(0, hardware_w, hardware_h, 0, -1, 1);
+#else
+    glOrthof(0, hardware_w, hardware_h, 0, -1, 1);
+#endif
 }
 
 void RenderGL11::prepareDrawMask()
@@ -403,6 +443,8 @@ void RenderGL11::prepareDrawImage()
     if(m_draw_mask_mode == 0)
     {
         // bitwise or
+        glDisable(GL_COLOR_LOGIC_OP);
+        glEnable(GL_COLOR_LOGIC_OP);
         glLogicOp(GL_OR);
     }
     else if(m_draw_mask_mode == 1)
@@ -472,11 +514,16 @@ static int s_nextPowerOfTwo(int val)
 
 void RenderGL11::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch, bool is_mask, uint32_t least_width, uint32_t least_height)
 {
+    // clear pre-existing errors
+    GLuint err;
+    while((err = glGetError()) != 0)
+        pLogWarning("Render GL: got GL error code %d prior to texture load", (int)err);
+
     // SDL_Surface *surface;
     // SDL_Texture *texture = nullptr;
 
     target.d.nOfColors = GL_RGBA;
-    target.d.format = GL_BGRA;
+    target.d.format = GL_RGBA;
 
     GLuint tex_id;
 
@@ -542,8 +589,8 @@ void RenderGL11::loadTexture(StdPicture &target, uint32_t width, uint32_t height
     glGenTextures(1, &tex_id);
     glBindTexture(GL_TEXTURE_2D, tex_id);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -578,7 +625,8 @@ void RenderGL11::loadTexture(StdPicture &target, uint32_t width, uint32_t height
         target.l.h_scale /= pad_h;
     }
 
-    GLenum err = glGetError();
+    // check for errors as a result of texture load
+    err = glGetError();
     if(err != GL_NO_ERROR && is_mask)
     {
         glDeleteTextures(1, &tex_id);
@@ -699,10 +747,10 @@ void RenderGL11::renderRect(int x, int y, int w, int h, float red, float green, 
     {
         const float world_coords[] = {x1, y1,
                                       x1, y2,
-                                      x2, y2,
-                                      x2, y1};
+                                      x2, y1,
+                                      x2, y2};
         glVertexPointer(2, GL_FLOAT, 0, world_coords);
-        glDrawArrays(GL_QUADS, 0, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
     else
     {
@@ -710,10 +758,10 @@ void RenderGL11::renderRect(int x, int y, int w, int h, float red, float green, 
         const float world_coords[] =
             {x1, y1,  x1, y2,  x1 + 1, y2,  x1 + 1, y1,
              x2 - 1, y1,  x2 - 1, y2,  x2, y2,  x2, y1,
-             x1, y1,  x1, y1 + 1,  x2, y1 + 1,  x2, y1,
-             x1, y2 - 1,  x1, y2,  x2, y2,  x2, y2 - 1};
+             x1, y2 - 1,  x1, y2,  x2, y2,  x2, y2 - 1,
+             x1, y1,  x1, y1 + 1,  x2, y1 + 1,  x2, y1};
         glVertexPointer(2, GL_FLOAT, 0, world_coords);
-        glDrawArrays(GL_QUADS, 0, 16);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 16);
     }
 }
 
@@ -730,15 +778,15 @@ void RenderGL11::renderRectBR(int _left, int _top, int _right, int _bottom, floa
 
     const float world_coords[] = {x1, y1,
         x1, y2,
-        x2, y2,
-        x2, y1};
+        x2, y1,
+        x2, y2};
 
     glColor4f(red, green, blue, alpha);
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 }
 
@@ -757,18 +805,20 @@ void RenderGL11::renderCircle(int cx, int cy, int radius, float red, float green
     double line_size = 2;
     double dy = line_size;
 
-    const int verts = 16;
+    const int verts = 32;
 
-    float world_coords[verts * 2];
+    float world_coords[verts * 2 + 4];
+    world_coords[0] = cx;
+    world_coords[1] = cy;
 
-    for(int i = 0; i < verts; i++)
+    for(int i = 0; i < verts + 1; i++)
     {
         float theta = i * (float)PI * 2 / verts;
         float x = cx + radius * cosf(theta);
         float y = cy + radius * sinf(theta);
 
-        world_coords[2 * i] = x;
-        world_coords[2 * i + 1] = y;
+        world_coords[2 * i + 2] = x;
+        world_coords[2 * i + 1 + 2] = y;
     }
 
     glColor4f(red, green, blue, alpha);
@@ -776,7 +826,7 @@ void RenderGL11::renderCircle(int cx, int cy, int radius, float red, float green
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glVertexPointer(2, GL_FLOAT, 0, world_coords);
-    glDrawArrays(GL_POLYGON, 0, verts);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, verts + 2);
 }
 
 void RenderGL11::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
@@ -876,13 +926,13 @@ void RenderGL11::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
 
     const float world_coords[] = {x1, y1,
         x1, y2,
-        x2, y2,
-        x2, y1};
+        x2, y1,
+        x2, y2};
 
     const float tex_coords[] = {u1, v1,
         u1, v2,
-        u2, v2,
-        u2, v1};
+        u2, v1,
+        u2, v2};
 
     glColor4f(red, green, blue, alpha);
 
@@ -894,7 +944,7 @@ void RenderGL11::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
         glVertexPointer(2, GL_FLOAT, 0, world_coords);
         glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
 
-        glDrawArrays(GL_QUADS, 0, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         prepareDrawImage();
     }
@@ -903,7 +953,7 @@ void RenderGL11::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, 
 
     glVertexPointer(2, GL_FLOAT, 0, world_coords);
     glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     if(tx.d.mask_texture_id)
     {
@@ -943,13 +993,13 @@ void RenderGL11::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
     const float world_coords[] = {x1, y1,
         x1, y2,
-        x2, y2,
-        x2, y1};
+        x2, y1,
+        x2, y2};
 
     const float tex_coords[] = {u1, v1,
         u1, v2,
-        u2, v2,
-        u2, v1};
+        u2, v1,
+        u2, v2};
 
     glColor4f(red, green, blue, alpha);
 
@@ -961,7 +1011,7 @@ void RenderGL11::renderTextureScale(double xDst, double yDst, double wDst, doubl
         glVertexPointer(2, GL_FLOAT, 0, world_coords);
         glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
 
-        glDrawArrays(GL_QUADS, 0, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         prepareDrawImage();
     }
@@ -970,7 +1020,7 @@ void RenderGL11::renderTextureScale(double xDst, double yDst, double wDst, doubl
 
     glVertexPointer(2, GL_FLOAT, 0, world_coords);
     glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     if(tx.d.mask_texture_id)
     {
@@ -1033,13 +1083,13 @@ void RenderGL11::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     const float world_coords[] = {x1, y1,
         x1, y2,
-        x2, y2,
-        x2, y1};
+        x2, y1,
+        x2, y2};
 
     const float tex_coords[] = {u1, v1,
         u1, v2,
-        u2, v2,
-        u2, v1};
+        u2, v1,
+        u2, v2};
 
     glColor4f(red, green, blue, alpha);
 
@@ -1051,7 +1101,7 @@ void RenderGL11::renderTexture(double xDstD, double yDstD, double wDstD, double 
         glVertexPointer(2, GL_FLOAT, 0, world_coords);
         glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
 
-        glDrawArrays(GL_QUADS, 0, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         prepareDrawImage();
     }
@@ -1060,7 +1110,7 @@ void RenderGL11::renderTexture(double xDstD, double yDstD, double wDstD, double 
 
     glVertexPointer(2, GL_FLOAT, 0, world_coords);
     glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     if(tx.d.mask_texture_id)
     {
@@ -1137,13 +1187,13 @@ void RenderGL11::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
 
     const float world_coords[] = {x1, y1,
         x1, y2,
-        x2, y2,
-        x2, y1};
+        x2, y1,
+        x2, y2};
 
     const float tex_coords[] = {u1, v1,
         u1, v2,
-        u2, v2,
-        u2, v1};
+        u2, v1,
+        u2, v2};
 
     glColor4f(red, green, blue, alpha);
 
@@ -1155,7 +1205,7 @@ void RenderGL11::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
         glVertexPointer(2, GL_FLOAT, 0, world_coords);
         glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
 
-        glDrawArrays(GL_QUADS, 0, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         prepareDrawImage();
     }
@@ -1164,7 +1214,7 @@ void RenderGL11::renderTextureFL(double xDstD, double yDstD, double wDstD, doubl
 
     glVertexPointer(2, GL_FLOAT, 0, world_coords);
     glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     if(tx.d.mask_texture_id)
     {
@@ -1206,13 +1256,13 @@ void RenderGL11::renderTexture(float xDst, float yDst,
 
     const float world_coords[] = {x1, y1,
         x1, y2,
-        x2, y2,
-        x2, y1};
+        x2, y1,
+        x2, y2};
 
     const float tex_coords[] = {u1, v1,
         u1, v2,
-        u2, v2,
-        u2, v1};
+        u2, v1,
+        u2, v2};
 
     glColor4f(red, green, blue, alpha);
 
@@ -1224,7 +1274,7 @@ void RenderGL11::renderTexture(float xDst, float yDst,
         glVertexPointer(2, GL_FLOAT, 0, world_coords);
         glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
 
-        glDrawArrays(GL_QUADS, 0, 4);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
         prepareDrawImage();
     }
@@ -1233,7 +1283,7 @@ void RenderGL11::renderTexture(float xDst, float yDst,
 
     glVertexPointer(2, GL_FLOAT, 0, world_coords);
     glTexCoordPointer(2, GL_FLOAT, 0, tex_coords);
-    glDrawArrays(GL_QUADS, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     if(tx.d.mask_texture_id)
     {
