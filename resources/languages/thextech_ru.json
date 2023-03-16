@@ -127,6 +127,18 @@
         "error": {
             "openFileFailed": "ОШИБКА: Не удаётся открыть \"{0}\": файл не существует или повреждён.",
             "warpNeedStarCount": "Требуется {0} {1}, чтобы войти."
+        },
+        "pause": {
+            "continue": "",
+            "dropAddPlayers": "",
+            "enterCode": "",
+            "quit": "",
+            "quitTesting": "",
+            "resetCheckpoints": "",
+            "restartLevel": "",
+            "returnToEditor": "",
+            "saveAndContinue": "",
+            "saveAndQuit": ""
         }
     },
     "languageName": "Русский",

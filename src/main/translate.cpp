@@ -281,6 +281,17 @@ XTechTranslate::XTechTranslate()
 
         {"game.error.warpNeedStarCount",            &g_gameStrings.warpNeedStarCount},
 
+        {"game.pause.continue",             &g_gameStrings.pauseItemContinue},
+        {"game.pause.restartLevel",         &g_gameStrings.pauseItemRestartLevel},
+        {"game.pause.resetCheckpoints",     &g_gameStrings.pauseItemResetCheckpoints},
+        {"game.pause.quitTesting",          &g_gameStrings.pauseItemQuitTesting},
+        {"game.pause.returnToEditor",       &g_gameStrings.pauseItemReturnToEditor},
+        {"game.pause.dropAddPlayers",       &g_gameStrings.pauseItemDropAddPlayers},
+        {"game.pause.enterCode",            &g_gameStrings.pauseItemEnterCode},
+        {"game.pause.saveAndContinue",      &g_gameStrings.pauseItemSaveAndContinue},
+        {"game.pause.saveAndQuit",          &g_gameStrings.pauseItemSaveAndQuit},
+        {"game.pause.quit",                 &g_gameStrings.pauseItemQuit},
+
 
 #ifdef THEXTECH_ENABLE_EDITOR
         {"editor.block.pickContents1",      &g_editorStrings.pickBlockContents1},

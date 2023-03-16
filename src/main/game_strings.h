@@ -33,6 +33,17 @@ struct GameContent
     std::string errorOpenFileFailed;
 
     std::string warpNeedStarCount;
+
+    std::string pauseItemContinue;
+    std::string pauseItemRestartLevel;
+    std::string pauseItemResetCheckpoints;
+    std::string pauseItemQuitTesting;
+    std::string pauseItemReturnToEditor;
+    std::string pauseItemDropAddPlayers;
+    std::string pauseItemEnterCode;
+    std::string pauseItemSaveAndContinue;
+    std::string pauseItemSaveAndQuit;
+    std::string pauseItemQuit;
 };
 
 extern GameContent g_gameStrings;

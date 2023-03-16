@@ -30,4 +30,15 @@ void initGameStrings()
     g_gameStrings.errorOpenFileFailed = "ERROR: Can't open \"{0}\": file doesn't exist or corrupted.";
 
     g_gameStrings.warpNeedStarCount = "You need {0} {1} to enter.";
+
+    g_gameStrings.pauseItemContinue = "Continue";
+    g_gameStrings.pauseItemRestartLevel = "Restart Level";
+    g_gameStrings.pauseItemResetCheckpoints = "Reset Checkpoints";
+    g_gameStrings.pauseItemQuitTesting = "Quit Testing";
+    g_gameStrings.pauseItemReturnToEditor = "Return to Editor";
+    g_gameStrings.pauseItemDropAddPlayers = "Drop/Add Players";
+    g_gameStrings.pauseItemEnterCode = "Enter Code";
+    g_gameStrings.pauseItemSaveAndContinue = "Save and Continue";
+    g_gameStrings.pauseItemSaveAndQuit = "Save and Quit";
+    g_gameStrings.pauseItemQuit = "Quit";
 }

@@ -45,6 +45,8 @@
 #include "speedrunner.h"
 #include "cheat_code.h"
 
+#include "main/game_strings.h"
+
 #include "editor.h"
 
 namespace PauseScreen
@@ -107,7 +109,7 @@ static bool s_DropAddScreen()
 
 static bool s_CheatScreen()
 {
-    cheats_setBuffer(TextEntryScreen::Run("Enter cheat:"));
+    cheats_setBuffer(TextEntryScreen::Run(g_gameStrings.pauseItemEnterCode));
     // uncomment this if you want to return to the pause menu
     // MenuCursorCanMove = false;
     // return false;
@@ -200,49 +202,49 @@ void Init(int plr, bool LegacyPause)
     // pause
     if(TestLevel && LevelBeatCode == -2)
     {
-        s_items.push_back(MenuItem{"RESTART", s_RestartLevel});
-        s_items.push_back(MenuItem{"RESET CHECKPOINTS", s_ResetCheckpoints});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
 
         if(Backup_FullFileName.empty())
-            s_items.push_back(MenuItem{"QUIT TESTING", s_QuitTesting});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
         else
-            s_items.push_back(MenuItem{"RETURN TO EDITOR", s_QuitTesting});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemReturnToEditor, s_QuitTesting});
     }
     else if(TestLevel)
     {
-        s_items.push_back(MenuItem{"CONTINUE", s_Continue});
-        s_items.push_back(MenuItem{"RESTART LEVEL", s_RestartLevel});
-        s_items.push_back(MenuItem{"RESET CHECKPOINTS", s_ResetCheckpoints});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
 
         if(g_compatibility.allow_drop_add && !LegacyPause)
-            s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
         if(g_config.enter_cheats_menu_item && !LegacyPause)
-            s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
         if(Backup_FullFileName.empty())
-            s_items.push_back(MenuItem{"QUIT TESTING", s_QuitTesting});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
         else
-            s_items.push_back(MenuItem{"RETURN TO EDITOR", s_QuitTesting});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemReturnToEditor, s_QuitTesting});
     }
     else
     {
-        s_items.push_back(MenuItem{"CONTINUE", s_Continue});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
 
         if(g_compatibility.allow_drop_add && !LegacyPause)
-            s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
         if(g_config.enter_cheats_menu_item && !LegacyPause)
-            s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
         if(CanSave)
         {
-            s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
-            s_items.push_back(MenuItem{"SAVE & QUIT", s_Quit});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemSaveAndContinue, s_SaveAndContinue});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemSaveAndQuit, s_Quit});
         }
         else
         {
-            s_items.push_back(MenuItem{"QUIT", s_Quit});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuit, s_Quit});
         }
     }
 }
