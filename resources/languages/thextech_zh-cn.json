@@ -39,7 +39,7 @@
             "promptEventName": "事件名称：",
             "promptEventText": "文字信息：",
             "props": {
-                "autostart": "进入关卡时开始",
+                "autostart": "进入关卡时启动",
                 "controls": "按键",
                 "endGame": "游戏通关",
                 "sound": "音效"
