@@ -293,7 +293,13 @@ struct screen_t
 template<class MyRef_t>
 inline Location_t extract_loc(MyRef_t obj)
 {
-    return obj->Location;
+    return static_cast<Location_t>(obj->Location);
+}
+
+template<>
+inline Location_t extract_loc(WorldLevelRef_t obj)
+{
+    return obj->LocationGFX();
 }
 
 template<>
@@ -323,7 +329,7 @@ inline Location_t extract_loc(NPCRef_t obj)
 template<class MyRef_t>
 inline Location_t extract_loc_layer(MyRef_t obj)
 {
-    Location_t loc = obj->Location;
+    Location_t loc = static_cast<Location_t>(obj->Location);
 
     if(obj->Layer != LAYER_NONE)
     {

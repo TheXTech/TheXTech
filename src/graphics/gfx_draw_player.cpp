@@ -34,6 +34,7 @@
 int pfrX(const StdPicture& tx, const Player_t& p)
 {
 #if !defined(THEXTECH_WIP_FEATURES) && !defined(__16M__)
+    UNUSED(tx);
     return ((p.Frame * p.Direction + 49) / 10) * 100;
 
 #else
@@ -71,6 +72,7 @@ int pfrX(const StdPicture& tx, const Player_t& p)
 int pfrY(const StdPicture& tx, const Player_t& p)
 {
 #if !defined(THEXTECH_WIP_FEATURES) && !defined(__16M__)
+    UNUSED(tx);
     return ((p.Frame * p.Direction + 49) % 10) * 100;
 
 #else

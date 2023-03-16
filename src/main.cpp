@@ -129,7 +129,7 @@ void SwapClockSpeed()
 
 #endif
 
-
+#ifndef THEXTECH_NO_ARGV_HANDLING
 static void strToPlayerSetup(int player, const std::string &setupString)
 {
     if(setupString.empty())
@@ -190,6 +190,7 @@ static void strToPlayerSetup(int player, const std::string &setupString)
         break;
     }
 }
+#endif
 
 extern "C"
 int main(int argc, char**argv)
@@ -548,6 +549,8 @@ int main(int argc, char**argv)
         return 2;
     }
 #else
+    UNUSED(argc);
+    UNUSED(argv);
 
     printf("Launching AppPath...\n");
     AppPathManager::initAppPath();

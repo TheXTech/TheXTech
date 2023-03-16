@@ -304,7 +304,7 @@ void RenderGL11::applyViewport()
 void RenderGL11::updateViewport()
 {
     int hardware_w, hardware_h;
-    XWindow::getWindowSize(&hardware_w, &hardware_h);
+    getRenderSize(&hardware_w, &hardware_h);
 
     // if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
     {
@@ -380,6 +380,11 @@ void RenderGL11::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_
     *window_y = (float)scr_y * m_phys_h / ScreenH + m_phys_y;
 }
 
+void RenderGL11::getRenderSize(int *w, int *h)
+{
+    SDL_GL_GetDrawableSize(m_window, w, h);
+}
+
 void RenderGL11::setTargetTexture()
 {
     if(!m_recentTargetScreen)
@@ -397,7 +402,7 @@ void RenderGL11::setTargetScreen()
     m_recentTargetScreen = true;
 
     int hardware_w, hardware_h;
-    XWindow::getWindowSize(&hardware_w, &hardware_h);
+    getRenderSize(&hardware_w, &hardware_h);
 
     glViewport(0,
             0,

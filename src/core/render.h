@@ -136,6 +136,19 @@ E_INLINE void offsetViewportIgnore(bool en) TAIL
 }
 #endif
 
+
+/*!
+ * \brief Get the current size of the window in render pixels
+ * \param w Width
+ * \param h Height
+ */
+E_INLINE void getRenderSize(int *w, int *h) TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->getRenderSize(w, h);
+}
+#endif
+
 /*!
  * \brief Map absolute point coordinate into screen relative
  * \param x Window X position

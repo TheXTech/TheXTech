@@ -126,9 +126,22 @@ public:
      */
     void offsetViewportIgnore(bool en) override;
 
+    /*!
+     * \brief Maps from cursor coordinates to game screen coordinates
+     */
     void mapToScreen(int x, int y, int *dx, int *dy) override;
 
+    /*!
+     * \brief Maps from game screen coordinates to cursor coordinates
+     */
     void mapFromScreen(int x, int y, int *dx, int *dy) override;
+
+    /*!
+     * \brief Get the current size of the window in render pixels
+     * \param w Width
+     * \param h Height
+     */
+    void getRenderSize(int *w, int *h) override;
 
     /*!
      * \brief Set render target into the virtual in-game screen (use to render in-game world)

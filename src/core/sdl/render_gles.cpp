@@ -1170,7 +1170,7 @@ void RenderGLES::repaint()
         clearBuffer();
 
         int hardware_w, hardware_h;
-        XWindow::getWindowSize(&hardware_w, &hardware_h);
+        getRenderSize(&hardware_w, &hardware_h);
 
         // draw screen at correct physical coordinates
         GLshort x1 = m_phys_x;
@@ -1316,7 +1316,7 @@ void RenderGLES::updateViewport()
     flushDrawQueues();
 
     int hardware_w, hardware_h;
-    XWindow::getWindowSize(&hardware_w, &hardware_h);
+    getRenderSize(&hardware_w, &hardware_h);
 
     // if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
     {
@@ -1398,6 +1398,11 @@ void RenderGLES::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_
     *window_y = (float)scr_y * m_phys_h / ScreenH + m_phys_y;
 }
 
+void RenderGLES::getRenderSize(int *w, int *h)
+{
+    SDL_GL_GetDrawableSize(m_window, w, h);
+}
+
 void RenderGLES::setTargetTexture()
 {
     if(!m_recentTargetScreen)
@@ -1424,7 +1429,7 @@ void RenderGLES::setTargetScreen()
     m_recentTargetScreen = true;
 
     int hardware_w, hardware_h;
-    XWindow::getWindowSize(&hardware_w, &hardware_h);
+    getRenderSize(&hardware_w, &hardware_h);
 
     glViewport(0,
             0,

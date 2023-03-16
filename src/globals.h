@@ -29,6 +29,7 @@
 #include "std_picture.h"
 
 #include "location.h"
+#include "pinched_info.h"
 #include "range_arr.hpp"
 #include "ref_type.h"
 #include "rand.h"
@@ -247,37 +248,42 @@ struct NPC_t
 //    AttLayer As String
     layerindex_t AttLayer = LAYER_NONE;
 //    Quicksand As Integer
-    int Quicksand = 0;
+    vbint_t Quicksand = 0;
 //    RespawnDelay As Integeri
-    int RespawnDelay = 0;
+    vbint_t RespawnDelay = 0;
 //    Bouce As Boolean
     bool Bouce = false;
+
 //    Pinched1 As Integer  'getting smashed by a block
-    int Pinched1 = 0;
+    // int Pinched1 = 0;
 //    Pinched2 As Integer
-    int Pinched2 = 0;
+    // int Pinched2 = 0;
 //    Pinched3 As Integer
-    int Pinched3 = 0;
+    // int Pinched3 = 0;
 //    Pinched4 As Integer
-    int Pinched4 = 0;
+    // int Pinched4 = 0;
 //    MovingPinched As Integer 'required to be smashed
-    int MovingPinched = 0;
+    // int MovingPinched = 0;
+
+    // NEW: replaces above with bitfield
+    PinchedInfo_t Pinched = PinchedInfo_t();
+
 //    NetTimeout As Integer 'for online
     // int NetTimeout = 0;    // unused since SMBX64, removed
 //    RealSpeedX As Single 'the real speed of the NPC
     float RealSpeedX = 0.0f;
 //    Wet As Integer ' greater then 0 of the NPC is in water
-    int Wet = 0;
+    vbint_t Wet = 0;
 //    Settings As Integer
     // int Settings = 0;    // unused since SMBX64, removed
 //    NoLavaSplash As Boolean 'true for no lava splash
     bool NoLavaSplash = false;
 //    Slope As Integer 'the block that the NPC is on a slope with
-    int Slope = 0;
+    vbint_t Slope = 0;
 //    Multiplier As Integer 'for upping the points the player recieves
-    int Multiplier = 0;
+    vbint_t Multiplier = 0;
 //    TailCD As Integer 'if greater then 0 the player can't hit with it's tail
-    int TailCD = 0;
+    vbint_t TailCD = 0;
 //    Shadow As Boolean 'if true turn the NPC black and allow it to pass through walls.  only used for a cheat code
     bool Shadow = false;
 //    TriggerActivate As String 'for events - triggers when NPC gets activated
@@ -315,9 +321,9 @@ struct NPC_t
 //    BeltSpeed As Single 'The speed of the object this NPC is standing on
     float BeltSpeed = 0.0f;
 //    standingOnPlayer As Integer 'If this NPC is standing on a player in the clown car
-    int standingOnPlayer = 0;
+    vbint_t standingOnPlayer = 0;
 //    standingOnPlayerY As Integer
-    int standingOnPlayerY = 0;
+    vbint_t standingOnPlayerY = 0;
 //    Generator As Boolean 'for spawning new NPCs
     bool Generator = false;
 //    GeneratorTimeMax As Single
@@ -325,9 +331,9 @@ struct NPC_t
 //    GeneratorTime As Single
     float GeneratorTime = 0.0f;
 //    GeneratorDirection As Integer
-    int GeneratorDirection = 0;
+    vbint_t GeneratorDirection = 0;
 //    GeneratorEffect As Integer
-    int GeneratorEffect = 0;
+    vbint_t GeneratorEffect = 0;
 //    GeneratorActive As Boolean
     bool GeneratorActive = false;
 //    playerTemp As Boolean
@@ -340,15 +346,15 @@ struct NPC_t
 //    DefaultDirection As Single
     float DefaultDirection = 0.0f;
 //    DefaultType As Integer
-    int DefaultType = 0;
+    vbint_t DefaultType = 0;
 //    DefaultSpecial As Integer
-    int DefaultSpecial = 0;
+    vbint_t DefaultSpecial = 0;
 //    DefaultSpecial2 As Integer
-    int DefaultSpecial2 = 0;
+    vbint_t DefaultSpecial2 = 0;
 //    Type As Integer 'Defines what NPC this is.  1 for goomba, 2 for red goomba, etc.
-    int Type = 0;
+    vbint_t Type = 0;
 //    Frame As Integer 'The graphic to be shown
-    int Frame = 0;
+    vbint_t Frame = 0;
 //    FrameCount As Single 'The counter for incrementing the frames
     float FrameCount = 0.0f;
 //    Direction As Single 'The direction the NPC is walking
@@ -371,41 +377,41 @@ struct NPC_t
 //    TurnAround As Boolean 'if the NPC needs to turn around
     bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.
-    int Killed = 0;
+    vbint_t Killed = 0;
 //    Active As Boolean 'If on screen
     bool Active = false;
 //    Reset(1 To 2) As Boolean 'If it can display the NPC
     RangeArrI<bool, 1, 2, false> Reset;
 //    TimeLeft As Integer 'Time left before reset when not on screen
-    int TimeLeft = 0;
+    vbint_t TimeLeft = 0;
 //    HoldingPlayer As Integer 'Who is holding it
-    int HoldingPlayer = 0;
+    vbint_t HoldingPlayer = 0;
 //    CantHurt As Integer 'Won't hurt the player
-    int CantHurt = 0;
+    vbint_t CantHurt = 0;
 //    CantHurtPlayer As Integer
-    int CantHurtPlayer = 0;
+    vbint_t CantHurtPlayer = 0;
 //    BattleOwner As Integer 'Owner of the projectile
-    int BattleOwner = 0;
+    vbint_t BattleOwner = 0;
 //    WallDeath As Integer
-    int WallDeath = 0;
+    vbint_t WallDeath = 0;
 //    Projectile As Boolean 'If the NPC is a projectile
     bool Projectile = false;
 //    Effect As Integer 'For starting / stopping effects
-    int Effect = 0;
+    vbint_t Effect = 0;
 //    Effect2 As Double
     double Effect2 = 0.0; // When Effect 4, Used to store a destination position, must be in double!
 //    Effect3 As Integer
-    int Effect3 = 0;
+    vbint_t Effect3 = 0;
 //    Section As Integer 'what section of the level the NPC is in
-    int Section = 0;
+    vbint_t Section = 0;
 //    Damage As Single
     float Damage = 0.0f;
 //    JustActivated As Integer 'The player that activated the NPC
-    int JustActivated = 0;
+    vbint_t JustActivated = 0;
 //    Block As Integer 'Used when a P-Switch turns a block into a coint
-    int Block = 0;
+    vbint_t Block = 0;
 //    tempBlock As Integer
-    int tempBlock = 0;
+    vbint_t tempBlock = 0;
 //    EXTRA: does the tempBlock have its own tree entry?
     // To explain further: when an NPC is at the same location as its tempBlock,
     //   its temp block is *not* added to the temp block quadtree
@@ -419,7 +425,7 @@ struct NPC_t
 //    TurnBackWipe As Boolean
     bool TurnBackWipe = false;
 //    Immune As Integer 'time that the NPC is immune
-    int Immune = 0;
+    vbint_t Immune = 0;
 //End Type
 };
 
@@ -503,7 +509,7 @@ struct Player_t
 //    SpinFireDir As Integer 'for shooting fireballs while spin jumping
     int SpinFireDir = 0;
 //    Multiplier As Integer 'for score increase for multiple hops
-    int Multiplier = 0;
+    vbint_t Multiplier = 0;
 //    SlideCounter As Integer 'for creating the dust effect when sliding
     int SlideCounter = 0;
 //    ShowWarp As Integer
@@ -618,17 +624,21 @@ struct Player_t
     bool Immune2 = false;
 //    ForceHitSpot3 As Boolean 'force hitspot 3 for collision detection
     bool ForceHitSpot3 = false;
+
 //'for getting smashed by a block
 //    Pinched1 As Integer
-    int Pinched1 = 0;
+    // int Pinched1 = 0;
 //    Pinched2 As Integer
-    int Pinched2 = 0;
+    // int Pinched2 = 0;
 //    Pinched3 As Integer
-    int Pinched3 = 0;
+    // int Pinched3 = 0;
 //    Pinched4 As Integer
-    int Pinched4 = 0;
+    // int Pinched4 = 0;
 //    NPCPinched As Integer 'must be > 0 for the player to get crushed
-    int NPCPinched = 0;
+    // int NPCPinched = 0;
+
+    PinchedInfo_t Pinched = PinchedInfo_t();
+
 //    m2Speed As Single
     float m2Speed = 0.0f;
 //    HoldingNPC As Integer 'What NPC is being held
@@ -686,7 +696,7 @@ struct Background_t
 //    Hidden As Boolean
     bool Hidden = false;
 //    Type As Integer
-    int Type = 0;
+    vbint_t Type = 0;
 //    Location As Location
     Location_t Location;
 //EXTRA: make a custom sorting priority
@@ -703,16 +713,16 @@ struct Background_t
 //Public Type Water
 struct Water_t
 {
+//    Location As Location
+    SpeedlessLocation_t Location;
+//    Buoy As Single 'not used
+    float Buoy = 0.0f;
 //    Layer As String
     layerindex_t Layer = LAYER_NONE;
 //    Hidden As Boolean
     bool Hidden = false;
-//    Buoy As Single 'not used
-    float Buoy = 0.0f;
 //    Quicksand As Boolean
     bool Quicksand = false;
-//    Location As Location
-    Location_t Location;
 //End Type
 };
 
@@ -726,13 +736,13 @@ struct Block_t
 //    Slippy As Boolean
     bool Slippy = false;
 //    RespawnDelay As Integer
-    int RespawnDelay = 0;
+    vbint_t RespawnDelay = 0;
 //    RapidHit As Integer
-    int RapidHit = 0;
+    vbint_t RapidHit = 0;
 //    DefaultType As Integer
-    int DefaultType = 0;
+    vbint_t DefaultType = 0;
 //    DefaultSpecial As Integer
-    int DefaultSpecial = 0;
+    vbint_t DefaultSpecial = 0;
 //'for event triggers
 //    TriggerHit As String
     eventindex_t TriggerHit = EVENT_NONE;
@@ -745,35 +755,35 @@ struct Block_t
 //    Hidden As Boolean
     bool Hidden = false;
 //    Type As Integer 'the block's type
-    int Type = 0;
+    vbint_t Type = 0;
 //    Special As Integer 'what is in the block?
-    int Special = 0;
+    vbint_t Special = 0;
 //'for the shake effect after hitting ablock
 //    ShakeY As Integer
-    int ShakeY = 0;
+    vbint_t ShakeY = 0;
 //    ShakeY2 As Integer
-    int ShakeY2 = 0;
+    vbint_t ShakeY2 = 0;
 //    ShakeY3 As Integer
-    int ShakeY3 = 0;
+    vbint_t ShakeY3 = 0;
 //    Kill As Boolean 'if true the game will destroy the block
     bool Kill = false;
 //    Invis As Boolean 'for invisible blocks
     bool Invis = false;
 //    NPC As Integer 'when a coin is turned into a block after the p switch is hit
-    int NPC = 0;
+    vbint_t NPC = 0;
 //    IsPlayer As Integer 'for the clown car
-    int IsPlayer = 0;
+    vbint_t IsPlayer = 0;
 //    IsNPC As Integer 'the type of NPC the block is
-    int IsNPC = 0;
+    vbint_t IsNPC = 0;
 //    standingOnPlayerY As Integer 'when standing on a player in the clown car
-    int standingOnPlayerY = 0;
+    vbint_t standingOnPlayerY = 0;
 //    noProjClipping As Boolean
     bool noProjClipping = false;
 //    IsReally As Integer 'the NPC that is this block
-    int IsReally = 0;
+    vbint_t IsReally = 0;
 
 // EXTRA: Indicate the fact that block was resized by a hit
-#if LOW_MEM
+#ifdef LOW_MEM
 
     inline void setShrinkResized() {}
 
@@ -813,15 +823,15 @@ struct Effect_t
 //    Location As Location
     Location_t Location;
 //    Type As Integer
-    int Type = 0;
+    vbint_t Type = 0;
 //    Frame As Integer
-    int Frame = 0;
+    vbint_t Frame = 0;
 //    FrameCount As Single
-    int FrameCount = 0;
+    vbint_t FrameCount = 0;
 //    Life As Integer 'timer before the effect disappears
-    int Life = 0;
+    vbint_t Life = 0;
 //    NewNpc As Integer 'when an effect should create and NPC, such as Yoshi
-    int NewNpc = 0;
+    vbint_t NewNpc = 0;
 //    Shadow As Boolean 'for a black effect set to true
     bool Shadow = false;
 //End Type
@@ -853,43 +863,59 @@ struct vScreen_t
 struct WorldLevel_t
 {
 //    Location As Location
-    Location_t Location;
-//    Type As Integer
-    int Type = 0;
+    SpeedlessLocation_t Location;
+
 //    FileName As String 'level's file
     std::string FileName;
-//    LevelExit(1 To 4) As Integer ' For the direction each type of exit opens the path
-    RangeArrI<int, 1, 4, 0> LevelExit;
-//    Active As Boolean
-    bool Active = false;
 //    LevelName As String 'The name of the level
     std::string LevelName;
+
+//    LevelExit(1 To 4) As Integer ' For the direction each type of exit opens the path
+    RangeArrI<vbint_t, 1, 4, 0> LevelExit;
+
+//    Type As Integer
+    vbint_t Type = 0;
 //    StartWarp As Integer 'If the level should start with a player exiting a warp
-    int StartWarp = 0;
-//    WarpX As Double 'for warping to another location on the world map
-    double WarpX = 0.0;
-//    WarpY As Double
-    double WarpY = 0.0;
+    vbint_t StartWarp = 0;
+
+//    Active As Boolean
+    bool Active = false;
 //    Path As Boolean 'for drawing a small path background
     bool Path = false;
 //    Path2 As Boolean 'big path background
     bool Path2 = false;
 //    Start As Boolean 'true if the game starts here
     bool Start = false;
+
+//    WarpX As Double 'for warping to another location on the world map
+    double WarpX = 0.0;
+//    WarpY As Double
+    double WarpY = 0.0;
+
 //    Visible As Boolean 'true if it should be shown on the map
     bool Visible = false;
+
 //End Type
-    int64_t Z = 0;
+
+    // int64_t Z = 0;
 
 // Display number of stars (if available)
-    int curStars = 0;
-    int maxStars = 0;
-    int starsShowPolicy = -1;
+    vbint_t curStars = 0;
+    vbint_t maxStars = 0;
+    vbint_t starsShowPolicy = -1;
+
+    // NEW: returns graphical location extent (based on whether GFXLevelBig is set)
+    //   defined in graphics.cpp
+    Location_t LocationGFX();
 };
 
 //Public Type Warp 'warps such as pipes and doors
 struct Warp_t
 {
+//    Entrance As Location 'location of warp entrance
+    SpeedlessLocation_t Entrance;
+//    Exit As Location 'location of warp exit
+    SpeedlessLocation_t Exit;
 //    Locked As Boolean 'requires a key NPC
     bool Locked = false;
 //    WarpNPC As Boolean 'allows NPC through the warp
@@ -905,43 +931,39 @@ struct Warp_t
 //    PlacedExit As Boolean
     bool PlacedExit = false;
 //    Stars As Integer 'number of stars required to enter
-    int Stars = 0;
-//    Entrance As Location 'location of warp entrance
-    Location_t Entrance;
-//    Exit As Location 'location of warp exit
-    Location_t Exit;
+    vbint_t Stars = 0;
 //    Effect As Integer 'style of warp. door/
-    int Effect = 0;
+    vbint_t Effect = 0;
 //    level As String 'filename of the level it should warp to
     stringindex_t level = STRINGINDEX_NONE;
 //    LevelWarp As Integer
-    int LevelWarp = 0;
+    vbint_t LevelWarp = 0;
 //    LevelEnt As Boolean 'this warp can't be used if set to true (this is for level entrances)
     bool LevelEnt = false;
 //    Direction As Integer 'direction of the entrance for pipe style warps
-    int Direction = 0;
+    vbint_t Direction = 0;
 //    Direction2 As Integer 'direction of the exit
-    int Direction2 = 0;
+    vbint_t Direction2 = 0;
 //    MapWarp As Boolean
     bool MapWarp = false;
 //    MapX As Integer
-    int MapX = 0;
+    vbint_t MapX = 0;
 //    MapY As Integer
-    int MapY = 0;
+    vbint_t MapY = 0;
 //    curStars As Integer
-    int curStars = 0;
+    vbint_t curStars = 0;
 //    maxStars As Integer
-    int maxStars = 0;
+    vbint_t maxStars = 0;
 //EXTRA:
     bool twoWay = false;
     bool noPrintStars = false;
     bool noEntranceScene = false;
     bool cannonExit = false;
+    float cannonExitSpeed = 10.0;
     bool stoodRequired = false; // Require player stood on the ground to enter this warp
-    double cannonExitSpeed = 10.0;
     eventindex_t eventEnter = EVENT_NONE;
     stringindex_t StarsMsg = STRINGINDEX_NONE;
-    int transitEffect = 0;
+    vbint_t transitEffect = 0;
 //End Type
 };
 
@@ -949,52 +971,58 @@ struct Warp_t
 struct Tile_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
-    int Type = 0;
+    vbint_t Type = 0;
 //End Type
-    int64_t Z = 0;
+
     bool Active = true;
+
+    // int64_t Z = 0;
 };
 
 //Public Type Scene 'World Scenery
 struct Scene_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
-    int Type = 0;
+    vbint_t Type = 0;
 //    Active As Boolean 'if false this won't be shown. used for paths that become available on a scene
     bool Active = false;
 //End Type
-    int64_t Z = 0;
+
+    // int64_t Z = 0;
 };
 
 //Public Type WorldPath 'World Paths
 struct WorldPath_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Active As Boolean
     bool Active = false;
 //    Type As Integer
-    int Type = 0;
+    vbint_t Type = 0;
 //End Type
-    int64_t Z = 0;
+
+    // int64_t Z = 0;
 };
 
 //Public Type WorldMusic 'World Music
 struct WorldMusic_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Type As Integer
-    int Type = 0;
+    vbint_t Type = 0;
 //    EXTRA: Custom Music
     stringindex_t MusicFile = STRINGINDEX_NONE;
 //End Type
-    int64_t Z = 0;
+
     bool Active = true;
+
+    // int64_t Z = 0;
 };
 
 //Public Type EditorCursor 'The editor's cursor
@@ -1081,7 +1109,7 @@ struct WorldPlayer_t
 struct CreditLine_t
 {
 //    Location As Location
-    Location_t Location;
+    SpeedlessLocation_t Location;
 //    Text As String
     stringindex_t Text = STRINGINDEX_NONE;
 //End Type
@@ -1249,7 +1277,7 @@ extern int LastBackground;
 //Public iBlocks As Integer 'blocks that are doing something. this keeps the number of interesting blocks
 extern int iBlocks;
 //Public iBlock(0 To maxBlocks) As Integer 'references a block #
-extern RangeArrI<int, 0, maxBlocks, 0> iBlock;
+extern RangeArrI<vbint_t, 0, maxBlocks, 0> iBlock;
 //Public numTiles As Integer 'number of map tiles
 extern int numTiles;
 //Public numScenes As Integer 'number of scense
@@ -1267,11 +1295,11 @@ extern RangeArrI<bool, 0, maxSections, false> LevelVWrap;
 //Public OffScreenExit(0 To maxSections) As Boolean 'walk offscreen to end the level
 extern RangeArrI<bool, 0, maxSections, false> OffScreenExit;
 //Public bgMusic(0 To maxSections) As Integer 'music
-extern RangeArrI<int, 0, maxSections, 0> bgMusic;
+extern RangeArrI<vbint_t, 0, maxSections, 0> bgMusic;
 //Public bgMusicREAL(0 To maxSections) As Integer 'default music
-extern RangeArrI<int, 0, maxSections, 0> bgMusicREAL;
+extern RangeArrI<vbint_t, 0, maxSections, 0> bgMusicREAL;
 //Public Background2REAL(0 To maxSections) As Integer 'background
-extern RangeArrI<int, 0, maxSections, 0> Background2REAL;
+extern RangeArrI<vbint_t, 0, maxSections, 0> Background2REAL;
 //Public LevelREAL(0 To maxSections) As Location 'default background
 extern RangeArr<Location_t, 0, maxSections> LevelREAL;
 //Public curMusic As Integer 'current music playing
@@ -1279,7 +1307,7 @@ extern int curMusic;
 //Public bgColor(0 To maxSections) As Long 'obsolete
 // extern RangeArrI<long, 0, maxSections, 0> bgColor;    // unused since SMBX64, removed
 //Public Background2(0 To maxSections) As Integer 'level background
-extern RangeArrI<int, 0, maxSections, 0> Background2;
+extern RangeArrI<vbint_t, 0, maxSections, 0> Background2;
 //Public WorldPath(1 To maxWorldPaths) As WorldPath
 extern RangeArr<WorldPath_t, 1, maxWorldPaths> WorldPath;
 DECLREF_T(WorldPath);

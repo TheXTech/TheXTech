@@ -24,6 +24,13 @@
 
 #include <stdint.h>
 
+// VB6 Integer type had 16-bit precision, but this is not ideal on modern platforms. Decide based on memory constraint.
+#ifdef LOW_MEM
+    using vbint_t = int16_t;
+#else
+    using vbint_t = int;
+#endif
+
 // OBSERVE: layer and event references are no longer
 //   represented by strings but rather indices in the
 //   Layers / Events array.

@@ -1651,11 +1651,11 @@ Location_t roundLoc(const Location_t &inLoc, double grid)
 
 void MoreScore(int addScore, const Location_t &Loc)
 {
-    int mult = 0; // dummy
+    vbint_t mult = 0; // dummy
     MoreScore(addScore, Loc, mult);
 }
 
-void MoreScore(int addScore, const Location_t &Loc, int &Multiplier)
+void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
 {
     //int oldM = 0;
     int A = 0;
@@ -1807,9 +1807,9 @@ void StartEpisode()
     {
         For(A, 1, numWorldPaths)
         {
-            Location_t tempLocation = WorldPath[A].Location;
+            SpeedlessLocation_t tempLocation = WorldPath[A].Location;
             {
-                Location_t &l = tempLocation;
+                SpeedlessLocation_t &l = tempLocation;
                 l.X += 4;
                 l.Y += 4;
                 l.Width -= 8;

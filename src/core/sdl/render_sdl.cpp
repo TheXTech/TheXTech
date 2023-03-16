@@ -248,11 +248,11 @@ void RenderSDL::updateViewport()
     int   wi, hi;
 
 #ifndef __EMSCRIPTEN__
-    XWindow::getWindowSize(&wi, &hi);
+    getRenderSize(&wi, &hi);
 #else
     if(XWindow::isFullScreen())
     {
-        XWindow::getWindowSize(&wi, &hi);
+        getRenderSize(&wi, &hi);
     }
     else
     {
@@ -351,6 +351,19 @@ void RenderSDL::offsetViewportIgnore(bool en)
         m_viewport_offset_y = en ? 0 : m_viewport_offset_y_cur;
     }
     m_viewport_offset_ignore = en;
+}
+
+void RenderSDL::getRenderSize(int* w, int* h)
+{
+    // make sure we're operating on default target (same as SDL)
+    SDL_Texture* saved_target = SDL_GetRenderTarget(m_gRenderer);
+    if(saved_target)
+        SDL_SetRenderTarget(m_gRenderer, NULL);
+
+    SDL_GetRendererOutputSize(m_gRenderer, w, h);
+
+    if (saved_target)
+        SDL_SetRenderTarget(m_gRenderer, saved_target);
 }
 
 void RenderSDL::mapToScreen(int x, int y, int *dx, int *dy)

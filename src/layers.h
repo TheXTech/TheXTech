@@ -66,16 +66,16 @@ struct EventSection_t
         LESet_ResetDefault = -2,
     };
 
-    //! Set new Music ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set music ID)
-    int music_id = LESet_Nothing;
-    //! Set new Custom Music File path
-    stringindex_t music_file = STRINGINDEX_NONE;
+    //! Change section borders if not (-1 - do nothing, -2 set default, any other values - set X position of left section boundary)
+    SpeedlessLocation_t position;
 
     //! Set new Background ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set background ID)
-    int background_id = LESet_Nothing;
+    vbint_t background_id = LESet_Nothing;
 
-    //! Change section borders if not (-1 - do nothing, -2 set default, any other values - set X position of left section boundary)
-    Location_t position;
+    //! Set new Music ID in this section (-1 - do nothing, -2 - reset to defaint, >=0 - set music ID)
+    vbint_t music_id = LESet_Nothing;
+    //! Set new Custom Music File path
+    stringindex_t music_file = STRINGINDEX_NONE;
 
     //! Do override current autoscroll
     bool  autoscroll = false;
@@ -97,7 +97,7 @@ struct Events_t
 //    LayerSmoke As Boolean
     bool LayerSmoke = false;
 //    Sound As Integer
-    int Sound = 0;
+    vbint_t Sound = 0;
 //    Name As String
     std::string Name;
 //    Text As String

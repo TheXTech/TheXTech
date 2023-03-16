@@ -55,6 +55,8 @@ int simpleMsgBox(uint32_t flags, const std::string &title, const std::string &me
     if(!conf)
         return -2;
 
+    UNUSED(flags);
+
     if(XRender::g_in_frame)
         C3D_FrameEnd(0);
     SoundPauseAll();

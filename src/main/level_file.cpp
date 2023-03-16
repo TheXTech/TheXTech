@@ -40,6 +40,7 @@
 #include "level_file.h"
 #include "trees.h"
 #include "npc_special_data.h"
+#include "graphics/gfx_update.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -869,7 +870,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 bgo = Background_t();
                 bgo.Layer = w.Layer;
                 bgo.Hidden = w.Hidden;
-                bgo.Location = w.Entrance;
+                bgo.Location = static_cast<Location_t>(w.Entrance);
                 bgo.Type = 98;
                 bgo.Location.Width = 16;
                 syncLayers_BGO(B);
@@ -880,7 +881,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                     numLocked++;
                     auto &bgo2 = Background[B];
                     bgo2 = bgo;
-                    bgo2.Location = w.Exit;
+                    bgo2.Location = static_cast<Location_t>(w.Exit);
                     bgo2.Location.Width = 16;
                     syncLayers_BGO(B);
                 }
@@ -924,6 +925,9 @@ void ClearLevel()
     UnloadCustomGFX();
     doShakeScreenClear();
     treeLevelCleanAll();
+
+    invalidateDrawBlocks();
+    invalidateDrawBGOs();
 
     AutoUseModern = false;
 

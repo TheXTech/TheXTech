@@ -138,14 +138,15 @@ void Deactivate(int A)
             NPC[A].Special6 = 0;
             NPC[A].Damage = 0;
             NPC[A].HoldingPlayer = 0;
-            NPC[A].Pinched1 = 0;
-            NPC[A].Pinched2 = 0;
-            NPC[A].Pinched3 = 0;
-            NPC[A].Pinched4 = 0;
 
-            // NPC[A].Pinched = 0;    // unused since SMBX64, removed
+            // NPC[A].Pinched1 = 0;
+            // NPC[A].Pinched2 = 0;
+            // NPC[A].Pinched3 = 0;
+            // NPC[A].Pinched4 = 0;
+            // NPC[A].Pinched = 0;
+            // NPC[A].MovingPinched = 0;
 
-            NPC[A].MovingPinched = 0;
+            NPC[A].Pinched = PinchedInfo_t();
 
             // NEW now that we have the new NPC Queues
             NPCQueues::update(A);
