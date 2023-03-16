@@ -2285,7 +2285,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         return;
     }
 
-    else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS)
+    if(EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
         // activate event
         SuperPrintR(mode, "ACTIVATE:", 3, e_ScreenW - 200, 200 + 2);
@@ -2378,6 +2378,10 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
     }
+    else if(m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
+    {
+        // no page selector, but don't return
+    }
     else
         return;
 
@@ -2394,6 +2398,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     std::string event_desc_2;
     std::string event_desc_3;
     eventindex_t* event_to_set;
+
     if(m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
     {
         event_name = "NEXT";
