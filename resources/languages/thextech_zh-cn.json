@@ -37,7 +37,7 @@
             "letterLayerClear": "空：",
             "letterTalk": "话：",
             "promptEventName": "事件名称：",
-            "promptEventText": "事件文字：",
+            "promptEventText": "文字信息：",
             "props": {
                 "autostart": "进入关卡时开始",
                 "controls": "按键",
@@ -61,7 +61,7 @@
             "labelAbbrevAttLayer": "跟随："
         },
         "letterDown": "下",
-        "letterLeft": ""左,
+        "letterLeft": "左",
         "letterRight": "右",
         "letterUp": "上",
         "npc": {
@@ -95,7 +95,7 @@
         "phraseDelayIsMs": "延迟：{0}毫秒",
         "phraseRadiusIndex": "半径{0}",
         "phraseSectionIndex": "场景{0}",
-        "phraseTextOf": "{0}文字",
+        "phraseTextOf": "{0}信息",
         "warp": {
             "transit": {
                 "name0": "无",
@@ -117,7 +117,7 @@
             "genitive": "NPC",
             "nominative": "NPC"
         },
-        "wordText": "文字"
+        "wordText": "信息"
     },
     "game": {
         "controls": {
