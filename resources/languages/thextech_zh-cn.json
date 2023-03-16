@@ -13,57 +13,57 @@
         },
         "events": {
             "bounds": {
-                "changeAllSectionBoundsToCurrent": "",
-                "changeSectionBoundsToCurrent": "",
-                "shouldEvent": ""
+                "changeAllSectionBoundsToCurrent": "更改所有场景范围到当前设置？",
+                "changeSectionBoundsToCurrent": "更改场景{0}的范围到当前设置？",
+                "shouldEvent": "事件{0}"
             },
-            "controlsForEvent": "",
+            "controlsForEvent": "强制按下玩家按键",
             "deletion": {
-                "cancel": "",
-                "confirm": "",
-                "deletingEvent": ""
+                "cancel": "否：不删除事件",
+                "confirm": "是：删除事件",
+                "deletingEvent": "删除事件{0}"
             },
             "header": "事件：",
-            "headerTriggerEvent": "",
-            "itemNewEvent": "",
+            "headerTriggerEvent": "触发",
+            "itemNewEvent": "<新事件>",
             "layers": {
-                "headerHide": "",
-                "headerMove": "",
-                "headerShow": "",
-                "headerToggle": ""
+                "headerHide": "隐藏：",
+                "headerMove": "移动：",
+                "headerShow": "显示：",
+                "headerToggle": "切换："
             },
             "letterActivate": "出：",
             "letterDeath": "死：",
             "letterLayerClear": "空：",
-            "letterTalk": "对：",
-            "promptEventName": "",
-            "promptEventText": "",
+            "letterTalk": "话：",
+            "promptEventName": "事件名称：",
+            "promptEventText": "事件文字：",
             "props": {
-                "autostart": "",
-                "controls": "",
-                "endGame": "",
-                "sound": ""
+                "autostart": "进入关卡时开始",
+                "controls": "按键",
+                "endGame": "游戏通关",
+                "sound": "音效"
             },
             "sections": {
-                "actionKeep": "",
-                "actionReset": "",
-                "actionSet": "",
-                "phraseAllSections": "",
-                "propBackground": "",
-                "propBounds": "",
-                "propMusic": ""
+                "actionKeep": "当前值",
+                "actionReset": "默认值",
+                "actionSet": "指定设置",
+                "phraseAllSections": "所有场景",
+                "propBackground": "背景图片",
+                "propBounds": "场景范围",
+                "propMusic": "音乐"
             },
-            "settingsForEvent": ""
+            "settingsForEvent": "事件设置"
         },
         "layers": {
-            "header": "",
+            "header": "图层：",
             "label": "图层：",
             "labelAbbrevAttLayer": "跟随："
         },
-        "letterDown": "",
-        "letterLeft": "",
-        "letterRight": "",
-        "letterUp": "",
+        "letterDown": "下",
+        "letterLeft": ""左,
+        "letterRight": "右",
+        "letterUp": "上",
         "npc": {
             "abbrevGen": "连续",
             "ai": {
@@ -91,7 +91,7 @@
         },
         "pageBlankOfBlank": "",
         "phraseAreYouSure": "",
-        "phraseCountMore": "",
+        "phraseCountMore": "更多{0}",
         "phraseDelayIsMs": "延迟：{0}毫秒",
         "phraseRadiusIndex": "半径{0}",
         "phraseSectionIndex": "场景{0}",
@@ -129,16 +129,16 @@
             "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。"
         },
         "pause": {
-            "continue": "",
-            "dropAddPlayers": "",
-            "enterCode": "",
-            "quit": "",
-            "quitTesting": "",
-            "resetCheckpoints": "",
-            "restartLevel": "",
-            "returnToEditor": "",
-            "saveAndContinue": "",
-            "saveAndQuit": ""
+            "continue": "继续",
+            "dropAddPlayers": "添加/删除玩家",
+            "enterCode": "输入代码",
+            "quit": "退出",
+            "quitTesting": "结束测试",
+            "resetCheckpoints": "重置中间点",
+            "restartLevel": "重新开始",
+            "returnToEditor": "返回编辑器",
+            "saveAndContinue": "保存并继续",
+            "saveAndQuit": "保存并退出"
         }
     },
     "languageName": "简体中文",
@@ -152,16 +152,16 @@
         },
         "controls": {
             "buttons": {
-                "altJump": "",
-                "altRun": "",
-                "down": "",
-                "drop": "",
-                "jump": "",
-                "left": "",
-                "right": "",
-                "run": "",
-                "start": "",
-                "up": ""
+                "altJump": "第二跳跃",
+                "altRun": "第二奔跑",
+                "down": "下",
+                "drop": "取出道具",
+                "jump": "跳跃",
+                "left": "左",
+                "right": "右",
+                "run": "奔跑",
+                "start": "开始",
+                "up": "上"
             },
             "controlsConnected": "已连接：",
             "controlsDeleteKey": "（按第二奔跑键清除）",
