@@ -45,9 +45,9 @@
                 "sound": "音效"
             },
             "sections": {
-                "actionKeep": "当前值",
-                "actionReset": "默认值",
-                "actionSet": "指定设置",
+                "actionKeep": "当前",
+                "actionReset": "默认",
+                "actionSet": "指定",
                 "phraseAllSections": "所有场景",
                 "propBackground": "背景图片",
                 "propBounds": "场景范围",
