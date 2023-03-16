@@ -15,7 +15,7 @@
             "bounds": {
                 "changeAllSectionBoundsToCurrent": "改变所有场景范围到当前设置吗？",
                 "changeSectionBoundsToCurrent": "改变场景{0}的范围到当前设置吗？",
-                "shouldEvent": "要将事件{0}"
+                "shouldEvent": "要使事件{0}"
             },
             "controlsForEvent": "强制按下玩家按键",
             "deletion": {
