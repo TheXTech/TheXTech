@@ -24,7 +24,7 @@
     <string name="touchscreen_vibration_test_label">Тест зворотнього зв\'язку</string>
     <string name="setup_show_battery_status_label">Стан батареї пристрою</string>
     <string name="setup_show_controller_state_label">Вивести стан ігрового контролера</string>
-    <string name="app_name">Двигун The X-Tech</string>
+    <string name="app_name">Рушій The X-Tech</string>
     <string name="setup_touchscreen_controller_enable">Увімкнути екранний джойстик</string>
     <string name="settings_button">Налаштування</string>
     <string name="setup_touchscreen_alwaysshow">Виводити екранний джойстик при запуску</string>

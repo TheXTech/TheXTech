@@ -660,7 +660,7 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
 
     if(!target.d.hasTexture())
     {
-        pLogWarning("FAILED TO LOAD!!! %s\n", path.c_str());
+        pLogWarning("FAILED TO LOAD!!! %s", path.c_str());
         target.d.destroy();
         target.inited = false;
     }

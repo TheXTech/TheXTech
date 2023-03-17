@@ -570,7 +570,7 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
 
     if(!target.d.texture)
     {
-        pLogWarning("FAILED TO LOAD!!! %s\n", path.c_str());
+        pLogWarning("FAILED TO LOAD!!! %s", path.c_str());
         target.inited = false;
     }
 
@@ -613,7 +613,7 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
 
     int w, h;
 
-    if(fscanf(f, "%d\n%d\n", &w, &h) != 2 || w < 0 || w > 8192 || h < 0 || h > 8192)
+    if((fscanf(f, "%d\n%d\n", &w, &h) != 2) || (w < 0) || (w > 8192) || (h < 0) || (h > 8192))
     {
         pLogWarning("Could not load image %s dimensions from load list", filename);
         target.inited = false;
