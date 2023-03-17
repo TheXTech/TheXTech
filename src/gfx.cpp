@@ -27,6 +27,20 @@
 #include "core/render.h"
 #include <fmt_format_ne.h>
 #include <Logger/logger.h>
+#if defined(__SWITCH__) || defined(__WII__)
+#   include <Utils/files.h>
+#   if defined(__SWITCH__)
+#       define UI_PLATFORM_EXT "-switch"
+#   elif defined(__WII__)
+#       define UI_PLATFORM_EXT "-wii"
+#   endif
+#endif
+
+#ifdef X_IMG_EXT
+#   define  UI_IMG_EXT X_IMG_EXT
+#else
+#   define  UI_IMG_EXT ".png"
+#endif
 
 
 GFX_t GFX;
@@ -34,11 +48,7 @@ GFX_t GFX;
 
 void GFX_t::loadImage(StdPicture &img, const std::string &path)
 {
-#ifdef X_IMG_EXT
-    std::string path_ext = path + X_IMG_EXT;
-#else
-    std::string path_ext = path + ".png";
-#endif
+    std::string path_ext = path + UI_IMG_EXT;
 
     pLogDebug("Loading texture %s...", path_ext.c_str());
     img = XRender::LoadPicture(path_ext);
@@ -105,7 +115,23 @@ bool GFX_t::load()
         loadImage(MCursor[i], uiPath + fmt::format_ne("MCursor{0}", i));
 
     For(i, 1, 4)
+    {
+#if defined(UI_PLATFORM_EXT)
+        auto n = uiPath + fmt::format_ne("MenuGFX{0}" UI_PLATFORM_EXT, i);
+#   ifdef X_IMG_EXT
+        if(Files::fileExists(n + UI_IMG_EXT) || Files::fileExists(n + ".png"))
+#   else
+        if(Files::fileExists(n + UI_IMG_EXT))
+#   endif
+        {
+            loadImage(MenuGFX[i], n);
+            continue;
+        }
+
+        pLogWarning("File %s%s doesn't exist, trying to load generic one...", n.c_str(), UI_IMG_EXT);
+#endif
         loadImage(MenuGFX[i], uiPath + fmt::format_ne("MenuGFX{0}", i));
+    }
 
     loadImage(Mount[2], uiPath + "Mount");
 

@@ -1,0 +1,4 @@
+The valid icon must be:
+- Should be a JPEG format
+- No EXIF included, absolutely
+- 256x256 size
