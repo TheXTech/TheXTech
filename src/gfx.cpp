@@ -118,11 +118,16 @@ bool GFX_t::load()
     {
 #if defined(UI_PLATFORM_EXT)
         auto n = uiPath + fmt::format_ne("MenuGFX{0}" UI_PLATFORM_EXT, i);
+#   ifdef X_IMG_EXT
+        if(Files::fileExists(n + UI_IMG_EXT) || Files::fileExists(n + ".png"))
+#   else
         if(Files::fileExists(n + UI_IMG_EXT))
+#   endif
         {
             loadImage(MenuGFX[i], n);
             continue;
         }
+
         pLogWarning("File %s%s doesn't exist, trying to load generic one...", n.c_str(), UI_IMG_EXT);
 #endif
         loadImage(MenuGFX[i], uiPath + fmt::format_ne("MenuGFX{0}", i));
