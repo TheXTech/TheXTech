@@ -391,7 +391,7 @@ void Insert(const char* c, int size)
 
     find_utf_offsets(Text.c_str(), s_Text_UTF_offsets);
 
-    while(s_cursor + 1 < s_Text_UTF_offsets.size() && s_Text_UTF_offsets[s_cursor] < new_pos)
+    while(s_cursor + 1 < (int)s_Text_UTF_offsets.size() && s_Text_UTF_offsets[s_cursor] < new_pos)
         s_cursor ++;
 }
 
@@ -532,12 +532,12 @@ bool KeyboardMouseRender(bool mouse, bool render)
         XRender::renderRect(win_x + 20, win_y + n_prompt_lines * 20 + 4, win_width - 40, n_text_lines * 20, 0.f, 0.f, 0.f, 0.8f);
         for(int i = 0; i < n_text_lines; i ++)
         {
-            if(n_text_chars * i + n_text_chars < s_Text_UTF_offsets.size())
+            if(n_text_chars * i + n_text_chars < (int)s_Text_UTF_offsets.size())
                 SuperPrint(s_Text_UTF_offsets[n_text_chars * i + n_text_chars] - s_Text_UTF_offsets[n_text_chars * i], Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4, win_x + 10 + 16, win_y + 6 + 20 * (n_prompt_lines + i));
             else
                 SuperPrint(Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4, win_x + 10 + 16, win_y + 6 + 20 * (n_prompt_lines + i));
             // render cursor if it is on this line
-            if((s_cursor >= i * n_text_chars && s_cursor < (i + 1) * n_text_chars) || (s_cursor == (i + 1) * n_text_chars && s_cursor == s_Text_UTF_offsets.size() - 1))
+            if((s_cursor >= i * n_text_chars && s_cursor < (i + 1) * n_text_chars) || (s_cursor == (i + 1) * n_text_chars && s_cursor == (int)s_Text_UTF_offsets.size() - 1))
             {
                 // do something else if we ever have var-length strings
                 int cursor_offset = SuperTextPixLen(s_Text_UTF_offsets[s_cursor] - s_Text_UTF_offsets[n_text_chars * i], Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4);
