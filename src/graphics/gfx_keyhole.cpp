@@ -52,23 +52,39 @@ void RenderKeyhole(int Z)
 
     double keyholeBottom = realKeyholeBottom * (1 - keyholeGrowthCoord) + idealKeyholeBottom * keyholeGrowthCoord;
 
-    RenderTexturePlayer(Z,
+    RenderTexturePlayerScale(Z,
         vScreenX[Z] + keyhole.Location.X + keyhole.Location.Width / 2 - keyhole.Location.Width * keyholeScale / 2,
         vScreenY[Z] + keyholeBottom - 24 * keyholeScale,
         keyhole.Location.Width * keyholeScale,
         keyhole.Location.Height * keyholeScale,
-        GFXBackgroundBMP[keyhole.Type]);
+        GFXBackgroundBMP[keyhole.Type],
+        0,
+        0,
+        keyhole.Location.Width,
+        keyhole.Location.Height);
 
     if(ratio >= 128)
         keyhole.Hidden = true;
 }
 
-void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
+void RenderTexturePlayerScale(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
                          StdPicture& tex,
-                         int src_x, int src_y, float r, float g, float b, float a)
+                         int src_x, int src_y, int src_w, int src_h,
+                         float r, float g, float b, float a)
 {
     if(LevelMacro != LEVELMACRO_KEYHOLE_EXIT || LevelMacroWhich == 0 || !g_compatibility.fix_keyhole_framerate)
-        return XRender::renderTexture(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, r, g, b, a);
+    {
+        if(src_w == -1 || src_h == -1)
+            return XRender::renderTexture(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, r, g, b, a);
+        else
+            return XRender::renderTextureScaleEx(dst_x, dst_y, dst_w, dst_h, tex, src_x, src_y, src_w, src_h, 0, nullptr, X_FLIP_NONE, r, g, b, a);
+    }
+
+    if(src_w == -1 || src_h == -1)
+    {
+        src_w = dst_w;
+        src_h = dst_h;
+    }
 
     int keyholeMax = g_compatibility.fix_keyhole_framerate ? 192 : 300;
     int keyholeDone = keyholeMax - 65;
@@ -90,6 +106,16 @@ void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double
                 tex,
                 src_x,
                 src_y,
-                dst_w, dst_h, 0, nullptr, X_FLIP_NONE,
+                src_w, src_h, 0, nullptr, X_FLIP_NONE,
                 r, g, b, a);
+}
+
+void RenderTexturePlayer(int Z, double dst_x, double dst_y, double dst_w, double dst_h,
+                         StdPicture& tex,
+                         int src_x, int src_y, float r, float g, float b, float a)
+{
+    RenderTexturePlayerScale(Z, dst_x, dst_y, dst_w, dst_h,
+        tex,
+        src_x, src_y, -1, -1,
+        r, g, b, a);
 }
