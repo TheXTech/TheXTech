@@ -353,6 +353,7 @@ void SetupCredits()
     AddCredit("ds-sloth"); // For the major contribution to the code and becoming a co-developer
     AddCredit("0lhi"); // Significant contribution to TheXTech development, testing, improvement process
     AddCredit("Eclipsed"); // For the help to verify and polish the speed-run mode
+    AddCredit("ThatRoadRunnerfan727 (Matthew)"); // For Nintendo Switch alpha testing on hardware
 #endif
     AddCredit("");
     AddCredit("4matsy");

@@ -18,7 +18,7 @@ add_custom_target(thextech_nro ALL
     "${ELF2NRO}"
     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech.elf"
     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech.nro"
-    "--icon=${TheXTech_SOURCE_DIR}/resources/switch/thextech-logo.png"
+    "--icon=${TheXTech_SOURCE_DIR}/resources/switch/thextech-logo.jpg"
     "--nacp=${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech.nacp"
     DEPENDS thextech thextech_nacp
 )
