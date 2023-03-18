@@ -13,57 +13,57 @@
         },
         "events": {
             "bounds": {
-                "changeAllSectionBoundsToCurrent": "",
-                "changeSectionBoundsToCurrent": "",
-                "shouldEvent": ""
+                "changeAllSectionBoundsToCurrent": "изменить все границы секции к текущим?",
+                "changeSectionBoundsToCurrent": "изменить границы секции {0} к текущим?",
+                "shouldEvent": "Должно ли событие {0}"
             },
-            "controlsForEvent": "",
+            "controlsForEvent": "Управление для события",
             "deletion": {
-                "cancel": "",
-                "confirm": "",
-                "deletingEvent": ""
+                "cancel": "Нет: не удалять событие",
+                "confirm": "Да: удалить событие",
+                "deletingEvent": "Удалить событие {0}"
             },
             "header": "События:",
-            "headerTriggerEvent": "",
-            "itemNewEvent": "",
+            "headerTriggerEvent": "Триггер:",
+            "itemNewEvent": "<Новое событие>",
             "layers": {
-                "headerHide": "",
-                "headerMove": "",
-                "headerShow": "",
-                "headerToggle": ""
+                "headerHide": "Скрыть:",
+                "headerMove": "Движение:",
+                "headerShow": "Показать:",
+                "headerToggle": "Переключ.:"
             },
             "letterActivate": "Ак:",
             "letterDeath": "См:",
             "letterLayerClear": "Сл:",
             "letterTalk": "Гв:",
-            "promptEventName": "",
-            "promptEventText": "",
+            "promptEventName": "Имя события:",
+            "promptEventText": "Текст события:",
             "props": {
-                "autostart": "",
-                "controls": "",
-                "endGame": "",
-                "sound": ""
+                "autostart": "Автозапуск",
+                "controls": "Управления",
+                "endGame": "Завершить игру",
+                "sound": "Звук"
             },
             "sections": {
-                "actionKeep": "",
-                "actionReset": "",
-                "actionSet": "",
-                "phraseAllSections": "",
-                "propBackground": "",
-                "propBounds": "",
-                "propMusic": ""
+                "actionKeep": "Оставить",
+                "actionReset": "Сбросить",
+                "actionSet": "Назначить",
+                "phraseAllSections": "Все секции",
+                "propBackground": "Фон",
+                "propBounds": "Границы",
+                "propMusic": "Музыка"
             },
-            "settingsForEvent": ""
+            "settingsForEvent": "Настройки события"
         },
         "layers": {
-            "header": "",
+            "header": "Слои:",
             "label": "Слой:",
             "labelAbbrevAttLayer": "Прис.: "
         },
-        "letterDown": "",
-        "letterLeft": "",
-        "letterRight": "",
-        "letterUp": "",
+        "letterDown": "Н",
+        "letterLeft": "Л",
+        "letterRight": "П",
+        "letterUp": "В",
         "npc": {
             "abbrevGen": "Ген.",
             "ai": {
@@ -89,9 +89,9 @@
             "stuckStop": "Стоп",
             "tooltipExpandSection": "Расширить секцию"
         },
-        "pageBlankOfBlank": "",
-        "phraseAreYouSure": "",
-        "phraseCountMore": "",
+        "pageBlankOfBlank": "Стр. {0}",
+        "phraseAreYouSure": "Вы уверены?",
+        "phraseCountMore": "Ещё {0}",
         "phraseDelayIsMs": "Период: {0} мс",
         "phraseRadiusIndex": "Радиус {0}",
         "phraseSectionIndex": "Секция {0}",
@@ -112,7 +112,7 @@
             "genitive": "События",
             "nominative": "Событие"
         },
-        "wordInstant": "",
+        "wordInstant": "Мгновенно",
         "wordNPC": {
             "genitive": "НИПа",
             "nominative": "НИП"
@@ -129,16 +129,16 @@
             "warpNeedStarCount": "Требуется {0} {1}, чтобы войти."
         },
         "pause": {
-            "continue": "",
-            "dropAddPlayers": "",
-            "enterCode": "",
-            "quit": "",
-            "quitTesting": "",
-            "resetCheckpoints": "",
-            "restartLevel": "",
-            "returnToEditor": "",
-            "saveAndContinue": "",
-            "saveAndQuit": ""
+            "continue": "Продолжить",
+            "dropAddPlayers": "Убр./Доб. игроков",
+            "enterCode": "Ввести код",
+            "quit": "Выйти",
+            "quitTesting": "Закрыть тест",
+            "resetCheckpoints": "Сбросить контр. точки",
+            "restartLevel": "Начать сначала",
+            "returnToEditor": "Назад в редактор",
+            "saveAndContinue": "Сохранить и продолжить",
+            "saveAndQuit": "Сохранить и выйти"
         }
     },
     "languageName": "Русский",
@@ -152,16 +152,16 @@
         },
         "controls": {
             "buttons": {
-                "altJump": "",
-                "altRun": "",
-                "down": "",
-                "drop": "",
-                "jump": "",
-                "left": "",
-                "right": "",
-                "run": "",
-                "start": "",
-                "up": ""
+                "altJump": "Альт-Прыг",
+                "altRun": "Альт-Бег",
+                "down": "Вниз",
+                "drop": "Выброс",
+                "jump": "Прыжок",
+                "left": "Влево",
+                "right": "Впаво",
+                "run": "Бег",
+                "start": "Старт",
+                "up": "Вверх"
             },
             "controlsConnected": "Подключено:",
             "controlsDeleteKey": "(Альт-Прыжок чтобы удалить)",
