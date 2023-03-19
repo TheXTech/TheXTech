@@ -89,8 +89,8 @@
             "stuckStop": "静止",
             "tooltipExpandSection": "扩展场景"
         },
-        "pageBlankOfBlank": "",
-        "phraseAreYouSure": "",
+        "pageBlankOfBlank": "第{0}/{1}页",
+        "phraseAreYouSure": "您确定吗？",
         "phraseCountMore": "更多{0}",
         "phraseDelayIsMs": "延迟：{0}毫秒",
         "phraseRadiusIndex": "半径{0}",
@@ -169,7 +169,7 @@
             "controlsInUse": "（已使用）",
             "controlsNewProfile": "<新建配置>",
             "controlsNotInUse": "（未使用）",
-            "controlsReallyDeleteProfile": "确定删除配置？",
+            "controlsReallyDeleteProfile": "是否删除配置？",
             "controlsTitle": "控制",
             "wordButtons": "按键",
             "wordProfiles": "配置"
