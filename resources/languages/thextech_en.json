@@ -89,8 +89,8 @@
             "stuckStop": "Stop",
             "tooltipExpandSection": "Expand section"
         },
-        "pageBlankOfBlank": "",
-        "phraseAreYouSure": "",
+        "pageBlankOfBlank": "Page {0} of {1}",
+        "phraseAreYouSure": "Are you sure?",
         "phraseCountMore": "{0} More",
         "phraseDelayIsMs": "Delay: {0} ms",
         "phraseRadiusIndex": "Radius {0}",

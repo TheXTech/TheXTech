@@ -24,6 +24,9 @@ EditorContent g_editorStrings;
 
 void initEditorStrings()
 {
+    g_editorStrings.phraseAreYouSure = "Are you sure?";
+    g_editorStrings.pageBlankOfBlank = "Page {0} of {1}";
+
     g_editorStrings.pickBlockContents1 = "Pick block";
     g_editorStrings.pickBlockContents2 = "contents";
 
