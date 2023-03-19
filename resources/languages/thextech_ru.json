@@ -89,7 +89,7 @@
             "stuckStop": "Стоп",
             "tooltipExpandSection": "Расширить секцию"
         },
-        "pageBlankOfBlank": "Стр. {0}",
+        "pageBlankOfBlank": "Стр. {0} из {1}",
         "phraseAreYouSure": "Вы уверены?",
         "phraseCountMore": "Ещё {0}",
         "phraseDelayIsMs": "Период: {0} мс",
