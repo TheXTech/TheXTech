@@ -712,12 +712,6 @@ else()
         src/core/sdl/events_sdl.cpp
     )
 
-    if(THEXTECH_BUILD_GL_LEGACY)
-        list(APPEND THEXTECH_SRC
-            src/core/sdl/render_gl11.cpp
-        )
-    endif()
-
     if(THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN OR THEXTECH_BUILD_GL_ES_LEGACY)
         list(APPEND THEXTECH_SRC
             src/core/sdl/gl_program_object.cpp
@@ -943,10 +937,6 @@ endif()
 
 if(THEXTECH_BUILD_GL_LEGACY)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_LEGACY)
-endif()
-
-if(THEXTECH_GL_ES_ONLY)
-    target_compile_definitions(thextech PRIVATE -DTHEXTECH_GL_ES_ONLY)
 endif()
 
 if(THEXTECH_BUILD_GL_DESKTOP_MODERN)
