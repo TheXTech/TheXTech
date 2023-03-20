@@ -34,10 +34,10 @@
 #ifdef CORE_EVERYTHING_SDL
 #   include "core/sdl/render_sdl.h"
 #   include "core/sdl/render_gl11.h"
-#   include "core/sdl/render_gles.h"
+#   include "core/sdl/render_gl.h"
 
-#   if defined(THEXTECH_BUILD_GL_MODERN)
-typedef RenderGLES RenderUsed;
+#   if defined(RENDERGL_SUPPORTED)
+typedef RenderGL RenderUsed;
 #   elif defined(THEXTECH_BUILD_GL_LEGACY)
 typedef RenderGL11 RenderUsed;
 #   else

@@ -42,7 +42,7 @@ struct StdPictureData
 private:
     friend class RenderSDL;
     friend class RenderGL11;
-    friend class RenderGLES;
+    friend class RenderGL;
 
     //! Texture instance pointer for SDL Render
     SDL_Texture *texture = nullptr;

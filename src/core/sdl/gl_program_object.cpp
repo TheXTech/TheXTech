@@ -18,13 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <SDL2/SDL_opengles2.h>
-
 #include <Logger/logger.h>
 
+#include "core/sdl/gl_inc.h"
 #include "core/sdl/gl_program_object.h"
 
 GLuint GLProgramObject::s_last_program = 0;
+
+#ifdef RENDERGL_HAS_SHADERS
 
 /*******************************
  *** Static helper functions ***
@@ -290,3 +291,19 @@ GLint GLProgramObject::get_uniform_loc(const std::string& name)
 {
     return glGetUniformLocation(m_program, name.c_str());
 }
+
+#else // #ifdef RENDERGL_HAS_SHADERS
+
+// all other functions intentionally left undefined, will cause link error if used
+
+GLProgramObject::GLProgramObject()
+{
+    // empty
+}
+
+GLProgramObject::~GLProgramObject()
+{
+    // empty
+}
+
+#endif

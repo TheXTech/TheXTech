@@ -19,17 +19,18 @@
  */
 
 #pragma once
-#ifndef RENDERGLES_T_H
-#define RENDERGLES_T_H
+#ifndef RenderGL_T_H
+#define RenderGL_T_H
 
 #include <utility>
 #include <vector>
+#include <array>
 #include <set>
 #include <map>
 #include <unordered_map>
 
 #include <SDL2/SDL_render.h>
-#include <SDL2/SDL_opengles2.h>
+#include "core/sdl/gl_inc.h"
 
 #include "core/base/render_base.h"
 #include "cmd_line_setup.h"
@@ -48,9 +49,17 @@ enum BufferIndex_t
     BUFFER_MAX,
 };
 
-class RenderGLES final : public AbstractRender_t
+class RenderGL final : public AbstractRender_t
 {
-public:
+private:
+    enum class SupportLevel
+    {
+        none,
+        core,
+        oes,
+        ext,
+    };
+
     struct Vertex_t
     {
         GLshort position[3];
@@ -74,10 +83,9 @@ public:
         }
     };
 
-private:
     struct hash_DrawContext
     {
-        std::size_t operator()(const RenderGLES::DrawContext_t& c) const noexcept
+        std::size_t operator()(const RenderGL::DrawContext_t& c) const noexcept
         {
             return std::hash<GLProgramObject*>()(c.program) ^ (std::hash<StdPicture*>()(c.texture) >> 1);
         }
@@ -120,12 +128,112 @@ private:
     int m_viewport_w = 0;
     int m_viewport_h = 0;
 
-    int m_draw_mask_mode = 0;
+    // internal capability trackers
+    GLint m_gl_majver = 0;
+    GLint m_gl_minver = 0;
+    GLint m_gl_profile = 0;
+
+    bool m_use_logicop = false;
+    bool m_use_shaders = false;
+    bool m_has_es3_shaders = false;
+    bool m_has_npot_texture = false;
+    bool m_has_bgra = false;
+    bool m_has_fbo = false;
+
+    bool m_client_side_arrays = false;
+
+    // OpenGL state
+    std::array<GLuint, BUFFER_MAX> m_buffer_texture = {0};
+    std::array<GLuint, BUFFER_MAX> m_buffer_fb = {0};
+
+    const GLuint& m_game_texture = m_buffer_texture[0];
+    const GLuint& m_game_texture_fb = m_buffer_fb[0];
+    GLuint m_game_depth_rb = 0;
+
+    static constexpr int s_num_buffers = 16;
+    GLuint m_vertex_buffer[s_num_buffers] = {0};
+    GLsizeiptr m_vertex_buffer_size[s_num_buffers] = {0};
+    int m_cur_buffer_index = 0;
+
+#ifdef RENDERGL_HAS_VAO
+    GLuint m_glcore_vao = 0;
+#endif
+
+    std::array<GLfloat, 16> m_transform_matrix;
+    std::array<GLfloat, 4> m_shader_read_viewport;
+
+    GLshort m_cur_depth = 0;
+
+    uint64_t m_current_frame = 0;
+    uint64_t m_transform_tick = 0;
+
+    // OpenGL program objects
+    GLProgramObject m_standard_program;
+    GLProgramObject m_bitmask_program;
+    GLProgramObject m_output_program;
+    GLProgramObject m_program_rect_filled;
+    GLProgramObject m_program_rect_unfilled;
+    GLProgramObject m_program_circle;
+    GLProgramObject m_program_circle_hole;
+
+
 
 private:
-    // perform a buffer->buffer copy
-    void update_fb_read_texture(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h);
 
+    // Source for builtin shaders, defined at render_gl_shaders.cpp
+    static const char* const s_es2_standard_vert_src;
+    static const char* const s_es2_advanced_vert_src;
+    // static const char* const s_es3_standard_vert_src;
+    // static const char* const s_es3_advanced_vert_src;
+
+    static const char* const s_es2_standard_frag_src;
+    static const char* const s_es2_bitmask_frag_src;
+    // static const char* const s_es3_standard_frag_src;
+    // static const char* const s_es3_bitmask_frag_src;
+
+    static const char* const s_es2_rect_filled_frag_src;
+    static const char* const s_es2_rect_unfilled_frag_src;
+    static const char* const s_es2_circle_frag_src;
+    static const char* const s_es2_circle_hole_frag_src;
+
+
+    // Initialization functions, defined at render_gl_init.cpp
+
+    // Returning false indicates a catastrophic failure and results in the OpenGL engine not being created
+    // Otherwise, instance flags will be set to reflect actual capabilities
+
+    // initialize the SDL OpenGL bindings according to version preferences and compile-time support,
+    // sets the version, and sets profile/version-dependent flags
+    bool initOpenGL(const CmdLineSetup_t &setup);
+
+    // initialize the OpenGL debug bindings if requested and possible
+    bool initDebug();
+
+    // initialize the global shader objects (also detects ES 2/3 shader support)
+    bool initShaders();
+
+    // setup the clear functions, blending, alpha test (legacy), and depth test
+    bool initState();
+
+    // initializes the game texture and framebuffer, the shader read texture, and the multipass support framebuffers
+    bool initFramebuffers();
+
+    // enable vertex arrays, allocate VBOs if required (Core/Emscripten) or requested and possible; also sets up the VAO if required (Core) or requested and possible
+    bool initVertexArrays();
+
+    // Private draw management functions
+
+    // initializes a single framebuffer with the game's current screen resolution
+    // if BUFFER_GAME, will include depth
+    // if not BUFFER_GAME, will accept case where FBO cannot be allocated as long as texture is okay
+    void createFramebuffer(BufferIndex_t buffer);
+    // destroys a single framebuffer
+    void destroyFramebuffer(BufferIndex_t buffer);
+    // perform a framebuffer->framebuffer copy
+    void framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h);
+
+    // fill the current vertex array buffer with a vertex attribute array
+    void fillVertexBuffer(const Vertex_t* vertex_attribs, int count);
     // deallocate queues unused since previous call
     void refreshDrawQueues();
     // clear queues without drawing or deallocating
@@ -136,8 +244,8 @@ private:
     VertexList& getOrderedDrawVertexList(DrawContext_t context, int depth);
 
 public:
-    RenderGLES();
-    ~RenderGLES() override;
+    RenderGL();
+    ~RenderGL() override;
 
     void togglehud() override;
 
@@ -244,7 +352,7 @@ public:
                      uint32_t image_width,
                      uint32_t image_height) override;
 
-    void compileShaders(StdPicture &target);
+    void compileShaders(StdPicture &target) override;
 
     bool textureMaskSupported() override;
 
@@ -321,4 +429,4 @@ public:
 };
 
 
-#endif // RENDERGLES_T_H
+#endif // RenderGL_T_H

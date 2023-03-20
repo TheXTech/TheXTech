@@ -158,11 +158,12 @@ if(NINTENDO_3DS)
     option(THEXTECH_CUSTOM_AUDIO_LIBRARY "Use the custom audio library instead of MixerX" OFF)
 endif()
 
-option(THEXTECH_BUILD_GL_LEGACY "On SDL builds, include the legacy OpenGL 1.1/2.0 renderer" ON)
-option(THEXTECH_BUILD_GL_MODERN "On SDL builds, include the modern OpenGL Core/ES renderer" ON)
+option(THEXTECH_BUILD_GL_DESKTOP_MODERN "On SDL builds, include the OpenGL 2.0+ Core/Compatibility renderer" ON)
+option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ renderer" ON)
+option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ON)
+option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" ON)
 
-option(THEXTECH_GL_ES_ONLY "Force the modern OpenGL renderer to use ES mode only" OFF)
-mark_as_advanced(THEXTECH_GL_ES_ONLY)
+option(THEXTECH_BUILD_GL_LEGACY "On SDL builds, include the deprecated OpenGL 1.1/2.0 renderer (will not be merged)" ON)
 
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
@@ -259,16 +260,22 @@ if(NINTENDO_DS)
     set(THEXTECH_NO_SDL_BUILD ON CACHE BOOL "" FORCE)
 endif()
 
-if(ANDROID OR EMSCRIPTEN OR NINTENDO_SWITCH)
-    set(THEXTECH_GL_ES_ONLY ON CACHE BOOL "" FORCE)
+if(ANDROID)
+    set(THEXTECH_BUILD_GL_LEGACY         OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
 
-if(ANDROID AND CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(THEXTECH_BUILD_GL_MODERN OFF CACHE BOOL "" FORCE)
-endif()
+# 32-bit Android special case, temporarily disabled for some experiments
+# if(ANDROID AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+#     set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+# endif()
 
-if(EMSCRIPTEN OR NINTENDO_SWITCH)
-    set(THEXTECH_BUILD_GL_LEGACY OFF CACHE BOOL "" FORCE)
+if(EMSCRIPTEN)
+    set(THEXTECH_BUILD_GL_LEGACY         OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY      OFF CACHE BOOL "" FORCE)
 endif()
 
 # ============ Platform-conf ==end=========
@@ -711,10 +718,12 @@ else()
         )
     endif()
 
-    if(THEXTECH_BUILD_GL_MODERN)
+    if(THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN OR THEXTECH_BUILD_GL_ES_LEGACY)
         list(APPEND THEXTECH_SRC
             src/core/sdl/gl_program_object.cpp
-            src/core/sdl/render_gles.cpp
+            src/core/sdl/render_gl.cpp
+            src/core/sdl/render_gl_init.cpp
+            src/core/sdl/render_gl_shaders.cpp
         )
     endif()
 endif()
@@ -936,12 +945,24 @@ if(THEXTECH_BUILD_GL_LEGACY)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_LEGACY)
 endif()
 
-if(THEXTECH_BUILD_GL_MODERN)
-    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_MODERN)
-endif()
-
 if(THEXTECH_GL_ES_ONLY)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_GL_ES_ONLY)
+endif()
+
+if(THEXTECH_BUILD_GL_DESKTOP_MODERN)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_DESKTOP_MODERN)
+endif()
+
+if(THEXTECH_BUILD_GL_ES_MODERN)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_ES_MODERN)
+endif()
+
+if(THEXTECH_BUILD_GL_DESKTOP_LEGACY)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_DESKTOP_LEGACY)
+endif()
+
+if(THEXTECH_BUILD_GL_ES_LEGACY)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_ES_LEGACY)
 endif()
 
 if(THEXTECH_ENABLE_WIP_FEATURES)

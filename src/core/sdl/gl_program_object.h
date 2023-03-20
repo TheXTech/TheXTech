@@ -21,8 +21,12 @@
 #pragma once
 #ifndef GL_PROGRAM_OBJECT_H
 
-#include <SDL2/SDL_opengles2.h>
 #include <vector>
+
+typedef unsigned int    GLenum;
+typedef int             GLint;
+typedef unsigned int    GLuint;
+typedef float           GLfloat;
 
 class GLProgramObject
 {
@@ -53,7 +57,7 @@ private:
 
     static GLuint s_compile_shader(GLenum type, const char* src);
 
-    virtual void m_link_program(GLuint vertex_shader, GLuint fragment_shader);
+    void m_link_program(GLuint vertex_shader, GLuint fragment_shader);
 
 public:
 
