@@ -62,7 +62,7 @@ RenderGL::~RenderGL()
 
 unsigned int RenderGL::SDL_InitFlags()
 {
-    return 0;
+    return SDL_WINDOW_OPENGL;
 }
 
 bool RenderGL::isWorking()
@@ -448,8 +448,6 @@ bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     if(!AbstractRender_t::init())
         return false;
-
-    Uint32 renderFlags = 0;
 
     if(!initOpenGL(setup)
         || !initDebug()

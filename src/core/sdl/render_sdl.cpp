@@ -82,17 +82,22 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     switch(setup.renderType)
     {
-    case RENDER_ACCELERATED_VSYNC:
-        renderFlags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC;
-        g_videoSettings.renderModeObtained = RENDER_ACCELERATED_VSYNC;
-        pLogDebug("Using accelerated rendering with a vertical synchronization");
-        m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
-        if(m_gRenderer)
-            break; // All okay
-        pLogWarning("Failed to initialize V-Synced renderer, trying to create accelerated renderer...");
-
-        // fallthrough
     case RENDER_ACCELERATED:
+    case RENDER_ACCELERATED_SDL:
+    default:
+        if(setup.vSync)
+        {
+            renderFlags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC;
+            g_videoSettings.renderModeObtained = RENDER_ACCELERATED;
+            pLogDebug("Using accelerated rendering with a vertical synchronization");
+            m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
+            if(m_gRenderer)
+                break; // All okay
+            pLogWarning("Failed to initialize V-Synced renderer, trying to create accelerated renderer...");
+        }
+
+        // continue
+
         renderFlags = SDL_RENDERER_ACCELERATED;
         g_videoSettings.renderModeObtained = RENDER_ACCELERATED;
         pLogDebug("Using accelerated rendering");

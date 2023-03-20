@@ -259,10 +259,16 @@ int main(int argc, char**argv)
         TCLAP::SwitchArg switchNoSound("s", "no-sound", "Disable sound", false);
         TCLAP::SwitchArg switchNoPause("p", "never-pause", "Never pause game when window losts a focus", false);
         TCLAP::SwitchArg switchBgInput(std::string(), "bg-input", "Allow background input for joysticks", false);
+        TCLAP::SwitchArg switchVSync(std::string(), "vsync", "Limit the framerate to the screen refresh rate", false);
         TCLAP::ValueArg<std::string> renderType("r", "render", "Sets the graphics mode:\n"
-                                                "  sw - software render (fallback)\n"
-                                                "  hw - hardware accelerated render [Default]\n"
-                                                "  vsync - hardware accelerated with the v-sync enabled",
+                                                "  sw - software SDL2 render (fallback)\n"
+                                                "  hw - generic hardware accelerated render (currently SDL2) [Default]\n"
+                                                "  vsync - generic hardware accelerated render with vSync [deprecated]\n"
+                                                "  sdl - hardware accelerated SDL2 render\n"
+                                                "  opengl - hardware accelerated OpenGL 2.1+ render\n"
+                                                "  opengles - hardware accelerated OpenGL ES (mobile) 2.0+ render\n"
+                                                "  opengl11 - hardware accelerated OpenGL 1.1-2.0 render (legacy)\n"
+                                                "  opengles11 - hardware accelerated OpenGL ES 1.1 render (legacy)",
                                                 false, "",
                                                 "render type",
                                                 cmd);
@@ -361,6 +367,7 @@ int main(int argc, char**argv)
         cmd.add(&switchNoSound);
         cmd.add(&switchNoPause);
         cmd.add(&switchBgInput);
+        cmd.add(&switchVSync);
         cmd.add(&switchBattleMode);
 
         cmd.add(&switchTestGodMode);
@@ -408,6 +415,7 @@ int main(int argc, char**argv)
         setup.noSound   = switchNoSound.isSet() ? switchNoSound.getValue() : g_audioSetup.disableSound;
         setup.neverPause = switchNoPause.isSet() ? switchNoPause.getValue() : g_videoSettings.allowBgWork;
         setup.allowBgInput = switchBgInput.isSet() ? switchBgInput.getValue() : g_videoSettings.allowBgControllerInput;
+        setup.vSync = switchVSync.isSet() ? switchVSync.getValue() : g_videoSettings.vSync;
 
         if(setup.allowBgInput) // The BG-input depends on the never-pause option
             setup.neverPause = setup.allowBgInput;
@@ -418,9 +426,22 @@ int main(int argc, char**argv)
             if(rt == "sw")
                 setup.renderType = RENDER_SOFTWARE;
             else if(rt == "vsync")
-                setup.renderType = RENDER_ACCELERATED_VSYNC;
+            {
+                setup.renderType = RENDER_ACCELERATED;
+                setup.vSync = true;
+            }
             else if(rt == "hw")
                 setup.renderType = RENDER_ACCELERATED;
+            else if(rt == "sdl")
+                setup.renderType = RENDER_ACCELERATED_SDL;
+            else if(rt == "opengl")
+                setup.renderType = RENDER_ACCELERATED_OPENGL;
+            else if(rt == "opengl11")
+                setup.renderType = RENDER_ACCELERATED_OPENGL_LEGACY;
+            else if(rt == "opengles")
+                setup.renderType = RENDER_ACCELERATED_OPENGL_ES;
+            else if(rt == "opengles11")
+                setup.renderType = RENDER_ACCELERATED_OPENGL_ES_LEGACY;
             else
             {
                 std::cerr << "Error: Invalid value for the --render argument: " << rt << std::endl;

@@ -25,6 +25,7 @@
 #endif
 
 #include "gfx.h"
+#include "video.h"
 
 #include "core/render.h"
 #include "core/window.h"
@@ -33,16 +34,7 @@
 
 #ifdef CORE_EVERYTHING_SDL
 #   include "core/sdl/render_sdl.h"
-#   include "core/sdl/render_gl11.h"
 #   include "core/sdl/render_gl.h"
-
-#   if defined(RENDERGL_SUPPORTED)
-typedef RenderGL RenderUsed;
-#   elif defined(THEXTECH_BUILD_GL_LEGACY)
-typedef RenderGL11 RenderUsed;
-#   else
-typedef RenderSDL RenderUsed;
-#   endif
 
 #   define USE_CORE_RENDER_SDL
 
@@ -85,10 +77,27 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     g_window = m_window.get();
 #endif
 
-#ifndef RENDER_CUSTOM
-    RenderUsed *render = new RenderUsed();
-    m_render.reset(render);
-    g_render = m_render.get();
+#ifdef USE_CORE_RENDER_SDL
+
+    bool try_gl = false;
+
+#   ifdef RENDERGL_SUPPORTED
+    if(setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+    {
+        RenderGL *render = new RenderGL();
+        m_render.reset(render);
+        g_render = m_render.get();
+        try_gl = true;
+    }
+    else
+#   endif // #ifdef RENDERGL_SUPPORTED
+
+    {
+        RenderSDL *render = new RenderSDL();
+        m_render.reset(render);
+        g_render = m_render.get();
+    }
+
 #endif
 
 #ifndef MSGBOX_CUSTOM
@@ -109,7 +118,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     D_pLogDebugNA("FrmMain: Loading XWindow...");
     res = XWindow::init();
 #elif defined(USE_CORE_WINDOW_SDL)
-    res = window->initSDL(setup, render->SDL_InitFlags());
+    res = window->initSDL(setup, g_render->SDL_InitFlags());
 #else
 #   error "FIXME: Implement supported window initialization here"
 #endif
@@ -148,7 +157,28 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     D_pLogDebugNA("FrmMain: Loading XRender...");
     res &= XRender::init();
 #elif defined(USE_CORE_WINDOW_SDL) && defined(USE_CORE_RENDER_SDL)
-    res = render->initRender(setup, window->getWindow());
+    res = g_render->initRender(setup, window->getWindow());
+
+#   ifdef RENDERGL_SUPPORTED
+    if(try_gl && !res)
+    {
+        pLogDebug("FrmMain: closing Render GL");
+        m_render->clearAllTextures();
+        m_render->close();
+
+        m_render.reset();
+        g_render = nullptr;
+
+        pLogDebug("FrmMain: retrying with Render SDL layer...");
+
+        RenderSDL *render = new RenderSDL();
+        m_render.reset(render);
+        g_render = m_render.get();
+
+        res = g_render->initRender(setup, window->getWindow());
+    }
+#   endif // #ifdef RENDERGL_SUPPORTED
+
 #else
 #   error "FIXME: Implement supported render initialization here"
 #endif

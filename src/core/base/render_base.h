@@ -33,7 +33,8 @@ struct GifRecorder;
 
 typedef struct SDL_Thread SDL_Thread;
 typedef struct SDL_mutex SDL_mutex;
-
+typedef struct SDL_Window SDL_Window;
+struct CmdLineSetup_t;
 
 class AbstractRender_t
 {
@@ -71,6 +72,8 @@ public:
      * \return true if render initialized and works
      */
     virtual bool isWorking() = 0;
+
+    virtual bool initRender(const CmdLineSetup_t &setup, SDL_Window *window) = 0;
 
     /*!
      * \brief Initialize defaults of the renderer

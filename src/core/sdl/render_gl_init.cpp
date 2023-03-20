@@ -27,6 +27,7 @@
 #include <Logger/logger.h>
 
 #include "globals.h"
+#include "video.h"
 
 #include "core/sdl/render_gl.h"
 
@@ -61,6 +62,39 @@ static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint i
     pLogWarning("Got GL error %s", message);
 }
 
+static const char* s_profile_name(const GLint profile)
+{
+    switch(profile)
+    {
+    case SDL_GL_CONTEXT_PROFILE_COMPATIBILITY:
+        return "Compatibility";
+    case SDL_GL_CONTEXT_PROFILE_CORE:
+        return "Core";
+    case SDL_GL_CONTEXT_PROFILE_ES:
+        return "ES";
+    default:
+        return "";
+    }
+}
+
+static void s_try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver)
+{
+    // context already initialized
+    if(context)
+        return;
+
+    pLogDebug("Render GL: attempting to create OpenGL %s %d.%d+ context...", s_profile_name(profile), majver, minver);
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, profile);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majver);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minver);
+    context = SDL_GL_CreateContext(window);
+
+    if(!context)
+        pLogDebug("Render GL: context creation failed.");
+
+}
+
 bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 {
     SDL_version compiled, linked;
@@ -75,79 +109,51 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 
+    // user request sequence
+
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-    if(!m_gContext)
+    if(setup.renderType == RENDER_ACCELERATED_OPENGL)
     {
-        pLogDebug("Render GL: attempting to create OpenGL Compatibility 3.3+ context...");
-
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-        m_gContext = SDL_GL_CreateContext(m_window);
-
-        if(!m_gContext)
-            pLogDebug("Render GL: context creation failed.");
+        s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3);
+        s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3);
     }
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
-    if(!m_gContext)
-    {
-        pLogDebug("Render GL: attempting to create OpenGL ES 2.0+ context...");
-
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-        m_gContext = SDL_GL_CreateContext(m_window);
-
-        if(!m_gContext)
-            pLogDebug("Render GL: context creation failed.");
-    }
-#endif
-
-#ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-    if(!m_gContext)
-    {
-        pLogDebug("Render GL: attempting to create OpenGL Core 3.3+ context...");
-
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-        m_gContext = SDL_GL_CreateContext(m_window);
-
-        if(!m_gContext)
-            pLogDebug("Render GL: context creation failed.");
-    }
+    if(setup.renderType == RENDER_ACCELERATED_OPENGL_ES)
+        s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
-    if(!m_gContext)
-    {
-        pLogDebug("Render GL: attempting to create OpenGL Compatibility 1.1+ context...");
-
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-        m_gContext = SDL_GL_CreateContext(m_window);
-
-        if(!m_gContext)
-            pLogDebug("Render GL: context creation failed.");
-    }
+    if(setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY)
+        s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_LEGACY
-    if(!m_gContext)
-    {
-        pLogDebug("Render GL: attempting to create OpenGL ES 1.1+ context...");
+    if(setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+        s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1);
+#endif
 
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 1);
-        SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-        m_gContext = SDL_GL_CreateContext(m_window);
+    // default fallback sequence
 
-        if(!m_gContext)
-            pLogDebug("Render GL: context creation failed.");
-    }
+#ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
+    s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3);
+#endif
+
+#ifdef THEXTECH_BUILD_GL_ES_MODERN
+    s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0);
+#endif
+
+#ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
+    s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3);
+#endif
+
+#ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+    s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1);
+#endif
+
+#ifdef THEXTECH_BUILD_GL_ES_LEGACY
+    s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1);
 #endif
 
     if(!m_gContext)
@@ -156,11 +162,12 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
         return false;
     }
 
+    // Check version
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &m_gl_profile);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &m_gl_majver);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &m_gl_minver);
 
-    pLogDebug("Render GL: successfully initialized OpenGL %d.%d with profile code %d", m_gl_majver, m_gl_minver, m_gl_profile);
+    pLogDebug("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, s_profile_name(m_gl_profile));
     pLogDebug("OpenGL version: %s", glGetString(GL_VERSION));
     pLogDebug("OpenGL renderer: %s", glGetString(GL_RENDERER));
 #ifdef RENDERGL_HAS_SHADERS
@@ -177,20 +184,25 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     m_maxTextureWidth = maxTextureSize;
     m_maxTextureHeight = maxTextureSize;
 
+#ifdef RENDERGL_HAS_LOGICOP
     if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES || m_gl_majver == 1)
         m_use_logicop = true;
     else
         m_use_logicop = false;
+#else
+    m_use_logicop = false;
+#endif
 
+#ifdef RENDERGL_HAS_SHADERS
     if(m_gl_majver > 1 && m_gl_profile != SDL_GL_CONTEXT_PROFILE_COMPATIBILITY)
         m_use_shaders = true;
-    else if(m_gl_majver > 1)
-    {
-        // should actually decide based on user request
+    else if(m_gl_majver > 1 && setup.renderType != RENDER_ACCELERATED_OPENGL_LEGACY)
         m_use_shaders = true;
-    }
     else
         m_use_shaders = false;
+#else
+    m_use_shaders = false;
+#endif
 
 #ifdef __EMSCRIPTEN__
     m_client_side_arrays = false;
@@ -201,12 +213,19 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
         m_client_side_arrays = true;
 #endif // #ifdef __EMSCRIPTEN__
 
+#ifdef RENDERGL_HAS_FBO
     if(m_gl_majver >= 2)
         m_has_fbo = true;
     else
         m_has_fbo = false;
+#else
+    m_has_fbo = false;
+#endif
 
     // should check for NPOT and BGRA textures
+
+    // setup vSync
+    SDL_GL_SetSwapInterval(setup.vSync);
 
     return true;
 }
@@ -343,9 +362,6 @@ bool RenderGL::initState()
 #else
     glClearDepth(0.0f);
 #endif
-
-    // misc state attributes
-    SDL_GL_SetSwapInterval(0);
 
     return true;
 }

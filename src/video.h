@@ -24,10 +24,15 @@
 
 enum RenderMode_t
 {
+    RENDER_ACCELERATED_VSYNC_DEPRECATED = -2,
     RENDER_AUTO = -1,
     RENDER_SOFTWARE = 0,
     RENDER_ACCELERATED,
-    RENDER_ACCELERATED_VSYNC
+    RENDER_ACCELERATED_SDL,
+    RENDER_ACCELERATED_OPENGL,
+    RENDER_ACCELERATED_OPENGL_ES,
+    RENDER_ACCELERATED_OPENGL_LEGACY,
+    RENDER_ACCELERATED_OPENGL_ES_LEGACY,
 };
 
 enum BatteryStatus_t
@@ -52,6 +57,8 @@ extern struct VideoSettings_t
     int    renderMode = RENDER_ACCELERATED;
     //! The currently running render mode
     int    renderModeObtained = RENDER_AUTO;
+    //! Attempt to enable vSync
+    bool   vSync = false;
     //! Device battery status indicator
     int    batteryStatus = BATTERY_STATUS_OFF;
     //! Allow game to work when window is not active

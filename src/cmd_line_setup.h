@@ -36,6 +36,8 @@ struct CmdLineSetup_t
     bool allowBgInput = false;
     //! TYpe of a render
     int renderType = -1;
+    //! Enable vSync support
+    bool vSync = false;
     //! Is a level testing mode
     bool testLevelMode = false;
     //! Level file to test
