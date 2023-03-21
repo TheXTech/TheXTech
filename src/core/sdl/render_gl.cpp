@@ -617,6 +617,10 @@ void RenderGL::repaint()
     GLuint err;
     while((err = glGetError()) != 0)
         pLogWarning("Render GL: got GL error code %d on repaint", (int)err);
+
+    // clear buffer in legacy GL
+    if(!m_game_texture_fb)
+        clearBuffer();
 }
 
 void RenderGL::applyViewport()
