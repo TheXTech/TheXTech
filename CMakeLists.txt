@@ -789,6 +789,10 @@ set_target_properties(thextech PROPERTIES
     OUTPUT_NAME "${THEXTECH_EXECUTABLE_NAME}"
 )
 
+if(CMAKE_BUILD_TYPE_LOWER STREQUAL "debug" OR CMAKE_BUILD_TYPE_LOWER STREQUAL "relwithdebinfo")
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_DEBUG_INFO)
+endif()
+
 if(APPLE)
     if(XTECH_MACOSX_TIGER)
         set(THEXTECH_EXECUTABLE_NAME_OUT TheXTechRun)
