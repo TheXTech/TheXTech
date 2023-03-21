@@ -727,7 +727,7 @@ void RenderGL::applyViewport()
             2.0f / (float)viewport_w, 0.0f, 0.0f, 0.0f,
             0.0f, -2.0f / (float)viewport_h, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
-            -(viewport_w + off_x + off_x + 0.5f) / (viewport_w), (viewport_h + off_y + off_y + 0.5f) / (viewport_h), 0.0f, 1.0f,
+            -(viewport_w + off_x + off_x) / (GLfloat)(viewport_w), (viewport_h + off_y + off_y) / (GLfloat)(viewport_h), 0.0f, 1.0f,
         };
 
         m_shader_read_viewport = {
@@ -746,13 +746,13 @@ void RenderGL::applyViewport()
         if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES)
         {
 #ifdef RENDERGL_HAS_ORTHOF
-            glOrthof( off_x + 0.5f, viewport_w + off_x + 0.5f, viewport_h + off_y + 0.5f, off_y + 0.5f, (1 << 15), -(1 << 15));
+            glOrthof( off_x, viewport_w + off_x, viewport_h + off_y, off_y, (1 << 15), -(1 << 15));
 #endif
         }
         else
         {
 #ifdef RENDERGL_HAS_ORTHO
-            glOrtho( off_x + 0.5f, viewport_w + off_x + 0.5f, viewport_h + off_y + 0.5f, off_y + 0.5f, (1 << 15), -(1 << 15));
+            glOrtho( off_x, viewport_w + off_x, viewport_h + off_y, off_y, (1 << 15), -(1 << 15));
 #endif
         }
     }
