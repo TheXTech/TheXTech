@@ -14,6 +14,12 @@
             android:title="@string/setup_assets_path_label" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/setup_display_cat">
+        <ListPreference
+            android:defaultValue=""
+            android:entries="@array/renderer"
+            android:entryValues="@array/rendererValues"
+            android:key="setup_renderer"
+            android:title="@string/setup_renderer_label" />
         <CheckBoxPreference
             android:defaultValue="false"
             android:key="show_fps"

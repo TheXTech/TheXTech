@@ -94,6 +94,13 @@ public class thextechActivity extends SDLActivity
         if(setup.getBoolean("setup_show_controller_state", false))
             args.add("--show-controls");
 
+        String renderer = setup.getString("setup_renderer", "");
+        if(!renderer.isEmpty())
+        {
+            args.add("--render");
+            args.add(renderer);
+        }
+
         int showBatteryStatus = Integer.parseInt(setup.getString("setup_show_battery_status", "0"));
         if(showBatteryStatus > 0)
         {
