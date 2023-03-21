@@ -34,14 +34,25 @@ DEALINGS IN THE SOFTWARE.
 #include "dirman.h"
 #include "dirman_private.h"
 
+#if defined(__APPLE__) && MAC_OS_X_VERSION_MAX_ALLOWED < 1010 && defined(DIRMAN_HAS_FSSTATAT)
+#   undef DIRMAN_HAS_FSSTATAT  /*This call isn't available at macOS older than 10.10 */
+#endif
 
 void DirMan::DirMan_private::setPath(const std::string &dirPath)
 {
+#ifdef DIRMAN_HAS_REALPATH
     char rp[PATH_MAX];
     memset(rp, 0, PATH_MAX);
     char* realPath = realpath(dirPath.c_str(), rp);
     (void)realPath;
     m_dirPath = rp;
+#else
+    m_dirPath = dirPath;
+
+    if(dirPath.size() > 2 && dirPath[dirPath.size() - 2] == ':')
+        return;
+#endif
+
     delEnd(m_dirPath, '/');
 }
 
@@ -51,23 +62,37 @@ bool DirMan::DirMan_private::getListOfFiles(std::vector<std::string> &list, cons
 
     dirent *dent = nullptr;
     DIR *srcdir = opendir(m_dirPath.c_str());
+
     if(srcdir == nullptr)
         return false;
 
     while((dent = readdir(srcdir)) != nullptr)
     {
+#ifdef DIRMAN_HAS_FSSTATAT
         struct stat st = {};
+#endif
+
         if(strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
             continue;
 
+#ifdef DIRMAN_HAS_FSSTATAT
         if(fstatat(dirfd(srcdir), dent->d_name, &st, 0) < 0)
             continue;
+
         if(S_ISREG(st.st_mode))
         {
             if(matchSuffixFilters(dent->d_name, suffix_filters))
                 list.emplace_back(dent->d_name);
         }
+#else
+        if(dent->d_type == DT_REG)
+        {
+            if(matchSuffixFilters(dent->d_name, suffix_filters))
+                list.emplace_back(dent->d_name);
+        }
+#endif
     }
+
     closedir(srcdir);
     return true;
 }
@@ -77,6 +102,7 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
     list.clear();
     dirent *dent = nullptr;
     DIR *srcdir = opendir(m_dirPath.c_str());
+
     if(srcdir == nullptr)
         return false;
 
@@ -86,6 +112,7 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
         if(strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
             continue;
 
+#ifdef DIRMAN_HAS_FSSTATAT
         if(fstatat(dirfd(srcdir), dent->d_name, &st, 0) < 0)
             continue;
 
@@ -94,8 +121,17 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
             if(matchSuffixFilters(dent->d_name, suffix_filters))
                 list.emplace_back(dent->d_name);
         }
+#else
+        if(dent->d_type == DT_DIR)
+        {
+            if(matchSuffixFilters(dent->d_name, suffix_filters))
+                list.emplace_back(dent->d_name);
+        }
+#endif
     }
+
     closedir(srcdir);
+
     return true;
 }
 
@@ -121,6 +157,7 @@ bool DirMan::DirMan_private::fetchListFromWalker(std::string &curPath, std::vect
         if(strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
             continue;
 
+#ifdef DIRMAN_HAS_FSSTATAT
         if(fstatat(dirfd(srcdir), dent->d_name, &st, 0) < 0)
             continue;
 
@@ -131,7 +168,17 @@ bool DirMan::DirMan_private::fetchListFromWalker(std::string &curPath, std::vect
             if(matchSuffixFilters(dent->d_name, m_walkerState.suffix_filters))
                 list.emplace_back(dent->d_name);
         }
+#else
+        if(dent->d_type == DT_DIR)
+            m_walkerState.digStack.push(path + "/" + dent->d_name);
+        else if(dent->d_type == DT_REG)
+        {
+            if(matchSuffixFilters(dent->d_name, m_walkerState.suffix_filters))
+                list.emplace_back(dent->d_name);
+        }
+#endif
     }
+
     closedir(srcdir);
     curPath = path;
 
