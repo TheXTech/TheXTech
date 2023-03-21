@@ -585,6 +585,10 @@ int main(int argc, char**argv)
     setup.testShowFPS = true;
 #endif
 
+#if defined(__EMSCRIPTEN__) && defined(THEXTECH_DEBUG_INFO)
+    setup.verboseLogging = true;
+#endif
+
 #ifdef __16M__
     // setup.testMaxFPS = true;
     setCpuClock(true);
