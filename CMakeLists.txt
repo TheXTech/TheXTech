@@ -163,8 +163,6 @@ option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ re
 option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ON)
 option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" ON)
 
-option(THEXTECH_BUILD_GL_LEGACY "On SDL builds, include the deprecated OpenGL 1.1/2.0 renderer (will not be merged)" ON)
-
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
 
@@ -261,7 +259,6 @@ if(NINTENDO_DS)
 endif()
 
 if(ANDROID)
-    set(THEXTECH_BUILD_GL_LEGACY         OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
@@ -272,7 +269,6 @@ endif()
 # endif()
 
 if(EMSCRIPTEN)
-    set(THEXTECH_BUILD_GL_LEGACY         OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_ES_LEGACY      OFF CACHE BOOL "" FORCE)
@@ -933,10 +929,6 @@ endif()
 
 if(THEXTECH_CLI_BUILD)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_CLI_BUILD)
-endif()
-
-if(THEXTECH_BUILD_GL_LEGACY)
-    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_LEGACY)
 endif()
 
 if(THEXTECH_BUILD_GL_DESKTOP_MODERN)
