@@ -58,8 +58,14 @@ bool AppPathManager::m_isPortable = false;
 
 static void appendSlash(std::string &path)
 {
+#if defined(__EMSCRIPTEN__)
+    // fix emscripten bug of duplicated worlds
+    if(path.empty() || path.back() != '/')
+        path.push_back('/');
+#else
     if(!path.empty() && path.back() != '/')
         path.push_back('/');
+#endif
 }
 
 void AppPathManager::setAssetsRoot(const std::string &root)
@@ -108,12 +114,7 @@ void AppPathManager::initAppPath()
         if(userDirPath != "/" && !appDir.exists() && !appDir.mkpath())
             goto defaultSettingsPath;
 
-        // note: automatically removes final slash
         m_userPath = appDir.absolutePath();
-
-        // fix emscripten bug of duplicated worlds
-        if(m_userPath.empty())
-            m_userPath = "/";
     }
 
     appendSlash(m_userPath);
