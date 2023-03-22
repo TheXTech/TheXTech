@@ -23,6 +23,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/trace.h>
+#include <emscripten/html5.h>
 #define LOG_CHANNEL "Application"
 #endif // __EMSCRIPTEN__
 
@@ -32,6 +33,7 @@ static std::mutex g_lockLocker;
 
 #define OUT_BUFFER_SIZE 10240
 static char       g_outputBuffer[OUT_BUFFER_SIZE];
+static char       g_outputBuffer2[OUT_BUFFER_SIZE];
 
 
 void LogWriter::OpenLogFile()
@@ -43,7 +45,6 @@ void LogWriter::CloseLog()
 void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
 {
     va_list arg_in;
-    (void)level;
 
 #ifndef PGE_NO_THREADING
     MUTEXLOCK(mutex);
@@ -53,8 +54,16 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
     int len = std::vsnprintf(g_outputBuffer, OUT_BUFFER_SIZE, format, arg_in);
     if(len > 0)
     {
-        std::fprintf(stderr, "%s: %s\n", label, g_outputBuffer);
-        std::fflush(stderr);
+        int len = std::snprintf(g_outputBuffer2, OUT_BUFFER_SIZE, "%s: %s\n", label, g_outputBuffer);
+        if(len > 0)
+        {
+            if(level == PGE_LogLevel::Critical || level == PGE_LogLevel::Fatal)
+                emscripten_console_error(g_outputBuffer2);
+            else if(level == PGE_LogLevel::Warning)
+                emscripten_console_warn(g_outputBuffer2);
+            else
+                emscripten_console_log(g_outputBuffer2);
+        }
     }
     va_end(arg_in);
     (void)len;
