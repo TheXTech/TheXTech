@@ -264,6 +264,11 @@ if(ANDROID)
     set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
 endif()
 
+if(APPLE)
+    set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_ES_LEGACY OFF CACHE BOOL "" FORCE)
+endif()
+
 # 32-bit Android special case, temporarily disabled for some experiments
 # if(ANDROID AND CMAKE_SIZEOF_VOID_P EQUAL 4)
 #     set(THEXTECH_BUILD_GL_ES_MODERN OFF CACHE BOOL "" FORCE)

@@ -27,7 +27,10 @@
 #    include <SDL2/SDL_opengl.h>
 #    include <SDL2/SDL_opengl_glext.h>
 
-#    define RENDERGL_HAS_DEBUG
+#    ifndef __APPLE__
+#        define RENDERGL_HAS_DEBUG
+#    endif
+
 #    define RENDERGL_HAS_LOGICOP
 #    define RENDERGL_HAS_ORTHO
 #    define RENDERGL_HAS_SHADERS
