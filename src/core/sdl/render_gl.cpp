@@ -813,6 +813,9 @@ void RenderGL::resetViewport()
 
 void RenderGL::setViewport(int x, int y, int w, int h)
 {
+    if(x == m_viewport_x && y == m_viewport_y && w == m_viewport_w && h == m_viewport_h)
+        return;
+
     flushDrawQueues();
 
     m_viewport_x = x;
@@ -825,6 +828,9 @@ void RenderGL::setViewport(int x, int y, int w, int h)
 
 void RenderGL::offsetViewport(int x, int y)
 {
+    if(x == m_viewport_offset_x && y == m_viewport_offset_y)
+        return;
+
     flushDrawQueues();
 
     m_viewport_offset_x = x;
@@ -835,6 +841,15 @@ void RenderGL::offsetViewport(int x, int y)
 
 void RenderGL::offsetViewportIgnore(bool en)
 {
+    if(en == m_viewport_offset_ignore)
+        return;
+
+    if(m_viewport_offset_x == 0 && m_viewport_offset_y == 0)
+    {
+        m_viewport_offset_ignore = en;
+        return;
+    }
+
     flushDrawQueues();
 
     m_viewport_offset_ignore = en;
