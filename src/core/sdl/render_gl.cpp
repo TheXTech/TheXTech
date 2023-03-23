@@ -624,9 +624,11 @@ void RenderGL::repaint()
     if(m_current_frame % 512 == 0)
         refreshDrawQueues();
 
+#if 0
     GLuint err;
     while((err = glGetError()) != 0)
         pLogWarning("Render GL: got GL error code %d on repaint", (int)err);
+#endif
 
     // clear buffer in legacy GL
     if(!m_game_texture_fb)
