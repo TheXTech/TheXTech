@@ -357,7 +357,7 @@ void RenderGL::flushDrawQueues()
             else
                 continue;
 
-            SDL_assert(context.program && context.program->inited());
+            SDL_assert(context.program);
             GLProgramObject* program = context.program;
 
             if(!m_use_logicop && (program == &m_standard_program) && context.texture && context.texture->d.mask_texture_id)
@@ -385,6 +385,7 @@ void RenderGL::flushDrawQueues()
 #ifdef RENDERGL_HAS_SHADERS
             if(m_use_shaders)
             {
+                SDL_assert(program->inited());
                 program->use_program();
                 program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), (GLfloat)((m_transform_tick / 3) % (65 * 60)) / 65.0f);
             }
