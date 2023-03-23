@@ -66,6 +66,10 @@ class RenderSDL final : public AbstractRender_t
     int m_viewport_w = 0;
     int m_viewport_h = 0;
 
+    //Need for HiDPI rendering (number of draw pixels per cursor pixel)
+    float m_hidpi_x = 1.0f;
+    float m_hidpi_y = 1.0f;
+
 public:
     RenderSDL();
     ~RenderSDL() override;
