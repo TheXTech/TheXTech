@@ -314,20 +314,29 @@ void RenderGL::flushDrawQueues()
     }
 
     // pass 2: translucent / interesting textures
-    glDepthMask(GL_FALSE);
-
+    bool early_return = true;
     int num_pass = 1;
 
     // save the opaque state if there are any multipass shaders
     for(auto& i : m_ordered_draw_queue)
     {
-        if(!i.second.vertices.empty() && i.first.second.program && i.first.second.program->get_type() >= GLProgramObject::multipass)
+        if(i.second.vertices.empty())
+            continue;
+
+        early_return = false;
+
+        if(i.first.second.program && i.first.second.program->get_type() >= GLProgramObject::multipass)
         {
             num_pass = s_num_pass;
             framebufferCopy(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
             break;
         }
     }
+
+    if(early_return)
+        return;
+
+    glDepthMask(GL_FALSE);
 
     for(int pass = 0; pass < num_pass; pass++)
     {
