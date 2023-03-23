@@ -667,14 +667,7 @@ void RenderGL::applyViewport()
     if(viewport_x + viewport_w > ScreenW)
         viewport_w = ScreenW - viewport_x;
 
-    GLint cur_fb = 0;
-
-#ifdef RENDERGL_HAS_FBO
-    if(m_has_fbo)
-        glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cur_fb);
-#endif
-
-    if(cur_fb != 0 && (GLuint)cur_fb == m_game_texture_fb)
+    if(m_has_fbo && m_game_texture_fb)
     {
         glViewport(viewport_x, ScreenH - (viewport_y + viewport_h),
             viewport_w, viewport_h);
@@ -901,7 +894,7 @@ void RenderGL::setTargetScreen()
     flushDrawQueues();
 
 #ifdef RENDERGL_HAS_FBO
-    if(m_has_fbo)
+    if(m_has_fbo && m_game_texture_fb)
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 #endif
 
