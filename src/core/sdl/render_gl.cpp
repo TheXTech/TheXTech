@@ -774,6 +774,12 @@ void RenderGL::updateViewport()
     int hardware_w, hardware_h;
     getRenderSize(&hardware_w, &hardware_h);
 
+    // quickly update the HiDPI scaling factor
+    int window_w, window_h;
+    XWindow::getWindowSize(&window_w, &window_h);
+    m_hidpi_x = (float)hardware_w / (float)window_w;
+    m_hidpi_y = (float)hardware_h / (float)window_h;
+
     // if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
     {
         int res_h = hardware_h;
@@ -859,14 +865,14 @@ void RenderGL::offsetViewportIgnore(bool en)
 
 void RenderGL::mapToScreen(int x, int y, int *dx, int *dy)
 {
-    *dx = static_cast<int>((static_cast<float>(x) - m_phys_x) * ScreenW / m_phys_w);
-    *dy = static_cast<int>((static_cast<float>(y) - m_phys_y) * ScreenH / m_phys_h);
+    *dx = static_cast<int>((static_cast<float>(x) * m_hidpi_x - m_phys_x) * ScreenW / m_phys_w);
+    *dy = static_cast<int>((static_cast<float>(y) * m_hidpi_y - m_phys_y) * ScreenH / m_phys_h);
 }
 
 void RenderGL::mapFromScreen(int scr_x, int scr_y, int *window_x, int *window_y)
 {
-    *window_x = (float)scr_x * m_phys_w / ScreenW + m_phys_x;
-    *window_y = (float)scr_y * m_phys_h / ScreenH + m_phys_y;
+    *window_x = ((float)scr_x * m_phys_w / ScreenW + m_phys_x) / m_hidpi_x;
+    *window_y = ((float)scr_y * m_phys_h / ScreenH + m_phys_y) / m_hidpi_y;
 }
 
 void RenderGL::getRenderSize(int *w, int *h)

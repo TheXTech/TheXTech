@@ -128,6 +128,10 @@ private:
     int m_viewport_w = 0;
     int m_viewport_h = 0;
 
+    //Need for HiDPI rendering (number of draw pixels per cursor pixel)
+    float m_hidpi_x = 1.0f;
+    float m_hidpi_y = 1.0f;
+
     // internal capability trackers
     GLint m_gl_majver = 0;
     GLint m_gl_minver = 0;
