@@ -501,7 +501,7 @@ bool KeyboardMouseRender(bool mouse, bool render)
     int win_width = kb_width + 20;
     int win_height = kb_height + 20;
 
-    int n_text_chars = s_current_keymap_cols * 2 + 1;
+    int n_text_chars = (s_current_keymap_cols * key_size - 20) / 18 - 1;
     int n_prompt_chars = n_text_chars + 2;
 
     int n_prompt_lines = ((s_Prompt.size() + n_prompt_chars - 1) / n_prompt_chars);
