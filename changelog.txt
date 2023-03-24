@@ -7,7 +7,7 @@ Changelog for 1.3.7-dev
 -<WIP>
 
 Changelog for 1.3.6.1
--Fixed some of the performance slowdown problems (@ds-sloth)
+-Fixed some of the performance slowdown problems using improved object spatial lookup tables (@ds-sloth)
 -Fixed the work of Sound FX on big-endian architectures (@Wohlstand)
 -Fixed directory creation flags on Vita (@suicvne)
 -Minor fixes to the gameplay recording system (@Wohlstand, @ds-sloth)
@@ -37,6 +37,7 @@ Changelog for 1.3.6.1
 -In Magic Hand mode, cursor now snaps to current layer's grid, instead of global grid. (@ds-sloth)
 -Fixed crash that could occur if player warped with >2P cheat active. (@ds-sloth)
 -Correctly render large level graphics at the edge of the screen. (@Wohlstand, @ds-sloth)
+-Miscellaneous improvements for the Emscripten experience on iOS (@ds-sloth)
 -Fixed bug where touchscreen controller would stay active during text entry screen without rendering (@ds-sloth)
 
 Changelog for 1.3.6
