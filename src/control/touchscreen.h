@@ -319,6 +319,8 @@ public:
 
 class InputMethod_TouchScreen : public InputMethod
 {
+    bool m_wasTextEntry = false;
+
 public:
     using InputMethod::Type;
     using InputMethod::Profile;
