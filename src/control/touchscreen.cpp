@@ -1146,7 +1146,7 @@ void TouchScreenController::processTouchDevice(TouchDevice_t& dev)
     {
         SDL_Finger* f = SDL_GetTouchFinger(dev.id, i);
 
-        if(!f || (f->id < 0)) //Skip a wrong finger
+        if(!f) //Skip a wrong finger
             continue;
 
         SDL_FingerID finger_id = f->id;
@@ -1441,12 +1441,6 @@ void TouchScreenController::render(int player_no)
         int y1 = Maths::iRound((k.y1 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
         int x2 = Maths::iRound((k.x2 / g_touchKeyMap.touchCanvasWidth) * float(m_renderWidth));
         int y2 = Maths::iRound((k.y2 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
-#ifdef __EMSCRIPTEN__
-        x1 *= 2;
-        y1 *= 2;
-        x2 *= 2;
-        y2 *= 2;
-#endif
         int w = x2 - x1;
         int h = y2 - y1;
         float r = 1.0f;

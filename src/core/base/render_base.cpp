@@ -361,6 +361,14 @@ void AbstractRender_t::compileShaders(StdPicture &target)
     UNUSED(target);
 
     /* unimplemented */
+
+    UNUSED(target);
+    UNUSED(mask_width);
+    UNUSED(mask_height);
+    UNUSED(RGBApixels);
+    UNUSED(pitch);
+    UNUSED(image_width);
+    UNUSED(image_height);
 }
 
 bool AbstractRender_t::textureMaskSupported()

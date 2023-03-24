@@ -58,8 +58,14 @@ bool AppPathManager::m_isPortable = false;
 
 static void appendSlash(std::string &path)
 {
+#if defined(__EMSCRIPTEN__)
+    // fix emscripten bug of duplicated worlds
+    if(path.empty() || path.back() != '/')
+        path.push_back('/');
+#else
     if(!path.empty() && path.back() != '/')
         path.push_back('/');
+#endif
 }
 
 void AppPathManager::setAssetsRoot(const std::string &root)
