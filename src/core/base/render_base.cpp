@@ -333,6 +333,14 @@ void AbstractRender_t::loadTextureMask(StdPicture &target,
                          uint32_t image_height)
 {
     /* unimplemented */
+
+    UNUSED(target);
+    UNUSED(mask_width);
+    UNUSED(mask_height);
+    UNUSED(RGBApixels);
+    UNUSED(pitch);
+    UNUSED(image_width);
+    UNUSED(image_height);
 }
 
 bool AbstractRender_t::textureMaskSupported()

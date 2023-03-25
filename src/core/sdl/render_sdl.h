@@ -70,6 +70,10 @@ class RenderSDL final : public AbstractRender_t
     // Current scaling mode
     int m_current_scale_mode = SCALE_DYNAMIC_NEAREST;
 
+    //Need for HiDPI rendering (number of draw pixels per cursor pixel)
+    float m_hidpi_x = 1.0f;
+    float m_hidpi_y = 1.0f;
+
 public:
     RenderSDL();
     ~RenderSDL() override;

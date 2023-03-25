@@ -31,6 +31,72 @@
 #include "config.h"
 #include "video.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/html5.h>
+
+void s_emscriptenFillBrowser()
+{
+    EmscriptenFullscreenStrategy strategy;
+    strategy.scaleMode = EMSCRIPTEN_FULLSCREEN_SCALE_STRETCH;
+    strategy.canvasResolutionScaleMode = EMSCRIPTEN_FULLSCREEN_CANVAS_SCALE_HIDEF;
+    strategy.filteringMode = EMSCRIPTEN_FULLSCREEN_FILTERING_DEFAULT;
+
+    strategy.canvasResizedCallback = nullptr;
+
+    pLogDebug("Activating canvas resize code");
+
+    emscripten_enter_soft_fullscreen("canvas", &strategy);
+    EM_ASM(currentFullscreenStrategy_bak = currentFullscreenStrategy;);
+}
+
+EM_BOOL s_restoreSoftFullscreen(int eventType, const void *reserved, void *userData)
+{
+    (void)(eventType);
+    (void)(reserved);
+    (void)(userData);
+
+    pLogDebug("Restoring canvas resize code after entering fullscreen...");
+
+    EM_ASM(
+        currentFullscreenStrategy = currentFullscreenStrategy_bak;
+    );
+    return false;
+}
+
+void s_emscriptenRealFullscreen()
+{
+    EmscriptenFullscreenStrategy strategy;
+
+    strategy.scaleMode = 0;
+    strategy.canvasResolutionScaleMode = 0;
+    strategy.filteringMode = 0;
+    strategy.canvasResizedCallback = s_restoreSoftFullscreen;
+
+    pLogDebug("Requesting HTML5 fullscreen mode...");
+
+    emscripten_request_fullscreen_strategy("#thextech-document", true, &strategy);
+}
+
+void s_emscriptenLeaveRealFullscreen()
+{
+    EM_ASM(
+        if(document.fullscreenElement || document.webkitFullscreenElement)
+        {
+            if(document.webkitExitFullscreen)
+                document.webkitExitFullscreen();
+            else
+                document.exitFullscreen();
+
+            setTimeout(() => {
+                console.log("Restoring canvas on return from fullscreen");
+                softFullscreenResizeWebGLRenderTarget();
+            }, 500);
+        }
+    );
+}
+
+#endif
+
 //! Path to game resources assets (by default it's ~/.PGE_Project/thextech/)
 extern std::string AppPath;
 
@@ -110,6 +176,11 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
     windowInitFlags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_SHOWN;
 #endif
 
+#ifdef __EMSCRIPTEN__
+    // don't use SDL fullscreen API on Emscripten
+    windowInitFlags &= ~SDL_WINDOW_FULLSCREEN;
+#endif
+
     m_window = SDL_CreateWindow(m_windowTitle.c_str(),
                                 SDL_WINDOWPOS_CENTERED,
                                 SDL_WINDOWPOS_CENTERED,
@@ -151,6 +222,14 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+#ifdef __EMSCRIPTEN__
+    EM_ASM(
+        document.documentElement.id = "thextech-document";
+        document.body.style.overflow = "hidden";
+    );
+    s_emscriptenFillBrowser();
+#endif
 
 #ifdef _WIN32
     FIBITMAP *img[2];
@@ -268,8 +347,12 @@ void WindowSDL::placeCursor(int window_x, int window_y)
 
 bool WindowSDL::isFullScreen()
 {
+#ifndef __EMSCRIPTEN__
     Uint32 flags = SDL_GetWindowFlags(m_window);
     return (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) ? SDL_TRUE : SDL_FALSE;
+#else
+    return m_fullscreen;
+#endif
 }
 
 int WindowSDL::setFullScreen(bool fs)
@@ -282,6 +365,16 @@ int WindowSDL::setFullScreen(bool fs)
 
     if(fs != isFullScreen())
     {
+#ifdef __EMSCRIPTEN__
+        if(fs)
+            s_emscriptenRealFullscreen();
+        else
+            s_emscriptenLeaveRealFullscreen();
+
+        m_fullscreen = fs;
+
+        return m_fullscreen;
+#else
         if(fs)
         {
             // Swith to FULLSCREEN mode
@@ -303,11 +396,9 @@ int WindowSDL::setFullScreen(bool fs)
                 pLogWarning("Setting windowed failed: %s", SDL_GetError());
                 return -1;
             }
-#ifdef __EMSCRIPTEN__
-            SDL_SetWindowSize(m_window, ScreenW, ScreenH);
-#endif
             return 0;
         }
+#endif
     }
 
     return 0;
