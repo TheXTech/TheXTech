@@ -57,6 +57,10 @@
 #include <nds.h>
 #endif
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 #ifdef ENABLE_XTECH_LUA
 #include "xtech_lua_main.h"
 #endif
@@ -609,12 +613,22 @@ int main(int argc, char**argv)
 
 #ifdef ENABLE_XTECH_LUA
     if(!xtech_lua_quit())
-        return 1;
+        ret = 1;
 #endif
 
     Controls::Quit();
 
     frmMain.freeSystem();
+
+#ifdef __EMSCRIPTEN__
+    AppPathManager::syncFs();
+    EM_ASM(
+        setTimeout(() => {
+            console.log("Attempting to close window following game exit...");
+            window.close();
+        }, 250);
+    );
+#endif
 
     return ret;
 }
