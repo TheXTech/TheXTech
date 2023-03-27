@@ -23,6 +23,8 @@
 #include <SDL2/SDL_rwops.h>
 #include <SDL2/SDL_filesystem.h>
 
+#include <Logger/logger.h>
+
 #include "app_path_private.h"
 
 
@@ -60,6 +62,8 @@ static void loadCustomState()
 static void saveCustomState()
 {
     loadingLocked = true;
+    pLogDebug("Synchronizing user file data...");
+
     EM_ASM(
         FS.syncfs(function (err) {
             assert(!err);

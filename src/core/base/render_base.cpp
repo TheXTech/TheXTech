@@ -621,7 +621,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
                         w, h);
         }
 
-        FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX);
+        FIBITMAP *d = (!shrink2x) ? FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX) : GraphicsHelps::fast2xScaleDown(sourceImage);
         if(d)
         {
             GraphicsHelps::closeImage(sourceImage);

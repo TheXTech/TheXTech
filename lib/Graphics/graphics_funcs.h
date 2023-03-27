@@ -153,6 +153,13 @@ public:
     static bool validateFor2xScaleDown(FIBITMAP *image, const std::string &origPath = std::string());
 
     /*!
+     * \brief Quickly scales down the image 2x using nearest-neighbor downsampling
+     * \param image Image to downscale
+     * \return FreeImage descriptor to scaled image
+     */
+    static FIBITMAP *fast2xScaleDown(FIBITMAP *image);
+
+    /*!
      * \brief Check textures are they require the bitmask render or not
      * \param image Front image
      * \param mask Mask image

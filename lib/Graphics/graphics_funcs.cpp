@@ -18,6 +18,7 @@
  */
 
 #include <SDL2/SDL_video.h>
+#include "sdl_proxy/sdl_assert.h"
 
 #include <Utils/files.h>
 #include <FileMapper/file_mapper.h>
@@ -525,10 +526,14 @@ bool GraphicsHelps::validateFor2xScaleDown(FIBITMAP *image, const std::string &o
 
     (void)origPath; // supress warning when build the release build
 
+    SDL_assert_release(FreeImage_GetBPP(image) == 32);
+    if(FreeImage_GetBPP(image) != 32)
+        return false;
+
     auto w = static_cast<uint32_t>(FreeImage_GetWidth(image));
     auto h = static_cast<uint32_t>(FreeImage_GetHeight(image));
-    auto pitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
-    BYTE *img_bits  = FreeImage_GetBits(image);
+    const uint32_t *img_pixels = reinterpret_cast<uint32_t*>(FreeImage_GetBits(image));
+    auto pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(image)) / 4;
 
     if(w % 2 || h % 2)
     {
@@ -536,18 +541,13 @@ bool GraphicsHelps::validateFor2xScaleDown(FIBITMAP *image, const std::string &o
         return false; // Not multiple two!
     }
 
-    BYTE *line1 = img_bits;
-    BYTE *line2 = (img_bits + pitch);
-
     for(uint32_t y = 0; y < h; y += 2)
     {
         for(uint32_t x = 0; x < w; x += 2)
         {
-            BYTE *p1 = line1 + (y * pitch) + (x * 4);
-            BYTE *p2 = line2 + (y * pitch) + (x * 4);
-            if(SDL_memcmp(p1, p1 + 4, 4) != 0 ||
-               SDL_memcmp(p1, p2, 4) != 0 ||
-               SDL_memcmp(p1, p2 + 4, 4) != 0)
+            if(img_pixels[y * pitch_px + x] != img_pixels[y * pitch_px + (x + 1)]
+                || img_pixels[y * pitch_px + x] != img_pixels[(y + 1) * pitch_px + x]
+                || img_pixels[y * pitch_px + x] != img_pixels[(y + 1) * pitch_px + (x + 1)])
             {
                 D_pLogWarning("Texture can't be shrank: Pixel colors at the %u x %u sector (2x2 square) aren't equal (%s)", x, y, origPath.c_str());
                 return false;
@@ -557,6 +557,38 @@ bool GraphicsHelps::validateFor2xScaleDown(FIBITMAP *image, const std::string &o
 
     D_pLogDebug("Texture CAN be shrank (%s)", origPath.c_str());
     return true;
+}
+
+FIBITMAP *GraphicsHelps::fast2xScaleDown(FIBITMAP *image)
+{
+    if(!image)
+        return nullptr;
+
+    if(FreeImage_GetBPP(image) != 32)
+        return nullptr;
+
+    auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto src_h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    const uint32_t *src_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(image));
+    auto src_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(image)) / 4;
+
+    FIBITMAP *dest = FreeImage_Allocate(src_w / 2, src_h / 2, 32);
+
+    if(!dest)
+        return nullptr;
+
+    uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
+    auto dest_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
+
+    for(uint32_t src_y = 0, dest_y = 0; src_y < src_h; src_y += 2, dest_y += 1)
+    {
+        for(uint32_t src_x = 0, dest_x = 0; src_x < src_w; src_x += 2, dest_x += 1)
+        {
+            dest_pixels[dest_y * dest_pitch_px + dest_x] = src_pixels[src_y * src_pitch_px + src_x];
+        }
+    }
+
+    return dest;
 }
 
 bool GraphicsHelps::validateBitmaskRequired(FIBITMAP *image, FIBITMAP *mask, const std::string &origPath)
