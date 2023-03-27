@@ -62,28 +62,13 @@ static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint i
     pLogWarning("Got GL error %s", message);
 }
 
-static const char* s_profile_name(const GLint profile)
-{
-    switch(profile)
-    {
-    case SDL_GL_CONTEXT_PROFILE_COMPATIBILITY:
-        return "Compatibility";
-    case SDL_GL_CONTEXT_PROFILE_CORE:
-        return "Core";
-    case SDL_GL_CONTEXT_PROFILE_ES:
-        return "ES";
-    default:
-        return "";
-    }
-}
-
-static void s_try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver)
+void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver)
 {
     // context already initialized
     if(context)
         return;
 
-    pLogDebug("Render GL: attempting to create OpenGL %s %d.%d+ context...", s_profile_name(profile), majver, minver);
+    pLogDebug("Render GL: attempting to create OpenGL %s %d.%d+ context...", get_profile_name(profile), majver, minver);
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, profile);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majver);
@@ -114,46 +99,46 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
     if(setup.renderType == RENDER_ACCELERATED_OPENGL)
     {
-        s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3);
-        s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3);
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3);
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3);
     }
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
     if(setup.renderType == RENDER_ACCELERATED_OPENGL_ES)
-        s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0);
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
     if(setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY)
-        s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1);
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_LEGACY
     if(setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
-        s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1);
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1);
 #endif
 
     // default fallback sequence
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-    s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 3, 3);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
-    s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
-    s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_CORE, 3, 3);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
-    s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY, 1, 1);
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_LEGACY
-    s_try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1);
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 1, 1);
 #endif
 
     if(!m_gContext)
@@ -167,7 +152,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &m_gl_majver);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &m_gl_minver);
 
-    pLogDebug("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, s_profile_name(m_gl_profile));
+    pLogDebug("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
     pLogDebug("OpenGL version: %s", glGetString(GL_VERSION));
     pLogDebug("OpenGL renderer: %s", glGetString(GL_RENDERER));
 #ifdef RENDERGL_HAS_SHADERS

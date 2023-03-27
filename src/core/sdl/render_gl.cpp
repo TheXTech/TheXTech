@@ -541,10 +541,35 @@ void RenderGL::repaint()
         return;
 #endif
 
-    if(!m_use_logicop)
-        SuperPrintScreenCenter("Logic Op Shader (ES2/3)", 3, 0);
-    else
-        SuperPrintScreenCenter("Logic Op Render (ES1/GL)", 3, 0);
+    SuperPrintScreenCenter(fmt::format_ne("DEV BUILD - OpenGL {0}.{1} {2}", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile)), 3, 0, 0.8f, 1.0f, 0.0f);
+
+    std::string feature_string = "Draw: ";
+    if(m_use_logicop)
+        feature_string += "LogicOp, ";
+    if(m_use_shaders)
+        feature_string += "shaders, ";
+    if(m_client_side_arrays)
+        feature_string += "client arr, ";
+
+    feature_string.resize(feature_string.size() - 2);
+    if(feature_string.size() == 4)
+        feature_string += ": NONE";
+
+    SuperPrintScreenCenter(feature_string, 3, 20, 0.8f, 1.0f, 0.0f);
+
+    feature_string = "FBO: ";
+    if(m_buffer_texture[BUFFER_GAME])
+        feature_string += "game, ";
+    if(m_buffer_texture[BUFFER_FB_READ])
+        feature_string += "local fx, ";
+    if(m_buffer_texture[BUFFER_PREV_PASS])
+        feature_string += "n-pass fx, ";
+
+    feature_string.resize(feature_string.size() - 2);
+    if(feature_string.size() == 3)
+        feature_string += ": NONE";
+
+    SuperPrintScreenCenter(feature_string, 3, 40, 0.8f, 1.0f, 0.0f);
 
     flushDrawQueues();
 

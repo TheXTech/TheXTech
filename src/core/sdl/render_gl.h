@@ -97,6 +97,21 @@ private:
         bool active = false;
     };
 
+    static inline const char* get_profile_name(const GLint profile)
+    {
+        switch(profile)
+        {
+        case SDL_GL_CONTEXT_PROFILE_COMPATIBILITY:
+            return "Compatibility";
+        case SDL_GL_CONTEXT_PROFILE_CORE:
+            return "Core";
+        case SDL_GL_CONTEXT_PROFILE_ES:
+            return "ES";
+        default:
+            return "";
+        }
+    }
+
     std::unordered_map<DrawContext_t, VertexList, hash_DrawContext> m_unordered_draw_queue;
     std::map<std::pair<int, DrawContext_t>, VertexList> m_ordered_draw_queue;
 
@@ -208,6 +223,7 @@ private:
 
     // initialize the SDL OpenGL bindings according to version preferences and compile-time support,
     // sets the version, and sets profile/version-dependent flags
+    static void try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver); // helper
     bool initOpenGL(const CmdLineSetup_t &setup);
 
     // initialize the OpenGL debug bindings if requested and possible
