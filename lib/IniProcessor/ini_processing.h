@@ -195,6 +195,21 @@ public:
     bool hasKey(const std::string &keyName) const;
 
     /**
+     * @brief Renames key to a new name, clobbering existing key at newName
+     * @param oldName current name of key
+     * @param newName new name of key
+     * @return true if rename is successful, false if oldName is not present in this section
+     */
+    bool renameKey(const std::string &oldName, const std::string &newName);
+
+    /**
+     * @brief Deletes key at keyName from current section
+     * @param keyName name of key to delete
+     * @return true if delete is successful, false if keyName is not present in this section
+     */
+    bool deleteKey(const std::string &keyName);
+
+    /**
      * @brief Get list of available keys in current groul
      * @return Array of strings
      */

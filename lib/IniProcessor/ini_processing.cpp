@@ -653,6 +653,43 @@ bool IniProcessing::hasKey(const std::string &keyName) const
     return (e != m_params.currentGroup->end());
 }
 
+bool IniProcessing::renameKey(const std::string &oldName, const std::string &newName)
+{
+    if(!m_params.opened)
+        return false;
+
+    if(!m_params.currentGroup)
+        return false;
+
+    auto it = m_params.currentGroup->find(oldName);
+    if(it != m_params.currentGroup->end())
+    {
+        std::swap((*m_params.currentGroup)[newName], it->second);
+        m_params.currentGroup->erase(it);
+        return true;
+    }
+
+    return false;
+}
+
+bool IniProcessing::deleteKey(const std::string &keyName)
+{
+    if(!m_params.opened)
+        return false;
+
+    if(!m_params.currentGroup)
+        return false;
+
+    auto it = m_params.currentGroup->find(keyName);
+    if(it != m_params.currentGroup->end())
+    {
+        m_params.currentGroup->erase(it);
+        return true;
+    }
+
+    return false;
+}
+
 std::vector<std::string> IniProcessing::allKeys() const
 {
     std::vector<std::string> keys;
