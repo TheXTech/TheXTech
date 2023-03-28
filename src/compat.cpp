@@ -192,7 +192,7 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
                     s.group().c_str(),
                     newName);
 
-        bool writable = true;
+        bool writable = (selWorld == 0 || LevelEditor) || (BattleMode ? SelectBattle : SelectWorld)[selWorld].editable;
 
         if(writable)
         {
@@ -230,7 +230,7 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
             {
                 pLogDebug("Updating file [%s]...", s.fileName().c_str());
                 s.renameKey(fieldName, newName);
-                s.writeIniFile();
+                writable = s.writeIniFile();
             }
 
             if(response == 2)
@@ -244,8 +244,11 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
                 SaveConfig();
             }
         }
-        // second condition ensures we only warn on first time the file is loaded
-        else if(g_config.compat_autoconvert_warn_unwritable && (s_first_load_iter[s.fileName()] == 0 || s_first_load_iter[s.fileName()] == s_cur_load_iter))
+
+        // NOTE: if saving failed above, writable is set to false even if it was originally true
+
+        // final condition ensures we only warn on first time the file is loaded
+        if(!writable && g_config.compat_autoconvert != Config_t::AUTOCONVERT_NEVER && g_config.compat_autoconvert_warn_unwritable && (s_first_load_iter[s.fileName()] == 0 || s_first_load_iter[s.fileName()] == s_cur_load_iter))
         {
             int response = PromptScreen::Run(fmt::format_ne(g_mainMenu.promptDeprecatedSettingUnwritable, s.fileName(), s.group().c_str(), fieldName, newName), {g_mainMenu.wordYes, g_mainMenu.wordNo});
 
