@@ -22,12 +22,19 @@
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
+#include <fmt_format_ne.h>
+
 #include "Graphics/graphics_funcs.h"
 #include "globals.h"
 #include "global_dirs.h"
 #include "compat.h"
 #include "main/speedrunner.h"
 #include "main/presetup.h"
+#include "main/screen_prompt.h"
+#include "main/menu_main.h"
+#include "game_main.h"
+
+#include "config.h"
 
 #include "sdl_proxy/sdl_stdinc.h"
 
@@ -174,13 +181,69 @@ static void compatInit(Compatibility_t &c)
 
 static void deprecatedWarning(IniProcessing &s, const char* fieldName, const char *newName)
 {
-    if(s.hasKey(fieldName))
+    if(s.hasKey(fieldName) && !s.hasKey(newName))
     {
         pLogWarning("File %s contains the deprecated setting \"%s\" at the section [%s]. Please rename it into \"%s\".",
                     s.fileName().c_str(),
                     fieldName,
                     s.group().c_str(),
                     newName);
+
+        bool writable = true;
+
+        if(writable)
+        {
+            int response;
+
+            if(g_config.compat_autoconvert == Config_t::AUTOCONVERT_ALWAYS)
+            {
+                response = 1;
+            }
+            else if(g_config.compat_autoconvert == Config_t::AUTOCONVERT_NEVER)
+            {
+                response = 0;
+            }
+            else
+            {
+                response = PromptScreen::Run(
+                    fmt::format_ne(g_mainMenu.promptDeprecatedSetting, fieldName, newName),
+                    {
+                        g_mainMenu.wordNo,
+                        g_mainMenu.wordYes,
+                        g_mainMenu.phraseNoNever,
+                        g_mainMenu.phraseYesAlways,
+                    }
+                );
+            }
+
+            if(response == 1 || response == 3)
+            {
+                pLogDebug("Updating file [%s]...", s.fileName().c_str());
+                s.renameKey(fieldName, newName);
+                s.writeIniFile();
+            }
+
+            if(response == 2)
+            {
+                g_config.compat_autoconvert = Config_t::AUTOCONVERT_NEVER;
+                SaveConfig();
+            }
+            else if(response == 3)
+            {
+                g_config.compat_autoconvert = Config_t::AUTOCONVERT_ALWAYS;
+                SaveConfig();
+            }
+        }
+        else if(g_config.compat_autoconvert_warn_unwritable)
+        {
+            int response = PromptScreen::Run(fmt::format_ne(g_mainMenu.promptDeprecatedSettingUnwritable, s.fileName(), s.group().c_str(), fieldName, newName), {g_mainMenu.wordYes, g_mainMenu.wordNo});
+
+            if(response == 1)
+            {
+                g_config.compat_autoconvert_warn_unwritable = false;
+                SaveConfig();
+            }
+        }
     }
 }
 
