@@ -158,6 +158,9 @@ void Render()
     g_levelScreenFader.draw();
 
     XRender::repaint();
+
+    if(TakeScreen)
+        ScreenShot();
 }
 
 bool Logic()
