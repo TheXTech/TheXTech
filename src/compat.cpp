@@ -38,6 +38,9 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+// support variables for autoconversion to avoid repeated nags
+static int s_cur_load_iter = 0;
+static std::unordered_map<std::string, int> s_first_load_iter;
 
 static int s_compatLevel = COMPAT_MODERN;
 
@@ -203,6 +206,11 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
             {
                 response = 0;
             }
+            // only warn on first time the file is loaded
+            else if(s_first_load_iter[s.fileName()] != 0 && s_first_load_iter[s.fileName()] != s_cur_load_iter)
+            {
+                response = 0;
+            }
             else
             {
                 response = PromptScreen::Run(
@@ -214,6 +222,8 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
                         g_mainMenu.phraseYesAlways,
                     }
                 );
+
+                s_first_load_iter[s.fileName()] = s_cur_load_iter;
             }
 
             if(response == 1 || response == 3)
@@ -234,7 +244,8 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
                 SaveConfig();
             }
         }
-        else if(g_config.compat_autoconvert_warn_unwritable)
+        // second condition ensures we only warn on first time the file is loaded
+        else if(g_config.compat_autoconvert_warn_unwritable && (s_first_load_iter[s.fileName()] == 0 || s_first_load_iter[s.fileName()] == s_cur_load_iter))
         {
             int response = PromptScreen::Run(fmt::format_ne(g_mainMenu.promptDeprecatedSettingUnwritable, s.fileName(), s.group().c_str(), fieldName, newName), {g_mainMenu.wordYes, g_mainMenu.wordNo});
 
@@ -243,6 +254,8 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
                 g_config.compat_autoconvert_warn_unwritable = false;
                 SaveConfig();
             }
+
+            s_first_load_iter[s.fileName()] = s_cur_load_iter;
         }
     }
 }
@@ -443,6 +456,8 @@ void LoadCustomCompat()
                                 (uint8_t)g_compatibility.bitblit_background_colour[1],
                                 (uint8_t)g_compatibility.bitblit_background_colour[2]);
 #endif
+
+    s_cur_load_iter++;
 }
 
 void ResetCompat()
