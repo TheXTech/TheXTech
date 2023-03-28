@@ -132,6 +132,11 @@ void initMainMenu()
 
     g_mainMenu.wordNo = "No";
     g_mainMenu.wordYes = "Yes";
+
+    g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nReplace it with the updated flag for version 1.3.6 and newer?\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"";
+    g_mainMenu.promptDeprecatedSettingUnwritable = "An unwritable file ({0}) uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nPlease update it manually and copy to your device.\n\nSection: [{1}]\nOld flag: \"{2}\"\nNew flag: \"{3}\"\n\nShow this type of message in future?";
+    g_mainMenu.phraseYesAlways = "Yes, always";
+    g_mainMenu.phraseNoNever = "No, never";
 }
 
 
