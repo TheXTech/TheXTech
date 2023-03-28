@@ -293,6 +293,8 @@ void FindWorlds()
                         w.blockChar[5] = true;
                     }
 
+                    w.editable = worldsRoot.editable;
+
                     SelectWorld.push_back(w);
                     if(worldsRoot.editable)
                         SelectWorldEditable.push_back(w);
@@ -351,13 +353,13 @@ static int FindLevelsThread(void *)
 
 void FindLevels()
 {
-    std::vector<std::string> battleRoots =
+    std::vector<WorldRoot_t> battleRoots =
     {
-        AppPath + "battle/"
+        {AppPath + "battle/", CAN_WRITE_APPPATH_WORLDS}
     };
 
     if(AppPathManager::userDirIsAvailable())
-        battleRoots.push_back(AppPathManager::userBattleRootDir());
+        battleRoots.push_back({AppPathManager::userBattleRootDir(), true});
 
     SelectBattle.clear();
     SelectBattle.emplace_back(SelectWorld_t()); // Dummy entry
@@ -374,7 +376,7 @@ void FindLevels()
     for(const auto &battleRoot : battleRoots)
     {
         std::vector<std::string> files;
-        DirMan battleLvls(battleRoot);
+        DirMan battleLvls(battleRoot.path);
         battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
         SDL_AtomicAdd(&loadingProgrssMax, (int)files.size());
     }
@@ -383,19 +385,20 @@ void FindLevels()
     for(const auto &battleRoot : battleRoots)
     {
         std::vector<std::string> files;
-        DirMan battleLvls(battleRoot);
+        DirMan battleLvls(battleRoot.path);
         battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
         for(std::string &fName : files)
         {
-            std::string wPath = battleRoot + fName;
+            std::string wPath = battleRoot.path + fName;
             if(FileFormats::OpenLevelFileHeader(wPath, head))
             {
                 SelectWorld_t w;
-                w.WorldPath = battleRoot;
+                w.WorldPath = battleRoot.path;
                 w.WorldFile = fName;
                 w.WorldName = head.LevelName;
                 if(w.WorldName.empty())
                     w.WorldName = fName;
+                w.editable = battleRoot.editable;
                 SelectBattle.push_back(w);
             }
 #ifndef PGE_NO_THREADING
