@@ -194,6 +194,13 @@ void OpenConfig()
             {"2", Config_t::EPISODE_TITLE_TRANSPARENT}
         };
 
+        const IniProcessing::StrEnumMap compatAutoconvert
+        {
+            {"ask", Config_t::AUTOCONVERT_ASK},
+            {"never", Config_t::AUTOCONVERT_NEVER},
+            {"always", Config_t::AUTOCONVERT_ALWAYS},
+        };
+
         const IniProcessing::StrEnumMap starsShowPolicy =
         {
             {"hide", 0},
@@ -211,6 +218,8 @@ void OpenConfig()
         config.read("new-editor", g_config.enable_editor, false);
         config.read("enable-editor", g_config.enable_editor, g_config.enable_editor);
         config.read("editor-edge-scroll", g_config.editor_edge_scroll, g_config.editor_edge_scroll);
+        config.readEnum("compat-autoconvert", g_config.compat_autoconvert, g_config.compat_autoconvert, compatAutoconvert);
+        config.read("compat-autoconvert-warn-unwritable", g_config.compat_autoconvert_warn_unwritable, g_config.compat_autoconvert_warn_unwritable);
         config.endGroup();
 
 #if defined(__ANDROID__) || defined(__EMSCRIPTEN__)
@@ -275,6 +284,13 @@ void SaveConfig()
     IniProcessing config(configPath);
     IniProcessing controls(controlsPath);
 
+    std::unordered_map<int, std::string> compatAutoconvert =
+    {
+        {Config_t::AUTOCONVERT_ASK, "ask"},
+        {Config_t::AUTOCONVERT_NEVER, "never"},
+        {Config_t::AUTOCONVERT_ALWAYS, "always"},
+    };
+
     config.beginGroup("main");
     config.setValue("release", curRelease);
 #if !defined(RENDER_FULLSCREEN_ALWAYS) // Don't remember fullscreen
@@ -285,6 +301,8 @@ void SaveConfig()
     config.setValue("enable-editor", g_config.enable_editor);
     config.setValue("editor-edge-scroll", g_config.editor_edge_scroll);
     config.setValue("loading-debug", g_config.loading_show_debug);
+    config.setValue("compat-autoconvert", compatAutoconvert[g_config.compat_autoconvert]);
+    config.setValue("compat-autoconvert-warn-unwritable", g_config.compat_autoconvert_warn_unwritable);
     config.endGroup();
 
     config.beginGroup("recent");
