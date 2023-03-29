@@ -342,10 +342,10 @@ bool IniProcessing::parseHelper(char *data, size_t size)
                 value = lskip(end + 1);
                 end = find_char_or_comment(value, '\0');
 
-                #ifndef CASE_SENSITIVE_KEYS
+#ifndef CASE_SENSITIVE_KEYS
                 for(char *iter = name; *iter != '\0'; ++iter)
                     *iter = (char)tolower(*iter);
-                #endif
+#endif
 
                 if(*end == ';')
                     *end = '\0';
@@ -359,9 +359,9 @@ bool IniProcessing::parseHelper(char *data, size_t size)
                     if(!recentKeys)
                         recentKeys = &m_params.iniData["General"];
 
-                    #ifdef INIDEBUG
+#ifdef INIDEBUG
                     printf("-> [%s]; %s = %s\n", section, name, v);
-                    #endif
+#endif
                     (*recentKeys)[name] = unescapeString( removeQuotes(v, v + strlen(v)) );
                 }
             }
@@ -649,7 +649,15 @@ bool IniProcessing::hasKey(const std::string &keyName) const
     if(!m_params.currentGroup)
         return false;
 
-    auto e = m_params.currentGroup->find(keyName);
+#ifndef CASE_SENSITIVE_KEYS
+    std::string keyName1(keyName);
+    for(char *iter = &keyName1[0]; *iter != '\0'; ++iter)
+        *iter = (char)tolower(*iter);
+#else
+    auto &keyName1 = keyName;
+#endif
+
+    auto e = m_params.currentGroup->find(keyName1);
     return (e != m_params.currentGroup->end());
 }
 
@@ -661,10 +669,29 @@ bool IniProcessing::renameKey(const std::string &oldName, const std::string &new
     if(!m_params.currentGroup)
         return false;
 
-    auto it = m_params.currentGroup->find(oldName);
+    if(oldName.empty() || newName.empty())
+        return false; // Empty keys are invalid
+
+#ifndef CASE_SENSITIVE_KEYS
+    std::string oldName1(oldName);
+    for(char *iter = &oldName1[0]; *iter != '\0'; ++iter)
+        *iter = (char)tolower(*iter);
+
+    std::string newName1(newName);
+    for(char *iter = &newName1[0]; *iter != '\0'; ++iter)
+        *iter = (char)tolower(*iter);
+#else
+    auto &oldName1 = oldName;
+    auto &newName1 = newName;
+#endif
+
+    if(oldName1 == newName1)
+        return true; /* Do nothing, keys are equal */
+
+    auto it = m_params.currentGroup->find(oldName1);
     if(it != m_params.currentGroup->end())
     {
-        std::swap((*m_params.currentGroup)[newName], it->second);
+        std::swap((*m_params.currentGroup)[newName1], it->second);
         m_params.currentGroup->erase(it);
         return true;
     }
@@ -680,7 +707,18 @@ bool IniProcessing::deleteKey(const std::string &keyName)
     if(!m_params.currentGroup)
         return false;
 
-    auto it = m_params.currentGroup->find(keyName);
+    if(keyName.empty())
+        return false; // Empty keys are invalid
+
+#ifndef CASE_SENSITIVE_KEYS
+    std::string keyName1(keyName);
+    for(char *iter = &keyName1[0]; *iter != '\0'; ++iter)
+        *iter = (char)tolower(*iter);
+#else
+    auto &keyName1 = keyName;
+#endif
+
+    auto it = m_params.currentGroup->find(keyName1);
     if(it != m_params.currentGroup->end())
     {
         m_params.currentGroup->erase(it);
