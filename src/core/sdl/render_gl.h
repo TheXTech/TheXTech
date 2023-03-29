@@ -180,7 +180,7 @@ private:
     const GLuint& m_game_texture_fb = m_buffer_fb[0];
     GLuint m_game_depth_rb = 0;
 
-    static constexpr int s_num_vertex_buffers = 16;
+    static constexpr int s_num_vertex_buffers = 128;
     GLuint m_vertex_buffer[s_num_vertex_buffers] = {0};
     GLsizeiptr m_vertex_buffer_size[s_num_vertex_buffers] = {0};
     int m_cur_vertex_buffer_index = 0;
