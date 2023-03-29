@@ -60,11 +60,11 @@ extern std::string getLogFilePath();
 
 #ifdef DEBUG_BUILD
 // Variadic with arguments
-#define D_pLogDebug(fmt, ...) pLogDebug(fmt, ##__VA_ARGS__)
-#define D_pLogWarning(fmt, ...) pLogWarning(fmt, ##__VA_ARGS__)
-#define D_pLogCritical(fmt, ...) pLogCritical(fmt, ##__VA_ARGS__)
-#define D_pLogInfo(fmt, ...) pLogInfo(fmt, ##__VA_ARGS__)
-#define D_pLogFatal(fmt, ...) pLogFatal(fmt, ##__VA_ARGS__)
+#define D_pLogDebug(fmt, ...) pLogDebug(fmt, __VA_ARGS__)
+#define D_pLogWarning(fmt, ...) pLogWarning(fmt, __VA_ARGS__)
+#define D_pLogCritical(fmt, ...) pLogCritical(fmt, __VA_ARGS__)
+#define D_pLogInfo(fmt, ...) pLogInfo(fmt, __VA_ARGS__)
+#define D_pLogFatal(fmt, ...) pLogFatal(fmt, __VA_ARGS__)
 // Standard without arguments to avoid "ISO C++11 requires at least one argument of the '...' in a variadic macro"
 #define D_pLogDebugNA(fmt) pLogDebug(fmt)
 #define D_pLogWarningNA(fmt) pLogWarning(fmt)

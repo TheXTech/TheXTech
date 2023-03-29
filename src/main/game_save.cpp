@@ -296,9 +296,7 @@ void SaveGame()
     // Also, save the speed-running states
     speedRun_saveStats();
 
-#ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
-#endif
 }
 
 void LoadGame()

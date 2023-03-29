@@ -1146,7 +1146,7 @@ void TouchScreenController::processTouchDevice(TouchDevice_t& dev)
     {
         SDL_Finger* f = SDL_GetTouchFinger(dev.id, i);
 
-        if(!f || (f->id < 0)) //Skip a wrong finger
+        if(!f) //Skip a wrong finger
             continue;
 
         SDL_FingerID finger_id = f->id;
@@ -1433,7 +1433,7 @@ void TouchScreenController::render(int player_no)
 
     for(int key = key_BEGIN; key < key_END; key++)
     {
-        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess || GamePaused == PauseCode::TextEntry || LevelEditor)
+        if((m_touchHidden && key != TouchScreenController::key_toggleKeysView) || LoadingInProcess || LevelEditor)
             continue;
 
         const auto& k = g_touchKeyMap.touchKeysMap[key];
@@ -1441,12 +1441,6 @@ void TouchScreenController::render(int player_no)
         int y1 = Maths::iRound((k.y1 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
         int x2 = Maths::iRound((k.x2 / g_touchKeyMap.touchCanvasWidth) * float(m_renderWidth));
         int y2 = Maths::iRound((k.y2 / g_touchKeyMap.touchCanvasHeight) * float(m_renderHeight));
-#ifdef __EMSCRIPTEN__
-        x1 *= 2;
-        y1 *= 2;
-        x2 *= 2;
-        y2 *= 2;
-#endif
         int w = x2 - x1;
         int h = y2 - y1;
         float r = 1.0f;
@@ -1592,7 +1586,7 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
 
     c = t->m_controller.m_current_keys;
 
-    TouchScreenController::ExtraKeys_t& te = t->m_controller.m_current_extra_keys;
+    const TouchScreenController::ExtraKeys_t& te = t->m_controller.m_current_extra_keys;
 
     if(GamePaused == PauseCode::None && !GameMenu && !GameOutro && !LevelSelect && t->m_controller.m_runHeld)
     {
@@ -1610,8 +1604,8 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
             c.Run |= true;
     }
 
-    // use the touchscreen as a mouse if the buttons are currently hidden, we are in TextEntry mode, or we are in LevelEditor mode
-    bool allowed = t->m_controller.m_touchHidden || GamePaused == PauseCode::TextEntry || LevelEditor;
+    // use the touchscreen as a mouse if the buttons are currently hidden, or we are in LevelEditor mode
+    bool allowed = t->m_controller.m_touchHidden || LevelEditor;
 
     if(allowed && t->m_controller.m_scrollActive)
     {
@@ -1666,6 +1660,18 @@ bool InputMethod_TouchScreen::Update(int player, Controls_t& c, CursorControls_t
 
     if(t->m_controller.m_current_extra_keys.keyCheats && t->m_controller.m_enable_enter_cheats)
         h[Hotkeys::Buttons::EnterCheats] = player;
+
+    // auto show/hide depending on context
+    if(m_wasTextEntry && GamePaused != PauseCode::TextEntry)
+    {
+        t->m_controller.m_touchHidden = false;
+        m_wasTextEntry = false;
+    }
+    else if(!m_wasTextEntry && GamePaused == PauseCode::TextEntry)
+    {
+        t->m_controller.m_touchHidden = true;
+        m_wasTextEntry = true;
+    }
 
     return true;
 }

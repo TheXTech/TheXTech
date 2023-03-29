@@ -333,6 +333,14 @@ void AbstractRender_t::loadTextureMask(StdPicture &target,
                          uint32_t image_height)
 {
     /* unimplemented */
+
+    UNUSED(target);
+    UNUSED(mask_width);
+    UNUSED(mask_height);
+    UNUSED(RGBApixels);
+    UNUSED(pitch);
+    UNUSED(image_width);
+    UNUSED(image_height);
 }
 
 bool AbstractRender_t::textureMaskSupported()
@@ -571,7 +579,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
                         w, h);
         }
 
-        FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX);
+        FIBITMAP *d = (!shrink2x) ? FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX) : GraphicsHelps::fast2xScaleDown(sourceImage);
         if(d)
         {
             GraphicsHelps::closeImage(sourceImage);

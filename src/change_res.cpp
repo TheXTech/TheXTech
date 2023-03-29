@@ -31,7 +31,10 @@ void SetOrigRes()
 {
     XWindow::setFullScreen(false);
     resChanged = false;
+
+#ifndef __EMSCRIPTEN__
     XWindow::setWindowSize(ScreenW, ScreenH);
+#endif
 
 #ifdef __EMSCRIPTEN__
     XEvents::eventResize();

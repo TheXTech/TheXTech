@@ -26,6 +26,7 @@
 #include "npc_id.h"
 #include "npc_special_data.h"
 #include <PGE_File_Formats/file_formats.h>
+#include <AppPath/app_path.h>
 #include "Logger/logger.h"
 
 void SaveLevel(const std::string& FilePath, int format, int version)   // saves the level
@@ -440,6 +441,8 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         PlaySound(SFX_Smash);
         return;
     }
+
+    AppPathManager::syncFs();
 
     // the rest of this stuff is all meant to be appropriately loading data
     // from the chosen folder
