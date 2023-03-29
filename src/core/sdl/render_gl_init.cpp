@@ -558,9 +558,9 @@ bool RenderGL::initVertexArrays()
 #ifdef RENDERGL_HAS_VBO
     if(!m_client_side_arrays)
     {
-        glGenBuffers(s_num_buffers, m_vertex_buffer);
+        glGenBuffers(s_num_vertex_buffers, m_vertex_buffer);
 
-        for(int i = 0; i < s_num_buffers; i++)
+        for(int i = 0; i < s_num_vertex_buffers; i++)
         {
             glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer[i]);
 #ifdef RENDERGL_HAS_STREAM_DRAW

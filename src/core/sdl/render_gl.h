@@ -42,29 +42,59 @@ struct SDL_Window;
 
 enum BufferIndex_t
 {
-    BUFFER_GAME,
+    BUFFER_GAME = 0,
     BUFFER_FB_READ,
     BUFFER_INIT_PASS,
     BUFFER_PREV_PASS,
     BUFFER_MAX,
 };
 
+enum TextureUnit_t
+{
+    TEXTURE_UNIT_IMAGE = GL_TEXTURE0,
+    TEXTURE_UNIT_FB_READ,
+    TEXTURE_UNIT_MASK,
+    TEXTURE_UNIT_PREVPASS,
+};
+
 class RenderGL final : public AbstractRender_t
 {
 private:
-    enum class SupportLevel
+    static inline const char* get_profile_name(const GLint profile)
     {
-        none,
-        core,
-        oes,
-        ext,
-    };
+        switch(profile)
+        {
+        case SDL_GL_CONTEXT_PROFILE_COMPATIBILITY:
+            return "Compatibility";
+        case SDL_GL_CONTEXT_PROFILE_CORE:
+            return "Core";
+        case SDL_GL_CONTEXT_PROFILE_ES:
+            return "ES";
+        default:
+            return "";
+        }
+    }
+
+    // unused for now
+    // enum class SupportLevel
+    // {
+    //     none,
+    //     core,
+    //     oes,
+    //     ext,
+    // };
 
     struct Vertex_t
     {
         GLshort position[3];
         GLubyte tint[4];
         GLfloat texcoord[2];
+    };
+
+    struct VertexList
+    {
+        std::vector<Vertex_t> vertices;
+        bool active = false;
     };
 
     struct DrawContext_t
@@ -90,27 +120,6 @@ private:
             return std::hash<GLProgramObject*>()(c.program) ^ (std::hash<StdPicture*>()(c.texture) >> 1);
         }
     };
-
-    struct VertexList
-    {
-        std::vector<Vertex_t> vertices;
-        bool active = false;
-    };
-
-    static inline const char* get_profile_name(const GLint profile)
-    {
-        switch(profile)
-        {
-        case SDL_GL_CONTEXT_PROFILE_COMPATIBILITY:
-            return "Compatibility";
-        case SDL_GL_CONTEXT_PROFILE_CORE:
-            return "Core";
-        case SDL_GL_CONTEXT_PROFILE_ES:
-            return "ES";
-        default:
-            return "";
-        }
-    }
 
     std::unordered_map<DrawContext_t, VertexList, hash_DrawContext> m_unordered_draw_queue;
     std::map<std::pair<int, DrawContext_t>, VertexList> m_ordered_draw_queue;
@@ -154,10 +163,12 @@ private:
 
     bool m_use_logicop = false;
     bool m_use_shaders = false;
-    bool m_has_es3_shaders = false;
-    bool m_has_npot_texture = false;
-    bool m_has_bgra = false;
     bool m_has_fbo = false;
+
+    // unused for now
+    // bool m_has_es3_shaders = false;
+    // bool m_has_npot_texture = false;
+    // bool m_has_bgra = false;
 
     bool m_client_side_arrays = false;
 
@@ -169,10 +180,10 @@ private:
     const GLuint& m_game_texture_fb = m_buffer_fb[0];
     GLuint m_game_depth_rb = 0;
 
-    static constexpr int s_num_buffers = 16;
-    GLuint m_vertex_buffer[s_num_buffers] = {0};
-    GLsizeiptr m_vertex_buffer_size[s_num_buffers] = {0};
-    int m_cur_buffer_index = 0;
+    static constexpr int s_num_vertex_buffers = 16;
+    GLuint m_vertex_buffer[s_num_vertex_buffers] = {0};
+    GLsizeiptr m_vertex_buffer_size[s_num_vertex_buffers] = {0};
+    int m_cur_vertex_buffer_index = 0;
 
 #ifdef RENDERGL_HAS_VAO
     GLuint m_glcore_vao = 0;
@@ -180,11 +191,11 @@ private:
 
     std::array<GLfloat, 16> m_transform_matrix;
     std::array<GLfloat, 4> m_shader_read_viewport;
+    uint64_t m_transform_tick = 0;
 
     GLshort m_cur_depth = 0;
 
     uint64_t m_current_frame = 0;
-    uint64_t m_transform_tick = 0;
 
     // OpenGL program objects
     GLProgramObject m_standard_program;

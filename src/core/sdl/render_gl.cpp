@@ -196,15 +196,15 @@ void RenderGL::fillVertexBuffer(const RenderGL::Vertex_t* vertex_attribs, int co
     else
     {
 #ifdef RENDERGL_HAS_VBO
-        m_cur_buffer_index++;
-        if(m_cur_buffer_index >= s_num_buffers)
-            m_cur_buffer_index = 0;
+        m_cur_vertex_buffer_index++;
+        if(m_cur_vertex_buffer_index >= s_num_vertex_buffers)
+            m_cur_vertex_buffer_index = 0;
 
         GLsizeiptr buffer_size = sizeof(RenderGL::Vertex_t) * count;
 
-        glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer[m_cur_buffer_index]);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer[m_cur_vertex_buffer_index]);
 
-        if(m_vertex_buffer_size[m_cur_buffer_index] < buffer_size)
+        if(m_vertex_buffer_size[m_cur_vertex_buffer_index] < buffer_size)
         {
 #   ifdef RENDERGL_HAS_STREAM_DRAW
             const auto draw_mode = (m_gl_majver == 1 ? GL_DYNAMIC_DRAW : GL_STREAM_DRAW);
@@ -212,7 +212,7 @@ void RenderGL::fillVertexBuffer(const RenderGL::Vertex_t* vertex_attribs, int co
             const auto draw_mode = GL_DYNAMIC_DRAW;
 #   endif
             glBufferData(GL_ARRAY_BUFFER, buffer_size, vertex_attribs, draw_mode);
-            m_vertex_buffer_size[m_cur_buffer_index] = buffer_size;
+            m_vertex_buffer_size[m_cur_vertex_buffer_index] = buffer_size;
         }
         else
         {
@@ -232,9 +232,9 @@ void RenderGL::fillVertexBuffer(const RenderGL::Vertex_t* vertex_attribs, int co
     else
     {
 #ifdef RENDERGL_HAS_FIXED_FUNCTION
-        glVertexPointer(3, GL_SHORT, sizeof(RenderGL::Vertex_t), array_start + offsetof(RenderGL::Vertex_t, position));
-        glTexCoordPointer(2, GL_FLOAT, sizeof(RenderGL::Vertex_t), array_start + offsetof(RenderGL::Vertex_t, texcoord));
-        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(RenderGL::Vertex_t), array_start + offsetof(RenderGL::Vertex_t, tint));
+        glVertexPointer(   3, GL_SHORT,         sizeof(RenderGL::Vertex_t), array_start + offsetof(RenderGL::Vertex_t, position));
+        glTexCoordPointer( 2, GL_FLOAT,         sizeof(RenderGL::Vertex_t), array_start + offsetof(RenderGL::Vertex_t, texcoord));
+        glColorPointer(    4, GL_UNSIGNED_BYTE, sizeof(RenderGL::Vertex_t), array_start + offsetof(RenderGL::Vertex_t, tint));
 #endif
     }
 }
@@ -314,7 +314,7 @@ void RenderGL::flushDrawQueues()
     }
 
     // pass 2: translucent / interesting textures
-    bool early_return = true;
+    bool no_translucent_objects = true;
     int num_pass = 1;
 
     // save the opaque state if there are any multipass shaders
@@ -323,9 +323,11 @@ void RenderGL::flushDrawQueues()
         if(i.second.vertices.empty())
             continue;
 
-        early_return = false;
+        no_translucent_objects = false;
 
-        if(i.first.second.program && i.first.second.program->get_type() >= GLProgramObject::multipass)
+        const GLProgramObject* program = i.first.second.program;
+
+        if(program && program->get_type() >= GLProgramObject::multipass)
         {
             num_pass = s_num_pass;
             framebufferCopy(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
@@ -333,7 +335,8 @@ void RenderGL::flushDrawQueues()
         }
     }
 
-    if(early_return)
+    // return without needing to call glDepthMask
+    if(no_translucent_objects)
         return;
 
     glDepthMask(GL_FALSE);
@@ -344,16 +347,19 @@ void RenderGL::flushDrawQueues()
         {
             framebufferCopy(BUFFER_PREV_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
             framebufferCopy(BUFFER_GAME, BUFFER_INIT_PASS, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
-            glActiveTexture(GL_TEXTURE3);
+
+            // slot for reading previous pass
+            glActiveTexture(TEXTURE_UNIT_PREVPASS);
             glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_PREV_PASS]);
         }
         else if(m_buffer_texture[BUFFER_INIT_PASS])
         {
-            glActiveTexture(GL_TEXTURE3);
+            // slot for reading previous pass
+            glActiveTexture(TEXTURE_UNIT_PREVPASS);
             glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_INIT_PASS]);
         }
 
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(TEXTURE_UNIT_IMAGE);
 
         for(auto& i : m_ordered_draw_queue)
         {
@@ -369,24 +375,38 @@ void RenderGL::flushDrawQueues()
             SDL_assert(context.program);
             GLProgramObject* program = context.program;
 
-            if(!m_use_logicop && (program == &m_standard_program) && context.texture && context.texture->d.mask_texture_id)
+            bool need_logic_op = (context.texture && context.texture->d.mask_texture_id && program == &m_standard_program);
+
+            // emulate the logic op if we can't use it directly
+            if(!m_use_logicop && need_logic_op)
+            {
                 program = &m_bitmask_program;
+                need_logic_op = false;
+            }
 
             if(program->get_type() >= GLProgramObject::read_buffer)
             {
                 if(vertex_attribs.size() > 6)
+                {
                     framebufferCopy(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+                }
                 else if(vertex_attribs.size() == 6)
-                    framebufferCopy(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0], m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1], vertex_attribs[5].position[0] - vertex_attribs[0].position[0], vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
+                {
+                    framebufferCopy(BUFFER_FB_READ, BUFFER_GAME,
+                        m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0],
+                        m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1],
+                        vertex_attribs[5].position[0] - vertex_attribs[0].position[0],
+                        vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
+                }
 
                 // only program allowed to use mask texture
                 if(program == &m_bitmask_program)
                 {
-                    glActiveTexture(GL_TEXTURE2);
+                    glActiveTexture(TEXTURE_UNIT_MASK);
                     glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
                 }
 
-                glActiveTexture(GL_TEXTURE0);
+                glActiveTexture(TEXTURE_UNIT_IMAGE);
             }
 
             fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
@@ -400,7 +420,7 @@ void RenderGL::flushDrawQueues()
             }
 #endif
 
-            if(context.texture && context.texture->d.mask_texture_id && program == &m_standard_program)
+            if(need_logic_op)
             {
                 prepareDrawMask();
                 glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
@@ -415,9 +435,10 @@ void RenderGL::flushDrawQueues()
 
             glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
 
-            if(context.texture && context.texture->d.mask_texture_id && program == &m_standard_program)
+            if(need_logic_op)
                 leaveMaskContext();
 
+            // clear on final pass
             if(pass == num_pass - 1)
                 vertex_attribs.clear();
         }
@@ -501,8 +522,8 @@ void RenderGL::close()
 #ifdef RENDERGL_HAS_VBO
     if(m_vertex_buffer[0])
     {
-        glDeleteBuffers(s_num_buffers, m_vertex_buffer);
-        for(int i = 0; i < s_num_buffers; i++)
+        glDeleteBuffers(s_num_vertex_buffers, m_vertex_buffer);
+        for(int i = 0; i < s_num_vertex_buffers; i++)
             m_vertex_buffer[i] = 0;
     }
 #endif
