@@ -102,7 +102,7 @@ public:
     /*!
      * \brief Reports whether there is a valid program stored in the object
      */
-    inline bool inited()
+    inline bool inited() const
     {
         return m_program != 0;
     }
@@ -110,7 +110,7 @@ public:
     /*!
      * \brief Reports the program type for multipass rendering
      */
-    inline Type get_type()
+    inline Type get_type() const
     {
         return m_type;
     }
