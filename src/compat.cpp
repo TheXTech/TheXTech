@@ -198,16 +198,8 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
         {
             int response;
 
-            if(g_config.compat_autoconvert == Config_t::AUTOCONVERT_ALWAYS)
-            {
-                response = 0;
-            }
-            else if(g_config.compat_autoconvert == Config_t::AUTOCONVERT_NEVER)
-            {
-                response = 1;
-            }
             // only warn on first time the file is loaded
-            else if(s_first_load_iter[s.fileName()] != 0 && s_first_load_iter[s.fileName()] != s_cur_load_iter)
+            if(s_first_load_iter[s.fileName()] != 0 && s_first_load_iter[s.fileName()] != s_cur_load_iter)
             {
                 response = 1;
             }
@@ -218,15 +210,13 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
                     {
                         g_mainMenu.wordYes,
                         g_mainMenu.wordNo,
-                        g_mainMenu.phraseYesAlways,
-                        g_mainMenu.phraseNoNever,
                     }
                 );
 
                 s_first_load_iter[s.fileName()] = s_cur_load_iter;
             }
 
-            if(response == 0 || response == 2)
+            if(response == 0)
             {
                 pLogDebug("Updating file [%s]...", s.fileName().c_str());
 
@@ -236,23 +226,12 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
 
                 writable = s.writeIniFile();
             }
-
-            if(response == 3)
-            {
-                g_config.compat_autoconvert = Config_t::AUTOCONVERT_NEVER;
-                SaveConfig();
-            }
-            else if(response == 2)
-            {
-                g_config.compat_autoconvert = Config_t::AUTOCONVERT_ALWAYS;
-                SaveConfig();
-            }
         }
 
         // NOTE: if saving failed above, writable is set to false even if it was originally true
 
         // final condition ensures we only warn on first time the file is loaded
-        if(!writable && g_config.compat_autoconvert != Config_t::AUTOCONVERT_NEVER && g_config.compat_autoconvert_warn_unwritable && (s_first_load_iter[s.fileName()] == 0 || s_first_load_iter[s.fileName()] == s_cur_load_iter))
+        if(!writable && (s_first_load_iter[s.fileName()] == 0 || s_first_load_iter[s.fileName()] == s_cur_load_iter))
         {
             std::string filename = s.fileName();
 
@@ -266,13 +245,7 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
                 filename.resize(filename.size() - AppPath.size());
             }
 
-            int response = PromptScreen::Run(fmt::format_ne(g_mainMenu.promptDeprecatedSettingUnwritable, filename, s.group().c_str(), fieldName, newName), {g_mainMenu.wordYes, g_mainMenu.wordNo});
-
-            if(response == 1)
-            {
-                g_config.compat_autoconvert_warn_unwritable = false;
-                SaveConfig();
-            }
+            PromptScreen::Run(fmt::format_ne(g_mainMenu.promptDeprecatedSettingUnwritable, filename, s.group().c_str(), fieldName, newName), {g_mainMenu.wordOkay});
 
             s_first_load_iter[s.fileName()] = s_cur_load_iter;
         }

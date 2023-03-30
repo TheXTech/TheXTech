@@ -38,16 +38,6 @@ extern struct Config_t
     int     editor_preferred_file_format = 0;
     //! Show debug string during the loading process
     bool    loading_show_debug = false;
-    //! Compat autoconversion preference
-    enum
-    {
-        AUTOCONVERT_ASK = 0,
-        AUTOCONVERT_NEVER,
-        AUTOCONVERT_ALWAYS,
-    };
-    int     compat_autoconvert = AUTOCONVERT_ASK;
-    //! Warn user if autoconversion is impossible
-    bool    compat_autoconvert_warn_unwritable = true;
 
     /* ---- Video ----*/
 

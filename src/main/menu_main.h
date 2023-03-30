@@ -134,14 +134,11 @@ struct MainMenuContent
 
     std::string wordYes;
     std::string wordNo;
+    std::string wordOkay;
 
     // Compat menu
     std::string promptDeprecatedSetting;
     std::string promptDeprecatedSettingUnwritable;
-    std::string phraseYesAlways;
-    std::string phraseNoNever;
-    std::string phraseShowAgain;
-    std::string phraseDoNotShowAgain;
 };
 
 extern MainMenuContent g_mainMenu;
