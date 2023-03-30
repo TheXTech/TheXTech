@@ -147,6 +147,10 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
         return false;
     }
 
+#if (defined(_WIN32) || defined(_WIN64)) && defined(THEXTECH_BUILD_GL_DESKTOP_MODERN)
+    glewInit();
+#endif
+
     // Check version
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &m_gl_profile);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &m_gl_majver);

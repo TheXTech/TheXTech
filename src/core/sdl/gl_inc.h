@@ -23,11 +23,18 @@
 #define RENDERGL_INC_H
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
+
+#if defined(_WIN32) || defined(_WIN64)
+#    define NO_SDL_GLEXT
+#    include <GL/glew.h>
+#else
 #    define GL_GLEXT_PROTOTYPES 1
+#endif
+
 #    include <SDL2/SDL_opengl.h>
 #    include <SDL2/SDL_opengl_glext.h>
 
-#    ifndef __APPLE__
+#    if !defined(__APPLE__) && !defined(_WIN32) && !defined(_WIN64)
 #        define RENDERGL_HAS_DEBUG
 #    endif
 
