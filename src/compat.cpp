@@ -229,7 +229,11 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
             if(response == 1 || response == 3)
             {
                 pLogDebug("Updating file [%s]...", s.fileName().c_str());
-                s.renameKey(fieldName, newName);
+
+                std::string current_value;
+                s.read(fieldName, current_value, current_value);
+                s.setValue(newName, current_value);
+
                 writable = s.writeIniFile();
             }
 
