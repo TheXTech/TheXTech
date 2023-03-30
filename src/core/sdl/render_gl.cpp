@@ -73,11 +73,8 @@ bool RenderGL::isWorking()
 
 // arguments
 constexpr bool s_prefer_fb_to_fb_render = true;
-static bool s_enable_debug_output = false;
 static int s_num_pass = 2;
 
-
-// doesn't work on GL ES for now due to limited SDL support
 
 void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h)
 {
@@ -1247,7 +1244,12 @@ bool RenderGL::textureMaskSupported()
 bool RenderGL::userShadersSupported()
 {
     // should check for GLES 2/3
+#ifdef THEXTECH_WIP_FEATURES
     return m_use_shaders;
+#else
+    // FIXME: should be false before submitting to the main repo
+    return m_use_shaders;
+#endif
 }
 
 void RenderGL::deleteTexture(StdPicture &tx, bool lazyUnload)
