@@ -108,7 +108,6 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
         if(source != BUFFER_GAME)
             glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[source]);
 
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[dest]);
         glCopyTexSubImage2D(GL_TEXTURE_2D,
             0,
@@ -133,7 +132,6 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
     if(dest != BUFFER_GAME)
         glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[dest]);
 
-    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_buffer_texture[source]);
 
 #ifdef RENDERGL_HAS_SHADERS
@@ -343,23 +341,28 @@ void RenderGL::flushDrawQueues()
 
     for(int pass = 0; pass < num_pass; pass++)
     {
+#ifdef RENDERGL_HAS_FBO
         if(pass != 0)
         {
             framebufferCopy(BUFFER_PREV_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
             framebufferCopy(BUFFER_GAME, BUFFER_INIT_PASS, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
 
-            // slot for reading previous pass
-            glActiveTexture(TEXTURE_UNIT_PREVPASS);
-            glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_PREV_PASS]);
+            // slot for reading previous pass (only need to reset it once)
+            if(pass == 1)
+            {
+                glActiveTexture(TEXTURE_UNIT_PREVPASS);
+                glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_PREV_PASS]);
+                glActiveTexture(TEXTURE_UNIT_IMAGE);
+            }
         }
         else if(m_buffer_texture[BUFFER_INIT_PASS])
         {
             // slot for reading previous pass
             glActiveTexture(TEXTURE_UNIT_PREVPASS);
             glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_INIT_PASS]);
+            glActiveTexture(TEXTURE_UNIT_IMAGE);
         }
-
-        glActiveTexture(TEXTURE_UNIT_IMAGE);
+#endif
 
         for(auto& i : m_ordered_draw_queue)
         {
@@ -384,6 +387,7 @@ void RenderGL::flushDrawQueues()
                 need_logic_op = false;
             }
 
+#ifdef RENDERGL_HAS_FBO
             if(program->get_type() >= GLProgramObject::read_buffer)
             {
                 if(vertex_attribs.size() > 6)
@@ -404,10 +408,10 @@ void RenderGL::flushDrawQueues()
                 {
                     glActiveTexture(TEXTURE_UNIT_MASK);
                     glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+                    glActiveTexture(TEXTURE_UNIT_IMAGE);
                 }
-
-                glActiveTexture(TEXTURE_UNIT_IMAGE);
             }
+#endif // #ifdef RENDERGL_HAS_FBO
 
             fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
 
@@ -641,7 +645,6 @@ void RenderGL::repaint()
 
         fillVertexBuffer(vertex_attribs, 4);
 
-        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_game_texture);
 
 #ifdef RENDERGL_HAS_SHADERS
@@ -1133,7 +1136,6 @@ void RenderGL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, 
     }
 
     glGenTextures(1, &tex_id);
-    // glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex_id);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);

@@ -514,9 +514,11 @@ bool RenderGL::initFramebuffers()
     // bind texture unit 1 to the framebuffer read texture
     if(m_buffer_texture[BUFFER_FB_READ])
     {
-        glActiveTexture(GL_TEXTURE1);
+#ifdef RENDERGL_HAS_FBO
+        glActiveTexture(TEXTURE_UNIT_FB_READ);
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_FB_READ]);
-        glActiveTexture(GL_TEXTURE0);
+        glActiveTexture(TEXTURE_UNIT_IMAGE);
+#endif
     }
 
     return true;
