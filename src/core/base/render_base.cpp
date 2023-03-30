@@ -263,6 +263,48 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     target.frame_w = static_cast<int>(w);
     target.frame_h = static_cast<int>(h);
 
+    bool wLimitExcited = m_maxTextureWidth > 0 && w > Uint32(m_maxTextureWidth);
+    bool hLimitExcited = m_maxTextureHeight > 0 && h > Uint32(m_maxTextureHeight);
+
+    if(wLimitExcited || hLimitExcited)
+    {
+        target.l.w_orig = int(w);
+        target.l.h_orig = int(h);
+
+        // WORKAROUND: down-scale too big textures
+        if(wLimitExcited)
+            w = Uint32(m_maxTextureWidth);
+        if(hLimitExcited)
+            h = Uint32(m_maxTextureHeight);
+
+        pLogWarning("Texture [%s] (%dx%d) is too big for a given hardware limit. "
+                    "Shrinking texture to %dx%d, quality may be distorted!",
+                    path.c_str(),
+                    target.l.w_orig, target.l.h_orig,
+                    w, h);
+
+        FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX);
+        if(d)
+        {
+            GraphicsHelps::closeImage(sourceImage);
+            sourceImage = d;
+        }
+
+        target.l.w_scale = float(w) / float(target.l.w_orig);
+        target.l.h_scale = float(h) / float(target.l.h_orig);
+        pitch = FreeImage_GetPitch(d);
+
+        if(maskImage)
+        {
+            d = FreeImage_Rescale(maskImage, int(w), int(h), FILTER_BOX);
+            if(d)
+            {
+                GraphicsHelps::closeImage(maskImage);
+                maskImage = d;
+            }
+        }
+    }
+
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
     g_render->loadTexture(target, w, h, textura, pitch);
 
