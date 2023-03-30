@@ -254,7 +254,19 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
         // final condition ensures we only warn on first time the file is loaded
         if(!writable && g_config.compat_autoconvert != Config_t::AUTOCONVERT_NEVER && g_config.compat_autoconvert_warn_unwritable && (s_first_load_iter[s.fileName()] == 0 || s_first_load_iter[s.fileName()] == s_cur_load_iter))
         {
-            int response = PromptScreen::Run(fmt::format_ne(g_mainMenu.promptDeprecatedSettingUnwritable, s.fileName(), s.group().c_str(), fieldName, newName), {g_mainMenu.wordYes, g_mainMenu.wordNo});
+            std::string filename = s.fileName();
+
+            // remove AppPath if it's included
+            pLogDebug("%s %s", filename.c_str(), AppPath.c_str());
+            if(filename.compare(0, AppPath.size(), AppPath) == 0)
+            {
+                for(size_t i = AppPath.size(); i < filename.size(); i++)
+                    filename[i - AppPath.size()] = filename[i];
+
+                filename.resize(filename.size() - AppPath.size());
+            }
+
+            int response = PromptScreen::Run(fmt::format_ne(g_mainMenu.promptDeprecatedSettingUnwritable, filename, s.group().c_str(), fieldName, newName), {g_mainMenu.wordYes, g_mainMenu.wordNo});
 
             if(response == 1)
             {
