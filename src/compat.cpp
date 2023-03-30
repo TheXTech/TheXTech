@@ -200,33 +200,33 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
 
             if(g_config.compat_autoconvert == Config_t::AUTOCONVERT_ALWAYS)
             {
-                response = 1;
+                response = 0;
             }
             else if(g_config.compat_autoconvert == Config_t::AUTOCONVERT_NEVER)
             {
-                response = 0;
+                response = 1;
             }
             // only warn on first time the file is loaded
             else if(s_first_load_iter[s.fileName()] != 0 && s_first_load_iter[s.fileName()] != s_cur_load_iter)
             {
-                response = 0;
+                response = 1;
             }
             else
             {
                 response = PromptScreen::Run(
                     fmt::format_ne(g_mainMenu.promptDeprecatedSetting, fieldName, newName),
                     {
-                        g_mainMenu.wordNo,
                         g_mainMenu.wordYes,
-                        g_mainMenu.phraseNoNever,
+                        g_mainMenu.wordNo,
                         g_mainMenu.phraseYesAlways,
+                        g_mainMenu.phraseNoNever,
                     }
                 );
 
                 s_first_load_iter[s.fileName()] = s_cur_load_iter;
             }
 
-            if(response == 1 || response == 3)
+            if(response == 0 || response == 2)
             {
                 pLogDebug("Updating file [%s]...", s.fileName().c_str());
 
@@ -237,12 +237,12 @@ static void deprecatedWarning(IniProcessing &s, const char* fieldName, const cha
                 writable = s.writeIniFile();
             }
 
-            if(response == 2)
+            if(response == 3)
             {
                 g_config.compat_autoconvert = Config_t::AUTOCONVERT_NEVER;
                 SaveConfig();
             }
-            else if(response == 3)
+            else if(response == 2)
             {
                 g_config.compat_autoconvert = Config_t::AUTOCONVERT_ALWAYS;
                 SaveConfig();
