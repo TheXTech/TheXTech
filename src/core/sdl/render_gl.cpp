@@ -492,6 +492,14 @@ bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         return false;
     }
 
+    GLenum err = glGetError();
+    if(err)
+    {
+        pLogDebug("Render GL: GL error %d occurred during init process, falling back to SDL.", err);
+        close();
+        return false;
+    }
+
 
 
     // Clean-up from a possible start-up junk
@@ -1053,7 +1061,7 @@ void RenderGL::leaveMaskContext()
 static int s_nextPowerOfTwo(int val)
 {
     int power = 1;
-    while (power < val)
+    while(power < val)
         power *= 2;
     return power;
 }

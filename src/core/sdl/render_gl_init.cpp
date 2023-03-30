@@ -226,6 +226,14 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     // setup vSync
     SDL_GL_SetSwapInterval(setup.vSync);
 
+    GLenum err = glGetError();
+
+    if(err)
+    {
+        pLogDebug("Render GL: GL error %d occurred in early init process, falling back to SDL.", err);
+        return false;
+    }
+
     return true;
 }
 
