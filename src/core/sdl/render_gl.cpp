@@ -1135,8 +1135,15 @@ void RenderGL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, 
     glGenTextures(1, &tex_id);
     glBindTexture(GL_TEXTURE_2D, tex_id);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+#ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+    auto texborder = (m_gl_majver == 1 && m_gl_profile == SDL_GL_CONTEXT_PROFILE_COMPATIBILITY)
+        ? GL_CLAMP : GL_CLAMP_TO_EDGE;
+#else
+    auto texborder = GL_CLAMP_TO_EDGE;
+#endif
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texborder);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texborder);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
