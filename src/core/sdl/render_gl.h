@@ -49,6 +49,7 @@ enum BufferIndex_t
     BUFFER_MAX,
 };
 
+#ifdef RENDERGL_HAS_FBO
 enum TextureUnit_t
 {
     TEXTURE_UNIT_IMAGE = GL_TEXTURE0,
@@ -56,6 +57,7 @@ enum TextureUnit_t
     TEXTURE_UNIT_MASK,
     TEXTURE_UNIT_PREVPASS,
 };
+#endif
 
 class RenderGL final : public AbstractRender_t
 {

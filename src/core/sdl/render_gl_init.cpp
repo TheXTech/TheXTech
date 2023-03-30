@@ -57,10 +57,12 @@ static std::string s_read_file(const char* filename)
     return out;
 }
 
+#ifdef RENDERGL_HAS_DEBUG
 static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam)
 {
     pLogWarning("Got GL error %s", message);
 }
+#endif
 
 void RenderGL::try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver)
 {
