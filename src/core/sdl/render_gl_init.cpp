@@ -158,11 +158,19 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &m_gl_majver);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &m_gl_minver);
 
+    // can't trust SDL2
+    const GLubyte* gl_ver_string = glGetString(GL_VERSION);
+    if(gl_ver_string && gl_ver_string[0] && gl_ver_string[1] && gl_ver_string[2])
+    {
+        m_gl_majver = gl_ver_string[0] - '0';
+        m_gl_minver = gl_ver_string[2] - '0';
+    }
+
     pLogDebug("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
     pLogDebug("OpenGL version: %s", glGetString(GL_VERSION));
     pLogDebug("OpenGL renderer: %s", glGetString(GL_RENDERER));
 #ifdef RENDERGL_HAS_SHADERS
-    if(m_gl_majver > 1)
+    if(m_gl_majver >= 2)
         pLogDebug("GLSL version: %s", glGetString(GL_SHADING_LANGUAGE_VERSION));
 #endif
     D_pLogDebug("OpenGL extensions: %s", glGetString(GL_EXTENSIONS));
@@ -185,9 +193,9 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 #endif
 
 #ifdef RENDERGL_HAS_SHADERS
-    if(m_gl_majver > 1 && m_gl_profile != SDL_GL_CONTEXT_PROFILE_COMPATIBILITY)
+    if(m_gl_majver >= 2 && m_gl_profile != SDL_GL_CONTEXT_PROFILE_COMPATIBILITY)
         m_use_shaders = true;
-    else if(m_gl_majver > 1 && setup.renderType != RENDER_ACCELERATED_OPENGL_LEGACY)
+    else if(m_gl_majver >= 2 && setup.renderType != RENDER_ACCELERATED_OPENGL_LEGACY)
         m_use_shaders = true;
     else
         m_use_shaders = false;
@@ -205,7 +213,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 #endif // #ifdef __EMSCRIPTEN__
 
 #ifdef RENDERGL_HAS_FBO
-    if(m_gl_majver >= 2)
+    if(m_gl_majver >= 2 && setup.renderType != RENDER_ACCELERATED_OPENGL_LEGACY)
         m_has_fbo = true;
     else
         m_has_fbo = false;
