@@ -471,9 +471,7 @@ void SaveConfig()
 
     config.writeIniFile();
     controls.writeIniFile();
-#ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();
-#endif
 
     pLogDebug("Saved config: %s, control mappings: %s", configPath.c_str(), controlsPath.c_str());
 }

@@ -22,6 +22,7 @@
 #include "sound.h"
 #include "write_common.h"
 #include <PGE_File_Formats/file_formats.h>
+#include <AppPath/app_path.h>
 #include "Logger/logger.h"
 
 void SaveWorld(const std::string& FilePath, int format, int version)   // Saves the world!
@@ -139,6 +140,8 @@ void SaveWorld(const std::string& FilePath, int format, int version)   // Saves 
         PlaySound(SFX_Smash);
         return;
     }
+
+    AppPathManager::syncFs();
 
     PlaySound(SFX_GotItem);
 }

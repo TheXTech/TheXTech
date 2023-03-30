@@ -108,15 +108,15 @@ void EventsSDL::processEvent()
         break;
 #ifdef USE_RENDER_BLOCKING
     case SDL_RENDER_DEVICE_RESET:
-        D_pLogDebug("Android: Render Device Reset");
+        D_pLogDebugNA("Android: Render Device Reset");
         break;
     case SDL_APP_WILLENTERBACKGROUND:
         XRender::setBlockRender(true);
-        D_pLogDebug("Android: Entering background");
+        D_pLogDebugNA("Android: Entering background");
         break;
     case SDL_APP_DIDENTERFOREGROUND:
         XRender::setBlockRender(false);
-        D_pLogDebug("Android: Resumed foreground");
+        D_pLogDebugNA("Android: Resumed foreground");
         break;
 #endif
     }
