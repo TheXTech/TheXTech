@@ -41,7 +41,6 @@ struct StdPictureData
 // Compatible backend is only can use these internals
 private:
     friend class RenderSDL;
-    friend class RenderGL11;
     friend class RenderGL;
 
     //! Texture instance pointer for SDL Render
