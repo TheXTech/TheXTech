@@ -38,7 +38,10 @@
 extern uint32_t SDL_GetTicks();
 #endif
 
-inline void SDL_Delay(int x) {}
+inline void SDL_Delay(int x)
+{
+    (void)(x);
+}
 
 #endif
 
