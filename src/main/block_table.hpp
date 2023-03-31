@@ -392,7 +392,7 @@ struct table_t
 
             if(columns[internal_col].size() == 0)
             {
-                inner_rect.cont_axes |= CONT_Y;
+                inner_rect.cont_axes |= CONT_X;
                 continue;
             }
 
