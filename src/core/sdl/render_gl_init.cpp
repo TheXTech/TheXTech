@@ -153,6 +153,14 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     glewInit();
 #endif
 
+#if defined(__SWITCH__) && defined(THEXTECH_BUILD_GL_DESKTOP_MODERN)
+    if(!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress))
+    {
+        pLogCritical("Render GL: unable to load GLAD, falling back to SDL.");
+        return false;
+    }
+#endif
+
     // Check version
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, &m_gl_profile);
     SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &m_gl_majver);

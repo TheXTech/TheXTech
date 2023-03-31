@@ -281,9 +281,12 @@ if(EMSCRIPTEN)
 endif()
 
 if(NINTENDO_SWITCH)
-    set(THEXTECH_BUILD_GL_DESKTOP_MODERN OFF CACHE BOOL "" FORCE)
-    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
     set(THEXTECH_BUILD_GL_ES_LEGACY      OFF CACHE BOOL "" FORCE)
+    set(THEXTECH_BUILD_GL_DESKTOP_LEGACY OFF CACHE BOOL "" FORCE)
+endif()
+
+if(NINTENDO_SWITCH AND THEXTECH_BUILD_GL_ES_MODERN AND THEXTECH_BUILD_GL_DESKTOP_MODERN)
+    error("A Nintendo Switch build cannot include both OpenGL Desktop and OpenGL ES")
 endif()
 
 # ============ Platform-conf ==end=========
@@ -918,7 +921,11 @@ endif()
 if(NINTENDO_SWITCH)
     target_link_libraries(A2XT_Int INTERFACE nx)
 
-    if(THEXTECH_BUILD_GL_MODERN)
+    if(THEXTECH_BUILD_GL_DESKTOP_MODERN)
+        target_link_libraries(A2XT_Int INTERFACE glad)
+    endif()
+
+    if(THEXTECH_BUILD_GL_ES_MODERN)
         target_link_libraries(A2XT_Int INTERFACE GLESv2)
     endif()
 

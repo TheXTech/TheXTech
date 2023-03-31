@@ -22,6 +22,11 @@
 #ifndef RENDERGL_INC_H
 #define RENDERGL_INC_H
 
+#if defined(__SWITCH__) && defined(THEXTECH_BUILD_GL_DESKTOP_MODERN)
+#    define NO_SDL_GLEXT
+#    include <glad/glad.h>
+#endif
+
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -39,12 +44,15 @@
 #    endif
 
 #    define RENDERGL_HAS_LOGICOP
-#    define RENDERGL_HAS_ORTHO
 #    define RENDERGL_HAS_SHADERS
-#    define RENDERGL_HAS_FIXED_FUNCTION
 #    define RENDERGL_HAS_VAO
 #    define RENDERGL_HAS_VBO
 #    define RENDERGL_HAS_FBO
+
+#ifndef NINTENDO_SWITCH
+#    define RENDERGL_HAS_ORTHO
+#    define RENDERGL_HAS_FIXED_FUNCTION
+#endif
 
 #    define RENDERGL_SUPPORTED
 #endif
