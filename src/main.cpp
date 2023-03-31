@@ -269,10 +269,18 @@ int main(int argc, char**argv)
                                                 "  hw - generic hardware accelerated render (currently SDL2) [Default]\n"
                                                 "  vsync - generic hardware accelerated render with vSync [deprecated]\n"
                                                 "  sdl - hardware accelerated SDL2 render\n"
+#   ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
                                                 "  opengl - hardware accelerated OpenGL 2.1+ render\n"
+#   endif
+#   ifdef THEXTECH_BUILD_GL_ES_MODERN
                                                 "  opengles - hardware accelerated OpenGL ES (mobile) 2.0+ render\n"
+#   endif
+#   ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
                                                 "  opengl11 - hardware accelerated OpenGL 1.1-2.0 render (legacy)\n"
+#   endif
+#   ifdef THEXTECH_BUILD_GL_ES_LEGACY
                                                 "  opengles11 - hardware accelerated OpenGL ES 1.1 render (legacy)",
+#   endif
                                                 false, "",
                                                 "render type",
                                                 cmd);
