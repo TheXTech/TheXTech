@@ -663,7 +663,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
                         w, h);
         }
 
-        FIBITMAP *d = (!shrink2x) ? FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX) : GraphicsHelps::fast2xScaleDown(sourceImage);
+        FIBITMAP *d = (wLimitExcited || hLimitExcited) ? FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX) : GraphicsHelps::fast2xScaleDown(sourceImage);
         if(d)
         {
             GraphicsHelps::closeImage(sourceImage);
