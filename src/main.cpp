@@ -279,8 +279,9 @@ int main(int argc, char**argv)
                                                 "  opengl11 - hardware accelerated OpenGL 1.1-2.0 render (legacy)\n"
 #   endif
 #   ifdef THEXTECH_BUILD_GL_ES_LEGACY
-                                                "  opengles11 - hardware accelerated OpenGL ES 1.1 render (legacy)",
+                                                "  opengles11 - hardware accelerated OpenGL ES 1.1 render (legacy)"
 #   endif
+                                                ,
                                                 false, "",
                                                 "render type",
                                                 cmd);
