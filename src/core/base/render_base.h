@@ -201,6 +201,8 @@ public:
 
     virtual bool userShadersSupported();
 
+    virtual bool depthTestSupported();
+
     void loadTexture_1x(StdPicture &target,
                              uint32_t width,
                              uint32_t height,

@@ -1243,6 +1243,11 @@ bool RenderGL::textureMaskSupported()
     return (m_use_logicop) || (m_use_shaders && m_buffer_texture[1]);
 }
 
+bool RenderGL::depthTestSupported()
+{
+    return true;
+}
+
 bool RenderGL::userShadersSupported()
 {
     // should check for GLES 2/3

@@ -389,6 +389,8 @@ public:
 
     bool userShadersSupported() override;
 
+    bool depthTestSupported() override;
+
     void deleteTexture(StdPicture &tx, bool lazyUnload = false) override;
     void clearAllTextures() override;
 

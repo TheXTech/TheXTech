@@ -318,7 +318,7 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
     g_render->loadTexture(target, w, h, textura, pitch);
 
-    if(maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, path))
+    if(!g_render->depthTestSupported() || maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, path))
         target.d.invalidateDepthTest();
 
 #ifdef DEBUG_BUILD
@@ -411,6 +411,11 @@ bool AbstractRender_t::textureMaskSupported()
 }
 
 bool AbstractRender_t::userShadersSupported()
+{
+    return false;
+}
+
+bool AbstractRender_t::depthTestSupported()
 {
     return false;
 }
@@ -688,7 +693,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
 
     g_render->loadTexture(target, w, h, textura, pitch);
-    if(maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
+
+    if(!g_render->depthTestSupported() || maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
         target.d.invalidateDepthTest();
 
     GraphicsHelps::closeImage(sourceImage);
