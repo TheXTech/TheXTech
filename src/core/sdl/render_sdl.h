@@ -76,7 +76,6 @@ public:
     RenderSDL();
     ~RenderSDL() override;
 
-    void togglehud() override;
 
     unsigned int SDL_InitFlags() override;
 

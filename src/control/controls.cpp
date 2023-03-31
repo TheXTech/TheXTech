@@ -126,8 +126,7 @@ void Hotkeys::Activate(size_t i, int player)
         return;
 
     case Buttons::ToggleHUD:
-        g_render->togglehud();
-        // ShowOnScreenHUD = !ShowOnScreenHUD;
+        ShowOnScreenHUD = !ShowOnScreenHUD;
         return;
 
     case Buttons::LegacyPause:

@@ -280,8 +280,6 @@ public:
     RenderGL();
     ~RenderGL() override;
 
-    void togglehud() override;
-
 
     unsigned int SDL_InitFlags() override;
 

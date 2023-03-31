@@ -165,11 +165,6 @@ void RenderSDL::close()
     m_gRenderer = nullptr;
 }
 
-void RenderSDL::togglehud()
-{
-    // empty
-}
-
 void RenderSDL::repaint()
 {
 #ifdef USE_RENDER_BLOCKING

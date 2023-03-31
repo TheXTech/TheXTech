@@ -551,19 +551,6 @@ void RenderGL::close()
     m_gContext = nullptr;
 }
 
-void RenderGL::togglehud()
-{
-#ifdef RENDERGL_HAS_LOGICOP
-    if(m_use_shaders && m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES)
-    {
-        m_use_logicop = !m_use_logicop;
-        PlaySoundMenu(SFX_Raccoon);
-    }
-    else
-#endif
-        PlaySoundMenu(SFX_BlockHit);
-}
-
 void RenderGL::repaint()
 {
 #ifdef USE_RENDER_BLOCKING
