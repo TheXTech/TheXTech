@@ -114,12 +114,7 @@ void AppPathManager::initAppPath()
         if(userDirPath != "/" && !appDir.exists() && !appDir.mkpath())
             goto defaultSettingsPath;
 
-        // note: automatically removes final slash
         m_userPath = appDir.absolutePath();
-
-        // fix emscripten bug of duplicated worlds
-        if(m_userPath.empty())
-            m_userPath = "/";
     }
 
     appendSlash(m_userPath);
