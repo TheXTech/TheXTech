@@ -79,9 +79,10 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 
 #ifdef USE_CORE_RENDER_SDL
 
-    bool try_gl = false;
 
 #   ifdef RENDERGL_SUPPORTED
+    bool try_gl = false;
+
     if(setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
     {
         RenderGL *render = new RenderGL();

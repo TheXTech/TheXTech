@@ -22,6 +22,10 @@
 #ifndef RenderGL_T_H
 #define RenderGL_T_H
 
+#include "core/sdl/gl_inc.h"
+
+#    ifdef RENDERGL_SUPPORTED
+
 #include <utility>
 #include <vector>
 #include <array>
@@ -30,7 +34,6 @@
 #include <unordered_map>
 
 #include <SDL2/SDL_render.h>
-#include "core/sdl/gl_inc.h"
 
 #include "core/base/render_base.h"
 #include "cmd_line_setup.h"
@@ -461,5 +464,7 @@ public:
 
 };
 
+
+#endif // RENDERGL_SUPPORTED
 
 #endif // RenderGL_T_H
