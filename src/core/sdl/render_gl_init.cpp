@@ -160,14 +160,25 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 
     // can't trust SDL2
     const GLubyte* gl_ver_string = glGetString(GL_VERSION);
-    if(gl_ver_string && gl_ver_string[0] && gl_ver_string[1] && gl_ver_string[2])
+    if(gl_ver_string)
     {
-        m_gl_majver = gl_ver_string[0] - '0';
-        m_gl_minver = gl_ver_string[2] - '0';
+        for(int ver_end = 0; gl_ver_string[ver_end] != '\0'; ver_end++)
+        {
+            int ver_start = ver_end - 2;
+
+            if(ver_start >= 0
+                && gl_ver_string[ver_start] >= '0' && gl_ver_string[ver_start] <= '9'
+                && gl_ver_string[ver_end]   >= '0' && gl_ver_string[ver_end]   <= '9')
+            {
+                m_gl_majver = gl_ver_string[ver_start] - '0';
+                m_gl_minver = gl_ver_string[ver_end] - '0';
+                break;
+            }
+        }
     }
 
     pLogDebug("Render GL: successfully initialized OpenGL %d.%d (Profile %s)", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile));
-    pLogDebug("OpenGL version: %s", glGetString(GL_VERSION));
+    pLogDebug("OpenGL version: %s", gl_ver_string);
     pLogDebug("OpenGL renderer: %s", glGetString(GL_RENDERER));
 #ifdef RENDERGL_HAS_SHADERS
     if(m_gl_majver >= 2)
