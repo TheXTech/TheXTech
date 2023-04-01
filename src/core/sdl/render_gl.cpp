@@ -1341,7 +1341,7 @@ void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, fl
 
     DrawContext_t context = {nullptr, (filled) ? &m_program_rect_filled : &m_program_rect_unfilled};
 
-    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    auto& vertex_attribs = ((m_use_depth_buffer && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
 
     vertex_attribs.push_back({{x1, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
     vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
@@ -1374,7 +1374,7 @@ void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, 
 
     DrawContext_t context = {nullptr, &m_program_circle};
 
-    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    auto& vertex_attribs = ((m_use_depth_buffer && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
 
     if(m_use_shaders)
     {
@@ -1429,7 +1429,7 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float gre
 
     DrawContext_t context = {nullptr, &m_program_circle_hole};
 
-    auto& vertex_attribs = ((alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    auto& vertex_attribs = ((m_use_depth_buffer && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
 
     if(m_use_shaders)
     {
