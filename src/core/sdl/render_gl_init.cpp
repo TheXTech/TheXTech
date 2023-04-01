@@ -246,7 +246,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 #endif // #ifdef __EMSCRIPTEN__
 
 #ifdef RENDERGL_HAS_FBO
-    if(m_gl_majver >= 2 && setup.renderType != RENDER_ACCELERATED_OPENGL_LEGACY)
+    if(m_gl_majver >= 3 && setup.renderType != RENDER_ACCELERATED_OPENGL_LEGACY)
         m_has_fbo = true;
     else
         m_has_fbo = false;
