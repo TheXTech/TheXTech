@@ -175,8 +175,15 @@ void offsetViewportIgnore(bool en)
 
 void setTransparentColor(StdPicture &target, uint32_t rgb)
 {
+#if defined(__WII__) || defined(__3DS__)
+    target.l.colorKey = true;
+    target.l.keyRgb[0] = (rgb >> 0) & 0xFF;
+    target.l.keyRgb[1] = (rgb >> 8) & 0xFF;
+    target.l.keyRgb[2] = (rgb >> 16) & 0xFF;
+#else
     UNUSED(target);
     UNUSED(rgb);
+#endif
 }
 
 void getRenderSize(int* w, int* h)
