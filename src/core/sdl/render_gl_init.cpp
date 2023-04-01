@@ -194,6 +194,20 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 #endif
     D_pLogDebug("OpenGL extensions: %s", glGetString(GL_EXTENSIONS));
 
+    GLint r, g, b, depth;
+    glGetIntegerv(GL_RED_BITS, &r);
+    glGetIntegerv(GL_GREEN_BITS, &g);
+    glGetIntegerv(GL_BLUE_BITS, &b);
+    glGetIntegerv(GL_DEPTH_BITS, &depth);
+
+    pLogDebug("OpenGL video mode: R%d G%d B%d with %d-bit depth buffer", r, g, b, depth);
+
+    if(depth >= 16)
+    {
+        // allow 8-bit? probably not...
+        m_use_depth_buffer = true;
+    }
+
     // Check capabilities
     GLint maxTextureSize = 256;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
@@ -354,44 +368,6 @@ bool RenderGL::initShaders()
 #endif
 }
 
-bool RenderGL::initState()
-{
-    // alpha test and texturing for legacy versions
-#if defined(THEXTECH_BUILD_GL_DESKTOP_LEGACY) || defined(THEXTECH_BUILD_GL_ES_LEGACY)
-    if(!m_use_shaders)
-    {
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_ALPHA_TEST);
-        glAlphaFunc(GL_GEQUAL, 1.0f / 32.0f);
-    }
-#endif
-
-    // depth test
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_GEQUAL);
-    glDepthMask(GL_TRUE);
-
-    // alpha blending
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-    // clear color and depth
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-#if (defined(THEXTECH_BUILD_GL_DESKTOP_MODERN) || defined(THEXTECH_BUILD_GL_DESKTOP_LEGACY)) && (defined(THEXTECH_BUILD_GL_ES_MODERN) || defined(THEXTECH_BUILD_GL_ES_LEGACY))
-    if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES)
-        glClearDepth(0.0f);
-    else
-        glClearDepthf(0.0f);
-#elif defined(THEXTECH_BUILD_GL_ES_MODERN) || defined(THEXTECH_BUILD_GL_ES_LEGACY)
-    glClearDepthf(0.0f);
-#else
-    glClearDepth(0.0f);
-#endif
-
-    return true;
-}
-
 void RenderGL::createFramebuffer(BufferIndex_t buffer)
 {
 #ifdef RENDERGL_HAS_FBO
@@ -447,6 +423,9 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
             destroyFramebuffer(buffer);
             return;
         }
+
+        // even if window doesn't have depth buffer, this counts!
+        m_use_depth_buffer = true;
     }
 
     // (3) allocate framebuffer (required for game texture, otherwise optional)
@@ -561,6 +540,47 @@ bool RenderGL::initFramebuffers()
         glActiveTexture(TEXTURE_UNIT_IMAGE);
 #endif
     }
+
+    return true;
+}
+
+bool RenderGL::initState()
+{
+    // alpha test and texturing for legacy versions
+#if defined(THEXTECH_BUILD_GL_DESKTOP_LEGACY) || defined(THEXTECH_BUILD_GL_ES_LEGACY)
+    if(!m_use_shaders)
+    {
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_ALPHA_TEST);
+        glAlphaFunc(GL_GEQUAL, 1.0f / 32.0f);
+    }
+#endif
+
+    // depth test
+    if(m_use_depth_buffer)
+    {
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_GEQUAL);
+        glDepthMask(GL_TRUE);
+    }
+
+    // alpha blending
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    // clear color and depth
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
+#if (defined(THEXTECH_BUILD_GL_DESKTOP_MODERN) || defined(THEXTECH_BUILD_GL_DESKTOP_LEGACY)) && (defined(THEXTECH_BUILD_GL_ES_MODERN) || defined(THEXTECH_BUILD_GL_ES_LEGACY))
+    if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES)
+        glClearDepth(0.0f);
+    else
+        glClearDepthf(0.0f);
+#elif defined(THEXTECH_BUILD_GL_ES_MODERN) || defined(THEXTECH_BUILD_GL_ES_LEGACY)
+    glClearDepthf(0.0f);
+#else
+    glClearDepth(0.0f);
+#endif
 
     return true;
 }

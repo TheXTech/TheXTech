@@ -334,7 +334,8 @@ void RenderGL::flushDrawQueues()
     if(no_translucent_objects)
         return;
 
-    glDepthMask(GL_FALSE);
+    if(m_use_depth_buffer)
+        glDepthMask(GL_FALSE);
 
     for(int pass = 0; pass < num_pass; pass++)
     {
@@ -445,7 +446,8 @@ void RenderGL::flushDrawQueues()
         }
     }
 
-    glDepthMask(GL_TRUE);
+    if(m_use_depth_buffer)
+        glDepthMask(GL_TRUE);
 }
 
 RenderGL::VertexList& RenderGL::getOrderedDrawVertexList(RenderGL::DrawContext_t context, int depth)
@@ -484,8 +486,8 @@ bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     if(!initOpenGL(setup)
         || !initDebug()
         || !initShaders()
-        || !initState()
         || !initFramebuffers()
+        || !initState()
         || !initVertexArrays())
     {
         close();
@@ -563,6 +565,8 @@ void RenderGL::repaint()
     std::string feature_string = "Draw: ";
     if(m_use_logicop)
         feature_string += "LogicOp, ";
+    if(m_use_depth_buffer)
+        feature_string += "depth, ";
     if(m_use_shaders)
         feature_string += "shaders, ";
     if(m_client_side_arrays)
@@ -591,7 +595,8 @@ void RenderGL::repaint()
     flushDrawQueues();
 
     m_cur_depth = 1;
-    glClear(GL_DEPTH_BUFFER_BIT);
+    if(m_use_depth_buffer)
+        glClear(GL_DEPTH_BUFFER_BIT);
 
 #ifdef USE_SCREENSHOTS_AND_RECS
     if(TakeScreen)
@@ -612,7 +617,8 @@ void RenderGL::repaint()
 
     setTargetScreen();
 
-    glDisable(GL_DEPTH_TEST);
+    if(m_use_depth_buffer)
+        glDisable(GL_DEPTH_TEST);
 
     if(m_game_texture_fb && m_game_texture)
     {
@@ -656,7 +662,9 @@ void RenderGL::repaint()
 
     flushDrawQueues();
 
-    glEnable(GL_DEPTH_TEST);
+    if(m_use_depth_buffer)
+        glEnable(GL_DEPTH_TEST);
+
     m_cur_depth = 1;
 
     SDL_GL_SwapWindow(m_window);
@@ -1245,7 +1253,7 @@ bool RenderGL::textureMaskSupported()
 
 bool RenderGL::depthTestSupported()
 {
-    return true;
+    return m_use_depth_buffer;
 }
 
 bool RenderGL::userShadersSupported()

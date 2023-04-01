@@ -169,6 +169,7 @@ private:
     bool m_use_logicop = false;
     bool m_use_shaders = false;
     bool m_has_fbo = false;
+    bool m_use_depth_buffer = false;
 
     // unused for now
     // bool m_has_es3_shaders = false;
@@ -248,11 +249,11 @@ private:
     // initialize the global shader objects (also detects ES 2/3 shader support)
     bool initShaders();
 
-    // setup the clear functions, blending, alpha test (legacy), and depth test
-    bool initState();
-
     // initializes the game texture and framebuffer, the shader read texture, and the multipass support framebuffers
     bool initFramebuffers();
+
+    // setup the clear functions, blending, alpha test (legacy), and depth test
+    bool initState();
 
     // enable vertex arrays, allocate VBOs if required (Core/Emscripten) or requested and possible; also sets up the VAO if required (Core) or requested and possible
     bool initVertexArrays();
