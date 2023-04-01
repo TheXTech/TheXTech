@@ -606,7 +606,9 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         return target;
 
     target.inited = true;
-    target.l.lazyLoaded = false;
+
+    // must be true to make it safe for the renderer to lazy-unload
+    target.l.lazyLoaded = true;
 
     if(Files::hasSuffix(target.l.path, ".tpl"))
     {

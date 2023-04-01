@@ -340,7 +340,10 @@ void minport_freeTextureMemory()
         StdPicture* last_tail = g_render_chain_tail;
 
         // will internally invoke deleteTexture, which invokes minport_unlinkTexture if written properly
-        lazyUnLoad(*g_render_chain_tail);
+        if(last_tail->l.lazyLoaded)
+            lazyUnLoad(*g_render_chain_tail);
+        else
+            minport_unlinkTexture(last_tail);
 
         if(g_render_chain_tail == last_tail)
         {
