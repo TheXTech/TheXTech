@@ -573,13 +573,21 @@ bool RenderGL::initState()
 
 #if (defined(THEXTECH_BUILD_GL_DESKTOP_MODERN) || defined(THEXTECH_BUILD_GL_DESKTOP_LEGACY)) && (defined(THEXTECH_BUILD_GL_ES_MODERN) || defined(THEXTECH_BUILD_GL_ES_LEGACY))
     if(m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES)
+    {
         glClearDepth(0.0f);
+        glDepthRange(0.0f, 1.0f);
+    }
     else
+    {
         glClearDepthf(0.0f);
+        glDepthRangef(0.0f, 1.0f);
+    }
 #elif defined(THEXTECH_BUILD_GL_ES_MODERN) || defined(THEXTECH_BUILD_GL_ES_LEGACY)
     glClearDepthf(0.0f);
+    glDepthRangef(0.0f, 1.0f);
 #else
     glClearDepth(0.0f);
+    glDepthRange(0.0f, 1.0f);
 #endif
 
     return true;
