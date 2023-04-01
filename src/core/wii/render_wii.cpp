@@ -601,6 +601,11 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     if(target.l.path.empty())
         return target;
 
+    if(maskPath.empty() && !maskFallbackPath.empty() && Files::fileExists(maskFallbackPath))
+        target.l.mask_path = maskFallbackPath;
+    else
+        target.l.mask_path = maskPath;
+
     target.inited = true;
 
     // must be true to make it safe for the renderer to lazy-unload
@@ -645,12 +650,12 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         }
         else
         {
-            s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), false, downscale);
+            s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), FreeImage_GetPitch(FI_tex), false, downscale);
             FreeImage_Unload(FI_tex);
 
             if(FI_mask)
             {
-                s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), true, downscale);
+                s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), FreeImage_GetPitch(FI_mask), true, downscale);
                 FreeImage_Unload(FI_mask);
             }
         }
@@ -734,7 +739,7 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
     if(target.l.path.empty())
         return target;
 
-    if(maskPath.empty() && Files::fileExists(maskFallbackPath))
+    if(maskPath.empty() && !maskFallbackPath.empty() && Files::fileExists(maskFallbackPath))
         target.l.mask_path = maskFallbackPath;
     else
         target.l.mask_path = maskPath;

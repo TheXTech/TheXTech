@@ -50,6 +50,8 @@
 namespace XRender
 {
 
+static const C2D_SpriteSheet HEAP_MANAGED_TEXTURE = reinterpret_cast<C2D_SpriteSheet>(reinterpret_cast<void*>(0xffffffff));
+
 uint32_t s_current_frame = 0;
 float s_depth_slider = 0.;
 
@@ -162,12 +164,115 @@ void s_clearAllTextures()
         deleteTexture(*p);
 }
 
+static int s_nextPowerOfTwo(int val)
+{
+    int power = 1;
+    while(power < val)
+        power *= 2;
+    return power;
+}
+
+static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t hsrc, uint32_t pitch, bool downscale = true)
+{
+    // calculate destination dimensions, including downscaling and required padding
+    int sf = (downscale ? 2 : 1);
+    uint32_t wdst = (wsrc + sf - 1) / sf;
+    uint32_t hdst = (hsrc + sf - 1) / sf;
+
+    uint32_t wtex = s_nextPowerOfTwo(wdst);
+    uint32_t htex = s_nextPowerOfTwo(hdst);
+
+    C2D_Image img;
+
+    img.tex = new C3D_Tex;
+    img.subtex = new Tex3DS_SubTexture({(u16)wtex, (u16)htex, 0.0f, 1.0f, wdst / (float)wtex, 1.0f - (hdst / (float)htex)});
+
+    if(!C3D_TexInit(img.tex, wtex, htex, GPU_RGBA8))
+    {
+        delete img.tex;
+        delete img.subtex;
+        img.tex = nullptr;
+        img.subtex = nullptr;
+        return img;
+    }
+
+    C3D_TexSetFilter(img.tex, GPU_NEAREST, GPU_NEAREST);
+    C3D_TexSetWrap(img.tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
+    img.tex->border = 0xFFFFFFFF;
+
+    for(u32 x = 0; x * sf < wsrc && x < wdst; x++)
+    {
+        for(u32 y = 0; y * sf < hsrc && y < hdst; y++)
+        {
+            const u32 dst_pixel = ((((y >> 3) * (wtex >> 3) + (x >> 3)) << 6) +
+                                ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) | ((y & 2) << 2) |
+                                ((x & 4) << 2) | ((y & 4) << 3))) * 4;
+
+            const u32 src_pixel = (y * sf * pitch) + (x * sf * 4);
+
+            ((uint8_t*)img.tex->data)[dst_pixel + 0] = src[src_pixel + 3];
+            ((uint8_t*)img.tex->data)[dst_pixel + 1] = src[src_pixel + 2];
+            ((uint8_t*)img.tex->data)[dst_pixel + 2] = src[src_pixel + 1];
+            ((uint8_t*)img.tex->data)[dst_pixel + 3] = src[src_pixel + 0];
+        }
+    }
+
+    return img;
+}
+
+void s_loadTexture(StdPicture& target, void* data, int width, int height, int pitch, bool mask, bool downscale = true)
+{
+    int max_size = (downscale ? 2048 : 1024);
+
+    // if(width > max_size && height <= max_size)
+    //     target.d.multi_horizontal = true;
+
+    for(int i = 0; i < 3; i++)
+    {
+        int start_x, start_y;
+
+        // if(target.d.multi_horizontal)
+        if(false)
+        {
+            start_y = 0;
+            start_x = i * max_size;
+        }
+        else
+        {
+            start_x = 0;
+            start_y = i * max_size;
+        }
+
+        int w_i = width - start_x;
+        int h_i = height - start_y;
+
+        if(w_i > max_size)
+            w_i = max_size;
+
+        if(h_i > max_size)
+            h_i = max_size;
+
+        if(w_i > 0 && h_i > 0)
+        {
+            target.d.image[i + 3 * mask] = s_RawToSwizzledRGBA((uint8_t*)data + (start_y * width + start_x) * 4, w_i, h_i, pitch, downscale);
+
+            if(target.d.image[i + 3 * mask].tex)
+            {
+                // printf("We initialized with %u %u\n", wdst, hdst);
+                target.d.texture[i + 3 * mask] = HEAP_MANAGED_TEXTURE;
+            }
+            else
+                break;
+        }
+    }
+}
+
 void s_loadTexture(StdPicture& target, C2D_SpriteSheet& sheet)
 {
     C2D_Image im = C2D_SpriteSheetGetImage(sheet, 0);
 
-    target.d.texture = sheet;
-    target.d.image = im;
+    target.d.texture[0] = sheet;
+    target.d.image[0] = im;
 
     if(!target.w)
     {
@@ -180,16 +285,16 @@ void s_loadTexture2(StdPicture& target, C2D_SpriteSheet& sheet)
 {
     C2D_Image im = C2D_SpriteSheetGetImage(sheet, 0);
 
-    target.d.texture2 = sheet;
-    target.d.image2 = im;
+    target.d.texture[1] = sheet;
+    target.d.image[1] = im;
 }
 
 void s_loadTexture3(StdPicture& target, C2D_SpriteSheet& sheet)
 {
     C2D_Image im = C2D_SpriteSheetGetImage(sheet, 0);
 
-    target.d.texture3 = sheet;
-    target.d.image3 = im;
+    target.d.texture[2] = sheet;
+    target.d.image[2] = im;
 }
 
 bool init()
@@ -569,7 +674,7 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         s_num_textures_loaded ++;
     }
 
-    if(!target.d.texture)
+    if(!target.d.hasTexture())
     {
         pLogWarning("FAILED TO LOAD!!! %s", path.c_str());
         target.inited = false;
@@ -697,7 +802,7 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
 
 void lazyLoad(StdPicture& target)
 {
-    if(!target.inited || !target.l.lazyLoaded || target.d.texture)
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
         return;
 
     C2D_SpriteSheet sourceImage;
@@ -759,10 +864,32 @@ void lazyPreLoad(StdPicture& target)
 
 void lazyUnLoad(StdPicture& target)
 {
-    if(!target.inited || !target.l.lazyLoaded || !target.d.texture)
+    if(!target.inited || !target.l.lazyLoaded || !target.d.hasTexture())
         return;
 
     deleteTexture(target, true);
+}
+
+void loadTexture(StdPicture& target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    s_loadTexture(target, RGBApixels, width, height, pitch, false, true);
+    target.inited = true;
+    target.l.lazyLoaded = false;
+    target.w = width;
+    target.h = height;
+    target.frame_w = width;
+    target.frame_h = height;
+}
+
+void loadTexture_1x(StdPicture& target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    s_loadTexture(target, RGBApixels, width, height, pitch, false, false);
+    target.inited = true;
+    target.l.lazyLoaded = false;
+    target.w = width * 2;
+    target.h = height * 2;
+    target.frame_w = width * 2;
+    target.frame_h = height * 2;
 }
 
 void deleteTexture(StdPicture& tx, bool lazyUnload)
@@ -772,23 +899,44 @@ void deleteTexture(StdPicture& tx, bool lazyUnload)
 
     minport_unlinkTexture(&tx);
 
-    if(tx.d.texture)
+    if(tx.d.texture[0] == HEAP_MANAGED_TEXTURE)
+    {
+        delete tx.d.image[0].tex;
+        delete tx.d.image[0].subtex;
+        tx.d.image[0] = C2D_Image();
+        tx.d.texture[0] = nullptr;
+    }
+    else if(tx.d.texture[0])
     {
         s_num_textures_loaded --;
-        C2D_SpriteSheetFree(tx.d.texture);
-        tx.d.texture = nullptr;
+        C2D_SpriteSheetFree(tx.d.texture[0]);
+        tx.d.texture[0] = nullptr;
     }
 
-    if(tx.d.texture2)
+    if(tx.d.texture[1] == HEAP_MANAGED_TEXTURE)
     {
-        C2D_SpriteSheetFree(tx.d.texture2);
-        tx.d.texture2 = nullptr;
+        delete tx.d.image[1].tex;
+        delete tx.d.image[1].subtex;
+        tx.d.image[1] = C2D_Image();
+        tx.d.texture[1] = nullptr;
+    }
+    else if(tx.d.texture[1])
+    {
+        C2D_SpriteSheetFree(tx.d.texture[1]);
+        tx.d.texture[1] = nullptr;
     }
 
-    if(tx.d.texture3)
+    if(tx.d.texture[2] == HEAP_MANAGED_TEXTURE)
     {
-        C2D_SpriteSheetFree(tx.d.texture3);
-        tx.d.texture3 = nullptr;
+        delete tx.d.image[2].tex;
+        delete tx.d.image[2].subtex;
+        tx.d.image[2] = C2D_Image();
+        tx.d.texture[2] = nullptr;
+    }
+    else if(tx.d.texture[2])
+    {
+        C2D_SpriteSheetFree(tx.d.texture[2]);
+        tx.d.texture[2] = nullptr;
     }
 
     if(!lazyUnload)
@@ -818,10 +966,10 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.l.lazyLoaded)
+    if(!tx.d.hasTexture() && tx.l.lazyLoaded)
         lazyLoad(tx);
 
-    if(!tx.d.texture)
+    if(!tx.d.hasTexture())
         return;
 
     // automatic flipping based on SMBX style!
@@ -879,21 +1027,21 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     {
         if(ySrc + hSrc > 2048)
         {
-            if(tx.d.texture3)
-                to_draw = &tx.d.image3;
+            if(tx.d.texture[2])
+                to_draw = &tx.d.image[2];
 
-            if(ySrc < 2048 && tx.d.texture2)
-                to_draw_2 = &tx.d.image2;
+            if(ySrc < 2048 && tx.d.texture[1])
+                to_draw_2 = &tx.d.image[1];
 
             ySrc -= 1024;
         }
         else
         {
-            if(tx.d.texture2)
-                to_draw = &tx.d.image2;
+            if(tx.d.texture[1])
+                to_draw = &tx.d.image[1];
 
             if(ySrc < 1024)
-                to_draw_2 = &tx.d.image;
+                to_draw_2 = &tx.d.image[0];
         }
 
         // draw the top pic
@@ -909,7 +1057,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         else
             ySrc -= 1024.0f;
     }
-    else to_draw = &tx.d.image;
+    else to_draw = &tx.d.image[0];
 
     if(to_draw != nullptr)
     {
