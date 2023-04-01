@@ -1327,6 +1327,15 @@ void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, fl
     SDL_assert(!m_blockRender);
 #endif
 
+    if(!m_use_shaders && !filled)
+    {
+        renderRect(x, y, 2, h, red, green, blue, alpha, true);
+        renderRect(x + w - 2, y, 2, h, red, green, blue, alpha, true);
+        renderRect(x, y, w, 2, red, green, blue, alpha, true);
+        renderRect(x, y + h - 2, w, 2, red, green, blue, alpha, true);
+        return;
+    }
+
     GLshort x1 = x;
     GLshort x2 = x + w;
     GLshort y1 = y;
