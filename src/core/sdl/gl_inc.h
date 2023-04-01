@@ -22,16 +22,15 @@
 #ifndef RENDERGL_INC_H
 #define RENDERGL_INC_H
 
-#if defined(__SWITCH__) && defined(THEXTECH_BUILD_GL_DESKTOP_MODERN)
-#    define NO_SDL_GLEXT
-#    include <glad/glad.h>
-#endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
 
 #if defined(_WIN32) || defined(_WIN64)
 #    define NO_SDL_GLEXT
 #    include <GL/glew.h>
+#elif defined(__SWITCH__)
+#    define NO_SDL_GLEXT
+#    include <glad/glad.h>
 #else
 #    define GL_GLEXT_PROTOTYPES 1
 #endif
