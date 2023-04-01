@@ -1457,6 +1457,39 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float gre
     else
     {
         // make a full circle poly here
+        const int verts = 32;
+        const float two_pi = (float)(2 * 3.1415926535897932384626433832795);
+
+        GLshort cx_s = cx;
+        GLshort cy_s = cy;
+
+        for(int i = 0; i < verts; i++)
+        {
+            float theta1 = i * two_pi / verts;
+            float theta2 = (i + 1) * two_pi / verts;
+
+            GLshort x1_perim = cx_s + (GLshort)roundf(radius * cosf(theta1));
+            GLshort y1_perim = cy_s + (GLshort)roundf(radius * sinf(theta1));
+
+            GLshort x2_perim = cx_s + (GLshort)roundf(radius * cosf(theta2));
+            GLshort y2_perim = cy_s + (GLshort)roundf(radius * sinf(theta2));
+
+            // project onto box
+            GLfloat box_radius1 = radius * 2 / (fabsf(cosf(theta1) - sinf(theta1)) + fabsf(cosf(theta1) + sinf(theta1)));
+            GLshort x1_box = cx_s + (GLshort)roundf(box_radius1 * cosf(theta1));
+            GLshort y1_box = cy_s + (GLshort)roundf(box_radius1 * sinf(theta1));
+
+            GLfloat box_radius2 = radius * 2 / (fabsf(cosf(theta2) - sinf(theta2)) + fabsf(cosf(theta2) + sinf(theta2)));
+            GLshort x2_box = cx_s + (GLshort)roundf(box_radius2 * cosf(theta2));
+            GLshort y2_box = cy_s + (GLshort)roundf(box_radius2 * sinf(theta2));
+
+            vertex_attribs.push_back({{x1_perim, y1_perim, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+            vertex_attribs.push_back({{x1_box, y1_box, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+            vertex_attribs.push_back({{x2_perim, y2_perim, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+            vertex_attribs.push_back({{x1_box, y1_box, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+            vertex_attribs.push_back({{x2_perim, y2_perim, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+            vertex_attribs.push_back({{x2_box, y2_box, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+        }
     }
 
     m_cur_depth++;
