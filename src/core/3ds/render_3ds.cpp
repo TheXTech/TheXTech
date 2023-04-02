@@ -1127,44 +1127,24 @@ void deleteTexture(StdPicture& tx, bool lazyUnload)
 
     minport_unlinkTexture(&tx);
 
-    if(tx.d.texture[0] == HEAP_MANAGED_TEXTURE)
-    {
-        delete tx.d.image[0].tex;
-        delete tx.d.image[0].subtex;
-        tx.d.image[0] = C2D_Image();
-        tx.d.texture[0] = nullptr;
-    }
-    else if(tx.d.texture[0])
-    {
+    if(tx.d.texture[0])
         s_num_textures_loaded --;
-        C2D_SpriteSheetFree(tx.d.texture[0]);
-        tx.d.texture[0] = nullptr;
-    }
 
-    if(tx.d.texture[1] == HEAP_MANAGED_TEXTURE)
+    for(int i = 0; i < 6; i++)
     {
-        delete tx.d.image[1].tex;
-        delete tx.d.image[1].subtex;
-        tx.d.image[1] = C2D_Image();
-        tx.d.texture[1] = nullptr;
-    }
-    else if(tx.d.texture[1])
-    {
-        C2D_SpriteSheetFree(tx.d.texture[1]);
-        tx.d.texture[1] = nullptr;
-    }
+        if(tx.d.texture[i] == HEAP_MANAGED_TEXTURE)
+        {
+            C3D_TexDelete(tx.d.image[i].tex);
+            delete tx.d.image[i].tex;
+            delete tx.d.image[i].subtex;
+        }
+        else if(tx.d.texture[i])
+        {
+            C2D_SpriteSheetFree(tx.d.texture[i]);
+        }
 
-    if(tx.d.texture[2] == HEAP_MANAGED_TEXTURE)
-    {
-        delete tx.d.image[2].tex;
-        delete tx.d.image[2].subtex;
-        tx.d.image[2] = C2D_Image();
-        tx.d.texture[2] = nullptr;
-    }
-    else if(tx.d.texture[2])
-    {
-        C2D_SpriteSheetFree(tx.d.texture[2]);
-        tx.d.texture[2] = nullptr;
+        tx.d.image[i] = C2D_Image();
+        tx.d.texture[i] = nullptr;
     }
 
     if(!lazyUnload)
