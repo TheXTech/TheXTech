@@ -108,7 +108,9 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
 
     while((dent = readdir(srcdir)) != nullptr)
     {
+#ifdef DIRMAN_HAS_FSSTATAT
         struct stat st = {};
+#endif
         if(strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
             continue;
 
@@ -153,7 +155,9 @@ bool DirMan::DirMan_private::fetchListFromWalker(std::string &curPath, std::vect
 
     while((dent = readdir(srcdir)) != nullptr)
     {
+#ifdef DIRMAN_HAS_FSSTATAT
         struct stat st;
+#endif
         if(strcmp(dent->d_name, ".") == 0 || strcmp(dent->d_name, "..") == 0)
             continue;
 
@@ -265,17 +269,27 @@ bool DirMan::rmAbsPath(const std::string &dirPath)
         {
             while((e->p = readdir(e->d)) != nullptr)
             {
+#ifdef DIRMAN_HAS_FSSTATAT
                 struct stat st = {};
-
+#endif
                 if(strcmp(e->p->d_name, ".") == 0 || strcmp(e->p->d_name, "..") == 0)
                     continue;
 
+#ifdef DIRMAN_HAS_FSSTATAT
                 if(fstatat(dirfd(e->d), e->p->d_name, &st, 0) < 0)
                     continue;
+#else
+                if(e->p->d_type == DT_UNKNOWN)
+                    continue;
+#endif
 
                 std::string path = e->path + "/" + e->p->d_name;
 
+#ifdef DIRMAN_HAS_FSSTATAT
                 if(S_ISDIR(st.st_mode))
+#else
+                if(e->p->d_type == DT_DIR)
+#endif
                 {
                     closedir(e->d);
                     e->d = nullptr;
