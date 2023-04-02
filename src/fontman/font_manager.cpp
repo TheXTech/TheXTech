@@ -217,7 +217,7 @@ void FontManager::initFull()
 
             bool doublePixel;
             // FIXME: add XRender::RENDER_1X flag, use that instead
-#ifdef __WII__
+#if defined(__WII__) || defined(__3DS__)
             const bool doublePixelDefault = true;
 #else
             const bool doublePixelDefault = false;

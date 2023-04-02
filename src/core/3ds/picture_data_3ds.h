@@ -27,7 +27,6 @@
 #include <citro2d.h>
 
 #define X_IMG_EXT ".t3x"
-#define X_NO_PNG_GIF
 
 /*!
  * \brief Platform specific picture data. Fields should not be used directly
@@ -37,16 +36,12 @@ struct StdPictureData
 
     uint32_t last_draw_frame = 0;
 
-    C2D_SpriteSheet texture = nullptr;
-    C2D_Image image;
-    C2D_SpriteSheet texture2 = nullptr;
-    C2D_Image image2;
-    C2D_SpriteSheet texture3 = nullptr;
-    C2D_Image image3;
+    C2D_SpriteSheet texture[6] = {nullptr};
+    C2D_Image image[6];
 
     inline bool hasTexture()
     {
-        return texture != nullptr;
+        return texture[0] != nullptr;
     }
 
 };
