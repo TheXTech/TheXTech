@@ -91,9 +91,9 @@ private:
 
     struct Vertex_t
     {
-        GLshort position[3];
-        GLubyte tint[4];
-        GLfloat texcoord[2];
+        std::array<GLshort, 3> position;
+        std::array<GLubyte, 4> tint;
+        std::array<GLfloat, 2> texcoord;
     };
 
     struct VertexList

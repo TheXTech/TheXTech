@@ -1350,14 +1350,16 @@ void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, fl
 
     DrawContext_t context = {nullptr, (filled) ? &m_program_rect_filled : &m_program_rect_unfilled};
 
-    auto& vertex_attribs = ((m_use_depth_buffer && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
+    auto& vertex_attribs = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+
+    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
 }
@@ -1383,7 +1385,9 @@ void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, 
 
     DrawContext_t context = {nullptr, &m_program_circle};
 
-    auto& vertex_attribs = ((m_use_depth_buffer && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
+
+    auto& vertex_attribs = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
 
     if(m_use_shaders)
     {
@@ -1392,12 +1396,12 @@ void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, 
         GLshort y1 = cy - radius;
         GLshort y2 = cy + radius;
 
-        vertex_attribs.push_back({{x1, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
-        vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 1.0}});
-        vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 0.0}});
-        vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 1.0}});
-        vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 0.0}});
-        vertex_attribs.push_back({{x2, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 1.0}});
+        vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {0.0, 0.0}});
+        vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {0.0, 1.0}});
+        vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {1.0, 0.0}});
+        vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {0.0, 1.0}});
+        vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {1.0, 0.0}});
+        vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {1.0, 1.0}});
     }
     else
     {
@@ -1416,11 +1420,11 @@ void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, 
 
             if(i != 0)
             {
-                vertex_attribs.push_back({{x, y, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
-                vertex_attribs.push_back({{cx_s, cy_s, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+                vertex_attribs.push_back({{x, y, m_cur_depth}, tint, {0.0, 0.0}});
+                vertex_attribs.push_back({{cx_s, cy_s, m_cur_depth}, tint, {0.0, 0.0}});
             }
             if(i != verts)
-                vertex_attribs.push_back({{x, y, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+                vertex_attribs.push_back({{x, y, m_cur_depth}, tint, {0.0, 0.0}});
         }
     }
 
@@ -1438,7 +1442,9 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float gre
 
     DrawContext_t context = {nullptr, &m_program_circle_hole};
 
-    auto& vertex_attribs = ((m_use_depth_buffer && alpha == 1.0f) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
+
+    auto& vertex_attribs = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
 
     if(m_use_shaders)
     {
@@ -1447,12 +1453,12 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float gre
         GLshort y1 = cy - radius;
         GLshort y2 = cy + radius;
 
-        vertex_attribs.push_back({{x1, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
-        vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 1.0}});
-        vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 0.0}});
-        vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 1.0}});
-        vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 0.0}});
-        vertex_attribs.push_back({{x2, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {1.0, 1.0}});
+        vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {0.0, 0.0}});
+        vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {0.0, 1.0}});
+        vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {1.0, 0.0}});
+        vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {0.0, 1.0}});
+        vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {1.0, 0.0}});
+        vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {1.0, 1.0}});
     }
     else
     {
@@ -1483,12 +1489,12 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float gre
             GLshort x2_box = cx_s + (GLshort)roundf(box_radius2 * cosf(theta2));
             GLshort y2_box = cy_s + (GLshort)roundf(box_radius2 * sinf(theta2));
 
-            vertex_attribs.push_back({{x1_perim, y1_perim, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
-            vertex_attribs.push_back({{x1_box, y1_box, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
-            vertex_attribs.push_back({{x2_perim, y2_perim, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
-            vertex_attribs.push_back({{x1_box, y1_box, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
-            vertex_attribs.push_back({{x2_perim, y2_perim, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
-            vertex_attribs.push_back({{x2_box, y2_box, m_cur_depth}, F_TO_B(red, green, blue, alpha), {0.0, 0.0}});
+            vertex_attribs.push_back({{x1_perim, y1_perim, m_cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x1_box, y1_box, m_cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x2_perim, y2_perim, m_cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x1_box, y1_box, m_cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x2_perim, y2_perim, m_cur_depth}, tint, {0.0, 0.0}});
+            vertex_attribs.push_back({{x2_box, y2_box, m_cur_depth}, tint, {0.0, 0.0}});
         }
     }
 
@@ -1557,14 +1563,16 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
 
     DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &m_standard_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
+    auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+
+    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
 }
@@ -1601,14 +1609,16 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
 
     DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &m_standard_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
+    auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+
+    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
 }
@@ -1668,14 +1678,16 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
 
     DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &m_standard_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
+    auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+
+    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
 }
@@ -1749,14 +1761,16 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
 
     DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &m_standard_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
+    auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+
+    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
 }
@@ -1793,14 +1807,16 @@ void RenderGL::renderTexture(float xDst, float yDst,
 
     DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &m_standard_program};
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && alpha == 1.0f && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, F_TO_B(red, green, blue, alpha), {u2, v2}});
+    auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+
+    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
 }
