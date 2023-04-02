@@ -49,6 +49,13 @@ struct StdPictureLoad
     //! Path to find image
     std::string path = "";
 
+    //! Path to find mask (if any)
+    std::string mask_path = "";
+
+    // Transparent color for BMP and JPEG
+    bool     colorKey = false;
+    uint8_t  keyRgb[3] = {0 /*R*/, 0 /*G*/, 0 /*B*/};
+
     inline void clear() {}
 };
 

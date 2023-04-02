@@ -59,7 +59,7 @@ namespace PackLoader
                 decref(i);
         }
 
-        constexpr operator packindex_t()
+        inline operator packindex_t() const
         {
             return i;
         }

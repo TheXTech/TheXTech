@@ -28,7 +28,13 @@
 
 #include <set>
 
+#include <FreeImageLite.h>
+
+#include <Graphics/graphics_funcs.h>
+
 #include <Logger/logger.h>
+#include <Utils/files.h>
+
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include "globals.h"
@@ -49,6 +55,8 @@
 
 namespace XRender
 {
+
+static const C2D_SpriteSheet HEAP_MANAGED_TEXTURE = reinterpret_cast<C2D_SpriteSheet>(reinterpret_cast<void*>(0xffffffff));
 
 uint32_t s_current_frame = 0;
 float s_depth_slider = 0.;
@@ -162,12 +170,201 @@ void s_clearAllTextures()
         deleteTexture(*p);
 }
 
+FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, int* orig_w = nullptr, int* orig_h = nullptr)
+{
+    if(path.empty())
+    {
+        pLogWarning("FreeImageLite failed to load image due to empty path");
+        return nullptr;
+    }
+
+    // this is wasteful, but it lets us diagnose memory issue vs other issues
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileType(path.c_str(), 0);
+
+    if(formato == FIF_UNKNOWN)
+    {
+        pLogWarning("FreeImageLite failed to load image due to unknown format");
+        return nullptr;
+    }
+
+    FIBITMAP* sourceImage = GraphicsHelps::loadImage(path);
+
+    if(!sourceImage)
+    {
+        pLogWarning("FreeImageLite failed to load image due to lack of memory, trying to free some memory");
+        minport_freeTextureMemory();
+        sourceImage = GraphicsHelps::loadImage(path);
+
+        if(!sourceImage)
+            return nullptr;
+    }
+
+    if(!maskPath.empty())
+        GraphicsHelps::mergeWithMask(sourceImage, "", maskPath);
+
+    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
+    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+
+    pLogDebug("loading %s, freeimage reports %u %u %u", path.c_str(), w, h, FreeImage_GetPitch(sourceImage));
+
+    if(orig_w)
+        *orig_w = w;
+
+    if(orig_h)
+        *orig_h = h;
+
+    if((w == 0) || (h == 0))
+    {
+        GraphicsHelps::closeImage(sourceImage);
+        pLogWarning("Error loading of image file:\n"
+                    "Reason: %s."
+                    "Zero image size!");
+        return nullptr;
+    }
+
+    FreeImage_FlipVertical(sourceImage);
+
+    return sourceImage;
+}
+
+static int s_nextPowerOfTwo(int val)
+{
+    int power = 8;
+    while(power < val)
+        power *= 2;
+    return power;
+}
+
+static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t hsrc, uint32_t pitch, bool mask, bool downscale = true)
+{
+    // calculate destination dimensions, including downscaling and required padding
+    int sf = (downscale ? 2 : 1);
+    uint32_t wdst = (wsrc + sf - 1) / sf;
+    uint32_t hdst = (hsrc + sf - 1) / sf;
+
+    uint32_t wtex = s_nextPowerOfTwo(wdst);
+    uint32_t htex = s_nextPowerOfTwo(hdst);
+
+    C2D_Image img;
+
+    img.tex = new C3D_Tex;
+    img.subtex = new Tex3DS_SubTexture({(u16)wdst, (u16)hdst, 0.0f, 1.0f, wdst / (float)wtex, 1.0f - (hdst / (float)htex)});
+
+    pLogDebug("This part is w %d h %d p %d -> %d %d %f %f %f %f", (int)wsrc, (int)hsrc, (int)pitch, (int)wtex, (int)htex, img.subtex->left, img.subtex->top, img.subtex->right, img.subtex->bottom);
+
+    if(!C3D_TexInit(img.tex, wtex, htex, GPU_RGBA8))
+    {
+        pLogDebug("Triggering free texture memory due to failed texture load (%u bytes free)", (unsigned)linearSpaceFree());
+        minport_freeTextureMemory();
+
+        if(!C3D_TexInit(img.tex, wtex, htex, GPU_RGBA8))
+        {
+            delete img.tex;
+            delete img.subtex;
+            img.tex = nullptr;
+            img.subtex = nullptr;
+            return img;
+        }
+    }
+
+    C3D_TexSetFilter(img.tex, GPU_NEAREST, GPU_NEAREST);
+    C3D_TexSetWrap(img.tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
+    img.tex->border = 0xFFFFFFFF;
+
+    for(u32 y = 0; y < hdst; y++)
+    {
+        for(u32 x = 0; x < wdst; x++)
+        {
+            const u32 dst_pixel = ((((y >> 3) * (wtex >> 3) + (x >> 3)) << 6) +
+                                ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) | ((y & 2) << 2) |
+                                ((x & 4) << 2) | ((y & 4) << 3))) * 4;
+
+            const u32 src_pixel = (y * sf * pitch) + (x * sf * 4);
+
+            ((uint8_t*)img.tex->data)[dst_pixel + 0] = src[src_pixel + 3];
+            ((uint8_t*)img.tex->data)[dst_pixel + 1] = src[src_pixel + 0];
+            ((uint8_t*)img.tex->data)[dst_pixel + 2] = src[src_pixel + 1];
+            ((uint8_t*)img.tex->data)[dst_pixel + 3] = src[src_pixel + 2];
+        }
+    }
+
+    // fill border if mask
+    if(mask)
+    {
+        for(u32 y = 0; y < htex; y++)
+        {
+            for(u32 x = (y < hdst) ? wdst : 0; x < wtex; x++)
+            {
+                const u32 dst_pixel = ((((y >> 3) * (wtex >> 3) + (x >> 3)) << 6) +
+                                    ((x & 1) | ((y & 1) << 1) | ((x & 2) << 1) | ((y & 2) << 2) |
+                                    ((x & 4) << 2) | ((y & 4) << 3))) * 4;
+
+                ((uint8_t*)img.tex->data)[dst_pixel + 0] = 255;
+                ((uint8_t*)img.tex->data)[dst_pixel + 1] = 255;
+                ((uint8_t*)img.tex->data)[dst_pixel + 2] = 255;
+                ((uint8_t*)img.tex->data)[dst_pixel + 3] = 255;
+            }
+        }
+    }
+
+    return img;
+}
+
+void s_loadTexture(StdPicture& target, void* data, int width, int height, int pitch, bool mask, bool downscale = true)
+{
+    int max_size = (downscale ? 2048 : 1024);
+
+    pLogDebug("Loading %s %d, w %d h %d p %d", target.l.path.c_str(), (int)mask, width, height, pitch);
+
+    // if(width > max_size && height <= max_size)
+    //     target.d.multi_horizontal = true;
+
+    for(int i = 0; i < 3; i++)
+    {
+        int start_x, start_y;
+
+        // if(target.d.multi_horizontal)
+        if(false)
+        {
+            start_y = 0;
+            start_x = i * max_size;
+        }
+        else
+        {
+            start_x = 0;
+            start_y = i * max_size;
+        }
+
+        int w_i = width - start_x;
+        int h_i = height - start_y;
+
+        if(w_i > max_size)
+            w_i = max_size;
+
+        if(h_i > max_size)
+            h_i = max_size;
+
+        if(w_i > 0 && h_i > 0)
+        {
+            target.d.image[i + 3 * mask] = s_RawToSwizzledRGBA((uint8_t*)data + (start_y * width + start_x) * 4, w_i, h_i, pitch, mask, downscale);
+
+            if(target.d.image[i + 3 * mask].tex)
+            {
+                // printf("We initialized with %u %u\n", wdst, hdst);
+                target.d.texture[i + 3 * mask] = HEAP_MANAGED_TEXTURE;
+            }
+            else
+                break;
+        }
+    }
+}
+
 void s_loadTexture(StdPicture& target, C2D_SpriteSheet& sheet)
 {
     C2D_Image im = C2D_SpriteSheetGetImage(sheet, 0);
 
-    target.d.texture = sheet;
-    target.d.image = im;
+    target.d.texture[0] = sheet;
+    target.d.image[0] = im;
 
     if(!target.w)
     {
@@ -180,16 +377,16 @@ void s_loadTexture2(StdPicture& target, C2D_SpriteSheet& sheet)
 {
     C2D_Image im = C2D_SpriteSheetGetImage(sheet, 0);
 
-    target.d.texture2 = sheet;
-    target.d.image2 = im;
+    target.d.texture[1] = sheet;
+    target.d.image[1] = im;
 }
 
 void s_loadTexture3(StdPicture& target, C2D_SpriteSheet& sheet)
 {
     C2D_Image im = C2D_SpriteSheetGetImage(sheet, 0);
 
-    target.d.texture3 = sheet;
-    target.d.image3 = im;
+    target.d.texture[2] = sheet;
+    target.d.image[2] = im;
 }
 
 bool init()
@@ -538,7 +735,7 @@ void minport_ApplyViewport()
     }
 }
 
-StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath, bool downscale)
 {
     (void)maskPath;
     (void)maskFallbackPath;
@@ -555,20 +752,68 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     if(target.l.path.empty())
         return target;
 
+    if(maskPath.empty() && !maskFallbackPath.empty() && Files::fileExists(maskFallbackPath))
+        target.l.mask_path = maskFallbackPath;
+    else
+        target.l.mask_path = maskPath;
+
     target.inited = true;
-    target.l.lazyLoaded = false;
 
-    sourceImage = C2D_SpriteSheetLoad(target.l.path.c_str());
+    // must be true to make it safe for the renderer to lazy-unload
+    target.l.lazyLoaded = true;
 
-    if(sourceImage)
+    if(Files::hasSuffix(target.l.path, ".t3x"))
     {
-        // Consider using https://github.com/xerpi/sf2dlib/blob/master/libsf2d/source/sf2d_texture.c to get some more advanced tex loads
-        s_loadTexture(target, sourceImage);
+        sourceImage = C2D_SpriteSheetLoad(target.l.path.c_str());
 
-        s_num_textures_loaded ++;
+        if(sourceImage)
+        {
+            s_loadTexture(target, sourceImage);
+            s_num_textures_loaded ++;
+        }
+    }
+    else
+    {
+        FIBITMAP* FI_tex = nullptr;
+        FIBITMAP* FI_mask = nullptr;
+
+        if(Files::hasSuffix(target.l.mask_path, "m.gif"))
+        {
+            FI_tex = robust_FILoad(target.l.path, "", &target.w, &target.h);
+
+            if(FI_tex)
+                FI_mask = robust_FILoad(target.l.mask_path, "");
+        }
+        else
+        {
+            FI_tex = robust_FILoad(target.l.path, target.l.mask_path, &target.w, &target.h);
+        }
+
+        if(!downscale)
+        {
+            target.w *= 2;
+            target.h *= 2;
+        }
+
+        if(!FI_tex)
+        {
+            pLogWarning("Permanently failed to load %s", target.l.path.c_str());
+            pLogWarning("Error: %d (%s)", errno, strerror(errno));
+        }
+        else
+        {
+            s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), FreeImage_GetPitch(FI_tex), false, downscale);
+            FreeImage_Unload(FI_tex);
+
+            if(FI_mask)
+            {
+                s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), FreeImage_GetPitch(FI_mask), true, downscale);
+                FreeImage_Unload(FI_mask);
+            }
+        }
     }
 
-    if(!target.d.texture)
+    if(!target.d.hasTexture())
     {
         pLogWarning("FAILED TO LOAD!!! %s", path.c_str());
         target.inited = false;
@@ -577,10 +822,14 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
     return target;
 }
 
+StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+{
+    return LoadPicture(path, maskPath, maskFallbackPath, true);
+}
+
 StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
 {
-    // The asset converter should have known not to downscale this image. Let's hope it was right.
-    return LoadPicture(path, maskPath, maskFallbackPath);
+    return LoadPicture(path, maskPath, maskFallbackPath, false);
 }
 
 StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
@@ -631,9 +880,6 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
 
 StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
 {
-    (void)maskPath;
-    (void)maskFallbackPath;
-
     StdPicture target;
 
     if(!GameIsActive)
@@ -645,35 +891,65 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
     if(target.l.path.empty())
         return target;
 
+    if(maskPath.empty() && !maskFallbackPath.empty() && Files::fileExists(maskFallbackPath))
+        target.l.mask_path = maskFallbackPath;
+    else
+        target.l.mask_path = maskPath;
+
     target.inited = true;
 
     target.l.lazyLoaded = true;
 
-    // We need to figure out the height and width!
-    std::string sizePath = path + ".size";
-    FILE* fs = fopen(sizePath.c_str(), "r");
-
-    // NOT null-terminated: wwww\nhhhh\n
-    char contents[10];
-
-    if(fs != nullptr)
+    if(Files::hasSuffix(target.l.path, ".t3x"))
     {
-        fread(&contents[0], 1, 10, fs);
-        contents[4] = '\0';
-        contents[9] = '\0';
-        target.w = atoi(&contents[0]);
-        target.h = atoi(&contents[5]);
+        // We need to figure out the height and width!
+        std::string sizePath = path + ".size";
+        FILE* fs = fopen(sizePath.c_str(), "r");
 
-        if(fclose(fs))
-            pLogWarning("lazyLoadPicture: Couldn't close file.");
+        // NOT null-terminated: wwww\nhhhh\n
+        char contents[10];
+
+        if(fs != nullptr)
+        {
+            fread(&contents[0], 1, 10, fs);
+            contents[4] = '\0';
+            contents[9] = '\0';
+            target.w = atoi(&contents[0]);
+            target.h = atoi(&contents[5]);
+
+            if(fclose(fs))
+                pLogWarning("lazyLoadPicture: Couldn't close file.");
+        }
+        // lazy load and unload to read dimensions if it doesn't exist.
+        // unload is essential because lazy load would save the address incorrectly.
+        else
+        {
+            pLogWarning("lazyLoadPicture: Couldn't open size file.");
+            lazyLoad(target);
+            lazyUnLoad(target);
+        }
     }
-    // lazy load and unload to read dimensions if it doesn't exist.
-    // unload is essential because lazy load would save the address incorrectly.
     else
     {
-        pLogWarning("lazyLoadPicture: Couldn't open size file.");
-        lazyLoad(target);
-        lazyUnLoad(target);
+        PGE_Size tSize;
+
+        if(!GraphicsHelps::getImageMetrics(path, &tSize))
+        {
+            pLogWarning("Error loading of image file:\n"
+                        "%s\n"
+                        "Reason: %s.",
+                        path.c_str(),
+                        (Files::fileExists(path) ? "wrong image format" : "file not exist"));
+
+            target.inited = false;
+            target.l.path.clear();
+            target.l.mask_path.clear();
+        }
+        else
+        {
+            target.w = tSize.w();
+            target.h = tSize.h();
+        }
     }
 
     return target;
@@ -685,7 +961,7 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
 
     if(!sourceImage)
     {
-        if(linearSpaceFree() < 4000000)
+        if(linearSpaceFree() < 8000000)
             minport_freeTextureMemory();
 
         sourceImage = C2D_SpriteSheetLoad(path);
@@ -696,50 +972,108 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
 
 void lazyLoad(StdPicture& target)
 {
-    if(!target.inited || !target.l.lazyLoaded || target.d.texture)
+    if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
         return;
 
-    C2D_SpriteSheet sourceImage;
-    std::string suppPath;
-
-    sourceImage = s_tryHardToLoadC2D_SpriteSheet(target.l.path.c_str()); // some other source image
-
-    if(!sourceImage)
+    if(!Files::hasSuffix(target.l.path, ".t3x"))
     {
-        pLogWarning("Permanently failed to load %s, %lu free", target.l.path.c_str(), linearSpaceFree());
-        pLogWarning("Error: %d (%s)", errno, strerror(errno));
-        target.inited = false;
-        return;
+        FIBITMAP* FI_tex = nullptr;
+        FIBITMAP* FI_mask = nullptr;
+
+        if(Files::hasSuffix(target.l.mask_path, "m.gif"))
+        {
+            FI_tex = robust_FILoad(target.l.path, "");
+
+            if(FI_tex)
+                FI_mask = robust_FILoad(target.l.mask_path, "");
+        }
+        else
+        {
+            FI_tex = robust_FILoad(target.l.path, target.l.mask_path);
+        }
+
+        if(!FI_tex)
+        {
+            pLogWarning("Permanently failed to load %s during image load, %lu free", target.l.path.c_str(), linearSpaceFree());
+            pLogWarning("Error: %d (%s)", errno, strerror(errno));
+            target.inited = false;
+            return;
+        }
+
+        if(target.l.colorKey) // Apply transparent color for key pixels
+        {
+            PGE_Pix colSrc = {target.l.keyRgb[0],
+                              target.l.keyRgb[1],
+                              target.l.keyRgb[2], 0xFF
+                             };
+            PGE_Pix colDst = {target.l.keyRgb[0],
+                              target.l.keyRgb[1],
+                              target.l.keyRgb[2], 0x00
+                             };
+            GraphicsHelps::replaceColor(FI_tex, colSrc, colDst);
+        }
+
+        s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), FreeImage_GetPitch(FI_tex), false);
+        FreeImage_Unload(FI_tex);
+
+        if(FI_mask)
+        {
+            s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), FreeImage_GetPitch(FI_mask), true);
+            FreeImage_Unload(FI_mask);
+        }
+
+        if(!target.d.hasTexture())
+        {
+            pLogWarning("Permanently failed to load %s during texture load, %lu free", target.l.path.c_str(), linearSpaceFree());
+            pLogWarning("Error: %d (%s)", errno, strerror(errno));
+            target.inited = false;
+            return;
+        }
     }
-
-    s_loadTexture(target, sourceImage);
-
-    if(target.h > 2048)
+    else
     {
-        suppPath = target.l.path + '1';
-        sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str());
+        C2D_SpriteSheet sourceImage;
+        std::string suppPath;
+
+        sourceImage = s_tryHardToLoadC2D_SpriteSheet(target.l.path.c_str()); // some other source image
 
         if(!sourceImage)
         {
-            pLogWarning("Permanently failed to load %s, %lu free", suppPath.c_str(), linearSpaceFree());
+            pLogWarning("Permanently failed to load %s, %lu free", target.l.path.c_str(), linearSpaceFree());
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
+            target.inited = false;
+            return;
         }
-        else
-            s_loadTexture2(target, sourceImage);
-    }
 
-    if(target.h > 4096)
-    {
-        suppPath = target.l.path + '2';
-        sourceImage = C2D_SpriteSheetLoad(suppPath.c_str());
+        s_loadTexture(target, sourceImage);
 
-        if(!sourceImage)
+        if(target.h > 2048)
         {
-            pLogWarning("Permanently failed to load %s, %lu free", suppPath.c_str(), linearSpaceFree());
-            pLogWarning("Error: %d (%s)", errno, strerror(errno));
+            suppPath = target.l.path + '1';
+            sourceImage = s_tryHardToLoadC2D_SpriteSheet(suppPath.c_str());
+
+            if(!sourceImage)
+            {
+                pLogWarning("Permanently failed to load %s, %lu free", suppPath.c_str(), linearSpaceFree());
+                pLogWarning("Error: %d (%s)", errno, strerror(errno));
+            }
+            else
+                s_loadTexture2(target, sourceImage);
         }
-        else
-            s_loadTexture3(target, sourceImage);
+
+        if(target.h > 4096)
+        {
+            suppPath = target.l.path + '2';
+            sourceImage = C2D_SpriteSheetLoad(suppPath.c_str());
+
+            if(!sourceImage)
+            {
+                pLogWarning("Permanently failed to load %s, %lu free", suppPath.c_str(), linearSpaceFree());
+                pLogWarning("Error: %d (%s)", errno, strerror(errno));
+            }
+            else
+                s_loadTexture3(target, sourceImage);
+        }
     }
 
     s_num_textures_loaded++;
@@ -758,10 +1092,32 @@ void lazyPreLoad(StdPicture& target)
 
 void lazyUnLoad(StdPicture& target)
 {
-    if(!target.inited || !target.l.lazyLoaded || !target.d.texture)
+    if(!target.inited || !target.l.lazyLoaded || !target.d.hasTexture())
         return;
 
     deleteTexture(target, true);
+}
+
+void loadTexture(StdPicture& target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    s_loadTexture(target, RGBApixels, width, height, pitch, false, true);
+    target.inited = true;
+    target.l.lazyLoaded = false;
+    target.w = width;
+    target.h = height;
+    target.frame_w = width;
+    target.frame_h = height;
+}
+
+void loadTexture_1x(StdPicture& target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    s_loadTexture(target, RGBApixels, width, height, pitch, false, false);
+    target.inited = true;
+    target.l.lazyLoaded = false;
+    target.w = width * 2;
+    target.h = height * 2;
+    target.frame_w = width * 2;
+    target.frame_h = height * 2;
 }
 
 void deleteTexture(StdPicture& tx, bool lazyUnload)
@@ -771,23 +1127,44 @@ void deleteTexture(StdPicture& tx, bool lazyUnload)
 
     minport_unlinkTexture(&tx);
 
-    if(tx.d.texture)
+    if(tx.d.texture[0] == HEAP_MANAGED_TEXTURE)
+    {
+        delete tx.d.image[0].tex;
+        delete tx.d.image[0].subtex;
+        tx.d.image[0] = C2D_Image();
+        tx.d.texture[0] = nullptr;
+    }
+    else if(tx.d.texture[0])
     {
         s_num_textures_loaded --;
-        C2D_SpriteSheetFree(tx.d.texture);
-        tx.d.texture = nullptr;
+        C2D_SpriteSheetFree(tx.d.texture[0]);
+        tx.d.texture[0] = nullptr;
     }
 
-    if(tx.d.texture2)
+    if(tx.d.texture[1] == HEAP_MANAGED_TEXTURE)
     {
-        C2D_SpriteSheetFree(tx.d.texture2);
-        tx.d.texture2 = nullptr;
+        delete tx.d.image[1].tex;
+        delete tx.d.image[1].subtex;
+        tx.d.image[1] = C2D_Image();
+        tx.d.texture[1] = nullptr;
+    }
+    else if(tx.d.texture[1])
+    {
+        C2D_SpriteSheetFree(tx.d.texture[1]);
+        tx.d.texture[1] = nullptr;
     }
 
-    if(tx.d.texture3)
+    if(tx.d.texture[2] == HEAP_MANAGED_TEXTURE)
     {
-        C2D_SpriteSheetFree(tx.d.texture3);
-        tx.d.texture3 = nullptr;
+        delete tx.d.image[2].tex;
+        delete tx.d.image[2].subtex;
+        tx.d.image[2] = C2D_Image();
+        tx.d.texture[2] = nullptr;
+    }
+    else if(tx.d.texture[2])
+    {
+        C2D_SpriteSheetFree(tx.d.texture[2]);
+        tx.d.texture[2] = nullptr;
     }
 
     if(!lazyUnload)
@@ -817,10 +1194,10 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     if(!tx.inited)
         return;
 
-    if(!tx.d.texture && tx.l.lazyLoaded)
+    if(!tx.d.hasTexture() && tx.l.lazyLoaded)
         lazyLoad(tx);
 
-    if(!tx.d.texture)
+    if(!tx.d.hasTexture())
         return;
 
     // automatic flipping based on SMBX style!
@@ -871,6 +1248,9 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     C2D_Image* to_draw = nullptr;
     C2D_Image* to_draw_2 = nullptr;
 
+    C2D_Image* to_mask = nullptr;
+    C2D_Image* to_mask_2 = nullptr;
+
     // Don't go more than size of texture
     // Failure conditions should only happen if texture is smaller than expected
 
@@ -878,28 +1258,61 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
     {
         if(ySrc + hSrc > 2048)
         {
-            if(tx.d.texture3)
-                to_draw = &tx.d.image3;
+            if(tx.d.texture[2])
+            {
+                to_draw = &tx.d.image[2];
+                if(tx.d.texture[5])
+                    to_mask = &tx.d.image[5];
+            }
 
-            if(ySrc < 2048 && tx.d.texture2)
-                to_draw_2 = &tx.d.image2;
+            if(ySrc < 2048 && tx.d.texture[1])
+            {
+                to_draw_2 = &tx.d.image[1];
+                if(tx.d.texture[4])
+                    to_mask_2 = &tx.d.image[4];
+            }
 
             ySrc -= 1024;
         }
         else
         {
-            if(tx.d.texture2)
-                to_draw = &tx.d.image2;
+            if(tx.d.texture[1])
+            {
+                to_draw = &tx.d.image[1];
+                if(tx.d.texture[4])
+                    to_mask = &tx.d.image[4];
+            }
 
             if(ySrc < 1024)
-                to_draw_2 = &tx.d.image;
+            {
+                to_draw_2 = &tx.d.image[0];
+                if(tx.d.texture[3])
+                    to_mask_2 = &tx.d.image[3];
+            }
         }
 
         // draw the top pic
         if(to_draw_2 != nullptr)
         {
+            if(to_mask_2)
+            {
+                C2D_Flush();
+                C3D_ColorLogicOp(GPU_LOGICOP_AND);
+                C2D_DrawImage_Custom(*to_mask_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
+                                     xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
+                C2D_Flush();
+                C3D_ColorLogicOp(GPU_LOGICOP_OR);
+            }
+
             C2D_DrawImage_Custom(*to_draw_2, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
                                  xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
+
+            if(to_mask_2)
+            {
+                C2D_Flush();
+                C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+            }
+
             yDst += (1024 - ySrc) * hDst / hSrc;
             hDst -= (1024 - ySrc) * hDst / hSrc;
             hSrc -= (1024 - ySrc);
@@ -908,12 +1321,33 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         else
             ySrc -= 1024.0f;
     }
-    else to_draw = &tx.d.image;
+    else
+    {
+        to_draw = &tx.d.image[0];
+        if(tx.d.texture[3])
+            to_mask = &tx.d.image[3];
+    }
 
     if(to_draw != nullptr)
     {
+        if(to_mask)
+        {
+            C2D_Flush();
+            C3D_ColorLogicOp(GPU_LOGICOP_AND);
+            C2D_DrawImage_Custom(*to_mask, xDst, yDst, wDst, hDst,
+                                 xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
+            C2D_Flush();
+            C3D_ColorLogicOp(GPU_LOGICOP_OR);
+        }
+
         C2D_DrawImage_Custom(*to_draw, xDst, yDst, wDst, hDst,
                              xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
+
+        if(to_mask)
+        {
+            C2D_Flush();
+            C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+        }
     }
 
     // Finalize rotation HERE
