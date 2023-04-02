@@ -52,6 +52,8 @@
 // #include "second_screen.h"
 #include "c2d_draw.h"
 
+// used for crash prevention
+extern u32 gpuCmdBufOffset, gpuCmdBufSize;
 
 namespace XRender
 {
@@ -396,7 +398,9 @@ bool init()
 
     gfxSet3D(true); // Enable stereoscopic 3D
 
-    C3D_Init(C3D_DEFAULT_CMDBUF_SIZE);
+    // default command buffer size is 0x40000 (256kb) but this is insufficient in extreme cases such as levels that paint the screen with small masked BGOs
+    size_t cmdbuf_size = 0xc0000;
+    C3D_Init(cmdbuf_size);
     C2D_Init(C2D_DEFAULT_MAX_OBJECTS);
     C2D_Prepare();
 
@@ -1178,6 +1182,10 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         lazyLoad(tx);
 
     if(!tx.d.hasTexture())
+        return;
+
+    // don't exceed 90%, ever
+    if(gpuCmdBufSize > 0 && gpuCmdBufOffset * 10 > gpuCmdBufSize * 9)
         return;
 
     // automatic flipping based on SMBX style!
