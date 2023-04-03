@@ -148,6 +148,30 @@ void AbstractRender_t::close()
 #endif
 }
 
+static void dumpFullFile(std::vector<char> &dst, const std::string &path)
+{
+    dst.clear();
+    SDL_RWops *f;
+
+    f = SDL_RWFromFile(path.c_str(), "rb");
+    if(!f)
+        return;
+
+    Sint64 fSize = SDL_RWsize(f);
+    if(fSize < 0)
+    {
+        pLogWarning("Failed to get size of the file: %s", path.c_str());
+        SDL_RWclose(f);
+        return;
+    }
+
+    dst.resize(size_t(fSize));
+    if(SDL_RWread(f, dst.data(), 1, fSize) != size_t(fSize))
+        pLogWarning("Failed to dump file on read operation: %s", path.c_str());
+
+    SDL_RWclose(f);
+}
+
 StdPicture AbstractRender_t::LoadPicture(const std::string &path,
                                          const std::string &maskPath,
                                          const std::string &maskFallbackPath)
@@ -343,6 +367,17 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
         GraphicsHelps::closeImage(maskImage);
     }
 
+    // load fragment shader if it exists
+    // userShadersSupported() condition must be removed before hot-swapping can be implemented
+    if(g_render->userShadersSupported() && Files::fileExists(path + ".frag"))
+    {
+        pLogDebug("Loading user shader [%s%s]...", path.c_str(), ".frag");
+        dumpFullFile(target.l.fragmentShaderSource, path + ".frag");
+        // must be null-terminated
+        target.l.fragmentShaderSource.push_back('\0');
+        g_render->compileShaders(target);
+    }
+
 #ifdef DEBUG_BUILD
     pLogDebug("Mask merging of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(maskElapsed));
     pLogDebug("Binding time of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(bindElapsed));
@@ -441,30 +476,6 @@ void AbstractRender_t::loadTexture_1x(StdPicture &target,
 //    }
 }
 
-static void dumpFullFile(std::vector<char> &dst, const std::string &path)
-{
-    dst.clear();
-    SDL_RWops *f;
-
-    f = SDL_RWFromFile(path.c_str(), "rb");
-    if(!f)
-        return;
-
-    Sint64 fSize = SDL_RWsize(f);
-    if(fSize < 0)
-    {
-        pLogWarning("Failed to get size of the file: %s", path.c_str());
-        SDL_RWclose(f);
-        return;
-    }
-
-    dst.resize(size_t(fSize));
-    if(SDL_RWread(f, dst.data(), 1, fSize) != size_t(fSize))
-        pLogWarning("Failed to dump file on read operation: %s", path.c_str());
-
-    SDL_RWclose(f);
-}
-
 StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
                                              const std::string &maskPath,
                                              const std::string &maskFallbackPath)
@@ -519,7 +530,8 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
     target.l.lazyLoaded = true;
     target.d.clear();
 
-    // load fragment shader to vector
+    // load fragment shader if it exists
+    // userShadersSupported() condition must be removed before hot-swapping can be implemented
     if(g_render->userShadersSupported() && Files::fileExists(path + ".frag"))
     {
         pLogDebug("Loading user shader [%s%s]...", path.c_str(), ".frag");
