@@ -723,6 +723,9 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
         GraphicsHelps::closeImage(maskImage);
     }
+
+    if(g_render->userShadersSupported() && !target.l.fragmentShaderSource.empty())
+        g_render->compileShaders(target);
 }
 
 void AbstractRender_t::lazyUnLoad(StdPicture &target)

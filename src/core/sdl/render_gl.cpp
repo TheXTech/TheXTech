@@ -1226,7 +1226,7 @@ void RenderGL::loadTextureMask(StdPicture &target, uint32_t mask_width, uint32_t
 void RenderGL::compileShaders(StdPicture &target)
 {
 #ifdef RENDERGL_HAS_SHADERS
-    if(!m_use_shaders)
+    if(!m_use_shaders || target.d.shader_program)
         return;
 
     pLogDebug("Render GL: compiling shader...");
@@ -1288,6 +1288,9 @@ void RenderGL::deleteTexture(StdPicture &tx, bool lazyUnload)
 
     if(tx.d.mask_texture_id)
         glDeleteTextures(1, &tx.d.mask_texture_id);
+
+    if(tx.d.shader_program)
+        tx.d.shader_program.reset();
 
     tx.d.texture_id = 0;
     tx.d.mask_texture_id = 0;
