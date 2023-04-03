@@ -55,6 +55,8 @@ protected:
     static bool m_blockRender;
 #endif
 
+    virtual void compileShaders(StdPicture &target);
+
 public:
     AbstractRender_t();
     virtual ~AbstractRender_t();
@@ -194,8 +196,6 @@ public:
                              uint32_t pitch,
                              uint32_t image_width,
                              uint32_t image_height);
-
-    virtual void compileShaders(StdPicture &target);
 
     virtual bool textureMaskSupported();
 

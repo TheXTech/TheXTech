@@ -280,6 +280,9 @@ private:
     // Choose vertex list for given context and depth pair. Prevents splitting groups for masked draws.
     VertexList& getOrderedDrawVertexList(DrawContext_t context, int depth);
 
+protected:
+    void compileShaders(StdPicture &target) override;
+
 public:
     RenderGL();
     ~RenderGL() override;
@@ -386,8 +389,6 @@ public:
                      uint32_t pitch,
                      uint32_t image_width,
                      uint32_t image_height) override;
-
-    void compileShaders(StdPicture &target) override;
 
     bool textureMaskSupported() override;
 
