@@ -49,11 +49,6 @@
 #    define RENDERGL_HAS_VBO
 #    define RENDERGL_HAS_FBO
 
-#ifndef NINTENDO_SWITCH
-#    define RENDERGL_HAS_ORTHO
-#    define RENDERGL_HAS_FIXED_FUNCTION
-#endif
-
 #    define RENDERGL_SUPPORTED
 #endif
 
