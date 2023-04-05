@@ -519,12 +519,15 @@ bool RenderGL::initFramebuffers()
         if(!m_buffer_texture[i])
             break;
 
-        // can't use other buffers without shaders
-        if(i == BUFFER_GAME && !m_use_shaders)
+        // only use FB read texture with either user shaders or logic-op emulation
+        const bool emulate_logic_op = !m_use_logicop && m_use_shaders;
+
+        // FIXME: m_use_shaders should check for user shader support here
+        if(i == BUFFER_GAME && !emulate_logic_op && !m_use_shaders)
             break;
 
         // can't use multipass rendering buffers without user shaders
-        // FIXME: check for user shader support here
+        // FIXME: m_use_shaders should check for user shader support here
         if(i == BUFFER_FB_READ && !m_use_shaders)
             break;
     }
