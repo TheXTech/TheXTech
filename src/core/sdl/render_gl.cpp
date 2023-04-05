@@ -234,7 +234,7 @@ void RenderGL::fillVertexBuffer(const RenderGL::Vertex_t* vertex_attribs, int co
     }
 }
 
-void RenderGL::refreshDrawQueues()
+void RenderGL::cleanupDrawQueues()
 {
     for(auto it = m_unordered_draw_queue.begin(); it != m_unordered_draw_queue.end();)
     {
@@ -275,177 +275,270 @@ void RenderGL::clearDrawQueues()
     m_mask_draw_context_depth.clear();
 }
 
-void RenderGL::flushDrawQueues()
+void RenderGL::flushUnorderedDrawQueue()
 {
-    // pass 1: opaque textures
     for(auto& i : m_unordered_draw_queue)
     {
         const DrawContext_t& context = i.first;
-        std::vector<Vertex_t>& vertex_attribs = i.second.vertices;
+        VertexList& vertex_list = i.second;
 
+        std::vector<Vertex_t>& vertex_attribs = vertex_list.vertices;
+
+        // mark VertexList as active if anything will be drawn
         if(!vertex_attribs.empty())
-            i.second.active = true;
+            vertex_list.active = true;
         else
             continue;
 
+        // context.program is not nullable
+        if(!context.program)
+        {
+            SDL_assert(context.program);
+            continue;
+        }
+
+        GLProgramObject* const program = context.program;
+
+        // load vertex attributes into current GL buffer
         fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
 
 #ifdef RENDERGL_HAS_SHADERS
+        // load program and update state if necessary (uses m_transform_tick to prevent unnecessary updates)
         if(m_use_shaders)
         {
-            context.program->use_program();
-            context.program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), (GLfloat)((m_transform_tick / 3) % (65 * 60)) / 65.0f);
+            SDL_assert(program->inited());
+
+            program->use_program();
+            program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
         }
 #endif
 
+        // bind texture if it exists
         if(context.texture)
             glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
+        // unbind texture in legacy mode (shader programs would just ignore texture)
         else if(!m_use_shaders)
             glBindTexture(GL_TEXTURE_2D, 0);
 
+        // draw!
         glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
 
+        // clear list
         vertex_attribs.clear();
     }
+}
 
-    // pass 2: translucent / interesting textures
-    bool no_translucent_objects = true;
-    int num_pass = 1;
-
-    // save the opaque state if there are any multipass shaders
+void RenderGL::executeOrderedDrawQueue(bool clear)
+{
     for(auto& i : m_ordered_draw_queue)
     {
-        if(i.second.vertices.empty())
+        // int draw_depth = i.first.first;
+        const DrawContext_t& context = i.first.second;
+
+        VertexList& vertex_list = i.second;
+        std::vector<Vertex_t>& vertex_attribs = vertex_list.vertices;
+
+        // mark VertexList as active if anything will be drawn
+        if(!vertex_attribs.empty())
+            vertex_list.active = true;
+        else
             continue;
 
-        no_translucent_objects = false;
+        // context.program is not nullable
+        if(!context.program)
+        {
+            SDL_assert(context.program);
+            continue;
+        }
 
-        const GLProgramObject* program = i.first.second.program;
+        GLProgramObject* program = context.program;
 
+        // context.texture is nullable
+        StdPicture* const texture = context.texture;
+
+        // figure out whether this draw should use bitmask rendering
+        bool use_gl_logic_op = (texture && texture->d.mask_texture_id && program == &m_standard_program);
+
+        // emulate the logic op if we can't use it directly
+        if(use_gl_logic_op && !m_use_logicop)
+        {
+            program = &m_bitmask_program;
+            use_gl_logic_op = false;
+        }
+
+        // setup the framebuffer read state as needed
+#ifdef RENDERGL_HAS_FBO
+        if(program->get_type() >= GLProgramObject::read_buffer)
+        {
+            // multiple quads -> copy the whole screen
+            if(vertex_attribs.size() > 6)
+            {
+                framebufferCopy(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+            }
+            // copy the quad behind the draw (speedup, doesn't work for rotated draw)
+            else if(vertex_attribs.size() == 6)
+            {
+                framebufferCopy(BUFFER_FB_READ, BUFFER_GAME,
+                    m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0],
+                    m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1],
+                    vertex_attribs[5].position[0] - vertex_attribs[0].position[0],
+                    vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
+            }
+
+            // the bitmask emulation program is the only program allowed to use the mask texture; bind it here
+            if(program == &m_bitmask_program)
+            {
+                glActiveTexture(TEXTURE_UNIT_MASK);
+                glBindTexture(GL_TEXTURE_2D, texture->d.mask_texture_id);
+                glActiveTexture(TEXTURE_UNIT_IMAGE);
+            }
+        }
+#endif // #ifdef RENDERGL_HAS_FBO
+
+        // load vertex attributes into current GL buffer
+        fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
+
+#ifdef RENDERGL_HAS_SHADERS
+        // load program and update state if necessary (uses m_transform_tick to prevent unnecessary updates)
+        if(m_use_shaders)
+        {
+            SDL_assert(program->inited());
+
+            program->use_program();
+            program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+        }
+#endif
+
+        // draw mask using glLogicOp state
+        if(use_gl_logic_op)
+        {
+            // prepare mask logicOp state
+            prepareDrawMask();
+
+            // bind mask texture
+            glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+
+            // draw!
+            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+
+            // prepare front image logicOp state
+            prepareDrawImage();
+        }
+
+        // bind texture if it exists
+        if(context.texture)
+            glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
+        // unbind texture in legacy mode (shader programs would just ignore texture)
+        else if(!m_use_shaders)
+            glBindTexture(GL_TEXTURE_2D, 0);
+
+        // draw!
+        glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+
+        // return to logicOp state for standard draws
+        if(use_gl_logic_op)
+            leaveMaskContext();
+
+        // clear queue only if requested
+        if(clear)
+            vertex_attribs.clear();
+    }
+}
+
+void RenderGL::prepareMultipassState(int pass)
+{
+#ifdef RENDERGL_HAS_FBO
+    // on first pass, use opaque state as "previous pass"
+    if(pass == 1)
+    {
+        // save the opaque state to init pass buffer
+        framebufferCopy(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+
+        // use as "previous pass"
+        glActiveTexture(TEXTURE_UNIT_PREVPASS);
+        glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_INIT_PASS]);
+        glActiveTexture(TEXTURE_UNIT_IMAGE);
+    }
+    // on later passes, use previous pass itself, then restore opaque state
+    else
+    {
+        // save previous pass to previous pass buffer
+        framebufferCopy(BUFFER_PREV_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+        // restore opaque state
+        framebufferCopy(BUFFER_GAME, BUFFER_INIT_PASS, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+
+        // use previous pass as previous pass (reverses pass-1 logic)
+        if(pass == 2)
+        {
+            glActiveTexture(TEXTURE_UNIT_PREVPASS);
+            glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_PREV_PASS]);
+            glActiveTexture(TEXTURE_UNIT_IMAGE);
+        }
+    }
+#else
+    (void)pass;
+#endif
+}
+
+void RenderGL::flushDrawQueues()
+{
+    // pass 0: opaque textures (unordered draw queues)
+    flushUnorderedDrawQueue();
+
+    // passes 1 to num_pass: translucent / interesting textures
+    bool any_translucent_draws = false;
+    bool any_multipass_draws = false;
+
+    // first, check what is enqueued; may allow us to skip all translucent rendering or multipass logic
+    for(auto& i : m_ordered_draw_queue)
+    {
+        // int draw_depth = i.first.first;
+        const DrawContext_t& context = i.first.second;
+
+        const VertexList& vertex_list = i.second;
+        const std::vector<Vertex_t>& vertex_attribs = vertex_list.vertices;
+
+        if(!vertex_attribs.empty())
+            continue;
+
+        any_translucent_draws = true;
+
+        const GLProgramObject* program = context.program;
+
+        // if any requested draw needs multipass rendering, enable it
         if(program && program->get_type() >= GLProgramObject::multipass)
         {
-            num_pass = s_num_pass;
-            framebufferCopy(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+            any_multipass_draws = true;
             break;
         }
     }
 
-    // return without needing to call glDepthMask
-    if(no_translucent_objects)
+    // if no translucent objects, return without needing to call glDepthMask (speedup on Emscripten)
+    if(!any_translucent_draws)
         return;
 
+    // disable depth writing while rendering translucent textures (small speedup, needed for multipass rendering)
     if(m_use_depth_buffer)
         glDepthMask(GL_FALSE);
 
-    for(int pass = 0; pass < num_pass; pass++)
+    // default to 1-pass rendering
+    int num_pass = 1;
+
+    // if shaders use multipass rendering and prev-pass framebuffer successfully allocated, enable multipass rendering
+    if(any_multipass_draws && m_buffer_texture[BUFFER_PREV_PASS])
+        num_pass = s_num_pass;
+
+    for(int pass = 1; pass <= num_pass; pass++)
     {
-#ifdef RENDERGL_HAS_FBO
-        if(pass != 0)
-        {
-            framebufferCopy(BUFFER_PREV_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
-            framebufferCopy(BUFFER_GAME, BUFFER_INIT_PASS, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+        // setup state for multipass rendering
+        if(any_multipass_draws && m_buffer_texture[BUFFER_INIT_PASS])
+            prepareMultipassState(pass);
 
-            // slot for reading previous pass (only need to reset it once)
-            if(pass == 1)
-            {
-                glActiveTexture(TEXTURE_UNIT_PREVPASS);
-                glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_PREV_PASS]);
-                glActiveTexture(TEXTURE_UNIT_IMAGE);
-            }
-        }
-        else if(m_buffer_texture[BUFFER_INIT_PASS])
-        {
-            // slot for reading previous pass
-            glActiveTexture(TEXTURE_UNIT_PREVPASS);
-            glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_INIT_PASS]);
-            glActiveTexture(TEXTURE_UNIT_IMAGE);
-        }
-#endif
-
-        for(auto& i : m_ordered_draw_queue)
-        {
-            // depth is i.first.first
-            const DrawContext_t& context = i.first.second;
-            std::vector<Vertex_t>& vertex_attribs = i.second.vertices;
-
-            if(!vertex_attribs.empty())
-                i.second.active = true;
-            else
-                continue;
-
-            SDL_assert(context.program);
-            GLProgramObject* program = context.program;
-
-            bool need_logic_op = (context.texture && context.texture->d.mask_texture_id && program == &m_standard_program);
-
-            // emulate the logic op if we can't use it directly
-            if(!m_use_logicop && need_logic_op)
-            {
-                program = &m_bitmask_program;
-                need_logic_op = false;
-            }
-
-#ifdef RENDERGL_HAS_FBO
-            if(program->get_type() >= GLProgramObject::read_buffer)
-            {
-                if(vertex_attribs.size() > 6)
-                {
-                    framebufferCopy(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
-                }
-                else if(vertex_attribs.size() == 6)
-                {
-                    framebufferCopy(BUFFER_FB_READ, BUFFER_GAME,
-                        m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0],
-                        m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1],
-                        vertex_attribs[5].position[0] - vertex_attribs[0].position[0],
-                        vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
-                }
-
-                // only program allowed to use mask texture
-                if(program == &m_bitmask_program)
-                {
-                    glActiveTexture(TEXTURE_UNIT_MASK);
-                    glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
-                    glActiveTexture(TEXTURE_UNIT_IMAGE);
-                }
-            }
-#endif // #ifdef RENDERGL_HAS_FBO
-
-            fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
-
-#ifdef RENDERGL_HAS_SHADERS
-            if(m_use_shaders)
-            {
-                SDL_assert(program->inited());
-                program->use_program();
-                program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), (GLfloat)((m_transform_tick / 3) % (65 * 60)) / 65.0f);
-            }
-#endif
-
-            if(need_logic_op)
-            {
-                prepareDrawMask();
-                glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
-                glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
-                prepareDrawImage();
-            }
-
-            if(context.texture)
-                glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
-            else if(!m_use_shaders)
-                glBindTexture(GL_TEXTURE_2D, 0);
-
-            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
-
-            if(need_logic_op)
-                leaveMaskContext();
-
-            // clear on final pass
-            if(pass == num_pass - 1)
-                vertex_attribs.clear();
-        }
+        // execute and possibly flush ordered draws
+        executeOrderedDrawQueue(pass == num_pass);
     }
 
+    // re-enable depth writing following
     if(m_use_depth_buffer)
         glDepthMask(GL_TRUE);
 }
@@ -671,7 +764,9 @@ void RenderGL::repaint()
 
     m_current_frame++;
     if(m_current_frame % 512 == 0)
-        refreshDrawQueues();
+        cleanupDrawQueues();
+
+    m_shader_clock = (GLfloat)((m_current_frame) % (65 * 60)) / 65.0f;
 
 #if 0
     GLuint err;

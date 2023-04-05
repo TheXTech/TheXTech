@@ -267,6 +267,9 @@ private:
     // representation of viewport (vScreen) to allow shaders to transform between draw coordinates and framebuffer texture coordinates
     std::array<GLfloat, 4> m_shader_read_viewport;
 
+    // clock variable in seconds for shaders (loops at 60s)
+    GLfloat m_shader_clock = 0.0f;
+
     // number of times the above have been set (used to limit number of uniform update calls)
     uint64_t m_transform_tick = 0;
 
@@ -387,7 +390,14 @@ private:
     void cleanupDrawQueues();
     // clear render queues without drawing or deallocating
     void clearDrawQueues();
-    // render and clear queues
+
+    // executes and clears all vertex lists in the unordered draw queue
+    void flushUnorderedDrawQueue();
+    // prepares for the next pass during multipass drawing
+    void prepareMultipassState(int pass);
+    // executes and optionally clears all vertex lists in the ordered draw queue
+    void executeOrderedDrawQueue(bool clear);
+    // Draws and clears all render queues. Called prior to changing GL context.
     void flushDrawQueues();
 
     // Selects efficient ordered vertex list for given context and depth pair. Batches across subsequent draws and masks.
