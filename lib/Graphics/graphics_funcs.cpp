@@ -163,6 +163,7 @@ FIBITMAP *GraphicsHelps::loadMask(const std::string &file, bool maskIsPng, bool 
     if(!mask)
         return nullptr;//Nothing to do
 
+    // this is the main reason that we have a separate call: extract a bitmask from a PNG RGBA image
     if(maskIsPng)
     {
         FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));
@@ -184,6 +185,7 @@ FIBITMAP *GraphicsHelps::loadMask(std::vector<char> &raw, bool maskIsPng, bool c
     if(!mask)
         return nullptr;//Nothing to do
 
+    // this is the main reason that we have a separate call: extract a bitmask from a PNG RGBA image
     if(maskIsPng)
     {
         FIBITMAP *front = FreeImage_Copy(mask, 0, 0, int(FreeImage_GetWidth(mask)), int(FreeImage_GetHeight(mask)));

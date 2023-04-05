@@ -22,18 +22,19 @@
 #ifndef RENDERGL_INC_H
 #define RENDERGL_INC_H
 
+// this auxiliary header includes the correct OpenGL headers, and sets defines based on which functions are available at compile time
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_MODERN
 
-#if defined(_WIN32) || defined(_WIN64)
-#    define NO_SDL_GLEXT
-#    include <GL/glew.h>
-#elif defined(__SWITCH__)
-#    define NO_SDL_GLEXT
-#    include <glad/glad.h>
-#else
-#    define GL_GLEXT_PROTOTYPES 1
-#endif
+#    if defined(_WIN32) || defined(_WIN64)
+#        define NO_SDL_GLEXT
+#        include <GL/glew.h>
+#    elif defined(__SWITCH__)
+#        define NO_SDL_GLEXT
+#        include <glad/glad.h>
+#    else
+#        define GL_GLEXT_PROTOTYPES 1
+#    endif
 
 #    include <SDL2/SDL_opengl.h>
 #    include <SDL2/SDL_opengl_glext.h>

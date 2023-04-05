@@ -342,6 +342,7 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
     g_render->loadTexture(target, w, h, textura, pitch);
 
+    // check for depth test
     if(!g_render->depthTestSupported() || maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, path))
         target.d.invalidateDepthTest();
 
@@ -356,6 +357,7 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     unloadElapsed = unloadTime.nanoelapsed();
 #endif
 
+    // load mask image if it exists
     if(maskImage)
     {
         uint32_t w_mask = static_cast<uint32_t>(FreeImage_GetWidth(maskImage));
@@ -422,6 +424,8 @@ void AbstractRender_t::loadTextureMask(StdPicture &target,
                          uint32_t image_width,
                          uint32_t image_height)
 {
+    /* unimplemented */
+
     UNUSED(target);
     UNUSED(mask_width);
     UNUSED(mask_height);
@@ -429,8 +433,6 @@ void AbstractRender_t::loadTextureMask(StdPicture &target,
     UNUSED(pitch);
     UNUSED(image_width);
     UNUSED(image_height);
-
-    /* unimplemented */
 }
 
 void AbstractRender_t::compileShaders(StdPicture &target)
@@ -538,6 +540,8 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
         dumpFullFile(target.l.fragmentShaderSource, path + ".frag");
         // must be null-terminated
         target.l.fragmentShaderSource.push_back('\0');
+
+        // eagerly compile it to minimize stutter
         g_render->compileShaders(target);
     }
 

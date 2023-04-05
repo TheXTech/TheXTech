@@ -43,28 +43,39 @@
 struct StdPicture;
 struct SDL_Window;
 
+/*!
+ * \brief Represents one of the game draw/read buffer textures
+ *
+ * RenderGL::framebufferCopy is used to copy contents from one buffer to another
+ */
 enum BufferIndex_t
 {
-    BUFFER_GAME = 0,
-    BUFFER_FB_READ,
-    BUFFER_INIT_PASS,
-    BUFFER_PREV_PASS,
+    BUFFER_GAME = 0,  /**< main texture for the game */
+    BUFFER_FB_READ,   /**< auxiliary texture used for reading from main buffer in shader */
+    BUFFER_INIT_PASS, /**< auxiliary texture used to restore the state after drawing only opaque objects (multipass rendering) */
+    BUFFER_PREV_PASS, /**< auxiliary texture used to read the state following the previous draw pass (multipass rendering) */
     BUFFER_MAX,
 };
 
 #ifdef RENDERGL_HAS_FBO
+/*!
+ * \brief Readable aliases for the texture units
+ */
 enum TextureUnit_t
 {
-    TEXTURE_UNIT_IMAGE = GL_TEXTURE0,
-    TEXTURE_UNIT_FB_READ,
-    TEXTURE_UNIT_MASK,
-    TEXTURE_UNIT_PREVPASS,
+    TEXTURE_UNIT_IMAGE = GL_TEXTURE0, /**< texture unit for the currently bound StdPicture (default) */
+    TEXTURE_UNIT_FB_READ,             /**< texture unit for reading from the FB read buffer (set once) */
+    TEXTURE_UNIT_MASK,                /**< texture unit for emulating bitmask rendering */
+    TEXTURE_UNIT_PREVPASS,            /**< texture unit for reading from the previous render pass (first set to init pass, and then prev pass) */
 };
 #endif
 
 class RenderGL final : public AbstractRender_t
 {
 private:
+    /*!
+     * \brief Takes GL profile int, returns profile string
+     */
     static inline const char* get_profile_name(const GLint profile)
     {
         switch(profile)
@@ -89,6 +100,13 @@ private:
     //     ext,
     // };
 
+    /*!
+     * \struct Vertex_t
+     * \brief Represents a single entry in a vertex array
+     * \param position: 3 int16_ts in viewport coordinates
+     * \param tint: 4 uint8_ts
+     * \param texcoord: 2 floats in GL texture-normalized coordinates (not picture coordinates if non-power-of-two)
+     */
     struct Vertex_t
     {
         std::array<GLshort, 3> position;
@@ -96,12 +114,24 @@ private:
         std::array<GLfloat, 2> texcoord;
     };
 
+    /*!
+     * \brief Represents a vertex array that can be rendered in a single glDrawArrays call
+     * \param vertices: vector of vertices, frequently resized to zero without deallocation for efficiency
+     * \param active: whether this vertex array was non-empty at any flushDrawQueues() since the last cleanupDrawQueues() call
+     */
     struct VertexList
     {
         std::vector<Vertex_t> vertices;
         bool active = false;
     };
 
+    /*!
+     * \brief Represents the draw state needed for a single glDrawArrays call
+     * \param texture: nullable pointer to a texture for the draw call
+     * \param program: non-nullable pointer to the program object for the draw call
+     *
+     * FUTURE: uniform: nullable pointer to the first uniform set for the draw call
+     */
     struct DrawContext_t
     {
         StdPicture* texture;
@@ -118,6 +148,9 @@ private:
         }
     };
 
+    /*!
+     * \brief Utility struct to allow DrawContext_t to be used as a key in a hash-map
+     */
     struct hash_DrawContext
     {
         std::size_t operator()(const RenderGL::DrawContext_t& c) const noexcept
@@ -126,17 +159,27 @@ private:
         }
     };
 
+    // unsorted draw queue that stores opaque draw calls in the current viewport state
     std::unordered_map<DrawContext_t, VertexList, hash_DrawContext> m_unordered_draw_queue;
+
+    // sorted draw queue that stores translucent / advanced draw calls in the current viewport state
     std::map<std::pair<int, DrawContext_t>, VertexList> m_ordered_draw_queue;
 
+    // state used to group subsequent ordered draws, even if their depths are not exactly the same
     std::unordered_map<DrawContext_t, int, hash_DrawContext> m_mask_draw_context_depth;
     DrawContext_t m_recent_draw_context;
     int m_recent_draw_context_depth = 0;
 
+    // reference to currently active SDL window
     SDL_Window    *m_window = nullptr;
 
+    // reference to SDL OpenGL context
     SDL_GLContext m_gContext = nullptr;
+
+    // tracks whether the renderer is currently drawing to the screen (instead of the game texture)
     bool           m_recentTargetScreen = false;
+
+    // set of all currently-loaded textures
     std::set<StdPicture *> m_textureBank;
 
     // Offset to shake screen
@@ -170,38 +213,62 @@ private:
     bool m_use_shaders = false;
     bool m_has_fbo = false;
     bool m_use_depth_buffer = false;
+    bool m_client_side_arrays = false;
 
     // unused for now
     // bool m_has_es3_shaders = false;
     // bool m_has_npot_texture = false;
     // bool m_has_bgra = false;
 
-    bool m_client_side_arrays = false;
 
     // OpenGL state
-    std::array<GLuint, BUFFER_MAX> m_buffer_texture = {0};
-    std::array<GLuint, BUFFER_MAX> m_buffer_fb = {0};
 
-    const GLuint& m_game_texture = m_buffer_texture[0];
-    const GLuint& m_game_texture_fb = m_buffer_fb[0];
+    // depth of most recent draw (reset per frame)
+    GLshort m_cur_depth = 0;
+
+    // tick for current frame
+    uint64_t m_current_frame = 0;
+
+    // framebuffer object (FBO) state
+
+    // textures for each render-to-texture layer
+    std::array<GLuint, BUFFER_MAX> m_buffer_texture = {0};
+    // FBOs for each render-to-texture layer (only the first is required)
+    std::array<GLuint, BUFFER_MAX> m_buffer_fb = {0};
+    // renderbuffer for main game framebuffer's depth component
     GLuint m_game_depth_rb = 0;
 
+    // references to main game framebuffer's texture and FBO
+    const GLuint& m_game_texture = m_buffer_texture[0];
+    const GLuint& m_game_texture_fb = m_buffer_fb[0];
+
+    // vertex buffer object (VBO) and vertex array object (VAO) state
+
+    // tuned carefully for performance on Mac and Emscripten, which require using VBOs
     static constexpr int s_num_vertex_buffers = 128;
+
+    // VBOs and their currently initialized sizes
     GLuint m_vertex_buffer[s_num_vertex_buffers] = {0};
     GLsizeiptr m_vertex_buffer_size[s_num_vertex_buffers] = {0};
+
+    // most recently filled VBO
     int m_cur_vertex_buffer_index = 0;
 
 #ifdef RENDERGL_HAS_VAO
+    // Single VAO (only used in GL Core), never changed. Only touched during init / cleanup functions.
     GLuint m_glcore_vao = 0;
 #endif
 
+    // shader state
+
+    // current transform matrix
     std::array<GLfloat, 16> m_transform_matrix;
+
+    // representation of viewport (vScreen) to allow shaders to transform between draw coordinates and framebuffer texture coordinates
     std::array<GLfloat, 4> m_shader_read_viewport;
+
+    // number of times the above have been set (used to limit number of uniform update calls)
     uint64_t m_transform_tick = 0;
-
-    GLshort m_cur_depth = 0;
-
-    uint64_t m_current_frame = 0;
 
     // OpenGL program objects
     GLProgramObject m_standard_program;
@@ -235,27 +302,65 @@ private:
 
     // Initialization functions, defined at render_gl_init.cpp
 
+    // For all:
     // Returning false indicates a catastrophic failure and results in the OpenGL engine not being created
     // Otherwise, instance flags will be set to reflect actual capabilities
 
-    // initialize the SDL OpenGL bindings according to version preferences and compile-time support,
-    // sets the version, and sets profile/version-dependent flags
-    static void try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver); // helper
+    /*!
+     * \brief Helper function to attempt to initialize an SDL OpenGL context of the desired profile and version
+     * \param[inout] context: reference to nullable SDL_GLContext. If non-null, no-op. If null, attempts initialization and signals success by leaving context non-null.
+     * \param[in] window: SDL_Window to use for the context
+     * \param profile: OpenGL profile to initialize
+     * \param majver: minimum OpenGL major version to initialize
+     * \param minver: minimum OpenGL minor version to initialize
+     */
+    static void try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver);
+
+    /*!
+     * \brief Initialize the SDL OpenGL bindings according to version preferences and compile-time support, sets the version, and sets profile/version-dependent flags
+     * \returns false no supported OpenGL profile can be initialized
+     */
     bool initOpenGL(const CmdLineSetup_t &setup);
 
-    // initialize the OpenGL debug bindings if requested and possible
+    /*!
+     * \brief Initialize the OpenGL debug bindings if requested and possible
+     */
     bool initDebug();
 
-    // initialize the global shader objects (also detects ES 2/3 shader support)
+    /*!
+     * \brief Initialize the global shader objects (also detects ES 2/3 shader support)
+     * \returns false if ES 2 shaders cannot be successfully compiled, but fixed-function pipeline is also unavailable
+     */
     bool initShaders();
 
-    // initializes the game texture and framebuffer, the shader read texture, and the multipass support framebuffers
+    /*!
+     * \brief Initializes the game texture and framebuffer, the shader read texture, and the multipass support framebuffers
+     *
+     * No-op if FBO is unsupported
+     *
+     * Only attempts to initialize shader read buffer if using shaders to emulate logic ops or supporting user shaders
+     * Only attempts to initialize other auxiliary buffers if supporting user shaders
+     */
     bool initFramebuffers();
 
-    // setup the clear functions, blending, alpha test (legacy), and depth test
+    /*!
+     * \brief Setup the clear functions, blending, alpha test (legacy), and depth test
+     *
+     * Clear functions: sets the clear color and depth
+     * Blending: sets standard alpha blending
+     * Alpha test: in fixed-function pipeline, enables alpha test with 0x08 cutoff
+     * Depth test: enables depth test by default and sets the pass function to >= (greater-than-or-equal)
+     */
     bool initState();
 
-    // enable vertex arrays, allocate VBOs if required (Core/Emscripten) or requested and possible; also sets up the VAO if required (Core) or requested and possible
+    /*!
+     * \brief Enable vertex arrays
+     *
+     * allocate VBOs if required (Core/Emscripten) or requested and possible
+     * also sets up the VAO if required (Core) or requested and possible
+     *
+     * \returns false if required VBO/VAO cannot be created
+     */
     bool initVertexArrays();
 
     // Private draw management functions
@@ -269,18 +374,27 @@ private:
     // perform a framebuffer->framebuffer copy
     void framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h);
 
-    // fill the current vertex array buffer with a vertex attribute array
+    // sets required GL logicOp state for masks
+    void prepareDrawMask();
+    // sets required GL logicOp state for front images
+    void prepareDrawImage();
+    // unsets GL logicOp state for ordinary drawing
+    void leaveMaskContext();
+
+    // fill a vertex array buffer with a vertex attribute array. prepares all state needed for call to glDrawArrays
     void fillVertexBuffer(const Vertex_t* vertex_attribs, int count);
-    // deallocate queues unused since previous call
-    void refreshDrawQueues();
-    // clear queues without drawing or deallocating
+    // deallocate render queues unused since previous call to cleanupDrawQueues
+    void cleanupDrawQueues();
+    // clear render queues without drawing or deallocating
     void clearDrawQueues();
     // render and clear queues
     void flushDrawQueues();
-    // Choose vertex list for given context and depth pair. Prevents splitting groups for masked draws.
+
+    // Selects efficient ordered vertex list for given context and depth pair. Batches across subsequent draws and masks.
     VertexList& getOrderedDrawVertexList(DrawContext_t context, int depth);
 
 protected:
+    // Compiles user fragment shader and assembles program in target.
     void compileShaders(StdPicture &target) override;
 
 public:
@@ -362,10 +476,6 @@ public:
      * \brief Set render target into the real window or screen (use to render on-screen buttons and other meta-info)
      */
     void setTargetScreen() override;
-
-    void prepareDrawMask();
-    void prepareDrawImage();
-    void leaveMaskContext();
 
     void loadTexture(StdPicture &target,
                      uint32_t width,
