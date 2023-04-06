@@ -148,7 +148,7 @@ void AbstractRender_t::close()
 #endif
 }
 
-static void dumpFullFile(std::vector<char> &dst, const std::string &path)
+void AbstractRender_t::dumpFullFile(std::vector<char> &dst, const std::string &path)
 {
     dst.clear();
     SDL_RWops *f;

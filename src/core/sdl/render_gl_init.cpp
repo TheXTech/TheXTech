@@ -20,8 +20,6 @@
 
 #include "core/sdl/gl_inc.h"
 
-#include <fstream>
-
 #include <SDL2/SDL_version.h>
 
 #include <Logger/logger.h>
@@ -32,30 +30,6 @@
 #include "core/sdl/render_gl.h"
 
 constexpr bool s_enable_debug_output = true;
-
-static std::string s_read_file(const char* filename)
-{
-    std::ifstream is(filename, std::ios::binary);
-
-    if(!is)
-        return "";
-
-    int length;
-    is.seekg(0, is.end);
-    length = is.tellg();
-    is.seekg(0, is.beg);
-
-    std::string out;
-    out.resize(length);
-
-    // read data as a block:
-    is.read(&out[0], length);
-
-    if(!is)
-        return "";
-
-    return out;
-}
 
 #ifdef RENDERGL_HAS_DEBUG
 static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam)
@@ -323,11 +297,14 @@ bool RenderGL::initShaders()
         return false;
     }
 
-    std::string logic_contents = s_read_file((AppPath + "/logic.frag").c_str());
+    std::vector<char> logic_contents;
+    dumpFullFile(logic_contents, (AppPath + "/logic.frag").c_str());
+    if(!logic_contents.empty())
+        logic_contents.push_back('\0');
 
     m_bitmask_program = GLProgramObject(
         s_es2_advanced_vert_src,
-        logic_contents.empty() ? s_es2_bitmask_frag_src : logic_contents.c_str()
+        logic_contents.empty() ? s_es2_bitmask_frag_src : logic_contents.data()
     );
 
     m_program_rect_filled = GLProgramObject(
@@ -350,14 +327,17 @@ bool RenderGL::initShaders()
         s_es2_circle_hole_frag_src
     );
 
-    std::string output_contents = s_read_file((AppPath + "/output.frag").c_str());
+    std::vector<char> output_contents;
+    dumpFullFile(output_contents, (AppPath + "/output.frag").c_str());
+    if(!output_contents.empty())
+        output_contents.push_back('\0');
 
     if(!output_contents.empty())
         pLogDebug("Loading screen fragment shader from output.frag...");
 
     m_output_program = GLProgramObject(
         s_es2_standard_vert_src,
-        output_contents.empty() ? s_es2_standard_frag_src : output_contents.c_str()
+        output_contents.empty() ? s_es2_standard_frag_src : output_contents.data()
     );
 
     return true;

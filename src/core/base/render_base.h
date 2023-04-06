@@ -57,6 +57,8 @@ protected:
 
     virtual void compileShaders(StdPicture &target);
 
+    static void dumpFullFile(std::vector<char> &dst, const std::string &path);
+
 public:
     AbstractRender_t();
     virtual ~AbstractRender_t();
