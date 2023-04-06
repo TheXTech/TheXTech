@@ -174,8 +174,6 @@ XTechTranslate::XTechTranslate()
     {
         {"menu.main.mainStartGame",        &g_mainMenu.mainStartGame},
         {"menu.main.main1PlayerGame",      &g_mainMenu.main1PlayerGame},
-        {"menu.main.mainStartGame",        &g_mainMenu.mainStartGame},
-        {"menu.main.main1PlayerGame",      &g_mainMenu.main1PlayerGame},
         {"menu.main.mainMultiplayerGame",  &g_mainMenu.mainMultiplayerGame},
         {"menu.main.mainBattleGame",       &g_mainMenu.mainBattleGame},
         {"menu.main.mainEditor",           &g_mainMenu.mainEditor},
