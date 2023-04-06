@@ -294,20 +294,53 @@ void minport_initFrame()
 
     int num_unloaded = 0;
 
+#if 0
+    // future code for when/if TffFont can recover from its textures being de-inited
+
+    StdPicture* cur = g_render_chain_tail;
+    while(cur && g_current_frame - cur->l.last_draw_frame > g_always_unload_after)
+    {
+        StdPicture* next = cur->l.next_texture;
+
+        if(cur->l.lazyLoaded)
+        {
+            // will internally invoke deleteTexture, which invokes minport_unlinkTexture if written properly
+            lazyUnLoad(*cur);
+
+            if(g_render_chain_tail == cur || cur->l.next_texture)
+            {
+                pLogCritical("Failed to unlink texture during lazyUnLoad! Manually unlinking texture. VRAM may be leaked.");
+                minport_unlinkTexture(cur);
+            }
+
+            num_unloaded++;
+        }
+
+        cur = next;
+    }
+#endif
+
     while(g_render_chain_tail && g_current_frame - g_render_chain_tail->l.last_draw_frame > g_always_unload_after)
     {
         StdPicture* last_tail = g_render_chain_tail;
 
         // will internally invoke deleteTexture, which invokes minport_unlinkTexture if written properly
-        lazyUnLoad(*g_render_chain_tail);
+        if(last_tail->l.lazyLoaded)
+        {
+            lazyUnLoad(*last_tail);
+            num_unloaded++;
+        }
+        else
+        {
+            // keeps us from freeing it, because it's not valid to! (can't be re-loaded)
+            minport_unlinkTexture(last_tail);
+        }
 
         if(g_render_chain_tail == last_tail)
         {
             pLogCritical("Failed to unlink texture during lazyUnLoad! Manually unlinking texture. VRAM may be leaked.");
             minport_unlinkTexture(g_render_chain_tail);
         }
-
-        num_unloaded++;
     }
 
     if(num_unloaded > 0)
@@ -342,6 +375,9 @@ void minport_freeTextureMemory()
 {
     int num_unloaded = 0;
 
+#if 0
+    // future code for when/if TffFont can recover from its textures being de-inited
+
     while(g_render_chain_tail && g_current_frame - g_render_chain_tail->l.last_draw_frame > g_never_unload_before)
     {
         StdPicture* last_tail = g_render_chain_tail;
@@ -350,7 +386,10 @@ void minport_freeTextureMemory()
         if(last_tail->l.lazyLoaded)
             lazyUnLoad(*g_render_chain_tail);
         else
-            minport_unlinkTexture(last_tail);
+        {
+            deleteTexture(*g_render_chain_tail, false);
+            num_deleted++;
+        }
 
         if(g_render_chain_tail == last_tail)
         {
@@ -359,6 +398,30 @@ void minport_freeTextureMemory()
         }
 
         num_unloaded++;
+    }
+#endif
+
+    while(g_render_chain_tail && g_current_frame - g_render_chain_tail->l.last_draw_frame > g_never_unload_before)
+    {
+        StdPicture* last_tail = g_render_chain_tail;
+
+        // will internally invoke deleteTexture, which invokes minport_unlinkTexture if written properly
+        if(last_tail->l.lazyLoaded)
+        {
+            lazyUnLoad(*last_tail);
+            num_unloaded++;
+        }
+        else
+        {
+            // keeps us from freeing it, because it's not valid to! (can't be re-loaded)
+            minport_unlinkTexture(last_tail);
+        }
+
+        if(g_render_chain_tail == last_tail)
+        {
+            pLogCritical("Failed to unlink texture during lazyUnLoad! Manually unlinking texture. VRAM may be leaked.");
+            minport_unlinkTexture(g_render_chain_tail);
+        }
     }
 
     pLogDebug("Unloaded %d stale textures at free texture memory request", num_unloaded);
