@@ -57,6 +57,7 @@ bool OpenWorld(std::string FilePath)
     int B = 0;
     // long long zCounter = 0;
     WorldData wld;
+    TranslateEpisode tr;
 
     ClearWorld();
 
@@ -106,12 +107,6 @@ bool OpenWorld(std::string FilePath)
 
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);
-
-    if(!GameMenu)
-    {
-        TranslateEpisode tr;
-        tr.loadWorldTranslation(wld, FileNameFull);
-    }
 
     LoadCustomCompat();
     FindCustomPlayers();
@@ -343,6 +338,9 @@ bool OpenWorld(std::string FilePath)
         // box.Z = zCounter++;
         treeWorldMusicAdd(&box);
     }
+
+    if(!LevelEditor)
+        tr.loadWorldTranslation(FileNameFull);
 
     LoadCustomSound();
 

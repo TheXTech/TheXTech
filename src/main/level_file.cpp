@@ -127,7 +127,8 @@ bool OpenLevel(std::string FilePath)
 
 bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 {
-    std::string newInput;
+//    std::string newInput;
+    TranslateEpisode tr;
 //    int FileRelease = 0;
     int A = 0;
     int B = 0;
@@ -170,12 +171,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     }
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
-
-    if(!GameMenu)
-    {
-        TranslateEpisode tr;
-        tr.loadLevelTranslation(lvl, FileNameFull);
-    }
 
     FileFormats::smbx64LevelPrepare(lvl);
     FileFormats::smbx64LevelSortBlocks(lvl);
@@ -799,6 +794,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         water.Layer = FindLayer(w.layer);
         syncLayers_Water(numWater);
     }
+
+    if(!GameMenu && !LevelEditor)
+        tr.loadLevelTranslation(FileNameFull);
 
     // FindBlocks();
     qSortBackgrounds(1, numBackground);

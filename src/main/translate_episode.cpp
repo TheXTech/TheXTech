@@ -27,6 +27,7 @@
 
 #include "translate_episode.h"
 #include "globals.h"
+#include "layers.h"
 
 
 
@@ -59,8 +60,8 @@ public:
 
         D_pLogDebug("JSON: Written %d into %s", m_outKey, m_outValue.c_str());
 
-        if(m_where == W_LEVEL_OBJ && m_outKey < (int)m_target->levels.size())
-            m_target->levels[m_outKey].title = m_outValue;
+        if(m_where == W_LEVEL_OBJ && m_outKey < numWorldLevels)
+            WorldLevel[m_outKey + 1].LevelName = m_outValue;
 
         m_outKey = -1;
         m_outValue.clear();
@@ -103,9 +104,26 @@ public:
         if(m_where == W_LEVEL_OBJ && m_curKey == "tit")
             m_outValue = val;
         else if(m_where == W_WORLD && m_curKey == "title")
-            m_target->EpisodeTitle = m_outValue;
+            WorldName = m_outValue;
         else if(m_where == W_WORLD && m_curKey == "credits")
-            m_target->authors = m_outValue;
+        {
+            for(int i = 1; i <= maxWorldCredits; i++)
+                WorldCredits[i].clear();
+
+            int B = 0;
+            std::vector<std::string> authorsList;
+            if(!m_outValue.empty())
+            {
+                Strings::split(authorsList, m_outValue, "\n");
+                for(auto &c : authorsList)
+                {
+                    B++;
+                    if(B > maxWorldCredits)
+                        break;
+                    WorldCredits[B] = c;
+                }
+            }
+        }
 
         return true;
     }
@@ -227,7 +245,6 @@ public:
     TrLevelParser(const TrLevelParser&) = default;
     ~TrLevelParser() = default;
 
-    LevelData *m_target = nullptr;
     std::string m_wantedKey;
     std::string m_curKey;
 
@@ -250,10 +267,10 @@ public:
 
         D_pLogDebug("JSON: Written %d into %s", m_outKey, m_outValue.c_str());
 
-        if(m_where == W_NPC_OBJ && m_outKey < (int)m_target->npc.size())
-            m_target->npc[m_outKey].msg = m_outValue;
-        else if(m_where == W_EVENT_OBJ && m_outKey < (int)m_target->events.size())
-            m_target->events[m_outKey].msg = m_outValue;
+        if(m_where == W_NPC_OBJ && m_outKey < numNPCs)
+            SetS(NPC[m_outKey + 1].Text, m_outValue);
+        else if(m_where == W_EVENT_OBJ && m_outKey < numEvents)
+            SetS(Events[m_outKey].Text, m_outValue);
 
         m_outKey = -1;
         m_outValue.clear();
@@ -298,7 +315,7 @@ public:
         else if(m_where == W_EVENT_OBJ && m_curKey == "msg")
             m_outValue = val;
         else if(m_where == W_LEVEL && m_curKey == "title")
-            m_target->LevelName = m_outValue;
+            LevelName = m_outValue;
 
         return true;
     }
@@ -623,7 +640,7 @@ static std::string getTrFile()
 TranslateEpisode::TranslateEpisode()
 {}
 
-void TranslateEpisode::loadLevelTranslation(LevelData& lvl, const std::string& key)
+void TranslateEpisode::loadLevelTranslation(const std::string& key)
 {
     if(CurrentLanguage.empty())
         return; // Language code is required!
@@ -635,7 +652,6 @@ void TranslateEpisode::loadLevelTranslation(LevelData& lvl, const std::string& k
 
     TrLevelParser parser;
     parser.m_wantedKey = key;
-    parser.m_target = &lvl;
 
     FILE *f_in = Files::utf8_fopen(langFile.c_str(), "r");
     if(!f_in)
@@ -647,7 +663,7 @@ void TranslateEpisode::loadLevelTranslation(LevelData& lvl, const std::string& k
         pLogDebug("JSON SaX returned FALSE");
 }
 
-void TranslateEpisode::loadWorldTranslation(WorldData& wld, const std::string& key)
+void TranslateEpisode::loadWorldTranslation(const std::string& key)
 {
     if(CurrentLanguage.empty())
         return; // Language code is required!
@@ -659,7 +675,6 @@ void TranslateEpisode::loadWorldTranslation(WorldData& wld, const std::string& k
 
     TrWorldParser parser;
     parser.m_wantedKey = key;
-    parser.m_target = &wld;
 
     FILE *f_in = Files::utf8_fopen(langFile.c_str(), "r");
     if(!f_in)

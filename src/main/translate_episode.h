@@ -38,14 +38,14 @@ public:
      * \param lvl Level data
      * \param key Translation key
      */
-    void loadLevelTranslation(LevelData &lvl, const std::string &key);
+    void loadLevelTranslation(const std::string &key);
 
     /*!
      * \brief Translate the world map file data by key
      * \param wld World map data
      * \param key Translation key
      */
-    void loadWorldTranslation(WorldData &wld, const std::string &key);
+    void loadWorldTranslation(const std::string &key);
 
     /*!
      * \brief Load the script translation data by key
