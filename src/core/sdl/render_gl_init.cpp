@@ -180,11 +180,11 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 
     pLogDebug("OpenGL video mode: R%d G%d B%d with %d-bit depth buffer", r, g, b, depth);
 
-    if(depth >= 16)
-    {
-        // allow 8-bit? probably not...
+    bool gles1 = (m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver == 1);
+
+    // depth buffering broken on some ancient Android phones under OpenGL ES 1
+    if(depth >= 16 && !gles1)
         m_use_depth_buffer = true;
-    }
 
     // Check capabilities
     GLint maxTextureSize = 256;
