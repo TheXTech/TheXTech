@@ -35,6 +35,7 @@
 #include "../main/trees.h"
 #include "level_file.h"
 #include "world_file.h"
+#include "translate_episode.h"
 
 #include <Utils/strings.h>
 #include <Utils/files.h>
@@ -86,15 +87,15 @@ bool OpenWorld(std::string FilePath)
         FileNameFull = Files::basename(FilePath);
         FullFileName = FilePath;
     }
-    else if(FileFormat == FileFormats::LVL_SMBX64 || FileFormat == FileFormats::LVL_SMBX38A)
+    else if(FileFormat == FileFormats::WLD_SMBX64 || FileFormat == FileFormats::WLD_SMBX38A)
     {
-        FileNameFull = FileName + ".lvl";
-        FullFileName = FileNamePath + FileName + ".lvl";
+        FileNameFull = FileName + ".wld";
+        FullFileName = FileNamePath + FileName + ".wld";
     }
     else
     {
-        FileNameFull = FileName + ".lvlx";
-        FullFileName = FileNamePath + FileName + ".lvlx";
+        FileNameFull = FileName + ".wldx";
+        FullFileName = FileNamePath + FileName + ".wldx";
     }
 
     // Preserve these values for quick restoring when going to the world map
