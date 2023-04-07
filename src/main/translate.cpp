@@ -127,30 +127,6 @@ static std::string getJsonValue(nlohmann::json &j, const std::string &key, const
     return getJsonValue(j[subKey], key.substr(dot + 1), defVal);
 }
 
-static bool dumpFile(const std::string &inPath, std::string &outData)
-{
-    off_t end;
-    bool ret = true;
-    FILE *in = Files::utf8_fopen(inPath.c_str(), "r");
-    if(!in)
-        return false;
-
-    outData.clear();
-
-    std::fseek(in, 0, SEEK_END);
-    end = std::ftell(in);
-    std::fseek(in, 0, SEEK_SET);
-
-    outData.resize(end);
-
-    if(std::fread((void*)outData.data(), 1, outData.size(), in) != outData.size())
-        ret = false;
-
-    std::fclose(in);
-
-    return ret;
-}
-
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
 static bool saveFile(const std::string &inPath, const std::string &inData)
 {
@@ -511,7 +487,7 @@ void XTechTranslate::updateLanguages()
         {
             std::string data;
 
-            if(!dumpFile(fullFilePath, data))
+            if(!Files::dumpFile(fullFilePath, data))
             {
                 std::printf("Warning: Failed to load the translation file %s: can't open file\n", fullFilePath.c_str());
                 continue;
@@ -604,7 +580,7 @@ bool XTechTranslate::translateFile(const std::string& file, TrList& list, const 
         if(Files::fileExists(file))
         {
             // Engine translations
-            if(!dumpFile(file, data))
+            if(!Files::dumpFile(file, data))
             {
                 pLogWarning("Failed to load the %s translation file %s: can't open file", trTypeName, file.c_str());
                 return false;
