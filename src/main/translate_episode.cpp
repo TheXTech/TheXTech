@@ -38,7 +38,6 @@ public:
     TrWorldParser(const TrWorldParser&) = default;
     ~TrWorldParser() = default;
 
-    WorldData *m_target = nullptr;
     std::string m_wantedKey;
     std::string m_curKey;
 

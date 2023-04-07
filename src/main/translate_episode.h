@@ -23,8 +23,7 @@
 
 #include <unordered_map>
 #include <string>
-#include <PGE_File_Formats/lvl_filedata.h>
-#include <PGE_File_Formats/wld_filedata.h>
+
 
 class TranslateEpisode
 {
