@@ -372,14 +372,25 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
     // allocate texture memory
     glBindTexture(GL_TEXTURE_2D, m_buffer_texture[buffer]);
 
+    int downscale = (buffer == BUFFER_LIGHTING) ? m_lighting_downscale : m_standard_downscale;
+
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-        ScreenW, ScreenH,
+        ScreenW / downscale, ScreenH / downscale,
         0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    if(buffer == BUFFER_LIGHTING && false)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    else
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    }
     glBindTexture(GL_TEXTURE_2D, 0);
 
     err = glGetError();
@@ -522,6 +533,14 @@ bool RenderGL::initFramebuffers()
     {
         glActiveTexture(TEXTURE_UNIT_FB_READ);
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_FB_READ]);
+        glActiveTexture(TEXTURE_UNIT_IMAGE);
+    }
+
+    // bind texture unit 5 to the lighting texture
+    if(m_buffer_texture[BUFFER_LIGHTING])
+    {
+        glActiveTexture(TEXTURE_UNIT_LIGHT_READ);
+        glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_LIGHTING]);
         glActiveTexture(TEXTURE_UNIT_IMAGE);
     }
 

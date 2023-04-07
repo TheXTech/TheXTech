@@ -445,6 +445,82 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
     }
 }
 
+void RenderGL::calculateLighting()
+{
+#if defined(RENDERGL_HAS_FBO) && defined(RENDERGL_HAS_SHADERS)
+    // FIXME: don't keep this (OBVIOUSLY)
+    GLProgramObject* m_current_lighting_program = GFXBackground[186].d.shader_program.get();
+
+    if(!m_current_lighting_program)
+        return;
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[BUFFER_LIGHTING]);
+
+    // fix offscreen coordinates
+    int viewport_x = m_viewport_x;
+    int viewport_y = m_viewport_y;
+    int viewport_w = m_viewport_w;
+    int viewport_h = m_viewport_h;
+
+    if(viewport_x < 0)
+    {
+        viewport_w += viewport_x;
+        viewport_x = 0;
+    }
+
+    if(viewport_y < 0)
+    {
+        viewport_h += viewport_y;
+        viewport_y = 0;
+    }
+
+    if(viewport_y + viewport_h > ScreenH)
+        viewport_h = ScreenH - viewport_y;
+
+    if(viewport_x + viewport_w > ScreenW)
+        viewport_w = ScreenW - viewport_x;
+
+    glViewport(viewport_x / m_lighting_downscale, (ScreenH - (viewport_y + viewport_h)) / m_lighting_downscale,
+        viewport_w / m_lighting_downscale, viewport_h / m_lighting_downscale);
+
+
+    m_current_lighting_program->use_program();
+    m_current_lighting_program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), (GLfloat)((m_transform_tick / 3) % (65 * 60)) / 65.0f);
+
+    GLshort x1 = m_viewport_x;
+    GLshort x2 = m_viewport_x + m_viewport_w;
+    GLshort y1 = m_viewport_y;
+    GLshort y2 = m_viewport_y + m_viewport_h;
+
+    GLfloat u1 = (float)x1 / ScreenW;
+    GLfloat u2 = (float)x2 / ScreenW;
+    GLfloat v1 = (float)(ScreenH - y1) / ScreenH;
+    GLfloat v2 = (float)(ScreenH - y2) / ScreenH;
+
+    x1 -= m_viewport_x;
+    x2 -= m_viewport_x;
+    y1 -= m_viewport_y;
+    y2 -= m_viewport_y;
+
+    RenderGL::Vertex_t copy_triangle_strip[] =
+    {
+        {{x1, y1, m_cur_depth}, {255, 255, 255, 255}, {u1, v1}},
+        {{x1, y2, m_cur_depth}, {255, 255, 255, 255}, {u1, v2}},
+        {{x2, y1, m_cur_depth}, {255, 255, 255, 255}, {u2, v1}},
+        {{x2, y2, m_cur_depth}, {255, 255, 255, 255}, {u2, v2}},
+    };
+
+    fillVertexBuffer(copy_triangle_strip, 4);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+
+    glViewport(viewport_x, ScreenH - (viewport_y + viewport_h),
+        viewport_w, viewport_h);
+#endif
+}
+
 void RenderGL::prepareMultipassState(int pass)
 {
 #ifdef RENDERGL_HAS_FBO
@@ -475,7 +551,7 @@ void RenderGL::prepareMultipassState(int pass)
             glActiveTexture(TEXTURE_UNIT_IMAGE);
         }
     }
-#else
+#else // #ifdef RENDERGL_HAS_FBO
     (void)pass;
 #endif
 }
@@ -487,8 +563,8 @@ void RenderGL::flushDrawQueues()
 
     // passes 1 to num_pass: translucent / interesting textures
     bool any_translucent_draws = false;
-    bool any_multipass_draws = false;
-    bool any_depth_read_draws = false;
+    int active_draw_flags = GLProgramObject::read_depth;
+    int flags_all = GLProgramObject::multipass | GLProgramObject::read_depth | GLProgramObject::read_light;
 
     // first, check what is enqueued; may allow us to skip all translucent rendering or multipass logic
     for(auto& i : m_ordered_draw_queue)
@@ -506,21 +582,12 @@ void RenderGL::flushDrawQueues()
 
         const GLProgramObject* program = context.program;
 
-        // if any requested draw needs multipass rendering, enable it
-        if(program && (program->get_flags() & GLProgramObject::multipass))
+        // add shader draw flags to requests
+        if(program && (program->get_flags() & flags_all))
         {
-            any_multipass_draws = true;
+            active_draw_flags |= program->get_flags();
 
-            if(any_multipass_draws && any_depth_read_draws)
-                break;
-        }
-
-        // if any requested draw needs to read the depth buffer, enable it
-        if(program && (program->get_flags() & GLProgramObject::read_depth))
-        {
-            any_depth_read_draws = true;
-
-            if(any_multipass_draws && any_depth_read_draws)
+            if((active_draw_flags & flags_all) == flags_all)
                 break;
         }
     }
@@ -536,13 +603,13 @@ void RenderGL::flushDrawQueues()
     // default to 1-pass rendering
     int num_pass = 1;
 
+#ifdef RENDERGL_HAS_FBO
     // if shaders use multipass rendering and prev-pass framebuffer successfully allocated, enable multipass rendering
-    if(any_multipass_draws && m_buffer_texture[BUFFER_PREV_PASS])
+    if((active_draw_flags & GLProgramObject::multipass) && m_buffer_texture[BUFFER_PREV_PASS])
         num_pass = s_num_pass;
 
     // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
-#ifdef RENDERGL_HAS_FBO
-    if(any_depth_read_draws && m_depth_read_texture)
+    if((active_draw_flags & GLProgramObject::read_depth) && m_depth_read_texture)
     {
         glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
         glCopyTexSubImage2D(GL_TEXTURE_2D,
@@ -554,12 +621,15 @@ void RenderGL::flushDrawQueues()
             m_viewport_w,
             m_viewport_h);
     }
+
+    if((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING])
+        calculateLighting();
 #endif
 
     for(int pass = 1; pass <= num_pass; pass++)
     {
         // setup state for multipass rendering
-        if(any_multipass_draws && m_buffer_texture[BUFFER_INIT_PASS])
+        if((active_draw_flags & GLProgramObject::multipass) && m_buffer_texture[BUFFER_INIT_PASS])
             prepareMultipassState(pass);
 
         // execute and possibly flush ordered draws

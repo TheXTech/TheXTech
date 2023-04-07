@@ -37,6 +37,7 @@ public:
         read_buffer = (1 << 1),
         multipass   = (1 << 2),
         read_depth  = (1 << 3),
+        read_light  = (1 << 4),
     };
 
 private:

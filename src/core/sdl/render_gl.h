@@ -54,6 +54,7 @@ enum BufferIndex_t
     BUFFER_FB_READ,   /**< auxiliary texture used for reading from main buffer in shader */
     BUFFER_INIT_PASS, /**< auxiliary texture used to restore the state after drawing only opaque objects (multipass rendering) */
     BUFFER_PREV_PASS, /**< auxiliary texture used to read the state following the previous draw pass (multipass rendering) */
+    BUFFER_LIGHTING,  /**< texture used to store the outcome of the lighting calculations */
     BUFFER_MAX,
 };
 
@@ -68,6 +69,7 @@ enum TextureUnit_t
     TEXTURE_UNIT_MASK,                /**< texture unit for emulating bitmask rendering (set per bitmasked render) */
     TEXTURE_UNIT_PREV_PASS,           /**< texture unit for reading from the previous render pass (first set to init pass, and then prev pass) */
     TEXTURE_UNIT_DEPTH_READ,          /**< texture unit for reading depth from the initial render pass (set once) */
+    TEXTURE_UNIT_LIGHT_READ,          /**< texture unit for reading lighting state (set once) */
 };
 #endif
 
@@ -205,6 +207,7 @@ private:
     float m_hidpi_x = 1.0f;
     float m_hidpi_y = 1.0f;
 
+
     // internal capability trackers
     GLint m_gl_majver = 0;
     GLint m_gl_minver = 0;
@@ -220,6 +223,11 @@ private:
     // bool m_has_es3_shaders = false;
     // bool m_has_npot_texture = false;
     // bool m_has_bgra = false;
+
+    // preferences
+
+    int m_standard_downscale = 1; // unsupported so far
+    int m_lighting_downscale = 2;
 
 
     // OpenGL state
@@ -396,6 +404,8 @@ private:
 
     // executes and clears all vertex lists in the unordered draw queue
     void flushUnorderedDrawQueue();
+    // calculates the lighting state using depth buffer information
+    void calculateLighting();
     // prepares for the next pass during multipass drawing
     void prepareMultipassState(int pass);
     // executes and optionally clears all vertex lists in the ordered draw queue

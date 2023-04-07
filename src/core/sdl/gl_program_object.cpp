@@ -173,6 +173,7 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     GLint u_mask_loc = glGetUniformLocation(m_program, "u_mask");
     GLint u_previous_pass_loc = glGetUniformLocation(m_program, "u_previous_pass");
     GLint u_depth_buffer_loc = glGetUniformLocation(m_program, "u_depth_buffer");
+    GLint u_light_buffer_loc = glGetUniformLocation(m_program, "u_light_buffer");
 
     glUseProgram(m_program);
     glUniform1i(u_texture_loc,       TEXTURE_UNIT_IMAGE      - GL_TEXTURE0);
@@ -180,6 +181,7 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     glUniform1i(u_mask_loc,          TEXTURE_UNIT_MASK       - GL_TEXTURE0);
     glUniform1i(u_previous_pass_loc, TEXTURE_UNIT_PREV_PASS  - GL_TEXTURE0);
     glUniform1i(u_depth_buffer_loc,  TEXTURE_UNIT_DEPTH_READ - GL_TEXTURE0);
+    glUniform1i(u_light_buffer_loc,  TEXTURE_UNIT_LIGHT_READ - GL_TEXTURE0);
 
     if(u_previous_pass_loc != -1)
         m_flags |= Flags::multipass;
@@ -187,6 +189,8 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
         m_flags |= Flags::read_buffer;
     if(u_depth_buffer_loc != -1)
         m_flags |= Flags::read_depth;
+    if(u_light_buffer_loc != -1)
+        m_flags |= Flags::read_light;
 
     D_pLogDebugNA("GLProgramObject: program successfully linked");
 }
