@@ -483,6 +483,10 @@ void RenderGL::calculateLighting()
     glViewport(viewport_x / m_lighting_downscale, (ScreenH - (viewport_y + viewport_h)) / m_lighting_downscale,
         viewport_w / m_lighting_downscale, viewport_h / m_lighting_downscale);
 
+    // works on ES
+    glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
+    glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
+    glActiveTexture(TEXTURE_UNIT_IMAGE);
 
     m_current_lighting_program->use_program();
     m_current_lighting_program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), (GLfloat)((m_transform_tick / 3) % (65 * 60)) / 65.0f);
@@ -608,22 +612,34 @@ void RenderGL::flushDrawQueues()
     if((active_draw_flags & GLProgramObject::multipass) && m_buffer_texture[BUFFER_PREV_PASS])
         num_pass = s_num_pass;
 
+    if((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING])
+        calculateLighting();
+
     // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
     if((active_draw_flags & GLProgramObject::read_depth) && m_depth_read_texture)
     {
-        glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
-        glCopyTexSubImage2D(GL_TEXTURE_2D,
-            0,
-            m_viewport_x,
-            ScreenH - (m_viewport_y + m_viewport_h),
-            m_viewport_x,
-            ScreenH - (m_viewport_y + m_viewport_h),
-            m_viewport_w,
-            m_viewport_h);
-    }
+        glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
 
-    if((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING])
-        calculateLighting();
+        // unsupported on GL ES (so might remove it entirely, or make a workaround)
+        if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES)
+        {
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+        else
+        {
+            glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
+            glCopyTexSubImage2D(GL_TEXTURE_2D,
+                0,
+                m_viewport_x,
+                ScreenH - (m_viewport_y + m_viewport_h),
+                m_viewport_x,
+                ScreenH - (m_viewport_y + m_viewport_h),
+                m_viewport_w,
+                m_viewport_h);
+        }
+
+        glActiveTexture(TEXTURE_UNIT_IMAGE);
+    }
 #endif
 
     for(int pass = 1; pass <= num_pass; pass++)

@@ -48,7 +48,6 @@
 #    define RENDERGL_HAS_VAO
 #    define RENDERGL_HAS_VBO
 #    define RENDERGL_HAS_FBO
-#    define RENDERGL_HAS_DEPTH_TEXTURE
 
 #    define RENDERGL_SUPPORTED
 #endif

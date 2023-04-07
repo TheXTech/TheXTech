@@ -82,7 +82,10 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
     if(setup.renderType == RENDER_ACCELERATED_OPENGL_ES)
+    {
+        try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 3, 0);
         try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0);
+    }
 #endif
 
 #ifdef THEXTECH_BUILD_GL_DESKTOP_LEGACY
@@ -102,6 +105,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 #endif
 
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
+    try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 3, 0);
     try_init_gl(m_gContext, m_window, SDL_GL_CONTEXT_PROFILE_ES, 2, 0);
 #endif
 
@@ -401,13 +405,33 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
         return;
     }
 
-    // (2) allocate render buffer (game texture only)
+    // (2) allocate depth buffer (game texture only)
     if(buffer == BUFFER_GAME)
     {
-        glGenRenderbuffers(1, &m_game_depth_rb);
-        glBindRenderbuffer(GL_RENDERBUFFER, m_game_depth_rb);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, ScreenW, ScreenH);
-        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        if(m_gl_majver >= 3)
+        {
+            glGenTextures(1, &m_game_depth_texture);
+
+            // allocate texture memory
+            glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
+                ScreenW / downscale, ScreenH / downscale,
+                0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+        else
+        {
+            glGenRenderbuffers(1, &m_game_depth_rb);
+            glBindRenderbuffer(GL_RENDERBUFFER, m_game_depth_rb);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, ScreenW / downscale, ScreenH / downscale);
+            glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        }
 
         err = glGetError();
         if(err)
@@ -442,7 +466,12 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_buffer_texture[buffer], 0);
 
     if(buffer == BUFFER_GAME)
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_game_depth_rb);
+    {
+        if(m_game_depth_texture)
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_game_depth_texture, 0);
+        else
+            glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_game_depth_rb);
+    }
 
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -480,6 +509,12 @@ void RenderGL::destroyFramebuffer(BufferIndex_t buffer)
     {
         glDeleteRenderbuffers(1, &m_game_depth_rb);
         m_game_depth_rb = 0;
+    }
+
+    if(buffer == BUFFER_GAME && m_game_depth_texture)
+    {
+        glDeleteTextures(1, &m_game_depth_texture);
+        m_game_depth_texture = 0;
     }
 
     if(m_buffer_texture[buffer])
@@ -544,9 +579,8 @@ bool RenderGL::initFramebuffers()
         glActiveTexture(TEXTURE_UNIT_IMAGE);
     }
 
-#    ifdef RENDERGL_HAS_DEPTH_TEXTURE
     // create texture for reading depth buffer
-    if(m_gl_majver >= 3 && m_game_depth_rb && m_use_shaders && m_buffer_texture[BUFFER_FB_READ])
+    if(m_gl_majver >= 3 && (m_game_depth_texture || m_game_depth_rb) && m_use_shaders && m_buffer_texture[BUFFER_FB_READ])
     {
         glGenTextures(1, &m_depth_read_texture);
 
@@ -577,12 +611,7 @@ bool RenderGL::initFramebuffers()
             m_depth_read_texture = 0;
             return true;
         }
-
-        glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
-        glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
-        glActiveTexture(TEXTURE_UNIT_IMAGE);
     }
-#    endif // #ifdef RENDERGL_HAS_DEPTH_TEXTURE
 
 #endif // #ifdef RENDERGL_HAS_FBO
 
