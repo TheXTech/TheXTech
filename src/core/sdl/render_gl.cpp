@@ -499,7 +499,7 @@ void RenderGL::flushDrawQueues()
         const VertexList& vertex_list = i.second;
         const std::vector<Vertex_t>& vertex_attribs = vertex_list.vertices;
 
-        if(!vertex_attribs.empty())
+        if(vertex_attribs.empty())
             continue;
 
         any_translucent_draws = true;
