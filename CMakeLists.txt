@@ -775,6 +775,7 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/language/*.h
     src/editor/*.h
     src/main/*.h
+    src/main/translate/*.h
     src/main/*.hpp
     src/npc/*.h
     src/npc/*.hpp

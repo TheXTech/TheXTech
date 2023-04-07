@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
 #ifndef TRANSLATEEPISODE_H
 #define TRANSLATEEPISODE_H
 
@@ -51,6 +52,13 @@ public:
      * \param key Translation key
      */
     void loadLunaScript(const std::string &key);
+
+    /*!
+     * \brief Attempt to find the translated episode title
+     * \param episodePath Path to the episode directory to prove
+     * \return true if translation has been found
+     */
+    bool tryTranslateTitle(const std::string &episodePath, const std::string &worldFile, std::string &output);
 
     /*!
      * \brief Translate script line by number

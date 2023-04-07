@@ -38,6 +38,7 @@
 #include "../gfx.h"
 #include "screen_connect.h"
 #include "menu_controls.h"
+#include "translate_episode.h"
 
 #include "speedrunner.h"
 #include "main/gameplay_timer.h"
@@ -253,6 +254,7 @@ struct WorldRoot_t
 
 void FindWorlds()
 {
+    TranslateEpisode tr;
     bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     NumSelectWorld = 0;
 
@@ -330,6 +332,9 @@ void FindWorlds()
                         w.blockChar[4] = true;
                         w.blockChar[5] = true;
                     }
+
+                    if(tr.tryTranslateTitle(epDir, fName, w.WorldName))
+                        pLogDebug("Translated world title: %s", w.WorldName.c_str());
 
                     SelectWorld.push_back(w);
                     if(worldsRoot.editable)
