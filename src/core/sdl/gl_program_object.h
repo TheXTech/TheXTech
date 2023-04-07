@@ -31,19 +31,19 @@ typedef float           GLfloat;
 class GLProgramObject
 {
 public:
-    enum Type
+    enum Flags
     {
-        opaque = 0,
-        translucent,
-        read_buffer,
-        multipass,
+        translucent = (1 << 0),
+        read_buffer = (1 << 1),
+        multipass   = (1 << 2),
+        read_depth  = (1 << 3),
     };
 
 private:
     static GLuint s_last_program;
 
     GLuint m_program = 0;
-    Type m_type = translucent;
+    int m_flags = translucent;
 
     GLint m_u_transform_loc = -1;
     GLint m_u_read_viewport_loc = -1;
@@ -110,9 +110,9 @@ public:
     /*!
      * \brief Reports the program type for multipass rendering
      */
-    inline Type get_type() const
+    inline int get_flags() const
     {
-        return m_type;
+        return m_flags;
     }
 
     /*!

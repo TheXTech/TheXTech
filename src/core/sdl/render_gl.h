@@ -65,8 +65,9 @@ enum TextureUnit_t
 {
     TEXTURE_UNIT_IMAGE = GL_TEXTURE0, /**< texture unit for the currently bound StdPicture (default) */
     TEXTURE_UNIT_FB_READ,             /**< texture unit for reading from the FB read buffer (set once) */
-    TEXTURE_UNIT_MASK,                /**< texture unit for emulating bitmask rendering */
-    TEXTURE_UNIT_PREVPASS,            /**< texture unit for reading from the previous render pass (first set to init pass, and then prev pass) */
+    TEXTURE_UNIT_MASK,                /**< texture unit for emulating bitmask rendering (set per bitmasked render) */
+    TEXTURE_UNIT_PREV_PASS,           /**< texture unit for reading from the previous render pass (first set to init pass, and then prev pass) */
+    TEXTURE_UNIT_DEPTH_READ,          /**< texture unit for reading depth from the initial render pass (set once) */
 };
 #endif
 
@@ -237,6 +238,8 @@ private:
     std::array<GLuint, BUFFER_MAX> m_buffer_fb = {0};
     // renderbuffer for main game framebuffer's depth component
     GLuint m_game_depth_rb = 0;
+    // texture for depth buffer read
+    GLuint m_depth_read_texture = 0;
 
     // references to main game framebuffer's texture and FBO
     const GLuint& m_game_texture = m_buffer_texture[0];

@@ -22,6 +22,7 @@
 
 #include "core/sdl/gl_inc.h"
 #include "core/sdl/gl_program_object.h"
+#include "core/sdl/render_gl.h"
 
 GLuint GLProgramObject::s_last_program = 0;
 
@@ -171,19 +172,21 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     GLint u_framebuffer_loc = glGetUniformLocation(m_program, "u_framebuffer");
     GLint u_mask_loc = glGetUniformLocation(m_program, "u_mask");
     GLint u_previous_pass_loc = glGetUniformLocation(m_program, "u_previous_pass");
+    GLint u_depth_buffer_loc = glGetUniformLocation(m_program, "u_depth_buffer");
 
     glUseProgram(m_program);
-    glUniform1i(u_texture_loc, 0);
-    glUniform1i(u_framebuffer_loc, 1);
-    glUniform1i(u_mask_loc, 2);
-    glUniform1i(u_previous_pass_loc, 3);
+    glUniform1i(u_texture_loc,       TEXTURE_UNIT_IMAGE      - GL_TEXTURE0);
+    glUniform1i(u_framebuffer_loc,   TEXTURE_UNIT_FB_READ    - GL_TEXTURE0);
+    glUniform1i(u_mask_loc,          TEXTURE_UNIT_MASK       - GL_TEXTURE0);
+    glUniform1i(u_previous_pass_loc, TEXTURE_UNIT_PREV_PASS  - GL_TEXTURE0);
+    glUniform1i(u_depth_buffer_loc,  TEXTURE_UNIT_DEPTH_READ - GL_TEXTURE0);
 
     if(u_previous_pass_loc != -1)
-        m_type = Type::multipass;
-    else if(u_framebuffer_loc != -1)
-        m_type = Type::read_buffer;
-    else
-        m_type = Type::translucent;
+        m_flags |= Flags::multipass;
+    if(u_framebuffer_loc != -1)
+        m_flags |= Flags::read_buffer;
+    if(u_depth_buffer_loc != -1)
+        m_flags |= Flags::read_depth;
 
     D_pLogDebugNA("GLProgramObject: program successfully linked");
 }
@@ -238,7 +241,7 @@ const GLProgramObject& GLProgramObject::operator=(GLProgramObject&& other)
     m_u_clock_loc = other.m_u_clock_loc;
 
     m_transform_tick = other.m_transform_tick;
-    m_type = other.m_type;
+    m_flags = other.m_flags;
 
     // prevent erasure
     other.m_program = 0;

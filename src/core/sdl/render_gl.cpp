@@ -368,7 +368,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
 
         // setup the framebuffer read state as needed
 #ifdef RENDERGL_HAS_FBO
-        if(program->get_type() >= GLProgramObject::read_buffer)
+        if(program->get_flags() & GLProgramObject::read_buffer)
         {
             // multiple quads -> copy the whole screen
             if(vertex_attribs.size() > 6)
@@ -455,7 +455,7 @@ void RenderGL::prepareMultipassState(int pass)
         framebufferCopy(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
 
         // use as "previous pass"
-        glActiveTexture(TEXTURE_UNIT_PREVPASS);
+        glActiveTexture(TEXTURE_UNIT_PREV_PASS);
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_INIT_PASS]);
         glActiveTexture(TEXTURE_UNIT_IMAGE);
     }
@@ -470,7 +470,7 @@ void RenderGL::prepareMultipassState(int pass)
         // use previous pass as previous pass (reverses pass-1 logic)
         if(pass == 2)
         {
-            glActiveTexture(TEXTURE_UNIT_PREVPASS);
+            glActiveTexture(TEXTURE_UNIT_PREV_PASS);
             glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_PREV_PASS]);
             glActiveTexture(TEXTURE_UNIT_IMAGE);
         }
@@ -488,6 +488,7 @@ void RenderGL::flushDrawQueues()
     // passes 1 to num_pass: translucent / interesting textures
     bool any_translucent_draws = false;
     bool any_multipass_draws = false;
+    bool any_depth_read_draws = false;
 
     // first, check what is enqueued; may allow us to skip all translucent rendering or multipass logic
     for(auto& i : m_ordered_draw_queue)
@@ -506,10 +507,21 @@ void RenderGL::flushDrawQueues()
         const GLProgramObject* program = context.program;
 
         // if any requested draw needs multipass rendering, enable it
-        if(program && program->get_type() >= GLProgramObject::multipass)
+        if(program && (program->get_flags() & GLProgramObject::multipass))
         {
             any_multipass_draws = true;
-            break;
+
+            if(any_multipass_draws && any_depth_read_draws)
+                break;
+        }
+
+        // if any requested draw needs to read the depth buffer, enable it
+        if(program && (program->get_flags() & GLProgramObject::read_depth))
+        {
+            any_depth_read_draws = true;
+
+            if(any_multipass_draws && any_depth_read_draws)
+                break;
         }
     }
 
@@ -527,6 +539,22 @@ void RenderGL::flushDrawQueues()
     // if shaders use multipass rendering and prev-pass framebuffer successfully allocated, enable multipass rendering
     if(any_multipass_draws && m_buffer_texture[BUFFER_PREV_PASS])
         num_pass = s_num_pass;
+
+    // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
+#ifdef RENDERGL_HAS_FBO
+    if(any_depth_read_draws && m_depth_read_texture)
+    {
+        glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
+        glCopyTexSubImage2D(GL_TEXTURE_2D,
+            0,
+            m_viewport_x,
+            ScreenH - (m_viewport_y + m_viewport_h),
+            m_viewport_x,
+            ScreenH - (m_viewport_y + m_viewport_h),
+            m_viewport_w,
+            m_viewport_h);
+    }
+#endif
 
     for(int pass = 1; pass <= num_pass; pass++)
     {
@@ -549,7 +577,7 @@ RenderGL::VertexList& RenderGL::getOrderedDrawVertexList(RenderGL::DrawContext_t
         return m_ordered_draw_queue[{m_recent_draw_context_depth, context}];
 
     // optimization for buffer-read shaders: only use a single depth per frame
-    if((context.program && context.program->get_type() >= GLProgramObject::read_buffer) || (!m_use_logicop && context.program == &m_standard_program && context.texture && context.texture->d.mask_texture_id))
+    if((context.program && (context.program->get_flags() & GLProgramObject::read_buffer)) || (!m_use_logicop && context.program == &m_standard_program && context.texture && context.texture->d.mask_texture_id))
     {
         int& saved_context_depth = m_mask_draw_context_depth[context];
 
@@ -622,6 +650,12 @@ void RenderGL::close()
 
     for(int i = BUFFER_GAME; i < BUFFER_MAX; i++)
         destroyFramebuffer((BufferIndex_t)i);
+
+    if(m_depth_read_texture)
+    {
+        glDeleteTextures(1, &m_depth_read_texture);
+        m_depth_read_texture = 0;
+    }
 
 #ifdef RENDERGL_HAS_VBO
     if(m_vertex_buffer[0])
@@ -824,7 +858,7 @@ void RenderGL::applyViewport()
                 2.0f / (float)viewport_w, 0.0f, 0.0f, 0.0f,
                 0.0f, -2.0f / (float)viewport_h, 0.0f, 0.0f,
                 0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
-                -float(viewport_w + off_x + off_x) / (viewport_w), float(viewport_h + off_y + off_y) / (viewport_h), 0.0f, 1.0f,
+                -float(viewport_w + off_x + off_x) / (viewport_w), float(viewport_h + off_y + off_y) / (viewport_h), -1.0f, 1.0f,
             };
 
             m_shader_read_viewport = {

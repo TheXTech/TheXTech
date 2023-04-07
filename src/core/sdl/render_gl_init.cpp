@@ -483,6 +483,7 @@ void RenderGL::destroyFramebuffer(BufferIndex_t buffer)
 
 bool RenderGL::initFramebuffers()
 {
+#ifdef RENDERGL_HAS_FBO
     if(!m_has_fbo)
         return true;
 
@@ -519,12 +520,52 @@ bool RenderGL::initFramebuffers()
     // bind texture unit 1 to the framebuffer read texture
     if(m_buffer_texture[BUFFER_FB_READ])
     {
-#ifdef RENDERGL_HAS_FBO
         glActiveTexture(TEXTURE_UNIT_FB_READ);
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_FB_READ]);
         glActiveTexture(TEXTURE_UNIT_IMAGE);
-#endif
     }
+
+#    ifdef RENDERGL_HAS_DEPTH_TEXTURE
+    // create texture for reading depth buffer
+    if(m_gl_majver >= 3 && m_game_depth_rb && m_use_shaders && m_buffer_texture[BUFFER_FB_READ])
+    {
+        glGenTextures(1, &m_depth_read_texture);
+
+        if(!m_depth_read_texture)
+        {
+            pLogWarning("Render GL: Failed to allocate depth read texture");
+            return true;
+        }
+
+        // allocate texture memory
+        glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
+            ScreenW, ScreenH,
+            0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glBindTexture(GL_TEXTURE_2D, 0);
+
+        GLenum err = glGetError();
+        if(err)
+        {
+            pLogWarning("Render GL: Failed to allocate depth read texture memory (GL error code %d)", (int)err);
+            glDeleteTextures(1, &m_depth_read_texture);
+            m_depth_read_texture = 0;
+            return true;
+        }
+
+        glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
+        glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
+        glActiveTexture(TEXTURE_UNIT_IMAGE);
+    }
+#    endif // #ifdef RENDERGL_HAS_DEPTH_TEXTURE
+
+#endif // #ifdef RENDERGL_HAS_FBO
 
     return true;
 }
