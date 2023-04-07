@@ -107,6 +107,12 @@ bool OpenWorld(std::string FilePath)
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);
 
+    if(!GameMenu)
+    {
+        TranslateEpisode tr;
+        tr.loadWorldTranslation(wld, FileNameFull);
+    }
+
     LoadCustomCompat();
     FindCustomPlayers();
     LoadCustomGFX(true);

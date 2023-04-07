@@ -512,6 +512,7 @@ set(THEXTECH_SRC
     src/main/screen_textentry.cpp
     src/main/game_strings.cpp
     src/main/translate.cpp
+    src/main/translate_episode.cpp
     src/main/menu_controls.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp

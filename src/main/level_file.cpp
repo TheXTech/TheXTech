@@ -41,6 +41,7 @@
 #include "trees.h"
 #include "npc_special_data.h"
 #include "graphics/gfx_update.h"
+#include "translate_episode.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -142,10 +143,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FreezeNPCs = false;
     CoinMode = false;
 
-    FileFormats::smbx64LevelPrepare(lvl);
-    FileFormats::smbx64LevelSortBlocks(lvl);
-    FileFormats::smbx64LevelSortBGOs(lvl);
-
     g_dirEpisode.setCurDir(lvl.meta.path);
     FileFormat = lvl.meta.RecentFormat;
     FileName = g_dirEpisode.resolveDirCase(lvl.meta.filename);
@@ -173,6 +170,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     }
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
+
+    if(!GameMenu)
+    {
+        TranslateEpisode tr;
+        tr.loadLevelTranslation(lvl, FileNameFull);
+    }
+
+    FileFormats::smbx64LevelPrepare(lvl);
+    FileFormats::smbx64LevelSortBlocks(lvl);
+    FileFormats::smbx64LevelSortBGOs(lvl);
 
     numBlock = 0;
     numBackground = 0;

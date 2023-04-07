@@ -26,6 +26,7 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 #include "core/msgbox.h"
+#include "main/translate_episode.h"
 
 #include "autocode_manager.h"
 #include "globals.h"
@@ -75,7 +76,8 @@ void AutocodeManager::Clear()
 bool AutocodeManager::LoadFiles()
 {
     bool ret = false;
-    std::string lunaLevel, lunaWorld;
+    std::string lunaLevel, lunaWorld,
+                keyLevel, keyWorld;
 
     g_dirEpisode.setCurDir(FileNamePath);
     g_dirCustom.setCurDir(FileNamePath + FileName);
@@ -84,13 +86,15 @@ bool AutocodeManager::LoadFiles()
 
     // Load autocode
     lunaLevel = g_dirCustom.resolveFileCaseExistsAbs(AUTOCODE_FNAME);
+    keyLevel = FileName + "/" + g_dirCustom.resolveFileCase(AUTOCODE_FNAME);
     if(!lunaLevel.empty())
-        ret |= ReadFile(lunaLevel);
+        ret |= ReadFile(lunaLevel, keyLevel);
 
     // Try to load world codes
     lunaWorld = g_dirEpisode.resolveFileCaseExistsAbs(WORLDCODE_FNAME);
+    keyWorld = g_dirEpisode.resolveFileCase(WORLDCODE_FNAME);
     if(!lunaWorld.empty())
-        ret |= ReadWorld(lunaWorld);
+        ret |= ReadWorld(lunaWorld, keyWorld);
 
     // Attempt to load global codes at the assets directory
     ret |= ReadGlobals(AppPathManager::assetsRoot() + GLOBALCODE_FNAME);
@@ -102,7 +106,7 @@ bool AutocodeManager::LoadFiles()
 }
 
 // READ FILE - Read the autocode file in the level folder
-bool AutocodeManager::ReadFile(const std::string &script_path)
+bool AutocodeManager::ReadFile(const std::string &script_path, const std::string& tr_key)
 {
     FILE *code_file = Files::utf8_fopen(script_path.c_str(), "rb");
     if(!code_file)
@@ -111,7 +115,7 @@ bool AutocodeManager::ReadFile(const std::string &script_path)
     pLogDebug("Loading %s level local autocode script...", script_path.c_str());
 
     m_Enabled = true;
-    Parse(code_file, false);
+    Parse(code_file, false, tr_key);
     std::fclose(code_file);
     showErrors(script_path);
 
@@ -119,7 +123,7 @@ bool AutocodeManager::ReadFile(const std::string &script_path)
 }
 
 // READ WORLD - Read the world autocode file in the world folder
-bool AutocodeManager::ReadWorld(const std::string &script_path)
+bool AutocodeManager::ReadWorld(const std::string &script_path, const std::string& tr_key)
 {
     FILE *code_file = Files::utf8_fopen(script_path.c_str(), "rb");
     if(!code_file)
@@ -128,7 +132,7 @@ bool AutocodeManager::ReadWorld(const std::string &script_path)
     pLogDebug("Loading %s episode wide autocode script...", script_path.c_str());
 
     m_Enabled = true;
-    Parse(code_file, false);
+    Parse(code_file, false, tr_key);
     std::fclose(code_file);
     showErrors(script_path);
 
@@ -155,7 +159,7 @@ bool AutocodeManager::ReadGlobals(const std::string &script_path)
 
 // PARSE    - Parse the autocode file and populate manager with the contained code/settings
 //            Doesn't delete codes already in the lists
-void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
+void AutocodeManager::Parse(FILE *code_file, bool add_to_globals, const std::string& tr_key)
 {
     char wbuf[2000];
     char wmidbuf[2000];
@@ -184,6 +188,9 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
     SDL_memset(wrefbuf, 0, 128);
 
     m_errors.clear();
+
+    TranslateEpisode tr;
+    tr.loadLunaScript(tr_key);
 
     std::fseek(code_file, 0, SEEK_SET);
 
@@ -308,6 +315,17 @@ void AutocodeManager::Parse(FILE *code_file, bool add_to_globals)
             // Register new autocode
 
             std::string ac_str = std::string(wstrbuf); // Get the string out of strbuf
+
+            switch(ac_type) // Translate string if possible
+            {
+            case AT_ShowText:
+            case AT_ShowVar:
+                tr.trScriptLine(ac_str, lineNum);
+                break;
+            default:
+                break;
+            }
+
             ac_str.erase(ac_str.find_last_not_of(" \n\r\t") + 1);
 
             std::string ref_str = std::string(wrefbuf); // Get var reference string if any
