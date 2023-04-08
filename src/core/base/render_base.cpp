@@ -260,8 +260,8 @@ StdPicture AbstractRender_t::LoadPicture(const std::string &path,
     FreeImage_FlipVertical(sourceImage);
     target.w = static_cast<int>(w);
     target.h = static_cast<int>(h);
-    target.frame_w = static_cast<int>(w);
-    target.frame_h = static_cast<int>(h);
+//    target.frame_w = static_cast<int>(w);
+//    target.frame_h = static_cast<int>(h);
 
     bool wLimitExcited = m_maxTextureWidth > 0 && w > Uint32(m_maxTextureWidth);
     bool hLimitExcited = m_maxTextureHeight > 0 && h > Uint32(m_maxTextureHeight);
@@ -359,8 +359,8 @@ StdPicture AbstractRender_t::LoadPicture_1x(const std::string &path,
 
         target.w *= 2;
         target.h *= 2;
-        target.frame_w *= 2;
-        target.frame_h *= 2;
+//        target.frame_w *= 2;
+//        target.frame_h *= 2;
     }
 
     return target;
@@ -568,8 +568,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     FreeImage_FlipVertical(sourceImage);
     target.w = static_cast<int>(w);
     target.h = static_cast<int>(h);
-    target.frame_w = static_cast<int>(w);
-    target.frame_h = static_cast<int>(h);
+//    target.frame_w = static_cast<int>(w);
+//    target.frame_h = static_cast<int>(h);
 
     bool shrink2x;
     switch(g_videoSettings.scaleDownTextures)

@@ -63,11 +63,11 @@ struct StdPicture
     //! Height of texture
     int h = 0;
 
-    // Frame width and height (for animation sprite textures)
+    // [UNUSED] Frame width and height (for animation sprite textures)
     //! Animation frame width
-    int frame_w = 0;
+    // int frame_w = 0;
     //1 Animation frame height
-    int frame_h = 0;
+    // int frame_h = 0;
 
     // These colors were used to auto-choose the fill color for the background
     //! Left-top pixel color
@@ -108,8 +108,8 @@ struct StdPicture
         l.clear();
         w = 0;
         h = 0;
-        frame_w = 0;
-        frame_h = 0;
+//        frame_w = 0;
+//        frame_h = 0;
     }
 };
 
