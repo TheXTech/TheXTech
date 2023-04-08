@@ -101,8 +101,6 @@ struct MainMenuContent
 
     std::string languageName;
 
-    std::string selectCharacter;
-
     std::string editorNewWorld;
     std::string editorErrorResolution;
     std::string editorErrorMissingResources;
@@ -134,23 +132,9 @@ struct MainMenuContent
     std::string optionsViewCredits;
 
     // ConnectScreen
-    std::string charSelTitle;
-    std::string reconnectTitle;
-    std::string dropAddTitle;
-    std::string wordPlayer;
-    std::string wordProfile;
-    std::string playerSelStartGame;
-    std::string phrasePressAButton;
-    std::string phraseTestControls;
-    std::string wordDisconnect;
-    std::string phraseHoldStartToReturn;
-    std::string wordBack;
-    std::string wordResume;
-    std::string wordWaiting;
-    std::string phraseForceResume;
-    std::string phraseDropOthers;
-    std::string phraseDropSelf;
-    std::string phraseChangeChar;
+    std::string connectCharSelTitle;
+    std::string connectStartGame;
+    std::string selectCharacter;
 
     // Controls menus
     std::string controlsTitle;
@@ -159,25 +143,37 @@ struct MainMenuContent
     std::string controlsDeviceTypes;
     std::string controlsInUse;
     std::string controlsNotInUse;
+
+    std::string controlsActivateProfile;
+    std::string controlsRenameProfile;
+    std::string controlsDeleteProfile;
+    std::string controlsPlayerControls;
+    std::string controlsCursorControls;
+    std::string controlsEditorControls;
+    std::string controlsHotkeys;
+
+    std::string controlsOptionRumble;
+    std::string controlsOptionGroundPoundButton;
+    std::string controlsOptionBatteryStatus;
+
     std::string wordProfiles;
     std::string wordButtons;
     std::string controlsReallyDeleteProfile;
     std::string controlsNewProfile;
-    std::string buttonUp;
-    std::string buttonDown;
-    std::string buttonLeft;
-    std::string buttonRight;
-    std::string buttonJump;
-    std::string buttonRun;
-    std::string buttonAltJump;
-    std::string buttonAltRun;
-    std::string buttonStart;
-    std::string buttonDrop;
 
     // General purpose
     std::string wordYes;
     std::string wordNo;
     std::string caseNone;
+    std::string wordOn;
+    std::string wordOff;
+    std::string wordShow;
+    std::string wordHide;
+    std::string wordPlayer;
+    std::string wordProfile;
+    std::string wordBack;
+    std::string wordResume;
+    std::string wordWaiting;
 };
 
 extern MainMenuContent g_mainMenu;

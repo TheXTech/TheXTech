@@ -39,8 +39,12 @@
 #include "main/outro_loop.h"
 #include "main/game_strings.h"
 
+#include "controls.h"
+
 #include "editor/editor_strings.h"
 #include "editor/editor_custom.h"
+
+#include "script/luna/luna.h"
 
 
 enum class PluralRules
@@ -165,8 +169,6 @@ XTechTranslate::XTechTranslate()
         {"menu.editor.errorMissingResources", &g_mainMenu.editorErrorMissingResources},
         {"menu.editor.promptNewWorldName", &g_mainMenu.editorPromptNewWorldName},
 
-        {"menu.character.charSelTitle",    &g_mainMenu.charSelTitle},
-
         {"menu.game.gameNoEpisodesToPlay", &g_mainMenu.gameNoEpisodesToPlay},
         {"menu.game.gameNoBattleLevels",   &g_mainMenu.gameNoBattleLevels},
         {"menu.game.gameBattleRandom",     &g_mainMenu.gameBattleRandom},
@@ -190,23 +192,10 @@ XTechTranslate::XTechTranslate()
         {"menu.options.optionsModeWindowed",     &g_mainMenu.optionsModeWindowed},
         {"menu.options.optionsViewCredits",      &g_mainMenu.optionsViewCredits},
 
-        {"menu.wordPlayer",                &g_mainMenu.wordPlayer},
-        {"menu.wordProfile",               &g_mainMenu.wordProfile},
-        {"menu.reconnectTitle",            &g_mainMenu.reconnectTitle},
-        {"menu.dropAddTitle",              &g_mainMenu.dropAddTitle},
-        {"menu.playerSelStartGame",        &g_mainMenu.playerSelStartGame},
-        {"menu.phrasePressAButton",        &g_mainMenu.phrasePressAButton},
-        {"menu.phraseTestControls",        &g_mainMenu.phraseTestControls},
-        {"menu.wordDisconnect",            &g_mainMenu.wordDisconnect},
-        {"menu.phraseHoldStartToReturn",   &g_mainMenu.phraseHoldStartToReturn},
-        {"menu.wordBack",                  &g_mainMenu.wordBack},
-        {"menu.wordResume",                &g_mainMenu.wordResume},
-        {"menu.wordWaiting",               &g_mainMenu.wordWaiting},
-        {"menu.phraseForceResume",         &g_mainMenu.phraseForceResume},
-        {"menu.phraseDropOthers",          &g_mainMenu.phraseDropOthers},
-        {"menu.phraseDropSelf",            &g_mainMenu.phraseDropSelf},
-        {"menu.phraseChangeChar",          &g_mainMenu.phraseChangeChar},
-        {"menu.selectCharacter",           &g_mainMenu.selectCharacter},
+        {"menu.character.charSelTitle",    &g_mainMenu.connectCharSelTitle},
+        {"menu.character.startGame",       &g_mainMenu.connectStartGame},
+        {"menu.character.selectCharacter", &g_mainMenu.selectCharacter},
+
 
         {"menu.controls.controlsTitle",     &g_mainMenu.controlsTitle},
         {"menu.controls.controlsConnected", &g_mainMenu.controlsConnected},
@@ -214,26 +203,76 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.controlsDeviceTypes", &g_mainMenu.controlsDeviceTypes},
         {"menu.controls.controlsInUse", &g_mainMenu.controlsInUse},
         {"menu.controls.controlsNotInUse", &g_mainMenu.controlsNotInUse},
+
+        {"menu.controls.profile.activateProfile", &g_mainMenu.controlsActivateProfile},
+        {"menu.controls.profile.renameProfile",   &g_mainMenu.controlsRenameProfile},
+        {"menu.controls.profile.deleteProfile",   &g_mainMenu.controlsDeleteProfile},
+        {"menu.controls.profile.playerControls",  &g_mainMenu.controlsPlayerControls},
+        {"menu.controls.profile.cursorControls",  &g_mainMenu.controlsCursorControls},
+        {"menu.controls.profile.editorControls",  &g_mainMenu.controlsEditorControls},
+        {"menu.controls.profile.hotkeys",         &g_mainMenu.controlsHotkeys},
+
+        {"menu.controls.options.rumble",            &g_mainMenu.controlsOptionRumble},
+        {"menu.controls.options.batteryStatus",     &g_mainMenu.controlsOptionBatteryStatus},
+        {"menu.controls.options.groundPoundButton", &g_mainMenu.controlsOptionGroundPoundButton},
+
         {"menu.controls.wordProfiles", &g_mainMenu.wordProfiles},
         {"menu.controls.wordButtons", &g_mainMenu.wordButtons},
 
-        {"menu.controls.buttons.up", &g_mainMenu.buttonUp},
-        {"menu.controls.buttons.down", &g_mainMenu.buttonDown},
-        {"menu.controls.buttons.left", &g_mainMenu.buttonLeft},
-        {"menu.controls.buttons.right", &g_mainMenu.buttonRight},
-        {"menu.controls.buttons.jump", &g_mainMenu.buttonJump},
-        {"menu.controls.buttons.run", &g_mainMenu.buttonRun},
-        {"menu.controls.buttons.altJump", &g_mainMenu.buttonAltJump},
-        {"menu.controls.buttons.altRun", &g_mainMenu.buttonAltRun},
-        {"menu.controls.buttons.start", &g_mainMenu.buttonStart},
-        {"menu.controls.buttons.drop", &g_mainMenu.buttonDrop},
+        {"menu.controls.buttons.up",      &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]},
+        {"menu.controls.buttons.down",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Down]},
+        {"menu.controls.buttons.left",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Left]},
+        {"menu.controls.buttons.right",   &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Right]},
+        {"menu.controls.buttons.jump",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Jump]},
+        {"menu.controls.buttons.run",     &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Run]},
+        {"menu.controls.buttons.altJump", &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::AltJump]},
+        {"menu.controls.buttons.altRun",  &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::AltRun]},
+        {"menu.controls.buttons.start",   &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Start]},
+        {"menu.controls.buttons.drop",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Drop]},
+
+        {"menu.controls.cursor.up",        &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorUp]},
+        {"menu.controls.cursor.down",      &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorDown]},
+        {"menu.controls.cursor.left",      &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorLeft]},
+        {"menu.controls.cursor.right",     &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorRight]},
+        {"menu.controls.cursor.primary",   &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Primary]},
+        {"menu.controls.cursor.secondary", &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Secondary]},
+        {"menu.controls.cursor.tertiary",  &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Tertiary]},
+
+        {"menu.controls.editor.scrollUp",      &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollUp]},
+        {"menu.controls.editor.scrollDown",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollDown]},
+        {"menu.controls.editor.scrollLeft",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollLeft]},
+        {"menu.controls.editor.scrollRight",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollRight]},
+        {"menu.controls.editor.fastScroll",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::FastScroll]},
+        {"menu.controls.editor.modeSelect",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ModeSelect]},
+        {"menu.controls.editor.modeErase",     &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ModeErase]},
+        {"menu.controls.editor.prevSection",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::PrevSection]},
+        {"menu.controls.editor.nextSection",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::NextSection]},
+        {"menu.controls.editor.switchScreens", &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::SwitchScreens]},
+        {"menu.controls.editor.testPlay",      &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::TestPlay]},
+
+        {"menu.controls.hotkeys.fullscreen",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::Fullscreen]},
+        {"menu.controls.hotkeys.screenshot",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::Screenshot]},
+        {"menu.controls.hotkeys.recordGif",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::RecordGif]},
+        {"menu.controls.hotkeys.debugInfo",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::DebugInfo]},
+        {"menu.controls.hotkeys.enterCheats", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::EnterCheats]},
+        {"menu.controls.hotkeys.toggleHUD",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::ToggleHUD]},
+        {"menu.controls.hotkeys.legacyPause", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::LegacyPause]},
 
         {"menu.controls.controlsReallyDeleteProfile", &g_mainMenu.controlsReallyDeleteProfile},
         {"menu.controls.controlsNewProfile", &g_mainMenu.controlsNewProfile},
 
-        {"menu.wordNo", &g_mainMenu.wordNo},
-        {"menu.wordYes", &g_mainMenu.wordYes},
-        {"menu.caseNone", &g_mainMenu.caseNone},
+        {"menu.wordNo",         &g_mainMenu.wordNo},
+        {"menu.wordYes",        &g_mainMenu.wordYes},
+        {"menu.caseNone",       &g_mainMenu.caseNone},
+        {"menu.wordOn",         &g_mainMenu.wordOn},
+        {"menu.wordOff",        &g_mainMenu.wordOff},
+        {"menu.wordShow",       &g_mainMenu.wordShow},
+        {"menu.wordHide",       &g_mainMenu.wordHide},
+        {"menu.wordPlayer",     &g_mainMenu.wordPlayer},
+        {"menu.wordProfile",    &g_mainMenu.wordProfile},
+        {"menu.wordBack",       &g_mainMenu.wordBack},
+        {"menu.wordResume",     &g_mainMenu.wordResume},
+        {"menu.wordWaiting",    &g_mainMenu.wordWaiting},
 
 
         {"outro.gameCredits",           &g_outroScreen.gameCredits},
@@ -266,6 +305,28 @@ XTechTranslate::XTechTranslate()
         {"game.pause.saveAndQuit",          &g_gameStrings.pauseItemSaveAndQuit},
         {"game.pause.quit",                 &g_gameStrings.pauseItemQuit},
 
+        {"game.connect.reconnectTitle",            &g_gameStrings.connectReconnectTitle},
+        {"game.connect.dropAddTitle",              &g_gameStrings.connectDropAddTitle},
+
+        {"game.connect.phrasePressAButton",        &g_gameStrings.connectPressAButton},
+
+        {"game.connect.phraseTestControls",        &g_gameStrings.connectTestControls},
+        {"game.connect.phraseHoldStart",           &g_gameStrings.connectHoldStart},
+        {"game.connect.wordDisconnect",            &g_gameStrings.connectDisconnect},
+
+        {"game.connect.phraseForceResume",         &g_gameStrings.connectForceResume},
+        {"game.connect.phraseDropPX",              &g_gameStrings.connectDropPX},
+
+        {"game.connect.phraseWaitingForInput",     &g_gameStrings.connectWaitingForInputDevice},
+        {"game.connect.splitPressSelect_1",        &g_gameStrings.connectPressSelectForControlsOptions_P1},
+        {"game.connect.splitPressSelect_2",        &g_gameStrings.connectPressSelectForControlsOptions_P2},
+
+        {"game.connect.phraseChangeChar",          &g_gameStrings.connectChangeChar},
+        {"game.connect.phraseSetControls",         &g_gameStrings.connectSetControls},
+        {"game.connect.phraseDropMe",              &g_gameStrings.connectDropMe},
+
+        {"game.connect.phraseStartToResume",       &g_gameStrings.connectPressStartToResume},
+        {"game.connect.phraseStartToForceRes",     &g_gameStrings.connectPressStartToForceResume},
 
 #ifdef THEXTECH_ENABLE_EDITOR
         {"editor.block.pickContents1",      &g_editorStrings.pickBlockContents1},
@@ -381,9 +442,11 @@ XTechTranslate::XTechTranslate()
     {
         {"languageName", &g_mainMenu.languageName},
 
-        {"objects.wordStarAccusativeSingular", &g_gameInfo.wordStarAccusativeSingular},
+        {"objects.wordStarAccusativeSingular",      &g_gameInfo.wordStarAccusativeSingular},
         {"objects.wordStarAccusativeDualOrCounter", &g_gameInfo.wordStarAccusativeDual_Cnt},
-        {"objects.wordStarAccusativePlural", &g_gameInfo.wordStarAccusativePlural},
+        {"objects.wordStarAccusativePlural",        &g_gameInfo.wordStarAccusativePlural},
+
+        {"objects.wordFails", &gDemoCounterTitleDefault}
     };
 
     for(int i = 1; i <= numCharacters; ++i)
@@ -407,6 +470,8 @@ void XTechTranslate::reset()
     // don't need to reset EditorCustom because we reloaded it in the initializer
     // it would be dangerous to reload it here because it would invalidate a lot of references
 #endif
+
+    Controls::InitStrings();
 
     s_CurrentPluralRules = PluralRules::OneIsSingular;
 }
@@ -559,6 +624,8 @@ bool XTechTranslate::translate()
         // assets translations
         if(!translateFile(langAssetsFile, m_assetsMap, "assets"))
             pLogWarning("Failed to apply the assets translation file %s", langAssetsFile.c_str());
+
+        gDemoCounterTitle = gDemoCounterTitleDefault;
     }
 
     if(langEngineFile.empty() && langAssetsFile.empty())

@@ -1,11 +1,4 @@
 {
-    "charcter": {
-        "name1": "Mario",
-        "name2": "Luigi",
-        "name3": "Peach",
-        "name4": "Toad",
-        "name5": "Link"
-    },
     "editor": {
         "block": {
             "pickContents1": "Pick block",
@@ -120,6 +113,24 @@
         "wordText": "Text"
     },
     "game": {
+        "connect": {
+            "dropAddTitle": "Drop/Add Players",
+            "phraseChangeChar": "Change Char",
+            "phraseDropMe": "Drop Me",
+            "phraseDropPX": "Drop P{0}",
+            "phraseForceResume": "Force Resume",
+            "phraseHoldStart": "Hold Start",
+            "phrasePressAButton": "Press A Button",
+            "phraseSetControls": "Set Controls",
+            "phraseStartToForceRes": "Press Start to Force Resume",
+            "phraseStartToResume": "Press Start to Resume",
+            "phraseTestControls": "Test Controls",
+            "phraseWaitingForInput": "Waiting for input device...",
+            "reconnectTitle": "Reconnect",
+            "splitPressSelect_1": "Press Select for",
+            "splitPressSelect_2": "Controls Options",
+            "wordDisconnect": "Disconnect"
+        },
         "controls": {
             "phrasePlayerConnected": "P{0} connected {1}, Profile: {2}",
             "phrasePlayerDisconnected": "P{0} disconnected"
@@ -148,7 +159,9 @@
         },
         "caseNone": "<None>",
         "character": {
-            "charSelTitle": "Character Select"
+            "charSelTitle": "Character Select",
+            "selectCharacter": "{0} game",
+            "startGame": "Start Game"
         },
         "controls": {
             "buttons": {
@@ -171,10 +184,54 @@
             "controlsNotInUse": "(Not In Use)",
             "controlsReallyDeleteProfile": "Really delete profile?",
             "controlsTitle": "Controls",
+            "cursor": {
+                "down": "Mouse Down",
+                "left": "Mouse Left",
+                "primary": "Primary",
+                "right": "Mouse Right",
+                "secondary": "Secondary",
+                "tertiary": "Tertiary",
+                "up": "Mouse Up"
+            },
+            "editor": {
+                "fastScroll": "Fast Scrl",
+                "modeErase": "Mode Erase",
+                "modeSelect": "Mode Select",
+                "nextSection": "Next Sect",
+                "prevSection": "Prev Sect",
+                "scrollDown": "Scrl Down",
+                "scrollLeft": "Scrl Left",
+                "scrollRight": "Scrl Right",
+                "scrollUp": "Scrl Up",
+                "switchScreens": "Show Pane",
+                "testPlay": "Test Play"
+            },
+            "hotkeys": {
+                "debugInfo": "Debug Info",
+                "enterCheats": "Enter Cheat",
+                "fullscreen": "Fullscreen",
+                "legacyPause": "Old Pause",
+                "recordGif": "Record GIF",
+                "screenshot": "Screenshot",
+                "toggleHUD": "Toggle HUD"
+            },
+            "options": {
+                "batteryStatus": "Battery Status",
+                "groundPoundButton": "Ground Pound Button",
+                "rumble": "Rumble"
+            },
+            "profile": {
+                "activateProfile": "Activate profile",
+                "cursorControls": "Cursor controls",
+                "deleteProfile": "Delete profile",
+                "editorControls": "Editor controls",
+                "hotkeys": "Hotkeys",
+                "playerControls": "Player controls",
+                "renameProfile": "Rename profile"
+            },
             "wordButtons": "Buttons",
             "wordProfiles": "Profiles"
         },
-        "dropAddTitle": "Drop/Add Players",
         "editor": {
             "errorMissingResources": "Sorry! You are missing {0}, required for the in-game editor.",
             "errorResolution": "Sorry! The in-game editor is not supported at your current resolution.",
@@ -210,29 +267,21 @@
             "optionsModeWindowed": "Windowed mode",
             "optionsViewCredits": "View credits"
         },
-        "phraseChangeChar": "Change Character",
-        "phraseDropOthers": "Drop Others",
-        "phraseDropSelf": "Drop Self",
-        "phraseForceResume": "Force Resume",
-        "phraseHoldStartToReturn": "Hold Start",
-        "phrasePressAButton": "Press A Button",
-        "phraseTestControls": "Test Controls",
-        "playerSelStartGame": "Start Game",
-        "reconnectTitle": "Reconnect",
-        "selectCharacter": "{0} game",
         "wordBack": "Back",
-        "wordDisconnect": "Disconnect",
+        "wordHide": "Hide",
         "wordNo": "No",
+        "wordOff": "Off",
+        "wordOn": "On",
         "wordPlayer": "Player",
         "wordProfile": "Profile",
         "wordResume": "Resume",
+        "wordShow": "Show",
         "wordWaiting": "Waiting",
         "wordYes": "Yes"
     },
     "outro": {
         "cppPortDevelopers": "C++ port developers:",
         "customSprites": "Custom Sprites:",
-        "d3dsPortBy": "3DS port By:",
         "engineCredits": "Engine credits:",
         "gameCredits": "Game credits:",
         "levelDesign": "Level Design:",
@@ -240,7 +289,6 @@
         "nameVitalyNovichkov": "Vitaly Novichkov",
         "originalBy": "Original VB6 code By:",
         "psVitaPortBy": "PS Vita Port By:",
-        "specialThanks": "Special Thanks:",
-        "wiiPortBy": "Wii port By:"
+        "specialThanks": "Special Thanks:"
     }
 }

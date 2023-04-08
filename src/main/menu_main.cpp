@@ -133,23 +133,14 @@ void initMainMenu()
     g_mainMenu.optionsModeWindowed = "Windowed mode";
     g_mainMenu.optionsViewCredits = "View credits";
 
-    g_mainMenu.charSelTitle = "Character Select";
-    g_mainMenu.reconnectTitle = "Reconnect";
-    g_mainMenu.dropAddTitle = "Drop/Add Players";
+    g_mainMenu.connectCharSelTitle = "Character Select";
+    g_mainMenu.connectStartGame = "Start Game";
+
     g_mainMenu.wordPlayer = "Player";
     g_mainMenu.wordProfile = "Profile";
-    g_mainMenu.playerSelStartGame = "Start Game";
-    g_mainMenu.phrasePressAButton = "Press A Button";
-    g_mainMenu.phraseTestControls = "Test Controls";
-    g_mainMenu.wordDisconnect = "Disconnect";
-    g_mainMenu.phraseHoldStartToReturn = "Hold Start";
     g_mainMenu.wordBack = "Back";
     g_mainMenu.wordResume = "Resume";
     g_mainMenu.wordWaiting = "Waiting";
-    g_mainMenu.phraseForceResume = "Force Resume";
-    g_mainMenu.phraseDropOthers = "Drop Others";
-    g_mainMenu.phraseDropSelf = "Drop Self";
-    g_mainMenu.phraseChangeChar = "Change Character";
 
     g_mainMenu.controlsTitle = "Controls";
     g_mainMenu.controlsConnected = "Connected:";
@@ -157,25 +148,32 @@ void initMainMenu()
     g_mainMenu.controlsDeviceTypes = "Device Types";
     g_mainMenu.controlsInUse = "(In Use)";
     g_mainMenu.controlsNotInUse = "(Not In Use)";
+
+    g_mainMenu.controlsActivateProfile = "Activate profile";
+    g_mainMenu.controlsRenameProfile = "Rename profile";
+    g_mainMenu.controlsDeleteProfile = "Delete profile";
+    g_mainMenu.controlsPlayerControls = "Player controls";
+    g_mainMenu.controlsCursorControls = "Cursor controls";
+    g_mainMenu.controlsEditorControls = "Editor controls";
+    g_mainMenu.controlsHotkeys = "Hotkeys";
+
+    g_mainMenu.controlsOptionRumble = "Rumble";
+    g_mainMenu.controlsOptionGroundPoundButton = "Ground Pound Button";
+    g_mainMenu.controlsOptionBatteryStatus = "Battery Status";
+
     g_mainMenu.wordProfiles = "Profiles";
-    g_mainMenu.wordButtons = "Buttons";
-    g_mainMenu.buttonUp = "Up";
-    g_mainMenu.buttonDown = "Down";
-    g_mainMenu.buttonLeft = "Left";
-    g_mainMenu.buttonRight = "Right";
-    g_mainMenu.buttonJump = "Jump";
-    g_mainMenu.buttonRun = "Run";
-    g_mainMenu.buttonAltJump = "Alt Jump";
-    g_mainMenu.buttonAltRun = "Alt Run";
-    g_mainMenu.buttonStart = "Start";
-    g_mainMenu.buttonDrop = "Drop";
+    g_mainMenu.wordButtons  = "Buttons";
 
     g_mainMenu.controlsReallyDeleteProfile = "Really delete profile?";
     g_mainMenu.controlsNewProfile = "<New Profile>";
 
-    g_mainMenu.wordNo = "No";
-    g_mainMenu.wordYes = "Yes";
+    g_mainMenu.wordNo   = "No";
+    g_mainMenu.wordYes  = "Yes";
     g_mainMenu.caseNone = "<None>";
+    g_mainMenu.wordOn   = "On";
+    g_mainMenu.wordOff  = "Off";
+    g_mainMenu.wordShow = "Show";
+    g_mainMenu.wordHide = "Hide";
 }
 
 

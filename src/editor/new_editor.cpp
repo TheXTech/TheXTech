@@ -40,11 +40,12 @@
 #include "config.h"
 #include "npc_id.h"
 #include "npc_special_data.h"
+#include "controls.h"
 
 #include "editor.h"
-#include "new_editor.h"
-#include "write_level.h"
-#include "write_world.h"
+#include "editor/new_editor.h"
+#include "editor/write_level.h"
+#include "editor/write_world.h"
 
 #include "editor/magic_block.h"
 #include "editor/editor_custom.h"
@@ -1200,40 +1201,43 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
         }
 
+        using Controls::PlayerControls::Buttons;
+
         if(UpdateButton(mode, 10 + 4, 80 + 4, GFX.EIcons, Events[m_current_event].Controls.Up, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Up = !Events[m_current_event].Controls.Up;
-        SuperPrintR(mode, g_mainMenu.buttonUp, 3, 54, 90);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Up), 3, 54, 90);
+
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 80 + 4, GFX.EIcons, Events[m_current_event].Controls.Down, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Down = !Events[m_current_event].Controls.Down;
-        SuperPrintR(mode, g_mainMenu.buttonDown, 3, e_ScreenW/2 + 54, 90);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Down), 3, e_ScreenW/2 + 54, 90);
 
         if(UpdateButton(mode, 10 + 4, 120 + 4, GFX.EIcons, Events[m_current_event].Controls.Left, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Left = !Events[m_current_event].Controls.Left;
-        SuperPrintR(mode, g_mainMenu.buttonLeft, 3, 54, 130);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Left), 3, 54, 130);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 120 + 4, GFX.EIcons, Events[m_current_event].Controls.Right, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Right = !Events[m_current_event].Controls.Right;
-        SuperPrintR(mode, g_mainMenu.buttonRight, 3, e_ScreenW/2 + 54, 130);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Right), 3, e_ScreenW/2 + 54, 130);
 
         if(UpdateButton(mode, 10 + 4, 160 + 4, GFX.EIcons, Events[m_current_event].Controls.Jump, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Jump = !Events[m_current_event].Controls.Jump;
-        SuperPrintR(mode, g_mainMenu.buttonJump, 3, 54, 170);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Jump), 3, 54, 170);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 160 + 4, GFX.EIcons, Events[m_current_event].Controls.Run, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Run = !Events[m_current_event].Controls.Run;
-        SuperPrintR(mode, g_mainMenu.buttonRun, 3, e_ScreenW/2 + 54, 170);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Run), 3, e_ScreenW/2 + 54, 170);
 
         if(UpdateButton(mode, 10 + 4, 200 + 4, GFX.EIcons, Events[m_current_event].Controls.AltJump, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.AltJump = !Events[m_current_event].Controls.AltJump;
-        SuperPrintR(mode, g_mainMenu.buttonAltJump, 3, 54, 210);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::AltJump), 3, 54, 210);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 200 + 4, GFX.EIcons, Events[m_current_event].Controls.AltRun, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.AltRun = !Events[m_current_event].Controls.AltRun;
-        SuperPrintR(mode, g_mainMenu.buttonAltRun, 3, e_ScreenW/2 + 54, 210);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::AltRun), 3, e_ScreenW/2 + 54, 210);
 
         if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, Events[m_current_event].Controls.Start, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Start = !Events[m_current_event].Controls.Start;
-        SuperPrintR(mode, g_mainMenu.buttonStart, 3, 54, 250);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Start), 3, 54, 250);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 240 + 4, GFX.EIcons, Events[m_current_event].Controls.Drop, 0, 7*32, 32, 32))
             Events[m_current_event].Controls.Drop = !Events[m_current_event].Controls.Drop;
-        SuperPrintR(mode, g_mainMenu.buttonDrop, 3, e_ScreenW/2 + 54, 250);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Drop), 3, e_ScreenW/2 + 54, 250);
         return;
     }
 
@@ -1875,7 +1879,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
 
     if(m_special_subpage >= this->num_test_players && m_special_subpage != 1)
     {
-        SuperPrintR(mode, "ENABLED", 3, e_ScreenW / 2 + 54, 194);
+        SuperPrintR(mode, g_editorStrings.wordEnabled, 3, e_ScreenW / 2 + 54, 194);
 
         if(UpdateCheckBox(mode, e_ScreenW / 2 + 10 + 4, 180 + 4, m_special_subpage == this->num_test_players))
         {

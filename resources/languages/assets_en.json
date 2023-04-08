@@ -468,6 +468,7 @@
     },
     "languageName": "English",
     "objects": {
+        "wordFails": "FAILS",
         "wordStarAccusativeDualOrCounter": "",
         "wordStarAccusativePlural": "stars",
         "wordStarAccusativeSingular": "star"

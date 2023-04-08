@@ -14,9 +14,10 @@
 
 #include "main/game_info.h"
 
-#include "screen_connect.h"
-#include "menu_main.h"
-#include "speedrunner.h"
+#include "main/screen_connect.h"
+#include "main/menu_main.h"
+#include "main/game_strings.h"
+#include "main/speedrunner.h"
 
 int g_charSelect[maxLocalPlayers] = {0};
 
@@ -1055,7 +1056,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         if(render)
         {
             RenderControls(p+1, cX-38, pY+1.25*line, 76, 30);
-            SuperPrintCenter(g_mainMenu.phraseHoldStartToReturn, 3, cX, pY+3*line);
+            SuperPrintCenter(g_gameStrings.connectHoldStart, 3, cX, pY+3*line);
             int n_stars;
             int n_empty;
             if(s_playerState[p] == PlayerState::ConfirmProfile && s_menuItem[p] < 66*3)
@@ -1086,18 +1087,18 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         if(render && s_menuItem[p] >= 0)
             Render_PCursor(pX - 20, pY + (1+s_menuItem[p])*line, p, r, g, b);
 
-        ret |= Player_MenuItem_Mouse_Render(p, 0, "SET CONTROLS",
+        ret |= Player_MenuItem_Mouse_Render(p, 0, g_gameStrings.connectSetControls,
             pX, pY+(1)*line, mouse, render);
         i++;
         if(SwapCharAllowed())
         {
-            ret |= Player_MenuItem_Mouse_Render(p, i, "CHANGE CHAR",
+            ret |= Player_MenuItem_Mouse_Render(p, i, g_gameStrings.connectChangeChar,
                 pX, pY+(1+i)*line, mouse, render);
             i++;
         }
         if(numPlayers > s_minPlayers)
         {
-            ret |= Player_MenuItem_Mouse_Render(p, i, "DROP ME",
+            ret |= Player_MenuItem_Mouse_Render(p, i, g_gameStrings.connectDropMe,
                 pX, pY+(1+i)*line, mouse, render);
             i++;
         }
@@ -1108,7 +1109,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
     {
         if(CheckDone() && render)
         {
-            SuperPrint(g_mainMenu.playerSelStartGame, 3, pX, pY+2*line);
+            SuperPrint(g_mainMenu.connectStartGame, 3, pX, pY+2*line);
             Render_PCursor(pX - 20, pY + 2*line, p, r, g, b);
         }
         else
@@ -1129,14 +1130,13 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
                 {
                     // figure out which player would be dropped...
                     int x = GetMenuPlayer();
-                    std::string msg = "DROP PX";
-                    msg[6] = '1' + x;
+                    std::string msg = fmt::format_ne(g_gameStrings.connectDropPX, x);
                     ret |= Player_MenuItem_Mouse_Render(p, 0, msg,
                         pX, pY+(2)*line, mouse, render);
                 }
                 else
                 {
-                    ret |= Player_MenuItem_Mouse_Render(p, 0, "FORCE RESUME",
+                    ret |= Player_MenuItem_Mouse_Render(p, 0, g_gameStrings.connectForceResume,
                         pX, pY+(2)*line, mouse, render);
                 }
             }
@@ -1163,9 +1163,9 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
         else
             Player_MenuItem_Mouse_Render(p, 0, g_mainMenu.wordProfile,
                 pX, pY + 2*line, mouse, render);
-        Player_MenuItem_Mouse_Render(p, 1, g_mainMenu.phraseTestControls,
+        Player_MenuItem_Mouse_Render(p, 1, g_gameStrings.connectTestControls,
             pX, pY + 3*line, mouse, render);
-        Player_MenuItem_Mouse_Render(p, 2, "RECONNECT",
+        Player_MenuItem_Mouse_Render(p, 2, g_gameStrings.connectReconnectTitle,
             pX, pY + 4*line, mouse, render);
     }
 
@@ -1182,19 +1182,19 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
 
                 XRender::renderRect(ScreenW / 2 - 240, infobox_y, 480, 68, 0, 0, 0, 0.5);
 
-                SuperPrintScreenCenter("WAITING FOR INPUT DEVICE...", 3, infobox_y + 4, 0.8f, 0.8f, 0.8f, 0.8f);
-                SuperPrintScreenCenter("PRESS SELECT FOR", 3, infobox_y + 24, 0.8f, 0.8f, 0.8f, 0.8f);
-                SuperPrintScreenCenter("CONTROLS OPTIONS", 3, infobox_y + 44, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintScreenCenter(g_gameStrings.connectWaitingForInputDevice, 3, infobox_y + 4, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, 0.8f, 0.8f, 0.8f, 0.8f);
             }
             else if(BlockFlash < 45)
-                SuperPrintCenter(g_mainMenu.phrasePressAButton, 3, cX, pY+2*line);
+                SuperPrintCenter(g_gameStrings.connectPressAButton, 3, cX, pY+2*line);
         }
         return ret;
     }
 
     if(s_playerState[p] == PlayerState::SelectChar && s_context != Context::MainMenu && p < numPlayers)
     {
-        SuperPrint("CHANGE CHAR", 3, pX, pY+2*line, 0.8f, 0.8f, 0.8f, 0.8f);
+        SuperPrint(g_gameStrings.connectChangeChar, 3, pX, pY+2*line, 0.8f, 0.8f, 0.8f, 0.8f);
         return ret;
     }
 
@@ -1218,8 +1218,8 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
                 SuperPrintCenter(g_mainMenu.wordProfile, 3, cX, pY + 2*line);
         }
 
-        SuperPrintCenter("PRESS SELECT FOR", 3, cX, pY + 3*line, 0.8f, 0.8f, 0.8f, 0.8f);
-        SuperPrintCenter("CONTROLS OPTIONS", 3, cX, pY + 4*line, 0.8f, 0.8f, 0.8f, 0.8f);
+        SuperPrintCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, cX, pY + 3*line, 0.8f, 0.8f, 0.8f, 0.8f);
+        SuperPrintCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, cX, pY + 4*line, 0.8f, 0.8f, 0.8f, 0.8f);
     }
     // show the squashed info for 1P mode
     else if(render)
@@ -1239,8 +1239,8 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
                 SuperPrintScreenCenter(Controls::g_InputMethods[p]->Name, 3, infobox_y + 4);
         }
 
-        SuperPrintScreenCenter("PRESS SELECT FOR", 3, infobox_y + 24, 0.8f, 0.8f, 0.8f, 0.8f);
-        SuperPrintScreenCenter("CONTROLS OPTIONS", 3, infobox_y + 44, 0.8f, 0.8f, 0.8f, 0.8f);
+        SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, 0.8f, 0.8f, 0.8f, 0.8f);
+        SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, 0.8f, 0.8f, 0.8f, 0.8f);
     }
 
     return ret;
@@ -1374,11 +1374,11 @@ int Mouse_Render(bool mouse, bool render)
             SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
         }
         else if(s_context == Context::MainMenu)
-            SuperPrintScreenCenter(g_mainMenu.charSelTitle, 3, sY);
+            SuperPrintScreenCenter(g_mainMenu.connectCharSelTitle, 3, sY);
         else if(s_context == Context::DropAdd)
-            SuperPrintScreenCenter(g_mainMenu.dropAddTitle, 3, sY);
+            SuperPrintScreenCenter(g_gameStrings.connectDropAddTitle, 3, sY);
         else if(s_context == Context::Reconnect)
-            SuperPrintScreenCenter(g_mainMenu.reconnectTitle, 3, sY);
+            SuperPrintScreenCenter(g_gameStrings.connectReconnectTitle, 3, sY);
     }
 
     if(s_context == Context::MainMenu && s_minPlayers == 1)
@@ -1394,9 +1394,9 @@ int Mouse_Render(bool mouse, bool render)
         if(CheckDone())
         {
             if(s_context == Context::Reconnect)
-                SuperPrintScreenCenter("PRESS START TO RESUME", 3, sY+line*8);
+                SuperPrintScreenCenter(g_gameStrings.connectPressStartToResume, 3, sY+line*8);
             else
-                SuperPrintScreenCenter("PRESS START TO RESUME", 3, sY+line*8, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintScreenCenter(g_gameStrings.connectPressStartToResume, 3, sY+line*8, 0.8f, 0.8f, 0.8f, 0.8f);
         }
         else
         {
@@ -1408,7 +1408,7 @@ int Mouse_Render(bool mouse, bool render)
                     break;
             }
             if(p != n)
-                SuperPrintScreenCenter("PRESS START TO FORCE RESUME", 3, sY+line*8, 0.8f, 0.8f, 0.8f, 0.8f);
+                SuperPrintScreenCenter(g_gameStrings.connectPressStartToForceResume, 3, sY+line*8, 0.8f, 0.8f, 0.8f, 0.8f);
         }
     }
 
@@ -1435,7 +1435,7 @@ int Mouse_Render(bool mouse, bool render)
                 {
                     XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, 0, 0, 0, 0.5);
                     if(BlockFlash < 45)
-                        SuperPrintScreenCenter(g_mainMenu.phrasePressAButton, 3, MenuY + 90);
+                        SuperPrintScreenCenter(g_gameStrings.connectPressAButton, 3, MenuY + 90);
                 }
             }
             else if(s_playerState[p] == PlayerState::Disconnected || s_playerState[p] == PlayerState::SelectChar)

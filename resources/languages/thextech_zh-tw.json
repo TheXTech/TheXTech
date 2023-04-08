@@ -1,0 +1,294 @@
+{
+    "editor": {
+        "block": {
+            "pickContents1": "選擇磚塊",
+            "pickContents2": "包含"
+        },
+        "events": {
+            "bounds": {
+                "changeAllSectionBoundsToCurrent": "改變所有場景範圍到當前設置嗎？",
+                "changeSectionBoundsToCurrent": "改變場景{0}的範圍到當前設置嗎？",
+                "shouldEvent": "要使事件{0}"
+            },
+            "controlsForEvent": "強制按下玩家按鍵",
+            "deletion": {
+                "cancel": "否：不刪除事件",
+                "confirm": "是：刪除事件",
+                "deletingEvent": "刪除事件{0}"
+            },
+            "header": "事件：",
+            "headerTriggerEvent": "觸發",
+            "itemNewEvent": "<新事件>",
+            "layers": {
+                "headerHide": "隱藏：",
+                "headerMove": "移動：",
+                "headerShow": "顯示：",
+                "headerToggle": "切換："
+            },
+            "letterActivate": "出：",
+            "letterDeath": "死：",
+            "letterLayerClear": "空：",
+            "letterTalk": "話：",
+            "promptEventName": "事件名稱：",
+            "promptEventText": "文字信息：",
+            "props": {
+                "autostart": "進入關卡時啓動",
+                "controls": "按鍵",
+                "endGame": "遊戲通關",
+                "sound": "音效"
+            },
+            "sections": {
+                "actionKeep": "當前",
+                "actionReset": "默認",
+                "actionSet": "指定",
+                "phraseAllSections": "所有場景",
+                "propBackground": "背景圖片",
+                "propBounds": "場景範圍",
+                "propMusic": "音樂"
+            },
+            "settingsForEvent": "事件設置"
+        },
+        "layers": {
+            "header": "圖層：",
+            "label": "圖層：",
+            "labelAbbrevAttLayer": "跟隨："
+        },
+        "letterDown": "下",
+        "letterLeft": "左",
+        "letterRight": "右",
+        "letterUp": "上",
+        "npc": {
+            "abbrevGen": "連續",
+            "ai": {
+                "LR": "左右",
+                "UD": "上下",
+                "aiIs": "AI：{0}",
+                "headerCustomAi": "自定義AI：",
+                "jump": "跳躍",
+                "leap": "飛躍",
+                "swim": "游泳",
+                "target": "目標",
+                "use1_0Ai": "使用1.0 AI？"
+            },
+            "gen": {
+                "direction": "方向",
+                "effectIs": "特效：{0}",
+                "effectShoot": "噴射",
+                "effectWarp": "水管",
+                "header": "生成器設置"
+            },
+            "inContainer": "包含",
+            "inertNice": "友好",
+            "stuckStop": "靜止",
+            "tooltipExpandSection": "擴展場景"
+        },
+        "pageBlankOfBlank": "第{0}/{1}頁",
+        "phraseAreYouSure": "您確定嗎？",
+        "phraseCountMore": "更多{0}",
+        "phraseDelayIsMs": "延遲：{0}毫秒",
+        "phraseRadiusIndex": "半徑{0}",
+        "phraseSectionIndex": "場景{0}",
+        "phraseTextOf": "{0}信息",
+        "warp": {
+            "transit": {
+                "name0": "無",
+                "name1": "滾動",
+                "name2": "淡入淡出",
+                "name3": "圓形",
+                "name4": "水平翻轉",
+                "name5": "垂直翻轉"
+            }
+        },
+        "wordCoins": "金幣",
+        "wordEnabled": "已啓用",
+        "wordEvent": {
+            "genitive": "事件",
+            "nominative": "事件"
+        },
+        "wordInstant": "立即",
+        "wordNPC": {
+            "genitive": "NPC",
+            "nominative": "NPC"
+        },
+        "wordText": "信息"
+    },
+    "game": {
+        "connect": {
+            "dropAddTitle": "加入/離開遊戲",
+            "phraseChangeChar": "更換角色",
+            "phraseDropMe": "離開遊戲",
+            "phraseDropPX": "離開玩家{0}的遊戲",
+            "phraseForceResume": "強制恢復",
+            "phraseHoldStart": "按住開始鍵",
+            "phrasePressAButton": "按下一個按鍵",
+            "phraseSetControls": "設置按鍵",
+            "phraseStartToForceRes": "按開始鍵強制恢復",
+            "phraseStartToResume": "按開始鍵恢復",
+            "phraseTestControls": "測試按鍵",
+            "phraseWaitingForInput": "等待玩家加入……",
+            "reconnectTitle": "重新連接",
+            "splitPressSelect_1": "按選擇鍵進入",
+            "splitPressSelect_2": "按鍵設置",
+            "wordDisconnect": "斷開"
+        },
+        "controls": {
+            "phrasePlayerConnected": "玩家{0}已連接{1}，配置：{2}",
+            "phrasePlayerDisconnected": "玩家{0}未連接"
+        },
+        "error": {
+            "openFileFailed": "錯誤：無法打開文件\"{0}\"：文件不存在或已損壞。",
+            "warpNeedStarCount": "你需要{0}{2}{1}才能進入此傳送點。"
+        },
+        "pause": {
+            "continue": "繼續",
+            "dropAddPlayers": "加入/離開遊戲",
+            "enterCode": "輸入代碼",
+            "quit": "退出",
+            "quitTesting": "結束測試",
+            "resetCheckpoints": "重置中間點",
+            "restartLevel": "重新開始",
+            "returnToEditor": "返回編輯器",
+            "saveAndContinue": "保存並繼續",
+            "saveAndQuit": "保存並退出"
+        }
+    },
+    "languageName": "繁體中文",
+    "menu": {
+        "battle": {
+            "errorNoLevels": "對戰關卡列表爲空，無法啓動對戰模式。"
+        },
+        "caseNone": "<無>",
+        "character": {
+            "charSelTitle": "選擇角色",
+            "selectCharacter": "{0}遊戲",
+            "startGame": "開始遊戲"
+        },
+        "controls": {
+            "buttons": {
+                "altJump": "第二跳躍",
+                "altRun": "第二奔跑",
+                "down": "下",
+                "drop": "取出道具",
+                "jump": "跳躍",
+                "left": "左",
+                "right": "右",
+                "run": "奔跑",
+                "start": "開始",
+                "up": "上"
+            },
+            "controlsConnected": "已連接：",
+            "controlsDeleteKey": "（按第二奔跑鍵清除）",
+            "controlsDeviceTypes": "設備類型",
+            "controlsInUse": "（已使用）",
+            "controlsNewProfile": "<新建配置>",
+            "controlsNotInUse": "（未使用）",
+            "controlsReallyDeleteProfile": "是否刪除配置？",
+            "controlsTitle": "控制",
+            "cursor": {
+                "down": "鼠標向下移動",
+                "left": "鼠標向左移動",
+                "primary": "鼠標左鍵",
+                "right": "鼠標向右移動",
+                "secondary": "鼠標右鍵",
+                "tertiary": "鼠標第三按鍵",
+                "up": "鼠標向上移動"
+            },
+            "editor": {
+                "fastScroll": "快速滾動",
+                "modeErase": "橡皮擦",
+                "modeSelect": "選擇模式",
+                "nextSection": "下一場景",
+                "prevSection": "上一場景t",
+                "scrollDown": "向下滾動",
+                "scrollLeft": "向左滾動",
+                "scrollRight": "向右滾動",
+                "scrollUp": "向上滾動",
+                "switchScreens": "顯示面板",
+                "testPlay": "測試關卡"
+            },
+            "hotkeys": {
+                "debugInfo": "調試信息",
+                "enterCheats": "輸入指令",
+                "fullscreen": "全屏",
+                "legacyPause": "舊版暫停菜單",
+                "recordGif": "GIF 動畫錄製",
+                "screenshot": "截圖",
+                "toggleHUD": "狀態欄切換"
+            },
+            "options": {
+                "batteryStatus": "電池狀態",
+                "groundPoundButton": "震地按鍵",
+                "rumble": "Rumble 控制器"
+            },
+            "profile": {
+                "activateProfile": "啓用配置",
+                "cursorControls": "鼠標控制",
+                "deleteProfile": "刪除配置",
+                "editorControls": "編輯器控制",
+                "hotkeys": "熱鍵",
+                "playerControls": "玩家控制",
+                "renameProfile": "重命名配置"
+            },
+            "wordButtons": "按鍵",
+            "wordProfiles": "配置"
+        },
+        "editor": {
+            "errorMissingResources": "抱歉，需要{0}，即編輯器圖標文件，才能啓動編輯器。",
+            "errorResolution": "抱歉，在當前設置的分辨率下，無法啓動編輯器。",
+            "newWorld": "<新地圖>",
+            "promptNewWorldName": "新地圖名稱"
+        },
+        "game": {
+            "gameBattleRandom": "隨機關卡",
+            "gameCopySave": "複製存檔",
+            "gameEraseSave": "刪除存檔",
+            "gameEraseSlot": "選擇要刪除的存檔",
+            "gameNoBattleLevels": "<對戰關卡列表爲空>",
+            "gameNoEpisodesToPlay": "<地圖列表爲空>",
+            "gameSlotContinue": "存檔 {0} ... {1}%",
+            "gameSlotNew": "存檔 {0} ... 新遊戲",
+            "gameSourceSlot": "選擇源存檔",
+            "gameTargetSlot": "選擇目標存檔",
+            "phraseScore": "得分：",
+            "phraseTime": "時間："
+        },
+        "loading": "加載中...",
+        "main": {
+            "main1PlayerGame": "單人遊戲",
+            "mainBattleGame": "對戰模式",
+            "mainEditor": "編輯器",
+            "mainExit": "退出",
+            "mainMultiplayerGame": "雙人遊戲",
+            "mainOptions": "設置",
+            "mainStartGame": "開始遊戲"
+        },
+        "options": {
+            "optionsModeFullScreen": "全屏模式",
+            "optionsModeWindowed": "窗口模式",
+            "optionsViewCredits": "查看製作團隊"
+        },
+        "wordBack": "返回",
+        "wordHide": "隱藏",
+        "wordNo": "否",
+        "wordOff": "關閉",
+        "wordOn": "開啓",
+        "wordPlayer": "玩家",
+        "wordProfile": "配置",
+        "wordResume": "恢復",
+        "wordShow": "",
+        "wordWaiting": "等待",
+        "wordYes": "是"
+    },
+    "outro": {
+        "cppPortDevelopers": "C++移植開發人員：",
+        "customSprites": "自定義素材：",
+        "engineCredits": "引擎製作人員名單：",
+        "gameCredits": "遊戲製作人員名單:",
+        "levelDesign": "關卡設計：",
+        "nameAndrewSpinks": "安德魯·斯賓克斯",
+        "nameVitalyNovichkov": "維塔利·諾維奇科夫",
+        "originalBy": "原始VB6代碼：",
+        "psVitaPortBy": "PS Vita移植：",
+        "specialThanks": "特別鳴謝："
+    }
+}
