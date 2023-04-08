@@ -943,8 +943,8 @@ void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *R
     target.l.lazyLoaded = false;
     target.w = width;
     target.h = height;
-    target.frame_w = width;
-    target.frame_h = height;
+//    target.frame_w = width;
+//    target.frame_h = height;
 }
 
 void loadTexture_1x(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
@@ -954,8 +954,8 @@ void loadTexture_1x(StdPicture &target, uint32_t width, uint32_t height, uint8_t
     target.l.lazyLoaded = false;
     target.w = width * 2;
     target.h = height * 2;
-    target.frame_w = width * 2;
-    target.frame_h = height * 2;
+//    target.frame_w = width * 2;
+//    target.frame_h = height * 2;
 }
 
 void deleteTexture(StdPicture& tx, bool lazyUnload)
@@ -976,8 +976,8 @@ void deleteTexture(StdPicture& tx, bool lazyUnload)
         tx.l.lazyLoaded = false;
         tx.w = 0;
         tx.h = 0;
-        tx.frame_w = 0;
-        tx.frame_h = 0;
+//        tx.frame_w = 0;
+//        tx.frame_h = 0;
     }
 }
 
