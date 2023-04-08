@@ -36,24 +36,52 @@
 #include "translate/tr_script.h"
 
 
-static std::string getTrFile(const std::string &episodePath = std::string())
+static std::string getTrFile(const std::string &subDir, const std::string &episodePath = std::string())
 {
     std::string langFile;
 
-    const auto &p = episodePath.empty() ? FileNamePath: episodePath;
+    const auto &p = episodePath.empty() ?
+                        FileNamePath :
+                        episodePath;
 
+    // Trying to find the dialect-specific translation
     if(!CurrentLangDialect.empty())
     {
-        langFile = p + fmt::format_ne("translation_{0}-{1}.json", CurrentLanguage.c_str(), CurrentLangDialect.c_str());
-        if(!Files::fileExists(langFile))
-            langFile.clear();
+        // Try to find the translation at the data sub-directory
+        if(!subDir.empty())
+        {
+            langFile = p + fmt::format_ne("{0}/translation_{1}-{2}.json", subDir, CurrentLanguage.c_str(), CurrentLangDialect.c_str());
+            if(!Files::fileExists(langFile))
+                langFile.clear();
+        }
+
+        // Now try at the episode root
+        if(langFile.empty())
+        {
+            langFile = p + fmt::format_ne("translation_{0}-{1}.json", CurrentLanguage.c_str(), CurrentLangDialect.c_str());
+            if(!Files::fileExists(langFile))
+                langFile.clear();
+        }
     }
 
+    // Trying the general translation
     if(langFile.empty())
     {
-        langFile = p + fmt::format_ne("translation_{0}.json", CurrentLanguage.c_str());
-        if(!Files::fileExists(langFile))
-            langFile.clear();
+        // Try to find the translation at the data sub-directory
+        if(!subDir.empty())
+        {
+            langFile = p + fmt::format_ne("{0}/translation_{1}.json", subDir, CurrentLanguage.c_str());
+            if(!Files::fileExists(langFile))
+                langFile.clear();
+        }
+
+        // Now try at the episode root
+        if(langFile.empty())
+        {
+            langFile = p + fmt::format_ne("translation_{0}.json", CurrentLanguage.c_str());
+            if(!Files::fileExists(langFile))
+                langFile.clear();
+        }
     }
 
     return langFile;
@@ -68,7 +96,7 @@ void TranslateEpisode::loadLevelTranslation(const std::string& key)
     if(CurrentLanguage.empty())
         return; // Language code is required!
 
-    std::string langFile = getTrFile();
+    std::string langFile = getTrFile(FileName);
 
     if(langFile.empty())
         return; // No translation found
@@ -91,7 +119,7 @@ void TranslateEpisode::loadWorldTranslation(const std::string& key)
     if(CurrentLanguage.empty())
         return; // Language code is required!
 
-    std::string langFile = getTrFile();
+    std::string langFile = getTrFile(FileNameWorld);
 
     if(langFile.empty())
         return; // No translation found
@@ -116,7 +144,7 @@ void TranslateEpisode::loadLunaScript(const std::string& key)
     if(CurrentLanguage.empty())
         return; // Language code is required!
 
-    std::string langFile = getTrFile();
+    std::string langFile = getTrFile(std::string());
 
     if(langFile.empty())
         return; // No translation found
@@ -142,7 +170,7 @@ bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
     if(CurrentLanguage.empty())
         return false; // Language code is required!
 
-    std::string langFile = getTrFile(episodePath);
+    std::string langFile = getTrFile(std::string(), episodePath);
 
     if(langFile.empty())
         return false; // No translation found
