@@ -25,6 +25,7 @@
 // forward declaration since some clients do not have SDL
 typedef union SDL_Event SDL_Event;
 
+#include <string>
 #include <array>
 #include <vector>
 
@@ -63,8 +64,6 @@ enum Buttons : size_t
 
 static constexpr size_t n_buttons = Buttons::MAX;
 
-
-// can be adapted for locale
 inline const char *GetButtonName_INI(size_t i)
 {
     switch(i)
@@ -94,8 +93,7 @@ inline const char *GetButtonName_INI(size_t i)
     }
 }
 
-// can be adapted for locale
-inline const char *GetButtonName_UI(size_t i)
+inline const char *GetButtonName_UI_Init(size_t i)
 {
     switch(i)
     {
@@ -122,6 +120,16 @@ inline const char *GetButtonName_UI(size_t i)
     default:
         return "NULL";
     }
+}
+
+extern std::array<std::string, Buttons::MAX> g_button_name_UI;
+
+inline const char *GetButtonName_UI(size_t i)
+{
+    if(i < Buttons::MAX)
+        return g_button_name_UI[i].c_str();
+
+    return "NULL";
 }
 
 // convenience function for accessing a button index
@@ -174,7 +182,6 @@ enum Buttons : size_t
 static constexpr size_t n_buttons = Buttons::MAX;
 
 
-// can be adapted for locale
 inline const char *GetButtonName_INI(size_t i)
 {
     switch(i)
@@ -198,8 +205,7 @@ inline const char *GetButtonName_INI(size_t i)
     }
 }
 
-// can be adapted for locale
-inline const char *GetButtonName_UI(size_t i)
+inline const char *GetButtonName_UI_Init(size_t i)
 {
     switch(i)
     {
@@ -220,6 +226,16 @@ inline const char *GetButtonName_UI(size_t i)
     default:
         return "NULL";
     }
+}
+
+extern std::array<std::string, Buttons::MAX> g_button_name_UI;
+
+inline const char *GetButtonName_UI(size_t i)
+{
+    if(i < Buttons::MAX)
+        return g_button_name_UI[i].c_str();
+
+    return "NULL";
 }
 
 // convenience function for accessing a button index
@@ -260,7 +276,6 @@ enum Buttons : size_t
 
 static constexpr size_t n_buttons = Buttons::MAX;
 
-// can be adapted for locale
 inline const char *GetButtonName_INI(size_t i)
 {
     switch(i)
@@ -292,8 +307,7 @@ inline const char *GetButtonName_INI(size_t i)
     }
 }
 
-// can be adapted for locale
-inline const char *GetButtonName_UI(size_t i)
+inline const char *GetButtonName_UI_Init(size_t i)
 {
     switch(i)
     {
@@ -322,6 +336,16 @@ inline const char *GetButtonName_UI(size_t i)
     default:
         return "NULL";
     }
+}
+
+extern std::array<std::string, Buttons::MAX> g_button_name_UI;
+
+inline const char *GetButtonName_UI(size_t i)
+{
+    if(i < Buttons::MAX)
+        return g_button_name_UI[i].c_str();
+
+    return "NULL";
 }
 
 // convenience function for accessing a button index
@@ -375,7 +399,6 @@ enum Buttons : size_t
 
 constexpr size_t n_buttons = Buttons::MAX;
 
-// can be adapted for locale
 inline const char *GetButtonName_INI(size_t i)
 {
     switch(i)
@@ -403,8 +426,7 @@ inline const char *GetButtonName_INI(size_t i)
     }
 }
 
-// can be adapted for locale
-inline const char *GetButtonName_UI(size_t i)
+inline const char *GetButtonName_UI_Init(size_t i)
 {
     switch(i)
     {
@@ -429,6 +451,16 @@ inline const char *GetButtonName_UI(size_t i)
     default:
         return "NULL";
     }
+}
+
+extern std::array<std::string, Buttons::MAX> g_button_name_UI;
+
+inline const char *GetButtonName_UI(size_t i)
+{
+    if(i < Buttons::MAX)
+        return g_button_name_UI[i].c_str();
+
+    return "NULL";
 }
 
 // function for activating a hotkey
@@ -714,6 +746,9 @@ protected:
     virtual void SaveConfig_Custom(IniProcessing *ctl);
     virtual void LoadConfig_Custom(IniProcessing *ctl);
 };
+
+// initialize the strings for localization (normally called by Init())
+void InitStrings();
 
 // allocate InputMethodTypes according to system configuration
 void Init();

@@ -86,6 +86,11 @@ HotkeysPressed_t g_hotkeysPressed;
 static HotkeysPressed_t s_hotkeysPressedOld;
 bool g_disallowHotkeys = false;
 
+std::array<std::string, PlayerControls::Buttons::MAX> PlayerControls::g_button_name_UI;
+std::array<std::string, CursorControls::Buttons::MAX> CursorControls::g_button_name_UI;
+std::array<std::string, EditorControls::Buttons::MAX> EditorControls::g_button_name_UI;
+std::array<std::string, Hotkeys::Buttons::MAX> Hotkeys::g_button_name_UI;
+
 void Hotkeys::Activate(size_t i, int player)
 {
     if(g_disallowHotkeys || g_pollingInput)
@@ -684,6 +689,22 @@ void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 || implementation for global functions                ||
 \*====================================================*/
 
+void InitStrings()
+{
+    // initialize the strings for localization
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+        PlayerControls::g_button_name_UI[i] = PlayerControls::GetButtonName_UI_Init(i);
+
+    for(size_t i = 0; i < CursorControls::n_buttons; i++)
+        CursorControls::g_button_name_UI[i] = CursorControls::GetButtonName_UI_Init(i);
+
+    for(size_t i = 0; i < EditorControls::n_buttons; i++)
+        EditorControls::g_button_name_UI[i] = EditorControls::GetButtonName_UI_Init(i);
+
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+        Hotkeys::g_button_name_UI[i] = Hotkeys::GetButtonName_UI_Init(i);
+}
+
 /*====================================================*\
 ||                                                    ||
 ||         ADD EVERY NEW INPUT METHOD HERE,           ||
@@ -712,6 +733,8 @@ void Init()
 #ifdef TOUCHSCREEN_H
     g_InputMethodTypes.push_back(new InputMethodType_TouchScreen);
 #endif
+
+    InitStrings();
 
     // not yet ready for prime time
     // g_InputMethodTypes.push_back(new InputMethodType_Duplicate);

@@ -184,6 +184,37 @@
             "controlsNotInUse": "(Не используется)",
             "controlsReallyDeleteProfile": "Действительно удалить профиль?",
             "controlsTitle": "Управление",
+            "cursor": {
+                "down": "",
+                "left": "",
+                "primary": "",
+                "right": "",
+                "secondary": "",
+                "tertiary": "",
+                "up": ""
+            },
+            "editor": {
+                "fastScroll": "",
+                "modeErase": "",
+                "modeSelect": "",
+                "nextSection": "",
+                "prevSection": "",
+                "scrollDown": "",
+                "scrollLeft": "",
+                "scrollRight": "",
+                "scrollUp": "",
+                "switchScreens": "",
+                "testPlay": ""
+            },
+            "hotkeys": {
+                "debugInfo": "",
+                "enterCheats": "",
+                "fullscreen": "",
+                "legacyPause": "",
+                "recordGif": "",
+                "screenshot": "",
+                "toggleHUD": ""
+            },
             "options": {
                 "batteryStatus": "",
                 "groundPoundButton": "",

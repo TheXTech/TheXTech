@@ -39,6 +39,8 @@
 #include "main/outro_loop.h"
 #include "main/game_strings.h"
 
+#include "controls.h"
+
 #include "editor/editor_strings.h"
 #include "editor/editor_custom.h"
 
@@ -217,16 +219,44 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.wordProfiles", &g_mainMenu.wordProfiles},
         {"menu.controls.wordButtons", &g_mainMenu.wordButtons},
 
-        {"menu.controls.buttons.up", &g_mainMenu.buttonUp},
-        {"menu.controls.buttons.down", &g_mainMenu.buttonDown},
-        {"menu.controls.buttons.left", &g_mainMenu.buttonLeft},
-        {"menu.controls.buttons.right", &g_mainMenu.buttonRight},
-        {"menu.controls.buttons.jump", &g_mainMenu.buttonJump},
-        {"menu.controls.buttons.run", &g_mainMenu.buttonRun},
-        {"menu.controls.buttons.altJump", &g_mainMenu.buttonAltJump},
-        {"menu.controls.buttons.altRun", &g_mainMenu.buttonAltRun},
-        {"menu.controls.buttons.start", &g_mainMenu.buttonStart},
-        {"menu.controls.buttons.drop", &g_mainMenu.buttonDrop},
+        {"menu.controls.buttons.up",      &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]},
+        {"menu.controls.buttons.down",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Down]},
+        {"menu.controls.buttons.left",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Left]},
+        {"menu.controls.buttons.right",   &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Right]},
+        {"menu.controls.buttons.jump",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Jump]},
+        {"menu.controls.buttons.run",     &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Run]},
+        {"menu.controls.buttons.altJump", &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::AltJump]},
+        {"menu.controls.buttons.altRun",  &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::AltRun]},
+        {"menu.controls.buttons.start",   &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Start]},
+        {"menu.controls.buttons.drop",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Drop]},
+
+        {"menu.controls.cursor.up",        &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorUp]},
+        {"menu.controls.cursor.down",      &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorDown]},
+        {"menu.controls.cursor.left",      &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorLeft]},
+        {"menu.controls.cursor.right",     &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::CursorRight]},
+        {"menu.controls.cursor.primary",   &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Primary]},
+        {"menu.controls.cursor.secondary", &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Secondary]},
+        {"menu.controls.cursor.tertiary",  &Controls::CursorControls::g_button_name_UI[Controls::CursorControls::Tertiary]},
+
+        {"menu.controls.editor.scrollUp",      &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollUp]},
+        {"menu.controls.editor.scrollDown",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollDown]},
+        {"menu.controls.editor.scrollLeft",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollLeft]},
+        {"menu.controls.editor.scrollRight",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ScrollRight]},
+        {"menu.controls.editor.fastScroll",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::FastScroll]},
+        {"menu.controls.editor.modeSelect",    &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ModeSelect]},
+        {"menu.controls.editor.modeErase",     &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::ModeErase]},
+        {"menu.controls.editor.prevSection",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::PrevSection]},
+        {"menu.controls.editor.nextSection",   &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::NextSection]},
+        {"menu.controls.editor.switchScreens", &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::SwitchScreens]},
+        {"menu.controls.editor.testPlay",      &Controls::EditorControls::g_button_name_UI[Controls::EditorControls::TestPlay]},
+
+        {"menu.controls.hotkeys.fullscreen",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::Fullscreen]},
+        {"menu.controls.hotkeys.screenshot",  &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::Screenshot]},
+        {"menu.controls.hotkeys.recordGif",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::RecordGif]},
+        {"menu.controls.hotkeys.debugInfo",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::DebugInfo]},
+        {"menu.controls.hotkeys.enterCheats", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::EnterCheats]},
+        {"menu.controls.hotkeys.toggleHUD",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::ToggleHUD]},
+        {"menu.controls.hotkeys.legacyPause", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::LegacyPause]},
 
         {"menu.controls.controlsReallyDeleteProfile", &g_mainMenu.controlsReallyDeleteProfile},
         {"menu.controls.controlsNewProfile", &g_mainMenu.controlsNewProfile},
@@ -440,6 +470,8 @@ void XTechTranslate::reset()
     // don't need to reset EditorCustom because we reloaded it in the initializer
     // it would be dangerous to reload it here because it would invalidate a lot of references
 #endif
+
+    Controls::InitStrings();
 
     s_CurrentPluralRules = PluralRules::OneIsSingular;
 }

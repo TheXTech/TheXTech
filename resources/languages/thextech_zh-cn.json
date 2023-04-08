@@ -184,6 +184,37 @@
             "controlsNotInUse": "（未使用）",
             "controlsReallyDeleteProfile": "是否删除配置？",
             "controlsTitle": "控制",
+            "cursor": {
+                "down": "",
+                "left": "",
+                "primary": "",
+                "right": "",
+                "secondary": "",
+                "tertiary": "",
+                "up": ""
+            },
+            "editor": {
+                "fastScroll": "",
+                "modeErase": "",
+                "modeSelect": "",
+                "nextSection": "",
+                "prevSection": "",
+                "scrollDown": "",
+                "scrollLeft": "",
+                "scrollRight": "",
+                "scrollUp": "",
+                "switchScreens": "",
+                "testPlay": ""
+            },
+            "hotkeys": {
+                "debugInfo": "",
+                "enterCheats": "",
+                "fullscreen": "",
+                "legacyPause": "",
+                "recordGif": "",
+                "screenshot": "",
+                "toggleHUD": ""
+            },
             "options": {
                 "batteryStatus": "",
                 "groundPoundButton": "",

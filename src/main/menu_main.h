@@ -160,16 +160,6 @@ struct MainMenuContent
     std::string wordButtons;
     std::string controlsReallyDeleteProfile;
     std::string controlsNewProfile;
-    std::string buttonUp;
-    std::string buttonDown;
-    std::string buttonLeft;
-    std::string buttonRight;
-    std::string buttonJump;
-    std::string buttonRun;
-    std::string buttonAltJump;
-    std::string buttonAltRun;
-    std::string buttonStart;
-    std::string buttonDrop;
 
     // General purpose
     std::string wordYes;

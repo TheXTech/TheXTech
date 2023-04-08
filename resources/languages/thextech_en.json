@@ -184,6 +184,37 @@
             "controlsNotInUse": "(Not In Use)",
             "controlsReallyDeleteProfile": "Really delete profile?",
             "controlsTitle": "Controls",
+            "cursor": {
+                "down": "Mouse Down",
+                "left": "Mouse Left",
+                "primary": "Primary",
+                "right": "Mouse Right",
+                "secondary": "Secondary",
+                "tertiary": "Tertiary",
+                "up": "Mouse Up"
+            },
+            "editor": {
+                "fastScroll": "Fast Scrl",
+                "modeErase": "Mode Erase",
+                "modeSelect": "Mode Select",
+                "nextSection": "Next Sect",
+                "prevSection": "Prev Sect",
+                "scrollDown": "Scrl Down",
+                "scrollLeft": "Scrl Left",
+                "scrollRight": "Scrl Right",
+                "scrollUp": "Scrl Up",
+                "switchScreens": "Show Pane",
+                "testPlay": "Test Play"
+            },
+            "hotkeys": {
+                "debugInfo": "Debug Info",
+                "enterCheats": "Enter Cheat",
+                "fullscreen": "Fullscreen",
+                "legacyPause": "Old Pause",
+                "recordGif": "Record GIF",
+                "screenshot": "Screenshot",
+                "toggleHUD": "Toggle HUD"
+            },
             "options": {
                 "batteryStatus": "Battery Status",
                 "groundPoundButton": "Ground Pound Button",
