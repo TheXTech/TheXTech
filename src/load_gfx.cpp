@@ -119,7 +119,7 @@ static void cgfx_initLangDir()
     }
 }
 
-SDL_FORCE_INLINE void s_resolveFile(const char **extList,
+SDL_FORCE_INLINE bool s_resolveFile(const char **extList,
                                     const char *extGif,
                                     const std::string &fName,
                                     std::string &imgToUse,
@@ -136,7 +136,7 @@ SDL_FORCE_INLINE void s_resolveFile(const char **extList,
             imgToUse = g_dirCustom.resolveFileCaseExistsAbs(s_langSubDir + fName + ext);
             isGif = (ext == extGif);
             if(!imgToUse.empty())
-                return; // Found that we looked for
+                return true; // Found that we looked for
         }
     }
 
@@ -146,7 +146,7 @@ SDL_FORCE_INLINE void s_resolveFile(const char **extList,
         imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ext);
         isGif = (ext == extGif);
         if(!imgToUse.empty())
-            return; // Found that we looked for
+            return true; // Found that we looked for
     }
 
     if(s_useLangDir)
@@ -157,7 +157,7 @@ SDL_FORCE_INLINE void s_resolveFile(const char **extList,
             imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(s_langSubDir + fName + ext);
             isGif = (ext == extGif);
             if(!imgToUse.empty())
-                return; // Found that we looked for
+                return true; // Found that we looked for
         }
     }
 
@@ -167,8 +167,10 @@ SDL_FORCE_INLINE void s_resolveFile(const char **extList,
         imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ext);
         isGif = (ext == extGif);
         if(!imgToUse.empty())
-            return; // Found that we looked for
+            return true; // Found that we looked for
     }
+
+    return false; // Nothing was found
 }
 
 /*!
@@ -214,79 +216,13 @@ static void loadCGFX(const std::string &origPath,
     const char *extGif = nullptr;
 #else
     // look for the image file: png in custom, gif in custom, png in episode, gif in episode
-    // s_useLangDir
     const char *extsList[] = {".png", ".gif", nullptr};
     const char *extGif = extsList[1];
 #endif
 
     std::string imgToUse;
-    s_resolveFile(extsList, extGif, fName, imgToUse, isGif);
 
-#if 0
-
-#if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
-    // look for the image file: ext in custom, png in custom, gif in custom, ext in episode, png in episode, gif in episode
-    std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
-
-    if(imgToUse.empty())
-    {
-        imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".png");
-    }
-
-    if(imgToUse.empty())
-    {
-        imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".gif");
-        isGif = true;
-    }
-
-    if(imgToUse.empty())
-    {
-        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
-        isGif = false;
-    }
-
-    if(imgToUse.empty())
-    {
-        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".png");
-    }
-
-    if(imgToUse.empty())
-    {
-        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".gif");
-        isGif = true;
-    }
-#elif defined(X_IMG_EXT)
-    // look for the image file: ext in custom, ext in episode
-    std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
-    if(imgToUse.empty())
-    {
-        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
-        isGif = false;
-    }
-#else
-    std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".png");
-
-    if(imgToUse.empty())
-    {
-        imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".gif");
-        isGif = true;
-    }
-
-    if(imgToUse.empty())
-    {
-        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".png");
-        isGif = false;
-    }
-
-    if(imgToUse.empty())
-    {
-        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".gif");
-        isGif = true;
-    }
-#endif
-#endif // if 0
-
-    if(imgToUse.empty())
+    if(!s_resolveFile(extsList, extGif, fName, imgToUse, isGif))
         return; // Nothing to do
 
     if(isGif && !skipMask)
