@@ -184,6 +184,15 @@
             "controlsNotInUse": "(Не используется)",
             "controlsReallyDeleteProfile": "Действительно удалить профиль?",
             "controlsTitle": "Управление",
+            "profile": {
+                "activateProfile": "",
+                "cursorControls": "",
+                "deleteProfile": "",
+                "editorControls": "",
+                "hotkeys": "",
+                "playerControls": "",
+                "renameProfile": ""
+            },
             "wordButtons": "Кнопки",
             "wordProfiles": "Профили"
         },

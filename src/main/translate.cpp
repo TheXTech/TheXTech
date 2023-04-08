@@ -201,6 +201,15 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.controlsDeviceTypes", &g_mainMenu.controlsDeviceTypes},
         {"menu.controls.controlsInUse", &g_mainMenu.controlsInUse},
         {"menu.controls.controlsNotInUse", &g_mainMenu.controlsNotInUse},
+
+        {"menu.controls.profile.activateProfile", &g_mainMenu.controlsActivateProfile},
+        {"menu.controls.profile.renameProfile",   &g_mainMenu.controlsRenameProfile},
+        {"menu.controls.profile.deleteProfile",   &g_mainMenu.controlsDeleteProfile},
+        {"menu.controls.profile.playerControls",  &g_mainMenu.controlsPlayerControls},
+        {"menu.controls.profile.cursorControls",  &g_mainMenu.controlsCursorControls},
+        {"menu.controls.profile.editorControls",  &g_mainMenu.controlsEditorControls},
+        {"menu.controls.profile.hotkeys",         &g_mainMenu.controlsHotkeys},
+
         {"menu.controls.wordProfiles", &g_mainMenu.wordProfiles},
         {"menu.controls.wordButtons", &g_mainMenu.wordButtons},
 

@@ -184,6 +184,15 @@
             "controlsNotInUse": "(Not In Use)",
             "controlsReallyDeleteProfile": "Really delete profile?",
             "controlsTitle": "Controls",
+            "profile": {
+                "activateProfile": "Activate profile",
+                "cursorControls": "Cursor controls",
+                "deleteProfile": "Delete profile",
+                "editorControls": "Editor controls",
+                "hotkeys": "Hotkeys",
+                "playerControls": "Player controls",
+                "renameProfile": "Rename profile"
+            },
             "wordButtons": "Buttons",
             "wordProfiles": "Profiles"
         },

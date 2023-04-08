@@ -106,7 +106,7 @@ int menuControls_Do()
         {
             PlaySoundMenu(SFX_Do);
             MenuCursorCanMove = false;
-            profile->Name = TextEntryScreen::Run("Rename profile:", profile->Name);
+            profile->Name = TextEntryScreen::Run(g_mainMenu.controlsRenameProfile, profile->Name);
             MenuCursorCanMove = false;
             return 0;
         }
@@ -782,19 +782,19 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         {
             const char* name;
             if(i == 0) // Activate profile
-                name = "Activate profile";
+                name = g_mainMenu.controlsActivateProfile.c_str();
             else if(i == 1) // Rename profile
-                name = "Rename profile";
+                name = g_mainMenu.controlsRenameProfile.c_str();
             else if(i == 2) // Delete profile
-                name = "Delete profile";
+                name = g_mainMenu.controlsDeleteProfile.c_str();
             else if(i == 3) // Player
-                name = "Player controls";
+                name = g_mainMenu.controlsPlayerControls.c_str();
             else if(i == 4) // Cursor
-                name = "Cursor controls";
+                name = g_mainMenu.controlsCursorControls.c_str();
             else if(i == 5) // Editor
-                name = "Editor controls";
+                name = g_mainMenu.controlsEditorControls.c_str();
             else if(i == 6) // Hotkeys
-                name = "Hotkeys";
+                name = g_mainMenu.controlsHotkeys.c_str();
             else
                 name = "";
 
@@ -805,7 +805,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 s = 1;
 
             if(render && i == 3 && i+s-2 >= scroll_start && i+s-2 < scroll_end)
-                SuperPrint("Controls", 3, sX+16, start_y+(i+s - 1 - scroll_start)*line);
+                SuperPrint(g_mainMenu.controlsTitle, 3, sX+16, start_y+(i+s - 1 - scroll_start)*line);
 
             if(i+s-1 < scroll_start || i+s-1 >= scroll_end)
                 continue;

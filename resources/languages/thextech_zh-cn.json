@@ -184,6 +184,15 @@
             "controlsNotInUse": "（未使用）",
             "controlsReallyDeleteProfile": "是否删除配置？",
             "controlsTitle": "控制",
+            "profile": {
+                "activateProfile": "",
+                "cursorControls": "",
+                "deleteProfile": "",
+                "editorControls": "",
+                "hotkeys": "",
+                "playerControls": "",
+                "renameProfile": ""
+            },
             "wordButtons": "按键",
             "wordProfiles": "配置"
         },

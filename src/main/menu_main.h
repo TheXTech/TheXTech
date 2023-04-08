@@ -143,6 +143,15 @@ struct MainMenuContent
     std::string controlsDeviceTypes;
     std::string controlsInUse;
     std::string controlsNotInUse;
+
+    std::string controlsActivateProfile;
+    std::string controlsRenameProfile;
+    std::string controlsDeleteProfile;
+    std::string controlsPlayerControls;
+    std::string controlsCursorControls;
+    std::string controlsEditorControls;
+    std::string controlsHotkeys;
+
     std::string wordProfiles;
     std::string wordButtons;
     std::string controlsReallyDeleteProfile;
