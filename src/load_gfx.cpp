@@ -93,6 +93,84 @@ static std::string getGfxDir()
     return AppPath + "graphics/";
 }
 
+static bool s_useLangDir = false;
+static std::string s_langSubDir;
+
+static void cgfx_initLangDir()
+{
+    std::string langDir;
+    s_useLangDir = false;
+    s_langSubDir.clear();
+
+    if(!CurrentLanguage.empty())
+    {
+        if(!CurrentLangDialect.empty())
+        {
+            langDir = CurrentLanguage + "-" + CurrentLangDialect;
+            if(DirMan::exists(g_dirCustom.getCurDir() + langDir))
+                s_langSubDir = langDir + "/";
+            else if(DirMan::exists(g_dirCustom.getCurDir() + CurrentLanguage))
+                s_langSubDir = CurrentLanguage + "/";
+        }
+        else if(DirMan::exists(g_dirCustom.getCurDir() + CurrentLanguage))
+            s_langSubDir = CurrentLanguage + "/";
+
+        s_useLangDir = !s_langSubDir.empty();
+    }
+}
+
+SDL_FORCE_INLINE void s_resolveFile(const char **extList,
+                                    const char *extGif,
+                                    const std::string &fName,
+                                    std::string &imgToUse,
+                                    bool &isGif)
+{
+    const char **ext_p;
+    const char *ext;
+
+    if(s_useLangDir)
+    {
+        ext_p = extList;
+        while((ext = *ext_p++) != nullptr)
+        {
+            imgToUse = g_dirCustom.resolveFileCaseExistsAbs(s_langSubDir + fName + ext);
+            isGif = (ext == extGif);
+            if(!imgToUse.empty())
+                return; // Found that we looked for
+        }
+    }
+
+    ext_p = extList;
+    while((ext = *ext_p++) != nullptr)
+    {
+        imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ext);
+        isGif = (ext == extGif);
+        if(!imgToUse.empty())
+            return; // Found that we looked for
+    }
+
+    if(s_useLangDir)
+    {
+        ext_p = extList;
+        while((ext = *ext_p++) != nullptr)
+        {
+            imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(s_langSubDir + fName + ext);
+            isGif = (ext == extGif);
+            if(!imgToUse.empty())
+                return; // Found that we looked for
+        }
+    }
+
+    ext_p = extList;
+    while((ext = *ext_p++) != nullptr)
+    {
+        imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ext);
+        isGif = (ext == extGif);
+        if(!imgToUse.empty())
+            return; // Found that we looked for
+    }
+}
+
 /*!
  * \brief Load the custom GFX sprite
  * \param origPath Path to original texture
@@ -128,25 +206,50 @@ static void loadCGFX(const std::string &origPath,
 
 #if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
     // look for the image file: ext in custom, png in custom, gif in custom, ext in episode, png in episode, gif in episode
+    const char *extsList[] = {X_IMG_EXT, ".png", ".gif", nullptr};
+    const char *extGif = extsList[2];
+#elif defined(X_IMG_EXT)
+    // look for the image file: ext in custom, ext in episode
+    const char *extsList[] = {X_IMG_EXT, nullptr};
+    const char *extGif = nullptr;
+#else
+    // look for the image file: png in custom, gif in custom, png in episode, gif in episode
+    // s_useLangDir
+    const char *extsList[] = {".png", ".gif", nullptr};
+    const char *extGif = extsList[1];
+#endif
+
+    std::string imgToUse;
+    s_resolveFile(extsList, extGif, fName, imgToUse, isGif);
+
+#if 0
+
+#if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
+    // look for the image file: ext in custom, png in custom, gif in custom, ext in episode, png in episode, gif in episode
     std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
+
     if(imgToUse.empty())
     {
         imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".png");
     }
+
     if(imgToUse.empty())
     {
         imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".gif");
         isGif = true;
     }
+
     if(imgToUse.empty())
     {
         imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + X_IMG_EXT);
         isGif = false;
     }
+
     if(imgToUse.empty())
     {
         imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".png");
     }
+
     if(imgToUse.empty())
     {
         imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".gif");
@@ -161,24 +264,27 @@ static void loadCGFX(const std::string &origPath,
         isGif = false;
     }
 #else
-    // look for the image file: png in custom, gif in custom, png in episode, gif in episode
     std::string imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".png");
+
     if(imgToUse.empty())
     {
         imgToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + ".gif");
         isGif = true;
     }
+
     if(imgToUse.empty())
     {
         imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".png");
         isGif = false;
     }
+
     if(imgToUse.empty())
     {
         imgToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + ".gif");
         isGif = true;
     }
 #endif
+#endif // if 0
 
     if(imgToUse.empty())
         return; // Nothing to do
@@ -186,9 +292,20 @@ static void loadCGFX(const std::string &origPath,
     if(isGif && !skipMask)
     {
         // look for the mask file: custom, episode, fallback
-        std::string maskToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + "m.gif");
+        std::string maskToUse;
+
+        if(s_useLangDir)
+            maskToUse = g_dirCustom.resolveFileCaseExistsAbs(s_langSubDir + fName + "m.gif");
+
+        if(maskToUse.empty())
+            maskToUse = g_dirCustom.resolveFileCaseExistsAbs(fName + "m.gif");
+
+        if(s_useLangDir && maskToUse.empty())
+            maskToUse = g_dirEpisode.resolveFileCaseExistsAbs(s_langSubDir + fName + "m.gif");
+
         if(maskToUse.empty())
             maskToUse = g_dirEpisode.resolveFileCaseExistsAbs(fName + "m.gif");
+
         if(maskToUse.empty())
             maskToUse = s_dirFallback.resolveFileCaseExistsAbs(fName + "m.gif");
 
@@ -1031,6 +1148,8 @@ void LoadCustomGFX(bool include_world)
     g_dirEpisode.setCurDir(FileNamePath);
     g_dirCustom.setCurDir(FileNamePath + FileName);
     s_dirFallback.setCurDir(getGfxDir() + "fallback");
+
+    cgfx_initLangDir();
 
     loadCustomUIAssets();
 
