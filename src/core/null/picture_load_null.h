@@ -20,19 +20,35 @@
 
 #pragma once
 
-#ifdef __WII__
-#   define PICTURE_LOAD_WII
-#   include "core/wii/picture_load_wii.h"
-#elif defined(__16M__)
-#   define PICTURE_LOAD_16M
-#   include "core/16m/picture_load_16m.h"
-#elif defined(__3DS__)
-#   define PICTURE_LOAD_3DS
-#   include "core/3ds/picture_load_3ds.h"
-#elif defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
-#   define PICTURE_LOAD_NULL
-#   include "core/null/picture_load_null.h"
-#else
-#   define PICTURE_LOAD_NORMAL
-#   include "core/base/picture_load_base.h"
-#endif
+#ifndef STD_PICTURE_LOAD_NULL_H
+#define STD_PICTURE_LOAD_NULL_H
+
+#include <string>
+
+/*!
+ * \brief Generic image loading store.
+ *
+ * If needed somehing unusual, please define alternative structure instead of this
+ */
+struct StdPictureLoad
+{
+    //! Is this a lazy-loaded texture?
+    bool lazyLoaded = false;
+
+    //! Path to find image
+    std::string path = "";
+
+    //! Path to find mask (if any)
+    std::string mask_path = "";
+
+    // Transparent color for BMP and JPEG
+    bool     colorKey = false;
+    uint8_t  keyRgb[3] = {0 /*R*/, 0 /*G*/, 0 /*B*/};
+
+    inline bool canLoad() const
+    {
+        return lazyLoaded;
+    }
+};
+
+#endif // #ifndef STD_PICTURE_LOAD_NULL_H

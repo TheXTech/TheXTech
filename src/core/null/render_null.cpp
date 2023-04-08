@@ -110,14 +110,13 @@ void setTransparentColor(StdPicture &target, uint32_t rgb)
     UNUSED(rgb);
 }
 
-StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleFactor, const std::string& maskPath, const std::string& maskFallbackPath)
 {
     (void)maskPath;
     (void)maskFallbackPath;
 
-    StdPicture target;
     if(!GameIsActive)
-        return target; // do nothing when game is closed
+        return; // do nothing when game is closed
 
     target.inited = true;
 
@@ -144,14 +143,14 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         uint32_t w, h;
         if(PGE_ImageInfo::getImageSize(path, &w, &h, nullptr))
         {
-            target.w = w;
-            target.h = h;
+            target.w = w * scaleFactor;
+            target.h = h * scaleFactor;
         }
         else
         {
             pLogWarning("loadPicture: Couldn't open file.");
             target.inited = false;
-            return target;
+            return;
         }
 #else
         // this will work if it's a PNG
@@ -160,7 +159,7 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         {
             pLogWarning("loadPicture: Couldn't open size file.");
             target.inited = false;
-            return target;
+            return;
         }
 
         fseek(fpng, 16, SEEK_SET);
@@ -176,8 +175,8 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
             h = static_cast<uint32_t>(((h << 24) | ((h << 8) & 0x00FF0000) |
                 ((h >> 8) & 0x0000FF00) | (h >> 24)));
 
-            target.w = w;
-            target.h = h;
+            target.w = w * scaleFactor;
+            target.h = h * scaleFactor;
         }
         else
         {
@@ -187,29 +186,12 @@ StdPicture LoadPicture(const std::string& path, const std::string& maskPath, con
         fclose(fpng);
 #endif
     }
-
-    return target;
 }
 
-StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir)
 {
-    StdPicture target = LoadPicture(path, maskPath, maskFallbackPath);
-    target.w *= 2;
-    target.h *= 2;
-    return target;
-}
-
-
-StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
-{
-    return LoadPicture(path, maskPath, maskFallbackPath);
-}
-
-StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
-{
-    StdPicture target;
     if(!GameIsActive)
-        return target; // do nothing when game is closed
+        return; // do nothing when game is closed
 
     int length;
 
@@ -217,13 +199,13 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
     {
         pLogWarning("Could not load image path from load list");
-        return target;
+        return;
     }
 
     if(length == 255)
     {
         pLogWarning("Image path %s was truncated in load list", filename);
-        return target;
+        return;
     }
 
     target.inited = true;
@@ -236,15 +218,13 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     {
         pLogWarning("Could not load image %s dimensions from load list", filename);
         target.inited = false;
-        return target;
+        return;
     }
 
     // pLogDebug("Successfully loaded %s (%d %d)", target.l.path.c_str(), w, h);
 
     target.w = w;
     target.h = h;
-
-    return target;
 }
 
 void lazyLoad(StdPicture &target)
@@ -258,34 +238,15 @@ void lazyPreLoad(StdPicture &target)
     lazyLoad(target);
 }
 
-void lazyUnLoad(StdPicture &target)
-{
-    deleteTexture(target, true);
-}
-
 
 void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
 {
-    target.w = width;
-    target.h = height;
 }
 
-void loadTexture_1x(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+void unloadTexture(StdPicture &tx)
 {
-    target.w = width * 2;
-    target.h = height * 2;
-}
-
-void deleteTexture(StdPicture &tx, bool lazyUnload)
-{
-    if(!lazyUnload)
-    {
-        tx.inited = false;
-        tx.w = 0;
-        tx.h = 0;
-        tx.frame_w = 0;
-        tx.frame_h = 0;
-    }
+    if(!tx.l.canLoad())
+        static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 }
 
 inline int ROUNDDIV2(int x)
