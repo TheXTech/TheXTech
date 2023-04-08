@@ -44,7 +44,7 @@ LunaImage::LunaImage(const std::string &filename)
 
     Init();
 
-    m_image = XRender::lazyLoadPicture(filename);
+    XRender::lazyLoadPicture(m_image, filename);
     if(Files::hasSuffix(filename, ".jpg") || Files::hasSuffix(filename, ".bmp"))
     {
         m_useTransColor = true;
@@ -68,7 +68,13 @@ LunaImage &LunaImage::operator=(const LunaImage &o)
     m_W = o.m_W;
     m_uid = o.m_uid;
     m_TransColor = o.m_TransColor;
-    m_image = o.m_image;
+
+    // clear current texture from renderer if it exists
+    m_image.reset();
+
+    // initialize load data from other texture
+    static_cast<StdPicture_Sub&>(m_image) = static_cast<const StdPicture_Sub&>(o.m_image);
+
     return *this;
 }
 
@@ -82,7 +88,7 @@ void LunaImage::Init()
 
 void LunaImage::Unload()
 {
-    XRender::deleteTexture(m_image);
+    m_image.reset();
     Init();
 }
 

@@ -67,6 +67,8 @@ public:
 
     bool initSystem(const CmdLineSetup_t &setup);
     void freeSystem();
+
+    bool restartRenderer();
 };
 
 #endif // FRMMAIN_H

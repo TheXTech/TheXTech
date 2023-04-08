@@ -148,224 +148,6 @@ void AbstractRender_t::close()
 #endif
 }
 
-StdPicture AbstractRender_t::LoadPicture(const std::string &path,
-                                         const std::string &maskPath,
-                                         const std::string &maskFallbackPath)
-{
-    StdPicture target;
-    FIBITMAP *sourceImage;
-    FIBITMAP *maskImage = nullptr;
-    bool useMask = true;
-
-    if(!GameIsActive)
-        return target; // do nothing when game is closed
-
-    if(path.empty())
-        return target;
-
-#ifdef DEBUG_BUILD
-    target.origPath = path;
-#endif
-
-    sourceImage = GraphicsHelps::loadImage(path);
-
-    // Don't load mask if PNG image is used
-    if(Files::hasSuffix(path, ".png"))
-        useMask = false;
-
-    if(!sourceImage)
-    {
-        pLogWarning("Error loading of image file:\n"
-                    "%s\n"
-                    "Reason: %s.",
-                    path.c_str(),
-                    (Files::fileExists(path) ? "wrong image format" : "file not exist"));
-        // target = g_renderer->getDummyTexture();
-        return target;
-    }
-
-#ifdef DEBUG_BUILD
-    ElapsedTimer totalTime;
-    ElapsedTimer maskMergingTime;
-    ElapsedTimer bindingTime;
-    ElapsedTimer unloadTime;
-    totalTime.start();
-    int64_t maskElapsed = 0;
-    int64_t bindElapsed = 0;
-    int64_t unloadElapsed = 0;
-#endif
-
-    //Apply Alpha mask
-    if(useMask && !maskPath.empty() && Files::fileExists(maskPath))
-    {
-        if(g_render->textureMaskSupported())
-        {
-            maskImage = GraphicsHelps::loadImage(maskPath);
-            FreeImage_FlipVertical(maskImage);
-        }
-        else
-        {
-#ifdef DEBUG_BUILD
-            maskMergingTime.start();
-#endif
-            GraphicsHelps::mergeWithMask(sourceImage, maskPath);
-#ifdef DEBUG_BUILD
-            maskElapsed = maskMergingTime.nanoelapsed();
-#endif
-        }
-    }
-    else if(useMask && !maskFallbackPath.empty())
-    {
-#ifdef DEBUG_BUILD
-        maskMergingTime.start();
-#endif
-        GraphicsHelps::mergeWithMask(sourceImage, "", maskFallbackPath);
-#ifdef DEBUG_BUILD
-        maskElapsed = maskMergingTime.nanoelapsed();
-#endif
-    }
-
-    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
-    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
-    uint32_t pitch = static_cast<uint32_t>(FreeImage_GetPitch(sourceImage));
-
-    if((w == 0) || (h == 0))
-    {
-        FreeImage_Unload(sourceImage);
-        pLogWarning("Error loading of image file:\n"
-                    "%s\n"
-                    "Reason: %s.",
-                    path.c_str(),
-                    "Zero image size!");
-        //target = g_renderer->getDummyTexture();
-        return target;
-    }
-
-#ifdef DEBUG_BUILD
-    bindingTime.start();
-#endif
-
-    RGBQUAD upperColor;
-    FreeImage_GetPixelColor(sourceImage, 0, 0, &upperColor);
-    target.ColorUpper.r = upperColor.rgbRed / 255.0f;
-    target.ColorUpper.g = upperColor.rgbGreen / 255.0f;
-    target.ColorUpper.b = upperColor.rgbBlue / 255.0f;
-
-    RGBQUAD lowerColor;
-    FreeImage_GetPixelColor(sourceImage, 0, static_cast<unsigned int>(h - 1), &lowerColor);
-    target.ColorLower.r = lowerColor.rgbRed / 255.0f;
-    target.ColorLower.b = lowerColor.rgbBlue / 255.0f;
-    target.ColorLower.g = lowerColor.rgbGreen / 255.0f;
-
-    FreeImage_FlipVertical(sourceImage);
-    target.w = static_cast<int>(w);
-    target.h = static_cast<int>(h);
-//    target.frame_w = static_cast<int>(w);
-//    target.frame_h = static_cast<int>(h);
-
-    bool wLimitExcited = m_maxTextureWidth > 0 && w > Uint32(m_maxTextureWidth);
-    bool hLimitExcited = m_maxTextureHeight > 0 && h > Uint32(m_maxTextureHeight);
-
-    if(wLimitExcited || hLimitExcited)
-    {
-        target.l.w_orig = int(w);
-        target.l.h_orig = int(h);
-
-        // WORKAROUND: down-scale too big textures
-        if(wLimitExcited)
-            w = Uint32(m_maxTextureWidth);
-        if(hLimitExcited)
-            h = Uint32(m_maxTextureHeight);
-
-        pLogWarning("Texture [%s] (%dx%d) is too big for a given hardware limit. "
-                    "Shrinking texture to %dx%d, quality may be distorted!",
-                    path.c_str(),
-                    target.l.w_orig, target.l.h_orig,
-                    w, h);
-
-        FIBITMAP *d = FreeImage_Rescale(sourceImage, int(w), int(h), FILTER_BOX);
-        if(d)
-        {
-            GraphicsHelps::closeImage(sourceImage);
-            sourceImage = d;
-        }
-
-        target.l.w_scale = float(w) / float(target.l.w_orig);
-        target.l.h_scale = float(h) / float(target.l.h_orig);
-        pitch = FreeImage_GetPitch(d);
-
-        if(maskImage)
-        {
-            d = FreeImage_Rescale(maskImage, int(w), int(h), FILTER_BOX);
-            if(d)
-            {
-                GraphicsHelps::closeImage(maskImage);
-                maskImage = d;
-            }
-        }
-    }
-
-    uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
-    g_render->loadTexture(target, w, h, textura, pitch);
-
-#ifdef DEBUG_BUILD
-    bindElapsed = bindingTime.nanoelapsed();
-    unloadTime.start();
-#endif
-    //SDL_FreeSurface(sourceImage);
-    GraphicsHelps::closeImage(sourceImage);
-
-#ifdef DEBUG_BUILD
-    unloadElapsed = unloadTime.nanoelapsed();
-#endif
-
-    if(maskImage)
-    {
-        uint32_t w_mask = static_cast<uint32_t>(FreeImage_GetWidth(maskImage));
-        uint32_t h_mask = static_cast<uint32_t>(FreeImage_GetHeight(maskImage));
-        uint32_t pitch_mask = static_cast<uint32_t>(FreeImage_GetPitch(maskImage));
-
-        textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(maskImage));
-        g_render->loadTextureMask(target, w_mask, h_mask, textura, pitch_mask, w, h);
-        GraphicsHelps::closeImage(maskImage);
-    }
-
-#ifdef DEBUG_BUILD
-    pLogDebug("Mask merging of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(maskElapsed));
-    pLogDebug("Binding time of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(bindElapsed));
-    pLogDebug("Unload time of %s passed in %d nanoseconds", path.c_str(), static_cast<int>(unloadElapsed));
-    pLogDebug("Total Loading of texture %s passed in %d nanoseconds (%dx%d)",
-              path.c_str(),
-              static_cast<int>(totalTime.nanoelapsed()),
-              static_cast<int>(w),
-              static_cast<int>(h));
-#endif
-
-    return target;
-}
-
-StdPicture AbstractRender_t::LoadPicture_1x(const std::string &path,
-                                         const std::string &maskPath,
-                                         const std::string &maskFallbackPath)
-{
-    StdPicture target = LoadPicture(path, maskPath, maskFallbackPath);
-
-    if(target.inited)
-    {
-        target.l.w_orig = target.w;
-        target.l.h_orig = target.h;
-        target.l.w_scale /= 2;
-        target.l.h_scale /= 2;
-
-        target.w *= 2;
-        target.h *= 2;
-//        target.frame_w *= 2;
-//        target.frame_h *= 2;
-    }
-
-    return target;
-}
-
 void AbstractRender_t::loadTextureMask(StdPicture &target,
                          uint32_t mask_width,
                          uint32_t mask_height,
@@ -388,27 +170,6 @@ void AbstractRender_t::loadTextureMask(StdPicture &target,
 bool AbstractRender_t::textureMaskSupported()
 {
     return false;
-}
-
-void AbstractRender_t::loadTexture_1x(StdPicture &target,
-                         uint32_t width,
-                         uint32_t height,
-                         uint8_t *RGBApixels,
-                         uint32_t pitch)
-{
-    loadTexture(target, width, height, RGBApixels, pitch);
-//    if(target.inited)
-//    {
-//        target.l.w_orig = target.w;
-//        target.l.h_orig = target.h;
-//        target.l.w_scale /= 2;
-//        target.l.h_scale /= 2;
-
-//        target.w *= 2;
-//        target.h *= 2;
-//        target.frame_w *= 2;
-//        target.frame_h *= 2;
-//    }
 }
 
 static void dumpFullFile(std::vector<char> &dst, const std::string &path)
@@ -435,19 +196,20 @@ static void dumpFullFile(std::vector<char> &dst, const std::string &path)
     SDL_RWclose(f);
 }
 
-StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
-                                             const std::string &maskPath,
-                                             const std::string &maskFallbackPath)
+void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
+                                       const std::string &path,
+                                       int scaleFactor,
+                                       const std::string &maskPath,
+                                       const std::string &maskFallbackPath)
 {
-    StdPicture target;
     PGE_Size tSize;
     bool useMask = true;
 
     if(!GameIsActive)
-        return target; // do nothing when game is closed
+        return; // do nothing when game is closed
 
     if(path.empty())
-        return target;
+        return;
 
 #ifdef DEBUG_BUILD
     target.origPath = path;
@@ -465,11 +227,11 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
                     path.c_str(),
                     (Files::fileExists(path) ? "wrong image format" : "file not exist"));
         // target = g_renderer->getDummyTexture();
-        return target;
+        return;
     }
 
-    target.w = tSize.w();
-    target.h = tSize.h();
+    target.w = tSize.w() * scaleFactor;
+    target.h = tSize.h() * scaleFactor;
 
     dumpFullFile(target.l.raw, path);
 
@@ -487,9 +249,8 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
 
     target.inited = true;
     target.l.lazyLoaded = true;
-    target.d.clear();
 
-    return target;
+    return;
 }
 
 void AbstractRender_t::setTransparentColor(StdPicture& target, uint32_t rgb)
@@ -566,10 +327,10 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     }
 
     FreeImage_FlipVertical(sourceImage);
-    target.w = static_cast<int>(w);
-    target.h = static_cast<int>(h);
-//    target.frame_w = static_cast<int>(w);
-//    target.frame_h = static_cast<int>(h);
+
+    // don't touch texture info, that was set on original load
+    // target.w = static_cast<int>(w);
+    // target.h = static_cast<int>(h);
 
     bool shrink2x;
     switch(g_videoSettings.scaleDownTextures)
@@ -590,8 +351,6 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     if(shrink2x)
     {
-        target.l.w_orig = int(w);
-        target.l.h_orig = int(h);
         w /= 2;
         h /= 2;
     }
@@ -601,12 +360,6 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     if(wLimitExcited || hLimitExcited || shrink2x)
     {
-        if(!shrink2x)
-        {
-            target.l.w_orig = int(w);
-            target.l.h_orig = int(h);
-        }
-
         // WORKAROUND: down-scale too big textures
         if(wLimitExcited)
             w = Uint32(m_maxTextureWidth);
@@ -626,11 +379,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         {
             GraphicsHelps::closeImage(sourceImage);
             sourceImage = d;
+            pitch = FreeImage_GetPitch(d);
         }
-
-        target.l.w_scale = float(w) / float(target.l.w_orig);
-        target.l.h_scale = float(h) / float(target.l.h_orig);
-        pitch = FreeImage_GetPitch(d);
 
         if(maskImage)
         {
@@ -661,13 +411,6 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
         GraphicsHelps::closeImage(maskImage);
     }
-}
-
-void AbstractRender_t::lazyUnLoad(StdPicture &target)
-{
-    if(!target.inited || !target.l.lazyLoaded || !target.d.hasTexture())
-        return;
-    XRender::deleteTexture(target, true);
 }
 
 void AbstractRender_t::lazyPreLoad(StdPicture &target)

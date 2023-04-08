@@ -46,9 +46,9 @@ struct PGEColor
 struct SDL_Texture;
 
 /**
- * @brief Handler of a graphical texture
+ * @brief Handler of a graphical texture, excluding renderer-specific data
  */
-struct StdPicture
+struct StdPicture_Sub
 {
 #ifdef STD_PICTURE_HAS_ORIG_PATH
     //! Debug-only file path to the original picture
@@ -94,23 +94,34 @@ struct StdPicture
     //! Loader-related data
     StdPictureLoad l;
 
+};
+
+
+/**
+ * @brief Handler of a graphical texture, including renderer-specific data
+ */
+struct StdPicture : public StdPicture_Sub
+{
+    StdPicture() = default;
+
     //! Platform specific texture data
     StdPictureData d;
 
     /*!
-     * \brief Reset all values into initial state.
-     *
-     * This must be called by renderer backend after texture deletion
+     * \brief Prevent any assignment of textures to preserve renderer references to loaded textures
      */
-    inline void resetAll()
-    {
-        inited = false;
-        l.clear();
-        w = 0;
-        h = 0;
-//        frame_w = 0;
-//        frame_h = 0;
-    }
+    StdPicture& operator=(const StdPicture& o) = delete;
+    StdPicture(const StdPicture& o) = delete;
+
+    /*!
+     * \brief reset operation unloads StdPictureData and also resets the StdPicture_Sub state
+     */
+    void reset();
+
+    /*!
+     * \brief Explicit destructor ensures that renderer unloads StdPictureData
+     */
+    ~StdPicture();
 };
 
 // This macro allows to get the original texture path when debug build is on,
