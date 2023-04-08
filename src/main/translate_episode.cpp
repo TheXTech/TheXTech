@@ -144,7 +144,7 @@ void TranslateEpisode::loadLunaScript(const std::string& key)
     if(CurrentLanguage.empty())
         return; // Language code is required!
 
-    std::string langFile = getTrFile(std::string());
+    std::string langFile = getTrFile(FileName);
 
     if(langFile.empty())
         return; // No translation found
