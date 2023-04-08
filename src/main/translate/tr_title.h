@@ -31,22 +31,17 @@ public:
     TrTitleParser(const TrTitleParser&) = default;
     ~TrTitleParser() = default;
 
-    const std::string m_wantedKey = "_episode_title";
-    const std::string m_wantedKeyW = "_episode_world";
+    const std::string m_wantedKeyTitle = " episode_title";
+    const std::string m_wantedKeyWorld = " episode_world";
     std::string m_wantedWorld;
     std::string m_curKey;
     std::string m_curWorld;
+    int depth = 0;
 
     std::string *m_toWrite = nullptr;
     std::string m_outValue;
     bool m_hasValue = false;
     bool m_hasWorldTitle = false;
-
-    enum Where
-    {
-        W_SKIP = 0,
-        W_ROOT
-    } m_where = W_SKIP;
 
     // called when null is parsed
     bool null()
@@ -77,28 +72,23 @@ public:
 
     bool string(string_t& val)
     {
-        if(m_where == W_ROOT)
+        if(m_curKey == m_wantedKeyTitle && !val.empty())
         {
-            if(m_curKey == "_episode_title" && !val.empty())
-            {
-                m_outValue = val;
-                m_hasValue = true;
-                return true; // We found that we looked for
-            }
+            m_outValue = val;
+            m_hasValue = true;
+        }
 
-            else if(m_curKey == "_episode_world" && !val.empty())
-            {
-                m_curWorld = val;
-                m_hasWorldTitle = true;
-                return true; // We found that we looked for
-            }
+        else if(m_curKey == m_wantedKeyWorld && !val.empty())
+        {
+            m_curWorld = val;
+            m_hasWorldTitle = true;
         }
 
         if(m_hasWorldTitle && m_hasValue)
         {
             if(m_curWorld == m_wantedWorld)
                 *m_toWrite = m_outValue;
-            return false;
+            return false; // We found that we looked for
         }
 
         return true;
@@ -112,29 +102,29 @@ public:
     // called when an object or array begins or ends, resp. The number of elements is passed (or -1 if not known)
     bool start_object(std::size_t)
     {
-        if(m_where == W_SKIP)
-            return true;
-
-        D_pLogDebug("JSON: Start Object (where=%d)", m_where);
+        ++depth;
+        D_pLogDebug("JSON: Start Object, depth=%d", depth);
+        if(depth > 1)
+            return false;
         return true;
     }
 
     bool end_object()
     {
-        if(m_where == W_SKIP)
-            return true;
-
-        D_pLogDebug("JSON: End Object (where=%d)", m_where);
+        --depth;
+        D_pLogDebug("JSON: End Object, depth=%d", depth);
         return true;
     }
 
     bool start_array(std::size_t)
     {
+        ++depth;
         return true;
     }
 
     bool end_array()
     {
+        --depth;
         return true;
     }
 
@@ -142,17 +132,6 @@ public:
     bool key(string_t& val)
     {
         m_curKey = val;
-
-        if(m_where == W_SKIP)
-        {
-            if(m_curKey == m_wantedKey || m_curKey == m_wantedKeyW)
-            {
-                m_where = W_ROOT;
-                D_pLogDebug("JSON: FOUND A KEY %s", val.c_str());
-            }
-            return true;
-        }
-
         D_pLogDebug("JSON: Key=%s", val.c_str());
 
         return true;
