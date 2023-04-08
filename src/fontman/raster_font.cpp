@@ -171,8 +171,8 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
         fontTexture.w /= 2;
         fontTexture.h *= texture_scale_factor;
         fontTexture.h /= 2;
-        fontTexture.frame_w = fontTexture.w;
-        fontTexture.frame_h = fontTexture.h;
+//        fontTexture.frame_w = fontTexture.w;
+//        fontTexture.frame_h = fontTexture.h;
 
 #ifdef PICTURE_LOAD_NORMAL
         fontTexture.l.w_scale *= 2.0 / texture_scale_factor;

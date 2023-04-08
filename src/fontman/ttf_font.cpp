@@ -650,8 +650,8 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
     StdPicture &texture = m_texturesBank.back();
     texture.w = width;
     texture.h = height;
-    texture.frame_w = width;
-    texture.frame_h = height;
+//    texture.frame_w = width;
+//    texture.frame_h = height;
 #ifdef PICTURE_LOAD_NORMAL
     texture.l.w_orig = 0;
     texture.l.h_orig = 0;
