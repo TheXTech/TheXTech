@@ -198,7 +198,7 @@
                 "modeErase": "橡皮擦",
                 "modeSelect": "選擇模式",
                 "nextSection": "下一場景",
-                "prevSection": "上一場景t",
+                "prevSection": "上一場景",
                 "scrollDown": "向下滾動",
                 "scrollLeft": "向左滾動",
                 "scrollRight": "向右滾動",
@@ -275,7 +275,7 @@
         "wordPlayer": "玩家",
         "wordProfile": "配置",
         "wordResume": "恢復",
-        "wordShow": "",
+        "wordShow": "顯示",
         "wordWaiting": "等待",
         "wordYes": "是"
     },
