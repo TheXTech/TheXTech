@@ -468,7 +468,7 @@
     },
     "languageName": "Русский",
     "objects": {
-        "wordFails": "",
+        "wordFails": "Неудачи",
         "wordStarAccusativeDualOrCounter": "звезды",
         "wordStarAccusativePlural": "звёзд",
         "wordStarAccusativeSingular": "звезду"
