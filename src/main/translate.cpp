@@ -42,6 +42,8 @@
 #include "editor/editor_strings.h"
 #include "editor/editor_custom.h"
 
+#include "script/luna/luna.h"
+
 
 enum class PluralRules
 {
@@ -393,9 +395,11 @@ XTechTranslate::XTechTranslate()
     {
         {"languageName", &g_mainMenu.languageName},
 
-        {"objects.wordStarAccusativeSingular", &g_gameInfo.wordStarAccusativeSingular},
+        {"objects.wordStarAccusativeSingular",      &g_gameInfo.wordStarAccusativeSingular},
         {"objects.wordStarAccusativeDualOrCounter", &g_gameInfo.wordStarAccusativeDual_Cnt},
-        {"objects.wordStarAccusativePlural", &g_gameInfo.wordStarAccusativePlural},
+        {"objects.wordStarAccusativePlural",        &g_gameInfo.wordStarAccusativePlural},
+
+        {"objects.wordFails", &gDemoCounterTitleDefault}
     };
 
     for(int i = 1; i <= numCharacters; ++i)
@@ -571,6 +575,8 @@ bool XTechTranslate::translate()
         // assets translations
         if(!translateFile(langAssetsFile, m_assetsMap, "assets"))
             pLogWarning("Failed to apply the assets translation file %s", langAssetsFile.c_str());
+
+        gDemoCounterTitle = gDemoCounterTitleDefault;
     }
 
     if(langEngineFile.empty() && langAssetsFile.empty())
