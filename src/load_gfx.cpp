@@ -249,7 +249,8 @@ static void loadImageFromList(FILE* f, const std::string& dir,
                     int *width, int *height, bool &is_custom_loc,
                     bool world = false, bool this_is_custom = false)
 {
-    StdPicture newTexture = XRender::lazyLoadPictureFromList(f, dir);
+    StdPicture_Sub newTexture;
+    XRender::lazyLoadPictureFromList(newTexture, f, dir);
 
     if(!newTexture.inited)
         return;
@@ -261,12 +262,12 @@ static void loadImageFromList(FILE* f, const std::string& dir,
         backup.remote_height = height;
         backup.remote_isCustom = &is_custom_loc;
         backup.remote_texture = &texture;
-        XRender::lazyUnLoad(texture);
+        XRender::unloadTexture(texture);
         if(width)
             backup.width = *width;
         if(height)
             backup.height = *height;
-        backup.texture = texture;
+        backup.texture_backup = static_cast<StdPicture_Sub&>(texture);
 
         if(world)
             g_defaultWorldGfxBackup.push_back(backup);
@@ -280,7 +281,7 @@ static void loadImageFromList(FILE* f, const std::string& dir,
         is_custom_loc = true;
     }
 
-    texture = newTexture;
+    static_cast<StdPicture_Sub&>(texture) = newTexture;
     if(width)
         *width = newTexture.w;
     if(height)

@@ -227,10 +227,12 @@ E_INLINE void lazyLoadPicture(StdPicture_Sub &target,
                               const std::string &path,
                               int scaleFactor,
                               const std::string &maskPath = std::string(),
-                              const std::string &maskFallbackPath = std::string())
+                              const std::string &maskFallbackPath = std::string()) TAIL
+#ifndef RENDER_CUSTOM
 {
     AbstractRender_t::lazyLoadPicture(target, path, scaleFactor, maskPath, maskFallbackPath);
 }
+#endif
 
 SDL_FORCE_INLINE void lazyLoadPicture(StdPicture_Sub &target,
                                       const std::string &path,
@@ -270,7 +272,7 @@ SDL_FORCE_INLINE void LoadPicture(StdPicture &target,
 
 
 #if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
-E_INLINE lazyLoadPictureFromList(StdPicture& target, int scaleFactor, FILE* f, const std::string& dir);
+E_INLINE void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir);
 #endif
 
 E_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb) TAIL

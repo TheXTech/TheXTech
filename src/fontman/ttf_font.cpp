@@ -661,13 +661,17 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSi
         break;
     }
 
-    texture.w = width;
-    texture.h = height;
-//    texture.frame_w = width;
-//    texture.frame_h = height;
+    if(m_doublePixel)
+    {
+        texture.w = width * 2;
+        texture.h = height * 2;
+    }
+    else
+    {
+        texture.w = width;
+        texture.h = height;
+    }
 
-    // This is accurate for doublePixel, and inaccurate otherwise. But the glyphs are always rendered scaled so it doesn't make a difference.
-    // For now, always mark it as 1x to indicate to XRender that it's not safe to downscale it, but if we tracked doublePixel, it would be fine to specialize here.
     XRender::loadTexture(texture, width, height, image, pitch);
 
     t_glyph.tx      = &texture;

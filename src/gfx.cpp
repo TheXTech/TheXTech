@@ -58,7 +58,7 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
     {
         path_ext = path + ".png";
         pLogDebug("Could not load, trying %s...", path_ext.c_str());
-        img = XRender::LoadPicture(path_ext);
+        XRender::LoadPicture(img, path_ext);
     }
 #endif
 
