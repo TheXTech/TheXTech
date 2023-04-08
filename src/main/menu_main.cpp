@@ -133,23 +133,14 @@ void initMainMenu()
     g_mainMenu.optionsModeWindowed = "Windowed mode";
     g_mainMenu.optionsViewCredits = "View credits";
 
-    g_mainMenu.charSelTitle = "Character Select";
-    g_mainMenu.reconnectTitle = "Reconnect";
-    g_mainMenu.dropAddTitle = "Drop/Add Players";
+    g_mainMenu.connectCharSelTitle = "Character Select";
+    g_mainMenu.connectStartGame = "Start Game";
+
     g_mainMenu.wordPlayer = "Player";
     g_mainMenu.wordProfile = "Profile";
-    g_mainMenu.playerSelStartGame = "Start Game";
-    g_mainMenu.phrasePressAButton = "Press A Button";
-    g_mainMenu.phraseTestControls = "Test Controls";
-    g_mainMenu.wordDisconnect = "Disconnect";
-    g_mainMenu.phraseHoldStartToReturn = "Hold Start";
     g_mainMenu.wordBack = "Back";
     g_mainMenu.wordResume = "Resume";
     g_mainMenu.wordWaiting = "Waiting";
-    g_mainMenu.phraseForceResume = "Force Resume";
-    g_mainMenu.phraseDropOthers = "Drop Others";
-    g_mainMenu.phraseDropSelf = "Drop Self";
-    g_mainMenu.phraseChangeChar = "Change Character";
 
     g_mainMenu.controlsTitle = "Controls";
     g_mainMenu.controlsConnected = "Connected:";

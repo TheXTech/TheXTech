@@ -76,7 +76,7 @@ void Render()
     }
 
     if(!none_missing)
-        SuperPrint(g_mainMenu.phrasePressAButton, 3, draw_X + 20, press_button_Y);
+        SuperPrint(g_gameStrings.connectPressAButton, 3, draw_X + 20, press_button_Y);
 }
 
 void Logic()

@@ -30,10 +30,11 @@
 #include "../gfx.h"
 #include "../core/render.h"
 
-#include "screen_textentry.h"
+#include "main/screen_textentry.h"
 
-#include "speedrunner.h"
-#include "menu_main.h"
+#include "main/speedrunner.h"
+#include "main/menu_main.h"
+#include "main/game_strings.h"
 
 bool g_pollingInput = false;
 
@@ -272,7 +273,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         if(top_line < 0)
             top_line = 0;
 
-        SuperPrintScreenCenter(g_mainMenu.phraseTestControls, 3, sY+(top_line)*line);
+        SuperPrintScreenCenter(g_gameStrings.connectTestControls, 3, sY+(top_line)*line);
 
         size_t p = s_changingProfilePlayer;
         if(!Controls::g_InputMethods[p])
@@ -287,7 +288,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         // display the test controls and profile reversion countdown (add more details)
         RenderControls(p+1, ScreenW/2-38, sY+(top_line+4)*line, 76, 30);
-        SuperPrintScreenCenter(g_mainMenu.phraseHoldStartToReturn, 3, sY+(top_line+6)*line);
+        SuperPrintScreenCenter(g_gameStrings.connectHoldStart, 3, sY+(top_line+6)*line);
         int n_stars;
         int n_empty;
         if(s_profileChangeTimer < 66*3)

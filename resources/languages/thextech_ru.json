@@ -1,11 +1,4 @@
 {
-    "charcter": {
-        "name1": "Марио",
-        "name2": "Луиджи",
-        "name3": "Пич",
-        "name4": "Тоад",
-        "name5": "Линк"
-    },
     "editor": {
         "block": {
             "pickContents1": "Взять блок",
@@ -120,6 +113,24 @@
         "wordText": "Текст"
     },
     "game": {
+        "connect": {
+            "dropAddTitle": "Доб./Убрать игроков",
+            "phraseChangeChar": "Сменить персонажа",
+            "phraseDropMe": "Убрать себя",
+            "phraseDropPX": "",
+            "phraseForceResume": "Принуд. возобновить",
+            "phraseHoldStart": "Удерж. Старт",
+            "phrasePressAButton": "",
+            "phraseSetControls": "",
+            "phraseStartToForceRes": "",
+            "phraseStartToResume": "",
+            "phraseTestControls": "Проверить управление",
+            "phraseWaitingForInput": "",
+            "reconnectTitle": "Переподключить",
+            "splitPressSelect_1": "",
+            "splitPressSelect_2": "",
+            "wordDisconnect": "Отключить"
+        },
         "controls": {
             "phrasePlayerConnected": "И{0} подключил(а) {0}, Профиль: {2}",
             "phrasePlayerDisconnected": "И{0} отключился(лась)"
@@ -148,7 +159,9 @@
         },
         "caseNone": "<Нет>",
         "character": {
-            "charSelTitle": "Выбор персонажа"
+            "charSelTitle": "Выбор персонажа",
+            "selectCharacter": "Играть, как {0}",
+            "startGame": "Начать игру"
         },
         "controls": {
             "buttons": {
@@ -174,7 +187,6 @@
             "wordButtons": "Кнопки",
             "wordProfiles": "Профили"
         },
-        "dropAddTitle": "Доб./Убрать игроков",
         "editor": {
             "errorMissingResources": "Извините, но для встроенного редактора не хватает файла {0}.",
             "errorResolution": "Извините, но встроенный редактор не поддерживает ваше текущее разрешение.",
@@ -210,18 +222,7 @@
             "optionsModeWindowed": "Оконный режим",
             "optionsViewCredits": "Титры"
         },
-        "phraseChangeChar": "Сменить персонажа",
-        "phraseDropOthers": "Убрать всех",
-        "phraseDropSelf": "Убрать себя",
-        "phraseForceResume": "Принуд. возобновить",
-        "phraseHoldStartToReturn": "Удерж. Старт",
-        "phrasePressAButton": "Нажмите кнопку A",
-        "phraseTestControls": "Проверить управление",
-        "playerSelStartGame": "Начать игру",
-        "reconnectTitle": "Переподключить",
-        "selectCharacter": "Играть, как {0}",
         "wordBack": "Назад",
-        "wordDisconnect": "Отключить",
         "wordNo": "Нет",
         "wordPlayer": "Игрок",
         "wordProfile": "Профиль",
@@ -232,7 +233,6 @@
     "outro": {
         "cppPortDevelopers": "Разработчики C++-порта:",
         "customSprites": "Доп-спрайты:",
-        "d3dsPortBy": "Автор порта на 3DS:",
         "engineCredits": "Создатели движка:",
         "gameCredits": "Создатели игры:",
         "levelDesign": "Дизайн уровней:",
@@ -240,7 +240,6 @@
         "nameVitalyNovichkov": "Новичков Виталий",
         "originalBy": "Автор оригинала на VB6:",
         "psVitaPortBy": "Автор порта на PS Vita:",
-        "specialThanks": "Особые благодарности:",
-        "wiiPortBy": "Автор порта на Wii:"
+        "specialThanks": "Особые благодарности:"
     }
 }

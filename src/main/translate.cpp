@@ -165,8 +165,6 @@ XTechTranslate::XTechTranslate()
         {"menu.editor.errorMissingResources", &g_mainMenu.editorErrorMissingResources},
         {"menu.editor.promptNewWorldName", &g_mainMenu.editorPromptNewWorldName},
 
-        {"menu.character.charSelTitle",    &g_mainMenu.charSelTitle},
-
         {"menu.game.gameNoEpisodesToPlay", &g_mainMenu.gameNoEpisodesToPlay},
         {"menu.game.gameNoBattleLevels",   &g_mainMenu.gameNoBattleLevels},
         {"menu.game.gameBattleRandom",     &g_mainMenu.gameBattleRandom},
@@ -190,23 +188,10 @@ XTechTranslate::XTechTranslate()
         {"menu.options.optionsModeWindowed",     &g_mainMenu.optionsModeWindowed},
         {"menu.options.optionsViewCredits",      &g_mainMenu.optionsViewCredits},
 
-        {"menu.wordPlayer",                &g_mainMenu.wordPlayer},
-        {"menu.wordProfile",               &g_mainMenu.wordProfile},
-        {"menu.reconnectTitle",            &g_mainMenu.reconnectTitle},
-        {"menu.dropAddTitle",              &g_mainMenu.dropAddTitle},
-        {"menu.playerSelStartGame",        &g_mainMenu.playerSelStartGame},
-        {"menu.phrasePressAButton",        &g_mainMenu.phrasePressAButton},
-        {"menu.phraseTestControls",        &g_mainMenu.phraseTestControls},
-        {"menu.wordDisconnect",            &g_mainMenu.wordDisconnect},
-        {"menu.phraseHoldStartToReturn",   &g_mainMenu.phraseHoldStartToReturn},
-        {"menu.wordBack",                  &g_mainMenu.wordBack},
-        {"menu.wordResume",                &g_mainMenu.wordResume},
-        {"menu.wordWaiting",               &g_mainMenu.wordWaiting},
-        {"menu.phraseForceResume",         &g_mainMenu.phraseForceResume},
-        {"menu.phraseDropOthers",          &g_mainMenu.phraseDropOthers},
-        {"menu.phraseDropSelf",            &g_mainMenu.phraseDropSelf},
-        {"menu.phraseChangeChar",          &g_mainMenu.phraseChangeChar},
-        {"menu.selectCharacter",           &g_mainMenu.selectCharacter},
+        {"menu.character.charSelTitle",    &g_mainMenu.connectCharSelTitle},
+        {"menu.character.startGame",       &g_mainMenu.connectStartGame},
+        {"menu.character.selectCharacter", &g_mainMenu.selectCharacter},
+
 
         {"menu.controls.controlsTitle",     &g_mainMenu.controlsTitle},
         {"menu.controls.controlsConnected", &g_mainMenu.controlsConnected},
@@ -231,9 +216,14 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.controlsReallyDeleteProfile", &g_mainMenu.controlsReallyDeleteProfile},
         {"menu.controls.controlsNewProfile", &g_mainMenu.controlsNewProfile},
 
-        {"menu.wordNo", &g_mainMenu.wordNo},
-        {"menu.wordYes", &g_mainMenu.wordYes},
-        {"menu.caseNone", &g_mainMenu.caseNone},
+        {"menu.wordNo",         &g_mainMenu.wordNo},
+        {"menu.wordYes",        &g_mainMenu.wordYes},
+        {"menu.caseNone",       &g_mainMenu.caseNone},
+        {"menu.wordPlayer",     &g_mainMenu.wordPlayer},
+        {"menu.wordProfile",    &g_mainMenu.wordProfile},
+        {"menu.wordBack",       &g_mainMenu.wordBack},
+        {"menu.wordResume",     &g_mainMenu.wordResume},
+        {"menu.wordWaiting",    &g_mainMenu.wordWaiting},
 
 
         {"outro.gameCredits",           &g_outroScreen.gameCredits},
@@ -266,6 +256,28 @@ XTechTranslate::XTechTranslate()
         {"game.pause.saveAndQuit",          &g_gameStrings.pauseItemSaveAndQuit},
         {"game.pause.quit",                 &g_gameStrings.pauseItemQuit},
 
+        {"game.connect.reconnectTitle",            &g_gameStrings.connectReconnectTitle},
+        {"game.connect.dropAddTitle",              &g_gameStrings.connectDropAddTitle},
+
+        {"game.connect.phrasePressAButton",        &g_gameStrings.connectPressAButton},
+
+        {"game.connect.phraseTestControls",        &g_gameStrings.connectTestControls},
+        {"game.connect.phraseHoldStart",           &g_gameStrings.connectHoldStart},
+        {"game.connect.wordDisconnect",            &g_gameStrings.connectDisconnect},
+
+        {"game.connect.phraseForceResume",         &g_gameStrings.connectForceResume},
+        {"game.connect.phraseDropPX",              &g_gameStrings.connectDropPX},
+
+        {"game.connect.phraseWaitingForInput",     &g_gameStrings.connectWaitingForInputDevice},
+        {"game.connect.splitPressSelect_1",        &g_gameStrings.connectPressSelectForControlsOptions_P1},
+        {"game.connect.splitPressSelect_2",        &g_gameStrings.connectPressSelectForControlsOptions_P2},
+
+        {"game.connect.phraseChangeChar",          &g_gameStrings.connectChangeChar},
+        {"game.connect.phraseSetControls",         &g_gameStrings.connectSetControls},
+        {"game.connect.phraseDropMe",              &g_gameStrings.connectDropMe},
+
+        {"game.connect.phraseStartToResume",       &g_gameStrings.connectPressStartToResume},
+        {"game.connect.phraseStartToForceRes",     &g_gameStrings.connectPressStartToForceResume},
 
 #ifdef THEXTECH_ENABLE_EDITOR
         {"editor.block.pickContents1",      &g_editorStrings.pickBlockContents1},

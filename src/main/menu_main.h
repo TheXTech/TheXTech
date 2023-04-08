@@ -101,8 +101,6 @@ struct MainMenuContent
 
     std::string languageName;
 
-    std::string selectCharacter;
-
     std::string editorNewWorld;
     std::string editorErrorResolution;
     std::string editorErrorMissingResources;
@@ -134,23 +132,9 @@ struct MainMenuContent
     std::string optionsViewCredits;
 
     // ConnectScreen
-    std::string charSelTitle;
-    std::string reconnectTitle;
-    std::string dropAddTitle;
-    std::string wordPlayer;
-    std::string wordProfile;
-    std::string playerSelStartGame;
-    std::string phrasePressAButton;
-    std::string phraseTestControls;
-    std::string wordDisconnect;
-    std::string phraseHoldStartToReturn;
-    std::string wordBack;
-    std::string wordResume;
-    std::string wordWaiting;
-    std::string phraseForceResume;
-    std::string phraseDropOthers;
-    std::string phraseDropSelf;
-    std::string phraseChangeChar;
+    std::string connectCharSelTitle;
+    std::string connectStartGame;
+    std::string selectCharacter;
 
     // Controls menus
     std::string controlsTitle;
@@ -178,6 +162,11 @@ struct MainMenuContent
     std::string wordYes;
     std::string wordNo;
     std::string caseNone;
+    std::string wordPlayer;
+    std::string wordProfile;
+    std::string wordBack;
+    std::string wordResume;
+    std::string wordWaiting;
 };
 
 extern MainMenuContent g_mainMenu;

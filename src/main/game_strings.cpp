@@ -41,4 +41,27 @@ void initGameStrings()
     g_gameStrings.pauseItemSaveAndContinue = "Save and Continue";
     g_gameStrings.pauseItemSaveAndQuit = "Save and Quit";
     g_gameStrings.pauseItemQuit = "Quit";
+
+
+    g_gameStrings.connectReconnectTitle = "Reconnect";
+    g_gameStrings.connectDropAddTitle = "Drop/Add Players";
+    g_gameStrings.connectPressAButton = "Press A Button";
+    g_gameStrings.connectTestControls = "Test Controls";
+    g_gameStrings.connectDisconnect = "Disconnect";
+    g_gameStrings.connectHoldStart = "Hold Start";
+
+    g_gameStrings.connectSetControls = "Set Controls";
+    g_gameStrings.connectChangeChar = "Change Char";
+    g_gameStrings.connectDropMe = "Drop Me";
+
+    g_gameStrings.connectDropPX = "Drop P{0}";
+    g_gameStrings.connectForceResume = "Force Resume";
+
+    g_gameStrings.connectWaitingForInputDevice = "Waiting for input device...";
+    g_gameStrings.connectPressSelectForControlsOptions_P1 = "Press Select for";
+    g_gameStrings.connectPressSelectForControlsOptions_P2 = "Controls Options";
+
+    g_gameStrings.connectPressStartToResume = "Press Start to Resume";
+    g_gameStrings.connectPressStartToForceResume = "Press Start to Force Resume";
+
 }

@@ -44,6 +44,32 @@ struct GameContent
     std::string pauseItemSaveAndContinue;
     std::string pauseItemSaveAndQuit;
     std::string pauseItemQuit;
+
+
+    // ConnectScreen
+
+    std::string connectReconnectTitle;
+    std::string connectDropAddTitle;
+
+    std::string connectPressAButton;
+
+    std::string connectTestControls;
+    std::string connectHoldStart;
+    std::string connectDisconnect;
+
+    std::string connectChangeChar;
+    std::string connectSetControls;
+    std::string connectDropMe;
+
+    std::string connectForceResume;
+    std::string connectDropPX;
+
+    std::string connectWaitingForInputDevice;
+    std::string connectPressSelectForControlsOptions_P1;
+    std::string connectPressSelectForControlsOptions_P2;
+
+    std::string connectPressStartToResume;
+    std::string connectPressStartToForceResume;
 };
 
 extern GameContent g_gameStrings;
