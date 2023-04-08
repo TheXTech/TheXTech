@@ -184,6 +184,11 @@
             "controlsNotInUse": "(Не используется)",
             "controlsReallyDeleteProfile": "Действительно удалить профиль?",
             "controlsTitle": "Управление",
+            "options": {
+                "batteryStatus": "",
+                "groundPoundButton": "",
+                "rumble": ""
+            },
             "profile": {
                 "activateProfile": "",
                 "cursorControls": "",
@@ -232,10 +237,14 @@
             "optionsViewCredits": "Титры"
         },
         "wordBack": "Назад",
+        "wordHide": "",
         "wordNo": "Нет",
+        "wordOff": "",
+        "wordOn": "",
         "wordPlayer": "Игрок",
         "wordProfile": "Профиль",
         "wordResume": "Возобновить",
+        "wordShow": "",
         "wordWaiting": "Ждём",
         "wordYes": "Да"
     },

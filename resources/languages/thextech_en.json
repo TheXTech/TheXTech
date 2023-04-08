@@ -184,6 +184,11 @@
             "controlsNotInUse": "(Not In Use)",
             "controlsReallyDeleteProfile": "Really delete profile?",
             "controlsTitle": "Controls",
+            "options": {
+                "batteryStatus": "Battery Status",
+                "groundPoundButton": "Ground Pound Button",
+                "rumble": "Rumble"
+            },
             "profile": {
                 "activateProfile": "Activate profile",
                 "cursorControls": "Cursor controls",
@@ -232,10 +237,14 @@
             "optionsViewCredits": "View credits"
         },
         "wordBack": "Back",
+        "wordHide": "Hide",
         "wordNo": "No",
+        "wordOff": "Off",
+        "wordOn": "On",
         "wordPlayer": "Player",
         "wordProfile": "Profile",
         "wordResume": "Resume",
+        "wordShow": "Show",
         "wordWaiting": "Waiting",
         "wordYes": "Yes"
     },

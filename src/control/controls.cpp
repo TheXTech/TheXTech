@@ -32,6 +32,7 @@
 #include "main/screen_textentry.h"
 #include "main/screen_quickreconnect.h"
 #include "main/cheat_code.h"
+#include "main/menu_main.h"
 #include "../graphics.h"
 #include "../frame_timer.h"
 
@@ -215,11 +216,11 @@ const char* InputMethodProfile::GetOptionName(size_t i)
         return this->GetOptionName_Custom(i - CommonOptions::COUNT);
 
     if(i == CommonOptions::rumble)
-        return "RUMBLE";
+        return g_mainMenu.controlsOptionRumble.c_str();
     else if(i == CommonOptions::ground_pound_by_alt_run)
-        return "GROUND POUND BUTTON";
+        return g_mainMenu.controlsOptionGroundPoundButton.c_str();
     else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
-        return "BATTERY STATUS";
+        return g_mainMenu.controlsOptionBatteryStatus.c_str();
     else
         return nullptr;
 }
@@ -237,23 +238,23 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
     if(i == CommonOptions::rumble)
     {
         if(this->m_rumbleEnabled)
-            return "ENABLED";
+            return g_mainMenu.wordOn.c_str();
         else
-            return "DISABLED";
+            return g_mainMenu.wordOff.c_str();
     }
     else if(i == CommonOptions::ground_pound_by_alt_run)
     {
         if(this->m_groundPoundByAltRun)
-            return "ALT RUN";
+            return PlayerControls::GetButtonName_UI(PlayerControls::Buttons::AltRun);
         else
-            return "DOWN";
+            return PlayerControls::GetButtonName_UI(PlayerControls::Buttons::Down);
     }
     else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
     {
         if(this->m_showPowerStatus)
-            return "SHOW";
+            return g_mainMenu.wordShow.c_str();
         else
-            return "HIDE";
+            return g_mainMenu.wordHide.c_str();
     }
     else
         return nullptr;

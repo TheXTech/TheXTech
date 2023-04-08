@@ -210,6 +210,10 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.profile.editorControls",  &g_mainMenu.controlsEditorControls},
         {"menu.controls.profile.hotkeys",         &g_mainMenu.controlsHotkeys},
 
+        {"menu.controls.options.rumble",            &g_mainMenu.controlsOptionRumble},
+        {"menu.controls.options.batteryStatus",     &g_mainMenu.controlsOptionBatteryStatus},
+        {"menu.controls.options.groundPoundButton", &g_mainMenu.controlsOptionGroundPoundButton},
+
         {"menu.controls.wordProfiles", &g_mainMenu.wordProfiles},
         {"menu.controls.wordButtons", &g_mainMenu.wordButtons},
 
@@ -230,6 +234,10 @@ XTechTranslate::XTechTranslate()
         {"menu.wordNo",         &g_mainMenu.wordNo},
         {"menu.wordYes",        &g_mainMenu.wordYes},
         {"menu.caseNone",       &g_mainMenu.caseNone},
+        {"menu.wordOn",         &g_mainMenu.wordOn},
+        {"menu.wordOff",        &g_mainMenu.wordOff},
+        {"menu.wordShow",       &g_mainMenu.wordShow},
+        {"menu.wordHide",       &g_mainMenu.wordHide},
         {"menu.wordPlayer",     &g_mainMenu.wordPlayer},
         {"menu.wordProfile",    &g_mainMenu.wordProfile},
         {"menu.wordBack",       &g_mainMenu.wordBack},

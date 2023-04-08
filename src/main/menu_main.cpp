@@ -157,6 +157,10 @@ void initMainMenu()
     g_mainMenu.controlsEditorControls = "Editor controls";
     g_mainMenu.controlsHotkeys = "Hotkeys";
 
+    g_mainMenu.controlsOptionRumble = "Rumble";
+    g_mainMenu.controlsOptionGroundPoundButton = "Ground Pound Button";
+    g_mainMenu.controlsOptionBatteryStatus = "Battery Status";
+
     g_mainMenu.wordProfiles = "Profiles";
     g_mainMenu.wordButtons = "Buttons";
     g_mainMenu.buttonUp = "Up";
@@ -174,8 +178,12 @@ void initMainMenu()
     g_mainMenu.controlsNewProfile = "<New Profile>";
 
     g_mainMenu.wordNo = "No";
-    g_mainMenu.wordYes = "Yes";
+    g_mainMenu.wordYes  = "Yes";
     g_mainMenu.caseNone = "<None>";
+    g_mainMenu.wordOn   = "On";
+    g_mainMenu.wordOff  = "Off";
+    g_mainMenu.wordShow = "Show";
+    g_mainMenu.wordHide = "Hide";
 }
 
 

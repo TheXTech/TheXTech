@@ -184,6 +184,11 @@
             "controlsNotInUse": "（未使用）",
             "controlsReallyDeleteProfile": "是否删除配置？",
             "controlsTitle": "控制",
+            "options": {
+                "batteryStatus": "",
+                "groundPoundButton": "",
+                "rumble": ""
+            },
             "profile": {
                 "activateProfile": "",
                 "cursorControls": "",
@@ -232,10 +237,14 @@
             "optionsViewCredits": "查看制作团队"
         },
         "wordBack": "返回",
+        "wordHide": "",
         "wordNo": "否",
+        "wordOff": "",
+        "wordOn": "",
         "wordPlayer": "玩家",
         "wordProfile": "配置",
         "wordResume": "恢复",
+        "wordShow": "",
         "wordWaiting": "等待",
         "wordYes": "是"
     },

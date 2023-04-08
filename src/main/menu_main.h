@@ -152,6 +152,10 @@ struct MainMenuContent
     std::string controlsEditorControls;
     std::string controlsHotkeys;
 
+    std::string controlsOptionRumble;
+    std::string controlsOptionGroundPoundButton;
+    std::string controlsOptionBatteryStatus;
+
     std::string wordProfiles;
     std::string wordButtons;
     std::string controlsReallyDeleteProfile;
@@ -171,6 +175,10 @@ struct MainMenuContent
     std::string wordYes;
     std::string wordNo;
     std::string caseNone;
+    std::string wordOn;
+    std::string wordOff;
+    std::string wordShow;
+    std::string wordHide;
     std::string wordPlayer;
     std::string wordProfile;
     std::string wordBack;
