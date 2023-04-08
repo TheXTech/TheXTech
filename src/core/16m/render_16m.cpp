@@ -961,8 +961,8 @@ void deleteTexture(StdPicture &tx, bool lazyUnload)
         tx.l.lazyLoaded = false;
         tx.w = 0;
         tx.h = 0;
-        tx.frame_w = 0;
-        tx.frame_h = 0;
+//        tx.frame_w = 0;
+//        tx.frame_h = 0;
     }
 }
 
