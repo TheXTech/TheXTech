@@ -207,7 +207,7 @@
                 "testPlay": "测试关卡"
             },
             "hotkeys": {
-               "debugInfo": "调试信息",
+                "debugInfo": "调试信息",
                 "enterCheats": "输入指令",
                 "fullscreen": "全屏",
                 "legacyPause": "旧版暂停菜单",
