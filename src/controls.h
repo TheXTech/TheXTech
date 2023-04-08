@@ -446,7 +446,7 @@ inline const char *GetButtonName_UI_Init(size_t i)
         return "Old Pause";
 #ifdef DEBUG_BUILD
     case Buttons::ToggleFontRender:
-        return "Toggle font renderer";
+        return "Old fonts";
 #endif
     default:
         return "NULL";
