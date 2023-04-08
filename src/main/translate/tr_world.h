@@ -45,6 +45,7 @@ public:
         W_WORLD,
         W_LEVELS,  W_LEVEL_OBJ
     } m_where = W_SKIP;
+    int m_depth = 0;
 
     void flushData()
     {
@@ -97,23 +98,27 @@ public:
         if(m_where == W_LEVEL_OBJ && m_curKey == "tit")
             m_outValue = val;
         else if(m_where == W_WORLD && m_curKey == "title")
-            WorldName = m_outValue;
+            WorldName = val;
         else if(m_where == W_WORLD && m_curKey == "credits")
         {
-            for(int i = 1; i <= maxWorldCredits; i++)
-                WorldCredits[i].clear();
-
+            std::string credits(val);
             int B = 0;
             std::vector<std::string> authorsList;
-            if(!m_outValue.empty())
+
+            if(!credits.empty())
             {
-                Strings::split(authorsList, m_outValue, "\n");
+                numWorldCredits = 0;
+                for(int i = 1; i <= maxWorldCredits; i++)
+                    WorldCredits[i].clear();
+
+                Strings::split(authorsList, credits, "\n");
                 for(auto &c : authorsList)
                 {
-                    B++;
+                    ++B;
                     if(B > maxWorldCredits)
                         break;
                     WorldCredits[B] = c;
+                    numWorldCredits = B;
                 }
             }
         }
@@ -129,6 +134,7 @@ public:
     // called when an object or array begins or ends, resp. The number of elements is passed (or -1 if not known)
     bool start_object(std::size_t)
     {
+        ++m_depth;
         if(m_where == W_SKIP)
             return true;
 
@@ -144,6 +150,7 @@ public:
 
     bool end_object()
     {
+        --m_depth;
         if(m_where == W_SKIP)
             return true;
 
@@ -164,6 +171,7 @@ public:
 
     bool start_array(std::size_t)
     {
+        ++m_depth;
         if(m_where == W_SKIP)
             return true;
 
@@ -175,13 +183,14 @@ public:
                 m_where = W_LEVELS;
         }
 
-        D_pLogDebug("JSON: Start Array (where=%d)", m_where);
+        D_pLogDebug("JSON: Start Array (where=%d, depth=%d)", m_where, m_depth);
 
         return true;
     }
 
     bool end_array()
     {
+        --m_depth;
         if(m_where == W_SKIP)
             return true;
 

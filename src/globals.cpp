@@ -126,6 +126,7 @@ RangeArr<Warp_t, 1, maxWarps> Warp;
 RangeArr<Tile_t, 1, maxTiles> Tile;
 RangeArr<Scene_t, 1, maxScenes> Scene;
 RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
+int numWorldCredits = 0;
 double CreditOffsetY = 0.0;
 double CreditTotalHeight = 0.0;
 int numCredits = 0;

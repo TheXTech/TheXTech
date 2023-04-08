@@ -150,6 +150,7 @@ bool OpenWorld(std::string FilePath)
     MaxWorldStars = int(wld.stars);
 
 
+    numWorldCredits = 0;
     for(int i = 1; i <= maxWorldCredits; i++)
         WorldCredits[i].clear();
 
@@ -160,10 +161,11 @@ bool OpenWorld(std::string FilePath)
         Strings::split(authorsList, wld.authors, "\n");
         for(auto &c : authorsList)
         {
-            B++;
+            ++B;
             if(B > maxWorldCredits)
                 break;
             WorldCredits[B] = c;
+            numWorldCredits = B;
         }
     }
 
@@ -458,6 +460,7 @@ void ClearWorld(bool quick)
     IsEpisodeIntro = false;
     StartLevel.clear();
     BeatTheGame = false;
+    numWorldCredits = 0;
     for(int A = 1; A <= maxWorldCredits; A++)
         WorldCredits[A].clear();
     if(LevelEditor)

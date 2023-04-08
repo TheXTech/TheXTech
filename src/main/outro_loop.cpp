@@ -307,16 +307,12 @@ void SetupCredits()
     AddCredit("");
 #endif
 
-    if(!WorldCredits[1].empty())
+    if(numWorldCredits > 0)
     {
         AddCredit(g_outroScreen.levelDesign);
         AddCredit("");
-        for(A = 1; A <= maxWorldCredits; A++)
-        {
-            if(WorldCredits[A].empty())
-                break;
+        for(A = 1; A <= numWorldCredits; A++)
             AddCredit(WorldCredits[A]);
-        }
         AddCredit("");
         AddCredit("");
         AddCredit("");

@@ -2041,14 +2041,22 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     if(UpdateButton(mode, 50 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
     {
         DisableCursorNew();
-        WorldCredits[m_special_subpage+1] = TextEntryScreen::Run("Credits", WorldCredits[m_special_subpage+1]);
+        WorldCredits[m_special_subpage + 1] = TextEntryScreen::Run("Credits", WorldCredits[m_special_subpage + 1]);
         MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
+        for(int i = SDL_max(numWorldCredits, m_special_subpage + 1); i > 0; --i) // Find the last non-empty line
+        {
+            if(!WorldCredits[m_special_subpage + 1].empty())
+            {
+                numWorldCredits = i;
+                break;
+            }
+        }
     }
 
     if(m_special_subpage < 4 && UpdateButton(mode, 90 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_special_subpage ++;
-    SuperPrintR(mode, "WORLD CREDITS LINE "+std::to_string(m_special_subpage+1)+":", 3, 144, 342);
-    SuperPrintR(mode, WorldCredits[m_special_subpage+1], 3, 144, 360);
+    SuperPrintR(mode, "WORLD CREDITS LINE "+std::to_string(m_special_subpage + 1) + ":", 3, 144, 342);
+    SuperPrintR(mode, WorldCredits[m_special_subpage + 1], 3, 144, 360);
 }
 
 void EditorScreen::UpdateSelectListScreen(CallMode mode)
