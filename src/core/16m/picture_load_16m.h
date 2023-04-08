@@ -27,8 +27,6 @@
 
 #include "core/16m/packloader.h"
 
-struct StdPicture;
-
 /*!
  * \brief Generic image loading store.
  *
@@ -39,18 +37,12 @@ struct StdPictureLoad
     //! Is this a lazy-loaded texture?
     bool lazyLoaded = false;
 
+    //! Generic information about texture type
+    int flags = 0;
+
     //! Pack index (PACK_NONE if not a pack)
     PackLoader::packref_t pack;
     uint32_t pack_offset = 0;
-
-    //! The previous texture in the render chain (nullptr if this is the tail or unloaded)
-    StdPicture* last_texture = nullptr;
-
-    //! The next texture in the render chain (nullptr if this is the head or unloaded)
-    StdPicture* next_texture = nullptr;
-
-    //! The last frame that the texture was rendered (not accessed if not in the render chain)
-    uint32_t last_draw_frame;
 
     //! Path to find image (could be a pack)
     std::string path = "";
