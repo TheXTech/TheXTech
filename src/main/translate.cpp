@@ -40,6 +40,7 @@
 #include "main/game_strings.h"
 
 #include "controls.h"
+#include "control/controls_strings.h"
 
 #include "editor/editor_strings.h"
 #include "editor/editor_custom.h"
@@ -204,6 +205,13 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.controlsInUse", &g_mainMenu.controlsInUse},
         {"menu.controls.controlsNotInUse", &g_mainMenu.controlsNotInUse},
 
+        {"menu.controls.wordProfiles", &g_mainMenu.wordProfiles},
+        {"menu.controls.wordButtons", &g_mainMenu.wordButtons},
+
+        {"menu.controls.controlsReallyDeleteProfile", &g_mainMenu.controlsReallyDeleteProfile},
+        {"menu.controls.controlsNewProfile", &g_mainMenu.controlsNewProfile},
+        {"menu.controls.caseInvalid",        &g_controlsStrings.sharedCaseInvalid},
+
         {"menu.controls.profile.activateProfile", &g_mainMenu.controlsActivateProfile},
         {"menu.controls.profile.renameProfile",   &g_mainMenu.controlsRenameProfile},
         {"menu.controls.profile.deleteProfile",   &g_mainMenu.controlsDeleteProfile},
@@ -215,9 +223,7 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.options.rumble",            &g_mainMenu.controlsOptionRumble},
         {"menu.controls.options.batteryStatus",     &g_mainMenu.controlsOptionBatteryStatus},
         {"menu.controls.options.groundPoundButton", &g_mainMenu.controlsOptionGroundPoundButton},
-
-        {"menu.controls.wordProfiles", &g_mainMenu.wordProfiles},
-        {"menu.controls.wordButtons", &g_mainMenu.wordButtons},
+        {"menu.controls.options.maxPlayers",        &g_controlsStrings.sharedOptionMaxPlayers},
 
         {"menu.controls.buttons.up",      &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]},
         {"menu.controls.buttons.down",    &Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Down]},
@@ -258,8 +264,26 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.hotkeys.toggleHUD",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::ToggleHUD]},
         {"menu.controls.hotkeys.legacyPause", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::LegacyPause]},
 
-        {"menu.controls.controlsReallyDeleteProfile", &g_mainMenu.controlsReallyDeleteProfile},
-        {"menu.controls.controlsNewProfile", &g_mainMenu.controlsNewProfile},
+#if defined(CONTROLS_16M_STRINGS)
+        {"menu.controls.tDS.buttonA",      &g_controlsStrings.tdsButtonA},
+        {"menu.controls.tDS.buttonB",      &g_controlsStrings.tdsButtonB},
+        {"menu.controls.tDS.buttonX",      &g_controlsStrings.tdsButtonX},
+        {"menu.controls.tDS.buttonY",      &g_controlsStrings.tdsButtonY},
+        {"menu.controls.tDS.buttonL",      &g_controlsStrings.tdsButtonL},
+        {"menu.controls.tDS.buttonR",      &g_controlsStrings.tdsButtonR},
+        {"menu.controls.tDS.buttonSelect", &g_controlsStrings.tdsButtonSelect},
+        {"menu.controls.tDS.buttonStart",  &g_controlsStrings.tdsButtonStart},
+
+        {"menu.controls.tDS.casePen",      &g_controlsStrings.tdsCasePen},
+#endif // #ifdef CONTROLS_16M_STRINGS
+
+#if defined(CONTROLS_3DS_STRINGS)
+        {"menu.controls.tDS.buttonZL",     &g_controlsStrings.tdsButtonZL},
+        {"menu.controls.tDS.buttonZR",     &g_controlsStrings.tdsButtonZR},
+        {"menu.controls.tDS.dPad",         &g_controlsStrings.tdsDpad},
+        {"menu.controls.tDS.tStick",       &g_controlsStrings.tdsTstick},
+        {"menu.controls.tDS.cStick",       &g_controlsStrings.tdsCstick},
+#endif // #ifdef CONTROLS_3DS_STRINGS
 
         {"menu.wordNo",         &g_mainMenu.wordNo},
         {"menu.wordYes",        &g_mainMenu.wordYes},

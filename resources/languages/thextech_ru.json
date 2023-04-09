@@ -176,6 +176,7 @@
                 "start": "Старт",
                 "up": "Вверх"
             },
+            "caseInvalid": "",
             "controlsConnected": "Подключено:",
             "controlsDeleteKey": "(Альт-Прыжок чтобы сбросить)",
             "controlsDeviceTypes": "Типы устройств",
@@ -218,6 +219,7 @@
             "options": {
                 "batteryStatus": "Состояние батареи",
                 "groundPoundButton": "Кнопка сотрясания земли",
+                "maxPlayers": "",
                 "rumble": "Вибрация"
             },
             "profile": {
@@ -228,6 +230,22 @@
                 "hotkeys": "Горчие клавиши",
                 "playerControls": "Игровое управление",
                 "renameProfile": "Переименовать профиль"
+            },
+            "tDS": {
+                "buttonA": "",
+                "buttonB": "",
+                "buttonL": "",
+                "buttonR": "",
+                "buttonSelect": "",
+                "buttonStart": "",
+                "buttonX": "",
+                "buttonY": "",
+                "buttonZL": "",
+                "buttonZR": "",
+                "cStick": "",
+                "casePen": "",
+                "dPad": "",
+                "tStick": ""
             },
             "wordButtons": "Кнопки",
             "wordProfiles": "Профили"

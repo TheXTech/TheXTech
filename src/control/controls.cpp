@@ -36,21 +36,8 @@
 #include "../graphics.h"
 #include "../frame_timer.h"
 
-// Control methods
-
-#ifdef __3DS__
-#include "input_3ds.h"
-#elif defined(__WII__)
-#include "input_wii.h"
-#elif defined(__16M__)
-#include "input_16m.h"
-#elif !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD)
-#include "keyboard.h"
-#include "joystick.h"
-#include "touchscreen.h"
-#endif
-
-#include "duplicate.h"
+#include "control/controls_methods.h"
+#include "control/controls_strings.h"
 
 #include <Logger/logger.h>
 
@@ -73,6 +60,8 @@ Controls_t& operator|=(Controls_t& o1, const Controls_t& o2)
 
     return o1;
 }
+
+ControlsStrings_t g_controlsStrings;
 
 
 namespace Controls

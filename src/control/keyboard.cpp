@@ -35,6 +35,8 @@
 #include "core/window.h"
 #include "main/cheat_code.h"
 
+#include "control/controls_strings.h"
+
 #include <Logger/logger.h>
 
 namespace Controls
@@ -1430,7 +1432,7 @@ size_t InputMethodType_Keyboard::GetOptionCount()
 const char* InputMethodType_Keyboard::GetOptionName(size_t i)
 {
     if(i == 0)
-        return "MAX KBD PLAYERS";
+        return g_controlsStrings.sharedOptionMaxPlayers.c_str();
 
     if(i == 1)
         return "TEXT ENTRY STYLE";

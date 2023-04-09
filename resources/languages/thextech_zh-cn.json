@@ -176,6 +176,7 @@
                 "start": "开始",
                 "up": "上"
             },
+            "caseInvalid": "",
             "controlsConnected": "已连接：",
             "controlsDeleteKey": "（按第二奔跑键清除）",
             "controlsDeviceTypes": "设备类型",
@@ -218,6 +219,7 @@
             "options": {
                 "batteryStatus": "电池状态",
                 "groundPoundButton": "震地按键",
+                "maxPlayers": "",
                 "rumble": "Rumble 控制器"
             },
             "profile": {
@@ -228,6 +230,22 @@
                 "hotkeys": "热键",
                 "playerControls": "玩家控制",
                 "renameProfile": "重命名配置"
+            },
+            "tDS": {
+                "buttonA": "",
+                "buttonB": "",
+                "buttonL": "",
+                "buttonR": "",
+                "buttonSelect": "",
+                "buttonStart": "",
+                "buttonX": "",
+                "buttonY": "",
+                "buttonZL": "",
+                "buttonZR": "",
+                "cStick": "",
+                "casePen": "",
+                "dPad": "",
+                "tStick": ""
             },
             "wordButtons": "按键",
             "wordProfiles": "配置"

@@ -176,6 +176,7 @@
                 "start": "Start",
                 "up": "Up"
             },
+            "caseInvalid": "(Invalid)",
             "controlsConnected": "Connected:",
             "controlsDeleteKey": "(Alt Jump to Delete)",
             "controlsDeviceTypes": "Device Types",
@@ -218,6 +219,7 @@
             "options": {
                 "batteryStatus": "Battery Status",
                 "groundPoundButton": "Ground Pound Button",
+                "maxPlayers": "Max Players",
                 "rumble": "Rumble"
             },
             "profile": {
@@ -228,6 +230,22 @@
                 "hotkeys": "Hotkeys",
                 "playerControls": "Player controls",
                 "renameProfile": "Rename profile"
+            },
+            "tDS": {
+                "buttonA": "A",
+                "buttonB": "B",
+                "buttonL": "L",
+                "buttonR": "R",
+                "buttonSelect": "Select",
+                "buttonStart": "Start",
+                "buttonX": "X",
+                "buttonY": "Y",
+                "buttonZL": "ZL",
+                "buttonZR": "ZR",
+                "cStick": "C-Stick",
+                "casePen": "(Pen)",
+                "dPad": "D-Pad",
+                "tStick": "Thumb"
             },
             "wordButtons": "Buttons",
             "wordProfiles": "Profiles"
