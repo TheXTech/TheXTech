@@ -407,6 +407,10 @@ bool init()
     C2D_SetTintMode(C2D_TintMult);
     C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
 
+    // IMPORTANT NOTE: the above results in "pre-multiplied" alpha for the render textures.
+    // Can be resolved by using a different blend function for final render to screen:
+    // C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+
     // consoleInit(GFX_BOTTOM, NULL);
 
     s_top_screen = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
