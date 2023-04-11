@@ -118,18 +118,14 @@ public:
 
     /*!
      * \brief Registers a custom uniform variable in the next available index
+     * \returns The internal index for the uniform
      */
-    void register_uniform(const std::string& name);
+    int register_uniform(const std::string& name);
 
     /*!
-     * \brief Gets location of custom uniform variable by registered index
+     * \brief Gets location of custom uniform variable by registered index (advanced, ignores uniform state management)
      */
     GLint get_uniform_loc(int index);
-
-    /*!
-     * \brief Gets location of custom uniform variable by querying GL (slow)
-     */
-    GLint get_uniform_loc(const std::string& name);
 };
 
 #endif // #ifndef GL_PROGRAM_OBJECT_H

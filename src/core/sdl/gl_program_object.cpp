@@ -278,9 +278,11 @@ void GLProgramObject::use_program()
 /*!
  * \brief Registers a custom uniform variable in the next available index
  */
-void GLProgramObject::register_uniform(const std::string& name)
+int GLProgramObject::register_uniform(const std::string& name)
 {
-    m_u_custom_loc.push_back(get_uniform_loc(name));
+    GLint loc = glGetUniformLocation(m_program, name.c_str());
+    m_u_custom_loc.push_back(loc);
+    return m_u_custom_loc.size() - 1;
 }
 
 /*!
@@ -289,14 +291,6 @@ void GLProgramObject::register_uniform(const std::string& name)
 GLint GLProgramObject::get_uniform_loc(int index)
 {
     return m_u_custom_loc[index];
-}
-
-/*!
- * \brief Gets location of custom uniform variable by querying GL (slow)
- */
-GLint GLProgramObject::get_uniform_loc(const std::string& name)
-{
-    return glGetUniformLocation(m_program, name.c_str());
 }
 
 #else // #ifdef RENDERGL_HAS_SHADERS
