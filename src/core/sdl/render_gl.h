@@ -130,24 +130,33 @@ private:
 
     /*!
      * \brief Represents the draw state needed for a single glDrawArrays call
-     * \param texture: nullable pointer to a texture for the draw call
      * \param program: non-nullable pointer to the program object for the draw call
-     *
-     * FUTURE: uniform: nullable pointer to the first uniform set for the draw call
+     * \param uniform_step: integer index to the index of the program object's current uniform state, indexed by times that uniforms were set
+     * \param texture: nullable pointer to a texture for the draw call
      */
     struct DrawContext_t
     {
-        StdPicture* texture;
         GLProgramObject* program;
+        int uniform_step;
+        StdPicture* texture;
+
+        constexpr DrawContext_t(std::nullptr_t)
+            : program(nullptr), uniform_step(0), texture(nullptr) {}
+
+        inline DrawContext_t(GLProgramObject& program)
+            : program(&program), uniform_step(program.get_uniform_step()), texture(nullptr) {}
+
+        inline DrawContext_t(GLProgramObject& program, StdPicture* texture)
+            : program(&program), uniform_step(program.get_uniform_step()), texture(texture) {}
 
         constexpr bool operator==(const DrawContext_t& o) const noexcept
         {
-            return texture == o.texture && program == o.program;
+            return texture == o.texture && program == o.program && uniform_step == o.uniform_step;
         }
 
         constexpr bool operator<(const DrawContext_t& o) const noexcept
         {
-            return texture < o.texture || (texture == o.texture && program < o.program);
+            return (program == o.program && uniform_step == o.uniform_step && texture < o.texture) || program < o.program || (program == o.program && uniform_step < o.uniform_step);
         }
     };
 
@@ -158,7 +167,7 @@ private:
     {
         std::size_t operator()(const RenderGL::DrawContext_t& c) const noexcept
         {
-            return std::hash<GLProgramObject*>()(c.program) ^ (std::hash<StdPicture*>()(c.texture) >> 1);
+            return std::hash<GLProgramObject*>()(c.program) ^ (std::hash<StdPicture*>()(c.texture) >> 1) ^ (std::hash<int>()(c.uniform_step) >> 2);
         }
     };
 
@@ -170,7 +179,7 @@ private:
 
     // state used to group subsequent ordered draws, even if their depths are not exactly the same
     std::unordered_map<DrawContext_t, int, hash_DrawContext> m_mask_draw_context_depth;
-    DrawContext_t m_recent_draw_context;
+    DrawContext_t m_recent_draw_context = {nullptr};
     int m_recent_draw_context_depth = 0;
 
     // reference to currently active SDL window

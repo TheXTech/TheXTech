@@ -54,6 +54,8 @@ private:
 
     uint64_t m_transform_tick = 0;
 
+    int m_final_uniform_step = 0;
+
     void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock);
 
     static GLuint s_compile_shader(GLenum type, const char* src);
@@ -126,6 +128,15 @@ public:
      * \brief Gets location of custom uniform variable by registered index (advanced, ignores uniform state management)
      */
     GLint get_uniform_loc(int index);
+
+    /*!
+     * \brief Returns the current uniform step for rewinding during the current frame
+     * \returns The current uniform step
+     */
+    inline int get_uniform_step()
+    {
+        return m_final_uniform_step;
+    }
 };
 
 #endif // #ifndef GL_PROGRAM_OBJECT_H

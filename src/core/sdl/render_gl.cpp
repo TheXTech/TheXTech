@@ -271,7 +271,7 @@ void RenderGL::clearDrawQueues()
     for(auto& i : m_ordered_draw_queue)
         i.second.vertices.clear();
 
-    m_recent_draw_context = DrawContext_t();
+    m_recent_draw_context = DrawContext_t(nullptr);
     m_mask_draw_context_depth.clear();
 }
 
@@ -1569,7 +1569,7 @@ void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, fl
     float v1 = -2.0f / h;
     float v2 = (h + 2.0f) / h;
 
-    DrawContext_t context = {nullptr, (filled) ? &m_program_rect_filled : &m_program_rect_unfilled};
+    DrawContext_t context = {(filled) ? m_program_rect_filled : m_program_rect_unfilled};
 
     std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
@@ -1604,7 +1604,7 @@ void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, 
     if(radius <= 0)
         return; // Nothing to draw
 
-    DrawContext_t context = {nullptr, &m_program_circle};
+    DrawContext_t context = {m_program_circle};
 
     std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
@@ -1661,7 +1661,7 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float gre
     if(radius <= 0)
         return; // Nothing to draw
 
-    DrawContext_t context = {nullptr, &m_program_circle_hole};
+    DrawContext_t context = {m_program_circle_hole};
 
     std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
@@ -1782,7 +1782,7 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &m_standard_program};
+    DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
     std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
@@ -1828,7 +1828,7 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
     float v1 = tx.l.h_scale * 0;
     float v2 = tx.l.h_scale * (tx.h);
 
-    DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &m_standard_program};
+    DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
     std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
@@ -1897,7 +1897,7 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     float v1 = tx.l.h_scale * ySrc;
     float v2 = tx.l.h_scale * (ySrc + hDst);
 
-    DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &m_standard_program};
+    DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
     std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
@@ -1980,7 +1980,7 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
     if(flip & X_FLIP_VERTICAL)
         std::swap(v1, v2);
 
-    DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &m_standard_program};
+    DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
     std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
@@ -2026,7 +2026,7 @@ void RenderGL::renderTexture(float xDst, float yDst,
     float v1 = tx.l.h_scale * 0;
     float v2 = tx.l.h_scale * (tx.h);
 
-    DrawContext_t context = {&tx, tx.d.shader_program ? tx.d.shader_program.get() : &m_standard_program};
+    DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
     std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
 
