@@ -28,6 +28,12 @@ typedef int             GLint;
 typedef unsigned int    GLuint;
 typedef float           GLfloat;
 
+struct UniformValue_t
+{
+    GLfloat value;
+};
+
+
 class GLProgramObject
 {
 public:
@@ -54,13 +60,31 @@ private:
 
     uint64_t m_transform_tick = 0;
 
+    // rewind state for uniforms
+    struct UniformAssignment_t
+    {
+        UniformValue_t pre;
+        UniformValue_t post;
+        int index;
+    };
+
+    int m_uniform_epoch = 0;
+    int m_epoch_uniform_step = 0;
     int m_final_uniform_step = 0;
 
+    int m_gl_uniform_step = 0;
+
+    std::vector<UniformAssignment_t> m_uniform_steps;
+    std::vector<UniformValue_t> m_final_uniform_state;
+
+    // internal functions
     void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock);
 
     static GLuint s_compile_shader(GLenum type, const char* src);
 
     void m_link_program(GLuint vertex_shader, GLuint fragment_shader);
+
+    void m_clear_uniform_epoch();
 
 public:
 
@@ -130,6 +154,26 @@ public:
     GLint get_uniform_loc(int index);
 
     /*!
+     * \brief Updates the current rewindable set of uniform assignments; if the epoch passed is not equal to the current one, clears this set
+     * \param epoch set of uniform assignments it should be possible to rewind through; generally follows the frame counter
+     */
+    inline void set_uniform_epoch(int epoch)
+    {
+        if(epoch != m_uniform_epoch)
+        {
+            m_clear_uniform_epoch();
+            m_uniform_epoch = epoch;
+        }
+    }
+
+    /*!
+     * \brief Assigns a custom uniform variable to a value and stores it in the managed uniform state
+     * \param index registered internal index returned by previous call to register_uniform
+     * \param value to assign the uniform to
+     */
+    void assign_uniform(int index, const UniformValue_t& value);
+
+    /*!
      * \brief Returns the current uniform step for rewinding during the current frame
      * \returns The current uniform step
      */
@@ -137,6 +181,12 @@ public:
     {
         return m_final_uniform_step;
     }
+
+    /*!
+     * \brief Returns the current uniform step for rewinding during the current frame
+     * \param step a step returned from get_uniform_step during the current epoch
+     */
+    void activate_uniform_step(int step);
 };
 
 #endif // #ifndef GL_PROGRAM_OBJECT_H
