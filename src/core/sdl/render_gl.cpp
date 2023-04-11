@@ -663,7 +663,10 @@ RenderGL::VertexList& RenderGL::getOrderedDrawVertexList(RenderGL::DrawContext_t
         return m_ordered_draw_queue[{m_recent_draw_context_depth, context}];
 
     // optimization for buffer-read shaders: only use a single depth per frame
-    if((context.program && (context.program->get_flags() & GLProgramObject::read_buffer)) || (!m_use_logicop && context.program == &m_standard_program && context.texture && context.texture->d.mask_texture_id))
+    bool accel_mask = !m_use_logicop || m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES;
+    bool is_mask = context.program == &m_standard_program && context.texture && context.texture->d.mask_texture_id;
+
+    if((context.program && (context.program->get_flags() & GLProgramObject::read_buffer)) || (accel_mask && is_mask))
     {
         int& saved_context_depth = m_mask_draw_context_depth[context];
 
