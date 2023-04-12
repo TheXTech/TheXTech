@@ -28,9 +28,56 @@ typedef int             GLint;
 typedef unsigned int    GLuint;
 typedef float           GLfloat;
 
+constexpr int XT_GL_FLOAT = 0x1406;
+constexpr int XT_GL_INT   = 0x1404;
+
+struct StdPictureLoad;
+
+
 struct UniformValue_t
 {
-    GLfloat value;
+    union values_t
+    {
+        GLfloat f[4] = {0.0};
+        GLint i[4];
+
+        constexpr values_t(GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4) :
+            f{v1, v2, v3, v4} {}
+
+        constexpr values_t(GLint v1, GLint v2, GLint v3, GLint v4) :
+            i{v1, v2, v3, v4} {}
+    };
+
+    values_t values;
+    int16_t type = XT_GL_FLOAT;
+    uint8_t width = 1;
+
+    explicit constexpr UniformValue_t(int16_t type, uint8_t width) :
+        values(0.0f, 0.0f, 0.0f, 0.0f), type(type), width(width) {}
+
+    constexpr UniformValue_t(GLfloat v1) :
+        values(  v1, 0.0f, 0.0f, 0.0f), type(XT_GL_FLOAT), width(1) {}
+
+    constexpr UniformValue_t(GLfloat v1, GLfloat v2) :
+        values(  v1,   v2, 0.0f, 0.0f), type(XT_GL_FLOAT), width(2) {}
+
+    constexpr UniformValue_t(GLfloat v1, GLfloat v2, GLfloat v3) :
+        values(  v1,   v2,   v3, 0.0f), type(XT_GL_FLOAT), width(3) {}
+
+    constexpr UniformValue_t(GLfloat v1, GLfloat v2, GLfloat v3, GLfloat v4) :
+        values(  v1,   v2,   v3,  v4), type(XT_GL_FLOAT), width(4) {}
+
+    constexpr UniformValue_t(GLint   v1) :
+        values(  v1,    0,    0,    0), type(XT_GL_INT  ), width(1) {}
+
+    constexpr UniformValue_t(GLint   v1, GLint   v2) :
+        values(  v1,   v2,    0,    0), type(XT_GL_INT  ), width(2) {}
+
+    constexpr UniformValue_t(GLint   v1, GLint   v2, GLint   v3) :
+        values(  v1,   v2,   v3,    0), type(XT_GL_INT  ), width(3) {}
+
+    constexpr UniformValue_t(GLint   v1, GLint   v2, GLint   v3, GLint   v4) :
+        values(  v1,   v2,   v3,   v4), type(XT_GL_INT  ), width(4) {}
 
     bool operator==(const UniformValue_t& o) const;
 
@@ -82,7 +129,6 @@ private:
     bool m_enqueue_clear_uniform_steps = false;
 
     std::vector<UniformAssignment_t> m_uniform_steps;
-    std::vector<UniformValue_t> m_final_uniform_state;
 
     // internal functions
     void m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock);
@@ -153,9 +199,19 @@ public:
 
     /*!
      * \brief Registers a custom uniform variable in the next available index
-     * \returns The internal index for the uniform
+     * \param l StdPictureLoad to restore uniform registrations / assignments from
+     *
+     * Note: will fix the type of any assignments in l
      */
-    int register_uniform(const char* name);
+    void restore_uniforms(StdPictureLoad& l);
+
+    /*!
+     * \brief Registers a custom uniform variable in the next available index
+     * \param name name of uniform
+     * \param l StdPictureLoad to cache the registration in, in case of unload
+     * \returns The internal index for the uniform, -1 on failure
+     */
+    int register_uniform(const char* name, StdPictureLoad& l);
 
     /*!
      * \brief Gets location of custom uniform variable by registered index (advanced, ignores uniform state management)
@@ -166,8 +222,9 @@ public:
      * \brief Assigns a custom uniform variable to a value and stores it in the managed uniform state
      * \param index registered internal index returned by previous call to register_uniform
      * \param value to assign the uniform to
+     * \param l StdPictureLoad to check current state from and cache the assignment in, in case of unload
      */
-    void assign_uniform(int index, const UniformValue_t& value);
+    void assign_uniform(int index, const UniformValue_t& value, StdPictureLoad& l);
 
     /*!
      * \brief Returns the current uniform step for rewinding during the current frame

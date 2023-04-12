@@ -755,6 +755,37 @@ void AbstractRender_t::lazyLoadedBytesReset()
     m_lazyLoadedBytes = 0;
 }
 
+int AbstractRender_t::registerUniform(StdPicture &target, const char* name)
+{
+#ifdef THEXTECH_BUILD_GL_MODERN
+    auto it = std::find(target.l.registeredUniforms.begin(), target.l.registeredUniforms.end(), name);
+
+    if(it == target.l.registeredUniforms.end())
+    {
+        target.l.registeredUniforms.push_back(name);
+        target.l.finalUniformState.push_back(UniformValue_t(0.0f));
+
+        return target.l.registeredUniforms.size() - 1;
+    }
+
+    return it - target.l.registeredUniforms.begin();
+
+#else
+    UNUSED(target);
+    UNUSED(name);
+
+    return -1;
+#endif
+}
+
+void AbstractRender_t::assignUniform(StdPicture &target, int index, const UniformValue_t& value)
+{
+#ifdef THEXTECH_BUILD_GL_MODERN
+    if(index >= 0 && index < (int)target.l.finalUniformState.size())
+        target.l.finalUniformState[index] = value;
+#endif
+}
+
 
 #ifdef USE_RENDER_BLOCKING
 bool AbstractRender_t::renderBlocked()

@@ -57,8 +57,15 @@ struct StdPictureLoad
     //! Was mask restored from the PNG at default graphics?
     bool isMaskPng = false;
 
+
+#ifdef THEXTECH_BUILD_GL_MODERN
     //! Original fragment shader source (if presented)
     std::vector<char> fragmentShaderSource;
+    //! Shader uniform variables registered
+    std::vector<std::string> registeredUniforms;
+    //! Most recent values for shader uniform variables
+    std::vector<UniformValue_t> finalUniformState;
+#endif
 
     // Original size (if texture got scaled while loading)
     //! Original width
@@ -85,7 +92,13 @@ struct StdPictureLoad
     {
         raw.clear();
         rawMask.clear();
+
+#ifdef THEXTECH_BUILD_GL_MODERN
         fragmentShaderSource.clear();
+        registeredUniforms.clear();
+        finalUniformState.clear();
+#endif
+
         lazyLoaded = false;
         isMaskPng = false;
         w_orig = 0;

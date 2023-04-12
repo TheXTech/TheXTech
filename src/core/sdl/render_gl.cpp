@@ -1544,6 +1544,35 @@ void RenderGL::clearBuffer()
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
+
+int RenderGL::registerUniform(StdPicture &target, const char* name)
+{
+#ifdef THEXTECH_BUILD_GL_MODERN
+
+    if(userShadersSupported() && target.d.shader_program && target.d.shader_program->inited())
+        return target.d.shader_program->register_uniform(name, target.l);
+    else
+        return AbstractRender_t::registerUniform(target, name);
+
+#else
+    return AbstractRender_t::registerUniform(target, name);
+#endif
+}
+
+void RenderGL::assignUniform(StdPicture &target, int index, const UniformValue_t& value)
+{
+#ifdef THEXTECH_BUILD_GL_MODERN
+
+    if(userShadersSupported() && target.d.shader_program && target.d.shader_program->inited())
+        return target.d.shader_program->assign_uniform(index, value, target.l);
+    else
+        return AbstractRender_t::assignUniform(target, index, value);
+
+#else
+    return AbstractRender_t::assignUniform(target, index, value);
+#endif
+}
+
 void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
 #ifdef USE_RENDER_BLOCKING
@@ -1868,19 +1897,6 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     }
 
     SDL_assert_release(tx.d.texture_id);
-
-    if(&tx == &GFXBackgroundBMP[145])
-    {
-        if(tx.d.shader_program && tx.d.shader_program->get_uniform_loc(0) == -1)
-        {
-            tx.d.shader_program->register_uniform("u_flow_rate");
-        }
-
-        if(yDstD < 200.0)
-        {
-            tx.d.shader_program->assign_uniform(0, {xDstD / 100.0});
-        }
-    }
 
     int xDst = Maths::iRound(xDstD);
     int yDst = Maths::iRound(yDstD);

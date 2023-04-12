@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <limits>
+#include <algorithm>
 
 #include <Logger/logger.h>
 
@@ -27,30 +27,73 @@
 #include "core/sdl/gl_inc.h"
 #include "core/sdl/gl_program_object.h"
 #include "core/sdl/render_gl.h"
-
-// checks if x comes strictly before y in a cyclic sequence
-static constexpr bool s_cycle_before(uint16_t x, uint16_t y)
-{
-    return (uint16_t)(x - y) > (std::numeric_limits<uint16_t>::max() >> 1);
-}
+#include "std_picture.h"
 
 
 GLuint GLProgramObject::s_last_program = 0;
 
 bool UniformValue_t::operator==(const UniformValue_t& o) const
 {
+    if(type != o.type || width != o.width)
+        return false;
+
+    if(width < 1 || width > 4)
+        return false;
+
+    if(type == XT_GL_FLOAT)
+    {
+        for(uint8_t i = 0; i < width; i++)
+        {
+            if(values.f[i] != o.values.f[i])
+                return false;
+        }
+
+        return true;
+    }
+    else if(type == XT_GL_INT)
+    {
+        for(uint8_t i = 0; i < width; i++)
+        {
+            if(values.i[i] != o.values.i[i])
+                return false;
+        }
+
+        return true;
+    }
+
     return false;
 }
+
+#ifdef RENDERGL_HAS_SHADERS
 
 void s_execute_assignment(GLint uniform_loc, const UniformValue_t& value)
 {
     if(uniform_loc == -1)
         return;
 
-    glUniform1f(uniform_loc, value.value);
+    if(value.type == XT_GL_FLOAT)
+    {
+        if(value.width == 1)
+            glUniform1f(uniform_loc, value.values.f[0]);
+        else if(value.width == 2)
+            glUniform2f(uniform_loc, value.values.f[0], value.values.f[1]);
+        else if(value.width == 3)
+            glUniform3f(uniform_loc, value.values.f[0], value.values.f[1], value.values.f[2]);
+        else if(value.width == 4)
+            glUniform4f(uniform_loc, value.values.f[0], value.values.f[1], value.values.f[2], value.values.f[3]);
+    }
+    else if(value.type == XT_GL_INT)
+    {
+        if(value.width == 1)
+            glUniform1i(uniform_loc, value.values.i[0]);
+        else if(value.width == 2)
+            glUniform2i(uniform_loc, value.values.i[0], value.values.i[1]);
+        else if(value.width == 3)
+            glUniform3i(uniform_loc, value.values.i[0], value.values.i[1], value.values.i[2]);
+        else if(value.width == 4)
+            glUniform4i(uniform_loc, value.values.i[0], value.values.i[1], value.values.i[2], value.values.i[3]);
+    }
 }
-
-#ifdef RENDERGL_HAS_SHADERS
 
 /*******************************
  *** Static helper functions ***
@@ -381,14 +424,107 @@ void GLProgramObject::use_program()
 
 /*!
  * \brief Registers a custom uniform variable in the next available index
+ * \param l StdPictureLoad to restore uniform registrations / assignments from
+ *
+ * Note: will fix the type of any assignments in l
  */
-int GLProgramObject::register_uniform(const char* name)
+void GLProgramObject::restore_uniforms(StdPictureLoad& l)
 {
-    GLint loc = glGetUniformLocation(m_program, name);
-    m_u_custom_loc.push_back(loc);
+    // clear own custom uniform state
+    m_u_custom_loc.clear();
 
-    // soon, check what size / type the uniform has here.
-    m_final_uniform_state.push_back(UniformValue_t());
+    // save l's custom uniform state, clearing l itself
+    std::vector<std::string> uniform_names;
+    std::vector<UniformValue_t> final_values;
+    std::swap(uniform_names, l.registeredUniforms);
+    std::swap(final_values, l.finalUniformState);
+
+    // register all uniforms (saving their types)
+    for(const std::string& name : uniform_names)
+        register_uniform(name.c_str(), l);
+
+    // assign all uniforms
+    for(size_t i = 0; i < final_values.size(); i++)
+        assign_uniform(i, final_values[i], l);
+}
+
+/*!
+ * \brief Registers a custom uniform variable in the next available index
+ */
+int GLProgramObject::register_uniform(const char* name, StdPictureLoad& l)
+{
+    auto it = std::find(l.registeredUniforms.begin(), l.registeredUniforms.end(), name);
+
+    if(it != l.registeredUniforms.end())
+        return it - l.registeredUniforms.begin();
+
+    GLint loc = -1;
+    if(m_program)
+        loc = glGetUniformLocation(m_program, name);
+
+    if(loc < 0)
+        pLogWarning("GLProgramObject: attempted to register non-existent uniform %s", name);
+
+    GLenum full_type = 0;
+    if(loc >= 0)
+        glGetActiveUniform(m_program, loc, 0, nullptr, nullptr, &full_type, nullptr);
+
+    int16_t type;
+    uint8_t width;
+
+    switch(full_type)
+    {
+    default:
+        if(loc >= 0)
+            pLogWarning("GLProgramObject: attempted to register uniform %s of invalid type %x", name, (unsigned int)full_type);
+
+        // fall through
+
+    case(GL_FLOAT):
+        type = XT_GL_FLOAT;
+        width = 1;
+        break;
+
+    case(GL_FLOAT_VEC2):
+        type = XT_GL_FLOAT;
+        width = 2;
+        break;
+
+    case(GL_FLOAT_VEC3):
+        type = XT_GL_FLOAT;
+        width = 3;
+        break;
+
+    case(GL_FLOAT_VEC4):
+        type = XT_GL_FLOAT;
+        width = 4;
+        break;
+
+    case(GL_INT):
+        type = XT_GL_INT;
+        width = 1;
+        break;
+
+    case(GL_INT_VEC2):
+        type = XT_GL_INT;
+        width = 2;
+        break;
+
+    case(GL_INT_VEC3):
+        type = XT_GL_INT;
+        width = 3;
+        break;
+
+    case(GL_INT_VEC4):
+        type = XT_GL_INT;
+        width = 4;
+        break;
+    }
+
+    l.registeredUniforms.push_back(name);
+    l.finalUniformState.push_back(UniformValue_t(type, width));
+
+    m_u_custom_loc.push_back(loc);
 
     return m_u_custom_loc.size() - 1;
 }
@@ -404,27 +540,32 @@ GLint GLProgramObject::get_uniform_loc(int index)
         return -1;
 }
 
-/*!
- * \brief Assigns a custom uniform variable to a value and stores it in the managed uniform state
- * \param index registered internal index returned by previous call to register_uniform
- * \param value to assign the uniform to
- */
-void GLProgramObject::assign_uniform(int index, const UniformValue_t& value)
+void GLProgramObject::assign_uniform(int index, const UniformValue_t& value, StdPictureLoad& l)
 {
-    if(index < 0 || index >= (int)m_u_custom_loc.size())
+    if(index < 0 || index >= (int)m_u_custom_loc.size() || index >= (int)l.finalUniformState.size())
     {
         pLogWarning("GLProgramObject: invalid assignment called for uniform %d, only %d registered.", index, (int)m_u_custom_loc.size());
+        return;
+    }
+
+    if(value.type != l.finalUniformState[index].type || value.width != l.finalUniformState[index].width)
+    {
+        pLogWarning("GLProgramObject: type mismatch in attempted assignment for uniform %d.", index);
         return;
     }
 
     if(m_enqueue_clear_uniform_steps)
         m_clear_uniform_steps();
 
-    if(value != m_final_uniform_state[index])
+    if(value != l.finalUniformState[index])
     {
-        m_uniform_steps.push_back({m_final_uniform_state[index], value, index});
-        m_final_uniform_step++;
-        m_final_uniform_state[index] = value;
+        if(m_u_custom_loc[index] != -1)
+        {
+            m_uniform_steps.push_back({l.finalUniformState[index], value, index});
+            m_final_uniform_step++;
+        }
+
+        l.finalUniformState[index] = value;
     }
 }
 

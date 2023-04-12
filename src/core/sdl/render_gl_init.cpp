@@ -376,7 +376,7 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
     // allocate texture memory
     glBindTexture(GL_TEXTURE_2D, m_buffer_texture[buffer]);
 
-    int downscale = (buffer == BUFFER_LIGHTING) ? m_lighting_downscale : m_standard_downscale;
+    int downscale = (buffer == BUFFER_LIGHTING) ? m_lighting_downscale : 1;
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
         ScreenW / downscale, ScreenH / downscale,

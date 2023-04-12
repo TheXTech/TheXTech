@@ -49,6 +49,7 @@ private:
     SDL_Texture *mask_texture = nullptr;
 
     //! GLProgramObject wrapper for texture's shader program
+    // the semantics here should require unique, and it will be changed to that once StdPictureData copying is banned
     std::shared_ptr<GLProgramObject> shader_program = nullptr;
     //! texture ID for OpenGL and other render engines
     GLuint       texture_id = 0;

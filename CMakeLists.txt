@@ -966,6 +966,10 @@ if(THEXTECH_BUILD_GL_ES_MODERN)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_ES_MODERN)
 endif()
 
+if(THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_ES_MODERN)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_MODERN)
+endif()
+
 if(THEXTECH_BUILD_GL_DESKTOP_LEGACY)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_DESKTOP_LEGACY)
 endif()

@@ -223,6 +223,9 @@ public:
 
     virtual void clearBuffer() = 0;
 
+    virtual int registerUniform(StdPicture &target, const char* name);
+    virtual void assignUniform(StdPicture &target, int index, const UniformValue_t& value);
+
 
 
     // Draw primitives

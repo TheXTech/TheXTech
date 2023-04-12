@@ -235,7 +235,6 @@ private:
 
     // preferences
 
-    int m_standard_downscale = 1; // unsupported so far
     int m_lighting_downscale = 2;
 
 
@@ -545,6 +544,8 @@ public:
 
     void clearBuffer() override;
 
+    int registerUniform(StdPicture &target, const char* name) override;
+    void assignUniform(StdPicture &target, int index, const UniformValue_t& value) override;
 
 
     // Draw primitives

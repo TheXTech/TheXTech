@@ -36,6 +36,8 @@
 #   define TAIL ;
 #endif
 
+struct UniformValue_t;
+
 
 namespace XRender
 {
@@ -357,6 +359,43 @@ E_INLINE void clearBuffer() TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->clearBuffer();
+}
+#endif
+
+
+// Support for initializing and setting shader uniforms
+
+/*!
+ * \brief Registers a custom uniform variable in the next available index
+ * \param target Destination texture entry
+ * \param name name of the uniform variable, passed to `glGetUniformLocation`
+ * \returns The internal index for the uniform, -1 on failure (including missing GL support at compile time)
+ *
+ * Returned indexes are maintained for the full lifespan of the StdPicture, including reloads
+ */
+E_INLINE int registerUniform(StdPicture &target,
+                             const char* name) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return g_render->registerUniform(target, name);
+}
+#endif
+
+/*!
+ * \brief Assigns a custom uniform variable to a specific value
+ * \param target Destination texture entry
+ * \param index index of the uniform variable, returned from `registerUniform`
+ * \param value value to store in the uniform variable
+ *
+ * Assignments to active indexes are maintained for the full lifespan of the StdPicture, including reloads
+ * Invalid assignments (wrong type or size) to active indexes will reset the uniform variable at the index
+ */
+E_INLINE void assignUniform(StdPicture &target,
+                            int index,
+                            const UniformValue_t& value) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return g_render->assignUniform(target, index, value);
 }
 #endif
 
