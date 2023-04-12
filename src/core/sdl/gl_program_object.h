@@ -31,6 +31,13 @@ typedef float           GLfloat;
 struct UniformValue_t
 {
     GLfloat value;
+
+    bool operator==(const UniformValue_t& o) const;
+
+    inline bool operator!=(const UniformValue_t& o) const
+    {
+        return !(*this == o);
+    }
 };
 
 
@@ -68,11 +75,11 @@ private:
         int index;
     };
 
-    int m_uniform_epoch = 0;
-    int m_epoch_uniform_step = 0;
-    int m_final_uniform_step = 0;
-
-    int m_gl_uniform_step = 0;
+    // these each denote states which PRECEDE the step's execution.
+    // thus, the highest legal step is m_uniform_steps.size()
+    uint16_t m_final_uniform_step = 0;
+    uint16_t m_gl_uniform_step = 0;
+    bool m_enqueue_clear_uniform_steps = false;
 
     std::vector<UniformAssignment_t> m_uniform_steps;
     std::vector<UniformValue_t> m_final_uniform_state;
@@ -84,7 +91,9 @@ private:
 
     void m_link_program(GLuint vertex_shader, GLuint fragment_shader);
 
-    void m_clear_uniform_epoch();
+    void m_activate_uniform_step(uint16_t step);
+
+    void m_clear_uniform_steps();
 
 public:
 
@@ -146,25 +155,12 @@ public:
      * \brief Registers a custom uniform variable in the next available index
      * \returns The internal index for the uniform
      */
-    int register_uniform(const std::string& name);
+    int register_uniform(const char* name);
 
     /*!
      * \brief Gets location of custom uniform variable by registered index (advanced, ignores uniform state management)
      */
     GLint get_uniform_loc(int index);
-
-    /*!
-     * \brief Updates the current rewindable set of uniform assignments; if the epoch passed is not equal to the current one, clears this set
-     * \param epoch set of uniform assignments it should be possible to rewind through; generally follows the frame counter
-     */
-    inline void set_uniform_epoch(int epoch)
-    {
-        if(epoch != m_uniform_epoch)
-        {
-            m_clear_uniform_epoch();
-            m_uniform_epoch = epoch;
-        }
-    }
 
     /*!
      * \brief Assigns a custom uniform variable to a value and stores it in the managed uniform state
@@ -177,16 +173,27 @@ public:
      * \brief Returns the current uniform step for rewinding during the current frame
      * \returns The current uniform step
      */
-    inline int get_uniform_step()
+    inline uint16_t get_uniform_step()
     {
         return m_final_uniform_step;
     }
 
     /*!
      * \brief Returns the current uniform step for rewinding during the current frame
-     * \param step a step returned from get_uniform_step during the current epoch
+     * \param step a step returned from get_uniform_step during the current frame
+     *
+     * Important note: may only be called while program has been activated by use_program()
+     * Important note: this method is called while clearing the render queue;
+     * thus, after calling this function at any point, any subsequent call to
+     * assign_uniform will clear the rewind buffer and reset the final step to 0
      */
-    void activate_uniform_step(int step);
+    void activate_uniform_step(uint16_t step)
+    {
+        if(step == m_gl_uniform_step)
+            return;
+
+        m_activate_uniform_step(step);
+    }
 };
 
 #endif // #ifndef GL_PROGRAM_OBJECT_H

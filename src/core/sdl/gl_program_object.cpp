@@ -18,13 +18,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <limits>
+
 #include <Logger/logger.h>
+
+#include "sdl_proxy/sdl_assert.h"
 
 #include "core/sdl/gl_inc.h"
 #include "core/sdl/gl_program_object.h"
 #include "core/sdl/render_gl.h"
 
+// checks if x comes strictly before y in a cyclic sequence
+static constexpr bool s_cycle_before(uint16_t x, uint16_t y)
+{
+    return (uint16_t)(x - y) > (std::numeric_limits<uint16_t>::max() >> 1);
+}
+
+
 GLuint GLProgramObject::s_last_program = 0;
+
+bool UniformValue_t::operator==(const UniformValue_t& o) const
+{
+    return false;
+}
+
+void s_execute_assignment(GLint uniform_loc, const UniformValue_t& value)
+{
+    if(uniform_loc == -1)
+        return;
+
+    glUniform1f(uniform_loc, value.value);
+}
 
 #ifdef RENDERGL_HAS_SHADERS
 
@@ -195,6 +219,86 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     D_pLogDebugNA("GLProgramObject: program successfully linked");
 }
 
+void GLProgramObject::m_activate_uniform_step(uint16_t step)
+{
+    // enqueue a clear next time a uniform is assigned
+    m_enqueue_clear_uniform_steps = true;
+
+    // safeties
+    SDL_assert_release(m_final_uniform_step <= m_uniform_steps.size());
+    SDL_assert_release(m_gl_uniform_step <= m_uniform_steps.size());
+
+    // is step after m_final_step?
+    if(step > m_final_uniform_step)
+    {
+        step = m_final_uniform_step;
+        pLogWarning("GLProgramObject: requested to activate uniform state that has not yet been set");
+    }
+
+    // track which uniforms are now matching the requested state
+    std::vector<bool> updated(m_u_custom_loc.size());
+
+    // rewind
+    if(step < m_gl_uniform_step)
+    {
+        // rewind each step between the requested step and the current GL step
+        // starts with step following REQUESTED STATE to avoid double-assignments
+        for(uint16_t step_index = step; step_index < m_gl_uniform_step; step_index++)
+        {
+            const UniformAssignment_t& assignment = m_uniform_steps[step_index];
+
+            // only undo the assignment CLOSEST to the requested state
+            if(updated[assignment.index])
+                continue;
+
+            updated[assignment.index] = true;
+
+            s_execute_assignment(get_uniform_loc(assignment.index), assignment.pre);
+        }
+
+        m_gl_uniform_step = step;
+    }
+    // fast-forward
+    else if(step > m_gl_uniform_step)
+    {
+        // execute each step between the requested step and the current GL step
+        // starts with step before REQUESTED STATE to avoid double-assignments
+        // (includes m_gl_uniform_step because m_gl_uniform_step represents state before step, moved dec into loop to avoid unsigned int >= 0)
+        for(uint16_t step_index = step; step_index > m_gl_uniform_step;)
+        {
+            step_index--;
+
+            const UniformAssignment_t& assignment = m_uniform_steps[step_index];
+
+            // only undo the assignment CLOSEST to the requested state
+            if(updated[assignment.index])
+                continue;
+
+            updated[assignment.index] = true;
+
+            s_execute_assignment(get_uniform_loc(assignment.index), assignment.post);
+        }
+
+        m_gl_uniform_step = step;
+    }
+}
+
+void GLProgramObject::m_clear_uniform_steps()
+{
+    // activate as the current GL program object
+    use_program();
+
+    // flush GL state to the most recent step
+    activate_uniform_step(m_final_uniform_step);
+
+    // clear set of uniform steps
+    m_uniform_steps.clear();
+
+    // our current uniform step precedes the first assignment of the frame
+    m_gl_uniform_step = 0;
+    m_final_uniform_step = 0;
+    m_enqueue_clear_uniform_steps = false;
+}
 
 /**********************
  *** Public methods ***
@@ -278,10 +382,14 @@ void GLProgramObject::use_program()
 /*!
  * \brief Registers a custom uniform variable in the next available index
  */
-int GLProgramObject::register_uniform(const std::string& name)
+int GLProgramObject::register_uniform(const char* name)
 {
-    GLint loc = glGetUniformLocation(m_program, name.c_str());
+    GLint loc = glGetUniformLocation(m_program, name);
     m_u_custom_loc.push_back(loc);
+
+    // soon, check what size / type the uniform has here.
+    m_final_uniform_state.push_back(UniformValue_t());
+
     return m_u_custom_loc.size() - 1;
 }
 
@@ -290,7 +398,34 @@ int GLProgramObject::register_uniform(const std::string& name)
  */
 GLint GLProgramObject::get_uniform_loc(int index)
 {
-    return m_u_custom_loc[index];
+    if(index >= 0 && index < (int)m_u_custom_loc.size())
+        return m_u_custom_loc[index];
+    else
+        return -1;
+}
+
+/*!
+ * \brief Assigns a custom uniform variable to a value and stores it in the managed uniform state
+ * \param index registered internal index returned by previous call to register_uniform
+ * \param value to assign the uniform to
+ */
+void GLProgramObject::assign_uniform(int index, const UniformValue_t& value)
+{
+    if(index < 0 || index >= (int)m_u_custom_loc.size())
+    {
+        pLogWarning("GLProgramObject: invalid assignment called for uniform %d, only %d registered.", index, (int)m_u_custom_loc.size());
+        return;
+    }
+
+    if(m_enqueue_clear_uniform_steps)
+        m_clear_uniform_steps();
+
+    if(value != m_final_uniform_state[index])
+    {
+        m_uniform_steps.push_back({m_final_uniform_state[index], value, index});
+        m_final_uniform_step++;
+        m_final_uniform_state[index] = value;
+    }
 }
 
 #else // #ifdef RENDERGL_HAS_SHADERS

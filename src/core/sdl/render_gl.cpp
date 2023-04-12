@@ -310,6 +310,7 @@ void RenderGL::flushUnorderedDrawQueue()
 
             program->use_program();
             program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+            program->activate_uniform_step(context.uniform_step);
         }
 #endif
 
@@ -406,6 +407,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
 
             program->use_program();
             program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+            program->activate_uniform_step(context.uniform_step);
         }
 #endif
 
@@ -1866,6 +1868,19 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     }
 
     SDL_assert_release(tx.d.texture_id);
+
+    if(&tx == &GFXBackgroundBMP[145])
+    {
+        if(tx.d.shader_program && tx.d.shader_program->get_uniform_loc(0) == -1)
+        {
+            tx.d.shader_program->register_uniform("u_flow_rate");
+        }
+
+        if(yDstD < 200.0)
+        {
+            tx.d.shader_program->assign_uniform(0, {xDstD / 100.0});
+        }
+    }
 
     int xDst = Maths::iRound(xDstD);
     int yDst = Maths::iRound(yDstD);
