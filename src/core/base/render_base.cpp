@@ -532,9 +532,9 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
     target.l.lazyLoaded = true;
     target.d.clear();
 
+#ifdef THEXTECH_BUILD_GL_MODERN
     // load fragment shader if it exists
-    // userShadersSupported() condition must be removed before hot-swapping can be implemented
-    if(g_render->userShadersSupported() && Files::fileExists(path + ".frag"))
+    if(Files::fileExists(path + ".frag"))
     {
         pLogDebug("Loading user shader [%s%s]...", path.c_str(), ".frag");
         dumpFullFile(target.l.fragmentShaderSource, path + ".frag");
@@ -544,6 +544,51 @@ StdPicture AbstractRender_t::lazyLoadPicture(const std::string &path,
         // eagerly compile it to minimize stutter
         g_render->compileShaders(target);
     }
+#endif
+
+    return target;
+}
+
+StdPicture AbstractRender_t::LoadPictureShader(const std::string &path)
+{
+    StdPicture target;
+
+    if(!GameIsActive)
+        return target; // do nothing when game is closed
+
+    if(path.empty())
+        return target;
+
+#ifdef DEBUG_BUILD
+    target.origPath = path;
+#endif
+
+    target.d.clear();
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+    // load fragment shader if it exists
+    if(Files::fileExists(path))
+    {
+        target.w = 1;
+        target.h = 1;
+
+        target.inited = true;
+        target.l.lazyLoaded = true;
+
+        // blank GIF of 1 pixel
+        const char blank_gif[] = "GIF87a\x01\x00\x01\x00\x80\x01\x00\x00\x00\x00\xff\xff\xff,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
+        target.l.raw.resize(sizeof(blank_gif) - 1);
+        SDL_memcpy(target.l.raw.data(), blank_gif, sizeof(blank_gif) - 1);
+
+        pLogDebug("Loading user shader [%s]...", path.c_str());
+        dumpFullFile(target.l.fragmentShaderSource, path);
+        // must be null-terminated
+        target.l.fragmentShaderSource.push_back('\0');
+
+        // eagerly compile it to minimize stutter
+        g_render->compileShaders(target);
+    }
+#endif
 
     return target;
 }

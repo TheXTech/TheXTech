@@ -183,6 +183,8 @@ public:
                                       const std::string &maskPath = std::string(),
                                       const std::string &maskFallbackPath = std::string());
 
+    static StdPicture LoadPictureShader(const std::string &path);
+
     static void setTransparentColor(StdPicture &target, uint32_t rgb);
 
     virtual void loadTexture(StdPicture &target,

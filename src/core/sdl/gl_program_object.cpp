@@ -544,13 +544,20 @@ void GLProgramObject::assign_uniform(int index, const UniformValue_t& value, Std
 {
     if(index < 0 || index >= (int)m_u_custom_loc.size() || index >= (int)l.finalUniformState.size())
     {
-        pLogWarning("GLProgramObject: invalid assignment called for uniform %d, only %d registered.", index, (int)m_u_custom_loc.size());
+        pLogWarning("GLProgramObject: invalid assignment called for uniform registered at index %d, only %d registered.", index, (int)m_u_custom_loc.size());
+        return;
+    }
+
+    if(m_u_custom_loc[index] == -1)
+    {
+        D_pLogDebug("GLProgramObject: attempted assignment to non-existent uniform registered at index %d.", index);
+        l.finalUniformState[index] = value;
         return;
     }
 
     if(value.type != l.finalUniformState[index].type || value.width != l.finalUniformState[index].width)
     {
-        pLogWarning("GLProgramObject: type mismatch in attempted assignment for uniform %d.", index);
+        pLogWarning("GLProgramObject: type mismatch in attempted assignment for uniform registered at index %d.", index);
         return;
     }
 

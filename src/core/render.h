@@ -200,6 +200,18 @@ E_INLINE void setTargetScreen() TAIL
 }
 #endif
 
+/*!
+ * \brief Reports whether the *currently-active* renderer supports loading GLSL ES shaders
+ *
+ * Should not be used to prevent loading (to ensure consistency when renderer is hotswapped)
+ */
+E_INLINE bool userShadersSupported() TAIL
+#ifndef RENDER_CUSTOM
+{
+    return g_render->userShadersSupported();
+}
+#endif
+
 #ifdef __16M__
 /*!
  * \brief Clear all currently loaded textures
@@ -251,6 +263,14 @@ E_INLINE StdPicture lazyLoadPicture(const std::string &path,
 #ifndef RENDER_CUSTOM
 {
     return AbstractRender_t::lazyLoadPicture(path, maskPath, maskFallbackPath);
+}
+#endif
+
+// load a shader-only picture (must succeed if file exists and shaders are supported at compile time)
+E_INLINE StdPicture LoadPictureShader(const std::string &path) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return AbstractRender_t::LoadPictureShader(path);
 }
 #endif
 
