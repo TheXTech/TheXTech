@@ -449,6 +449,8 @@ public:
 
     InputMethodType_TouchScreen();
 
+    const std::string& LocalName() const override;
+
     bool TestProfileType(InputMethodProfile *profile);
     bool RumbleSupported();
     bool ConsumeEvent(const SDL_Event *ev);

@@ -176,6 +176,8 @@ public:
     InputMethodType_Joystick();
     ~InputMethodType_Joystick();
 
+    const std::string& LocalName() const override;
+
     bool TestProfileType(InputMethodProfile *profile);
     bool RumbleSupported();
 

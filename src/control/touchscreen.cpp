@@ -33,6 +33,9 @@
 #include "../player.h"
 #include "../core/render.h"
 #include "../core/window.h"
+
+#include "control/controls_strings.h"
+
 #include "editor/new_editor.h"
 
 #include <SDL2/SDL_haptic.h>
@@ -2183,6 +2186,11 @@ InputMethodType_TouchScreen::InputMethodType_TouchScreen()
     this->Name = "Touchscreen";
 }
 
+const std::string& InputMethodType_TouchScreen::LocalName() const
+{
+    return g_controlsStrings.nameTouchscreen;
+}
+
 bool InputMethodType_TouchScreen::TestProfileType(InputMethodProfile* profile)
 {
     return (bool)dynamic_cast<InputMethodProfile_TouchScreen*>(profile);
@@ -2279,7 +2287,7 @@ InputMethod* InputMethodType_TouchScreen::Poll(const std::vector<InputMethod*>& 
         SharedCursor.GoOffscreen();
     }
 
-    method->Name = "Touchscreen";
+    method->Name = this->LocalName();
     method->Type = this;
 
     this->m_controller.m_active_method = method;

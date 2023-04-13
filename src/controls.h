@@ -652,13 +652,16 @@ protected:
     virtual InputMethodProfile *AllocateProfile() noexcept = 0;
 
 public:
-    // absolutely required to be unique, because it is used to identify configuration
+    // absolutely required to be unique, because it is used to identify configuration. DO NOT LOCALIZE.
     std::string Name;
     // not required to be defined, refers to original "player-X-keyboard", etc, configurations.
     std::string LegacyName;
 
     // InputMethodType frees its InputMethodProfiles in its destructor
     virtual ~InputMethodType();
+
+    // returns localized name based on translations, possibly to name individual methods and profiles
+    virtual const std::string& LocalName() const;
 
     std::vector<InputMethodProfile *> GetProfiles();
     // returns a pointer to the new profile on success

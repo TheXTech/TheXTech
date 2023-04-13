@@ -59,7 +59,25 @@ struct ControlsStrings_t
     std::string sharedCaseInvalid = "(Invalid)";
     std::string sharedOptionMaxPlayers = "Max Players";
 
-#if defined(CONTROLS_16M_STRINGS)
+#ifdef CONTROLS_KEYBOARD_STRINGS
+    std::string nameKeyboard = "Keyboard";
+    std::string keyboardOptionTextEntryStyle = "Text Entry Style";
+#endif
+
+#if defined(CONTROLS_KEYBOARD_STRINGS) || defined(CONTROLS_JOYSTICK_STRINGS)
+    std::string nameGamepad = "Gamepad";
+#endif
+
+#if defined(CONTROLS_JOYSTICK_STRINGS)
+    std::string nameOldJoy = "Old Joy";
+    std::string phraseNewProfOldJoy = "New Profile for Old Joystick";
+#endif
+
+#ifdef CONTROLS_TOUCHSCREEN_STRINGS
+    std::string nameTouchscreen = "Touchscreen";
+#endif
+
+#ifdef CONTROLS_16M_STRINGS
     std::string tdsButtonA = "A";
     std::string tdsButtonB = "B";
     std::string tdsButtonX = "X";

@@ -220,8 +220,10 @@
                 "batteryStatus": "Battery Status",
                 "groundPoundButton": "Ground Pound Button",
                 "maxPlayers": "Max Players",
-                "rumble": "Rumble"
+                "rumble": "Rumble",
+                "textEntryStyle": "Text Entry Style"
             },
+            "phraseNewProfOldJoy": "New Profile for Old Joystick",
             "profile": {
                 "activateProfile": "Activate profile",
                 "cursorControls": "Cursor controls",
@@ -246,6 +248,12 @@
                 "casePen": "(Pen)",
                 "dPad": "D-Pad",
                 "tStick": "Thumb"
+            },
+            "types": {
+                "gamepad": "Gamepad",
+                "keyboard": "Keyboard",
+                "oldJoystick": "Old Joy",
+                "touchscreen": "Touchscreen"
             },
             "wordButtons": "Buttons",
             "wordProfiles": "Profiles"

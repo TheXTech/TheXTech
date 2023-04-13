@@ -372,13 +372,13 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 }
 
                 if(in_use)
-                    SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->Name + " " + g_mainMenu.controlsInUse, 3, sX+48, sY+(3+i)*line);
+                    SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->LocalName() + " " + g_mainMenu.controlsInUse, 3, sX+48, sY+(3+i)*line);
                 else
-                    SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->Name, 3, sX+48, sY+(3+i)*line);
+                    SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->LocalName(), 3, sX+48, sY+(3+i)*line);
                 if(MenuCursor == scroll_start + i)
                     XRender::renderTexture(sX + 24, sY+(3+i)*line, GFX.MCursor[0]);
             }
-            int item_width = Controls::g_InputMethodTypes[scroll_start + i]->Name.size()*18;
+            int item_width = Controls::g_InputMethodTypes[scroll_start + i]->LocalName().size()*18;
             if(mouse && SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
                 && SharedCursor.Y >= sY+(3+i)*line && SharedCursor.Y <= sY+(3+i)*line + 16)
             {

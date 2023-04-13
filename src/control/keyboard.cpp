@@ -805,6 +805,11 @@ InputMethodType_Keyboard::InputMethodType_Keyboard()
     this->LegacyName = "keyboard";
 }
 
+const std::string& InputMethodType_Keyboard::LocalName() const
+{
+    return g_controlsStrings.nameKeyboard;
+}
+
 bool InputMethodType_Keyboard::TestProfileType(InputMethodProfile* profile)
 {
     return (bool)dynamic_cast<InputMethodProfile_Keyboard*>(profile);
@@ -1103,7 +1108,7 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
     if(!method)
         return nullptr;
 
-    method->Name = "Keyboard";
+    method->Name = this->LocalName();
     method->Type = this;
     method->Profile = target_profile;
 
@@ -1435,7 +1440,7 @@ const char* InputMethodType_Keyboard::GetOptionName(size_t i)
         return g_controlsStrings.sharedOptionMaxPlayers.c_str();
 
     if(i == 1)
-        return "TEXT ENTRY STYLE";
+        return g_controlsStrings.keyboardOptionTextEntryStyle.c_str();
 
     return nullptr;
 }
@@ -1455,9 +1460,9 @@ const char* InputMethodType_Keyboard::GetOptionValue(size_t i)
     if(i == 1)
     {
         if(this->m_directText)
-            return "KEYBOARD";
+            return g_controlsStrings.nameKeyboard.c_str();
         else
-            return "GAMEPAD";
+            return g_controlsStrings.nameGamepad.c_str();
     }
 
     return nullptr;

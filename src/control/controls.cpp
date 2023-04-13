@@ -369,6 +369,11 @@ InputMethodType::~InputMethodType()
     this->m_profiles.clear();
 }
 
+const std::string& InputMethodType::LocalName() const
+{
+    return this->Name;
+}
+
 std::vector<InputMethodProfile*> InputMethodType::GetProfiles()
 {
     return this->m_profiles;
@@ -383,7 +388,7 @@ InputMethodProfile* InputMethodType::AddProfile()
 
     profile->Type = this;
     this->m_profiles.push_back((InputMethodProfile*) profile);
-    profile->Name = this->Name + " " + std::to_string(this->m_profiles.size());
+    profile->Name = this->LocalName() + " " + std::to_string(this->m_profiles.size());
 
     return profile;
 }
@@ -569,7 +574,7 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
         {
             ctl->beginGroup(group_name);
             new_profile->LoadConfig_All(ctl);
-            ctl->read("name", new_profile->Name, this->Name + " " + std::to_string(i + n_existing + 1));
+            ctl->read("name", new_profile->Name, this->LocalName() + " " + std::to_string(i + n_existing + 1));
             ctl->endGroup();
         }
     }

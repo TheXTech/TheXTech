@@ -220,8 +220,10 @@
                 "batteryStatus": "電池狀態",
                 "groundPoundButton": "震地按鍵",
                 "maxPlayers": "玩家上限",
-                "rumble": "Rumble 控制器"
+                "rumble": "Rumble 控制器",
+                "textEntryStyle": ""
             },
+            "phraseNewProfOldJoy": "",
             "profile": {
                 "activateProfile": "啓用配置",
                 "cursorControls": "鼠標控制",
@@ -246,6 +248,12 @@
                 "casePen": "(觸控筆)",
                 "dPad": "方向鍵",
                 "tStick": "左搖桿"
+            },
+            "types": {
+                "gamepad": "",
+                "keyboard": "",
+                "oldJoystick": "",
+                "touchscreen": ""
             },
             "wordButtons": "按鍵",
             "wordProfiles": "配置"

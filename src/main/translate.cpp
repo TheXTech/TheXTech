@@ -264,6 +264,24 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.hotkeys.toggleHUD",   &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::ToggleHUD]},
         {"menu.controls.hotkeys.legacyPause", &Controls::Hotkeys::g_button_name_UI[Controls::Hotkeys::LegacyPause]},
 
+#ifdef CONTROLS_KEYBOARD_STRINGS
+        {"menu.controls.types.keyboard",    &g_controlsStrings.nameKeyboard},
+        {"menu.controls.options.textEntryStyle",    &g_controlsStrings.keyboardOptionTextEntryStyle},
+#endif
+
+#if defined(CONTROLS_KEYBOARD_STRINGS) || defined(CONTROLS_JOYSTICK_STRINGS)
+        {"menu.controls.types.gamepad",    &g_controlsStrings.nameGamepad},
+#endif
+
+#if defined(CONTROLS_JOYSTICK_STRINGS)
+        {"menu.controls.phraseNewProfOldJoy",&g_controlsStrings.phraseNewProfOldJoy},
+        {"menu.controls.types.oldJoystick",&g_controlsStrings.nameOldJoy},
+#endif
+
+#if defined(CONTROLS_TOUCHSCREEN_STRINGS)
+        {"menu.controls.types.touchscreen",&g_controlsStrings.nameTouchscreen},
+#endif
+
 #if defined(CONTROLS_16M_STRINGS)
         {"menu.controls.tDS.buttonA",      &g_controlsStrings.tdsButtonA},
         {"menu.controls.tDS.buttonB",      &g_controlsStrings.tdsButtonB},

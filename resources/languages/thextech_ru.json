@@ -220,8 +220,10 @@
                 "batteryStatus": "Состояние батареи",
                 "groundPoundButton": "Кнопка сотрясания земли",
                 "maxPlayers": "",
-                "rumble": "Вибрация"
+                "rumble": "Вибрация",
+                "textEntryStyle": ""
             },
+            "phraseNewProfOldJoy": "",
             "profile": {
                 "activateProfile": "Активировать профиль",
                 "cursorControls": "Указатель",
@@ -246,6 +248,12 @@
                 "casePen": "",
                 "dPad": "",
                 "tStick": ""
+            },
+            "types": {
+                "gamepad": "",
+                "keyboard": "",
+                "oldJoystick": "",
+                "touchscreen": ""
             },
             "wordButtons": "Кнопки",
             "wordProfiles": "Профили"
