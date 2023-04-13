@@ -154,6 +154,7 @@
     },
     "languageName": "English",
     "menu": {
+        "abbrevMilliseconds": "MS",
         "battle": {
             "errorNoLevels": "Can't start battle because of no levels available"
         },
@@ -177,6 +178,8 @@
                 "up": "Up"
             },
             "caseInvalid": "(Invalid)",
+            "caseMouse": "(Mouse)",
+            "caseTouch": "(Touch)",
             "controlsConnected": "Connected:",
             "controlsDeleteKey": "(Alt Jump to Delete)",
             "controlsDeviceTypes": "Device Types",
@@ -248,6 +251,35 @@
                 "casePen": "(Pen)",
                 "dPad": "D-Pad",
                 "tStick": "Thumb"
+            },
+            "touchscreen": {
+                "layout": {
+                    "longOld": "Long (Old)",
+                    "phabletOld": "Phablet (Old)",
+                    "phoneOld": "Phone (Old)",
+                    "standard": "Standard",
+                    "tabletOld": "Tablet (Old)",
+                    "tight": "Tight",
+                    "tinyOld": "Tiny (Old)"
+                },
+                "option": {
+                    "feedbackLength": "Feedback Length",
+                    "feedbackStrength": "Feedback Strength",
+                    "holdRun": "Hold Run on Start",
+                    "interfaceStyle": "Interface Style",
+                    "layoutStyle": "Layout Style",
+                    "resetLayout": "Reset Layout",
+                    "sStartSpacing": "S-Start Spacing",
+                    "scaleButtons": "Scale Buttons",
+                    "scaleDPad": "Scale D-Pad",
+                    "scaleFactor": "Scale Factor",
+                    "showCodeButton": "Show Code Button"
+                },
+                "style": {
+                    "ABXY": "ABXY",
+                    "XODA": "XODA",
+                    "actions": "Actions"
+                }
             },
             "types": {
                 "gamepad": "Gamepad",

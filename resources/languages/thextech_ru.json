@@ -154,6 +154,7 @@
     },
     "languageName": "Русский",
     "menu": {
+        "abbrevMilliseconds": "",
         "battle": {
             "errorNoLevels": "Невозможно начать битву потому что нету доступных уровней"
         },
@@ -177,6 +178,8 @@
                 "up": "Вверх"
             },
             "caseInvalid": "",
+            "caseMouse": "",
+            "caseTouch": "",
             "controlsConnected": "Подключено:",
             "controlsDeleteKey": "(Альт-Прыжок чтобы сбросить)",
             "controlsDeviceTypes": "Типы устройств",
@@ -248,6 +251,35 @@
                 "casePen": "",
                 "dPad": "",
                 "tStick": ""
+            },
+            "touchscreen": {
+                "layout": {
+                    "longOld": "",
+                    "phabletOld": "",
+                    "phoneOld": "",
+                    "standard": "",
+                    "tabletOld": "",
+                    "tight": "",
+                    "tinyOld": ""
+                },
+                "option": {
+                    "feedbackLength": "",
+                    "feedbackStrength": "",
+                    "holdRun": "",
+                    "interfaceStyle": "",
+                    "layoutStyle": "",
+                    "resetLayout": "",
+                    "sStartSpacing": "",
+                    "scaleButtons": "",
+                    "scaleDPad": "",
+                    "scaleFactor": "",
+                    "showCodeButton": ""
+                },
+                "style": {
+                    "ABXY": "",
+                    "XODA": "",
+                    "actions": ""
+                }
             },
             "types": {
                 "gamepad": "",

@@ -174,6 +174,7 @@ void initMainMenu()
     g_mainMenu.wordOff  = "Off";
     g_mainMenu.wordShow = "Show";
     g_mainMenu.wordHide = "Hide";
+    g_mainMenu.abbrevMilliseconds = "MS";
 }
 
 

@@ -35,6 +35,8 @@
 #include "core/window.h"
 #include "main/cheat_code.h"
 
+#include "main/menu_main.h"
+
 #include "control/controls_strings.h"
 
 #include <Logger/logger.h>
@@ -612,7 +614,7 @@ const char* InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size
     if(c == ControlsClass::Player)
         keys = this->m_keys;
     else if(c == ControlsClass::Cursor)
-        return "(MOUSE)";
+        return g_controlsStrings.caseMouse.c_str();
     else if(c == ControlsClass::Editor)
         keys = this->m_editor_keys;
     else if(c == ControlsClass::Hotkey)
@@ -621,7 +623,7 @@ const char* InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size
         return "";
 
     if(keys[i] == null_key)
-        return "NONE";
+        return g_mainMenu.caseNone.c_str();
 
     return SDL_GetScancodeName((SDL_Scancode)keys[i]);
 }
@@ -642,7 +644,7 @@ const char* InputMethodProfile_Keyboard::NameSecondaryButton(ControlsClass c, si
         return "";
 
     if(keys2[i] == null_key)
-        return "NONE";
+        return "";
 
     return SDL_GetScancodeName((SDL_Scancode)keys2[i]);
 }

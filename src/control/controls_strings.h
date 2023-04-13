@@ -62,6 +62,7 @@ struct ControlsStrings_t
 #ifdef CONTROLS_KEYBOARD_STRINGS
     std::string nameKeyboard = "Keyboard";
     std::string keyboardOptionTextEntryStyle = "Text Entry Style";
+    std::string caseMouse = "(Mouse)";
 #endif
 
 #if defined(CONTROLS_KEYBOARD_STRINGS) || defined(CONTROLS_JOYSTICK_STRINGS)
@@ -75,6 +76,33 @@ struct ControlsStrings_t
 
 #ifdef CONTROLS_TOUCHSCREEN_STRINGS
     std::string nameTouchscreen = "Touchscreen";
+    std::string caseTouch = "(Touch)";
+
+
+    std::string touchscreenOptionLayoutStyle = "Layout Style";
+    std::string touchscreenOptionScaleFactor = "Scale Factor";
+    std::string touchscreenOptionScaleDPad = "Scale D-Pad";
+    std::string touchscreenOptionScaleButtons = "Scale Buttons";
+    std::string touchscreenOptionSStartSpacing = "S-Start Spacing";
+    std::string touchscreenOptionResetLayout = "Reset Layout";
+    std::string touchscreenOptionInterfaceStyle = "Interface Style";
+    std::string touchscreenOptionFeedbackStrength = "Feedback Strength";
+    std::string touchscreenOptionFeedbackLength = "Feedback Length";
+    std::string touchscreenOptionHoldRun = "Hold Run on Start";
+    std::string touchscreenOptionShowCodeButton = "Show Code Button";
+
+
+    std::string touchscreenLayoutTight = "Tight";
+    std::string touchscreenLayoutTinyOld = "Tiny (Old)";
+    std::string touchscreenLayoutPhoneOld = "Phone (Old)";
+    std::string touchscreenLayoutLongOld = "Long (Old)";
+    std::string touchscreenLayoutPhabletOld = "Phablet (Old)";
+    std::string touchscreenLayoutTabletOld = "Tablet (Old)";
+    std::string touchscreenLayoutStandard = "Standard";
+
+    std::string touchscreenStyleActions = "Actions";
+    std::string touchscreenStyleABXY = "ABXY";
+    std::string touchscreenStyleXODA = "XODA";
 #endif
 
 #ifdef CONTROLS_16M_STRINGS

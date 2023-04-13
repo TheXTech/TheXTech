@@ -154,6 +154,7 @@
     },
     "languageName": "繁體中文",
     "menu": {
+        "abbrevMilliseconds": "",
         "battle": {
             "errorNoLevels": "對戰關卡列表爲空，無法啓動對戰模式。"
         },
@@ -177,6 +178,8 @@
                 "up": "上"
             },
             "caseInvalid": "(無效)",
+            "caseMouse": "",
+            "caseTouch": "",
             "controlsConnected": "已連接：",
             "controlsDeleteKey": "（按第二奔跑鍵清除）",
             "controlsDeviceTypes": "設備類型",
@@ -248,6 +251,35 @@
                 "casePen": "(觸控筆)",
                 "dPad": "方向鍵",
                 "tStick": "左搖桿"
+            },
+            "touchscreen": {
+                "layout": {
+                    "longOld": "",
+                    "phabletOld": "",
+                    "phoneOld": "",
+                    "standard": "",
+                    "tabletOld": "",
+                    "tight": "",
+                    "tinyOld": ""
+                },
+                "option": {
+                    "feedbackLength": "",
+                    "feedbackStrength": "",
+                    "holdRun": "",
+                    "interfaceStyle": "",
+                    "layoutStyle": "",
+                    "resetLayout": "",
+                    "sStartSpacing": "",
+                    "scaleButtons": "",
+                    "scaleDPad": "",
+                    "scaleFactor": "",
+                    "showCodeButton": ""
+                },
+                "style": {
+                    "ABXY": "",
+                    "XODA": "",
+                    "actions": ""
+                }
             },
             "types": {
                 "gamepad": "",

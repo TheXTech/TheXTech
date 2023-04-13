@@ -174,6 +174,7 @@ struct MainMenuContent
     std::string wordBack;
     std::string wordResume;
     std::string wordWaiting;
+    std::string abbrevMilliseconds;
 };
 
 extern MainMenuContent g_mainMenu;

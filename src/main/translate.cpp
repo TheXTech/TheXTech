@@ -267,20 +267,48 @@ XTechTranslate::XTechTranslate()
 #ifdef CONTROLS_KEYBOARD_STRINGS
         {"menu.controls.types.keyboard",    &g_controlsStrings.nameKeyboard},
         {"menu.controls.options.textEntryStyle",    &g_controlsStrings.keyboardOptionTextEntryStyle},
+        {"menu.controls.caseMouse",         &g_controlsStrings.caseMouse},
 #endif
 
 #if defined(CONTROLS_KEYBOARD_STRINGS) || defined(CONTROLS_JOYSTICK_STRINGS)
-        {"menu.controls.types.gamepad",    &g_controlsStrings.nameGamepad},
+        {"menu.controls.types.gamepad",     &g_controlsStrings.nameGamepad},
 #endif
 
 #if defined(CONTROLS_JOYSTICK_STRINGS)
         {"menu.controls.phraseNewProfOldJoy",&g_controlsStrings.phraseNewProfOldJoy},
-        {"menu.controls.types.oldJoystick",&g_controlsStrings.nameOldJoy},
+        {"menu.controls.types.oldJoystick", &g_controlsStrings.nameOldJoy},
 #endif
 
 #if defined(CONTROLS_TOUCHSCREEN_STRINGS)
-        {"menu.controls.types.touchscreen",&g_controlsStrings.nameTouchscreen},
-#endif
+        {"menu.controls.types.touchscreen", &g_controlsStrings.nameTouchscreen},
+
+        {"menu.controls.caseTouch",         &g_controlsStrings.caseTouch},
+
+        {"menu.controls.touchscreen.option.layoutStyle",    &g_controlsStrings.touchscreenOptionLayoutStyle},
+        {"menu.controls.touchscreen.option.scaleFactor",    &g_controlsStrings.touchscreenOptionScaleFactor},
+        {"menu.controls.touchscreen.option.scaleDPad",      &g_controlsStrings.touchscreenOptionScaleDPad},
+        {"menu.controls.touchscreen.option.scaleButtons",   &g_controlsStrings.touchscreenOptionScaleButtons},
+        {"menu.controls.touchscreen.option.sStartSpacing",  &g_controlsStrings.touchscreenOptionSStartSpacing},
+        {"menu.controls.touchscreen.option.resetLayout",    &g_controlsStrings.touchscreenOptionResetLayout},
+        {"menu.controls.touchscreen.option.interfaceStyle", &g_controlsStrings.touchscreenOptionInterfaceStyle},
+        {"menu.controls.touchscreen.option.feedbackStrength", &g_controlsStrings.touchscreenOptionFeedbackStrength},
+        {"menu.controls.touchscreen.option.feedbackLength", &g_controlsStrings.touchscreenOptionFeedbackLength},
+        {"menu.controls.touchscreen.option.holdRun",        &g_controlsStrings.touchscreenOptionHoldRun},
+        {"menu.controls.touchscreen.option.showCodeButton", &g_controlsStrings.touchscreenOptionShowCodeButton},
+
+
+        {"menu.controls.touchscreen.layout.tight",          &g_controlsStrings.touchscreenLayoutTight},
+        {"menu.controls.touchscreen.layout.tinyOld",        &g_controlsStrings.touchscreenLayoutTinyOld},
+        {"menu.controls.touchscreen.layout.phoneOld",       &g_controlsStrings.touchscreenLayoutPhoneOld},
+        {"menu.controls.touchscreen.layout.longOld",        &g_controlsStrings.touchscreenLayoutLongOld},
+        {"menu.controls.touchscreen.layout.phabletOld",     &g_controlsStrings.touchscreenLayoutPhabletOld},
+        {"menu.controls.touchscreen.layout.tabletOld",      &g_controlsStrings.touchscreenLayoutTabletOld},
+        {"menu.controls.touchscreen.layout.standard",       &g_controlsStrings.touchscreenLayoutStandard},
+
+        {"menu.controls.touchscreen.style.actions",         &g_controlsStrings.touchscreenStyleActions},
+        {"menu.controls.touchscreen.style.ABXY",            &g_controlsStrings.touchscreenStyleABXY},
+        {"menu.controls.touchscreen.style.XODA",            &g_controlsStrings.touchscreenStyleXODA},
+#endif // #if defined(CONTROLS_TOUCHSCREEN_STRINGS)
 
 #if defined(CONTROLS_16M_STRINGS)
         {"menu.controls.tDS.buttonA",      &g_controlsStrings.tdsButtonA},
@@ -348,6 +376,8 @@ XTechTranslate::XTechTranslate()
         {"menu.wordBack",       &g_mainMenu.wordBack},
         {"menu.wordResume",     &g_mainMenu.wordResume},
         {"menu.wordWaiting",    &g_mainMenu.wordWaiting},
+
+        {"menu.abbrevMilliseconds", &g_mainMenu.abbrevMilliseconds},
 
 
         {"outro.gameCredits",           &g_outroScreen.gameCredits},
