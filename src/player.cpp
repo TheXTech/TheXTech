@@ -6048,6 +6048,16 @@ void PlayerEffects(const int A)
                 switch(warp.transitEffect)
                 {
                 default:
+                    if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+                    {
+                        if(Maths::iRound(leftToGoal) == 8 && warp.level == STRINGINDEX_NONE && !warp.MapWarp)
+                            g_levelVScreenFader[A].setupFader(3, 0, 65, warp.transitEffect,
+                                                              true,
+                                                              Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                                              Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
+                        break;
+                    }
+                // fallthrough
                 case LevelDoor::TRANSIT_NONE:
                     if(Maths::iRound(leftToGoal) == 0 && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
                         g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 0, 65, ScreenFader::S_FADE);
@@ -6230,6 +6240,16 @@ void PlayerEffects(const int A)
                 switch(warp.transitEffect)
                 {
                 default:
+                    if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+                    {
+                        g_levelVScreenFader[A].setupFader(3, 65, 0, warp.transitEffect,
+                                                          true,
+                                                          Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                                          Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                                          A);
+                        break;
+                    }
+                // fallthrough
                 case LevelDoor::TRANSIT_NONE:
                     g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
                     break;
@@ -6574,6 +6594,16 @@ void PlayerEffects(const int A)
             switch(warp.transitEffect)
             {
             default:
+                if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+                {
+                    if(fEqual(p.Effect2, 5) && warp.level == STRINGINDEX_NONE && !warp.MapWarp)
+                        g_levelVScreenFader[A].setupFader(3, 0, 65, warp.transitEffect,
+                                                          true,
+                                                          Maths::iRound(warp_enter.X + warp_enter.Width / 2),
+                                                          Maths::iRound(warp_enter.Y + warp_enter.Height / 2), A);
+                    break;
+                }
+            // fallthrough
             case LevelDoor::TRANSIT_NONE:
                 if(fEqual(p.Effect2, 20) && warp.level == STRINGINDEX_NONE && !warp.MapWarp && !SectionCollision(p.Section, warp_exit))
                     g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 9 : 64, 0, 65, ScreenFader::S_FADE);
@@ -6654,6 +6684,16 @@ void PlayerEffects(const int A)
                 switch(warp.transitEffect)
                 {
                 default:
+                    if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+                    {
+                        g_levelVScreenFader[A].setupFader(3, 65, 0, warp.transitEffect,
+                                                          true,
+                                                          Maths::iRound(warp_exit.X + warp_exit.Width / 2),
+                                                          Maths::iRound(warp_exit.Y + warp_exit.Height /2),
+                                                          A);
+                        break;
+                    }
+                // fallthrough
                 case LevelDoor::TRANSIT_NONE:
                     g_levelVScreenFader[A].setupFader(g_config.EnableInterLevelFade ? 8 : 64, 65, 0, ScreenFader::S_FADE);
                     break;

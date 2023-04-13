@@ -19,20 +19,53 @@
  */
 
 #include <cmath>
+#include <algorithm>
 
 #include "sdl_proxy/sdl_stdinc.h"
 
-#include "global_constants.h"
+#include "globals.h"
 #include "range_arr.hpp"
 #include "core/render.h"
 
 #include "screen_fader.h"
 
-//Public vScreenX(0 To maxPlayers) As Double  'vScreen offset
-extern RangeArr<double, 0, maxPlayers> vScreenX;
-//Public vScreenY(0 To maxPlayers) As Double 'vScreen offset
-extern RangeArr<double, 0, maxPlayers> vScreenY;
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+#    include <vector>
+#    include "core/sdl/gl_program_bank.h"
+
+static std::vector<LoadedGLProgramRef_t> s_loaded_effects;
+#endif // #ifdef THEXTECH_BUILD_GL_MODERN
+
+
+void ScreenFader::clearTransitEffects()
+{
+#ifdef THEXTECH_BUILD_GL_MODERN
+    s_loaded_effects.clear();
+#endif
+}
+
+int ScreenFader::loadTransitEffect(const std::string& name)
+{
+#ifdef THEXTECH_BUILD_GL_MODERN
+    LoadedGLProgramRef_t effect = ResolveGLProgram("transit-" + name + ".frag");
+
+    if((int)effect < 0)
+        return S_FADE;
+
+    auto it = std::find(s_loaded_effects.begin(), s_loaded_effects.end(), effect);
+
+    if(it != s_loaded_effects.end())
+        return static_cast<int>(it - s_loaded_effects.begin()) + S_CUSTOM;
+
+    s_loaded_effects.push_back(effect);
+
+    return static_cast<int>(s_loaded_effects.size() - 1) + S_CUSTOM;
+#else
+    UNUSED(name);
+    return S_FADE;
+#endif
+}
 
 void ScreenFader::clearFader()
 {
@@ -49,7 +82,7 @@ void ScreenFader::clearFader()
     m_focusOffsetY = 0.0;
 }
 
-void ScreenFader::setupFader(int step, int start, int goal, Shape shape, bool useFocus, int focusX, int focusY, int screen)
+void ScreenFader::setupFader(int step, int start, int goal, int shape, bool useFocus, int focusX, int focusY, int screen)
 {
     m_shape = shape;
     m_fader.setRatio(start / 65.0);
@@ -67,6 +100,11 @@ void ScreenFader::setupFader(int step, int start, int goal, Shape shape, bool us
     m_focusTrackY = nullptr;
     m_focusOffsetX = 0.0;
     m_focusOffsetY = 0.0;
+
+    if(m_shape >= S_CUSTOM && m_shape - S_CUSTOM < (int)s_loaded_effects.size())
+        m_focusUniform = XRender::registerUniform(s_loaded_effects[m_shape - S_CUSTOM], "u_focus");
+    else
+        m_focusUniform = -1;
 }
 
 void ScreenFader::setTrackedFocus(double *x, double *y, double offX, double offY)
@@ -137,6 +175,38 @@ void ScreenFader::draw()
 
     switch(m_shape)
     {
+    default:
+#ifdef THEXTECH_BUILD_GL_MODERN
+        if(XRender::userShadersSupported() && m_shape >= S_CUSTOM && m_shape - S_CUSTOM < (int)s_loaded_effects.size())
+        {
+            StdPicture& effect = s_loaded_effects[m_shape - S_CUSTOM];
+
+            if(m_focusUniform >= 0)
+            {
+                GLint focusX = m_focusSet ? m_focusX : (ScreenW / 2);
+                GLint focusY = m_focusSet ? m_focusY : (ScreenH / 2);
+
+                if(m_focusSet && m_focusScreen >= 0)
+                {
+                    focusX += vScreenX[m_focusScreen];
+                    focusY += vScreenY[m_focusScreen];
+                }
+
+                XRender::assignUniform(effect, m_focusUniform, UniformValue_t((GLfloat)focusX, (GLfloat)focusY));
+            }
+
+            if(m_focusScreen > 0)
+                XRender::renderTextureScale(0, 0, vScreen[m_focusScreen].Width, vScreen[m_focusScreen].Height, effect, 1.0, 1.0, 1.0, m_scale);
+            else
+                XRender::renderTextureScale(0, 0, ScreenW, ScreenH, effect, 1.0, 1.0, 1.0, m_scale);
+
+            // if catastrophic failure, fallback to normal fader
+            if(effect.inited)
+                break;
+        }
+#endif // #ifdef THEXTECH_BUILD_GL_MODERN
+
+    // fallthrough
     case S_FADE:
         XRender::renderRect(0, 0, ScreenW, ScreenH, color_r, color_b, color_g, m_scale, true);
         break;

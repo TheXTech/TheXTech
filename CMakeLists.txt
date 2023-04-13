@@ -739,6 +739,13 @@ else()
             src/core/sdl/render_gl_shaders.cpp
         )
     endif()
+
+    if(THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_ES_MODERN)
+        list(APPEND THEXTECH_SRC
+            src/core/sdl/gl_program_bank.cpp
+        )
+    endif()
+
 endif()
 
 # Add heads into the list
