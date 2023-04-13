@@ -303,6 +303,39 @@ XTechTranslate::XTechTranslate()
         {"menu.controls.tDS.cStick",       &g_controlsStrings.tdsCstick},
 #endif // #ifdef CONTROLS_3DS_STRINGS
 
+#if defined(CONTROLS_WII_STRINGS)
+        {"menu.controls.wii.typeWiimote",         &g_controlsStrings.wiiTypeWiimote},
+        {"menu.controls.wii.typeNunchuck",        &g_controlsStrings.wiiTypeNunchuck},
+        {"menu.controls.wii.typeClassic",         &g_controlsStrings.wiiTypeClassic},
+        {"menu.controls.wii.phraseNewNunchuck",   &g_controlsStrings.wiiPhraseNewNunchuck},
+        {"menu.controls.wii.phraseNewClassic",    &g_controlsStrings.wiiPhraseNewClassic},
+
+        {"menu.controls.wii.wiimote.dPad",        &g_controlsStrings.wiiDpad},
+        {"menu.controls.wii.wiimote.buttonA",     &g_controlsStrings.wiiButtonA},
+        {"menu.controls.wii.wiimote.buttonB",     &g_controlsStrings.wiiButtonB},
+        {"menu.controls.wii.wiimote.buttonMinus", &g_controlsStrings.wiiButtonMinus},
+        {"menu.controls.wii.wiimote.buttonPlus",  &g_controlsStrings.wiiButtonPlus},
+        {"menu.controls.wii.wiimote.buttonHome",  &g_controlsStrings.wiiButtonHome},
+        {"menu.controls.wii.wiimote.button2",     &g_controlsStrings.wiiButton2},
+        {"menu.controls.wii.wiimote.button1",     &g_controlsStrings.wiiButton1},
+        {"menu.controls.wii.wiimote.shake",       &g_controlsStrings.wiiShake},
+        {"menu.controls.wii.wiimote.caseIR",      &g_controlsStrings.wiiCaseIR},
+
+        {"menu.controls.wii.nunchuck.prefixN",    &g_controlsStrings.wiiPrefixNunchuck},
+        {"menu.controls.wii.nunchuck.buttonZ",    &g_controlsStrings.wiiButtonZ},
+        {"menu.controls.wii.nunchuck.buttonC",    &g_controlsStrings.wiiButtonC},
+
+        {"menu.controls.wii.classic.lStick",      &g_controlsStrings.wiiLStick},
+        {"menu.controls.wii.classic.rStick",      &g_controlsStrings.wiiRStick},
+        {"menu.controls.wii.classic.buttonZL",    &g_controlsStrings.wiiButtonZL},
+        {"menu.controls.wii.classic.buttonZR",    &g_controlsStrings.wiiButtonZR},
+        {"menu.controls.wii.classic.buttonLT",    &g_controlsStrings.wiiButtonLT},
+        {"menu.controls.wii.classic.buttonRT",    &g_controlsStrings.wiiButtonRT},
+        {"menu.controls.wii.classic.buttonX",     &g_controlsStrings.wiiButtonX},
+        {"menu.controls.wii.classic.buttonY",     &g_controlsStrings.wiiButtonY},
+
+#endif // #ifdef CONTROLS_WII_STRINGS
+
         {"menu.wordNo",         &g_mainMenu.wordNo},
         {"menu.wordYes",        &g_mainMenu.wordYes},
         {"menu.caseNone",       &g_mainMenu.caseNone},

@@ -98,6 +98,46 @@ struct ControlsStrings_t
     std::string tdsButtonZR = "ZR";
 #endif // #ifdef CONTROLS_3DS_STRINGS
 
+#ifdef CONTROLS_WII_STRINGS
+    std::string wiiTypeWiimote = "Wiimote";
+
+    std::string wiiDpad = "D-Pad";
+
+    std::string wiiButtonA = "A";
+    std::string wiiButtonB = "B";
+    std::string wiiButtonMinus = "-";
+    std::string wiiButtonPlus = "+";
+    std::string wiiButtonHome = "Home";
+    std::string wiiButton2 = "2";
+    std::string wiiButton1 = "1";
+    std::string wiiShake = "Shake";
+
+    std::string wiiTypeNunchuck = "Nunchuck";
+    std::string wiiPhraseNewNunchuck = "New Nunchuck Profile";
+
+    std::string wiiPrefixNunchuck = "N";
+
+    std::string wiiButtonZ = "Z";
+    std::string wiiButtonC = "C";
+
+    std::string wiiTypeClassic = "Classic";
+    std::string wiiPhraseNewClassic = "New Classic Profile";
+
+    std::string wiiLStick = "L-Pad";
+    std::string wiiRStick = "R-Pad";
+
+    std::string wiiButtonZL = "ZL";
+    std::string wiiButtonZR = "ZR";
+    std::string wiiButtonLT = "LT";
+    std::string wiiButtonRT = "RT";
+    std::string wiiButtonX = "X";
+    std::string wiiButtonY = "Y";
+
+    std::string wiiCaseIR = "(IR)";
+
+#endif // #ifdef CONTROLS_WII_STRINGS
+
+
 };
 
 extern ControlsStrings_t g_controlsStrings;

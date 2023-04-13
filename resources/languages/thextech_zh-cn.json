@@ -255,6 +255,40 @@
                 "oldJoystick": "",
                 "touchscreen": ""
             },
+            "wii": {
+                "classic": {
+                    "buttonLT": "",
+                    "buttonRT": "",
+                    "buttonX": "",
+                    "buttonY": "",
+                    "buttonZL": "",
+                    "buttonZR": "",
+                    "lStick": "",
+                    "rStick": ""
+                },
+                "nunchuck": {
+                    "buttonC": "",
+                    "buttonZ": "",
+                    "prefixN": ""
+                },
+                "phraseNewClassic": "",
+                "phraseNewNunchuck": "",
+                "typeClassic": "",
+                "typeNunchuck": "",
+                "typeWiimote": "",
+                "wiimote": {
+                    "button1": "",
+                    "button2": "",
+                    "buttonA": "",
+                    "buttonB": "",
+                    "buttonHome": "",
+                    "buttonMinus": "",
+                    "buttonPlus": "",
+                    "caseIR": "",
+                    "dPad": "",
+                    "shake": ""
+                }
+            },
             "wordButtons": "按键",
             "wordProfiles": "配置"
         },

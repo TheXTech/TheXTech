@@ -255,6 +255,40 @@
                 "oldJoystick": "Old Joy",
                 "touchscreen": "Touchscreen"
             },
+            "wii": {
+                "classic": {
+                    "buttonLT": "LT",
+                    "buttonRT": "RT",
+                    "buttonX": "X",
+                    "buttonY": "Y",
+                    "buttonZL": "ZL",
+                    "buttonZR": "ZR",
+                    "lStick": "L-Pad",
+                    "rStick": "R-Pad"
+                },
+                "nunchuck": {
+                    "buttonC": "C",
+                    "buttonZ": "Z",
+                    "prefixN": "N"
+                },
+                "phraseNewClassic": "New Classic Profile",
+                "phraseNewNunchuck": "New Nunchuck Profile",
+                "typeClassic": "Classic",
+                "typeNunchuck": "Nunchuck",
+                "typeWiimote": "Wiimote",
+                "wiimote": {
+                    "button1": "1",
+                    "button2": "2",
+                    "buttonA": "A",
+                    "buttonB": "B",
+                    "buttonHome": "Home",
+                    "buttonMinus": "-",
+                    "buttonPlus": "+",
+                    "caseIR": "(IR)",
+                    "dPad": "D-Pad",
+                    "shake": "Shake"
+                }
+            },
             "wordButtons": "Buttons",
             "wordProfiles": "Profiles"
         },
