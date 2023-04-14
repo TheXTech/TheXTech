@@ -1458,7 +1458,7 @@ void RenderGL::compileShaders(StdPicture &target)
     pLogDebug("Render GL: compiling shader...");
 
     target.d.shader_program = std::make_shared<GLProgramObject>(
-        s_es2_advanced_vert_src,
+        s_es3_advanced_vert_src,
         target.l.fragmentShaderSource.data()
     );
 
