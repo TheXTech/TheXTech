@@ -46,7 +46,7 @@
                 "propBounds": "场景范围",
                 "propMusic": "音乐"
             },
-            "settingsForEvent": "事件设置"
+            "settingsForEvent": "事件选项"
         },
         "layers": {
             "header": "图层：",
@@ -58,7 +58,7 @@
         "letterRight": "右",
         "letterUp": "上",
         "npc": {
-            "abbrevGen": "连续",
+            "abbrevGen": "生成器",
             "ai": {
                 "LR": "左右",
                 "UD": "上下",
@@ -75,7 +75,7 @@
                 "effectIs": "特效：{0}",
                 "effectShoot": "喷射",
                 "effectWarp": "水管",
-                "header": "生成器设置"
+                "header": "生成器选项"
             },
             "inContainer": "包含",
             "inertNice": "友好",
