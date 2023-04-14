@@ -117,7 +117,7 @@
             "dropAddTitle": "加入/離開遊戲",
             "phraseChangeChar": "更換角色",
             "phraseDropMe": "離開遊戲",
-            "phraseDropPX": "離開玩家{0}的遊戲",
+            "phraseDropPX": "移除玩家{0}的遊戲",
             "phraseForceResume": "強制恢復",
             "phraseHoldStart": "按住開始鍵",
             "phrasePressAButton": "按下一個按鍵",
@@ -154,7 +154,7 @@
     },
     "languageName": "繁體中文",
     "menu": {
-        "abbrevMilliseconds": "",
+        "abbrevMilliseconds": "毫秒",
         "battle": {
             "errorNoLevels": "對戰關卡列表爲空，無法啓動對戰模式。"
         },
@@ -177,9 +177,9 @@
                 "start": "開始",
                 "up": "上"
             },
-            "caseInvalid": "(無效)",
-            "caseMouse": "",
-            "caseTouch": "",
+            "caseInvalid": "（無效）",
+            "caseMouse": "（鼠標）",
+            "caseTouch": "（觸屏）",
             "controlsConnected": "已連接：",
             "controlsDeleteKey": "（按第二奔跑鍵清除）",
             "controlsDeviceTypes": "設備類型",
@@ -212,7 +212,7 @@
             },
             "hotkeys": {
                 "debugInfo": "調試信息",
-                "enterCheats": "輸入指令",
+                "enterCheats": "輸入作弊指令",
                 "fullscreen": "全屏",
                 "legacyPause": "舊版暫停菜單",
                 "recordGif": "GIF 動畫錄製",
@@ -224,7 +224,7 @@
                 "groundPoundButton": "震地按鍵",
                 "maxPlayers": "玩家上限",
                 "rumble": "Rumble 控制器",
-                "textEntryStyle": ""
+                "textEntryStyle": "按鍵名稱顯示"
             },
             "phraseNewProfOldJoy": "",
             "profile": {
@@ -254,71 +254,71 @@
             },
             "touchscreen": {
                 "layout": {
-                    "longOld": "",
-                    "phabletOld": "",
-                    "phoneOld": "",
-                    "standard": "",
-                    "tabletOld": "",
-                    "tight": "",
-                    "tinyOld": ""
+                    "longOld": "寬屏（舊）",
+                    "phabletOld": "大平板（舊）",
+                    "phoneOld": "手機（舊）",
+                    "standard": "普通",
+                    "tabletOld": "平板（舊）",
+                    "tight": "大號",
+                    "tinyOld": "小號（舊）"
                 },
                 "option": {
-                    "feedbackLength": "",
-                    "feedbackStrength": "",
-                    "holdRun": "",
-                    "interfaceStyle": "",
-                    "layoutStyle": "",
-                    "resetLayout": "",
-                    "sStartSpacing": "",
-                    "scaleButtons": "",
-                    "scaleDPad": "",
-                    "scaleFactor": "",
-                    "showCodeButton": ""
+                    "feedbackLength": "震動時長",
+                    "feedbackStrength": "震動強度",
+                    "holdRun": "啓動時自動按住奔跑鍵",
+                    "interfaceStyle": "按鈕樣式",
+                    "layoutStyle": "按鍵樣式",
+                    "resetLayout": "重置佈局",
+                    "sStartSpacing": "選擇/開始鍵間距",
+                    "scaleButtons": "按鈕縮放",
+                    "scaleDPad": "方向鍵縮放",
+                    "scaleFactor": "按鍵全局縮放",
+                    "showCodeButton": "顯示作弊指令按鈕"
                 },
                 "style": {
-                    "ABXY": "",
-                    "XODA": "",
-                    "actions": ""
+                    "ABXY": "ABXY",
+                    "XODA": "XODA",
+                    "actions": "動作"
                 }
             },
             "types": {
-                "gamepad": "",
-                "keyboard": "",
-                "oldJoystick": "",
-                "touchscreen": ""
+                "gamepad": "手柄",
+                "keyboard": "鍵盤",
+                "oldJoystick": "老式手柄",
+                "touchscreen": "觸屏"
             },
             "wii": {
                 "classic": {
-                    "buttonLT": "",
-                    "buttonRT": "",
-                    "buttonX": "",
-                    "buttonY": "",
-                    "buttonZL": "",
-                    "buttonZR": "",
-                    "lStick": "",
-                    "rStick": ""
+                    "buttonLT": "LT",
+                    "buttonRT": "RT",
+                    "buttonX": "X",
+                    "buttonY": "Y",
+                    "buttonZL": "ZL",
+                    "buttonZR": "ZR",
+                    "lStick": "左搖桿",
+                    "rStick": "右搖桿"
                 },
                 "nunchuck": {
-                    "buttonC": "",
-                    "buttonZ": "",
-                    "prefixN": ""
+                    "buttonC": "C",
+                    "buttonZ": "Z",
+                    "prefixN": "N"
                 },
-                "phraseNewClassic": "",
-                "phraseNewNunchuck": "",
-                "typeClassic": "",
-                "typeNunchuck": "",
-                "typeWiimote": "",
+                "phraseNewClassic": "新建經典手柄配置",
+                "phraseNewNunchuck": "新建雙節棍控制器配置",
+                "typeClassic": "經典手柄",
+                "typeNunchuck": "雙節棍控制器",
+                "typeWiimote": "Wii遙控器",
                 "wiimote": {
-                    "button1": "",
-                    "button2": "",
-                    "buttonA": "",
-                    "buttonB": "",
-                    "buttonHome": "",
-                    "buttonMinus": "",
-                    "buttonPlus": "",
-                    "caseIR": "",
-                    "dPad": "",
-                    "shake": ""
+                    "button1": "1",
+                    "button2": "2",
+                    "buttonA": "A",
+                    "buttonB": "B",
+                    "buttonHome": "Home",
+                    "buttonMinus": "-",
+                    "buttonPlus": "+",
+                    "caseIR": "（IR）",
+                    "dPad": "十字鍵",
+                    "shake": "震動"
                 }
             },
             "wordButtons": "按鍵",
