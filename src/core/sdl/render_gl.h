@@ -229,7 +229,7 @@ private:
     bool m_client_side_arrays = false;
 
     // unused for now
-    // bool m_has_es3_shaders = false;
+    bool m_has_es3_shaders = false;
     // bool m_has_npot_texture = false;
     // bool m_has_bgra = false;
 
@@ -310,13 +310,13 @@ private:
     // Source for builtin shaders, defined at render_gl_shaders.cpp
     static const char* const s_es2_standard_vert_src;
     static const char* const s_es2_advanced_vert_src;
-    // static const char* const s_es3_standard_vert_src;
-    // static const char* const s_es3_advanced_vert_src;
+
+    static const char* const s_es3_standard_vert_src;
+    static const char* const s_es3_advanced_vert_src;
 
     static const char* const s_es2_standard_frag_src;
     static const char* const s_es2_bitmask_frag_src;
-    // static const char* const s_es3_standard_frag_src;
-    // static const char* const s_es3_bitmask_frag_src;
+    static const char* const s_es3_bitmask_frag_src;
 
     static const char* const s_es2_rect_filled_frag_src;
     static const char* const s_es2_rect_unfilled_frag_src;

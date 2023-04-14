@@ -789,6 +789,8 @@ void RenderGL::repaint()
         feature_string += "shaders, ";
     if(m_client_side_arrays)
         feature_string += "client arr, ";
+    if(m_has_es3_shaders)
+        feature_string += "ES3, ";
 
     feature_string.resize(feature_string.size() - 2);
     if(feature_string.size() == 4)
@@ -803,6 +805,10 @@ void RenderGL::repaint()
         feature_string += "local fx, ";
     if(m_buffer_texture[BUFFER_PREV_PASS])
         feature_string += "n-pass fx, ";
+    if(m_buffer_texture[BUFFER_LIGHTING])
+        feature_string += "light, ";
+    if(m_depth_read_texture)
+        feature_string += "depth, ";
 
     feature_string.resize(feature_string.size() - 2);
     if(feature_string.size() == 3)
@@ -1478,9 +1484,8 @@ bool RenderGL::depthTestSupported()
 
 bool RenderGL::userShadersSupported()
 {
-    // should check for GLES 2/3
 #ifdef THEXTECH_WIP_FEATURES
-    return m_use_shaders;
+    return m_use_shaders && m_has_es3_shaders;
 #else
     // FIXME: should be false before submitting to the main repo
     return m_use_shaders;

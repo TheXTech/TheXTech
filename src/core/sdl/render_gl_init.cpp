@@ -307,9 +307,19 @@ bool RenderGL::initShaders()
         logic_contents.push_back('\0');
 
     m_bitmask_program = GLProgramObject(
-        s_es2_advanced_vert_src,
-        logic_contents.empty() ? s_es2_bitmask_frag_src : logic_contents.data()
+        s_es3_advanced_vert_src,
+        s_es3_bitmask_frag_src
     );
+
+    if(m_bitmask_program.inited())
+        m_has_es3_shaders = true;
+    else
+    {
+        m_bitmask_program = GLProgramObject(
+            s_es2_advanced_vert_src,
+            logic_contents.empty() ? s_es2_bitmask_frag_src : logic_contents.data()
+        );
+    }
 
     m_program_rect_filled = GLProgramObject(
         s_es2_standard_vert_src,

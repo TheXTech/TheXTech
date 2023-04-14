@@ -64,6 +64,33 @@ void main()
 }
 )RAW";
 
+
+const char* const RenderGL::s_es3_advanced_vert_src =
+R"RAW(#version 300 es
+
+uniform   mat4 u_transform;
+uniform   vec4 u_read_viewport;
+
+in vec4 a_position;
+in vec2 a_texcoord;
+in vec4 a_tint;
+
+out   vec2 v_texcoord;
+out   vec2 v_fbcoord;
+out   vec4 v_tint;
+
+void main()
+{
+    gl_Position = u_transform * a_position;
+    v_texcoord = a_texcoord;
+    v_tint = a_tint;
+    v_fbcoord = vec2(gl_Position);
+    v_fbcoord *= u_read_viewport.xy;
+    v_fbcoord += u_read_viewport.zw;
+}
+)RAW";
+
+
 const char* const RenderGL::s_es2_standard_frag_src =
 R"RAW(#version 100
 precision mediump float;
@@ -198,6 +225,49 @@ void main()
 
   gl_FragColor.rgb = bitwise_ops(l_bg, l_mask, l_image);
   gl_FragColor.a = 1.0;
+}
+)RAW";
+
+const char* const RenderGL::s_es3_bitmask_frag_src =
+R"RAW(#version 300 es
+
+precision mediump float;
+
+in   vec2      v_texcoord;
+in   vec2      v_fbcoord;
+in   vec4      v_tint;
+
+uniform   sampler2D u_texture;
+uniform   sampler2D u_framebuffer;
+uniform   sampler2D u_mask;
+
+out vec4 FragColor;
+
+vec3 bitwise_ops(vec3 x, vec3 y, vec3 z)
+{
+    uvec3 x_u = uvec3(x * 255.9);
+    uvec3 y_u = uvec3(y * 255.9);
+    uvec3 z_u = uvec3(z * 255.9);
+
+    return vec3((x_u & y_u) | z_u) / 255.0;
+}
+
+void main()
+{
+  vec3 l_image = texture(u_texture, v_texcoord).rgb;
+  vec3 l_mask = texture(u_mask, v_texcoord).rgb;
+
+  if(l_image.r == 0.0 && l_image.g == 0.0 && l_image.b == 0.0 && l_mask.r == 1.0 && l_mask.g == 1.0 && l_mask.b == 1.0)
+    discard;
+
+  // l_image *= v_tint.rgb;
+
+  vec2 src = v_fbcoord.xy;
+
+  vec3 l_bg = texture(u_framebuffer, src).rgb;
+
+  FragColor.rgb = bitwise_ops(l_bg, l_mask, l_image);
+  FragColor.a = 1.0;
 }
 )RAW";
 
