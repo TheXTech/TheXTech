@@ -46,7 +46,7 @@
                 "propBounds": "場景範圍",
                 "propMusic": "音樂"
             },
-            "settingsForEvent": "事件設置"
+            "settingsForEvent": "事件選項"
         },
         "layers": {
             "header": "圖層：",
@@ -58,7 +58,7 @@
         "letterRight": "右",
         "letterUp": "上",
         "npc": {
-            "abbrevGen": "連續",
+            "abbrevGen": "生成器",
             "ai": {
                 "LR": "左右",
                 "UD": "上下",
@@ -75,7 +75,7 @@
                 "effectIs": "特效：{0}",
                 "effectShoot": "噴射",
                 "effectWarp": "水管",
-                "header": "生成器設置"
+                "header": "生成器選項"
             },
             "inContainer": "包含",
             "inertNice": "友好",
@@ -127,8 +127,8 @@
             "phraseTestControls": "測試按鍵",
             "phraseWaitingForInput": "等待玩家加入……",
             "reconnectTitle": "重新連接",
-            "splitPressSelect_1": "按選擇鍵進入",
-            "splitPressSelect_2": "按鍵設置",
+            "splitPressSelect_1": "按選擇鍵",
+            "splitPressSelect_2": "進入按鍵設置",
             "wordDisconnect": "斷開"
         },
         "controls": {
