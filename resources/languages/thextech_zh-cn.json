@@ -127,8 +127,8 @@
             "phraseTestControls": "测试按键",
             "phraseWaitingForInput": "等待玩家加入……",
             "reconnectTitle": "重新连接",
-            "splitPressSelect_1": "按选择键进入",
-            "splitPressSelect_2": "按键设置",
+            "splitPressSelect_1": "按选择键",
+            "splitPressSelect_2": "进入按键设置",
             "wordDisconnect": "断开"
         },
         "controls": {
