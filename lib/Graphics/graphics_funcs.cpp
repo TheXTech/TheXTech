@@ -39,6 +39,9 @@
 #endif
 #include <FreeImageLite.h>
 
+// strangely undocumented import necessary to use the FreeImage handle functions
+extern void SetDefaultIO(FreeImageIO *io);
+
 void GraphicsHelps::initFreeImage()
 {
     FreeImage_Initialise();
@@ -79,12 +82,21 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
         return nullptr;
 
 #else
-    FREE_IMAGE_FORMAT formato = FreeImage_GetFileType(file.c_str(), 0);
+    FreeImageIO io;
+    SetDefaultIO(&io);
+    FILE *handle = Files::utf8_fopen(file.c_str(), "rb");
 
-    if(formato  == FIF_UNKNOWN)
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
+
+    if(formato == FIF_UNKNOWN)
+    {
+        fclose(handle);
         return NULL;
+    }
 
-    FIBITMAP *img = FreeImage_Load(formato, file.c_str());
+    FIBITMAP *img = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
+
+    fclose(handle);
 
     if(!img)
         return NULL;
