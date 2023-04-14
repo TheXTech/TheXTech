@@ -214,7 +214,7 @@ void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string&
     target.l.lazyLoaded = true;
 
     int w, h, flags;
-    if((fscanf(f, "%d\n%d\n%d\n", &w, &h, &flags) != 3) || (w < 0) || (w > 8192) || (h < 0) || (h > 8192))
+    if((fscanf(f, "%d\n%d\n%d\n", &w, &h, &flags) < 2) || (w < 0) || (w > 8192) || (h < 0) || (h > 8192))
     {
         pLogWarning("Could not load image %s dimensions from load list", filename);
         target.inited = false;
