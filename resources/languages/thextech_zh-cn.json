@@ -117,7 +117,7 @@
             "dropAddTitle": "加入/离开游戏",
             "phraseChangeChar": "更换角色",
             "phraseDropMe": "离开游戏",
-            "phraseDropPX": "离开玩家{0}的游戏",
+            "phraseDropPX": "移除玩家{0}的游戏",
             "phraseForceResume": "强制恢复",
             "phraseHoldStart": "按住开始键",
             "phrasePressAButton": "按下一个按键",
