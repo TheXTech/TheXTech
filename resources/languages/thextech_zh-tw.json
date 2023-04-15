@@ -226,7 +226,7 @@
                 "rumble": "Rumble 控制器",
                 "textEntryStyle": "按鍵名稱顯示"
             },
-            "phraseNewProfOldJoy": "",
+            "phraseNewProfOldJoy": "新建老式手柄配置",
             "profile": {
                 "activateProfile": "啓用配置",
                 "cursorControls": "鼠標控制",
