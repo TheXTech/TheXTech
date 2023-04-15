@@ -162,9 +162,12 @@ GLuint GLProgramObject::s_compile_shader(GLenum type, const char* src)
 
 void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock)
 {
-    glUniformMatrix4fv(m_u_transform_loc, 1, GL_FALSE, transform);
-    glUniform4fv(m_u_read_viewport_loc, 1, read_viewport);
-    glUniform1f(m_u_clock_loc, clock);
+    if(m_u_transform_loc != -1)
+        glUniformMatrix4fv(m_u_transform_loc, 1, GL_FALSE, transform);
+    if(m_u_read_viewport_loc != -1)
+        glUniform4fv(m_u_read_viewport_loc, 1, read_viewport);
+    if(m_u_clock_loc != -1)
+        glUniform1f(m_u_clock_loc, clock);
 }
 
 void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shader)
