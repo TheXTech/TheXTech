@@ -450,12 +450,18 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
 void RenderGL::calculateLighting()
 {
 #if defined(RENDERGL_HAS_FBO) && defined(RENDERGL_HAS_SHADERS)
-    // FIXME: don't keep this (OBVIOUSLY)
-    GLProgramObject* m_current_lighting_program = GFXBackground[186].d.shader_program.get();
 
-    if(!m_current_lighting_program)
+    if(!m_lighting_program.inited() || !m_light_ubo)
         return;
 
+    // first, flush the lights
+    m_light_queue.lights[m_light_count].type = LightType::none;
+
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Light) * m_light_count + 4, &m_light_queue);
+
+    m_light_count = 0;
+
+    // now, bind the correct portion of the lighting framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[BUFFER_LIGHTING]);
 
     // fix offscreen coordinates
@@ -490,8 +496,8 @@ void RenderGL::calculateLighting()
     glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
     glActiveTexture(TEXTURE_UNIT_IMAGE);
 
-    m_current_lighting_program->use_program();
-    m_current_lighting_program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), (GLfloat)((m_transform_tick / 3) % (65 * 60)) / 65.0f);
+    m_lighting_program.use_program();
+    m_lighting_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), (GLfloat)((m_transform_tick / 3) % (65 * 60)) / 65.0f);
 
     GLshort x1 = m_viewport_x;
     GLshort x2 = m_viewport_x + m_viewport_w;
@@ -755,6 +761,13 @@ void RenderGL::close()
         for(int i = 0; i < s_num_vertex_buffers; i++)
             m_vertex_buffer[i] = 0;
     }
+
+    if(m_light_ubo)
+    {
+        glDeleteBuffers(1, &m_light_ubo);
+        m_light_ubo = 0;
+    }
+
 #endif
 
 #ifdef RENDERGL_HAS_VAO

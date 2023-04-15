@@ -354,6 +354,28 @@ bool RenderGL::initShaders()
         output_contents.empty() ? s_es2_standard_frag_src : output_contents.data()
     );
 
+    // initialize the lighting program
+    if(m_has_es3_shaders)
+    {
+        dumpFullFile(output_contents, (AppPath + "/graphics/shaders/lighting.frag").c_str());
+        if(!output_contents.empty())
+            output_contents.push_back('\0');
+
+        m_lighting_program = GLProgramObject(
+            s_es3_advanced_vert_src,
+            output_contents.empty() ? s_es3_lighting_frag_src : output_contents.data()
+        );
+
+        if(m_lighting_program.inited())
+        {
+            // initialize uniform buffer (if supported)
+            glGenBuffers(1, &m_light_ubo);
+            glBindBuffer(GL_UNIFORM_BUFFER, m_light_ubo);
+            glBufferData(GL_UNIFORM_BUFFER, sizeof(LightBuffer), &m_light_queue, GL_STREAM_DRAW);
+            glBindBufferBase(GL_UNIFORM_BUFFER, 0, m_light_ubo);
+        }
+    }
+
     return true;
 #else // #ifdef RENDERGL_HAS_SHADERS
     if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_COMPATIBILITY || m_gl_majver < 2)
@@ -709,11 +731,11 @@ bool RenderGL::initVertexArrays()
         for(int i = 0; i < s_num_vertex_buffers; i++)
         {
             glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer[i]);
-#ifdef RENDERGL_HAS_STREAM_DRAW
+#    ifdef RENDERGL_HAS_STREAM_DRAW
             const auto draw_mode = (m_gl_majver == 1 ? GL_DYNAMIC_DRAW : GL_STREAM_DRAW);
-#else
+#    else
             const auto draw_mode = GL_DYNAMIC_DRAW;
-#endif
+#    endif
             glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex_t) * 4, nullptr, draw_mode);
             m_vertex_buffer_size[i] = sizeof(Vertex_t) * 4;
         }

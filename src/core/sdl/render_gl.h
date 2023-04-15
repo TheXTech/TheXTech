@@ -171,6 +171,80 @@ private:
         }
     };
 
+#ifdef RENDERGL_HAS_SHADERS
+
+    enum class LightType : uint32_t
+    {
+        none = 0,
+        point,
+        arc,
+        bar,
+        box,
+    };
+
+#    ifdef THEXTECH_BIG_ENDIAN
+    struct LightColor
+    {
+        constexpr LightColor() = default;
+        constexpr LightColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xff)
+            : a(a), r(r), g(g), b(b) {}
+
+        uint8_t a = 0x00;
+        uint8_t r = 0x00;
+        uint8_t g = 0x00;
+        uint8_t b = 0x00;
+    };
+#    else // #ifdef THEXTECH_BIG_ENDIAN
+    struct LightColor
+    {
+        constexpr LightColor() = default;
+        constexpr LightColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 0xff)
+            : b(b), g(g), r(r), a(a) {}
+
+        uint8_t b = 0x00;
+        uint8_t g = 0x00;
+        uint8_t r = 0x00;
+        uint8_t a = 0x00;
+    };
+#    endif // #else (from #ifdef THEXTECH_BIG_ENDIAN)
+
+    using LightPos = std::array<GLfloat, 4>;
+
+    /*!
+     * \brief Information parameterizing the overall lighting system
+     */
+    struct LightHeader
+    {};
+
+    /*!
+     * \brief Information parameterizing a single light source
+     */
+    struct Light
+    {
+        constexpr Light() = default;
+        constexpr Light(LightType type, LightColor color, GLfloat radius, GLfloat depth, LightPos pos)
+            : type(type), color(color), radius(radius), depth(depth), pos(pos) {}
+
+        static constexpr Light Point(GLfloat x, GLfloat y, GLfloat depth, LightColor color, GLfloat radius)
+        {
+            return Light(LightType::point, color, radius, depth, {x, y, 0.0f, 0.0f});
+        }
+
+        LightType type = LightType::none;
+        LightColor color = LightColor{0, 0, 0, 0};
+        GLfloat radius = 0.0;
+        GLfloat depth = 0.0;
+        LightPos pos = {0.0, 0.0, 0.0, 0.0};
+    };
+
+    struct LightBuffer
+    {
+        // LightHeader header;
+        std::array<Light, 64> lights;
+    };
+
+#endif // #ifdef RENDERGL_HAS_SHADERS
+
     // unsorted draw queue that stores opaque draw calls in the current viewport state
     std::unordered_map<DrawContext_t, VertexList, hash_DrawContext> m_unordered_draw_queue;
 
@@ -305,7 +379,21 @@ private:
 
 
 
-private:
+    // extra state supporting the lighting system
+
+    // performs the light calculation pass
+    GLProgramObject m_lighting_program;
+
+    // UBO to support the lighting queue
+    GLuint m_light_ubo = 0;
+
+    // filled with lights over the course of a render queue fill
+    LightBuffer m_light_queue;
+
+    // tracks how many lights have been added in the current frame
+    int m_light_count = 0;
+
+
 
     // Source for builtin shaders, defined at render_gl_shaders.cpp
     static const char* const s_es2_standard_vert_src;
@@ -323,6 +411,7 @@ private:
     static const char* const s_es2_circle_frag_src;
     static const char* const s_es2_circle_hole_frag_src;
 
+    static const char* const s_es3_lighting_frag_src;
 
     // Initialization functions, defined at render_gl_init.cpp
 
@@ -332,7 +421,7 @@ private:
 
     /*!
      * \brief Helper function to attempt to initialize an SDL OpenGL context of the desired profile and version
-     * \param[inout] context: reference to nullable SDL_GLContext. If non-null, no-op. If null, attempts initialization and signals success by leaving context non-null.
+     * \param[inout] context: reference to nullable SDL_GLContext. If non-null, no-op (already inited). If null, attempts initialization and signals success by leaving context non-null.
      * \param[in] window: SDL_Window to use for the context
      * \param profile: OpenGL profile to initialize
      * \param majver: minimum OpenGL major version to initialize
