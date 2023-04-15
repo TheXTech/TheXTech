@@ -1487,7 +1487,7 @@ void RenderGL::compileShaders(StdPicture &target)
 
 bool RenderGL::textureMaskSupported()
 {
-    return (m_use_logicop) || (m_use_shaders && m_buffer_texture[1]);
+    return (m_use_logicop) || (m_use_shaders && m_buffer_texture[BUFFER_FB_READ]);
 }
 
 bool RenderGL::depthTestSupported()
@@ -1501,7 +1501,7 @@ bool RenderGL::userShadersSupported()
     return m_use_shaders && m_has_es3_shaders;
 #else
     // FIXME: should be false before submitting to the main repo
-    return m_use_shaders;
+    return m_use_shaders && m_has_es3_shaders;
 #endif
 }
 
