@@ -154,7 +154,7 @@
     },
     "languageName": "Русский",
     "menu": {
-        "abbrevMilliseconds": "",
+        "abbrevMilliseconds": "мс",
         "battle": {
             "errorNoLevels": "Невозможно начать битву потому что нету доступных уровней"
         },
@@ -177,9 +177,9 @@
                 "start": "Старт",
                 "up": "Вверх"
             },
-            "caseInvalid": "",
-            "caseMouse": "",
-            "caseTouch": "",
+            "caseInvalid": "(Некор.)",
+            "caseMouse": "(Мышь)",
+            "caseTouch": "(Сенсор)",
             "controlsConnected": "Подключено:",
             "controlsDeleteKey": "(Альт-Прыжок чтобы сбросить)",
             "controlsDeviceTypes": "Типы устройств",
@@ -222,11 +222,11 @@
             "options": {
                 "batteryStatus": "Состояние батареи",
                 "groundPoundButton": "Кнопка сотрясания земли",
-                "maxPlayers": "",
+                "maxPlayers": "Макс. игроков",
                 "rumble": "Вибрация",
-                "textEntryStyle": ""
+                "textEntryStyle": "Тип ввода текста"
             },
-            "phraseNewProfOldJoy": "",
+            "phraseNewProfOldJoy": "Новый профиль для ст.джойстика",
             "profile": {
                 "activateProfile": "Активировать профиль",
                 "cursorControls": "Указатель",
@@ -237,88 +237,88 @@
                 "renameProfile": "Переименовать профиль"
             },
             "tDS": {
-                "buttonA": "",
-                "buttonB": "",
-                "buttonL": "",
-                "buttonR": "",
-                "buttonSelect": "",
-                "buttonStart": "",
-                "buttonX": "",
-                "buttonY": "",
-                "buttonZL": "",
-                "buttonZR": "",
-                "cStick": "",
-                "casePen": "",
-                "dPad": "",
-                "tStick": ""
+                "buttonA": "A",
+                "buttonB": "B",
+                "buttonL": "L",
+                "buttonR": "R",
+                "buttonSelect": "Выбор",
+                "buttonStart": "Старт",
+                "buttonX": "X",
+                "buttonY": "Y",
+                "buttonZL": "ZL",
+                "buttonZR": "ZR",
+                "cStick": "Рычажок",
+                "casePen": "(Перо)",
+                "dPad": "Крест.",
+                "tStick": "Выступ"
             },
             "touchscreen": {
                 "layout": {
-                    "longOld": "",
-                    "phabletOld": "",
-                    "phoneOld": "",
-                    "standard": "",
-                    "tabletOld": "",
-                    "tight": "",
-                    "tinyOld": ""
+                    "longOld": "Длинная (ст.)",
+                    "phabletOld": "Фаблет (ст.)",
+                    "phoneOld": "Телефон (ст.)",
+                    "standard": "Обычная",
+                    "tabletOld": "Планшет (ст.)",
+                    "tight": "Плотная",
+                    "tinyOld": "Кроха (ст.)"
                 },
                 "option": {
-                    "feedbackLength": "",
-                    "feedbackStrength": "",
-                    "holdRun": "",
-                    "interfaceStyle": "",
-                    "layoutStyle": "",
-                    "resetLayout": "",
-                    "sStartSpacing": "",
-                    "scaleButtons": "",
-                    "scaleDPad": "",
-                    "scaleFactor": "",
-                    "showCodeButton": ""
+                    "feedbackLength": "Длительность отдачи",
+                    "feedbackStrength": "Сила отдачи",
+                    "holdRun": "Удержание БЕГа при запуске",
+                    "interfaceStyle": "Стиль кнопок",
+                    "layoutStyle": "Вид раскладки",
+                    "resetLayout": "Сбросить раскладку",
+                    "sStartSpacing": "Расстояние Выбор-Старт",
+                    "scaleButtons": "Масштаб кнопок",
+                    "scaleDPad": "Масштаб крестовины",
+                    "scaleFactor": "Общий масштаб",
+                    "showCodeButton": "Показать кнопку кода"
                 },
                 "style": {
-                    "ABXY": "",
-                    "XODA": "",
-                    "actions": ""
+                    "ABXY": "ABXY",
+                    "XODA": "XODA",
+                    "actions": "Дейсвтия"
                 }
             },
             "types": {
-                "gamepad": "",
-                "keyboard": "",
-                "oldJoystick": "",
-                "touchscreen": ""
+                "gamepad": "Геймпад",
+                "keyboard": "Клавиатура",
+                "oldJoystick": "Ст.джойстик",
+                "touchscreen": "Сенсор"
             },
             "wii": {
                 "classic": {
-                    "buttonLT": "",
-                    "buttonRT": "",
-                    "buttonX": "",
-                    "buttonY": "",
-                    "buttonZL": "",
-                    "buttonZR": "",
-                    "lStick": "",
-                    "rStick": ""
+                    "buttonLT": "LT",
+                    "buttonRT": "RT",
+                    "buttonX": "X",
+                    "buttonY": "Y",
+                    "buttonZL": "ZL",
+                    "buttonZR": "ZR",
+                    "lStick": "Л.Джой.",
+                    "rStick": "П.Джой."
                 },
                 "nunchuck": {
-                    "buttonC": "",
-                    "buttonZ": "",
-                    "prefixN": ""
+                    "buttonC": "C",
+                    "buttonZ": "Z",
+                    "prefixN": "N"
                 },
-                "phraseNewClassic": "",
-                "phraseNewNunchuck": "",
-                "typeClassic": "",
-                "typeNunchuck": "",
-                "typeWiimote": "",
+                "phraseNewClassic": "Нов. профиль Classic",
+                "phraseNewNunchuck": "Нов. профиль Nunchack",
+                "typeClassic": "Classic",
+                "typeNunchuck": "Nunchack",
+                "typeWiimote": "Wiimote",
                 "wiimote": {
-                    "button1": "",
-                    "button2": "",
-                    "buttonA": "",
-                    "buttonB": "",
-                    "buttonHome": "",
-                    "buttonMinus": "",
-                    "buttonPlus": "",
-                    "caseIR": "",
-                    "dPad": "",
-                    "shake": ""
+                    "button1": "1",
+                    "button2": "2",
+                    "buttonA": "A",
+                    "buttonB": "B",
+                    "buttonHome": "Дом",
+                    "buttonMinus": "-",
+                    "buttonPlus": "+",
+                    "caseIR": "(ИК)",
+                    "dPad": "Крест.",
+                    "shake": "Встряска"
                 }
             },
             "wordButtons": "Кнопки",
