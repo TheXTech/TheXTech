@@ -409,7 +409,7 @@ void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height,
     target.d.h_scale = static_cast<float>(height) / target.h;
 
     m_loadedPictures.insert(&target);
-    D_pLogDebug("RenderSDL: loading texture at %p, new texture count %d...", &tx, (int)m_loadedPictures.size());
+    D_pLogDebug("RenderSDL: loading texture at %p, new texture count %d...", &target, (int)m_loadedPictures.size());
 
     target.inited = true;
 
