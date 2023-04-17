@@ -65,6 +65,9 @@
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
 #    include <SDL2/SDL_opengles2.h>
 
+// unsure whether to make this platform-dependent
+#    include <GLES3/gl3.h>
+
 #    define RENDERGL_HAS_SHADERS
 #    define RENDERGL_HAS_VBO
 #    define RENDERGL_HAS_FBO
