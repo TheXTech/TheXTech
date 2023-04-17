@@ -650,6 +650,9 @@ void RenderGL::flushDrawQueues()
     }
 #endif
 
+    // reset lighting buffer
+    m_light_count = 0;
+
     for(int pass = 1; pass <= num_pass; pass++)
     {
         // setup state for multipass rendering
