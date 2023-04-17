@@ -80,7 +80,7 @@ struct GFXBackup_t
     StdPicture *remote_texture = nullptr;
     int width = 0;
     int height = 0;
-    StdPicture texture;
+    StdPicture_Sub texture_backup;
 };
 
 static std::vector<GFXBackup_t> g_defaultLevelGfxBackup;
@@ -192,7 +192,7 @@ static void loadCGFX(const std::string &origPath,
 {
     std::string loadedPath;
     bool success = false;
-    StdPicture newTexture;
+    StdPicture_Sub newTexture;
 
     GFXBackup_t backup;
     backup.remote_width = width;
@@ -248,7 +248,7 @@ static void loadCGFX(const std::string &origPath,
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s with mask %s", imgToUse.c_str(), maskToUse.c_str());
 #endif
-        newTexture = XRender::lazyLoadPicture(imgToUse, maskToUse, origPath);
+        XRender::lazyLoadPicture(newTexture, imgToUse, maskToUse, origPath);
         success = newTexture.inited;
         loadedPath = imgToUse;
     }
@@ -257,21 +257,21 @@ static void loadCGFX(const std::string &origPath,
 #ifdef DEBUG_BUILD
         pLogDebug("Trying to load custom GFX: %s", imgToUse.c_str());
 #endif
-        newTexture = XRender::lazyLoadPicture(imgToUse);
+        XRender::lazyLoadPicture(newTexture, imgToUse);
         success = newTexture.inited;
         loadedPath = imgToUse;
     }
 
     if(success)
     {
-        // don't allow texture to be incorrectly tracked as loaded
-        XRender::lazyUnLoad(texture);
+        // don't keep state from old texture
+        XRender::unloadTexture(texture);
 
         pLogDebug("Loaded custom GFX: %s", loadedPath.c_str());
         isCustom = true;
 
-        backup.texture = texture;
-        texture = newTexture;
+        backup.texture_backup = static_cast<StdPicture_Sub&>(texture);
+        static_cast<StdPicture_Sub&>(texture) = newTexture;
 
         if(width)
             *width = newTexture.w;
@@ -302,7 +302,8 @@ static void loadImageFromList(FILE* f, const std::string& dir,
                     int *width, int *height, bool &is_custom_loc,
                     bool world = false, bool this_is_custom = false)
 {
-    StdPicture newTexture = XRender::lazyLoadPictureFromList(f, dir);
+    StdPicture_Sub newTexture;
+    XRender::lazyLoadPictureFromList(newTexture, f, dir);
 
     if(!newTexture.inited)
         return;
@@ -314,12 +315,12 @@ static void loadImageFromList(FILE* f, const std::string& dir,
         backup.remote_height = height;
         backup.remote_isCustom = &is_custom_loc;
         backup.remote_texture = &texture;
-        XRender::lazyUnLoad(texture);
+        XRender::unloadTexture(texture);
         if(width)
             backup.width = *width;
         if(height)
             backup.height = *height;
-        backup.texture = texture;
+        backup.texture_backup = static_cast<StdPicture_Sub&>(texture);
 
         if(world)
             g_defaultWorldGfxBackup.push_back(backup);
@@ -333,7 +334,7 @@ static void loadImageFromList(FILE* f, const std::string& dir,
         is_custom_loc = true;
     }
 
-    texture = newTexture;
+    static_cast<StdPicture_Sub&>(texture) = newTexture;
     if(width)
         *width = newTexture.w;
     if(height)
@@ -611,8 +612,8 @@ static void restoreLevelBackupTextures()
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
         SDL_assert_release(t.remote_texture);
-        XRender::deleteTexture(*t.remote_texture);
-        *t.remote_texture = t.texture;
+        XRender::unloadTexture(*t.remote_texture);
+        *static_cast<StdPicture_Sub*>(t.remote_texture) = t.texture_backup;
     }
     g_defaultLevelGfxBackup.clear();
 }
@@ -630,8 +631,8 @@ static void restoreWorldBackupTextures()
         if(t.remote_isCustom)
             *t.remote_isCustom = false;
         SDL_assert_release(t.remote_texture);
-        XRender::deleteTexture(*t.remote_texture);
-        *t.remote_texture = t.texture;
+        XRender::unloadTexture(*t.remote_texture);
+        *static_cast<StdPicture_Sub*>(t.remote_texture) = t.texture_backup;
     }
     g_defaultWorldGfxBackup.clear();
 }
@@ -679,7 +680,7 @@ void LoadGFX()
             s_find_image(p, CurDir, fmt::format_ne("{1}-{0}", A, GFXPlayerNames[c]));
             if(!p.empty())
             {
-                (*GFXCharacterBMP[c])[A] = XRender::lazyLoadPicture(p);
+                XRender::lazyLoadPicture((*GFXCharacterBMP[c])[A], p);
                 (*GFXCharacterWidth[c])[A] = (*GFXCharacterBMP[c])[A].w;
                 (*GFXCharacterHeight[c])[A] = (*GFXCharacterBMP[c])[A].h;
             }
@@ -696,7 +697,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("block-{0}", A));
         if(!p.empty())
         {
-            GFXBlockBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXBlockBMP[A], p);
         }
         else
         {
@@ -716,7 +717,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("background2-{0}", A));
         if(!p.empty())
         {
-            GFXBackground2BMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXBackground2BMP[A], p);
             GFXBackground2Width[A] = GFXBackground2BMP[A].w;
             GFXBackground2Height[A] = GFXBackground2BMP[A].h;
         }
@@ -739,7 +740,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("npc-{0}", A));
         if(!p.empty())
         {
-            GFXNPCBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXNPCBMP[A], p);
             GFXNPCWidth[A] = GFXNPCBMP[A].w;
             GFXNPCHeight[A] = GFXNPCBMP[A].h;
             if(A % 20 == 0)
@@ -763,7 +764,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("effect-{0}", A));
         if(!p.empty())
         {
-            GFXEffectBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXEffectBMP[A], p);
             GFXEffectWidth[A] = GFXEffectBMP[A].w;
             GFXEffectHeight[A] = GFXEffectBMP[A].h;
             if(A % 20 == 0)
@@ -787,7 +788,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("yoshib-{0}", A));
         if(!p.empty())
         {
-            GFXYoshiBBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXYoshiBBMP[A], p);
             if(A % 20 == 0)
                 UpdateLoad();
         }
@@ -804,7 +805,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("yoshit-{0}", A));
         if(!p.empty())
         {
-            GFXYoshiTBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXYoshiTBMP[A], p);
             if(A % 20 == 0)
                 UpdateLoad();
         }
@@ -824,7 +825,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("background-{0}", A));
         if(!p.empty())
         {
-            GFXBackgroundBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXBackgroundBMP[A], p);
             GFXBackgroundWidth[A] = GFXBackgroundBMP[A].w;
             GFXBackgroundHeight[A] = GFXBackgroundBMP[A].h;
             BackgroundWidth[A] = GFXBackgroundWidth[A];
@@ -850,7 +851,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("tile-{0}", A));
         if(!p.empty())
         {
-            GFXTileBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXTileBMP[A], p);
             GFXTileWidth[A] = GFXTileBMP[A].w;
             GFXTileHeight[A] = GFXTileBMP[A].h;
             if(A % 20 == 0)
@@ -872,7 +873,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("level-{0}", A));
         if(!p.empty())
         {
-            GFXLevelBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXLevelBMP[A], p);
             GFXLevelWidth[A] = GFXLevelBMP[A].w;
             GFXLevelHeight[A] = GFXLevelBMP[A].h;
             if(A % 20 == 0)
@@ -894,7 +895,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("scene-{0}", A));
         if(!p.empty())
         {
-            GFXSceneBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXSceneBMP[A], p);
             GFXSceneWidth[A] = GFXSceneBMP[A].w;
             GFXSceneHeight[A] = GFXSceneBMP[A].h;
             if(A % 20 == 0)
@@ -916,7 +917,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("player-{0}", A));
         if(!p.empty())
         {
-            GFXPlayerBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXPlayerBMP[A], p);
             GFXPlayerWidth[A] = GFXPlayerBMP[A].w;
             GFXPlayerHeight[A] = GFXPlayerBMP[A].h;
             if(A % 20 == 0)
@@ -938,7 +939,7 @@ void LoadGFX()
         s_find_image(p, CurDir, fmt::format_ne("path-{0}", A));
         if(!p.empty())
         {
-            GFXPathBMP[A] = XRender::lazyLoadPicture(p);
+            XRender::lazyLoadPicture(GFXPathBMP[A], p);
             GFXPathWidth[A] = GFXPathBMP[A].w;
             GFXPathHeight[A] = GFXPathBMP[A].h;
             if(A % 20 == 0)

@@ -96,23 +96,20 @@ namespace Controls
 void TouchScreenGFX_t::loadImage(StdPicture& img, const std::string& fileName)
 {
     std::string imgPath = m_gfxPath + fileName;
-#ifdef __ANDROID__
 
+#ifdef __ANDROID__
     if(!Files::fileExists(imgPath)) // If not exists at assets, do load bundled
         imgPath = "buttons/" + fileName;
-
 #endif
 
     pLogDebug("Loading texture %s...", imgPath.c_str());
-    img = XRender::LoadPicture(imgPath);
+    XRender::LoadPicture(img, imgPath);
 
     if(!img.inited)
     {
         pLogWarning("Failed to load texture: %s...", imgPath.c_str());
         m_loadErrors++;
     }
-
-    m_loadedImages.push_back(&img);
 }
 
 TouchScreenGFX_t::TouchScreenGFX_t()
@@ -178,14 +175,6 @@ TouchScreenGFX_t::TouchScreenGFX_t()
     }
 
     m_success = true;
-}
-
-TouchScreenGFX_t::~TouchScreenGFX_t()
-{
-    for(StdPicture* p : m_loadedImages)
-        XRender::deleteTexture(*p);
-
-    m_loadedImages.clear();
 }
 
 /*------------------------------------------*\

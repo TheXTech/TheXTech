@@ -25,9 +25,9 @@
 #include <string>
 #include "std_picture.h"
 #include "base/render_types.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #ifndef RENDER_CUSTOM
-#   include "sdl_proxy/sdl_stdinc.h"
 #   include "base/render_base.h"
 #   define E_INLINE SDL_FORCE_INLINE
 #   define TAIL
@@ -223,45 +223,24 @@ E_INLINE void setTargetSubScreen() TAIL
 #endif
 
 
-// load a picture whose logical size is the same as its texture size (the texture normally would have 2x2 pixels)
-E_INLINE StdPicture LoadPicture(const std::string &path,
-                                const std::string &maskPath = std::string(),
-                                const std::string &maskFallbackPath = std::string()) TAIL
+E_INLINE void lazyLoadPicture(StdPicture_Sub &target,
+                              const std::string &path,
+                              int scaleFactor,
+                              const std::string &maskPath = std::string(),
+                              const std::string &maskFallbackPath = std::string()) TAIL
 #ifndef RENDER_CUSTOM
 {
-    return AbstractRender_t::LoadPicture(path, maskPath, maskFallbackPath);
+    AbstractRender_t::lazyLoadPicture(target, path, scaleFactor, maskPath, maskFallbackPath);
 }
 #endif
 
-// load a picture whose logical size is twice its texture size (the texture has 1x1 pixels)
-E_INLINE StdPicture LoadPicture_1x(const std::string &path,
-                                const std::string &maskPath = std::string(),
-                                const std::string &maskFallbackPath = std::string()) TAIL
-#ifndef RENDER_CUSTOM
+SDL_FORCE_INLINE void lazyLoadPicture(StdPicture_Sub &target,
+                                      const std::string &path,
+                                      const std::string &maskPath = std::string(),
+                                      const std::string &maskFallbackPath = std::string())
 {
-    return AbstractRender_t::LoadPicture_1x(path, maskPath, maskFallbackPath);
+    lazyLoadPicture(target, path, 1, maskPath, maskFallbackPath);
 }
-#endif
-
-E_INLINE StdPicture lazyLoadPicture(const std::string &path,
-                                    const std::string &maskPath = std::string(),
-                                    const std::string &maskFallbackPath = std::string()) TAIL
-#ifndef RENDER_CUSTOM
-{
-    return AbstractRender_t::lazyLoadPicture(path, maskPath, maskFallbackPath);
-}
-#endif
-
-#if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
-E_INLINE StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir);
-#endif
-
-E_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb) TAIL
-#ifndef RENDER_CUSTOM
-{
-    AbstractRender_t::setTransparentColor(target, rgb);
-}
-#endif
 
 E_INLINE void lazyLoad(StdPicture &target) TAIL
 #ifndef RENDER_CUSTOM
@@ -270,10 +249,36 @@ E_INLINE void lazyLoad(StdPicture &target) TAIL
 }
 #endif
 
-E_INLINE void lazyUnLoad(StdPicture &target) TAIL
+// load a picture whose logical size is some factor times its texture size (the texture has 1x1 pixels)
+SDL_FORCE_INLINE void LoadPicture(StdPicture &target,
+                                  const std::string &path,
+                                  int scaleFactor,
+                                  const std::string &maskPath = std::string(),
+                                  const std::string &maskFallbackPath = std::string())
+{
+    lazyLoadPicture(target, path, scaleFactor, maskPath, maskFallbackPath);
+    lazyLoad(target);
+}
+
+// load a picture whose logical size is the same as its texture size (the texture normally would have 2x2 pixels)
+SDL_FORCE_INLINE void LoadPicture(StdPicture &target,
+                                  const std::string &path,
+                                  const std::string &maskPath = std::string(),
+                                  const std::string &maskFallbackPath = std::string())
+{
+    lazyLoadPicture(target, path, 1, maskPath, maskFallbackPath);
+    lazyLoad(target);
+}
+
+
+#if defined(PGE_MIN_PORT) || defined(THEXTECH_CLI_BUILD)
+E_INLINE void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir);
+#endif
+
+E_INLINE void setTransparentColor(StdPicture &target, uint32_t rgb) TAIL
 #ifndef RENDER_CUSTOM
 {
-    AbstractRender_t::lazyUnLoad(target);
+    AbstractRender_t::setTransparentColor(target, rgb);
 }
 #endif
 
@@ -299,16 +304,15 @@ E_INLINE void lazyLoadedBytesReset() TAIL
 #endif
 
 /*!
- * \brief Load a texture whose logical size is the same as its texture size (the texture normally would have 2x2 pixels)
+ * \brief Load a texture's backing image data (image data may differ from texture's logical size)
  * \param target Destination texture entry
  * \param width Width of the input texture in pixels
  * \param height Height of the input texture in pixels
  * \param RGBApixels Pointer to the RGBA pixel data
  * \param pitch Width of the line in bytes
  *
- * Important note: All internal data of the target texture
- * (such as .w, .h, .frame_w, .frame_h, .l.w_orig, .l.h_orig,
- * .l.w_scale, .l.h_scale) must be filled externally BEFORE loading
+ * Important note: internal size data of the target texture
+ * (such as .w, .h) must be filled externally BEFORE loading
  * the texture.
  */
 E_INLINE void loadTexture(StdPicture &target,
@@ -323,33 +327,14 @@ E_INLINE void loadTexture(StdPicture &target,
 #endif
 
 /*!
- * \brief load an RGBA texture whose logical size is the twice its texture size (the texture has 1x1 pixels)
- * \param target Destination texture entry
- * \param width Width of the input texture in pixels
- * \param height Height of the input texture in pixels
- * \param RGBApixels Pointer to the RGBA pixel data
- * \param pitch Width of the line in bytes
+ * \brief Unload all renderer-specific state of a texture
  *
- * Important note: All internal data of the target texture
- * (such as .w, .h, .frame_w, .frame_h, .l.w_orig, .l.h_orig,
- * .l.w_scale, .l.h_scale) must be filled externally BEFORE loading
- * the texture.
+ * Important note: if the texture does not have loading information, fully de-inits it.
  */
-E_INLINE void loadTexture_1x(StdPicture &target,
-                          uint32_t width,
-                          uint32_t height,
-                          uint8_t *RGBApixels,
-                          uint32_t pitch) TAIL
+E_INLINE void unloadTexture(StdPicture &tx) TAIL
 #ifndef RENDER_CUSTOM
 {
-    g_render->loadTexture_1x(target, width, height, RGBApixels, pitch);
-}
-#endif
-
-E_INLINE void deleteTexture(StdPicture &tx, bool lazyUnload = false) TAIL
-#ifndef RENDER_CUSTOM
-{
-    g_render->deleteTexture(tx, lazyUnload);
+    g_render->unloadTexture(tx);
 }
 #endif
 

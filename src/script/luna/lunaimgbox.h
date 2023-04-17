@@ -49,7 +49,9 @@ public:
 
     LunaImage(const std::string &filename);
     LunaImage(const LunaImage &o);
+    LunaImage(LunaImage &&o);
     LunaImage &operator=(const LunaImage &o);
+    LunaImage &operator=(LunaImage &&o);
 
     void Init();
 

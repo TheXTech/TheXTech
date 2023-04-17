@@ -85,7 +85,7 @@ static inline void pfree(packindex_t pack)
     }
 }
 
-void setup(StdPicture& tex, const std::string& pack_path, uint32_t pack_offset)
+void setup(StdPicture_Sub& tex, const std::string& pack_path, uint32_t pack_offset)
 {
     auto it = s_pack_map.find(pack_path);
 
@@ -116,7 +116,7 @@ void decref(uint8_t pack)
         pfree(pack);
 }
 
-FILE* getf(const StdPicture& tex, int index)
+FILE* getf(const StdPicture_Sub& tex, int index)
 {
     // XMsgBox::errorMsgBox("was called", "open");
 
@@ -146,8 +146,8 @@ FILE* getf(const StdPicture& tex, int index)
             int prev_logical_w = tex.w;
             int prev_logical_h = index * 2048;
 
-            prev_logical_w >>= (1 + (tex.d.flags & 15));
-            prev_logical_h >>= (1 + (tex.d.flags & 15));
+            prev_logical_w >>= (1 + (tex.l.flags & 15));
+            prev_logical_h >>= (1 + (tex.l.flags & 15));
 
             // 4bpp
             offset += prev_logical_w * prev_logical_h / 2;
@@ -165,7 +165,7 @@ FILE* getf(const StdPicture& tex, int index)
     return nullptr;
 }
 
-void finalizef(FILE* f, const StdPicture& tex)
+void finalizef(FILE* f, const StdPicture_Sub& tex)
 {
     if(tex.l.pack == PACK_NONE)
         fclose(f);

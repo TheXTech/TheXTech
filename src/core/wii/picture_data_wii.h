@@ -31,12 +31,26 @@
 // also, if graphics lists are included, they can force MOST (but not all) assets to be read from TPL
 #define X_IMG_EXT ".tpl"
 
+struct StdPicture;
+
 /*!
  * \brief Platform specific picture data. Fields should not be used directly
  */
 struct StdPictureData
 {
     bool multi_horizontal = false;
+
+    // render chain data to store render sequence
+
+    //! The previous texture in the render chain (nullptr if this is the tail or unloaded)
+    StdPicture* last_texture = nullptr;
+
+    //! The next texture in the render chain (nullptr if this is the head or unloaded)
+    StdPicture* next_texture = nullptr;
+
+    //! The last frame that the texture was rendered (not accessed if not in the render chain)
+    uint32_t last_draw_frame = 0;
+
 
     // possible backing data
     bool texture_file_init[3] = {false, false, false};

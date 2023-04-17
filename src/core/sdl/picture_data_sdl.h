@@ -36,6 +36,7 @@ struct SDL_Texture;
 struct StdPictureData
 {
 // Compatible backend is only can use these internals
+private:
     friend class RenderSDL;
 
     //! Texture instance pointer for SDL Render
@@ -53,19 +54,20 @@ struct StdPictureData
     //! Number of colors
     GLint       nOfColors = 0;
 
+    //! Width scale factor
+    float w_scale = 1.0f;
+    //! Height scale factor
+    float h_scale = 1.0f;
+
     //! Cached color modifier
     uint8_t     modColor[4] = {255,255,255,255};
 
 // Public API
+public:
 
-    inline bool hasTexture()
+    inline bool hasTexture() const
     {
         return texture != nullptr;
-    }
-
-    inline void clear()
-    {
-        texture = nullptr;
     }
 };
 
