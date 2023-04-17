@@ -53,8 +53,6 @@ RasterFont::RasterFont() : BaseFontEngine()
 
 RasterFont::~RasterFont()
 {
-    for(StdPicture &t : m_texturesBank)
-        XRender::deleteTexture(t);
     m_texturesBank.clear();
 }
 
@@ -154,37 +152,13 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
         return;
     }
 
-    // if scale factor is 1, then it's a "2x" texture meaning that (in standard image format) the image is made of 2x2 pixels
-    StdPicture fontTexture = (texture_scale_factor == 1 ? XRender::LoadPicture(root + texFile) : XRender::LoadPicture_1x(root + texFile));
+    m_texturesBank.emplace_back();
+    StdPicture &fontTexture = m_texturesBank.back();
 
-    // don't allow odd scale factors other than 1
-    if(texture_scale_factor > 1 && texture_scale_factor & 1)
-    {
-        pLogWarning("Font texture uses odd scale factor, rounding down");
-        texture_scale_factor &= ~1;
-    }
-
-    if(texture_scale_factor > 2)
-    {
-        // was loaded as 2x the original image, now it's Nx.
-        fontTexture.w *= texture_scale_factor;
-        fontTexture.w /= 2;
-        fontTexture.h *= texture_scale_factor;
-        fontTexture.h /= 2;
-//        fontTexture.frame_w = fontTexture.w;
-//        fontTexture.frame_h = fontTexture.h;
-
-#ifdef PICTURE_LOAD_NORMAL
-        fontTexture.l.w_scale *= 2.0 / texture_scale_factor;
-        fontTexture.l.h_scale *= 2.0 / texture_scale_factor;
-#endif
-    }
+    XRender::LoadPicture(fontTexture, root + texFile, texture_scale_factor);
 
     if(!fontTexture.inited)
         pLogWarning("Failed to load font texture! Invalid image!");
-
-    m_texturesBank.push_back(fontTexture);
-    StdPicture *loadedTexture = &m_texturesBank.back();
 
     if((m_letterWidth == 0) || (m_letterHeight == 0))
     {
@@ -258,13 +232,13 @@ void RasterFont::loadFontMap(std::string fontmap_ini)
         float l, t;
         try
         {
-            rch.tx              =  loadedTexture;
+            rch.tx              =  &fontTexture;
             l                   =  std::stof(charPosY.c_str()) / m_matrixWidth;
             rch.padding_left    = (ucharX.size() > 1) ? char2int(ucharX[1]) : 0;
             rch.padding_right   = (ucharX.size() > 2) ? char2int(ucharX[2]) : 0;
             t                   =  std::stof(charPosX.c_str()) / m_matrixHeight;
-            rch.x               =  static_cast<int32_t>(loadedTexture->w * l);
-            rch.y               =  static_cast<int32_t>(loadedTexture->h * t);
+            rch.x               =  static_cast<int32_t>(fontTexture.w * l);
+            rch.y               =  static_cast<int32_t>(fontTexture.h * t);
             rch.valid = true;
         }
         catch(std::exception &e)

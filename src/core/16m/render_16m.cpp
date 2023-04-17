@@ -161,8 +161,8 @@ private:
             logical_h = 2048;
 
         // scale down by power of two
-        logical_w >>= (1 + (m_tex->d.flags & 15));
-        logical_h >>= (1 + (m_tex->d.flags & 15));
+        logical_w >>= (1 + (m_tex->l.flags & 15));
+        logical_h >>= (1 + (m_tex->l.flags & 15));
 
         if(logical_w > 1024)
             return false;
@@ -306,7 +306,7 @@ private:
             return false;
 
         int tex_params = TEXGEN_OFF;
-        if((m_tex->d.flags & 16) == 0)
+        if((m_tex->l.flags & 16) == 0)
             tex_params |= GL_TEXTURE_COLOR0_TRANSPARENT;
 
         glBindTexture(0, m_texname);
@@ -759,27 +759,13 @@ void minport_ApplyViewport()
     glOrthof32( off_x, g_viewport_w + off_x, g_viewport_h + off_y, off_y, -1 << 12, 1 << 12 );
 }
 
-StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
-{
-    StdPicture ret = lazyLoadPicture(path, maskPath, maskFallbackPath);
-
-    return ret;
-}
-
-StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
-{
-    // The asset converter should have known not to downscale this image. Let's hope it was right.
-    return LoadPicture(path, maskPath, maskFallbackPath);
-}
-
-StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleFactor, const std::string& maskPath, const std::string& maskFallbackPath)
 {
     (void)maskPath;
     (void)maskFallbackPath;
 
-    StdPicture target;
     if(!GameIsActive)
-        return target; // do nothing when game is closed
+        return; // do nothing when game is closed
 
     target.inited = true;
     target.l.path = path;
@@ -801,7 +787,7 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
         {
             target.w = w;
             target.h = h;
-            target.d.flags = flags;
+            target.l.flags = flags;
         }
 
         if(fclose(fs))
@@ -812,15 +798,12 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
         pLogWarning("loadPicture: Couldn't open size file.");
         target.inited = false;
     }
-
-    return target;
 }
 
-StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
+void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir)
 {
-    StdPicture target;
     if(!GameIsActive)
-        return target; // do nothing when game is closed
+        return; // do nothing when game is closed
 
     int length;
 
@@ -828,13 +811,13 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
     {
         pLogWarning("Could not load image path from load list");
-        return target;
+        return;
     }
 
     if(length == 255)
     {
         pLogWarning("Image path %s was truncated in load list, aborting", filename);
-        return target;
+        return;
     }
 
     target.inited = true;
@@ -867,16 +850,16 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     {
         pLogWarning("Could not load image %s dimensions from load list", filename);
         target.inited = false;
-        return target;
+        return;
     }
 
     // pLogDebug("Successfully loaded %s (%d %d)", target.l.path.c_str(), w, h);
 
     target.w = w;
     target.h = h;
-    target.d.flags = flags;
+    target.l.flags = flags;
 
-    return target;
+    return;
 }
 
 void lazyLoad(StdPicture &target)
@@ -905,11 +888,6 @@ void lazyPreLoad(StdPicture &target)
     }
 }
 
-void lazyUnLoad(StdPicture &target)
-{
-    deleteTexture(target, true);
-}
-
 void clearAllTextures()
 {
     s_texture_loader.reset();
@@ -933,7 +911,7 @@ void clearAllTextures()
     glResetTextures();
 }
 
-void deleteTexture(StdPicture &tx, bool lazyUnload)
+void unloadTexture(StdPicture &tx)
 {
     if(!tx.inited)
         return;
@@ -955,15 +933,8 @@ void deleteTexture(StdPicture &tx, bool lazyUnload)
 
     tx.d.destroy();
 
-    if(!lazyUnload)
-    {
-        tx.inited = false;
-        tx.l.lazyLoaded = false;
-        tx.w = 0;
-        tx.h = 0;
-//        tx.frame_w = 0;
-//        tx.frame_h = 0;
-    }
+    if(tx.l.path.empty())
+        static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 }
 
 void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,
@@ -1037,7 +1008,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         // draw the top pic
         if(to_draw_2)
         {
-            GL_DrawImage_Custom(to_draw_2, tx.d.flags, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
+            GL_DrawImage_Custom(to_draw_2, tx.l.flags, xDst, yDst, wDst, (1024 - ySrc) * hDst / hSrc,
                                 xSrc, ySrc, wSrc, 1024 - ySrc, flip, red, green, blue, alpha);
             yDst += (1024 - ySrc) * hDst / hSrc;
             hDst -= (1024 - ySrc) * hDst / hSrc;
@@ -1054,7 +1025,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
 
     if(!to_draw) return;
 
-    GL_DrawImage_Custom(to_draw, tx.d.flags, xDst, yDst, wDst, hDst,
+    GL_DrawImage_Custom(to_draw, tx.l.flags, xDst, yDst, wDst, hDst,
                         xSrc, ySrc, wSrc, hSrc, flip, red, green, blue, alpha);
 
     // finalize rotation HERE

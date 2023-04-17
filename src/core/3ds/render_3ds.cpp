@@ -168,8 +168,13 @@ void s_ensureInFrame()
 
 void s_clearAllTextures()
 {
-    for(StdPicture* p = g_render_chain_tail; p != nullptr; p = p->l.next_texture)
-        deleteTexture(*p);
+    for(StdPicture* p = g_render_chain_tail; p != nullptr;)
+    {
+        StdPicture* last_p = p;
+        p = p->d.next_texture;
+
+        unloadTexture(*last_p);
+    }
 }
 
 FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, int* orig_w = nullptr, int* orig_h = nullptr)
@@ -312,8 +317,11 @@ static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t
     return img;
 }
 
-void s_loadTexture(StdPicture& target, void* data, int width, int height, int pitch, bool mask, bool downscale = true)
+void s_loadTexture(StdPicture& target, void* data, int width, int height, int pitch, bool mask)
 {
+    // downscale if logical width matches the actual width of the texture, otherwise don't
+    bool downscale = (width >= target.w);
+
     int max_size = (downscale ? 2048 : 1024);
 
     pLogDebug("Loading %s %d, w %d h %d p %d", target.l.path.c_str(), (int)mask, width, height, pitch);
@@ -743,109 +751,10 @@ void minport_ApplyViewport()
     }
 }
 
-StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath, bool downscale)
+void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir)
 {
-    (void)maskPath;
-    (void)maskFallbackPath;
-
-    StdPicture target;
-    C2D_SpriteSheet sourceImage;
-
     if(!GameIsActive)
-        return target; // do nothing when game is closed
-
-    target.inited = false;
-    target.l.path = path;
-
-    if(target.l.path.empty())
-        return target;
-
-    if(maskPath.empty() && !maskFallbackPath.empty() && Files::fileExists(maskFallbackPath))
-        target.l.mask_path = maskFallbackPath;
-    else
-        target.l.mask_path = maskPath;
-
-    target.inited = true;
-
-    // must be true to make it safe for the renderer to lazy-unload
-    target.l.lazyLoaded = true;
-
-    if(Files::hasSuffix(target.l.path, ".t3x"))
-    {
-        sourceImage = C2D_SpriteSheetLoad(target.l.path.c_str());
-
-        if(sourceImage)
-        {
-            s_loadTexture(target, sourceImage);
-            s_num_textures_loaded ++;
-        }
-    }
-    else
-    {
-        FIBITMAP* FI_tex = nullptr;
-        FIBITMAP* FI_mask = nullptr;
-
-        if(Files::hasSuffix(target.l.mask_path, "m.gif"))
-        {
-            FI_tex = robust_FILoad(target.l.path, "", &target.w, &target.h);
-
-            if(FI_tex)
-                FI_mask = robust_FILoad(target.l.mask_path, "");
-        }
-        else
-        {
-            FI_tex = robust_FILoad(target.l.path, target.l.mask_path, &target.w, &target.h);
-        }
-
-        if(!downscale)
-        {
-            target.w *= 2;
-            target.h *= 2;
-        }
-
-        if(!FI_tex)
-        {
-            pLogWarning("Permanently failed to load %s", target.l.path.c_str());
-            pLogWarning("Error: %d (%s)", errno, strerror(errno));
-        }
-        else
-        {
-            s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), FreeImage_GetPitch(FI_tex), false, downscale);
-            FreeImage_Unload(FI_tex);
-
-            if(FI_mask)
-            {
-                s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), FreeImage_GetPitch(FI_mask), true, downscale);
-                FreeImage_Unload(FI_mask);
-            }
-        }
-    }
-
-    if(!target.d.hasTexture())
-    {
-        pLogWarning("FAILED TO LOAD!!! %s", path.c_str());
-        target.inited = false;
-    }
-
-    return target;
-}
-
-StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
-{
-    return LoadPicture(path, maskPath, maskFallbackPath, true);
-}
-
-StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
-{
-    return LoadPicture(path, maskPath, maskFallbackPath, false);
-}
-
-StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
-{
-    StdPicture target;
-
-    if(!GameIsActive)
-        return target; // do nothing when game is closed
+        return; // do nothing when game is closed
 
     int length;
 
@@ -854,13 +763,13 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
     {
         pLogWarning("Could not load image path from load list");
-        return target;
+        return;
     }
 
     if(length == 255)
     {
         pLogWarning("Image path %s was truncated in load list", filename);
-        return target;
+        return;
     }
 
     target.inited = true;
@@ -874,7 +783,7 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     {
         pLogWarning("Could not load image %s dimensions from load list", filename);
         target.inited = false;
-        return target;
+        return;
     }
 
     // pLogDebug("Successfully loaded %s (%d %d)", target.l.path.c_str(), w, h);
@@ -882,22 +791,20 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     target.w = w;
     target.h = h;
 
-    return target;
+    return;
 }
 
 
-StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleFactor, const std::string& maskPath, const std::string& maskFallbackPath)
 {
-    StdPicture target;
-
     if(!GameIsActive)
-        return target; // do nothing when game is closed
+        return; // do nothing when game is closed
 
     target.inited = false;
     target.l.path = path;
 
     if(target.l.path.empty())
-        return target;
+        return;
 
     if(maskPath.empty() && !maskFallbackPath.empty() && Files::fileExists(maskFallbackPath))
         target.l.mask_path = maskFallbackPath;
@@ -928,13 +835,11 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
             if(fclose(fs))
                 pLogWarning("lazyLoadPicture: Couldn't close file.");
         }
-        // lazy load and unload to read dimensions if it doesn't exist.
-        // unload is essential because lazy load would save the address incorrectly.
         else
         {
-            pLogWarning("lazyLoadPicture: Couldn't open size file.");
-            lazyLoad(target);
-            lazyUnLoad(target);
+            pLogWarning("lazyLoadPicture: Couldn't open size file. Giving up.");
+            target.inited = false;
+            return;
         }
     }
     else
@@ -955,12 +860,10 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
         }
         else
         {
-            target.w = tSize.w();
-            target.h = tSize.h();
+            target.w = tSize.w() * scaleFactor;
+            target.h = tSize.h() * scaleFactor;
         }
     }
-
-    return target;
 }
 
 static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
@@ -1098,44 +1001,18 @@ void lazyPreLoad(StdPicture& target)
     lazyLoad(target);
 }
 
-void lazyUnLoad(StdPicture& target)
-{
-    if(!target.inited || !target.l.lazyLoaded || !target.d.hasTexture())
-        return;
-
-    deleteTexture(target, true);
-}
-
 void loadTexture(StdPicture& target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
 {
-    s_loadTexture(target, RGBApixels, width, height, pitch, false, true);
+    s_loadTexture(target, RGBApixels, width, height, pitch, false);
     target.inited = true;
     target.l.lazyLoaded = false;
-    target.w = width;
-    target.h = height;
-//    target.frame_w = width;
-//    target.frame_h = height;
 }
 
-void loadTexture_1x(StdPicture& target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+void unloadTexture(StdPicture& tx)
 {
-    s_loadTexture(target, RGBApixels, width, height, pitch, false, false);
-    target.inited = true;
-    target.l.lazyLoaded = false;
-    target.w = width * 2;
-    target.h = height * 2;
-//    target.frame_w = width * 2;
-//    target.frame_h = height * 2;
-}
-
-void deleteTexture(StdPicture& tx, bool lazyUnload)
-{
-    if(!tx.inited)
-        return;
-
     minport_unlinkTexture(&tx);
 
-    if(tx.d.texture[0])
+    if(tx.d.hasTexture())
         s_num_textures_loaded --;
 
     for(int i = 0; i < 6; i++)
@@ -1155,15 +1032,8 @@ void deleteTexture(StdPicture& tx, bool lazyUnload)
         tx.d.texture[i] = nullptr;
     }
 
-    if(!lazyUnload)
-    {
-        tx.inited = false;
-        tx.l.lazyLoaded = false;
-        tx.w = 0;
-        tx.h = 0;
-//        tx.frame_w = 0;
-//        tx.frame_h = 0;
-    }
+    if(!tx.l.canLoad())
+        static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 }
 
 void minport_RenderBoxFilled(int x1, int y1, int x2, int y2, uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)

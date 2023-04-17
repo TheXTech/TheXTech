@@ -164,17 +164,17 @@ public:
 
     // Load and unload textures
 
-    static StdPicture LoadPicture(const std::string &path,
-                                  const std::string &maskPath = std::string(),
-                                  const std::string &maskFallbackPath = std::string());
+    static void LoadPicture(StdPicture& target,
+                            const std::string &path,
+                            int scaleFactor = 1,
+                            const std::string &maskPath = std::string(),
+                            const std::string &maskFallbackPath = std::string());
 
-    static StdPicture LoadPicture_1x(const std::string &path,
-                                  const std::string &maskPath = std::string(),
-                                  const std::string &maskFallbackPath = std::string());
-
-    static StdPicture lazyLoadPicture(const std::string &path,
-                                      const std::string &maskPath = std::string(),
-                                      const std::string &maskFallbackPath = std::string());
+    static void lazyLoadPicture(StdPicture_Sub& target,
+                                const std::string &path,
+                                int scaleFactor = 1,
+                                const std::string &maskPath = std::string(),
+                                const std::string &maskFallbackPath = std::string());
 
     static void setTransparentColor(StdPicture &target, uint32_t rgb);
 
@@ -183,6 +183,8 @@ public:
                              uint32_t height,
                              uint8_t *RGBApixels,
                              uint32_t pitch) = 0;
+
+    virtual void unloadTexture(StdPicture &tx) = 0;
 
     virtual void loadTextureMask(StdPicture &target,
                              uint32_t mask_width,
@@ -194,20 +196,12 @@ public:
 
     virtual bool textureMaskSupported();
 
-    void loadTexture_1x(StdPicture &target,
-                             uint32_t width,
-                             uint32_t height,
-                             uint8_t *RGBApixels,
-                             uint32_t pitch);
-
     static void lazyLoad(StdPicture &target);
-    static void lazyUnLoad(StdPicture &target);
     static void lazyPreLoad(StdPicture &target);
 
     static size_t lazyLoadedBytes();
     static void lazyLoadedBytesReset();
 
-    virtual void deleteTexture(StdPicture &tx, bool lazyUnload = false) = 0;
     virtual void clearAllTextures() = 0;
 
     virtual void clearBuffer() = 0;

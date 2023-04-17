@@ -40,7 +40,7 @@ class RenderSDL final : public AbstractRender_t
     SDL_Texture  *m_tBuffer = nullptr;
     bool          m_tBufferDisabled = false;
     SDL_Texture  *m_recentTarget = nullptr;
-    std::set<SDL_Texture *> m_textureBank;
+    std::set<StdPicture *> m_loadedPictures;
 
     // Scale of virtual and window resolutuins
     float m_scale_x = 1.f;
@@ -69,6 +69,8 @@ class RenderSDL final : public AbstractRender_t
     //Need for HiDPI rendering (number of draw pixels per cursor pixel)
     float m_hidpi_x = 1.0f;
     float m_hidpi_y = 1.0f;
+
+    static void txColorMod(StdPictureData &tx, float red, float green, float blue, float alpha);
 
 public:
     RenderSDL();
@@ -161,7 +163,7 @@ public:
                      uint8_t *RGBApixels,
                      uint32_t pitch) override;
 
-    void deleteTexture(StdPicture &tx, bool lazyUnload = false) override;
+    void unloadTexture(StdPicture &tx) override;
     void clearAllTextures() override;
 
     void clearBuffer() override;

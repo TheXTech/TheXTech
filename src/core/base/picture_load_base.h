@@ -20,12 +20,13 @@
 
 #pragma once
 
-#ifndef STD_PICTURE_LOAD_H
-#define STD_PICTURE_LOAD_H
+#ifndef STD_PICTURE_LOAD_BASE_H
+#define STD_PICTURE_LOAD_BASE_H
 
-#include <string>
+#define PICTURE_LOAD_NORMAL
 
-#include "core/16m/packloader.h"
+#include <cstdint>
+#include <vector>
 
 /*!
  * \brief Generic image loading store.
@@ -37,21 +38,24 @@ struct StdPictureLoad
     //! Is this a lazy-loaded texture?
     bool lazyLoaded = false;
 
-    //! Generic information about texture type
-    int flags = 0;
+    //! Original compressed data of the front image
+    std::vector<char> raw;
+    //! Original compressed data of the mask image (if presented)
+    std::vector<char> rawMask;
+    //! Was mask restored from the PNG at default graphics?
+    bool isMaskPng = false;
 
-    //! Pack index (PACK_NONE if not a pack)
-    PackLoader::packref_t pack;
-    uint32_t pack_offset = 0;
+    // Transparent color for BMP and JPEG
+    bool     colorKey = false;
+    uint8_t  keyRgb[3] = {0 /*R*/, 0 /*G*/, 0 /*B*/};
 
-    //! Path to find image (could be a pack)
-    std::string path = "";
-
-    inline void clear()
+    /*!
+     * \brief Can a picture be reloaded from this load struct?
+     */
+    inline bool canLoad() const
     {
-        pack = PackLoader::PACK_NONE;
-        pack_offset = 0;
+        return lazyLoaded;
     }
 };
 
-#endif // #ifndef STD_PICTURE_LOAD_H
+#endif // STD_PICTURE_LOAD_BASE_H
