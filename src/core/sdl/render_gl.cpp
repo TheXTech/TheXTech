@@ -133,7 +133,7 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
 
 #ifdef RENDERGL_HAS_SHADERS
     m_standard_program.use_program();
-    m_standard_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), (GLfloat)((m_transform_tick / 3) % (65 * 60)) / 65.0f);
+    m_standard_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
 #endif
 
     GLshort x1 = x;
@@ -497,7 +497,7 @@ void RenderGL::calculateLighting()
     glActiveTexture(TEXTURE_UNIT_IMAGE);
 
     m_lighting_program.use_program();
-    m_lighting_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), (GLfloat)((m_transform_tick / 3) % (65 * 60)) / 65.0f);
+    m_lighting_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
 
     GLshort x1 = m_viewport_x;
     GLshort x2 = m_viewport_x + m_viewport_w;
@@ -886,7 +886,7 @@ void RenderGL::repaint()
         if(m_use_shaders)
         {
             m_output_program.use_program();
-            m_output_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), (GLfloat)((m_transform_tick / 3) % (65 * 60)) / 65.0f);
+            m_output_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
         }
 #endif
 
