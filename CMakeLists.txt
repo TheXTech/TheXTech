@@ -743,6 +743,7 @@ else()
     if(THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_ES_MODERN)
         list(APPEND THEXTECH_SRC
             src/core/sdl/gl_program_bank.cpp
+            src/core/sdl/gl_particle_system.cpp
         )
     endif()
 
