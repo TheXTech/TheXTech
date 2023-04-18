@@ -685,6 +685,9 @@ public:
     void renderTexture(float xDst, float yDst, StdPicture &tx,
                        float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) override;
 
+    void renderParticleSystem(StdPicture &tx,
+                              double camX,
+                              double camY) override;
 
 
 

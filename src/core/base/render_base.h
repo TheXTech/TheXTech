@@ -185,6 +185,8 @@ public:
 
     static void LoadPictureShader(StdPicture& target, const std::string &path);
 
+    static void LoadPictureParticleSystem(StdPicture& target, const std::string &vertexPath, const std::string& fragPath, const std::string& imagePath);
+
     static void setTransparentColor(StdPicture &target, uint32_t rgb);
 
     virtual void loadTexture(StdPicture &target,
@@ -221,6 +223,10 @@ public:
 
     virtual int registerUniform(StdPicture &target, const char* name);
     virtual void assignUniform(StdPicture &target, int index, const UniformValue_t& value);
+    virtual void spawnParticle(StdPicture &target,
+                               double worldX,
+                               double worldY,
+                               ParticleVertexAttrs_t attrs);
 
 
 
@@ -271,6 +277,10 @@ public:
 
     virtual void renderTexture(float xDst, float yDst, StdPicture &tx,
                                float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
+
+    virtual void renderParticleSystem(StdPicture &tx,
+                                      double camX,
+                                      double camY);
 
 
 

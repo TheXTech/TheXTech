@@ -263,11 +263,19 @@ E_INLINE void lazyLoad(StdPicture &target) TAIL
 }
 #endif
 
-// load a shader-only picture (must succeed if file exists and shaders are supported at compile time)
+// load a shader-only picture (must succeed if file exists and shaders are supported at COMPILE time)
 E_INLINE void LoadPictureShader(StdPicture& target, const std::string &path) TAIL
 #ifndef RENDER_CUSTOM
 {
     AbstractRender_t::LoadPictureShader(target, path);
+}
+#endif
+
+// load a particle system picture (must succeed if vertex file exists, all other provided files exist, and shaders are supported at COMPILE time)
+E_INLINE void LoadPictureParticleSystem(StdPicture& target, const std::string &vertexPath, const std::string& fragPath, const std::string& imagePath) TAIL
+#ifndef RENDER_CUSTOM
+{
+    AbstractRender_t::LoadPictureParticleSystem(target, vertexPath, fragPath, imagePath);
 }
 #endif
 
@@ -404,6 +412,25 @@ E_INLINE void assignUniform(StdPicture &target,
 }
 #endif
 
+/*!
+ * \brief Adds a particle to a particle system at a certain world location
+ * \param target Destination texture entry
+ * \param worldX world X coordinate at which to draw the particle
+ * \param worldY world Y coordinate at which to draw the particle
+ * \param attrs  system-specific attributes with which to draw the particle
+ *
+ * Particles are only stored or remembered if the current renderer supports them.
+ */
+E_INLINE void spawnParticle(StdPicture &target,
+                            double worldX,
+                            double worldY,
+                            ParticleVertexAttrs_t attrs) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return g_render->spawnParticle(target, worldX, worldY, attrs);
+}
+#endif
+
 
 
 // Draw primitives
@@ -517,6 +544,23 @@ E_INLINE void renderTexture(float xDst, float yDst, StdPicture &tx,
 {
     g_render->renderTexture(xDst, yDst, tx,
                             red, green, blue, alpha);
+}
+#endif
+
+/*!
+ * \brief Draws the particle system at a particular camera offset
+ * \param tx Source particle system
+ * \param camX current camera X position (same as vScreenX)
+ * \param camY current camera Y position (same as vScreenY)
+ *
+ * No-op if particle effects are not supported.
+ */
+E_INLINE void renderParticleSystem(StdPicture &tx,
+                                   double camX,
+                                   double camY) TAIL
+#ifndef RENDER_CUSTOM
+{
+    return g_render->renderParticleSystem(tx, camX, camY);
 }
 #endif
 

@@ -26,6 +26,7 @@
 #include <stdint.h>
 
 #include "core/sdl/gl_program_object.h"
+#include "core/sdl/gl_particle_system.h"
 
 typedef unsigned int    GLenum;
 typedef int             GLint;
@@ -48,8 +49,15 @@ private:
     //! Mask texture instance pointer for SDL Render
     SDL_Texture *mask_texture = nullptr;
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+
     //! GLProgramObject wrapper for texture's shader program
     std::unique_ptr<GLProgramObject> shader_program = nullptr;
+
+    //! GLParticleSystem wrapper for texture's particle system state
+    std::unique_ptr<GLParticleSystem> particle_system = nullptr;
+
+#endif
 
     //! texture ID for OpenGL and other render engines
     GLuint       texture_id = 0;

@@ -170,7 +170,7 @@ void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat
         glUniform1f(m_u_clock_loc, clock);
 }
 
-void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shader)
+void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shader, bool particle_system)
 {
     m_program = 0;
 
@@ -261,6 +261,8 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
         m_flags |= Flags::read_depth;
     if(u_light_buffer_loc != -1)
         m_flags |= Flags::read_light;
+    if(particle_system)
+        m_flags |= Flags::particles;
 
     D_pLogDebugNA("GLProgramObject: program successfully linked");
 }
@@ -355,12 +357,12 @@ GLProgramObject::GLProgramObject()
     // empty
 }
 
-GLProgramObject::GLProgramObject(GLuint vertex_shader, GLuint fragment_shader)
+GLProgramObject::GLProgramObject(GLuint vertex_shader, GLuint fragment_shader, bool particle_system)
 {
-    m_link_program(vertex_shader, fragment_shader);
+    m_link_program(vertex_shader, fragment_shader, particle_system);
 }
 
-GLProgramObject::GLProgramObject(const char* vertex_src, const char* fragment_src)
+GLProgramObject::GLProgramObject(const char* vertex_src, const char* fragment_src, bool particle_system)
 {
     GLuint vertex_shader = s_compile_shader(GL_VERTEX_SHADER, vertex_src);
 
@@ -370,9 +372,12 @@ GLProgramObject::GLProgramObject(const char* vertex_src, const char* fragment_sr
     GLuint fragment_shader = s_compile_shader(GL_FRAGMENT_SHADER, fragment_src);
 
     if(!fragment_shader)
+    {
+        glDeleteShader(vertex_shader);
         return;
+    }
 
-    m_link_program(vertex_shader, fragment_shader);
+    m_link_program(vertex_shader, fragment_shader, particle_system);
 
     glDeleteShader(vertex_shader);
     glDeleteShader(fragment_shader);

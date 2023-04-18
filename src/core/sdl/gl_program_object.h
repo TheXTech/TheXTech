@@ -98,6 +98,7 @@ public:
         multipass   = (1 << 2),
         read_depth  = (1 << 3),
         read_light  = (1 << 4),
+        particles   = (1 << 5),
     };
 
 private:
@@ -135,7 +136,7 @@ private:
 
     static GLuint s_compile_shader(GLenum type, const char* src);
 
-    void m_link_program(GLuint vertex_shader, GLuint fragment_shader);
+    void m_link_program(GLuint vertex_shader, GLuint fragment_shader, bool particle_system = false);
 
     void m_activate_uniform_step(uint16_t step);
 
@@ -145,8 +146,8 @@ public:
 
     GLProgramObject();
 
-    GLProgramObject(const char* vertex_src, const char* fragment_src);
-    GLProgramObject(GLuint vertex_shader, GLuint fragment_shader);
+    GLProgramObject(const char* vertex_src, const char* fragment_src, bool particle_system = false);
+    GLProgramObject(GLuint vertex_shader, GLuint fragment_shader, bool particle_system = false);
 
     virtual ~GLProgramObject();
 

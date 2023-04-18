@@ -47,8 +47,11 @@ struct StdPictureLoad
 
 
 #ifdef THEXTECH_BUILD_GL_MODERN
+    //! Original vertex shader source (if presented) -- CURRENTLY USED ONLY FOR PARTICLE SYSTEMS
+    std::vector<char> particleVertexShaderSource;
     //! Original fragment shader source (if presented)
     std::vector<char> fragmentShaderSource;
+
     //! Shader uniform variables registered
     std::vector<std::string> registeredUniforms;
     //! Most recent values for shader uniform variables

@@ -54,6 +54,8 @@
 #endif
 
 
+static const char blank_gif[] = "GIF87a\x01\x00\x01\x00\x80\x01\x00\x00\x00\x00\xff\xff\xff,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
+
 AbstractRender_t* g_render = nullptr;
 
 size_t AbstractRender_t::m_lazyLoadedBytes = 0;
@@ -304,7 +306,6 @@ void AbstractRender_t::LoadPictureShader(StdPicture& target, const std::string &
         target.l.lazyLoaded = true;
 
         // blank GIF of 1 pixel
-        const char blank_gif[] = "GIF87a\x01\x00\x01\x00\x80\x01\x00\x00\x00\x00\xff\xff\xff,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
         target.l.raw.resize(sizeof(blank_gif) - 1);
         SDL_memcpy(target.l.raw.data(), blank_gif, sizeof(blank_gif) - 1);
 
@@ -312,6 +313,65 @@ void AbstractRender_t::LoadPictureShader(StdPicture& target, const std::string &
         dumpFullFile(target.l.fragmentShaderSource, path);
         // must be null-terminated
         target.l.fragmentShaderSource.push_back('\0');
+
+        // eagerly compile it to minimize stutter
+        g_render->compileShaders(target);
+    }
+#endif
+}
+
+void AbstractRender_t::LoadPictureParticleSystem(StdPicture& target, const std::string &vertexPath, const std::string& fragPath, const std::string& imagePath)
+{
+    if(!GameIsActive)
+        return; // do nothing when game is closed
+
+    if(vertexPath.empty())
+        return;
+
+#ifdef DEBUG_BUILD
+    target.origPath = vertexPath;
+#endif
+
+    target.reset();
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+    bool valid = Files::fileExists(vertexPath)
+        && (fragPath.empty() || Files::fileExists(fragPath))
+        && (imagePath.empty() || Files::fileExists(imagePath));
+
+    // load fragment shader if it exists
+    if(valid)
+    {
+        if(!imagePath.empty())
+        {
+            lazyLoadPicture(target, imagePath);
+        }
+        else
+        {
+            target.w = 1;
+            target.h = 1;
+
+            target.inited = true;
+            target.l.lazyLoaded = true;
+
+            // blank GIF of 1 pixel
+            const char blank_gif[] = "GIF87a\x01\x00\x01\x00\x80\x01\x00\x00\x00\x00\xff\xff\xff,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
+            target.l.raw.resize(sizeof(blank_gif) - 1);
+            SDL_memcpy(target.l.raw.data(), blank_gif, sizeof(blank_gif) - 1);
+        }
+
+        pLogDebug("Loading particle system vertex shader [%s]...", vertexPath.c_str());
+        dumpFullFile(target.l.particleVertexShaderSource, vertexPath);
+        // must be null-terminated
+        target.l.particleVertexShaderSource.push_back('\0');
+
+        if(!fragPath.empty())
+        {
+            pLogDebug("Loading particle system fragment shader [%s]...", fragPath.c_str());
+            dumpFullFile(target.l.fragmentShaderSource, fragPath);
+            // must be null-terminated
+            target.l.fragmentShaderSource.push_back('\0');
+        }
 
         // eagerly compile it to minimize stutter
         g_render->compileShaders(target);
@@ -487,7 +547,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         GraphicsHelps::closeImage(maskImage);
     }
 
-    if(g_render->userShadersSupported() && !target.l.fragmentShaderSource.empty())
+    if(g_render->userShadersSupported() && (!target.l.particleVertexShaderSource.empty() || !target.l.fragmentShaderSource.empty()))
         g_render->compileShaders(target);
 }
 
@@ -536,6 +596,25 @@ void AbstractRender_t::assignUniform(StdPicture &target, int index, const Unifor
     if(index >= 0 && index < (int)target.l.finalUniformState.size())
         target.l.finalUniformState[index] = value;
 #endif
+}
+
+void AbstractRender_t::spawnParticle(StdPicture &target, double worldX, double worldY, ParticleVertexAttrs_t attrs)
+{
+    // no-op
+
+    UNUSED(target);
+    UNUSED(worldX);
+    UNUSED(worldY);
+    UNUSED(attrs);
+}
+
+void AbstractRender_t::renderParticleSystem(StdPicture &tx, double camX, double camY)
+{
+    // no-op
+
+    UNUSED(tx);
+    UNUSED(camX);
+    UNUSED(camY);
 }
 
 

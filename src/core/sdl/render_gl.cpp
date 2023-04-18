@@ -372,7 +372,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
         if(program->get_flags() & GLProgramObject::read_buffer)
         {
             // multiple quads -> copy the whole screen
-            if(vertex_attribs.size() > 6)
+            if(program->get_flags() & GLProgramObject::particles || vertex_attribs.size() > 6)
             {
                 framebufferCopy(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
             }
@@ -396,50 +396,72 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
         }
 #endif // #ifdef RENDERGL_HAS_FBO
 
-        // load vertex attributes into current GL buffer
-        fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
+        // vertex-based draw
+        if(!(program->get_flags() & GLProgramObject::particles))
+        {
+            // load vertex attributes into current GL buffer
+            fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
 
 #ifdef RENDERGL_HAS_SHADERS
-        // load program and update state if necessary (uses m_transform_tick to prevent unnecessary updates)
-        if(m_use_shaders)
-        {
-            SDL_assert(program->inited());
+            // load program and update state if necessary (uses m_transform_tick to prevent unnecessary updates)
+            if(m_use_shaders)
+            {
+                SDL_assert(program->inited());
 
-            program->use_program();
-            program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
-            program->activate_uniform_step(context.uniform_step);
-        }
+                program->use_program();
+                program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+                program->activate_uniform_step(context.uniform_step);
+            }
 #endif
 
-        // draw mask using glLogicOp state
-        if(use_gl_logic_op)
-        {
-            // prepare mask logicOp state
-            prepareDrawMask();
+            // draw mask using glLogicOp state
+            if(use_gl_logic_op)
+            {
+                // prepare mask logicOp state
+                prepareDrawMask();
 
-            // bind mask texture
-            glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+                // bind mask texture
+                glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
+
+                // draw!
+                glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+
+                // prepare front image logicOp state
+                prepareDrawImage();
+            }
+
+            // bind texture if it exists
+            if(context.texture)
+                glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
+            // unbind texture in legacy mode (shader programs would just ignore texture)
+            else if(!m_use_shaders)
+                glBindTexture(GL_TEXTURE_2D, 0);
 
             // draw!
             glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
 
-            // prepare front image logicOp state
-            prepareDrawImage();
+            // return to logicOp state for standard draws
+            if(use_gl_logic_op)
+                leaveMaskContext();
         }
+        else
+        {
+#ifdef RENDERGL_HAS_SHADERS
+            bool state_valid = program->inited() && context.texture && context.texture->d.particle_system;
+            SDL_assert(state_valid);
 
-        // bind texture if it exists
-        if(context.texture)
-            glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
-        // unbind texture in legacy mode (shader programs would just ignore texture)
-        else if(!m_use_shaders)
-            glBindTexture(GL_TEXTURE_2D, 0);
+            if(state_valid)
+            {
+                program->use_program();
+                program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+                program->activate_uniform_step(context.uniform_step);
 
-        // draw!
-        glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+                glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
 
-        // return to logicOp state for standard draws
-        if(use_gl_logic_op)
-            leaveMaskContext();
+                context.texture->d.particle_system->fill_and_draw();
+            }
+#endif
+        }
 
         // clear queue only if requested
         if(clear)
@@ -1466,10 +1488,24 @@ void RenderGL::compileShaders(StdPicture &target)
 
     pLogDebug("Render GL: compiling shader...");
 
-    target.d.shader_program.reset(new GLProgramObject(
-        s_es2_advanced_vert_src,
-        target.l.fragmentShaderSource.data()
-    ));
+    if(target.l.particleVertexShaderSource.empty())
+    {
+        target.d.shader_program.reset(new GLProgramObject(
+            s_es2_advanced_vert_src,
+            target.l.fragmentShaderSource.data()
+        ));
+    }
+    else
+    {
+        target.d.shader_program.reset(new GLProgramObject(
+            target.l.particleVertexShaderSource.data(),
+            target.l.fragmentShaderSource.empty() ? s_es2_standard_frag_src : target.l.fragmentShaderSource.data(),
+            true
+        ));
+
+        target.d.particle_system.reset(new GLParticleSystem());
+        target.d.particle_system->init(256);
+    }
 
     if(target.d.shader_program && !target.d.shader_program->inited())
     {
@@ -2084,6 +2120,40 @@ void RenderGL::renderTexture(float xDst, float yDst,
     vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
     vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
     vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
+
+    m_cur_depth++;
+}
+
+void RenderGL::renderParticleSystem(StdPicture &tx,
+                          double camX,
+                          double camY)
+{
+#ifdef USE_RENDER_BLOCKING
+    SDL_assert(!m_blockRender);
+#endif
+
+    if(!tx.inited)
+        return;
+
+    if(!tx.d.texture_id && tx.l.lazyLoaded)
+        lazyLoad(tx);
+
+    if(!tx.d.texture_id || !tx.d.shader_program)
+    {
+        D_pLogWarningNA("Attempt to render an uninitialized particle system!");
+        return;
+    }
+
+    UNUSED(camX);
+    UNUSED(camY);
+
+    // set cam and depth uniforms HERE
+
+    DrawContext_t context = {*tx.d.shader_program, &tx};
+
+    auto& vertex_attribs = getOrderedDrawVertexList(context, m_cur_depth).vertices;
+
+    vertex_attribs.emplace_back();
 
     m_cur_depth++;
 }

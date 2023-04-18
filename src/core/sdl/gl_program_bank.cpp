@@ -25,6 +25,8 @@
 #include "globals.h"
 #include "global_dirs.h"
 
+#include "Logger/logger.h"
+
 std::vector<std::unique_ptr<StdPicture>> LoadedGLProgram;
 
 static std::map<std::string, LoadedGLProgramRef_t> s_ProgramCache;
@@ -32,13 +34,9 @@ static DirListCI s_dirShaders;
 
 void ClearAllGLPrograms()
 {
-    // s_ProgramCache.clear();
-
-    // totally unsafe until StdPicture cleanup, then totally safe!
-    // LoadedProgram.clear();
+    s_ProgramCache.clear();
+    LoadedGLProgram.clear();
 }
-
-#include "Logger/logger.h"
 
 LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name)
 {
@@ -56,7 +54,10 @@ LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name)
         resolved = s_dirShaders.resolveFileCaseExistsAbs(frag_name);
 
     if(resolved.empty())
+    {
+        pLogDebug("Failed to locate fragment shader [%s]", frag_name.c_str());
         return static_cast<LoadedGLProgramRef_t>(-1);
+    }
 
     auto it = s_ProgramCache.find(resolved);
     if(it != s_ProgramCache.end())
@@ -68,6 +69,61 @@ LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name)
     dst.reset(new StdPicture());
 
     XRender::LoadPictureShader(*dst, resolved);
+
+    if(!dst->inited)
+    {
+        LoadedGLProgram.pop_back();
+        return static_cast<LoadedGLProgramRef_t>(-1);
+    }
+
+    s_ProgramCache[resolved] = dst;
+
+    return dst;
+}
+
+LoadedGLProgramRef_t ResolveGLParticleSystem(const std::string& name)
+{
+    s_dirShaders.setCurDir(AppPath + "graphics/shaders");
+
+    g_dirEpisode.setCurDir(FileNamePath);
+    g_dirCustom.setCurDir(FileNamePath + FileName);
+
+    std::string vert_name = name + ".vert";
+
+    std::string resolved = g_dirCustom.resolveFileCaseExistsAbs(vert_name);
+    DirListCI* source_dir = &g_dirCustom;
+
+    if(resolved.empty())
+    {
+        resolved = g_dirEpisode.resolveFileCaseExistsAbs(vert_name);
+        source_dir = &g_dirEpisode;
+    }
+
+    if(resolved.empty())
+    {
+        resolved = s_dirShaders.resolveFileCaseExistsAbs(vert_name);
+        source_dir = &s_dirShaders;
+    }
+
+    if(resolved.empty())
+    {
+        pLogDebug("Failed to locate particle system [%s]", vert_name.c_str());
+        return static_cast<LoadedGLProgramRef_t>(-1);
+    }
+
+    auto it = s_ProgramCache.find(resolved);
+    if(it != s_ProgramCache.end())
+        return it->second;
+
+    LoadedGLProgram.emplace_back();
+    std::unique_ptr<StdPicture>& dst = LoadedGLProgram.back();
+
+    dst.reset(new StdPicture());
+
+    std::string frag_resolved = source_dir->resolveFileCaseExistsAbs(name + ".frag");
+    std::string image_resolved = source_dir->resolveFileCaseExistsAbs(name + ".png");
+
+    XRender::LoadPictureParticleSystem(*dst, resolved, frag_resolved, image_resolved);
 
     if(!dst->inited)
     {
