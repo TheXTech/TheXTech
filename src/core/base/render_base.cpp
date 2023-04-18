@@ -454,7 +454,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
         if(maskImage)
         {
-            d = FreeImage_Rescale(maskImage, int(w), int(h), FILTER_BOX);
+            d = (wLimitExcited || hLimitExcited) ? FreeImage_Rescale(maskImage, int(w), int(h), FILTER_BOX) : GraphicsHelps::fast2xScaleDown(maskImage);
             if(d)
             {
                 GraphicsHelps::closeImage(maskImage);
