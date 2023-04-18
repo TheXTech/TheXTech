@@ -55,6 +55,7 @@ typedef EventsSDL EventsUsed;
 
 #include "frm_main.h"
 
+FrmMain g_frmMain;
 
 bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 {

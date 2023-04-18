@@ -215,7 +215,6 @@ int main(int argc, char**argv)
 #endif
 
     CmdLineSetup_t setup;
-    FrmMain frmMain;
 
 #if defined(__APPLE__) && defined(USE_APPLE_X11)
     char *x11_display_env = getenv("DISPLAY");
@@ -612,9 +611,9 @@ int main(int argc, char**argv)
     // set this flag before SDL initialization to allow game be quit when closing a window before a loading process will be completed
     GameIsActive = true;
 
-    if(frmMain.initSystem(setup))
+    if(g_frmMain.initSystem(setup))
     {
-        frmMain.freeSystem();
+        g_frmMain.freeSystem();
         return 1;
     }
 
@@ -648,7 +647,7 @@ int main(int argc, char**argv)
 
     Controls::Quit();
 
-    frmMain.freeSystem();
+    g_frmMain.freeSystem();
 
 #ifdef __EMSCRIPTEN__
     AppPathManager::syncFs();

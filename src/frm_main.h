@@ -71,4 +71,6 @@ public:
     bool restartRenderer();
 };
 
+extern FrmMain g_frmMain;
+
 #endif // FRMMAIN_H
