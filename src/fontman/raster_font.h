@@ -129,7 +129,7 @@ private:
     CharMap m_charMap;
 
     //! Bank of loaded textures
-    VPtrList<StdPicture > m_texturesBank;
+    VPtrList<StdPicture> m_texturesBank;
 };
 
 #endif // RASTER_FONT_H

@@ -20,12 +20,10 @@
 
 #pragma once
 
-#ifndef STD_PICTURE_LOAD_H
-#define STD_PICTURE_LOAD_H
+#ifndef STD_PICTURE_LOAD_WII_H
+#define STD_PICTURE_LOAD_WII_H
 
 #include <string>
-
-struct StdPicture;
 
 /*!
  * \brief Generic image loading store.
@@ -37,15 +35,6 @@ struct StdPictureLoad
     //! Is this a lazy-loaded texture?
     bool lazyLoaded = false;
 
-    //! The previous texture in the render chain (nullptr if this is the tail or unloaded)
-    StdPicture* last_texture = nullptr;
-
-    //! The next texture in the render chain (nullptr if this is the head or unloaded)
-    StdPicture* next_texture = nullptr;
-
-    //! The last frame that the texture was rendered (not accessed if not in the render chain)
-    uint32_t last_draw_frame;
-
     //! Path to find image
     std::string path = "";
     std::string mask_path = "";
@@ -54,7 +43,10 @@ struct StdPictureLoad
     bool     colorKey = false;
     uint8_t  keyRgb[3] = {0 /*R*/, 0 /*G*/, 0 /*B*/};
 
-    inline void clear() {}
+    inline bool canLoad() const
+    {
+        return lazyLoaded;
+    }
 };
 
-#endif // #ifndef STD_PICTURE_LOAD_H
+#endif // #ifndef STD_PICTURE_LOAD_WII_H

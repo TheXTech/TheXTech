@@ -96,6 +96,7 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         pLogWarning("Failed to initialize V-Synced renderer, trying to create accelerated renderer...");
 
         // fallthrough
+    default:
     case RENDER_ACCELERATED:
         renderFlags = SDL_RENDERER_ACCELERATED;
         g_videoSettings.renderModeObtained = RENDER_ACCELERATED;
@@ -466,9 +467,6 @@ void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height,
     SDL_Surface *surface;
     SDL_Texture *texture = nullptr;
 
-    target.d.nOfColors = GL_RGBA;
-    target.d.format = GL_BGRA;
-
     surface = SDL_CreateRGBSurfaceFrom(RGBApixels,
                                        static_cast<int>(width),
                                        static_cast<int>(height),
@@ -486,13 +484,20 @@ void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height,
     if(!texture)
     {
         pLogWarning("Render SDL: Failed to load texture! (%s)", SDL_GetError());
-        target.d.clear();
         target.inited = false;
         return;
     }
 
     target.d.texture = texture;
-    m_textureBank.insert(texture);
+
+    target.d.nOfColors = GL_RGBA;
+    target.d.format = GL_BGRA;
+
+    target.d.w_scale = static_cast<float>(width) / target.w;
+    target.d.h_scale = static_cast<float>(height) / target.h;
+
+    m_loadedPictures.insert(&target);
+    D_pLogDebug("RenderSDL: loading texture at %p, new texture count %d...", &target, (int)m_loadedPictures.size());
 
     target.inited = true;
 
@@ -501,46 +506,41 @@ void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height,
 #endif
 }
 
-void RenderSDL::deleteTexture(StdPicture &tx, bool lazyUnload)
+void RenderSDL::unloadTexture(StdPicture &tx)
 {
-    if(!tx.inited || !tx.d.texture)
-    {
-        if(!lazyUnload)
-            tx.inited = false;
-        return;
-    }
+    auto corpseIt = m_loadedPictures.find(&tx);
+    if(corpseIt != m_loadedPictures.end())
+        m_loadedPictures.erase(corpseIt);
 
-    auto corpseIt = m_textureBank.find(tx.d.texture);
-    if(corpseIt == m_textureBank.end())
-    {
+    D_pLogDebug("RenderSDL: unloading texture at %p, new texture count %d...", &tx, (int)m_loadedPictures.size());
+
+    if(tx.d.hasTexture())
         SDL_DestroyTexture(tx.d.texture);
-        tx.d.texture = nullptr;
-        if(!lazyUnload)
-            tx.inited = false;
-        return;
-    }
 
-    SDL_Texture *corpse = *corpseIt;
-    if(corpse)
-        SDL_DestroyTexture(corpse);
-    m_textureBank.erase(corpse);
+    tx.d = StdPictureData();
 
-    tx.d.texture = nullptr;
+    if(!tx.l.canLoad())
+        static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 
-    if(!lazyUnload)
-        tx.resetAll();
-
-    tx.d.format = 0;
-    tx.d.nOfColors = 0;
-
-    tx.resetColors();
+    return;
 }
 
 void RenderSDL::clearAllTextures()
 {
-    for(SDL_Texture *tx : m_textureBank)
-        SDL_DestroyTexture(tx);
-    m_textureBank.clear();
+    for(StdPicture *tx : m_loadedPictures)
+    {
+        D_pLogDebug("RenderSDL: unloading texture at %p on clearAllTextures()", tx);
+
+        if(tx->d.hasTexture())
+            SDL_DestroyTexture(tx->d.texture);
+
+        tx->d = StdPictureData();
+
+        if(!tx->l.canLoad())
+            static_cast<StdPicture_Sub&>(*tx) = StdPicture_Sub();
+    }
+
+    m_loadedPictures.clear();
 }
 
 void RenderSDL::clearBuffer()
@@ -691,7 +691,7 @@ void RenderSDL::renderCircleHole(int cx, int cy, int radius, float red, float gr
 
 
 
-static SDL_INLINE void txColorMod(StdPictureData &tx, float red, float green, float blue, float alpha)
+void RenderSDL::txColorMod(StdPictureData &tx, float red, float green, float blue, float alpha)
 {
     uint8_t modColor[4] = {static_cast<unsigned char>(255.f * red),
                            static_cast<unsigned char>(255.f * green),
@@ -773,11 +773,8 @@ void RenderSDL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, d
 #endif
 
     SDL_Rect sourceRect;
-    if(tx.l.w_orig == 0 && tx.l.h_orig == 0)
-        sourceRect = {xSrc, ySrc, wSrc, hSrc};
-    else
-        sourceRect = {int(tx.l.w_scale * xSrc), int(tx.l.h_scale * ySrc),
-                      int(tx.l.w_scale * wSrc), int(tx.l.h_scale * hSrc)};
+    sourceRect = {int(tx.d.w_scale * xSrc), int(tx.d.h_scale * ySrc),
+                  int(tx.d.w_scale * wSrc), int(tx.d.h_scale * hSrc)};
 
     txColorMod(tx.d, red, green, blue, alpha);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
@@ -818,10 +815,7 @@ void RenderSDL::renderTextureScale(double xDst, double yDst, double wDst, double
 #endif
 
     SDL_Rect sourceRect;
-    if(tx.l.w_orig == 0 && tx.l.h_orig == 0)
-        sourceRect = {0, 0, tx.w, tx.h};
-    else
-        sourceRect = {0, 0, tx.l.w_orig, tx.l.h_orig};
+    sourceRect = {0, 0, tx.w, tx.h};
 
     txColorMod(tx.d, red, green, blue, alpha);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
@@ -884,11 +878,8 @@ void RenderSDL::renderTexture(double xDstD, double yDstD, double wDstD, double h
 
     SDL_Rect sourceRect;
 
-    if(tx.l.w_orig == 0 && tx.l.h_orig == 0)
-        sourceRect = {xSrc, ySrc, (int)wDst, (int)hDst};
-    else
-        sourceRect = {int(tx.l.w_scale * xSrc), int(tx.l.h_scale * ySrc),
-                      int(tx.l.w_scale * wDst), int(tx.l.h_scale * hDst)};
+    sourceRect = {int(tx.d.w_scale * xSrc), int(tx.d.h_scale * ySrc),
+                  int(tx.d.w_scale * wDst), int(tx.d.h_scale * hDst)};
 
     txColorMod(tx.d, red, green, blue, alpha);
     SDL_RenderCopyF(m_gRenderer, tx.d.texture, &sourceRect, &destRect);
@@ -955,11 +946,8 @@ void RenderSDL::renderTextureFL(double xDstD, double yDstD, double wDstD, double
 
     SDL_Rect sourceRect;
 
-    if(tx.l.w_orig == 0 && tx.l.h_orig == 0)
-        sourceRect = {xSrc, ySrc, (int)wDst, (int)hDst};
-    else
-        sourceRect = {int(tx.l.w_scale * xSrc), int(tx.l.h_scale * ySrc),
-                      int(tx.l.w_scale * wDst), int(tx.l.h_scale * hDst)};
+    sourceRect = {int(tx.d.w_scale * xSrc), int(tx.d.h_scale * ySrc),
+                  int(tx.d.w_scale * wDst), int(tx.d.h_scale * hDst)};
 
     txColorMod(tx.d, red, green, blue, alpha);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,
@@ -994,10 +982,7 @@ void RenderSDL::renderTexture(float xDst, float yDst,
 #endif
 
     SDL_Rect sourceRect;
-    if(tx.l.w_orig == 0 && tx.l.h_orig == 0)
-        sourceRect = {0, 0, tx.w, tx.h};
-    else
-        sourceRect = {0, 0, tx.l.w_orig, tx.l.h_orig};
+    sourceRect = {0, 0, tx.w, tx.h};
 
     txColorMod(tx.d, red, green, blue, alpha);
     SDL_RenderCopyExF(m_gRenderer, tx.d.texture, &sourceRect, &destRect,

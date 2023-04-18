@@ -18,38 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "std_picture.h"
+#include "core/render.h"
 
-#ifndef STD_PICTURE_LOAD_H
-#define STD_PICTURE_LOAD_H
-
-#include <string>
-
-struct StdPicture;
-
-/*!
- * \brief Generic image loading store.
- *
- * If needed somehing unusual, please define alternative structure instead of this
- */
-struct StdPictureLoad
+StdPicture::~StdPicture()
 {
-    //! Is this a lazy-loaded texture?
-    bool lazyLoaded = false;
+    if(d.hasTexture())
+        XRender::unloadTexture(*this);
+}
 
-    //! The previous texture in the render chain (nullptr if this is the tail or unloaded)
-    StdPicture* last_texture = nullptr;
+void StdPicture::reset()
+{
+    if(d.hasTexture())
+        XRender::unloadTexture(*this);
 
-    //! The next texture in the render chain (nullptr if this is the head or unloaded)
-    StdPicture* next_texture = nullptr;
-
-    //! The last frame that the texture was rendered (not accessed if not in the render chain)
-    uint32_t last_draw_frame;
-
-    //! Path to find image
-    std::string path = "";
-
-    inline void clear() {}
-};
-
-#endif // #ifndef STD_PICTURE_LOAD_H
+    static_cast<StdPicture_Sub&>(*this) = StdPicture_Sub();
+}

@@ -53,14 +53,14 @@ void GFX_t::loadImage(StdPicture &img, const std::string &path)
     std::string path_ext = path + UI_IMG_EXT;
 
     pLogDebug("Loading texture %s...", path_ext.c_str());
-    img = XRender::LoadPicture(path_ext);
+    XRender::LoadPicture(img, path_ext);
 
 #if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
     if(!img.inited)
     {
         path_ext = path + ".png";
         pLogDebug("Could not load, trying %s...", path_ext.c_str());
-        img = XRender::LoadPicture(path_ext);
+        XRender::LoadPicture(img, path_ext);
     }
 #endif
 
@@ -241,7 +241,7 @@ bool GFX_t::load()
 void GFX_t::unLoad()
 {
     for(StdPicture *p : m_loadedImages)
-        XRender::deleteTexture(*p);
+        XRender::unloadTexture(*p);
     m_loadedImages.clear();
     SDL_memset(m_isCustom, 0, sizeof(m_loadedImages.size() * sizeof(bool)));
 }

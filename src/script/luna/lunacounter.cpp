@@ -42,7 +42,7 @@ DeathCounter gDeathCounter;
 DeathCounter::DeathCounter() noexcept
 {
     mStatFileOK = false;
-    mEnabled = true;
+    mEnabled = false;
     mCurTotalDeaths = 0;
     mCurLevelDeaths = 0;
 }
@@ -84,7 +84,7 @@ void DeathCounter::quit()
 {
     counterFile.clear();
     mStatFileOK = false;
-    mEnabled = true;
+    mEnabled = false;
     mCurTotalDeaths = 0;
     mCurLevelDeaths = 0;
     mDeathRecords.clear();

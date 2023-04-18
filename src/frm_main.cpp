@@ -20,7 +20,7 @@
 
 #include <Logger/logger.h>
 
-#if defined(__WII__) || !defined(RENDER_CUSTOM)
+#if defined(__WII__) || defined(__3DS__) || !defined(RENDER_CUSTOM)
 #   include <Graphics/graphics_funcs.h>
 #endif
 
@@ -62,7 +62,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     //Write into log the application start event
     pLogDebug("<Application started>");
 
-#if defined(__WII__) || !defined(RENDER_CUSTOM)
+#if defined(__WII__) || defined(__3DS__) || !defined(RENDER_CUSTOM)
     //Initialize FreeImage
     D_pLogDebugNA("FrmMain: Loading FreeImage...");
     GraphicsHelps::initFreeImage();
@@ -201,10 +201,41 @@ void FrmMain::freeSystem()
     g_window = nullptr;
 #endif
 
-#if defined(__WII__) || !defined(RENDER_CUSTOM)
+#if defined(__WII__) || defined(__3DS__) || !defined(RENDER_CUSTOM)
     GraphicsHelps::closeFreeImage();
 #endif
 
     pLogDebug("<Application closed>");
     CloseLog();
+}
+
+bool FrmMain::restartRenderer()
+{
+    pLogDebug("FrmMain: attempting to restart XRender...");
+
+    bool res;
+
+#ifdef RENDER_CUSTOM
+    XRender::quit();
+
+    res = XRender::init();
+#else
+    if(m_render)
+    {
+        m_render->clearAllTextures();
+        m_render->close();
+    }
+
+    m_render.reset();
+    g_render = nullptr;
+
+    RenderUsed *render = new RenderUsed();
+    m_render.reset(render);
+    g_render = m_render.get();
+
+    const CmdLineSetup_t setup;
+    res = render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+#endif
+
+    return res;
 }

@@ -93,10 +93,6 @@ TtfFont::TtfFont() : BaseFontEngine()
 
 TtfFont::~TtfFont()
 {
-    for(StdPicture &t : m_texturesBank)
-        XRender::deleteTexture(t);
-    m_texturesBank.clear();
-
     TTF_MUTEX_LOCK();
     if(m_face)
     {
@@ -472,7 +468,13 @@ const TtfFont::TheGlyph &TtfFont::getGlyph(uint32_t fontSize, char32_t character
     {
         auto rc = fSize->second.find(character);
         if(rc != fSize->second.end())
+        {
+            // reload if the renderer has unloaded the glyph
+            if(rc->second.tx && !rc->second.tx->d.hasTexture())
+                return loadGlyph(*(rc->second.tx), fontSize, character);
+
             return rc->second;
+        }
         return loadGlyph(fontSize, character);
     }
 
@@ -480,6 +482,19 @@ const TtfFont::TheGlyph &TtfFont::getGlyph(uint32_t fontSize, char32_t character
 }
 
 const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t character)
+{
+    m_texturesBank.emplace_back();
+    StdPicture &texture = m_texturesBank.back();
+
+    const TtfFont::TheGlyph &ret = loadGlyph(texture, fontSize, character);
+
+    if(ret.tx != &texture)
+        m_texturesBank.pop_back();
+
+    return ret;
+}
+
+const TtfFont::TheGlyph &TtfFont::loadGlyph(StdPicture &texture, uint32_t fontSize, char32_t character)
 {
     FT_Error     error = 0;
     FT_UInt      t_glyphIndex = 0;
@@ -646,22 +661,18 @@ const TtfFont::TheGlyph &TtfFont::loadGlyph(uint32_t fontSize, char32_t characte
         break;
     }
 
-    m_texturesBank.emplace_back();
-    StdPicture &texture = m_texturesBank.back();
-    texture.w = width;
-    texture.h = height;
-    texture.frame_w = width;
-    texture.frame_h = height;
-#ifdef PICTURE_LOAD_NORMAL
-    texture.l.w_orig = 0;
-    texture.l.h_orig = 0;
-    texture.l.w_scale = 1.f;
-    texture.l.h_scale = 1.f;
-#endif
+    if(m_doublePixel)
+    {
+        texture.w = width * 2;
+        texture.h = height * 2;
+    }
+    else
+    {
+        texture.w = width;
+        texture.h = height;
+    }
 
-    // This is accurate for doublePixel, and inaccurate otherwise. But the glyphs are always rendered scaled so it doesn't make a difference.
-    // For now, always mark it as 1x to indicate to XRender that it's not safe to downscale it, but if we tracked doublePixel, it would be fine to specialize here.
-    XRender::loadTexture_1x(texture, width, height, image, pitch);
+    XRender::loadTexture(texture, width, height, image, pitch);
 
     t_glyph.tx      = &texture;
     t_glyph.width   = width;

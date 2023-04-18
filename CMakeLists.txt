@@ -140,7 +140,7 @@ else()
     set(USE_SYSTEM_SDL2_DEFAULT ${USE_SYSTEM_LIBS_DEFAULT})
 endif()
 
-if(NINTENDO_3DS OR NINTENDO_DS)
+if(NINTENDO_DS)
     set(THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT OFF)
 else()
     set(THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT ON)
@@ -551,6 +551,7 @@ set(THEXTECH_SRC
     src/rand.cpp
     src/sorting.cpp
     src/screen_fader.cpp
+    src/std_picture.cpp
     src/npc/npc_hit.cpp
     src/npc/npc_kill.cpp
     src/npc/npc_update.cpp
