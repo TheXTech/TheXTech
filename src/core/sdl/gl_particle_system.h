@@ -27,23 +27,25 @@
 #include "core/sdl/gl_inc.h"
 #include "core/sdl/gl_program_object.h"
 
-// struct ParticleInfo_t
-// {
-//     // empty
-// };
-
-struct ParticleVertex_t
+struct ParticleVertexImmutable_t
 {
     GLfloat index = 0.0;
-    std::array<GLubyte, 2> coord = {0, 0};
-    // ParticleInfo_t info;
+    std::array<GLubyte, 2> texcoord = {0, 0};
+};
+
+struct ParticleVertexMutable_t
+{
+    std::array<GLfloat, 2> position = {0.0, 0.0};
+    GLfloat spawn_time = -60.0;
+    std::array<GLubyte, 4> attribs = {0, 0, 0, 0};
 };
 
 class GLParticleSystem
 {
     GLuint m_vertex_buffer = 0;
 
-    std::vector<ParticleVertex_t> m_vertices;
+    std::vector<ParticleVertexImmutable_t> m_vertices_immutable;
+    std::vector<ParticleVertexMutable_t> m_vertices_mutable;
 
     int m_particle_count = 0;
     int m_next_particle = 0;

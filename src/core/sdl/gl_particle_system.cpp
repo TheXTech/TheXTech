@@ -26,8 +26,11 @@ void GLParticleSystem::init(int particle_count)
 {
     reset();
 
-    m_vertices.clear();
-    m_vertices.resize(particle_count * 6);
+    m_vertices_immutable.clear();
+    m_vertices_immutable.resize(particle_count * 6);
+
+    m_vertices_mutable.clear();
+    m_vertices_mutable.resize(particle_count * 6);
 
     m_particle_count = particle_count;
     m_next_particle = 0;
@@ -36,25 +39,27 @@ void GLParticleSystem::init(int particle_count)
     {
         for(int vertex = 0; vertex < 6; vertex++)
         {
-            ParticleVertex_t& target = m_vertices[particle * 6 + vertex];
+            ParticleVertexImmutable_t& target = m_vertices_immutable[particle * 6 + vertex];
 
             target.index = (GLfloat)particle / particle_count;
 
             if(vertex == 0 || vertex == 1 || vertex == 3)
-                target.coord[0] = 0;
+                target.texcoord[0] = 0;
             else
-                target.coord[0] = 1;
+                target.texcoord[0] = 1;
 
             if(vertex == 0 || vertex == 3 || vertex == 5)
-                target.coord[1] = 0;
+                target.texcoord[1] = 0;
             else
-                target.coord[1] = 1;
+                target.texcoord[1] = 1;
         }
     }
 
     glGenBuffers(1, &m_vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(ParticleVertex_t) * m_vertices.size(), m_vertices.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(ParticleVertexImmutable_t) * m_vertices_immutable.size() + sizeof(ParticleVertexMutable_t) * m_vertices_mutable.size(), nullptr, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(ParticleVertexImmutable_t) * m_vertices_immutable.size(), m_vertices_immutable.data());
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(ParticleVertexImmutable_t) * m_vertices_immutable.size(), sizeof(ParticleVertexMutable_t) * m_vertices_mutable.size(), m_vertices_mutable.data());
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -66,7 +71,8 @@ void GLParticleSystem::reset()
         m_vertex_buffer = 0;
     }
 
-    m_vertices.clear();
+    m_vertices_immutable.clear();
+    m_vertices_mutable.clear();
     m_particle_count = 0;
     m_next_particle = 0;
 }
@@ -75,15 +81,20 @@ void GLParticleSystem::fill_and_draw()
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
 
-    glVertexAttribPointer(0, 1, GL_FLOAT,         GL_FALSE, sizeof(ParticleVertex_t), (void*)offsetof(ParticleVertex_t, index));
-    glVertexAttribPointer(1, 2, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ParticleVertex_t), (void*)offsetof(ParticleVertex_t, coord));
-
-    glDrawArrays(GL_TRIANGLES, 0, m_vertices.size());
-
     // if(mod_count > m_particle_count) ...
     // if(mod_start + mod_count > m_particle_count) two updates
     // else
     // glBufferSubData(GL_ARRAY_BUFFER, mod_start * sizeof(ParticleVertex_t), mod_count * sizeof(ParticleVertex_t), m_vertices.data() + mod_start);
+
+    glVertexAttribPointer(0, 1, GL_FLOAT,         GL_FALSE, sizeof(ParticleVertexImmutable_t), (void*)offsetof(ParticleVertexImmutable_t, index));
+    glVertexAttribPointer(1, 2, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(ParticleVertexImmutable_t), (void*)offsetof(ParticleVertexImmutable_t, texcoord));
+
+    uint8_t* mutable_array_offset = (uint8_t*)(sizeof(ParticleVertexImmutable_t) * m_vertices_immutable.size());
+    glVertexAttribPointer(2, 2, GL_FLOAT,         GL_FALSE, sizeof(ParticleVertexMutable_t), mutable_array_offset + offsetof(ParticleVertexMutable_t, position));
+    glVertexAttribPointer(3, 1, GL_FLOAT,         GL_FALSE, sizeof(ParticleVertexMutable_t), mutable_array_offset + offsetof(ParticleVertexMutable_t, spawn_time));
+    glVertexAttribPointer(4, 4, GL_UNSIGNED_BYTE, GL_TRUE,  sizeof(ParticleVertexMutable_t), mutable_array_offset + offsetof(ParticleVertexMutable_t, attribs));
+
+    glDrawArrays(GL_TRIANGLES, 0, m_vertices_immutable.size());
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
