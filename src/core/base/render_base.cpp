@@ -397,6 +397,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     }
 
     FreeImage_FlipVertical(sourceImage);
+    if(maskImage)
+        FreeImage_FlipVertical(maskImage);
 
     // don't touch texture info, that was set on original load
     // target.w = static_cast<int>(w);
