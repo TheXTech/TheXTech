@@ -249,3 +249,39 @@ void FrmMain::freeSystem()
     pLogDebug("<Application closed>");
     CloseLog();
 }
+
+bool FrmMain::restartRenderer()
+{
+    pLogDebug("FrmMain: attempting to restart XRender...");
+
+    bool res;
+
+#ifdef RENDER_CUSTOM
+    XRender::quit();
+
+    res = XRender::init();
+#else
+    if(m_render)
+    {
+        m_render->clearAllTextures();
+        m_render->close();
+    }
+
+    bool use_sdl = dynamic_cast<RenderGL*>(m_render.get());
+
+    m_render.reset();
+    g_render = nullptr;
+
+    if(use_sdl)
+        m_render.reset(new RenderSDL());
+    else
+        m_render.reset(new RenderGL());
+
+    g_render = m_render.get();
+
+    const CmdLineSetup_t setup;
+    res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+#endif
+
+    return res;
+}

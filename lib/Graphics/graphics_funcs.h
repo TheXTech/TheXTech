@@ -160,6 +160,13 @@ public:
     static FIBITMAP *fast2xScaleDown(FIBITMAP *image);
 
     /*!
+     * \brief Quickly convert the image from 16-color or 256-color to 32-bit RGBA
+     * \param image Image to convert
+     * \return FreeImage descriptor to converted image
+     */
+    static FIBITMAP *fastConvertTo32Bit(FIBITMAP *image);
+
+    /*!
      * \brief Check textures are they require the bitmask render or not
      * \param image Front image
      * \param mask Mask image

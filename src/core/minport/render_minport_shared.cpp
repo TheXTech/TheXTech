@@ -294,20 +294,19 @@ void minport_initFrame()
 
     int num_unloaded = 0;
 
-    while(g_render_chain_tail && g_current_frame - g_render_chain_tail->l.last_draw_frame > g_always_unload_after)
+    while(g_render_chain_tail && g_current_frame - g_render_chain_tail->d.last_draw_frame > g_always_unload_after)
     {
         StdPicture* last_tail = g_render_chain_tail;
 
-        // will internally invoke deleteTexture, which invokes minport_unlinkTexture if written properly
-        lazyUnLoad(*g_render_chain_tail);
+        // will internally invoke minport_unlinkTexture if written properly
+        unloadTexture(*last_tail);
+        num_unloaded++;
 
         if(g_render_chain_tail == last_tail)
         {
-            pLogCritical("Failed to unlink texture during lazyUnLoad! Manually unlinking texture. VRAM may be leaked.");
+            pLogCritical("Failed to unlink texture during unloadTexture! Manually unlinking texture. VRAM may be leaked.");
             minport_unlinkTexture(g_render_chain_tail);
         }
-
-        num_unloaded++;
     }
 
     if(num_unloaded > 0)
@@ -321,20 +320,20 @@ void minport_unlinkTexture(StdPicture* tx)
 {
     // redirect the tail and head
     if(tx == g_render_chain_tail)
-        g_render_chain_tail = tx->l.next_texture;
+        g_render_chain_tail = tx->d.next_texture;
 
     if(tx == g_render_chain_head)
-        g_render_chain_head = tx->l.last_texture;
+        g_render_chain_head = tx->d.last_texture;
 
     // unlink from its context
-    if(tx->l.last_texture)
-        tx->l.last_texture->l.next_texture = tx->l.next_texture;
+    if(tx->d.last_texture)
+        tx->d.last_texture->d.next_texture = tx->d.next_texture;
 
-    if(tx->l.next_texture)
-        tx->l.next_texture->l.last_texture = tx->l.last_texture;
+    if(tx->d.next_texture)
+        tx->d.next_texture->d.last_texture = tx->d.last_texture;
 
-    tx->l.last_texture = nullptr;
-    tx->l.next_texture = nullptr;
+    tx->d.last_texture = nullptr;
+    tx->d.next_texture = nullptr;
 }
 
 // unload all textures not rendered since g_never_unload_before
@@ -342,23 +341,19 @@ void minport_freeTextureMemory()
 {
     int num_unloaded = 0;
 
-    while(g_render_chain_tail && g_current_frame - g_render_chain_tail->l.last_draw_frame > g_never_unload_before)
+    while(g_render_chain_tail && g_current_frame - g_render_chain_tail->d.last_draw_frame > g_never_unload_before)
     {
         StdPicture* last_tail = g_render_chain_tail;
 
-        // will internally invoke deleteTexture, which invokes minport_unlinkTexture if written properly
-        if(last_tail->l.lazyLoaded)
-            lazyUnLoad(*g_render_chain_tail);
-        else
-            minport_unlinkTexture(last_tail);
+        // will internally invoke minport_unlinkTexture if written properly
+        unloadTexture(*last_tail);
+        num_unloaded++;
 
         if(g_render_chain_tail == last_tail)
         {
-            pLogCritical("Failed to unlink texture during lazyUnLoad! Manually unlinking texture. VRAM may be leaked.");
+            pLogCritical("Failed to unlink texture during unloadTexture! Manually unlinking texture. VRAM may be leaked.");
             minport_unlinkTexture(g_render_chain_tail);
         }
-
-        num_unloaded++;
     }
 
     pLogDebug("Unloaded %d stale textures at free texture memory request", num_unloaded);
@@ -383,7 +378,7 @@ inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t w
 
     if(tx.inited && tx.l.lazyLoaded && &tx != g_render_chain_head)
     {
-        tx.l.last_draw_frame = g_current_frame;
+        tx.d.last_draw_frame = g_current_frame;
 
         // unlink
         minport_unlinkTexture(&tx);
@@ -391,8 +386,8 @@ inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t w
         // insert at head
         if(g_render_chain_head)
         {
-            g_render_chain_head->l.next_texture = &tx;
-            tx.l.last_texture = g_render_chain_head;
+            g_render_chain_head->d.next_texture = &tx;
+            tx.d.last_texture = g_render_chain_head;
         }
         else
         {

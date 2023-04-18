@@ -429,7 +429,7 @@ void GLProgramObject::use_program()
  * \brief Registers a custom uniform variable in the next available index
  * \param l StdPictureLoad to restore uniform registrations / assignments from
  *
- * Note: will fix the type of any assignments in l
+ * Note: will fix any incorrect assignment types in l
  */
 void GLProgramObject::restore_uniforms(StdPictureLoad& l)
 {

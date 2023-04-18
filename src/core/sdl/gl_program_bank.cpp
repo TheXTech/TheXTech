@@ -25,7 +25,7 @@
 #include "globals.h"
 #include "global_dirs.h"
 
-std::vector<StdPicture> LoadedGLProgram;
+std::vector<std::unique_ptr<StdPicture>> LoadedGLProgram;
 
 static std::map<std::string, LoadedGLProgramRef_t> s_ProgramCache;
 static DirListCI s_dirShaders;
@@ -37,6 +37,8 @@ void ClearAllGLPrograms()
     // totally unsafe until StdPicture cleanup, then totally safe!
     // LoadedProgram.clear();
 }
+
+#include "Logger/logger.h"
 
 LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name)
 {
@@ -61,11 +63,13 @@ LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name)
         return it->second;
 
     LoadedGLProgram.emplace_back();
-    StdPicture& dst = LoadedGLProgram.back();
+    std::unique_ptr<StdPicture>& dst = LoadedGLProgram.back();
 
-    dst = XRender::LoadPictureShader(resolved);
+    dst.reset(new StdPicture());
 
-    if(!dst.inited)
+    XRender::LoadPictureShader(*dst, resolved);
+
+    if(!dst->inited)
     {
         LoadedGLProgram.pop_back();
         return static_cast<LoadedGLProgramRef_t>(-1);

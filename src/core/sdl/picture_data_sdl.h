@@ -49,8 +49,8 @@ private:
     SDL_Texture *mask_texture = nullptr;
 
     //! GLProgramObject wrapper for texture's shader program
-    // the semantics here should require unique, and it will be changed to that once StdPictureData copying is banned
-    std::shared_ptr<GLProgramObject> shader_program = nullptr;
+    std::unique_ptr<GLProgramObject> shader_program = nullptr;
+
     //! texture ID for OpenGL and other render engines
     GLuint       texture_id = 0;
     //! mask texture ID for OpenGL and other render engines
@@ -61,6 +61,11 @@ private:
     //! Number of colors
     GLint       nOfColors = 0;
 
+    //! Width scale factor
+    float w_scale = 1.0f;
+    //! Height scale factor
+    float h_scale = 1.0f;
+
     //! Cached color modifier
     uint8_t     modColor[4] = {255,255,255,255};
 
@@ -70,18 +75,9 @@ private:
 // Public API
 public:
 
-    inline bool hasTexture()
+    inline bool hasTexture() const
     {
         return texture != nullptr || texture_id != 0;
-    }
-
-    inline void clear()
-    {
-        texture = nullptr;
-        use_depth_test = true;
-
-        if(shader_program)
-            shader_program.reset();
     }
 
     inline void invalidateDepthTest()

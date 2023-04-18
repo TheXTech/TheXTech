@@ -266,7 +266,7 @@ private:
     bool           m_recentTargetScreen = false;
 
     // set of all currently-loaded textures
-    std::set<StdPicture *> m_textureBank;
+    std::set<StdPicture *> m_loadedPictures;
 
     // Offset to shake screen
     int m_viewport_offset_x = 0;
@@ -628,7 +628,7 @@ public:
 
     bool depthTestSupported() override;
 
-    void deleteTexture(StdPicture &tx, bool lazyUnload = false) override;
+    void unloadTexture(StdPicture &tx) override;
     void clearAllTextures() override;
 
     void clearBuffer() override;

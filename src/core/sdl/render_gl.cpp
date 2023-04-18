@@ -1338,10 +1338,7 @@ void RenderGL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, 
         {
             pLogWarning("Render GL: Failed to allocate padded texture memory");
             if(!is_mask)
-            {
-                target.d.clear();
-                target.inited = false;
-            }
+                target.d = StdPictureData();
             return;
         }
 
@@ -1372,8 +1369,7 @@ void RenderGL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, 
     else if(!use_pixels)
     {
         pLogWarning("Render GL: Couldn't find texture data");
-        target.d.clear();
-        target.inited = false;
+        target.d = StdPictureData();
         return;
     }
 
@@ -1414,13 +1410,11 @@ void RenderGL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, 
 
     if(!is_mask)
     {
-        if(target.l.w_scale == 0)
-            target.l.w_scale = 1;
-        if(target.l.h_scale == 0)
-            target.l.h_scale = 1;
+        target.d.w_scale = static_cast<float>(width) / target.w;
+        target.d.h_scale = static_cast<float>(height) / target.h;
 
-        target.l.w_scale /= pad_w;
-        target.l.h_scale /= pad_h;
+        target.d.w_scale /= pad_w;
+        target.d.h_scale /= pad_h;
     }
 
     // check for errors as a result of texture load
@@ -1436,8 +1430,7 @@ void RenderGL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, 
         glDeleteTextures(1, &tex_id);
 
         pLogWarning("Render GL: Couldn't load texture data (GL error code %d)", (int)err);
-        target.d.clear();
-        target.inited = false;
+        target.d = StdPictureData();
         return;
     }
 
@@ -1448,7 +1441,7 @@ void RenderGL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, 
         target.d.texture_id = tex_id;
         target.inited = true;
     }
-    m_textureBank.insert(&target);
+    m_loadedPictures.insert(&target);
 
 #if defined(__APPLE__) && defined(USE_APPLE_X11)
     // SDL_GL_UnbindTexture(texture); // Unbind texture after it got been loaded (otherwise a white screen will happen)
@@ -1473,16 +1466,19 @@ void RenderGL::compileShaders(StdPicture &target)
 
     pLogDebug("Render GL: compiling shader...");
 
-    target.d.shader_program = std::make_shared<GLProgramObject>(
+    target.d.shader_program.reset(new GLProgramObject(
         s_es3_advanced_vert_src,
         target.l.fragmentShaderSource.data()
-    );
+    ));
 
     if(target.d.shader_program && !target.d.shader_program->inited())
     {
         target.d.shader_program.reset();
         pLogDebug("Render GL: using default program due to failed compile/link...");
     }
+
+    if(target.d.shader_program)
+        target.d.shader_program->restore_uniforms(target.l);
 #else
     UNUSED(target);
 #endif
@@ -1508,21 +1504,13 @@ bool RenderGL::userShadersSupported()
 #endif
 }
 
-void RenderGL::deleteTexture(StdPicture &tx, bool lazyUnload)
+void RenderGL::unloadTexture(StdPicture &tx)
 {
-    if(!tx.inited || !tx.d.texture_id)
-    {
-        if(!lazyUnload)
-            tx.inited = false;
-        return;
-    }
+    auto corpseIt = m_loadedPictures.find(&tx);
+    if(corpseIt != m_loadedPictures.end())
+        m_loadedPictures.erase(corpseIt);
 
-    auto corpseIt = m_textureBank.find(&tx);
-    if(corpseIt != m_textureBank.end())
-    {
-        m_textureBank.erase(corpseIt);
-        return;
-    }
+    D_pLogDebug("RenderSDL: unloading texture at %p, new texture count %d...", &tx, (int)m_loadedPictures.size());
 
     if(tx.d.texture_id)
         glDeleteTextures(1, &tx.d.texture_id);
@@ -1530,27 +1518,33 @@ void RenderGL::deleteTexture(StdPicture &tx, bool lazyUnload)
     if(tx.d.mask_texture_id)
         glDeleteTextures(1, &tx.d.mask_texture_id);
 
-    if(tx.d.shader_program)
-        tx.d.shader_program.reset();
+    tx.d = StdPictureData();
 
-    tx.d.texture_id = 0;
-    tx.d.mask_texture_id = 0;
+    if(!tx.l.canLoad())
+        static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 
-    if(!lazyUnload)
-        tx.resetAll();
-
-    tx.d.format = 0;
-    tx.d.nOfColors = 0;
-
-    tx.resetColors();
+    return;
 }
 
 void RenderGL::clearAllTextures()
 {
-    for(StdPicture *tx : m_textureBank)
-        deleteTexture(*tx, false);
+    for(StdPicture *tx : m_loadedPictures)
+    {
+        D_pLogDebug("RenderSDL: unloading texture at %p on clearAllTextures()", tx);
 
-    m_textureBank.clear();
+        if(tx->d.texture_id)
+            glDeleteTextures(1, &tx->d.texture_id);
+
+        if(tx->d.mask_texture_id)
+            glDeleteTextures(1, &tx->d.mask_texture_id);
+
+        tx->d = StdPictureData();
+
+        if(!tx->l.canLoad())
+            static_cast<StdPicture_Sub&>(*tx) = StdPicture_Sub();
+    }
+
+    m_loadedPictures.clear();
 }
 
 void RenderGL::clearBuffer()
@@ -1823,10 +1817,10 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
     GLshort y1 = yDst;
     GLshort y2 = yDst + hDst;
 
-    float u1 = tx.l.w_scale * xSrc;
-    float u2 = tx.l.w_scale * (xSrc + wSrc);
-    float v1 = tx.l.h_scale * ySrc;
-    float v2 = tx.l.h_scale * (ySrc + hSrc);
+    float u1 = tx.d.w_scale * xSrc;
+    float u2 = tx.d.w_scale * (xSrc + wSrc);
+    float v1 = tx.d.h_scale * ySrc;
+    float v2 = tx.d.h_scale * (ySrc + hSrc);
 
     if(flip & X_FLIP_HORIZONTAL)
         std::swap(u1, u2);
@@ -1875,10 +1869,10 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
     GLshort y1 = yDst;
     GLshort y2 = yDst + hDst;
 
-    float u1 = tx.l.w_scale * 0;
-    float u2 = tx.l.w_scale * (tx.w);
-    float v1 = tx.l.h_scale * 0;
-    float v2 = tx.l.h_scale * (tx.h);
+    float u1 = tx.d.w_scale * 0;
+    float u2 = tx.d.w_scale * (tx.w);
+    float v1 = tx.d.h_scale * 0;
+    float v2 = tx.d.h_scale * (tx.h);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
@@ -1944,10 +1938,10 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     GLshort y1 = yDst;
     GLshort y2 = yDst + hDst;
 
-    float u1 = tx.l.w_scale * xSrc;
-    float u2 = tx.l.w_scale * (xSrc + wDst);
-    float v1 = tx.l.h_scale * ySrc;
-    float v2 = tx.l.h_scale * (ySrc + hDst);
+    float u1 = tx.d.w_scale * xSrc;
+    float u2 = tx.d.w_scale * (xSrc + wDst);
+    float v1 = tx.d.h_scale * ySrc;
+    float v2 = tx.d.h_scale * (ySrc + hDst);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
@@ -2021,10 +2015,10 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
     GLshort y1 = -cy;
     GLshort y2 = -cy + hDst;
 
-    float u1 = tx.l.w_scale * xSrc;
-    float u2 = tx.l.w_scale * (xSrc + wDst);
-    float v1 = tx.l.h_scale * ySrc;
-    float v2 = tx.l.h_scale * (ySrc + hDst);
+    float u1 = tx.d.w_scale * xSrc;
+    float u2 = tx.d.w_scale * (xSrc + wDst);
+    float v1 = tx.d.h_scale * ySrc;
+    float v2 = tx.d.h_scale * (ySrc + hDst);
 
     if(flip & X_FLIP_HORIZONTAL)
         std::swap(u1, u2);
@@ -2073,10 +2067,10 @@ void RenderGL::renderTexture(float xDst, float yDst,
     GLshort y1 = yDst;
     GLshort y2 = yDst + tx.h;
 
-    float u1 = tx.l.w_scale * 0;
-    float u2 = tx.l.w_scale * (tx.w);
-    float v1 = tx.l.h_scale * 0;
-    float v2 = tx.l.h_scale * (tx.h);
+    float u1 = tx.d.w_scale * 0;
+    float u2 = tx.d.w_scale * (tx.w);
+    float v1 = tx.d.h_scale * 0;
+    float v2 = tx.d.h_scale * (tx.h);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 

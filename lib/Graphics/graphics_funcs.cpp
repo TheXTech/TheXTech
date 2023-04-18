@@ -17,6 +17,8 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#include <array>
+
 #include <SDL2/SDL_video.h>
 #include "sdl_proxy/sdl_assert.h"
 
@@ -38,6 +40,9 @@
 #include <SDL2/SDL_syswm.h>
 #endif
 #include <FreeImageLite.h>
+
+// strangely undocumented import necessary to use the FreeImage handle functions
+extern void SetDefaultIO(FreeImageIO *io);
 
 void GraphicsHelps::initFreeImage()
 {
@@ -79,12 +84,21 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
         return nullptr;
 
 #else
-    FREE_IMAGE_FORMAT formato = FreeImage_GetFileType(file.c_str(), 0);
+    FreeImageIO io;
+    SetDefaultIO(&io);
+    FILE *handle = Files::utf8_fopen(file.c_str(), "rb");
 
-    if(formato  == FIF_UNKNOWN)
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
+
+    if(formato == FIF_UNKNOWN)
+    {
+        fclose(handle);
         return NULL;
+    }
 
-    FIBITMAP *img = FreeImage_Load(formato, file.c_str());
+    FIBITMAP *img = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
+
+    fclose(handle);
 
     if(!img)
         return NULL;
@@ -100,8 +114,14 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
 #ifdef DEBUG_BUILD
         imgConvTime.start();
 #endif
-        FIBITMAP *temp;
-        temp = FreeImage_ConvertTo32Bits(img);
+        FIBITMAP *temp = nullptr;
+
+#ifdef THEXTECH_WIP_FEATURES
+        temp = fastConvertTo32Bit(img);
+#endif
+
+        if(!temp)
+            temp = FreeImage_ConvertTo32Bits(img);
 
         FreeImage_Unload(img);
 
@@ -139,8 +159,14 @@ FIBITMAP *GraphicsHelps::loadImage(std::vector<char> &raw, bool convertTo32bit)
 
     if(convertTo32bit && (FreeImage_GetBPP(img) != 32))
     {
-        FIBITMAP *temp;
-        temp = FreeImage_ConvertTo32Bits(img);
+        FIBITMAP *temp = nullptr;
+
+#ifdef THEXTECH_WIP_FEATURES
+        temp = fastConvertTo32Bit(img);
+#endif
+
+        if(!temp)
+            temp = FreeImage_ConvertTo32Bits(img);
 
         FreeImage_Unload(img);
 
@@ -587,6 +613,95 @@ FIBITMAP *GraphicsHelps::fast2xScaleDown(FIBITMAP *image)
         for(uint32_t src_x = 0, dest_x = 0; src_x < src_w; src_x += 2, dest_x += 1)
         {
             dest_pixels[dest_y * dest_pitch_px + dest_x] = src_pixels[src_y * src_pitch_px + src_x];
+        }
+    }
+
+    return dest;
+}
+
+FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
+{
+    // two kilobytes of stack isn't affordable? make these static, then.
+
+    // palette for high nybble (ignores low nybble)
+    std::array<uint32_t, 256> palette_high;
+
+    // palette for low nybble (ignores high nybble)
+    std::array<uint32_t, 256> palette_low;
+
+
+    if(!image)
+        return nullptr;
+
+    if(FreeImage_GetBPP(image) != 4 && FreeImage_GetBPP(image) != 8)
+        return nullptr;
+
+    auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto src_h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    const uint8_t *src_pixels  = reinterpret_cast<uint8_t*>(FreeImage_GetBits(image));
+    const uint32_t *src_palette = reinterpret_cast<uint32_t*>(FreeImage_GetPalette(image));
+    const uint8_t *src_trans = reinterpret_cast<uint8_t*>(FreeImage_GetTransparencyTable(image));
+    auto src_pitch = static_cast<uint32_t>(FreeImage_GetPitch(image));
+
+    FIBITMAP *dest = FreeImage_Allocate(src_w, src_h, 32);
+
+    if(!dest)
+        return nullptr;
+
+    uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
+    auto dest_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
+
+    if(FreeImage_GetBPP(image) == 8)
+    {
+        for(int i = 0; i < 256; i++)
+        {
+            palette_high[i] = src_palette[i];
+
+            if(src_trans)
+                ((uint8_t*)&palette_high[i])[3] = src_trans[i];
+            else
+                ((uint8_t*)&palette_high[i])[3] = 255;
+        }
+
+        for(uint32_t y = 0; y < src_h; y++)
+        {
+            for(uint32_t x = 0; x < src_w; x++)
+            {
+                dest_pixels[y * dest_pitch_px + x] = palette_high[src_pixels[y * src_pitch + x]];
+            }
+        }
+    }
+    else
+    {
+        // fill low and high nybble palettes
+        for(int i = 0; i < 16; i++)
+        {
+            for(int j = 0; j < 16; j++)
+            {
+                palette_high[i * 16 + j] = src_palette[i];
+                if(src_trans)
+                    ((uint8_t*)&palette_high[i * 16 + j])[3] = src_trans[i];
+                else
+                    ((uint8_t*)&palette_high[i * 16 + j])[3] = 255;
+
+                palette_low[i * 16 + j] = src_palette[j];
+                if(src_trans)
+                    ((uint8_t*)&palette_low[i * 16 + j])[3] = src_trans[j];
+                else
+                    ((uint8_t*)&palette_low[i * 16 + j])[3] = 255;
+            }
+        }
+
+        for(uint32_t y = 0; y < src_h; y++)
+        {
+            for(uint32_t x = 0; x < src_w - 1; x += 2)
+            {
+                dest_pixels[y * dest_pitch_px + x] = palette_high[src_pixels[y * src_pitch + (x / 2)]];
+                dest_pixels[y * dest_pitch_px + x + 1] = palette_low[src_pixels[y * src_pitch + (x / 2)]];
+            }
+
+            if(src_w % 2)
+                dest_pixels[y * dest_pitch_px + src_w - 1] = palette_high[src_pixels[y * src_pitch + (src_w / 2)]];
         }
     }
 

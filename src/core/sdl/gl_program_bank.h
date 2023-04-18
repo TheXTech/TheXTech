@@ -24,6 +24,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <memory>
 
 #include "range_arr.hpp"
 #include "ref_type.h"
@@ -31,7 +32,7 @@
 
 // a bank to store loaded "pure" GL programs -- StdPictures whose only purpose is to execute a fragment shader
 
-extern std::vector<StdPicture> LoadedGLProgram;
+extern std::vector<std::unique_ptr<StdPicture>> LoadedGLProgram;
 
 DECLREF_T(LoadedGLProgram);
 

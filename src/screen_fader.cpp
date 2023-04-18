@@ -101,8 +101,8 @@ void ScreenFader::setupFader(int step, int start, int goal, int shape, bool useF
     m_focusOffsetX = 0.0;
     m_focusOffsetY = 0.0;
 
-    if(m_shape >= S_CUSTOM && m_shape - S_CUSTOM < (int)s_loaded_effects.size())
-        m_focusUniform = XRender::registerUniform(s_loaded_effects[m_shape - S_CUSTOM], "u_focus");
+    if(m_shape >= S_CUSTOM && m_shape - S_CUSTOM < (int)s_loaded_effects.size() && s_loaded_effects[m_shape - S_CUSTOM]->get())
+        m_focusUniform = XRender::registerUniform(*s_loaded_effects[m_shape - S_CUSTOM]->get(), "u_focus");
     else
         m_focusUniform = -1;
 }
@@ -177,9 +177,9 @@ void ScreenFader::draw()
     {
     default:
 #ifdef THEXTECH_BUILD_GL_MODERN
-        if(XRender::userShadersSupported() && m_shape >= S_CUSTOM && m_shape - S_CUSTOM < (int)s_loaded_effects.size())
+        if(XRender::userShadersSupported() && m_shape >= S_CUSTOM && m_shape - S_CUSTOM < (int)s_loaded_effects.size() && s_loaded_effects[m_shape - S_CUSTOM]->get())
         {
-            StdPicture& effect = s_loaded_effects[m_shape - S_CUSTOM];
+            StdPicture& effect = *s_loaded_effects[m_shape - S_CUSTOM]->get();
 
             if(m_focusUniform >= 0)
             {

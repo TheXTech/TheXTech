@@ -170,7 +170,12 @@ private:
     static const TheGlyph dummyGlyph;
 
     const TheGlyph &getGlyph(uint32_t fontSize, char32_t character);
+
+    // version allocating a new texture
     const TheGlyph &loadGlyph(uint32_t fontSize, char32_t character);
+
+    // version using an existing texture
+    const TheGlyph &loadGlyph(StdPicture &texture, uint32_t fontSize, char32_t character);
 
     typedef std::unordered_map<char32_t, TheGlyph> CharMap;
     typedef std::unordered_map<uint32_t, CharMap>  SizeCharMap;
