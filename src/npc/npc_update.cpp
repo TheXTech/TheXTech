@@ -135,7 +135,7 @@ void UpdateNPCs()
 //    bool noBelt = false;
     float oldBeltSpeed = 0;
 //    float beltFixX = 0;
-    int oldDirection = 0;
+    // int oldDirection = 0;
 
     // used for collision detection
     // int64_t fBlock = 0;
@@ -1141,8 +1141,7 @@ void UpdateNPCs()
                 }
             }
 
-            oldDirection = NPC[A].Direction;
-            UNUSED(oldDirection);
+            // oldDirection = NPC[A].Direction;
 
             if(NPC[A].Type == 17 || NPC[A].Type == 18)
             {

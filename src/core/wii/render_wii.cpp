@@ -69,16 +69,12 @@ int g_rmode_h = 480;
  * Convert a raw BMP (ARGB) to 4x4RGBA.
  * @author DragonMinded, modifications by ds-sloth
 */
-static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height, uint32_t stride, uint32_t* wdst_out, uint32_t* hdst_out, bool downscale = true)
+static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height, uint32_t pitch, uint32_t* wdst_out, uint32_t* hdst_out, bool downscale = true)
 {
     // calculate destination dimensions, including downscaling and required padding
-    uint32_t wdst = width + 1;
-    uint32_t hdst = height + 1;
-
-    // define scaling factor
     int sf = (downscale ? 2 : 1);
-    wdst /= sf;
-    hdst /= sf;
+    uint32_t wdst = (width + sf - 1) / sf;
+    uint32_t hdst = (height + sf - 1) / sf;
 
     if(wdst & 3)
     {
@@ -120,9 +116,9 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                     }
 
                     // New: Alpha pixels
-                    *p++ = src[(((i + argb) * sf) + ((block + c) * sf * stride)) * 4 + 3];
+                    *p++ = src[(((i + argb) * sf * 4) + ((block + c) * sf * pitch)) + 3];
                     // Red pixels
-                    *p++ = src[(((i + argb) * sf) + ((block + c) * sf * stride)) * 4 + 0];
+                    *p++ = src[(((i + argb) * sf * 4) + ((block + c) * sf * pitch)) + 0];
                 }
             }
 
@@ -140,9 +136,9 @@ static void* s_RawTo4x4RGBA(const uint8_t* src, uint32_t width, uint32_t height,
                     }
 
                     // Green pixels
-                    *p++ = src[((((i + argb) * sf) + ((block + c) * sf * stride)) * 4) + 1];
+                    *p++ = src[((((i + argb) * sf * 4) + ((block + c) * sf * pitch))) + 1];
                     // Blue pixels
-                    *p++ = src[((((i + argb) * sf) + ((block + c) * sf * stride)) * 4) + 2];
+                    *p++ = src[((((i + argb) * sf * 4) + ((block + c) * sf * pitch))) + 2];
                 }
             }
         }
@@ -201,7 +197,7 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
     uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
     uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
 
-    pLogDebug("loading %s, freeimage reports %u %u %u\n", path.c_str(), w, h, FreeImage_GetPitch(sourceImage));
+    pLogDebug("loading %s, freeimage reports %u %u %u", path.c_str(), w, h, FreeImage_GetPitch(sourceImage));
 
     if(orig_w)
         *orig_w = w;
@@ -223,8 +219,11 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
     return sourceImage;
 }
 
-void s_loadTexture(StdPicture& target, void* data, int width, int height, bool mask, bool downscale = true)
+void s_loadTexture(StdPicture& target, void* data, int width, int height, int pitch, bool mask)
 {
+    // downscale if logical width matches the actual width of the texture, otherwise don't
+    bool downscale = (width >= target.w);
+
     int max_size = (downscale ? 2048 : 1024);
 
     if(width > max_size && height <= max_size)
@@ -257,7 +256,7 @@ void s_loadTexture(StdPicture& target, void* data, int width, int height, bool m
         if(w_i > 0 && h_i > 0)
         {
             uint32_t wdst, hdst;
-            target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + (start_y * width + start_x) * 4, w_i, h_i, width, &wdst, &hdst, downscale);
+            target.d.backing_texture[i + 3 * mask] = s_RawTo4x4RGBA((uint8_t*)data + start_y * pitch + start_x * 4, w_i, h_i, pitch, &wdst, &hdst, downscale);
 
             if(target.d.backing_texture[i + 3 * mask])
             {
@@ -589,101 +588,10 @@ void minport_ApplyViewport()
     // GX_SetScissorBoxOffset(-ox, -oy);
 }
 
-StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath, bool downscale)
+void lazyLoadPictureFromList(StdPicture_Sub& target, FILE* f, const std::string& dir)
 {
-    (void)maskPath;
-    (void)maskFallbackPath;
-
-    StdPicture target;
-
     if(!GameIsActive)
-        return target; // do nothing when game is closed
-
-    target.inited = false;
-    target.l.path = path;
-
-    if(target.l.path.empty())
-        return target;
-
-    target.inited = true;
-    target.l.lazyLoaded = false;
-
-    if(Files::hasSuffix(target.l.path, ".tpl"))
-    {
-        if(TPL_OpenTPLFromFile(&target.d.texture_file[0], target.l.path.c_str()) == 1)
-        {
-            target.d.texture_file_init[0] = true;
-            s_loadTexture(target, 0);
-            s_num_textures_loaded ++;
-        }
-    }
-    else
-    {
-        FIBITMAP* FI_tex = nullptr;
-        FIBITMAP* FI_mask = nullptr;
-
-        if(Files::hasSuffix(target.l.mask_path, "m.gif"))
-        {
-            FI_tex = robust_FILoad(target.l.path, "", &target.w, &target.h);
-
-            if(FI_tex)
-                FI_mask = robust_FILoad(target.l.mask_path, "");
-        }
-        else
-        {
-            FI_tex = robust_FILoad(target.l.path, target.l.mask_path, &target.w, &target.h);
-        }
-
-        if(!downscale)
-        {
-            target.w *= 2;
-            target.h *= 2;
-        }
-
-        if(!FI_tex)
-        {
-            pLogWarning("Permanently failed to load %s", target.l.path.c_str());
-            pLogWarning("Error: %d (%s)", errno, strerror(errno));
-        }
-        else
-        {
-            s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), false, downscale);
-            FreeImage_Unload(FI_tex);
-
-            if(FI_mask)
-            {
-                s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), true, downscale);
-                FreeImage_Unload(FI_mask);
-            }
-        }
-    }
-
-    if(!target.d.hasTexture())
-    {
-        pLogWarning("FAILED TO LOAD!!! %s", path.c_str());
-        target.d.destroy();
-        target.inited = false;
-    }
-
-    return target;
-}
-
-StdPicture LoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
-{
-    return LoadPicture(path, maskPath, maskFallbackPath, true);
-}
-
-StdPicture LoadPicture_1x(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
-{
-    return LoadPicture(path, maskPath, maskFallbackPath, false);
-}
-
-StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
-{
-    StdPicture target;
-
-    if(!GameIsActive)
-        return target; // do nothing when game is closed
+        return; // do nothing when game is closed
 
     int length;
 
@@ -692,13 +600,13 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     if(fscanf(f, "%255[^\n]%n%*[^\n]\n", filename, &length) != 1)
     {
         pLogWarning("Could not load image path from load list");
-        return target;
+        return;
     }
 
     if(length == 255)
     {
         pLogWarning("Image path %s was truncated in load list", filename);
-        return target;
+        return;
     }
 
     target.inited = true;
@@ -712,7 +620,7 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     {
         pLogWarning("Could not load image %s dimensions from load list", filename);
         target.inited = false;
-        return target;
+        return;
     }
 
     // pLogDebug("Successfully loaded %s (%d %d)", target.l.path.c_str(), w, h);
@@ -720,23 +628,21 @@ StdPicture lazyLoadPictureFromList(FILE* f, const std::string& dir)
     target.w = w;
     target.h = h;
 
-    return target;
+    return;
 }
 
-StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath, const std::string& maskFallbackPath)
+void lazyLoadPicture(StdPicture_Sub& target, const std::string& path, int scaleFactor, const std::string& maskPath, const std::string& maskFallbackPath)
 {
-    StdPicture target;
-
     if(!GameIsActive)
-        return target; // do nothing when game is closed
+        return; // do nothing when game is closed
 
     target.inited = false;
     target.l.path = path;
 
     if(target.l.path.empty())
-        return target;
+        return;
 
-    if(maskPath.empty() && Files::fileExists(maskFallbackPath))
+    if(maskPath.empty() && !maskFallbackPath.empty() && Files::fileExists(maskFallbackPath))
         target.l.mask_path = maskFallbackPath;
     else
         target.l.mask_path = maskPath;
@@ -781,12 +687,10 @@ StdPicture lazyLoadPicture(const std::string& path, const std::string& maskPath,
         }
         else
         {
-            target.w = tSize.w();
-            target.h = tSize.h();
+            target.w = tSize.w() * scaleFactor;
+            target.h = tSize.h() * scaleFactor;
         }
     }
-
-    return target;
 }
 
 int robust_OpenTPLFromFile(TPLFile* target, const char* path)
@@ -864,12 +768,12 @@ void lazyLoad(StdPicture& target)
             GraphicsHelps::replaceColor(FI_tex, colSrc, colDst);
         }
 
-        s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), false);
+        s_loadTexture(target, FreeImage_GetBits(FI_tex), FreeImage_GetWidth(FI_tex), FreeImage_GetHeight(FI_tex), FreeImage_GetPitch(FI_tex), false);
         FreeImage_Unload(FI_tex);
 
         if(FI_mask)
         {
-            s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), true);
+            s_loadTexture(target, FreeImage_GetBits(FI_mask), FreeImage_GetWidth(FI_mask), FreeImage_GetHeight(FI_mask), FreeImage_GetPitch(FI_mask), true);
             FreeImage_Unload(FI_mask);
         }
     }
@@ -925,41 +829,15 @@ void lazyPreLoad(StdPicture& target)
     lazyLoad(target);
 }
 
-void lazyUnLoad(StdPicture& target)
-{
-    if(!target.inited || !target.l.lazyLoaded || !target.d.hasTexture())
-        return;
-
-    deleteTexture(target, true);
-}
-
 void loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
 {
-    s_loadTexture(target, RGBApixels, width, height, false, true);
+    s_loadTexture(target, RGBApixels, width, height, pitch, false);
     target.inited = true;
     target.l.lazyLoaded = false;
-    target.w = width;
-    target.h = height;
-    target.frame_w = width;
-    target.frame_h = height;
 }
 
-void loadTexture_1x(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+void unloadTexture(StdPicture& tx)
 {
-    s_loadTexture(target, RGBApixels, width, height, false, false);
-    target.inited = true;
-    target.l.lazyLoaded = false;
-    target.w = width * 2;
-    target.h = height * 2;
-    target.frame_w = width * 2;
-    target.frame_h = height * 2;
-}
-
-void deleteTexture(StdPicture& tx, bool lazyUnload)
-{
-    if(!tx.inited)
-        return;
-
     minport_unlinkTexture(&tx);
 
     if(tx.d.hasTexture())
@@ -967,15 +845,8 @@ void deleteTexture(StdPicture& tx, bool lazyUnload)
 
     tx.d.destroy();
 
-    if(!lazyUnload)
-    {
-        tx.inited = false;
-        tx.l.lazyLoaded = false;
-        tx.w = 0;
-        tx.h = 0;
-        tx.frame_w = 0;
-        tx.frame_h = 0;
-    }
+    if(!tx.l.canLoad())
+        static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 }
 
 inline int ROUNDDIV2(int x)

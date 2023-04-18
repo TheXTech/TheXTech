@@ -29,6 +29,8 @@
 #define X_IMG_EXT ".dsg"
 #define X_NO_PNG_GIF
 
+struct StdPicture;
+
 /*!
  * \brief Platform specific picture data. Fields should not be used directly
  */
@@ -37,11 +39,18 @@ struct StdPictureData
 
     bool attempted_load = false;
 
-    int flags = 0;
-
     int texture[3] = {0, 0, 0};
     uint16_t tex_w[3] = {0, 0, 0};
     uint16_t tex_h[3] = {0, 0, 0};
+
+    //! The previous texture in the render chain (nullptr if this is the tail or unloaded)
+    StdPicture* last_texture = nullptr;
+
+    //! The next texture in the render chain (nullptr if this is the head or unloaded)
+    StdPicture* next_texture = nullptr;
+
+    //! The last frame that the texture was rendered (not accessed if not in the render chain)
+    uint32_t last_draw_frame = 0;
 
     inline bool reallyHasTexture()
     {

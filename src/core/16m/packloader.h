@@ -26,19 +26,19 @@
 #include <string>
 #include <cstdio>
 
-struct StdPicture;
+struct StdPicture_Sub;
 
 namespace PackLoader
 {
     using packindex_t = uint8_t;
     constexpr packindex_t PACK_NONE = -1;
 
-    void setup(StdPicture& tex, const std::string& pack_path, uint32_t pack_offset);
+    void setup(StdPicture_Sub& tex, const std::string& pack_path, uint32_t pack_offset);
     void incref(packindex_t pack);
     void decref(packindex_t pack);
 
-    FILE* getf(const StdPicture& tex, int index);
-    void finalizef(FILE* f, const StdPicture& tex);
+    FILE* getf(const StdPicture_Sub& tex, int index);
+    void finalizef(FILE* f, const StdPicture_Sub& tex);
 
     class packref_t
     {
@@ -59,7 +59,7 @@ namespace PackLoader
                 decref(i);
         }
 
-        constexpr operator packindex_t()
+        inline operator packindex_t() const
         {
             return i;
         }

@@ -97,7 +97,7 @@ bool Renderer::LoadBitmapResource(const std::string& filename, int resource_code
 
 void Renderer::StoreImage(LunaImage &&bmp, int resource_code)
 {
-    m_legacyResourceCodeImages[resource_code] = bmp;
+    m_legacyResourceCodeImages[resource_code] = std::move(bmp);
 }
 
 bool Renderer::DeleteImage(int resource_code)

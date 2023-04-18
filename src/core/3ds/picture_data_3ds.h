@@ -27,7 +27,8 @@
 #include <citro2d.h>
 
 #define X_IMG_EXT ".t3x"
-#define X_NO_PNG_GIF
+
+struct StdPicture;
 
 /*!
  * \brief Platform specific picture data. Fields should not be used directly
@@ -35,18 +36,22 @@
 struct StdPictureData
 {
 
+    //! The previous texture in the render chain (nullptr if this is the tail or unloaded)
+    StdPicture* last_texture = nullptr;
+
+    //! The next texture in the render chain (nullptr if this is the head or unloaded)
+    StdPicture* next_texture = nullptr;
+
+    //! The last frame that the texture was rendered (not accessed if not in the render chain)
     uint32_t last_draw_frame = 0;
 
-    C2D_SpriteSheet texture = nullptr;
-    C2D_Image image;
-    C2D_SpriteSheet texture2 = nullptr;
-    C2D_Image image2;
-    C2D_SpriteSheet texture3 = nullptr;
-    C2D_Image image3;
+    //! Loaded texture data
+    C2D_SpriteSheet texture[6] = {nullptr};
+    C2D_Image image[6];
 
     inline bool hasTexture()
     {
-        return texture != nullptr;
+        return texture[0] != nullptr;
     }
 
 };
