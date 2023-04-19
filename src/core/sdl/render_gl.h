@@ -50,11 +50,12 @@ struct SDL_Window;
  */
 enum BufferIndex_t
 {
-    BUFFER_GAME = 0,  /**< main texture for the game */
-    BUFFER_FB_READ,   /**< auxiliary texture used for reading from main buffer in shader */
-    BUFFER_INIT_PASS, /**< auxiliary texture used to restore the state after drawing only opaque objects (multipass rendering) */
-    BUFFER_PREV_PASS, /**< auxiliary texture used to read the state following the previous draw pass (multipass rendering) */
-    BUFFER_LIGHTING,  /**< texture used to store the outcome of the lighting calculations */
+    BUFFER_GAME = 0,   /**< main texture for the game */
+    BUFFER_FB_READ,    /**< auxiliary texture used for reading from main buffer in shader */
+    BUFFER_INIT_PASS,  /**< auxiliary texture used to restore the state after drawing only opaque objects (multipass rendering) */
+    BUFFER_PREV_PASS,  /**< auxiliary texture used to read the state following the previous draw pass (multipass rendering) */
+    BUFFER_DEPTH_READ, /**< auxiliary texture used to copy the depth from the initial render pass */
+    BUFFER_LIGHTING,   /**< texture used to store the outcome of the lighting calculations */
     BUFFER_MAX,
 };
 
@@ -330,12 +331,12 @@ private:
     GLuint m_game_depth_rb = 0;
     // texture for main game framebuffer's depth component (preferred)
     GLuint m_game_depth_texture = 0;
-    // texture for depth buffer read
-    GLuint m_depth_read_texture = 0;
 
     // references to main game framebuffer's texture and FBO
-    const GLuint& m_game_texture = m_buffer_texture[0];
-    const GLuint& m_game_texture_fb = m_buffer_fb[0];
+    const GLuint& m_game_texture = m_buffer_texture[BUFFER_GAME];
+    const GLuint& m_game_texture_fb = m_buffer_fb[BUFFER_GAME];
+    // texture for depth buffer read
+    const GLuint& m_depth_read_texture = m_buffer_texture[BUFFER_DEPTH_READ];
 
     // vertex buffer object (VBO) and vertex array object (VAO) state
 
@@ -486,6 +487,8 @@ private:
     void destroyFramebuffer(BufferIndex_t buffer);
     // perform a framebuffer->framebuffer copy
     void framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h);
+    // perform a full depth buffer copy to the TEXTURE_UNIT_DEPTH_READ
+    void depthbufferCopy();
 
     // sets required GL logicOp state for masks
     void prepareDrawMask();

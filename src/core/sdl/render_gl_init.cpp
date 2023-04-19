@@ -396,6 +396,12 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
     // (0) cleanup existing framebuffer
     destroyFramebuffer(buffer);
 
+    if((m_gl_majver < 3 || !m_game_depth_texture) && buffer == BUFFER_DEPTH_READ)
+    {
+        pLogDebug("Cannot create depth read buffer on OpenGL < 3.0 / OpenGL ES < 3.0");
+        return;
+    }
+
     // (1) allocate texture
     glGenTextures(1, &m_buffer_texture[buffer]);
 
@@ -410,9 +416,18 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
 
     int downscale = (buffer == BUFFER_LIGHTING) ? m_lighting_downscale : 1;
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-        ScreenW / downscale, ScreenH / downscale,
-        0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    if(buffer == BUFFER_DEPTH_READ)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
+            ScreenW / downscale, ScreenH / downscale,
+            0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
+    }
+    else
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
+            ScreenW / downscale, ScreenH / downscale,
+            0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    }
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -486,7 +501,7 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
     }
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[buffer]);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_buffer_texture[buffer], 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, (buffer == BUFFER_DEPTH_READ) ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_buffer_texture[buffer], 0);
 
     if(buffer == BUFFER_GAME)
     {
@@ -600,40 +615,6 @@ bool RenderGL::initFramebuffers()
         glActiveTexture(TEXTURE_UNIT_LIGHT_READ);
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_LIGHTING]);
         glActiveTexture(TEXTURE_UNIT_IMAGE);
-    }
-
-    // create texture for reading depth buffer
-    if(m_gl_majver >= 3 && (m_game_depth_texture || m_game_depth_rb) && m_use_shaders && m_buffer_texture[BUFFER_FB_READ])
-    {
-        glGenTextures(1, &m_depth_read_texture);
-
-        if(!m_depth_read_texture)
-        {
-            pLogWarning("Render GL: Failed to allocate depth read texture");
-            return true;
-        }
-
-        // allocate texture memory
-        glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
-            ScreenW, ScreenH,
-            0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        glBindTexture(GL_TEXTURE_2D, 0);
-
-        GLenum err = glGetError();
-        if(err)
-        {
-            pLogWarning("Render GL: Failed to allocate depth read texture memory (GL error code %d)", (int)err);
-            glDeleteTextures(1, &m_depth_read_texture);
-            m_depth_read_texture = 0;
-            return true;
-        }
     }
 
 #endif // #ifdef RENDERGL_HAS_FBO

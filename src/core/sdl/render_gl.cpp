@@ -176,6 +176,81 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
 #endif
 }
 
+void RenderGL::depthbufferCopy()
+{
+    int x = m_viewport_x;
+    int y = m_viewport_y;
+    int w = m_viewport_w;
+    int h = m_viewport_h;
+
+    if(x < 0)
+    {
+        w += x;
+        x = 0;
+    }
+
+    if(y < 0)
+    {
+        h += y;
+        y = 0;
+    }
+
+    if(x + w >= ScreenW)
+        w = ScreenW - x;
+
+    if(y + h >= ScreenH)
+        h = ScreenH - y;
+
+    if(w <= 0 || h <= 0)
+        return;
+
+    if(!m_buffer_fb[BUFFER_DEPTH_READ] || m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES)
+    {
+        glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
+
+        glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
+
+        glCopyTexSubImage2D(GL_TEXTURE_2D,
+            0,
+            x,
+            ScreenH - (y + h),
+            x,
+            ScreenH - (y + h),
+            w,
+            h);
+
+        glActiveTexture(TEXTURE_UNIT_IMAGE);
+
+        return;
+    }
+    else if(!m_buffer_fb[BUFFER_DEPTH_READ])
+    {
+        pLogWarning("Render GL: invalid buffer copy called");
+        return;
+    }
+
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_buffer_fb[BUFFER_DEPTH_READ]);
+
+    glBlitFramebuffer(x,
+        ScreenH - (y + h),
+        x + w,
+        ScreenH - y,
+        x,
+        ScreenH - (y + h),
+        x + w,
+        ScreenH - y,
+        GL_DEPTH_BUFFER_BIT,
+        GL_NEAREST);
+
+    glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
+
+    glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
+
+    glActiveTexture(TEXTURE_UNIT_IMAGE);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+}
+
 void RenderGL::fillVertexBuffer(const RenderGL::Vertex_t* vertex_attribs, int count)
 {
 #ifndef RENDERGL_HAS_VBO
@@ -476,14 +551,14 @@ void RenderGL::calculateLighting()
     if(!m_lighting_program.inited() || !m_light_ubo)
         return;
 
-    // first, flush the lights
+    // SECTION: flush the lights
     m_light_queue.lights[m_light_count].type = LightType::none;
 
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Light) * m_light_count + 4, &m_light_queue);
 
     m_light_count = 0;
 
-    // now, bind the correct portion of the lighting framebuffer
+    // SECTION: bind the lighting framebuffer and choose the correct GL viewport given downscaling
     glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[BUFFER_LIGHTING]);
 
     // fix offscreen coordinates
@@ -513,7 +588,8 @@ void RenderGL::calculateLighting()
     glViewport(viewport_x / m_lighting_downscale, (ScreenH - (viewport_y + viewport_h)) / m_lighting_downscale,
         viewport_w / m_lighting_downscale, viewport_h / m_lighting_downscale);
 
-    // works on ES
+
+    // SECTION: bind the texture and program
     glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
     glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
     glActiveTexture(TEXTURE_UNIT_IMAGE);
@@ -521,6 +597,7 @@ void RenderGL::calculateLighting()
     m_lighting_program.use_program();
     m_lighting_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
 
+    // SECTION: create and execute the draw call
     GLshort x1 = m_viewport_x;
     GLshort x2 = m_viewport_x + m_viewport_w;
     GLshort y1 = m_viewport_y;
@@ -548,6 +625,7 @@ void RenderGL::calculateLighting()
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
+    // SECTION: restore the normal framebuffer and viewport
     glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
 
     glViewport(viewport_x, ScreenH - (viewport_y + viewport_h),
@@ -630,10 +708,6 @@ void RenderGL::flushDrawQueues()
     if(!any_translucent_draws)
         return;
 
-    // disable depth writing while rendering translucent textures (small speedup, needed for multipass rendering)
-    if(m_use_depth_buffer)
-        glDepthMask(GL_FALSE);
-
     // default to 1-pass rendering
     int num_pass = 1;
 
@@ -647,30 +721,13 @@ void RenderGL::flushDrawQueues()
 
     // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
     if((active_draw_flags & GLProgramObject::read_depth) && m_depth_read_texture)
-    {
-        glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
-
-        // unsupported on GL ES (so might remove it entirely, or make a workaround)
-        if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES)
-        {
-            glBindTexture(GL_TEXTURE_2D, 0);
-        }
-        else
-        {
-            glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
-            glCopyTexSubImage2D(GL_TEXTURE_2D,
-                0,
-                m_viewport_x,
-                ScreenH - (m_viewport_y + m_viewport_h),
-                m_viewport_x,
-                ScreenH - (m_viewport_y + m_viewport_h),
-                m_viewport_w,
-                m_viewport_h);
-        }
-
-        glActiveTexture(TEXTURE_UNIT_IMAGE);
-    }
+        depthbufferCopy();
 #endif
+
+
+    // disable depth writing while rendering translucent textures (small speedup, needed for multipass rendering)
+    if(m_use_depth_buffer)
+        glDepthMask(GL_FALSE);
 
     // reset lighting buffer
     m_light_count = 0;
@@ -768,16 +825,11 @@ void RenderGL::close()
     m_program_circle_hole.reset();
     m_program_rect_filled.reset();
     m_program_rect_unfilled.reset();
+    m_lighting_program.reset();
 #endif
 
     for(int i = BUFFER_GAME; i < BUFFER_MAX; i++)
         destroyFramebuffer((BufferIndex_t)i);
-
-    if(m_depth_read_texture)
-    {
-        glDeleteTextures(1, &m_depth_read_texture);
-        m_depth_read_texture = 0;
-    }
 
 #ifdef RENDERGL_HAS_VBO
     if(m_vertex_buffer[0])
