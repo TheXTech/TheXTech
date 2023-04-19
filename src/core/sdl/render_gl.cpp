@@ -1971,6 +1971,26 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
 
     SDL_assert_release(tx.d.texture_id);
 
+#if 0
+    if(m_light_count < 63)
+    {
+        if(&tx == &GFXNPC[13])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, m_cur_depth, LightColor(128, 0, 0), 100.0);
+        }
+
+        if(&tx == &GFXBackground[96])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, m_cur_depth, LightColor(64, 0, 0), 250.0);
+        }
+
+        if(&tx == &GFXBackground[97])
+        {
+            m_light_queue.lights[m_light_count++] = Light::Point(xDstD + wDstD / 2.0, yDstD + hDstD / 2.0, m_cur_depth, LightColor(0, 64, 64), 250.0);
+        }
+    }
+#endif
+
     int xDst = Maths::iRound(xDstD);
     int yDst = Maths::iRound(yDstD);
     int wDst = Maths::iRound(wDstD);
