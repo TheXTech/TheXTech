@@ -2217,10 +2217,14 @@ void UpdateGraphics(bool skipRepaint)
 
             lunaRender(Z);
 
+            XRender::splitFrame();
+
             // Always draw for single-player
             // And don't draw when many players at the same screen
             if(numPlayers == 1 || numScreens != 1)
                 g_levelVScreenFader[Z].draw();
+
+            XRender::splitFrame();
 
 #ifdef __3DS__
         XRender::setTargetLayer(3);

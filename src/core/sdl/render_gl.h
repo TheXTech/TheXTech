@@ -578,6 +578,18 @@ public:
      */
     void offsetViewportIgnore(bool en) override;
 
+    /*!
+     * \brief Make any subsequent draws invisible to any previous draws (reflections)
+     *
+     * Only has an effect for OpenGL renderer and other batched renderers.
+     *
+     * Note: may result in subsequent transparent draw being inaccurately drawn above previous transparent draw.
+     */
+    inline void splitFrame() override
+    {
+        flushDrawQueues();
+    }
+
     void mapToScreen(int x, int y, int *dx, int *dy) override;
 
     void mapFromScreen(int x, int y, int *dx, int *dy) override;

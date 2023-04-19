@@ -89,6 +89,8 @@ E_INLINE void updateViewport() TAIL
 
 /*!
  * \brief Reset viewport into default state
+ *
+ * Note: WILL invoke splitFrame
  */
 E_INLINE void resetViewport() TAIL
 #ifndef RENDER_CUSTOM
@@ -103,6 +105,8 @@ E_INLINE void resetViewport() TAIL
  * \param y Y position
  * \param w Viewport Width
  * \param h Viewport Height
+ *
+ * Note: WILL invoke splitFrame
  */
 E_INLINE void setViewport(int x, int y, int w, int h) TAIL
 #ifndef RENDER_CUSTOM
@@ -117,6 +121,7 @@ E_INLINE void setViewport(int x, int y, int w, int h) TAIL
  * \param y Y offset
  *
  * All drawing objects will be drawn with a small offset
+ * MAY invoke splitFrame
  */
 E_INLINE void offsetViewport(int x, int y) TAIL // for screen-shaking
 #ifndef RENDER_CUSTOM
@@ -130,11 +135,26 @@ E_INLINE void offsetViewport(int x, int y) TAIL // for screen-shaking
  * \param en Enable viewport offset ignore
  *
  * Use this to draw certain objects with ignorign of the GFX offset
+ * MAY invoke splitFrame
  */
 E_INLINE void offsetViewportIgnore(bool en) TAIL
 #ifndef RENDER_CUSTOM
 {
     g_render->offsetViewportIgnore(en);
+}
+#endif
+
+/*!
+ * \brief Make any subsequent draws invisible to any previous draws (reflections)
+ *
+ * Only has an effect for OpenGL renderer and other batched renderers.
+ *
+ * Note: may result in subsequent transparent draw being inaccurately drawn above previous transparent draw.
+ */
+E_INLINE void splitFrame() TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->splitFrame();
 }
 #endif
 

@@ -132,6 +132,15 @@ public:
     virtual void offsetViewportIgnore(bool en) = 0;
 
     /*!
+     * \brief Make any subsequent draws invisible to any previous draws (reflections)
+     *
+     * Only has an effect for OpenGL renderer and other batched renderers.
+     *
+     * Note: may result in subsequent transparent draw being inaccurately drawn above previous transparent draw.
+     */
+    inline virtual void splitFrame() {}
+
+    /*!
      * \brief Get the current size of the window in render pixels
      * \param w Width
      * \param h Height
