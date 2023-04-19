@@ -635,6 +635,7 @@ public:
 
     int registerUniform(StdPicture &target, const char* name) override;
     void assignUniform(StdPicture &target, int index, const UniformValue_t& value) override;
+    void spawnParticle(StdPicture &target, double worldX, double worldY, ParticleVertexAttrs_t attrs) override;
 
 
     // Draw primitives

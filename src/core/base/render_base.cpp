@@ -375,6 +375,10 @@ void AbstractRender_t::LoadPictureParticleSystem(StdPicture& target, const std::
 
         // eagerly compile it to minimize stutter
         g_render->compileShaders(target);
+
+        // immediately claim the first two uniform spots (so they can have constant engine-level locations)
+        g_render->registerUniform(target, "u_particle_z");
+        g_render->registerUniform(target, "u_camera_pos");
     }
 #endif
 }

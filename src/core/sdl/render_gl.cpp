@@ -1624,6 +1624,28 @@ void RenderGL::assignUniform(StdPicture &target, int index, const UniformValue_t
 #endif
 }
 
+void RenderGL::spawnParticle(StdPicture &target, double worldX, double worldY, ParticleVertexAttrs_t attrs)
+{
+    if(!target.inited)
+        return;
+
+    if(!target.d.texture_id && target.l.lazyLoaded)
+        lazyLoad(target);
+
+    if(!target.d.particle_system)
+    {
+        D_pLogWarningNA("Attempt to spawn particle in non-particle system StdPicture!");
+        return;
+    }
+
+    ParticleVertexMutable_t particle;
+    particle.position = {(GLfloat)worldX, (GLfloat)worldY};
+    particle.spawn_time = m_shader_clock;
+    particle.attribs = attrs;
+
+    target.d.particle_system->add_particle(particle);
+}
+
 void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, float blue, float alpha, bool filled)
 {
 #ifdef USE_RENDER_BLOCKING
@@ -2144,10 +2166,11 @@ void RenderGL::renderParticleSystem(StdPicture &tx,
         return;
     }
 
-    UNUSED(camX);
-    UNUSED(camY);
+    // assign depth
+    assignUniform(tx, 0, UniformValue_t(m_cur_depth * m_transform_matrix[2 * 4 + 2] + m_transform_matrix[3 * 4 + 2]));
 
-    // set cam and depth uniforms HERE
+    // assign camera pos
+    assignUniform(tx, 1, UniformValue_t((GLfloat)camX, (GLfloat)camY));
 
     DrawContext_t context = {*tx.d.shader_program, &tx};
 

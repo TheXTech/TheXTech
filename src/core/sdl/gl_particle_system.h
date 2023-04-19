@@ -51,6 +51,7 @@ class GLParticleSystem
 
     int m_particle_count = 0;
     int m_next_particle = 0;
+    int m_modified_count = 0;
 
 public:
 
@@ -70,7 +71,7 @@ public:
         reset();
     }
 
-    // void AddParticle();
+    void add_particle(const ParticleVertexMutable_t& state);
 };
 
 #endif // #ifndef GL_PARTICLE_SYSTEM_H

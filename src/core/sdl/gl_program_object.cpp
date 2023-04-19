@@ -188,9 +188,20 @@ void GLProgramObject::m_link_program(GLuint vertex_shader, GLuint fragment_shade
     glAttachShader(program, fragment_shader);
 
     // set the builtin vertex attribute locations
-    glBindAttribLocation(program, 0, "a_position");
-    glBindAttribLocation(program, 1, "a_texcoord");
-    glBindAttribLocation(program, 2, "a_tint");
+    if(!particle_system)
+    {
+        glBindAttribLocation(program, 0, "a_position");
+        glBindAttribLocation(program, 1, "a_texcoord");
+        glBindAttribLocation(program, 2, "a_tint");
+    }
+    else
+    {
+        glBindAttribLocation(program, 0, "a_index");
+        glBindAttribLocation(program, 1, "a_texcoord");
+        glBindAttribLocation(program, 2, "a_position");
+        glBindAttribLocation(program, 3, "a_spawn_time");
+        glBindAttribLocation(program, 4, "a_attribs");
+    }
 
     // Link the program
     glLinkProgram(program);
