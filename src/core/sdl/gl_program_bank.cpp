@@ -27,7 +27,13 @@
 
 #include "Logger/logger.h"
 
+
 std::vector<std::unique_ptr<StdPicture>> LoadedGLProgram;
+
+RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionEffect;
+RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionParticlesBG;
+RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionParticlesFG;
+
 
 static std::map<std::string, LoadedGLProgramRef_t> s_ProgramCache;
 static DirListCI s_dirShaders;
@@ -36,6 +42,9 @@ void ClearAllGLPrograms()
 {
     s_ProgramCache.clear();
     LoadedGLProgram.clear();
+    SectionEffect.fill(-1);
+    SectionParticlesBG.fill(-1);
+    SectionParticlesFG.fill(-1);
 }
 
 LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name)

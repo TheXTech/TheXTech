@@ -52,6 +52,10 @@
 #include "graphics/gfx_special_frames.h"
 #include "graphics/gfx_keyhole.h"
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+#    include "core/sdl/gl_program_bank.h"
+#endif
+
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
 
@@ -1093,6 +1097,11 @@ void UpdateGraphics(bool skipRepaint)
             XRender::setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
 
         DrawBackground(S, Z);
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+        if((int)SectionParticlesBG[S] != -1)
+            XRender::renderParticleSystem(**SectionParticlesBG[S], vScreenX[Z], vScreenY[Z]);
+#endif
 
         // don't show background outside of the current section!
         if(LevelEditor)
@@ -2216,6 +2225,14 @@ void UpdateGraphics(bool skipRepaint)
         /* Dropped */
 
             lunaRender(Z);
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+            if((int)SectionParticlesFG[S] != -1)
+                XRender::renderParticleSystem(**SectionParticlesFG[S], vScreenX[Z], vScreenY[Z]);
+
+            if((int)SectionEffect[S] != -1)
+                XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
+#endif
 
             XRender::splitFrame();
 

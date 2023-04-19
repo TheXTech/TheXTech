@@ -55,6 +55,11 @@
 #include "editor/editor_custom.h"
 
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+#    include "core/sdl/gl_program_bank.h"
+#endif
+
+
 void bgoApplyZMode(Background_t *bgo, int smbx64sp)
 {
     if(bgo->zMode == LevelBGO::ZDefault)
@@ -230,6 +235,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             CustomMusic[B].clear();
         else
             CustomMusic[B] = g_dirEpisode.resolveFileCase(s.music_file);
+#if 0
+        SectionEffect[B] = ResolveGLProgram("darkness.frag");
+        SectionParticlesBG[B] = ResolveGLParticleSystem("particle");
+#endif
         B++;
         if(B > maxSections)
             break;
@@ -940,6 +949,12 @@ void ClearLevel()
 
 #ifdef __16M__
     XRender::clearAllTextures();
+#endif
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+    SectionEffect.fill(-1);
+    SectionParticlesBG.fill(-1);
+    SectionParticlesFG.fill(-1);
 #endif
 
     UnloadCustomGFX();

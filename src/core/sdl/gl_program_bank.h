@@ -29,6 +29,7 @@
 #include "range_arr.hpp"
 #include "ref_type.h"
 #include "std_picture.h"
+#include "global_constants.h"
 
 // a bank to store loaded "pure" GL programs -- StdPictures whose only purpose is to execute a fragment shader
 
@@ -44,5 +45,9 @@ LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name);
 
 // returns -1 on failure
 LoadedGLProgramRef_t ResolveGLParticleSystem(const std::string& name);
+
+extern RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionEffect;
+extern RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionParticlesBG;
+extern RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionParticlesFG;
 
 #endif // #ifndef GL_PROGRAM_BANK_H
