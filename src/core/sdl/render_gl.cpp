@@ -76,9 +76,8 @@ constexpr bool s_prefer_fb_to_fb_render = true;
 static int s_num_pass = 2;
 
 
-void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h)
+void RenderGL::s_normalize_coords(int& x, int& y, int& w, int& h)
 {
-#ifdef RENDERGL_HAS_FBO
     if(x < 0)
     {
         w += x;
@@ -96,6 +95,12 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
 
     if(y + h >= ScreenH)
         h = ScreenH - y;
+}
+
+void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h)
+{
+#ifdef RENDERGL_HAS_FBO
+    s_normalize_coords(x, y, w, h);
 
     if(w <= 0 || h <= 0)
         return;
@@ -183,23 +188,7 @@ void RenderGL::depthbufferCopy()
     int w = m_viewport_w;
     int h = m_viewport_h;
 
-    if(x < 0)
-    {
-        w += x;
-        x = 0;
-    }
-
-    if(y < 0)
-    {
-        h += y;
-        y = 0;
-    }
-
-    if(x + w >= ScreenW)
-        w = ScreenW - x;
-
-    if(y + h >= ScreenH)
-        h = ScreenH - y;
+    s_normalize_coords(x, y, w, h);
 
     if(w <= 0 || h <= 0)
         return;
@@ -567,23 +556,7 @@ void RenderGL::calculateLighting()
     int viewport_w = m_viewport_w;
     int viewport_h = m_viewport_h;
 
-    if(viewport_x < 0)
-    {
-        viewport_w += viewport_x;
-        viewport_x = 0;
-    }
-
-    if(viewport_y < 0)
-    {
-        viewport_h += viewport_y;
-        viewport_y = 0;
-    }
-
-    if(viewport_y + viewport_h > ScreenH)
-        viewport_h = ScreenH - viewport_y;
-
-    if(viewport_x + viewport_w > ScreenW)
-        viewport_w = ScreenW - viewport_x;
+    s_normalize_coords(viewport_x, viewport_y, viewport_w, viewport_h);
 
     glViewport(viewport_x / m_lighting_downscale, (ScreenH - (viewport_y + viewport_h)) / m_lighting_downscale,
         viewport_w / m_lighting_downscale, viewport_h / m_lighting_downscale);
@@ -1014,25 +987,10 @@ void RenderGL::applyViewport()
     int viewport_w = m_viewport_w;
     int viewport_h = m_viewport_h;
 
-    if(viewport_x < 0)
-    {
-        off_x += viewport_x;
-        viewport_w += viewport_x;
-        viewport_x = 0;
-    }
+    s_normalize_coords(viewport_x, viewport_y, viewport_w, viewport_h);
 
-    if(viewport_y < 0)
-    {
-        off_y += viewport_y;
-        viewport_h += viewport_y;
-        viewport_y = 0;
-    }
-
-    if(viewport_y + viewport_h > ScreenH)
-        viewport_h = ScreenH - viewport_y;
-
-    if(viewport_x + viewport_w > ScreenW)
-        viewport_w = ScreenW - viewport_x;
+    off_x += viewport_x - m_viewport_x;
+    off_y += viewport_y - m_viewport_y;
 
     if(m_has_fbo && m_game_texture_fb)
     {
