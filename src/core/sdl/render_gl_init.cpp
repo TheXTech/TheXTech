@@ -34,6 +34,13 @@ constexpr bool s_enable_debug_output = true;
 #ifdef RENDERGL_HAS_DEBUG
 static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam)
 {
+    UNUSED(source);
+    UNUSED(type);
+    UNUSED(id);
+    UNUSED(severity);
+    UNUSED(length);
+    UNUSED(userParam);
+
     pLogWarning("Got GL error %s", message);
 }
 #endif
