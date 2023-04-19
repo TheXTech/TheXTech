@@ -54,7 +54,7 @@
 #endif
 
 
-static const char blank_gif[] = "GIF87a\x01\x00\x01\x00\x80\x01\x00\x00\x00\x00\xff\xff\xff,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
+static const char blank_gif[] = "GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
 
 AbstractRender_t* g_render = nullptr;
 
@@ -355,7 +355,6 @@ void AbstractRender_t::LoadPictureParticleSystem(StdPicture& target, const std::
             target.l.lazyLoaded = true;
 
             // blank GIF of 1 pixel
-            const char blank_gif[] = "GIF87a\x01\x00\x01\x00\x80\x01\x00\x00\x00\x00\xff\xff\xff,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
             target.l.raw.resize(sizeof(blank_gif) - 1);
             SDL_memcpy(target.l.raw.data(), blank_gif, sizeof(blank_gif) - 1);
         }
