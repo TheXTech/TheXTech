@@ -1850,10 +1850,41 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
             hSrc = 0;
     }
 
-    GLshort x1 = xDst;
-    GLshort x2 = xDst + wDst;
-    GLshort y1 = yDst;
-    GLshort y2 = yDst + hDst;
+    GLshort x1, x2, x3, x4, y1, y2, y3, y4;
+
+
+    if(rotateAngle != 0.0)
+    {
+        int cx = center ? center->x : wDst / 2;
+        int cy = center ? center->y : hDst / 2;
+
+        GLshort l_off = -cx;
+        GLshort r_off = wDst - cx;
+        GLshort t_off = -cy;
+        GLshort b_off = hDst - cy;
+
+        rotateAngle *= -2.0 * M_PI / 360.0;
+
+        x1 = l_off *  cos(rotateAngle) + t_off * sin(rotateAngle) + xDst + cx;
+        x2 = l_off *  cos(rotateAngle) + b_off * sin(rotateAngle) + xDst + cx;
+        x3 = r_off *  cos(rotateAngle) + t_off * sin(rotateAngle) + xDst + cx;
+        x4 = r_off *  cos(rotateAngle) + b_off * sin(rotateAngle) + xDst + cx;
+        y1 = l_off * -sin(rotateAngle) + t_off * cos(rotateAngle) + yDst + cy;
+        y2 = l_off * -sin(rotateAngle) + b_off * cos(rotateAngle) + yDst + cy;
+        y3 = r_off * -sin(rotateAngle) + t_off * cos(rotateAngle) + yDst + cy;
+        y4 = r_off * -sin(rotateAngle) + b_off * cos(rotateAngle) + yDst + cy;
+    }
+    else
+    {
+        x1 = xDst;
+        x2 = xDst;
+        x3 = xDst + wDst;
+        x4 = xDst + wDst;
+        y1 = yDst;
+        y2 = yDst + hDst;
+        y3 = yDst;
+        y4 = yDst + hDst;
+    }
 
     float u1 = tx.d.w_scale * xSrc;
     float u2 = tx.d.w_scale * (xSrc + wSrc);
@@ -1873,11 +1904,11 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
     auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
 
     vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
+    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x3, y3, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x3, y3, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x4, y4, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
     m_drawQueued = true;
@@ -2063,18 +2094,40 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
             hDst = 0;
     }
 
-    float cx = center ? center->x : xDst + wDst / 2.0f;
-    float cy = center ? center->y : yDst + hDst / 2.0f;
+    GLshort x1, x2, x3, x4, y1, y2, y3, y4;
 
-    // glPushMatrix();
+    if(rotateAngle != 0.0)
+    {
+        int cx = center ? center->x : wDst / 2;
+        int cy = center ? center->y : hDst / 2;
 
-    // glTranslatef(xDst + cx, yDst + cy, 0);
-    // glRotatef(rotateAngle, 0, 0, 1);
+        GLshort l_off = -cx;
+        GLshort r_off = wDst - cx;
+        GLshort t_off = -cy;
+        GLshort b_off = hDst - cy;
 
-    GLshort x1 = -cx;
-    GLshort x2 = -cx + wDst;
-    GLshort y1 = -cy;
-    GLshort y2 = -cy + hDst;
+        rotateAngle *= -2.0 * M_PI / 360.0;
+
+        x1 = l_off *  cos(rotateAngle) + t_off * sin(rotateAngle) + xDst + cx;
+        x2 = l_off *  cos(rotateAngle) + b_off * sin(rotateAngle) + xDst + cx;
+        x3 = r_off *  cos(rotateAngle) + t_off * sin(rotateAngle) + xDst + cx;
+        x4 = r_off *  cos(rotateAngle) + b_off * sin(rotateAngle) + xDst + cx;
+        y1 = l_off * -sin(rotateAngle) + t_off * cos(rotateAngle) + yDst + cy;
+        y2 = l_off * -sin(rotateAngle) + b_off * cos(rotateAngle) + yDst + cy;
+        y3 = r_off * -sin(rotateAngle) + t_off * cos(rotateAngle) + yDst + cy;
+        y4 = r_off * -sin(rotateAngle) + b_off * cos(rotateAngle) + yDst + cy;
+    }
+    else
+    {
+        x1 = xDst;
+        x2 = xDst;
+        x3 = xDst + wDst;
+        x4 = xDst + wDst;
+        y1 = yDst;
+        y2 = yDst + hDst;
+        y3 = yDst;
+        y4 = yDst + hDst;
+    }
 
     float u1 = tx.d.w_scale * xSrc;
     float u2 = tx.d.w_scale * (xSrc + wDst);
@@ -2094,11 +2147,11 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
     auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
 
     vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
+    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x3, y3, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u1, v2}});
+    vertex_attribs.push_back({{x3, y3, m_cur_depth}, tint, {u2, v1}});
+    vertex_attribs.push_back({{x4, y4, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
     m_drawQueued = true;
