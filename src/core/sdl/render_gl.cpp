@@ -345,6 +345,8 @@ void RenderGL::cleanupDrawQueues()
 
 void RenderGL::clearDrawQueues()
 {
+    m_drawQueued = false;
+
     for(auto& i : m_unordered_draw_queue)
         i.second.vertices.clear();
 
@@ -659,6 +661,11 @@ void RenderGL::prepareMultipassState(int pass)
 
 void RenderGL::flushDrawQueues()
 {
+    if(!m_drawQueued)
+        return;
+
+    m_drawQueued = false;
+
     // pass 0: opaque textures (unordered draw queues)
     flushUnorderedDrawQueue();
 
@@ -1054,7 +1061,7 @@ void RenderGL::applyViewport()
     else
     {
 #ifdef RENDERGL_HAS_FIXED_FUNCTION
-        glMatrixMode( GL_PROJECTION );
+        glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
         m_Ortho(off_x, viewport_w + off_x, (y_sign == -1) * viewport_h + off_y, (y_sign == 1) * viewport_h + off_y, (1 << 15), -(1 << 15));
@@ -1657,6 +1664,7 @@ void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, fl
     vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
+    m_drawQueued = true;
 }
 
 void RenderGL::renderRectBR(int _left, int _top, int _right, int _bottom, float red, float green, float blue, float alpha)
@@ -1724,6 +1732,7 @@ void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, 
     }
 
     m_cur_depth++;
+    m_drawQueued = true;
 }
 
 void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float green, float blue, float alpha)
@@ -1794,6 +1803,7 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float gre
     }
 
     m_cur_depth++;
+    m_drawQueued = true;
 }
 
 
@@ -1870,6 +1880,7 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
     vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
+    m_drawQueued = true;
 }
 
 void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double hDst,
@@ -1916,6 +1927,7 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
     vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
+    m_drawQueued = true;
 }
 
 void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hDstD,
@@ -2005,6 +2017,7 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
+    m_drawQueued = true;
 }
 
 void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double hDstD,
@@ -2088,6 +2101,7 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
     vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
+    m_drawQueued = true;
 }
 
 void RenderGL::renderTexture(float xDst, float yDst,
@@ -2134,6 +2148,7 @@ void RenderGL::renderTexture(float xDst, float yDst,
     vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
 
     m_cur_depth++;
+    m_drawQueued = true;
 }
 
 void RenderGL::renderParticleSystem(StdPicture &tx,
@@ -2169,6 +2184,7 @@ void RenderGL::renderParticleSystem(StdPicture &tx,
     vertex_attribs.emplace_back();
 
     m_cur_depth++;
+    m_drawQueued = true;
 }
 
 void RenderGL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)

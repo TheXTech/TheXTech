@@ -355,6 +355,9 @@ private:
     GLuint m_glcore_vao = 0;
 #endif
 
+    // some queue flags, used at flushDrawQueues()
+    bool m_drawQueued = false;
+
     // shader state
 
     // current transform matrix
