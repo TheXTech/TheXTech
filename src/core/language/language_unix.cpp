@@ -27,13 +27,21 @@
 
 void XLanguagePriv::detectOSLanguage()
 {
-    const char *langEnv = std::getenv("LANGUAGE");
+    const char *languageEnv = std::getenv("LANGUAGE");
+    const char *langEnv = std::getenv("LANG");
 
     CurrentLanguage = "en";
-    CurrentLangDialect = "uk";
+    CurrentLangDialect = "gb";
 
-    if(langEnv)
+    if(languageEnv)
+        CurrentLanguage = std::string(languageEnv);
+    else if(langEnv)
+    {
         CurrentLanguage = std::string(langEnv);
+        auto dot = CurrentLanguage.find('.');
+        if(dot != std::string::npos)
+            CurrentLanguage.erase(dot, std::string::npos);
+    }
 
     std::transform(CurrentLanguage.begin(),
                    CurrentLanguage.end(),
