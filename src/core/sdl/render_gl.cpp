@@ -2189,8 +2189,6 @@ void RenderGL::renderParticleSystem(StdPicture &tx,
 
 void RenderGL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels)
 {
-    glFlush();
-
     int phys_x, phys_y;
 
     mapFromScreen(x, y, &phys_x, &phys_y);
@@ -2231,8 +2229,6 @@ void RenderGL::getScreenPixels(int x, int y, int w, int h, unsigned char *pixels
 
 void RenderGL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pixels)
 {
-    glFlush();
-
     int phys_x, phys_y, phys_w, phys_h;
 
 #ifdef RENDERGL_HAS_FBO
