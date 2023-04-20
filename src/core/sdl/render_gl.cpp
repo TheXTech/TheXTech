@@ -97,6 +97,22 @@ void RenderGL::s_normalize_coords(int& x, int& y, int& w, int& h)
         h = ScreenH - y;
 }
 
+void RenderGL::m_Ortho(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far)
+{
+    if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES)
+    {
+#ifdef RENDERGL_HAS_ORTHOF
+        glOrthof(left, right, bottom, top, near, far);
+#endif
+    }
+    else
+    {
+#ifdef RENDERGL_HAS_ORTHO
+        glOrtho(left, right, bottom, top, near, far);
+#endif
+    }
+}
+
 void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h)
 {
 #ifdef RENDERGL_HAS_FBO
@@ -114,9 +130,9 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
         glCopyTexSubImage2D(GL_TEXTURE_2D,
             0,
             x,
-            ScreenH - (y + h),
+            y,
             x,
-            ScreenH - (y + h),
+            y,
             w,
             h);
 
@@ -148,8 +164,8 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
 
     GLfloat u1 = (float)x1 / ScreenW;
     GLfloat u2 = (float)x2 / ScreenW;
-    GLfloat v1 = (float)(ScreenH - y1) / ScreenH;
-    GLfloat v2 = (float)(ScreenH - y2) / ScreenH;
+    GLfloat v1 = (float)y1 / ScreenH;
+    GLfloat v2 = (float)y2 / ScreenH;
 
     x1 -= m_viewport_x;
     x2 -= m_viewport_x;
@@ -202,9 +218,9 @@ void RenderGL::depthbufferCopy()
         glCopyTexSubImage2D(GL_TEXTURE_2D,
             0,
             x,
-            ScreenH - (y + h),
+            y,
             x,
-            ScreenH - (y + h),
+            y,
             w,
             h);
 
@@ -221,13 +237,13 @@ void RenderGL::depthbufferCopy()
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_buffer_fb[BUFFER_DEPTH_READ]);
 
     glBlitFramebuffer(x,
-        ScreenH - (y + h),
+        y,
         x + w,
-        ScreenH - y,
+        y + h,
         x,
-        ScreenH - (y + h),
+        y,
         x + w,
-        ScreenH - y,
+        y + h,
         GL_DEPTH_BUFFER_BIT,
         GL_NEAREST);
 
@@ -558,7 +574,7 @@ void RenderGL::calculateLighting()
 
     s_normalize_coords(viewport_x, viewport_y, viewport_w, viewport_h);
 
-    glViewport(viewport_x / m_lighting_downscale, (ScreenH - (viewport_y + viewport_h)) / m_lighting_downscale,
+    glViewport(viewport_x / m_lighting_downscale, viewport_y / m_lighting_downscale,
         viewport_w / m_lighting_downscale, viewport_h / m_lighting_downscale);
 
 
@@ -578,8 +594,8 @@ void RenderGL::calculateLighting()
 
     GLfloat u1 = (float)x1 / ScreenW;
     GLfloat u2 = (float)x2 / ScreenW;
-    GLfloat v1 = (float)(ScreenH - y1) / ScreenH;
-    GLfloat v2 = (float)(ScreenH - y2) / ScreenH;
+    GLfloat v1 = (float)y1 / ScreenH;
+    GLfloat v2 = (float)y2 / ScreenH;
 
     x1 -= m_viewport_x;
     x2 -= m_viewport_x;
@@ -601,7 +617,7 @@ void RenderGL::calculateLighting()
     // SECTION: restore the normal framebuffer and viewport
     glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
 
-    glViewport(viewport_x, ScreenH - (viewport_y + viewport_h),
+    glViewport(viewport_x, viewport_y,
         viewport_w, viewport_h);
 #endif
 }
@@ -922,10 +938,10 @@ void RenderGL::repaint()
 
         const Vertex_t vertex_attribs[] =
         {
-            {{x1, y1, 0}, {255, 255, 255, 255}, {0.0, 1.0}},
-            {{x1, y2, 0}, {255, 255, 255, 255}, {0.0, 0.0}},
-            {{x2, y1, 0}, {255, 255, 255, 255}, {1.0, 1.0}},
-            {{x2, y2, 0}, {255, 255, 255, 255}, {1.0, 0.0}},
+            {{x1, y1, 0}, {255, 255, 255, 255}, {0.0, 0.0}},
+            {{x1, y2, 0}, {255, 255, 255, 255}, {0.0, 1.0}},
+            {{x2, y1, 0}, {255, 255, 255, 255}, {1.0, 0.0}},
+            {{x2, y2, 0}, {255, 255, 255, 255}, {1.0, 1.0}},
         };
 
         fillVertexBuffer(vertex_attribs, 4);
@@ -992,78 +1008,45 @@ void RenderGL::applyViewport()
     off_x += viewport_x - m_viewport_x;
     off_y += viewport_y - m_viewport_y;
 
+    int y_sign = 1;
+
     if(m_has_fbo && m_game_texture_fb)
     {
-        glViewport(viewport_x, ScreenH - (viewport_y + viewport_h),
-            viewport_w, viewport_h);
-
-        if(m_use_shaders)
-        {
-            m_transform_matrix = {
-                2.0f / (float)viewport_w, 0.0f, 0.0f, 0.0f,
-                0.0f, -2.0f / (float)viewport_h, 0.0f, 0.0f,
-                0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
-                -float(viewport_w + off_x + off_x) / (viewport_w), float(viewport_h + off_y + off_y) / (viewport_h), -1.0f, 1.0f,
-            };
-
-            m_shader_read_viewport = {
-                // multiply
-                0.5f * (float)viewport_w / (float)ScreenW,
-                0.5f * (float)viewport_h / (float)ScreenH,
-
-                // add
-                ((float)(viewport_x + off_x) + 0.5f * (float)viewport_w) / (float)ScreenW,
-                ((float)(ScreenH - (viewport_y + viewport_h + off_y)) + 0.5f * (float)viewport_h) / (float)ScreenH,
-            };
-
-            m_transform_tick++;
-        }
-        else
-        {
-#ifdef RENDERGL_HAS_FIXED_FUNCTION
-            glMatrixMode( GL_PROJECTION );
-            glLoadIdentity();
-#endif
-
-            if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES)
-            {
-#ifdef RENDERGL_HAS_ORTHOF
-                glOrthof( off_x, viewport_w + off_x, viewport_h + off_y, off_y, (1 << 15), -(1 << 15));
-#endif
-            }
-            else
-            {
-#ifdef RENDERGL_HAS_ORTHO
-                glOrtho( off_x, viewport_w + off_x, viewport_h + off_y, off_y, (1 << 15), -(1 << 15));
-#endif
-            }
-        }
-
-        return;
+        glViewport(viewport_x, viewport_y, viewport_w, viewport_h);
     }
+    else
+    {
+        int phys_offset_x = viewport_x * m_phys_w / ScreenW;
+        int phys_width = viewport_w * m_phys_w / ScreenW;
 
-    int phys_offset_x = viewport_x * m_phys_w / ScreenW;
-    int phys_width = viewport_w * m_phys_w / ScreenW;
+        int phys_offset_y = viewport_y * m_phys_h / ScreenH;
+        int phys_height = viewport_h * m_phys_h / ScreenH;
 
-    int phys_offset_y = viewport_y * m_phys_h / ScreenH;
-    int phys_height = viewport_h * m_phys_h / ScreenH;
+        y_sign = -1;
 
-    glViewport(m_phys_x + phys_offset_x,
-            m_phys_y + m_phys_h - phys_height - phys_offset_y, // relies on fact that m_phys_y is a symmetric border
-            phys_width,
-            phys_height);
+        glViewport(m_phys_x + phys_offset_x,
+                m_phys_y + m_phys_h - phys_height - phys_offset_y, // relies on fact that m_phys_y is a symmetric border
+                phys_width,
+                phys_height);
+    }
 
     if(m_use_shaders)
     {
         m_transform_matrix = {
             2.0f / (float)viewport_w, 0.0f, 0.0f, 0.0f,
-            0.0f, -2.0f / (float)viewport_h, 0.0f, 0.0f,
+            0.0f, y_sign * 2.0f / (float)viewport_h, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
-            -(viewport_w + off_x + off_x) / (GLfloat)(viewport_w), (viewport_h + off_y + off_y) / (GLfloat)(viewport_h), 0.0f, 1.0f,
+            -(float)(viewport_w + off_x + off_x) / (viewport_w), -y_sign * (float)(viewport_h + off_y + off_y) / (viewport_h), -1.0f, 1.0f,
         };
 
         m_shader_read_viewport = {
-            0.0f, 0.0f, 0.0f, 0.0f,
+            // multiply
+            0.5f * (float)viewport_w / (float)ScreenW,
+            0.5f * (float)viewport_h / (float)ScreenH,
+
+            // add
+            ((float)(viewport_x + off_x) + 0.5f * (float)viewport_w) / (float)ScreenW,
+            ((float)(viewport_y + off_y) + 0.5f * (float)viewport_h) / (float)ScreenH,
         };
 
         m_transform_tick++;
@@ -1073,20 +1056,9 @@ void RenderGL::applyViewport()
 #ifdef RENDERGL_HAS_FIXED_FUNCTION
         glMatrixMode( GL_PROJECTION );
         glLoadIdentity();
-#endif
 
-        if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES)
-        {
-#ifdef RENDERGL_HAS_ORTHOF
-            glOrthof( off_x, viewport_w + off_x, viewport_h + off_y, off_y, (1 << 15), -(1 << 15));
+        m_Ortho(off_x, viewport_w + off_x, (y_sign == -1) * viewport_h + off_y, (y_sign == 1) * viewport_h + off_y, (1 << 15), -(1 << 15));
 #endif
-        }
-        else
-        {
-#ifdef RENDERGL_HAS_ORTHO
-            glOrtho( off_x, viewport_w + off_x, viewport_h + off_y, off_y, (1 << 15), -(1 << 15));
-#endif
-        }
     }
 }
 
@@ -1274,20 +1246,8 @@ void RenderGL::setTargetScreen()
 #ifdef RENDERGL_HAS_FIXED_FUNCTION
         glMatrixMode( GL_PROJECTION );
         glLoadIdentity();
+        m_Ortho(0, hardware_w, hardware_h, 0, (1 << 15), -(1 << 15));
 #endif
-
-        if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES)
-        {
-#ifdef RENDERGL_HAS_ORTHOF
-            glOrthof(0, hardware_w, hardware_h, 0, (1 << 15), -(1 << 15));
-#endif
-        }
-        else
-        {
-#ifdef RENDERGL_HAS_ORTHO
-            glOrtho(0, hardware_w, hardware_h, 0, (1 << 15), -(1 << 15));
-#endif
-        }
     }
 }
 
@@ -2298,11 +2258,7 @@ void RenderGL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pi
     // rescale and move to target
     for(int r = 0; r < h; r++)
     {
-        int phys_r_max = phys_h - 1;
-        int phys_r_ind = r * phys_h / h;
-
-        // vertical flip from OpenGL to image
-        int phys_r = phys_r_max - phys_r_ind;
+        int phys_r = r * phys_h / h;
 
         for(int c = 0; c < w; c++)
         {

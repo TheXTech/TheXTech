@@ -481,6 +481,8 @@ private:
 
     static void s_normalize_coords(int& x, int& y, int& w, int& h);
 
+    void m_Ortho(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far);
+
     // initializes a single framebuffer with the game's current screen resolution
     // if BUFFER_GAME, will include depth
     // if not BUFFER_GAME, will accept case where FBO cannot be allocated as long as texture is okay
