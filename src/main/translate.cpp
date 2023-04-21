@@ -491,6 +491,12 @@ XTechTranslate::XTechTranslate()
 
         {"editor.toggleMagicBlock",         &g_editorStrings.toggleMagicBlock},
 
+        {"editor.testPlay.magicHand",       &g_editorStrings.testMagicHand},
+        {"editor.testPlay.char",            &g_editorStrings.testChar},
+        {"editor.testPlay.power",           &g_editorStrings.testPower},
+        {"editor.testPlay.boot",            &g_editorStrings.testBoot},
+        {"editor.testPlay.pet",             &g_editorStrings.testPet},
+
         {"editor.events.header",            &g_editorStrings.eventsHeader},
         {"editor.events.letterActivate",    &g_editorStrings.eventsLetterActivate},
         {"editor.events.letterDeath",       &g_editorStrings.eventsLetterDeath},

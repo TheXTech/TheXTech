@@ -84,6 +84,12 @@ struct EditorContent
 
     std::string toggleMagicBlock;
 
+    std::string testMagicHand;
+    std::string testChar;
+    std::string testPower;
+    std::string testBoot;
+    std::string testPet;
+
     std::string eventsHeader;
     std::string eventsLetterActivate;
     std::string eventsLetterDeath;

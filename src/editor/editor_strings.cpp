@@ -81,6 +81,12 @@ void initEditorStrings()
 
     g_editorStrings.toggleMagicBlock = "Magic Block";
 
+    g_editorStrings.testMagicHand = "Magic Hand";
+    g_editorStrings.testChar = "Char";
+    g_editorStrings.testPower = "Power";
+    g_editorStrings.testBoot = "Boot";
+    g_editorStrings.testPet = "Pet";
+
     g_editorStrings.eventsHeader = "Events:";
     g_editorStrings.eventsLetterActivate = "A:";
     g_editorStrings.eventsLetterDeath = "D:";

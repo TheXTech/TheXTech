@@ -1799,7 +1799,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     // settings screen, now.
 
     // magic block settings
-    SuperPrintR(mode, g_editorStrings.magicBlock, 3, 10, 50);
+    SuperPrintR(mode, g_editorStrings.toggleMagicBlock, 3, 10, 50);
 
 
     if(EditorCustom::block_pages.empty() && EditorCustom::bgo_pages.empty() && EditorCustom::tile_pages.empty())
@@ -1866,11 +1866,11 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     if(m_special_subpage > this->num_test_players + 1)
         m_special_subpage = this->num_test_players;
 
-    SuperPrintR(mode, "MAGIC HAND", 3, e_ScreenW - 230, 94);
+    SuperPrintR(mode, g_editorStrings.testMagicHand, 3, e_ScreenW - 230, 94);
     if(UpdateCheckBox(mode, e_ScreenW - 50 + 4, 80 + 4, this->test_magic_hand))
         this->test_magic_hand = !this->test_magic_hand;
 
-    SuperPrintR(mode, "TEST PLAY", 3, e_ScreenW - 230, 54);
+    SuperPrintR(mode, Controls::EditorControls::g_button_name_UI[Controls::EditorControls::TestPlay], 3, e_ScreenW - 230, 54);
     if(UpdateButton(mode, e_ScreenW-50 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::play, 32, 32))
     {
         // turn this into a routine...?! (cross-reference editor.cpp handler for EditorControls.TestPlay)
@@ -1884,13 +1884,14 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
             g_levelScreenFader.setupFader(4, 0, 65, ScreenFader::S_FADE);
         else
             g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
+
         editorWaitForFade();
 
         HasCursor = false;
         zTestLevel(this->test_magic_hand);
     }
 
-    SuperPrintR(mode, "PLAYER " + std::to_string(m_special_subpage), 3, 440, 154);
+    SuperPrintR(mode, g_mainMenu.wordPlayer + " " + std::to_string(m_special_subpage), 3, 440, 154);
     if(m_special_subpage > 1 && UpdateButton(mode, 400 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_special_subpage --;
     if(m_special_subpage < maxLocalPlayers && m_special_subpage <= this->num_test_players && UpdateButton(mode, 580 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -1912,7 +1913,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     if(m_special_subpage > this->num_test_players)
         return;
 
-    SuperPrintR(mode, "CHAR", 3, e_ScreenW / 2 + 10, 234);
+    SuperPrintR(mode, g_editorStrings.testChar, 3, e_ScreenW / 2 + 10, 234);
 
     constexpr int block_for_char[] = {622, 623, 624, 625, 631};
     for(int ch = 1; ch <= 5; ch++)
@@ -1924,7 +1925,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
             testPlayer[m_special_subpage].Character = ch;
     }
 
-    SuperPrintR(mode, "POWER", 3, e_ScreenW / 2 + 10, 274);
+    SuperPrintR(mode, g_editorStrings.testPower, 3, e_ScreenW / 2 + 10, 274);
 
     if(testPlayer[m_special_subpage].State == 0)
         testPlayer[m_special_subpage].State = 2;
@@ -1945,7 +1946,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
             testPlayer[m_special_subpage].State = state;
     }
 
-    SuperPrintR(mode, "BOOT", 3, e_ScreenW / 2 + 10, 354);
+    SuperPrintR(mode, g_editorStrings.testBoot, 3, e_ScreenW / 2 + 10, 354);
 
     constexpr int NPC_for_boot[] = {NPCID_GRNBOOT, NPCID_REDBOOT, NPCID_BLUBOOT};
     for(int boot = 1; boot <= 3; boot++)
@@ -1967,7 +1968,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
         }
     }
 
-    SuperPrintR(mode, "PET", 3, e_ScreenW / 2 + 10, 394);
+    SuperPrintR(mode, g_editorStrings.testPet, 3, e_ScreenW / 2 + 10, 394);
 
     constexpr int NPC_for_yoshi[] = {NPCID_YOSHI_GREEN, NPCID_YOSHI_BLUE, NPCID_YOSHI_YELLOW, NPCID_YOSHI_RED, NPCID_YOSHI_BLACK, NPCID_YOSHI_PURPLE, NPCID_YOSHI_PINK, NPCID_YOSHI_CYAN};
     for(int yoshi = 1; yoshi <= 8; yoshi++)
