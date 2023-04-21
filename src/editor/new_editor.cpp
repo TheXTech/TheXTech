@@ -2104,7 +2104,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     const std::vector<int16_t>* source_indices;
     if(m_special_page == SPECIAL_PAGE_EVENT_SOUND)
     {
-        SuperPrintR(mode, "SOUND FOR", 3, 10, 40);
+        SuperPrintR(mode, g_editorStrings.selectSoundForEvent, 3, 10, 40);
         SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
         target = &Events[m_current_event].Sound;
         current_page = &m_sounds_page;
@@ -2116,14 +2116,15 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     {
         if(m_special_subpage > 0)
         {
-            SuperPrintR(mode, "SECT " + std::to_string(m_special_subpage) + " BG FOR", 3, 10, 40);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectSectBlankPropBlankForEvent, m_special_subpage, g_editorStrings.eventsCaseBackground), 3, 10, 40);
             target = &Events[m_current_event].section[m_special_subpage-1].background_id;
         }
         else
         {
-            SuperPrintR(mode, "ALL SECT BG FOR", 3, 10, 40);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectAllSectPropBlankForEvent, g_editorStrings.eventsCaseBackground), 3, 10, 40);
             target = nullptr;
         }
+
         SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
         current_page = &m_background_page;
 
@@ -2134,14 +2135,15 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     {
         if(m_special_subpage > 0)
         {
-            SuperPrintR(mode, "SECT " + std::to_string(m_special_subpage) + " MUSIC FOR", 3, 10, 40);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectSectBlankPropBlankForEvent, m_special_subpage, g_editorStrings.eventsCaseMusic), 3, 10, 40);
             target = &Events[m_current_event].section[m_special_subpage-1].music_id;
         }
         else
         {
-            SuperPrintR(mode, "ALL SECT MUSIC FOR", 3, 10, 40);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectAllSectPropBlankForEvent, g_editorStrings.eventsCaseMusic), 3, 10, 40);
             target = nullptr;
         }
+
         SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
         current_page = &m_music_page;
 
@@ -2150,7 +2152,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     }
     else if(m_special_page == SPECIAL_PAGE_SECTION_BACKGROUND)
     {
-        SuperPrintR(mode, "SECTION " + std::to_string(curSection + 1) + " BG", 3, 10, 50);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectSectionBlankPropBlank, curSection + 1, g_editorStrings.eventsCaseBackground), 3, 10, 50);
         target = &Background2[curSection];
         current_page = &m_background_page;
 
@@ -2159,7 +2161,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     }
     else if(m_special_page == SPECIAL_PAGE_SECTION_MUSIC)
     {
-        SuperPrintR(mode, "SECTION " + std::to_string(curSection + 1) + " MUSIC", 3, 10, 50);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectSectionBlankPropBlank, curSection + 1, g_editorStrings.eventsCaseMusic), 3, 10, 50);
         target = &bgMusic[curSection];
         current_page = &m_music_page;
 
@@ -2169,13 +2171,13 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     else if(m_special_page == SPECIAL_PAGE_LEVEL_EXIT)
     {
         if(m_special_subpage == 1)
-            SuperPrintR(mode, "UPPER PATH UNLOCK", 3, 10, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]), 3, 10, 50);
         else if(m_special_subpage == 2)
-            SuperPrintR(mode,  "LEFT PATH UNLOCK", 3, 10, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Left]), 3, 10, 50);
         else if(m_special_subpage == 3)
-            SuperPrintR(mode, "LOWER PATH UNLOCK", 3, 10, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Down]), 3, 10, 50);
         else if(m_special_subpage == 4)
-            SuperPrintR(mode, "RIGHT PATH UNLOCK", 3, 10, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Right]), 3, 10, 50);
         else
             return;
 
@@ -2186,7 +2188,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     }
     else if(m_special_page == SPECIAL_PAGE_WARP_TRANSITION)
     {
-        SuperPrintR(mode, "WARP TRANSITION EFFECT", 3, 10, 50);
+        SuperPrintR(mode, g_editorStrings.selectWarpTransitionEffect, 3, 10, 50);
 
         target = &EditorCursor.Warp.transitEffect;
         current_page = nullptr;
@@ -2195,7 +2197,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC)
     {
-        SuperPrintR(mode, "WORLD MUSIC", 3, 10, 50);
+        SuperPrintR(mode, g_editorStrings.selectWorldMusic, 3, 10, 50);
         target = &EditorCursor.WorldMusic.Type;
         current_page = &m_music_page;
 

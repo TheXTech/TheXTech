@@ -558,6 +558,14 @@ XTechTranslate::XTechTranslate()
         {"editor.world.allowChars",           &g_editorStrings.worldAllowChars},
         {"editor.world.phraseCreditIndex",    &g_editorStrings.worldCreditIndex},
 
+        {"editor.select.soundForEvent",             &g_editorStrings.selectSoundForEvent},
+        {"editor.select.sectBlankPropBlankForEvent", &g_editorStrings.selectSectBlankPropBlankForEvent},
+        {"editor.select.allSectPropBlankForEvent",  &g_editorStrings.selectAllSectPropBlankForEvent},
+        {"editor.select.sectionBlankPropBlank",     &g_editorStrings.selectSectionBlankPropBlank},
+        {"editor.select.pathBlankUnlock",           &g_editorStrings.selectPathBlankUnlock},
+        {"editor.select.warpTransitEffect",         &g_editorStrings.selectWarpTransitionEffect},
+        {"editor.select.worldMusic",                &g_editorStrings.selectWorldMusic},
+
         {"editor.layers.header",              &g_editorStrings.layersHeader},
 
         {"editor.layers.label",               &g_editorStrings.labelLayer},

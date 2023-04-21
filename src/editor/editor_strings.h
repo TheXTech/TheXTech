@@ -150,6 +150,14 @@ struct EditorContent
     std::string worldAllowChars;
     std::string worldCreditIndex;
 
+    std::string selectSoundForEvent;
+    std::string selectSectBlankPropBlankForEvent;
+    std::string selectAllSectPropBlankForEvent;
+    std::string selectSectionBlankPropBlank;
+    std::string selectPathBlankUnlock;
+    std::string selectWarpTransitionEffect;
+    std::string selectWorldMusic;
+
     std::string layersHeader;
 
     std::string labelLayer;

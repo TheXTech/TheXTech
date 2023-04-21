@@ -102,8 +102,8 @@ void initEditorStrings()
     g_editorStrings.eventsItemNewEvent = "<New Event>";
 
     g_editorStrings.eventsShouldEvent = "Should Event {0}";
-    g_editorStrings.eventsChangeSectionBoundsToCurrent = "Change section {0} bounds to current?";
-    g_editorStrings.eventsChangeAllSectionBoundsToCurrent = "Change all section bounds to current?";
+    g_editorStrings.eventsChangeSectionBoundsToCurrent = "Change sect {0} bounds to current?";
+    g_editorStrings.eventsChangeAllSectionBoundsToCurrent = "Change all sect bounds to current?";
 
     g_editorStrings.eventsControlsForEvent = "Controls for event";
     g_editorStrings.eventsSettingsForEvent = "Settings for event";
@@ -146,6 +146,14 @@ void initEditorStrings()
     g_editorStrings.worldTotalStars = "Total Stars: ";
     g_editorStrings.worldAllowChars = "Allow Chars";
     g_editorStrings.worldCreditIndex = "World Credit Line {0}:";
+
+    g_editorStrings.selectSoundForEvent = "Sound for Event";
+    g_editorStrings.selectSectBlankPropBlankForEvent = "Sect {0} {1} for";
+    g_editorStrings.selectAllSectPropBlankForEvent = "All Sect {0} for";
+    g_editorStrings.selectSectionBlankPropBlank = "Section {0} {1}";
+    g_editorStrings.selectPathBlankUnlock = "Path {0} Unlock By";
+    g_editorStrings.selectWarpTransitionEffect = "Warp Transition Effect";
+    g_editorStrings.selectWorldMusic = "World Music";
 
     g_editorStrings.layersHeader = "Layers:";
 
