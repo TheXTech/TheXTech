@@ -21,6 +21,7 @@
 #include <cstddef>
 
 #include "core/sdl/gl_particle_system.h"
+#include "core/sdl/gl_inc.h"
 
 void GLParticleSystem::init(int particle_count)
 {

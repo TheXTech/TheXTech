@@ -22,6 +22,7 @@
 #ifndef GL_PROGRAM_OBJECT_H
 
 #include <vector>
+#include <cstdint>
 
 typedef unsigned int    GLenum;
 typedef int             GLint;

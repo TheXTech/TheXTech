@@ -179,6 +179,7 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
 #endif
     D_pLogDebug("OpenGL extensions: %s", glGetString(GL_EXTENSIONS));
 
+#if defined(THEXTECH_BUILD_GL_ES_MODERN) || defined(THEXTECH_BUILD_GL_ES_LEGACY) || defined(THEXTECH_BUILD_GL_DESKTOP_LEGACY)
     GLint r, g, b, depth;
     glGetIntegerv(GL_RED_BITS, &r);
     glGetIntegerv(GL_GREEN_BITS, &g);
@@ -186,6 +187,9 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
     glGetIntegerv(GL_DEPTH_BITS, &depth);
 
     pLogDebug("OpenGL video mode: R%d G%d B%d with %d-bit depth buffer", r, g, b, depth);
+#else
+    GLint depth = 16;
+#endif
 
     bool gles1 = (m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver == 1);
 

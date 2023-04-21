@@ -21,10 +21,14 @@
 #pragma once
 #ifndef GL_PARTICLE_SYSTEM_H
 
+#include <cstdint>
+
 #include <array>
 #include <vector>
 
-#include "core/sdl/gl_inc.h"
+typedef float           GLfloat;
+typedef uint8_t         GLubyte;
+
 #include "core/sdl/gl_program_object.h"
 
 struct ParticleVertexImmutable_t
