@@ -1635,23 +1635,23 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     if(UpdateButton(mode, 10 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
     {
         DisableCursorNew();
-        LevelName = TextEntryScreen::Run("Level name", LevelName);
+        LevelName = TextEntryScreen::Run(g_editorStrings.levelName, LevelName);
         MouseMove(SharedCursor.X, SharedCursor.Y);
     }
-    SuperPrintR(mode, "LEVEL NAME:", 3, 54, 42);
+    SuperPrintR(mode, g_editorStrings.levelName, 3, 54, 42);
     if(!LevelName.empty())
         SuperPrintR(mode, LevelName, 3, 54, 60);
     else
-        SuperPrintR(mode, "NONE", 3, 54, 60);
+        SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 60);
 
-    SuperPrintR(mode, "SET START:", 3, 10, 110);
+    SuperPrintR(mode, g_editorStrings.levelStartPos, 3, 10, 110);
     if(UpdateButton(mode, 240, 100, GFXBlock[622], EditorCursor.SubMode == 4, 0, 0, 32, 32))
         EditorCursor.SubMode = 4;
     if(UpdateButton(mode, 280, 100, GFXBlock[623], EditorCursor.SubMode == 5, 0, 0, 32, 32))
         EditorCursor.SubMode = 5;
 
     // section settings
-    SuperPrintR(mode, "SECTION "+std::to_string(curSection+1), 3, 240, 166);
+    SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseSectionIndex, curSection + 1), 3, 240, 166);
     if(curSection > 0 && UpdateButton(mode, 160 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         SetSection(curSection - 1);
     if(curSection < maxSections && UpdateButton(mode, 440 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -1674,20 +1674,23 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         }
 
         if(i == indices.size())
-            SuperPrint("MUSIC: " + std::to_string(bgMusic[curSection]), 3, 54, 286);
+            SuperPrint(g_editorStrings.eventsCaseMusic + ": " + std::to_string(bgMusic[curSection]), 3, 54, 286);
         else
-            SuperPrint("MUSIC: " + names[i], 3, 54, 286);
+            SuperPrint(g_editorStrings.eventsCaseMusic + ": " + names[i], 3, 54, 286);
     }
 
     if(bgMusic[curSection] == 24)
     {
         if(CustomMusic[curSection].length() < 15)
+        {
             SuperPrintR(mode, CustomMusic[curSection], 3, 374, 292);
+        }
         else
         {
             SuperPrintR(mode, CustomMusic[curSection].substr(0,14), 3, 374, 282);
             SuperPrintR(mode, CustomMusic[curSection].substr(14,14), 3, 374, 300);
         }
+
         if(UpdateButton(mode, 330 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
             StartFileBrowser(&CustomMusic[curSection], FileNamePath, "", {".mp3", ".ogg", ".spc", ".vgm"}, BROWSER_MODE_OPEN, BROWSER_CALLBACK_CUSTOM_MUSIC);
     }
@@ -1709,13 +1712,13 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
         }
 
         if(i == indices.size())
-            SuperPrintR(mode, "BG: " + std::to_string(Background2[curSection]), 3, 54, 246);
+            SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + std::to_string(Background2[curSection]), 3, 54, 246);
         else
-            SuperPrintR(mode, "BG: " + names[i], 3, 54, 246);
+            SuperPrintR(mode, g_editorStrings.eventsCaseBackground + ": " + names[i], 3, 54, 246);
     }
 
     // set bounds
-    SuperPrintR(mode, "SET BOUNDS:", 3, 10, 206);
+    SuperPrintR(mode, g_editorStrings.sectionSetBounds, 3, 10, 206);
     if(UpdateButton(mode, 240, 200, GFX.EIcons, EditorCursor.SubMode == 0, 0, 32*Icon::up, 32, 32))
         EditorCursor.SubMode = 0;
     if(UpdateButton(mode, 280, 200, GFX.EIcons, EditorCursor.SubMode == 3, 0, 32*Icon::down, 32, 32))
@@ -1728,55 +1731,61 @@ void EditorScreen::UpdateSectionsScreen(CallMode mode)
     // hwrap - LevelWrap
     if(UpdateCheckBox(mode, 10 + 4, 320 + 4, LevelWrap[curSection]))
         LevelWrap[curSection] = !LevelWrap[curSection];
-    SuperPrintR(mode, "HORIZ. WRAP", 3, 54, 326);
+    SuperPrintR(mode, g_editorStrings.sectionHorizWrap, 3, 54, 326);
     // underwater - UnderWater
     if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 320 + 4, UnderWater[curSection]))
         UnderWater[curSection] = !UnderWater[curSection];
-    SuperPrintR(mode, "UNDERWATER", 3, e_ScreenW/2 + 54, 326);
+    SuperPrintR(mode, g_editorStrings.sectionUnderwater, 3, e_ScreenW/2 + 54, 326);
     // no turn back - NoTurnBack
     if(UpdateCheckBox(mode, 10 + 4, 360 + 4, NoTurnBack[curSection]))
         NoTurnBack[curSection] = !NoTurnBack[curSection];
-    SuperPrintR(mode, "NO TURN BACK", 3, 54, 366);
+    SuperPrintR(mode, g_editorStrings.sectionNoTurnBack, 3, 54, 366);
     // leave to exit - OffScreenExit
     if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 360 + 4, OffScreenExit[curSection]))
         OffScreenExit[curSection] = !OffScreenExit[curSection];
-    SuperPrintR(mode, "LEAVE TO EXIT", 3, e_ScreenW/2 + 54, 366);
+    SuperPrintR(mode, g_editorStrings.sectionOffscreenExit, 3, e_ScreenW/2 + 54, 366);
 
     // moved autoscroll into level settings, and only allow section 0 / event 0 (level start).
     // this is due to an awful bug which couldn't be fixed if people had taken
     // advantage of the ridiculously incorrect original behavior.
     if(curSection == 0)
     {
-        SuperPrintR(mode, "SCROLL:", 3, 10, 430);
-        int sy = (vb6Round)(Events[0].AutoY*10);
-        int sx = (vb6Round)(Events[0].AutoX*10);
+        SuperPrintR(mode, g_editorStrings.sectionScroll, 3, 10, 430);
+
+        int sy = vb6Round(Events[0].AutoY*10);
         if(sy < 0)
-            SuperPrintR(mode, "U"+std::to_string(-sy), 3, 180, 422);
+            SuperPrintR(mode, g_editorStrings.letterUp    + std::to_string(-sy), 3, 180, 422);
         else if(sy > 0)
-            SuperPrintR(mode, "D"+std::to_string(sy), 3, 180, 422);
+            SuperPrintR(mode, g_editorStrings.letterDown  + std::to_string(sy), 3, 180, 422);
         else
             SuperPrintR(mode, "-", 3, 180, 422);
+
+        int sx = vb6Round(Events[0].AutoX*10);
         if(sx < 0)
-            SuperPrintR(mode, "L"+std::to_string(-sx), 3, 180, 440);
+            SuperPrintR(mode, g_editorStrings.letterLeft  + std::to_string(-sx), 3, 180, 440);
         else if(sx > 0)
-            SuperPrintR(mode, "R"+std::to_string(sx), 3, 180, 440);
+            SuperPrintR(mode, g_editorStrings.letterRight + std::to_string(sx), 3, 180, 440);
         else
             SuperPrintR(mode, "-", 3, 180, 440);
+
         if(UpdateButton(mode, 240 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
         {
             Events[0].AutoY = 0.1f*(sy-1);
             UpdateStartLevelEventBounds();
         }
+
         if(UpdateButton(mode, 280 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
         {
             Events[0].AutoY = 0.1f*(sy+1);
             UpdateStartLevelEventBounds();
         }
+
         if(UpdateButton(mode, 320 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         {
             Events[0].AutoX = 0.1f*(sx-1);
             UpdateStartLevelEventBounds();
         }
+
         if(UpdateButton(mode, 360 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         {
             Events[0].AutoX = 0.1f*(sx+1);

@@ -121,6 +121,16 @@ void initEditorStrings()
 
     g_editorStrings.eventsHeaderTriggerEvent = "Trigger:";
 
+    g_editorStrings.levelName = "Level Name";
+    g_editorStrings.levelStartPos = "Start Pos";
+
+    g_editorStrings.sectionSetBounds = "Set Bounds";
+    g_editorStrings.sectionScroll = "Scroll";
+    g_editorStrings.sectionHorizWrap = "Horiz. Wrap";
+    g_editorStrings.sectionUnderwater = "Underwater";
+    g_editorStrings.sectionNoTurnBack = "No Turn Back";
+    g_editorStrings.sectionOffscreenExit = "Offscreen Exit";
+
     g_editorStrings.layersHeader = "Layers:";
 
     g_editorStrings.labelLayer = "Layer:";

@@ -532,6 +532,16 @@ XTechTranslate::XTechTranslate()
 
         {"editor.events.headerTriggerEvent",  &g_editorStrings.eventsHeaderTriggerEvent},
 
+        {"editor.level.levelName",            &g_editorStrings.levelName},
+        {"editor.level.startPos",             &g_editorStrings.levelStartPos},
+
+        {"editor.section.setBounds",          &g_editorStrings.sectionSetBounds},
+        {"editor.section.scroll",             &g_editorStrings.sectionScroll},
+        {"editor.section.horizWrap",          &g_editorStrings.sectionHorizWrap},
+        {"editor.section.underwater",         &g_editorStrings.sectionUnderwater},
+        {"editor.section.noTurnBack",         &g_editorStrings.sectionNoTurnBack},
+        {"editor.section.offscreenExit",      &g_editorStrings.sectionOffscreenExit},
+
         {"editor.layers.header",              &g_editorStrings.layersHeader},
 
         {"editor.layers.label",               &g_editorStrings.labelLayer},

@@ -124,6 +124,16 @@ struct EditorContent
 
     std::string eventsHeaderTriggerEvent;
 
+    std::string levelName;
+    std::string levelStartPos;
+
+    std::string sectionSetBounds;
+    std::string sectionScroll;
+    std::string sectionHorizWrap;
+    std::string sectionUnderwater;
+    std::string sectionNoTurnBack;
+    std::string sectionOffscreenExit;
+
     std::string layersHeader;
 
     std::string labelLayer;
