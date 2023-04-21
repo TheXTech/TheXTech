@@ -518,114 +518,121 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
     {
         // Containers
         SuperPrintR(mode, g_editorStrings.npcInContainer, 3, e_ScreenW - 40, 40);
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFXNPC[91], EditorCursor.NPC.Type == 91, 0, 0, NPCWidth[91], NPCHeight[91]))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFXNPC[NPCID_BURIEDPLANT], EditorCursor.NPC.Type == NPCID_BURIEDPLANT, 0, 0, NPCWidth[NPCID_BURIEDPLANT], NPCHeight[NPCID_BURIEDPLANT]))
         {
-            if(EditorCursor.NPC.Type == 91)
+            if(EditorCursor.NPC.Type == NPCID_BURIEDPLANT)
             {
                 EditorCursor.NPC.Type = EditorCursor.NPC.Special;
                 EditorCursor.NPC.Special = 0;
             }
-            else if(!(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
-                || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284))
+            else if(!(EditorCursor.NPC.Type == NPCID_BURIEDPLANT || EditorCursor.NPC.Type == NPCID_YOSHIEGG
+                || EditorCursor.NPC.Type == NPCID_BUBBLE || EditorCursor.NPC.Type == NPCID_LAKITU_SMW))
             {
                 EditorCursor.NPC.Special = EditorCursor.NPC.Type;
-                EditorCursor.NPC.Type = 91;
+                EditorCursor.NPC.Type = NPCID_BURIEDPLANT;
             }
             else
             {
-                EditorCursor.NPC.Type = 91;
+                EditorCursor.NPC.Type = NPCID_BURIEDPLANT;
             }
         }
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 100 + 4, GFXNPC[96], EditorCursor.NPC.Type == 96))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 100 + 4, GFXNPC[NPCID_YOSHIEGG], EditorCursor.NPC.Type == NPCID_YOSHIEGG))
         {
-            if(EditorCursor.NPC.Type == 96)
+            if(EditorCursor.NPC.Type == NPCID_YOSHIEGG)
             {
                 EditorCursor.NPC.Type = EditorCursor.NPC.Special;
                 EditorCursor.NPC.Special = 0;
             }
-            else if(!(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
-                || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284))
+            else if(!(EditorCursor.NPC.Type == NPCID_BURIEDPLANT || EditorCursor.NPC.Type == NPCID_YOSHIEGG
+                || EditorCursor.NPC.Type == NPCID_BUBBLE || EditorCursor.NPC.Type == NPCID_LAKITU_SMW))
             {
                 EditorCursor.NPC.Special = EditorCursor.NPC.Type;
-                EditorCursor.NPC.Type = 96;
+                EditorCursor.NPC.Type = NPCID_YOSHIEGG;
             }
             else
             {
-                EditorCursor.NPC.Type = 96;
+                EditorCursor.NPC.Type = NPCID_YOSHIEGG;
             }
         }
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFXNPC[284], EditorCursor.NPC.Type == 284, 0, 0, NPCWidthGFX[284], NPCHeightGFX[284]))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFXNPC[NPCID_LAKITU_SMW], EditorCursor.NPC.Type == NPCID_LAKITU_SMW, 0, 0, NPCWidthGFX[NPCID_LAKITU_SMW], NPCHeightGFX[NPCID_LAKITU_SMW]))
         {
-            if(EditorCursor.NPC.Type == 284)
+            if(EditorCursor.NPC.Type == NPCID_LAKITU_SMW)
             {
                 EditorCursor.NPC.Type = EditorCursor.NPC.Special;
                 EditorCursor.NPC.Special = 0;
             }
-            else if(!(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
-                || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284))
+            else if(!(EditorCursor.NPC.Type == NPCID_BURIEDPLANT || EditorCursor.NPC.Type == NPCID_YOSHIEGG
+                || EditorCursor.NPC.Type == NPCID_BUBBLE || EditorCursor.NPC.Type == NPCID_LAKITU_SMW))
             {
                 EditorCursor.NPC.Special = EditorCursor.NPC.Type;
-                EditorCursor.NPC.Type = 284;
+                EditorCursor.NPC.Type = NPCID_LAKITU_SMW;
             }
             else
             {
-                EditorCursor.NPC.Type = 284;
+                EditorCursor.NPC.Type = NPCID_LAKITU_SMW;
             }
         }
         if(AllowBubble())
         {
-            if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[283], EditorCursor.NPC.Type == 283, 0, 0, NPCWidthGFX[283], NPCHeightGFX[283]))
+            if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_BUBBLE], EditorCursor.NPC.Type == NPCID_BUBBLE, 0, 0, NPCWidthGFX[NPCID_BUBBLE], NPCHeightGFX[NPCID_BUBBLE]))
             {
-                if(EditorCursor.NPC.Type == 283)
+                if(EditorCursor.NPC.Type == NPCID_BUBBLE)
                 {
                     EditorCursor.NPC.Type = EditorCursor.NPC.Special;
                     EditorCursor.NPC.Special = 0;
                 }
-                else if(!(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
-                    || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284))
+                else if(!(EditorCursor.NPC.Type == NPCID_BURIEDPLANT || EditorCursor.NPC.Type == NPCID_YOSHIEGG
+                    || EditorCursor.NPC.Type == NPCID_BUBBLE || EditorCursor.NPC.Type == NPCID_LAKITU_SMW))
                 {
                     EditorCursor.NPC.Special = EditorCursor.NPC.Type;
-                    EditorCursor.NPC.Type = 283;
+                    EditorCursor.NPC.Type = NPCID_BUBBLE;
                 }
                 else
                 {
-                    EditorCursor.NPC.Type = 283;
+                    EditorCursor.NPC.Type = NPCID_BUBBLE;
                 }
             }
         }
-        // Various properties...
+
+        // Various properties that depend on type, get the real one here:
         int type;
-        if(EditorCursor.NPC.Type == 91 || EditorCursor.NPC.Type == 96
-            || EditorCursor.NPC.Type == 283 || EditorCursor.NPC.Type == 284)
+        if(EditorCursor.NPC.Type == NPCID_BURIEDPLANT || EditorCursor.NPC.Type == NPCID_YOSHIEGG
+            || EditorCursor.NPC.Type == NPCID_BUBBLE || EditorCursor.NPC.Type == NPCID_LAKITU_SMW)
+        {
             type = EditorCursor.NPC.Special;
+        }
         else
+        {
             type = EditorCursor.NPC.Type;
+        }
+
         // Direction
         Icon::Icons dir_neg_icon = Icon::left;
         Icon::Icons dir_pos_icon = Icon::right;
 
         bool show_random = true;
-        if(type == 57 || type == 60 || type == 62 || type == 64 || type == 66)
+        if(type == NPCID_CONVEYOR || type == NPCID_YELBLOCKS || type == NPCID_BLUBLOCKS || type == NPCID_GRNBLOCKS || type == NPCID_REDBLOCKS)
             show_random = false;
 
+        // "direction" means different things for these types
         if(mode == CallMode::Render)
         {
-            if(type == 60 || type == 62 || type == 64 || type == 66 || type == 104)
+            if(type == NPCID_YELBLOCKS || type == NPCID_BLUBLOCKS || type == NPCID_GRNBLOCKS || type == NPCID_REDBLOCKS || type == NPCID_PLATFORM_SMB3)
             {
-                SuperPrint("ACTIVE", 3, e_ScreenW - 174, 40);
+                SuperPrint(g_editorStrings.npcPropertyActive, 3, e_ScreenW - 174, 40);
                 dir_neg_icon = Icon::x;
                 dir_pos_icon = Icon::check;
             }
-            else if(type == 259 || type == 260)
+            else if(type == NPCID_ROTODISK || type == NPCID_FIREBAR)
             {
-                SuperPrint("ATTACH", 3, e_ScreenW - 174, 40);
+                SuperPrint(g_editorStrings.npcPropertyAttachSurface, 3, e_ScreenW - 174, 40);
                 dir_neg_icon = Icon::bottom;
                 dir_pos_icon = Icon::top;
             }
             else
             {
-                SuperPrint("FACING", 3, e_ScreenW - 174, 40);
-                if(type == 106 || (NPCIsAParaTroopa[type] && EditorCursor.NPC.Special == 3))
+                SuperPrint(g_editorStrings.npcPropertyFacing, 3, e_ScreenW - 174, 40);
+                if(type == NPCID_PLATFORM_SMB || (NPCIsAParaTroopa[type] && EditorCursor.NPC.Special == 3))
                 {
                     dir_neg_icon = Icon::up;
                     dir_pos_icon = Icon::down;
@@ -633,6 +640,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             }
         }
 
+        // show and apply direction
         if(UpdateButton(mode, e_ScreenW - 180 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == -1, 0, 32 * dir_neg_icon, 32, 32))
             EditorCursor.NPC.Direction = -1;
         if(show_random && UpdateButton(mode, e_ScreenW - 140 + 4, 60 + 4, GFX.EIcons, EditorCursor.NPC.Direction == 0, 0, 32 * Icon::unk, 32, 32))
@@ -853,7 +861,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         {
             SuperPrint(g_editorStrings.labelLayer, 3, e_ScreenW - 200, 414);
             if(EditorCursor.NPC.Layer == LAYER_NONE)
-                SuperPrint("DEFAULT", 3, e_ScreenW - 200, 440);
+                SuperPrint(g_editorStrings.layerDefault, 3, e_ScreenW - 200, 440);
             else
                 SuperPrint(GetL(EditorCursor.NPC.Layer), 3, e_ScreenW - 200, 440);
             if(EditorCursor.NPC.AttLayer != LAYER_NONE && EditorCursor.NPC.AttLayer != LAYER_DEFAULT)
@@ -953,7 +961,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         SuperPrintR(mode, g_editorStrings.wordCoins, 3, 70, 40);
 
         bool currently_coins = EditorCursor.Block.Special > 0 && EditorCursor.Block.Special < 1000;
-        if(UpdateButton(mode, 60 + 4, 60 + 4, GFXNPC[10], currently_coins, 0, 0, 32, 32) && !currently_coins)
+        if(UpdateButton(mode, 60 + 4, 60 + 4, GFXNPC[NPCID_COIN_SMB3], currently_coins, 0, 0, 32, 32) && !currently_coins)
         {
             EditorCursor.Block.Special = 1;
             currently_coins = true;
@@ -972,23 +980,23 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             EditorCursor.Block.Special = 0;
 
         SuperPrintR(mode, "3", 3, 40 + 10, 140);
-        static const int p7_common[] = {10, 9, 90, 14, 264, 34, 169, 170, 226, 287};
+        static const int p7_common[] = {NPCID_COIN_SMB3, NPCID_SHROOM_SMB3, NPCID_LIFE_SMB3, NPCID_FIREFLOWER_SMB3, NPCID_ICEFLOWER_SMB3, NPCID_LEAF, NPCID_TANOOKISUIT, NPCID_HAMMERSUIT, NPCID_VINEHEAD_GREEN_SMB3, NPCID_RANDOM_POWERUP};
         UpdateNPCGrid(mode, 40, 160, p7_common, sizeof(p7_common)/sizeof(int), 10);
 
         SuperPrintR(mode, "4", 3, 40 + 10, 200);
-        static const int p7_smw[] = {33, 185, 187, 183, 188, 277, 95, 31, 227};
+        static const int p7_smw[] = {NPCID_COIN_SMW, NPCID_SHROOM_SMW, NPCID_LIFE_SMW, NPCID_FIREFLOWER_SMW, NPCID_MOON, NPCID_ICEFLOWER_SMW, NPCID_YOSHI_GREEN, NPCID_KEY, NPCID_VINEHEAD_SMW};
         UpdateNPCGrid(mode, 40, 220, p7_smw, sizeof(p7_smw)/sizeof(int), 10);
 
         SuperPrintR(mode, "1", 3, 40 + 10, 260);
-        static const int p7_smb1[] = {88, 184, 186, 182, 153};
+        static const int p7_smb1[] = {NPCID_COIN_SMB, NPCID_SHROOM_SMB, NPCID_LIFE_SMB, NPCID_FIREFLOWER_SMB, NPCID_PSHROOM};
         UpdateNPCGrid(mode, 40, 280, p7_smb1, sizeof(p7_smb1)/sizeof(int), 5);
 
         SuperPrintR(mode, "2", 3, 40 + 10, 320);
-        static const int p7_smb2[] = {138, 249, 134, 241, 240};
+        static const int p7_smb2[] = {NPCID_COIN_SMB2, NPCID_SHROOM_SMB2, NPCID_BOMB, NPCID_POW, NPCID_TIMER_SMB2};
         UpdateNPCGrid(mode, 40, 340, p7_smb2, sizeof(p7_smb2)/sizeof(int), 5);
 
         SuperPrintR(mode, "*", 3, 40 + 10, 380);
-        static const int p7_misc[] = {152, 250, 254, 251, 252, 253};
+        static const int p7_misc[] = {NPCID_RING_MISC, NPCID_HEART, NPCID_FAIRY_PENDANT, NPCID_GRNRUPEE, NPCID_BLURUPEE, NPCID_REDRUPEE};
         UpdateNPCGrid(mode, 40, 400, p7_misc, sizeof(p7_misc)/sizeof(int), 10);
     }
 }

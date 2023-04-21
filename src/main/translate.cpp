@@ -441,6 +441,9 @@ XTechTranslate::XTechTranslate()
         {"editor.npc.inContainer",          &g_editorStrings.npcInContainer},
         {"editor.npc.inertNice",            &g_editorStrings.npcInertNice},
         {"editor.npc.stuckStop",            &g_editorStrings.npcStuckStop},
+        {"editor.npc.props.active",         &g_editorStrings.npcPropertyActive},
+        {"editor.npc.props.attachSurface",  &g_editorStrings.npcPropertyAttachSurface},
+        {"editor.npc.props.facing",         &g_editorStrings.npcPropertyFacing},
         {"editor.npc.abbrevGen",            &g_editorStrings.npcAbbrevGen},
 
         {"editor.npc.ai.aiIs",              &g_editorStrings.npcAiIs},
@@ -533,6 +536,7 @@ XTechTranslate::XTechTranslate()
 
         {"editor.layers.label",               &g_editorStrings.labelLayer},
         {"editor.layers.labelAbbrevAttLayer", &g_editorStrings.labelAbbrevAttLayer},
+        {"editor.layers.default",             &g_editorStrings.layerDefault},
 #endif // THEXTECH_ENABLE_EDITOR
     };
 

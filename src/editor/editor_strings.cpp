@@ -34,6 +34,9 @@ void initEditorStrings()
     g_editorStrings.npcInertNice = "Nice";
     g_editorStrings.npcStuckStop = "Stop";
     g_editorStrings.npcAbbrevGen = "Gen";
+    g_editorStrings.npcPropertyActive = "Active";
+    g_editorStrings.npcPropertyAttachSurface = "Attach";
+    g_editorStrings.npcPropertyFacing = "Facing";
 
     g_editorStrings.npcAiIs = "AI: {0}";
     g_editorStrings.npcAiTarget = "Target";
@@ -122,6 +125,7 @@ void initEditorStrings()
 
     g_editorStrings.labelLayer = "Layer:";
     g_editorStrings.labelAbbrevAttLayer = "Att: ";
+    g_editorStrings.layerDefault = "Default";
 
     g_editorStrings.listWarpTransitNames = {"NONE", "SCROLL", "FADE", "CIRCLE", "FLIP (H)", "FLIP (V)"};
 }

@@ -37,6 +37,9 @@ struct EditorContent
     std::string npcInertNice;
     std::string npcStuckStop;
     std::string npcAbbrevGen;
+    std::string npcPropertyActive;
+    std::string npcPropertyAttachSurface;
+    std::string npcPropertyFacing;
 
     std::string npcAiIs;
     std::string npcAiTarget;
@@ -125,6 +128,7 @@ struct EditorContent
 
     std::string labelLayer;
     std::string labelAbbrevAttLayer;
+    std::string layerDefault;
 
     std::vector<std::string> listWarpTransitNames{6};
 };
