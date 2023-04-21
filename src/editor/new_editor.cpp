@@ -2337,7 +2337,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(EditorCursor.NPC.TriggerActivate != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerActivate), 3, e_ScreenW - 200, 220 + 2);
         else
-            SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 220 + 2);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 220 + 2);
 
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
@@ -2348,7 +2348,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(EditorCursor.NPC.TriggerDeath != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerDeath), 3, e_ScreenW - 200, 260 + 2);
         else
-            SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 260 + 2);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 260 + 2);
 
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 240 + 4, GFX.EIcons, m_special_subpage == 2, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 2;
@@ -2359,7 +2359,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(EditorCursor.NPC.TriggerTalk != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerTalk), 3, e_ScreenW - 200, 300 + 2);
         else
-            SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 300 + 2);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 300 + 2);
 
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 280 + 4, GFX.EIcons, m_special_subpage == 3, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 3;
@@ -2370,7 +2370,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(EditorCursor.NPC.TriggerLast != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerLast), 3, e_ScreenW - 200, 340 + 2);
         else
-            SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 340 + 2);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 340 + 2);
 
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 320 + 4, GFX.EIcons, m_special_subpage == 4, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 4;
@@ -2383,7 +2383,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(EditorCursor.Block.TriggerHit != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 200, 220 + 2);
         else
-            SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 220 + 2);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 220 + 2);
 
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
@@ -2394,7 +2394,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(EditorCursor.Block.TriggerDeath != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 200, 260 + 2);
         else
-            SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 260 + 2);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 260 + 2);
 
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 240 + 4, GFX.EIcons, m_special_subpage == 2, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 2;
@@ -2405,7 +2405,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(EditorCursor.Block.TriggerLast != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 200, 300 + 2);
         else
-            SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 300 + 2);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 300 + 2);
 
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 280 + 4, GFX.EIcons, m_special_subpage == 3, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 3;
@@ -2418,7 +2418,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(EditorCursor.Warp.eventEnter != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Warp.eventEnter), 3, e_ScreenW - 200, 220 + 2);
         else
-            SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 220 + 2);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 220 + 2);
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
     }
@@ -2534,7 +2534,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     // render current event
     SuperPrintR(mode, event_name + " EVENT:", 3, 10, 40);
     if(*event_to_set == EVENT_NONE)
-        SuperPrintR(mode, "NONE", 3, 10, 56);
+        SuperPrintR(mode, g_mainMenu.caseNone, 3, 10, 56);
     else
         SuperPrintR(mode, Events[*event_to_set].Name, 3, 10, 56);
 
@@ -2544,7 +2544,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         eventindex_t e = m_events_page*10 + i - 1;
         if(e == EVENT_NONE)
         {
-            SuperPrintR(mode, "NONE", 3, 54, 80 + 40*i + 12);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 80 + 40*i + 12);
             if(UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *event_to_set == EVENT_NONE, 0, 0, 32, 32))
                 *event_to_set = EVENT_NONE;
         }
@@ -2618,7 +2618,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
     {
         SuperPrintR(mode, "LAYER:", 3, e_ScreenW - 200, 200 + 2);
         if(EditorCursor.Layer == LAYER_NONE)
-            SuperPrintR(mode, "DEFAULT", 3, e_ScreenW - 200, 220 + 2);
+            SuperPrintR(mode, g_editorStrings.layerDefault, 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, GetL(EditorCursor.Layer), 3, e_ScreenW - 200, 220 + 2);
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 0, 0, 32*Icon::action, 32, 32))
@@ -2626,7 +2626,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
 
         SuperPrintR(mode, "ATTACHED:", 3, e_ScreenW - 200, 260 + 2);
         if(EditorCursor.NPC.AttLayer == LAYER_NONE || EditorCursor.NPC.AttLayer == LAYER_DEFAULT)
-            SuperPrintR(mode, "NONE", 3, e_ScreenW - 200, 280 + 2);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 280 + 2);
         else
             SuperPrintR(mode, GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 200, 280 + 2);
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 260 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
@@ -2692,9 +2692,9 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
     if(*layer_to_set == LAYER_NONE)
     {
         if(m_special_subpage == 1 || m_special_page == SPECIAL_PAGE_EVENT_LAYERS)
-            SuperPrintR(mode, "NONE", 3, 10, 56);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, 10, 56);
         else
-            SuperPrintR(mode, "DEFAULT", 3, 10, 56);
+            SuperPrintR(mode, g_editorStrings.layerDefault, 3, 10, 56);
     }
     else
         SuperPrintR(mode, GetL(*layer_to_set), 3, 10, 56);
@@ -2715,7 +2715,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         // separate None for Event layers
         if(l == -1)
         {
-            SuperPrintR(mode, "NONE", 3, 54, 80 + 40*i + 12);
+            SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 80 + 40*i + 12);
 
             if(m_special_page != SPECIAL_PAGE_EVENT_LAYERS && UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *layer_to_set == LAYER_NONE, 0, 0, 32, 32))
                 *layer_to_set = LAYER_NONE;
@@ -2727,9 +2727,9 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         {
             // AttLayer
             if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
-                SuperPrintR(mode, "NONE", 3, 54, 80 + 40*i + 12);
+                SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 80 + 40*i + 12);
             else
-                SuperPrintR(mode, "DEFAULT", 3, 54, 80 + 40*i + 12);
+                SuperPrintR(mode, g_editorStrings.layerDefault, 3, 54, 80 + 40*i + 12);
 
             if(UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *layer_to_set == LAYER_NONE || (*layer_to_set) == l, 0, 0, 32, 32))
                 *layer_to_set = LAYER_NONE;
@@ -2993,7 +2993,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     // Layers
     SuperPrintR(mode, "LAYER:", 3, e_ScreenW - 160, 434);
     if(EditorCursor.Block.Layer == LAYER_NONE)
-        SuperPrintR(mode, "DEFAULT", 3, e_ScreenW - 160, 460);
+        SuperPrintR(mode, g_editorStrings.layerDefault, 3, e_ScreenW - 160, 460);
     else
         SuperPrintR(mode, GetL(EditorCursor.Block.Layer), 3, e_ScreenW - 160, 460);
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
@@ -3083,7 +3083,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
     // Layers
     SuperPrintR(mode, "LAYER:", 3, e_ScreenW - 160, 434);
     if(EditorCursor.Background.Layer == LAYER_NONE)
-        SuperPrintR(mode, "DEFAULT", 3, e_ScreenW - 160, 460);
+        SuperPrintR(mode, g_editorStrings.layerDefault, 3, e_ScreenW - 160, 460);
     else
         SuperPrintR(mode, GetL(EditorCursor.Background.Layer), 3, e_ScreenW - 160, 460);
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
@@ -3150,7 +3150,7 @@ void EditorScreen::UpdateWaterScreen(CallMode mode)
     // layers
     SuperPrintR(mode, "LAYER:", 3, 246, 234);
     if(EditorCursor.Layer == LAYER_NONE)
-        SuperPrintR(mode, "DEFAULT", 3, 206, 260);
+        SuperPrintR(mode, g_editorStrings.layerDefault, 3, 206, 260);
     else
         SuperPrintR(mode, GetL(EditorCursor.Layer), 3, 206, 260);
     if(UpdateButton(mode, 380 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
@@ -3246,7 +3246,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
     {
         SuperPrint("LAYER:", 3, e_ScreenW - 200, 414);
         if(EditorCursor.Warp.Layer == LAYER_NONE)
-            SuperPrint("DEFAULT", 3, e_ScreenW - 240, 440);
+            SuperPrint(g_editorStrings.layerDefault, 3, e_ScreenW - 240, 440);
         else
             SuperPrint(GetL(EditorCursor.Warp.Layer), 3, e_ScreenW - 240, 440);
     }
@@ -3460,7 +3460,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             }
             else
             {
-                SuperPrintR(mode, "NONE", 3, 4, 330);
+                SuperPrintR(mode, g_mainMenu.caseNone, 3, 4, 330);
             }
             if(UpdateButton(mode, 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
             {
@@ -3684,7 +3684,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     }
     else
     {
-        SuperPrintR(mode, "NONE", 3, e_ScreenW - 240 + 4, 330);
+        SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 240 + 4, 330);
     }
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
     {
