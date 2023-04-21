@@ -1003,7 +1003,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
 void EditorScreen::UpdateMagicBlockScreen(CallMode mode)
 {
-    SuperPrintR(mode, "MAGIC BLOCK SETTINGS", 3, 160, 50);
+    SuperPrintR(mode, "MAGIC BLOCK (DEPRECATED EXTRA SETTINGS)", 3, 160, 50);
 
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
         m_special_page = SPECIAL_PAGE_EDITOR_SETTINGS;
