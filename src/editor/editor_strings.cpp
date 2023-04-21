@@ -79,6 +79,8 @@ void initEditorStrings()
     g_editorStrings.letterLeft = "L";
     g_editorStrings.letterRight = "R";
 
+    g_editorStrings.toggleMagicBlock = "Magic Block";
+
     g_editorStrings.eventsHeader = "Events:";
     g_editorStrings.eventsLetterActivate = "A:";
     g_editorStrings.eventsLetterDeath = "D:";

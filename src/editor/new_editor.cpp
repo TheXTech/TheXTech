@@ -1799,7 +1799,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     // settings screen, now.
 
     // magic block settings
-    SuperPrintR(mode, "MAGIC BLOCK MODE", 3, 10, 50);
+    SuperPrintR(mode, g_editorStrings.magicBlock, 3, 10, 50);
 
 
     if(EditorCustom::block_pages.empty() && EditorCustom::bgo_pages.empty() && EditorCustom::tile_pages.empty())

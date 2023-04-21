@@ -82,6 +82,8 @@ struct EditorContent
     std::string letterLeft;
     std::string letterRight;
 
+    std::string toggleMagicBlock;
+
     std::string eventsHeader;
     std::string eventsLetterActivate;
     std::string eventsLetterDeath;

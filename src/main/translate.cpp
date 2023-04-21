@@ -489,6 +489,8 @@ XTechTranslate::XTechTranslate()
         {"editor.letterLeft",               &g_editorStrings.letterLeft},
         {"editor.letterRight",              &g_editorStrings.letterRight},
 
+        {"editor.toggleMagicBlock",         &g_editorStrings.toggleMagicBlock},
+
         {"editor.events.header",            &g_editorStrings.eventsHeader},
         {"editor.events.letterActivate",    &g_editorStrings.eventsLetterActivate},
         {"editor.events.letterDeath",       &g_editorStrings.eventsLetterDeath},
