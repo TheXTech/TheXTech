@@ -1997,56 +1997,63 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     if(UpdateButton(mode, 10 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
     {
         DisableCursorNew();
-        WorldName = TextEntryScreen::Run("World name", WorldName);
+        WorldName = TextEntryScreen::Run(g_editorStrings.worldName, WorldName);
         MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
     }
 
-    SuperPrintR(mode, "WORLD NAME:", 3, 54, 42);
+    SuperPrintR(mode, g_editorStrings.worldName, 3, 54, 42);
     if(!WorldName.empty())
         SuperPrintR(mode, WorldName, 3, 54, 60);
     else
-        SuperPrintR(mode, "NONE", 3, 54, 60);
+        SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 60);
 
     // auto start level
     if(UpdateButton(mode, 10 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
         StartFileBrowser(&StartLevel, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
 
-    SuperPrintR(mode, "AUTO START LEVEL:", 3, 54, 102);
+    SuperPrintR(mode, g_editorStrings.worldIntroLevel, 3, 54, 102);
 
     if(!StartLevel.empty())
         SuperPrintR(mode, StartLevel, 3, 54, 120);
     else
-        SuperPrintR(mode, "NONE", 3, 54, 120);
+        SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 120);
 
     // no world map - NoMap
     if(UpdateCheckBox(mode, 10 + 4, 160 + 4, NoMap))
         NoMap = !NoMap;
 
-    SuperPrintR(mode, "NO WORLD MAP", 3, 54, 170);
+    SuperPrintR(mode, g_editorStrings.worldHubWorld, 3, 54, 170);
+
     // restart after death - RestartLevel
     if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 160 + 4, RestartLevel))
         RestartLevel = !RestartLevel;
 
-    SuperPrintR(mode, "RESTART", 3, e_ScreenW/2 + 54, 162);
-    SuperPrintR(mode, "ON DEATH", 3, e_ScreenW/2 + 54, 180);
+    SuperPrintR(mode, g_editorStrings.worldRetryOnFail, 3, e_ScreenW/2 + 54, 170);
 
+    // world star count
     if(MaxWorldStars > 0 && UpdateButton(mode, 120 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         MaxWorldStars --;
 
-    SuperPrintR(mode, "TOTAL STARS: " + std::to_string(MaxWorldStars), 3, 170, 230);
+    SuperPrintR(mode, g_editorStrings.worldTotalStars + std::to_string(MaxWorldStars), 3, 170, 230);
 
     if(UpdateButton(mode, 440 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         MaxWorldStars ++;
 
-    SuperPrintR(mode, "ALLOW CHARS:", 3, 10, 290);
+    // allow chars
+    SuperPrintR(mode, g_editorStrings.worldAllowChars, 3, 10, 290);
+
     if(UpdateButton(mode, 240 + 4, 280 + 4, GFXBlock[622], !blockCharacter[1], 0, 0, 32, 32))
         blockCharacter[1] = !blockCharacter[1];
+
     if(UpdateButton(mode, 280 + 4, 280 + 4, GFXBlock[623], !blockCharacter[2], 0, 0, 32, 32))
         blockCharacter[2] = !blockCharacter[2];
+
     if(UpdateButton(mode, 320 + 4, 280 + 4, GFXBlock[624], !blockCharacter[3], 0, 0, 32, 32))
         blockCharacter[3] = !blockCharacter[3];
+
     if(UpdateButton(mode, 360 + 4, 280 + 4, GFXBlock[625], !blockCharacter[4], 0, 0, 32, 32))
         blockCharacter[4] = !blockCharacter[4];
+
     if(UpdateButton(mode, 400 + 4, 280 + 4, GFXBlock[631], !blockCharacter[5], 0, 0, 32, 32))
         blockCharacter[5] = !blockCharacter[5];
 
@@ -2054,14 +2061,15 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
     if(blockCharacter[1] && blockCharacter[2] && blockCharacter[3] && blockCharacter[4] && blockCharacter[5])
         blockCharacter[1] = false;
 
-    // credits...
+
+    // World credits...
     if(m_special_subpage > 0 && UpdateButton(mode, 10 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_special_subpage --;
 
     if(UpdateButton(mode, 50 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
     {
         DisableCursorNew();
-        WorldCredits[m_special_subpage + 1] = TextEntryScreen::Run("Credits", WorldCredits[m_special_subpage + 1]);
+        WorldCredits[m_special_subpage + 1] = TextEntryScreen::Run(fmt::format_ne(g_editorStrings.worldCreditIndex, m_special_subpage + 1), WorldCredits[m_special_subpage + 1]);
         MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
         for(int i = SDL_max(numWorldCredits, m_special_subpage + 1); i > 0; --i) // Find the last non-empty line
         {
@@ -2075,7 +2083,8 @@ void EditorScreen::UpdateWorldSettingsScreen(CallMode mode)
 
     if(m_special_subpage < 4 && UpdateButton(mode, 90 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_special_subpage ++;
-    SuperPrintR(mode, "WORLD CREDITS LINE "+std::to_string(m_special_subpage + 1) + ":", 3, 144, 342);
+
+    SuperPrintR(mode, fmt::format_ne(g_editorStrings.worldCreditIndex, m_special_subpage + 1), 3, 144, 342);
     SuperPrintR(mode, WorldCredits[m_special_subpage + 1], 3, 144, 360);
 }
 
@@ -2088,6 +2097,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         else
             m_special_page = SPECIAL_PAGE_NONE;
     }
+
     vbint_t* target;
     int* current_page;
     const std::vector<std::string>* source;

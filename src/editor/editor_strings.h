@@ -142,6 +142,14 @@ struct EditorContent
     std::string sectionNoTurnBack;
     std::string sectionOffscreenExit;
 
+    std::string worldName;
+    std::string worldIntroLevel;
+    std::string worldHubWorld;
+    std::string worldRetryOnFail;
+    std::string worldTotalStars;
+    std::string worldAllowChars;
+    std::string worldCreditIndex;
+
     std::string layersHeader;
 
     std::string labelLayer;

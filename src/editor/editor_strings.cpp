@@ -139,6 +139,14 @@ void initEditorStrings()
     g_editorStrings.sectionNoTurnBack = "No Turn Back";
     g_editorStrings.sectionOffscreenExit = "Offscreen Exit";
 
+    g_editorStrings.worldName = "World Name";
+    g_editorStrings.worldIntroLevel = "Intro Level";
+    g_editorStrings.worldHubWorld = "Hub World";
+    g_editorStrings.worldRetryOnFail = "Retry On Fail";
+    g_editorStrings.worldTotalStars = "Total Stars: ";
+    g_editorStrings.worldAllowChars = "Allow Chars";
+    g_editorStrings.worldCreditIndex = "World Credit Line {0}:";
+
     g_editorStrings.layersHeader = "Layers:";
 
     g_editorStrings.labelLayer = "Layer:";

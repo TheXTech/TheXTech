@@ -550,6 +550,14 @@ XTechTranslate::XTechTranslate()
         {"editor.section.noTurnBack",         &g_editorStrings.sectionNoTurnBack},
         {"editor.section.offscreenExit",      &g_editorStrings.sectionOffscreenExit},
 
+        {"editor.world.name",                 &g_editorStrings.worldName},
+        {"editor.world.introLevel",           &g_editorStrings.worldIntroLevel},
+        {"editor.world.hubWorld",             &g_editorStrings.worldHubWorld},
+        {"editor.world.retryOnFail",          &g_editorStrings.worldRetryOnFail},
+        {"editor.world.totalStars",           &g_editorStrings.worldTotalStars},
+        {"editor.world.allowChars",           &g_editorStrings.worldAllowChars},
+        {"editor.world.phraseCreditIndex",    &g_editorStrings.worldCreditIndex},
+
         {"editor.layers.header",              &g_editorStrings.layersHeader},
 
         {"editor.layers.label",               &g_editorStrings.labelLayer},
