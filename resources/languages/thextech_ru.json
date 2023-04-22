@@ -111,6 +111,8 @@
             "labelMoveLayer": "",
             "promptLayerName": ""
         },
+        "letterCoordX": "",
+        "letterCoordY": "",
         "letterDown": "Н",
         "letterLeft": "Л",
         "letterRight": "П",
@@ -119,6 +121,7 @@
             "levelName": "",
             "startPos": ""
         },
+        "mapPos": "",
         "npc": {
             "abbrevGen": "Ген.",
             "ai": {
@@ -156,6 +159,7 @@
         "phraseRadiusIndex": "Радиус {0}",
         "phraseSectionIndex": "Секция {0}",
         "phraseTextOf": "Текст \"{0}\"",
+        "phraseWarpIndex": "",
         "section": {
             "horizWrap": "",
             "noTurnBack": "",
@@ -182,6 +186,34 @@
         },
         "toggleMagicBlock": "",
         "warp": {
+            "allow": "",
+            "cannonExit": "",
+            "dir": "",
+            "effect": "",
+            "in": "",
+            "item": "",
+            "lvlWarp": "",
+            "needFloor": "",
+            "needKey": "",
+            "needStarCount": "",
+            "out": "",
+            "placing": "",
+            "ride": "",
+            "showStarCount": "",
+            "showStartScene": "",
+            "speed": "",
+            "starLockMessage": "",
+            "style": {
+                "blipInstant": "",
+                "door": "",
+                "pipe": "",
+                "portal": "",
+                "style": ""
+            },
+            "target": "",
+            "title": "",
+            "to": "",
+            "toMap": "",
             "transit": {
                 "name0": "НЕТ",
                 "name1": "ПРОКРУТКА",
@@ -189,7 +221,8 @@
                 "name3": "КРУГ",
                 "name4": "ОТРАЖ. (Г)",
                 "name5": "ОТРАЖ. (В)"
-            }
+            },
+            "twoWay": ""
         },
         "wordCoins": "Монетки",
         "wordEnabled": "Включено",

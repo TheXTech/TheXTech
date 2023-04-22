@@ -38,6 +38,34 @@ void initEditorStrings()
     g_editorStrings.blockInvis = "Invis";
     g_editorStrings.blockInside = "Inside:";
 
+    g_editorStrings.warpTitle = "Warp Settings";
+    g_editorStrings.warpPlacing = "Placing:";
+    g_editorStrings.warpIn = "In";
+    g_editorStrings.warpOut = "Out";
+    g_editorStrings.warpDir = "Dir.";
+    g_editorStrings.warpTwoWay = "Two-Way";
+    g_editorStrings.warpStyle = "Style: ";
+    g_editorStrings.warpStylePipe = "Pipe";
+    g_editorStrings.warpStyleDoor = "Door";
+    g_editorStrings.warpStyleBlipInstant = "Blip";
+    g_editorStrings.warpStylePortal = "Port";
+    g_editorStrings.warpEffect = "Effect:";
+    g_editorStrings.warpAllow = "Allow:";
+    g_editorStrings.warpItem = "Item";
+    g_editorStrings.warpRide = "Ride";
+    g_editorStrings.warpCannonExit = "Cannon Exit";
+    g_editorStrings.warpSpeed = "Speed ";
+    g_editorStrings.warpNeedStarCount = "Need {0} {1}";
+    g_editorStrings.warpNeedKey = "Need Key";
+    g_editorStrings.warpNeedFloor = "Need Floor";
+    g_editorStrings.warpStarLockMessage = "Star lock msg";
+    g_editorStrings.warpToMap = "To Map";
+    g_editorStrings.warpLvlWarp = "Lvl Warp";
+    g_editorStrings.warpTarget = "Target: ";
+    g_editorStrings.warpTo = "To: {0}";
+    g_editorStrings.warpShowStartScene = "Show Start Scene";
+    g_editorStrings.warpShowStarCount = "Show Star Count";
+
     g_editorStrings.npcInContainer = "In";
     g_editorStrings.npcInertNice = "Nice";
     g_editorStrings.npcStuckStop = "Stop";
@@ -80,13 +108,17 @@ void initEditorStrings()
     g_editorStrings.phraseTextOf = "{0} Text";
     g_editorStrings.phraseSectionIndex = "Section {0}";
     g_editorStrings.phraseRadiusIndex = "Radius {0}";
+    g_editorStrings.phraseWarpIndex = "Warp {0}";
     g_editorStrings.phraseCountMore = "{0} More";
     g_editorStrings.phraseDelayIsMs = "Delay: {0} ms";
+    g_editorStrings.mapPos = "Map Pos:";
 
     g_editorStrings.letterUp = "U";
     g_editorStrings.letterDown = "D";
     g_editorStrings.letterLeft = "L";
     g_editorStrings.letterRight = "R";
+    g_editorStrings.letterCoordX = "X";
+    g_editorStrings.letterCoordY = "Y";
 
     g_editorStrings.toggleMagicBlock = "Magic Block";
 

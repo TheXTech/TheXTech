@@ -111,6 +111,8 @@
             "labelMoveLayer": "移動圖層：",
             "promptLayerName": "圖層名稱"
         },
+        "letterCoordX": "",
+        "letterCoordY": "",
         "letterDown": "下",
         "letterLeft": "左",
         "letterRight": "右",
@@ -119,6 +121,7 @@
             "levelName": "關卡名稱",
             "startPos": "遊戲起點"
         },
+        "mapPos": "",
         "npc": {
             "abbrevGen": "生成器",
             "ai": {
@@ -156,6 +159,7 @@
         "phraseRadiusIndex": "半徑{0}",
         "phraseSectionIndex": "場景{0}",
         "phraseTextOf": "{0}信息",
+        "phraseWarpIndex": "",
         "section": {
             "horizWrap": "橫向循環",
             "noTurnBack": "單向卷軸",
@@ -182,6 +186,34 @@
         },
         "toggleMagicBlock": "智能編輯模式",
         "warp": {
+            "allow": "",
+            "cannonExit": "",
+            "dir": "",
+            "effect": "",
+            "in": "",
+            "item": "",
+            "lvlWarp": "",
+            "needFloor": "",
+            "needKey": "",
+            "needStarCount": "",
+            "out": "",
+            "placing": "",
+            "ride": "",
+            "showStarCount": "",
+            "showStartScene": "",
+            "speed": "",
+            "starLockMessage": "",
+            "style": {
+                "blipInstant": "",
+                "door": "",
+                "pipe": "",
+                "portal": "",
+                "style": ""
+            },
+            "target": "",
+            "title": "",
+            "to": "",
+            "toMap": "",
             "transit": {
                 "name0": "無",
                 "name1": "滾動",
@@ -189,7 +221,8 @@
                 "name3": "圓形",
                 "name4": "水平翻轉",
                 "name5": "垂直翻轉"
-            }
+            },
+            "twoWay": ""
         },
         "wordCoins": "金幣",
         "wordEnabled": "已啓用",

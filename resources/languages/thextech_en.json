@@ -111,6 +111,8 @@
             "labelMoveLayer": "Move Layer:",
             "promptLayerName": "Layer name"
         },
+        "letterCoordX": "X",
+        "letterCoordY": "Y",
         "letterDown": "D",
         "letterLeft": "L",
         "letterRight": "R",
@@ -119,6 +121,7 @@
             "levelName": "Level Name",
             "startPos": "Start Pos"
         },
+        "mapPos": "Map Pos:",
         "npc": {
             "abbrevGen": "Gen",
             "ai": {
@@ -156,6 +159,7 @@
         "phraseRadiusIndex": "Radius {0}",
         "phraseSectionIndex": "Section {0}",
         "phraseTextOf": "{0} Text",
+        "phraseWarpIndex": "Warp {0}",
         "section": {
             "horizWrap": "Horiz. Wrap",
             "noTurnBack": "No Turn Back",
@@ -182,6 +186,34 @@
         },
         "toggleMagicBlock": "Magic Block",
         "warp": {
+            "allow": "Allow:",
+            "cannonExit": "Cannon Exit",
+            "dir": "Dir.",
+            "effect": "Effect:",
+            "in": "In",
+            "item": "Item",
+            "lvlWarp": "Lvl Warp",
+            "needFloor": "Need Floor",
+            "needKey": "Need Key",
+            "needStarCount": "Need {0} {1}",
+            "out": "Out",
+            "placing": "Placing:",
+            "ride": "Ride",
+            "showStarCount": "Show Star Count",
+            "showStartScene": "Show Start Scene",
+            "speed": "Speed ",
+            "starLockMessage": "Star lock msg",
+            "style": {
+                "blipInstant": "Blip",
+                "door": "Door",
+                "pipe": "Pipe",
+                "portal": "Port",
+                "style": "Style: "
+            },
+            "target": "Target: ",
+            "title": "Warp Settings",
+            "to": "To: {0}",
+            "toMap": "To Map",
             "transit": {
                 "name0": "NONE",
                 "name1": "SCROLL",
@@ -189,7 +221,8 @@
                 "name3": "CIRCLE",
                 "name4": "FLIP (H)",
                 "name5": "FLIP (V)"
-            }
+            },
+            "twoWay": "Two-Way"
         },
         "wordCoins": "Coins",
         "wordEnabled": "Enabled",

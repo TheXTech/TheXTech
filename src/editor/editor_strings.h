@@ -41,6 +41,34 @@ struct EditorContent
     std::string blockInvis;
     std::string blockInside;
 
+    std::string warpTitle;
+    std::string warpPlacing;
+    std::string warpIn;
+    std::string warpOut;
+    std::string warpDir;
+    std::string warpTwoWay;
+    std::string warpStyle;
+    std::string warpStylePipe;
+    std::string warpStyleDoor;
+    std::string warpStyleBlipInstant;
+    std::string warpStylePortal;
+    std::string warpEffect;
+    std::string warpAllow;
+    std::string warpItem;
+    std::string warpRide;
+    std::string warpCannonExit;
+    std::string warpSpeed;
+    std::string warpNeedStarCount;
+    std::string warpNeedKey;
+    std::string warpNeedFloor;
+    std::string warpStarLockMessage;
+    std::string warpToMap;
+    std::string warpLvlWarp;
+    std::string warpTarget;
+    std::string warpTo;
+    std::string warpShowStartScene;
+    std::string warpShowStarCount;
+
     std::string npcInContainer;
     std::string npcInertNice;
     std::string npcStuckStop;
@@ -83,13 +111,17 @@ struct EditorContent
     std::string phraseTextOf;
     std::string phraseSectionIndex;
     std::string phraseRadiusIndex;
+    std::string phraseWarpIndex;
     std::string phraseCountMore;
     std::string phraseDelayIsMs;
+    std::string mapPos;
 
     std::string letterUp;
     std::string letterDown;
     std::string letterLeft;
     std::string letterRight;
+    std::string letterCoordX;
+    std::string letterCoordY;
 
     std::string toggleMagicBlock;
 
