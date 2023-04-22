@@ -16,19 +16,50 @@
                 "confirm": "Да: удалить событие",
                 "deletingEvent": "Удалить событие {0}"
             },
+            "desc": {
+                "activate1": "",
+                "activate2": "",
+                "death1": "",
+                "destroy1": "",
+                "destroy2": "",
+                "enter1": "",
+                "enter2": "",
+                "hit1": "",
+                "layerClear1": "",
+                "layerClear2": "",
+                "layerClear3": "",
+                "phraseTriggersWhen": "",
+                "talk1": "",
+                "talk2": ""
+            },
             "header": "События:",
             "headerTriggerEvent": "Триггер:",
             "itemNewEvent": "<Новое событие>",
+            "label": {
+                "activate": "",
+                "death": "",
+                "destroy": "",
+                "enter": "",
+                "hit": "",
+                "layerClear": "",
+                "next": "",
+                "talk": ""
+            },
             "layers": {
                 "headerHide": "Скрыть:",
                 "headerMove": "Движение:",
                 "headerShow": "Показать:",
                 "headerToggle": "Переключ.:"
             },
-            "letterActivate": "Ак:",
-            "letterDeath": "См:",
-            "letterLayerClear": "Сл:",
-            "letterTalk": "Гв:",
+            "letter": {
+                "activate": "Ак:",
+                "death": "См:",
+                "destroy": "",
+                "enter": "",
+                "hit": "",
+                "layerClear": "Сл:",
+                "talk": "Гв:"
+            },
             "promptEventName": "Имя события:",
             "promptEventText": "Текст события:",
             "props": {
@@ -49,14 +80,38 @@
             "settingsForEvent": "Настройки события"
         },
         "layers": {
+            "abbrevAttLayer": "Прис.: ",
+            "default": "",
+            "deletion": {
+                "cancel": "",
+                "confirmDelete": "",
+                "confirmPreserve": "",
+                "header": "",
+                "preserveLayerContents": ""
+            },
+            "desc": {
+                "att1": "",
+                "att2": "",
+                "att3": "",
+                "att4": "",
+                "att5": ""
+            },
             "header": "Слои:",
+            "itemNewLayer": "",
             "label": "Слой:",
-            "labelAbbrevAttLayer": "Прис.: "
+            "labelAttached": "",
+            "labelAttachedLayer": "",
+            "labelMoveLayer": "",
+            "promptLayerName": ""
         },
         "letterDown": "Н",
         "letterLeft": "Л",
         "letterRight": "П",
         "letterUp": "В",
+        "level": {
+            "levelName": "",
+            "startPos": ""
+        },
         "npc": {
             "abbrevGen": "Ген.",
             "ai": {
@@ -79,6 +134,11 @@
             },
             "inContainer": "В",
             "inertNice": "Чувств.",
+            "props": {
+                "active": "",
+                "attachSurface": "",
+                "facing": ""
+            },
             "stuckStop": "Стоп",
             "tooltipExpandSection": "Расширить секцию"
         },
@@ -89,6 +149,31 @@
         "phraseRadiusIndex": "Радиус {0}",
         "phraseSectionIndex": "Секция {0}",
         "phraseTextOf": "Текст \"{0}\"",
+        "section": {
+            "horizWrap": "",
+            "noTurnBack": "",
+            "offscreenExit": "",
+            "scroll": "",
+            "setBounds": "",
+            "underwater": ""
+        },
+        "select": {
+            "allSectPropBlankForEvent": "",
+            "pathBlankUnlock": "",
+            "sectBlankPropBlankForEvent": "",
+            "sectionBlankPropBlank": "",
+            "soundForEvent": "",
+            "warpTransitEffect": "",
+            "worldMusic": ""
+        },
+        "testPlay": {
+            "boot": "",
+            "char": "",
+            "magicHand": "",
+            "pet": "",
+            "power": ""
+        },
+        "toggleMagicBlock": "",
         "warp": {
             "transit": {
                 "name0": "НЕТ",
@@ -103,14 +188,24 @@
         "wordEnabled": "Включено",
         "wordEvent": {
             "genitive": "События",
-            "nominative": "Событие"
+            "nominative": "Событие",
+            "typeLabel": ""
         },
         "wordInstant": "Мгновенно",
         "wordNPC": {
             "genitive": "НИПа",
             "nominative": "НИП"
         },
-        "wordText": "Текст"
+        "wordText": "Текст",
+        "world": {
+            "allowChars": "",
+            "hubWorld": "",
+            "introLevel": "",
+            "name": "",
+            "phraseCreditIndex": "",
+            "retryOnFail": "",
+            "totalStars": ""
+        }
     },
     "game": {
         "connect": {

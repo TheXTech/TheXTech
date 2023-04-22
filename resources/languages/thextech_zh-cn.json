@@ -16,19 +16,50 @@
                 "confirm": "是：删除事件",
                 "deletingEvent": "删除事件{0}"
             },
+            "desc": {
+                "activate1": "",
+                "activate2": "",
+                "death1": "",
+                "destroy1": "",
+                "destroy2": "",
+                "enter1": "",
+                "enter2": "",
+                "hit1": "",
+                "layerClear1": "",
+                "layerClear2": "",
+                "layerClear3": "",
+                "phraseTriggersWhen": "",
+                "talk1": "",
+                "talk2": ""
+            },
             "header": "事件：",
             "headerTriggerEvent": "触发",
             "itemNewEvent": "<新事件>",
+            "label": {
+                "activate": "",
+                "death": "",
+                "destroy": "",
+                "enter": "",
+                "hit": "",
+                "layerClear": "",
+                "next": "",
+                "talk": ""
+            },
             "layers": {
                 "headerHide": "隐藏：",
                 "headerMove": "移动：",
                 "headerShow": "显示：",
                 "headerToggle": "切换："
             },
-            "letterActivate": "出：",
-            "letterDeath": "死：",
-            "letterLayerClear": "空：",
-            "letterTalk": "话：",
+            "letter": {
+                "activate": "出：",
+                "death": "死：",
+                "destroy": "",
+                "enter": "",
+                "hit": "",
+                "layerClear": "空：",
+                "talk": "话："
+            },
             "promptEventName": "事件名称：",
             "promptEventText": "文字信息：",
             "props": {
@@ -49,14 +80,38 @@
             "settingsForEvent": "事件选项"
         },
         "layers": {
+            "abbrevAttLayer": "跟随：",
+            "default": "",
+            "deletion": {
+                "cancel": "",
+                "confirmDelete": "",
+                "confirmPreserve": "",
+                "header": "",
+                "preserveLayerContents": ""
+            },
+            "desc": {
+                "att1": "",
+                "att2": "",
+                "att3": "",
+                "att4": "",
+                "att5": ""
+            },
             "header": "图层：",
+            "itemNewLayer": "",
             "label": "图层：",
-            "labelAbbrevAttLayer": "跟随："
+            "labelAttached": "",
+            "labelAttachedLayer": "",
+            "labelMoveLayer": "",
+            "promptLayerName": ""
         },
         "letterDown": "下",
         "letterLeft": "左",
         "letterRight": "右",
         "letterUp": "上",
+        "level": {
+            "levelName": "",
+            "startPos": ""
+        },
         "npc": {
             "abbrevGen": "生成器",
             "ai": {
@@ -79,6 +134,11 @@
             },
             "inContainer": "包含",
             "inertNice": "友好",
+            "props": {
+                "active": "",
+                "attachSurface": "",
+                "facing": ""
+            },
             "stuckStop": "静止",
             "tooltipExpandSection": "扩展场景"
         },
@@ -89,6 +149,31 @@
         "phraseRadiusIndex": "半径{0}",
         "phraseSectionIndex": "场景{0}",
         "phraseTextOf": "{0}信息",
+        "section": {
+            "horizWrap": "",
+            "noTurnBack": "",
+            "offscreenExit": "",
+            "scroll": "",
+            "setBounds": "",
+            "underwater": ""
+        },
+        "select": {
+            "allSectPropBlankForEvent": "",
+            "pathBlankUnlock": "",
+            "sectBlankPropBlankForEvent": "",
+            "sectionBlankPropBlank": "",
+            "soundForEvent": "",
+            "warpTransitEffect": "",
+            "worldMusic": ""
+        },
+        "testPlay": {
+            "boot": "",
+            "char": "",
+            "magicHand": "",
+            "pet": "",
+            "power": ""
+        },
+        "toggleMagicBlock": "",
         "warp": {
             "transit": {
                 "name0": "无",
@@ -103,14 +188,24 @@
         "wordEnabled": "已启用",
         "wordEvent": {
             "genitive": "事件",
-            "nominative": "事件"
+            "nominative": "事件",
+            "typeLabel": ""
         },
         "wordInstant": "立即",
         "wordNPC": {
             "genitive": "NPC",
             "nominative": "NPC"
         },
-        "wordText": "信息"
+        "wordText": "信息",
+        "world": {
+            "allowChars": "",
+            "hubWorld": "",
+            "introLevel": "",
+            "name": "",
+            "phraseCreditIndex": "",
+            "retryOnFail": "",
+            "totalStars": ""
+        }
     },
     "game": {
         "connect": {

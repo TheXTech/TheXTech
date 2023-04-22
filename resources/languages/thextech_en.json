@@ -6,8 +6,8 @@
         },
         "events": {
             "bounds": {
-                "changeAllSectionBoundsToCurrent": "Change all section bounds to current?",
-                "changeSectionBoundsToCurrent": "Change section {0} bounds to current?",
+                "changeAllSectionBoundsToCurrent": "Change all sect bounds to current?",
+                "changeSectionBoundsToCurrent": "Change sect {0} bounds to current?",
                 "shouldEvent": "Should Event {0}"
             },
             "controlsForEvent": "Controls for event",
@@ -16,19 +16,50 @@
                 "confirm": "Yes: delete event",
                 "deletingEvent": "Deleting event {0}"
             },
+            "desc": {
+                "activate1": "NPC enters",
+                "activate2": "the screen",
+                "death1": "NPC dies",
+                "destroy1": "block is",
+                "destroy2": "destroyed",
+                "enter1": "warp is",
+                "enter2": "entered",
+                "hit1": "block is hit",
+                "layerClear1": "everything in",
+                "layerClear2": "object layer",
+                "layerClear3": "is gone",
+                "phraseTriggersWhen": "triggers when",
+                "talk1": "player talks",
+                "talk2": "to NPC"
+            },
             "header": "Events:",
             "headerTriggerEvent": "Trigger:",
             "itemNewEvent": "<New Event>",
+            "label": {
+                "activate": "Activate",
+                "death": "Death",
+                "destroy": "Destroy",
+                "enter": "Enter",
+                "hit": "Hit",
+                "layerClear": "Layer Clear",
+                "next": "Next",
+                "talk": "Talk"
+            },
             "layers": {
                 "headerHide": "Hide:",
                 "headerMove": "Move:",
                 "headerShow": "Show:",
                 "headerToggle": "Toggle:"
             },
-            "letterActivate": "A:",
-            "letterDeath": "D:",
-            "letterLayerClear": "L:",
-            "letterTalk": "T:",
+            "letter": {
+                "activate": "A:",
+                "death": "D:",
+                "destroy": "D:",
+                "enter": "E:",
+                "hit": "H:",
+                "layerClear": "L:",
+                "talk": "T:"
+            },
             "promptEventName": "Event name",
             "promptEventText": "Event text",
             "props": {
@@ -49,14 +80,38 @@
             "settingsForEvent": "Settings for event"
         },
         "layers": {
+            "abbrevAttLayer": "Att: ",
+            "default": "Default",
+            "deletion": {
+                "cancel": "Cancel: do not delete layer",
+                "confirmDelete": "No: *DELETE ALL CONTENTS*",
+                "confirmPreserve": "Yes: move to default layer",
+                "header": "Deleting layer {0}",
+                "preserveLayerContents": "Preserve layer contents?"
+            },
+            "desc": {
+                "att1": "Whenever the",
+                "att2": "NPC moves,",
+                "att3": "the attached",
+                "att4": "layer moves",
+                "att5": "following it"
+            },
             "header": "Layers:",
+            "itemNewLayer": "<New Layer>",
             "label": "Layer:",
-            "labelAbbrevAttLayer": "Att: "
+            "labelAttached": "Attached:",
+            "labelAttachedLayer": "Attached Layer:",
+            "labelMoveLayer": "Move Layer:",
+            "promptLayerName": "Layer name"
         },
         "letterDown": "D",
         "letterLeft": "L",
         "letterRight": "R",
         "letterUp": "U",
+        "level": {
+            "levelName": "Level Name",
+            "startPos": "Start Pos"
+        },
         "npc": {
             "abbrevGen": "Gen",
             "ai": {
@@ -79,6 +134,11 @@
             },
             "inContainer": "In",
             "inertNice": "Nice",
+            "props": {
+                "active": "Active",
+                "attachSurface": "Attach",
+                "facing": "Facing"
+            },
             "stuckStop": "Stop",
             "tooltipExpandSection": "Expand section"
         },
@@ -89,6 +149,31 @@
         "phraseRadiusIndex": "Radius {0}",
         "phraseSectionIndex": "Section {0}",
         "phraseTextOf": "{0} Text",
+        "section": {
+            "horizWrap": "Horiz. Wrap",
+            "noTurnBack": "No Turn Back",
+            "offscreenExit": "Offscreen Exit",
+            "scroll": "Scroll",
+            "setBounds": "Set Bounds",
+            "underwater": "Underwater"
+        },
+        "select": {
+            "allSectPropBlankForEvent": "All Sect {0} for",
+            "pathBlankUnlock": "Path {0} Unlock By",
+            "sectBlankPropBlankForEvent": "Sect {0} {1} for",
+            "sectionBlankPropBlank": "Section {0} {1}",
+            "soundForEvent": "Sound for Event",
+            "warpTransitEffect": "Warp Transition Effect",
+            "worldMusic": "World Music"
+        },
+        "testPlay": {
+            "boot": "Boot",
+            "char": "Char",
+            "magicHand": "Magic Hand",
+            "pet": "Pet",
+            "power": "Power"
+        },
+        "toggleMagicBlock": "Magic Block",
         "warp": {
             "transit": {
                 "name0": "NONE",
@@ -103,14 +188,24 @@
         "wordEnabled": "Enabled",
         "wordEvent": {
             "genitive": "Event",
-            "nominative": "Event"
+            "nominative": "Event",
+            "typeLabel": "{0} Event:"
         },
         "wordInstant": "Instant",
         "wordNPC": {
             "genitive": "NPC",
             "nominative": "NPC"
         },
-        "wordText": "Text"
+        "wordText": "Text",
+        "world": {
+            "allowChars": "Allow Chars",
+            "hubWorld": "Hub World",
+            "introLevel": "Intro Level",
+            "name": "World Name",
+            "phraseCreditIndex": "World Credit Line {0}:",
+            "retryOnFail": "Retry On Fail",
+            "totalStars": "Total Stars: "
+        }
     },
     "game": {
         "connect": {
@@ -169,7 +264,7 @@
                 "altJump": "Alt Jump",
                 "altRun": "Alt Run",
                 "down": "Down",
-                "drop": "Drop",
+                "drop": "Drop Item",
                 "jump": "Jump",
                 "left": "Left",
                 "right": "Right",
