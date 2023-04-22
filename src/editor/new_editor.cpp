@@ -2332,7 +2332,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     if(EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
         // activate event
-        SuperPrintR(mode, "ACTIVATE:", 3, e_ScreenW - 200, 200 + 2);
+        SuperPrintR(mode, g_editorStrings.eventsLabelActivate, 3, e_ScreenW - 200, 200 + 2);
 
         if(EditorCursor.NPC.TriggerActivate != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerActivate), 3, e_ScreenW - 200, 220 + 2);
@@ -2343,7 +2343,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             m_special_subpage = 1;
 
         // death event
-        SuperPrintR(mode, "DEATH:", 3, e_ScreenW - 200, 240 + 2);
+        SuperPrintR(mode, g_editorStrings.eventsLabelDeath, 3, e_ScreenW - 200, 240 + 2);
 
         if(EditorCursor.NPC.TriggerDeath != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerDeath), 3, e_ScreenW - 200, 260 + 2);
@@ -2354,7 +2354,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             m_special_subpage = 2;
 
         // talk event
-        SuperPrintR(mode, "TALK:", 3, e_ScreenW - 200, 280 + 2);
+        SuperPrintR(mode, g_editorStrings.eventsLabelTalk, 3, e_ScreenW - 200, 280 + 2);
 
         if(EditorCursor.NPC.TriggerTalk != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerTalk), 3, e_ScreenW - 200, 300 + 2);
@@ -2365,7 +2365,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             m_special_subpage = 3;
 
         // layer clear event
-        SuperPrintR(mode, "LAYER CLEAR:", 3, e_ScreenW - 200, 320 + 2);
+        SuperPrintR(mode, g_editorStrings.eventsLabelLayerClear, 3, e_ScreenW - 200, 320 + 2);
 
         if(EditorCursor.NPC.TriggerLast != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.NPC.TriggerLast), 3, e_ScreenW - 200, 340 + 2);
@@ -2378,7 +2378,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     else if(EditorCursor.Mode == OptCursor_t::LVL_BLOCKS)
     {
         // block hit event
-        SuperPrintR(mode, "HIT:", 3, e_ScreenW - 200, 200 + 2);
+        SuperPrintR(mode, g_editorStrings.eventsLabelHit, 3, e_ScreenW - 200, 200 + 2);
 
         if(EditorCursor.Block.TriggerHit != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 200, 220 + 2);
@@ -2389,7 +2389,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             m_special_subpage = 1;
 
         // block destroy event
-        SuperPrintR(mode, "DESTROY:", 3, e_ScreenW - 200, 240 + 2);
+        SuperPrintR(mode, g_editorStrings.eventsLabelDestroy, 3, e_ScreenW - 200, 240 + 2);
 
         if(EditorCursor.Block.TriggerDeath != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 200, 260 + 2);
@@ -2400,7 +2400,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             m_special_subpage = 2;
 
         // layer clear event
-        SuperPrintR(mode, "LAYER CLEAR:", 3, e_ScreenW - 200, 280 + 2);
+        SuperPrintR(mode, g_editorStrings.eventsLabelLayerClear, 3, e_ScreenW - 200, 280 + 2);
 
         if(EditorCursor.Block.TriggerLast != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 200, 300 + 2);
@@ -2414,7 +2414,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     {
         m_special_subpage = 1;
 
-        SuperPrintR(mode, "ENTER:", 3, e_ScreenW - 200, 200 + 2);
+        SuperPrintR(mode, g_editorStrings.eventsLabelEnter, 3, e_ScreenW - 200, 200 + 2);
         if(EditorCursor.Warp.eventEnter != EVENT_NONE)
             SuperPrintR(mode, GetE(EditorCursor.Warp.eventEnter), 3, e_ScreenW - 200, 220 + 2);
         else
@@ -2445,37 +2445,37 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
 
     if(m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
     {
-        event_name = "NEXT";
+        event_name = g_editorStrings.eventsLabelNext;
         event_to_set = &Events[m_current_event].TriggerEvent;
     }
     else if(EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
         if(m_special_subpage == 1)
         {
-            event_name = "ACTIVATE";
-            event_desc = "NPC ENTERS";
-            event_desc_2 = "THE SCREEN";
+            event_name = g_editorStrings.eventsLabelActivate;
+            event_desc = g_editorStrings.eventsDescActivate1;
+            event_desc_2 = g_editorStrings.eventsDescActivate2;
             event_to_set = &EditorCursor.NPC.TriggerActivate;
         }
         else if(m_special_subpage == 2)
         {
-            event_name = "DEATH";
-            event_desc = "NPC DIES";
+            event_name = g_editorStrings.eventsLabelDeath;
+            event_desc = g_editorStrings.eventsDescDeath1;
             event_to_set = &EditorCursor.NPC.TriggerDeath;
         }
         else if(m_special_subpage == 3)
         {
-            event_name = "TALK";
-            event_desc = "PLAYER TALKS";
-            event_desc_2 = "TO NPC";
+            event_name = g_editorStrings.eventsLabelTalk;
+            event_desc = g_editorStrings.eventsDescTalk1;
+            event_desc_2 = g_editorStrings.eventsDescTalk2;
             event_to_set = &EditorCursor.NPC.TriggerTalk;
         }
         else if(m_special_subpage == 4)
         {
-            event_name = "LAYER CLEAR";
-            event_desc = "EVERYTHING IN";
-            event_desc_2 = "NPC'S LAYER";
-            event_desc_3 = "HAS DIED";
+            event_name = g_editorStrings.eventsLabelLayerClear;
+            event_desc = g_editorStrings.eventsDescLayerClear1;
+            event_desc_2 = g_editorStrings.eventsDescLayerClear2;
+            event_desc_3 = g_editorStrings.eventsDescLayerClear3;
             event_to_set = &EditorCursor.NPC.TriggerLast;
         }
         else
@@ -2485,23 +2485,23 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     {
         if(m_special_subpage == 1)
         {
-            event_name = "HIT";
-            event_desc = "BLOCK IS HIT";
+            event_name = g_editorStrings.eventsLabelHit;
+            event_desc = g_editorStrings.eventsDescHit1;
             event_to_set = &EditorCursor.Block.TriggerHit;
         }
         else if(m_special_subpage == 2)
         {
-            event_name = "DESTROY";
-            event_desc = "BLOCK IS";
-            event_desc_2 = "DESTROYED";
+            event_name = g_editorStrings.eventsLabelDestroy;
+            event_desc = g_editorStrings.eventsDescDestroy1;
+            event_desc_2 = g_editorStrings.eventsDescDestroy2;
             event_to_set = &EditorCursor.Block.TriggerDeath;
         }
         else if(m_special_subpage == 3)
         {
-            event_name = "LAYER CLEAR";
-            event_desc = "EVERYTHING IN";
-            event_desc_2 = "BLOCK LAYER";
-            event_desc_3 = "HAS DIED";
+            event_name = g_editorStrings.eventsLabelLayerClear;
+            event_desc = g_editorStrings.eventsDescLayerClear1;
+            event_desc_2 = g_editorStrings.eventsDescLayerClear2;
+            event_desc_3 = g_editorStrings.eventsDescLayerClear3;
             event_to_set = &EditorCursor.Block.TriggerLast;
         }
         else
@@ -2511,9 +2511,9 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     {
         if(m_special_subpage == 1)
         {
-            event_name = "ENTER";
-            event_desc = "WARP IS";
-            event_desc_2 = "ENTERED";
+            event_name = g_editorStrings.eventsLabelEnter;
+            event_desc = g_editorStrings.eventsDescEnter1;
+            event_desc_2 = g_editorStrings.eventsDescEnter2;
             event_to_set = &EditorCursor.Warp.eventEnter;
         }
         else
@@ -2526,13 +2526,13 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
 
     // render description
     SuperPrintR(mode, event_name, 3, e_ScreenW - 236, 80);
-    SuperPrintR(mode, "TRIGGERS WHEN", 3, e_ScreenW - 236, 100);
+    SuperPrintR(mode, g_editorStrings.eventsDescPhraseTriggersWhen, 3, e_ScreenW - 236, 100);
     SuperPrintR(mode, event_desc, 3, e_ScreenW - 236, 120);
     SuperPrintR(mode, event_desc_2, 3, e_ScreenW - 236, 140);
     SuperPrintR(mode, event_desc_3, 3, e_ScreenW - 236, 160);
 
     // render current event
-    SuperPrintR(mode, event_name + " EVENT:", 3, 10, 40);
+    SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseTypeLabelEvent, event_name), 3, 10, 40);
     if(*event_to_set == EVENT_NONE)
         SuperPrintR(mode, g_mainMenu.caseNone, 3, 10, 56);
     else
@@ -2983,15 +2983,15 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     }
 
     // Events
-    SuperPrintR(mode, "EVENTS:", 3, e_ScreenW - 160, 334);
-    SuperPrintR(mode, "H:" + GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 160, 360);
-    SuperPrintR(mode, "D:" + GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 160, 380);
-    SuperPrintR(mode, "L:" + GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 160, 400);
+    SuperPrintR(mode, g_editorStrings.eventsHeader, 3, e_ScreenW - 160, 334);
+    SuperPrintR(mode, g_editorStrings.eventsLetterHit + GetE(EditorCursor.Block.TriggerHit), 3, e_ScreenW - 160, 360);
+    SuperPrintR(mode, g_editorStrings.eventsLetterDestroy + GetE(EditorCursor.Block.TriggerDeath), 3, e_ScreenW - 160, 380);
+    SuperPrintR(mode, g_editorStrings.eventsLetterLayerClear + GetE(EditorCursor.Block.TriggerLast), 3, e_ScreenW - 160, 400);
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
 
     // Layers
-    SuperPrintR(mode, "LAYER:", 3, e_ScreenW - 160, 434);
+    SuperPrintR(mode, g_editorStrings.labelLayer, 3, e_ScreenW - 160, 434);
     if(EditorCursor.Block.Layer == LAYER_NONE)
         SuperPrintR(mode, g_editorStrings.layerDefault, 3, e_ScreenW - 160, 460);
     else
@@ -3081,11 +3081,12 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
 
 
     // Layers
-    SuperPrintR(mode, "LAYER:", 3, e_ScreenW - 160, 434);
+    SuperPrintR(mode, g_editorStrings.labelLayer, 3, e_ScreenW - 160, 434);
     if(EditorCursor.Background.Layer == LAYER_NONE)
         SuperPrintR(mode, g_editorStrings.layerDefault, 3, e_ScreenW - 160, 460);
     else
         SuperPrintR(mode, GetL(EditorCursor.Background.Layer), 3, e_ScreenW - 160, 460);
+
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 
@@ -3147,12 +3148,14 @@ void EditorScreen::UpdateWaterScreen(CallMode mode)
         EditorCursor.Water.Quicksand = false;
     if(UpdateButton(mode, 380 + 4, 160 + 4, GFXBackgroundBMP[188], EditorCursor.Water.Quicksand, 0, 0, 32, 32))
         EditorCursor.Water.Quicksand = true;
+
     // layers
-    SuperPrintR(mode, "LAYER:", 3, 246, 234);
+    SuperPrintR(mode, g_editorStrings.labelLayer, 3, 246, 234);
     if(EditorCursor.Layer == LAYER_NONE)
         SuperPrintR(mode, g_editorStrings.layerDefault, 3, 206, 260);
     else
         SuperPrintR(mode, GetL(EditorCursor.Layer), 3, 206, 260);
+
     if(UpdateButton(mode, 380 + 4, 220 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 }
@@ -3234,8 +3237,8 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
     {
         if(mode == CallMode::Render)
         {
-            SuperPrint("EVENTS:", 3, e_ScreenW - 200, 334);
-            SuperPrint("E:" + GetE(EditorCursor.Warp.eventEnter), 3, e_ScreenW - 240, 360);
+            SuperPrint(g_editorStrings.eventsHeader, 3, e_ScreenW - 200, 334);
+            SuperPrint(g_editorStrings.eventsLetterEnter + GetE(EditorCursor.Warp.eventEnter), 3, e_ScreenW - 240, 360);
         }
         if(UpdateButton(mode, e_ScreenW - 80 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_TRIGGERS;
@@ -3244,12 +3247,13 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
     // Layers
     if(mode == CallMode::Render)
     {
-        SuperPrint("LAYER:", 3, e_ScreenW - 200, 414);
+        SuperPrint(g_editorStrings.labelLayer, 3, e_ScreenW - 200, 414);
         if(EditorCursor.Warp.Layer == LAYER_NONE)
             SuperPrint(g_editorStrings.layerDefault, 3, e_ScreenW - 240, 440);
         else
             SuperPrint(GetL(EditorCursor.Warp.Layer), 3, e_ScreenW - 240, 440);
     }
+
     if(UpdateButton(mode, e_ScreenW - 80 + 4, 400 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 

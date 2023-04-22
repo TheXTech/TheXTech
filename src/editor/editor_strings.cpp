@@ -62,6 +62,7 @@ void initEditorStrings()
 
     g_editorStrings.wordEvent = "Event";
     g_editorStrings.wordEventGenitive = "Event";
+    g_editorStrings.phraseTypeLabelEvent = "{0} Event:";
 
     g_editorStrings.wordCoins = "Coins";
 
@@ -88,10 +89,39 @@ void initEditorStrings()
     g_editorStrings.testPet = "Pet";
 
     g_editorStrings.eventsHeader = "Events:";
+
     g_editorStrings.eventsLetterActivate = "A:";
     g_editorStrings.eventsLetterDeath = "D:";
     g_editorStrings.eventsLetterTalk = "T:";
     g_editorStrings.eventsLetterLayerClear = "L:";
+    g_editorStrings.eventsLetterHit = "H:";
+    g_editorStrings.eventsLetterDestroy = "D:";
+    g_editorStrings.eventsLetterEnter = "E:";
+
+    g_editorStrings.eventsLabelNext = "Next";
+    g_editorStrings.eventsLabelActivate = "Activate";
+    g_editorStrings.eventsLabelDeath = "Death";
+    g_editorStrings.eventsLabelTalk = "Talk";
+    g_editorStrings.eventsLabelLayerClear = "Layer Clear";
+    g_editorStrings.eventsLabelHit = "Hit";
+    g_editorStrings.eventsLabelDestroy = "Destroy";
+    g_editorStrings.eventsLabelEnter = "Enter";
+
+    g_editorStrings.eventsDescActivate1 = "NPC enters";
+    g_editorStrings.eventsDescActivate2 = "the screen";
+    g_editorStrings.eventsDescDeath1 = "NPC dies";
+    g_editorStrings.eventsDescTalk1 = "player talks";
+    g_editorStrings.eventsDescTalk2 = "to NPC";
+    g_editorStrings.eventsDescLayerClear1 = "everything in";
+    g_editorStrings.eventsDescLayerClear2 = "object layer";
+    g_editorStrings.eventsDescLayerClear3 = "is gone";
+    g_editorStrings.eventsDescHit1 = "block is hit";
+    g_editorStrings.eventsDescDestroy1 = "block is";
+    g_editorStrings.eventsDescDestroy2 = "destroyed";
+    g_editorStrings.eventsDescEnter1 = "warp is";
+    g_editorStrings.eventsDescEnter2 = "entered";
+
+    g_editorStrings.eventsDescPhraseTriggersWhen = "triggers when";
 
     g_editorStrings.eventsDeletingEvent = "Deleting event {0}";
     g_editorStrings.eventsDeletionConfirm = "Yes: delete event";

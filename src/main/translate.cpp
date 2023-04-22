@@ -470,6 +470,7 @@ XTechTranslate::XTechTranslate()
 
         {"editor.wordEvent.nominative",     &g_editorStrings.wordEvent},
         {"editor.wordEvent.genitive",       &g_editorStrings.wordEventGenitive},
+        {"editor.wordEvent.typeLabel",      &g_editorStrings.phraseTypeLabelEvent},
 
         {"editor.wordCoins",                &g_editorStrings.wordCoins},
 
@@ -498,10 +499,39 @@ XTechTranslate::XTechTranslate()
         {"editor.testPlay.pet",             &g_editorStrings.testPet},
 
         {"editor.events.header",            &g_editorStrings.eventsHeader},
-        {"editor.events.letterActivate",    &g_editorStrings.eventsLetterActivate},
-        {"editor.events.letterDeath",       &g_editorStrings.eventsLetterDeath},
-        {"editor.events.letterTalk",        &g_editorStrings.eventsLetterTalk},
-        {"editor.events.letterLayerClear",  &g_editorStrings.eventsLetterLayerClear},
+
+        {"editor.events.letter.activate",    &g_editorStrings.eventsLetterActivate},
+        {"editor.events.letter.death",       &g_editorStrings.eventsLetterDeath},
+        {"editor.events.letter.talk",        &g_editorStrings.eventsLetterTalk},
+        {"editor.events.letter.layerClear",  &g_editorStrings.eventsLetterLayerClear},
+        {"editor.events.letter.hit",         &g_editorStrings.eventsLetterHit},
+        {"editor.events.letter.destroy",     &g_editorStrings.eventsLetterDestroy},
+        {"editor.events.letter.enter",       &g_editorStrings.eventsLetterEnter},
+
+        {"editor.events.label.next",        &g_editorStrings.eventsLabelNext},
+        {"editor.events.label.activate",    &g_editorStrings.eventsLabelActivate},
+        {"editor.events.label.death",       &g_editorStrings.eventsLabelDeath},
+        {"editor.events.label.talk",        &g_editorStrings.eventsLabelTalk},
+        {"editor.events.label.layerClear",  &g_editorStrings.eventsLabelLayerClear},
+        {"editor.events.label.hit",         &g_editorStrings.eventsLabelHit},
+        {"editor.events.label.destroy",     &g_editorStrings.eventsLabelDestroy},
+        {"editor.events.label.enter",       &g_editorStrings.eventsLabelEnter},
+
+        {"editor.events.desc.activate1",    &g_editorStrings.eventsDescActivate1},
+        {"editor.events.desc.activate2",    &g_editorStrings.eventsDescActivate2},
+        {"editor.events.desc.death1",       &g_editorStrings.eventsDescDeath1},
+        {"editor.events.desc.talk1",        &g_editorStrings.eventsDescTalk1},
+        {"editor.events.desc.talk2",        &g_editorStrings.eventsDescTalk2},
+        {"editor.events.desc.layerClear1",  &g_editorStrings.eventsDescLayerClear1},
+        {"editor.events.desc.layerClear2",  &g_editorStrings.eventsDescLayerClear2},
+        {"editor.events.desc.layerClear3",  &g_editorStrings.eventsDescLayerClear3},
+        {"editor.events.desc.hit1",         &g_editorStrings.eventsDescHit1},
+        {"editor.events.desc.destroy1",     &g_editorStrings.eventsDescDestroy1},
+        {"editor.events.desc.destroy2",     &g_editorStrings.eventsDescDestroy2},
+        {"editor.events.desc.enter1",       &g_editorStrings.eventsDescEnter1},
+        {"editor.events.desc.enter2",       &g_editorStrings.eventsDescEnter2},
+
+        {"editor.events.desc.phraseTriggersWhen",   &g_editorStrings.eventsDescPhraseTriggersWhen},
 
         {"editor.events.deletion.deletingEvent",    &g_editorStrings.eventsDeletingEvent},
         {"editor.events.deletion.confirm",          &g_editorStrings.eventsDeletionConfirm},

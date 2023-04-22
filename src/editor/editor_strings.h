@@ -65,6 +65,7 @@ struct EditorContent
 
     std::string wordEvent;
     std::string wordEventGenitive;
+    std::string phraseTypeLabelEvent;
 
     std::string wordCoins;
 
@@ -91,10 +92,39 @@ struct EditorContent
     std::string testPet;
 
     std::string eventsHeader;
+
     std::string eventsLetterActivate;
     std::string eventsLetterDeath;
     std::string eventsLetterTalk;
     std::string eventsLetterLayerClear;
+    std::string eventsLetterHit;
+    std::string eventsLetterDestroy;
+    std::string eventsLetterEnter;
+
+    std::string eventsLabelNext;
+    std::string eventsLabelActivate;
+    std::string eventsLabelDeath;
+    std::string eventsLabelTalk;
+    std::string eventsLabelLayerClear;
+    std::string eventsLabelHit;
+    std::string eventsLabelDestroy;
+    std::string eventsLabelEnter;
+
+    std::string eventsDescActivate1;
+    std::string eventsDescActivate2;
+    std::string eventsDescDeath1;
+    std::string eventsDescTalk1;
+    std::string eventsDescTalk2;
+    std::string eventsDescLayerClear1;
+    std::string eventsDescLayerClear2;
+    std::string eventsDescLayerClear3;
+    std::string eventsDescHit1;
+    std::string eventsDescDestroy1;
+    std::string eventsDescDestroy2;
+    std::string eventsDescEnter1;
+    std::string eventsDescEnter2;
+
+    std::string eventsDescPhraseTriggersWhen;
 
     std::string eventsDeletingEvent;
     std::string eventsDeletionConfirm;
