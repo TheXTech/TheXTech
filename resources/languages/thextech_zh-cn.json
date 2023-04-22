@@ -383,5 +383,5 @@
         "psVitaPortBy": "PS Vita移植：",
         "specialThanks": "特别鸣谢："
     },
-    "pluralRules": "仅限单数"
+    "pluralRules": "singular-only"
 }
