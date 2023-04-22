@@ -3609,7 +3609,7 @@ void EditorScreen::UpdateSceneScreen(CallMode mode)
 {
     // Scene GUI (none)
 
-    SuperPrintR(mode, "SCENERY", 3, 10, 40);
+    // SuperPrintR(mode, "SCENERY", 3, 10, 40);
     static const int scenes[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 48, 49, 42, 47, 46, 43, 45, 64, 65, 44, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63};
     UpdateSceneGrid(mode, 0, 60, scenes, sizeof(scenes)/sizeof(int), 10);
 }
@@ -3648,7 +3648,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
     if(mode == CallMode::Render)
         XRender::renderRect(e_ScreenW - 240, 40, 240, e_ScreenH - 40, 0.7f, 0.7f, 0.9f, 0.75f, true);
 
-    SuperPrintR(mode, "LEVEL GRAPHIC", 3, 10, 40);
+    // SuperPrintR(mode, "LEVEL GRAPHIC", 3, 10, 40);
     static const int levels[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32};
     UpdateLevelGrid(mode, 0, 60, levels, sizeof(levels)/sizeof(int), 8);
 
@@ -3824,7 +3824,7 @@ void EditorScreen::UpdatePathScreen(CallMode mode)
 {
     // Path GUI (none)
 
-    SuperPrintR(mode, "PATH GRAPHIC", 3, 10, 40);
+    // SuperPrintR(mode, "PATH GRAPHIC", 3, 10, 40);
     static const int paths[] = { 2, 1, 18, 19, 31, 22, 32,
         11, 6, 10, 30, 25, 27, 23,
          9, 5,  7, 21,  3, 20, 26,
