@@ -1,15 +1,15 @@
 {
     "editor": {
         "block": {
-            "canBreak": "",
-            "canBreakTooltip": "",
-            "inside": "",
-            "invis": "",
-            "letterHeight": "",
-            "letterWidth": "",
+            "canBreak": "可頂碎",
+            "canBreakTooltip": "舊版本：頂磚塊後將會破碎",
+            "inside": "包含：",
+            "invis": "隱形",
+            "letterHeight": "寬",
+            "letterWidth": "高",
             "pickContents1": "選擇磚塊",
-            "pickContents2": "包含",
-            "slick": ""
+            "pickContents2": "包含道具",
+            "slick": "打滑"
         },
         "events": {
             "bounds": {
@@ -24,33 +24,33 @@
                 "deletingEvent": "刪除事件{0}"
             },
             "desc": {
-                "activate1": "",
-                "activate2": "",
-                "death1": "",
-                "destroy1": "",
-                "destroy2": "",
-                "enter1": "",
-                "enter2": "",
-                "hit1": "",
-                "layerClear1": "",
-                "layerClear2": "",
-                "layerClear3": "",
-                "phraseTriggersWhen": "",
-                "talk1": "",
-                "talk2": ""
+                "activate1": "NPC在當前畫面出現時觸",
+                "activate2": "發事件",
+                "death1": "NPC死亡時觸發事件",
+                "destroy1": "磚塊破碎時觸發事件",
+                "destroy2": " ",
+                "enter1": "進入傳送點時觸發事件",
+                "enter2": " ",
+                "hit1": "磚塊被撞擊時觸發事件",
+                "layerClear1": "當前圖層中的對象全部清除",
+                "layerClear2": "時觸發事件",
+                "layerClear3": " ",
+                "phraseTriggersWhen": "將於",
+                "talk1": "和NPC對話後觸發事件",
+                "talk2": " "
             },
             "header": "事件：",
             "headerTriggerEvent": "觸發",
             "itemNewEvent": "<新事件>",
             "label": {
-                "activate": "",
-                "death": "",
-                "destroy": "",
-                "enter": "",
-                "hit": "",
-                "layerClear": "",
-                "next": "",
-                "talk": ""
+                "activate": "出現",
+                "death": "死亡",
+                "destroy": "破碎",
+                "enter": "進入傳送點",
+                "hit": "撞擊",
+                "layerClear": "空白圖層",
+                "next": "下一個",
+                "talk": "對話"
             },
             "layers": {
                 "headerHide": "隱藏：",
@@ -61,9 +61,9 @@
             "letter": {
                 "activate": "出：",
                 "death": "死：",
-                "destroy": "",
-                "enter": "",
-                "hit": "",
+                "destroy": "碎：",
+                "enter": "進：",
+                "hit": "撞：",
                 "layerClear": "空：",
                 "talk": "話："
             },
@@ -88,36 +88,36 @@
         },
         "layers": {
             "abbrevAttLayer": "跟隨：",
-            "default": "",
+            "default": "默認",
             "deletion": {
-                "cancel": "",
-                "confirmDelete": "",
-                "confirmPreserve": "",
-                "header": "",
-                "preserveLayerContents": ""
+                "cancel": "取消：不刪除圖層",
+                "confirmDelete": "否：*刪除全部對象*",
+                "confirmPreserve": "是：移動到默認圖層",
+                "header": "刪除圖層{0}",
+                "preserveLayerContents": "是否保留圖層對象？"
             },
             "desc": {
-                "att1": "",
-                "att2": "",
-                "att3": "",
-                "att4": "",
-                "att5": ""
+                "att1": "當 NPC 移動時，",
+                "att2": "圖層也將隨之移動",
+                "att3": " ",
+                "att4": " ",
+                "att5": " "
             },
             "header": "圖層：",
-            "itemNewLayer": "",
+            "itemNewLayer": "<新圖層>",
             "label": "圖層：",
-            "labelAttached": "",
-            "labelAttachedLayer": "",
-            "labelMoveLayer": "",
-            "promptLayerName": ""
+            "labelAttached": "跟隨：",
+            "labelAttachedLayer": "跟隨圖層",
+            "labelMoveLayer": "移動圖層：",
+            "promptLayerName": "圖層名稱"
         },
         "letterDown": "下",
         "letterLeft": "左",
         "letterRight": "右",
         "letterUp": "上",
         "level": {
-            "levelName": "",
-            "startPos": ""
+            "levelName": "關卡名稱",
+            "startPos": "遊戲起點"
         },
         "npc": {
             "abbrevGen": "生成器",
@@ -142,9 +142,9 @@
             "inContainer": "包含",
             "inertNice": "友好",
             "props": {
-                "active": "",
-                "attachSurface": "",
-                "facing": ""
+                "active": "啓動",
+                "attachSurface": "跟隨",
+                "facing": "方向"
             },
             "stuckStop": "靜止",
             "tooltipExpandSection": "擴展場景"
@@ -157,30 +157,30 @@
         "phraseSectionIndex": "場景{0}",
         "phraseTextOf": "{0}信息",
         "section": {
-            "horizWrap": "",
-            "noTurnBack": "",
-            "offscreenExit": "",
-            "scroll": "",
-            "setBounds": "",
-            "underwater": ""
+            "horizWrap": "橫向循環",
+            "noTurnBack": "單向卷軸",
+            "offscreenExit": "場景邊緣出口",
+            "scroll": "滾動",
+            "setBounds": "設置範圍",
+            "underwater": "水下"
         },
         "select": {
-            "allSectPropBlankForEvent": "",
-            "pathBlankUnlock": "",
-            "sectBlankPropBlankForEvent": "",
-            "sectionBlankPropBlank": "",
-            "soundForEvent": "",
-            "warpTransitEffect": "",
-            "worldMusic": ""
+            "allSectPropBlankForEvent": "更改所有場景{0}於事件",
+            "pathBlankUnlock": "路線向{0}開啓條件",
+            "sectBlankPropBlankForEvent": "更改場景{0}的{1}於事件",
+            "sectionBlankPropBlank": "場景{0}{1}",
+            "soundForEvent": "播放聲音",
+            "warpTransitEffect": "過渡效果",
+            "worldMusic": "大地圖音樂"
         },
         "testPlay": {
-            "boot": "",
-            "char": "",
-            "magicHand": "",
-            "pet": "",
-            "power": ""
+            "boot": "靴子",
+            "char": "角色",
+            "magicHand": "鼠標",
+            "pet": "坐騎",
+            "power": "狀態"
         },
-        "toggleMagicBlock": "",
+        "toggleMagicBlock": "智能編輯模式",
         "warp": {
             "transit": {
                 "name0": "無",
@@ -196,7 +196,7 @@
         "wordEvent": {
             "genitive": "事件",
             "nominative": "事件",
-            "typeLabel": ""
+            "typeLabel": "事件 {0}："
         },
         "wordInstant": "立即",
         "wordNPC": {
@@ -205,13 +205,13 @@
         },
         "wordText": "信息",
         "world": {
-            "allowChars": "",
-            "hubWorld": "",
-            "introLevel": "",
-            "name": "",
-            "phraseCreditIndex": "",
-            "retryOnFail": "",
-            "totalStars": ""
+            "allowChars": "可用角色",
+            "hubWorld": "禁用大地圖",
+            "introLevel": "開場關卡",
+            "name": "地圖名稱",
+            "phraseCreditIndex": "地圖製作團隊 第{0}行：",
+            "retryOnFail": "失敗之後重新開始",
+            "totalStars": "總星星數："
         }
     },
     "game": {
@@ -234,7 +234,7 @@
             "wordDisconnect": "斷開"
         },
         "controls": {
-            "phrasePlayerConnected": "玩家{0}已連接{1}，配置：{2}",
+            "phrasePlayerConnected": "玩家{0}已連接{1}， 配置： {2}",
             "phrasePlayerDisconnected": "玩家{0}未連接"
         },
         "error": {
@@ -254,7 +254,7 @@
             "saveAndQuit": "保存並退出"
         }
     },
-    "languageName": "繁體中文",
+    "languageName": "簡體中文",
     "menu": {
         "abbrevMilliseconds": "毫秒",
         "battle": {
@@ -289,7 +289,7 @@
             "controlsNewProfile": "<新建配置>",
             "controlsNotInUse": "（未使用）",
             "controlsReallyDeleteProfile": "是否刪除配置？",
-            "controlsTitle": "控制",
+            "controlsTitle": "按鍵配置",
             "cursor": {
                 "down": "鼠標向下移動",
                 "left": "鼠標向左移動",
