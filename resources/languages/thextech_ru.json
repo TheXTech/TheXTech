@@ -118,7 +118,12 @@
         "letterRight": "П",
         "letterUp": "В",
         "level": {
+            "alwaysVis": "",
+            "bigBG": "",
+            "gameStart": "",
             "levelName": "",
+            "pathBG": "",
+            "pathUnlocks": "",
             "startPos": ""
         },
         "mapPos": "",

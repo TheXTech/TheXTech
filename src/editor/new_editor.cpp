@@ -2172,14 +2172,16 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     }
     else if(m_special_page == SPECIAL_PAGE_LEVEL_EXIT)
     {
+        using Controls::PlayerControls::Buttons;
+
         if(m_special_subpage == 1)
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]), 3, 10, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, GetButtonName_UI(Buttons::Up)), 3, 10, 50);
         else if(m_special_subpage == 2)
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Left]), 3, 10, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, GetButtonName_UI(Buttons::Left)), 3, 10, 50);
         else if(m_special_subpage == 3)
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Down]), 3, 10, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, GetButtonName_UI(Buttons::Down)), 3, 10, 50);
         else if(m_special_subpage == 4)
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Right]), 3, 10, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectPathBlankUnlock, GetButtonName_UI(Buttons::Right)), 3, 10, 50);
         else
             return;
 
@@ -3479,7 +3481,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
             if(EditorCursor.Warp.LevelWarp > 0 && UpdateButton(mode, 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
                 EditorCursor.Warp.LevelWarp --;
 
-            if(UpdateButton(mode, 280 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+            if(EditorCursor.Warp.LevelWarp < maxWarps && UpdateButton(mode, 280 + 4, 340 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
                 EditorCursor.Warp.LevelWarp ++;
 
             if(FileFormat == FileFormats::LVL_PGEX)
@@ -3701,7 +3703,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         if(EditorCursor.WorldLevel.Path)
             EditorCursor.WorldLevel.Path2 = false;
     }
-    SuperPrintR(mode, "PATH BG", 3, e_ScreenW - 240 + 44, 90);
+    SuperPrintR(mode, g_editorStrings.levelPathBG, 3, e_ScreenW - 240 + 44, 90);
 
     // big bg - Path2
     if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 120+4, EditorCursor.WorldLevel.Path2))
@@ -3710,52 +3712,57 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         if(EditorCursor.WorldLevel.Path2)
             EditorCursor.WorldLevel.Path = false;
     }
-    SuperPrintR(mode, "BIG BG", 3, e_ScreenW - 240 + 44, 130);
+    SuperPrintR(mode, g_editorStrings.levelBigBG, 3, e_ScreenW - 240 + 44, 130);
 
     // game start - Start
     if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 160 + 4, EditorCursor.WorldLevel.Start))
         EditorCursor.WorldLevel.Start = !EditorCursor.WorldLevel.Start;
-    SuperPrintR(mode, "GAME START", 3, e_ScreenW - 240 + 44, 170);
+    SuperPrintR(mode, g_editorStrings.levelGameStart, 3, e_ScreenW - 240 + 44, 170);
 
     // always visible - Visible
     if(UpdateCheckBox(mode, e_ScreenW - 240 + 4, 200 + 4, EditorCursor.WorldLevel.Visible))
         EditorCursor.WorldLevel.Visible = !EditorCursor.WorldLevel.Visible;
-    SuperPrintR(mode, "ALWAYS VIS", 3, e_ScreenW - 240 + 44, 210);
+    SuperPrintR(mode, g_editorStrings.levelAlwaysVis, 3, e_ScreenW - 240 + 44, 210);
 
     // map warp!
-    SuperPrintR(mode, "MAP WARP:", 3, e_ScreenW - 240 + 44, 302);
-    if((int)EditorCursor.WorldLevel.WarpX != -1 || (int)EditorCursor.WorldLevel.WarpY != -1.)
+    SuperPrintR(mode, g_editorStrings.mapPos, 3, e_ScreenW - 240 + 44, 302);
+
+    if((int)EditorCursor.WorldLevel.WarpX != -1 || (int)EditorCursor.WorldLevel.WarpY != -1)
     {
-        SuperPrintR(mode, "X: "+std::to_string((int)EditorCursor.WorldLevel.WarpX), 3, e_ScreenW - 240 + 4, 320);
-        SuperPrintR(mode, "Y: "+std::to_string((int)EditorCursor.WorldLevel.WarpY), 3, e_ScreenW - 240 + 4, 340);
+        SuperPrintR(mode, g_editorStrings.letterCoordX + ": " + std::to_string((int)EditorCursor.WorldLevel.WarpX), 3, e_ScreenW - 240 + 4, 320);
+        SuperPrintR(mode, g_editorStrings.letterCoordY + ": " + std::to_string((int)EditorCursor.WorldLevel.WarpY), 3, e_ScreenW - 240 + 4, 340);
         if(UpdateButton(mode, e_ScreenW - 240 + 160 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
         {
-            EditorCursor.WorldLevel.WarpX = -1.;
-            EditorCursor.WorldLevel.WarpY = -1.;
+            EditorCursor.WorldLevel.WarpX = -1;
+            EditorCursor.WorldLevel.WarpY = -1;
         }
     }
     else
     {
         SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 240 + 4, 330);
     }
+
     if(UpdateButton(mode, e_ScreenW - 240 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
     {
         EditorCursor.WorldLevel.WarpY = 32*((int)EditorCursor.WorldLevel.WarpY/32 - 1);
         if((int)EditorCursor.WorldLevel.WarpX == -1)
             EditorCursor.WorldLevel.WarpX = 0.;
     }
+
     if(UpdateButton(mode, e_ScreenW - 240 + 40 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
     {
         EditorCursor.WorldLevel.WarpY = 32*((int)EditorCursor.WorldLevel.WarpY/32 + 1);
         if((int)EditorCursor.WorldLevel.WarpX == -1)
             EditorCursor.WorldLevel.WarpX = 0.;
     }
+
     if(UpdateButton(mode, e_ScreenW - 240 + 80 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
     {
         EditorCursor.WorldLevel.WarpX = 32*((int)EditorCursor.WorldLevel.WarpX/32 - 1);
         if((int)EditorCursor.WorldLevel.WarpY == -1)
             EditorCursor.WorldLevel.WarpY = 0.;
     }
+
     if(UpdateButton(mode, e_ScreenW - 240 + 120 + 4, 360 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
     {
         EditorCursor.WorldLevel.WarpX = 32*((int)EditorCursor.WorldLevel.WarpX/32 + 1);
@@ -3768,48 +3775,50 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
         XRender::renderRect(0, e_ScreenH - 240, e_ScreenW - 240, 240, 0.6f, 0.6f, 0.8f, 1.0f, true);
 
     // level name - LevelName
-    SuperPrintR(mode, "LEVEL NAME:", 3, 10 + 44, e_ScreenH - 240 + 2);
+    SuperPrintR(mode, g_editorStrings.levelName, 3, 10 + 44, e_ScreenH - 240 + 2);
     SuperPrintR(mode, EditorCursor.WorldLevel.LevelName.substr(0, 19), 3, 10 + 44, e_ScreenH - 240 + 20);
     if(EditorCursor.WorldLevel.LevelName.length() > 19)
         SuperPrintR(mode, EditorCursor.WorldLevel.LevelName.substr(19), 3, 10 + 44 + 18, e_ScreenH - 240 + 38);
     if(UpdateButton(mode, 10 + 4, e_ScreenH - 240 + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
     {
         DisableCursorNew();
-        EditorCursor.WorldLevel.LevelName = TextEntryScreen::Run("Level name", EditorCursor.WorldLevel.LevelName);
+        EditorCursor.WorldLevel.LevelName = TextEntryScreen::Run(g_editorStrings.levelName, EditorCursor.WorldLevel.LevelName);
         MouseMove(SharedCursor.X, SharedCursor.Y);
     }
 
     // level filename - FileName
-    SuperPrintR(mode, "FILENAME:", 3, 10 + 44, e_ScreenH - 180 + 2);
+    SuperPrintR(mode, g_editorStrings.warpTarget, 3, 10 + 44, e_ScreenH - 180 + 2);
     if(!EditorCursor.WorldLevel.FileName.empty())
         SuperPrintR(mode, EditorCursor.WorldLevel.FileName, 3, 10 + 44, e_ScreenH - 180 + 20);
     else
-        SuperPrintR(mode, "<NONE>", 3, 10 + 44, e_ScreenH - 180 + 20);
+        SuperPrintR(mode, g_mainMenu.caseNone, 3, 10 + 44, e_ScreenH - 180 + 20);
     if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
         StartFileBrowser(&EditorCursor.WorldLevel.FileName, FileNamePath, "", {".lvl", ".lvlx"}, BROWSER_MODE_OPEN);
 
     if(!EditorCursor.WorldLevel.FileName.empty())
     {
         // entrance warp - StartWarp
-        if(EditorCursor.WorldLevel.StartWarp > 0 && UpdateButton(mode, 50 + 4, e_ScreenH - 180 + 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+        if(EditorCursor.WorldLevel.StartWarp > 0 && UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             EditorCursor.WorldLevel.StartWarp -= 1;
         if(EditorCursor.WorldLevel.StartWarp < maxWarps && UpdateButton(mode, 280 + 4, e_ScreenH - 180 + 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             EditorCursor.WorldLevel.StartWarp += 1;
-        SuperPrintR(mode, "ENTRANCE:", 3, 50 + 44, e_ScreenH - 180 + 40 + 2);
-        if(EditorCursor.WorldLevel.StartWarp != 0)
-            SuperPrintR(mode, "WARP " + std::to_string(EditorCursor.WorldLevel.StartWarp), 3, 50 + 44, e_ScreenH - 180 + 40 + 20);
+
+        if(EditorCursor.WorldLevel.StartWarp == 0)
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.warpTo, g_editorStrings.levelStartPos), 3, 10 + 44, e_ScreenH - 180 + 40 + 12);
         else
-            SuperPrintR(mode, "NORMAL", 3, 50 + 44, e_ScreenH - 180 + 40 + 20);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.warpTo, fmt::format_ne(g_editorStrings.phraseWarpIndex, EditorCursor.WorldLevel.StartWarp)), 3, 10 + 44, e_ScreenH - 180 + 40 + 12);
 
         // exits
-        SuperPrintR(mode, "PATH UNLOCKS", 3, 10 + 44, e_ScreenH - 180 + 80 + 2);
+        SuperPrintR(mode, g_editorStrings.levelPathUnlocks, 3, 10 + 44, e_ScreenH - 180 + 80 + 2);
+
+        using Controls::PlayerControls::Buttons;
 
         if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 100 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_LEVEL_EXIT;
             m_special_subpage = 1;
         }
-        SuperPrintR(mode, "UP", 3, 10 + 44, e_ScreenH - 180 + 102);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Up), 3, 10 + 44, e_ScreenH - 180 + 102);
         SuperPrintR(mode, EditorCustom::list_level_exit_names[EditorCursor.WorldLevel.LevelExit[1]+1], 3, 10 + 44, e_ScreenH - 180 + 120);
 
         if(UpdateButton(mode, (e_ScreenW - 240)/2 + 10 + 4, e_ScreenH - 180 + 100 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
@@ -3817,7 +3826,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_LEVEL_EXIT;
             m_special_subpage = 3;
         }
-        SuperPrintR(mode, "DOWN", 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 102);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Down), 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 102);
         SuperPrintR(mode, EditorCustom::list_level_exit_names[EditorCursor.WorldLevel.LevelExit[3]+1], 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 120);
 
         if(UpdateButton(mode, 10 + 4, e_ScreenH - 180 + 140 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
@@ -3825,7 +3834,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_LEVEL_EXIT;
             m_special_subpage = 2;
         }
-        SuperPrintR(mode, "LEFT", 3, 10 + 44, e_ScreenH - 180 + 142);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Left), 3, 10 + 44, e_ScreenH - 180 + 142);
         SuperPrintR(mode, EditorCustom::list_level_exit_names[EditorCursor.WorldLevel.LevelExit[2]+1], 3, 10 + 44, e_ScreenH - 180 + 160);
 
         if(UpdateButton(mode, (e_ScreenW - 240)/2 + 10 + 4, e_ScreenH - 180 + 140 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
@@ -3833,7 +3842,7 @@ void EditorScreen::UpdateLevelScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_LEVEL_EXIT;
             m_special_subpage = 4;
         }
-        SuperPrintR(mode, "RIGHT", 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 142);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Right), 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 142);
         SuperPrintR(mode, EditorCustom::list_level_exit_names[EditorCursor.WorldLevel.LevelExit[4]+1], 3, (e_ScreenW - 240)/2 + 10 + 44, e_ScreenH - 180 + 160);
     }
 

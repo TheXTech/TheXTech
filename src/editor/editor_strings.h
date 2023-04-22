@@ -204,6 +204,11 @@ struct EditorContent
 
     std::string levelName;
     std::string levelStartPos;
+    std::string levelPathBG;
+    std::string levelBigBG;
+    std::string levelGameStart;
+    std::string levelAlwaysVis;
+    std::string levelPathUnlocks;
 
     std::string sectionSetBounds;
     std::string sectionScroll;

@@ -118,7 +118,12 @@
         "letterRight": "右",
         "letterUp": "上",
         "level": {
+            "alwaysVis": "",
+            "bigBG": "",
+            "gameStart": "",
             "levelName": "關卡名稱",
+            "pathBG": "",
+            "pathUnlocks": "",
             "startPos": "遊戲起點"
         },
         "mapPos": "",

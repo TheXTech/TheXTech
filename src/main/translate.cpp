@@ -612,6 +612,11 @@ XTechTranslate::XTechTranslate()
 
         {"editor.level.levelName",            &g_editorStrings.levelName},
         {"editor.level.startPos",             &g_editorStrings.levelStartPos},
+        {"editor.level.pathBG",               &g_editorStrings.levelPathBG},
+        {"editor.level.bigBG",                &g_editorStrings.levelBigBG},
+        {"editor.level.gameStart",            &g_editorStrings.levelGameStart},
+        {"editor.level.alwaysVis",            &g_editorStrings.levelAlwaysVis},
+        {"editor.level.pathUnlocks",          &g_editorStrings.levelPathUnlocks},
 
         {"editor.section.setBounds",          &g_editorStrings.sectionSetBounds},
         {"editor.section.scroll",             &g_editorStrings.sectionScroll},

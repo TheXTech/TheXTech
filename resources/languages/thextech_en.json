@@ -118,7 +118,12 @@
         "letterRight": "R",
         "letterUp": "U",
         "level": {
+            "alwaysVis": "Always Vis",
+            "bigBG": "Big BG",
+            "gameStart": "Game Start",
             "levelName": "Level Name",
+            "pathBG": "Path BG",
+            "pathUnlocks": "Path Unlocks",
             "startPos": "Start Pos"
         },
         "mapPos": "Map Pos:",
