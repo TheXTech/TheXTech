@@ -2897,9 +2897,6 @@ void zTestLevel(bool magicHand, bool interProcess)
 #ifdef THEXTECH_INTERPROC_SUPPORTED
     if(interProcess)
     {
-        LevelData data;
-        FileFormats::CreateLevelData(data);
-        data.meta.ReadFileValid = false;
         pLogDebug("ICP: Requesting editor for a file....");
         IntProc::sendMessage("CMD:CONNECT_TO_ENGINE");
         ElapsedTimer time;
@@ -2939,7 +2936,7 @@ void zTestLevel(bool magicHand, bool interProcess)
             PGE_Delay(2);
         }
 
-        data = IntProc::editor->m_acceptedLevel;
+        LevelData& data = IntProc::editor->m_acceptedLevel;
         if(!timeOut && !data.meta.ReadFileValid) //-V560
         {
             pLogWarning("Bad file format!");
