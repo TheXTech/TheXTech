@@ -289,7 +289,7 @@
             "controlsNewProfile": "<新建配置>",
             "controlsNotInUse": "（未使用）",
             "controlsReallyDeleteProfile": "是否删除配置？",
-            "controlsTitle": "控制",
+            "controlsTitle": "按键配置",
             "cursor": {
                 "down": "鼠标向下移动",
                 "left": "鼠标向左移动",
