@@ -322,6 +322,7 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     // It's primary use is a debugging of the font engine itself, comparing with the
     // old font engine on the fly
     this->m_hotkeys[Hotkeys::Buttons::ToggleFontRender] = SDL_SCANCODE_F4;
+    this->m_hotkeys[Hotkeys::Buttons::ReloadLanguage] = SDL_SCANCODE_F5;
 #endif
 }
 

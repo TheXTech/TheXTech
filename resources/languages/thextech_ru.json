@@ -1,15 +1,15 @@
 {
     "editor": {
         "block": {
-            "canBreak": "",
-            "canBreakTooltip": "",
-            "inside": "",
-            "invis": "",
-            "letterHeight": "",
-            "letterWidth": "",
+            "canBreak": "Можн. слом.",
+            "canBreakTooltip": "Устар.: ломается при ударе",
+            "inside": "Содерж.:",
+            "invis": "Невид.",
+            "letterHeight": "В ",
+            "letterWidth": "Ш ",
             "pickContents1": "Взять блок",
             "pickContents2": "содержимое",
-            "slick": ""
+            "slick": "Лёд"
         },
         "events": {
             "bounds": {
@@ -39,7 +39,7 @@
                 "talk1": "",
                 "talk2": ""
             },
-            "header": "События:",
+            "header": "Событ.:",
             "headerTriggerEvent": "Триггер:",
             "itemNewEvent": "<Новое событие>",
             "label": {
@@ -140,11 +140,11 @@
                 "header": "Настройки генератора"
             },
             "inContainer": "В",
-            "inertNice": "Чувств.",
+            "inertNice": "Друг",
             "props": {
-                "active": "",
-                "attachSurface": "",
-                "facing": ""
+                "active": "Актив.",
+                "attachSurface": "Прис.",
+                "facing": "Напр."
             },
             "stuckStop": "Стоп",
             "tooltipExpandSection": "Расширить секцию"

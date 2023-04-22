@@ -33,6 +33,7 @@
 #include "main/screen_quickreconnect.h"
 #include "main/cheat_code.h"
 #include "main/menu_main.h"
+#include "main/translate.h"
 #include "../graphics.h"
 #include "../frame_timer.h"
 
@@ -109,6 +110,18 @@ void Hotkeys::Activate(size_t i, int player)
     case Buttons::ToggleFontRender:
         NewFontRender = !NewFontRender;
         return;
+
+    case Buttons::ReloadLanguage:
+    {
+        XTechTranslate translator;
+        if(translator.translate())
+        {
+            pLogDebug("Reloaded translation for language %s-%s",
+                      CurrentLanguage.c_str(),
+                      CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
+        }
+        return;
+    }
 #endif
 
     case Buttons::DebugInfo:

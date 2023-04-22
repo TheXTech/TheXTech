@@ -393,6 +393,7 @@ enum Buttons : size_t
     ToggleHUD, LegacyPause,
 #ifdef DEBUG_BUILD
     ToggleFontRender,
+    ReloadLanguage,
 #endif
     MAX
 };
@@ -420,6 +421,8 @@ inline const char *GetButtonName_INI(size_t i)
 #ifdef DEBUG_BUILD
     case Buttons::ToggleFontRender:
         return "toggle-font-render";
+    case Buttons::ReloadLanguage:
+        return "reload-language";
 #endif
     default:
         return "NULL";
@@ -447,6 +450,8 @@ inline const char *GetButtonName_UI_Init(size_t i)
 #ifdef DEBUG_BUILD
     case Buttons::ToggleFontRender:
         return "Old fonts";
+    case Buttons::ReloadLanguage:
+        return "Reload lang";
 #endif
     default:
         return "NULL";
