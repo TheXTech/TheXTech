@@ -2948,7 +2948,7 @@ void zTestLevel(bool magicHand, bool interProcess)
             return;
         }
 
-        OpenLevelData(data);
+        OpenLevelData(data, IntProc::editor->m_accepted_lvl_path);
 
         pLogDebug("ICP: Done, starting a game....");
         IntProc::setState("Done. Starting game...");
