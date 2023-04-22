@@ -277,6 +277,9 @@
             },
             "twoWay": ""
         },
+        "water": {
+            "title": ""
+        },
         "wordCoins": "Монетки",
         "wordEnabled": "Включено",
         "wordEvent": {
@@ -284,12 +287,15 @@
             "nominative": "Событие",
             "typeLabel": ""
         },
+        "wordHeight": "",
         "wordInstant": "Мгновенно",
+        "wordMode": "",
         "wordNPC": {
             "genitive": "НИПа",
             "nominative": "НИП"
         },
         "wordText": "Текст",
+        "wordWidth": "",
         "world": {
             "allowChars": "",
             "hubWorld": "",

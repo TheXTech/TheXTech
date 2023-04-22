@@ -66,6 +66,8 @@ void initEditorStrings()
     g_editorStrings.warpShowStartScene = "Show Start Scene";
     g_editorStrings.warpShowStarCount = "Show Star Count";
 
+    g_editorStrings.waterTitle = "Water Settings";
+
     g_editorStrings.npcInContainer = "In";
     g_editorStrings.npcInertNice = "Nice";
     g_editorStrings.npcStuckStop = "Stop";
@@ -105,6 +107,10 @@ void initEditorStrings()
     g_editorStrings.wordEnabled = "Enabled";
     g_editorStrings.wordText = "Text";
     g_editorStrings.wordInstant = "Instant";
+    g_editorStrings.wordMode = "Mode";
+    g_editorStrings.wordHeight = "Height";
+    g_editorStrings.wordWidth = "Width";
+
     g_editorStrings.phraseTextOf = "{0} Text";
     g_editorStrings.phraseSectionIndex = "Section {0}";
     g_editorStrings.phraseRadiusIndex = "Radius {0}";

@@ -474,6 +474,8 @@ XTechTranslate::XTechTranslate()
         {"editor.warp.showStartScene",      &g_editorStrings.warpShowStartScene},
         {"editor.warp.showStarCount",       &g_editorStrings.warpShowStarCount},
 
+        {"editor.water.title",              &g_editorStrings.waterTitle},
+
         {"editor.npc.inContainer",          &g_editorStrings.npcInContainer},
         {"editor.npc.inertNice",            &g_editorStrings.npcInertNice},
         {"editor.npc.stuckStop",            &g_editorStrings.npcStuckStop},
@@ -513,6 +515,10 @@ XTechTranslate::XTechTranslate()
         {"editor.wordEnabled",              &g_editorStrings.wordEnabled},
         {"editor.wordText",                 &g_editorStrings.wordText},
         {"editor.wordInstant",              &g_editorStrings.wordInstant},
+        {"editor.wordMode",                 &g_editorStrings.wordMode},
+        {"editor.wordHeight",               &g_editorStrings.wordHeight},
+        {"editor.wordWidth",                &g_editorStrings.wordWidth},
+
         {"editor.phraseTextOf",             &g_editorStrings.phraseTextOf},
         {"editor.phraseSectionIndex",       &g_editorStrings.phraseSectionIndex},
         {"editor.phraseRadiusIndex",        &g_editorStrings.phraseRadiusIndex},

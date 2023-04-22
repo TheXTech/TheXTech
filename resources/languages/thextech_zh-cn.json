@@ -277,6 +277,9 @@
             },
             "twoWay": ""
         },
+        "water": {
+            "title": ""
+        },
         "wordCoins": "金币",
         "wordEnabled": "已启用",
         "wordEvent": {
@@ -284,12 +287,15 @@
             "nominative": "事件",
             "typeLabel": "{0}时触发事件："
         },
+        "wordHeight": "",
         "wordInstant": "立即",
+        "wordMode": "",
         "wordNPC": {
             "genitive": "NPC",
             "nominative": "NPC"
         },
         "wordText": "信息",
+        "wordWidth": "",
         "world": {
             "allowChars": "可用角色",
             "hubWorld": "禁用大地图",

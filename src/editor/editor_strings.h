@@ -69,6 +69,8 @@ struct EditorContent
     std::string warpShowStartScene;
     std::string warpShowStarCount;
 
+    std::string waterTitle;
+
     std::string npcInContainer;
     std::string npcInertNice;
     std::string npcStuckStop;
@@ -108,6 +110,10 @@ struct EditorContent
     std::string wordEnabled;
     std::string wordText;
     std::string wordInstant;
+    std::string wordMode;
+    std::string wordHeight;
+    std::string wordWidth;
+
     std::string phraseTextOf;
     std::string phraseSectionIndex;
     std::string phraseRadiusIndex;

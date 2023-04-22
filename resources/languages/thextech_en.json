@@ -277,6 +277,9 @@
             },
             "twoWay": "Two-Way"
         },
+        "water": {
+            "title": "Water Settings"
+        },
         "wordCoins": "Coins",
         "wordEnabled": "Enabled",
         "wordEvent": {
@@ -284,12 +287,15 @@
             "nominative": "Event",
             "typeLabel": "{0} Event:"
         },
+        "wordHeight": "Height",
         "wordInstant": "Instant",
+        "wordMode": "Mode",
         "wordNPC": {
             "genitive": "NPC",
             "nominative": "NPC"
         },
         "wordText": "Text",
+        "wordWidth": "Width",
         "world": {
             "allowChars": "Allow Chars",
             "hubWorld": "Hub World",

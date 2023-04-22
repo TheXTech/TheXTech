@@ -3124,38 +3124,54 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
 
 void EditorScreen::UpdateWaterScreen(CallMode mode)
 {
-    SuperPrintR(mode, "WATER SETTINGS", 3, 200, 50);
+    SuperPrintR(mode, g_editorStrings.waterTitle, 3, 200, 50);
+
     int H = ((int)EditorCursor.Water.Location.Height)/32;
     int W = ((int)EditorCursor.Water.Location.Width)/32;
+
+    // validation
     if(H == 0)
     {
         H = 1;
         EditorCursor.Water.Location.Height = 32;
     }
+
     if(W == 0)
     {
         W = 1;
         EditorCursor.Water.Location.Width = 32;
     }
+
+    // Width
     if(W >= 10)
-        SuperPrintR(mode, "WIDTH " + std::to_string(W), 3, 180, 90);
+        SuperPrintR(mode, g_editorStrings.wordWidth + " " + std::to_string(W), 3, 180, 90);
     else
-        SuperPrintR(mode, "WIDTH  " + std::to_string(W), 3, 180, 90);
+        SuperPrintR(mode, g_editorStrings.wordWidth + " " + std::to_string(W), 3, 180, 90);
+
     if(W > 1 && UpdateButton(mode, 340 + 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         EditorCursor.Water.Location.Width = 32 * (W - 1);
+
     if(UpdateButton(mode, 380 + 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         EditorCursor.Water.Location.Width = 32 * (W + 1);
+
+    // Height
     if(H >= 10)
-        SuperPrintR(mode, "HEIGHT " + std::to_string(H), 3, 162, 130);
+        SuperPrintR(mode, g_editorStrings.wordHeight + " " + std::to_string(H), 3, 162, 130);
     else
-        SuperPrintR(mode, "HEIGHT  " + std::to_string(H), 3, 162, 130);
+        SuperPrintR(mode, g_editorStrings.wordHeight + " " + std::to_string(H), 3, 162, 130);
+
     if(H > 1 && UpdateButton(mode, 340 + 4, 120 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         EditorCursor.Water.Location.Height = 32 * (H - 1);
+
     if(UpdateButton(mode, 380 + 4, 120 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         EditorCursor.Water.Location.Height = 32 * (H + 1);
-    SuperPrintR(mode, "MODE", 3, 246, 170);
+
+    // mode
+    SuperPrintR(mode, g_editorStrings.wordMode, 3, 246, 170);
+
     if(UpdateButton(mode, 340 + 4, 160 + 4, GFXBackgroundBMP[26], !EditorCursor.Water.Quicksand, 0, 0, 32, 32))
         EditorCursor.Water.Quicksand = false;
+
     if(UpdateButton(mode, 380 + 4, 160 + 4, GFXBackgroundBMP[188], EditorCursor.Water.Quicksand, 0, 0, 32, 32))
         EditorCursor.Water.Quicksand = true;
 
