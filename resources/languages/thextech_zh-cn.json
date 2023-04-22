@@ -37,7 +37,7 @@
                 "layerClear3": " ",
                 "phraseTriggersWhen": "将于",
                 "talk1": "和NPC对话后触发事件",
-                "talk2": ""
+                "talk2": " "
             },
             "header": "事件：",
             "headerTriggerEvent": "触发",
@@ -88,7 +88,7 @@
         },
         "layers": {
             "abbrevAttLayer": "跟随：",
-            "default": "",
+            "default": "默认",
             "deletion": {
                 "cancel": "取消：不删除图层",
                 "confirmDelete": "否：*删除全部对象*",
@@ -99,9 +99,9 @@
             "desc": {
                 "att1": "当 NPC 移动时，",
                 "att2": "图层也将随之移动",
-                "att3": "",
-                "att4": "",
-                "att5": ""
+                "att3": " ",
+                "att4": " ",
+                "att5": " "
             },
             "header": "图层：",
             "itemNewLayer": "<新图层>",
