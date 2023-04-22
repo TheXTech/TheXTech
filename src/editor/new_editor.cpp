@@ -861,11 +861,11 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         {
             SuperPrint(g_editorStrings.labelLayer, 3, e_ScreenW - 200, 414);
             if(EditorCursor.NPC.Layer == LAYER_NONE)
-                SuperPrint(g_editorStrings.layerDefault, 3, e_ScreenW - 200, 440);
+                SuperPrint(g_editorStrings.layersLayerDefault, 3, e_ScreenW - 200, 440);
             else
                 SuperPrint(GetL(EditorCursor.NPC.Layer), 3, e_ScreenW - 200, 440);
             if(EditorCursor.NPC.AttLayer != LAYER_NONE && EditorCursor.NPC.AttLayer != LAYER_DEFAULT)
-                SuperPrint(g_editorStrings.labelAbbrevAttLayer + GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 200, 460);
+                SuperPrint(g_editorStrings.layersAbbrevAttLayer + GetL(EditorCursor.NPC.AttLayer), 3, e_ScreenW - 200, 460);
         }
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 400 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
             m_special_page = SPECIAL_PAGE_OBJ_LAYER;
@@ -2567,33 +2567,39 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
 {
     if(m_special_page == SPECIAL_PAGE_LAYER_DELETION)
     {
-        SuperPrintR(mode, "DELETING LAYER " + Layer[m_special_subpage].Name, 3, 60, 40);
-        SuperPrintR(mode, "PRESERVE LAYER CONTENTS?", 3, 10, 60);
-        SuperPrintR(mode, "YES: MOVE TO DEFAULT LAYER", 3, 60, 110);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.layersDeletionHeader, Layer[m_special_subpage].Name), 3, 60, 40);
+        SuperPrintR(mode, g_editorStrings.layersDeletionPreserveLayerContents, 3, 10, 60);
+
+        SuperPrintR(mode, g_editorStrings.layersDeletionConfirmPreserve, 3, 60, 110);
 
         if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             DeleteLayer((layerindex_t)m_special_subpage, false);
             m_special_subpage = 0;
             m_special_page = SPECIAL_PAGE_LAYERS;
+            return;
         }
 
-        SuperPrintR(mode, "NO: *DELETE ALL CONTENTS*", 3, 60, 150);
+
+        SuperPrintR(mode, g_editorStrings.layersDeletionConfirmDelete, 3, 60, 150);
 
         if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             DeleteLayer((layerindex_t)m_special_subpage, true);
             m_special_subpage = 0;
             m_special_page = SPECIAL_PAGE_LAYERS;
+            return;
         }
 
-        SuperPrintR(mode, "CANCEL: DO NOT DELETE " + Layer[m_special_subpage].Name, 3, 60, 190);
+
+        SuperPrintR(mode, g_editorStrings.layersDeletionCancel, 3, 60, 190);
 
         if(UpdateButton(mode, 20 + 4, 180 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_subpage = 0;
             m_special_page = SPECIAL_PAGE_LAYERS;
         }
+
         return;
     }
 
@@ -2616,15 +2622,15 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
 
     if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && EditorCursor.Mode == OptCursor_t::LVL_NPCS)
     {
-        SuperPrintR(mode, "LAYER:", 3, e_ScreenW - 200, 200 + 2);
+        SuperPrintR(mode, g_editorStrings.labelLayer, 3, e_ScreenW - 200, 200 + 2);
         if(EditorCursor.Layer == LAYER_NONE)
-            SuperPrintR(mode, g_editorStrings.layerDefault, 3, e_ScreenW - 200, 220 + 2);
+            SuperPrintR(mode, g_editorStrings.layersLayerDefault, 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, GetL(EditorCursor.Layer), 3, e_ScreenW - 200, 220 + 2);
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 0, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 0;
 
-        SuperPrintR(mode, "ATTACHED:", 3, e_ScreenW - 200, 260 + 2);
+        SuperPrintR(mode, g_editorStrings.layersLabelAttached, 3, e_ScreenW - 200, 260 + 2);
         if(EditorCursor.NPC.AttLayer == LAYER_NONE || EditorCursor.NPC.AttLayer == LAYER_DEFAULT)
             SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 280 + 2);
         else
@@ -2659,42 +2665,42 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
     }
 
     // prepare selector
-    std::string layer_name;
+    const std::string* layer_name;
     layerindex_t* layer_to_set;
     if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
     {
-        layer_name = "ATTACHED LAYER:";
+        layer_name = &g_editorStrings.layersLabelAttachedLayer;
         layer_to_set = &EditorCursor.NPC.AttLayer;
     }
     else if(m_special_page == SPECIAL_PAGE_EVENT_LAYERS)
     {
-        layer_name = "MOVE LAYER:";
+        layer_name = &g_editorStrings.layersLabelMoveLayer;
         layer_to_set = &Events[m_current_event].MoveLayer;
     }
     else
     {
-        layer_name = "CURRENT LAYER:";
+        layer_name = &g_editorStrings.labelLayer;
         layer_to_set = &EditorCursor.Layer;
     }
 
     // render description
     if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
     {
-        SuperPrintR(mode, "WHENEVER THE", 3, e_ScreenW - 236, 80);
-        SuperPrintR(mode, "NPC MOVES,", 3, e_ScreenW - 236, 100);
-        SuperPrintR(mode, "THE ATTACHED", 3, e_ScreenW - 236, 120);
-        SuperPrintR(mode, "LAYER MOVES", 3, e_ScreenW - 236, 140);
-        SuperPrintR(mode, "FOLLOWING IT.", 3, e_ScreenW - 236, 160);
+        SuperPrintR(mode, g_editorStrings.layersDescAtt1, 3, e_ScreenW - 236, 80);
+        SuperPrintR(mode, g_editorStrings.layersDescAtt2, 3, e_ScreenW - 236, 100);
+        SuperPrintR(mode, g_editorStrings.layersDescAtt3, 3, e_ScreenW - 236, 120);
+        SuperPrintR(mode, g_editorStrings.layersDescAtt4, 3, e_ScreenW - 236, 140);
+        SuperPrintR(mode, g_editorStrings.layersDescAtt5, 3, e_ScreenW - 236, 160);
     }
 
     // render current layer
-    SuperPrintR(mode, layer_name, 3, 10, 40);
+    SuperPrintR(mode, *layer_name, 3, 10, 40);
     if(*layer_to_set == LAYER_NONE)
     {
         if(m_special_subpage == 1 || m_special_page == SPECIAL_PAGE_EVENT_LAYERS)
             SuperPrintR(mode, g_mainMenu.caseNone, 3, 10, 56);
         else
-            SuperPrintR(mode, g_editorStrings.layerDefault, 3, 10, 56);
+            SuperPrintR(mode, g_editorStrings.layersLayerDefault, 3, 10, 56);
     }
     else
         SuperPrintR(mode, GetL(*layer_to_set), 3, 10, 56);
@@ -2729,7 +2735,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
             if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
                 SuperPrintR(mode, g_mainMenu.caseNone, 3, 54, 80 + 40*i + 12);
             else
-                SuperPrintR(mode, g_editorStrings.layerDefault, 3, 54, 80 + 40*i + 12);
+                SuperPrintR(mode, g_editorStrings.layersLayerDefault, 3, 54, 80 + 40*i + 12);
 
             if(UpdateButton(mode, 10 + 4, 80 + 40*i + 4, GFX.ECursor[2], *layer_to_set == LAYER_NONE || (*layer_to_set) == l, 0, 0, 32, 32))
                 *layer_to_set = LAYER_NONE;
@@ -2767,7 +2773,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
                 if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
                 {
                     DisableCursorNew();
-                    std::string new_name = TextEntryScreen::Run("New layer name", Layer[l].Name);
+                    std::string new_name = TextEntryScreen::Run(g_editorStrings.layersPromptLayerName, Layer[l].Name);
                     if(!new_name.empty())
                         RenameLayer(l, new_name);
                     MouseMove((float)SharedCursor.X, (float)SharedCursor.Y);
@@ -2839,12 +2845,12 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
         // create a new layer!
         else if(m_special_page == SPECIAL_PAGE_LAYERS && l != 0 && !Layer[l - 1].Name.empty())
         {
-            SuperPrintR(mode, "<NEW LAYER>", 3, 54, 80 + 40*i + 10);
+            SuperPrintR(mode, g_editorStrings.layersItemNewLayer, 3, 54, 80 + 40*i + 10);
             // rename only
             if(UpdateButton(mode, 400 + 4, 80 + 40*i + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
                 DisableCursorNew();
-                std::string new_name = TextEntryScreen::Run("New layer name", "");
+                std::string new_name = TextEntryScreen::Run(g_editorStrings.layersPromptLayerName, "");
                 if(!new_name.empty() && FindLayer(new_name) == LAYER_NONE)
                 {
                     Layer[l] = Layer_t();
@@ -2993,7 +2999,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     // Layers
     SuperPrintR(mode, g_editorStrings.labelLayer, 3, e_ScreenW - 160, 434);
     if(EditorCursor.Block.Layer == LAYER_NONE)
-        SuperPrintR(mode, g_editorStrings.layerDefault, 3, e_ScreenW - 160, 460);
+        SuperPrintR(mode, g_editorStrings.layersLayerDefault, 3, e_ScreenW - 160, 460);
     else
         SuperPrintR(mode, GetL(EditorCursor.Block.Layer), 3, e_ScreenW - 160, 460);
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
@@ -3083,7 +3089,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
     // Layers
     SuperPrintR(mode, g_editorStrings.labelLayer, 3, e_ScreenW - 160, 434);
     if(EditorCursor.Background.Layer == LAYER_NONE)
-        SuperPrintR(mode, g_editorStrings.layerDefault, 3, e_ScreenW - 160, 460);
+        SuperPrintR(mode, g_editorStrings.layersLayerDefault, 3, e_ScreenW - 160, 460);
     else
         SuperPrintR(mode, GetL(EditorCursor.Background.Layer), 3, e_ScreenW - 160, 460);
 
@@ -3152,7 +3158,7 @@ void EditorScreen::UpdateWaterScreen(CallMode mode)
     // layers
     SuperPrintR(mode, g_editorStrings.labelLayer, 3, 246, 234);
     if(EditorCursor.Layer == LAYER_NONE)
-        SuperPrintR(mode, g_editorStrings.layerDefault, 3, 206, 260);
+        SuperPrintR(mode, g_editorStrings.layersLayerDefault, 3, 206, 260);
     else
         SuperPrintR(mode, GetL(EditorCursor.Layer), 3, 206, 260);
 
@@ -3249,7 +3255,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
     {
         SuperPrint(g_editorStrings.labelLayer, 3, e_ScreenW - 200, 414);
         if(EditorCursor.Warp.Layer == LAYER_NONE)
-            SuperPrint(g_editorStrings.layerDefault, 3, e_ScreenW - 240, 440);
+            SuperPrint(g_editorStrings.layersLayerDefault, 3, e_ScreenW - 240, 440);
         else
             SuperPrint(GetL(EditorCursor.Warp.Layer), 3, e_ScreenW - 240, 440);
     }

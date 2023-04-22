@@ -599,8 +599,27 @@ XTechTranslate::XTechTranslate()
         {"editor.layers.header",              &g_editorStrings.layersHeader},
 
         {"editor.layers.label",               &g_editorStrings.labelLayer},
-        {"editor.layers.labelAbbrevAttLayer", &g_editorStrings.labelAbbrevAttLayer},
-        {"editor.layers.default",             &g_editorStrings.layerDefault},
+        {"editor.layers.labelAttached",       &g_editorStrings.layersLabelAttached},
+        {"editor.layers.abbrevAttLayer",      &g_editorStrings.layersAbbrevAttLayer},
+        {"editor.layers.default",             &g_editorStrings.layersLayerDefault},
+
+        {"editor.layers.labelAttachedLayer",  &g_editorStrings.layersLabelAttachedLayer},
+        {"editor.layers.labelMoveLayer",      &g_editorStrings.layersLabelMoveLayer},
+
+        {"editor.layers.deletion.header",                   &g_editorStrings.layersDeletionHeader},
+        {"editor.layers.deletion.preserveLayerContents",    &g_editorStrings.layersDeletionPreserveLayerContents},
+        {"editor.layers.deletion.confirmPreserve",          &g_editorStrings.layersDeletionConfirmPreserve},
+        {"editor.layers.deletion.confirmDelete",            &g_editorStrings.layersDeletionConfirmDelete},
+        {"editor.layers.deletion.cancel",                   &g_editorStrings.layersDeletionCancel},
+
+        {"editor.layers.desc.att1", &g_editorStrings.layersDescAtt1},
+        {"editor.layers.desc.att2", &g_editorStrings.layersDescAtt2},
+        {"editor.layers.desc.att3", &g_editorStrings.layersDescAtt3},
+        {"editor.layers.desc.att4", &g_editorStrings.layersDescAtt4},
+        {"editor.layers.desc.att5", &g_editorStrings.layersDescAtt5},
+
+        {"editor.layers.promptLayerName", &g_editorStrings.layersPromptLayerName},
+        {"editor.layers.itemNewLayer",    &g_editorStrings.layersItemNewLayer},
 #endif // THEXTECH_ENABLE_EDITOR
     };
 

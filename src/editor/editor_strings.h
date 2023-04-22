@@ -191,8 +191,27 @@ struct EditorContent
     std::string layersHeader;
 
     std::string labelLayer;
-    std::string labelAbbrevAttLayer;
-    std::string layerDefault;
+    std::string layersLabelAttached;
+    std::string layersAbbrevAttLayer;
+    std::string layersLayerDefault;
+
+    std::string layersLabelAttachedLayer;
+    std::string layersLabelMoveLayer;
+
+    std::string layersDeletionHeader;
+    std::string layersDeletionPreserveLayerContents;
+    std::string layersDeletionConfirmPreserve;
+    std::string layersDeletionConfirmDelete;
+    std::string layersDeletionCancel;
+
+    std::string layersDescAtt1;
+    std::string layersDescAtt2;
+    std::string layersDescAtt3;
+    std::string layersDescAtt4;
+    std::string layersDescAtt5;
+
+    std::string layersPromptLayerName;
+    std::string layersItemNewLayer;
 
     std::vector<std::string> listWarpTransitNames{6};
 };

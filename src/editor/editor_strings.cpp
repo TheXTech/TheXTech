@@ -188,8 +188,27 @@ void initEditorStrings()
     g_editorStrings.layersHeader = "Layers:";
 
     g_editorStrings.labelLayer = "Layer:";
-    g_editorStrings.labelAbbrevAttLayer = "Att: ";
-    g_editorStrings.layerDefault = "Default";
+    g_editorStrings.layersLabelAttached = "Attached:";
+    g_editorStrings.layersAbbrevAttLayer = "Att: ";
+    g_editorStrings.layersLayerDefault = "Default";
+
+    g_editorStrings.layersLabelAttachedLayer = "Attached Layer:";
+    g_editorStrings.layersLabelMoveLayer = "Move Layer:";
+
+    g_editorStrings.layersDeletionHeader = "Deleting layer {0}";
+    g_editorStrings.layersDeletionPreserveLayerContents = "Preserve layer contents?";
+    g_editorStrings.layersDeletionConfirmPreserve = "Yes: move to default layer";
+    g_editorStrings.layersDeletionConfirmDelete = "No: *DELETE ALL CONTENTS*";
+    g_editorStrings.layersDeletionCancel = "Cancel: do not delete layer";
+
+    g_editorStrings.layersDescAtt1 = "Whenever the";
+    g_editorStrings.layersDescAtt2 = "NPC moves,";
+    g_editorStrings.layersDescAtt3 = "the attached";
+    g_editorStrings.layersDescAtt4 = "layer moves";
+    g_editorStrings.layersDescAtt5 = "following it";
+
+    g_editorStrings.layersPromptLayerName = "Layer name";
+    g_editorStrings.layersItemNewLayer = "<New Layer>";
 
     g_editorStrings.listWarpTransitNames = {"NONE", "SCROLL", "FADE", "CIRCLE", "FLIP (H)", "FLIP (V)"};
 }
