@@ -318,6 +318,15 @@ struct EditorContent
     std::string fileConvertFeatureWorldStarDisplay;
     std::string fileConvertFeatureLevelStarDisplay;
 
+    std::string browserNewFile;
+    std::string browserSaveFile;
+    std::string browserOpenFile;
+
+    std::string browserItemNewFile;
+    std::string browserItemNewFolder;
+
+    std::string browserAskOverwriteFile;
+
     std::vector<std::string> listWarpTransitNames{6};
 };
 

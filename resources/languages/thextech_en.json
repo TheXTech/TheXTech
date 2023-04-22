@@ -11,6 +11,14 @@
             "pickContents2": "contents",
             "slick": "Slick"
         },
+        "browser": {
+            "askOverwriteFile": "Overwrite {0}?",
+            "itemNewFile": "<New File>",
+            "itemNewFolder": "<New Folder>",
+            "newFile": "New file",
+            "openFile": "Open file",
+            "saveFile": "Save file"
+        },
         "events": {
             "bounds": {
                 "changeAllSectionBoundsToCurrent": "Change all sect bounds to current?",

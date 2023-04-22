@@ -726,6 +726,15 @@ XTechTranslate::XTechTranslate()
         {"editor.file.convert.featureWorldStarDisplay", &g_editorStrings.fileConvertFeatureWorldStarDisplay},
         {"editor.file.convert.featureLevelStarDisplay", &g_editorStrings.fileConvertFeatureLevelStarDisplay},
 
+        {"editor.browser.newFile",          &g_editorStrings.browserNewFile},
+        {"editor.browser.saveFile",         &g_editorStrings.browserSaveFile},
+        {"editor.browser.openFile",         &g_editorStrings.browserOpenFile},
+
+        {"editor.browser.itemNewFile",      &g_editorStrings.browserItemNewFile},
+        {"editor.browser.itemNewFolder",    &g_editorStrings.browserItemNewFolder},
+
+        {"editor.browser.askOverwriteFile", &g_editorStrings.browserAskOverwriteFile},
+
 #endif // THEXTECH_ENABLE_EDITOR
     };
 

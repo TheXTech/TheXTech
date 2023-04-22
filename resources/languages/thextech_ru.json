@@ -11,6 +11,14 @@
             "pickContents2": "содержимое",
             "slick": "Лёд"
         },
+        "browser": {
+            "askOverwriteFile": "",
+            "itemNewFile": "",
+            "itemNewFolder": "",
+            "newFile": "",
+            "openFile": "",
+            "saveFile": ""
+        },
         "events": {
             "bounds": {
                 "changeAllSectionBoundsToCurrent": "изменить все границы секции к текущим?",

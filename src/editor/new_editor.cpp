@@ -4372,20 +4372,23 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
 
     if(m_special_page == SPECIAL_PAGE_BROWSER_CONFIRM)
     {
-        SuperPrintR(mode, "CONFIRM", 3, 60, 40);
-        SuperPrintR(mode, "OVERWRITE " + m_cur_file + "?", 3, 10, 60);
-        SuperPrintR(mode, "YES", 3, 60, 110);
+        SuperPrintR(mode, g_editorStrings.phraseAreYouSure, 3, 60, 40);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.browserAskOverwriteFile, m_cur_file), 3, 10, 60);
+
+        SuperPrintR(mode, g_mainMenu.wordYes, 3, 60, 110);
         if(UpdateButton(mode, 10 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             FileBrowserSuccess();
             return;
         }
-        SuperPrintR(mode, "NO", 3, 60, 150);
+
+        SuperPrintR(mode, g_mainMenu.wordNo, 3, 60, 150);
         if(UpdateButton(mode, 10 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_BROWSER;
             m_cur_file.clear();
         }
+
         return;
     }
 
@@ -4394,27 +4397,33 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
 
     int dir_length = m_cur_path_dirs.size() + 1; // ".."
     int file_length = m_cur_path_files.size();
+
     if(m_browser_mode == BROWSER_MODE_SAVE || m_browser_mode == BROWSER_MODE_SAVE_NEW)
     {
         if(m_browser_mode == BROWSER_MODE_SAVE_NEW)
-            SuperPrintR(mode, "NEW FILE", 3, 60, 40);
+            SuperPrintR(mode, g_editorStrings.browserNewFile, 3, 60, 40);
         else
-            SuperPrintR(mode, "SAVE FILE", 3, 60, 40);
+            SuperPrintR(mode, g_editorStrings.browserSaveFile, 3, 60, 40);
+
         dir_length ++; // "new", last folder
         file_length ++; // "new", first file
     }
     else
     {
-        SuperPrintR(mode, "OPEN FILE", 3, 60, 40);
+        SuperPrintR(mode, g_editorStrings.browserOpenFile, 3, 60, 40);
     }
+
     // ignore directories
     if(IGNORE_DIRS)
         dir_length = 0;
+
     int page_max = (dir_length + file_length - 1) / 20;
     if(!(page_max == 0 && m_special_subpage == 0))
         SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, m_special_subpage + 1, page_max + 1), 3, e_ScreenW - 320, 40);
+
     if(m_special_subpage > 0 && UpdateButton(mode, e_ScreenW - 120 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
         m_special_subpage --;
+
     if(m_special_subpage < page_max && UpdateButton(mode, e_ScreenW - 80 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
         m_special_subpage ++;
 
@@ -4422,10 +4431,11 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
     {
         const int avail_chars = (e_ScreenW-140)/18;
         if(m_cur_path.size() > avail_chars)
-            SuperPrintR(mode, "IN ..." + m_cur_path.substr(m_cur_path.size() - avail_chars), 3, 10, 60);
+            SuperPrintR(mode, g_editorStrings.npcInContainer + " ..." + m_cur_path.substr(m_cur_path.size() - avail_chars), 3, 10, 60);
         else
-            SuperPrintR(mode, "IN " + m_cur_path, 3, 10, 60);
+            SuperPrintR(mode, g_editorStrings.npcInContainer + " " + m_cur_path, 3, 10, 60);
     }
+
     // render file selector
     for(int i = 0; i < 20; i++)
     {
@@ -4444,17 +4454,18 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
         }
         else if((m_browser_mode == BROWSER_MODE_SAVE || m_browser_mode == BROWSER_MODE_SAVE_NEW) && l == dir_length - 1)
         {
-            SuperPrintR(mode, "<NEW FOLDER>", 3, x + 44, y + 12);
+            SuperPrintR(mode, g_editorStrings.browserItemNewFolder, 3, x + 44, y + 12);
             if(UpdateButton(mode, x + 4, y + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
                 DisableCursorNew();
-                std::string folder_name = TextEntryScreen::Run("New folder name", "");
+                std::string folder_name = TextEntryScreen::Run(g_editorStrings.browserItemNewFolder, "");
+                MouseMove(SharedCursor.X, SharedCursor.Y);
+
                 if(!folder_name.empty() && !m_dirman.exists(folder_name))
                 {
                     m_dirman.mkdir(folder_name);
                     m_path_synced = false;
                 }
-                MouseMove(SharedCursor.X, SharedCursor.Y);
             }
         }
         else if(l < dir_length)
@@ -4467,6 +4478,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
                 SuperPrintR(mode, m_cur_path_dirs[l].substr(0, 14), 3, x + 44, y + 2);
                 SuperPrintR(mode, m_cur_path_dirs[l].substr(14, 14), 3, x + 44, y + 20);
             }
+
             if(UpdateButton(mode, x + 4, y + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
             {
                 m_cur_path += m_cur_path_dirs[l] + "/";
@@ -4476,17 +4488,19 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
         }
         else if((m_browser_mode == BROWSER_MODE_SAVE || m_browser_mode == BROWSER_MODE_SAVE_NEW) && l == dir_length)
         {
-            SuperPrintR(mode, "<NEW FILE>", 3, x + 44, y + 12);
+            SuperPrintR(mode, g_editorStrings.browserItemNewFile, 3, x + 44, y + 12);
             if(UpdateButton(mode, x + 4, y + 4, GFX.EIcons, false, 0, 32*Icon::pencil, 32, 32))
             {
                 DisableCursorNew();
-                std::string file_name = TextEntryScreen::Run("Save as", "");
+                std::string file_name = TextEntryScreen::Run(g_editorStrings.fileCommandSaveAs, "");
                 MouseMove(SharedCursor.X, SharedCursor.Y);
+
                 if(!file_name.empty())
                 {
                     // validate: append the file extension if it doesn't already appear.
                     ValidateExt(file_name);
                     m_cur_file = m_cur_path + file_name;
+
                     if(FileExists(file_name))
                         m_special_page = SPECIAL_PAGE_BROWSER_CONFIRM;
                     else
@@ -4503,6 +4517,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
                 l -= dir_length + 1;
             else
                 l -= dir_length;
+
             if(m_cur_path_files[l].length() < 15)
                 SuperPrintR(mode, m_cur_path_files[l], 3, x + 44, y + 10);
             else
@@ -4510,6 +4525,7 @@ void EditorScreen::UpdateBrowserScreen(CallMode mode)
                 SuperPrintR(mode, m_cur_path_files[l].substr(0, 14), 3, x + 44, y + 2);
                 SuperPrintR(mode, m_cur_path_files[l].substr(14, 14), 3, x + 44, y + 20);
             }
+
             if(UpdateButton(mode, x + 4, y + 4, GFX.ECursor[2], false, 0, 0, 32, 32))
             {
                 m_cur_file = m_cur_path + m_cur_path_files[l];

@@ -11,6 +11,14 @@
             "pickContents2": "包含道具",
             "slick": "打滑"
         },
+        "browser": {
+            "askOverwriteFile": "",
+            "itemNewFile": "",
+            "itemNewFolder": "",
+            "newFile": "",
+            "openFile": "",
+            "saveFile": ""
+        },
         "events": {
             "bounds": {
                 "changeAllSectionBoundsToCurrent": "改變所有場景範圍到當前設置嗎？",

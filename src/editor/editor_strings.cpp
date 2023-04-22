@@ -315,5 +315,14 @@ void initEditorStrings()
     g_editorStrings.fileConvertFeatureWorldStarDisplay = "Uses world setting for star display.";
     g_editorStrings.fileConvertFeatureLevelStarDisplay = "A level uses setting for star display.";
 
+    g_editorStrings.browserNewFile = "New file";
+    g_editorStrings.browserSaveFile = "Save file";
+    g_editorStrings.browserOpenFile = "Open file";
+
+    g_editorStrings.browserItemNewFile = "<New File>";
+    g_editorStrings.browserItemNewFolder = "<New Folder>";
+
+    g_editorStrings.browserAskOverwriteFile = "Overwrite {0}?";
+
     g_editorStrings.listWarpTransitNames = {"NONE", "SCROLL", "FADE", "CIRCLE", "FLIP (H)", "FLIP (V)"};
 }
