@@ -196,7 +196,7 @@
         "wordEvent": {
             "genitive": "事件",
             "nominative": "事件",
-            "typeLabel": "事件 {0}："
+            "typeLabel": "{0}时触发事件："
         },
         "wordInstant": "立即",
         "wordNPC": {
