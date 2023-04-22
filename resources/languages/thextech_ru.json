@@ -1,8 +1,15 @@
 {
     "editor": {
         "block": {
+            "canBreak": "",
+            "canBreakTooltip": "",
+            "inside": "",
+            "invis": "",
+            "letterHeight": "",
+            "letterWidth": "",
             "pickContents1": "Взять блок",
-            "pickContents2": "содержимое"
+            "pickContents2": "содержимое",
+            "slick": ""
         },
         "events": {
             "bounds": {

@@ -2936,12 +2936,12 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     {
         int H = ((int)EditorCursor.Block.Location.Height)/32;
         int W = ((int)EditorCursor.Block.Location.Width)/32;
-        SuperPrintR(mode, "W " + std::to_string(W), 3, e_ScreenW - 160, 112);
+        SuperPrintR(mode, g_editorStrings.blockLetterWidth  + std::to_string(W), 3, e_ScreenW - 160, 112);
         if(W > 2 && UpdateButton(mode, e_ScreenW - 80 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             EditorCursor.Block.Location.Width = 32 * (W - 1);
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             EditorCursor.Block.Location.Width = 32 * (W + 1);
-        SuperPrintR(mode, "H " + std::to_string(H), 3, e_ScreenW - 160, 152);
+        SuperPrintR(mode, g_editorStrings.blockLetterHeight + std::to_string(H), 3, e_ScreenW - 160, 152);
         if(H > 2 && UpdateButton(mode, e_ScreenW - 80 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             EditorCursor.Block.Location.Height = 32 * (H - 1);
         if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
@@ -2951,8 +2951,8 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     // Legacy for Spin Block
     if(FileFormat == FileFormats::LVL_PGEX && EditorCursor.Block.Type == 90)
     {
-        SuperPrintR(mode, "CAN BREAK", 3, e_ScreenW - 160, 106);
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 120 + 4, GFXBlock[188], EditorCursor.Block.forceSmashable, 0, 0, 32, 32, "LEGACY: BREAKS WHEN HIT"))
+        SuperPrintR(mode, g_editorStrings.blockCanBreak, 3, e_ScreenW - 160, 106);
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 120 + 4, GFXBlock[188], EditorCursor.Block.forceSmashable, 0, 0, 32, 32, g_editorStrings.blockTooltipCanBreak.c_str()))
             EditorCursor.Block.forceSmashable = !EditorCursor.Block.forceSmashable;
     }
     else
@@ -2961,15 +2961,15 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     }
 
     // Slippy ("SLICK") and Invis
-    SuperPrintR(mode, "SLICK:", 3, e_ScreenW - 150, 214);
+    SuperPrintR(mode, g_editorStrings.blockSlick, 3, e_ScreenW - 150, 214);
     if(UpdateCheckBox(mode, e_ScreenW - 40 + 4, 200 + 4, EditorCursor.Block.Slippy))
         EditorCursor.Block.Slippy = !EditorCursor.Block.Slippy;
-    SuperPrintR(mode, "INVIS:", 3, e_ScreenW - 150, 254);
+    SuperPrintR(mode, g_editorStrings.blockInvis, 3, e_ScreenW - 150, 254);
     if(UpdateCheckBox(mode, e_ScreenW - 40 + 4, 240 + 4, EditorCursor.Block.Invis))
         EditorCursor.Block.Invis = !EditorCursor.Block.Invis;
 
     // Contents
-    SuperPrintR(mode, "INSIDE:", 3, e_ScreenW - 160, 294);
+    SuperPrintR(mode, g_editorStrings.blockInside, 3, e_ScreenW - 160, 294);
     int n_type = 0;
     if(EditorCursor.Block.Special > 0 && EditorCursor.Block.Special <= 1000)
     {

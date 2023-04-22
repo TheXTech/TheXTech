@@ -438,6 +438,14 @@ XTechTranslate::XTechTranslate()
         {"editor.block.pickContents1",      &g_editorStrings.pickBlockContents1},
         {"editor.block.pickContents2",      &g_editorStrings.pickBlockContents2},
 
+        {"editor.block.letterWidth",        &g_editorStrings.blockLetterWidth},
+        {"editor.block.letterHeight",       &g_editorStrings.blockLetterHeight},
+        {"editor.block.canBreak",           &g_editorStrings.blockCanBreak},
+        {"editor.block.canBreakTooltip",    &g_editorStrings.blockTooltipCanBreak},
+        {"editor.block.slick",              &g_editorStrings.blockSlick},
+        {"editor.block.invis",              &g_editorStrings.blockInvis},
+        {"editor.block.inside",             &g_editorStrings.blockInside},
+
         {"editor.npc.inContainer",          &g_editorStrings.npcInContainer},
         {"editor.npc.inertNice",            &g_editorStrings.npcInertNice},
         {"editor.npc.stuckStop",            &g_editorStrings.npcStuckStop},
@@ -545,21 +553,21 @@ XTechTranslate::XTechTranslate()
         {"editor.events.bounds.changeSectionBoundsToCurrent",     &g_editorStrings.eventsChangeSectionBoundsToCurrent},
         {"editor.events.bounds.changeAllSectionBoundsToCurrent",     &g_editorStrings.eventsChangeAllSectionBoundsToCurrent},
 
-        {"editor.events.controlsForEvent",     &g_editorStrings.eventsControlsForEvent},
-        {"editor.events.settingsForEvent",     &g_editorStrings.eventsSettingsForEvent},
+        {"editor.events.controlsForEvent",       &g_editorStrings.eventsControlsForEvent},
+        {"editor.events.settingsForEvent",       &g_editorStrings.eventsSettingsForEvent},
 
-        {"editor.events.layers.headerShow",     &g_editorStrings.eventsHeaderShow},
-        {"editor.events.layers.headerHide",     &g_editorStrings.eventsHeaderHide},
-        {"editor.events.layers.headerToggle",     &g_editorStrings.eventsHeaderToggle},
-        {"editor.events.layers.headerMove",     &g_editorStrings.eventsHeaderMove},
+        {"editor.events.layers.headerShow",      &g_editorStrings.eventsHeaderShow},
+        {"editor.events.layers.headerHide",      &g_editorStrings.eventsHeaderHide},
+        {"editor.events.layers.headerToggle",    &g_editorStrings.eventsHeaderToggle},
+        {"editor.events.layers.headerMove",      &g_editorStrings.eventsHeaderMove},
 
-        {"editor.events.sections.actionKeep",     &g_editorStrings.eventsActionKeep},
-        {"editor.events.sections.actionReset",     &g_editorStrings.eventsActionReset},
+        {"editor.events.sections.actionKeep",    &g_editorStrings.eventsActionKeep},
+        {"editor.events.sections.actionReset",   &g_editorStrings.eventsActionReset},
         {"editor.events.sections.actionSet",     &g_editorStrings.eventsActionSet},
 
         {"editor.events.sections.propMusic",     &g_editorStrings.eventsCaseMusic},
-        {"editor.events.sections.propBackground",     &g_editorStrings.eventsCaseBackground},
-        {"editor.events.sections.propBounds",     &g_editorStrings.eventsCaseBounds},
+        {"editor.events.sections.propBackground", &g_editorStrings.eventsCaseBackground},
+        {"editor.events.sections.propBounds",    &g_editorStrings.eventsCaseBounds},
 
         {"editor.events.sections.phraseAllSections",     &g_editorStrings.eventsPhraseAllSections},
 

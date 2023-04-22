@@ -30,6 +30,14 @@ void initEditorStrings()
     g_editorStrings.pickBlockContents1 = "Pick block";
     g_editorStrings.pickBlockContents2 = "contents";
 
+    g_editorStrings.blockLetterWidth  = "W ";
+    g_editorStrings.blockLetterHeight = "H ";
+    g_editorStrings.blockCanBreak = "Can Break";
+    g_editorStrings.blockTooltipCanBreak = "Legacy: breaks when hit";
+    g_editorStrings.blockSlick = "Slick";
+    g_editorStrings.blockInvis = "Invis";
+    g_editorStrings.blockInside = "Inside:";
+
     g_editorStrings.npcInContainer = "In";
     g_editorStrings.npcInertNice = "Nice";
     g_editorStrings.npcStuckStop = "Stop";

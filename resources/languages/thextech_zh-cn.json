@@ -1,8 +1,15 @@
 {
     "editor": {
         "block": {
+            "canBreak": "",
+            "canBreakTooltip": "",
+            "inside": "",
+            "invis": "",
+            "letterHeight": "",
+            "letterWidth": "",
             "pickContents1": "选择砖块",
-            "pickContents2": "包含"
+            "pickContents2": "包含",
+            "slick": ""
         },
         "events": {
             "bounds": {

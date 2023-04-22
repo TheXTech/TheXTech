@@ -33,6 +33,14 @@ struct EditorContent
     std::string pickBlockContents1;
     std::string pickBlockContents2;
 
+    std::string blockLetterWidth;
+    std::string blockLetterHeight;
+    std::string blockCanBreak;
+    std::string blockTooltipCanBreak;
+    std::string blockSlick;
+    std::string blockInvis;
+    std::string blockInside;
+
     std::string npcInContainer;
     std::string npcInertNice;
     std::string npcStuckStop;

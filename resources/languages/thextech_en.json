@@ -1,8 +1,15 @@
 {
     "editor": {
         "block": {
+            "canBreak": "Can Break",
+            "canBreakTooltip": "Legacy: breaks when hit",
+            "inside": "Inside:",
+            "invis": "Invis",
+            "letterHeight": "H ",
+            "letterWidth": "W ",
             "pickContents1": "Pick block",
-            "pickContents2": "contents"
+            "pickContents2": "contents",
+            "slick": "Slick"
         },
         "events": {
             "bounds": {
