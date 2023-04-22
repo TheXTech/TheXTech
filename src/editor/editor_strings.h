@@ -327,6 +327,25 @@ struct EditorContent
 
     std::string browserAskOverwriteFile;
 
+    std::string tooltipSelect;
+    std::string tooltipErase;
+    std::string tooltipEraseAll;
+    std::string tooltipBlocks;
+    std::string tooltipBGOs;
+    std::string tooltipNPCs;
+    std::string tooltipWarps;
+    std::string tooltipWater;
+    std::string tooltipSettings;
+    std::string tooltipLayers;
+    std::string tooltipEvents;
+    std::string tooltipTiles;
+    std::string tooltipScenes;
+    std::string tooltipLevels;
+    std::string tooltipPaths;
+    std::string tooltipMusic;
+    std::string tooltipFile;
+    std::string tooltipShow;
+
     std::vector<std::string> listWarpTransitNames{6};
 };
 

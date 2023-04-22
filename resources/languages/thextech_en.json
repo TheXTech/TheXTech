@@ -246,6 +246,26 @@
             "power": "Power"
         },
         "toggleMagicBlock": "Magic Block",
+        "tooltip": {
+            "BGOs": "BGOs",
+            "NPCs": "NPCs",
+            "blocks": "Blocks",
+            "erase": "Erase",
+            "eraseAll": "Erase All",
+            "events": "Events",
+            "file": "File",
+            "layers": "Layers",
+            "levels": "Levels",
+            "music": "Music",
+            "paths": "Paths",
+            "scenes": "Scenes",
+            "select": "Select",
+            "settings": "Settings",
+            "show": "Show",
+            "tiles": "Tiles",
+            "warps": "Warps",
+            "water": "Water"
+        },
         "warp": {
             "allow": "Allow:",
             "cannonExit": "Cannon Exit",

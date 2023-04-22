@@ -735,6 +735,25 @@ XTechTranslate::XTechTranslate()
 
         {"editor.browser.askOverwriteFile", &g_editorStrings.browserAskOverwriteFile},
 
+        {"editor.tooltip.select",   &g_editorStrings.tooltipSelect},
+        {"editor.tooltip.erase",    &g_editorStrings.tooltipErase},
+        {"editor.tooltip.eraseAll", &g_editorStrings.tooltipEraseAll},
+        {"editor.tooltip.blocks",   &g_editorStrings.tooltipBlocks},
+        {"editor.tooltip.BGOs",     &g_editorStrings.tooltipBGOs},
+        {"editor.tooltip.NPCs",     &g_editorStrings.tooltipNPCs},
+        {"editor.tooltip.warps",    &g_editorStrings.tooltipWarps},
+        {"editor.tooltip.water",    &g_editorStrings.tooltipWater},
+        {"editor.tooltip.settings", &g_editorStrings.tooltipSettings},
+        {"editor.tooltip.layers",   &g_editorStrings.tooltipLayers},
+        {"editor.tooltip.events",   &g_editorStrings.tooltipEvents},
+        {"editor.tooltip.tiles",    &g_editorStrings.tooltipTiles},
+        {"editor.tooltip.scenes",   &g_editorStrings.tooltipScenes},
+        {"editor.tooltip.levels",   &g_editorStrings.tooltipLevels},
+        {"editor.tooltip.paths",    &g_editorStrings.tooltipPaths},
+        {"editor.tooltip.music",    &g_editorStrings.tooltipMusic},
+        {"editor.tooltip.file",     &g_editorStrings.tooltipFile},
+        {"editor.tooltip.show",     &g_editorStrings.tooltipShow},
+
 #endif // THEXTECH_ENABLE_EDITOR
     };
 

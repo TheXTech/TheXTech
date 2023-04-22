@@ -324,5 +324,24 @@ void initEditorStrings()
 
     g_editorStrings.browserAskOverwriteFile = "Overwrite {0}?";
 
+    g_editorStrings.tooltipSelect = "Select";
+    g_editorStrings.tooltipErase = "Erase";
+    g_editorStrings.tooltipEraseAll = "Erase All";
+    g_editorStrings.tooltipBlocks = "Blocks";
+    g_editorStrings.tooltipBGOs = "BGOs";
+    g_editorStrings.tooltipNPCs = "NPCs";
+    g_editorStrings.tooltipWarps = "Warps";
+    g_editorStrings.tooltipWater = "Water";
+    g_editorStrings.tooltipSettings = "Settings";
+    g_editorStrings.tooltipLayers = "Layers";
+    g_editorStrings.tooltipEvents = "Events";
+    g_editorStrings.tooltipTiles = "Tiles";
+    g_editorStrings.tooltipScenes = "Scenes";
+    g_editorStrings.tooltipLevels = "Levels";
+    g_editorStrings.tooltipPaths = "Paths";
+    g_editorStrings.tooltipMusic = "Music";
+    g_editorStrings.tooltipFile = "File";
+    g_editorStrings.tooltipShow = "Show";
+
     g_editorStrings.listWarpTransitNames = {"NONE", "SCROLL", "FADE", "CIRCLE", "FLIP (H)", "FLIP (V)"};
 }

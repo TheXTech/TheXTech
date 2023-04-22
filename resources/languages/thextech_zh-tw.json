@@ -246,6 +246,26 @@
             "power": "狀態"
         },
         "toggleMagicBlock": "智能編輯模式",
+        "tooltip": {
+            "BGOs": "",
+            "NPCs": "",
+            "blocks": "",
+            "erase": "",
+            "eraseAll": "",
+            "events": "",
+            "file": "",
+            "layers": "",
+            "levels": "",
+            "music": "",
+            "paths": "",
+            "scenes": "",
+            "select": "",
+            "settings": "",
+            "show": "",
+            "tiles": "",
+            "warps": "",
+            "water": ""
+        },
         "warp": {
             "allow": "",
             "cannonExit": "",
