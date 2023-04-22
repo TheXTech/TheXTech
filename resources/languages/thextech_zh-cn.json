@@ -24,9 +24,9 @@
                 "deletingEvent": "删除事件{0}"
             },
             "desc": {
-                "activate1": "NPC在当前画面出现时触发",
-                "activate2": "事件",
-                "death1": "NPC 死亡时触发事件",
+                "activate1": "NPC在当前画面出现时触",
+                "activate2": "发事件",
+                "death1": "NPC死亡时触发事件",
                 "destroy1": "砖块破碎时触发事件",
                 "destroy2": " ",
                 "enter1": "进入传送点时触发事件",
@@ -59,7 +59,7 @@
                 "headerToggle": "切换："
             },
             "letter": {
-                "activate": "出：",
+                "activate": "出现：",
                 "death": "死：",
                 "destroy": "碎：",
                 "enter": "进：",
