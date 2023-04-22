@@ -28,13 +28,13 @@
                 "activate2": "事件",
                 "death1": "NPC 死亡时触发事件",
                 "destroy1": "砖块破碎时触发事件",
-                "destroy2": "",
+                "destroy2": " ",
                 "enter1": "进入传送点时触发事件",
-                "enter2": "",
+                "enter2": " ",
                 "hit1": "砖块被撞击时触发事件",
-                "layerClear1": "当前图层中的对象全部清除时",
-                "layerClear2": "触发事件",
-                "layerClear3": "",
+                "layerClear1": "当前图层中的对象全部清除",
+                "layerClear2": "时触发事件",
+                "layerClear3": " ",
                 "phraseTriggersWhen": "将于",
                 "talk1": "和NPC对话后触发事件",
                 "talk2": ""
@@ -196,7 +196,7 @@
         "wordEvent": {
             "genitive": "事件",
             "nominative": "事件",
-            "typeLabel": ""
+            "typeLabel": "事件 {0}："
         },
         "wordInstant": "立即",
         "wordNPC": {
