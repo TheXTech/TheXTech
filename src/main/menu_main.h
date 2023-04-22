@@ -100,6 +100,7 @@ struct MainMenuContent
     std::string loading;
 
     std::string languageName;
+    std::string pluralRules;
 
     std::string editorNewWorld;
     std::string editorErrorResolution;

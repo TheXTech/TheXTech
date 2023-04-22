@@ -382,5 +382,6 @@
         "originalBy": "原始VB6代碼：",
         "psVitaPortBy": "PS Vita移植：",
         "specialThanks": "特別鳴謝："
-    }
+    },
+    "pluralRules": "singular-only"
 }

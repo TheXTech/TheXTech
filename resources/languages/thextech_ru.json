@@ -382,5 +382,6 @@
         "originalBy": "Автор оригинала на VB6:",
         "psVitaPortBy": "Автор порта на PS Vita:",
         "specialThanks": "Особые благодарности:"
-    }
+    },
+    "pluralRules": "slavic"
 }

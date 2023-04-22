@@ -382,5 +382,6 @@
         "originalBy": "Original VB6 code By:",
         "psVitaPortBy": "PS Vita Port By:",
         "specialThanks": "Special Thanks:"
-    }
+    },
+    "pluralRules": "one-is-singular"
 }

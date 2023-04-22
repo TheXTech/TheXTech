@@ -104,6 +104,7 @@ void initMainMenu()
     g_mainMenu.loading = "Loading...";
 
     g_mainMenu.languageName = "English";
+    g_mainMenu.pluralRules = "one-is-singular";
 
     g_mainMenu.selectCharacter = "{0} game";
 

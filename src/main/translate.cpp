@@ -164,6 +164,7 @@ XTechTranslate::XTechTranslate()
         {"menu.loading",                   &g_mainMenu.loading},
 
         {"languageName",                   &g_mainMenu.languageName},
+        {"pluralRules",                    &g_mainMenu.pluralRules},
 
         {"menu.editor.newWorld",           &g_mainMenu.editorNewWorld},
         {"menu.editor.errorResolution",    &g_mainMenu.editorErrorResolution},
@@ -709,10 +710,7 @@ bool XTechTranslate::translate()
         return false;
     }
 
-    if(SDL_strcasecmp(CurrentLanguage.c_str(), "ru") == 0)
-        s_CurrentPluralRules = PluralRules::Slavic;
-    else
-        s_CurrentPluralRules = PluralRules::OneIsSingular;
+    s_CurrentPluralRules = PluralRules::OneIsSingular;
 
     const std::string &langEngineFile = XLanguage::getEngineFile();
     const std::string &langAssetsFile = XLanguage::getAssetsFile();
@@ -738,6 +736,13 @@ bool XTechTranslate::translate()
 
     if(!Files::fileExists(langEngineFile) && !Files::fileExists(langAssetsFile))
         return false; // Files are not exists, do nothing
+
+    if(g_mainMenu.pluralRules == "one-is-singular")
+        s_CurrentPluralRules = PluralRules::OneIsSingular;
+    else if(g_mainMenu.pluralRules == "singular-only")
+        s_CurrentPluralRules = PluralRules::SingularOnly;
+    else if(g_mainMenu.pluralRules == "slavic")
+        s_CurrentPluralRules = PluralRules::Slavic;
 
     return true;
 }
