@@ -355,7 +355,7 @@
         },
         "controls": {
             "phrasePlayerConnected": "玩家{0}已连接{1}， 配置： {2}",
-            "phrasePlayerDisconnected": "玩家{0}未连接"
+            "phrasePlayerDisconnected": "玩家{0}未连接任何设备"
         },
         "error": {
             "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。",
