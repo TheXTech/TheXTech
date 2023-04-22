@@ -1,9 +1,9 @@
 {
     "editor": {
         "block": {
-            "canBreak": "可破坏",
-            "canBreakTooltip": "旧版：顶砖块后破碎",
-            "inside": "包含：：",
+            "canBreak": "可顶碎",
+            "canBreakTooltip": "旧版本：顶砖块后将会破碎",
+            "inside": "包含：",
             "invis": "隐形",
             "letterHeight": "宽",
             "letterWidth": "高",
@@ -25,18 +25,18 @@
             },
             "desc": {
                 "activate1": "NPC在当前画面出现时触发",
-                "activate2": "",
-                "death1": "NPC 死亡时触发",
-                "destroy1": "砖块破碎时触发",
+                "activate2": "事件",
+                "death1": "NPC 死亡时触发事件",
+                "destroy1": "砖块破碎时触发事件",
                 "destroy2": "",
-                "enter1": "进入传送点时触发",
+                "enter1": "进入传送点时触发事件",
                 "enter2": "",
-                "hit1": "砖块被撞击时触发",
+                "hit1": "砖块被撞击时触发事件",
                 "layerClear1": "当前图层中的对象全部清除时",
-                "layerClear2": "触发",
+                "layerClear2": "触发事件",
                 "layerClear3": "",
-                "phraseTriggersWhen": "事件将于",
-                "talk1": "和NPC对话后触发",
+                "phraseTriggersWhen": "将于",
+                "talk1": "和NPC对话后触发事件",
                 "talk2": ""
             },
             "header": "事件：",
@@ -63,7 +63,7 @@
                 "death": "死：",
                 "destroy": "碎：",
                 "enter": "进：",
-                "hit": "顶：",
+                "hit": "撞：",
                 "layerClear": "空：",
                 "talk": "话："
             },
@@ -234,7 +234,7 @@
             "wordDisconnect": "断开"
         },
         "controls": {
-            "phrasePlayerConnected": "玩家{0}已连接{1}，配置：{2}",
+            "phrasePlayerConnected": "玩家{0}已连接{1}， 配置： {2}",
             "phrasePlayerDisconnected": "玩家{0}未连接"
         },
         "error": {
