@@ -3895,31 +3895,31 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         }
 
         bool can_save;
-        std::string action;
+        std::string* action;
         if(m_special_subpage == 1)
         {
             can_save = true;
-            action = "CLEAR LEVEL";
+            action = &g_editorStrings.fileActionClearLevel;
         }
         else if(m_special_subpage == 11)
         {
             can_save = true;
-            action = "CLEAR WORLD";
+            action = &g_editorStrings.fileActionClearWorld;
         }
         else if(m_special_subpage == 2 || m_special_subpage == 12)
         {
             can_save = true;
-            action = "OPEN";
+            action = &g_editorStrings.fileActionOpen;
         }
         else if(m_special_subpage == 3 || m_special_subpage == 13)
         {
             can_save = false;
-            action = "REVERT";
+            action = &g_editorStrings.fileActionRevert;
         }
         else if(m_special_subpage == 4)
         {
             can_save = true;
-            action = "EXIT";
+            action = &g_editorStrings.fileActionExit;
         }
         else // should never happen
         {
@@ -3927,14 +3927,14 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         }
 
         if(can_save)
-            SuperPrintR(mode, "SAVE BEFORE YOU " + action + "?", 3, 10, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.fileConfirmationSaveBeforeAction, *action), 3, 10, 50);
         else
-            SuperPrintR(mode, "ARE YOU SURE YOU WANT TO " + action + "?", 3, 10, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.fileConfirmationConfirmAction, *action), 3, 10, 50);
 
         bool confirmed = false;
         if(can_save)
         {
-            SuperPrintR(mode, "YES: SAVE THEN " + action, 3, 60, 110);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.fileOptionYesSaveThenAction, *action), 3, 60, 110);
             if(UpdateButton(mode, 20 + 4, 100 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
             {
                 if(!WorldEditor)
@@ -3945,22 +3945,20 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             }
         }
 
-        if(can_save)
-            SuperPrintR(mode, "NO: " + action + " WITHOUT SAVING", 3, 60, 150);
-        else
-            SuperPrintR(mode, action + " WITHOUT SAVING", 3, 60, 150);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.fileOptionActionWithoutSave, *action), 3, 60, 150);
         if(UpdateButton(mode, 20 + 4, 140 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             confirmed = true;
         }
 
-        SuperPrintR(mode, "CANCEL: DO NOT " + action, 3, 60, 190);
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.fileOptionCancelAction, *action), 3, 60, 190);
         if(UpdateButton(mode, 20 + 4, 180 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_FILE;
             m_special_subpage = 0;
             return;
         }
+
         if(confirmed)
         {
             if(m_special_subpage == 1) // new level
@@ -4038,23 +4036,22 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
     {
         // TODO: find a way to warn them if this would overwrite something
 
-        const char* format = (m_special_subpage == FileFormats::LVL_PGEX) ? "MODERN?" : "LEGACY?";
+        const std::string* format = (m_special_subpage == FileFormats::LVL_PGEX) ? &g_editorStrings.fileFormatModern : &g_editorStrings.fileFormatLegacy;
 
-        SuperPrintR(mode, "CONVERT FORMAT TO", 3, 10, 50);
-        SuperPrintR(mode, format, 3, 10 + 18*18, 50); // 17 is the length of "CONVERT FORMAT TO "
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.fileConfirmationConvertFormatTo, *format), 3, 10, 50);
 
-        SuperPrintR(mode, "The file extension will change but", 4, 20, 90);
-        SuperPrintR(mode, "the old file will NOT be deleted.", 4, 20, 110);
+        SuperPrintR(mode, g_editorStrings.fileConvertDesc1, 4, 20, 90);
+        SuperPrintR(mode, g_editorStrings.fileConvertDesc2, 4, 20, 110);
 
         if(m_saved_message.empty())
-            SuperPrintR(mode, "There are no compatibility issues.", 4, 20, 150);
+            SuperPrintR(mode, g_editorStrings.fileConvertNoIssues, 4, 20, 150);
         else
         {
-            SuperPrintR(mode, "The features below will be LOST:", 4, 20, 150, 1.0f, 0.5f, 0.5f);
+            SuperPrintR(mode, g_editorStrings.fileConvertFeaturesWillBeLost, 4, 20, 150, 1.0f, 0.5f, 0.5f);
             SuperPrintR(mode, m_saved_message, 4, 4, 180);
         }
 
-        SuperPrintR(mode, "PROCEED WITH CONVERSION", 3, 60, 390);
+        SuperPrintR(mode, g_editorStrings.fileOptionProceedWithConversion, 3, 60, 390);
         if(UpdateButton(mode, 20 + 4, 380 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             if(WorldEditor)
@@ -4075,7 +4072,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             m_saved_message.clear();
         }
 
-        SuperPrintR(mode, "CANCEL CONVERSION", 3, 60, 430);
+        SuperPrintR(mode, g_editorStrings.fileOptionCancelConversion, 3, 60, 430);
         if(UpdateButton(mode, 20 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::action, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_FILE;
@@ -4086,45 +4083,49 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         return;
     }
 
-    SuperPrintR(mode, "CURRENT FILE: " + FileNameFull, 3, 10, 50);
+    SuperPrintR(mode, g_editorStrings.fileLabelCurrentFile + FileNameFull, 3, 10, 50);
 
-    SuperPrintR(mode, "FORMAT: ", 3, 150, 90);
+    SuperPrintR(mode, g_editorStrings.fileLabelFormat, 3, 150, 90);
 
-    if(UpdateButton(mode, 320 + 4, 80 + 4, GFXNPC[NPCID_SHROOM_SMB3], FileFormat == FileFormats::LVL_SMBX64, 0, 0, 32, 32, "Legacy") && FileFormat != FileFormats::LVL_SMBX64)
+    if(UpdateButton(mode, 320 + 4, 80 + 4, GFXNPC[NPCID_SHROOM_SMB3], FileFormat == FileFormats::LVL_SMBX64, 0, 0, 32, 32, g_editorStrings.fileFormatLegacy.c_str()) && FileFormat != FileFormats::LVL_SMBX64)
     {
         m_special_page = SPECIAL_PAGE_FILE_CONVERT;
         m_special_subpage = FileFormats::LVL_SMBX64;
         CanConvertLevel(FileFormats::LVL_SMBX64, &m_saved_message);
     }
-    if(UpdateButton(mode, 360 + 4, 80 + 4, GFX.EIcons, FileFormat == FileFormats::LVL_PGEX, 0, 32*Icon::thextech, 32, 32, "Modern") && FileFormat != FileFormats::LVL_PGEX)
+
+    if(UpdateButton(mode, 360 + 4, 80 + 4, GFX.EIcons, FileFormat == FileFormats::LVL_PGEX, 0, 32*Icon::thextech, 32, 32, g_editorStrings.fileFormatModern.c_str()) && FileFormat != FileFormats::LVL_PGEX)
     {
         m_special_page = SPECIAL_PAGE_FILE_CONVERT;
         m_special_subpage = FileFormats::LVL_PGEX;
         CanConvertLevel(FileFormats::LVL_PGEX, &m_saved_message);
     }
 
-    SuperPrintR(mode, "LEVEL", 3, 110, 140);
+    SuperPrintR(mode, g_editorStrings.fileSectionLevel, 3, 110, 140);
 
-    SuperPrintR(mode, "NEW", 3, 54, 170);
+    SuperPrintR(mode, g_editorStrings.fileCommandNew, 3, 54, 170);
     if(UpdateButton(mode, 10 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::newf, 32, 32))
     {
         m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
         m_special_subpage = 1;
     }
-    SuperPrintR(mode, "OPEN...", 3, 54, 210);
+
+    SuperPrintR(mode, g_editorStrings.fileCommandOpen, 3, 54, 210);
     if(UpdateButton(mode, 10 + 4, 200 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
     {
         m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
         m_special_subpage = 2;
     }
+
     if(!WorldEditor)
     {
-        SuperPrintR(mode, "SAVE", 3, 54, 250);
+        SuperPrintR(mode, g_editorStrings.fileCommandSave, 3, 54, 250);
         if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::save, 32, 32))
         {
             SaveLevel(FullFileName, FileFormat);
         }
-        SuperPrintR(mode, "SAVE AS...", 3, 54, 290);
+
+        SuperPrintR(mode, g_editorStrings.fileCommandSaveAs, 3, 54, 290);
         if(UpdateButton(mode, 10 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::save, 32, 32))
         {
             if(FileFormat == 1 || FileFormat == 2)
@@ -4132,7 +4133,8 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             else
                 StartFileBrowser(&FullFileName, "", FileNamePath, {".lvlx"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_LEVEL);
         }
-        SuperPrintR(mode, "REVERT", 3, 54, 330);
+
+        SuperPrintR(mode, g_editorStrings.fileActionRevert, 3, 54, 330);
         if(UpdateButton(mode, 10 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::hop, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
@@ -4140,28 +4142,31 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         }
     }
 
-    SuperPrintR(mode, "WORLD", 3, e_ScreenW/2 + 110, 140);
+    SuperPrintR(mode, g_editorStrings.fileSectionWorld, 3, e_ScreenW/2 + 110, 140);
 
-    SuperPrintR(mode, "NEW", 3, e_ScreenW/2 + 54, 170);
+    SuperPrintR(mode, g_editorStrings.fileCommandNew, 3, e_ScreenW/2 + 54, 170);
     if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 160 + 4, GFX.EIcons, false, 0, 32*Icon::newf, 32, 32))
     {
         m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
         m_special_subpage = 11;
     }
-    SuperPrintR(mode, "OPEN...", 3, e_ScreenW/2 + 54, 210);
+
+    SuperPrintR(mode, g_editorStrings.fileCommandOpen, 3, e_ScreenW/2 + 54, 210);
     if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 200 + 4, GFX.EIcons, false, 0, 32*Icon::open, 32, 32))
     {
         m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
         m_special_subpage = 12;
     }
+
     if(WorldEditor)
     {
-        SuperPrintR(mode, "SAVE", 3, e_ScreenW/2 + 54, 250);
+        SuperPrintR(mode, g_editorStrings.fileCommandSave, 3, e_ScreenW/2 + 54, 250);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::save, 32, 32))
         {
             SaveWorld(FullFileName, FileFormat);
         }
-        SuperPrintR(mode, "SAVE AS...", 3, e_ScreenW/2 + 54, 290);
+
+        SuperPrintR(mode, g_editorStrings.fileCommandSaveAs, 3, e_ScreenW/2 + 54, 290);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 280 + 4, GFX.EIcons, false, 0, 32*Icon::save, 32, 32))
         {
             if(FileFormat == 1 || FileFormat == 2)
@@ -4169,7 +4174,8 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
             else
                 StartFileBrowser(&FullFileName, "", FileNamePath, {".wldx"}, BROWSER_MODE_SAVE, BROWSER_CALLBACK_SAVE_WORLD);
         }
-        SuperPrintR(mode, "REVERT", 3, e_ScreenW/2 + 54, 330);
+
+        SuperPrintR(mode, g_editorStrings.fileActionRevert, 3, e_ScreenW/2 + 54, 330);
         if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 320 + 4, GFX.EIcons, false, 0, 32*Icon::hop, 32, 32))
         {
             m_special_page = SPECIAL_PAGE_FILE_CONFIRM;
@@ -4177,7 +4183,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
         }
     }
 
-    SuperPrintR(mode, "EXIT", 3, 54, 410);
+    SuperPrintR(mode, g_editorStrings.fileActionExit, 3, 54, 410);
     if(UpdateButton(mode, 10 + 4, 400 + 4, GFX.EIcons, false, 0, 32*Icon::x, 32, 32))
     {
         m_special_page = SPECIAL_PAGE_FILE_CONFIRM;

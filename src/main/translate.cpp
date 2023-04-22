@@ -665,6 +665,61 @@ XTechTranslate::XTechTranslate()
 
         {"editor.layers.promptLayerName", &g_editorStrings.layersPromptLayerName},
         {"editor.layers.itemNewLayer",    &g_editorStrings.layersItemNewLayer},
+
+        {"editor.file.actionClearLevel",            &g_editorStrings.fileActionClearLevel},
+        {"editor.file.actionClearWorld",            &g_editorStrings.fileActionClearWorld},
+        {"editor.file.actionOpen",                  &g_editorStrings.fileActionOpen},
+        {"editor.file.actionRevert",                &g_editorStrings.fileActionRevert},
+        {"editor.file.actionExit",                  &g_editorStrings.fileActionExit},
+        {"editor.file.confirmSaveBeforeAction",     &g_editorStrings.fileConfirmationSaveBeforeAction},
+        {"editor.file.confirmConfirmAction",        &g_editorStrings.fileConfirmationConfirmAction},
+        {"editor.file.confirmConvertFormatTo",      &g_editorStrings.fileConfirmationConvertFormatTo},
+        {"editor.file.optionYesSaveThenAction",     &g_editorStrings.fileOptionYesSaveThenAction},
+        {"editor.file.optionActionWithoutSave",     &g_editorStrings.fileOptionActionWithoutSave},
+        {"editor.file.optionCancelAction",          &g_editorStrings.fileOptionCancelAction},
+        {"editor.file.optionProceedWithConversion", &g_editorStrings.fileOptionProceedWithConversion},
+        {"editor.file.optionCancelConversion",      &g_editorStrings.fileOptionCancelConversion},
+
+        {"editor.file.labelCurrentFile",    &g_editorStrings.fileLabelCurrentFile},
+        {"editor.file.labelFormat",         &g_editorStrings.fileLabelFormat},
+
+        {"editor.file.formatModern",        &g_editorStrings.fileFormatModern},
+        {"editor.file.formatLegacy",        &g_editorStrings.fileFormatLegacy},
+
+        {"editor.file.sectionLevel",        &g_editorStrings.fileSectionLevel},
+        {"editor.file.sectionWorld",        &g_editorStrings.fileSectionWorld},
+        {"editor.file.commandNew",          &g_editorStrings.fileCommandNew},
+        {"editor.file.commandOpen",         &g_editorStrings.fileCommandOpen},
+        {"editor.file.commandSave",         &g_editorStrings.fileCommandSave},
+        {"editor.file.commandSaveAs",       &g_editorStrings.fileCommandSaveAs},
+
+        {"editor.file.convert.desc1",               &g_editorStrings.fileConvertDesc1},
+        {"editor.file.convert.desc2",               &g_editorStrings.fileConvertDesc2},
+        {"editor.file.convert.noIssues",            &g_editorStrings.fileConvertNoIssues},
+        {"editor.file.convert.featuresWillBeLost",  &g_editorStrings.fileConvertFeaturesWillBeLost},
+
+        {"editor.file.convert._38aUnsupported",     &g_editorStrings.fileConvert38aUnsupported},
+        {"editor.file.convert.formatUnknown",       &g_editorStrings.fileConvertFormatUnknown},
+
+        {"editor.file.convert.featureWarpTransit",      &g_editorStrings.fileConvertFeatureWarpTransit},
+        {"editor.file.convert.featureWarpNeedsStand",   &g_editorStrings.fileConvertFeatureWarpNeedsStand},
+        {"editor.file.convert.featureWarpCannonExit",   &g_editorStrings.fileConvertFeatureWarpCannonExit},
+        {"editor.file.convert.featureWarpEnterEvent",   &g_editorStrings.fileConvertFeatureWarpEnterEvent},
+        {"editor.file.convert.featureWarpCustomStarsMsg", &g_editorStrings.fileConvertFeatureWarpCustomStarsMsg},
+        {"editor.file.convert.featureWarpNoPrintStars", &g_editorStrings.fileConvertFeatureWarpNoPrintStars},
+        {"editor.file.convert.featureWarpNoStartScene", &g_editorStrings.fileConvertFeatureWarpNoStartScene},
+        {"editor.file.convert.featureWarpPortal",       &g_editorStrings.fileConvertFeatureWarpPortal},
+
+        {"editor.file.convert.featureEventCustomMusic", &g_editorStrings.fileConvertFeatureEventCustomMusic},
+        {"editor.file.convert.featureEventAutoscroll",  &g_editorStrings.fileConvertFeatureEventAutoscroll},
+
+        {"editor.file.convert.featureNPCVariant",       &g_editorStrings.fileConvertFeatureNPCVariant},
+        {"editor.file.convert.featureBlockForceSmashable", &g_editorStrings.fileConvertFeatureBlockForceSmashable},
+
+        {"editor.file.convert.featureCustomWorldMusic", &g_editorStrings.fileConvertFeatureCustomWorldMusic},
+        {"editor.file.convert.featureWorldStarDisplay", &g_editorStrings.fileConvertFeatureWorldStarDisplay},
+        {"editor.file.convert.featureLevelStarDisplay", &g_editorStrings.fileConvertFeatureLevelStarDisplay},
+
 #endif // THEXTECH_ENABLE_EDITOR
     };
 

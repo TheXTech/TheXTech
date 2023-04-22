@@ -46,6 +46,7 @@
 #include "global_dirs.h"
 
 #include "editor/editor_custom.h"
+#include "editor/editor_strings.h"
 
 bool OpenWorld(std::string FilePath)
 {
@@ -527,14 +528,20 @@ bool CanConvertWorld(int format, std::string* reasons)
     if(format == FileFormats::WLD_SMBX38A)
     {
         if(reasons)
-            *reasons = "The SMBX38-A format is not supported at this time.\n";
+        {
+            *reasons = g_editorStrings.fileConvert38aUnsupported;
+            *reasons += '\n';
+        }
         return false;
     }
 
     if(format != FileFormats::WLD_SMBX64)
     {
         if(reasons)
-            *reasons = "Requested format is unknown.\n";
+        {
+            *reasons = g_editorStrings.fileConvertFormatUnknown;
+            *reasons += '\n';
+        }
         return false;
     }
 
@@ -548,7 +555,10 @@ bool CanConvertWorld(int format, std::string* reasons)
         {
             can_convert = false;
             if(reasons)
-                *reasons += "Uses custom world music file.\n";
+            {
+                *reasons = g_editorStrings.fileConvertFeatureCustomWorldMusic;
+                *reasons += '\n';
+            }
             break;
         }
     }
@@ -557,7 +567,10 @@ bool CanConvertWorld(int format, std::string* reasons)
     {
         can_convert = false;
         if(reasons)
-            *reasons += "Uses world setting for star display.\n";
+        {
+            *reasons = g_editorStrings.fileConvertFeatureWorldStarDisplay;
+            *reasons += '\n';
+        }
     }
 
     for(int i = 1; i <= numWorldLevels; i++)
@@ -566,7 +579,10 @@ bool CanConvertWorld(int format, std::string* reasons)
         {
             can_convert = false;
             if(reasons)
-                *reasons += "Uses per-level setting for star display.\n";
+            {
+                *reasons = g_editorStrings.fileConvertFeatureLevelStarDisplay;
+                *reasons += '\n';
+            }
         }
     }
 

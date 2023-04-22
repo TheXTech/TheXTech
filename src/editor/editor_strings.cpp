@@ -255,5 +255,59 @@ void initEditorStrings()
     g_editorStrings.layersPromptLayerName = "Layer name";
     g_editorStrings.layersItemNewLayer = "<New Layer>";
 
+    g_editorStrings.fileActionClearLevel = "Clear Level";
+    g_editorStrings.fileActionClearWorld = "Clear World";
+    g_editorStrings.fileActionOpen = "Open";
+    g_editorStrings.fileActionRevert = "Revert";
+    g_editorStrings.fileActionExit = "Exit";
+    g_editorStrings.fileConfirmationSaveBeforeAction = "Save before you {0}?";
+    g_editorStrings.fileConfirmationConfirmAction = "Are you sure you want to {0}?";
+    g_editorStrings.fileConfirmationConvertFormatTo = "Convert format to {0}?";
+    g_editorStrings.fileOptionYesSaveThenAction = "Yes: save then {0}";
+    g_editorStrings.fileOptionActionWithoutSave = "{0} without saving";
+    g_editorStrings.fileOptionCancelAction = "Cancel: do not {0}";
+    g_editorStrings.fileOptionProceedWithConversion = "Proceed with conversion";
+    g_editorStrings.fileOptionCancelConversion = "Cancel conversion";
+
+    g_editorStrings.fileLabelCurrentFile = "Current file: ";
+    g_editorStrings.fileLabelFormat = "Format:";
+
+    g_editorStrings.fileFormatModern = "Modern";
+    g_editorStrings.fileFormatLegacy = "Legacy";
+
+    g_editorStrings.fileSectionLevel = "Level";
+    g_editorStrings.fileSectionWorld = "World";
+    g_editorStrings.fileCommandNew = "New";
+    g_editorStrings.fileCommandOpen = "Open...";
+    g_editorStrings.fileCommandSave = "Save";
+    g_editorStrings.fileCommandSaveAs = "Save as...";
+
+    g_editorStrings.fileConvertDesc1 = "The file extension will change but";
+    g_editorStrings.fileConvertDesc2 = "the old file will NOT be deleted.";
+    g_editorStrings.fileConvertNoIssues = "There are no compatibility issues.";
+    g_editorStrings.fileConvertFeaturesWillBeLost = "The features below will be LOST:";
+
+    g_editorStrings.fileConvert38aUnsupported = "The SMBX38-A format is not supported for conversion.";
+    g_editorStrings.fileConvertFormatUnknown = "Requested format is unknown.";
+
+    g_editorStrings.fileConvertFeatureWarpTransit = "A warp uses new transition effect.";
+    g_editorStrings.fileConvertFeatureWarpNeedsStand = "A warp requires player to stand.";
+    g_editorStrings.fileConvertFeatureWarpCannonExit = "A warp has the cannon exit effect.";
+    g_editorStrings.fileConvertFeatureWarpEnterEvent = "A warp triggers an event on entry.";
+    g_editorStrings.fileConvertFeatureWarpCustomStarsMsg = "A warp has a custom stars message.";
+    g_editorStrings.fileConvertFeatureWarpNoPrintStars = "A warp hides target level stars.";
+    g_editorStrings.fileConvertFeatureWarpNoStartScene = "A level warp skips the start scene.";
+    g_editorStrings.fileConvertFeatureWarpPortal = "A warp uses the portal effect.";
+
+    g_editorStrings.fileConvertFeatureEventCustomMusic = "An event sets music to a file.";
+    g_editorStrings.fileConvertFeatureEventAutoscroll = "An event uses modern autoscroll.";
+
+    g_editorStrings.fileConvertFeatureNPCVariant = "An NPC uses a behavior variant.";
+    g_editorStrings.fileConvertFeatureBlockForceSmashable = "A spin block uses legacy smash.";
+
+    g_editorStrings.fileConvertFeatureCustomWorldMusic = "Uses custom world music file.";
+    g_editorStrings.fileConvertFeatureWorldStarDisplay = "Uses world setting for star display.";
+    g_editorStrings.fileConvertFeatureLevelStarDisplay = "A level uses setting for star display.";
+
     g_editorStrings.listWarpTransitNames = {"NONE", "SCROLL", "FADE", "CIRCLE", "FLIP (H)", "FLIP (V)"};
 }

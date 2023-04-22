@@ -258,6 +258,60 @@ struct EditorContent
     std::string layersPromptLayerName;
     std::string layersItemNewLayer;
 
+    std::string fileActionClearLevel;
+    std::string fileActionClearWorld;
+    std::string fileActionOpen;
+    std::string fileActionRevert;
+    std::string fileActionExit;
+    std::string fileConfirmationSaveBeforeAction;
+    std::string fileConfirmationConfirmAction;
+    std::string fileConfirmationConvertFormatTo;
+    std::string fileOptionYesSaveThenAction;
+    std::string fileOptionActionWithoutSave;
+    std::string fileOptionCancelAction;
+    std::string fileOptionProceedWithConversion;
+    std::string fileOptionCancelConversion;
+
+    std::string fileLabelCurrentFile;
+    std::string fileLabelFormat;
+
+    std::string fileFormatModern;
+    std::string fileFormatLegacy;
+
+    std::string fileSectionLevel;
+    std::string fileSectionWorld;
+    std::string fileCommandNew;
+    std::string fileCommandOpen;
+    std::string fileCommandSave;
+    std::string fileCommandSaveAs;
+
+    std::string fileConvertDesc1;
+    std::string fileConvertDesc2;
+    std::string fileConvertNoIssues;
+    std::string fileConvertFeaturesWillBeLost;
+
+    std::string fileConvert38aUnsupported;
+    std::string fileConvertFormatUnknown;
+
+    std::string fileConvertFeatureWarpTransit;
+    std::string fileConvertFeatureWarpNeedsStand;
+    std::string fileConvertFeatureWarpCannonExit;
+    std::string fileConvertFeatureWarpEnterEvent;
+    std::string fileConvertFeatureWarpCustomStarsMsg;
+    std::string fileConvertFeatureWarpNoPrintStars;
+    std::string fileConvertFeatureWarpNoStartScene;
+    std::string fileConvertFeatureWarpPortal;
+
+    std::string fileConvertFeatureEventCustomMusic;
+    std::string fileConvertFeatureEventAutoscroll;
+
+    std::string fileConvertFeatureNPCVariant;
+    std::string fileConvertFeatureBlockForceSmashable;
+
+    std::string fileConvertFeatureCustomWorldMusic;
+    std::string fileConvertFeatureWorldStarDisplay;
+    std::string fileConvertFeatureLevelStarDisplay;
+
     std::vector<std::string> listWarpTransitNames{6};
 };
 

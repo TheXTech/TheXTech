@@ -53,6 +53,7 @@
 #include "global_dirs.h"
 
 #include "editor/editor_custom.h"
+#include "editor/editor_strings.h"
 
 
 void bgoApplyZMode(Background_t *bgo, int smbx64sp)
@@ -1138,14 +1139,20 @@ bool CanConvertLevel(int format, std::string* reasons)
     if(format == FileFormats::LVL_SMBX38A)
     {
         if(reasons)
-            *reasons = "The SMBX38-A format is not supported at this time.\n";
+        {
+            *reasons = g_editorStrings.fileConvert38aUnsupported;
+            *reasons += '\n';
+        }
         return false;
     }
 
     if(format != FileFormats::LVL_SMBX64)
     {
         if(reasons)
-            *reasons = "Requested format is unknown.\n";
+        {
+            *reasons = g_editorStrings.fileConvertFormatUnknown;
+            *reasons += '\n';
+        }
         return false;
     }
 
@@ -1170,7 +1177,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_transit = true;
             if(reasons)
-                *reasons += "A warp uses new transition effect.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpTransit;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_stood && w.stoodRequired)
@@ -1178,7 +1188,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_stood = true;
             if(reasons)
-                *reasons += "A warp requires player to stand.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpNeedsStand;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_cannon && w.cannonExit)
@@ -1186,7 +1199,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_cannon = true;
             if(reasons)
-                *reasons += "A warp has the cannon exit effect.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpCannonExit;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_warp_event && w.eventEnter != EVENT_NONE)
@@ -1194,7 +1210,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_warp_event = true;
             if(reasons)
-                *reasons += "A warp triggers an event on entry.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpEnterEvent;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_stars_msg && !GetS(w.StarsMsg).empty())
@@ -1202,7 +1221,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_stars_msg = true;
             if(reasons)
-                *reasons += "A warp has a custom stars message.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpCustomStarsMsg;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_no_print_stars && w.noPrintStars)
@@ -1210,7 +1232,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_no_print_stars = true;
             if(reasons)
-                *reasons += "A warp hides its star requirement.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpNoPrintStars;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_no_entrance_scene && w.noEntranceScene)
@@ -1218,15 +1243,21 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_no_entrance_scene = true;
             if(reasons)
-                *reasons += "A level warp skips the start scene.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpNoStartScene;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_portal_warp && w.Effect == 3)
         {
             can_convert = false;
             seen_portal_warp = true;
-           if(reasons)
-                *reasons += "A warp uses the portal effect.\n";
+            if(reasons)
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpPortal;
+                *reasons += '\n';
+            }
          }
     }
 
@@ -1245,7 +1276,10 @@ bool CanConvertLevel(int format, std::string* reasons)
                 can_convert = false;
                 seen_event_custom_music = true;
                 if(reasons)
-                    *reasons += "An event sets music to a file.\n";
+                {
+                    *reasons += g_editorStrings.fileConvertFeatureEventCustomMusic;
+                    *reasons += '\n';
+                }
             }
 
             if(!seen_modern_autoscroll && ss.autoscroll)
@@ -1253,7 +1287,10 @@ bool CanConvertLevel(int format, std::string* reasons)
                 can_convert = false;
                 seen_modern_autoscroll = true;
                 if(reasons)
-                    *reasons += "An event uses modern autoscroll.\n";
+                {
+                    *reasons += g_editorStrings.fileConvertFeatureEventAutoscroll;
+                    *reasons += '\n';
+                }
             }
         }
     }
@@ -1265,9 +1302,8 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             if(reasons)
             {
-                *reasons += "An NPC type ";
-                *reasons += std::to_string(NPC[i].Type);
-                *reasons += " has custom behavior.\n";
+                *reasons += g_editorStrings.fileConvertFeatureNPCVariant;
+                *reasons += '\n';
             }
             break;
         }
@@ -1279,7 +1315,10 @@ bool CanConvertLevel(int format, std::string* reasons)
         {
             can_convert = false;
             if(reasons)
-                *reasons += "A spin block uses ancient smashable behavior.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureBlockForceSmashable;
+                *reasons += '\n';
+            }
             break;
         }
     }
