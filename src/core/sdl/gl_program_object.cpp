@@ -486,7 +486,12 @@ int GLProgramObject::register_uniform(const char* name, StdPictureLoad& l)
 
     GLenum full_type = 0;
     if(loc >= 0)
-        glGetActiveUniform(m_program, loc, 0, nullptr, nullptr, &full_type, nullptr);
+    {
+        // size is not nullable on certain drivers, length and name are.
+        GLint size;
+        glGetActiveUniform(m_program, loc, 0, nullptr, &size, &full_type, nullptr);
+        (void)size;
+    }
 
     int16_t type;
     uint8_t width;
