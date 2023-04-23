@@ -952,9 +952,9 @@ void ClearLevel()
 #endif
 
 #ifdef THEXTECH_BUILD_GL_MODERN
-    SectionEffect.fill(-1);
-    SectionParticlesBG.fill(-1);
-    SectionParticlesFG.fill(-1);
+    SectionEffect.fill(LoadedGLProgramRef_t());
+    SectionParticlesBG.fill(LoadedGLProgramRef_t());
+    SectionParticlesFG.fill(LoadedGLProgramRef_t());
 #endif
 
     UnloadCustomGFX();

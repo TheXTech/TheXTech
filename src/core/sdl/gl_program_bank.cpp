@@ -28,6 +28,8 @@
 #include "Logger/logger.h"
 
 
+constexpr LoadedGLProgramRef_t INVALID_PROGRAM_REF;
+
 std::vector<std::unique_ptr<StdPicture>> LoadedGLProgram;
 
 RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionEffect;
@@ -42,9 +44,9 @@ void ClearAllGLPrograms()
 {
     s_ProgramCache.clear();
     LoadedGLProgram.clear();
-    SectionEffect.fill(-1);
-    SectionParticlesBG.fill(-1);
-    SectionParticlesFG.fill(-1);
+    SectionEffect.fill(INVALID_PROGRAM_REF);
+    SectionParticlesBG.fill(INVALID_PROGRAM_REF);
+    SectionParticlesFG.fill(INVALID_PROGRAM_REF);
 }
 
 LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name)
@@ -65,7 +67,7 @@ LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name)
     if(resolved.empty())
     {
         pLogDebug("Failed to locate fragment shader [%s]", frag_name.c_str());
-        return static_cast<LoadedGLProgramRef_t>(-1);
+        return INVALID_PROGRAM_REF;
     }
 
     auto it = s_ProgramCache.find(resolved);
@@ -82,7 +84,7 @@ LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name)
     if(!dst->inited)
     {
         LoadedGLProgram.pop_back();
-        return static_cast<LoadedGLProgramRef_t>(-1);
+        return INVALID_PROGRAM_REF;
     }
 
     s_ProgramCache[resolved] = dst;
@@ -117,7 +119,7 @@ LoadedGLProgramRef_t ResolveGLParticleSystem(const std::string& name)
     if(resolved.empty())
     {
         pLogDebug("Failed to locate particle system [%s]", vert_name.c_str());
-        return static_cast<LoadedGLProgramRef_t>(-1);
+        return INVALID_PROGRAM_REF;
     }
 
     auto it = s_ProgramCache.find(resolved);
@@ -137,7 +139,7 @@ LoadedGLProgramRef_t ResolveGLParticleSystem(const std::string& name)
     if(!dst->inited)
     {
         LoadedGLProgram.pop_back();
-        return static_cast<LoadedGLProgramRef_t>(-1);
+        return INVALID_PROGRAM_REF;
     }
 
     s_ProgramCache[resolved] = dst;

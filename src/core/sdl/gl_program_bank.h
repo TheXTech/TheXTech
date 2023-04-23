@@ -40,10 +40,10 @@ DECLREF_T(LoadedGLProgram);
 // care must be taken to avoid dangling `LoadedGLProgramRef_t`s
 void ClearAllGLPrograms();
 
-// returns -1 on failure
+// returns LoadedGLProgramRef_t() (evals to false) on failure
 LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name);
 
-// returns -1 on failure
+// returns LoadedGLProgramRef_t() (evals to false) on failure
 LoadedGLProgramRef_t ResolveGLParticleSystem(const std::string& name);
 
 extern RangeArr<LoadedGLProgramRef_t, 0, maxSections> SectionEffect;

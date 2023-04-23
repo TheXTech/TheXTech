@@ -1099,7 +1099,7 @@ void UpdateGraphics(bool skipRepaint)
         DrawBackground(S, Z);
 
 #ifdef THEXTECH_BUILD_GL_MODERN
-        if((int)SectionParticlesBG[S] != -1)
+        if(SectionParticlesBG[S])
             XRender::renderParticleSystem(**SectionParticlesBG[S], vScreenX[Z], vScreenY[Z]);
 #endif
 
@@ -2227,10 +2227,10 @@ void UpdateGraphics(bool skipRepaint)
             lunaRender(Z);
 
 #ifdef THEXTECH_BUILD_GL_MODERN
-            if((int)SectionParticlesFG[S] != -1)
+            if(SectionParticlesFG[S])
                 XRender::renderParticleSystem(**SectionParticlesFG[S], vScreenX[Z], vScreenY[Z]);
 
-            if((int)SectionEffect[S] != -1)
+            if(SectionEffect[S])
                 XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
 #endif
 
