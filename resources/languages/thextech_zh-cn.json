@@ -313,7 +313,7 @@
         "wordEvent": {
             "genitive": "事件",
             "nominative": "事件",
-            "typeLabel": "{0}时触发事件："
+            "typeLabel": "触发{0}事件："
         },
         "wordHeight": "高",
         "wordInstant": "立即",
