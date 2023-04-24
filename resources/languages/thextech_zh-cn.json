@@ -108,8 +108,8 @@
             "confirmConvertFormatTo": "是否转换格式到{0}？",
             "confirmSaveBeforeAction": "{0}前是否保存文件？",
             "convert": {
-                "_38aUnsupported": "SMBX-38A 格式的关卡不支持转换。",
-                "desc1": "文件格式将会转换，但旧文件不会删除。",
+                "_38aUnsupported": "不支持转换 SMBX-38A 格式的关卡。",
+                "desc1": "文件格式将会转换，但不会删除源文件。",
                 "desc2": " ",
                 "featureBlockForceSmashable": "采用旧版本中可破碎的旋转方块。",
                 "featureCustomWorldMusic": "在大地图中使用自定义音乐。",
@@ -128,7 +128,7 @@
                 "featureWorldStarDisplay": "通过大地图的设置显示星星数量。",
                 "featuresWillBeLost": "下列特性将会丢失：",
                 "formatUnknown": "请求的格式不支持。",
-                "noIssues": "该操作不会造成兼容问题。"
+                "noIssues": "该操作不会造成任何兼容性问题。"
             },
             "formatLegacy": "旧版本",
             "formatModern": "新版本",
@@ -146,8 +146,8 @@
             "abbrevAttLayer": "跟随：",
             "default": "默认",
             "deletion": {
-                "cancel": "取消：不删除图层",
-                "confirmDelete": "否：*删除全部对象*",
+                "cancel": "取消：返回上一级菜单",
+                "confirmDelete": "否：删除全部对象",
                 "confirmPreserve": "是：移动到默认图层",
                 "header": "删除图层{0}",
                 "preserveLayerContents": "是否保留图层对象？"
@@ -188,8 +188,8 @@
             "ai": {
                 "LR": "左右",
                 "UD": "上下",
-                "aiIs": "AI：{0}",
-                "headerCustomAi": "自定义AI：",
+                "aiIs": "动作：{0}",
+                "headerCustomAi": "自定义动作：",
                 "jump": "跳跃",
                 "leap": "飞跃",
                 "swim": "游泳",
@@ -204,7 +204,7 @@
                 "header": "生成器选项"
             },
             "inContainer": "包含",
-            "inertNice": "友好",
+            "inertNice": "  友好",
             "props": {
                 "active": "启动",
                 "attachSurface": "跟随",
