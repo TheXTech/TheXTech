@@ -72,7 +72,7 @@ bool RenderGL::isWorking()
 
 
 // arguments
-constexpr bool s_prefer_fb_to_fb_render = true;
+constexpr bool s_prefer_fb_copyTex = false;
 static int s_num_pass = 2;
 
 
@@ -116,60 +116,67 @@ void RenderGL::m_Ortho(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top,
 void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h)
 {
 #ifdef RENDERGL_HAS_FBO
+
     s_normalize_coords(x, y, w, h);
 
     if(w <= 0 || h <= 0)
         return;
 
-    if((!s_prefer_fb_to_fb_render || !m_buffer_fb[dest]) && m_buffer_fb[source])
+    // there are two methods: copy via glCopyTexSubImage2D and a draw call from the source buffer's texture to the dest fbo
+
+    bool can_use_copyTex = m_buffer_texture[dest] && m_buffer_fb[source];
+    bool can_use_draw    = m_buffer_texture[source] && m_buffer_fb[dest];
+
+    bool use_copyTex = (s_prefer_fb_copyTex || !can_use_draw) && can_use_copyTex;
+
+    if(use_copyTex)
     {
         if(source != BUFFER_GAME)
             glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[source]);
 
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[dest]);
-        glCopyTexSubImage2D(GL_TEXTURE_2D,
-            0,
-            x,
-            y,
-            x,
-            y,
-            w,
-            h);
+
+        glCopyTexSubImage2D(
+            GL_TEXTURE_2D, 0,
+            x, y,
+            x, y, w, h
+        );
 
         if(source != BUFFER_GAME)
             glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
-
-        return;
     }
-    else if(!m_buffer_fb[dest])
+    else if(can_use_draw)
     {
-        pLogWarning("Render GL: invalid buffer copy called");
-        return;
-    }
+        // bind dest framebuffer and source texture
 
-    if(dest != BUFFER_GAME)
-        glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[dest]);
+        if(dest != BUFFER_GAME)
+            glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[dest]);
 
-    glBindTexture(GL_TEXTURE_2D, m_buffer_texture[source]);
+        glBindTexture(GL_TEXTURE_2D, m_buffer_texture[source]);
+
+        // use default program for copy
 
 #ifdef RENDERGL_HAS_SHADERS
-    m_standard_program.use_program();
-    m_standard_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+        m_standard_program.use_program();
+        m_standard_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
 #endif
 
-    GLshort x1 = x;
-    GLshort x2 = x + w;
-    GLshort y1 = y;
+        // form vertices: dest is relative to viewport, source isn't
+
+        GLshort x1 = x;
+        GLshort x2 = x + w;
+        GLshort y1 = y;
     GLshort y2 = y + h;
 
     GLfloat u1 = (float)x1 / ScreenW;
     GLfloat u2 = (float)x2 / ScreenW;
-    GLfloat v1 = (float)y1 / ScreenH;
-    GLfloat v2 = (float)y2 / ScreenH;
+        GLfloat v1 = (float)y1 / ScreenH;
+        GLfloat v2 = (float)y2 / ScreenH;
 
-    x1 -= m_viewport_x;
-    x2 -= m_viewport_x;
-    y1 -= m_viewport_y;
+        // dest rect is viewport-relative
+        x1 -= m_viewport_x;
+        x2 -= m_viewport_x;
+        y1 -= m_viewport_y;
     y2 -= m_viewport_y;
 
     RenderGL::Vertex_t copy_triangle_strip[] =
@@ -177,15 +184,25 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
         {{x1, y1, m_cur_depth}, {255, 255, 255, 255}, {u1, v1}},
         {{x1, y2, m_cur_depth}, {255, 255, 255, 255}, {u1, v2}},
         {{x2, y1, m_cur_depth}, {255, 255, 255, 255}, {u2, v1}},
-        {{x2, y2, m_cur_depth}, {255, 255, 255, 255}, {u2, v2}},
-    };
+            {{x2, y2, m_cur_depth}, {255, 255, 255, 255}, {u2, v2}},
+        };
 
-    fillVertexBuffer(copy_triangle_strip, 4);
+        // fill vertex buffer to GL state and execute draw call
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        fillVertexBuffer(copy_triangle_strip, 4);
 
-    if(dest != BUFFER_GAME)
-        glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+        // restore standard framebuffer
+
+        if(dest != BUFFER_GAME)
+            glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+    }
+    else
+    {
+        pLogWarning("Render GL: invalid buffer copy called");
+    }
+
 #else // #ifdef RENDERGL_HAS_FBO
     UNUSED(dest);
     UNUSED(source);
@@ -193,6 +210,7 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
     UNUSED(y);
     UNUSED(w);
     UNUSED(h);
+
     pLogWarning("Render GL: framebufferCopy called without framebuffer subsystem -> no-op");
 #endif
 }
