@@ -217,6 +217,8 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
 
 void RenderGL::depthbufferCopy()
 {
+#ifdef RENDERGL_HAS_FBO
+
     int x = m_viewport_x;
     int y = m_viewport_y;
     int w = m_viewport_w;
@@ -227,51 +229,54 @@ void RenderGL::depthbufferCopy()
     if(w <= 0 || h <= 0)
         return;
 
-    if(!m_buffer_fb[BUFFER_DEPTH_READ] || m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES)
-    {
-        glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
+    // there are two methods: copy via glCopyTexSubImage2D (faster, but doesn't work on GL ES) or copy via glBlitFramebuffer
 
-        glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
+    bool can_use_copyTex = m_depth_read_texture && (m_gl_profile != SDL_GL_CONTEXT_PROFILE_ES);
+    bool can_use_blitFramebuffer = m_buffer_fb[BUFFER_DEPTH_READ];
 
-        glCopyTexSubImage2D(GL_TEXTURE_2D,
-            0,
-            x,
-            y,
-            x,
-            y,
-            w,
-            h);
-
-        glActiveTexture(TEXTURE_UNIT_IMAGE);
-
-        return;
-    }
-    else if(!m_buffer_fb[BUFFER_DEPTH_READ])
-    {
-        pLogWarning("Render GL: invalid buffer copy called");
-        return;
-    }
-
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_buffer_fb[BUFFER_DEPTH_READ]);
-
-    glBlitFramebuffer(x,
-        y,
-        x + w,
-        y + h,
-        x,
-        y,
-        x + w,
-        y + h,
-        GL_DEPTH_BUFFER_BIT,
-        GL_NEAREST);
+    // in every case, even failure, should bind m_depth_read_texture to TEXTURE_UNIT_DEPTH_READ
 
     glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
-
     glBindTexture(GL_TEXTURE_2D, m_depth_read_texture);
 
+    if(can_use_copyTex)
+    {
+        // easy copy call
+        glCopyTexSubImage2D(
+            GL_TEXTURE_2D, 0,
+            x, y,
+            x, y, w, h
+        );
+    }
+    else if(can_use_blitFramebuffer)
+    {
+        // slightly more complex, glBlitFramebuffer blits from the READ framebuffer to the DRAW framebuffer
+
+        glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_buffer_fb[BUFFER_DEPTH_READ]);
+
+        glBlitFramebuffer(
+            x, y, x + w, y + h,
+            x, y, x + w, y + h,
+            GL_DEPTH_BUFFER_BIT,
+            GL_NEAREST
+        );
+
+        // restore original framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+    }
+    else
+    {
+        pLogWarning("Render GL: invalid depth buffer copy called");
+    }
+
+    // restore standard active texture before returning
     glActiveTexture(TEXTURE_UNIT_IMAGE);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+#else // #ifdef RENDERGL_HAS_FBO
+
+    pLogWarning("Render GL: depthbufferCopy called without framebuffer subsystem -> no-op");
+
+#endif
 }
 
 void RenderGL::fillVertexBuffer(const RenderGL::Vertex_t* vertex_attribs, int count)
