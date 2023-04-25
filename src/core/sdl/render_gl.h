@@ -35,6 +35,8 @@
 
 #include <SDL2/SDL_render.h>
 
+#include "core/sdl/gl_geom.h"
+
 #include "core/base/render_base.h"
 #include "cmd_line_setup.h"
 
@@ -113,8 +115,10 @@ private:
      */
     struct Vertex_t
     {
+        using Tint = std::array<GLubyte, 4>;
+
         std::array<GLshort, 3> position;
-        std::array<GLubyte, 4> tint;
+        Tint tint;
         std::array<GLfloat, 2> texcoord;
     };
 
@@ -522,8 +526,17 @@ private:
     // Draws and clears all render queues. Called prior to changing GL context.
     void flushDrawQueues();
 
+    // front-end render helper functions
+
     // Selects efficient ordered vertex list for given context and depth pair. Batches across subsequent draws and masks.
     VertexList& getOrderedDrawVertexList(DrawContext_t context, int depth);
+
+    // Adds vertices to a VertexList
+    void addVertices(VertexList& list, const RectI& loc, const RectF& texcoord, GLshort depth, const Vertex_t::Tint& tint);
+    void addVertices(VertexList& list, const QuadI& loc, const RectF& texcoord, GLshort depth, const Vertex_t::Tint& tint);
+
+    // simple helper function to make a triangle strip for a single-quad draw
+    std::array<Vertex_t, 4> genTriangleStrip(const RectI& loc, const RectF& texcoord, GLshort depth, const Vertex_t::Tint& tint);
 
 protected:
     // Compiles user fragment shader and assembles program in target.
