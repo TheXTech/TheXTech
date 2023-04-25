@@ -672,8 +672,8 @@ void RenderGL::flushDrawQueues()
 
     // passes 1 to num_pass: translucent / interesting textures
     bool any_translucent_draws = false;
-    int active_draw_flags = GLProgramObject::read_depth;
-    int flags_all = GLProgramObject::multipass | GLProgramObject::read_depth | GLProgramObject::read_light;
+    int active_draw_flags = 0;
+    const int flags_all = GLProgramObject::multipass | GLProgramObject::read_depth | GLProgramObject::read_light;
 
     // first, check what is enqueued; may allow us to skip all translucent rendering or multipass logic
     for(auto& i : m_ordered_draw_queue)
