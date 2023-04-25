@@ -494,7 +494,7 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
         m_use_depth_buffer = true;
     }
 
-    // (3) allocate framebuffer (required for game texture, otherwise optional)
+    // (3) allocate framebuffer (required for game texture, otherwise optional with a fallback in framebufferCopy)
     glGenFramebuffers(1, &m_buffer_fb[buffer]);
     if(!m_buffer_fb[buffer])
     {
@@ -522,6 +522,7 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
             glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_game_depth_rb);
     }
 
+    // (4) status checking
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     if(status != GL_FRAMEBUFFER_COMPLETE)

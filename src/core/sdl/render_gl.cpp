@@ -568,14 +568,16 @@ void RenderGL::calculateLighting()
     if(!m_lighting_program.inited() || !m_light_ubo)
         return;
 
-    // SECTION: flush the lights
+
+    // (1) flush the lights
     m_light_queue.lights[m_light_count].type = LightType::none;
 
     glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(Light) * m_light_count + 4, &m_light_queue);
 
     m_light_count = 0;
 
-    // SECTION: bind the lighting framebuffer and choose the correct GL viewport given downscaling
+
+    // (2) bind the lighting framebuffer and choose the correct GL viewport given downscaling
     glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[BUFFER_LIGHTING]);
 
     // fix offscreen coordinates
@@ -590,7 +592,7 @@ void RenderGL::calculateLighting()
         viewport_w / m_lighting_downscale, viewport_h / m_lighting_downscale);
 
 
-    // SECTION: bind the texture and program
+    // (3) bind the texture and program
     glActiveTexture(TEXTURE_UNIT_DEPTH_READ);
     glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
     glActiveTexture(TEXTURE_UNIT_IMAGE);
@@ -617,7 +619,8 @@ void RenderGL::calculateLighting()
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-    // SECTION: restore the normal framebuffer and viewport
+
+    // (5) restore the normal framebuffer and viewport
     glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
 
     glViewport(viewport_x, viewport_y,
@@ -708,7 +711,6 @@ void RenderGL::flushDrawQueues()
     // default to 1-pass rendering
     int num_pass = 1;
 
-#ifdef RENDERGL_HAS_FBO
     // if shaders use multipass rendering and prev-pass framebuffer successfully allocated, enable multipass rendering
     if((active_draw_flags & GLProgramObject::multipass) && m_buffer_texture[BUFFER_PREV_PASS])
         num_pass = s_num_pass;
@@ -719,8 +721,6 @@ void RenderGL::flushDrawQueues()
     // if any shaders read the depth buffer and it is supported, copy it from the main framebuffer
     if((active_draw_flags & GLProgramObject::read_depth) && m_depth_read_texture)
         depthbufferCopy();
-#endif
-
 
     // disable depth writing while rendering translucent textures (small speedup, needed for multipass rendering)
     if(m_use_depth_buffer)
