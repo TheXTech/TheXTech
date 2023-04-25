@@ -163,33 +163,20 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
 
         // form vertices: dest is relative to viewport, source isn't
 
-        GLshort x1 = x;
-        GLshort x2 = x + w;
-        GLshort y1 = y;
-    GLshort y2 = y + h;
+        RectI draw_loc = RectI(x, y, x + w, y + h);
 
-    GLfloat u1 = (float)x1 / ScreenW;
-    GLfloat u2 = (float)x2 / ScreenW;
-        GLfloat v1 = (float)y1 / ScreenH;
-        GLfloat v2 = (float)y2 / ScreenH;
+        RectF draw_source = RectF(draw_loc);
+        draw_source /= PointF(ScreenW, ScreenH);
 
         // dest rect is viewport-relative
-        x1 -= m_viewport_x;
-        x2 -= m_viewport_x;
-        y1 -= m_viewport_y;
-    y2 -= m_viewport_y;
+        draw_source -= PointI(m_viewport_x, m_viewport_y);
 
-    RenderGL::Vertex_t copy_triangle_strip[] =
-    {
-        {{x1, y1, m_cur_depth}, {255, 255, 255, 255}, {u1, v1}},
-        {{x1, y2, m_cur_depth}, {255, 255, 255, 255}, {u1, v2}},
-        {{x2, y1, m_cur_depth}, {255, 255, 255, 255}, {u2, v1}},
-            {{x2, y2, m_cur_depth}, {255, 255, 255, 255}, {u2, v2}},
-        };
+        std::array<Vertex_t, 4> copy_triangle_strip =
+            genTriangleStrip(draw_loc, draw_source, m_cur_depth, {255, 255, 255, 255});
 
         // fill vertex buffer to GL state and execute draw call
 
-        fillVertexBuffer(copy_triangle_strip, 4);
+        fillVertexBuffer(copy_triangle_strip.data(), 4);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -611,31 +598,22 @@ void RenderGL::calculateLighting()
     m_lighting_program.use_program();
     m_lighting_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
 
-    // SECTION: create and execute the draw call
-    GLshort x1 = m_viewport_x;
-    GLshort x2 = m_viewport_x + m_viewport_w;
-    GLshort y1 = m_viewport_y;
-    GLshort y2 = m_viewport_y + m_viewport_h;
 
-    GLfloat u1 = (float)x1 / ScreenW;
-    GLfloat u2 = (float)x2 / ScreenW;
-    GLfloat v1 = (float)y1 / ScreenH;
-    GLfloat v2 = (float)y2 / ScreenH;
+    // (4) create and execute the draw call
+    RectI draw_loc = {m_viewport_x, m_viewport_y, m_viewport_x + m_viewport_w, m_viewport_y + m_viewport_h};
 
-    x1 -= m_viewport_x;
-    x2 -= m_viewport_x;
-    y1 -= m_viewport_y;
-    y2 -= m_viewport_y;
+    RectF draw_source = RectF(draw_loc);
+    draw_source /= PointF(ScreenW, ScreenH);
 
-    RenderGL::Vertex_t copy_triangle_strip[] =
-    {
-        {{x1, y1, m_cur_depth}, {255, 255, 255, 255}, {u1, v1}},
-        {{x1, y2, m_cur_depth}, {255, 255, 255, 255}, {u1, v2}},
-        {{x2, y1, m_cur_depth}, {255, 255, 255, 255}, {u2, v1}},
-        {{x2, y2, m_cur_depth}, {255, 255, 255, 255}, {u2, v2}},
-    };
+    // draw dest is in viewport coordinates, draw source isn't
+    draw_loc -= PointI(m_viewport_x, m_viewport_y);
 
-    fillVertexBuffer(copy_triangle_strip, 4);
+    std::array<Vertex_t, 4> lighting_triangle_strip =
+        genTriangleStrip(draw_loc, draw_source, m_cur_depth, {255, 255, 255, 255});
+
+    // fill vertex buffer to GL state and execute draw call
+
+    fillVertexBuffer(lighting_triangle_strip.data(), 4);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -793,6 +771,63 @@ RenderGL::VertexList& RenderGL::getOrderedDrawVertexList(RenderGL::DrawContext_t
     return m_ordered_draw_queue[{depth, context}];
 }
 
+// Adds vertices to a VertexList
+inline void RenderGL::addVertices(VertexList& list, const RectI& loc, const RectF& tc, GLshort depth, const Vertex_t::Tint& tint)
+{
+    const GLshort x1 = loc.tl.x;
+    const GLshort x2 = loc.br.x;
+    const GLshort y1 = loc.tl.y;
+    const GLshort y2 = loc.br.y;
+
+    const GLfloat u1 = tc.tl.x;
+    const GLfloat u2 = tc.br.x;
+    const GLfloat v1 = tc.tl.y;
+    const GLfloat v2 = tc.br.y;
+
+    list.vertices.push_back({{x1, y1, depth}, tint, {u1, v1}});
+    list.vertices.push_back({{x1, y2, depth}, tint, {u1, v2}});
+    list.vertices.push_back({{x2, y1, depth}, tint, {u2, v1}});
+    list.vertices.push_back({{x1, y2, depth}, tint, {u1, v2}});
+    list.vertices.push_back({{x2, y1, depth}, tint, {u2, v1}});
+    list.vertices.push_back({{x2, y2, depth}, tint, {u2, v2}});
+}
+
+inline void RenderGL::addVertices(VertexList& list, const QuadI& loc, const RectF& tc, GLshort depth, const Vertex_t::Tint& tint)
+{
+    const GLfloat u1 = tc.tl.x;
+    const GLfloat u2 = tc.br.x;
+    const GLfloat v1 = tc.tl.y;
+    const GLfloat v2 = tc.br.y;
+
+    list.vertices.push_back({{loc.tl.x, loc.tl.y, depth}, tint, {u1, v1}});
+    list.vertices.push_back({{loc.bl.x, loc.bl.y, depth}, tint, {u1, v2}});
+    list.vertices.push_back({{loc.tr.x, loc.tr.y, depth}, tint, {u2, v1}});
+    list.vertices.push_back({{loc.bl.x, loc.bl.y, depth}, tint, {u1, v2}});
+    list.vertices.push_back({{loc.tr.x, loc.tr.y, depth}, tint, {u2, v1}});
+    list.vertices.push_back({{loc.br.x, loc.br.y, depth}, tint, {u2, v2}});
+}
+
+// simple helper function to make a triangle strip for a single-quad draw
+inline std::array<RenderGL::Vertex_t, 4> RenderGL::genTriangleStrip(const RectI& loc, const RectF& tc, GLshort depth, const Vertex_t::Tint& tint)
+{
+    const GLshort x1 = loc.tl.x;
+    const GLshort x2 = loc.br.x;
+    const GLshort y1 = loc.tl.y;
+    const GLshort y2 = loc.br.y;
+
+    const GLfloat u1 = tc.tl.x;
+    const GLfloat u2 = tc.br.x;
+    const GLfloat v1 = tc.tl.y;
+    const GLfloat v2 = tc.br.y;
+
+    return {
+        Vertex_t{{x1, y1, depth}, tint, {u1, v1}},
+        Vertex_t{{x1, y2, depth}, tint, {u1, v2}},
+        Vertex_t{{x2, y1, depth}, tint, {u2, v1}},
+        Vertex_t{{x2, y2, depth}, tint, {u2, v2}},
+    };
+}
+
 bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 {
     pLogDebug("Init renderer settings...");
@@ -820,7 +855,6 @@ bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         close();
         return false;
     }
-
 
 
     // Clean-up from a possible start-up junk
@@ -961,20 +995,13 @@ void RenderGL::repaint()
         getRenderSize(&hardware_w, &hardware_h);
 
         // draw screen at correct physical coordinates
-        GLshort x1 = m_phys_x;
-        GLshort x2 = m_phys_x + m_phys_w;
-        GLshort y1 = m_phys_y;
-        GLshort y2 = m_phys_y + m_phys_h;
+        RectI draw_loc = RectI(m_phys_x, m_phys_y, m_phys_x + m_phys_w, m_phys_y + m_phys_h);
+        RectF draw_source = RectF(0.0, 0.0, 1.0, 1.0);
+        Vertex_t::Tint tint = {255, 255, 255, 255};
 
-        const Vertex_t vertex_attribs[] =
-        {
-            {{x1, y1, 0}, {255, 255, 255, 255}, {0.0, 0.0}},
-            {{x1, y2, 0}, {255, 255, 255, 255}, {0.0, 1.0}},
-            {{x2, y1, 0}, {255, 255, 255, 255}, {1.0, 0.0}},
-            {{x2, y2, 0}, {255, 255, 255, 255}, {1.0, 1.0}},
-        };
+        std::array<Vertex_t, 4> vertex_attribs = genTriangleStrip(draw_loc, draw_source, 0, tint);
 
-        fillVertexBuffer(vertex_attribs, 4);
+        fillVertexBuffer(vertex_attribs.data(), 4);
 
         glBindTexture(GL_TEXTURE_2D, m_game_texture);
 
@@ -1661,10 +1688,13 @@ void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, fl
         return;
     }
 
-    GLshort x1 = x;
-    GLshort x2 = x + w;
-    GLshort y1 = y;
-    GLshort y2 = y + h;
+    DrawContext_t context = {(filled) ? m_program_rect_filled : m_program_rect_unfilled};
+
+    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
+
+    auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+
+    RectI draw_loc = RectI(x, y, x + w, y + h);
 
     // want interpolated value to be <= 0 for first two pixels, >= 1 for last two pixels
     float u1 = -2.0f / w;
@@ -1673,18 +1703,9 @@ void RenderGL::renderRect(int x, int y, int w, int h, float red, float green, fl
     float v1 = -2.0f / h;
     float v2 = (h + 2.0f) / h;
 
-    DrawContext_t context = {(filled) ? m_program_rect_filled : m_program_rect_unfilled};
+    RectF draw_source = RectF(u1, v1, u2, v2);
 
-    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
-
-    auto& vertex_attribs = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
-
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
+    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
     m_cur_depth++;
     m_drawQueued = true;
@@ -1711,27 +1732,22 @@ void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, 
 
     DrawContext_t context = {m_program_circle};
 
-    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_attribs = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
     if(m_use_shaders)
     {
-        GLshort x1 = cx - radius;
-        GLshort x2 = cx + radius;
-        GLshort y1 = cy - radius;
-        GLshort y2 = cy + radius;
+        RectI draw_loc = RectI(cx - radius, cy - radius, cx + radius, cy + radius);
+        RectF draw_source = RectF(0.0, 0.0, 1.0, 1.0);
 
-        vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {0.0, 0.0}});
-        vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {0.0, 1.0}});
-        vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {1.0, 0.0}});
-        vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {0.0, 1.0}});
-        vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {1.0, 0.0}});
-        vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {1.0, 1.0}});
+        addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
     }
     else
     {
-        // make a full circle poly here
+        auto& vertex_attribs = vertex_list.vertices;
+
+        // manually fill with  a full circle poly here
         const int verts = 20;
         const float two_pi = (float)(2 * 3.1415926535897932384626433832795);
 
@@ -1769,27 +1785,22 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float gre
 
     DrawContext_t context = {m_program_circle_hole};
 
-    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_attribs = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    auto& vertex_list = ((m_use_depth_buffer && tint[3] == 255) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
     if(m_use_shaders)
     {
-        GLshort x1 = cx - radius;
-        GLshort x2 = cx + radius;
-        GLshort y1 = cy - radius;
-        GLshort y2 = cy + radius;
+        RectI draw_loc = RectI(cx - radius, cy - radius, cx + radius, cy + radius);
+        RectF draw_source = RectF(0.0, 0.0, 1.0, 1.0);
 
-        vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {0.0, 0.0}});
-        vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {0.0, 1.0}});
-        vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {1.0, 0.0}});
-        vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {0.0, 1.0}});
-        vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {1.0, 0.0}});
-        vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {1.0, 1.0}});
+        addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
     }
     else
     {
-        // make a full circle poly here
+        auto& vertex_attribs = vertex_list.vertices;
+
+        // manually fill with  a full circle poly here
         const int verts = 32;
         const float two_pi = (float)(2 * 3.1415926535897932384626433832795);
 
@@ -1873,65 +1884,39 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
             hSrc = 0;
     }
 
-    GLshort x1, x2, x3, x4, y1, y2, y3, y4;
-
+    QuadI draw_loc;
 
     if(rotateAngle != 0.0)
     {
         int cx = center ? center->x : wDst / 2;
         int cy = center ? center->y : hDst / 2;
 
-        GLshort l_off = -cx;
-        GLshort r_off = wDst - cx;
-        GLshort t_off = -cy;
-        GLshort b_off = hDst - cy;
+        RectI offset = RectI(-cx, -cy, wDst - cx, hDst - cy);
 
-        rotateAngle *= -2.0 * M_PI / 360.0;
-
-        x1 = l_off *  cos(rotateAngle) + t_off * sin(rotateAngle) + xDst + cx;
-        x2 = l_off *  cos(rotateAngle) + b_off * sin(rotateAngle) + xDst + cx;
-        x3 = r_off *  cos(rotateAngle) + t_off * sin(rotateAngle) + xDst + cx;
-        x4 = r_off *  cos(rotateAngle) + b_off * sin(rotateAngle) + xDst + cx;
-        y1 = l_off * -sin(rotateAngle) + t_off * cos(rotateAngle) + yDst + cy;
-        y2 = l_off * -sin(rotateAngle) + b_off * cos(rotateAngle) + yDst + cy;
-        y3 = r_off * -sin(rotateAngle) + t_off * cos(rotateAngle) + yDst + cy;
-        y4 = r_off * -sin(rotateAngle) + b_off * cos(rotateAngle) + yDst + cy;
+        draw_loc = QuadI(offset).rotate(rotateAngle);
+        draw_loc += PointI(xDst + cx, yDst + cy);
     }
     else
     {
-        x1 = xDst;
-        x2 = xDst;
-        x3 = xDst + wDst;
-        x4 = xDst + wDst;
-        y1 = yDst;
-        y2 = yDst + hDst;
-        y3 = yDst;
-        y4 = yDst + hDst;
+        draw_loc = QuadI(RectI(xDst, yDst, xDst + wDst, yDst + hDst));
     }
 
-    float u1 = tx.d.w_scale * xSrc;
-    float u2 = tx.d.w_scale * (xSrc + wSrc);
-    float v1 = tx.d.h_scale * ySrc;
-    float v2 = tx.d.h_scale * (ySrc + hSrc);
+    RectF draw_source = RectF(xSrc, ySrc, xSrc + wSrc, ySrc + hSrc);
+    draw_source *= PointF(tx.d.w_scale, tx.d.h_scale);
 
     if(flip & X_FLIP_HORIZONTAL)
-        std::swap(u1, u2);
+        std::swap(draw_source.tl.x, draw_source.br.x);
 
     if(flip & X_FLIP_VERTICAL)
-        std::swap(v1, v2);
+        std::swap(draw_source.tl.y, draw_source.br.y);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
-    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    auto& vertex_list = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x3, y3, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x3, y3, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x4, y4, m_cur_depth}, tint, {u2, v2}});
+    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
     m_cur_depth++;
     m_drawQueued = true;
@@ -1957,28 +1942,18 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
         return;
     }
 
-    GLshort x1 = xDst;
-    GLshort x2 = xDst + wDst;
-    GLshort y1 = yDst;
-    GLshort y2 = yDst + hDst;
+    RectI draw_loc = RectI(xDst, yDst, xDst + wDst, yDst + hDst);
 
-    float u1 = tx.d.w_scale * 0;
-    float u2 = tx.d.w_scale * (tx.w);
-    float v1 = tx.d.h_scale * 0;
-    float v2 = tx.d.h_scale * (tx.h);
+    RectF draw_source = RectF(0.0, 0.0, tx.w, tx.h);
+    draw_source *= PointF(tx.d.w_scale, tx.d.h_scale);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
-    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    auto& vertex_list = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
+    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
     m_cur_depth++;
     m_drawQueued = true;
@@ -2047,28 +2022,18 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
             hDst = 0;
     }
 
-    GLshort x1 = xDst;
-    GLshort x2 = xDst + wDst;
-    GLshort y1 = yDst;
-    GLshort y2 = yDst + hDst;
+    RectI draw_loc = RectI(xDst, yDst, xDst + wDst, yDst + hDst);
 
-    float u1 = tx.d.w_scale * xSrc;
-    float u2 = tx.d.w_scale * (xSrc + wDst);
-    float v1 = tx.d.h_scale * ySrc;
-    float v2 = tx.d.h_scale * (ySrc + hDst);
+    RectF draw_source = RectF(xSrc, ySrc, xSrc + wDst, ySrc + hDst);
+    draw_source *= PointF(tx.d.w_scale, tx.d.h_scale);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
-    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    auto& vertex_list = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
+    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
     m_cur_depth++;
     m_drawQueued = true;
@@ -2117,64 +2082,39 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
             hDst = 0;
     }
 
-    GLshort x1, x2, x3, x4, y1, y2, y3, y4;
+    QuadI draw_loc;
 
     if(rotateAngle != 0.0)
     {
         int cx = center ? center->x : wDst / 2;
         int cy = center ? center->y : hDst / 2;
 
-        GLshort l_off = -cx;
-        GLshort r_off = wDst - cx;
-        GLshort t_off = -cy;
-        GLshort b_off = hDst - cy;
+        RectI offset = RectI(-cx, -cy, wDst - cx, hDst - cy);
 
-        rotateAngle *= -2.0 * M_PI / 360.0;
-
-        x1 = l_off *  cos(rotateAngle) + t_off * sin(rotateAngle) + xDst + cx;
-        x2 = l_off *  cos(rotateAngle) + b_off * sin(rotateAngle) + xDst + cx;
-        x3 = r_off *  cos(rotateAngle) + t_off * sin(rotateAngle) + xDst + cx;
-        x4 = r_off *  cos(rotateAngle) + b_off * sin(rotateAngle) + xDst + cx;
-        y1 = l_off * -sin(rotateAngle) + t_off * cos(rotateAngle) + yDst + cy;
-        y2 = l_off * -sin(rotateAngle) + b_off * cos(rotateAngle) + yDst + cy;
-        y3 = r_off * -sin(rotateAngle) + t_off * cos(rotateAngle) + yDst + cy;
-        y4 = r_off * -sin(rotateAngle) + b_off * cos(rotateAngle) + yDst + cy;
+        draw_loc = QuadI(offset).rotate(rotateAngle);
+        draw_loc += PointI(xDst + cx, yDst + cy);
     }
     else
     {
-        x1 = xDst;
-        x2 = xDst;
-        x3 = xDst + wDst;
-        x4 = xDst + wDst;
-        y1 = yDst;
-        y2 = yDst + hDst;
-        y3 = yDst;
-        y4 = yDst + hDst;
+        draw_loc = QuadI(RectI(xDst, yDst, xDst + wDst, yDst + hDst));
     }
 
-    float u1 = tx.d.w_scale * xSrc;
-    float u2 = tx.d.w_scale * (xSrc + wDst);
-    float v1 = tx.d.h_scale * ySrc;
-    float v2 = tx.d.h_scale * (ySrc + hDst);
+    RectF draw_source = RectF(xSrc, ySrc, xSrc + wDst, ySrc + hDst);
+    draw_source *= PointF(tx.d.w_scale, tx.d.h_scale);
 
     if(flip & X_FLIP_HORIZONTAL)
-        std::swap(u1, u2);
+        std::swap(draw_source.tl.x, draw_source.br.x);
 
     if(flip & X_FLIP_VERTICAL)
-        std::swap(v1, v2);
+        std::swap(draw_source.tl.y, draw_source.br.y);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
-    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    auto& vertex_list = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x3, y3, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x3, y3, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x4, y4, m_cur_depth}, tint, {u2, v2}});
+    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
     m_cur_depth++;
     m_drawQueued = true;
@@ -2200,28 +2140,18 @@ void RenderGL::renderTexture(float xDst, float yDst,
         return;
     }
 
-    GLshort x1 = xDst;
-    GLshort x2 = xDst + tx.w;
-    GLshort y1 = yDst;
-    GLshort y2 = yDst + tx.h;
+    RectI draw_loc = RectI(xDst, yDst, xDst + tx.w, yDst + tx.h);
 
-    float u1 = tx.d.w_scale * 0;
-    float u2 = tx.d.w_scale * (tx.w);
-    float v1 = tx.d.h_scale * 0;
-    float v2 = tx.d.h_scale * (tx.h);
+    RectF draw_source = RectF(0.0, 0.0, tx.w, tx.h);
+    draw_source *= PointF(tx.d.w_scale, tx.d.h_scale);
 
     DrawContext_t context = {tx.d.shader_program ? *tx.d.shader_program : m_standard_program, &tx};
 
-    std::array<GLubyte, 4> tint = F_TO_B(red, green, blue, alpha);
+    Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_attribs = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth)).vertices;
+    auto& vertex_list = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
-    vertex_attribs.push_back({{x1, y1, m_cur_depth}, tint, {u1, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x1, y2, m_cur_depth}, tint, {u1, v2}});
-    vertex_attribs.push_back({{x2, y1, m_cur_depth}, tint, {u2, v1}});
-    vertex_attribs.push_back({{x2, y2, m_cur_depth}, tint, {u2, v2}});
+    addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
     m_cur_depth++;
     m_drawQueued = true;
