@@ -371,6 +371,8 @@ void RenderGL::flushUnorderedDrawQueue()
 {
     for(auto& i : m_unordered_draw_queue)
     {
+        // (0) extract draw call info
+
         const DrawContext_t& context = i.first;
         VertexList& vertex_list = i.second;
 
@@ -391,11 +393,11 @@ void RenderGL::flushUnorderedDrawQueue()
 
         GLProgramObject* const program = context.program;
 
-        // load vertex attributes into current GL buffer
-        fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
+        // context.texture is nullable
+        StdPicture* const texture = context.texture;
 
-#ifdef RENDERGL_HAS_SHADERS
-        // load program and update state if necessary (uses m_transform_tick to prevent unnecessary updates)
+
+        // (1) load program and update state if necessary (uses m_transform_tick to prevent unnecessary updates)
         if(m_use_shaders)
         {
             SDL_assert(program->inited());
@@ -404,19 +406,24 @@ void RenderGL::flushUnorderedDrawQueue()
             program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
             program->activate_uniform_step(context.uniform_step);
         }
-#endif
+
+
+        // (2) draw!
+
+        // load vertex attributes into current GL buffer
+        fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
 
         // bind texture if it exists
-        if(context.texture)
-            glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
-        // unbind texture in legacy mode (shader programs would just ignore texture)
-        else if(!m_use_shaders)
+        if(texture)
+            glBindTexture(GL_TEXTURE_2D, texture->d.texture_id);
+        else
             glBindTexture(GL_TEXTURE_2D, 0);
 
         // draw!
         glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
 
-        // clear list
+
+        // (3) clear list
         vertex_attribs.clear();
     }
 }
@@ -425,7 +432,9 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
 {
     for(auto& i : m_ordered_draw_queue)
     {
-        // int draw_depth = i.first.first;
+        // (0) extract draw call info
+
+        // int draw_depth = i.first.first; // unused
         const DrawContext_t& context = i.first.second;
 
         VertexList& vertex_list = i.second;
@@ -449,7 +458,8 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
         // context.texture is nullable
         StdPicture* const texture = context.texture;
 
-        // figure out whether this draw should use bitmask rendering
+
+        // (1) figure out whether this draw should use logic op rendering and prepare if so
         bool use_gl_logic_op = (texture && texture->d.mask_texture_id && program == &m_standard_program);
 
         // emulate the logic op if we can't use it directly
@@ -457,10 +467,15 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
         {
             program = &m_bitmask_program;
             use_gl_logic_op = false;
+
+            // bind the bitmask texture to the secondary texture unit
+            glActiveTexture(TEXTURE_UNIT_MASK);
+            glBindTexture(GL_TEXTURE_2D, texture->d.mask_texture_id);
+            glActiveTexture(TEXTURE_UNIT_IMAGE);
         }
 
-        // setup the framebuffer read state as needed
-#ifdef RENDERGL_HAS_FBO
+
+        // (2) setup the framebuffer read state as needed
         if(program->get_flags() & GLProgramObject::read_buffer)
         {
             // multiple quads -> copy the whole screen
@@ -477,85 +492,67 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
                     vertex_attribs[5].position[0] - vertex_attribs[0].position[0],
                     vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
             }
-
-            // the bitmask emulation program is the only program allowed to use the mask texture; bind it here
-            if(program == &m_bitmask_program)
-            {
-                glActiveTexture(TEXTURE_UNIT_MASK);
-                glBindTexture(GL_TEXTURE_2D, texture->d.mask_texture_id);
-                glActiveTexture(TEXTURE_UNIT_IMAGE);
-            }
         }
-#endif // #ifdef RENDERGL_HAS_FBO
 
-        // vertex-based draw
-        if(!(program->get_flags() & GLProgramObject::particles))
+
+        // (3) load program and update state if necessary (uses m_transform_tick to prevent unnecessary updates)
+        if(m_use_shaders)
         {
-            // load vertex attributes into current GL buffer
-            fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
+            SDL_assert(program->inited());
 
-#ifdef RENDERGL_HAS_SHADERS
-            // load program and update state if necessary (uses m_transform_tick to prevent unnecessary updates)
-            if(m_use_shaders)
-            {
-                SDL_assert(program->inited());
-
-                program->use_program();
-                program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
-                program->activate_uniform_step(context.uniform_step);
-            }
-#endif
-
-            // draw mask using glLogicOp state
-            if(use_gl_logic_op)
-            {
-                // prepare mask logicOp state
-                prepareDrawMask();
-
-                // bind mask texture
-                glBindTexture(GL_TEXTURE_2D, context.texture->d.mask_texture_id);
-
-                // draw!
-                glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
-
-                // prepare front image logicOp state
-                prepareDrawImage();
-            }
-
-            // bind texture if it exists
-            if(context.texture)
-                glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
-            // unbind texture in legacy mode (shader programs would just ignore texture)
-            else if(!m_use_shaders)
-                glBindTexture(GL_TEXTURE_2D, 0);
-
-            // draw!
-            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
-
-            // return to logicOp state for standard draws
-            if(use_gl_logic_op)
-                leaveMaskContext();
+            program->use_program();
+            program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+            program->activate_uniform_step(context.uniform_step);
         }
-        else
+
+
+        // (4) draw! (separate logic for particle system, OpenGL LogicOp draw, and standard vertex-based draw)
+        if(program->get_flags() & GLProgramObject::particles)
         {
-#ifdef RENDERGL_HAS_SHADERS
-            bool state_valid = program->inited() && context.texture && context.texture->d.particle_system;
+            bool state_valid = program->inited() && texture && texture->d.particle_system;
             SDL_assert(state_valid);
 
             if(state_valid)
             {
-                program->use_program();
-                program->update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
-                program->activate_uniform_step(context.uniform_step);
-
-                glBindTexture(GL_TEXTURE_2D, context.texture->d.texture_id);
-
-                context.texture->d.particle_system->fill_and_draw();
+                glBindTexture(GL_TEXTURE_2D, texture->d.texture_id);
+                texture->d.particle_system->fill_and_draw();
             }
-#endif
+        }
+        else if(use_gl_logic_op)
+        {
+            // load vertex attributes into current GL buffer
+            fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
+
+            // draw mask
+            prepareDrawMask();
+            glBindTexture(GL_TEXTURE_2D, texture->d.mask_texture_id);
+            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+
+            // draw image at same coordinates
+            prepareDrawImage();
+            glBindTexture(GL_TEXTURE_2D, texture->d.texture_id);
+            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
+
+            // return to standard LogicOp state
+            leaveMaskContext();
+        }
+        else
+        {
+            // load vertex attributes into current GL buffer
+            fillVertexBuffer(vertex_attribs.data(), vertex_attribs.size());
+
+            // bind image texture if it exists
+            if(texture)
+                glBindTexture(GL_TEXTURE_2D, texture->d.texture_id);
+            else
+                glBindTexture(GL_TEXTURE_2D, 0);
+
+            // draw!
+            glDrawArrays(GL_TRIANGLES, 0, vertex_attribs.size());
         }
 
-        // clear queue only if requested
+
+        // (5) clear vertex list, only if requested
         if(clear)
             vertex_attribs.clear();
     }
