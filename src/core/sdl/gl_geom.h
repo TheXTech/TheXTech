@@ -40,6 +40,11 @@ struct PointI
         return PointI(-x, -y);
     }
 
+    inline constexpr PointI operator+(const PointI& o) const
+    {
+        return PointI(x + o.x, y + o.y);
+    }
+
     inline const PointI& operator+=(const PointI& o)
     {
         x += o.x;
@@ -96,6 +101,55 @@ struct PointF
     }
 };
 
+struct RectSizeI
+{
+    PointI xy;
+    PointI wh;
+
+    GLshort& x = xy.x;
+    GLshort& y = xy.y;
+
+    GLshort& w = wh.x;
+    GLshort& h = wh.y;
+
+    constexpr RectSizeI(int x, int y, int w, int h) :
+        xy(x, y), wh(w, h) {}
+
+    constexpr RectSizeI(const RectSizeI&) = default;
+
+    inline RectSizeI& operator=(const RectSizeI& o)
+    {
+        xy = o.xy;
+        wh = o.wh;
+
+        return *this;
+    }
+
+    inline RectSizeI operator+(const PointI& o) const
+    {
+        RectSizeI ret = *this;
+        ret.xy += o;
+        return ret;
+    }
+
+    inline RectSizeI& operator+=(const PointI& o)
+    {
+        xy += o;
+        return *this;
+    }
+
+    inline RectSizeI& operator-=(const PointI& o)
+    {
+        xy -= o;
+        return *this;
+    }
+
+    inline RectSizeI operator/(GLshort factor) const
+    {
+        return RectSizeI(x / factor, y / factor, w / factor, h / factor);
+    }
+};
+
 struct RectI
 {
     PointI tl;
@@ -103,6 +157,9 @@ struct RectI
 
     constexpr RectI(int l, int t, int r, int b) :
         tl(l, t), br(r, b) {}
+
+    constexpr explicit RectI(const RectSizeI& o) :
+        tl(o.xy), br(o.xy + o.wh) {}
 
     inline const RectI& operator+=(const PointI& o)
     {

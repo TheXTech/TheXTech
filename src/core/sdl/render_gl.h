@@ -274,8 +274,7 @@ private:
     std::set<StdPicture *> m_loadedPictures;
 
     // Offset to shake screen
-    int m_viewport_offset_x = 0;
-    int m_viewport_offset_y = 0;
+    PointI m_viewport_offset = PointI(0, 0);
     // Keep zero viewport offset while this flag is on
     bool m_viewport_offset_ignore = false;
 
@@ -286,10 +285,7 @@ private:
     int m_phys_h = 0;
 
     //Need to calculate in-game vScreen position
-    int m_viewport_x = 0;
-    int m_viewport_y = 0;
-    int m_viewport_w = 0;
-    int m_viewport_h = 0;
+    RectSizeI m_viewport = RectSizeI(0, 0, 0, 0);
 
     //Need for HiDPI rendering (number of draw pixels per cursor pixel)
     float m_hidpi_x = 1.0f;
@@ -486,7 +482,7 @@ private:
 
     // Private draw management functions
 
-    static void s_normalize_coords(int& x, int& y, int& w, int& h);
+    static void s_normalize_coords(RectSizeI& r);
 
     void m_Ortho(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far);
 
@@ -497,7 +493,7 @@ private:
     // destroys a single framebuffer
     void destroyFramebuffer(BufferIndex_t buffer);
     // perform a framebuffer->framebuffer copy
-    void framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h);
+    void framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSizeI r);
     // perform a full depth buffer copy to the TEXTURE_UNIT_DEPTH_READ
     void depthbufferCopy();
 

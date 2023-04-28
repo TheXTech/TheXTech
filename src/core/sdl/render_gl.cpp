@@ -76,25 +76,25 @@ constexpr bool s_prefer_fb_copyTex = false;
 static int s_num_pass = 2;
 
 
-void RenderGL::s_normalize_coords(int& x, int& y, int& w, int& h)
+void RenderGL::s_normalize_coords(RectSizeI& r)
 {
-    if(x < 0)
+    if(r.x < 0)
     {
-        w += x;
-        x = 0;
+        r.w += r.x;
+        r.x = 0;
     }
 
-    if(y < 0)
+    if(r.y < 0)
     {
-        h += y;
-        y = 0;
+        r.h += r.y;
+        r.y = 0;
     }
 
-    if(x + w >= ScreenW)
-        w = ScreenW - x;
+    if(r.x + r.w >= ScreenW)
+        r.w = ScreenW - r.x;
 
-    if(y + h >= ScreenH)
-        h = ScreenH - y;
+    if(r.y + r.h >= ScreenH)
+        r.h = ScreenH - r.y;
 }
 
 void RenderGL::m_Ortho(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far)
@@ -113,13 +113,13 @@ void RenderGL::m_Ortho(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top,
     }
 }
 
-void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, int y, int w, int h)
+void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSizeI r)
 {
 #ifdef RENDERGL_HAS_FBO
 
-    s_normalize_coords(x, y, w, h);
+    s_normalize_coords(r);
 
-    if(w <= 0 || h <= 0)
+    if(r.w <= 0 || r.h <= 0)
         return;
 
     // there are two methods: copy via glCopyTexSubImage2D and a draw call from the source buffer's texture to the dest fbo
@@ -138,8 +138,8 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
 
         glCopyTexSubImage2D(
             GL_TEXTURE_2D, 0,
-            x, y,
-            x, y, w, h
+            r.x, r.y,
+            r.x, r.y, r.w, r.h
         );
 
         if(source != BUFFER_GAME)
@@ -156,20 +156,21 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, int x, 
 
         // use default program for copy
 
-#ifdef RENDERGL_HAS_SHADERS
-        m_standard_program.use_program();
-        m_standard_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
-#endif
+        if(m_use_shaders)
+        {
+            m_standard_program.use_program();
+            m_standard_program.update_transform(m_transform_tick, m_transform_matrix.data(), m_shader_read_viewport.data(), m_shader_clock);
+        }
 
         // form vertices: dest is relative to viewport, source isn't
 
-        RectI draw_loc = RectI(x, y, x + w, y + h);
+        RectI draw_loc = RectI(r);
 
         RectF draw_source = RectF(draw_loc);
         draw_source /= PointF(ScreenW, ScreenH);
 
         // dest rect is viewport-relative
-        draw_source -= PointI(m_viewport_x, m_viewport_y);
+        draw_source -= m_viewport.xy;
 
         std::array<Vertex_t, 4> copy_triangle_strip =
             genTriangleStrip(draw_loc, draw_source, m_cur_depth, {255, 255, 255, 255});
@@ -206,14 +207,11 @@ void RenderGL::depthbufferCopy()
 {
 #ifdef RENDERGL_HAS_FBO
 
-    int x = m_viewport_x;
-    int y = m_viewport_y;
-    int w = m_viewport_w;
-    int h = m_viewport_h;
+    RectSizeI r = m_viewport;
 
-    s_normalize_coords(x, y, w, h);
+    s_normalize_coords(r);
 
-    if(w <= 0 || h <= 0)
+    if(r.w <= 0 || r.h <= 0)
         return;
 
     // there are two methods: copy via glCopyTexSubImage2D (faster, but doesn't work on GL ES) or copy via glBlitFramebuffer
@@ -231,8 +229,8 @@ void RenderGL::depthbufferCopy()
         // easy copy call
         glCopyTexSubImage2D(
             GL_TEXTURE_2D, 0,
-            x, y,
-            x, y, w, h
+            r.x, r.y,
+            r.x, r.y, r.w, r.h
         );
     }
     else if(can_use_blitFramebuffer)
@@ -242,8 +240,8 @@ void RenderGL::depthbufferCopy()
         glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_buffer_fb[BUFFER_DEPTH_READ]);
 
         glBlitFramebuffer(
-            x, y, x + w, y + h,
-            x, y, x + w, y + h,
+            r.x, r.y, r.x + r.w, r.y + r.h,
+            r.x, r.y, r.x + r.w, r.y + r.h,
             GL_DEPTH_BUFFER_BIT,
             GL_NEAREST
         );
@@ -481,16 +479,19 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
             // multiple quads -> copy the whole screen
             if(program->get_flags() & GLProgramObject::particles || vertex_attribs.size() > 6)
             {
-                framebufferCopy(BUFFER_FB_READ, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+                framebufferCopy(BUFFER_FB_READ, BUFFER_GAME, m_viewport);
             }
             // copy the quad behind the draw (speedup, doesn't work for rotated draw)
             else if(vertex_attribs.size() == 6)
             {
-                framebufferCopy(BUFFER_FB_READ, BUFFER_GAME,
-                    m_viewport_x + m_viewport_offset_x + vertex_attribs[0].position[0],
-                    m_viewport_y + m_viewport_offset_y + vertex_attribs[0].position[1],
+                RectSizeI dest = RectSizeI(
+                    vertex_attribs[0].position[0],
+                    vertex_attribs[0].position[1],
                     vertex_attribs[5].position[0] - vertex_attribs[0].position[0],
-                    vertex_attribs[5].position[1] - vertex_attribs[0].position[1]);
+                    vertex_attribs[5].position[1] - vertex_attribs[0].position[1]
+                );
+
+                framebufferCopy(BUFFER_FB_READ, BUFFER_GAME, dest + m_viewport.xy + m_viewport_offset);
             }
         }
 
@@ -578,15 +579,14 @@ void RenderGL::calculateLighting()
     glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[BUFFER_LIGHTING]);
 
     // fix offscreen coordinates
-    int viewport_x = m_viewport_x;
-    int viewport_y = m_viewport_y;
-    int viewport_w = m_viewport_w;
-    int viewport_h = m_viewport_h;
+    RectSizeI viewport = m_viewport;
 
-    s_normalize_coords(viewport_x, viewport_y, viewport_w, viewport_h);
+    s_normalize_coords(viewport);
 
-    glViewport(viewport_x / m_lighting_downscale, viewport_y / m_lighting_downscale,
-        viewport_w / m_lighting_downscale, viewport_h / m_lighting_downscale);
+    RectSizeI viewport_scaled = viewport / m_lighting_downscale;
+
+    glViewport(viewport_scaled.x, viewport_scaled.y,
+        viewport_scaled.w, viewport_scaled.h);
 
 
     // (3) bind the texture and program
@@ -599,13 +599,13 @@ void RenderGL::calculateLighting()
 
 
     // (4) create and execute the draw call
-    RectI draw_loc = {m_viewport_x, m_viewport_y, m_viewport_x + m_viewport_w, m_viewport_y + m_viewport_h};
+    RectI draw_loc = RectI(m_viewport);
 
     RectF draw_source = RectF(draw_loc);
     draw_source /= PointF(ScreenW, ScreenH);
 
     // draw dest is in viewport coordinates, draw source isn't
-    draw_loc -= PointI(m_viewport_x, m_viewport_y);
+    draw_loc -= m_viewport.xy;
 
     std::array<Vertex_t, 4> lighting_triangle_strip =
         genTriangleStrip(draw_loc, draw_source, m_cur_depth, {255, 255, 255, 255});
@@ -620,8 +620,8 @@ void RenderGL::calculateLighting()
     // (5) restore the normal framebuffer and viewport
     glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
 
-    glViewport(viewport_x, viewport_y,
-        viewport_w, viewport_h);
+    glViewport(viewport.x, viewport.y,
+        viewport.w, viewport.h);
 #endif
 }
 
@@ -632,7 +632,7 @@ void RenderGL::prepareMultipassState(int pass)
     if(pass == 1)
     {
         // save the opaque state to init pass buffer
-        framebufferCopy(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+        framebufferCopy(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport);
 
         // use as "previous pass"
         glActiveTexture(TEXTURE_UNIT_PREV_PASS);
@@ -643,9 +643,9 @@ void RenderGL::prepareMultipassState(int pass)
     else
     {
         // save previous pass to previous pass buffer
-        framebufferCopy(BUFFER_PREV_PASS, BUFFER_GAME, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+        framebufferCopy(BUFFER_PREV_PASS, BUFFER_GAME, m_viewport);
         // restore opaque state
-        framebufferCopy(BUFFER_GAME, BUFFER_INIT_PASS, m_viewport_x, m_viewport_y, m_viewport_w, m_viewport_h);
+        framebufferCopy(BUFFER_GAME, BUFFER_INIT_PASS, m_viewport);
 
         // use previous pass as previous pass (reverses pass-1 logic)
         if(pass == 2)
@@ -1048,33 +1048,29 @@ void RenderGL::applyViewport()
     if(m_recentTargetScreen)
         return;
 
-    int off_x = m_viewport_offset_ignore ? 0 : m_viewport_offset_x;
-    int off_y = m_viewport_offset_ignore ? 0 : m_viewport_offset_y;
+    PointI off = m_viewport_offset_ignore ? PointI(0, 0) : m_viewport_offset;
 
     // fix offscreen coordinates
-    int viewport_x = m_viewport_x;
-    int viewport_y = m_viewport_y;
-    int viewport_w = m_viewport_w;
-    int viewport_h = m_viewport_h;
+    RectSizeI viewport = m_viewport;
 
-    s_normalize_coords(viewport_x, viewport_y, viewport_w, viewport_h);
+    s_normalize_coords(viewport);
 
-    off_x += viewport_x - m_viewport_x;
-    off_y += viewport_y - m_viewport_y;
+    off += viewport.xy;
+    off -= m_viewport.xy;
 
     int y_sign = 1;
 
     if(m_has_fbo && m_game_texture_fb)
     {
-        glViewport(viewport_x, viewport_y, viewport_w, viewport_h);
+        glViewport(viewport.x, viewport.y, viewport.w, viewport.h);
     }
     else
     {
-        int phys_offset_x = viewport_x * m_phys_w / ScreenW;
-        int phys_width = viewport_w * m_phys_w / ScreenW;
+        int phys_offset_x = viewport.x * m_phys_w / ScreenW;
+        int phys_width = viewport.w * m_phys_w / ScreenW;
 
-        int phys_offset_y = viewport_y * m_phys_h / ScreenH;
-        int phys_height = viewport_h * m_phys_h / ScreenH;
+        int phys_offset_y = viewport.y * m_phys_h / ScreenH;
+        int phys_height = viewport.h * m_phys_h / ScreenH;
 
         y_sign = -1;
 
@@ -1087,20 +1083,20 @@ void RenderGL::applyViewport()
     if(m_use_shaders)
     {
         m_transform_matrix = {
-            2.0f / (float)viewport_w, 0.0f, 0.0f, 0.0f,
-            0.0f, y_sign * 2.0f / (float)viewport_h, 0.0f, 0.0f,
+            2.0f / (float)viewport.w, 0.0f, 0.0f, 0.0f,
+            0.0f, y_sign * 2.0f / (float)viewport.h, 0.0f, 0.0f,
             0.0f, 0.0f, 1.0f / (float)(1 << 15), 0.0f,
-            -(float)(viewport_w + off_x + off_x) / (viewport_w), -y_sign * (float)(viewport_h + off_y + off_y) / (viewport_h), -1.0f, 1.0f,
+            -(float)(viewport.w + off.x + off.x) / (viewport.w), -y_sign * (float)(viewport.h + off.y + off.y) / (viewport.h), -1.0f, 1.0f,
         };
 
         m_shader_read_viewport = {
             // multiply
-            0.5f * (float)viewport_w / (float)ScreenW,
-            0.5f * (float)viewport_h / (float)ScreenH,
+            0.5f * (float)viewport.w / (float)ScreenW,
+            0.5f * (float)viewport.h / (float)ScreenH,
 
             // add
-            ((float)(viewport_x + off_x) + 0.5f * (float)viewport_w) / (float)ScreenW,
-            ((float)(viewport_y + off_y) + 0.5f * (float)viewport_h) / (float)ScreenH,
+            ((float)(viewport.x + off.x) + 0.5f * (float)viewport.w) / (float)ScreenW,
+            ((float)(viewport.y + off.y) + 0.5f * (float)viewport.h) / (float)ScreenH,
         };
 
         m_transform_tick++;
@@ -1111,7 +1107,7 @@ void RenderGL::applyViewport()
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
 
-        m_Ortho(off_x, viewport_w + off_x, (y_sign == -1) * viewport_h + off_y, (y_sign == 1) * viewport_h + off_y, (1 << 15), -(1 << 15));
+        m_Ortho(off.x, viewport.w + off.x, (y_sign == -1) * viewport.h + off.y, (y_sign == 1) * viewport.h + off.y, (1 << 15), -(1 << 15));
 #endif
     }
 }
@@ -1144,13 +1140,9 @@ void RenderGL::updateViewport()
         m_phys_h = res_h;
     }
 
-    m_viewport_x = 0;
-    m_viewport_y = 0;
-    m_viewport_w = ScreenW;
-    m_viewport_h = ScreenH;
+    m_viewport = RectSizeI(0, 0, ScreenW, ScreenH);
 
-    m_viewport_offset_x = 0;
-    m_viewport_offset_y = 0;
+    m_viewport_offset = PointI(0, 0);
     m_viewport_offset_ignore = false;
 
     pLogDebug("Phys screen is %d x %d", m_phys_w, m_phys_h);
@@ -1168,28 +1160,24 @@ void RenderGL::resetViewport()
 
 void RenderGL::setViewport(int x, int y, int w, int h)
 {
-    if(x == m_viewport_x && y == m_viewport_y && w == m_viewport_w && h == m_viewport_h)
+    if(x == m_viewport.x && y == m_viewport.y && w == m_viewport.w && h == m_viewport.h)
         return;
 
     flushDrawQueues();
 
-    m_viewport_x = x;
-    m_viewport_y = y;
-    m_viewport_w = w;
-    m_viewport_h = h;
+    m_viewport = RectSizeI(x, y, w, h);
 
     applyViewport();
 }
 
 void RenderGL::offsetViewport(int x, int y)
 {
-    if(x == m_viewport_offset_x && y == m_viewport_offset_y)
+    if(x == m_viewport_offset.x && y == m_viewport_offset.y)
         return;
 
     flushDrawQueues();
 
-    m_viewport_offset_x = x;
-    m_viewport_offset_y = y;
+    m_viewport_offset = PointI(x, y);
 
     applyViewport();
 }
@@ -1199,7 +1187,7 @@ void RenderGL::offsetViewportIgnore(bool en)
     if(en == m_viewport_offset_ignore)
         return;
 
-    if(m_viewport_offset_x == 0 && m_viewport_offset_y == 0)
+    if(m_viewport_offset.x == 0 && m_viewport_offset.y == 0)
     {
         m_viewport_offset_ignore = en;
         return;
