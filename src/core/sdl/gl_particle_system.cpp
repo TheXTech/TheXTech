@@ -84,6 +84,7 @@ void GLParticleSystem::fill_and_draw()
     glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
 
     // update all needed particles
+
     // whole buffer
     if(m_modified_count >= m_particle_count)
     {
@@ -104,7 +105,7 @@ void GLParticleSystem::fill_and_draw()
             sizeof(ParticleVertexMutable_t) * (mod_wrap_count * 6), m_vertices_mutable.data() + (mod_wrap_start * 6));
     }
     // internal section of buffer
-    else
+    else if(m_modified_count > 0)
     {
         // particles from (m_next_particle - m_modified_count) up to (m_next_particle), delta = m_modified_count
         int mod_start = m_next_particle - m_modified_count;
