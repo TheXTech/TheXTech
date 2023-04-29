@@ -87,7 +87,7 @@
 #define V_VERSION V_PROJECT_VERSION_NUM
 #define V_RELEASE "" //Developing state (for release this field must be empty)
 
-#define V_COPYRIGHT "2020-2022 by Wohlstand"
+#define V_COPYRIGHT "2020-2023 by Wohlstand"
 
 #define V_COMPANY "Moondust Team"
 

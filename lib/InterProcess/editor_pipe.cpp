@@ -4,6 +4,7 @@
 
 #include <Utils/files.h>
 #include <Utils/elapsed_timer.h>
+#include <Utils/strings.h>
 
 #include <iostream>
 #include <cstdio>
@@ -195,6 +196,7 @@ void EditorPipe::icomingData(const std::string &in)
                      in.c_str())
                    );
         m_accepted_lvl_path   = std::string(in.c_str() + 11, (in.size() - 11));//skip "SEND_LVLX: "
+        Strings::doTrim(m_accepted_lvl_path);
         m_doAcceptLevelData  = true;
         IntProc::setState("Accepted SEND_LVLX");
         sendMessage("READY\n\n");
