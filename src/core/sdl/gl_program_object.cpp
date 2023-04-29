@@ -295,7 +295,9 @@ void GLProgramObject::m_activate_uniform_step(uint16_t step)
     }
 
     // track which uniforms are now matching the requested state
-    std::vector<bool> updated(m_u_custom_loc.size());
+    static std::vector<bool> updated;
+    updated.clear();
+    updated.resize(m_u_custom_loc.size());
 
     // rewind
     if(step < m_gl_uniform_step)
