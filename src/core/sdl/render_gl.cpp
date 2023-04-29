@@ -289,11 +289,7 @@ void RenderGL::fillVertexBuffer(const RenderGL::Vertex_t* vertex_attribs, int co
 
         if(m_vertex_buffer_size[m_cur_vertex_buffer_index] < buffer_size)
         {
-#   ifdef RENDERGL_HAS_STREAM_DRAW
             const auto draw_mode = (m_gl_majver == 1 ? GL_DYNAMIC_DRAW : GL_STREAM_DRAW);
-#   else
-            const auto draw_mode = GL_DYNAMIC_DRAW;
-#   endif
             glBufferData(GL_ARRAY_BUFFER, buffer_size, vertex_attribs, draw_mode);
             m_vertex_buffer_size[m_cur_vertex_buffer_index] = buffer_size;
         }
@@ -454,7 +450,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
         GLProgramObject* program = context.program;
 
         // context.texture is nullable
-        StdPicture* const texture = context.texture;
+        StdPicture* texture = context.texture;
 
 
         // (1) figure out whether this draw should use logic op rendering and prepare if so
@@ -1734,7 +1730,7 @@ void RenderGL::renderCircle(int cx, int cy, int radius, float red, float green, 
 
         // manually fill with  a full circle poly here
         const int verts = 20;
-        const float two_pi = (float)(2 * 3.1415926535897932384626433832795);
+        const float two_pi = (float)(2 * M_PI);
 
         GLshort cx_s = cx;
         GLshort cy_s = cy;
@@ -1787,7 +1783,7 @@ void RenderGL::renderCircleHole(int cx, int cy, int radius, float red, float gre
 
         // manually fill with  a full circle poly here
         const int verts = 32;
-        const float two_pi = (float)(2 * 3.1415926535897932384626433832795);
+        const float two_pi = (float)(2 * M_PI);
 
         GLshort cx_s = cx;
         GLshort cy_s = cy;
@@ -1899,7 +1895,8 @@ void RenderGL::renderTextureScaleEx(double xDstD, double yDstD, double wDstD, do
 
     Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_list = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
+    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
     addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
@@ -1936,7 +1933,8 @@ void RenderGL::renderTextureScale(double xDst, double yDst, double wDst, double 
 
     Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_list = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
+    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
     addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
@@ -2016,7 +2014,8 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
 
     Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_list = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
+    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
     addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
@@ -2097,7 +2096,8 @@ void RenderGL::renderTextureFL(double xDstD, double yDstD, double wDstD, double 
 
     Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_list = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
+    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
     addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
@@ -2134,7 +2134,8 @@ void RenderGL::renderTexture(float xDst, float yDst,
 
     Vertex_t::Tint tint = F_TO_B(red, green, blue, alpha);
 
-    auto& vertex_list = ((tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program) ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
+    bool draw_opaque = (tx.d.use_depth_test && tint[3] == 255 && !tx.d.shader_program);
+    auto& vertex_list = (draw_opaque ? m_unordered_draw_queue[context] : getOrderedDrawVertexList(context, m_cur_depth));
 
     addVertices(vertex_list, draw_loc, draw_source, m_cur_depth, tint);
 
