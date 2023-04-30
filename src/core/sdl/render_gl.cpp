@@ -131,7 +131,7 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
 
     if(use_copyTex)
     {
-        if(source != BUFFER_GAME)
+        if(source != m_cur_pass_target)
             glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[source]);
 
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[dest]);
@@ -142,14 +142,14 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
             r.x, r.y, r.w, r.h
         );
 
-        if(source != BUFFER_GAME)
-            glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+        if(source != m_cur_pass_target)
+            glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[m_cur_pass_target]);
     }
     else if(can_use_draw)
     {
         // bind dest framebuffer and source texture
 
-        if(dest != BUFFER_GAME)
+        if(dest != m_cur_pass_target)
             glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[dest]);
 
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[source]);
@@ -183,8 +183,8 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
 
         // restore standard framebuffer
 
-        if(dest != BUFFER_GAME)
-            glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+        if(dest != m_cur_pass_target)
+            glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[m_cur_pass_target]);
     }
     else
     {
@@ -247,7 +247,7 @@ void RenderGL::depthbufferCopy()
         );
 
         // restore original framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[m_cur_pass_target]);
     }
     else
     {
@@ -475,7 +475,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
             // multiple quads -> copy the whole screen
             if(program->get_flags() & GLProgramObject::particles || vertex_attribs.size() > 6)
             {
-                framebufferCopy(BUFFER_FB_READ, BUFFER_GAME, m_viewport);
+                framebufferCopy(BUFFER_FB_READ, m_cur_pass_target, m_viewport);
             }
             // copy the quad behind the draw (speedup, doesn't work for rotated draw)
             else if(vertex_attribs.size() == 6)
@@ -487,7 +487,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
                     vertex_attribs[5].position[1] - vertex_attribs[0].position[1]
                 );
 
-                framebufferCopy(BUFFER_FB_READ, BUFFER_GAME, dest + m_viewport.xy + m_viewport_offset);
+                framebufferCopy(BUFFER_FB_READ, m_cur_pass_target, dest + m_viewport.xy + m_viewport_offset);
             }
         }
 
@@ -614,45 +614,46 @@ void RenderGL::calculateLighting()
 
 
     // (5) restore the normal framebuffer and viewport
-    glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[m_cur_pass_target]);
 
     glViewport(viewport.x, viewport.y,
         viewport.w, viewport.h);
 #endif
 }
 
-void RenderGL::prepareMultipassState(int pass)
+void RenderGL::prepareMultipassState(int pass, int num_pass)
 {
 #ifdef RENDERGL_HAS_FBO
-    // on first pass, use opaque state as "previous pass"
-    if(pass == 1)
-    {
-        // save the opaque state to init pass buffer
-        framebufferCopy(BUFFER_INIT_PASS, BUFFER_GAME, m_viewport);
 
-        // use as "previous pass"
-        glActiveTexture(TEXTURE_UNIT_PREV_PASS);
-        glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_INIT_PASS]);
-        glActiveTexture(TEXTURE_UNIT_IMAGE);
-    }
-    // on later passes, use previous pass itself, then restore opaque state
-    else
-    {
-        // save previous pass to previous pass buffer
-        framebufferCopy(BUFFER_PREV_PASS, BUFFER_GAME, m_viewport);
-        // restore opaque state
-        framebufferCopy(BUFFER_GAME, BUFFER_INIT_PASS, m_viewport);
+    BufferIndex_t prev_buffer = (pass == 1        ? BUFFER_GAME :
+                                    (pass % 2 ? BUFFER_INT_PASS_2 : BUFFER_INT_PASS_1 ));
+    BufferIndex_t draw_buffer = (pass == num_pass ? BUFFER_GAME :
+                                    (pass % 2 ? BUFFER_INT_PASS_1 : BUFFER_INT_PASS_2 ));
 
-        // use previous pass as previous pass (reverses pass-1 logic)
-        if(pass == 2)
-        {
-            glActiveTexture(TEXTURE_UNIT_PREV_PASS);
-            glBindTexture(GL_TEXTURE_2D, m_buffer_texture[BUFFER_PREV_PASS]);
-            glActiveTexture(TEXTURE_UNIT_IMAGE);
-        }
+    // should only happen if num_pass is forced to be 1
+    if(prev_buffer == draw_buffer)
+    {
+        // avoid undefined behavior (reading from currently bound color attachment texture)
+        framebufferCopy(BUFFER_FB_READ, prev_buffer, m_viewport);
+        prev_buffer = BUFFER_FB_READ;
     }
+
+    // bind the previous pass texture
+    glActiveTexture(TEXTURE_UNIT_PREV_PASS);
+    glBindTexture(GL_TEXTURE_2D, m_buffer_texture[prev_buffer]);
+    glActiveTexture(TEXTURE_UNIT_IMAGE);
+
+    // set the desired framebuffer
+    m_cur_pass_target = draw_buffer;
+    glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[draw_buffer]);
+
+    // if not the last pass, copy opaque state from main framebuffer
+    if(pass != num_pass)
+        framebufferCopy(draw_buffer, BUFFER_GAME, m_viewport);
+
 #else // #ifdef RENDERGL_HAS_FBO
     (void)pass;
+    (void)num_pass;
 #endif
 }
 
@@ -704,10 +705,15 @@ void RenderGL::flushDrawQueues()
     // default to 1-pass rendering
     int num_pass = 1;
 
-    // if shaders use multipass rendering and prev-pass framebuffer successfully allocated, enable multipass rendering
-    if((active_draw_flags & GLProgramObject::multipass) && m_buffer_texture[BUFFER_PREV_PASS])
+    // if shaders use multipass rendering and intermediate pass framebuffer successfully allocated, enable multipass rendering
+    if((active_draw_flags & GLProgramObject::multipass) && m_buffer_fb[BUFFER_INT_PASS_1])
         num_pass = s_num_pass;
 
+    // if second intermediate pass framebuffer missing, cap at 2 passes
+    if(!m_buffer_fb[BUFFER_INT_PASS_2] && num_pass > 2)
+        num_pass = 2;
+
+    // if shaders use lighting and lighting framebuffer successfully allocated, calculate lighting
     if((active_draw_flags & GLProgramObject::read_light) && m_buffer_fb[BUFFER_LIGHTING])
         calculateLighting();
 
@@ -725,8 +731,8 @@ void RenderGL::flushDrawQueues()
     for(int pass = 1; pass <= num_pass; pass++)
     {
         // setup state for multipass rendering
-        if((active_draw_flags & GLProgramObject::multipass) && m_buffer_texture[BUFFER_INIT_PASS])
-            prepareMultipassState(pass);
+        if(active_draw_flags & GLProgramObject::multipass)
+            prepareMultipassState(pass, num_pass);
 
         // execute and possibly flush ordered draws
         executeOrderedDrawQueue(pass == num_pass);
@@ -939,7 +945,7 @@ void RenderGL::repaint()
         feature_string += "game, ";
     if(m_buffer_texture[BUFFER_FB_READ])
         feature_string += "local fx, ";
-    if(m_buffer_texture[BUFFER_PREV_PASS])
+    if(m_buffer_texture[BUFFER_INT_PASS_2])
         feature_string += "n-pass fx, ";
     if(m_buffer_texture[BUFFER_LIGHTING])
         feature_string += "light, ";

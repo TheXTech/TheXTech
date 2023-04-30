@@ -54,8 +54,8 @@ enum BufferIndex_t
 {
     BUFFER_GAME = 0,   /**< main texture for the game */
     BUFFER_FB_READ,    /**< auxiliary texture used for reading from main buffer in shader */
-    BUFFER_INIT_PASS,  /**< auxiliary texture used to restore the state after drawing only opaque objects (multipass rendering) */
-    BUFFER_PREV_PASS,  /**< auxiliary texture used to read the state following the previous draw pass (multipass rendering) */
+    BUFFER_INT_PASS_1, /**< auxiliary target used to render an intermediate pass during multipass rendering */
+    BUFFER_INT_PASS_2, /**< auxiliary target used to render an intermediate pass during multipass rendering */
     BUFFER_DEPTH_READ, /**< auxiliary texture used to copy the depth from the initial render pass */
     BUFFER_LIGHTING,   /**< texture used to store the outcome of the lighting calculations */
     BUFFER_MAX,
@@ -70,7 +70,7 @@ enum TextureUnit_t
     TEXTURE_UNIT_IMAGE = GL_TEXTURE0, /**< texture unit for the currently bound StdPicture (default) */
     TEXTURE_UNIT_FB_READ,             /**< texture unit for reading from the FB read buffer (set once) */
     TEXTURE_UNIT_MASK,                /**< texture unit for emulating bitmask rendering (set per bitmasked render) */
-    TEXTURE_UNIT_PREV_PASS,           /**< texture unit for reading from the previous render pass (first set to init pass, and then prev pass) */
+    TEXTURE_UNIT_PREV_PASS,           /**< texture unit for reading from the previous render pass (first set to game, and then most recent int pass) */
     TEXTURE_UNIT_DEPTH_READ,          /**< texture unit for reading depth from the initial render pass */
     TEXTURE_UNIT_LIGHT_READ,          /**< texture unit for reading lighting state (set once) */
 };
@@ -327,16 +327,20 @@ private:
     std::array<GLuint, BUFFER_MAX> m_buffer_texture = {0};
     // FBOs for each render-to-texture layer (only the first is required)
     std::array<GLuint, BUFFER_MAX> m_buffer_fb = {0};
-    // renderbuffer for main game framebuffer's depth component
-    GLuint m_game_depth_rb = 0;
     // texture for main game framebuffer's depth component (preferred)
     GLuint m_game_depth_texture = 0;
+    // fallback: renderbuffer for main game framebuffer's depth component
+    GLuint m_game_depth_rb = 0;
 
     // references to main game framebuffer's texture and FBO
     const GLuint& m_game_texture = m_buffer_texture[BUFFER_GAME];
     const GLuint& m_game_texture_fb = m_buffer_fb[BUFFER_GAME];
     // texture for depth buffer read
     const GLuint& m_depth_read_texture = m_buffer_texture[BUFFER_DEPTH_READ];
+
+    // tracks the current pass render target during multipass rendering (as a buffer index), always BUFFER_GAME except during flushDrawQueues()
+    BufferIndex_t m_cur_pass_target = BUFFER_GAME;
+
 
     // vertex buffer object (VBO) and vertex array object (VAO) state
 
@@ -516,7 +520,7 @@ private:
     // calculates the lighting state using depth buffer information
     void calculateLighting();
     // prepares for the next pass during multipass drawing
-    void prepareMultipassState(int pass);
+    void prepareMultipassState(int pass, int num_pass);
     // executes and optionally clears all vertex lists in the ordered draw queue
     void executeOrderedDrawQueue(bool clear);
     // Draws and clears all render queues. Called prior to changing GL context.

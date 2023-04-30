@@ -514,7 +514,7 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
     glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[buffer]);
     glFramebufferTexture2D(GL_FRAMEBUFFER, (buffer == BUFFER_DEPTH_READ) ? GL_DEPTH_ATTACHMENT : GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_buffer_texture[buffer], 0);
 
-    if(buffer == BUFFER_GAME)
+    if(buffer == BUFFER_GAME || buffer == BUFFER_INT_PASS_1 || buffer == BUFFER_INT_PASS_2)
     {
         if(m_game_depth_texture)
             glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_game_depth_texture, 0);
@@ -608,10 +608,6 @@ bool RenderGL::initFramebuffers()
         if(i == BUFFER_FB_READ && !m_use_shaders)
             break;
     }
-
-    // deallocate BUFFER_INIT_PASS if BUFFER_PREV_PASS didn't allocate
-    if(!m_buffer_texture[BUFFER_PREV_PASS] && m_buffer_texture[BUFFER_INIT_PASS])
-        destroyFramebuffer(BUFFER_INIT_PASS);
 
     // bind texture unit 1 to the framebuffer read texture
     if(m_buffer_texture[BUFFER_FB_READ])
