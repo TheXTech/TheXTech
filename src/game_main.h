@@ -33,6 +33,7 @@ enum class PauseCode
     Reconnect,
     DropAdd,
     TextEntry,
+    Prompt,
 };
 
 //Public GamePaused As Boolean 'true if the game is paused

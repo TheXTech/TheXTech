@@ -22,15 +22,25 @@
 #include <IniProcessor/ini_processing.h>
 #include <Utils/files.h>
 #include <Utils/dir_list_ci.h>
+#include <fmt_format_ne.h>
+
 #include "Graphics/graphics_funcs.h"
 #include "globals.h"
 #include "global_dirs.h"
 #include "compat.h"
 #include "main/speedrunner.h"
 #include "main/presetup.h"
+#include "main/screen_prompt.h"
+#include "main/menu_main.h"
+#include "game_main.h"
+
+#include "config.h"
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+// support variables for autoconversion to avoid repeated nags
+static int s_cur_load_iter = 0;
+static std::unordered_map<std::string, int> s_first_load_iter;
 
 static int s_compatLevel = COMPAT_MODERN;
 
@@ -174,13 +184,71 @@ static void compatInit(Compatibility_t &c)
 
 static void deprecatedWarning(IniProcessing &s, const char* fieldName, const char *newName)
 {
-    if(s.hasKey(fieldName))
+    if(s.hasKey(fieldName) && !s.hasKey(newName))
     {
         pLogWarning("File %s contains the deprecated setting \"%s\" at the section [%s]. Please rename it into \"%s\".",
                     s.fileName().c_str(),
                     fieldName,
                     s.group().c_str(),
                     newName);
+
+        bool writable = (selWorld == 0 || LevelEditor) || (BattleMode ? SelectBattle : SelectWorld)[selWorld].editable;
+
+        if(writable)
+        {
+            int response;
+
+            // only warn on first time the file is loaded
+            if(s_first_load_iter[s.fileName()] != 0 && s_first_load_iter[s.fileName()] != s_cur_load_iter)
+            {
+                response = 1;
+            }
+            else
+            {
+                response = PromptScreen::Run(
+                    fmt::format_ne(g_mainMenu.promptDeprecatedSetting, fieldName, newName),
+                    {
+                        g_mainMenu.wordYes,
+                        g_mainMenu.wordNo,
+                    }
+                );
+
+                s_first_load_iter[s.fileName()] = s_cur_load_iter;
+            }
+
+            if(response == 0)
+            {
+                pLogDebug("Updating file [%s]...", s.fileName().c_str());
+
+                std::string current_value;
+                s.read(fieldName, current_value, current_value);
+                s.setValue(newName, current_value);
+
+                writable = s.writeIniFile();
+            }
+        }
+
+        // NOTE: if saving failed above, writable is set to false even if it was originally true
+
+        // final condition ensures we only warn on first time the file is loaded
+        if(!writable && (s_first_load_iter[s.fileName()] == 0 || s_first_load_iter[s.fileName()] == s_cur_load_iter))
+        {
+            std::string filename = s.fileName();
+
+            // remove AppPath if it's included
+            pLogDebug("%s %s", filename.c_str(), AppPath.c_str());
+            if(filename.compare(0, AppPath.size(), AppPath) == 0)
+            {
+                for(size_t i = AppPath.size(); i < filename.size(); i++)
+                    filename[i - AppPath.size()] = filename[i];
+
+                filename.resize(filename.size() - AppPath.size());
+            }
+
+            PromptScreen::Run(fmt::format_ne(g_mainMenu.promptDeprecatedSettingUnwritable, filename, s.group().c_str(), fieldName, newName), {g_mainMenu.wordOkay});
+
+            s_first_load_iter[s.fileName()] = s_cur_load_iter;
+        }
     }
 }
 
@@ -380,6 +448,8 @@ void LoadCustomCompat()
                                 (uint8_t)g_compatibility.bitblit_background_colour[1],
                                 (uint8_t)g_compatibility.bitblit_background_colour[2]);
 #endif
+
+    s_cur_load_iter++;
 }
 
 void ResetCompat()
