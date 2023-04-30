@@ -92,11 +92,13 @@ private:
         if(!m_params.currentGroup)
             return params::IniKeys::iterator();
 
-        #ifndef CASE_SENSITIVE_KEYS
+#ifndef CASE_SENSITIVE_KEYS
         std::string key1(key);
         for(char *iter = &key1[0]; *iter != '\0'; ++iter)
             *iter = (char)tolower(*iter);
-        #endif
+#else
+        auto &key1 = key;
+#endif
 
         params::IniKeys::iterator e = m_params.currentGroup->find(key1);
 
@@ -193,6 +195,21 @@ public:
      * @return true if key is presented in this section
      */
     bool hasKey(const std::string &keyName) const;
+
+    /**
+     * @brief Renames key to a new name, clobbering existing key at newName
+     * @param oldName current name of key
+     * @param newName new name of key
+     * @return true if rename is successful, false if oldName is not present in this section
+     */
+    bool renameKey(const std::string &oldName, const std::string &newName);
+
+    /**
+     * @brief Deletes key at keyName from current section
+     * @param keyName name of key to delete
+     * @return true if delete is successful, false if keyName is not present in this section
+     */
+    bool deleteKey(const std::string &keyName);
 
     /**
      * @brief Get list of available keys in current groul
