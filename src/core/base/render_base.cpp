@@ -528,12 +528,12 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         }
     }
 
+    if(!g_render->depthTestSupported() || maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
+        target.d.invalidateDepthTest();
+
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
 
     g_render->loadTexture(target, w, h, textura, pitch);
-
-    if(!g_render->depthTestSupported() || maskImage || !GraphicsHelps::validateForDepthTest(sourceImage, StdPictureGetOrigPath(target)))
-        target.d.invalidateDepthTest();
 
     GraphicsHelps::closeImage(sourceImage);
 
