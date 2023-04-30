@@ -510,6 +510,7 @@ set(THEXTECH_SRC
     src/main/screen_connect.cpp
     src/main/screen_quickreconnect.cpp
     src/main/screen_textentry.cpp
+    src/main/screen_prompt.cpp
     src/main/game_strings.cpp
     src/main/translate.cpp
     src/main/translate_episode.cpp

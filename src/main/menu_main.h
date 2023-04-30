@@ -165,6 +165,7 @@ struct MainMenuContent
     // General purpose
     std::string wordYes;
     std::string wordNo;
+    std::string wordOkay;
     std::string caseNone;
     std::string wordOn;
     std::string wordOff;
@@ -176,6 +177,10 @@ struct MainMenuContent
     std::string wordResume;
     std::string wordWaiting;
     std::string abbrevMilliseconds;
+
+    // Compat menu
+    std::string promptDeprecatedSetting;
+    std::string promptDeprecatedSettingUnwritable;
 };
 
 extern MainMenuContent g_mainMenu;

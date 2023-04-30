@@ -170,12 +170,16 @@ void initMainMenu()
 
     g_mainMenu.wordNo   = "No";
     g_mainMenu.wordYes  = "Yes";
+    g_mainMenu.wordOkay = "Okay";
     g_mainMenu.caseNone = "<None>";
     g_mainMenu.wordOn   = "On";
     g_mainMenu.wordOff  = "Off";
     g_mainMenu.wordShow = "Show";
     g_mainMenu.wordHide = "Hide";
     g_mainMenu.abbrevMilliseconds = "MS";
+
+    g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"\n\n\nReplace it with the updated flag for version 1.3.6 and newer?";
+    g_mainMenu.promptDeprecatedSettingUnwritable = "An unwritable file ({0}) uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nSection: [{1}]\nOld flag: \"{2}\"\nNew flag: \"{3}\"\n\n\nPlease update it manually and copy to your device.";
 }
 
 
@@ -333,6 +337,8 @@ void FindWorlds()
                         w.blockChar[5] = true;
                     }
 
+                    w.editable = worldsRoot.editable;
+
                     if(tr.tryTranslateTitle(epDir, fName, w.WorldName))
                         pLogDebug("Translated world title: %s", w.WorldName.c_str());
 
@@ -394,13 +400,13 @@ static int FindLevelsThread(void *)
 
 void FindLevels()
 {
-    std::vector<std::string> battleRoots =
+    std::vector<WorldRoot_t> battleRoots =
     {
-        AppPath + "battle/"
+        {AppPath + "battle/", CAN_WRITE_APPPATH_WORLDS}
     };
 
     if(AppPathManager::userDirIsAvailable())
-        battleRoots.push_back(AppPathManager::userBattleRootDir());
+        battleRoots.push_back({AppPathManager::userBattleRootDir(), true});
 
     SelectBattle.clear();
     SelectBattle.emplace_back(SelectWorld_t()); // Dummy entry
@@ -417,7 +423,7 @@ void FindLevels()
     for(const auto &battleRoot : battleRoots)
     {
         std::vector<std::string> files;
-        DirMan battleLvls(battleRoot);
+        DirMan battleLvls(battleRoot.path);
         battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
         SDL_AtomicAdd(&loadingProgrssMax, (int)files.size());
     }
@@ -426,19 +432,20 @@ void FindLevels()
     for(const auto &battleRoot : battleRoots)
     {
         std::vector<std::string> files;
-        DirMan battleLvls(battleRoot);
+        DirMan battleLvls(battleRoot.path);
         battleLvls.getListOfFiles(files, {".lvl", ".lvlx"});
         for(std::string &fName : files)
         {
-            std::string wPath = battleRoot + fName;
+            std::string wPath = battleRoot.path + fName;
             if(FileFormats::OpenLevelFileHeader(wPath, head))
             {
                 SelectWorld_t w;
-                w.WorldPath = battleRoot;
+                w.WorldPath = battleRoot.path;
                 w.WorldFile = fName;
                 w.WorldName = head.LevelName;
                 if(w.WorldName.empty())
                     w.WorldName = fName;
+                w.editable = battleRoot.editable;
                 SelectBattle.push_back(w);
             }
 #ifndef PGE_NO_THREADING

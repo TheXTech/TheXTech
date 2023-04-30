@@ -48,6 +48,7 @@
 #include "screen_connect.h"
 #include "screen_quickreconnect.h"
 #include "screen_textentry.h"
+#include "screen_prompt.h"
 #include "script/luna/luna.h"
 
 #include "../pseudo_vb.h"
@@ -103,7 +104,9 @@ void editorWaitForFade()
         if(canProceedFrame())
         {
             computeFrameTime1();
-            if(WorldEditor)
+            if(GamePaused == PauseCode::Prompt)
+                PromptScreen::Render();
+            else if(WorldEditor)
                 UpdateGraphics2();
             else
                 UpdateGraphics();
@@ -397,6 +400,10 @@ int PauseGame(PauseCode code, int plr)
         ConnectScreen::DropAdd_Start();
         XWindow::showCursor(0);
     }
+    else if(code == PauseCode::Prompt)
+    {
+        PromptScreen::Init();
+    }
     else if(code == PauseCode::TextEntry)
     {
         // assume TextEntryScreen has already been inited through its Run function.
@@ -432,7 +439,10 @@ int PauseGame(PauseCode code, int plr)
             g_microStats.start_task(MicroStats::Graphics);
 
             speedRun_tick();
-            if((LevelSelect && !GameMenu) || WorldEditor)
+
+            if(code == PauseCode::Prompt)
+                PromptScreen::Render();
+            else if((LevelSelect && !GameMenu) || WorldEditor)
                 UpdateGraphics2();
             else
                 UpdateGraphics();
@@ -486,6 +496,11 @@ int PauseGame(PauseCode code, int plr)
             else if(GamePaused == PauseCode::Message)
             {
                 if(MessageScreen_Logic(plr))
+                    break;
+            }
+            else if(GamePaused == PauseCode::Prompt)
+            {
+                if(PromptScreen::Logic())
                     break;
             }
             else if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
