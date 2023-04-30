@@ -425,18 +425,18 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
     // allocate texture memory
     glBindTexture(GL_TEXTURE_2D, m_buffer_texture[buffer]);
 
-    int downscale = (buffer == BUFFER_LIGHTING) ? m_lighting_downscale : 1;
+    float scale_factor = (buffer == BUFFER_LIGHTING) ? m_lighting_scale_factor : m_render_scale_factor;
 
     if(buffer == BUFFER_DEPTH_READ)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
-            ScreenW / downscale, ScreenH / downscale,
+            ScreenW * scale_factor, ScreenH * scale_factor,
             0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
     }
     else
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,
-            ScreenW / downscale, ScreenH / downscale,
+            ScreenW * scale_factor, ScreenH * scale_factor,
             0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     }
 
@@ -465,7 +465,7 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
             glBindTexture(GL_TEXTURE_2D, m_game_depth_texture);
 
             glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16,
-                ScreenW / downscale, ScreenH / downscale,
+                ScreenW * scale_factor, ScreenH * scale_factor,
                 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_SHORT, nullptr);
 
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -478,7 +478,7 @@ void RenderGL::createFramebuffer(BufferIndex_t buffer)
         {
             glGenRenderbuffers(1, &m_game_depth_rb);
             glBindRenderbuffer(GL_RENDERBUFFER, m_game_depth_rb);
-            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, ScreenW / downscale, ScreenH / downscale);
+            glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, ScreenW * scale_factor, ScreenH * scale_factor);
             glBindRenderbuffer(GL_RENDERBUFFER, 0);
         }
 

@@ -119,8 +119,10 @@ struct RectSizeI
 
     inline RectSizeI& operator=(const RectSizeI& o)
     {
-        xy = o.xy;
-        wh = o.wh;
+        x = o.x;
+        y = o.y;
+        w = o.w;
+        h = o.h;
 
         return *this;
     }
@@ -144,9 +146,14 @@ struct RectSizeI
         return *this;
     }
 
-    inline RectSizeI operator/(GLshort factor) const
+    inline RectSizeI operator*(GLfloat factor) const
     {
-        return RectSizeI(x / factor, y / factor, w / factor, h / factor);
+        return RectSizeI(x * factor, y * factor, w * factor, h * factor);
+    }
+
+    inline RectSizeI operator/(GLshort div) const
+    {
+        return RectSizeI(x / div, y / div, w / div, h / div);
     }
 };
 

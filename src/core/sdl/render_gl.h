@@ -310,7 +310,8 @@ private:
 
     // preferences
 
-    int m_lighting_downscale = 2;
+    float m_render_scale_factor = 1.0f;
+    float m_lighting_scale_factor = 0.5f;
 
 
     // OpenGL state

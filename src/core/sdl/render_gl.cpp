@@ -136,6 +136,8 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
 
         glBindTexture(GL_TEXTURE_2D, m_buffer_texture[dest]);
 
+        r = r * m_render_scale_factor;
+
         glCopyTexSubImage2D(
             GL_TEXTURE_2D, 0,
             r.x, r.y,
@@ -226,6 +228,8 @@ void RenderGL::depthbufferCopy()
 
     if(can_use_copyTex)
     {
+        r = r * m_render_scale_factor;
+
         // easy copy call
         glCopyTexSubImage2D(
             GL_TEXTURE_2D, 0,
@@ -579,7 +583,7 @@ void RenderGL::calculateLighting()
 
     s_normalize_coords(viewport);
 
-    RectSizeI viewport_scaled = viewport / m_lighting_downscale;
+    RectSizeI viewport_scaled = viewport * m_lighting_scale_factor;
 
     glViewport(viewport_scaled.x, viewport_scaled.y,
         viewport_scaled.w, viewport_scaled.h);
@@ -616,8 +620,10 @@ void RenderGL::calculateLighting()
     // (5) restore the normal framebuffer and viewport
     glBindFramebuffer(GL_FRAMEBUFFER, m_buffer_fb[m_cur_pass_target]);
 
-    glViewport(viewport.x, viewport.y,
-        viewport.w, viewport.h);
+    viewport_scaled = viewport * m_render_scale_factor;
+
+    glViewport(viewport_scaled.x, viewport_scaled.y,
+        viewport_scaled.w, viewport_scaled.h);
 #endif
 }
 
@@ -1064,7 +1070,9 @@ void RenderGL::applyViewport()
 
     if(m_has_fbo && m_game_texture_fb)
     {
-        glViewport(viewport.x, viewport.y, viewport.w, viewport.h);
+        RectSizeI viewport_scaled = viewport * m_render_scale_factor;
+
+        glViewport(viewport_scaled.x, viewport_scaled.y, viewport_scaled.w, viewport_scaled.h);
     }
     else
     {
@@ -2234,10 +2242,10 @@ void RenderGL::getScreenPixelsRGBA(int x, int y, int w, int h, unsigned char *pi
 
     if(m_game_texture_fb && m_game_texture)
     {
-        phys_x = x;
-        phys_y = y;
-        phys_w = w;
-        phys_h = h;
+        phys_x = x * m_render_scale_factor;
+        phys_y = y * m_render_scale_factor;
+        phys_w = w * m_render_scale_factor;
+        phys_h = h * m_render_scale_factor;
 
         glGetIntegerv(GL_FRAMEBUFFER_BINDING, &prev_fb);
         glBindFramebuffer(GL_FRAMEBUFFER, m_game_texture_fb);
