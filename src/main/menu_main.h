@@ -138,6 +138,11 @@ struct MainMenuContent
 
     std::string wordYes;
     std::string wordNo;
+    std::string wordOkay;
+
+    // Compat menu
+    std::string promptDeprecatedSetting;
+    std::string promptDeprecatedSettingUnwritable;
 };
 
 extern MainMenuContent g_mainMenu;
