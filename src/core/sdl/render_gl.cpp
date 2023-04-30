@@ -1555,10 +1555,10 @@ bool RenderGL::depthTestSupported()
 bool RenderGL::userShadersSupported()
 {
 #ifdef THEXTECH_WIP_FEATURES
-    return m_use_shaders && m_has_es3_shaders;
+    return m_use_shaders && m_has_es3_shaders && m_buffer_texture[BUFFER_FB_READ];
 #else
     // FIXME: should be false before submitting to the main repo
-    return m_use_shaders && m_has_es3_shaders;
+    return m_use_shaders && m_has_es3_shaders && m_buffer_texture[BUFFER_FB_READ];
 #endif
 }
 
