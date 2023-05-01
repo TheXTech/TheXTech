@@ -108,10 +108,12 @@ private:
     GLuint m_program = 0;
     int m_flags = translucent;
 
+    // OpenGL locations for common uniforms
     GLint m_u_transform_loc = -1;
     GLint m_u_read_viewport_loc = -1;
     GLint m_u_clock_loc = -1;
 
+    // OpenGL locations for custom uniforms (indices match those returned by register_uniform)
     std::vector<GLint> m_u_custom_loc;
 
     uint64_t m_transform_tick = 0;
@@ -126,10 +128,15 @@ private:
 
     // these each denote states which PRECEDE the step's execution.
     // thus, the highest legal step is m_uniform_steps.size()
+
+    // the uniform state following all issued assignments
     uint16_t m_final_uniform_step = 0;
+    // the uniform state currently active in the GL
     uint16_t m_gl_uniform_step = 0;
+    // whether the next uniform assignment should apply and clear all previous uniform steps
     bool m_enqueue_clear_uniform_steps = false;
 
+    // a list of all uniform assignments since the previous clear
     std::vector<UniformAssignment_t> m_uniform_steps;
 
     // internal functions
@@ -225,12 +232,16 @@ public:
      * \param index registered internal index returned by previous call to register_uniform
      * \param value to assign the uniform to
      * \param l StdPictureLoad to check current state from and cache the assignment in, in case of unload
+     *
+     * Note: clears the previous rewind buffer if activate_uniform_step has been called.
      */
     void assign_uniform(int index, const UniformValue_t& value, StdPictureLoad& l);
 
     /*!
-     * \brief Returns the current uniform step for rewinding during the current frame
+     * \brief Returns the current uniform step (following all pending assignments) for rewinding during the current frame
      * \returns The current uniform step
+     *
+     * FIXME: should clear the previous rewind buffer if activate_uniform_step has been called
      */
     inline uint16_t get_uniform_step()
     {
