@@ -250,6 +250,9 @@ private:
 
 #endif // #ifdef RENDERGL_HAS_SHADERS
 
+
+    // state supporting the draw queues
+
     // unsorted draw queue that stores opaque draw calls in the current viewport state
     std::unordered_map<DrawContext_t, VertexList, hash_DrawContext> m_unordered_draw_queue;
 
@@ -260,6 +263,10 @@ private:
     std::unordered_map<DrawContext_t, int, hash_DrawContext> m_mask_draw_context_depth;
     DrawContext_t m_recent_draw_context = {nullptr};
     int m_recent_draw_context_depth = 0;
+
+
+
+    // state supporting public render functionality
 
     // reference to currently active SDL window
     SDL_Window    *m_window = nullptr;
@@ -292,6 +299,7 @@ private:
     float m_hidpi_y = 1.0f;
 
 
+
     // internal capability trackers
     GLint m_gl_majver = 0;
     GLint m_gl_minver = 0;
@@ -303,15 +311,17 @@ private:
     bool m_use_depth_buffer = false;
     bool m_client_side_arrays = false;
 
-    // unused for now
     bool m_has_es3_shaders = false;
+    // unused for now
     // bool m_has_npot_texture = false;
     // bool m_has_bgra = false;
+
 
     // preferences
 
     float m_render_scale_factor = 1.0f;
     float m_lighting_scale_factor = 0.5f;
+
 
 
     // OpenGL state
@@ -321,6 +331,8 @@ private:
 
     // tick for current frame
     uint64_t m_current_frame = 0;
+
+
 
     // framebuffer object (FBO) state
 
@@ -343,6 +355,7 @@ private:
     BufferIndex_t m_cur_pass_target = BUFFER_GAME;
 
 
+
     // vertex buffer object (VBO) and vertex array object (VAO) state
 
     // tuned carefully for performance on Mac and Emscripten, which require using VBOs
@@ -360,8 +373,11 @@ private:
     GLuint m_glcore_vao = 0;
 #endif
 
+
     // some queue flags, used at flushDrawQueues()
     bool m_drawQueued = false;
+
+
 
     // shader state
 
@@ -422,7 +438,10 @@ private:
 
     static const char* const s_es3_lighting_frag_src;
 
-    // Initialization functions, defined at render_gl_init.cpp
+
+    /***********************************************************\
+    || Initialization functions, defined at render_gl_init.cpp ||
+    \***********************************************************/
 
     // For all:
     // Returning false indicates a catastrophic failure and results in the OpenGL engine not being created
@@ -437,6 +456,13 @@ private:
      * \param minver: minimum OpenGL minor version to initialize
      */
     static void try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver);
+
+    // initializes a single framebuffer with the game's current screen resolution scaled by the appropriate scaling factor
+    // if a render target (BUFFER_GAME, BUFFER_INT_PASS_1, BUFFER_INT_PASS_2), will include depth
+    void createFramebuffer(BufferIndex_t buffer);
+
+    // destroys a single framebuffer
+    void destroyFramebuffer(BufferIndex_t buffer);
 
     /*!
      * \brief Initialize the SDL OpenGL bindings according to version preferences and compile-time support, sets the version, and sets profile/version-dependent flags
@@ -485,21 +511,21 @@ private:
      */
     bool initVertexArrays();
 
-    // Private draw management functions
 
+    /***********************************************************************\
+    || Private draw management functions, defined at render_gl_backend.cpp ||
+    \***********************************************************************/
+
+    // normalizes a rect to fully fit within the (0, 0, ScreenW, ScreenH) box
     static void s_normalize_coords(RectSizeI& r);
 
+    // shortcut to the correct glOrtho / glOrthof function
     void m_Ortho(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far);
 
-    // initializes a single framebuffer with the game's current screen resolution
-    // if BUFFER_GAME, will include depth
-    // if not BUFFER_GAME, will accept case where FBO cannot be allocated as long as texture is okay
-    void createFramebuffer(BufferIndex_t buffer);
-    // destroys a single framebuffer
-    void destroyFramebuffer(BufferIndex_t buffer);
     // perform a framebuffer->framebuffer copy
     void framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSizeI r);
-    // perform a full depth buffer copy to the TEXTURE_UNIT_DEPTH_READ
+
+    // perform a full depth buffer copy to the depth read buffer (accessible from TEXTURE_UNIT_DEPTH_READ)
     void depthbufferCopy();
 
     // sets required GL logicOp state for masks
@@ -527,7 +553,10 @@ private:
     // Draws and clears all render queues. Called prior to changing GL context.
     void flushDrawQueues();
 
-    // front-end render helper functions
+
+    /************************************************************************\
+    || Front-end render helper functions, defined at render_gl_frontend.cpp ||
+    \************************************************************************/
 
     // Selects efficient ordered vertex list for given context and depth pair. Batches across subsequent draws and masks.
     VertexList& getOrderedDrawVertexList(DrawContext_t context, int depth);
@@ -542,6 +571,11 @@ private:
 protected:
     // Compiles user fragment shader and assembles program in target.
     void compileShaders(StdPicture &target) override;
+
+
+    /**************************************************************\
+    || Public render functions, defined at render_gl_frontend.cpp ||
+    \**************************************************************/
 
 public:
     RenderGL();
