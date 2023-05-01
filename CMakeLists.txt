@@ -736,7 +736,8 @@ else()
     if(THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN OR THEXTECH_BUILD_GL_ES_LEGACY)
         list(APPEND THEXTECH_SRC
             src/core/opengl/gl_program_object.cpp
-            src/core/opengl/render_gl.cpp
+            src/core/opengl/render_gl_frontend.cpp
+            src/core/opengl/render_gl_backend.cpp
             src/core/opengl/render_gl_init.cpp
             src/core/opengl/render_gl_shaders.cpp
         )
