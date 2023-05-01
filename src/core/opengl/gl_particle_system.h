@@ -53,9 +53,19 @@ class GLParticleSystem
     std::vector<ParticleVertexImmutable_t> m_vertices_immutable;
     std::vector<ParticleVertexMutable_t> m_vertices_mutable;
 
+    // this is the particle system's capacity
     int m_particle_count = 0;
+
+    // the next particle index to use for add_particle
     int m_next_particle = 0;
+    // the number of particles added during the last frame
     int m_modified_count = 0;
+
+    // tracked to ensure particles expire before the clock wraps around
+    int m_oldest_active_particle = -1;
+
+    // update section of mutable vertex buffer
+    void m_update_buffer_section(int begin, int count);
 
 public:
 
@@ -68,7 +78,7 @@ public:
 
     void reset();
 
-    void fill_and_draw();
+    void fill_and_draw(GLfloat clock);
 
     inline ~GLParticleSystem()
     {

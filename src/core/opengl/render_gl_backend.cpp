@@ -479,7 +479,7 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
             if(state_valid)
             {
                 glBindTexture(GL_TEXTURE_2D, texture->d.texture_id);
-                texture->d.particle_system->fill_and_draw();
+                texture->d.particle_system->fill_and_draw(m_shader_clock);
             }
         }
         else if(use_gl_logic_op)

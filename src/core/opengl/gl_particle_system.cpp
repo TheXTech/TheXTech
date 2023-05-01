@@ -74,46 +74,110 @@ void GLParticleSystem::reset()
 
     m_vertices_immutable.clear();
     m_vertices_mutable.clear();
+
     m_particle_count = 0;
+
     m_next_particle = 0;
     m_modified_count = 0;
+
+    m_oldest_active_particle = -1;
 }
 
-void GLParticleSystem::fill_and_draw()
+inline void GLParticleSystem::m_update_buffer_section(int begin, int count)
+{
+    glBufferSubData(GL_ARRAY_BUFFER, sizeof(ParticleVertexImmutable_t) * m_vertices_immutable.size() + sizeof(ParticleVertexMutable_t) * (begin * 6),
+        sizeof(ParticleVertexMutable_t) * (count * 6), m_vertices_mutable.data() + (begin * 6));
+}
+
+void GLParticleSystem::fill_and_draw(GLfloat clock)
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer);
+
+    // allow any old particles to expire
+
+    // to properly delete expired particles (prevent wraparound loop), do something like:
+    //   - track "oldest active"
+    //   - if oldest active overwritten, just shift up on
+    //   - each draw, check if oldest has expired (is about to wraparound)
+    //     - compare with clock, erase if 90% of loop_period has elapsed
+    //     - erase by setting spawn_time to -loop_period
+    //     - iteratively check next-oldest if so
+
+    int particle_wipe_start = m_oldest_active_particle;
+    int particle_wipe_end = m_oldest_active_particle;
+    while(m_oldest_active_particle != -1)
+    {
+        GLfloat spawn_time = m_vertices_mutable[m_oldest_active_particle * 6].spawn_time;
+
+        // if spawn_time was already negative, then no particles are currently active
+        if(spawn_time < 0.0f)
+        {
+            m_oldest_active_particle = -1;
+            break;
+        }
+
+        GLfloat time_since_spawn = clock - spawn_time;
+
+        // oldest particle should be inactivated
+        if((time_since_spawn >= 0.0f) ? (time_since_spawn > 50.0f) : (time_since_spawn > 50.0f + -60.0f))
+        {
+            // clear the particle
+            for(int i = 0; i < 6; i++)
+                m_vertices_mutable[m_oldest_active_particle * 6 + i].spawn_time = -60.0f;
+
+            m_oldest_active_particle++;
+            particle_wipe_end++;
+
+            // push the wipe to GL now if wrapping around
+            if(m_oldest_active_particle == m_particle_count)
+            {
+                // particles from (particle_wipe_start) up to (particle_wipe_end), delta = particle_wipe_end - particle_wipe_start
+                m_update_buffer_section(particle_wipe_start, particle_wipe_end - particle_wipe_start);
+
+                m_oldest_active_particle = 0;
+                particle_wipe_start = 0;
+                particle_wipe_end = 0;
+            }
+        }
+        // all particles still active
+        else
+        {
+            break;
+        }
+    }
+
+    if(particle_wipe_end != particle_wipe_start)
+        m_update_buffer_section(particle_wipe_start, particle_wipe_end - particle_wipe_start);
+
 
     // update all needed particles
 
     // whole buffer
     if(m_modified_count >= m_particle_count)
     {
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(ParticleVertexImmutable_t) * m_vertices_immutable.size(),
-            sizeof(ParticleVertexMutable_t) * m_vertices_mutable.size(), m_vertices_mutable.data());
+        m_update_buffer_section(0, m_vertices_mutable.size());
     }
     // wraparound (start and finish of buffer)
     else if(m_modified_count > m_next_particle)
     {
         // particles up to (not including) m_next_particle
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(ParticleVertexImmutable_t) * m_vertices_immutable.size(),
-            sizeof(ParticleVertexMutable_t) * (m_next_particle * 6), m_vertices_mutable.data());
+        m_update_buffer_section(0, m_next_particle);
 
         // particles from (m_next_particle + m_particle_count - m_modified_count) up to (m_particle_count), delta = m_modified_count - m_next_particle
         int mod_wrap_start = m_next_particle + m_particle_count - m_modified_count;
         int mod_wrap_count = m_modified_count - m_next_particle;
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(ParticleVertexImmutable_t) * m_vertices_immutable.size() + sizeof(ParticleVertexMutable_t) * (mod_wrap_start * 6),
-            sizeof(ParticleVertexMutable_t) * (mod_wrap_count * 6), m_vertices_mutable.data() + (mod_wrap_start * 6));
+        m_update_buffer_section(mod_wrap_start, mod_wrap_count);
     }
     // internal section of buffer
     else if(m_modified_count > 0)
     {
         // particles from (m_next_particle - m_modified_count) up to (m_next_particle), delta = m_modified_count
         int mod_start = m_next_particle - m_modified_count;
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(ParticleVertexImmutable_t) * m_vertices_immutable.size() + sizeof(ParticleVertexMutable_t) * (mod_start * 6),
-            sizeof(ParticleVertexMutable_t) * (m_modified_count * 6), m_vertices_mutable.data() + (mod_start * 6));
+        m_update_buffer_section(mod_start, m_modified_count);
     }
 
     m_modified_count = 0;
+
 
     // load all attributes
     glVertexAttribPointer(0, 1, GL_FLOAT,         GL_FALSE, sizeof(ParticleVertexImmutable_t), (void*)offsetof(ParticleVertexImmutable_t, index));
@@ -128,6 +192,7 @@ void GLParticleSystem::fill_and_draw()
     glEnableVertexAttribArray(3);
     glEnableVertexAttribArray(4);
 
+    // draw!
     glDrawArrays(GL_TRIANGLES, 0, m_vertices_immutable.size());
 
     // disable the arrays (necessary for Emscripten and possibly also GL core)
@@ -146,6 +211,17 @@ void GLParticleSystem::add_particle(const ParticleVertexMutable_t& state)
     for(int i = 0; i < 6; i++)
     {
         m_vertices_mutable[(m_next_particle * 6) + i] = state;
+    }
+
+    // keep track of true oldest particle
+    if(m_oldest_active_particle == -1)
+        m_oldest_active_particle = m_next_particle;
+    else if(m_oldest_active_particle == m_next_particle)
+    {
+        m_oldest_active_particle += 1;
+
+        if(m_oldest_active_particle == m_particle_count)
+            m_oldest_active_particle = 0;
     }
 
     m_next_particle++;
