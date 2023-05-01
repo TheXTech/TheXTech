@@ -40,6 +40,12 @@
 #include "controls.h"
 
 
+#ifdef MUTABLE_PARTICLES_DEMO
+#include "core/opengl/gl_program_bank.h"
+StdPicture* s_sparkle;
+#endif
+
+
 #ifndef UNUSED
 #define UNUSED(x) (void)x
 #endif
@@ -185,6 +191,10 @@ bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     updateViewport();
 
+#ifdef MUTABLE_PARTICLES_DEMO
+    s_sparkle = ResolveGLParticleSystem("sparkle")->get();
+#endif
+
     return true;
 }
 
@@ -242,6 +252,11 @@ void RenderGL::repaint()
 #ifdef USE_RENDER_BLOCKING
     if(m_blockRender)
         return;
+#endif
+
+#ifdef MUTABLE_PARTICLES_DEMO
+    if(s_sparkle)
+        renderParticleSystem(*s_sparkle, vScreenX[1], vScreenY[1]);
 #endif
 
     SuperPrintScreenCenter(fmt::format_ne("DEV BUILD - OpenGL {0}.{1} {2}", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile)), 3, 0, 0.8f, 1.0f, 0.0f);
@@ -1297,7 +1312,15 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
 
     SDL_assert_release(tx.d.texture_id);
 
-#if 0
+#ifdef MUTABLE_PARTICLES_DEMO
+    if(&tx >= &GFXMario[1] && &tx <= &GFXMario[7])
+    {
+        if(s_sparkle)
+            spawnParticle(*s_sparkle, xDstD - vScreenX[1], yDstD - vScreenY[1], ParticleVertexAttrs_t());
+    }
+#endif
+
+#ifdef LIGHT_DEMO
     if(m_light_count < 63)
     {
         if(&tx == &GFXNPC[13])
