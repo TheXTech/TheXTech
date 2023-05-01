@@ -245,6 +245,9 @@ public:
      */
     inline uint16_t get_uniform_step()
     {
+        if(m_enqueue_clear_uniform_steps)
+            m_clear_uniform_steps();
+
         return m_final_uniform_step;
     }
 
