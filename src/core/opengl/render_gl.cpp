@@ -21,7 +21,7 @@
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
 
-#include "core/sdl/gl_inc.h"
+#include "core/opengl/gl_inc.h"
 
 #include <FreeImageLite.h>
 #include <Graphics/graphics_funcs.h>
@@ -29,8 +29,8 @@
 #include <Logger/logger.h>
 #include <Utils/maths.h>
 
-#include "core/sdl/render_gl.h"
-#include "core/sdl/gl_program_object.h"
+#include "core/opengl/render_gl.h"
+#include "core/opengl/gl_program_object.h"
 
 #include "video.h"
 #include "core/window.h"

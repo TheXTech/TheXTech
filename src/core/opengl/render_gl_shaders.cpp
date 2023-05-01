@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/sdl/render_gl.h"
+#include "core/opengl/render_gl.h"
 
 const char* const RenderGL::s_es2_standard_vert_src =
 R"RAW(#version 100

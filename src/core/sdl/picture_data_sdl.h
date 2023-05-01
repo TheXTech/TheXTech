@@ -25,8 +25,8 @@
 #include <memory>
 #include <stdint.h>
 
-#include "core/sdl/gl_program_object.h"
-#include "core/sdl/gl_particle_system.h"
+#include "core/opengl/gl_program_object.h"
+#include "core/opengl/gl_particle_system.h"
 
 typedef unsigned int    GLenum;
 typedef int             GLint;

@@ -29,7 +29,7 @@
 typedef float           GLfloat;
 typedef uint8_t         GLubyte;
 
-#include "core/sdl/gl_program_object.h"
+#include "core/opengl/gl_program_object.h"
 
 struct ParticleVertexImmutable_t
 {

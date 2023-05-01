@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "core/sdl/gl_inc.h"
+#include "core/opengl/gl_inc.h"
 
 #include <SDL2/SDL_version.h>
 
@@ -27,7 +27,7 @@
 #include "globals.h"
 #include "video.h"
 
-#include "core/sdl/render_gl.h"
+#include "core/opengl/render_gl.h"
 
 constexpr bool s_enable_debug_output = true;
 

@@ -56,7 +56,7 @@
 
 
 #ifdef THEXTECH_BUILD_GL_MODERN
-#    include "core/sdl/gl_program_bank.h"
+#    include "core/opengl/gl_program_bank.h"
 #endif
 
 

@@ -34,7 +34,7 @@
 
 #ifdef CORE_EVERYTHING_SDL
 #   include "core/sdl/render_sdl.h"
-#   include "core/sdl/render_gl.h"
+#   include "core/opengl/render_gl.h"
 
 #   define USE_CORE_RENDER_SDL
 

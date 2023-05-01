@@ -22,7 +22,7 @@
 #ifndef RenderGL_T_H
 #define RenderGL_T_H
 
-#include "core/sdl/gl_inc.h"
+#include "core/opengl/gl_inc.h"
 
 #    ifdef RENDERGL_SUPPORTED
 
@@ -35,12 +35,12 @@
 
 #include <SDL2/SDL_render.h>
 
-#include "core/sdl/gl_geom.h"
+#include "core/opengl/gl_geom.h"
 
 #include "core/base/render_base.h"
 #include "cmd_line_setup.h"
 
-#include "core/sdl/gl_program_object.h"
+#include "core/opengl/gl_program_object.h"
 
 struct StdPicture;
 struct SDL_Window;
