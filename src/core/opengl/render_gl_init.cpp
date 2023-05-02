@@ -31,6 +31,27 @@
 
 constexpr bool s_enable_debug_output = true;
 
+
+#if defined(__ANDROID__) && defined(THEXTECH_BUILD_GL_ES_MODERN)
+
+#include <EGL/egl.h>
+
+GL_APICALL void (* GL_APIENTRY glBindBufferBase) (GLenum target, GLuint index, GLuint buffer);
+GL_APICALL void (* GL_APIENTRY glBlitFramebuffer) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+
+void load_gles3_symbols()
+{
+    #define FIND_PROC(s) s = reinterpret_cast<decltype(s)>(eglGetProcAddress(#s))
+
+    FIND_PROC(glBindBufferBase);
+    FIND_PROC(glBlitFramebuffer);
+
+    #undef FIND_PROC
+}
+
+#endif // #if defined(__ANDROID__) && defined(THEXTECH_BUILD_GL_ES_MODERN)
+
+
 #ifdef RENDERGL_HAS_DEBUG
 static void APIENTRY s_HandleGLDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const char *message, const void *userParam)
 {
@@ -257,6 +278,11 @@ bool RenderGL::initOpenGL(const CmdLineSetup_t &setup)
         pLogDebug("Render GL: GL error %d occurred in early init process, falling back to SDL.", err);
         return false;
     }
+
+#if defined(__ANDROID__) && defined(THEXTECH_BUILD_GL_ES_MODERN)
+    if(m_gl_profile == SDL_GL_CONTEXT_PROFILE_ES && m_gl_majver >= 3)
+        load_gles3_symbols();
+#endif
 
     return true;
 }

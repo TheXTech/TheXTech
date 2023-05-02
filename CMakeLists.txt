@@ -924,6 +924,10 @@ endif()
 
 if(ANDROID)
     target_link_libraries(A2XT_Int INTERFACE log)
+
+    if(THEXTECH_BUILD_GL_ES_MODERN)
+        target_link_libraries(A2XT_Int INTERFACE EGL)
+    endif()
 endif()
 
 if(NINTENDO_SWITCH)

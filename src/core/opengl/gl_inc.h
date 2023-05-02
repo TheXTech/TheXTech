@@ -65,8 +65,19 @@
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
 #    include <SDL2/SDL_opengles2.h>
 
-// unsure whether to make this platform-dependent
-#    include <GLES3/gl3.h>
+#    ifdef __ANDROID__
+
+#        define GL_UNIFORM_BUFFER       0x8A11
+#        define GL_DRAW_FRAMEBUFFER     0x8CA9
+
+// defined and loaded in render_gl_init.cpp
+
+extern GL_APICALL void (* GL_APIENTRY glBindBufferBase) (GLenum target, GLuint index, GLuint buffer);
+extern GL_APICALL void (* GL_APIENTRY glBlitFramebuffer) (GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
+
+#    else
+#        include <GLES3/gl3.h>
+#    endif
 
 #    define RENDERGL_HAS_SHADERS
 #    define RENDERGL_HAS_VBO
