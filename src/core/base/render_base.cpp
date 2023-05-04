@@ -249,8 +249,6 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
 
     target.inited = true;
     target.l.lazyLoaded = true;
-
-    return;
 }
 
 void AbstractRender_t::setTransparentColor(StdPicture& target, uint32_t rgb)
