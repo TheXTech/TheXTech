@@ -22,6 +22,7 @@
 #include "globals.h"
 #include "mememu.h"
 #include "npc.h"
+#include "main/trees.h"
 
 
 NPC_t *NpcF::Get(int index)
@@ -86,7 +87,16 @@ void NpcF::MemSet(int ID, size_t offset, double value, OPTYPE operation, FIELDTY
     {
         thisnpc = &NPC[i];
         if(anyID || thisnpc->Type == ID)
+        {
+            auto ol = thisnpc->Location;
+            const auto &nl = thisnpc->Location;
+
             MemAssign(thisnpc, offset, value, operation, ftype);
+
+            // Update tree if got altered
+            if(ol.X != nl.X || ol.Y != nl.Y || ol.Width != nl.Width || ol.Height != nl.Height)
+                treeNPCUpdate(i);
+        }
     }//for
 }
 
