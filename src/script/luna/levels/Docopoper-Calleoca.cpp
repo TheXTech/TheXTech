@@ -32,6 +32,7 @@
 
 #include "Docopoper-Calleoca.h"
 #include "globals.h"
+#include "main/trees.h"
 #include "../lunaplayer.h"
 #include "../lunanpc.h"
 
@@ -289,6 +290,7 @@ void CalleocaCode()
             {
                 goal_npc->Location.X = demo->Location.X;
                 goal_npc->Location.Y = demo->Location.Y;
+                treeNPCUpdate(goal_npc);
             }
         }
 
@@ -326,6 +328,7 @@ void CalleocaCode()
 
     hurt_npc->Location.X = demo->Location.X;
     hurt_npc->Location.Y = demo->Location.Y - 128;
+    treeNPCUpdate(hurt_npc);
 
     switch (phase)
     {
@@ -370,6 +373,9 @@ void CalleocaCode()
         calleoca_npc1->Location.X = storage_x;
         calleoca_npc1->Location.Y = storage_y;
     }
+
+    treeNPCUpdate(calleoca_npc1);
+    treeNPCUpdate(calleoca_npc2);
 
     //Renderer::Get().SafePrint(std::wstring(L"FUEL: " + std::to_wstring(missile_fuel)), 3, 0, 256);
     //Renderer::Get().SafePrint(std::wstring(L"DEMO X: " + std::to_wstring(demo->CurYPos)), 3, 0, 256 + 32);
