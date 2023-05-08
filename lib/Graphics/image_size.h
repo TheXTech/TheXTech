@@ -21,6 +21,7 @@
 #define IMAGESIZE_H
 
 #include "PGEString.h"
+#include <cstdint>
 
 struct SDL_RWops;
 
