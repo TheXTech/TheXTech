@@ -87,6 +87,7 @@ void ScienceCode()
     }
 
     hurt_npc->Location.X = demo->Location.X;
+    treeNPCUpdate(hurt_npc);
 
     doughnuts = FindAllNPC(NPC_DOUGHNUT);
 
@@ -114,6 +115,7 @@ void ScienceCode()
 
             doughnut->Location.X += x_diff * 15;
             doughnut->Location.Y += y_diff * 15;
+            treeNPCUpdate(doughnut);
         }
         grace_timer--;
     }
