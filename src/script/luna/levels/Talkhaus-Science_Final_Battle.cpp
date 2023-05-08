@@ -29,9 +29,11 @@
 #include <vector>
 
 #include "sdl_proxy/sdl_assert.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "Talkhaus-Science_Final_Battle.h"
 #include "globals.h"
+#include "main/trees.h"
 #include "../lunanpc.h"
 #include "../lunaplayer.h"
 
@@ -105,7 +107,7 @@ void ScienceCode()
 
             x_diff = doughnut->Location.X - demo->Location.X;
             y_diff = doughnut->Location.Y - demo->Location.Y;
-            m = sqrt(x_diff * x_diff + y_diff * y_diff);
+            m = SDL_sqrt(x_diff * x_diff + y_diff * y_diff);
 
             if(m == 0)
                 continue;
