@@ -79,8 +79,8 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE=$DEVKITPRO/cmake/Wii.cmake \
             -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local \
             -DCMAKE_PREFIX_PATH=/opt/devkitpro/portlibs/wii-local \
-            -DCMAKE_C_FLAGS_RELEASE="-O1 -DNDEBUG" -DCMAKE_CXX_FLAGS_RELEASE="-O1 -DNDEBUG" \
-            -DCMAKE_BUILD_TYPE=Release \
+            -DSDL_ALTIVEC=OFF \
+            -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
             ..
         cmake --build . --target all -j4
         sudo cmake --build . --target install
