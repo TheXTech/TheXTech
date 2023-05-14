@@ -383,10 +383,10 @@ NPC_t* FindNPC(vbint_t identity)
 {
     NPC_t* currentnpc = nullptr;
 
-    for(int i = 0; i <= numNPCs; i++)
+    for(int i = 0; i < numNPCs; i++)
     {
         currentnpc = NpcF::Get(i);
-        if(currentnpc->Type == identity)
+        if(currentnpc && currentnpc->Type == identity)
             return currentnpc;
     }
 

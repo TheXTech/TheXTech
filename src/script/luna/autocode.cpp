@@ -57,6 +57,7 @@
 #include "compat.h"
 #include "main/speedrunner.h"
 
+#include "main/trees.h"
 
 static FIELDTYPE StrToFieldtype(std::string string)
 {
@@ -224,7 +225,7 @@ void Autocode::Do(bool init)
         {
             //char* dbg = "SCREEN EDGE DBG";
 
-            // Get all target NPCs in section into a list
+            // Get all target NPCs in section into a list (slow, could easily optimize using NPCQueues::Active.no_change)
             std::list<NPC_t *> npcs;
             NpcF::FindAll((int)Target, demo->Section, &npcs);
 
@@ -241,7 +242,10 @@ void Autocode::Do(bool init)
                         //double* pCamera = vScreenY;
                         double top = -vScreenY[1];
                         if(npc->Location.Y < top + Param2)
+                        {
                             npc->Location.Y = (top + Param2) + 1;
+                            treeNPCUpdate(npc);
+                        }
                         break;
                     }
 
@@ -250,7 +254,10 @@ void Autocode::Do(bool init)
                         //double* pCamera = GM_CAMERA_Y;
                         double bot = -vScreenY[1] + ScreenH;
                         if(npc->Location.Y > bot - Param2)
+                        {
                             npc->Location.Y = (bot - Param2) - 1;
+                            treeNPCUpdate(npc);
+                        }
                         break;
                     }
 
@@ -259,7 +266,10 @@ void Autocode::Do(bool init)
                         //double* pCamera = GM_CAMERA_X;
                         double left = -vScreenX[1];
                         if(npc->Location.X < left + Param2)
+                        {
                             npc->Location.X = (left + Param2) + 1;
+                            treeNPCUpdate(npc);
+                        }
                         break;
                     }
 
@@ -268,7 +278,10 @@ void Autocode::Do(bool init)
                         //double* pCamera = GM_CAMERA_X;
                         double rt = -vScreenX[1] + ScreenW;
                         if(npc->Location.Y > rt - Param2)
+                        {
                             npc->Location.Y = (rt - Param2) - 1;
+                            treeNPCUpdate(npc);
+                        }
                         break;
                     }
                     }

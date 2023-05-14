@@ -157,25 +157,25 @@ static NPC_t *FindNPC(short identity)
 {
     NPC_t *currentnpc = nullptr;
 
-    for(int i = 0; i <= numNPCs; i++)
+    for(int i = 0; i < numNPCs; i++)
     {
         currentnpc = NpcF::Get(i);
-        if(currentnpc->Type == identity)
+        if(currentnpc && currentnpc->Type == identity)
             return currentnpc;
     }
 
     return nullptr;
 }
 
-static std:: vector<NPC_t *> FindAllNPC(short identity)
+static std::vector<NPC_t *> FindAllNPC(short identity)
 {
     std::vector<NPC_t *> npcs_found = std::vector<NPC_t *>();
     NPC_t *currentnpc = nullptr;
 
-    for(int i = 0; i <= numNPCs; i++)
+    for(int i = 0; i < numNPCs; i++)
     {
         currentnpc = NpcF::Get(i);
-        if(currentnpc->Type == identity)
+        if(currentnpc && currentnpc->Type == identity)
             npcs_found.push_back(currentnpc);
     }
 
