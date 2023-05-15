@@ -112,12 +112,14 @@ jobs:
     - name: Upload artifact
       if: success()
       uses: actions/upload-artifact@v3
+      continue-on-error: true
       with:
         path: build/package/*.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
       if: success() && github.event_name != 'pull_request' && ${{ steps.upload-check.outputs.available == 'true' }}
+      continue-on-error: true
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then

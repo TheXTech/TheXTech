@@ -144,12 +144,14 @@ jobs:
       - name: Upload APK (unsigned)
         if: success() && ${{ steps.signing-check.outputs.available != 'true' }}
         uses: actions/upload-artifact@v3
+        continue-on-error: true
         with:
           name: thextech-android-${BRANCH_NAME_RES}-unsigned
           path: android-project/thextech-android-*.apk
 
       - name: Deploy to builds.wohlsoft.ru
         if: success() && github.event_name != 'pull_request' && ${{ steps.upload-check.outputs.available == 'true' }}
+        continue-on-error: true
         shell: bash
         run: |
           if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
