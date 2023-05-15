@@ -19,6 +19,32 @@ jobs:
     runs-on: ubuntu-latest
     name: Build release-apk
     steps:
+      - name: Check for the upload support
+        id: upload-check
+        shell: bash
+        run: |
+          if [[ "${{ secrets.builds_login }}" != '' && \
+                "${{ secrets.builds_password }}" != '' && \
+                "${{ secrets.builds_host }}" != '' ]]; then
+            echo "available=true" >> $GITHUB_OUTPUT;
+          else
+            echo "available=false" >> $GITHUB_OUTPUT;
+          fi
+
+      - name: Check for the upload support
+        id: signing-check
+        shell: bash
+        run: |
+          if [[ "${{ secrets.ANDROID_KEYSTORE }}" != '' && \
+                "${{ secrets.RELEASE_STORE_PASSWORD }}" != '' && \
+                "${{ secrets.RELEASE_KEY_PASSWORD }}" != '' && \
+                "${{ secrets.RELEASE_KEY_ALIAS }}" != '' ]];
+          then
+              echo "defined=true" >> $GITHUB_OUTPUT;
+          else
+              echo "defined=false" >> $GITHUB_OUTPUT;
+          fi
+
       - uses: styfle/cancel-workflow-action@0.11.0
         with:
           workflow_id: android-ci.yml
@@ -59,9 +85,11 @@ jobs:
         run: echo VERSION_CODE=${{ github.run_number }} > ./version.properties
 
       - name: Import the signing
+        if: ${{ steps.signing-check.outputs.available == 'true' }}
         run: echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 -d > release-key.jks
 
       - name: Build with Gradle
+        if: ${{ steps.signing-check.outputs.available == 'true' }}
         run: ./gradlew assembleReleaseci
         env:
           RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
@@ -70,7 +98,18 @@ jobs:
           PIN_ALIAS: ${{ secrets.PIN_ALIAS }}
           DB_PASS_ALIAS: ${{ secrets.DB_PASS_ALIAS }}
 
+      - name: Build with Gradle (unsigned)
+        if: ${{ steps.signing-check.outputs.available != 'true' }}
+        run: ./gradlew assembleRelease
+        env:
+          RELEASE_STORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+          RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          PIN_ALIAS: ${{ secrets.PIN_ALIAS }}
+          DB_PASS_ALIAS: ${{ secrets.DB_PASS_ALIAS }}
+
       - name: Rename APK
+        if: ${{ steps.signing-check.outputs.available == 'true' }}
         shell: bash
         run: |
           if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
@@ -82,15 +121,37 @@ jobs:
 
           mv thextech/build/outputs/apk/releaseci/thextech-releaseci.apk thextech-android-${BRANCH_NAME_RES}.apk
 
+      - name: Rename APK (unsigned)
+        if: ${{ steps.signing-check.outputs.available != 'true' }}
+        shell: bash
+        run: |
+          if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+              BRANCH_NAME_RES="pull-request"
+              echo "-- Pull-request detected!"
+          else
+              BRANCH_NAME_RES=${BRANCH_NAME}
+          fi
+
+          mv thextech/build/outputs/apk/release/thextech-release.apk thextech-android-${BRANCH_NAME_RES}-unsigned.apk
+
       - name: Upload APK
+        if: ${{ steps.signing-check.outputs.available == 'true' }}
         if: success()
         uses: actions/upload-artifact@v3
         with:
           name: thextech-android-${BRANCH_NAME_RES}
           path: android-project/thextech-android-*.apk
 
+      - name: Upload APK (unsigned)
+        if: ${{ steps.signing-check.outputs.available != 'true' }}
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: thextech-android-${BRANCH_NAME_RES}-unsigned
+          path: android-project/thextech-android-*.apk
+
       - name: Deploy to builds.wohlsoft.ru
-        if: success() && github.event_name != 'pull_request'
+        if: success() && github.event_name != 'pull_request' && ${{ steps.upload-check.outputs.available == 'true' }}
         shell: bash
         run: |
           if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
