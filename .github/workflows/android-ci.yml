@@ -132,7 +132,7 @@ jobs:
               BRANCH_NAME_RES=${BRANCH_NAME}
           fi
 
-          mv thextech/build/outputs/apk/release/thextech-release.apk thextech-android-${BRANCH_NAME_RES}-unsigned.apk
+          mv thextech/build/outputs/apk/release/thextech-release-unsigned.apk thextech-android-${BRANCH_NAME_RES}-unsigned.apk
 
       - name: Upload APK
         if: success() && ${{ steps.signing-check.outputs.available == 'true' }}
