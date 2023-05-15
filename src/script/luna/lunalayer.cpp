@@ -33,6 +33,10 @@ void LayerF::Stop(Layer_t *layer)
     layer->EffectStop = false;
     layer->SpeedX = 0.0001f;
     layer->SpeedY = 0.0001f;
+
+    // NOTE from ds-sloth: why non-zero? probably, to make sure all objects get updated.
+    // It would be better to set all objects (Blocks, BGOs, NPCs) in layer to speed 0.
+    // keep it this way to preserve compatibility with existing Autocode content.
 }
 
 void LayerF::SetYSpeed(Layer_t *layer, float setY)

@@ -43,6 +43,18 @@ jobs:
           }
 
     steps:
+    - name: Check for the upload support
+      id: upload-check
+      shell: bash
+      run: |
+        if [[ "${{ secrets.builds_login }}" != '' && \
+              "${{ secrets.builds_password }}" != '' && \
+              "${{ secrets.builds_host }}" != '' ]]; then
+          echo "available=true" >> $GITHUB_OUTPUT;
+        else
+          echo "available=false" >> $GITHUB_OUTPUT;
+        fi
+
     - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: vita-ci.yml
@@ -154,12 +166,14 @@ jobs:
     - name: Upload artifact
       if: success()
       uses: actions/upload-artifact@v3
+      continue-on-error: true
       with:
         path: build/package/*.zip
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      if: success() && github.event_name != 'pull_request'
+      if: success() && github.event_name != 'pull_request' && ${{ steps.upload-check.outputs.available == 'true' }}
+      continue-on-error: true
       shell: bash
       run: |
         if [[ ! -z "${{ matrix.config.extra_path }}" ]]; then

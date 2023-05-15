@@ -39,6 +39,9 @@ static std::wstring Str2WStr(const std::string &path)
     return wpath;
 }
 #else
+#if defined(__ANDROID__)
+#   include <SDL2/SDL_rwops.h>
+#endif
 #include <unistd.h>
 #include <fcntl.h>         // open
 #include <string.h>
@@ -178,9 +181,20 @@ int Files::skipBom(FILE* file, const char** charset)
 
 bool Files::fileExists(const std::string &path)
 {
-#ifdef _WIN32
+#if defined(_WIN32)
     std::wstring wpath = Str2WStr(path);
     return PathFileExistsW(wpath.c_str()) == TRUE;
+
+#elif defined(__ANDROID__)
+    SDL_RWops *ops = SDL_RWFromFile(path.c_str(), "rb");
+    if(ops)
+    {
+        SDL_RWclose(ops);
+        return true;
+    }
+
+    return false;
+
 #else
     FILE *ops = fopen(path.c_str(), "rb");
     if(ops)
