@@ -19,6 +19,23 @@ jobs:
     runs-on: ubuntu-latest
     name: Build release-apk
     steps:
+      - uses: styfle/cancel-workflow-action@0.11.0
+        with:
+          workflow_id: android-ci.yml
+          all_but_latest: true
+          access_token: ${{ github.token }}
+
+      - uses: actions/checkout@v3
+
+#      - uses: nelonoel/branch-name@v1.0.1
+      - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+      - name: Pull submodules
+        shell: bash
+        run: |
+          git submodule init
+          git submodule update
+
       - name: Check for the upload support
         id: upload-check
         shell: bash
@@ -44,23 +61,6 @@ jobs:
           else
               echo "defined=false" >> $GITHUB_OUTPUT;
           fi
-
-      - uses: styfle/cancel-workflow-action@0.11.0
-        with:
-          workflow_id: android-ci.yml
-          all_but_latest: true
-          access_token: ${{ github.token }}
-
-      - uses: actions/checkout@v3
-
-#      - uses: nelonoel/branch-name@v1.0.1
-      - uses: Wohlstand/branch-name@v1.0.1-wohl
-
-      - name: Pull submodules
-        shell: bash
-        run: |
-          git submodule init
-          git submodule update
 
       - name: Install Dependencies
         shell: bash
