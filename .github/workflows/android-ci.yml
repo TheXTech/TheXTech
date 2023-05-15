@@ -135,16 +135,14 @@ jobs:
           mv thextech/build/outputs/apk/release/thextech-release.apk thextech-android-${BRANCH_NAME_RES}-unsigned.apk
 
       - name: Upload APK
-        if: ${{ steps.signing-check.outputs.available == 'true' }}
-        if: success()
+        if: success() && ${{ steps.signing-check.outputs.available == 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: thextech-android-${BRANCH_NAME_RES}
           path: android-project/thextech-android-*.apk
 
       - name: Upload APK (unsigned)
-        if: ${{ steps.signing-check.outputs.available != 'true' }}
-        if: success()
+        if: success() && ${{ steps.signing-check.outputs.available != 'true' }}
         uses: actions/upload-artifact@v3
         with:
           name: thextech-android-${BRANCH_NAME_RES}-unsigned
