@@ -57,9 +57,9 @@ jobs:
                 "${{ secrets.RELEASE_KEY_PASSWORD }}" != '' && \
                 "${{ secrets.RELEASE_KEY_ALIAS }}" != '' ]];
           then
-              echo "defined=true" >> $GITHUB_OUTPUT;
+              echo "available=true" >> $GITHUB_OUTPUT;
           else
-              echo "defined=false" >> $GITHUB_OUTPUT;
+              echo "available=false" >> $GITHUB_OUTPUT;
           fi
 
       - name: Install Dependencies
@@ -162,7 +162,11 @@ jobs:
           fi
 
           UPLOAD_LIST="set ssl:verify-certificate no;"
-          UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${BRANCH_NAME_RES}.apk;"
+          if [[ "${{ steps.signing-check.outputs.available }}" == 'true']]; then
+              UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${BRANCH_NAME_RES}.apk;"
+          else
+              UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${BRANCH_NAME_RES}-unsigned.apk;"
+          fi
           lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
       - name: List Build Directory
