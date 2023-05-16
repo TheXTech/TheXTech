@@ -379,8 +379,8 @@ bool OpenWorld(std::string FilePath)
                 ll.Start = true;
         }
 
-        vScreenX[1] = (ScreenW / 2 - 800 / 2);
-        vScreenY[1] = (ScreenH / 2 - 600 / 2);
+        vScreen[1].X = (ScreenW / 2 - 800 / 2);
+        vScreen[1].Y = (ScreenH / 2 - 600 / 2);
     }
 //    else
 //    {
@@ -466,8 +466,8 @@ void ClearWorld(bool quick)
         WorldCredits[A].clear();
     if(LevelEditor)
     {
-        vScreenX[1] = 0;
-        vScreenY[1] = 0;
+        vScreen[1].X = 0;
+        vScreen[1].Y = 0;
     }
 //    if(LevelEditor == true)
 //    {
@@ -476,8 +476,8 @@ void ClearWorld(bool quick)
 //        frmWorld.txtStartLevel = "";
 //        frmWorld::chkNoMap.Value = false;
 //        frmWorld.chkRestartLevel = false;
-//        vScreenX[1] = 0;
-//        vScreenY[1] = 0;
+//        vScreen[1].X = 0;
+//        vScreen[1].Y = 0;
 //        for(A = 1; A <= 5; A++)
 //            frmWorld::txtCredits(A).Text = "";
 //        frmWorld.txtStars = "";

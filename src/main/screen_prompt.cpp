@@ -105,8 +105,8 @@ void Render()
     XRender::clearBuffer();
 
     // display background
-    vScreenX[1] = 0;
-    vScreenY[1] = 0;
+    vScreen[1].X = 0;
+    vScreen[1].Y = 0;
     vScreen[1].Left = 0; vScreen[1].Top = 0; vScreen[1].Width = ScreenW; vScreen[1].Height = ScreenH;
     level[1] = newLoc(0, 0, ScreenW, ScreenH);
     LevelREAL[1] = newLoc(0, 0, ScreenW, ScreenH);

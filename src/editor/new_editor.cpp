@@ -75,10 +75,10 @@ int e_CursorX, e_CursorY;
 
 void DisableCursorNew()
 {
-    EditorCursor.Location.X = vScreenX[1] - 800;
-    EditorCursor.X = float(vScreenX[1] - 800);
-    EditorCursor.Location.Y = vScreenY[1] - 600;
-    EditorCursor.Y = float(vScreenY[1] - 600);
+    EditorCursor.Location.X = vScreen[1].X - 800;
+    EditorCursor.X = float(vScreen[1].X - 800);
+    EditorCursor.Location.Y = vScreen[1].Y - 600;
+    EditorCursor.Y = float(vScreen[1].Y - 600);
     HasCursor = false;
 
     e_CursorX = -50;

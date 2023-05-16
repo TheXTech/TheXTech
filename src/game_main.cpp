@@ -646,7 +646,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             OpenLevel(introPath);
-            vScreenX[1] = -level[0].X;
+            vScreen[1].X = -level[0].X;
 
             if(g_config.EnableInterLevelFade)
                 g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);

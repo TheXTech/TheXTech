@@ -203,11 +203,15 @@ RangeArrI<int, 0, maxNPCType, 0> NPCFrameStyle;
 RangeArrI<bool, 0, maxBlockType, false> BlockIsSizable;
 RangeArrI<int, 0, maxBlockType, 0> BlockSlope;
 RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
-RangeArr<double, 0, maxPlayers> vScreenX;
-RangeArr<double, 0, maxPlayers> vScreenY;
 
-RangeArr<double, 0, maxPlayers> qScreenX;
-RangeArr<double, 0, maxPlayers> qScreenY;
+// moved into vScreen
+// RangeArr<double, 0, maxPlayers> vScreenX;
+// RangeArr<double, 0, maxPlayers> vScreenY;
+
+// moved into qScreenLoc
+// RangeArr<double, 0, maxPlayers> qScreenX;
+// RangeArr<double, 0, maxPlayers> qScreenY;
+
 bool qScreen = false;
 RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
@@ -565,6 +569,7 @@ void initAll()
     BlockSwitch.fill(false);
     PowerUpUnlock.fill(false);
     vScreen.fill(vScreen_t());
+    qScreenLoc.fill(vScreen_t());
     PlayerStart.fill(Location_t());
     blockCharacter.fill(false);
     OwedMount.fill(0);
@@ -587,10 +592,6 @@ void initAll()
     Background2.fill(0);
     SpecialFrameCount.fill(0.f);
     NPCSpeedvar.fill(0.f);
-    vScreenX.fill(0.0);
-    vScreenY.fill(0.0);
-    qScreenX.fill(0.0);
-    qScreenY.fill(0.0);
 
     Block.fill(Block_t());
     Background.fill(Background_t());
