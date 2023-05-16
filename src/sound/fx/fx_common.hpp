@@ -39,17 +39,17 @@
 // Float32-LE
 static float getFloatLSBSample(uint8_t *raw, int c)
 {
-    uint32_t r;
-    float f;
-    void *t;
+    union
+    {
+        float f;
+        uint32_t r;
+    } o;
     raw += (c * sizeof(float));
-    r = (((uint32_t)raw[0] <<  0) & 0x000000FF) |
-        (((uint32_t)raw[1] <<  8) & 0x0000FF00) |
-        (((uint32_t)raw[2] << 16) & 0x00FF0000) |
-        (((uint32_t)raw[3] << 24) & 0xFF000000);
-    t = &r;
-    f = *(float*)t;
-    return f;
+    o.r = (((uint32_t)raw[0] <<  0) & 0x000000FF) |
+          (((uint32_t)raw[1] <<  8) & 0x0000FF00) |
+          (((uint32_t)raw[2] << 16) & 0x00FF0000) |
+          (((uint32_t)raw[3] << 24) & 0xFF000000);
+    return o.f;
 }
 static void setFloatLSBSample(uint8_t **raw, float ov)
 {
@@ -64,17 +64,17 @@ static void setFloatLSBSample(uint8_t **raw, float ov)
 // Float32-BE
 static float getFloatMSBSample(uint8_t *raw, int c)
 {
-    uint32_t r;
-    float f;
-    void *t;
+    union
+    {
+        float f;
+        uint32_t r;
+    } o;
     raw += (c * sizeof(float));
-    r = (((uint32_t)raw[3] <<  0) & 0x000000FF) |
-        (((uint32_t)raw[2] <<  8) & 0x0000FF00) |
-        (((uint32_t)raw[1] << 16) & 0x00FF0000) |
-        (((uint32_t)raw[0] << 24) & 0xFF000000);
-    t = &r;
-    f = *(float*)t;
-    return f;
+    o.r = (((uint32_t)raw[3] <<  0) & 0x000000FF) |
+          (((uint32_t)raw[2] <<  8) & 0x0000FF00) |
+          (((uint32_t)raw[1] << 16) & 0x00FF0000) |
+          (((uint32_t)raw[0] << 24) & 0xFF000000);
+    return o.f;
 }
 static void setFloatMSBSample(uint8_t **raw, float ov)
 {

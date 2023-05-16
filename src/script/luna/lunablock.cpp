@@ -23,6 +23,8 @@
 
 #include "main/trees.h"
 
+#include "graphics/gfx_update.h" // invalidateDrawBlocks
+
 Block_t *BlocksF::Get(int index)
 {
     return &Block[index];
@@ -55,20 +57,36 @@ void BlocksF::SwapAll(int type1, int type2)
 
 void BlocksF::ShowAll(int type)
 {
+    bool any_change = false;
+
     for(int i = 1; i <= numBlock; i++)
     {
         if(Block[i].Type == type)
+        {
             Block[i].Invis = false;
+            any_change = true;
+        }
     }
+
+    if(any_change)
+        invalidateDrawBlocks();
 }
 
 void BlocksF::HideAll(int type)
 {
+    bool any_change = false;
+
     for(int i = 1; i <= numBlock; i++)
     {
         if(Block[i].Type == type)
+        {
             Block[i].Invis = true;
+            any_change = true;
+        }
     }
+
+    if(any_change)
+        invalidateDrawBlocks();
 }
 
 bool BlocksF::IsPlayerTouchingType(int type, int sought, Player_t *demo)

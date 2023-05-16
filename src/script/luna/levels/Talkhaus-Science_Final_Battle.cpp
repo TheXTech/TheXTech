@@ -29,9 +29,11 @@
 #include <vector>
 
 #include "sdl_proxy/sdl_assert.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "Talkhaus-Science_Final_Battle.h"
 #include "globals.h"
+#include "main/trees.h"
 #include "../lunanpc.h"
 #include "../lunaplayer.h"
 
@@ -87,6 +89,7 @@ void ScienceCode()
     }
 
     hurt_npc->Location.X = demo->Location.X;
+    treeNPCUpdate(hurt_npc);
 
     doughnuts = FindAllNPC(NPC_DOUGHNUT);
 
@@ -104,7 +107,7 @@ void ScienceCode()
 
             x_diff = doughnut->Location.X - demo->Location.X;
             y_diff = doughnut->Location.Y - demo->Location.Y;
-            m = sqrt(x_diff * x_diff + y_diff * y_diff);
+            m = SDL_sqrt(x_diff * x_diff + y_diff * y_diff);
 
             if(m == 0)
                 continue;
@@ -114,6 +117,7 @@ void ScienceCode()
 
             doughnut->Location.X += x_diff * 15;
             doughnut->Location.Y += y_diff * 15;
+            treeNPCUpdate(doughnut);
         }
         grace_timer--;
     }
@@ -153,25 +157,25 @@ static NPC_t *FindNPC(short identity)
 {
     NPC_t *currentnpc = nullptr;
 
-    for(int i = 0; i <= numNPCs; i++)
+    for(int i = 0; i < numNPCs; i++)
     {
         currentnpc = NpcF::Get(i);
-        if(currentnpc->Type == identity)
+        if(currentnpc && currentnpc->Type == identity)
             return currentnpc;
     }
 
     return nullptr;
 }
 
-static std:: vector<NPC_t *> FindAllNPC(short identity)
+static std::vector<NPC_t *> FindAllNPC(short identity)
 {
     std::vector<NPC_t *> npcs_found = std::vector<NPC_t *>();
     NPC_t *currentnpc = nullptr;
 
-    for(int i = 0; i <= numNPCs; i++)
+    for(int i = 0; i < numNPCs; i++)
     {
         currentnpc = NpcF::Get(i);
-        if(currentnpc->Type == identity)
+        if(currentnpc && currentnpc->Type == identity)
             npcs_found.push_back(currentnpc);
     }
 

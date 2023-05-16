@@ -564,9 +564,9 @@ FIBITMAP *GraphicsHelps::fast2xScaleDown(FIBITMAP *image)
     uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
     auto dest_pitch_px = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
 
-    for(uint32_t src_y = 0, dest_y = 0; src_y < src_h; src_y += 2, dest_y += 1)
+    for(uint32_t src_y = 0, dest_y = 0; dest_y < src_h / 2; src_y += 2, dest_y += 1)
     {
-        for(uint32_t src_x = 0, dest_x = 0; src_x < src_w; src_x += 2, dest_x += 1)
+        for(uint32_t src_x = 0, dest_x = 0; dest_x < src_w / 2; src_x += 2, dest_x += 1)
         {
             dest_pixels[dest_y * dest_pitch_px + dest_x] = src_pixels[src_y * src_pitch_px + src_x];
         }

@@ -249,8 +249,6 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
 
     target.inited = true;
     target.l.lazyLoaded = true;
-
-    return;
 }
 
 void AbstractRender_t::setTransparentColor(StdPicture& target, uint32_t rgb)
@@ -336,7 +334,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
     switch(g_videoSettings.scaleDownTextures)
     {
     case VideoSettings_t::SCALE_ALL:
-        shrink2x = true;
+        // only do it if the texture isn't already downscaled
+        shrink2x = (w >= Uint32(target.w) && h >= Uint32(target.h));
         break;
     case VideoSettings_t::SCALE_SAFE:
         shrink2x = GraphicsHelps::validateFor2xScaleDown(sourceImage, StdPictureGetOrigPath(target));
