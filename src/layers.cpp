@@ -714,8 +714,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
     bool tempBool = false;
     Location_t tempLevel;
     vScreen_t screenLoc;
-    double tX = 0;
-    double tY = 0;
+
     // Ignore vanilla autoscroll if newer way has been used
     bool autoScrollerChanged = false;
 
@@ -828,20 +827,17 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         C = plr;
                         if(numPlayers == 2 && DScreenType != 5)
                         {
-                            tX = vScreen[C].X;
-                            tY = vScreen[C].Y;
                             level[B] = tempLevel;
                             screenLoc = vScreen[C];
                             SoundPause[13] = 10;
                             DynamicScreen();
                             GetvScreenAverage();
                             qScreen = true;
-                            qScreenLoc[1].X = vScreen[1].X;
-                            qScreenLoc[1].Y = vScreen[1].Y;
+                            qScreenLoc[1] = vScreen[1];
 
                             if(int(screenLoc.Width) == 400)
                             {
-                                if(qScreenLoc[1].X < tX + screenLoc.Left)
+                                if(qScreenLoc[1].X < screenLoc.X + screenLoc.Left)
                                     qScreenLoc[1].X += 200;
                                 else
                                     qScreenLoc[1].X -= 200;
@@ -849,7 +845,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             if(int(screenLoc.Height) == 300)
                             {
-                                if(qScreenLoc[1].Y < tY + screenLoc.Top)
+                                if(qScreenLoc[1].Y < screenLoc.Y + screenLoc.Top)
                                     qScreenLoc[1].Y += 150;
                                 else
                                     qScreenLoc[1].Y -= 150;
@@ -868,8 +864,6 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         else
                         {
                             qScreen = true;
-                            qScreenLoc[1].X = vScreen[1].X;
-                            qScreenLoc[1].Y = vScreen[1].Y;
                             qScreenLoc[1] = vScreen[1];
                         }
 

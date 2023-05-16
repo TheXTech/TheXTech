@@ -6237,8 +6237,6 @@ void PlayerEffects(const int A)
                 case LevelDoor::TRANSIT_SCROLL:
                     if(same_section)
                     {
-                        qScreenLoc[A].X = vScreen[A].X;
-                        qScreenLoc[A].Y = vScreen[A].Y;
                         qScreenLoc[A] = vScreen[A];
                         qScreen = true;
                     }
@@ -6661,8 +6659,6 @@ void PlayerEffects(const int A)
                 case LevelDoor::TRANSIT_SCROLL:
                     if(same_section)
                     {
-                        qScreenLoc[A].X = vScreen[A].X;
-                        qScreenLoc[A].Y = vScreen[A].Y;
                         qScreenLoc[A] = vScreen[A];
                         qScreen = true;
                     }
