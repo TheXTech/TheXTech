@@ -130,6 +130,9 @@ elseif(NOT MSVC)
             string(REGEX REPLACE "-O2" "-Os"
                 CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 
+            # Supress the std::vector::insert() GCC change warning
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcompare-debug-second")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcompare-debug-second")
             # use --gc-sections for all build types
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -Wl,--gc-sections")
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Wl,--gc-sections")
@@ -140,7 +143,10 @@ elseif(NOT MSVC)
             set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
             set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
             set(LINK_FLAGS_MINSIZEREL  "${LINK_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
-        elseif(NINTENDO_3DS OR NINTENDO_WII)
+        elseif(NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
+            # Supress the std::vector::insert() GCC change warning
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcompare-debug-second")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcompare-debug-second")
             # use --gc-sections for all build types
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -Wl,--gc-sections")
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Wl,--gc-sections")
@@ -152,9 +158,12 @@ elseif(NOT MSVC)
             set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
             set(LINK_FLAGS_MINSIZEREL  "${LINK_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
         elseif(VITA)
+            # Supress the std::vector::insert() GCC change warning
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVITA=1 -fcompare-debug-second")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVITA=1 -fcompare-debug-second")
             # VitaSDK specifies -O2 for release configurations. PS Vita Support - Axiom 2022
-            set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1 -fcompare-debug-second")
-            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1 -fpermissive -fcompare-debug-second -fno-optimize-sibling-calls -Wno-class-conversion")
+            set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1")
+            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1 -fpermissive -fno-optimize-sibling-calls -Wno-class-conversion")
             set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -Wl,--gc-sections")
         elseif(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s -Wl,--gc-sections -Wl,-s")
