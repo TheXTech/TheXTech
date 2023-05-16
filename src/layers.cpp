@@ -934,16 +934,19 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         }
                         else
                         {
-                            qScreen = true;
-                            qScreenLoc[1] = vScreen[1];
+                            if(!qScreen)
+                            {
+                                qScreen = true;
+                                qScreenLoc[1] = vScreen[1];
+                            }
 
                             // the next code is designed to avoid needing a qScreen if it wouldn't have occurred in the original game
                             bool use_new_resize = true;
 
-                            double old_w = vScreen[1].Width;
-                            double old_h = vScreen[1].Height;
-                            double old_x = vScreen[1].X;
-                            double old_y = vScreen[1].Y;
+                            double old_w = qScreenLoc[1].Width;
+                            double old_h = qScreenLoc[1].Height;
+                            double old_x = qScreenLoc[1].X;
+                            double old_y = qScreenLoc[1].Y;
 
                             // (1) old bounds shouldn't be outside of the new level
                             if(-old_x < level[B].X
