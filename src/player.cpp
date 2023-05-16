@@ -3657,7 +3657,7 @@ void RespawnPlayer(int A, double Direction, double CenterX, double StopY)
     Player[A].Effect = 6;
     // location where player stops flashing
     Player[A].Effect2 = StopY - Player[A].Location.Height;
-    Player[A].Location.Y = -vScreenY[1] - Player[A].Location.Height;
+    Player[A].Location.Y = -vScreen[1].Y - Player[A].Location.Height;
     Player[A].Location.X = CenterX - Player[A].Location.Width / 2.0;
 }
 
@@ -6237,8 +6237,8 @@ void PlayerEffects(const int A)
                 case LevelDoor::TRANSIT_SCROLL:
                     if(same_section)
                     {
-                        qScreenX[A] = vScreenX[A];
-                        qScreenY[A] = vScreenY[A];
+                        qScreenLoc[A].X = vScreen[A].X;
+                        qScreenLoc[A].Y = vScreen[A].Y;
                         qScreenLoc[A] = vScreen[A];
                         qScreen = true;
                     }
@@ -6661,8 +6661,8 @@ void PlayerEffects(const int A)
                 case LevelDoor::TRANSIT_SCROLL:
                     if(same_section)
                     {
-                        qScreenX[A] = vScreenX[A];
-                        qScreenY[A] = vScreenY[A];
+                        qScreenLoc[A].X = vScreen[A].X;
+                        qScreenLoc[A].Y = vScreen[A].Y;
                         qScreenLoc[A] = vScreen[A];
                         qScreen = true;
                     }

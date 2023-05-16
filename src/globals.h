@@ -840,6 +840,10 @@ struct Effect_t
 //Public Type vScreen 'Screen controls
 struct vScreen_t
 {
+    // previously their own arrays, vScreenX and vScreenY
+    double X = 0.0;
+    double Y = 0.0;
+
 //    Left As Double
     double Left = 0.0;
 //    Top As Double
@@ -1491,15 +1495,21 @@ enum
 extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope;
 //Public BlockSlope2(0 To maxBlockType) As Integer 'block is sloped on the bottom.
 extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
+
+// moved into vScreen
+
 //Public vScreenX(0 To maxPlayers) As Double  'vScreen offset
-extern RangeArr<double, 0, maxPlayers> vScreenX;
+// extern RangeArr<double, 0, maxPlayers> vScreenX;
 //Public vScreenY(0 To maxPlayers) As Double 'vScreen offset
-extern RangeArr<double, 0, maxPlayers> vScreenY;
+// extern RangeArr<double, 0, maxPlayers> vScreenY;
+
+// moved into qScreenLoc
 
 //Public qScreenX(1 To maxPlayers) As Double  'vScreen offset adjust
-extern RangeArr<double, 0, maxPlayers> qScreenX;
+// extern RangeArr<double, 0, maxPlayers> qScreenX;
 //Public qScreenY(1 To maxPlayers) As Double 'vScreen offset adjust
-extern RangeArr<double, 0, maxPlayers> qScreenY;
+// extern RangeArr<double, 0, maxPlayers> qScreenY;
+
 //Public qScreen As Boolean 'Weather or not the screen needs adjusting
 extern bool qScreen;
 // NEW: allows screen position to change during qScreen

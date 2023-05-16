@@ -828,48 +828,48 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         C = plr;
                         if(numPlayers == 2 && DScreenType != 5)
                         {
-                            tX = vScreenX[C];
-                            tY = vScreenY[C];
+                            tX = vScreen[C].X;
+                            tY = vScreen[C].Y;
                             level[B] = tempLevel;
                             screenLoc = vScreen[C];
                             SoundPause[13] = 10;
                             DynamicScreen();
                             GetvScreenAverage();
                             qScreen = true;
-                            qScreenX[1] = vScreenX[1];
-                            qScreenY[1] = vScreenY[1];
+                            qScreenLoc[1].X = vScreen[1].X;
+                            qScreenLoc[1].Y = vScreen[1].Y;
 
                             if(int(screenLoc.Width) == 400)
                             {
-                                if(qScreenX[1] < tX + screenLoc.Left)
-                                    qScreenX[1] += 200;
+                                if(qScreenLoc[1].X < tX + screenLoc.Left)
+                                    qScreenLoc[1].X += 200;
                                 else
-                                    qScreenX[1] -= 200;
+                                    qScreenLoc[1].X -= 200;
                             }
 
                             if(int(screenLoc.Height) == 300)
                             {
-                                if(qScreenY[1] < tY + screenLoc.Top)
-                                    qScreenY[1] += 150;
+                                if(qScreenLoc[1].Y < tY + screenLoc.Top)
+                                    qScreenLoc[1].Y += 150;
                                 else
-                                    qScreenY[1] -= 150;
+                                    qScreenLoc[1].Y -= 150;
                             }
 
-                            if(-qScreenX[1] < level[Player[C].Section].X)
-                                qScreenX[1] = -level[Player[C].Section].X;
-                            if(-qScreenX[1] + ScreenW /*FrmMain.ScaleWidth*/ > level[Player[C].Section].Width)
-                                qScreenX[1] = -(level[Player[C].Section].Width - ScreenW);
-                            if(-qScreenY[1] < level[Player[C].Section].Y)
-                                qScreenY[1] = -level[Player[C].Section].Y;
-                            if(-qScreenY[1] + ScreenH /*FrmMain.ScaleHeight*/ > level[Player[C].Section].Height)
-                                qScreenY[1] = -(level[Player[C].Section].Height - ScreenH);
+                            if(-qScreenLoc[1].X < level[Player[C].Section].X)
+                                qScreenLoc[1].X = -level[Player[C].Section].X;
+                            if(-qScreenLoc[1].X + ScreenW /*FrmMain.ScaleWidth*/ > level[Player[C].Section].Width)
+                                qScreenLoc[1].X = -(level[Player[C].Section].Width - ScreenW);
+                            if(-qScreenLoc[1].Y < level[Player[C].Section].Y)
+                                qScreenLoc[1].Y = -level[Player[C].Section].Y;
+                            if(-qScreenLoc[1].Y + ScreenH /*FrmMain.ScaleHeight*/ > level[Player[C].Section].Height)
+                                qScreenLoc[1].Y = -(level[Player[C].Section].Height - ScreenH);
                             level[B] = static_cast<Location_t>(s.position);
                         }
                         else
                         {
                             qScreen = true;
-                            qScreenX[1] = vScreenX[1];
-                            qScreenY[1] = vScreenY[1];
+                            qScreenLoc[1].X = vScreen[1].X;
+                            qScreenLoc[1].Y = vScreen[1].Y;
                             qScreenLoc[1] = vScreen[1];
                         }
 

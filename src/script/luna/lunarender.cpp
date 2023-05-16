@@ -339,13 +339,13 @@ void Render::CalcCameraPos(double *ret_x, double *ret_y)
 
     if(ret_x != nullptr)
     {
-        val = vScreenX[1];
+        val = vScreen[1].X;
         *ret_x = val - val - val; // Fix backwards smbx camera
     }
 
     if(ret_y != nullptr)
     {
-        val = vScreenY[1];
+        val = vScreen[1].Y;
         *ret_y = val - val - val; // Fix backwards smbx camera
     }
 }

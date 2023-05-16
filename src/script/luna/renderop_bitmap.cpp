@@ -45,8 +45,8 @@ void RenderBitmapOp::Draw(Renderer *renderer)
 
     if(sceneCoords)
     {
-        screenX -= vScreenX[renderer->GetCameraIdx()];
-        screenY -= vScreenY[renderer->GetCameraIdx()];
+        screenX -= vScreen[renderer->GetCameraIdx()].X;
+        screenY -= vScreen[renderer->GetCameraIdx()].Y;
     }
 
     // Get integer values as current rendering backends prefer that

@@ -23,15 +23,10 @@
 #include "sdl_proxy/sdl_stdinc.h"
 
 #include "global_constants.h"
-#include "range_arr.hpp"
+#include "globals.h" // vScreen
 #include "core/render.h"
 
 #include "screen_fader.h"
-
-//Public vScreenX(0 To maxPlayers) As Double  'vScreen offset
-extern RangeArr<double, 0, maxPlayers> vScreenX;
-//Public vScreenY(0 To maxPlayers) As Double 'vScreen offset
-extern RangeArr<double, 0, maxPlayers> vScreenY;
 
 
 void ScreenFader::clearFader()
@@ -151,8 +146,8 @@ void ScreenFader::draw()
 
             if(m_focusScreen >= 0)
             {
-                focusX += vScreenX[m_focusScreen];
-                focusY += vScreenY[m_focusScreen];
+                focusX += vScreen[m_focusScreen].X;
+                focusY += vScreen[m_focusScreen].Y;
             }
 
             float rightW = (ScreenW -focusX),
@@ -183,8 +178,8 @@ void ScreenFader::draw()
 
             if(m_focusScreen)
             {
-                focusX += vScreenX[m_focusScreen];
-                focusY += vScreenY[m_focusScreen];
+                focusX += vScreen[m_focusScreen].X;
+                focusY += vScreen[m_focusScreen].Y;
             }
 
             // int radius = ScreenH - (ScreenH * m_scale);
