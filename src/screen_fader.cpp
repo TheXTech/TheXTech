@@ -22,16 +22,11 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
-#include "globals.h"
-#include "range_arr.hpp"
+#include "global_constants.h"
+#include "globals.h" // vScreen
 #include "core/render.h"
 
 #include "screen_fader.h"
-
-//Public vScreenX(0 To maxPlayers) As Double  'vScreen offset
-extern RangeArr<double, 0, maxPlayers> vScreenX;
-//Public vScreenY(0 To maxPlayers) As Double 'vScreen offset
-extern RangeArr<double, 0, maxPlayers> vScreenY;
 
 
 void ScreenFader::clearFader()
@@ -154,8 +149,8 @@ void ScreenFader::draw(bool fullscreen)
 
             if(m_focusScreen >= 0)
             {
-                focusX += vScreenX[m_focusScreen];
-                focusY += vScreenY[m_focusScreen];
+                focusX += vScreen[m_focusScreen].X;
+                focusY += vScreen[m_focusScreen].Y;
 
                 if(fullscreen)
                 {
@@ -200,8 +195,8 @@ void ScreenFader::draw(bool fullscreen)
 
             if(m_focusScreen >= 0)
             {
-                focusX += vScreenX[m_focusScreen];
-                focusY += vScreenY[m_focusScreen];
+                focusX += vScreen[m_focusScreen].X;
+                focusY += vScreen[m_focusScreen].Y;
 
                 if(fullscreen)
                 {

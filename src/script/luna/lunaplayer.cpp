@@ -126,8 +126,8 @@ LunaRect PlayerF::GetScreenPosition(Player_t *player)
 {
     //    double* pCameraY = (double*)GM_CAMERA_Y;
     //    double* pCameraX = (double*)GM_CAMERA_X;
-    double cam_y = -vScreenY[1];
-    double cam_x = -vScreenX[1];
+    double cam_y = -vScreen[1].Y;
+    double cam_x = -vScreen[1].X;
     //    double cam_d = cam_y + 600;
     //    double cam_r = cam_x + 800;
 

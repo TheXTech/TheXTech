@@ -227,8 +227,8 @@ void UpdatePlayer()
                     }
                     else
                     {
-                        A1 = (float)((-vScreenX[1] + vScreen[1].Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5));
-                        B1 = (float)((-vScreenY[1] + vScreen[1].Height * 0.5) - Player[A].Location.Y);
+                        A1 = (float)((-vScreen[1].X + vScreen[1].Width * 0.5) - (Player[A].Location.X + Player[A].Location.Width * 0.5));
+                        B1 = (float)((-vScreen[1].Y + vScreen[1].Height * 0.5) - Player[A].Location.Y);
                     }
                     C1 = std::sqrt((A1 * A1) + (B1 * B1));
                     if(C1 != 0.0f)
@@ -4467,14 +4467,14 @@ void UpdatePlayer()
                 {
                     if(ScreenType == 3)
                     {
-                        if(Player[A].Location.X < -vScreenX[1])
+                        if(Player[A].Location.X < -vScreen[1].X)
                         {
-                            Player[A].Location.X = -vScreenX[1] + 1;
+                            Player[A].Location.X = -vScreen[1].X + 1;
                             Player[A].Location.SpeedX = 4;
                         }
-                        else if(Player[A].Location.X > -vScreenX[1] + ScreenW/*frmMain.ScaleWidth*/ - Player[A].Location.Width)
+                        else if(Player[A].Location.X > -vScreen[1].X + ScreenW/*frmMain.ScaleWidth*/ - Player[A].Location.Width)
                         {
-                            Player[A].Location.X = -vScreenX[1] + ScreenW/*frmMain.ScaleWidth*/ - Player[A].Location.Width - 1;
+                            Player[A].Location.X = -vScreen[1].X + ScreenW/*frmMain.ScaleWidth*/ - Player[A].Location.Width - 1;
                             Player[A].Location.SpeedX = -4;
                         }
                     }

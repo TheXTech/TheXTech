@@ -43,9 +43,9 @@ void DrawInterface(int Z, int numScreens)
         else
             GetvScreenCanonical(Z, &l, &t);
         if(vScreen[Z].Height > 600)
-            ScreenTop = -t + vScreenY[Z];
+            ScreenTop = -t + vScreen[Z].Y;
         if(vScreen[Z].Width > 800)
-            CenterX = -l + 400 + vScreenX[Z];
+            CenterX = -l + 400 + vScreen[Z].X;
     }
 
     int B = 0;

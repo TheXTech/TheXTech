@@ -158,8 +158,8 @@ void DynamicScreen()
     {
         double l, t;
         GetvScreenAverageCanonical(&l, &t, true);
-        vScreenX[1] = l;
-        vScreenY[1] = t;
+        vScreen[1].X = l;
+        vScreen[1].Y = t;
     }
 
     for(A = 1; A <= numPlayers; A++)
@@ -181,7 +181,7 @@ void DynamicScreen()
             double FieldW = g_compatibility.free_level_res ? ScreenW : 800;
             double FieldH = g_compatibility.free_level_res ? ScreenH : 600;
 
-            if(level[Player[1].Section].Width - level[Player[1].Section].X > FieldW && (((!vScreen[2].Visible && Player[2].Location.X + vScreenX[1] >= FieldW * 0.75 - Player[2].Location.Width / 2.0) || (vScreen[2].Visible && Player[2].Location.X + vScreenX[1] >= FieldW * 0.75 - Player[2].Location.Width / 2.0)) && (Player[1].Location.X < level[Player[1].Section].Width - FieldW * 0.75 - Player[1].Location.Width / 2.0)))
+            if(level[Player[1].Section].Width - level[Player[1].Section].X > FieldW && (((!vScreen[2].Visible && Player[2].Location.X + vScreen[1].X >= FieldW * 0.75 - Player[2].Location.Width / 2.0) || (vScreen[2].Visible && Player[2].Location.X + vScreen[1].X >= FieldW * 0.75 - Player[2].Location.Width / 2.0)) && (Player[1].Location.X < level[Player[1].Section].Width - FieldW * 0.75 - Player[1].Location.Width / 2.0)))
             {
                 vScreen[2].Height = ScreenH;
                 vScreen[2].Width = ScreenW / 2;
@@ -196,7 +196,7 @@ void DynamicScreen()
                 if(g_compatibility.free_level_res)
                 {
                     GetvScreenAverage2();
-                    t = vScreenY[1];
+                    t = vScreen[1].Y;
                 }
                 else
                 {
@@ -215,7 +215,7 @@ void DynamicScreen()
                 DScreenType = 1;
                 vScreen[2].Visible = true;
             }
-            else if(level[Player[1].Section].Width - level[Player[1].Section].X > FieldW && (((!vScreen[2].Visible && Player[1].Location.X + vScreenX[1] >= FieldW * 0.75 - Player[1].Location.Width / 2.0) || (vScreen[2].Visible && Player[1].Location.X + vScreenX[2] >= FieldW * 0.75 - Player[1].Location.Width / 2.0)) && (Player[2].Location.X < level[Player[1].Section].Width - FieldW * 0.75 - Player[2].Location.Width / 2.0)))
+            else if(level[Player[1].Section].Width - level[Player[1].Section].X > FieldW && (((!vScreen[2].Visible && Player[1].Location.X + vScreen[1].X >= FieldW * 0.75 - Player[1].Location.Width / 2.0) || (vScreen[2].Visible && Player[1].Location.X + vScreen[2].X >= FieldW * 0.75 - Player[1].Location.Width / 2.0)) && (Player[2].Location.X < level[Player[1].Section].Width - FieldW * 0.75 - Player[2].Location.Width / 2.0)))
             {
                 vScreen[1].Height = ScreenH;
                 vScreen[1].Width = ScreenW / 2;
@@ -230,7 +230,7 @@ void DynamicScreen()
                 if(g_compatibility.free_level_res)
                 {
                     GetvScreenAverage2();
-                    t = vScreenY[1];
+                    t = vScreen[1].Y;
                 }
                 else
                 {
@@ -249,7 +249,7 @@ void DynamicScreen()
                 DScreenType = 2;
                 vScreen[2].Visible = true;
             }
-            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > FieldH && ((!vScreen[2].Visible && Player[1].Location.Y + vScreenY[1] >= FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height) || (vScreen[2].Visible && Player[1].Location.Y + vScreenY[2] >= FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height)) && (Player[2].Location.Y < level[Player[1].Section].Height - FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height))
+            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > FieldH && ((!vScreen[2].Visible && Player[1].Location.Y + vScreen[1].Y >= FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height) || (vScreen[2].Visible && Player[1].Location.Y + vScreen[2].Y >= FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height)) && (Player[2].Location.Y < level[Player[1].Section].Height - FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height))
             {
                 vScreen[1].Height = ScreenH / 2;
                 vScreen[1].Width = ScreenW;
@@ -264,7 +264,7 @@ void DynamicScreen()
                 if(g_compatibility.free_level_res)
                 {
                     GetvScreenAverage2();
-                    l = vScreenX[1];
+                    l = vScreen[1].X;
                 }
                 else
                 {
@@ -283,7 +283,7 @@ void DynamicScreen()
                 DScreenType = 3;
                 vScreen[2].Visible = true;
             }
-            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > FieldH && ((!vScreen[2].Visible && Player[2].Location.Y + vScreenY[1] >= FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height) || (vScreen[2].Visible && Player[2].Location.Y + vScreenY[1] >= FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height)) && (Player[1].Location.Y < level[Player[1].Section].Height - FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height))
+            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > FieldH && ((!vScreen[2].Visible && Player[2].Location.Y + vScreen[1].Y >= FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height) || (vScreen[2].Visible && Player[2].Location.Y + vScreen[1].Y >= FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height)) && (Player[1].Location.Y < level[Player[1].Section].Height - FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height))
             {
                 vScreen[1].Height = ScreenH / 2;
                 vScreen[1].Width = ScreenW;
@@ -298,7 +298,7 @@ void DynamicScreen()
                 if(g_compatibility.free_level_res)
                 {
                     GetvScreenAverage2();
-                    l = vScreenX[1];
+                    l = vScreen[1].X;
                 }
                 else
                 {
@@ -540,11 +540,11 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     double resizeRateX = resizeRate;
     double resizeRateY = resizeRate;
 
-    double camFramesX_l = std::abs(vScreenX[Z] - qScreenX[Z])/camRateX;
-    double camFramesY_t = std::abs(vScreenY[Z] - qScreenY[Z])/camRateY;
+    double camFramesX_l = std::abs(vScreen[Z].X - qScreenLoc[Z].X)/camRateX;
+    double camFramesY_t = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y)/camRateY;
 
-    double camFramesX_r = std::abs(vScreenX[Z] - vScreen[Z].Width - qScreenX[Z] + qScreenLoc[Z].Width)/camRateX;
-    double camFramesY_b = std::abs(vScreenY[Z] - vScreen[Z].Height - qScreenY[Z] + qScreenLoc[Z].Height)/camRateY;
+    double camFramesX_r = std::abs(vScreen[Z].X - vScreen[Z].Width - qScreenLoc[Z].X + qScreenLoc[Z].Width)/camRateX;
+    double camFramesY_b = std::abs(vScreen[Z].Y - vScreen[Z].Height - qScreenLoc[Z].Y + qScreenLoc[Z].Height)/camRateY;
 
     double camFramesX = SDL_min(camFramesX_l, camFramesX_r);
     double camFramesY = SDL_min(camFramesY_t, camFramesY_b);
@@ -576,25 +576,25 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     if(qFramesY < 1)
         qFramesY = 1;
 
-    camRateX = std::abs(vScreenX[Z] - qScreenX[Z])/qFramesX;
-    camRateY = std::abs(vScreenY[Z] - qScreenY[Z])/qFramesY;
+    camRateX = std::abs(vScreen[Z].X - qScreenLoc[Z].X)/qFramesX;
+    camRateY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y)/qFramesY;
 
     resizeRateX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft)/qFramesX;
     resizeRateY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop)/qFramesY;
 
-    if(vScreenX[Z] < qScreenX[Z] - camRateX)
-        qScreenX[Z] -= camRateX;
-    else if(vScreenX[Z] > qScreenX[Z] + camRateX)
-        qScreenX[Z] += camRateX;
+    if(vScreen[Z].X < qScreenLoc[Z].X - camRateX)
+        qScreenLoc[Z].X -= camRateX;
+    else if(vScreen[Z].X > qScreenLoc[Z].X + camRateX)
+        qScreenLoc[Z].X += camRateX;
     else
-        qScreenX[Z] = vScreenX[Z];
+        qScreenLoc[Z].X = vScreen[Z].X;
 
-    if(vScreenY[Z] < qScreenY[Z] - camRateY)
-        qScreenY[Z] -= camRateY;
-    else if(vScreenY[Z] > qScreenY[Z] + camRateY)
-        qScreenY[Z] += camRateY;
+    if(vScreen[Z].Y < qScreenLoc[Z].Y - camRateY)
+        qScreenLoc[Z].Y -= camRateY;
+    else if(vScreen[Z].Y > qScreenLoc[Z].Y + camRateY)
+        qScreenLoc[Z].Y += camRateY;
     else
-        qScreenY[Z] = vScreenY[Z];
+        qScreenLoc[Z].Y = vScreen[Z].Y;
 
     if(vScreen[Z].ScreenLeft < qScreenLoc[Z].ScreenLeft - resizeRateX)
         qScreenLoc[Z].ScreenLeft -= resizeRateX;
@@ -624,8 +624,8 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     else
         qScreenLoc[Z].Height = vScreen[Z].Height;
 
-    vScreenX[Z] = qScreenX[Z];
-    vScreenY[Z] = qScreenY[Z];
+    vScreen[Z].X = qScreenLoc[Z].X;
+    vScreen[Z].Y = qScreenLoc[Z].Y;
 
     // for now -- eventually may want to set width/height another way
     if(g_compatibility.modern_section_change)

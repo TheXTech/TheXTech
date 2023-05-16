@@ -341,13 +341,13 @@ void Render::CalcCameraPos(double *ret_x, double *ret_y)
 
     if(ret_x != nullptr)
     {
-        val = vScreenX[1];
+        val = vScreen[1].X;
         *ret_x = val - val - val; // Fix backwards smbx camera
     }
 
     if(ret_y != nullptr)
     {
-        val = vScreenY[1];
+        val = vScreen[1].Y;
         *ret_y = val - val - val; // Fix backwards smbx camera
     }
 }
@@ -370,10 +370,11 @@ void Render::TranslateScreenCoords(double &x, double &y, double w, double h)
                 GetvScreenAverageCanonical(&l, &t);
             else
                 GetvScreenCanonical(1, &l, &t);
+
             if(vScreen[1].Height > 600)
-                top = -t + vScreenY[1];
+                top = -t + vScreen[1].Y;
             if(vScreen[1].Width > 800)
-                left = -l + vScreenX[1];
+                left = -l + vScreen[1].X;
         }
 
         x += left;

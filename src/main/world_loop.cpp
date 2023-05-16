@@ -190,8 +190,6 @@ static inline bool s_worldUpdateMusic(const Location_t &loc, bool section_only =
         {
             qScreen = true;
             s_playCamSound = true;
-            qScreenX[1] = vScreenX[1];
-            qScreenY[1] = vScreenY[1];
             qScreenLoc[1] = vScreen[1];
         }
     }
@@ -265,8 +263,8 @@ static void s_SetvScreenWorld(double fx, double fy)
     vScreen[1].Width = ScreenW - (margin * 2);
 
 
-    vScreenX[1] = -fx + vScreen[1].Width / 2.0;
-    vScreenY[1] = -fy + vScreen[1].Height / 2.0;
+    vScreen[1].X = -fx + vScreen[1].Width / 2.0;
+    vScreen[1].Y = -fy + vScreen[1].Height / 2.0;
 
     bool allowExpandedFrame = worldHasFrameAssets() /* || g_gameInfo.interface4_stretch*/;
     if(s_currentWorldSection != 0 || !g_config.world_map_expand_view || !g_compatibility.free_world_res || !allowExpandedFrame)
@@ -279,23 +277,23 @@ static void s_SetvScreenWorld(double fx, double fy)
         {
             vScreen[1].Left += (vScreen[1].Width - sLoc.Width) / 2;
             vScreen[1].Width = sLoc.Width;
-            vScreenX[1] = -sLoc.X;
+            vScreen[1].X = -sLoc.X;
         }
-        else if(-vScreenX[1] < sLoc.X)
-            vScreenX[1] = -sLoc.X;
-        else if(-vScreenX[1] > sLoc.X + sLoc.Width - vScreen[1].Width)
-            vScreenX[1] = -(sLoc.X + sLoc.Width - vScreen[1].Width);
+        else if(-vScreen[1].X < sLoc.X)
+            vScreen[1].X = -sLoc.X;
+        else if(-vScreen[1].X > sLoc.X + sLoc.Width - vScreen[1].Width)
+            vScreen[1].X = -(sLoc.X + sLoc.Width - vScreen[1].Width);
 
         if(sLoc.Height < vScreen[1].Height)
         {
             vScreen[1].Top += (vScreen[1].Height - sLoc.Height) / 2;
             vScreen[1].Height = sLoc.Height;
-            vScreenY[1] = -sLoc.Y;
+            vScreen[1].Y = -sLoc.Y;
         }
-        else if(-vScreenY[1] < sLoc.Y)
-            vScreenY[1] = -sLoc.Y;
-        else if(-vScreenY[1] > sLoc.Y + sLoc.Height - vScreen[1].Height)
-            vScreenY[1] = -(sLoc.Y + sLoc.Height - vScreen[1].Height);
+        else if(-vScreen[1].Y < sLoc.Y)
+            vScreen[1].Y = -sLoc.Y;
+        else if(-vScreen[1].Y > sLoc.Y + sLoc.Height - vScreen[1].Height)
+            vScreen[1].Y = -(sLoc.Y + sLoc.Height - vScreen[1].Height);
     }
 
     vScreen[1].ScreenTop = vScreen[1].Top;
@@ -1016,8 +1014,6 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
     }
 
     qScreen = true;
-    qScreenX[1] = vScreenX[1];
-    qScreenY[1] = vScreenY[1];
     qScreenLoc[1] = vScreen[1];
 }
 
@@ -1133,8 +1129,6 @@ void PathPath(WorldPath_t &Pth, bool Skp)
         if(g_compatibility.modern_section_change)
         {
             qScreen = true;
-            qScreenX[1] = vScreenX[1];
-            qScreenY[1] = vScreenY[1];
             qScreenLoc[1] = vScreen[1];
         }
         else
@@ -1211,8 +1205,6 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                         if(g_compatibility.modern_section_change)
                         {
                             qScreen = true;
-                            qScreenX[1] = vScreenX[1];
-                            qScreenY[1] = vScreenY[1];
                             qScreenLoc[1] = vScreen[1];
                         }
                         else

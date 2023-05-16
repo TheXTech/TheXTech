@@ -65,8 +65,8 @@ void RenderStringOp::Draw(Renderer *renderer)
 
     if(sceneCoords)
     {
-        x -= static_cast<float>(vScreenX[renderer->GetCameraIdx()]);
-        y -= static_cast<float>(vScreenY[renderer->GetCameraIdx()]);
+        x -= static_cast<float>(vScreen[renderer->GetCameraIdx()].X);
+        y -= static_cast<float>(vScreen[renderer->GetCameraIdx()].Y);
     }
     else
     {

@@ -41,10 +41,10 @@ void RenderRectOp::Draw(Renderer *renderer)
     double sx1 = this->x1, sy1 = this->y1, sx2 = this->x2, sy2 = this->y2;
     if(sceneCoords)
     {
-        sx1 -= vScreenX[renderer->GetCameraIdx()];
-        sy1 -= vScreenY[renderer->GetCameraIdx()];
-        sx2 -= vScreenX[renderer->GetCameraIdx()];
-        sy2 -= vScreenY[renderer->GetCameraIdx()];
+        sx1 -= vScreen[renderer->GetCameraIdx()].X;
+        sy1 -= vScreen[renderer->GetCameraIdx()].Y;
+        sx2 -= vScreen[renderer->GetCameraIdx()].X;
+        sy2 -= vScreen[renderer->GetCameraIdx()].Y;
     }
     else
     {

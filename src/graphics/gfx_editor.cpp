@@ -87,8 +87,8 @@ void DrawEditorLevel(int Z)
                             tempLocation.Width = NPCWidthGFX[C];
                         }
 
-                        XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[C],
-                            vScreenY[Z] + tempLocation.Y + NPCFrameOffsetY[C],
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX[C],
+                            vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY[C],
                             tempLocation.Width, tempLocation.Height,
                             GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
                     }
@@ -102,7 +102,7 @@ void DrawEditorLevel(int Z)
                         tempLocation.X = Block[A].Location.X + Block[A].Location.Width / 2 - GFX.Chat.w / 2;
                         tempLocation.Y = Block[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
                     }
                 }
             }
@@ -131,8 +131,8 @@ void DrawEditorLevel(int Z)
                         else
                             tempLocation.Y = NPC[A].Location.Y;
                         tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - tempLocation.Width / 2;
-                        XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[C],
-                            vScreenY[Z] + tempLocation.Y + NPCFrameOffsetY[C],
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX[C],
+                            vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY[C],
                             tempLocation.Width, tempLocation.Height,
                             GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
                     }
@@ -149,7 +149,7 @@ void DrawEditorLevel(int Z)
                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - 4 - GFX.Chat.w;
                         tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
                     }
                 }
 
@@ -164,7 +164,7 @@ void DrawEditorLevel(int Z)
                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 + 4;
                         tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
                     }
                 }
             }
@@ -239,24 +239,24 @@ void DrawEditorLevel(int Z)
                 if(Warp[A].PlacedEnt)
                 {
                     if(complete)
-                        XRender::renderRect(vScreenX[Z] + Warp[A].Entrance.X, vScreenY[Z] + Warp[A].Entrance.Y, 32, 32,
+                        XRender::renderRect(vScreen[Z].X + Warp[A].Entrance.X, vScreen[Z].Y + Warp[A].Entrance.Y, 32, 32,
                             1.f, 0.f, 1.f, 1.f, false);
                     else
-                        XRender::renderRect(vScreenX[Z] + Warp[A].Entrance.X, vScreenY[Z] + Warp[A].Entrance.Y, 32, 32,
+                        XRender::renderRect(vScreen[Z].X + Warp[A].Entrance.X, vScreen[Z].Y + Warp[A].Entrance.Y, 32, 32,
                             0.7f, 0.3f, 0.f, 1.f, false);
-                    SuperPrint(std::to_string(A), 1, vScreenX[Z] + Warp[A].Entrance.X + 2, vScreenY[Z] + Warp[A].Entrance.Y + 2);
+                    SuperPrint(std::to_string(A), 1, vScreen[Z].X + Warp[A].Entrance.X + 2, vScreen[Z].Y + Warp[A].Entrance.Y + 2);
                 }
 
                 if(Warp[A].PlacedExit)
                 {
                     if(complete)
-                        XRender::renderRect(vScreenX[Z] + Warp[A].Exit.X, vScreenY[Z] + Warp[A].Exit.Y, 32, 32,
+                        XRender::renderRect(vScreen[Z].X + Warp[A].Exit.X, vScreen[Z].Y + Warp[A].Exit.Y, 32, 32,
                             1.f, 0.f, 1.f, 1.f, false);
                     else
-                        XRender::renderRect(vScreenX[Z] + Warp[A].Exit.X, vScreenY[Z] + Warp[A].Exit.Y, 32, 32,
+                        XRender::renderRect(vScreen[Z].X + Warp[A].Exit.X, vScreen[Z].Y + Warp[A].Exit.Y, 32, 32,
                             0.7f, 0.3f, 0.f, 1.f, false);
-                    SuperPrint(std::to_string(A), 1, vScreenX[Z] + Warp[A].Exit.X + Warp[A].Exit.Width - 16 - 2,
-                        vScreenY[Z] + Warp[A].Exit.Y + Warp[A].Exit.Height - 14 - 2);
+                    SuperPrint(std::to_string(A), 1, vScreen[Z].X + Warp[A].Exit.X + Warp[A].Exit.Width - 16 - 2,
+                        vScreen[Z].Y + Warp[A].Exit.Y + Warp[A].Exit.Height - 14 - 2);
                 }
             }
         }
@@ -270,28 +270,28 @@ void DrawEditorLevel(int Z)
     {
         if(BlockFlash > 30 || BlockFlash == 0)
         {
-            if(vScreenX[Z] + level[S].X > 0)
+            if(vScreen[Z].X + level[S].X > 0)
             {
                 XRender::renderRect(0, 0,
-                                   vScreenX[Z] + level[S].X, ScreenH, 0.f, 0.f, 0.f, 1.f, true);
+                                   vScreen[Z].X + level[S].X, ScreenH, 0.f, 0.f, 0.f, 1.f, true);
             }
 
-            if(ScreenW > level[S].Width + vScreenX[Z])
+            if(ScreenW > level[S].Width + vScreen[Z].X)
             {
-                XRender::renderRect(level[S].Width + vScreenX[Z], 0,
-                                   ScreenW - (level[S].Width + vScreenX[Z]), ScreenH, 0.f, 0.f, 0.f, 1.f, true);
+                XRender::renderRect(level[S].Width + vScreen[Z].X, 0,
+                                   ScreenW - (level[S].Width + vScreen[Z].X), ScreenH, 0.f, 0.f, 0.f, 1.f, true);
             }
 
-            if(vScreenY[Z] + level[S].Y > 0)
+            if(vScreen[Z].Y + level[S].Y > 0)
             {
                 XRender::renderRect(0, 0,
-                                   ScreenW, vScreenY[Z] + level[S].Y, 0.f, 0.f, 0.f, 1.f, true);
+                                   ScreenW, vScreen[Z].Y + level[S].Y, 0.f, 0.f, 0.f, 1.f, true);
             }
 
-            if(ScreenH > level[S].Height + vScreenY[Z])
+            if(ScreenH > level[S].Height + vScreen[Z].Y)
             {
-                XRender::renderRect(0, level[S].Height + vScreenY[Z],
-                                   ScreenW, ScreenH - (level[S].Height + vScreenY[Z]), 0.f, 0.f, 0.f, 1.f, true);
+                XRender::renderRect(0, level[S].Height + vScreen[Z].Y,
+                                   ScreenW, ScreenH - (level[S].Height + vScreen[Z].Y), 0.f, 0.f, 0.f, 1.f, true);
             }
         }
     }
@@ -355,8 +355,8 @@ void DrawEditorLevel(int Z)
                                     E = 1;
                             }
 
-                            XRender::renderTexture(vScreenX[Z] + b.Location.X + C * 32,
-                                                  vScreenY[Z] + b.Location.Y + B * 32,
+                            XRender::renderTexture(vScreen[Z].X + b.Location.X + C * 32,
+                                                  vScreen[Z].Y + b.Location.Y + B * 32,
                                                   32, 32, GFXBlock[b.Type], D * 32, E * 32);
                         }
                     }
@@ -366,8 +366,8 @@ void DrawEditorLevel(int Z)
             {
                 if(vScreenCollision(Z, b.Location))
                 {
-                    XRender::renderTexture(vScreenX[Z] + b.Location.X,
-                                          vScreenY[Z] + b.Location.Y + b.ShakeY3,
+                    XRender::renderTexture(vScreen[Z].X + b.Location.X,
+                                          vScreen[Z].Y + b.Location.Y + b.ShakeY3,
                                           b.Location.Width,
                                           b.Location.Height,
                                           GFXBlock[b.Type], 0, BlockFrame[b.Type] * 32);
@@ -399,8 +399,8 @@ void DrawEditorLevel(int Z)
                         tempLocation.Width = NPCWidthGFX[C];
                     }
 
-                    XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[C],
-                        vScreenY[Z] + tempLocation.Y + NPCFrameOffsetY[C],
+                    XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX[C],
+                        vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY[C],
                         tempLocation.Width, tempLocation.Height,
                         GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
                 }
@@ -412,7 +412,7 @@ void DrawEditorLevel(int Z)
                 tempLocation.X = b.Location.X + b.Location.Width / 2 - GFX.Chat.w / 2;
                 tempLocation.Y = b.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
             }
         }
 
@@ -480,8 +480,8 @@ void DrawEditorLevel(int Z)
             auto &b = e.Background;
             if(vScreenCollision(Z, b.Location))
             {
-                XRender::renderTexture(vScreenX[Z] + b.Location.X,
-                                      vScreenY[Z] + b.Location.Y,
+                XRender::renderTexture(vScreen[Z].X + b.Location.X,
+                                      vScreen[Z].Y + b.Location.Y,
                                       BackgroundWidth[b.Type],
                                       BackgroundHeight[b.Type],
                                       GFXBackground[b.Type], 0,
@@ -500,8 +500,8 @@ void DrawEditorLevel(int Z)
             auto &n = e.NPC;
             if(NPCWidthGFX[n.Type] == 0)
             {
-                XRender::renderTexture(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type],
-                                      vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type],
+                XRender::renderTexture(vScreen[Z].X + n.Location.X + NPCFrameOffsetX[n.Type],
+                                      vScreen[Z].Y + n.Location.Y + NPCFrameOffsetY[n.Type],
                                       n.Location.Width,
                                       n.Location.Height,
                                       GFXNPC[n.Type], 0, n.Frame * n.Location.Height);
@@ -525,14 +525,14 @@ void DrawEditorLevel(int Z)
                     tempLocation.Y = n.Location.Y + n.Location.Height / 2 - tempLocation.Height / 2;
                     B = EditorNPCFrame(int(n.Special), n.Direction);
 
-                    XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[n.Type],
-                                          vScreenY[Z] + tempLocation.Y,
+                    XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX[n.Type],
+                                          vScreen[Z].Y + tempLocation.Y,
                                           tempLocation.Width, tempLocation.Height,
                                           GFXNPC[n.Special], 0, B * tempLocation.Height);
                 }
 
-                XRender::renderTexture(vScreenX[Z] + n.Location.X + NPCFrameOffsetX[n.Type] - NPCWidthGFX[n.Type] / 2 + n.Location.Width / 2,
-                                      vScreenY[Z] + n.Location.Y + NPCFrameOffsetY[n.Type] - NPCHeightGFX[n.Type] + n.Location.Height,
+                XRender::renderTexture(vScreen[Z].X + n.Location.X + NPCFrameOffsetX[n.Type] - NPCWidthGFX[n.Type] / 2 + n.Location.Width / 2,
+                                      vScreen[Z].Y + n.Location.Y + NPCFrameOffsetY[n.Type] - NPCHeightGFX[n.Type] + n.Location.Height,
                                       NPCWidthGFX[n.Type], NPCHeightGFX[n.Type], GFXNPC[n.Type],
                                       0, n.Frame * NPCHeightGFX[n.Type]);
             }
@@ -561,8 +561,8 @@ void DrawEditorLevel(int Z)
                         tempLocation.Y = n.Location.Y;
                     tempLocation.X = n.Location.X + n.Location.Width / 2 - tempLocation.Width / 2;
 
-                    XRender::renderTexture(vScreenX[Z] + tempLocation.X + NPCFrameOffsetX[C],
-                        vScreenY[Z] + tempLocation.Y + NPCFrameOffsetY[C],
+                    XRender::renderTexture(vScreen[Z].X + tempLocation.X + NPCFrameOffsetX[C],
+                        vScreen[Z].Y + tempLocation.Y + NPCFrameOffsetY[C],
                         tempLocation.Width, tempLocation.Height,
                         GFXNPC[C], 0, EditorNPCFrame(C, -1) * tempLocation.Height);
                 }
@@ -577,7 +577,7 @@ void DrawEditorLevel(int Z)
                     tempLocation.X = n.Location.X + n.Location.Width / 2 - 4 - GFX.Chat.w;
                 tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
             }
 
             // and that they can talk
@@ -589,21 +589,21 @@ void DrawEditorLevel(int Z)
                     tempLocation.X = n.Location.X + n.Location.Width / 2 + 4;
                 tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreenX[Z] + tempLocation.X, vScreenY[Z] + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
         {
             if(EditorCursor.Water.Quicksand)
-                XRender::renderRect(vScreenX[Z] + EditorCursor.Location.X, vScreenY[Z] + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
+                XRender::renderRect(vScreen[Z].X + EditorCursor.Location.X, vScreen[Z].Y + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
                     1.f, 1.f, 0.f, 1.f, false);
             else
-                XRender::renderRect(vScreenX[Z] + EditorCursor.Location.X, vScreenY[Z] + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
+                XRender::renderRect(vScreen[Z].X + EditorCursor.Location.X, vScreen[Z].Y + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
                     0.f, 1.f, 1.f, 1.f, false);
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WARPS)
         {
-            XRender::renderRect(vScreenX[Z] + EditorCursor.Location.X, vScreenY[Z] + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
+            XRender::renderRect(vScreen[Z].X + EditorCursor.Location.X, vScreen[Z].Y + EditorCursor.Location.Y, EditorCursor.Location.Width, EditorCursor.Location.Height,
                 1.f, 0.f, 0.f, 1.f, false);
         }
 
@@ -717,8 +717,8 @@ void DrawEditorWorld()
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_TILES)
     {
-        XRender::renderTexture(vScreenX[Z] + EditorCursor.Tile.Location.X,
-            vScreenY[Z] + EditorCursor.Tile.Location.Y,
+        XRender::renderTexture(vScreen[Z].X + EditorCursor.Tile.Location.X,
+            vScreen[Z].Y + EditorCursor.Tile.Location.Y,
             EditorCursor.Tile.Location.Width,
             EditorCursor.Tile.Location.Height,
             GFXTile[EditorCursor.Tile.Type],
@@ -727,8 +727,8 @@ void DrawEditorWorld()
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_SCENES)
     {
-        XRender::renderTexture(vScreenX[Z] + EditorCursor.Scene.Location.X,
-            vScreenY[Z] + EditorCursor.Scene.Location.Y,
+        XRender::renderTexture(vScreen[Z].X + EditorCursor.Scene.Location.X,
+            vScreen[Z].Y + EditorCursor.Scene.Location.Y,
             EditorCursor.Scene.Location.Width,
             EditorCursor.Scene.Location.Height,
             GFXScene[EditorCursor.Scene.Type],
@@ -739,8 +739,8 @@ void DrawEditorWorld()
     {
         if(EditorCursor.WorldLevel.Path)
         {
-            XRender::renderTexture(vScreenX[Z] + EditorCursor.WorldLevel.Location.X,
-                                  vScreenY[Z] + EditorCursor.WorldLevel.Location.Y,
+            XRender::renderTexture(vScreen[Z].X + EditorCursor.WorldLevel.Location.X,
+                                  vScreen[Z].Y + EditorCursor.WorldLevel.Location.Y,
                                   EditorCursor.WorldLevel.Location.Width,
                                   EditorCursor.WorldLevel.Location.Height,
                                   GFXLevelBMP[0], 0, 0);
@@ -748,31 +748,31 @@ void DrawEditorWorld()
 
         if(EditorCursor.WorldLevel.Path2)
         {
-            XRender::renderTexture(vScreenX[Z] + EditorCursor.WorldLevel.Location.X - 16,
-                                  vScreenY[Z] + 8 + EditorCursor.WorldLevel.Location.Y,
+            XRender::renderTexture(vScreen[Z].X + EditorCursor.WorldLevel.Location.X - 16,
+                                  vScreen[Z].Y + 8 + EditorCursor.WorldLevel.Location.Y,
                                   64, 32,
                                   GFXLevelBMP[29], 0, 0);
         }
 
         if(GFXLevelBig[EditorCursor.WorldLevel.Type])
         {
-            XRender::renderTexture(vScreenX[Z] + EditorCursor.WorldLevel.Location.X - (GFXLevelWidth[EditorCursor.WorldLevel.Type] - 32) / 2.0,
-                                  vScreenY[Z] + EditorCursor.WorldLevel.Location.Y - GFXLevelHeight[EditorCursor.WorldLevel.Type] + 32,
+            XRender::renderTexture(vScreen[Z].X + EditorCursor.WorldLevel.Location.X - (GFXLevelWidth[EditorCursor.WorldLevel.Type] - 32) / 2.0,
+                                  vScreen[Z].Y + EditorCursor.WorldLevel.Location.Y - GFXLevelHeight[EditorCursor.WorldLevel.Type] + 32,
                                   GFXLevelWidth[EditorCursor.WorldLevel.Type], GFXLevelHeight[EditorCursor.WorldLevel.Type],
                                   GFXLevelBMP[EditorCursor.WorldLevel.Type], 0, 32 * LevelFrame[EditorCursor.WorldLevel.Type]);
         }
         else
         {
-            XRender::renderTexture(vScreenX[Z] + EditorCursor.WorldLevel.Location.X,
-                                  vScreenY[Z] + EditorCursor.WorldLevel.Location.Y,
+            XRender::renderTexture(vScreen[Z].X + EditorCursor.WorldLevel.Location.X,
+                                  vScreen[Z].Y + EditorCursor.WorldLevel.Location.Y,
                                   EditorCursor.WorldLevel.Location.Width, EditorCursor.WorldLevel.Location.Height,
                                   GFXLevelBMP[EditorCursor.WorldLevel.Type], 0, 32 * LevelFrame[EditorCursor.WorldLevel.Type]);
         }
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_PATHS)
     {
-        XRender::renderTexture(vScreenX[Z] + EditorCursor.WorldPath.Location.X,
-            vScreenY[Z] + EditorCursor.WorldPath.Location.Y,
+        XRender::renderTexture(vScreen[Z].X + EditorCursor.WorldPath.Location.X,
+            vScreen[Z].Y + EditorCursor.WorldPath.Location.Y,
             EditorCursor.WorldPath.Location.Width,
             EditorCursor.WorldPath.Location.Height,
             GFXPath[EditorCursor.WorldPath.Type],
@@ -780,9 +780,9 @@ void DrawEditorWorld()
     }
     else if(EditorCursor.Mode == OptCursor_t::WLD_MUSIC)
     {
-        XRender::renderRect(vScreenX[Z] + EditorCursor.WorldMusic.Location.X, vScreenY[Z] + EditorCursor.WorldMusic.Location.Y, 32, 32,
+        XRender::renderRect(vScreen[Z].X + EditorCursor.WorldMusic.Location.X, vScreen[Z].Y + EditorCursor.WorldMusic.Location.Y, 32, 32,
             1.f, 0.f, 1.f, 1.f, false);
-        SuperPrint(std::to_string(EditorCursor.WorldMusic.Type), 1, vScreenX[Z] + EditorCursor.WorldMusic.Location.X + 2, vScreenY[Z] + EditorCursor.WorldMusic.Location.Y + 2);
+        SuperPrint(std::to_string(EditorCursor.WorldMusic.Type), 1, vScreen[Z].X + EditorCursor.WorldMusic.Location.X + 2, vScreen[Z].Y + EditorCursor.WorldMusic.Location.Y + 2);
     }
 
     double X = EditorCursor.X;

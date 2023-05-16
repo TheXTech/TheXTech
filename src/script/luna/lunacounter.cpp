@@ -364,9 +364,9 @@ void DeathCounter::Draw(int screenZ) const
         else
             GetvScreenCanonical(screenZ, &l, &t);
         if(vScreen[screenZ].Height > 600)
-            ScreenTop = -t + vScreenY[screenZ];
+            ScreenTop = -t + vScreen[screenZ].Y;
         if(vScreen[screenZ].Width > 800)
-            HUDLeft = -l + vScreenX[screenZ];
+            HUDLeft = -l + vScreen[screenZ].X;
     }
 
     XRender::offsetViewportIgnore(true);
