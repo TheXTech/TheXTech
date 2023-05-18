@@ -288,6 +288,8 @@ endif()
 
 include(cmake/library_zlib.cmake)
 
+add_definitions("-DMOONDUST_LOGGER_FILENAME_PREFIX=\"TheXTech\"")
+
 if(THEXTECH_ENABLE_TTF_SUPPORT)
     option(THEXTECH_ENABLE_TTF_HARFBUZZ "Enable the HarfBuzz library use" OFF)
     mark_as_advanced(THEXTECH_ENABLE_TTF_HARFBUZZ) # Temporarily disable
