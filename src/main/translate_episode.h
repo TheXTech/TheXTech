@@ -29,6 +29,7 @@
 class TranslateEpisode
 {
     std::unordered_map<int, std::string> m_scriptLines;
+    std::unordered_map<std::string, std::string> m_scriptTrId;
 
 public:
     TranslateEpisode();

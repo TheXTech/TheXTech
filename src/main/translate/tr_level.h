@@ -20,8 +20,11 @@
 
 #pragma once
 #ifndef XTECH_TRANSLATE_EPISODE
+#include <unordered_map>
+#include <vector>
 #include <json/json.hpp>
 #include <Logger/logger.h>
+#include <Utils/strings.h>
 #include "globals.h"
 #include "layers.h"
 #endif /* XTECH_TRANSLATE_EPISODE */
@@ -29,14 +32,32 @@
 class TrLevelParser : public nlohmann::json_sax<nlohmann::json>
 {
 public:
-    TrLevelParser() = default;
+    TrLevelParser()
+    {
+        // Build the map of tr-id objects
+        for(int i = 1; i <= numNPCs; ++i)
+        {
+            auto &it = m_trIdMap[GetS(NPC[i].Text)];
+            it.push_back(NPC[i].Text);
+        }
+
+        for(int i = 0; i < numEvents; ++i)
+        {
+            auto &it = m_trIdMap[GetS(Events[i].Text)];
+            it.push_back(Events[i].Text);
+        }
+    }
+
     TrLevelParser(const TrLevelParser&) = default;
     ~TrLevelParser() = default;
+
+    std::unordered_map<std::string, std::vector<stringindex_t> > m_trIdMap;
 
     std::string m_wantedKey;
     std::string m_curKey;
 
     int m_outKey = -1;
+    std::string m_outTrId;
     std::string m_outValue;
 
     enum Where
@@ -50,17 +71,31 @@ public:
 
     void flushData()
     {
-        if(m_outKey < 0 || m_outValue.empty())
+        if((m_outKey < 0 && m_outTrId.empty()) || m_outValue.empty())
             return;
 
-        D_pLogDebug("JSON: Written %d into %s", m_outKey, m_outValue.c_str());
+        if(!m_outTrId.empty()) // By TrId
+        {
+            D_pLogDebug("JSON: Written %s into %s", m_outTrId.c_str(), m_outValue.c_str());
+            auto it = m_trIdMap.find(m_outTrId);
+            if(it != m_trIdMap.end())
+            {
+                for(auto &k : it->second)
+                    SetS(k, m_outValue);
+            }
+        }
+        else // By object Index
+        {
+            D_pLogDebug("JSON: Written %d into %s", m_outKey, m_outValue.c_str());
 
-        if(m_where == W_NPC_OBJ && m_outKey < numNPCs)
-            SetS(NPC[m_outKey + 1].Text, m_outValue);
-        else if(m_where == W_EVENT_OBJ && m_outKey < numEvents)
-            SetS(Events[m_outKey].Text, m_outValue);
+            if(m_where == W_NPC_OBJ && m_outKey < numNPCs)
+                SetS(NPC[m_outKey + 1].Text, m_outValue);
+            else if(m_where == W_EVENT_OBJ && m_outKey < numEvents)
+                SetS(Events[m_outKey].Text, m_outValue);
+        }
 
         m_outKey = -1;
+        m_outTrId.clear();
         m_outValue.clear();
     }
 
@@ -98,7 +133,9 @@ public:
 
     bool string(string_t& val)
     {
-        if(m_where == W_NPC_OBJ && m_curKey == "talk")
+        if((m_where == W_NPC_OBJ || m_where == W_EVENT_OBJ) && m_curKey == "tr-id")
+            m_outTrId = val;
+        else if(m_where == W_NPC_OBJ && m_curKey == "talk")
             m_outValue = val;
         else if(m_where == W_EVENT_OBJ && m_curKey == "msg")
             m_outValue = val;

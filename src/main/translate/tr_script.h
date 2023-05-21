@@ -20,6 +20,8 @@
 
 #pragma once
 #ifndef XTECH_TRANSLATE_EPISODE
+#include <unordered_map>
+#include <vector>
 #include <json/json.hpp>
 #include <Logger/logger.h>
 #endif /* XTECH_TRANSLATE_EPISODE */
@@ -32,10 +34,12 @@ public:
     ~TrScriptParser() = default;
 
     std::unordered_map<int, std::string> *m_outputLines;
+    std::unordered_map<std::string, std::string> *m_outputTrIdLines;
     std::string m_wantedKey;
     std::string m_curKey;
 
     int m_outKey = -1;
+    std::string m_outTrId;
     std::string m_outValue;
 
     enum Where
@@ -49,14 +53,22 @@ public:
 
     void flushData()
     {
-        if(m_outKey < 0 || m_outValue.empty())
+        if((m_outKey < 0 && m_outTrId.empty()) || m_outValue.empty())
             return;
 
-        D_pLogDebug("JSON: Written %d into %s", m_outKey, m_outValue.c_str());
-
-        m_outputLines->insert({m_outKey, m_outValue});
+        if(!m_outTrId.empty()) // By TrId
+        {
+            D_pLogDebug("JSON: Written %s into %s", m_outTrId.c_str(), m_outValue.c_str());
+            m_outputTrIdLines->insert({m_outTrId, m_outValue});
+        }
+        else
+        {
+            D_pLogDebug("JSON: Written %d into %s", m_outKey, m_outValue.c_str());
+            m_outputLines->insert({m_outKey, m_outValue});
+        }
 
         m_outKey = -1;
+        m_outTrId.clear();
         m_outValue.clear();
     }
 
@@ -94,7 +106,9 @@ public:
 
     bool string(string_t& val)
     {
-        if(m_where == W_LINES_OBJ && m_curKey == "tr")
+        if(m_where == W_LINES_OBJ && m_curKey == "tr-id")
+            m_outTrId = val;
+        else if(m_where == W_LINES_OBJ && m_curKey == "tr")
             m_outValue = val;
         return true;
     }

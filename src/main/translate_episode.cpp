@@ -24,9 +24,13 @@
 #include <Utils/strings.h>
 #include <fmt_format_ne.h>
 #include <fstream>
+#include <unordered_map>
+#include <vector>
 
 #include "globals.h"
+#ifndef LAYERS_H // Workaround for Clazy
 #include "layers.h"
+#endif
 
 #include "translate_episode.h"
 #define XTECH_TRANSLATE_EPISODE
@@ -173,6 +177,7 @@ void TranslateEpisode::loadWorldTranslation(const std::string& key)
 void TranslateEpisode::loadLunaScript(const std::string& key)
 {
     m_scriptLines.clear();
+    m_scriptTrId.clear();
 
     if(CurrentLanguage.empty())
         return; // Language code is required!
@@ -185,6 +190,7 @@ void TranslateEpisode::loadLunaScript(const std::string& key)
     TrScriptParser parser;
     parser.m_wantedKey = key;
     parser.m_outputLines = &m_scriptLines;
+    parser.m_outputTrIdLines = &m_scriptTrId;
 
     FILE *f_in = Files::utf8_fopen(langFile.c_str(), "r");
     if(!f_in)
@@ -226,10 +232,20 @@ bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
 
 void TranslateEpisode::trScriptLine(std::string& data, int line)
 {
-    if(m_scriptLines.empty())
+    if(m_scriptLines.empty() && m_scriptTrId.empty())
         return;
+
+    if(!m_scriptTrId.empty())
+    {
+        auto f = m_scriptTrId.find(data);
+        if(f != m_scriptTrId.end())
+        {
+            data = f->second;
+            return; // translated by TrId
+        }
+    }
 
     auto f = m_scriptLines.find(line);
     if(f != m_scriptLines.end())
-        data = f->second;
+        data = f->second; // translated by line number
 }
