@@ -32,6 +32,8 @@ namespace XLanguage
  */
 void init();
 
+void initManual();
+
 
 void splitRegion(char delimiter);
 

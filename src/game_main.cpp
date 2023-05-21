@@ -213,8 +213,6 @@ int GameMain(const CmdLineSetup_t &setup)
     initGameStrings();
     StartMenu = true;
 
-    XLanguage::init();
-
     if(!CurrentLanguage.empty())
     {
         XTechTranslate translator;

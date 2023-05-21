@@ -586,6 +586,7 @@ int main(int argc, char**argv)
             CurrentLangDialect.clear();
             XLanguage::splitRegion('-');
             XLanguage::splitRegion('_');
+            XLanguage::initManual();
 #ifdef DEBUG_BUILD
             std::cerr << "Debug: Manually selected language: " << CurrentLanguage << (CurrentLangDialect.empty() ? "" : "-" + CurrentLangDialect) << std::endl;
             std::cerr.flush();

@@ -40,7 +40,7 @@
 #include "translate/tr_script.h"
 
 
-static std::string getTrFile(const std::string &subDir, const std::string &episodePath = std::string())
+static std::string getTrFileLang(const std::string &lang, const std::string &dialect, const std::string &subDir, const std::string &episodePath = std::string())
 {
     std::string langFile;
 
@@ -49,19 +49,19 @@ static std::string getTrFile(const std::string &subDir, const std::string &episo
                         episodePath;
 
     // Trying to find the dialect-specific translation
-    if(!CurrentLangDialect.empty())
+    if(!dialect.empty())
     {
         if(!subDir.empty())
         {
             // Try to find the translation at the i18n at data sub-directory
-            langFile = p + fmt::format_ne("{0}/i18n/translation_{1}-{2}.json", subDir, CurrentLanguage.c_str(), CurrentLangDialect.c_str());
+            langFile = p + fmt::format_ne("{0}/i18n/translation_{1}-{2}.json", subDir, lang.c_str(), dialect.c_str());
             if(!Files::fileExists(langFile))
                 langFile.clear();
 
             // Try to find the translation at the data sub-directory
             if(langFile.empty())
             {
-                langFile = p + fmt::format_ne("{0}/translation_{1}-{2}.json", subDir, CurrentLanguage.c_str(), CurrentLangDialect.c_str());
+                langFile = p + fmt::format_ne("{0}/translation_{1}-{2}.json", subDir, lang.c_str(), dialect.c_str());
                 if(!Files::fileExists(langFile))
                     langFile.clear();
             }
@@ -70,7 +70,7 @@ static std::string getTrFile(const std::string &subDir, const std::string &episo
         // Now try at the i18n at episode root
         if(langFile.empty())
         {
-            langFile = p + fmt::format_ne("i18n/translation_{0}-{1}.json", CurrentLanguage.c_str(), CurrentLangDialect.c_str());
+            langFile = p + fmt::format_ne("i18n/translation_{0}-{1}.json", lang.c_str(), dialect.c_str());
             if(!Files::fileExists(langFile))
                 langFile.clear();
         }
@@ -78,7 +78,7 @@ static std::string getTrFile(const std::string &subDir, const std::string &episo
         // Now try at the episode root
         if(langFile.empty())
         {
-            langFile = p + fmt::format_ne("translation_{0}-{1}.json", CurrentLanguage.c_str(), CurrentLangDialect.c_str());
+            langFile = p + fmt::format_ne("translation_{0}-{1}.json", lang.c_str(), dialect.c_str());
             if(!Files::fileExists(langFile))
                 langFile.clear();
         }
@@ -91,14 +91,14 @@ static std::string getTrFile(const std::string &subDir, const std::string &episo
         if(!subDir.empty())
         {
             // Try to find the translation at the i18n at data sub-directory
-            langFile = p + fmt::format_ne("{0}/i18n/translation_{1}.json", subDir, CurrentLanguage.c_str());
+            langFile = p + fmt::format_ne("{0}/i18n/translation_{1}.json", subDir, lang.c_str());
             if(!Files::fileExists(langFile))
                 langFile.clear();
 
             // Try to find the translation at the data sub-directory
             if(langFile.empty())
             {
-                langFile = p + fmt::format_ne("{0}/translation_{1}.json", subDir, CurrentLanguage.c_str());
+                langFile = p + fmt::format_ne("{0}/translation_{1}.json", subDir, lang.c_str());
                 if(!Files::fileExists(langFile))
                     langFile.clear();
             }
@@ -107,7 +107,7 @@ static std::string getTrFile(const std::string &subDir, const std::string &episo
         // Now try at the i18n at episode root
         if(langFile.empty())
         {
-            langFile = p + fmt::format_ne("i18n/translation_{0}.json", CurrentLanguage.c_str());
+            langFile = p + fmt::format_ne("i18n/translation_{0}.json", lang.c_str());
             if(!Files::fileExists(langFile))
                 langFile.clear();
         }
@@ -115,11 +115,22 @@ static std::string getTrFile(const std::string &subDir, const std::string &episo
         // Now try at the episode root
         if(langFile.empty())
         {
-            langFile = p + fmt::format_ne("translation_{0}.json", CurrentLanguage.c_str());
+            langFile = p + fmt::format_ne("translation_{0}.json", lang.c_str());
             if(!Files::fileExists(langFile))
                 langFile.clear();
         }
     }
+
+    return langFile;
+}
+
+
+static std::string getTrFile(const std::string &subDir, const std::string &episodePath = std::string())
+{
+    std::string langFile = getTrFileLang(CurrentLanguage, CurrentLangDialect, subDir, episodePath);
+
+    if(langFile.empty()) // If no language detected or invalid language set, fallback to English
+        langFile = getTrFileLang("en", "gb", subDir, episodePath);
 
     return langFile;
 }
@@ -130,9 +141,6 @@ TranslateEpisode::TranslateEpisode()
 
 void TranslateEpisode::loadLevelTranslation(const std::string& key)
 {
-    if(CurrentLanguage.empty())
-        return; // Language code is required!
-
     std::string langFile = getTrFile(FileName);
 
     if(langFile.empty())
@@ -153,9 +161,6 @@ void TranslateEpisode::loadLevelTranslation(const std::string& key)
 
 void TranslateEpisode::loadWorldTranslation(const std::string& key)
 {
-    if(CurrentLanguage.empty())
-        return; // Language code is required!
-
     std::string langFile = getTrFile(FileNameWorld);
 
     if(langFile.empty())
@@ -178,9 +183,6 @@ void TranslateEpisode::loadLunaScript(const std::string& key)
 {
     m_scriptLines.clear();
     m_scriptTrId.clear();
-
-    if(CurrentLanguage.empty())
-        return; // Language code is required!
 
     std::string langFile = getTrFile(FileName);
 
@@ -206,9 +208,6 @@ bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
                                          const std::string& worldFile,
                                          std::string& output)
 {
-    if(CurrentLanguage.empty())
-        return false; // Language code is required!
-
     std::string langFile = getTrFile(std::string(), episodePath);
 
     if(langFile.empty())

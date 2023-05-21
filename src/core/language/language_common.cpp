@@ -47,6 +47,9 @@ static bool detectSetup()
     if(CurrentLanguage.empty())
         return false; // Language code is required!
 
+    langEngineFile.clear();
+    langAssetsFile.clear();
+
     if(!CurrentLangDialect.empty())
     {
         langEngineFile = AppPathManager::languagesDir() + fmt::format_ne("thextech_{0}-{1}.json", CurrentLanguage.c_str(), CurrentLangDialect.c_str());
@@ -76,10 +79,6 @@ static bool detectSetup()
 void XLanguage::init()
 {
     pLogDebug("Selecting best localization...");
-
-    // try command-line set language first
-    if(!CurrentLanguage.empty() && detectSetup())
-        return;
 
 #ifndef THEXTECH_DISABLE_SDL_LOCALE
     SDL_Locale *loc = SDL_GetPreferredLocales();
@@ -113,6 +112,21 @@ void XLanguage::init()
     detectSetup();
 }
 
+void XLanguage::initManual()
+{
+    if(!CurrentLanguage.empty() && detectSetup())
+        return;
+
+    // Fall back to English if manually-selected language is invalid
+    CurrentLanguage = "en";
+    CurrentLangDialect = "gb";
+
+    if(!detectSetup())
+    {
+        CurrentLanguage.clear();
+        CurrentLangDialect.clear();
+    }
+}
 
 void XLanguage::splitRegion(char delimiter)
 {
