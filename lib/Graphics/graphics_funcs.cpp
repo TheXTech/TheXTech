@@ -20,7 +20,9 @@
 #include <array>
 
 #include <SDL2/SDL_video.h>
-#include "sdl_proxy/sdl_assert.h"
+#ifndef SDL_SDL_ASSERT_H
+#   include "sdl_proxy/sdl_assert.h"
+#endif
 
 #include <Utils/files.h>
 #include <FileMapper/file_mapper.h>
@@ -29,7 +31,7 @@
 #include <Logger/logger.h>
 
 #ifdef DEBUG_BUILD
-#include <Utils/elapsed_timer.h>
+#   include <Utils/elapsed_timer.h>
 #endif
 
 #include "image_size.h"
@@ -37,7 +39,7 @@
 //#include <common_features/engine_resources.h>
 
 #ifdef _WIN32
-#include <SDL2/SDL_syswm.h>
+#   include <SDL2/SDL_syswm.h>
 #endif
 #include <FreeImageLite.h>
 

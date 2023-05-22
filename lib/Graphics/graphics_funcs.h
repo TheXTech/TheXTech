@@ -17,7 +17,9 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
-#include "sdl_proxy/sdl_stdinc.h"
+#ifndef SDL_SDL_STDINC_H
+#   include "sdl_proxy/sdl_stdinc.h"
+#endif
 
 #include <string>
 #include <vector>
