@@ -182,7 +182,7 @@ static int isDebuggerPresent()
     "%s"
 
 #define STR_EXPAND(tok) #tok
-#define STR(tok) STR_EXPAND(tok)
+#define STRR(tok) STR_EXPAND(tok)
 
 static const char *g_messageToUser =
     "================================================\n"
@@ -195,10 +195,10 @@ static const char *g_messageToUser =
     "Build date: " V_DATE_OF_BUILD "\n"
     "================================================\n"
 #ifndef THEXTECH_NO_SDL_BUILD
-    "SDL2 " STR(SDL_MAJOR_VERSION) "." STR(SDL_MINOR_VERSION) "." STR(SDL_PATCHLEVEL) "\n"
+    "SDL2 " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) "\n"
 #endif
 #if !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD)
-    "SDL Mixer X " STR(SDL_MIXER_MAJOR_VERSION) "." STR(SDL_MIXER_MINOR_VERSION) "." STR(SDL_MIXER_PATCHLEVEL) "\n"
+    "SDL Mixer X " STRR(SDL_MIXER_MAJOR_VERSION) "." STRR(SDL_MIXER_MINOR_VERSION) "." STRR(SDL_MIXER_PATCHLEVEL) "\n"
 #endif
     "================================================\n"
     " Please send this log file to the developers by one of ways:\n"
@@ -386,6 +386,47 @@ static void removePersonalData(std::string &log)
 
 #endif // DO_REMOVE_PERSONAL_DATA
 
+#if defined(__WII__) || defined(__WIIU__)
+#   define USE_PPC_BACKTRACE
+int ppc_backtrace(void **buffer, int size)
+{
+    int depth;
+    uint32_t stackptr, lr, *addr;
+
+    // get link register
+    asm volatile ("mflr %0" : "=r"(lr));
+
+    // link register is assigned to depth[0]
+    buffer[0] = (void *) (lr - 4);
+
+    // get stackpointer
+    asm volatile("stw %%sp, 0(%0)" : : "b" ((uint32_t)&stackptr));
+
+    // assign stack ptr to address
+    addr = (uint32_t *)stackptr;
+
+    // get the frames
+    if (*addr)
+    {
+        // skip first two frames because this function
+        // does create a stackframe but doesn't set lr on
+        // the previous one.
+        addr = (uint32_t *)*addr;
+        if (*addr)
+            addr = (uint32_t *)*addr;
+
+    }
+
+    for(depth = 1; (depth < size && *addr); ++depth)
+    {
+        uint32_t * next = (uint32_t *) *addr;
+        buffer[depth] = (void *) (*(addr + 1) - 4);
+        addr = next;
+    }
+
+    return depth;
+}
+#endif
 
 static std::string getStacktrace()
 {
@@ -394,6 +435,23 @@ static std::string getStacktrace()
 
 #if defined(_WIN32)
     GetStackWalk(bkTrace);
+
+#elif defined(USE_PPC_BACKTRACE)
+    void  *array[400];
+    char stack_entry[25];
+    int size;
+
+    D_pLogDebugNA("Requesting backtrace...");
+    size = ppc_backtrace(array, 400);
+
+    D_pLogDebugNA("Filling std::string...");
+    for(int j = 0; j < size; j++)
+    {
+        SDL_snprintf(stack_entry, 25, "- 0x%08x\n", (uint32_t)array[j]);
+        bkTrace.append(stack_entry);
+    }
+
+    D_pLogDebugNA("DONE!");
 
 #elif Backtrace_FOUND
     void  *array[400];
