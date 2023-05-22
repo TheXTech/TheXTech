@@ -452,15 +452,19 @@ if(NOT ANDROID
 endif()
 
 
-if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT VITA AND NOT PGE_MIN_PORT)
-    list(APPEND LIB_SRC
-        ${FILEMAPPER_SRCS}
-        ${STACK_WALKER_SRCS}
-        lib/CrashHandler/crash_handler.cpp
-    )
-    add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
-    set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
+if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_SWITCH AND NOT VITA AND NOT PGE_MIN_PORT)
+    list(APPEND LIB_SRC ${FILEMAPPER_SRCS})
+    set(THEXTECH_FILEMAPPER_SUPPORTED ON)
 endif()
+
+
+list(APPEND LIB_SRC
+    ${STACK_WALKER_SRCS}
+    lib/CrashHandler/crash_handler.cpp
+)
+add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
+set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
+
 
 if(APPLE)
     file(GLOB PGE_FILE_ICONS "${CMAKE_CURRENT_SOURCE_DIR}/resources/file_icons/*.icns")
@@ -975,6 +979,10 @@ endif()
 
 if(THEXTECH_INTERPROC_SUPPORTED)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_INTERPROC_SUPPORTED)
+endif()
+
+if(THEXTECH_FILEMAPPER_SUPPORTED)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_FILEMAPPER_SUPPORTED)
 endif()
 
 if(THEXTECH_CRASHHANDLER_SUPPORTED)

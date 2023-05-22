@@ -64,8 +64,26 @@
 
 #endif //PGE_ENGINE_DEBUG
 
-#if !defined(_WIN32) && !defined(__SWITCH__) // Unsupported signals by Windows
+// Exclude platforms that don't have SIG_INFO support
+#if    !defined(_WIN32) \
+    && !defined(__3DS__) \
+    && !defined(__WII__) \
+    && !defined(__WIIU__) \
+    && !defined(__SWITCH__) \
+    && !defined(VITA)
 #   define HAS_SIG_INFO
+#endif
+
+// Exclude personal data removal from platforms where API doesn't allows to recognise the user and/or home directory
+#if    !defined(VITA) \
+    && !defined(__3DS__) \
+    && !defined(__WII__) \
+    && !defined(__WIIU__)  \
+    && !defined(__SWITCH__) \
+    && !defined(__EMSCRIPTEN__) \
+    && !defined(__ANDROID__) \
+    && !defined(__HAIKU__)
+#   define DO_REMOVE_PERSONAL_DATA
 #endif
 
 
@@ -282,6 +300,7 @@ static void androidDumpBacktrace(std::ostringstream &os, void **buffer, size_t c
 }
 #endif
 
+#ifdef DO_REMOVE_PERSONAL_DATA
 static std::string getCurrentUserName()
 {
     std::string user;
@@ -295,9 +314,6 @@ static std::string getCurrentUserName()
     size_t nCnt = WideCharToMultiByte(CP_UTF8, 0, userNameW, usernameLen, userName, 256, 0, 0);
     userName[nCnt] = '\0';
     user = std::string(userName);
-
-#elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__HAIKU__) || defined(__SWITCH__)
-    user = "user"; // No way to get user, here is SINGLE generic user
 
 #else
     struct passwd *pwd = getpwuid(getuid());
@@ -320,9 +336,6 @@ static std::string getCurrentHomePath()
     size_t nCnt = WideCharToMultiByte(CP_UTF8, 0, homeDirW, -1, homeDir, MAX_PATH * 4, 0, 0);
     homeDir[nCnt] = '\0';
     homedir = std::string(homeDir);
-
-#elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__SWITCH__)
-    homedir = "/"; // No way to get user, here is SINGLE generic user
 
 #elif defined(__HAIKU__)
     {
@@ -371,6 +384,9 @@ static void removePersonalData(std::string &log)
     replaceStr(log, user, "anonymouse");
 }
 
+#endif // DO_REMOVE_PERSONAL_DATA
+
+
 static std::string getStacktrace()
 {
     D_pLogDebugNA("Initializing std::string...");
@@ -410,7 +426,10 @@ static std::string getStacktrace()
     bkTrace = "<Stack trace not supported for this platform!>";
 #endif
 
+#ifdef DO_REMOVE_PERSONAL_DATA
     removePersonalData(bkTrace);
+#endif // DO_REMOVE_PERSONAL_DATA
+
     return bkTrace;
 }
 
