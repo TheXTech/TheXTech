@@ -516,17 +516,20 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
 
     try
     {
-        //throw;
+        std::rethrow_exception(std::current_exception());
     }
     catch(const std::exception &e)
     {
-        exc.append(__FUNCTION__);
-        exc.append(" caught unhandled exception. what(): ");
+        exc.append(" caught an unhandled exception. [");
         exc.append(e.what());
+        exc.append("]");
+    }
+    catch(const std::bad_exception &)
+    {
+        exc.append(" caught a bad unhandled exception.");
     }
     catch(...)
     {
-        exc.append(__FUNCTION__);
         exc.append(" caught unhandled exception. (unknown) ");
     }
 
