@@ -421,10 +421,10 @@ static std::string getStacktrace()
 
 static LLVM_ATTRIBUTE_NORETURN void abortEngine(int signal)
 {
+    CloseLog();
 #ifndef THEXTECH_NO_SDL_BUILD
     SDL_Quit();
 #endif
-    CloseLog();
     exit(signal);
 }
 
@@ -516,7 +516,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     {
         std::string stack = getStacktrace();
 
-#if defined(HAS_SIG_INFO)
+#   if defined(HAS_SIG_INFO)
         if(siginfo)
         {
             switch(siginfo->si_code)
@@ -546,7 +546,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
             }
         }
         else
-#endif
+#   endif // HAS_SIG_INFO
         {
             pLogFatal("<Physical memory address error>\n"
                       STACK_FORMAT,
@@ -580,7 +580,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         abortEngine(signal);
     }
 
-#endif
+#endif // NOT _WIN32
 
     case SIGFPE:
     {
@@ -622,7 +622,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
             }
         }
         else
-#endif
+#endif // HAS_SIG_INFO
         {
             pLogFatal("<wrong arithmetical operation>\n"
                       STACK_FORMAT,
@@ -683,7 +683,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
             }
         }
         else
-#endif// _WIN32
+#endif // HAS_SIG_INFO
         {
             pLogFatal("<Segmentation fault crash!>\n"
                       STACK_FORMAT,
@@ -759,7 +759,7 @@ void CrashHandler::initSigs()
     sigaction(SIGSEGV, &act, nullptr);
     sigaction(SIGINT,  &act, nullptr);
     sigaction(SIGABRT, &act, nullptr);
-#else
+#else // HAS_SIG_INFO
     signal(SIGILL,  &handle_signalWIN32);
     signal(SIGFPE,  &handle_signalWIN32);
     signal(SIGSEGV, &handle_signalWIN32);
@@ -772,6 +772,6 @@ void CrashHandler::initSigs()
     signal(SIGBUS, &handle_signalWIN32);
     signal(SIGURG, &handle_signalWIN32);
 #   endif
-#endif
+#endif // HAS_SIG_INFO
 }
 /* Signals End */
