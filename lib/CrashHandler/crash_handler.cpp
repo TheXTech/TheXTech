@@ -19,6 +19,7 @@
 
 
 #include "sdl_proxy/sdl_head.h"
+#include "sdl_proxy/sdl_assert.h"
 
 #ifndef THEXTECH_NO_SDL_BUILD
 #include <SDL2/SDL_version.h>
@@ -718,6 +719,27 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     }
 }
 
+#ifndef THEXTECH_NO_SDL_BUILD
+static SDL_AssertState custom_sdl_handler(const SDL_AssertData *data, void *userdata)
+{
+    std::string stack = getStacktrace();
+    pLogFatal("<Assertion condition has failed>:\n"
+              "---------------------------------------------------------\n"
+              "File: %s(%d)\n"
+              "Function: %s\n"
+              "Condition: %s\n"
+              "---------------------------------------------------------\n"
+              STACK_FORMAT,
+              data->filename, data->linenum,
+              data->function,
+              data->condition,
+              stack.c_str(),
+              g_messageToUser);
+
+    return SDL_GetDefaultAssertionHandler()(data, userdata);
+}
+#endif
+
 #if defined(HAS_SIG_INFO)
 static struct sigaction act;
 #else
@@ -737,6 +759,10 @@ void CrashHandler::initSigs()
 #ifdef PGE_ENGINE_DEBUG
     if(isDebuggerPresent())
         return; // Don't initialize crash handlers on attached debugger
+#endif
+
+#ifndef THEXTECH_NO_SDL_BUILD
+    SDL_SetAssertionHandler(&custom_sdl_handler, NULL);
 #endif
 
     std::set_new_handler(&crashByFlood);
