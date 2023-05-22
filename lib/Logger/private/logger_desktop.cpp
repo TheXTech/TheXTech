@@ -18,8 +18,7 @@
  */
 
 #if defined(__WIN32__) || defined(__GDK__)
-#include <handleapi.h>
-#include <fileapi.h>
+#include <windows.h>
 #endif
 
 #define LOGGER_INTERNAL
