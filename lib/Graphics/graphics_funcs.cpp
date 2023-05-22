@@ -25,7 +25,9 @@
 #endif
 
 #include <Utils/files.h>
-#include <FileMapper/file_mapper.h>
+#ifdef THEXTECH_FILEMAPPER_SUPPORTED
+#   include <FileMapper/file_mapper.h>
+#endif
 
 #include "graphics_funcs.h"
 #include <Logger/logger.h>
@@ -65,7 +67,7 @@ FIBITMAP *GraphicsHelps::loadImage(const std::string &file, bool convertTo32bit)
     loadingTime.start();
     fReadTime.start();
 #endif
-#if  defined(__unix__) || defined(__APPLE__) || defined(_WIN32) || defined(__HAIKU__)
+#if defined(THEXTECH_FILEMAPPER_SUPPORTED)
     FileMapper fileMap;
 
     if(!fileMap.open_file(file))
