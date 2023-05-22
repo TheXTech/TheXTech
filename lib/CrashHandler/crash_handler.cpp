@@ -17,9 +17,12 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
-
-#include "sdl_proxy/sdl_head.h"
-#include "sdl_proxy/sdl_assert.h"
+#ifndef SDL_HEAD_HHHHHH
+#   include "sdl_proxy/sdl_head.h"
+#endif
+#ifndef SDL_SDL_ASSERT_H
+#   include "sdl_proxy/sdl_assert.h"
+#endif
 
 #ifndef THEXTECH_NO_SDL_BUILD
 #include <SDL2/SDL_version.h>
