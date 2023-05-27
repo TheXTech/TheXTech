@@ -227,6 +227,11 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         {
             npc.special_data = n.Special;
         }
+        // Star ID if >0
+        else if(n.Type == NPCID_STAR_SMB3 || n.Type == NPCID_STAR_SMW)
+        {
+            npc.special_data = int(n.Special);
+        }
         // Legacy and custom behaviors
         else if(find_Variant_Data(n.Type) != nullptr)
         {

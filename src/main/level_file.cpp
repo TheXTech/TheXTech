@@ -548,6 +548,12 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
+        if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW)
+        {
+            npc.Special = n.special_data;
+            npc.DefaultSpecial = int(npc.Special);
+        }
+
         if(compatModern && isSmbx64)
         {
             // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
@@ -670,14 +676,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
         else if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW) // Is a star
         {
-            bool tempBool = false;
+            bool starFound = false;
             for(const auto& star : Star)
             {
-                if(star.level == FileNameFull && (star.Section == npc.Section || star.Section == -1))
-                    tempBool = true;
+                bool bySection = int(npc.Special) <= 0 && (star.Section == npc.Section || star.Section == -1);
+                bool byId = int(npc.Special) > 0 && -star.Section == int(npc.Special);
+                if(star.level == FileNameFull && (bySection || byId))
+                    starFound = true;
             }
 
-            if(tempBool)
+            if(starFound)
             {
                 npc.Special = 1;
                 npc.DefaultSpecial = 1;
