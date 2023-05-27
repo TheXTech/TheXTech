@@ -90,7 +90,7 @@ RangeArr<float, 0, maxSections> AutoY;
 int numStars = 0;
 RangeArr<Water_t, 0, maxWater> Water;
 int numWater = 0;
-RangeArr<Star_t, 1, maxStarsNum> Star;
+std::vector<Star_t> Star;
 std::string GoToLevel;
 bool GoToLevelNoGameThing = false;
 std::string StartLevel;
@@ -574,7 +574,6 @@ void initAll()
     AutoX.fill(0.f);
     AutoY.fill(0.f);
     Water.fill(Water_t());
-    Star.fill(Star_t());
     // FirstBlock.fill(0);
     // LastBlock.fill(0);
     iBlock.fill(0);
