@@ -680,7 +680,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             for(const auto& star : Star)
             {
                 bool bySection = int(npc.Special) <= 0 && (star.Section == npc.Section || star.Section == -1);
-                bool byId = int(npc.Special) > 0 && -star.Section == int(npc.Special);
+                bool byId = int(npc.Special) > 0 && -(star.Section + 100) == int(npc.Special);
                 if(star.level == FileNameFull && (bySection || byId))
                     starFound = true;
             }

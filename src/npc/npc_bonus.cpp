@@ -622,7 +622,7 @@ void TouchBonus(int A, int B)
                 for(const auto& star : Star)
                 {
                     bool bySection = int(NPC[B].Special) <= 0 && (star.Section == NPC[B].Section || star.Section == -1);
-                    bool byId = int(NPC[B].Special) > 0 && -star.Section == int(NPC[B].Special);
+                    bool byId = int(NPC[B].Special) > 0 && -(star.Section + 100) == int(NPC[B].Special);
                     if(star.level == FileNameFull && (bySection || byId))
                         tempBool = true;
                 }
@@ -632,7 +632,7 @@ void TouchBonus(int A, int B)
                     Star_t star;
                     star.level = FileNameFull;
                     // Positive - section number, Negative - UID of each star per level
-                    star.Section = int(NPC[B].Special) <= 0 ? NPC[B].Section : -int(NPC[B].Special);
+                    star.Section = int(NPC[B].Special) <= 0 ? NPC[B].Section : -int(NPC[B].Special) - 100;
                     Star.push_back(std::move(star));
                     numStars = (int)Star.size();
 #ifdef THEXTECH_INTERPROC_SUPPORTED
