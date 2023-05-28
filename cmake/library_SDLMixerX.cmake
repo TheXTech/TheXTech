@@ -21,6 +21,8 @@ else()
     set(PGE_SHARED_SDLMIXER OFF)
 endif()
 
+option(MIXERX_ENABLE_WAVPACK "Enable the WavPack codec support [Support is experimental, doesn't builds on some platforms]" OFF)
+
 if(NOT VITA AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT XTECH_MACOSX_TIGER)
     option(PGE_USE_LOCAL_SDL2 "Do use the locally-built SDL2 library from the AudioCodecs set. Otherwise, download and build the development top main version." ON)
 else()
@@ -227,8 +229,13 @@ endif()
 list(APPEND MixerX_CodecLibs
     "${AC_OPUSFILE}"
     "${AC_OPUS}"
-    "${AC_OGG}"
-#    "${AC_WAVPACK}"
+    "${AC_OGG}")
+
+if(MIXERX_ENABLE_WAVPACK)
+    list(APPEND MixerX_CodecLibs "${AC_WAVPACK}")
+endif()
+
+list(APPEND MixerX_CodecLibs
     "${AC_ADLMIDI}"
     "${AC_OPNMIDI}"
     "${AC_EDMIDI}"
@@ -260,9 +267,14 @@ if(VITA)
         "-DLIBVORBISFILE_LIB=vorbisfile"
     )
 
-    set(MixerX_CodecLibs # Minimal list of libraries to link
-        "${AC_FLUIDLITE}"
-#        "${AC_WAVPACK}"
+    # Minimal list of libraries to link
+    set(MixerX_CodecLibs "${AC_FLUIDLITE}")
+
+    if(MIXERX_ENABLE_WAVPACK)
+        list(append MixerX_CodecLibs "${AC_WAVPACK}")
+    endif()
+
+    list(APPEND MixerX_CodecLibs
         "${AC_ADLMIDI}"
         "${AC_OPNMIDI}"
         "${AC_EDMIDI}"
@@ -304,7 +316,7 @@ else()
         "-DBUILD_FLAC=OFF"
         "-DBUILD_MPG123=OFF"
         "-DBUILD_GME_SYSTEM_ZLIB=${USE_SYSTEM_ZLIB}"
-        "-DBUILD_WAVPACK=OFF"
+        "-DBUILD_WAVPACK=${MIXERX_ENABLE_WAVPACK}"
     )
 endif()
 
@@ -391,7 +403,7 @@ if(NOT THEXTECH_NO_MIXER_X)
             "-DUSE_MIDI_FLUIDLITE_OGG_STB=ON"
             "-DUSE_DRFLAC=ON"
             "-DUSE_FLAC=OFF"
-            "-DUSE_WAVPACK=OFF"
+            "-DUSE_WAVPACK=${MIXERX_ENABLE_WAVPACK}"
             "-DUSE_OGG_VORBIS_STB=${MIXER_USE_OGG_VORBIS_STB}"
             "-DUSE_OGG_VORBIS_TREMOR=${MIXER_USE_OGG_VORBIS_TREMOR}"
             "-DUSE_MP3_DRMP3=ON"

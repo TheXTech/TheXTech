@@ -114,5 +114,11 @@ void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va
 
     SDL_RWwrite(s_logout, reinterpret_cast<const void *>(OS_NEWLINE), 1, OS_NEWLINE_LEN);
     va_end(arg_in);
+
+/* WORKAROUNDS: flush the output of SDL RWops */
+#ifdef HAVE_STDIO_H
+    if(s_logout->hidden.stdio.fp)
+        fflush(s_logout->hidden.stdio.fp);
+#endif
 }
 #endif // NO_FILE_LOGGING

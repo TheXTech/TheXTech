@@ -224,4 +224,4 @@ bool Logic()
     return false;
 }
 
-}; // namespace PromptScreen
+} // namespace PromptScreen

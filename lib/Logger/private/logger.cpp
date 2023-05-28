@@ -36,6 +36,9 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+#ifndef MOONDUST_LOGGER_FILENAME_PREFIX
+#   error Please define the "-DMOONDUST_LOGGER_FILENAME_PREFIX=<name-of-application>" to specify the log filename prefix
+#endif
 
 std::string     LogWriter::m_logDirPath;
 std::string     LogWriter::m_logFilePath;
@@ -77,7 +80,7 @@ static void cleanUpLogs(const std::string &logsPath, int maxLogs)
     // Be sure that we are looking for our log files and don't touch others
     for(auto &s : filesPre)
     {
-        if(SDL_strncasecmp(s.c_str(), "TheXTech_log_", 13) == 0)
+        if(SDL_strncasecmp(s.c_str(), MOONDUST_LOGGER_FILENAME_PREFIX "_log_", 13) == 0)
             files.push_back(s);
     }
 
@@ -110,7 +113,7 @@ void LoadLogSettings(bool disableStdOut, bool verboseLogs)
     LogWriter::m_logLevel = PGE_LogLevel::Debug;
 
 #if !defined(NO_FILE_LOGGING)
-    std::string logFileName = fmt::format_ne("TheXTech_log_{0}.txt", return_current_time_and_date());
+    std::string logFileName = fmt::format_ne(MOONDUST_LOGGER_FILENAME_PREFIX "_log_{0}.txt", return_current_time_and_date());
 #endif
 
     std::string mainIniFile = AppPathManager::settingsFileSTD();

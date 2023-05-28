@@ -249,6 +249,7 @@ else()
     xtech_add_warning_flag("-Wpedantic" PEDANTIC_WARNING)
     xtech_disable_warning_flag("variadic-macros" NO_VARIADIC_MACROS_WARNING)
     xtech_disable_warning_flag("psabi" NO_PSABI_WARNING)
+    xtech_disable_warning_flag("dangling-reference" NO_DANGLING_REFERENCE_WARNING)
 endif()
 
 

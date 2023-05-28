@@ -550,6 +550,12 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
+        if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW)
+        {
+            npc.Special = n.special_data;
+            npc.DefaultSpecial = int(npc.Special);
+        }
+
         if(compatModern && isSmbx64)
         {
             // legacy Smbx64 NPC behavior tracking moved to npc_special_data.h
@@ -672,14 +678,16 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
         else if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW) // Is a star
         {
-            bool tempBool = false;
-            for(B = 1; B <= numStars; ++B)
+            bool starFound = false;
+            for(const auto& star : Star)
             {
-                if(Star[B].level == FileNameFull && (Star[B].Section == npc.Section || Star[B].Section == -1))
-                    tempBool = true;
+                bool bySection = int(npc.Special) <= 0 && (star.Section == npc.Section || star.Section == -1);
+                bool byId = int(npc.Special) > 0 && -(star.Section + 100) == int(npc.Special);
+                if(star.level == FileNameFull && (bySection || byId))
+                    starFound = true;
             }
 
-            if(tempBool)
+            if(starFound)
             {
                 npc.Special = 1;
                 npc.DefaultSpecial = 1;
@@ -1120,9 +1128,9 @@ void FindStars()
                     warp.maxStars = head.stars;
                     warp.curStars = 0;
 
-                    for(int B = 1; B <= numStars; B++)
+                    for(const auto& star : Star)
                     {
-                        if(SDL_strcasecmp(Star[B].level.c_str(), GetS(warp.level).c_str()) == 0)
+                        if(SDL_strcasecmp(star.level.c_str(), GetS(warp.level).c_str()) == 0)
                             warp.curStars++;
                     }
                 }

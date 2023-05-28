@@ -534,9 +534,9 @@ void FindWldStars()
                     l.maxStars = head.stars;
                     l.curStars = 0;
 
-                    for(int B = 1; B <= numStars; B++)
+                    for(const auto& star : Star)
                     {
-                        if(SDL_strcasecmp(Star[B].level.c_str(), l.FileName.c_str()) == 0)
+                        if(SDL_strcasecmp(star.level.c_str(), l.FileName.c_str()) == 0)
                             l.curStars++;
                     }
                 }

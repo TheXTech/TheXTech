@@ -87,6 +87,7 @@ static bool s_ResetCheckpoints()
     Checkpoint.clear();
     CheckpointsList.clear();
     numStars = 0;
+    Star.clear();
 #ifdef THEXTECH_INTERPROC_SUPPORTED
     IntProc::sendStarsNumber(numStars);
 #endif

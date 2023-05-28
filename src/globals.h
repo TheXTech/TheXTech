@@ -1255,7 +1255,7 @@ DECLREF_T(Water);
 //Public numWater As Integer 'number of water
 extern int numWater;
 //Public Star(1 To 1000) As Star
-extern RangeArr<Star_t, 1, maxStarsNum> Star;
+extern std::vector<Star_t> Star;
 //Public GoToLevel As String
 extern std::string GoToLevel;
 //! EXTRA: Hide entrance screen
