@@ -883,15 +883,16 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         {
             const EditorCustom::ItemFamily& family = **it;
 
-            if(family.X == 0)
-                SuperPrintR(mode, family.name, 3, 40 + family.X * 40 + 10, 40 + family.Y * 20);
-            else if(40 + family.X * 40 + family.name.size() * 20 > e_ScreenW - 200)
+            if(mode == CallMode::Render)
             {
-                if(mode == CallMode::Render)
-                    SuperPrintRightAlign(family.name, 3, e_ScreenW - 200 - 4, 40 + family.Y * 20);
+                int pix_len = SuperTextPixLen(family.name, 3);
+
+                if(40 + family.X * 40 + pix_len > e_ScreenW - 200)
+                    SuperPrint(family.name, 3, e_ScreenW - 200 - 4 - pix_len, 40 + family.Y * 20);
+                else
+                    SuperPrint(family.name, 3, 40 + family.X * 40 + 4, 40 + family.Y * 20);
             }
-            else
-                SuperPrintR(mode, family.name, 3, 40 + family.X * 40 - 8, 40 + family.Y * 20);
+
             UpdateNPCGrid(mode, 40 + family.X * 40, 60 + family.Y * 20, family.layout_pod.types.data(), family.layout_pod.types.size(), family.layout_pod.cols);
         }
     }
@@ -3009,6 +3010,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 
+    // block selector
     if(m_Block_page > 0 && m_Block_page <= (int)EditorCustom::block_pages.size())
     {
         const EditorCustom::ItemPage_t& page = EditorCustom::block_pages[m_Block_page - 1];
@@ -3017,15 +3019,16 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
         {
             const EditorCustom::ItemFamily& family = **it;
 
-            if(family.X == 0)
-                SuperPrintR(mode, family.name, 3, 40 + family.X * 40 + 10, 40 + family.Y * 20);
-            else if(40 + family.X * 40 + family.name.size() * 20 > e_ScreenW - 160)
+            if(mode == CallMode::Render)
             {
-                if(mode == CallMode::Render)
-                    SuperPrintRightAlign(family.name, 3, e_ScreenW - 160 - 4, 40 + family.Y * 20);
+                int pix_len = SuperTextPixLen(family.name, 3);
+
+                if(40 + family.X * 40 + pix_len > e_ScreenW - 160)
+                    SuperPrint(family.name, 3, e_ScreenW - 160 - 4 - pix_len, 40 + family.Y * 20);
+                else
+                    SuperPrint(family.name, 3, 40 + family.X * 40 + 4, 40 + family.Y * 20);
             }
-            else
-                SuperPrintR(mode, family.name, 3, 40 + family.X * 40 - 8, 40 + family.Y * 20);
+
             UpdateBlockGrid(mode, 40 + family.X * 40, 60 + family.Y * 20, family.layout_pod.types.data(), family.layout_pod.types.size(), family.layout_pod.cols);
         }
     }
@@ -3100,6 +3103,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
     if(UpdateButton(mode, e_ScreenW - 40 + 4, 420 + 4, GFX.EIcons, false, 0, 32*Icon::subscreen, 32, 32))
         m_special_page = SPECIAL_PAGE_OBJ_LAYER;
 
+    // BGO selector
     if(m_BGO_page > 0 && m_BGO_page <= (int)EditorCustom::bgo_pages.size())
     {
         const EditorCustom::ItemPage_t& page = EditorCustom::bgo_pages[m_BGO_page - 1];
@@ -3108,15 +3112,16 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
         {
             const EditorCustom::ItemFamily& family = **it;
 
-            if(family.X == 0)
-                SuperPrintR(mode, family.name, 3, 40 + family.X * 40 + 10, 40 + family.Y * 20);
-            else if(40 + family.X * 40 + family.name.size() * 20 > e_ScreenW - 160)
+            if(mode == CallMode::Render)
             {
-                if(mode == CallMode::Render)
-                    SuperPrintRightAlign(family.name, 3, e_ScreenW - 160 - 4, 40 + family.Y * 20);
+                int pix_len = SuperTextPixLen(family.name, 3);
+
+                if(40 + family.X * 40 + pix_len > e_ScreenW - 160)
+                    SuperPrint(family.name, 3, e_ScreenW - 160 - 4 - pix_len, 40 + family.Y * 20);
+                else
+                    SuperPrint(family.name, 3, 40 + family.X * 40 + 4, 40 + family.Y * 20);
             }
-            else
-                SuperPrintR(mode, family.name, 3, 40 + family.X * 40 - 8, 40 + family.Y * 20);
+
             UpdateBGOGrid(mode, 40 + family.X * 40, 60 + family.Y * 20, family.layout_pod.types.data(), family.layout_pod.types.size(), family.layout_pod.cols);
         }
     }
@@ -3628,15 +3633,16 @@ void EditorScreen::UpdateTileScreen(CallMode mode)
         {
             const EditorCustom::ItemFamily& family = **it;
 
-            if(family.X == 0)
-                SuperPrintR(mode, family.name, 3, 40 + family.X * 40 + 10, 40 + family.Y * 20);
-            else if(40 + family.X * 40 + family.name.size() * 20 > e_ScreenW - 120)
+            if(mode == CallMode::Render)
             {
-                if(mode == CallMode::Render)
-                    SuperPrintRightAlign(family.name, 3, e_ScreenW - 120 - 4, 40 + family.Y * 20);
+                int pix_len = SuperTextPixLen(family.name, 3);
+
+                if(40 + family.X * 40 + pix_len > e_ScreenW)
+                    SuperPrint(family.name, 3, e_ScreenW - 4 - pix_len, 40 + family.Y * 20);
+                else
+                    SuperPrint(family.name, 3, 40 + family.X * 40 + 4, 40 + family.Y * 20);
             }
-            else
-                SuperPrintR(mode, family.name, 3, 40 + family.X * 40 - 8, 40 + family.Y * 20);
+
             UpdateTileGrid(mode, 40 + family.X * 40, 60 + family.Y * 20, family.layout_pod.types.data(), family.layout_pod.types.size(), family.layout_pod.cols);
         }
     }
