@@ -309,6 +309,7 @@ if(THEXTECH_ENABLE_LUA)
     include(cmake/library_luabind.cmake)
 endif()
 
+include(cmake/library_discord_rpc.cmake)
 
 if(EMSCRIPTEN)
     message("Is EMSCRIPTEN!")
@@ -402,6 +403,11 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     endif()
 
     list(APPEND A2XT_LIBS PGE_ZLib)
+endif()
+
+if(THEXTECH_ENABLE_DISCORD_RPC)
+    list(APPEND A2XT_DEPS DiscordPRC_Local)
+    list(APPEND A2XT_LIBS PGE_DiscordRPC)
 endif()
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
@@ -938,6 +944,10 @@ endif()
 
 if(THEXTECH_ENABLE_LUA)
     target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_LUA)
+endif()
+
+if(THEXTECH_ENABLE_DISCORD_RPC)
+    target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_DISCORD_RPC)
 endif()
 
 if(ENABLE_ADDRESS_SANITIZER)
