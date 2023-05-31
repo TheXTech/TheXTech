@@ -51,6 +51,8 @@ public:
     void setEditorFile(const std::string &fil);
     void setIconName(const std::string &icon);
 
+    void sync();
+
     void update();
     void clear();
 };

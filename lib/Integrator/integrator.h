@@ -41,6 +41,8 @@ void clearLevelName();
 void setEditorFile(const std::string &editorFile);
 void clearEditorFile();
 
+void sync();
+
 #else
 
 // Empty calls that does nothing
@@ -58,6 +60,8 @@ static inline void clearLevelName() {}
 
 static inline void setEditorFile(const std::string &) {}
 static inline void clearEditorFile() {}
+
+static inline void sync() {}
 
 #endif
 }

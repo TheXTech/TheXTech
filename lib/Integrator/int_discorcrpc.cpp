@@ -157,6 +157,14 @@ void DiscorcRPC::setIconName(const std::string& icon)
         iconName.resize(32);
 }
 
+void DiscorcRPC::sync()
+{
+#ifdef DISCORD_DISABLE_IO_THREAD
+    Discord_UpdateConnection();
+#endif
+    Discord_RunCallbacks();
+}
+
 void DiscorcRPC::update()
 {
     pLogDebug("Discord: Updating state...");
@@ -199,20 +207,12 @@ void DiscorcRPC::update()
     discordPresence.spectateSecret = "";
     discordPresence.instance = 0;
     Discord_UpdatePresence(&discordPresence);
-
-#ifdef DISCORD_DISABLE_IO_THREAD
-    Discord_UpdateConnection();
-#endif
-    Discord_RunCallbacks();
+    sync();
 }
 
 void DiscorcRPC::clear()
 {
     pLogDebug("Discord: Clearing the presence...");
     Discord_ClearPresence();
-
-#ifdef DISCORD_DISABLE_IO_THREAD
-    Discord_UpdateConnection();
-#endif
-    Discord_RunCallbacks();
+    sync();
 }

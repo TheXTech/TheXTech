@@ -182,3 +182,11 @@ void Integrator::clearEditorFile()
 
     s_prevEditorFile.clear();
 }
+
+void Integrator::sync()
+{
+#ifdef ENABLE_XTECH_DISCORD_RPC
+    if(s_discordLoaded)
+        s_discord.sync();
+#endif
+}

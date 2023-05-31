@@ -1111,6 +1111,7 @@ int GameMain(const CmdLineSetup_t &setup)
 void EditorLoop()
 {
     Controls::Update();
+    Integrator::sync();
     UpdateEditor();
     UpdateBlocks();
     UpdateEffects();
