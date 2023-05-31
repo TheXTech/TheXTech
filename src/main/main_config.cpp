@@ -240,6 +240,9 @@ void OpenConfig()
         config.read("enter-cheats-menu-item", g_config.enter_cheats_menu_item, false);
         config.read("world-map-fast-move", g_config.worldMapFastMove, false);
         config.read("editor-pause-on-death", g_config.editor_pause_on_death, true);
+#ifdef ENABLE_XTECH_DISCORD_RPC
+        config.read("discord-rpc", g_config.discord_rpc, false);
+#endif
         config.endGroup();
 
         config.beginGroup("effects");
@@ -385,6 +388,9 @@ void SaveConfig()
     config.setValue("enter-cheats-menu-item", g_config.enter_cheats_menu_item);
     config.setValue("world-map-fast-move", g_config.worldMapFastMove);
     config.setValue("editor-pause-on-death", g_config.editor_pause_on_death);
+#ifdef ENABLE_XTECH_DISCORD_RPC
+    config.setValue("discord-rpc", g_config.discord_rpc);
+#endif
     config.endGroup();
 
     config.beginGroup("speedrun");

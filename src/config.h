@@ -68,6 +68,10 @@ extern struct Config_t
     bool    worldMapFastMove = false;
     //! Enter the pause menu after dying while testing a level
     bool    editor_pause_on_death = true;
+#ifdef ENABLE_XTECH_DISCORD_RPC
+    //! Enable Discord Rich Presense support on supported platforms
+    bool    discord_rpc = false;
+#endif
 
     /* ---- Effects ----*/
 

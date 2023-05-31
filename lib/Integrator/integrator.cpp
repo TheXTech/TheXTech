@@ -19,9 +19,12 @@
  */
 
 #include "integrator.h"
+#include "config.h"
+
 #ifdef ENABLE_XTECH_DISCORD_RPC
 #include "int_discorcrpc.h"
 static DiscorcRPC s_discord;
+static bool s_discordLoaded = false;
 #endif
 
 static bool s_integrationsLoaded = false;
@@ -42,7 +45,11 @@ void Integrator::initIntegrations()
         return;
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    s_discord.init();
+    if(g_config.discord_rpc)
+    {
+        s_discord.init();
+        s_discordLoaded = true;
+    }
 #endif
 
     s_integrationsLoaded = true;
@@ -54,8 +61,11 @@ void Integrator::quitIntegrations()
         return;
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    s_discord.clear();
-    s_discord.quit();
+    if(s_discordLoaded)
+    {
+        s_discord.clear();
+        s_discord.quit();
+    }
 #endif
 
     s_integrationsLoaded = false;
@@ -64,10 +74,13 @@ void Integrator::quitIntegrations()
 void Integrator::setGameName(const std::string& gameName, const std::string& iconName)
 {
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    s_discord.setGameName(gameName);
-    if(!iconName.empty())
-        s_discord.setIconName(iconName);
-    s_discord.update();
+    if(s_discordLoaded)
+    {
+        s_discord.setGameName(gameName);
+        if(!iconName.empty())
+            s_discord.setIconName(iconName);
+        s_discord.update();
+    }
 #endif
 }
 
@@ -77,8 +90,11 @@ void Integrator::setEpisodeName(const std::string& episodeName)
         return;
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    s_discord.setEpisodeName(episodeName);
-    s_discord.update();
+    if(s_discordLoaded)
+    {
+        s_discord.setEpisodeName(episodeName);
+        s_discord.update();
+    }
 #endif
 
     clearAllPrev();
@@ -91,8 +107,11 @@ void Integrator::clearEpisodeName()
         return;
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    s_discord.setEpisodeName(std::string());
-    s_discord.update();
+    if(s_discordLoaded)
+    {
+        s_discord.setEpisodeName(std::string());
+        s_discord.update();
+    }
 #endif
 
     s_prevEpisodeName.clear();
@@ -104,8 +123,11 @@ void Integrator::setLevelName(const std::string& levelName)
         return;
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    s_discord.setLevelName(levelName);
-    s_discord.update();
+    if(s_discordLoaded)
+    {
+        s_discord.setLevelName(levelName);
+        s_discord.update();
+    }
 #endif
 
     clearAllPrev();
@@ -118,8 +140,11 @@ void Integrator::clearLevelName()
         return;
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    s_discord.setLevelName(std::string());
-    s_discord.update();
+    if(s_discordLoaded)
+    {
+        s_discord.setLevelName(std::string());
+        s_discord.update();
+    }
 #endif
 
     s_prevLevelName.clear();
@@ -131,8 +156,11 @@ void Integrator::setEditorFile(const std::string& editorFile)
         return;
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    s_discord.setEditorFile(editorFile);
-    s_discord.update();
+    if(s_discordLoaded)
+    {
+        s_discord.setEditorFile(editorFile);
+        s_discord.update();
+    }
 #endif
 
     clearAllPrev();
@@ -145,8 +173,11 @@ void Integrator::clearEditorFile()
         return;
 
 #ifdef ENABLE_XTECH_DISCORD_RPC
-    s_discord.setEditorFile(std::string());
-    s_discord.update();
+    if(s_discordLoaded)
+    {
+        s_discord.setEditorFile(std::string());
+        s_discord.update();
+    }
 #endif
 
     s_prevEditorFile.clear();
