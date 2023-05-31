@@ -1030,15 +1030,10 @@ if(NOT USE_SYSTEM_LIBS AND A2XT_DEPS)
     add_dependencies(thextech ${A2XT_DEPS})
 endif()
 
-test_big_endian(THEXTECH_IS_BIG_ENDIAN)
 if(THEXTECH_IS_BIG_ENDIAN)
-    message("== Target processor endianess: BIG ENDIAN")
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_BIG_ENDIAN -DSOUND_FX_BIG_ENDIAN)
-else()
-    message("== Target processor endianess: LITTLE ENDIAN")
 endif()
 
-message("== Size of void pointer is ${CMAKE_SIZEOF_VOID_P}!")
 if(CMAKE_SIZEOF_VOID_P MATCHES "8")
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_WORDSIZE=64)
 elseif(CMAKE_SIZEOF_VOID_P MATCHES "4")
@@ -1046,7 +1041,6 @@ elseif(CMAKE_SIZEOF_VOID_P MATCHES "4")
 else()
     message(WARNING "Unknown word size ${CMAKE_SIZEOF_VOID_P}!")
 endif()
-
 
 if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
     if(NOT APPLE AND NOT MSVC)
