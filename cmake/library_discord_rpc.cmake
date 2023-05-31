@@ -15,7 +15,7 @@ elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
 endif()
 
 if(DISCORD_RPC_SUPPORTED)
-    option(THEXTECH_ENABLE_DISCORD_RPC "Enable Discord RPC support" ON)
+    option(THEXTECH_ENABLE_DISCORD_RPC "Enable Discord RPC support" OFF)
 else()
     set(THEXTECH_ENABLE_DISCORD_RPC OFF CACHE BOOL "" FORCE)
     mark_as_advanced(THEXTECH_ENABLE_DISCORD_RPC)
@@ -23,6 +23,7 @@ endif()
 
 if(DISCORD_RPC_SUPPORTED AND THEXTECH_ENABLE_DISCORD_RPC)
     set(libDiscordRpc_Libs "${DEPENDENCIES_INSTALL_DIR}/lib/${CMAKE_STATIC_LIBRARY_PREFIX}discord-rpc${PGE_LIBS_DEBUG_SUFFIX}${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    set(THEXTECH_DISCORD_APPID nullptr CACHE STRING "Discord Application ID for the Risch Presence work")
 
     ExternalProject_Add(
         DiscordPRC_Local

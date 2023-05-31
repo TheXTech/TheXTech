@@ -64,6 +64,8 @@ void initGameInfo()
 #   endif
 #endif /* CUSTOM_GAME_NAME_TITLE */
 
+    g_gameInfo.statusIconName.clear();
+
     g_gameInfo.characterName[1] = "Mario";
     g_gameInfo.characterName[2] = "Luigi";
     g_gameInfo.characterName[3] = "Peach";
@@ -113,6 +115,7 @@ void initGameInfo()
             g_gameInfo.titleWindow = fmt::format_ne("{0} - (TheXTech v{1}, #{2})", g_gameInfo.title, V_LATEST_STABLE, V_BUILD_VER);
             config.read("disable-two-player", g_gameInfo.disableTwoPlayer, false);
             config.read("disable-battle-mode", g_gameInfo.disableBattleMode, false);
+            config.read("status-icon-name", g_gameInfo.statusIconName, std::string());
         }
         config.endGroup();
 

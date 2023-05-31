@@ -408,6 +408,7 @@ endif()
 if(THEXTECH_ENABLE_DISCORD_RPC)
     list(APPEND A2XT_DEPS DiscordPRC_Local)
     list(APPEND A2XT_LIBS PGE_DiscordRPC)
+    set(THEXTECH_ENABLE_INTEGRATOR ON)  # This feature needs for an Integrator
 endif()
 
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
@@ -451,12 +452,27 @@ if(NOT ANDROID
    AND NOT THEXTECH_CLI_BUILD
    AND NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
+        lib/InterProcess/editor_pipe.h
         lib/InterProcess/editor_pipe.cpp
+        lib/InterProcess/intproc.h
         lib/InterProcess/intproc.cpp
     )
     set(THEXTECH_INTERPROC_SUPPORTED ON)
 endif()
 
+# Integrations with external applications
+if(THEXTECH_ENABLE_INTEGRATOR)
+    list(APPEND LIB_SRC
+        lib/Integrator/integrator.h
+        lib/Integrator/integrator.cpp)
+
+    if(THEXTECH_ENABLE_DISCORD_RPC)
+        list(APPEND LIB_SRC
+            lib/Integrator/int_discorcrpc.h
+            lib/Integrator/int_discorcrpc.cpp
+        )
+    endif()
+endif()
 
 if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_SWITCH AND NOT VITA AND NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC ${FILEMAPPER_SRCS})
@@ -712,7 +728,6 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/AppPath/*.h
     lib/CrashHandler/*.h
     lib/Graphics/*.h
-    lib/InterProcess/*.h
     lib/tclap/*.h
     lib/fmt/*.h
     src/*.h
@@ -946,8 +961,12 @@ if(THEXTECH_ENABLE_LUA)
     target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_LUA)
 endif()
 
+if(THEXTECH_ENABLE_INTEGRATOR)
+    target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_INTEGRATOR)
+endif()
+
 if(THEXTECH_ENABLE_DISCORD_RPC)
-    target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_DISCORD_RPC)
+    target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_DISCORD_RPC -DXTECH_DISCORD_APPID=${THEXTECH_DISCORD_APPID})
 endif()
 
 if(ENABLE_ADDRESS_SANITIZER)

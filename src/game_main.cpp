@@ -26,6 +26,7 @@
 #include <Logger/logger.h>
 #include <Utils/files.h>
 #include <AppPath/app_path.h>
+#include <Integrator/integrator.h>
 #include <PGE_File_Formats/file_formats.h>
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #   include <InterProcess/intproc.h>
@@ -306,6 +307,9 @@ int GameMain(const CmdLineSetup_t &setup)
         IntProc::init();
 #endif
 
+    Integrator::initIntegrations();
+    Integrator::setGameName(g_gameInfo.title, g_gameInfo.statusIconName);
+
     LoadingInProcess = false;
 
     // Clear the screen
@@ -356,6 +360,11 @@ int GameMain(const CmdLineSetup_t &setup)
         else
         {
             zTestLevel(setup.testMagicHand, setup.interprocess);
+
+            if(!LevelName.empty())
+                Integrator::setLevelName(LevelName);
+            else
+                Integrator::setLevelName(FileName);
         }
     }
 
@@ -544,6 +553,10 @@ int GameMain(const CmdLineSetup_t &setup)
         // The Game Menu
         else if(GameMenu)
         {
+            Integrator::clearEpisodeName();
+            Integrator::clearLevelName();
+            Integrator::clearEditorFile();
+
             BattleIntro = 0;
             BattleOutro = 0;
             AllCharBlock = 0;
@@ -1031,6 +1044,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
                     Backup_FullFileName = "";
 
+                    Integrator::setEditorFile(FileName);
+
                     editorScreen.active = false;
                     MouseRelease = false;
 
@@ -1082,6 +1097,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
     } while(GameIsActive);
 
+    Integrator::quitIntegrations();
+
     return 0;
 }
 
@@ -1112,6 +1129,7 @@ void EditorLoop()
 void KillIt()
 {
     GameIsActive = false;
+    Integrator::initIntegrations();
 #ifndef RENDER_FULLSCREEN_ALWAYS
     XWindow::hide();
     if(resChanged)
@@ -1802,6 +1820,8 @@ void StartEpisode()
         LoadGame();
         speedRun_loadStats();
     }
+
+    Integrator::setEpisodeName(WorldName);
 
     if(WorldUnlock)
     {
