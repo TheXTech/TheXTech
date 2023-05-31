@@ -4893,8 +4893,14 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
 #else
         XRender::renderTexture(X, Y, GFX.ECursor[2]);
 #endif
+
         if(e_tooltip)
-            SuperPrint(e_tooltip, 3, X + 28, Y + 34, 1.0f, 0.7f, 0.7f);
+        {
+            if(e_CursorX + 28 < sx + e_ScreenW / 2)
+                SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34, 1.0f, 0.7f, 0.7f);
+            else
+                SuperPrintRightAlign(e_tooltip, 3, e_CursorX + 10, e_CursorY + 34, 1.0f, 0.7f, 0.7f);
+        }
     }
 }
 
@@ -5026,7 +5032,7 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
 #endif
         if(e_tooltip)
         {
-            if(e_CursorX + 28 < e_ScreenW - 60)
+            if(e_CursorX + 28 < e_ScreenW / 2)
                 SuperPrint(e_tooltip, 3, e_CursorX + 28, e_CursorY + 34, 1.0f, 0.7f, 0.7f);
             else
                 SuperPrintRightAlign(e_tooltip, 3, e_CursorX + 10, e_CursorY + 34, 1.0f, 0.7f, 0.7f);
