@@ -22,6 +22,7 @@
 #include "compat.h"
 #include "effect.h"
 #include "npc.h"
+#include "npc_id.h"
 #include "sound.h"
 #include "game_main.h"
 #include "collision.h"
@@ -726,8 +727,19 @@ void UpdateEffects()
                         nn.Location.Width = NPCWidth[nn.Type];
                         nn.Location.Y += 32 - nn.Location.Height;
                         nn.Location.X += -nn.Location.Width / 2.0 + 16;
-                        if(nn.Type == 34)
+
+                        if(nn.Type == NPCID_LEAF)
                             nn.Location.SpeedY = -6;
+
+                        if(NPCIsCheep[e.NewNpc] || NPCIsAParaTroopa[e.NewNpc] || e.NewNpc == NPCID_FIREBAR)
+                        {
+                            nn.Special = e.NewNpcSpecial;
+                            nn.DefaultSpecial = int(nn.Special);
+                        }
+
+                        if(e.NewNpc == NPCID_STAR_SMB3 || e.NewNpc == NPCID_STAR_SMW)
+                            nn.Variant = (uint16_t)e.NewNpcSpecial;
+
                         syncLayers_NPC(numNPCs);
                         CheckSectionNPC(numNPCs);
                     }
@@ -803,7 +815,7 @@ void UpdateEffects()
     }
 }
 
-void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, bool Shadow)
+void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, bool Shadow, vbint_t newNpcSpecial)
 {
 // this sub creates effects
 // please reference the /graphics/effect folder to see what the effects are
@@ -905,6 +917,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
         auto &ne = Effect[numEffects];
         ne.Shadow = Shadow;
         ne.NewNpc = NewNpc;
+        ne.NewNpcSpecial = newNpcSpecial;
         if(ne.NewNpc == 96)
             ne.NewNpc = 0;
         ne.Location.X = Location.X;
