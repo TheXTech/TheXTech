@@ -831,12 +831,16 @@ struct Effect_t
 //    Life As Integer 'timer before the effect disappears
     vbint_t Life = 0;
 //    NewNpc As Integer 'when an effect should create and NPC, such as Yoshi
-    vbint_t NewNpc = 0;
-// EXTRA: New NPC's special value
-    vbint_t NewNpcSpecial = 0;
+//    vbint_t NewNpc = 0; // MOVED to EffectNewNPC_t below
 //    Shadow As Boolean 'for a black effect set to true
     bool Shadow = false;
 //End Type
+};
+
+struct EffectNewNPC_t
+{
+    vbint_t NewNpc = 0;
+    vbint_t NewNpcSpecial = 0;
 };
 
 //Public Type vScreen 'Screen controls
