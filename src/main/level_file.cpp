@@ -28,7 +28,6 @@
 #include "../globals.h"
 #include "../frame_timer.h"
 #include "../npc.h"
-#include "../effect.h"
 #include "../load_gfx.h"
 #include "../custom.h"
 #include "../sound.h"
@@ -939,7 +938,7 @@ void ClearLevel()
     const Block_t blankBlock = Block_t();
     const Background_t BlankBackground = Background_t();
     const Location_t BlankLocation = Location_t();
-//    const Effect_t blankEffect = Effect_t();
+    const Effect_t blankEffect = Effect_t();
     NPCScore[NPCID_DRAGONCOIN] = 6;
     RestoreWorldStrings();
     LevelName.clear();
@@ -1079,10 +1078,9 @@ void ClearLevel()
         Warp[A] = blankWarp;
     numWarps = 0;
 
-//    for(A = 1; A <= numEffects; A++)
-//        Effect[A] = blankEffect;
-//    numEffects = 0;
-    ClearEffects();
+    for(A = 1; A <= numEffects; A++)
+        Effect[A] = blankEffect;
+    numEffects = 0;
     numBackground = 0;
     numLocked = 0;
     MidBackground = 1;

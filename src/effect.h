@@ -25,7 +25,6 @@
 #include "global_constants.h"
 #include "location.h"
 
-void ClearEffects();
 // Public Sub UpdateEffects() 'Updates the effects
 // Updates the effects
 void UpdateEffects();

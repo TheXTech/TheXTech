@@ -18,8 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <unordered_map>
-
 #include "globals.h"
 #include "compat.h"
 #include "effect.h"
@@ -32,18 +30,6 @@
 #include "graphics/gfx_update.h"
 
 #include "main/trees.h"
-
-typedef std::unordered_map<int, EffectNewNPC_t> EffectNewNpcMap_t;
-static EffectNewNpcMap_t s_newNpc;
-
-void ClearEffects()
-{
-    const Effect_t blankEffect = Effect_t();
-    for(int A = 1; A <= numEffects; ++A)
-        Effect[A] = blankEffect;
-    numEffects = 0;
-    s_newNpc.clear();
-}
 
 // Updates the effects
 void UpdateEffects()
@@ -63,21 +49,18 @@ void UpdateEffects()
     For(A, 1, numEffects)
     {
         auto &e = Effect[A];
-        EffectNewNpcMap_t::iterator nn_it = s_newNpc.find(A);
         e.Life -= 1;
 
         if(e.Life == 0)
         {
             if(e.Type == 14)
             {
-                SDL_assert(nn_it != s_newNpc.end());
-                auto &en = nn_it->second;
-                if(en.NewNpc > 0)
+                if(e.NewNpc > 0)
                 {
                     numNPCs++;
                     auto &nn = NPC[numNPCs];
                     nn = NPC_t();
-                    nn.Type = en.NewNpc;
+                    nn.Type = e.NewNpc;
                     nn.Location.Height = NPCHeight[nn.Type];
                     nn.Location.Width = NPCWidth[nn.Type];
                     nn.Location.X = e.Location.X + e.Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
@@ -219,9 +202,7 @@ void UpdateEffects()
         }
         else if(e.Type == 113) // Water Bubbles
         {
-            SDL_assert(nn_it != s_newNpc.end());
-            auto &en = nn_it->second;
-            if(en.NewNpc == 0)
+            if(e.NewNpc == 0)
             {
                 tempBool = false;
                 for(B = 1; B <= numWater; B++)
@@ -529,11 +510,9 @@ void UpdateEffects()
                 // tempBool = True
                 if(!tempBool)
                 {
-                    SDL_assert(nn_it != s_newNpc.end());
-                    auto &en = nn_it->second;
                     e.Life = 0;
                     e.Frame = 3;
-                    Block[en.NewNpc].Hidden = false;
+                    Block[e.NewNpc].Hidden = false;
                     invalidateDrawBlocks();
                 }
                 else
@@ -717,10 +696,7 @@ void UpdateEffects()
         }
         else if(e.Type == 56) // Egg
         {
-            SDL_assert(nn_it != s_newNpc.end());
-            auto &en = nn_it->second;
-
-            if(en.NewNpc == 0 && e.FrameCount < 19)
+            if(e.NewNpc == 0 && e.FrameCount < 19)
                 e.FrameCount = 19;
             e.FrameCount += 1;
             if(e.FrameCount == 10)
@@ -733,11 +709,11 @@ void UpdateEffects()
             else if(e.FrameCount == 30)
             {
                 e.Life = 0;
-                if(!LevelEditor && en.NewNpc != 96)
+                if(!LevelEditor && e.NewNpc != 96)
                 {
-                    if(NPCIsYoshi[en.NewNpc])
-                        NewEffect(58, e.Location, 1, static_cast<float>(en.NewNpc));
-                    else if(en.NewNpc > 0)
+                    if(NPCIsYoshi[e.NewNpc])
+                        NewEffect(58, e.Location, 1, static_cast<float>(e.NewNpc));
+                    else if(e.NewNpc > 0)
                     {
                         numNPCs++;
                         auto &nn = NPC[numNPCs];
@@ -746,7 +722,7 @@ void UpdateEffects()
                         nn.Active = true;
                         nn.TimeLeft = 100;
                         nn.Direction = 0;
-                        nn.Type = en.NewNpc;
+                        nn.Type = e.NewNpc;
                         nn.Location.Height = NPCHeight[nn.Type];
                         nn.Location.Width = NPCWidth[nn.Type];
                         nn.Location.Y += 32 - nn.Location.Height;
@@ -755,14 +731,14 @@ void UpdateEffects()
                         if(nn.Type == NPCID_LEAF)
                             nn.Location.SpeedY = -6;
 
-                        if(NPCIsCheep[en.NewNpc] || NPCIsAParaTroopa[en.NewNpc] || en.NewNpc == NPCID_FIREBAR)
+                        if(NPCIsCheep[e.NewNpc] || NPCIsAParaTroopa[e.NewNpc] || e.NewNpc == NPCID_FIREBAR)
                         {
-                            nn.Special = en.NewNpcSpecial;
+                            nn.Special = e.NewNpcSpecial;
                             nn.DefaultSpecial = int(nn.Special);
                         }
 
-                        if(en.NewNpc == NPCID_STAR_SMB3 || en.NewNpc == NPCID_STAR_SMW)
-                            nn.Variant = (uint16_t)en.NewNpcSpecial;
+                        if(e.NewNpc == NPCID_STAR_SMB3 || e.NewNpc == NPCID_STAR_SMW)
+                            nn.Variant = (uint16_t)e.NewNpcSpecial;
 
                         syncLayers_NPC(numNPCs);
                         CheckSectionNPC(numNPCs);
@@ -783,9 +759,6 @@ void UpdateEffects()
         }
         else if(e.Type == 58) // yoshi grow
         {
-            SDL_assert(nn_it != s_newNpc.end());
-            auto &en = nn_it->second;
-
             e.FrameCount += 1;
             if(e.FrameCount < 10)
                 e.Frame = 0;
@@ -810,26 +783,25 @@ void UpdateEffects()
                 nn.Active = true;
                 nn.TimeLeft = 100;
                 nn.Direction = 1;
-                nn.Type = en.NewNpc;
+                nn.Type = e.NewNpc;
                 nn.Location.Height = NPCHeight[nn.Type];
                 nn.Location.Width = NPCWidth[nn.Type];
                 syncLayers_NPC(numNPCs);
                 CheckSectionNPC(numNPCs);
             }
-
-            if(en.NewNpc == 98)
+            if(e.NewNpc == 98)
                 e.Frame += 2;
-            else if(en.NewNpc == 99)
+            else if(e.NewNpc == 99)
                 e.Frame += 4;
-            else if(en.NewNpc == 100)
+            else if(e.NewNpc == 100)
                 e.Frame += 6;
-            else if(en.NewNpc == 148)
+            else if(e.NewNpc == 148)
                 e.Frame += 8;
-            else if(en.NewNpc == 149)
+            else if(e.NewNpc == 149)
                 e.Frame += 10;
-            else if(en.NewNpc == 150)
+            else if(e.NewNpc == 150)
                 e.Frame += 12;
-            else if(en.NewNpc == 228)
+            else if(e.NewNpc == 228)
                 e.Frame += 14;
         }
         else if(e.Type == 79)
@@ -902,8 +874,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
     {
         numEffects++;
         auto &ne = Effect[numEffects];
-        auto &nn = s_newNpc[numEffects];
-        nn.NewNpc = NewNpc;
+        ne.NewNpc = NewNpc;
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
@@ -921,11 +892,10 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
     {
         numEffects++;
         auto &ne = Effect[numEffects];
-        auto &nne = s_newNpc[numEffects];
-        nne.NewNpc = NewNpc;
+        ne.NewNpc = NewNpc;
         ne.Shadow = Shadow;
-        if(nne.NewNpc == 96)
-            nne.NewNpc = 0;
+        if(ne.NewNpc == 96)
+            ne.NewNpc = 0;
         if(Direction == -1)
             ne.Location.X = Location.X + Location.Width / 2.0 + 16 + 48 * Direction;
         else
@@ -945,12 +915,11 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
     {
         numEffects++;
         auto &ne = Effect[numEffects];
-        auto &nne = s_newNpc[numEffects];
         ne.Shadow = Shadow;
-        nne.NewNpc = NewNpc;
-        nne.NewNpcSpecial = newNpcSpecial;
-        if(nne.NewNpc == 96)
-            nne.NewNpc = 0;
+        ne.NewNpc = NewNpc;
+        ne.NewNpcSpecial = newNpcSpecial;
+        if(ne.NewNpc == 96)
+            ne.NewNpc = 0;
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;
         ne.Location.Width = 32;
@@ -964,7 +933,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
 
         if(A == 56)
         {
-            if(nne.NewNpc != 0 /*&& ne.NewNpc != 96*/) // never 96, because of condition above that replaces 96 with zero
+            if(ne.NewNpc != 0 /*&& ne.NewNpc != 96*/) // never 96, because of condition above that replaces 96 with zero
                 PlaySound(SFX_YoshiEgg);
             else
                 PlaySound(SFX_Smash);
@@ -993,9 +962,8 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
     {
         numEffects++;
         auto &ne = Effect[numEffects];
-        auto &nne = s_newNpc[numEffects];
         ne.Shadow = Shadow;
-        nne.NewNpc = NewNpc;
+        ne.NewNpc = NewNpc;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
         ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
@@ -1011,9 +979,8 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
     {
         numEffects++;
         auto &ne = Effect[numEffects];
-        auto &nne = s_newNpc[numEffects];
         ne.Shadow = Shadow;
-        nne.NewNpc = NewNpc;
+        ne.NewNpc = NewNpc;
         ne.Location.X = Location.X;
         ne.Location.Y = Location.Y;
         ne.Location.Width = 32;
@@ -1126,7 +1093,6 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
     {
         numEffects++;
         auto &ne = Effect[numEffects];
-        auto &nne = s_newNpc[numEffects];
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectWidth[A];
         ne.Location.X = Location.X;
@@ -1167,7 +1133,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
 
         ne.Frame = 0;
         ne.Life = 300;
-        nne.NewNpc = NewNpc;
+        ne.NewNpc = NewNpc;
         ne.Type = A;
 
         if(!tempBool && A == 114)
@@ -1207,9 +1173,8 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
     {
         numEffects++;
         auto &ne = Effect[numEffects];
-        auto &nne = s_newNpc[numEffects];
         ne.Shadow = Shadow;
-        nne.NewNpc = NewNpc;
+        ne.NewNpc = NewNpc;
         ne.Location.Width = 32;
         ne.Location.Height = 32;
         ne.Location.X = Location.X;
@@ -1697,7 +1662,6 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
     {
         numEffects++;
         auto &ne = Effect[numEffects];
-        auto &nne = s_newNpc[numEffects];
         ne.Shadow = Shadow;
         ne.Location.Width = EffectWidth[A];
         ne.Location.Height = EffectHeight[A];
@@ -1705,7 +1669,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
         ne.Location.Y = Location.Y + 22;
         ne.Location.SpeedY = 0;
         ne.Location.SpeedX = 0;
-        nne.NewNpc = NewNpc;
+        ne.NewNpc = NewNpc;
         ne.Frame = 0;
         ne.Life = 120;
         ne.Type = A;
@@ -1946,17 +1910,6 @@ void KillEffect(int A)
 {
     if(numEffects == 0 || A > maxEffects)
         return;
-
-    auto ne_dst = s_newNpc.find(A);
-    if(ne_dst != s_newNpc.end())
-        s_newNpc.erase(ne_dst);
-
-    auto ne_src = s_newNpc.find(numEffects);
-    if(ne_src != s_newNpc.end())
-    {
-        s_newNpc.insert({A, ne_src->second});
-        s_newNpc.erase(ne_src);
-    }
 
     Effect_t &e = Effect[numEffects];
     Effect[A] = e;
