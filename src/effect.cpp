@@ -36,31 +36,6 @@
 typedef std::unordered_map<int, EffectNewNPC_t> EffectNewNpcMap_t;
 static EffectNewNpcMap_t s_newNpc;
 
-#ifdef DEBUG_BUILD
-#include <Logger/logger.h>
-static int s_statMaxEffects = 0;
-static int s_statMaxNewNpc = 0;
-
-static void logMaxEffects()
-{
-    bool changed = false;
-    if(s_statMaxEffects < numEffects)
-    {
-        s_statMaxEffects = numEffects;
-        changed = true;
-    }
-
-    if(s_statMaxNewNpc < (int)s_newNpc.size())
-    {
-        s_statMaxNewNpc = (int)s_newNpc.size();
-        changed = true;
-    }
-
-    if(changed)
-        pLogDebug("-- Maximum effects number got increased: e=%d, NewNpc=%d", s_statMaxEffects, s_statMaxNewNpc);
-}
-#endif
-
 void ClearEffects()
 {
     const Effect_t blankEffect = Effect_t();
@@ -74,10 +49,6 @@ void ClearEffects()
 void UpdateEffects()
 {
 // please reference the /graphics/effect folder to see what the effects are
-
-#ifdef DEBUG_BUILD
-    logMaxEffects();
-#endif
 
 //    int A = 0;
     int B = 0;
