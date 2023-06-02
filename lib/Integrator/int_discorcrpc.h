@@ -28,6 +28,7 @@ class DiscorcRPC
 {
     int FrustrationLevel = 0;
     int SendPresence = 1;
+    uint32_t m_last_sync = 0;
 
     std::string episodeName;
     std::string levelName;

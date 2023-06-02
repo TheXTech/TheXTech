@@ -19,6 +19,7 @@
  */
 
 #include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_timer.h"
 #include "int_discorcrpc.h"
 #include <Logger/logger.h>
 
@@ -72,7 +73,9 @@ void DiscorcRPC::clearAllLabels()
 }
 
 DiscorcRPC::DiscorcRPC()
-{}
+{
+    m_last_sync = SDL_GetTicks();
+}
 
 DiscorcRPC::~DiscorcRPC()
 {
@@ -159,6 +162,10 @@ void DiscorcRPC::setIconName(const std::string& icon)
 
 void DiscorcRPC::sync()
 {
+    if(SDL_GetTicks() - m_last_sync < 100)
+        return; // 10 calls per second is allowed!
+
+    m_last_sync = SDL_GetTicks();
 #ifdef DISCORD_DISABLE_IO_THREAD
     Discord_UpdateConnection();
 #endif
