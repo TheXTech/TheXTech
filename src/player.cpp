@@ -7516,6 +7516,8 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
         RespawnPlayerTo(A, A);
         PlaySound(SFX_DropItem);
     }
+
+    UpdateYoshiMusic();
 }
 
 // returns whether a player is allowed to swap characters
