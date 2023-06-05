@@ -20,6 +20,7 @@
 
 
 #include <Logger/logger.h>
+#include <Integrator/integrator.h>
 
 #include "../globals.h"
 #include "../game_main.h"
@@ -112,11 +113,11 @@ void DoCredits(bool quit)
 void OutroLoop()
 {
     Controls::Update();
+    Integrator::sync();
     bool quit = SharedControls.QuitCredits;
+
     for(int i = 0; i < maxLocalPlayers; i++)
-    {
         quit |= Player[i+1].Controls.Start;
-    }
 
     if(g_gameInfo.outroDeadMode)
     {

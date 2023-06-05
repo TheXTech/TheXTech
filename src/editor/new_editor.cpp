@@ -22,6 +22,7 @@
 
 #include <PGE_File_Formats/file_formats.h>
 #include <Logger/logger.h>
+#include <Integrator/integrator.h>
 
 #include "core/render.h"
 
@@ -4634,6 +4635,8 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
                 OpenLevel(FullFileName);
             }
 
+            Integrator::setEditorFile(FileName);
+
             m_special_page = SPECIAL_PAGE_FILE;
             m_special_subpage = 0;
             m_saved_message.clear();
@@ -4776,12 +4779,14 @@ void EditorScreen::FileBrowserSuccess()
         EnsureLevel();
         OpenLevel(FullFileName);
         ResetCursor();
+        Integrator::setEditorFile(FileName);
     }
     else if(m_browser_callback == BROWSER_CALLBACK_SAVE_LEVEL)
     {
         SaveLevel(FullFileName, FileFormat);
         // this will resync custom assets
         OpenLevel(FullFileName);
+        Integrator::setEditorFile(FileName);
     }
     else if(m_browser_callback == BROWSER_CALLBACK_NEW_LEVEL)
     {
@@ -4794,18 +4799,21 @@ void EditorScreen::FileBrowserSuccess()
         // this will resync custom assets
         OpenLevel(FullFileName);
         ResetCursor();
+        Integrator::setEditorFile(FileName);
     }
     else if(m_browser_callback == BROWSER_CALLBACK_OPEN_WORLD)
     {
         EnsureWorld();
         OpenWorld(FullFileName);
         ResetCursor();
+        Integrator::setEditorFile(FileName);
     }
     else if(m_browser_callback == BROWSER_CALLBACK_SAVE_WORLD)
     {
         SaveWorld(FullFileName, FileFormat);
         // resync custom assets
         OpenWorld(FullFileName);
+        Integrator::setEditorFile(FileName);
     }
     else if(m_browser_callback == BROWSER_CALLBACK_NEW_WORLD)
     {
@@ -4818,6 +4826,7 @@ void EditorScreen::FileBrowserSuccess()
         // resync custom assets
         OpenWorld(FullFileName);
         ResetCursor();
+        Integrator::setEditorFile(FileName);
     }
     else if(m_browser_callback == BROWSER_CALLBACK_CUSTOM_MUSIC)
     {

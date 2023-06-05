@@ -227,7 +227,10 @@ jobs:
           export PATH=${{ matrix.config.extra_path }}:${PATH}
           echo "PATH environment: ${PATH}"
         fi
-        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} .
+        if [[ "${{ secrets.DISCORD_APP_ID }}" != '' ]]; then
+          LOCAL_EXTRA_SETUP="-DTHEXTECH_ENABLE_DISCORD_RPC=ON -DTHEXTECH_DISCORD_APPID=\"${{ secrets.DISCORD_APP_ID }}\""
+        fi
+        cmake -B build -G "${{ matrix.config.generator }}" -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} ${{ matrix.config.extra_options }} ${LOCAL_EXTRA_SETUP} .
 
     - name: Build
       shell: bash

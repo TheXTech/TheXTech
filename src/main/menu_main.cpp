@@ -32,6 +32,7 @@
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
 #include <PGE_File_Formats/file_formats.h>
+#include <Integrator/integrator.h>
 
 #include "menu_main.h"
 #include "game_info.h"
@@ -1118,6 +1119,7 @@ bool mainMenuUpdate()
                                 g_recentWorldEditor = wPath;
                                 SaveConfig();
                             }
+                            Integrator::setEditorFile(FileName);
                             editorScreen.ResetCursor();
                             editorScreen.active = false;
                             MouseRelease = false;
