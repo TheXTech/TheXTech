@@ -20,6 +20,7 @@
 
 #include "../globals.h"
 #include "../npc.h"
+#include "../npc_id.h"
 #include "../sound.h"
 #include "../collision.h"
 #include "../effect.h"
@@ -617,12 +618,12 @@ void TouchBonus(int A, int B)
                 StopMusic();
                 PlaySound(SFX_CrystalBallExit);
             }
-            else if(NPC[B].Type == 97 || NPC[B].Type == 196)
+            else if(NPC[B].Type == NPCID_STAR_SMB3 || NPC[B].Type == NPCID_STAR_SMW)
             {
                 for(const auto& star : Star)
                 {
-                    bool bySection = int(NPC[B].Special) <= 0 && (star.Section == NPC[B].Section || star.Section == -1);
-                    bool byId = int(NPC[B].Special) > 0 && -(star.Section + 100) == int(NPC[B].Special);
+                    bool bySection = NPC[B].Variant == 0 && (star.Section == NPC[B].Section || star.Section == -1);
+                    bool byId = NPC[B].Variant > 0 && -(star.Section + 100) == int(NPC[B].Variant);
                     if(star.level == FileNameFull && (bySection || byId))
                         tempBool = true;
                 }
@@ -632,7 +633,10 @@ void TouchBonus(int A, int B)
                     Star_t star;
                     star.level = FileNameFull;
                     // Positive - section number, Negative - UID of each star per level
-                    star.Section = int(NPC[B].Special) <= 0 ? NPC[B].Section : -int(NPC[B].Special) - 100;
+                    int special = (int)NPC[B].Variant;
+                    star.Section = special <= 0 ? NPC[B].Section : -special - 100;
+                    if(special > 0)
+                        pLogDebug("Got a star with UID=%d", special);
                     Star.push_back(std::move(star));
                     numStars = (int)Star.size();
 #ifdef THEXTECH_INTERPROC_SUPPORTED
