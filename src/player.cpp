@@ -31,6 +31,7 @@
 #include "graphics.h"
 #include "collision.h"
 #include "npc.h"
+#include "npc_id.h"
 #include "sound.h"
 #include "game_main.h"
 #include "effect.h"
@@ -5005,25 +5006,31 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.StandingOnNPC].Frame = 0;
                         NPC[p.StandingOnNPC].Frame = EditorNPCFrame(NPC[p.StandingOnNPC].Type, NPC[p.StandingOnNPC].Direction);
                         NPC[p.StandingOnNPC].Type = NPC[p.StandingOnNPC].Special;
+
                         if(NPC[p.StandingOnNPC].Type == 287)
                         {
                             NPC[p.StandingOnNPC].Type = RandomBonus();
                             NPC[p.StandingOnNPC].DefaultSpecial = NPC[p.StandingOnNPC].Type;
                         }
+
                         CharStuff(p.StandingOnNPC);
                         NPC[p.StandingOnNPC].Special = 0;
+
                         if(NPCIsYoshi[NPC[p.StandingOnNPC].Type])
                         {
                             NPC[p.StandingOnNPC].Special = NPC[p.StandingOnNPC].Type;
                             NPC[p.StandingOnNPC].Type = 96;
                         }
+
                         if(!(NPC[p.StandingOnNPC].Type == 21 || NPC[p.StandingOnNPC].Type == 22 || NPC[p.StandingOnNPC].Type == 26 || NPC[p.StandingOnNPC].Type == 31 || NPC[p.StandingOnNPC].Type == 32 || NPC[p.StandingOnNPC].Type == 35 || NPC[p.StandingOnNPC].Type == 191 || NPC[p.StandingOnNPC].Type == 193 || NPC[p.StandingOnNPC].Type == 49 || NPCIsAnExit[NPC[p.StandingOnNPC].Type]))
                         {
                             if(!BattleMode)
                                 NPC[p.StandingOnNPC].DefaultType = 0;
                         }
+
                         NPC[p.StandingOnNPC].Location.Height = NPCHeight[NPC[p.StandingOnNPC].Type];
                         NPC[p.StandingOnNPC].Location.Width = NPCWidth[NPC[p.StandingOnNPC].Type];
+
                         if(NPC[p.StandingOnNPC].Type == 147)
                         {
                             B = iRand(9);
@@ -5037,6 +5044,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.StandingOnNPC].Location.X += -NPC[p.StandingOnNPC].Location.Width / 2.0;
                             NPC[p.StandingOnNPC].Location.Y += -NPC[p.StandingOnNPC].Location.Height / 2.0;
                         }
+
                         NPCFrames(p.StandingOnNPC);
 
                         if(p.StandingOnNPC > 0)
@@ -7517,6 +7525,8 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
         RespawnPlayerTo(A, A);
         PlaySound(SFX_DropItem);
     }
+
+    UpdateYoshiMusic();
 }
 
 // returns whether a player is allowed to swap characters

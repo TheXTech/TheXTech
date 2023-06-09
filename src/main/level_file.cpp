@@ -492,6 +492,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     for(auto &n : lvl.npc)
     {
+        bool variantHandled = false;
+
         numNPCs++;
         if(numNPCs > maxNPCs)
         {
@@ -521,6 +523,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         {
             npc.Special = n.contents;
             npc.DefaultSpecial = int(npc.Special);
+            npc.Variant = n.special_data;
+            variantHandled = true;
         }
 
         if(npc.Type == NPCID_POTION || npc.Type == NPCID_POTIONDOOR ||
@@ -550,8 +554,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW)
         {
-            npc.Special = n.special_data;
-            npc.DefaultSpecial = int(npc.Special);
+            npc.Variant = n.special_data;
+            variantHandled = true;
         }
 
         if(compatModern && isSmbx64)
@@ -574,7 +578,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
         else
         {
-            npc.Variant = 0;
+            if(!variantHandled)
+                npc.Variant = 0;
         }
 
         // All of the following duplicate the new Special7 code.
@@ -679,8 +684,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             bool starFound = false;
             for(const auto& star : Star)
             {
-                bool bySection = int(npc.Special) <= 0 && (star.Section == npc.Section || star.Section == -1);
-                bool byId = int(npc.Special) > 0 && -(star.Section + 100) == int(npc.Special);
+                bool bySection = npc.Variant == 0 && (star.Section == npc.Section || star.Section == -1);
+                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
                 if(star.level == FileNameFull && (bySection || byId))
                     starFound = true;
             }
@@ -690,6 +695,24 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special = 1;
                 npc.DefaultSpecial = 1;
                 if(npc.Type == NPCID_STAR_SMW)
+                    npc.Killed = 9;
+            }
+        }
+        else if((npc.Type == NPCID_BURIEDPLANT || npc.Type == NPCID_YOSHIEGG ||
+                  npc.Type == NPCID_BUBBLE || npc.Type == NPCID_LAKITU_SMW) &&
+                (n.contents == NPCID_STAR_SMB3 || n.contents == NPCID_STAR_SMW)) // Is a container that has a star inside
+        {
+            bool starFound = false;
+            for(const auto& star : Star)
+            {
+                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
+                if(star.level == FileNameFull && byId)
+                    starFound = true;
+            }
+
+            if(starFound)
+            {
+                if(n.contents == NPCID_STAR_SMW)
                     npc.Killed = 9;
             }
         }

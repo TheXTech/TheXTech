@@ -18,22 +18,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-#ifndef EFFECT_H
-#define EFFECT_H
+#ifndef DISCORCRPC_H
+#define DISCORCRPC_H
 
-#include "global_constants.h"
-#include "location.h"
+#include <stdint.h>
+#include <string>
 
-// Public Sub UpdateEffects() 'Updates the effects
-// Updates the effects
-void UpdateEffects();
-// Public Sub NewEffect(A As Integer, Location As Location, Optional Direction As Single = 1, Optional NewNpc As Integer = 0, Optional Shadow As Boolean = False)  'Create an effect
-// Create an effect
-void NewEffect(int A, const Location_t &Location_t, float Direction = 1, int NewNpc = 0, bool Shadow = false, vbint_t newNpcSpecial = 0);
-// Public Sub KillEffect(A As Integer) 'Remove the effect
-// Remove the effect
-void KillEffect(int A);
+class DiscorcRPC
+{
+    int FrustrationLevel = 0;
+    int SendPresence = 1;
+    uint32_t m_last_sync = 0;
 
+    std::string episodeName;
+    std::string levelName;
+    std::string editorFile;
 
-#endif // EFFECT_H
+    std::string gameName;
+    std::string iconName;
+
+    void clearAllLabels();
+
+public:
+    DiscorcRPC();
+    ~DiscorcRPC();
+
+    void init();
+    void quit();
+
+    void setGameName(const std::string &game);
+    void setEpisodeName(const std::string &ep);
+    void setLevelName(const std::string &lev);
+    void setEditorFile(const std::string &fil);
+    void setIconName(const std::string &icon);
+
+    void sync();
+
+    void update();
+    void clear();
+};
+
+#endif // DISCORCRPC_H

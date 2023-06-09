@@ -19,6 +19,7 @@
  */
 
 #include <Utils/files.h>
+#include <Integrator/integrator.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
 
@@ -199,6 +200,7 @@ void WorldLoop()
     }
 
     speedRun_tick();
+    Integrator::sync();
     UpdateGraphics2();
 
     if(!Controls::Update())

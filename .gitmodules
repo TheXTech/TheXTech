@@ -30,3 +30,6 @@
 	path = 3rdparty/harfbuzz
 	url = https://github.com/Wohlstand/harfbuzz.git
     branch = main
+[submodule "3rdparty/thextech-discord-rpc"]
+	path = 3rdparty/thextech-discord-rpc
+	url = https://github.com/Wohlstand/thextech-discord-rpc.git

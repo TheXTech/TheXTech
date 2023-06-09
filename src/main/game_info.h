@@ -34,6 +34,8 @@ struct GameInfo
     std::string titleCredits;
     RangeArr<std::string, 1, numCharacters> characterName;
 
+    std::string statusIconName;
+
     std::string wordStarAccusativeSingular;
     std::string wordStarAccusativeDual_Cnt;
     std::string wordStarAccusativePlural;

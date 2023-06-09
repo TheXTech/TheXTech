@@ -11,6 +11,21 @@ if(APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
     set(XTECH_MACOSX_TIGER TRUE)
 endif()
 
+# =========================== Architecture info ===============================
+
+include(${CMAKE_CURRENT_LIST_DIR}/TargetArch.cmake)
+target_architecture(TARGET_PROCESSOR)
+message(STATUS "Target architecture: ${TARGET_PROCESSOR}")
+
+test_big_endian(THEXTECH_IS_BIG_ENDIAN)
+if(THEXTECH_IS_BIG_ENDIAN)
+    message(STATUS "Target processor endianess: BIG ENDIAN")
+else()
+    message(STATUS "Target processor endianess: LITTLE ENDIAN")
+endif()
+
+message(STATUS "Size of void pointer is ${CMAKE_SIZEOF_VOID_P}!")
+
 # =============================== Policies ====================================
 
 # Ninja requires custom command byproducts to be explicit.
