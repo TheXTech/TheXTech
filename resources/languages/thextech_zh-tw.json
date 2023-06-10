@@ -350,7 +350,7 @@
             "phraseWaitingForInput": "等待玩家加入……",
             "reconnectTitle": "重新連接",
             "splitPressSelect_1": "按選擇鍵",
-            "splitPressSelect_2": "進入按鍵設置",
+            "splitPressSelect_2": "進入按鍵配置",
             "wordDisconnect": "斷開"
         },
         "controls": {
@@ -364,7 +364,7 @@
         "pause": {
             "continue": "繼續",
             "dropAddPlayers": "加入/離開遊戲",
-            "enterCode": "輸入代碼",
+            "enterCode": "輸入指令",
             "quit": "退出",
             "quitTesting": "結束測試",
             "resetCheckpoints": "重置中間點",
