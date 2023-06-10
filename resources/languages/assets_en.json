@@ -469,7 +469,7 @@
     "languageName": "English",
     "objects": {
         "wordFails": "FAILS",
-        "wordStarAccusativeDualOrCounter": "",
+        "wordStarAccusativeDualOrCounter": "<Unused in English, translate as \"stars\" in Dual form if your language has dual form (the number between plural and singular)>",
         "wordStarAccusativePlural": "stars",
         "wordStarAccusativeSingular": "star"
     }

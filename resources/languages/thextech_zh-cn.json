@@ -153,7 +153,7 @@
                 "preserveLayerContents": "是否保留图层对象？"
             },
             "desc": {
-                "att1": "当 NPC 移动时，",
+                "att1": "当NPC移动时，",
                 "att2": "图层也将随之移动",
                 "att3": " ",
                 "att4": " ",
@@ -445,7 +445,7 @@
                 "batteryStatus": "电池状态",
                 "groundPoundButton": "震地按键",
                 "maxPlayers": "玩家上限",
-                "rumble": "Rumble 控制器",
+                "rumble": "Rumble控制器",
                 "textEntryStyle": "按键名称显示"
             },
             "phraseNewProfOldJoy": "新建老式手柄配置",
