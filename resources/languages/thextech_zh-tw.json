@@ -374,7 +374,7 @@
             "saveAndQuit": "保存並退出"
         }
     },
-    "languageName": "簡體中文",
+    "languageName": "繁體中文",
     "menu": {
         "abbrevMilliseconds": "毫秒",
         "battle": {
@@ -563,8 +563,8 @@
             "gameSlotNew": "存檔 {0} ... 新遊戲",
             "gameSourceSlot": "選擇源存檔",
             "gameTargetSlot": "選擇目標存檔",
-            "phraseScore": "得分：",
-            "phraseTime": "時間："
+            "phraseScore": "得分：{0}",
+            "phraseTime": "時間：{0}"
         },
         "loading": "加載中...",
         "main": {
