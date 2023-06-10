@@ -245,7 +245,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
     LoadingInProcess = true;
 
-    ShowFPS = setup.testShowFPS || true; // FIXME: revert before merge
+    ShowFPS = setup.testShowFPS;
     MaxFPS = setup.testMaxFPS; // || (g_videoSettings.renderModeObtained == RENDER_ACCELERATED_VSYNC);
 
     OpenConfig();
