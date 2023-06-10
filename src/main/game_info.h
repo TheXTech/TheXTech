@@ -36,6 +36,10 @@ struct GameInfo
 
     std::string statusIconName;
 
+    std::string wordStarAccusativeSingular;
+    std::string wordStarAccusativeDual_Cnt;
+    std::string wordStarAccusativePlural;
+
     bool disableBattleMode = true;
     bool disableTwoPlayer = true;
 

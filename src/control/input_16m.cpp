@@ -28,16 +28,24 @@
 
 #include "controls.h"
 #include "control/input_16m.h"
+#include "control/controls_strings.h"
 
-const char* KEYNAMES[32] = {
- "A", "B", "SELECT", "START",
- "RIGHT", "LEFT", "UP", "DOWN",
- "R", "L", "X", "Y",
- "12", "13", "14", "15",
- "16", "17", "18", "19",
- "TOUCH", "21", "22", "23",
- "24", "25", "26", "27",
- "28", "29", "30", "31"
+#include "main/menu_main.h"
+
+#define buttonRight Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Right]
+#define buttonLeft  Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Left]
+#define buttonUp    Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]
+#define buttonDown  Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Down]
+
+const std::string* KEYNAMES[32] = {
+ &g_controlsStrings.tdsButtonA,   &g_controlsStrings.tdsButtonB, &g_controlsStrings.tdsButtonSelect, &g_controlsStrings.tdsButtonStart,
+ &buttonRight,                    &buttonLeft,                   &buttonUp,                     &buttonDown,
+ &g_controlsStrings.tdsButtonR,   &g_controlsStrings.tdsButtonL, &g_controlsStrings.tdsButtonX, &g_controlsStrings.tdsButtonY,
+ &g_mainMenu.caseNone,            &g_mainMenu.caseNone,          &g_mainMenu.caseNone,          &g_mainMenu.caseNone,
+ &g_mainMenu.caseNone,            &g_mainMenu.caseNone,          &g_mainMenu.caseNone,          &g_mainMenu.caseNone,
+ &g_controlsStrings.tdsCasePen,   &g_mainMenu.caseNone,          &g_mainMenu.caseNone,          &g_mainMenu.caseNone,
+ &g_mainMenu.caseNone,            &g_mainMenu.caseNone,          &g_mainMenu.caseNone,          &g_mainMenu.caseNone,
+ &g_mainMenu.caseNone,            &g_mainMenu.caseNone,          &g_mainMenu.caseNone,          &g_mainMenu.caseNone
 };
 
 enum KEYID {
@@ -588,7 +596,7 @@ const char* InputMethodProfile_16M::NamePrimaryButton(ControlsClass c, size_t i)
     if(c == ControlsClass::Player)
         keys = this->m_keys;
     else if(c == ControlsClass::Cursor)
-        return "(PEN)";
+        return g_controlsStrings.dsCasePen.c_str();
     else if(c == ControlsClass::Editor)
         keys = this->m_editor_keys;
     else if(c == ControlsClass::Hotkey)
@@ -597,12 +605,12 @@ const char* InputMethodProfile_16M::NamePrimaryButton(ControlsClass c, size_t i)
         return "";
 
     if(keys[i] == null_key)
-        return "NONE";
+        return g_mainMenu.caseNone.c_str();
 
     if(keys[i] < 0 || keys[i] >= 32)
-        return "(INVALID)";
+        return g_controlsStrings.sharedCaseInvalid.c_str();
 
-    return KEYNAMES[keys[i]];
+    return KEYNAMES[keys[i]]->c_str();
 }
 
 const char* InputMethodProfile_16M::NameSecondaryButton(ControlsClass c, size_t i)
@@ -620,10 +628,13 @@ const char* InputMethodProfile_16M::NameSecondaryButton(ControlsClass c, size_t 
     else
         return "";
 
-    if(keys2[i] < 0 || keys2[i] >= 32)
-        return "(INVALID)";
+    if(keys2[i] == null_key)
+        return "";
 
-    return KEYNAMES[keys2[i]];
+    if(keys2[i] < 0 || keys2[i] >= 32)
+        return g_controlsStrings.sharedCaseInvalid.c_str();
+
+    return KEYNAMES[keys2[i]]->c_str();
 }
 
 void InputMethodProfile_16M::SaveConfig(IniProcessing* ctl)
@@ -997,7 +1008,7 @@ InputMethod* InputMethodType_16M::Poll(const std::vector<InputMethod*>& active_m
     if(!method)
         return nullptr;
 
-    method->Name = "NDS";
+    method->Name = this->Name;
     method->Type = this;
     method->Profile = target_profile;
 
@@ -1049,7 +1060,7 @@ size_t InputMethodType_16M::GetOptionCount()
 const char* InputMethodType_16M::GetOptionName(size_t i)
 {
     if(i == 0)
-        return "MAX PLAYERS";
+        return g_controlsStrings.sharedOptionMaxPlayers.c_str();
 
     return nullptr;
 }
@@ -1077,7 +1088,7 @@ bool InputMethodType_16M::OptionChange(size_t i)
         this->m_maxPlayers ++;
 
         if(this->m_maxPlayers > 2)
-            this->m_maxPlayers = 0;
+            this->m_maxPlayers = 1;
 
         return true;
     }
@@ -1090,7 +1101,7 @@ bool InputMethodType_16M::OptionRotateLeft(size_t i)
 {
     if(i == 0)
     {
-        if(this->m_maxPlayers > 0)
+        if(this->m_maxPlayers > 1)
         {
             this->m_maxPlayers --;
             return true;

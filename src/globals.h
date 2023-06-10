@@ -1334,6 +1334,7 @@ extern RangeArr<Scene_t, 1, maxScenes> Scene;
 DECLREF_T(Scene);
 //Public Credit(1 To 200) As CreditLine 'for end game credits
 extern RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
+extern int numWorldCredits;
 extern double CreditOffsetY;
 extern double CreditTotalHeight;
 //Public numCredits As Integer 'number of credits
@@ -2294,5 +2295,8 @@ extern std::string LevelName;
 //Public Const curRelease As Integer = 64
 const int curRelease = 64;
 
+//EXTRA: Language
+extern std::string CurrentLanguage;
+extern std::string CurrentLangDialect;
 
 #endif // GLOBALS_H

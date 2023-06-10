@@ -25,6 +25,8 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
+#include "main/translate.h"
+
 #include "editor/editor_custom.h"
 
 #include "sound.h"
@@ -60,6 +62,8 @@ ItemList_t sound_list;
 ItemList_t music_list;
 ItemList_t wmusic_list;
 ItemList_t bg2_list;
+
+std::vector<std::string> list_level_exit_names(10);
 
 
 // implementation for ItemType_t
@@ -523,6 +527,33 @@ void ItemList_t::make_layout(int rows)
     }
 }
 
+void ItemList_t::make_translation(XTechTranslate& translate, const char* group, const char* prefix, const std::vector<std::pair<ListItemFamily_t, std::string>>& families)
+{
+    int header = -1;
+
+    for(size_t i = 0; i < indices.size(); i++)
+    {
+        if(indices[i] != -1)
+        {
+            if(header < 0)
+                translate.m_assetsMap.insert({fmt::format_ne("editor.{0}.auto.{1}{2}", group, prefix, indices[i]), &names[i]});
+            else if(header < (int)families.size())
+                translate.m_assetsMap.insert({fmt::format_ne("editor.{0}.{1}.{2}{3}", group, families[header].second, prefix, indices[i]), &names[i]});
+            else
+                translate.m_assetsMap.insert({fmt::format_ne("editor.{0}.fam{1}.{2}{3}", group, header, prefix, indices[i]), &names[i]});
+        }
+        else if(!names[i].empty())
+        {
+            header++;
+
+            if(header < (int)families.size())
+                translate.m_assetsMap.insert({fmt::format_ne("editor.{0}.{1}.header", group, families[header].second), &names[i]});
+            else
+                translate.m_assetsMap.insert({fmt::format_ne("editor.{0}.fam{1}.header", group, header), &names[i]});
+        }
+    }
+}
+
 
 // general-purpose layout functions
 
@@ -912,7 +943,7 @@ void make_pages(std::vector<ItemFamily*>& families, std::vector<ItemPage_t>& pag
 }
 
 
-void Load()
+void Load(XTechTranslate* translate)
 {
     block_families.clear();
     bgo_families.clear();
@@ -928,15 +959,24 @@ void Load()
     pLogDebug("Loading editor.ini...");
 
     IniProcessing editor(AppPath + "editor.ini");
+    IniProcessing sound(AppPath + "sound.ini");
+    IniProcessing music(AppPath + "music.ini");
 
     std::vector<int> temp_ints;
     std::vector<int> temp_layout_pod_indices;
     std::string temp_str;
 
-    std::vector<ListItemFamily_t> sound_families;
-    std::vector<ListItemFamily_t> music_families;
-    std::vector<ListItemFamily_t> wmusic_families;
-    std::vector<ListItemFamily_t> bg2_families;
+    // will be added to the global list and then destroyed
+    std::vector<std::pair<ListItemFamily_t, std::string>> sound_families;
+    std::vector<std::pair<ListItemFamily_t, std::string>> music_families;
+    std::vector<std::pair<ListItemFamily_t, std::string>> wmusic_families;
+    std::vector<std::pair<ListItemFamily_t, std::string>> bg2_families;
+
+    // needed to form the translations correctly
+    std::vector<std::string> block_family_keys;
+    std::vector<std::string> bgo_family_keys;
+    std::vector<std::string> npc_family_keys;
+    std::vector<std::string> tile_family_keys;
 
     for(const std::string& group : editor.childGroups())
     {
@@ -954,6 +994,7 @@ void Load()
             prefix = "blk";
             max_item_type = maxBlockType;
             has_slope = true;
+            block_family_keys.push_back(group.c_str() + prefix_length);
         }
         else if(SDL_strncasecmp(group.c_str(), "bgofam", 6) == 0)
         {
@@ -961,6 +1002,7 @@ void Load()
             f_ptr = &bgo_families[bgo_families.size() - 1];
             prefix = "bgo";
             max_item_type = maxBackgroundType;
+            bgo_family_keys.push_back(group.c_str() + prefix_length);
         }
         else if(SDL_strncasecmp(group.c_str(), "npcfam", 6) == 0)
         {
@@ -968,6 +1010,7 @@ void Load()
             f_ptr = &npc_families[npc_families.size() - 1];
             prefix = "npc";
             max_item_type = maxNPCType;
+            npc_family_keys.push_back(group.c_str() + prefix_length);
         }
         else if(SDL_strncasecmp(group.c_str(), "tilefam", 7) == 0)
         {
@@ -976,31 +1019,40 @@ void Load()
             prefix = "tile";
             prefix_length = 4;
             max_item_type = maxTileType;
+            tile_family_keys.push_back(group.c_str() + prefix_length);
         }
         else if(SDL_strncasecmp(group.c_str(), "sndfam", 6) == 0)
         {
             sound_families.emplace_back();
-            l_ptr = &sound_families[sound_families.size() - 1];
+            l_ptr = &sound_families[sound_families.size() - 1].first;
             prefix = "snd";
+            sound_families[sound_families.size() - 1].second = group.c_str() + prefix_length;
         }
         else if(SDL_strncasecmp(group.c_str(), "musfam", 6) == 0)
         {
             music_families.emplace_back();
-            l_ptr = &music_families[music_families.size() - 1];
+            l_ptr = &music_families[music_families.size() - 1].first;
             prefix = "mus";
+            music_families[music_families.size() - 1].second = group.c_str() + prefix_length;
         }
         else if(SDL_strncasecmp(group.c_str(), "wmusfam", 7) == 0)
         {
             wmusic_families.emplace_back();
-            l_ptr = &wmusic_families[wmusic_families.size() - 1];
+            l_ptr = &wmusic_families[wmusic_families.size() - 1].first;
             prefix = "wmus";
             prefix_length = 4;
+            wmusic_families[wmusic_families.size() - 1].second = group.c_str() + prefix_length;
         }
         else if(SDL_strncasecmp(group.c_str(), "bg2fam", 6) == 0)
         {
             bg2_families.emplace_back();
-            l_ptr = &bg2_families[bg2_families.size() - 1];
+            l_ptr = &bg2_families[bg2_families.size() - 1].first;
             prefix = "bg2";
+            bg2_families[bg2_families.size() - 1].second = group.c_str() + prefix_length;
+        }
+        else if(SDL_strcasecmp(group.c_str(), "exit-codes") == 0)
+        {
+            // handled above to ensure we get failsafes
         }
         else
         {
@@ -1013,7 +1065,7 @@ void Load()
 
             ListItemFamily_t& f = *l_ptr;
 
-            editor.read("name", f.name, "");
+            editor.read("name", f.name, "...");
             editor.read("sort-index", f.sort_index, 0);
 
             temp_ints.clear();
@@ -1427,6 +1479,25 @@ void Load()
     }
 
 
+    // Process exit codes
+    editor.beginGroup("exit-codes");
+
+    editor.read("any", list_level_exit_names[0], "Any");
+    editor.read("none", list_level_exit_names[1], "None");
+
+    translate->m_assetsMap.insert({fmt::format_ne("editor.exit-codes.{0}", "any"), &(list_level_exit_names[0])});
+    translate->m_assetsMap.insert({fmt::format_ne("editor.exit-codes.{0}", "none"), &(list_level_exit_names[1])});
+
+    for(size_t i = 1; i + 1 < list_level_exit_names.size(); i++)
+    {
+        const std::string s = fmt::format_ne("code{0}", i);
+        editor.read(s.c_str(), list_level_exit_names[i + 1], s);
+        translate->m_assetsMap.insert({fmt::format_ne("editor.exit-codes.{0}", i), &(list_level_exit_names[i + 1])});
+    }
+
+    editor.endGroup();
+
+
     // process Blocks
     s_ordered_block_families.clear();
     for(ItemFamily& family : block_families)
@@ -1455,6 +1526,14 @@ void Load()
         else if(blocks_begun)
             pLogWarning("Can't find family for block type %d", i + 1);
     }
+
+    // add Blocks to translations
+    if(translate)
+    {
+        for(uint8_t i = 0; i < block_families.size(); i++)
+            translate->m_assetsMap.insert({fmt::format_ne("editor.block.{0}", block_family_keys[i]), &(block_families[i].name)});
+    }
+
 
     // process BGOs
     s_ordered_bgo_families.clear();
@@ -1485,6 +1564,14 @@ void Load()
         else if(bgos_begun && i + 1 != 160 && i + 1 != 98)
             pLogWarning("Can't find family for BGO type %d", i + 1);
     }
+
+    // add BGOs to translations
+    if(translate)
+    {
+        for(uint8_t i = 0; i < bgo_families.size(); i++)
+            translate->m_assetsMap.insert({fmt::format_ne("editor.bgo.{0}", bgo_family_keys[i]), &(bgo_families[i].name)});
+    }
+
 
     // process NPCs
     s_ordered_npc_families.clear();
@@ -1519,6 +1606,14 @@ void Load()
     }
 #endif
 
+    // add NPCs to translations
+    if(translate)
+    {
+        for(uint8_t i = 0; i < npc_families.size(); i++)
+            translate->m_assetsMap.insert({fmt::format_ne("editor.npc.{0}", npc_family_keys[i]), &(npc_families[i].name)});
+    }
+
+
     // process tiles
     s_ordered_tile_families.clear();
     for(ItemFamily& family : tile_families)
@@ -1548,18 +1643,27 @@ void Load()
             pLogWarning("Can't find family for tile type %d", i + 1);
     }
 
+    // add tiles to translations
+    if(translate)
+    {
+        for(uint8_t i = 0; i < tile_families.size(); i++)
+            translate->m_assetsMap.insert({fmt::format_ne("editor.tile.{0}", tile_family_keys[i]), &(tile_families[i].name)});
+    }
+
+
     // process bg2s
     if(!bg2_families.empty())
     {
         std::sort(bg2_families.begin(), bg2_families.end(),
-        [](const ListItemFamily_t& a, const ListItemFamily_t& b)
+        [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
-            return a.sort_index < b.sort_index;
+            return a.first.sort_index < b.first.sort_index;
         });
 
         size_t length = 1;
-        for(const ListItemFamily_t& f : bg2_families)
+        for(const std::pair<ListItemFamily_t, std::string>& p : bg2_families)
         {
+            const ListItemFamily_t& f = p.first;
             length += 1 + f.indices.size();
         }
 
@@ -1569,8 +1673,10 @@ void Load()
         bg2_list.indices.push_back(0);
         bg2_list.names.push_back("None");
 
-        for(ListItemFamily_t& f : bg2_families)
+        for(std::pair<ListItemFamily_t, std::string>& p : bg2_families)
         {
+            ListItemFamily_t& f = p.first;
+
             bg2_list.indices.push_back(-1);
             bg2_list.names.push_back(std::move(f.name));
 
@@ -1582,20 +1688,25 @@ void Load()
         }
 
         bg2_list.make_layout(10);
+
+        // add to translation engine
+        if(translate)
+            bg2_list.make_translation(*translate, "background2", "bg2-", bg2_families);
     }
 
     // process music
     if(!music_families.empty())
     {
         std::sort(music_families.begin(), music_families.end(),
-        [](const ListItemFamily_t& a, const ListItemFamily_t& b)
+        [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
-            return a.sort_index < b.sort_index;
+            return a.first.sort_index < b.first.sort_index;
         });
 
         size_t length = 2;
-        for(const ListItemFamily_t& f : music_families)
+        for(const std::pair<ListItemFamily_t, std::string>& p : music_families)
         {
+            const ListItemFamily_t& f = p.first;
             length += 1 + f.indices.size();
         }
 
@@ -1608,8 +1719,10 @@ void Load()
         music_list.indices.push_back(24);
         music_list.names.push_back("Custom");
 
-        for(ListItemFamily_t& f : music_families)
+        for(std::pair<ListItemFamily_t, std::string>& p : music_families)
         {
+            ListItemFamily_t& f = p.first;
+
             music_list.indices.push_back(-1);
             music_list.names.push_back(std::move(f.name));
 
@@ -1621,20 +1734,25 @@ void Load()
         }
 
         music_list.make_layout(10);
+
+        // add to translation engine
+        if(translate)
+            music_list.make_translation(*translate, "music", "music", music_families);
     }
 
     // process world music
     if(!wmusic_families.empty())
     {
         std::sort(wmusic_families.begin(), wmusic_families.end(),
-        [](const ListItemFamily_t& a, const ListItemFamily_t& b)
+        [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
-            return a.sort_index < b.sort_index;
+            return a.first.sort_index < b.first.sort_index;
         });
 
         size_t length = 1;
-        for(const ListItemFamily_t& f : wmusic_families)
+        for(const std::pair<ListItemFamily_t, std::string>& p : wmusic_families)
         {
+            const ListItemFamily_t& f = p.first;
             length += 1 + f.indices.size();
         }
 
@@ -1644,8 +1762,10 @@ void Load()
         wmusic_list.indices.push_back(0);
         wmusic_list.names.push_back("None");
 
-        for(ListItemFamily_t& f : wmusic_families)
+        for(std::pair<ListItemFamily_t, std::string>& p : wmusic_families)
         {
+            ListItemFamily_t& f = p.first;
+
             wmusic_list.indices.push_back(-1);
             wmusic_list.names.push_back(std::move(f.name));
 
@@ -1657,20 +1777,25 @@ void Load()
         }
 
         wmusic_list.make_layout(10);
+
+        // add to translation engine
+        if(translate)
+            wmusic_list.make_translation(*translate, "worldMusic", "wmusic", wmusic_families);
     }
 
     // process sounds
     if(!sound_families.empty())
     {
         std::sort(sound_families.begin(), sound_families.end(),
-        [](const ListItemFamily_t& a, const ListItemFamily_t& b)
+        [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
-            return a.sort_index < b.sort_index;
+            return a.first.sort_index < b.first.sort_index;
         });
 
         size_t length = 1;
-        for(const ListItemFamily_t& f : sound_families)
+        for(const std::pair<ListItemFamily_t, std::string>& p : sound_families)
         {
+            const ListItemFamily_t& f = p.first;
             length += 1 + f.indices.size();
         }
 
@@ -1680,8 +1805,10 @@ void Load()
         sound_list.indices.push_back(0);
         sound_list.names.push_back("None");
 
-        for(ListItemFamily_t& f : sound_families)
+        for(std::pair<ListItemFamily_t, std::string>& p : sound_families)
         {
+            ListItemFamily_t& f = p.first;
+
             sound_list.indices.push_back(-1);
             sound_list.names.push_back(std::move(f.name));
 
@@ -1693,6 +1820,10 @@ void Load()
         }
 
         sound_list.make_layout(10);
+
+        // add to translation engine
+        if(translate)
+            sound_list.make_translation(*translate, "sound", "sound", sound_families);
     }
 }
 

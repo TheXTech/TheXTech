@@ -26,6 +26,9 @@
 #include "controls.h"
 #include "control/input_wii.h"
 
+#include "control/controls_strings.h"
+#include "main/menu_main.h"
+
 #include <Logger/logger.h>
 
 #include <wiiuse/wpad.h>
@@ -43,32 +46,51 @@
 
 #define WPAD_SHAKE     0x1FFF
 
-static constexpr std::array<const uint32_t, 12> wiimote_buttons = {WPAD_BUTTON_2, WPAD_BUTTON_1, WPAD_BUTTON_B, WPAD_BUTTON_A, WPAD_BUTTON_MINUS, WPAD_BUTTON_HOME, WPAD_BUTTON_LEFT, WPAD_BUTTON_RIGHT, WPAD_BUTTON_DOWN, WPAD_BUTTON_UP, WPAD_BUTTON_PLUS, WPAD_SHAKE};
-static constexpr std::array<const char*, 12> wiimote_button_names = {"2", "1", "B", "A", "-", "HOME", "D LEFT", "D RIGHT", "D DOWN", "D UP", "+", "SHAKE"};
+#define buttonRight Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Right]
+#define buttonLeft  Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Left]
+#define buttonUp    Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]
+#define buttonDown  Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Down]
 
-static constexpr std::array<const uint32_t, 6> nunchuck_buttons = {WPAD_STICK_LL, WPAD_STICK_LR, WPAD_STICK_LU, WPAD_STICK_LD, WPAD_NUNCHUK_BUTTON_Z, WPAD_NUNCHUK_BUTTON_C};
-static constexpr std::array<const char*, 6> nunchuck_button_names = {"N LEFT", "N RIGHT", "N UP", "N DOWN", "Z", "C"};
+bool is_direction(const std::string* s)
+{
+    return s == &buttonLeft || s == &buttonDown || s == &buttonUp || s == &buttonRight;
+}
 
-static constexpr std::array<const uint32_t, 23> classic_buttons = {WPAD_CLASSIC_BUTTON_UP, WPAD_CLASSIC_BUTTON_LEFT, WPAD_CLASSIC_BUTTON_ZR, WPAD_CLASSIC_BUTTON_X, WPAD_CLASSIC_BUTTON_A, WPAD_CLASSIC_BUTTON_Y,
-    WPAD_CLASSIC_BUTTON_B, WPAD_CLASSIC_BUTTON_ZL, WPAD_CLASSIC_BUTTON_FULL_R, WPAD_CLASSIC_BUTTON_PLUS, WPAD_CLASSIC_BUTTON_HOME, WPAD_CLASSIC_BUTTON_MINUS, WPAD_CLASSIC_BUTTON_FULL_L, WPAD_CLASSIC_BUTTON_DOWN,
+static constexpr std::array<const uint32_t, 12> wiimote_buttons =      {WPAD_BUTTON_2,                 WPAD_BUTTON_1,                 WPAD_BUTTON_B,                 WPAD_BUTTON_A,                 WPAD_BUTTON_MINUS,                 WPAD_BUTTON_HOME,                 WPAD_BUTTON_LEFT, WPAD_BUTTON_RIGHT, WPAD_BUTTON_DOWN, WPAD_BUTTON_UP, WPAD_BUTTON_PLUS,                 WPAD_SHAKE};
+static const std::array<const std::string*, 12> wiimote_button_names = {&g_controlsStrings.wiiButton2, &g_controlsStrings.wiiButton1, &g_controlsStrings.wiiButtonB, &g_controlsStrings.wiiButtonA, &g_controlsStrings.wiiButtonMinus, &g_controlsStrings.wiiButtonHome, &buttonLeft,      &buttonRight,      &buttonDown,      &buttonUp,      &g_controlsStrings.wiiButtonPlus, &g_controlsStrings.wiiShake};
+
+static constexpr std::array<const uint32_t, 6> nunchuck_buttons =      {WPAD_STICK_LL, WPAD_STICK_LR, WPAD_STICK_LU, WPAD_STICK_LD, WPAD_NUNCHUK_BUTTON_Z,         WPAD_NUNCHUK_BUTTON_C};
+static const std::array<const std::string*, 6> nunchuck_button_names = {&buttonLeft,   &buttonRight,  &buttonUp,     &buttonDown,   &g_controlsStrings.wiiButtonZ, &g_controlsStrings.wiiButtonC};
+
+static constexpr std::array<const uint32_t, 23> classic_buttons = {WPAD_CLASSIC_BUTTON_UP, WPAD_CLASSIC_BUTTON_LEFT, WPAD_CLASSIC_BUTTON_ZR,         WPAD_CLASSIC_BUTTON_X,         WPAD_CLASSIC_BUTTON_A,         WPAD_CLASSIC_BUTTON_Y,
+    WPAD_CLASSIC_BUTTON_B,         WPAD_CLASSIC_BUTTON_ZL,         WPAD_CLASSIC_BUTTON_FULL_R,     WPAD_CLASSIC_BUTTON_PLUS,         WPAD_CLASSIC_BUTTON_HOME,         WPAD_CLASSIC_BUTTON_MINUS,         WPAD_CLASSIC_BUTTON_FULL_L,     WPAD_CLASSIC_BUTTON_DOWN,
     WPAD_CLASSIC_BUTTON_RIGHT, WPAD_STICK_LL, WPAD_STICK_LR, WPAD_STICK_LU, WPAD_STICK_LD, WPAD_STICK_RL, WPAD_STICK_RR, WPAD_STICK_RU, WPAD_STICK_RD};
-static constexpr std::array<const char*, 23> classic_button_names = {"D UP", "D LEFT", "ZR", "X", "A", "Y", "B", "ZL", "RT", "+", "HOME", "-", "LT", "D DOWN", "D RIGHT",
-    "L LEFT", "L RIGHT", "L UP", "L DOWN", "R LEFT", "R RIGHT", "R UP", "R DOWN"};
+static const std::array<const std::string*, 23> classic_button_names = {&buttonUp,         &buttonLeft,              &g_controlsStrings.wiiButtonZR, &g_controlsStrings.wiiButtonX, &g_controlsStrings.wiiButtonA, &g_controlsStrings.wiiButtonY,
+    &g_controlsStrings.wiiButtonB, &g_controlsStrings.wiiButtonZL, &g_controlsStrings.wiiButtonRT, &g_controlsStrings.wiiButtonPlus, &g_controlsStrings.wiiButtonHome, &g_controlsStrings.wiiButtonMinus, &g_controlsStrings.wiiButtonLT, &buttonDown,
+    &buttonRight,              &buttonLeft,   &buttonRight,  &buttonUp,     &buttonDown,   &buttonLeft,   &buttonRight,  &buttonUp,     &buttonDown};
+
+static std::string s_buffer;
 
 static const char* s_get_name(uint32_t button, uint8_t expansion)
 {
     if(button == Controls::null_but)
-        return "NONE";
+        return nullptr;
 
     // main Wiimote buttons
     if(button < WPAD_STICK_LL)
     {
         auto i = std::find(wiimote_buttons.begin(), wiimote_buttons.end(), button);
         if(i == wiimote_buttons.end())
-            return "INVALID";
+            return g_controlsStrings.sharedCaseInvalid.c_str();
 
         int index = i - wiimote_buttons.begin();
-        return wiimote_button_names[index];
+        if(is_direction(wiimote_button_names[index]))
+        {
+            s_buffer = g_controlsStrings.wiiDpad + " " + *wiimote_button_names[index];
+            return s_buffer.c_str();
+        }
+
+        return wiimote_button_names[index]->c_str();
     }
 
     // nunchuck buttons
@@ -76,10 +98,16 @@ static const char* s_get_name(uint32_t button, uint8_t expansion)
     {
         auto i = std::find(nunchuck_buttons.begin(), nunchuck_buttons.end(), button);
         if(i == nunchuck_buttons.end())
-            return "INVALID";
+            return g_controlsStrings.sharedCaseInvalid.c_str();
 
         int index = i - nunchuck_buttons.begin();
-        return nunchuck_button_names[index];
+        if(is_direction(nunchuck_button_names[index]))
+        {
+            s_buffer = g_controlsStrings.wiiPrefixNunchuck + " " + *nunchuck_button_names[index];
+            return s_buffer.c_str();
+        }
+
+        return nunchuck_button_names[index]->c_str();
     }
 
     // classic buttons
@@ -87,13 +115,22 @@ static const char* s_get_name(uint32_t button, uint8_t expansion)
     {
         auto i = std::find(classic_buttons.begin(), classic_buttons.end(), button);
         if(i == classic_buttons.end())
-            return "INVALID";
+            return g_controlsStrings.sharedCaseInvalid.c_str();
 
         int index = i - classic_buttons.begin();
-        return classic_button_names[index];
+        if(is_direction(classic_button_names[index]))
+        {
+            const std::string& prefix = (button >= WPAD_STICK_RL && button <= WPAD_STICK_RD) ? g_controlsStrings.wiiRStick
+                : (button >= WPAD_STICK_LL && button <= WPAD_STICK_LD) ? g_controlsStrings.wiiLStick
+                : g_controlsStrings.wiiDpad;
+            s_buffer = prefix + " " + *classic_button_names[index];
+            return s_buffer.c_str();
+        }
+
+        return classic_button_names[index]->c_str();
     }
 
-    return "INVALID";
+    return g_controlsStrings.sharedCaseInvalid.c_str();
 }
 
 static inline double i_get_thumb_dbl(WPADData* data, uint32_t button, uint8_t expansion)
@@ -442,8 +479,15 @@ StatusInfo InputMethod_Wii::GetStatus()
 \*===============================================*/
 
 // the job of this function is to initialize the class in a consistent state
-InputMethodProfile_Wii::InputMethodProfile_Wii(uint8_t expansion) : m_expansion(expansion)
+InputMethodProfile_Wii::InputMethodProfile_Wii(uint8_t expansion)
 {
+    this->InitAs(expansion);
+}
+
+void InputMethodProfile_Wii::InitAs(uint8_t expansion)
+{
+    this->m_expansion = expansion;
+
     for(size_t i = 0; i < PlayerControls::n_buttons; i++)
     {
         this->m_keys[i] = null_but;
@@ -929,9 +973,9 @@ const char* InputMethodProfile_Wii::NamePrimaryButton(ControlsClass c, size_t i)
     else if(c == ControlsClass::Cursor)
     {
         if(i < CursorControls::Buttons::Primary)
-            return "(IR)";
+            return g_controlsStrings.wiiCaseIR.c_str();
         else
-            return "(NONE)";
+            return g_mainMenu.caseNone.c_str();
     }
     else if(c == ControlsClass::Editor)
         keys = this->m_editor_keys;
@@ -940,7 +984,12 @@ const char* InputMethodProfile_Wii::NamePrimaryButton(ControlsClass c, size_t i)
     else
         return "";
 
-    return s_get_name(keys[i], m_expansion);
+    const char* ret = s_get_name(keys[i], m_expansion);
+
+    if(!ret)
+        return g_mainMenu.caseNone.c_str();
+
+    return ret;
 }
 
 const char* InputMethodProfile_Wii::NameSecondaryButton(ControlsClass c, size_t i)
@@ -958,7 +1007,12 @@ const char* InputMethodProfile_Wii::NameSecondaryButton(ControlsClass c, size_t 
     else
         return "";
 
-    return s_get_name(keys2[i], m_expansion);
+    const char* ret = s_get_name(keys2[i], m_expansion);
+
+    if(!ret)
+        return "";
+
+    return ret;
 }
 
 void InputMethodProfile_Wii::SaveConfig(IniProcessing* ctl)
@@ -1282,12 +1336,13 @@ InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_m
     printf("allocated\n");
 
     if(expansion == WPAD_EXP_NUNCHUK)
-        method->Name = "Nunchuck ";
+        method->Name = g_controlsStrings.wiiTypeNunchuck;
     else if(expansion == WPAD_EXP_CLASSIC)
-        method->Name = "Classic ";
+        method->Name = g_controlsStrings.wiiTypeClassic;
     else
-        method->Name = "Wiimote ";
+        method->Name = g_controlsStrings.wiiTypeWiimote;
 
+    method->Name += " ";
     method->Name += std::to_string(chn + 1);
     method->Type = this;
 
@@ -1356,6 +1411,34 @@ InputMethod* InputMethodType_Wii::Poll(const std::vector<InputMethod*>& active_m
     return (InputMethod*)method;
 }
 
+InputMethodProfile* InputMethodType_Wii::AddNunchuckProfile()
+{
+    InputMethodProfile* p_ = this->AddProfile();
+    auto* p = dynamic_cast<InputMethodProfile_Wii*>(p_);
+
+    if(!p)
+        return nullptr;
+
+    p->InitAs(WPAD_EXP_NUNCHUK);
+    p->Name = g_controlsStrings.wiiTypeNunchuck + " " + std::to_string(this->m_profiles.size());
+
+    return p_;
+}
+
+InputMethodProfile* InputMethodType_Wii::AddClassicProfile()
+{
+    InputMethodProfile* p_ = this->AddProfile();
+    auto* p = dynamic_cast<InputMethodProfile_Wii*>(p_);
+
+    if(!p)
+        return nullptr;
+
+    p->InitAs(WPAD_EXP_CLASSIC);
+    p->Name = g_controlsStrings.wiiTypeClassic + " " + std::to_string(this->m_profiles.size());
+
+    return p_;
+}
+
 /*-----------------------*\
 || OPTIONAL METHODS      ||
 \*-----------------------*/
@@ -1405,9 +1488,9 @@ size_t InputMethodType_Wii::GetOptionCount()
 const char* InputMethodType_Wii::GetOptionName(size_t i)
 {
     if(i == 0)
-        return "NEW NUNCHUCK PROFILE";
+        return g_controlsStrings.wiiPhraseNewNunchuck.c_str();
     else if(i == 1)
-        return "NEW CLASSIC PROFILE";
+        return g_controlsStrings.wiiPhraseNewClassic.c_str();
 
     return nullptr;
 }
@@ -1424,14 +1507,10 @@ const char* InputMethodType_Wii::GetOptionValue(size_t i)
 // called when A is pressed; allowed to interrupt main game loop
 bool InputMethodType_Wii::OptionChange(size_t i)
 {
-    if(i == 0)
-    {
+    if(i == 0 && this->AddNunchuckProfile())
         return true;
-    }
-    else if(i == 1)
-    {
+    else if(i == 1 && this->AddClassicProfile())
         return true;
-    }
 
     return false;
 }

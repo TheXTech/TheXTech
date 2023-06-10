@@ -33,6 +33,10 @@
 #include "../player.h"
 #include "../core/render.h"
 #include "../core/window.h"
+
+#include "main/menu_main.h"
+#include "control/controls_strings.h"
+
 #include "editor/new_editor.h"
 
 #include <SDL2/SDL_haptic.h>
@@ -1797,7 +1801,7 @@ const char* InputMethodProfile_TouchScreen::NamePrimaryButton(ControlsClass c, s
 {
     UNUSED(c);
     UNUSED(i);
-    return "(TOUCH)";
+    return g_controlsStrings.caseTouch.c_str();
 }
 
 const char* InputMethodProfile_TouchScreen::NameSecondaryButton(ControlsClass c, size_t i)
@@ -1854,37 +1858,37 @@ const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
     switch(i)
     {
     case Options::layout:
-        return "LAYOUT STYLE";
+        return g_controlsStrings.touchscreenOptionLayoutStyle.c_str();
 
     case Options::scale_factor:
-        return "SCALE FACTOR";
+        return g_controlsStrings.touchscreenOptionScaleFactor.c_str();
 
     case Options::scale_factor_dpad:
-        return "SCALE D-PAD";
+        return g_controlsStrings.touchscreenOptionScaleDPad.c_str();
 
     case Options::scale_factor_buttons:
-        return "SCALE BUTTONS";
+        return g_controlsStrings.touchscreenOptionScaleButtons.c_str();
 
     case Options::scale_factor_ss_spacing:
-        return "S-START SPACING";
+        return g_controlsStrings.touchscreenOptionSStartSpacing.c_str();
 
     case Options::reset_layout:
-        return "RESET LAYOUT";
+        return g_controlsStrings.touchscreenOptionResetLayout.c_str();
 
     case Options::style:
-        return "INTERFACE STYLE";
+        return g_controlsStrings.touchscreenOptionInterfaceStyle.c_str();
 
     case Options::fb_strength:
-        return "FEEDBACK STRENGTH";
+        return g_controlsStrings.touchscreenOptionFeedbackStrength.c_str();
 
     case Options::fb_length:
-        return "FEEDBACK LENGTH";
+        return g_controlsStrings.touchscreenOptionFeedbackLength.c_str();
 
     case Options::hold_run:
-        return "HOLD RUN ON START";
+        return g_controlsStrings.touchscreenOptionHoldRun.c_str();
 
     case Options::enable_enter_cheats:
-        return "SHOW CHEAT BUTTON";
+        return g_controlsStrings.touchscreenOptionShowCodeButton.c_str();
     }
 
     return nullptr;
@@ -1896,24 +1900,25 @@ const char* InputMethodProfile_TouchScreen::GetOptionName_Custom(size_t i)
 const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
 {
     static char length_buf[8];
+    static std::string delay_buf;
 
     switch(i)
     {
     case Options::layout:
         if(this->m_layout == TouchScreenController::layout_tight)
-            return "TIGHT";
+            return g_controlsStrings.touchscreenLayoutTight.c_str();
         else if(this->m_layout == TouchScreenController::layout_old_tiny)
-            return "TINY (OLD)";
+            return g_controlsStrings.touchscreenLayoutTinyOld.c_str();
         else if(this->m_layout == TouchScreenController::layout_old_average)
-            return "PHONE (OLD)";
+            return g_controlsStrings.touchscreenLayoutPhoneOld.c_str();
         else if(this->m_layout == TouchScreenController::layout_old_long)
-            return "LONG (OLD)";
+            return g_controlsStrings.touchscreenLayoutLongOld.c_str();
         else if(this->m_layout == TouchScreenController::layout_old_phablet)
-            return "PHABLET (OLD)";
+            return g_controlsStrings.touchscreenLayoutPhabletOld.c_str();
         else if(this->m_layout == TouchScreenController::layout_old_tablet)
-            return "TABLET (OLD)";
+            return g_controlsStrings.touchscreenLayoutTabletOld.c_str();
         else
-            return "STANDARD";
+            return g_controlsStrings.touchscreenLayoutStandard.c_str();
 
     case Options::scale_factor:
         SDL_snprintf(length_buf, 8, "%d%%", this->m_scale_factor);
@@ -1933,15 +1938,15 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
 
     case Options::style:
         if(this->m_touchpad_style == TouchScreenController::style_actions)
-            return "ACTIONS";
+            return g_controlsStrings.touchscreenStyleActions.c_str();
         else if(this->m_touchpad_style == TouchScreenController::style_abxy)
-            return "ABXY";
+            return g_controlsStrings.touchscreenStyleABXY.c_str();
         else
-            return "XODA";
+            return g_controlsStrings.touchscreenStyleXODA.c_str();
 
     case Options::fb_strength:
         if(this->m_feedback_strength == 0.f)
-            return "OFF";
+            return g_mainMenu.wordOff.c_str();
         else if(this->m_feedback_strength == 0.25f)
             return "25%";
         else if(this->m_feedback_strength == 0.50f)
@@ -1952,20 +1957,22 @@ const char* InputMethodProfile_TouchScreen::GetOptionValue_Custom(size_t i)
             return "100%";
 
     case Options::fb_length:
-        SDL_snprintf(length_buf, 8, "%d MS", this->m_feedback_length);
-        return length_buf;
+        delay_buf = std::to_string(this->m_feedback_length);
+        delay_buf += " ";
+        delay_buf += g_mainMenu.abbrevMilliseconds;
+        return delay_buf.c_str();
 
     case Options::hold_run:
         if(this->m_hold_run)
-            return "ON";
+            return g_mainMenu.wordOn.c_str();
         else
-            return "OFF";
+            return g_mainMenu.wordOff.c_str();
 
     case Options::enable_enter_cheats:
         if(this->m_enable_enter_cheats)
-            return "ON";
+            return g_mainMenu.wordOn.c_str();
         else
-            return "OFF";
+            return g_mainMenu.wordOff.c_str();
     }
 
     return nullptr;
@@ -2172,6 +2179,11 @@ InputMethodType_TouchScreen::InputMethodType_TouchScreen()
     this->Name = "Touchscreen";
 }
 
+const std::string& InputMethodType_TouchScreen::LocalName() const
+{
+    return g_controlsStrings.nameTouchscreen;
+}
+
 bool InputMethodType_TouchScreen::TestProfileType(InputMethodProfile* profile)
 {
     return (bool)dynamic_cast<InputMethodProfile_TouchScreen*>(profile);
@@ -2268,7 +2280,7 @@ InputMethod* InputMethodType_TouchScreen::Poll(const std::vector<InputMethod*>& 
         SharedCursor.GoOffscreen();
     }
 
-    method->Name = "Touchscreen";
+    method->Name = this->LocalName();
     method->Type = this;
 
     this->m_controller.m_active_method = method;

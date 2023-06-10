@@ -30,10 +30,11 @@
 #include "../gfx.h"
 #include "../core/render.h"
 
-#include "screen_textentry.h"
+#include "main/screen_textentry.h"
 
-#include "speedrunner.h"
-#include "menu_main.h"
+#include "main/speedrunner.h"
+#include "main/menu_main.h"
+#include "main/game_strings.h"
 
 bool g_pollingInput = false;
 
@@ -105,7 +106,7 @@ int menuControls_Do()
         {
             PlaySoundMenu(SFX_Do);
             MenuCursorCanMove = false;
-            profile->Name = TextEntryScreen::Run("Rename profile:", profile->Name);
+            profile->Name = TextEntryScreen::Run(g_mainMenu.controlsRenameProfile, profile->Name);
             MenuCursorCanMove = false;
             return 0;
         }
@@ -272,7 +273,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         if(top_line < 0)
             top_line = 0;
 
-        SuperPrintScreenCenter(g_mainMenu.phraseTestControls, 3, sY+(top_line)*line);
+        SuperPrintScreenCenter(g_gameStrings.connectTestControls, 3, sY+(top_line)*line);
 
         size_t p = s_changingProfilePlayer;
         if(!Controls::g_InputMethods[p])
@@ -287,7 +288,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         // display the test controls and profile reversion countdown (add more details)
         RenderControls(p+1, ScreenW/2-38, sY+(top_line+4)*line, 76, 30);
-        SuperPrintScreenCenter(g_mainMenu.phraseHoldStartToReturn, 3, sY+(top_line+6)*line);
+        SuperPrintScreenCenter(g_gameStrings.connectHoldStart, 3, sY+(top_line+6)*line);
         int n_stars;
         int n_empty;
         if(s_profileChangeTimer < 66*3)
@@ -371,13 +372,13 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 }
 
                 if(in_use)
-                    SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->Name + " " + g_mainMenu.controlsInUse, 3, sX+48, sY+(3+i)*line);
+                    SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->LocalName() + " " + g_mainMenu.controlsInUse, 3, sX+48, sY+(3+i)*line);
                 else
-                    SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->Name, 3, sX+48, sY+(3+i)*line);
+                    SuperPrint(Controls::g_InputMethodTypes[scroll_start + i]->LocalName(), 3, sX+48, sY+(3+i)*line);
                 if(MenuCursor == scroll_start + i)
                     XRender::renderTexture(sX + 24, sY+(3+i)*line, GFX.MCursor[0]);
             }
-            int item_width = Controls::g_InputMethodTypes[scroll_start + i]->Name.size()*18;
+            int item_width = Controls::g_InputMethodTypes[scroll_start + i]->LocalName().size()*18;
             if(mouse && SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
                 && SharedCursor.Y >= sY+(3+i)*line && SharedCursor.Y <= sY+(3+i)*line + 16)
             {
@@ -781,19 +782,19 @@ int menuControls_Mouse_Render(bool mouse, bool render)
         {
             const char* name;
             if(i == 0) // Activate profile
-                name = "Activate profile";
+                name = g_mainMenu.controlsActivateProfile.c_str();
             else if(i == 1) // Rename profile
-                name = "Rename profile";
+                name = g_mainMenu.controlsRenameProfile.c_str();
             else if(i == 2) // Delete profile
-                name = "Delete profile";
+                name = g_mainMenu.controlsDeleteProfile.c_str();
             else if(i == 3) // Player
-                name = "Player controls";
+                name = g_mainMenu.controlsPlayerControls.c_str();
             else if(i == 4) // Cursor
-                name = "Cursor controls";
+                name = g_mainMenu.controlsCursorControls.c_str();
             else if(i == 5) // Editor
-                name = "Editor controls";
+                name = g_mainMenu.controlsEditorControls.c_str();
             else if(i == 6) // Hotkeys
-                name = "Hotkeys";
+                name = g_mainMenu.controlsHotkeys.c_str();
             else
                 name = "";
 
@@ -804,7 +805,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 s = 1;
 
             if(render && i == 3 && i+s-2 >= scroll_start && i+s-2 < scroll_end)
-                SuperPrint("Controls", 3, sX+16, start_y+(i+s - 1 - scroll_start)*line);
+                SuperPrint(g_mainMenu.controlsTitle, 3, sX+16, start_y+(i+s - 1 - scroll_start)*line);
 
             if(i+s-1 < scroll_start || i+s-1 >= scroll_end)
                 continue;

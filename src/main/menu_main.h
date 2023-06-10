@@ -99,26 +99,43 @@ struct MainMenuContent
 
     std::string loading;
 
-    RangeArr<std::string, 1, numCharacters> selectPlayer;
+    std::string languageName;
+    std::string pluralRules;
+
+    std::string editorNewWorld;
+    std::string editorErrorResolution;
+    std::string editorErrorMissingResources;
+    std::string editorPromptNewWorldName;
+
+    std::string gameNoEpisodesToPlay;
+    std::string gameNoBattleLevels;
+    std::string gameBattleRandom;
+
+    std::string gameSlotContinue;
+    std::string gameSlotNew;
+
+    std::string gameCopySave;
+    std::string gameEraseSave;
+
+    std::string gameSourceSlot;
+    std::string gameTargetSlot;
+    std::string gameEraseSlot;
+
+    std::string phraseScore;
+    std::string phraseTime;
+
+    // Battle
+    std::string errorBattleNoLevels;
+
+    // Options
+    std::string optionsModeFullScreen;
+    std::string optionsModeWindowed;
+    std::string optionsViewCredits;
 
     // ConnectScreen
-    std::string charSelTitle;
-    std::string reconnectTitle;
-    std::string dropAddTitle;
-    std::string wordPlayer;
-    std::string wordProfile;
-    std::string playerSelStartGame;
-    std::string phrasePressAButton;
-    std::string phraseTestControls;
-    std::string wordDisconnect;
-    std::string phraseHoldStartToReturn;
-    std::string wordBack;
-    std::string wordResume;
-    std::string wordWaiting;
-    std::string phraseForceResume;
-    std::string phraseDropOthers;
-    std::string phraseDropSelf;
-    std::string phraseChangeChar;
+    std::string connectCharSelTitle;
+    std::string connectStartGame;
+    std::string selectCharacter;
 
     // Controls menus
     std::string controlsTitle;
@@ -127,14 +144,39 @@ struct MainMenuContent
     std::string controlsDeviceTypes;
     std::string controlsInUse;
     std::string controlsNotInUse;
+
+    std::string controlsActivateProfile;
+    std::string controlsRenameProfile;
+    std::string controlsDeleteProfile;
+    std::string controlsPlayerControls;
+    std::string controlsCursorControls;
+    std::string controlsEditorControls;
+    std::string controlsHotkeys;
+
+    std::string controlsOptionRumble;
+    std::string controlsOptionGroundPoundButton;
+    std::string controlsOptionBatteryStatus;
+
     std::string wordProfiles;
     std::string wordButtons;
     std::string controlsReallyDeleteProfile;
     std::string controlsNewProfile;
 
+    // General purpose
     std::string wordYes;
     std::string wordNo;
     std::string wordOkay;
+    std::string caseNone;
+    std::string wordOn;
+    std::string wordOff;
+    std::string wordShow;
+    std::string wordHide;
+    std::string wordPlayer;
+    std::string wordProfile;
+    std::string wordBack;
+    std::string wordResume;
+    std::string wordWaiting;
+    std::string abbrevMilliseconds;
 
     // Compat menu
     std::string promptDeprecatedSetting;

@@ -39,6 +39,7 @@
 #include "../gfx.h"
 #include "screen_connect.h"
 #include "menu_controls.h"
+#include "translate_episode.h"
 
 #include "speedrunner.h"
 #include "main/gameplay_timer.h"
@@ -65,9 +66,10 @@
 MainMenuContent g_mainMenu;
 
 #ifndef PGE_NO_THREADING
-static SDL_atomic_t         loading;
-static SDL_atomic_t         loadingProgrss;
-static SDL_atomic_t         loadingProgrssMax;
+static bool                 s_atomicsInited = false;
+static SDL_atomic_t         loading = {};
+static SDL_atomic_t         loadingProgrss = {};
+static SDL_atomic_t         loadingProgrssMax = {};
 
 static SDL_Thread*          loadingThread = nullptr;
 #endif
@@ -83,9 +85,13 @@ std::vector<SelectWorld_t> SelectBattle;
 void initMainMenu()
 {
 #ifndef PGE_NO_THREADING
-    SDL_AtomicSet(&loading, 0);
-    SDL_AtomicSet(&loadingProgrss, 0);
-    SDL_AtomicSet(&loadingProgrssMax, 0);
+    if(!s_atomicsInited)
+    {
+        SDL_AtomicSet(&loading, 0);
+        SDL_AtomicSet(&loadingProgrss, 0);
+        SDL_AtomicSet(&loadingProgrssMax, 0);
+        s_atomicsInited = true;
+    }
 #endif
 
     g_mainMenu.mainStartGame = "Start Game";
@@ -98,26 +104,45 @@ void initMainMenu()
 
     g_mainMenu.loading = "Loading...";
 
-    for(int i = 1; i <= numCharacters; ++i)
-        g_mainMenu.selectPlayer[i] = fmt::format_ne("{0} game", g_gameInfo.characterName[i]);
+    g_mainMenu.languageName = "English";
+    g_mainMenu.pluralRules = "one-is-singular";
 
-    g_mainMenu.charSelTitle = "Character Select";
-    g_mainMenu.reconnectTitle = "Reconnect";
-    g_mainMenu.dropAddTitle = "Drop/Add Players";
+    g_mainMenu.selectCharacter = "{0} game";
+
+    g_mainMenu.editorNewWorld = "<New World>";
+    g_mainMenu.editorErrorResolution = "Sorry! The in-game editor is not supported at your current resolution.";
+    g_mainMenu.editorErrorMissingResources = "Sorry! You are missing {0}, required for the in-game editor.";
+    g_mainMenu.editorPromptNewWorldName = "New world name";
+
+    g_mainMenu.gameNoEpisodesToPlay = "<No episodes to play>";
+    g_mainMenu.gameNoBattleLevels = "<No battle levels>";
+    g_mainMenu.gameBattleRandom = "Random Level";
+
+    g_mainMenu.gameSlotContinue = "SLOT {0} ... {1}%";
+    g_mainMenu.gameSlotNew = "SLOT {0} ... NEW GAME";
+    g_mainMenu.gameCopySave = "Copy save";
+    g_mainMenu.gameEraseSave = "Erase save";
+    g_mainMenu.gameSourceSlot = "Select the source slot";
+    g_mainMenu.gameTargetSlot = "Now select the target";
+    g_mainMenu.gameEraseSlot = "Select the slot to erase";
+
+    g_mainMenu.phraseScore = "Score: {0}";
+    g_mainMenu.phraseTime = "Time: {0}";
+
+    g_mainMenu.errorBattleNoLevels = "Can't start battle because of no levels available";
+
+    g_mainMenu.optionsModeFullScreen = "Fullscreen mode";
+    g_mainMenu.optionsModeWindowed = "Windowed mode";
+    g_mainMenu.optionsViewCredits = "View credits";
+
+    g_mainMenu.connectCharSelTitle = "Character Select";
+    g_mainMenu.connectStartGame = "Start Game";
+
     g_mainMenu.wordPlayer = "Player";
     g_mainMenu.wordProfile = "Profile";
-    g_mainMenu.playerSelStartGame = "Start Game";
-    g_mainMenu.phrasePressAButton = "Press A Button";
-    g_mainMenu.phraseTestControls = "Test Controls";
-    g_mainMenu.wordDisconnect = "Disconnect";
-    g_mainMenu.phraseHoldStartToReturn = "Hold Start";
     g_mainMenu.wordBack = "Back";
     g_mainMenu.wordResume = "Resume";
     g_mainMenu.wordWaiting = "Waiting";
-    g_mainMenu.phraseForceResume = "Force Resume";
-    g_mainMenu.phraseDropOthers = "Drop Others";
-    g_mainMenu.phraseDropSelf = "Drop Self";
-    g_mainMenu.phraseChangeChar = "Change Character";
 
     g_mainMenu.controlsTitle = "Controls";
     g_mainMenu.controlsConnected = "Connected:";
@@ -125,15 +150,34 @@ void initMainMenu()
     g_mainMenu.controlsDeviceTypes = "Device Types";
     g_mainMenu.controlsInUse = "(In Use)";
     g_mainMenu.controlsNotInUse = "(Not In Use)";
+
+    g_mainMenu.controlsActivateProfile = "Activate profile";
+    g_mainMenu.controlsRenameProfile = "Rename profile";
+    g_mainMenu.controlsDeleteProfile = "Delete profile";
+    g_mainMenu.controlsPlayerControls = "Player controls";
+    g_mainMenu.controlsCursorControls = "Cursor controls";
+    g_mainMenu.controlsEditorControls = "Editor controls";
+    g_mainMenu.controlsHotkeys = "Hotkeys";
+
+    g_mainMenu.controlsOptionRumble = "Rumble";
+    g_mainMenu.controlsOptionGroundPoundButton = "Ground Pound Button";
+    g_mainMenu.controlsOptionBatteryStatus = "Battery Status";
+
     g_mainMenu.wordProfiles = "Profiles";
-    g_mainMenu.wordButtons = "Buttons";
+    g_mainMenu.wordButtons  = "Buttons";
 
     g_mainMenu.controlsReallyDeleteProfile = "Really delete profile?";
     g_mainMenu.controlsNewProfile = "<New Profile>";
 
-    g_mainMenu.wordNo = "No";
-    g_mainMenu.wordYes = "Yes";
+    g_mainMenu.wordNo   = "No";
+    g_mainMenu.wordYes  = "Yes";
     g_mainMenu.wordOkay = "Okay";
+    g_mainMenu.caseNone = "<None>";
+    g_mainMenu.wordOn   = "On";
+    g_mainMenu.wordOff  = "Off";
+    g_mainMenu.wordShow = "Show";
+    g_mainMenu.wordHide = "Hide";
+    g_mainMenu.abbrevMilliseconds = "MS";
 
     g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"\n\n\nReplace it with the updated flag for version 1.3.6 and newer?";
     g_mainMenu.promptDeprecatedSettingUnwritable = "An unwritable file ({0}) uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nSection: [{1}]\nOld flag: \"{2}\"\nNew flag: \"{3}\"\n\n\nPlease update it manually and copy to your device.";
@@ -215,6 +259,7 @@ struct WorldRoot_t
 
 void FindWorlds()
 {
+    TranslateEpisode tr;
     bool compatModern = (CompatGetLevel() == COMPAT_MODERN);
     NumSelectWorld = 0;
 
@@ -295,6 +340,9 @@ void FindWorlds()
 
                     w.editable = worldsRoot.editable;
 
+                    if(tr.tryTranslateTitle(epDir, fName, w.WorldName))
+                        pLogDebug("Translated world title: %s", w.WorldName.c_str());
+
                     SelectWorld.push_back(w);
                     if(worldsRoot.editable)
                         SelectWorldEditable.push_back(w);
@@ -312,7 +360,7 @@ void FindWorlds()
         SelectWorld.clear();
         SelectWorld.emplace_back(SelectWorld_t()); // Dummy entry
         SelectWorld.emplace_back(SelectWorld_t()); // "no battle levels" entry
-        SelectWorld[1].WorldName = "<No episodes to play>";
+        SelectWorld[1].WorldName = g_mainMenu.gameNoEpisodesToPlay;
         SelectWorld[1].disabled = true;
     }
 
@@ -332,7 +380,7 @@ void FindWorlds()
     NumSelectWorld = (int)(SelectWorld.size() - 1);
 
     SelectWorld_t createWorld = SelectWorld_t();
-    createWorld.WorldName = "<New World>";
+    createWorld.WorldName = g_mainMenu.editorNewWorld;
     SelectWorldEditable.push_back(createWorld);
     NumSelectWorldEditable = (SelectWorldEditable.size() - 1);
 
@@ -366,7 +414,7 @@ void FindLevels()
 
     NumSelectBattle = 1;
     SelectBattle.emplace_back(SelectWorld_t()); // "random level" entry
-    SelectBattle[1].WorldName = "Random Level";
+    SelectBattle[1].WorldName = g_mainMenu.gameBattleRandom;
     LevelData head;
 
 #ifndef PGE_NO_THREADING
@@ -419,7 +467,7 @@ void FindLevels()
 
         NumSelectBattle = 1;
         SelectBattle.emplace_back(SelectWorld_t()); // "no battle levels" entry
-        SelectBattle[1].WorldName = "<No battle levels>";
+        SelectBattle[1].WorldName = g_mainMenu.gameNoBattleLevels;
         SelectBattle[1].disabled = true;
     }
 }
@@ -681,13 +729,13 @@ bool mainMenuUpdate()
                     if(ScreenW < 640 || ScreenH < 480)
                     {
                         PlaySoundMenu(SFX_BlockHit);
-                        MessageText = "Sorry! The in-game editor is not supported at your current resolution.";
+                        MessageText = g_mainMenu.editorErrorResolution;
                         PauseGame(PauseCode::Message);
                     }
                     else if(!GFX.EIcons.inited)
                     {
                         PlaySoundMenu(SFX_BlockHit);
-                        MessageText = "Sorry! You are missing EditorIcons.png, the icons for the in-game editor.";
+                        MessageText = fmt::format_ne(g_mainMenu.editorErrorMissingResources, "EditorIcons.png");
                         PauseGame(PauseCode::Message);
                     }
                     else
@@ -1066,7 +1114,7 @@ bool mainMenuUpdate()
                         if(selWorld == NumSelectWorldEditable)
                         {
                             ClearWorld(true);
-                            WorldName = TextEntryScreen::Run("New world name");
+                            WorldName = TextEntryScreen::Run(g_mainMenu.editorPromptNewWorldName);
                             if(!WorldName.empty())
                             {
                                 std::string fn = WorldName;
@@ -1575,7 +1623,8 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     {
         if(SaveSlotInfo[A].Progress >= 0)
         {
-            SuperPrint(fmt::format_ne("SLOT {0} ... {1}%", A, SaveSlotInfo[A].Progress), 3, MenuX, MenuY - 30 + (A * 30));
+            // "SLOT {0} ... {1}%"
+            SuperPrint(fmt::format_ne(g_mainMenu.gameSlotContinue, A, SaveSlotInfo[A].Progress), 3, MenuX, MenuY - 30 + (A * 30));
             if(SaveSlotInfo[A].Stars > 0)
             {
                 XRender::renderTexture(MenuX + 260, MenuY - 30 + (A * 30) + 1,
@@ -1589,15 +1638,16 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         }
         else
         {
-            SuperPrint(fmt::format_ne("SLOT {0} ... NEW GAME", A), 3, MenuX, MenuY - 30 + (A * 30));
+            // "SLOT {0} ... NEW GAME"
+            SuperPrint(fmt::format_ne(g_mainMenu.gameSlotNew, A), 3, MenuX, MenuY - 30 + (A * 30));
         }
     }
 
     if(MenuMode == MENU_SELECT_SLOT_1P || MenuMode == MENU_SELECT_SLOT_2P)
     {
-        SuperPrint("COPY SAVE", 3, MenuX, MenuY - 30 + (A * 30));
+        SuperPrint(g_mainMenu.gameCopySave, 3, MenuX, MenuY - 30 + (A * 30));
         A++;
-        SuperPrint("ERASE SAVE", 3, MenuX, MenuY - 30 + (A * 30));
+        SuperPrint(g_mainMenu.gameEraseSave, 3, MenuX, MenuY - 30 + (A * 30));
     }
 
     if(MenuCursor < 0 || MenuCursor >= maxSaveSlots || (MenuMode != MENU_SELECT_SLOT_1P && MenuMode != MENU_SELECT_SLOT_2P) || SaveSlotInfo[MenuCursor + 1].Progress < 0)
@@ -1626,7 +1676,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     // Score
     bool show_timer = info.Time > 0 && g_speedRunnerMode != SPEEDRUN_MODE_OFF;
     int row_score = show_timer ? row_1 : row_c;
-    SuperPrint(t = fmt::format_ne("Score: {0}", info.Score), 3, infobox_x + 10, row_score);
+    SuperPrint(t = fmt::format_ne(g_mainMenu.phraseScore, info.Score), 3, infobox_x + 10, row_score);
 
     // Gameplay Timer
     if(show_timer)
@@ -1636,7 +1686,7 @@ static void s_drawGameSaves(int MenuX, int MenuY)
         if(t.size() > 9)
             t = t.substr(0, t.size() - 4);
 
-        SuperPrint(fmt::format_ne("Time: {0}", t), 3, infobox_x + 10, row_2);
+        SuperPrint(fmt::format_ne(g_mainMenu.phraseTime, t), 3, infobox_x + 10, row_2);
     }
 
     // If demos off, put (l)ives and (c)oins on center
@@ -1885,9 +1935,9 @@ void mainMenuDraw()
         s_drawGameSaves(MenuX, MenuY);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S1 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S1)
-            SuperPrint("Select the source slot", 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 0.7f, 1.0f);
+            SuperPrint(g_mainMenu.gameSourceSlot, 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 0.7f, 1.0f);
         else if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
-            SuperPrint("Now select the target", 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 1.0f, 0.7f);
+            SuperPrint(g_mainMenu.gameTargetSlot, 3, MenuX, MenuY - 30 + (5 * 30), 0.7f, 1.0f, 0.7f);
 
         if(MenuMode == MENU_SELECT_SLOT_1P_COPY_S2 || MenuMode == MENU_SELECT_SLOT_2P_COPY_S2)
         {
@@ -1904,7 +1954,7 @@ void mainMenuDraw()
         SuperPrint(SelectWorld[selWorld].WorldName, 3, MenuX, MenuY - 40, 0.6f, 1.f, 1.f);
         s_drawGameSaves(MenuX, MenuY);
 
-        SuperPrint("Select the slot to erase", 3, MenuX, MenuY - 30 + (5 * 30), 1.0f, 0.7f, 0.7f);
+        SuperPrint(g_mainMenu.gameEraseSlot, 3, MenuX, MenuY - 30 + (5 * 30), 1.0f, 0.7f, 0.7f);
 
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30), GFX.MCursor[0]);
     }
@@ -1916,11 +1966,11 @@ void mainMenuDraw()
         SuperPrint(g_mainMenu.controlsTitle, 3, MenuX, MenuY + 30*i++);
 #ifndef RENDER_FULLSCREEN_ALWAYS
         if(resChanged)
-            SuperPrint("WINDOWED MODE", 3, MenuX, MenuY + (30 * i++));
+            SuperPrint(g_mainMenu.optionsModeWindowed, 3, MenuX, MenuY + (30 * i++));
         else
-            SuperPrint("FULLSCREEN MODE", 3, MenuX, MenuY + (30 * i++));
+            SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
 #endif
-        SuperPrint("VIEW CREDITS", 3, MenuX, MenuY + (30 * i++));
+        SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
                                GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);
     }

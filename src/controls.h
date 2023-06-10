@@ -25,6 +25,7 @@
 // forward declaration since some clients do not have SDL
 typedef union SDL_Event SDL_Event;
 
+#include <string>
 #include <array>
 #include <vector>
 
@@ -63,8 +64,6 @@ enum Buttons : size_t
 
 static constexpr size_t n_buttons = Buttons::MAX;
 
-
-// can be adapted for locale
 inline const char *GetButtonName_INI(size_t i)
 {
     switch(i)
@@ -94,8 +93,7 @@ inline const char *GetButtonName_INI(size_t i)
     }
 }
 
-// can be adapted for locale
-inline const char *GetButtonName_UI(size_t i)
+inline const char *GetButtonName_UI_Init(size_t i)
 {
     switch(i)
     {
@@ -122,6 +120,16 @@ inline const char *GetButtonName_UI(size_t i)
     default:
         return "NULL";
     }
+}
+
+extern std::array<std::string, Buttons::MAX> g_button_name_UI;
+
+inline const char *GetButtonName_UI(size_t i)
+{
+    if(i < Buttons::MAX)
+        return g_button_name_UI[i].c_str();
+
+    return "NULL";
 }
 
 // convenience function for accessing a button index
@@ -174,7 +182,6 @@ enum Buttons : size_t
 static constexpr size_t n_buttons = Buttons::MAX;
 
 
-// can be adapted for locale
 inline const char *GetButtonName_INI(size_t i)
 {
     switch(i)
@@ -198,8 +205,7 @@ inline const char *GetButtonName_INI(size_t i)
     }
 }
 
-// can be adapted for locale
-inline const char *GetButtonName_UI(size_t i)
+inline const char *GetButtonName_UI_Init(size_t i)
 {
     switch(i)
     {
@@ -220,6 +226,16 @@ inline const char *GetButtonName_UI(size_t i)
     default:
         return "NULL";
     }
+}
+
+extern std::array<std::string, Buttons::MAX> g_button_name_UI;
+
+inline const char *GetButtonName_UI(size_t i)
+{
+    if(i < Buttons::MAX)
+        return g_button_name_UI[i].c_str();
+
+    return "NULL";
 }
 
 // convenience function for accessing a button index
@@ -260,7 +276,6 @@ enum Buttons : size_t
 
 static constexpr size_t n_buttons = Buttons::MAX;
 
-// can be adapted for locale
 inline const char *GetButtonName_INI(size_t i)
 {
     switch(i)
@@ -292,8 +307,7 @@ inline const char *GetButtonName_INI(size_t i)
     }
 }
 
-// can be adapted for locale
-inline const char *GetButtonName_UI(size_t i)
+inline const char *GetButtonName_UI_Init(size_t i)
 {
     switch(i)
     {
@@ -322,6 +336,16 @@ inline const char *GetButtonName_UI(size_t i)
     default:
         return "NULL";
     }
+}
+
+extern std::array<std::string, Buttons::MAX> g_button_name_UI;
+
+inline const char *GetButtonName_UI(size_t i)
+{
+    if(i < Buttons::MAX)
+        return g_button_name_UI[i].c_str();
+
+    return "NULL";
 }
 
 // convenience function for accessing a button index
@@ -369,13 +393,13 @@ enum Buttons : size_t
     ToggleHUD, LegacyPause,
 #ifdef DEBUG_BUILD
     ToggleFontRender,
+    ReloadLanguage,
 #endif
     MAX
 };
 
 constexpr size_t n_buttons = Buttons::MAX;
 
-// can be adapted for locale
 inline const char *GetButtonName_INI(size_t i)
 {
     switch(i)
@@ -397,14 +421,15 @@ inline const char *GetButtonName_INI(size_t i)
 #ifdef DEBUG_BUILD
     case Buttons::ToggleFontRender:
         return "toggle-font-render";
+    case Buttons::ReloadLanguage:
+        return "reload-language";
 #endif
     default:
         return "NULL";
     }
 }
 
-// can be adapted for locale
-inline const char *GetButtonName_UI(size_t i)
+inline const char *GetButtonName_UI_Init(size_t i)
 {
     switch(i)
     {
@@ -424,11 +449,23 @@ inline const char *GetButtonName_UI(size_t i)
         return "Old Pause";
 #ifdef DEBUG_BUILD
     case Buttons::ToggleFontRender:
-        return "Toggle font renderer";
+        return "Old fonts";
+    case Buttons::ReloadLanguage:
+        return "Reload lang";
 #endif
     default:
         return "NULL";
     }
+}
+
+extern std::array<std::string, Buttons::MAX> g_button_name_UI;
+
+inline const char *GetButtonName_UI(size_t i)
+{
+    if(i < Buttons::MAX)
+        return g_button_name_UI[i].c_str();
+
+    return "NULL";
 }
 
 // function for activating a hotkey
@@ -620,13 +657,16 @@ protected:
     virtual InputMethodProfile *AllocateProfile() noexcept = 0;
 
 public:
-    // absolutely required to be unique, because it is used to identify configuration
+    // absolutely required to be unique, because it is used to identify configuration. DO NOT LOCALIZE.
     std::string Name;
     // not required to be defined, refers to original "player-X-keyboard", etc, configurations.
     std::string LegacyName;
 
     // InputMethodType frees its InputMethodProfiles in its destructor
     virtual ~InputMethodType();
+
+    // returns localized name based on translations, possibly to name individual methods and profiles
+    virtual const std::string& LocalName() const;
 
     std::vector<InputMethodProfile *> GetProfiles();
     // returns a pointer to the new profile on success
@@ -714,6 +754,9 @@ protected:
     virtual void SaveConfig_Custom(IniProcessing *ctl);
     virtual void LoadConfig_Custom(IniProcessing *ctl);
 };
+
+// initialize the strings for localization (normally called by Init())
+void InitStrings();
 
 // allocate InputMethodTypes according to system configuration
 void Init();

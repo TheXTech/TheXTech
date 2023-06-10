@@ -40,6 +40,7 @@
 #include "speedrunner.h"
 #include "screen_quickreconnect.h"
 #include "screen_connect.h"
+#include "main/game_strings.h"
 
 #include "global_dirs.h"
 
@@ -574,7 +575,7 @@ void WorldLoop()
                             if(!OpenLevel(levelPath))
                             {
                                 delayedMusicStart(); // Allow music being started
-                                MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", level.FileName);
+                                MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, level.FileName);
                                 PauseGame(PauseCode::Message);
                                 ErrorQuit = true;
                             }

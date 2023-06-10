@@ -1,0 +1,609 @@
+{
+    "editor": {
+        "block": {
+            "canBreak": "可頂碎",
+            "canBreakTooltip": "舊版本：頂磚塊後將會破碎",
+            "inside": "包含：",
+            "invis": "隱形",
+            "letterHeight": "高 ",
+            "letterWidth": "寬 ",
+            "pickContents1": "選擇磚塊",
+            "pickContents2": "包含道具",
+            "slick": "打滑"
+        },
+        "browser": {
+            "askOverwriteFile": "是否覆蓋文件{0}？",
+            "itemNewFile": "<新文件>",
+            "itemNewFolder": "<新建文件夾>",
+            "newFile": "新建文件",
+            "openFile": "打開文件",
+            "saveFile": "刪除文件"
+        },
+        "events": {
+            "bounds": {
+                "changeAllSectionBoundsToCurrent": "改變所有場景範圍到當前設置嗎？",
+                "changeSectionBoundsToCurrent": "改變場景{0}的範圍到當前設置嗎？",
+                "shouldEvent": "要使事件{0}"
+            },
+            "controlsForEvent": "強制按下玩家按鍵",
+            "deletion": {
+                "cancel": "否：不刪除事件",
+                "confirm": "是：刪除事件",
+                "deletingEvent": "刪除事件{0}"
+            },
+            "desc": {
+                "activate1": "NPC在當前畫面出現時",
+                "activate2": " ",
+                "death1": "NPC死亡時",
+                "destroy1": "磚塊破碎時",
+                "destroy2": " ",
+                "enter1": "進入傳送點時",
+                "enter2": " ",
+                "hit1": "磚塊被撞擊時",
+                "layerClear1": "當前圖層中的對象爲空時",
+                "layerClear2": " ",
+                "layerClear3": " ",
+                "phraseTriggersWhen": "觸發事件於",
+                "talk1": "和NPC對話後",
+                "talk2": " "
+            },
+            "header": "事件：",
+            "headerTriggerEvent": "觸發",
+            "itemNewEvent": "<新事件>",
+            "label": {
+                "activate": "出現",
+                "death": "死亡",
+                "destroy": "破碎",
+                "enter": "進入傳送點",
+                "hit": "撞擊",
+                "layerClear": "空白圖層",
+                "next": "下一個",
+                "talk": "對話"
+            },
+            "layers": {
+                "headerHide": "隱藏：",
+                "headerMove": "移動：",
+                "headerShow": "顯示：",
+                "headerToggle": "切換："
+            },
+            "letter": {
+                "activate": "出：",
+                "death": "死：",
+                "destroy": "碎：",
+                "enter": "進：",
+                "hit": "撞：",
+                "layerClear": "空：",
+                "talk": "話："
+            },
+            "promptEventName": "事件名稱：",
+            "promptEventText": "文字信息：",
+            "props": {
+                "autostart": "進入關卡時啓動",
+                "controls": "按鍵",
+                "endGame": "遊戲通關",
+                "sound": "音效"
+            },
+            "sections": {
+                "actionKeep": "當前",
+                "actionReset": "默認",
+                "actionSet": "指定",
+                "phraseAllSections": "所有場景",
+                "propBackground": "背景圖片",
+                "propBounds": "場景範圍",
+                "propMusic": "音樂"
+            },
+            "settingsForEvent": "事件選項"
+        },
+        "file": {
+            "actionClearLevel": "清除關卡",
+            "actionClearWorld": "清除大地圖",
+            "actionExit": "退出",
+            "actionOpen": "打開",
+            "actionRevert": "恢復",
+            "commandNew": "新建",
+            "commandOpen": "打開...",
+            "commandSave": "保存",
+            "commandSaveAs": "另存爲...",
+            "confirmConfirmAction": "您確定要{0}嗎？",
+            "confirmConvertFormatTo": "是否轉換格式到{0}？",
+            "confirmSaveBeforeAction": "{0}前是否保存文件？",
+            "convert": {
+                "_38aUnsupported": "不支持轉換 SMBX-38A 格式的關卡。",
+                "desc1": "文件格式將會轉換，但不會刪除源文件。",
+                "desc2": " ",
+                "featureBlockForceSmashable": "使用了舊版本中可破碎的旋轉方塊。",
+                "featureCustomWorldMusic": "在大地圖中設置了自定義音樂。",
+                "featureEventAutoscroll": "在事件中設置了新版的強制卷軸。",
+                "featureEventCustomMusic": "在事件中設置了自定義音樂。",
+                "featureLevelStarDisplay": "在關卡中使用了星星數量的顯示設置。",
+                "featureNPCVariant": "在NPC中採用了其他的AI。",
+                "featureWarpCannonExit": "傳送點設置了水管炮出口。",
+                "featureWarpCustomStarsMsg": "傳送點設置了需要星星進入的自定義信息。",
+                "featureWarpEnterEvent": "傳送點設置了進入觸發事件。",
+                "featureWarpNeedsStand": "傳送點設置了需要角色站立時纔可進入。",
+                "featureWarpNoPrintStars": "傳送點設置了不顯示星星數量。",
+                "featureWarpNoStartScene": "傳送點設置了不顯示開始界面。",
+                "featureWarpPortal": "傳送點使用了傳送門。",
+                "featureWarpTransit": "傳送點使用了過渡效果。",
+                "featureWorldStarDisplay": "使用了大地圖的設置以顯示星星數量。",
+                "featuresWillBeLost": "下列特性將會丟失：",
+                "formatUnknown": "請求的格式不支持。",
+                "noIssues": "該操作不會造成任何兼容性問題。"
+            },
+            "formatLegacy": "舊版本",
+            "formatModern": "新版本",
+            "labelCurrentFile": "當前文件：",
+            "labelFormat": "格式：",
+            "optionActionWithoutSave": "否：{0}而不保存文件",
+            "optionCancelAction": "取消：返回上一級菜單",
+            "optionCancelConversion": "取消轉換",
+            "optionProceedWithConversion": "確認轉換",
+            "optionYesSaveThenAction": "是：{0}並保存文件",
+            "sectionLevel": "關卡",
+            "sectionWorld": "大地圖"
+        },
+        "layers": {
+            "abbrevAttLayer": "跟隨：",
+            "default": "默認",
+            "deletion": {
+                "cancel": "取消：不刪除圖層",
+                "confirmDelete": "否：*刪除全部對象*",
+                "confirmPreserve": "是：移動到默認圖層",
+                "header": "刪除圖層{0}",
+                "preserveLayerContents": "是否保留圖層對象？"
+            },
+            "desc": {
+                "att1": "當 NPC 移動時，",
+                "att2": "圖層也將隨之移動",
+                "att3": " ",
+                "att4": " ",
+                "att5": " "
+            },
+            "header": "圖層：",
+            "itemNewLayer": "<新圖層>",
+            "label": "圖層：",
+            "labelAttached": "跟隨：",
+            "labelAttachedLayer": "跟隨圖層",
+            "labelMoveLayer": "移動圖層：",
+            "promptLayerName": "圖層名稱"
+        },
+        "letterCoordX": "X",
+        "letterCoordY": "Y",
+        "letterDown": "下",
+        "letterLeft": "左",
+        "letterRight": "右",
+        "letterUp": "上",
+        "level": {
+            "alwaysVis": "總是可見",
+            "bigBG": "大背景",
+            "gameStart": "遊戲起點",
+            "levelName": "關卡名稱",
+            "pathBG": "路線背景",
+            "pathUnlocks": "路線開啓",
+            "startPos": "遊戲起點"
+        },
+        "mapPos": "地圖位置：",
+        "npc": {
+            "abbrevGen": "生成器",
+            "ai": {
+                "LR": "左右",
+                "UD": "上下",
+                "aiIs": "AI：{0}",
+                "headerCustomAi": "自定義AI：",
+                "jump": "跳躍",
+                "leap": "飛躍",
+                "swim": "游泳",
+                "target": "目標",
+                "use1_0Ai": "使用1.0 AI？"
+            },
+            "gen": {
+                "direction": "方向",
+                "effectIs": "特效：{0}",
+                "effectShoot": "噴射",
+                "effectWarp": "水管",
+                "header": "生成器選項"
+            },
+            "inContainer": "包含",
+            "inertNice": "友好",
+            "props": {
+                "active": "啓動",
+                "attachSurface": "跟隨",
+                "facing": "方向"
+            },
+            "stuckStop": "靜止",
+            "tooltipExpandSection": "擴展場景"
+        },
+        "pageBlankOfBlank": "第{0}/{1}頁",
+        "phraseAreYouSure": "您確定嗎？",
+        "phraseCountMore": "更多{0}",
+        "phraseDelayIsMs": "延遲：{0}毫秒",
+        "phraseRadiusIndex": "半徑{0}",
+        "phraseSectionIndex": "場景{0}",
+        "phraseTextOf": "{0}的文字信息",
+        "phraseWarpIndex": "傳送點{0}號",
+        "section": {
+            "horizWrap": "橫向循環",
+            "noTurnBack": "單向卷軸",
+            "offscreenExit": "場景邊緣出口",
+            "scroll": "強制卷軸",
+            "setBounds": "設置範圍",
+            "underwater": "水下"
+        },
+        "select": {
+            "allSectPropBlankForEvent": "更改所有場景{0}於事件",
+            "pathBlankUnlock": "路線向{0}開啓條件",
+            "sectBlankPropBlankForEvent": "更改場景{0}的{1}於事件",
+            "sectionBlankPropBlank": "場景{0}{1}",
+            "soundForEvent": "播放聲音",
+            "warpTransitEffect": "過渡效果",
+            "worldMusic": "大地圖音樂"
+        },
+        "testPlay": {
+            "boot": "靴子",
+            "char": "角色",
+            "magicHand": "鼠標",
+            "pet": "坐騎",
+            "power": "狀態"
+        },
+        "toggleMagicBlock": "智能編輯模式",
+        "tooltip": {
+            "BGOs": "背景對象",
+            "NPCs": "NPC",
+            "blocks": "磚塊",
+            "erase": "刪除",
+            "eraseAll": "刪除全部",
+            "events": "事件",
+            "file": "文件",
+            "layers": "圖層",
+            "levels": "關卡",
+            "music": "音樂",
+            "paths": "路線",
+            "scenes": "風景",
+            "select": "選擇",
+            "settings": "設置",
+            "show": "顯示",
+            "tiles": "地形",
+            "warps": "傳送點",
+            "water": "水流"
+        },
+        "warp": {
+            "allow": "允許：",
+            "cannonExit": "水管炮出口",
+            "dir": "方向",
+            "effect": "過渡效果：",
+            "in": "入口",
+            "item": "攜帶道具",
+            "lvlWarp": "傳送到另一關卡",
+            "needFloor": "需要站立",
+            "needKey": "需要鑰匙",
+            "needStarCount": "需要{0}{2}{1}",
+            "out": "出口",
+            "placing": "放置：",
+            "ride": "坐騎",
+            "showStarCount": "顯示星星數量",
+            "showStartScene": "顯示開場界面",
+            "speed": "速度：",
+            "starLockMessage": "需要星星時的信息",
+            "style": {
+                "blipInstant": "瞬移",
+                "door": "門",
+                "pipe": "水管",
+                "portal": "傳送門",
+                "style": "傳送類別："
+            },
+            "target": "目標：",
+            "title": "傳送點",
+            "to": "傳送到：{0}",
+            "toMap": "傳送到大地圖",
+            "transit": {
+                "name0": "無",
+                "name1": "滾動",
+                "name2": "淡入淡出",
+                "name3": "圓形",
+                "name4": "水平翻轉",
+                "name5": "垂直翻轉"
+            },
+            "twoWay": "雙向傳送"
+        },
+        "water": {
+            "title": "流體"
+        },
+        "wordCoins": "金幣",
+        "wordEnabled": "已啓用",
+        "wordEvent": {
+            "genitive": "事件",
+            "nominative": "事件",
+            "typeLabel": "{0}時觸發事件："
+        },
+        "wordHeight": "高",
+        "wordInstant": "立即",
+        "wordMode": "流體類型",
+        "wordNPC": {
+            "genitive": "NPC",
+            "nominative": "NPC"
+        },
+        "wordText": "信息",
+        "wordWidth": "寬",
+        "world": {
+            "allowChars": "可用角色",
+            "hubWorld": "禁用大地圖",
+            "introLevel": "開場關卡",
+            "name": "地圖名稱",
+            "phraseCreditIndex": "地圖製作團隊 第{0}行：",
+            "retryOnFail": "失敗之後重新開始",
+            "totalStars": "總星星數："
+        }
+    },
+    "game": {
+        "connect": {
+            "dropAddTitle": "加入/離開遊戲",
+            "phraseChangeChar": "更換角色",
+            "phraseDropMe": "離開遊戲",
+            "phraseDropPX": "移除玩家{0}的遊戲",
+            "phraseForceResume": "強制恢復",
+            "phraseHoldStart": "按住開始鍵",
+            "phrasePressAButton": "按下一個按鍵",
+            "phraseSetControls": "設置按鍵",
+            "phraseStartToForceRes": "按開始鍵強制恢復",
+            "phraseStartToResume": "按開始鍵恢復",
+            "phraseTestControls": "測試按鍵",
+            "phraseWaitingForInput": "等待玩家加入……",
+            "reconnectTitle": "重新連接",
+            "splitPressSelect_1": "按選擇鍵",
+            "splitPressSelect_2": "進入按鍵設置",
+            "wordDisconnect": "斷開"
+        },
+        "controls": {
+            "phrasePlayerConnected": "玩家{0}已連接{1}， 配置： {2}",
+            "phrasePlayerDisconnected": "玩家{0}未連接任何設備"
+        },
+        "error": {
+            "openFileFailed": "錯誤：無法打開文件\"{0}\"：文件不存在或已損壞。",
+            "warpNeedStarCount": "你需要{0}{2}{1}才能進入此傳送點。"
+        },
+        "pause": {
+            "continue": "繼續",
+            "dropAddPlayers": "加入/離開遊戲",
+            "enterCode": "輸入代碼",
+            "quit": "退出",
+            "quitTesting": "結束測試",
+            "resetCheckpoints": "重置中間點",
+            "restartLevel": "重新開始",
+            "returnToEditor": "返回編輯器",
+            "saveAndContinue": "保存並繼續",
+            "saveAndQuit": "保存並退出"
+        }
+    },
+    "languageName": "簡體中文",
+    "menu": {
+        "abbrevMilliseconds": "毫秒",
+        "battle": {
+            "errorNoLevels": "對戰關卡列表爲空，無法啓動對戰模式。"
+        },
+        "caseNone": "<無>",
+        "character": {
+            "charSelTitle": "選擇角色",
+            "selectCharacter": "{0}遊戲",
+            "startGame": "開始遊戲"
+        },
+        "controls": {
+            "buttons": {
+                "altJump": "第二跳躍",
+                "altRun": "第二奔跑",
+                "down": "下",
+                "drop": "取出道具",
+                "jump": "跳躍",
+                "left": "左",
+                "right": "右",
+                "run": "奔跑",
+                "start": "開始",
+                "up": "上"
+            },
+            "caseInvalid": "（無效）",
+            "caseMouse": "（鼠標）",
+            "caseTouch": "（觸屏）",
+            "controlsConnected": "已連接：",
+            "controlsDeleteKey": "（按第二奔跑鍵清除）",
+            "controlsDeviceTypes": "設備類型",
+            "controlsInUse": "（已使用）",
+            "controlsNewProfile": "<新建配置>",
+            "controlsNotInUse": "（未使用）",
+            "controlsReallyDeleteProfile": "是否刪除配置？",
+            "controlsTitle": "按鍵配置",
+            "cursor": {
+                "down": "鼠標向下移動",
+                "left": "鼠標向左移動",
+                "primary": "鼠標左鍵",
+                "right": "鼠標向右移動",
+                "secondary": "鼠標右鍵",
+                "tertiary": "鼠標第三按鍵",
+                "up": "鼠標向上移動"
+            },
+            "editor": {
+                "fastScroll": "快速滾動",
+                "modeErase": "橡皮擦",
+                "modeSelect": "選擇模式",
+                "nextSection": "下一場景",
+                "prevSection": "上一場景",
+                "scrollDown": "向下滾動",
+                "scrollLeft": "向左滾動",
+                "scrollRight": "向右滾動",
+                "scrollUp": "向上滾動",
+                "switchScreens": "顯示面板",
+                "testPlay": "測試關卡"
+            },
+            "hotkeys": {
+                "debugInfo": "調試信息",
+                "enterCheats": "輸入作弊指令",
+                "fullscreen": "全屏",
+                "legacyPause": "舊版暫停菜單",
+                "recordGif": "GIF 動畫錄製",
+                "screenshot": "截圖",
+                "toggleHUD": "狀態欄切換"
+            },
+            "options": {
+                "batteryStatus": "電池狀態",
+                "groundPoundButton": "震地按鍵",
+                "maxPlayers": "玩家上限",
+                "rumble": "Rumble 控制器",
+                "textEntryStyle": "按鍵名稱顯示"
+            },
+            "phraseNewProfOldJoy": "新建老式手柄配置",
+            "profile": {
+                "activateProfile": "啓用配置",
+                "cursorControls": "鼠標控制",
+                "deleteProfile": "刪除配置",
+                "editorControls": "編輯器控制",
+                "hotkeys": "熱鍵",
+                "playerControls": "玩家控制",
+                "renameProfile": "重命名配置"
+            },
+            "tDS": {
+                "buttonA": "A",
+                "buttonB": "B",
+                "buttonL": "L",
+                "buttonR": "R",
+                "buttonSelect": "選擇",
+                "buttonStart": "開始",
+                "buttonX": "X",
+                "buttonY": "Y",
+                "buttonZL": "ZL",
+                "buttonZR": "ZR",
+                "cStick": "右搖桿",
+                "casePen": "(觸控筆)",
+                "dPad": "方向鍵",
+                "tStick": "左搖桿"
+            },
+            "touchscreen": {
+                "layout": {
+                    "longOld": "寬屏（舊）",
+                    "phabletOld": "大平板（舊）",
+                    "phoneOld": "手機（舊）",
+                    "standard": "普通",
+                    "tabletOld": "平板（舊）",
+                    "tight": "大號",
+                    "tinyOld": "小號（舊）"
+                },
+                "option": {
+                    "feedbackLength": "震動時長",
+                    "feedbackStrength": "震動強度",
+                    "holdRun": "啓動時自動按住奔跑鍵",
+                    "interfaceStyle": "按鈕樣式",
+                    "layoutStyle": "按鍵樣式",
+                    "resetLayout": "重置佈局",
+                    "sStartSpacing": "選擇/開始鍵間距",
+                    "scaleButtons": "按鈕縮放",
+                    "scaleDPad": "方向鍵縮放",
+                    "scaleFactor": "按鍵全局縮放",
+                    "showCodeButton": "顯示作弊指令按鈕"
+                },
+                "style": {
+                    "ABXY": "ABXY",
+                    "XODA": "XODA",
+                    "actions": "動作"
+                }
+            },
+            "types": {
+                "gamepad": "手柄",
+                "keyboard": "鍵盤",
+                "oldJoystick": "老式手柄",
+                "touchscreen": "觸屏"
+            },
+            "wii": {
+                "classic": {
+                    "buttonLT": "LT",
+                    "buttonRT": "RT",
+                    "buttonX": "X",
+                    "buttonY": "Y",
+                    "buttonZL": "ZL",
+                    "buttonZR": "ZR",
+                    "lStick": "左搖桿",
+                    "rStick": "右搖桿"
+                },
+                "nunchuck": {
+                    "buttonC": "C",
+                    "buttonZ": "Z",
+                    "prefixN": "N"
+                },
+                "phraseNewClassic": "新建經典手柄配置",
+                "phraseNewNunchuck": "新建雙節棍控制器配置",
+                "typeClassic": "經典手柄",
+                "typeNunchuck": "雙節棍控制器",
+                "typeWiimote": "Wii遙控器",
+                "wiimote": {
+                    "button1": "1",
+                    "button2": "2",
+                    "buttonA": "A",
+                    "buttonB": "B",
+                    "buttonHome": "Home",
+                    "buttonMinus": "-",
+                    "buttonPlus": "+",
+                    "caseIR": "（IR）",
+                    "dPad": "十字鍵",
+                    "shake": "震動"
+                }
+            },
+            "wordButtons": "按鍵",
+            "wordProfiles": "配置"
+        },
+        "editor": {
+            "errorMissingResources": "抱歉，需要{0}，即編輯器圖標文件，才能啓動編輯器。",
+            "errorResolution": "抱歉，在當前設置的分辨率下，無法啓動編輯器。",
+            "newWorld": "<新地圖>",
+            "promptNewWorldName": "新地圖名稱"
+        },
+        "game": {
+            "gameBattleRandom": "隨機關卡",
+            "gameCopySave": "複製存檔",
+            "gameEraseSave": "刪除存檔",
+            "gameEraseSlot": "選擇要刪除的存檔",
+            "gameNoBattleLevels": "<對戰關卡列表爲空>",
+            "gameNoEpisodesToPlay": "<地圖列表爲空>",
+            "gameSlotContinue": "存檔 {0} ... {1}%",
+            "gameSlotNew": "存檔 {0} ... 新遊戲",
+            "gameSourceSlot": "選擇源存檔",
+            "gameTargetSlot": "選擇目標存檔",
+            "phraseScore": "得分：",
+            "phraseTime": "時間："
+        },
+        "loading": "加載中...",
+        "main": {
+            "main1PlayerGame": "單人遊戲",
+            "mainBattleGame": "對戰模式",
+            "mainEditor": "編輯器",
+            "mainExit": "退出",
+            "mainMultiplayerGame": "雙人遊戲",
+            "mainOptions": "設置",
+            "mainStartGame": "開始遊戲"
+        },
+        "options": {
+            "optionsModeFullScreen": "全屏模式",
+            "optionsModeWindowed": "窗口模式",
+            "optionsViewCredits": "查看製作團隊"
+        },
+        "wordBack": "返回",
+        "wordHide": "隱藏",
+        "wordNo": "否",
+        "wordOff": "關閉",
+        "wordOn": "開啓",
+        "wordPlayer": "玩家",
+        "wordProfile": "配置",
+        "wordResume": "恢復",
+        "wordShow": "顯示",
+        "wordWaiting": "等待",
+        "wordYes": "是"
+    },
+    "outro": {
+        "cppPortDevelopers": "C++移植開發人員：",
+        "customSprites": "自定義素材：",
+        "engineCredits": "引擎製作人員名單：",
+        "gameCredits": "遊戲製作人員名單:",
+        "levelDesign": "關卡設計：",
+        "nameAndrewSpinks": "安德魯·斯賓克斯",
+        "nameVitalyNovichkov": "維塔利·諾維奇科夫",
+        "originalBy": "原始VB6代碼：",
+        "psVitaPortBy": "PS Vita移植：",
+        "specialThanks": "特別鳴謝："
+    },
+    "pluralRules": "singular-only"
+}

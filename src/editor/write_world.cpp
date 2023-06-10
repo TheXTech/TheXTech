@@ -47,7 +47,7 @@ void SaveWorld(const std::string& FilePath, int format, int version)   // Saves 
         out.nocharacter.push_back(blockCharacter[i]);
     out.charactersToS64();
 
-    for(int A = 1; A <= maxWorldCredits; ++A)
+    for(int A = 1; A <= numWorldCredits; ++A)
     {
         if(!out.authors.empty())
             out.authors.push_back('\n');
