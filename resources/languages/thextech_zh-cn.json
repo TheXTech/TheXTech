@@ -563,8 +563,8 @@
             "gameSlotNew": "存档 {0} ... 新游戏",
             "gameSourceSlot": "选择源存档",
             "gameTargetSlot": "选择目标存档",
-            "phraseScore": "得分：",
-            "phraseTime": "时间："
+            "phraseScore": "得分：{0}",
+            "phraseTime": "时间：{0}"
         },
         "loading": "加载中...",
         "main": {
