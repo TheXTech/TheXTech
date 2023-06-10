@@ -235,10 +235,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             CustomMusic[B].clear();
         else
             CustomMusic[B] = g_dirEpisode.resolveFileCase(s.music_file);
-#if 0
-        SectionEffect[B] = ResolveGLProgram("darkness.frag");
-        SectionParticlesBG[B] = ResolveGLParticleSystem("particle");
-#endif
         B++;
         if(B > maxSections)
             break;
@@ -804,25 +800,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         warp.stoodRequired = w.stood_state_required;
         warp.transitEffect = w.transition_effect;
-
-        // need to use JSON loader here on extra-data variable
-#if 0
-        switch((unsigned)numWarps % 4)
-        {
-        case 0:
-            warp.transitEffect = ScreenFader::loadTransitEffect("blur");
-            break;
-        case 1:
-            warp.transitEffect = ScreenFader::loadTransitEffect("mosaic");
-            break;
-        case 2:
-            warp.transitEffect = ScreenFader::loadTransitEffect("lines");
-            break;
-        case 3:
-            warp.transitEffect = ScreenFader::loadTransitEffect("zoom");
-            break;
-        }
-#endif
 
         warp.Entrance.Height = 32;
         warp.Entrance.Width = 32;
