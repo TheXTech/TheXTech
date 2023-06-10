@@ -468,7 +468,7 @@
     },
     "languageName": "繁體中文",
     "objects": {
-	"wordFails": "失敗次數",
+        "wordFails": "失敗次數",
         "wordStarAccusativeDualOrCounter": "顆",
         "wordStarAccusativePlural": "星星",
         "wordStarAccusativeSingular": "星星"
