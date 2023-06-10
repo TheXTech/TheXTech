@@ -350,7 +350,7 @@
             "phraseWaitingForInput": "等待玩家加入……",
             "reconnectTitle": "重新连接",
             "splitPressSelect_1": "按选择键",
-            "splitPressSelect_2": "进入按键设置",
+            "splitPressSelect_2": "进入按键配置",
             "wordDisconnect": "断开"
         },
         "controls": {
@@ -364,7 +364,7 @@
         "pause": {
             "continue": "继续",
             "dropAddPlayers": "加入/离开游戏",
-            "enterCode": "输入代码",
+            "enterCode": "输入指令",
             "quit": "退出",
             "quitTesting": "结束测试",
             "resetCheckpoints": "重置中间点",
