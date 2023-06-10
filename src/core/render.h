@@ -145,7 +145,7 @@ E_INLINE void offsetViewportIgnore(bool en) TAIL
 #endif
 
 /*!
- * \brief Make any subsequent draws invisible to any previous draws (reflections)
+ * \brief Make any subsequent draws invisible to any previous draws (important for reflections, transparency, etc)
  *
  * Only has an effect for OpenGL renderer and other batched renderers.
  *
@@ -439,7 +439,7 @@ E_INLINE void assignUniform(StdPicture &target,
  * \param worldY world Y coordinate at which to draw the particle
  * \param attrs  system-specific attributes with which to draw the particle
  *
- * Particles are only stored or remembered if the current renderer supports them.
+ * Particles are only stored or remembered if the CURRENT renderer supports them.
  */
 E_INLINE void spawnParticle(StdPicture &target,
                             double worldX,

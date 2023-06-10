@@ -52,9 +52,9 @@ struct StdPictureLoad
     //! Original fragment shader source (if presented)
     std::vector<char> fragmentShaderSource;
 
-    //! Shader uniform variables registered
+    //! Shader uniform variables registered, in order of registration
     std::vector<std::string> registeredUniforms;
-    //! Most recent values for shader uniform variables
+    //! Most recent values for shader uniform variables, in order of registration
     std::vector<UniformValue_t> finalUniformState;
 #endif
 
