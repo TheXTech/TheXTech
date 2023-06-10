@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">The X-Tech Engine</string>
+    <string name="app_name">TheXTech Engine</string>
     <string name="title_activity_game_settings">Game settings</string>
     <string name="start_game_button">Start game</string>
     <string name="settings_button">Settings</string>

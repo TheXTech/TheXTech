@@ -32,24 +32,13 @@
 #include "main/screen_textentry.h"
 #include "main/screen_quickreconnect.h"
 #include "main/cheat_code.h"
+#include "main/menu_main.h"
+#include "main/translate.h"
 #include "../graphics.h"
 #include "../frame_timer.h"
 
-// Control methods
-
-#ifdef __3DS__
-#include "input_3ds.h"
-#elif defined(__WII__)
-#include "input_wii.h"
-#elif defined(__16M__)
-#include "input_16m.h"
-#elif !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD)
-#include "keyboard.h"
-#include "joystick.h"
-#include "touchscreen.h"
-#endif
-
-#include "duplicate.h"
+#include "control/controls_methods.h"
+#include "control/controls_strings.h"
 
 #include <Logger/logger.h>
 
@@ -73,6 +62,8 @@ Controls_t& operator|=(Controls_t& o1, const Controls_t& o2)
     return o1;
 }
 
+ControlsStrings_t g_controlsStrings;
+
 
 namespace Controls
 {
@@ -84,6 +75,11 @@ static PauseCode s_requestedPause = PauseCode::None;
 HotkeysPressed_t g_hotkeysPressed;
 static HotkeysPressed_t s_hotkeysPressedOld;
 bool g_disallowHotkeys = false;
+
+std::array<std::string, PlayerControls::Buttons::MAX> PlayerControls::g_button_name_UI;
+std::array<std::string, CursorControls::Buttons::MAX> CursorControls::g_button_name_UI;
+std::array<std::string, EditorControls::Buttons::MAX> EditorControls::g_button_name_UI;
+std::array<std::string, Hotkeys::Buttons::MAX> Hotkeys::g_button_name_UI;
 
 void Hotkeys::Activate(size_t i, int player)
 {
@@ -114,6 +110,18 @@ void Hotkeys::Activate(size_t i, int player)
     case Buttons::ToggleFontRender:
         NewFontRender = !NewFontRender;
         return;
+
+    case Buttons::ReloadLanguage:
+    {
+        XTechTranslate translator;
+        if(translator.translate())
+        {
+            pLogDebug("Reloaded translation for language %s-%s",
+                      CurrentLanguage.c_str(),
+                      CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
+        }
+        return;
+    }
 #endif
 
     case Buttons::DebugInfo:
@@ -215,11 +223,11 @@ const char* InputMethodProfile::GetOptionName(size_t i)
         return this->GetOptionName_Custom(i - CommonOptions::COUNT);
 
     if(i == CommonOptions::rumble)
-        return "RUMBLE";
+        return g_mainMenu.controlsOptionRumble.c_str();
     else if(i == CommonOptions::ground_pound_by_alt_run)
-        return "GROUND POUND BUTTON";
+        return g_mainMenu.controlsOptionGroundPoundButton.c_str();
     else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
-        return "BATTERY STATUS";
+        return g_mainMenu.controlsOptionBatteryStatus.c_str();
     else
         return nullptr;
 }
@@ -237,23 +245,23 @@ const char* InputMethodProfile::GetOptionValue(size_t i)
     if(i == CommonOptions::rumble)
     {
         if(this->m_rumbleEnabled)
-            return "ENABLED";
+            return g_mainMenu.wordOn.c_str();
         else
-            return "DISABLED";
+            return g_mainMenu.wordOff.c_str();
     }
     else if(i == CommonOptions::ground_pound_by_alt_run)
     {
         if(this->m_groundPoundByAltRun)
-            return "ALT RUN";
+            return PlayerControls::GetButtonName_UI(PlayerControls::Buttons::AltRun);
         else
-            return "DOWN";
+            return PlayerControls::GetButtonName_UI(PlayerControls::Buttons::Down);
     }
     else if(i == CommonOptions::show_power_status) // -V547 Should be here to fail when adding new enum fields
     {
         if(this->m_showPowerStatus)
-            return "SHOW";
+            return g_mainMenu.wordShow.c_str();
         else
-            return "HIDE";
+            return g_mainMenu.wordHide.c_str();
     }
     else
         return nullptr;
@@ -374,6 +382,11 @@ InputMethodType::~InputMethodType()
     this->m_profiles.clear();
 }
 
+const std::string& InputMethodType::LocalName() const
+{
+    return this->Name;
+}
+
 std::vector<InputMethodProfile*> InputMethodType::GetProfiles()
 {
     return this->m_profiles;
@@ -388,7 +401,7 @@ InputMethodProfile* InputMethodType::AddProfile()
 
     profile->Type = this;
     this->m_profiles.push_back((InputMethodProfile*) profile);
-    profile->Name = this->Name + " " + std::to_string(this->m_profiles.size());
+    profile->Name = this->LocalName() + " " + std::to_string(this->m_profiles.size());
 
     return profile;
 }
@@ -574,7 +587,7 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
         {
             ctl->beginGroup(group_name);
             new_profile->LoadConfig_All(ctl);
-            ctl->read("name", new_profile->Name, this->Name + " " + std::to_string(i + n_existing + 1));
+            ctl->read("name", new_profile->Name, this->LocalName() + " " + std::to_string(i + n_existing + 1));
             ctl->endGroup();
         }
     }
@@ -683,6 +696,22 @@ void InputMethodType::LoadConfig_Custom(IniProcessing* ctl)
 || implementation for global functions                ||
 \*====================================================*/
 
+void InitStrings()
+{
+    // initialize the strings for localization
+    for(size_t i = 0; i < PlayerControls::n_buttons; i++)
+        PlayerControls::g_button_name_UI[i] = PlayerControls::GetButtonName_UI_Init(i);
+
+    for(size_t i = 0; i < CursorControls::n_buttons; i++)
+        CursorControls::g_button_name_UI[i] = CursorControls::GetButtonName_UI_Init(i);
+
+    for(size_t i = 0; i < EditorControls::n_buttons; i++)
+        EditorControls::g_button_name_UI[i] = EditorControls::GetButtonName_UI_Init(i);
+
+    for(size_t i = 0; i < Hotkeys::n_buttons; i++)
+        Hotkeys::g_button_name_UI[i] = Hotkeys::GetButtonName_UI_Init(i);
+}
+
 /*====================================================*\
 ||                                                    ||
 ||         ADD EVERY NEW INPUT METHOD HERE,           ||
@@ -711,6 +740,8 @@ void Init()
 #ifdef TOUCHSCREEN_H
     g_InputMethodTypes.push_back(new InputMethodType_TouchScreen);
 #endif
+
+    InitStrings();
 
     // not yet ready for prime time
     // g_InputMethodTypes.push_back(new InputMethodType_Duplicate);

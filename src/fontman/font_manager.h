@@ -60,6 +60,11 @@ void initFull();
 //! De-Initialize font manager and clear memory
 void quit();
 
+/*!
+ * \brief Checks if font manager works
+ * \return true when manager actually works
+ */
+bool isInitied();
 
 int fontIdFromSmbxFont(int font);
 uint32_t fontSizeFromSmbxFont(int font);

@@ -107,13 +107,14 @@ public:
     int m_maxKeyboards = 2;
     bool m_directText = true;
 
-    using InputMethodType::Name;
     using InputMethodType::m_profiles;
 
     const uint8_t *m_keyboardState;
     int m_keyboardStateSize = 0;
 
     InputMethodType_Keyboard();
+
+    const std::string& LocalName() const override;
 
     bool TestProfileType(InputMethodProfile *profile);
     bool RumbleSupported();

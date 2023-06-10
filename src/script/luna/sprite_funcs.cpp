@@ -421,8 +421,8 @@ void SpriteFunc::BumpMove(CSprite *me, SpriteComponent *obj)
 
 //                    if(false)   // debugging
 //                    {
-                        //double camtop = -vScreenY[1];
-                        //double camleft = -vScreenX[1];
+                        //double camtop = -vScreen[1].Y;
+                        //double camleft = -vScreen[1].X;
                         //debug_rect.color = COLOR;
                         COLOR += 0x55000055;
                         //debug_rect.m_FramesLeft = 1;

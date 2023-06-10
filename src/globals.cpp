@@ -90,7 +90,7 @@ RangeArr<float, 0, maxSections> AutoY;
 int numStars = 0;
 RangeArr<Water_t, 0, maxWater> Water;
 int numWater = 0;
-RangeArr<Star_t, 1, maxStarsNum> Star;
+std::vector<Star_t> Star;
 std::string GoToLevel;
 bool GoToLevelNoGameThing = false;
 std::string StartLevel;
@@ -126,6 +126,7 @@ RangeArr<Warp_t, 1, maxWarps> Warp;
 RangeArr<Tile_t, 1, maxTiles> Tile;
 RangeArr<Scene_t, 1, maxScenes> Scene;
 RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
+int numWorldCredits = 0;
 double CreditOffsetY = 0.0;
 double CreditTotalHeight = 0.0;
 int numCredits = 0;
@@ -202,11 +203,15 @@ RangeArrI<int, 0, maxNPCType, 0> NPCFrameStyle;
 RangeArrI<bool, 0, maxBlockType, false> BlockIsSizable;
 RangeArrI<int, 0, maxBlockType, 0> BlockSlope;
 RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
-RangeArr<double, 0, maxPlayers> vScreenX;
-RangeArr<double, 0, maxPlayers> vScreenY;
 
-RangeArr<double, 0, maxPlayers> qScreenX;
-RangeArr<double, 0, maxPlayers> qScreenY;
+// moved into vScreen
+// RangeArr<double, 0, maxPlayers> vScreenX;
+// RangeArr<double, 0, maxPlayers> vScreenY;
+
+// moved into qScreenLoc
+// RangeArr<double, 0, maxPlayers> qScreenX;
+// RangeArr<double, 0, maxPlayers> qScreenY;
+
 bool qScreen = false;
 RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
@@ -531,6 +536,8 @@ RangeArrI<int, 1, maxPlayers, 0> BattleLives;
 int BattleIntro = 0;
 int BattleOutro = 0;
 std::string LevelName;
+std::string CurrentLanguage;
+std::string CurrentLangDialect;
 
 //void DoEvents()
 //{
@@ -562,6 +569,7 @@ void initAll()
     BlockSwitch.fill(false);
     PowerUpUnlock.fill(false);
     vScreen.fill(vScreen_t());
+    qScreenLoc.fill(vScreen_t());
     PlayerStart.fill(Location_t());
     blockCharacter.fill(false);
     OwedMount.fill(0);
@@ -569,7 +577,6 @@ void initAll()
     AutoX.fill(0.f);
     AutoY.fill(0.f);
     Water.fill(Water_t());
-    Star.fill(Star_t());
     // FirstBlock.fill(0);
     // LastBlock.fill(0);
     iBlock.fill(0);
@@ -584,10 +591,6 @@ void initAll()
     Background2.fill(0);
     SpecialFrameCount.fill(0.f);
     NPCSpeedvar.fill(0.f);
-    vScreenX.fill(0.0);
-    vScreenY.fill(0.0);
-    qScreenX.fill(0.0);
-    qScreenY.fill(0.0);
 
     Block.fill(Block_t());
     Background.fill(Background_t());

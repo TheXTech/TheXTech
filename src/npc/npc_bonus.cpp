@@ -20,6 +20,7 @@
 
 #include "../globals.h"
 #include "../npc.h"
+#include "../npc_id.h"
 #include "../sound.h"
 #include "../collision.h"
 #include "../effect.h"
@@ -98,10 +99,10 @@ void DropBonus(int A)
                     B = 40;
                 GetvScreenAverage();
 
-                double ScreenTop = -vScreenY[1];
+                double ScreenTop = -vScreen[1].Y;
                 if(vScreen[1].Height > 600)
                     ScreenTop += vScreen[1].Height / 2 - 300;
-                double CenterX = -vScreenX[1] + vScreen[1].Width / 2;
+                double CenterX = -vScreen[1].X + vScreen[1].Width / 2;
 
                 NPC[numNPCs].Location.X = CenterX - NPC[numNPCs].Location.Width / 2.0 + B;
                 NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
@@ -109,17 +110,17 @@ void DropBonus(int A)
                 //            else if(nPlay.Online == true)
                 //            {
                 //                GetvScreen 1;
-                //                NPC[numNPCs].Location.X = -vScreenX[1] + vScreen[1].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-                //                NPC[numNPCs].Location.Y = -vScreenY[1] + 16 + 12;
+                //                NPC[numNPCs].Location.X = -vScreen[1].X + vScreen[1].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+                //                NPC[numNPCs].Location.Y = -vScreen[1].Y + 16 + 12;
                 //            }
             else
             {
                 GetvScreen(A);
 
-                double ScreenTop = -vScreenY[A];
+                double ScreenTop = -vScreen[A].Y;
                 if(vScreen[A].Height > 600)
                     ScreenTop += vScreen[A].Height / 2 - 300;
-                double CenterX = -vScreenX[A] + vScreen[A].Width / 2;
+                double CenterX = -vScreen[A].X + vScreen[A].Width / 2;
 
                 NPC[numNPCs].Location.X = CenterX - NPC[numNPCs].Location.Width / 2.0;
                 NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
@@ -617,19 +618,27 @@ void TouchBonus(int A, int B)
                 StopMusic();
                 PlaySound(SFX_CrystalBallExit);
             }
-            else if(NPC[B].Type == 97 || NPC[B].Type == 196)
+            else if(NPC[B].Type == NPCID_STAR_SMB3 || NPC[B].Type == NPCID_STAR_SMW)
             {
-                for(C = 1; C <= numStars; C++)
+                for(const auto& star : Star)
                 {
-                    if(Star[C].level == FileNameFull && (Star[C].Section == NPC[B].Section || Star[C].Section == -1))
+                    bool bySection = NPC[B].Variant == 0 && (star.Section == NPC[B].Section || star.Section == -1);
+                    bool byId = NPC[B].Variant > 0 && -(star.Section + 100) == int(NPC[B].Variant);
+                    if(star.level == FileNameFull && (bySection || byId))
                         tempBool = true;
                 }
 
                 if(!tempBool)
                 {
-                    numStars += 1;
-                    Star[numStars].level = FileNameFull;
-                    Star[numStars].Section = NPC[B].Section;
+                    Star_t star;
+                    star.level = FileNameFull;
+                    // Positive - section number, Negative - UID of each star per level
+                    int special = (int)NPC[B].Variant;
+                    star.Section = special <= 0 ? NPC[B].Section : -special - 100;
+                    if(special > 0)
+                        pLogDebug("Got a star with UID=%d", special);
+                    Star.push_back(std::move(star));
+                    numStars = (int)Star.size();
 #ifdef THEXTECH_INTERPROC_SUPPORTED
                     IntProc::sendStarsNumber(numStars);
 #endif

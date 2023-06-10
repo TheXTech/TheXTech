@@ -84,11 +84,4 @@ extern std::string getLogFilePath();
 #define D_pLogInfoNA(fmt) (void)0;
 #endif
 
-#ifdef __cplusplus
-#define LogDebug(msg) WriteToLog(PGE_LogLevel::Debug, msg)
-#define LogWarning(msg) WriteToLog(PGE_LogLevel::Warning, msg)
-#define LogCritical(msg) WriteToLog(PGE_LogLevel::Critical, msg)
-#define LogFatal(msg) WriteToLog(PGE_LogLevel::Fatal, msg)
-#endif//__cplusplus
-
 #endif // LOGGER_H

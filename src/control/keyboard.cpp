@@ -35,6 +35,10 @@
 #include "core/window.h"
 #include "main/cheat_code.h"
 
+#include "main/menu_main.h"
+
+#include "control/controls_strings.h"
+
 #include <Logger/logger.h>
 
 namespace Controls
@@ -318,6 +322,7 @@ InputMethodProfile_Keyboard::InputMethodProfile_Keyboard()
     // It's primary use is a debugging of the font engine itself, comparing with the
     // old font engine on the fly
     this->m_hotkeys[Hotkeys::Buttons::ToggleFontRender] = SDL_SCANCODE_F4;
+    this->m_hotkeys[Hotkeys::Buttons::ReloadLanguage] = SDL_SCANCODE_F5;
 #endif
 }
 
@@ -610,7 +615,7 @@ const char* InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size
     if(c == ControlsClass::Player)
         keys = this->m_keys;
     else if(c == ControlsClass::Cursor)
-        return "(MOUSE)";
+        return g_controlsStrings.caseMouse.c_str();
     else if(c == ControlsClass::Editor)
         keys = this->m_editor_keys;
     else if(c == ControlsClass::Hotkey)
@@ -619,7 +624,7 @@ const char* InputMethodProfile_Keyboard::NamePrimaryButton(ControlsClass c, size
         return "";
 
     if(keys[i] == null_key)
-        return "NONE";
+        return g_mainMenu.caseNone.c_str();
 
     return SDL_GetScancodeName((SDL_Scancode)keys[i]);
 }
@@ -640,7 +645,7 @@ const char* InputMethodProfile_Keyboard::NameSecondaryButton(ControlsClass c, si
         return "";
 
     if(keys2[i] == null_key)
-        return "NONE";
+        return "";
 
     return SDL_GetScancodeName((SDL_Scancode)keys2[i]);
 }
@@ -801,6 +806,11 @@ InputMethodType_Keyboard::InputMethodType_Keyboard()
     this->m_keyboardState = SDL_GetKeyboardState(&this->m_keyboardStateSize);
     this->Name = "Keyboard";
     this->LegacyName = "keyboard";
+}
+
+const std::string& InputMethodType_Keyboard::LocalName() const
+{
+    return g_controlsStrings.nameKeyboard;
 }
 
 bool InputMethodType_Keyboard::TestProfileType(InputMethodProfile* profile)
@@ -1101,7 +1111,7 @@ InputMethod* InputMethodType_Keyboard::Poll(const std::vector<InputMethod*>& act
     if(!method)
         return nullptr;
 
-    method->Name = "Keyboard";
+    method->Name = this->LocalName();
     method->Type = this;
     method->Profile = target_profile;
 
@@ -1430,10 +1440,10 @@ size_t InputMethodType_Keyboard::GetOptionCount()
 const char* InputMethodType_Keyboard::GetOptionName(size_t i)
 {
     if(i == 0)
-        return "MAX KBD PLAYERS";
+        return g_controlsStrings.sharedOptionMaxPlayers.c_str();
 
     if(i == 1)
-        return "TEXT ENTRY STYLE";
+        return g_controlsStrings.keyboardOptionTextEntryStyle.c_str();
 
     return nullptr;
 }
@@ -1453,9 +1463,9 @@ const char* InputMethodType_Keyboard::GetOptionValue(size_t i)
     if(i == 1)
     {
         if(this->m_directText)
-            return "KEYBOARD";
+            return g_controlsStrings.nameKeyboard.c_str();
         else
-            return "GAMEPAD";
+            return g_controlsStrings.nameGamepad.c_str();
     }
 
     return nullptr;

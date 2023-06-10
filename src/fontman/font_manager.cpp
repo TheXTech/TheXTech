@@ -157,6 +157,8 @@ void FontManager::initFull()
 
     /***************Load raster font support****************/
     DirMan fontsDir(fonts_root);
+    if(!fontsDir.exists())
+        return; // Fonts manager is unavailable when directory is not exists
 
     std::vector<std::string> files;
     fontsDir.getListOfFiles(files, {".font.ini"});
@@ -294,6 +296,11 @@ void FontManager::quit()
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     closeFreeType();
 #endif
+}
+
+bool FontManager::isInitied()
+{
+    return g_fontManagerIsInit;
 }
 
 

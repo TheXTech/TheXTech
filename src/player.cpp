@@ -31,6 +31,7 @@
 #include "graphics.h"
 #include "collision.h"
 #include "npc.h"
+#include "npc_id.h"
 #include "sound.h"
 #include "game_main.h"
 #include "effect.h"
@@ -42,6 +43,9 @@
 #include "main/game_globals.h"
 #include "main/trees.h"
 #include "main/menu_main.h"
+#include "main/game_strings.h"
+#include "main/game_info.h"
+#include "main/translate.h"
 #include "core/render.h"
 #include "core/events.h"
 #include "compat.h"
@@ -3657,7 +3661,7 @@ void RespawnPlayer(int A, double Direction, double CenterX, double StopY)
     Player[A].Effect = 6;
     // location where player stops flashing
     Player[A].Effect2 = StopY - Player[A].Location.Height;
-    Player[A].Location.Y = -vScreenY[1] - Player[A].Location.Height;
+    Player[A].Location.Y = -vScreen[1].Y - Player[A].Location.Height;
     Player[A].Location.X = CenterX - Player[A].Location.Width / 2.0;
 }
 
@@ -4538,9 +4542,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
     if(warp.Stars > numStars && canWarp)
     {
         if(warp.StarsMsg == STRINGINDEX_NONE)
-            MessageText = (warp.Stars == 1) ?
-                              "You need 1 star to enter." :
-                              fmt::format_ne("You need {0} stars to enter.", warp.Stars);
+            MessageText = fmt::format_ne(g_gameStrings.warpNeedStarCount, warp.Stars, LanguageFormatNumber(warp.Stars, g_gameInfo.wordStarAccusativeSingular, g_gameInfo.wordStarAccusativeDual_Cnt, g_gameInfo.wordStarAccusativePlural), g_gameInfo.wordStarAccusativeDual_Cnt);
         else
             MessageText = GetS(warp.StarsMsg);
 
@@ -5004,25 +5006,31 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.StandingOnNPC].Frame = 0;
                         NPC[p.StandingOnNPC].Frame = EditorNPCFrame(NPC[p.StandingOnNPC].Type, NPC[p.StandingOnNPC].Direction);
                         NPC[p.StandingOnNPC].Type = NPC[p.StandingOnNPC].Special;
+
                         if(NPC[p.StandingOnNPC].Type == 287)
                         {
                             NPC[p.StandingOnNPC].Type = RandomBonus();
                             NPC[p.StandingOnNPC].DefaultSpecial = NPC[p.StandingOnNPC].Type;
                         }
+
                         CharStuff(p.StandingOnNPC);
                         NPC[p.StandingOnNPC].Special = 0;
+
                         if(NPCIsYoshi[NPC[p.StandingOnNPC].Type])
                         {
                             NPC[p.StandingOnNPC].Special = NPC[p.StandingOnNPC].Type;
                             NPC[p.StandingOnNPC].Type = 96;
                         }
+
                         if(!(NPC[p.StandingOnNPC].Type == 21 || NPC[p.StandingOnNPC].Type == 22 || NPC[p.StandingOnNPC].Type == 26 || NPC[p.StandingOnNPC].Type == 31 || NPC[p.StandingOnNPC].Type == 32 || NPC[p.StandingOnNPC].Type == 35 || NPC[p.StandingOnNPC].Type == 191 || NPC[p.StandingOnNPC].Type == 193 || NPC[p.StandingOnNPC].Type == 49 || NPCIsAnExit[NPC[p.StandingOnNPC].Type]))
                         {
                             if(!BattleMode)
                                 NPC[p.StandingOnNPC].DefaultType = 0;
                         }
+
                         NPC[p.StandingOnNPC].Location.Height = NPCHeight[NPC[p.StandingOnNPC].Type];
                         NPC[p.StandingOnNPC].Location.Width = NPCWidth[NPC[p.StandingOnNPC].Type];
+
                         if(NPC[p.StandingOnNPC].Type == 147)
                         {
                             B = iRand(9);
@@ -5036,6 +5044,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.StandingOnNPC].Location.X += -NPC[p.StandingOnNPC].Location.Width / 2.0;
                             NPC[p.StandingOnNPC].Location.Y += -NPC[p.StandingOnNPC].Location.Height / 2.0;
                         }
+
                         NPCFrames(p.StandingOnNPC);
 
                         if(p.StandingOnNPC > 0)
@@ -6257,8 +6266,6 @@ void PlayerEffects(const int A)
                 case LevelDoor::TRANSIT_SCROLL:
                     if(same_section)
                     {
-                        qScreenX[A] = vScreenX[A];
-                        qScreenY[A] = vScreenY[A];
                         qScreenLoc[A] = vScreen[A];
                         qScreen = true;
                     }
@@ -6701,8 +6708,6 @@ void PlayerEffects(const int A)
                 case LevelDoor::TRANSIT_SCROLL:
                     if(same_section)
                     {
-                        qScreenX[A] = vScreenX[A];
-                        qScreenY[A] = vScreenY[A];
                         qScreenLoc[A] = vScreen[A];
                         qScreen = true;
                     }
@@ -7560,6 +7565,8 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
         RespawnPlayerTo(A, A);
         PlaySound(SFX_DropItem);
     }
+
+    UpdateYoshiMusic();
 }
 
 // returns whether a player is allowed to swap characters

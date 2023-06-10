@@ -17,8 +17,12 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
-
-#include "sdl_proxy/sdl_head.h"
+#ifndef SDL_HEAD_HHHHHH
+#   include "sdl_proxy/sdl_head.h"
+#endif
+#ifndef SDL_SDL_ASSERT_H
+#   include "sdl_proxy/sdl_assert.h"
+#endif
 
 #ifndef THEXTECH_NO_SDL_BUILD
 #include <SDL2/SDL_version.h>
@@ -60,8 +64,26 @@
 
 #endif //PGE_ENGINE_DEBUG
 
-#if !defined(_WIN32) && !defined(__SWITCH__) // Unsupported signals by Windows
+// Exclude platforms that don't have SIG_INFO support
+#if    !defined(_WIN32) \
+    && !defined(__3DS__) \
+    && !defined(__WII__) \
+    && !defined(__WIIU__) \
+    && !defined(__SWITCH__) \
+    && !defined(VITA)
 #   define HAS_SIG_INFO
+#endif
+
+// Exclude personal data removal from platforms where API doesn't allows to recognise the user and/or home directory
+#if    !defined(VITA) \
+    && !defined(__3DS__) \
+    && !defined(__WII__) \
+    && !defined(__WIIU__)  \
+    && !defined(__SWITCH__) \
+    && !defined(__EMSCRIPTEN__) \
+    && !defined(__ANDROID__) \
+    && !defined(__HAIKU__)
+#   define DO_REMOVE_PERSONAL_DATA
 #endif
 
 
@@ -160,7 +182,7 @@ static int isDebuggerPresent()
     "%s"
 
 #define STR_EXPAND(tok) #tok
-#define STR(tok) STR_EXPAND(tok)
+#define STRR(tok) STR_EXPAND(tok)
 
 static const char *g_messageToUser =
     "================================================\n"
@@ -173,10 +195,10 @@ static const char *g_messageToUser =
     "Build date: " V_DATE_OF_BUILD "\n"
     "================================================\n"
 #ifndef THEXTECH_NO_SDL_BUILD
-    "SDL2 " STR(SDL_MAJOR_VERSION) "." STR(SDL_MINOR_VERSION) "." STR(SDL_PATCHLEVEL) "\n"
+    "SDL2 " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) "\n"
 #endif
 #if !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD)
-    "SDL Mixer X " STR(SDL_MIXER_MAJOR_VERSION) "." STR(SDL_MIXER_MINOR_VERSION) "." STR(SDL_MIXER_PATCHLEVEL) "\n"
+    "SDL Mixer X " STRR(SDL_MIXER_MAJOR_VERSION) "." STRR(SDL_MIXER_MINOR_VERSION) "." STRR(SDL_MIXER_PATCHLEVEL) "\n"
 #endif
     "================================================\n"
     " Please send this log file to the developers by one of ways:\n"
@@ -278,6 +300,7 @@ static void androidDumpBacktrace(std::ostringstream &os, void **buffer, size_t c
 }
 #endif
 
+#ifdef DO_REMOVE_PERSONAL_DATA
 static std::string getCurrentUserName()
 {
     std::string user;
@@ -291,9 +314,6 @@ static std::string getCurrentUserName()
     size_t nCnt = WideCharToMultiByte(CP_UTF8, 0, userNameW, usernameLen, userName, 256, 0, 0);
     userName[nCnt] = '\0';
     user = std::string(userName);
-
-#elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__HAIKU__) || defined(__SWITCH__)
-    user = "user"; // No way to get user, here is SINGLE generic user
 
 #else
     struct passwd *pwd = getpwuid(getuid());
@@ -316,9 +336,6 @@ static std::string getCurrentHomePath()
     size_t nCnt = WideCharToMultiByte(CP_UTF8, 0, homeDirW, -1, homeDir, MAX_PATH * 4, 0, 0);
     homeDir[nCnt] = '\0';
     homedir = std::string(homeDir);
-
-#elif defined(__EMSCRIPTEN__) || defined(__ANDROID__) || defined(__SWITCH__)
-    homedir = "/"; // No way to get user, here is SINGLE generic user
 
 #elif defined(__HAIKU__)
     {
@@ -367,6 +384,50 @@ static void removePersonalData(std::string &log)
     replaceStr(log, user, "anonymouse");
 }
 
+#endif // DO_REMOVE_PERSONAL_DATA
+
+#if defined(__WII__) || defined(__WIIU__)
+#   define USE_PPC_BACKTRACE
+int ppc_backtrace(void **buffer, int size)
+{
+    int depth;
+    uint32_t stackptr, lr, *addr;
+
+    // get link register
+    asm volatile ("mflr %0" : "=r"(lr));
+
+    // link register is assigned to depth[0]
+    buffer[0] = (void *) (lr - 4);
+
+    // get stackpointer
+    asm volatile("stw %%sp, 0(%0)" : : "b" ((uint32_t)&stackptr));
+
+    // assign stack ptr to address
+    addr = (uint32_t *)stackptr;
+
+    // get the frames
+    if (*addr)
+    {
+        // skip first two frames because this function
+        // does create a stackframe but doesn't set lr on
+        // the previous one.
+        addr = (uint32_t *)*addr;
+        if (*addr)
+            addr = (uint32_t *)*addr;
+
+    }
+
+    for(depth = 1; (depth < size && *addr); ++depth)
+    {
+        uint32_t * next = (uint32_t *) *addr;
+        buffer[depth] = (void *) (*(addr + 1) - 4);
+        addr = next;
+    }
+
+    return depth;
+}
+#endif
+
 static std::string getStacktrace()
 {
     D_pLogDebugNA("Initializing std::string...");
@@ -374,6 +435,23 @@ static std::string getStacktrace()
 
 #if defined(_WIN32)
     GetStackWalk(bkTrace);
+
+#elif defined(USE_PPC_BACKTRACE)
+    void  *array[400];
+    char stack_entry[25];
+    int size;
+
+    D_pLogDebugNA("Requesting backtrace...");
+    size = ppc_backtrace(array, 400);
+
+    D_pLogDebugNA("Filling std::string...");
+    for(int j = 0; j < size; j++)
+    {
+        SDL_snprintf(stack_entry, 25, "- 0x%08x\n", (uint32_t)array[j]);
+        bkTrace.append(stack_entry);
+    }
+
+    D_pLogDebugNA("DONE!");
 
 #elif Backtrace_FOUND
     void  *array[400];
@@ -406,7 +484,10 @@ static std::string getStacktrace()
     bkTrace = "<Stack trace not supported for this platform!>";
 #endif
 
+#ifdef DO_REMOVE_PERSONAL_DATA
     removePersonalData(bkTrace);
+#endif // DO_REMOVE_PERSONAL_DATA
+
     return bkTrace;
 }
 
@@ -421,10 +502,10 @@ static std::string getStacktrace()
 
 static LLVM_ATTRIBUTE_NORETURN void abortEngine(int signal)
 {
+    CloseLog();
 #ifndef THEXTECH_NO_SDL_BUILD
     SDL_Quit();
 #endif
-    CloseLog();
     exit(signal);
 }
 
@@ -435,17 +516,16 @@ void LLVM_ATTRIBUTE_NORETURN CrashHandler::crashByUnhandledException()
 
     try
     {
-        //throw;
+        std::rethrow_exception(std::current_exception());
     }
     catch(const std::exception &e)
     {
-        exc.append(__FUNCTION__);
-        exc.append(" caught unhandled exception. what(): ");
+        exc.append(" caught an unhandled exception. [");
         exc.append(e.what());
+        exc.append("]");
     }
     catch(...)
     {
-        exc.append(__FUNCTION__);
         exc.append(" caught unhandled exception. (unknown) ");
     }
 
@@ -516,7 +596,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     {
         std::string stack = getStacktrace();
 
-#if defined(HAS_SIG_INFO)
+#   if defined(HAS_SIG_INFO)
         if(siginfo)
         {
             switch(siginfo->si_code)
@@ -546,7 +626,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
             }
         }
         else
-#endif
+#   endif // HAS_SIG_INFO
         {
             pLogFatal("<Physical memory address error>\n"
                       STACK_FORMAT,
@@ -580,7 +660,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
         abortEngine(signal);
     }
 
-#endif
+#endif // NOT _WIN32
 
     case SIGFPE:
     {
@@ -622,7 +702,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
             }
         }
         else
-#endif
+#endif // HAS_SIG_INFO
         {
             pLogFatal("<wrong arithmetical operation>\n"
                       STACK_FORMAT,
@@ -683,7 +763,7 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
             }
         }
         else
-#endif// _WIN32
+#endif // HAS_SIG_INFO
         {
             pLogFatal("<Segmentation fault crash!>\n"
                       STACK_FORMAT,
@@ -718,6 +798,27 @@ static void handle_signal(int signal, siginfo_t *siginfo, void * /*context*/)
     }
 }
 
+#ifndef THEXTECH_NO_SDL_BUILD
+static SDL_AssertState custom_sdl_handler(const SDL_AssertData *data, void *userdata)
+{
+    std::string stack = getStacktrace();
+    pLogFatal("<Assertion condition has failed>:\n"
+              "---------------------------------------------------------\n"
+              "File: %s(%d)\n"
+              "Function: %s\n"
+              "Condition: %s\n"
+              "---------------------------------------------------------\n"
+              STACK_FORMAT,
+              data->filename, data->linenum,
+              data->function,
+              data->condition,
+              stack.c_str(),
+              g_messageToUser);
+
+    return SDL_GetDefaultAssertionHandler()(data, userdata);
+}
+#endif
+
 #if defined(HAS_SIG_INFO)
 static struct sigaction act;
 #else
@@ -737,6 +838,10 @@ void CrashHandler::initSigs()
 #ifdef PGE_ENGINE_DEBUG
     if(isDebuggerPresent())
         return; // Don't initialize crash handlers on attached debugger
+#endif
+
+#ifndef THEXTECH_NO_SDL_BUILD
+    SDL_SetAssertionHandler(&custom_sdl_handler, NULL);
 #endif
 
     std::set_new_handler(&crashByFlood);
@@ -759,7 +864,7 @@ void CrashHandler::initSigs()
     sigaction(SIGSEGV, &act, nullptr);
     sigaction(SIGINT,  &act, nullptr);
     sigaction(SIGABRT, &act, nullptr);
-#else
+#else // HAS_SIG_INFO
     signal(SIGILL,  &handle_signalWIN32);
     signal(SIGFPE,  &handle_signalWIN32);
     signal(SIGSEGV, &handle_signalWIN32);
@@ -772,6 +877,6 @@ void CrashHandler::initSigs()
     signal(SIGBUS, &handle_signalWIN32);
     signal(SIGURG, &handle_signalWIN32);
 #   endif
-#endif
+#endif // HAS_SIG_INFO
 }
 /* Signals End */

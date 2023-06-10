@@ -19,6 +19,7 @@
  */
 
 #include <Utils/files.h>
+#include <Integrator/integrator.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
 
@@ -39,6 +40,7 @@
 #include "speedrunner.h"
 #include "screen_quickreconnect.h"
 #include "screen_connect.h"
+#include "main/game_strings.h"
 
 #include "global_dirs.h"
 
@@ -185,8 +187,8 @@ void WorldLoop()
     if(SingleCoop > 0)
         SingleCoop = 1;
 
-    vScreenX[1] = -(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0) + vScreen[1].Width / 2.0;
-    vScreenY[1] = -(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0) + vScreen[1].Height / 2.0 + 32;
+    vScreen[1].X = -(WorldPlayer[1].Location.X + WorldPlayer[1].Location.Width / 2.0) + vScreen[1].Width / 2.0;
+    vScreen[1].Y = -(WorldPlayer[1].Location.Y + WorldPlayer[1].Location.Height / 2.0) + vScreen[1].Height / 2.0 + 32;
 
     if(numPlayers > 2)
         numPlayers = 1;
@@ -198,6 +200,7 @@ void WorldLoop()
     }
 
     speedRun_tick();
+    Integrator::sync();
     UpdateGraphics2();
 
     if(!Controls::Update())
@@ -572,7 +575,7 @@ void WorldLoop()
                             if(!OpenLevel(levelPath))
                             {
                                 delayedMusicStart(); // Allow music being started
-                                MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", level.FileName);
+                                MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, level.FileName);
                                 PauseGame(PauseCode::Message);
                                 ErrorQuit = true;
                             }
@@ -960,8 +963,8 @@ void PathPath(WorldPath_t &Pth, bool Skp)
     if(!Pth.Active && !Skp)
     {
         Pth.Active = true;
-        vScreenX[1] = -(Pth.Location.X + Pth.Location.Width / 2.0) + vScreen[1].Width / 2.0;
-        vScreenY[1] = -(Pth.Location.Y + Pth.Location.Height / 2.0) + vScreen[1].Height / 2.0;
+        vScreen[1].X = -(Pth.Location.X + Pth.Location.Width / 2.0) + vScreen[1].Width / 2.0;
+        vScreen[1].Y = -(Pth.Location.Y + Pth.Location.Height / 2.0) + vScreen[1].Height / 2.0;
         PlaySound(SFX_NewPath);
         PathWait();
     }
@@ -1021,8 +1024,8 @@ void PathPath(WorldPath_t &Pth, bool Skp)
                     lev.Active = true;
                     if(!Skp)
                     {
-                        vScreenX[1] = -(lev.Location.X + lev.Location.Width / 2.0) + vScreen[1].Width / 2.0;
-                        vScreenY[1] = -(lev.Location.Y + lev.Location.Height / 2.0) + vScreen[1].Height / 2.0;
+                        vScreen[1].X = -(lev.Location.X + lev.Location.Width / 2.0) + vScreen[1].Width / 2.0;
+                        vScreen[1].Y = -(lev.Location.Y + lev.Location.Height / 2.0) + vScreen[1].Height / 2.0;
                         PlaySound(SFX_NewPath);
                         PathWait();
                     }

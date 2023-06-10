@@ -285,13 +285,13 @@ void DropNPC(int A, int NPCType)
                 B = -40;
             if(A == 2)
                 B = 40;
-            NPC[numNPCs].Location.X = -vScreenX[1] + vScreen[1].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0 + B;
-            NPC[numNPCs].Location.Y = -vScreenY[1] + 16 + 12;
+            NPC[numNPCs].Location.X = -vScreen[1].X + vScreen[1].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0 + B;
+            NPC[numNPCs].Location.Y = -vScreen[1].Y + 16 + 12;
         }
         else
         {
-            NPC[numNPCs].Location.X = -vScreenX[A] + vScreen[A].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
-            NPC[numNPCs].Location.Y = -vScreenY[A] + 16 + 12;
+            NPC[numNPCs].Location.X = -vScreen[A].X + vScreen[A].Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
+            NPC[numNPCs].Location.Y = -vScreen[A].Y + 16 + 12;
         }
         NPC[numNPCs].Location.SpeedX = 0;
         NPC[numNPCs].Location.SpeedY = 0;
@@ -4749,11 +4749,11 @@ void SpecialNPC(int A)
 
             if(NPC[A].Location.Y + NPC[A].Location.Height > Player[C].Location.Y - 248)
                 NPC[A].Special2 = 1;
-            if(NPC[A].Location.Y + NPC[A].Location.Height < Player[C].Location.Y - 256 || NPC[A].Location.Y < -vScreenY[D])
+            if(NPC[A].Location.Y + NPC[A].Location.Height < Player[C].Location.Y - 256 || NPC[A].Location.Y < -vScreen[D].Y)
                 NPC[A].Special2 = 0;
-            if(NPC[A].Location.Y > -vScreenY[D] + 64)
+            if(NPC[A].Location.Y > -vScreen[D].Y + 64)
                 NPC[A].Special2 = 1;
-            if(NPC[A].Location.Y < -vScreenY[D] + 72)
+            if(NPC[A].Location.Y < -vScreen[D].Y + 72)
                 NPC[A].Special2 = 0;
 
             if(NPC[A].Special2 == 0)
@@ -5308,11 +5308,11 @@ void SpecialNPC(int A)
 
             if(NPC[A].Location.Y + NPC[A].Location.Height > Player[C].Location.Y - 248)
                 NPC[A].Special2 = 1;
-            if(NPC[A].Location.Y + NPC[A].Location.Height < Player[C].Location.Y - 256 || NPC[A].Location.Y < -vScreenY[D])
+            if(NPC[A].Location.Y + NPC[A].Location.Height < Player[C].Location.Y - 256 || NPC[A].Location.Y < -vScreen[D].Y)
                 NPC[A].Special2 = 0;
-            if(NPC[A].Location.Y > -vScreenY[D] + 64)
+            if(NPC[A].Location.Y > -vScreen[D].Y + 64)
                 NPC[A].Special2 = 1;
-            if(NPC[A].Location.Y < -vScreenY[D] + 72)
+            if(NPC[A].Location.Y < -vScreen[D].Y + 72)
                 NPC[A].Special2 = 0;
 
             if(NPC[A].Special2 == 0)

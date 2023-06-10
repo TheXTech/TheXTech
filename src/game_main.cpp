@@ -26,6 +26,7 @@
 #include <Logger/logger.h>
 #include <Utils/files.h>
 #include <AppPath/app_path.h>
+#include <Integrator/integrator.h>
 #include <PGE_File_Formats/file_formats.h>
 #ifdef THEXTECH_INTERPROC_SUPPORTED
 #   include <InterProcess/intproc.h>
@@ -66,11 +67,16 @@
 #include "main/speedrunner.h"
 #include "main/menu_main.h"
 #include "main/game_info.h"
+#include "main/outro_loop.h"
+#include "editor/editor_strings.h"
+#include "main/game_strings.h"
+#include "main/translate.h"
 #include "main/record.h"
 #include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
 #include "core/msgbox.h"
+#include "core/language.h"
 #include "script/luna/luna.h"
 
 #include "pseudo_vb.h"
@@ -202,8 +208,22 @@ int GameMain(const CmdLineSetup_t &setup)
     //        DoEvents
     //    Loop While StartMenu = False 'wait until the player clicks a button
 
+    initOutroContent();
     initMainMenu();
+    initEditorStrings();
+    initGameStrings();
     StartMenu = true;
+
+    if(!CurrentLanguage.empty())
+    {
+        XTechTranslate translator;
+        if(translator.translate())
+        {
+            pLogDebug("Loaded translation for language %s-%s",
+                      CurrentLanguage.c_str(),
+                      CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
+        }
+    }
 
     initAll();
 
@@ -306,6 +326,9 @@ int GameMain(const CmdLineSetup_t &setup)
         IntProc::init();
 #endif
 
+    Integrator::initIntegrations();
+    Integrator::setGameName(g_gameInfo.title, g_gameInfo.statusIconName);
+
     LoadingInProcess = false;
 
     // Clear the screen
@@ -356,6 +379,11 @@ int GameMain(const CmdLineSetup_t &setup)
         else
         {
             zTestLevel(setup.testMagicHand, setup.interprocess);
+
+            if(!LevelName.empty())
+                Integrator::setLevelName(LevelName);
+            else
+                Integrator::setLevelName(FileName);
         }
     }
 
@@ -544,6 +572,10 @@ int GameMain(const CmdLineSetup_t &setup)
         // The Game Menu
         else if(GameMenu)
         {
+            Integrator::clearEpisodeName();
+            Integrator::clearLevelName();
+            Integrator::clearEditorFile();
+
             BattleIntro = 0;
             BattleOutro = 0;
             AllCharBlock = 0;
@@ -625,7 +657,7 @@ int GameMain(const CmdLineSetup_t &setup)
             }
 
             OpenLevel(introPath);
-            vScreenX[1] = -level[0].X;
+            vScreen[1].X = -level[0].X;
 
             if(g_config.EnableInterLevelFade)
                 g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
@@ -773,7 +805,7 @@ int GameMain(const CmdLineSetup_t &setup)
 
                 if(!OpenLevel(levelPath))
                 {
-                    MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", levelPath);
+                    MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, levelPath);
                     PauseGame(PauseCode::Message);
                     ErrorQuit = true;
                 }
@@ -1031,6 +1063,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
                     Backup_FullFileName = "";
 
+                    Integrator::setEditorFile(FileName);
+
                     editorScreen.active = false;
                     MouseRelease = false;
 
@@ -1082,6 +1116,8 @@ int GameMain(const CmdLineSetup_t &setup)
 
     } while(GameIsActive);
 
+    Integrator::quitIntegrations();
+
     return 0;
 }
 
@@ -1094,6 +1130,7 @@ int GameMain(const CmdLineSetup_t &setup)
 void EditorLoop()
 {
     Controls::Update();
+    Integrator::sync();
     UpdateEditor();
     UpdateBlocks();
     UpdateEffects();
@@ -1112,6 +1149,7 @@ void EditorLoop()
 void KillIt()
 {
     GameIsActive = false;
+    Integrator::initIntegrations();
 #ifndef RENDER_FULLSCREEN_ALWAYS
     XWindow::hide();
     if(resChanged)
@@ -1803,6 +1841,8 @@ void StartEpisode()
         speedRun_loadStats();
     }
 
+    Integrator::setEpisodeName(WorldName);
+
     if(WorldUnlock)
     {
         For(A, 1, numWorldPaths)
@@ -1844,7 +1884,7 @@ void StartEpisode()
         std::string levelPath = SelectWorld[selWorld].WorldPath + StartLevel;
         if(!OpenLevel(levelPath))
         {
-            MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", StartLevel);
+            MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, StartLevel);
             PauseGame(PauseCode::Message);
             ErrorQuit = true;
         }
@@ -1918,7 +1958,7 @@ void StartBattleMode()
 
     if(NumSelectBattle <= 1)
     {
-        MessageText = "Can't start battle because of no levels available";
+        MessageText = g_mainMenu.errorBattleNoLevels;
         PauseGame(PauseCode::Message);
         ErrorQuit = true;
     }
@@ -1931,7 +1971,7 @@ void StartBattleMode()
     std::string levelPath = SelectBattle[selWorld].WorldPath + SelectBattle[selWorld].WorldFile;
     if(!OpenLevel(levelPath))
     {
-        MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", SelectBattle[selWorld].WorldFile);
+        MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, SelectBattle[selWorld].WorldFile);
         PauseGame(PauseCode::Message);
         ErrorQuit = true;
     }

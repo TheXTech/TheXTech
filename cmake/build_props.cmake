@@ -11,6 +11,21 @@ if(APPLE AND CMAKE_HOST_SYSTEM_VERSION VERSION_LESS 9)
     set(XTECH_MACOSX_TIGER TRUE)
 endif()
 
+# =========================== Architecture info ===============================
+
+include(${CMAKE_CURRENT_LIST_DIR}/TargetArch.cmake)
+target_architecture(TARGET_PROCESSOR)
+message(STATUS "Target architecture: ${TARGET_PROCESSOR}")
+
+test_big_endian(THEXTECH_IS_BIG_ENDIAN)
+if(THEXTECH_IS_BIG_ENDIAN)
+    message(STATUS "Target processor endianess: BIG ENDIAN")
+else()
+    message(STATUS "Target processor endianess: LITTLE ENDIAN")
+endif()
+
+message(STATUS "Size of void pointer is ${CMAKE_SIZEOF_VOID_P}!")
+
 # =============================== Policies ====================================
 
 # Ninja requires custom command byproducts to be explicit.
@@ -130,6 +145,9 @@ elseif(NOT MSVC)
             string(REGEX REPLACE "-O2" "-Os"
                 CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
 
+            # Supress the std::vector::insert() GCC change warning
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcompare-debug-second")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcompare-debug-second")
             # use --gc-sections for all build types
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -Wl,--gc-sections")
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Wl,--gc-sections")
@@ -140,7 +158,10 @@ elseif(NOT MSVC)
             set(CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
             set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
             set(LINK_FLAGS_MINSIZEREL  "${LINK_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
-        elseif(NINTENDO_3DS OR NINTENDO_WII)
+        elseif(NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_WIIU OR NINTENDO_SWITCH)
+            # Supress the std::vector::insert() GCC change warning
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcompare-debug-second")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcompare-debug-second")
             # use --gc-sections for all build types
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -Wl,--gc-sections")
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Wl,--gc-sections")
@@ -152,9 +173,12 @@ elseif(NOT MSVC)
             set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
             set(LINK_FLAGS_MINSIZEREL  "${LINK_FLAGS_MINSIZEREL} -g -Wl,--gc-sections")
         elseif(VITA)
+            # Supress the std::vector::insert() GCC change warning
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DVITA=1 -fcompare-debug-second")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DVITA=1 -fcompare-debug-second")
             # VitaSDK specifies -O2 for release configurations. PS Vita Support - Axiom 2022
-            set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1 -fcompare-debug-second")
-            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1 -fpermissive -fcompare-debug-second -fno-optimize-sibling-calls -Wno-class-conversion")
+            set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1")
+            set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -I../src -Wl,--gc-sections -DVITA=1 -fpermissive -fno-optimize-sibling-calls -Wno-class-conversion")
             set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -Wl,--gc-sections")
         elseif(NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s -Wl,--gc-sections -Wl,-s")
@@ -240,6 +264,7 @@ else()
     xtech_add_warning_flag("-Wpedantic" PEDANTIC_WARNING)
     xtech_disable_warning_flag("variadic-macros" NO_VARIADIC_MACROS_WARNING)
     xtech_disable_warning_flag("psabi" NO_PSABI_WARNING)
+    xtech_disable_warning_flag("dangling-reference" NO_DANGLING_REFERENCE_WARNING)
 endif()
 
 

@@ -351,3 +351,27 @@ void Files::getGifMask(std::string& mask, const std::string& front)
     else
         mask.insert(mask.begin() + dotPos, 'm');
 }
+
+bool Files::dumpFile(const std::string& inPath, std::string& outData)
+{
+    off_t end;
+    bool ret = true;
+    FILE *in = Files::utf8_fopen(inPath.c_str(), "r");
+    if(!in)
+        return false;
+
+    outData.clear();
+
+    std::fseek(in, 0, SEEK_END);
+    end = std::ftell(in);
+    std::fseek(in, 0, SEEK_SET);
+
+    outData.resize(end);
+
+    if(std::fread((void*)outData.data(), 1, outData.size(), in) != outData.size())
+        ret = false;
+
+    std::fclose(in);
+
+    return ret;
+}

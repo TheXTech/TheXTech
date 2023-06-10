@@ -159,11 +159,11 @@ static void write_header()
     fprintf(record_file, "Score %d\r\n", Score);
     fprintf(record_file, "Stars %d\r\n", numStars);
 
-    for(int A = 1; A <= numStars; A++)
+    for(const auto& star : Star)
     {
         fprintf(record_file, "Star\r\n");
-        fprintf(record_file, "%s\r\n", Star[A].level.c_str());
-        fprintf(record_file, "Section %d\r\n", Star[A].Section);
+        fprintf(record_file, "%s\r\n", star.level.c_str());
+        fprintf(record_file, "Section %d\r\n", star.Section);
     }
 
     fprintf(record_file, "Players %d\r\n", numPlayers);
@@ -270,17 +270,22 @@ static void read_header()
     fscanf(replay_file, "Coins %d\r\n", &Coins);
     fscanf(replay_file, "Score %d\r\n", &Score);
     fscanf(replay_file, "Stars %d\r\n", &numStars);
+    
+    if(Star.capacity() < (size_t)numStars)
+        Star.reserve(numStars);
 
     for(int A = 1; A <= numStars; A++)
     {
+        Star_t star;
         fgets(buffer, 1024, replay_file); // "Star"
         fgets(buffer, 1024, replay_file); // level
 
         for(int i = 0; i < 1024; i++)
             if(buffer[i] == '\r') buffer[i] = '\0'; // clip the newline :(
 
-        Star[A].level = buffer;
-        fscanf(replay_file, "Section %d\r\n", &Star[A].Section);
+        star.level = buffer;
+        fscanf(replay_file, "Section %d\r\n", &star.Section);
+        Star.push_back(std::move(star));
     }
 
     fscanf(replay_file, "Players %d\r\n", &numPlayers);

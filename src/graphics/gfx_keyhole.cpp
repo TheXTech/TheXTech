@@ -53,8 +53,8 @@ void RenderKeyhole(int Z)
     double keyholeBottom = realKeyholeBottom * (1 - keyholeGrowthCoord) + idealKeyholeBottom * keyholeGrowthCoord;
 
     RenderTexturePlayerScale(Z,
-        vScreenX[Z] + keyhole.Location.X + keyhole.Location.Width / 2 - keyhole.Location.Width * keyholeScale / 2,
-        vScreenY[Z] + keyholeBottom - 24 * keyholeScale,
+        vScreen[Z].X + keyhole.Location.X + keyhole.Location.Width / 2 - keyhole.Location.Width * keyholeScale / 2,
+        vScreen[Z].Y + keyholeBottom - 24 * keyholeScale,
         keyhole.Location.Width * keyholeScale,
         keyhole.Location.Height * keyholeScale,
         GFXBackgroundBMP[keyhole.Type],
@@ -96,8 +96,8 @@ void RenderTexturePlayerScale(int Z, double dst_x, double dst_y, double dst_w, d
 
     double scale = ratio < 155 ? 1.0 : (double)(255 - ratio) / 100;
 
-    double cx = vScreenX[Z] + keyhole.Location.X + keyhole.Location.Width / 2;
-    double cy = vScreenY[Z] + keyhole.Location.Y + 12;
+    double cx = vScreen[Z].X + keyhole.Location.X + keyhole.Location.Width / 2;
+    double cy = vScreen[Z].Y + keyhole.Location.Y + 12;
 
     return XRender::renderTextureScaleEx(
                 dst_x * scale + cx * (1 - scale),

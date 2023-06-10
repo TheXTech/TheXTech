@@ -20,6 +20,7 @@
 
 #include <AppPath/app_path.h>
 #include <Utils/files.h>
+#include <Integrator/integrator.h>
 #include <PGE_File_Formats/file_formats.h>
 #include <fmt_format_ne.h>
 
@@ -213,16 +214,16 @@ static void updateIntroLevelActivity()
             }
         }
 
-        if(p.Location.X < -vScreenX[1] - p.Location.Width && -vScreenX[1] > level[0].X)
+        if(p.Location.X < -vScreen[1].X - p.Location.Width && -vScreen[1].X > level[0].X)
             p.Dead = true;
 
-        if(p.Location.X > -vScreenX[1] + vScreen[1].Width + 200)
+        if(p.Location.X > -vScreen[1].X + vScreen[1].Width + 200)
             p.Dead = true;
 
-        if(p.Location.X > -vScreenX[1] + vScreen[1].Width * 0.75 && -vScreenX[1] + vScreen[1].Width + 50 < level[0].Width)
+        if(p.Location.X > -vScreen[1].X + vScreen[1].Width * 0.75 && -vScreen[1].X + vScreen[1].Width + 50 < level[0].Width)
             p.Controls.Run = false;
 
-        if(-vScreenX[1] <= level[0].X && (p.Dead || p.TimeToLive > 0) && g_gameInfo.introMaxPlayersCount > 0)
+        if(-vScreen[1].X <= level[0].X && (p.Dead || p.TimeToLive > 0) && g_gameInfo.introMaxPlayersCount > 0)
         {
             p.ForceHold = 65;
             p.State = iRand(6) + 2;
@@ -520,6 +521,8 @@ void MenuLoop()
     if(mainMenuUpdate())
         return;
 
+    Integrator::sync();
+
     if(!g_gameInfo.introDeadMode)
         updateIntroLevelActivity();
     else
@@ -538,7 +541,7 @@ void MenuLoop()
 
     if(SharedCursor.Primary)
     {
-        const Location_t cursorLoc = newLoc(SharedCursor.X - vScreenX[1], SharedCursor.Y - vScreenY[1]);
+        const Location_t cursorLoc = newLoc(SharedCursor.X - vScreen[1].X, SharedCursor.Y - vScreen[1].Y);
         if(iRand(5) >= 2)
         {
             NewEffect(80, cursorLoc);
@@ -555,8 +558,8 @@ void MenuLoop()
                     if(!NPCIsACoin[NPC[A].Type])
                     {
                         NPC[0] = NPC[A];
-                        NPC[0].Location.X = SharedCursor.X - vScreenX[1];
-                        NPC[0].Location.Y = SharedCursor.Y - vScreenY[1];
+                        NPC[0].Location.X = SharedCursor.X - vScreen[1].X;
+                        NPC[0].Location.Y = SharedCursor.Y - vScreen[1].Y;
                         NPCHit(A, 3, 0);
                     }
                     else

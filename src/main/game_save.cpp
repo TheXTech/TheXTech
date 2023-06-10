@@ -218,19 +218,17 @@ void SaveGame()
 
     for(A = numPlayers; A >= 1; A--)
         SavedChar[Player[A].Character] = Player[A];
-    for(A = numStars; A >= 1; A--)
+
+    // Clean-up from invalid entries
+    for(auto it = Star.begin(); it != Star.end(); )
     {
-        if(Star[A].level.empty())
-        {
-            if(numStars > A)
-            {
-                Star[A] = Star[numStars];
-                Star[numStars].level.clear();
-                Star[numStars].Section = 0;
-            }
-            numStars -= 1;
-        }
+        if(it->level.empty())
+            it = Star.erase(it);
+        else
+            ++it;
     }
+
+    numStars = (int)Star.size();
 
     const auto &w = SelectWorld[selWorld];
 
@@ -277,8 +275,8 @@ void SaveGame()
     for(A = 1; A <= numScenes; A++)
         sav.visibleScenery.emplace_back(A, Scene[A].Active);
 
-    for(A = 1; A <= numStars; A++)
-        sav.gottenStars.emplace_back(Star[A].level, Star[A].Section);
+    for(const auto& star : Star)
+        sav.gottenStars.emplace_back(star.level, star.Section);
 
     sav.totalStars = uint32_t(MaxWorldStars);
 
@@ -399,12 +397,15 @@ void LoadGame()
             Scene[A].Active = p.second;
     }
 
-    A = 1;
+    if(Star.capacity() < sav.gottenStars.size())
+        Star.reserve(sav.gottenStars.size());
+
     for(auto &p : sav.gottenStars)
     {
-        Star[A].level = p.first;
-        Star[A].Section = p.second;
-        A++;
+        Star_t star;
+        star.level = p.first;
+        star.Section = p.second;
+        Star.push_back(std::move(star));
     }
 
     numStars = int(sav.gottenStars.size());
@@ -457,13 +458,8 @@ void ClearGame(bool punnish)
     for(int A = 1; A <= maxScenes; ++A)
         Scene[A].Active = true;
 
-    for(int A = 1; A <= maxStarsNum; ++A)
-    {
-        Star[A].level.clear();
-        Star[A].Section = 0;
-    }
-
     maxStars = 0;
+    Star.clear();
     numStars = 0;
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE

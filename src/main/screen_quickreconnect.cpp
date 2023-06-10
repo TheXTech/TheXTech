@@ -18,11 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../controls.h"
-#include "../globals.h"
-#include "../graphics.h"
+#include <fmt_format_ne.h>
 
-#include "menu_main.h"
+#include "controls.h"
+#include "globals.h"
+#include "graphics.h"
+
+#include "main/menu_main.h"
+#include "main/game_strings.h"
 
 namespace QuickReconnectScreen
 {
@@ -46,19 +49,17 @@ void Render()
     int drawn = 0;
     bool none_missing = true;
 
-    char message[] = "P_ DISCONNECTED";
+    std::string message;
 
     for(int i = maxLocalPlayers - 1; i >= 0; i--)
     {
         if(i >= numPlayers)
             continue;
 
-        message[1] = '1' + i;
-
         if(i >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[i])
         {
             int draw_Y = last_player_Y - 20 * drawn;
-            message[3] = 'D';
+            message = fmt::format_ne(g_gameStrings.controlsPhrasePlayerDisconnected, i + 1);
             SuperPrint(message, 3, draw_X, draw_Y);
             drawn++;
             none_missing = false;
@@ -67,15 +68,15 @@ void Render()
         {
             int draw_Y = last_player_Y - 20 * drawn;
             message[3] = '\0';
-            std::string p = (Controls::g_InputMethods[i]->Profile ? Controls::g_InputMethods[i]->Profile->Name : "<NONE>");
-            std::string&& s = message + g_mainMenu.controlsConnected + " " + Controls::g_InputMethods[i]->Name + ", " + g_mainMenu.wordProfile + ": " + p;
-            SuperPrint(s, 3, draw_X, draw_Y);
+            const std::string& p = (Controls::g_InputMethods[i]->Profile ? Controls::g_InputMethods[i]->Profile->Name : g_mainMenu.caseNone);
+            message = fmt::format_ne(g_gameStrings.controlsPhrasePlayerConnected, i + 1, Controls::g_InputMethods[i]->Name, p);
+            SuperPrint(message, 3, draw_X, draw_Y);
             drawn++;
         }
     }
 
     if(!none_missing)
-        SuperPrint(g_mainMenu.phrasePressAButton, 3, draw_X + 20, press_button_Y);
+        SuperPrint(g_gameStrings.connectPressAButton, 3, draw_X + 20, press_button_Y);
 }
 
 void Logic()

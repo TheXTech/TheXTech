@@ -23,8 +23,10 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 
-#include "globals.h"
+#include "global_constants.h"
+#include "globals.h" // vScreen
 #include "range_arr.hpp"
+
 #include "core/render.h"
 
 #include "screen_fader.h"
@@ -188,8 +190,8 @@ void ScreenFader::draw()
 
                 if(m_focusSet && m_focusScreen >= 0)
                 {
-                    focusX += vScreenX[m_focusScreen];
-                    focusY += vScreenY[m_focusScreen];
+                    focusX += vScreen[m_focusScreen].X;
+                    focusY += vScreen[m_focusScreen].Y;
                 }
 
                 XRender::assignUniform(effect, m_focusUniform, UniformValue_t((GLfloat)focusX, (GLfloat)focusY));
@@ -221,8 +223,8 @@ void ScreenFader::draw()
 
             if(m_focusScreen >= 0)
             {
-                focusX += vScreenX[m_focusScreen];
-                focusY += vScreenY[m_focusScreen];
+                focusX += vScreen[m_focusScreen].X;
+                focusY += vScreen[m_focusScreen].Y;
             }
 
             float rightW = (ScreenW -focusX),
@@ -253,8 +255,8 @@ void ScreenFader::draw()
 
             if(m_focusScreen)
             {
-                focusX += vScreenX[m_focusScreen];
-                focusY += vScreenY[m_focusScreen];
+                focusX += vScreen[m_focusScreen].X;
+                focusY += vScreen[m_focusScreen].Y;
             }
 
             // int radius = ScreenH - (ScreenH * m_scale);

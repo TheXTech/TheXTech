@@ -437,10 +437,10 @@ bool vScreenCollision(int A, const Location_t &Loc2)
     if(A == 0)
         return true;
 
-    return (-vScreenX[A] <= Loc2.X + Loc2.Width) &&
-           (-vScreenX[A] + vScreen[A].Width >= Loc2.X) &&
-           (-vScreenY[A] <= Loc2.Y + Loc2.Height) &&
-           (-vScreenY[A] + vScreen[A].Height >= Loc2.Y);
+    return (-vScreen[A].X <= Loc2.X + Loc2.Width) &&
+           (-vScreen[A].X + vScreen[A].Width >= Loc2.X) &&
+           (-vScreen[A].Y <= Loc2.Y + Loc2.Height) &&
+           (-vScreen[A].Y + vScreen[A].Height >= Loc2.Y);
 }
 
 bool vScreenCollision(int A, const SpeedlessLocation_t &Loc2)
@@ -448,27 +448,27 @@ bool vScreenCollision(int A, const SpeedlessLocation_t &Loc2)
     if(A == 0)
         return true;
 
-    return (-vScreenX[A] <= Loc2.X + Loc2.Width) &&
-           (-vScreenX[A] + vScreen[A].Width >= Loc2.X) &&
-           (-vScreenY[A] <= Loc2.Y + Loc2.Height) &&
-           (-vScreenY[A] + vScreen[A].Height >= Loc2.Y);
+    return (-vScreen[A].X <= Loc2.X + Loc2.Width) &&
+           (-vScreen[A].X + vScreen[A].Width >= Loc2.X) &&
+           (-vScreen[A].Y <= Loc2.Y + Loc2.Height) &&
+           (-vScreen[A].Y + vScreen[A].Height >= Loc2.Y);
 }
 
 // vScreen collisions 2
 bool vScreenCollision2(int A, const Location_t &Loc2)
 {
-    return (-vScreenX[A] + 64 <= Loc2.X + Loc2.Width) &&
-           (-vScreenX[A] + vScreen[A].Width - 64 >= Loc2.X) &&
-           (-vScreenY[A] + 96 <= Loc2.Y + Loc2.Height) &&
-           (-vScreenY[A] + vScreen[A].Height - 64 >= Loc2.Y);
+    return (-vScreen[A].X + 64 <= Loc2.X + Loc2.Width) &&
+           (-vScreen[A].X + vScreen[A].Width - 64 >= Loc2.X) &&
+           (-vScreen[A].Y + 96 <= Loc2.Y + Loc2.Height) &&
+           (-vScreen[A].Y + vScreen[A].Height - 64 >= Loc2.Y);
 }
 
 bool vScreenCollision2(int A, const SpeedlessLocation_t &Loc2)
 {
-    return (-vScreenX[A] + 64 <= Loc2.X + Loc2.Width) &&
-           (-vScreenX[A] + vScreen[A].Width - 64 >= Loc2.X) &&
-           (-vScreenY[A] + 96 <= Loc2.Y + Loc2.Height) &&
-           (-vScreenY[A] + vScreen[A].Height - 64 >= Loc2.Y);
+    return (-vScreen[A].X + 64 <= Loc2.X + Loc2.Width) &&
+           (-vScreen[A].X + vScreen[A].Width - 64 >= Loc2.X) &&
+           (-vScreen[A].Y + 96 <= Loc2.Y + Loc2.Height) &&
+           (-vScreen[A].Y + vScreen[A].Height - 64 >= Loc2.Y);
 }
 
 // Collision detection for blocks. Prevents walking on walls.

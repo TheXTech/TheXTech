@@ -21,6 +21,7 @@
 #include "lunaplayer.h"
 #include "lunanpc.h"
 #include "globals.h"
+#include "sound.h"
 #include "mememu.h"
 
 
@@ -106,6 +107,7 @@ void PlayerF::FilterMount(Player_t *player)
 {
     player->MountType = 0;
     player->Mount = 0;
+    UpdateYoshiMusic();
 }
 
 
@@ -126,8 +128,8 @@ LunaRect PlayerF::GetScreenPosition(Player_t *player)
 {
     //    double* pCameraY = (double*)GM_CAMERA_Y;
     //    double* pCameraX = (double*)GM_CAMERA_X;
-    double cam_y = -vScreenY[1];
-    double cam_x = -vScreenX[1];
+    double cam_y = -vScreen[1].Y;
+    double cam_x = -vScreen[1].X;
     //    double cam_d = cam_y + 600;
     //    double cam_r = cam_x + 800;
 
@@ -144,6 +146,8 @@ void PlayerF::CycleRight(Player_t *player)
     player->Character++;
     if(player->Character > 5)
         player->Character = 1;
+
+    UpdateYoshiMusic();
 }
 
 void PlayerF::CycleLeft(Player_t *player)
@@ -151,6 +155,8 @@ void PlayerF::CycleLeft(Player_t *player)
     player->Character--;
     if(player->Character <= 0)
         player->Character = 5;
+
+    UpdateYoshiMusic();
 }
 
 bool PlayerF::IsHoldingSpriteType(Player_t *player, int NPC_ID)

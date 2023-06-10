@@ -1,0 +1,609 @@
+{
+    "editor": {
+        "block": {
+            "canBreak": "Можн. слом.",
+            "canBreakTooltip": "Устар.: ломается при ударе",
+            "inside": "Содерж.:",
+            "invis": "Невид.",
+            "letterHeight": "В ",
+            "letterWidth": "Ш ",
+            "pickContents1": "Выберите",
+            "pickContents2": "сод. блока",
+            "slick": "Лёд"
+        },
+        "browser": {
+            "askOverwriteFile": "Заменить {0}?",
+            "itemNewFile": "<Нов. файл>",
+            "itemNewFolder": "<Нов. папка>",
+            "newFile": "Новый файл",
+            "openFile": "Открыть файл",
+            "saveFile": "Сохранить файл"
+        },
+        "events": {
+            "bounds": {
+                "changeAllSectionBoundsToCurrent": "изменить все границы секции к текущим?",
+                "changeSectionBoundsToCurrent": "изменить границы секции {0} к текущим?",
+                "shouldEvent": "Должно ли событие {0}"
+            },
+            "controlsForEvent": "Управление для события",
+            "deletion": {
+                "cancel": "Нет: не удалять событие",
+                "confirm": "Да: удалить событие",
+                "deletingEvent": "Удалить событие {0}"
+            },
+            "desc": {
+                "activate1": "НИП появился",
+                "activate2": "на экране",
+                "death1": "НИП умирает",
+                "destroy1": "Блок",
+                "destroy2": "разрушен",
+                "enter1": "игрок вошёл",
+                "enter2": "в проход",
+                "hit1": "Удар по блоку",
+                "layerClear1": "Слой был",
+                "layerClear2": "очищен от",
+                "layerClear3": "объектов",
+                "phraseTriggersWhen": "Актив., когда:",
+                "talk1": "Игрок говорит",
+                "talk2": "с НИП"
+            },
+            "header": "Событ.:",
+            "headerTriggerEvent": "Триггер:",
+            "itemNewEvent": "<Новое событие>",
+            "label": {
+                "activate": "Активация",
+                "death": "Смерть",
+                "destroy": "Разруш.",
+                "enter": "Вход",
+                "hit": "Удар",
+                "layerClear": "Слой чист",
+                "next": "След.",
+                "talk": "Поговорить"
+            },
+            "layers": {
+                "headerHide": "Скрыть:",
+                "headerMove": "Движение:",
+                "headerShow": "Показать:",
+                "headerToggle": "Переключ.:"
+            },
+            "letter": {
+                "activate": "Ак:",
+                "death": "См:",
+                "destroy": "Ун:",
+                "enter": "Вх:",
+                "hit": "Ур:",
+                "layerClear": "Сл:",
+                "talk": "Гв:"
+            },
+            "promptEventName": "Имя события:",
+            "promptEventText": "Текст события:",
+            "props": {
+                "autostart": "Автозап.",
+                "controls": "Управления",
+                "endGame": "Зав.игр.",
+                "sound": "Звук"
+            },
+            "sections": {
+                "actionKeep": "Ост.",
+                "actionReset": "Сброс",
+                "actionSet": "Назн.",
+                "phraseAllSections": "Все секции",
+                "propBackground": "Фон",
+                "propBounds": "Границы",
+                "propMusic": "Музыка"
+            },
+            "settingsForEvent": "Настройки события"
+        },
+        "file": {
+            "actionClearLevel": "Стереть уровень",
+            "actionClearWorld": "Стереть мир",
+            "actionExit": "Выйти",
+            "actionOpen": "Открыть",
+            "actionRevert": "Откатить",
+            "commandNew": "Новый",
+            "commandOpen": "Открыть...",
+            "commandSave": "Сохранить",
+            "commandSaveAs": "Сохранить как...",
+            "confirmConfirmAction": "Вы уверены, что хотите {0}?",
+            "confirmConvertFormatTo": "Преобразовать в {0} формат?",
+            "confirmSaveBeforeAction": "Сохранить, прежде чем {0}?",
+            "convert": {
+                "_38aUnsupported": "Формат SMBX-38A не поддерживает преобразование.",
+                "desc1": "Расширение имени файла изменится,",
+                "desc2": "а старый файл не будет удалён",
+                "featureBlockForceSmashable": "Старое поведение крут. блока.",
+                "featureCustomWorldMusic": "Внешние файлы мызки в мире.",
+                "featureEventAutoscroll": "Современная автопрокрутка.",
+                "featureEventCustomMusic": "Изм. файла музыки событием.",
+                "featureLevelStarDisplay": "Кол-во звёзд на уровне.",
+                "featureNPCVariant": "Настраиваемое поведение НИПов.",
+                "featureWarpCannonExit": "Эффект выхода-пушки.",
+                "featureWarpCustomStarsMsg": "Своё сообщение о звёздах.",
+                "featureWarpEnterEvent": "Триггер события на вход в проход.",
+                "featureWarpNeedsStand": "Проход, требующий стояния на земле.",
+                "featureWarpNoPrintStars": "Откл. отобр. звёзд на проходах.",
+                "featureWarpNoStartScene": "Откл. перех. сцены на проходах.",
+                "featureWarpPortal": "Поддержка поральных проходов.",
+                "featureWarpTransit": "Визуальные переходы в проходах.",
+                "featureWorldStarDisplay": "Кол-во звёзд в мире.",
+                "featuresWillBeLost": "Функционал, который будет ПОТЕРЯН:",
+                "formatUnknown": "Запрошенный формат неизвестен.",
+                "noIssues": "Проблемы совместимости не найдены."
+            },
+            "formatLegacy": "Устаревший",
+            "formatModern": "Современный",
+            "labelCurrentFile": "Текущий файл:",
+            "labelFormat": "Формат:",
+            "optionActionWithoutSave": "{0} без сохранения?",
+            "optionCancelAction": "Отмена действия: {0}",
+            "optionCancelConversion": "Отмена преобразования",
+            "optionProceedWithConversion": "Выполнить с преобразованием",
+            "optionYesSaveThenAction": "Да: сохран., прежде чем {0}",
+            "sectionLevel": "Уровень",
+            "sectionWorld": "Мир"
+        },
+        "layers": {
+            "abbrevAttLayer": "Прис.: ",
+            "default": "По-умолч.",
+            "deletion": {
+                "cancel": "Отмена: не удалять слой",
+                "confirmDelete": "Нет: *УДАЛИТЬ ВСЁ СОДЕРЖИМОЕ*",
+                "confirmPreserve": "Да: перемест.. в основной слой",
+                "header": "Удаление слоя {0}",
+                "preserveLayerContents": "Сохранить содержимое слоя?"
+            },
+            "desc": {
+                "att1": "Когда нИП",
+                "att2": "движется,",
+                "att3": "присоед.",
+                "att4": "слой следует",
+                "att5": "за ним"
+            },
+            "header": "Слои:",
+            "itemNewLayer": "<Нов. слой>",
+            "label": "Слой:",
+            "labelAttached": "Присоед.:",
+            "labelAttachedLayer": "Присоед. слой:",
+            "labelMoveLayer": "Движение слоя:",
+            "promptLayerName": "Имя слоя"
+        },
+        "letterCoordX": "X",
+        "letterCoordY": "Y",
+        "letterDown": "Н",
+        "letterLeft": "Л",
+        "letterRight": "П",
+        "letterUp": "В",
+        "level": {
+            "alwaysVis": "Всегда вид.",
+            "bigBG": "Большой фон",
+            "gameStart": "Начало игры",
+            "levelName": "Имя уровня",
+            "pathBG": "Фон-путь",
+            "pathUnlocks": "Разблок.путей",
+            "startPos": "Нач. позиция"
+        },
+        "mapPos": "Позиция:",
+        "npc": {
+            "abbrevGen": "Ген.",
+            "ai": {
+                "LR": "ЛП",
+                "UD": "ВН",
+                "aiIs": "ИИ: {0}",
+                "headerCustomAi": "Свой ИИ:",
+                "jump": "Прыг",
+                "leap": "Скок",
+                "swim": "Плав.",
+                "target": "Цель",
+                "use1_0Ai": "Исп. ИИ 1.0?"
+            },
+            "gen": {
+                "direction": "Направление",
+                "effectIs": "Эффект: {0}",
+                "effectShoot": "Выстрел",
+                "effectWarp": "Выползание",
+                "header": "Настройки генератора"
+            },
+            "inContainer": "В",
+            "inertNice": "Друг",
+            "props": {
+                "active": "Актив.",
+                "attachSurface": "Прис.",
+                "facing": "Напр."
+            },
+            "stuckStop": "Стоп",
+            "tooltipExpandSection": "Расширить секцию"
+        },
+        "pageBlankOfBlank": "Стр. {0} из {1}",
+        "phraseAreYouSure": "Вы уверены?",
+        "phraseCountMore": "Ещё {0}",
+        "phraseDelayIsMs": "Период: {0} мс",
+        "phraseRadiusIndex": "Радиус {0}",
+        "phraseSectionIndex": "Секция {0}",
+        "phraseTextOf": "Текст \"{0}\"",
+        "phraseWarpIndex": "Проход {0}",
+        "section": {
+            "horizWrap": "Гор. перенос",
+            "noTurnBack": "Только вправо",
+            "offscreenExit": "Выход за экран",
+            "scroll": "Прокрутка",
+            "setBounds": "Уст. границы",
+            "underwater": "Под водой"
+        },
+        "select": {
+            "allSectPropBlankForEvent": "{0} для всех секций",
+            "pathBlankUnlock": "Разблок. путь {0}:",
+            "sectBlankPropBlankForEvent": "{1} для секции {0}",
+            "sectionBlankPropBlank": "{1} секции {0}",
+            "soundForEvent": "Звук для события",
+            "warpTransitEffect": "Эффект перехода прохода",
+            "worldMusic": "Музыка мира"
+        },
+        "testPlay": {
+            "boot": "Сапог",
+            "char": "Перс.",
+            "magicHand": "Хватайка",
+            "pet": "Конь",
+            "power": "Сила"
+        },
+        "toggleMagicBlock": "Волшебный блок",
+        "tooltip": {
+            "BGOs": "Фоновые объекты",
+            "NPCs": "Неигровые персонажи",
+            "blocks": "Блоки",
+            "erase": "Ластик",
+            "eraseAll": "Стереть всё",
+            "events": "События",
+            "file": "Файл",
+            "layers": "Слои",
+            "levels": "Уровни",
+            "music": "Музыка",
+            "paths": "Пути",
+            "scenes": "Декорации",
+            "select": "Выбор",
+            "settings": "Настройки",
+            "show": "Показать",
+            "tiles": "Ландшафт",
+            "warps": "Проходы",
+            "water": "Вода"
+        },
+        "warp": {
+            "allow": "Разр.",
+            "cannonExit": "Выход-пушка",
+            "dir": "Напр.",
+            "effect": "Эффект:",
+            "in": "Вх.",
+            "item": "Вещь",
+            "lvlWarp": "Ц.проход",
+            "needFloor": "Нужна земля",
+            "needKey": "Запереть",
+            "needStarCount": "Нужно {0} {1}",
+            "out": "Вых.",
+            "placing": "Размещение:",
+            "ride": "Езд.",
+            "showStarCount": "Показ. звёзды",
+            "showStartScene": "Показ. н.сцену",
+            "speed": "Сила ",
+            "starLockMessage": "Сообщ. о звзд.",
+            "style": {
+                "blipInstant": "Мгнв.",
+                "door": "Дверь",
+                "pipe": "Труба",
+                "portal": "Портал",
+                "style": "Стиль:"
+            },
+            "target": "Цель: ",
+            "title": "Настр. прохода",
+            "to": "К: {0}",
+            "toMap": "В мир",
+            "transit": {
+                "name0": "НЕТ",
+                "name1": "ПРОКР.",
+                "name2": "ПЕРЕЛ.",
+                "name3": "КРУГ",
+                "name4": "ОТР. (Г)",
+                "name5": "ОТР. (В)"
+            },
+            "twoWay": "Дву-напр."
+        },
+        "water": {
+            "title": "Настройки воды"
+        },
+        "wordCoins": "Монетки",
+        "wordEnabled": "Включено",
+        "wordEvent": {
+            "genitive": "События",
+            "nominative": "Событие",
+            "typeLabel": "Событие \"{0}\":"
+        },
+        "wordHeight": "Высота",
+        "wordInstant": "Мгновенно",
+        "wordMode": "Режим",
+        "wordNPC": {
+            "genitive": "НИПа",
+            "nominative": "НИП"
+        },
+        "wordText": "Текст",
+        "wordWidth": "Ширина",
+        "world": {
+            "allowChars": "Разр. перс.",
+            "hubWorld": "Коридорный мир",
+            "introLevel": "Урвоень-вступление",
+            "name": "Название мира",
+            "phraseCreditIndex": "Титры, стрка {0}:",
+            "retryOnFail": "Переигр. сразу",
+            "totalStars": "Всего звёзд:"
+        }
+    },
+    "game": {
+        "connect": {
+            "dropAddTitle": "Доб./Убрать игроков",
+            "phraseChangeChar": "Сменить персонажа",
+            "phraseDropMe": "Убрать себя",
+            "phraseDropPX": "Убрать игрока {0}",
+            "phraseForceResume": "Принуд. возобновить",
+            "phraseHoldStart": "Удерж. Старт",
+            "phrasePressAButton": "Нажмите кнопку A",
+            "phraseSetControls": "Назначить управление",
+            "phraseStartToForceRes": "Нажмите Start, чтобы принуд. возобн.",
+            "phraseStartToResume": "Нажмите Start, чтобы возобновить",
+            "phraseTestControls": "Проверить управление",
+            "phraseWaitingForInput": "Ожидание устройств ввода..",
+            "reconnectTitle": "Переподключить",
+            "splitPressSelect_1": "Нажмите Select, чтобы",
+            "splitPressSelect_2": "Настройки управления",
+            "wordDisconnect": "Отключить"
+        },
+        "controls": {
+            "phrasePlayerConnected": "И{0} подключил(а) {0}, Профиль: {2}",
+            "phrasePlayerDisconnected": "И{0} отключился(лась)"
+        },
+        "error": {
+            "openFileFailed": "ОШИБКА: Не удаётся открыть \"{0}\": файл не существует или повреждён.",
+            "warpNeedStarCount": "Требуется {0} {1}, чтобы войти."
+        },
+        "pause": {
+            "continue": "Продолжить",
+            "dropAddPlayers": "Убр./Доб. игроков",
+            "enterCode": "Ввести код",
+            "quit": "Выйти",
+            "quitTesting": "Закрыть тест",
+            "resetCheckpoints": "Сбросить контр. точки",
+            "restartLevel": "Начать сначала",
+            "returnToEditor": "Назад в редактор",
+            "saveAndContinue": "Сохранить и продолжить",
+            "saveAndQuit": "Сохранить и выйти"
+        }
+    },
+    "languageName": "Русский",
+    "menu": {
+        "abbrevMilliseconds": "мс",
+        "battle": {
+            "errorNoLevels": "Невозможно начать битву потому что нету доступных уровней"
+        },
+        "caseNone": "<Нет>",
+        "character": {
+            "charSelTitle": "Выбор персонажа",
+            "selectCharacter": "Играть, как {0}",
+            "startGame": "Начать игру"
+        },
+        "controls": {
+            "buttons": {
+                "altJump": "Альт-Прыг",
+                "altRun": "Альт-Бег",
+                "down": "Вниз",
+                "drop": "Выброс",
+                "jump": "Прыжок",
+                "left": "Влево",
+                "right": "Впаво",
+                "run": "Бег",
+                "start": "Старт",
+                "up": "Вверх"
+            },
+            "caseInvalid": "(Некор.)",
+            "caseMouse": "(Мышь)",
+            "caseTouch": "(Сенсор)",
+            "controlsConnected": "Подключено:",
+            "controlsDeleteKey": "(Альт-Прыжок чтобы сбросить)",
+            "controlsDeviceTypes": "Типы устройств",
+            "controlsInUse": "(Используется)",
+            "controlsNewProfile": "<Новый профиль>",
+            "controlsNotInUse": "(Не используется)",
+            "controlsReallyDeleteProfile": "Действительно удалить профиль?",
+            "controlsTitle": "Управление",
+            "cursor": {
+                "down": "Мышь вниз",
+                "left": "Мышь влево",
+                "primary": "Первичн.",
+                "right": "Мышь вправо",
+                "secondary": "Вторичн.",
+                "tertiary": "Третичн.",
+                "up": "Мышь вверх"
+            },
+            "editor": {
+                "fastScroll": "Быс.прокр.",
+                "modeErase": "Ластик",
+                "modeSelect": "Выбор",
+                "nextSection": "След.сект.",
+                "prevSection": "Пред.сект.",
+                "scrollDown": "Пр.вниз",
+                "scrollLeft": "Пр.влево",
+                "scrollRight": "Пр.вправо",
+                "scrollUp": "Пр.вверх",
+                "switchScreens": "Панель",
+                "testPlay": "Тест-игра"
+            },
+            "hotkeys": {
+                "debugInfo": "Отл.инф.",
+                "enterCheats": "Ввечти чит",
+                "fullscreen": "Полн.экран",
+                "legacyPause": "Ст.пауза",
+                "recordGif": "Зап.GIF",
+                "screenshot": "Снимок",
+                "toggleHUD": "Пер.пан."
+            },
+            "options": {
+                "batteryStatus": "Состояние батареи",
+                "groundPoundButton": "Кнопка сотрясания земли",
+                "maxPlayers": "Макс. игроков",
+                "rumble": "Вибрация",
+                "textEntryStyle": "Тип ввода текста"
+            },
+            "phraseNewProfOldJoy": "Новый профиль для ст.джойстика",
+            "profile": {
+                "activateProfile": "Активировать профиль",
+                "cursorControls": "Указатель",
+                "deleteProfile": "Удалить профиль",
+                "editorControls": "Редактор",
+                "hotkeys": "Горчие клавиши",
+                "playerControls": "Игровое управление",
+                "renameProfile": "Переименовать профиль"
+            },
+            "tDS": {
+                "buttonA": "A",
+                "buttonB": "B",
+                "buttonL": "L",
+                "buttonR": "R",
+                "buttonSelect": "Выбор",
+                "buttonStart": "Старт",
+                "buttonX": "X",
+                "buttonY": "Y",
+                "buttonZL": "ZL",
+                "buttonZR": "ZR",
+                "cStick": "Рычажок",
+                "casePen": "(Перо)",
+                "dPad": "Крест.",
+                "tStick": "Выступ"
+            },
+            "touchscreen": {
+                "layout": {
+                    "longOld": "Длинная (ст.)",
+                    "phabletOld": "Фаблет (ст.)",
+                    "phoneOld": "Телефон (ст.)",
+                    "standard": "Обычная",
+                    "tabletOld": "Планшет (ст.)",
+                    "tight": "Плотная",
+                    "tinyOld": "Кроха (ст.)"
+                },
+                "option": {
+                    "feedbackLength": "Длительность отдачи",
+                    "feedbackStrength": "Сила отдачи",
+                    "holdRun": "Удержание БЕГа при запуске",
+                    "interfaceStyle": "Стиль кнопок",
+                    "layoutStyle": "Вид раскладки",
+                    "resetLayout": "Сбросить раскладку",
+                    "sStartSpacing": "Расстояние Выбор-Старт",
+                    "scaleButtons": "Масштаб кнопок",
+                    "scaleDPad": "Масштаб крестовины",
+                    "scaleFactor": "Общий масштаб",
+                    "showCodeButton": "Показать кнопку кода"
+                },
+                "style": {
+                    "ABXY": "ABXY",
+                    "XODA": "XODA",
+                    "actions": "Дейсвтия"
+                }
+            },
+            "types": {
+                "gamepad": "Геймпад",
+                "keyboard": "Клавиатура",
+                "oldJoystick": "Ст.джойстик",
+                "touchscreen": "Сенсор"
+            },
+            "wii": {
+                "classic": {
+                    "buttonLT": "LT",
+                    "buttonRT": "RT",
+                    "buttonX": "X",
+                    "buttonY": "Y",
+                    "buttonZL": "ZL",
+                    "buttonZR": "ZR",
+                    "lStick": "Л.Джой.",
+                    "rStick": "П.Джой."
+                },
+                "nunchuck": {
+                    "buttonC": "C",
+                    "buttonZ": "Z",
+                    "prefixN": "N"
+                },
+                "phraseNewClassic": "Нов. профиль Classic",
+                "phraseNewNunchuck": "Нов. профиль Nunchack",
+                "typeClassic": "Classic",
+                "typeNunchuck": "Nunchack",
+                "typeWiimote": "Wiimote",
+                "wiimote": {
+                    "button1": "1",
+                    "button2": "2",
+                    "buttonA": "A",
+                    "buttonB": "B",
+                    "buttonHome": "Дом",
+                    "buttonMinus": "-",
+                    "buttonPlus": "+",
+                    "caseIR": "(ИК)",
+                    "dPad": "Крест.",
+                    "shake": "Встряска"
+                }
+            },
+            "wordButtons": "Кнопки",
+            "wordProfiles": "Профили"
+        },
+        "editor": {
+            "errorMissingResources": "Извините, но для встроенного редактора не хватает файла {0}.",
+            "errorResolution": "Извините, но встроенный редактор не поддерживает ваше текущее разрешение.",
+            "newWorld": "<Новый мир>",
+            "promptNewWorldName": "Имя нового мира"
+        },
+        "game": {
+            "gameBattleRandom": "Случайный уровень",
+            "gameCopySave": "Скопир. сохранение",
+            "gameEraseSave": "Стереть сохранение",
+            "gameEraseSlot": "Какое сохранение стереть?",
+            "gameNoBattleLevels": "<Нету уровней битвы>",
+            "gameNoEpisodesToPlay": "<Эпизоды отсутствуют>",
+            "gameSlotContinue": "Слот {0} ... {1}%",
+            "gameSlotNew": "Слот {0} ... Новая игра",
+            "gameSourceSlot": "Что скопировать?",
+            "gameTargetSlot": "Куда скопировать?",
+            "phraseScore": "Счёт: {0}",
+            "phraseTime": "Время: {0}"
+        },
+        "loading": "Загрузка...",
+        "main": {
+            "main1PlayerGame": "Одиночная игра",
+            "mainBattleGame": "Битва",
+            "mainEditor": "Редактор",
+            "mainExit": "Выйти",
+            "mainMultiplayerGame": "Игра вдвоём",
+            "mainOptions": "Настройки",
+            "mainStartGame": "Начать игру"
+        },
+        "options": {
+            "optionsModeFullScreen": "На весь экран",
+            "optionsModeWindowed": "Оконный режим",
+            "optionsViewCredits": "Титры"
+        },
+        "wordBack": "Назад",
+        "wordHide": "Скрыть",
+        "wordNo": "Нет",
+        "wordOff": "Выкл.",
+        "wordOn": "Вкл.",
+        "wordPlayer": "Игрок",
+        "wordProfile": "Профиль",
+        "wordResume": "Возобновить",
+        "wordShow": "Показать",
+        "wordWaiting": "Ждём",
+        "wordYes": "Да"
+    },
+    "outro": {
+        "cppPortDevelopers": "Разработчики C++-порта:",
+        "customSprites": "Доп-спрайты:",
+        "engineCredits": "Создатели движка:",
+        "gameCredits": "Создатели игры:",
+        "levelDesign": "Дизайн уровней:",
+        "nameAndrewSpinks": "Эндрю Спинкс",
+        "nameVitalyNovichkov": "Новичков Виталий",
+        "originalBy": "Автор оригинала на VB6:",
+        "psVitaPortBy": "Автор порта на PS Vita:",
+        "specialThanks": "Особые благодарности:"
+    },
+    "pluralRules": "slavic"
+}

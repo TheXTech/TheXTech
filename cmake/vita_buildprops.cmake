@@ -2,7 +2,7 @@ message("Set CMAKE Flags for Vita.")
 include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
 
 if(POLICY CMP0077)
-    cmake_policy(SET CMP0077 OLD)
+    cmake_policy(SET CMP0077 NEW)
 endif()
 
 if(NOT VITA_APP_NAME)

@@ -17,6 +17,12 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
+#if defined(_WIN32) || defined(__GDK__)
+#include <windows.h>
+#include <handleapi.h>
+#include <fileapi.h>
+#endif
+
 #define LOGGER_INTERNAL
 #include "sdl_proxy/sdl_rwops.h"
 
@@ -115,5 +121,16 @@ void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va
 
     SDL_RWwrite(s_logout, reinterpret_cast<const void *>(OS_NEWLINE), 1, OS_NEWLINE_LEN);
     va_end(arg_in);
+
+/* WORKAROUNDS: flush the output of SDL RWops */
+#if defined(_WIN32) || defined(__GDK__)
+    if(s_logout->hidden.windowsio.h != INVALID_HANDLE_VALUE)
+        FlushFileBuffers(s_logout->hidden.windowsio.h);
+#elif HAVE_STDIO_H
+    if(s_logout->hidden.stdio.fp)
+        fflush(s_logout->hidden.stdio.fp);
+#endif
+
 }
+
 #endif // NO_FILE_LOGGING
