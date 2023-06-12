@@ -297,10 +297,11 @@ PGEString PGE_ImageInfo::getMaskName(const PGEString &imageFileName)
     std::string mask = PGEStringToStd(imageFileName);
     //Make mask filename
     size_t dotPos = mask.find_last_of('.');
+
     if(dotPos == std::string::npos)
         mask.push_back('m');
     else
         mask.insert(mask.begin() + std::string::difference_type(dotPos), 'm');
+
     return StdToPGEString(mask);
 }
-
