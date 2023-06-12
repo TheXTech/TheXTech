@@ -1,4 +1,4 @@
-def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY');
+def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY')
 def buildAsApplication = !buildAsLibrary
 if (buildAsApplication) {
     apply plugin: 'com.android.application'
@@ -106,7 +106,7 @@ android {
         externalNativeBuild {
             cmake {
                 abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
-                arguments "-DANDROID_PLATFORM=16 -DAPP_PLATFORM=android-16"
+                arguments "-DANDROID_PLATFORM=16", "-DAPP_PLATFORM=android-16", "-DANDROID_STL=c++_static"
             }
         }
         ndk{
@@ -173,8 +173,8 @@ android {
             variant.outputs.each { output ->
                 def outputFile = output.outputFile
                 if (outputFile != null && outputFile.name.endsWith(".aar")) {
-                    def fileName = "ru.wohlsoft.thextech.aar";
-                    output.outputFile = new File(outputFile.parent, fileName);
+                    def fileName = "ru.wohlsoft.thextech.aar"
+                    output.outputFile = new File(outputFile.parent, fileName)
                 }
             }
         }
@@ -188,7 +188,7 @@ dependencies {
     def lifecycle_version = "2.6.1"
     implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
-    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.preference:preference:1.2.0'
     constraints {
         // Workaround to fix the build: https://dev.to/retyui/fix-react-native-android-builds-duplicate-class-kotlincollections-found-in-modules-jetified-kotlin-stdlib-180-2ca7
