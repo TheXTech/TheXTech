@@ -68,7 +68,7 @@ public class thextechActivity extends SDLActivity
         String[] langD = lang.split("_");
         if(langD.length >= 2)
             setLanguageCodes(langD[0], langD[1]);
-        else if(langD.length >= 1)
+        else if(langD.length == 1)
             setLanguageCodes(langD[0], "");
     }
 
