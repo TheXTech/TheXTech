@@ -110,7 +110,7 @@ void UpdateNPCs()
     int HitSpot = 0; // used for collision detection
     double tempHit = 0;
     double tempHitOld = 0;
-    Block_t tmpBlock;
+    // Block_t tmpBlock;
     int tempHitBlock = 0;
     int tempHitOldBlock = 0;
     int tempHitIsSlope = 0;

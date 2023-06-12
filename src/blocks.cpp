@@ -45,14 +45,14 @@
 void BlockHit(int A, bool HitDown, int whatPlayer)
 {
     int tempPlayer = 0;
-    bool makeShroom = false; // if true make amushroom
+    bool makeShroom = false; // if true make a mushroom
     int newBlock = 0; // what the block should turn into if anything
     int C = 0;
 //    int B = 0;
     Block_t blankBlock;
     bool tempBool = false;
     int oldSpecial = 0; // previous .Special
-    Location_t tempLocation;
+    // Location_t tempLocation;
 
     auto &b = Block[A];
 
