@@ -170,7 +170,7 @@ jobs:
           fi
 
           UPLOAD_LIST="set ssl:verify-certificate no;"
-          if [[ "${{ steps.signing-check.outputs.available }}" == 'true']]; then
+          if [[ "${{ steps.signing-check.outputs.available }}" == 'true' ]]; then
               UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${BRANCH_NAME_RES}.apk;"
           else
               UPLOAD_LIST="${UPLOAD_LIST} put -O "www/android/" ./thextech-android-${BRANCH_NAME_RES}-unsigned.apk;"
