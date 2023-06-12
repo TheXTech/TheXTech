@@ -94,11 +94,6 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffloat-store")
 endif()
 
-if(ANDROID)
-    include(cmake/ndk-stl-config.cmake)
-    set(ANDROID_STL "c++_static")
-endif()
-
 if(WIN32 AND NOT EMSCRIPTEN)
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif()

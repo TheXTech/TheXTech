@@ -56,6 +56,7 @@ public class thextechActivity extends SDLActivity
     protected String[] getLibraries()
     {
         return new String[] {
+//            "c++_shared",
 //            "hidapi",
 //            "SDL2",
             "thextech"

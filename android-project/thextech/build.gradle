@@ -1,4 +1,4 @@
-def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY')
+def buildAsLibrary = project.hasProperty('BUILD_AS_LIBRARY');
 def buildAsApplication = !buildAsLibrary
 if (buildAsApplication) {
     apply plugin: 'com.android.application'
@@ -92,6 +92,12 @@ println "Project version: " + xTechVersionString + ", version code: " + xTechVer
 
 android {
     compileSdkVersion 33
+
+    // Note: The NDK 23 is SIGNIFICANTLY important, because of the support for non-NEON and older Android versions
+    //       The NDK 24 removes the support for Android 4.1, 4.2, and 4.3.
+    //       See details: https://github.com/android/ndk/wiki/Changelog-r24
+    ndkVersion "23.2.8568313"
+
     defaultConfig {
         if (buildAsApplication) {
             applicationId "ru.wohlsoft.thextech"
@@ -106,7 +112,7 @@ android {
         externalNativeBuild {
             cmake {
                 abiFilters "armeabi-v7a", "arm64-v8a", "x86", "x86_64"
-                arguments "-DANDROID_PLATFORM=16", "-DAPP_PLATFORM=android-16", "-DANDROID_STL=c++_static"
+                arguments "-DANDROID_PLATFORM=16", "-DANDROID_STL=c++_static"
             }
         }
         ndk{
@@ -165,6 +171,9 @@ android {
                 path "../../CMakeLists.txt"
             }
         }
+        packagingOptions{
+            doNotStrip "*/armeabi-v7a/*.so"
+        }
     }
 
 
@@ -173,8 +182,8 @@ android {
             variant.outputs.each { output ->
                 def outputFile = output.outputFile
                 if (outputFile != null && outputFile.name.endsWith(".aar")) {
-                    def fileName = "ru.wohlsoft.thextech.aar"
-                    output.outputFile = new File(outputFile.parent, fileName)
+                    def fileName = "ru.wohlsoft.thextech.aar";
+                    output.outputFile = new File(outputFile.parent, fileName);
                 }
             }
         }
