@@ -64,7 +64,7 @@ public:
 
 #ifdef THEXTECH_ENABLE_EDITOR
     friend void EditorCustom::Load(XTechTranslate* translate);
-    friend class EditorCustom::ItemList_t;
+    friend struct EditorCustom::ItemList_t;
 #endif
 
 private:

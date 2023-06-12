@@ -657,6 +657,7 @@ static const TouchKeyMap::KeyPos c_10_6_tablet[TouchScreenController::key_END] =
 // watch your aspect ratios. they are preserved now!
 
 // based on c_10_6_tablet; no longer used.
+#if 0
 static const TouchKeyMap::KeyPos c_smallAutoMap[TouchScreenController::key_END] =
 {
     /* Note that order of keys must match the TouchScreenController::commands enum!!! */
@@ -678,6 +679,7 @@ static const TouchKeyMap::KeyPos c_smallAutoMap[TouchScreenController::key_END] 
     {TouchKeyMap::L, TouchKeyMap::T, 0.01, 0.01, 0.07, 0.07, TouchScreenController::key_toggleKeysView},
     {TouchKeyMap::L, TouchKeyMap::T, 0.01, 0.08, 0.07, 0.14, TouchScreenController::key_enterCheats},
 };
+#endif
 
 // based on c_averagePhoneMap
 static const TouchKeyMap::KeyPos c_standardAutoMap[TouchScreenController::key_END] =

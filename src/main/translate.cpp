@@ -84,6 +84,7 @@ const std::string& LanguageFormatNumber(int number, const std::string& singular,
         return singular;
 }
 
+#ifndef THEXTECH_DISABLE_LANG_TOOLS
 static void setJsonValue(nlohmann::json &j, const std::string &key, const std::string &value)
 {
     auto dot = key.find(".");
@@ -115,6 +116,7 @@ static bool setJsonValueIfNotExist(nlohmann::json &j, const std::string &key, co
     std::string subKey = key.substr(0, dot);
     return setJsonValueIfNotExist(j[subKey], key.substr(dot + 1), value);
 }
+#endif
 
 static std::string getJsonValue(nlohmann::json &j, const std::string &key, const std::string &defVal)
 {

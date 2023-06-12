@@ -438,7 +438,7 @@ class InputMethodType_TouchScreen : public InputMethodType
 private:
     bool m_canPoll = false;
 
-    InputMethodProfile *AllocateProfile() noexcept;
+    InputMethodProfile *AllocateProfile() noexcept override;
 
 public:
     using InputMethodType::Name;
@@ -450,16 +450,16 @@ public:
 
     const std::string& LocalName() const override;
 
-    bool TestProfileType(InputMethodProfile *profile);
-    bool RumbleSupported();
-    bool ConsumeEvent(const SDL_Event *ev);
+    bool TestProfileType(InputMethodProfile *profile) override;
+    bool RumbleSupported() override;
+    bool ConsumeEvent(const SDL_Event *ev) override;
 
-    void UpdateControlsPre();
-    void UpdateControlsPost();
+    void UpdateControlsPre() override;
+    void UpdateControlsPost() override;
 
     // null if no input method is ready
     // allocates the new InputMethod on the heap
-    InputMethod *Poll(const std::vector<InputMethod *> &active_methods) noexcept;
+    InputMethod *Poll(const std::vector<InputMethod *> &active_methods) noexcept override;
 };
 
 } // namespace Controls
