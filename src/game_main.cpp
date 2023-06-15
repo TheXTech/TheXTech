@@ -576,7 +576,7 @@ int GameMain(const CmdLineSetup_t &setup)
             Integrator::clearEpisodeName();
             Integrator::clearLevelName();
             Integrator::clearEditorFile();
-            FontManager::clearCustomFonts();
+            FontManager::clearAllCustomFonts();
 
             BattleIntro = 0;
             BattleOutro = 0;
@@ -768,8 +768,7 @@ int GameMain(const CmdLineSetup_t &setup)
             LoadCustomGFX();
             LoadCustomSound();
             SetupPlayers();
-            FontManager::clearLevelFonts();
-            FontManager::loadCustomFonts(FileNamePath, FileNamePath + FileName);
+            FontManager::loadCustomFonts(FileNamePath, FileNamePath + FileName + "/");
 
 #ifndef PGE_MIN_PORT
             if(!NoMap)
@@ -1821,7 +1820,7 @@ void StartEpisode()
         PGE_Delay(500);
 
     ClearGame();
-    FontManager::clearCustomFonts();
+    FontManager::clearAllCustomFonts();
 
     std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
 

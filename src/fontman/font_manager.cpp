@@ -75,7 +75,6 @@ static TtfFont         *g_defaultTtfFont = nullptr;
 
 //! Is font manager initialized
 static bool             g_fontManagerIsInit = false;
-static bool             g_worldFontsLoaded = false;
 
 typedef std::unordered_map<std::string, int> FontsHash;
 //! Database of available fonts
@@ -87,6 +86,7 @@ static FontsHash        g_fontNameToIdBackupWorld;
 static bool             g_double_pixled = false;
 
 static const int c_smbxFontsMapMax = 100;
+// Current state
 static int s_smbxFontsMap[c_smbxFontsMapMax];
 static int s_smbxFontsSizesMap[c_smbxFontsMapMax];
 
@@ -94,7 +94,7 @@ static int s_smbxFontsSizesMap[c_smbxFontsMapMax];
 static int s_smbxFontsMapDefault[c_smbxFontsMapMax];
 static int s_smbxFontsSizesMapDefault[c_smbxFontsMapMax];
 
-// The state preserved during world map
+// The episode-wide preserved state without content of data directory
 static int s_smbxFontsMapWorld[c_smbxFontsMapMax];
 static int s_smbxFontsSizesMapWorld[c_smbxFontsMapMax];
 
@@ -102,15 +102,19 @@ static const uint32_t c_defaultFontSize = 14;
 
 static bool s_fontMapsDefault = true;
 static bool s_fontMapsWorld = true;
+static std::string s_lastWorldFontsPath;
+static std::string s_lastCustomFontsPath;
 
 
 static void registerFont(BaseFontEngine* font)
 {
     g_anyFonts.push_back(font);
+
     int newIdx = g_anyFonts.size() - 1;
     auto ef = g_fontNameToId.find(font->getFontName());
 
-    if(ef != g_fontNameToId.end()) // If overriding existing font by name, also replace SMBX code overrides
+    // If overriding an existing font by name, also replace the SMBX code overrides
+    if(ef != g_fontNameToId.end())
     {
         int oldIdx = ef->second;
         for(int i = 0; i < c_smbxFontsMapMax; ++i)
@@ -118,9 +122,10 @@ static void registerFont(BaseFontEngine* font)
             if(s_smbxFontsMap[i] == oldIdx)
                 s_smbxFontsMap[i] = newIdx;
         }
+        ef->second = newIdx;
     }
-
-    g_fontNameToId.insert({font->getFontName(), g_anyFonts.size() - 1});
+    else
+        g_fontNameToId.insert({font->getFontName(), newIdx});
 }
 
 static void backupDefaultFontMaps()
@@ -385,6 +390,12 @@ void FontManager::initFull()
         return;
     }
 
+    if(g_anyFonts.empty())
+    {
+        pLogWarning("There is no available fonts at the directory %s", fonts_root.c_str());
+        return;
+    }
+
     s_fontMapsDefault = true;
     s_fontMapsWorld = true;
     g_fontManagerIsInit = true;
@@ -406,33 +417,54 @@ void FontManager::quit()
 void FontManager::loadCustomFonts(const std::string& episodeRoot, const std::string& dataSubDir)
 {
     backupDefaultFontMaps();
+    bool doLoadWorld = false;
+    bool doLoadCustom = false;
 
-    D_pLogDebug("Atteint to load custom fonts at %s/fonts", episodeRoot.c_str());
-
-    if(!g_worldFontsLoaded && s_loadFintsFromDir(episodeRoot + "/fonts",
-                                                 g_rasterFontsCustom,
-                                                 LOADFONTARG(g_ttfFontsCustom)))
+    // Loading fonts from the episode directory
+    if(s_lastWorldFontsPath != episodeRoot)
     {
-        pLogDebug("Loaded custom fonts from the %s/fonts", episodeRoot.c_str());
+        if(!s_lastWorldFontsPath.empty())
+            clearAllCustomFonts();
+        doLoadWorld = true;
+        pLogDebug("Attempt to load custom fonts at %sfonts", episodeRoot.c_str());
+    }
+    else
+        pLogDebug("Fonts at %sfonts already loaded", episodeRoot.c_str());
+
+    if(doLoadWorld && s_loadFintsFromDir(episodeRoot + "fonts",
+                                         g_rasterFontsCustom,
+                                         LOADFONTARG(g_ttfFontsCustom)))
+    {
+        s_lastWorldFontsPath = episodeRoot;
+        pLogDebug("Loaded custom fonts from the %sfonts", episodeRoot.c_str());
         s_fontMapsDefault = false;
         s_fontMapsWorld = true;
-        g_worldFontsLoaded = true;
         backupWorldFontMaps();
     }
 
-    D_pLogDebug("Atteint to load custom fonts at %s/fonts", dataSubDir.c_str());
-
-    if(s_loadFintsFromDir(dataSubDir + "/fonts",
-                           g_rasterFontsCustomLevel,
-                           LOADFONTARG(g_ttfFontsCustomLevel)))
+    // Loading fonts from the data directory
+    if(s_lastCustomFontsPath != dataSubDir)
     {
-        pLogDebug("Loaded custom fonts from the %s/fonts", dataSubDir.c_str());
+        if(!s_lastCustomFontsPath.empty())
+            clearLevelFonts();
+        doLoadCustom = true;
+        pLogDebug("Attempt to load custom fonts at %sfonts", dataSubDir.c_str());
+    }
+    else
+        pLogDebug("Fonts at %sfonts already loaded", dataSubDir.c_str());
+
+    if(doLoadCustom && s_loadFintsFromDir(dataSubDir + "fonts",
+                                          g_rasterFontsCustomLevel,
+                                          LOADFONTARG(g_ttfFontsCustomLevel)))
+    {
+        s_lastCustomFontsPath = dataSubDir;
+        pLogDebug("Loaded custom fonts from the %sfonts", dataSubDir.c_str());
         s_fontMapsDefault = false;
         s_fontMapsWorld = false;
     }
 }
 
-void FontManager::clearCustomFonts()
+void FontManager::clearAllCustomFonts()
 {
     g_rasterFontsCustomLevel.clear();
     g_rasterFontsCustom.clear();
@@ -440,8 +472,9 @@ void FontManager::clearCustomFonts()
     g_ttfFontsCustomLevel.clear();
     g_ttfFontsCustom.clear();
 #endif
+    s_lastCustomFontsPath.clear();
+    s_lastWorldFontsPath.clear();
     restoreDefaultFontMaps();
-    g_worldFontsLoaded = false;
 }
 
 void FontManager::clearLevelFonts()
@@ -451,10 +484,8 @@ void FontManager::clearLevelFonts()
     g_ttfFontsCustomLevel.clear();
 #endif
 
-    if(!s_fontMapsWorld)
-        restoreWorldFontMaps();
-    else if(!s_fontMapsDefault)
-        restoreDefaultFontMaps();
+    s_lastCustomFontsPath.clear();
+    restoreWorldFontMaps();
 }
 
 bool FontManager::isInitied()

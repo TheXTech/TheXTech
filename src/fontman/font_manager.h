@@ -67,10 +67,10 @@ void loadCustomFonts(const std::string &episodeRoot, const std::string &dataSubD
 /**
  * @brief Removes all custom fonts completely
  */
-void clearCustomFonts();
+void clearAllCustomFonts();
 
 /**
- * @brief Removes all level-wide fonts
+ * @brief Removes all level-wide fonts, but keeps episode-wide fonts being loaded
  */
 void clearLevelFonts();
 
