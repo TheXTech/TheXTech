@@ -52,13 +52,27 @@ void         utf8_pop_back(std::string &str);
 void         utf8_erase_at(std::string &str, size_t begin);
 void         utf8_erase_before(std::string &str, size_t end);
 
-
-//! Initialize basic support for font rendering withouth config pack
-void initBasic();
 //! Full initialization of font renderith include external fonts
 void initFull();
 //! De-Initialize font manager and clear memory
 void quit();
+
+/**
+ * @brief Attempts to load custom fonts for the episode and for the level
+ * @param episodeRoot Episode directory
+ * @param dataSubDir Data directory
+ */
+void loadCustomFonts(const std::string &episodeRoot, const std::string &dataSubDir);
+
+/**
+ * @brief Removes all custom fonts completely
+ */
+void clearCustomFonts();
+
+/**
+ * @brief Removes all level-wide fonts
+ */
+void clearLevelFonts();
 
 /*!
  * \brief Checks if font manager works
