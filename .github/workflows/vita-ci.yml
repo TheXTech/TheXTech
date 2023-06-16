@@ -23,7 +23,7 @@ jobs:
         config:
         - {
             name: "Vita build",
-            os: ubuntu-20.04,
+            os: ubuntu-22.04,
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake \
@@ -32,7 +32,7 @@ jobs:
             -DVITA_VERSION=\"01.05\"",
 
             deps_cmdline: "sudo apt-get update -qq \
-            && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python zip",
+            && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python3 zip",
 
             generator: "Unix Makefiles",
             build_type: "MinSizeRel",
