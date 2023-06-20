@@ -239,7 +239,7 @@ private:
         LightColor color = LightColor{0, 0, 0, 0};
         GLfloat radius = 0.0;
         GLfloat depth = 0.0;
-        LightPos pos = {0.0, 0.0, 0.0, 0.0};
+        LightPos pos = LightPos{0.0, 0.0, 0.0, 0.0};
     };
 
     struct LightBuffer
