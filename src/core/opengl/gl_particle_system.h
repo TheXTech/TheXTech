@@ -34,16 +34,16 @@ typedef uint8_t         GLubyte;
 struct ParticleVertexImmutable_t
 {
     GLfloat index = 0.0;
-    std::array<GLubyte, 2> texcoord = {0, 0};
+    std::array<GLubyte, 2> texcoord = std::array<GLubyte, 2>{0, 0};
 };
 
 using ParticleVertexAttrs_t = std::array<GLubyte, 4>;
 
 struct ParticleVertexMutable_t
 {
-    std::array<GLfloat, 2> position = {0.0, 0.0};
+    std::array<GLfloat, 2> position = std::array<GLfloat, 2>{0.0, 0.0};
     GLfloat spawn_time = -60.0;
-    ParticleVertexAttrs_t attribs = {0, 0, 0, 0};
+    ParticleVertexAttrs_t attribs = ParticleVertexAttrs_t{0, 0, 0, 0};
 };
 
 class GLParticleSystem
