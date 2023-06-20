@@ -35,4 +35,6 @@ struct FPoint_t
     float y;
 };
 
+using ParticleVertexAttrs_t = std::array<GLubyte, 4>;
+
 #endif // ABTRACTRENDERTYPES_T_H
