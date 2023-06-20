@@ -65,7 +65,7 @@
 #ifdef THEXTECH_BUILD_GL_ES_MODERN
 #    include <SDL2/SDL_opengles2.h>
 
-#    ifdef __ANDROID__
+#    if defined(__ANDROID__) || defined(__VITA__)
 
 #        define GL_UNIFORM_BUFFER       0x8A11
 #        define GL_DRAW_FRAMEBUFFER     0x8CA9
