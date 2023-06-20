@@ -3405,7 +3405,7 @@ void UpdateNPCs()
                                         double right_border = NPC[A].Location.X + NPC[A].Location.Width;
 
                                         int first_after_block = -1;
-                                        double first_after_x, first_after_y;
+                                        double first_after_x = 0.0, first_after_y = 0.0;
 
                                         // IF PSwitchTime != 0 but the blocks are sorted,
                                         // then we would have iterated over the NPC's entire FLBlock column without breaking,
