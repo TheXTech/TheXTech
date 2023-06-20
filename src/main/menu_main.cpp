@@ -1621,25 +1621,36 @@ static void s_drawGameSaves(int MenuX, int MenuY)
 
     for(A = 1; A <= maxSaveSlots; A++)
     {
+        int posY = MenuY - 30 + (A * 30);
+
         if(SaveSlotInfo[A].Progress >= 0)
         {
             // "SLOT {0} ... {1}%"
-            SuperPrint(fmt::format_ne(g_mainMenu.gameSlotContinue, A, SaveSlotInfo[A].Progress), 3, MenuX, MenuY - 30 + (A * 30));
+            std::string p = fmt::format_ne(g_mainMenu.gameSlotContinue, A, SaveSlotInfo[A].Progress);
+            int len = SuperTextPixLen(p, 3);
+
+            SuperPrint(p, 3, MenuX, posY);
+
             if(SaveSlotInfo[A].Stars > 0)
             {
-                XRender::renderTexture(MenuX + 260, MenuY - 30 + (A * 30) + 1,
+                len += 4;
+                XRender::renderTexture(MenuX + len, posY + 1,
                                       GFX.Interface[5].w, GFX.Interface[5].h,
                                       GFX.Interface[5], 0, 0);
-                XRender::renderTexture(MenuX + 260 + 24, MenuY - 30 + (A * 30) + 2,
+
+                len += GFX.Interface[5].w + 4;
+                XRender::renderTexture(MenuX + len, posY + 2,
                                       GFX.Interface[1].w, GFX.Interface[1].h,
                                       GFX.Interface[1], 0, 0);
-                SuperPrint(fmt::format_ne(" {0}", SaveSlotInfo[A].Stars), 3, MenuX + 288, MenuY - 30 + (A * 30));
+
+                len += GFX.Interface[1].w + 4;
+                SuperPrint(fmt::format_ne("{0}", SaveSlotInfo[A].Stars), 3, MenuX + len, posY);
             }
         }
         else
         {
             // "SLOT {0} ... NEW GAME"
-            SuperPrint(fmt::format_ne(g_mainMenu.gameSlotNew, A), 3, MenuX, MenuY - 30 + (A * 30));
+            SuperPrint(fmt::format_ne(g_mainMenu.gameSlotNew, A), 3, MenuX, posY);
         }
     }
 

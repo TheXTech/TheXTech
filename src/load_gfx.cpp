@@ -147,7 +147,7 @@ static void cgfx_initLangDir()
         }
 
         s_useLangDir = !s_langSubDir.empty();
-        s_useLangDirEp = !!s_langSubDirEp.empty();
+        s_useLangDirEp = !s_langSubDirEp.empty();
     }
 }
 

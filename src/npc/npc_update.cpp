@@ -110,7 +110,7 @@ void UpdateNPCs()
     int HitSpot = 0; // used for collision detection
     double tempHit = 0;
     double tempHitOld = 0;
-    Block_t tmpBlock;
+    // Block_t tmpBlock;
     int tempHitBlock = 0;
     int tempHitOldBlock = 0;
     int tempHitIsSlope = 0;
@@ -3405,7 +3405,7 @@ void UpdateNPCs()
                                         double right_border = NPC[A].Location.X + NPC[A].Location.Width;
 
                                         int first_after_block = -1;
-                                        double first_after_x, first_after_y;
+                                        double first_after_x = 0.0, first_after_y = 0.0;
 
                                         // IF PSwitchTime != 0 but the blocks are sorted,
                                         // then we would have iterated over the NPC's entire FLBlock column without breaking,

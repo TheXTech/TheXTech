@@ -56,6 +56,7 @@ public class thextechActivity extends SDLActivity
     protected String[] getLibraries()
     {
         return new String[] {
+//            "c++_shared",
 //            "hidapi",
 //            "SDL2",
             "thextech"
@@ -68,7 +69,7 @@ public class thextechActivity extends SDLActivity
         String[] langD = lang.split("_");
         if(langD.length >= 2)
             setLanguageCodes(langD[0], langD[1]);
-        else if(langD.length >= 1)
+        else if(langD.length == 1)
             setLanguageCodes(langD[0], "");
     }
 

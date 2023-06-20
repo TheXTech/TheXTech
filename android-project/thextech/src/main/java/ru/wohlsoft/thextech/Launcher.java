@@ -460,8 +460,11 @@ public class Launcher extends AppCompatActivity
 
     public boolean hasManageAppFS()
     {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !Environment.isExternalStorageManager())
+        if(Build.VERSION.SDK_INT >= 30)
         {
+            if(Environment.isExternalStorageManager())
+                return true;
+
             AlertDialog.Builder b = new AlertDialog.Builder(this);
             b.setTitle(R.string.managePermExplainTitle);
             b.setMessage(R.string.managePermExplainText);
@@ -490,7 +493,7 @@ public class Launcher extends AppCompatActivity
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
-        if(grantResults.length <= 0)
+        if(grantResults.length == 0)
             return;
         if(!permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE))
             return;

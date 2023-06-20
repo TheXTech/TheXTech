@@ -68,11 +68,11 @@ struct KM_Key
         return o.id == id && o.val == val && o.type == type;
     }
 
-    inline void assign(int type, int id, int val)
+    inline void assign(int i_type, int i_id, int i_val)
     {
-        this->type = type;
-        this->id = id;
-        this->val = val;
+        this->type = i_type;
+        this->id = i_id;
+        this->val = i_val;
     }
 };
 
@@ -161,7 +161,7 @@ private:
     std::set<InputMethodProfile_Joystick *> m_hiddenProfiles; // owns unconverted legacy profiles
     std::unordered_map<std::string, InputMethodProfile *> m_lastProfileByGUID;
 
-    InputMethodProfile *AllocateProfile() noexcept;
+    InputMethodProfile *AllocateProfile() noexcept override;
 
     /*-----------------------*\
     || CUSTOM METHODS        ||
@@ -178,15 +178,15 @@ public:
 
     const std::string& LocalName() const override;
 
-    bool TestProfileType(InputMethodProfile *profile);
-    bool RumbleSupported();
+    bool TestProfileType(InputMethodProfile *profile) override;
+    bool RumbleSupported() override;
 
-    void UpdateControlsPre();
-    void UpdateControlsPost();
+    void UpdateControlsPre() override;
+    void UpdateControlsPost() override;
 
     // null if no input method is ready
     // allocates the new InputMethod on the heap
-    InputMethod *Poll(const std::vector<InputMethod *> &active_methods) noexcept;
+    InputMethod *Poll(const std::vector<InputMethod *> &active_methods) noexcept override;
 
     /*-----------------------*\
     || CUSTOM METHODS        ||
@@ -201,31 +201,31 @@ public:
 protected:
     // optional function allowing developer to associate device information with profile, etc
     // if developer wants to forbid assignment, return false
-    bool SetProfile_Custom(InputMethod *method, int player_no, InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods);
+    bool SetProfile_Custom(InputMethod *method, int player_no, InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods) override;
     // unregisters any references to the profile before final deallocation
     // returns false to prevent deletion if this is impossible
-    bool DeleteProfile_Custom(InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods);
+    bool DeleteProfile_Custom(InputMethodProfile *profile, const std::vector<InputMethod *> &active_methods) override;
 public:
-    bool ConsumeEvent(const SDL_Event *ev);
+    bool ConsumeEvent(const SDL_Event *ev) override;
 
 public:
     // How many per-type special options are there?
-    size_t GetOptionCount();
+    size_t GetOptionCount() override;
     // Methods to manage per-profile options
     // It is guaranteed that none of these will be called if
     // GetOptionCount() returns 0.
     // get a char* describing the option
-    const char *GetOptionName(size_t i);
+    const char *GetOptionName(size_t i) override;
     // get a char* describing the current option value
     // must be allocated in static or instance memory
     // WILL NOT be freed
-    const char *GetOptionValue(size_t i);
+    const char *GetOptionValue(size_t i) override;
     // called when A is pressed; allowed to interrupt main game loop
-    bool OptionChange(size_t i);
+    bool OptionChange(size_t i) override;
 
 protected:
-    void SaveConfig_Custom(IniProcessing *ctl);
-    void LoadConfig_Custom(IniProcessing *ctl);
+    void SaveConfig_Custom(IniProcessing *ctl) override;
+    void LoadConfig_Custom(IniProcessing *ctl) override;
 
 };
 
