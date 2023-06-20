@@ -52,7 +52,7 @@ jobs:
             libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev \
             libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev \
             libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa \
-            libgles2-mesa-dev libmirclient-dev libproxy-dev libsdl2-dev libpng-dev libjpeg-dev \
+            libgles2-mesa-dev libgles-dev libmirclient-dev libproxy-dev libsdl2-dev libpng-dev libjpeg-dev \
             hashdeep dpkg debconf lintian \
             && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh \
             && chmod uog+x cmake-3.15.4-Linux-x86_64.sh \
@@ -102,7 +102,7 @@ jobs:
             libxkbcommon-dev:i386 libfontconfig1-dev:i386 libasound2-dev:i386 libpulse-dev:i386 \
             libdbus-1-dev:i386 udev mtdev-tools webp libudev-dev:i386 libwayland-dev:i386 \
             libegl1-mesa-dev:i386 mesa-common-dev:i386 libgl1-mesa-dev:i386 libglu1-mesa-dev:i386 \
-            libgles2-mesa:i386 libgles2-mesa-dev:i386 libproxy-dev:i386 libsdl2-dev:i386 \
+            libgles2-mesa:i386 libgles2-mesa-dev:i386 libgles-dev:i386 libproxy-dev:i386 libsdl2-dev:i386 \
             libpng-dev:i386 libjpeg-dev:i386 hashdeep dpkg debconf lintian \
             && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh \
             && chmod uog+x cmake-3.15.4-Linux-x86_64.sh \
@@ -150,7 +150,7 @@ jobs:
             libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev \
             libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev libwayland-dev \
             libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev libgles2-mesa \
-            libgles2-mesa-dev libmirclient-dev libproxy-dev libsdl2-dev libpng-dev libjpeg-dev \
+            libgles2-mesa-dev libgles-dev libmirclient-dev libproxy-dev libsdl2-dev libpng-dev libjpeg-dev \
             hashdeep dpkg debconf lintian \
             && wget -q https://github.com/Kitware/CMake/releases/download/v3.15.4/cmake-3.15.4-Linux-x86_64.sh \
             && chmod uog+x cmake-3.15.4-Linux-x86_64.sh \
@@ -192,7 +192,7 @@ jobs:
             libxxf86vm-dev libxinerama-dev libxkbcommon-dev libfontconfig1-dev libasound2-dev \
             libpulse-dev libdbus-1-dev udev mtdev-tools webp libudev-dev libglm-dev \
             libwayland-dev libegl1-mesa-dev mesa-common-dev libgl1-mesa-dev libglu1-mesa-dev \
-            libgles2-mesa libgles2-mesa-dev libmirclient-dev libproxy-dev libsdl2-dev \
+            libgles2-mesa libgles2-mesa-dev libgles-dev libmirclient-dev libproxy-dev libsdl2-dev \
             libpng-dev libjpeg-dev hashdeep dpkg debconf lintian",
 
             executable_name: "thextech-smbx",
