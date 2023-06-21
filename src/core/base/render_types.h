@@ -22,6 +22,12 @@
 #ifndef ABTRACTRENDERTYPES_T_H
 #define ABTRACTRENDERTYPES_T_H
 
+#include <array>
+
+typedef float           GLfloat;
+typedef int             GLint;
+typedef uint8_t         GLubyte;
+
 enum RendererFlip_t
 {
     X_FLIP_NONE       = 0x00000000,    /**< Do not flip */

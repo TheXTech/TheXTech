@@ -103,10 +103,12 @@ void ScreenFader::setupFader(int step, int start, int goal, int shape, bool useF
     m_focusOffsetX = 0.0;
     m_focusOffsetY = 0.0;
 
+#ifdef THEXTECH_BUILD_GL_MODERN
     if(m_shape >= S_CUSTOM && m_shape - S_CUSTOM < (int)s_loaded_effects.size() && s_loaded_effects[m_shape - S_CUSTOM]->get())
         m_focusUniform = XRender::registerUniform(*s_loaded_effects[m_shape - S_CUSTOM]->get(), "u_focus");
     else
         m_focusUniform = -1;
+#endif
 }
 
 void ScreenFader::setTrackedFocus(double *x, double *y, double offX, double offY)

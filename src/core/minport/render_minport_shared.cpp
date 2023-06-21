@@ -173,6 +173,11 @@ void offsetViewportIgnore(bool en)
     minport_ApplyViewport();
 }
 
+void splitFrame()
+{
+    /* empty */
+}
+
 void setTransparentColor(StdPicture &target, uint32_t rgb)
 {
 #if defined(__WII__) || defined(__3DS__)
