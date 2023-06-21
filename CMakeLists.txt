@@ -529,12 +529,14 @@ if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_
 endif()
 
 
-list(APPEND LIB_SRC
-    ${STACK_WALKER_SRCS}
-    lib/CrashHandler/crash_handler.cpp
-)
-add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
-set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
+if(NINTENDO_3DS OR NINTENDO_WII OR NOT PGE_MIN_PORT)
+    list(APPEND LIB_SRC
+        ${STACK_WALKER_SRCS}
+        lib/CrashHandler/crash_handler.cpp
+    )
+    add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
+    set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
+endif()
 
 
 if(APPLE)
