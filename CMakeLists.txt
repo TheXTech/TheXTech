@@ -389,6 +389,8 @@ if(THEXTECH_ENABLE_LUA)
     list(APPEND A2XT_INCS script/include)
 endif()
 
+include(cmake/library_glew.cmake)
+
 if(USE_SYSTEM_LIBS)
     find_package(SDL2 REQUIRED)
 
@@ -438,6 +440,10 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     if(WIN32 AND THEXTECH_BUILD_GL_DESKTOP_MODERN)
         list(APPEND A2XT_LIBS glew32)
         list(APPEND A2XT_LIBS opengl32)
+    endif()
+
+    if(THEXTECH_ENABLE_VENDORED_GLEW)
+        list(APPEND A2XT_DEPS GLEW_Local)
     endif()
 
     list(APPEND A2XT_LIBS PGE_ZLib)
