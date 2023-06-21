@@ -31,12 +31,14 @@
 #include <Graphics/graphics_funcs.h>
 #include <IniProcessor/ini_processing.h>
 #include <Logger/logger.h>
-#include "core/render.h"
-
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
+
+#include "global_constants.h"
+#include "core/render.h"
+
 
 #include <vector>
 #ifdef LOW_MEM
@@ -82,9 +84,9 @@ static TtfFont         *g_defaultTtfFont = nullptr;
 static bool             g_fontManagerIsInit = false;
 
 #ifdef LOW_MEM
-typedef std::map<std::string, int> FontsHash;
+typedef std::map<std::string, vbint_t> FontsHash;
 #else
-typedef std::unordered_map<std::string, int> FontsHash;
+typedef std::unordered_map<std::string, vbint_t> FontsHash;
 #endif
 //! Database of available fonts
 static FontsHash        g_fontNameToId;
@@ -94,18 +96,23 @@ static FontsHash        g_fontNameToIdBackupWorld;
 
 static bool             g_double_pixled = false;
 
-static const int c_smbxFontsMapMax = 100;
+#ifdef LOW_MEM
+static const vbint_t    c_smbxFontsMapMax = 10;
+#else
+static const vbint_t    c_smbxFontsMapMax = 20;
+#endif
+
 // Current state
-static int s_smbxFontsMap[c_smbxFontsMapMax];
-static int s_smbxFontsSizesMap[c_smbxFontsMapMax];
+static vbint_t s_smbxFontsMap[c_smbxFontsMapMax];
+static vbint_t s_smbxFontsSizesMap[c_smbxFontsMapMax];
 
 // The initial default state
-static int s_smbxFontsMapDefault[c_smbxFontsMapMax];
-static int s_smbxFontsSizesMapDefault[c_smbxFontsMapMax];
+static vbint_t s_smbxFontsMapDefault[c_smbxFontsMapMax];
+static vbint_t s_smbxFontsSizesMapDefault[c_smbxFontsMapMax];
 
 // The episode-wide preserved state without content of data directory
-static int s_smbxFontsMapWorld[c_smbxFontsMapMax];
-static int s_smbxFontsSizesMapWorld[c_smbxFontsMapMax];
+static vbint_t s_smbxFontsMapWorld[c_smbxFontsMapMax];
+static vbint_t s_smbxFontsSizesMapWorld[c_smbxFontsMapMax];
 
 static const uint32_t c_defaultFontSize = 14;
 
@@ -119,18 +126,19 @@ static void registerFont(BaseFontEngine* font)
 {
     g_anyFonts.push_back(font);
 
-    int newIdx = g_anyFonts.size() - 1;
+    vbint_t newIdx = static_cast<vbint_t>(g_anyFonts.size()) - 1;
     auto ef = g_fontNameToId.find(font->getFontName());
 
     // If overriding an existing font by name, also replace the SMBX code overrides
     if(ef != g_fontNameToId.end())
     {
-        int oldIdx = ef->second;
+        vbint_t oldIdx = ef->second;
         for(int i = 0; i < c_smbxFontsMapMax; ++i)
         {
             if(s_smbxFontsMap[i] == oldIdx)
                 s_smbxFontsMap[i] = newIdx;
         }
+
         ef->second = newIdx;
     }
     else
