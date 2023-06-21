@@ -39,6 +39,11 @@
 #include <fmt_format_ne.h>
 
 #include <vector>
+#ifdef LOW_MEM
+#   include <map>
+#else
+#   include <unordered_map>
+#endif
 
 BaseFontEngine::~BaseFontEngine()
 {}
@@ -56,7 +61,7 @@ static TtfFontsList    g_ttfFontsCustom;
 static TtfFontsList    g_ttfFontsCustomLevel;
 #define LOADFONTARG(x) x
 #else
-#define LOADFONTARG(x) false
+#   define LOADFONTARG(x) false
 #endif
 
 typedef VPtrList<BaseFontEngine*> PtrFontsList;
@@ -76,7 +81,11 @@ static TtfFont         *g_defaultTtfFont = nullptr;
 //! Is font manager initialized
 static bool             g_fontManagerIsInit = false;
 
+#ifdef LOW_MEM
+typedef std::map<std::string, int> FontsHash;
+#else
 typedef std::unordered_map<std::string, int> FontsHash;
+#endif
 //! Database of available fonts
 static FontsHash        g_fontNameToId;
 //! Backup of the database of available fonts

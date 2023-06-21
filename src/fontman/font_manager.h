@@ -26,8 +26,6 @@
 #include <Utils/vptrlist.h>
 
 #include <string>
-#include <vector>
-#include <unordered_map>
 
 #include "font_engine_base.h"
 
