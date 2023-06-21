@@ -596,7 +596,7 @@ const char* InputMethodProfile_16M::NamePrimaryButton(ControlsClass c, size_t i)
     if(c == ControlsClass::Player)
         keys = this->m_keys;
     else if(c == ControlsClass::Cursor)
-        return g_controlsStrings.dsCasePen.c_str();
+        return g_controlsStrings.tdsCasePen.c_str();
     else if(c == ControlsClass::Editor)
         keys = this->m_editor_keys;
     else if(c == ControlsClass::Hotkey)
