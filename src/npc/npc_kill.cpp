@@ -30,6 +30,8 @@
 #include "../controls.h"
 #include "../layers.h"
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "npc/npc_queues.h"
 
 void KillNPC(int A, int B)

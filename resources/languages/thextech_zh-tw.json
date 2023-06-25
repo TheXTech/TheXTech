@@ -12,12 +12,12 @@
             "slick": "打滑"
         },
         "browser": {
-            "askOverwriteFile": "是否覆蓋文件{0}？",
-            "itemNewFile": "<新文件>",
-            "itemNewFolder": "<新建文件夾>",
-            "newFile": "新建文件",
-            "openFile": "打開文件",
-            "saveFile": "刪除文件"
+            "askOverwriteFile": "是否覆蓋檔案{0}？",
+            "itemNewFile": "<新建檔案>",
+            "itemNewFolder": "<新建資料夾>",
+            "newFile": "新建檔案",
+            "openFile": "打開檔案",
+            "saveFile": "刪除檔案"
         },
         "events": {
             "bounds": {
@@ -106,10 +106,10 @@
             "commandSaveAs": "另存爲...",
             "confirmConfirmAction": "您確定要{0}嗎？",
             "confirmConvertFormatTo": "是否轉換格式到{0}？",
-            "confirmSaveBeforeAction": "{0}前是否保存文件？",
+            "confirmSaveBeforeAction": "{0}前是否保存檔案？",
             "convert": {
                 "_38aUnsupported": "不支持轉換 SMBX-38A 格式的關卡。",
-                "desc1": "文件格式將會轉換，但不會刪除源文件。",
+                "desc1": "檔案格式將會轉換，但不會刪除原始檔。",
                 "desc2": " ",
                 "featureBlockForceSmashable": "使用了舊版本中可破碎的旋轉方塊。",
                 "featureCustomWorldMusic": "在大地圖中設置了自定義音樂。",
@@ -132,13 +132,13 @@
             },
             "formatLegacy": "舊版本",
             "formatModern": "新版本",
-            "labelCurrentFile": "當前文件：",
+            "labelCurrentFile": "當前檔案：",
             "labelFormat": "格式：",
-            "optionActionWithoutSave": "否：{0}而不保存文件",
+            "optionActionWithoutSave": "否：{0}而不保存檔案",
             "optionCancelAction": "取消：返回上一級菜單",
             "optionCancelConversion": "取消轉換",
             "optionProceedWithConversion": "確認轉換",
-            "optionYesSaveThenAction": "是：{0}並保存文件",
+            "optionYesSaveThenAction": "是：{0}並保存檔案",
             "sectionLevel": "關卡",
             "sectionWorld": "大地圖"
         },
@@ -253,7 +253,7 @@
             "erase": "刪除",
             "eraseAll": "刪除全部",
             "events": "事件",
-            "file": "文件",
+            "file": "檔案",
             "layers": "圖層",
             "levels": "關卡",
             "music": "音樂",
@@ -358,7 +358,7 @@
             "phrasePlayerDisconnected": "玩家{0}未連接任何設備"
         },
         "error": {
-            "openFileFailed": "錯誤：無法打開文件\"{0}\"：文件不存在或已損壞。",
+            "openFileFailed": "錯誤：無法打開檔案\"{0}\"：檔案不存在或已損壞。",
             "warpNeedStarCount": "你需要{0}{2}{1}才能進入此傳送點。"
         },
         "pause": {
@@ -547,7 +547,7 @@
             "wordProfiles": "配置"
         },
         "editor": {
-            "errorMissingResources": "抱歉，需要{0}，即編輯器圖標文件，才能啓動編輯器。",
+            "errorMissingResources": "抱歉，需要{0}，即編輯器圖示檔案，才能啓動編輯器。",
             "errorResolution": "抱歉，在當前設置的分辨率下，無法啓動編輯器。",
             "newWorld": "<新地圖>",
             "promptNewWorldName": "新地圖名稱"
