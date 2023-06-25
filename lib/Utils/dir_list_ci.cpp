@@ -2,9 +2,38 @@
 #include "strings.h"
 #include "dir_list_ci.h"
 
+#include <locale>
 #include <cstring>
 #include <algorithm>
 #include <utility>
+
+
+static bool matchSuffixFilters(const std::string &name, const std::vector<std::string> &suffixFilters)
+{
+    bool found = false;
+    std::locale loc;
+
+    if(suffixFilters.empty())
+        return true;//If no filter, grand everything
+
+    for(const std::string &suffix : suffixFilters)
+    {
+        if(suffix.size() > name.size())
+            continue;
+
+        std::string f;
+        f.reserve(name.size());
+        for(const char &c : name)
+            f.push_back(std::tolower(c, loc));
+
+        found |= (f.compare(f.size() - suffix.size(), suffix.size(), suffix) == 0);
+
+        if(found)
+            return true;
+    }
+
+    return found;
+}
 
 
 DirListCI::DirListCI(std::string curDir) noexcept
@@ -104,6 +133,89 @@ bool DirListCI::existsCI(const std::string &in_name)
         auto found = m_fileMap.find(uppercase_string);
         return found != m_fileMap.end();
     }
+}
+
+bool DirListCI::dirExistsCI(const std::string& in_name)
+{
+    if(in_name.empty())
+        return false;
+
+    std::string name;
+    replaceSlashes(name, in_name);
+
+    // For sub-directory path, look deeply
+    auto subDir = name.find('/');
+
+    if(subDir != std::string::npos)
+    {
+        auto sdName = resolveDirCase(name.substr(0, subDir));
+        auto sdir = name.substr(subDir + 1);
+        auto sdf = m_subDirs.find(sdName);
+        // std::string found;
+
+        if(sdf == m_subDirs.end())
+        {
+            auto f = m_subDirs.emplace(sdName, DirListCIPtr(new DirListCI(m_curDir + sdName)));
+            return f.first->second->dirExistsCI(sdir);
+        }
+        else
+            return sdf->second->dirExistsCI(sdir);
+    }
+
+    std::string uppercase_string;
+    uppercase_string.resize(name.length());
+    std::transform(name.begin(), name.end(), uppercase_string.begin(),
+                   [](unsigned char c){ return std::toupper(c); });
+    auto found = m_dirMap.find(uppercase_string);
+    return found != m_dirMap.end();
+}
+
+std::vector<std::string> DirListCI::getFilesList(const std::string& subDir,
+                                                 const std::vector<std::string>& suffix_filters)
+{
+    std::vector<std::string> ret;
+
+    std::string name;
+    replaceSlashes(name, subDir);
+
+    if(!subDir.empty())
+    {
+        std::string sdName, sdir;
+        // For sub-directory path, look deeply
+        auto subDir = name.find('/');
+
+        if(subDir != std::string::npos)
+        {
+            sdName = resolveDirCase(name.substr(0, subDir));
+            sdir = name.substr(subDir + 1);
+        }
+        else
+            sdName = name;
+
+        auto sdf = m_subDirs.find(sdName);
+        // std::string found;
+
+        if(sdf == m_subDirs.end())
+        {
+            auto f = m_subDirs.emplace(sdName, DirListCIPtr(new DirListCI(m_curDir + sdName)));
+            return f.first->second->getFilesList(sdir);
+        }
+        else
+            return sdf->second->getFilesList(sdir);
+    }
+
+    for(auto &f : m_fileMap)
+    {
+        if(matchSuffixFilters(f.second, suffix_filters))
+            ret.push_back(f.second);
+    }
+
+    return ret;
+}
+
+std::vector<std::string> DirListCI::getFilesList(const std::vector<std::string>& suffix_filters)
+{
+    return getFilesList(std::string(), suffix_filters);
 }
 
 std::string DirListCI::resolveFileCaseExists(const std::string &in_name)
