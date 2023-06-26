@@ -107,7 +107,7 @@ bool OpenWorld(std::string FilePath)
     FileNamePathWorld = FileNamePath;
     FileFormatWorld = FileFormat;
 
-    FontManager::loadCustomFonts(g_dirEpisode.getCurDir(), g_dirCustom.getCurDir());
+    FontManager::loadCustomFonts();
 
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);

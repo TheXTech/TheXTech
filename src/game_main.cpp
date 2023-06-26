@@ -768,7 +768,7 @@ int GameMain(const CmdLineSetup_t &setup)
             LoadCustomGFX();
             LoadCustomSound();
             SetupPlayers();
-            FontManager::loadCustomFonts(FileNamePath, FileNamePath + FileName + "/");
+            FontManager::loadCustomFonts();
 
 #ifndef PGE_MIN_PORT
             if(!NoMap)

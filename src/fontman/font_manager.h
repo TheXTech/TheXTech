@@ -57,10 +57,8 @@ void quit();
 
 /**
  * @brief Attempts to load custom fonts for the episode and for the level
- * @param episodeRoot Episode directory
- * @param dataSubDir Data directory
  */
-void loadCustomFonts(const std::string &episodeRoot, const std::string &dataSubDir);
+void loadCustomFonts();
 
 /**
  * @brief Removes all custom fonts completely

@@ -56,7 +56,7 @@ RasterFont::~RasterFont()
     m_texturesBank.clear();
 }
 
-void RasterFont::loadFont(std::string font_ini)
+void RasterFont::loadFont(const std::string &font_ini)
 {
     if(!Files::fileExists(font_ini))
     {
@@ -117,7 +117,7 @@ void RasterFont::loadFont(std::string font_ini)
     pLogDebug("Loaded raster font with name: [%s]", m_fontName.c_str());
 }
 
-void RasterFont::loadFontMap(std::string fontmap_ini)
+void RasterFont::loadFontMap(const std::string& fontmap_ini)
 {
     std::string root = DirMan(Files::dirname(fontmap_ini)).absolutePath() + "/";
 

@@ -38,6 +38,7 @@
 
 #include "global_constants.h"
 #include "core/render.h"
+#include "global_dirs.h"
 
 
 #include <vector>
@@ -238,11 +239,13 @@ TtfFont* FontManager::getTtfFontByName(const std::string& fontName)
 }
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-static bool s_loadFintsFromDir(const std::string &fonts_root,
+static bool s_loadFintsFromDir(DirListCI &fonts_root,
+                               const std::string &subdir,
                                RasterFontsList &outRasterFonts,
                                TtfFontsList &outTtfFonts)
 #else
-static bool s_loadFintsFromDir(const std::string &fonts_root,
+static bool s_loadFintsFromDir(DirListCI &fonts_root,
+                               const std::string &subdir,
                                RasterFontsList &outRasterFonts,
                                bool)
 #endif
@@ -250,19 +253,19 @@ static bool s_loadFintsFromDir(const std::string &fonts_root,
     using namespace FontManager;
 
     /***************Load raster font support****************/
-    DirMan fontsDir(fonts_root);
-    if(!fontsDir.exists())
+    if(!subdir.empty() && !fonts_root.dirExistsCI(subdir))
         return false; // Fonts manager is unavailable when directory is not exists
 
-    std::vector<std::string> files;
-    fontsDir.getListOfFiles(files, {".font.ini"});
+    std::vector<std::string> files = fonts_root.getFilesList(subdir, {".font.ini"});
     std::sort(files.begin(), files.end());
+
+    std::string sSubDir = subdir + (subdir.empty() ? "" : "/");
 
     for(std::string &fonFile : files)
     {
         outRasterFonts.emplace_back();
         RasterFont& rf = outRasterFonts.back();
-        std::string fontPath = fontsDir.absolutePath() + "/" + fonFile;
+        std::string fontPath = fonts_root.getCurDir() + sSubDir + fonFile;
         pLogDebug("Loading raster font %s...", fontPath.c_str());
         rf.loadFont(fontPath);
 
@@ -279,7 +282,7 @@ static bool s_loadFintsFromDir(const std::string &fonts_root,
         g_defaultRasterFont = &outRasterFonts.front();
 
     /***************Load TTF font support****************/
-    IniProcessing overrider(fonts_root + "/overrides.ini");
+    IniProcessing overrider(fonts_root.getCurDir() + subdir + "/overrides.ini");
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     if(overrider.beginGroup("ttf-fonts"))
@@ -319,7 +322,7 @@ static bool s_loadFintsFromDir(const std::string &fonts_root,
 #endif
             overrider.read(keyDoublePixel.c_str(), doublePixel, doublePixelDefault);
 
-            std::string fontPath = fontsDir.absolutePath() + "/" + fontFile;
+            std::string fontPath = fonts_root.getCurDir() + sSubDir + fontFile;
 
             outTtfFonts.emplace_back();
             TtfFont& tf = outTtfFonts.back();
@@ -400,8 +403,15 @@ void FontManager::initFull()
     }
 
     const std::string fonts_root = AppPathManager::assetsRoot() + "fonts";
+    if(!DirMan::exists(fonts_root))
+    {
+        pLogWarning("Can't load fonts as directory %s does not exists", fonts_root.c_str());
+        return;
+    }
 
-    if(!s_loadFintsFromDir(fonts_root, g_rasterFonts, LOADFONTARG(g_ttfFonts)))
+    DirListCI fontsRootCI(fonts_root);
+
+    if(!s_loadFintsFromDir(fontsRootCI, std::string(), g_rasterFonts, LOADFONTARG(g_ttfFonts)))
     {
         pLogWarning("Can't load any font from the directory %s", fonts_root.c_str());
         return;
@@ -431,11 +441,14 @@ void FontManager::quit()
 #endif
 }
 
-void FontManager::loadCustomFonts(const std::string& episodeRoot, const std::string& dataSubDir)
+void FontManager::loadCustomFonts()
 {
     backupDefaultFontMaps();
     bool doLoadWorld = false;
     bool doLoadCustom = false;
+
+    const std::string& episodeRoot = g_dirEpisode.getCurDir();
+    const std::string& dataSubDir = g_dirCustom.getCurDir();
 
     // Loading fonts from the episode directory
     if(s_lastWorldFontsPath != episodeRoot)
@@ -448,7 +461,8 @@ void FontManager::loadCustomFonts(const std::string& episodeRoot, const std::str
     else
         pLogDebug("Fonts at %sfonts already loaded", episodeRoot.c_str());
 
-    if(doLoadWorld && s_loadFintsFromDir(episodeRoot + "fonts",
+    if(doLoadWorld && s_loadFintsFromDir(g_dirEpisode,
+                                         "fonts",
                                          g_rasterFontsCustom,
                                          LOADFONTARG(g_ttfFontsCustom)))
     {
@@ -470,7 +484,8 @@ void FontManager::loadCustomFonts(const std::string& episodeRoot, const std::str
     else
         pLogDebug("Fonts at %sfonts already loaded", dataSubDir.c_str());
 
-    if(doLoadCustom && s_loadFintsFromDir(dataSubDir + "fonts",
+    if(doLoadCustom && s_loadFintsFromDir(g_dirCustom,
+                                         "fonts",
                                           g_rasterFontsCustomLevel,
                                           LOADFONTARG(g_ttfFontsCustomLevel)))
     {

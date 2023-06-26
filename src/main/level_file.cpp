@@ -196,7 +196,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FindCustomNPCs();
     LoadCustomGFX();
     LoadCustomSound();
-    FontManager::loadCustomFonts(g_dirEpisode.getCurDir(), g_dirCustom.getCurDir());
+    FontManager::loadCustomFonts();
 
 //    if(DirMan::exists(FileNamePath + FileName)) // Useless now
 //        LoadCustomGFX2(FileNamePath + FileName);
