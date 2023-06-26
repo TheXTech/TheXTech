@@ -1151,7 +1151,7 @@ void FindStars()
 
                     for(const auto& star : Star)
                     {
-                        if(SDL_strcasecmp(star.level.c_str(), GetS(warp.level).c_str()) == 0)
+                        if(SDL_strcasecmp(star.level.c_str(), Files::basename(GetS(warp.level)).c_str()) == 0)
                             warp.curStars++;
                     }
                 }

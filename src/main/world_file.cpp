@@ -509,7 +509,7 @@ void FindWldStars()
 
                     for(const auto& star : Star)
                     {
-                        if(SDL_strcasecmp(star.level.c_str(), l.FileName.c_str()) == 0)
+                        if(SDL_strcasecmp(star.level.c_str(), Files::basename(l.FileName).c_str()) == 0)
                             l.curStars++;
                     }
                 }
