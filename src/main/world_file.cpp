@@ -36,6 +36,7 @@
 #include "level_file.h"
 #include "world_file.h"
 #include "translate_episode.h"
+#include "fontman/font_manager.h"
 
 #include <Utils/strings.h>
 #include <Utils/files.h>
@@ -105,6 +106,8 @@ bool OpenWorld(std::string FilePath)
     FileNameWorld = FileName;
     FileNamePathWorld = FileNamePath;
     FileFormatWorld = FileFormat;
+
+    FontManager::loadCustomFonts();
 
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);

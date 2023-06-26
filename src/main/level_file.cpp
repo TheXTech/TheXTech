@@ -42,6 +42,7 @@
 #include "npc_special_data.h"
 #include "graphics/gfx_update.h"
 #include "translate_episode.h"
+#include "fontman/font_manager.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -195,6 +196,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FindCustomNPCs();
     LoadCustomGFX();
     LoadCustomSound();
+    FontManager::loadCustomFonts();
 
 //    if(DirMan::exists(FileNamePath + FileName)) // Useless now
 //        LoadCustomGFX2(FileNamePath + FileName);
@@ -959,6 +961,7 @@ void ClearLevel()
     UnloadCustomGFX();
     doShakeScreenClear();
     treeLevelCleanAll();
+    FontManager::clearLevelFonts();
 
     invalidateDrawBlocks();
     invalidateDrawBGOs();
