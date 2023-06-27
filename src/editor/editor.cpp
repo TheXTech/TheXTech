@@ -51,6 +51,7 @@
 #include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
+#include "fontman/font_manager.h"
 
 #include "controls.h"
 
@@ -2885,6 +2886,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     LevelEditor = false;
     SetupPlayers();
     MagicHand = magicHand;
+    FontManager::clearAllCustomFonts();
 
     if(TestFullscreen)
     {
