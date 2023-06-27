@@ -961,7 +961,10 @@ void ClearLevel()
     UnloadCustomGFX();
     doShakeScreenClear();
     treeLevelCleanAll();
-    FontManager::clearLevelFonts();
+    if(TestLevel || LevelEditor)
+        FontManager::clearAllCustomFonts();
+    else
+        FontManager::clearLevelFonts();
 
     invalidateDrawBlocks();
     invalidateDrawBGOs();
