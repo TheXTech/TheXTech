@@ -94,11 +94,6 @@ if(CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffloat-store")
 endif()
 
-if(ANDROID)
-    include(cmake/ndk-stl-config.cmake)
-    set(ANDROID_STL "c++_static")
-endif()
-
 if(WIN32 AND NOT EMSCRIPTEN)
     set(CMAKE_SHARED_LIBRARY_PREFIX "")
 endif()
@@ -168,6 +163,8 @@ option(ENABLE_LOGGING "Enable debug logging written into a file (may not work on
 
 option(THEXTECH_ENABLE_LUA "Enable lua scripting support" OFF)
 option(THEXTECH_ENABLE_LUNA_AUTOCODE "Enable LunaDLL Autocode scripting support" ON)
+
+option(THEXTECH_ENABLE_EDITOR "Enable runtime support for editor features" ON)
 
 option(THEXTECH_ENABLE_TTF_SUPPORT "Enable TTF fonts support (FreeType required)" ${THEXTECH_ENABLE_TTF_SUPPORT_DEFAULT})
 
@@ -309,6 +306,7 @@ if(THEXTECH_ENABLE_LUA)
     include(cmake/library_luabind.cmake)
 endif()
 
+include(cmake/library_discord_rpc.cmake)
 
 if(EMSCRIPTEN)
     message("Is EMSCRIPTEN!")
@@ -404,6 +402,12 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
     list(APPEND A2XT_LIBS PGE_ZLib)
 endif()
 
+if(THEXTECH_ENABLE_DISCORD_RPC)
+    list(APPEND A2XT_DEPS DiscordPRC_Local)
+    list(APPEND A2XT_LIBS PGE_DiscordRPC)
+    set(THEXTECH_ENABLE_INTEGRATOR ON)  # This feature needs for an Integrator
+endif()
+
 target_link_libraries(A2XT_Int INTERFACE ${A2XT_LIBS})
 target_include_directories(A2XT_Int INTERFACE ${A2XT_INCS})
 
@@ -445,12 +449,27 @@ if(NOT ANDROID
    AND NOT THEXTECH_CLI_BUILD
    AND NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC
+        lib/InterProcess/editor_pipe.h
         lib/InterProcess/editor_pipe.cpp
+        lib/InterProcess/intproc.h
         lib/InterProcess/intproc.cpp
     )
     set(THEXTECH_INTERPROC_SUPPORTED ON)
 endif()
 
+# Integrations with external applications
+if(THEXTECH_ENABLE_INTEGRATOR)
+    list(APPEND LIB_SRC
+        lib/Integrator/integrator.h
+        lib/Integrator/integrator.cpp)
+
+    if(THEXTECH_ENABLE_DISCORD_RPC)
+        list(APPEND LIB_SRC
+            lib/Integrator/int_discorcrpc.h
+            lib/Integrator/int_discorcrpc.cpp
+        )
+    endif()
+endif()
 
 if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_SWITCH AND NOT VITA AND NOT PGE_MIN_PORT)
     list(APPEND LIB_SRC ${FILEMAPPER_SRCS})
@@ -458,12 +477,14 @@ if(NOT NINTENDO_3DS AND NOT NINTENDO_WII AND NOT NINTENDO_WIIU AND NOT NINTENDO_
 endif()
 
 
-list(APPEND LIB_SRC
-    ${STACK_WALKER_SRCS}
-    lib/CrashHandler/crash_handler.cpp
-)
-add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
-set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
+if(NINTENDO_3DS OR NINTENDO_WII OR NOT PGE_MIN_PORT)
+    list(APPEND LIB_SRC
+        ${STACK_WALKER_SRCS}
+        lib/CrashHandler/crash_handler.cpp
+    )
+    add_git_version_defs(lib/CrashHandler/crash_handler.cpp)
+    set(THEXTECH_CRASHHANDLER_SUPPORTED ON)
+endif()
 
 
 if(APPLE)
@@ -515,6 +536,9 @@ set(THEXTECH_SRC
     src/main/screen_quickreconnect.cpp
     src/main/screen_textentry.cpp
     src/main/screen_prompt.cpp
+    src/main/game_strings.cpp
+    src/main/translate.cpp
+    src/main/translate_episode.cpp
     src/main/menu_controls.cpp
     src/main/cheat_code.cpp
     src/main/outro_loop.cpp
@@ -543,13 +567,6 @@ set(THEXTECH_SRC
     src/layers.cpp
     src/custom.cpp
     src/graphics.cpp
-    src/editor/editor.cpp
-    src/editor/new_editor.cpp
-    src/editor/write_common.cpp
-    src/editor/write_level.cpp
-    src/editor/write_world.cpp
-    src/editor/editor_custom.cpp
-    src/editor/magic_block.cpp
     src/main.cpp
     src/blocks.cpp
     src/gfx.cpp
@@ -633,6 +650,20 @@ if(THEXTECH_ENABLE_AUDIO_FX)
     )
 endif()
 
+if(THEXTECH_ENABLE_EDITOR)
+    add_definitions(-DTHEXTECH_ENABLE_EDITOR)
+    list(APPEND THEXTECH_SRC
+        src/editor/editor.cpp
+        src/editor/new_editor.cpp
+        src/editor/write_common.cpp
+        src/editor/write_level.cpp
+        src/editor/write_world.cpp
+        src/editor/editor_custom.cpp
+        src/editor/editor_strings.cpp
+        src/editor/magic_block.cpp
+    )
+endif()
+
 if(NINTENDO_3DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
@@ -701,6 +732,55 @@ else()
     )
 endif()
 
+
+list(APPEND THEXTECH_SRC src/core/language/language_common.cpp)
+
+# Notes:
+# - First, algorithm will try to detect language using SDL's method if available (Supported by SDL 2.0.14 and newer)
+# - Then, falls to the system specific code to detect the language
+# If there is a necessary to disable use of SDL-based language detection,
+# define the macro `THEXTECH_DISABLE_SDL_LOCALE` which will completely disable the SDL-based language detector
+
+if(THEXTECH_NO_SDL_BUILD)
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
+endif()
+
+if(WIN32)
+    list(APPEND THEXTECH_SRC src/core/language/language_win32.cpp)
+elseif(APPLE)
+    list(APPEND THEXTECH_SRC src/core/language/language_apple.cpp)
+elseif(ANDROID)
+    list(APPEND THEXTECH_SRC src/core/language/language_android.cpp)
+elseif(NINTENDO_DS)
+    # FIXME: Implement the Nintendo DS language initializer
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+elseif(NINTENDO_3DS)
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for 3DS doesn't support language detection
+    list(APPEND THEXTECH_SRC src/core/language/language_3ds.cpp)
+elseif(NINTENDO_WII)
+    # FIXME: Implement the Nintendo WII language initializer
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+elseif(NINTENDO_WIIU)
+    # FIXME: Implement the Nintendo WII U language initializer
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+elseif(NINTENDO_SWITCH)
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE) # SDL for Switch doesn't support language detection
+    list(APPEND THEXTECH_SRC src/core/language/language_switch.cpp)
+elseif(VITA)
+    # FIXME: Implement the PS Vita language initializer
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+elseif(UNIX)
+    list(APPEND THEXTECH_SRC src/core/language/language_unix.cpp)
+else()
+    add_definitions(-DTHEXTECH_DISABLE_SDL_LOCALE)
+    list(APPEND THEXTECH_SRC src/core/language/language_dummy.cpp)
+endif()
+
+
 # Add heads into the list
 file(GLOB THEXTECH_HEADS_SRC
     *.h
@@ -708,9 +788,9 @@ file(GLOB THEXTECH_HEADS_SRC
     lib/AppPath/*.h
     lib/CrashHandler/*.h
     lib/Graphics/*.h
-    lib/InterProcess/*.h
     lib/tclap/*.h
     lib/fmt/*.h
+    lib/json/*.hpp
     src/*.h
     src/*.hpp
     src/script/*.h
@@ -720,8 +800,10 @@ file(GLOB THEXTECH_HEADS_SRC
     src/core/*.h
     src/core/base/*.h
     src/core/sdl/*.h
+    src/core/language/*.h
     src/editor/*.h
     src/main/*.h
+    src/main/translate/*.h
     src/main/*.hpp
     src/npc/*.h
     src/npc/*.hpp
@@ -906,6 +988,11 @@ elseif(PGE_MIN_PORT)
     target_compile_definitions(thextech PRIVATE -DLOW_MEM)
 endif()
 
+if(NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_SWITCH OR ANDROID OR EMSCRIPTEN)
+    # Disable language tools at non-desktop platforms
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_DISABLE_LANG_TOOLS)
+endif()
+
 if(THEXTECH_NO_SDL_BUILD)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DTHEXTECH_NO_SDL_BUILD)
 endif()
@@ -940,6 +1027,14 @@ endif()
 
 if(THEXTECH_ENABLE_LUA)
     target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_LUA)
+endif()
+
+if(THEXTECH_ENABLE_INTEGRATOR)
+    target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_INTEGRATOR)
+endif()
+
+if(THEXTECH_ENABLE_DISCORD_RPC)
+    target_compile_definitions(thextech PRIVATE -DENABLE_XTECH_DISCORD_RPC -DXTECH_DISCORD_APPID=${THEXTECH_DISCORD_APPID})
 endif()
 
 if(ENABLE_ADDRESS_SANITIZER)
@@ -1032,15 +1127,10 @@ if(NOT USE_SYSTEM_LIBS AND A2XT_DEPS)
     add_dependencies(thextech ${A2XT_DEPS})
 endif()
 
-test_big_endian(THEXTECH_IS_BIG_ENDIAN)
 if(THEXTECH_IS_BIG_ENDIAN)
-    message("== Target processor endianess: BIG ENDIAN")
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_BIG_ENDIAN -DSOUND_FX_BIG_ENDIAN)
-else()
-    message("== Target processor endianess: LITTLE ENDIAN")
 endif()
 
-message("== Size of void pointer is ${CMAKE_SIZEOF_VOID_P}!")
 if(CMAKE_SIZEOF_VOID_P MATCHES "8")
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_WORDSIZE=64)
 elseif(CMAKE_SIZEOF_VOID_P MATCHES "4")
@@ -1048,7 +1138,6 @@ elseif(CMAKE_SIZEOF_VOID_P MATCHES "4")
 else()
     message(WARNING "Unknown word size ${CMAKE_SIZEOF_VOID_P}!")
 endif()
-
 
 if(USE_STATIC_LIBC AND NOT USE_SYSTEM_LIBS)
     if(NOT APPLE AND NOT MSVC)

@@ -2,6 +2,7 @@
 #define DIRLISTCI_H
 
 #include <string>
+#include <vector>
 #include <unordered_map>
 #include <memory>
 
@@ -23,6 +24,15 @@ public:
 
     // checks whether a file exists (case-insensitive)
     bool existsCI(const std::string &name);
+
+    // checks whether a directory exists (case-insensitive)
+    bool dirExistsCI(const std::string &name);
+
+    // get a list of files at the selected directory
+    std::vector<std::string> getFilesList(const std::string &subDir,
+                                          const std::vector<std::string> &suffix_filters = std::vector<std::string>());
+
+    std::vector<std::string> getFilesList(const std::vector<std::string> &suffix_filters = std::vector<std::string>());
 
     // resolves the file's case and returns the original string if failed
     std::string resolveFileCase(const std::string &name);

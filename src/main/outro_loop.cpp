@@ -20,6 +20,7 @@
 
 
 #include <Logger/logger.h>
+#include <Integrator/integrator.h>
 
 #include "../globals.h"
 #include "../game_main.h"
@@ -34,6 +35,29 @@
 #include "../sound.h"
 #include "../main/trees.h"
 #include "game_info.h"
+#include "outro_loop.h"
+
+OutroContent g_outroScreen;
+
+void initOutroContent()
+{
+    g_outroScreen.gameCredits = "Game credits:";
+    g_outroScreen.engineCredits = "Engine credits:";
+
+    g_outroScreen.originalBy = "Original VB6 code By:";
+    g_outroScreen.nameAndrewSpinks = "Andrew Spinks";
+
+    g_outroScreen.cppPortDevelopers = "C++ port developers:";
+    g_outroScreen.nameVitalyNovichkov = "Vitaly Novichkov";
+
+    g_outroScreen.psVitaPortBy = "PS Vita Port By:";
+
+    g_outroScreen.levelDesign = "Level Design:";
+
+    g_outroScreen.customSprites = "Custom Sprites:";
+
+    g_outroScreen.specialThanks = "Special Thanks:";
+}
 
 
 void DoCredits(bool quit)
@@ -112,11 +136,11 @@ void DoCredits(bool quit)
 void OutroLoop()
 {
     Controls::Update();
+    Integrator::sync();
     bool quit = SharedControls.QuitCredits;
+
     for(int i = 0; i < maxLocalPlayers; i++)
-    {
         quit |= Player[i+1].Controls.Start;
-    }
 
     if(g_gameInfo.outroDeadMode)
     {
@@ -251,62 +275,45 @@ void SetupCredits()
 #else
     if(!g_gameInfo.creditsGame.empty())
     {
-        AddCredit("Game credits:");
+        AddCredit(g_outroScreen.gameCredits);
         for(auto &s : g_gameInfo.creditsGame)
             AddCredit(s);
         AddCredit("");
         AddCredit("");
-        AddCredit("Engine credits:");
+        AddCredit(g_outroScreen.engineCredits);
         AddCredit("");
     }
 
-    AddCredit("Original VB6 code By:");
+    AddCredit(g_outroScreen.originalBy);
 #endif
     AddCredit("");
-    AddCredit("Andrew Spinks");
+    AddCredit(g_outroScreen.nameAndrewSpinks);
     AddCredit("'Redigit'");
     AddCredit("");
     AddCredit("");
 #ifndef ENABLE_OLD_CREDITS
-    AddCredit("C++ port By:");
+    AddCredit(g_outroScreen.cppPortDevelopers);
     AddCredit("");
-    AddCredit("Vitaly Novichkov");
+    AddCredit(g_outroScreen.nameVitalyNovichkov);
     AddCredit("'Wohlstand'");
     AddCredit("");
-    AddCredit("");
-#endif
-#ifdef __3DS__
-    AddCredit("3DS port By:");
-    AddCredit("");
     AddCredit("'ds-sloth'");
-    AddCredit("");
-    AddCredit("");
-#endif
-#ifdef __WII__
-    AddCredit("Wii port By:");
-    AddCredit("");
-    AddCredit("'ds-sloth'");
-    AddCredit("");
     AddCredit("");
 #endif
 #ifdef VITA
-    AddCredit("PS Vita Port By:");
+    AddCredit(g_outroScreen.psVitaPortBy);
     AddCredit("");
     AddCredit("Axiom");
     AddCredit("");
     AddCredit("");
 #endif
 
-    if(!WorldCredits[1].empty())
+    if(numWorldCredits > 0)
     {
-        AddCredit("Level Design:");
+        AddCredit(g_outroScreen.levelDesign);
         AddCredit("");
-        for(A = 1; A <= maxWorldCredits; A++)
-        {
-            if(WorldCredits[A].empty())
-                break;
+        for(A = 1; A <= numWorldCredits; A++)
             AddCredit(WorldCredits[A]);
-        }
         AddCredit("");
         AddCredit("");
         AddCredit("");
@@ -315,7 +322,7 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
     AddCredit("");
-    AddCredit("Custom Sprites:");
+    AddCredit(g_outroScreen.customSprites);
     AddCredit("");
     AddCredit("Blue");
     AddCredit("Iceman404");
@@ -326,7 +333,7 @@ void SetupCredits()
     AddCredit("");
     AddCredit("");
     AddCredit("");
-    AddCredit("Special Thanks:");
+    AddCredit(g_outroScreen.specialThanks);
 #ifndef ENABLE_OLD_CREDITS
     AddCredit("");
     AddCredit("Kevsoft");
@@ -336,7 +343,7 @@ void SetupCredits()
     AddCredit("ShadowYoshi (Joey)");
     AddCredit("ZeZeinzer"); // Android testing, touchscreen controller button pictures
     AddCredit("LucyZocker"); // Android testing
-    AddCredit("DavFar Gamers"); // Spanish translation of the readme
+    AddCredit("DavFar"); // Spanish translation of the ReadMe
     AddCredit("Yingchun Soul"); // Idea for individual iceball shooting SFX and contribution with the "frozen NPC breaking" SFX
     AddCredit("MrDoubleA"); // Contribution with the "NPC got frozen" SFX
     AddCredit("Slash-18"); // Contribution with the better iceball shooting SFX
@@ -425,7 +432,7 @@ void SetupCredits()
     for(A = 1; A <= numCredits; A++)
     {
         auto &cr = Credit[A];
-        cr.Location.Width = GetS(cr.Text).size() * 18;
+        cr.Location.Width = SuperTextPixLen(GetS(cr.Text), g_gameInfo.creditsFont);
         cr.Location.Height = 16;
         cr.Location.X = (double(ScreenW) / 2) - (cr.Location.Width / 2.0);
         cr.Location.Y = 32 * A;

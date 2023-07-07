@@ -20,6 +20,7 @@
 
 
 #include <Logger/logger.h>
+#include <Integrator/integrator.h>
 #include <pge_delay.h>
 
 #include "../globals.h"
@@ -141,6 +142,8 @@ void GameLoop()
 
     if(QuickReconnectScreen::g_active)
         QuickReconnectScreen::Logic();
+
+    Integrator::sync();
 
     g_microStats.start_task(MicroStats::Layers);
 

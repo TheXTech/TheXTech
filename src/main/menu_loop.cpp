@@ -20,6 +20,7 @@
 
 #include <AppPath/app_path.h>
 #include <Utils/files.h>
+#include <Integrator/integrator.h>
 #include <PGE_File_Formats/file_formats.h>
 #include <fmt_format_ne.h>
 
@@ -519,6 +520,8 @@ void MenuLoop()
 
     if(mainMenuUpdate())
         return;
+
+    Integrator::sync();
 
     if(!g_gameInfo.introDeadMode)
         updateIntroLevelActivity();

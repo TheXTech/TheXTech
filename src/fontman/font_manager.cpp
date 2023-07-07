@@ -18,6 +18,7 @@
  */
 
 #include "sdl_proxy/sdl_assert.h"
+#include "sdl_proxy/sdl_stdinc.h"
 
 #include "font_manager.h"
 #include "font_manager_private.h"
@@ -30,24 +31,47 @@
 #include <Graphics/graphics_funcs.h>
 #include <IniProcessor/ini_processing.h>
 #include <Logger/logger.h>
-#include "core/render.h"
-
 #include <Utils/files.h>
 #include <DirManager/dirman.h>
 #include <IniProcessor/ini_processing.h>
 #include <fmt_format_ne.h>
 
+#include "global_constants.h"
+#include "core/render.h"
+#include "global_dirs.h"
+
+
 #include <vector>
+#ifdef LOW_MEM
+#   include <map>
+#else
+#   include <unordered_map>
+#endif
 
 BaseFontEngine::~BaseFontEngine()
 {}
 
+typedef VPtrList<RasterFont> RasterFontsList;
+typedef VPtrList<TtfFont> TtfFontsList;
+
 //! Complete array of available raster fonts
-static VPtrList<RasterFont> g_rasterFonts;
+static RasterFontsList g_rasterFonts;
+static RasterFontsList g_rasterFontsCustomLevel;
+static RasterFontsList g_rasterFontsCustom;
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-static VPtrList<TtfFont>    g_ttfFonts;
+static TtfFontsList    g_ttfFonts;
+static TtfFontsList    g_ttfFontsCustom;
+static TtfFontsList    g_ttfFontsCustomLevel;
+#define LOADFONTARG(x) x
+#else
+#   define LOADFONTARG(x) false
 #endif
-static VPtrList<BaseFontEngine*>    g_anyFonts;
+
+typedef VPtrList<BaseFontEngine*> PtrFontsList;
+static PtrFontsList    g_anyFonts;
+//! Backup for the case when any custom fonts are been loaded
+static PtrFontsList    g_anyFontsBackup;
+static PtrFontsList    g_anyFontsBackupWorld;
 
 //! Default raster font to render text
 static RasterFont      *g_defaultRasterFont = nullptr;
@@ -60,22 +84,114 @@ static TtfFont         *g_defaultTtfFont = nullptr;
 //! Is font manager initialized
 static bool             g_fontManagerIsInit = false;
 
-typedef std::unordered_map<std::string, int> FontsHash;
+#ifdef LOW_MEM
+typedef std::map<std::string, vbint_t> FontsHash;
+#else
+typedef std::unordered_map<std::string, vbint_t> FontsHash;
+#endif
 //! Database of available fonts
 static FontsHash        g_fontNameToId;
+//! Backup of the database of available fonts
+static FontsHash        g_fontNameToIdBackup;
+static FontsHash        g_fontNameToIdBackupWorld;
 
 static bool             g_double_pixled = false;
+
+#ifdef LOW_MEM
+static const vbint_t    c_smbxFontsMapMax = 10;
+#else
+static const vbint_t    c_smbxFontsMapMax = 20;
+#endif
+
+// Current state
+static vbint_t s_smbxFontsMap[c_smbxFontsMapMax];
+static vbint_t s_smbxFontsSizesMap[c_smbxFontsMapMax];
+
+// The initial default state
+static vbint_t s_smbxFontsMapDefault[c_smbxFontsMapMax];
+static vbint_t s_smbxFontsSizesMapDefault[c_smbxFontsMapMax];
+
+// The episode-wide preserved state without content of data directory
+static vbint_t s_smbxFontsMapWorld[c_smbxFontsMapMax];
+static vbint_t s_smbxFontsSizesMapWorld[c_smbxFontsMapMax];
+
+static const uint32_t c_defaultFontSize = 14;
+
+static bool s_fontMapsDefault = true;
+static bool s_fontMapsWorld = true;
+static std::string s_lastWorldFontsPath;
+static std::string s_lastCustomFontsPath;
+
 
 static void registerFont(BaseFontEngine* font)
 {
     g_anyFonts.push_back(font);
-    g_fontNameToId.insert({font->getFontName(), g_anyFonts.size() - 1});
+
+    vbint_t newIdx = static_cast<vbint_t>(g_anyFonts.size()) - 1;
+    auto ef = g_fontNameToId.find(font->getFontName());
+
+    // If overriding an existing font by name, also replace the SMBX code overrides
+    if(ef != g_fontNameToId.end())
+    {
+        vbint_t oldIdx = ef->second;
+        for(int i = 0; i < c_smbxFontsMapMax; ++i)
+        {
+            if(s_smbxFontsMap[i] == oldIdx)
+                s_smbxFontsMap[i] = newIdx;
+        }
+
+        ef->second = newIdx;
+    }
+    else
+        g_fontNameToId.insert({font->getFontName(), newIdx});
 }
 
-static const int c_smbxFontsMapMax = 100;
-static int s_smbxFontsMap[c_smbxFontsMapMax];
-static int s_smbxFontsSizesMap[c_smbxFontsMapMax];
-static const uint32_t c_defaultFontSize = 14;
+static void backupDefaultFontMaps()
+{
+    if(!s_fontMapsDefault)
+        return; // Don't preserve customized font maps
+
+    SDL_memcpy(s_smbxFontsMapDefault, s_smbxFontsMap, sizeof(s_smbxFontsMap));
+    SDL_memcpy(s_smbxFontsSizesMapDefault, s_smbxFontsSizesMap, sizeof(s_smbxFontsSizesMap));
+    g_anyFontsBackup = g_anyFonts;
+    g_fontNameToIdBackup = g_fontNameToId;
+}
+
+static void restoreDefaultFontMaps()
+{
+    if(s_fontMapsDefault)
+        return; // Don't restore if already default
+
+    SDL_memcpy(s_smbxFontsMap, s_smbxFontsMapDefault, sizeof(s_smbxFontsMap));
+    SDL_memcpy(s_smbxFontsSizesMap, s_smbxFontsSizesMapDefault, sizeof(s_smbxFontsSizesMap));
+    g_anyFonts = g_anyFontsBackup;
+    g_fontNameToId = g_fontNameToIdBackup;
+    s_fontMapsDefault = true;
+    s_fontMapsWorld = true;
+}
+
+static void backupWorldFontMaps()
+{
+    if(!s_fontMapsWorld)
+        return; // Don't preserve customized font maps
+
+    SDL_memcpy(s_smbxFontsMapWorld, s_smbxFontsMap, sizeof(s_smbxFontsMap));
+    SDL_memcpy(s_smbxFontsSizesMapWorld, s_smbxFontsSizesMap, sizeof(s_smbxFontsSizesMap));
+    g_anyFontsBackupWorld = g_anyFonts;
+    g_fontNameToIdBackupWorld = g_fontNameToId;
+}
+
+static void restoreWorldFontMaps()
+{
+    if(s_fontMapsWorld)
+        return; // Don't restore if already default
+
+    SDL_memcpy(s_smbxFontsMap, s_smbxFontsMapWorld, sizeof(s_smbxFontsMap));
+    SDL_memcpy(s_smbxFontsSizesMap, s_smbxFontsSizesMapWorld, sizeof(s_smbxFontsSizesMap));
+    g_anyFonts = g_anyFontsBackupWorld;
+    g_fontNameToId = g_fontNameToIdBackupWorld;
+    s_fontMapsWorld = true;
+}
 
 int FontManager::fontIdFromSmbxFont(int font)
 {
@@ -122,67 +238,51 @@ TtfFont* FontManager::getTtfFontByName(const std::string& fontName)
 #endif
 }
 
-void FontManager::initBasic()
-{
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-    if(!g_ft)
-        initializeFreeType();
-    g_defaultTtfFont = nullptr;
+static bool s_loadFintsFromDir(DirListCI &fonts_root,
+                               const std::string &subdir,
+                               RasterFontsList &outRasterFonts,
+                               TtfFontsList &outTtfFonts)
+#else
+static bool s_loadFintsFromDir(DirListCI &fonts_root,
+                               const std::string &subdir,
+                               RasterFontsList &outRasterFonts,
+                               bool)
 #endif
-
-    g_double_pixled = false;
-    g_fontManagerIsInit = true;
-}
-
-void FontManager::initFull()
 {
-#ifdef THEXTECH_ENABLE_TTF_SUPPORT
-    if(!g_ft)
-        initializeFreeType();
-    g_defaultTtfFont = nullptr;
-#endif
-
-    g_double_pixled = false; //ConfigManager::setup_fonts.double_pixled;
-
-    std::memset(s_smbxFontsMap, 0, sizeof(s_smbxFontsMap));
-    std::memset(s_smbxFontsSizesMap, 0, sizeof(s_smbxFontsSizesMap));
-
-    for(int i = 0; i < c_smbxFontsMapMax; ++i)
-    {
-        s_smbxFontsMap[i] = -1;
-        s_smbxFontsSizesMap[i] = -1;
-    }
-
-    const std::string fonts_root = AppPathManager::assetsRoot() + "fonts";
+    using namespace FontManager;
 
     /***************Load raster font support****************/
-    DirMan fontsDir(fonts_root);
+    if(!subdir.empty() && !fonts_root.dirExistsCI(subdir))
+        return false; // Fonts manager is unavailable when directory is not exists
 
-    std::vector<std::string> files;
-    fontsDir.getListOfFiles(files, {".font.ini"});
+    std::vector<std::string> files = fonts_root.getFilesList(subdir, {".font.ini"});
     std::sort(files.begin(), files.end());
+
+    std::string sSubDir = subdir + (subdir.empty() ? "" : "/");
+
     for(std::string &fonFile : files)
     {
-        g_rasterFonts.emplace_back();
-        RasterFont& rf = g_rasterFonts.back();
-        std::string fontPath = fontsDir.absolutePath() + "/" + fonFile;
+        outRasterFonts.emplace_back();
+        RasterFont& rf = outRasterFonts.back();
+        std::string fontPath = fonts_root.getCurDir() + sSubDir + fonFile;
         pLogDebug("Loading raster font %s...", fontPath.c_str());
         rf.loadFont(fontPath);
 
         if(!rf.isLoaded())   //Pop broken font from array
         {
             pLogWarning("Failed to load the font %s", fontPath.c_str());
-            g_rasterFonts.pop_back();
+            outRasterFonts.pop_back();
         }
         else   //Register font name in a table
             registerFont(&rf);
     }
 
-    if(!g_rasterFonts.empty())
-        g_defaultRasterFont = &g_rasterFonts.front();
+    if(!outRasterFonts.empty())
+        g_defaultRasterFont = &outRasterFonts.front();
 
     /***************Load TTF font support****************/
-    IniProcessing overrider(fonts_root + "/overrides.ini");
+    IniProcessing overrider(fonts_root.getCurDir() + subdir + "/overrides.ini");
 
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     if(overrider.beginGroup("ttf-fonts"))
@@ -222,10 +322,10 @@ void FontManager::initFull()
 #endif
             overrider.read(keyDoublePixel.c_str(), doublePixel, doublePixelDefault);
 
-            std::string fontPath = fontsDir.absolutePath() + "/" + fontFile;
+            std::string fontPath = fonts_root.getCurDir() + sSubDir + fontFile;
 
-            g_ttfFonts.emplace_back();
-            TtfFont& tf = g_ttfFonts.back();
+            outTtfFonts.emplace_back();
+            TtfFont& tf = outTtfFonts.back();
 
             tf.setAntiAlias(antiAlias);
             tf.setBitmapSize(bitmapSize);
@@ -236,7 +336,7 @@ void FontManager::initFull()
             if(!tf.isLoaded())   //Pop broken font from array
             {
                 pLogWarning("Failed to load the font %s", fontPath.c_str());
-                g_ttfFonts.pop_back();
+                outTtfFonts.pop_back();
             }
             else   //Register font name in a table
             {
@@ -280,6 +380,51 @@ void FontManager::initFull()
 
     overrider.endGroup();
 
+    return true;
+}
+
+void FontManager::initFull()
+{
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
+    if(!g_ft)
+        initializeFreeType();
+    g_defaultTtfFont = nullptr;
+#endif
+
+    g_double_pixled = false; //ConfigManager::setup_fonts.double_pixled;
+
+    SDL_memset(s_smbxFontsMap, 0, sizeof(s_smbxFontsMap));
+    SDL_memset(s_smbxFontsSizesMap, 0, sizeof(s_smbxFontsSizesMap));
+
+    for(int i = 0; i < c_smbxFontsMapMax; ++i)
+    {
+        s_smbxFontsMap[i] = -1;
+        s_smbxFontsSizesMap[i] = -1;
+    }
+
+    const std::string fonts_root = AppPathManager::assetsRoot() + "fonts";
+    if(!DirMan::exists(fonts_root))
+    {
+        pLogWarning("Can't load fonts as directory %s does not exists", fonts_root.c_str());
+        return;
+    }
+
+    DirListCI fontsRootCI(fonts_root);
+
+    if(!s_loadFintsFromDir(fontsRootCI, std::string(), g_rasterFonts, LOADFONTARG(g_ttfFonts)))
+    {
+        pLogWarning("Can't load any font from the directory %s", fonts_root.c_str());
+        return;
+    }
+
+    if(g_anyFonts.empty())
+    {
+        pLogWarning("There is no available fonts at the directory %s", fonts_root.c_str());
+        return;
+    }
+
+    s_fontMapsDefault = true;
+    s_fontMapsWorld = true;
     g_fontManagerIsInit = true;
 }
 
@@ -294,6 +439,90 @@ void FontManager::quit()
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
     closeFreeType();
 #endif
+}
+
+void FontManager::loadCustomFonts()
+{
+    backupDefaultFontMaps();
+    bool doLoadWorld = false;
+    bool doLoadCustom = false;
+
+    const std::string& episodeRoot = g_dirEpisode.getCurDir();
+    const std::string& dataSubDir = g_dirCustom.getCurDir();
+
+    // Loading fonts from the episode directory
+    if(s_lastWorldFontsPath != episodeRoot)
+    {
+        if(!s_lastWorldFontsPath.empty())
+            clearAllCustomFonts();
+        doLoadWorld = true;
+        pLogDebug("Attempt to load custom fonts at %sfonts", episodeRoot.c_str());
+    }
+    else
+        pLogDebug("Fonts at %sfonts already loaded", episodeRoot.c_str());
+
+    if(doLoadWorld && s_loadFintsFromDir(g_dirEpisode,
+                                         "fonts",
+                                         g_rasterFontsCustom,
+                                         LOADFONTARG(g_ttfFontsCustom)))
+    {
+        s_lastWorldFontsPath = episodeRoot;
+        pLogDebug("Loaded custom fonts from the %sfonts", episodeRoot.c_str());
+        s_fontMapsDefault = false;
+        s_fontMapsWorld = true;
+        backupWorldFontMaps();
+    }
+
+    // Loading fonts from the data directory
+    if(s_lastCustomFontsPath != dataSubDir)
+    {
+        if(!s_lastCustomFontsPath.empty())
+            clearLevelFonts();
+        doLoadCustom = true;
+        pLogDebug("Attempt to load custom fonts at %sfonts", dataSubDir.c_str());
+    }
+    else
+        pLogDebug("Fonts at %sfonts already loaded", dataSubDir.c_str());
+
+    if(doLoadCustom && s_loadFintsFromDir(g_dirCustom,
+                                         "fonts",
+                                          g_rasterFontsCustomLevel,
+                                          LOADFONTARG(g_ttfFontsCustomLevel)))
+    {
+        s_lastCustomFontsPath = dataSubDir;
+        pLogDebug("Loaded custom fonts from the %sfonts", dataSubDir.c_str());
+        s_fontMapsDefault = false;
+        s_fontMapsWorld = false;
+    }
+}
+
+void FontManager::clearAllCustomFonts()
+{
+    g_rasterFontsCustomLevel.clear();
+    g_rasterFontsCustom.clear();
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
+    g_ttfFontsCustomLevel.clear();
+    g_ttfFontsCustom.clear();
+#endif
+    s_lastCustomFontsPath.clear();
+    s_lastWorldFontsPath.clear();
+    restoreDefaultFontMaps();
+}
+
+void FontManager::clearLevelFonts()
+{
+    g_rasterFontsCustomLevel.clear();
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
+    g_ttfFontsCustomLevel.clear();
+#endif
+
+    s_lastCustomFontsPath.clear();
+    restoreWorldFontMaps();
+}
+
+bool FontManager::isInitied()
+{
+    return g_fontManagerIsInit;
 }
 
 

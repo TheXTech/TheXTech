@@ -46,10 +46,12 @@
 #include "main/trees.h"
 #include "main/game_globals.h"
 #include "main/screen_connect.h"
+#include "main/game_strings.h"
 #include "load_gfx.h"
 #include "core/render.h"
 #include "core/window.h"
 #include "core/events.h"
+#include "fontman/font_manager.h"
 
 #include "controls.h"
 
@@ -2884,6 +2886,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     LevelEditor = false;
     SetupPlayers();
     MagicHand = magicHand;
+    FontManager::clearAllCustomFonts();
 
     if(TestFullscreen)
     {
@@ -2954,7 +2957,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     {
         if(!OpenLevel(FullFileName))
         {
-            MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", FullFileName);
+            MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, FullFileName);
             PauseGame(PauseCode::Message);
             ErrorQuit = true;
         }

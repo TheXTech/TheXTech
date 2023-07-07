@@ -45,6 +45,8 @@
 #include "speedrunner.h"
 #include "cheat_code.h"
 
+#include "main/game_strings.h"
+
 #include "editor.h"
 
 namespace PauseScreen
@@ -59,6 +61,7 @@ struct MenuItem
 
 static bool s_is_legacy = false;
 static int s_pause_plr = 0;
+static int s_longest_width = 0;
 static std::vector<MenuItem> s_items;
 
 static bool s_Continue()
@@ -108,7 +111,7 @@ static bool s_DropAddScreen()
 
 static bool s_CheatScreen()
 {
-    cheats_setBuffer(TextEntryScreen::Run("Enter cheat:"));
+    cheats_setBuffer(TextEntryScreen::Run(g_gameStrings.pauseItemEnterCode));
     // uncomment this if you want to return to the pause menu
     // MenuCursorCanMove = false;
     // return false;
@@ -201,82 +204,100 @@ void Init(int plr, bool LegacyPause)
     // pause
     if(TestLevel && LevelBeatCode == -2)
     {
-        s_items.push_back(MenuItem{"RESTART", s_RestartLevel});
-        s_items.push_back(MenuItem{"RESET CHECKPOINTS", s_ResetCheckpoints});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
 
         if(Backup_FullFileName.empty())
-            s_items.push_back(MenuItem{"QUIT TESTING", s_QuitTesting});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
         else
-            s_items.push_back(MenuItem{"RETURN TO EDITOR", s_QuitTesting});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemReturnToEditor, s_QuitTesting});
     }
     else if(TestLevel)
     {
-        s_items.push_back(MenuItem{"CONTINUE", s_Continue});
-        s_items.push_back(MenuItem{"RESTART LEVEL", s_RestartLevel});
-        s_items.push_back(MenuItem{"RESET CHECKPOINTS", s_ResetCheckpoints});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
 
         if(g_compatibility.allow_drop_add && !LegacyPause)
-            s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
         if(g_config.enter_cheats_menu_item && !LegacyPause)
-            s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
         if(Backup_FullFileName.empty())
-            s_items.push_back(MenuItem{"QUIT TESTING", s_QuitTesting});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
         else
-            s_items.push_back(MenuItem{"RETURN TO EDITOR", s_QuitTesting});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemReturnToEditor, s_QuitTesting});
     }
     else
     {
-        s_items.push_back(MenuItem{"CONTINUE", s_Continue});
+        s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
 
         if(g_compatibility.allow_drop_add && !LegacyPause)
-            s_items.push_back(MenuItem{"DROP/ADD PLAYERS", s_DropAddScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
         if(g_config.enter_cheats_menu_item && !LegacyPause)
-            s_items.push_back(MenuItem{"ENTER CHEAT", s_CheatScreen});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
         if(CanSave)
         {
-            s_items.push_back(MenuItem{"SAVE & CONTINUE", s_SaveAndContinue});
-            s_items.push_back(MenuItem{"SAVE & QUIT", s_Quit});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemSaveAndContinue, s_SaveAndContinue});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemSaveAndQuit, s_Quit});
         }
         else
         {
-            s_items.push_back(MenuItem{"QUIT", s_Quit});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuit, s_Quit});
         }
     }
+
+    // set the longest width
+    s_longest_width = 0;
+
+    for(size_t i = 0; i < s_items.size(); i++)
+    {
+        int item_width = SuperTextPixLen(s_items[i].name, 3);
+        if(item_width > s_longest_width)
+            s_longest_width = item_width;
+    }
+
+    int total_menu_height = s_items.size() * 36 - 18;
+    int total_menu_width = s_longest_width + 40;
+
+    // GBA bounds
+    if(total_menu_height > 320 || total_menu_width > 480)
+        pLogDebug("Menu doesn't fit within bounds (actual size %dx%d, bounds 480x320)", total_menu_width, total_menu_height);
 }
 
 void Render()
 {
+    // height includes intermediate padding but no top/bottom padding
+    // width includes cursor on left and 20px padding on right for symmetry
     int total_menu_height = s_items.size() * 36 - 18;
+    int total_menu_width = s_longest_width + 40;
+
+    // enforce GBA bounds (480x320)
+    if(total_menu_height > 320)
+        total_menu_height = 320;
+
+    if(total_menu_width > 480)
+        total_menu_width = 480;
+
     int menu_box_height = 200;
+    int menu_box_width = 380;
 
     if(menu_box_height - total_menu_height < 18)
         menu_box_height = total_menu_height + 18;
 
-    bool has_long_item = false;
+    if(menu_box_width - total_menu_width < 32)
+        menu_box_width = total_menu_width + 32;
 
-    for(const MenuItem& i : s_items)
-    {
-        if(i.name.size() > 10)
-            has_long_item = true;
-    }
-
-    int menu_left_X = ScreenW / 2 - 190 + 62;
-
-    if(!has_long_item)
-        menu_left_X += 56;
-
+    int menu_left_X = ScreenW / 2 - total_menu_width / 2 + 20;
     int menu_top_Y = ScreenH / 2 - total_menu_height / 2;
 
-    XRender::renderRect(ScreenW / 2 - 190, ScreenH / 2 - menu_box_height / 2, 380, menu_box_height, 0, 0, 0);
+    XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, 0, 0, 0);
 
     for(size_t i = 0; i < s_items.size(); i++)
-    {
         SuperPrint(s_items[i].name, 3, menu_left_X, menu_top_Y + (i * 36));
-    }
 
     if(GFX.PCursor.inited)
     {

@@ -30,6 +30,8 @@
 #include "main/presetup.h"
 #include "main/game_info.h"
 #include "main/speedrunner.h"
+#include "main/translate.h"
+#include "core/language.h"
 #include "compat.h"
 #include "controls.h"
 #include <AppPath/app_path.h>
@@ -343,7 +345,8 @@ int main(int argc, char**argv)
                                                    "  always - Blink effect will work always\n"
                                                    "  never - Disable blink effect completely",
                                                     false, "undefined",
-                                                   "opaque, always, never");
+                                                   "opaque, always, never",
+                                                    cmd);
         TCLAP::SwitchArg switchDisplayControls(std::string(), "show-controls", "Display current controller state while the game process", false);
         TCLAP::ValueArg<unsigned int> showBatteryStatus(std::string(), "show-battery-status",
                                                    "Display the battery status indicator (if available):\n"
@@ -355,6 +358,11 @@ int main(int argc, char**argv)
                                                     false, 0u,
                                                    "0, 1, 2, 3, or 4",
                                                    cmd);
+#ifndef THEXTECH_DISABLE_LANG_TOOLS
+        TCLAP::SwitchArg switchMakeLangTemplate(std::string(), "export-lang", "Exports the default language template", false);
+        TCLAP::SwitchArg switchLangUpdate(std::string(), "lang-update", "Updated all language of assets package: missing lines will be added", false);
+#endif
+        TCLAP::ValueArg<std::string> lang(std::string(), "lang", "Set the engine's language by code", false, "", "en, ru, zh-cn, etc.");
 
         TCLAP::SwitchArg switchVerboseLog(std::string(), "verbose", "Enable log output into the terminal", false);
 
@@ -377,10 +385,14 @@ int main(int argc, char**argv)
         cmd.add(&switchVerboseLog);
         cmd.add(&switchSpeedRunSemiTransparent);
         cmd.add(&switchDisplayControls);
+#ifndef THEXTECH_DISABLE_LANG_TOOLS
+        cmd.add(&switchMakeLangTemplate);
+        cmd.add(&switchLangUpdate);
+#endif
+        cmd.add(&lang);
         cmd.add(&inputFileNames);
 
         cmd.parse(argc, argv);
-
 
         // Initialize the assets and user paths
         {
@@ -396,6 +408,28 @@ int main(int argc, char**argv)
             AppPathManager::initAppPath();
             AppPath = AppPathManager::assetsRoot();
         }
+
+#ifndef THEXTECH_DISABLE_LANG_TOOLS
+        // Print the language template to the screen
+        if(switchMakeLangTemplate.isSet() && switchMakeLangTemplate.getValue())
+        {
+            initGameInfo();
+            XTechTranslate translate;
+            translate.exportTemplate();
+            return 0;
+        }
+
+        // Update all translation files at current assets pack
+        if(switchLangUpdate.isSet() && switchLangUpdate.getValue())
+        {
+            initGameInfo();
+            XTechTranslate translate;
+            translate.updateLanguages();
+            return 0;
+        }
+#endif
+
+        XLanguage::init();
 
         OpenConfig_preSetup();
 
@@ -432,7 +466,7 @@ int main(int argc, char**argv)
                 return 2;
             }
 #ifdef DEBUG_BUILD
-            std::cerr << "Manually selected renderer:" << rt << " - " << setup.renderType << std::endl;
+            std::cerr << "Manually selected renderer: " << rt << " - " << setup.renderType << std::endl;
             std::cerr.flush();
 #endif
         }
@@ -544,6 +578,19 @@ int main(int argc, char**argv)
         {
             setup.testShowFPS = true;
             setup.neverPause = true;
+        }
+
+        if(lang.isSet()) // Note: this part of code must be BEFORE the XLanguage::init() call
+        {
+            CurrentLanguage = lang.getValue();
+            CurrentLangDialect.clear();
+            XLanguage::splitRegion('-');
+            XLanguage::splitRegion('_');
+            XLanguage::initManual();
+#ifdef DEBUG_BUILD
+            std::cerr << "Debug: Manually selected language: " << CurrentLanguage << (CurrentLangDialect.empty() ? "" : "-" + CurrentLangDialect) << std::endl;
+            std::cerr.flush();
+#endif
         }
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions

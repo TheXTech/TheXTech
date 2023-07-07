@@ -30,6 +30,8 @@
 #include "../controls.h"
 #include "../layers.h"
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "npc/npc_queues.h"
 
 void KillNPC(int A, int B)
@@ -789,7 +791,7 @@ void KillNPC(int A, int B)
             CharStuff(A, true);
             if(NPC[A].Special == 287)
                 NPC[A].Special = RandomBonus();
-            NewEffect(56, NPC[A].Location, 1, static_cast<int>(floor(static_cast<double>(NPC[A].Special))));
+            NewEffect(56, NPC[A].Location, 1, (int)SDL_floor(NPC[A].Special), false, (vbint_t)NPC[A].Variant);
             if(C == 98)
                 Effect[numEffects].Frame += 3;
             else if(C == 99)

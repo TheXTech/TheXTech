@@ -64,11 +64,17 @@ void initGameInfo()
 #   endif
 #endif /* CUSTOM_GAME_NAME_TITLE */
 
+    g_gameInfo.statusIconName.clear();
+
     g_gameInfo.characterName[1] = "Mario";
     g_gameInfo.characterName[2] = "Luigi";
     g_gameInfo.characterName[3] = "Peach";
     g_gameInfo.characterName[4] = "Toad";
     g_gameInfo.characterName[5] = "Link";
+
+    g_gameInfo.wordStarAccusativeSingular = "star";
+    g_gameInfo.wordStarAccusativeDual_Cnt = "";
+    g_gameInfo.wordStarAccusativePlural = "stars";
 
     g_gameInfo.creditsFont = 4;
 
@@ -113,6 +119,7 @@ void initGameInfo()
             g_gameInfo.titleWindow = fmt::format_ne("{0} - (TheXTech v{1}, #{2})", g_gameInfo.title, V_LATEST_STABLE, V_BUILD_VER);
             config.read("disable-two-player", g_gameInfo.disableTwoPlayer, false);
             config.read("disable-battle-mode", g_gameInfo.disableBattleMode, false);
+            config.read("status-icon-name", g_gameInfo.statusIconName, std::string());
         }
         config.endGroup();
 
@@ -128,6 +135,14 @@ void initGameInfo()
         config.beginGroup("luna-script");
         {
             config.read("enable-engine", gLunaEnabledGlobally, true);
+        }
+        config.endGroup();
+
+        config.beginGroup("objects");
+        {
+            config.read("star", g_gameInfo.wordStarAccusativeSingular, "star");
+            config.read("star-singular", g_gameInfo.wordStarAccusativeSingular, g_gameInfo.wordStarAccusativeSingular);
+            config.read("star-plural", g_gameInfo.wordStarAccusativePlural, g_gameInfo.wordStarAccusativeSingular + "s");
         }
         config.endGroup();
 

@@ -29,17 +29,28 @@
 #include "controls.h"
 #include "control/input_3ds.h"
 
+#include "control/controls_strings.h"
+
+#include "main/menu_main.h"
+
 #include <Logger/logger.h>
 
-const char* KEYNAMES[32] = {
-    "A", "B", "SELECT", "START",
-    "D-PAD RIGHT", "D-PAD LEFT", "D-PAD UP", "D-PAD DOWN",
-    "R", "L", "X", "Y",
-    "", "", "ZL", "ZR",
-    "", "", "", "",
-    "TOUCH", "", "", "",
-    "C-STICK RIGHT", "C-STICK LEFT", "C-STICK UP", "C-STICK DOWN",
-    "THUMB RIGHT", "THUMB LEFT", "THUMB UP", "THUMB DOWN"
+static std::string s_buffer;
+
+#define buttonRight Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Right]
+#define buttonLeft  Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Left]
+#define buttonUp    Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Up]
+#define buttonDown  Controls::PlayerControls::g_button_name_UI[Controls::PlayerControls::Down]
+
+const std::string* KEYNAMES[32] = {
+ &g_controlsStrings.tdsButtonA,   &g_controlsStrings.tdsButtonB, &g_controlsStrings.tdsButtonSelect, &g_controlsStrings.tdsButtonStart,
+ &buttonRight,                    &buttonLeft,                   &buttonUp,                     &buttonDown,
+ &g_controlsStrings.tdsButtonR,   &g_controlsStrings.tdsButtonL, &g_controlsStrings.tdsButtonX, &g_controlsStrings.tdsButtonY,
+ &g_mainMenu.caseNone,            &g_mainMenu.caseNone,          &g_controlsStrings.tdsButtonZL, &g_controlsStrings.tdsButtonZR,
+ &g_mainMenu.caseNone,            &g_mainMenu.caseNone,          &g_mainMenu.caseNone,          &g_mainMenu.caseNone,
+ &g_controlsStrings.tdsCasePen,   &g_mainMenu.caseNone,          &g_mainMenu.caseNone,          &g_mainMenu.caseNone,
+ &buttonRight,                    &buttonLeft,                   &buttonUp,                     &buttonDown,
+ &buttonRight,                    &buttonLeft,                   &buttonUp,                     &buttonDown,
 };
 
 enum KEYID {
@@ -622,7 +633,7 @@ const char* InputMethodProfile_3DS::NamePrimaryButton(ControlsClass c, size_t i)
     if(c == ControlsClass::Player)
         keys = this->m_keys;
     else if(c == ControlsClass::Cursor)
-        return "(PEN)";
+        return g_controlsStrings.tdsCasePen.c_str();
     else if(c == ControlsClass::Editor)
         keys = this->m_editor_keys;
     else if(c == ControlsClass::Hotkey)
@@ -631,12 +642,30 @@ const char* InputMethodProfile_3DS::NamePrimaryButton(ControlsClass c, size_t i)
         return "";
 
     if(keys[i] == null_key)
-        return "NONE";
+        return g_mainMenu.caseNone.c_str();
 
     if(keys[i] < 0 || keys[i] >= 32)
-        return "(INVALID)";
+        return g_controlsStrings.sharedCaseInvalid.c_str();
 
-    return KEYNAMES[keys[i]];
+    if(keys[i] >= KEYID_DRIGHT && keys[i] <= KEYID_DDOWN)
+    {
+        s_buffer = g_controlsStrings.tdsDpad + " " + *KEYNAMES[keys[i]];
+        return s_buffer.c_str();
+    }
+
+    if(keys[i] >= KEYID_CSTICK_RIGHT && keys[i] <= KEYID_CSTICK_DOWN)
+    {
+        s_buffer = g_controlsStrings.tdsCstick + " " + *KEYNAMES[keys[i]];
+        return s_buffer.c_str();
+    }
+
+    if(keys[i] >= KEYID_PAD_RIGHT && keys[i] <= KEYID_PAD_DOWN)
+    {
+        s_buffer = g_controlsStrings.tdsTstick + " " + *KEYNAMES[keys[i]];
+        return s_buffer.c_str();
+    }
+
+    return KEYNAMES[keys[i]]->c_str();
 }
 
 const char* InputMethodProfile_3DS::NameSecondaryButton(ControlsClass c, size_t i)
@@ -654,10 +683,31 @@ const char* InputMethodProfile_3DS::NameSecondaryButton(ControlsClass c, size_t 
     else
         return "";
 
-    if(keys2[i] < 0 || keys2[i] >= 32)
-        return "(INVALID)";
+    if(keys2[i] == null_key)
+        return "";
 
-    return KEYNAMES[keys2[i]];
+    if(keys2[i] < 0 || keys2[i] >= 32)
+        return g_controlsStrings.sharedCaseInvalid.c_str();
+
+    if(keys2[i] >= KEYID_DRIGHT && keys2[i] <= KEYID_DDOWN)
+    {
+        s_buffer = g_controlsStrings.tdsDpad + " " + *KEYNAMES[keys2[i]];
+        return s_buffer.c_str();
+    }
+
+    if(keys2[i] >= KEYID_CSTICK_RIGHT && keys2[i] <= KEYID_CSTICK_DOWN)
+    {
+        s_buffer = g_controlsStrings.tdsCstick + " " + *KEYNAMES[keys2[i]];
+        return s_buffer.c_str();
+    }
+
+    if(keys2[i] >= KEYID_PAD_RIGHT && keys2[i] <= KEYID_PAD_DOWN)
+    {
+        s_buffer = g_controlsStrings.tdsTstick + " " + *KEYNAMES[keys2[i]];
+        return s_buffer.c_str();
+    }
+
+    return KEYNAMES[keys2[i]]->c_str();
 }
 
 void InputMethodProfile_3DS::SaveConfig(IniProcessing* ctl)
@@ -1033,7 +1083,7 @@ InputMethod* InputMethodType_3DS::Poll(const std::vector<InputMethod*>& active_m
     if(!method)
         return nullptr;
 
-    method->Name = "3DS";
+    method->Name = this->Name;
     method->Type = this;
     method->Profile = target_profile;
 
@@ -1085,7 +1135,7 @@ size_t InputMethodType_3DS::GetOptionCount()
 const char* InputMethodType_3DS::GetOptionName(size_t i)
 {
     if(i == 0)
-        return "MAX PLAYERS";
+        return g_controlsStrings.sharedOptionMaxPlayers.c_str();
 
     return nullptr;
 }
@@ -1113,7 +1163,7 @@ bool InputMethodType_3DS::OptionChange(size_t i)
         this->m_maxPlayers ++;
 
         if(this->m_maxPlayers > 2)
-            this->m_maxPlayers = 0;
+            this->m_maxPlayers = 1;
 
         return true;
     }
@@ -1126,7 +1176,7 @@ bool InputMethodType_3DS::OptionRotateLeft(size_t i)
 {
     if(i == 0)
     {
-        if(this->m_maxPlayers > 0)
+        if(this->m_maxPlayers > 1)
         {
             this->m_maxPlayers --;
             return true;

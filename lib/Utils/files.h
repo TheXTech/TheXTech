@@ -52,6 +52,7 @@ namespace Files
     bool hasSuffix(const std::string &path, const std::string &suffix);
     //Appends "m" into basename of the file name before last dot
     void getGifMask(std::string &mask, const std::string &front);
+    bool dumpFile(const std::string &inPath, std::string &outData);
 }
 
 #endif // FILES_H

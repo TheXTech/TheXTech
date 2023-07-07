@@ -94,6 +94,7 @@ namespace TextEntryScreen
 {
 
 std::string Text;
+static std::vector<int16_t> s_Prompt_UTF_offsets;
 static std::vector<int16_t> s_Text_UTF_offsets;
 
 static std::string s_Prompt;
@@ -160,6 +161,7 @@ static const char* s_keymap_JP =
 static std::vector<int16_t> s_current_keymap_UTF_offsets;
 
 static const char* s_current_keymap = s_keymap_EN;
+// static const char* s_current_keymap = s_keymap_RU;
 static int s_current_keymap_rows = 5;
 static int s_current_keymap_cols = 12;
 static int s_current_keymap_levels = 3;
@@ -391,7 +393,7 @@ void Insert(const char* c, int size)
 
     find_utf_offsets(Text.c_str(), s_Text_UTF_offsets);
 
-    while(s_cursor + 1 < (int)s_Text_UTF_offsets.size() && s_Text_UTF_offsets[s_cursor] < new_pos)
+    while(s_cursor + 1 < (int16_t)s_Text_UTF_offsets.size() && s_Text_UTF_offsets[s_cursor] < new_pos)
         s_cursor ++;
 }
 
@@ -504,7 +506,7 @@ bool KeyboardMouseRender(bool mouse, bool render)
     int n_text_chars = (s_current_keymap_cols * key_size - 20) / 18 - 1;
     int n_prompt_chars = n_text_chars + 2;
 
-    int n_prompt_lines = ((s_Prompt.size() + n_prompt_chars - 1) / n_prompt_chars);
+    int n_prompt_lines = ((s_Prompt_UTF_offsets.size() - 1 + n_prompt_chars - 1) / n_prompt_chars);
     int n_text_lines = ((s_Text_UTF_offsets.size() - 1 + n_text_chars - 1) / n_text_chars);
     if(n_text_lines == 0)
         n_text_lines = 1;
@@ -526,20 +528,23 @@ bool KeyboardMouseRender(bool mouse, bool render)
         XRender::renderRect(win_x, win_y, win_width, win_height, 0.6f, 0.6f, 1.f, 0.8f);
         for(int i = 0; i < n_prompt_lines; i ++)
         {
-            SuperPrint(s_Prompt.substr(n_prompt_chars * i, n_prompt_chars), 4, win_x + 10, win_y + 6 + 20*i);
+            if(n_prompt_chars * (i + 1) < (int)s_Prompt_UTF_offsets.size())
+                SuperPrint(s_Prompt_UTF_offsets[n_prompt_chars * (i + 1)] - s_Prompt_UTF_offsets[n_prompt_chars * i], s_Prompt.c_str() + s_Prompt_UTF_offsets[n_prompt_chars * i], 4, win_x + 10, win_y + 6 + 20*i);
+            else
+                SuperPrint(s_Prompt.c_str() + s_Prompt_UTF_offsets[n_prompt_chars * i], 4, win_x + 10, win_y + 6 + 20*i);
         }
 
         XRender::renderRect(win_x + 20, win_y + n_prompt_lines * 20 + 4, win_width - 40, n_text_lines * 20, 0.f, 0.f, 0.f, 0.8f);
         for(int i = 0; i < n_text_lines; i ++)
         {
-            if(n_text_chars * i + n_text_chars < (int)s_Text_UTF_offsets.size())
-                SuperPrint(s_Text_UTF_offsets[n_text_chars * i + n_text_chars] - s_Text_UTF_offsets[n_text_chars * i], Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4, win_x + 10 + 16, win_y + 6 + 20 * (n_prompt_lines + i));
+            if(n_text_chars * (i + 1) < (int)s_Text_UTF_offsets.size())
+                SuperPrint(s_Text_UTF_offsets[n_text_chars * (i + 1)] - s_Text_UTF_offsets[n_text_chars * i], Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4, win_x + 10 + 16, win_y + 6 + 20 * (n_prompt_lines + i));
             else
                 SuperPrint(Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4, win_x + 10 + 16, win_y + 6 + 20 * (n_prompt_lines + i));
+
             // render cursor if it is on this line
             if((s_cursor >= i * n_text_chars && s_cursor < (i + 1) * n_text_chars) || (s_cursor == (i + 1) * n_text_chars && s_cursor == (int)s_Text_UTF_offsets.size() - 1))
             {
-                // do something else if we ever have var-length strings
                 int cursor_offset = SuperTextPixLen(s_Text_UTF_offsets[s_cursor] - s_Text_UTF_offsets[n_text_chars * i], Text.c_str() + s_Text_UTF_offsets[n_text_chars * i], 4);
                 XRender::renderRect(win_x + 10 + 16 + cursor_offset - 2, win_y + 4 + 20 * (n_prompt_lines + i), 2, 20, 1.f, 1.f, 1.f, 0.5f);
             }
@@ -596,6 +601,7 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     s_Prompt = Prompt;
     Text = Value;
     find_utf_offsets(Text.c_str(), s_Text_UTF_offsets);
+    find_utf_offsets(s_Prompt.c_str(), s_Prompt_UTF_offsets);
     s_cursor = s_Text_UTF_offsets.size() - 1;
     s_mouse_up = 2;
     s_cur_level = 0;

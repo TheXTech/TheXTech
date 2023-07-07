@@ -7,7 +7,7 @@ if [[ "$reponame" == "LuaJIT" ]]; then
     echo "Branch v2.1"
     git checkout v2.1
     git pull origin v2.1
-elif [[ "$reponame" == "harfbuzz" ]]; then
+elif [[ "$reponame" == "harfbuzz" || "$reponame" == "thextech-discord-rpc" ]]; then
     echo "Branch main"
     git checkout main
     git pull origin main

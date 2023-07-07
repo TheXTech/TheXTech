@@ -30,6 +30,8 @@
 #include "../controls.h"
 #include "joystick.h"
 
+#include "control/controls_strings.h"
+
 namespace Controls
 {
 
@@ -1460,6 +1462,11 @@ InputMethodType_Joystick::~InputMethodType_Joystick()
         this->CloseJoystick(joystick_id);
 }
 
+const std::string& InputMethodType_Joystick::LocalName() const
+{
+    return g_controlsStrings.nameGamepad;
+}
+
 bool InputMethodType_Joystick::TestProfileType(InputMethodProfile* profile)
 {
     return (bool)dynamic_cast<InputMethodProfile_Joystick*>(profile);
@@ -1793,7 +1800,7 @@ InputMethodProfile* InputMethodType_Joystick::AddOldJoystickProfile()
         return nullptr;
 
     p->InitAsJoystick();
-    p->Name = "Old Joy " + std::to_string(this->m_profiles.size());
+    p->Name = g_controlsStrings.nameOldJoy + " " + std::to_string(this->m_profiles.size());
 
     return p_;
 }
@@ -1886,7 +1893,7 @@ size_t InputMethodType_Joystick::GetOptionCount()
 const char* InputMethodType_Joystick::GetOptionName(size_t i)
 {
     if(i == 0)
-        return "NEW PROFILE FOR OLD JOYSTICK";
+        return g_controlsStrings.phraseNewProfOldJoy.c_str();
     else
         return nullptr;
 }

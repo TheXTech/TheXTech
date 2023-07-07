@@ -373,7 +373,7 @@ struct NPC_t
 //    Special6 As Double
     double Special6 = 0.0;
 // EXTRA: Variant (previously Special7)
-    uint8_t Variant = 0;
+    uint16_t Variant = 0;
 //    TurnAround As Boolean 'if the NPC needs to turn around
     bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.
@@ -832,6 +832,8 @@ struct Effect_t
     vbint_t Life = 0;
 //    NewNpc As Integer 'when an effect should create and NPC, such as Yoshi
     vbint_t NewNpc = 0;
+// EXTRA: New NPC's special value
+    vbint_t NewNpcSpecial = 0;
 //    Shadow As Boolean 'for a black effect set to true
     bool Shadow = false;
 //End Type
@@ -1337,6 +1339,7 @@ extern RangeArr<Scene_t, 1, maxScenes> Scene;
 DECLREF_T(Scene);
 //Public Credit(1 To 200) As CreditLine 'for end game credits
 extern RangeArr<CreditLine_t, 1, maxCreditsLines> Credit;
+extern int numWorldCredits;
 extern double CreditOffsetY;
 extern double CreditTotalHeight;
 //Public numCredits As Integer 'number of credits
@@ -2301,5 +2304,9 @@ const int curRelease = 64;
 extern int ScreenW;
 extern int ScreenH;
 #endif
+
+//EXTRA: Language
+extern std::string CurrentLanguage;
+extern std::string CurrentLangDialect;
 
 #endif // GLOBALS_H

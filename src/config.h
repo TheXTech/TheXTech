@@ -78,6 +78,10 @@ extern struct Config_t
     int     InternalH = 600;
     //! HUD follows player onscreen (useful for levels much larger than the intended screen size)
     bool    hud_follows_player = false;
+#ifdef ENABLE_XTECH_DISCORD_RPC
+    //! Enable Discord Rich Presense support on supported platforms
+    bool    discord_rpc = false;
+#endif
 
     /* ---- Effects ----*/
 

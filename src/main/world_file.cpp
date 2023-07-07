@@ -35,6 +35,8 @@
 #include "../main/trees.h"
 #include "level_file.h"
 #include "world_file.h"
+#include "translate_episode.h"
+#include "fontman/font_manager.h"
 
 #include <Utils/strings.h>
 #include <Utils/files.h>
@@ -45,6 +47,7 @@
 #include "global_dirs.h"
 
 #include "editor/editor_custom.h"
+#include "editor/editor_strings.h"
 
 bool OpenWorld(std::string FilePath)
 {
@@ -56,6 +59,7 @@ bool OpenWorld(std::string FilePath)
     int B = 0;
     // long long zCounter = 0;
     WorldData wld;
+    TranslateEpisode tr;
 
     ClearWorld();
 
@@ -86,15 +90,15 @@ bool OpenWorld(std::string FilePath)
         FileNameFull = Files::basename(FilePath);
         FullFileName = FilePath;
     }
-    else if(FileFormat == FileFormats::LVL_SMBX64 || FileFormat == FileFormats::LVL_SMBX38A)
+    else if(FileFormat == FileFormats::WLD_SMBX64 || FileFormat == FileFormats::WLD_SMBX38A)
     {
-        FileNameFull = FileName + ".lvl";
-        FullFileName = FileNamePath + FileName + ".lvl";
+        FileNameFull = FileName + ".wld";
+        FullFileName = FileNamePath + FileName + ".wld";
     }
     else
     {
-        FileNameFull = FileName + ".lvlx";
-        FullFileName = FileNamePath + FileName + ".lvlx";
+        FileNameFull = FileName + ".wldx";
+        FullFileName = FileNamePath + FileName + ".wldx";
     }
 
     // Preserve these values for quick restoring when going to the world map
@@ -103,15 +107,14 @@ bool OpenWorld(std::string FilePath)
     FileNamePathWorld = FileNamePath;
     FileFormatWorld = FileFormat;
 
+    FontManager::loadCustomFonts();
+
     if(wld.meta.RecentFormat == LevelData::SMBX64)
         FileRelease = int(wld.meta.RecentFormatVersion);
 
     LoadCustomCompat();
     FindCustomPlayers();
     LoadCustomGFX(true);
-
-    if(LevelEditor || WorldEditor)
-        EditorCustom::Load();
 
     numTiles = 0;
     numScenes = 0;
@@ -151,6 +154,7 @@ bool OpenWorld(std::string FilePath)
     MaxWorldStars = int(wld.stars);
 
 
+    numWorldCredits = 0;
     for(int i = 1; i <= maxWorldCredits; i++)
         WorldCredits[i].clear();
 
@@ -161,10 +165,11 @@ bool OpenWorld(std::string FilePath)
         Strings::split(authorsList, wld.authors, "\n");
         for(auto &c : authorsList)
         {
-            B++;
+            ++B;
             if(B > maxWorldCredits)
                 break;
             WorldCredits[B] = c;
+            numWorldCredits = B;
         }
     }
 
@@ -373,6 +378,9 @@ bool OpenWorld(std::string FilePath)
         treeWorldMusicAdd(&box);
     }
 
+    if(!LevelEditor)
+        tr.loadWorldTranslation(FileNameFull);
+
     LoadCustomSound();
 
     if(!LevelEditor)
@@ -489,6 +497,7 @@ void ClearWorld(bool quick)
     IsEpisodeIntro = false;
     StartLevel.clear();
     BeatTheGame = false;
+    numWorldCredits = 0;
     for(int A = 1; A <= maxWorldCredits; A++)
         WorldCredits[A].clear();
     if(LevelEditor)
@@ -536,7 +545,7 @@ void FindWldStars()
 
                     for(const auto& star : Star)
                     {
-                        if(SDL_strcasecmp(star.level.c_str(), l.FileName.c_str()) == 0)
+                        if(SDL_strcasecmp(star.level.c_str(), Files::basename(l.FileName).c_str()) == 0)
                             l.curStars++;
                     }
                 }
@@ -555,14 +564,20 @@ bool CanConvertWorld(int format, std::string* reasons)
     if(format == FileFormats::WLD_SMBX38A)
     {
         if(reasons)
-            *reasons = "The SMBX38-A format is not supported at this time.\n";
+        {
+            *reasons = g_editorStrings.fileConvert38aUnsupported;
+            *reasons += '\n';
+        }
         return false;
     }
 
     if(format != FileFormats::WLD_SMBX64)
     {
         if(reasons)
-            *reasons = "Requested format is unknown.\n";
+        {
+            *reasons = g_editorStrings.fileConvertFormatUnknown;
+            *reasons += '\n';
+        }
         return false;
     }
 
@@ -576,7 +591,10 @@ bool CanConvertWorld(int format, std::string* reasons)
         {
             can_convert = false;
             if(reasons)
-                *reasons += "Uses custom world music file.\n";
+            {
+                *reasons = g_editorStrings.fileConvertFeatureCustomWorldMusic;
+                *reasons += '\n';
+            }
             break;
         }
     }
@@ -585,7 +603,10 @@ bool CanConvertWorld(int format, std::string* reasons)
     {
         can_convert = false;
         if(reasons)
-            *reasons += "Uses world setting for star display.\n";
+        {
+            *reasons = g_editorStrings.fileConvertFeatureWorldStarDisplay;
+            *reasons += '\n';
+        }
     }
 
     for(int i = 1; i <= numWorldLevels; i++)
@@ -594,7 +615,10 @@ bool CanConvertWorld(int format, std::string* reasons)
         {
             can_convert = false;
             if(reasons)
-                *reasons += "Uses per-level setting for star display.\n";
+            {
+                *reasons = g_editorStrings.fileConvertFeatureLevelStarDisplay;
+                *reasons += '\n';
+            }
         }
     }
 

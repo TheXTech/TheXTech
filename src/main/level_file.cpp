@@ -43,6 +43,8 @@
 #include "graphics/gfx_camera.h"
 #include "graphics/gfx_update.h"
 #include "npc/npc_activation.h"
+#include "translate_episode.h"
+#include "fontman/font_manager.h"
 
 #include <DirManager/dirman.h>
 #include <Utils/files.h>
@@ -54,6 +56,7 @@
 #include "global_dirs.h"
 
 #include "editor/editor_custom.h"
+#include "editor/editor_strings.h"
 
 
 void bgoApplyZMode(Background_t *bgo, int smbx64sp)
@@ -128,7 +131,8 @@ bool OpenLevel(std::string FilePath)
 
 bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 {
-    std::string newInput;
+//    std::string newInput;
+    TranslateEpisode tr;
 //    int FileRelease = 0;
     int A = 0;
     int B = 0;
@@ -143,10 +147,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     BlockSound();
     FreezeNPCs = false;
     CoinMode = false;
-
-    FileFormats::smbx64LevelPrepare(lvl);
-    FileFormats::smbx64LevelSortBlocks(lvl);
-    FileFormats::smbx64LevelSortBGOs(lvl);
 
     g_dirEpisode.setCurDir(lvl.meta.path);
     FileFormat = lvl.meta.RecentFormat;
@@ -176,6 +176,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     IsEpisodeIntro = (StartLevel == FileNameFull);
 
+    FileFormats::smbx64LevelPrepare(lvl);
+    FileFormats::smbx64LevelSortBlocks(lvl);
+    FileFormats::smbx64LevelSortBGOs(lvl);
+
     numBlock = 0;
     numBackground = 0;
     numLocked = 0;
@@ -194,9 +198,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     FindCustomNPCs();
     LoadCustomGFX();
     LoadCustomSound();
-
-    if(LevelEditor)
-        EditorCustom::Load();
+    FontManager::loadCustomFonts();
 
 //    if(DirMan::exists(FileNamePath + FileName)) // Useless now
 //        LoadCustomGFX2(FileNamePath + FileName);
@@ -494,6 +496,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     for(auto &n : lvl.npc)
     {
+        bool variantHandled = false;
+
         numNPCs++;
         if(numNPCs > maxNPCs)
         {
@@ -523,6 +527,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         {
             npc.Special = n.contents;
             npc.DefaultSpecial = int(npc.Special);
+            npc.Variant = n.special_data;
+            variantHandled = true;
         }
 
         if(npc.Type == NPCID_POTION || npc.Type == NPCID_POTIONDOOR ||
@@ -552,8 +558,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW)
         {
-            npc.Special = n.special_data;
-            npc.DefaultSpecial = int(npc.Special);
+            npc.Variant = n.special_data;
+            variantHandled = true;
         }
 
         if(compatModern && isSmbx64)
@@ -576,7 +582,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         }
         else
         {
-            npc.Variant = 0;
+            if(!variantHandled)
+                npc.Variant = 0;
         }
 
         // All of the following duplicate the new Special7 code.
@@ -681,8 +688,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             bool starFound = false;
             for(const auto& star : Star)
             {
-                bool bySection = int(npc.Special) <= 0 && (star.Section == npc.Section || star.Section == -1);
-                bool byId = int(npc.Special) > 0 && -(star.Section + 100) == int(npc.Special);
+                bool bySection = npc.Variant == 0 && (star.Section == npc.Section || star.Section == -1);
+                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
                 if(star.level == FileNameFull && (bySection || byId))
                     starFound = true;
             }
@@ -692,6 +699,24 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special = 1;
                 npc.DefaultSpecial = 1;
                 if(npc.Type == NPCID_STAR_SMW)
+                    npc.Killed = 9;
+            }
+        }
+        else if((npc.Type == NPCID_BURIEDPLANT || npc.Type == NPCID_YOSHIEGG ||
+                  npc.Type == NPCID_BUBBLE || npc.Type == NPCID_LAKITU_SMW) &&
+                (n.contents == NPCID_STAR_SMB3 || n.contents == NPCID_STAR_SMW)) // Is a container that has a star inside
+        {
+            bool starFound = false;
+            for(const auto& star : Star)
+            {
+                bool byId = npc.Variant > 0 && -(star.Section + 100) == (int)npc.Variant;
+                if(star.level == FileNameFull && byId)
+                    starFound = true;
+            }
+
+            if(starFound)
+            {
+                if(n.contents == NPCID_STAR_SMW)
                     npc.Killed = 9;
             }
         }
@@ -805,6 +830,9 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         water.Layer = FindLayer(w.layer);
         syncLayers_Water(numWater);
     }
+
+    if(!GameMenu && !LevelEditor)
+        tr.loadLevelTranslation(FileNameFull);
 
     // FindBlocks();
     qSortBackgrounds(1, numBackground);
@@ -938,6 +966,7 @@ void ClearLevel()
     doShakeScreenClear();
     ResetCameraPanning();
     treeLevelCleanAll();
+    FontManager::clearLevelFonts();
 
     invalidateDrawBlocks();
     invalidateDrawBGOs();
@@ -1130,7 +1159,7 @@ void FindStars()
 
                     for(const auto& star : Star)
                     {
-                        if(SDL_strcasecmp(star.level.c_str(), GetS(warp.level).c_str()) == 0)
+                        if(SDL_strcasecmp(star.level.c_str(), Files::basename(GetS(warp.level)).c_str()) == 0)
                             warp.curStars++;
                     }
                 }
@@ -1149,14 +1178,20 @@ bool CanConvertLevel(int format, std::string* reasons)
     if(format == FileFormats::LVL_SMBX38A)
     {
         if(reasons)
-            *reasons = "The SMBX38-A format is not supported at this time.\n";
+        {
+            *reasons = g_editorStrings.fileConvert38aUnsupported;
+            *reasons += '\n';
+        }
         return false;
     }
 
     if(format != FileFormats::LVL_SMBX64)
     {
         if(reasons)
-            *reasons = "Requested format is unknown.\n";
+        {
+            *reasons = g_editorStrings.fileConvertFormatUnknown;
+            *reasons += '\n';
+        }
         return false;
     }
 
@@ -1181,7 +1216,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_transit = true;
             if(reasons)
-                *reasons += "A warp uses new transition effect.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpTransit;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_stood && w.stoodRequired)
@@ -1189,7 +1227,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_stood = true;
             if(reasons)
-                *reasons += "A warp requires player to stand.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpNeedsStand;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_cannon && w.cannonExit)
@@ -1197,7 +1238,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_cannon = true;
             if(reasons)
-                *reasons += "A warp has the cannon exit effect.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpCannonExit;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_warp_event && w.eventEnter != EVENT_NONE)
@@ -1205,7 +1249,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_warp_event = true;
             if(reasons)
-                *reasons += "A warp triggers an event on entry.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpEnterEvent;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_stars_msg && !GetS(w.StarsMsg).empty())
@@ -1213,7 +1260,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_stars_msg = true;
             if(reasons)
-                *reasons += "A warp has a custom stars message.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpCustomStarsMsg;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_no_print_stars && w.noPrintStars)
@@ -1221,7 +1271,10 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_no_print_stars = true;
             if(reasons)
-                *reasons += "A warp hides its star requirement.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpNoPrintStars;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_no_entrance_scene && w.noEntranceScene)
@@ -1229,15 +1282,21 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             seen_no_entrance_scene = true;
             if(reasons)
-                *reasons += "A level warp skips the start scene.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpNoStartScene;
+                *reasons += '\n';
+            }
         }
 
         if(!seen_portal_warp && w.Effect == 3)
         {
             can_convert = false;
             seen_portal_warp = true;
-           if(reasons)
-                *reasons += "A warp uses the portal effect.\n";
+            if(reasons)
+            {
+                *reasons += g_editorStrings.fileConvertFeatureWarpPortal;
+                *reasons += '\n';
+            }
          }
     }
 
@@ -1256,7 +1315,10 @@ bool CanConvertLevel(int format, std::string* reasons)
                 can_convert = false;
                 seen_event_custom_music = true;
                 if(reasons)
-                    *reasons += "An event sets music to a file.\n";
+                {
+                    *reasons += g_editorStrings.fileConvertFeatureEventCustomMusic;
+                    *reasons += '\n';
+                }
             }
 
             if(!seen_modern_autoscroll && ss.autoscroll)
@@ -1264,7 +1326,10 @@ bool CanConvertLevel(int format, std::string* reasons)
                 can_convert = false;
                 seen_modern_autoscroll = true;
                 if(reasons)
-                    *reasons += "An event uses modern autoscroll.\n";
+                {
+                    *reasons += g_editorStrings.fileConvertFeatureEventAutoscroll;
+                    *reasons += '\n';
+                }
             }
         }
     }
@@ -1276,9 +1341,8 @@ bool CanConvertLevel(int format, std::string* reasons)
             can_convert = false;
             if(reasons)
             {
-                *reasons += "An NPC type ";
-                *reasons += std::to_string(NPC[i].Type);
-                *reasons += " has custom behavior.\n";
+                *reasons += g_editorStrings.fileConvertFeatureNPCVariant;
+                *reasons += '\n';
             }
             break;
         }
@@ -1290,7 +1354,10 @@ bool CanConvertLevel(int format, std::string* reasons)
         {
             can_convert = false;
             if(reasons)
-                *reasons += "A spin block uses ancient smashable behavior.\n";
+            {
+                *reasons += g_editorStrings.fileConvertFeatureBlockForceSmashable;
+                *reasons += '\n';
+            }
             break;
         }
     }

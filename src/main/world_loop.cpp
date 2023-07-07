@@ -19,6 +19,7 @@
  */
 
 #include <Utils/files.h>
+#include <Integrator/integrator.h>
 #include <pge_delay.h>
 #include <fmt_format_ne.h>
 #include <sdl_proxy/sdl_stdinc.h>
@@ -41,6 +42,7 @@
 #include "speedrunner.h"
 #include "screen_quickreconnect.h"
 #include "screen_connect.h"
+#include "main/game_strings.h"
 
 #include "global_dirs.h"
 
@@ -348,6 +350,7 @@ void WorldLoop()
     }
 
     speedRun_tick();
+    Integrator::sync();
     UpdateGraphics2();
 
     if(!Controls::Update())
@@ -726,7 +729,7 @@ void WorldLoop()
                             if(!OpenLevel(levelPath))
                             {
                                 delayedMusicStart(); // Allow music being started
-                                MessageText = fmt::format_ne("ERROR: Can't open \"{0}\": file doesn't exist or corrupted.", level.FileName);
+                                MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, level.FileName);
                                 PauseGame(PauseCode::Message);
                                 ErrorQuit = true;
                             }

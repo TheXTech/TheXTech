@@ -59,6 +59,8 @@ public:
 
     InputMethodProfile_Wii(uint8_t expansion);
 
+    void InitAs(uint8_t expansion);
+
     // Polls a new (secondary) device button for the i'th player button
     // Returns true on success and false if no button pressed
     // Never allows two player buttons to bind to the same device button
@@ -108,6 +110,12 @@ public:
     // null if no input method is ready
     // allocates the new InputMethod on the heap
     InputMethod *Poll(const std::vector<InputMethod *> &active_methods) noexcept;
+
+    /*-----------------------*\
+    || CUSTOM METHODS        ||
+    \*-----------------------*/
+    InputMethodProfile *AddNunchuckProfile();
+    InputMethodProfile *AddClassicProfile();
 
     /*-----------------------*\
     || OPTIONAL METHODS      ||

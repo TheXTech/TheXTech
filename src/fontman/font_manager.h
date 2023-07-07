@@ -26,8 +26,6 @@
 #include <Utils/vptrlist.h>
 
 #include <string>
-#include <vector>
-#include <unordered_map>
 
 #include "font_engine_base.h"
 
@@ -52,14 +50,31 @@ void         utf8_pop_back(std::string &str);
 void         utf8_erase_at(std::string &str, size_t begin);
 void         utf8_erase_before(std::string &str, size_t end);
 
-
-//! Initialize basic support for font rendering withouth config pack
-void initBasic();
 //! Full initialization of font renderith include external fonts
 void initFull();
 //! De-Initialize font manager and clear memory
 void quit();
 
+/**
+ * @brief Attempts to load custom fonts for the episode and for the level
+ */
+void loadCustomFonts();
+
+/**
+ * @brief Removes all custom fonts completely
+ */
+void clearAllCustomFonts();
+
+/**
+ * @brief Removes all level-wide fonts, but keeps episode-wide fonts being loaded
+ */
+void clearLevelFonts();
+
+/*!
+ * \brief Checks if font manager works
+ * \return true when manager actually works
+ */
+bool isInitied();
 
 int fontIdFromSmbxFont(int font);
 uint32_t fontSizeFromSmbxFont(int font);
