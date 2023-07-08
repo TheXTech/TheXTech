@@ -379,6 +379,9 @@ void AbstractRender_t::LoadPictureParticleSystem(StdPicture& target, const std::
         g_render->registerUniform(target, "u_particle_z");
         g_render->registerUniform(target, "u_camera_pos");
     }
+#else
+    UNUSED(fragPath);
+    UNUSED(imagePath);
 #endif
 }
 
@@ -551,8 +554,10 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         GraphicsHelps::closeImage(maskImage);
     }
 
+#ifdef RENDERGL_SUPPORTED
     if(g_render->userShadersSupported() && (!target.l.particleVertexShaderSource.empty() || !target.l.fragmentShaderSource.empty()))
         g_render->compileShaders(target);
+#endif
 }
 
 void AbstractRender_t::lazyPreLoad(StdPicture &target)
@@ -599,6 +604,10 @@ void AbstractRender_t::assignUniform(StdPicture &target, int index, const Unifor
 #ifdef THEXTECH_BUILD_GL_MODERN
     if(index >= 0 && index < (int)target.l.finalUniformState.size())
         target.l.finalUniformState[index] = value;
+#else
+    UNUSED(target);
+    UNUSED(index);
+    UNUSED(value);
 #endif
 }
 
