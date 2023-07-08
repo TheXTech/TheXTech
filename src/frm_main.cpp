@@ -263,7 +263,7 @@ bool FrmMain::restartRenderer()
 
     res = XRender::init();
 
-#elif RENDERGL_SUPPORTED
+#elif defined(RENDERGL_SUPPORTED)
     // SDL / OpenGL -- toggle for now
 
     if(m_render)
