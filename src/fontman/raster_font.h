@@ -40,8 +40,8 @@ public:
 
     virtual ~RasterFont() override;
 
-    void  loadFont(std::string font_ini);
-    void  loadFontMap(std::string fontmap_ini);
+    void  loadFont(const std::string& font_ini);
+    void  loadFontMap(const std::string &fontmap_ini);
 
     /*!
      * \brief Measure the size of the multiline text block in pixels

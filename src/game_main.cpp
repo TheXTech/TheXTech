@@ -78,6 +78,7 @@
 #include "core/msgbox.h"
 #include "core/language.h"
 #include "script/luna/luna.h"
+#include "fontman/font_manager.h"
 
 #include "pseudo_vb.h"
 
@@ -575,6 +576,7 @@ int GameMain(const CmdLineSetup_t &setup)
             Integrator::clearEpisodeName();
             Integrator::clearLevelName();
             Integrator::clearEditorFile();
+            FontManager::clearAllCustomFonts();
 
             BattleIntro = 0;
             BattleOutro = 0;
@@ -766,6 +768,7 @@ int GameMain(const CmdLineSetup_t &setup)
             LoadCustomGFX();
             LoadCustomSound();
             SetupPlayers();
+            FontManager::loadCustomFonts();
 
 #ifndef PGE_MIN_PORT
             if(!NoMap)
@@ -1817,6 +1820,7 @@ void StartEpisode()
         PGE_Delay(500);
 
     ClearGame();
+    FontManager::clearAllCustomFonts();
 
     std::string wPath = SelectWorld[selWorld].WorldPath + SelectWorld[selWorld].WorldFile;
 
