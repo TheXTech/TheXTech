@@ -258,10 +258,14 @@ bool FrmMain::restartRenderer()
     bool res;
 
 #ifdef RENDER_CUSTOM
+    // custom renderer
     XRender::quit();
 
     res = XRender::init();
-#else
+
+#elif RENDERGL_SUPPORTED
+    // SDL / OpenGL -- toggle for now
+
     if(m_render)
     {
         m_render->clearAllTextures();
@@ -277,6 +281,25 @@ bool FrmMain::restartRenderer()
         m_render.reset(new RenderSDL());
     else
         m_render.reset(new RenderGL());
+
+    g_render = m_render.get();
+
+    const CmdLineSetup_t setup;
+    res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+
+#else
+    // SDL, no OpenGL
+
+    if(m_render)
+    {
+        m_render->clearAllTextures();
+        m_render->close();
+    }
+
+    m_render.reset();
+    g_render = nullptr;
+
+    m_render.reset(new RenderSDL());
 
     g_render = m_render.get();
 
