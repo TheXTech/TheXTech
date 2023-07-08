@@ -28,6 +28,7 @@
 
 #    if defined(_WIN32) || defined(_WIN64)
 #        define NO_SDL_GLEXT
+#        define GLEW_STATIC
 #        include <GL/glew.h>
 #    elif defined(__SWITCH__)
 #        define NO_SDL_GLEXT

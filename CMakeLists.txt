@@ -448,13 +448,13 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
         list(APPEND A2XT_LIBS opengl32)
     endif()
 
-    if(WIN32 AND THEXTECH_BUILD_GL_DESKTOP_MODERN)
-        list(APPEND A2XT_LIBS glew32)
-        list(APPEND A2XT_LIBS opengl32)
-    endif()
-
     if(THEXTECH_ENABLE_VENDORED_GLEW)
         list(APPEND A2XT_DEPS GLEW_Local)
+        list(APPEND A2XT_LIBS PGE_GLEW)
+
+        if(WIN32)
+            list(APPEND A2XT_LIBS glu32 opengl32 gdi32)
+        endif()
     endif()
 
     list(APPEND A2XT_LIBS PGE_ZLib)

@@ -1,13 +1,21 @@
 add_library(PGE_GLEW INTERFACE)
 
-# FIXME: Make a proper condition to specify all supported platforms
-set(GLEW_SUPPORTED ON)
+# GLEW is only used for the Windows builds
+if(WIN32)
+    set(GLEW_SUPPORTED ON)
+else()
+    set(GLEW_SUPPORTED OFF)
+endif()
 
 if(GLEW_SUPPORTED)
-    option(THEXTECH_ENABLE_VENDORED_GLEW "Enable building of the vendored GLEW library" OFF)
+    option(THEXTECH_ENABLE_VENDORED_GLEW "Enable building of the vendored GLEW library" ON)
+    mark_as_advanced(THEXTECH_ENABLE_VENDORED_GLEW)
+
+    if(NOT THEXTECH_BUILD_GL_DESKTOP_MODERN)
+        set(THEXTECH_ENABLE_VENDORED_GLEW OFF CACHE BOOL "")
+    endif()
 else()
     set(THEXTECH_ENABLE_VENDORED_GLEW OFF CACHE BOOL "" FORCE)
-    mark_as_advanced(THEXTECH_ENABLE_VENDORED_GLEW)
 endif()
 
 if(GLEW_SUPPORTED AND THEXTECH_ENABLE_VENDORED_GLEW)
