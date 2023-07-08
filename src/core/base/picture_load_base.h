@@ -28,6 +28,11 @@
 #include <cstdint>
 #include <vector>
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+#include <string>
+#include "core/opengl/gl_program_object.h"
+#endif
+
 /*!
  * \brief Generic image loading store.
  *
