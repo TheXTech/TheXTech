@@ -336,10 +336,12 @@ private:
 
     // framebuffer object (FBO) state
 
+    // note: {} value-initializes array to zeros
+
     // textures for each render-to-texture layer
-    std::array<GLuint, BUFFER_MAX> m_buffer_texture = std::array<GLuint, BUFFER_MAX>();
+    std::array<GLuint, BUFFER_MAX> m_buffer_texture{};
     // FBOs for each render-to-texture layer (only the first is required)
-    std::array<GLuint, BUFFER_MAX> m_buffer_fb = std::array<GLuint, BUFFER_MAX>();
+    std::array<GLuint, BUFFER_MAX> m_buffer_fb{};
     // texture for main game framebuffer's depth component (preferred)
     GLuint m_game_depth_texture = 0;
     // fallback: renderbuffer for main game framebuffer's depth component
