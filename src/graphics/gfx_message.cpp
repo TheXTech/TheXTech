@@ -50,6 +50,7 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
 
 #endif
 
+    // possibly, load these data from the fonts engine
     const int charWidth = 18;
     const int lineHeight = 16;
 
@@ -64,7 +65,7 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
     int lineStart = 0; // start of current line
     int lastWord = 0; // planned start of next line
     int numLines = 0; // n lines
-    const int maxChars = ((TextBoxW - 24) / charWidth) + 1; // 27 by default
+    const int maxChars = ((TextBoxW - 24) / charWidth) + 1; // 27 chars wide by default
     // Text size without a NULL terminator
     const int textSize = static_cast<int>(SuperTextMap.size() - 1);
 
@@ -94,7 +95,7 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
         lineStart = lastWord;
     }
 
-    // Draw the background now we know how many lines there are.
+    // Draw the background now we know how many lines there are. 10px of padding above and below.
     int totalHeight = numLines * lineHeight + 20;
 
     if(!UseGFX)
@@ -113,31 +114,49 @@ void DrawMessage(const UTF8CharMap_t &SuperTextMap)
 #ifndef BUILT_IN_TEXTBOX
     else
     {
-        // carefully render the background image...
+        // amount of space to fill
+        int spaceToFill = totalHeight - 20 - 20;
+
+        // amount of middle GFX that gets looped. 20px in SMBX64.
+        int gfxMidH = GFX.TextBox.h - 20 - 20;
+
+        // number of reps needed to fill space
+        int vertReps = spaceToFill / gfxMidH + 1;
+
+        // want 20px of padding at bottom if possible
+        int bottomPaddingHeight = 20;
+
+        // special case where the entire message box is under 40px tall
+        if(spaceToFill <= 0)
+        {
+            vertReps = 0;
+            bottomPaddingHeight += spaceToFill;
+            spaceToFill = 0;
+        }
+
+        // render top 20px of graphics
         XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
                                BoxY_Start,
                                TextBoxW, 20, GFX.TextBox, 0, 0);
-        int rndMidH = totalHeight - 20 - 20;
-        int gfxMidH = GFX.TextBox.h - 20 - 20;
-        int vertReps = rndMidH / gfxMidH + 1;
 
+        // loop middle of graphics
         for(int i = 0; i < vertReps; i++)
         {
-            if((i + 1) * gfxMidH <= rndMidH)
+            if((i + 1) * gfxMidH <= spaceToFill)
                 XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
                                        BoxY_Start + 20 + i * gfxMidH,
                                        TextBoxW, gfxMidH, GFX.TextBox, 0, 20);
             else
                 XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
                                        BoxY_Start + 20 + i * gfxMidH,
-                                       TextBoxW, rndMidH - i * gfxMidH, GFX.TextBox, 0, 20);
+                                       TextBoxW, spaceToFill - i * gfxMidH, GFX.TextBox, 0, 20);
         }
 
+        // render bottom of graphics
         XRender::renderTexture(ScreenW / 2 - TextBoxW / 2,
-                               BoxY_Start + 20 + rndMidH,
-                               TextBoxW, 20, GFX.TextBox, 0, GFX.TextBox.h - 20);
+                               BoxY_Start + 20 + spaceToFill,
+                               TextBoxW, bottomPaddingHeight, GFX.TextBox, 0, GFX.TextBox.h - bottomPaddingHeight);
     }
-
 #endif
 
     // PASS TWO: draw the lines
