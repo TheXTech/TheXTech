@@ -453,7 +453,7 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
         list(APPEND A2XT_LIBS PGE_GLEW)
 
         if(WIN32)
-            list(APPEND A2XT_LIBS glu32 opengl32 gdi32)
+            list(APPEND A2XT_LIBS opengl32 gdi32)
         endif()
     endif()
 
