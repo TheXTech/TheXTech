@@ -789,10 +789,6 @@ void UpdateGraphics(bool skipRepaint)
 
     bool Do_FrameSkip = FrameSkip && !TakeScreen;
 
-    // Note: never frame skip in this case, because the legacy code doesn't update the fields used by frameSkipNeeded()
-    if(!g_compatibility.fix_keyhole_framerate && LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
-        Do_FrameSkip = false;
-
     if(Do_FrameSkip)
         Do_FrameSkip = frameSkipNeeded();
 

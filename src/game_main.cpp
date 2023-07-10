@@ -1326,30 +1326,15 @@ void UpdateMacro()
     }
     else if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
     {
-        float tempTime = 0;
-        float gameTime = 0;
-        int keyholeMax = g_compatibility.fix_keyhole_framerate ? 192 : 300;
+        const int keyholeMax = 192; // Was 300
 
         do
         {
-            // tempTime = Timer - Int(Timer)
+            XEvents::doEvents();
 
-            tempTime = (float(SDL_GetTicks()) / 1000.0f) - std::floor(float(SDL_GetTicks()) / 1000.0f);
-//            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
-
-            if(g_compatibility.fix_keyhole_framerate)
-                XEvents::doEvents();
-
-            if(g_compatibility.fix_keyhole_framerate ?
-               canProceedFrame() :
-               (tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime))
+            if(canProceedFrame())
             {
-                gameTime = tempTime;
-
-                if(g_compatibility.fix_keyhole_framerate)
-                    computeFrameTime1();
-                else
-                    XEvents::doEvents();
+                computeFrameTime1();
 
                 speedRun_tick();
                 Controls::Update();
@@ -1357,11 +1342,8 @@ void UpdateMacro()
                 UpdateSound();
                 BlockFrames();
 
-                if(g_compatibility.fix_keyhole_framerate)
-                {
-                    XEvents::doEvents();
-                    computeFrameTime2();
-                }
+                XEvents::doEvents();
+                computeFrameTime2();
 
                 updateScreenFaders();
 
