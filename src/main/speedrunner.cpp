@@ -214,15 +214,18 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
         r = 0.f;
         g = 0.f;
         b = 0.f;
+
         if(status_info.power_level <= .5f)
         {
             r = (.5f - status_info.power_level) / .5f;
         }
+
         if(status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
         {
             g = 1.f;
             g -= r;
         }
+
         if(status_info.power_status == Controls::StatusInfo::POWER_CHARGED)
         {
             b = 0.8f;
