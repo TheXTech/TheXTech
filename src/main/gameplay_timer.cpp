@@ -235,8 +235,8 @@ void GameplayTimer::tick()
     if(!m_cyclesInt)
     {
         m_cyclesInt = true;
-        m_cyclesCurrent = 1;
-        m_cyclesTotal = 1;
+        m_cyclesCurrent = 0;
+        m_cyclesTotal = 0;
         m_cyclesFin = 0;
         m_levelBlinkActive = false;
         m_worldBlinkActive = false;
