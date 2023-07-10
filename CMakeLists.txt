@@ -444,17 +444,18 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
 
-    if(WIN32 AND THEXTECH_BUILD_GL_DESKTOP_LEGACY)
-        list(APPEND A2XT_LIBS opengl32)
+    if(WIN32 AND (THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY))
+        list(APPEND A2XT_LIBS opengl32 gdi32)
+
+        # glu32 not needed or provided on ARM
+        if("${TARGET_PROCESSOR}" STREQUAL "i386" OR "${TARGET_PROCESSOR}" STREQUAL "x86_64")
+            list(APPEND A2XT_LIBS glu32)
+        endif()
     endif()
 
     if(THEXTECH_ENABLE_VENDORED_GLEW)
         list(APPEND A2XT_DEPS GLEW_Local)
         list(APPEND A2XT_LIBS PGE_GLEW)
-
-        if(WIN32)
-            list(APPEND A2XT_LIBS opengl32 gdi32)
-        endif()
     endif()
 
     list(APPEND A2XT_LIBS PGE_ZLib)
