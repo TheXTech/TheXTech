@@ -455,10 +455,10 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
         message("== Building with OpenGL enabled on Windows. Processor architecture: ${TARGET_PROCESSOR}")
 
         # glu32 not needed or provided on ARM
-        if("${TARGET_PROCESSOR}" STREQUAL "i386" OR "${TARGET_PROCESSOR}" STREQUAL "x86_64")
+#        if("${TARGET_PROCESSOR}" STREQUAL "i386" OR "${TARGET_PROCESSOR}" STREQUAL "x86_64")
             list(APPEND A2XT_LIBS glu32)
             message("Linking glu32 for GLEW (OpenGL support library) on Windows x86(_64)")
-        endif()
+#        endif()
 
         list(APPEND A2XT_LIBS opengl32 gdi32)
     endif()
