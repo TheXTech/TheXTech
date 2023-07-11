@@ -340,7 +340,23 @@
                 "sound71": "Tırmanmak",
                 "sound72": "Yüzmek",
                 "sound24": "Fırlamak",
-                "sound25": "Çekiç Fırlatmak"
+                "sound25": "Çekiç Fırlatmak",
+                "sound73": "Hafif Tutmak",
+                "sound75": "Sebze Fırlatmak",
+                "sound76": "Kalp Kaybetmek"
+            },
+            "fam-ui": {
+                "header": "Arayüz",
+                "sound11": "Eşya Bırakmak",
+                "sound13": "Kamera",
+                "sound26": "Kaymak",
+                "sound30": "Durdurmak",
+                "sound47": "Mesaj"
+            },
+            "fam-world": {
+                "header": "Dünya",
+                "sound27": "Yeni Yol",
+                "sound28": "Seviye Seçmek"
             }
         },
         "worldMusic": {
@@ -350,8 +366,41 @@
                 "wmusic16": "Mağara",
                 "wmusic4": "Tema",
                 "wmusic7": "Orman",
-                "wmusic13": "Zindan"
+                "wmusic13": "Zindan",
+                "wmusic12": "Özel",
+                "header": "Dünya"
+            },
+            "fam-new": {
+                "wmusic5": "Tema",
+                "header": "Yeni"
+            },
+            "fam-set3": {
+                "header": "Set 3",
+                "wmusic6": "Dünya 2",
+                "wmusic10": "Dünya 6",
+                "wmusic11": "Dünya 5",
+                "wmusic9": "Dünya 8",
+                "wmusic2": "Dünya 4",
+                "wmusic3": "Dünya 7",
+                "wmusic1": "Dünya 1",
+                "wmusic8": "Dünya 3"
+            },
+            "auto": {
+                "wmusic0": "Hiç"
             }
+        },
+        "tile": {
+            "fam-marble3": "Mermer",
+            "fam-grass2": "Mutlu Çimen",
+            "fam-desert1": "Toz",
+            "fam-grass1": "Eski Çimen",
+            "fam-dirt2": "Ölü Çimen",
+            "fam-clouds4": "Bulutlar",
+            "fam-granite3": "Granit",
+            "fam-lava3": "Lav",
+            "fam-stonewall3": "Taş Duvar",
+            "fam-snow1": "Eski Kar",
+            "fam-wall2": "Kum Duvar"
         }
     },
     "objects": {
