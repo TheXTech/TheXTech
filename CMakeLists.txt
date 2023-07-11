@@ -444,9 +444,10 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
 
-    if(UNIX AND (THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN OR THEXTECH_BUILD_GL_ES_LEGACY))
-        list(APPEND A2XT_LIBS GL)
-    endif()
+# UNIX seems to be too general -- how to target desktop Linux specifically?
+#    if(UNIX AND (THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN OR THEXTECH_BUILD_GL_ES_LEGACY))
+#        list(APPEND A2XT_LIBS GL)
+#    endif()
 
     if(WIN32 AND (THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY))
         list(APPEND A2XT_LIBS opengl32 gdi32)
@@ -454,7 +455,10 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
         # glu32 not needed or provided on ARM
         if("${TARGET_PROCESSOR}" STREQUAL "i386" OR "${TARGET_PROCESSOR}" STREQUAL "x86_64")
             list(APPEND A2XT_LIBS glu32)
+            message("Linking glu32 for GLEW (OpenGL support library) on Windows x86(_64)")
         endif()
+
+        list(APPEND A2XT_LIBS opengl32 gdi32)
     endif()
 
     if(THEXTECH_ENABLE_VENDORED_GLEW)
@@ -1035,7 +1039,7 @@ endif()
 if(ANDROID)
     target_link_libraries(A2XT_Int INTERFACE log)
 
-    if(THEXTECH_BUILD_GL_ES_MODERN)
+    if(THEXTECH_BUILD_GL_ES_LEGACY OR THEXTECH_BUILD_GL_ES_MODERN)
         target_link_libraries(A2XT_Int INTERFACE EGL)
     endif()
 endif()
