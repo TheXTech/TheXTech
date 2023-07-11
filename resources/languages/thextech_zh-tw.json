@@ -146,7 +146,7 @@
             "abbrevAttLayer": "跟隨：",
             "default": "默認",
             "deletion": {
-                "cancel": "取消：不刪除圖層",
+                "cancel": "取消：返回上一級菜單",
                 "confirmDelete": "否：*刪除全部對象*",
                 "confirmPreserve": "是：移動到默認圖層",
                 "header": "刪除圖層{0}",
@@ -313,7 +313,7 @@
         "wordEvent": {
             "genitive": "事件",
             "nominative": "事件",
-            "typeLabel": "{0}時觸發事件："
+            "typeLabel": "觸發{0}事件："
         },
         "wordHeight": "高",
         "wordInstant": "立即",
