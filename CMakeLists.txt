@@ -449,23 +449,18 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
 #        list(APPEND A2XT_LIBS GL)
 #    endif()
 
-    if(WIN32 AND (THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY))
-        list(APPEND A2XT_LIBS opengl32 gdi32)
-
-        message("== Building with OpenGL enabled on Windows. Processor architecture: ${TARGET_PROCESSOR}")
-
-        # glu32 not needed or provided on ARM
-#        if("${TARGET_PROCESSOR}" STREQUAL "i386" OR "${TARGET_PROCESSOR}" STREQUAL "x86_64")
-            list(APPEND A2XT_LIBS glu32)
-            message("Linking glu32 for GLEW (OpenGL support library) on Windows x86(_64)")
-#        endif()
-
-        list(APPEND A2XT_LIBS opengl32 gdi32)
-    endif()
-
     if(THEXTECH_ENABLE_VENDORED_GLEW)
         list(APPEND A2XT_DEPS GLEW_Local)
         list(APPEND A2XT_LIBS PGE_GLEW)
+    endif()
+
+    if(WIN32 AND (THEXTECH_BUILD_GL_DESKTOP_MODERN OR THEXTECH_BUILD_GL_DESKTOP_LEGACY))
+        # glu32 not needed or provided on ARM
+        if("${TARGET_PROCESSOR}" STREQUAL "i386" OR "${TARGET_PROCESSOR}" STREQUAL "x86_64")
+            list(APPEND A2XT_LIBS glu32)
+        endif()
+
+        list(APPEND A2XT_LIBS opengl32 gdi32)
     endif()
 
     list(APPEND A2XT_LIBS PGE_ZLib)
