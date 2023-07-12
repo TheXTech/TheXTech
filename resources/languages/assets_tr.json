@@ -160,7 +160,8 @@
             "3": "Çık",
             "5": "Orb #41",
             "7": "Topla",
-            "4": "Anahtar"
+            "4": "Anahtar",
+            "none": "Hiç"
         },
         "music": {
             "fam-64": {
@@ -188,7 +189,8 @@
                 "music37": "Buz Dağı",
                 "music38": "Orman Dağı",
                 "header": "Diğer Şeyler",
-                "music13": "Yeni Ana Dünya"
+                "music13": "Yeni Ana Dünya",
+                "music8": "Köşeye Sıkıştın!"
             },
             "fam-rpg": {
                 "music33": "Bulutlar",
@@ -238,6 +240,9 @@
                 "music48": "Su",
                 "music51": "Boss",
                 "music10": "Ana Dünya"
+            },
+            "auto": {
+                "music0": "Hiç"
             }
         },
         "npc": {
@@ -277,19 +282,65 @@
                 "sound84": "Anahtar Al",
                 "sound81": "Mücevher Al",
                 "sound79": "Kalp Al",
-                "sound80": "Kahraman Öldü"
+                "sound80": "Kahraman Öldü",
+                "header": "Kahraman"
             },
             "fam-item": {
                 "header": "Eşya",
                 "sound14": "Para",
                 "sound16": "Lav",
-                "sound22": "Mermi"
+                "sound22": "Mermi",
+                "sound37": "Parçalayıcı",
+                "sound4": "Blok Kırıldı",
+                "sound42": "Büyük Ateş Topu",
+                "sound43": "Havai Fişek",
+                "sound51": "Yumurta Kırılması",
+                "sound56": "Zil",
+                "sound57": "İskelet",
+                "sound58": "Checkpoint",
+                "sound59": "Toplanabilir",
+                "sound74": "Testere",
+                "sound9": "Kabuğa Tekme",
+                "sound61": "Lav Canavarı",
+                "sound7": "Powerup"
             },
             "auto": {
                 "sound0": "Hiç"
             },
             "fam-boss": {
                 "header": "Boss"
+            },
+            "fam-jingle": {
+                "header": "Tını",
+                "sound20": "Boss Yenme",
+                "sound21": "Zinden Bitirme",
+                "sound31": "Anahtar Çıkışı",
+                "sound40": "Top Çıkışı",
+                "sound19": "Rulet Çıkışı",
+                "sound45": "Oyun Bitirme",
+                "sound52": "Yıldız Alma Çıkışı",
+                "sound8": "Oyuncu Öldü"
+            },
+            "fam-player": {
+                "header": "Oyuncu",
+                "sound1": "Atlamak",
+                "sound10": "Patinaj",
+                "sound12": "Eyşa Almak",
+                "sound15": "1up",
+                "sound18": "Ateş Topu",
+                "sound2": "Ezilme",
+                "sound23": "Tutmak",
+                "sound33": "Kuyruk",
+                "sound34": "Rakun",
+                "sound35": "Bot Kaybetmek",
+                "sound46": "Kapı",
+                "sound5": "Küçülmek",
+                "sound54": "Oyuncu Öldü 2",
+                "sound6": "Büyümek",
+                "sound71": "Tırmanmak",
+                "sound72": "Yüzmek",
+                "sound24": "Fırlamak",
+                "sound25": "Çekiç Fırlatmak"
             }
         },
         "worldMusic": {
