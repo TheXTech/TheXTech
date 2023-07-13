@@ -693,7 +693,7 @@ void FontManager::optimizeTextPx(std::string& text,
         case '\t':
         case ' ':
             lastspace = i;
-            pixelWidth += font->glyphSize(&text[i], x, ttf_FontSize);
+            pixelWidth += font->glyphSize(&text[i], x, ttf_FontSize).w();
             break;
 
         case '\n':
@@ -706,7 +706,7 @@ void FontManager::optimizeTextPx(std::string& text,
             break;
 
         default:
-            pixelWidth += font->glyphSize(&text[i], x, ttf_FontSize);
+            pixelWidth += font->glyphSize(&text[i], x, ttf_FontSize).w();
             break;
         }
 

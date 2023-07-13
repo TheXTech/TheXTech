@@ -153,6 +153,7 @@ void initEditorStrings()
     g_editorStrings.eventsLabelDestroy = "Destroy";
     g_editorStrings.eventsLabelEnter = "Enter";
 
+    g_editorStrings.eventsDescActivate = "NPC enters the screen";
     g_editorStrings.eventsDescActivate1 = "NPC enters";
     g_editorStrings.eventsDescActivate2 = "the screen";
     g_editorStrings.eventsDescDeath1 = "NPC dies";
@@ -167,6 +168,7 @@ void initEditorStrings()
     g_editorStrings.eventsDescEnter1 = "warp is";
     g_editorStrings.eventsDescEnter2 = "entered";
 
+    g_editorStrings.eventsDescPhraseTriggersWhenTemplate = "{0} triggers when {1}";
     g_editorStrings.eventsDescPhraseTriggersWhen = "triggers when";
 
     g_editorStrings.eventsDeletingEvent = "Deleting event {0}";

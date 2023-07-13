@@ -569,6 +569,7 @@ XTechTranslate::XTechTranslate()
         {"editor.events.label.destroy",     &g_editorStrings.eventsLabelDestroy},
         {"editor.events.label.enter",       &g_editorStrings.eventsLabelEnter},
 
+        {"editor.events.desc.activate",     &g_editorStrings.eventsDescActivate},
         {"editor.events.desc.activate1",    &g_editorStrings.eventsDescActivate1},
         {"editor.events.desc.activate2",    &g_editorStrings.eventsDescActivate2},
         {"editor.events.desc.death1",       &g_editorStrings.eventsDescDeath1},

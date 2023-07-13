@@ -156,6 +156,7 @@ struct EditorContent
     std::string eventsLabelDestroy;
     std::string eventsLabelEnter;
 
+    std::string eventsDescActivate;
     std::string eventsDescActivate1;
     std::string eventsDescActivate2;
     std::string eventsDescDeath1;
@@ -170,6 +171,7 @@ struct EditorContent
     std::string eventsDescEnter1;
     std::string eventsDescEnter2;
 
+    std::string eventsDescPhraseTriggersWhenTemplate;
     std::string eventsDescPhraseTriggersWhen;
 
     std::string eventsDeletingEvent;

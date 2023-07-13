@@ -26,6 +26,7 @@
 
 #include "sdl_proxy/sdl_stdinc.h"
 #include <Integrator/integrator.h>
+#include <fontman/font_manager.h>
 
 #include "core/render.h"
 
@@ -2459,8 +2460,8 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(m_special_subpage == 1)
         {
             event_name = g_editorStrings.eventsLabelActivate;
-            event_desc = g_editorStrings.eventsDescActivate1;
-            event_desc_2 = g_editorStrings.eventsDescActivate2;
+            event_desc = g_editorStrings.eventsDescActivate;
+            // event_desc_2 = g_editorStrings.eventsDescActivate2;
             event_to_set = &EditorCursor.NPC.TriggerActivate;
         }
         else if(m_special_subpage == 2)
@@ -2531,11 +2532,16 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     }
 
     // render description
-    SuperPrintR(mode, event_name, 3, e_ScreenW - 236, 80);
-    SuperPrintR(mode, g_editorStrings.eventsDescPhraseTriggersWhen, 3, e_ScreenW - 236, 100);
-    SuperPrintR(mode, event_desc, 3, e_ScreenW - 236, 120);
-    SuperPrintR(mode, event_desc_2, 3, e_ScreenW - 236, 140);
-    SuperPrintR(mode, event_desc_3, 3, e_ScreenW - 236, 160);
+    {
+        std::string desc = fmt::format(g_editorStrings.eventsDescPhraseTriggersWhenTemplate, event_name, event_desc);
+        FontManager::optimizeTextPx(desc, 230, 3, nullptr, nullptr, 14);
+        FontManager::printText(desc.c_str(), desc.size(), e_ScreenW - 236, 80, FontManager::fontIdFromSmbxFont(3));
+//        SuperPrintR(mode, event_name, 3, e_ScreenW - 236, 80);
+//        SuperPrintR(mode, g_editorStrings.eventsDescPhraseTriggersWhen, 3, e_ScreenW - 236, 100);
+//        SuperPrintR(mode, event_desc, 3, e_ScreenW - 236, 120);
+//        SuperPrintR(mode, event_desc_2, 3, e_ScreenW - 236, 140);
+//        SuperPrintR(mode, event_desc_3, 3, e_ScreenW - 236, 160);
+    }
 
     // render current event
     SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseTypeLabelEvent, event_name), 3, 10, 40);
