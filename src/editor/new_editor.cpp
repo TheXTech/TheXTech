@@ -2534,7 +2534,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     // render description
     {
         std::string desc = fmt::format(g_editorStrings.eventsDescPhraseTriggersWhenTemplate, event_name, event_desc);
-        FontManager::optimizeTextPx(desc, 230, 3, nullptr, nullptr, 14);
+        FontManager::optimizeTextPx(desc, 230, FontManager::fontIdFromSmbxFont(3), nullptr, nullptr, 14);
         FontManager::printText(desc.c_str(), desc.size(), e_ScreenW - 236, 80, FontManager::fontIdFromSmbxFont(3));
 //        SuperPrintR(mode, event_name, 3, e_ScreenW - 236, 80);
 //        SuperPrintR(mode, g_editorStrings.eventsDescPhraseTriggersWhen, 3, e_ScreenW - 236, 100);
