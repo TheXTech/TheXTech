@@ -1,3 +1,48 @@
 {
-    "languageName": "Türkçe"
+    "languageName": "Türkçe",
+    "editor": {
+        "block": {
+            "canBreak": "Kırılabilir",
+            "canBreakTooltip": "Legacy: vurunca kırılır",
+            "inside": "İçinde:",
+            "invis": "Görmez",
+            "letterHeight": "Y",
+            "letterWidth": "G",
+            "pickContents1": "Blok",
+            "pickContents2": "içeriği seç",
+            "slick": "Kaygan"
+        },
+        "browser": {
+            "askOverwriteFile": "Üzerine Yaz {0}?",
+            "itemNewFile": "<Yeni Dosya>",
+            "itemNewFolder": "<Yeni Klâsör>",
+            "newFile": "Yeni dosya",
+            "openFile": "Dosyayı aç",
+            "saveFile": "Dosyayı kaydet"
+        },
+        "events": {
+            "bounds": {
+                "changeAllSectionBoundsToCurrent": "Bütün kısımları buna dönüştür?",
+                "changeSectionBoundsToCurrent": "{0} kısımını buna dönüştür?"
+            },
+            "controlsForEvent": "Olaylar için kontroller",
+            "deletion": {
+                "cancel": "Hayır: olayı silme",
+                "confirm": "Evet: olayı sil",
+                "deletingEvent": "{0} olayı siliniyor"
+            },
+            "desc": {
+                "activate1": "NPC ekrana",
+                "hit1": "Bloğa vurulduğunda",
+                "activate2": "girer",
+                "death1": "NPC ölür",
+                "destroy1": "blok",
+                "destroy2": "yok edildi",
+                "layerClear2": "her şey",
+                "phraseTriggersWhen": "NPC öldüğünde",
+                "layerClear3": "gitti",
+                "layerClear1": "obje katmanındaki"
+            }
+        }
+    }
 }
