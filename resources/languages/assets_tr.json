@@ -8,40 +8,45 @@
     },
     "editor": {
         "background2": {
-            "fam-misc": {
-                "bg2-45": "Uzay Bataklığı",
-                "bg2-40": "Gizli Maden",
-                "bg2-16": "Uzay Krateri",
-                "header": "Diğer Şeyler",
-                "bg2-47": "Uzay Üssü",
-                "bg2-46": "Uzay Gemisi"
-            },
             "auto": {
                 "bg2-0": "Hiç"
+            },
+            "fam-misc": {
+                "bg2-16": "Uzay Krateri",
+                "bg2-40": "Gizli Maden",
+                "bg2-45": "Uzay Bataklığı",
+                "bg2-46": "Uzay Gemisi",
+                "bg2-47": "Uzay Üssü",
+                "header": "Diğer Şeyler"
             },
             "fam-set1": {
                 "bg2-10": "Ana Dünya",
                 "bg2-41": "Kale",
                 "bg2-50": "Mantarlar",
                 "bg2-51": "Çöl",
-                "header": "Set 1",
                 "bg2-7": "Yer Altı",
                 "bg2-8": "Gece",
-                "bg2-9": "Gece 2"
+                "bg2-9": "Gece 2",
+                "header": "Set 1"
             },
             "fam-set2": {
+                "bg2-25": "Yer Altı",
                 "bg2-44": "Kale",
                 "bg2-48": "Bulutlar",
                 "bg2-49": "Bayır - Gece",
-                "header": "Set 2",
-                "bg2-57": "Zindan",
-                "bg2-54": "Depo",
-                "bg2-53": "Uçurum",
-                "bg2-52": "Çöl - Gece",
                 "bg2-5": "Ağaçalar",
-                "bg2-25": "Yer Altı"
+                "bg2-52": "Çöl - Gece",
+                "bg2-53": "Uçurum",
+                "bg2-54": "Depo",
+                "bg2-57": "Zindan",
+                "header": "Set 2"
             },
             "fam-set3": {
+                "bg2-1": "Bloklar",
+                "bg2-13": "Bulutlar",
+                "bg2-14": "Çöl",
+                "bg2-15": "Zindan 2",
+                "bg2-17": "Gemi",
                 "bg2-2": "Bayır",
                 "bg2-20": "Orman",
                 "bg2-21": "Çatışma",
@@ -57,14 +62,9 @@
                 "bg2-38": "Mağara",
                 "bg2-39": "Mağara 2",
                 "bg2-4": "Borular",
-                "bg2-17": "Gemi",
-                "bg2-15": "Zindan 2",
-                "bg2-14": "Çöl",
-                "bg2-13": "Bulutlar",
-                "bg2-1": "Bloklar",
                 "bg2-56": "Su Altı",
-                "header": "Set 3",
-                "bg2-6": "Bonus"
+                "bg2-6": "Bonus",
+                "header": "Set 3"
             },
             "fam-set4": {
                 "bg2-11": "Bayır",
@@ -75,8 +75,8 @@
                 "bg2-29": "Gece",
                 "bg2-30": "Mağara",
                 "bg2-31": "Bulutlar",
-                "bg2-33": "Bayır 4",
                 "bg2-32": "Bayır 2",
+                "bg2-33": "Bayır 4",
                 "bg2-34": "Bayır 3",
                 "bg2-42": "Kale",
                 "bg2-43": "Kale 2",
@@ -86,31 +86,36 @@
             }
         },
         "bgo": {
+            "fam-art2": "",
+            "fam-bars4": "",
             "fam-clouds1": "Bulutlar",
             "fam-doors2": "Kapılar",
             "fam-doors4": "Kapılar",
             "fam-exit3": "Çıkış",
             "fam-fences1": "Çit",
             "fam-fences4": "Çit",
+            "fam-ghost4": "Hayalet",
             "fam-hut1": "Kulube",
             "fam-key4": "Anahtar",
             "fam-misc4": "Diğer Şeyler",
+            "fam-plants1": "Bitkiler",
             "fam-plants2": "Bitkiler",
+            "fam-plants3": "Bitkiler",
             "fam-plants4": "Bitkiler",
-            "fam-sandbg3": "Kum AP",
             "fam-platform4": "Platform",
-            "fam-water3": "Su",
+            "fam-sandbg3": "Kum AP",
+            "fam-sandfg3": "",
             "fam-space5": "Uzay Böceği",
             "fam-structures3": "Yapılar",
             "fam-temple5": "Tapınak",
-            "fam-plants1": "Bitkiler",
-            "fam-ghost4": "Hayalet",
+            "fam-tiles3": "",
             "fam-water1": "Su",
-            "fam-plants3": "Bitkiler",
             "fam-water2": "Su",
+            "fam-water3": "Su",
             "fam-water4": "Su"
         },
         "block": {
+            "fam-bonus3": "Bonus",
             "fam-bonus4": "Bonus",
             "fam-bricks5": "Tuğla",
             "fam-castle2": "Kale",
@@ -125,7 +130,10 @@
             "fam-grass3": "Çimen",
             "fam-grass4": "Çimen",
             "fam-house3": "Ev",
+            "fam-hurts3": "Hasar",
+            "fam-lava4": "Lav ve Hasar",
             "fam-mansion4": "Malikane",
+            "fam-metal5-1": "",
             "fam-metal5-3": "Diğer Şeyler",
             "fam-misc1": "Diğer Şeyler",
             "fam-misc2": "Diğer Şeyler",
@@ -137,42 +145,51 @@
             "fam-pipes3": "Borular",
             "fam-pipes4": "Borular",
             "fam-pipes5-2": "Borular",
+            "fam-pipes5-3": "Uzun Borular",
             "fam-ruins5": "Enkaz",
+            "fam-sized1": "",
+            "fam-sized2": "",
+            "fam-sized3": "",
+            "fam-sized4": "",
             "fam-special1": "Özel",
             "fam-special2": "Özel",
             "fam-special3": "Özel",
+            "fam-special4": "Özel",
             "fam-steampunk3": "Steampunk",
+            "fam-switch4": "",
             "fam-underground1": "Yer Altı",
-            "fam-hurts3": "Hasar",
-            "fam-lava4": "Lav ve Hasar",
             "fam-underground2": "Yer Altı",
             "fam-water3": "Su",
             "fam-wood2": "Odun",
             "fam-wood3": "Odun",
-            "fam-woods4": "Odunlar(Koru) ne olduğuna bağlı",
-            "fam-bonus3": "Bonus",
-            "fam-special4": "Özel",
-            "fam-pipes5-3": "Uzun Borular"
+            "fam-woods4": "Odunlar(Koru) ne olduğuna bağlı"
         },
         "exit-codes": {
             "1": "Rulet",
             "2": "Orb #16",
             "3": "Çık",
-            "5": "Orb #41",
-            "7": "Topla",
             "4": "Anahtar",
+            "5": "Orb #41",
+            "6": "",
+            "7": "Topla",
+            "8": "",
+            "any": "",
             "none": "Hiç"
         },
         "music": {
+            "auto": {
+                "music0": "Hiç",
+                "music24": ""
+            },
             "fam-64": {
                 "header": "64",
+                "music14": "Çöl",
                 "music26": "Kale",
                 "music27": "Ana Tema",
-                "music49": "Su",
-                "music50": "Mağara",
                 "music35": "Kar",
-                "music14": "Çöl",
-                "music36": "Boss"
+                "music36": "Boss",
+                "music49": "Su",
+                "music50": "Mağara"
             },
             "fam-fight": {
                 "header": "Uçuş",
@@ -183,23 +200,26 @@
                 "music53": "Pinball"
             },
             "fam-misc": {
+                "header": "Diğer Şeyler",
+                "music13": "Yeni Ana Dünya",
                 "music18": "Sahil",
                 "music20": "Füzyon Reaktörü",
                 "music23": "Yiğit Orman",
                 "music37": "Buz Dağı",
                 "music38": "Orman Dağı",
-                "header": "Diğer Şeyler",
-                "music13": "Yeni Ana Dünya",
+                "music55": "",
+                "music56": "",
                 "music8": "Köşeye Sıkıştın!"
             },
             "fam-rpg": {
-                "music33": "Bulutlar",
                 "header": "RYO",
                 "music16": "Orman",
-                "music34": "Kasaba",
                 "music21": "Çatışma",
+                "music30": "",
                 "music31": "Deniz Kenarı",
-                "music32": "Gölet"
+                "music32": "Gölet",
+                "music33": "Bulutlar",
+                "music34": "Kasaba"
             },
             "fam-set1": {
                 "header": "Set 1",
@@ -222,27 +242,26 @@
                 "music3": "Zindan",
                 "music4": "Yer Altı",
                 "music47": "Su",
+                "music54": "",
                 "music6": "Boss"
             },
             "fam-space": {
                 "header": "Uzay",
                 "music11": "Kızıl Bataklık",
                 "music12": "Krater",
+                "music22": "",
                 "music44": "Eşya Odası",
                 "music45": "Son Boss"
             },
             "fam-world": {
                 "header": "Dünya",
+                "music10": "Ana Dünya",
                 "music17": "Malikane",
                 "music28": "Gökyüzü",
                 "music29": "Mağara",
                 "music41": "Zindan",
                 "music48": "Su",
-                "music51": "Boss",
-                "music10": "Ana Dünya"
-            },
-            "auto": {
-                "music0": "Hiç"
+                "music51": "Boss"
             }
         },
         "npc": {
@@ -255,9 +274,11 @@
             "fam-boss5": "Boss",
             "fam-char3": "Karakter",
             "fam-char5": "Karakter",
+            "fam-ckpt4": "",
             "fam-enemies1": "Düşmanlar",
             "fam-enemies2": "Düşmanlar",
             "fam-enemies3": "Düşmanlar",
+            "fam-enemies4": "Düşmanlar",
             "fam-enemies5": "Düşmanlar",
             "fam-exit2": "Çıkış",
             "fam-exit3": "Çıkış",
@@ -267,29 +288,62 @@
             "fam-items3": "Eşyalar",
             "fam-items4": "Eşyalar",
             "fam-items5": "Eşyalar",
+            "fam-pet4": "",
             "fam-plant3": "Bitki",
+            "fam-plat1": "",
+            "fam-plat3": "",
+            "fam-plat4": "",
             "fam-shell1": "Kabuk",
             "fam-shell3": "Kabuk",
             "fam-sign4": "Tabela",
+            "fam-switch5": "",
+            "fam-veg2": "",
             "fam-vine1": "Sarmaşık",
             "fam-vine2": "Sarmaşık",
             "fam-vine3": "Sarmaşık",
             "fam-vine4": "Sarmaşık",
-            "fam-enemies4": "Düşmanlar"
+            "fam-warp2": ""
         },
         "sound": {
+            "auto": {
+                "sound0": "Hiç"
+            },
+            "fam-boss": {
+                "header": "Boss",
+                "sound38": "",
+                "sound39": "",
+                "sound41": "",
+                "sound44": "",
+                "sound62": "",
+                "sound63": "",
+                "sound67": "",
+                "sound68": "",
+                "sound69": "",
+                "sound70": ""
+            },
             "fam-hero": {
-                "sound84": "Anahtar Al",
-                "sound81": "Mücevher Al",
+                "header": "Kahraman",
+                "sound53": "",
+                "sound77": "",
+                "sound78": "",
                 "sound79": "Kalp Al",
                 "sound80": "Kahraman Öldü",
-                "header": "Kahraman"
+                "sound81": "Mücevher Al",
+                "sound82": "",
+                "sound83": "",
+                "sound84": "Anahtar Al",
+                "sound85": "",
+                "sound86": "",
+                "sound87": "",
+                "sound88": ""
             },
             "fam-item": {
                 "header": "Eşya",
                 "sound14": "Para",
                 "sound16": "Lav",
                 "sound22": "Mermi",
+                "sound3": "",
+                "sound32": "",
                 "sound37": "Parçalayıcı",
                 "sound4": "Blok Kırıldı",
                 "sound42": "Büyük Ateş Topu",
@@ -299,27 +353,33 @@
                 "sound57": "İskelet",
                 "sound58": "Checkpoint",
                 "sound59": "Toplanabilir",
-                "sound74": "Testere",
-                "sound9": "Kabuğa Tekme",
                 "sound61": "Lav Canavarı",
-                "sound7": "Powerup"
-            },
-            "auto": {
-                "sound0": "Hiç"
-            },
-            "fam-boss": {
-                "header": "Boss"
+                "sound64": "",
+                "sound65": "",
+                "sound66": "",
+                "sound7": "Powerup",
+                "sound74": "Testere",
+                "sound9": "Kabuğa Tekme"
             },
             "fam-jingle": {
                 "header": "Tını",
+                "sound19": "Rulet Çıkışı",
                 "sound20": "Boss Yenme",
                 "sound21": "Zinden Bitirme",
                 "sound31": "Anahtar Çıkışı",
                 "sound40": "Top Çıkışı",
-                "sound19": "Rulet Çıkışı",
                 "sound45": "Oyun Bitirme",
                 "sound52": "Yıldız Alma Çıkışı",
+                "sound60": "",
                 "sound8": "Oyuncu Öldü"
+            },
+            "fam-pet": {
+                "header": "",
+                "sound36": "",
+                "sound48": "",
+                "sound49": "",
+                "sound50": "",
+                "sound55": ""
             },
             "fam-player": {
                 "header": "Oyuncu",
@@ -327,9 +387,12 @@
                 "sound10": "Patinaj",
                 "sound12": "Eyşa Almak",
                 "sound15": "1up",
+                "sound17": "",
                 "sound18": "Ateş Topu",
                 "sound2": "Ezilme",
                 "sound23": "Tutmak",
+                "sound24": "Fırlamak",
+                "sound25": "Çekiç Fırlatmak",
                 "sound33": "Kuyruk",
                 "sound34": "Rakun",
                 "sound35": "Bot Kaybetmek",
@@ -339,8 +402,6 @@
                 "sound6": "Büyümek",
                 "sound71": "Tırmanmak",
                 "sound72": "Yüzmek",
-                "sound24": "Fırlamak",
-                "sound25": "Çekiç Fırlatmak",
                 "sound73": "Hafif Tutmak",
                 "sound75": "Sebze Fırlatmak",
                 "sound76": "Kalp Kaybetmek"
@@ -350,6 +411,7 @@
                 "sound11": "Eşya Bırakmak",
                 "sound13": "Kamera",
                 "sound26": "Kaymak",
+                "sound29": "",
                 "sound30": "Durdurmak",
                 "sound47": "Mesaj"
             },
@@ -359,54 +421,56 @@
                 "sound28": "Seviye Seçmek"
             }
         },
+        "tile": {
+            "fam-clouds4": "Bulutlar",
+            "fam-desert1": "Toz",
+            "fam-dirt2": "Ölü Çimen",
+            "fam-granite3": "Granit",
+            "fam-grass1": "Eski Çimen",
+            "fam-grass2": "Mutlu Çimen",
+            "fam-lava3": "Lav",
+            "fam-lilac4": "",
+            "fam-marble3": "Mermer",
+            "fam-snow1": "Eski Kar",
+            "fam-stonewall3": "Taş Duvar",
+            "fam-wall2": "Kum Duvar"
+        },
         "worldMusic": {
+            "auto": {
+                "wmusic0": "Hiç"
+            },
+            "fam-new": {
+                "header": "Yeni",
+                "wmusic5": "Tema"
+            },
+            "fam-set3": {
+                "header": "Set 3",
+                "wmusic1": "Dünya 1",
+                "wmusic10": "Dünya 6",
+                "wmusic11": "Dünya 5",
+                "wmusic2": "Dünya 4",
+                "wmusic3": "Dünya 7",
+                "wmusic6": "Dünya 2",
+                "wmusic8": "Dünya 3",
+                "wmusic9": "Dünya 8"
+            },
             "fam-world": {
+                "header": "Dünya",
+                "wmusic12": "Özel",
+                "wmusic13": "Zindan",
                 "wmusic14": "Gökyüzü",
                 "wmusic15": "Ada",
                 "wmusic16": "Mağara",
                 "wmusic4": "Tema",
-                "wmusic7": "Orman",
-                "wmusic13": "Zindan",
-                "wmusic12": "Özel",
-                "header": "Dünya"
-            },
-            "fam-new": {
-                "wmusic5": "Tema",
-                "header": "Yeni"
-            },
-            "fam-set3": {
-                "header": "Set 3",
-                "wmusic6": "Dünya 2",
-                "wmusic10": "Dünya 6",
-                "wmusic11": "Dünya 5",
-                "wmusic9": "Dünya 8",
-                "wmusic2": "Dünya 4",
-                "wmusic3": "Dünya 7",
-                "wmusic1": "Dünya 1",
-                "wmusic8": "Dünya 3"
-            },
-            "auto": {
-                "wmusic0": "Hiç"
+                "wmusic7": "Orman"
             }
-        },
-        "tile": {
-            "fam-marble3": "Mermer",
-            "fam-grass2": "Mutlu Çimen",
-            "fam-desert1": "Toz",
-            "fam-grass1": "Eski Çimen",
-            "fam-dirt2": "Ölü Çimen",
-            "fam-clouds4": "Bulutlar",
-            "fam-granite3": "Granit",
-            "fam-lava3": "Lav",
-            "fam-stonewall3": "Taş Duvar",
-            "fam-snow1": "Eski Kar",
-            "fam-wall2": "Kum Duvar"
         }
     },
+    "languageName": "Türkçe",
     "objects": {
+        "wordFails": "HATALAR",
+        "wordStarAccusativeDualOrCounter": "",
         "wordStarAccusativePlural": "Yıldızlar",
-        "wordStarAccusativeSingular": "Yıldız",
-        "wordFails": "HATALAR"
-    },
-    "languageName": "Türkçe"
+        "wordStarAccusativeSingular": "Yıldız"
+    }
 }

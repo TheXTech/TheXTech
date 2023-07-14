@@ -49,6 +49,15 @@ public:
                               bool cut = false, uint32_t fontSize = 14) = 0;
 
     /*!
+     * \brief Get a size of one glyph
+     * \param utf8char Pointer to one UTF-8 character
+     * \param charNum Character number in the line (required to compute the size of the taboluation)
+     * \param fontSize Size of TTF font glyph
+     * \return Width and height of one glyph in pixels
+     */
+    virtual PGE_Size glyphSize(const char *utf8char, uint32_t charNum = 0, uint32_t fontSize = 14) = 0;
+
+    /*!
      * \brief Print the multiline text block on the screen
      * \param text Multi-line text string
      * \param text_size The byte size of the text string to print
