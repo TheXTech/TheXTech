@@ -514,8 +514,12 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && mode == CallMode::Render)
     {
-        SuperPrint(g_editorStrings.pickBlockContents1, 3, e_ScreenW - 200, 90);
-        SuperPrint(g_editorStrings.pickBlockContents2, 3, e_ScreenW - 200, 110);
+        const int fontId = FontManager::fontIdFromSmbxFont(3);
+        std::string desc = g_editorStrings.pickBlockContents;
+        FontManager::optimizeTextPx(desc, 230, fontId, nullptr, nullptr, 14);
+        FontManager::printText(desc.c_str(), desc.size(), e_ScreenW - 200, 90, fontId);
+//        SuperPrint(g_editorStrings.pickBlockContents1, 3, e_ScreenW - 200, 90);
+//        SuperPrint(g_editorStrings.pickBlockContents2, 3, e_ScreenW - 200, 110);
     }
 
     if(m_special_page != SPECIAL_PAGE_BLOCK_CONTENTS)
@@ -2446,8 +2450,6 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     // prepare selector
     std::string event_name;
     std::string event_desc;
-    std::string event_desc_2;
-    std::string event_desc_3;
     eventindex_t* event_to_set;
 
     if(m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
@@ -2461,28 +2463,24 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         {
             event_name = g_editorStrings.eventsLabelActivate;
             event_desc = g_editorStrings.eventsDescActivate;
-            // event_desc_2 = g_editorStrings.eventsDescActivate2;
             event_to_set = &EditorCursor.NPC.TriggerActivate;
         }
         else if(m_special_subpage == 2)
         {
             event_name = g_editorStrings.eventsLabelDeath;
-            event_desc = g_editorStrings.eventsDescDeath1;
+            event_desc = g_editorStrings.eventsDescDeath;
             event_to_set = &EditorCursor.NPC.TriggerDeath;
         }
         else if(m_special_subpage == 3)
         {
             event_name = g_editorStrings.eventsLabelTalk;
-            event_desc = g_editorStrings.eventsDescTalk1;
-            event_desc_2 = g_editorStrings.eventsDescTalk2;
+            event_desc = g_editorStrings.eventsDescTalk;
             event_to_set = &EditorCursor.NPC.TriggerTalk;
         }
         else if(m_special_subpage == 4)
         {
             event_name = g_editorStrings.eventsLabelLayerClear;
-            event_desc = g_editorStrings.eventsDescLayerClear1;
-            event_desc_2 = g_editorStrings.eventsDescLayerClear2;
-            event_desc_3 = g_editorStrings.eventsDescLayerClear3;
+            event_desc = g_editorStrings.eventsDescLayerClear;
             event_to_set = &EditorCursor.NPC.TriggerLast;
         }
         else
@@ -2493,22 +2491,19 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(m_special_subpage == 1)
         {
             event_name = g_editorStrings.eventsLabelHit;
-            event_desc = g_editorStrings.eventsDescHit1;
+            event_desc = g_editorStrings.eventsDescHit;
             event_to_set = &EditorCursor.Block.TriggerHit;
         }
         else if(m_special_subpage == 2)
         {
             event_name = g_editorStrings.eventsLabelDestroy;
-            event_desc = g_editorStrings.eventsDescDestroy1;
-            event_desc_2 = g_editorStrings.eventsDescDestroy2;
+            event_desc = g_editorStrings.eventsDescDestroy;
             event_to_set = &EditorCursor.Block.TriggerDeath;
         }
         else if(m_special_subpage == 3)
         {
             event_name = g_editorStrings.eventsLabelLayerClear;
-            event_desc = g_editorStrings.eventsDescLayerClear1;
-            event_desc_2 = g_editorStrings.eventsDescLayerClear2;
-            event_desc_3 = g_editorStrings.eventsDescLayerClear3;
+            event_desc = g_editorStrings.eventsDescLayerClear;
             event_to_set = &EditorCursor.Block.TriggerLast;
         }
         else
@@ -2519,8 +2514,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
         if(m_special_subpage == 1)
         {
             event_name = g_editorStrings.eventsLabelEnter;
-            event_desc = g_editorStrings.eventsDescEnter1;
-            event_desc_2 = g_editorStrings.eventsDescEnter2;
+            event_desc = g_editorStrings.eventsDescEnter;
             event_to_set = &EditorCursor.Warp.eventEnter;
         }
         else
@@ -2698,11 +2692,14 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
     // render description
     if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
     {
-        SuperPrintR(mode, g_editorStrings.layersDescAtt1, 3, e_ScreenW - 236, 80);
-        SuperPrintR(mode, g_editorStrings.layersDescAtt2, 3, e_ScreenW - 236, 100);
-        SuperPrintR(mode, g_editorStrings.layersDescAtt3, 3, e_ScreenW - 236, 120);
-        SuperPrintR(mode, g_editorStrings.layersDescAtt4, 3, e_ScreenW - 236, 140);
-        SuperPrintR(mode, g_editorStrings.layersDescAtt5, 3, e_ScreenW - 236, 160);
+        std::string desc = g_editorStrings.layersDescAtt;
+        FontManager::optimizeTextPx(desc, 230, FontManager::fontIdFromSmbxFont(3), nullptr, nullptr, 14);
+        FontManager::printText(desc.c_str(), desc.size(), e_ScreenW - 236, 80, FontManager::fontIdFromSmbxFont(3));
+//        SuperPrintR(mode, g_editorStrings.layersDescAtt, 3, e_ScreenW - 236, 80);
+//        SuperPrintR(mode, g_editorStrings.layersDescAtt2, 3, e_ScreenW - 236, 100);
+//        SuperPrintR(mode, g_editorStrings.layersDescAtt3, 3, e_ScreenW - 236, 120);
+//        SuperPrintR(mode, g_editorStrings.layersDescAtt4, 3, e_ScreenW - 236, 140);
+//        SuperPrintR(mode, g_editorStrings.layersDescAtt5, 3, e_ScreenW - 236, 160);
     }
 
     // render current layer
@@ -4069,8 +4066,13 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
 
         SuperPrintR(mode, fmt::format_ne(g_editorStrings.fileConfirmationConvertFormatTo, *format), 3, 10, 50);
 
-        SuperPrintR(mode, g_editorStrings.fileConvertDesc1, 4, 20, 90);
-        SuperPrintR(mode, g_editorStrings.fileConvertDesc2, 4, 20, 110);
+        {
+            const int fontId = FontManager::fontIdFromSmbxFont(4);
+            std::string desc = g_editorStrings.fileConvertDesc;
+            FontManager::optimizeTextPx(desc, 606, fontId, nullptr, nullptr, 14);
+            FontManager::printText(desc.c_str(), desc.size(), 20, 90, fontId);
+            // SuperPrintR(mode, g_editorStrings.fileConvertDesc, 4, 20, 90);
+        }
 
         if(m_saved_message.empty())
             SuperPrintR(mode, g_editorStrings.fileConvertNoIssues, 4, 20, 150);
