@@ -161,7 +161,6 @@ void initEditorStrings()
     g_editorStrings.eventsDescEnter = "warp is entered";
 
     g_editorStrings.eventsDescPhraseTriggersWhenTemplate = "{0} triggers when {1}";
-    g_editorStrings.eventsDescPhraseTriggersWhen = "triggers when";
 
     g_editorStrings.eventsDeletingEvent = "Deleting event {0}";
     g_editorStrings.eventsDeletionConfirm = "Yes: delete event";

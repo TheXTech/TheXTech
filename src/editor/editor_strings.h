@@ -164,7 +164,6 @@ struct EditorContent
     std::string eventsDescEnter;
 
     std::string eventsDescPhraseTriggersWhenTemplate;
-    std::string eventsDescPhraseTriggersWhen;
 
     std::string eventsDeletingEvent;
     std::string eventsDeletionConfirm;

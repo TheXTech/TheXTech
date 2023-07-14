@@ -569,14 +569,14 @@ XTechTranslate::XTechTranslate()
         {"editor.events.label.enter",       &g_editorStrings.eventsLabelEnter},
 
         {"editor.events.desc.activate",     &g_editorStrings.eventsDescActivate},
-        {"editor.events.desc.death1",       &g_editorStrings.eventsDescDeath},
+        {"editor.events.desc.death",        &g_editorStrings.eventsDescDeath},
         {"editor.events.desc.talk",         &g_editorStrings.eventsDescTalk},
         {"editor.events.desc.layerClear",   &g_editorStrings.eventsDescLayerClear},
         {"editor.events.desc.hit",          &g_editorStrings.eventsDescHit},
         {"editor.events.desc.destroy",      &g_editorStrings.eventsDescDestroy},
         {"editor.events.desc.enter",        &g_editorStrings.eventsDescEnter},
 
-        {"editor.events.desc.phraseTriggersWhen",   &g_editorStrings.eventsDescPhraseTriggersWhen},
+        {"editor.events.desc.phraseTriggersWhenTemplate",   &g_editorStrings.eventsDescPhraseTriggersWhenTemplate},
 
         {"editor.events.deletion.deletingEvent",    &g_editorStrings.eventsDeletingEvent},
         {"editor.events.deletion.confirm",          &g_editorStrings.eventsDeletionConfirm},
