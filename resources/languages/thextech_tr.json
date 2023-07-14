@@ -39,9 +39,17 @@
                 "destroy1": "blok",
                 "destroy2": "yok edildi",
                 "layerClear2": "her şey",
-                "phraseTriggersWhen": "NPC öldüğünde",
+                "phraseTriggersWhen": "etkinleştir",
                 "layerClear3": "gitti",
-                "layerClear1": "obje katmanındaki"
+                "layerClear1": "obje katmanındaki",
+                "talk1": "NPC ile",
+                "talk2": "konuşulduğunda"
+            },
+            "header": "Olaylar:",
+            "headerTriggerEvent": "Etkinleştir:",
+            "itemNewEvent": "<Yeni Olay>",
+            "label": {
+                "activate": "Aktifleştir"
             }
         }
     }
