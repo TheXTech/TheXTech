@@ -1,1 +1,29 @@
-{}
+{
+    "editor": {
+        "background2": {
+            "fam-set1": {
+                "bg2-50": "Champiñones",
+                "bg2-7": "Subterráneo",
+                "bg2-8": "Noche",
+                "bg2-41": "Castillo",
+                "bg2-51": "Desierto",
+                "bg2-9": "Noche 2"
+            },
+            "fam-set2": {
+                "bg2-25": "Subterráneo",
+                "bg2-44": "Castillo",
+                "bg2-48": "Nubes"
+            },
+            "fam-misc": {
+                "bg2-16": "Cráter espacial",
+                "bg2-40": "Mina secreta",
+                "bg2-47": "Base espacial",
+                "bg2-46": "Nave espacial",
+                "bg2-45": "Pantano espacial"
+            },
+            "auto": {
+                "bg2-0": "Ninguno"
+            }
+        }
+    }
+}
