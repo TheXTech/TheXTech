@@ -145,6 +145,21 @@ void           optimizeText(std::string &text,
                             int *numCols = 0);
 
 /**
+ * @brief Clean-Up text fragment to fit into the pixel width
+ * @param [_inout] text Text to optimize
+ * @param [_in]  max_pixels_lenght max line lenght in pixels
+ * @param [_in]  fontId font ID
+ * @param [_out] numLines Total line in the text fragment after optimization
+ * @param [_out] numCols Total columns in the text fragment after optimization
+ */
+void           optimizeTextPx(std::string &text,
+                              size_t max_pixels_lenght,
+                              int fontId,
+                              int *numLines = 0,
+                              int *numCols = 0,
+                              uint32_t ttf_FontSize = 14);
+
+/**
  * @brief Strip text outing of max count of symbols
  * @param text input text
  * @param max_symbols Maximal character count limit

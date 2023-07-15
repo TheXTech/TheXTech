@@ -667,6 +667,84 @@ void FontManager::optimizeText(std::string &text, size_t max_line_lenght, int *n
         *numCols = static_cast<int>(maxWidth);
 }
 
+void FontManager::optimizeTextPx(std::string& text,
+                                 size_t max_pixels_lenght,
+                                 int fontId,
+                                 int* numLines,
+                                 int* numCols,
+                                 uint32_t ttf_FontSize)
+{
+    /****************Word wrap*********************/
+    size_t  lastspace = 0;
+    int     count = 1;
+    size_t  maxWidth = 0;
+    size_t  pixelWidth = 0;
+    BaseFontEngine *font = nullptr;
+
+    if((fontId < 0) || (static_cast<size_t>(fontId) >= g_anyFonts.size()) || !g_anyFonts[fontId])
+        return; // Invalid font
+
+    font = g_anyFonts[fontId];
+
+    for(size_t x = 0, i = 0; i < text.size(); i++, x++)
+    {
+        switch(text[i])
+        {
+        case '\t':
+        case ' ':
+            lastspace = i;
+            pixelWidth += font->glyphSize(&text[i], x, ttf_FontSize).w();
+            break;
+
+        case '\n':
+            lastspace = 0;
+            if((maxWidth < x) && (maxWidth < max_pixels_lenght))
+                maxWidth = x;
+            x = 0;
+            pixelWidth = 0;
+            count++;
+            break;
+
+        default:
+            pixelWidth += font->glyphSize(&text[i], x, ttf_FontSize).w();
+            break;
+        }
+
+        if(pixelWidth >= max_pixels_lenght) //If lenght more than allowed
+        {
+            maxWidth = x;
+
+            if(lastspace > 0)
+            {
+                text[lastspace] = '\n';
+                i = lastspace - 1;
+                lastspace = 0;
+            }
+            else
+            {
+                text.insert(i, 1, '\n');
+                x = 0;
+                pixelWidth = 0;
+                count++;
+            }
+        }
+
+        UTF8 uch = static_cast<unsigned char>(text[i]);
+        i += static_cast<size_t>(trailingBytesForUTF8[uch]);
+    }
+
+    if(count == 1)
+        maxWidth = text.length();
+
+    /****************Word wrap*end*****************/
+
+    if(numLines)
+        *numLines = count;
+
+    if(numCols)
+        *numCols = static_cast<int>(maxWidth);
+}
+
 std::string FontManager::cropText(std::string text, size_t max_symbols)
 {
     if(max_symbols == 0)
@@ -678,5 +756,6 @@ std::string FontManager::cropText(std::string text, size_t max_symbols)
         text.erase(utf8len, text.size() - utf8len);
         text.append("...");
     }
+
     return text;
 }

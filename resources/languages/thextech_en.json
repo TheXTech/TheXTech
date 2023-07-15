@@ -7,8 +7,7 @@
             "invis": "Invis",
             "letterHeight": "H ",
             "letterWidth": "W ",
-            "pickContents1": "Pick block",
-            "pickContents2": "contents",
+            "pickContents": "Pick block contents",
             "slick": "Slick"
         },
         "browser": {
@@ -32,20 +31,14 @@
                 "deletingEvent": "Deleting event {0}"
             },
             "desc": {
-                "activate1": "NPC enters",
-                "activate2": "the screen",
-                "death1": "NPC dies",
-                "destroy1": "block is",
-                "destroy2": "destroyed",
-                "enter1": "warp is",
-                "enter2": "entered",
-                "hit1": "block is hit",
-                "layerClear1": "everything in",
-                "layerClear2": "object layer",
-                "layerClear3": "is gone",
-                "phraseTriggersWhen": "triggers when",
-                "talk1": "player talks",
-                "talk2": "to NPC"
+                "activate": "NPC enters the screen",
+                "death": "NPC dies",
+                "destroy": "block is destroyed",
+                "enter": "warp is entered",
+                "hit": "block is hit",
+                "layerClear": "everything in object layer is gone",
+                "phraseTriggersWhenTemplate": "{0} triggers when {1}",
+                "talk": "player talks to NPC"
             },
             "header": "Events:",
             "headerTriggerEvent": "Trigger:",
@@ -109,9 +102,8 @@
             "confirmSaveBeforeAction": "Save before you {0}?",
             "convert": {
                 "_38aUnsupported": "The SMBX38-A format is not supported for conversion.",
-                "desc1": "The file extension will change but",
-                "desc2": "the old file will NOT be deleted.",
-                "featureBlockForceSmashable": "A spin block uses ancient smashable behavior.",
+                "desc": "The file extension will change but the old file will NOT be deleted.",
+                "featureBlockForceSmashable": "A spin block uses legacy smash.",
                 "featureCustomWorldMusic": "Uses custom world music file.",
                 "featureEventAutoscroll": "An event uses modern autoscroll.",
                 "featureEventCustomMusic": "An event sets music to a file.",
@@ -153,11 +145,7 @@
                 "preserveLayerContents": "Preserve layer contents?"
             },
             "desc": {
-                "att1": "Whenever the",
-                "att2": "NPC moves,",
-                "att3": "the attached",
-                "att4": "layer moves",
-                "att5": "following it"
+                "att": "Whenever the NPC moves, the attached layer moves following it"
             },
             "header": "Layers:",
             "itemNewLayer": "<New Layer>",

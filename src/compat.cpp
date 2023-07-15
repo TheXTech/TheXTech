@@ -140,7 +140,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_powerup_lava_bug = false;
         c.fix_char3_escape_shell_surf = false;
         // 1.3.5
-        c.fix_keyhole_framerate = false;
+        // c.fix_keyhole_framerate = false; Keep the keyhole fix everywhere!
         c.fix_char5_vehicle_climb = false;
         c.fix_vehicle_char_switch = false;
         c.fix_vanilla_checkpoints = false;
