@@ -514,10 +514,10 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
     if(m_special_page == SPECIAL_PAGE_BLOCK_CONTENTS && mode == CallMode::Render)
     {
-        const int fontId = FontManager::fontIdFromSmbxFont(3);
-        std::string desc = g_editorStrings.pickBlockContents;
-        FontManager::optimizeTextPx(desc, 230, fontId, nullptr, nullptr, 14);
-        FontManager::printText(desc.c_str(), desc.size(), e_ScreenW - 200, 90, fontId);
+        FontManager::printTextOptiPx(g_editorStrings.pickBlockContents,
+                                     e_ScreenW - 200, 90,
+                                     230,
+                                     FontManager::fontIdFromSmbxFont(3));
 //        SuperPrint(g_editorStrings.pickBlockContents1, 3, e_ScreenW - 200, 90);
 //        SuperPrint(g_editorStrings.pickBlockContents2, 3, e_ScreenW - 200, 110);
     }
@@ -2527,9 +2527,10 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
 
     // render description
     {
-        std::string desc = fmt::format(g_editorStrings.eventsDescPhraseTriggersWhenTemplate, event_name, event_desc);
-        FontManager::optimizeTextPx(desc, 230, FontManager::fontIdFromSmbxFont(3), nullptr, nullptr, 14);
-        FontManager::printText(desc.c_str(), desc.size(), e_ScreenW - 236, 80, FontManager::fontIdFromSmbxFont(3));
+        FontManager::printTextOptiPx(fmt::format(g_editorStrings.eventsDescPhraseTriggersWhenTemplate, event_name, event_desc),
+                                     e_ScreenW - 236, 80,
+                                     230,
+                                     FontManager::fontIdFromSmbxFont(3));
 //        SuperPrintR(mode, event_name, 3, e_ScreenW - 236, 80);
 //        SuperPrintR(mode, g_editorStrings.eventsDescPhraseTriggersWhen, 3, e_ScreenW - 236, 100);
 //        SuperPrintR(mode, event_desc, 3, e_ScreenW - 236, 120);
@@ -2692,9 +2693,10 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
     // render description
     if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
     {
-        std::string desc = g_editorStrings.layersDescAtt;
-        FontManager::optimizeTextPx(desc, 230, FontManager::fontIdFromSmbxFont(3), nullptr, nullptr, 14);
-        FontManager::printText(desc.c_str(), desc.size(), e_ScreenW - 236, 80, FontManager::fontIdFromSmbxFont(3));
+        FontManager::printTextOptiPx(g_editorStrings.layersDescAtt,
+                                     e_ScreenW - 236, 80,
+                                     230,
+                                     FontManager::fontIdFromSmbxFont(3));
 //        SuperPrintR(mode, g_editorStrings.layersDescAtt, 3, e_ScreenW - 236, 80);
 //        SuperPrintR(mode, g_editorStrings.layersDescAtt2, 3, e_ScreenW - 236, 100);
 //        SuperPrintR(mode, g_editorStrings.layersDescAtt3, 3, e_ScreenW - 236, 120);
@@ -4066,13 +4068,11 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
 
         SuperPrintR(mode, fmt::format_ne(g_editorStrings.fileConfirmationConvertFormatTo, *format), 3, 10, 50);
 
-        {
-            const int fontId = FontManager::fontIdFromSmbxFont(4);
-            std::string desc = g_editorStrings.fileConvertDesc;
-            FontManager::optimizeTextPx(desc, 606, fontId, nullptr, nullptr, 14);
-            FontManager::printText(desc.c_str(), desc.size(), 20, 90, fontId);
-            // SuperPrintR(mode, g_editorStrings.fileConvertDesc, 4, 20, 90);
-        }
+        FontManager::printTextOptiPx(g_editorStrings.fileConvertDesc,
+                                     20, 90,
+                                     606,
+                                     FontManager::fontIdFromSmbxFont(4));
+        // SuperPrintR(mode, g_editorStrings.fileConvertDesc, 4, 20, 90);
 
         if(m_saved_message.empty())
             SuperPrintR(mode, g_editorStrings.fileConvertNoIssues, 4, 20, 150);
