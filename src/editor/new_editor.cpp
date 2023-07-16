@@ -1276,7 +1276,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
     if(!Events[m_current_event].ShowLayer.empty())
     {
         layer_line ++;
-        SuperPrintR(mode, g_editorStrings.eventsHeaderMove, 3, e_ScreenW - 200, 40 + (20 * layer_line));
+        SuperPrintR(mode, g_editorStrings.eventsHeaderShow, 3, e_ScreenW - 200, 40 + (20 * layer_line));
         layer_line ++;
         SuperPrintR(mode, GetL(Events[m_current_event].ShowLayer[0]), 3, e_ScreenW - 240, 40 + (20 * layer_line));
         layer_line ++;
