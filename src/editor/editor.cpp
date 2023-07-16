@@ -47,6 +47,7 @@
 #include "main/game_globals.h"
 #include "main/screen_connect.h"
 #include "main/game_strings.h"
+#include "main/speedrunner.h"
 #include "load_gfx.h"
 #include "core/render.h"
 #include "core/window.h"
@@ -2968,7 +2969,9 @@ void zTestLevel(bool magicHand, bool interProcess)
     // reset Drop/Add allowed characters
     ConnectScreen::SaveChars();
 
-    GameThing(0, 0);
+    int waitms = (g_speedRunnerMode != SPEEDRUN_MODE_OFF) ? 750 : 0;
+    GameThing(waitms, 0);
+
     SetupScreens();
     TestLevel = true;
     LevelSelect = false;
