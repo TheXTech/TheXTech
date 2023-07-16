@@ -2901,6 +2901,13 @@ void zTestLevel(bool magicHand, bool interProcess)
         MagicHand = false;
     }
 
+    // in speedrun mode, confirm that controls are set up before game starts
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF && !Controls::Update())
+    {
+        ClearLevel();
+        PauseGame(PauseCode::Reconnect);
+    }
+
 #ifdef THEXTECH_INTERPROC_SUPPORTED
     if(interProcess)
     {
