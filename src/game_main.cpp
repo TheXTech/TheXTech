@@ -1032,7 +1032,7 @@ int GameMain(const CmdLineSetup_t &setup)
             if(TestLevel)
             {
                 // if failed, restart
-                if(LevelBeatCode == 0 && g_config.editor_pause_on_death)
+                if(LevelBeatCode == 0)
                 {
                     LevelSelect = false;
                     LevelBeatCode = -2; // checked in PauseScreen::Init()

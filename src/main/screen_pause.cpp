@@ -201,7 +201,9 @@ void Init(int plr, bool LegacyPause)
 
     bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
 
-    // pause
+    // add pause menu items
+
+    // just died in level test
     if(TestLevel && LevelBeatCode == -2)
     {
         s_items.push_back(MenuItem{g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
@@ -212,6 +214,7 @@ void Init(int plr, bool LegacyPause)
         else
             s_items.push_back(MenuItem{g_gameStrings.pauseItemReturnToEditor, s_QuitTesting});
     }
+    // other level test case
     else if(TestLevel)
     {
         s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
@@ -224,11 +227,13 @@ void Init(int plr, bool LegacyPause)
         if(g_config.enter_cheats_menu_item && !LegacyPause)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
+        // distinguishes between command-line test and editor level test
         if(Backup_FullFileName.empty())
             s_items.push_back(MenuItem{g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
         else
             s_items.push_back(MenuItem{g_gameStrings.pauseItemReturnToEditor, s_QuitTesting});
     }
+    // main game pause
     else
     {
         s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
