@@ -790,7 +790,7 @@ bool ProcessEvent(const SDL_Event* ev)
 //    b. May update SharedControls or SharedCursor using hardcoded keys
 // 4. Updates speedrun and recording modules
 // 5. Resolves inconsistent control states (Left+Right, etc)
-bool Update()
+bool Update(bool check_lost_devices)
 {
     bool okay = true;
 
@@ -831,7 +831,7 @@ bool Update()
             continue;
         }
 
-        if(!method->Update(i + 1, controls, cursor, editor, g_hotkeysPressed))
+        if(!method->Update(i + 1, controls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
         {
             okay = false;
             DeleteInputMethod(method);
@@ -940,7 +940,7 @@ bool Update()
     }
 
     if(((int)g_InputMethods.size() < numPlayers) && (numPlayers <= maxLocalPlayers)
-       && !SingleCoop && !GameMenu && !Record::replay_file)
+       && !SingleCoop && !GameMenu && !Record::replay_file && check_lost_devices)
     {
         // fill with nullptrs
         while((int)g_InputMethods.size() < numPlayers)

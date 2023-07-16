@@ -777,8 +777,9 @@ bool ProcessEvent(const SDL_Event *ev);
 //    b. If GameMenu or GameOutro is set, may update controls or Menu variables using hardcoded keys
 // 4. Updates speedrun and recording modules
 // 5. Resolves inconsistent control states (Left+Right, etc)
-// Returns false if any of the devices were lost.
-bool Update();
+//
+// If `check_lost_devices` is set and any of the devices were lost, removes the corresponding input method and returns false.
+bool Update(bool check_lost_devices = true);
 
 void SaveConfig(IniProcessing *ctl);
 void LoadConfig(IniProcessing *ctl);
