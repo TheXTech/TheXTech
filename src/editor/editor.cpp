@@ -2290,6 +2290,9 @@ void GetEditorControls()
             g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
         editorWaitForFade();
 
+        // force reconnect on leveltest start
+        Controls::ClearInputMethods();
+
         HasCursor = false;
         zTestLevel(editorScreen.test_magic_hand);
     }
@@ -2964,8 +2967,6 @@ void zTestLevel(bool magicHand, bool interProcess)
         }
     }
 
-    // force reconnect on leveltest start
-    Controls::ClearInputMethods();
     // reset Drop/Add allowed characters
     ConnectScreen::SaveChars();
 

@@ -1891,6 +1891,9 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
 
         editorWaitForFade();
 
+        // force reconnect on leveltest start
+        Controls::ClearInputMethods();
+
         HasCursor = false;
         zTestLevel(this->test_magic_hand);
     }
