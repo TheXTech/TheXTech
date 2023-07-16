@@ -430,6 +430,8 @@ void FontManager::initFull()
 
 void FontManager::quit()
 {
+    clearAllCustomFonts();
+
     g_fontNameToId.clear();
     g_anyFonts.clear();
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
