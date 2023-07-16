@@ -109,6 +109,7 @@ void Reconnect_Start()
         s_playerState[i] = PlayerState::Disconnected;
         s_menuItem[i] = 0;
         s_inputReady[i] = false;
+        g_charSelect[i] = Player[i+1].Character;
     }
     s_context = Context::Reconnect;
 
