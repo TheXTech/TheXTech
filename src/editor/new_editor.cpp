@@ -1606,9 +1606,7 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
         SuperPrintR(mode, GetE(Events[m_current_event].TriggerEvent).substr(0,19), 3, 54, 240);
 
         if(Events[m_current_event].TriggerDelay > 0)
-        {
             SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * (int)Events[m_current_event].TriggerDelay), 3, 54, 272);
-        }
         else
             SuperPrintR(mode, g_editorStrings.wordInstant, 3, 54, 272);
 
@@ -2430,12 +2428,23 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             SuperPrintR(mode, GetE(EditorCursor.Warp.eventEnter), 3, e_ScreenW - 200, 220 + 2);
         else
             SuperPrintR(mode, g_mainMenu.caseNone, 3, e_ScreenW - 200, 220 + 2);
+
         if(UpdateButton(mode, e_ScreenW - 240 + 4, 200 + 4, GFX.EIcons, m_special_subpage == 1, 0, 32*Icon::action, 32, 32))
             m_special_subpage = 1;
     }
     else if(m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
     {
-        // no page selector, but don't return
+        // delay selector, instead of page selector
+        if(Events[m_current_event].TriggerDelay > 0)
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseDelayIsMs, 100 * (int)Events[m_current_event].TriggerDelay), 3, e_ScreenW - 240 + 4, 272);
+        else
+            SuperPrintR(mode, g_editorStrings.wordInstant, 3, e_ScreenW - 240 + 4, 272);
+
+        if(UpdateButton(mode, e_ScreenW - 240 + 4, 230 + 4, GFX.EIcons, false, 0, 32*Icon::up, 32, 32))
+            Events[m_current_event].TriggerDelay ++;
+
+        if(Events[m_current_event].TriggerDelay > 0 && UpdateButton(mode, e_ScreenW - 240 + 4, 290 + 4, GFX.EIcons, false, 0, 32*Icon::down, 32, 32))
+            Events[m_current_event].TriggerDelay --;
     }
     else
         return;
