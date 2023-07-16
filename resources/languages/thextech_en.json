@@ -37,6 +37,7 @@
                 "enter": "warp is entered",
                 "hit": "block is hit",
                 "layerClear": "everything in object layer is gone",
+                "phraseTriggersAfterTemplate": "{0} triggers {1} ms after event {2} occurs",
                 "phraseTriggersWhenTemplate": "{0} triggers when {1}",
                 "talk": "player talks to NPC"
             },

@@ -2527,15 +2527,15 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
 
     // render description
     {
-        FontManager::printTextOptiPx(fmt::format(g_editorStrings.eventsDescPhraseTriggersWhenTemplate, event_name, event_desc),
+        // trigger after current event is a special case
+        std::string descFormatted = (m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
+            ? fmt::format(g_editorStrings.eventsDescPhraseTriggersAfterTemplate, event_name, (int)Events[m_current_event].TriggerDelay * 100, Events[m_current_event].Name)
+            : fmt::format(g_editorStrings.eventsDescPhraseTriggersWhenTemplate, event_name, event_desc);
+
+        FontManager::printTextOptiPx(descFormatted,
                                      e_ScreenW - 236, 80,
                                      230,
                                      FontManager::fontIdFromSmbxFont(3));
-//        SuperPrintR(mode, event_name, 3, e_ScreenW - 236, 80);
-//        SuperPrintR(mode, g_editorStrings.eventsDescPhraseTriggersWhen, 3, e_ScreenW - 236, 100);
-//        SuperPrintR(mode, event_desc, 3, e_ScreenW - 236, 120);
-//        SuperPrintR(mode, event_desc_2, 3, e_ScreenW - 236, 140);
-//        SuperPrintR(mode, event_desc_3, 3, e_ScreenW - 236, 160);
     }
 
     // render current event

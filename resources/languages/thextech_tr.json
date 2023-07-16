@@ -37,6 +37,7 @@
                 "enter": "",
                 "hit": "Bloğa vurulduğunda",
                 "layerClear": "obje katma- nındaki her şey temizlendiğinde",
+                "phraseTriggersAfterTemplate": "",
                 "phraseTriggersWhenTemplate": "{0}: {1} etkinleştir",
                 "talk": "NPC ile konuşulduğunda"
             },

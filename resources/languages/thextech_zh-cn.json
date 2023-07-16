@@ -37,6 +37,7 @@
                 "enter": "进入传送点时",
                 "hit": "砖块被撞击时",
                 "layerClear": "当前图层中的对象为空时",
+                "phraseTriggersAfterTemplate": "",
                 "phraseTriggersWhenTemplate": "{0}：{1}触发该事件",
                 "talk": "和NPC对话后"
             },

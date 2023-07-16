@@ -577,6 +577,7 @@ XTechTranslate::XTechTranslate()
         {"editor.events.desc.enter",        &g_editorStrings.eventsDescEnter},
 
         {"editor.events.desc.phraseTriggersWhenTemplate",   &g_editorStrings.eventsDescPhraseTriggersWhenTemplate},
+        {"editor.events.desc.phraseTriggersAfterTemplate",   &g_editorStrings.eventsDescPhraseTriggersAfterTemplate},
 
         {"editor.events.deletion.deletingEvent",    &g_editorStrings.eventsDeletingEvent},
         {"editor.events.deletion.confirm",          &g_editorStrings.eventsDeletionConfirm},
