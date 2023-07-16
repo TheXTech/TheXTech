@@ -135,7 +135,7 @@ void DoCredits(bool quit)
 
 void OutroLoop()
 {
-    Controls::Update();
+    Controls::Update(false);
     Integrator::sync();
     bool quit = SharedControls.QuitCredits;
 

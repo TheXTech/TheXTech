@@ -264,7 +264,7 @@ int GameMain(const CmdLineSetup_t &setup)
         XRender::repaint();
         XRender::setTargetScreen();
         XEvents::doEvents();
-        Controls::Update();
+        Controls::Update(false);
         PGE_Delay(10);
     }
 #endif
@@ -1337,7 +1337,7 @@ void UpdateMacro()
                 computeFrameTime1();
 
                 speedRun_tick();
-                Controls::Update();
+                Controls::Update(false);
                 UpdateGraphics();
                 UpdateSound();
                 BlockFrames();

@@ -190,7 +190,7 @@ void GameThing(int waitms, int fadeSpeed)
             {
                 computeFrameTime1();
 
-                Controls::Update();
+                Controls::Update(false);
 
                 XRender::setTargetTexture();
                 XRender::clearBuffer();
