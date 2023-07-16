@@ -1031,8 +1031,8 @@ int GameMain(const CmdLineSetup_t &setup)
 //            If TestLevel = True Then
             if(TestLevel)
             {
-                // if failed, restart
-                if(LevelBeatCode == 0)
+                // if failed or from command line, provide option to restart
+                if(LevelBeatCode == 0 || (setup.testLevelMode && LevelBeatCode >= 0))
                 {
                     LevelSelect = false;
                     LevelBeatCode = -2; // checked in PauseScreen::Init()
@@ -1074,7 +1074,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     if(g_config.EnableInterLevelFade)
                         g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
                 }
-                // from command line, close
+                // from command line, close (if player has requested to stop testing)
                 else if(setup.testLevelMode)
                 {
                     GameIsActive = false;
