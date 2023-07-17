@@ -174,6 +174,10 @@ extern ItemList_t bg2_list;
 // has fixed size of 10
 extern std::vector<std::string> list_level_exit_names;
 
+
+// tracks loading state
+extern uint8_t loaded;
+
 } // namespace EditorCustom
 
 #endif // EDITOR_CUSTOM_H

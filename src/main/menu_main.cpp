@@ -61,6 +61,7 @@
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
 #include "editor/write_world.h"
+#include "editor/editor_custom.h"
 #include "script/luna/luna.h"
 
 MainMenuContent g_mainMenu;
@@ -736,6 +737,12 @@ bool mainMenuUpdate()
                     {
                         PlaySoundMenu(SFX_BlockHit);
                         MessageText = fmt::format_ne(g_mainMenu.editorErrorMissingResources, "EditorIcons.png");
+                        PauseGame(PauseCode::Message);
+                    }
+                    else if(!EditorCustom::loaded)
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                        MessageText = fmt::format_ne(g_mainMenu.editorErrorMissingResources, "editor.ini");
                         PauseGame(PauseCode::Message);
                     }
                     else
