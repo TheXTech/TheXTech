@@ -171,9 +171,6 @@ android {
                 path "../../CMakeLists.txt"
             }
         }
-        packagingOptions{
-            doNotStrip "*/armeabi-v7a/*.so"
-        }
     }
 
 
