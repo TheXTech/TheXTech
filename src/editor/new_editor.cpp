@@ -2547,6 +2547,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
     }
 
     // render description
+    if(mode == CallMode::Render)
     {
         // trigger after current event is a special case
         std::string descFormatted = (m_special_page == SPECIAL_PAGE_EVENT_TRIGGER)
@@ -2712,7 +2713,7 @@ void EditorScreen::UpdateLayersScreen(CallMode mode)
     }
 
     // render description
-    if(m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
+    if(mode == CallMode::Render && m_special_page == SPECIAL_PAGE_OBJ_LAYER && m_special_subpage == 1)
     {
         FontManager::printTextOptiPx(g_editorStrings.layersDescAtt,
                                      e_ScreenW - 236, 80,
@@ -4089,10 +4090,13 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
 
         SuperPrintR(mode, fmt::format_ne(g_editorStrings.fileConfirmationConvertFormatTo, *format), 3, 10, 50);
 
-        FontManager::printTextOptiPx(g_editorStrings.fileConvertDesc,
-                                     20, 90,
-                                     606,
-                                     FontManager::fontIdFromSmbxFont(4));
+        if(mode == CallMode::Render)
+        {
+            FontManager::printTextOptiPx(g_editorStrings.fileConvertDesc,
+                                         20, 90,
+                                         606,
+                                         FontManager::fontIdFromSmbxFont(4));
+        }
         // SuperPrintR(mode, g_editorStrings.fileConvertDesc, 4, 20, 90);
 
         if(m_saved_message.empty())
