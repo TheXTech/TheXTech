@@ -102,6 +102,7 @@ public:
     int16_t icon = 0;
     int8_t category = 0;
     bool is_misc = true;
+    bool behind_mode = false;
 
 
     void make_layout_pods();

@@ -41,12 +41,12 @@ using namespace EditorCustom;
 
 
 bool enabled = false;
-bool replace_existing = false;
-bool advanced_mode = false;
+bool replace_existing = true;
+// bool advanced_mode = false;
 bool count_level_edges = true;
 
-CrossEffectLevel check_level = LEVEL_FAMILY;
-CrossEffectLevel change_level = LEVEL_FAMILY;
+// CrossEffectLevel check_level = LEVEL_FAMILY;
+// CrossEffectLevel change_level = LEVEL_FAMILY;
 
 
 
@@ -240,6 +240,9 @@ struct MagicInfo<BackgroundRef_t>
 template<class ItemRef_t>
 int s_pick_type(ItemFamily& family, ItemRef_t A)
 {
+    const CrossEffectLevel check_level = family.behind_mode ? LEVEL_ALL : LEVEL_FAMILY;
+    constexpr bool advanced_mode = false;
+
     ItemType_t inferred_type;
 
     inferred_type.type = A->Type;
@@ -548,6 +551,8 @@ void s_apply_type(BlockRef_t B, int type)
 template<class ItemRef_t>
 void MagicItem(int Type, Location_t loc)
 {
+    constexpr CrossEffectLevel change_level = LEVEL_FAMILY;
+
     using ItemInfo = MagicInfo<ItemRef_t>;
 
     if(Type < 1 || Type > ItemInfo::maxType)
@@ -623,6 +628,8 @@ void MagicItem(int Type, Location_t loc)
 template<class ItemRef_t>
 void MagicItem(ItemRef_t A)
 {
+    constexpr CrossEffectLevel change_level = LEVEL_FAMILY;
+
     using ItemInfo = MagicInfo<ItemRef_t>;
 
     if((int)A < 1 || (int)A > ItemInfo::numItem)

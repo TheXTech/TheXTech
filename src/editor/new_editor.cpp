@@ -160,6 +160,8 @@ void EditorScreen::ResetCursor()
     m_background_page = 0;
     m_current_event = 0;
 
+    MagicBlock::enabled = false;
+
     FocusNPC();
     FocusBlock();
     FocusBGO();
@@ -1010,6 +1012,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
     }
 }
 
+#if 0
 void EditorScreen::UpdateMagicBlockScreen(CallMode mode)
 {
     SuperPrintR(mode, "MAGIC BLOCK (DEPRECATED EXTRA SETTINGS)", 3, 160, 50);
@@ -1072,6 +1075,7 @@ void EditorScreen::UpdateMagicBlockScreen(CallMode mode)
 
     return;
 }
+#endif
 
 void EditorScreen::UpdateEventsScreen(CallMode mode)
 {
@@ -1805,7 +1809,9 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
 {
     // settings screen, now.
 
-    // magic block settings
+#if 0
+    // previous magic block settings
+
     SuperPrintR(mode, g_editorStrings.toggleMagicBlock, 3, 10, 50);
 
 
@@ -1857,7 +1863,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
         if(UpdateCheckBox(mode, 4, 280 + 4, MagicBlock::replace_existing))
             MagicBlock::replace_existing = !MagicBlock::replace_existing;
     }
-
+#endif
 
     if(WorldEditor || MagicHand)
         return;
@@ -2964,6 +2970,17 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
             m_Block_page = index;
     }
 
+    // Magic Block toggle
+    if(mode == CallMode::Render)
+    {
+        FontManager::printTextOptiPx(g_editorStrings.toggleMagicBlock,
+                                     e_ScreenW - 120, 42,
+                                     120,
+                                     FontManager::fontIdFromSmbxFont(3));
+    }
+    if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + 4, GFXNPC[NPCID_PSWITCH_SMW], MagicBlock::enabled, 0, 0, 32, 32))
+        MagicBlock::enabled = !MagicBlock::enabled;
+
     // Resizing
     if(BlockIsSizable[EditorCursor.Block.Type])
     {
@@ -3120,6 +3137,16 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
             m_BGO_page = index;
     }
 
+    // Magic Block toggle
+    if(mode == CallMode::Render)
+    {
+        FontManager::printTextOptiPx(g_editorStrings.toggleMagicBlock,
+                                     e_ScreenW - 120, 42,
+                                     120,
+                                     FontManager::fontIdFromSmbxFont(3));
+    }
+    if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + 4, GFXNPC[NPCID_PSWITCH_SMW], MagicBlock::enabled, 0, 0, 32, 32))
+        MagicBlock::enabled = !MagicBlock::enabled;
 
     // Layers
     SuperPrintR(mode, g_editorStrings.labelLayer, 3, e_ScreenW - 160, 434);
@@ -5031,8 +5058,8 @@ void EditorScreen::UpdateEditorScreen(CallMode mode, bool second_screen)
         UpdateEditorSettingsScreen(mode);
     else if(m_special_page == SPECIAL_PAGE_WORLD_SETTINGS)
         UpdateWorldSettingsScreen(mode);
-    else if(m_special_page == SPECIAL_PAGE_MAGICBLOCK)
-        UpdateMagicBlockScreen(mode);
+    // else if(m_special_page == SPECIAL_PAGE_MAGICBLOCK)
+    //     UpdateMagicBlockScreen(mode);
     else if(m_special_page == SPECIAL_PAGE_EVENT_MUSIC || m_special_page == SPECIAL_PAGE_EVENT_BACKGROUND
         || m_special_page == SPECIAL_PAGE_EVENT_SOUND || m_special_page == SPECIAL_PAGE_SECTION_BACKGROUND
         || m_special_page == SPECIAL_PAGE_SECTION_MUSIC || m_special_page == SPECIAL_PAGE_LEVEL_EXIT
