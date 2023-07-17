@@ -1474,6 +1474,7 @@ void Load(XTechTranslate* translate)
 #endif
 
             editor.read("misc", f.is_misc, f.is_misc);
+            editor.read("behind", f.behind_mode, false);
             f.make_layout_pods();
         }
     }

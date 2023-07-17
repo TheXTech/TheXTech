@@ -596,7 +596,7 @@ void MagicItem(int Type, Location_t loc)
             if(family_b == FAMILY_NONE)
                 continue;
 
-            if(change_level != LEVEL_ALL && family_b != family)
+            if(change_level != LEVEL_ALL && family_b != family && !ItemInfo::families[family_b].behind_mode)
                 continue;
 
             if(!CheckCollision(tempLoc, B->Location))
@@ -678,7 +678,7 @@ void MagicItem(ItemRef_t A)
             if(family_b == FAMILY_NONE)
                 continue;
 
-            if(change_level != LEVEL_ALL && family_b != family)
+            if(change_level != LEVEL_ALL && family_b != family && !ItemInfo::families[family_b].behind_mode)
                 continue;
 
             if(!CheckCollision(tempLoc, B->Location))
