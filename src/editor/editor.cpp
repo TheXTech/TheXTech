@@ -46,6 +46,7 @@
 #include "main/trees.h"
 #include "main/game_globals.h"
 #include "main/screen_connect.h"
+#include "main/screen_quickreconnect.h"
 #include "main/game_strings.h"
 #include "main/speedrunner.h"
 #include "load_gfx.h"
@@ -2905,7 +2906,9 @@ void zTestLevel(bool magicHand, bool interProcess)
     if(g_speedRunnerMode != SPEEDRUN_MODE_OFF && !Controls::Update())
     {
         ClearLevel();
-        PauseGame(PauseCode::Reconnect);
+        MessageText = g_gameStrings.connectWaitingForInputDevice;
+        QuickReconnectScreen::g_active = true;
+        PauseGame(PauseCode::Message);
     }
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
