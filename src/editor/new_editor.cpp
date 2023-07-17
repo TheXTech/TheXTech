@@ -4900,8 +4900,8 @@ void EditorScreen::UpdateSelectorBar(CallMode mode, bool select_bar_only)
             m_special_page = SPECIAL_PAGE_FILE;
     }
 
-    // settings
-    if(UpdateButton(mode, sx+14*40 + 4, 4, GFX.EIcons, in_leveltest_settings, 0, 32*Icon::subscreen, 32, 32, g_editorStrings.tooltipSettings.c_str()))
+    // test play settings
+    if(!WorldEditor && UpdateButton(mode, sx+14*40 + 4, 4, GFX.EIcons, in_leveltest_settings, 0, 32*Icon::play, 32, 32, g_editorStrings.tooltipSettings.c_str()))
     {
         if(in_leveltest_settings || !editorScreen.active)
             swap_screens();
