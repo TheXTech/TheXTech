@@ -1273,6 +1273,10 @@ void UpdateEditor()
                 {
                     if(!MouseRelease || (!BlockIsSizable[Block[A].Type] && !BlockIsSizable[EditorCursor.Block.Type]))
                     {
+                        // ignore sizable background blocks in Magic Block mode
+                        if(MagicBlock::enabled && BlockIsSizable[Block[A].Type] && !BlockIsSizable[EditorCursor.Block.Type])
+                            continue;
+
                         if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
                         {
                             if(!(MagicBlock::enabled && MagicBlock::replace_existing) || (!MouseRelease && CheckCollision(Block[A].Location, last_EC_loc)))
@@ -1296,7 +1300,9 @@ void UpdateEditor()
                             if(ffEqual(EditorCursor.Location.X, Block[A].Location.X) &&
                                ffEqual(EditorCursor.Location.Y, Block[A].Location.Y))
                             {
-                                pLogDebug("Sizable block was rejected at block at EC Loc (%f, %f), other block loc (%f, %f)", EditorCursor.Location.X, EditorCursor.Location.Y, Block[A].Location.X, Block[A].Location.Y);
+                                if(MouseRelease)
+                                    pLogDebug("Sizable block was rejected at block at EC Loc (%f, %f), other block loc (%f, %f)", EditorCursor.Location.X, EditorCursor.Location.Y, Block[A].Location.X, Block[A].Location.Y);
+
                                 CanPlace = false;
                                 break;
                             }

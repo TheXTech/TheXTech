@@ -273,6 +273,9 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
     {
         if(A != B && !s_check_hidden(B) && CheckCollision(tempLoc, B->Location))
         {
+            if(BlockIsSizable[B->Type])
+                continue;
+
             bool hit = false;
             for(ItemType_t t : family.types)
             {
@@ -304,6 +307,9 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
     {
         if(A != B && !s_check_hidden(B) && CheckCollision(tempLoc, B->Location))
         {
+            if(BlockIsSizable[B->Type])
+                continue;
+
             bool hit = false;
             for(ItemType_t t : family.types)
             {
@@ -338,6 +344,9 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
     {
         if(A != B && !s_check_hidden(B) && CheckCollision(tempLoc, B->Location))
         {
+            if(BlockIsSizable[B->Type])
+                continue;
+
             bool hit = false;
             for(ItemType_t t : family.types)
             {
@@ -369,6 +378,9 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
     {
         if(A != B && !s_check_hidden(B) && CheckCollision(tempLoc, B->Location))
         {
+            if(BlockIsSizable[B->Type])
+                continue;
+
             bool hit = false;
             for(ItemType_t t : family.types)
             {
@@ -403,6 +415,10 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
     {
         if(A != B && !s_check_hidden(B) && CheckCollision(tempLoc, B->Location))
         {
+            // count only the top of a sizable as a collision
+            if(BlockIsSizable[B->Type] && A->Location.Y >= B->Location.Y)
+                continue;
+
             bool hit = false;
             for(ItemType_t t : family.types)
             {
@@ -434,6 +450,10 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
     {
         if(A != B && !s_check_hidden(B) && CheckCollision(tempLoc, B->Location))
         {
+            // count only the top of a sizable as a collision
+            if(BlockIsSizable[B->Type] && A->Location.Y >= B->Location.Y)
+                continue;
+
             bool hit = false;
             for(ItemType_t t : family.types)
             {
@@ -468,6 +488,10 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
     {
         if(A != B && !s_check_hidden(B) && CheckCollision(tempLoc, B->Location))
         {
+            // count only the top of a sizable as a collision
+            if(BlockIsSizable[B->Type] && A->Location.Y >= B->Location.Y)
+                continue;
+
             bool hit = false;
             for(ItemType_t t : family.types)
             {
@@ -499,6 +523,9 @@ int s_pick_type(ItemFamily& family, ItemRef_t A)
     {
         if(A != B && !s_check_hidden(B) && CheckCollision(tempLoc, B->Location))
         {
+            if(BlockIsSizable[B->Type])
+                continue;
+
             bool hit = false;
             for(ItemType_t t : family.types)
             {
