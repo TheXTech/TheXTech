@@ -2220,7 +2220,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
 
     if(current_page != nullptr)
     {
-        int page_max = ((int)source->size() - 1) / 20;
+        int page_max = !source->empty() ? ((static_cast<int>(source->size()) - 1) / 20) : 0;
 
         if(!(page_max == 0 && *current_page == 0))
             SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, *current_page + 1, page_max + 1), 3, e_ScreenW - 320, 50);
@@ -2255,7 +2255,11 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
 
         int index;
         if(source_indices != nullptr)
-            index = (*source_indices)[j]; // FIXME: Don't crash here when array is empty
+        {
+            if(source_indices->empty())
+                return; // Note: this is an invalid: array must not being empty!
+            index = (*source_indices)[j];
+        }
         else if(m_special_page == SPECIAL_PAGE_LEVEL_EXIT)
             index = j - 1;
         else
