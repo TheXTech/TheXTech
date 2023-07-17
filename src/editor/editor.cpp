@@ -1275,7 +1275,7 @@ void UpdateEditor()
                     {
                         if(CursorCollision(EditorCursor.Location, Block[A].Location) && !Block[A].Hidden)
                         {
-                            if(!MagicBlock::replace_existing || (!MouseRelease && CheckCollision(Block[A].Location, last_EC_loc)))
+                            if(!(MagicBlock::enabled && MagicBlock::replace_existing) || (!MouseRelease && CheckCollision(Block[A].Location, last_EC_loc)))
                             {
                                 CanPlace = false;
                                 break;
@@ -1636,7 +1636,7 @@ void UpdateEditor()
                 {
                     if(CursorCollision(EditorCursor.Location, Tile[A].Location))
                     {
-                        if(!MagicBlock::replace_existing || (!MouseRelease && CheckCollision(Tile[A].Location, last_EC_loc)))
+                        if(!(MagicBlock::enabled && MagicBlock::replace_existing) || (!MouseRelease && CheckCollision(Tile[A].Location, last_EC_loc)))
                         {
                             CanPlace = false;
                             break;
