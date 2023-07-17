@@ -2220,36 +2220,42 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
 
     if(current_page != nullptr)
     {
-        int page_max = (source->size() - 1) / 20;
+        int page_max = ((int)source->size() - 1) / 20;
+
         if(!(page_max == 0 && *current_page == 0))
-        SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, *current_page + 1, page_max + 1), 3, e_ScreenW - 320, 50);
+            SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, *current_page + 1, page_max + 1), 3, e_ScreenW - 320, 50);
+
         if(*current_page > 0 && UpdateButton(mode, e_ScreenW - 120 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             *current_page = *current_page - 1;
+
         if(*current_page < page_max && UpdateButton(mode, e_ScreenW - 80 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
             *current_page = *current_page + 1;
 
         if(*current_page < 0)
             *current_page = 0;
+
         if(*current_page > page_max)
             *current_page = page_max;
     }
 
     for(int i = 0; i < 20; i++)
     {
-        int x = 10 + (e_ScreenW/2)*(i/10);
-        int y = 80 + 40*(i%10);
+        int x = 10 + (e_ScreenW / 2) * (i / 10);
+        int y = 80 + 40 * (i % 10);
 
         int j;
+
         if(current_page != nullptr)
-            j = *current_page*20 + i;
+            j = (*current_page * 20) + i;
         else
             j = i;
+
         if(j >= (int)source->size())
             break;
 
         int index;
         if(source_indices != nullptr)
-            index = (*source_indices)[j];
+            index = (*source_indices)[j]; // FIXME: Don't crash here when array is empty
         else if(m_special_page == SPECIAL_PAGE_LEVEL_EXIT)
             index = j - 1;
         else
@@ -2303,6 +2309,7 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
                         for(int s = 0; s <= maxSections; s++)
                             Events[m_current_event].section[s].music_id = index;
                     }
+
                     // and do whatever necessary to preview it.
                     if(m_special_page == SPECIAL_PAGE_EVENT_SOUND && index != 0)
                         PlaySound(index);
@@ -2334,6 +2341,7 @@ void EditorScreen::UpdateEventsSubScreen(CallMode mode)
             m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
         else
             m_special_page = SPECIAL_PAGE_NONE;
+
         m_special_subpage = 0;
         return;
     }
