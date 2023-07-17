@@ -1031,8 +1031,9 @@ int GameMain(const CmdLineSetup_t &setup)
 //            If TestLevel = True Then
             if(TestLevel)
             {
-                // if failed or from command line, provide option to restart
-                if(LevelBeatCode == 0 || (setup.testLevelMode && LevelBeatCode >= 0))
+                // provide option to restart (was previously restricted to fails and command-line runs)
+                // if(LevelBeatCode == 0 || (setup.testLevelMode && LevelBeatCode >= 0))
+                if(LevelBeatCode >= 0)
                 {
                     LevelSelect = false;
                     LevelBeatCode = -2; // checked in PauseScreen::Init()
