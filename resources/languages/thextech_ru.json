@@ -24,7 +24,7 @@
                 "changeSectionBoundsToCurrent": "изменить границы секции {0} к текущим?",
                 "shouldEvent": "Должно ли событие {0}"
             },
-            "controlsForEvent": "Управление для события",
+            "controlsForEvent": "Авто-управление персонажем",
             "deletion": {
                 "cancel": "Нет: не удалять событие",
                 "confirm": "Да: удалить событие",
@@ -37,7 +37,7 @@
                 "enter": "игрок войдёт в проход",
                 "hit": "по блоку ударят",
                 "layerClear": "слой будет очищен от объектов",
-                "phraseTriggersAfterTemplate": "",
+                "phraseTriggersAfterTemplate": "Событие, которое сработает через {1} мс. после события \\\"{2}\\\"",
                 "phraseTriggersWhen": "Актив., когда:",
                 "phraseTriggersWhenTemplate": "{0}: Сработает, когда {1}",
                 "talk": "игрок поговорит с НИП"
@@ -74,7 +74,7 @@
             "promptEventText": "Текст события:",
             "props": {
                 "autostart": "Автозап.",
-                "controls": "Управления",
+                "controls": "Авто-уп.",
                 "endGame": "Зав.игр.",
                 "sound": "Звук"
             },
