@@ -796,6 +796,7 @@ void XTechTranslate::reset()
 #endif
 
     Controls::InitStrings();
+    g_controlsStrings = ControlsStrings_t();
 
     s_CurrentPluralRules = PluralRules::OneIsSingular;
 }
