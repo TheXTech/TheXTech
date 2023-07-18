@@ -33,6 +33,13 @@ namespace XLanguage
 void resolveLanguage(const std::string& requestedLanguage);
 
 
+/*!
+ * \brief Replaces string with next available language (slow)
+ * Uses global state: CurrentLanguage, CurrentLangDialect
+ */
+void rotateLanguage(std::string& nextLanguage, int step = 1);
+
+
 void splitRegion(char delimiter);
 
 

@@ -21,8 +21,8 @@
 #include <algorithm>
 #include <Utils/strings.h>
 #include <Utils/files.h>
+#include <DirManager/dirman.h>
 #include <AppPath/app_path.h>
-#include "language_private.h"
 #include <fmt_format_ne.h>
 
 #ifndef THEXTECH_DISABLE_SDL_LOCALE
@@ -34,8 +34,10 @@
 #   endif
 #endif
 
+#include "config.h"
 #include "globals.h"
-#include "../language.h"
+#include "core/language.h"
+#include "core/language/language_private.h"
 
 
 static std::string langEngineFile;
@@ -152,6 +154,89 @@ void XLanguage::resolveLanguage(const std::string& requestedLanguage)
         CurrentLanguage.clear();
         CurrentLangDialect.clear();
     }
+}
+
+void XLanguage::rotateLanguage(std::string& nextLanguage, int step)
+{
+    constexpr size_t prefix_length = 9; // std::string("thextech_").size();
+    constexpr size_t suffix_length = 5; // std::string(".json").size();
+    constexpr size_t ignore_length = prefix_length + suffix_length;
+
+    std::vector<std::string> list;
+    DirMan langs(AppPathManager::languagesDir());
+
+    if(!langs.exists())
+    {
+        pLogDebug("Can't open the languages directory: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    if(!langs.getListOfFiles(list, {".json"}))
+    {
+        pLogDebug("Can't show the content of the languages directory: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    if(list.empty())
+    {
+        pLogDebug("Languages directory does not have JSON files: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    // tag non-lowercase filenames and language codes including underscores for exclusion during sorting
+    for(std::string& fn : list)
+    {
+        for(auto& c : fn)
+        {
+            if(c != std::tolower(c))
+            {
+                fn[0] = '_';
+                break;
+            }
+        }
+
+        if(fn.end() - fn.begin() > (std::ptrdiff_t)prefix_length && std::find(fn.begin() + prefix_length, fn.end(), '_') != fn.end())
+            fn[0] = '_';
+    }
+
+    // sort filenames
+    std::sort(list.begin(), list.end());
+
+    const auto langs_begin = std::lower_bound(list.cbegin(), list.cend(), "thextech_");
+    const auto langs_end   = std::upper_bound(list.cbegin(), list.cend(), "thextech`");
+
+    if(langs_begin == langs_end)
+    {
+        pLogDebug("Languages directory does not have thextech_*.json files: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    // find current filename
+    std::string seek_fn = fmt::format_ne("thextech_{0}.json", g_config.language);
+
+    auto curr_lang_fn = std::find(langs_begin, langs_end, seek_fn);
+
+    if(g_config.language == "auto")
+        curr_lang_fn = langs_end;
+
+    // pick next filename
+    std::ptrdiff_t cur_index = curr_lang_fn - langs_begin;
+    std::ptrdiff_t new_index = cur_index + step;
+    std::ptrdiff_t opts_len = (langs_end - langs_begin) + 1;
+
+    // limit to bounds + 1 (in order to include "auto")
+    std::ptrdiff_t wrapped_index = (new_index < 0) ? (new_index % opts_len + opts_len) : (new_index % opts_len);
+
+    auto next_lang_fn = langs_begin + wrapped_index;
+
+    if(next_lang_fn == langs_end)
+    {
+        nextLanguage = "auto";
+        return;
+    }
+
+    // extract next language name
+    nextLanguage = next_lang_fn->substr(prefix_length, next_lang_fn->size() - ignore_length);
 }
 
 void XLanguage::splitRegion(char delimiter)

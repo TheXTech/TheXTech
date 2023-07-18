@@ -384,6 +384,7 @@ XTechTranslate::XTechTranslate()
         {"menu.wordBack",       &g_mainMenu.wordBack},
         {"menu.wordResume",     &g_mainMenu.wordResume},
         {"menu.wordWaiting",    &g_mainMenu.wordWaiting},
+        {"menu.wordLanguage",    &g_mainMenu.wordLanguage},
 
         {"menu.abbrevMilliseconds", &g_mainMenu.abbrevMilliseconds},
 
@@ -1004,6 +1005,7 @@ void ReloadTranslations()
     XLanguage::resolveLanguage(g_config.language);
 
     XTechTranslate translator;
+    translator.reset();
     if(translator.translate())
     {
         pLogDebug("Reloaded translation for language %s-%s",
