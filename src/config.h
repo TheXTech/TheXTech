@@ -41,7 +41,7 @@ extern struct Config_t
     //! Show debug string during the loading process
     bool    loading_show_debug = false;
     //! User's preferred language / dialect
-    std::string language = "sys";
+    std::string language = "auto";
 
     /* ---- Video ----*/
 

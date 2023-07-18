@@ -88,7 +88,10 @@ static bool detectSetup()
 
 void XLanguage::resolveLanguage(const std::string& requestedLanguage)
 {
-    if(!requestedLanguage.empty() && requestedLanguage != "sys")
+    CurrentLanguage = "";
+    CurrentLangDialect = "";
+
+    if(!requestedLanguage.empty() && requestedLanguage != "auto")
     {
         CurrentLanguage = requestedLanguage;
 
