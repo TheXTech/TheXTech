@@ -30,9 +30,7 @@ namespace XLanguage
 /*!
  * \brief Detect system language and set global variables
  */
-void init();
-
-void initManual();
+void resolveLanguage(const std::string& requestedLanguage);
 
 
 void splitRegion(char delimiter);

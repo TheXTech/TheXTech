@@ -44,6 +44,7 @@
 #include "main/game_strings.h"
 
 #include "controls.h"
+#include "config.h"
 #include "control/controls_strings.h"
 
 #include "editor/editor_strings.h"
@@ -997,3 +998,17 @@ bool XTechTranslate::translateFile(const std::string& file, TrList& list, const 
 
     return true;
 }
+
+void ReloadTranslations()
+{
+    XLanguage::resolveLanguage(g_config.language);
+
+    XTechTranslate translator;
+    if(translator.translate())
+    {
+        pLogDebug("Reloaded translation for language %s-%s",
+                  CurrentLanguage.c_str(),
+                  CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
+    }
+}
+

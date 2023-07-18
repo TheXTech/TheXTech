@@ -47,6 +47,16 @@ static bool detectSetup()
     if(CurrentLanguage.empty())
         return false; // Language code is required!
 
+    std::transform(CurrentLanguage.begin(),
+                   CurrentLanguage.end(),
+                   CurrentLanguage.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+
+    std::transform(CurrentLangDialect.begin(),
+                   CurrentLangDialect.end(),
+                   CurrentLangDialect.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+
     langEngineFile.clear();
     langAssetsFile.clear();
 
@@ -76,11 +86,22 @@ static bool detectSetup()
 }
 
 
-void XLanguage::init()
+void XLanguage::resolveLanguage(const std::string& requestedLanguage)
 {
-    pLogDebug("Selecting best localization...");
+    if(!requestedLanguage.empty() && requestedLanguage != "sys")
+    {
+        CurrentLanguage = requestedLanguage;
+
+        splitRegion('-');
+        splitRegion('_');
+
+        if(detectSetup())
+            return; // Found!
+    }
 
 #ifndef THEXTECH_DISABLE_SDL_LOCALE
+    pLogDebug("Checking SDL localization...");
+
     SDL_Locale *loc = SDL_GetPreferredLocales();
     CurrentLanguage.clear();
     CurrentLangDialect.clear();
@@ -108,18 +129,20 @@ void XLanguage::init()
 #endif
 
     // Detect using system specific ways
+    pLogDebug("Checking system localization...");
+
     XLanguagePriv::detectOSLanguage();
-    detectSetup();
-}
+    if(detectSetup())
+        return; // Found!
 
-void XLanguage::initManual()
-{
-    if(!CurrentLanguage.empty() && detectSetup())
-        return;
+    pLogDebug("Checking en-gb fallback...");
 
-    // Fall back to English if manually-selected language is invalid
+    // Fall back to English if selected language is invalid
     CurrentLanguage = "en";
     CurrentLangDialect = "gb";
+
+    if(detectSetup())
+        return; // Found!
 
     if(!detectSetup())
     {

@@ -22,6 +22,8 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#include <string>
+
 extern struct Config_t
 {
     /* ---- Main ----*/
@@ -38,6 +40,8 @@ extern struct Config_t
     int     editor_preferred_file_format = 0;
     //! Show debug string during the loading process
     bool    loading_show_debug = false;
+    //! User's preferred language / dialect
+    std::string language = "sys";
 
     /* ---- Video ----*/
 
