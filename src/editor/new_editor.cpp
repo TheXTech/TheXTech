@@ -1240,41 +1240,46 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 
         using Controls::PlayerControls::Buttons;
 
-        if(UpdateButton(mode, 10 + 4, 80 + 4, GFX.EIcons, Events[m_current_event].Controls.Up, 0, 7*32, 32, 32))
+        if(UpdateCheckBox(mode, 10 + 4, 80 + 4, Events[m_current_event].Controls.Up))
             Events[m_current_event].Controls.Up = !Events[m_current_event].Controls.Up;
         SuperPrintR(mode, GetButtonName_UI(Buttons::Up), 3, 54, 90);
 
-        if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 80 + 4, GFX.EIcons, Events[m_current_event].Controls.Down, 0, 7*32, 32, 32))
+        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 80 + 4, Events[m_current_event].Controls.Down))
             Events[m_current_event].Controls.Down = !Events[m_current_event].Controls.Down;
         SuperPrintR(mode, GetButtonName_UI(Buttons::Down), 3, e_ScreenW/2 + 54, 90);
 
-        if(UpdateButton(mode, 10 + 4, 120 + 4, GFX.EIcons, Events[m_current_event].Controls.Left, 0, 7*32, 32, 32))
+        if(UpdateCheckBox(mode, 10 + 4, 120 + 4, Events[m_current_event].Controls.Left))
             Events[m_current_event].Controls.Left = !Events[m_current_event].Controls.Left;
         SuperPrintR(mode, GetButtonName_UI(Buttons::Left), 3, 54, 130);
-        if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 120 + 4, GFX.EIcons, Events[m_current_event].Controls.Right, 0, 7*32, 32, 32))
+
+        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 120 + 4, Events[m_current_event].Controls.Right))
             Events[m_current_event].Controls.Right = !Events[m_current_event].Controls.Right;
         SuperPrintR(mode, GetButtonName_UI(Buttons::Right), 3, e_ScreenW/2 + 54, 130);
 
-        if(UpdateButton(mode, 10 + 4, 160 + 4, GFX.EIcons, Events[m_current_event].Controls.Jump, 0, 7*32, 32, 32))
+        if(UpdateCheckBox(mode, 10 + 4, 160 + 4, Events[m_current_event].Controls.Jump))
             Events[m_current_event].Controls.Jump = !Events[m_current_event].Controls.Jump;
         SuperPrintR(mode, GetButtonName_UI(Buttons::Jump), 3, 54, 170);
-        if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 160 + 4, GFX.EIcons, Events[m_current_event].Controls.Run, 0, 7*32, 32, 32))
+
+        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 160 + 4, Events[m_current_event].Controls.Run))
             Events[m_current_event].Controls.Run = !Events[m_current_event].Controls.Run;
         SuperPrintR(mode, GetButtonName_UI(Buttons::Run), 3, e_ScreenW/2 + 54, 170);
 
-        if(UpdateButton(mode, 10 + 4, 200 + 4, GFX.EIcons, Events[m_current_event].Controls.AltJump, 0, 7*32, 32, 32))
+        if(UpdateCheckBox(mode, 10 + 4, 200 + 4, Events[m_current_event].Controls.AltJump))
             Events[m_current_event].Controls.AltJump = !Events[m_current_event].Controls.AltJump;
         SuperPrintR(mode, GetButtonName_UI(Buttons::AltJump), 3, 54, 210);
-        if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 200 + 4, GFX.EIcons, Events[m_current_event].Controls.AltRun, 0, 7*32, 32, 32))
+
+        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 200 + 4, Events[m_current_event].Controls.AltRun))
             Events[m_current_event].Controls.AltRun = !Events[m_current_event].Controls.AltRun;
         SuperPrintR(mode, GetButtonName_UI(Buttons::AltRun), 3, e_ScreenW/2 + 54, 210);
 
-        if(UpdateButton(mode, 10 + 4, 240 + 4, GFX.EIcons, Events[m_current_event].Controls.Start, 0, 7*32, 32, 32))
+        if(UpdateCheckBox(mode, 10 + 4, 240 + 4, Events[m_current_event].Controls.Start))
             Events[m_current_event].Controls.Start = !Events[m_current_event].Controls.Start;
         SuperPrintR(mode, GetButtonName_UI(Buttons::Start), 3, 54, 250);
-        if(UpdateButton(mode, e_ScreenW/2 + 10 + 4, 240 + 4, GFX.EIcons, Events[m_current_event].Controls.Drop, 0, 7*32, 32, 32))
+
+        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 240 + 4, Events[m_current_event].Controls.Drop))
             Events[m_current_event].Controls.Drop = !Events[m_current_event].Controls.Drop;
         SuperPrintR(mode, GetButtonName_UI(Buttons::Drop), 3, e_ScreenW/2 + 54, 250);
+
         return;
     }
 
