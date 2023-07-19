@@ -473,11 +473,11 @@ int main(int argc, char**argv)
                 setup.renderType = RENDER_SOFTWARE;
             else if(rt == "vsync")
             {
-                setup.renderType = RENDER_ACCELERATED;
+                setup.renderType = RENDER_ACCELERATED_SDL;
                 setup.vSync = true;
             }
             else if(rt == "hw")
-                setup.renderType = RENDER_ACCELERATED;
+                setup.renderType = RENDER_ACCELERATED_SDL;
             else if(rt == "sdl")
                 setup.renderType = RENDER_ACCELERATED_SDL;
             else if(rt == "opengl")

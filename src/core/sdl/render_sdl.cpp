@@ -82,13 +82,12 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
 
     switch(setup.renderType)
     {
-    case RENDER_ACCELERATED:
     case RENDER_ACCELERATED_SDL:
     default:
         if(setup.vSync)
         {
             renderFlags = SDL_RENDERER_ACCELERATED|SDL_RENDERER_PRESENTVSYNC;
-            g_videoSettings.renderModeObtained = RENDER_ACCELERATED;
+            g_videoSettings.renderModeObtained = RENDER_ACCELERATED_SDL;
             pLogDebug("Using accelerated rendering with a vertical synchronization");
             m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
             if(m_gRenderer)
@@ -99,7 +98,7 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         // continue
 
         renderFlags = SDL_RENDERER_ACCELERATED;
-        g_videoSettings.renderModeObtained = RENDER_ACCELERATED;
+        g_videoSettings.renderModeObtained = RENDER_ACCELERATED_SDL;
         pLogDebug("Using accelerated rendering");
         m_gRenderer = SDL_CreateRenderer(window, -1, renderFlags | SDL_RENDERER_TARGETTEXTURE); // Try to make renderer
         if(m_gRenderer)
