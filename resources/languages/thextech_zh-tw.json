@@ -37,7 +37,8 @@
                 "enter": "進入傳送點時",
                 "hit": "磚塊被撞擊時",
                 "layerClear": "當前圖層中的對象爲空時",
-                "phraseTriggersWhenTemplate": "{0}觸發事件於{1}",
+                "phraseTriggersAfterTemplate": "將於事件：{2}經過{1}毫秒之後，觸發{0}事件",
+                "phraseTriggersWhenTemplate": "{0}：{1}觸發該事件",
                 "talk": "和NPC對話後"
             },
             "header": "事件：",
@@ -103,7 +104,7 @@
             "convert": {
                 "_38aUnsupported": "不支持轉換 SMBX-38A 格式的關卡。",
                 "desc": "檔案格式將會轉換，但不會刪除原始檔。",
-                "featureBlockForceSmashable": "使用了舊版本中可破碎的旋轉方塊。",
+                "featureBlockForceSmashable": "旋轉方塊設置了舊版本的破碎方式。",
                 "featureCustomWorldMusic": "在大地圖中設置了自定義音樂。",
                 "featureEventAutoscroll": "在事件中設置了新版的強制卷軸。",
                 "featureEventCustomMusic": "在事件中設置了自定義音樂。",

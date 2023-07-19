@@ -36,7 +36,8 @@
                 "destroy": "blok yok edildi",
                 "enter": "",
                 "hit": "Bloğa vurulduğunda",
-                "layerClear": "obje katmanındaki her şey gitti",
+                "layerClear": "obje katma- nındaki her şey temizlendiğinde",
+                "phraseTriggersAfterTemplate": "",
                 "phraseTriggersWhenTemplate": "{0}: {1} etkinleştir",
                 "talk": "NPC ile konuşulduğunda"
             },
@@ -44,17 +45,17 @@
             "headerTriggerEvent": "Etkinleştir:",
             "itemNewEvent": "<Yeni Olay>",
             "label": {
-                "activate": "Aktifleştir",
-                "death": "",
+                "activate": "Konuştu- ğunda",
+                "death": "Öldü- ğünde",
                 "destroy": "",
                 "enter": "",
                 "hit": "",
-                "layerClear": "",
+                "layerClear": "Katman Temiz",
                 "next": "",
-                "talk": ""
+                "talk": "Konuştuğunda"
             },
             "layers": {
-                "headerHide": "",
+                "headerHide": "Sakla:",
                 "headerMove": "",
                 "headerShow": "",
                 "headerToggle": ""
