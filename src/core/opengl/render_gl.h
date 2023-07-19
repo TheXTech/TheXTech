@@ -39,6 +39,7 @@
 
 #include "core/base/render_base.h"
 #include "cmd_line_setup.h"
+#include "video.h"
 
 #include "core/opengl/gl_program_object.h"
 
@@ -457,7 +458,7 @@ private:
      * \param majver: minimum OpenGL major version to initialize
      * \param minver: minimum OpenGL minor version to initialize
      */
-    static void try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver);
+    static void try_init_gl(SDL_GLContext& context, SDL_Window* window, GLint profile, GLint majver, GLint minver, RenderMode_t mode);
 
     // initializes a single framebuffer with the game's current screen resolution scaled by the appropriate scaling factor
     // if a render target (BUFFER_GAME, BUFFER_INT_PASS_1, BUFFER_INT_PASS_2), will include depth
