@@ -1897,11 +1897,6 @@ static void itsVegas()
     PlaySound(SFX_CardRouletteClear);
 }
 
-static void toggleRender()
-{
-    g_frmMain.restartRenderer();
-}
-
 
 
 
@@ -1930,8 +1925,6 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
     {"redigitiscool", redigitIsCool, false},
 #endif
     {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false},
-
-    {"togglerender", toggleRender, false},
 
     {nullptr, nullptr, false}
 };

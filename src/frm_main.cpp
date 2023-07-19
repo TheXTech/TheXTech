@@ -272,20 +272,46 @@ bool FrmMain::restartRenderer()
         m_render->close();
     }
 
-    bool use_sdl = dynamic_cast<RenderGL*>(m_render.get());
-
     m_render.reset();
     g_render = nullptr;
 
-    if(use_sdl)
-        m_render.reset(new RenderSDL());
-    else
+    bool try_gl = false;
+
+    CmdLineSetup_t setup;
+    setup.renderType = g_videoSettings.renderMode;
+    setup.vSync = g_videoSettings.vSync;
+
+    if(setup.renderType == RENDER_ACCELERATED_OPENGL || setup.renderType == RENDER_ACCELERATED_OPENGL_ES || setup.renderType == RENDER_ACCELERATED_OPENGL_LEGACY || setup.renderType == RENDER_ACCELERATED_OPENGL_ES_LEGACY)
+    {
         m_render.reset(new RenderGL());
+        try_gl = true;
+    }
+    else
+    {
+        m_render.reset(new RenderSDL());
+    }
 
     g_render = m_render.get();
 
-    const CmdLineSetup_t setup;
     res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+
+    if(try_gl && !res)
+    {
+        pLogDebug("FrmMain: closing Render GL");
+        m_render->clearAllTextures();
+        m_render->close();
+
+        m_render.reset();
+        g_render = nullptr;
+
+        pLogDebug("FrmMain: retrying with Render SDL layer...");
+
+        RenderSDL *render = new RenderSDL();
+        m_render.reset(render);
+        g_render = m_render.get();
+
+        res = g_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+    }
 
 #else
     // SDL, no OpenGL
@@ -303,7 +329,10 @@ bool FrmMain::restartRenderer()
 
     g_render = m_render.get();
 
-    const CmdLineSetup_t setup;
+    CmdLineSetup_t setup;
+    setup.renderType = g_videoSettings.renderMode;
+    setup.vSync = g_videoSettings.vSync;
+
     res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
 #endif
 
