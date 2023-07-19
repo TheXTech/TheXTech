@@ -58,6 +58,9 @@
 #include "world_file.h"
 #include "pge_delay.h"
 
+#include "video.h"
+#include "frm_main.h"
+
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
 #include "editor/write_world.h"
@@ -1437,10 +1440,12 @@ bool mainMenuUpdate()
         // Options
         else if(MenuMode == MENU_OPTIONS)
         {
+            int optionsMenuLength = 1;
 #ifndef RENDER_FULLSCREEN_ALWAYS
-            const int optionsMenuLength = 2;
-#else
-            const int optionsMenuLength = 1;
+            optionsMenuLength++;
+#endif
+#ifndef RENDER_CUSTOM
+            optionsMenuLength++;
 #endif
 
             if(SharedCursor.Move)
@@ -1460,6 +1465,10 @@ bool mainMenuUpdate()
                             else
                                 menuLen = 18 * 15; // std::strlen("fullscreen mode")
                         }
+#endif
+#ifndef RENDER_CUSTOM
+                        else if(A == i++)
+                            menuLen = 18 * 25; // Render Mode: XXXXXXXX
 #endif
                         else
                             menuLen = 18 * 12 - 2; // std::strlen("view credits")
@@ -1495,11 +1504,11 @@ bool mainMenuUpdate()
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
                 }
-                else if(menuDoPress || MenuMouseClick)
+                else if(menuDoPress || MenuMouseClick || leftPressed || rightPressed)
                 {
                     MenuCursorCanMove = false;
                     int i = 0;
-                    if(MenuCursor == i++)
+                    if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
                         MenuCursor = 0;
                         MenuMode = MENU_INPUT_SETTINGS;
@@ -1512,7 +1521,43 @@ bool mainMenuUpdate()
                         ChangeScreen();
                     }
 #endif
+#ifndef RENDER_CUSTOM
                     else if(MenuCursor == i++)
+                    {
+                        int delta = leftPressed ? -1 : 1;
+
+                        bool first = true;
+
+                        // check for and skip unsupported modes
+                        while(first
+#   ifndef THEXTECH_BUILD_GL_DESKTOP_MODERN
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL
+#   endif
+#   ifndef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_LEGACY
+#   endif
+#   ifndef THEXTECH_BUILD_GL_ES_MODERN
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_ES
+#   endif
+#   ifndef THEXTECH_BUILD_GL_ES_LEGACY
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_ES_LEGACY
+#   endif
+                        )
+                        {
+                            g_videoSettings.renderMode += delta;
+                            if(g_videoSettings.renderMode < RENDER_SOFTWARE)
+                                g_videoSettings.renderMode = RENDER_END - 1;
+                            else if(g_videoSettings.renderMode >= RENDER_END)
+                                g_videoSettings.renderMode = RENDER_SOFTWARE;
+
+                            first = false;
+                        }
+
+                        if(g_frmMain.restartRenderer())
+                            SaveConfig();
+                    }
+#endif // #ifndef RENDER_CUSTOM
+                    else if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
                         PlaySoundMenu(SFX_Do);
                         GameMenu = false;
@@ -1980,6 +2025,20 @@ void mainMenuDraw()
             SuperPrint(g_mainMenu.optionsModeWindowed, 3, MenuX, MenuY + (30 * i++));
         else
             SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
+#endif
+#ifndef RENDER_CUSTOM
+        const char* const renderers[] = {
+            "SW",
+            "HW",
+            "OpenGL 3+",
+            "OpenGL ES 2+",
+            "OpenGL 1.1",
+            "OpenGL ES 1.1",
+        };
+        if(g_videoSettings.renderMode == g_videoSettings.renderModeObtained)
+            SuperPrint(fmt::format_ne("Render: {0}", renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
+        else
+            SuperPrint(fmt::format_ne("Render: {0} (X)", renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
 #endif
         SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
