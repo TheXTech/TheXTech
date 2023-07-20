@@ -43,7 +43,7 @@ public:
     WindowSDL();
     virtual ~WindowSDL();
 
-    bool initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags);
+    bool create(uint32_t windowInitFlags);
 
     void close() override;
 

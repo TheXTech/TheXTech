@@ -33,6 +33,8 @@
 #include "core/events.h"
 
 #ifdef CORE_EVERYTHING_SDL
+#   include "core/sdl/init_sdl.h"
+
 #   include "core/sdl/render_sdl.h"
 #   include "core/opengl/render_gl.h"
 
@@ -120,13 +122,20 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     D_pLogDebugNA("FrmMain: Loading XWindow...");
     res = XWindow::init();
 #elif defined(USE_CORE_WINDOW_SDL)
-    res = window->initSDL(setup, g_render->SDL_InitFlags());
+    res = TXT_InitSDL(setup);
+    if(!res)
+        return true;
+
+    res = window->create(g_render->SDL_InitFlags());
 #else
 #   error "FIXME: Implement supported window initialization here"
 #endif
 
     if(!res)
+    {
+        freeSystem();
         return true;
+    }
 
 
     // Initializing message box
@@ -168,6 +177,9 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         m_render->clearAllTextures();
         m_render->close();
 
+        msgbox->close();
+        window->close();
+
         m_render.reset();
         g_render = nullptr;
 
@@ -177,7 +189,14 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         m_render.reset(render);
         g_render = m_render.get();
 
-        res = g_render->initRender(setup, window->getWindow());
+        // make new window
+        res = window->create(g_render->SDL_InitFlags());
+
+        if(res)
+        {
+            msgbox->init(window->getWindow());
+            res = g_render->initRender(setup, window->getWindow());
+        }
     }
 #   endif // #ifdef RENDERGL_SUPPORTED
 
@@ -243,6 +262,8 @@ void FrmMain::freeSystem()
     g_window = nullptr;
 #endif
 
+    TXT_QuitSDL();
+
 #if defined(__WII__) || defined(__3DS__) || !defined(RENDER_CUSTOM)
     GraphicsHelps::closeFreeImage();
 #endif
@@ -264,13 +285,15 @@ bool FrmMain::restartRenderer()
     res = XRender::init();
 
 #elif defined(RENDERGL_SUPPORTED)
-    // SDL / OpenGL -- toggle for now
 
     if(m_render)
     {
         m_render->clearAllTextures();
         m_render->close();
     }
+
+    g_msgBox->close();
+    g_window->close();
 
     m_render.reset();
     g_render = nullptr;
@@ -293,13 +316,22 @@ bool FrmMain::restartRenderer()
 
     g_render = m_render.get();
 
-    res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+    res = reinterpret_cast<WindowUsed*>(g_window)->create(g_render->SDL_InitFlags());
+
+    if(res)
+    {
+        reinterpret_cast<MsgBoxUsed*>(g_msgBox)->init(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+        res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+    }
 
     if(try_gl && !res)
     {
         pLogDebug("FrmMain: closing Render GL");
         m_render->clearAllTextures();
         m_render->close();
+
+        g_msgBox->close();
+        g_window->close();
 
         m_render.reset();
         g_render = nullptr;
@@ -310,7 +342,13 @@ bool FrmMain::restartRenderer()
         m_render.reset(render);
         g_render = m_render.get();
 
-        res = g_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+        res = reinterpret_cast<WindowUsed*>(g_window)->create(g_render->SDL_InitFlags());
+
+        if(res)
+        {
+            reinterpret_cast<MsgBoxUsed*>(g_msgBox)->init(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+            res = g_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
+        }
     }
 
 #else
@@ -335,6 +373,8 @@ bool FrmMain::restartRenderer()
 
     res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
 #endif
+
+    XWindow::show();
 
     return res;
 }

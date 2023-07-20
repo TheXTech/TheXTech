@@ -18,7 +18,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <locale.h>
 #include <SDL2/SDL.h>
 
 #include <Logger/logger.h>
@@ -105,61 +104,15 @@ WindowSDL::WindowSDL() :
 WindowSDL::~WindowSDL()
 {}
 
-bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
+bool WindowSDL::create(uint32_t windowInitFlags)
 {
+    SDL_ClearError();
+
     bool res = true;
 
     m_windowTitle = g_gameInfo.titleWindow;
 
-    if(setup.allowBgInput)
-        SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
-
-#if defined(__ANDROID__) || (defined(__APPLE__) && (defined(TARGET_IPHONE_SIMULATOR) || defined(TARGET_OS_IPHONE)))
-    // Restrict the landscape orientation only
-    SDL_SetHint(SDL_HINT_ORIENTATIONS, "LandscapeLeft LandscapeRight");
-#endif
-
-#if defined(__ANDROID__)
-    SDL_setenv("SDL_AUDIODRIVER", "openslES", 1);
-    SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
-    SDL_SetHint(SDL_HINT_MOUSE_TOUCH_EVENTS, "0");
-    SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 5);
-    SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 6);
-    SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
-#endif
-
-    Uint32 sdlInitFlags = 0;
-    // Prepare flags for SDL initialization
-#if !defined(__EMSCRIPTEN__) && !defined(SDL_TIMERS_DISABLED)
-    sdlInitFlags |= SDL_INIT_TIMER;
-#endif
-#if !defined(SDL_AUDIO_DISABLED)
-    sdlInitFlags |= SDL_INIT_AUDIO;
-#endif
-    sdlInitFlags |= SDL_INIT_VIDEO;
-    sdlInitFlags |= SDL_INIT_EVENTS;
-#if !defined(SDL_JOYSTICK_DISABLED)
-    sdlInitFlags |= SDL_INIT_JOYSTICK;
-    sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
-#endif
-#if !defined(SDL_HAPTIC_DISABLED)
-    sdlInitFlags |= SDL_INIT_HAPTIC;
-#endif
-
-    // Initialize SDL
-    res = (SDL_Init(sdlInitFlags) >= 0);
-
-    // Workaround: https://discourse.libsdl.org/t/26995
-    setlocale(LC_NUMERIC, "C");
-
-    const char *error = SDL_GetError();
-    if(*error != '\0')
-        pLogWarning("Error while SDL Initialization: %s", error);
-    SDL_ClearError();
-    if(!res)
-        return false;
-
-    SDL_GL_ResetAttributes();
+    // SDL_GL_ResetAttributes();
 
 #if defined(__SWITCH__) /* On Switch, expect the initial size 1920x1080 */
     const int initWindowW = 1920;
@@ -196,7 +149,12 @@ bool WindowSDL::initSDL(const CmdLineSetup_t &setup, uint32_t windowInitFlags)
 
     if(isSdlError())
     {
-        pLogCritical("Unable to create window!");
+        const char *error = SDL_GetError();
+        if(*error != '\0')
+            pLogCritical("Unable to create window: %s", error);
+        else
+            pLogCritical("Unable to create window!");
+
         SDL_ClearError();
         return false;
     }
@@ -272,8 +230,6 @@ void WindowSDL::close()
     if(m_window)
         SDL_DestroyWindow(m_window);
     m_window = nullptr;
-
-    SDL_Quit();
 }
 
 SDL_Window *WindowSDL::getWindow()
