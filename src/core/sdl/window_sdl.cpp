@@ -126,6 +126,10 @@ bool WindowSDL::create(uint32_t windowInitFlags)
     windowInitFlags |= SDL_WINDOW_FULLSCREEN | SDL_WINDOW_SHOWN;
 #endif
 
+    // restore fullscreen state
+    if(m_fullscreen)
+        windowInitFlags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+
 #ifdef __EMSCRIPTEN__
     // don't use SDL fullscreen API on Emscripten
     windowInitFlags &= ~SDL_WINDOW_FULLSCREEN;
@@ -293,12 +297,7 @@ void WindowSDL::placeCursor(int window_x, int window_y)
 
 bool WindowSDL::isFullScreen()
 {
-#ifndef __EMSCRIPTEN__
-    Uint32 flags = SDL_GetWindowFlags(m_window);
-    return (flags & SDL_WINDOW_FULLSCREEN_DESKTOP) ? SDL_TRUE : SDL_FALSE;
-#else
     return m_fullscreen;
-#endif
 }
 
 int WindowSDL::setFullScreen(bool fs)
@@ -309,15 +308,15 @@ int WindowSDL::setFullScreen(bool fs)
     if((SDL_GetWindowFlags(m_window) & SDL_WINDOW_RESIZABLE) == 0)
         return -1; // Can't switch fullscreen mode when window is not resizable
 
-    if(fs != isFullScreen())
+    if(fs != m_fullscreen)
     {
+        m_fullscreen = fs;
+
 #ifdef __EMSCRIPTEN__
         if(fs)
             s_emscriptenRealFullscreen();
         else
             s_emscriptenLeaveRealFullscreen();
-
-        m_fullscreen = fs;
 
         return m_fullscreen;
 #else
