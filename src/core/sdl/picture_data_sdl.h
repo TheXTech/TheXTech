@@ -57,6 +57,11 @@ private:
     //! GLParticleSystem wrapper for texture's particle system state
     std::unique_ptr<GLParticleSystem> particle_system = nullptr;
 
+#else
+
+    static constexpr GLProgramObject* shader_program = nullptr;
+    static constexpr GLParticleSystem* particle_system = nullptr;
+
 #endif
 
     //! texture ID for OpenGL and other render engines

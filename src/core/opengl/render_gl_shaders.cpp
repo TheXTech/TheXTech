@@ -20,6 +20,8 @@
 
 #include "core/opengl/render_gl.h"
 
+#ifdef RENDERGL_HAS_SHADERS
+
 const char* const RenderGL::s_es2_standard_vert_src =
 R"RAW(#version 100
 uniform   mat4 u_transform;
@@ -459,3 +461,5 @@ void main()
     o_FragColor.a = 1.0;
 }
 )RAW";
+
+#endif

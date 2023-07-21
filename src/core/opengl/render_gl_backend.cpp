@@ -159,10 +159,7 @@ void RenderGL::framebufferCopy(BufferIndex_t dest, BufferIndex_t source, RectSiz
 #else // #ifdef RENDERGL_HAS_FBO
     UNUSED(dest);
     UNUSED(source);
-    UNUSED(x);
-    UNUSED(y);
-    UNUSED(w);
-    UNUSED(h);
+    UNUSED(r);
 
     pLogWarning("Render GL: framebufferCopy called without framebuffer subsystem -> no-op");
 #endif
@@ -429,10 +426,12 @@ void RenderGL::executeOrderedDrawQueue(bool clear)
             program = &m_bitmask_program;
             use_gl_logic_op = false;
 
+#ifdef RENDERGL_HAS_FBO
             // bind the bitmask texture to the secondary texture unit
             glActiveTexture(TEXTURE_UNIT_MASK);
             glBindTexture(GL_TEXTURE_2D, texture->d.mask_texture_id);
             glActiveTexture(TEXTURE_UNIT_IMAGE);
+#endif
         }
 
 
@@ -695,7 +694,9 @@ void RenderGL::flushDrawQueues()
         glDepthMask(GL_FALSE);
 
     // reset lighting buffer
+#ifdef RENDERGL_HAS_SHADERS
     m_light_count = 0;
+#endif
 
     for(int pass = 1; pass <= num_pass; pass++)
     {

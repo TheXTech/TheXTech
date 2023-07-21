@@ -616,4 +616,17 @@ GLProgramObject::~GLProgramObject()
     // empty
 }
 
+void GLProgramObject::m_activate_uniform_step(uint16_t step)
+{
+    (void)(step);
+}
+
+void GLProgramObject::m_update_transform(const GLfloat* transform, const GLfloat* read_viewport, GLfloat clock)
+{
+    // empty
+    (void)(transform);
+    (void)(read_viewport);
+    (void)(clock);
+}
+
 #endif

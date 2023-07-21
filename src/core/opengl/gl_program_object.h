@@ -148,7 +148,11 @@ private:
 
     void m_activate_uniform_step(uint16_t step);
 
+#ifdef RENDERGL_HAS_SHADERS
     void m_clear_uniform_steps();
+#else
+    inline void m_clear_uniform_steps() {}
+#endif
 
 public:
 
@@ -169,7 +173,11 @@ public:
     /*!
      * \brief Activate program in OpenGL state
      */
+#ifdef RENDERGL_HAS_SHADERS
     void use_program();
+#else
+    inline void use_program() {}
+#endif
 
     // inline functions for fast paths
 
@@ -240,8 +248,6 @@ public:
     /*!
      * \brief Returns the current uniform step (following all pending assignments) for rewinding during the current frame
      * \returns The current uniform step
-     *
-     * FIXME: should clear the previous rewind buffer if activate_uniform_step has been called
      */
     inline uint16_t get_uniform_step()
     {

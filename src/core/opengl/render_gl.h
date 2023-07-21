@@ -409,16 +409,16 @@ private:
 
     // extra state supporting the lighting system
 
+#ifdef RENDERGL_HAS_SHADERS
+
     // performs the light calculation pass
     GLProgramObject m_lighting_program;
 
     // UBO to support the lighting queue
     GLuint m_light_ubo = 0;
 
-#ifdef RENDERGL_HAS_SHADERS
     // filled with lights over the course of a render queue fill
     LightBuffer m_light_queue;
-#endif
 
     // tracks how many lights have been added in the current frame
     int m_light_count = 0;
@@ -442,6 +442,8 @@ private:
     static const char* const s_es2_circle_hole_frag_src;
 
     static const char* const s_es3_lighting_frag_src;
+
+#endif // #ifdef RENDERGL_HAS_SHADERS
 
 
     /***********************************************************\
