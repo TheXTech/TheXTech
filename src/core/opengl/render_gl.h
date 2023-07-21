@@ -415,8 +415,10 @@ private:
     // UBO to support the lighting queue
     GLuint m_light_ubo = 0;
 
+#ifdef RENDERGL_HAS_SHADERS
     // filled with lights over the course of a render queue fill
     LightBuffer m_light_queue;
+#endif
 
     // tracks how many lights have been added in the current frame
     int m_light_count = 0;
