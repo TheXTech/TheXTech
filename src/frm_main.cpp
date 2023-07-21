@@ -262,7 +262,9 @@ void FrmMain::freeSystem()
     g_window = nullptr;
 #endif
 
+#ifdef CORE_EVERYTHING_SDL
     TXT_QuitSDL();
+#endif
 
 #if defined(__WII__) || defined(__3DS__) || !defined(RENDER_CUSTOM)
     GraphicsHelps::closeFreeImage();
