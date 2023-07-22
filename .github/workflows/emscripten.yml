@@ -126,6 +126,14 @@ jobs:
         cd ..
         rm assets.7z
 
+    - name: Apply update to translations
+      shell: bash
+      run: |
+        ASSETS_ROOT="$PWD/assets"
+        cd .github/ci-helper
+        bash translate_update.sh "${ASSETS_ROOT}"
+        cd ../..
+
     - name: Configure
       shell: bash
       run: |
