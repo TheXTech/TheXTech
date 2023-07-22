@@ -27,6 +27,13 @@
 namespace XLanguage
 {
 
+
+/*!
+ * \brief Finds present and non-empty language translations (called during engine load)
+ */
+void findLanguages();
+
+
 /*!
  * \brief Detect system language and set global variables
  */

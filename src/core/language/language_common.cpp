@@ -34,11 +34,15 @@
 #   endif
 #endif
 
+#include "sdl_proxy/sdl_rwops.h"
+
 #include "config.h"
 #include "globals.h"
 #include "core/language.h"
 #include "core/language/language_private.h"
 
+
+static std::vector<std::string> s_languages;
 
 static std::string langEngineFile;
 static std::string langAssetsFile;
@@ -85,6 +89,87 @@ static bool detectSetup()
     pLogDebug("Trying localization %s-%s -> found files [%s] and [%s]", CurrentLanguage.c_str(), CurrentLangDialect.c_str(), langEngineFile.c_str(), langAssetsFile.c_str());
 
     return !langEngineFile.empty() || !langAssetsFile.empty();
+}
+
+
+void XLanguage::findLanguages()
+{
+    constexpr size_t prefix_length = 9; // std::string("thextech_").size();
+
+    // clear and free s_languages
+    {
+        std::vector<std::string> blank;
+        std::swap(s_languages, blank);
+    }
+
+    std::vector<std::string> list;
+    DirMan langs(AppPathManager::languagesDir());
+
+    if(!langs.exists())
+    {
+        pLogDebug("Can't open the languages directory: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    if(!langs.getListOfFiles(list, {".json"}))
+    {
+        pLogDebug("Can't show the content of the languages directory: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    if(list.empty())
+    {
+        pLogDebug("Languages directory does not have JSON files: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    // tag non-lowercase filenames and language codes including underscores for exclusion during sorting
+    for(std::string& fn : list)
+    {
+        for(auto& c : fn)
+        {
+            if(c != std::tolower(c))
+            {
+                fn[0] = '_';
+                break;
+            }
+        }
+
+        if(fn.end() - fn.begin() > (std::ptrdiff_t)prefix_length && std::find(fn.begin() + prefix_length, fn.end(), '_') != fn.end())
+            fn[0] = '_';
+    }
+
+    // sort filenames
+    std::sort(list.begin(), list.end());
+
+    const auto langs_begin = std::lower_bound(list.cbegin(), list.cend(), "thextech_");
+    const auto langs_end   = std::upper_bound(list.cbegin(), list.cend(), "thextech`");
+
+    if(langs_begin == langs_end)
+    {
+        pLogDebug("Languages directory does not have thextech_*.json files: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    // fill s_languages
+    for(auto it = langs_begin; it != langs_end; ++it)
+    {
+        // check filesize > 8 bytes
+        auto f = SDL_RWFromFile((langs.absolutePath() + "/" + *it).c_str(), "rb");
+
+        // file doesn't exist / has problem opening
+        if(!f)
+            continue;
+
+        auto fsize = SDL_RWsize(f);
+        SDL_RWclose(f);
+
+        // file too small
+        if(fsize < 8)
+            continue;
+
+        s_languages.push_back(*it);
+    }
 }
 
 
@@ -162,74 +247,31 @@ void XLanguage::rotateLanguage(std::string& nextLanguage, int step)
     constexpr size_t suffix_length = 5; // std::string(".json").size();
     constexpr size_t ignore_length = prefix_length + suffix_length;
 
-    std::vector<std::string> list;
-    DirMan langs(AppPathManager::languagesDir());
-
-    if(!langs.exists())
+    if(s_languages.empty())
     {
-        pLogDebug("Can't open the languages directory: %s", langs.absolutePath().c_str());
-        return;
-    }
-
-    if(!langs.getListOfFiles(list, {".json"}))
-    {
-        pLogDebug("Can't show the content of the languages directory: %s", langs.absolutePath().c_str());
-        return;
-    }
-
-    if(list.empty())
-    {
-        pLogDebug("Languages directory does not have JSON files: %s", langs.absolutePath().c_str());
-        return;
-    }
-
-    // tag non-lowercase filenames and language codes including underscores for exclusion during sorting
-    for(std::string& fn : list)
-    {
-        for(auto& c : fn)
-        {
-            if(c != std::tolower(c))
-            {
-                fn[0] = '_';
-                break;
-            }
-        }
-
-        if(fn.end() - fn.begin() > (std::ptrdiff_t)prefix_length && std::find(fn.begin() + prefix_length, fn.end(), '_') != fn.end())
-            fn[0] = '_';
-    }
-
-    // sort filenames
-    std::sort(list.begin(), list.end());
-
-    const auto langs_begin = std::lower_bound(list.cbegin(), list.cend(), "thextech_");
-    const auto langs_end   = std::upper_bound(list.cbegin(), list.cend(), "thextech`");
-
-    if(langs_begin == langs_end)
-    {
-        pLogDebug("Languages directory does not have thextech_*.json files: %s", langs.absolutePath().c_str());
+        pLogDebug("Cannot rotate language because none are present");
         return;
     }
 
     // find current filename
     std::string seek_fn = fmt::format_ne("thextech_{0}.json", g_config.language);
 
-    auto curr_lang_fn = std::find(langs_begin, langs_end, seek_fn);
+    auto curr_lang_fn = std::find(s_languages.cbegin(), s_languages.cend(), seek_fn);
 
     if(g_config.language == "auto")
-        curr_lang_fn = langs_end;
+        curr_lang_fn = s_languages.cend();
 
     // pick next filename
-    std::ptrdiff_t cur_index = curr_lang_fn - langs_begin;
+    std::ptrdiff_t cur_index = curr_lang_fn - s_languages.cbegin();
     std::ptrdiff_t new_index = cur_index + step;
-    std::ptrdiff_t opts_len = (langs_end - langs_begin) + 1;
+    std::ptrdiff_t opts_len  = s_languages.size() + 1;
 
     // limit to bounds + 1 (in order to include "auto")
     std::ptrdiff_t wrapped_index = (new_index < 0) ? (new_index % opts_len + opts_len) : (new_index % opts_len);
 
-    auto next_lang_fn = langs_begin + wrapped_index;
+    auto next_lang_fn = s_languages.cbegin() + wrapped_index;
 
-    if(next_lang_fn == langs_end)
+    if(next_lang_fn == s_languages.cend())
     {
         nextLanguage = "auto";
         return;
