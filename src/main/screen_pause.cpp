@@ -203,11 +203,14 @@ void Init(int plr, bool LegacyPause)
 
     // add pause menu items
 
-    // just died in level test
-    if(TestLevel && LevelBeatCode == -2)
+    // level test restart screen
+    if(TestLevel && LevelBeatCode <= -2)
     {
-        s_items.push_back(MenuItem{g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
+        s_items.push_back(MenuItem{LevelBeatCode == -3 ? g_gameStrings.pauseItemContinue : g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
         s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
+
+        if(g_compatibility.allow_drop_add && !LegacyPause)
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
         if(Backup_FullFileName.empty())
             s_items.push_back(MenuItem{g_gameStrings.pauseItemQuitTesting, s_QuitTesting});

@@ -2906,9 +2906,12 @@ void zTestLevel(bool magicHand, bool interProcess)
     if(g_speedRunnerMode != SPEEDRUN_MODE_OFF && !Controls::Update())
     {
         ClearLevel();
-        MessageText = g_gameStrings.connectWaitingForInputDevice;
+        // MessageText = g_gameStrings.connectWaitingForInputDevice;
+        TestLevel = true;
+        LevelBeatCode = -3;
         QuickReconnectScreen::g_active = true;
-        PauseGame(PauseCode::Message);
+        PauseGame(PauseCode::PauseScreen);
+        LevelBeatCode = 0;
     }
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
