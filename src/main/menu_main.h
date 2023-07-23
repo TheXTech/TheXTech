@@ -180,6 +180,7 @@ struct MainMenuContent
     std::string wordBack;
     std::string wordResume;
     std::string wordWaiting;
+    std::string wordLanguage;
     std::string abbrevMilliseconds;
 
     // Compat menu

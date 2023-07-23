@@ -60,6 +60,8 @@
 #include "video.h"
 #include "change_res.h"
 #include "game_globals.h"
+#include "core/language.h"
+#include "main/translate.h"
 
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
@@ -183,6 +185,7 @@ void initMainMenu()
     g_mainMenu.wordOff  = "Off";
     g_mainMenu.wordShow = "Show";
     g_mainMenu.wordHide = "Hide";
+    g_mainMenu.wordLanguage = "Language";
     g_mainMenu.abbrevMilliseconds = "MS";
 
     g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"\n\n\nReplace it with the updated flag for version 1.3.6 and newer?";
@@ -1510,7 +1513,7 @@ bool mainMenuUpdate()
         // Options
         else if(MenuMode == MENU_OPTIONS)
         {
-            int optionsMenuLength = 1; // controls, credits
+            int optionsMenuLength = 2; // controls, language, credits
 #ifndef RENDER_FULLSCREEN_ALWAYS
             optionsMenuLength++;
 #endif
@@ -1543,6 +1546,8 @@ bool mainMenuUpdate()
                         else if(A == i++)
                             menuLen = 18 * std::strlen("res: WWWxHHH (word)");
 #endif
+                        else if(A == i++)
+                            menuLen = 18 * 25; // Language: XXXXX (YY)
                         else
                             menuLen = 18 * 12 - 2; // std::strlen("view credits")
 
@@ -1583,7 +1588,7 @@ bool mainMenuUpdate()
                 {
                     MenuCursorCanMove = false;
                     int i = 0;
-                    if(MenuCursor == i++)
+                    if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
                         MenuCursor = 0;
                         MenuMode = MENU_INPUT_SETTINGS;
@@ -1669,6 +1674,12 @@ bool mainMenuUpdate()
                     }
 #endif
                     else if(MenuCursor == i++)
+                    {
+                        XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
+                        ReloadTranslations();
+                        SaveConfig();
+                    }
+                    else if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
                         PlaySoundMenu(SFX_Do);
                         GameMenu = false;
@@ -2228,6 +2239,7 @@ void mainMenuDraw()
 
         SuperPrint(resString, 3, MenuX, MenuY + (30 * i++));
 #endif
+        SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
         SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
                                GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);

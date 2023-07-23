@@ -123,6 +123,7 @@ void OpenConfig_preSetup()
 
         config.beginGroup("main");
         config.read("loading-debug", g_config.loading_show_debug, true);
+        config.read("language", g_config.language, g_config.language);
         config.endGroup();
 
         config.beginGroup("video");
@@ -329,6 +330,7 @@ void SaveConfig()
     config.setValue("enable-editor", g_config.enable_editor);
     config.setValue("editor-edge-scroll", g_config.editor_edge_scroll);
     config.setValue("loading-debug", g_config.loading_show_debug);
+    config.setValue("language", g_config.language);
     config.endGroup();
 
     config.beginGroup("recent");

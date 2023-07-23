@@ -162,6 +162,10 @@ elseif(NOT MSVC)
             # Supress the std::vector::insert() GCC change warning
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fcompare-debug-second")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fcompare-debug-second")
+            if(NINTENDO_WII OR NINTENDO_WIIU)
+                set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mno-altivec -Ubool -Uvector -U_GNU_SOURCE")
+                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mno-altivec -Ubool -Uvector -U_GNU_SOURCE")
+            endif()
             # use --gc-sections for all build types
             set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -g -Wl,--gc-sections")
             set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -g -Wl,--gc-sections")

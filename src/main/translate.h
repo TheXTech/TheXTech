@@ -71,4 +71,7 @@ private:
     bool translateFile(const std::string &file, TrList &list, const char* trTypeName);
 };
 
+// safe to call at any time; reloads all engine-level string translations (no level / episode translations)
+void ReloadTranslations();
+
 #endif // TRANSLATE_H

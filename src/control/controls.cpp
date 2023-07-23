@@ -113,13 +113,7 @@ void Hotkeys::Activate(size_t i, int player)
 
     case Buttons::ReloadLanguage:
     {
-        XTechTranslate translator;
-        if(translator.translate())
-        {
-            pLogDebug("Reloaded translation for language %s-%s",
-                      CurrentLanguage.c_str(),
-                      CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
-        }
+        ReloadTranslations();
         return;
     }
 #endif

@@ -114,20 +114,48 @@
 #endif
 
 
-#if defined(_X86_)||defined(__i386__)||defined(__i486__)||defined(__i586__)||defined(__i686__)||defined(_M_IX86)
+#if defined(_X86_) || defined(__i386__) || defined(__i486__) || defined(__i586__) || defined(__i686__) || defined(_M_IX86)
     #define FILE_CPU "x86 (32-bit)"
-#elif defined(__x86_64__)||defined(__amd64__)||defined(_WIN64)||defined(_M_X64)||defined(_M_AMD64)
+#elif defined(__x86_64__) || defined(__amd64__) || defined(_WIN64) || defined(_M_X64) || defined(_M_AMD64)
     #define FILE_CPU "x86_64 (64-bit)"
-#elif defined(__arm__)||defined(_M_ARM)||defined(_M_ARMT)
-    #ifdef __aarch64__
-        #define FILE_CPU "ARM (64-bit)"
+#elif defined(__arm__) || defined(__TARGET_ARCH_ARM) || defined(__ARM_ARCH)
+    #if defined(__ARM_ARCH_8__) \
+     || defined(__ARM_ARCH_8A) \
+     || defined(__ARM_ARCH_8A__) \
+     || defined(__ARM_ARCH_8R__) \
+     || defined(__ARM_ARCH_8M__) \
+     || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM >= 8) \
+     || (defined(__ARM_ARCH) && __ARM_ARCH >= 8)
+        #define FILE_CPU "ARM64 (64-bit)"
+    #elif defined(__ARM_ARCH_7__) \
+       || defined(__ARM_ARCH_7A__) \
+       || defined(__ARM_ARCH_7R__) \
+       || defined(__ARM_ARCH_7M__) \
+       || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM >= 7) \
+       || (defined(__ARM_ARCH) && __ARM_ARCH >= 7)
+        #define FILE_CPU "ARMv7 (32-bit)"
+    #elif defined(__ARM_ARCH_6__) \
+       || defined(__ARM_ARCH_6J__) \
+       || defined(__ARM_ARCH_6T2__) \
+       || defined(__ARM_ARCH_6Z__) \
+       || defined(__ARM_ARCH_6K__) \
+       || defined(__ARM_ARCH_6ZK__) \
+       || defined(__ARM_ARCH_6M__) \
+       || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM >= 6) \
+       || (defined(__ARM_ARCH) && __ARM_ARCH >= 6)
+        #define FILE_CPU "ARMv6 (32-bit)"
+    #elif defined(__ARM_ARCH_5TEJ__) \
+      || (defined(__TARGET_ARCH_ARM) && __TARGET_ARCH_ARM >= 5)
+        #define FILE_CPU "ARMv5 (32-bit)"
     #else
-        #define FILE_CPU "ARM (32-bit)"
+        #define FILE_CPU "ARM (Unknown)"
     #endif
-#elif defined(__mips__)||defined(__mips)||defined(__MIPS__)
+#elif defined(__mips__) || defined(__mips) || defined(__MIPS__)
     #define FILE_CPU "MIPS"
-#elif defined(__powerpc__)||defined(_M_PPC)||defined(__POWERPC__)
-    #if defined(__powerpc64__)||defined(__ppc64__)||defined(__PPC64__)
+#elif defined(__ppc__) || defined(__ppc) || defined(__powerpc__) \
+   || defined(_ARCH_COM) || defined(_ARCH_PWR) || defined(_ARCH_PPC)  \
+   || defined(_M_MPPC) || defined(_M_PPC)
+    #if defined(__ppc64__) || defined(__powerpc64__) || defined(__64BIT__)
         #define FILE_CPU "PowerPC (64-bit)"
     #else
         #define FILE_CPU "PowerPC (32-bit)"
@@ -139,4 +167,3 @@
 #define V_DATE_OF_BUILD __DATE__ " " __TIME__
 
 #endif
-

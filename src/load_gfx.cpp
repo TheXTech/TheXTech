@@ -678,24 +678,24 @@ static void restoreWorldBackupTextures()
 }
 
 
-static inline void s_find_image(std::string& dest, DirListCI& CurDir, std::string basename)
+static inline void s_find_image(std::string& dest, DirListCI& CurDir, std::string baseName)
 {
 #if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
-    int s = basename.size();
-    basename += X_IMG_EXT;
-    dest = CurDir.resolveFileCaseExistsAbs(basename);
+    int s = baseName.size();
+    baseName += X_IMG_EXT;
+    dest = CurDir.resolveFileCaseExistsAbs(baseName);
     if(dest.empty())
     {
-        basename.resize(s);
-        basename += ".png";
-        dest = CurDir.resolveFileCaseExistsAbs(basename);
+        baseName.resize(s);
+        baseName += ".png";
+        dest = CurDir.resolveFileCaseExistsAbs(baseName);
     }
 #elif defined(X_IMG_EXT)
-    basename += X_IMG_EXT;
-    dest = CurDir.resolveFileCaseExistsAbs(basename);
+    baseName += X_IMG_EXT;
+    dest = CurDir.resolveFileCaseExistsAbs(baseName);
 #else
-    basename += ".png";
-    dest = CurDir.resolveFileCaseExistsAbs(basename);
+    baseName += ".png";
+    dest = CurDir.resolveFileCaseExistsAbs(baseName);
 #endif
 }
 
@@ -735,14 +735,12 @@ void LoadGFX()
     {
         LoaderUpdateDebugString(fmt::format_ne("Block {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("block-{0}", A));
+
         if(!p.empty())
-        {
             XRender::lazyLoadPicture(GFXBlockBMP[A], p);
-        }
         else
-        {
             break;
-        }
+
         if(A % 20 == 0)
             UpdateLoad();
     }
@@ -755,6 +753,7 @@ void LoadGFX()
     {
         LoaderUpdateDebugString(fmt::format_ne("Background {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("background2-{0}", A));
+
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXBackground2BMP[A], p);
@@ -767,7 +766,9 @@ void LoadGFX()
             GFXBackground2Height[A] = 0;
             break;
         }
-        if(A % 10 == 0) UpdateLoad();
+
+        if(A % 10 == 0)
+            UpdateLoad();
     }
     UpdateLoad();
 
@@ -778,6 +779,7 @@ void LoadGFX()
     {
         LoaderUpdateDebugString(fmt::format_ne("NPC {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("npc-{0}", A));
+
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXNPCBMP[A], p);
@@ -802,6 +804,7 @@ void LoadGFX()
     {
         LoaderUpdateDebugString(fmt::format_ne("Effect {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("effect-{0}", A));
+
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXEffectBMP[A], p);
@@ -826,6 +829,7 @@ void LoadGFX()
     {
         LoaderUpdateDebugString(fmt::format_ne("Mount B {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("yoshib-{0}", A));
+
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXYoshiBBMP[A], p);
@@ -843,6 +847,7 @@ void LoadGFX()
     {
         LoaderUpdateDebugString(fmt::format_ne("Mount T {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("yoshit-{0}", A));
+
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXYoshiTBMP[A], p);
@@ -863,6 +868,7 @@ void LoadGFX()
     {
         LoaderUpdateDebugString(fmt::format_ne("BGO {0}", A));
         s_find_image(p, CurDir, fmt::format_ne("background-{0}", A));
+
         if(!p.empty())
         {
             XRender::lazyLoadPicture(GFXBackgroundBMP[A], p);
@@ -875,6 +881,7 @@ void LoadGFX()
         {
             break;
         }
+
         if(A % 20 == 0)
             UpdateLoad();
     }

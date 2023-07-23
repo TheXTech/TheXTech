@@ -50,6 +50,21 @@ inline int SDL_RWseek(SDL_RWops* stream, long offset, int whence)
     return fseek(stream->f, offset, whence);
 }
 
+inline Sint64 SDL_RWsize(SDL_RWops* stream)
+{
+    if(!stream || !stream->f)
+        return -1;
+
+    long curpos = ftell(stream->f);
+
+    fseek(stream->f, 0, SEEK_END);
+    Sint64 filesize = static_cast<Sint64>(ftell(stream->f));
+
+    fseek(stream->f, curpos, SEEK_SET);
+
+    return filesize;
+}
+
 inline SDL_RWops* SDL_RWFromFile(const char* pathname, const char* mode)
 {
     FILE* f = fopen(pathname, mode);

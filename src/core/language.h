@@ -27,12 +27,24 @@
 namespace XLanguage
 {
 
+
+/*!
+ * \brief Finds present and non-empty language translations (called during engine load)
+ */
+void findLanguages();
+
+
 /*!
  * \brief Detect system language and set global variables
  */
-void init();
+void resolveLanguage(const std::string& requestedLanguage);
 
-void initManual();
+
+/*!
+ * \brief Replaces string with next available language (slow)
+ * Uses global state: CurrentLanguage, CurrentLangDialect
+ */
+void rotateLanguage(std::string& nextLanguage, int step = 1);
 
 
 void splitRegion(char delimiter);
