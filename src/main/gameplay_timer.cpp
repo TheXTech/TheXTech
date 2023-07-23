@@ -232,6 +232,7 @@ void GameplayTimer::save()
 
 void GameplayTimer::tick()
 {
+    // initialize timer
     if(!m_cyclesInt)
     {
         m_cyclesInt = true;
@@ -242,25 +243,23 @@ void GameplayTimer::tick()
         m_worldBlinkActive = false;
         m_blinkingFactor = 0.0f;
     }
-    else
+
+    if(LevelSelect || (!LevelSelect && LevelMacro == 0))
+        m_cyclesCurrent += 1;
+    else if(m_allowBlink && !m_levelBlinkActive)
+        m_levelBlinkActive = true;
+
+    if(!m_cyclesFin)
+        m_cyclesTotal += 1;
+
+    if(m_levelBlinkActive)
+        updateColorSpin(5.0f);
+
+    if(m_worldBlinkActive)
     {
-        if(LevelSelect || (!LevelSelect && LevelMacro == 0))
-            m_cyclesCurrent += 1;
-        else if(m_allowBlink && !m_levelBlinkActive)
-            m_levelBlinkActive = true;
-
-        if(!m_cyclesFin)
-            m_cyclesTotal += 1;
-
-        if(m_levelBlinkActive)
-            updateColorSpin(5.0f);
-
-        if(m_worldBlinkActive)
-        {
-            m_blinkingFactor += m_blinkingDir * 0.02;
-            if(m_blinkingFactor >= 0.3f || m_blinkingFactor <= -0.3f)
-                m_blinkingDir *= -1.0f;
-        }
+        m_blinkingFactor += m_blinkingDir * 0.02;
+        if(m_blinkingFactor >= 0.3f || m_blinkingFactor <= -0.3f)
+            m_blinkingDir *= -1.0f;
     }
 }
 
