@@ -1675,7 +1675,6 @@ bool mainMenuUpdate()
                     {
                         XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
                         ReloadTranslations();
-                        SaveConfig();
                     }
                     else if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
