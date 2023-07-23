@@ -670,24 +670,24 @@ static void restoreWorldBackupTextures()
 }
 
 
-static inline void s_find_image(std::string& dest, DirListCI& CurDir, std::string basename)
+static inline void s_find_image(std::string& dest, DirListCI& CurDir, std::string baseName)
 {
 #if defined(X_IMG_EXT) && !defined(X_NO_PNG_GIF)
-    int s = basename.size();
-    basename += X_IMG_EXT;
-    dest = CurDir.resolveFileCaseExistsAbs(basename);
+    int s = baseName.size();
+    baseName += X_IMG_EXT;
+    dest = CurDir.resolveFileCaseExistsAbs(baseName);
     if(dest.empty())
     {
-        basename.resize(s);
-        basename += ".png";
-        dest = CurDir.resolveFileCaseExistsAbs(basename);
+        baseName.resize(s);
+        baseName += ".png";
+        dest = CurDir.resolveFileCaseExistsAbs(baseName);
     }
 #elif defined(X_IMG_EXT)
-    basename += X_IMG_EXT;
-    dest = CurDir.resolveFileCaseExistsAbs(basename);
+    baseName += X_IMG_EXT;
+    dest = CurDir.resolveFileCaseExistsAbs(baseName);
 #else
-    basename += ".png";
-    dest = CurDir.resolveFileCaseExistsAbs(basename);
+    baseName += ".png";
+    dest = CurDir.resolveFileCaseExistsAbs(baseName);
 #endif
 }
 
