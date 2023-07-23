@@ -4782,13 +4782,19 @@ void SuperWarp(const int A)
 {
     auto &plr = Player[A];
 
-    if(plr.WarpCD <= 0 && plr.Mount != 2 && !plr.GroundPound && !plr.GroundPound2)
+    if(plr.WarpCD <= 0 && plr.Mount != 2 /* && !plr.GroundPound && !plr.GroundPound2 */)
     {
         for(int B = 1; B <= numWarps; B++)
         {
             auto &warp = Warp[B];
 
             if(warp.Hidden)
+                continue;
+
+            // In normal mode, ignore pounds only for pipe / door warps. In compat mode, ignore pounds for all warps.
+            bool ground_pound = plr.GroundPound || plr.GroundPound2;
+            bool skip_pounds = !g_compatibility.fix_pound_skip_warp || warp.Effect == 1 || warp.Effect == 2;
+            if(ground_pound && skip_pounds)
                 continue;
 
             if(checkWarp(warp, B, plr, A, false))

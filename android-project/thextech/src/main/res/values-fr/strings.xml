@@ -29,5 +29,4 @@
     <string name="settings_button">Paramètres</string>
     <string name="start_game_button">Démarrer le jeu</string>
     <string name="title_activity_game_settings">Paramètres du jeu</string>
-    <string name="app_name">The X-Tech Engine</string>
 </resources>

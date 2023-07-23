@@ -7,8 +7,7 @@
             "invis": "Невид.",
             "letterHeight": "В ",
             "letterWidth": "Ш ",
-            "pickContents1": "Выберите",
-            "pickContents2": "сод. блока",
+            "pickContents": "Выберите содержимое блока",
             "slick": "Лёд"
         },
         "browser": {
@@ -25,27 +24,23 @@
                 "changeSectionBoundsToCurrent": "изменить границы секции {0} к текущим?",
                 "shouldEvent": "Должно ли событие {0}"
             },
-            "controlsForEvent": "Управление для события",
+            "controlsForEvent": "Авто-управление персонажем",
             "deletion": {
                 "cancel": "Нет: не удалять событие",
                 "confirm": "Да: удалить событие",
                 "deletingEvent": "Удалить событие {0}"
             },
             "desc": {
-                "activate1": "НИП появился",
-                "activate2": "на экране",
-                "death1": "НИП умирает",
-                "destroy1": "Блок",
-                "destroy2": "разрушен",
-                "enter1": "игрок вошёл",
-                "enter2": "в проход",
-                "hit1": "Удар по блоку",
-                "layerClear1": "Слой был",
-                "layerClear2": "очищен от",
-                "layerClear3": "объектов",
+                "activate": "НИП появится на экране",
+                "death": "НИП умрёт",
+                "destroy": "блок будет разрушен",
+                "enter": "игрок войдёт в проход",
+                "hit": "по блоку ударят",
+                "layerClear": "слой будет очищен от объектов",
+                "phraseTriggersAfterTemplate": "Событие, которое сработает через {1} мс. после события \\\"{2}\\\"",
                 "phraseTriggersWhen": "Актив., когда:",
-                "talk1": "Игрок говорит",
-                "talk2": "с НИП"
+                "phraseTriggersWhenTemplate": "{0}: Сработает, когда {1}",
+                "talk": "игрок поговорит с НИП"
             },
             "header": "Событ.:",
             "headerTriggerEvent": "Триггер:",
@@ -79,7 +74,7 @@
             "promptEventText": "Текст события:",
             "props": {
                 "autostart": "Автозап.",
-                "controls": "Управления",
+                "controls": "Авто-уп.",
                 "endGame": "Зав.игр.",
                 "sound": "Звук"
             },
@@ -109,8 +104,7 @@
             "confirmSaveBeforeAction": "Сохранить, прежде чем {0}?",
             "convert": {
                 "_38aUnsupported": "Формат SMBX-38A не поддерживает преобразование.",
-                "desc1": "Расширение имени файла изменится,",
-                "desc2": "а старый файл не будет удалён",
+                "desc": "Расширение имени файла изменится, но старый файл удалён не будет.",
                 "featureBlockForceSmashable": "Старое поведение крут. блока.",
                 "featureCustomWorldMusic": "Внешние файлы мызки в мире.",
                 "featureEventAutoscroll": "Современная автопрокрутка.",
@@ -153,11 +147,7 @@
                 "preserveLayerContents": "Сохранить содержимое слоя?"
             },
             "desc": {
-                "att1": "Когда нИП",
-                "att2": "движется,",
-                "att3": "присоед.",
-                "att4": "слой следует",
-                "att5": "за ним"
+                "att": "Пока НИП движется, присоединён- ный слой следует за ним"
             },
             "header": "Слои:",
             "itemNewLayer": "<Нов. слой>",

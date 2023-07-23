@@ -120,8 +120,9 @@ static void compatInit(Compatibility_t &c)
     c.bitblit_background_colour[1] = 0;
     c.bitblit_background_colour[2] = 0;
     c.custom_powerup_collect_score = true;
-    // 1.3.7
     c.fix_player_crush_death = true;
+    c.fix_pound_skip_warp = true;
+    // 1.3.7
     c.free_level_res = true;
     c.free_world_res = true;
     c.NPC_activate_mode = NPC_activate_modes::smart;
@@ -147,7 +148,7 @@ static void compatInit(Compatibility_t &c)
         c.fix_powerup_lava_bug = false;
         c.fix_char3_escape_shell_surf = false;
         // 1.3.5
-        c.fix_keyhole_framerate = false;
+        // c.fix_keyhole_framerate = false; Keep the keyhole fix everywhere!
         c.fix_char5_vehicle_climb = false;
         c.fix_vehicle_char_switch = false;
         c.fix_vanilla_checkpoints = false;
@@ -171,8 +172,9 @@ static void compatInit(Compatibility_t &c)
         c.fix_npc_ceiling_speed = false;
         c.emulate_classic_block_order = true;
         c.custom_powerup_collect_score = false;
-        // 1.3.7
         c.fix_player_crush_death = false;
+        c.fix_pound_skip_warp = false;
+        // 1.3.7
         c.free_level_res = false;
         c.free_world_res = false;
         c.NPC_activate_mode = NPC_activate_modes::onscreen;
@@ -421,8 +423,9 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("fix-npc-ceiling-speed", c.fix_npc_ceiling_speed, c.fix_npc_ceiling_speed);
         compat.read("emulate-classic-block-order", c.emulate_classic_block_order, c.emulate_classic_block_order);
         // compat.read("custom-powerup-collect-score", c.custom_powerup_collect_score, c.custom_powerup_collect_score);
-        // 1.3.7 (but these will be changed in the Compat update)
         compat.read("fix-player-crush-death", c.fix_player_crush_death, c.fix_player_crush_death);
+        compat.read("fix-pound-skip-warp", c.fix_pound_skip_warp, c.fix_pound_skip_warp);
+        // 1.3.7 (but these will be changed in the Compat update)
         compat.read("free-level-res", c.free_level_res, c.free_level_res);
         compat.read("free-world-res", c.free_world_res, c.free_world_res);
         const IniProcessing::StrEnumMap activModes =

@@ -102,6 +102,7 @@ public:
     int16_t icon = 0;
     int8_t category = 0;
     bool is_misc = true;
+    bool behind_mode = false;
 
 
     void make_layout_pods();
@@ -173,6 +174,10 @@ extern ItemList_t bg2_list;
 
 // has fixed size of 10
 extern std::vector<std::string> list_level_exit_names;
+
+
+// tracks loading state
+extern uint8_t loaded;
 
 } // namespace EditorCustom
 

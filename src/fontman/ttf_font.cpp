@@ -314,6 +314,40 @@ PGE_Size TtfFont::textSize(const char *text, size_t text_size,
     return PGE_Size(static_cast<int32_t>(widthSummMax), static_cast<int32_t>((fontSize * 1.5) * count));
 }
 
+PGE_Size TtfFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t fontSize)
+{
+    PGE_Size ret(0, static_cast<int32_t>(fontSize * 1.5));
+
+    const char &cx = utf8char[0];
+
+    switch(cx)
+    {
+    case '\n':
+    case '\r':
+        break;
+
+    case '\t':
+    {
+        //Fake tabulation
+        size_t space = (4 * fontSize);
+        if(space == 0)
+            space = 1; // Don't divide by zero
+        ret.setWidth(space - ((charNum / space) % 4));
+        break;
+    }
+
+    default:
+    {
+        const TheGlyph &glyph = getGlyph(fontSize, get_utf8_char(&cx));
+        ret.setWidth(glyph.width > 0 ? uint32_t(glyph.advance >> 6) : (fontSize >> 2));
+        break;
+    }
+
+    }//Switch
+
+    return ret;
+}
+
 void TtfFont::printText(const char *text, size_t text_size,
                         int32_t x, int32_t y,
                         float Red, float Green, float Blue, float Alpha,
