@@ -2276,6 +2276,9 @@ void UpdateGraphics(bool skipRepaint)
                 XRender::offsetViewportIgnore(true);
                 SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
 
+#if 0
+                // deprecated profiling info
+
                 for(int i = 0; i < 2; i++)
                 {
                     int val = (i == 0 ? g_microStats.view_total : g_microStats.view_slow_frame_time);
@@ -2302,6 +2305,7 @@ void UpdateGraphics(bool skipRepaint)
                         : fmt::sprintf_ne("%d%% (max)", (val + 5) / 10));
                     SuperPrint(display, 3, x, y, r, g, 0.f, a);
                 }
+#endif
                 XRender::offsetViewportIgnore(false);
             }
 
