@@ -21,10 +21,10 @@ def main(in_args):
     patch_file = in_args[1]
     out_file = in_args[2]
 
-    with open(in_file) as first_file:
+    with open(in_file, encoding='utf-8') as first_file:
         json_out = json.load(first_file)
 
-    with open(patch_file) as second_file:
+    with open(patch_file, encoding='utf-8') as second_file:
         json_in = json.load(second_file)
 
     print("-- Patching translation file: %s\n"
