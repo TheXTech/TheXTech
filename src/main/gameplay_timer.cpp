@@ -244,7 +244,10 @@ void GameplayTimer::tick()
         m_blinkingFactor = 0.0f;
     }
 
-    if(LevelSelect || (!LevelSelect && LevelMacro == 0))
+    bool in_leveltest_restart_screen = (GamePaused == PauseCode::PauseScreen && LevelBeatCode < 0);
+    bool in_normal_level_play = (!LevelSelect && LevelMacro == 0);
+
+    if(!in_leveltest_restart_screen && (LevelSelect || in_normal_level_play))
         m_cyclesCurrent += 1;
     else if(m_allowBlink && !m_levelBlinkActive)
         m_levelBlinkActive = true;
