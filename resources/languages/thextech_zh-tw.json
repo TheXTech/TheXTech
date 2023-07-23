@@ -580,7 +580,8 @@
         "wordResume": "恢復",
         "wordShow": "顯示",
         "wordWaiting": "等待",
-        "wordYes": "是"
+        "wordYes": "是",
+        "wordLanguage": "語言"
     },
     "outro": {
         "cppPortDevelopers": "C++移植開發人員：",
