@@ -190,8 +190,6 @@ void initMainMenu()
 
     g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"\n\n\nReplace it with the updated flag for version 1.3.6 and newer?";
     g_mainMenu.promptDeprecatedSettingUnwritable = "An unwritable file ({0}) uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nSection: [{1}]\nOld flag: \"{2}\"\nNew flag: \"{3}\"\n\n\nPlease update it manually and copy to your device.";
-
-    MenuMode = MENU_INTRO;
 }
 
 

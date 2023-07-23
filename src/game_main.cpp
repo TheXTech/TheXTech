@@ -240,6 +240,7 @@ int GameMain(const CmdLineSetup_t &setup)
     initEditorStrings();
     initGameStrings();
     StartMenu = true;
+    MenuMode = MENU_INTRO;
 
     if(!CurrentLanguage.empty())
     {
