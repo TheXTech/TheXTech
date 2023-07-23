@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 """
 This script adds a license file to a DMG. Requires Xcode and a plain ascii text
 license file.
@@ -38,8 +38,8 @@ class Path(str):
         os.unlink(self)
 
 
-def mktemp(dir=None, suffix=''):
-    (fd, filename) = tempfile.mkstemp(dir=dir, suffix=suffix)
+def mktemp(dirname=None, suffix=''):
+    (fd, filename) = tempfile.mkstemp(dir=dirname, suffix=suffix)
     os.close(fd)
     return Path(filename)
 
@@ -98,7 +98,7 @@ def main(in_options, in_args):
                 os.system('hdiutil convert %s.temp.dmg -format ' % dmg_file +
                           'UDZO -imagekey zlib-devel=9 -o %s' % dmg_file)
             os.remove('%s.temp.dmg' % dmg_file)
-    print "Successfully added license to '%s'" % dmg_file
+    print("Successfully added license to '%s'" % dmg_file)
 
 
 if __name__ == '__main__':
@@ -135,7 +135,7 @@ if __name__ == '__main__':
     )
     options, args = parser.parse_args()
     cond = len(args) != 2 or not os.path.exists(options.rez) \
-           or not os.path.exists(options.flat_carbon)
+        or not os.path.exists(options.flat_carbon)
     if cond:
         parser.print_usage()
         sys.exit(1)
