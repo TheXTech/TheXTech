@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <Utils/strings.h>
 #include <Utils/files.h>
+#include <util.h>
 #include <DirManager/dirman.h>
 #include <AppPath/app_path.h>
 #include <fmt_format_ne.h>
@@ -97,10 +98,7 @@ void XLanguage::findLanguages()
     constexpr size_t prefix_length = 9; // std::string("thextech_").size();
 
     // clear and free s_languages
-    {
-        std::vector<std::string> blank;
-        std::swap(s_languages, blank);
-    }
+    util::clear_mem(s_languages);
 
     std::vector<std::string> list;
     DirMan langs(AppPathManager::languagesDir());
