@@ -422,7 +422,7 @@ PGE_Size RasterFont::textSize(const char* text, size_t text_size, uint32_t max_l
     return PGE_Size(static_cast<int32_t>(widthSummMax), static_cast<int32_t>(m_newlineOffset * count));
 }
 
-PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t fontSize)
+PGE_Size RasterFont::glyphSize(const char* utf8char, uint32_t charNum, uint32_t /*fontSize*/)
 {
     PGE_Size ret(0, m_newlineOffset);
     const char &cx = utf8char[0];
