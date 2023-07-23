@@ -34,11 +34,19 @@ bool g_active;
 
 static int s_toast_duration[maxLocalPlayers] = {0};
 
+void Deactivate()
+{
+    g_active = false;
+
+    for(int i = 0; i < maxLocalPlayers; ++i)
+        s_toast_duration[i] = 0;
+}
+
 void Render()
 {
     if(GameMenu || LevelEditor || GameOutro)
     {
-        g_active = false;
+        Deactivate();
         return;
     }
 
@@ -82,7 +90,7 @@ void Logic()
 {
     if(GameMenu || LevelEditor || GameOutro)
     {
-        g_active = false;
+        Deactivate();
         return;
     }
 
