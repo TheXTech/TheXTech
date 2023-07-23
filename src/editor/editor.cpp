@@ -2906,7 +2906,10 @@ void zTestLevel(bool magicHand, bool interProcess)
     if(g_speedRunnerMode != SPEEDRUN_MODE_OFF && !Controls::Update())
     {
         ClearLevel();
-        // MessageText = g_gameStrings.connectWaitingForInputDevice;
+        // force players offscreen
+        for(int i = 1; i <= maxLocalPlayers; i++)
+            Player[i].Location.X = -20000.0;
+
         TestLevel = true;
         LevelBeatCode = -3;
         QuickReconnectScreen::g_active = true;
