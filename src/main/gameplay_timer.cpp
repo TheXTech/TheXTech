@@ -285,5 +285,7 @@ void GameplayTimer::render()
     float wc = m_worldBlinkActive ? 0.5f + m_blinkingFactor : 1.f;
 
     SuperPrintScreenCenter(formatTime(m_cyclesCurrent), 3, y - 34, lc[0], lc[1], lc[2], a);
-    SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, wc, 1.0f, wc, a);
+
+    if(!TestLevel)
+        SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, wc, 1.0f, wc, a);
 }
