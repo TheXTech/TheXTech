@@ -27,6 +27,8 @@
 #include "compat.h"
 #include "../controls.h"
 
+#include "main/screen_quickreconnect.h"
+
 #include "gameplay_timer.h"
 
 
@@ -280,6 +282,10 @@ void speedRun_renderControls(int player, int screenZ)
         return; // Don't draw things at Menu and Outro
 
     if(player < 1 || player > 2)
+        return;
+
+    const bool player_missing = (player - 1 >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player - 1]);
+    if(QuickReconnectScreen::g_active && player_missing)
         return;
 
     // Controller
