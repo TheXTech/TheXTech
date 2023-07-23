@@ -21,8 +21,9 @@
 #include <algorithm>
 #include <Utils/strings.h>
 #include <Utils/files.h>
+#include <util.h>
+#include <DirManager/dirman.h>
 #include <AppPath/app_path.h>
-#include "language_private.h"
 #include <fmt_format_ne.h>
 
 #ifndef THEXTECH_DISABLE_SDL_LOCALE
@@ -34,9 +35,15 @@
 #   endif
 #endif
 
-#include "globals.h"
-#include "../language.h"
+#include "sdl_proxy/sdl_rwops.h"
 
+#include "config.h"
+#include "globals.h"
+#include "core/language.h"
+#include "core/language/language_private.h"
+
+
+static std::vector<std::string> s_languages;
 
 static std::string langEngineFile;
 static std::string langAssetsFile;
@@ -46,6 +53,16 @@ static bool detectSetup()
 {
     if(CurrentLanguage.empty())
         return false; // Language code is required!
+
+    std::transform(CurrentLanguage.begin(),
+                   CurrentLanguage.end(),
+                   CurrentLanguage.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
+
+    std::transform(CurrentLangDialect.begin(),
+                   CurrentLangDialect.end(),
+                   CurrentLangDialect.begin(),
+                   [](unsigned char c) { return std::tolower(c); });
 
     langEngineFile.clear();
     langAssetsFile.clear();
@@ -76,11 +93,103 @@ static bool detectSetup()
 }
 
 
-void XLanguage::init()
+void XLanguage::findLanguages()
 {
-    pLogDebug("Selecting best localization...");
+    constexpr size_t prefix_length = 9; // std::string("thextech_").size();
+
+    // clear and free s_languages
+    util::clear_mem(s_languages);
+
+    std::vector<std::string> list;
+    DirMan langs(AppPathManager::languagesDir());
+
+    if(!langs.exists())
+    {
+        pLogDebug("Can't open the languages directory: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    if(!langs.getListOfFiles(list, {".json"}))
+    {
+        pLogDebug("Can't show the content of the languages directory: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    if(list.empty())
+    {
+        pLogDebug("Languages directory does not have JSON files: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    // tag non-lowercase filenames and language codes including underscores for exclusion during sorting
+    for(std::string& fn : list)
+    {
+        for(auto& c : fn)
+        {
+            if(c != std::tolower(c))
+            {
+                fn[0] = '_';
+                break;
+            }
+        }
+
+        if(fn.end() - fn.begin() > (std::ptrdiff_t)prefix_length && std::find(fn.begin() + prefix_length, fn.end(), '_') != fn.end())
+            fn[0] = '_';
+    }
+
+    // sort filenames
+    std::sort(list.begin(), list.end());
+
+    const auto langs_begin = std::lower_bound(list.cbegin(), list.cend(), "thextech_");
+    const auto langs_end   = std::upper_bound(list.cbegin(), list.cend(), "thextech`");
+
+    if(langs_begin == langs_end)
+    {
+        pLogDebug("Languages directory does not have thextech_*.json files: %s", langs.absolutePath().c_str());
+        return;
+    }
+
+    // fill s_languages
+    for(auto it = langs_begin; it != langs_end; ++it)
+    {
+        // check filesize > 8 bytes
+        auto f = SDL_RWFromFile((langs.absolutePath() + "/" + *it).c_str(), "rb");
+
+        // file doesn't exist / has problem opening
+        if(!f)
+            continue;
+
+        auto fsize = SDL_RWsize(f);
+        SDL_RWclose(f);
+
+        // file too small
+        if(fsize < 8)
+            continue;
+
+        s_languages.push_back(*it);
+    }
+}
+
+
+void XLanguage::resolveLanguage(const std::string& requestedLanguage)
+{
+    CurrentLanguage = "";
+    CurrentLangDialect = "";
+
+    if(!requestedLanguage.empty() && requestedLanguage != "auto")
+    {
+        CurrentLanguage = requestedLanguage;
+
+        splitRegion('-');
+        splitRegion('_');
+
+        if(detectSetup())
+            return; // Found!
+    }
 
 #ifndef THEXTECH_DISABLE_SDL_LOCALE
+    pLogDebug("Checking SDL localization...");
+
     SDL_Locale *loc = SDL_GetPreferredLocales();
     CurrentLanguage.clear();
     CurrentLangDialect.clear();
@@ -108,24 +217,66 @@ void XLanguage::init()
 #endif
 
     // Detect using system specific ways
+    pLogDebug("Checking system localization...");
+
     XLanguagePriv::detectOSLanguage();
-    detectSetup();
-}
+    if(detectSetup())
+        return; // Found!
 
-void XLanguage::initManual()
-{
-    if(!CurrentLanguage.empty() && detectSetup())
-        return;
+    pLogDebug("Checking en-gb fallback...");
 
-    // Fall back to English if manually-selected language is invalid
+    // Fall back to English if selected language is invalid
     CurrentLanguage = "en";
     CurrentLangDialect = "gb";
+
+    if(detectSetup())
+        return; // Found!
 
     if(!detectSetup())
     {
         CurrentLanguage.clear();
         CurrentLangDialect.clear();
     }
+}
+
+void XLanguage::rotateLanguage(std::string& nextLanguage, int step)
+{
+    constexpr size_t prefix_length = 9; // std::string("thextech_").size();
+    constexpr size_t suffix_length = 5; // std::string(".json").size();
+    constexpr size_t ignore_length = prefix_length + suffix_length;
+
+    if(s_languages.empty())
+    {
+        pLogDebug("Cannot rotate language because none are present");
+        return;
+    }
+
+    // find current filename
+    std::string seek_fn = fmt::format_ne("thextech_{0}.json", g_config.language);
+
+    auto curr_lang_fn = std::find(s_languages.cbegin(), s_languages.cend(), seek_fn);
+
+    if(g_config.language == "auto")
+        curr_lang_fn = s_languages.cend();
+
+    // pick next filename
+    std::ptrdiff_t cur_index = curr_lang_fn - s_languages.cbegin();
+    std::ptrdiff_t new_index = cur_index + step;
+    std::ptrdiff_t opts_len  = s_languages.size() + 1;
+
+    // limit to bounds + 1 (in order to include "auto")
+    std::ptrdiff_t wrapped_index = (new_index < 0) ? (new_index % opts_len + opts_len) : (new_index % opts_len);
+
+    auto next_lang_fn = s_languages.cbegin() + wrapped_index;
+
+    if(next_lang_fn == s_languages.cend())
+    {
+        nextLanguage = "auto";
+        return;
+    }
+
+    // extract next language name
+    nextLanguage = next_lang_fn->substr(prefix_length, next_lang_fn->size() - ignore_length);
 }
 
 void XLanguage::splitRegion(char delimiter)
