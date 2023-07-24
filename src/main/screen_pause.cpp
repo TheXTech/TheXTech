@@ -327,7 +327,7 @@ void Render()
         {
             float c = ((int)i == MenuCursor) ? 1.0f : 0.5f;
 
-            SuperPrintScreenCenter(s_items[i].name, 4, menu_top_Y + (i * 36), c, c, c);
+            SuperPrintScreenCenter(s_items[i].name, 5, menu_top_Y + (i * 36), c, c, c);
         }
     }
     else
