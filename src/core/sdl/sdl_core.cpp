@@ -53,13 +53,15 @@ bool CoreSDL::init(const CmdLineSetup_t &setup)
 #if !defined(SDL_AUDIO_DISABLED)
     sdlInitFlags |= SDL_INIT_AUDIO;
 #endif
+#if !defined(__WII__) && !defined(__3DS__)
     sdlInitFlags |= SDL_INIT_VIDEO;
     sdlInitFlags |= SDL_INIT_EVENTS;
-#if !defined(SDL_JOYSTICK_DISABLED)
+#endif
+#if !defined(__WII__) && !defined(__3DS__) && !defined(SDL_JOYSTICK_DISABLED)
     sdlInitFlags |= SDL_INIT_JOYSTICK;
     sdlInitFlags |= SDL_INIT_GAMECONTROLLER;
 #endif
-#if !defined(SDL_HAPTIC_DISABLED)
+#if !defined(__WII__) && !defined(__3DS__) && !defined(SDL_HAPTIC_DISABLED)
     sdlInitFlags |= SDL_INIT_HAPTIC;
 #endif
 
