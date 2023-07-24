@@ -36,10 +36,11 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 }
 
 #ifndef NO_FILE_LOGGING
-void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg)
+void LoggerPrivate_pLogFile(int level, const char *label, const char *in_time, const char *format, va_list arg)
 {
     (void)level;
     (void)label;
+    (void)in_time;
     (void)format;
     (void)arg;
 }

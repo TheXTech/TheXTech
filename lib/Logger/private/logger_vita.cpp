@@ -85,7 +85,7 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 }
 
 #ifndef NO_FILE_LOGGING
-void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg)
+void LoggerPrivate_pLogFile(int level, const char *label, const char *in_time, const char *format, va_list arg)
 {
     if(!s_logout)
         return;
@@ -94,7 +94,7 @@ void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va
     (void)level;
 
     va_copy(arg_in, arg);
-    std::fprintf(s_logout, "%s: ", label);
+    std::fprintf(s_logout, "%s [%s]: ", in_time, label);
     std::vfprintf(s_logout, format, arg_in);
     std::fprintf(s_logout, OS_NEWLINE);
     std::fflush(s_logout);
