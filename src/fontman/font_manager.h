@@ -125,12 +125,13 @@ int      getFontID(std::string fontName);
  * @param Blue Blue color level from 0.0 to 1.0
  * @param Alpha Alpha-channel level from 0.0 to 1.0
  * @param ttf_FontSize Point size for the TTF fonts
+ * @param outline Render using added outline
  */
 void printText(const char* text, size_t text_size,
                int x, int y,
                int font = DefaultRaster,
                float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
-               uint32_t ttf_FontSize = 14);
+               uint32_t ttf_FontSize = 14, bool outline = false);
 
 /**
  * @brief Clean-Up text fragment to fit into the character width
