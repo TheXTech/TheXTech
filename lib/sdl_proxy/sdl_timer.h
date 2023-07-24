@@ -24,7 +24,16 @@
 
 #ifndef SDLRPOXY_NULL
 
+#include <SDL2/SDL_version.h>
 #include <SDL2/SDL_timer.h>
+
+#if !SDL_VERSION_ATLEAST(2, 0, 18)
+// This call has been introduced in SDL 2.0.18. For the older SDL2, have a fallback!
+inline uint64_t SDL_GetTicks64()
+{
+    return (uint64_t)SDL_GetTicks();
+}
+#endif
 
 #else
 
@@ -36,6 +45,7 @@
 
 #ifndef SDL_timer_h_
 extern uint32_t SDL_GetTicks();
+extern uint64_t SDL_GetTicks64();
 #endif
 
 inline void SDL_Delay(int x)

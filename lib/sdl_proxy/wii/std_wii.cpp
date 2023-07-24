@@ -43,9 +43,7 @@ uint64_t startTime = -1;
 uint64_t SDL_GetMicroTicks()
 {
     if(startTime == (uint64_t)-1)
-    {
         startTime = gettime();
-    }
 
     return diff_usec(startTime, gettime());
 }
