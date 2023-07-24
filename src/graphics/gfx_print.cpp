@@ -41,6 +41,9 @@ namespace std
 
 int SuperTextPixLen(int SuperN, const char* SuperChars, int Font)
 {
+    if(Font == 5)
+        Font = 4;
+
     int len = 0;
     int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
 
@@ -98,58 +101,104 @@ int SuperTextPixLen(int SuperN, const char* SuperChars, int Font)
 
 void SuperPrintRightAlign(int SuperN, const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
+    int RealFont = Font;
+    bool outline = false;
+
+    if(Font == 5)
+    {
+        Font = 4;
+        outline = true;
+    }
+
     int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
 
     if(dFont >= 0)
     {
         X -= FontManager::textSize(SuperChars, SuperN, dFont, 0, false, FontManager::fontSizeFromSmbxFont(Font)).w();
-        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font));
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
     }
 
     X -= SuperTextPixLen(SuperN, SuperChars, Font);
-    SuperPrint(SuperN, SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrint(SuperN, SuperChars, RealFont, X, Y, r, g, b, a);
 }
 
 void SuperPrintCenter(int SuperN, const char* SuperChars, int Font, float X, float Y, float r, float g, float b, float a)
 {
+    int RealFont = Font;
+    bool outline = false;
+
+    if(Font == 5)
+    {
+        Font = 4;
+        outline = true;
+    }
+
     int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
 
     if(dFont >= 0)
     {
         X -= FontManager::textSize(SuperChars, SuperN, dFont, 0, false, FontManager::fontSizeFromSmbxFont(Font)).w() / 2;
-        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font));
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
     }
 
     X -= SuperTextPixLen(SuperN, SuperChars, Font) / 2;
-    SuperPrint(SuperN, SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrint(SuperN, SuperChars, RealFont, X, Y, r, g, b, a);
 }
 
 void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float Y, float r, float g, float b, float a)
 {
+    int RealFont = Font;
+    bool outline = false;
+
+    if(Font == 5)
+    {
+        Font = 4;
+        outline = true;
+    }
+
+    if(Font == 5)
+        Font = 4;
+
     int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
 
     if(dFont >= 0)
     {
         float X = (ScreenW / 2) - (FontManager::textSize(SuperChars, SuperN, dFont, 0, false, FontManager::fontSizeFromSmbxFont(Font)).w() / 2);
-        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font));
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
     }
 
     float X = (ScreenW / 2) - (SuperTextPixLen(SuperN, SuperChars, Font) / 2);
-    SuperPrint(SuperN, SuperChars, Font, X, Y, r, g, b, a);
+    SuperPrint(SuperN, SuperChars, RealFont, X, Y, r, g, b, a);
 }
 
 void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
                 float r, float g, float b, float a)
 {
+    bool outline = false;
+
+    if(Font == 5)
+    {
+        Font = 4;
+        outline = true;
+    }
+
     int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
 
     if(dFont >= 0)
     {
-        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font));
+        FontManager::printText(SuperChars, SuperN, X, Y, dFont, r, g, b, a, FontManager::fontSizeFromSmbxFont(Font), outline);
         return;
+    }
+
+    if(outline)
+    {
+        SuperPrint(SuperN, SuperChars, Font, X - 2, Y, 0, 0, 0, a);
+        SuperPrint(SuperN, SuperChars, Font, X + 2, Y, 0, 0, 0, a);
+        SuperPrint(SuperN, SuperChars, Font, X, Y - 2, 0, 0, 0, a);
+        SuperPrint(SuperN, SuperChars, Font, X, Y + 2, 0, 0, 0, a);
     }
 
 //    int A = 0;
