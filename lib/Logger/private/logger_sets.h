@@ -41,6 +41,8 @@ public:
     //! Verbose logs to stdOut if possible
     static bool       m_enabledVerboseLogs;
 
+    static uint64_t   m_appStartTicks;
+
     static void OpenLogFile();
     static void CloseLog();
 };
@@ -48,7 +50,7 @@ public:
 extern void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg);
 
 #ifndef NO_FILE_LOGGING
-extern void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg);
+extern void LoggerPrivate_pLogFile(int level, const char *label, const char *in_time, const char *format, va_list arg);
 #endif
 
 #endif // LOGGER_SETS_H

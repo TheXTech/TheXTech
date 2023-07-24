@@ -17,31 +17,16 @@
  * or see <http://www.gnu.org/licenses/>.
  */
 
-#define LOGGER_INTERNAL
-#include "logger_sets.h"
+#ifndef SDL_CORE_H
+#define SDL_CORE_H
 
+#include "cmd_line_setup.h"
 
-void LogWriter::OpenLogFile()
-{}
-
-void LogWriter::CloseLog()
-{}
-
-void LoggerPrivate_pLogConsole(int level, const char *label, const char *format, va_list arg)
+class CoreSDL
 {
-    (void)level;
-    (void)label;
-    (void)format;
-    (void)arg;
-}
+public:
+    static bool init(const CmdLineSetup_t &setup);
+    static void quit();
+};
 
-#ifndef NO_FILE_LOGGING
-void LoggerPrivate_pLogFile(int level, const char *label, const char *in_time, const char *format, va_list arg)
-{
-    (void)level;
-    (void)label;
-    (void)in_time;
-    (void)format;
-    (void)arg;
-}
-#endif
+#endif // SDL_CORE_H
