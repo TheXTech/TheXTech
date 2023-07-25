@@ -115,7 +115,12 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
 #endif
 
     if(!res)
+    {
+#ifndef THEXTECH_NO_SDL_CORE
+    CoreSDL::quit();
+#endif
         return true;
+    }
 
 
     // Initializing message box
