@@ -33,6 +33,7 @@
 #include "main/translate.h"
 #include "core/language.h"
 #include "compat.h"
+#include "config.h"
 #include "controls.h"
 #include <AppPath/app_path.h>
 
@@ -444,8 +445,6 @@ int main(int argc, char**argv)
         }
 #endif
 
-        XLanguage::init();
-
         OpenConfig_preSetup();
 
 
@@ -609,18 +608,9 @@ int main(int argc, char**argv)
             setup.neverPause = true;
         }
 
-        if(lang.isSet()) // Note: this part of code must be BEFORE the XLanguage::init() call
-        {
-            CurrentLanguage = lang.getValue();
-            CurrentLangDialect.clear();
-            XLanguage::splitRegion('-');
-            XLanguage::splitRegion('_');
-            XLanguage::initManual();
-#ifdef DEBUG_BUILD
-            std::cerr << "Debug: Manually selected language: " << CurrentLanguage << (CurrentLangDialect.empty() ? "" : "-" + CurrentLangDialect) << std::endl;
-            std::cerr.flush();
-#endif
-        }
+        // override language loaded in OpenConfig_PreSetup()
+        if(lang.isSet())
+            g_config.language = lang;
     }
     catch(TCLAP::ArgException &e)   // catch any exceptions
     {
@@ -663,6 +653,8 @@ int main(int argc, char**argv)
         g_frmMain.freeSystem();
         return 1;
     }
+
+    XLanguage::resolveLanguage(g_config.language);
 
 #ifdef __APPLE__
     macosReceiveOpenFile();

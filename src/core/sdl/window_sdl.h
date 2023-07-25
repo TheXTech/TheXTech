@@ -41,7 +41,7 @@ public:
     WindowSDL();
     virtual ~WindowSDL();
 
-    bool create(uint32_t windowInitFlags);
+    bool initSDL(uint32_t windowInitFlags);
 
     void close() override;
 

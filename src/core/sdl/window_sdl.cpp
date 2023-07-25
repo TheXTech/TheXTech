@@ -104,7 +104,7 @@ WindowSDL::WindowSDL() :
 WindowSDL::~WindowSDL()
 {}
 
-bool WindowSDL::create(uint32_t windowInitFlags)
+bool WindowSDL::initSDL(uint32_t windowInitFlags)
 {
     SDL_ClearError();
 

@@ -44,6 +44,7 @@
 #include "main/game_strings.h"
 
 #include "controls.h"
+#include "config.h"
 #include "control/controls_strings.h"
 
 #include "editor/editor_strings.h"
@@ -383,6 +384,7 @@ XTechTranslate::XTechTranslate()
         {"menu.wordBack",       &g_mainMenu.wordBack},
         {"menu.wordResume",     &g_mainMenu.wordResume},
         {"menu.wordWaiting",    &g_mainMenu.wordWaiting},
+        {"menu.wordLanguage",    &g_mainMenu.wordLanguage},
 
         {"menu.abbrevMilliseconds", &g_mainMenu.abbrevMilliseconds},
 
@@ -794,6 +796,7 @@ void XTechTranslate::reset()
 #endif
 
     Controls::InitStrings();
+    g_controlsStrings = ControlsStrings_t();
 
     s_CurrentPluralRules = PluralRules::OneIsSingular;
 }
@@ -997,3 +1000,18 @@ bool XTechTranslate::translateFile(const std::string& file, TrList& list, const 
 
     return true;
 }
+
+void ReloadTranslations()
+{
+    XLanguage::resolveLanguage(g_config.language);
+
+    XTechTranslate translator;
+    translator.reset();
+    if(translator.translate())
+    {
+        pLogDebug("Reloaded translation for language %s-%s",
+                  CurrentLanguage.c_str(),
+                  CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
+    }
+}
+

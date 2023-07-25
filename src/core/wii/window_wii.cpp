@@ -41,13 +41,6 @@ namespace XWindow
 
 bool init()
 {
-    // Mixer is the only component using SDL on Wii
-    if(SDL_Init(SDL_INIT_AUDIO|SDL_INIT_TIMER) < 0)
-    {
-        pLogWarning("Couldn't initialize SDL audio: %s\n", SDL_GetError());
-        return false;
-    }
-
     return true;
 }
 

@@ -424,7 +424,7 @@
             },
             "hotkeys": {
                 "debugInfo": "Отл.инф.",
-                "enterCheats": "Ввечти чит",
+                "enterCheats": "Ввести чит",
                 "fullscreen": "Полн.экран",
                 "legacyPause": "Ст.пауза",
                 "recordGif": "Зап.GIF",
@@ -581,7 +581,8 @@
         "wordResume": "Возобновить",
         "wordShow": "Показать",
         "wordWaiting": "Ждём",
-        "wordYes": "Да"
+        "wordYes": "Да",
+        "wordLanguage": "Язык"
     },
     "outro": {
         "cppPortDevelopers": "Разработчики C++-порта:",

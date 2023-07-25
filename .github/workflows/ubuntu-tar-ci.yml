@@ -222,6 +222,16 @@ jobs:
         cd ..
         rm aod.7z
 
+    - name: Apply update to translations
+      shell: bash
+      run: |
+        ASSETS_ROOT1="$PWD/smbx13"
+        ASSETS_ROOT2="$PWD/aod"
+        cd .github/ci-helper
+        bash translate_update.sh "${ASSETS_ROOT1}"
+        bash translate_update.sh "${ASSETS_ROOT2}"
+        cd ../..
+
     - name: Configure
       shell: bash
       run: |

@@ -32,6 +32,10 @@
 #include "core/msgbox.h"
 #include "core/events.h"
 
+#ifndef THEXTECH_NO_SDL_CORE
+#   include "core/sdl/sdl_core.h"
+#endif
+
 #ifdef CORE_EVERYTHING_SDL
 #   include "core/sdl/init_sdl.h"
 
@@ -66,6 +70,12 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
     //Write into log the application start event
     pLogDebug("<Application started>");
+
+#ifndef THEXTECH_NO_SDL_CORE
+    res = CoreSDL::init(setup);
+    if(!res)
+        return false;
+#endif
 
 #if defined(__WII__) || defined(__3DS__) || !defined(RENDER_CUSTOM)
     //Initialize FreeImage
@@ -122,18 +132,16 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     D_pLogDebugNA("FrmMain: Loading XWindow...");
     res = XWindow::init();
 #elif defined(USE_CORE_WINDOW_SDL)
-    res = TXT_InitSDL(setup);
-    if(!res)
-        return true;
-
-    res = window->create(g_render->SDL_InitFlags());
+    res = window->initSDL(g_render->SDL_InitFlags());
 #else
 #   error "FIXME: Implement supported window initialization here"
 #endif
 
     if(!res)
     {
-        freeSystem();
+#ifndef THEXTECH_NO_SDL_CORE
+    CoreSDL::quit();
+#endif
         return true;
     }
 
@@ -190,7 +198,7 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
         g_render = m_render.get();
 
         // make new window
-        res = window->create(g_render->SDL_InitFlags());
+        res = window->initSDL(g_render->SDL_InitFlags());
 
         if(res)
         {
@@ -262,16 +270,16 @@ void FrmMain::freeSystem()
     g_window = nullptr;
 #endif
 
-#ifdef CORE_EVERYTHING_SDL
-    TXT_QuitSDL();
-#endif
-
 #if defined(__WII__) || defined(__3DS__) || !defined(RENDER_CUSTOM)
     GraphicsHelps::closeFreeImage();
 #endif
 
     pLogDebug("<Application closed>");
     CloseLog();
+
+#ifndef THEXTECH_NO_SDL_CORE
+    CoreSDL::quit();
+#endif
 }
 
 bool FrmMain::restartRenderer()
@@ -318,7 +326,7 @@ bool FrmMain::restartRenderer()
 
     g_render = m_render.get();
 
-    res = reinterpret_cast<WindowUsed*>(g_window)->create(g_render->SDL_InitFlags());
+    res = reinterpret_cast<WindowUsed*>(g_window)->initSDL(g_render->SDL_InitFlags());
 
     if(res)
     {
@@ -344,7 +352,7 @@ bool FrmMain::restartRenderer()
         m_render.reset(render);
         g_render = m_render.get();
 
-        res = reinterpret_cast<WindowUsed*>(g_window)->create(g_render->SDL_InitFlags());
+        res = reinterpret_cast<WindowUsed*>(g_window)->initSDL(g_render->SDL_InitFlags());
 
         if(res)
         {

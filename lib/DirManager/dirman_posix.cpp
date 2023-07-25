@@ -45,7 +45,11 @@ void DirMan::DirMan_private::setPath(const std::string &dirPath)
     memset(rp, 0, PATH_MAX);
     char* realPath = realpath(dirPath.c_str(), rp);
     (void)realPath;
-    m_dirPath = rp;
+
+    if(strlen(rp) > 0)
+        m_dirPath = rp;
+    else // If failed
+        m_dirPath = dirPath;
 #else
     m_dirPath = dirPath;
 

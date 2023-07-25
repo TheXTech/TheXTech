@@ -45,10 +45,30 @@ void CSV2DoubleArr(const std::string &source, std::vector<double> &dest);
 void base64_encode(std::string &ret, const unsigned char *bytes_to_encode, size_t in_len);
 void base64_decode(std::string &ret, std::string const &encoded_string);
 
+template<typename _Tp, typename _Alloc = std::allocator<_Tp> >
+void clear_mem(std::vector<_Tp, _Alloc> &v)
+{
+    std::vector<_Tp, _Alloc> blank;
+    std::swap(v, blank);
 }
+
+inline void clear_mem(std::string &v)
+{
+    std::string blank;
+    std::swap(v, blank);
+}
+
+inline void clear_mem(std::wstring &v)
+{
+    std::wstring blank;
+    std::swap(v, blank);
+}
+
+} // util
 
 namespace varadic_util
 {
+
 template<int ...>
 struct seq { };
 
@@ -60,7 +80,8 @@ struct gens<0, S...>
 {
     typedef seq<S...> type;
 };
-}
+
+} // varadic_util
 
 
 
@@ -92,6 +113,7 @@ namespace charsets_utils
 size_t utf8len(const char *s);
 int UTF8Str_To_WStr(std::wstring &dest, const std::string  &source);
 int WStr_To_UTF8Str(std::string  &dest, const std::wstring &source);
-}
+
+} // charsets_utils
 
 #endif // UTIL_H
