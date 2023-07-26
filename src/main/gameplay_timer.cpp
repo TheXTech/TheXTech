@@ -249,7 +249,7 @@ void GameplayTimer::tick()
 
     if(!in_leveltest_restart_screen && (LevelSelect || in_normal_level_play))
         m_cyclesCurrent += 1;
-    else if(m_allowBlink && !m_levelBlinkActive)
+    else if(!in_leveltest_restart_screen && m_allowBlink && !m_levelBlinkActive)
         m_levelBlinkActive = true;
 
     if(!m_cyclesFin)
