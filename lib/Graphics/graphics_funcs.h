@@ -157,6 +157,14 @@ public:
     static FIBITMAP *fastConvertTo32Bit(FIBITMAP *image);
 
     /*!
+     * \brief Quickly convert the image from 16-color or 256-color to 32-bit RGBA and simultaneously downscale
+     * \param image           Image to convert
+     * \param do_scale_down   Whether to actually scale down image
+     * \return FreeImage descriptor to converted image
+     */
+    static FIBITMAP *fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_down = true);
+
+    /*!
      * \brief Set the icon for the SDL Window
      * \param window Target window instance
      * \param img Icon image to set
