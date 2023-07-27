@@ -438,7 +438,7 @@ endif()
 
 
 message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
-if(NOT THEXTECH_CLI_BUILD)
+if(NOT THEXTECH_CLI_BUILD AND NOT THEXTECH_NO_MIXER_X)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_CodecLibs})
 endif()
 
