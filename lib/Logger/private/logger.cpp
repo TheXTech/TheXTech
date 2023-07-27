@@ -35,6 +35,7 @@
 #include <fmt/fmt_printf.h>
 
 #include "sdl_proxy/sdl_stdinc.h"
+#include "sdl_proxy/sdl_timer.h"
 
 #ifndef MOONDUST_LOGGER_FILENAME_PREFIX
 #   error Please define the "-DMOONDUST_LOGGER_FILENAME_PREFIX=<name-of-application>" to specify the log filename prefix
@@ -47,7 +48,26 @@ int             LogWriter::m_maxFilesCount = 10;
 bool            LogWriter::m_enabled = false;
 bool            LogWriter::m_enabledStdOut = false;
 bool            LogWriter::m_enabledVerboseLogs = false;
+uint64_t        LogWriter::m_appStartTicks = 0;
 
+static std::string getRunTimeString()
+{
+    uint64_t ticks_fms = SDL_GetTicks64() - LogWriter::m_appStartTicks;
+    uint64_t ticks_fs = ticks_fms / 1000;
+    uint64_t ticks_fm = ticks_fs / 60;
+    uint64_t ticks_h = ticks_fm / 60;
+
+    uint64_t ticks_ms = ticks_fms % 1000;
+    uint64_t ticks_s = ticks_fs % 60;
+    uint64_t ticks_m = ticks_fm % 60;
+
+    if(ticks_h > 0)
+        return fmt::sprintf_ne("%02d:%02d:%02d.%03d",
+                               (int)ticks_h, (int)ticks_m, (int)ticks_s, (int)ticks_ms);
+    else
+        return fmt::sprintf_ne("%02d:%02d.%03d",
+                               (int)ticks_m, (int)ticks_s, (int)ticks_ms);
+}
 
 #if !defined(NO_FILE_LOGGING)
 static std::string return_current_time_and_date()
@@ -115,6 +135,8 @@ void LoadLogSettings(bool disableStdOut, bool verboseLogs)
 #if !defined(NO_FILE_LOGGING)
     std::string logFileName = fmt::format_ne(MOONDUST_LOGGER_FILENAME_PREFIX "_log_{0}.txt", return_current_time_and_date());
 #endif
+
+    LogWriter::m_appStartTicks = SDL_GetTicks64();
 
     std::string mainIniFile = AppPathManager::settingsFileSTD();
     IniProcessing logSettings(mainIniFile);
@@ -192,7 +214,10 @@ static inline void pLogGeneric(int level, const char *label, const char *format,
 
 #ifndef NO_FILE_LOGGING
     if(LogWriter::m_logLevel >= level)
-        LoggerPrivate_pLogFile(level, label, format, arg);
+    {
+        auto t = getRunTimeString();
+        LoggerPrivate_pLogFile(level, label, t.c_str(), format, arg);
+    }
 #endif
 }
 

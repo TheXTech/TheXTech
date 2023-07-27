@@ -31,6 +31,10 @@
 #include "core/msgbox.h"
 #include "core/events.h"
 
+#ifndef THEXTECH_NO_SDL_CORE
+#   include "core/sdl/sdl_core.h"
+#endif
+
 #ifdef CORE_EVERYTHING_SDL
 #   include "core/sdl/render_sdl.h"
 typedef RenderSDL RenderUsed;
@@ -61,6 +65,12 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     LoadLogSettings(setup.interprocess, setup.verboseLogging);
     //Write into log the application start event
     pLogDebug("<Application started>");
+
+#ifndef THEXTECH_NO_SDL_CORE
+    res = CoreSDL::init(setup);
+    if(!res)
+        return false;
+#endif
 
 #if defined(__WII__) || defined(__3DS__) || !defined(RENDER_CUSTOM)
     //Initialize FreeImage
@@ -99,13 +109,18 @@ bool FrmMain::initSystem(const CmdLineSetup_t &setup)
     D_pLogDebugNA("FrmMain: Loading XWindow...");
     res = XWindow::init();
 #elif defined(USE_CORE_WINDOW_SDL)
-    res = window->initSDL(setup, render->SDL_InitFlags());
+    res = window->initSDL(render->SDL_InitFlags());
 #else
 #   error "FIXME: Implement supported window initialization here"
 #endif
 
     if(!res)
+    {
+#ifndef THEXTECH_NO_SDL_CORE
+    CoreSDL::quit();
+#endif
         return true;
+    }
 
 
     // Initializing message box
@@ -207,6 +222,10 @@ void FrmMain::freeSystem()
 
     pLogDebug("<Application closed>");
     CloseLog();
+
+#ifndef THEXTECH_NO_SDL_CORE
+    CoreSDL::quit();
+#endif
 }
 
 bool FrmMain::restartRenderer()

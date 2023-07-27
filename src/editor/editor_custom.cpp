@@ -1064,6 +1064,7 @@ void Load(XTechTranslate* translate)
             pLogWarning("Ignoring invalid group %s.", group.c_str());
         }
 
+        // handling for Lists
         if(l_ptr)
         {
             editor.beginGroup(group);
@@ -1157,6 +1158,7 @@ void Load(XTechTranslate* translate)
             }
         }
 
+        // handling for ordinary Families
         if(f_ptr)
         {
             temp_layout_pod_indices.clear();
@@ -1218,6 +1220,9 @@ void Load(XTechTranslate* translate)
                         continue;
 
                     if(SDL_strncasecmp(key.c_str(), "icon", 4) == 0)
+                        continue;
+
+                    if(SDL_strncasecmp(key.c_str(), "behi", 4) == 0)
                         continue;
 
                     bool pod_mode = false;

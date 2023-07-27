@@ -49,6 +49,7 @@ Changelog for 1.3.6.1
 -Fixed vanilla bug where player could be crushed by a horizontally (not vertically) moving ceiling (@ds-sloth)
 -Fixed TheXTech bug where a semi-transparent message box was not rendered correctly with a single-line messages. (@ds-sloth)
 -Keyhole framerate fix will be enabled by default (@Wohlstand, @0lhi)
+-Fixed vanilla bug where player could fall through an Instant/Portal warp while performing the "Pound" move. (@ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)
