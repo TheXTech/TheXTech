@@ -44,6 +44,7 @@
 #include "main/game_strings.h"
 
 #include "controls.h"
+#include "config.h"
 #include "control/controls_strings.h"
 
 #include "editor/editor_strings.h"
@@ -383,6 +384,7 @@ XTechTranslate::XTechTranslate()
         {"menu.wordBack",       &g_mainMenu.wordBack},
         {"menu.wordResume",     &g_mainMenu.wordResume},
         {"menu.wordWaiting",    &g_mainMenu.wordWaiting},
+        {"menu.wordLanguage",    &g_mainMenu.wordLanguage},
 
         {"menu.abbrevMilliseconds", &g_mainMenu.abbrevMilliseconds},
 
@@ -441,8 +443,7 @@ XTechTranslate::XTechTranslate()
         {"game.connect.phraseStartToForceRes",     &g_gameStrings.connectPressStartToForceResume},
 
 #ifdef THEXTECH_ENABLE_EDITOR
-        {"editor.block.pickContents1",      &g_editorStrings.pickBlockContents1},
-        {"editor.block.pickContents2",      &g_editorStrings.pickBlockContents2},
+        {"editor.block.pickContents",       &g_editorStrings.pickBlockContents},
 
         {"editor.block.letterWidth",        &g_editorStrings.blockLetterWidth},
         {"editor.block.letterHeight",       &g_editorStrings.blockLetterHeight},
@@ -569,21 +570,16 @@ XTechTranslate::XTechTranslate()
         {"editor.events.label.destroy",     &g_editorStrings.eventsLabelDestroy},
         {"editor.events.label.enter",       &g_editorStrings.eventsLabelEnter},
 
-        {"editor.events.desc.activate1",    &g_editorStrings.eventsDescActivate1},
-        {"editor.events.desc.activate2",    &g_editorStrings.eventsDescActivate2},
-        {"editor.events.desc.death1",       &g_editorStrings.eventsDescDeath1},
-        {"editor.events.desc.talk1",        &g_editorStrings.eventsDescTalk1},
-        {"editor.events.desc.talk2",        &g_editorStrings.eventsDescTalk2},
-        {"editor.events.desc.layerClear1",  &g_editorStrings.eventsDescLayerClear1},
-        {"editor.events.desc.layerClear2",  &g_editorStrings.eventsDescLayerClear2},
-        {"editor.events.desc.layerClear3",  &g_editorStrings.eventsDescLayerClear3},
-        {"editor.events.desc.hit1",         &g_editorStrings.eventsDescHit1},
-        {"editor.events.desc.destroy1",     &g_editorStrings.eventsDescDestroy1},
-        {"editor.events.desc.destroy2",     &g_editorStrings.eventsDescDestroy2},
-        {"editor.events.desc.enter1",       &g_editorStrings.eventsDescEnter1},
-        {"editor.events.desc.enter2",       &g_editorStrings.eventsDescEnter2},
+        {"editor.events.desc.activate",     &g_editorStrings.eventsDescActivate},
+        {"editor.events.desc.death",        &g_editorStrings.eventsDescDeath},
+        {"editor.events.desc.talk",         &g_editorStrings.eventsDescTalk},
+        {"editor.events.desc.layerClear",   &g_editorStrings.eventsDescLayerClear},
+        {"editor.events.desc.hit",          &g_editorStrings.eventsDescHit},
+        {"editor.events.desc.destroy",      &g_editorStrings.eventsDescDestroy},
+        {"editor.events.desc.enter",        &g_editorStrings.eventsDescEnter},
 
-        {"editor.events.desc.phraseTriggersWhen",   &g_editorStrings.eventsDescPhraseTriggersWhen},
+        {"editor.events.desc.phraseTriggersWhenTemplate",   &g_editorStrings.eventsDescPhraseTriggersWhenTemplate},
+        {"editor.events.desc.phraseTriggersAfterTemplate",   &g_editorStrings.eventsDescPhraseTriggersAfterTemplate},
 
         {"editor.events.deletion.deletingEvent",    &g_editorStrings.eventsDeletingEvent},
         {"editor.events.deletion.confirm",          &g_editorStrings.eventsDeletionConfirm},
@@ -669,11 +665,7 @@ XTechTranslate::XTechTranslate()
         {"editor.layers.deletion.confirmDelete",            &g_editorStrings.layersDeletionConfirmDelete},
         {"editor.layers.deletion.cancel",                   &g_editorStrings.layersDeletionCancel},
 
-        {"editor.layers.desc.att1", &g_editorStrings.layersDescAtt1},
-        {"editor.layers.desc.att2", &g_editorStrings.layersDescAtt2},
-        {"editor.layers.desc.att3", &g_editorStrings.layersDescAtt3},
-        {"editor.layers.desc.att4", &g_editorStrings.layersDescAtt4},
-        {"editor.layers.desc.att5", &g_editorStrings.layersDescAtt5},
+        {"editor.layers.desc.att", &g_editorStrings.layersDescAtt},
 
         {"editor.layers.promptLayerName", &g_editorStrings.layersPromptLayerName},
         {"editor.layers.itemNewLayer",    &g_editorStrings.layersItemNewLayer},
@@ -705,8 +697,7 @@ XTechTranslate::XTechTranslate()
         {"editor.file.commandSave",         &g_editorStrings.fileCommandSave},
         {"editor.file.commandSaveAs",       &g_editorStrings.fileCommandSaveAs},
 
-        {"editor.file.convert.desc1",               &g_editorStrings.fileConvertDesc1},
-        {"editor.file.convert.desc2",               &g_editorStrings.fileConvertDesc2},
+        {"editor.file.convert.desc",                &g_editorStrings.fileConvertDesc},
         {"editor.file.convert.noIssues",            &g_editorStrings.fileConvertNoIssues},
         {"editor.file.convert.featuresWillBeLost",  &g_editorStrings.fileConvertFeaturesWillBeLost},
 
@@ -805,6 +796,7 @@ void XTechTranslate::reset()
 #endif
 
     Controls::InitStrings();
+    g_controlsStrings = ControlsStrings_t();
 
     s_CurrentPluralRules = PluralRules::OneIsSingular;
 }
@@ -1008,3 +1000,18 @@ bool XTechTranslate::translateFile(const std::string& file, TrList& list, const 
 
     return true;
 }
+
+void ReloadTranslations()
+{
+    XLanguage::resolveLanguage(g_config.language);
+
+    XTechTranslate translator;
+    translator.reset();
+    if(translator.translate())
+    {
+        pLogDebug("Reloaded translation for language %s-%s",
+                  CurrentLanguage.c_str(),
+                  CurrentLangDialect.empty() ? "??" : CurrentLangDialect.c_str());
+    }
+}
+

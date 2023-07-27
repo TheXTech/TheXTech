@@ -119,6 +119,7 @@ static void compatInit(Compatibility_t &c)
     c.bitblit_background_colour[2] = 0;
     c.custom_powerup_collect_score = true;
     c.fix_player_crush_death = true;
+    c.fix_pound_skip_warp = true;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -164,6 +165,7 @@ static void compatInit(Compatibility_t &c)
         c.emulate_classic_block_order = true;
         c.custom_powerup_collect_score = false;
         c.fix_player_crush_death = false;
+        c.fix_pound_skip_warp = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -408,6 +410,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         compat.read("emulate-classic-block-order", c.emulate_classic_block_order, c.emulate_classic_block_order);
         // compat.read("custom-powerup-collect-score", c.custom_powerup_collect_score, c.custom_powerup_collect_score);
         compat.read("fix-player-crush-death", c.fix_player_crush_death, c.fix_player_crush_death);
+        compat.read("fix-pound-skip-warp", c.fix_pound_skip_warp, c.fix_pound_skip_warp);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);

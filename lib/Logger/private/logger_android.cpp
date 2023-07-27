@@ -92,7 +92,7 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 }
 
 #ifndef NO_FILE_LOGGING
-void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va_list arg)
+void LoggerPrivate_pLogFile(int level, const char *label, const char *in_time, const char *format, va_list arg)
 {
     va_list arg_in;
     (void)level;
@@ -104,7 +104,7 @@ void LoggerPrivate_pLogFile(int level, const char *label, const char *format, va
 
     va_copy(arg_in, arg);
 
-    int len = SDL_snprintf(g_outputBuffer, OUT_BUFFER_SIZE, "%s: ", label);
+    int len = SDL_snprintf(g_outputBuffer, OUT_BUFFER_SIZE, "%s [%s]: ", in_time, label);
     if(len > 0)
         SDL_RWwrite(s_logout, g_outputBuffer, 1, (size_t)(len < OUT_BUFFER_STRING_SIZE ? len : OUT_BUFFER_STRING_SIZE));
 

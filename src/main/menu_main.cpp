@@ -57,10 +57,13 @@
 #include "level_file.h"
 #include "world_file.h"
 #include "pge_delay.h"
+#include "core/language.h"
+#include "main/translate.h"
 
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
 #include "editor/write_world.h"
+#include "editor/editor_custom.h"
 #include "script/luna/luna.h"
 
 MainMenuContent g_mainMenu;
@@ -177,6 +180,7 @@ void initMainMenu()
     g_mainMenu.wordOff  = "Off";
     g_mainMenu.wordShow = "Show";
     g_mainMenu.wordHide = "Hide";
+    g_mainMenu.wordLanguage = "Language";
     g_mainMenu.abbrevMilliseconds = "MS";
 
     g_mainMenu.promptDeprecatedSetting = "This file uses a deprecated compatibility flag that will be removed in version 1.3.7.\n\nOld flag: \"{0}\"\nNew flag: \"{1}\"\n\n\nReplace it with the updated flag for version 1.3.6 and newer?";
@@ -736,6 +740,12 @@ bool mainMenuUpdate()
                     {
                         PlaySoundMenu(SFX_BlockHit);
                         MessageText = fmt::format_ne(g_mainMenu.editorErrorMissingResources, "EditorIcons.png");
+                        PauseGame(PauseCode::Message);
+                    }
+                    else if(!EditorCustom::loaded)
+                    {
+                        PlaySoundMenu(SFX_BlockHit);
+                        MessageText = fmt::format_ne(g_mainMenu.editorErrorMissingResources, "editor.ini");
                         PauseGame(PauseCode::Message);
                     }
                     else
@@ -1438,9 +1448,9 @@ bool mainMenuUpdate()
         else if(MenuMode == MENU_OPTIONS)
         {
 #ifndef RENDER_FULLSCREEN_ALWAYS
-            const int optionsMenuLength = 2;
+            const int optionsMenuLength = 3;
 #else
-            const int optionsMenuLength = 1;
+            const int optionsMenuLength = 2;
 #endif
 
             if(SharedCursor.Move)
@@ -1461,6 +1471,8 @@ bool mainMenuUpdate()
                                 menuLen = 18 * 15; // std::strlen("fullscreen mode")
                         }
 #endif
+                        else if(A == i++)
+                            menuLen = 18 * 25; // Language: XXXXX (YY)
                         else
                             menuLen = 18 * 12 - 2; // std::strlen("view credits")
 
@@ -1495,11 +1507,11 @@ bool mainMenuUpdate()
                     MenuCursorCanMove = false;
                     PlaySoundMenu(SFX_Slide);
                 }
-                else if(menuDoPress || MenuMouseClick)
+                else if(menuDoPress || MenuMouseClick || leftPressed || rightPressed)
                 {
                     MenuCursorCanMove = false;
                     int i = 0;
-                    if(MenuCursor == i++)
+                    if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
                         MenuCursor = 0;
                         MenuMode = MENU_INPUT_SETTINGS;
@@ -1513,6 +1525,12 @@ bool mainMenuUpdate()
                     }
 #endif
                     else if(MenuCursor == i++)
+                    {
+                        XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
+                        ReloadTranslations();
+                        SaveConfig();
+                    }
+                    else if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
                         PlaySoundMenu(SFX_Do);
                         GameMenu = false;
@@ -1981,6 +1999,7 @@ void mainMenuDraw()
         else
             SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
 #endif
+        SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
         SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
                                GFX.MCursor[0].w, GFX.MCursor[0].h, GFX.MCursor[0], 0, 0);

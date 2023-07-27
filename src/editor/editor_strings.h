@@ -30,8 +30,7 @@ struct EditorContent
     std::string phraseAreYouSure;
     std::string pageBlankOfBlank;
 
-    std::string pickBlockContents1;
-    std::string pickBlockContents2;
+    std::string pickBlockContents;
 
     std::string blockLetterWidth;
     std::string blockLetterHeight;
@@ -156,21 +155,16 @@ struct EditorContent
     std::string eventsLabelDestroy;
     std::string eventsLabelEnter;
 
-    std::string eventsDescActivate1;
-    std::string eventsDescActivate2;
-    std::string eventsDescDeath1;
-    std::string eventsDescTalk1;
-    std::string eventsDescTalk2;
-    std::string eventsDescLayerClear1;
-    std::string eventsDescLayerClear2;
-    std::string eventsDescLayerClear3;
-    std::string eventsDescHit1;
-    std::string eventsDescDestroy1;
-    std::string eventsDescDestroy2;
-    std::string eventsDescEnter1;
-    std::string eventsDescEnter2;
+    std::string eventsDescActivate;
+    std::string eventsDescDeath;
+    std::string eventsDescTalk;
+    std::string eventsDescLayerClear;
+    std::string eventsDescHit;
+    std::string eventsDescDestroy;
+    std::string eventsDescEnter;
 
-    std::string eventsDescPhraseTriggersWhen;
+    std::string eventsDescPhraseTriggersWhenTemplate;
+    std::string eventsDescPhraseTriggersAfterTemplate;
 
     std::string eventsDeletingEvent;
     std::string eventsDeletionConfirm;
@@ -255,11 +249,7 @@ struct EditorContent
     std::string layersDeletionConfirmDelete;
     std::string layersDeletionCancel;
 
-    std::string layersDescAtt1;
-    std::string layersDescAtt2;
-    std::string layersDescAtt3;
-    std::string layersDescAtt4;
-    std::string layersDescAtt5;
+    std::string layersDescAtt;
 
     std::string layersPromptLayerName;
     std::string layersItemNewLayer;
@@ -291,8 +281,7 @@ struct EditorContent
     std::string fileCommandSave;
     std::string fileCommandSaveAs;
 
-    std::string fileConvertDesc1;
-    std::string fileConvertDesc2;
+    std::string fileConvertDesc;
     std::string fileConvertNoIssues;
     std::string fileConvertFeaturesWillBeLost;
 

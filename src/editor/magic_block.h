@@ -40,10 +40,10 @@ enum CrossEffectLevel
 
 extern bool enabled;
 extern bool replace_existing;
-extern bool advanced_mode;
+// extern bool advanced_mode;
 extern bool count_level_edges;
-extern CrossEffectLevel check_level;
-extern CrossEffectLevel change_level;
+// extern CrossEffectLevel check_level;
+// extern CrossEffectLevel change_level;
 
 void MagicBlock(BlockRef_t A);
 void MagicBlock(int Type, Location_t loc);

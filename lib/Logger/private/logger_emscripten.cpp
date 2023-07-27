@@ -70,6 +70,6 @@ void LoggerPrivate_pLogConsole(int level, const char *label, const char *format,
 }
 
 #ifndef NO_FILE_LOGGING
-void LoggerPrivate_pLogFile(int, const char *, const char *, va_list)
+void LoggerPrivate_pLogFile(int, const char *, const char *, const char *, va_list)
 {}
 #endif // NO_FILE_LOGGING

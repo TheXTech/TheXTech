@@ -134,16 +134,68 @@ void printText(const char* text, size_t text_size,
                uint32_t ttf_FontSize = 14, bool outline = false);
 
 /**
- * @brief Clean-Up text fragment to fit into the character width
- * @param [_inout] text Text to optimize
- * @param [_in]  max_line_lenght max line lenght in characters
- * @param [_out] numLines Total line in the text fragment after optimization
- * @param [_out] numCols Total columns in the text fragment after optimization
+ * @brief Optimize and print the text fragment to the screen
+ * @param text Text fragment to print
+ * @param x X position on the screen
+ * @param y Y position on the screen
+ * @param max_columns The maximum line length in characters (columns)
+ * @param font The Font-ID
+ * @param Red Red color level from 0.0 to 1.0
+ * @param Green Green color level from 0.0 to 1.0
+ * @param Blue Blue color level from 0.0 to 1.0
+ * @param Alpha Alpha-channel level from 0.0 to 1.0
+ * @param ttf_FontSize Point size for the TTF fonts
  */
-void           optimizeText(std::string &text,
-                            size_t max_line_lenght,
-                            int *numLines = 0,
-                            int *numCols = 0);
+void printTextOptiCol(std::string text,
+                      int x, int y,
+                      size_t max_columns,
+                      int font = DefaultRaster,
+                      float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
+                      uint32_t ttf_FontSize = 14);
+
+/**
+ * @brief Optimize and print the text fragment to the screen
+ * @param text Text fragment to print
+ * @param x X position on the screen
+ * @param y Y position on the screen
+ * @param max_pixels_lenght The maximum line length in pixels
+ * @param font The Font-ID
+ * @param Red Red color level from 0.0 to 1.0
+ * @param Green Green color level from 0.0 to 1.0
+ * @param Blue Blue color level from 0.0 to 1.0
+ * @param Alpha Alpha-channel level from 0.0 to 1.0
+ * @param ttf_FontSize Point size for the TTF fonts
+ */
+void printTextOptiPx(std::string text,
+                     int x, int y,
+                     size_t max_pixels_lenght,
+                     int font = DefaultRaster,
+                     float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
+                     uint32_t ttf_FontSize = 14);
+
+/**
+ * @brief Optimise the given text fragment to fit it into the given columns count.
+ * @param [_inout] text Text to optimize
+ * @param [_in]  max_columns The maximum line length in characters (columns)
+ * @return Computed size of the printed text in columns and lines
+ *
+ * Suitable with monospace fonts.
+ */
+PGE_Size       optimizeText(std::string &text, size_t max_columns);
+
+/**
+ * @brief Optimise the given text fragment to fit it into the given pixels width
+ * @param [_inout] text Text to optimize (the result will be writtein back to here)
+ * @param [_in]  max_pixels_lenght The maximum line length in pixels
+ * @param [_in]  fontId font ID
+ * @return Computed pixels size of the printed text fragment
+ *
+ * Can be used with any kind of the font
+ */
+PGE_Size    optimizeTextPx(std::string &text,
+                           size_t max_pixels_lenght,
+                           int fontId,
+                           uint32_t ttf_FontSize = 14);
 
 /**
  * @brief Strip text outing of max count of symbols

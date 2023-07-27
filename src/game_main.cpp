@@ -102,6 +102,10 @@ static int loadingThread(void *waiter_ptr)
 #else
     UNUSED(waiter_ptr);
 #endif
+
+    LoaderUpdateDebugString("Translations");
+    XLanguage::findLanguages(); // find present translations
+
     SetupPhysics(); // Setup Physics
     SetupGraphics(); // setup graphics
 //    Load GFX 'load the graphics form

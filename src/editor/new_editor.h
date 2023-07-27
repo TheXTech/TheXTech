@@ -240,7 +240,7 @@ private:
     void UpdateFileScreen(CallMode mode);
     void UpdateBrowserScreen(CallMode mode);
 
-    void UpdateMagicBlockScreen(CallMode mode);
+    // void UpdateMagicBlockScreen(CallMode mode);
 
 public:
     bool active = true;

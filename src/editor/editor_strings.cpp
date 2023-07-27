@@ -27,8 +27,7 @@ void initEditorStrings()
     g_editorStrings.phraseAreYouSure = "Are you sure?";
     g_editorStrings.pageBlankOfBlank = "Page {0} of {1}";
 
-    g_editorStrings.pickBlockContents1 = "Pick block";
-    g_editorStrings.pickBlockContents2 = "contents";
+    g_editorStrings.pickBlockContents = "Pick block contents";
 
     g_editorStrings.blockLetterWidth  = "W ";
     g_editorStrings.blockLetterHeight = "H ";
@@ -153,21 +152,16 @@ void initEditorStrings()
     g_editorStrings.eventsLabelDestroy = "Destroy";
     g_editorStrings.eventsLabelEnter = "Enter";
 
-    g_editorStrings.eventsDescActivate1 = "NPC enters";
-    g_editorStrings.eventsDescActivate2 = "the screen";
-    g_editorStrings.eventsDescDeath1 = "NPC dies";
-    g_editorStrings.eventsDescTalk1 = "player talks";
-    g_editorStrings.eventsDescTalk2 = "to NPC";
-    g_editorStrings.eventsDescLayerClear1 = "everything in";
-    g_editorStrings.eventsDescLayerClear2 = "object layer";
-    g_editorStrings.eventsDescLayerClear3 = "is gone";
-    g_editorStrings.eventsDescHit1 = "block is hit";
-    g_editorStrings.eventsDescDestroy1 = "block is";
-    g_editorStrings.eventsDescDestroy2 = "destroyed";
-    g_editorStrings.eventsDescEnter1 = "warp is";
-    g_editorStrings.eventsDescEnter2 = "entered";
+    g_editorStrings.eventsDescActivate = "NPC enters the screen";
+    g_editorStrings.eventsDescDeath = "NPC dies";
+    g_editorStrings.eventsDescTalk = "player talks to NPC";
+    g_editorStrings.eventsDescLayerClear = "everything in object layer is gone";
+    g_editorStrings.eventsDescHit = "block is hit";
+    g_editorStrings.eventsDescDestroy = "block is destroyed";
+    g_editorStrings.eventsDescEnter = "warp is entered";
 
-    g_editorStrings.eventsDescPhraseTriggersWhen = "triggers when";
+    g_editorStrings.eventsDescPhraseTriggersWhenTemplate = "{0} triggers when {1}";
+    g_editorStrings.eventsDescPhraseTriggersAfterTemplate = "{0} triggers {1} ms after event {2} occurs";
 
     g_editorStrings.eventsDeletingEvent = "Deleting event {0}";
     g_editorStrings.eventsDeletionConfirm = "Yes: delete event";
@@ -252,11 +246,7 @@ void initEditorStrings()
     g_editorStrings.layersDeletionConfirmDelete = "No: *DELETE ALL CONTENTS*";
     g_editorStrings.layersDeletionCancel = "Cancel: do not delete layer";
 
-    g_editorStrings.layersDescAtt1 = "Whenever the";
-    g_editorStrings.layersDescAtt2 = "NPC moves,";
-    g_editorStrings.layersDescAtt3 = "the attached";
-    g_editorStrings.layersDescAtt4 = "layer moves";
-    g_editorStrings.layersDescAtt5 = "following it";
+    g_editorStrings.layersDescAtt = "Whenever the NPC moves, the attached layer moves following it";
 
     g_editorStrings.layersPromptLayerName = "Layer name";
     g_editorStrings.layersItemNewLayer = "<New Layer>";
@@ -288,8 +278,7 @@ void initEditorStrings()
     g_editorStrings.fileCommandSave = "Save";
     g_editorStrings.fileCommandSaveAs = "Save as...";
 
-    g_editorStrings.fileConvertDesc1 = "The file extension will change but";
-    g_editorStrings.fileConvertDesc2 = "the old file will NOT be deleted.";
+    g_editorStrings.fileConvertDesc = "The file extension will change but the old file will NOT be deleted.";
     g_editorStrings.fileConvertNoIssues = "There are no compatibility issues.";
     g_editorStrings.fileConvertFeaturesWillBeLost = "The features below will be LOST:";
 

@@ -430,6 +430,8 @@ void FontManager::initFull()
 
 void FontManager::quit()
 {
+    clearAllCustomFonts();
+
     g_fontNameToId.clear();
     g_anyFonts.clear();
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
@@ -622,7 +624,7 @@ void FontManager::printText(const char* text, size_t text_size,
     font_engine->printText(text, text_size, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
 }
 
-void FontManager::optimizeText(std::string &text, size_t max_line_lenght, int *numLines, int *numCols)
+PGE_Size FontManager::optimizeText(std::string &text, size_t max_columns)
 {
     /****************Word wrap*********************/
     size_t  lastspace = 0;
@@ -640,14 +642,14 @@ void FontManager::optimizeText(std::string &text, size_t max_line_lenght, int *n
 
         case '\n':
             lastspace = 0;
-            if((maxWidth < x) && (maxWidth < max_line_lenght))
+            if((maxWidth < x) && (maxWidth < max_columns))
                 maxWidth = x;
             x = 0;
             count++;
             break;
         }
 
-        if(x >= max_line_lenght) //If lenght more than allowed
+        if(x >= max_columns) //If lenght more than allowed
         {
             maxWidth = x;
 
@@ -674,11 +676,127 @@ void FontManager::optimizeText(std::string &text, size_t max_line_lenght, int *n
 
     /****************Word wrap*end*****************/
 
-    if(numLines)
-        *numLines = count;
+    return PGE_Size(count, static_cast<int>(maxWidth));
+}
 
-    if(numCols)
-        *numCols = static_cast<int>(maxWidth);
+
+void FontManager::printTextOptiCol(std::string text,
+                                   int x, int y,
+                                   size_t max_columns,
+                                   int font,
+                                   float Red, float Green, float Blue, float Alpha,
+                                   uint32_t ttf_FontSize)
+{
+    FontManager::optimizeText(text, max_columns);
+    FontManager::printText(text.c_str(), text.size(),
+                           x, y,
+                           font,
+                           Red, Green, Blue, Alpha,
+                           ttf_FontSize);
+}
+
+void FontManager::printTextOptiPx(std::string text,
+                                  int x, int y,
+                                  size_t max_pixels_lenght,
+                                  int font,
+                                  float Red, float Green, float Blue, float Alpha,
+                                  uint32_t ttf_FontSize)
+{
+    FontManager::optimizeTextPx(text, max_pixels_lenght, font, ttf_FontSize);
+    FontManager::printText(text.c_str(), text.size(),
+                           x, y,
+                           font,
+                           Red, Green, Blue, Alpha,
+                           ttf_FontSize);
+}
+
+PGE_Size FontManager::optimizeTextPx(std::string& text,
+                                     size_t max_pixels_lenght,
+                                     int fontId,
+                                     uint32_t ttf_FontSize)
+{
+    /****************Word wrap*********************/
+    size_t  lastspace = 0;
+    int     count = 1;
+    size_t  height = 0;
+    size_t  maxWidth = 0;
+    size_t  maxWidthAtSpace = 0;
+    size_t  pixelWidth = 0;
+    size_t  pixelWidthPrev = 0;
+    BaseFontEngine *font = nullptr;
+    PGE_Size gs;
+
+    if((fontId < 0) || (static_cast<size_t>(fontId) >= g_anyFonts.size()) || !g_anyFonts[fontId])
+        return PGE_Size(0, 0); // Invalid font
+
+    font = g_anyFonts[fontId];
+
+    for(size_t x = 0, i = 0; i < text.size(); i++, x++)
+    {
+        switch(text[i])
+        {
+        case '\t':
+        case ' ':
+            lastspace = i;
+            maxWidthAtSpace = pixelWidth;
+            gs = font->glyphSize(&text[i], x, ttf_FontSize);
+            pixelWidthPrev = pixelWidth;
+            pixelWidth += gs.w();
+            break;
+
+        case '\n':
+            lastspace = 0;
+            maxWidthAtSpace = 0;
+
+            if((maxWidth < pixelWidth) && (maxWidth < max_pixels_lenght))
+                maxWidth = pixelWidth;
+
+            x = 0;
+            pixelWidth = 0;
+            pixelWidthPrev = 0;
+            height += gs.h();
+            count++;
+            break;
+
+        default:
+            pixelWidthPrev = pixelWidth;
+            gs = font->glyphSize(&text[i], x, ttf_FontSize);
+            pixelWidth += gs.w();
+            break;
+        }
+
+        if(pixelWidth >= max_pixels_lenght) //If lenght more than allowed
+        {
+            if(lastspace > 0)
+            {
+                if(maxWidth < maxWidthAtSpace)
+                    maxWidth = maxWidthAtSpace;
+                text[lastspace] = '\n';
+                i = lastspace - 1;
+                lastspace = 0;
+            }
+            else
+            {
+                if(maxWidth < pixelWidthPrev)
+                    maxWidth = pixelWidthPrev;
+                text.insert(i, 1, '\n');
+                x = 0;
+                pixelWidth = 0;
+                height += gs.h();
+                count++;
+            }
+        }
+
+        UTF8 uch = static_cast<unsigned char>(text[i]);
+        i += static_cast<size_t>(trailingBytesForUTF8[uch]);
+    }
+
+    if(count == 1)
+        maxWidth = pixelWidth;
+
+    /****************Word wrap*end*****************/
+
+    return PGE_Size(maxWidth, height);
 }
 
 std::string FontManager::cropText(std::string text, size_t max_symbols)
@@ -692,5 +810,6 @@ std::string FontManager::cropText(std::string text, size_t max_symbols)
         text.erase(utf8len, text.size() - utf8len);
         text.append("...");
     }
+
     return text;
 }

@@ -65,6 +65,9 @@ ItemList_t bg2_list;
 
 std::vector<std::string> list_level_exit_names(10);
 
+static constexpr uint8_t LOADED_ALL = 7;
+uint8_t loaded = 0;
+
 
 // implementation for ItemType_t
 ItemType_t::ItemType_t(int type, const char* sides, slope_t slope, int width, int height, int group)
@@ -955,6 +958,8 @@ void Load(XTechTranslate* translate)
     wmusic_list.clear();
     bg2_list.clear();
 
+    loaded = 0;
+
 
     pLogDebug("Loading editor.ini...");
 
@@ -1059,6 +1064,7 @@ void Load(XTechTranslate* translate)
             pLogWarning("Ignoring invalid group %s.", group.c_str());
         }
 
+        // handling for Lists
         if(l_ptr)
         {
             editor.beginGroup(group);
@@ -1152,6 +1158,7 @@ void Load(XTechTranslate* translate)
             }
         }
 
+        // handling for ordinary Families
         if(f_ptr)
         {
             temp_layout_pod_indices.clear();
@@ -1213,6 +1220,9 @@ void Load(XTechTranslate* translate)
                         continue;
 
                     if(SDL_strncasecmp(key.c_str(), "icon", 4) == 0)
+                        continue;
+
+                    if(SDL_strncasecmp(key.c_str(), "behi", 4) == 0)
                         continue;
 
                     bool pod_mode = false;
@@ -1469,15 +1479,10 @@ void Load(XTechTranslate* translate)
 #endif
 
             editor.read("misc", f.is_misc, f.is_misc);
+            editor.read("behind", f.behind_mode, false);
             f.make_layout_pods();
         }
     }
-
-    if(block_families.empty())
-    {
-        pLogWarning("Can't find editor.ini, falling back on hardcoded block_families.");
-    }
-
 
     // Process exit codes
     editor.beginGroup("exit-codes");
@@ -1499,6 +1504,9 @@ void Load(XTechTranslate* translate)
 
 
     // process Blocks
+    if(!block_families.empty())
+        loaded++;
+
     s_ordered_block_families.clear();
     for(ItemFamily& family : block_families)
     {
@@ -1536,6 +1544,9 @@ void Load(XTechTranslate* translate)
 
 
     // process BGOs
+    if(!bgo_families.empty())
+        loaded++;
+
     s_ordered_bgo_families.clear();
     for(ItemFamily& family : bgo_families)
     {
@@ -1574,6 +1585,9 @@ void Load(XTechTranslate* translate)
 
 
     // process NPCs
+    if(!npc_families.empty())
+        loaded++;
+
     s_ordered_npc_families.clear();
     for(ItemFamily& family : npc_families)
     {
@@ -1615,6 +1629,9 @@ void Load(XTechTranslate* translate)
 
 
     // process tiles
+    if(!tile_families.empty())
+        loaded++;
+
     s_ordered_tile_families.clear();
     for(ItemFamily& family : tile_families)
     {
@@ -1654,6 +1671,8 @@ void Load(XTechTranslate* translate)
     // process bg2s
     if(!bg2_families.empty())
     {
+        loaded++;
+
         std::sort(bg2_families.begin(), bg2_families.end(),
         [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
@@ -1694,9 +1713,12 @@ void Load(XTechTranslate* translate)
             bg2_list.make_translation(*translate, "background2", "bg2-", bg2_families);
     }
 
+
     // process music
     if(!music_families.empty())
     {
+        loaded++;
+
         std::sort(music_families.begin(), music_families.end(),
         [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
@@ -1786,6 +1808,8 @@ void Load(XTechTranslate* translate)
     // process sounds
     if(!sound_families.empty())
     {
+        loaded++;
+
         std::sort(sound_families.begin(), sound_families.end(),
         [](const std::pair<ListItemFamily_t, std::string>& a, const std::pair<ListItemFamily_t, std::string>& b)
         {
@@ -1825,6 +1849,12 @@ void Load(XTechTranslate* translate)
         if(translate)
             sound_list.make_translation(*translate, "sound", "sound", sound_families);
     }
+
+    // report loading status
+    if(loaded == 0)
+        pLogWarning("Could not load editor.ini, editor disabled");
+    else if(loaded < LOADED_ALL)
+        pLogWarning("editor.ini seems incomplete");
 }
 
 } // namespace EditorCustom

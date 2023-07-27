@@ -1,1 +1,84 @@
-{}
+{
+    "editor": {
+        "block": {
+            "canBreak": "Se rompe",
+            "canBreakTooltip": "Legado: Se rompe al ser golpeado",
+            "inside": "Tiene:",
+            "invis": "Invis",
+            "slick": "Resbala"
+        },
+        "browser": {
+            "askOverwriteFile": "Sobreescribir {0}?",
+            "itemNewFile": "<Nuevo archivo>",
+            "itemNewFolder": "<Nueva carpeta>",
+            "newFile": "Nuevo archivo",
+            "openFile": "Abrir archivo",
+            "saveFile": "Guardar archivo"
+        },
+        "events": {
+            "controlsForEvent": "Controles para evento",
+            "header": "Eventos:",
+            "deletion": {
+                "cancel": "No: No eliminar evento",
+                "confirm": "Sí: Eliminar evento",
+                "deletingEvent": "Eliminando evento {0}"
+            },
+            "desc": {
+                "death": "NPC muere",
+                "destroy": "Bloque es destruido",
+                "hit": "Bloque es golpeado",
+                "phraseTriggersWhenTemplate": "{0} se activa cuando {1}",
+                "talk": "Jugador habla a NPC"
+            },
+            "itemNewEvent": "<Nuevo evento>",
+            "label": {
+                "activate": "Activar",
+                "destroy": "Destruir",
+                "death": "Muerte"
+            },
+            "sections": {
+                "phraseAllSections": "Todas las secciones",
+                "propMusic": "Música"
+            }
+        },
+        "file": {
+            "actionExit": "Salir",
+            "actionOpen": "Abrir",
+            "actionRevert": "Revertir",
+            "commandNew": "Nuevo",
+            "commandOpen": "Abrir...",
+            "commandSave": "Guardar",
+            "formatModern": "Moderno",
+            "optionCancelConversion": "Cancelar conversión",
+            "commandSaveAs": "Guardar como...",
+            "confirmConfirmAction": "Estás seguro de que quieres {0}?",
+            "convert": {
+                "desc": "La extensión del archivo cambiará, pero el archivo antiguo NO será eliminado.",
+                "featureCustomWorldMusic": "Usa archivo de música de mundo personalizada.",
+                "featuresWillBeLost": "Las características de abajo se PERDERÁN:",
+                "_38aUnsupported": "El formato SMBX38-A no es soportado para conversión.",
+                "noIssues": "No hay problemas de compatibilidad."
+            },
+            "formatLegacy": "Legado",
+            "optionActionWithoutSave": "{0} sin guardar",
+            "optionProceedWithConversion": "Proceder con la conversión",
+            "sectionLevel": "Nivel",
+            "sectionWorld": "Mundo",
+            "confirmConvertFormatTo": "Convertir formato a {0}?",
+            "confirmSaveBeforeAction": "Guardar antes que tú {0}?"
+        },
+        "layers": {
+            "deletion": {
+                "cancel": "Cancelar: No eliminar capa",
+                "header": "Eliminando capa {0}"
+            },
+            "header": "Capas:",
+            "itemNewLayer": "<Nueva capa>",
+            "label": "Capa:",
+            "promptLayerName": "Nombre de la capa"
+        },
+        "level": {
+            "levelName": "Nombre del nivel"
+        }
+    }
+}
