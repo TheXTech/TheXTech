@@ -399,6 +399,16 @@ void s_loadTexture3(StdPicture& target, C2D_SpriteSheet& sheet)
     target.d.image[2] = im;
 }
 
+static inline void s_resetBlend()
+{
+    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE_MINUS_DST_ALPHA, GPU_ONE);
+}
+
+static inline void s_mergeBlend()
+{
+    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+}
+
 bool init()
 {
     // 3ds libs
@@ -413,11 +423,7 @@ bool init()
     C2D_Prepare();
 
     C2D_SetTintMode(C2D_TintMult);
-    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
-
-    // IMPORTANT NOTE: the above results in "pre-multiplied" alpha for the render textures.
-    // Can be resolved by using a different blend function for final render to screen:
-    // C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+    s_resetBlend();
 
     // consoleInit(GFX_BOTTOM, NULL);
 
@@ -540,6 +546,8 @@ void repaint()
     // constexpr int shift = MAX_3D_OFFSET / 2;
     constexpr double shift_i[] = {shift, shift * 0.4, 0, shift * -0.4};
 
+    s_mergeBlend();
+
     s_depth_slider = osGet3DSliderState();
 
     s_cur_target = nullptr;
@@ -635,6 +643,8 @@ void repaint()
                                  X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
         }
     }
+
+    s_resetBlend();
 
     s_current_frame ++;
     g_in_frame = false;
@@ -1172,7 +1182,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(to_mask_2)
             {
                 C2D_Flush();
-                C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+                s_resetBlend();
             }
 
             yDst += (1024 - ySrc) * hDst / hSrc;
@@ -1208,7 +1218,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         if(to_mask)
         {
             C2D_Flush();
-            C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+            s_resetBlend();
         }
     }
 
