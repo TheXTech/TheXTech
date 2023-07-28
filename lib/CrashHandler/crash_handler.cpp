@@ -27,7 +27,7 @@
 #ifndef THEXTECH_NO_SDL_BUILD
 #include <SDL2/SDL_version.h>
 
-#   ifndef THEXTECH_CLI_BUILD
+#   if !defined(THEXTECH_CLI_BUILD) && !defined(CUSTOM_AUDIO)
 #   include <SDL2/SDL_mixer_ext.h>
 #   endif
 #endif
@@ -197,7 +197,7 @@ static const char *g_messageToUser =
 #ifndef THEXTECH_NO_SDL_BUILD
     "SDL2 " STRR(SDL_MAJOR_VERSION) "." STRR(SDL_MINOR_VERSION) "." STRR(SDL_PATCHLEVEL) "\n"
 #endif
-#if !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD)
+#if !defined(THEXTECH_NO_SDL_BUILD) && !defined(THEXTECH_CLI_BUILD) && !defined(CUSTOM_AUDIO)
     "SDL Mixer X " STRR(SDL_MIXER_MAJOR_VERSION) "." STRR(SDL_MIXER_MINOR_VERSION) "." STRR(SDL_MIXER_PATCHLEVEL) "\n"
 #endif
     "================================================\n"

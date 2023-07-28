@@ -399,6 +399,10 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
         list(APPEND A2XT_LIBS PGE_SDLMixerX_static)
     endif()
 
+    if(THEXTECH_CUSTOM_AUDIO_LIBRARY)
+        list(APPEND A2XT_LIBS gme vorbisidec ogg)
+    endif()
+
     list(APPEND A2XT_LIBS PGE_ZLib)
 endif()
 

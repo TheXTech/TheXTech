@@ -530,6 +530,7 @@ XTechTranslate::XTechTranslate()
         {"editor.phraseSectionIndex",       &g_editorStrings.phraseSectionIndex},
         {"editor.phraseRadiusIndex",        &g_editorStrings.phraseRadiusIndex},
         {"editor.phraseWarpIndex",          &g_editorStrings.phraseWarpIndex},
+        {"editor.phraseGenericIndex",       &g_editorStrings.phraseGenericIndex},
         {"editor.phraseDelayIsMs",          &g_editorStrings.phraseDelayIsMs},
         {"editor.phraseCountMore",          &g_editorStrings.phraseCountMore},
         {"editor.mapPos",                   &g_editorStrings.mapPos},

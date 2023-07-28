@@ -5452,6 +5452,8 @@ void SpecialNPC(int A)
                 NPC[numNPCs].Section = NPC[A].Section;
                 NPC[numNPCs].TimeLeft = 100;
 
+                NPC[numNPCs].Variant = NPC[A].Variant;
+
                 if(NPCIsACoin[NPC[numNPCs].Type])
                 {
                     NPC[numNPCs].Special = 1;

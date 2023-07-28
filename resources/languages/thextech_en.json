@@ -206,6 +206,7 @@
         "phraseAreYouSure": "Are you sure?",
         "phraseCountMore": "{0} More",
         "phraseDelayIsMs": "Delay: {0} ms",
+        "phraseGenericIndex": "Number {0}",
         "phraseRadiusIndex": "Radius {0}",
         "phraseSectionIndex": "Section {0}",
         "phraseTextOf": "{0} Text",

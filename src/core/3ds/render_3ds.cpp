@@ -30,6 +30,9 @@
 
 #include <FreeImageLite.h>
 
+// strangely undocumented import necessary to use the FreeImage handle functions
+extern void SetDefaultIO(FreeImageIO *io);
+
 #include <Graphics/graphics_funcs.h>
 
 #include <Logger/logger.h>
@@ -176,7 +179,7 @@ void s_clearAllTextures()
     }
 }
 
-FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, int* orig_w = nullptr, int* orig_h = nullptr)
+FIBITMAP* robust_FILoad(const std::string& path, int target_w)
 {
     if(path.empty())
     {
@@ -184,49 +187,74 @@ FIBITMAP* robust_FILoad(const std::string& path, const std::string& maskPath, in
         return nullptr;
     }
 
-    // this is wasteful, but it lets us diagnose memory issue vs other issues
-    FREE_IMAGE_FORMAT formato = FreeImage_GetFileType(path.c_str(), 0);
+    FILE *handle = Files::utf8_fopen(path.c_str(), "rb");
+
+    FreeImageIO io;
+    SetDefaultIO(&io);
+    FREE_IMAGE_FORMAT formato = FreeImage_GetFileTypeFromHandle(&io, (fi_handle)handle);
 
     if(formato == FIF_UNKNOWN)
     {
         pLogWarning("FreeImageLite failed to load image due to unknown format");
+        fclose(handle);
         return nullptr;
     }
 
-    FIBITMAP* sourceImage = GraphicsHelps::loadImage(path);
-
-    if(!sourceImage)
+    FIBITMAP *rawImage = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
+    if(!rawImage)
     {
         pLogWarning("FreeImageLite failed to load image due to lack of memory, trying to free some memory");
         minport_freeTextureMemory();
-        sourceImage = GraphicsHelps::loadImage(path);
+        rawImage = FreeImage_LoadFromHandle(formato, &io, (fi_handle)handle);
 
-        if(!sourceImage)
+        if(!rawImage)
+        {
+            fclose(handle);
             return nullptr;
+        }
+
+        pLogDebug("Loaded successfully!");
     }
 
-    if(!maskPath.empty())
-        GraphicsHelps::mergeWithMask(sourceImage, "", maskPath);
+    fclose(handle);
 
-    uint32_t w = static_cast<uint32_t>(FreeImage_GetWidth(sourceImage));
-    uint32_t h = static_cast<uint32_t>(FreeImage_GetHeight(sourceImage));
+    int32_t w = static_cast<int32_t>(FreeImage_GetWidth(rawImage));
+    int32_t h = static_cast<int32_t>(FreeImage_GetHeight(rawImage));
 
-    pLogDebug("loading %s, freeimage reports %u %u %u", path.c_str(), w, h, FreeImage_GetPitch(sourceImage));
-
-    if(orig_w)
-        *orig_w = w;
-
-    if(orig_h)
-        *orig_h = h;
+    pLogDebug("loading %s, freeimage reports %dx%d (%d-bit), pitch %u", path.c_str(), w, h, (int)FreeImage_GetBPP(rawImage), FreeImage_GetPitch(rawImage));
 
     if((w == 0) || (h == 0))
     {
-        GraphicsHelps::closeImage(sourceImage);
+        GraphicsHelps::closeImage(rawImage);
         pLogWarning("Error loading of image file:\n"
                     "Reason: %s."
                     "Zero image size!");
         return nullptr;
     }
+
+    if(w < target_w && FreeImage_GetBPP(rawImage) == 32)
+    {
+        FreeImage_FlipVertical(rawImage);
+        return rawImage;
+    }
+
+    FIBITMAP *sourceImage = GraphicsHelps::fastScaleDownAnd32Bit(rawImage, w >= target_w);
+    if(!sourceImage)
+    {
+        pLogWarning("Failed to convert image due to lack of memory, trying to free some memory");
+        minport_freeTextureMemory();
+        sourceImage = GraphicsHelps::fastScaleDownAnd32Bit(rawImage, w >= target_w);
+
+        if(!sourceImage)
+        {
+            FreeImage_Unload(rawImage);
+            return nullptr;
+        }
+
+        pLogDebug("Converted successfully!");
+    }
+
+    FreeImage_Unload(rawImage);
 
     FreeImage_FlipVertical(sourceImage);
 
@@ -398,6 +426,16 @@ void s_loadTexture3(StdPicture& target, C2D_SpriteSheet& sheet)
     target.d.image[2] = im;
 }
 
+static inline void s_resetBlend()
+{
+    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE_MINUS_DST_ALPHA, GPU_ONE);
+}
+
+static inline void s_mergeBlend()
+{
+    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+}
+
 bool init()
 {
     // 3ds libs
@@ -412,11 +450,7 @@ bool init()
     C2D_Prepare();
 
     C2D_SetTintMode(C2D_TintMult);
-    C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
-
-    // IMPORTANT NOTE: the above results in "pre-multiplied" alpha for the render textures.
-    // Can be resolved by using a different blend function for final render to screen:
-    // C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+    s_resetBlend();
 
     // consoleInit(GFX_BOTTOM, NULL);
 
@@ -538,6 +572,8 @@ void repaint()
     constexpr int shift = MAX_3D_OFFSET / 2;
     constexpr double shift_i[] = {shift, shift * 0.4, 0, shift * -0.4};
 
+    s_mergeBlend();
+
     s_depth_slider = osGet3DSliderState();
 
     s_cur_target = nullptr;
@@ -633,6 +669,8 @@ void repaint()
                                  X_FLIP_NONE, 1.0f, 1.0f, 1.0f, 1.0f);
         }
     }
+
+    s_resetBlend();
 
     s_current_frame ++;
     g_in_frame = false;
@@ -893,14 +931,27 @@ void lazyLoad(StdPicture& target)
 
         if(Files::hasSuffix(target.l.mask_path, "m.gif"))
         {
-            FI_tex = robust_FILoad(target.l.path, "");
+            FI_tex = robust_FILoad(target.l.path, target.w);
 
             if(FI_tex)
-                FI_mask = robust_FILoad(target.l.mask_path, "");
+                FI_mask = robust_FILoad(target.l.mask_path, target.w);
         }
         else
         {
-            FI_tex = robust_FILoad(target.l.path, target.l.mask_path);
+            FI_tex = robust_FILoad(target.l.path, target.w);
+            FIBITMAP* FI_mask_rgba = robust_FILoad(target.l.mask_path, target.w);
+            if(FI_mask_rgba)
+            {
+                FIBITMAP* FI_mask_lum = nullptr;
+                GraphicsHelps::getMaskFromRGBA(FI_mask_rgba, FI_mask_lum);
+                GraphicsHelps::closeImage(FI_mask_rgba);
+
+                if(FI_mask_lum)
+                {
+                    GraphicsHelps::mergeWithMask(FI_tex, FI_mask_lum);
+                    GraphicsHelps::closeImage(FI_mask_lum);
+                }
+            }
         }
 
         if(!FI_tex)
@@ -935,7 +986,7 @@ void lazyLoad(StdPicture& target)
 
         if(!target.d.hasTexture())
         {
-            pLogWarning("Permanently failed to load %s during texture load, %lu free", target.l.path.c_str(), linearSpaceFree());
+            pLogWarning("Permanently failed to load %s during texture load (upload to GPU failed), %lu free", target.l.path.c_str(), linearSpaceFree());
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
             target.inited = false;
             return;
@@ -1172,7 +1223,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
             if(to_mask_2)
             {
                 C2D_Flush();
-                C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+                s_resetBlend();
             }
 
             yDst += (1024 - ySrc) * hDst / hSrc;
@@ -1208,7 +1259,7 @@ void minport_RenderTexturePrivate(int16_t xDst, int16_t yDst, int16_t wDst, int1
         if(to_mask)
         {
             C2D_Flush();
-            C3D_AlphaBlend(GPU_BLEND_ADD, GPU_BLEND_ADD, GPU_SRC_ALPHA, GPU_ONE_MINUS_SRC_ALPHA, GPU_ONE, GPU_ONE_MINUS_SRC_ALPHA);
+            s_resetBlend();
         }
     }
 
