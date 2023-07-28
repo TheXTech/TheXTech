@@ -1323,14 +1323,18 @@ void UpdateNPCs()
                                         if(CheckCollision(NPC[A].Location, NPC[B].Location))
                                         {
                                             NPCHit(B, 3, A);
+
                                             if(NPC[B].Killed > 0)
                                             {
                                                 NPC[B].Location.SpeedX = Physics.NPCShellSpeed * 0.5 * -Player[NPC[A].HoldingPlayer].Direction;
                                                 NPCHit(A, 5, B);
                                             }
+
                                             if(NPC[A].Killed > 0)
                                                 NPC[A].Location.SpeedX = Physics.NPCShellSpeed * 0.5 * Player[NPC[A].HoldingPlayer].Direction;
-                                            break;
+
+                                            if(!g_compatibility.fix_held_item_cancel || NPC[A].Killed || NPC[B].Killed)
+                                                break;
                                         }
                                     }
                                 }

@@ -121,6 +121,7 @@ static void compatInit(Compatibility_t &c)
     c.custom_powerup_collect_score = true;
     c.fix_player_crush_death = true;
     c.fix_pound_skip_warp = true;
+    c.fix_held_item_cancel = true;
     c.modern_section_change = true;
 
 
@@ -168,6 +169,7 @@ static void compatInit(Compatibility_t &c)
         c.custom_powerup_collect_score = false;
         c.fix_player_crush_death = false;
         c.fix_pound_skip_warp = false;
+        c.fix_held_item_cancel = false;
         c.modern_section_change = false;
     }
 
@@ -415,6 +417,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // compat.read("custom-powerup-collect-score", c.custom_powerup_collect_score, c.custom_powerup_collect_score);
         compat.read("fix-player-crush-death", c.fix_player_crush_death, c.fix_player_crush_death);
         compat.read("fix-pound-skip-warp", c.fix_pound_skip_warp, c.fix_pound_skip_warp);
+        compat.read("fix-held-item-cancel", c.fix_held_item_cancel, c.fix_held_item_cancel);
         compat.read("modern-section-change", c.modern_section_change, c.modern_section_change);
     }
     // 1.3.4
