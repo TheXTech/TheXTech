@@ -60,10 +60,14 @@ void SetupGraphics();
 //! DUMMY AND USELESS
 void SetupEditorGraphics();
 // Public Sub SetupScreens()
-void SetupScreens();
+void SetupScreens(bool reset = true);
 // Public Sub DynamicScreen() 'for the split screen stuff
 // for the split screen stuff
 void DynamicScreen();
+
+// NEW: moves qScreen towards vScreen, now including the screen size
+bool Update_qScreen(int Z, int camRate = 2, int resizeRate = 2);
+
 // Public Sub SuperPrint(SuperWords As String, Font As Integer, X As Single, Y As Single) 'prints text to the screen
 // prints text to the screen
 int SuperTextPixLen(int SuperN, const char* SuperChars, int Font);

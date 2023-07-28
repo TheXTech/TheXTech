@@ -90,6 +90,7 @@ struct Compatibility_t
     bool custom_powerup_collect_score; // collected powerups give score from npc-X.txt
     bool fix_player_crush_death; // player should not be crushed by corners of slopes or by hitting a horizontally moving ceiling
     bool fix_pound_skip_warp; // ground pound state should not skip instant / portal warps
+    bool modern_section_change; // fix glitches and improve animations for section resize
     unsigned int bitblit_background_colour[3];
 
     // SpeedRun section
