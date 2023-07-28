@@ -46,6 +46,8 @@ Changelog for 1.3.6.1
 -Keyhole framerate fix will be enabled by default (@Wohlstand, @0lhi)
 -Fixed vanilla bug where player could fall through an Instant/Portal warp while performing the "Pound" move. (@ds-sloth)
 -Fixed vanilla bug where held item would not affect a hostile NPC that intersects with an immune NPC (such as an egg container). (@ds-sloth)
+-Fixed vanilla bug where engine would appear to break if an event changed the boundaries of a different section. (@ds-sloth)
+-Added modern animations for section boundary change in multiplayer. (@ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)
