@@ -817,6 +817,18 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Special2 ++;
         }
 
+        // multistars
+        if((type == NPCID_STAR_SMW || type == NPCID_STAR_SMB3) && FileFormat == FileFormats::LVL_PGEX)
+        {
+            std::string&& star_index = EditorCursor.NPC.Variant ? fmt::format_ne(g_editorStrings.phraseGenericIndex, (int)(EditorCursor.NPC.Variant)) : g_editorStrings.fileFormatLegacy;
+            SuperPrintCenterR(mode, star_index, 3, e_ScreenW - 120, 220);
+
+            if(EditorCursor.NPC.Variant > 0 && UpdateButton(mode, e_ScreenW - 160 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+                EditorCursor.NPC.Variant --;
+            if(EditorCursor.NPC.Variant < 20 && UpdateButton(mode, e_ScreenW - 120 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+                EditorCursor.NPC.Variant ++;
+        }
+
         const NPC_Variant_Data_t* data = find_Variant_Data(EditorCursor.NPC.Type);
 
         // special case for NPCID_BOWSER_SMB3 since it also has the Legacy button

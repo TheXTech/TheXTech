@@ -117,6 +117,7 @@ struct EditorContent
     std::string phraseSectionIndex;
     std::string phraseRadiusIndex;
     std::string phraseWarpIndex;
+    std::string phraseGenericIndex;
     std::string phraseCountMore;
     std::string phraseDelayIsMs;
     std::string mapPos;
