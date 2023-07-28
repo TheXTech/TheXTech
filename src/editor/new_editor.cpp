@@ -235,10 +235,18 @@ void SetEditorNPCType(int type)
             EditorCursor.NPC.Special = 0;
     }
 
+    // reset Special2 for NPCs that don't allow it
+    if(!(EditorCursor.NPC.Type == NPCID_POTIONDOOR || EditorCursor.NPC.Type == NPCID_POTION
+        || (EditorCursor.NPC.Type == NPCID_BURIEDPLANT && EditorCursor.NPC.Special == NPCID_POTION)))
+    {
+        EditorCursor.NPC.Special2 = 0;
+    }
+
     // reset legacy for the NPCs that don't allow it
     if(!(type == NPCID_BOOMBOOM || type == NPCID_BIRDO || type == NPCID_BOWSER_SMB3))
         EditorCursor.NPC.Legacy = false;
 
+    // reset Variant data across different NPCs
     if(find_Variant_Data(prev_type) != find_Variant_Data(type))
     {
         if(FileFormat == FileFormats::LVL_PGEX)
@@ -248,6 +256,10 @@ void SetEditorNPCType(int type)
         else
             EditorCursor.NPC.Variant = 0;
     }
+
+    // reset Variant data for NPCs that don't support it
+    if(find_Variant_Data(type) == nullptr && !(type == NPCID_STAR_SMW || type == NPCID_STAR_SMB3))
+        EditorCursor.NPC.Variant = 0;
 
     // turn into new type if can't be in bubble anymore
     if(EditorCursor.NPC.Type == 283 && !AllowBubble())
