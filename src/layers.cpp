@@ -865,6 +865,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             SetupScreens(false);
                             DynamicScreen();
                             // CenterScreens();
+
                             if(vScreen[2].Visible)
                             {
                                 for(int Z = 1; Z <= 2; Z++)
@@ -887,7 +888,9 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                     GetvScreen(Z);
                             }
                             else
+                            {
                                 GetvScreenAverage();
+                            }
 
                             // set the qScreen!
                             qScreen = true;
@@ -895,40 +898,48 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             // set the second qScreen if possible
                             if(vScreen[2].Visible)
-                            {
                                 qScreenLoc[2] = vScreen[2];
-                            }
 
                             // special code to indicate the direction the other player was warped from
                             if(warped_plr && !vScreen[2].Visible)
                             {
+                                // total distance of warp
                                 double dSquare = tX * tX + tY * tY;
 
+                                // project onto the circle: proportion of distance from each axis
                                 double xProp = tX * tX / dSquare;
                                 double yProp = tY * tY / dSquare;
 
                                 if(tX < 0)
                                     xProp *= -1;
+
                                 if(tY < 0)
                                     yProp *= -1;
 
+                                // maximum total shift of 1/4 of the vScreen's size; also limit by 200x150 (SMBX64 amount)
                                 double maxShiftX = vScreen[1].Width / 4;
                                 double maxShiftY = vScreen[1].Height / 4;
+
                                 if(maxShiftX > 200)
                                     maxShiftX = 200;
+
                                 if(maxShiftY > 150)
                                     maxShiftY = 150;
 
+                                // apply the shift
                                 qScreenLoc[1].X += maxShiftX * xProp;
                                 qScreenLoc[1].Y += maxShiftY * yProp;
 
                                 // restrict to old level bounds
                                 if(-qScreenLoc[1].X < level[B].X)
                                     qScreenLoc[1].X = -level[B].X;
+
                                 if(-qScreenLoc[1].X + vScreen[1].Width > level[B].Width)
                                     qScreenLoc[1].X = -(level[B].Width - vScreen[1].Width);
+
                                 if(-qScreenLoc[1].Y < level[B].Y)
                                     qScreenLoc[1].Y = -level[B].Y;
+
                                 if(-qScreenLoc[1].Y + vScreen[1].Height > level[B].Height)
                                     qScreenLoc[1].Y = -(level[B].Height - vScreen[1].Height);
                             }
@@ -965,7 +976,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             qScreen = true;
                             qScreenLoc[1] = vScreen[1];
 
-                            // pan to indicate warped player
+                            // pan to indicate warped player, in the direction the screen was previously split
                             if(int(screenLoc.Width) == 400)
                             {
                                 if(qScreenLoc[1].X < screenLoc.X + screenLoc.Left)
@@ -985,13 +996,17 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             // restrict to old level bounds
                             if(-qScreenLoc[1].X < level[B].X)
                                 qScreenLoc[1].X = -level[B].X;
+
                             if(-qScreenLoc[1].X + ScreenW /*FrmMain.ScaleWidth*/ > level[B].Width)
                                 qScreenLoc[1].X = -(level[B].Width - ScreenW);
+
                             if(-qScreenLoc[1].Y < level[B].Y)
                                 qScreenLoc[1].Y = -level[B].Y;
+
                             if(-qScreenLoc[1].Y + ScreenH /*FrmMain.ScaleHeight*/ > level[B].Height)
                                 qScreenLoc[1].Y = -(level[B].Height - ScreenH);
 
+                            // restore the new level
                             level[B] = static_cast<Location_t>(s.position);
                         }
                         else
