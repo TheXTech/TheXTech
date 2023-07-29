@@ -827,6 +827,8 @@ void UpdateGraphics(bool skipRepaint)
 
     g_stats.reset();
 
+    bool continue_qScreen = false;
+
     // prepare to fill this frame's NoReset queue
     std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
     NPCQueues::NoReset.clear();
@@ -855,24 +857,13 @@ void UpdateGraphics(bool skipRepaint)
                 GetvScreen(Z);
         }
 
+        // moved to `graphics/gfx_screen.cpp`
         if(!Do_FrameSkip && qScreen)
-        {
-            if(vScreen[1].X < qScreenLoc[1].X - 2)
-                qScreenLoc[1].X -= 2;
-            else if(vScreen[1].X > qScreenLoc[1].X + 2)
-                qScreenLoc[1].X += 2;
-            if(vScreen[1].Y < qScreenLoc[1].Y - 2)
-                qScreenLoc[1].Y -= 2;
-            else if(vScreen[1].Y > qScreenLoc[1].Y + 2)
-                qScreenLoc[1].Y += 2;
+            continue_qScreen |= Update_qScreen(Z);
 
-            if(qScreenLoc[1].X < vScreen[1].X + 5 && qScreenLoc[1].X > vScreen[1].X - 5 &&
-               qScreenLoc[1].Y < vScreen[1].Y + 5 && qScreenLoc[1].Y > vScreen[1].Y - 5)
-                qScreen = false;
-
-            vScreen[1].X = qScreenLoc[1].X;
-            vScreen[1].Y = qScreenLoc[1].Y;
-        }
+        // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
+        if(Z == 2 && !g_compatibility.modern_section_change)
+            continue_qScreen = false;
 
         // noturningback
         if(!LevelEditor && NoTurnBack[Player[Z].Section])
@@ -995,6 +986,10 @@ void UpdateGraphics(bool skipRepaint)
     // we've now done all the logic that UpdateGraphics can do.
     if(Do_FrameSkip)
         return;
+
+    // only updated on non-frameskip in vanilla
+    qScreen = continue_qScreen;
+
 
     XRender::setTargetTexture();
 

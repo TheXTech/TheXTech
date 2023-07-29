@@ -91,6 +91,7 @@ struct Compatibility_t
     bool fix_player_crush_death; // player should not be crushed by corners of slopes or by hitting a horizontally moving ceiling
     bool fix_pound_skip_warp; // ground pound state should not skip instant / portal warps
     bool fix_held_item_cancel; // do not cancel held item hitting hostile NPC that intersects with an immune NPC
+    bool modern_section_change; // fix glitches and improve animations for section resize
     unsigned int bitblit_background_colour[3];
 
     // SpeedRun section
