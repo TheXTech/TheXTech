@@ -940,7 +940,10 @@ void lazyLoad(StdPicture& target)
         else
         {
             FI_tex = robust_FILoad(target.l.path, target.w);
-            FIBITMAP* FI_mask_rgba = robust_FILoad(target.l.mask_path, target.w);
+            FIBITMAP* FI_mask_rgba = nullptr;
+            if(!target.l.mask_path.empty())
+                FI_mask_rgba = robust_FILoad(target.l.mask_path, target.w);
+
             if(FI_mask_rgba)
             {
                 FIBITMAP* FI_mask_lum = nullptr;
