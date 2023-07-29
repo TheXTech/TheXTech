@@ -304,7 +304,7 @@ static C2D_Image s_RawToSwizzledRGBA(const uint8_t* src, uint32_t wsrc, uint32_t
 
     C3D_TexSetFilter(img.tex, GPU_NEAREST, GPU_NEAREST);
     C3D_TexSetWrap(img.tex, GPU_CLAMP_TO_BORDER, GPU_CLAMP_TO_BORDER);
-    img.tex->border = 0xFFFFFFFF;
+    img.tex->border = mask ? 0xFFFFFFFF : 0x00FFFFFF;
 
     for(u32 y = 0; y < hdst; y++)
     {
@@ -574,12 +574,13 @@ void repaint()
     // constexpr int shift = MAX_3D_OFFSET / 2;
     constexpr double shift_i[] = {shift, shift * 0.4, 0, shift * -0.4};
 
-    s_mergeBlend();
-
     s_depth_slider = osGet3DSliderState();
 
     s_cur_target = nullptr;
     C2D_ViewReset();
+
+    C2D_Flush();
+    s_mergeBlend();
 
     // in this case, the level graphics have already been rescaled to the bottom screen
     if(g_screen_swapped && (LevelEditor || MagicHand) && editorScreen.active)
