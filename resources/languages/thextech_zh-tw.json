@@ -321,7 +321,8 @@
             "phraseCreditIndex": "地圖製作團隊 第{0}行：",
             "retryOnFail": "失敗之後重新開始",
             "totalStars": "總星星數："
-        }
+        },
+        "phraseGenericIndex": "編號：{0}"
     },
     "game": {
         "connect": {
