@@ -149,7 +149,7 @@ void TranslateEpisode::loadLevelTranslation(const std::string& key)
     TrLevelParser parser;
     parser.m_wantedKey = key;
 
-    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "r");
+    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "rb");
     if(!f_in)
         return;
 
@@ -169,7 +169,7 @@ void TranslateEpisode::loadWorldTranslation(const std::string& key)
     TrWorldParser parser;
     parser.m_wantedKey = key;
 
-    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "r");
+    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "rb");
     if(!f_in)
         return;
 
@@ -194,7 +194,7 @@ void TranslateEpisode::loadLunaScript(const std::string& key)
     parser.m_outputLines = &m_scriptLines;
     parser.m_outputTrIdLines = &m_scriptTrId;
 
-    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "r");
+    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "rb");
     if(!f_in)
         return;
 
@@ -217,7 +217,7 @@ bool TranslateEpisode::tryTranslateTitle(const std::string& episodePath,
     parser.m_toWrite = &output;
     parser.m_wantedWorld = worldFile;
 
-    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "r");
+    FILE *f_in = Files::utf8_fopen(langFile.c_str(), "rb");
     if(!f_in)
         return false;
 
