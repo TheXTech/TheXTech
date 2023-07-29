@@ -30,7 +30,7 @@ for dirpath, _, files in os.walk(datadir, topdown=True):
                 font.read(rfn)
 
                 if 'font-map' in font:
-                    if 'texture-scale' in font['font-map'] and font['font-map']['texture-scale'].strip != '1':
+                    if 'texture-scale' in font['font-map'] and font['font-map']['texture-scale'].strip() != '1':
                         if 'texture' in font['font-map']:
                             tex_string = font['font-map']['texture'].strip().strip('\"')
                             print(f"{tex_string} is 1x")
