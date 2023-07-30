@@ -30,15 +30,13 @@ jobs:
             name: "3DS",
             id: "3ds",
             docker_image: "devkitpro/devkitarm",
-            upload_directory: "www/3ds/",
-            package_ext: "romfs"
+            upload_directory: "www/3ds/"
           }
         - {
             name: "Wii",
             id: "wii",
             docker_image: "devkitpro/devkitppc",
-            upload_directory: "www/wii/",
-            package_ext: "zip"
+            upload_directory: "www/wii/"
           }
         source:
         # ======================================= Adventures of Demo =======================================
@@ -72,7 +70,7 @@ jobs:
       id: res
       shell: bash
       run: |
-        echo "filename=assets-${{ matrix.source.id }}-${{ matrix.target.id }}.${{ matrix.target.package_ext }}" >> $GITHUB_OUTPUT;
+        echo "filename=assets-${{ matrix.source.id }}-${{ matrix.target.id }}.zip" >> $GITHUB_OUTPUT;
         echo "The target will be named: [assets-${{ matrix.source.id }}-${{ matrix.target.id }}.${{ matrix.target.package_ext }}]"
 
     - uses: styfle/cancel-workflow-action@0.11.0
@@ -132,7 +130,8 @@ jobs:
       if: matrix.target.id == '3ds'
       shell: bash
       run: |
-        mkromfs3ds assets/target package/${{ steps.res.outputs.filename }}
+        mkromfs3ds assets/target package/${{ steps.res.outputs.filename }}.romfs
+        zip -9 "package/${{ steps.res.outputs.filename }}" "package/${{ steps.res.outputs.filename }}.romfs"
 
     - name: Package for Wii
       if: matrix.target.id == 'wii'
