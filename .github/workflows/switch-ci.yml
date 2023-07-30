@@ -163,7 +163,7 @@ jobs:
         name: ${{ matrix.config.name }} ${{ matrix.config.build_type }}
 
     - name: Deploy to builds.wohlsoft.ru
-      if: success() && github.event_name != 'pull_request' && ${{ steps.event-check.is_pull_request == 'false' }} && ${{ steps.upload-check.outputs.available == 'true' }}
+      if: success() && github.event_name != 'pull_request' && ${{ steps.event-check.outputs.is_pull_request == 'false' }} && ${{ steps.upload-check.outputs.available == 'true' }}
       continue-on-error: true
       shell: bash
       run: |
