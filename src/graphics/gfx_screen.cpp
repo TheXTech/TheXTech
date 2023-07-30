@@ -540,17 +540,17 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     double resizeRateX = resizeRate;
     double resizeRateY = resizeRate;
 
-    double camFramesX_l = std::abs(vScreen[Z].X - qScreenLoc[Z].X)/camRateX;
-    double camFramesY_t = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y)/camRateY;
+    double camFramesX_l = std::abs(vScreen[Z].X - qScreenLoc[Z].X) / camRateX;
+    double camFramesY_t = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y) / camRateY;
 
-    double camFramesX_r = std::abs(vScreen[Z].X - vScreen[Z].Width - qScreenLoc[Z].X + qScreenLoc[Z].Width)/camRateX;
-    double camFramesY_b = std::abs(vScreen[Z].Y - vScreen[Z].Height - qScreenLoc[Z].Y + qScreenLoc[Z].Height)/camRateY;
+    double camFramesX_r = std::abs(vScreen[Z].X - vScreen[Z].Width - qScreenLoc[Z].X + qScreenLoc[Z].Width) / camRateX;
+    double camFramesY_b = std::abs(vScreen[Z].Y - vScreen[Z].Height - qScreenLoc[Z].Y + qScreenLoc[Z].Height) / camRateY;
 
     double camFramesX = SDL_min(camFramesX_l, camFramesX_r);
     double camFramesY = SDL_min(camFramesY_t, camFramesY_b);
 
-    double resizeFramesX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft)/resizeRateX;
-    double resizeFramesY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop)/resizeRateY;
+    double resizeFramesX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft) / resizeRateX;
+    double resizeFramesY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop) / resizeRateY;
 
     if(!g_compatibility.modern_section_change)
     {
@@ -627,7 +627,7 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     vScreen[Z].X = qScreenLoc[Z].X;
     vScreen[Z].Y = qScreenLoc[Z].Y;
 
-    // for now -- eventually may want to set width/height another way
+    // update vScreen width / height
     if(g_compatibility.modern_section_change)
     {
         vScreen[Z].Width -= 2*(std::floor(qScreenLoc[Z].ScreenLeft) - vScreen[Z].ScreenLeft);

@@ -708,9 +708,8 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
     // this is for events that have just been triggered
     int B = 0;
-    int C = 0;
+    // int C = 0;
     int D = 0;
-    int plr = 0;
     bool tempBool = false;
     Location_t tempLevel;
     Location_t newLevel;
@@ -763,24 +762,24 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                     AutoY[B] = s.autoscroll_y;
                 }
 
-                int warped_player = 0;
+                int onscreen_plr = 0;
+                int warped_plr = 0;
+
+                bool is_reset = int(s.position.X) == EventSection_t::LESet_ResetDefault;
 
                 /* Resize the section boundaries */
-                if(int(s.position.X) == EventSection_t::LESet_ResetDefault && !g_compatibility.modern_section_change)
+                if(is_reset && !g_compatibility.modern_section_change)
                     level[B] = LevelREAL[B];
                 else if(int(s.position.X) != EventSection_t::LESet_Nothing)
                 {
                     tempLevel = level[B];
-                    if(int(s.position.X) == EventSection_t::LESet_ResetDefault)
-                        newLevel = LevelREAL[B];
-                    else
-                        newLevel = static_cast<Location_t>(s.position);
+                    newLevel = (is_reset) ? LevelREAL[B] : static_cast<Location_t>(s.position);
                     level[B] = newLevel;
 
                     // warp other players to resized section, if not a reset
-                    if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start") && int(s.position.X) != EventSection_t::LESet_ResetDefault)
+                    if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start"))
                     {
-                        for(C = 1; C <= numPlayers; C++)
+                        for(int C = 1; C <= numPlayers; C++)
                         {
                             // If .Section = B Then
                             // Should set this only if the warp is successful!
@@ -797,11 +796,16 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                         if(Player[C].Location.Y <= level[B].Height)
                                         {
                                             tempBool = true; // Check to see if player is still in section after resizing
-                                            plr = C;
+                                            onscreen_plr = C;
+                                            Player[C].Section = B;
                                         }
                                     }
                                 }
                             }
+
+                            // don't warp on reset
+                            if(is_reset)
+                                continue;
 
                             if(!tempBool)
                             {
@@ -817,7 +821,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                                 {
                                                     if(Player[D].Location.Y <= level[B].Height) // Move to another player who is still in the section
                                                     {
-                                                        warped_player = C;
+                                                        warped_plr = C;
 
                                                         Player[C].Section = B;
                                                         Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
@@ -836,24 +840,23 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         }
                     }
 
-                    // start the qScreen animation
+                    // start the modern qScreen animation
                     if(!equalCase(evt.Name, "Level - Start") && g_compatibility.modern_section_change)
                     {
                         // the onscreen player
-                        C = plr;
-                        if(plr == 0)
+                        if(onscreen_plr == 0)
                         {
                             // no qScreen because there were no onscreen players
                         }
-                        if(numPlayers == 2)
+                        else if(numPlayers == 2)
                         {
                             double tX = 0.0;
                             double tY = 0.0;
 
-                            if(warped_player)
+                            if(warped_plr)
                             {
-                                tX = vScreen[warped_player].X - vScreen[C].X;
-                                tY = vScreen[warped_player].Y - vScreen[C].Y;
+                                tX = vScreen[warped_plr].X - vScreen[onscreen_plr].X;
+                                tY = vScreen[warped_plr].Y - vScreen[onscreen_plr].Y;
                             }
 
                             SoundPause[13] = 10;
@@ -862,6 +865,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             SetupScreens(false);
                             DynamicScreen();
                             CenterScreens();
+
                             if(vScreen[2].Visible)
                             {
                                 for(int Z = 1; Z <= 2; Z++)
@@ -884,7 +888,9 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                     GetvScreen(Z);
                             }
                             else
+                            {
                                 GetvScreenAverage();
+                            }
 
                             // set the qScreen!
                             qScreen = true;
@@ -892,41 +898,50 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             // set the second qScreen if possible
                             if(vScreen[2].Visible)
-                            {
                                 qScreenLoc[2] = vScreen[2];
-                            }
 
                             // special code to indicate the direction the other player was warped from
-                            if(warped_player && !vScreen[2].Visible)
+                            if(warped_plr && !vScreen[2].Visible)
                             {
+                                // total distance of warp
                                 double dSquare = tX * tX + tY * tY;
 
+                                // project onto the circle: proportion of distance from each axis
                                 double xProp = tX * tX / dSquare;
                                 double yProp = tY * tY / dSquare;
 
                                 if(tX < 0)
                                     xProp *= -1;
+
                                 if(tY < 0)
                                     yProp *= -1;
 
+                                // maximum total shift of 1/4 of the vScreen's size; also limit by 200x150 (SMBX64 amount)
                                 double maxShiftX = vScreen[1].Width / 4;
                                 double maxShiftY = vScreen[1].Height / 4;
+
                                 if(maxShiftX > 200)
                                     maxShiftX = 200;
+
                                 if(maxShiftY > 150)
                                     maxShiftY = 150;
 
+                                // apply the shift
                                 qScreenLoc[1].X += maxShiftX * xProp;
                                 qScreenLoc[1].Y += maxShiftY * yProp;
 
-                                if(-qScreenLoc[1].X < level[Player[C].Section].X)
-                                    qScreenLoc[1].X = -level[Player[C].Section].X;
-                                if(-qScreenLoc[1].X + vScreen[1].Width > level[Player[C].Section].Width)
-                                    qScreenLoc[1].X = -(level[Player[C].Section].Width - vScreen[1].Width);
-                                if(-qScreenLoc[1].Y < level[Player[C].Section].Y)
-                                    qScreenLoc[1].Y = -level[Player[C].Section].Y;
-                                if(-qScreenLoc[1].Y + vScreen[1].Height > level[Player[C].Section].Height)
-                                    qScreenLoc[1].Y = -(level[Player[C].Section].Height - vScreen[1].Height);
+                                // restrict to old level bounds
+                                if(-qScreenLoc[1].X < level[B].X)
+                                    qScreenLoc[1].X = -level[B].X;
+
+                                if(-qScreenLoc[1].X + vScreen[1].Width > level[B].Width)
+                                    qScreenLoc[1].X = -(level[B].Width - vScreen[1].Width);
+
+                                if(-qScreenLoc[1].Y < level[B].Y)
+                                    qScreenLoc[1].Y = -level[B].Y;
+
+                                if(-qScreenLoc[1].Y + vScreen[1].Height > level[B].Height)
+                                    qScreenLoc[1].Y = -(level[B].Height - vScreen[1].Height);
                             }
 
                             // restore the new level
@@ -996,11 +1011,10 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                     // legacy qScreen animation
                     else if(!equalCase(evt.Name, "Level - Start"))
                     {
-                        C = plr;
                         if(numPlayers == 2 && DScreenType != 5)
                         {
                             level[B] = tempLevel;
-                            screenLoc = vScreen[C];
+                            screenLoc = vScreen[onscreen_plr];
                             SoundPause[13] = 10;
 
                             DynamicScreen();
@@ -1020,9 +1034,9 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             // enable qScreen!
                             qScreen = true;
-                            qScreenLoc[1] = screenLoc;
+                            qScreenLoc[1] = vScreen[1];
 
-                            // pan to indicate warped player
+                            // pan to indicate warped player, in the direction the screen was previously split
                             if(int(screenLoc.Width) == 400)
                             {
                                 if(qScreenLoc[1].X < screenLoc.X + screenLoc.Left)
@@ -1039,15 +1053,21 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                     qScreenLoc[1].Y -= 150;
                             }
 
-                            if(-qScreenLoc[1].X < level[Player[C].Section].X)
-                                qScreenLoc[1].X = -level[Player[C].Section].X;
-                            if(-qScreenLoc[1].X + vScreen[1].Width > level[Player[C].Section].Width)
-                                qScreenLoc[1].X = -(level[Player[C].Section].Width - vScreen[1].Width);
-                            if(-qScreenLoc[1].Y < level[Player[C].Section].Y)
-                                qScreenLoc[1].Y = -level[Player[C].Section].Y;
-                            if(-qScreenLoc[1].Y + vScreen[1].Height > level[Player[C].Section].Height)
-                                qScreenLoc[1].Y = -(level[Player[C].Section].Height - vScreen[1].Height);
+                            // restrict to old level bounds
+                            // FIXME: vScreen[1].Width / vScreen[1].Height was ScreenW / ScreenH. Should adjust to be logical ScreenW.
+                            if(-qScreenLoc[1].X < level[B].X)
+                                qScreenLoc[1].X = -level[B].X;
 
+                            if(-qScreenLoc[1].X + vScreen[1].Width /*FrmMain.ScaleWidth*/ > level[B].Width)
+                                qScreenLoc[1].X = -(level[B].Width - ScreenW);
+
+                            if(-qScreenLoc[1].Y < level[B].Y)
+                                qScreenLoc[1].Y = -level[B].Y;
+
+                            if(-qScreenLoc[1].Y + vScreen[1].Height /*FrmMain.ScaleHeight*/ > level[B].Height)
+                                qScreenLoc[1].Y = -(level[B].Height - ScreenH);
+
+                            // restore the new level
                             level[B] = static_cast<Location_t>(s.position);
                         }
                         else
@@ -1058,7 +1078,6 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                         resetFrameTimer();
                     }
-
                 }
             }
 

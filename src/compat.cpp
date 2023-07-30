@@ -122,12 +122,13 @@ static void compatInit(Compatibility_t &c)
     c.custom_powerup_collect_score = true;
     c.fix_player_crush_death = true;
     c.fix_pound_skip_warp = true;
+    c.fix_held_item_cancel = true;
+    c.modern_section_change = true;
     // 1.3.7
     c.free_level_res = true;
     c.free_world_res = true;
     c.NPC_activate_mode = NPC_activate_modes::smart;
     c.disable_background2_tiling = false;
-    c.modern_section_change = true;
 
 
     if(s_compatLevel >= COMPAT_SMBX2) // Make sure that bugs were same as on SMBX2 Beta 4 on this moment
@@ -174,11 +175,12 @@ static void compatInit(Compatibility_t &c)
         c.custom_powerup_collect_score = false;
         c.fix_player_crush_death = false;
         c.fix_pound_skip_warp = false;
+        c.fix_held_item_cancel = false;
+        c.modern_section_change = false;
         // 1.3.7
         c.free_level_res = false;
         c.free_world_res = false;
         c.NPC_activate_mode = NPC_activate_modes::onscreen;
-        c.modern_section_change = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -425,6 +427,8 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // compat.read("custom-powerup-collect-score", c.custom_powerup_collect_score, c.custom_powerup_collect_score);
         compat.read("fix-player-crush-death", c.fix_player_crush_death, c.fix_player_crush_death);
         compat.read("fix-pound-skip-warp", c.fix_pound_skip_warp, c.fix_pound_skip_warp);
+        compat.read("fix-held-item-cancel", c.fix_held_item_cancel, c.fix_held_item_cancel);
+        compat.read("modern-section-change", c.modern_section_change, c.modern_section_change);
         // 1.3.7 (but these will be changed in the Compat update)
         compat.read("free-level-res", c.free_level_res, c.free_level_res);
         compat.read("free-world-res", c.free_world_res, c.free_world_res);
@@ -437,7 +441,6 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         };
         compat.readEnum("npc-activate-mode", c.NPC_activate_mode, c.NPC_activate_mode, activModes);
         compat.read("disable-background2-tiling", c.disable_background2_tiling, c.disable_background2_tiling);
-        compat.read("modern-section-change", c.modern_section_change, c.modern_section_change);
     }
     // 1.3.4
     compat.read("fix-player-filter-bounce", c.fix_player_filter_bounce, c.fix_player_filter_bounce);

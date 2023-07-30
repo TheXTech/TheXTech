@@ -685,7 +685,7 @@ FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_do
     if(FreeImage_GetBPP(image) == 32)
         return fast2xScaleDown(image);
 
-    if(FreeImage_GetBPP(image) != 1 && FreeImage_GetBPP(image) != 4 && FreeImage_GetBPP(image) != 8)
+    if(FreeImage_GetBPP(image) != 1 && FreeImage_GetBPP(image) != 4 && FreeImage_GetBPP(image) != 8 && FreeImage_GetBPP(image) != 24)
         return nullptr;
 
     auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
@@ -729,6 +729,26 @@ FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_do
                 uint8_t which_bit = 64 >> ((x % 4) * 2);
                 bool lit = src_pixels[y * src_stride + x / 4] & which_bit;
                 dest_pixels[y * dest_px_stride + x] = palette[lit];
+            }
+        }
+
+        return dest;
+    }
+
+    // special logic for 24 BPP
+    if(FreeImage_GetBPP(image) == 24)
+    {
+        src_pixel_stride = 6;
+        uint8_t* dest_pixel_components = reinterpret_cast<uint8_t*>(dest_pixels);
+
+        for(uint32_t y = 0; y < src_h / 2; y++)
+        {
+            for(uint32_t x = 0; x < src_w / 2; x++)
+            {
+                dest_pixel_components[(y * dest_px_stride + x) * 4 + 0] = src_pixels[y * src_stride + x * src_pixel_stride + 0];
+                dest_pixel_components[(y * dest_px_stride + x) * 4 + 1] = src_pixels[y * src_stride + x * src_pixel_stride + 1];
+                dest_pixel_components[(y * dest_px_stride + x) * 4 + 2] = src_pixels[y * src_stride + x * src_pixel_stride + 2];
+                dest_pixel_components[(y * dest_px_stride + x) * 4 + 3] = 255;
             }
         }
 

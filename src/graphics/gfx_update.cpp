@@ -1495,6 +1495,7 @@ void UpdateGraphics(bool skipRepaint)
                                 }
                             }
                         }
+
                         if(C == 0)
                         {
                             for(int B = 1; B <= numPlayers; B++)
@@ -1509,6 +1510,7 @@ void UpdateGraphics(bool skipRepaint)
                                 }
                             }
                         }
+
                         Player[A].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[A].Location.Width / 2.0;
                         Player[A].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[A].Location.Height;
                         Player[A].Section = Player[D].Section;
@@ -1557,9 +1559,7 @@ void UpdateGraphics(bool skipRepaint)
                     NPCWidthGFX[NPC[A].Type], NPCHeight[NPC[A].Type]);
 
                 if(vScreenCollision(Z, NPC[A].Location) || vScreenCollision(Z, loc2))
-                {
                     NPC_Draw_Queue_p.add(A);
-                }
             }
         }
     }
@@ -1568,6 +1568,7 @@ void UpdateGraphics(bool skipRepaint)
     if(Do_FrameSkip)
         return;
 
+    // only updated on non-frameskip in vanilla
     qScreen = continue_qScreen;
 
 

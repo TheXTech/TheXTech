@@ -356,7 +356,7 @@ bool Files::dumpFile(const std::string& inPath, std::string& outData)
 {
     off_t end;
     bool ret = true;
-    FILE *in = Files::utf8_fopen(inPath.c_str(), "r");
+    FILE *in = Files::utf8_fopen(inPath.c_str(), "rb");
     if(!in)
         return false;
 

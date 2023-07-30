@@ -322,7 +322,8 @@
             "phraseCreditIndex": "Титры, стрка {0}:",
             "retryOnFail": "Переигр. сразу",
             "totalStars": "Всего звёзд:"
-        }
+        },
+        "phraseGenericIndex": "Номер {0}"
     },
     "game": {
         "connect": {
