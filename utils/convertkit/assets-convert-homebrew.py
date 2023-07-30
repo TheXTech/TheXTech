@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('input')
 parser.add_argument('output')
-parser.add_argument('-t', '--target', choices=['3ds',' wii'], required=True)
+parser.add_argument('-t', '--target', choices=['3ds', 'wii'], required=True)
 
 args = parser.parse_args()
 
