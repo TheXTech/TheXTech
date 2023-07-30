@@ -17,7 +17,7 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.source.name }} for ${{ matrix.target.name }})
+    name: ${{ matrix.source.name }} for ${{ matrix.target.name }}
     runs-on: ubuntu-latest
     container: ${{ matrix.target.docker_image }}
     env:
@@ -90,14 +90,12 @@ jobs:
       shell: bash
       continue-on-error: true
       run: |
-        pwd
-        git clone https://github.com/ds-sloth/spc2it
-        cd spc2it
+        git clone https://github.com/ds-sloth/spc2it ../spc2it
+        cd ../spc2it
         meson build
         cd build
         ninja
         cp spc2it /usr/bin/spc2it
-        cd ../..
 
     - uses: actions/checkout@v3
 
@@ -105,48 +103,43 @@ jobs:
       uses: carlosperate/download-file-action@v2
       with:
         file-url: "${{ matrix.source.assets_url }}"
-        file-name: assets.7z
+        file-name: assets-source.7z
 
     - name: Unpack assets
       shell: bash
       run: |
-        pwd
-        mkdir -p assets/orig
-        cd assets/orig
-        7z x ../../assets.7z
+        mkdir -p assets/source
+        cd assets/source
+        7z x ../../assets-source.7z
         cd ../..
-        rm assets.7z
+        rm assets-source.7z
 
         mkdir -p package
-
-        cd assets
 
     - name: Convert assets
       shell: bash
       run: |
-        pwd
-        python3 ../utils/convertkit/assets-convert-homebrew.py -t ${{ matrix.target.id }} orig conv
+        cd assets
+        python3 ../utils/convertkit/assets-convert-homebrew.py -t ${{ matrix.target.id }} source target
 
     - name: Package for 3DS
       if: matrix.target.id == '3ds'
       shell: bash
       run: |
-        pwd
-        mkromfs3ds conv ../package/${{ steps.res.filename }}
+        mkromfs3ds assets/target package/${{ steps.res.filename }}
 
     - name: Package for Wii
       if: matrix.target.id == 'wii'
       shell: bash
       run: |
-        pwd
-        zip -9 -r "../package/${{ steps.res.filename }}" "conv"
+        zip -9 -r "package/${{ steps.res.filename }}" "assets/target"
 
     - name: Upload artifact
       if: success()
       uses: actions/upload-artifact@v3
       continue-on-error: true
       with:
-        path: ../package/${{ steps.res.filename }}
+        path: package/${{ steps.res.filename }}
         name: ${{ matrix.source.name }} Assets (${{ matrix.target.name }})
 
     - name: Deploy to builds.wohlsoft.ru
@@ -154,8 +147,7 @@ jobs:
       continue-on-error: true
       shell: bash
       run: |
-        pwd
-        cd ../package
+        cd package
 
         UPLOAD_LIST="set ssl:verify-certificate no;"
         UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.target.upload_directory }} ${{ steps.res.filename }};"
@@ -166,6 +158,6 @@ jobs:
       if: always()
       shell: bash
       run: |
+        cd assets/target
         pwd
-        cd ..
-        ls -lR assets
+        ls -lR
