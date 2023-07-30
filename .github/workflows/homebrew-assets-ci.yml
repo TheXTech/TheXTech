@@ -85,12 +85,12 @@ jobs:
       shell: bash
       run: |
         apt update
-        apt install -y gcc meson ninja-build  \ # spc2it build
-                       imagemagick ffmpeg     \ # conversion codecs
-                       python3                \ # run convert script
-                       p7zip-full             \ # unpackage assets
-                       zip                    \ # package Wii assets
-                       lftp                     # upload to builds server
+        apt install -y gcc meson ninja-build  \
+                       imagemagick ffmpeg     \
+                       python3                \
+                       p7zip-full             \
+                       zip                    \
+                       lftp
 
     - name: Build and install spc2it Dependency
       shell: bash
