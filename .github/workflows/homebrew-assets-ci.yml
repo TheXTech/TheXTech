@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - wip-assets-CI
     paths:
       - .github/workflows/homebrew-assets-ci.yml
       - utils/convertkit/assets-convert-homebrew.py
@@ -12,6 +11,7 @@ on:
     branches:
       - main
     paths:
+      - .github/workflows/homebrew-assets-ci.yml
       - utils/convertkit/assets-convert-homebrew.py
   workflow_dispatch:
 
