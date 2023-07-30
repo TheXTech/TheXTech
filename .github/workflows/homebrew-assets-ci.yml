@@ -133,6 +133,14 @@ jobs:
 
         mkdir -p package
 
+    - name: Apply update to translations
+      shell: bash
+      run: |
+        ASSETS_ROOT="$PWD/assets/source"
+        cd .github/ci-helper
+        bash translate_update.sh "${ASSETS_ROOT}"
+        cd ../..
+
     - name: Convert assets
       shell: bash
       run: |
