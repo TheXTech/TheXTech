@@ -73,6 +73,7 @@ jobs:
       shell: bash
       run: |
         echo "filename=assets-${{ matrix.source.id }}-${{ matrix.target.id }}.${{ matrix.target.package_ext }}" >> $GITHUB_OUTPUT;
+        echo "The target will be named: [assets-${{ matrix.source.id }}-${{ matrix.target.id }}.${{ matrix.target.package_ext }}]"
 
     - uses: styfle/cancel-workflow-action@0.11.0
       with:
@@ -84,7 +85,12 @@ jobs:
       shell: bash
       run: |
         apt update
-        apt install -y gcc meson ninja-build imagemagick python3 p7zip-full zip lftp
+        apt install -y gcc meson ninja-build  \ # spc2it build
+                       imagemagick ffmpeg     \ # conversion codecs
+                       python3                \ # run convert script
+                       p7zip-full             \ # unpackage assets
+                       zip                    \ # package Wii assets
+                       lftp                     # upload to builds server
 
     - name: Build and install spc2it Dependency
       shell: bash
@@ -126,20 +132,20 @@ jobs:
       if: matrix.target.id == '3ds'
       shell: bash
       run: |
-        mkromfs3ds assets/target package/${{ steps.res.filename }}
+        mkromfs3ds assets/target package/${{ steps.res.outputs.filename }}
 
     - name: Package for Wii
       if: matrix.target.id == 'wii'
       shell: bash
       run: |
-        zip -9 -r "package/${{ steps.res.filename }}" "assets/target"
+        zip -9 -r "package/${{ steps.res.outputs.filename }}" "assets/target"
 
     - name: Upload artifact
       if: success()
       uses: actions/upload-artifact@v3
       continue-on-error: true
       with:
-        path: package/${{ steps.res.filename }}
+        path: package/${{ steps.res.outputs.filename }}
         name: ${{ matrix.source.name }} Assets (${{ matrix.target.name }})
 
     - name: Deploy to builds.wohlsoft.ru
@@ -150,7 +156,7 @@ jobs:
         cd package
 
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.target.upload_directory }} ${{ steps.res.filename }};"
+        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.target.upload_directory }} ${{ steps.res.outputs.filename }};"
 
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
