@@ -2328,7 +2328,7 @@ void NPCHit(int A, int B, int C)
     }
     else if(NPC[A].Location.Height != oldNPC.Location.Height
         || NPC[A].Location.X != oldNPC.Location.X
-        || NPC[A].Location.X != oldNPC.Location.Y)
+        || NPC[A].Location.Y != oldNPC.Location.Y)
     {
         treeNPCUpdate(A);
         if(NPC[A].tempBlock > 0)
