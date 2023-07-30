@@ -46,7 +46,7 @@ public:
         {
             SafeSet* m_parent;
             PlainIt it;
-            bool prev_invalid;
+            int prev_invalid;
 
             T last_val;
 
@@ -57,12 +57,12 @@ public:
                 m_parent->invalid = false;
             }
 
-            inline iterator(SafeSet& parent, std::nullptr_t ptr) : m_parent(ptr), it(parent.m_set.end()) {}
+            inline iterator(SafeSet& parent, std::nullptr_t ptr) : m_parent(ptr), it(parent.m_set.end()), prev_invalid(-1) {}
 
             inline ~iterator()
             {
-                if(m_parent)
-                    m_parent->invalid |= prev_invalid;
+                if(m_parent && prev_invalid > 0)
+                    m_parent->invalid = true;
             }
 
             inline bool operator!=(const iterator& o)
