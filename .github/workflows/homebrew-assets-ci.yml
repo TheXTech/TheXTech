@@ -17,13 +17,44 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.config.name }} | ${{ matrix.config.build_type }}
+    name: ${{ matrix.source.name }} for ${{ matrix.target.name }})
     runs-on: ubuntu-latest
-    container: devkitpro/toolchain-base
+    container: ${{ matrix.target.docker_image }}
     env:
         DEVKITPRO: /opt/devkitpro
     strategy:
       fail-fast: false
+      matrix:
+        target:
+        - {
+            name: "3DS",
+            id: "3ds",
+            docker_image: "devkitpro/devkitarm",
+            upload_directory: "www/3ds/",
+            package_ext: "romfs"
+          }
+        - {
+            name: "Wii",
+            id: "wii",
+            docker_image: "devkitpro/devkitppc",
+            upload_directory: "www/wii/",
+            package_ext: "zip"
+          }
+        source:
+        # ======================================= Adventures of Demo =======================================
+        # The side game about Demo and siblings from the A2XT universe by raocow and his fan community.
+        - {
+            name: "Adventures of Demo",
+            id: "aod",
+            assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+          }
+        # ======================================= Super Mario Bros. X - a fan-game =======================================
+        # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
+        - {
+            name: "Super Mario Bros. X",
+            id: "smbx13",
+            assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+          }
     steps:
     - name: Check for the upload support
       id: upload-check
@@ -37,6 +68,12 @@ jobs:
           echo "available=false" >> $GITHUB_OUTPUT;
         fi
 
+    - name: Resolve artifact filename
+      id: res
+      shell: bash
+      run: |
+        echo "filename=assets-${{ matrix.source.id }}-${{ matrix.target.id }}.${{ matrix.target.package_ext }}" >> $GITHUB_OUTPUT;
+
     - uses: styfle/cancel-workflow-action@0.11.0
       with:
         workflow_id: homebrew-assets-ci.yml
@@ -47,12 +84,7 @@ jobs:
       shell: bash
       run: |
         apt update
-        apt install -y gcc meson ninja-build imagemagick python3 p7zip-full zip
-
-    - name: Install devkitPro Dependencies
-      shell: bash
-      run: |
-        dkp-pacman --noconfirm -Sy 3dstools tex3ds gamecube-tools
+        apt install -y gcc meson ninja-build imagemagick python3 p7zip-full zip lftp
 
     - name: Build and install spc2it Dependency
       shell: bash
@@ -69,126 +101,71 @@ jobs:
 
     - uses: actions/checkout@v3
 
-    - name: Download SMBX 1.3 assets
+    - name: Download assets
       uses: carlosperate/download-file-action@v2
-      continue-on-error: true
       with:
-        file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z"
-        file-name: smbx13.7z
-
-    - name: Download AoD assets
-      uses: carlosperate/download-file-action@v2
-      continue-on-error: true
-      with:
-        file-url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z"
-        file-name: aod.7z
+        file-url: "${{ matrix.source.assets_url }}"
+        file-name: assets.7z
 
     - name: Unpack assets
       shell: bash
-      continue-on-error: true
       run: |
         pwd
-        mkdir -p assets/smbx13
-        cd assets/smbx13
-        7z x ../../smbx13.7z
+        mkdir -p assets/orig
+        cd assets/orig
+        7z x ../../assets.7z
         cd ../..
-        rm smbx13.7z
-
-        mkdir -p assets/aod
-        cd assets/aod
-        7z x ../../aod.7z
-        cd ../..
-        rm aod.7z
+        rm assets.7z
 
         mkdir -p package
 
         cd assets
 
-    - name: Convert SMBX 1.3 assets for 3DS
-      id: smbx13_3ds
+    - name: Convert assets
       shell: bash
-      continue-on-error: true
       run: |
         pwd
-        python3 ../utils/convertkit/assets-convert-homebrew.py -t 3ds smbx13 smbx13-3ds
-        mkromfs3ds smbx13-3ds ../package/assets-smbx13-3ds.romfs
+        python3 ../utils/convertkit/assets-convert-homebrew.py -t ${{ matrix.target.id }} orig conv
 
-    - name: Upload SMBX 1.3 assets for 3DS
-      if: steps.smbx13_3ds.outcome == 'success'
-      uses: actions/upload-artifact@v3
-      continue-on-error: true
-      with:
-        path: ../package/assets-smbx13-3ds.romfs
-        name: SMBX 1.3 Assets (3DS)
-
-    - name: Convert SMBX 1.3 for Wii
-      id: smbx13_wii
+    - name: Package for 3DS
+      if: matrix.target.id == '3ds'
       shell: bash
-      continue-on-error: true
       run: |
         pwd
-        python3 utils/convertkit/assets-convert-homebrew.py -t wii smbx13 smbx13-wii
-        zip -9 -r "../package/assets-smbx13-wii.zip" "smbx13-wii"
+        mkromfs3ds conv ../package/${{ steps.res.filename }}
 
-    - name: Upload SMBX 1.3 assets for Wii
-      if: steps.smbx13_wii.outcome == 'success'
-      uses: actions/upload-artifact@v3
-      continue-on-error: true
-      with:
-        path: ../package/assets-smbx13-wii.zip
-        name: SMBX 1.3 Assets (Wii)
-
-    - name: Convert AoD for 3DS
-      id: aod_3ds
+    - name: Package for Wii
+      if: matrix.target.id == 'wii'
       shell: bash
-      continue-on-error: true
       run: |
-        python3 utils/convertkit/assets-convert-homebrew.py -t 3ds aod aod-3ds
-        mkromfs3ds aod-3ds ../package/assets-aod-3ds.romfs
+        pwd
+        zip -9 -r "../package/${{ steps.res.filename }}" "conv"
 
-    - name: Upload AoD assets for 3DS
-      if: steps.aod_3ds.outcome == 'success'
+    - name: Upload artifact
+      if: success()
       uses: actions/upload-artifact@v3
       continue-on-error: true
       with:
-        path: ../package/assets-aod-3ds.romfs
-        name: AoD Assets (3DS)
-
-    - name: Convert AoD for Wii
-      id: aod_wii
-      shell: bash
-      continue-on-error: true
-      run: |
-        python3 utils/convertkit/assets-convert-homebrew.py -t wii aod aod-wii
-        zip -9 -r "../package/assets-aod-wii.zip" "aod-wii"
-
-    - name: Upload AoD assets for Wii
-      if: steps.aod_wii.outcome == 'success'
-      uses: actions/upload-artifact@v3
-      continue-on-error: true
-      with:
-        path: ../package/assets-aod-wii.zip
-        name: AoD Assets (Wii)
+        path: ../package/${{ steps.res.filename }}
+        name: ${{ matrix.source.name }} Assets (${{ matrix.target.name }})
 
     - name: Deploy to builds.wohlsoft.ru
       if: success() && github.event_name != 'pull_request' && ${{ steps.upload-check.outputs.available == 'true' }}
       continue-on-error: true
       shell: bash
       run: |
+        pwd
         cd ../package
 
         UPLOAD_LIST="set ssl:verify-certificate no;"
-        for q in *-wii.zip; do
-            UPLOAD_LIST="${UPLOAD_LIST} put -O www/wii $q;"
-        done
-        for q in *-3ds.romfs; do
-            UPLOAD_LIST="${UPLOAD_LIST} put -O www/3ds $q;"
-        done
+        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.target.upload_directory }} ${{ steps.res.filename }};"
+
         lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
 
     - name: List Build Directory
       if: always()
       shell: bash
       run: |
+        pwd
         cd ..
         ls -lR assets
