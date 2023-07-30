@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - wip-assets-CI
     paths:
       - utils/convertkit/assets-convert-homebrew.py
   pull_request:
@@ -56,6 +57,7 @@ jobs:
       shell: bash
       continue-on-error: true
       run: |
+        pwd
         git clone https://github.com/ds-sloth/spc2it
         cd spc2it
         meson build
@@ -84,6 +86,7 @@ jobs:
       shell: bash
       continue-on-error: true
       run: |
+        pwd
         mkdir -p assets/smbx13
         cd assets/smbx13
         7z x ../../smbx13.7z
@@ -105,6 +108,7 @@ jobs:
       shell: bash
       continue-on-error: true
       run: |
+        pwd
         python3 ../utils/convertkit/assets-convert-homebrew.py -t 3ds smbx13 smbx13-3ds
         mkromfs3ds smbx13-3ds ../package/assets-smbx13-3ds.romfs
 
@@ -121,6 +125,7 @@ jobs:
       shell: bash
       continue-on-error: true
       run: |
+        pwd
         python3 utils/convertkit/assets-convert-homebrew.py -t wii smbx13 smbx13-wii
         zip -9 -r "../package/assets-smbx13-wii.zip" "smbx13-wii"
 
