@@ -262,9 +262,13 @@ void UpdatePlayer()
                     if(C1 < 10 && C1 > -10)
                         KillPlayer(A);
                 }
-                else if(Player[A].TimeToLive >= 200) // ScreenType = 1
+                // start fadeout (65 / 3) frames before level end
+                else if(Player[A].TimeToLive == 200 - (65 / 3))
                 {
                     ProcessLastDead(); // Fade out screen if the last player died
+                }
+                else if(Player[A].TimeToLive >= 200) // ScreenType = 1
+                {
                     KillPlayer(A); // Time to die
                 }
             }
