@@ -26,6 +26,8 @@
 #include <cstdlib>
 #include <gme/gme.h>
 
+#include <Logger/logger.h>
+
 volatile SimpleChannel channels[NUM_CHANNELS];
 char* audio_buffer = NULL;
 
@@ -616,7 +618,7 @@ bool audioInit()
 
     if(!audio_buffer)
     {
-        printf("Failed to allocate audio buffer\n");
+        pLogWarning("Failed to allocate audio buffer");
         return false;
     }
 
@@ -649,8 +651,7 @@ bool audioInit()
     // Thanks to @mkst from sm64 3ds port
     int cpu = 0; // application core
 
-    if(
-        R_SUCCEEDED(APT_SetAppCpuTimeLimit(30)))
+    if(R_SUCCEEDED(APT_SetAppCpuTimeLimit(30)))
         cpu = 1; // system core
 
     // Set the thread priority to the main thread's priority ...
@@ -667,9 +668,9 @@ bool audioInit()
                                 cpu, true);
 
     if(sound_thread)
-        printf("Created audio thread at %p on %s core\n", (void*)sound_thread, cpu ? "os" : "application");
+        pLogDebug("Created audio thread at %p on %s core", (void*)sound_thread, cpu ? "os" : "application");
     else
-        printf("Failed to create audio thread\n");
+        pLogWarning("Failed to create audio thread");
 
     return (bool)sound_thread;
 }

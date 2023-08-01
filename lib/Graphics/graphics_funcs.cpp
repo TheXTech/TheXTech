@@ -668,6 +668,134 @@ FIBITMAP *GraphicsHelps::fastConvertTo32Bit(FIBITMAP *image)
     return dest;
 }
 
+FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_down)
+{
+    // one kilobytes of stack isn't affordable? make this static, then.
+
+    // palette for full byte or high nybble (ignores low nybble if 4bpp)
+    std::array<uint32_t, 256> palette;
+
+
+    if(!image)
+        return nullptr;
+
+    if(!do_scale_down)
+        return fastConvertTo32Bit(image);
+
+    if(FreeImage_GetBPP(image) == 32)
+        return fast2xScaleDown(image);
+
+    if(FreeImage_GetBPP(image) != 1 && FreeImage_GetBPP(image) != 4 && FreeImage_GetBPP(image) != 8 && FreeImage_GetBPP(image) != 24)
+        return nullptr;
+
+    auto src_w = static_cast<uint32_t>(FreeImage_GetWidth(image));
+    auto src_h = static_cast<uint32_t>(FreeImage_GetHeight(image));
+    const uint8_t *src_pixels  = reinterpret_cast<uint8_t*>(FreeImage_GetBits(image));
+    const uint32_t *src_palette = reinterpret_cast<uint32_t*>(FreeImage_GetPalette(image));
+    const uint8_t *src_trans = reinterpret_cast<uint8_t*>(FreeImage_GetTransparencyTable(image));
+
+    auto src_stride = static_cast<uint32_t>(FreeImage_GetPitch(image)) * 2;
+    auto src_pixel_stride = (FreeImage_GetBPP(image) == 8) ? 2 : 1;
+
+    FIBITMAP *dest = FreeImage_Allocate(src_w / 2, src_h / 2, 32);
+
+    if(!dest)
+    {
+        return nullptr;
+    }
+
+    uint32_t *dest_pixels  = reinterpret_cast<uint32_t*>(FreeImage_GetBits(dest));
+    auto dest_px_stride = static_cast<uint32_t>(FreeImage_GetPitch(dest)) / 4;
+
+    // special logic for 1 BPP
+    if(FreeImage_GetBPP(image) == 1)
+    {
+        // fill first two entries
+        for(int i = 0; i < 2; i++)
+        {
+            palette[i] = src_palette[i];
+
+            if(src_trans)
+                ((uint8_t*)&palette[i])[3] = src_trans[i];
+            else
+                ((uint8_t*)&palette[i])[3] = 255;
+        }
+
+        // perform lookups
+        for(uint32_t y = 0; y < src_h / 2; y++)
+        {
+            for(uint32_t x = 0; x < src_w / 2; x++)
+            {
+                uint8_t which_bit = 64 >> ((x % 4) * 2);
+                bool lit = src_pixels[y * src_stride + x / 4] & which_bit;
+                dest_pixels[y * dest_px_stride + x] = palette[lit];
+            }
+        }
+
+        return dest;
+    }
+
+    // special logic for 24 BPP
+    if(FreeImage_GetBPP(image) == 24)
+    {
+        src_pixel_stride = 6;
+        uint8_t* dest_pixel_components = reinterpret_cast<uint8_t*>(dest_pixels);
+
+        for(uint32_t y = 0; y < src_h / 2; y++)
+        {
+            for(uint32_t x = 0; x < src_w / 2; x++)
+            {
+                dest_pixel_components[(y * dest_px_stride + x) * 4 + 0] = src_pixels[y * src_stride + x * src_pixel_stride + 0];
+                dest_pixel_components[(y * dest_px_stride + x) * 4 + 1] = src_pixels[y * src_stride + x * src_pixel_stride + 1];
+                dest_pixel_components[(y * dest_px_stride + x) * 4 + 2] = src_pixels[y * src_stride + x * src_pixel_stride + 2];
+                dest_pixel_components[(y * dest_px_stride + x) * 4 + 3] = 255;
+            }
+        }
+
+        return dest;
+    }
+
+    // fill palette
+    if(FreeImage_GetBPP(image) == 8)
+    {
+        for(int i = 0; i < 256; i++)
+        {
+            palette[i] = src_palette[i];
+
+            if(src_trans)
+                ((uint8_t*)&palette[i])[3] = src_trans[i];
+            else
+                ((uint8_t*)&palette[i])[3] = 255;
+        }
+    }
+    else if(FreeImage_GetBPP(image) == 4)
+    {
+        // fill high nybble palettes
+        for(int i = 0; i < 16; i++)
+        {
+            for(int j = 0; j < 16; j++)
+            {
+                palette[i * 16 + j] = src_palette[i];
+                if(src_trans)
+                    ((uint8_t*)&palette[i * 16 + j])[3] = src_trans[i];
+                else
+                    ((uint8_t*)&palette[i * 16 + j])[3] = 255;
+            }
+        }
+    }
+
+    // perform lookups
+    for(uint32_t y = 0; y < src_h / 2; y++)
+    {
+        for(uint32_t x = 0; x < src_w / 2; x++)
+        {
+            dest_pixels[y * dest_px_stride + x] = palette[src_pixels[y * src_stride + x * src_pixel_stride]];
+        }
+    }
+
+    return dest;
+}
+
 bool GraphicsHelps::setWindowIcon(SDL_Window *window, FIBITMAP *img, int iconSize)
 {
 #ifdef _WIN32

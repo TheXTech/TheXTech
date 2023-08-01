@@ -45,7 +45,11 @@ inline uint64_t SDL_GetTicks64()
 
 #ifndef SDL_timer_h_
 extern uint32_t SDL_GetTicks();
-extern uint64_t SDL_GetTicks64();
+
+inline uint64_t SDL_GetTicks64()
+{
+    return (uint64_t)SDL_GetTicks();
+}
 #endif
 
 inline void SDL_Delay(int x)

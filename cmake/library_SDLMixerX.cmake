@@ -33,7 +33,7 @@ set(MIXER_USE_OGG_VORBIS_FILE OFF)
 set(MIXER_USE_OGG_VORBIS_STB ON)
 set(MIXER_USE_OGG_VORBIS_TREMOR OFF)
 
-if(NINTENDO_3DS AND THEXTECH_CUSTOM_AUDIO_LIBRARY)
+if(NINTENDO_3DS)
     set(MIXER_USE_OGG_VORBIS_FILE OFF)
     set(MIXER_USE_OGG_VORBIS_STB OFF)
     set(MIXER_USE_OGG_VORBIS_TREMOR ON)
@@ -438,7 +438,7 @@ endif()
 
 
 message("--- Detected system libraries list: ${MixerX_SysLibs} ---")
-if(NOT THEXTECH_CLI_BUILD)
+if(NOT THEXTECH_CLI_BUILD AND NOT THEXTECH_NO_MIXER_X)
     target_link_libraries(PGE_SDLMixerX_static INTERFACE ${MixerX_CodecLibs})
 endif()
 

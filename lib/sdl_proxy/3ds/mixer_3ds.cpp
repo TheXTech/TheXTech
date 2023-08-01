@@ -74,7 +74,7 @@ int MixPlatform_PlayStream(int channel, const char* path, int loops)
 int Mix_Init(int flags)
 {
     // These codecs only supported
-    return flags & (MIX_INIT_OGG | MIX_INIT_MP3);
+    return flags & (MIX_INIT_OGG);
 }
 
 void Mix_Quit()

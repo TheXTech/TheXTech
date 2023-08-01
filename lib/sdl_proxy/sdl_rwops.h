@@ -25,6 +25,7 @@
 #if defined(SDLRPOXY_NULL)
 
 #include <cstdio>
+#include <cstdint>
 
 #define RW_SEEK_CUR SEEK_CUR
 #define RW_SEEK_SET SEEK_SET
@@ -50,7 +51,7 @@ inline int SDL_RWseek(SDL_RWops* stream, long offset, int whence)
     return fseek(stream->f, offset, whence);
 }
 
-inline Sint64 SDL_RWsize(SDL_RWops* stream)
+inline int64_t SDL_RWsize(SDL_RWops* stream)
 {
     if(!stream || !stream->f)
         return -1;
@@ -58,7 +59,7 @@ inline Sint64 SDL_RWsize(SDL_RWops* stream)
     long curpos = ftell(stream->f);
 
     fseek(stream->f, 0, SEEK_END);
-    Sint64 filesize = static_cast<Sint64>(ftell(stream->f));
+    int64_t filesize = static_cast<int64_t>(ftell(stream->f));
 
     fseek(stream->f, curpos, SEEK_SET);
 

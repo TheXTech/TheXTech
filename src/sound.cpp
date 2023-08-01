@@ -255,17 +255,17 @@ void InitMixerX()
     if(ret != initFlags)
     {
         pLogWarning("MixerX: Some modules aren't properly initialized");
-        if((initFlags & MIX_INIT_MID) != MIX_INIT_MID)
+        if((ret & MIX_INIT_MID) != MIX_INIT_MID)
             pLogWarning("MixerX: Failed to initialize MIDI module");
-        if((initFlags & MIX_INIT_MOD) != MIX_INIT_MOD)
+        if((ret & MIX_INIT_MOD) != MIX_INIT_MOD)
             pLogWarning("MixerX: Failed to initialize Tracker music module");
-        if((initFlags & MIX_INIT_FLAC) != MIX_INIT_FLAC)
+        if((ret & MIX_INIT_FLAC) != MIX_INIT_FLAC)
             pLogWarning("MixerX: Failed to initialize FLAC module");
-        if((initFlags & MIX_INIT_OGG) != MIX_INIT_OGG)
+        if((ret & MIX_INIT_OGG) != MIX_INIT_OGG)
             pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
-        if((initFlags & MIX_INIT_OPUS) != MIX_INIT_OPUS)
+        if((ret & MIX_INIT_OPUS) != MIX_INIT_OPUS)
             pLogWarning("MixerX: Failed to initialize Opus module");
-        if((initFlags & MIX_INIT_MP3) != MIX_INIT_MP3)
+        if((ret & MIX_INIT_MP3) != MIX_INIT_MP3)
             pLogWarning("MixerX: Failed to initialize MP3 module");
     }
 

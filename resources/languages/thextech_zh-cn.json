@@ -321,7 +321,8 @@
             "phraseCreditIndex": "地图制作团队 第{0}行：",
             "retryOnFail": "失败之后重新开始",
             "totalStars": "总星星数："
-        }
+        },
+        "phraseGenericIndex": "编号：{0}"
     },
     "game": {
         "connect": {
