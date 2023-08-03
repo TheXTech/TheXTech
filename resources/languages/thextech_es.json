@@ -5,7 +5,8 @@
             "canBreakTooltip": "Legado: Se rompe al ser golpeado",
             "inside": "Tiene:",
             "invis": "Invis",
-            "slick": "Resbala"
+            "slick": "Resbala",
+            "pickContents": "Elegir contenido del bloque"
         },
         "browser": {
             "askOverwriteFile": "Sobreescribir {0}?",
