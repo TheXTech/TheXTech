@@ -88,6 +88,8 @@
 #include "config.h"
 #include "main/screen_connect.h"
 
+#include "main/level_medals.h"
+
 #include "main/trees.h"
 
 void CheckActive();
@@ -611,6 +613,8 @@ int GameMain(const CmdLineSetup_t &setup)
             pLogDebug("Clear check-points at Game Menu start");
             Checkpoint.clear();
             CheckpointsList.clear();
+            g_curLevelMedals.reset_lvl();
+            g_curLevelMedals.reset_checkpoint();
             WorldPlayer[1].Frame = 0;
             cheats_clearBuffer();
             LevelBeatCode = 0;
@@ -1018,6 +1022,14 @@ int GameMain(const CmdLineSetup_t &setup)
                 }
                 return false;
             });
+
+            if(LevelBeatCode > 0)
+            {
+                g_curLevelMedals.commit();
+                g_curLevelMedals.reset_checkpoint();
+            }
+            else
+                g_curLevelMedals.on_all_dead();
 
             Record::EndRecording();
 

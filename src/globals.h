@@ -887,9 +887,6 @@ struct LevelWarpSaveEntry_t
     LevelSaveInfo_t save_info;
 };
 
-// List of stars / medal info entries for the levels NOT on the world map
-extern std::vector<LevelWarpSaveEntry_t> LevelWarpSaveEntries;
-
 //Public Type WorldLevel 'the type for levels on the world map
 struct WorldLevel_t
 {
@@ -986,7 +983,7 @@ struct Warp_t
 //    curStars As Integer
     uint8_t curStars = 0;
 //    maxStars As Integer
-    uint16_t save_info_idx = 0xFFFF;
+    uint16_t save_info_idx = 0x8000;
 //EXTRA:
     bool twoWay = false;
     bool noPrintStars = false;
@@ -999,15 +996,7 @@ struct Warp_t
     vbint_t transitEffect = 0;
 //End Type
 
-    inline const LevelSaveInfo_t save_info()
-    {
-        if(save_info_idx != 0xFFFF && save_info_idx < LevelWarpSaveEntries.size())
-        {
-            return LevelWarpSaveEntries[save_info_idx].save_info;
-        }
-
-        return LevelSaveInfo_t();
-    }
+    inline const LevelSaveInfo_t save_info() const;
 };
 
 //Public Type Tile 'Tiles for the World
@@ -1165,6 +1154,9 @@ struct Checkpoint_t
 };
 // List of taken checkpoints, spawn player at last of them
 extern std::vector<Checkpoint_t> CheckpointsList;
+
+// List of stars / medal info entries for the levels NOT on the world map
+extern std::vector<LevelWarpSaveEntry_t> LevelWarpSaveEntries;
 
 //Public MagicHand As Boolean 'true if playing a level in the editor while not in fullscreen mode
 extern bool MagicHand;
@@ -1393,6 +1385,18 @@ extern int numWorldMusic;
 //Public WorldLevel(1 To maxWorldLevels) As WorldLevel
 extern RangeArr<WorldLevel_t, 1, maxWorldLevels> WorldLevel;
 DECLREF_T(WorldLevel);
+
+inline const LevelSaveInfo_t Warp_t::save_info() const
+{
+    if(save_info_idx < 0x7FFF && save_info_idx < LevelWarpSaveEntries.size())
+        return LevelWarpSaveEntries[save_info_idx].save_info;
+
+    if(save_info_idx > 0x8000 && save_info_idx - 0x8000 <= numWorldLevels)
+        return WorldLevel[save_info_idx - 0x8000].save_info;
+
+    return LevelSaveInfo_t();
+}
+
 //Public Background(1 To maxBackgrounds) As Background
 extern RangeArr<Background_t, 1, (maxBackgrounds + maxWarps)> Background;
 DECLREF_T(Background);
@@ -1725,6 +1729,11 @@ extern bool EndIntro;
 extern bool ExitMenu;
 //Public LevelSelect As Boolean 'true if game should load the world map
 extern bool LevelSelect;
+
+inline bool InHub()
+{
+    return NoMap && IsEpisodeIntro;
+}
 
 extern bool LevelRestartRequested;
 //Public WorldPlayer(1) As WorldPlayer

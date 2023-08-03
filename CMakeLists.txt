@@ -532,6 +532,7 @@ set(THEXTECH_SRC
     src/main/record.cpp
     src/main/game_save.cpp
     src/main/level_save_info.cpp
+    src/main/level_medals.cpp
     src/main/main_config.cpp
     src/main/level_file.cpp
     src/main/menu_loop.cpp

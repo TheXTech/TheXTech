@@ -39,6 +39,7 @@
 #include "../npc_id.h"
 #include "level_file.h"
 #include "main/level_save_info.h"
+#include "main/level_medals.h"
 #include "trees.h"
 #include "npc_special_data.h"
 #include "graphics/gfx_update.h"
@@ -234,6 +235,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     if(FilePath == ".lvl" || FilePath == ".lvlx")
         return false;
+
+    g_curLevelMedals.prepare_lvl(lvl);
 
     maxStars = lvl.stars;
     LevelName = lvl.LevelName;
@@ -948,6 +951,8 @@ void OpenLevelDataPost()
         }
     }
 
+    OrderMedals();
+
     // If too much locks
     SDL_assert_release(numBackground + numLocked <= (maxBackgrounds + maxWarps));
 
@@ -1020,6 +1025,8 @@ void ClearLevel()
     curMusic = 0;
     curStars = 0;
     maxStars = 0;
+    g_curLevelMedals.reset_lvl();
+
     PSwitchTime = 0;
     PSwitchStop = 0;
     BeltDirection = 1;
@@ -1174,7 +1181,21 @@ void FindStars()
             if(warp.save_info().inited())
                 continue;
 
-            for(uint16_t idx = 0; idx != 0xFFFF && idx < LevelWarpSaveEntries.size(); ++idx)
+            for(uint16_t idx = 1; idx != 0x7FFF && idx <= numWorldLevels; ++idx)
+            {
+                const auto& l = WorldLevel[idx];
+
+                if(l.FileName == lFile)
+                {
+                    warp.save_info_idx = 0x8000 + idx;
+                    break;
+                }
+            }
+
+            if(warp.save_info().inited())
+                continue;
+
+            for(uint16_t idx = 0; idx != 0x7FFF && idx < LevelWarpSaveEntries.size(); ++idx)
             {
                 const auto& e = LevelWarpSaveEntries[idx];
 
@@ -1188,7 +1209,7 @@ void FindStars()
             if(warp.save_info().inited())
                 continue;
 
-            if(LevelWarpSaveEntries.size() >= 0xFFFF)
+            if(LevelWarpSaveEntries.size() >= 0x7FFF)
                 continue;
 
             // done in level load function

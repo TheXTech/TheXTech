@@ -20,9 +20,12 @@
 
 #include <cstdio>
 #include <string>
+#include <bitset>
 #include <PGE_File_Formats/file_formats.h>
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
+
+#include "npc_id.h"
 
 #include "globals.h"
 
@@ -178,17 +181,74 @@ void ExportLevelSaveInfo(saveUserData::DataSection& s)
     }
 }
 
+LevelSaveInfo_t InitLevelSaveInfo(LevelData& loadedLevel)
+{
+    LevelSaveInfo_t ret;
+
+    ret.max_stars = loadedLevel.stars;
+    ret.max_medals = 0;
+    ret.medals_got = 0;
+    ret.medals_best = 0;
+
+    uint8_t full_count = 0;
+    std::bitset<8> spec_hits;
+
+    // look for medals
+    for(auto &npc : loadedLevel.npc)
+    {
+        bool is_container = (npc.id == NPCID_ITEM_BURIED || npc.id == NPCID_ITEM_POD ||
+            npc.id == NPCID_ITEM_BUBBLE || npc.id == NPCID_ITEM_THROWER);
+
+        bool contains_medal = is_container && npc.contents == NPCID_MEDAL;
+
+        // allow medals only
+        if(npc.id != NPCID_MEDAL && !contains_medal)
+            continue;
+
+        // don't count friendly medals (except, thrown medals can be collected)
+        if(npc.friendly && npc.id != NPCID_ITEM_THROWER)
+            continue;
+
+        uint8_t Variant = static_cast<uint8_t>(npc.special_data);
+
+        if(Variant > 8)
+            continue;
+
+        if(Variant == 0)
+        {
+            if(full_count < 8)
+                full_count++;
+
+            continue;
+        }
+
+        if(!spec_hits[Variant - 1])
+        {
+            full_count++;
+            spec_hits[Variant - 1] = true;
+        }
+    }
+
+    ret.max_medals = full_count;
+
+    return ret;
+}
+
 LevelSaveInfo_t InitLevelSaveInfo(const std::string& fullPath, LevelData& tempData)
 {
     LevelSaveInfo_t ret;
 
-    if(FileFormats::OpenLevelFileHeader(fullPath, tempData))
+    if(FileFormats::OpenLevelFile(fullPath, tempData))
     {
-        ret.max_stars = tempData.stars;
-        ret.max_medals = 0;
-        ret.medals_got = 0;
-        ret.medals_best = 0;
-        pLogDebug("Initing level save data at [%s] with %d stars", fullPath.c_str(), (int)tempData.stars);
+        ret = InitLevelSaveInfo(tempData);
+        pLogDebug("Initing level save data at [%s] with %d stars", fullPath.c_str(), (int)ret.max_stars);
+    }
+    else
+    {
+        pLogWarning("During save info init: error of level \"%s\" file loading: %s (line %d).",
+                    fullPath.c_str(),
+                    tempData.meta.ERROR_info.c_str(),
+                    tempData.meta.ERROR_linenum);
     }
 
     return ret;
