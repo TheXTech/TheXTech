@@ -102,6 +102,29 @@ void addMissingLvlSuffix(std::string &fileName)
     }
 }
 
+void validateLevelName(std::string &out, const std::string &raw)
+{
+    if(raw.empty())
+    {
+        out.clear();
+        return;
+    }
+
+    if(!Strings::endsWith(raw, ".lvl") && !Strings::endsWith(raw, ".lvlx"))
+    {
+        std::string lx = g_dirEpisode.resolveFileCaseExists(raw + ".lvlx"),
+                    lo = g_dirEpisode.resolveFileCaseExists(raw + ".lvl");
+
+        if(!lx.empty())
+            out = lx;
+        else if(!lo.empty())
+            out = lo;
+        else
+            out = g_dirEpisode.resolveFileCase(raw);
+    }
+    else
+        out = g_dirEpisode.resolveFileCase(raw);
+}
 
 bool OpenLevel(std::string FilePath)
 {
@@ -722,6 +745,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         syncLayers_NPC(numNPCs);
     }
 
+    std::string level_name;
 
     for(auto &w : lvl.doors)
     {
@@ -749,22 +773,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         // Work around filenames with no extension suffix and case missmatch
         if(!w.lname.empty())
         {
-            std::string level_name;
-
-            if(!Strings::endsWith(w.lname, ".lvl") && !Strings::endsWith(w.lname, ".lvlx"))
-            {
-                std::string lx = g_dirEpisode.resolveFileCaseExists(w.lname + ".lvlx"),
-                            lo = g_dirEpisode.resolveFileCaseExists(w.lname + ".lvl");
-                if(!lx.empty())
-                    level_name = lx;
-                else if(!lo.empty())
-                    level_name = lo;
-                else
-                    level_name = g_dirEpisode.resolveFileCase(w.lname);
-            }
-            else
-                level_name = g_dirEpisode.resolveFileCase(w.lname);
-
+            validateLevelName(level_name, w.lname);
             SetS(warp.level, level_name);
         }
 

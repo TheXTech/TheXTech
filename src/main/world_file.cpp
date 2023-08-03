@@ -281,7 +281,7 @@ bool OpenWorld(std::string FilePath)
         ll.Location.X = l.x;
         ll.Location.Y = l.y;
         ll.Type = int(l.id);
-        ll.FileName = g_dirEpisode.resolveFileCase(l.lvlfile);
+        validateLevelName(ll.FileName, l.lvlfile);
         ll.LevelName = l.title;
         ll.LevelExit[1] = l.top_exit;
         ll.LevelExit[2] = l.left_exit;
