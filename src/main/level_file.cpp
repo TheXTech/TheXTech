@@ -38,6 +38,7 @@
 #include "../editor.h"
 #include "../npc_id.h"
 #include "level_file.h"
+#include "main/level_save_info.h"
 #include "trees.h"
 #include "npc_special_data.h"
 #include "graphics/gfx_update.h"
@@ -141,10 +142,10 @@ bool OpenLevel(std::string FilePath)
         LevelData lvl;
         if(!FileFormats::OpenLevelFile(FilePath, lvl))
         {
-        pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
-                    FilePath.c_str(),
-                    lvl.meta.ERROR_info.c_str(),
-                    lvl.meta.ERROR_linenum);
+            pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
+                        FilePath.c_str(),
+                        lvl.meta.ERROR_info.c_str(),
+                        lvl.meta.ERROR_linenum);
             return false;
         }
 
@@ -1152,7 +1153,7 @@ void FindStars()
 //    int A = 0;
 //    int B = 0;
 //    std::string newInput;
-    LevelData head;
+    LevelData tempData;
 
     for(int A = 1; A <= numWarps; A++)
     {
@@ -1161,25 +1162,50 @@ void FindStars()
         if(warp.level != STRINGINDEX_NONE)
         {
             std::string lFile = GetS(warp.level);
-            addMissingLvlSuffix(lFile);
+
+            warp.curStars = 0;
+
+            for(const auto& star : Star)
+            {
+                if(SDL_strcasecmp(star.level.c_str(), Files::basename(lFile).c_str()) == 0)
+                    warp.curStars++;
+            }
+
+            if(warp.save_info().inited())
+                continue;
+
+            for(uint16_t idx = 0; idx != 0xFFFF && idx < LevelWarpSaveEntries.size(); ++idx)
+            {
+                const auto& e = LevelWarpSaveEntries[idx];
+
+                if(e.levelPath == lFile)
+                {
+                    warp.save_info_idx = idx;
+                    break;
+                }
+            }
+
+            if(warp.save_info().inited())
+                continue;
+
+            if(LevelWarpSaveEntries.size() >= 0xFFFF)
+                continue;
+
+            // done in level load function
+            // addMissingLvlSuffix(lFile);
 
             std::string fullPath = g_dirEpisode.resolveFileCaseExistsAbs(lFile);
 
             if(!fullPath.empty())
             {
-                if(FileFormats::OpenLevelFileHeader(fullPath, head))
-                {
-                    warp.maxStars = head.stars;
-                    warp.curStars = 0;
+                LevelSaveInfo_t info = InitLevelSaveInfo(fullPath, tempData);
 
-                    for(const auto& star : Star)
-                    {
-                        if(SDL_strcasecmp(star.level.c_str(), Files::basename(GetS(warp.level)).c_str()) == 0)
-                            warp.curStars++;
-                    }
+                if(info.inited())
+                {
+                    warp.save_info_idx = LevelWarpSaveEntries.size();
+                    LevelWarpSaveEntries.push_back({lFile, info});
                 }
             }
-
         }
     }
 }

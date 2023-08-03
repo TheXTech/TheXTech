@@ -865,6 +865,31 @@ struct vScreen_t
 //End Type
 };
 
+// NEW: information about available Stars and obtained / available Medals for a level
+struct LevelSaveInfo_t
+{
+    uint8_t  max_stars = 0;
+    uint8_t  max_medals = 255; // invalid, maximum is 8
+
+    // BITMASKS, max medals is 8
+    uint8_t medals_got = 0;
+    uint8_t medals_best = 0;
+
+    inline bool inited() const
+    {
+        return max_medals != 255;
+    }
+};
+
+struct LevelWarpSaveEntry_t
+{
+    std::string levelPath;
+    LevelSaveInfo_t save_info;
+};
+
+// List of stars / medal info entries for the levels NOT on the world map
+extern std::vector<LevelWarpSaveEntry_t> LevelWarpSaveEntries;
+
 //Public Type WorldLevel 'the type for levels on the world map
 struct WorldLevel_t
 {
@@ -906,9 +931,11 @@ struct WorldLevel_t
     // int64_t Z = 0;
 
 // Display number of stars (if available)
-    vbint_t curStars = 0;
-    vbint_t maxStars = 0;
-    vbint_t starsShowPolicy = -1;
+    int8_t starsShowPolicy = -1;
+    uint8_t curStars = 0;
+
+    // new: info about collected / available medals / stars
+    LevelSaveInfo_t save_info;
 
     // NEW: returns graphical location extent (based on whether GFXLevelBig is set)
     //   defined in graphics.cpp
@@ -947,9 +974,9 @@ struct Warp_t
 //    LevelEnt As Boolean 'this warp can't be used if set to true (this is for level entrances)
     bool LevelEnt = false;
 //    Direction As Integer 'direction of the entrance for pipe style warps
-    vbint_t Direction = 0;
+    int8_t Direction = 0;
 //    Direction2 As Integer 'direction of the exit
-    vbint_t Direction2 = 0;
+    int8_t Direction2 = 0;
 //    MapWarp As Boolean
     bool MapWarp = false;
 //    MapX As Integer
@@ -957,9 +984,9 @@ struct Warp_t
 //    MapY As Integer
     vbint_t MapY = 0;
 //    curStars As Integer
-    vbint_t curStars = 0;
+    uint8_t curStars = 0;
 //    maxStars As Integer
-    vbint_t maxStars = 0;
+    uint16_t save_info_idx = 0xFFFF;
 //EXTRA:
     bool twoWay = false;
     bool noPrintStars = false;
@@ -971,6 +998,16 @@ struct Warp_t
     stringindex_t StarsMsg = STRINGINDEX_NONE;
     vbint_t transitEffect = 0;
 //End Type
+
+    inline const LevelSaveInfo_t save_info()
+    {
+        if(save_info_idx != 0xFFFF && save_info_idx < LevelWarpSaveEntries.size())
+        {
+            return LevelWarpSaveEntries[save_info_idx].save_info;
+        }
+
+        return LevelSaveInfo_t();
+    }
 };
 
 //Public Type Tile 'Tiles for the World

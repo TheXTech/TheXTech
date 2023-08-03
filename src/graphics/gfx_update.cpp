@@ -2233,9 +2233,9 @@ void UpdateGraphics(bool skipRepaint)
                     {
                         std::string tempString;
                         auto &w = Warp[Player[A].ShowWarp];
-                        if(!w.noPrintStars && w.maxStars > 0 && Player[A].Mount != 2)
+                        if(!w.noPrintStars && w.save_info().max_stars > 0 && Player[A].Mount != 2)
                         {
-                            tempString = fmt::format_ne("{0}/{1}", w.curStars, w.maxStars);
+                            tempString = fmt::format_ne("{0}/{1}", w.curStars, w.save_info().max_stars);
                             XRender::renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreen[Z].X - tempString.length() * 9, Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y + 1, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
                             XRender::renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreen[Z].X - tempString.length() * 9 - 20, Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y, GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
                             SuperPrint(tempString, 3,

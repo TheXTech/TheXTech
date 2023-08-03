@@ -33,7 +33,9 @@
 #include <fmt_format_ne.h>
 #include <IniProcessor/ini_processing.h>
 #include <script/luna/lunacounter.h>
+#include <Logger/logger.h>
 
+#include "main/level_save_info.h"
 #include "menu_main.h"
 
 std::string makeGameSavePath(std::string episode, std::string world, std::string saveFile)
@@ -286,6 +288,14 @@ void SaveGame()
         sav.userData.store.push_back(gLunaVarBank);
 #endif
 
+    saveUserData::DataSection levelSaveInfo;
+
+    ExportLevelSaveInfo(levelSaveInfo);
+    levelSaveInfo.location = saveUserData::DATA_GLOBAL;
+    levelSaveInfo.name = "_TheXTech_LevelSaveInfo";
+
+    sav.userData.store.push_back(levelSaveInfo);
+
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
 
     if(Files::fileExists(legacyGamesaveLocker))
@@ -426,6 +436,15 @@ void LoadGame()
 
     gSavedVarBank.TryLoadWorldVars();
 #endif
+
+    for(const saveUserData::DataSection& s : sav.userData.store)
+    {
+        if(s.location == saveUserData::DATA_GLOBAL && s.name == "_TheXTech_LevelSaveInfo")
+        {
+            ImportLevelSaveInfo(s);
+            break;
+        }
+    }
 }
 
 void ClearGame(bool punnish)
@@ -453,7 +472,10 @@ void ClearGame(bool punnish)
         WorldPath[A].Active = false;
 
     for(int A = 1; A <= maxWorldLevels; ++A)
+    {
         WorldLevel[A].Active = false;
+        WorldLevel[A].save_info = LevelSaveInfo_t();
+    }
 
     for(int A = 1; A <= maxScenes; ++A)
         Scene[A].Active = true;
@@ -461,6 +483,8 @@ void ClearGame(bool punnish)
     maxStars = 0;
     Star.clear();
     numStars = 0;
+
+    LevelWarpSaveEntries.clear();
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
     gLunaVarBank = saveUserData::DataSection();

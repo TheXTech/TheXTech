@@ -232,7 +232,7 @@ void WorldLoop()
                     WorldPlayer[1].LevelName = l.LevelName;
                     auto &s = WorldPlayer[1].stars;
                     s.cur = l.curStars;
-                    s.max = l.maxStars;
+                    s.max = l.save_info.max_stars;
                     s.displayPolicy = computeStarsShowingPolicy(l.starsShowPolicy, s.cur);
                     LevelPath(l, A);
                 }
@@ -255,7 +255,7 @@ void WorldLoop()
                     WorldPlayer[1].LevelName = l.LevelName;
                     auto &s = WorldPlayer[1].stars;
                     s.cur = l.curStars;
-                    s.max = l.maxStars;
+                    s.max = l.save_info.max_stars;
                     s.displayPolicy = computeStarsShowingPolicy(l.starsShowPolicy, s.cur);
                     break;
                 }
@@ -341,7 +341,7 @@ void WorldLoop()
                 WorldPlayer[1].LevelName = l.LevelName;
                 auto &s = WorldPlayer[1].stars;
                 s.cur = l.curStars;
-                s.max = l.maxStars;
+                s.max = l.save_info.max_stars;
                 s.displayPolicy = computeStarsShowingPolicy(l.starsShowPolicy, s.cur);
                 break;
             }
