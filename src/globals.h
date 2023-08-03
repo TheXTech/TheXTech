@@ -373,7 +373,7 @@ struct NPC_t
 //    Special6 As Double
     double Special6 = 0.0;
 // EXTRA: Variant (previously Special7)
-    uint16_t Variant = 0;
+    uint8_t Variant = 0;
 //    TurnAround As Boolean 'if the NPC needs to turn around
     bool TurnAround = false;
 //    Killed As Integer 'Flags the NPC to die a specific way.
@@ -833,7 +833,7 @@ struct Effect_t
 //    NewNpc As Integer 'when an effect should create and NPC, such as Yoshi
     vbint_t NewNpc = 0;
 // EXTRA: New NPC's special value
-    vbint_t NewNpcSpecial = 0;
+    uint8_t NewNpcSpecial = 0;
 //    Shadow As Boolean 'for a black effect set to true
     bool Shadow = false;
 //End Type
