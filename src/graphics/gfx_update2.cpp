@@ -34,6 +34,7 @@
 #include "../main/screen_textentry.h"
 #include "../game_main.h"
 #include "../main/world_globals.h"
+#include "main/level_medals.h"
 #include "../core/render.h"
 #include "../screen_fader.h"
 
@@ -459,6 +460,8 @@ void UpdateGraphics2(bool skipRepaint)
 
             auto policy = computeStarsShowingPolicy(l.starsShowPolicy, l.curStars);
 
+            int Y = vScreen[Z].Y + WorldPlayer[1].Location.Y - 32;
+
             if(l.save_info.max_stars > 0 && policy > Compatibility_t::STARS_DONT_SHOW)
             {
                 std::string label;
@@ -470,15 +473,24 @@ void UpdateGraphics2(bool skipRepaint)
 
                 int len = SuperTextPixLen(label, 3);
                 int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
-                 int x = vScreen[Z].X + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2) - (totalLen / 2);
-                 int y = vScreen[Z].Y + WorldPlayer[1].Location.Y - 32;
+                int x = vScreen[Z].X + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2) - (totalLen / 2);
 
-                 XRender::renderTexture(x, y,
+                XRender::renderTexture(x, Y,
                                        GFX.Interface[5].w, GFX.Interface[5].h, GFX.Interface[5], 0, 0);
-                 XRender::renderTexture(x + GFX.Interface[5].w + 8, y,
+                XRender::renderTexture(x + GFX.Interface[5].w + 8, Y,
                                        GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
-                 SuperPrint(label, 3, x + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4, y);
-             }
+                SuperPrint(label, 3, x + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4, Y);
+                Y -= 20;
+            }
+
+            if(l.save_info.max_medals > 0 && true)
+            {
+                int X = vScreen[Z].X + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2);
+
+                uint8_t ckpt = (Checkpoint == FileNamePathWorld + l.FileName) ? g_curLevelMedals.got : 0;
+
+                DrawMedals(X, Y, true, l.save_info.max_medals, 0, ckpt, l.save_info.medals_got, l.save_info.medals_best);
+            }
         }
 
 #ifdef __3DS__

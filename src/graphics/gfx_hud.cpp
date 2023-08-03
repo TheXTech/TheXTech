@@ -23,6 +23,7 @@
 #include "../core/render.h"
 #include "../gfx.h"
 
+#include "main/level_medals.h"
 
 void DrawInterface(int Z, int numScreens)
 {
@@ -389,6 +390,14 @@ void DrawInterface(int Z, int numScreens)
         }
     }
 
+    if(!InHub() && !BattleMode)
+    {
+        int MedalsX = SDL_min(vScreen[Z].Width - 16, CenterX + 400 - 16);
+        int MedalsY = ScreenTop + 16;
+
+        DrawMedals(MedalsX, MedalsY, false, g_curLevelMedals.max, g_curLevelMedals.prev, 0, g_curLevelMedals.got, g_curLevelMedals.life);
+    }
+
     if(BattleIntro > 0)
     {
         if(BattleIntro > 45 || BattleIntro % 2 == 1)
@@ -406,4 +415,38 @@ void DrawInterface(int Z, int numScreens)
     }
 
     XRender::offsetViewportIgnore(false);
+}
+
+void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ckpt, uint8_t got, uint8_t best)
+{
+    int coin_width = GFX.Interface[2].w;
+
+    if(center)
+        X -= ((coin_width * max) / 2) & ~1;
+    else
+        X -= (coin_width * max);
+
+    if(max > 8)
+        max = 8;
+
+    for(int i = 0; i < max; ++i)
+    {
+        int bit = (1 << i);
+
+        double X_i = X + coin_width * i;
+
+        if(best & bit)
+            XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.0f, 0.0f, 1.0f);
+        else if(got & bit)
+            XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.8f, 0.8f, 0.8f);
+        else if(ckpt & bit)
+        {
+            // do a flash effect here!
+            XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.0f, 1.0f, 0.0f);
+        }
+        else if(prev & bit)
+            XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.5f, 0.5f, 0.5f);
+        else
+            XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.5f, 0.5f, 0.5f, 0.5f);
+    }
 }

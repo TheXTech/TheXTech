@@ -135,6 +135,10 @@ void DrawCredits();
 // Public Sub DrawInterface(Z As Integer, numScreens) 'draws the games interface
 // draws the games interface
 void DrawInterface(int Z, int numScreens);
+
+// NEW: draws a set of medals
+void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ckpt, uint8_t got, uint8_t best);
+
 // NEW: draws the level editor interface on vScreen Z
 void DrawEditorLevel(int Z);
 // NEW: draws the level editor UI
