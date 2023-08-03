@@ -72,40 +72,6 @@ void worldWaitForFade(int waitTicks)
 }
 
 
-static inline int computeStarsShowingPolicy(int ll, int cur)
-{
-    // Level individual
-    if(ll > Compatibility_t::STARS_UNSPECIFIED)
-    {
-        if(ll == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-            return Compatibility_t::STARS_DONT_SHOW;
-        return ll;
-    }
-
-    // World map-wide
-    if(WorldStarsShowPolicy > Compatibility_t::STARS_UNSPECIFIED)
-    {
-        if(WorldStarsShowPolicy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-            return Compatibility_t::STARS_DONT_SHOW;
-        return WorldStarsShowPolicy;
-    }
-
-    // Compatibility settings
-    if(g_compatibility.world_map_stars_show_policy > Compatibility_t::STARS_UNSPECIFIED)
-    {
-        if(g_compatibility.world_map_stars_show_policy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-            return Compatibility_t::STARS_DONT_SHOW;
-
-        return g_compatibility.world_map_stars_show_policy;
-    }
-
-    // Gameplay settings
-    if(g_config.WorldMapStarShowPolicyGlobal == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
-        return Compatibility_t::STARS_DONT_SHOW;
-
-    return g_config.WorldMapStarShowPolicyGlobal;
-}
-
 bool g_isWorldMusicNotSame(WorldMusic_t &mus)
 {
     bool ret = false;
@@ -228,13 +194,8 @@ void WorldLoop()
             {
                 if(WorldLevel[curWorldLevel].LevelExit[A] == LevelBeatCode || WorldLevel[curWorldLevel].LevelExit[A] == -1)
                 {
-                    auto &l = WorldLevel[curWorldLevel];
-                    WorldPlayer[1].LevelName = l.LevelName;
-                    auto &s = WorldPlayer[1].stars;
-                    s.cur = l.curStars;
-                    s.max = l.save_info.max_stars;
-                    s.displayPolicy = computeStarsShowingPolicy(l.starsShowPolicy, s.cur);
-                    LevelPath(l, A);
+                    WorldPlayer[1].LevelIndex = curWorldLevel;
+                    LevelPath(WorldLevel[curWorldLevel], A);
                 }
             }
 
@@ -251,12 +212,7 @@ void WorldLoop()
                 WorldLevel_t &l = *t;
                 if(CheckCollision(WorldPlayer[1].Location, l.Location))
                 {
-                    curWorldLevel = t;
-                    WorldPlayer[1].LevelName = l.LevelName;
-                    auto &s = WorldPlayer[1].stars;
-                    s.cur = l.curStars;
-                    s.max = l.save_info.max_stars;
-                    s.displayPolicy = computeStarsShowingPolicy(l.starsShowPolicy, s.cur);
+                    WorldPlayer[1].LevelIndex = t;
                     break;
                 }
             }
@@ -330,7 +286,7 @@ void WorldLoop()
         tempLocation.Height -= 8;
         tempLocation.X += 4;
         tempLocation.Y += 4;
-        WorldPlayer[1].LevelName.clear();
+        WorldPlayer[1].LevelIndex = 0;
 
         //for(A = 1; A <= numWorldLevels; A++)
         for(auto t : treeWorldLevelQuery(tempLocation, SORTMODE_Z))
@@ -338,11 +294,7 @@ void WorldLoop()
             WorldLevel_t &l = *t;
             if(CheckCollision(tempLocation, l.Location))
             {
-                WorldPlayer[1].LevelName = l.LevelName;
-                auto &s = WorldPlayer[1].stars;
-                s.cur = l.curStars;
-                s.max = l.save_info.max_stars;
-                s.displayPolicy = computeStarsShowingPolicy(l.starsShowPolicy, s.cur);
+                WorldPlayer[1].LevelIndex = t;
                 break;
             }
         }
@@ -861,7 +813,7 @@ void LevelPath(const WorldLevel_t &Lvl, int Direction, bool Skp)
 
 void PlayerPath(WorldPlayer_t &p)
 {
-    if(!p.LevelName.empty())
+    if(p.LevelIndex)
         return;
 
     Location_t tempLocation = p.Location;

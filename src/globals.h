@@ -1134,15 +1134,9 @@ struct WorldPlayer_t
 // EXTRA: last move direction
     int LastMove = 0;
 //    LevelName As String
-    std::string LevelName;
+    // std::string LevelName;
+    vbint_t LevelIndex;
 //End Type
-
-    struct StarsState_t
-    {
-        int cur = 0;
-        int max = 0;
-        int displayPolicy = 0;
-    } stars;
 };
 
 //Public Type Layer

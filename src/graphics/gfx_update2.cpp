@@ -42,6 +42,40 @@
 #include <fmt_format_ne.h>
 
 
+static inline int computeStarsShowingPolicy(int ll, int cur)
+{
+    // Level individual
+    if(ll > Compatibility_t::STARS_UNSPECIFIED)
+    {
+        if(ll == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+            return Compatibility_t::STARS_DONT_SHOW;
+        return ll;
+    }
+
+    // World map-wide
+    if(WorldStarsShowPolicy > Compatibility_t::STARS_UNSPECIFIED)
+    {
+        if(WorldStarsShowPolicy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+            return Compatibility_t::STARS_DONT_SHOW;
+        return WorldStarsShowPolicy;
+    }
+
+    // Compatibility settings
+    if(g_compatibility.world_map_stars_show_policy > Compatibility_t::STARS_UNSPECIFIED)
+    {
+        if(g_compatibility.world_map_stars_show_policy == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+            return Compatibility_t::STARS_DONT_SHOW;
+
+        return g_compatibility.world_map_stars_show_policy;
+    }
+
+    // Gameplay settings
+    if(g_config.WorldMapStarShowPolicyGlobal == Compatibility_t::STARS_SHOW_COLLECTED_ONLY && cur <= 0)
+        return Compatibility_t::STARS_DONT_SHOW;
+
+    return g_config.WorldMapStarShowPolicyGlobal;
+}
+
 // draws GFX to screen when on the world map/world map editor
 void UpdateGraphics2(bool skipRepaint)
 {
@@ -419,21 +453,23 @@ void UpdateGraphics2(bool skipRepaint)
                               WorldPlayer[1].Location.Width, WPHeight,
                               GFXPlayerBMP[WorldPlayer[1].Type], 0, WPHeight * WorldPlayer[1].Frame);
 
-        if(!WorldPlayer[1].LevelName.empty())
+        if(WorldPlayer[1].LevelIndex)
         {
-             auto &s = WorldPlayer[1].stars;
+            auto &l = WorldLevel[WorldPlayer[1].LevelIndex];
 
-             if(s.max > 0 && s.displayPolicy > Compatibility_t::STARS_DONT_SHOW)
-             {
-                 std::string label;
+            auto policy = computeStarsShowingPolicy(l.starsShowPolicy, l.curStars);
 
-                 if(s.displayPolicy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
-                     label = fmt::format_ne("{0}/{1}", s.cur, s.max);
-                 else
-                     label = fmt::format_ne("{0}", s.cur);
+            if(l.save_info.max_stars > 0 && policy > Compatibility_t::STARS_DONT_SHOW)
+            {
+                std::string label;
 
-                 int len = SuperTextPixLen(label, 3);
-                 int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
+                if(policy >= Compatibility_t::STARS_SHOW_COLLECTED_AND_AVAILABLE)
+                    label = fmt::format_ne("{0}/{1}", l.curStars, l.save_info.max_stars);
+                else
+                    label = fmt::format_ne("{0}", l.curStars);
+
+                int len = SuperTextPixLen(label, 3);
+                int totalLen = len + GFX.Interface[1].w + GFX.Interface[5].w + 8 + 4;
                  int x = vScreen[Z].X + WorldPlayer[1].Location.X + (WorldPlayer[1].Location.Width / 2) - (totalLen / 2);
                  int y = vScreen[Z].Y + WorldPlayer[1].Location.Y - 32;
 
@@ -530,10 +566,10 @@ void UpdateGraphics2(bool skipRepaint)
         }
 
         // Print the level's name
-        if(!WorldPlayer[1].LevelName.empty())
+        if(WorldPlayer[1].LevelIndex)
         {
             int lnlx = 32 + (48 * A) + 116;
-            SuperPrint(WorldPlayer[1].LevelName, 2, lnlx, 109);
+            SuperPrint(WorldLevel[WorldPlayer[1].LevelIndex].LevelName, 2, lnlx, 109);
         }
 
         g_worldScreenFader.draw();
