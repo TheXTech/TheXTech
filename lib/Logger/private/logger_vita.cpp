@@ -33,7 +33,7 @@
 
 #   define VITA_TEMP_BUFFER_SIZE (1024 * 1024)
 
-static char __string_buffer[VITA_TEMP_BUFFER_SIZE];
+static char __string_buffer[VITA_TEMP_BUFFER_SIZE - 3];
 static char __string_buffer2[VITA_TEMP_BUFFER_SIZE];
 static int __vita_debug_setup = 0;
 #endif
