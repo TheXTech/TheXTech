@@ -36,6 +36,7 @@ extern void validateLevelName(std::string &out, const std::string &raw);
 //! loads the level
 bool OpenLevel(std::string FilePath);
 bool OpenLevelData(LevelData &lvl, const std::string FilePath = std::string());
+void OpenLevelDataPost();
 //! Reset everything to zero
 void ClearLevel();
 

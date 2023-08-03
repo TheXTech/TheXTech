@@ -137,23 +137,29 @@ bool OpenLevel(std::string FilePath)
 //            FilePath += ".lvl";
 //    }
 
-    LevelData lvl;
-    if(!FileFormats::OpenLevelFile(FilePath, lvl))
     {
+        LevelData lvl;
+        if(!FileFormats::OpenLevelFile(FilePath, lvl))
+        {
         pLogWarning("Error of level \"%s\" file loading: %s (line %d).",
                     FilePath.c_str(),
                     lvl.meta.ERROR_info.c_str(),
                     lvl.meta.ERROR_linenum);
-        return false;
+            return false;
+        }
+
+        if(!OpenLevelData(lvl, FilePath))
+            return false;
     }
 
-    return OpenLevelData(lvl, FilePath);
+    OpenLevelDataPost();
+
+    return true;
 }
 
 bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 {
 //    std::string newInput;
-    TranslateEpisode tr;
 //    int FileRelease = 0;
     int A = 0;
     int B = 0;
@@ -838,6 +844,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         syncLayers_Water(numWater);
     }
 
+    return true;
+}
+
+void OpenLevelDataPost()
+{
+    TranslateEpisode tr;
+
     if(!GameMenu && !LevelEditor)
         tr.loadLevelTranslation(FileNameFull);
 
@@ -851,7 +864,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     // moved the old event/layer loading code to the top
     // since it is needed before loading objects now
 
-    for(A = 0; A < numLayers; A++)
+    for(int A = 0; A < numLayers; A++)
     {
         if(Layer[A].Hidden)
             HideLayer(A, true);
@@ -867,7 +880,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
     {
         FindStars();
         LevelMacro = LEVELMACRO_OFF;
-        for(A = 0; A <= numSections; A++) // Automatically correct 608 section height to 600
+        for(int A = 0; A <= numSections; A++) // Automatically correct 608 section height to 600
         {
 //            if(int(level[A].Height - level[A].Y) == 608)
 //                level[A].Y += 8;
@@ -876,8 +889,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 level[A].Y = level[A].Height - 600; // Better and cleaner logic
         }
 
-        B = numBackground;
-        for(A = 1; A <= numWarps; A++)
+        int B = numBackground;
+        for(int A = 1; A <= numWarps; A++)
         {
             auto &w = Warp[A];
             if(w.Effect == 2 && w.Stars > numStars)
@@ -939,8 +952,6 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
     SoundPause[13] = 100;
     resetFrameTimer();
-
-    return true;
 }
 
 void ClearLevel()
