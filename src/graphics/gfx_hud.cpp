@@ -420,6 +420,13 @@ void DrawInterface(int Z, int numScreens)
 void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ckpt, uint8_t got, uint8_t best)
 {
     int coin_width = GFX.Interface[2].w;
+    int coin_height = GFX.Interface[2].h;
+
+    if(GFX.Medals.inited)
+    {
+        coin_width = GFX.Medals.w / 4;
+        coin_height = GFX.Medals.h;
+    }
 
     if(center)
         X -= ((coin_width * max) / 2) & ~1;
@@ -429,24 +436,72 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
     if(max > 8)
         max = 8;
 
+    BlockFlash += 1;
+
+    if(BlockFlash >= 256)
+        BlockFlash = 0;
+
     for(int i = 0; i < max; ++i)
     {
         int bit = (1 << i);
 
         double X_i = X + coin_width * i;
 
-        if(best & bit)
-            XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.0f, 0.0f, 1.0f);
-        else if(got & bit)
-            XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.8f, 0.8f, 0.8f);
-        else if(ckpt & bit)
+        if(GFX.Medals.inited)
         {
-            // do a flash effect here!
-            XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.0f, 1.0f, 0.0f);
+            if(best & bit)
+                XRender::renderTexture(X_i, Y, coin_width, coin_height, GFX.Medals, coin_width * 3, 0);
+            else if(got & bit)
+                XRender::renderTexture(X_i, Y, coin_width, coin_height, GFX.Medals, coin_width * 2, 0);
+            else if(ckpt & bit && (BlockFlash % 64) < 32)
+                XRender::renderTexture(X_i, Y, coin_width, coin_height, GFX.Medals, coin_width * 2, 0);
+            else if(prev & bit)
+                XRender::renderTexture(X_i, Y, coin_width, coin_height, GFX.Medals, coin_width * 1, 0);
+            else
+                XRender::renderTexture(X_i, Y, coin_width, coin_height, GFX.Medals, 0, 0);
         }
-        else if(prev & bit)
-            XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.5f, 0.5f, 0.5f);
         else
-            XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.5f, 0.5f, 0.5f, 0.5f);
+        {
+            if(best & bit)
+                XRender::renderTexture(X_i, Y, GFX.Interface[2], 1.0f, 1.0f, 1.0f);
+            else if(got & bit)
+                XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.9f, 0.9f, 0.9f);
+            else if(ckpt & bit && (BlockFlash % 64) < 32)
+                XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.9f, 0.9f, 0.9f);
+            else if(prev & bit)
+                XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.5f, 0.5f, 0.5f);
+            else
+                XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.5f, 0.5f, 0.5f, 0.5f);
+        }
+
+        // render sparkles
+        if(best & bit)
+        {
+            int sparkle_1_idx = BlockFlash / 16; // on frame 3
+
+            for(int i = 0; i < 3; ++i)
+            {
+                int sparkle_idx = (sparkle_1_idx + i) % 16;
+                int sparkle_frame = 2 - i;
+
+                int sparkle_X = (9 * sparkle_idx) % coin_width;
+                int sparkle_Y = (13 * sparkle_idx) % coin_height;
+
+                if(sparkle_X <= 2)
+                    sparkle_X = 2;
+
+                if(sparkle_Y <= 2)
+                    sparkle_Y = 2;
+
+                sparkle_X -= EffectWidth[78] / 2;
+                sparkle_Y -= EffectHeight[78] / 2;
+
+                sparkle_X &= ~1;
+                sparkle_Y &= ~1;
+
+                XRender::renderTexture(X_i + sparkle_X, Y + sparkle_Y, EffectWidth[78], EffectHeight[78], GFXEffect[78], 0, EffectHeight[78] * sparkle_frame, 1.0f, 1.0f, 1.0f, 0.5f);
+            }
+        }
+
     }
 }
