@@ -565,6 +565,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_keyhole.cpp
     src/control/duplicate.cpp
     src/control/controls.cpp
+    src/logic/object_graph.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp

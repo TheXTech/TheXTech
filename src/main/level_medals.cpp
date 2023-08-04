@@ -20,13 +20,18 @@
 
 #include <bitset>
 #include <array>
+#include <algorithm>
 
 #include <PGE_File_Formats/file_formats.h>
+
+#include <Logger/logger.h>
 
 #include "npc_id.h"
 
 #include "main/level_medals.h"
 #include "main/level_save_info.h"
+
+#include "logic/object_graph.h"
 
 CurLevelMedals_t g_curLevelMedals;
 
@@ -143,7 +148,8 @@ void CurLevelMedals_t::commit()
 
 void OrderMedals()
 {
-    std::array<int16_t, 8> auto_hits;
+    using dist_and_hit_index = std::pair<uint16_t, int16_t>;
+    std::array<dist_and_hit_index, 8> auto_hits;
     int auto_count = 0;
 
     std::bitset<8> spec_hits;
@@ -174,7 +180,7 @@ void OrderMedals()
         {
             if(auto_count < 8)
             {
-                auto_hits[auto_count] = static_cast<int16_t>(i);
+                auto_hits[auto_count] = {0, static_cast<int16_t>(i)};
                 auto_count++;
             }
 
@@ -186,15 +192,41 @@ void OrderMedals()
         spec_hits[n.Variant - 1] = true;
     }
 
+    if(auto_count > 1)
+    {
+        // need to order the auto_hits
+        ObjectGraph::Graph graph;
+        ObjectGraph::FillGraph(graph);
+
+        for(int auto_i = 0; auto_i < auto_count; ++auto_i)
+        {
+            const NPC_t& n = NPC[auto_hits[auto_i].second];
+
+            double coord = graph.place_loc({n.Location.X, n.Location.Y});
+
+            pLogDebug("Number %d gets coord %f", auto_hits[auto_i].second, coord);
+
+            // 1.0 is the furthest exit, and it's never negative
+            if(coord > 2.0)
+                coord = 2.0;
+
+            auto_hits[auto_i].first = static_cast<uint16_t>(coord / 2.0 * 0xFFFF);
+        }
+
+        std::sort(auto_hits.begin(), auto_hits.begin() + auto_count);
+    }
+
     for(int auto_i = 0; auto_i < auto_count; ++auto_i)
     {
-        NPC_t& n = NPC[auto_hits[auto_i]];
+        NPC_t& n = NPC[auto_hits[auto_i].second];
 
         // try to find an index
         for(int i = 0; i < 8; ++i)
         {
             if(!spec_hits[i])
             {
+                pLogDebug("Number %d gets index %d", auto_hits[auto_i].second, i + 1);
+
                 n.Variant = i + 1;
                 spec_hits[i] = true;
                 break;
