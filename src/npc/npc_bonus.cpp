@@ -195,7 +195,7 @@ void TouchBonus(int A, int B)
         // If NPC(B).Type = 34 Or NPC(B).Type = 169 Or NPC(B).Type = 170 Then NPC(B).Type = 9
         // End If
 
-        if(NPC[B].Type == 273 && numPlayers > 1) // ? mushroom
+        if(NPC[B].Type == NPCID_SWAP_POWER && numPlayers > 1) // ? mushroom
         {
             if(!Player[1].Dead && Player[1].TimeToLive == 0 && !Player[2].Dead &&
                 Player[2].TimeToLive == 0 && Player[1].Immune == 0 && Player[2].Immune == 0)
@@ -225,7 +225,7 @@ void TouchBonus(int A, int B)
             }
         }
 
-        if(NPC[B].Type == 254) // Player is a fairy
+        if(NPC[B].Type == NPCID_FLY_POWER) // Player is a fairy
         {
             if(Player[A].Mount == 2)
                 return;
@@ -253,7 +253,7 @@ void TouchBonus(int A, int B)
             MoreScore(10, NPC[B].Location);
             return;
         }
-        if(NPC[B].Type == 248 && NPC[B].Effect != 2 && (Player[A].Character == 1 || Player[A].Character == 2)) // send the clock to the item container
+        if(NPC[B].Type == NPCID_TIMER_S3 && NPC[B].Effect != 2 && (Player[A].Character == 1 || Player[A].Character == 2)) // send the clock to the item container
         {
             Player[A].HeldBonus = 248;
             NPC[B].Killed = 9;
@@ -261,7 +261,7 @@ void TouchBonus(int A, int B)
             PlaySound(SFX_GotItem);
             return;
         }
-        if(NPC[B].Type == 240 || NPC[B].Type == 248) // player touched the clock
+        if(NPC[B].Type == NPCID_TIMER_S2 || NPC[B].Type == NPCID_TIMER_S3) // player touched the clock
         {
             PSwitchStop = Physics.NPCPSwitch;
             FreezeNPCs = true;
@@ -308,7 +308,7 @@ void TouchBonus(int A, int B)
         }
         if(NPC[B].Type == 153) // Bonus is a POISON mushroom
             PlayerHurt(A);
-        else if(NPC[B].Type == 9 || NPC[B].Type == 184 || NPC[B].Type == 185 || NPC[B].Type == 249 || NPC[B].Type == 250) // Bonus is a mushroom
+        else if(NPC[B].Type == 9 || NPC[B].Type == 184 || NPC[B].Type == 185 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5) // Bonus is a mushroom
         {
             if(Player[A].Character == 5 && Player[A].State == 1)
                 Player[A].State = 2;
@@ -332,7 +332,7 @@ void TouchBonus(int A, int B)
                     UnDuck(Player[A]);
                 PlaySound(SFX_PlayerGrow);
             }
-            else if(NPC[B].Type == 250)
+            else if(NPC[B].Type == NPCID_POWER_S5)
                 PlaySound(SFX_HeroHeart);
             else
             {
@@ -379,7 +379,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 264 || NPC[B].Type == 277) // Bonus is an ice flower
+        else if(NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4) // Bonus is an ice flower
         {
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
@@ -513,13 +513,13 @@ void TouchBonus(int A, int B)
         {
             if(NPC[B].Type == 152)
                 PlaySound(SFX_RingGet);
-            else if(NPC[B].Type == 251 || NPC[B].Type == 252 || NPC[B].Type == 253)
+            else if(NPC[B].Type == NPCID_GEM_1 || NPC[B].Type == NPCID_GEM_5 || NPC[B].Type == NPCID_GEM_20)
                 PlaySound(SFX_HeroRupee);
-            else if(NPC[B].Type != 274)
+            else if(NPC[B].Type != NPCID_MEDAL)
                 PlaySound(SFX_Coin);
-            if(NPC[B].Type == 252 || NPC[B].Type == 258)
+            if(NPC[B].Type == NPCID_GEM_5 || NPC[B].Type == NPCID_COIN_5)
                 Coins += 5;
-            else if(NPC[B].Type == 253)
+            else if(NPC[B].Type == NPCID_GEM_20)
                 Coins += 20;
             else
                 Coins += 1;
@@ -534,7 +534,7 @@ void TouchBonus(int A, int B)
                 else
                     Coins = 99;
             }
-            if(NPC[B].Type == 274)
+            if(NPC[B].Type == NPCID_MEDAL)
             {
                 PlaySound(SFX_MedalGet);
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);

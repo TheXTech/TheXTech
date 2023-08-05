@@ -1326,7 +1326,7 @@ void UpdateEditor()
                 {
                     for(A = 1; A <= numNPCs; A++)
                     {
-                        if(NPC[A].Type != 91 && NPC[A].Type != 259 && NPC[A].Type != 260)
+                        if(NPC[A].Type != 91 && NPC[A].Type != NPCID_FIRE_DISK && NPC[A].Type != NPCID_FIRE_CHAIN)
                         {
                             if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active)
                             {

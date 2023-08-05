@@ -50,6 +50,8 @@
 #include "main/trees.h"
 
 #include "cheat_code.h"
+
+#include "npc_id.h"
 #include "eff_id.h"
 
 
@@ -226,7 +228,7 @@ static void iceAge()
     {
         if(NPC[C].Active)
         {
-            if(!NPCNoIceBall[NPC[C].Type] && NPC[C].Type != 263 && !NPCIsABonus[NPC[C].Type])
+            if(!NPCNoIceBall[NPC[C].Type] && NPC[C].Type != NPCID_ICE_CUBE && !NPCIsABonus[NPC[C].Type])
             {
                 NPC[0].Type = 265;
                 NPCHit(C, 3, 0);

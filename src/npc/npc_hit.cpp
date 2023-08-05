@@ -126,12 +126,12 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = 172;
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
             }
-            else if(NPC[A].Type == 243)
+            else if(NPC[A].Type == NPCID_FLY_FODDER_S5)
             {
                 NPC[A].Type = 242;
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
             }
-            else if(NPC[A].Type == 244)
+            else if(NPC[A].Type == NPCID_FLY_FODDER_S3)
             {
                 NPC[A].Type = 1;
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
@@ -215,7 +215,7 @@ void NPCHit(int A, int B, int C)
         if(NPC[C].Generator)
             return;
     }
-    if((NPC[A].Type == 235 || NPC[A].Type == 231 || NPCIsCheep[NPC[A].Type]) && B == 1)
+    if((NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_SQUID_S3 || NPCIsCheep[NPC[A].Type]) && B == 1)
     {
         if(Player[C].Wet > 0)
             return;
@@ -234,7 +234,7 @@ void NPCHit(int A, int B, int C)
     }
 
 
-    if(B == 1 && NPCJumpHurt[NPC[A].Type] && NPC[A].Type != 283) // Things that don't die from jumping
+    if(B == 1 && NPCJumpHurt[NPC[A].Type] && NPC[A].Type != NPCID_ITEM_BUBBLE) // Things that don't die from jumping
         return;
 
     // Add it to the queue, no matter whether it will happen. Reduces code size and increases maintainability.
@@ -252,13 +252,13 @@ void NPCHit(int A, int B, int C)
     }
 
     // Yoshi Ice
-    if(NPC[A].Type == 237)
+    if(NPC[A].Type == NPCID_ICE_BLOCK)
     {
         if(B != 1 && B != 7 && B != 8 && B != 4)
             NPC[A].Killed = B;
     }
     // Frozen NPC
-    else if(NPC[A].Type == 263)
+    else if(NPC[A].Type == NPCID_ICE_CUBE)
     {
         if(B == 3 && NPC[C].Type == 13)
         {
@@ -301,7 +301,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].Killed = 9;
         PlaySound(SFX_HeroHeart);
     }
-    else if(B == 10 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 241 || NPC[A].Type == 96 || NPC[A].Type == 22 || NPC[A].Type == 134))
+    else if(B == 10 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == 96 || NPC[A].Type == 22 || NPC[A].Type == 134))
     {
         PlaySound(SFX_ShellHit);
         NPC[A].Bouce = true;
@@ -369,9 +369,9 @@ void NPCHit(int A, int B, int C)
         NPC[A].Location.SpeedY = -4;
         NPC[A].CantHurtPlayer = C;
         NPC[A].CantHurt = 30;
-        if(NPCIsVeggie[NPC[A].Type] || NPC[A].Type == 29 || NPC[A].Type == 251 || NPC[A].Type == 252)
+        if(NPCIsVeggie[NPC[A].Type] || NPC[A].Type == 29 || NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5)
         {
-            if(NPC[A].Type != 252)
+            if(NPC[A].Type != NPCID_GEM_5)
                 NPC[A].Type = 251;
             NPC[A].Location.SpeedX = (1 + dRand() * 0.5) * Player[C].Direction;
             NPC[A].Location.SpeedY = -5;
@@ -451,7 +451,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
         if(NPC[A].Damage >= 15)
             NPC[A].Killed = B;
-        else if(fiEqual(NPC[A].Special, 5) && !(NPC[A].Type == 268 || NPC[A].Type == 281))
+        else if(fiEqual(NPC[A].Special, 5) && !(NPC[A].Type == NPCID_MAGIC_BOSS_SHELL || NPC[A].Type == NPCID_FIRE_BOSS_SHELL))
         {
             NPC[A].Special = 0;
             NPC[A].Special2 = 0;
@@ -461,7 +461,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special6 = 0;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height;
-            if(NPC[A].Type == 267)
+            if(NPC[A].Type == NPCID_MAGIC_BOSS)
                 NPC[A].Type = 268;
             else
                 NPC[A].Type = 281;
@@ -538,12 +538,12 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Goomba / Nekkid Koopa
-    else if(NPC[A].Type == 1 || NPC[A].Type == 2 || NPC[A].Type == 242 || NPC[A].Type == 27 ||
+    else if(NPC[A].Type == 1 || NPC[A].Type == 2 || NPC[A].Type == NPCID_FODDER_S5 || NPC[A].Type == 27 ||
             NPC[A].Type == 55 || NPC[A].Type == 59 || NPC[A].Type == 61 || NPC[A].Type == 63 ||
-            NPC[A].Type == 65 || NPC[A].Type == 71 || NPC[A].Type == 77 || NPC[A].Type == 271 ||
+            NPC[A].Type == 65 || NPC[A].Type == 71 || NPC[A].Type == 77 || NPC[A].Type == NPCID_BAT ||
             NPC[A].Type == 89 || (NPC[A].Type >= 117 && NPC[A].Type <= 120) || NPC[A].Type == 162 ||
-            NPC[A].Type == 163 || NPC[A].Type == 229 || NPC[A].Type == 236 || NPC[A].Type == 230 ||
-            NPC[A].Type == 232 || NPC[A].Type == 233 || NPC[A].Type == 234)
+            NPC[A].Type == 163 || NPC[A].Type == NPCID_GRN_FISH_S3 || NPC[A].Type == NPCID_FISH_S4 || NPC[A].Type == NPCID_RED_FISH_S3 ||
+            NPC[A].Type == NPCID_GOGGLE_FISH || NPC[A].Type == NPCID_GRN_FISH_S1 || NPC[A].Type == NPCID_BONE_FISH)
     {
         if(B == 1)
         {
@@ -555,7 +555,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Location.Y += -NPC[A].Location.Height;
                 PlaySound(SFX_Stomp);
             }
-            else if(NPC[A].Type != 234)
+            else if(NPC[A].Type != NPCID_BONE_FISH)
                 NPC[A].Killed = B;
         }
         else if(NPC[A].Type >= 117 && NPC[A].Type <= 120)
@@ -568,7 +568,7 @@ void NPCHit(int A, int B, int C)
         }
         else
         {
-            if(NPC[A].Type == 234 && B == 3)
+            if(NPC[A].Type == NPCID_BONE_FISH && B == 3)
             {
                 if(NPC[C].Type != 13 && NPC[C].Type != 108)
                     NPC[A].Killed = B;
@@ -866,15 +866,15 @@ void NPCHit(int A, int B, int C)
 
         // Projectile Only Death (Ghosts, Thwomps, Etc.)
     }
-    else if(NPC[A].Type == 37 || NPC[A].Type == 38 || NPC[A].Type == 42 || NPC[A].Type == 43 || NPC[A].Type == 180 || NPC[A].Type == 179 || NPC[A].Type == 206 || NPC[A].Type == 259)
+    else if(NPC[A].Type == 37 || NPC[A].Type == 38 || NPC[A].Type == 42 || NPC[A].Type == 43 || NPC[A].Type == 180 || NPC[A].Type == 179 || NPC[A].Type == 206 || NPC[A].Type == NPCID_FIRE_DISK)
     {
         if((B == 3 && NPC[C].Type != 13) || B == 4)
         {
-            if(NPC[A].Type != 259 && NPC[C].Type != 58) // roto disks don't die form falling blocks
+            if(NPC[A].Type != NPCID_FIRE_DISK && NPC[C].Type != 58) // roto disks don't die form falling blocks
             {
                 if(NPC[A].Type != 179)
                     NPC[A].Killed = B;
-                if(B == 3 && (NPC[A].Type == 37 || NPC[A].Type == 180 || NPC[A].Type == 259))
+                if(B == 3 && (NPC[A].Type == 37 || NPC[A].Type == 180 || NPC[A].Type == NPCID_FIRE_DISK))
                 {
                     if(NPC[C].Location.SpeedX > 0)
                     {
@@ -1006,7 +1006,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special = 10000;
     }
     // Heart bomb
-    else if(NPC[A].Type == 291)
+    else if(NPC[A].Type == NPCID_CHAR3_HEAVY)
     {
         if(B == 9)
             NPC[A].Killed = B;
@@ -1213,7 +1213,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
     }
     // SML2 Paragoomba
-    else if(NPC[A].Type == 243)
+    else if(NPC[A].Type == NPCID_FLY_FODDER_S5)
     {
         if(B == 1)
         {
@@ -1227,7 +1227,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
     }
     // SMB3 Brown Paragoomba
-    else if(NPC[A].Type == 244)
+    else if(NPC[A].Type == NPCID_FLY_FODDER_S3)
     {
         if(B == 1)
         {
@@ -1629,7 +1629,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Big Piranha Plant
-    else if(NPC[A].Type == 256 || NPC[A].Type == 257)
+    else if(NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
     {
         if(!(B == 1 || B == 2 || B == 6))
         {
@@ -1669,7 +1669,7 @@ void NPCHit(int A, int B, int C)
     }
 
     // Piranha Plants
-    else if(NPC[A].Type == 8 || NPC[A].Type == 275 || NPC[A].Type == 93 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 245 || NPC[A].Type == 270)
+    else if(NPC[A].Type == 8 || NPC[A].Type == NPCID_QUAD_SPITTER || NPC[A].Type == 93 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_JUMP_PLANT)
     {
         if(!(B == 1 || B == 2 || B == 6))
         {
@@ -1701,7 +1701,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Player Fireball
-    else if(NPC[A].Type == 13 || NPC[A].Type == 265)
+    else if(NPC[A].Type == 13 || NPC[A].Type == NPCID_PLR_ICEBALL)
     {
         if(B != 7 && B != 9 && B != 2)
         {
@@ -1743,7 +1743,7 @@ void NPCHit(int A, int B, int C)
     else if(NPC[A].Type == 29)
         NPC[A].Killed = B;
     // Hammer Bros. Hammer
-    else if(NPC[A].Type == 30)
+    else if(NPC[A].Type == NPC_HEAVY_THROWN)
     {
         if(B == 3)
             NPC[A].Killed = B;
@@ -1875,9 +1875,9 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Indestructable Objects
-    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239 || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == 96 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 240 || NPC[A].Type == 241 || NPC[A].Type == 278 || NPC[A].Type == 279)
+    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == 35 || NPC[A].Type == 191 || NPC[A].Type == 193 || NPC[A].Type == 49 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == 96 || (NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON)
     {
-        if(NPC[A].Type == 241 && (B == 4 || B == 5 || B == 10))
+        if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && (B == 4 || B == 5 || B == 10))
         {
             NPC[A].Killed = 4;
             PowBlock();
@@ -1898,7 +1898,7 @@ void NPCHit(int A, int B, int C)
             if(B == 1 && NPC[A].Type == 26)
                 PlaySound(SFX_Spring);
 
-            if(B == 1 && (NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239))
+            if(B == 1 && (NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT))
             {
                 NPC[A].Killed = 1;
                 if(NPC[A].Type == 32)
@@ -1906,7 +1906,7 @@ void NPCHit(int A, int B, int C)
                     PSwitchTime = Physics.NPCPSwitch;
                     PSwitchPlayer = C;
                 }
-                else if(NPC[A].Type == 238)
+                else if(NPC[A].Type == NPCID_TIME_SWITCH)
                 {
                     PSwitchStop = Physics.NPCPSwitch;
                     FreezeNPCs = true;
@@ -1966,7 +1966,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Misc. Things With No Jump Death (SMB2 Shy Guys, SMB2 Ninji, SMB2 Pokey)
-    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 247 || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 36 || NPC[A].Type == 285 || NPC[A].Type == 286 || NPC[A].Type == 47 || NPC[A].Type == 284 || NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 158 || NPC[A].Type == 231 || NPC[A].Type == 235 || NPC[A].Type == 261 || NPC[A].Type == 272)
+    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == NPCID_STACKER || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 36 || NPC[A].Type == NPCID_SPIKY_S4 || NPC[A].Type == NPCID_SPIKY_BALL_S4 || NPC[A].Type == 47 || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 158 || NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_WALK_PLANT || NPC[A].Type == NPCID_VINE_BUG)
     {
         if(B == 10 && NPC[A].Type != 158)
             NPC[A].Killed = B;
@@ -2051,7 +2051,7 @@ void NPCHit(int A, int B, int C)
 
         if(B == 1 && NPC[A].Type == 158)
             PlaySound(SFX_Stomp);
-        if((B == 1 || B == 8) && (NPC[A].Type == 47 || NPC[A].Type == 284))
+        if((B == 1 || B == 8) && (NPC[A].Type == 47 || NPC[A].Type == NPCID_ITEM_THROWER))
             NPC[A].Killed = B;
     }
     // Exits
@@ -2073,13 +2073,13 @@ void NPCHit(int A, int B, int C)
             PlaySound(SFX_ShellHit);
         if(B == 2)
         {
-            if(NPC[A].Type == 251 || NPC[A].Type == 252 || NPC[A].Type == 253)
+            if(NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5 || NPC[A].Type == NPCID_GEM_20)
             {
                 PlaySound(SFX_HeroRupee);
                 NewEffect(EFFID_COIN_COLLECT, NPC[A].Location);
                 MoreScore(1, NPC[A].Location);
             }
-            else if(NPC[A].Type == 258 || NPC[A].Type == 103)
+            else if(NPC[A].Type == NPCID_COIN_5 || NPC[A].Type == 103)
             {
                 PlaySound(SFX_Coin);
                 NewEffect(EFFID_COIN_COLLECT, NPC[A].Location);
@@ -2096,9 +2096,9 @@ void NPCHit(int A, int B, int C)
             }
 
             NPC[A].Killed = 9;
-            if(NPC[A].Type == 252 || NPC[A].Type == 258)
+            if(NPC[A].Type == NPCID_GEM_5 || NPC[A].Type == NPCID_COIN_5)
                 Coins += 5;
-            else if(NPC[A].Type == 253)
+            else if(NPC[A].Type == NPCID_GEM_20)
                 Coins += 20;
             else
                 Coins += 1;
@@ -2149,7 +2149,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 7)
         {
-            if(NPC[A].Type == 9 || NPC[A].Type == 273 || NPC[A].Type == 14 ||
+            if(NPC[A].Type == 9 || NPC[A].Type == NPCID_SWAP_POWER || NPC[A].Type == 14 ||
                NPC[A].Type == 90 || NPC[A].Type == 153 || NPC[A].Type == 169 ||
                (NPC[A].Type >= 182 && NPC[A].Type <= 188) || NPC[A].Type == 170)
             {
@@ -2192,7 +2192,7 @@ void NPCHit(int A, int B, int C)
     Player[0].Multiplier = 0;
     if((B == 1 || B == 8) && C <= numPlayers && !NPCIsABonus[NPC[A].Type])
     {
-        if(NPC[A].Type == 13 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 239)
+        if(NPC[A].Type == 13 || NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT)
         {
         }
         else if(oldNPC.Type == 137 || NPC[A].Type == 45 || oldNPC.Type == 166 || NPC[A].Type == 168 || (NPCIsAShell[oldNPC.Type] && B != 8))
@@ -2227,7 +2227,7 @@ void NPCHit(int A, int B, int C)
         }
     }
 
-    if((B == 2 || B == 7) && !NPCIsABonus[NPC[A].Type] && oldNPC.Type != 194 && NPC[A].Type != 241)
+    if((B == 2 || B == 7) && !NPCIsABonus[NPC[A].Type] && oldNPC.Type != 194 && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[A].Killed != 0 || NPC[A].Type != oldNPC.Type)
         {
@@ -2245,7 +2245,7 @@ void NPCHit(int A, int B, int C)
         }
     }
 
-    if(B == 4 && NPC[A].Killed == 4 && !NPCIsACoin[NPC[A].Type] && C != A && NPC[A].Type != 13 && NPC[A].Type != 265 && NPC[A].Type != 108 && NPC[A].Type != 241)
+    if(B == 4 && NPC[A].Killed == 4 && !NPCIsACoin[NPC[A].Type] && C != A && NPC[A].Type != 13 && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != 108 && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[C].Type != 208)
         {
@@ -2274,7 +2274,7 @@ void NPCHit(int A, int B, int C)
     if(!NPCIsACoin[NPC[A].Type] && B == 3 && C != A &&
        (NPC[A].Killed == B || !fEqual(NPC[A].Damage, oldNPC.Damage)) &&
         NPC[A].Type != 13 && NPC[A].Type != 108 && NPC[A].Type != 45 &&
-        NPC[A].Type != 210 && NPC[A].Type != 241)
+        NPC[A].Type != 210 && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[A].Killed == B)
         {

@@ -26,6 +26,8 @@
 #include "core/render.h"
 #include "gfx.h"
 
+#include "npc_id.h"
+
 #include "graphics/gfx_keyhole.h"
 
 #include "compat.h"
@@ -307,7 +309,7 @@ void DrawPlayer(Player_t &p, const int Z)
         // peach/toad held npcs
             if((p.Character == 3 || p.Character == 4) && p.HoldingNPC > 0 && p.Effect != 7)
             {
-                if(NPC[p.HoldingNPC].Type != 263)
+                if(NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE)
                 {
                     if(
                         (

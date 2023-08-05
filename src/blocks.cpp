@@ -2078,10 +2078,10 @@ void PSwitch(bool enabled)
                     numBlock++;
                     auto &nb = Block[numBlock];
 
-                    if((NPC[A].Type == 251 || NPC[A].Type == 252 || NPC[A].Type == 253) && NPC[A].DefaultType != 0)
+                    if((NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5 || NPC[A].Type == NPCID_GEM_20) && NPC[A].DefaultType != 0)
                         NPC[A].Type = NPC[A].DefaultType;
 
-                    if(NPC[A].Type == 33 || NPC[A].Type == 258)
+                    if(NPC[A].Type == 33 || NPC[A].Type == NPCID_COIN_5)
                         nb.Type = 89;
                     else if(NPC[A].Type == 88)
                         nb.Type = 188;

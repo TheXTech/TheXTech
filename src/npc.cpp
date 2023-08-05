@@ -204,7 +204,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     {
         if(!NPC[i].Hidden && NPC[i].Active && !NPC[i].Inert && !NPC[i].Generator && !NPCIsABonus[NPC[i].Type])
         {
-            if(NPC[i].Type != 13 && NPC[i].Type != 291)
+            if(NPC[i].Type != 13 && NPC[i].Type != NPCID_CHAR3_HEAVY)
             {
                 A = std::abs(NPC[i].Location.X + NPC[i].Location.Width / 2.0 - X);
                 B = std::abs(NPC[i].Location.Y + NPC[i].Location.Height / 2.0 - Y);
@@ -313,17 +313,17 @@ void TurnNPCsIntoCoins()
             if(!NPC[A].Hidden && NPC[A].Killed == 0 && !NPCIsAnExit[NPC[A].Type] && !NPC[A].Inert)
             {
                 if(!NPCIsYoshi[NPC[A].Type] && !NPCIsBoot[NPC[A].Type] &&
-                   !NPCIsABonus[NPC[A].Type] && NPC[A].Type != 265 && NPC[A].Type != 13 &&
+                   !NPCIsABonus[NPC[A].Type] && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != 13 &&
                    NPC[A].Type != 108 && NPC[A].Type != 26 && !NPCIsVeggie[NPC[A].Type] &&
                    NPC[A].Type != 91 && NPC[A].Type != 171 && !NPCIsAVine[NPC[A].Type] &&
                    NPC[A].Type != 56 && NPC[A].Type != 60 && NPC[A].Type != 62 &&
                    NPC[A].Type != 64 && NPC[A].Type != 66 && NPC[A].Type != 104 &&
-                   !(NPC[A].Projectile && NPC[A].Type == 30) &&
+                   !(NPC[A].Projectile && NPC[A].Type == NPC_HEAVY_THROWN) &&
                    !(NPC[A].Projectile && NPC[A].Type == 17) &&
-                   NPC[A].Type != 291 && NPC[A].Type != 292 && NPC[A].Type != 266 &&
+                   NPC[A].Type != NPCID_CHAR3_HEAVY && NPC[A].Type != NPCID_CHAR4_HEAVY && NPC[A].Type != NPCID_SWORDBEAM &&
                    NPC[A].Type != 57 && NPC[A].Type != 58 &&
                    !(NPC[A].Type >= 78 && NPC[A].Type <= 83) &&
-                   NPC[A].Type != 91 && NPC[A].Type != 260 && NPC[A].Type != 259)
+                   NPC[A].Type != 91 && NPC[A].Type != NPCID_FIRE_CHAIN && NPC[A].Type != NPCID_FIRE_DISK)
                 {
                     NPC[A].Location.Y += 32;
                     NewEffect(EFFID_COIN_BLOCK_S3, NPC[A].Location);
@@ -354,7 +354,7 @@ void TurnNPCsIntoCoins()
                     if(NPC[A].tempBlock != 0)
                         treeNPCSplitTempBlock(A);
                 }
-                else if(NPC[A].Type == 197 || NPC[A].Type == 260 || NPC[A].Type == 259)
+                else if(NPC[A].Type == 197 || NPC[A].Type == NPCID_FIRE_CHAIN || NPC[A].Type == NPCID_FIRE_DISK)
                 {
                     NPC[A].Active = false;
                     NPCQueues::update(A);
@@ -3148,10 +3148,10 @@ void SpecialNPC(int A)
     Location_t tempLocation2;
     // NPC_t tempNPC;
 
-    if(NPC[A].Type == 87 || NPC[A].Type == 276 || NPC[A].Type == 85 ||
-       NPC[A].Type == 133 || NPC[A].Type == 246 || NPC[A].Type == 30 ||
+    if(NPC[A].Type == 87 || NPC[A].Type == NPCID_QUAD_BALL || NPC[A].Type == 85 ||
+       NPC[A].Type == 133 || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPC_HEAVY_THROWN ||
        NPC[A].Type == 202 || NPC[A].Type == 210 ||
-       (BattleMode && (NPC[A].Type == 13 || NPC[A].Type == 171 || NPC[A].Type == 265))) // Link shield block
+       (BattleMode && (NPC[A].Type == 13 || NPC[A].Type == 171 || NPC[A].Type == NPCID_PLR_ICEBALL))) // Link shield block
     {
         for(B = 1; B <= numPlayers; B++)
         {
@@ -3186,11 +3186,11 @@ void SpecialNPC(int A)
                         NPC[A].Killed = 9;
                         NPCQueues::Killed.push_back(A);
 
-                        if(NPC[A].Type == 13 || NPC[A].Type == 265)
+                        if(NPC[A].Type == 13 || NPC[A].Type == NPCID_PLR_ICEBALL)
                             NPC[A].Killed = 3;
 
-                        if(NPC[A].Type != 30 && NPC[A].Type != 202 && NPC[A].Type != 210 &&
-                           NPC[A].Type != 171 && NPC[A].Type != 13 && NPC[A].Type != 265)
+                        if(NPC[A].Type != NPC_HEAVY_THROWN && NPC[A].Type != 202 && NPC[A].Type != 210 &&
+                           NPC[A].Type != 171 && NPC[A].Type != 13 && NPC[A].Type != NPCID_PLR_ICEBALL)
                         {
                             for(int Ci = 1; Ci <= 10; Ci++)
                             {
@@ -3205,7 +3205,7 @@ void SpecialNPC(int A)
                             }
                         }
 
-                        if(NPC[A].Type != 13 && NPC[A].Type != 265)
+                        if(NPC[A].Type != 13 && NPC[A].Type != NPCID_PLR_ICEBALL)
                         {
                             NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                             NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
@@ -3231,7 +3231,7 @@ void SpecialNPC(int A)
             }
         }
     }
-    if(NPC[A].Type == 292) // Toad Boomerang
+    if(NPC[A].Type == NPCID_CHAR4_HEAVY) // Toad Boomerang
     {
         double npcHCenter = NPC[A].Location.X + NPC[A].Location.Width / 2.0;
         double npcVCenter = NPC[A].Location.Y + NPC[A].Location.Height / 2.0;
@@ -3371,7 +3371,7 @@ void SpecialNPC(int A)
             NPCQueues::Killed.push_back(A);
         }
     }
-    else if(NPC[A].Type == 251 || NPC[A].Type == 252 || NPC[A].Type == 253) // Rupee
+    else if(NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5 || NPC[A].Type == NPCID_GEM_20) // Rupee
     {
         if(NPC[A].Location.SpeedX < -0.02)
             NPC[A].Location.SpeedX += 0.02;
@@ -3380,7 +3380,7 @@ void SpecialNPC(int A)
         else
             NPC[A].Location.SpeedX = 0;
     }
-    else if(NPC[A].Type == 237 || NPC[A].Type == 263) // Yoshi Ice
+    else if(NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE) // Yoshi Ice
     {
         if(iRand(100) >= 93)
         {
@@ -3406,7 +3406,7 @@ void SpecialNPC(int A)
             }
         }
     }
-    else if(NPC[A].Type == 231 || NPC[A].Type == 235) // Blooper
+    else if(NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1) // Blooper
     {
         if(NPC[A].Wet == 2 && NPC[A].Quicksand == 0)
         {
@@ -3523,7 +3523,7 @@ void SpecialNPC(int A)
             }
         }
     }
-    else if(NPC[A].Type == 288)
+    else if(NPC[A].Type == NPCID_DOOR_MAKER)
     {
         if(NPC[A].Special3 == 1)
         {
@@ -3543,7 +3543,7 @@ void SpecialNPC(int A)
         }
     }
     // firespitting plant
-    else if(NPC[A].Type == 245)
+    else if(NPC[A].Type == NPCID_FIRE_PLANT)
     {
         C = 0;
         for(B = 1; B <= numPlayers; B++)
@@ -3692,7 +3692,7 @@ void SpecialNPC(int A)
 
     // jumping plant
     }
-    else if(NPC[A].Type == 270)
+    else if(NPC[A].Type == NPCID_JUMP_PLANT)
     {
         if(NPC[A].Projectile)
         {
@@ -3794,7 +3794,7 @@ void SpecialNPC(int A)
 
     // Piranha Plant code
     }
-    else if(NPC[A].Type == 8 || NPC[A].Type == 74 || NPC[A].Type == 93 || NPC[A].Type == 256)
+    else if(NPC[A].Type == 8 || NPC[A].Type == 74 || NPC[A].Type == 93 || NPC[A].Type == NPCID_LONG_PLANT_UP)
     {
         if(NPC[A].Special3 > 0)
             NPC[A].Special3 -= 1;
@@ -3834,7 +3834,7 @@ void SpecialNPC(int A)
             }
             else if(NPC[A].Special2 == 2)
             {
-                if(NPC[A].Type != 256)
+                if(NPC[A].Type != NPCID_LONG_PLANT_UP)
                     NPC[A].Special += 1;
                 if(NPC[A].Special >= 50)
                 {
@@ -3849,7 +3849,7 @@ void SpecialNPC(int A)
                 if(NPC[A].Special >= NPCHeight[NPC[A].Type] * 0.65 + 1)
                 {
                     NPC[A].Special2 = 4;
-                    if(NPC[A].Type == 256)
+                    if(NPC[A].Type == NPCID_LONG_PLANT_UP)
                         NPC[A].Special = 0;
                 }
             }
@@ -3873,7 +3873,7 @@ void SpecialNPC(int A)
                             }
                         }
                     }
-                    if(NPC[A].Type == 256)
+                    if(NPC[A].Type == NPCID_LONG_PLANT_UP)
                         tempTurn = true;
                     if(tempTurn)
                     {
@@ -3897,7 +3897,7 @@ void SpecialNPC(int A)
         }
     // down piranha plant
     }
-    else if(NPC[A].Type == 51 || NPC[A].Type == 257)
+    else if(NPC[A].Type == 51 || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
     {
         if(NPC[A].Special3 > 0)
             NPC[A].Special3 -= 1;
@@ -3934,7 +3934,7 @@ void SpecialNPC(int A)
             }
             else if(NPC[A].Special2 == 2)
             {
-                if(NPC[A].Type != 257)
+                if(NPC[A].Type != NPCID_LONG_PLANT_DOWN)
                     NPC[A].Special += 1;
                 if(NPC[A].Special >= 50)
                 {
@@ -4603,7 +4603,7 @@ void SpecialNPC(int A)
             NPC[numNPCs].Location.X = NPC[A].Location.X;
             NPC[numNPCs].Location.Y = NPC[A].Location.Y;
             NPC[numNPCs].Direction = NPC[A].Direction;
-            NPC[numNPCs].Type = 30;
+            NPC[numNPCs].Type = NPC_HEAVY_THROWN;
             NPC[numNPCs].Section = NPC[A].Section;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 50;
@@ -5249,7 +5249,7 @@ void SpecialNPC(int A)
 
 
     }
-    else if(NPC[A].Type == 284) // smw lakitu
+    else if(NPC[A].Type == NPCID_ITEM_THROWER) // smw lakitu
     {
         if(NPC[A].Special == 0)
             NPC[A].Special = NPC[A].Type;
@@ -5432,7 +5432,7 @@ void SpecialNPC(int A)
 
                 NPC[numNPCs].Type = NPC[A].Special;
 
-                if(NPC[numNPCs].Type == 287)
+                if(NPC[numNPCs].Type == NPCID_RANDOM_POWER)
                     NPC[numNPCs].Type = RandomBonus();
 
                 NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -5629,9 +5629,9 @@ void CharStuff(int WhatNPC, bool CheckEggs)
                     NPCQueues::Unchecked.push_back(A);
                     treeNPCUpdate(A);
                 }
-                else if(NPC[A].Type == 10 || NPC[A].Type == 33 || NPC[A].Type == 88 || NPC[A].Type == 138 || NPC[A].Type == 258) // turn coins into rupees
+                else if(NPC[A].Type == 10 || NPC[A].Type == 33 || NPC[A].Type == 88 || NPC[A].Type == 138 || NPC[A].Type == NPCID_COIN_5) // turn coins into rupees
                 {
-                    if(NPC[A].Type == 258)
+                    if(NPC[A].Type == NPCID_COIN_5)
                         NPC[A].Type = 252;
                     else
                         NPC[A].Type = 251;

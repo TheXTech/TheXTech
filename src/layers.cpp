@@ -26,6 +26,7 @@
 #include "effect.h"
 #include "collision.h"
 #include "npc.h"
+#include "npc_id.h"
 #include "eff_id.h"
 #include "sound.h"
 #include "graphics.h"
@@ -1494,8 +1495,8 @@ void UpdateLayers()
                            NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 46 ||
                            NPC[B].Type == 93 || NPC[B].Type == 74 || NPCIsAVine[NPC[B].Type] ||
                            NPC[B].Type == 192 || NPC[B].Type == 197 || NPC[B].Type == 91 ||
-                           NPC[B].Type == 211 || NPC[B].Type == 256 || NPC[B].Type == 257 ||
-                           NPC[B].Type == 245)
+                           NPC[B].Type == 211 || NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_LONG_PLANT_DOWN ||
+                           NPC[B].Type == NPCID_FIRE_PLANT)
                         {
                             if(NPC[B].Type == 91 || NPC[B].Type == 211)
                             {
@@ -1513,7 +1514,7 @@ void UpdateLayers()
                                 NPC[B].Location.X = NPC[B].DefaultLocation.X;
                                 NPC[B].Location.Y = NPC[B].DefaultLocation.Y;
                                 if(NPC[B].Type == 8 || NPC[B].Type == 74 || NPC[B].Type == 93 ||
-                                   NPC[B].Type == 256 || NPC[B].Type == 245)
+                                   NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_FIRE_PLANT)
                                     NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
                                 else if(NPC[B].Type == 52 && fiEqual(NPC[B].Direction, -1))
                                     NPC[B].Location.X += NPC[B].DefaultLocation.Width;
