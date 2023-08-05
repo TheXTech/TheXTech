@@ -245,7 +245,7 @@ void NPCHit(int A, int B, int C)
         {
             NPC[A].Killed = 9;
             Player[C].HasKey = true;
-            PlaySound(SFX_ZeldaKey);
+            PlaySound(SFX_HeroKey);
             return;
         }
     }
@@ -298,7 +298,7 @@ void NPCHit(int A, int B, int C)
         // .Location.Y += .Location.Height / 2 - EffectHeight(10) / 2
         // NewEffect 10, .Location
         NPC[A].Killed = 9;
-        PlaySound(SFX_ZeldaHeart);
+        PlaySound(SFX_HeroHeart);
     }
     else if(B == 10 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 241 || NPC[A].Type == 96 || NPC[A].Type == 22 || NPC[A].Type == 134))
     {
@@ -329,7 +329,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Location.Y += -NPC[A].Location.Height;
             NPC[A].Type = NPC[A].Special;
         }
-        PlaySound(SFX_ZeldaGrass);
+        PlaySound(SFX_HeroGrass);
         NewEffect(63, NPC[A].Location);
         if(NPC[A].Type == 17)
         {
@@ -422,7 +422,7 @@ void NPCHit(int A, int B, int C)
             PlaySound(SFX_Stomp);
             NPC[A].Special = 5;
             if(NPC[A].Type == NPCID_MAGIC_BOSS && NPC[A].Damage < 15)
-                PlaySound(SFX_LarryShell);
+                PlaySound(SFX_MagicBossShell);
         }
         else if(B == 3 || B == 4 || B == 5)
         {
@@ -436,15 +436,15 @@ void NPCHit(int A, int B, int C)
                 NPCHit(C, 3, B);
                 NPC[A].Special = 5;
                 NPC[A].Damage += 5;
-                PlaySound(SFX_BirdoHit);
+                PlaySound(SFX_SpitBossHit);
                 if(NPC[A].Type == NPCID_MAGIC_BOSS && NPC[A].Damage < 15)
-                    PlaySound(SFX_LarryShell);
+                    PlaySound(SFX_MagicBossShell);
             }
         }
         else if(B == 10)
         {
             NPC[A].Damage += 2;
-            PlaySound(SFX_ZeldaHit);
+            PlaySound(SFX_HeroHit);
         }
         else if(B == 6)
             NPC[A].Killed = B;
@@ -511,13 +511,13 @@ void NPCHit(int A, int B, int C)
                 NPCHit(C, 3, B);
                 NPC[A].Special = 5;
                 NPC[A].Damage += 5;
-                PlaySound(SFX_BirdoHit);
+                PlaySound(SFX_SpitBossHit);
             }
         }
         else if(B == 10)
         {
             NPC[A].Damage += 2;
-            PlaySound(SFX_ZeldaHit);
+            PlaySound(SFX_HeroHit);
         }
         else if(B == 6)
             NPC[A].Killed = B;
@@ -724,7 +724,7 @@ void NPCHit(int A, int B, int C)
         else if(B == 6)
         {
             NPC[A].Killed = B;
-            PlaySound(SFX_WartKilled);
+            PlaySound(SFX_SickBossKilled);
         }
         else if(B == 10)
         {
@@ -734,17 +734,17 @@ void NPCHit(int A, int B, int C)
         if(NPC[A].Damage >= 20)
         {
             NPC[A].Killed = 3;
-            PlaySound(SFX_BirdoBeat);
+            PlaySound(SFX_SpitBossBeat);
         }
         else if(B == 3)
         {
             if(NPC[C].Type == 13)
                 PlaySound(SFX_ShellHit);
             else
-                PlaySound(SFX_BirdoHit);
+                PlaySound(SFX_SpitBossHit);
         }
         else if(B == 10)
-            PlaySound(SFX_BirdoHit);
+            PlaySound(SFX_SpitBossHit);
     }
     // Wart
     else if(NPC[A].Type == NPCID_SICK_BOSS)
@@ -758,7 +758,7 @@ void NPCHit(int A, int B, int C)
             {
                 if(NPC[A].Special == 1)
                 {
-                    PlaySound(SFX_BirdoHit);
+                    PlaySound(SFX_SpitBossHit);
                     NPC[A].Damage += 5;
                     NPC[A].Immune = 20;
                     NPC[C].Killed = 9;
@@ -768,7 +768,7 @@ void NPCHit(int A, int B, int C)
             {
                 if(NPC[C].Type != 13)
                 {
-                    PlaySound(SFX_BirdoHit);
+                    PlaySound(SFX_SpitBossHit);
                     NPC[A].Damage += 5;
                     NPC[A].Immune = 20;
                 }
@@ -782,11 +782,11 @@ void NPCHit(int A, int B, int C)
         else if(B == 6)
         {
             NPC[A].Killed = B;
-            PlaySound(SFX_WartKilled);
+            PlaySound(SFX_SickBossKilled);
         }
         else if(B == 10)
         {
-            PlaySound(SFX_BirdoHit);
+            PlaySound(SFX_SpitBossHit);
             NPC[A].Damage += 5;
             NPC[A].Immune = 20;
         }
@@ -802,7 +802,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Immune = 20;
             if(NPC[C].Type != 13)
             {
-                PlaySound(SFX_BirdoHit);
+                PlaySound(SFX_SpitBossHit);
                 NPC[A].Damage += 3;
             }
             else
@@ -813,7 +813,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 10)
         {
-            PlaySound(SFX_BirdoHit);
+            PlaySound(SFX_SpitBossHit);
             NPC[A].Immune = 20;
             NPC[A].Damage += 1;
         }
@@ -827,7 +827,7 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 1 || B == 8 || B == 10)
         {
-            PlaySound(SFX_DryBones);
+            PlaySound(SFX_Skeleton);
             PlaySound(SFX_Stomp);
             NPC[A].Special = 1;
             NPC[A].Special2 = 0;
@@ -858,7 +858,7 @@ void NPCHit(int A, int B, int C)
             if(NPC[A].Damage >= 3)
                 NPC[A].Killed = B;
             else
-                PlaySound(SFX_BirdoHit);
+                PlaySound(SFX_SpitBossHit);
         }
         else if(B == 6)
             NPC[A].Killed = B;
@@ -1478,7 +1478,7 @@ void NPCHit(int A, int B, int C)
                     NPCHit(C, 3, A);
                 if(NPC[C].Type != 13)
                 {
-                    PlaySound(SFX_BirdoHit);
+                    PlaySound(SFX_SpitBossHit);
                     NPC[A].Damage += 10;
                 }
                 else
@@ -1493,7 +1493,7 @@ void NPCHit(int A, int B, int C)
         else if(B == 10)
         {
             NPC[A].Immune = 10;
-            PlaySound(SFX_BirdoHit);
+            PlaySound(SFX_SpitBossHit);
             NPC[A].Damage += 10;
         }
         if(NPC[A].Damage >= 200)
@@ -1638,7 +1638,7 @@ void NPCHit(int A, int B, int C)
                 {
                     if(NPC[C].Type == 13)
                     {
-                        PlaySound(SFX_BirdoHit);
+                        PlaySound(SFX_SpitBossHit);
                         NPC[A].Damage += 1;
                         NPC[A].Special3 = 10;
                         if(NPC[A].Special2 == 2)
@@ -1647,7 +1647,7 @@ void NPCHit(int A, int B, int C)
                     else
                     {
                         NPC[A].Damage += 3;
-                        PlaySound(SFX_BirdoHit);
+                        PlaySound(SFX_SpitBossHit);
                         NPC[A].Special3 = 30;
                         if(NPC[A].Special2 == 2)
                             NPC[A].Special = 50;
@@ -1656,7 +1656,7 @@ void NPCHit(int A, int B, int C)
                 else if(B == 10)
                 {
                     NPC[A].Damage += 2;
-                    PlaySound(SFX_BirdoHit);
+                    PlaySound(SFX_SpitBossHit);
                     NPC[A].Special3 = 10;
                     if(NPC[A].Special2 == 2)
                         NPC[A].Special = 50;
@@ -1709,8 +1709,8 @@ void NPCHit(int A, int B, int C)
                 if(NPC[C].Type != 171)
                 {
                     // if(B != 6) // Always true
-                    if(fEqual(NPC[A].Special, 5) && HasSound(SFX_ZeldaFireRod))
-                        PlaySound(SFX_ZeldaFire);
+                    if(fEqual(NPC[A].Special, 5) && HasSound(SFX_HeroFireRod))
+                        PlaySound(SFX_HeroFire);
                     else
                         PlaySound(SFX_BlockHit);
                     NPC[A].Killed = B;
@@ -1720,8 +1720,8 @@ void NPCHit(int A, int B, int C)
             {
                 if(B != 6)
                 {
-                    if(fEqual(NPC[A].Special, 5) && HasSound(SFX_ZeldaFireRod))
-                        PlaySound(SFX_ZeldaFire);
+                    if(fEqual(NPC[A].Special, 5) && HasSound(SFX_HeroFireRod))
+                        PlaySound(SFX_HeroFire);
                     else
                         PlaySound(SFX_BlockHit);
                 }
@@ -1758,7 +1758,7 @@ void NPCHit(int A, int B, int C)
                 if(B == 1)
                     PlaySound(SFX_Stomp);
                 else
-                    PlaySound(SFX_BirdoHit);
+                    PlaySound(SFX_SpitBossHit);
                 NPC[A].Special = 4;
                 NPC[A].Special2 = 0;
                 NPC[A].Location.SpeedX = 0;
@@ -1784,7 +1784,7 @@ void NPCHit(int A, int B, int C)
 #endif
                 NPC[A].Immune = 10;
                 NPC[A].Damage++;
-                PlaySound(SFX_BirdoHit);
+                PlaySound(SFX_SpitBossHit);
             }
         }
 
@@ -1828,7 +1828,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Special = -30;
                     NPC[A].Damage += 1;
                     NPC[A].Direction = -NPC[A].Direction;
-                    PlaySound(SFX_BirdoHit);
+                    PlaySound(SFX_SpitBossHit);
                 }
             }
             else if(B == 4)
@@ -1838,7 +1838,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Special = -30;
                 NPC[A].Damage += 1;
                 NPC[A].Direction = -NPC[A].Direction;
-                PlaySound(SFX_BirdoHit);
+                PlaySound(SFX_SpitBossHit);
             }
 
             if(NPC[A].Damage >= 3)
@@ -1848,7 +1848,7 @@ void NPCHit(int A, int B, int C)
         if(B == 6)
         {
             NPC[A].Killed = B;
-            PlaySound(SFX_BirdoHit);
+            PlaySound(SFX_SpitBossHit);
         }
     }
     // Eggs
@@ -1889,7 +1889,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(NPC[A].Type == 96 && B == 10)
         {
-            PlaySound(SFX_ZeldaKill);
+            PlaySound(SFX_HeroKill);
             NPC[A].Special2 = 1;
         }
         else
@@ -2074,7 +2074,7 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type == 251 || NPC[A].Type == 252 || NPC[A].Type == 253)
             {
-                PlaySound(SFX_ZeldaRupee);
+                PlaySound(SFX_HeroRupee);
                 NewEffect(78, NPC[A].Location);
                 MoreScore(1, NPC[A].Location);
             }

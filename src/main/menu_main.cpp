@@ -1391,7 +1391,7 @@ bool mainMenuUpdate()
                     }
                     else
                     {
-                        PlaySoundMenu(SFX_Raccoon);
+                        PlaySoundMenu(SFX_Transform);
                         menuCopySaveDst = slot;
                         CopySave(selWorld, menuCopySaveSrc, menuCopySaveDst);
                         FindSaves();
@@ -1432,7 +1432,7 @@ bool mainMenuUpdate()
                     DeleteSave(selWorld, (MenuCursor + 1));
                     FindSaves();
                     MenuCursor = 4;
-                    PlaySoundMenu(SFX_Blaarg);
+                    PlaySoundMenu(SFX_LavaMonster);
                     MenuCursorCanMove = false;
                 }
             }

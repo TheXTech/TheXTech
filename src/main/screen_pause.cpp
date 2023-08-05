@@ -157,7 +157,7 @@ static bool s_SaveAndContinue()
     else
     {
         // player tried to cheat, scare them
-        PlaySound(SFX_BowserKilled);
+        PlaySound(SFX_VillainKilled);
     }
 
     return true;

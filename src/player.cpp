@@ -477,7 +477,7 @@ void PlayerHurt(const int A)
 
     if(p.Fairy)
     {
-        PlaySound(SFX_ZeldaFairy);
+        PlaySound(SFX_HeroFairy);
         p.Immune = 30;
         p.Effect = 8;
         p.Effect2 = 4;
@@ -495,7 +495,7 @@ void PlayerHurt(const int A)
             p.Location.SpeedY = -7.01;
             p.StandingOnNPC = 0;
             p.FireBallCD = 20;
-            PlaySound(SFX_ZeldaHurt);
+            PlaySound(SFX_HeroHurt);
         }
         return;
     }
@@ -539,7 +539,7 @@ void PlayerHurt(const int A)
             else if(p.Mount == 3)
             {
                 UnDuck(Player[A]);
-                PlaySound(SFX_YoshiHurt);
+                PlaySound(SFX_PetHurt);
                 p.Immune = 100;
                 p.Immune2 = true;
                 p.CanJump = false;
@@ -653,7 +653,7 @@ void PlayerHurt(const int A)
                         }
                         p.Immune = 150;
                         p.Immune2 = true;
-                        PlaySound(SFX_ZeldaHurt);
+                        PlaySound(SFX_HeroHurt);
                         return;
                     }
                 }
@@ -761,7 +761,7 @@ void PlayerDead(int A)
 //    }
 
     if(p.Character == 5)
-        PlaySound(SFX_ZeldaDied);
+        PlaySound(SFX_HeroDied);
     else
     {
         if(BattleMode)
@@ -902,7 +902,7 @@ void KillPlayer(const int A)
         {
             if(BattleLives[A] > 0)
                 BattleLives[A] -= 1;
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             p.Frame = 1;
             p.Location.SpeedX = 0;
             p.Location.SpeedY = 0;
@@ -2358,7 +2358,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                             }
                             if(block.Type == 370)
                             {
-                                PlaySound(SFX_ZeldaGrass);
+                                PlaySound(SFX_HeroGrass);
                                 block.Hidden = true;
                                 block.Layer = LAYER_DESTROYED_BLOCKS;
                                 syncLayersTrees_Block(A);
@@ -2483,7 +2483,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         }
 
                         PlayerHurt(A);
-                        PlaySound(SFX_ZeldaHit);
+                        PlaySound(SFX_HeroHit);
                     }
                     else
                     {
@@ -2671,7 +2671,7 @@ void YoshiSpit(const int A)
         //    PlayerPush(p.YoshiPlayer, 4);
 
         p.YoshiPlayer = 0;
-        PlaySound(SFX_BirdoSpit);
+        PlaySound(SFX_SpitBossSpit);
     }
     else
     {
@@ -2749,7 +2749,7 @@ void YoshiSpit(const int A)
             if(NPC[p.YoshiNPC].Type == 45)
                 NPC[p.YoshiNPC].Special = 1;
 
-            PlaySound(SFX_BirdoSpit);
+            PlaySound(SFX_SpitBossSpit);
 
             if(!p.Controls.Down || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
             {
@@ -2854,7 +2854,7 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16 + 16;
         NewEffect(10, tempLocation);
         Effect[numEffects].Location.SpeedX = 2;
-        PlaySound(SFX_Twomp);
+        PlaySound(SFX_Stone);
         if(BreakBlocks && g_config.GameplayShakeScreenPound)
             doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 4, 0.2);
     }
@@ -3382,7 +3382,7 @@ void YoshiEatCode(const int A)
                             p.MountSpecial = 1;
                             p.YoshiTongueLength = 0;
                             p.YoshiTonugeBool = false;
-                            PlaySound(SFX_YoshiTongue);
+                            PlaySound(SFX_PetTongue);
                         }
                     }
                     else
@@ -3627,7 +3627,7 @@ void YoshiEatCode(const int A)
                             Coins = 99;
                     }
 
-                    PlaySound(SFX_YoshiSwallow);
+                    PlaySound(SFX_PetSwallow);
                 }
             }
 
@@ -4372,7 +4372,7 @@ void PowerUps(const int A)
                     {
                         p.TailCount = 1;
                         if(!p.SpinJump)
-                            PlaySound(SFX_Tail);
+                            PlaySound(SFX_Whip);
                     }
                 }
              }
@@ -5703,7 +5703,7 @@ void LinkFrame(Player_t &p)
         {
             if(p.SlideCounter <= 0)
             {
-                PlaySound(SFX_ZeldaDash);
+                PlaySound(SFX_HeroDash);
                 p.SlideCounter = 2 + iRand_round(2);
                 tempLocation.Y = p.Location.Y + p.Location.Height - 4;
 
@@ -7147,7 +7147,7 @@ void PlayerEffects(const int A)
         if(p.Effect2 == 0.0)
         {
             UnDuck(Player[A]);
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             tempLocation.Width = 32;
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;

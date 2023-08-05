@@ -126,7 +126,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     SwapCharacter(whatPlayer, 5, false, true);
                 }
 
-                PlaySound(SFX_Raccoon);
+                PlaySound(SFX_Transform);
             }
             else
             {
@@ -375,7 +375,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                             nn.Type = 252;
                         if(iRand(60) < 3)
                             nn.Type = 253;
-                        PlaySound(SFX_ZeldaRupee);
+                        PlaySound(SFX_HeroRupee);
                     }
                     else
                     {
@@ -731,7 +731,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Location.Y = b.Location.Y - 32;
                     nn.Location.SpeedY = -6;
                     nn.Location.Height = NPCHeight[C];
-                    // PlaySound(SFX_Mushroom); // Don't play mushroom sound on leaf, like in original SMB3
+                    // PlaySound(SFX_ItemEmerge); // Don't play mushroom sound on leaf, like in original SMB3
                 }
                 else
                 {
@@ -744,7 +744,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                         PlaySound(SFX_SproutVine);
                         break;
                     default:
-                        PlaySound(SFX_Mushroom);
+                        PlaySound(SFX_ItemEmerge);
                         break;
                     }
                 }
@@ -754,7 +754,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 nn.Location.Y = b.Location.Y + 4;
                 nn.Location.Height = NPCHeight[C];
                 nn.Effect = 3;
-                PlaySound(SFX_Mushroom);
+                PlaySound(SFX_ItemEmerge);
             }
 
             nn.Effect2 = 0;
@@ -776,7 +776,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 #if 0 // don't spawn players from blocks anymore
         else // Spawn the player
         {
-            PlaySound(SFX_Mushroom);
+            PlaySound(SFX_ItemEmerge);
             Player[tempPlayer].State = 1;
             Player[tempPlayer].Location.Width = Physics.PlayerWidth[Player[tempPlayer].Character][Player[tempPlayer].State];
             Player[tempPlayer].Location.Height = Physics.PlayerHeight[Player[tempPlayer].Character][Player[tempPlayer].State];
@@ -826,7 +826,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             tempPlayer = 0;
         }
 
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
         if(tempPlayer == 0)
         {
             numNPCs++;
@@ -916,7 +916,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             tempPlayer = 0;
         }
 
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
 
         if(tempPlayer == 0)
         {
@@ -1023,7 +1023,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         // TODO: @Wohlstand why was this commented out?
-        // PlaySound(SFX_Mushroom);
+        // PlaySound(SFX_ItemEmerge);
 
         if(tempPlayer == 0)
         {
@@ -1134,7 +1134,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
 
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
         numNPCs++;
         auto &nn = NPC[numNPCs];
         nn = NPC_t();
@@ -1168,7 +1168,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     else if(b.Special == 105) // Block contains a Green Yoshi
     {
         SoundPause[2] = 2;
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
 
         if(!HitDown)
         {
@@ -1220,7 +1220,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         else
         {
-            PlaySound(SFX_Mushroom);
+            PlaySound(SFX_ItemEmerge);
             nn.Location.Y = b.Location.Y + 4;
             nn.Location.Height = 32;
             nn.Effect = 3;
@@ -1260,7 +1260,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
 
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
 
         numNPCs++;
         auto &nn = NPC[numNPCs];
@@ -1321,7 +1321,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
 
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
         numNPCs++;
         auto &nn = NPC[numNPCs];
         nn = NPC_t();
@@ -2044,7 +2044,7 @@ void UpdateBlocks()
         PSwitchTime--;
 
         if(PSwitchTime == 195)
-            PlaySound(SFX_PSwitchTimeout);
+            PlaySound(SFX_CoinSwitchTimeout);
 
         if(PSwitchTime <= 1)
         {
@@ -2399,7 +2399,7 @@ void PowBlock()
     int A = 0;
     int Z = 0;
 
-    PlaySound(SFX_Twomp);
+    PlaySound(SFX_Stone);
     numScreens = 1;
 
     if(!LevelEditor)

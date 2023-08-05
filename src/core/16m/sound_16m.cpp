@@ -537,7 +537,7 @@ void InitSound()
     UpdateLoad();
 
     if(playerUseOwnHammer)
-        playerHammerSFX = SFX_PlayerHammer;
+        playerHammerSFX = SFX_PlayerHeavy;
     else if(playerUseNPCHammer)
         playerHammerSFX = SFX_Throw;
     else
@@ -569,8 +569,8 @@ static const std::unordered_map<int, int> s_soundFallback =
     {SFX_Iceball, SFX_Fireball},
     {SFX_Freeze, SFX_ShellHit},
     {SFX_Icebreak, SFX_ShellHit},
-    {SFX_SproutVine, SFX_Mushroom},
-    {SFX_LudwigKilled, SFX_WartKilled},
+    {SFX_SproutVine, SFX_ItemEmerge},
+    {SFX_FireBossKilled, SFX_SickBossKilled},
 };
 
 static int getFallbackSfx(int A)

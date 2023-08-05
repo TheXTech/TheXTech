@@ -2972,9 +2972,9 @@ void UpdateNPCs()
                                                                 NPC[A].Special = 2;
 
                                                             if((NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == 70) && NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
-                                                                PlaySound(SFX_Twomp);
+                                                                PlaySound(SFX_Stone);
                                                             if(NPC[A].Type == 78 && NPC[A].Location.SpeedY > Physics.NPCGravity * 10)
-                                                                PlaySound(SFX_Twomp);
+                                                                PlaySound(SFX_Stone);
 
                                                             if(WalkingCollision3(NPC[A].Location, Block[B].Location, oldBeltSpeed) || NPC[A].Location.Width > 32)
                                                             {
@@ -4775,7 +4775,7 @@ void UpdateNPCs()
                             else
                             {
                                 bool legacy = /*NPC[A].Legacy &&*/ (NPC[A].Variant == 1);
-                                PlaySound(SFX_Twomp);
+                                PlaySound(SFX_Stone);
                                 NPC[A].Special3 = 30;
                                 NPC[A].Frame = 11;
                                 NPC[A].Projectile = false;
@@ -4960,7 +4960,7 @@ void UpdateNPCs()
                         NPC[A].Special3 += 1;
                     if(NPC[A].Special3 >= 20)
                     {
-                        PlaySound(SFX_HammerToss);
+                        PlaySound(SFX_HeavyToss);
                         NPC[A].Special3 = 0; // -15
                         numNPCs++;
                         NPC[numNPCs] = NPC_t();

@@ -356,7 +356,7 @@ bool Player_Back(int p)
         {
             SwapCharacter(p+1, g_charSelect[p], g_config.StrictDropAdd);
             if(!g_config.StrictDropAdd)
-                PlaySound(SFX_Raccoon);
+                PlaySound(SFX_Transform);
         }
         s_playerState[p] = PlayerState::DropAddMain;
         s_menuItem[p] = 1;
@@ -538,7 +538,7 @@ bool Player_Select(int p)
                 {
                     SwapCharacter(p+1, g_charSelect[p], g_config.StrictDropAdd && !SwapCharAllowed());
                     if(!g_config.StrictDropAdd || SwapCharAllowed())
-                        PlaySound(SFX_Raccoon);
+                        PlaySound(SFX_Transform);
                 }
                 do_sentinel.active = false;
             }
@@ -560,7 +560,7 @@ bool Player_Select(int p)
                     else
                         Lives -= 1;
                 }
-                PlaySound(SFX_Mushroom);
+                PlaySound(SFX_ItemEmerge);
                 do_sentinel.active = false;
             }
         }
@@ -1561,7 +1561,7 @@ int Logic()
                 {
                     s_playerState[p] = PlayerState::ControlsMenu;
                     s_menuItem[p] = 2;
-                    PlaySoundMenu(SFX_Yoshi);
+                    PlaySoundMenu(SFX_Pet);
                 }
                 else if(p == 0 && s_minPlayers == 1)
                 {
@@ -1600,7 +1600,7 @@ int Logic()
                 {
                     s_playerState[p] = PlayerState::ControlsMenu;
                     s_menuItem[p] = 2;
-                    PlaySoundMenu(SFX_Yoshi);
+                    PlaySoundMenu(SFX_Pet);
                 }
                 else
                 {
@@ -1615,13 +1615,13 @@ int Logic()
                 {
                     s_playerState[p] = PlayerState::ControlsMenu;
                     s_menuItem[p] = 2;
-                    PlaySoundMenu(SFX_Yoshi);
+                    PlaySoundMenu(SFX_Pet);
                 }
                 else
                 {
                     s_playerState[p] = PlayerState::ReconnectMain;
                     s_menuItem[p] = 0;
-                    PlaySoundMenu(SFX_Yoshi);
+                    PlaySoundMenu(SFX_Pet);
                 }
             }
             // okay to continue processing them because Controls are now updated

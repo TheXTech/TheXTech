@@ -239,7 +239,7 @@ void TouchBonus(int A, int B)
                     SizeCheck(Player[A]);
                     NewEffect(63, Player[A].Location);
                 }
-                PlaySound(SFX_ZeldaFairy);
+                PlaySound(SFX_HeroFairy);
                 Player[A].FairyTime = -1;
                 NPC[B].Killed = 9;
                 NPCQueues::Killed.push_back(B);
@@ -332,7 +332,7 @@ void TouchBonus(int A, int B)
                 PlaySound(SFX_PlayerGrow);
             }
             else if(NPC[B].Type == 250)
-                PlaySound(SFX_ZeldaHeart);
+                PlaySound(SFX_HeroHeart);
             else
             {
                 if(doPlayGrowWithGotItem())
@@ -360,14 +360,14 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaItem);
+                    PlaySound(SFX_HeroItem);
                 else
                     PlaySound(SFX_PlayerGrow);
             }
             else
             {
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaHeart);
+                    PlaySound(SFX_HeroHeart);
                 else
                 {
                     if(doPlayGrowWithGotItem())
@@ -397,14 +397,14 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaItem);
+                    PlaySound(SFX_HeroItem);
                 else
                     PlaySound(SFX_PlayerGrow);
             }
             else
             {
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaHeart);
+                    PlaySound(SFX_HeroHeart);
                 else
                 {
                     if(doPlayGrowWithGotItem())
@@ -428,14 +428,14 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaItem);
+                    PlaySound(SFX_HeroItem);
                 else
-                    PlaySound(SFX_Raccoon);
+                    PlaySound(SFX_Transform);
             }
             else
             {
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaHeart);
+                    PlaySound(SFX_HeroHeart);
                 else
                 {
                     if(doPlayGrowWithGotItem())
@@ -459,14 +459,14 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaItem);
+                    PlaySound(SFX_HeroItem);
                 else
-                    PlaySound(SFX_Raccoon);
+                    PlaySound(SFX_Transform);
             }
             else
             {
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaHeart);
+                    PlaySound(SFX_HeroHeart);
                 else
                 {
                     if(doPlayGrowWithGotItem())
@@ -490,14 +490,14 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaItem);
+                    PlaySound(SFX_HeroItem);
                 else
-                    PlaySound(SFX_Raccoon);
+                    PlaySound(SFX_Transform);
             }
             else
             {
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaHeart);
+                    PlaySound(SFX_HeroHeart);
                 else
                 {
                     if(doPlayGrowWithGotItem())
@@ -511,9 +511,9 @@ void TouchBonus(int A, int B)
         else if(NPCIsACoin[NPC[B].Type]) // Bonus is a coin
         {
             if(NPC[B].Type == 152)
-                PlaySound(SFX_SonicRing);
+                PlaySound(SFX_RingGet);
             else if(NPC[B].Type == 251 || NPC[B].Type == 252 || NPC[B].Type == 253)
-                PlaySound(SFX_ZeldaRupee);
+                PlaySound(SFX_HeroRupee);
             else if(NPC[B].Type != 274)
                 PlaySound(SFX_Coin);
             if(NPC[B].Type == 252 || NPC[B].Type == 258)
@@ -535,7 +535,7 @@ void TouchBonus(int A, int B)
             }
             if(NPC[B].Type == 274)
             {
-                PlaySound(SFX_DraginCoin);
+                PlaySound(SFX_MedalGet);
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
                 NPCScore[274] += 1;
                 if(NPCScore[274] > 14)
@@ -665,7 +665,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_GotStar);
                 }
                 else
-                    PlaySound(SFX_DraginCoin);
+                    PlaySound(SFX_MedalGet);
             }
         }
         if(toadBool > 0)

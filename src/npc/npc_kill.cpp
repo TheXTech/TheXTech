@@ -212,7 +212,7 @@ void KillNPC(int A, int B)
     {
         if(!(NPC[A].Type == 15 || NPC[A].Type == 39 || NPC[A].Type == 86 || NPC[A].Type == 209 || NPC[A].Type == 200 || NPC[A].Type == 201 || NPC[A].Type == 203 || NPC[A].Type == 204 || NPC[A].Type == 205 || NPC[A].Type == 210 || NPC[A].Type == 208))
         {
-            PlaySound(SFX_ZeldaKill);
+            PlaySound(SFX_HeroKill);
             NewEffect(63 , NPC[A].Location);
             B = 9;
             if(iRand(10) < 3)
@@ -597,7 +597,7 @@ void KillNPC(int A, int B)
         }
         else if(NPC[A].Type == 125 || NPCIsABot[NPC[A].Type] || NPC[A].Type == 255)
         {
-            PlaySound(SFX_ZeldaKill);
+            PlaySound(SFX_HeroKill);
             NewEffect(63 , NPC[A].Location);
         }
         else if(NPC[A].Type == 133)
@@ -650,7 +650,7 @@ void KillNPC(int A, int B)
         else if(NPC[A].Type == 201 || NPC[A].Type == 262) // wart, smb2 bosses
         {
             if(NPC[A].Type == 262 && NPC[A].Killed != 3 && NPC[A].Killed != 6 && NPC[A].Killed != 10)
-                PlaySound(SFX_BirdoBeat);
+                PlaySound(SFX_SpitBossBeat);
 
             // If B <> 6 Then MoreScore NPCScore(.Type), .Location
             if(B == 6)
@@ -698,7 +698,7 @@ void KillNPC(int A, int B)
                 // .Location.X += -1
                 NewEffect(105, NPC[A].Location, NPC[A].Direction);
             }
-            PlaySound(SFX_BowserKilled);
+            PlaySound(SFX_VillainKilled);
         }
         else if(NPC[A].Type == 86) // bowser
         {
@@ -720,7 +720,7 @@ void KillNPC(int A, int B)
                 NPC[A].Location.X -= 1;
                 NewEffect(50, NPC[A].Location, NPC[A].Direction);
             }
-            PlaySound(SFX_BowserKilled);
+            PlaySound(SFX_VillainKilled);
 
             if(NPC[A].Legacy)
             {
@@ -1080,7 +1080,7 @@ void KillNPC(int A, int B)
         }
         else if(NPC[A].Type == 39) // Birdo
         {
-            PlaySound(SFX_BirdoHit);
+            PlaySound(SFX_SpitBossHit);
             if(NPC[A].Legacy && !LevelEditor)
             {
                 for(C = 1; C <= numNPCs; C++)
@@ -1107,7 +1107,7 @@ void KillNPC(int A, int B)
                     NPC[numNPCs].Frame = 0;
                     syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
-                    PlaySound(SFX_BirdoBeat);
+                    PlaySound(SFX_SpitBossBeat);
                 }
                 else
                 {

@@ -163,7 +163,7 @@ void UpdateEffects()
             if(e.Frame > 7)
                 e.Frame = 0;
 
-            if(HasSound(SFX_LarryShell)) // When new sound is presented, do animation a bit differently
+            if(HasSound(SFX_MagicBossShell)) // When new sound is presented, do animation a bit differently
             {
                 if(e.Life == 75)
                     e.Location.SpeedY = -5;
@@ -174,10 +174,10 @@ void UpdateEffects()
                 else if(e.Life == 52)
                     e.Location.SpeedY = -14;
             }
-            else if(!HasSound(SFX_LarryShell) && e.Life == 100) // Old sound
+            else if(!HasSound(SFX_MagicBossShell) && e.Life == 100) // Old sound
             {
                 e.Location.SpeedY = -8;
-                PlaySound(SFX_WartKilled);
+                PlaySound(SFX_SickBossKilled);
             }
         }
         else if(e.Type == 114) // Splash
@@ -886,7 +886,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
         ne.Type = A;
         ne.Location.X = Location.X + Location.Width / 2.0 - ne.Location.Width / 2.0;
         ne.Location.Y = Location.Y + Location.Height - ne.Location.Height;
-        PlaySound(SFX_LarryKilled);
+        PlaySound(SFX_MagicBossKilled);
     }
     else if(A == 104) // Blaarg eyes
     {
@@ -934,12 +934,12 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
         if(A == 56)
         {
             if(ne.NewNpc != 0 /*&& ne.NewNpc != 96*/) // never 96, because of condition above that replaces 96 with zero
-                PlaySound(SFX_YoshiEgg);
+                PlaySound(SFX_PetBirth);
             else
                 PlaySound(SFX_Smash);
         }
         else if(A == 58)
-            PlaySound(SFX_Yoshi);
+            PlaySound(SFX_Pet);
     }
     else if(A == 136) // Roto Disk
     {
@@ -1901,7 +1901,7 @@ void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, b
         ne.Location.SpeedX = 3 * -Direction;
         ne.Life = 200;
         ne.Type = A;
-        PlaySound(SFX_LudwigKilled);
+        PlaySound(SFX_FireBossKilled);
     }
 }
 

@@ -1012,7 +1012,7 @@ void UpdatePlayer()
                 }
                 else if(Player[A].Fairy)
                 {
-                    PlaySound(SFX_ZeldaFairy);
+                    PlaySound(SFX_HeroFairy);
                     Player[A].Immune = 10;
                     Player[A].Effect = 8;
                     Player[A].Effect2 = 4;
@@ -1326,7 +1326,7 @@ void UpdatePlayer()
                                 {
                                     if(Player[A].CanJump)
                                     {
-                                        PlaySound(SFX_Tail); // Jump sound
+                                        PlaySound(SFX_Whip); // Jump sound
                                         Player[A].Jump = Physics.PlayerJumpHeight * 0.6;
                                         NPC[Player[A].StandingOnNPC].Location.SpeedY = Physics.PlayerJumpVelocity * 0.9;
                                     }
@@ -1412,7 +1412,7 @@ void UpdatePlayer()
                                         Player[A].Location.SpeedY -= 1;
                                         Player[A].CanPound = true;
                                         if(Player[A].YoshiBlue || (Player[A].Mount == 1 && Player[A].MountType == 3))
-                                            PlaySound(SFX_YoshiTongue);
+                                            PlaySound(SFX_PetTongue);
                                     }
                                 }
                             }
@@ -1522,7 +1522,7 @@ void UpdatePlayer()
                                             Player[A].Location.SpeedX += -NPC[Player[A].StandingOnNPC].Location.SpeedX;
                                     }
 
-                                    PlaySound(SFX_Tail); // Jump sound
+                                    PlaySound(SFX_Whip); // Jump sound
                                     Player[A].Jump -= 6;
                                     if(Player[A].Direction == 1)
                                         Player[A].SpinFrame = 0;
@@ -1571,7 +1571,7 @@ void UpdatePlayer()
                                     Player[A].Location.SpeedY -= 1;
                                     Player[A].CanPound = true;
                                     if(Player[A].YoshiBlue)
-                                        PlaySound(SFX_YoshiTongue);
+                                        PlaySound(SFX_PetTongue);
                                 }
                             }
                             // End If
@@ -1811,7 +1811,7 @@ void UpdatePlayer()
                                 Player[A].FlyCount = 0;
                                 Player[A].Fairy = true;
                                 SizeCheck(Player[A]);
-                                PlaySound(SFX_ZeldaFairy);
+                                PlaySound(SFX_HeroFairy);
                                 Player[A].Immune = 10;
                                 Player[A].Effect = 8;
                                 Player[A].Effect2 = 4;
@@ -1889,7 +1889,7 @@ void UpdatePlayer()
                         if(Player[A].SwordPoke == 1)
                         {
                             TailSwipe(A, true, true);
-                            PlaySound(SFX_ZeldaStab);
+                            PlaySound(SFX_HeroStab);
                             if((Player[A].State == 3 || Player[A].State == 7 || Player[A].State == 6) && Player[A].FireBallCD2 == 0)
                             {
                                 Player[A].FireBallCD2 = 40;
@@ -1897,11 +1897,11 @@ void UpdatePlayer()
                                     Player[A].FireBallCD2 = 25;
 
                                 if(Player[A].State == 6)
-                                    PlaySound(SFX_ZeldaSwordBeam);
+                                    PlaySound(SFX_HeroSwordBeam);
                                 else if(Player[A].State == 7)
-                                    PlaySound(SFX_ZeldaIce);
+                                    PlaySound(SFX_HeroIce);
                                 else
-                                    PlaySound(SFX_ZeldaFireRod);
+                                    PlaySound(SFX_HeroFireRod);
 
                                 numNPCs++;
                                 NPC[numNPCs] = NPC_t();
@@ -2581,7 +2581,7 @@ void UpdatePlayer()
                                             {
                                                 if(Player[A].Location.SpeedY > 3)
                                                 {
-                                                    PlaySound(SFX_Twomp);
+                                                    PlaySound(SFX_Stone);
                                                     YoshiPound(A, Player[A].Mount, true);
                                                 }
                                             }
@@ -3199,7 +3199,7 @@ void UpdatePlayer()
                                         {
                                             Player[A].Fairy = true;
                                             SizeCheck(Player[A]);
-                                            PlaySound(SFX_ZeldaFairy);
+                                            PlaySound(SFX_HeroFairy);
                                             Player[A].Immune = 10;
                                             Player[A].Effect = 8;
                                             Player[A].Effect2 = 4;
@@ -3304,7 +3304,7 @@ void UpdatePlayer()
                                                     {
                                                         NPCHit(B, 3, B);
                                                         if(NPC[B].Type == 266)
-                                                            PlaySound(SFX_ZeldaHit);
+                                                            PlaySound(SFX_HeroHit);
                                                     }
                                                     PlayerHurt(A);
                                                 }
@@ -3357,7 +3357,7 @@ void UpdatePlayer()
                                                 {
                                                     PlayerHurt(A);
                                                     NPCHit(B, 4, B);
-                                                    PlaySound(SFX_BirdoHit);
+                                                    PlaySound(SFX_SpitBossHit);
                                                 }
                                             }
                                         }
@@ -3563,7 +3563,7 @@ void UpdatePlayer()
                                                 {
                                                     Player[A].Fairy = true;
                                                     SizeCheck(Player[A]);
-                                                    PlaySound(SFX_ZeldaFairy);
+                                                    PlaySound(SFX_HeroFairy);
                                                     Player[A].Immune = 10;
                                                     Player[A].Effect = 8;
                                                     Player[A].Effect2 = 4;
@@ -3743,7 +3743,7 @@ void UpdatePlayer()
                                                     Player[A].MountSpecial = 0;
                                                     Player[A].YoshiTonugeBool = false;
                                                     Player[A].YoshiTongueLength = 0;
-                                                    PlaySound(SFX_Yoshi);
+                                                    PlaySound(SFX_Pet);
                                                     UpdateYoshiMusic();
                                                     YoshiHeight(A);
                                                 }
@@ -4336,7 +4336,7 @@ void UpdatePlayer()
                         if(g_compatibility.fix_char5_vehicle_climb && Player[A].Fairy) // Avoid the mortal glitch
                         {
                             Player[A].Fairy = false;
-                            PlaySound(SFX_ZeldaFairy);
+                            PlaySound(SFX_HeroFairy);
                             NewEffect(63, Player[A].Location);
                         }
                         Player[A].Location = NPC[B].Location;
@@ -4356,7 +4356,7 @@ void UpdatePlayer()
                     {
                         Player[A].StandingOnNPC = 0;
                         if(Player[A].Location.SpeedY > 4 + NPC[B].Location.SpeedY)
-                            PlaySound(SFX_Twomp);
+                            PlaySound(SFX_Stone);
                         Player[A].Location.SpeedY = NPC[B].Location.SpeedY;
                     }
 

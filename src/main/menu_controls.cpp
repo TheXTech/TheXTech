@@ -248,7 +248,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 {
                     if(profile && type->DeleteProfile(profile, Controls::g_InputMethods))
                     {
-                        PlaySoundMenu(SFX_BowserKilled);
+                        PlaySoundMenu(SFX_VillainKilled);
                         s_deleteProfileSel = false;
                         MenuCursor = s_curProfile;
                         s_curProfile = -1;
@@ -1277,7 +1277,7 @@ int menuControls_Logic()
         }
         if(s_profileChangeTimer > 66*4)
         {
-            PlaySoundMenu(SFX_Yoshi);
+            PlaySoundMenu(SFX_Pet);
             s_lastProfile = nullptr;
             s_changingProfilePlayer = -1;
         }
@@ -1369,7 +1369,7 @@ int menuControls_Logic()
         {
             if(profile != s_lastProfile && type->DeleteProfile(profile, Controls::g_InputMethods))
             {
-                PlaySoundMenu(SFX_BowserKilled);
+                PlaySoundMenu(SFX_VillainKilled);
                 s_deleteProfileSel = false;
                 MenuCursor = s_curProfile - 1;
                 if(MenuCursor < 0)

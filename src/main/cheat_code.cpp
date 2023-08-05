@@ -193,7 +193,7 @@ static void fairyMagic()
     {
         for(int B = 1; B <= numPlayers; B++)
         {
-            PlaySound(SFX_ZeldaFairy);
+            PlaySound(SFX_HeroFairy);
             Player[B].Immune = 10;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
@@ -207,7 +207,7 @@ static void fairyMagic()
     {
         for(int B = 1; B <= numPlayers; B++)
         {
-            PlaySound(SFX_ZeldaFairy);
+            PlaySound(SFX_HeroFairy);
             Player[B].Immune = 10;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
@@ -233,13 +233,13 @@ static void iceAge()
         }
     }
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 }
 
 static void iStillPlayWithLegos()
 {
     ShowLayer(LAYER_DESTROYED_BLOCKS);
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 }
 
 static void itsRainingMen()
@@ -263,7 +263,7 @@ static void itsRainingMen()
         }
     }
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 }
 
 static void dontTypeThis()
@@ -287,7 +287,7 @@ static void dontTypeThis()
         }
     }
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 }
 
 static void wetWater()
@@ -368,7 +368,7 @@ static void wetWater()
         }
     }
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -425,7 +425,7 @@ static void needATanookiSuit()
 
         if(Player[B].Character >= 3 && Player[B].State != 5)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
@@ -451,7 +451,7 @@ static void needAHammerSuit()
 
         if(Player[B].Character >= 3 && Player[B].State != 6)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
@@ -477,7 +477,7 @@ static void needAMushroom()
 
         if(Player[B].Character >= 3 && Player[B].State == 1)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
@@ -503,7 +503,7 @@ static void needAFlower()
 
         if(Player[B].Character >= 3 && Player[B].State != 3)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
@@ -529,7 +529,7 @@ static void needAnIceFlower()
 
         if(Player[B].Character >= 3 && Player[B].State != 7)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
@@ -554,7 +554,7 @@ static void needALeaf()
 
         if(Player[B].Character >= 3 && Player[B].State != 4)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
@@ -637,7 +637,7 @@ static void shadowStar()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -660,7 +660,7 @@ static void becomeAsPeach()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -690,7 +690,7 @@ static void becomeAsToad()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -720,7 +720,7 @@ static void becomeAsLink()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -750,7 +750,7 @@ static void becomeAsMario()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -780,7 +780,7 @@ static void becomeAsLuigi()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -1172,7 +1172,7 @@ static void warioTime()
                !NPC[B].Inert
             )
             {
-                PlaySound(SFX_Raccoon);
+                PlaySound(SFX_Transform);
                 NPC[B].Location.Y += NPC[B].Location.Height / 2.0;
                 NPC[B].Location.X += NPC[B].Location.Width / 2.0;
                 tempLocation = NPC[B].Location;
@@ -1755,7 +1755,7 @@ static void newLeaf()
     CaptainN = false;
     GrabAll = false;
     ShadowMode = false;
-    PlaySound(SFX_BowserKilled);
+    PlaySound(SFX_VillainKilled);
 }
 
 static void getMeOuttaHere()
@@ -1776,7 +1776,7 @@ static void holyTrinity()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -1805,7 +1805,7 @@ static void essentials()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
