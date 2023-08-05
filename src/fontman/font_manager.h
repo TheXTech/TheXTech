@@ -131,7 +131,8 @@ void printText(const char* text, size_t text_size,
                int x, int y,
                int font = DefaultRaster,
                float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
-               uint32_t ttf_FontSize = 14, bool outline = false);
+               uint32_t ttf_FontSize = 14, bool outline = false,
+               float outline_r = 0.0, float outline_g = 0.0, float outline_b = 0.0);
 
 /**
  * @brief Optimize and print the text fragment to the screen
