@@ -610,7 +610,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 }
                 if(mouse && value)
                 {
-                    int item_width = strlen(value)*18;
+                    int item_width = SuperTextPixLen(value, 3);
+
                     if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
                         && SharedCursor.Y >= start_y + (o_base + 2*i + 1 - scroll_start)*line && SharedCursor.Y <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
                     {
@@ -818,7 +819,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             }
             if(mouse)
             {
-                int item_width = SDL_strlen(name) * 18;
+                int item_width = SuperTextPixLen(name, 3);
+
                 if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
                     && SharedCursor.Y >= start_y + (i+s-scroll_start)*line && SharedCursor.Y <= start_y + (i+s-scroll_start)*line + 16)
                 {
@@ -864,9 +866,11 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                             XRender::renderTexture(sX + 24, start_y + (o_base + 2*i + 1 - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
+
                 if(mouse && value)
                 {
-                    int item_width = strlen(value)*18;
+                    int item_width = SuperTextPixLen(value, 3);
+
                     if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
                         && SharedCursor.Y >= start_y + (o_base + 2*i + 1 - scroll_start)*line && SharedCursor.Y <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
                     {
@@ -901,6 +905,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                             XRender::renderTexture(sX + 24, start_y + (o_base + i - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
+
                 if(mouse)
                 {
                     if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+width-32
@@ -1107,9 +1112,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
             if(mouse && !g_pollingInput && SharedCursor.Y >= start_y + value_row * line && SharedCursor.Y <= start_y + value_row * line + 16)
             {
-                // FIXME: use SuperTextPixLen.
-                int primary_width = strlen(profile->NamePrimaryButton(s_profileTab, i)) * 18;
-                int secondary_width = strlen(profile->NameSecondaryButton(s_profileTab, i)) * 18;
+                int primary_width = SuperTextPixLen(profile->NamePrimaryButton(s_profileTab, i), 3);
+                int secondary_width = SuperTextPixLen(profile->NameSecondaryButton(s_profileTab, i), 3);
 
                 if(primary_width < 72)
                     primary_width = 72;
