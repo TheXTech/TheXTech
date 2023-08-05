@@ -875,7 +875,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             // only show it if it will (i) reset, or (ii) have something to go to.
             // short-circuit evaluation keeps this from accessing outside of the valid range
             bool show_prev_button = (!valid || i != 0);
-            bool show_next_button = (!valid || data->strings[i+1]);
+            bool show_next_button = (!valid || data->strings[i + 1]);
             if(show_prev_button && UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             {
                 if(!valid)
@@ -888,7 +888,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 if(!valid)
                     EditorCursor.NPC.Variant = data->values[0];
                 else
-                    EditorCursor.NPC.Variant = data->values[i+1];
+                    EditorCursor.NPC.Variant = data->values[i + 1];
             }
         }
 

@@ -1780,7 +1780,7 @@ void StartEpisode()
     for(int i = 0; i < numPlayers; i++)
     {
         if(g_charSelect[i] != 0)
-            Player[i+1].Character = g_charSelect[i];
+            Player[i + 1].Character = g_charSelect[i];
     }
 
     for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
@@ -1917,7 +1917,7 @@ void StartBattleMode()
     for(int i = 0; i < numPlayers; i++)
     {
         if(g_charSelect[i] != 0)
-            Player[i+1].Character = g_charSelect[i];
+            Player[i + 1].Character = g_charSelect[i];
     }
 
     for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)

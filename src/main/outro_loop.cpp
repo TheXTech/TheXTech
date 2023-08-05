@@ -140,7 +140,7 @@ void OutroLoop()
     bool quit = SharedControls.QuitCredits;
 
     for(int i = 0; i < maxLocalPlayers; i++)
-        quit |= Player[i+1].Controls.Start;
+        quit |= Player[i + 1].Controls.Start;
 
     if(g_gameInfo.outroDeadMode)
     {

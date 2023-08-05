@@ -521,7 +521,7 @@ bool mainMenuUpdate()
 
     for(int i = 0; i < maxLocalPlayers; i++)
     {
-        Controls_t &c = Player[i+1].Controls;
+        Controls_t &c = Player[i + 1].Controls;
 
         menuDoPress |= c.Start || c.Jump;
         menuBackPress |= c.Run;

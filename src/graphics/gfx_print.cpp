@@ -158,9 +158,6 @@ void SuperPrintScreenCenter(int SuperN, const char* SuperChars, int Font, float 
         outline = true;
     }
 
-    if(Font == 5)
-        Font = 4;
-
     int dFont = NewFontRender ? FontManager::fontIdFromSmbxFont(Font) : -1;
 
     if(dFont >= 0)
