@@ -1389,7 +1389,7 @@ void UpdateLayers()
                 {
                     for(int B : Layer[A].NPCs)
                     {
-                        if(NPC[B].Type == 91 || NPC[B].Type == 211 || NPCIsAVine[NPC[B].Type])
+                        if(NPC[B].Type == 91 || NPC[B].Type == NPC_HOMING_BALL_GEN || NPCIsAVine[NPC[B].Type])
                         {
                             NPC[B].Location.SpeedX = 0;
                             NPC[B].Location.SpeedY = 0;
@@ -1494,11 +1494,11 @@ void UpdateLayers()
                            NPCIsACoin[NPC[B].Type] || NPC[B].Type == 8 || NPC[B].Type == 37 ||
                            NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 46 ||
                            NPC[B].Type == 93 || NPC[B].Type == 74 || NPCIsAVine[NPC[B].Type] ||
-                           NPC[B].Type == 192 || NPC[B].Type == 197 || NPC[B].Type == 91 ||
-                           NPC[B].Type == 211 || NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_LONG_PLANT_DOWN ||
+                           NPC[B].Type == NPCID_CHECKPOINT || NPC[B].Type == NPCID_GOALTAPE || NPC[B].Type == 91 ||
+                           NPC[B].Type == NPC_HOMING_BALL_GEN || NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_LONG_PLANT_DOWN ||
                            NPC[B].Type == NPCID_FIRE_PLANT)
                         {
-                            if(NPC[B].Type == 91 || NPC[B].Type == 211)
+                            if(NPC[B].Type == 91 || NPC[B].Type == NPC_HOMING_BALL_GEN)
                             {
                                 NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
                                 NPC[B].Location.SpeedY = double(Layer[A].SpeedY);

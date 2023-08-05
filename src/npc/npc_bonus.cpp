@@ -183,7 +183,7 @@ void TouchBonus(int A, int B)
         //            Netplay::sendData "1k" + std::to_string(A) + "|" + std::to_string(B) + "|" + NPC[B].Type + LB;
         if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) // for link give hearts
         {
-            if(NPC[B].Type == 34 || NPC[B].Type == 169 || NPC[B].Type == 170)
+            if(NPC[B].Type == 34 || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPC_HEAVY_POWER)
             {
                 Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
@@ -246,7 +246,7 @@ void TouchBonus(int A, int B)
                 NPCQueues::Killed.push_back(B);
             }
         }
-        if(NPC[B].Type == 90 || NPC[B].Type == 187 || NPC[B].Type == 186) // player touched a 1up mushroom
+        if(NPC[B].Type == 90 || NPC[B].Type == NPCID_LIFE_S4 || NPC[B].Type == NPCID_LIFE_S1) // player touched a 1up mushroom
         {
             NPC[B].Killed = 9;
             NPCQueues::Killed.push_back(B);
@@ -270,7 +270,7 @@ void TouchBonus(int A, int B)
             NPCQueues::Killed.push_back(B);
             return;
         }
-        if(NPC[B].Type == 192) // player touched the chekpoint
+        if(NPC[B].Type == NPCID_CHECKPOINT) // player touched the chekpoint
         {
             RumbleForPowerup(A);
             if(Player[A].State == 1)
@@ -288,14 +288,14 @@ void TouchBonus(int A, int B)
             pLogDebug("Added checkpoint ID %d", cp.id);
             return;
         }
-        if(NPC[B].Type == 188) // player touched the 3up moon
+        if(NPC[B].Type == NPCID_3_LIFE) // player touched the 3up moon
         {
             NPC[B].Killed = 9;
             NPCQueues::Killed.push_back(B);
             MoreScore(12, NPC[B].Location);
             return;
         }
-        if(NPC[B].Type == 178)
+        if(NPC[B].Type == NPCID_AXE)
         {
             NPC[B].Killed = 9;
             NPCQueues::Killed.push_back(B);
@@ -306,9 +306,9 @@ void TouchBonus(int A, int B)
             toadBool = NPC[B].Type;
             NPC[B].Type = 9;
         }
-        if(NPC[B].Type == 153) // Bonus is a POISON mushroom
+        if(NPC[B].Type == NPCID_POISON) // Bonus is a POISON mushroom
             PlayerHurt(A);
-        else if(NPC[B].Type == 9 || NPC[B].Type == 184 || NPC[B].Type == 185 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5) // Bonus is a mushroom
+        else if(NPC[B].Type == 9 || NPC[B].Type == NPCID_POWER_S1 || NPC[B].Type == NPCID_POWER_S4 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5) // Bonus is a mushroom
         {
             if(Player[A].Character == 5 && Player[A].State == 1)
                 Player[A].State = 2;
@@ -343,7 +343,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 14 || NPC[B].Type == 182 || NPC[B].Type == 183) // Bonus is a fire flower
+        else if(NPC[B].Type == 14 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4) // Bonus is a fire flower
         {
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
@@ -447,7 +447,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 169) // Bonus is a Tanooki Suit
+        else if(NPC[B].Type == NPCID_STATUE_POWER) // Bonus is a Tanooki Suit
         {
             UpdatePlayerBonus(A, NPC[B].Type);
             Player[A].StateNPC = NPC[B].Type;
@@ -478,7 +478,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 170) // Bonus is a Hammer Suit
+        else if(NPC[B].Type == NPC_HEAVY_POWER) // Bonus is a Hammer Suit
         {
             UpdatePlayerBonus(A, NPC[B].Type);
             Player[A].StateNPC = NPC[B].Type;
@@ -511,7 +511,7 @@ void TouchBonus(int A, int B)
         }
         else if(NPCIsACoin[NPC[B].Type]) // Bonus is a coin
         {
-            if(NPC[B].Type == 152)
+            if(NPC[B].Type == NPCID_RING)
                 PlaySound(SFX_RingGet);
             else if(NPC[B].Type == NPCID_GEM_1 || NPC[B].Type == NPCID_GEM_5 || NPC[B].Type == NPCID_GEM_20)
                 PlaySound(SFX_HeroRupee);
@@ -548,7 +548,7 @@ void TouchBonus(int A, int B)
         }
         else if(NPCIsAnExit[NPC[B].Type] && LevelMacro == LEVELMACRO_OFF) // Level exit
         {
-            if(NPC[B].Type != 196)
+            if(NPC[B].Type != NPCID_STAR_COLLECT)
             {
                 TurnNPCsIntoCoins();
                 FreezeNPCs = false;

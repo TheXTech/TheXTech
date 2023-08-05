@@ -1515,11 +1515,11 @@ void UpdateEditor()
 
                 for(A = 1; A <= numNPCs; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active && (NPC[A].Type != 159 || EditorCursor.NPC.Type == 159))
+                    if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active && (NPC[A].Type != NPCID_LIFT_SAND || EditorCursor.NPC.Type == 159))
                     {
                         if(!NPC[A].Generator || NPC[A].Type == EditorCursor.NPC.Type)
                         {
-                            if((EditorCursor.NPC.Type != 208 && NPC[A].Type != 208) || (EditorCursor.NPC.Type == 208 && NPC[A].Type == 208))
+                            if((EditorCursor.NPC.Type != 208 && NPC[A].Type != NPCID_BOSS_CASE) || (EditorCursor.NPC.Type == 208 && NPC[A].Type == NPCID_BOSS_CASE))
                             {
                                 if(!NPCIsAVine[NPC[A].Type])
                                 {

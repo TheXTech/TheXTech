@@ -230,7 +230,7 @@ static void iceAge()
         {
             if(!NPCNoIceBall[NPC[C].Type] && NPC[C].Type != NPCID_ICE_CUBE && !NPCIsABonus[NPC[C].Type])
             {
-                NPC[0].Type = 265;
+                NPC[0].Type = NPCID_PLR_ICEBALL;
                 NPCHit(C, 3, 0);
             }
         }
@@ -1313,7 +1313,7 @@ static void hellFire()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 279;
+            NPC[numNPCs].Type = NPCID_FLY_CANNON;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1341,7 +1341,7 @@ static void upAndOut()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 278;
+            NPC[numNPCs].Type = NPCID_FLY_BLOCK;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1369,7 +1369,7 @@ static void powHammer()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 241;
+            NPC[numNPCs].Type = NPCID_EARTHQUAKE_BLOCK;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1427,7 +1427,7 @@ static void rainbowRider()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 195;
+            NPC[numNPCs].Type = NPCID_FLIPPED_RAINBOW_SHELL;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
