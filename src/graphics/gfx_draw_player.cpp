@@ -323,7 +323,7 @@ void DrawPlayer(Player_t &p, const int Z)
                              ) ||
                           NPC[p.HoldingNPC].Effect == 5
                         ) &&
-                        NPC[p.HoldingNPC].Type != 91 &&
+                        NPC[p.HoldingNPC].Type != NPCID_ITEM_BURIED &&
                      !Player[NPC[p.HoldingNPC].HoldingPlayer].Dead
                     )
                     {

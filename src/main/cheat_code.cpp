@@ -253,7 +253,7 @@ static void itsRainingMen()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 90;
+            NPC[numNPCs].Type = NPCID_LIFE_S3;
             NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
             NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
             NPC[numNPCs].Location.Height = 32;
@@ -277,7 +277,7 @@ static void dontTypeThis()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 134;
+            NPC[numNPCs].Type = NPCID_BOMB;
             NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
             NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
             NPC[numNPCs].Location.Height = 32;
@@ -1171,7 +1171,7 @@ static void warioTime()
                !NPCIsABonus[NPC[B].Type] &&
                !NPCIsACoin[NPC[B].Type] &&
                !NPCIsAnExit[NPC[B].Type] &&
-                NPC[B].Type != 91 && !NPC[B].Generator &&
+                NPC[B].Type != NPCID_ITEM_BURIED && !NPC[B].Generator &&
                !NPC[B].Inert
             )
             {
@@ -1258,7 +1258,7 @@ static void bombsAway()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 134;
+            NPC[numNPCs].Type = NPCID_BOMB;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.X = Player[B].Location.X;
@@ -1453,7 +1453,7 @@ static void greenEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 95;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1480,7 +1480,7 @@ static void blueEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Frame = 1;
             NPC[numNPCs].Special = 98;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1508,7 +1508,7 @@ static void yellowEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 99;
             NPC[numNPCs].Frame = 2;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1536,7 +1536,7 @@ static void redEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 100;
             NPC[numNPCs].Frame = 3;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1565,7 +1565,7 @@ static void blackEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 148;
             NPC[numNPCs].Frame = 4;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1593,7 +1593,7 @@ static void purpleEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 149;
             NPC[numNPCs].Frame = 5;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1621,7 +1621,7 @@ static void pinkEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 150;
             NPC[numNPCs].Frame = 6;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1649,7 +1649,7 @@ static void coldEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 228;
             NPC[numNPCs].Frame = 6;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];

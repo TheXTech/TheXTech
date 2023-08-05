@@ -2083,11 +2083,11 @@ void PSwitch(bool enabled)
 
                     if(NPC[A].Type == 33 || NPC[A].Type == NPCID_COIN_5)
                         nb.Type = 89;
-                    else if(NPC[A].Type == 88)
+                    else if(NPC[A].Type == NPCID_COIN_S1)
                         nb.Type = 188;
-                    else if(NPC[A].Type == 103)
+                    else if(NPC[A].Type == NPCID_RED_COIN)
                         nb.Type = 280;
-                    else if(NPC[A].Type == 138)
+                    else if(NPC[A].Type == NPCID_COIN_S2)
                         nb.Type = 293;
                     else
                         nb.Type = 4;

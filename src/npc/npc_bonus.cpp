@@ -246,7 +246,7 @@ void TouchBonus(int A, int B)
                 NPCQueues::Killed.push_back(B);
             }
         }
-        if(NPC[B].Type == 90 || NPC[B].Type == NPCID_LIFE_S4 || NPC[B].Type == NPCID_LIFE_S1) // player touched a 1up mushroom
+        if(NPC[B].Type == NPCID_LIFE_S3 || NPC[B].Type == NPCID_LIFE_S4 || NPC[B].Type == NPCID_LIFE_S1) // player touched a 1up mushroom
         {
             NPC[B].Killed = 9;
             NPCQueues::Killed.push_back(B);
@@ -646,7 +646,7 @@ void TouchBonus(int A, int B)
                     CheckAfterStarTake(false);
                 }
 
-                if(NPC[B].Type == 97)
+                if(NPC[B].Type == NPCID_STAR_EXIT)
                 {
                     LevelMacro = LEVELMACRO_STAR_EXIT;
                     for(C = 1; C <= numPlayers; C++)

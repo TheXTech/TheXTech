@@ -424,7 +424,7 @@ void UpdateEditor()
                     {
                         tempLocation = NPC[A].Location;
 
-                        if(NPC[A].Type == 91) // Herb's container offset
+                        if(NPC[A].Type == NPCID_ITEM_BURIED) // Herb's container offset
                             tempLocation.Y -= 16;
 
                         if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
@@ -941,7 +941,7 @@ void UpdateEditor()
                     for(A = 1; A <= numNPCs; A++)
                     {
                         tempLocation = NPC[A].Location;
-                        if(NPC[A].Type == 91)
+                        if(NPC[A].Type == NPCID_ITEM_BURIED)
                             tempLocation.Y -= 16;
 
                         if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
@@ -1326,7 +1326,7 @@ void UpdateEditor()
                 {
                     for(A = 1; A <= numNPCs; A++)
                     {
-                        if(NPC[A].Type != 91 && NPC[A].Type != NPCID_FIRE_DISK && NPC[A].Type != NPCID_FIRE_CHAIN)
+                        if(NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_FIRE_DISK && NPC[A].Type != NPCID_FIRE_CHAIN)
                         {
                             if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active)
                             {
