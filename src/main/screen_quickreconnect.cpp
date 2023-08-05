@@ -34,11 +34,19 @@ bool g_active;
 
 static int s_toast_duration[maxLocalPlayers] = {0};
 
+void Deactivate()
+{
+    g_active = false;
+
+    for(int i = 0; i < maxLocalPlayers; ++i)
+        s_toast_duration[i] = 0;
+}
+
 void Render()
 {
     if(GameMenu || LevelEditor || GameOutro)
     {
-        g_active = false;
+        Deactivate();
         return;
     }
 
@@ -67,7 +75,6 @@ void Render()
         else if(s_toast_duration[i])
         {
             int draw_Y = last_player_Y - 20 * drawn;
-            message[3] = '\0';
             const std::string& p = (Controls::g_InputMethods[i]->Profile ? Controls::g_InputMethods[i]->Profile->Name : g_mainMenu.caseNone);
             message = fmt::format_ne(g_gameStrings.controlsPhrasePlayerConnected, i + 1, Controls::g_InputMethods[i]->Name, p);
             SuperPrint(message, 3, draw_X, draw_Y);
@@ -83,7 +90,7 @@ void Logic()
 {
     if(GameMenu || LevelEditor || GameOutro)
     {
-        g_active = false;
+        Deactivate();
         return;
     }
 

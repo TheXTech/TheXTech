@@ -38,9 +38,9 @@
 #include "../lunaplayer.h"
 
 
-#define NPC_FIREBAR 260
-#define NPC_DOUGHNUT 210
-#define NPC_SCIENCE 209
+#define NPCID_FIRE_CHAIN 260
+#define NPCID_DOUGHNUT 210
+#define NPCID_SCIENCE 209
 
 namespace ScienceBattle
 {
@@ -74,7 +74,7 @@ void ScienceCode()
         SDL_assert_release(demo);
     }
 
-    hurt_npc = FindNPC(NPC_FIREBAR);
+    hurt_npc = FindNPC(NPCID_FIRE_CHAIN);
 
     if(!hurt_npc)
         return;
@@ -91,7 +91,7 @@ void ScienceCode()
     hurt_npc->Location.X = demo->Location.X;
     treeNPCUpdate(hurt_npc);
 
-    doughnuts = FindAllNPC(NPC_DOUGHNUT);
+    doughnuts = FindAllNPC(NPCID_DOUGHNUT);
 
     if(demo->HoldingNPC > 0)
         throw_timer = 30;

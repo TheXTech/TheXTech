@@ -21,6 +21,7 @@
 #include "../globals.h"
 #include "../npc.h"
 #include "../npc_id.h"
+#include "../eff_id.h"
 #include "../sound.h"
 #include "../collision.h"
 #include "../effect.h"
@@ -182,7 +183,7 @@ void TouchBonus(int A, int B)
         //            Netplay::sendData "1k" + std::to_string(A) + "|" + std::to_string(B) + "|" + NPC[B].Type + LB;
         if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) // for link give hearts
         {
-            if(NPC[B].Type == 34 || NPC[B].Type == 169 || NPC[B].Type == 170)
+            if(NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPC_HEAVY_POWER)
             {
                 Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
@@ -194,7 +195,7 @@ void TouchBonus(int A, int B)
         // If NPC(B).Type = 34 Or NPC(B).Type = 169 Or NPC(B).Type = 170 Then NPC(B).Type = 9
         // End If
 
-        if(NPC[B].Type == 273 && numPlayers > 1) // ? mushroom
+        if(NPC[B].Type == NPCID_SWAP_POWER && numPlayers > 1) // ? mushroom
         {
             if(!Player[1].Dead && Player[1].TimeToLive == 0 && !Player[2].Dead &&
                 Player[2].TimeToLive == 0 && Player[1].Immune == 0 && Player[2].Immune == 0)
@@ -224,7 +225,7 @@ void TouchBonus(int A, int B)
             }
         }
 
-        if(NPC[B].Type == 254) // Player is a fairy
+        if(NPC[B].Type == NPCID_FLY_POWER) // Player is a fairy
         {
             if(Player[A].Mount == 2)
                 return;
@@ -237,22 +238,22 @@ void TouchBonus(int A, int B)
                     Player[A].Effect2 = 4;
                     Player[A].Fairy = true;
                     SizeCheck(Player[A]);
-                    NewEffect(63, Player[A].Location);
+                    NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                 }
-                PlaySound(SFX_ZeldaFairy);
+                PlaySound(SFX_HeroFairy);
                 Player[A].FairyTime = -1;
                 NPC[B].Killed = 9;
                 NPCQueues::Killed.push_back(B);
             }
         }
-        if(NPC[B].Type == 90 || NPC[B].Type == 187 || NPC[B].Type == 186) // player touched a 1up mushroom
+        if(NPC[B].Type == NPCID_LIFE_S3 || NPC[B].Type == NPCID_LIFE_S4 || NPC[B].Type == NPCID_LIFE_S1) // player touched a 1up mushroom
         {
             NPC[B].Killed = 9;
             NPCQueues::Killed.push_back(B);
             MoreScore(10, NPC[B].Location);
             return;
         }
-        if(NPC[B].Type == 248 && NPC[B].Effect != 2 && (Player[A].Character == 1 || Player[A].Character == 2)) // send the clock to the item container
+        if(NPC[B].Type == NPCID_TIMER_S3 && NPC[B].Effect != 2 && (Player[A].Character == 1 || Player[A].Character == 2)) // send the clock to the item container
         {
             Player[A].HeldBonus = 248;
             NPC[B].Killed = 9;
@@ -260,7 +261,7 @@ void TouchBonus(int A, int B)
             PlaySound(SFX_GotItem);
             return;
         }
-        if(NPC[B].Type == 240 || NPC[B].Type == 248) // player touched the clock
+        if(NPC[B].Type == NPCID_TIMER_S2 || NPC[B].Type == NPCID_TIMER_S3) // player touched the clock
         {
             PSwitchStop = Physics.NPCPSwitch;
             FreezeNPCs = true;
@@ -269,7 +270,7 @@ void TouchBonus(int A, int B)
             NPCQueues::Killed.push_back(B);
             return;
         }
-        if(NPC[B].Type == 192) // player touched the chekpoint
+        if(NPC[B].Type == NPCID_CHECKPOINT) // player touched the chekpoint
         {
             RumbleForPowerup(A);
             if(Player[A].State == 1)
@@ -287,14 +288,14 @@ void TouchBonus(int A, int B)
             pLogDebug("Added checkpoint ID %d", cp.id);
             return;
         }
-        if(NPC[B].Type == 188) // player touched the 3up moon
+        if(NPC[B].Type == NPCID_3_LIFE) // player touched the 3up moon
         {
             NPC[B].Killed = 9;
             NPCQueues::Killed.push_back(B);
             MoreScore(12, NPC[B].Location);
             return;
         }
-        if(NPC[B].Type == 178)
+        if(NPC[B].Type == NPCID_AXE)
         {
             NPC[B].Killed = 9;
             NPCQueues::Killed.push_back(B);
@@ -303,11 +304,11 @@ void TouchBonus(int A, int B)
         if(NPCIsToad[NPC[B].Type])
         {
             toadBool = NPC[B].Type;
-            NPC[B].Type = 9;
+            NPC[B].Type = NPCID_POWER_S3;
         }
-        if(NPC[B].Type == 153) // Bonus is a POISON mushroom
+        if(NPC[B].Type == NPCID_POISON) // Bonus is a POISON mushroom
             PlayerHurt(A);
-        else if(NPC[B].Type == 9 || NPC[B].Type == 184 || NPC[B].Type == 185 || NPC[B].Type == 249 || NPC[B].Type == 250) // Bonus is a mushroom
+        else if(NPC[B].Type == NPCID_POWER_S3 || NPC[B].Type == NPCID_POWER_S1 || NPC[B].Type == NPCID_POWER_S4 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5) // Bonus is a mushroom
         {
             if(Player[A].Character == 5 && Player[A].State == 1)
                 Player[A].State = 2;
@@ -331,8 +332,8 @@ void TouchBonus(int A, int B)
                     UnDuck(Player[A]);
                 PlaySound(SFX_PlayerGrow);
             }
-            else if(NPC[B].Type == 250)
-                PlaySound(SFX_ZeldaHeart);
+            else if(NPC[B].Type == NPCID_POWER_S5)
+                PlaySound(SFX_HeroHeart);
             else
             {
                 if(doPlayGrowWithGotItem())
@@ -342,7 +343,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 14 || NPC[B].Type == 182 || NPC[B].Type == 183) // Bonus is a fire flower
+        else if(NPC[B].Type == NPCID_FIRE_POWER_S3 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4) // Bonus is a fire flower
         {
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
@@ -360,14 +361,14 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaItem);
+                    PlaySound(SFX_HeroItem);
                 else
                     PlaySound(SFX_PlayerGrow);
             }
             else
             {
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaHeart);
+                    PlaySound(SFX_HeroHeart);
                 else
                 {
                     if(doPlayGrowWithGotItem())
@@ -378,7 +379,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 264 || NPC[B].Type == 277) // Bonus is an ice flower
+        else if(NPC[B].Type == NPCID_ICE_POWER_S3 || NPC[B].Type == NPCID_ICE_POWER_S4) // Bonus is an ice flower
         {
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
@@ -397,14 +398,14 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaItem);
+                    PlaySound(SFX_HeroItem);
                 else
                     PlaySound(SFX_PlayerGrow);
             }
             else
             {
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaHeart);
+                    PlaySound(SFX_HeroHeart);
                 else
                 {
                     if(doPlayGrowWithGotItem())
@@ -415,7 +416,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 34) // Bonus is a leaf
+        else if(NPC[B].Type == NPCID_LEAF_POWER) // Bonus is a leaf
         {
             UpdatePlayerBonus(A, NPC[B].Type);
             Player[A].StateNPC = NPC[B].Type;
@@ -428,14 +429,14 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaItem);
+                    PlaySound(SFX_HeroItem);
                 else
-                    PlaySound(SFX_Raccoon);
+                    PlaySound(SFX_Transform);
             }
             else
             {
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaHeart);
+                    PlaySound(SFX_HeroHeart);
                 else
                 {
                     if(doPlayGrowWithGotItem())
@@ -446,7 +447,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 169) // Bonus is a Tanooki Suit
+        else if(NPC[B].Type == NPCID_STATUE_POWER) // Bonus is a Tanooki Suit
         {
             UpdatePlayerBonus(A, NPC[B].Type);
             Player[A].StateNPC = NPC[B].Type;
@@ -459,14 +460,14 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaItem);
+                    PlaySound(SFX_HeroItem);
                 else
-                    PlaySound(SFX_Raccoon);
+                    PlaySound(SFX_Transform);
             }
             else
             {
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaHeart);
+                    PlaySound(SFX_HeroHeart);
                 else
                 {
                     if(doPlayGrowWithGotItem())
@@ -477,7 +478,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 170) // Bonus is a Hammer Suit
+        else if(NPC[B].Type == NPC_HEAVY_POWER) // Bonus is a Hammer Suit
         {
             UpdatePlayerBonus(A, NPC[B].Type);
             Player[A].StateNPC = NPC[B].Type;
@@ -490,14 +491,14 @@ void TouchBonus(int A, int B)
                 if(Player[A].Mount > 0)
                     UnDuck(Player[A]);
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaItem);
+                    PlaySound(SFX_HeroItem);
                 else
-                    PlaySound(SFX_Raccoon);
+                    PlaySound(SFX_Transform);
             }
             else
             {
                 if(Player[A].Character == 5)
-                    PlaySound(SFX_ZeldaHeart);
+                    PlaySound(SFX_HeroHeart);
                 else
                 {
                     if(doPlayGrowWithGotItem())
@@ -510,15 +511,15 @@ void TouchBonus(int A, int B)
         }
         else if(NPCIsACoin[NPC[B].Type]) // Bonus is a coin
         {
-            if(NPC[B].Type == 152)
-                PlaySound(SFX_SonicRing);
-            else if(NPC[B].Type == 251 || NPC[B].Type == 252 || NPC[B].Type == 253)
-                PlaySound(SFX_ZeldaRupee);
-            else if(NPC[B].Type != 274)
+            if(NPC[B].Type == NPCID_RING)
+                PlaySound(SFX_RingGet);
+            else if(NPC[B].Type == NPCID_GEM_1 || NPC[B].Type == NPCID_GEM_5 || NPC[B].Type == NPCID_GEM_20)
+                PlaySound(SFX_HeroRupee);
+            else if(NPC[B].Type != NPCID_MEDAL)
                 PlaySound(SFX_Coin);
-            if(NPC[B].Type == 252 || NPC[B].Type == 258)
+            if(NPC[B].Type == NPCID_GEM_5 || NPC[B].Type == NPCID_COIN_5)
                 Coins += 5;
-            else if(NPC[B].Type == 253)
+            else if(NPC[B].Type == NPCID_GEM_20)
                 Coins += 20;
             else
                 Coins += 1;
@@ -533,9 +534,9 @@ void TouchBonus(int A, int B)
                 else
                     Coins = 99;
             }
-            if(NPC[B].Type == 274)
+            if(NPC[B].Type == NPCID_MEDAL)
             {
-                PlaySound(SFX_DraginCoin);
+                PlaySound(SFX_MedalGet);
                 MoreScore(NPCScore[NPC[B].Type], NPC[B].Location);
                 NPCScore[274] += 1;
                 if(NPCScore[274] > 14)
@@ -543,18 +544,18 @@ void TouchBonus(int A, int B)
             }
             else
                 MoreScore(1, NPC[B].Location);
-            NewEffect(78, NPC[B].Location);
+            NewEffect(EFFID_COIN_COLLECT, NPC[B].Location);
         }
         else if(NPCIsAnExit[NPC[B].Type] && LevelMacro == LEVELMACRO_OFF) // Level exit
         {
-            if(NPC[B].Type != 196)
+            if(NPC[B].Type != NPCID_STAR_COLLECT)
             {
                 TurnNPCsIntoCoins();
                 FreezeNPCs = false;
                 if(numPlayers > 2 /*&& nPlay.Online == false*/)
                     Player[1] = Player[A];
             }
-            if(NPC[B].Type == 11)
+            if(NPC[B].Type == NPCID_ITEMGOAL)
             {
                 if(NPC[B].Frame == 0)
                     MoreScore(10, Player[A].Location);
@@ -580,7 +581,7 @@ void TouchBonus(int A, int B)
                 XEvents::doEvents();
                 PlaySound(SFX_CardRouletteClear);
             }
-            else if(NPC[B].Type == 16)
+            else if(NPC[B].Type == NPCID_GOALORB_S3)
             {
                 LevelMacro = LEVELMACRO_QUESTION_SPHERE_EXIT;
                 for(C = 1; C <= numPlayers; C++)
@@ -599,7 +600,7 @@ void TouchBonus(int A, int B)
                 StopMusic();
                 PlaySound(SFX_DungeonClear);
             }
-            else if(NPC[B].Type == 41)
+            else if(NPC[B].Type == NPCID_GOALORB_S2)
             {
                 LevelMacro = LEVELMACRO_CRYSTAL_BALL_EXIT;
                 for(C = 1; C <= numPlayers; C++)
@@ -618,7 +619,7 @@ void TouchBonus(int A, int B)
                 StopMusic();
                 PlaySound(SFX_CrystalBallExit);
             }
-            else if(NPC[B].Type == NPCID_STAR_SMB3 || NPC[B].Type == NPCID_STAR_SMW)
+            else if(NPC[B].Type == NPCID_STAR_EXIT || NPC[B].Type == NPCID_STAR_COLLECT)
             {
                 for(const auto& star : Star)
                 {
@@ -645,7 +646,7 @@ void TouchBonus(int A, int B)
                     CheckAfterStarTake(false);
                 }
 
-                if(NPC[B].Type == 97)
+                if(NPC[B].Type == NPCID_STAR_EXIT)
                 {
                     LevelMacro = LEVELMACRO_STAR_EXIT;
                     for(C = 1; C <= numPlayers; C++)
@@ -665,7 +666,7 @@ void TouchBonus(int A, int B)
                     PlaySound(SFX_GotStar);
                 }
                 else
-                    PlaySound(SFX_DraginCoin);
+                    PlaySound(SFX_MedalGet);
             }
         }
         if(toadBool > 0)

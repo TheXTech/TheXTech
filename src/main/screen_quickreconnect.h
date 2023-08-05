@@ -27,6 +27,7 @@ namespace QuickReconnectScreen
 
 extern bool g_active;
 
+void Deactivate();
 void Render();
 void Logic();
 

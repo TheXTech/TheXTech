@@ -32,6 +32,7 @@
 #include "collision.h"
 #include "npc.h"
 #include "npc_id.h"
+#include "eff_id.h"
 #include "sound.h"
 #include "game_main.h"
 #include "effect.h"
@@ -132,7 +133,7 @@ static void setupCheckpoints()
 
         for(int A = 1; A <= numNPCs; A++)
         {
-            if(NPC[A].Type != 192)
+            if(NPC[A].Type != NPCID_CHECKPOINT)
                 continue;
 
             if(g_compatibility.fix_vanilla_checkpoints && cp.id != Maths::iRound(NPC[A].Special))
@@ -477,7 +478,7 @@ void PlayerHurt(const int A)
 
     if(p.Fairy)
     {
-        PlaySound(SFX_ZeldaFairy);
+        PlaySound(SFX_HeroFairy);
         p.Immune = 30;
         p.Effect = 8;
         p.Effect2 = 4;
@@ -487,7 +488,7 @@ void PlayerHurt(const int A)
         // FIXME: Here is a possible vanilla bug: B is always 0 even at original code
         SizeCheck(Player[B]);
 
-        NewEffect(63, p.Location);
+        NewEffect(EFFID_SMOKE_S5, p.Location);
         if(p.Character == 5)
         {
             p.FrameCount = -10;
@@ -495,7 +496,7 @@ void PlayerHurt(const int A)
             p.Location.SpeedY = -7.01;
             p.StandingOnNPC = 0;
             p.FireBallCD = 20;
-            PlaySound(SFX_ZeldaHurt);
+            PlaySound(SFX_HeroHurt);
         }
         return;
     }
@@ -508,7 +509,7 @@ void PlayerHurt(const int A)
             p.Hearts = 1;
     }
 
-    if(NPC[p.HoldingNPC].Type == 13)
+    if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL)
         p.HoldingNPC = 0;
 
     if(LevelMacro == LEVELMACRO_OFF)
@@ -525,11 +526,11 @@ void PlayerHurt(const int A)
                 tempLocation = p.Location;
                 tempLocation.SpeedX = 5 * -p.Direction;
                 if(p.MountType == 1)
-                    NewEffect(26, tempLocation);
+                    NewEffect(EFFID_GRN_BOOT_DIE, tempLocation);
                 else if(p.MountType == 2)
-                    NewEffect(101, tempLocation);
+                    NewEffect(EFFID_RED_BOOT_DIE, tempLocation);
                 else
-                    NewEffect(102, tempLocation);
+                    NewEffect(EFFID_BLU_BOOT_DIE, tempLocation);
                 p.Location.Y += p.Location.Height;
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
                 p.Location.Y += -p.Location.Height;
@@ -539,7 +540,7 @@ void PlayerHurt(const int A)
             else if(p.Mount == 3)
             {
                 UnDuck(Player[A]);
-                PlaySound(SFX_YoshiHurt);
+                PlaySound(SFX_PetHurt);
                 p.Immune = 100;
                 p.Immune2 = true;
                 p.CanJump = false;
@@ -566,21 +567,21 @@ void PlayerHurt(const int A)
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 100;
                 if(p.MountType == 1)
-                    NPC[numNPCs].Type = 95;
+                    NPC[numNPCs].Type = NPCID_PET_GREEN;
                 else if(p.MountType == 2)
-                    NPC[numNPCs].Type = 98;
+                    NPC[numNPCs].Type = NPCID_PET_BLUE;
                 else if(p.MountType == 3)
-                    NPC[numNPCs].Type = 99;
+                    NPC[numNPCs].Type = NPCID_PET_YELLOW;
                 else if(p.MountType == 4)
-                    NPC[numNPCs].Type = 100;
+                    NPC[numNPCs].Type = NPCID_PET_RED;
                 else if(p.MountType == 5)
-                    NPC[numNPCs].Type = 148;
+                    NPC[numNPCs].Type = NPCID_PET_BLACK;
                 else if(p.MountType == 6)
-                    NPC[numNPCs].Type = 149;
+                    NPC[numNPCs].Type = NPCID_PET_PURPLE;
                 else if(p.MountType == 7)
-                    NPC[numNPCs].Type = 150;
+                    NPC[numNPCs].Type = NPCID_PET_PINK;
                 else if(p.MountType == 8)
-                    NPC[numNPCs].Type = 228;
+                    NPC[numNPCs].Type = NPCID_PET_CYAN;
                 NPC[numNPCs].Special = 1;
                 NPC[numNPCs].Location.Height = 32;
                 NPC[numNPCs].Location.Width = 32;
@@ -653,7 +654,7 @@ void PlayerHurt(const int A)
                         }
                         p.Immune = 150;
                         p.Immune2 = true;
-                        PlaySound(SFX_ZeldaHurt);
+                        PlaySound(SFX_HeroHurt);
                         return;
                     }
                 }
@@ -679,7 +680,7 @@ void PlayerHurt(const int A)
                         NPC[numNPCs].Frame += SpecialFrame[2];
                         NPC[numNPCs].Active = true;
                         NPC[numNPCs].TimeLeft = 100;
-                        NPC[numNPCs].Type = 56;
+                        NPC[numNPCs].Type = NPCID_VEHICLE;
                         NPC[numNPCs].Location.Height = 128;
                         NPC[numNPCs].Location.Width = 128;
                         NPC[numNPCs].Location.Y = static_cast<int>(floor(static_cast<double>(p.Location.Y)));
@@ -708,15 +709,15 @@ void PlayerHurt(const int A)
                                     treeNPCSplitTempBlock(B);
 
                                 NPC[B].standingOnPlayerY = 0;
-                                if(NPC[B].Type == 22)
+                                if(NPC[B].Type == NPCID_CANNONITEM)
                                     NPC[B].Special = 0;
-                                if(NPC[B].Type == 50)
+                                if(NPC[B].Type == NPCID_TOOTHY)
                                 {
                                     NPC[B].Killed = 9;
                                     NPCQueues::Killed.push_back(B);
                                     NPC[B].Special = 0;
                                 }
-                                else if(NPC[B].Type == 49)
+                                else if(NPC[B].Type == NPCID_TOOTHYPIPE)
                                     NPC[B].Special = 0;
                             }
                         }
@@ -730,16 +731,16 @@ void PlayerHurt(const int A)
 void PlayerDeathEffect(int A)
 {
     if(Player[A].Character == 1)
-        NewEffect(3, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR1_DIE, Player[A].Location, 1, 0, ShadowMode);
     else if(Player[A].Character == 2)
-        NewEffect(5, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR2_DIE, Player[A].Location, 1, 0, ShadowMode);
     else if(Player[A].Character == 3)
-        NewEffect(129, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR3_DIE, Player[A].Location, 1, 0, ShadowMode);
     else if(Player[A].Character == 4)
-        NewEffect(130, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR4_DIE, Player[A].Location, 1, 0, ShadowMode);
     else if(Player[A].Character == 5)
     {
-        NewEffect(134, Player[A].Location, static_cast<float>(Player[A].Direction), 0, ShadowMode);
+        NewEffect(EFFID_CHAR5_DIE, Player[A].Location, static_cast<float>(Player[A].Direction), 0, ShadowMode);
         Effect[numEffects].Location.SpeedX = 2 * -Player[A].Direction;
     }
 }
@@ -761,7 +762,7 @@ void PlayerDead(int A)
 //    }
 
     if(p.Character == 5)
-        PlaySound(SFX_ZeldaDied);
+        PlaySound(SFX_HeroDied);
     else
     {
         if(BattleMode)
@@ -807,7 +808,7 @@ void PlayerDead(int A)
         NPC[numNPCs].Frame += SpecialFrame[2];
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 100;
-        NPC[numNPCs].Type = 56;
+        NPC[numNPCs].Type = NPCID_VEHICLE;
         NPC[numNPCs].Location.Height = 128;
         NPC[numNPCs].Location.Width = 128;
         NPC[numNPCs].Location.Y = static_cast<int>(floor(static_cast<double>(p.Location.Y)));
@@ -873,7 +874,7 @@ void KillPlayer(const int A)
 
     if(p.HoldingNPC > 0)
     {
-        if(NPC[p.HoldingNPC].Type == 272)
+        if(NPC[p.HoldingNPC].Type == NPCID_VINE_BUG)
             NPC[p.HoldingNPC].Projectile = true;
     }
 
@@ -902,7 +903,7 @@ void KillPlayer(const int A)
         {
             if(BattleLives[A] > 0)
                 BattleLives[A] -= 1;
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             p.Frame = 1;
             p.Location.SpeedX = 0;
             p.Location.SpeedY = 0;
@@ -924,7 +925,7 @@ void KillPlayer(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(131, tempLocation);
+            NewEffect(EFFID_SMOKE_S4, tempLocation);
             UpdateYoshiMusic();
         }
     }
@@ -998,7 +999,6 @@ void ProcessLastDead()
     {
         FadeOutMusic(500);
         g_levelScreenFader.setupFader(3, 0, 65, ScreenFader::S_FADE);
-        levelWaitForFade();
     }
 }
 
@@ -1293,7 +1293,7 @@ void PlayerFrame(Player_t &p)
                     p.SlideCounter = 2 + iRand_round(2); // p(2) = 25%, p(3) = 50%, p(4) = 25%
                     tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                     tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4;
-                    NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                 }
             }
         }
@@ -1315,7 +1315,7 @@ void PlayerFrame(Player_t &p)
                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 6;
                     else
                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 - 6;
-                    NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                 }
             }
         }
@@ -1494,7 +1494,7 @@ void PlayerFrame(Player_t &p)
                                         p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 8 * -p.Direction;
-                                        NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                                     }
                                 }
 
@@ -1513,7 +1513,7 @@ void PlayerFrame(Player_t &p)
                                         p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 8 * -p.Direction;
-                                        NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                                     }
                                 }
 
@@ -1572,7 +1572,7 @@ void PlayerFrame(Player_t &p)
                             p.SlideCounter = 2 + iRand_round(2);
                             tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 10 * -p.Direction;
-                            NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                            NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                         }
                     }
 
@@ -1724,7 +1724,7 @@ void PlayerFrame(Player_t &p)
                                         p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 6 * -p.Direction;
-                                        NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                                     }
                                 }
                                 p.Frame = 6;
@@ -1743,7 +1743,7 @@ void PlayerFrame(Player_t &p)
                                         p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 10 * -p.Direction;
-                                        NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                                     }
                                 }
                                 p.Frame = 6;
@@ -1871,7 +1871,7 @@ void PlayerFrame(Player_t &p)
                             p.SlideCounter = 2 + iRand_round(2);
                             tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 10 * -p.Direction;
-                            NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                            NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                         }
                     }
                     if(p.Location.SpeedX != 0)
@@ -2338,7 +2338,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                             {
                                 tempLoc.X = (block.Location.X + tailLoc.X + (block.Location.Width + tailLoc.Width) / 2.0) / 2 - 16;
                                 tempLoc.Y = (block.Location.Y + tailLoc.Y + (block.Location.Height + tailLoc.Height) / 2.0) / 2 - 16;
-                                NewEffect(73, tempLoc);
+                                NewEffect(EFFID_WHIP, tempLoc);
                             }
                             break;
                         }
@@ -2359,11 +2359,11 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                             }
                             if(block.Type == 370)
                             {
-                                PlaySound(SFX_ZeldaGrass);
+                                PlaySound(SFX_HeroGrass);
                                 block.Hidden = true;
                                 block.Layer = LAYER_DESTROYED_BLOCKS;
                                 syncLayersTrees_Block(A);
-                                NewEffect(10, block.Location);
+                                NewEffect(EFFID_SMOKE_S3, block.Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
 
@@ -2389,23 +2389,23 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
         if(NPC[A].Active && NPC[A].Effect == 0 && !(NPCIsAnExit[NPC[A].Type] || (NPCIsACoin[NPC[A].Type] && !Stab)) &&
             NPC[A].CantHurtPlayer != plr && !(p.StandingOnNPC == A && p.ShellSurf))
         {
-            if(NPC[A].Type != 13 && NPC[A].Type != 265 && !(NPC[A].Type == 17 && NPC[A].Projectile) &&
-                NPC[A].Type != 108 && NPC[A].Type != 197 && NPC[A].Type != 192)
+            if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && !(NPC[A].Type == NPCID_BULLET && NPC[A].Projectile) &&
+                NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_GOALTAPE && NPC[A].Type != NPCID_CHECKPOINT)
             {
                 stabLoc = NPC[A].Location;
-                if(NPCHeightGFX[NPC[A].Type] > NPC[A].Location.Height && NPC[A].Type != 8 && NPC[A].Type != 15 &&
-                    NPC[A].Type != 205 && NPC[A].Type != 9 && NPC[A].Type != 51 && NPC[A].Type != 52 &&
-                    NPC[A].Type != 74 && NPC[A].Type != 93 && NPC[A].Type != 245)
+                if(NPCHeightGFX[NPC[A].Type] > NPC[A].Location.Height && NPC[A].Type != NPCID_PLANT_S3 && NPC[A].Type != NPCID_MINIBOSS &&
+                    NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_POWER_S3 && NPC[A].Type != NPCID_BOTTOM_PLANT && NPC[A].Type != NPCID_SIDE_PLANT &&
+                    NPC[A].Type != NPCID_BIG_PLANT && NPC[A].Type != NPCID_PLANT_S1 && NPC[A].Type != NPCID_FIRE_PLANT)
                 {
                     stabLoc.Y += stabLoc.Height;
                     stabLoc.Height = NPCHeightGFX[NPC[A].Type];
                     stabLoc.Y += -stabLoc.Height;
                 }
 
-                if(NPC[A].Type == 91 && Stab)
+                if(NPC[A].Type == NPCID_ITEM_BURIED && Stab)
                     stabLoc.Y += -stabLoc.Height;
 
-                if(CheckCollision(tailLoc, stabLoc) && NPC[A].Killed == 0 && NPC[A].TailCD == 0 && !(StabDir != 0 && NPC[A].Type == 91))
+                if(CheckCollision(tailLoc, stabLoc) && NPC[A].Killed == 0 && NPC[A].TailCD == 0 && !(StabDir != 0 && NPC[A].Type == NPCID_ITEM_BURIED))
                 {
                     oldNPC = NPC[A];
                     if(Stab)
@@ -2413,12 +2413,12 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         B = NPC[A].Damage;
                         C = NPC[A].Type;
 
-                        if(StabDir == 2 && ((NPC[A].Type >= 154 && NPC[A].Type <= 157) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == 238 || NPC[A].Type == 241))
+                        if(StabDir == 2 && ((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK))
                         {
                         }
                         else
                         {
-                            if(NPC[A].Type == 45 && StabDir != 0)
+                            if(NPC[A].Type == NPCID_SLIDE_BLOCK && StabDir != 0)
                             {
                                 NPC[A].Special = 1;
                                 NPC[A].Projectile = true;
@@ -2452,7 +2452,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                             tempLoc.X = (NPC[A].Location.X + tailLoc.X + (NPC[A].Location.Width + tailLoc.Width) / 2.0) / 2 - 16;
                             tempLoc.Y = (NPC[A].Location.Y + tailLoc.Y + (NPC[A].Location.Height + tailLoc.Height) / 2.0) / 2 - 16;
                             NPC[A].BattleOwner = plr;
-                            NewEffect(73, tempLoc);
+                            NewEffect(EFFID_WHIP, tempLoc);
                         }
                     }
 
@@ -2484,7 +2484,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         }
 
                         PlayerHurt(A);
-                        PlaySound(SFX_ZeldaHit);
+                        PlaySound(SFX_HeroHit);
                     }
                     else
                     {
@@ -2672,7 +2672,7 @@ void YoshiSpit(const int A)
         //    PlayerPush(p.YoshiPlayer, 4);
 
         p.YoshiPlayer = 0;
-        PlaySound(SFX_BirdoSpit);
+        PlaySound(SFX_SpitBossSpit);
     }
     else
     {
@@ -2680,8 +2680,8 @@ void YoshiSpit(const int A)
         if(NPCIsAShell[NPC[p.YoshiNPC].Type])
             NPC[p.YoshiNPC].Special = 0;
 
-        if((NPCIsAShell[NPC[p.YoshiNPC].Type] || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == 194) &&
-           NPC[p.YoshiNPC].Type != 24 && p.YoshiRed)
+        if((NPCIsAShell[NPC[p.YoshiNPC].Type] || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL) &&
+           NPC[p.YoshiNPC].Type != NPCID_GLASS_SHELL && p.YoshiRed)
         {
             NPC[p.YoshiNPC].Killed = 9;
             NPCQueues::Killed.push_back(p.YoshiNPC);
@@ -2691,7 +2691,7 @@ void YoshiSpit(const int A)
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
                 NPC[numNPCs].Direction = p.Direction;
-                NPC[numNPCs].Type = 108;
+                NPC[numNPCs].Type = NPCID_PET_FIRE;
                 NPC[numNPCs].Frame = EditorNPCFrame(NPC[numNPCs].Type, NPC[numNPCs].Direction);
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].Section = p.Section;
@@ -2747,10 +2747,10 @@ void YoshiSpit(const int A)
 
 
 
-            if(NPC[p.YoshiNPC].Type == 45)
+            if(NPC[p.YoshiNPC].Type == NPCID_SLIDE_BLOCK)
                 NPC[p.YoshiNPC].Special = 1;
 
-            PlaySound(SFX_BirdoSpit);
+            PlaySound(SFX_SpitBossSpit);
 
             if(!p.Controls.Down || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
             {
@@ -2760,7 +2760,7 @@ void YoshiSpit(const int A)
                     // NPCHit .YoshiNPC, 1, A
                     NPC[p.YoshiNPC].Location.SpeedX = Physics.NPCShellSpeed * p.Direction;
                 }
-                else if(NPC[p.YoshiNPC].Type == 45)
+                else if(NPC[p.YoshiNPC].Type == NPCID_SLIDE_BLOCK)
                     NPC[p.YoshiNPC].Location.SpeedX = Physics.NPCShellSpeed * p.Direction;
                 else
                 {
@@ -2770,7 +2770,7 @@ void YoshiSpit(const int A)
                 }
             }
 
-            if(NPC[p.YoshiNPC].Type == 237)
+            if(NPC[p.YoshiNPC].Type == NPCID_ICE_BLOCK)
             {
                 NPC[p.YoshiNPC].Direction = p.Direction;
                 NPC[p.YoshiNPC].Projectile = true;
@@ -2850,12 +2850,12 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
         tempLocation.Height = 32;
         tempLocation.Y = p.Location.Y + p.Location.Height - 16;
         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16 - 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
         Effect[numEffects].Location.SpeedX = -2;
         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16 + 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
         Effect[numEffects].Location.SpeedX = 2;
-        PlaySound(SFX_Twomp);
+        PlaySound(SFX_Stone);
         if(BreakBlocks && g_config.GameplayShakeScreenPound)
             doShakeScreen(0, 4, SHAKE_SEQUENTIAL, 4, 0.2);
     }
@@ -2897,11 +2897,11 @@ void PlayerDismount(const int A)
         NPC[numNPCs].TimeLeft = 100;
 
         if(Player[A].MountType == 1)
-            NPC[numNPCs].Type = 35;
+            NPC[numNPCs].Type = NPCID_GRN_BOOT;
         else if(Player[A].MountType == 2)
-            NPC[numNPCs].Type = 191;
+            NPC[numNPCs].Type = NPCID_RED_BOOT;
         else if(Player[A].MountType == 3)
-            NPC[numNPCs].Type = 193;
+            NPC[numNPCs].Type = NPCID_BLU_BOOT;
 
         NPC[numNPCs].Location.Height = 32;
         NPC[numNPCs].Location.Width = 32;
@@ -2937,7 +2937,7 @@ void PlayerDismount(const int A)
         NPC[numNPCs].Frame = NPC[numNPCs].Frame + SpecialFrame[2];
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 100;
-        NPC[numNPCs].Type = 56;
+        NPC[numNPCs].Type = NPCID_VEHICLE;
         NPC[numNPCs].Location.Height = 128;
         NPC[numNPCs].Location.Width = 128;
         NPC[numNPCs].Location.Y = static_cast<int>(floor(static_cast<double>(Player[A].Location.Y)));
@@ -2980,15 +2980,15 @@ void PlayerDismount(const int A)
                 treeNPCUpdate(B);
 
                 NPC[B].standingOnPlayerY = 0;
-                if(NPC[B].Type == 22)
+                if(NPC[B].Type == NPCID_CANNONITEM)
                     NPC[B].Special = 0;
-                if(NPC[B].Type == 50)
+                if(NPC[B].Type == NPCID_TOOTHY)
                 {
                     NPC[B].Killed = 9;
                     NPC[B].Special = 0;
                     NPCQueues::Killed.push_back(B);
                 }
-                else if(NPC[B].Type == 49)
+                else if(NPC[B].Type == NPCID_TOOTHYPIPE)
                     NPC[B].Special = 0;
             }
         }
@@ -3011,21 +3011,21 @@ void PlayerDismount(const int A)
         NPC[numNPCs].TimeLeft = 100;
 
         if(Player[A].MountType == 1)
-            NPC[numNPCs].Type = 95;
+            NPC[numNPCs].Type = NPCID_PET_GREEN;
         else if(Player[A].MountType == 2)
-            NPC[numNPCs].Type = 98;
+            NPC[numNPCs].Type = NPCID_PET_BLUE;
         else if(Player[A].MountType == 3)
-            NPC[numNPCs].Type = 99;
+            NPC[numNPCs].Type = NPCID_PET_YELLOW;
         else if(Player[A].MountType == 4)
-            NPC[numNPCs].Type = 100;
+            NPC[numNPCs].Type = NPCID_PET_RED;
         else if(Player[A].MountType == 5)
-            NPC[numNPCs].Type = 148;
+            NPC[numNPCs].Type = NPCID_PET_BLACK;
         else if(Player[A].MountType == 6)
-            NPC[numNPCs].Type = 149;
+            NPC[numNPCs].Type = NPCID_PET_PURPLE;
         else if(Player[A].MountType == 7)
-            NPC[numNPCs].Type = 150;
+            NPC[numNPCs].Type = NPCID_PET_PINK;
         else if(Player[A].MountType == 8)
-            NPC[numNPCs].Type = 228;
+            NPC[numNPCs].Type = NPCID_PET_CYAN;
 
         NPC[numNPCs].Location.Height = 32;
         NPC[numNPCs].Location.Width = 32;
@@ -3287,16 +3287,16 @@ void YoshiEatCode(const int A)
         {
             if(p.YoshiNPC > 0)
             {
-                if(NPC[p.YoshiNPC].Type == 7 || NPC[p.YoshiNPC].Type == 6)
+                if(NPC[p.YoshiNPC].Type == NPCID_RED_SHELL_S3 || NPC[p.YoshiNPC].Type == NPCID_RED_TURTLE_S3)
                     p.YoshiRed = true;
-                if(NPC[p.YoshiNPC].Type == 110 || NPC[p.YoshiNPC].Type == 114 || NPC[p.YoshiNPC].Type == 128)
+                if(NPC[p.YoshiNPC].Type == NPCID_RED_TURTLE_S4 || NPC[p.YoshiNPC].Type == NPCID_RED_SHELL_S4 || NPC[p.YoshiNPC].Type == NPCID_RED_SLIME)
                     p.YoshiRed = true;
-                if(NPC[p.YoshiNPC].Type == 110 || NPC[p.YoshiNPC].Type == 114 || NPC[p.YoshiNPC].Type == 128)
+                if(NPC[p.YoshiNPC].Type == NPCID_RED_TURTLE_S4 || NPC[p.YoshiNPC].Type == NPCID_RED_SHELL_S4 || NPC[p.YoshiNPC].Type == NPCID_RED_SLIME)
                     p.YoshiRed = true;
-                if(NPC[p.YoshiNPC].Type == 174 || NPC[p.YoshiNPC].Type == 175 || NPC[p.YoshiNPC].Type == 177 || NPC[p.YoshiNPC].Type == 194)
+                if(NPC[p.YoshiNPC].Type == NPCID_RED_SHELL_S1 || NPC[p.YoshiNPC].Type == NPCID_RED_TURTLE_S1 || NPC[p.YoshiNPC].Type == NPCID_RED_FLY_TURTLE_S1 || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL)
                     p.YoshiRed = true;
 
-                if(NPC[p.YoshiNPC].Type == 111 || NPC[p.YoshiNPC].Type == 115 || NPC[p.YoshiNPC].Type == 194 || NPC[p.YoshiNPC].Type == 195)
+                if(NPC[p.YoshiNPC].Type == NPCID_BLU_TURTLE_S4 || NPC[p.YoshiNPC].Type == NPCID_BLU_SHELL_S4 || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_FLIPPED_RAINBOW_SHELL)
                 {
                     if(!p.YoshiBlue)
                     {
@@ -3307,9 +3307,9 @@ void YoshiEatCode(const int A)
                     p.YoshiBlue = true;
                 }
 
-                if(NPC[p.YoshiNPC].Type == 112 || NPC[p.YoshiNPC].Type == 116 ||
-                   NPC[p.YoshiNPC].Type == 127 || NPC[p.YoshiNPC].Type == 194 ||
-                   NPC[p.YoshiNPC].Type == 195)
+                if(NPC[p.YoshiNPC].Type == NPCID_YEL_TURTLE_S4 || NPC[p.YoshiNPC].Type == NPCID_YEL_SHELL_S4 ||
+                   NPC[p.YoshiNPC].Type == NPCID_CYAN_SLIME || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL ||
+                   NPC[p.YoshiNPC].Type == NPCID_FLIPPED_RAINBOW_SHELL)
                     p.YoshiYellow = true;
             }
 
@@ -3340,7 +3340,7 @@ void YoshiEatCode(const int A)
 
         if(p.MountSpecial == 0)
         {
-            if(NPC[p.YoshiNPC].Type == 31) // key check
+            if(NPC[p.YoshiNPC].Type == NPCID_KEY) // key check
             {
                 for(int B : treeBackgroundQuery(p.Location, SORTMODE_ID))
                 {
@@ -3366,7 +3366,7 @@ void YoshiEatCode(const int A)
                     }
                 }
             }
-            else if(NPC[p.YoshiNPC].Type == 45)
+            else if(NPC[p.YoshiNPC].Type == NPCID_SLIDE_BLOCK)
                 NPC[p.YoshiNPC].Special = 1;
 
             if(p.FireBallCD > 0)
@@ -3383,7 +3383,7 @@ void YoshiEatCode(const int A)
                             p.MountSpecial = 1;
                             p.YoshiTongueLength = 0;
                             p.YoshiTonugeBool = false;
-                            PlaySound(SFX_YoshiTongue);
+                            PlaySound(SFX_PetTongue);
                         }
                     }
                     else
@@ -3501,43 +3501,43 @@ void YoshiEatCode(const int A)
         {
             p.YoshiTFrameCount = 1;
 
-            if(NPC[p.YoshiNPC].Type == 4 || NPC[p.YoshiNPC].Type == 76)
-                NPC[p.YoshiNPC].Type = 5;
-            else if(NPC[p.YoshiNPC].Type == 6 || NPC[p.YoshiNPC].Type == 161)
-                NPC[p.YoshiNPC].Type = 7;
-            else if(NPC[p.YoshiNPC].Type == 23)
-                NPC[p.YoshiNPC].Type = 24;
-            else if(NPC[p.YoshiNPC].Type == 72)
-                NPC[p.YoshiNPC].Type = 73;
-            else if(NPC[p.YoshiNPC].Type >= 109 && NPC[p.YoshiNPC].Type <= 112)
-                NPC[p.YoshiNPC].Type += 4;
-            else if(NPC[p.YoshiNPC].Type >= 121 && NPC[p.YoshiNPC].Type <= 124)
+            if(NPC[p.YoshiNPC].Type == NPCID_GRN_TURTLE_S3 || NPC[p.YoshiNPC].Type == NPCID_GRN_FLY_TURTLE_S3)
+                NPC[p.YoshiNPC].Type = NPCID_GRN_SHELL_S3;
+            else if(NPC[p.YoshiNPC].Type == NPCID_RED_TURTLE_S3 || NPC[p.YoshiNPC].Type == NPCID_RED_FLY_TURTLE_S3)
+                NPC[p.YoshiNPC].Type = NPCID_RED_SHELL_S3;
+            else if(NPC[p.YoshiNPC].Type == NPCID_GLASS_TURTLE)
+                NPC[p.YoshiNPC].Type = NPCID_GLASS_SHELL;
+            else if(NPC[p.YoshiNPC].Type == NPCID_BIG_TURTLE)
+                NPC[p.YoshiNPC].Type = NPCID_BIG_SHELL;
+            else if(NPC[p.YoshiNPC].Type >= NPCID_GRN_TURTLE_S4 && NPC[p.YoshiNPC].Type <= NPCID_YEL_TURTLE_S4)
+                NPC[p.YoshiNPC].Type += NPCID_GRN_TURTLE_S3;
+            else if(NPC[p.YoshiNPC].Type >= NPCID_GRN_FLY_TURTLE_S4 && NPC[p.YoshiNPC].Type <= NPCID_YEL_FLY_TURTLE_S4)
             {
-                NPC[p.YoshiNPC].Type -= 8;
+                NPC[p.YoshiNPC].Type -= NPCID_PLANT_S3;
                 NPC[p.YoshiNPC].Special = 0;
             }
-            else if(NPC[p.YoshiNPC].Type == 173 || NPC[p.YoshiNPC].Type == 176)
+            else if(NPC[p.YoshiNPC].Type == NPCID_GRN_TURTLE_S1 || NPC[p.YoshiNPC].Type == NPCID_GRN_FLY_TURTLE_S1)
             {
-                NPC[p.YoshiNPC].Type = 172;
+                NPC[p.YoshiNPC].Type = NPCID_GRN_SHELL_S1;
                 NPC[p.YoshiNPC].Location.Height = 28;
             }
-            else if(NPC[p.YoshiNPC].Type == 175 || NPC[p.YoshiNPC].Type == 177)
+            else if(NPC[p.YoshiNPC].Type == NPCID_RED_TURTLE_S1 || NPC[p.YoshiNPC].Type == NPCID_RED_FLY_TURTLE_S1)
             {
-                NPC[p.YoshiNPC].Type = 174;
+                NPC[p.YoshiNPC].Type = NPCID_RED_SHELL_S1;
                 NPC[p.YoshiNPC].Location.Height = 28;
             }
 
             NPC[p.YoshiNPC].Location.Height = NPCHeight[NPC[p.YoshiNPC].Type];
-            if((NPCIsGrabbable[NPC[p.YoshiNPC].Type] || NPCIsAShell[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == 40 || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == 194 || NPC[p.YoshiNPC].Type == 135 || NPC[p.YoshiNPC].Type == 136 || NPC[p.YoshiNPC].Type == 137) && (NPC[p.YoshiNPC].Type != 166))
+            if((NPCIsGrabbable[NPC[p.YoshiNPC].Type] || NPCIsAShell[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_SPIT_BOSS_BALL || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3) && (NPC[p.YoshiNPC].Type != NPC_HIT_CARRY_FODDER))
             {
-                if(NPC[p.YoshiNPC].Type == 135)
+                if(NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2)
                     NPC[p.YoshiNPC].Special = 450;
-                if(NPC[p.YoshiNPC].Type == 134)
+                if(NPC[p.YoshiNPC].Type == NPCID_BOMB)
                     NPC[p.YoshiNPC].Special = 250;
-                if(NPC[p.YoshiNPC].Type == 136 || NPC[p.YoshiNPC].Type == 137)
+                if(NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3)
                 {
                     NPC[p.YoshiNPC].Special = 250;
-                    NPC[p.YoshiNPC].Type = 137;
+                    NPC[p.YoshiNPC].Type = NPCID_LIT_BOMB_S3;
                     NPC[p.YoshiNPC].Location.Height = NPCHeight[NPC[p.YoshiNPC].Type];
                 }
 
@@ -3550,7 +3550,7 @@ void YoshiEatCode(const int A)
                     NPCQueues::update(p.YoshiNPC);
                 }
 
-                if(NPC[p.YoshiNPC].Type == 49)
+                if(NPC[p.YoshiNPC].Type == NPCID_TOOTHYPIPE)
                 {
                     NPC[p.YoshiNPC].Special = 0;
                     NPC[p.YoshiNPC].Special2 = 0;
@@ -3559,9 +3559,9 @@ void YoshiEatCode(const int A)
             else if(p.MountType == 7 && !NPCIsABonus[NPC[p.YoshiNPC].Type])
             {
                 B = iRand(9);
-                NPC[p.YoshiNPC].Type = 139 + B;
-                if(NPC[p.YoshiNPC].Type == 147)
-                    NPC[p.YoshiNPC].Type = 92;
+                NPC[p.YoshiNPC].Type = NPCID_VEGGIE_2 + B;
+                if(NPC[p.YoshiNPC].Type == NPCID_VEGGIE_RANDOM)
+                    NPC[p.YoshiNPC].Type = NPCID_VEGGIE_1;
                 NPC[p.YoshiNPC].Location.X += NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += NPC[p.YoshiNPC].Location.Height / 2.0;
                 NPC[p.YoshiNPC].Location.Width = NPCWidth[NPC[p.YoshiNPC].Type];
@@ -3581,7 +3581,7 @@ void YoshiEatCode(const int A)
             }
             else if(p.MountType == 8 && !NPCIsABonus[NPC[p.YoshiNPC].Type])
             {
-                NPC[p.YoshiNPC].Type = 237;
+                NPC[p.YoshiNPC].Type = NPCID_ICE_BLOCK;
                 NPC[p.YoshiNPC].Location.X += NPC[p.YoshiNPC].Location.Width / 2.0;
                 NPC[p.YoshiNPC].Location.Y += NPC[p.YoshiNPC].Location.Height / 2.0;
                 NPC[p.YoshiNPC].Location.Width = NPCWidth[NPC[p.YoshiNPC].Type];
@@ -3628,7 +3628,7 @@ void YoshiEatCode(const int A)
                             Coins = 99;
                     }
 
-                    PlaySound(SFX_YoshiSwallow);
+                    PlaySound(SFX_PetSwallow);
                 }
             }
 
@@ -3808,7 +3808,7 @@ void ClownCar()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].playerTemp = true;
-            NPC[numNPCs].Type = 56;
+            NPC[numNPCs].Type = NPCID_VEHICLE;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 100;
             NPC[numNPCs].Location = Player[A].Location;
@@ -3840,7 +3840,7 @@ void ClownCar()
 
             for(int numNPCsMax8 = numNPCs, B = 1; B <= numNPCsMax8; B++)
             {
-                if(NPC[B].standingOnPlayer == A && NPC[B].Type != 50)
+                if(NPC[B].standingOnPlayer == A && NPC[B].Type != NPCID_TOOTHY)
                 {
                     if(Player[A].Effect == 0)
                         NPC[B].Location.X += Player[A].Location.SpeedX + double(Player[A].mountBump);
@@ -3854,7 +3854,7 @@ void ClownCar()
 
                     if(Player[A].Controls.Run)
                     {
-                        if(NPC[B].Type == 49)
+                        if(NPC[B].Type == NPCID_TOOTHYPIPE)
                         {
                             if(NPC[B].Special == 0.0)
                             {
@@ -3865,7 +3865,7 @@ void ClownCar()
                                 NPC[numNPCs].Active = true;
                                 NPC[numNPCs].Section = Player[A].Section;
                                 NPC[numNPCs].TimeLeft = 100;
-                                NPC[numNPCs].Type = 50;
+                                NPC[numNPCs].Type = NPCID_TOOTHY;
                                 NPC[numNPCs].Location.Height = 32;
                                 NPC[numNPCs].Location.Width = 48;
                                 NPC[numNPCs].Special = A;
@@ -3878,7 +3878,7 @@ void ClownCar()
 
                             for(int numNPCsMax9 = numNPCs, C = 1; C <= numNPCsMax9; C++)
                             {
-                                if(NPC[C].Type == 50 && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
+                                if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
                                 {
                                     NPC[C].standingOnPlayer = A;
                                     NPC[C].Projectile = true;
@@ -3965,7 +3965,7 @@ void WaterCheck(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height - tempLocation.Height;
-            NewEffect(114, tempLocation);
+            NewEffect(EFFID_WATER_SPLASH, tempLocation);
         }
     }
 
@@ -4005,7 +4005,7 @@ void WaterCheck(const int A)
                         tempLocation.Height = 32;
                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
                         tempLocation.Y = p.Location.Y + p.Location.Height - tempLocation.Height;
-                        NewEffect(114, tempLocation);
+                        NewEffect(EFFID_WATER_SPLASH, tempLocation);
                     }
                 }
 
@@ -4046,13 +4046,13 @@ void WaterCheck(const int A)
                 {
                     if(CheckCollision(Water[B].Location, tempLocation))
                     {
-                        NewEffect(113, tempLocation, 1, 0, ShadowMode);
+                        NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, 0, ShadowMode);
                         break;
                     }
                 }
             }
             else
-                NewEffect(113, tempLocation, 1, 1, ShadowMode);
+                NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, 1, ShadowMode);
         }
     }
 }
@@ -4132,7 +4132,7 @@ void PowerUps(const int A)
         {
             if(NPC[B].Active)
             {
-                if(NPC[B].Type == 292)
+                if(NPC[B].Type == NPCID_CHAR4_HEAVY)
                 {
                     if(Maths::iRound(NPC[B].Special5) == A)
                     {
@@ -4161,11 +4161,11 @@ void PowerUps(const int A)
                         NPC[numNPCs] = NPC_t();
                         if(ShadowMode)
                             NPC[numNPCs].Shadow = true;
-                        NPC[numNPCs].Type = 171;
+                        NPC[numNPCs].Type = NPCID_PLR_HEAVY;
                         if(p.Character == 3)
                         {
                             p.FireBallCD = 45;
-                            NPC[numNPCs].Type = 291;
+                            NPC[numNPCs].Type = NPCID_CHAR3_HEAVY;
                             if(p.Controls.AltRun && p.Mount == 0)
                             {
                                 NPC[numNPCs].HoldingPlayer = A;
@@ -4181,7 +4181,7 @@ void PowerUps(const int A)
                             p.FireBallCD = 0;
                             if(FlameThrower)
                                 p.FireBallCD = 40;
-                            NPC[numNPCs].Type = 292;
+                            NPC[numNPCs].Type = NPCID_CHAR4_HEAVY;
                             NPC[numNPCs].Special5 = A;
                             NPC[numNPCs].Special6 = p.Direction;
                             PlaySound(SFX_Throw);
@@ -4269,9 +4269,9 @@ void PowerUps(const int A)
                         NPC[numNPCs] = NPC_t();
                         if(ShadowMode)
                             NPC[numNPCs].Shadow = true;
-                        NPC[numNPCs].Type = 13;
+                        NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
                         if(p.State == 7)
-                            NPC[numNPCs].Type = 265;
+                            NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
                         NPC[numNPCs].Projectile = true;
                         NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                         NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -4373,7 +4373,7 @@ void PowerUps(const int A)
                     {
                         p.TailCount = 1;
                         if(!p.SpinJump)
-                            PlaySound(SFX_Tail);
+                            PlaySound(SFX_Whip);
                     }
                 }
              }
@@ -4409,7 +4409,7 @@ void PowerUps(const int A)
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = Physics.NPCTimeOffScreen;
             NPC[numNPCs].Section = p.Section;
-            NPC[numNPCs].Type = 134;
+            NPC[numNPCs].Type = NPCID_BOMB;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].CantHurtPlayer = A;
@@ -4484,7 +4484,7 @@ void PowerUps(const int A)
     if(p.FireBallCD2 < 0)
         p.FireBallCD2 = 0;
 
-    if(!(p.Character == 3 && NPC[p.HoldingNPC].Type == 13))
+    if(!(p.Character == 3 && NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL))
     {
         p.FireBallCD -= 1;
         if(FlameThrower)
@@ -4561,12 +4561,12 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
         if(warp.Locked)
         {
-            if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == 31)
+            if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == NPCID_KEY)
             {
                 NPC[plr.HoldingNPC].Killed = 9;
                 NPCQueues::Killed.push_back(plr.HoldingNPC);
 
-                NewEffect(10, NPC[plr.HoldingNPC].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[plr.HoldingNPC].Location);
                 warp.Locked = false;
                 int allBGOs = numBackground + numLocked;
                 for(int C = numBackground + 1; C <= allBGOs; C++)
@@ -4584,7 +4584,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     }
                 }
             }
-            else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == 31)
+            else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == NPCID_KEY)
             {
                 NPC[plr.YoshiNPC].Killed = 9;
                 NPCQueues::Killed.push_back(plr.YoshiNPC);
@@ -4654,7 +4654,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         {
             if(plr.HoldingNPC > 0)
             {
-                if(NPC[plr.HoldingNPC].Type == 29)
+                if(NPC[plr.HoldingNPC].Type == NPC_HEAVY_THROWER)
                 {
                     NPCHit(plr.HoldingNPC, 3, plr.HoldingNPC);
                 }
@@ -4676,7 +4676,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
         if(plr.HoldingNPC > 0)
         {
-            if(NPC[plr.HoldingNPC].Type == 263) // can't bring ice through warps
+            if(NPC[plr.HoldingNPC].Type == NPCID_ICE_CUBE) // can't bring ice through warps
             {
                 NPC[plr.HoldingNPC].HoldingPlayer = 0;
                 plr.HoldingNPC = 0;
@@ -4756,18 +4756,18 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                 if(CheckCollision(entrance, Background[C].Location) || CheckCollision(exit, Background[C].Location))
                 {
                     if(Background[C].Type == 88)
-                        NewEffect(54, Background[C].Location);
+                        NewEffect(EFFID_DOOR_S2_OPEN, Background[C].Location);
                     else if(Background[C].Type == 87)
-                        NewEffect(55, Background[C].Location);
+                        NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[C].Location);
                     else if(Background[C].Type == 107)
-                        NewEffect(59, Background[C].Location);
+                        NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[C].Location);
                     else if(Background[C].Type == 141)
                     {
                         Location_t bLoc = Background[C].Location;
                         bLoc.X += bLoc.Width / 2.0;
                         bLoc.Width = 104;
                         bLoc.X += -bLoc.Width / 2.0;
-                        NewEffect(103, bLoc);
+                        NewEffect(EFFID_BIG_DOOR_OPEN, bLoc);
                     }
                 }
             }
@@ -4898,7 +4898,7 @@ void PlayerCollide(const int A)
                     if(p2.Location.SpeedY <= 0)
                         p2.Location.SpeedY = 0.1;
                     p2.CanJump = false;
-                    NewEffect(75, newLoc(p1.Location.X + p1.Location.Width / 2.0 - 16, p1.Location.Y + p1.Location.Height - 16));
+                    NewEffect(EFFID_WHACK, newLoc(p1.Location.X + p1.Location.Width / 2.0 - 16, p1.Location.Y + p1.Location.Height - 16));
                 }
                 else if(HitSpot == 3)
                 {
@@ -4916,7 +4916,7 @@ void PlayerCollide(const int A)
                     if(p1.Location.SpeedY <= 0)
                         p1.Location.SpeedY = 0.1;
                     p1.CanJump = false;
-                    NewEffect(75, newLoc(p2.Location.X + p2.Location.Width / 2.0 - 16, p2.Location.Y + p2.Location.Height - 16));
+                    NewEffect(EFFID_WHACK, newLoc(p2.Location.X + p2.Location.Width / 2.0 - 16, p2.Location.Y + p2.Location.Height - 16));
                 }
                 else if(HitSpot == 5)
                 {
@@ -5004,7 +5004,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.StandingOnNPC].Direction = p.Direction;
                     NPCFrames(p.StandingOnNPC);
 
-                    if(NPC[p.StandingOnNPC].Type == 91)
+                    if(NPC[p.StandingOnNPC].Type == NPCID_ITEM_BURIED)
                     {
                         p.Location.SpeedX += NPC[p.StandingOnNPC].Location.SpeedX;
                         NPC[p.StandingOnNPC].Direction = p.Direction;
@@ -5013,7 +5013,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.StandingOnNPC].Frame = EditorNPCFrame(NPC[p.StandingOnNPC].Type, NPC[p.StandingOnNPC].Direction);
                         NPC[p.StandingOnNPC].Type = NPC[p.StandingOnNPC].Special;
 
-                        if(NPC[p.StandingOnNPC].Type == 287)
+                        if(NPC[p.StandingOnNPC].Type == NPCID_RANDOM_POWER)
                         {
                             NPC[p.StandingOnNPC].Type = RandomBonus();
                             NPC[p.StandingOnNPC].DefaultSpecial = NPC[p.StandingOnNPC].Type;
@@ -5025,10 +5025,10 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         if(NPCIsYoshi[NPC[p.StandingOnNPC].Type])
                         {
                             NPC[p.StandingOnNPC].Special = NPC[p.StandingOnNPC].Type;
-                            NPC[p.StandingOnNPC].Type = 96;
+                            NPC[p.StandingOnNPC].Type = NPCID_ITEM_POD;
                         }
 
-                        if(!(NPC[p.StandingOnNPC].Type == 21 || NPC[p.StandingOnNPC].Type == 22 || NPC[p.StandingOnNPC].Type == 26 || NPC[p.StandingOnNPC].Type == 31 || NPC[p.StandingOnNPC].Type == 32 || NPC[p.StandingOnNPC].Type == 35 || NPC[p.StandingOnNPC].Type == 191 || NPC[p.StandingOnNPC].Type == 193 || NPC[p.StandingOnNPC].Type == 49 || NPCIsAnExit[NPC[p.StandingOnNPC].Type]))
+                        if(!(NPC[p.StandingOnNPC].Type == NPCID_CANNONENEMY || NPC[p.StandingOnNPC].Type == NPCID_CANNONITEM || NPC[p.StandingOnNPC].Type == NPCID_SPRING || NPC[p.StandingOnNPC].Type == NPCID_KEY || NPC[p.StandingOnNPC].Type == NPCID_COIN_SWITCH || NPC[p.StandingOnNPC].Type == NPCID_GRN_BOOT || NPC[p.StandingOnNPC].Type == NPCID_RED_BOOT || NPC[p.StandingOnNPC].Type == NPCID_BLU_BOOT || NPC[p.StandingOnNPC].Type == NPCID_TOOTHYPIPE || NPCIsAnExit[NPC[p.StandingOnNPC].Type]))
                         {
                             if(!BattleMode)
                                 NPC[p.StandingOnNPC].DefaultType = 0;
@@ -5037,12 +5037,12 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.StandingOnNPC].Location.Height = NPCHeight[NPC[p.StandingOnNPC].Type];
                         NPC[p.StandingOnNPC].Location.Width = NPCWidth[NPC[p.StandingOnNPC].Type];
 
-                        if(NPC[p.StandingOnNPC].Type == 147)
+                        if(NPC[p.StandingOnNPC].Type == NPCID_VEGGIE_RANDOM)
                         {
                             B = iRand(9);
-                            NPC[p.StandingOnNPC].Type = 139 + B;
-                            if(NPC[p.StandingOnNPC].Type == 147)
-                                NPC[p.StandingOnNPC].Type = 92;
+                            NPC[p.StandingOnNPC].Type = NPCID_VEGGIE_2 + B;
+                            if(NPC[p.StandingOnNPC].Type == NPCID_VEGGIE_RANDOM)
+                                NPC[p.StandingOnNPC].Type = NPCID_VEGGIE_1;
                             NPC[p.StandingOnNPC].Location.X += NPC[p.StandingOnNPC].Location.Width / 2.0;
                             NPC[p.StandingOnNPC].Location.Y += NPC[p.StandingOnNPC].Location.Height / 2.0;
                             NPC[p.StandingOnNPC].Location.Width = NPCWidth[NPC[p.StandingOnNPC].Type];
@@ -5066,7 +5066,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 {
                     if(p.GrabTime == 0)
                     {
-                        if(NPC[p.StandingOnNPC].Type == 91 || NPCIsVeggie[NPC[p.StandingOnNPC].Type])
+                        if(NPC[p.StandingOnNPC].Type == NPCID_ITEM_BURIED || NPCIsVeggie[NPC[p.StandingOnNPC].Type])
                             PlaySound(SFX_Grab2);
                         else
                             PlaySound(SFX_Grab);
@@ -5095,7 +5095,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
         lyrX = NPC[p.HoldingNPC].Location.X;
         lyrY = NPC[p.HoldingNPC].Location.Y;
         LayerNPC = p.HoldingNPC;
-        if(NPC[p.HoldingNPC].Type == 278 || NPC[p.HoldingNPC].Type == 279)
+        if(NPC[p.HoldingNPC].Type == NPCID_FLY_BLOCK || NPC[p.HoldingNPC].Type == NPCID_FLY_CANNON)
         {
             if(p.Jump == 0)
                 NPC[p.HoldingNPC].Special = 1;
@@ -5104,7 +5104,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 p.Jump = p.Jump * 1.5;
                 NPC[p.HoldingNPC].Special = 0;
             }
-            if(NPC[p.HoldingNPC].Type == 279)
+            if(NPC[p.HoldingNPC].Type == NPCID_FLY_CANNON)
             {
                 NPC[p.HoldingNPC].Special2 += 1;
                 if(p.SpinJump)
@@ -5142,7 +5142,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[numNPCs].CantHurt = 10000;
                         NPC[numNPCs].CantHurtPlayer = A;
                         NPC[numNPCs].BattleOwner = A;
-                        NPC[numNPCs].Type = 108;
+                        NPC[numNPCs].Type = NPCID_PET_FIRE;
                         NPC[numNPCs].Location.Width = NPCWidth[108];
                         NPC[numNPCs].Location.Height = NPCHeight[108];
                         NPC[numNPCs].Active = true;
@@ -5177,7 +5177,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             }
         }
 
-        if(NPC[p.HoldingNPC].Type == 263)
+        if(NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
             NPC[p.HoldingNPC].Special3 = 0;
         NPC[p.HoldingNPC].TimeLeft = Physics.NPCTimeOffScreen;
         NPC[p.HoldingNPC].Effect = 0;
@@ -5206,7 +5206,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.HoldingNPC].Location.Y = p.Location.Y - NPC[p.HoldingNPC].Location.Height + 6;
                     else
                     {
-                        if(NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == 265)
+                        if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL)
                         {
                             NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0 + dRand() * 4 - 2;
                             NPC[p.HoldingNPC].Location.Y = p.Location.Y - NPC[p.HoldingNPC].Location.Height - 4 + dRand() * 4 - 2;
@@ -5224,7 +5224,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
             }
-            if(NPC[p.HoldingNPC].Type == 49 && !FreezeNPCs)
+            if(NPC[p.HoldingNPC].Type == NPCID_TOOTHYPIPE && !FreezeNPCs)
             {
                 if(NPC[p.HoldingNPC].Special == 0.0)
                 {
@@ -5235,7 +5235,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].Section = p.Section;
                     NPC[numNPCs].TimeLeft = 100;
-                    NPC[numNPCs].Type = 50;
+                    NPC[numNPCs].Type = NPCID_TOOTHY;
                     NPC[numNPCs].Location.Height = 32;
                     NPC[numNPCs].Location.Width = 48;
                     NPC[numNPCs].Special = A;
@@ -5245,7 +5245,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 }
                 for(B = 1; B <= numNPCs; B++)
                 {
-                    if(NPC[B].Type == 50 && NPC[B].Special == A)
+                    if(NPC[B].Type == NPCID_TOOTHY && NPC[B].Special == A)
                     {
                         NPC[B].CantHurt = 10;
                         NPC[B].CantHurtPlayer = A;
@@ -5266,15 +5266,15 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             NPC[p.HoldingNPC].Location.SpeedX = 0;
             NPC[p.HoldingNPC].Location.SpeedY = 0;
             NPC[p.HoldingNPC].WallDeath = 5;
-            if(NPC[p.HoldingNPC].Type == 29)
+            if(NPC[p.HoldingNPC].Type == NPC_HEAVY_THROWER)
             {
                 NPCHit(p.HoldingNPC, 3, p.HoldingNPC);
             }
             if(NPCIsACoin[NPC[p.HoldingNPC].Type] && !p.Controls.Down) // Smoke effect for coins
-                NewEffect(10, NPC[p.HoldingNPC].Location);
-            if(p.Controls.Up && !NPCIsACoin[NPC[p.HoldingNPC].Type] && NPC[p.HoldingNPC].Type != 17) // Throw the npc up
+                NewEffect(EFFID_SMOKE_S3, NPC[p.HoldingNPC].Location);
+            if(p.Controls.Up && !NPCIsACoin[NPC[p.HoldingNPC].Type] && NPC[p.HoldingNPC].Type != NPCID_BULLET) // Throw the npc up
             {
-                if(NPCIsAShell[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == 45 || NPC[p.HoldingNPC].Type == 263)
+                if(NPCIsAShell[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == NPCID_SLIDE_BLOCK || NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
                 {
                     if(p.Controls.Left || p.Controls.Right) // Up and forward
                     {
@@ -5284,8 +5284,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         tempLocation.Width = 0;
                         tempLocation.Y = (p.Location.Y + NPC[p.HoldingNPC].Location.Y * 4) / 5;
                         tempLocation.X = (p.Location.X + NPC[p.HoldingNPC].Location.X * 4) / 5;
-                        if(NPC[p.HoldingNPC].Type != 263)
-                            NewEffect(132, tempLocation);
+                        if(NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE)
+                            NewEffect(EFFID_STOMP_INIT, tempLocation);
                     }
                     else
                     {
@@ -5294,8 +5294,8 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         tempLocation.Width = 0;
                         tempLocation.Y = (p.Location.Y + NPC[p.HoldingNPC].Location.Y * 4) / 5;
                         tempLocation.X = (p.Location.X + NPC[p.HoldingNPC].Location.X * 4) / 5;
-                        if(NPC[p.HoldingNPC].Type != 263)
-                            NewEffect(132, tempLocation);
+                        if(NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE)
+                            NewEffect(EFFID_STOMP_INIT, tempLocation);
                     }
                 }
                 else
@@ -5320,18 +5320,18 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.HoldingNPC].Location.SpeedY = -9;
                     }
                 }
-                if(NPCIsVeggie[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == 19 || NPC[p.HoldingNPC].Type == 20 || NPC[p.HoldingNPC].Type == 25 || NPC[p.HoldingNPC].Type == 129 || NPC[p.HoldingNPC].Type == 130 || NPC[p.HoldingNPC].Type == 131 || NPC[p.HoldingNPC].Type == 132 || NPC[p.HoldingNPC].Type == 134 || NPC[p.HoldingNPC].Type == 135 || NPC[p.HoldingNPC].Type == 154 || NPC[p.HoldingNPC].Type == 155 || NPC[p.HoldingNPC].Type == 156 || NPC[p.HoldingNPC].Type == 157 || NPC[p.HoldingNPC].Type == 40 || NPC[p.HoldingNPC].Type == 240 || NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == 265 || NPC[p.HoldingNPC].Type == 288 || NPC[p.HoldingNPC].Type == 291)
+                if(NPCIsVeggie[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == NPCID_BLU_GUY || NPC[p.HoldingNPC].Type == NPCID_RED_GUY || NPC[p.HoldingNPC].Type == NPCID_JUMPER_S3 || NPC[p.HoldingNPC].Type == NPCID_BIRD || NPC[p.HoldingNPC].Type == NPCID_RED_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BLU_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_GRY_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BOMB || NPC[p.HoldingNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_A || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_B || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_C || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_D || NPC[p.HoldingNPC].Type == NPCID_SPIT_BOSS_BALL || NPC[p.HoldingNPC].Type == NPCID_TIMER_S2 || NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_DOOR_MAKER || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
                     PlaySound(SFX_Throw);
                 else
                     PlaySound(SFX_ShellHit);
                 NPC[p.HoldingNPC].Projectile = true;
             }
-            else if(p.Controls.Down && NPC[p.HoldingNPC].Type != 17) // Drop
+            else if(p.Controls.Down && NPC[p.HoldingNPC].Type != NPCID_BULLET) // Drop
             {
                 tempBool = false;
                 if((p.Direction == 1 && p.Location.SpeedX > 3) || (p.Direction == -1 && p.Location.SpeedX < -3))
                     tempBool = true;
-                if(tempBool && NPC[p.HoldingNPC].Type == 195)
+                if(tempBool && NPC[p.HoldingNPC].Type == NPCID_FLIPPED_RAINBOW_SHELL)
                 {
                     p.Location.SpeedX = 0;
                     NPC[p.HoldingNPC].Location.SpeedX = Physics.NPCShellSpeed * p.Direction;
@@ -5340,7 +5340,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].CantHurtPlayer = 0;
                     NPC[p.HoldingNPC].HoldingPlayer = 0;
                     PlaySound(SFX_ShellHit);
-                    NewEffect(73, newLoc(NPC[p.HoldingNPC].Location.X, NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC].Location.Height - 16));
+                    NewEffect(EFFID_WHIP, newLoc(NPC[p.HoldingNPC].Location.X, NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC].Location.Height - 16));
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + p.Location.Height - NPC[p.HoldingNPC].Location.Height;
                     p.Location.Y = NPC[p.HoldingNPC].Location.Y - p.Location.Height;
@@ -5358,12 +5358,12 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     else
                         NPC[p.HoldingNPC].Location.X = p.Location.X - NPC[p.HoldingNPC].Location.Width - 0.1;
                     NPC[p.HoldingNPC].Projectile = false;
-                    if(NPC[p.HoldingNPC].Type == 272)
+                    if(NPC[p.HoldingNPC].Type == NPCID_VINE_BUG)
                         NPC[p.HoldingNPC].Projectile = true;
                     if(p.StandingOnNPC != 0)
                         NPC[p.HoldingNPC].Location.Y += NPC[p.StandingOnNPC].Location.SpeedY;
                 }
-                if(NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == 265 || NPC[p.HoldingNPC].Type == 291)
+                if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
                 {
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
                     if(p.State == 1)
@@ -5376,14 +5376,14 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 }
             }
             else if(!NPCIsAShell[NPC[p.HoldingNPC].Type] &&
-                    NPC[p.HoldingNPC].Type != 45 &&
-                    NPC[p.HoldingNPC].Type != 263 &&
+                    NPC[p.HoldingNPC].Type != NPCID_SLIDE_BLOCK &&
+                    NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE &&
                     !NPCIsACoin[NPC[p.HoldingNPC].Type]) // if not a shell or a coin the kick it up and forward
             {
             // peach
                 if(p.Character == 3)
                 {
-                    if(NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == 265 || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
+                    if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
                     {
                         NPC[p.HoldingNPC].Location.SpeedX = 5 * p.Direction + p.Location.SpeedX * 0.3;
                         NPC[p.HoldingNPC].Location.SpeedY = 3;
@@ -5397,7 +5397,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 }
                 else if(p.Character == 4)
                 {
-                    if(NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == 265 || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
+                    if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
                     {
                         NPC[p.HoldingNPC].Location.SpeedX = 6 * p.Direction + p.Location.SpeedX * 0.4;
                         NPC[p.HoldingNPC].Location.SpeedY = 3.5;
@@ -5415,9 +5415,9 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].Location.SpeedY = -6;
                 }
                 NPC[p.HoldingNPC].Projectile = true;
-                if(NPCIsVeggie[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == 19 || NPC[p.HoldingNPC].Type == 20 || NPC[p.HoldingNPC].Type == 25 || NPC[p.HoldingNPC].Type == 129 || NPC[p.HoldingNPC].Type == 130 || NPC[p.HoldingNPC].Type == 131 || NPC[p.HoldingNPC].Type == 132 || NPC[p.HoldingNPC].Type == 134 || NPC[p.HoldingNPC].Type == 135 || NPC[p.HoldingNPC].Type == 154 || NPC[p.HoldingNPC].Type == 155 || NPC[p.HoldingNPC].Type == 156 || NPC[p.HoldingNPC].Type == 157 || NPC[p.HoldingNPC].Type == 40 || NPC[p.HoldingNPC].Type == 240 || NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == 265 || NPC[p.HoldingNPC].Type == 288 || NPC[p.HoldingNPC].Type == 291)
+                if(NPCIsVeggie[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == NPCID_BLU_GUY || NPC[p.HoldingNPC].Type == NPCID_RED_GUY || NPC[p.HoldingNPC].Type == NPCID_JUMPER_S3 || NPC[p.HoldingNPC].Type == NPCID_BIRD || NPC[p.HoldingNPC].Type == NPCID_RED_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BLU_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_GRY_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BOMB || NPC[p.HoldingNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_A || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_B || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_C || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_D || NPC[p.HoldingNPC].Type == NPCID_SPIT_BOSS_BALL || NPC[p.HoldingNPC].Type == NPCID_TIMER_S2 || NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_DOOR_MAKER || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
                     PlaySound(SFX_Throw);
-                else if(NPC[p.HoldingNPC].Type == 17)
+                else if(NPC[p.HoldingNPC].Type == NPCID_BULLET)
                     PlaySound(SFX_Bullet);
                 else
                     PlaySound(SFX_ShellHit);
@@ -5435,9 +5435,9 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 tempLocation.Width = 0;
                 tempLocation.Y = (p.Location.Y + NPC[p.HoldingNPC].Location.Y * 4) / 5;
                 tempLocation.X = (p.Location.X + NPC[p.HoldingNPC].Location.X * 4) / 5;
-                NewEffect(132, tempLocation);
+                NewEffect(EFFID_STOMP_INIT, tempLocation);
             }
-            else if(NPC[p.HoldingNPC].Type == 263)
+            else if(NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
             {
                  PlaySound(SFX_ShellHit);
                 NPC[p.HoldingNPC].Location.SpeedX = Physics.NPCShellSpeed * p.Direction;
@@ -5445,25 +5445,25 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 NPC[p.HoldingNPC].CantHurtPlayer = A;
                 NPC[p.HoldingNPC].Projectile = true;
             }
-            if(NPC[p.HoldingNPC].Type == 134 && NPC[p.HoldingNPC].Location.SpeedX != 0)
+            if(NPC[p.HoldingNPC].Type == NPCID_BOMB && NPC[p.HoldingNPC].Location.SpeedX != 0)
             {
                 NPC[p.HoldingNPC].Location.SpeedX += p.Location.SpeedX * 0.5;
                 if(p.StandingOnNPC != 0)
                     NPC[p.HoldingNPC].Location.SpeedX += NPC[p.StandingOnNPC].Location.SpeedX;
             }
-            if(NPC[p.HoldingNPC].Type == 13 && NPC[p.HoldingNPC].Special == 4) // give toad fireballs a little spunk
+            if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL && NPC[p.HoldingNPC].Special == 4) // give toad fireballs a little spunk
             {
                 if(NPC[p.HoldingNPC].Location.SpeedY < 0)
                     NPC[p.HoldingNPC].Location.SpeedY = NPC[p.HoldingNPC].Location.SpeedY * 1.1;
             }
-            if(NPC[p.HoldingNPC].Type == 291)
+            if(NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
             {
                 if(p.Location.SpeedX != 0 && NPC[p.HoldingNPC].Location.SpeedX != 0)
                     NPC[p.HoldingNPC].Location.SpeedX += p.Location.SpeedX * 0.5;
             }
 
             // this block was misleadingly left-indented in VB6, but its nesting in C++ is accurate to its nesting in VB6, and now I'm fixing the indentation to match the nesting -- ds-sloth
-            if(NPC[p.HoldingNPC].Type == 292)
+            if(NPC[p.HoldingNPC].Type == NPCID_CHAR4_HEAVY)
             {
                 NPC[p.HoldingNPC].Special5 = A;
                 NPC[p.HoldingNPC].Special6 = p.Direction;
@@ -5520,7 +5520,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             {
                                 // if(NPC[C].Layer == Layer[B].Name)
                                 {
-                                    if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
+                                    if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == NPCID_ITEM_BURIED)
                                     {
                                         NPC[C].Location.SpeedX = 0;
                                         NPC[C].Location.SpeedY = 0;
@@ -5587,7 +5587,7 @@ void LinkFrame(Player_t &p)
                     p.SlideCounter = 2 + iRand_round(2);
                     tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                     tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4;
-                    NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                 }
             }
         }
@@ -5704,7 +5704,7 @@ void LinkFrame(Player_t &p)
         {
             if(p.SlideCounter <= 0)
             {
-                PlaySound(SFX_ZeldaDash);
+                PlaySound(SFX_HeroDash);
                 p.SlideCounter = 2 + iRand_round(2);
                 tempLocation.Y = p.Location.Y + p.Location.Height - 4;
 
@@ -5713,7 +5713,7 @@ void LinkFrame(Player_t &p)
                 else
                     tempLocation.X = p.Location.X + p.Location.Width / 2.0 + 6 - 4;
 
-                NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
             }
         }
     }
@@ -6476,7 +6476,7 @@ void PlayerEffects(const int A)
                 auto loc = warp_exit;
                 if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
                     loc.Y += loc.Height - (p.Location.Height / 2) - (loc.Height / 2);
-                NewEffect(132, loc, p.Direction); // Cannon pipe shoot effect
+                NewEffect(EFFID_STOMP_INIT, loc, p.Direction); // Cannon pipe shoot effect
             }
 
             if(p.HoldingNPC > 0)
@@ -6797,11 +6797,11 @@ void PlayerEffects(const int A)
                     if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
                     {
                         if(Background[c].Type == 88)
-                            NewEffect(54, Background[c].Location);
+                            NewEffect(EFFID_DOOR_S2_OPEN, Background[c].Location);
                         else if(Background[c].Type == 87)
-                            NewEffect(55, Background[c].Location);
+                            NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[c].Location);
                         else if(Background[c].Type == 107)
-                            NewEffect(59, Background[c].Location);
+                            NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[c].Location);
                     }
                 }
 
@@ -6855,11 +6855,11 @@ void PlayerEffects(const int A)
                     if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
                     {
                         if(Background[c].Type == 88)
-                            NewEffect(54, Background[c].Location);
+                            NewEffect(EFFID_DOOR_S2_OPEN, Background[c].Location);
                         else if(Background[c].Type == 87)
-                            NewEffect(55, Background[c].Location);
+                            NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[c].Location);
                         else if(Background[c].Type == 107)
-                            NewEffect(59, Background[c].Location);
+                            NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[c].Location);
                     }
                 }
 
@@ -7037,7 +7037,7 @@ void PlayerEffects(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(131, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
 
         p.Effect2 += 1;
@@ -7079,7 +7079,7 @@ void PlayerEffects(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(131, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
         p.Effect2 += 1;
         if(fEqual(p.Effect2, 14))
@@ -7121,7 +7121,7 @@ void PlayerEffects(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(131, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
 
         p.Effect2 += 1;
@@ -7139,7 +7139,7 @@ void PlayerEffects(const int A)
     {
         for(B = 1; B <= 2; B++)
         {
-            NewEffect(80, newLoc(p.Location.X + dRand() * (p.Location.Width + 8) - 8,
+            NewEffect(EFFID_SPARKLE, newLoc(p.Location.X + dRand() * (p.Location.Width + 8) - 8,
                                  p.Location.Y + dRand() * (p.Location.Height + 8) - 4), 1, 0, ShadowMode);
             Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
             Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
@@ -7148,12 +7148,12 @@ void PlayerEffects(const int A)
         if(p.Effect2 == 0.0)
         {
             UnDuck(Player[A]);
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             tempLocation.Width = 32;
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(10, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S3, tempLocation, 1, 0, ShadowMode);
 
             if(!p.Stoned)
             {
@@ -7518,7 +7518,7 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
             Location_t tempLocation = p.Location;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
-            NewEffect(10, tempLocation);
+            NewEffect(EFFID_SMOKE_S3, tempLocation);
         }
     }
 

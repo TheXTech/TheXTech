@@ -32,6 +32,7 @@
 #include "collision.h"
 #include "npc.h"
 #include "npc_id.h"
+#include "eff_id.h"
 #include "player.h"
 #include "sorting.h"
 #include "layers.h"
@@ -126,7 +127,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     SwapCharacter(whatPlayer, 5, false, true);
                 }
 
-                PlaySound(SFX_Raccoon);
+                PlaySound(SFX_Transform);
             }
             else
             {
@@ -209,7 +210,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         for(auto B = 1; B <= numNPCs; B++)
         {
-            if(NPC[B].Type == 60)
+            if(NPC[B].Type == NPCID_YEL_PLATFORM)
             {
                 NPC[B].Direction = -NPC[B].Direction;
             }
@@ -232,7 +233,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         for(auto B = 1; B <= numNPCs; B++)
         {
-            if(NPC[B].Type == 62)
+            if(NPC[B].Type == NPCID_BLU_PLATFORM)
             {
                 NPC[B].Direction = -NPC[B].Direction;
             }
@@ -255,7 +256,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         for(auto B = 1; B <= numNPCs; B++)
         {
-            if(NPC[B].Type == 64)
+            if(NPC[B].Type == NPCID_GRN_PLATFORM)
             {
                 NPC[B].Direction = -NPC[B].Direction;
             }
@@ -278,7 +279,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         for(auto B = 1; B <= numNPCs; B++)
         {
-            if(NPC[B].Type == 66)
+            if(NPC[B].Type == NPCID_RED_PLATFORM)
             {
                 NPC[B].Direction = -NPC[B].Direction;
             }
@@ -375,7 +376,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                             nn.Type = 252;
                         if(iRand(60) < 3)
                             nn.Type = 253;
-                        PlaySound(SFX_ZeldaRupee);
+                        PlaySound(SFX_HeroRupee);
                     }
                     else
                     {
@@ -422,7 +423,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     }
                 }
                 PlaySound(SFX_Coin);
-                NewEffect(11, b.Location);
+                NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
                 b.Special -= 1;
             }
         }
@@ -454,18 +455,18 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 #if 0 // Useless code, needs a fix. Right now its broken by overriding by constant value
                 if(newBlock == 89)
                 {
-                    nn.Type = NPCID_COIN_SMW;
+                    nn.Type = NPCID_COIN_S4;
                 }
                 else if(newBlock == 192)
                 {
-                    nn.Type = NPCID_COIN_SMB;
+                    nn.Type = NPCID_COIN_S1;
                 }
                 else
                 {
-                    nn.Type = NPCID_COIN_SMB3;
+                    nn.Type = NPCID_COIN_S3;
                 }
 #endif
-                nn.Type = NPCID_COIN_SMB2;
+                nn.Type = NPCID_COIN_S2;
 
                 nn.Location.Width = NPCWidth[nn.Type];
                 nn.Location.Height = NPCHeight[nn.Type];
@@ -497,7 +498,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     }
                 }
                 PlaySound(SFX_Coin);
-                NewEffect(11, b.Location);
+                NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
                 b.Special -= 1;
             }
 
@@ -519,7 +520,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 }
             }
             PlaySound(SFX_Coin);
-            NewEffect(11, b.Location);
+            NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
             b.Special -= 1;
         }
 
@@ -725,26 +726,26 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Location.Height = 32;
                     nn.Location.Y = b.Location.Y - 32;
                 }
-                else if(nn.Type == NPCID_LEAF)
+                else if(nn.Type == NPCID_LEAF_POWER)
                 {
                     nn.Effect = 0;
                     nn.Location.Y = b.Location.Y - 32;
                     nn.Location.SpeedY = -6;
                     nn.Location.Height = NPCHeight[C];
-                    // PlaySound(SFX_Mushroom); // Don't play mushroom sound on leaf, like in original SMB3
+                    // PlaySound(SFX_ItemEmerge); // Don't play mushroom sound on leaf, like in original SMB3
                 }
                 else
                 {
                     nn.Effect = 1;
                     switch(C)
                     {
-                    case NPCID_VINEHEAD_GREEN_SMB3:
-                    case NPCID_VINEHEAD_RED_SMB3:
-                    case NPCID_VINEHEAD_SMW:
+                    case NPCID_GRN_VINE_TOP_S3:
+                    case NPCID_RED_VINE_TOP_S3:
+                    case NPCID_GRN_VINE_TOP_S4:
                         PlaySound(SFX_SproutVine);
                         break;
                     default:
-                        PlaySound(SFX_Mushroom);
+                        PlaySound(SFX_ItemEmerge);
                         break;
                     }
                 }
@@ -754,7 +755,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 nn.Location.Y = b.Location.Y + 4;
                 nn.Location.Height = NPCHeight[C];
                 nn.Effect = 3;
-                PlaySound(SFX_Mushroom);
+                PlaySound(SFX_ItemEmerge);
             }
 
             nn.Effect2 = 0;
@@ -776,7 +777,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 #if 0 // don't spawn players from blocks anymore
         else // Spawn the player
         {
-            PlaySound(SFX_Mushroom);
+            PlaySound(SFX_ItemEmerge);
             Player[tempPlayer].State = 1;
             Player[tempPlayer].Location.Width = Physics.PlayerWidth[Player[tempPlayer].Character][Player[tempPlayer].State];
             Player[tempPlayer].Location.Height = Physics.PlayerHeight[Player[tempPlayer].Character][Player[tempPlayer].State];
@@ -826,7 +827,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             tempPlayer = 0;
         }
 
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
         if(tempPlayer == 0)
         {
             numNPCs++;
@@ -916,7 +917,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             tempPlayer = 0;
         }
 
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
 
         if(tempPlayer == 0)
         {
@@ -1023,7 +1024,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
 
         // TODO: @Wohlstand why was this commented out?
-        // PlaySound(SFX_Mushroom);
+        // PlaySound(SFX_ItemEmerge);
 
         if(tempPlayer == 0)
         {
@@ -1134,7 +1135,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
 
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
         numNPCs++;
         auto &nn = NPC[numNPCs];
         nn = NPC_t();
@@ -1168,7 +1169,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
     else if(b.Special == 105) // Block contains a Green Yoshi
     {
         SoundPause[2] = 2;
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
 
         if(!HitDown)
         {
@@ -1220,7 +1221,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         else
         {
-            PlaySound(SFX_Mushroom);
+            PlaySound(SFX_ItemEmerge);
             nn.Location.Y = b.Location.Y + 4;
             nn.Location.Height = 32;
             nn.Effect = 3;
@@ -1260,7 +1261,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
 
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
 
         numNPCs++;
         auto &nn = NPC[numNPCs];
@@ -1321,7 +1322,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
             BlockShakeDown(A);
         }
 
-        PlaySound(SFX_Mushroom);
+        PlaySound(SFX_ItemEmerge);
         numNPCs++;
         auto &nn = NPC[numNPCs];
         nn = NPC_t();
@@ -1467,17 +1468,17 @@ void KillBlock(int A, bool Splode)
             PlaySound(SFX_BlockSmashed); // Block smashed
         // Create the break effect
         if(Block[A].Type == 60)
-            NewEffect(21, Block[A].Location);
+            NewEffect(EFFID_BLU_BLOCK_SMASH, Block[A].Location);
         else if(Block[A].Type == 188)
-            NewEffect(51, Block[A].Location);
+            NewEffect(EFFID_BLOCK_S1_SMASH, Block[A].Location);
         else if(Block[A].Type == 457)
-            NewEffect(100, Block[A].Location);
+            NewEffect(EFFID_GRY_BLOCK_SMASH, Block[A].Location);
         else if(Block[A].Type == 526)
-            NewEffect(107, Block[A].Location);
+            NewEffect(EFFID_SPACE_BLOCK_SMASH, Block[A].Location);
         else if(Block[A].Type == 293)
-            NewEffect(135, Block[A].Location);
+            NewEffect(EFFID_DIRT_BLOCK_SMASH, Block[A].Location);
         else
-            NewEffect(1, Block[A].Location);
+            NewEffect(EFFID_BLOCK_SMASH, Block[A].Location);
     }
 
     if(LevelEditor)
@@ -1829,7 +1830,7 @@ void UpdateBlocks()
                                 syncLayersTrees_Block_SetHidden(A);
 
                                 if(!b.Hidden) // -V547 // False positive: the b.Hidden gets changed inside syncLayersTrees_Block_SetHidden() call
-                                    NewEffect(10, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
+                                    NewEffect(EFFID_SMOKE_S3, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
                             }
                             else
                             {
@@ -1839,7 +1840,7 @@ void UpdateBlocks()
                             if(b.Type != b.DefaultType || b.Special != b.DefaultSpecial)
                             {
                                 if(b.Type != b.DefaultType)
-                                    NewEffect(10, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
+                                    NewEffect(EFFID_SMOKE_S3, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
                                 b.Special = b.DefaultSpecial;
                                 b.Type = b.DefaultType;
                             }
@@ -1887,7 +1888,7 @@ void UpdateBlocks()
                 {
                     ib.Hidden = true;
                     invalidateDrawBlocks();
-                    NewEffect(82, ib.Location, 1, iBlock[A]);
+                    NewEffect(EFFID_SPINBLOCK, ib.Location, 1, iBlock[A]);
                     ib.ShakeY = 0;
                     ib.ShakeY2 = 0;
                     ib.ShakeY3 = 0;
@@ -1913,7 +1914,7 @@ void UpdateBlocks()
                 {
                     ib.Hidden = true;
                     invalidateDrawBlocks();
-                    NewEffect(82, ib.Location, 1, iBlock[A]);
+                    NewEffect(EFFID_SPINBLOCK, ib.Location, 1, iBlock[A]);
                     ib.ShakeY = 0;
                     ib.ShakeY2 = 0;
                     ib.ShakeY3 = 0;
@@ -2044,7 +2045,7 @@ void UpdateBlocks()
         PSwitchTime--;
 
         if(PSwitchTime == 195)
-            PlaySound(SFX_PSwitchTimeout);
+            PlaySound(SFX_CoinSwitchTimeout);
 
         if(PSwitchTime <= 1)
         {
@@ -2067,7 +2068,7 @@ void PSwitch(bool enabled)
         {
             bool transform = NPCIsACoin[NPC[A].Type] && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
 
-            if(NPC[A].Type == NPCID_DRAGONCOIN && g_compatibility.fix_special_coin_switch)
+            if(NPC[A].Type == NPCID_MEDAL && g_compatibility.fix_special_coin_switch)
                 transform = false;
 
             if(transform)
@@ -2077,16 +2078,16 @@ void PSwitch(bool enabled)
                     numBlock++;
                     auto &nb = Block[numBlock];
 
-                    if((NPC[A].Type == 251 || NPC[A].Type == 252 || NPC[A].Type == 253) && NPC[A].DefaultType != 0)
+                    if((NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5 || NPC[A].Type == NPCID_GEM_20) && NPC[A].DefaultType != 0)
                         NPC[A].Type = NPC[A].DefaultType;
 
-                    if(NPC[A].Type == 33 || NPC[A].Type == 258)
+                    if(NPC[A].Type == NPCID_COIN_S4 || NPC[A].Type == NPCID_COIN_5)
                         nb.Type = 89;
-                    else if(NPC[A].Type == 88)
+                    else if(NPC[A].Type == NPCID_COIN_S1)
                         nb.Type = 188;
-                    else if(NPC[A].Type == 103)
+                    else if(NPC[A].Type == NPCID_RED_COIN)
                         nb.Type = 280;
-                    else if(NPC[A].Type == 138)
+                    else if(NPC[A].Type == NPCID_COIN_S2)
                         nb.Type = 293;
                     else
                         nb.Type = 4;
@@ -2399,7 +2400,7 @@ void PowBlock()
     int A = 0;
     int Z = 0;
 
-    PlaySound(SFX_Twomp);
+    PlaySound(SFX_Stone);
     numScreens = 1;
 
     if(!LevelEditor)

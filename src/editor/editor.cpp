@@ -46,7 +46,9 @@
 #include "main/trees.h"
 #include "main/game_globals.h"
 #include "main/screen_connect.h"
+#include "main/screen_quickreconnect.h"
 #include "main/game_strings.h"
+#include "main/speedrunner.h"
 #include "load_gfx.h"
 #include "core/render.h"
 #include "core/window.h"
@@ -57,6 +59,7 @@
 
 #include "pseudo_vb.h"
 #include "npc_id.h"
+#include "eff_id.h"
 
 #include "write_level.h"
 #include "write_world.h"
@@ -421,7 +424,7 @@ void UpdateEditor()
                     {
                         tempLocation = NPC[A].Location;
 
-                        if(NPC[A].Type == 91) // Herb's container offset
+                        if(NPC[A].Type == NPCID_ITEM_BURIED) // Herb's container offset
                             tempLocation.Y -= 16;
 
                         if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
@@ -938,7 +941,7 @@ void UpdateEditor()
                     for(A = 1; A <= numNPCs; A++)
                     {
                         tempLocation = NPC[A].Location;
-                        if(NPC[A].Type == 91)
+                        if(NPC[A].Type == NPCID_ITEM_BURIED)
                             tempLocation.Y -= 16;
 
                         if(CursorCollision(EditorCursor.Location, tempLocation) && !NPC[A].Hidden)
@@ -1034,7 +1037,7 @@ void UpdateEditor()
                             auto &b = Background[A];
                             b.Location.X += b.Location.Width / 2.0 - EffectWidth[10] / 2;
                             b.Location.Y += b.Location.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, b.Location);
+                            NewEffect(EFFID_SMOKE_S3, b.Location);
                             PlaySound(SFX_Smash);
 
                             Location_t loc = Background[A].Location;
@@ -1124,7 +1127,7 @@ void UpdateEditor()
                             tempLocation = static_cast<Location_t>(WorldMusic[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, tempLocation);
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                             PlaySound(SFX_ShellHit);
                             if(A != numWorldMusic)
                             {
@@ -1153,7 +1156,7 @@ void UpdateEditor()
                             tempLocation = static_cast<Location_t>(WorldPath[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, tempLocation);
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                             PlaySound(SFX_ShellHit);
                             if(A != numWorldPaths)
                             {
@@ -1186,7 +1189,7 @@ void UpdateEditor()
                             tempLocation = static_cast<Location_t>(Scene[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, tempLocation);
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                             PlaySound(SFX_ShellHit);
                             for(B = A; B < numScenes; B++)
                             {
@@ -1214,7 +1217,7 @@ void UpdateEditor()
                             tempLocation = static_cast<Location_t>(WorldLevel[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, tempLocation);
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                             PlaySound(SFX_ShellHit);
                             if(A != numWorldLevels)
                             {
@@ -1242,7 +1245,7 @@ void UpdateEditor()
                             tempLocation = static_cast<Location_t>(Tile[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, tempLocation);
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                             PlaySound(SFX_ShellHit);
 
                             Location_t loc = static_cast<Location_t>(Tile[A].Location);
@@ -1323,7 +1326,7 @@ void UpdateEditor()
                 {
                     for(A = 1; A <= numNPCs; A++)
                     {
-                        if(NPC[A].Type != 91 && NPC[A].Type != 259 && NPC[A].Type != 260)
+                        if(NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_FIRE_DISK && NPC[A].Type != NPCID_FIRE_CHAIN)
                         {
                             if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active)
                             {
@@ -1512,11 +1515,11 @@ void UpdateEditor()
 
                 for(A = 1; A <= numNPCs; A++)
                 {
-                    if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active && (NPC[A].Type != 159 || EditorCursor.NPC.Type == 159))
+                    if(CursorCollision(EditorCursor.Location, NPC[A].Location) && !NPC[A].Hidden && NPC[A].Active && (NPC[A].Type != NPCID_LIFT_SAND || EditorCursor.NPC.Type == 159))
                     {
                         if(!NPC[A].Generator || NPC[A].Type == EditorCursor.NPC.Type)
                         {
-                            if((EditorCursor.NPC.Type != 208 && NPC[A].Type != 208) || (EditorCursor.NPC.Type == 208 && NPC[A].Type == 208))
+                            if((EditorCursor.NPC.Type != 208 && NPC[A].Type != NPCID_BOSS_CASE) || (EditorCursor.NPC.Type == 208 && NPC[A].Type == NPCID_BOSS_CASE))
                             {
                                 if(!NPCIsAVine[NPC[A].Type])
                                 {
@@ -2295,6 +2298,9 @@ void GetEditorControls()
             g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
         editorWaitForFade();
 
+        // force reconnect on leveltest start
+        Controls::ClearInputMethods();
+
         HasCursor = false;
         zTestLevel(editorScreen.test_magic_hand);
     }
@@ -2516,7 +2522,7 @@ void SetCursor()
         // Container NPCs are handled elsewhere in new editor
         if(MagicHand)
         {
-            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCIsCheep[t] && !NPCIsAParaTroopa[t] && t != NPCID_FIREBAR)
+            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCIsCheep[t] && !NPCIsAParaTroopa[t] && t != NPCID_FIRE_CHAIN)
                 EditorCursor.NPC.Special = 0;
             if(t != 288 && t != 289 && t != 91 && t != 260)
                 EditorCursor.NPC.Special2 = 0.0;
@@ -2903,6 +2909,22 @@ void zTestLevel(bool magicHand, bool interProcess)
         MagicHand = false;
     }
 
+    // in speedrun mode, confirm that controls are set up before game starts
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF && !Controls::Update())
+    {
+        ClearLevel();
+        // force players offscreen
+        for(int i = 1; i <= maxLocalPlayers; i++)
+            Player[i].Location.X = -20000.0;
+
+        TestLevel = true;
+        LevelBeatCode = -3;
+        QuickReconnectScreen::g_active = true;
+        PauseGame(PauseCode::PauseScreen);
+        LevelBeatCode = 0;
+        QuickReconnectScreen::Deactivate();
+    }
+
 #ifdef THEXTECH_INTERPROC_SUPPORTED
     if(interProcess)
     {
@@ -2969,12 +2991,12 @@ void zTestLevel(bool magicHand, bool interProcess)
         }
     }
 
-    // force reconnect on leveltest start
-    Controls::ClearInputMethods();
     // reset Drop/Add allowed characters
     ConnectScreen::SaveChars();
 
-    GameThing(0, 0);
+    int waitms = (g_speedRunnerMode != SPEEDRUN_MODE_OFF) ? 750 : 0;
+    GameThing(waitms, 0);
+
     SetupScreens();
     TestLevel = true;
     LevelSelect = false;

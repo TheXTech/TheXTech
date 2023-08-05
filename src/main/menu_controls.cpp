@@ -77,7 +77,7 @@ int menuControls_Do()
             int i;
             for(i = 0; i < maxLocalPlayers; i++)
             {
-                if(Player[i+1].Controls.Start || Player[i+1].Controls.Jump)
+                if(Player[i + 1].Controls.Start || Player[i + 1].Controls.Jump)
                     break;
             }
             if(i == maxLocalPlayers || !Controls::g_InputMethods[i])
@@ -248,7 +248,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 {
                     if(profile && type->DeleteProfile(profile, Controls::g_InputMethods))
                     {
-                        PlaySoundMenu(SFX_BowserKilled);
+                        PlaySoundMenu(SFX_VillainKilled);
                         s_deleteProfileSel = false;
                         MenuCursor = s_curProfile;
                         s_curProfile = -1;
@@ -520,7 +520,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         for(int i = 0; i <= n_profiles; i++)
         {
-            if(i+1 >= scroll_start && i+1 < scroll_end)
+            if(i + 1 >= scroll_start && i + 1 < scroll_end)
             {
                 if(render)
                 {
@@ -538,13 +538,13 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     }
 
                     if(i == n_profiles)
-                        SuperPrint(g_mainMenu.controlsNewProfile, 3, sX+48, start_y + (i+1-scroll_start)*line);
+                        SuperPrint(g_mainMenu.controlsNewProfile, 3, sX+48, start_y + (i + 1-scroll_start)*line);
                     else if(in_use)
-                        SuperPrint(profiles[i]->Name + " " + g_mainMenu.controlsInUse, 3, sX+48, start_y + (i+1-scroll_start)*line);
+                        SuperPrint(profiles[i]->Name + " " + g_mainMenu.controlsInUse, 3, sX+48, start_y + (i + 1-scroll_start)*line);
                     else
-                        SuperPrint(profiles[i]->Name, 3, sX+48, start_y + (i+1-scroll_start)*line);
+                        SuperPrint(profiles[i]->Name, 3, sX+48, start_y + (i + 1-scroll_start)*line);
                     if(MenuCursor == i)
-                        XRender::renderTexture(sX + 24, start_y + (i+1-scroll_start)*line, GFX.MCursor[0]);
+                        XRender::renderTexture(sX + 24, start_y + (i + 1-scroll_start)*line, GFX.MCursor[0]);
                 }
                 if(mouse)
                 {
@@ -554,7 +554,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                     else
                         item_width = profiles[i]->Name.size()*18;
                     if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
-                        && SharedCursor.Y >= start_y + (i+1-scroll_start)*line && SharedCursor.Y <= start_y + (i+1-scroll_start)*line + 16)
+                        && SharedCursor.Y >= start_y + (i + 1-scroll_start)*line && SharedCursor.Y <= start_y + (i + 1-scroll_start)*line + 16)
                     {
                         if(MenuCursor != i)
                         {
@@ -610,7 +610,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                 }
                 if(mouse && value)
                 {
-                    int item_width = strlen(value)*18;
+                    int item_width = SuperTextPixLen(value, 3);
+
                     if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
                         && SharedCursor.Y >= start_y + (o_base + 2*i + 1 - scroll_start)*line && SharedCursor.Y <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
                     {
@@ -818,7 +819,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             }
             if(mouse)
             {
-                int item_width = SDL_strlen(name) * 18;
+                int item_width = SuperTextPixLen(name, 3);
+
                 if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
                     && SharedCursor.Y >= start_y + (i+s-scroll_start)*line && SharedCursor.Y <= start_y + (i+s-scroll_start)*line + 16)
                 {
@@ -864,9 +866,11 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                             XRender::renderTexture(sX + 24, start_y + (o_base + 2*i + 1 - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
+
                 if(mouse && value)
                 {
-                    int item_width = strlen(value)*18;
+                    int item_width = SuperTextPixLen(value, 3);
+
                     if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+48 + item_width
                         && SharedCursor.Y >= start_y + (o_base + 2*i + 1 - scroll_start)*line && SharedCursor.Y <= start_y + (o_base + 2*i + 1 - scroll_start)*line + 16)
                     {
@@ -901,6 +905,7 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                             XRender::renderTexture(sX + 24, start_y + (o_base + i - scroll_start)*line, GFX.MCursor[0]);
                     }
                 }
+
                 if(mouse)
                 {
                     if(SharedCursor.X >= sX+48 && SharedCursor.X <= sX+width-32
@@ -1051,80 +1056,71 @@ int menuControls_Mouse_Render(bool mouse, bool render)
 
         for(int i = 0; i < n_buttons; i++)
         {
+            int label_row, value_row, label_x, left_value_x, right_value_x;
+
             if(double_line)
             {
-                if(render && b_base+2*i >= scroll_start && b_base+2*i+1 < scroll_end)
-                {
-                    const char* name = nullptr;
-                    if(s_profileTab == Controls::ControlsClass::Player)
-                        name = Controls::PlayerControls::GetButtonName_UI(i);
-                    else if(s_profileTab == Controls::ControlsClass::Cursor)
-                        name = Controls::CursorControls::GetButtonName_UI(i);
-                    else if(s_profileTab == Controls::ControlsClass::Editor)
-                        name = Controls::EditorControls::GetButtonName_UI(i);
-                    else if(s_profileTab == Controls::ControlsClass::Hotkey)
-                        name = Controls::Hotkeys::GetButtonName_UI(i);
+                label_row = b_base + (2 * i) - scroll_start;
+                value_row = label_row + 1;
 
-                    SuperPrint(name, 3, sX+32+(width-32)/4, start_y+(b_base+2*i - scroll_start)*line);
-
-                    if(MenuCursor == i && !s_secondaryInput && g_pollingInput)
-                        SuperPrint("...", 3, sX+32, start_y+(b_base+2*i+1 - scroll_start)*line);
-                    else
-                        SuperPrint(profile->NamePrimaryButton(s_profileTab, i), 3, sX+32, start_y+(b_base+2*i+1 - scroll_start)*line);
-                    if(MenuCursor == i && s_secondaryInput && g_pollingInput)
-                        SuperPrint("...", 3, sX+32+(width-32)/2, start_y+(b_base+2*i+1 - scroll_start)*line);
-                    else
-                        SuperPrint(profile->NameSecondaryButton(s_profileTab, i), 3, sX+32+(width-32)/2, start_y+(b_base+2*i+1 - scroll_start)*line);
-                    if(MenuCursor == i)
-                    {
-                        if(!s_secondaryInput)
-                            XRender::renderTexture(sX+8, start_y+(b_base+2*i+1 - scroll_start)*line, GFX.MCursor[0]);
-                        else
-                            XRender::renderTexture(sX+8+(width-32)/2, start_y+(b_base+2*i+1 - scroll_start)*line, GFX.MCursor[0]);
-                    }
-                }
+                label_x = sX + 32 + ((width - 32) / 4);
+                left_value_x = sX + 32;
+                right_value_x = sX + 32 + ((width - 32) / 2);
             }
             else
             {
-                if(render && b_base+i >= scroll_start && b_base+i < scroll_end)
-                {
-                    const char* name = nullptr;
-                    if(s_profileTab == Controls::ControlsClass::Player)
-                        name = Controls::PlayerControls::GetButtonName_UI(i);
-                    else if(s_profileTab == Controls::ControlsClass::Cursor)
-                        name = Controls::CursorControls::GetButtonName_UI(i);
-                    else if(s_profileTab == Controls::ControlsClass::Editor)
-                        name = Controls::EditorControls::GetButtonName_UI(i);
-                    else if(s_profileTab == Controls::ControlsClass::Hotkey)
-                        name = Controls::Hotkeys::GetButtonName_UI(i);
+                label_row = b_base + i - scroll_start;
+                value_row = label_row;
 
-                    SuperPrint(name, 3, sX+48, start_y+(b_base+i - scroll_start)*line);
-                    if(MenuCursor == i && !s_secondaryInput && g_pollingInput)
-                        SuperPrint("...", 3, sX+width-420, start_y+(b_base+i - scroll_start)*line);
+                label_x = sX + 48;
+                left_value_x = sX + width - 420;
+                right_value_x = sX + width - 210;
+            }
+
+            if(render && label_row >= 0 && label_row < avail_lines)
+            {
+                const char* name = nullptr;
+                if(s_profileTab == Controls::ControlsClass::Player)
+                    name = Controls::PlayerControls::GetButtonName_UI(i);
+                else if(s_profileTab == Controls::ControlsClass::Cursor)
+                    name = Controls::CursorControls::GetButtonName_UI(i);
+                else if(s_profileTab == Controls::ControlsClass::Editor)
+                    name = Controls::EditorControls::GetButtonName_UI(i);
+                else if(s_profileTab == Controls::ControlsClass::Hotkey)
+                    name = Controls::Hotkeys::GetButtonName_UI(i);
+
+                SuperPrint(name, 3, label_x, start_y + label_row * line);
+
+                if(MenuCursor == i && !s_secondaryInput && g_pollingInput)
+                    SuperPrint("...", 3, left_value_x, start_y + value_row * line);
+                else
+                    SuperPrint(profile->NamePrimaryButton(s_profileTab, i), 3, left_value_x, start_y + value_row * line);
+
+                if(MenuCursor == i && s_secondaryInput && g_pollingInput)
+                    SuperPrint("...", 3, right_value_x, start_y + value_row * line);
+                else
+                    SuperPrint(profile->NameSecondaryButton(s_profileTab, i), 3, right_value_x, start_y + value_row * line);
+
+                if(MenuCursor == i)
+                {
+                    if(!s_secondaryInput)
+                        XRender::renderTexture(left_value_x - 24, start_y + value_row * line, GFX.MCursor[0]);
                     else
-                        SuperPrint(profile->NamePrimaryButton(s_profileTab, i), 3, sX+width-420, start_y+(b_base+i - scroll_start)*line);
-                    if(MenuCursor == i && s_secondaryInput && g_pollingInput)
-                        SuperPrint("...", 3, sX+width-210, start_y+(b_base+i - scroll_start)*line);
-                    else
-                        SuperPrint(profile->NameSecondaryButton(s_profileTab, i), 3, sX+width-210, start_y+(b_base+i - scroll_start)*line);
-                    if(MenuCursor == i)
-                    {
-                        if(!s_secondaryInput)
-                            XRender::renderTexture(sX+width-420-24, start_y+(b_base+i - scroll_start)*line, GFX.MCursor[0]);
-                        else
-                            XRender::renderTexture(sX+width-210-24, start_y+(b_base+i - scroll_start)*line, GFX.MCursor[0]);
-                    }
+                        XRender::renderTexture(right_value_x - 24, start_y + value_row * line, GFX.MCursor[0]);
                 }
             }
-            if(mouse && !g_pollingInput)
+
+            if(mouse && !g_pollingInput && SharedCursor.Y >= start_y + value_row * line && SharedCursor.Y <= start_y + value_row * line + 16)
             {
-                int primary_width = strlen(profile->NamePrimaryButton(s_profileTab, i))*18;
+                int primary_width = SuperTextPixLen(profile->NamePrimaryButton(s_profileTab, i), 3);
+                int secondary_width = SuperTextPixLen(profile->NameSecondaryButton(s_profileTab, i), 3);
+
                 if(primary_width < 72)
                     primary_width = 72;
-                if((double_line && SharedCursor.X >= sX+32 && SharedCursor.X <= sX+32+primary_width
-                    && SharedCursor.Y >= start_y + (b_base + 2*i+1 - scroll_start)*line && SharedCursor.Y <= start_y + (b_base + 2*i+1 - scroll_start)*line + 16)
-                    || (!double_line && SharedCursor.X >= sX+width-420 && SharedCursor.X <= sX+width-420+primary_width
-                    && SharedCursor.Y >= start_y + (b_base + i - scroll_start)*line && SharedCursor.Y <= start_y + (b_base + i - scroll_start)*line + 16))
+                if(secondary_width < 72)
+                    secondary_width = 72;
+
+                if(SharedCursor.X >= left_value_x && SharedCursor.X <= left_value_x + primary_width)
                 {
                     if(MenuCursor != i || s_secondaryInput)
                     {
@@ -1142,13 +1138,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
                         return 0;
                     }
                 }
-                int secondary_width = strlen(profile->NameSecondaryButton(s_profileTab, i))*18;
-                if(secondary_width < 72)
-                    secondary_width = 72;
-                if((double_line && SharedCursor.X >= sX+32+(width-32)/2 && SharedCursor.X <= sX+32+(width-32)/2+secondary_width
-                    && SharedCursor.Y >= start_y + (b_base + 2*i+1 - scroll_start)*line && SharedCursor.Y <= start_y + (b_base + 2*i+1 - scroll_start)*line + 16)
-                    || (!double_line && SharedCursor.X >= sX+width-210 && SharedCursor.X <= sX+width-210+secondary_width
-                    && SharedCursor.Y >= start_y + (b_base + i - scroll_start)*line && SharedCursor.Y <= start_y + (b_base + i - scroll_start)*line + 16))
+
+                if(SharedCursor.X >= right_value_x && SharedCursor.X <= right_value_x + secondary_width)
                 {
                     if(MenuCursor != i || !s_secondaryInput)
                     {
@@ -1237,7 +1228,7 @@ int menuControls_Logic()
 
         for(int i = 0; i < maxLocalPlayers; i++)
         {
-            cancel |= Player[i+1].Controls.Run;
+            cancel |= Player[i + 1].Controls.Run;
         }
 
         if(MenuCursorCanMove && cancel)
@@ -1286,7 +1277,7 @@ int menuControls_Logic()
         }
         if(s_profileChangeTimer > 66*4)
         {
-            PlaySoundMenu(SFX_Yoshi);
+            PlaySoundMenu(SFX_Pet);
             s_lastProfile = nullptr;
             s_changingProfilePlayer = -1;
         }
@@ -1310,7 +1301,7 @@ int menuControls_Logic()
         if(s_changingProfilePlayer == i)
             continue;
 
-        Controls_t &c = Player[i+1].Controls;
+        Controls_t &c = Player[i + 1].Controls;
 
         menuDoPress |= c.Start || c.Jump;
         menuBackPress |= c.Run;
@@ -1378,7 +1369,7 @@ int menuControls_Logic()
         {
             if(profile != s_lastProfile && type->DeleteProfile(profile, Controls::g_InputMethods))
             {
-                PlaySoundMenu(SFX_BowserKilled);
+                PlaySoundMenu(SFX_VillainKilled);
                 s_deleteProfileSel = false;
                 MenuCursor = s_curProfile - 1;
                 if(MenuCursor < 0)

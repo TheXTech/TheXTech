@@ -661,7 +661,7 @@ bool Logic()
 
     for(int i = 0; i < maxLocalPlayers; i++)
     {
-        Controls_t &c = Player[i+1].Controls;
+        Controls_t &c = Player[i + 1].Controls;
 
         startPressed |= c.Start;
         doPressed |= c.Jump || c.AltJump;

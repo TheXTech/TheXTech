@@ -26,6 +26,8 @@
 #include "core/render.h"
 #include "gfx.h"
 
+#include "npc_id.h"
+
 #include "graphics/gfx_keyhole.h"
 
 #include "compat.h"
@@ -307,7 +309,7 @@ void DrawPlayer(Player_t &p, const int Z)
         // peach/toad held npcs
             if((p.Character == 3 || p.Character == 4) && p.HoldingNPC > 0 && p.Effect != 7)
             {
-                if(NPC[p.HoldingNPC].Type != 263)
+                if(NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE)
                 {
                     if(
                         (
@@ -316,12 +318,12 @@ void DrawPlayer(Player_t &p, const int Z)
                                         NPC[p.HoldingNPC].HoldingPlayer > 0 &&
                                         Player[NPC[p.HoldingNPC].HoldingPlayer].Effect != 3
                                   ) ||
-                                 (NPC[p.HoldingNPC].Type == 50 && NPC[p.HoldingNPC].standingOnPlayer == 0) ||
-                                 (NPC[p.HoldingNPC].Type == 17 && NPC[p.HoldingNPC].CantHurt > 0)
+                                 (NPC[p.HoldingNPC].Type == NPCID_TOOTHY && NPC[p.HoldingNPC].standingOnPlayer == 0) ||
+                                 (NPC[p.HoldingNPC].Type == NPCID_BULLET && NPC[p.HoldingNPC].CantHurt > 0)
                              ) ||
                           NPC[p.HoldingNPC].Effect == 5
                         ) &&
-                        NPC[p.HoldingNPC].Type != 91 &&
+                        NPC[p.HoldingNPC].Type != NPCID_ITEM_BURIED &&
                      !Player[NPC[p.HoldingNPC].HoldingPlayer].Dead
                     )
                     {
