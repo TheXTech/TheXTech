@@ -42,7 +42,6 @@ struct Compatibility_t
     bool fix_char3_escape_shell_surf;
     bool fix_plant_wobble; // improves visual appearance of plants
     bool fix_powerup_lava_bug; // powerups always die when hitting lava, instead of checking the types of arbitrary NPCs
-    bool fix_keyhole_framerate;
     // 1.3.5
     bool fix_char5_vehicle_climb;
     bool fix_vehicle_char_switch;
@@ -90,6 +89,8 @@ struct Compatibility_t
     bool custom_powerup_collect_score; // collected powerups give score from npc-X.txt
     bool fix_player_crush_death; // player should not be crushed by corners of slopes or by hitting a horizontally moving ceiling
     bool fix_pound_skip_warp; // ground pound state should not skip instant / portal warps
+    bool fix_held_item_cancel; // do not cancel held item hitting hostile NPC that intersects with an immune NPC
+    bool modern_section_change; // fix glitches and improve animations for section resize
     unsigned int bitblit_background_colour[3];
 
     // SpeedRun section

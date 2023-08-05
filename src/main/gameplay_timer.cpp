@@ -232,35 +232,37 @@ void GameplayTimer::save()
 
 void GameplayTimer::tick()
 {
+    // initialize timer
     if(!m_cyclesInt)
     {
         m_cyclesInt = true;
-        m_cyclesCurrent = 1;
-        m_cyclesTotal = 1;
+        m_cyclesCurrent = 0;
+        m_cyclesTotal = 0;
         m_cyclesFin = 0;
         m_levelBlinkActive = false;
         m_worldBlinkActive = false;
         m_blinkingFactor = 0.0f;
     }
-    else
+
+    bool in_leveltest_restart_screen = (GamePaused == PauseCode::PauseScreen && LevelBeatCode < 0);
+    bool in_normal_level_play = (!LevelSelect && LevelMacro == 0);
+
+    if(!in_leveltest_restart_screen && (LevelSelect || in_normal_level_play))
+        m_cyclesCurrent += 1;
+    else if(!in_leveltest_restart_screen && m_allowBlink && !m_levelBlinkActive)
+        m_levelBlinkActive = true;
+
+    if(!m_cyclesFin)
+        m_cyclesTotal += 1;
+
+    if(m_levelBlinkActive)
+        updateColorSpin(5.0f);
+
+    if(m_worldBlinkActive)
     {
-        if(LevelSelect || (!LevelSelect && LevelMacro == 0))
-            m_cyclesCurrent += 1;
-        else if(m_allowBlink && !m_levelBlinkActive)
-            m_levelBlinkActive = true;
-
-        if(!m_cyclesFin)
-            m_cyclesTotal += 1;
-
-        if(m_levelBlinkActive)
-            updateColorSpin(5.0f);
-
-        if(m_worldBlinkActive)
-        {
-            m_blinkingFactor += m_blinkingDir * 0.02;
-            if(m_blinkingFactor >= 0.3f || m_blinkingFactor <= -0.3f)
-                m_blinkingDir *= -1.0f;
-        }
+        m_blinkingFactor += m_blinkingDir * 0.02;
+        if(m_blinkingFactor >= 0.3f || m_blinkingFactor <= -0.3f)
+            m_blinkingDir *= -1.0f;
     }
 }
 
@@ -286,5 +288,7 @@ void GameplayTimer::render()
     float wc = m_worldBlinkActive ? 0.5f + m_blinkingFactor : 1.f;
 
     SuperPrintScreenCenter(formatTime(m_cyclesCurrent), 3, y - 34, lc[0], lc[1], lc[2], a);
-    SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, wc, 1.0f, wc, a);
+
+    if(!TestLevel)
+        SuperPrintScreenCenter(formatTime(m_cyclesTotal),   3, y - 18, wc, 1.0f, wc, a);
 }

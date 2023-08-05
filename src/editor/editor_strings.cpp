@@ -114,6 +114,7 @@ void initEditorStrings()
     g_editorStrings.phraseSectionIndex = "Section {0}";
     g_editorStrings.phraseRadiusIndex = "Radius {0}";
     g_editorStrings.phraseWarpIndex = "Warp {0}";
+    g_editorStrings.phraseGenericIndex = "Number {0}";
     g_editorStrings.phraseCountMore = "{0} More";
     g_editorStrings.phraseDelayIsMs = "Delay: {0} ms";
     g_editorStrings.mapPos = "Map Pos:";

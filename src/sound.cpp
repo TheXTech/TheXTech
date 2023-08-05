@@ -255,17 +255,17 @@ void InitMixerX()
     if(ret != initFlags)
     {
         pLogWarning("MixerX: Some modules aren't properly initialized");
-        if((initFlags & MIX_INIT_MID) != MIX_INIT_MID)
+        if((ret & MIX_INIT_MID) != MIX_INIT_MID)
             pLogWarning("MixerX: Failed to initialize MIDI module");
-        if((initFlags & MIX_INIT_MOD) != MIX_INIT_MOD)
+        if((ret & MIX_INIT_MOD) != MIX_INIT_MOD)
             pLogWarning("MixerX: Failed to initialize Tracker music module");
-        if((initFlags & MIX_INIT_FLAC) != MIX_INIT_FLAC)
+        if((ret & MIX_INIT_FLAC) != MIX_INIT_FLAC)
             pLogWarning("MixerX: Failed to initialize FLAC module");
-        if((initFlags & MIX_INIT_OGG) != MIX_INIT_OGG)
+        if((ret & MIX_INIT_OGG) != MIX_INIT_OGG)
             pLogWarning("MixerX: Failed to initialize OGG Vorbis module");
-        if((initFlags & MIX_INIT_OPUS) != MIX_INIT_OPUS)
+        if((ret & MIX_INIT_OPUS) != MIX_INIT_OPUS)
             pLogWarning("MixerX: Failed to initialize Opus module");
-        if((initFlags & MIX_INIT_MP3) != MIX_INIT_MP3)
+        if((ret & MIX_INIT_MP3) != MIX_INIT_MP3)
             pLogWarning("MixerX: Failed to initialize MP3 module");
     }
 
@@ -1089,7 +1089,7 @@ void InitSound()
     sounds.endGroup();
 
     if(playerUseOwnHammer)
-        playerHammerSFX = SFX_PlayerHammer;
+        playerHammerSFX = SFX_PlayerHeavy;
     else if(playerUseNPCHammer)
         playerHammerSFX = SFX_Throw;
     else
@@ -1166,11 +1166,11 @@ static const std::unordered_map<int, int> s_soundFallback =
     {SFX_Iceball, SFX_Fireball},
     {SFX_Freeze, SFX_ShellHit},
     {SFX_Icebreak, SFX_ShellHit},
-    {SFX_SproutVine, SFX_Mushroom},
-    {SFX_LudwigKilled, SFX_WartKilled},
-    {SFX_ZeldaIce, SFX_ZeldaFire},
-    {SFX_ZeldaFireRod, SFX_ZeldaFire},
-    {SFX_FlameThrower, SFX_ZeldaFire},
+    {SFX_SproutVine, SFX_ItemEmerge},
+    {SFX_FireBossKilled, SFX_SickBossKilled},
+    {SFX_HeroIce, SFX_HeroFire},
+    {SFX_HeroFireRod, SFX_HeroFire},
+    {SFX_FlameThrower, SFX_HeroFire},
 };
 
 static int getFallbackSfx(int A)
@@ -1193,8 +1193,8 @@ void PlaySound(int A, int loops, int volume)
         A = getFallbackSfx(A);
     else if(!s_useIceBallSfx && A == SFX_Iceball)
         A = SFX_Fireball; // Fell back into fireball when iceball sound isn't preferred
-    else if(!s_useIceBallSfx && A == SFX_ZeldaIce)
-        A = SFX_ZeldaFire;
+    else if(!s_useIceBallSfx && A == SFX_HeroIce)
+        A = SFX_HeroFire;
     else if(!s_useNewIceSfx && (A == SFX_Freeze || A == SFX_Icebreak))
         A = SFX_ShellHit; // Restore the old behavior
 

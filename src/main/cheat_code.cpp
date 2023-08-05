@@ -52,6 +52,9 @@
 
 #include "cheat_code.h"
 
+#include "npc_id.h"
+#include "eff_id.h"
+
 
 static void redigitIsCool()
 {
@@ -194,28 +197,28 @@ static void fairyMagic()
     {
         for(int B = 1; B <= numPlayers; B++)
         {
-            PlaySound(SFX_ZeldaFairy);
+            PlaySound(SFX_HeroFairy);
             Player[B].Immune = 10;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].Fairy = false;
             Player[B].FairyTime = 0;
             SizeCheck(Player[B]);
-            NewEffect(63, Player[B].Location);
+            NewEffect(EFFID_SMOKE_S5, Player[B].Location);
         }
     }
     else
     {
         for(int B = 1; B <= numPlayers; B++)
         {
-            PlaySound(SFX_ZeldaFairy);
+            PlaySound(SFX_HeroFairy);
             Player[B].Immune = 10;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].Fairy = true;
             Player[B].FairyTime = -1;
             SizeCheck(Player[B]);
-            NewEffect(63, Player[B].Location);
+            NewEffect(EFFID_SMOKE_S5, Player[B].Location);
         }
     }
 }
@@ -226,21 +229,21 @@ static void iceAge()
     {
         if(NPC[C].Active)
         {
-            if(!NPCNoIceBall[NPC[C].Type] && NPC[C].Type != 263 && !NPCIsABonus[NPC[C].Type])
+            if(!NPCNoIceBall[NPC[C].Type] && NPC[C].Type != NPCID_ICE_CUBE && !NPCIsABonus[NPC[C].Type])
             {
-                NPC[0].Type = 265;
+                NPC[0].Type = NPCID_PLR_ICEBALL;
                 NPCHit(C, 3, 0);
             }
         }
     }
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 }
 
 static void iStillPlayWithLegos()
 {
     ShowLayer(LAYER_DESTROYED_BLOCKS);
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 }
 
 static void itsRainingMen()
@@ -251,7 +254,7 @@ static void itsRainingMen()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 90;
+            NPC[numNPCs].Type = NPCID_LIFE_S3;
             NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
             NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
             NPC[numNPCs].Location.Height = 32;
@@ -264,7 +267,7 @@ static void itsRainingMen()
         }
     }
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 }
 
 static void dontTypeThis()
@@ -275,7 +278,7 @@ static void dontTypeThis()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 134;
+            NPC[numNPCs].Type = NPCID_BOMB;
             NPC[numNPCs].Location.Y = Player[C].Location.Y - 600;
             NPC[numNPCs].Location.X = Player[C].Location.X - 400 + B;
             NPC[numNPCs].Location.Height = 32;
@@ -288,7 +291,7 @@ static void dontTypeThis()
         }
     }
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 }
 
 static void wetWater()
@@ -369,7 +372,7 @@ static void wetWater()
         }
     }
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -426,13 +429,13 @@ static void needATanookiSuit()
 
         if(Player[B].Character >= 3 && Player[B].State != 5)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 5;
             SizeCheck(Player[B]);
-            NewEffect(10,
+            NewEffect(EFFID_SMOKE_S3,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
@@ -452,13 +455,13 @@ static void needAHammerSuit()
 
         if(Player[B].Character >= 3 && Player[B].State != 6)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 6;
             SizeCheck(Player[B]);
-            NewEffect(10,
+            NewEffect(EFFID_SMOKE_S3,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
@@ -478,13 +481,13 @@ static void needAMushroom()
 
         if(Player[B].Character >= 3 && Player[B].State == 1)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 2;
             SizeCheck(Player[B]);
-            NewEffect(10,
+            NewEffect(EFFID_SMOKE_S3,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
@@ -504,13 +507,13 @@ static void needAFlower()
 
         if(Player[B].Character >= 3 && Player[B].State != 3)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 3;
             SizeCheck(Player[B]);
-            NewEffect(10,
+            NewEffect(EFFID_SMOKE_S3,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
@@ -530,13 +533,13 @@ static void needAnIceFlower()
 
         if(Player[B].Character >= 3 && Player[B].State != 7)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 7;
             SizeCheck(Player[B]);
-            NewEffect(10,
+            NewEffect(EFFID_SMOKE_S3,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
@@ -555,13 +558,13 @@ static void needALeaf()
 
         if(Player[B].Character >= 3 && Player[B].State != 4)
         {
-            PlaySound(SFX_Raccoon);
+            PlaySound(SFX_Transform);
             Player[B].Immune = 30;
             Player[B].Effect = 8;
             Player[B].Effect2 = 4;
             Player[B].State = 4;
             SizeCheck(Player[B]);
-            NewEffect(10,
+            NewEffect(EFFID_SMOKE_S3,
                       newLoc(Player[B].Location.X + Player[B].Location.Width / 2.0 - EffectWidth[10] / 2.0,
                       Player[B].Location.Y + Player[B].Location.Height / 2.0 - EffectHeight[10] / 2.0));
         }
@@ -638,7 +641,7 @@ static void shadowStar()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -646,7 +649,7 @@ static void shadowStar()
         tempLocation = Player[B].Location;
         tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
         tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
     }
 
     ShadowMode = !ShadowMode;
@@ -661,7 +664,7 @@ static void becomeAsPeach()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -681,7 +684,7 @@ static void becomeAsPeach()
         tempLocation = Player[B].Location;
         tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
         tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
     }
 
     UpdateYoshiMusic();
@@ -691,7 +694,7 @@ static void becomeAsToad()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -711,7 +714,7 @@ static void becomeAsToad()
         tempLocation = Player[B].Location;
         tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
         tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
     }
 
     UpdateYoshiMusic();
@@ -721,7 +724,7 @@ static void becomeAsLink()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -741,7 +744,7 @@ static void becomeAsLink()
         tempLocation = Player[B].Location;
         tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
         tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
     }
 
     UpdateYoshiMusic();
@@ -751,7 +754,7 @@ static void becomeAsMario()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -771,7 +774,7 @@ static void becomeAsMario()
         tempLocation = Player[B].Location;
         tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
         tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
     }
 
     UpdateYoshiMusic();
@@ -781,7 +784,7 @@ static void becomeAsLuigi()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -801,7 +804,7 @@ static void becomeAsLuigi()
         tempLocation = Player[B].Location;
         tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
         tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
     }
 
     UpdateYoshiMusic();
@@ -1169,18 +1172,18 @@ static void warioTime()
                !NPCIsABonus[NPC[B].Type] &&
                !NPCIsACoin[NPC[B].Type] &&
                !NPCIsAnExit[NPC[B].Type] &&
-                NPC[B].Type != 91 && !NPC[B].Generator &&
+                NPC[B].Type != NPCID_ITEM_BURIED && !NPC[B].Generator &&
                !NPC[B].Inert
             )
             {
-                PlaySound(SFX_Raccoon);
+                PlaySound(SFX_Transform);
                 NPC[B].Location.Y += NPC[B].Location.Height / 2.0;
                 NPC[B].Location.X += NPC[B].Location.Width / 2.0;
                 tempLocation = NPC[B].Location;
                 tempLocation.Y -= 16;
                 tempLocation.X -= 16;
-                NewEffect(10, tempLocation);
-                NPC[B].Type = 10;
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
+                NPC[B].Type = NPCID_COIN_S3;
                 NPC[B].Location.Width = NPCWidth[NPC[B].Type];
                 NPC[B].Location.Height = NPCHeight[NPC[B].Type];
                 NPC[B].Location.Y += -NPC[B].Location.Height / 2.0;
@@ -1203,7 +1206,7 @@ static void carKeys()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 31;
+            NPC[numNPCs].Type = NPCID_KEY;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1230,7 +1233,7 @@ static void boingyBoing()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 26;
+            NPC[numNPCs].Type = NPCID_SPRING;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1256,7 +1259,7 @@ static void bombsAway()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 134;
+            NPC[numNPCs].Type = NPCID_BOMB;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.X = Player[B].Location.X;
@@ -1285,7 +1288,7 @@ static void fireMissiles()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 17;
+            NPC[numNPCs].Type = NPCID_BULLET;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1311,7 +1314,7 @@ static void hellFire()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 279;
+            NPC[numNPCs].Type = NPCID_FLY_CANNON;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1339,7 +1342,7 @@ static void upAndOut()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 278;
+            NPC[numNPCs].Type = NPCID_FLY_BLOCK;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1367,7 +1370,7 @@ static void powHammer()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 241;
+            NPC[numNPCs].Type = NPCID_EARTHQUAKE_BLOCK;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1396,7 +1399,7 @@ static void hammerInMyPants()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 29;
+            NPC[numNPCs].Type = NPC_HEAVY_THROWER;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1425,7 +1428,7 @@ static void rainbowRider()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 195;
+            NPC[numNPCs].Type = NPCID_FLIPPED_RAINBOW_SHELL;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1451,7 +1454,7 @@ static void greenEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 95;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
@@ -1478,7 +1481,7 @@ static void blueEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Frame = 1;
             NPC[numNPCs].Special = 98;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1506,7 +1509,7 @@ static void yellowEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 99;
             NPC[numNPCs].Frame = 2;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1534,7 +1537,7 @@ static void redEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 100;
             NPC[numNPCs].Frame = 3;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1563,7 +1566,7 @@ static void blackEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 148;
             NPC[numNPCs].Frame = 4;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1591,7 +1594,7 @@ static void purpleEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 149;
             NPC[numNPCs].Frame = 5;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1619,7 +1622,7 @@ static void pinkEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 150;
             NPC[numNPCs].Frame = 6;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1647,7 +1650,7 @@ static void coldEgg()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 96;
+            NPC[numNPCs].Type = NPCID_ITEM_POD;
             NPC[numNPCs].Special = 228;
             NPC[numNPCs].Frame = 6;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
@@ -1756,7 +1759,7 @@ static void newLeaf()
     CaptainN = false;
     GrabAll = false;
     ShadowMode = false;
-    PlaySound(SFX_BowserKilled);
+    PlaySound(SFX_VillainKilled);
 }
 
 static void getMeOuttaHere()
@@ -1777,7 +1780,7 @@ static void holyTrinity()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -1785,7 +1788,7 @@ static void holyTrinity()
         tempLocation = Player[B].Location;
         tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
         tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
     }
 
     if(ShadowMode && GodMode && MultiHop)
@@ -1806,7 +1809,7 @@ static void essentials()
 {
     Location_t tempLocation;
 
-    PlaySound(SFX_Raccoon);
+    PlaySound(SFX_Transform);
 
     for(int B = 1; B <= numPlayers; B++)
     {
@@ -1814,7 +1817,7 @@ static void essentials()
         tempLocation = Player[B].Location;
         tempLocation.Y = Player[B].Location.Y + Player[B].Location.Height / 2.0 - 16;
         tempLocation.X = Player[B].Location.X + Player[B].Location.Width / 2.0 - 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
     }
 
     if(ShadowMode && GodMode && MultiHop && SuperSpeed)

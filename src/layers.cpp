@@ -26,6 +26,8 @@
 #include "effect.h"
 #include "collision.h"
 #include "npc.h"
+#include "npc_id.h"
+#include "eff_id.h"
 #include "sound.h"
 #include "graphics.h"
 #include "game_main.h"
@@ -376,7 +378,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 tempLocation = NPC[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
 
             if(!LevelEditor)
@@ -420,7 +422,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Block[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Block[A].Hidden = false;
@@ -440,7 +442,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Background[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Background[A].Hidden = false;
@@ -491,7 +493,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
                 tempLocation = NPC[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
 
@@ -515,7 +517,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Block[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Block[A].Hidden = true;
@@ -533,7 +535,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Background[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Background[A].Hidden = true;
@@ -708,11 +710,11 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
     // this is for events that have just been triggered
     int B = 0;
-    int C = 0;
+    // int C = 0;
     int D = 0;
-    int plr = 0;
     bool tempBool = false;
     Location_t tempLevel;
+    Location_t newLevel;
     vScreen_t screenLoc;
 
     // Ignore vanilla autoscroll if newer way has been used
@@ -762,20 +764,30 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                     AutoY[B] = s.autoscroll_y;
                 }
 
-                /* Resize the section noundaries */
-                if(int(s.position.X) == EventSection_t::LESet_ResetDefault)
+                int onscreen_plr = 0;
+                int warped_plr = 0;
+
+                bool is_reset = int(s.position.X) == EventSection_t::LESet_ResetDefault;
+
+                /* Resize the section boundaries */
+                if(is_reset && !g_compatibility.modern_section_change)
                     level[B] = LevelREAL[B];
                 else if(int(s.position.X) != EventSection_t::LESet_Nothing)
                 {
                     tempLevel = level[B];
-                    level[B] = static_cast<Location_t>(s.position);
+                    newLevel = (is_reset) ? LevelREAL[B] : static_cast<Location_t>(s.position);
+                    level[B] = newLevel;
 
+                    // warp other players to resized section, if not a reset
                     if(!evt.AutoStart && !equalCase(evt.Name, "Level - Start"))
                     {
-                        for(C = 1; C <= numPlayers; C++)
+                        for(int C = 1; C <= numPlayers; C++)
                         {
                             // If .Section = B Then
-                            Player[C].Section = B;
+                            // Should set this only if the warp is successful!
+                            if(!g_compatibility.modern_section_change)
+                                Player[C].Section = B;
+
                             tempBool = false;
                             if(Player[C].Location.X + Player[C].Location.Width >= level[B].X)
                             {
@@ -786,11 +798,16 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                         if(Player[C].Location.Y <= level[B].Height)
                                         {
                                             tempBool = true; // Check to see if player is still in section after resizing
-                                            plr = C;
+                                            onscreen_plr = C;
+                                            Player[C].Section = B;
                                         }
                                     }
                                 }
                             }
+
+                            // don't warp on reset
+                            if(is_reset)
+                                continue;
 
                             if(!tempBool)
                             {
@@ -806,6 +823,9 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                                 {
                                                     if(Player[D].Location.Y <= level[B].Height) // Move to another player who is still in the section
                                                     {
+                                                        warped_plr = C;
+
+                                                        Player[C].Section = B;
                                                         Player[C].Location.X = Player[D].Location.X + Player[D].Location.Width / 2.0 - Player[C].Location.Width / 2.0;
                                                         Player[C].Location.Y = Player[D].Location.Y + Player[D].Location.Height - Player[C].Location.Height;
                                                         Player[C].Effect = 9;
@@ -822,19 +842,143 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                         }
                     }
 
-                    if(!equalCase(evt.Name, "Level - Start"))
+                    // start the modern qScreen animation
+                    if(!equalCase(evt.Name, "Level - Start") && g_compatibility.modern_section_change)
                     {
-                        C = plr;
-                        if(numPlayers == 2 && DScreenType != 5)
+                        // the onscreen player
+                        if(onscreen_plr == 0)
                         {
-                            level[B] = tempLevel;
-                            screenLoc = vScreen[C];
+                            // no qScreen because there were no onscreen players
+                        }
+                        else if(numPlayers == 2)
+                        {
+                            double tX = 0.0;
+                            double tY = 0.0;
+
+                            if(warped_plr)
+                            {
+                                tX = vScreen[warped_plr].X - vScreen[onscreen_plr].X;
+                                tY = vScreen[warped_plr].Y - vScreen[onscreen_plr].Y;
+                            }
+
                             SoundPause[13] = 10;
+
+                            // need two cycles to fully update the dynamic screens in the new level
+                            SetupScreens(false);
                             DynamicScreen();
-                            GetvScreenAverage();
+                            // CenterScreens();
+
+                            if(vScreen[2].Visible)
+                            {
+                                for(int Z = 1; Z <= 2; Z++)
+                                    GetvScreen(Z);
+                            }
+                            else
+                                GetvScreenAverage();
+
+                            // set up the dynamic screens in the new level
+                            SetupScreens(false);
+                            DynamicScreen();
+
+                            // set the positions (including screen positions) in the old level
+                            level[B] = tempLevel;
+                            // CenterScreens();
+
+                            if(vScreen[2].Visible)
+                            {
+                                for(int Z = 1; Z <= 2; Z++)
+                                    GetvScreen(Z);
+                            }
+                            else
+                            {
+                                GetvScreenAverage();
+                            }
+
+                            // set the qScreen!
                             qScreen = true;
                             qScreenLoc[1] = vScreen[1];
 
+                            // set the second qScreen if possible
+                            if(vScreen[2].Visible)
+                                qScreenLoc[2] = vScreen[2];
+
+                            // special code to indicate the direction the other player was warped from
+                            if(warped_plr && !vScreen[2].Visible)
+                            {
+                                // total distance of warp
+                                double dSquare = tX * tX + tY * tY;
+
+                                // project onto the circle: proportion of distance from each axis
+                                double xProp = tX * tX / dSquare;
+                                double yProp = tY * tY / dSquare;
+
+                                if(tX < 0)
+                                    xProp *= -1;
+
+                                if(tY < 0)
+                                    yProp *= -1;
+
+                                // maximum total shift of 1/4 of the vScreen's size; also limit by 200x150 (SMBX64 amount)
+                                double maxShiftX = vScreen[1].Width / 4;
+                                double maxShiftY = vScreen[1].Height / 4;
+
+                                if(maxShiftX > 200)
+                                    maxShiftX = 200;
+
+                                if(maxShiftY > 150)
+                                    maxShiftY = 150;
+
+                                // apply the shift
+                                qScreenLoc[1].X += maxShiftX * xProp;
+                                qScreenLoc[1].Y += maxShiftY * yProp;
+
+                                // restrict to old level bounds
+                                if(-qScreenLoc[1].X < level[B].X)
+                                    qScreenLoc[1].X = -level[B].X;
+
+                                if(-qScreenLoc[1].X + vScreen[1].Width > level[B].Width)
+                                    qScreenLoc[1].X = -(level[B].Width - vScreen[1].Width);
+
+                                if(-qScreenLoc[1].Y < level[B].Y)
+                                    qScreenLoc[1].Y = -level[B].Y;
+
+                                if(-qScreenLoc[1].Y + vScreen[1].Height > level[B].Height)
+                                    qScreenLoc[1].Y = -(level[B].Height - vScreen[1].Height);
+                            }
+
+                            // restore the new level
+                            level[B] = newLevel;
+                        }
+                        else
+                        {
+                            if(!qScreen)
+                            {
+                                qScreen = true;
+                                qScreenLoc[1] = vScreen[1];
+                            }
+                        }
+
+                        resetFrameTimer();
+                    }
+                    // legacy qScreen animation
+                    else if(!equalCase(evt.Name, "Level - Start"))
+                    {
+                        if(numPlayers == 2 && DScreenType != 5)
+                        {
+                            level[B] = tempLevel;
+                            screenLoc = vScreen[onscreen_plr];
+                            SoundPause[13] = 10;
+
+                            DynamicScreen();
+
+                            // calculate the vScreen at non-splitscreen resolution (as the original game does)
+                            GetvScreenAverage();
+
+                            // enable qScreen!
+                            qScreen = true;
+                            qScreenLoc[1] = vScreen[1];
+
+                            // pan to indicate warped player, in the direction the screen was previously split
                             if(int(screenLoc.Width) == 400)
                             {
                                 if(qScreenLoc[1].X < screenLoc.X + screenLoc.Left)
@@ -851,14 +995,20 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                     qScreenLoc[1].Y -= 150;
                             }
 
-                            if(-qScreenLoc[1].X < level[Player[C].Section].X)
-                                qScreenLoc[1].X = -level[Player[C].Section].X;
-                            if(-qScreenLoc[1].X + ScreenW /*FrmMain.ScaleWidth*/ > level[Player[C].Section].Width)
-                                qScreenLoc[1].X = -(level[Player[C].Section].Width - ScreenW);
-                            if(-qScreenLoc[1].Y < level[Player[C].Section].Y)
-                                qScreenLoc[1].Y = -level[Player[C].Section].Y;
-                            if(-qScreenLoc[1].Y + ScreenH /*FrmMain.ScaleHeight*/ > level[Player[C].Section].Height)
-                                qScreenLoc[1].Y = -(level[Player[C].Section].Height - ScreenH);
+                            // restrict to old level bounds
+                            if(-qScreenLoc[1].X < level[B].X)
+                                qScreenLoc[1].X = -level[B].X;
+
+                            if(-qScreenLoc[1].X + ScreenW /*FrmMain.ScaleWidth*/ > level[B].Width)
+                                qScreenLoc[1].X = -(level[B].Width - ScreenW);
+
+                            if(-qScreenLoc[1].Y < level[B].Y)
+                                qScreenLoc[1].Y = -level[B].Y;
+
+                            if(-qScreenLoc[1].Y + ScreenH /*FrmMain.ScaleHeight*/ > level[B].Height)
+                                qScreenLoc[1].Y = -(level[B].Height - ScreenH);
+
+                            // restore the new level
                             level[B] = static_cast<Location_t>(s.position);
                         }
                         else
@@ -953,7 +1103,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                     for(int C : Layer[B].NPCs)
                     {
-                        if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
+                        if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == NPCID_ITEM_BURIED)
                         {
                             NPC[C].Location.SpeedX = 0;
                             NPC[C].Location.SpeedY = 0;
@@ -1239,7 +1389,7 @@ void UpdateLayers()
                 {
                     for(int B : Layer[A].NPCs)
                     {
-                        if(NPC[B].Type == 91 || NPC[B].Type == 211 || NPCIsAVine[NPC[B].Type])
+                        if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPC_HOMING_BALL_GEN || NPCIsAVine[NPC[B].Type])
                         {
                             NPC[B].Location.SpeedX = 0;
                             NPC[B].Location.SpeedY = 0;
@@ -1341,14 +1491,14 @@ void UpdateLayers()
                         NPC[B].DefaultLocation.Y += double(Layer[A].SpeedY);
 
                         if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != 0 ||
-                           NPCIsACoin[NPC[B].Type] || NPC[B].Type == 8 || NPC[B].Type == 37 ||
-                           NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 46 ||
-                           NPC[B].Type == 93 || NPC[B].Type == 74 || NPCIsAVine[NPC[B].Type] ||
-                           NPC[B].Type == 192 || NPC[B].Type == 197 || NPC[B].Type == 91 ||
-                           NPC[B].Type == 211 || NPC[B].Type == 256 || NPC[B].Type == 257 ||
-                           NPC[B].Type == 245)
+                           NPCIsACoin[NPC[B].Type] || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
+                           NPC[B].Type == NPCID_BOTTOM_PLANT || NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_FALL_BLOCK_RED ||
+                           NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_BIG_PLANT || NPCIsAVine[NPC[B].Type] ||
+                           NPC[B].Type == NPCID_CHECKPOINT || NPC[B].Type == NPCID_GOALTAPE || NPC[B].Type == NPCID_ITEM_BURIED ||
+                           NPC[B].Type == NPC_HOMING_BALL_GEN || NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_LONG_PLANT_DOWN ||
+                           NPC[B].Type == NPCID_FIRE_PLANT)
                         {
-                            if(NPC[B].Type == 91 || NPC[B].Type == 211)
+                            if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPC_HOMING_BALL_GEN)
                             {
                                 NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
                                 NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
@@ -1363,10 +1513,10 @@ void UpdateLayers()
                             {
                                 NPC[B].Location.X = NPC[B].DefaultLocation.X;
                                 NPC[B].Location.Y = NPC[B].DefaultLocation.Y;
-                                if(NPC[B].Type == 8 || NPC[B].Type == 74 || NPC[B].Type == 93 ||
-                                   NPC[B].Type == 256 || NPC[B].Type == 245)
+                                if(NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B].Type == NPCID_PLANT_S1 ||
+                                   NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_FIRE_PLANT)
                                     NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
-                                else if(NPC[B].Type == 52 && fiEqual(NPC[B].Direction, -1))
+                                else if(NPC[B].Type == NPCID_SIDE_PLANT && fiEqual(NPC[B].Direction, -1))
                                     NPC[B].Location.X += NPC[B].DefaultLocation.Width;
                             }
                             else

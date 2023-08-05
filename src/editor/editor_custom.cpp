@@ -641,10 +641,10 @@ std::vector<ItemFamily*>::iterator make_page(std::vector<ItemFamily*>::iterator 
 
             // we'll be below the margin
 
-            // pick whether to fill the row or keep the margin
-            okay = family.make_layout(width);
-
+            // pick whether to fill the row (use width) or keep the margin (use main_width)
+            family.make_layout(width);
             int height_full = family.layout_pod.rows * 2 + 1;
+
             okay = family.make_layout(main_width);
             int height_main = family.layout_pod.rows * 2 + 1;
 
@@ -1064,6 +1064,7 @@ void Load(XTechTranslate* translate)
             pLogWarning("Ignoring invalid group %s.", group.c_str());
         }
 
+        // handling for Lists
         if(l_ptr)
         {
             editor.beginGroup(group);
@@ -1157,6 +1158,7 @@ void Load(XTechTranslate* translate)
             }
         }
 
+        // handling for ordinary Families
         if(f_ptr)
         {
             temp_layout_pod_indices.clear();
@@ -1218,6 +1220,9 @@ void Load(XTechTranslate* translate)
                         continue;
 
                     if(SDL_strncasecmp(key.c_str(), "icon", 4) == 0)
+                        continue;
+
+                    if(SDL_strncasecmp(key.c_str(), "behi", 4) == 0)
                         continue;
 
                     bool pod_mode = false;

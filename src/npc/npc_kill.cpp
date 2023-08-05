@@ -21,6 +21,7 @@
 #include "../globals.h"
 #include "../npc.h"
 #include "../npc_id.h"
+#include "../eff_id.h"
 #include "../sound.h"
 #include "../effect.h"
 #include "../layers.h"
@@ -55,9 +56,9 @@ void KillNPC(int A, int B)
 
     // don't need to worry about updating NPC A's tree because that will certainly happen in either the syncLayersNPC or the Deactivate call at the end of the procedure
 
-    if(NPC[A].Type == 263 && NPC[A].Special > 0 && NPC[A].Killed != 9)
+    if(NPC[A].Type == NPCID_ICE_CUBE && NPC[A].Special > 0 && NPC[A].Killed != 9)
     {
-        NewEffect(10, NPC[A].Location);
+        NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
         for(C = 1; C <= 50; C++)
         {
             tempLocation.Height = EffectHeight[80];
@@ -66,7 +67,7 @@ void KillNPC(int A, int B)
             tempLocation.SpeedY = 0;
             tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width;
             tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height;
-            NewEffect(80, tempLocation);
+            NewEffect(EFFID_SPARKLE, tempLocation);
             Effect[numEffects].Location.SpeedX = dRand() * 4 - 2 - NPC[A].Location.SpeedX * 0.2;
             Effect[numEffects].Location.SpeedY = dRand() * 4 - 2 + NPC[A].Location.SpeedY * 0.2;
             Effect[numEffects].Frame = iRand(3);
@@ -86,10 +87,10 @@ void KillNPC(int A, int B)
             NPC[A].Location.SpeedX = double(2 * NPC[A].Direction);
     }
 
-    if(NPC[A].Killed == 8 && NPC[A].Type != 13 && NPC[A].Type != 125 && !NPCIsABot[NPC[A].Type] && NPC[A].Type != 203 && NPC[A].Type != 204 && NPC[A].Type != 205 && NPC[A].Type != 210)
-        NewEffect(76, NPC[A].Location);
+    if(NPC[A].Killed == 8 && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_KNIGHT && !NPCIsABot[NPC[A].Type] && NPC[A].Type != NPCID_FLIER && NPC[A].Type != NPCID_ROCKET_FLIER && NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPC_HOMING_BALL)
+        NewEffect(EFFID_BOOT_STOMP, NPC[A].Location);
 
-    if(NPC[A].Type == 59 || NPC[A].Type == 61 || NPC[A].Type == 63 || NPC[A].Type == 65 || NPC[A].DefaultType == 59 || NPC[A].DefaultType == 61 || NPC[A].DefaultType == 63 || NPC[A].DefaultType == 65)
+    if(NPC[A].Type == NPCID_YELSWITCH_FODDER || NPC[A].Type == NPCID_BLUSWITCH_FODDER || NPC[A].Type == NPCID_GRNSWITCH_FODDER || NPC[A].Type == NPCID_REDSWITCH_FODDER || NPC[A].DefaultType == 59 || NPC[A].DefaultType == 61 || NPC[A].DefaultType == 63 || NPC[A].DefaultType == 65)
     {
         tempBool = false;
 
@@ -107,7 +108,7 @@ void KillNPC(int A, int B)
 
         if(!tempBool)
         {
-            if(NPC[A].Type == 59 || NPC[A].DefaultType == 59)
+            if(NPC[A].Type == NPCID_YELSWITCH_FODDER || NPC[A].DefaultType == 59)
             {
                 PlaySound(SFX_PSwitch);
                 for(C = 1; C <= numBlock; C++)
@@ -119,11 +120,11 @@ void KillNPC(int A, int B)
                 }
                 for(C = 1; C <= numNPCs; C++)
                 {
-                    if(NPC[C].Type == 60)
+                    if(NPC[C].Type == NPCID_YEL_PLATFORM)
                         NPC[C].Direction = -NPC[C].Direction;
                 }
             }
-            else if(NPC[A].Type == 61 || NPC[A].DefaultType == 61)
+            else if(NPC[A].Type == NPCID_BLUSWITCH_FODDER || NPC[A].DefaultType == 61)
             {
                 PlaySound(SFX_PSwitch);
                 for(C = 1; C <= numBlock; C++)
@@ -135,11 +136,11 @@ void KillNPC(int A, int B)
                 }
                 for(C = 1; C <= numNPCs; C++)
                 {
-                    if(NPC[C].Type == 62)
+                    if(NPC[C].Type == NPCID_BLU_PLATFORM)
                         NPC[C].Direction = -NPC[C].Direction;
                 }
             }
-            else if(NPC[A].Type == 63 || NPC[A].DefaultType == 63)
+            else if(NPC[A].Type == NPCID_GRNSWITCH_FODDER || NPC[A].DefaultType == 63)
             {
                 PlaySound(SFX_PSwitch);
                 for(C = 1; C <= numBlock; C++)
@@ -151,11 +152,11 @@ void KillNPC(int A, int B)
                 }
                 for(C = 1; C <= numNPCs; C++)
                 {
-                    if(NPC[C].Type == 64)
+                    if(NPC[C].Type == NPCID_GRN_PLATFORM)
                         NPC[C].Direction = -NPC[C].Direction;
                 }
             }
-            else if(NPC[A].Type == 65 || NPC[A].DefaultType == 65)
+            else if(NPC[A].Type == NPCID_REDSWITCH_FODDER || NPC[A].DefaultType == 65)
             {
                 PlaySound(SFX_PSwitch);
                 for(C = 1; C <= numBlock; C++)
@@ -167,7 +168,7 @@ void KillNPC(int A, int B)
                 }
                 for(C = 1; C <= numNPCs; C++)
                 {
-                    if(NPC[C].Type == 66)
+                    if(NPC[C].Type == NPCID_RED_PLATFORM)
                         NPC[C].Direction = -NPC[C].Direction;
                 }
             }
@@ -210,26 +211,26 @@ void KillNPC(int A, int B)
 
     if(NPC[A].Killed == 10) // Things that die by Link's sword
     {
-        if(!(NPC[A].Type == 15 || NPC[A].Type == 39 || NPC[A].Type == 86 || NPC[A].Type == 209 || NPC[A].Type == 200 || NPC[A].Type == 201 || NPC[A].Type == 203 || NPC[A].Type == 204 || NPC[A].Type == 205 || NPC[A].Type == 210 || NPC[A].Type == 208))
+        if(!(NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_SPIT_BOSS || NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_VILLAIN_S1 || NPC[A].Type == NPCID_SICK_BOSS || NPC[A].Type == NPCID_FLIER || NPC[A].Type == NPCID_ROCKET_FLIER || NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPC_HOMING_BALL || NPC[A].Type == NPCID_BOSS_CASE))
         {
-            PlaySound(SFX_ZeldaKill);
-            NewEffect(63 , NPC[A].Location);
+            PlaySound(SFX_HeroKill);
+            NewEffect(EFFID_SMOKE_S5, NPC[A].Location);
             B = 9;
             if(iRand(10) < 3)
             {
                 numNPCs++;
                 NPC[numNPCs] = NPC_t();
-                NPC[numNPCs].Type = 251;
+                NPC[numNPCs].Type = NPCID_GEM_1;
                 if(iRand(5) == 0)
-                    NPC[numNPCs].Type = 252;
+                    NPC[numNPCs].Type = NPCID_GEM_5;
                 if(iRand(40) < 3)
-                    NPC[numNPCs].Type = 253;
+                    NPC[numNPCs].Type = NPCID_GEM_20;
                 NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                 NPC[numNPCs].Location.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - NPC[numNPCs].Location.Width / 2.0;
                 NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                 if(NPC[A].Location.Height >= 32)
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height / 2.0 - NPC[numNPCs].Location.Height / 2.0;
-                else if(NPC[A].Type == 51 || NPC[A].Type == 257) // Stops the rupees from spawning in blocks
+                else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN) // Stops the rupees from spawning in blocks
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + 1;
                 else // Stops the rupees from spawning in blocks
                     NPC[numNPCs].Location.Y = NPC[A].Location.Y + NPC[A].Location.Height - NPC[numNPCs].Location.Height - 1;
@@ -249,28 +250,28 @@ void KillNPC(int A, int B)
     if(B != 9)
     {
         NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-        if(NPC[A].Type == 235 || NPC[A].Type == 231 || NPC[A].Type == 1 || NPC[A].Type == 242 || NPC[A].Type == 243 || NPC[A].Type == 244 || NPC[A].Type == 162 || NPC[A].Type == 163 || NPC[A].Type == 164 || NPC[A].Type == 165 || NPC[A].Type == 166 || NPC[A].Type == 167 || NPC[A].Type == 229 || NPC[A].Type == 236 || NPC[A].Type == 230 || NPC[A].Type == 232 || NPC[A].Type == 233 || NPC[A].Type == 234 || NPC[A].Type == 237 || NPC[A].Type == 263) // Goomba / Rex
+        if(NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_FODDER_S3 || NPC[A].Type == NPCID_FODDER_S5 || NPC[A].Type == NPCID_FLY_FODDER_S5 || NPC[A].Type == NPCID_FLY_FODDER_S3 || NPC[A].Type == NPCID_BRUTE || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE || NPC[A].Type == NPCID_CARRY_FODDER || NPC[A].Type == NPC_HIT_CARRY_FODDER || NPC[A].Type == NPCID_FLY_CARRY_FODDER || NPC[A].Type == NPCID_GRN_FISH_S3 || NPC[A].Type == NPCID_FISH_S4 || NPC[A].Type == NPCID_RED_FISH_S3 || NPC[A].Type == NPCID_GOGGLE_FISH || NPC[A].Type == NPCID_GRN_FISH_S1 || NPC[A].Type == NPCID_BONE_FISH || NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE) // Goomba / Rex
         {
-            if(B == 1 && NPC[A].Type != 229 && NPC[A].Type != 236 && NPC[A].Type != 230 && NPC[A].Type != 232 && NPC[A].Type != 233 && NPC[A].Type != 234)
+            if(B == 1 && NPC[A].Type != NPCID_GRN_FISH_S3 && NPC[A].Type != NPCID_FISH_S4 && NPC[A].Type != NPCID_RED_FISH_S3 && NPC[A].Type != NPCID_GOGGLE_FISH && NPC[A].Type != NPCID_GRN_FISH_S1 && NPC[A].Type != NPCID_BONE_FISH)
             {
-                if(NPC[A].Type == 1)
-                    NewEffect(2, NPC[A].Location);
-                else if(NPC[A].Type == 242)
-                    NewEffect(126, NPC[A].Location);
-                else if(NPC[A].Type == NPCID_BLOOPER && g_compatibility.fix_squid_stomp_effect)
+                if(NPC[A].Type == NPCID_FODDER_S3)
+                    NewEffect(EFFID_FODDER_S3_SQUISH, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_FODDER_S5)
+                    NewEffect(EFFID_FODDER_S5_SQUISH, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_SQUID_S1 && g_compatibility.fix_squid_stomp_effect)
                 {
                     NPC[A].Location.SpeedY = 0.123;
-                    NewEffect(121, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_SQUID_S1_DIE, NPC[A].Location, NPC[A].Direction);
                     PlaySound(SFX_ShellHit);
                 }
-                else if(NPC[A].Type == NPCID_BLOOPER_SMB3 && g_compatibility.fix_squid_stomp_effect)
+                else if(NPC[A].Type == NPCID_SQUID_S3 && g_compatibility.fix_squid_stomp_effect)
                 {
                     NPC[A].Location.SpeedY = 0.123;
-                    NewEffect(117, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_SQUID_S3_DIE, NPC[A].Location, NPC[A].Direction);
                     PlaySound(SFX_ShellHit);
                 }
                 else
-                    NewEffect(84, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_BRUTE_SQUISH, NPC[A].Location, NPC[A].Direction);
             }
             else if(B == 6)
             {
@@ -279,83 +280,83 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Width = 32;
                 NPC[A].Location.Y += NPC[A].Location.Height - 32;
                 NPC[A].Location.Height = 32;
-                NewEffect(10, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13, NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - 16;
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
-                if(NPC[A].Type == 237) // Yoshi's ice break
+                if(NPC[A].Type == NPCID_ICE_BLOCK) // Yoshi's ice break
                     PlaySound(SFX_Icebreak);
                 else
                     PlaySound(SFX_ShellHit); // Shell hit sound
-                if(NPC[A].Type == 1 || NPC[A].Type == 244)
-                    NewEffect(4, NPC[A].Location);
-                else if(NPC[A].Type == 242 || NPC[A].Type == 243)
-                    NewEffect(127, NPC[A].Location);
-                else if(NPC[A].Type == 231)
-                    NewEffect(117, NPC[A].Location);
-                else if(NPC[A].Type == 235)
-                    NewEffect(121, NPC[A].Location);
-                else if(NPC[A].Type == 162)
-                    NewEffect(86, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 164)
-                    NewEffect(87, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 163)
-                    NewEffect(85, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 229)
+                if(NPC[A].Type == NPCID_FODDER_S3 || NPC[A].Type == NPCID_FLY_FODDER_S3)
+                    NewEffect(EFFID_FODDER_S3_DIE, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_FODDER_S5 || NPC[A].Type == NPCID_FLY_FODDER_S5)
+                    NewEffect(EFFID_FODDER_S5_DIE, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_SQUID_S3)
+                    NewEffect(EFFID_SQUID_S3_DIE, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_SQUID_S1)
+                    NewEffect(EFFID_SQUID_S1_DIE, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_BRUTE)
+                    NewEffect(EFFID_BRUTE_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_BIG_MOLE)
+                    NewEffect(EFFID_BIG_MOLE_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_BRUTE_SQUISHED)
+                    NewEffect(EFFID_BRUTE_SQUISHED_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_GRN_FISH_S3)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(115, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_GRN_FISH_S3_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == 236)
+                else if(NPC[A].Type == NPCID_FISH_S4)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(122, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_FISH_S4_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == 230)
+                else if(NPC[A].Type == NPCID_RED_FISH_S3)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(116, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_RED_FISH_S3_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == 232)
+                else if(NPC[A].Type == NPCID_GOGGLE_FISH)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(118, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_GOGGLE_FISH_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == 233)
+                else if(NPC[A].Type == NPCID_GRN_FISH_S1)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(119, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_GRN_FISH_S1_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == 234)
+                else if(NPC[A].Type == NPCID_BONE_FISH)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(B == 1)
                         NPC[A].Location.SpeedY = -2;
-                    NewEffect(120, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_BONE_FISH_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == 237 || NPC[A].Type == 263)
+                else if(NPC[A].Type == NPCID_ICE_BLOCK || NPC[A].Type == NPCID_ICE_CUBE)
                 {
-                    NewEffect(10, NPC[A].Location);
+                    NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                     for(C = 1; C <= 50; C++)
                     {
                         tempLocation.Height = EffectHeight[80];
@@ -364,55 +365,55 @@ void KillNPC(int A, int B)
                         tempLocation.SpeedY = 0;
                         tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width;
                         tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height;
-                        NewEffect(80, tempLocation);
+                        NewEffect(EFFID_SPARKLE, tempLocation);
                         Effect[numEffects].Location.SpeedX = dRand() * 2 - 1 - NPC[A].Location.SpeedX * 0.3;
                         Effect[numEffects].Location.SpeedY = dRand() * 2 - 1 + NPC[A].Location.SpeedY * 0.3;
                         Effect[numEffects].Frame = iRand(3);
                     }
                 }
                 else
-                    NewEffect(88, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_CARRY_FODDER_DIE, NPC[A].Location, NPC[A].Direction);
             }
         }
-        else if(NPC[A].Type == 203 || NPC[A].Type == 204 || NPC[A].Type == 205 || NPC[A].Type == 210)
+        else if(NPC[A].Type == NPCID_FLIER || NPC[A].Type == NPCID_ROCKET_FLIER || NPC[A].Type == NPCID_WALL_BUG || NPC[A].Type == NPC_HOMING_BALL)
         {
             PlaySound(SFX_SMKilled);
-            NewEffect(108, NPC[A].Location);
+            NewEffect(EFFID_BOSS_FRAGILE_EXPLODE, NPC[A].Location);
         }
-        else if(NPC[A].Type == 208)
+        else if(NPC[A].Type == NPCID_BOSS_CASE)
         {
             PlaySound(SFX_SMGlass);
             for(C = 1; C <= 100; C++)
-                NewEffect(111, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 16, NPC[A].Location.Y + dRand() * NPC[A].Location.Height - 16));
+                NewEffect(EFFID_BOSS_CASE_BREAK, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 16, NPC[A].Location.Y + dRand() * NPC[A].Location.Height - 16));
         }
-        else if(NPC[A].Type == 209)
+        else if(NPC[A].Type == NPCID_BOSS_FRAGILE)
         {
             PlaySound(SFX_SMCry);
             PlaySound(SFX_SMExplosion);
-            NewEffect(112, NPC[A].Location, NPC[A].Direction);
+            NewEffect(EFFID_BOSS_FRAGILE_DIE, NPC[A].Location, NPC[A].Direction);
         }
-        else if(NPC[A].Type == 38 || NPC[A].Type == 42 || NPC[A].Type == 43 || NPC[A].Type == 44 || NPC[A].Type == 206 || NPC[A].Type == 259)
+        else if(NPC[A].Type == NPCID_GHOST_S3 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_GHOST_S4 || NPC[A].Type == NPCID_BIG_GHOST || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_FIRE_DISK)
         {
             PlaySound(SFX_ShellHit); // Shell hit sound
             NPC[A].Location.SpeedY = -10;
-            if(NPC[A].Type == 38)
-                NewEffect(94, NPC[A].Location, NPC[A].Direction);
-            else if(NPC[A].Type == 42)
-                NewEffect(93, NPC[A].Location, NPC[A].Direction);
-            else if(NPC[A].Type == 43)
-                NewEffect(92, NPC[A].Location, NPC[A].Direction);
-            else if(NPC[A].Type == 206)
-                NewEffect(110, NPC[A].Location);
-            else if(NPC[A].Type == 259)
+            if(NPC[A].Type == NPCID_GHOST_S3)
+                NewEffect(EFFID_GHOST_S3_DIE, NPC[A].Location, NPC[A].Direction);
+            else if(NPC[A].Type == NPCID_GHOST_FAST)
+                NewEffect(EFFID_GHOST_FAST_DIE, NPC[A].Location, NPC[A].Direction);
+            else if(NPC[A].Type == NPCID_GHOST_S4)
+                NewEffect(EFFID_GHOST_S4_DIE, NPC[A].Location, NPC[A].Direction);
+            else if(NPC[A].Type == NPCID_WALL_SPARK)
+                NewEffect(EFFID_WALL_SPARK_DIE, NPC[A].Location);
+            else if(NPC[A].Type == NPCID_FIRE_DISK)
             {
-                NewEffect(136, NPC[A].Location);
+                NewEffect(EFFID_FIRE_DISK_DIE, NPC[A].Location);
                 Effect[numEffects].Frame = NPC[A].Frame;
                 Effect[numEffects].Life = 100;
             }
             else
-                NewEffect(91, NPC[A].Location, NPC[A].Direction);
+                NewEffect(EFFID_BIG_GHOST_DIE, NPC[A].Location, NPC[A].Direction);
         }
-        else if(NPC[A].Type == 168) // bully
+        else if(NPC[A].Type == NPCID_BULLY) // bully
         {
             NPC[A].Location.SpeedY = -8;
             if(B == 6)
@@ -422,21 +423,21 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Y += NPC[A].Location.Height - EffectHeight[10];
                 NPC[A].Location.Width = 32;
                 NPC[A].Location.Height = 32;
-                NewEffect(10, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit);
-                NewEffect(89, NPC[A].Location, NPC[A].Direction);
+                NewEffect(EFFID_BULLY_DIE, NPC[A].Location, NPC[A].Direction);
             }
 
         }
@@ -451,38 +452,38 @@ void KillNPC(int A, int B)
             if(NPC[A].Killed == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 32) // P Switch
+        else if(NPC[A].Type == NPCID_COIN_SWITCH) // P Switch
         {
             if(B == 1)
             {
                 NPC[A].Location.Y += 2;
-                NewEffect(81 , NPC[A].Location);
+                NewEffect(EFFID_COIN_SWITCH_PRESS, NPC[A].Location);
             }
             else if(B == 2)
             {
                 PlaySound(SFX_ShellHit);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 238) // P Switch Time
+        else if(NPC[A].Type == NPCID_TIME_SWITCH) // P Switch Time
         {
             if(B == 1)
             {
                 NPC[A].Location.Y += 2;
-                NewEffect(123 , NPC[A].Location);
+                NewEffect(EFFID_TIME_SWITCH_PRESS, NPC[A].Location);
             }
             else if(B == 2)
             {
                 PlaySound(SFX_ShellHit);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 239) // Red Switch
+        else if(NPC[A].Type == NPCID_TNT) // Red Switch
         {
             if(B == 1)
             {
@@ -492,38 +493,38 @@ void KillNPC(int A, int B)
             else if(B == 2)
             {
                 PlaySound(SFX_ShellHit);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             }
         }
-        else if((NPC[A].Type == 84 || NPC[A].Type == 181) && B == 6) // lava only
+        else if((NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4) && B == 6) // lava only
         {
             NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height - 32;
             NPC[A].Location.Height = 32;
             NPC[A].Location.Width = 32;
             PlaySound(SFX_Lava);
-            NewEffect(10 , NPC[A].Location);
+            NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             if(!NPC[A].NoLavaSplash)
-                NewEffect(13 , NPC[A].Location);
+                NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
         }
-        else if(NPC[A].Type == 37 || NPC[A].Type == 179 || NPC[A].Type == 180) // thwomp
+        else if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_STONE_S4) // thwomp
         {
             if(B == 3 || B == 4 || B == 2)
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
                 NPC[A].Location.SpeedY = -10;
-                if(NPC[A].Type == 37)
-                    NewEffect(90 , NPC[A].Location);
-                else if(NPC[A].Type == 179)
+                if(NPC[A].Type == NPCID_STONE_S3)
+                    NewEffect(EFFID_STONE_S3_DIE, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_SAW)
                 {
                     NPC[A].Location.Width = 64;
                     NPC[A].Location.Height = 64;
                     NPC[A].Location.X -= 8;
                     NPC[A].Location.Y -= 8;
-                    NewEffect(99 , NPC[A].Location);
+                    NewEffect(EFFID_SAW_DIE, NPC[A].Location);
                 }
-                else if(NPC[A].Type == 180)
-                    NewEffect(98 , NPC[A].Location);
+                else if(NPC[A].Type == NPCID_STONE_S4)
+                    NewEffect(EFFID_STONE_S4_DIE, NPC[A].Location);
             }
             else if(B == 6)
             {
@@ -532,11 +533,11 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Height = 32;
                 NPC[A].Location.Width = 32;
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
-            else if(NPC[A].Type == 179)
+            else if(NPC[A].Type == NPCID_SAW)
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
                 NPC[A].Location.SpeedY = -10;
@@ -544,113 +545,112 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Height = 64;
                 NPC[A].Location.X -= 8;
                 NPC[A].Location.Y -= 8;
-                NewEffect(99 , NPC[A].Location);
+                NewEffect(EFFID_SAW_DIE, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 136 || NPC[A].Type == 137)
+        else if(NPC[A].Type == NPCID_WALK_BOMB_S3 || NPC[A].Type == NPCID_LIT_BOMB_S3)
         {
             if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit);
                 NPC[A].Location.SpeedY = -11;
-                NewEffect(72, NPC[A].Location, NPC[A].Direction);
+                NewEffect(EFFID_WALK_BOMB_S3_DIE, NPC[A].Location, NPC[A].Direction);
             }
         }
-        else if(NPC[A].Type == 89) // SMB1 Goomba
+        else if(NPC[A].Type == NPCID_FODDER_S1) // SMB1 Goomba
         {
             if(B == 1)
-                NewEffect(52 , NPC[A].Location);
+                NewEffect(EFFID_FODDER_S1_SQUISH, NPC[A].Location);
             else if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                NewEffect(53 , NPC[A].Location);
+                NewEffect(EFFID_FODDER_S1_DIE, NPC[A].Location);
             }
         // Zelda NPCs
         }
-        else if(NPC[A].Type == 125 || NPCIsABot[NPC[A].Type] || NPC[A].Type == 255)
+        else if(NPC[A].Type == NPCID_KNIGHT || NPCIsABot[NPC[A].Type] || NPC[A].Type == NPCID_LOCK_DOOR)
         {
-            PlaySound(SFX_ZeldaKill);
-            NewEffect(63 , NPC[A].Location);
+            PlaySound(SFX_HeroKill);
+            NewEffect(EFFID_SMOKE_S5, NPC[A].Location);
         }
-        else if(NPC[A].Type == 133)
+        else if(NPC[A].Type == NPCID_SPIT_GUY_BALL)
         {
             NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX * 0.3;
-            NewEffect(68 , NPC[A].Location);
+            NewEffect(EFFID_SPIT_GUY_BALL_DIE, NPC[A].Location);
         }
-        else if(NPC[A].Type == 59 || NPC[A].Type == 61 || NPC[A].Type == 63 || NPC[A].Type == 65) // switch goombas
+        else if(NPC[A].Type == NPCID_YELSWITCH_FODDER || NPC[A].Type == NPCID_BLUSWITCH_FODDER || NPC[A].Type == NPCID_GRNSWITCH_FODDER || NPC[A].Type == NPCID_REDSWITCH_FODDER) // switch goombas
         {
             if(B == 1)
             {
-                NewEffect(NPC[A].Type - 22, NPC[A].Location);
+                NewEffect(NPC[A].Type - NPCID_YELSWITCH_FODDER + EFFID_YELSWITCH_FODDER_SQUISH, NPC[A].Location);
             }
             else if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                NewEffect(NPC[A].Type - 21, NPC[A].Location);
+                NewEffect(NPC[A].Type - NPCID_YELSWITCH_FODDER + EFFID_YELSWITCH_FODDER_DIE, NPC[A].Location);
             }
-
         }
-        else if(NPC[A].Type == 267 || NPC[A].Type == 268 || NPC[A].Type == 280 || NPC[A].Type == 281) // larry koopa
+        else if(NPC[A].Type == NPCID_MAGIC_BOSS || NPC[A].Type == NPCID_MAGIC_BOSS_SHELL || NPC[A].Type == NPCID_FIRE_BOSS || NPC[A].Type == NPCID_FIRE_BOSS_SHELL) // larry koopa
         {
             if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
-            else if(NPC[A].Type == 280 || NPC[A].Type == 281)
-                NewEffect(143 , NPC[A].Location);
+            else if(NPC[A].Type == NPCID_FIRE_BOSS || NPC[A].Type == NPCID_FIRE_BOSS_SHELL)
+                NewEffect(EFFID_FIRE_BOSS_DIE, NPC[A].Location);
             else
-                NewEffect(140 , NPC[A].Location);
+                NewEffect(EFFID_MAGIC_BOSS_DIE, NPC[A].Location);
 
         }
-        else if(NPC[A].Type == 201 || NPC[A].Type == 262) // wart, smb2 bosses
+        else if(NPC[A].Type == NPCID_SICK_BOSS || NPC[A].Type == NPCID_BOMBER_BOSS) // wart, smb2 bosses
         {
-            if(NPC[A].Type == 262 && NPC[A].Killed != 3 && NPC[A].Killed != 6 && NPC[A].Killed != 10)
-                PlaySound(SFX_BirdoBeat);
+            if(NPC[A].Type == NPCID_BOMBER_BOSS && NPC[A].Killed != 3 && NPC[A].Killed != 6 && NPC[A].Killed != 10)
+                PlaySound(SFX_SpitBossBeat);
 
             // If B <> 6 Then MoreScore NPCScore(.Type), .Location
             if(B == 6)
@@ -661,24 +661,24 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Y += 24;
                 NPC[A].Location.Width = 32;
                 NPC[A].Location.Height = 32;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else
             {
                 NPC[A].Location.SpeedY = -7;
-                if(NPC[A].Type == 262)
+                if(NPC[A].Type == NPCID_BOMBER_BOSS)
                 {
-                    NewEffect(138, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_BOMBER_BOSS_DIE, NPC[A].Location, NPC[A].Direction);
                     Effect[numEffects].Location.SpeedX = 0;
                     Effect[numEffects].Location.SpeedY = -8;
                 }
                 else
-                    NewEffect(106, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_SICK_BOSS_DIE, NPC[A].Location, NPC[A].Direction);
             }
         }
-        else if(NPC[A].Type == 200) // king koopa
+        else if(NPC[A].Type == NPCID_VILLAIN_S1) // king koopa
         {
             if(B == 6)
             {
@@ -688,19 +688,19 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Y += 24;
                 NPC[A].Location.Width = 32;
                 NPC[A].Location.Height = 32;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else
             {
                 // .Location.Width += 2
                 // .Location.X += -1
-                NewEffect(105, NPC[A].Location, NPC[A].Direction);
+                NewEffect(EFFID_VILLAIN_S1_DIE, NPC[A].Location, NPC[A].Direction);
             }
-            PlaySound(SFX_BowserKilled);
+            PlaySound(SFX_VillainKilled);
         }
-        else if(NPC[A].Type == 86) // bowser
+        else if(NPC[A].Type == NPCID_VILLAIN_S3) // bowser
         {
             if(B == 6)
             {
@@ -710,24 +710,24 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Y += 24;
                 NPC[A].Location.Width = 32;
                 NPC[A].Location.Height = 32;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else
             {
                 NPC[A].Location.Width += 2;
                 NPC[A].Location.X -= 1;
-                NewEffect(50, NPC[A].Location, NPC[A].Direction);
+                NewEffect(EFFID_VILLAIN_S3_DIE, NPC[A].Location, NPC[A].Direction);
             }
-            PlaySound(SFX_BowserKilled);
+            PlaySound(SFX_VillainKilled);
 
             if(NPC[A].Legacy)
             {
                 tempBool = false;
                 for(B = 1; B <= numNPCs; B++)
                 {
-                    if(B != A && NPC[B].Type == 86)
+                    if(B != A && NPC[B].Type == NPCID_VILLAIN_S3)
                     {
                         tempBool = true;
                         break;
@@ -742,28 +742,28 @@ void KillNPC(int A, int B)
                 }
             }
         }
-        else if(NPC[A].Type == 2 || NPC[A].Type == 3) // Red goomba
+        else if(NPC[A].Type == NPCID_RED_FODDER || NPC[A].Type == NPCID_RED_FLY_FODDER) // Red goomba
         {
             if(B == 1)
-                NewEffect(6 , NPC[A].Location);
+                NewEffect(EFFID_RED_FODDER_SQUISH, NPC[A].Location);
             else if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                NewEffect(7 , NPC[A].Location);
+                NewEffect(EFFID_RED_FODDER_DIE, NPC[A].Location);
             }
         }
         else if(NPCIsToad[NPC[A].Type]) // toad
@@ -774,24 +774,24 @@ void KillNPC(int A, int B)
                 {
                     NPC[A].Location.Y += (NPC[A].Location.Height - 32);
                     PlaySound(SFX_Lava);
-                    NewEffect(10 , NPC[A].Location);
+                    NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                     if(!NPC[A].NoLavaSplash)
-                        NewEffect(13 , NPC[A].Location);
+                        NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
                 }
                 else
                 {
                     PlaySound(SFX_ShellHit); // Shell hit sound
-                    NewEffect(48, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_POWER_S3_DIE, NPC[A].Location, NPC[A].Direction);
                 }
             }
         }
-        else if(NPC[A].Type == 96) // yoshi egg
+        else if(NPC[A].Type == NPCID_ITEM_POD) // yoshi egg
         {
             C = NPC[A].Special;
             CharStuff(A, true);
             if(NPC[A].Special == 287)
                 NPC[A].Special = RandomBonus();
-            NewEffect(56, NPC[A].Location, 1, (int)SDL_floor(NPC[A].Special), false, (vbint_t)NPC[A].Variant);
+            NewEffect(EFFID_ITEM_POD_OPEN, NPC[A].Location, 1, (int)SDL_floor(NPC[A].Special), false, (vbint_t)NPC[A].Variant);
             if(C == 98)
                 Effect[numEffects].Frame += 3;
             else if(C == 99)
@@ -807,10 +807,10 @@ void KillNPC(int A, int B)
             else if(C == 228)
                 Effect[numEffects].Frame += 15;
         }
-        else if(NPC[A].Type == 71) // giagnormous goomba
+        else if(NPC[A].Type == NPCID_BIG_FODDER) // giagnormous goomba
         {
             if(B == 1)
-                NewEffect(45 , NPC[A].Location);
+                NewEffect(EFFID_BIG_FODDER_SQUISH, NPC[A].Location);
             else if(B == 6)
             {
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
@@ -818,39 +818,39 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Height = 32;
                 NPC[A].Location.Width = 32;
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                NewEffect(46 , NPC[A].Location);
+                NewEffect(EFFID_BIG_FODDER_DIE, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 27) // Grey goomba
+        else if(NPC[A].Type == NPCID_UNDER_FODDER) // Grey goomba
         {
             if(B == 1)
-                NewEffect(23 , NPC[A].Location);
+                NewEffect(EFFID_UNDER_FODDER_SQUISH, NPC[A].Location);
             else if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
@@ -858,25 +858,25 @@ void KillNPC(int A, int B)
                 PlaySound(SFX_ShellHit); // Shell hit sound
                 if(B != 5)
                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                NewEffect(22 , NPC[A].Location);
+                NewEffect(EFFID_UNDER_FODDER_DIE, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 55) // nekkid koopa
+        else if(NPC[A].Type == NPCID_EXT_TURTLE) // nekkid koopa
         {
             if(B == 1)
-                NewEffect(35 , NPC[A].Location);
+                NewEffect(EFFID_EXT_TURTLE_SQUISH, NPC[A].Location);
             else if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
@@ -884,10 +884,10 @@ void KillNPC(int A, int B)
                 PlaySound(SFX_ShellHit); // Shell hit sound
                 if(B != 5)
                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                NewEffect(36, NPC[A].Location, NPC[A].Direction);
+                NewEffect(EFFID_EXT_TURTLE_DIE, NPC[A].Location, NPC[A].Direction);
             }
         }
-        else if(NPC[A].Type == 189) // Dry Bones
+        else if(NPC[A].Type == NPCID_SKELETON) // Dry Bones
         {
             NPC[A].Location.Width = 48;
             NPC[A].Location.X -= 8;
@@ -898,35 +898,35 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Height = 32;
                 NPC[A].Location.Width = 32;
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else
             {
                 PlaySound(SFX_ShellHit);
-                NewEffect(97, NPC[A].Location, NPC[A].Direction);
+                NewEffect(EFFID_SKELETON_DIE, NPC[A].Location, NPC[A].Direction);
             }
         }
-        else if(NPC[A].Type >= 117 && NPC[A].Type <= 120) // SMW Beach Koopas
+        else if(NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4) // SMW Beach Koopas
         {
             if(B == 1)
             {
-                NewEffect(62 , NPC[A].Location);
+                NewEffect(EFFID_HIT_TURTLE_S4_SQUISH, NPC[A].Location);
                 Effect[numEffects].Frame = NPC[A].Type - 117;
             }
             else if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
@@ -934,123 +934,123 @@ void KillNPC(int A, int B)
                 PlaySound(SFX_ShellHit);
                 if(B != 5)
                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
-                NewEffect(61, NPC[A].Location, NPC[A].Direction);
+                NewEffect(EFFID_HIT_TURTLE_S4_DIE, NPC[A].Location, NPC[A].Direction);
                 Effect[numEffects].Frame = (NPC[A].Type - 117) * 4;
                 if(NPC[A].Direction == 1)
                     Effect[numEffects].Frame += 2;
             }
         }
-        else if(NPC[A].Type == 4 || NPC[A].Type == 5 || NPC[A].Type == 76) // Green Koopa
+        else if(NPC[A].Type == NPCID_GRN_TURTLE_S3 || NPC[A].Type == NPCID_GRN_SHELL_S3 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S3) // Green Koopa
         {
              NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[8] / 2.0;
              NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[8] / 2.0;
             if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                NewEffect(8 , NPC[A].Location);
+                NewEffect(EFFID_GRN_SHELL_S3_DIE, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 207) // spike top
+        else if(NPC[A].Type == NPCID_WALL_TURTLE) // spike top
         {
             if(B == 6)
             {
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[8] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[8] / 2.0;
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                NewEffect(109, NPC[A].Location, static_cast<double>(NPC[A].Frame));
+                NewEffect(EFFID_WALL_TURTLE_DIE, NPC[A].Location, static_cast<double>(NPC[A].Frame));
             }
         }
-        else if(NPC[A].Type == 172 || NPC[A].Type == 173 || NPC[A].Type == 176) // smb1 Green Koopa
+        else if(NPC[A].Type == NPCID_GRN_SHELL_S1 || NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1) // smb1 Green Koopa
         {
              NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[8] / 2.0;
              NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[8] / 2.0;
             if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                NewEffect(95 , NPC[A].Location);
+                NewEffect(EFFID_GRN_SHELL_S1_DIE, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 174 || NPC[A].Type == 175 || NPC[A].Type == 177) // smb1 red Koopa
+        else if(NPC[A].Type == NPCID_RED_SHELL_S1 || NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1) // smb1 red Koopa
         {
              NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[8] / 2.0;
              NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[8] / 2.0;
             if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                NewEffect(96 , NPC[A].Location);
+                NewEffect(EFFID_RED_SHELL_S1_DIE, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 241)
+        else if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK)
         {
             Controls::RumbleAllPlayers(200, 1.0);
 
             if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else
                 NewEffect(125 , NPC[A].Location);
         }
-        else if(NPC[A].Type == 72 || NPC[A].Type == 73) // giant Green Koopa
+        else if(NPC[A].Type == NPCID_BIG_TURTLE || NPC[A].Type == NPCID_BIG_SHELL) // giant Green Koopa
         {
              NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[8] / 2.0;
              NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[8] / 2.0;
@@ -1061,31 +1061,31 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Height = 32;
                 NPC[A].Location.Width = 32;
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                NewEffect(47 , NPC[A].Location);
+                NewEffect(EFFID_BIG_SHELL_DIE, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 39) // Birdo
+        else if(NPC[A].Type == NPCID_SPIT_BOSS) // Birdo
         {
-            PlaySound(SFX_BirdoHit);
+            PlaySound(SFX_SpitBossHit);
             if(NPC[A].Legacy && !LevelEditor)
             {
                 for(C = 1; C <= numNPCs; C++)
                 {
-                    if(NPC[C].Type == 39 && C != A)
+                    if(NPC[C].Type == NPCID_SPIT_BOSS && C != A)
                     {
                         DontSpawnExit = true;
                         break;
@@ -1096,7 +1096,7 @@ void KillNPC(int A, int B)
                 {
                     numNPCs++;
                     NPC[numNPCs] = NPC_t();
-                    NPC[numNPCs].Type = 41;
+                    NPC[numNPCs].Type = NPCID_GOALORB_S2;
                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                     NPC[numNPCs].Location.X = NPC[A].Location.X;
@@ -1107,13 +1107,13 @@ void KillNPC(int A, int B)
                     NPC[numNPCs].Frame = 0;
                     syncLayers_NPC(numNPCs);
                     CheckSectionNPC(numNPCs);
-                    PlaySound(SFX_BirdoBeat);
+                    PlaySound(SFX_SpitBossBeat);
                 }
                 else
                 {
                     for(int C : NPCQueues::Active.no_change)
                     {
-                        if(NPC[C].Type == 39 && NPC[C].Active && C != A)
+                        if(NPC[C].Type == NPCID_SPIT_BOSS && NPC[C].Active && C != A)
                         {
                             DontResetMusic = true;
                             break;
@@ -1131,111 +1131,111 @@ void KillNPC(int A, int B)
 
             NPC[A].Location.Y += -NPC[A].Location.Height / 2.0 + 32;
             NPC[A].Location.X += -NPC[A].Location.Width / 2.0 + 20;
-            NewEffect(29, NPC[A].Location, NPC[A].Direction);
+            NewEffect(EFFID_SPIT_BOSS_DIE, NPC[A].Location, NPC[A].Direction);
         }
-        else if(NPC[A].Type == 40) // Egg
+        else if(NPC[A].Type == NPCID_SPIT_BOSS_BALL) // Egg
         {
             if(NPC[A].Special == 1)
                 NPC[A].Location.SpeedY = -5.1;
-            NewEffect(28 , NPC[A].Location);
+            NewEffect(EFFID_SPIT_BOSS_BALL_DIE, NPC[A].Location);
         }
-        else if(NPC[A].Type == 6 || NPC[A].Type == 7 || NPC[A].Type == 161) // Red Koopa
+        else if(NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_RED_SHELL_S3 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S3) // Red Koopa
         {
              NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[9] / 2.0;
              NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[9] / 2.0;
             if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                  NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                  NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                NewEffect(9 , NPC[A].Location);
+                NewEffect(EFFID_RED_SHELL_S3_DIE, NPC[A].Location);
             }
 
         }
-        else if((NPC[A].Type >= 109 && NPC[A].Type <= 116) || (NPC[A].Type >= 121 && NPC[A].Type <= 124)) // SMW Koopas
+        else if((NPC[A].Type >= NPCID_GRN_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_SHELL_S4) || (NPC[A].Type >= NPCID_GRN_FLY_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_FLY_TURTLE_S4)) // SMW Koopas
         {
             if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit);
-                NewEffect(60 , NPC[A].Location);
-                if(NPC[A].Type <= 112)
+                NewEffect(EFFID_SHELL_S4_DIE, NPC[A].Location);
+                if(NPC[A].Type <= NPCID_YEL_TURTLE_S4)
                     Effect[numEffects].Frame = NPC[A].Type - 109;
-                else if(NPC[A].Type <= 116)
+                else if(NPC[A].Type <= NPCID_YEL_SHELL_S4)
                     Effect[numEffects].Frame = NPC[A].Type - 113;
                 else
                     Effect[numEffects].Frame = NPC[A].Type - 121;
             }
         }
-        else if(NPC[A].Type == 23 || NPC[A].Type == 24 || NPC[A].Type == 36 || NPC[A].Type == 53 || NPC[A].Type == 54 || NPC[A].Type == 285 || NPC[A].Type == 286) // Hard thing / Spiney
+        else if(NPC[A].Type == NPCID_GLASS_TURTLE || NPC[A].Type == NPCID_GLASS_SHELL || NPC[A].Type == NPCID_SPIKY_S3 || NPC[A].Type == NPCID_CRAB || NPC[A].Type == NPCID_FLY || NPC[A].Type == NPCID_SPIKY_S4 || NPC[A].Type == NPCID_SPIKY_BALL_S4) // Hard thing / Spiney
         {
             NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[9] / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[9] / 2.0;
             if(B == 6)
             {
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 PlaySound(SFX_ShellHit); // Shell hit sound
-                if(NPC[A].Type == 36)
-                    NewEffect(27, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 285 || NPC[A].Type == 286)
-                    NewEffect(146, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 53)
-                    NewEffect(33 , NPC[A].Location);
-                else if(NPC[A].Type == 54)
-                    NewEffect(34 , NPC[A].Location);
+                if(NPC[A].Type == NPCID_SPIKY_S3)
+                    NewEffect(EFFID_SPIKY_S3_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_SPIKY_S4 || NPC[A].Type == NPCID_SPIKY_BALL_S4)
+                    NewEffect(EFFID_SPIKY_S4_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_CRAB)
+                    NewEffect(EFFID_CRAB_DIE, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_FLY)
+                    NewEffect(EFFID_FLY_DIE, NPC[A].Location);
                 else
-                    NewEffect(19 , NPC[A].Location);
+                    NewEffect(EFFID_GLASS_SHELL_DIE, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 30) // Hammer
+        else if(NPC[A].Type == NPC_HEAVY_THROWN) // Hammer
         {
             if(B == 3)
             {
                 PlaySound(SFX_ShellHit);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             }
         }
-        else if(NPC[A].Type == 256 || NPC[A].Type == 257)
+        else if(NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
         {
             NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
             tempLocation = NPC[A].Location;
-            if(NPC[A].Type == 257)
+            if(NPC[A].Type == NPCID_LONG_PLANT_DOWN)
             {
                 int npcH = NPC[A].Location.Height;
                 for(C = 0; C <= npcH; C += 32)
@@ -1243,7 +1243,7 @@ void KillNPC(int A, int B)
                     if(NPC[A].Location.Height - C > 16)
                     {
                         tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 32 - C;
-                        NewEffect(10, tempLocation);
+                        NewEffect(EFFID_SMOKE_S3, tempLocation);
                     }
                 }
             }
@@ -1255,23 +1255,23 @@ void KillNPC(int A, int B)
                     if(NPC[A].Location.Height - C > 16)
                     {
                         tempLocation.Y = NPC[A].Location.Y + C;
-                        NewEffect(10, tempLocation);
+                        NewEffect(EFFID_SMOKE_S3, tempLocation);
                     }
                 }
             }
             PlaySound(SFX_ShellHit); // Shell hit sound
         }
-        else if(NPC[A].Type == 8 || NPC[A].Type == 275 || NPC[A].Type == 93 || NPC[A].Type == 12 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == 74 || NPC[A].Type == 37 || NPC[A].Type == 38 || NPC[A].Type == 42 || NPC[A].Type == 43 || NPC[A].Type == 44 || NPC[A].Type == 245 || NPC[A].Type == 270) // Piranha Plant / Fireball
+        else if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_QUAD_SPITTER || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_LAVABUBBLE || NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_GHOST_S3 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_GHOST_S4 || NPC[A].Type == NPCID_BIG_GHOST || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_JUMP_PLANT) // Piranha Plant / Fireball
         {
             NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
             NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-            NewEffect(10 , NPC[A].Location);
+            NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             if(B == 8)
                 PlaySound(SFX_Smash);
             else
                 PlaySound(SFX_ShellHit); // Shell hit sound
         }
-        else if(NPC[A].Type == 13 || NPC[A].Type == 108 || NPC[A].Type == 265) // Small Fireball / Yoshi Fireball
+        else if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_ICEBALL) // Small Fireball / Yoshi Fireball
         {
             if(B == 6)
             {
@@ -1279,31 +1279,31 @@ void KillNPC(int A, int B)
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[9] / 2.0;
                 NPC[A].Location.Width = 32;
                 PlaySound(SFX_Lava);
-                NewEffect(10, NPC[A].Location, 1, 0, NPC[A].Shadow);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location, 1, 0, NPC[A].Shadow);
                 NPC[A].Location.X += 2;
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else
             {
                 for(C = 1; C <= 10; C++)
                 {
-                    if(NPC[A].Type == 265)
-                        NewEffect(139, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
+                    if(NPC[A].Type == NPCID_PLR_ICEBALL)
+                        NewEffect(EFFID_PLR_ICEBALL_TRAIL, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
                     else
-                        NewEffect(77, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
+                        NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, static_cast<float>(NPC[A].Special), 0, NPC[A].Shadow);
                     Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX * 0.1;
                     Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
                 }
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                if((NPC[A].Type == 13 && NPC[A].Special == 5) || NPC[A].Type == 108)
-                    NewEffect(10, NPC[A].Location, 1, 0, NPC[A].Shadow);
+                if((NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].Special == 5) || NPC[A].Type == NPCID_PET_FIRE)
+                    NewEffect(EFFID_SMOKE_S3, NPC[A].Location, 1, 0, NPC[A].Shadow);
                 else
-                    NewEffect(131, NPC[A].Location, 1, 0, NPC[A].Shadow);
+                    NewEffect(EFFID_SMOKE_S4, NPC[A].Location, 1, 0, NPC[A].Shadow);
             }
         }
-        else if(NPC[A].Type == 15) // Big Koopa
+        else if(NPC[A].Type == NPCID_MINIBOSS) // Big Koopa
         {
             NPC[A].Location.Y += -(NPCHeight[NPC[A].Type] - NPC[A].Location.Height);
             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
@@ -1311,7 +1311,7 @@ void KillNPC(int A, int B)
             {
                 for(B = 1; B <= numNPCs; B++)
                 {
-                    if(NPC[B].Type == 15 && NPC[B].Killed == 0 && B != A)
+                    if(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Killed == 0 && B != A)
                     {
                         DontSpawnExit = true;
                         break;
@@ -1322,14 +1322,14 @@ void KillNPC(int A, int B)
                     DontSpawnExit = true;
 
                 if(!DontSpawnExit)
-                    NewEffect(14, NPC[A].Location, 1, 16);
+                    NewEffect(EFFID_MINIBOSS_DIE, NPC[A].Location, 1, 16);
                 else
                 {
-                    NewEffect(14 , NPC[A].Location);
+                    NewEffect(EFFID_MINIBOSS_DIE, NPC[A].Location);
 
                     for(int B : NPCQueues::Active.no_change)
                     {
-                        if(NPC[B].Type == 15 && NPC[B].Active && B != A && NPC[B].Killed == 0)
+                        if(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Active && B != A && NPC[B].Killed == 0)
                         {
                             DontResetMusic = true;
                             break;
@@ -1345,9 +1345,9 @@ void KillNPC(int A, int B)
                 }
             }
             else
-                NewEffect(14 , NPC[A].Location);
+                NewEffect(EFFID_MINIBOSS_DIE, NPC[A].Location);
         }
-        else if(NPC[A].Type == 17 || NPC[A].Type == 18) // Bullet Bills
+        else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET) // Bullet Bills
         {
             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX / 2;
             if(B == 1)
@@ -1364,62 +1364,62 @@ void KillNPC(int A, int B)
             {
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
                 if(B == 3 || B == 2)
                     PlaySound(SFX_ShellHit);
-                if(NPC[A].Type == 17)
-                    NewEffect(15, NPC[A].Location, NPC[A].Direction);
+                if(NPC[A].Type == NPCID_BULLET)
+                    NewEffect(EFFID_BULLET_DIE, NPC[A].Location, NPC[A].Direction);
                 else
-                    NewEffect(16, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_BIG_BULLET_DIE, NPC[A].Location, NPC[A].Direction);
             }
         }
-        else if(NPC[A].Type == 247 || NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 29 || NPC[A].Type == 47 || NPC[A].Type == 284 || NPC[A].Type == 48 || NPC[A].Type == 77 || NPC[A].Type == 271 || (NPC[A].Type >= 129 && NPC[A].Type <= 132) || NPC[A].Type == 158 || NPC[A].Type == 261 || NPC[A].Type == 272) // Misc Things
+        else if(NPC[A].Type == NPCID_STACKER || NPC[A].Type == NPCID_BLU_GUY || NPC[A].Type == NPCID_RED_GUY || NPC[A].Type == NPCID_JUMPER_S3 || NPC[A].Type == NPCID_RED_FISH_S1 || NPC[A].Type == NPC_HEAVY_THROWER || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_JUMPER_S4 || NPC[A].Type == NPCID_BAT || (NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY) || NPC[A].Type == NPCID_SATURN || NPC[A].Type == NPCID_WALK_PLANT || NPC[A].Type == NPCID_VINE_BUG) // Misc Things
         {
             if(B == 6)
             {
                 NPC[A].Location.Y += (NPC[A].Location.Height - 32);
                 PlaySound(SFX_Lava);
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
             else if(B == 8)
             {
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
             else
             {
-                if(NPC[A].Type >= 129 && NPC[A].Type <= 132)
-                    NewEffect(64 + NPC[A].Type - 129, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 19)
-                    NewEffect(17, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 20)
-                    NewEffect(18, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 261)
-                    NewEffect(137, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 25)
-                    NewEffect(20, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 28)
+                if(NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY)
+                    NewEffect(NPC[A].Type - NPCID_BIRD + EFFID_BIRD_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_BLU_GUY)
+                    NewEffect(EFFID_RED_GUY_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_RED_GUY)
+                    NewEffect(EFFID_BLU_GUY_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_WALK_PLANT)
+                    NewEffect(EFFID_WALK_PLANT_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_JUMPER_S3)
+                    NewEffect(EFFID_JUMPER_S3_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_RED_FISH_S1)
                 {
                     NPC[A].Location.SpeedY = -11;
                     if(NPC[A].Killed == 1)
                         NPC[A].Location.SpeedY = 0;
-                    NewEffect(24, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_RED_FISH_S1_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == 158)
-                    NewEffect(83, NPC[A].Location, NPC[A].Direction);
-                else if(NPC[A].Type == 247)
-                    NewEffect(128 , NPC[A].Location);
-                else if(NPC[A].Type == 272)
-                    NewEffect(142 , NPC[A].Location);
-                else if(NPC[A].Type == 77)
+                else if(NPC[A].Type == NPCID_SATURN)
+                    NewEffect(EFFID_SATURN_DIE, NPC[A].Location, NPC[A].Direction);
+                else if(NPC[A].Type == NPCID_STACKER)
+                    NewEffect(EFFID_STACKER_DIE, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_VINE_BUG)
+                    NewEffect(EFFID_VINE_BUG_DIE, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_JUMPER_S4)
                 {
                     if(B == 1)
                     {
@@ -1433,9 +1433,9 @@ void KillNPC(int A, int B)
                         PlaySound(SFX_ShellHit);
                     }
 
-                    NewEffect(49, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_JUMPER_S4_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == 271)
+                else if(NPC[A].Type == NPCID_BAT)
                 {
                     if(B == 1)
                     {
@@ -1448,9 +1448,9 @@ void KillNPC(int A, int B)
                         PlaySound(SFX_ShellHit);
                     }
 
-                    NewEffect(141, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_BAT_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == 29)
+                else if(NPC[A].Type == NPC_HEAVY_THROWER)
                 {
                     if(B == 1)
                     {
@@ -1464,11 +1464,11 @@ void KillNPC(int A, int B)
                         PlaySound(SFX_ShellHit);
                     }
 
-                    NewEffect(25, NPC[A].Location, NPC[A].Direction);
+                    NewEffect(EFFID_HEAVY_THROWER_DIE, NPC[A].Location, NPC[A].Direction);
                 }
-                else if(NPC[A].Type == 48)
-                    NewEffect(31 , NPC[A].Location);
-                else if(NPC[A].Type == 47 || NPC[A].Type == 284)
+                else if(NPC[A].Type == NPCID_SPIKY_BALL_S3)
+                    NewEffect(EFFID_SPIKY_BALL_S3_DIE, NPC[A].Location);
+                else if(NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER)
                 {
                     if(NPC[A].Location.SpeedX > 4)
                         NPC[A].Location.SpeedX = 4;
@@ -1487,31 +1487,31 @@ void KillNPC(int A, int B)
                         PlaySound(SFX_ShellHit);
                     }
 
-                    if(NPC[A].Type == 284)
-                        NewEffect(145 , NPC[A].Location);
+                    if(NPC[A].Type == NPCID_ITEM_THROWER)
+                        NewEffect(EFFID_ITEM_THROWER_DIE, NPC[A].Location);
                     else
                     {
                         NPC[A].Location.Y -= 14;
-                        NewEffect(32 , NPC[A].Location);
+                        NewEffect(EFFID_SPIKY_THROWER_DIE, NPC[A].Location);
                     }
                 }
 
-                if(NPC[A].Type != 29 && NPC[A].Type != 47 && NPC[A].Type != 77)
+                if(NPC[A].Type != NPC_HEAVY_THROWER && NPC[A].Type != NPCID_SPIKY_THROWER && NPC[A].Type != NPCID_JUMPER_S4)
                     PlaySound(SFX_ShellHit);
             }
         }
-        else if(NPC[A].Type == 45) // ice block
+        else if(NPC[A].Type == NPCID_SLIDE_BLOCK) // ice block
         {
             if(B == 6)
             {
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
                 PlaySound(SFX_Lava);
             }
             else
             {
-                NewEffect(30 , NPC[A].Location);
+                NewEffect(EFFID_SLIDE_BLOCK_SMASH, NPC[A].Location);
                 PlaySound(SFX_BlockSmashed);
             }
         }
@@ -1523,25 +1523,25 @@ void KillNPC(int A, int B)
                     PlaySound(SFX_ShellHit);
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             }
             else if(B == 6)
             {
                 PlaySound(SFX_Lava);
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 if(!NPC[A].NoLavaSplash)
-                    NewEffect(13 , NPC[A].Location);
+                    NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             }
         }
         else if(LevelEditor || MagicHand)
         {
-            if(!(NPC[A].Type == 32 && B == 1))
+            if(!(NPC[A].Type == NPCID_COIN_SWITCH && B == 1))
             {
                 NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10 , NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                 PlaySound(SFX_Smash);
             }
         }
@@ -1574,7 +1574,7 @@ void KillNPC(int A, int B)
             if(Player[B].StandingOnNPC == A)
             {
                 Player[B].StandingOnNPC = 0;
-                if(NPC[A].Type != 56)
+                if(NPC[A].Type != NPCID_VEHICLE)
                     Player[B].Location.SpeedY = NPC[A].Location.SpeedY;
             }
             else if(Player[B].StandingOnNPC == numNPCs)
@@ -1603,17 +1603,17 @@ void KillNPC(int A, int B)
         if(NPC[A].Effect == 5 || NPC[A].Effect == 6)
             Player[NPC[A].Effect2].YoshiNPC = A;
 
-        if(NPC[A].Type == 49 && NPC[A].Special == 1)
+        if(NPC[A].Type == NPCID_TOOTHYPIPE && NPC[A].Special == 1)
         {
             for(C = 1; C <= numNPCs; C++)
             {
-                if(NPC[C].Type == 50 && NPC[C].Special2 == numNPCs + 1)
+                if(NPC[C].Type == NPCID_TOOTHY && NPC[C].Special2 == numNPCs + 1)
                     NPC[C].Special2 = A;
             }
         }
-        else if(NPC[A].Type == 49 && NPC[A].Special2 > 0)
+        else if(NPC[A].Type == NPCID_TOOTHYPIPE && NPC[A].Special2 > 0)
             NPC[(int)NPC[A].Special2].Special2 = A;
-        else if(NPC[A].Type == 50 && NPC[A].Special2 > 0)
+        else if(NPC[A].Type == NPCID_TOOTHY && NPC[A].Special2 > 0)
             NPC[(int)NPC[A].Special2].Special2 = A;
     }
     else

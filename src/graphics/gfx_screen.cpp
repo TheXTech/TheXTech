@@ -56,7 +56,7 @@ void SetScreenType()
 }
 
 // Sets up the split lines
-void SetupScreens()
+void SetupScreens(bool reset)
 {
     SetScreenType();
 
@@ -108,7 +108,9 @@ void SetupScreens()
         vScreen[1].Width = ScreenW;
         vScreen[1].Left = 0;
         vScreen[1].Top = 0;
-        vScreen[2].Visible = false;
+
+        if(reset)
+            vScreen[2].Visible = false;
         break;
     case 6: // VScreen Coop
         vScreen[1].Height = ScreenH;
@@ -323,6 +325,89 @@ void DynamicScreen()
         if(Player[A].Mount == 2)
             Player[A].Location.Height = 128;
     }
+}
+
+// NEW: moves qScreen towards vScreen, now including the screen size
+bool Update_qScreen(int Z, int camRate, int resizeRate)
+{
+    if(Z == 2 && !g_compatibility.modern_section_change)
+        return false;
+
+    bool continue_qScreen = true;
+
+    // take the slower option of 2px per second camera (vanilla)
+    //   or 2px per second resize, then scale the speed of the faster one to match
+    double camRateX = camRate;
+    double camRateY = camRate;
+
+    double resizeRateX = resizeRate;
+    double resizeRateY = resizeRate;
+
+    double camFramesX_l = std::abs(vScreen[Z].X - qScreenLoc[Z].X)/camRateX;
+    double camFramesY_t = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y)/camRateY;
+
+    double camFramesX_r = std::abs(vScreen[Z].X - vScreen[Z].Width - qScreenLoc[Z].X + qScreenLoc[Z].Width)/camRateX;
+    double camFramesY_b = std::abs(vScreen[Z].Y - vScreen[Z].Height - qScreenLoc[Z].Y + qScreenLoc[Z].Height)/camRateY;
+
+    double camFramesX = SDL_min(camFramesX_l, camFramesX_r);
+    double camFramesY = SDL_min(camFramesY_t, camFramesY_b);
+
+    double resizeFramesX = 0;
+    double resizeFramesY = 0;
+
+    double qFramesX = (camFramesX > resizeFramesX ? camFramesX : resizeFramesX);
+    double qFramesY = (camFramesY > resizeFramesY ? camFramesY : resizeFramesY);
+
+    // don't continue after this frame if it would arrive next frame
+    // (this is the intent of the <5 condition in the vanilla game)
+    if(qFramesX < 2.5 && qFramesY < 2.5)
+        continue_qScreen = false;
+
+    // but, the original condition occurred *after* adding/subtracting 2, so actually
+    // the original game would not continue if it would arrive the frame after next, too
+    if(!g_compatibility.modern_section_change && qFramesX < 3.5 && qFramesY < 3.5)
+        continue_qScreen = false;
+
+    if(qFramesX < 1)
+        qFramesX = 1;
+    if(qFramesY < 1)
+        qFramesY = 1;
+
+    camRateX = std::abs(vScreen[Z].X - qScreenLoc[Z].X)/qFramesX;
+    camRateY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y)/qFramesY;
+
+    if(vScreen[Z].X < qScreenLoc[Z].X - camRateX)
+        qScreenLoc[Z].X -= camRateX;
+    else if(vScreen[Z].X > qScreenLoc[Z].X + camRateX)
+        qScreenLoc[Z].X += camRateX;
+    else
+        qScreenLoc[Z].X = vScreen[Z].X;
+
+    if(vScreen[Z].Y < qScreenLoc[Z].Y - camRateY)
+        qScreenLoc[Z].Y -= camRateY;
+    else if(vScreen[Z].Y > qScreenLoc[Z].Y + camRateY)
+        qScreenLoc[Z].Y += camRateY;
+    else
+        qScreenLoc[Z].Y = vScreen[Z].Y;
+
+    if(vScreen[Z].Width < qScreenLoc[Z].Width - resizeRateX * 2)
+        qScreenLoc[Z].Width -= resizeRateX * 2;
+    else if(vScreen[Z].Width > qScreenLoc[Z].Width + resizeRateX * 2)
+        qScreenLoc[Z].Width += resizeRateX * 2;
+    else
+        qScreenLoc[Z].Width = vScreen[Z].Width;
+
+    if(vScreen[Z].Height < qScreenLoc[Z].Height - resizeRateY * 2)
+        qScreenLoc[Z].Height -= resizeRateY * 2;
+    else if(vScreen[Z].Height > qScreenLoc[Z].Height + resizeRateY * 2)
+        qScreenLoc[Z].Height += resizeRateY * 2;
+    else
+        qScreenLoc[Z].Height = vScreen[Z].Height;
+
+    vScreen[Z].X = qScreenLoc[Z].X;
+    vScreen[Z].Y = qScreenLoc[Z].Y;
+
+    return continue_qScreen;
 }
 
 void SetRes()

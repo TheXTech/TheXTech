@@ -51,13 +51,13 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
     // put NPC types 60, 62, 64, 66, and 78-83 first. (why?)
     for(A = 1; A <= numNPCs; A++)
     {
-        if(NPC[A].Type == 60 || NPC[A].Type == 62 || NPC[A].Type == 64 || NPC[A].Type == 66 || (NPC[A].Type >= 78 && NPC[A].Type <= 83))
+        if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M))
         {
             // swap it with the first NPC that isn't one of the special ones
             // this started as B = 1 but C + 1 will work now.
             for(B = C + 1; B < A; B++)
             {
-                if (!(NPC[B].Type == 60 || NPC[B].Type == 62 || NPC[B].Type == 64 || NPC[B].Type == 66 || (NPC[B].Type >= 78 && NPC[B].Type <= 83)))
+                if (!(NPC[B].Type == NPCID_YEL_PLATFORM || NPC[B].Type == NPCID_BLU_PLATFORM || NPC[B].Type == NPCID_GRN_PLATFORM || NPC[B].Type == NPCID_RED_PLATFORM || (NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M)))
                 {
                     std::swap(NPC[A], NPC[B]);
                     break;
@@ -210,26 +210,26 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         npc.y = n.Location.Y;
         npc.direct = n.Direction;
 
-        if(n.Type == NPCID_BURIEDPLANT || n.Type == NPCID_YOSHIEGG ||
-           n.Type == NPCID_BUBBLE || n.Type == NPCID_LAKITU_SMW)
+        if(n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD ||
+           n.Type == NPCID_ITEM_BUBBLE || n.Type == NPCID_ITEM_THROWER)
         {
             npc.contents = long(n.Special);
             npc.special_data = n.Variant;
         }
 
         // Warp Section pointer
-        if(n.Type == NPCID_POTION || n.Type == NPCID_POTIONDOOR ||
-          (n.Type == NPCID_BURIEDPLANT && n.Special == NPCID_POTION))
+        if(n.Type == NPCID_DOOR_MAKER || n.Type == NPCID_MAGIC_DOOR ||
+          (n.Type == NPCID_ITEM_BURIED && n.Special == NPCID_DOOR_MAKER))
         {
             npc.special_data = n.Special2;
         }
         // AI / firebar length
-        else if(n.Type == NPCID_FIREBAR || NPCIsAParaTroopa[n.Type] || NPCIsCheep[n.Type])
+        else if(n.Type == NPCID_FIRE_CHAIN || NPCIsAParaTroopa[n.Type] || NPCIsCheep[n.Type])
         {
             npc.special_data = n.Special;
         }
         // Star ID if >0
-        else if(n.Type == NPCID_STAR_SMB3 || n.Type == NPCID_STAR_SMW)
+        else if(n.Type == NPCID_STAR_EXIT || n.Type == NPCID_STAR_COLLECT)
         {
             npc.special_data = int(n.Variant);
         }

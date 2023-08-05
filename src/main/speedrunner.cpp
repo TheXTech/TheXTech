@@ -27,6 +27,8 @@
 #include "compat.h"
 #include "../controls.h"
 
+#include "main/screen_quickreconnect.h"
+
 #include "gameplay_timer.h"
 
 
@@ -214,15 +216,18 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
         r = 0.f;
         g = 0.f;
         b = 0.f;
+
         if(status_info.power_level <= .5f)
         {
             r = (.5f - status_info.power_level) / .5f;
         }
+
         if(status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
         {
             g = 1.f;
             g -= r;
         }
+
         if(status_info.power_status == Controls::StatusInfo::POWER_CHARGED)
         {
             b = 0.8f;
@@ -277,6 +282,10 @@ void speedRun_renderControls(int player, int screenZ)
         return; // Don't draw things at Menu and Outro
 
     if(player < 1 || player > 2)
+        return;
+
+    const bool player_missing = (player - 1 >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player - 1]);
+    if(QuickReconnectScreen::g_active && player_missing)
         return;
 
     // Controller

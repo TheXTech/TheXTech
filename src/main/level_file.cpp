@@ -526,8 +526,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.Type = 1;
         }
 
-        if(npc.Type == NPCID_BURIEDPLANT || npc.Type == NPCID_YOSHIEGG ||
-           npc.Type == NPCID_BUBBLE || npc.Type == NPCID_LAKITU_SMW)
+        if(npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
+           npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER)
         {
             npc.Special = n.contents;
             npc.DefaultSpecial = int(npc.Special);
@@ -535,8 +535,8 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             variantHandled = true;
         }
 
-        if(npc.Type == NPCID_POTION || npc.Type == NPCID_POTIONDOOR ||
-          (npc.Type == NPCID_BURIEDPLANT && n.contents == NPCID_POTION))
+        if(npc.Type == NPCID_DOOR_MAKER || npc.Type == NPCID_MAGIC_DOOR ||
+          (npc.Type == NPCID_ITEM_BURIED && n.contents == NPCID_DOOR_MAKER))
         {
             npc.Special2 = n.special_data;
             npc.DefaultSpecial2 = int(npc.Special2);
@@ -554,13 +554,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(npc.Type == NPCID_FIREBAR)
+        if(npc.Type == NPCID_FIRE_CHAIN)
         {
             npc.Special = n.special_data;
             npc.DefaultSpecial = int(npc.Special);
         }
 
-        if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW)
+        if(npc.Type == NPCID_STAR_EXIT || npc.Type == NPCID_STAR_COLLECT)
         {
             npc.Variant = n.special_data;
             variantHandled = true;
@@ -604,7 +604,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special7 = n.special_data; // SMBX 1.2.1 and newer behavior, customizable behavior
         }
 
-        if(npc.Type == NPCID_THWOMP_SMB3)
+        if(npc.Type == NPCID_STONE_S3)
         {
             if(compatModern && isSmbx64 && fVersion < 9)
                 npc.Special7 = 1.0; // Make twomps to fall always
@@ -612,7 +612,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.Special7 = n.special_data;
         }
 
-        if(npc.Type == NPCID_BOWSER_SMB3)
+        if(npc.Type == NPCID_VILLAIN_S3)
         {
             if(compatModern && isSmbx64 && fVersion < 30)
                 npc.Special7 = 1.0; // Keep original behavior of Bowser as in SMBX 1.0
@@ -622,11 +622,11 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
         switch(npc.Type)
         {
-        case NPCID_YELBLOCKS:
-        case NPCID_BLUBLOCKS:
-        case NPCID_GRNBLOCKS:
-        case NPCID_REDBLOCKS:
-        case NPCID_PLATFORM_SMB3:
+        case NPCID_YEL_PLATFORM:
+        case NPCID_BLU_PLATFORM:
+        case NPCID_GRN_PLATFORM:
+        case NPCID_RED_PLATFORM:
+        case NPCID_PLATFORM_S3:
         case NPCID_SAW:
             if(compatModern && isSmbx64 && fVersion < 30)
                 npc.Special7 = 1.0; // Workaround for yellow platform at The Invasion 1 on the "Clown Car Parking" level
@@ -687,7 +687,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
                 npc.DefaultSpecial = int(npc.Special);
             }
         }
-        else if(npc.Type == NPCID_STAR_SMB3 || npc.Type == NPCID_STAR_SMW) // Is a star
+        else if(npc.Type == NPCID_STAR_EXIT || npc.Type == NPCID_STAR_COLLECT) // Is a star
         {
             bool starFound = false;
             for(const auto& star : Star)
@@ -702,13 +702,13 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             {
                 npc.Special = 1;
                 npc.DefaultSpecial = 1;
-                if(npc.Type == NPCID_STAR_SMW)
+                if(npc.Type == NPCID_STAR_COLLECT)
                     npc.Killed = 9;
             }
         }
-        else if((npc.Type == NPCID_BURIEDPLANT || npc.Type == NPCID_YOSHIEGG ||
-                  npc.Type == NPCID_BUBBLE || npc.Type == NPCID_LAKITU_SMW) &&
-                (n.contents == NPCID_STAR_SMB3 || n.contents == NPCID_STAR_SMW)) // Is a container that has a star inside
+        else if((npc.Type == NPCID_ITEM_BURIED || npc.Type == NPCID_ITEM_POD ||
+                  npc.Type == NPCID_ITEM_BUBBLE || npc.Type == NPCID_ITEM_THROWER) &&
+                (n.contents == NPCID_STAR_EXIT || n.contents == NPCID_STAR_COLLECT)) // Is a container that has a star inside
         {
             bool starFound = false;
             for(const auto& star : Star)
@@ -720,7 +720,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 
             if(starFound)
             {
-                if(n.contents == NPCID_STAR_SMW)
+                if(n.contents == NPCID_STAR_COLLECT)
                     npc.Killed = 9;
             }
         }
@@ -950,7 +950,7 @@ void ClearLevel()
     const Background_t BlankBackground = Background_t();
     const Location_t BlankLocation = Location_t();
     const Effect_t blankEffect = Effect_t();
-    NPCScore[NPCID_DRAGONCOIN] = 6;
+    NPCScore[NPCID_MEDAL] = 6;
     RestoreWorldStrings();
     LevelName.clear();
     ResetCompat();

@@ -88,12 +88,15 @@ public:
     }
 
     TreeResult_Sentinel(const TreeResult_Sentinel& other) = delete;
+    const TreeResult_Sentinel& operator=(const TreeResult_Sentinel& other) = delete;
 
     TreeResult_Sentinel(TreeResult_Sentinel&& other)
     {
         i_vec = other.i_vec;
         other.i_vec = nullptr;
     }
+
+    const TreeResult_Sentinel& operator=(const TreeResult_Sentinel&& other) = delete;
 
     it begin() const
     {

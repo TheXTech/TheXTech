@@ -14,7 +14,7 @@ graphicsdir = os.path.join(datadir, 'graphics')
 outdir = sys.argv[2]
 
 for dirpath, _, files in os.walk(datadir, topdown=True):
-    outpath = outdir+dirpath[len(datadir):]
+    outpath = os.path.join(outdir, dirpath[len(datadir):])
     os.makedirs(outpath, exist_ok=True)
 
     if dirpath.endswith('fonts/'):

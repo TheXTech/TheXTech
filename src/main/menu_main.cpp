@@ -524,7 +524,7 @@ bool mainMenuUpdate()
 
     for(int i = 0; i < maxLocalPlayers; i++)
     {
-        Controls_t &c = Player[i+1].Controls;
+        Controls_t &c = Player[i + 1].Controls;
 
         menuDoPress |= c.Start || c.Jump;
         menuBackPress |= c.Run;
@@ -1024,7 +1024,7 @@ bool mainMenuUpdate()
 
                     For(A, 1, numNPCs)
                     {
-                        if(NPC[A].Type == 13)
+                        if(NPC[A].Type == NPCID_PLR_FIREBALL)
                             NPC[A].Special = MenuCursor + 1;
                     }
                 }
@@ -1394,7 +1394,7 @@ bool mainMenuUpdate()
                     }
                     else
                     {
-                        PlaySoundMenu(SFX_Raccoon);
+                        PlaySoundMenu(SFX_Transform);
                         menuCopySaveDst = slot;
                         CopySave(selWorld, menuCopySaveSrc, menuCopySaveDst);
                         FindSaves();
@@ -1435,7 +1435,7 @@ bool mainMenuUpdate()
                     DeleteSave(selWorld, (MenuCursor + 1));
                     FindSaves();
                     MenuCursor = 4;
-                    PlaySoundMenu(SFX_Blaarg);
+                    PlaySoundMenu(SFX_LavaMonster);
                     MenuCursorCanMove = false;
                 }
             }

@@ -29,7 +29,7 @@
 #include "SAJewers-Snowboardin.h"
 #include "../lunanpc.h"
 
-#define NPC_SHELL 195
+#define NPCID_SHELL 195
 
 namespace SAJSnowbordin
 {
@@ -44,7 +44,7 @@ void SnowbordinInitCode()
 
 void SnowbordinCode()
 {
-    NPC_t *shell_npc = FindNPC(NPC_SHELL);
+    NPC_t *shell_npc = FindNPC(NPCID_SHELL);
 
     if(!shell_npc)
         return;
