@@ -1021,7 +1021,7 @@ bool mainMenuUpdate()
 
                     For(A, 1, numNPCs)
                     {
-                        if(NPC[A].Type == 13)
+                        if(NPC[A].Type == NPCID_PLR_FIREBALL)
                             NPC[A].Special = MenuCursor + 1;
                     }
                 }

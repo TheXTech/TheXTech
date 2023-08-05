@@ -509,7 +509,7 @@ void PlayerHurt(const int A)
             p.Hearts = 1;
     }
 
-    if(NPC[p.HoldingNPC].Type == 13)
+    if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL)
         p.HoldingNPC = 0;
 
     if(LevelMacro == LEVELMACRO_OFF)
@@ -680,7 +680,7 @@ void PlayerHurt(const int A)
                         NPC[numNPCs].Frame += SpecialFrame[2];
                         NPC[numNPCs].Active = true;
                         NPC[numNPCs].TimeLeft = 100;
-                        NPC[numNPCs].Type = 56;
+                        NPC[numNPCs].Type = NPCID_VEHICLE;
                         NPC[numNPCs].Location.Height = 128;
                         NPC[numNPCs].Location.Width = 128;
                         NPC[numNPCs].Location.Y = static_cast<int>(floor(static_cast<double>(p.Location.Y)));
@@ -709,15 +709,15 @@ void PlayerHurt(const int A)
                                     treeNPCSplitTempBlock(B);
 
                                 NPC[B].standingOnPlayerY = 0;
-                                if(NPC[B].Type == 22)
+                                if(NPC[B].Type == NPCID_CANNONITEM)
                                     NPC[B].Special = 0;
-                                if(NPC[B].Type == 50)
+                                if(NPC[B].Type == NPCID_TOOTHY)
                                 {
                                     NPC[B].Killed = 9;
                                     NPCQueues::Killed.push_back(B);
                                     NPC[B].Special = 0;
                                 }
-                                else if(NPC[B].Type == 49)
+                                else if(NPC[B].Type == NPCID_TOOTHYPIPE)
                                     NPC[B].Special = 0;
                             }
                         }
@@ -808,7 +808,7 @@ void PlayerDead(int A)
         NPC[numNPCs].Frame += SpecialFrame[2];
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 100;
-        NPC[numNPCs].Type = 56;
+        NPC[numNPCs].Type = NPCID_VEHICLE;
         NPC[numNPCs].Location.Height = 128;
         NPC[numNPCs].Location.Width = 128;
         NPC[numNPCs].Location.Y = static_cast<int>(floor(static_cast<double>(p.Location.Y)));
@@ -2389,12 +2389,12 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
         if(NPC[A].Active && NPC[A].Effect == 0 && !(NPCIsAnExit[NPC[A].Type] || (NPCIsACoin[NPC[A].Type] && !Stab)) &&
             NPC[A].CantHurtPlayer != plr && !(p.StandingOnNPC == A && p.ShellSurf))
         {
-            if(NPC[A].Type != 13 && NPC[A].Type != NPCID_PLR_ICEBALL && !(NPC[A].Type == 17 && NPC[A].Projectile) &&
+            if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && !(NPC[A].Type == NPCID_BULLET && NPC[A].Projectile) &&
                 NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_GOALTAPE && NPC[A].Type != NPCID_CHECKPOINT)
             {
                 stabLoc = NPC[A].Location;
-                if(NPCHeightGFX[NPC[A].Type] > NPC[A].Location.Height && NPC[A].Type != 8 && NPC[A].Type != 15 &&
-                    NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != 9 && NPC[A].Type != 51 && NPC[A].Type != 52 &&
+                if(NPCHeightGFX[NPC[A].Type] > NPC[A].Location.Height && NPC[A].Type != NPCID_PLANT_S3 && NPC[A].Type != NPCID_MINIBOSS &&
+                    NPC[A].Type != NPCID_WALL_BUG && NPC[A].Type != NPCID_POWER_S3 && NPC[A].Type != NPCID_BOTTOM_PLANT && NPC[A].Type != NPCID_SIDE_PLANT &&
                     NPC[A].Type != NPCID_BIG_PLANT && NPC[A].Type != NPCID_PLANT_S1 && NPC[A].Type != NPCID_FIRE_PLANT)
                 {
                     stabLoc.Y += stabLoc.Height;
@@ -2413,12 +2413,12 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                         B = NPC[A].Damage;
                         C = NPC[A].Type;
 
-                        if(StabDir == 2 && ((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK))
+                        if(StabDir == 2 && ((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK))
                         {
                         }
                         else
                         {
-                            if(NPC[A].Type == 45 && StabDir != 0)
+                            if(NPC[A].Type == NPCID_SLIDE_BLOCK && StabDir != 0)
                             {
                                 NPC[A].Special = 1;
                                 NPC[A].Projectile = true;
@@ -2681,7 +2681,7 @@ void YoshiSpit(const int A)
             NPC[p.YoshiNPC].Special = 0;
 
         if((NPCIsAShell[NPC[p.YoshiNPC].Type] || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL) &&
-           NPC[p.YoshiNPC].Type != 24 && p.YoshiRed)
+           NPC[p.YoshiNPC].Type != NPCID_GLASS_SHELL && p.YoshiRed)
         {
             NPC[p.YoshiNPC].Killed = 9;
             NPCQueues::Killed.push_back(p.YoshiNPC);
@@ -2747,7 +2747,7 @@ void YoshiSpit(const int A)
 
 
 
-            if(NPC[p.YoshiNPC].Type == 45)
+            if(NPC[p.YoshiNPC].Type == NPCID_SLIDE_BLOCK)
                 NPC[p.YoshiNPC].Special = 1;
 
             PlaySound(SFX_SpitBossSpit);
@@ -2760,7 +2760,7 @@ void YoshiSpit(const int A)
                     // NPCHit .YoshiNPC, 1, A
                     NPC[p.YoshiNPC].Location.SpeedX = Physics.NPCShellSpeed * p.Direction;
                 }
-                else if(NPC[p.YoshiNPC].Type == 45)
+                else if(NPC[p.YoshiNPC].Type == NPCID_SLIDE_BLOCK)
                     NPC[p.YoshiNPC].Location.SpeedX = Physics.NPCShellSpeed * p.Direction;
                 else
                 {
@@ -2897,7 +2897,7 @@ void PlayerDismount(const int A)
         NPC[numNPCs].TimeLeft = 100;
 
         if(Player[A].MountType == 1)
-            NPC[numNPCs].Type = 35;
+            NPC[numNPCs].Type = NPCID_GRN_BOOT;
         else if(Player[A].MountType == 2)
             NPC[numNPCs].Type = NPCID_RED_BOOT;
         else if(Player[A].MountType == 3)
@@ -2937,7 +2937,7 @@ void PlayerDismount(const int A)
         NPC[numNPCs].Frame = NPC[numNPCs].Frame + SpecialFrame[2];
         NPC[numNPCs].Active = true;
         NPC[numNPCs].TimeLeft = 100;
-        NPC[numNPCs].Type = 56;
+        NPC[numNPCs].Type = NPCID_VEHICLE;
         NPC[numNPCs].Location.Height = 128;
         NPC[numNPCs].Location.Width = 128;
         NPC[numNPCs].Location.Y = static_cast<int>(floor(static_cast<double>(Player[A].Location.Y)));
@@ -2980,15 +2980,15 @@ void PlayerDismount(const int A)
                 treeNPCUpdate(B);
 
                 NPC[B].standingOnPlayerY = 0;
-                if(NPC[B].Type == 22)
+                if(NPC[B].Type == NPCID_CANNONITEM)
                     NPC[B].Special = 0;
-                if(NPC[B].Type == 50)
+                if(NPC[B].Type == NPCID_TOOTHY)
                 {
                     NPC[B].Killed = 9;
                     NPC[B].Special = 0;
                     NPCQueues::Killed.push_back(B);
                 }
-                else if(NPC[B].Type == 49)
+                else if(NPC[B].Type == NPCID_TOOTHYPIPE)
                     NPC[B].Special = 0;
             }
         }
@@ -3287,7 +3287,7 @@ void YoshiEatCode(const int A)
         {
             if(p.YoshiNPC > 0)
             {
-                if(NPC[p.YoshiNPC].Type == 7 || NPC[p.YoshiNPC].Type == 6)
+                if(NPC[p.YoshiNPC].Type == NPCID_RED_SHELL_S3 || NPC[p.YoshiNPC].Type == NPCID_RED_TURTLE_S3)
                     p.YoshiRed = true;
                 if(NPC[p.YoshiNPC].Type == NPCID_RED_TURTLE_S4 || NPC[p.YoshiNPC].Type == NPCID_RED_SHELL_S4 || NPC[p.YoshiNPC].Type == NPCID_RED_SLIME)
                     p.YoshiRed = true;
@@ -3340,7 +3340,7 @@ void YoshiEatCode(const int A)
 
         if(p.MountSpecial == 0)
         {
-            if(NPC[p.YoshiNPC].Type == 31) // key check
+            if(NPC[p.YoshiNPC].Type == NPCID_KEY) // key check
             {
                 for(int B : treeBackgroundQuery(p.Location, SORTMODE_ID))
                 {
@@ -3366,7 +3366,7 @@ void YoshiEatCode(const int A)
                     }
                 }
             }
-            else if(NPC[p.YoshiNPC].Type == 45)
+            else if(NPC[p.YoshiNPC].Type == NPCID_SLIDE_BLOCK)
                 NPC[p.YoshiNPC].Special = 1;
 
             if(p.FireBallCD > 0)
@@ -3501,19 +3501,19 @@ void YoshiEatCode(const int A)
         {
             p.YoshiTFrameCount = 1;
 
-            if(NPC[p.YoshiNPC].Type == 4 || NPC[p.YoshiNPC].Type == NPCID_GRN_FLY_TURTLE_S3)
-                NPC[p.YoshiNPC].Type = 5;
-            else if(NPC[p.YoshiNPC].Type == 6 || NPC[p.YoshiNPC].Type == NPCID_RED_FLY_TURTLE_S3)
-                NPC[p.YoshiNPC].Type = 7;
-            else if(NPC[p.YoshiNPC].Type == 23)
-                NPC[p.YoshiNPC].Type = 24;
+            if(NPC[p.YoshiNPC].Type == NPCID_GRN_TURTLE_S3 || NPC[p.YoshiNPC].Type == NPCID_GRN_FLY_TURTLE_S3)
+                NPC[p.YoshiNPC].Type = NPCID_GRN_SHELL_S3;
+            else if(NPC[p.YoshiNPC].Type == NPCID_RED_TURTLE_S3 || NPC[p.YoshiNPC].Type == NPCID_RED_FLY_TURTLE_S3)
+                NPC[p.YoshiNPC].Type = NPCID_RED_SHELL_S3;
+            else if(NPC[p.YoshiNPC].Type == NPCID_GLASS_TURTLE)
+                NPC[p.YoshiNPC].Type = NPCID_GLASS_SHELL;
             else if(NPC[p.YoshiNPC].Type == NPCID_BIG_TURTLE)
                 NPC[p.YoshiNPC].Type = NPCID_BIG_SHELL;
             else if(NPC[p.YoshiNPC].Type >= NPCID_GRN_TURTLE_S4 && NPC[p.YoshiNPC].Type <= NPCID_YEL_TURTLE_S4)
-                NPC[p.YoshiNPC].Type += 4;
+                NPC[p.YoshiNPC].Type += NPCID_GRN_TURTLE_S3;
             else if(NPC[p.YoshiNPC].Type >= NPCID_GRN_FLY_TURTLE_S4 && NPC[p.YoshiNPC].Type <= NPCID_YEL_FLY_TURTLE_S4)
             {
-                NPC[p.YoshiNPC].Type -= 8;
+                NPC[p.YoshiNPC].Type -= NPCID_PLANT_S3;
                 NPC[p.YoshiNPC].Special = 0;
             }
             else if(NPC[p.YoshiNPC].Type == NPCID_GRN_TURTLE_S1 || NPC[p.YoshiNPC].Type == NPCID_GRN_FLY_TURTLE_S1)
@@ -3528,7 +3528,7 @@ void YoshiEatCode(const int A)
             }
 
             NPC[p.YoshiNPC].Location.Height = NPCHeight[NPC[p.YoshiNPC].Type];
-            if((NPCIsGrabbable[NPC[p.YoshiNPC].Type] || NPCIsAShell[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == 40 || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3) && (NPC[p.YoshiNPC].Type != NPC_HIT_CARRY_FODDER))
+            if((NPCIsGrabbable[NPC[p.YoshiNPC].Type] || NPCIsAShell[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_SPIT_BOSS_BALL || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3) && (NPC[p.YoshiNPC].Type != NPC_HIT_CARRY_FODDER))
             {
                 if(NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2)
                     NPC[p.YoshiNPC].Special = 450;
@@ -3550,7 +3550,7 @@ void YoshiEatCode(const int A)
                     NPCQueues::update(p.YoshiNPC);
                 }
 
-                if(NPC[p.YoshiNPC].Type == 49)
+                if(NPC[p.YoshiNPC].Type == NPCID_TOOTHYPIPE)
                 {
                     NPC[p.YoshiNPC].Special = 0;
                     NPC[p.YoshiNPC].Special2 = 0;
@@ -3808,7 +3808,7 @@ void ClownCar()
             numNPCs++;
             NPC[numNPCs] = NPC_t();
             NPC[numNPCs].playerTemp = true;
-            NPC[numNPCs].Type = 56;
+            NPC[numNPCs].Type = NPCID_VEHICLE;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 100;
             NPC[numNPCs].Location = Player[A].Location;
@@ -3840,7 +3840,7 @@ void ClownCar()
 
             for(int numNPCsMax8 = numNPCs, B = 1; B <= numNPCsMax8; B++)
             {
-                if(NPC[B].standingOnPlayer == A && NPC[B].Type != 50)
+                if(NPC[B].standingOnPlayer == A && NPC[B].Type != NPCID_TOOTHY)
                 {
                     if(Player[A].Effect == 0)
                         NPC[B].Location.X += Player[A].Location.SpeedX + double(Player[A].mountBump);
@@ -3854,7 +3854,7 @@ void ClownCar()
 
                     if(Player[A].Controls.Run)
                     {
-                        if(NPC[B].Type == 49)
+                        if(NPC[B].Type == NPCID_TOOTHYPIPE)
                         {
                             if(NPC[B].Special == 0.0)
                             {
@@ -3865,7 +3865,7 @@ void ClownCar()
                                 NPC[numNPCs].Active = true;
                                 NPC[numNPCs].Section = Player[A].Section;
                                 NPC[numNPCs].TimeLeft = 100;
-                                NPC[numNPCs].Type = 50;
+                                NPC[numNPCs].Type = NPCID_TOOTHY;
                                 NPC[numNPCs].Location.Height = 32;
                                 NPC[numNPCs].Location.Width = 48;
                                 NPC[numNPCs].Special = A;
@@ -3878,7 +3878,7 @@ void ClownCar()
 
                             for(int numNPCsMax9 = numNPCs, C = 1; C <= numNPCsMax9; C++)
                             {
-                                if(NPC[C].Type == 50 && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
+                                if(NPC[C].Type == NPCID_TOOTHY && Maths::iRound(NPC[C].Special) == A && Maths::iRound(NPC[C].Special2) == B)
                                 {
                                     NPC[C].standingOnPlayer = A;
                                     NPC[C].Projectile = true;
@@ -4269,7 +4269,7 @@ void PowerUps(const int A)
                         NPC[numNPCs] = NPC_t();
                         if(ShadowMode)
                             NPC[numNPCs].Shadow = true;
-                        NPC[numNPCs].Type = 13;
+                        NPC[numNPCs].Type = NPCID_PLR_FIREBALL;
                         if(p.State == 7)
                             NPC[numNPCs].Type = NPCID_PLR_ICEBALL;
                         NPC[numNPCs].Projectile = true;
@@ -4484,7 +4484,7 @@ void PowerUps(const int A)
     if(p.FireBallCD2 < 0)
         p.FireBallCD2 = 0;
 
-    if(!(p.Character == 3 && NPC[p.HoldingNPC].Type == 13))
+    if(!(p.Character == 3 && NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL))
     {
         p.FireBallCD -= 1;
         if(FlameThrower)
@@ -4561,7 +4561,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
 
         if(warp.Locked)
         {
-            if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == 31)
+            if(plr.HoldingNPC > 0 && NPC[plr.HoldingNPC].Type == NPCID_KEY)
             {
                 NPC[plr.HoldingNPC].Killed = 9;
                 NPCQueues::Killed.push_back(plr.HoldingNPC);
@@ -4584,7 +4584,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                     }
                 }
             }
-            else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == 31)
+            else if(plr.Mount == 3 && plr.YoshiNPC > 0 && NPC[plr.YoshiNPC].Type == NPCID_KEY)
             {
                 NPC[plr.YoshiNPC].Killed = 9;
                 NPCQueues::Killed.push_back(plr.YoshiNPC);
@@ -4654,7 +4654,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         {
             if(plr.HoldingNPC > 0)
             {
-                if(NPC[plr.HoldingNPC].Type == 29)
+                if(NPC[plr.HoldingNPC].Type == NPC_HEAVY_THROWER)
                 {
                     NPCHit(plr.HoldingNPC, 3, plr.HoldingNPC);
                 }
@@ -5028,7 +5028,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.StandingOnNPC].Type = NPCID_ITEM_POD;
                         }
 
-                        if(!(NPC[p.StandingOnNPC].Type == 21 || NPC[p.StandingOnNPC].Type == 22 || NPC[p.StandingOnNPC].Type == 26 || NPC[p.StandingOnNPC].Type == 31 || NPC[p.StandingOnNPC].Type == 32 || NPC[p.StandingOnNPC].Type == 35 || NPC[p.StandingOnNPC].Type == NPCID_RED_BOOT || NPC[p.StandingOnNPC].Type == NPCID_BLU_BOOT || NPC[p.StandingOnNPC].Type == 49 || NPCIsAnExit[NPC[p.StandingOnNPC].Type]))
+                        if(!(NPC[p.StandingOnNPC].Type == NPCID_CANNONENEMY || NPC[p.StandingOnNPC].Type == NPCID_CANNONITEM || NPC[p.StandingOnNPC].Type == NPCID_SPRING || NPC[p.StandingOnNPC].Type == NPCID_KEY || NPC[p.StandingOnNPC].Type == NPCID_COIN_SWITCH || NPC[p.StandingOnNPC].Type == NPCID_GRN_BOOT || NPC[p.StandingOnNPC].Type == NPCID_RED_BOOT || NPC[p.StandingOnNPC].Type == NPCID_BLU_BOOT || NPC[p.StandingOnNPC].Type == NPCID_TOOTHYPIPE || NPCIsAnExit[NPC[p.StandingOnNPC].Type]))
                         {
                             if(!BattleMode)
                                 NPC[p.StandingOnNPC].DefaultType = 0;
@@ -5206,7 +5206,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         NPC[p.HoldingNPC].Location.Y = p.Location.Y - NPC[p.HoldingNPC].Location.Height + 6;
                     else
                     {
-                        if(NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL)
+                        if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL)
                         {
                             NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0 + dRand() * 4 - 2;
                             NPC[p.HoldingNPC].Location.Y = p.Location.Y - NPC[p.HoldingNPC].Location.Height - 4 + dRand() * 4 - 2;
@@ -5224,7 +5224,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width - Physics.PlayerGrabSpotX[p.Character][p.State] - NPC[p.HoldingNPC].Location.Width;
                 NPC[p.HoldingNPC].Location.Y = p.Location.Y + Physics.PlayerGrabSpotY[p.Character][p.State] + 32 - NPC[p.HoldingNPC].Location.Height;
             }
-            if(NPC[p.HoldingNPC].Type == 49 && !FreezeNPCs)
+            if(NPC[p.HoldingNPC].Type == NPCID_TOOTHYPIPE && !FreezeNPCs)
             {
                 if(NPC[p.HoldingNPC].Special == 0.0)
                 {
@@ -5235,7 +5235,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[numNPCs].Active = true;
                     NPC[numNPCs].Section = p.Section;
                     NPC[numNPCs].TimeLeft = 100;
-                    NPC[numNPCs].Type = 50;
+                    NPC[numNPCs].Type = NPCID_TOOTHY;
                     NPC[numNPCs].Location.Height = 32;
                     NPC[numNPCs].Location.Width = 48;
                     NPC[numNPCs].Special = A;
@@ -5245,7 +5245,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 }
                 for(B = 1; B <= numNPCs; B++)
                 {
-                    if(NPC[B].Type == 50 && NPC[B].Special == A)
+                    if(NPC[B].Type == NPCID_TOOTHY && NPC[B].Special == A)
                     {
                         NPC[B].CantHurt = 10;
                         NPC[B].CantHurtPlayer = A;
@@ -5266,15 +5266,15 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             NPC[p.HoldingNPC].Location.SpeedX = 0;
             NPC[p.HoldingNPC].Location.SpeedY = 0;
             NPC[p.HoldingNPC].WallDeath = 5;
-            if(NPC[p.HoldingNPC].Type == 29)
+            if(NPC[p.HoldingNPC].Type == NPC_HEAVY_THROWER)
             {
                 NPCHit(p.HoldingNPC, 3, p.HoldingNPC);
             }
             if(NPCIsACoin[NPC[p.HoldingNPC].Type] && !p.Controls.Down) // Smoke effect for coins
                 NewEffect(EFFID_SMOKE_S3, NPC[p.HoldingNPC].Location);
-            if(p.Controls.Up && !NPCIsACoin[NPC[p.HoldingNPC].Type] && NPC[p.HoldingNPC].Type != 17) // Throw the npc up
+            if(p.Controls.Up && !NPCIsACoin[NPC[p.HoldingNPC].Type] && NPC[p.HoldingNPC].Type != NPCID_BULLET) // Throw the npc up
             {
-                if(NPCIsAShell[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == 45 || NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
+                if(NPCIsAShell[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == NPCID_SLIDE_BLOCK || NPC[p.HoldingNPC].Type == NPCID_ICE_CUBE)
                 {
                     if(p.Controls.Left || p.Controls.Right) // Up and forward
                     {
@@ -5320,13 +5320,13 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                             NPC[p.HoldingNPC].Location.SpeedY = -9;
                     }
                 }
-                if(NPCIsVeggie[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == 19 || NPC[p.HoldingNPC].Type == 20 || NPC[p.HoldingNPC].Type == 25 || NPC[p.HoldingNPC].Type == NPCID_BIRD || NPC[p.HoldingNPC].Type == NPCID_RED_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BLU_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_GRY_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BOMB || NPC[p.HoldingNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_A || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_B || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_C || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_D || NPC[p.HoldingNPC].Type == 40 || NPC[p.HoldingNPC].Type == NPCID_TIMER_S2 || NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_DOOR_MAKER || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
+                if(NPCIsVeggie[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == NPCID_BLU_GUY || NPC[p.HoldingNPC].Type == NPCID_RED_GUY || NPC[p.HoldingNPC].Type == NPCID_JUMPER_S3 || NPC[p.HoldingNPC].Type == NPCID_BIRD || NPC[p.HoldingNPC].Type == NPCID_RED_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BLU_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_GRY_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BOMB || NPC[p.HoldingNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_A || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_B || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_C || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_D || NPC[p.HoldingNPC].Type == NPCID_SPIT_BOSS_BALL || NPC[p.HoldingNPC].Type == NPCID_TIMER_S2 || NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_DOOR_MAKER || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
                     PlaySound(SFX_Throw);
                 else
                     PlaySound(SFX_ShellHit);
                 NPC[p.HoldingNPC].Projectile = true;
             }
-            else if(p.Controls.Down && NPC[p.HoldingNPC].Type != 17) // Drop
+            else if(p.Controls.Down && NPC[p.HoldingNPC].Type != NPCID_BULLET) // Drop
             {
                 tempBool = false;
                 if((p.Direction == 1 && p.Location.SpeedX > 3) || (p.Direction == -1 && p.Location.SpeedX < -3))
@@ -5363,7 +5363,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     if(p.StandingOnNPC != 0)
                         NPC[p.HoldingNPC].Location.Y += NPC[p.StandingOnNPC].Location.SpeedY;
                 }
-                if(NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
+                if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
                 {
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
                     if(p.State == 1)
@@ -5376,14 +5376,14 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 }
             }
             else if(!NPCIsAShell[NPC[p.HoldingNPC].Type] &&
-                    NPC[p.HoldingNPC].Type != 45 &&
+                    NPC[p.HoldingNPC].Type != NPCID_SLIDE_BLOCK &&
                     NPC[p.HoldingNPC].Type != NPCID_ICE_CUBE &&
                     !NPCIsACoin[NPC[p.HoldingNPC].Type]) // if not a shell or a coin the kick it up and forward
             {
             // peach
                 if(p.Character == 3)
                 {
-                    if(NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
+                    if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
                     {
                         NPC[p.HoldingNPC].Location.SpeedX = 5 * p.Direction + p.Location.SpeedX * 0.3;
                         NPC[p.HoldingNPC].Location.SpeedY = 3;
@@ -5397,7 +5397,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 }
                 else if(p.Character == 4)
                 {
-                    if(NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
+                    if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || (p.Location.SpeedY != 0 && p.StandingOnNPC == 0 && p.Slope == 0))
                     {
                         NPC[p.HoldingNPC].Location.SpeedX = 6 * p.Direction + p.Location.SpeedX * 0.4;
                         NPC[p.HoldingNPC].Location.SpeedY = 3.5;
@@ -5415,9 +5415,9 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].Location.SpeedY = -6;
                 }
                 NPC[p.HoldingNPC].Projectile = true;
-                if(NPCIsVeggie[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == 19 || NPC[p.HoldingNPC].Type == 20 || NPC[p.HoldingNPC].Type == 25 || NPC[p.HoldingNPC].Type == NPCID_BIRD || NPC[p.HoldingNPC].Type == NPCID_RED_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BLU_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_GRY_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BOMB || NPC[p.HoldingNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_A || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_B || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_C || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_D || NPC[p.HoldingNPC].Type == 40 || NPC[p.HoldingNPC].Type == NPCID_TIMER_S2 || NPC[p.HoldingNPC].Type == 13 || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_DOOR_MAKER || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
+                if(NPCIsVeggie[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == NPCID_BLU_GUY || NPC[p.HoldingNPC].Type == NPCID_RED_GUY || NPC[p.HoldingNPC].Type == NPCID_JUMPER_S3 || NPC[p.HoldingNPC].Type == NPCID_BIRD || NPC[p.HoldingNPC].Type == NPCID_RED_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BLU_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_GRY_SPIT_GUY || NPC[p.HoldingNPC].Type == NPCID_BOMB || NPC[p.HoldingNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_A || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_B || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_C || NPC[p.HoldingNPC].Type == NPCID_CARRY_BLOCK_D || NPC[p.HoldingNPC].Type == NPCID_SPIT_BOSS_BALL || NPC[p.HoldingNPC].Type == NPCID_TIMER_S2 || NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL || NPC[p.HoldingNPC].Type == NPCID_PLR_ICEBALL || NPC[p.HoldingNPC].Type == NPCID_DOOR_MAKER || NPC[p.HoldingNPC].Type == NPCID_CHAR3_HEAVY)
                     PlaySound(SFX_Throw);
-                else if(NPC[p.HoldingNPC].Type == 17)
+                else if(NPC[p.HoldingNPC].Type == NPCID_BULLET)
                     PlaySound(SFX_Bullet);
                 else
                     PlaySound(SFX_ShellHit);
@@ -5451,7 +5451,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 if(p.StandingOnNPC != 0)
                     NPC[p.HoldingNPC].Location.SpeedX += NPC[p.StandingOnNPC].Location.SpeedX;
             }
-            if(NPC[p.HoldingNPC].Type == 13 && NPC[p.HoldingNPC].Special == 4) // give toad fireballs a little spunk
+            if(NPC[p.HoldingNPC].Type == NPCID_PLR_FIREBALL && NPC[p.HoldingNPC].Special == 4) // give toad fireballs a little spunk
             {
                 if(NPC[p.HoldingNPC].Location.SpeedY < 0)
                     NPC[p.HoldingNPC].Location.SpeedY = NPC[p.HoldingNPC].Location.SpeedY * 1.1;

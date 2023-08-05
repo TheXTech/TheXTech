@@ -374,7 +374,7 @@ void UpdateNPCs()
                         {
                             for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_NONE))
                             {
-                                if(B != A && NPC[B].Active && NPC[B].Type != 57)
+                                if(B != A && NPC[B].Active && NPC[B].Type != NPCID_CONVEYOR)
                                 {
                                     if(CheckCollision(NPC[A].Location, NPC[B].Location))
                                     {
@@ -444,10 +444,10 @@ void UpdateNPCs()
                                 NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
                                 PlaySound(SFX_Bullet);
                                 NPC[numNPCs].Projectile = true;
-                                if(NPC[numNPCs].Type == 17) // Normal Bullet Bills
+                                if(NPC[numNPCs].Type == NPCID_BULLET) // Normal Bullet Bills
                                     NPC[numNPCs].Projectile = false;
 
-                                if(NPC[numNPCs].Type == 45)
+                                if(NPC[numNPCs].Type == NPCID_SLIDE_BLOCK)
                                     NPC[numNPCs].Special = 1;
                                 if(NPC[A].GeneratorDirection == 1)
                                 {
@@ -504,7 +504,7 @@ void UpdateNPCs()
         }
 
         // Force-active NPCs
-        if(NPC[A].Type == 57 && !NPC[A].Hidden)
+        if(NPC[A].Type == NPCID_CONVEYOR && !NPC[A].Hidden)
         {
             CheckSectionNPC(A);
             bool sameSection = false;
@@ -526,7 +526,7 @@ void UpdateNPCs()
             else if(!NPC[A].Active)
                 NPCQueues::Active.erase(A);
         }
-        else if(NPC[A].Type == 60 || NPC[A].Type == 62 || NPC[A].Type == 64 || NPC[A].Type == 66)
+        else if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
         {
             NPC[A].Active = true;
             NPC[A].TimeLeft = 100;
@@ -545,7 +545,7 @@ void UpdateNPCs()
             int numAct = 0;
 
             if(NPC[A].Active && NPC[A].TimeLeft > 1 &&
-               NPC[A].Type != 57 && NPC[A].Type != 46 &&
+               NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_FALL_BLOCK_RED &&
                NPC[A].Type != NPCID_FALL_BLOCK_BROWN && !NPCIsACoin[NPC[A].Type]) // And .Type <> 47
             {
                 if(NPC[A].TriggerActivate != EVENT_NONE)
@@ -669,11 +669,11 @@ void UpdateNPCs()
         // this code became the function CheckNPCWidth above
         if(fEqual(NPC[A].Location.Width, 32.0))
         {
-            if(NPC[A].Type != 57 && NPC[A].Type != NPCID_STATUE_S3)
+            if(NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_STATUE_S3)
             {
                 // If .Type = 58 Or .Type = 21 Then
-                if(!(NPCIsAnExit[NPC[A].Type] || NPC[A].Type == 8 || NPC[A].Type == 51 ||
-                     NPC[A].Type == 52 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP ||
+                if(!(NPCIsAnExit[NPC[A].Type] || NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BOTTOM_PLANT ||
+                     NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP ||
                      NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT))
                 {
                     NPC[A].Location.X += 0.015;
@@ -698,7 +698,7 @@ void UpdateNPCs()
 
         if(NPC[A].Active && NPC[A].TimeLeft > 1)
         {
-            if(NPC[A].Type == 45 && NPC[A].Special == 1)
+            if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)
             {
                 if(NPC[A].Projectile)
                     NPC[A].Special2 = 0;
@@ -719,10 +719,10 @@ void UpdateNPCs()
                 if(
                     (
                         !NPC[A].Projectile && NPC[A].HoldingPlayer == 0 &&
-                        NPC[A].Effect == 0 && !(NPC[A].Type == 45 && NPC[A].Special == 1) &&
-                       !((NPC[A].Type == 46 || NPC[A].Type == NPCID_FALL_BLOCK_BROWN) && NPC[A].Special == 1)
-                    ) || NPC[A].Type == 58 || NPC[A].Type == 67 || NPC[A].Type == 68 ||
-                    NPC[A].Type == 69 || NPC[A].Type == NPCID_VPIPE_LONG
+                        NPC[A].Effect == 0 && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) &&
+                       !((NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN) && NPC[A].Special == 1)
+                    ) || NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPC_HPIPE_SHORT || NPC[A].Type == NPC_HPIPE_LONG ||
+                    NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG
                 )
                 {
                     numBlock++;
@@ -733,13 +733,13 @@ void UpdateNPCs()
                     Block[numBlock].IsPlayer = NPC[A].standingOnPlayer;
                     Block[numBlock].standingOnPlayerY = NPC[A].standingOnPlayerY;
                     Block[numBlock].IsReally = A;
-                    if(NPC[A].Type == 56)
+                    if(NPC[A].Type == NPCID_VEHICLE)
                         Block[numBlock].Type = 25;
                     if(NPCIsAHit1Block[NPC[A].Type] || (NPCCanWalkOn[NPC[A].Type] && !NPCIsABlock[NPC[A].Type]))
                         Block[numBlock].Type = 26;
                     if(NPCCanWalkOn[NPC[A].Type] && !NPCIsAHit1Block[NPC[A].Type] && !NPCIsABlock[NPC[A].Type])
                         Block[numBlock].noProjClipping = true;
-                    if(NPC[A].Type == 26 && Block[numBlock].Location.Height != 32)
+                    if(NPC[A].Type == NPCID_SPRING && Block[numBlock].Location.Height != 32)
                     {
                         Block[numBlock].Location.Y -= 16;
                         Block[numBlock].Location.Height += 16;
@@ -791,7 +791,7 @@ void UpdateNPCs()
             continue;
 
         // check for inactive NPCs that are falling off
-        if(NPC[A].JustActivated == 0 && !(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != 12)
+        if(NPC[A].JustActivated == 0 && !(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
         {
             if(!GameMenu && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
             {
@@ -828,11 +828,11 @@ void UpdateNPCs()
 
 
         StopHit = 0;
-        if(!NPC[A].Projectile || NPC[A].Type == 50 || NPC[A].Type == NPCID_TANK_TREADS)
+        if(!NPC[A].Projectile || NPC[A].Type == NPCID_TOOTHY || NPC[A].Type == NPCID_TANK_TREADS)
             NPC[A].Multiplier = 0;
         if(NPC[A].Immune > 0)
             NPC[A].Immune -= 1;
-        if(NPC[A].Type == 56 && NPC[A].TimeLeft > 1)
+        if(NPC[A].Type == NPCID_VEHICLE && NPC[A].TimeLeft > 1)
             NPC[A].TimeLeft = 100;
 #endif
 
@@ -880,7 +880,7 @@ void UpdateNPCs()
 
 
 
-                else if(NPC[A].Type == 17 || NPC[A].Type == 18 || (NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) || NPC[A].Type == 42) // Special Start for Jumping Fish and Bullet Bills
+                else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || (NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) || NPC[A].Type == NPCID_GHOST_FAST) // Special Start for Jumping Fish and Bullet Bills
                 {
                     if(NPC[A].TimeLeft <= 1)
                     {
@@ -909,10 +909,10 @@ void UpdateNPCs()
                         if(NPC[A].tempBlock > 0)
                             treeNPCSplitTempBlock(A);
                     }
-                    else if(NPC[A].Type != 42)
+                    else if(NPC[A].Type != NPCID_GHOST_FAST)
                         PlaySound(SFX_Bullet);
                 }
-                else if(NPC[A].Type == 21)
+                else if(NPC[A].Type == NPCID_CANNONENEMY)
                     NPC[A].Special = 100;
             }
             else if(!NPC[A].Generator && !NPCQueues::check_active(NPC[A]))
@@ -923,15 +923,15 @@ void UpdateNPCs()
             NPC[A].JustActivated = 0;
             NPC[A].CantHurt = 0;
             NPC[A].CantHurtPlayer = 0;
-            if(NPC[A].Type == 21)
+            if(NPC[A].Type == NPCID_CANNONENEMY)
                 NPC[A].Projectile = false;
-            if(NPC[A].Type == 22)
+            if(NPC[A].Type == NPCID_CANNONITEM)
                 NPC[A].Projectile = false;
         }
         // check for active NPCs that are falling off
         else if(NPC[A].Location.Y > level[NPC[A].Section].Height && NPC[A].Location.Y > level[NPC[A].Section].Height + 16)
         {
-            if(!GameMenu && !(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != 12)
+            if(!GameMenu && !(NPCIsCheep[NPC[A].Type] && Maths::iRound(NPC[A].Special) == 2) && NPC[A].Type != NPCID_LAVABUBBLE)
                 NPCHit(A, 9);
         }
 
@@ -970,15 +970,15 @@ void UpdateNPCs()
                 NPC[A].RealSpeedX = 0;
             }
 
-            if(!NPC[A].Projectile || NPC[A].Type == 50 || NPC[A].Type == NPCID_TANK_TREADS)
+            if(!NPC[A].Projectile || NPC[A].Type == NPCID_TOOTHY || NPC[A].Type == NPCID_TANK_TREADS)
                 NPC[A].Multiplier = 0;
             if(NPC[A].Immune > 0)
                 NPC[A].Immune -= 1;
-            if(NPC[A].Type == 56 && NPC[A].TimeLeft > 1)
+            if(NPC[A].Type == NPCID_VEHICLE && NPC[A].TimeLeft > 1)
                 NPC[A].TimeLeft = 100;
 
             speedVar = 1;
-            if(NPC[A].Slope > 0 && !(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == 45 && NPC[A].Special == 1)))
+            if(NPC[A].Slope > 0 && !(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)))
             {
                 if((NPC[A].Location.SpeedX > 0 && BlockSlope[Block[NPC[A].Slope].Type] == -1) ||
                    (NPC[A].Location.SpeedX < 0 && BlockSlope[Block[NPC[A].Slope].Type] == 1))
@@ -995,7 +995,7 @@ void UpdateNPCs()
             // water check
 
             // Things immune to water's effects
-            if(NPC[A].Type == 12 || NPC[A].Type == 17 || NPC[A].Type == 18 || NPC[A].Type == NPC_HEAVY_THROWN || NPC[A].Type == 38 || NPC[A].Type == 42 || NPC[A].Type == 43 || NPC[A].Type == 44 || NPC[A].Type == NPCID_STATUE_FIRE || NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_CHAR4_HEAVY || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPC_HOMING_BALL || NPC[A].Type == NPCID_RED_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S4 || NPC[A].Type == 47 || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_MAGIC_BOSS_BALL || (NPCIsACoin[NPC[A].Type] && NPC[A].Special == 0) || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN)
+            if(NPC[A].Type == NPCID_LAVABUBBLE || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET || NPC[A].Type == NPC_HEAVY_THROWN || NPC[A].Type == NPCID_GHOST_S3 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_GHOST_S4 || NPC[A].Type == NPCID_BIG_GHOST || NPC[A].Type == NPCID_STATUE_FIRE || NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_CHAR4_HEAVY || NPC[A].Type == NPCID_GOALTAPE || NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPC_HOMING_BALL || NPC[A].Type == NPCID_RED_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S3 || NPC[A].Type == NPCID_GRN_VINE_TOP_S4 || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_MAGIC_BOSS_BALL || (NPCIsACoin[NPC[A].Type] && NPC[A].Special == 0) || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN)
             {
                 NPC[A].Wet = 0;
                 NPC[A].Quicksand = 0;
@@ -1028,7 +1028,7 @@ void UpdateNPCs()
                                     NewEffect(EFFID_WATER_SPLASH, tempLocation);
                                 }
 
-                                if(!(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 1) && NPC[A].Type != 34 && NPC[A].Type != 13)
+                                if(!(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 1) && NPC[A].Type != NPCID_LEAF_POWER && NPC[A].Type != NPCID_PLR_FIREBALL)
                                 {
                                     if(NPC[A].Location.SpeedY > 0.5)
                                         NPC[A].Location.SpeedY = 0.5;
@@ -1144,12 +1144,12 @@ void UpdateNPCs()
 
             // oldDirection = NPC[A].Direction;
 
-            if(NPC[A].Type == 17 || NPC[A].Type == 18)
+            if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET)
             {
                 if(NPC[A].CantHurt > 0)
                 {
                     NPC[A].CantHurt = 10000;
-                    if(NPC[A].Type == 18)
+                    if(NPC[A].Type == NPCID_BIG_BULLET)
                         NPC[A].Location.SpeedX = 4 * NPC[A].Direction;
                 }
                 if(NPC[A].TimeLeft > 3 && !BattleMode)
@@ -1167,9 +1167,9 @@ void UpdateNPCs()
             if((NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_FIRE_DISK || NPC[A].Type == NPCID_FIRE_CHAIN) && NPC[A].TimeLeft > 1)
                 NPC[A].TimeLeft = 100;
 
-            if(!(NPC[A].Type == 13 || (NPCIsCheep[NPC[A].Type] && fiEqual(NPC[A].Special, 2)) ||
-                 NPC[A].Type == 50 || NPC[A].Type == 56 || NPC[A].Type == 60 || NPC[A].Type == 62 ||
-                 NPC[A].Type == 64 || NPC[A].Type == 66 || NPC[A].Type == NPCID_VILLAIN_S3 || NPCIsYoshi[NPC[A].Type]) &&
+            if(!(NPC[A].Type == NPCID_PLR_FIREBALL || (NPCIsCheep[NPC[A].Type] && fiEqual(NPC[A].Special, 2)) ||
+                 NPC[A].Type == NPCID_TOOTHY || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM ||
+                 NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM || NPC[A].Type == NPCID_VILLAIN_S3 || NPCIsYoshi[NPC[A].Type]) &&
                  NPC[A].HoldingPlayer == 0)
             {
                 int C = 0;
@@ -1198,7 +1198,7 @@ void UpdateNPCs()
                 if(NPC[A].HoldingPlayer > 0) // NPC is held
                 {
                     NPC[A].standingOnPlayer = 0;
-                    if(NPC[A].Type == 56)
+                    if(NPC[A].Type == NPCID_VEHICLE)
                     {
                         Player[NPC[A].HoldingPlayer].HoldingNPC = 0;
                         NPC[A].HoldingPlayer = 0;
@@ -1243,12 +1243,12 @@ void UpdateNPCs()
                                 NPC[A].Type = NPCID_ITEM_POD;
                             }
 
-                            if(!(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 ||
-                                 NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_BLU_BOOT ||
-                                 NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == 35 ||
+                            if(!(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY ||
+                                 NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_BLU_BOOT ||
+                                 NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_GRN_BOOT ||
                                  // Duplicated segment [PVS Studio]
                                  // NPC[A].Type == NPCID_BLU_BOOT ||
-                                 NPC[A].Type == 49 || NPCIsAnExit[NPC[A].Type]))
+                                 NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsAnExit[NPC[A].Type]))
                                 NPC[A].DefaultType = 0;
 
                             NPC[A].Location.Height = NPCHeight[NPC[A].Type];
@@ -1271,7 +1271,7 @@ void UpdateNPCs()
                             NPCQueues::Unchecked.push_back(A);
                         }
 
-                        if(NPC[A].Type == 45)
+                        if(NPC[A].Type == NPCID_SLIDE_BLOCK)
                             NPC[A].Special = 1;
 
                         if(NPC[A].Type == NPCID_SPIT_GUY_BALL)
@@ -1297,25 +1297,25 @@ void UpdateNPCs()
                         NPC[A].Location.SpeedY = Player[NPC[A].HoldingPlayer].Location.SpeedY;
                         NPC[A].Location.SpeedX = 0;
 
-                        if(!(NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 32 ||
-                             NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == 35 || NPC[A].Type == NPCID_RED_BOOT ||
+                        if(!(NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH ||
+                             NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT ||
                              // Duplicated segment [PVS Studio]
                              // NPC[A].Type == NPCID_BLU_BOOT ||
-                             NPC[A].Type == 49 || NPC[A].Type == NPCID_BOMB || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) ||
-                             NPC[A].Type == 31 || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_CHAR4_HEAVY))
+                             NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_BOMB || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) ||
+                             NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON || NPC[A].Type == NPCID_CHAR4_HEAVY))
                         {
                             for(int B : treeNPCQuery(NPC[A].Location, SORTMODE_ID))
                             {
                                 if(B != A && NPC[B].Active &&
                                    (NPC[B].HoldingPlayer == 0 || (BattleMode && NPC[B].HoldingPlayer != NPC[A].HoldingPlayer)) &&
                                    !NPCIsABonus[NPC[B].Type] &&
-                                   (NPC[B].Type != 13  || (BattleMode && NPC[B].CantHurtPlayer != NPC[A].HoldingPlayer)) &&
+                                   (NPC[B].Type != NPCID_PLR_FIREBALL  || (BattleMode && NPC[B].CantHurtPlayer != NPC[A].HoldingPlayer)) &&
                                    (NPC[B].Type != NPCID_PLR_ICEBALL || (BattleMode && NPC[B].CantHurtPlayer != NPC[A].HoldingPlayer)) &&
-                                    NPC[B].Type != 21 && NPC[B].Type != 22 &&  NPC[B].Type != 26 && NPC[B].Type != 31 &&
-                                    NPC[B].Type != 32 && NPC[B].Type != NPCID_TIME_SWITCH && NPC[B].Type != NPCID_TNT && NPC[B].Type != NPCID_RED_BOOT &&
-                                    NPC[B].Type != 35 && !(NPC[B].Type == NPCID_BLU_BOOT && NPC[A].Type == NPCID_BLU_BOOT) &&
-                                    NPC[B].Type != 37 && NPC[B].Type != NPCID_STONE_S4 && NPC[B].Type != 38 &&
-                                    NPC[B].Type != 39 && !(NPC[B].Type == 45 && NPC[B].Special == 0.0) &&
+                                    NPC[B].Type != NPCID_CANNONENEMY && NPC[B].Type != NPCID_CANNONITEM &&  NPC[B].Type != NPCID_SPRING && NPC[B].Type != NPCID_KEY &&
+                                    NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_TIME_SWITCH && NPC[B].Type != NPCID_TNT && NPC[B].Type != NPCID_RED_BOOT &&
+                                    NPC[B].Type != NPCID_GRN_BOOT && !(NPC[B].Type == NPCID_BLU_BOOT && NPC[A].Type == NPCID_BLU_BOOT) &&
+                                    NPC[B].Type != NPCID_STONE_S3 && NPC[B].Type != NPCID_STONE_S4 && NPC[B].Type != NPCID_GHOST_S3 &&
+                                    NPC[B].Type != NPCID_SPIT_BOSS && !(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0.0) &&
                                     NPC[B].Type != NPCID_ITEM_BURIED && NPC[B].Type != NPCID_LIFT_SAND && NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL &&
                                    !(NPC[B].Type == NPC_HEAVY_THROWN && NPC[B].Projectile) && NPC[B].Type != NPCID_EARTHQUAKE_BLOCK && NPC[B].Type != NPCID_ICE_CUBE && NPC[B].Type != NPCID_CHAR3_HEAVY)
                                 {
@@ -1363,13 +1363,13 @@ void UpdateNPCs()
                             NPC[A].Projectile = true;
                         NPC[A].Location.SpeedX = 0;
                         NPC[A].Location.SpeedY = 0;
-                        if(NPC[A].Type == 29)
+                        if(NPC[A].Type == NPC_HEAVY_THROWER)
                         {
                             NPC[A].Killed = 3;
                             NPCQueues::Killed.push_back(A);
                             NPC[A].Direction = -NPC[A].Direction;
                         }
-                        if(NPC[A].Type == 17)
+                        if(NPC[A].Type == NPCID_BULLET)
                         {
                             PlaySound(SFX_Bullet);
                             NPC[A].Location.SpeedX = 5 * NPC[A].Direction;
@@ -1414,7 +1414,7 @@ void UpdateNPCs()
 
                     if(NPC[A].CantHurt > 0)
                     {
-                        if(NPC[A].Type != 21)
+                        if(NPC[A].Type != NPCID_CANNONENEMY)
                             NPC[A].CantHurt -= 1;
                     }
                     else
@@ -1472,9 +1472,9 @@ void UpdateNPCs()
                         if(NPC[A].Type == NPCID_SAW)
                             NPC[A].Special2 = -NPC[A].Special2;
 
-                        if(!NPCIsAShell[NPC[A].Type] && NPC[A].Type != 13 && NPC[A].Type != NPCID_TANK_TREADS &&
-                           NPC[A].Type != 17 && NPC[A].Type != NPCID_VILLAIN_S3 && !NPCIsABot[NPC[A].Type] &&
-                           NPC[A].Type != 40 && NPC[A].Type != NPCID_SPIT_GUY_BALL && !NPCIsVeggie[NPC[A].Type] &&
+                        if(!NPCIsAShell[NPC[A].Type] && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_TANK_TREADS &&
+                           NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_VILLAIN_S3 && !NPCIsABot[NPC[A].Type] &&
+                           NPC[A].Type != NPCID_SPIT_BOSS_BALL && NPC[A].Type != NPCID_SPIT_GUY_BALL && !NPCIsVeggie[NPC[A].Type] &&
                            NPC[A].Type != NPCID_ROCKET_WOOD && NPC[A].Type != NPCID_WALL_SPARK && NPC[A].Type != NPCID_WALL_BUG &&
                            NPC[A].Type != NPCID_WALL_TURTLE && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_SWORDBEAM)  // Don't turn around if a shell or a fireball
                         {
@@ -1493,7 +1493,7 @@ void UpdateNPCs()
 
 
                     // Default Movement Code
-                    if((NPCDefaultMovement[NPC[A].Type] || (NPCIsCheep[NPC[A].Type] && NPC[A].Special != 2)) && !((NPC[A].Type == 55 || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0) && NPC[A].Type != NPCID_ITEM_BURIED)
+                    if((NPCDefaultMovement[NPC[A].Type] || (NPCIsCheep[NPC[A].Type] && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0) && NPC[A].Type != NPCID_ITEM_BURIED)
                     {
                         if(NPC[A].Direction == 0)
                         {
@@ -1560,18 +1560,18 @@ void UpdateNPCs()
                             NPC[A].Location.SpeedX = 2.5 * NPC[A].Direction;
                     }
                     // Slow things down that shouldnt move
-                    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 25 || NPC[A].Type == 26 ||
-                            NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT ||
-                            NPC[A].Type == 35 || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT ||
-                            (NPC[A].Type == 40 && NPC[A].Projectile) || NPC[A].Type == 49 || NPC[A].Type == 58 ||
-                            NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == NPCID_VPIPE_LONG ||
+                    else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_JUMPER_S3 || NPC[A].Type == NPCID_SPRING ||
+                            NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT ||
+                            NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT ||
+                            (NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_METALBARREL ||
+                            NPC[A].Type == NPC_HPIPE_SHORT || NPC[A].Type == NPC_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG ||
                             (NPCIsVeggie[NPC[A].Type] && !NPC[A].Projectile) ||
-                            (NPC[A].Type == 29 && NPC[A].Projectile) ||
-                            /*(NPC[A].Projectile && (NPC[A].Type == 54 && NPC[A].Type == 15)) ||*/ // FIXME: This segment is always false (type equal both 54 and 15, impossible!) [PVS Studio]
+                            (NPC[A].Type == NPC_HEAVY_THROWER && NPC[A].Projectile) ||
+                            /*(NPC[A].Projectile && (NPC[A].Type == NPCID_FLY && NPC[A].Type == NPCID_MINIBOSS)) ||*/ // FIXME: This segment is always false (type equal both 54 and 15, impossible!) [PVS Studio]
                             NPC[A].Type == NPCID_CIVILIAN_SCARED || NPC[A].Type == NPCID_STATUE_S3 || NPC[A].Type == NPCID_STATUE_S4 || NPC[A].Type == NPCID_CIVILIAN ||
                             NPC[A].Type == NPCID_CHAR3 || NPC[A].Type == NPCID_ITEM_POD || NPC[A].Type == NPCID_BOMB || NPC[A].Type == NPCID_LIT_BOMB_S3 ||
                             NPC[A].Type == NPCID_CHAR2 || NPC[A].Type == NPCID_CHAR5 || (NPCIsYoshi[NPC[A].Type] && NPC[A].Special == 0) ||
-                            (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPC_HIT_CARRY_FODDER || (NPC[A].Type == 39 && NPC[A].Projectile) ||
+                            (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPC_HIT_CARRY_FODDER || (NPC[A].Type == NPCID_SPIT_BOSS && NPC[A].Projectile) ||
                             NPC[A].Type == NPC_HEAVY_POWER || NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPCID_FIRE_POWER_S4 || NPC[A].Type == NPCID_3_LIFE ||
                             NPC[A].Type == NPCID_STAR_EXIT || NPC[A].Type == NPCID_STAR_COLLECT || NPC[A].Type == NPCID_FIRE_POWER_S1 || NPC[A].Type == NPCID_TIMER_S2 ||
                             NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_POWER_S2 || NPC[A].Type == NPCID_POWER_S5 || NPC[A].Type == NPCID_FLY_POWER ||
@@ -1609,7 +1609,7 @@ void UpdateNPCs()
                         }
                     }
                     // Mushroom Movement Code
-                    else if(NPC[A].Type == 9 || NPC[A].Type == NPCID_SWAP_POWER || NPC[A].Type == NPCID_LIFE_S3 ||
+                    else if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_SWAP_POWER || NPC[A].Type == NPCID_LIFE_S3 ||
                             NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 ||
                             NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED ||
                             NPC[A].Type == NPCID_BIG_MOLE)
@@ -1716,7 +1716,7 @@ void UpdateNPCs()
 
                         // Big Koopa Movement Code
                     }
-                    else if(NPC[A].Type == 15)
+                    else if(NPC[A].Type == NPCID_MINIBOSS)
                     {
                         if(NPC[A].Location.SpeedX < 0)
                             NPC[A].Direction = -1;
@@ -1748,7 +1748,7 @@ void UpdateNPCs()
                         }
                         // spiney eggs
                     }
-                    else if(NPC[A].Type == 48)
+                    else if(NPC[A].Type == NPCID_SPIKY_BALL_S3)
                     {
                         if(NPC[A].CantHurt > 0)
                         {
@@ -1778,12 +1778,12 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedX -= 0.04;
                         }
                     }
-                    else if(NPC[A].Type == 17 || NPC[A].Type == 18)
+                    else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET)
                     {
                         if(NPC[A].CantHurt < 1000)
                             NPC[A].Location.SpeedX = 4 * NPC[A].Direction;
                     }
-                    else if(NPC[A].Type == 42)
+                    else if(NPC[A].Type == NPCID_GHOST_FAST)
                         NPC[A].Location.SpeedX = 2 * double(NPC[A].Direction);
                     // yoshi
                     if(NPCIsYoshi[NPC[A].Type])
@@ -1807,10 +1807,10 @@ void UpdateNPCs()
                             }
                         }
                     }
-                    if(NPC[A].Type != 39 && NPC[A].Type != 46 && NPC[A].Type != NPCID_FALL_BLOCK_BROWN && NPC[A].Type != 56 &&
-                       NPC[A].Type != 57 && NPC[A].Type != 60 && NPC[A].Type != 62 && NPC[A].Type != 64 &&
-                       NPC[A].Type != 66 && NPC[A].Type != NPCID_STATUE_S3 && NPC[A].Type != NPCID_STATUE_S4 && NPC[A].Type != NPCID_STATUE_FIRE &&
-                       NPC[A].Type != 22 && NPC[A].Type != 49 && NPC[A].Type != 50 && !(NPC[A].Type >= NPCID_PLATFORM_S3 &&
+                    if(NPC[A].Type != NPCID_SPIT_BOSS && NPC[A].Type != NPCID_FALL_BLOCK_RED && NPC[A].Type != NPCID_FALL_BLOCK_BROWN && NPC[A].Type != NPCID_VEHICLE &&
+                       NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_YEL_PLATFORM && NPC[A].Type != NPCID_BLU_PLATFORM && NPC[A].Type != NPCID_GRN_PLATFORM &&
+                       NPC[A].Type != NPCID_RED_PLATFORM && NPC[A].Type != NPCID_STATUE_S3 && NPC[A].Type != NPCID_STATUE_S4 && NPC[A].Type != NPCID_STATUE_FIRE &&
+                       NPC[A].Type != NPCID_CANNONITEM && NPC[A].Type != NPCID_TOOTHYPIPE && NPC[A].Type != NPCID_TOOTHY && !(NPC[A].Type >= NPCID_PLATFORM_S3 &&
                        NPC[A].Type <= NPCID_PLATFORM_S1))
                     {
                         if(NPC[A].Location.SpeedX < 0) // Find the NPCs direction
@@ -1820,7 +1820,7 @@ void UpdateNPCs()
                     }
                     // Reset Speed when no longer a projectile
                     // If Not (NPCIsAShell(.Type) Or .Type = 8 Or .Type = 93 Or .Type = 74 Or .Type = 51 Or .Type = 52 Or .Type = 12 Or .Type = 14 Or .Type = 13 Or .Type = 15 Or NPCIsABonus(.Type) Or .Type = 17 Or .Type = 18 Or .Type = 21 Or .Type = 22 Or .Type = 25 Or .Type = 26 Or .Type = 29 Or .Type = 30 Or .Type = 31 Or .Type = 32 Or .Type = 35 Or .Type = 37 Or .Type = 38 Or .Type = 39 Or .Type = 40 Or .Type = 42 Or .Type = 43 Or .Type = 44 Or .Type = 45 Or .Type = 46 Or .Type = 47 Or .Type = 48 Or .Type = 76 Or .Type = 49 Or .Type = 54 Or .Type = 56 Or .Type = 57 Or .Type = 58 Or .Type = 60 Or .Type = 62 Or .Type = 64 Or .Type = 66 Or .Type = 67 Or .Type = 68 Or .Type = 69 Or .Type = 70 Or .Type = 78 Or .Type = 84 Or .Type = 85 Or .Type = 87 Or (.Type = 55 And .Special > 0) Or (.Type >= 79 And .Type <= 83) Or .Type = 86 Or .Type = 92 Or .Type = 94 Or NPCIsYoshi(.Type) Or .Type = 96 Or .Type = 101 Or .Type = 102) And .Projectile = False Then
-                    if((NPCDefaultMovement[NPC[A].Type] || (NPCIsCheep[NPC[A].Type] && NPC[A].Special != 2)) && !((NPC[A].Type == 55 || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0) && !NPC[A].Projectile)
+                    if((NPCDefaultMovement[NPC[A].Type] || (NPCIsCheep[NPC[A].Type] && NPC[A].Special != 2)) && !((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPC[A].Special > 0) && !NPC[A].Projectile)
                     {
                         if(!NPCCanWalkOn[NPC[A].Type])
                         {
@@ -1868,7 +1868,7 @@ void UpdateNPCs()
                     if(!NPCNoGravity[NPC[A].Type])
                     {
 
-                        if(NPC[A].Type == 13 || NPC[A].Type == NPCID_PLR_ICEBALL)
+                        if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
                         {
                             NPC[A].CantHurt = 100;
                             if(NPC[A].Special < 2)
@@ -1899,7 +1899,7 @@ void UpdateNPCs()
                                 NPC[A].Location.SpeedY += Physics.NPCGravity * 1.3;
 
                         }
-                        else if(NPC[A].Type == 17 || NPC[A].Type == 18)
+                        else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET)
                             NPC[A].Location.SpeedY = 0;
 
                         else if((NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && !NPC[A].Projectile)
@@ -1921,13 +1921,13 @@ void UpdateNPCs()
                         else if(NPC[A].Type != NPCID_RED_VINE_TOP_S3 && NPC[A].Type != NPCID_GRN_VINE_TOP_S3 && NPC[A].Type != NPCID_GRN_VINE_TOP_S4 &&
                                 !(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && NPC[A].Type != NPC_HOMING_BALL &&
                                 NPC[A].Type != NPC_HOMING_BALL_GEN && NPC[A].Type != NPCID_SPIT_GUY_BALL && NPC[A].Type != NPCID_STAR_EXIT && NPC[A].Type != NPCID_STAR_COLLECT &&
-                                NPC[A].Type != NPCID_VILLAIN_FIRE && NPC[A].Type != 8 && NPC[A].Type != NPCID_FIRE_PLANT && NPC[A].Type != NPCID_PLANT_FIRE &&
+                                NPC[A].Type != NPCID_VILLAIN_FIRE && NPC[A].Type != NPCID_PLANT_S3 && NPC[A].Type != NPCID_FIRE_PLANT && NPC[A].Type != NPCID_PLANT_FIRE &&
                                 NPC[A].Type != NPCID_PLANT_S1 && NPC[A].Type != NPCID_BIG_PLANT && NPC[A].Type != NPCID_LONG_PLANT_UP && NPC[A].Type != NPCID_LONG_PLANT_DOWN &&
-                                !NPCIsAParaTroopa[NPC[A].Type] && NPC[A].Type != 51 && NPC[A].Type != 52 &&
-                                NPC[A].Type != 34 && NPC[A].Type != 37 && NPC[A].Type != NPCID_STONE_S4 && NPC[A].Type != 38 &&
-                                NPC[A].Type != 42 && NPC[A].Type != 43 && NPC[A].Type != 44 && NPC[A].Type != 47 &&
-                                NPC[A].Type != 56 && NPC[A].Type != 57 && NPC[A].Type != 60 &&
-                                NPC[A].Type != 62 && NPC[A].Type != 64 && NPC[A].Type != 66 &&
+                                !NPCIsAParaTroopa[NPC[A].Type] && NPC[A].Type != NPCID_BOTTOM_PLANT && NPC[A].Type != NPCID_SIDE_PLANT &&
+                                NPC[A].Type != NPCID_LEAF_POWER && NPC[A].Type != NPCID_STONE_S3 && NPC[A].Type != NPCID_STONE_S4 && NPC[A].Type != NPCID_GHOST_S3 &&
+                                NPC[A].Type != NPCID_GHOST_FAST && NPC[A].Type != NPCID_GHOST_S4 && NPC[A].Type != NPCID_BIG_GHOST && NPC[A].Type != NPCID_SPIKY_THROWER &&
+                                NPC[A].Type != NPCID_VEHICLE && NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_YEL_PLATFORM &&
+                                NPC[A].Type != NPCID_BLU_PLATFORM && NPC[A].Type != NPCID_GRN_PLATFORM && NPC[A].Type != NPCID_RED_PLATFORM &&
                                 NPC[A].Type != NPCID_STATUE_FIRE && !(NPCIsACoin[NPC[A].Type] && NPC[A].Special == 0) &&
                                 NPC[A].Type != NPCID_CHECKER_PLATFORM && NPC[A].Type != NPCID_PLATFORM_S1 && NPC[A].Type != NPCID_PET_FIRE &&
                                 NPC[A].Type != NPCID_GOALTAPE && NPC[A].Type != NPCID_LAVA_MONSTER && NPC[A].Type != NPCID_FLIER &&
@@ -2033,7 +2033,7 @@ void UpdateNPCs()
 
                     if(NPC[A].Location.SpeedY >= 8 && NPC[A].Type != NPCID_FIRE_DISK && NPC[A].Type != NPCID_FIRE_CHAIN)
                         NPC[A].Location.SpeedY = 8;
-                    if(NPC[A].Type == 40)
+                    if(NPC[A].Type == NPCID_SPIT_BOSS_BALL)
                     {
                         if(!NPC[A].Projectile)
                         {
@@ -2042,16 +2042,16 @@ void UpdateNPCs()
                                 NPC[A].Projectile = true;
                         }
                     }
-                    if((NPC[A].Type == 45 || NPC[A].Type == 46 || NPC[A].Type == NPCID_FALL_BLOCK_BROWN) && NPC[A].Special == 0)
+                    if((NPC[A].Type == NPCID_SLIDE_BLOCK || NPC[A].Type == NPCID_FALL_BLOCK_RED || NPC[A].Type == NPCID_FALL_BLOCK_BROWN) && NPC[A].Special == 0)
                         NPC[A].Location.SpeedY = 0;
-                    if(NPC[A].Type == 50 || NPC[A].Type == NPC_HOMING_BALL_GEN)
+                    if(NPC[A].Type == NPCID_TOOTHY || NPC[A].Type == NPC_HOMING_BALL_GEN)
                     {
                         NPC[A].Location.SpeedX = 0;
                         NPC[A].Location.SpeedY = 0;
                     }
                     NPCSpecial(A);
                     // Dont move
-                    if(NPC[A].Stuck && !NPC[A].Projectile && NPC[A].Type != 34) // face closest player
+                    if(NPC[A].Stuck && !NPC[A].Projectile && NPC[A].Type != NPCID_LEAF_POWER) // face closest player
                     {
                         NPC[A].Location.SpeedX = 0;
                         if(!(NPC[A].Type == NPCID_SKELETON && NPC[A].Special > 0))
@@ -2175,7 +2175,7 @@ void UpdateNPCs()
                     }
 
                     if((!NPCIsAnExit[NPC[A].Type] || NPC[A].Type == NPCID_STAR_EXIT || NPC[A].Type == NPCID_STAR_COLLECT) &&
-                        NPC[A].Type != 14 && NPC[A].Type != 57)
+                        NPC[A].Type != NPCID_FIRE_POWER_S3 && NPC[A].Type != NPCID_CONVEYOR)
                     {
                         if(!NPCIsAParaTroopa[NPC[A].Type] && NPC[A].Type != NPCID_ITEM_BURIED)
                         {
@@ -2185,7 +2185,7 @@ void UpdateNPCs()
                     }
                     else
                     {
-                        if(!(NPC[A].Location.X == NPC[A].DefaultLocation.X && NPC[A].Location.Y == NPC[A].DefaultLocation.Y) || NPC[A].Type == 14)
+                        if(!(NPC[A].Location.X == NPC[A].DefaultLocation.X && NPC[A].Location.Y == NPC[A].DefaultLocation.Y) || NPC[A].Type == NPCID_FIRE_POWER_S3)
                         {
                             NPC[A].Location.SpeedX = NPC[A].Location.SpeedX * 0.99;
                             NPC[A].Location.X += NPC[A].Location.SpeedX;
@@ -2201,11 +2201,11 @@ void UpdateNPCs()
 
 
                     // projectile check
-                    if(NPC[A].Type == 13 || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_ICEBALL || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_CHAR4_HEAVY)
+                    if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PET_FIRE || NPC[A].Type == NPCID_PLR_ICEBALL || NPC[A].Type == NPCID_SWORDBEAM || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_CHAR4_HEAVY)
                         NPC[A].Projectile = true;
 
                     // make things projectiles
-                    if(NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == NPCID_VPIPE_LONG || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M))
+                    if(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPC_HPIPE_SHORT || NPC[A].Type == NPC_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M))
                     {
                         if(NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
                             NPC[A].Projectile = true;
@@ -2252,8 +2252,8 @@ void UpdateNPCs()
                     if(NPC[A].Location.X + NPC[A].Location.Width > (FLBlocks + 1) * 32)
                         NPC[A].Location.X = (FLBlocks + 1) * 32 - NPC[A].Location.Width;
 
-                    if(!(NPCIsACoin[NPC[A].Type] && NPC[A].Special == 0) && !(NPC[A].Type == 45 && NPC[A].Special == 0) &&
-                       NPC[A].Type != 57 && NPC[A].Type != NPCID_STATUE_FIRE && NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_STAR_EXIT &&
+                    if(!(NPCIsACoin[NPC[A].Type] && NPC[A].Special == 0) && !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) &&
+                       NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_STATUE_FIRE && NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_STAR_EXIT &&
                        NPC[A].Type != NPCID_STAR_COLLECT && !(NPC[A].Type >= NPCID_PLATFORM_S3 && NPC[A].Type <= NPCID_PLATFORM_S1) &&
                        !(NPCIsAnExit[NPC[A].Type] && ((NPC[A].DefaultLocation.X == NPC[A].Location.X &&
                        NPC[A].DefaultLocation.Y == NPC[A].Location.Y) || NPC[A].Inert)) &&
@@ -2262,9 +2262,9 @@ void UpdateNPCs()
                     {
 
                         if((!NPCNoClipping[NPC[A].Type] || NPC[A].Projectile) &&
-                           !(NPC[A].Type == 40 && NPC[A].Projectile) && NPC[A].Type != 50 &&
+                           !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && NPC[A].Projectile) && NPC[A].Type != NPCID_TOOTHY &&
                             NPC[A].standingOnPlayer == 0 && !(NPCIsVeggie[NPC[A].Type] && NPC[A].Projectile) &&
-                           NPC[A].Type != NPC_HEAVY_THROWN && NPC[A].Type != 18 && NPC[A].Type != NPCID_PET_FIRE &&
+                           NPC[A].Type != NPC_HEAVY_THROWN && NPC[A].Type != NPCID_BIG_BULLET && NPC[A].Type != NPCID_PET_FIRE &&
                            !(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && NPC[A].Type != NPCID_VINE_BUG)
                         {
                             for(bCheck = 1; bCheck <= 2; bCheck++)
@@ -2309,7 +2309,7 @@ void UpdateNPCs()
                                                        !(NPC[A].Projectile && Block[B].noProjClipping) &&
                                                        !BlockNoClipping[Block[B].Type] && !Block[B].Hidden)
                                                     {
-                                                        if(Block[B].IsNPC == 78 && !NPCNoClipping[NPC[A].Type] && NPC[A].Type != 17)
+                                                        if(Block[B].IsNPC == 78 && !NPCNoClipping[NPC[A].Type] && NPC[A].Type != NPCID_BULLET)
                                                             NPCHit(A, 8);
 
                                                         if(Block[B].IsNPC != 57 && (NPCIsABlock[Block[B].IsNPC] || NPCIsAHit1Block[Block[B].IsNPC] || NPCCanWalkOn[Block[B].IsNPC]))
@@ -2336,7 +2336,7 @@ void UpdateNPCs()
                                                         if(NPC[A].Type == NPCID_SWORDBEAM)
                                                             HitSpot = 0;
 
-                                                        if(Block[B].IsPlayer > 0 && ((!NPCStandsOnPlayer[NPC[A].Type] && NPC[A].Type != 13) || NPC[A].Inert))
+                                                        if(Block[B].IsPlayer > 0 && ((!NPCStandsOnPlayer[NPC[A].Type] && NPC[A].Type != NPCID_PLR_FIREBALL) || NPC[A].Inert))
                                                             HitSpot = 0;
 
                                                         if((NPCIsCheep[NPC[A].Type] && NPC[A].Special == 2) && HitSpot != 3)
@@ -2354,7 +2354,7 @@ void UpdateNPCs()
                                                                 HitSpot = 1;
                                                         }
 
-                                                        if(NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == NPCID_VPIPE_LONG)
+                                                        if(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPC_HPIPE_SHORT || NPC[A].Type == NPC_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG)
                                                         {
                                                             if(Block[B].IsPlayer > 0 || Block[B].IsNPC == 56)
                                                             {
@@ -2366,7 +2366,7 @@ void UpdateNPCs()
                                                         if(NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M && HitSpot != 1)
                                                             HitSpot = 0;
 
-                                                        if(NPC[A].Type == 48 && (Block[B].IsNPC == 22 || Block[B].IsNPC == 49)) // spiney eggs don't walk on special items
+                                                        if(NPC[A].Type == NPCID_SPIKY_BALL_S3 && (Block[B].IsNPC == 22 || Block[B].IsNPC == 49)) // spiney eggs don't walk on special items
                                                             HitSpot = 0;
 
                                                         if(NPC[A].Type == NPCID_RAFT) // Skull raft
@@ -2415,7 +2415,7 @@ void UpdateNPCs()
                                                             }
                                                         }
 
-                                                        if(NPC[A].Type == 13 || NPC[A].Type == NPCID_PLR_ICEBALL)
+                                                        if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
                                                         {
                                                             if(Block[B].Type == 626 && fiEqual(NPC[A].Special, 1))
                                                                 HitSpot = 0;
@@ -2427,7 +2427,7 @@ void UpdateNPCs()
                                                                 HitSpot = 0;
                                                         }
 
-                                                        if(NPC[A].Type == 13 || NPC[A].Type == NPCID_PET_FIRE)
+                                                        if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PET_FIRE)
                                                         {
                                                             if(Block[B].Type == 621 || Block[B].Type == 620)
                                                             {
@@ -2443,7 +2443,7 @@ void UpdateNPCs()
                                                                     NPC[numNPCs] = NPC_t();
                                                                     NPC[numNPCs].Location.Width = 28;
                                                                     NPC[numNPCs].Location.Height = 32;
-                                                                    NPC[numNPCs].Type = 10;
+                                                                    NPC[numNPCs].Type = NPCID_COIN_S3;
                                                                     NPC[numNPCs].Location.Y = Block[B].Location.Y;
                                                                     NPC[numNPCs].Location.X = Block[B].Location.X + 2;
                                                                     NPC[numNPCs].Active = true;
@@ -2456,7 +2456,7 @@ void UpdateNPCs()
                                                             }
                                                         }
 
-                                                        if((NPC[A].Type == 37 || NPC[A].Type == NPCID_STONE_S4) && HitSpot != 1)
+                                                        if((NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4) && HitSpot != 1)
                                                             HitSpot = 0;
 
                                                         if(Block[B].IsNPC == 57 && HitSpot == 5)
@@ -2467,13 +2467,13 @@ void UpdateNPCs()
                                                                 HitSpot = 2;
                                                         }
 
-                                                        if(NPC[A].Type == 13 || NPC[A].Type == NPCID_PLR_ICEBALL)
+                                                        if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
                                                         {
                                                             if(NPCIsABonus[Block[B].IsNPC])
                                                                 HitSpot = 0;
                                                         }
 
-                                                        if(NPC[A].Type == 15 && HitSpot == 5)
+                                                        if(NPC[A].Type == NPCID_MINIBOSS && HitSpot == 5)
                                                         {
                                                             if(NPC[A].WallDeath >= 5)
                                                             {
@@ -2600,7 +2600,7 @@ void UpdateNPCs()
                                                             if(NPC[A].Location.Y < Block[B].Location.Y + Block[B].Location.Height - (Block[B].Location.Height * Slope) - 0.1)
                                                             {
 
-                                                                if(NPC[A].Type == 13 || NPC[A].Type == 17 || NPC[A].Type == NPCID_PLR_ICEBALL)
+                                                                if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_PLR_ICEBALL)
                                                                     NPCHit(A, 3, A);
 
                                                                 if(NPC[A].Type == NPCID_ICE_CUBE)
@@ -2706,7 +2706,7 @@ void UpdateNPCs()
                                                                             NPC[A].Special2 = -NPC[A].Special2;
                                                                         }
 
-                                                                        if(NPC[A].Type == 17 || NPC[A].Type == 40) // Bullet bills crash on slopes
+                                                                        if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_SPIT_BOSS_BALL) // Bullet bills crash on slopes
                                                                         {
                                                                             NPC[A].Slope = 1;
                                                                             if(NPC[A].Location.SpeedX < 0)
@@ -2726,7 +2726,7 @@ void UpdateNPCs()
                                                                             // Fireballs dont go up steep slopes
                                                                             if(Block[B].Location.Height / static_cast<double>(Block[B].Location.Width) >= 1 && ((BlockSlope[Block[B].Type] == -1 && NPC[A].Location.SpeedX > 0) || (BlockSlope[Block[B].Type] == 1 && NPC[A].Location.SpeedX < 0)))
                                                                             {
-                                                                                if((NPC[A].Type == 13 && NPC[A].Special != 2 && NPC[A].Special != 3) || (NPC[A].Type == NPCID_PLR_ICEBALL && NPC[A].Special == 5))
+                                                                                if((NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].Special != 2 && NPC[A].Special != 3) || (NPC[A].Type == NPCID_PLR_ICEBALL && NPC[A].Special == 5))
                                                                                 {
                                                                                     if(NPC[A].Location.SpeedX < 0)
                                                                                         HitSpot = 2;
@@ -2734,7 +2734,7 @@ void UpdateNPCs()
                                                                                         HitSpot = 4;
                                                                                 }
                                                                             }
-                                                                            if(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == 45 && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
+                                                                            if(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
                                                                             {
                                                                                 if(NPC[A].Location.SpeedY > NPC[A].Location.SpeedX * (Block[B].Location.Height / static_cast<double>(Block[B].Location.Width)) * BlockSlope[Block[B].Type])
                                                                                 {
@@ -2766,7 +2766,7 @@ void UpdateNPCs()
                                                         if(BlockKills[Block[B].Type] && (HitSpot > 0 || NPC[A].Slope == B))
                                                             NPCHit(A, 6, B);
 
-                                                        if(NPC[A].Type == 13 && Block[B].IsNPC == 263)
+                                                        if(NPC[A].Type == NPCID_PLR_FIREBALL && Block[B].IsNPC == 263)
                                                             HitSpot = 0;
 
                                                         if(NPC[A].Type == NPCID_ITEM_POD && HitSpot == 1)
@@ -2783,7 +2783,7 @@ void UpdateNPCs()
                                                             }
                                                         }
                                                         // beech koopa kicking an ice block
-                                                        if(((g_compatibility.fix_npc55_kick_ice_blocks && NPC[A].Type == 55) || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && Block[B].IsNPC == 45)
+                                                        if(((g_compatibility.fix_npc55_kick_ice_blocks && NPC[A].Type == NPCID_EXT_TURTLE) || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && Block[B].IsNPC == 45)
                                                         {
                                                             if(HitSpot == 2 || HitSpot == 4)
                                                             {
@@ -2924,7 +2924,7 @@ void UpdateNPCs()
                                                             NPC[A].Special2 = 0;
                                                         }
 
-                                                        if((NPC[A].Type == 13 || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[A].Special == 5 && HitSpot > 0)
+                                                        if((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[A].Special == 5 && HitSpot > 0)
                                                             NPCHit(A, 3, A);
                                                         if(NPC[A].Type == NPCID_PLR_ICEBALL && HitSpot > 1)
                                                             NPCHit(A, 3, A);
@@ -2949,7 +2949,7 @@ void UpdateNPCs()
                                                         // hitspot 1
                                                         if(HitSpot == 1) // Hitspot 1
                                                         {
-                                                            if((NPC[A].Type == 13 || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[A].Location.SpeedX == 0)
+                                                            if((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[A].Location.SpeedX == 0)
                                                                 NPCHit(A, 4, A);
 
 
@@ -2967,12 +2967,12 @@ void UpdateNPCs()
                                                                 else if(NPC[Block[B].IsReally].TimeLeft - 1 > NPC[A].TimeLeft)
                                                                     NPC[A].TimeLeft = NPC[Block[B].IsReally].TimeLeft - 1;
                                                             }
-                                                            if(NPC[A].Type == 45 && NPC[A].Special == 1 && NPC[A].Location.SpeedX == 0 && NPC[A].Location.SpeedY > 7.95)
+                                                            if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1 && NPC[A].Location.SpeedX == 0 && NPC[A].Location.SpeedY > 7.95)
                                                                 NPCHit(A, 4, A);
-                                                            if(NPC[A].Type == 37 || NPC[A].Type == NPCID_STONE_S4)
+                                                            if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4)
                                                                 NPC[A].Special = 2;
 
-                                                            if((NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == NPCID_VPIPE_LONG) && NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
+                                                            if((NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPC_HPIPE_SHORT || NPC[A].Type == NPC_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG) && NPC[A].Location.SpeedY > Physics.NPCGravity * 20)
                                                                 PlaySound(SFX_Stone);
                                                             if(NPC[A].Type == NPCID_TANK_TREADS && NPC[A].Location.SpeedY > Physics.NPCGravity * 10)
                                                                 PlaySound(SFX_Stone);
@@ -3024,7 +3024,7 @@ void UpdateNPCs()
 
                                                             if(tempHitBlock == B)
                                                             {
-                                                                if(NPC[A].Type == 48)
+                                                                if(NPC[A].Type == NPCID_SPIKY_BALL_S3)
                                                                 {
                                                                     if(NPC[A].Location.SpeedY > 2)
                                                                     {
@@ -3047,7 +3047,7 @@ void UpdateNPCs()
                                                                 if(NPC[A].Projectile)
                                                                 {
 
-                                                                    if(NPC[A].Type == 13)
+                                                                    if(NPC[A].Type == NPCID_PLR_FIREBALL)
                                                                     {
                                                                         if(NPC[A].Special == 4)
                                                                             NPC[A].Location.SpeedY = -3 + Block[B].Location.SpeedY;
@@ -3076,10 +3076,10 @@ void UpdateNPCs()
 
 
                                                                     }
-                                                                    else if(NPC[A].Bouce || NPC[A].Location.SpeedY > 5.8 || ((NPC[A].Type == 22 || NPC[A].Type == 49) && (NPC[A].Location.SpeedY > 2 || (NPC[A].Location.SpeedX > 1 || NPC[A].Location.SpeedX < -1))))
+                                                                    else if(NPC[A].Bouce || NPC[A].Location.SpeedY > 5.8 || ((NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE) && (NPC[A].Location.SpeedY > 2 || (NPC[A].Location.SpeedX > 1 || NPC[A].Location.SpeedX < -1))))
                                                                     {
                                                                         NPC[A].Bouce = false;
-                                                                        if(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == 45 && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
+                                                                        if(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
                                                                         {
                                                                             if(NPC[A].Slope == 0)
                                                                                 NPC[A].Location.SpeedY = -NPC[A].Location.SpeedY * 0.5;
@@ -3093,7 +3093,7 @@ void UpdateNPCs()
                                                                             }
 
                                                                         }
-                                                                        else if(NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == NPCID_VPIPE_LONG || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M))
+                                                                        else if(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPC_HPIPE_SHORT || NPC[A].Type == NPC_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M))
                                                                             NPC[A].Location.SpeedY = 0;
                                                                         else if(NPC[A].Type == NPCID_VILLAIN_S3 || NPC[A].Type == NPCID_ITEM_POD)
                                                                         {
@@ -3107,7 +3107,7 @@ void UpdateNPCs()
                                                                         tempHit = 0;
                                                                         tempHitOld = 0;
                                                                     }
-                                                                    else if(NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != 17 && NPC[A].Type != 13)
+                                                                    else if(NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_PLR_FIREBALL)
                                                                     {
                                                                         if(NPCMovesPlayer[NPC[A].Type])
                                                                         {
@@ -3131,7 +3131,7 @@ void UpdateNPCs()
                                                                             if(NPC[A].Location.SpeedX > -0.1 && NPC[A].Location.SpeedX < 0.1)
                                                                                 NPC[A].Projectile = false;
                                                                         }
-                                                                        else if(!(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == 45 && NPC[A].Special == 1) || NPC[A].Type == 48))
+                                                                        else if(!(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_SPIKY_BALL_S3))
                                                                             NPC[A].Projectile = false;
                                                                         else if(NPC[A].Location.SpeedX == 0)
                                                                             NPC[A].Projectile = false;
@@ -3151,7 +3151,7 @@ void UpdateNPCs()
                                                                     NPC[A].Location.SpeedX = 0;
                                                                 addBelt = NPC[A].Location.X;
                                                                 resetBeltSpeed = true;
-                                                                if(NPC[A].Type == 13 && NPC[A].Special == 3)
+                                                                if(NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].Special == 3)
                                                                 {
                                                                     if(NPC[A].Special2 == 0)
                                                                     {
@@ -3161,13 +3161,13 @@ void UpdateNPCs()
                                                                     else
                                                                         NPCHit(A, 4, A);
                                                                 }
-                                                                else if(NPC[A].Type == 13 || NPC[A].Type == 40)
+                                                                else if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_SPIT_BOSS_BALL)
                                                                     NPCHit(A, 4, A);
-                                                                if(NPC[A].Type == 45 && NPC[A].Special == 1)
+                                                                if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)
                                                                     NPCHit(A, 4, A);
                                                                 if(NPC[A].Slope == 0 && !SlopeTurn)
                                                                     NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
-                                                                if(!(NPC[A].Type == 13 || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == 17))
+                                                                if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
                                                                     NPC[A].TurnAround = true;
                                                                 if(NPCIsAParaTroopa[NPC[A].Type])
                                                                     NPC[A].Location.SpeedX += -Block[B].Location.SpeedX * 1.2;
@@ -3183,7 +3183,7 @@ void UpdateNPCs()
                                                                 NPC[A].Location.SpeedX = 0;
                                                             resetBeltSpeed = true;
                                                             addBelt = NPC[A].Location.X;
-                                                            if(NPC[A].Type == 13 && NPC[A].Special == 3)
+                                                            if(NPC[A].Type == NPCID_PLR_FIREBALL && NPC[A].Special == 3)
                                                             {
                                                                 if(NPC[A].Special2 == 0)
                                                                 {
@@ -3193,13 +3193,13 @@ void UpdateNPCs()
                                                                 else
                                                                     NPCHit(A, 4, A);
                                                             }
-                                                            else if(NPC[A].Type == 13 || NPC[A].Type == 40)
+                                                            else if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_SPIT_BOSS_BALL)
                                                                 NPCHit(A, 4, A);
-                                                            if(NPC[A].Type == 45 && NPC[A].Special == 1)
+                                                            if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)
                                                                 NPCHit(A, 4, A);
                                                             if(NPC[A].Slope == 0 && !SlopeTurn)
                                                                 NPC[A].Location.X = Block[B].Location.X - NPC[A].Location.Width - 0.01;
-                                                            if(!(NPC[A].Type == 13 || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == 17))
+                                                            if(!(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_TANK_TREADS || NPC[A].Type == NPCID_BULLET))
                                                                 NPC[A].TurnAround = true;
                                                             if(NPCIsAParaTroopa[NPC[A].Type])
                                                                 NPC[A].Location.SpeedX += -Block[B].Location.SpeedX * 1.2;
@@ -3209,9 +3209,9 @@ void UpdateNPCs()
                                                         }
                                                         else if(HitSpot == 3) // Hitspot 3
                                                         {
-                                                            if(NPC[A].Type == 45 && NPC[A].Special == 1)
+                                                            if(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1)
                                                                 NPCHit(A, 4, A);
-                                                            if(NPC[A].Type == 15)
+                                                            if(NPC[A].Type == NPCID_MINIBOSS)
                                                                 NPC[A].Special3 = 0;
                                                             if(tempBlockHit[1] == 0)
                                                                 tempBlockHit[1] = B;
@@ -3225,7 +3225,7 @@ void UpdateNPCs()
                                                         }
                                                         else if(HitSpot == 5) // Hitspot 5
                                                         {
-                                                            if(NPC[A].Type == 13 || NPC[A].Type == 40)
+                                                            if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_SPIT_BOSS_BALL)
                                                                 NPCHit(A, 4, A);
                                                             beltClear = true;
 
@@ -3235,12 +3235,12 @@ void UpdateNPCs()
                                                             NPC[A].onWall = true;
 
                                                             if(NPC[A].WallDeath >= 5 && !NPCIsABonus[NPC[A].Type] && NPC[A].Type != NPCID_FLY_BLOCK &&
-                                                               NPC[A].Type != NPCID_FLY_CANNON && NPC[A].Type != NPCID_RED_BOOT && NPC[A].Type != 21 && NPC[A].Type != 22 &&
-                                                               NPC[A].Type != 26 && NPC[A].Type != 29 && NPC[A].Type != 31 && NPC[A].Type != 32 &&
-                                                               NPC[A].Type != 35 &&
+                                                               NPC[A].Type != NPCID_FLY_CANNON && NPC[A].Type != NPCID_RED_BOOT && NPC[A].Type != NPCID_CANNONENEMY && NPC[A].Type != NPCID_CANNONITEM &&
+                                                               NPC[A].Type != NPCID_SPRING && NPC[A].Type != NPC_HEAVY_THROWER && NPC[A].Type != NPCID_KEY && NPC[A].Type != NPCID_COIN_SWITCH &&
+                                                               NPC[A].Type != NPCID_GRN_BOOT &&
                                                                // Duplicated segment [PVS Studio]
                                                                // NPC[A].Type != NPCID_RED_BOOT &&
-                                                               NPC[A].Type != NPCID_BLU_BOOT && NPC[A].Type != 49 &&
+                                                               NPC[A].Type != NPCID_BLU_BOOT && NPC[A].Type != NPCID_TOOTHYPIPE &&
                                                                NPC[A].Type != NPCID_BOMB && NPC[A].Type != NPCID_SATURN && NPC[A].Type != NPCID_FLIPPED_RAINBOW_SHELL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK &&
                                                                !((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D))) // walldeath stuff
                                                             {
@@ -3258,7 +3258,7 @@ void UpdateNPCs()
                                                                     NPCQueues::Killed.push_back(A);
                                                                 }
                                                             }
-                                                            else if(NPC[A].Type != 48 && !(NPCIsABlock[NPC[A].Type] && Block[B].IsNPC > 0) && Block[B].IsNPC != 57)
+                                                            else if(NPC[A].Type != NPCID_SPIKY_BALL_S3 && !(NPCIsABlock[NPC[A].Type] && Block[B].IsNPC > 0) && Block[B].IsNPC != 57)
                                                             {
                                                                 addBelt = NPC[A].Location.X;
                                                                 if(NPC[A].Location.X + NPC[A].Location.Width / 2.0 < Block[B].Location.X + Block[B].Location.Width * 0.5)
@@ -3266,12 +3266,12 @@ void UpdateNPCs()
                                                                 else
                                                                     NPC[A].Location.X = Block[B].Location.X + Block[B].Location.Width + 0.01;
                                                                 addBelt = NPC[A].Location.X - addBelt;
-                                                                if(NPC[A].Type == 15)
+                                                                if(NPC[A].Type == NPCID_MINIBOSS)
                                                                 {
                                                                     NPC[A].Location.SpeedY = 0;
                                                                     NPC[A].Location.Y = Block[B].Location.Y - NPC[A].Location.Height - 0.01;
                                                                 }
-                                                                if(NPC[A].Type != 13 && NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != NPCID_PLR_ICEBALL)
+                                                                if(NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_TANK_TREADS && NPC[A].Type != NPCID_PLR_ICEBALL)
                                                                     NPC[A].TurnAround = true;
                                                                 if(NPCIsAShell[NPC[A].Type])
                                                                 {
@@ -3291,20 +3291,20 @@ void UpdateNPCs()
                                                                                 tempHitIsSlope, &NPC[A]);
                                                         }
 
-                                                        if((NPC[A].Projectile && NPC[A].Type != 13) != 0 && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != 58 && !(NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == NPCID_VPIPE_LONG)) // Hit the block if the NPC is a projectile
+                                                        if((NPC[A].Projectile && NPC[A].Type != NPCID_PLR_FIREBALL) != 0 && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_METALBARREL && !(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPC_HPIPE_SHORT || NPC[A].Type == NPC_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG)) // Hit the block if the NPC is a projectile
                                                         {
                                                             if(HitSpot == 2 || HitSpot == 4 || HitSpot == 5)
                                                             {
                                                                 BlockHit(B);
                                                                 PlaySound(SFX_BlockHit);
-                                                                if(NPC[A].Type == 17) // Bullet Bills
+                                                                if(NPC[A].Type == NPCID_BULLET) // Bullet Bills
                                                                 {
                                                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                                                     NPCHit(A, 4, A);
                                                                     BlockHitHard(B);
                                                                     break;
                                                                 }
-                                                                if(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == 45 && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
+                                                                if(NPCIsAShell[NPC[A].Type] || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 1) || NPC[A].Type == NPCID_ICE_CUBE)
                                                                 {
                                                                     BlockHitHard(B);
                                                                     if(Block[B].Type == 4 || Block[B].Type == 188 || Block[B].Type == 60 || Block[B].Type == 90)
@@ -3353,11 +3353,11 @@ void UpdateNPCs()
                                 else
                                     winningBlock = tempBlockHit[2];
                             }
-                            if(NPC[A].Type == 13 || NPC[A].Type == NPCID_PLR_ICEBALL) // Kill the fireball
+                            if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) // Kill the fireball
                                 NPCHit(A, 4);
                             else if(NPC[A].Projectile || Block[winningBlock].Invis) // Hit the block hard if the NPC is a projectile
                             {
-                                if(!(NPC[A].Type == 58 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == 21))
+                                if(!(NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPC_HPIPE_SHORT || NPC[A].Type == NPC_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == NPCID_CANNONENEMY))
                                 {
                                     if(NPC[A].Location.SpeedY < -0.05)
                                     {
@@ -3575,7 +3575,7 @@ void UpdateNPCs()
                         if(beltClear)
                             NPC[A].BeltSpeed = 0;
 
-                        if(NPC[A].Type == 37 || NPC[A].Type == NPCID_STONE_S4)
+                        if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4)
                             NPC[A].BeltSpeed = 0;
                         // End Block Collision
                         // If .Type = 12 Then .Projectile = True 'Stop the big fireballs from getting killed from tha lava
@@ -3590,14 +3590,14 @@ void UpdateNPCs()
 
                         // NPC Collision
 
-                        if(!NPC[A].Inert && NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != 22 && NPC[A].Type != 26 &&
-                                !(NPC[A].Type == NPC_HEAVY_THROWN && !NPC[A].Projectile) && NPC[A].Type != 32 && NPC[A].Type != 35 &&
-                                !(NPC[A].Type == 40 && !NPC[A].Projectile) &&
-                                !((NPC[A].Type == 58 || NPC[A].Type == 60 || NPC[A].Type == 62 || NPC[A].Type == 64 ||
-                           NPC[A].Type == 66 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 ||
-                           NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == 21) && !NPC[A].Projectile) &&
-                                !(NPC[A].Type == 45 && NPC[A].Special == 0) && !(NPC[A].Type == 48 && !NPC[A].Projectile) &&
-                           NPC[A].Type != 49 && NPC[A].Type != 46 && NPC[A].Type != 56 && NPC[A].Type != 57 &&
+                        if(!NPC[A].Inert && NPC[A].Type != NPCID_LIFT_SAND && NPC[A].Type != NPCID_CANNONITEM && NPC[A].Type != NPCID_SPRING &&
+                                !(NPC[A].Type == NPC_HEAVY_THROWN && !NPC[A].Projectile) && NPC[A].Type != NPCID_COIN_SWITCH && NPC[A].Type != NPCID_GRN_BOOT &&
+                                !(NPC[A].Type == NPCID_SPIT_BOSS_BALL && !NPC[A].Projectile) &&
+                                !((NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM ||
+                           NPC[A].Type == NPCID_RED_PLATFORM || NPC[A].Type == NPC_HPIPE_SHORT || NPC[A].Type == NPC_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT ||
+                           NPC[A].Type == NPCID_VPIPE_LONG || NPC[A].Type == NPCID_CANNONENEMY) && !NPC[A].Projectile) &&
+                                !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) && !(NPC[A].Type == NPCID_SPIKY_BALL_S3 && !NPC[A].Projectile) &&
+                           NPC[A].Type != NPCID_TOOTHYPIPE && NPC[A].Type != NPCID_FALL_BLOCK_RED && NPC[A].Type != NPCID_VEHICLE && NPC[A].Type != NPCID_CONVEYOR &&
                                 !NPCIsYoshi[NPC[A].Type] && !(NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M) &&
                                 !(NPC[A].Type == NPCID_ITEM_POD && !NPC[A].Projectile) && !(NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 &&
                            NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4 && NPC[A].Projectile && NPC[A].CantHurt > 0) &&
@@ -3624,7 +3624,7 @@ void UpdateNPCs()
                                             {
                                                 // if(B != A)
                                                 {
-                                                    if(!(NPC[B].Type == 15 && NPC[B].Special == 4) && !(NPCIsToad[NPC[B].Type]) &&
+                                                    if(!(NPC[B].Type == NPCID_MINIBOSS && NPC[B].Special == 4) && !(NPCIsToad[NPC[B].Type]) &&
                                                        !(NPC[B].Type >= NPCID_PLATFORM_S3 && NPC[B].Type <= NPCID_PLATFORM_S1) && !(NPC[B].Type >= NPCID_CARRY_BLOCK_A && NPC[B].Type <= NPCID_CARRY_BLOCK_D) &&
                                                        NPC[B].Type != NPCID_LIFT_SAND && NPC[B].Type != NPCID_SICK_BOSS_BALL && !NPCIsAVine[NPC[B].Type] &&
                                                        NPC[B].Type != NPCID_PLR_ICEBALL && NPC[B].Type != NPCID_FIRE_CHAIN && NPC[B].Type != NPCID_CHAR3_HEAVY)
@@ -3635,21 +3635,21 @@ void UpdateNPCs()
                                                            NPC[B].JustActivated == 0 && !NPC[B].Inert && NPC[B].Killed == 0)
                                                         {
 
-                                                            if(NPC[B].Type != 22 && NPC[B].Type != NPCID_SWORDBEAM && NPC[B].Type != 49 && NPC[B].Type != 26 &&
-                                                               NPC[B].Type != NPC_HEAVY_THROWN && NPC[B].Type != 31 && NPC[B].Type != 32 && NPC[B].Type != 35 &&
-                                                               NPC[B].Type != 56 && NPC[B].Type != 50 && NPC[B].Type != 57 && NPC[B].Type != 58 &&
+                                                            if(NPC[B].Type != NPCID_CANNONITEM && NPC[B].Type != NPCID_SWORDBEAM && NPC[B].Type != NPCID_TOOTHYPIPE && NPC[B].Type != NPCID_SPRING &&
+                                                               NPC[B].Type != NPC_HEAVY_THROWN && NPC[B].Type != NPCID_KEY && NPC[B].Type != NPCID_COIN_SWITCH && NPC[B].Type != NPCID_GRN_BOOT &&
+                                                               NPC[B].Type != NPCID_VEHICLE && NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_CONVEYOR && NPC[B].Type != NPCID_METALBARREL &&
                                                                NPC[B].Type != NPCID_RED_BOOT && NPC[B].Type != NPCID_BLU_BOOT && !NPC[B].Generator &&
-                                                               !((NPC[A].Type == 13 || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL) &&
+                                                               !((NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL) && NPC[B].Type == NPCID_FLIPPED_RAINBOW_SHELL) &&
                                                                NPC[B].Type != NPCID_TIMER_S2 && NPC[B].Type != NPCID_FLY_BLOCK && NPC[B].Type != NPCID_FLY_CANNON && NPC[B].Type != NPCID_DOOR_MAKER &&
                                                                NPC[B].Type != NPCID_MAGIC_DOOR && NPC[B].Type != NPCID_CHAR3_HEAVY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY)
                                                             {
-                                                                if(!(NPC[B].Type == 67 || NPC[B].Type == 60 || NPC[B].Type == 62 ||
-                                                                   NPC[B].Type == 64 || NPC[B].Type == 66 || NPC[B].Type == 68 ||
-                                                                   NPC[B].Type == 69 || NPC[B].Type == NPCID_VPIPE_LONG) && !(!NPC[A].Projectile &&
-                                                                   NPC[B].Type == 48) && !NPCIsYoshi[NPC[B].Type] && NPC[B].Type != 46 &&
-                                                                   NPC[B].Type != NPCID_FALL_BLOCK_BROWN && !(NPC[B].Type == 45 && NPC[B].Special == 0) &&
-                                                                   NPC[B].Type != 57 && !(NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M) &&
-                                                                   NPC[B].Type != NPCID_STATUE_S3 && NPC[B].Type != NPCID_STATUE_FIRE && !(NPC[B].Type == 17 &&
+                                                                if(!(NPC[B].Type == NPC_HPIPE_SHORT || NPC[B].Type == NPCID_YEL_PLATFORM || NPC[B].Type == NPCID_BLU_PLATFORM ||
+                                                                   NPC[B].Type == NPCID_GRN_PLATFORM || NPC[B].Type == NPCID_RED_PLATFORM || NPC[B].Type == NPC_HPIPE_LONG ||
+                                                                   NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG) && !(!NPC[A].Projectile &&
+                                                                   NPC[B].Type == NPCID_SPIKY_BALL_S3) && !NPCIsYoshi[NPC[B].Type] && NPC[B].Type != NPCID_FALL_BLOCK_RED &&
+                                                                   NPC[B].Type != NPCID_FALL_BLOCK_BROWN && !(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0) &&
+                                                                   NPC[B].Type != NPCID_CONVEYOR && !(NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M) &&
+                                                                   NPC[B].Type != NPCID_STATUE_S3 && NPC[B].Type != NPCID_STATUE_FIRE && !(NPC[B].Type == NPCID_BULLET &&
                                                                    NPC[B].CantHurt > 0) && NPC[B].Type != NPCID_ITEM_BURIED && !(NPC[A].CantHurtPlayer == NPC[B].CantHurtPlayer &&
                                                                    NPC[A].CantHurtPlayer > 0) && !(NPC[B].Type == NPCID_ITEM_POD && !NPC[B].Projectile) &&
                                                                    NPC[B].Type != NPCID_PET_FIRE && NPC[B].Type != NPCID_PLANT_FIRE && NPC[B].Type != NPCID_QUAD_BALL &&
@@ -3679,8 +3679,8 @@ void UpdateNPCs()
                                                                     if(NPCIsToad[NPC[A].Type])
                                                                     {
                                                                         if(!(NPCWontHurt[NPC[B].Type] && !NPC[B].Projectile) && !NPCIsABonus[NPC[B].Type] &&
-                                                                           NPC[B].Type != 13 && NPC[B].Type != NPCID_PLR_ICEBALL && !(NPC[B].Type == 17 && NPC[B].CantHurt > 0) &&
-                                                                           NPC[B].Type != 50 && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY && NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
+                                                                           NPC[B].Type != NPCID_PLR_FIREBALL && NPC[B].Type != NPCID_PLR_ICEBALL && !(NPC[B].Type == NPCID_BULLET && NPC[B].CantHurt > 0) &&
+                                                                           NPC[B].Type != NPCID_TOOTHY && NPC[B].Type != NPCID_PLR_HEAVY && NPC[B].Type != NPCID_CHAR4_HEAVY && NPC[B].Type != NPCID_FLIPPED_RAINBOW_SHELL)
                                                                         {
                                                                             NPCHit(A, 3, B);
                                                                             HitSpot = 0;
@@ -3699,7 +3699,7 @@ void UpdateNPCs()
 
                                                                         if(CheckCollision(tempLocation, tempLocation2))
                                                                         {
-                                                                            NPC[B].Type -= 4;
+                                                                            NPC[B].Type -= NPCID_GRN_TURTLE_S3;
                                                                             if(NPC[B].Type == NPCID_YEL_TURTLE_S4)
                                                                                 NPC[B].Type = NPCID_RAINBOW_SHELL;
                                                                             NPC[A].Killed = 9;
@@ -3709,14 +3709,14 @@ void UpdateNPCs()
                                                                         }
                                                                     }
                                                                     // NPC is a projectile
-                                                                    else if(NPC[A].Projectile && !(NPC[B].Type == 45 && NPC[B].Special == 0.0) && NPC[A].Type != NPCID_SWORDBEAM)
+                                                                    else if(NPC[A].Projectile && !(NPC[B].Type == NPCID_SLIDE_BLOCK && NPC[B].Special == 0.0) && NPC[A].Type != NPCID_SWORDBEAM)
                                                                     {
-                                                                        if(!(NPC[A].Projectile && NPC[B].Projectile && NPC[A].Type == 17 && NPC[B].Type == 17 && NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer))
+                                                                        if(!(NPC[A].Projectile && NPC[B].Projectile && NPC[A].Type == NPCID_BULLET && NPC[B].Type == NPCID_BULLET && NPC[A].CantHurtPlayer != NPC[B].CantHurtPlayer))
                                                                         {
-                                                                            if(!((NPC[A].Type == 13 && NPCIsABonus[NPC[B].Type]) || NPC[B].Type == 13 || NPC[B].Type == NPCID_VILLAIN_FIRE))
+                                                                            if(!((NPC[A].Type == NPCID_PLR_FIREBALL && NPCIsABonus[NPC[B].Type]) || NPC[B].Type == NPCID_PLR_FIREBALL || NPC[B].Type == NPCID_VILLAIN_FIRE))
                                                                             {
                                                                                 if(NPCIsAShell[NPC[A].Type] &&
-                                                                                        (NPC[B].Type == 55 || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) &&
+                                                                                        (NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) &&
                                                                                         (int(NPC[A].Direction) != int(NPC[B].Direction) || NPC[A].Special > 0) && !NPC[B].Projectile)
                                                                                 {
                                                                                     if(int(NPC[A].Direction) == -1)
@@ -3813,7 +3813,7 @@ void UpdateNPCs()
                                                                                 {
                                                                                     if(!NPCIsABonus[NPC[B].Type])
                                                                                     {
-                                                                                        if(NPC[A].Type == 21 && NPC[B].Type == 17)
+                                                                                        if(NPC[A].Type == NPCID_CANNONENEMY && NPC[B].Type == NPCID_BULLET)
                                                                                             NPC[B].Projectile = true;
                                                                                         else
                                                                                         {
@@ -3843,7 +3843,7 @@ void UpdateNPCs()
                                                                                                 }
                                                                                             }
 
-                                                                                            if(!(NPC[A].Type == 17 && NPC[A].Projectile))
+                                                                                            if(!(NPC[A].Type == NPCID_BULLET && NPC[A].Projectile))
                                                                                             {
                                                                                                 if(NPCIsAShell[NPC[B].Type] && NPC[B].Projectile)
                                                                                                 {
@@ -3860,14 +3860,14 @@ void UpdateNPCs()
                                                                                             if(!tempBool) // end cluster
                                                                                                 NPCHit(B, 3, A);
 
-                                                                                            if(NPC[A].Type == 17)
+                                                                                            if(NPC[A].Type == NPCID_BULLET)
                                                                                             {
-                                                                                                if(NPC[B].Type == 15)
+                                                                                                if(NPC[B].Type == NPCID_MINIBOSS)
                                                                                                 {
                                                                                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                                                                                     NPCHit(A, 4, B);
                                                                                                 }
-                                                                                                else if(NPC[B].Type == 21)
+                                                                                                else if(NPC[B].Type == NPCID_CANNONENEMY)
                                                                                                 {
                                                                                                     NPC[A].Location.SpeedX = -NPC[A].Location.SpeedX;
                                                                                                     PlaySound(SFX_BlockHit);
@@ -3880,7 +3880,7 @@ void UpdateNPCs()
                                                                             }
                                                                         }
                                                                     }
-                                                                    else if(!(NPC[B].Type == 40 && !NPC[B].Projectile))
+                                                                    else if(!(NPC[B].Type == NPCID_SPIT_BOSS_BALL && !NPC[B].Projectile))
                                                                     {
                                                                         HitSpot = FindCollision(NPC[A].Location, NPC[B].Location);
                                                                         if(NPCIsToad[NPC[A].Type] && NPC[A].Killed > 0)
@@ -3900,9 +3900,9 @@ void UpdateNPCs()
 
                                                                         if(!NPC[B].Projectile && !NPCNoClipping[NPC[A].Type] && !NPCNoClipping[NPC[B].Type])
                                                                         {
-                                                                            if(((NPC[A].Type == 55 || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPCIsAShell[NPC[B].Type]) || ((NPC[B].Type == 55 || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) && NPCIsAShell[NPC[A].Type])) // Nekkid koopa kicking a shell
+                                                                            if(((NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4) && NPCIsAShell[NPC[B].Type]) || ((NPC[B].Type == NPCID_EXT_TURTLE || NPC[B].Type == NPCID_BLU_HIT_TURTLE_S4) && NPCIsAShell[NPC[A].Type])) // Nekkid koopa kicking a shell
                                                                             {
-                                                                                if(NPC[A].Type == 55 || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4)
+                                                                                if(NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_BLU_HIT_TURTLE_S4)
                                                                                 {
                                                                                     if(NPC[A].Location.SpeedY == Physics.NPCGravity || NPC[A].Slope > 0)
                                                                                     {
@@ -3928,7 +3928,7 @@ void UpdateNPCs()
                                                                                 {
                                                                                     if(NPC[A].Location.SpeedX * NPC[A].Direction > NPC[B].Location.SpeedX * NPC[B].Direction)
                                                                                     {
-                                                                                        if(NPC[A].Type != 17 && NPC[A].Type != 13 && NPC[A].Type != NPCID_PLR_ICEBALL)
+                                                                                        if(NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL)
                                                                                             NPC[A].TurnAround = true;
                                                                                     }
                                                                                     else if(NPC[A].Location.SpeedX * NPC[A].Direction < NPC[B].Location.SpeedX * NPC[B].Direction)
@@ -3941,7 +3941,7 @@ void UpdateNPCs()
                                                                                 }
                                                                                 else
                                                                                 {
-                                                                                    if(NPC[A].Type != 17 && NPC[A].Type != 13 && NPC[A].Type != NPCID_PLR_ICEBALL)
+                                                                                    if(NPC[A].Type != NPCID_BULLET && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL)
                                                                                         NPC[A].TurnAround = true;
                                                                                     NPC[B].TurnAround = true;
                                                                                 }
@@ -3970,7 +3970,7 @@ void UpdateNPCs()
 
                         if(tempHit != 0) // Walking   // VERIFY ME
                         {
-                            if(NPC[A].Type == 3) // Walking code for Flying Goomba
+                            if(NPC[A].Type == NPCID_RED_FLY_FODDER) // Walking code for Flying Goomba
                             {
                                 if(NPC[A].Special <= 30)
                                 {
@@ -4276,7 +4276,7 @@ void UpdateNPCs()
                                 else
                                 {
                                     NPC[A].Location.SpeedY = 0;
-                                    if(NPC[A].Slope > 0 && !NPCIsAShell[NPC[A].Type] && NPC[A].Type != 45)
+                                    if(NPC[A].Slope > 0 && !NPCIsAShell[NPC[A].Type] && NPC[A].Type != NPCID_SLIDE_BLOCK)
                                     {
                                         NPC[A].Location.SpeedY = NPC[A].Location.SpeedX * (Block[NPC[A].Slope].Location.Height / static_cast<double>(Block[NPC[A].Slope].Location.Width)) * BlockSlope[Block[NPC[A].Slope].Type];
                                         if(NPC[A].Location.SpeedY < 0)
@@ -4320,12 +4320,12 @@ void UpdateNPCs()
                         }
                     }
                 }
-                if(NPC[A].tempBlock > 0 && (NPC[A].Type < 60 || NPC[A].Type > 66) && NPC[A].Type != 57)
+                if(NPC[A].tempBlock > 0 && (NPC[A].Type < 60 || NPC[A].Type > 66) && NPC[A].Type != NPCID_CONVEYOR)
                 {
-                    if((NPC[A].Type < 78 || NPC[A].Type > 83) && NPC[A].Type != 26)
+                    if((NPC[A].Type < 78 || NPC[A].Type > 83) && NPC[A].Type != NPCID_SPRING)
                     {
                         Block[NPC[A].tempBlock].Location = NPC[A].Location;
-                        if(NPC[A].Type == 26)
+                        if(NPC[A].Type == NPCID_SPRING)
                         {
                             // the NPC tree accounts for this; no need to split tempBlock
                             Block[NPC[A].tempBlock].Location.Y -= 16;
@@ -4391,7 +4391,7 @@ void UpdateNPCs()
 
                 if(NPC[A].Projectile)
                 {
-                    if(NPC[A].Type == NPCID_SAW || NPC[A].Type == 58 || NPC[A].Type == 21 || NPC[A].Type == 67 || NPC[A].Type == 68 || NPC[A].Type == 69 || NPC[A].Type == NPCID_VPIPE_LONG || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M))
+                    if(NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_METALBARREL || NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPC_HPIPE_SHORT || NPC[A].Type == NPC_HPIPE_LONG || NPC[A].Type == NPCID_VPIPE_SHORT || NPC[A].Type == NPCID_VPIPE_LONG || (NPC[A].Type >= NPCID_TANK_TREADS && NPC[A].Type <= NPCID_SLANT_WOOD_M))
                         NPC[A].Projectile = false;
                 }
 
@@ -4955,7 +4955,7 @@ void UpdateNPCs()
                     }
 
                 }
-                else if(NPC[A].Type == 29 && NPC[A].HoldingPlayer > 0)
+                else if(NPC[A].Type == NPC_HEAVY_THROWER && NPC[A].HoldingPlayer > 0)
                 {
                     if(Player[NPC[A].HoldingPlayer].Effect == 0)
                         NPC[A].Special3 += 1;
@@ -4982,9 +4982,9 @@ void UpdateNPCs()
                         syncLayers_NPC(numNPCs);
                     }
                 }
-                else if(NPC[A].Type == 21 || NPC[A].Type == 22) // Bullet Bill Shooter
+                else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM) // Bullet Bill Shooter
                 {
-                    if(NPC[A].Type == 21)
+                    if(NPC[A].Type == NPCID_CANNONENEMY)
                     {
                         NPC[A].Special += 1;
                         if(NPC[A].HoldingPlayer > 0)
@@ -5052,7 +5052,7 @@ void UpdateNPCs()
                                 Player[NPC[A].HoldingPlayer].SpinFireDir = int(NPC[A].Direction);
                         }
 
-                        if(NPC[A].HoldingPlayer == 0 && NPC[A].standingOnPlayer == 0 && NPC[A].Type == 21)
+                        if(NPC[A].HoldingPlayer == 0 && NPC[A].standingOnPlayer == 0 && NPC[A].Type == NPCID_CANNONENEMY)
                         {
                             C = 0;
                             for(B = 1; B <= numPlayers; B++)
@@ -5086,7 +5086,7 @@ void UpdateNPCs()
                                 tempBool = false;
                                 NPC[numNPCs].Direction = NPC[A].Direction;
                                 NPC[numNPCs].DefaultDirection = NPC[A].Direction;
-                                if(NPC[A].HoldingPlayer > 0 || NPC[A].standingOnPlayer > 0 || (NPC[A].Type == 22 && NPC[A].Projectile))
+                                if(NPC[A].HoldingPlayer > 0 || NPC[A].standingOnPlayer > 0 || (NPC[A].Type == NPCID_CANNONITEM && NPC[A].Projectile))
                                 {
                                     NPC[numNPCs].Projectile = true;
                                     NPC[numNPCs].CantHurt = 10000;
@@ -5099,7 +5099,7 @@ void UpdateNPCs()
                                     NPC[numNPCs].CantHurt = 1000;
                                     NPC[numNPCs].CantHurtPlayer = NPC[A].CantHurtPlayer;
                                 }
-                                else if(NPC[A].Type == 22)
+                                else if(NPC[A].Type == NPCID_CANNONITEM)
                                 {
                                     tempBool = true;
                                     numNPCs--;
@@ -5111,7 +5111,7 @@ void UpdateNPCs()
                                     NPC[numNPCs].TimeLeft = 100;
                                     NPC[numNPCs].JustActivated = 0;
                                     NPC[numNPCs].Section = NPC[A].Section;
-                                    NPC[numNPCs].Type = 17;
+                                    NPC[numNPCs].Type = NPCID_BULLET;
                                     NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
                                     NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
 
@@ -5138,7 +5138,7 @@ void UpdateNPCs()
                         }
                     }
                 }
-                else if(NPC[A].Type == 50)
+                else if(NPC[A].Type == NPCID_TOOTHY)
                 {
                     B = 0;
                     if(NPC[A].Special > 0)
@@ -5238,7 +5238,7 @@ void UpdateNPCs()
                     if(NPC[A].standingOnPlayer > 0 && !Player[NPC[A].standingOnPlayer].Controls.Run)
                         NPC[A].Special = 0;
                 }
-                else if(NPC[A].Type == 31)
+                else if(NPC[A].Type == NPCID_KEY)
                 {
                     if(NPC[A].HoldingPlayer > 0)
                     {
@@ -5440,7 +5440,7 @@ void UpdateNPCs()
             }
             else if(NPC[A].Effect == 3) // Bonus falling out of a block
             {
-                if(NPC[A].Type == 34)
+                if(NPC[A].Type == NPCID_LEAF_POWER)
                     NPC[A].Direction = 1;
                 else if(NPC[A].Direction == 0.f) // Move toward the closest player
                 {
@@ -5535,7 +5535,7 @@ void UpdateNPCs()
                 }
                 else if(NPC[A].Effect3 == 2)
                 {
-                    if(NPC[A].Type == 9 || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE)
+                    if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE)
                         NPC[A].Location.X -= double(Physics.NPCMushroomSpeed);
                     else if(NPCCanWalkOn[NPC[A].Type])
                         NPC[A].Location.X -= 1;
@@ -5551,7 +5551,7 @@ void UpdateNPCs()
                 }
                 else if(NPC[A].Effect3 == 4)
                 {
-                    if(NPC[A].Type == 9 || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE)
+                    if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_BIG_MOLE)
                         NPC[A].Location.X += double(Physics.NPCMushroomSpeed);
                     else if(NPCCanWalkOn[NPC[A].Type])
                         NPC[A].Location.X += 1;

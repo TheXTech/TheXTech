@@ -227,8 +227,8 @@ public:
                 (
                   (
                     (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
-                    (NPC[A].Type == 50 && NPC[A].standingOnPlayer == 0) ||
-                    (NPC[A].Type == 17 && NPC[A].CantHurt > 0)
+                    (NPC[A].Type == NPCID_TOOTHY && NPC[A].standingOnPlayer == 0) ||
+                    (NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
                   ) || NPC[A].Effect == 5
                 ) && NPC[A].Type != NPCID_ITEM_BURIED && !Player[NPC[A].HoldingPlayer].Dead
             )
@@ -256,8 +256,8 @@ public:
             g_stats.renderedNPCs += 1;
         }
         else if(NPC[A].Effect == 0 && NPC[A].HoldingPlayer == 0 &&
-            (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 || NPC[A].Type == 22 ||
-                NPC[A].Type == 49 || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
+            (NPC[A].standingOnPlayer > 0 || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CANNONITEM ||
+                NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
                 NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPCIsACoin[NPC[A].Type]))
         {
             if(Low_n == sizeof(Low) / sizeof(uint16_t))
@@ -269,10 +269,10 @@ public:
         else if(NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT ||
             ((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] ||
                     NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_FIRE_PLANT ||
-                    NPC[A].Type == 8 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
-                    NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == 51 ||
-                    NPC[A].Type == 52 || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
-                    NPC[A].Effect == 4 || (NPC[A].Type == 45 && NPC[A].Special == 0.0))
+                    NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
+                    NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_BOTTOM_PLANT ||
+                    NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
+                    NPC[A].Effect == 4 || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0.0))
                 && NPC[A].standingOnPlayer == 0))
         {
             if(BG_n == sizeof(BG) / sizeof(uint16_t))
@@ -611,10 +611,10 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
 
         if(((NPC[A].Effect == 208 || NPCIsAVine[NPC[A].Type] ||
              NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_FIRE_PLANT ||
-             NPC[A].Type == 8 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
-             NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == 51 ||
-             NPC[A].Type == 52 || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
-             NPC[A].Effect == 4 || (NPC[A].Type == 45 && NPC[A].Special == 0.0)) &&
+             NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BIG_PLANT ||
+             NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_BOTTOM_PLANT ||
+             NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Effect == 1 || NPC[A].Effect == 3 ||
+             NPC[A].Effect == 4 || (NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0.0)) &&
              (NPC[A].standingOnPlayer == 0 && (!NPC[A].Generator || LevelEditor))) ||
              NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_JUMP_PLANT)
         {
@@ -624,8 +624,8 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
             }
         }
 
-        if(NPC[A].Effect == 0 && ((NPC[A].HoldingPlayer == 0 && (NPC[A].standingOnPlayer > 0 || NPC[A].Type == 56 ||
-                                   NPC[A].Type == 22 || NPC[A].Type == 49 || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
+        if(NPC[A].Effect == 0 && ((NPC[A].HoldingPlayer == 0 && (NPC[A].standingOnPlayer > 0 || NPC[A].Type == NPCID_VEHICLE ||
+                                   NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ROCKET_WOOD ||
                                    NPC[A].Type == NPCID_FIRE_BOSS_FIRE || NPCIsACoin[NPC[A].Type]) && (!NPC[A].Generator || LevelEditor))))
         {
             npcALoc = newLoc(NPC[A].Location.X - (NPCWidthGFX[NPC[A].Type] - NPC[A].Location.Width) / 2.0,
@@ -651,10 +651,10 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
         if(NPC[A].Effect == 0)
         {
             if(!(NPC[A].HoldingPlayer > 0 || NPCIsAVine[NPC[A].Type] || NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_FIRE_BOSS_FIRE ||
-                 NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_ROCKET_WOOD || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == 8 || NPC[A].Type == NPCID_FIRE_PLANT ||
-                 NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP ||
-                 NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == 56 || NPC[A].Type == 22 || NPC[A].Type == 49 || NPC[A].Type == NPCID_ITEM_BURIED) &&
-               !(NPC[A].Type == 45 && NPC[A].Special == 0) && NPC[A].standingOnPlayer == 0 &&
+                 NPC[A].Type == NPCID_JUMP_PLANT || NPC[A].Type == NPCID_ROCKET_WOOD || NPC[A].Type == NPCID_LIFT_SAND || NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_FIRE_PLANT ||
+                 NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP ||
+                 NPC[A].Type == NPCID_LONG_PLANT_DOWN || NPC[A].Type == NPCID_VEHICLE || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_TOOTHYPIPE || NPC[A].Type == NPCID_ITEM_BURIED) &&
+               !(NPC[A].Type == NPCID_SLIDE_BLOCK && NPC[A].Special == 0) && NPC[A].standingOnPlayer == 0 &&
                !NPCForeground[NPC[A].Type] && (!NPC[A].Generator || LevelEditor) &&
                NPC[A].Type != NPCID_SAW && NPC[A].Type != NPCID_ICE_CUBE)
             {
@@ -674,8 +674,8 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
             (
               (
                 (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
-                (NPC[A].Type == 50 && NPC[A].standingOnPlayer == 0) ||
-                (NPC[A].Type == 17 && NPC[A].CantHurt > 0)
+                (NPC[A].Type == NPCID_TOOTHY && NPC[A].standingOnPlayer == 0) ||
+                (NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
               ) || NPC[A].Effect == 5
             ) && NPC[A].Type != NPCID_ITEM_BURIED && !Player[NPC[A].HoldingPlayer].Dead
         )
@@ -726,13 +726,13 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
                 NPC_Draw_Queue_p.add(A);
             }
 
-            if((NPC[A].Reset[Z] && (!check_both_reset || NPC[A].Reset[3 - Z])) || NPC[A].Active || (activate_conveyer && NPC[A].Type == 57))
+            if((NPC[A].Reset[Z] && (!check_both_reset || NPC[A].Reset[3 - Z])) || NPC[A].Active || (activate_conveyer && NPC[A].Type == NPCID_CONVEYOR))
             {
                 if(set_justactivated && !NPC[A].Active)
                     NPC[A].JustActivated = Z;
 
                 NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
-                if(check_long_life && (NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == 9 || NPC[A].Type == 14 || NPC[A].Type == 22 || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPC_HEAVY_POWER || NPC[A].Type == NPCID_FIRE_POWER_S1 || NPC[A].Type == NPCID_FIRE_POWER_S4 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_3_LIFE || NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL || NPC[A].Type == NPCID_PLATFORM_S3))
+                if(check_long_life && (NPCIsYoshi[NPC[A].Type] || NPCIsBoot[NPC[A].Type] || NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_FIRE_POWER_S3 || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_STATUE_POWER || NPC[A].Type == NPC_HEAVY_POWER || NPC[A].Type == NPCID_FIRE_POWER_S1 || NPC[A].Type == NPCID_FIRE_POWER_S4 || NPC[A].Type == NPCID_POWER_S1 || NPC[A].Type == NPCID_POWER_S4 || NPC[A].Type == NPCID_LIFE_S1 || NPC[A].Type == NPCID_LIFE_S4 || NPC[A].Type == NPCID_3_LIFE || NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL || NPC[A].Type == NPCID_PLATFORM_S3))
                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen * 20;
 
                 if(!NPC[A].Active)
@@ -1380,11 +1380,11 @@ void UpdateGraphics(bool skipRepaint)
                 {
                     {
                         {
-                            if(NPC[A].Type == 8 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
+                            if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_LONG_PLANT_UP || NPC[A].Type == NPCID_JUMP_PLANT)
                             {
                                 XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type], vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type], NPC[A].Location.Width, NPC[A].Location.Height, GFXNPC[NPC[A].Type], 0, NPC[A].Frame * NPCHeight[NPC[A].Type], cn, cn, cn);
                             }
-                            else if(NPC[A].Type == 51 || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
+                            else if(NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_LONG_PLANT_DOWN)
                             {
                                 XRender::renderTexture(vScreen[Z].X + NPC[A].Location.X + NPCFrameOffsetX[NPC[A].Type],
                                         vScreen[Z].Y + NPC[A].Location.Y + NPCFrameOffsetY[NPC[A].Type],
@@ -1393,7 +1393,7 @@ void UpdateGraphics(bool skipRepaint)
                                         NPC[A].Frame * NPCHeight[NPC[A].Type] + NPCHeight[NPC[A].Type] - NPC[A].Location.Height,
                                         cn, cn, cn);
                             }
-                            else if(NPC[A].Type == 52)
+                            else if(NPC[A].Type == NPCID_SIDE_PLANT)
                             {
                                 if(NPC[A].Direction == -1)
                                 {

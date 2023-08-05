@@ -1,16 +1,17 @@
 #include <fmt_format_ne.h>
 
-#include "../core/render.h"
+#include "core/render.h"
 
-#include "../global_constants.h"
-#include "../controls.h"
-#include "../sound.h"
-#include "../globals.h"
-#include "../gfx.h"
-#include "../graphics.h"
-#include "../player.h"
-#include "../compat.h"
-#include "../config.h"
+#include "global_constants.h"
+#include "controls.h"
+#include "sound.h"
+#include "globals.h"
+#include "gfx.h"
+#include "graphics.h"
+#include "player.h"
+#include "compat.h"
+#include "config.h"
+#include "npc_id.h"
 
 #include "main/game_info.h"
 
@@ -935,8 +936,8 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
 
                         for(int A = 1; A <= numNPCs; A++)
                         {
-                            if(A % (p + 1) == 0 && NPC[A].Type == 13)
-                                NPC[A].Special = c+1;
+                            if(A % (p + 1) == 0 && NPC[A].Type == NPCID_PLR_FIREBALL)
+                                NPC[A].Special = c + 1;
                         }
                     }
                 }

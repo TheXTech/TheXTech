@@ -1182,7 +1182,7 @@ static void warioTime()
                 tempLocation.Y -= 16;
                 tempLocation.X -= 16;
                 NewEffect(EFFID_SMOKE_S3, tempLocation);
-                NPC[B].Type = 10;
+                NPC[B].Type = NPCID_COIN_S3;
                 NPC[B].Location.Width = NPCWidth[NPC[B].Type];
                 NPC[B].Location.Height = NPCHeight[NPC[B].Type];
                 NPC[B].Location.Y += -NPC[B].Location.Height / 2.0;
@@ -1205,7 +1205,7 @@ static void carKeys()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 31;
+            NPC[numNPCs].Type = NPCID_KEY;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1232,7 +1232,7 @@ static void boingyBoing()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 26;
+            NPC[numNPCs].Type = NPCID_SPRING;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1287,7 +1287,7 @@ static void fireMissiles()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 17;
+            NPC[numNPCs].Type = NPCID_BULLET;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;
@@ -1398,7 +1398,7 @@ static void hammerInMyPants()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = 29;
+            NPC[numNPCs].Type = NPC_HEAVY_THROWER;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;

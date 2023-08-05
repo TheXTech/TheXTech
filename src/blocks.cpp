@@ -210,7 +210,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         for(auto B = 1; B <= numNPCs; B++)
         {
-            if(NPC[B].Type == 60)
+            if(NPC[B].Type == NPCID_YEL_PLATFORM)
             {
                 NPC[B].Direction = -NPC[B].Direction;
             }
@@ -233,7 +233,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         for(auto B = 1; B <= numNPCs; B++)
         {
-            if(NPC[B].Type == 62)
+            if(NPC[B].Type == NPCID_BLU_PLATFORM)
             {
                 NPC[B].Direction = -NPC[B].Direction;
             }
@@ -256,7 +256,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         for(auto B = 1; B <= numNPCs; B++)
         {
-            if(NPC[B].Type == 64)
+            if(NPC[B].Type == NPCID_GRN_PLATFORM)
             {
                 NPC[B].Direction = -NPC[B].Direction;
             }
@@ -279,7 +279,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
         }
         for(auto B = 1; B <= numNPCs; B++)
         {
-            if(NPC[B].Type == 66)
+            if(NPC[B].Type == NPCID_RED_PLATFORM)
             {
                 NPC[B].Direction = -NPC[B].Direction;
             }
@@ -2081,7 +2081,7 @@ void PSwitch(bool enabled)
                     if((NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5 || NPC[A].Type == NPCID_GEM_20) && NPC[A].DefaultType != 0)
                         NPC[A].Type = NPC[A].DefaultType;
 
-                    if(NPC[A].Type == 33 || NPC[A].Type == NPCID_COIN_5)
+                    if(NPC[A].Type == NPCID_COIN_S4 || NPC[A].Type == NPCID_COIN_5)
                         nb.Type = 89;
                     else if(NPC[A].Type == NPCID_COIN_S1)
                         nb.Type = 188;

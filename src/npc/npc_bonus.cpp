@@ -183,7 +183,7 @@ void TouchBonus(int A, int B)
         //            Netplay::sendData "1k" + std::to_string(A) + "|" + std::to_string(B) + "|" + NPC[B].Type + LB;
         if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) // for link give hearts
         {
-            if(NPC[B].Type == 34 || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPC_HEAVY_POWER)
+            if(NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPC_HEAVY_POWER)
             {
                 Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
@@ -304,11 +304,11 @@ void TouchBonus(int A, int B)
         if(NPCIsToad[NPC[B].Type])
         {
             toadBool = NPC[B].Type;
-            NPC[B].Type = 9;
+            NPC[B].Type = NPCID_POWER_S3;
         }
         if(NPC[B].Type == NPCID_POISON) // Bonus is a POISON mushroom
             PlayerHurt(A);
-        else if(NPC[B].Type == 9 || NPC[B].Type == NPCID_POWER_S1 || NPC[B].Type == NPCID_POWER_S4 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5) // Bonus is a mushroom
+        else if(NPC[B].Type == NPCID_POWER_S3 || NPC[B].Type == NPCID_POWER_S1 || NPC[B].Type == NPCID_POWER_S4 || NPC[B].Type == NPCID_POWER_S2 || NPC[B].Type == NPCID_POWER_S5) // Bonus is a mushroom
         {
             if(Player[A].Character == 5 && Player[A].State == 1)
                 Player[A].State = 2;
@@ -343,7 +343,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 14 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4) // Bonus is a fire flower
+        else if(NPC[B].Type == NPCID_FIRE_POWER_S3 || NPC[B].Type == NPCID_FIRE_POWER_S1 || NPC[B].Type == NPCID_FIRE_POWER_S4) // Bonus is a fire flower
         {
             if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5)
             {
@@ -416,7 +416,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == 34) // Bonus is a leaf
+        else if(NPC[B].Type == NPCID_LEAF_POWER) // Bonus is a leaf
         {
             UpdatePlayerBonus(A, NPC[B].Type);
             Player[A].StateNPC = NPC[B].Type;
@@ -555,7 +555,7 @@ void TouchBonus(int A, int B)
                 if(numPlayers > 2 /*&& nPlay.Online == false*/)
                     Player[1] = Player[A];
             }
-            if(NPC[B].Type == 11)
+            if(NPC[B].Type == NPCID_ITEMGOAL)
             {
                 if(NPC[B].Frame == 0)
                     MoreScore(10, Player[A].Location);
@@ -581,7 +581,7 @@ void TouchBonus(int A, int B)
                 XEvents::doEvents();
                 PlaySound(SFX_CardRouletteClear);
             }
-            else if(NPC[B].Type == 16)
+            else if(NPC[B].Type == NPCID_GOALORB_S3)
             {
                 LevelMacro = LEVELMACRO_QUESTION_SPHERE_EXIT;
                 for(C = 1; C <= numPlayers; C++)
@@ -600,7 +600,7 @@ void TouchBonus(int A, int B)
                 StopMusic();
                 PlaySound(SFX_DungeonClear);
             }
-            else if(NPC[B].Type == 41)
+            else if(NPC[B].Type == NPCID_GOALORB_S2)
             {
                 LevelMacro = LEVELMACRO_CRYSTAL_BALL_EXIT;
                 for(C = 1; C <= numPlayers; C++)

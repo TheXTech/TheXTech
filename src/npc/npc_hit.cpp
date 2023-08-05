@@ -71,19 +71,19 @@ void NPCHit(int A, int B, int C)
             if(NPCNoIceBall[NPC[A].Type] || NPC[A].Location.Width > 128 || NPC[A].Location.Height > 128)
                 return;
 
-            if(NPC[A].Type == 3)
+            if(NPC[A].Type == NPCID_RED_FLY_FODDER)
             {
-                NPC[A].Type = 2;
+                NPC[A].Type = NPCID_RED_FODDER;
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
             }
-            else if(NPC[A].Type == 4)
+            else if(NPC[A].Type == NPCID_GRN_TURTLE_S3)
             {
-                NPC[A].Type = 5;
+                NPC[A].Type = NPCID_GRN_SHELL_S3;
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
             }
-            else if(NPC[A].Type == 6 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S3)
+            else if(NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S3)
             {
-                NPC[A].Type = 7;
+                NPC[A].Type = NPCID_RED_SHELL_S3;
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
             }
             else if(NPC[A].Type == NPCID_BIG_TURTLE)
@@ -93,7 +93,7 @@ void NPCHit(int A, int B, int C)
             }
             else if(NPC[A].Type == NPCID_GRN_FLY_TURTLE_S3)
             {
-                NPC[A].Type = 5;
+                NPC[A].Type = NPCID_GRN_SHELL_S3;
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
             }
             else if(NPC[A].Type == NPCID_GRN_TURTLE_S4 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S4)
@@ -133,7 +133,7 @@ void NPCHit(int A, int B, int C)
             }
             else if(NPC[A].Type == NPCID_FLY_FODDER_S3)
             {
-                NPC[A].Type = 1;
+                NPC[A].Type = NPCID_FODDER_S3;
                 NPC[A].Frame = EditorNPCFrame(NPC[A].Type, NPC[A].Direction);
             }
 
@@ -226,7 +226,7 @@ void NPCHit(int A, int B, int C)
         return;
     if(B == 3 || B == 4 || B == 5) // Things immune to fire
     {
-        if(NPC[C].Type == 13)
+        if(NPC[C].Type == NPCID_PLR_FIREBALL)
         {
             if(NPCNoFireBall[NPC[A].Type])
                 return;
@@ -240,7 +240,7 @@ void NPCHit(int A, int B, int C)
     // Add it to the queue, no matter whether it will happen. Reduces code size and increases maintainability.
     NPCQueues::Killed.push_back(A);
 
-    if(B == 10 && NPC[A].Type == 31)
+    if(B == 10 && NPC[A].Type == NPCID_KEY)
     {
         if(Player[C].Character == 5 && !Player[C].HasKey)
         {
@@ -260,7 +260,7 @@ void NPCHit(int A, int B, int C)
     // Frozen NPC
     else if(NPC[A].Type == NPCID_ICE_CUBE)
     {
-        if(B == 3 && NPC[C].Type == 13)
+        if(B == 3 && NPC[C].Type == NPCID_PLR_FIREBALL)
         {
 
             NPC[A].Type = NPC[A].Special;
@@ -301,11 +301,11 @@ void NPCHit(int A, int B, int C)
         NPC[A].Killed = 9;
         PlaySound(SFX_HeroHeart);
     }
-    else if(B == 10 && ((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == 26 || NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_ITEM_POD || NPC[A].Type == 22 || NPC[A].Type == NPCID_BOMB))
+    else if(B == 10 && ((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_ITEM_POD || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_BOMB))
     {
         PlaySound(SFX_ShellHit);
         NPC[A].Bouce = true;
-        if((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == 22)
+        if((NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_CANNONITEM)
         {
             NPC[A].Location.SpeedX = 3 * Player[C].Direction;
             NPC[A].Location.SpeedY = -5;
@@ -319,7 +319,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].CantHurt = 30;
         NPC[A].CantHurtPlayer = C;
         NPC[A].BattleOwner = C;
-        if(NPC[A].Type == 22)
+        if(NPC[A].Type == NPCID_CANNONITEM)
             NPC[A].Direction = Player[C].Direction;
     }
     // SMB2 Grass
@@ -332,7 +332,7 @@ void NPCHit(int A, int B, int C)
         }
         PlaySound(SFX_HeroGrass);
         NewEffect(EFFID_SMOKE_S5, NPC[A].Location);
-        if(NPC[A].Type == 17)
+        if(NPC[A].Type == NPCID_BULLET)
         {
             PlaySound(SFX_Bullet);
             NPC[A].Location.SpeedX = 5 * Player[C].Direction;
@@ -355,7 +355,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Special = NPC[A].Type;
             NPC[A].Type = NPCID_ITEM_POD;
         }
-        if(!(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == 35 || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == 49 || NPCIsAnExit[NPC[A].Type]))
+        if(!(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsAnExit[NPC[A].Type]))
         {
             if(!BattleMode)
                 NPC[A].DefaultType = 0;
@@ -364,12 +364,12 @@ void NPCHit(int A, int B, int C)
         NPC[A].Location.Width = NPCWidth[NPC[A].Type];
         NPC[A].Location.Y += -NPC[A].Location.Height;
         NPC[A].Location.SpeedX = (3 + dRand() * 1) * Player[C].Direction;
-        if(NPC[A].Type == 17)
+        if(NPC[A].Type == NPCID_BULLET)
             NPC[A].Location.SpeedX = 5 * Player[C].Direction;
         NPC[A].Location.SpeedY = -4;
         NPC[A].CantHurtPlayer = C;
         NPC[A].CantHurt = 30;
-        if(NPCIsVeggie[NPC[A].Type] || NPC[A].Type == 29 || NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5)
+        if(NPCIsVeggie[NPC[A].Type] || NPC[A].Type == NPC_HEAVY_THROWER || NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5)
         {
             if(NPC[A].Type != NPCID_GEM_5)
                 NPC[A].Type = NPCID_GEM_1;
@@ -427,7 +427,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 3 || B == 4 || B == 5)
         {
-            if(NPC[C].Type == 13 || NPC[C].Type == NPCID_PET_FIRE)
+            if(NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_PET_FIRE)
             {
                 NPC[A].Damage += 1;
                 PlaySound(SFX_ShellHit);
@@ -502,7 +502,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 3 || B == 4 || B == 5)
         {
-            if(NPC[C].Type == 13 || NPC[C].Type == NPCID_PET_FIRE)
+            if(NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_PET_FIRE)
             {
                 NPC[A].Damage += 1;
                 PlaySound(SFX_ShellHit);
@@ -538,9 +538,9 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Goomba / Nekkid Koopa
-    else if(NPC[A].Type == 1 || NPC[A].Type == 2 || NPC[A].Type == NPCID_FODDER_S5 || NPC[A].Type == 27 ||
-            NPC[A].Type == 55 || NPC[A].Type == 59 || NPC[A].Type == 61 || NPC[A].Type == 63 ||
-            NPC[A].Type == 65 || NPC[A].Type == NPCID_BIG_FODDER || NPC[A].Type == NPCID_JUMPER_S4 || NPC[A].Type == NPCID_BAT ||
+    else if(NPC[A].Type == NPCID_FODDER_S3 || NPC[A].Type == NPCID_RED_FODDER || NPC[A].Type == NPCID_FODDER_S5 || NPC[A].Type == NPCID_UNDER_FODDER ||
+            NPC[A].Type == NPCID_EXT_TURTLE || NPC[A].Type == NPCID_YELSWITCH_FODDER || NPC[A].Type == NPCID_BLUSWITCH_FODDER || NPC[A].Type == NPCID_GRNSWITCH_FODDER ||
+            NPC[A].Type == NPCID_REDSWITCH_FODDER || NPC[A].Type == NPCID_BIG_FODDER || NPC[A].Type == NPCID_JUMPER_S4 || NPC[A].Type == NPCID_BAT ||
             NPC[A].Type == NPCID_FODDER_S1 || (NPC[A].Type >= NPCID_GRN_HIT_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_HIT_TURTLE_S4) || NPC[A].Type == NPCID_BRUTE ||
             NPC[A].Type == NPCID_BRUTE_SQUISHED || NPC[A].Type == NPCID_GRN_FISH_S3 || NPC[A].Type == NPCID_FISH_S4 || NPC[A].Type == NPCID_RED_FISH_S3 ||
             NPC[A].Type == NPCID_GOGGLE_FISH || NPC[A].Type == NPCID_GRN_FISH_S1 || NPC[A].Type == NPCID_BONE_FISH)
@@ -570,7 +570,7 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type == NPCID_BONE_FISH && B == 3)
             {
-                if(NPC[C].Type != 13 && NPC[C].Type != NPCID_PET_FIRE)
+                if(NPC[C].Type != NPCID_PLR_FIREBALL && NPC[C].Type != NPCID_PET_FIRE)
                     NPC[A].Killed = B;
             }
             else
@@ -607,7 +607,7 @@ void NPCHit(int A, int B, int C)
         {
             if(B == 3 || B == 10)
             {
-                if(NPC[C].Type == 13)
+                if(NPC[C].Type == NPCID_PLR_FIREBALL)
                 {
                 }
                 else
@@ -637,7 +637,7 @@ void NPCHit(int A, int B, int C)
         if(B == 3)
         {
             PlaySound(SFX_SMBlockHit);
-            if(NPC[C].Type == 13)
+            if(NPC[C].Type == NPCID_PLR_FIREBALL)
             {
             }
             else
@@ -662,7 +662,7 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 3)
         {
-            if(NPC[C].Type != 13 && NPC[C].Type != NPCID_PET_FIRE)
+            if(NPC[C].Type != NPCID_PLR_FIREBALL && NPC[C].Type != NPCID_PET_FIRE)
                 NPC[A].Killed = B;
         }
         else if(B == 2 || B == 4 || B == 5 || B == 6 || B == 9 || B == 10)
@@ -673,7 +673,7 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 3)
         {
-            if(NPC[C].Type != 13 && NPC[C].Type != NPCID_PET_FIRE)
+            if(NPC[C].Type != NPCID_PLR_FIREBALL && NPC[C].Type != NPCID_PET_FIRE)
                 NPC[A].Killed = B;
         }
         else if(B != 1)
@@ -684,7 +684,7 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 3)
         {
-            if(NPC[C].Type == 13)
+            if(NPC[C].Type == NPCID_PLR_FIREBALL)
                 NPC[A].Damage += 1;
             else
                 NPC[A].Damage += 3;
@@ -714,7 +714,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 3)
         {
-            if(NPC[C].Type != 13)
+            if(NPC[C].Type != NPCID_PLR_FIREBALL)
             {
                 NPC[A].Damage += 5;
                 NPC[A].Immune = 60;
@@ -739,7 +739,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 3)
         {
-            if(NPC[C].Type == 13)
+            if(NPC[C].Type == NPCID_PLR_FIREBALL)
                 PlaySound(SFX_ShellHit);
             else
                 PlaySound(SFX_SpitBossHit);
@@ -767,7 +767,7 @@ void NPCHit(int A, int B, int C)
             }
             else
             {
-                if(NPC[C].Type != 13)
+                if(NPC[C].Type != NPCID_PLR_FIREBALL)
                 {
                     PlaySound(SFX_SpitBossHit);
                     NPC[A].Damage += 5;
@@ -801,7 +801,7 @@ void NPCHit(int A, int B, int C)
         else if(B == 3)
         {
             NPC[A].Immune = 20;
-            if(NPC[C].Type != 13)
+            if(NPC[C].Type != NPCID_PLR_FIREBALL)
             {
                 PlaySound(SFX_SpitBossHit);
                 NPC[A].Damage += 3;
@@ -837,7 +837,7 @@ void NPCHit(int A, int B, int C)
         }
         else if(B == 3)
         {
-            if(NPC[C].Type == 13 || NPC[C].Type == NPCID_PET_FIRE)
+            if(NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_PET_FIRE)
             {
             }
             else
@@ -848,11 +848,11 @@ void NPCHit(int A, int B, int C)
 
         // Big Boo
     }
-    else if(NPC[A].Type == 44)
+    else if(NPC[A].Type == NPCID_BIG_GHOST)
     {
-        if((B == 3 && NPC[C].Type != 13) || B == 4)
+        if((B == 3 && NPC[C].Type != NPCID_PLR_FIREBALL) || B == 4)
         {
-            if(B == 3 && NPC[C].Type == 45)
+            if(B == 3 && NPC[C].Type == NPCID_SLIDE_BLOCK)
                 NPCHit(C, 3, C);
             NPC[A].Damage += 1;
             NPC[A].Immune = 30;
@@ -866,15 +866,15 @@ void NPCHit(int A, int B, int C)
 
         // Projectile Only Death (Ghosts, Thwomps, Etc.)
     }
-    else if(NPC[A].Type == 37 || NPC[A].Type == 38 || NPC[A].Type == 42 || NPC[A].Type == 43 || NPC[A].Type == NPCID_STONE_S4 || NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_FIRE_DISK)
+    else if(NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_GHOST_S3 || NPC[A].Type == NPCID_GHOST_FAST || NPC[A].Type == NPCID_GHOST_S4 || NPC[A].Type == NPCID_STONE_S4 || NPC[A].Type == NPCID_SAW || NPC[A].Type == NPCID_WALL_SPARK || NPC[A].Type == NPCID_FIRE_DISK)
     {
-        if((B == 3 && NPC[C].Type != 13) || B == 4)
+        if((B == 3 && NPC[C].Type != NPCID_PLR_FIREBALL) || B == 4)
         {
-            if(NPC[A].Type != NPCID_FIRE_DISK && NPC[C].Type != 58) // roto disks don't die form falling blocks
+            if(NPC[A].Type != NPCID_FIRE_DISK && NPC[C].Type != NPCID_METALBARREL) // roto disks don't die form falling blocks
             {
                 if(NPC[A].Type != NPCID_SAW)
                     NPC[A].Killed = B;
-                if(B == 3 && (NPC[A].Type == 37 || NPC[A].Type == NPCID_STONE_S4 || NPC[A].Type == NPCID_FIRE_DISK))
+                if(B == 3 && (NPC[A].Type == NPCID_STONE_S3 || NPC[A].Type == NPCID_STONE_S4 || NPC[A].Type == NPCID_FIRE_DISK))
                 {
                     if(NPC[C].Location.SpeedX > 0)
                     {
@@ -901,7 +901,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
         else if(B == 3)
         {
-            if(NPC[C].Type != 13)
+            if(NPC[C].Type != NPCID_PLR_FIREBALL)
                 NPC[A].Killed = B;
         }
     }
@@ -1050,7 +1050,7 @@ void NPCHit(int A, int B, int C)
     else if(NPCIsABot[NPC[A].Type])
         NPC[A].Killed = B;
     // Switch Platforms
-    else if(NPC[A].Type == 60 || NPC[A].Type == 62 || NPC[A].Type == 64 || NPC[A].Type == 66)
+    else if(NPC[A].Type == NPCID_YEL_PLATFORM || NPC[A].Type == NPCID_BLU_PLATFORM || NPC[A].Type == NPCID_GRN_PLATFORM || NPC[A].Type == NPCID_RED_PLATFORM)
     {
         if(B == 9)
             NPC[A].Killed = B;
@@ -1130,7 +1130,7 @@ void NPCHit(int A, int B, int C)
         {
             if(B == 3)
             {
-                if(NPC[C].Type != 13 && NPC[C].Type != NPCID_PET_FIRE)
+                if(NPC[C].Type != NPCID_PLR_FIREBALL && NPC[C].Type != NPCID_PET_FIRE)
                     NPC[A].Killed = B;
             }
             else if(B != 8)
@@ -1173,7 +1173,7 @@ void NPCHit(int A, int B, int C)
         {
             if(B == 3 || B == 5)
             {
-                if(NPC[C].Type != 13 && NPC[C].Type != NPCID_PET_FIRE)
+                if(NPC[C].Type != NPCID_PLR_FIREBALL && NPC[C].Type != NPCID_PET_FIRE)
                     NPC[A].Killed = B;
             }
             else if(B != 8)
@@ -1199,14 +1199,14 @@ void NPCHit(int A, int B, int C)
         }
     }
     // SMB3 Red Paragoomba
-    else if(NPC[A].Type == 3)
+    else if(NPC[A].Type == NPCID_RED_FLY_FODDER)
     {
         if(B == 1)
         {
             PlaySound(SFX_Stomp);
             if(NPC[A].Location.SpeedY < 0)
                 NPC[A].Location.SpeedY = 0;
-            NPC[A].Type = 2;
+            NPC[A].Type = NPCID_RED_FODDER;
             NPC[A].Frame = 0;
         }
         else
@@ -1234,14 +1234,14 @@ void NPCHit(int A, int B, int C)
             PlaySound(SFX_Stomp);
             if(NPC[A].Location.SpeedY < 0)
                 NPC[A].Location.SpeedY = 0;
-            NPC[A].Type = 1;
+            NPC[A].Type = NPCID_FODDER_S3;
             NPC[A].Frame = 0;
         }
         else
             NPC[A].Killed = B;
     }
     // SMB3 Ice Block
-    else if(NPC[A].Type == 45)
+    else if(NPC[A].Type == NPCID_SLIDE_BLOCK)
     {
         if(B == 1 || (B == 10 && !NPC[A].Projectile))
         {
@@ -1267,7 +1267,7 @@ void NPCHit(int A, int B, int C)
             }
             else if(B == 3)
             {
-                if(NPC[C].Type != 13)
+                if(NPC[C].Type != NPCID_PLR_FIREBALL)
                     NPC[A].Killed = B;
                 if(NPC[C].Killed == 0)
                     NPCHit(C, 3, A);
@@ -1286,23 +1286,23 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Things With Shells (Koopa Troopa, Buzzy Beetle, Etc.)
-    else if(NPC[A].Type == 4 || NPC[A].Type == 6 || NPC[A].Type == 23 || NPC[A].Type == NPCID_BIG_TURTLE || NPCIsAParaTroopa[NPC[A].Type] || (NPC[A].Type >= NPCID_GRN_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_TURTLE_S4) || NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1)
+    else if(NPC[A].Type == NPCID_GRN_TURTLE_S3 || NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_GLASS_TURTLE || NPC[A].Type == NPCID_BIG_TURTLE || NPCIsAParaTroopa[NPC[A].Type] || (NPC[A].Type >= NPCID_GRN_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_TURTLE_S4) || NPC[A].Type == NPCID_GRN_TURTLE_S1 || NPC[A].Type == NPCID_RED_TURTLE_S1 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S1)
     {
         if(B == 1)
         {
             PlaySound(SFX_Stomp);
             NPC[A].Location.Y += NPC[A].Location.Height;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
-            if(NPC[A].Type == 4)
-                NPC[A].Type = 5;
-            else if(NPC[A].Type == 6)
-                NPC[A].Type = 7;
+            if(NPC[A].Type == NPCID_GRN_TURTLE_S3)
+                NPC[A].Type = NPCID_GRN_SHELL_S3;
+            else if(NPC[A].Type == NPCID_RED_TURTLE_S3)
+                NPC[A].Type = NPCID_RED_SHELL_S3;
             else if(NPC[A].Type == NPCID_BIG_TURTLE)
                 NPC[A].Type = NPCID_BIG_SHELL;
             else if(NPC[A].Type == NPCID_GRN_FLY_TURTLE_S3) // winged green koopa
-                NPC[A].Type = 4;
+                NPC[A].Type = NPCID_GRN_TURTLE_S3;
             else if(NPC[A].Type == NPCID_RED_FLY_TURTLE_S3) // winged red koopa
-                NPC[A].Type = 6;
+                NPC[A].Type = NPCID_RED_TURTLE_S3;
             else if(NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1) // smb1 winged green koopa
                 NPC[A].Type = NPCID_GRN_TURTLE_S1;
             else if(NPC[A].Type == NPCID_RED_FLY_TURTLE_S1) // smb winged red koopa
@@ -1317,11 +1317,11 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_RED_SHELL_S1;
                 NPC[A].Location.Height = 28;
             }
-            else if(NPC[A].Type == 23)
-                NPC[A].Type = 24;
+            else if(NPC[A].Type == NPCID_GLASS_TURTLE)
+                NPC[A].Type = NPCID_GLASS_SHELL;
             else if(NPC[A].Type >= NPCID_GRN_FLY_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_FLY_TURTLE_S4) // smw winged koopas
             {
-                NPC[A].Type -= 12;
+                NPC[A].Type -= NPCID_LAVABUBBLE;
                 NPC[A].Special = 0;
             }
             else
@@ -1366,14 +1366,14 @@ void NPCHit(int A, int B, int C)
             NPC[A].Projectile = true;
             NPC[A].Location.Y += NPC[A].Location.Height;
             NPC[A].Location.X += NPC[A].Location.Width / 2.0;
-            if(NPC[A].Type == 4 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S3)
-                NPC[A].Type = 5;
-            else if(NPC[A].Type == 6 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S3)
-                NPC[A].Type = 7;
+            if(NPC[A].Type == NPCID_GRN_TURTLE_S3 || NPC[A].Type == NPCID_GRN_FLY_TURTLE_S3)
+                NPC[A].Type = NPCID_GRN_SHELL_S3;
+            else if(NPC[A].Type == NPCID_RED_TURTLE_S3 || NPC[A].Type == NPCID_RED_FLY_TURTLE_S3)
+                NPC[A].Type = NPCID_RED_SHELL_S3;
             else if(NPC[A].Type == NPCID_BIG_TURTLE)
                 NPC[A].Type = NPCID_BIG_SHELL;
             else if(NPC[A].Type == NPCID_RED_FLY_TURTLE_S3) // winged red koopa
-                NPC[A].Type = 6;
+                NPC[A].Type = NPCID_RED_TURTLE_S3;
             else if(NPC[A].Type == NPCID_GRN_FLY_TURTLE_S1) // smb1 winged green koopa
             {
                 NPC[A].Type = NPCID_GRN_SHELL_S1;
@@ -1394,15 +1394,15 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Type = NPCID_RED_SHELL_S1;
                 NPC[A].Location.Height = 28;
             }
-            else if(NPC[A].Type == 23)
-                NPC[A].Type = 24;
+            else if(NPC[A].Type == NPCID_GLASS_TURTLE)
+                NPC[A].Type = NPCID_GLASS_SHELL;
             else if(NPC[A].Type >= NPCID_GRN_FLY_TURTLE_S4 && NPC[A].Type <= NPCID_YEL_FLY_TURTLE_S4)
             {
-                NPC[A].Type -= 12;
+                NPC[A].Type -= NPCID_LAVABUBBLE;
                 NPC[A].Special = 0;
             }
             else
-                NPC[A].Type += 4;
+                NPC[A].Type += NPCID_GRN_TURTLE_S3;
             if(B == 7 && NPC[A].Type >= NPCID_GRN_SHELL_S4 && NPC[A].Type <= NPCID_GRN_HIT_TURTLE_S4)
             {
                 numNPCs++;
@@ -1440,7 +1440,7 @@ void NPCHit(int A, int B, int C)
         {
             if(B == 3)
             {
-                if(!(NPC[A].Type == 23 && (NPC[C].Type == 13 || NPC[C].Type == NPCID_PET_FIRE)))
+                if(!(NPC[A].Type == NPCID_GLASS_TURTLE && (NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_PET_FIRE)))
                     NPC[A].Killed = B;
             }
             else
@@ -1470,14 +1470,14 @@ void NPCHit(int A, int B, int C)
             if(NPC[C].Type != NPCID_VILLAIN_S3)
             {
                 NPC[A].Immune = 10;
-                if(NPC[C].Type == 17)
+                if(NPC[C].Type == NPCID_BULLET)
                 {
                     NPC[C].Location.SpeedX = -NPC[C].Location.SpeedX;
                     NPCHit(C, 4, C);
                 }
                 else
                     NPCHit(C, 3, A);
-                if(NPC[C].Type != 13)
+                if(NPC[C].Type != NPCID_PLR_FIREBALL)
                 {
                     PlaySound(SFX_SpitBossHit);
                     NPC[A].Damage += 10;
@@ -1538,7 +1538,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Shells
-    else if(NPC[A].Type == 5 || NPC[A].Type == 7 || NPC[A].Type == 24 || NPC[A].Type == NPCID_BIG_SHELL || (NPC[A].Type >= NPCID_GRN_SHELL_S4 && NPC[A].Type <= NPCID_YEL_SHELL_S4) || NPC[A].Type == NPCID_RED_SHELL_S1 || NPC[A].Type == NPCID_GRN_SHELL_S1 || NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL)
+    else if(NPC[A].Type == NPCID_GRN_SHELL_S3 || NPC[A].Type == NPCID_RED_SHELL_S3 || NPC[A].Type == NPCID_GLASS_SHELL || NPC[A].Type == NPCID_BIG_SHELL || (NPC[A].Type >= NPCID_GRN_SHELL_S4 && NPC[A].Type <= NPCID_YEL_SHELL_S4) || NPC[A].Type == NPCID_RED_SHELL_S1 || NPC[A].Type == NPCID_GRN_SHELL_S1 || NPC[A].Type == NPCID_FLIPPED_RAINBOW_SHELL)
     {
         if(B == 1)
         {
@@ -1590,7 +1590,7 @@ void NPCHit(int A, int B, int C)
         {
             if(B == 3)
             {
-                if(!(NPC[A].Type == 24 && (NPC[C].Type == 13 || NPC[C].Type == NPCID_PET_FIRE)))
+                if(!(NPC[A].Type == NPCID_GLASS_SHELL && (NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_PET_FIRE)))
                     NPC[A].Killed = B;
             }
             else
@@ -1602,7 +1602,7 @@ void NPCHit(int A, int B, int C)
             {
                 // FIXME: Why the condition is here if it always assigns B? [PVS Studio]
 #if 0
-                if(!(NPC[A].Type == 24 && NPC[C].Type == 13))
+                if(!(NPC[A].Type == NPCID_GLASS_SHELL && NPC[C].Type == NPCID_PLR_FIREBALL))
                     NPC[A].Killed = B;
                 else
                     NPC[A].Killed = B;
@@ -1637,7 +1637,7 @@ void NPCHit(int A, int B, int C)
             {
                 if(B == 3)
                 {
-                    if(NPC[C].Type == 13)
+                    if(NPC[C].Type == NPCID_PLR_FIREBALL)
                     {
                         PlaySound(SFX_SpitBossHit);
                         NPC[A].Damage += 1;
@@ -1669,7 +1669,7 @@ void NPCHit(int A, int B, int C)
     }
 
     // Piranha Plants
-    else if(NPC[A].Type == 8 || NPC[A].Type == NPCID_QUAD_SPITTER || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == 51 || NPC[A].Type == 52 || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_JUMP_PLANT)
+    else if(NPC[A].Type == NPCID_PLANT_S3 || NPC[A].Type == NPCID_QUAD_SPITTER || NPC[A].Type == NPCID_PLANT_S1 || NPC[A].Type == NPCID_BOTTOM_PLANT || NPC[A].Type == NPCID_SIDE_PLANT || NPC[A].Type == NPCID_BIG_PLANT || NPC[A].Type == NPCID_FIRE_PLANT || NPC[A].Type == NPCID_JUMP_PLANT)
     {
         if(!(B == 1 || B == 2 || B == 6))
         {
@@ -1679,7 +1679,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Podoboo
-    else if(NPC[A].Type == 12)
+    else if(NPC[A].Type == NPCID_LAVABUBBLE)
     {
         if(B == 9)
         {
@@ -1701,7 +1701,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Player Fireball
-    else if(NPC[A].Type == 13 || NPC[A].Type == NPCID_PLR_ICEBALL)
+    else if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
     {
         if(B != 7 && B != 9 && B != 2)
         {
@@ -1740,7 +1740,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Hammer Bros.
-    else if(NPC[A].Type == 29)
+    else if(NPC[A].Type == NPC_HEAVY_THROWER)
         NPC[A].Killed = B;
     // Hammer Bros. Hammer
     else if(NPC[A].Type == NPC_HEAVY_THROWN)
@@ -1749,7 +1749,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
     }
     // Boom Boom
-    else if(NPC[A].Type == 15)
+    else if(NPC[A].Type == NPCID_MINIBOSS)
     {
         if(NPC[A].Special != 4)
         {
@@ -1793,17 +1793,17 @@ void NPCHit(int A, int B, int C)
             NPC[A].Killed = B;
     }
     // Bullet Bills
-    else if(NPC[A].Type == 17 || NPC[A].Type == 18)
+    else if(NPC[A].Type == NPCID_BULLET || NPC[A].Type == NPCID_BIG_BULLET)
     {
         if(B == 1 || B == 3 || B == 4 || B == 5 || B == 7 || B == 8 || B == 10)
         {
-            if(!((B == 3 || B == 4) && (NPC[C].Type == 13 || NPC[C].Type == 12)))
+            if(!((B == 3 || B == 4) && (NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_LAVABUBBLE)))
             {
                 if(!(B == 7 && NPC[A].Projectile))
                 {
                     if(!(B == 3 && NPC[A].CantHurt > 0) && !(B == 3 && NPC[C].Type == NPCID_PET_FIRE))
                     {
-                        if(!(NPC[A].Type == 18 && B == 4))
+                        if(!(NPC[A].Type == NPCID_BIG_BULLET && B == 4))
                         {
                             if(!(B == 10 && NPC[A].Projectile)) // Link can't stab friendly bullets
                             {
@@ -1818,13 +1818,13 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Birdo
-    else if(NPC[A].Type == 39)
+    else if(NPC[A].Type == NPCID_SPIT_BOSS)
     {
         if(NPC[A].Special >= 0)
         {
             if(B == 3)
             {
-                if(NPC[C].Type != 13)
+                if(NPC[C].Type != NPCID_PLR_FIREBALL)
                 {
                     NPC[A].Special = -30;
                     NPC[A].Damage += 1;
@@ -1853,11 +1853,11 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Eggs
-    else if(NPC[A].Type == 40)
+    else if(NPC[A].Type == NPCID_SPIT_BOSS_BALL)
     {
         if(B == 3)
         {
-            if(NPC[C].Type == 13)
+            if(NPC[C].Type == NPCID_PLR_FIREBALL)
                 B = 0;
         }
 
@@ -1875,7 +1875,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Indestructable Objects
-    else if(NPC[A].Type == 21 || NPC[A].Type == 22 || NPC[A].Type == 26 || NPC[A].Type == 31 || NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == 35 || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == 49 || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == NPCID_ITEM_POD || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON)
+    else if(NPC[A].Type == NPCID_CANNONENEMY || NPC[A].Type == NPCID_CANNONITEM || NPC[A].Type == NPCID_SPRING || NPC[A].Type == NPCID_KEY || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT || NPC[A].Type == NPCID_GRN_BOOT || NPC[A].Type == NPCID_RED_BOOT || NPC[A].Type == NPCID_BLU_BOOT || NPC[A].Type == NPCID_TOOTHYPIPE || NPCIsYoshi[NPC[A].Type] || NPC[A].Type == NPCID_ITEM_POD || (NPC[A].Type >= NPCID_CARRY_BLOCK_A && NPC[A].Type <= NPCID_CARRY_BLOCK_D) || NPC[A].Type == NPCID_TIMER_S2 || NPC[A].Type == NPCID_EARTHQUAKE_BLOCK || NPC[A].Type == NPCID_FLY_BLOCK || NPC[A].Type == NPCID_FLY_CANNON)
     {
         if(NPC[A].Type == NPCID_EARTHQUAKE_BLOCK && (B == 4 || B == 5 || B == 10))
         {
@@ -1895,13 +1895,13 @@ void NPCHit(int A, int B, int C)
         }
         else
         {
-            if(B == 1 && NPC[A].Type == 26)
+            if(B == 1 && NPC[A].Type == NPCID_SPRING)
                 PlaySound(SFX_Spring);
 
-            if(B == 1 && (NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT))
+            if(B == 1 && (NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT))
             {
                 NPC[A].Killed = 1;
-                if(NPC[A].Type == 32)
+                if(NPC[A].Type == NPCID_COIN_SWITCH)
                 {
                     PSwitchTime = Physics.NPCPSwitch;
                     PSwitchPlayer = C;
@@ -1933,7 +1933,7 @@ void NPCHit(int A, int B, int C)
                 }
                 else
                 {
-                    if(NPC[A].Type == 26)
+                    if(NPC[A].Type == NPCID_SPRING)
                         NPC[A].Location.Y -= 16;
                     NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                     if(!NPC[A].NoLavaSplash)
@@ -1966,7 +1966,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Misc. Things With No Jump Death (SMB2 Shy Guys, SMB2 Ninji, SMB2 Pokey)
-    else if(NPC[A].Type == 19 || NPC[A].Type == 20 || NPC[A].Type == NPCID_STACKER || NPC[A].Type == 25 || NPC[A].Type == 28 || NPC[A].Type == 36 || NPC[A].Type == NPCID_SPIKY_S4 || NPC[A].Type == NPCID_SPIKY_BALL_S4 || NPC[A].Type == 47 || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == 48 || NPC[A].Type == 53 || NPC[A].Type == 54 || (NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY) || NPC[A].Type == NPCID_SATURN || NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_WALK_PLANT || NPC[A].Type == NPCID_VINE_BUG)
+    else if(NPC[A].Type == NPCID_BLU_GUY || NPC[A].Type == NPCID_RED_GUY || NPC[A].Type == NPCID_STACKER || NPC[A].Type == NPCID_JUMPER_S3 || NPC[A].Type == NPCID_RED_FISH_S1 || NPC[A].Type == NPCID_SPIKY_S3 || NPC[A].Type == NPCID_SPIKY_S4 || NPC[A].Type == NPCID_SPIKY_BALL_S4 || NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER || NPC[A].Type == NPCID_SPIKY_BALL_S3 || NPC[A].Type == NPCID_CRAB || NPC[A].Type == NPCID_FLY || (NPC[A].Type >= NPCID_BIRD && NPC[A].Type <= NPCID_GRY_SPIT_GUY) || NPC[A].Type == NPCID_SATURN || NPC[A].Type == NPCID_SQUID_S3 || NPC[A].Type == NPCID_SQUID_S1 || NPC[A].Type == NPCID_WALK_PLANT || NPC[A].Type == NPCID_VINE_BUG)
     {
         if(B == 10 && NPC[A].Type != NPCID_SATURN)
             NPC[A].Killed = B;
@@ -2021,7 +2021,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Location.SpeedX = Player[C].Location.SpeedX + 4 * Player[C].Direction;
                 PlaySound(SFX_ShellHit);
             }
-            else if(!(NPC[A].Type == NPCID_SATURN && (B == 4 || B == 8 || (B == 3 && NPC[C].Type == 13))))
+            else if(!(NPC[A].Type == NPCID_SATURN && (B == 4 || B == 8 || (B == 3 && NPC[C].Type == NPCID_PLR_FIREBALL))))
             {
                 if(NPC[A].Type == NPCID_SATURN && B == 7)
                 {
@@ -2036,7 +2036,7 @@ void NPCHit(int A, int B, int C)
                     NPC[A].Killed = B;
             }
         }
-        else if(B == 1 && NPC[A].Type == 28)
+        else if(B == 1 && NPC[A].Type == NPCID_RED_FISH_S1)
         {
             NPC[A].Killed = B;
             NPC[A].Location.SpeedY = 0;
@@ -2051,7 +2051,7 @@ void NPCHit(int A, int B, int C)
 
         if(B == 1 && NPC[A].Type == NPCID_SATURN)
             PlaySound(SFX_Stomp);
-        if((B == 1 || B == 8) && (NPC[A].Type == 47 || NPC[A].Type == NPCID_ITEM_THROWER))
+        if((B == 1 || B == 8) && (NPC[A].Type == NPCID_SPIKY_THROWER || NPC[A].Type == NPCID_ITEM_THROWER))
             NPC[A].Killed = B;
     }
     // Exits
@@ -2144,12 +2144,12 @@ void NPCHit(int A, int B, int C)
         // B == 6 - old behavior, access index C as an NPC
         else if(B == 6 || B == 5 || B == 4)
         {
-            if(!(NPC[C].Type == 13 || NPC[C].Type == NPCID_PET_FIRE || NPC[C].Type == NPCID_PLR_HEAVY || NPCIsVeggie[NPC[C].Type]))
+            if(!(NPC[C].Type == NPCID_PLR_FIREBALL || NPC[C].Type == NPCID_PET_FIRE || NPC[C].Type == NPCID_PLR_HEAVY || NPCIsVeggie[NPC[C].Type]))
                 NPC[A].Killed = B;
         }
         else if(B == 7)
         {
-            if(NPC[A].Type == 9 || NPC[A].Type == NPCID_SWAP_POWER || NPC[A].Type == 14 ||
+            if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_SWAP_POWER || NPC[A].Type == NPCID_FIRE_POWER_S3 ||
                NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_STATUE_POWER ||
                (NPC[A].Type >= NPCID_FIRE_POWER_S1 && NPC[A].Type <= NPCID_3_LIFE) || NPC[A].Type == NPC_HEAVY_POWER)
             {
@@ -2173,7 +2173,7 @@ void NPCHit(int A, int B, int C)
     bool tempBool = false;
     if(NPC[A].Killed == 3)
     {
-        if(NPC[C].Type == 13 && NPC[C].Special == 5.0 && NPC[A].Type != 13)
+        if(NPC[C].Type == NPCID_PLR_FIREBALL && NPC[C].Special == 5.0 && NPC[A].Type != NPCID_PLR_FIREBALL)
         {
             NPC[A].Direction = NPC[C].Direction;
             NPC[A].Killed = 10;
@@ -2192,10 +2192,10 @@ void NPCHit(int A, int B, int C)
     Player[0].Multiplier = 0;
     if((B == 1 || B == 8) && C <= numPlayers && !NPCIsABonus[NPC[A].Type])
     {
-        if(NPC[A].Type == 13 || NPC[A].Type == 32 || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT)
+        if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_COIN_SWITCH || NPC[A].Type == NPCID_TIME_SWITCH || NPC[A].Type == NPCID_TNT)
         {
         }
-        else if(oldNPC.Type == 137 || NPC[A].Type == 45 || oldNPC.Type == 166 || NPC[A].Type == NPCID_BULLY || (NPCIsAShell[oldNPC.Type] && B != 8))
+        else if(oldNPC.Type == 137 || NPC[A].Type == NPCID_SLIDE_BLOCK || oldNPC.Type == 166 || NPC[A].Type == NPCID_BULLY || (NPCIsAShell[oldNPC.Type] && B != 8))
         {
             if(B != 8) // (.Type = 45 And B = 8) Then
             {
@@ -2212,7 +2212,7 @@ void NPCHit(int A, int B, int C)
                 NPC[A].Killed != oldNPC.Killed ||
                 NPC[A].Type != oldNPC.Type || NPC[A].Inert != oldNPC.Inert)
         {
-            if(NPC[A].Type == 15 && NPC[A].Killed == 0)
+            if(NPC[A].Type == NPCID_MINIBOSS && NPC[A].Killed == 0)
             {
                 MoreScore(2, NPC[A].Location, Player[C].Multiplier);
                 if(Player[C].Multiplier > NPC[A].Multiplier)
@@ -2245,11 +2245,11 @@ void NPCHit(int A, int B, int C)
         }
     }
 
-    if(B == 4 && NPC[A].Killed == 4 && !NPCIsACoin[NPC[A].Type] && C != A && NPC[A].Type != 13 && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
+    if(B == 4 && NPC[A].Killed == 4 && !NPCIsACoin[NPC[A].Type] && C != A && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[C].Type != NPCID_BOSS_CASE)
         {
-            if(!(NPC[A].Type == 17 && NPC[A].CantHurt > 0))
+            if(!(NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0))
             {
                 if(NPC[C].Multiplier < NPC[A].Multiplier)
                     NPC[C].Multiplier = NPC[A].Multiplier;
@@ -2265,15 +2265,15 @@ void NPCHit(int A, int B, int C)
         MoreScore(NPCScore[NPC[A].Type], NPC[A].Location, NPC[A].Multiplier);
     }
 
-    if(B == 6 && NPC[A].Killed == 6 && (NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_VILLAIN_S1 || NPC[A].Type == NPCID_SICK_BOSS || NPC[A].Type == 15 || NPC[A].Type == 39 || NPC[A].Type == NPCID_VILLAIN_S3))
+    if(B == 6 && NPC[A].Killed == 6 && (NPC[A].Type == NPCID_BOSS_FRAGILE || NPC[A].Type == NPCID_VILLAIN_S1 || NPC[A].Type == NPCID_SICK_BOSS || NPC[A].Type == NPCID_MINIBOSS || NPC[A].Type == NPCID_SPIT_BOSS || NPC[A].Type == NPCID_VILLAIN_S3))
     {
-        if(!NPCWontHurt[NPC[A].Type] && !NPCIsABonus[NPC[A].Type] && NPC[A].Type != 13)
+        if(!NPCWontHurt[NPC[A].Type] && !NPCIsABonus[NPC[A].Type] && NPC[A].Type != NPCID_PLR_FIREBALL)
             MoreScore(NPCScore[NPC[A].Type], NPC[A].Location);
     }
 
     if(!NPCIsACoin[NPC[A].Type] && B == 3 && C != A &&
        (NPC[A].Killed == B || !fEqual(NPC[A].Damage, oldNPC.Damage)) &&
-        NPC[A].Type != 13 && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != 45 &&
+        NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SLIDE_BLOCK &&
         NPC[A].Type != NPC_HOMING_BALL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[A].Killed == B)

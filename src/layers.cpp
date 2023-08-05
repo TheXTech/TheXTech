@@ -1491,8 +1491,8 @@ void UpdateLayers()
                         NPC[B].DefaultLocation.Y += double(Layer[A].SpeedY);
 
                         if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != 0 ||
-                           NPCIsACoin[NPC[B].Type] || NPC[B].Type == 8 || NPC[B].Type == 37 ||
-                           NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 46 ||
+                           NPCIsACoin[NPC[B].Type] || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
+                           NPC[B].Type == NPCID_BOTTOM_PLANT || NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_FALL_BLOCK_RED ||
                            NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_BIG_PLANT || NPCIsAVine[NPC[B].Type] ||
                            NPC[B].Type == NPCID_CHECKPOINT || NPC[B].Type == NPCID_GOALTAPE || NPC[B].Type == NPCID_ITEM_BURIED ||
                            NPC[B].Type == NPC_HOMING_BALL_GEN || NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_LONG_PLANT_DOWN ||
@@ -1513,10 +1513,10 @@ void UpdateLayers()
                             {
                                 NPC[B].Location.X = NPC[B].DefaultLocation.X;
                                 NPC[B].Location.Y = NPC[B].DefaultLocation.Y;
-                                if(NPC[B].Type == 8 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B].Type == NPCID_PLANT_S1 ||
+                                if(NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B].Type == NPCID_PLANT_S1 ||
                                    NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_FIRE_PLANT)
                                     NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
-                                else if(NPC[B].Type == 52 && fiEqual(NPC[B].Direction, -1))
+                                else if(NPC[B].Type == NPCID_SIDE_PLANT && fiEqual(NPC[B].Direction, -1))
                                     NPC[B].Location.X += NPC[B].DefaultLocation.Width;
                             }
                             else
