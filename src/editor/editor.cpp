@@ -59,6 +59,7 @@
 
 #include "pseudo_vb.h"
 #include "npc_id.h"
+#include "eff_id.h"
 
 #include "write_level.h"
 #include "write_world.h"
@@ -1036,7 +1037,7 @@ void UpdateEditor()
                             auto &b = Background[A];
                             b.Location.X += b.Location.Width / 2.0 - EffectWidth[10] / 2;
                             b.Location.Y += b.Location.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, b.Location);
+                            NewEffect(EFFID_SMOKE_S3, b.Location);
                             PlaySound(SFX_Smash);
 
                             Location_t loc = Background[A].Location;
@@ -1126,7 +1127,7 @@ void UpdateEditor()
                             tempLocation = static_cast<Location_t>(WorldMusic[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, tempLocation);
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                             PlaySound(SFX_ShellHit);
                             if(A != numWorldMusic)
                             {
@@ -1155,7 +1156,7 @@ void UpdateEditor()
                             tempLocation = static_cast<Location_t>(WorldPath[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, tempLocation);
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                             PlaySound(SFX_ShellHit);
                             if(A != numWorldPaths)
                             {
@@ -1188,7 +1189,7 @@ void UpdateEditor()
                             tempLocation = static_cast<Location_t>(Scene[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, tempLocation);
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                             PlaySound(SFX_ShellHit);
                             for(B = A; B < numScenes; B++)
                             {
@@ -1216,7 +1217,7 @@ void UpdateEditor()
                             tempLocation = static_cast<Location_t>(WorldLevel[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, tempLocation);
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                             PlaySound(SFX_ShellHit);
                             if(A != numWorldLevels)
                             {
@@ -1244,7 +1245,7 @@ void UpdateEditor()
                             tempLocation = static_cast<Location_t>(Tile[A].Location);
                             tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2;
                             tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2;
-                            NewEffect(10, tempLocation);
+                            NewEffect(EFFID_SMOKE_S3, tempLocation);
                             PlaySound(SFX_ShellHit);
 
                             Location_t loc = static_cast<Location_t>(Tile[A].Location);

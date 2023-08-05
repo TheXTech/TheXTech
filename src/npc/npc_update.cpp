@@ -35,6 +35,7 @@
 #include "../config.h"
 #include "../main/trees.h"
 #include "../npc_id.h"
+#include "../eff_id.h"
 #include "../layers.h"
 
 #include "npc/npc_queues.h"
@@ -452,7 +453,7 @@ void UpdateNPCs()
                                 {
                                     NPC[numNPCs].Location.SpeedY = -10;
                                     NPC[numNPCs].Location.SpeedX = 0;
-                                    NewEffect(10, newLoc(NPC[A].Location.X, NPC[A].Location.Y + 16, 32, 32));
+                                    NewEffect(EFFID_SMOKE_S3, newLoc(NPC[A].Location.X, NPC[A].Location.Y + 16, 32, 32));
                                     if(NPCIsVeggie[NPC[numNPCs].Type])
                                         NPC[numNPCs].Location.SpeedX = dRand() * 2 - 1;
                                     // NPC(numNPCs).Location.SpeedY = -1
@@ -460,19 +461,19 @@ void UpdateNPCs()
                                 else if(NPC[A].GeneratorDirection == 2)
                                 {
                                     NPC[numNPCs].Location.SpeedX = -Physics.NPCShellSpeed;
-                                    NewEffect(10, newLoc(NPC[A].Location.X + 16, NPC[A].Location.Y, 32, 32));
+                                    NewEffect(EFFID_SMOKE_S3, newLoc(NPC[A].Location.X + 16, NPC[A].Location.Y, 32, 32));
                                 }
                                 else if(NPC[A].GeneratorDirection == 3)
                                 {
                                     NPC[numNPCs].Location.SpeedY = 8;
                                     NPC[numNPCs].Location.SpeedX = 0;
-                                    NewEffect(10, newLoc(NPC[A].Location.X, NPC[A].Location.Y - 16, 32, 32));
+                                    NewEffect(EFFID_SMOKE_S3, newLoc(NPC[A].Location.X, NPC[A].Location.Y - 16, 32, 32));
                                 }
                                 else
                                 {
                                     NPC[numNPCs].Location.SpeedX = Physics.NPCShellSpeed;
                                     SoundPause[3] = 1;
-                                    NewEffect(10, newLoc(NPC[A].Location.X - 16, NPC[A].Location.Y, 32, 32));
+                                    NewEffect(EFFID_SMOKE_S3, newLoc(NPC[A].Location.X - 16, NPC[A].Location.Y, 32, 32));
                                 }
                             }
 
@@ -706,7 +707,7 @@ void UpdateNPCs()
                     NPC[A].Special2 += 1;
                     if(NPC[A].Special2 >= 450)
                     {
-                        NewEffect(10, NPC[A].Location);
+                        NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                         NPC[A].Killed = 9;
                         NPCQueues::Killed.push_back(A);
                     }
@@ -1024,7 +1025,7 @@ void UpdateNPCs()
                                     tempLocation.Height = 32;
                                     tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
                                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
-                                    NewEffect(114, tempLocation);
+                                    NewEffect(EFFID_WATER_SPLASH, tempLocation);
                                 }
 
                                 if(!(NPCIsCheep[NPC[A].Type] && NPC[A].Special == 1) && NPC[A].Type != 34 && NPC[A].Type != 13)
@@ -1061,7 +1062,7 @@ void UpdateNPCs()
                 tempLocation.Height = 32;
                 tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2.0 - tempLocation.Width / 2.0;
                 tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
-                NewEffect(114, tempLocation);
+                NewEffect(EFFID_WATER_SPLASH, tempLocation);
             }
 
 
@@ -1212,7 +1213,7 @@ void UpdateNPCs()
                             NPC[A].HoldingPlayer = 0;
                             NPC[A].Killed = 9;
                             NPCQueues::Killed.push_back(A);
-                            NewEffect(10, NPC[A].Location);
+                            NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                         }
 
                         if(NPCIsYoshi[NPC[A].Type])
@@ -1351,7 +1352,7 @@ void UpdateNPCs()
                                 tempLocation.SpeedY = 0;
                                 tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
                                 tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
-                                NewEffect(80, tempLocation);
+                                NewEffect(EFFID_SPARKLE, tempLocation);
                             }
                         }
                     }
@@ -1465,7 +1466,7 @@ void UpdateNPCs()
                             tempLocation.X = NPC[A].Location.X - 16;
                             if(NPC[A].Direction == 1)
                                 tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width - 16;
-                            NewEffect(132, tempLocation);
+                            NewEffect(EFFID_STOMP_INIT, tempLocation);
                         }
 
                         if(NPC[A].Type == 179)
@@ -3252,7 +3253,7 @@ void UpdateNPCs()
                                                                     NPCHit(A, 3, A);
                                                                 else
                                                                 {
-                                                                    NewEffect(75, NPC[A].Location);
+                                                                    NewEffect(EFFID_WHACK, NPC[A].Location);
                                                                     NPC[A].Killed = 3;
                                                                     NPCQueues::Killed.push_back(A);
                                                                 }
@@ -5129,7 +5130,7 @@ void UpdateNPCs()
                                     tempLocation = NPC[numNPCs].Location;
                                     tempLocation.X = NPC[numNPCs].Location.X + (NPC[numNPCs].Location.Width / 2.0) * NPC[numNPCs].Direction;
                                     tempLocation.Y = NPC[numNPCs].Location.Y + NPC[numNPCs].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                                    NewEffect(10, tempLocation);
+                                    NewEffect(EFFID_SMOKE_S3, tempLocation);
 
                                     PlaySound(SFX_Bullet);
                                 }

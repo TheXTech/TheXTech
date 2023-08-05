@@ -51,6 +51,7 @@
 #include "change_res.h"
 #include "collision.h"
 #include "effect.h"
+#include "eff_id.h"
 #include "graphics.h"
 #include "layers.h"
 #include "load_gfx.h"
@@ -1709,7 +1710,7 @@ void MoreScore(int addScore, const Location_t &Loc, vbint_t &Multiplier)
     }
     else
         Score += Points[A];
-    NewEffect(79, Loc);
+    NewEffect(EFFID_SCORE, Loc);
     Effect[numEffects].Frame = A - 1;
 }
 

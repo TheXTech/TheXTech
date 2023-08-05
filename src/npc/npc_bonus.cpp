@@ -21,6 +21,7 @@
 #include "../globals.h"
 #include "../npc.h"
 #include "../npc_id.h"
+#include "../eff_id.h"
 #include "../sound.h"
 #include "../collision.h"
 #include "../effect.h"
@@ -237,7 +238,7 @@ void TouchBonus(int A, int B)
                     Player[A].Effect2 = 4;
                     Player[A].Fairy = true;
                     SizeCheck(Player[A]);
-                    NewEffect(63, Player[A].Location);
+                    NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                 }
                 PlaySound(SFX_HeroFairy);
                 Player[A].FairyTime = -1;
@@ -543,7 +544,7 @@ void TouchBonus(int A, int B)
             }
             else
                 MoreScore(1, NPC[B].Location);
-            NewEffect(78, NPC[B].Location);
+            NewEffect(EFFID_COIN_COLLECT, NPC[B].Location);
         }
         else if(NPCIsAnExit[NPC[B].Type] && LevelMacro == LEVELMACRO_OFF) // Level exit
         {

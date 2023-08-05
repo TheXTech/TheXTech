@@ -26,6 +26,7 @@
 #include "effect.h"
 #include "collision.h"
 #include "npc.h"
+#include "eff_id.h"
 #include "sound.h"
 #include "graphics.h"
 #include "game_main.h"
@@ -376,7 +377,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 tempLocation = NPC[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
 
             if(!LevelEditor)
@@ -420,7 +421,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Block[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Block[A].Hidden = false;
@@ -440,7 +441,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Background[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Background[A].Hidden = false;
@@ -491,7 +492,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
                 tempLocation = NPC[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
 
@@ -515,7 +516,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Block[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Block[A].Hidden = true;
@@ -533,7 +534,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Background[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Background[A].Hidden = true;

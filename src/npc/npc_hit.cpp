@@ -30,6 +30,7 @@
 #include "../blocks.h"
 #include "../graphics.h"
 #include "../npc_id.h"
+#include "../eff_id.h"
 #include "../layers.h"
 
 #include "npc/npc_queues.h"
@@ -161,7 +162,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Projectile = false;
             NPC[A].RealSpeedX = 0;
 
-            NewEffect(10, NPC[A].Location);
+            NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
             for(C = 1; C <= 20; C++)
             {
                 tempLocation.Height = EffectHeight[80];
@@ -170,7 +171,7 @@ void NPCHit(int A, int B, int C)
                 tempLocation.SpeedY = 0;
                 tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
                 tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
-                NewEffect(80, tempLocation);
+                NewEffect(EFFID_SPARKLE, tempLocation);
                 Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
                 Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
                 Effect[numEffects].Frame = iRand(3);
@@ -330,7 +331,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Type = NPC[A].Special;
         }
         PlaySound(SFX_HeroGrass);
-        NewEffect(63, NPC[A].Location);
+        NewEffect(EFFID_SMOKE_S5, NPC[A].Location);
         if(NPC[A].Type == 17)
         {
             PlaySound(SFX_Bullet);
@@ -1259,7 +1260,7 @@ void NPCHit(int A, int B, int C)
                 if(C == A)
                 {
                     NPC[A].Killed = B;
-                    NewEffect(75, NPC[A].Location);
+                    NewEffect(EFFID_WHACK, NPC[A].Location);
                     Effect[numEffects].Location.X += NPC[A].Location.SpeedX;
                     Effect[numEffects].Location.Y += NPC[A].Location.SpeedY;
                 }
@@ -1357,7 +1358,7 @@ void NPCHit(int A, int B, int C)
             NPC[A].Frame = 0;
             pLogDebug("Shell stomp, X distance: [%g], Y=[%g]", std::abs(NPC[numNPCs].Location.X - NPC[A].Location.X), NPC[numNPCs].Location.Y);
             if(NPC[A].Type >= 109 && NPC[A].Type <= 120)
-                NewEffect(10, NPC[A].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
         }
         else if(B == 2 || B == 7)
         {
@@ -1528,7 +1529,7 @@ void NPCHit(int A, int B, int C)
         {
             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 2;
             tempLocation.X = NPC[A].Location.X - 4 + dRand() * (NPC[A].Location.Width + 8) - 4;
-            NewEffect(74, tempLocation);
+            NewEffect(EFFID_SKID_DUST, tempLocation);
         }
         else if(B == 8)
         {
@@ -1580,7 +1581,7 @@ void NPCHit(int A, int B, int C)
             {
                 tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 2;
                 tempLocation.X = NPC[A].Location.X - 4 + dRand() * (NPC[A].Location.Width + 8) - 4;
-                NewEffect(74, tempLocation);
+                NewEffect(EFFID_SKID_DUST, tempLocation);
             }
             else
                 NPC[A].Killed = B;
@@ -1928,15 +1929,15 @@ void NPCHit(int A, int B, int C)
                     tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - 2;
                     // tempLocation.X = .Location.X + .Location.Width / 2 - 4 '+ 4 * .Direction
                     tempLocation.X = NPC[A].Location.X - 4 + dRand() * (NPC[A].Location.Width + 8) - 4;
-                    NewEffect(74, tempLocation);
+                    NewEffect(EFFID_SKID_DUST, tempLocation);
                 }
                 else
                 {
                     if(NPC[A].Type == 26)
                         NPC[A].Location.Y -= 16;
-                    NewEffect(10, NPC[A].Location);
+                    NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                     if(!NPC[A].NoLavaSplash)
-                        NewEffect(13, NPC[A].Location);
+                        NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
                     PlaySound(SFX_Lava);
                     NPC[A].Location = NPC[A].DefaultLocation;
 
@@ -2058,8 +2059,8 @@ void NPCHit(int A, int B, int C)
     {
         if(B == 6)
         {
-            NewEffect(10, NPC[A].Location);
-            NewEffect(13, NPC[A].Location);
+            NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
+            NewEffect(EFFID_LAVA_SPLASH, NPC[A].Location);
             PlaySound(SFX_Lava);
             NPC[A].Location = NPC[A].DefaultLocation;
             NPCQueues::Unchecked.push_back(A);
@@ -2075,13 +2076,13 @@ void NPCHit(int A, int B, int C)
             if(NPC[A].Type == 251 || NPC[A].Type == 252 || NPC[A].Type == 253)
             {
                 PlaySound(SFX_HeroRupee);
-                NewEffect(78, NPC[A].Location);
+                NewEffect(EFFID_COIN_COLLECT, NPC[A].Location);
                 MoreScore(1, NPC[A].Location);
             }
             else if(NPC[A].Type == 258 || NPC[A].Type == 103)
             {
                 PlaySound(SFX_Coin);
-                NewEffect(78, NPC[A].Location);
+                NewEffect(EFFID_COIN_COLLECT, NPC[A].Location);
                 MoreScore(1, NPC[A].Location);
             }
             else
@@ -2091,7 +2092,7 @@ void NPCHit(int A, int B, int C)
                 //NPC[A].Location.X = NPC[A].Location.X; // - (32 - .Location.Width) / 2
                 NPC[A].Location.Height = 0;
                 PlaySound(SFX_Coin);
-                NewEffect(11, NPC[A].Location);
+                NewEffect(EFFID_COIN_BLOCK_S3, NPC[A].Location);
             }
 
             NPC[A].Killed = 9;
@@ -2232,7 +2233,7 @@ void NPCHit(int A, int B, int C)
         {
             MoreScore(NPCScore[NPC[A].Type], NPC[A].Location);
             if(B == 2)
-                NewEffect(75, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
+                NewEffect(EFFID_WHACK, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
         }
         else if(NPC[A].Location.SpeedX != oldNPC.Location.SpeedX ||
                 NPC[A].Location.SpeedY != oldNPC.Location.SpeedY /*||
@@ -2240,7 +2241,7 @@ void NPCHit(int A, int B, int C)
         {
             // MoreScore 1, .Location
             if(B == 2)
-                NewEffect(75, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
+                NewEffect(EFFID_WHACK, newLoc(NPC[A].Location.X, NPC[A].Location.Y + NPC[A].Location.Height - 16));
         }
     }
 
@@ -2295,7 +2296,7 @@ void NPCHit(int A, int B, int C)
                 tempLocation.Y = (NPC[C].Location.Y + tempLocation.Y + NPC[C].Location.Height / 2.0 + tempLocation.Height / 2.0) / 2 - 16;
                 tempLocation.X = (NPC[C].Location.X + tempLocation.X + NPC[C].Location.Width / 2.0 + tempLocation.Width / 2.0) / 2 - 16;
             }
-            NewEffect(75, tempLocation);
+            NewEffect(EFFID_WHACK, tempLocation);
         }
     }
 

@@ -40,6 +40,8 @@
 #include "../graphics.h"
 #include "../controls.h"
 
+#include "eff_id.h"
+
 #include "npc/npc_queues.h"
 
 
@@ -962,7 +964,7 @@ void UpdatePlayer()
                 {
                     if(iRand(10) == 0)
                     {
-                        NewEffect(80,
+                        NewEffect(EFFID_SPARKLE,
                                   newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
                                          Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)), 1, 0, ShadowMode);
                         Effect[numEffects].Location.SpeedX = dRand() * 0.5 - 0.25;
@@ -1018,7 +1020,7 @@ void UpdatePlayer()
                     Player[A].Effect2 = 4;
                     Player[A].Fairy = false;
                     SizeCheck(Player[A]);
-                    NewEffect(63, Player[A].Location);
+                    NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                     PlayerPush(A, 3);
                 }
                 else
@@ -1442,7 +1444,7 @@ void UpdatePlayer()
                                 tempLocation.X = Player[A].Location.X;
                                 for(B = 1; B <= 10; B++)
                                 {
-                                    NewEffect(80, tempLocation);
+                                    NewEffect(EFFID_SPARKLE, tempLocation);
                                     Effect[numEffects].Location.SpeedX = (dRand() * 3) - 1.5;
                                     Effect[numEffects].Location.SpeedY = (dRand() * 0.5) + (1.5 - std::abs(Effect[numEffects].Location.SpeedX)) * 0.5;
                                     Effect[numEffects].Location.SpeedX += -Player[A].Location.SpeedX * 0.2;
@@ -1482,7 +1484,7 @@ void UpdatePlayer()
                                 {
                                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2 + dRand() * (NPC[Player[A].StandingOnNPC].Location.Height - 8) + 4;
                                     tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width - 8) + 4 - 8 * Player[A].Direction;
-                                    NewEffect(80, tempLocation, 1, 0, ShadowMode);
+                                    NewEffect(EFFID_SPARKLE, tempLocation, 1, 0, ShadowMode);
                                     Effect[numEffects].Frame = iRand(3);
                                     Effect[numEffects].Location.SpeedY = (Player[A].Location.Y + Player[A].Location.Height + NPC[Player[A].StandingOnNPC].Location.Height / 32.0 - tempLocation.Y + 12) * 0.05;
                                 }
@@ -1742,7 +1744,7 @@ void UpdatePlayer()
                                 {
                                     if(iRand(10) == 0)
                                     {
-                                        NewEffect(80, newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
+                                        NewEffect(EFFID_SPARKLE, newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
                                                              Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)), 1, 0, ShadowMode);
                                         Effect[numEffects].Location.SpeedX = (dRand() * 0.5) - 0.25;
                                         Effect[numEffects].Location.SpeedY = (dRand() * 0.5) - 0.25;
@@ -1815,7 +1817,7 @@ void UpdatePlayer()
                                 Player[A].Immune = 10;
                                 Player[A].Effect = 8;
                                 Player[A].Effect2 = 4;
-                                NewEffect(63, Player[A].Location);
+                                NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                             }
                         }
 
@@ -2113,7 +2115,7 @@ void UpdatePlayer()
                 {
                     if(iRand(4) == 0)
                     {
-                        NewEffect(80,
+                        NewEffect(EFFID_SPARKLE,
                                   newLoc(Player[A].Location.X - 8 + dRand() * (Player[A].Location.Width + 16) - 4,
                                                   Player[A].Location.Y - 8 + dRand() * (Player[A].Location.Height + 16)),
                                                   1, 0, ShadowMode);
@@ -2509,7 +2511,7 @@ void UpdatePlayer()
                                                 {
                                                     tempLocation.Y = Player[A].Location.Y + Player[A].Location.Height - 2;
                                                     tempLocation.X = Player[A].Location.X - 4 + dRand() * (Player[A].Location.Width + 8) - 4;
-                                                    NewEffect(74, tempLocation);
+                                                    NewEffect(EFFID_SKID_DUST, tempLocation);
                                                 }
                                             }
                                         }
@@ -2841,7 +2843,7 @@ void UpdatePlayer()
                                 Block[B].Hidden = true;
                                 Block[B].Layer = LAYER_DESTROYED_BLOCKS;
                                 syncLayersTrees_Block(B);
-                                NewEffect(10, Block[B].Location);
+                                NewEffect(EFFID_SMOKE_S3, Block[B].Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                                 Player[A].GrabTime = 0;
                             }
@@ -3203,7 +3205,7 @@ void UpdatePlayer()
                                             Player[A].Immune = 10;
                                             Player[A].Effect = 8;
                                             Player[A].Effect2 = 4;
-                                            NewEffect(63, Player[A].Location);
+                                            NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                                         }
 
                                         if(Player[A].FairyTime != -1 && Player[A].FairyTime < 20)
@@ -3533,7 +3535,7 @@ void UpdatePlayer()
                                             NPCQueues::Killed.push_back(B);
                                             for(C = 1; C <= 10; ++C)
                                             {
-                                                NewEffect(77, NPC[B].Location, static_cast<float>(NPC[B].Special));
+                                                NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[B].Location, static_cast<float>(NPC[B].Special));
                                                 Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[B].Location.SpeedX * 0.1;
                                                 Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[B].Location.SpeedY * 0.1;
                                                 if(Effect[numEffects].Frame == 0)
@@ -3543,7 +3545,7 @@ void UpdatePlayer()
                                             }
                                             NPC[B].Location.X += NPC[B].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                                             NPC[B].Location.Y += NPC[B].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                                            NewEffect(10, NPC[B].Location);
+                                            NewEffect(EFFID_SMOKE_S3, NPC[B].Location);
 
                                             treeNPCUpdate(B);
                                         }
@@ -3567,7 +3569,7 @@ void UpdatePlayer()
                                                     Player[A].Immune = 10;
                                                     Player[A].Effect = 8;
                                                     Player[A].Effect2 = 4;
-                                                    NewEffect(63, Player[A].Location);
+                                                    NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                                                 }
                                                 if(Player[A].FairyTime != -1 && Player[A].FairyTime < 20)
                                                     Player[A].FairyTime = 20;
@@ -3640,11 +3642,11 @@ void UpdatePlayer()
                                             tempLocation = static_cast<Location_t>(Warp[numWarps + 1].Entrance);
                                             tempLocation.Y -= 32;
                                             tempLocation.Height = 64;
-                                            NewEffect(54, tempLocation);
+                                            NewEffect(EFFID_DOOR_S2_OPEN, tempLocation);
                                             tempLocation = static_cast<Location_t>(Warp[numWarps + 1].Exit);
                                             tempLocation.Y -= 32;
                                             tempLocation.Height = 64;
-                                            NewEffect(54, tempLocation);
+                                            NewEffect(EFFID_DOOR_S2_OPEN, tempLocation);
                                         }
                                     }
 
@@ -3916,7 +3918,7 @@ void UpdatePlayer()
                                                         tempLocation.Width = 0;
                                                         tempLocation.Y = (Player[A].Location.Y + NPC[B].Location.Y * 4) / 5;
                                                         tempLocation.X = (Player[A].Location.X + NPC[B].Location.X * 4) / 5;
-                                                        NewEffect(132, tempLocation);
+                                                        NewEffect(EFFID_STOMP_INIT, tempLocation);
                                                         NPC[B].CantHurt = 0;
                                                         NPC[B].CantHurtPlayer = 0;
                                                         NPCHit(B, 1, A);
@@ -3942,7 +3944,7 @@ void UpdatePlayer()
                                                 {
                                                     NPC[B].TailCD = 12;
                                                     if(NPC[B].Type != 166 && NPC[B].Type != 137)
-                                                        NewEffect(75, newLoc((Player[A].Location.X + NPC[B].Location.X + (Player[A].Location.Width + NPC[B].Location.Width) / 2.0) / 2, (Player[A].Location.Y + NPC[B].Location.Y + (Player[A].Location.Height + NPC[B].Location.Height) / 2.0) / 2));
+                                                        NewEffect(EFFID_WHACK, newLoc((Player[A].Location.X + NPC[B].Location.X + (Player[A].Location.Width + NPC[B].Location.Width) / 2.0) / 2, (Player[A].Location.Y + NPC[B].Location.Y + (Player[A].Location.Height + NPC[B].Location.Height) / 2.0) / 2));
                                                     NPCHit(B, 1, A);
                                                 }
                                             }
@@ -4174,9 +4176,9 @@ void UpdatePlayer()
                     }
                     Player[A].Location.Y = tempLocation.Y;
                     if(tempShell)
-                        NewEffect(132, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - EffectWidth[132] / 2.0, Player[A].Location.Y + Player[A].Location.Height - EffectHeight[132] / 2.0));
+                        NewEffect(EFFID_STOMP_INIT, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - EffectWidth[132] / 2.0, Player[A].Location.Y + Player[A].Location.Height - EffectHeight[132] / 2.0));
                     else if(!tempSpring)
-                        NewEffect(75, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
+                        NewEffect(EFFID_WHACK, newLoc(Player[A].Location.X + Player[A].Location.Width / 2.0 - 16, Player[A].Location.Y + Player[A].Location.Height - 16));
                     else
                         tempSpring = false;
                     PlayerPush(A, 3);
@@ -4337,7 +4339,7 @@ void UpdatePlayer()
                         {
                             Player[A].Fairy = false;
                             PlaySound(SFX_HeroFairy);
-                            NewEffect(63, Player[A].Location);
+                            NewEffect(EFFID_SMOKE_S5, Player[A].Location);
                         }
                         Player[A].Location = NPC[B].Location;
                         Player[A].Mount = 2;

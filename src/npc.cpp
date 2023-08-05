@@ -35,6 +35,7 @@
 #include "main/trees.h"
 #include "core/events.h"
 #include "npc_id.h"
+#include "eff_id.h"
 #include "layers.h"
 
 #include "npc/npc_queues.h"
@@ -177,21 +178,21 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     NPC[0].Multiplier = 0;
     if(Game == 0)
     {
-        NewEffect(148, Location);
+        NewEffect(EFFID_CHAR3_HEAVY_EXPLODE, Location);
         PlaySound(SFX_Bullet);
         Radius = 32;
     }
     if(Game == 2)
     {
         Controls::RumbleAllPlayers(150, 1.0);
-        NewEffect(69, Location);
+        NewEffect(EFFID_BOMB_S2_EXPLODE, Location);
         PlaySound(SFX_Fireworks);
         Radius = 52;
     }
     if(Game == 3)
     {
         Controls::RumbleAllPlayers(200, 1.0);
-        NewEffect(70, Location);
+        NewEffect(EFFID_BOMB_S3_EXPLODE_SEED, Location);
         PlaySound(SFX_Fireworks);
         Radius = 64;
     }
@@ -325,7 +326,7 @@ void TurnNPCsIntoCoins()
                    NPC[A].Type != 91 && NPC[A].Type != 260 && NPC[A].Type != 259)
                 {
                     NPC[A].Location.Y += 32;
-                    NewEffect(11, NPC[A].Location);
+                    NewEffect(EFFID_COIN_BLOCK_S3, NPC[A].Location);
                     PlaySound(SFX_Coin);
                     Coins += 1;
                     if(Coins >= 100)
@@ -782,7 +783,7 @@ void NPCSpecial(int A)
 
             for(int i = 1; i <= 5; i++)
             {
-                NewEffect(80, newLoc(npc.Location.X + npc.Location.Width / 2.0 - 4, npc.Location.Y + npc.Location.Height / 2.0 - 6), 1, 0, npc.Shadow);
+                NewEffect(EFFID_SPARKLE, newLoc(npc.Location.X + npc.Location.Width / 2.0 - 4, npc.Location.Y + npc.Location.Height / 2.0 - 6), 1, 0, npc.Shadow);
                 Effect[numEffects].Location.SpeedX = dRand() * 6 - 3;
                 Effect[numEffects].Location.SpeedY = dRand() * 6 - 3;
                 Effect[numEffects].Frame = iRand(3);
@@ -921,7 +922,7 @@ void NPCSpecial(int A)
 
         if(npc.Special3 > 0)
         {
-            NewEffect(144, npc.Location);
+            NewEffect(EFFID_BUBBLE_POP, npc.Location);
             PlaySound(SFX_Bubble);
             npc.Type = npc.Special;
             npc.Special3 = 0;
@@ -1625,7 +1626,7 @@ void NPCSpecial(int A)
                 tempLocation.SpeedY = 0;
                 tempLocation.X = npc.Location.X + dRand() * 16 - EffectWidth[80] / 2.0 - 4; // + .Location.SpeedX
                 tempLocation.Y = npc.Location.Y + dRand() * 4 - EffectHeight[80] / 2.0 - 2;
-                NewEffect(80, tempLocation);
+                NewEffect(EFFID_SPARKLE, tempLocation);
                 Effect[numEffects].Location.SpeedX = npc.Location.SpeedX * 0.3 + dRand() * 2 - 1;
                 Effect[numEffects].Location.SpeedY = dRand() * 1 - 0.5;
                 Effect[numEffects].Frame = iRand(3);
@@ -1640,7 +1641,7 @@ void NPCSpecial(int A)
             tempLocation.SpeedY = 0;
             tempLocation.X = npc.Location.X + dRand() * 16 - EffectWidth[80] / 2.0 - 4; // + .Location.SpeedX
             tempLocation.Y = npc.Location.Y + dRand() * 4 - EffectHeight[80] / 2.0 - 2;
-            NewEffect(80, tempLocation);
+            NewEffect(EFFID_SPARKLE, tempLocation);
             Effect[numEffects].Location.SpeedX = npc.Location.SpeedX * 0.15;
             Effect[numEffects].Location.SpeedY = npc.Location.SpeedY; // + Rnd * 2 - 1
             Effect[numEffects].Frame = iRand(2) + 1;
@@ -1894,7 +1895,7 @@ void NPCSpecial(int A)
 
         if(npc.Special4 == 4)
         {
-            NewEffect(136, npc.Location);
+            NewEffect(EFFID_FIRE_DISK_DIE, npc.Location);
             Effect[numEffects].Frame = npc.Frame;
             Effect[numEffects].Location.SpeedX = 0;
             Effect[numEffects].Location.SpeedY = 0;
@@ -1981,7 +1982,7 @@ void NPCSpecial(int A)
             if(n.Type == NPCID_KEY && n.Active && n.HoldingPlayer != 0 && CheckCollision(npc.Location, n.Location))
             {
                 n.Killed = 9;
-                NewEffect(10, n.Location);
+                NewEffect(EFFID_SMOKE_S3, n.Location);
                 npc.Killed = 3;
                 NPCQueues::Killed.push_back(A);
                 NPCQueues::Killed.push_back(i);
@@ -3009,7 +3010,7 @@ void NPCSpecial(int A)
                     else
                         npc.Direction = 1;
                     npc.Special = 1;
-                    NewEffect(104, npc.Location, npc.Direction);
+                    NewEffect(EFFID_LAVA_MONSTER_LOOK, npc.Location, npc.Direction);
                     break;
                 }
             }
@@ -3193,7 +3194,7 @@ void SpecialNPC(int A)
                         {
                             for(int Ci = 1; Ci <= 10; Ci++)
                             {
-                                NewEffect(77, NPC[A].Location, static_cast<float>(NPC[A].Special));
+                                NewEffect(EFFID_PLR_FIREBALL_TRAIL, NPC[A].Location, static_cast<float>(NPC[A].Special));
                                 Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5 + NPC[A].Location.SpeedX * 0.1;
                                 Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5 - NPC[A].Location.SpeedY * 0.1;
 
@@ -3208,7 +3209,7 @@ void SpecialNPC(int A)
                         {
                             NPC[A].Location.X += NPC[A].Location.Width / 2.0 - EffectWidth[10] / 2.0;
                             NPC[A].Location.Y += NPC[A].Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                            NewEffect(10, NPC[A].Location);
+                            NewEffect(EFFID_SMOKE_S3, NPC[A].Location);
                             // deferring tree update to end of the NPC physics update
                         }
                     }
@@ -3389,7 +3390,7 @@ void SpecialNPC(int A)
             tempLocation.SpeedY = 0;
             tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
             tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
-            NewEffect(80, tempLocation);
+            NewEffect(EFFID_SPARKLE, tempLocation);
         }
         if(NPC[A].Projectile)
         {
@@ -3401,7 +3402,7 @@ void SpecialNPC(int A)
                 tempLocation.SpeedY = 0;
                 tempLocation.X = NPC[A].Location.X - tempLocation.Width / 2.0 + dRand() * NPC[A].Location.Width - 4;
                 tempLocation.Y = NPC[A].Location.Y - tempLocation.Height / 2.0 + dRand() * NPC[A].Location.Height - 4;
-                NewEffect(80, tempLocation);
+                NewEffect(EFFID_SPARKLE, tempLocation);
             }
         }
     }
@@ -3528,8 +3529,8 @@ void SpecialNPC(int A)
         {
             tempLocation = NPC[A].Location;
             tempLocation.Y -= 32;
-            NewEffect(147, NPC[A].Location);
-            NewEffect(147, tempLocation);
+            NewEffect(EFFID_SMOKE_S2, NPC[A].Location);
+            NewEffect(EFFID_SMOKE_S2, tempLocation);
             NPC[A].Frame = 0;
             NPC[A].Location.SpeedX = 0;
             NPC[A].Location.SpeedY = 0;
@@ -4134,7 +4135,7 @@ void SpecialNPC(int A)
             PlaySound(SFX_Lava);
             tempLocation = NPC[A].Location;
             tempLocation.Y -= 32;
-            NewEffect(13, tempLocation);
+            NewEffect(EFFID_LAVA_SPLASH, tempLocation);
         }
         else if(fiEqual(NPC[A].Special2, 1))
         {
@@ -4144,7 +4145,7 @@ void SpecialNPC(int A)
             if(NPC[A].Location.Y < NPC[A].DefaultLocation.Y - 10)
             {
                 if(int(NPC[A].Special) % 5 == 0) {
-                    NewEffect(12, NPC[A].Location);
+                    NewEffect(EFFID_BIG_FIREBALL_TAIL, NPC[A].Location);
                 }
             }
 
@@ -4162,7 +4163,7 @@ void SpecialNPC(int A)
             {
                 tempLocation = NPC[A].Location;
                 tempLocation.Y += 2;
-                NewEffect(13, tempLocation);
+                NewEffect(EFFID_LAVA_SPLASH, tempLocation);
                 PlaySound(SFX_Lava);
             }
 
@@ -4957,12 +4958,12 @@ void SpecialNPC(int A)
 
 //                    tempLocation.X = NPC[A].Location.X;
                     tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width / 8);
-                    NewEffect(10, tempLocation);
+                    NewEffect(EFFID_SMOKE_S3, tempLocation);
                     Effect[numEffects].Location.SpeedX = -1.5;
 
 //                    tempLocation.X += tempLocation.Width - EffectWidth[10];
                     tempLocation.X = (NPC[A].Location.X + NPC[A].Location.Width - EffectWidth[10]) - (NPC[A].Location.Width / 8);
-                    NewEffect(10, tempLocation);
+                    NewEffect(EFFID_SMOKE_S3, tempLocation);
                     Effect[numEffects].Location.SpeedX = 1.5;
 
                 }
@@ -5111,7 +5112,7 @@ void SpecialNPC(int A)
             if(NPC[A].Special4 >= 5)
             {
                 NPC[A].Special4 = 0;
-                NewEffect(80, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
+                NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
                 Effect[numEffects].Location.SpeedX = dRand() * 1.0 - 0.5;
                 Effect[numEffects].Location.SpeedY = dRand() * 1.0 - 0.5;
             }
@@ -5122,7 +5123,7 @@ void SpecialNPC(int A)
             if(NPC[A].Special4 >= 10)
             {
                 NPC[A].Special4 = 0;
-                NewEffect(80, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
+                NewEffect(EFFID_SPARKLE, newLoc(NPC[A].Location.X + dRand() * NPC[A].Location.Width - 2, NPC[A].Location.Y + dRand() * NPC[A].Location.Height));
                 Effect[numEffects].Location.SpeedX = dRand() * 1.0 - 0.5;
                 Effect[numEffects].Location.SpeedY = dRand() * 1.0 - 0.5;
                 Effect[numEffects].Frame = 1;

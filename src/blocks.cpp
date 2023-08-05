@@ -32,6 +32,7 @@
 #include "collision.h"
 #include "npc.h"
 #include "npc_id.h"
+#include "eff_id.h"
 #include "player.h"
 #include "sorting.h"
 #include "layers.h"
@@ -422,7 +423,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     }
                 }
                 PlaySound(SFX_Coin);
-                NewEffect(11, b.Location);
+                NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
                 b.Special -= 1;
             }
         }
@@ -497,7 +498,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     }
                 }
                 PlaySound(SFX_Coin);
-                NewEffect(11, b.Location);
+                NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
                 b.Special -= 1;
             }
 
@@ -519,7 +520,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                 }
             }
             PlaySound(SFX_Coin);
-            NewEffect(11, b.Location);
+            NewEffect(EFFID_COIN_BLOCK_S3, b.Location);
             b.Special -= 1;
         }
 
@@ -1467,17 +1468,17 @@ void KillBlock(int A, bool Splode)
             PlaySound(SFX_BlockSmashed); // Block smashed
         // Create the break effect
         if(Block[A].Type == 60)
-            NewEffect(21, Block[A].Location);
+            NewEffect(EFFID_BLU_BLOCK_SMASH, Block[A].Location);
         else if(Block[A].Type == 188)
-            NewEffect(51, Block[A].Location);
+            NewEffect(EFFID_BLOCK_S1_SMASH, Block[A].Location);
         else if(Block[A].Type == 457)
-            NewEffect(100, Block[A].Location);
+            NewEffect(EFFID_GRY_BLOCK_SMASH, Block[A].Location);
         else if(Block[A].Type == 526)
-            NewEffect(107, Block[A].Location);
+            NewEffect(EFFID_SPACE_BLOCK_SMASH, Block[A].Location);
         else if(Block[A].Type == 293)
-            NewEffect(135, Block[A].Location);
+            NewEffect(EFFID_DIRT_BLOCK_SMASH, Block[A].Location);
         else
-            NewEffect(1, Block[A].Location);
+            NewEffect(EFFID_BLOCK_SMASH, Block[A].Location);
     }
 
     if(LevelEditor)
@@ -1829,7 +1830,7 @@ void UpdateBlocks()
                                 syncLayersTrees_Block_SetHidden(A);
 
                                 if(!b.Hidden) // -V547 // False positive: the b.Hidden gets changed inside syncLayersTrees_Block_SetHidden() call
-                                    NewEffect(10, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
+                                    NewEffect(EFFID_SMOKE_S3, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
                             }
                             else
                             {
@@ -1839,7 +1840,7 @@ void UpdateBlocks()
                             if(b.Type != b.DefaultType || b.Special != b.DefaultSpecial)
                             {
                                 if(b.Type != b.DefaultType)
-                                    NewEffect(10, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
+                                    NewEffect(EFFID_SMOKE_S3, newLoc(b.Location.X + b.Location.Width / 2.0 - EffectWidth[10] / 2, b.Location.Y + b.Location.Height / 2.0 - EffectHeight[10] / 2));
                                 b.Special = b.DefaultSpecial;
                                 b.Type = b.DefaultType;
                             }
@@ -1887,7 +1888,7 @@ void UpdateBlocks()
                 {
                     ib.Hidden = true;
                     invalidateDrawBlocks();
-                    NewEffect(82, ib.Location, 1, iBlock[A]);
+                    NewEffect(EFFID_SPINBLOCK, ib.Location, 1, iBlock[A]);
                     ib.ShakeY = 0;
                     ib.ShakeY2 = 0;
                     ib.ShakeY3 = 0;
@@ -1913,7 +1914,7 @@ void UpdateBlocks()
                 {
                     ib.Hidden = true;
                     invalidateDrawBlocks();
-                    NewEffect(82, ib.Location, 1, iBlock[A]);
+                    NewEffect(EFFID_SPINBLOCK, ib.Location, 1, iBlock[A]);
                     ib.ShakeY = 0;
                     ib.ShakeY2 = 0;
                     ib.ShakeY3 = 0;

@@ -23,6 +23,7 @@
 #include "effect.h"
 #include "npc.h"
 #include "npc_id.h"
+#include "eff_id.h"
 #include "sound.h"
 #include "game_main.h"
 #include "collision.h"
@@ -88,7 +89,7 @@ void UpdateEffects()
         {
             if(e.Life % 5 == 0)
             {
-                NewEffect(108, newLoc(e.Location.X + (dRand() * e.Location.Width),
+                NewEffect(EFFID_BOSS_FRAGILE_EXPLODE, newLoc(e.Location.X + (dRand() * e.Location.Width),
                                       e.Location.Y + (dRand() * e.Location.Height)));
             }
         }
@@ -340,7 +341,7 @@ void UpdateEffects()
                 if(e.Frame == 2)
                 {
                     e.Life = 0;
-                    NewEffect(133, e.Location);
+                    NewEffect(EFFID_STOMP_STAR, e.Location);
                 }
             }
         }
@@ -398,7 +399,7 @@ void UpdateEffects()
             {
                 e.Location.X += e.Location.Width / 2.0 - EffectWidth[10] / 2.0;
                 e.Location.Y += e.Location.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, e.Location);
+                NewEffect(EFFID_SMOKE_S3, e.Location);
             }
         }
         else if(e.Type == 74) // Slide Smoke
@@ -573,7 +574,7 @@ void UpdateEffects()
         {
             if(e.FrameCount == 0)
             {
-                NewEffect(71, e.Location, static_cast<float>(e.Frame));
+                NewEffect(EFFID_BOMB_S3_EXPLODE, e.Location, static_cast<float>(e.Frame));
                 e.Frame += 1;
                 if(e.Frame >= 4)
                     e.Frame = 0;
@@ -594,7 +595,7 @@ void UpdateEffects()
                 }
             if(e.Type == 148 && iRand(10) >= 8)
             {
-                NewEffect(77, e.Location, 3);
+                NewEffect(EFFID_PLR_FIREBALL_TRAIL, e.Location, 3);
                 Effect[numEffects].Location.SpeedX = dRand() * 3 - 1.5;
                 Effect[numEffects].Location.SpeedY = dRand() * 3 - 1.5;
             }
@@ -704,7 +705,7 @@ void UpdateEffects()
             else if(e.FrameCount == 20)
             {
                 e.Frame = 2;
-                NewEffect(57, e.Location);
+                NewEffect(EFFID_ITEM_POD_BREAK, e.Location);
             }
             else if(e.FrameCount == 30)
             {
@@ -712,7 +713,7 @@ void UpdateEffects()
                 if(!LevelEditor && e.NewNpc != 96)
                 {
                     if(NPCIsYoshi[e.NewNpc])
-                        NewEffect(58, e.Location, 1, static_cast<float>(e.NewNpc));
+                        NewEffect(EFFID_PET_BIRTH, e.Location, 1, static_cast<float>(e.NewNpc));
                     else if(e.NewNpc > 0)
                     {
                         numNPCs++;

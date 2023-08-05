@@ -32,6 +32,7 @@
 #include "collision.h"
 #include "npc.h"
 #include "npc_id.h"
+#include "eff_id.h"
 #include "sound.h"
 #include "game_main.h"
 #include "effect.h"
@@ -487,7 +488,7 @@ void PlayerHurt(const int A)
         // FIXME: Here is a possible vanilla bug: B is always 0 even at original code
         SizeCheck(Player[B]);
 
-        NewEffect(63, p.Location);
+        NewEffect(EFFID_SMOKE_S5, p.Location);
         if(p.Character == 5)
         {
             p.FrameCount = -10;
@@ -525,11 +526,11 @@ void PlayerHurt(const int A)
                 tempLocation = p.Location;
                 tempLocation.SpeedX = 5 * -p.Direction;
                 if(p.MountType == 1)
-                    NewEffect(26, tempLocation);
+                    NewEffect(EFFID_GRN_BOOT_DIE, tempLocation);
                 else if(p.MountType == 2)
-                    NewEffect(101, tempLocation);
+                    NewEffect(EFFID_RED_BOOT_DIE, tempLocation);
                 else
-                    NewEffect(102, tempLocation);
+                    NewEffect(EFFID_BLU_BOOT_DIE, tempLocation);
                 p.Location.Y += p.Location.Height;
                 p.Location.Height = Physics.PlayerHeight[p.Character][p.State];
                 p.Location.Y += -p.Location.Height;
@@ -730,16 +731,16 @@ void PlayerHurt(const int A)
 void PlayerDeathEffect(int A)
 {
     if(Player[A].Character == 1)
-        NewEffect(3, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR1_DIE, Player[A].Location, 1, 0, ShadowMode);
     else if(Player[A].Character == 2)
-        NewEffect(5, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR2_DIE, Player[A].Location, 1, 0, ShadowMode);
     else if(Player[A].Character == 3)
-        NewEffect(129, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR3_DIE, Player[A].Location, 1, 0, ShadowMode);
     else if(Player[A].Character == 4)
-        NewEffect(130, Player[A].Location, 1, 0, ShadowMode);
+        NewEffect(EFFID_CHAR4_DIE, Player[A].Location, 1, 0, ShadowMode);
     else if(Player[A].Character == 5)
     {
-        NewEffect(134, Player[A].Location, static_cast<float>(Player[A].Direction), 0, ShadowMode);
+        NewEffect(EFFID_CHAR5_DIE, Player[A].Location, static_cast<float>(Player[A].Direction), 0, ShadowMode);
         Effect[numEffects].Location.SpeedX = 2 * -Player[A].Direction;
     }
 }
@@ -924,7 +925,7 @@ void KillPlayer(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(131, tempLocation);
+            NewEffect(EFFID_SMOKE_S4, tempLocation);
             UpdateYoshiMusic();
         }
     }
@@ -1292,7 +1293,7 @@ void PlayerFrame(Player_t &p)
                     p.SlideCounter = 2 + iRand_round(2); // p(2) = 25%, p(3) = 50%, p(4) = 25%
                     tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                     tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4;
-                    NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                 }
             }
         }
@@ -1314,7 +1315,7 @@ void PlayerFrame(Player_t &p)
                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 6;
                     else
                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 - 6;
-                    NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                 }
             }
         }
@@ -1493,7 +1494,7 @@ void PlayerFrame(Player_t &p)
                                         p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 8 * -p.Direction;
-                                        NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                                     }
                                 }
 
@@ -1512,7 +1513,7 @@ void PlayerFrame(Player_t &p)
                                         p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 8 * -p.Direction;
-                                        NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                                     }
                                 }
 
@@ -1571,7 +1572,7 @@ void PlayerFrame(Player_t &p)
                             p.SlideCounter = 2 + iRand_round(2);
                             tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 10 * -p.Direction;
-                            NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                            NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                         }
                     }
 
@@ -1723,7 +1724,7 @@ void PlayerFrame(Player_t &p)
                                         p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 6 * -p.Direction;
-                                        NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                                     }
                                 }
                                 p.Frame = 6;
@@ -1742,7 +1743,7 @@ void PlayerFrame(Player_t &p)
                                         p.SlideCounter = 2 + iRand_round(2);
                                         tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 10 * -p.Direction;
-                                        NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                                        NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                                     }
                                 }
                                 p.Frame = 6;
@@ -1870,7 +1871,7 @@ void PlayerFrame(Player_t &p)
                             p.SlideCounter = 2 + iRand_round(2);
                             tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4 + 10 * -p.Direction;
-                            NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                            NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                         }
                     }
                     if(p.Location.SpeedX != 0)
@@ -2337,7 +2338,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                             {
                                 tempLoc.X = (block.Location.X + tailLoc.X + (block.Location.Width + tailLoc.Width) / 2.0) / 2 - 16;
                                 tempLoc.Y = (block.Location.Y + tailLoc.Y + (block.Location.Height + tailLoc.Height) / 2.0) / 2 - 16;
-                                NewEffect(73, tempLoc);
+                                NewEffect(EFFID_WHIP, tempLoc);
                             }
                             break;
                         }
@@ -2362,7 +2363,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                                 block.Hidden = true;
                                 block.Layer = LAYER_DESTROYED_BLOCKS;
                                 syncLayersTrees_Block(A);
-                                NewEffect(10, block.Location);
+                                NewEffect(EFFID_SMOKE_S3, block.Location);
                                 Effect[numEffects].Location.SpeedY = -2;
                             }
 
@@ -2451,7 +2452,7 @@ void TailSwipe(const int plr, bool boo, bool Stab, int StabDir)
                             tempLoc.X = (NPC[A].Location.X + tailLoc.X + (NPC[A].Location.Width + tailLoc.Width) / 2.0) / 2 - 16;
                             tempLoc.Y = (NPC[A].Location.Y + tailLoc.Y + (NPC[A].Location.Height + tailLoc.Height) / 2.0) / 2 - 16;
                             NPC[A].BattleOwner = plr;
-                            NewEffect(73, tempLoc);
+                            NewEffect(EFFID_WHIP, tempLoc);
                         }
                     }
 
@@ -2849,10 +2850,10 @@ void YoshiPound(const int A, int mount, bool BreakBlocks)
         tempLocation.Height = 32;
         tempLocation.Y = p.Location.Y + p.Location.Height - 16;
         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16 - 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
         Effect[numEffects].Location.SpeedX = -2;
         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16 + 16;
-        NewEffect(10, tempLocation);
+        NewEffect(EFFID_SMOKE_S3, tempLocation);
         Effect[numEffects].Location.SpeedX = 2;
         PlaySound(SFX_Stone);
         if(BreakBlocks && g_config.GameplayShakeScreenPound)
@@ -3964,7 +3965,7 @@ void WaterCheck(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height - tempLocation.Height;
-            NewEffect(114, tempLocation);
+            NewEffect(EFFID_WATER_SPLASH, tempLocation);
         }
     }
 
@@ -4004,7 +4005,7 @@ void WaterCheck(const int A)
                         tempLocation.Height = 32;
                         tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
                         tempLocation.Y = p.Location.Y + p.Location.Height - tempLocation.Height;
-                        NewEffect(114, tempLocation);
+                        NewEffect(EFFID_WATER_SPLASH, tempLocation);
                     }
                 }
 
@@ -4045,13 +4046,13 @@ void WaterCheck(const int A)
                 {
                     if(CheckCollision(Water[B].Location, tempLocation))
                     {
-                        NewEffect(113, tempLocation, 1, 0, ShadowMode);
+                        NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, 0, ShadowMode);
                         break;
                     }
                 }
             }
             else
-                NewEffect(113, tempLocation, 1, 1, ShadowMode);
+                NewEffect(EFFID_AIR_BUBBLE, tempLocation, 1, 1, ShadowMode);
         }
     }
 }
@@ -4565,7 +4566,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                 NPC[plr.HoldingNPC].Killed = 9;
                 NPCQueues::Killed.push_back(plr.HoldingNPC);
 
-                NewEffect(10, NPC[plr.HoldingNPC].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[plr.HoldingNPC].Location);
                 warp.Locked = false;
                 int allBGOs = numBackground + numLocked;
                 for(int C = numBackground + 1; C <= allBGOs; C++)
@@ -4755,18 +4756,18 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
                 if(CheckCollision(entrance, Background[C].Location) || CheckCollision(exit, Background[C].Location))
                 {
                     if(Background[C].Type == 88)
-                        NewEffect(54, Background[C].Location);
+                        NewEffect(EFFID_DOOR_S2_OPEN, Background[C].Location);
                     else if(Background[C].Type == 87)
-                        NewEffect(55, Background[C].Location);
+                        NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[C].Location);
                     else if(Background[C].Type == 107)
-                        NewEffect(59, Background[C].Location);
+                        NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[C].Location);
                     else if(Background[C].Type == 141)
                     {
                         Location_t bLoc = Background[C].Location;
                         bLoc.X += bLoc.Width / 2.0;
                         bLoc.Width = 104;
                         bLoc.X += -bLoc.Width / 2.0;
-                        NewEffect(103, bLoc);
+                        NewEffect(EFFID_BIG_DOOR_OPEN, bLoc);
                     }
                 }
             }
@@ -4897,7 +4898,7 @@ void PlayerCollide(const int A)
                     if(p2.Location.SpeedY <= 0)
                         p2.Location.SpeedY = 0.1;
                     p2.CanJump = false;
-                    NewEffect(75, newLoc(p1.Location.X + p1.Location.Width / 2.0 - 16, p1.Location.Y + p1.Location.Height - 16));
+                    NewEffect(EFFID_WHACK, newLoc(p1.Location.X + p1.Location.Width / 2.0 - 16, p1.Location.Y + p1.Location.Height - 16));
                 }
                 else if(HitSpot == 3)
                 {
@@ -4915,7 +4916,7 @@ void PlayerCollide(const int A)
                     if(p1.Location.SpeedY <= 0)
                         p1.Location.SpeedY = 0.1;
                     p1.CanJump = false;
-                    NewEffect(75, newLoc(p2.Location.X + p2.Location.Width / 2.0 - 16, p2.Location.Y + p2.Location.Height - 16));
+                    NewEffect(EFFID_WHACK, newLoc(p2.Location.X + p2.Location.Width / 2.0 - 16, p2.Location.Y + p2.Location.Height - 16));
                 }
                 else if(HitSpot == 5)
                 {
@@ -5270,7 +5271,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 NPCHit(p.HoldingNPC, 3, p.HoldingNPC);
             }
             if(NPCIsACoin[NPC[p.HoldingNPC].Type] && !p.Controls.Down) // Smoke effect for coins
-                NewEffect(10, NPC[p.HoldingNPC].Location);
+                NewEffect(EFFID_SMOKE_S3, NPC[p.HoldingNPC].Location);
             if(p.Controls.Up && !NPCIsACoin[NPC[p.HoldingNPC].Type] && NPC[p.HoldingNPC].Type != 17) // Throw the npc up
             {
                 if(NPCIsAShell[NPC[p.HoldingNPC].Type] || NPC[p.HoldingNPC].Type == 45 || NPC[p.HoldingNPC].Type == 263)
@@ -5284,7 +5285,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         tempLocation.Y = (p.Location.Y + NPC[p.HoldingNPC].Location.Y * 4) / 5;
                         tempLocation.X = (p.Location.X + NPC[p.HoldingNPC].Location.X * 4) / 5;
                         if(NPC[p.HoldingNPC].Type != 263)
-                            NewEffect(132, tempLocation);
+                            NewEffect(EFFID_STOMP_INIT, tempLocation);
                     }
                     else
                     {
@@ -5294,7 +5295,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                         tempLocation.Y = (p.Location.Y + NPC[p.HoldingNPC].Location.Y * 4) / 5;
                         tempLocation.X = (p.Location.X + NPC[p.HoldingNPC].Location.X * 4) / 5;
                         if(NPC[p.HoldingNPC].Type != 263)
-                            NewEffect(132, tempLocation);
+                            NewEffect(EFFID_STOMP_INIT, tempLocation);
                     }
                 }
                 else
@@ -5339,7 +5340,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                     NPC[p.HoldingNPC].CantHurtPlayer = 0;
                     NPC[p.HoldingNPC].HoldingPlayer = 0;
                     PlaySound(SFX_ShellHit);
-                    NewEffect(73, newLoc(NPC[p.HoldingNPC].Location.X, NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC].Location.Height - 16));
+                    NewEffect(EFFID_WHIP, newLoc(NPC[p.HoldingNPC].Location.X, NPC[p.HoldingNPC].Location.Y + NPC[p.HoldingNPC].Location.Height - 16));
                     NPC[p.HoldingNPC].Location.X = p.Location.X + p.Location.Width / 2.0 - NPC[p.HoldingNPC].Location.Width / 2.0;
                     NPC[p.HoldingNPC].Location.Y = p.Location.Y + p.Location.Height - NPC[p.HoldingNPC].Location.Height;
                     p.Location.Y = NPC[p.HoldingNPC].Location.Y - p.Location.Height;
@@ -5434,7 +5435,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
                 tempLocation.Width = 0;
                 tempLocation.Y = (p.Location.Y + NPC[p.HoldingNPC].Location.Y * 4) / 5;
                 tempLocation.X = (p.Location.X + NPC[p.HoldingNPC].Location.X * 4) / 5;
-                NewEffect(132, tempLocation);
+                NewEffect(EFFID_STOMP_INIT, tempLocation);
             }
             else if(NPC[p.HoldingNPC].Type == 263)
             {
@@ -5586,7 +5587,7 @@ void LinkFrame(Player_t &p)
                     p.SlideCounter = 2 + iRand_round(2);
                     tempLocation.Y = p.Location.Y + p.Location.Height - 5;
                     tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 4;
-                    NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                    NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
                 }
             }
         }
@@ -5712,7 +5713,7 @@ void LinkFrame(Player_t &p)
                 else
                     tempLocation.X = p.Location.X + p.Location.Width / 2.0 + 6 - 4;
 
-                NewEffect(74, tempLocation, 1, 0, ShadowMode);
+                NewEffect(EFFID_SKID_DUST, tempLocation, 1, 0, ShadowMode);
             }
         }
     }
@@ -6475,7 +6476,7 @@ void PlayerEffects(const int A)
                 auto loc = warp_exit;
                 if(warp_dir_exit == LevelDoor::EXIT_LEFT || warp_dir_exit == LevelDoor::EXIT_RIGHT)
                     loc.Y += loc.Height - (p.Location.Height / 2) - (loc.Height / 2);
-                NewEffect(132, loc, p.Direction); // Cannon pipe shoot effect
+                NewEffect(EFFID_STOMP_INIT, loc, p.Direction); // Cannon pipe shoot effect
             }
 
             if(p.HoldingNPC > 0)
@@ -6796,11 +6797,11 @@ void PlayerEffects(const int A)
                     if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
                     {
                         if(Background[c].Type == 88)
-                            NewEffect(54, Background[c].Location);
+                            NewEffect(EFFID_DOOR_S2_OPEN, Background[c].Location);
                         else if(Background[c].Type == 87)
-                            NewEffect(55, Background[c].Location);
+                            NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[c].Location);
                         else if(Background[c].Type == 107)
-                            NewEffect(59, Background[c].Location);
+                            NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[c].Location);
                     }
                 }
 
@@ -6854,11 +6855,11 @@ void PlayerEffects(const int A)
                     if(CheckCollision(Warp[p.Warp].Exit, Background[c].Location))
                     {
                         if(Background[c].Type == 88)
-                            NewEffect(54, Background[c].Location);
+                            NewEffect(EFFID_DOOR_S2_OPEN, Background[c].Location);
                         else if(Background[c].Type == 87)
-                            NewEffect(55, Background[c].Location);
+                            NewEffect(EFFID_DOOR_DOUBLE_S3_OPEN, Background[c].Location);
                         else if(Background[c].Type == 107)
-                            NewEffect(59, Background[c].Location);
+                            NewEffect(EFFID_DOOR_SIDE_S3_OPEN, Background[c].Location);
                     }
                 }
 
@@ -7036,7 +7037,7 @@ void PlayerEffects(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(131, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
 
         p.Effect2 += 1;
@@ -7078,7 +7079,7 @@ void PlayerEffects(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(131, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
         p.Effect2 += 1;
         if(fEqual(p.Effect2, 14))
@@ -7120,7 +7121,7 @@ void PlayerEffects(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(131, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S4, tempLocation, 1, 0, ShadowMode);
         }
 
         p.Effect2 += 1;
@@ -7138,7 +7139,7 @@ void PlayerEffects(const int A)
     {
         for(B = 1; B <= 2; B++)
         {
-            NewEffect(80, newLoc(p.Location.X + dRand() * (p.Location.Width + 8) - 8,
+            NewEffect(EFFID_SPARKLE, newLoc(p.Location.X + dRand() * (p.Location.Width + 8) - 8,
                                  p.Location.Y + dRand() * (p.Location.Height + 8) - 4), 1, 0, ShadowMode);
             Effect[numEffects].Location.SpeedX = dRand() * 2 - 1;
             Effect[numEffects].Location.SpeedY = dRand() * 2 - 1;
@@ -7152,7 +7153,7 @@ void PlayerEffects(const int A)
             tempLocation.Height = 32;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - tempLocation.Width / 2.0;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - tempLocation.Height / 2.0;
-            NewEffect(10, tempLocation, 1, 0, ShadowMode);
+            NewEffect(EFFID_SMOKE_S3, tempLocation, 1, 0, ShadowMode);
 
             if(!p.Stoned)
             {
@@ -7517,7 +7518,7 @@ void SwapCharacter(int A, int Character, bool Die, bool FromBlock)
             Location_t tempLocation = p.Location;
             tempLocation.Y = p.Location.Y + p.Location.Height / 2.0 - 16;
             tempLocation.X = p.Location.X + p.Location.Width / 2.0 - 16;
-            NewEffect(10, tempLocation);
+            NewEffect(EFFID_SMOKE_S3, tempLocation);
         }
     }
 
