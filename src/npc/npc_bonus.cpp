@@ -618,7 +618,7 @@ void TouchBonus(int A, int B)
                 StopMusic();
                 PlaySound(SFX_CrystalBallExit);
             }
-            else if(NPC[B].Type == NPCID_STAR_SMB3 || NPC[B].Type == NPCID_STAR_SMW)
+            else if(NPC[B].Type == NPCID_STAR_EXIT || NPC[B].Type == NPCID_STAR_COLLECT)
             {
                 for(const auto& star : Star)
                 {

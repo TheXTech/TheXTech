@@ -454,18 +454,18 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
 #if 0 // Useless code, needs a fix. Right now its broken by overriding by constant value
                 if(newBlock == 89)
                 {
-                    nn.Type = NPCID_COIN_SMW;
+                    nn.Type = NPCID_COIN_S4;
                 }
                 else if(newBlock == 192)
                 {
-                    nn.Type = NPCID_COIN_SMB;
+                    nn.Type = NPCID_COIN_S1;
                 }
                 else
                 {
-                    nn.Type = NPCID_COIN_SMB3;
+                    nn.Type = NPCID_COIN_S3;
                 }
 #endif
-                nn.Type = NPCID_COIN_SMB2;
+                nn.Type = NPCID_COIN_S2;
 
                 nn.Location.Width = NPCWidth[nn.Type];
                 nn.Location.Height = NPCHeight[nn.Type];
@@ -725,7 +725,7 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Location.Height = 32;
                     nn.Location.Y = b.Location.Y - 32;
                 }
-                else if(nn.Type == NPCID_LEAF)
+                else if(nn.Type == NPCID_LEAF_POWER)
                 {
                     nn.Effect = 0;
                     nn.Location.Y = b.Location.Y - 32;
@@ -738,9 +738,9 @@ void BlockHit(int A, bool HitDown, int whatPlayer)
                     nn.Effect = 1;
                     switch(C)
                     {
-                    case NPCID_VINEHEAD_GREEN_SMB3:
-                    case NPCID_VINEHEAD_RED_SMB3:
-                    case NPCID_VINEHEAD_SMW:
+                    case NPCID_GRN_VINE_TOP_S3:
+                    case NPCID_RED_VINE_TOP_S3:
+                    case NPCID_GRN_VINE_TOP_S4:
                         PlaySound(SFX_SproutVine);
                         break;
                     default:
@@ -2067,7 +2067,7 @@ void PSwitch(bool enabled)
         {
             bool transform = NPCIsACoin[NPC[A].Type] && NPC[A].Block == 0 && !NPC[A].Hidden && NPC[A].Special == 0.0;
 
-            if(NPC[A].Type == NPCID_DRAGONCOIN && g_compatibility.fix_special_coin_switch)
+            if(NPC[A].Type == NPCID_MEDAL && g_compatibility.fix_special_coin_switch)
                 transform = false;
 
             if(transform)

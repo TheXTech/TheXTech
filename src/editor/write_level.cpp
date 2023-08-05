@@ -210,26 +210,26 @@ void SaveLevel(const std::string& FilePath, int format, int version)   // saves 
         npc.y = n.Location.Y;
         npc.direct = n.Direction;
 
-        if(n.Type == NPCID_BURIEDPLANT || n.Type == NPCID_YOSHIEGG ||
-           n.Type == NPCID_BUBBLE || n.Type == NPCID_LAKITU_SMW)
+        if(n.Type == NPCID_ITEM_BURIED || n.Type == NPCID_ITEM_POD ||
+           n.Type == NPCID_ITEM_BUBBLE || n.Type == NPCID_ITEM_THROWER)
         {
             npc.contents = long(n.Special);
             npc.special_data = n.Variant;
         }
 
         // Warp Section pointer
-        if(n.Type == NPCID_POTION || n.Type == NPCID_POTIONDOOR ||
-          (n.Type == NPCID_BURIEDPLANT && n.Special == NPCID_POTION))
+        if(n.Type == NPCID_DOOR_MAKER || n.Type == NPCID_MAGIC_DOOR ||
+          (n.Type == NPCID_ITEM_BURIED && n.Special == NPCID_DOOR_MAKER))
         {
             npc.special_data = n.Special2;
         }
         // AI / firebar length
-        else if(n.Type == NPCID_FIREBAR || NPCIsAParaTroopa[n.Type] || NPCIsCheep[n.Type])
+        else if(n.Type == NPCID_FIRE_CHAIN || NPCIsAParaTroopa[n.Type] || NPCIsCheep[n.Type])
         {
             npc.special_data = n.Special;
         }
         // Star ID if >0
-        else if(n.Type == NPCID_STAR_SMB3 || n.Type == NPCID_STAR_SMW)
+        else if(n.Type == NPCID_STAR_EXIT || n.Type == NPCID_STAR_COLLECT)
         {
             npc.special_data = int(n.Variant);
         }

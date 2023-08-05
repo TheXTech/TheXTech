@@ -2109,7 +2109,7 @@ void UpdateNPCs()
                         NPC[A].Location.SpeedY = 0;
                     }
 
-                    if(NPC[A].Type == NPCID_SKULL) // Skull raft
+                    if(NPC[A].Type == NPCID_RAFT) // Skull raft
                     {
                         for(B = 1; B <= numPlayers; B++)
                         {
@@ -2368,7 +2368,7 @@ void UpdateNPCs()
                                                         if(NPC[A].Type == 48 && (Block[B].IsNPC == 22 || Block[B].IsNPC == 49)) // spiney eggs don't walk on special items
                                                             HitSpot = 0;
 
-                                                        if(NPC[A].Type == NPCID_SKULL) // Skull raft
+                                                        if(NPC[A].Type == NPCID_RAFT) // Skull raft
                                                         {
                                                             if(Block[B].IsNPC > 0)
                                                                 HitSpot = 0;
@@ -2916,8 +2916,8 @@ void UpdateNPCs()
                                                             NPCHit(A, 4, A);
 
                                                         // If a Pokey head stands on a top of another Pokey segment
-                                                        if(HitSpot == 1 && NPC[A].Type == NPCID_POKEY && Block[B].IsNPC == NPCID_POKEY
-                                                            && NPC[Block[B].IsReally].Type == NPCID_POKEY) // Make sure Pokey didn't transformed into ice cube or anything also
+                                                        if(HitSpot == 1 && NPC[A].Type == NPCID_STACKER && Block[B].IsNPC == NPCID_STACKER
+                                                            && NPC[Block[B].IsReally].Type == NPCID_STACKER) // Make sure Pokey didn't transformed into ice cube or anything also
                                                         {
                                                             NPC[Block[B].IsReally].Special = -3;
                                                             NPC[A].Special2 = 0;

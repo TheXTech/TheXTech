@@ -40,10 +40,10 @@
 
 #define PI 3.1415926535897932384626433832795
 
-#define NPC_SIGN 151
-#define NPC_COIN 10
-#define NPC_FIREBAR 260
-#define NPC_GOAL 16
+#define NPCID_SIGN 151
+#define NPCID_COIN 10
+#define NPCID_FIRE_CHAIN 260
+#define NPCID_GOAL 16
 
 #define OFFSCREEN_DIST 400
 #define MIDPOINT_X -194620
@@ -283,7 +283,7 @@ void CalleocaCode()
             win_timer--;
         else
         {
-            goal_npc = FindNPC(NPC_GOAL);
+            goal_npc = FindNPC(NPCID_GOAL);
             if(goal_npc != nullptr)
             {
                 goal_npc->Location.X = demo->Location.X;
@@ -297,9 +297,9 @@ void CalleocaCode()
 
     if(!init_doonce)
     {
-        calleoca_npc1 = FindNPC(NPC_SIGN);
-        calleoca_npc2 = FindNPC(NPC_COIN);
-        hurt_npc	  = FindNPC(NPC_FIREBAR);
+        calleoca_npc1 = FindNPC(NPCID_SIGN);
+        calleoca_npc2 = FindNPC(NPCID_COIN);
+        hurt_npc	  = FindNPC(NPCID_FIRE_CHAIN);
 
         calleoca_x = calleoca_npc1->Location.X;
         calleoca_y = calleoca_npc1->Location.Y;
@@ -315,14 +315,14 @@ void CalleocaCode()
         init_doonce = true;
     }
 
-    if(calleoca_npc1->Type != NPC_SIGN)
-        calleoca_npc1 = FindNPC(NPC_SIGN);
+    if(calleoca_npc1->Type != NPCID_SIGN)
+        calleoca_npc1 = FindNPC(NPCID_SIGN);
 
-    if(calleoca_npc2->Type != NPC_COIN)
-        calleoca_npc2 = FindNPC(NPC_COIN);
+    if(calleoca_npc2->Type != NPCID_COIN)
+        calleoca_npc2 = FindNPC(NPCID_COIN);
 
-    if(hurt_npc->Type != NPC_FIREBAR)
-        hurt_npc = FindNPC(NPC_FIREBAR);
+    if(hurt_npc->Type != NPCID_FIRE_CHAIN)
+        hurt_npc = FindNPC(NPCID_FIRE_CHAIN);
 
     hurt_npc->Location.X = demo->Location.X;
     hurt_npc->Location.Y = demo->Location.Y - 128;

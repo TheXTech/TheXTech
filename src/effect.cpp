@@ -728,16 +728,16 @@ void UpdateEffects()
                         nn.Location.Y += 32 - nn.Location.Height;
                         nn.Location.X += -nn.Location.Width / 2.0 + 16;
 
-                        if(nn.Type == NPCID_LEAF)
+                        if(nn.Type == NPCID_LEAF_POWER)
                             nn.Location.SpeedY = -6;
 
-                        if(NPCIsCheep[e.NewNpc] || NPCIsAParaTroopa[e.NewNpc] || e.NewNpc == NPCID_FIREBAR)
+                        if(NPCIsCheep[e.NewNpc] || NPCIsAParaTroopa[e.NewNpc] || e.NewNpc == NPCID_FIRE_CHAIN)
                         {
                             nn.Special = e.NewNpcSpecial;
                             nn.DefaultSpecial = int(nn.Special);
                         }
 
-                        if(e.NewNpc == NPCID_STAR_SMB3 || e.NewNpc == NPCID_STAR_SMW)
+                        if(e.NewNpc == NPCID_STAR_EXIT || e.NewNpc == NPCID_STAR_COLLECT)
                             nn.Variant = (uint16_t)e.NewNpcSpecial;
 
                         syncLayers_NPC(numNPCs);

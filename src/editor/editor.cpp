@@ -2521,7 +2521,7 @@ void SetCursor()
         // Container NPCs are handled elsewhere in new editor
         if(MagicHand)
         {
-            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCIsCheep[t] && !NPCIsAParaTroopa[t] && t != NPCID_FIREBAR)
+            if(t != 91 && t != 96 && t != 283 && t != 284 && !NPCIsCheep[t] && !NPCIsAParaTroopa[t] && t != NPCID_FIRE_CHAIN)
                 EditorCursor.NPC.Special = 0;
             if(t != 288 && t != 289 && t != 91 && t != 260)
                 EditorCursor.NPC.Special2 = 0.0;
