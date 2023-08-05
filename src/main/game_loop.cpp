@@ -194,12 +194,7 @@ void GameLoop()
         speedRun_triggerLeave();
         NextLevel();
 
-        // Controls::Update();
-
-        // Controls::Update() was commented out because the current screen state may be unpredictable,
-        // so it's not a reasonable time for the user to reconnect if something has happened.
-        // But, the classic game updates controls here so we need to Sync the recording.
-        Record::Sync();
+        Controls::Update(false);
     }
     else if(qScreen)
     {

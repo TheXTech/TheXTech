@@ -46,7 +46,9 @@
 #include "main/trees.h"
 #include "main/game_globals.h"
 #include "main/screen_connect.h"
+#include "main/screen_quickreconnect.h"
 #include "main/game_strings.h"
+#include "main/speedrunner.h"
 #include "load_gfx.h"
 #include "core/render.h"
 #include "core/window.h"
@@ -2295,6 +2297,9 @@ void GetEditorControls()
             g_levelScreenFader.setupFader(65, 0, 65, ScreenFader::S_FADE);
         editorWaitForFade();
 
+        // force reconnect on leveltest start
+        Controls::ClearInputMethods();
+
         HasCursor = false;
         zTestLevel(editorScreen.test_magic_hand);
     }
@@ -2903,6 +2908,22 @@ void zTestLevel(bool magicHand, bool interProcess)
         MagicHand = false;
     }
 
+    // in speedrun mode, confirm that controls are set up before game starts
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF && !Controls::Update())
+    {
+        ClearLevel();
+        // force players offscreen
+        for(int i = 1; i <= maxLocalPlayers; i++)
+            Player[i].Location.X = -20000.0;
+
+        TestLevel = true;
+        LevelBeatCode = -3;
+        QuickReconnectScreen::g_active = true;
+        PauseGame(PauseCode::PauseScreen);
+        LevelBeatCode = 0;
+        QuickReconnectScreen::Deactivate();
+    }
+
 #ifdef THEXTECH_INTERPROC_SUPPORTED
     if(interProcess)
     {
@@ -2969,12 +2990,12 @@ void zTestLevel(bool magicHand, bool interProcess)
         }
     }
 
-    // force reconnect on leveltest start
-    Controls::ClearInputMethods();
     // reset Drop/Add allowed characters
     ConnectScreen::SaveChars();
 
-    GameThing(0, 0);
+    int waitms = (g_speedRunnerMode != SPEEDRUN_MODE_OFF) ? 750 : 0;
+    GameThing(waitms, 0);
+
     SetupScreens();
     TestLevel = true;
     LevelSelect = false;

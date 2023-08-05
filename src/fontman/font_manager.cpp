@@ -575,7 +575,8 @@ void FontManager::printText(const char* text, size_t text_size,
                             int x, int y,
                             int font,
                             float Red, float Green, float Blue, float Alpha,
-                            uint32_t ttf_FontSize)
+                            uint32_t ttf_FontSize, bool outline,
+                            float outline_r, float outline_g, float outline_b)
 {
     if(!g_fontManagerIsInit)
         return;
@@ -583,31 +584,45 @@ void FontManager::printText(const char* text, size_t text_size,
     if(!text || text_size == 0)
         return;
 
+    BaseFontEngine* font_engine = nullptr;
+
     if((font >= 0) && (static_cast<size_t>(font) < g_anyFonts.size()) && g_anyFonts[font])
     {
         if(g_anyFonts[font]->isLoaded())
         {
-            g_anyFonts[font]->printText(text, text_size, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
-            return;
+            font_engine = g_anyFonts[font];
         }
     }
 
-    switch(font)
+    if(!font_engine)
     {
-    case DefaultRaster:
-        if(g_defaultRasterFont && g_defaultRasterFont->isLoaded())
+        switch(font)
         {
-            g_defaultRasterFont->printText(text, text_size, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
-            break;
-        } /*fallthrough*/
-    case DefaultTTF_Font:
-    default:
+        case DefaultRaster:
+            if(g_defaultRasterFont && g_defaultRasterFont->isLoaded())
+            {
+                font_engine = g_defaultRasterFont;
+                break;
+            } /*fallthrough*/
+        case DefaultTTF_Font:
+        default:
 #ifdef THEXTECH_ENABLE_TTF_SUPPORT
-        if(g_defaultTtfFont && g_defaultTtfFont->isLoaded())
-            g_defaultTtfFont->printText(text, text_size, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
+            if(g_defaultTtfFont && g_defaultTtfFont->isLoaded())
+                font_engine = g_defaultTtfFont;
 #endif
-        break;
+            break;
+        }
     }
+
+    if(outline)
+    {
+        font_engine->printText(text, text_size, x - 2, y, outline_r, outline_g, outline_b, Alpha, ttf_FontSize);
+        font_engine->printText(text, text_size, x + 2, y, outline_r, outline_g, outline_b, Alpha, ttf_FontSize);
+        font_engine->printText(text, text_size, x, y - 2, outline_r, outline_g, outline_b, Alpha, ttf_FontSize);
+        font_engine->printText(text, text_size, x, y + 2, outline_r, outline_g, outline_b, Alpha, ttf_FontSize);
+    }
+
+    font_engine->printText(text, text_size, x, y, Red, Green, Blue, Alpha, ttf_FontSize);
 }
 
 PGE_Size FontManager::optimizeText(std::string &text, size_t max_columns)

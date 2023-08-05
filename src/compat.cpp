@@ -83,7 +83,6 @@ static void compatInit(Compatibility_t &c)
     c.fix_char3_escape_shell_surf = true;
     c.fix_plant_wobble = true;
     c.fix_powerup_lava_bug = true;
-    c.fix_keyhole_framerate = true;
     // 1.3.5
     c.fix_char5_vehicle_climb = true;
     c.fix_vehicle_char_switch = true;
@@ -370,7 +369,6 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         deprecatedWarning(compat, "fix-peach-escape-shell-surf", "fix-char3-escape-shell-surf");
         compat.read("fix-plant-wobble", c.fix_plant_wobble, c.fix_plant_wobble);
         compat.read("fix-powerup-lava-bug", c.fix_powerup_lava_bug, c.fix_powerup_lava_bug);
-        compat.read("fix-keyhole-framerate", c.fix_keyhole_framerate, c.fix_keyhole_framerate);
         // 1.3.5
         compat.read("fix-link-clowncar-fairy", c.fix_char5_vehicle_climb, c.fix_char5_vehicle_climb);// DEPRECATED since 1.3.6
         deprecatedWarning(compat, "fix-link-clowncar-fairy", "fix-char5-vehicle-climb");

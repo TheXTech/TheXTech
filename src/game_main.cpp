@@ -268,7 +268,7 @@ int GameMain(const CmdLineSetup_t &setup)
         XRender::repaint();
         XRender::setTargetScreen();
         XEvents::doEvents();
-        Controls::Update();
+        Controls::Update(false);
         PGE_Delay(10);
     }
 #endif
@@ -1035,8 +1035,9 @@ int GameMain(const CmdLineSetup_t &setup)
 //            If TestLevel = True Then
             if(TestLevel)
             {
-                // if failed, restart
-                if(LevelBeatCode == 0 && g_config.editor_pause_on_death)
+                // provide option to restart (was previously restricted to fails and command-line runs)
+                // if(LevelBeatCode == 0 || (setup.testLevelMode && LevelBeatCode >= 0))
+                if(LevelBeatCode >= 0)
                 {
                     LevelSelect = false;
                     LevelBeatCode = -2; // checked in PauseScreen::Init()
@@ -1078,7 +1079,7 @@ int GameMain(const CmdLineSetup_t &setup)
                     if(g_config.EnableInterLevelFade)
                         g_levelScreenFader.setupFader(3, 65, 0, ScreenFader::S_FADE);
                 }
-                // from command line, close
+                // from command line, close (if player has requested to stop testing)
                 else if(setup.testLevelMode)
                 {
                     GameIsActive = false;
@@ -1330,42 +1331,24 @@ void UpdateMacro()
     }
     else if(LevelMacro == LEVELMACRO_KEYHOLE_EXIT)
     {
-        float tempTime = 0;
-        float gameTime = 0;
-        int keyholeMax = g_compatibility.fix_keyhole_framerate ? 192 : 300;
+        const int keyholeMax = 192; // Was 300
 
         do
         {
-            // tempTime = Timer - Int(Timer)
+            XEvents::doEvents();
 
-            tempTime = (float(SDL_GetTicks()) / 1000.0f) - std::floor(float(SDL_GetTicks()) / 1000.0f);
-//            if(tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime)
-
-            if(g_compatibility.fix_keyhole_framerate)
-                XEvents::doEvents();
-
-            if(g_compatibility.fix_keyhole_framerate ?
-               canProceedFrame() :
-               (tempTime > (float)(gameTime + 0.01f) || tempTime < gameTime))
+            if(canProceedFrame())
             {
-                gameTime = tempTime;
-
-                if(g_compatibility.fix_keyhole_framerate)
-                    computeFrameTime1();
-                else
-                    XEvents::doEvents();
+                computeFrameTime1();
 
                 speedRun_tick();
-                Controls::Update();
+                Controls::Update(false);
                 UpdateGraphics();
                 UpdateSound();
                 BlockFrames();
 
-                if(g_compatibility.fix_keyhole_framerate)
-                {
-                    XEvents::doEvents();
-                    computeFrameTime2();
-                }
+                XEvents::doEvents();
+                computeFrameTime2();
 
                 updateScreenFaders();
 
@@ -1797,7 +1780,7 @@ void StartEpisode()
     for(int i = 0; i < numPlayers; i++)
     {
         if(g_charSelect[i] != 0)
-            Player[i+1].Character = g_charSelect[i];
+            Player[i + 1].Character = g_charSelect[i];
     }
 
     for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
@@ -1934,7 +1917,7 @@ void StartBattleMode()
     for(int i = 0; i < numPlayers; i++)
     {
         if(g_charSelect[i] != 0)
-            Player[i+1].Character = g_charSelect[i];
+            Player[i + 1].Character = g_charSelect[i];
     }
 
     for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)

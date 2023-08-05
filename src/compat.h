@@ -42,7 +42,6 @@ struct Compatibility_t
     bool fix_char3_escape_shell_surf;
     bool fix_plant_wobble; // improves visual appearance of plants
     bool fix_powerup_lava_bug; // powerups always die when hitting lava, instead of checking the types of arbitrary NPCs
-    bool fix_keyhole_framerate;
     // 1.3.5
     bool fix_char5_vehicle_climb;
     bool fix_vehicle_char_switch;

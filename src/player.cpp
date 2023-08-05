@@ -998,7 +998,6 @@ void ProcessLastDead()
     {
         FadeOutMusic(500);
         g_levelScreenFader.setupFader(3, 0, 65, ScreenFader::S_FADE);
-        levelWaitForFade();
     }
 }
 

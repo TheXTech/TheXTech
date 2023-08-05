@@ -552,7 +552,7 @@ void WorldLoop()
                             // save which characters were present at level start
                             if(SwapCharAllowed())
                             {
-                                pLogDebug("Save drop/add characters configuration at GameLoop()");
+                                pLogDebug("Save drop/add characters configuration at WorldLoop()");
                                 ConnectScreen::SaveChars();
                             }
 

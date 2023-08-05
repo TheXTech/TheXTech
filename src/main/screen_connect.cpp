@@ -109,6 +109,7 @@ void Reconnect_Start()
         s_playerState[i] = PlayerState::Disconnected;
         s_menuItem[i] = 0;
         s_inputReady[i] = false;
+        g_charSelect[i] = Player[i + 1].Character;
     }
     s_context = Context::Reconnect;
 
@@ -134,7 +135,7 @@ void DropAdd_Start()
             s_playerState[i] = PlayerState::Disconnected;
         s_menuItem[i] = 0;
         s_inputReady[i] = false;
-        g_charSelect[i] = Player[i+1].Character;
+        g_charSelect[i] = Player[i + 1].Character;
     }
     s_context = Context::DropAdd;
 
@@ -232,7 +233,7 @@ void Player_ValidateChar(int p)
     {
         for(i = 0; i < 5; i++)
         {
-            if(!blockCharacter[i+1] && s_char_info.accept(i))
+            if(!blockCharacter[i + 1] && s_char_info.accept(i))
             {
                 s_menuItem[p] = i;
                 break;
