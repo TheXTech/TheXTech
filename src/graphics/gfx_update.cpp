@@ -2237,7 +2237,7 @@ void UpdateGraphics(bool skipRepaint)
 
                         int Y = Player[A].Location.Y + Player[A].Location.Height - 96 + vScreen[Z].Y;
 
-                        if(!w.noPrintStars && w.save_info().max_stars > 0 && Player[A].Mount != 2)
+                        if(!w.noPrintStars && w.save_info().inited() && w.save_info().max_stars > 0 && Player[A].Mount != 2)
                         {
                             tempString = fmt::format_ne("{0}/{1}", w.curStars, w.save_info().max_stars);
                             XRender::renderTexture(Player[A].Location.X + Player[A].Location.Width / 2.0 + vScreen[Z].X - tempString.length() * 9, Y + 1, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
@@ -2249,7 +2249,7 @@ void UpdateGraphics(bool skipRepaint)
                             Y -= 20;
                         }
 
-                        if(w.save_info().max_medals > 0 && true)
+                        if(w.save_info().inited() && w.save_info().max_medals > 0)
                         {
                             int X = vScreen[Z].X + Player[A].Location.X + (Player[A].Location.Width / 2);
 

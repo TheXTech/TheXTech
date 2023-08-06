@@ -18,10 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <fmt_format_ne.h>
+
 #include "../globals.h"
 #include "../graphics.h"
 #include "../core/render.h"
 #include "../gfx.h"
+
+#include "config.h"
 
 #include "main/level_medals.h"
 
@@ -417,8 +421,76 @@ void DrawInterface(int Z, int numScreens)
     XRender::offsetViewportIgnore(false);
 }
 
+enum class MedalDrawLevel
+{
+    Off, Prev, Got, Best
+};
+
+static inline void s_DrawMedal(int x, int y, int coin_width, int coin_height, MedalDrawLevel level)
+{
+    if(GFX.Medals.inited)
+    {
+        if(level == MedalDrawLevel::Best)
+            XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, coin_width * 3, 0);
+        else if(level == MedalDrawLevel::Got)
+            XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, coin_width * 2, 0);
+        else if(level == MedalDrawLevel::Prev)
+            XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, coin_width * 1, 0);
+        else
+            XRender::renderTexture(x, y, coin_width, coin_height, GFX.Medals, 0, 0);
+    }
+    else
+    {
+        if(level == MedalDrawLevel::Best)
+            XRender::renderTexture(x, y, GFX.Interface[2], 1.0f, 1.0f, 1.0f);
+        else if(level == MedalDrawLevel::Got)
+            XRender::renderTexture(x, y, GFX.Interface[2], 0.9f, 0.9f, 0.9f);
+        else if(level == MedalDrawLevel::Prev)
+            XRender::renderTexture(x, y, GFX.Interface[2], 0.5f, 0.5f, 0.5f);
+        else
+            XRender::renderTexture(x, y, GFX.Interface[2], 0.5f, 0.5f, 0.5f, 0.5f);
+    }
+
+    // render sparkles
+    if(level == MedalDrawLevel::Best)
+    {
+        int sparkle_1_idx = BlockFlash / 16; // on frame 3
+
+        for(int i = 0; i < 3; ++i)
+        {
+            int sparkle_idx = (sparkle_1_idx + i) % 16;
+            int sparkle_frame = 2 - i;
+
+            int sparkle_X = (9 * sparkle_idx) % coin_width;
+            int sparkle_Y = (13 * sparkle_idx) % coin_height;
+
+            if(sparkle_X <= 2)
+                sparkle_X = 2;
+
+            if(sparkle_Y <= 2)
+                sparkle_Y = 2;
+
+            sparkle_X -= EffectWidth[78] / 2;
+            sparkle_Y -= EffectHeight[78] / 2;
+
+            sparkle_X &= ~1;
+            sparkle_Y &= ~1;
+
+            XRender::renderTexture(x + sparkle_X, y + sparkle_Y, EffectWidth[78], EffectHeight[78], GFXEffect[78], 0, EffectHeight[78] * sparkle_frame, 1.0f, 1.0f, 1.0f, 0.5f);
+        }
+    }
+}
+
 void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ckpt, uint8_t got, uint8_t best)
 {
+    g_config.medals_show_policy = Config_t::MEDALS_SHOW_COUNTS;
+
+    if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_OFF)
+        return;
+
+    if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_GOT && got == 0)
+        return;
+
     int coin_width = GFX.Interface[2].w;
     int coin_height = GFX.Interface[2].h;
 
@@ -428,11 +500,6 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
         coin_height = GFX.Medals.h;
     }
 
-    if(center)
-        X -= ((coin_width * max) / 2) & ~1;
-    else
-        X -= (coin_width * max);
-
     if(max > 8)
         max = 8;
 
@@ -441,67 +508,102 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
     if(BlockFlash >= 256)
         BlockFlash = 0;
 
+    if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_FULL)
+    {
+        if(center)
+            X -= ((coin_width * max) / 2) & ~1;
+        else
+            X -= (coin_width * max);
+
+        for(int i = 0; i < max; ++i)
+        {
+            int bit = (1 << i);
+            int X_i = X + coin_width * i;
+
+            if(best & bit)
+                s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Best);
+            else if(got & bit)
+                s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Got);
+            else if(ckpt & bit && (BlockFlash % 64) < 32)
+                s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Got);
+            else if(prev & bit)
+                s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Prev);
+            else
+                s_DrawMedal(X_i, Y, coin_width, coin_height, MedalDrawLevel::Off);
+        }
+
+        return;
+    }
+
+    int best_count = 0;
+    int got_count = 0;
+
     for(int i = 0; i < max; ++i)
     {
         int bit = (1 << i);
 
-        double X_i = X + coin_width * i;
-
-        if(GFX.Medals.inited)
-        {
-            if(best & bit)
-                XRender::renderTexture(X_i, Y, coin_width, coin_height, GFX.Medals, coin_width * 3, 0);
-            else if(got & bit)
-                XRender::renderTexture(X_i, Y, coin_width, coin_height, GFX.Medals, coin_width * 2, 0);
-            else if(ckpt & bit && (BlockFlash % 64) < 32)
-                XRender::renderTexture(X_i, Y, coin_width, coin_height, GFX.Medals, coin_width * 2, 0);
-            else if(prev & bit)
-                XRender::renderTexture(X_i, Y, coin_width, coin_height, GFX.Medals, coin_width * 1, 0);
-            else
-                XRender::renderTexture(X_i, Y, coin_width, coin_height, GFX.Medals, 0, 0);
-        }
-        else
-        {
-            if(best & bit)
-                XRender::renderTexture(X_i, Y, GFX.Interface[2], 1.0f, 1.0f, 1.0f);
-            else if(got & bit)
-                XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.9f, 0.9f, 0.9f);
-            else if(ckpt & bit && (BlockFlash % 64) < 32)
-                XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.9f, 0.9f, 0.9f);
-            else if(prev & bit)
-                XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.5f, 0.5f, 0.5f);
-            else
-                XRender::renderTexture(X_i, Y, GFX.Interface[2], 0.5f, 0.5f, 0.5f, 0.5f);
-        }
-
-        // render sparkles
         if(best & bit)
-        {
-            int sparkle_1_idx = BlockFlash / 16; // on frame 3
+            best_count++;
+        else if(got & bit)
+            got_count++;
+    }
 
-            for(int i = 0; i < 3; ++i)
-            {
-                int sparkle_idx = (sparkle_1_idx + i) % 16;
-                int sparkle_frame = 2 - i;
+    std::string label_1;
+    std::string label_2;
 
-                int sparkle_X = (9 * sparkle_idx) % coin_width;
-                int sparkle_Y = (13 * sparkle_idx) % coin_height;
+    int total_len = 0;
+    int pix_len_1 = 0;
+    int pix_len_2 = 0;
 
-                if(sparkle_X <= 2)
-                    sparkle_X = 2;
+    if(best_count)
+    {
+        if(!got_count && g_config.medals_show_policy == Config_t::MEDALS_SHOW_COUNTS)
+            label_1 = fmt::format_ne("{0}/{1}", best_count, max);
+        else
+            label_1 = fmt::format_ne("{0}", best_count);
 
-                if(sparkle_Y <= 2)
-                    sparkle_Y = 2;
+        total_len += coin_width + 8 + GFX.Interface[5].w + 4;
+        pix_len_1 = SuperTextPixLen(label_1, 3);
+        total_len += pix_len_1;
 
-                sparkle_X -= EffectWidth[78] / 2;
-                sparkle_Y -= EffectHeight[78] / 2;
+        // padding
+        if(got_count)
+            total_len += 8;
+    }
 
-                sparkle_X &= ~1;
-                sparkle_Y &= ~1;
+    if(got_count || !best_count)
+    {
+        if(g_config.medals_show_policy == Config_t::MEDALS_SHOW_COUNTS)
+            label_2 = fmt::format_ne("{0}/{1}", got_count, max);
+        else
+            label_2 = fmt::format_ne("{0}", got_count);
 
-                XRender::renderTexture(X_i + sparkle_X, Y + sparkle_Y, EffectWidth[78], EffectHeight[78], GFXEffect[78], 0, EffectHeight[78] * sparkle_frame, 1.0f, 1.0f, 1.0f, 0.5f);
-            }
-        }
+        total_len += coin_width + 8 + GFX.Interface[5].w + 4;
+        pix_len_2 = SuperTextPixLen(label_2, 3);
+        total_len += pix_len_2;
+    }
 
+    if(center)
+        X -= (total_len / 2) & ~1;
+    else
+        X -= total_len;
+
+    if(best_count)
+    {
+        s_DrawMedal(X, Y, coin_width, coin_height, MedalDrawLevel::Best);
+        X += coin_width + 8;
+        XRender::renderTexture(X, Y, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        X += GFX.Interface[1].w + 4;
+        SuperPrint(label_1, 3, X, Y);
+        X += pix_len_1 + 8;
+    }
+
+    if(got_count || !best_count)
+    {
+        s_DrawMedal(X, Y, coin_width, coin_height, MedalDrawLevel::Got);
+        X += coin_width + 8;
+        XRender::renderTexture(X, Y, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        X += GFX.Interface[1].w + 4;
+        SuperPrint(label_2, 3, X, Y);
     }
 }

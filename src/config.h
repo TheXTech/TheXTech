@@ -58,10 +58,24 @@ extern struct Config_t
 
     /* ---- Gameplay ----*/
 
+    enum
+    {
+        //* don't show medals in HUD
+        MEDALS_SHOW_OFF = 0,
+        //* show counts of gotten medals
+        MEDALS_SHOW_GOT,
+        //* show counts of gotten and available medals
+        MEDALS_SHOW_COUNTS,
+        //* show position of gotten and available medals
+        MEDALS_SHOW_FULL,
+    };
+
     //! Do ground-point by alt-run key instead of down
     bool    GameplayPoundByAltRun = false;
     //! Policy of stars showing at world map
     int     WorldMapStarShowPolicyGlobal = 0;
+    //! Policy of medals showing
+    int     medals_show_policy = MEDALS_SHOW_OFF;
     //! Use strict Drop/Add (lose life on Add after Drop, SwapCharacter)
     bool    StrictDropAdd = false;
     //! Use the quick (non-pausing) reconnect screen
