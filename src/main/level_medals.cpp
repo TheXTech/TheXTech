@@ -204,7 +204,7 @@ void OrderMedals()
 
             double coord = graph.place_loc({n.Location.X, n.Location.Y});
 
-            pLogDebug("Number %d gets coord %f", auto_hits[auto_i].second, coord);
+            D_pLogDebug("Medal with NPC ID %d at %f from level start to level end", auto_hits[auto_i].second, coord);
 
             // 1.0 is the furthest exit, and it's never negative
             if(coord > 2.0)
@@ -225,7 +225,7 @@ void OrderMedals()
         {
             if(!spec_hits[i])
             {
-                pLogDebug("Number %d gets index %d", auto_hits[auto_i].second, i + 1);
+                D_pLogDebug("Medal with NPC ID %d gets index %d", auto_hits[auto_i].second, i + 1);
 
                 n.Variant = i + 1;
                 spec_hits[i] = true;
