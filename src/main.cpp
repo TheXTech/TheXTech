@@ -285,6 +285,11 @@ int main(int argc, char**argv)
                                                    "number 1 or 2",
                                                    cmd);
 
+        TCLAP::ValueArg<unsigned int> startWarp("w", "start-warp", "Warp index to start level test at",
+                                                    false, 0u,
+                                                   "start warp index",
+                                                   cmd);
+
         TCLAP::SwitchArg switchBattleMode("b", "battle", "Test level in battle mode", false);
 
         TCLAP::ValueArg<std::string> playerCharacter1("1",
@@ -578,6 +583,9 @@ int main(int argc, char**argv)
             setup.testShowFPS = true;
             setup.neverPause = true;
         }
+
+        if(startWarp.isSet() && startWarp.getValue() > 0 && startWarp.getValue() < maxWarps)
+            testStartWarp = startWarp.getValue();
 
         // override language loaded in OpenConfig_PreSetup()
         if(lang.isSet())

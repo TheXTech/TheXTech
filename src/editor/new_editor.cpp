@@ -176,6 +176,9 @@ void EditorScreen::ResetCursor()
 
     MagicBlock::enabled = false;
 
+    if(testStartWarp > numWarps && LevelEditor)
+        testStartWarp = numWarps;
+
     FocusNPC();
     FocusBlock();
     FocusBGO();
@@ -1925,6 +1928,17 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     SuperPrintRightR(mode, g_editorStrings.testMagicHand, 3, e_ScreenW - 60, 94);
     if(UpdateCheckBox(mode, e_ScreenW - 50 + 4, 80 + 4, this->test_magic_hand))
         this->test_magic_hand = !this->test_magic_hand;
+
+    if(testStartWarp == 0)
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.warpTo, g_editorStrings.levelStartPos), 3, 46, 94);
+    else
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.warpTo, fmt::format_ne(g_editorStrings.phraseWarpIndex, testStartWarp)), 3, 46, 94);
+
+    if(testStartWarp > 0 && UpdateButton(mode, 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+        testStartWarp--;
+
+    if(testStartWarp < numWarps && UpdateButton(mode, 280 + 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+        testStartWarp++;
 
     SuperPrintRightR(mode, Controls::EditorControls::g_button_name_UI[Controls::EditorControls::TestPlay], 3, e_ScreenW - 60, 54);
     if(UpdateButton(mode, e_ScreenW-50 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::play, 32, 32))
@@ -4150,6 +4164,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
                 TestLevel = false;
                 m_special_page = SPECIAL_PAGE_NONE;
                 m_special_subpage = 0;
+                testStartWarp = 0;
             }
         }
         return;
