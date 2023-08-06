@@ -25,6 +25,8 @@
 #include <Logger/logger.h>
 #include <fmt_format_ne.h>
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "npc_id.h"
 
 #include "globals.h"
