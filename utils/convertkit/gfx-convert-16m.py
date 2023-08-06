@@ -17,6 +17,9 @@ graphicsdir = os.path.join(datadir, 'graphics')
 fallbackdir = os.path.join(datadir, 'graphics', 'fallback')
 outdir = sys.argv[2]
 
+if not datadir.endswith('/'): datadir += '/'
+if not outdir.endswith('/'): outdir += '/'
+
 for dirpath, _, files in os.walk(datadir, topdown=True):
     if dirpath.endswith('fallback'):
         continue
