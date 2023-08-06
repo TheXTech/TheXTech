@@ -23,7 +23,7 @@ jobs:
     env:
         DEVKITPRO: /opt/devkitpro
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         target:
         - {
