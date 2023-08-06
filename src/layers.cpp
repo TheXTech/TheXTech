@@ -26,6 +26,8 @@
 #include "effect.h"
 #include "collision.h"
 #include "npc.h"
+#include "npc_id.h"
+#include "eff_id.h"
 #include "sound.h"
 #include "graphics.h"
 #include "game_main.h"
@@ -376,7 +378,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 tempLocation = NPC[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
 
             if(!LevelEditor)
@@ -420,7 +422,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Block[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Block[A].Hidden = false;
@@ -440,7 +442,7 @@ void ShowLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Background[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Background[A].Hidden = false;
@@ -491,7 +493,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
                 tempLocation = NPC[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
 
@@ -515,7 +517,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Block[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Block[A].Hidden = true;
@@ -533,7 +535,7 @@ void HideLayer(layerindex_t L, bool NoEffect)
                 tempLocation = Background[A].Location;
                 tempLocation.X += tempLocation.Width / 2.0 - EffectWidth[10] / 2.0;
                 tempLocation.Y += tempLocation.Height / 2.0 - EffectHeight[10] / 2.0;
-                NewEffect(10, tempLocation);
+                NewEffect(EFFID_SMOKE_S3, tempLocation);
             }
         }
         Background[A].Hidden = true;
@@ -1162,7 +1164,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                     for(int C : Layer[B].NPCs)
                     {
-                        if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == 91)
+                        if(NPCIsAVine[NPC[C].Type] || NPC[C].Type == NPCID_ITEM_BURIED)
                         {
                             NPC[C].Location.SpeedX = 0;
                             NPC[C].Location.SpeedY = 0;
@@ -1448,7 +1450,7 @@ void UpdateLayers()
                 {
                     for(int B : Layer[A].NPCs)
                     {
-                        if(NPC[B].Type == 91 || NPC[B].Type == 211 || NPCIsAVine[NPC[B].Type])
+                        if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPC_HOMING_BALL_GEN || NPCIsAVine[NPC[B].Type])
                         {
                             NPC[B].Location.SpeedX = 0;
                             NPC[B].Location.SpeedY = 0;
@@ -1550,14 +1552,14 @@ void UpdateLayers()
                         NPC[B].DefaultLocation.Y += double(Layer[A].SpeedY);
 
                         if(!NPC[B].Active || NPC[B].Generator || NPC[B].Effect != 0 ||
-                           NPCIsACoin[NPC[B].Type] || NPC[B].Type == 8 || NPC[B].Type == 37 ||
-                           NPC[B].Type == 51 || NPC[B].Type == 52 || NPC[B].Type == 46 ||
-                           NPC[B].Type == 93 || NPC[B].Type == 74 || NPCIsAVine[NPC[B].Type] ||
-                           NPC[B].Type == 192 || NPC[B].Type == 197 || NPC[B].Type == 91 ||
-                           NPC[B].Type == 211 || NPC[B].Type == 256 || NPC[B].Type == 257 ||
-                           NPC[B].Type == 245)
+                           NPCIsACoin[NPC[B].Type] || NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_STONE_S3 ||
+                           NPC[B].Type == NPCID_BOTTOM_PLANT || NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_FALL_BLOCK_RED ||
+                           NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_BIG_PLANT || NPCIsAVine[NPC[B].Type] ||
+                           NPC[B].Type == NPCID_CHECKPOINT || NPC[B].Type == NPCID_GOALTAPE || NPC[B].Type == NPCID_ITEM_BURIED ||
+                           NPC[B].Type == NPC_HOMING_BALL_GEN || NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_LONG_PLANT_DOWN ||
+                           NPC[B].Type == NPCID_FIRE_PLANT)
                         {
-                            if(NPC[B].Type == 91 || NPC[B].Type == 211)
+                            if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPC_HOMING_BALL_GEN)
                             {
                                 NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
                                 NPC[B].Location.SpeedY = double(Layer[A].SpeedY);
@@ -1572,10 +1574,10 @@ void UpdateLayers()
                             {
                                 NPC[B].Location.X = NPC[B].DefaultLocation.X;
                                 NPC[B].Location.Y = NPC[B].DefaultLocation.Y;
-                                if(NPC[B].Type == 8 || NPC[B].Type == 74 || NPC[B].Type == 93 ||
-                                   NPC[B].Type == 256 || NPC[B].Type == 245)
+                                if(NPC[B].Type == NPCID_PLANT_S3 || NPC[B].Type == NPCID_BIG_PLANT || NPC[B].Type == NPCID_PLANT_S1 ||
+                                   NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_FIRE_PLANT)
                                     NPC[B].Location.Y += NPC[B].DefaultLocation.Height;
-                                else if(NPC[B].Type == 52 && fiEqual(NPC[B].Direction, -1))
+                                else if(NPC[B].Type == NPCID_SIDE_PLANT && fiEqual(NPC[B].Direction, -1))
                                     NPC[B].Location.X += NPC[B].DefaultLocation.Width;
                             }
                             else

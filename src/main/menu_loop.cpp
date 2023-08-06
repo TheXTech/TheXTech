@@ -31,6 +31,7 @@
 #include "../graphics.h"
 #include "../blocks.h"
 #include "../npc.h"
+#include "../eff_id.h"
 #include "../layers.h"
 #include "../player.h"
 #include "../collision.h"
@@ -544,7 +545,7 @@ void MenuLoop()
         const Location_t cursorLoc = newLoc(SharedCursor.X - vScreen[1].X - vScreen[1].ScreenLeft, SharedCursor.Y - vScreen[1].Y - vScreen[1].ScreenTop);
         if(iRand(5) >= 2)
         {
-            NewEffect(80, cursorLoc);
+            NewEffect(EFFID_SPARKLE, cursorLoc);
             Effect[numEffects].Location.SpeedX = dRand() * 4 - 2;
             Effect[numEffects].Location.SpeedY = dRand() * 4 - 2;
         }
@@ -564,7 +565,7 @@ void MenuLoop()
                     }
                     else
                     {
-                        NewEffect(78, NPC[A].Location);
+                        NewEffect(EFFID_COIN_COLLECT, NPC[A].Location);
                         NPC[A].Killed = 9;
                         NPCQueues::Killed.push_back(A);
                     }

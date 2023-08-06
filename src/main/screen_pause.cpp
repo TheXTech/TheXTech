@@ -59,7 +59,14 @@ struct MenuItem
     MenuItem(std::string n, bool(*cb)()) : name(n), callback(cb) {};
 };
 
-static bool s_is_legacy = false;
+enum class PauseType
+{
+    Modern,
+    Testing,
+    Legacy,
+};
+
+static PauseType s_pause_type = PauseType::Modern;
 static int s_pause_plr = 0;
 static int s_longest_width = 0;
 static std::vector<MenuItem> s_items;
@@ -150,7 +157,7 @@ static bool s_SaveAndContinue()
     else
     {
         // player tried to cheat, scare them
-        PlaySound(SFX_BowserKilled);
+        PlaySound(SFX_VillainKilled);
     }
 
     return true;
@@ -193,50 +200,54 @@ void Init(int plr, bool LegacyPause)
     MenuCursor = 0;
     MenuCursorCanMove = false;
 
-    s_is_legacy = LegacyPause;
+    if(LegacyPause)
+        s_pause_type = PauseType::Legacy;
+    else if(TestLevel)
+        s_pause_type = PauseType::Testing;
+    else
+        s_pause_type = PauseType::Modern;
+
     s_pause_plr = plr;
 
     // do a context-aware initialization of s_items
     s_items.clear();
 
-    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater;
+    bool CanSave = (LevelSelect || (IsEpisodeIntro && NoMap)) && !Cheater && !TestLevel;
 
-    // pause
-    if(TestLevel && LevelBeatCode == -2)
+    // add pause menu items
+
+    // level test
+    if(s_pause_type == PauseType::Testing)
     {
-        s_items.push_back(MenuItem{g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
-        s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
+        bool inter_screen = (LevelBeatCode <= -2);
+        bool start_screen = (LevelBeatCode == -3);
+        bool editor_test = !Backup_FullFileName.empty();
 
-        if(Backup_FullFileName.empty())
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
-        else
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemReturnToEditor, s_QuitTesting});
-    }
-    else if(TestLevel)
-    {
-        s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
-        s_items.push_back(MenuItem{g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
-        s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
+        if(!inter_screen)
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
 
-        if(g_compatibility.allow_drop_add && !LegacyPause)
+        s_items.push_back(MenuItem{start_screen ? g_gameStrings.pauseItemContinue : g_gameStrings.pauseItemRestartLevel, s_RestartLevel});
+
+        if(!start_screen)
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemResetCheckpoints, s_ResetCheckpoints});
+
+        if(g_compatibility.allow_drop_add)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
-        if(g_config.enter_cheats_menu_item && !LegacyPause)
+        if(!inter_screen && g_config.enter_cheats_menu_item)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
-        if(Backup_FullFileName.empty())
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
-        else
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemReturnToEditor, s_QuitTesting});
+        s_items.push_back(MenuItem{editor_test ? g_gameStrings.pauseItemReturnToEditor : g_gameStrings.pauseItemQuitTesting, s_QuitTesting});
     }
+    // main game pause
     else
     {
         s_items.push_back(MenuItem{g_gameStrings.pauseItemContinue, s_Continue});
 
-        if(g_compatibility.allow_drop_add && !LegacyPause)
+        if(g_compatibility.allow_drop_add && s_pause_type != PauseType::Legacy)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemDropAddPlayers, s_DropAddScreen});
 
-        if(g_config.enter_cheats_menu_item && !LegacyPause)
+        if(g_config.enter_cheats_menu_item && s_pause_type != PauseType::Legacy)
             s_items.push_back(MenuItem{g_gameStrings.pauseItemEnterCode, s_CheatScreen});
 
         if(CanSave)
@@ -246,7 +257,7 @@ void Init(int plr, bool LegacyPause)
         }
         else
         {
-            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuit, s_Quit});
+            s_items.push_back(MenuItem{g_gameStrings.pauseItemQuit, TestLevel ? s_QuitTesting : s_Quit});
         }
     }
 
@@ -294,24 +305,52 @@ void Render()
     int menu_left_X = ScreenW / 2 - total_menu_width / 2 + 20;
     int menu_top_Y = ScreenH / 2 - total_menu_height / 2;
 
-    XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, 0, 0, 0);
-
-    for(size_t i = 0; i < s_items.size(); i++)
-        SuperPrint(s_items[i].name, 3, menu_left_X, menu_top_Y + (i * 36));
-
-    if(GFX.PCursor.inited)
+    switch(s_pause_type)
     {
-        if(s_pause_plr == 2 && !s_is_legacy)
-            XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, 0.0, 1.0, 0.0);
-        else if(s_pause_plr != 1 && !s_is_legacy)
-            XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor);
-        else
-            XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, 1.0, 0.0, 0.0);
+    case(PauseType::Legacy):
+        XRender::renderRect(ScreenW / 2 - 190, ScreenH / 2 - menu_box_height / 2, 380, menu_box_height, 0, 0, 0);
+        break;
+    case(PauseType::Modern):
+    default:
+        XRender::renderRect(ScreenW / 2 - 190 - 4, ScreenH / 2 - menu_box_height / 2 - 4, 380 + 8, menu_box_height + 8, 0, 0, 0, 1);
+        XRender::renderRect(ScreenW / 2 - 190 - 2, ScreenH / 2 - menu_box_height / 2 - 2, 380 + 4, menu_box_height + 4, 1, 1, 1, 1);
+        XRender::renderRect(ScreenW / 2 - 190, ScreenH / 2 - menu_box_height / 2, 380, menu_box_height, 0, 0, 0, 1);
+        break;
+    case(PauseType::Testing):
+        XRender::renderRect(ScreenW / 2 - 190, ScreenH / 2 - menu_box_height / 2, 380, menu_box_height, 0, 0, 0, 0.5);
+        break;
     }
-    else if(s_pause_plr == 2 && !s_is_legacy)
-        XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[3], 0, 0);
+
+    if(s_pause_type == PauseType::Testing)
+    {
+        for(size_t i = 0; i < s_items.size(); i++)
+        {
+            float c = ((int)i == MenuCursor) ? 1.0f : 0.5f;
+
+            SuperPrintScreenCenter(s_items[i].name, 5, menu_top_Y + (i * 36), c, c, c);
+        }
+    }
     else
-        XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[0], 0, 0);
+    {
+        const int font = (s_pause_type == PauseType::Legacy) ? 3 : 4;
+
+        for(size_t i = 0; i < s_items.size(); i++)
+            SuperPrint(s_items[i].name, font, menu_left_X, menu_top_Y + (i * 36));
+
+        if(GFX.PCursor.inited)
+        {
+            if(s_pause_plr == 2 && s_pause_type != PauseType::Legacy)
+                XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, 0.0, 1.0, 0.0);
+            else if(s_pause_plr != 1 && s_pause_type != PauseType::Legacy)
+                XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor);
+            else
+                XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), GFX.PCursor, 1.0, 0.0, 0.0);
+        }
+        else if(s_pause_plr == 2 && s_pause_type != PauseType::Legacy)
+            XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[3], 0, 0);
+        else
+            XRender::renderTexture(menu_left_X - 20, menu_top_Y + (MenuCursor * 36), 16, 16, GFX.MCursor[0], 0, 0);
+    }
 }
 
 bool Logic(int plr)

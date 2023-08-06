@@ -641,10 +641,10 @@ std::vector<ItemFamily*>::iterator make_page(std::vector<ItemFamily*>::iterator 
 
             // we'll be below the margin
 
-            // pick whether to fill the row or keep the margin
-            okay = family.make_layout(width);
-
+            // pick whether to fill the row (use width) or keep the margin (use main_width)
+            family.make_layout(width);
             int height_full = family.layout_pod.rows * 2 + 1;
+
             okay = family.make_layout(main_width);
             int height_main = family.layout_pod.rows * 2 + 1;
 

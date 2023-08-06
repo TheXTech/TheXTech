@@ -276,7 +276,6 @@ void OpenConfig()
         config.read("no-pause-reconnect", g_config.NoPauseReconnect, false);
         config.read("enter-cheats-menu-item", g_config.enter_cheats_menu_item, false);
         config.read("world-map-fast-move", g_config.worldMapFastMove, false);
-        config.read("editor-pause-on-death", g_config.editor_pause_on_death, true);
         config.read("hud-follows-player", g_config.hud_follows_player, false);
 #ifdef ENABLE_XTECH_DISCORD_RPC
         config.read("discord-rpc", g_config.discord_rpc, false);
@@ -439,7 +438,6 @@ void SaveConfig()
     config.setValue("no-pause-reconnect", g_config.NoPauseReconnect);
     config.setValue("enter-cheats-menu-item", g_config.enter_cheats_menu_item);
     config.setValue("world-map-fast-move", g_config.worldMapFastMove);
-    config.setValue("editor-pause-on-death", g_config.editor_pause_on_death);
     config.setValue("hud-follows-player", g_config.hud_follows_player);
 #ifdef ENABLE_XTECH_DISCORD_RPC
     config.setValue("discord-rpc", g_config.discord_rpc);

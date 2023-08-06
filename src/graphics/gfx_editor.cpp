@@ -110,7 +110,7 @@ void DrawEditorLevel(int Z)
             // render NPCs in containers
             for(A = 1; A <= numNPCs; A++)
             {
-                if(!NPC[A].Hidden && (NPC[A].Type == 91 || NPC[A].Type == 96)
+                if(!NPC[A].Hidden && (NPC[A].Type == NPCID_ITEM_BURIED || NPC[A].Type == NPCID_ITEM_POD)
                     && (NPC[A].Special > 0))
                 {
                     if(vScreenCollision(Z, NPC[A].Location))
@@ -126,7 +126,7 @@ void DrawEditorLevel(int Z)
                             tempLocation.Height = NPCHeightGFX[C];
                             tempLocation.Width = NPCWidthGFX[C];
                         }
-                        if(NPC[A].Type == 96)
+                        if(NPC[A].Type == NPCID_ITEM_POD)
                             tempLocation.Y = NPC[A].Location.Y + NPC[A].Location.Height - tempLocation.Height;
                         else
                             tempLocation.Y = NPC[A].Location.Y;

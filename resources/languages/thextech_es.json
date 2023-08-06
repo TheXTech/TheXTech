@@ -5,7 +5,8 @@
             "canBreakTooltip": "Legado: Se rompe al ser golpeado",
             "inside": "Tiene:",
             "invis": "Invis",
-            "slick": "Resbala"
+            "slick": "Resbala",
+            "pickContents": "Elegir contenido del bloque"
         },
         "browser": {
             "askOverwriteFile": "Sobreescribir {0}?",
@@ -28,17 +29,56 @@
                 "destroy": "Bloque es destruido",
                 "hit": "Bloque es golpeado",
                 "phraseTriggersWhenTemplate": "{0} se activa cuando {1}",
-                "talk": "Jugador habla a NPC"
+                "talk": "Jugador habla a NPC",
+                "phraseTriggersAfterTemplate": "{0} se activa {1} ms después del evento {2}",
+                "activate": "NPC entra en la pantalla",
+                "enter": "se ingresa al pasaje",
+                "layerClear": "todo en la capa de objetos se ha ido"
             },
             "itemNewEvent": "<Nuevo evento>",
             "label": {
                 "activate": "Activar",
                 "destroy": "Destruir",
-                "death": "Muerte"
+                "death": "Muerte",
+                "enter": "Ingreso",
+                "hit": "Golpe",
+                "next": "Siguiente",
+                "talk": "Conversación"
             },
             "sections": {
                 "phraseAllSections": "Todas las secciones",
-                "propMusic": "Música"
+                "propMusic": "Música",
+                "actionReset": "Reiniciar",
+                "actionSet": "Establecer",
+                "actionKeep": "Mantener",
+                "propBackground": "Fondo",
+                "propBounds": "Límites"
+            },
+            "headerTriggerEvent": "Activa evento:",
+            "letter": {
+                "hit": "G:",
+                "death": "M:",
+                "talk": "C:"
+            },
+            "promptEventText": "Texto del evento",
+            "props": {
+                "autostart": "Autoencendido",
+                "controls": "Controles",
+                "endGame": "Final del Juego",
+                "sound": "Sonido"
+            },
+            "settingsForEvent": "Ajustes para el Evento",
+            "bounds": {
+                "shouldEvent": "Debería el Evento {0}",
+                "changeAllSectionBoundsToCurrent": "Cambiar todos los límites de la sección a los actuales?",
+                "changeSectionBoundsToCurrent": "Cambiar los límites de la sección {0} a los actuales?"
+            },
+            "promptEventName": "Nombre del evento",
+            "layers": {
+                "headerMove": "Mover:",
+                "headerHide": "Esconde:",
+                "headerToggle": "Conmutar:",
+                "headerShow": "Muestra:"
             }
         },
         "file": {
@@ -79,6 +119,9 @@
         },
         "level": {
             "levelName": "Nombre del nivel"
+        },
+        "wordEvent": {
+            "typeLabel": "Evento {0}:"
         }
     }
 }

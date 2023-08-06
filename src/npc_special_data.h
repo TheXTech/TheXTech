@@ -105,19 +105,19 @@ constexpr uint8_t cannon_values[] = {0, 1, 2};
 constexpr int cannon_active_below[] = {66, 51, 28};
 constexpr NPC_Variant_Data_t Variant_cannon = {cannon_strings, cannon_values, cannon_active_below};
 
-// NPCID_THWOMP_SMB3
+// NPCID_STONE_S3
 constexpr const char* thwomp_strings[] = {"Modern", "Fall\nAlways", nullptr};
 constexpr uint8_t thwomp_values[] = {0, 1};
 constexpr int thwomp_active_below[] = {66, 9};
 constexpr NPC_Variant_Data_t Variant_thwomp = {thwomp_strings, thwomp_values, thwomp_active_below};
 
-// NPCID_BOWSER_SMB3
+// NPCID_VILLAIN_S3
 constexpr const char* bowser3_strings[] = {"Modern", "Section\nExpand", nullptr};
 constexpr uint8_t bowser3_values[] = {0, 1};
 constexpr int bowser3_active_below[] = {66, 30};
 constexpr NPC_Variant_Data_t Variant_bowser3 = {bowser3_strings, bowser3_values, bowser3_active_below};
 
-// NPCID_YELBLOCKS, NPCID_BLUBLOCKS, NPCID_GRNBLOCKS, NPCID_REDBLOCKS, NPCID_PLATFORM_SMB3, NPCID_SAW
+// NPCID_YEL_PLATFORM, NPCID_BLU_PLATFORM, NPCID_GRN_PLATFORM, NPCID_RED_PLATFORM, NPCID_PLATFORM_S3, NPCID_SAW
 constexpr const char* platform_strings[] = {"XTech", "1.3", "Pre-1.2", nullptr};
 constexpr uint8_t platform_values[] = {2, 0, 1};
 constexpr int platform_active_below[] = {-1, 66, 30};
@@ -126,13 +126,13 @@ constexpr NPC_Variant_Data_t Variant_platform = {platform_strings, platform_valu
 constexpr NPC_Variant_Map_t NPC_Variant_map[] =
 {
     {NPCID_CANNONITEM, &Variant_cannon},
-    {NPCID_THWOMP_SMB3, &Variant_thwomp},
-    {NPCID_BOWSER_SMB3, &Variant_bowser3},
-    {NPCID_YELBLOCKS, &Variant_platform},
-    {NPCID_BLUBLOCKS, &Variant_platform},
-    {NPCID_GRNBLOCKS, &Variant_platform},
-    {NPCID_REDBLOCKS, &Variant_platform},
-    {NPCID_PLATFORM_SMB3, &Variant_platform},
+    {NPCID_STONE_S3, &Variant_thwomp},
+    {NPCID_VILLAIN_S3, &Variant_bowser3},
+    {NPCID_YEL_PLATFORM, &Variant_platform},
+    {NPCID_BLU_PLATFORM, &Variant_platform},
+    {NPCID_GRN_PLATFORM, &Variant_platform},
+    {NPCID_RED_PLATFORM, &Variant_platform},
+    {NPCID_PLATFORM_S3, &Variant_platform},
     {NPCID_SAW, &Variant_platform},
 };
 

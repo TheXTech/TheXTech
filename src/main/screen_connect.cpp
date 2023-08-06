@@ -1,16 +1,17 @@
 #include <fmt_format_ne.h>
 
-#include "../core/render.h"
+#include "core/render.h"
 
-#include "../global_constants.h"
-#include "../controls.h"
-#include "../sound.h"
-#include "../globals.h"
-#include "../gfx.h"
-#include "../graphics.h"
-#include "../player.h"
-#include "../compat.h"
-#include "../config.h"
+#include "global_constants.h"
+#include "controls.h"
+#include "sound.h"
+#include "globals.h"
+#include "gfx.h"
+#include "graphics.h"
+#include "player.h"
+#include "compat.h"
+#include "config.h"
+#include "npc_id.h"
 
 #include "main/game_info.h"
 
@@ -109,6 +110,7 @@ void Reconnect_Start()
         s_playerState[i] = PlayerState::Disconnected;
         s_menuItem[i] = 0;
         s_inputReady[i] = false;
+        g_charSelect[i] = Player[i + 1].Character;
     }
     s_context = Context::Reconnect;
 
@@ -134,7 +136,7 @@ void DropAdd_Start()
             s_playerState[i] = PlayerState::Disconnected;
         s_menuItem[i] = 0;
         s_inputReady[i] = false;
-        g_charSelect[i] = Player[i+1].Character;
+        g_charSelect[i] = Player[i + 1].Character;
     }
     s_context = Context::DropAdd;
 
@@ -232,7 +234,7 @@ void Player_ValidateChar(int p)
     {
         for(i = 0; i < 5; i++)
         {
-            if(!blockCharacter[i+1] && s_char_info.accept(i))
+            if(!blockCharacter[i + 1] && s_char_info.accept(i))
             {
                 s_menuItem[p] = i;
                 break;
@@ -355,7 +357,7 @@ bool Player_Back(int p)
         {
             SwapCharacter(p+1, g_charSelect[p], g_config.StrictDropAdd);
             if(!g_config.StrictDropAdd)
-                PlaySound(SFX_Raccoon);
+                PlaySound(SFX_Transform);
         }
         s_playerState[p] = PlayerState::DropAddMain;
         s_menuItem[p] = 1;
@@ -537,7 +539,7 @@ bool Player_Select(int p)
                 {
                     SwapCharacter(p+1, g_charSelect[p], g_config.StrictDropAdd && !SwapCharAllowed());
                     if(!g_config.StrictDropAdd || SwapCharAllowed())
-                        PlaySound(SFX_Raccoon);
+                        PlaySound(SFX_Transform);
                 }
                 do_sentinel.active = false;
             }
@@ -559,7 +561,7 @@ bool Player_Select(int p)
                     else
                         Lives -= 1;
                 }
-                PlaySound(SFX_Mushroom);
+                PlaySound(SFX_ItemEmerge);
                 do_sentinel.active = false;
             }
         }
@@ -934,8 +936,8 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
 
                         for(int A = 1; A <= numNPCs; A++)
                         {
-                            if(A % (p + 1) == 0 && NPC[A].Type == 13)
-                                NPC[A].Special = c+1;
+                            if(A % (p + 1) == 0 && NPC[A].Type == NPCID_PLR_FIREBALL)
+                                NPC[A].Special = c + 1;
                         }
                     }
                 }
@@ -1560,7 +1562,7 @@ int Logic()
                 {
                     s_playerState[p] = PlayerState::ControlsMenu;
                     s_menuItem[p] = 2;
-                    PlaySoundMenu(SFX_Yoshi);
+                    PlaySoundMenu(SFX_Pet);
                 }
                 else if(p == 0 && s_minPlayers == 1)
                 {
@@ -1599,7 +1601,7 @@ int Logic()
                 {
                     s_playerState[p] = PlayerState::ControlsMenu;
                     s_menuItem[p] = 2;
-                    PlaySoundMenu(SFX_Yoshi);
+                    PlaySoundMenu(SFX_Pet);
                 }
                 else
                 {
@@ -1614,13 +1616,13 @@ int Logic()
                 {
                     s_playerState[p] = PlayerState::ControlsMenu;
                     s_menuItem[p] = 2;
-                    PlaySoundMenu(SFX_Yoshi);
+                    PlaySoundMenu(SFX_Pet);
                 }
                 else
                 {
                     s_playerState[p] = PlayerState::ReconnectMain;
                     s_menuItem[p] = 0;
-                    PlaySoundMenu(SFX_Yoshi);
+                    PlaySoundMenu(SFX_Pet);
                 }
             }
             // okay to continue processing them because Controls are now updated

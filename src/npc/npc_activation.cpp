@@ -66,16 +66,16 @@ inline static bool s_Event_SoundOnly(const Events_t& evt, int test_section)
 static bool s_NPC_MustBeCanonical_internal(const NPC_t& n)
 {
     return n.Generator
-        || n.Type == NPCID_THWOMP_SMB3
-        || n.Type == NPCID_THWOMP_SMW
+        || n.Type == NPCID_STONE_S3
+        || n.Type == NPCID_STONE_S4
         || n.Type == NPCID_METALBARREL
         || n.Type == NPCID_CANNONENEMY
-        || n.Type == NPCID_STATUE_SMB3
-        || n.Type == NPCID_STATUE_SMW
-        || n.Type == NPCID_RINKAGEN
-        || n.Type == NPCID_BLARGG
-        || n.Type == NPCID_LAKITU_SMB3
-        || n.Type == NPCID_LAKITU_SMW
+        || n.Type == NPCID_STATUE_S3
+        || n.Type == NPCID_STATUE_S4
+        || n.Type == NPC_HOMING_BALL_GEN
+        || n.Type == NPCID_LAVA_MONSTER
+        || n.Type == NPCID_SPIKY_THROWER
+        || n.Type == NPCID_ITEM_THROWER
         || (NPCIsCheep[n.Type] && Maths::iRound(n.Special) == 2)
         || n.AttLayer != LAYER_NONE
         || (n.TriggerActivate != EVENT_NONE && !s_Event_SoundOnly(Events[n.TriggerActivate], n.Section));
@@ -89,11 +89,11 @@ bool NPC_MustBeCanonical(NPCRef_t n)
 bool NPC_MustNotRenderInactive(const NPC_t& n)
 {
     return (NPCIsCheep[n.Type] && Maths::iRound(n.Special) == 2)
-        || n.Type == NPCID_PODOBOO
-        || n.Type == NPCID_PIRANHA_SMB3 || n.Type == NPCID_BOTTOMPIRANHA || n.Type == NPCID_SIDEPIRANHA
-        || n.Type == NPCID_BIGPIRANHA || n.Type == NPCID_PIRANHA_SMB || n.Type == NPCID_FIREPIRANHA
-        || n.Type == NPCID_LONGPIRANHA_UP || n.Type == NPCID_LONGPIRANHA_DOWN || n.Type == NPCID_PIRANHAHEAD
-        || n.Type == NPCID_BLARGG;
+        || n.Type == NPCID_LAVABUBBLE
+        || n.Type == NPCID_PLANT_S3 || n.Type == NPCID_BOTTOM_PLANT || n.Type == NPCID_SIDE_PLANT
+        || n.Type == NPCID_BIG_PLANT || n.Type == NPCID_PLANT_S1 || n.Type == NPCID_FIRE_PLANT
+        || n.Type == NPCID_LONG_PLANT_UP || n.Type == NPCID_LONG_PLANT_DOWN || n.Type == NPCID_JUMP_PLANT
+        || n.Type == NPCID_LAVA_MONSTER;
 }
 
 bool NPC_MustRenderInactive(const NPC_t& n)
@@ -106,30 +106,29 @@ bool NPC_MustRenderInactive(const NPC_t& n)
         || NPCIsAVine[n.Type]
         || NPCIsABonus[n.Type]
         || n.Type == NPCID_CHECKPOINT
-        || n.Type == NPCID_BURIEDPLANT
+        || n.Type == NPCID_ITEM_BURIED
         || n.Type == NPCID_CONVEYOR
-        || n.Type == NPCID_THWOMP_SMB3
-        || n.Type == NPCID_THWOMP_SMW
-        || n.Type == NPCID_RINKAGEN
+        || n.Type == NPCID_STONE_S3
+        || n.Type == NPCID_STONE_S4
+        || n.Type == NPC_HOMING_BALL_GEN
         || n.Type == NPCID_ITEMGOAL
         || n.Type == NPCID_CANNONENEMY
-        || n.Type == NPCID_STATUE_SMB3
-        || n.Type == NPCID_STATUE_SMW
-        || n.Type == NPCID_YOSHIEGG
+        || n.Type == NPCID_STATUE_S3
+        || n.Type == NPCID_STATUE_S4
+        || n.Type == NPCID_ITEM_POD
         || n.Type == NPCID_SPRING
         || n.Type == NPCID_CANNONITEM
         || n.Type == NPCID_KEY
-        || n.Type == NPCID_PSWITCH_SMB3
-        || n.Type == NPCID_TIMESWITCH
-        || n.Type == NPCID_PSWITCH_SMW
+        || n.Type == NPCID_TIME_SWITCH
+        || n.Type == NPCID_COIN_SWITCH
         || n.Type == NPCID_ICE_BLOCK
-        || n.Type == NPCID_CLOWNCAR
+        || n.Type == NPCID_VEHICLE
         || n.Type == NPCID_AXE
-        || n.Type == NPCID_NIPPER_PLANT
-        || n.Type == NPCID_PROPELLERBLOCK
-        || n.Type == NPCID_PROPELLERCANNON
-        || n.Type == NPCID_POTIONDOOR
-        || n.Type == NPCID_POTION;
+        || n.Type == NPCID_WALK_PLANT
+        || n.Type == NPCID_FLY_BLOCK
+        || n.Type == NPCID_FLY_CANNON
+        || n.Type == NPCID_MAGIC_DOOR
+        || n.Type == NPCID_DOOR_MAKER;
 }
 
 void NPC_ConstructCanonicalSet()

@@ -227,23 +227,23 @@ void SetEditorNPCType(int type)
             EditorCursor.NPC.Special = 1;
 
         // reset special for NPCs that don't allow it
-        if(!(NPCIsCheep[type] || NPCIsAParaTroopa[type] || type == NPCID_FIREBAR))
+        if(!(NPCIsCheep[type] || NPCIsAParaTroopa[type] || type == NPCID_FIRE_CHAIN))
             EditorCursor.NPC.Special = 0;
 
         // reset special if it's out of range
-        if(!(type == NPCID_FIREBAR) && EditorCursor.NPC.Special > 5)
+        if(!(type == NPCID_FIRE_CHAIN) && EditorCursor.NPC.Special > 5)
             EditorCursor.NPC.Special = 0;
     }
 
     // reset Special2 for NPCs that don't allow it
-    if(!(EditorCursor.NPC.Type == NPCID_POTIONDOOR || EditorCursor.NPC.Type == NPCID_POTION
-        || (EditorCursor.NPC.Type == NPCID_BURIEDPLANT && EditorCursor.NPC.Special == NPCID_POTION)))
+    if(!(EditorCursor.NPC.Type == NPCID_MAGIC_DOOR || EditorCursor.NPC.Type == NPCID_DOOR_MAKER
+        || (EditorCursor.NPC.Type == NPCID_ITEM_BURIED && EditorCursor.NPC.Special == NPCID_DOOR_MAKER)))
     {
         EditorCursor.NPC.Special2 = 0;
     }
 
     // reset legacy for the NPCs that don't allow it
-    if(!(type == NPCID_BOOMBOOM || type == NPCID_BIRDO || type == NPCID_BOWSER_SMB3))
+    if(!(type == NPCID_MINIBOSS || type == NPCID_SPIT_BOSS || type == NPCID_VILLAIN_S3))
         EditorCursor.NPC.Legacy = false;
 
     // reset Variant data across different NPCs
@@ -258,7 +258,7 @@ void SetEditorNPCType(int type)
     }
 
     // reset Variant data for NPCs that don't support it
-    if(find_Variant_Data(type) == nullptr && !(type == NPCID_STAR_SMW || type == NPCID_STAR_SMB3))
+    if(find_Variant_Data(type) == nullptr && !(type == NPCID_STAR_COLLECT || type == NPCID_STAR_EXIT))
         EditorCursor.NPC.Variant = 0;
 
     // turn into new type if can't be in bubble anymore
@@ -554,86 +554,86 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
     {
         // Containers
         SuperPrintCenterR(mode, g_editorStrings.npcInContainer, 3, e_ScreenW - 20, 40);
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFXNPC[NPCID_BURIEDPLANT], EditorCursor.NPC.Type == NPCID_BURIEDPLANT, 0, 0, NPCWidth[NPCID_BURIEDPLANT], NPCHeight[NPCID_BURIEDPLANT]))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 60 + 4, GFXNPC[NPCID_ITEM_BURIED], EditorCursor.NPC.Type == NPCID_ITEM_BURIED, 0, 0, NPCWidth[NPCID_ITEM_BURIED], NPCHeight[NPCID_ITEM_BURIED]))
         {
-            if(EditorCursor.NPC.Type == NPCID_BURIEDPLANT)
+            if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED)
             {
                 EditorCursor.NPC.Type = EditorCursor.NPC.Special;
                 EditorCursor.NPC.Special = 0;
             }
-            else if(!(EditorCursor.NPC.Type == NPCID_BURIEDPLANT || EditorCursor.NPC.Type == NPCID_YOSHIEGG
-                || EditorCursor.NPC.Type == NPCID_BUBBLE || EditorCursor.NPC.Type == NPCID_LAKITU_SMW))
+            else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
+                || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER))
             {
                 EditorCursor.NPC.Special = EditorCursor.NPC.Type;
-                EditorCursor.NPC.Type = NPCID_BURIEDPLANT;
+                EditorCursor.NPC.Type = NPCID_ITEM_BURIED;
             }
             else
             {
-                EditorCursor.NPC.Type = NPCID_BURIEDPLANT;
+                EditorCursor.NPC.Type = NPCID_ITEM_BURIED;
             }
         }
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 100 + 4, GFXNPC[NPCID_YOSHIEGG], EditorCursor.NPC.Type == NPCID_YOSHIEGG))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 100 + 4, GFXNPC[NPCID_ITEM_POD], EditorCursor.NPC.Type == NPCID_ITEM_POD))
         {
-            if(EditorCursor.NPC.Type == NPCID_YOSHIEGG)
+            if(EditorCursor.NPC.Type == NPCID_ITEM_POD)
             {
                 EditorCursor.NPC.Type = EditorCursor.NPC.Special;
                 EditorCursor.NPC.Special = 0;
             }
-            else if(!(EditorCursor.NPC.Type == NPCID_BURIEDPLANT || EditorCursor.NPC.Type == NPCID_YOSHIEGG
-                || EditorCursor.NPC.Type == NPCID_BUBBLE || EditorCursor.NPC.Type == NPCID_LAKITU_SMW))
+            else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
+                || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER))
             {
                 EditorCursor.NPC.Special = EditorCursor.NPC.Type;
-                EditorCursor.NPC.Type = NPCID_YOSHIEGG;
+                EditorCursor.NPC.Type = NPCID_ITEM_POD;
             }
             else
             {
-                EditorCursor.NPC.Type = NPCID_YOSHIEGG;
+                EditorCursor.NPC.Type = NPCID_ITEM_POD;
             }
         }
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFXNPC[NPCID_LAKITU_SMW], EditorCursor.NPC.Type == NPCID_LAKITU_SMW, 0, 0, NPCWidthGFX[NPCID_LAKITU_SMW], NPCHeightGFX[NPCID_LAKITU_SMW]))
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 140 + 4, GFXNPC[NPCID_ITEM_THROWER], EditorCursor.NPC.Type == NPCID_ITEM_THROWER, 0, 0, NPCWidthGFX[NPCID_ITEM_THROWER], NPCHeightGFX[NPCID_ITEM_THROWER]))
         {
-            if(EditorCursor.NPC.Type == NPCID_LAKITU_SMW)
+            if(EditorCursor.NPC.Type == NPCID_ITEM_THROWER)
             {
                 EditorCursor.NPC.Type = EditorCursor.NPC.Special;
                 EditorCursor.NPC.Special = 0;
             }
-            else if(!(EditorCursor.NPC.Type == NPCID_BURIEDPLANT || EditorCursor.NPC.Type == NPCID_YOSHIEGG
-                || EditorCursor.NPC.Type == NPCID_BUBBLE || EditorCursor.NPC.Type == NPCID_LAKITU_SMW))
+            else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
+                || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER))
             {
                 EditorCursor.NPC.Special = EditorCursor.NPC.Type;
-                EditorCursor.NPC.Type = NPCID_LAKITU_SMW;
+                EditorCursor.NPC.Type = NPCID_ITEM_THROWER;
             }
             else
             {
-                EditorCursor.NPC.Type = NPCID_LAKITU_SMW;
+                EditorCursor.NPC.Type = NPCID_ITEM_THROWER;
             }
         }
         if(AllowBubble())
         {
-            if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_BUBBLE], EditorCursor.NPC.Type == NPCID_BUBBLE, 0, 0, NPCWidthGFX[NPCID_BUBBLE], NPCHeightGFX[NPCID_BUBBLE]))
+            if(UpdateButton(mode, e_ScreenW - 40 + 4, 180 + 4, GFXNPC[NPCID_ITEM_BUBBLE], EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE, 0, 0, NPCWidthGFX[NPCID_ITEM_BUBBLE], NPCHeightGFX[NPCID_ITEM_BUBBLE]))
             {
-                if(EditorCursor.NPC.Type == NPCID_BUBBLE)
+                if(EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE)
                 {
                     EditorCursor.NPC.Type = EditorCursor.NPC.Special;
                     EditorCursor.NPC.Special = 0;
                 }
-                else if(!(EditorCursor.NPC.Type == NPCID_BURIEDPLANT || EditorCursor.NPC.Type == NPCID_YOSHIEGG
-                    || EditorCursor.NPC.Type == NPCID_BUBBLE || EditorCursor.NPC.Type == NPCID_LAKITU_SMW))
+                else if(!(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
+                    || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER))
                 {
                     EditorCursor.NPC.Special = EditorCursor.NPC.Type;
-                    EditorCursor.NPC.Type = NPCID_BUBBLE;
+                    EditorCursor.NPC.Type = NPCID_ITEM_BUBBLE;
                 }
                 else
                 {
-                    EditorCursor.NPC.Type = NPCID_BUBBLE;
+                    EditorCursor.NPC.Type = NPCID_ITEM_BUBBLE;
                 }
             }
         }
 
         // Various properties that depend on type, get the real one here:
         int type;
-        if(EditorCursor.NPC.Type == NPCID_BURIEDPLANT || EditorCursor.NPC.Type == NPCID_YOSHIEGG
-            || EditorCursor.NPC.Type == NPCID_BUBBLE || EditorCursor.NPC.Type == NPCID_LAKITU_SMW)
+        if(EditorCursor.NPC.Type == NPCID_ITEM_BURIED || EditorCursor.NPC.Type == NPCID_ITEM_POD
+            || EditorCursor.NPC.Type == NPCID_ITEM_BUBBLE || EditorCursor.NPC.Type == NPCID_ITEM_THROWER)
         {
             type = EditorCursor.NPC.Special;
         }
@@ -647,19 +647,19 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         Icon::Icons dir_pos_icon = Icon::right;
 
         bool show_random = true;
-        if(type == NPCID_CONVEYOR || type == NPCID_YELBLOCKS || type == NPCID_BLUBLOCKS || type == NPCID_GRNBLOCKS || type == NPCID_REDBLOCKS)
+        if(type == NPCID_CONVEYOR || type == NPCID_YEL_PLATFORM || type == NPCID_BLU_PLATFORM || type == NPCID_GRN_PLATFORM || type == NPCID_RED_PLATFORM)
             show_random = false;
 
         // "direction" means different things for these types
         if(mode == CallMode::Render)
         {
-            if(type == NPCID_YELBLOCKS || type == NPCID_BLUBLOCKS || type == NPCID_GRNBLOCKS || type == NPCID_REDBLOCKS || type == NPCID_PLATFORM_SMB3)
+            if(type == NPCID_YEL_PLATFORM || type == NPCID_BLU_PLATFORM || type == NPCID_GRN_PLATFORM || type == NPCID_RED_PLATFORM || type == NPCID_PLATFORM_S3)
             {
                 SuperPrintCenter(g_editorStrings.npcPropertyActive, 3, e_ScreenW - 120, 40);
                 dir_neg_icon = Icon::x;
                 dir_pos_icon = Icon::check;
             }
-            else if(type == NPCID_ROTODISK || type == NPCID_FIREBAR)
+            else if(type == NPCID_FIRE_DISK || type == NPCID_FIRE_CHAIN)
             {
                 SuperPrintCenter(g_editorStrings.npcPropertyAttachSurface, 3, e_ScreenW - 120, 40);
                 dir_neg_icon = Icon::bottom;
@@ -668,7 +668,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             else
             {
                 SuperPrintCenter(g_editorStrings.npcPropertyFacing, 3, e_ScreenW - 120, 40);
-                if(type == NPCID_PLATFORM_SMB || (NPCIsAParaTroopa[type] && EditorCursor.NPC.Special == 3))
+                if(type == NPCID_PLATFORM_S1 || (NPCIsAParaTroopa[type] && EditorCursor.NPC.Special == 3))
                 {
                     dir_neg_icon = Icon::up;
                     dir_pos_icon = Icon::down;
@@ -798,7 +798,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Special = 4;
         }
 
-        if(type == NPCID_BOOMBOOM || type == NPCID_BIRDO || type == NPCID_BOWSER_SMB3)
+        if(type == NPCID_MINIBOSS || type == NPCID_SPIT_BOSS || type == NPCID_VILLAIN_S3)
         {
             SuperPrintR(mode, g_editorStrings.npcUse1_0Ai, 3, e_ScreenW - 200, 220);
             if(UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, EditorCursor.NPC.Legacy, 0, 32*Icon::_10, 32, 32))
@@ -807,7 +807,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Legacy = false;
         }
 
-        if(EditorCursor.NPC.Type == NPCID_FIREBAR)
+        if(EditorCursor.NPC.Type == NPCID_FIRE_CHAIN)
         {
             SuperPrintR(mode, fmt::format_ne(g_editorStrings.phraseRadiusIndex, (int)EditorCursor.NPC.Special), 3, e_ScreenW - 200, 220);
 
@@ -817,8 +817,8 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 EditorCursor.NPC.Special ++;
         }
 
-        if(EditorCursor.NPC.Type == NPCID_POTIONDOOR || EditorCursor.NPC.Type == NPCID_POTION
-            || (EditorCursor.NPC.Type == NPCID_BURIEDPLANT && EditorCursor.NPC.Special == NPCID_POTION))
+        if(EditorCursor.NPC.Type == NPCID_MAGIC_DOOR || EditorCursor.NPC.Type == NPCID_DOOR_MAKER
+            || (EditorCursor.NPC.Type == NPCID_ITEM_BURIED && EditorCursor.NPC.Special == NPCID_DOOR_MAKER))
         {
             std::string&& dest_section = fmt::format_ne(g_editorStrings.phraseSectionIndex, (int)(EditorCursor.NPC.Special2) + 1);
             SuperPrintR(mode, dest_section, 3, e_ScreenW - 200, 220);
@@ -830,7 +830,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         }
 
         // multistars
-        if((type == NPCID_STAR_SMW || type == NPCID_STAR_SMB3) && FileFormat == FileFormats::LVL_PGEX)
+        if((type == NPCID_STAR_COLLECT || type == NPCID_STAR_EXIT) && FileFormat == FileFormats::LVL_PGEX)
         {
             std::string&& star_index = EditorCursor.NPC.Variant ? fmt::format_ne(g_editorStrings.phraseGenericIndex, (int)(EditorCursor.NPC.Variant)) : g_editorStrings.fileFormatLegacy;
             SuperPrintCenterR(mode, star_index, 3, e_ScreenW - 120, 220);
@@ -843,8 +843,8 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
 
         const NPC_Variant_Data_t* data = find_Variant_Data(EditorCursor.NPC.Type);
 
-        // special case for NPCID_BOWSER_SMB3 since it also has the Legacy button
-        if(EditorCursor.NPC.Type == NPCID_BOWSER_SMB3 && FileFormat == FileFormats::LVL_PGEX)
+        // special case for NPCID_VILLAIN_S3 since it also has the Legacy button
+        if(EditorCursor.NPC.Type == NPCID_VILLAIN_S3 && FileFormat == FileFormats::LVL_PGEX)
         {
             if(UpdateButton(mode, e_ScreenW - 40 + 4, 240 + 4, GFXBlock[4], EditorCursor.NPC.Variant == 1,
                 0, 32 * BlockFrame[4], 32, 32, g_editorStrings.npcTooltipExpandSection.c_str()))
@@ -875,7 +875,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             // only show it if it will (i) reset, or (ii) have something to go to.
             // short-circuit evaluation keeps this from accessing outside of the valid range
             bool show_prev_button = (!valid || i != 0);
-            bool show_next_button = (!valid || data->strings[i+1]);
+            bool show_next_button = (!valid || data->strings[i + 1]);
             if(show_prev_button && UpdateButton(mode, e_ScreenW - 200 + 4, 240 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
             {
                 if(!valid)
@@ -888,7 +888,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
                 if(!valid)
                     EditorCursor.NPC.Variant = data->values[0];
                 else
-                    EditorCursor.NPC.Variant = data->values[i+1];
+                    EditorCursor.NPC.Variant = data->values[i + 1];
             }
         }
 
@@ -1010,7 +1010,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
         SuperPrintR(mode, g_editorStrings.wordCoins, 3, 70, 40);
 
         bool currently_coins = EditorCursor.Block.Special > 0 && EditorCursor.Block.Special < 1000;
-        if(UpdateButton(mode, 60 + 4, 60 + 4, GFXNPC[NPCID_COIN_SMB3], currently_coins, 0, 0, 32, 32) && !currently_coins)
+        if(UpdateButton(mode, 60 + 4, 60 + 4, GFXNPC[NPCID_COIN_S3], currently_coins, 0, 0, 32, 32) && !currently_coins)
         {
             EditorCursor.Block.Special = 1;
             currently_coins = true;
@@ -1029,23 +1029,23 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             EditorCursor.Block.Special = 0;
 
         SuperPrintR(mode, "3", 3, 40 + 10, 140);
-        static const int p7_common[] = {NPCID_COIN_SMB3, NPCID_SHROOM_SMB3, NPCID_LIFE_SMB3, NPCID_FIREFLOWER_SMB3, NPCID_ICEFLOWER_SMB3, NPCID_LEAF, NPCID_TANOOKISUIT, NPCID_HAMMERSUIT, NPCID_VINEHEAD_GREEN_SMB3, NPCID_RANDOM_POWERUP};
+        static const int p7_common[] = {NPCID_COIN_S3, NPCID_POWER_S3, NPCID_LIFE_S3, NPCID_FIRE_POWER_S3, NPCID_ICE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPC_HEAVY_POWER, NPCID_GRN_VINE_TOP_S3, NPCID_RANDOM_POWER};
         UpdateNPCGrid(mode, 40, 160, p7_common, sizeof(p7_common)/sizeof(int), 10);
 
         SuperPrintR(mode, "4", 3, 40 + 10, 200);
-        static const int p7_smw[] = {NPCID_COIN_SMW, NPCID_SHROOM_SMW, NPCID_LIFE_SMW, NPCID_FIREFLOWER_SMW, NPCID_MOON, NPCID_ICEFLOWER_SMW, NPCID_YOSHI_GREEN, NPCID_KEY, NPCID_VINEHEAD_SMW};
+        static const int p7_smw[] = {NPCID_COIN_S4, NPCID_POWER_S4, NPCID_LIFE_S4, NPCID_FIRE_POWER_S4, NPCID_3_LIFE, NPCID_ICE_POWER_S4, NPCID_PET_GREEN, NPCID_KEY, NPCID_GRN_VINE_TOP_S4};
         UpdateNPCGrid(mode, 40, 220, p7_smw, sizeof(p7_smw)/sizeof(int), 10);
 
         SuperPrintR(mode, "1", 3, 40 + 10, 260);
-        static const int p7_smb1[] = {NPCID_COIN_SMB, NPCID_SHROOM_SMB, NPCID_LIFE_SMB, NPCID_FIREFLOWER_SMB, NPCID_PSHROOM};
+        static const int p7_smb1[] = {NPCID_COIN_S1, NPCID_POWER_S1, NPCID_LIFE_S1, NPCID_FIRE_POWER_S1, NPCID_POISON};
         UpdateNPCGrid(mode, 40, 280, p7_smb1, sizeof(p7_smb1)/sizeof(int), 5);
 
         SuperPrintR(mode, "2", 3, 40 + 10, 320);
-        static const int p7_smb2[] = {NPCID_COIN_SMB2, NPCID_SHROOM_SMB2, NPCID_BOMB, NPCID_POW, NPCID_TIMER_SMB2};
+        static const int p7_smb2[] = {NPCID_COIN_S2, NPCID_POWER_S2, NPCID_BOMB, NPCID_EARTHQUAKE_BLOCK, NPCID_TIMER_S2};
         UpdateNPCGrid(mode, 40, 340, p7_smb2, sizeof(p7_smb2)/sizeof(int), 5);
 
         SuperPrintR(mode, "*", 3, 40 + 10, 380);
-        static const int p7_misc[] = {NPCID_RING_MISC, NPCID_HEART, NPCID_FAIRY_PENDANT, NPCID_GRNRUPEE, NPCID_BLURUPEE, NPCID_REDRUPEE};
+        static const int p7_misc[] = {NPCID_RING, NPCID_POWER_S5, NPCID_FLY_POWER, NPCID_GEM_1, NPCID_GEM_5, NPCID_GEM_20};
         UpdateNPCGrid(mode, 40, 400, p7_misc, sizeof(p7_misc)/sizeof(int), 10);
     }
 }
@@ -1943,6 +1943,9 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
 
         editorWaitForFade();
 
+        // force reconnect on leveltest start
+        Controls::ClearInputMethods();
+
         HasCursor = false;
         zTestLevel(this->test_magic_hand);
     }
@@ -1986,7 +1989,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     if(testPlayer[m_special_subpage].State == 0)
         testPlayer[m_special_subpage].State = 2;
 
-    constexpr int NPC_for_state[] = {0, NPCID_SHROOM_SMB3, NPCID_FIREFLOWER_SMB3, NPCID_LEAF, NPCID_TANOOKISUIT, NPCID_HAMMERSUIT, NPCID_ICEFLOWER_SMB3};
+    constexpr int NPC_for_state[] = {0, NPCID_POWER_S3, NPCID_FIRE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPC_HEAVY_POWER, NPCID_ICE_POWER_S3};
     for(int state = 1; state <= 7; state++)
     {
         bool pActive = testPlayer[m_special_subpage].State == state;
@@ -2004,7 +2007,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
 
     SuperPrintR(mode, g_editorStrings.testBoot, 3, e_ScreenW / 2 + 10, 354);
 
-    constexpr int NPC_for_boot[] = {NPCID_GRNBOOT, NPCID_REDBOOT, NPCID_BLUBOOT};
+    constexpr int NPC_for_boot[] = {NPCID_GRN_BOOT, NPCID_RED_BOOT, NPCID_BLU_BOOT};
     for(int boot = 1; boot <= 3; boot++)
     {
         bool pActive = testPlayer[m_special_subpage].Mount == 1 && testPlayer[m_special_subpage].MountType == boot;
@@ -2026,7 +2029,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
 
     SuperPrintR(mode, g_editorStrings.testPet, 3, e_ScreenW / 2 + 10, 394);
 
-    constexpr int NPC_for_yoshi[] = {NPCID_YOSHI_GREEN, NPCID_YOSHI_BLUE, NPCID_YOSHI_YELLOW, NPCID_YOSHI_RED, NPCID_YOSHI_BLACK, NPCID_YOSHI_PURPLE, NPCID_YOSHI_PINK, NPCID_YOSHI_CYAN};
+    constexpr int NPC_for_yoshi[] = {NPCID_PET_GREEN, NPCID_PET_BLUE, NPCID_PET_YELLOW, NPCID_PET_RED, NPCID_PET_BLACK, NPCID_PET_PURPLE, NPCID_PET_PINK, NPCID_PET_CYAN};
     for(int yoshi = 1; yoshi <= 8; yoshi++)
     {
         bool pActive = testPlayer[m_special_subpage].Mount == 3 && testPlayer[m_special_subpage].MountType == yoshi;
@@ -3021,7 +3024,7 @@ void EditorScreen::UpdateBlockScreen(CallMode mode)
                                      120,
                                      FontManager::fontIdFromSmbxFont(3));
     }
-    if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + 4, GFXNPC[NPCID_PSWITCH_SMW], MagicBlock::enabled, 0, 0, 32, 32))
+    if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + 4, GFXNPC[NPCID_COIN_SWITCH], MagicBlock::enabled, 0, 0, 32, 32))
         MagicBlock::enabled = !MagicBlock::enabled;
 
     // Resizing
@@ -3188,7 +3191,7 @@ void EditorScreen::UpdateBGOScreen(CallMode mode)
                                      120,
                                      FontManager::fontIdFromSmbxFont(3));
     }
-    if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + 4, GFXNPC[NPCID_PSWITCH_SMW], MagicBlock::enabled, 0, 0, 32, 32))
+    if(UpdateButton(mode, e_ScreenW - 160 + 4, 40 + 4, GFXNPC[NPCID_COIN_SWITCH], MagicBlock::enabled, 0, 0, 32, 32))
         MagicBlock::enabled = !MagicBlock::enabled;
 
     // Layers
@@ -3442,7 +3445,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
         if(UpdateButton(mode, 300 + 4, 180 + 4, GFXBackgroundBMP[61], EditorCursor.Warp.Effect == 0, 0, 0, 32, 32))
             EditorCursor.Warp.Effect = 0;
 
-        if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, 340 + 4, 180 + 4, GFXNPC[NPCID_RINKA], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
+        if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, 340 + 4, 180 + 4, GFXNPC[NPC_HOMING_BALL], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
             EditorCursor.Warp.Effect = 3;
 
         // fade effect
@@ -3611,7 +3614,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
                     EditorCursor.Warp.noEntranceScene = !EditorCursor.Warp.noEntranceScene;
                 // display the option to show/hide the level star count
                 SuperPrintRightR(mode, g_editorStrings.warpShowStarCount, 3, 320, 454);
-                if(UpdateButton(mode, 320 + 4, 440 + 4, GFXNPC[NPCID_STAR_SMB3], !EditorCursor.Warp.noPrintStars, 0, 0, 32, 32))
+                if(UpdateButton(mode, 320 + 4, 440 + 4, GFXNPC[NPCID_STAR_EXIT], !EditorCursor.Warp.noPrintStars, 0, 0, 32, 32))
                     EditorCursor.Warp.noPrintStars = !EditorCursor.Warp.noPrintStars;
             }
         }
@@ -4215,7 +4218,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
 
     SuperPrintR(mode, g_editorStrings.fileLabelFormat, 3, 150, 90);
 
-    if(UpdateButton(mode, 320 + 4, 80 + 4, GFXNPC[NPCID_SHROOM_SMB3], FileFormat == FileFormats::LVL_SMBX64, 0, 0, 32, 32, g_editorStrings.fileFormatLegacy.c_str()) && FileFormat != FileFormats::LVL_SMBX64)
+    if(UpdateButton(mode, 320 + 4, 80 + 4, GFXNPC[NPCID_POWER_S3], FileFormat == FileFormats::LVL_SMBX64, 0, 0, 32, 32, g_editorStrings.fileFormatLegacy.c_str()) && FileFormat != FileFormats::LVL_SMBX64)
     {
         m_special_page = SPECIAL_PAGE_FILE_CONVERT;
         m_special_subpage = FileFormats::LVL_SMBX64;
