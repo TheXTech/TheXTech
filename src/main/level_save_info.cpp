@@ -29,69 +29,34 @@
 
 #include "globals.h"
 
-static bool s_serializeSaveInfo(std::string& s, const LevelSaveInfo_t& info)
+static bool s_exportSingleSaveInfo(saveLevelInfo& s, const LevelSaveInfo_t& info)
 {
     if(!info.inited())
         return false;
 
-    char medals_got[9];
-    char medals_best[9];
+    s.max_stars = info.max_stars;
+    s.max_medals = info.max_medals;
 
-    for(int i = 0; i < info.max_medals && i < 8; ++i)
+    int size = SDL_min(info.max_medals, 8);
+
+    s.medals_got.resize(size);
+    s.medals_best.resize(size);
+
+    for(int i = 0; i < size; ++i)
     {
-        medals_got[i]  = (info.medals_got  & (1 << i)) ? '+' : '.';
-        medals_best[i] = (info.medals_best & (1 << i)) ? '+' : '.';
+        s.medals_got[i]  = (info.medals_got  & (1 << i));
+        s.medals_best[i] = (info.medals_best & (1 << i));
     }
-
-    for(int i = info.max_medals; i < 8; ++i)
-    {
-        medals_got[i] = ' ';
-        medals_best[i] = ' ';
-    }
-
-    medals_got[8] = '\0';
-    medals_best[8] = '\0';
-
-    unsigned max_stars = info.max_stars;
-    unsigned max_medals = info.max_medals;
-
-    if(max_medals > 8)
-        max_medals = 8;
-
-    s = fmt::sprintf_ne("V:1;Sm:%3u;Mm:%1u;Mg:%s;Mb:%s;", (unsigned)max_stars, (unsigned)max_medals, medals_got, medals_best);
 
     return true;
 }
 
-static bool s_parseSaveInfo(LevelSaveInfo_t& info, const std::string& s)
+static bool s_importSingleSaveInfo(LevelSaveInfo_t& info, const saveLevelInfo& s)
 {
     info = LevelSaveInfo_t();
 
-    unsigned version = 0;
-    int end_pos = 0;
-
-    if(sscanf(s.c_str(), "V:%2u;%n", &version, &end_pos) != 1 || end_pos < 1)
-    {
-        pLogWarning("Invalid level save info string [%s]", s.c_str());
-        return false;
-    }
-
-    if(version != 1)
-    {
-        pLogWarning("Supported level save info string version %u, full string [%s]", version, s.c_str());
-        return false;
-    }
-
-    unsigned max_stars = 0;
-    unsigned max_medals = 0;
-    char medals_got[9];
-    char medals_best[9];
-
-    if(sscanf(s.c_str(), "V:%2u;Sm:%3u;Mm:%1u;Mg:%8[+. ];Mb:%8[+. ];%n", &version, &max_stars, &max_medals, medals_got, medals_best, &end_pos) != 5 || end_pos != (int)s.size())
-    {
-        pLogWarning("Invalid level save info string [%s]", s.c_str());
-        return false;
-    }
+    unsigned max_stars = s.max_stars;
+    unsigned max_medals = s.max_medals;
 
     // validate limits
     if(max_stars > 255)
@@ -104,20 +69,20 @@ static bool s_parseSaveInfo(LevelSaveInfo_t& info, const std::string& s)
     info.max_stars = max_stars;
     info.max_medals = max_medals;
 
-    // parse strings
+    // load medals
     for(unsigned i = 0; i < max_medals; ++i)
     {
-        if(medals_got[i] == '+')
+        if(s.medals_got[i])
             info.medals_got |= (1 << i);
 
-        if(medals_best[i] == '+')
+        if(s.medals_best[i])
             info.medals_best |= (1 << i);
     }
 
     return true;
 }
 
-void ImportLevelSaveInfo(const saveUserData::DataSection& s)
+void ImportLevelSaveInfo(const GamesaveData& s)
 {
     for(int A = 1; A <= numWorldLevels; A++)
     {
@@ -129,14 +94,14 @@ void ImportLevelSaveInfo(const saveUserData::DataSection& s)
 
     LevelWarpSaveEntries.clear();
 
-    for(const saveUserData::DataEntry& e : s.data)
+    for(const saveLevelInfo& e : s.levelInfo)
     {
         LevelSaveInfo_t info;
 
-        if(!s_parseSaveInfo(info, e.value))
+        if(!s_importSingleSaveInfo(info, e))
             continue;
 
-        D_pLogDebug("Loaded save info %d %d %d %d for level [%s]", (int)info.max_stars, (int)info.max_medals, (int)info.medals_got, (int)info.medals_best, e.key.c_str());
+        D_pLogDebug("Loaded save info %d %d %d %d for level [%s]", (int)info.max_stars, (int)info.max_medals, (int)info.medals_got, (int)info.medals_best, e.level_filename.c_str());
 
         // see if it applies to a world level
         bool worldLevelHit = false;
@@ -148,7 +113,7 @@ void ImportLevelSaveInfo(const saveUserData::DataSection& s)
             if(l.save_info.inited())
                 continue;
 
-            if(l.FileName == e.key)
+            if(l.FileName == e.level_filename)
             {
                 l.save_info = info;
                 worldLevelHit = true;
@@ -159,25 +124,31 @@ void ImportLevelSaveInfo(const saveUserData::DataSection& s)
         if(!worldLevelHit)
         {
             // add a new level warp save entry
-            LevelWarpSaveEntries.push_back(LevelWarpSaveEntry_t{e.key, info});
+            LevelWarpSaveEntries.push_back(LevelWarpSaveEntry_t{e.level_filename, info});
         }
     }
 }
 
-void ExportLevelSaveInfo(saveUserData::DataSection& s)
+void ExportLevelSaveInfo(GamesaveData& s)
 {
-    std::string buf;
+    saveLevelInfo tempInfo;
 
     for(int A = 1; A <= numWorldLevels; A++)
     {
-        if(s_serializeSaveInfo(buf, WorldLevel[A].save_info))
-            s.data.push_back({WorldLevel[A].FileName, buf});
+        if(s_exportSingleSaveInfo(tempInfo, WorldLevel[A].save_info))
+        {
+            tempInfo.level_filename = WorldLevel[A].FileName;
+            s.levelInfo.push_back(tempInfo);
+        }
     }
 
     for(const auto& e : LevelWarpSaveEntries)
     {
-        if(s_serializeSaveInfo(buf, e.save_info))
-            s.data.push_back({e.levelPath, buf});
+        if(s_exportSingleSaveInfo(tempInfo, e.save_info))
+        {
+            tempInfo.level_filename = e.levelPath;
+            s.levelInfo.push_back(tempInfo);
+        }
     }
 }
 

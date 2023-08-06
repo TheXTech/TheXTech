@@ -288,13 +288,7 @@ void SaveGame()
         sav.userData.store.push_back(gLunaVarBank);
 #endif
 
-    saveUserData::DataSection levelSaveInfo;
-
-    ExportLevelSaveInfo(levelSaveInfo);
-    levelSaveInfo.location = saveUserData::DATA_GLOBAL;
-    levelSaveInfo.name = "_TheXTech_LevelSaveInfo";
-
-    sav.userData.store.push_back(levelSaveInfo);
+    ExportLevelSaveInfo(sav);
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
 
@@ -437,14 +431,7 @@ void LoadGame()
     gSavedVarBank.TryLoadWorldVars();
 #endif
 
-    for(const saveUserData::DataSection& s : sav.userData.store)
-    {
-        if(s.location == saveUserData::DATA_GLOBAL && s.name == "_TheXTech_LevelSaveInfo")
-        {
-            ImportLevelSaveInfo(s);
-            break;
-        }
-    }
+    ImportLevelSaveInfo(sav);
 }
 
 void ClearGame(bool punnish)
