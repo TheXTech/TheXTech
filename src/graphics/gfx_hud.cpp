@@ -562,7 +562,7 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
         else
             label_1 = fmt::format_ne("{0}", best_count);
 
-        total_len += coin_width + 8 + GFX.Interface[5].w + 4;
+        total_len += coin_width + 8 + GFX.Interface[1].w + 4;
         pix_len_1 = SuperTextPixLen(label_1, 3);
         total_len += pix_len_1;
 
@@ -578,7 +578,7 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
         else
             label_2 = fmt::format_ne("{0}", got_count);
 
-        total_len += coin_width + 8 + GFX.Interface[5].w + 4;
+        total_len += coin_width + 8 + GFX.Interface[1].w + 4;
         pix_len_2 = SuperTextPixLen(label_2, 3);
         total_len += pix_len_2;
     }
@@ -592,7 +592,7 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
     {
         s_DrawMedal(X, Y, coin_width, coin_height, MedalDrawLevel::Best);
         X += coin_width + 8;
-        XRender::renderTexture(X, Y, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        XRender::renderTexture(X, Y, GFX.Interface[1]);
         X += GFX.Interface[1].w + 4;
         SuperPrint(label_1, 3, X, Y);
         X += pix_len_1 + 8;
@@ -602,7 +602,7 @@ void DrawMedals(int X, int Y, bool center, uint8_t max, uint8_t prev, uint8_t ck
     {
         s_DrawMedal(X, Y, coin_width, coin_height, MedalDrawLevel::Got);
         X += coin_width + 8;
-        XRender::renderTexture(X, Y, GFX.Interface[1].w, GFX.Interface[1].h, GFX.Interface[1], 0, 0);
+        XRender::renderTexture(X, Y, GFX.Interface[1]);
         X += GFX.Interface[1].w + 4;
         SuperPrint(label_2, 3, X, Y);
     }
