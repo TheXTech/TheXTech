@@ -288,7 +288,7 @@ void SaveGame()
         sav.userData.store.push_back(gLunaVarBank);
 #endif
 
-    ExportLevelSaveInfo(sav);
+    // ExportLevelSaveInfo(sav);
 
     FileFormats::WriteExtendedSaveFileF(savePath, sav);
 
