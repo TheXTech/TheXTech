@@ -1450,7 +1450,7 @@ void UpdateLayers()
                 {
                     for(int B : Layer[A].NPCs)
                     {
-                        if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPC_HOMING_BALL_GEN || NPCIsAVine[NPC[B].Type])
+                        if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_HOMING_BALL_GEN || NPCIsAVine[NPC[B].Type])
                         {
                             NPC[B].Location.SpeedX = 0;
                             NPC[B].Location.SpeedY = 0;
@@ -1556,10 +1556,10 @@ void UpdateLayers()
                            NPC[B].Type == NPCID_BOTTOM_PLANT || NPC[B].Type == NPCID_SIDE_PLANT || NPC[B].Type == NPCID_FALL_BLOCK_RED ||
                            NPC[B].Type == NPCID_PLANT_S1 || NPC[B].Type == NPCID_BIG_PLANT || NPCIsAVine[NPC[B].Type] ||
                            NPC[B].Type == NPCID_CHECKPOINT || NPC[B].Type == NPCID_GOALTAPE || NPC[B].Type == NPCID_ITEM_BURIED ||
-                           NPC[B].Type == NPC_HOMING_BALL_GEN || NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_LONG_PLANT_DOWN ||
+                           NPC[B].Type == NPCID_HOMING_BALL_GEN || NPC[B].Type == NPCID_LONG_PLANT_UP || NPC[B].Type == NPCID_LONG_PLANT_DOWN ||
                            NPC[B].Type == NPCID_FIRE_PLANT)
                         {
-                            if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPC_HOMING_BALL_GEN)
+                            if(NPC[B].Type == NPCID_ITEM_BURIED || NPC[B].Type == NPCID_HOMING_BALL_GEN)
                             {
                                 NPC[B].Location.SpeedX = double(Layer[A].SpeedX);
                                 NPC[B].Location.SpeedY = double(Layer[A].SpeedY);

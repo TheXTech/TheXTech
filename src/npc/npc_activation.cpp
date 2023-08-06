@@ -72,7 +72,7 @@ static bool s_NPC_MustBeCanonical_internal(const NPC_t& n)
         || n.Type == NPCID_CANNONENEMY
         || n.Type == NPCID_STATUE_S3
         || n.Type == NPCID_STATUE_S4
-        || n.Type == NPC_HOMING_BALL_GEN
+        || n.Type == NPCID_HOMING_BALL_GEN
         || n.Type == NPCID_LAVA_MONSTER
         || n.Type == NPCID_SPIKY_THROWER
         || n.Type == NPCID_ITEM_THROWER
@@ -110,7 +110,7 @@ bool NPC_MustRenderInactive(const NPC_t& n)
         || n.Type == NPCID_CONVEYOR
         || n.Type == NPCID_STONE_S3
         || n.Type == NPCID_STONE_S4
-        || n.Type == NPC_HOMING_BALL_GEN
+        || n.Type == NPCID_HOMING_BALL_GEN
         || n.Type == NPCID_ITEMGOAL
         || n.Type == NPCID_CANNONENEMY
         || n.Type == NPCID_STATUE_S3

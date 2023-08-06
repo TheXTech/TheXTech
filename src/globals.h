@@ -1152,6 +1152,9 @@ extern int numLocked;
 extern bool resChanged;
 
 
+// NEW: start warp for a test level
+extern int16_t testStartWarp;
+
 // These have been partially moved into the Controls namespace
 // and partially moved to g_pollingInput (declared and defined in main/menu_controls.*)
 

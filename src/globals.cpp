@@ -61,6 +61,8 @@ bool ClearBuffer = false;
 int numLocked = 0;
 bool resChanged = false;
 
+int16_t testStartWarp = 0;
+
 // moved into game_loop.cpp
 // PauseCode GamePaused = PauseCode::None;
 

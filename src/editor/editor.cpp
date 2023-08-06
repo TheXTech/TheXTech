@@ -3003,7 +3003,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     EndLevel = false;
     editorScreen.active = false;
     ReturnWarp = 0;
-    StartWarp = 0;
+    StartWarp = testStartWarp;
 
     optCursor.current = OptCursor_t::LVL_SELECT;
     EditorCursor.Mode = OptCursor_t::LVL_SELECT;

@@ -3285,7 +3285,7 @@ void UpdatePlayer()
                             {
                                 if(CheckCollision(Player[A].Location, NPC[B].Location))
                                 {
-                                    if((NPC[B].Type == NPCID_METALBARREL || NPC[B].Type == NPCID_CANNONENEMY || NPC[B].Type == NPC_HPIPE_SHORT || NPC[B].Type == NPC_HPIPE_LONG || NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG) && NPC[B].Projectile)
+                                    if((NPC[B].Type == NPCID_METALBARREL || NPC[B].Type == NPCID_CANNONENEMY || NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_HPIPE_LONG || NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG) && NPC[B].Projectile)
                                         PlayerHurt(A);
                                     if((Player[A].Mount == 1 || Player[A].Mount == 3 || Player[A].SpinJump || (Player[A].ShellSurf && NPCIsAShell[NPC[B].Type]) || (Player[A].Stoned && !NPCCanWalkOn[NPC[B].Type])) && !NPCMovesPlayer[NPC[B].Type])
                                         HitSpot = BootCollision(Player[A].Location, NPC[B].Location, NPCCanWalkOn[NPC[B].Type]); // find the hitspot for normal mario
@@ -3330,7 +3330,7 @@ void UpdatePlayer()
                                                 }
                                             }
                                         }
-                                        if((NPC[B].Type == NPCID_TOOTHY || NPC[B].Type == NPC_HEAVY_THROWN) && BattleMode && NPC[B].CantHurtPlayer != A)
+                                        if((NPC[B].Type == NPCID_TOOTHY || NPC[B].Type == NPCID_HEAVY_THROWN) && BattleMode && NPC[B].CantHurtPlayer != A)
                                             PlayerHurt(A);
                                         if((NPC[B].Type == NPCID_ICE_CUBE || NPC[B].Type == NPCID_ITEM_POD) && BattleMode &&
                                             NPC[B].CantHurtPlayer != A && NPC[B].Projectile != 0 && NPC[B].BattleOwner != A)
@@ -3375,7 +3375,7 @@ void UpdatePlayer()
 
                                         if(BattleMode && NPC[B].BattleOwner != A && NPC[B].Projectile != 0 && NPC[B].CantHurtPlayer != A)
                                         {
-                                            if(NPC[B].Type == NPCID_BOMB || NPC[B].Type == NPCID_LIT_BOMB_S3 || NPC[B].Type == NPCID_CARRY_BLOCK_A || NPC[B].Type == NPCID_CARRY_BLOCK_B || NPC[B].Type == NPCID_CARRY_BLOCK_C || NPC[B].Type == NPCID_CARRY_BLOCK_D || NPC[B].Type == NPC_HIT_CARRY_FODDER || ((NPCIsAShell[NPC[B].Type] || NPC[B].Type == NPCID_SLIDE_BLOCK) && NPC[B].Location.SpeedX == 0))
+                                            if(NPC[B].Type == NPCID_BOMB || NPC[B].Type == NPCID_LIT_BOMB_S3 || NPC[B].Type == NPCID_CARRY_BLOCK_A || NPC[B].Type == NPCID_CARRY_BLOCK_B || NPC[B].Type == NPCID_CARRY_BLOCK_C || NPC[B].Type == NPCID_CARRY_BLOCK_D || NPC[B].Type == NPCID_HIT_CARRY_FODDER || ((NPCIsAShell[NPC[B].Type] || NPC[B].Type == NPCID_SLIDE_BLOCK) && NPC[B].Location.SpeedX == 0))
                                             {
                                                 if(NPCIsAShell[NPC[B].Type] && HitSpot == 1 && Player[A].SpinJump)
                                                 {
@@ -3400,7 +3400,7 @@ void UpdatePlayer()
 
                                     if(GameOutro)
                                         HitSpot = 0;
-                                    if(NPC[B].Type == NPC_HEAVY_THROWN && NPC[B].CantHurt > 0)
+                                    if(NPC[B].Type == NPCID_HEAVY_THROWN && NPC[B].CantHurt > 0)
                                         HitSpot = 0;
                                     if(NPC[B].Type == NPCID_ITEM_POD && HitSpot == 1)
                                         HitSpot = 0;
@@ -3805,7 +3805,7 @@ void UpdatePlayer()
                                                             PlayerHurt(A);
                                                     }
                                                 }
-                                                else if((NPC[B].Type == NPCID_LIT_BOMB_S3) || NPC[B].Type == NPC_HIT_CARRY_FODDER)
+                                                else if((NPC[B].Type == NPCID_LIT_BOMB_S3) || NPC[B].Type == NPCID_HIT_CARRY_FODDER)
                                                     NPCHit(B, 1, A); // NPC 'B' was jumped on '1' by player 'A'
                                                 else if(NPC[B].Killed != 10 && !NPCIsBoot[NPC[B].Type] && !NPCIsYoshi[NPC[B].Type] && !(NPCIsAShell[NPC[B].Type] && NPC[B].CantHurtPlayer == A)) // Bounce off everything except Bonus and Piranha Plants
                                                 {
@@ -3939,12 +3939,12 @@ void UpdatePlayer()
                                             TouchBonus(A, B);
                                         else // Everything else
                                         {
-                                            if((NPC[B].Type == NPCID_LIT_BOMB_S3 || NPC[B].Type == NPC_HIT_CARRY_FODDER) && NPC[B].HoldingPlayer != A) // kick the bob-om
+                                            if((NPC[B].Type == NPCID_LIT_BOMB_S3 || NPC[B].Type == NPCID_HIT_CARRY_FODDER) && NPC[B].HoldingPlayer != A) // kick the bob-om
                                             {
                                                 if(NPC[B].TailCD == 0)
                                                 {
                                                     NPC[B].TailCD = 12;
-                                                    if(NPC[B].Type != NPC_HIT_CARRY_FODDER && NPC[B].Type != NPCID_LIT_BOMB_S3)
+                                                    if(NPC[B].Type != NPCID_HIT_CARRY_FODDER && NPC[B].Type != NPCID_LIT_BOMB_S3)
                                                         NewEffect(EFFID_WHACK, newLoc((Player[A].Location.X + NPC[B].Location.X + (Player[A].Location.Width + NPC[B].Location.Width) / 2.0) / 2, (Player[A].Location.Y + NPC[B].Location.Y + (Player[A].Location.Height + NPC[B].Location.Height) / 2.0) / 2));
                                                     NPCHit(B, 1, A);
                                                 }
@@ -4014,7 +4014,7 @@ void UpdatePlayer()
                                                     Player[A].Jump = 0;
                                                     if(Player[A].Mount == 2)
                                                         Player[A].Location.SpeedY += 2;
-                                                    if(NPC[B].Type == NPCID_METALBARREL || NPC[B].Type == NPCID_CANNONENEMY || NPC[B].Type == NPC_HPIPE_SHORT || NPC[B].Type == NPC_HPIPE_LONG || NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG || (NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M))
+                                                    if(NPC[B].Type == NPCID_METALBARREL || NPC[B].Type == NPCID_CANNONENEMY || NPC[B].Type == NPCID_HPIPE_SHORT || NPC[B].Type == NPCID_HPIPE_LONG || NPC[B].Type == NPCID_VPIPE_SHORT || NPC[B].Type == NPCID_VPIPE_LONG || (NPC[B].Type >= NPCID_TANK_TREADS && NPC[B].Type <= NPCID_SLANT_WOOD_M))
                                                     {
                                                         if(NPC[B].Location.SpeedY >= Physics.NPCGravity * 20)
                                                             PlayerHurt(A);
