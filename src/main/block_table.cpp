@@ -318,20 +318,20 @@ TreeResult_Sentinel<BlockRef_t> treeBlockQuery(const Location_t &loc,
 
 static void s_NPCsToTempBlocks(std::vector<BaseRef_t>& out, size_t begin)
 {
-    for(auto it = out.begin() + begin; it != out.end();)
+    for(size_t i = begin; i != out.size();)
     {
         // some NPCs' tempBlocks are at a different place than their location,
         // and those tempBlocks get added to the dedicated tree.
 
-        const NPC_t& n = (NPCRef_t) *it;
+        const NPC_t& n = (NPCRef_t) out[i];
         if(!n.tempBlockInTree && n.tempBlock != 0 && n.tempBlock <= numBlock)
         {
-            *it = n.tempBlock;
-            ++it;
+            out[i] = n.tempBlock;
+            ++i;
         }
         else
         {
-            *it = *(out.end() - 1);
+            out[i] = out[out.size() - 1];
             out.resize(out.size() - 1);
         }
     }
