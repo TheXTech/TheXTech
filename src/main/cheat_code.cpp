@@ -1398,7 +1398,7 @@ static void hammerInMyPants()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPC_HEAVY_THROWER;
+            NPC[numNPCs].Type = NPCID_HEAVY_THROWER;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;

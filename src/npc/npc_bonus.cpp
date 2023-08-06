@@ -183,7 +183,7 @@ void TouchBonus(int A, int B)
         //            Netplay::sendData "1k" + std::to_string(A) + "|" + std::to_string(B) + "|" + NPC[B].Type + LB;
         if(Player[A].Character == 3 || Player[A].Character == 4 || Player[A].Character == 5) // for link give hearts
         {
-            if(NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPC_HEAVY_POWER)
+            if(NPC[B].Type == NPCID_LEAF_POWER || NPC[B].Type == NPCID_STATUE_POWER || NPC[B].Type == NPCID_HEAVY_POWER)
             {
                 Player[A].Hearts += 1;
                 if(Player[A].Hearts > 3)
@@ -478,7 +478,7 @@ void TouchBonus(int A, int B)
             if(NPC[B].Effect != 2)
                 s_PowerupScore(B);
         }
-        else if(NPC[B].Type == NPC_HEAVY_POWER) // Bonus is a Hammer Suit
+        else if(NPC[B].Type == NPCID_HEAVY_POWER) // Bonus is a Hammer Suit
         {
             UpdatePlayerBonus(A, NPC[B].Type);
             Player[A].StateNPC = NPC[B].Type;

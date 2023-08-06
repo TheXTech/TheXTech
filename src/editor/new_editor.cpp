@@ -1029,7 +1029,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             EditorCursor.Block.Special = 0;
 
         SuperPrintR(mode, "3", 3, 40 + 10, 140);
-        static const int p7_common[] = {NPCID_COIN_S3, NPCID_POWER_S3, NPCID_LIFE_S3, NPCID_FIRE_POWER_S3, NPCID_ICE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPC_HEAVY_POWER, NPCID_GRN_VINE_TOP_S3, NPCID_RANDOM_POWER};
+        static const int p7_common[] = {NPCID_COIN_S3, NPCID_POWER_S3, NPCID_LIFE_S3, NPCID_FIRE_POWER_S3, NPCID_ICE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPCID_HEAVY_POWER, NPCID_GRN_VINE_TOP_S3, NPCID_RANDOM_POWER};
         UpdateNPCGrid(mode, 40, 160, p7_common, sizeof(p7_common)/sizeof(int), 10);
 
         SuperPrintR(mode, "4", 3, 40 + 10, 200);
@@ -1989,7 +1989,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     if(testPlayer[m_special_subpage].State == 0)
         testPlayer[m_special_subpage].State = 2;
 
-    constexpr int NPC_for_state[] = {0, NPCID_POWER_S3, NPCID_FIRE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPC_HEAVY_POWER, NPCID_ICE_POWER_S3};
+    constexpr int NPC_for_state[] = {0, NPCID_POWER_S3, NPCID_FIRE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPCID_HEAVY_POWER, NPCID_ICE_POWER_S3};
     for(int state = 1; state <= 7; state++)
     {
         bool pActive = testPlayer[m_special_subpage].State == state;
@@ -3445,7 +3445,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
         if(UpdateButton(mode, 300 + 4, 180 + 4, GFXBackgroundBMP[61], EditorCursor.Warp.Effect == 0, 0, 0, 32, 32))
             EditorCursor.Warp.Effect = 0;
 
-        if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, 340 + 4, 180 + 4, GFXNPC[NPC_HOMING_BALL], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
+        if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, 340 + 4, 180 + 4, GFXNPC[NPCID_HOMING_BALL], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
             EditorCursor.Warp.Effect = 3;
 
         // fade effect

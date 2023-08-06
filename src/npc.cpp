@@ -318,7 +318,7 @@ void TurnNPCsIntoCoins()
                    NPC[A].Type != NPCID_ITEM_BURIED && NPC[A].Type != NPCID_PLR_HEAVY && !NPCIsAVine[NPC[A].Type] &&
                    NPC[A].Type != NPCID_VEHICLE && NPC[A].Type != NPCID_YEL_PLATFORM && NPC[A].Type != NPCID_BLU_PLATFORM &&
                    NPC[A].Type != NPCID_GRN_PLATFORM && NPC[A].Type != NPCID_RED_PLATFORM && NPC[A].Type != NPCID_PLATFORM_S3 &&
-                   !(NPC[A].Projectile && NPC[A].Type == NPC_HEAVY_THROWN) &&
+                   !(NPC[A].Projectile && NPC[A].Type == NPCID_HEAVY_THROWN) &&
                    !(NPC[A].Projectile && NPC[A].Type == NPCID_BULLET) &&
                    NPC[A].Type != NPCID_CHAR3_HEAVY && NPC[A].Type != NPCID_CHAR4_HEAVY && NPC[A].Type != NPCID_SWORDBEAM &&
                    NPC[A].Type != NPCID_CONVEYOR && NPC[A].Type != NPCID_METALBARREL &&
@@ -2012,7 +2012,7 @@ void NPCSpecial(int A)
             // deferring tree update to end of the NPC physics update
         }
     }
-    else if(npc.Type == NPC_HOMING_BALL) // O thing
+    else if(npc.Type == NPCID_HOMING_BALL) // O thing
     {
         if(npc.Special == 0)
         {
@@ -2048,7 +2048,7 @@ void NPCSpecial(int A)
         }
 
     }
-    else if(npc.Type == NPC_HOMING_BALL_GEN) // Metroid O shooter thing
+    else if(npc.Type == NPCID_HOMING_BALL_GEN) // Metroid O shooter thing
     {
         npc.Special += 1 + dRand();
         if(npc.Special >= 200 + dRand() * 200)
@@ -2063,7 +2063,7 @@ void NPCSpecial(int A)
             NPC[numNPCs].Location.Y = npc.Location.Y;
             NPC[numNPCs].Section = npc.Section;
             NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
-            NPC[numNPCs].Type = NPC_HOMING_BALL;
+            NPC[numNPCs].Type = NPCID_HOMING_BALL;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 50;
 
@@ -2809,7 +2809,7 @@ void NPCSpecial(int A)
                 NPC[numNPCs].Location.X = npc.Location.X + npc.Location.Width / 2.0 - 16;
                 NPC[numNPCs].Location.Y = npc.Location.Y - 32;
                 NPC[numNPCs].Direction = npc.Direction;
-                NPC[numNPCs].Type = NPC_HEAVY_THROWN;
+                NPC[numNPCs].Type = NPCID_HEAVY_THROWN;
                 NPC[numNPCs].Active = true;
                 NPC[numNPCs].TimeLeft = 50;
                 NPC[numNPCs].Layer = LAYER_SPAWNED_NPCS;
@@ -3149,8 +3149,8 @@ void SpecialNPC(int A)
     // NPC_t tempNPC;
 
     if(NPC[A].Type == NPCID_VILLAIN_FIRE || NPC[A].Type == NPCID_QUAD_BALL || NPC[A].Type == NPCID_STATUE_FIRE ||
-       NPC[A].Type == NPCID_SPIT_GUY_BALL || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPC_HEAVY_THROWN ||
-       NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPC_HOMING_BALL ||
+       NPC[A].Type == NPCID_SPIT_GUY_BALL || NPC[A].Type == NPCID_PLANT_FIRE || NPC[A].Type == NPCID_HEAVY_THROWN ||
+       NPC[A].Type == NPCID_SICK_BOSS_BALL || NPC[A].Type == NPCID_HOMING_BALL ||
        (BattleMode && (NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_HEAVY || NPC[A].Type == NPCID_PLR_ICEBALL))) // Link shield block
     {
         for(B = 1; B <= numPlayers; B++)
@@ -3189,7 +3189,7 @@ void SpecialNPC(int A)
                         if(NPC[A].Type == NPCID_PLR_FIREBALL || NPC[A].Type == NPCID_PLR_ICEBALL)
                             NPC[A].Killed = 3;
 
-                        if(NPC[A].Type != NPC_HEAVY_THROWN && NPC[A].Type != NPCID_SICK_BOSS_BALL && NPC[A].Type != NPC_HOMING_BALL &&
+                        if(NPC[A].Type != NPCID_HEAVY_THROWN && NPC[A].Type != NPCID_SICK_BOSS_BALL && NPC[A].Type != NPCID_HOMING_BALL &&
                            NPC[A].Type != NPCID_PLR_HEAVY && NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PLR_ICEBALL)
                         {
                             for(int Ci = 1; Ci <= 10; Ci++)
@@ -4538,7 +4538,7 @@ void SpecialNPC(int A)
         }
     }
     // Hammer Bro
-    else if(NPC[A].Type == NPC_HEAVY_THROWER && !NPC[A].Projectile)
+    else if(NPC[A].Type == NPCID_HEAVY_THROWER && !NPC[A].Projectile)
     {
         C = 0;
         for(B = 1; B <= numPlayers; B++)
@@ -4603,7 +4603,7 @@ void SpecialNPC(int A)
             NPC[numNPCs].Location.X = NPC[A].Location.X;
             NPC[numNPCs].Location.Y = NPC[A].Location.Y;
             NPC[numNPCs].Direction = NPC[A].Direction;
-            NPC[numNPCs].Type = NPC_HEAVY_THROWN;
+            NPC[numNPCs].Type = NPCID_HEAVY_THROWN;
             NPC[numNPCs].Section = NPC[A].Section;
             NPC[numNPCs].Active = true;
             NPC[numNPCs].TimeLeft = 50;
@@ -4909,7 +4909,7 @@ void SpecialNPC(int A)
             }
         }
     }
-    else if(NPC[A].Type == NPC_HIT_CARRY_FODDER) // smw goomba
+    else if(NPC[A].Type == NPCID_HIT_CARRY_FODDER) // smw goomba
     {
         NPC[A].Special += 1;
         if(NPC[A].Special >= 400)
@@ -5684,7 +5684,7 @@ int RandomBonus()
     case 3:
         return NPCID_STATUE_POWER;
     case 4:
-        return NPC_HEAVY_POWER;
+        return NPCID_HEAVY_POWER;
     case 5:
         return NPCID_ICE_POWER_S3;
     }
