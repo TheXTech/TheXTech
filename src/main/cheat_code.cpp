@@ -297,7 +297,7 @@ static void wetWater()
 {
     for(int B = 1; B <= numEffects; B++)
     {
-        if(Effect[B].Type == 113)
+        if(Effect[B].Type == EFFID_AIR_BUBBLE)
             Effect[B].Life = 0;
     }
 

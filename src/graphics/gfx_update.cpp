@@ -48,6 +48,7 @@
 
 #include "effect.h"
 #include "npc_id.h"
+#include "eff_id.h"
 
 #include "graphics/gfx_special_frames.h"
 #include "graphics/gfx_keyhole.h"
@@ -1718,10 +1719,10 @@ void UpdateGraphics(bool skipRepaint)
         for(A = 1; A <= numEffects; A++)
         {
             g_stats.checkedEffects++;
-            if(Effect[A].Type == 112 || Effect[A].Type == 54 || Effect[A].Type == 55 ||
-               Effect[A].Type == 59 || Effect[A].Type == 77 || Effect[A].Type == 81 ||
-               Effect[A].Type == 82 || Effect[A].Type == 103 || Effect[A].Type == 104 ||
-               Effect[A].Type == 114 || Effect[A].Type == 123 || Effect[A].Type == 124)
+            if(Effect[A].Type == EFFID_BOSS_FRAGILE_DIE || Effect[A].Type == EFFID_DOOR_S2_OPEN || Effect[A].Type == EFFID_DOOR_DOUBLE_S3_OPEN ||
+               Effect[A].Type == EFFID_DOOR_SIDE_S3_OPEN || Effect[A].Type == EFFID_PLR_FIREBALL_TRAIL || Effect[A].Type == EFFID_COIN_SWITCH_PRESS ||
+               Effect[A].Type == EFFID_SPINBLOCK || Effect[A].Type == EFFID_BIG_DOOR_OPEN || Effect[A].Type == EFFID_LAVA_MONSTER_LOOK ||
+               Effect[A].Type == EFFID_WATER_SPLASH || Effect[A].Type == EFFID_TIME_SWITCH_PRESS || Effect[A].Type == EFFID_TNT_PRESS)
             {
                 g_stats.renderedEffects++;
                 if(vScreenCollision(Z, Effect[A].Location))
@@ -2140,9 +2141,9 @@ void UpdateGraphics(bool skipRepaint)
 //            With Effect(A)
             auto &e = Effect[A];
 //                If .Type <> 112 And .Type <> 54 And .Type <> 55 And .Type <> 59 And .Type <> 77 And .Type <> 81 And .Type <> 82 And .Type <> 103 And .Type <> 104 And .Type <> 114 And .Type <> 123 And .Type <> 124 Then
-            if(e.Type != 112 && e.Type != 54 && e.Type != 55 && e.Type != 59 &&
-               e.Type != 77 && e.Type != 81 && e.Type != 82 && e.Type != 103 &&
-               e.Type != 104 && e.Type != 114 && e.Type != 123 && e.Type != 124)
+            if(e.Type != EFFID_BOSS_FRAGILE_DIE && e.Type != EFFID_DOOR_S2_OPEN && e.Type != EFFID_DOOR_DOUBLE_S3_OPEN && e.Type != EFFID_DOOR_SIDE_S3_OPEN &&
+               e.Type != EFFID_PLR_FIREBALL_TRAIL && e.Type != EFFID_COIN_SWITCH_PRESS && e.Type != EFFID_SPINBLOCK && e.Type != EFFID_BIG_DOOR_OPEN &&
+               e.Type != EFFID_LAVA_MONSTER_LOOK && e.Type != EFFID_WATER_SPLASH && e.Type != EFFID_TIME_SWITCH_PRESS && e.Type != EFFID_TNT_PRESS)
             {
 //                    If vScreenCollision(Z, .Location) Then
                 if(vScreenCollision(Z, e.Location))
