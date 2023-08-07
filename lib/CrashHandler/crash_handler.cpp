@@ -306,6 +306,9 @@ static std::string getCurrentUserName()
     std::string user;
 
 #if defined(_WIN32)
+#   if defined(THEXTECH_WINRT)
+    user = "UnknownUser";  // FIXME: Implement for WinRT
+#   else
     char    userName[256];
     wchar_t userNameW[256];
     DWORD usernameLen = 256;
@@ -314,7 +317,7 @@ static std::string getCurrentUserName()
     size_t nCnt = WideCharToMultiByte(CP_UTF8, 0, userNameW, usernameLen, userName, 256, 0, 0);
     userName[nCnt] = '\0';
     user = std::string(userName);
-
+#   endif
 #else
     struct passwd *pwd = getpwuid(getuid());
     if(pwd == nullptr)
@@ -330,13 +333,16 @@ static std::string getCurrentHomePath()
     std::string homedir;
 
 #ifdef _WIN32
+#   if defined(THEXTECH_WINRT)
+    homedir = "C:\\Users\\<unknown>"; // FIXME: Implement for WinRT
+#   else
     char    homeDir[MAX_PATH * 4];
     wchar_t homeDirW[MAX_PATH];
     SHGetFolderPathW(NULL, CSIDL_PROFILE, NULL, 0, homeDirW);
     size_t nCnt = WideCharToMultiByte(CP_UTF8, 0, homeDirW, -1, homeDir, MAX_PATH * 4, 0, 0);
     homeDir[nCnt] = '\0';
     homedir = std::string(homeDir);
-
+#   endif
 #elif defined(__HAIKU__)
     {
         const char *home = SDL_getenv("HOME");

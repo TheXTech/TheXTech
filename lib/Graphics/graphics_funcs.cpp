@@ -929,7 +929,7 @@ FIBITMAP *GraphicsHelps::fastScaleDownAnd32Bit(FIBITMAP *image, bool do_scale_do
 
 bool GraphicsHelps::setWindowIcon(SDL_Window *window, FIBITMAP *img, int iconSize)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(THEXTECH_WINRT)
     struct SDL_SysWMinfo wmInfo;
     SDL_VERSION(&wmInfo.version)
 

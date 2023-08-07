@@ -369,7 +369,7 @@ void NPCHit(int A, int B, int C)
         NPC[A].Location.SpeedY = -4;
         NPC[A].CantHurtPlayer = C;
         NPC[A].CantHurt = 30;
-        if(NPCIsVeggie[NPC[A].Type] || NPC[A].Type == NPC_HEAVY_THROWER || NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5)
+        if(NPCIsVeggie[NPC[A].Type] || NPC[A].Type == NPCID_HEAVY_THROWER || NPC[A].Type == NPCID_GEM_1 || NPC[A].Type == NPCID_GEM_5)
         {
             if(NPC[A].Type != NPCID_GEM_5)
                 NPC[A].Type = NPCID_GEM_1;
@@ -626,7 +626,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Metroid Cherrio
-    else if(NPC[A].Type == NPC_HOMING_BALL)
+    else if(NPC[A].Type == NPCID_HOMING_BALL)
     {
         if(B == 3 || B == 4 || B == 5 || B == 7 || B == 9 || B == 10)
             NPC[A].Killed = B;
@@ -906,7 +906,7 @@ void NPCHit(int A, int B, int C)
         }
     }
     // SMW Goombas
-    else if(NPC[A].Type == NPCID_CARRY_FODDER || NPC[A].Type == NPC_HIT_CARRY_FODDER ||
+    else if(NPC[A].Type == NPCID_CARRY_FODDER || NPC[A].Type == NPCID_HIT_CARRY_FODDER ||
             NPC[A].Type == NPCID_FLY_CARRY_FODDER || NPC[A].Type == NPCID_BULLY)
     {
         if(B == 1)
@@ -934,9 +934,9 @@ void NPCHit(int A, int B, int C)
             {
                 PlaySound(SFX_ShellHit);
                 NPC[A].Projectile = true;
-                NPC[A].Type = NPC_HIT_CARRY_FODDER;
+                NPC[A].Type = NPCID_HIT_CARRY_FODDER;
             }
-            else if(NPC[A].Type == NPC_HIT_CARRY_FODDER)
+            else if(NPC[A].Type == NPCID_HIT_CARRY_FODDER)
             {
                 if(NPC[A].CantHurt == 0)
                 {
@@ -957,7 +957,7 @@ void NPCHit(int A, int B, int C)
         else if(B == 2)
         {
             if(NPC[A].Type != NPCID_BULLY)
-                NPC[A].Type = NPC_HIT_CARRY_FODDER;
+                NPC[A].Type = NPCID_HIT_CARRY_FODDER;
             NPC[A].Special = 0;
             if(NPC[A].Location.SpeedY > -4)
             {
@@ -973,7 +973,7 @@ void NPCHit(int A, int B, int C)
         else if(B == 7)
         {
             if(NPC[A].Type != NPCID_BULLY)
-                NPC[A].Type = NPC_HIT_CARRY_FODDER;
+                NPC[A].Type = NPCID_HIT_CARRY_FODDER;
             NPC[A].Special = 0;
             PlaySound(SFX_Stomp);
             NPC[A].Location.SpeedY = -5;
@@ -1740,10 +1740,10 @@ void NPCHit(int A, int B, int C)
         }
     }
     // Hammer Bros.
-    else if(NPC[A].Type == NPC_HEAVY_THROWER)
+    else if(NPC[A].Type == NPCID_HEAVY_THROWER)
         NPC[A].Killed = B;
     // Hammer Bros. Hammer
-    else if(NPC[A].Type == NPC_HEAVY_THROWN)
+    else if(NPC[A].Type == NPCID_HEAVY_THROWN)
     {
         if(B == 3)
             NPC[A].Killed = B;
@@ -2151,7 +2151,7 @@ void NPCHit(int A, int B, int C)
         {
             if(NPC[A].Type == NPCID_POWER_S3 || NPC[A].Type == NPCID_SWAP_POWER || NPC[A].Type == NPCID_FIRE_POWER_S3 ||
                NPC[A].Type == NPCID_LIFE_S3 || NPC[A].Type == NPCID_POISON || NPC[A].Type == NPCID_STATUE_POWER ||
-               (NPC[A].Type >= NPCID_FIRE_POWER_S1 && NPC[A].Type <= NPCID_3_LIFE) || NPC[A].Type == NPC_HEAVY_POWER)
+               (NPC[A].Type >= NPCID_FIRE_POWER_S1 && NPC[A].Type <= NPCID_3_LIFE) || NPC[A].Type == NPCID_HEAVY_POWER)
             {
                 NPC[A].Direction = Player[C].Direction;
                 NPC[A].Location.SpeedX = std::abs(NPC[A].Location.SpeedX) * double(NPC[A].Direction);
@@ -2274,7 +2274,7 @@ void NPCHit(int A, int B, int C)
     if(!NPCIsACoin[NPC[A].Type] && B == 3 && C != A &&
        (NPC[A].Killed == B || !fEqual(NPC[A].Damage, oldNPC.Damage)) &&
         NPC[A].Type != NPCID_PLR_FIREBALL && NPC[A].Type != NPCID_PET_FIRE && NPC[A].Type != NPCID_SLIDE_BLOCK &&
-        NPC[A].Type != NPC_HOMING_BALL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
+        NPC[A].Type != NPCID_HOMING_BALL && NPC[A].Type != NPCID_EARTHQUAKE_BLOCK)
     {
         if(NPC[A].Killed == B)
         {

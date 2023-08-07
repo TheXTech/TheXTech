@@ -298,7 +298,7 @@ static void wetWater()
 {
     for(int B = 1; B <= numEffects; B++)
     {
-        if(Effect[B].Type == 113)
+        if(Effect[B].Type == EFFID_AIR_BUBBLE)
             Effect[B].Life = 0;
     }
 
@@ -1399,7 +1399,7 @@ static void hammerInMyPants()
         {
             numNPCs++;
             NPC[numNPCs] = NPC_t();
-            NPC[numNPCs].Type = NPC_HEAVY_THROWER;
+            NPC[numNPCs].Type = NPCID_HEAVY_THROWER;
             NPC[numNPCs].Location.Width = NPCWidth[NPC[numNPCs].Type];
             NPC[numNPCs].Location.Height = NPCHeight[NPC[numNPCs].Type];
             NPC[numNPCs].Location.SpeedX = 0;

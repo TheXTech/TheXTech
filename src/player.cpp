@@ -3528,7 +3528,7 @@ void YoshiEatCode(const int A)
             }
 
             NPC[p.YoshiNPC].Location.Height = NPCHeight[NPC[p.YoshiNPC].Type];
-            if((NPCIsGrabbable[NPC[p.YoshiNPC].Type] || NPCIsAShell[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_SPIT_BOSS_BALL || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3) && (NPC[p.YoshiNPC].Type != NPC_HIT_CARRY_FODDER))
+            if((NPCIsGrabbable[NPC[p.YoshiNPC].Type] || NPCIsAShell[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_SPIT_BOSS_BALL || NPCIsABot[NPC[p.YoshiNPC].Type] || NPC[p.YoshiNPC].Type == NPCID_RAINBOW_SHELL || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2 || NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S3 || NPC[p.YoshiNPC].Type == NPCID_LIT_BOMB_S3) && (NPC[p.YoshiNPC].Type != NPCID_HIT_CARRY_FODDER))
             {
                 if(NPC[p.YoshiNPC].Type == NPCID_WALK_BOMB_S2)
                     NPC[p.YoshiNPC].Special = 450;
@@ -4654,7 +4654,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         {
             if(plr.HoldingNPC > 0)
             {
-                if(NPC[plr.HoldingNPC].Type == NPC_HEAVY_THROWER)
+                if(NPC[plr.HoldingNPC].Type == NPCID_HEAVY_THROWER)
                 {
                     NPCHit(plr.HoldingNPC, 3, plr.HoldingNPC);
                 }
@@ -5266,7 +5266,7 @@ void PlayerGrabCode(const int A, bool DontResetGrabTime)
             NPC[p.HoldingNPC].Location.SpeedX = 0;
             NPC[p.HoldingNPC].Location.SpeedY = 0;
             NPC[p.HoldingNPC].WallDeath = 5;
-            if(NPC[p.HoldingNPC].Type == NPC_HEAVY_THROWER)
+            if(NPC[p.HoldingNPC].Type == NPCID_HEAVY_THROWER)
             {
                 NPCHit(p.HoldingNPC, 3, p.HoldingNPC);
             }

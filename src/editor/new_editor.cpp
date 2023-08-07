@@ -176,6 +176,9 @@ void EditorScreen::ResetCursor()
 
     MagicBlock::enabled = false;
 
+    if(testStartWarp > numWarps && LevelEditor)
+        testStartWarp = numWarps;
+
     FocusNPC();
     FocusBlock();
     FocusBGO();
@@ -1029,7 +1032,7 @@ void EditorScreen::UpdateNPCScreen(CallMode mode)
             EditorCursor.Block.Special = 0;
 
         SuperPrintR(mode, "3", 3, 40 + 10, 140);
-        static const int p7_common[] = {NPCID_COIN_S3, NPCID_POWER_S3, NPCID_LIFE_S3, NPCID_FIRE_POWER_S3, NPCID_ICE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPC_HEAVY_POWER, NPCID_GRN_VINE_TOP_S3, NPCID_RANDOM_POWER};
+        static const int p7_common[] = {NPCID_COIN_S3, NPCID_POWER_S3, NPCID_LIFE_S3, NPCID_FIRE_POWER_S3, NPCID_ICE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPCID_HEAVY_POWER, NPCID_GRN_VINE_TOP_S3, NPCID_RANDOM_POWER};
         UpdateNPCGrid(mode, 40, 160, p7_common, sizeof(p7_common)/sizeof(int), 10);
 
         SuperPrintR(mode, "4", 3, 40 + 10, 200);
@@ -1926,6 +1929,17 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     if(UpdateCheckBox(mode, e_ScreenW - 50 + 4, 80 + 4, this->test_magic_hand))
         this->test_magic_hand = !this->test_magic_hand;
 
+    if(testStartWarp == 0)
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.warpTo, g_editorStrings.levelStartPos), 3, 46, 94);
+    else
+        SuperPrintR(mode, fmt::format_ne(g_editorStrings.warpTo, fmt::format_ne(g_editorStrings.phraseWarpIndex, testStartWarp)), 3, 46, 94);
+
+    if(testStartWarp > 0 && UpdateButton(mode, 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::left, 32, 32))
+        testStartWarp--;
+
+    if(testStartWarp < numWarps && UpdateButton(mode, 280 + 4, 80 + 4, GFX.EIcons, false, 0, 32*Icon::right, 32, 32))
+        testStartWarp++;
+
     SuperPrintRightR(mode, Controls::EditorControls::g_button_name_UI[Controls::EditorControls::TestPlay], 3, e_ScreenW - 60, 54);
     if(UpdateButton(mode, e_ScreenW-50 + 4, 40 + 4, GFX.EIcons, false, 0, 32*Icon::play, 32, 32))
     {
@@ -1989,7 +2003,7 @@ void EditorScreen::UpdateEditorSettingsScreen(CallMode mode)
     if(testPlayer[m_special_subpage].State == 0)
         testPlayer[m_special_subpage].State = 2;
 
-    constexpr int NPC_for_state[] = {0, NPCID_POWER_S3, NPCID_FIRE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPC_HEAVY_POWER, NPCID_ICE_POWER_S3};
+    constexpr int NPC_for_state[] = {0, NPCID_POWER_S3, NPCID_FIRE_POWER_S3, NPCID_LEAF_POWER, NPCID_STATUE_POWER, NPCID_HEAVY_POWER, NPCID_ICE_POWER_S3};
     for(int state = 1; state <= 7; state++)
     {
         bool pActive = testPlayer[m_special_subpage].State == state;
@@ -3445,7 +3459,7 @@ void EditorScreen::UpdateWarpScreen(CallMode mode)
         if(UpdateButton(mode, 300 + 4, 180 + 4, GFXBackgroundBMP[61], EditorCursor.Warp.Effect == 0, 0, 0, 32, 32))
             EditorCursor.Warp.Effect = 0;
 
-        if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, 340 + 4, 180 + 4, GFXNPC[NPC_HOMING_BALL], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
+        if(FileFormat == FileFormats::LVL_PGEX && UpdateButton(mode, 340 + 4, 180 + 4, GFXNPC[NPCID_HOMING_BALL], EditorCursor.Warp.Effect == 3, 0, 0, 32, 32))
             EditorCursor.Warp.Effect = 3;
 
         // fade effect
@@ -4150,6 +4164,7 @@ void EditorScreen::UpdateFileScreen(CallMode mode)
                 TestLevel = false;
                 m_special_page = SPECIAL_PAGE_NONE;
                 m_special_subpage = 0;
+                testStartWarp = 0;
             }
         }
         return;

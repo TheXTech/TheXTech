@@ -734,12 +734,12 @@ void UpdateEffects()
 
                         if(NPCIsCheep[e.NewNpc] || NPCIsAParaTroopa[e.NewNpc] || e.NewNpc == NPCID_FIRE_CHAIN)
                         {
-                            nn.Special = e.NewNpcSpecial;
-                            nn.DefaultSpecial = int(nn.Special);
+                            nn.Special = static_cast<double>(e.NewNpcSpecial);
+                            nn.DefaultSpecial = static_cast<int>(e.NewNpcSpecial);
                         }
 
                         if(e.NewNpc == NPCID_STAR_EXIT || e.NewNpc == NPCID_STAR_COLLECT)
-                            nn.Variant = (uint16_t)e.NewNpcSpecial;
+                            nn.Variant = e.NewNpcSpecial;
 
                         syncLayers_NPC(numNPCs);
                         CheckSectionNPC(numNPCs);
@@ -816,7 +816,7 @@ void UpdateEffects()
     }
 }
 
-void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, bool Shadow, vbint_t newNpcSpecial)
+void NewEffect(int A, const Location_t &Location, float Direction, int NewNpc, bool Shadow, uint8_t newNpcSpecial)
 {
 // this sub creates effects
 // please reference the /graphics/effect folder to see what the effects are

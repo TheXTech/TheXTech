@@ -95,7 +95,7 @@ void ansi2utf8(char *inout, const DWORD maxLen)
     std::wstring tmpW;
     tmpW.resize(maxLen);
     memset(&tmpW[0], 0, sizeof(wchar_t) * maxLen);
-    int len = strlen(inout);
+    int len = (int)strlen(inout);
     len = MultiByteToWideChar(CP_ACP, 0, inout, len, &tmpW[0], maxLen);
     len = WideCharToMultiByte(CP_UTF8, 0, &tmpW[0], len, inout, (maxLen - 1), 0, 0);
     inout[len] = '\0';
@@ -329,7 +329,7 @@ public:
                     szTempSize = GetEnvironmentVariableW(L"ProgramFiles", &szTemp[0], 4096);
                     szTemp.resize(szTempSize);
                 }
-                #ifdef _M_IX86
+#ifdef _M_IX86
                 if((m_hDbhHelp == NULL) && (szTempSize > 0))
                 {
                     szTemp = szTemp + L"\\Debugging Tools for Windows (x86)\\dbghelp.dll";
@@ -339,7 +339,7 @@ public:
                         m_hDbhHelp = LoadLibraryW(szTemp.c_str());
                     }
                 }
-                #elif _M_X64
+#elif _M_X64
                 if((m_hDbhHelp == NULL) && (szTempSize > 0))
                 {
                     szTemp += L"\\Debugging Tools for Windows (x64)\\dbghelp.dll";
@@ -349,7 +349,7 @@ public:
                         m_hDbhHelp = LoadLibraryW(szTemp.c_str());
                     }
                 }
-                #elif _M_IA64
+#elif _M_IA64
                 if((m_hDbhHelp == NULL) && (szTempSize > 0))
                 {
                     szTemp += L"\\Debugging Tools for Windows (ia64)\\dbghelp.dll";
@@ -359,12 +359,14 @@ public:
                         m_hDbhHelp = LoadLibrary(szTempS);
                     }
                 }
-                #endif
+#endif
+
                 if(!m_hDbhHelp)
                 {
                     szTempSize = GetEnvironmentVariableW(L"ProgramFiles", &szTemp[0], 4096);
                     szTemp.resize(szTempSize);
                 }
+
                 // If still not found, try the old directories...
                 if((m_hDbhHelp == NULL) && (szTempSize > 0))
                 {
@@ -375,7 +377,8 @@ public:
                         m_hDbhHelp = LoadLibraryW(&szTemp[0]);
                     }
                 }
-                #if defined _M_X64 || defined _M_IA64
+
+#if defined _M_X64 || defined _M_IA64
                 if(!m_hDbhHelp)
                 {
                     szTempSize = GetEnvironmentVariableW(L"ProgramFiles", &szTemp[0], 4096);
@@ -391,13 +394,16 @@ public:
                         m_hDbhHelp = LoadLibraryW(szTempS);
                     }
                 }
-                #endif
+#endif
             }
         }
+
         if(m_hDbhHelp == NULL)   // if not already loaded, try to load a default-one
             m_hDbhHelp = LoadLibraryW(L"dbghelp.dll");
+
         if(m_hDbhHelp == NULL)
             return FALSE;
+
         pSI = (tSI)(void*)GetProcAddress(m_hDbhHelp, "SymInitialize");
         pSC = (tSC)(void*)GetProcAddress(m_hDbhHelp, "SymCleanup");
 
@@ -445,7 +451,12 @@ public:
         }
         char    szUserName[1024] = {0};
         DWORD   dwSize = 1024;
+#ifdef THEXTECH_WINRT
+        dwSize = sprintf(szUserName, "<unknown>");
+#else
         GetUserNameA(szUserName, &dwSize);
+#endif
+
         this->m_parent->OnSymInit(buf, symOptions, szUserName);
 
         return TRUE;

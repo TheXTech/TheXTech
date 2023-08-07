@@ -2976,6 +2976,7 @@ void zTestLevel(bool magicHand, bool interProcess)
         }
 
         OpenLevelData(data, IntProc::editor->m_accepted_lvl_path);
+        OpenLevelDataPost();
 
         pLogDebug("ICP: Done, starting a game....");
         IntProc::setState("Done. Starting game...");
@@ -3003,7 +3004,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     EndLevel = false;
     editorScreen.active = false;
     ReturnWarp = 0;
-    StartWarp = 0;
+    StartWarp = testStartWarp;
 
     optCursor.current = OptCursor_t::LVL_SELECT;
     EditorCursor.Mode = OptCursor_t::LVL_SELECT;
