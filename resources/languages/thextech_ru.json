@@ -345,7 +345,7 @@
             "wordDisconnect": "Отключить"
         },
         "controls": {
-            "phrasePlayerConnected": "И{0} подключил(а) {0}, Профиль: {2}",
+            "phrasePlayerConnected": "И{0} подключил(а) {1}, Профиль: {2}",
             "phrasePlayerDisconnected": "И{0} отключился(лась)"
         },
         "error": {
