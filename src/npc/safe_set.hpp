@@ -87,7 +87,8 @@ public:
                 else
                     ++it;
 
-                last_val = *it;
+                if(it != m_parent->m_set.end())
+                    last_val = *it;
 
                 return *this;
             }

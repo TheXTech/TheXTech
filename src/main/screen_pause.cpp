@@ -261,12 +261,14 @@ void Init(int plr, bool LegacyPause)
         }
     }
 
+    const int font = (s_pause_type == PauseType::Legacy) ? 3 : 4;
+
     // set the longest width
     s_longest_width = 0;
 
     for(size_t i = 0; i < s_items.size(); i++)
     {
-        int item_width = SuperTextPixLen(s_items[i].name, 3);
+        int item_width = SuperTextPixLen(s_items[i].name, font);
         if(item_width > s_longest_width)
             s_longest_width = item_width;
     }
@@ -308,16 +310,16 @@ void Render()
     switch(s_pause_type)
     {
     case(PauseType::Legacy):
-        XRender::renderRect(ScreenW / 2 - 190, ScreenH / 2 - menu_box_height / 2, 380, menu_box_height, 0, 0, 0);
+        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, 0, 0, 0);
         break;
     case(PauseType::Modern):
     default:
-        XRender::renderRect(ScreenW / 2 - 190 - 4, ScreenH / 2 - menu_box_height / 2 - 4, 380 + 8, menu_box_height + 8, 0, 0, 0, 1);
-        XRender::renderRect(ScreenW / 2 - 190 - 2, ScreenH / 2 - menu_box_height / 2 - 2, 380 + 4, menu_box_height + 4, 1, 1, 1, 1);
-        XRender::renderRect(ScreenW / 2 - 190, ScreenH / 2 - menu_box_height / 2, 380, menu_box_height, 0, 0, 0, 1);
+        XRender::renderRect(ScreenW / 2 - menu_box_width / 2 - 4, ScreenH / 2 - menu_box_height / 2 - 4, menu_box_width + 8, menu_box_height + 8, 0, 0, 0, 1);
+        XRender::renderRect(ScreenW / 2 - menu_box_width / 2 - 2, ScreenH / 2 - menu_box_height / 2 - 2, menu_box_width + 4, menu_box_height + 4, 1, 1, 1, 1);
+        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, 0, 0, 0, 1);
         break;
     case(PauseType::Testing):
-        XRender::renderRect(ScreenW / 2 - 190, ScreenH / 2 - menu_box_height / 2, 380, menu_box_height, 0, 0, 0, 0.5);
+        XRender::renderRect(ScreenW / 2 - menu_box_width / 2, ScreenH / 2 - menu_box_height / 2, menu_box_width, menu_box_height, 0, 0, 0, 0.5);
         break;
     }
 

@@ -1,0 +1,189 @@
+name: Homebrew Assets CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/homebrew-assets-ci.yml
+      - utils/convertkit/assets-convert-homebrew.py
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/homebrew-assets-ci.yml
+      - utils/convertkit/assets-convert-homebrew.py
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.source.name }} for ${{ matrix.target.name }}
+    runs-on: ubuntu-latest
+    container: ${{ matrix.target.docker_image }}
+    env:
+        DEVKITPRO: /opt/devkitpro
+    strategy:
+      fail-fast: true
+      matrix:
+        target:
+        - {
+            name: "3DS",
+            id: "3ds",
+            docker_image: "devkitpro/devkitarm",
+            upload_directory: "www/3ds/"
+          }
+        - {
+            name: "Wii",
+            id: "wii",
+            docker_image: "devkitpro/devkitppc",
+            upload_directory: "www/wii/"
+          }
+        source:
+        # ======================================= Adventures of Demo =======================================
+        # The side game about Demo and siblings from the A2XT universe by raocow and his fan community.
+        - {
+            name: "Adventures of Demo",
+            id: "aod",
+            assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-adventure-of-demo-assets-full.7z",
+          }
+        # ======================================= Super Mario Bros. X - a fan-game =======================================
+        # Was made in 2009 by Andrew Spinks "Redigit", and supported up to 2011 by it's original author.
+        - {
+            name: "Super Mario Bros. X",
+            id: "smbx13",
+            assets_url: "https://wohlsoft.ru/projects/TheXTech/_downloads/thextech-smbx13-assets-full.7z",
+          }
+    steps:
+    - name: Check for the upload support
+      id: upload-check
+      shell: bash
+      run: |
+        if [[ "${{ secrets.builds_login }}" != '' && \
+              "${{ secrets.builds_password }}" != '' && \
+              "${{ secrets.builds_host }}" != '' ]]; then
+          echo "available=true" >> $GITHUB_OUTPUT;
+        else
+          echo "available=false" >> $GITHUB_OUTPUT;
+        fi
+
+    - name: Resolve artifact filename
+      id: res
+      shell: bash
+      run: |
+        echo "filename=assets-${{ matrix.source.id }}-${{ matrix.target.id }}.zip" >> $GITHUB_OUTPUT;
+        echo "The target will be named: [assets-${{ matrix.source.id }}-${{ matrix.target.id }}.${{ matrix.target.package_ext }}]"
+
+    - uses: styfle/cancel-workflow-action@0.11.0
+      with:
+        workflow_id: homebrew-assets-ci.yml
+        all_but_latest: true
+        access_token: ${{ github.token }}
+
+    - name: Install Debian Dependencies
+      shell: bash
+      run: |
+        apt update
+        apt install -y gcc meson ninja-build  \
+                       imagemagick ffmpeg     \
+                       python3                \
+                       p7zip-full             \
+                       zip                    \
+                       lftp
+
+#    - uses: nelonoel/branch-name@v1.0.1
+    - uses: Wohlstand/branch-name@v1.0.1-wohl
+
+    - name: Check if a pull request
+      id: event-check
+      shell: bash
+      run: |
+        if [[ "${BRANCH_NAME}" == *"merge"* ]]; then
+          echo "is_pull_request=true" >> $GITHUB_OUTPUT;
+        else
+          echo "is_pull_request=false" >> $GITHUB_OUTPUT;
+        fi
+
+    - name: Build and install spc2it Dependency
+      shell: bash
+      continue-on-error: true
+      run: |
+        git clone https://github.com/ds-sloth/spc2it ../spc2it
+        cd ../spc2it
+        meson build
+        cd build
+        ninja
+        cp spc2it /usr/bin/spc2it
+
+    - uses: actions/checkout@v3
+
+    - name: Download assets
+      uses: carlosperate/download-file-action@v2
+      with:
+        file-url: "${{ matrix.source.assets_url }}"
+        file-name: assets-source.7z
+
+    - name: Unpack assets
+      shell: bash
+      run: |
+        mkdir -p assets/source
+        cd assets/source
+        7z x ../../assets-source.7z
+        cd ../..
+        rm assets-source.7z
+
+        mkdir -p package
+
+    - name: Apply update to translations
+      shell: bash
+      run: |
+        ASSETS_ROOT="$PWD/assets/source"
+        cd .github/ci-helper
+        bash translate_update.sh "${ASSETS_ROOT}"
+        cd ../..
+
+    - name: Convert assets
+      shell: bash
+      run: |
+        cd assets
+        python3 ../utils/convertkit/assets-convert-homebrew.py -t ${{ matrix.target.id }} source target
+
+    - name: Package for 3DS
+      if: matrix.target.id == '3ds'
+      shell: bash
+      run: |
+        mkromfs3ds assets/target package/${{ steps.res.outputs.filename }}.romfs
+        zip -9 "package/${{ steps.res.outputs.filename }}" "package/${{ steps.res.outputs.filename }}.romfs"
+
+    - name: Package for Wii
+      if: matrix.target.id == 'wii'
+      shell: bash
+      run: |
+        zip -9 -r "package/${{ steps.res.outputs.filename }}" "assets/target"
+
+    - name: Upload artifact
+      if: success()
+      uses: actions/upload-artifact@v3
+      continue-on-error: true
+      with:
+        path: package/${{ steps.res.outputs.filename }}
+        name: ${{ matrix.source.name }} Assets (${{ matrix.target.name }})
+
+    - name: Deploy to builds.wohlsoft.ru
+      if: success() && github.event_name != 'pull_request' && ${{ steps.event-check.outputs.is_pull_request == 'false' }} && ${{ steps.upload-check.outputs.available == 'true' }}
+      continue-on-error: true
+      shell: bash
+      run: |
+        cd package
+
+        UPLOAD_LIST="set ssl:verify-certificate no;"
+        UPLOAD_LIST="${UPLOAD_LIST} put -O ${{ matrix.target.upload_directory }} ${{ steps.res.outputs.filename }};"
+
+        lftp -e "${UPLOAD_LIST} exit" -u ${{ secrets.builds_login }},${{ secrets.builds_password }} ${{ secrets.builds_host }}
+
+    - name: List Build Directory
+      if: always()
+      shell: bash
+      run: |
+        cd assets/target
+        pwd
+        ls -lR
