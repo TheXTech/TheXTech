@@ -354,6 +354,10 @@ void Render::CalcCameraPos(double *ret_x, double *ret_y)
 
 void Render::TranslateScreenCoords(double &x, double &y, double w, double h)
 {
+    // FIXME: What we shall to do with w and h?
+    UNUSED(w);
+    UNUSED(h);
+
     if(g_config.autocode_translate_coords)
     {
         int top = 0;
