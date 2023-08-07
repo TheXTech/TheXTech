@@ -85,7 +85,7 @@ void UpdateInternalRes()
             req_h = 600;
 
 #ifdef THEXTECH_FIXED_RES
-            PlaySoundMenu(SFX_BowserKilled);
+            PlaySoundMenu(SFX_VillainKilled);
             MessageText = "Sorry! The requested compatibility mode was not enabled because your copy of TheXTech was not built to support a resolution of 800x600.";
             PauseGame(PauseCode::Message);
             MessageText.clear();
