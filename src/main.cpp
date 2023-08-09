@@ -487,6 +487,8 @@ int main(int argc, char**argv)
             {
                 if(Files::hasSuffix(fpath, ".lvl") || Files::hasSuffix(fpath, ".lvlx"))
                     setup.testLevel = fpath;
+                else if(Files::hasSuffix(fpath, ".wld") || Files::hasSuffix(fpath, ".wldx"))
+                    setup.testLevel = fpath;
                 else if(Files::hasSuffix(fpath, ".rec"))
                     setup.testReplay = fpath;
 

@@ -87,6 +87,7 @@
 
 #include "config.h"
 #include "main/screen_connect.h"
+#include "main/screen_quickreconnect.h"
 
 #include "main/trees.h"
 
@@ -348,15 +349,17 @@ int GameMain(const CmdLineSetup_t &setup)
 
     if(!setup.testLevel.empty() || !setup.testReplay.empty() || setup.interprocess) // Start level testing immediately!
     {
+        bool is_world = (Files::hasSuffix(setup.testLevel, ".wld") || Files::hasSuffix(setup.testLevel, ".wldx"));
+
         GameMenu = false;
-        LevelSelect = false;
+        LevelSelect = is_world;
 
         if(!setup.testReplay.empty())
             Record::LoadReplay(setup.testReplay, setup.testLevel);
         else
             FullFileName = setup.testLevel;
 
-        if(setup.testBattleMode)
+        if(setup.testBattleMode && !is_world)
         {
             numPlayers = 2;
             BattleMode = true;
@@ -378,9 +381,45 @@ int GameMain(const CmdLineSetup_t &setup)
             editorScreen.active = false;
             MouseRelease = false;
             LevelEditor = true;
+            WorldEditor = is_world;
             OpenLevel(FullFileName);
             editorScreen.ResetCursor();
             EditorBackup();
+        }
+        else if(is_world)
+        {
+            LoadSingleWorld(setup.testLevel);
+
+            selWorld = 1;
+
+            if(SelectWorld[selWorld].WorldPath.empty())
+            {
+                LevelSelect = false;
+                TestLevel = true;
+                EndLevel = false;
+                MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, setup.testLevel);
+                PauseGame(PauseCode::Message);
+                ErrorQuit = true;
+            }
+            else
+            {
+                if(numPlayers < 1)
+                    numPlayers = 1;
+
+                // prepare for StartEpisode(): set player characters
+                for(int i = 0; i < numPlayers; i++)
+                {
+                    if(testPlayer[i + 1].Character != 0)
+                        g_charSelect[i] = testPlayer[i + 1].Character;
+
+                    if(i <= (int)Controls::g_InputMethods.size())
+                        Controls::g_InputMethods.push_back(nullptr);
+                }
+
+                QuickReconnectScreen::g_active = true;
+
+                StartEpisode();
+            }
         }
         else
         {
