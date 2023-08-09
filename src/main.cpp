@@ -364,6 +364,8 @@ int main(int argc, char**argv)
                                                     false, 0u,
                                                    "0, 1, 2, 3, or 4",
                                                    cmd);
+        TCLAP::ValueArg<int> saveSlot(std::string(), "save-slot", "Save slot to use for world play", false, 0, "number from 1 to 3", cmd);
+
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
         TCLAP::SwitchArg switchMakeLangTemplate(std::string(), "export-lang", "Exports the default language template", false);
         TCLAP::SwitchArg switchLangUpdate(std::string(), "lang-update", "Updated all language of assets package: missing lines will be added", false);
@@ -523,6 +525,7 @@ int main(int argc, char**argv)
         setup.testMaxFPS = switchTestMaxFPS.getValue();
         setup.testMagicHand = switchTestMagicHand.getValue();
         setup.testEditor = switchTestEditor.getValue();
+        setup.testSave = saveSlot.getValue();
 
         if(compatLevel.isSet())
         {

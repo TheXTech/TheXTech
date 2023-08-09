@@ -403,6 +403,12 @@ int GameMain(const CmdLineSetup_t &setup)
             }
             else
             {
+                if(setup.testSave >= 0 && setup.testSave <= maxSaveSlots)
+                {
+                    selSave = setup.testSave;
+                    FindSaves();
+                }
+
                 if(numPlayers < 1)
                     numPlayers = 1;
 
@@ -612,6 +618,12 @@ int GameMain(const CmdLineSetup_t &setup)
                         {
                             SetupScreens();
                         });
+        }
+
+        // quickly exit if returned to menu from world test
+        else if(setup.testLevelMode && GameMenu)
+        {
+            GameIsActive = false;
         }
 
         // The Game Menu
