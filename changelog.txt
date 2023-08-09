@@ -49,6 +49,7 @@ Changelog for 1.3.6.1
 -Fixed vanilla bug where engine would appear to break if an event changed the boundaries of a different section. (@ds-sloth)
 -Added modern animations for section boundary change in multiplayer. (@ds-sloth)
 -The keyhole framerate fix has been turned on permanently, now it's impossible to disable this fix (@Wohlstand, @0lhi)
+-Added support for starting a world with a specific save (--save-slot X) from the command line (@ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)
