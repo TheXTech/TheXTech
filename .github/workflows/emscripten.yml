@@ -188,7 +188,7 @@ jobs:
         cp ../README.md "package/${{ matrix.config.subdir_name }}/"
         cp ../README.RUS.md "package/${{ matrix.config.subdir_name }}/"
         cp ../README.ESP.md "package/${{ matrix.config.subdir_name }}/"
-        cp output/bin/${{ matrix.config.executable_name }}* "package/${{ matrix.config.subdir_name }}/"
+        cp output/bin/* "package/${{ matrix.config.subdir_name }}/"
         cd package
         tar -cvzf "thextech-${{ matrix.config.package_filename_game }}-webassembly-${BRANCH_NAME_RES}.tar.gz" "${{ matrix.config.subdir_name }}"
         rm -Rf "${{ matrix.config.subdir_name }}"
