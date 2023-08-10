@@ -24,6 +24,9 @@
 
 #include <string>
 
+//! if true, bitmask merge is forced to occur even when logic ops are supported and merge loses information
+extern bool g_ForceBitmaskMerge;
+
 /*!
  * \brief Reset all customized cheats state into default
  */

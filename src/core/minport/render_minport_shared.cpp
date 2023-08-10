@@ -364,6 +364,30 @@ void minport_freeTextureMemory()
     pLogDebug("Unloaded %d stale textures at free texture memory request", num_unloaded);
 }
 
+#ifdef __16M__
+
+//! stub for 16M since it doesn't support masks
+void unloadGifTextures() {}
+
+#else
+
+void unloadGifTextures()
+{
+    for(StdPicture* p = g_render_chain_tail; p != nullptr;)
+    {
+        StdPicture* last_p = p;
+        p = p->d.next_texture;
+
+        if(!last_p->l.mask_path.empty())
+        {
+            D_pLogDebug("XRender: unloading texture at %p on unloadGifTextures()", tx);
+            unloadTexture(*last_p);
+        }
+    }
+}
+
+#endif
+
 // intermediate draw method
 
 inline void minport_RenderTexturePrivate_2(int16_t xDst, int16_t yDst, int16_t wDst, int16_t hDst,

@@ -232,6 +232,16 @@ E_INLINE bool userShadersSupported() TAIL
 }
 #endif
 
+/*!
+ * \brief Unload all currently loaded GIF textures
+ */
+E_INLINE void unloadGifTextures() TAIL
+#ifndef RENDER_CUSTOM
+{
+    g_render->unloadGifTextures();
+}
+#endif
+
 #ifdef __16M__
 /*!
  * \brief Clear all currently loaded textures

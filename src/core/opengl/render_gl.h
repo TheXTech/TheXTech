@@ -706,6 +706,7 @@ public:
     bool depthTestSupported() override;
 
     void unloadTexture(StdPicture &tx) override;
+    void unloadGifTextures() override;
     void clearAllTextures() override;
 
     void clearBuffer() override;

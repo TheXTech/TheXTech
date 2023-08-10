@@ -226,6 +226,7 @@ public:
     static size_t lazyLoadedBytes();
     static void lazyLoadedBytesReset();
 
+    virtual inline void unloadGifTextures() {}
     virtual void clearAllTextures() = 0;
 
     virtual void clearBuffer() = 0;

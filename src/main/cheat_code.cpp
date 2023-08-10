@@ -50,11 +50,14 @@
 #include "npc/npc_queues.h"
 #include "main/trees.h"
 
+#include "core/render.h"
+
 #include "cheat_code.h"
 
 #include "npc_id.h"
 #include "eff_id.h"
 
+bool g_ForceBitmaskMerge = false;
 
 static void redigitIsCool()
 {
@@ -1746,6 +1749,13 @@ static void speedDemon()
     PlaySound(MaxFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
+static void toggleMask()
+{
+    PlaySound(g_ForceBitmaskMerge ? SFX_PlayerGrow : SFX_PlayerShrink);
+    g_ForceBitmaskMerge = !g_ForceBitmaskMerge;
+    XRender::unloadGifTextures();
+}
+
 static void newLeaf()
 {
     GodMode = false;
@@ -1928,6 +1938,8 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
     {"redigitiscool", redigitIsCool, false},
 #endif
     {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false},
+
+    {"togglemask", toggleMask, false},
 
     {nullptr, nullptr, false}
 };

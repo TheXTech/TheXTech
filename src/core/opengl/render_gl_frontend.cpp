@@ -916,6 +916,21 @@ void RenderGL::unloadTexture(StdPicture &tx)
     return;
 }
 
+void RenderGL::unloadGifTextures()
+{
+    // need to backup because unloadTexture modifies m_loadedPictures
+    auto pictures_bak = m_loadedPictures;
+
+    for(StdPicture *tx : pictures_bak)
+    {
+        if(!tx->l.rawMask.empty())
+        {
+            D_pLogDebug("RenderGL: unloading texture at %p on unloadGifTextures()", tx);
+            unloadTexture(*tx);
+        }
+    }
+}
+
 void RenderGL::clearAllTextures()
 {
     for(StdPicture *tx : m_loadedPictures)

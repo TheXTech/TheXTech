@@ -42,8 +42,11 @@
 
 #include <chrono>
 
-#include "render_base.h"
-#include "../render.h"
+#include "core/base/render_base.h"
+#include "core/render.h"
+
+#include "main/cheat_code.h"
+
 #include "video.h"
 #include "globals.h"
 #include "sound.h"
@@ -411,8 +414,8 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         // load mask
         maskImage = GraphicsHelps::loadMask(target.l.rawMask, target.l.isMaskPng);
 
-        // merge it with image if PNG, masks are unsupported, or the mask could be properly represented with RGBA
-        if(target.l.isMaskPng || !g_render->textureMaskSupported()
+        // merge it with image if PNG, masks are unsupported, merge is forced, or the mask could be properly represented with RGBA
+        if(target.l.isMaskPng || g_ForceBitmaskMerge || !g_render->textureMaskSupported()
             || !GraphicsHelps::validateBitmaskRequired(sourceImage, maskImage, StdPictureGetOrigPath(target)))
         {
             GraphicsHelps::mergeWithMask(sourceImage, maskImage);

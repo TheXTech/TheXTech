@@ -42,6 +42,8 @@
 #include "video.h"
 #include "frame_timer.h"
 
+#include "main/cheat_code.h"
+
 #include "core/window.h"
 
 #include "core/render.h"
@@ -753,6 +755,13 @@ void lazyLoad(StdPicture& target)
             pLogWarning("Error: %d (%s)", errno, strerror(errno));
             target.inited = false;
             return;
+        }
+
+        if(FI_mask && (g_ForceBitmaskMerge || !GraphicsHelps::validateBitmaskRequired(FI_tex, FI_mask, target.l.path)))
+        {
+            GraphicsHelps::mergeWithMask(FI_tex, FI_mask);
+            GraphicsHelps::closeImage(FI_mask);
+            FI_mask = nullptr;
         }
 
         if(target.l.colorKey) // Apply transparent color for key pixels
