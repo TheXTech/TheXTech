@@ -5,7 +5,7 @@
   "display": "fullscreen",
   "orientation": "landscape-primary",
   "scope": "${THEXTECH_DEPLOY_URL}",
-  "start_url": "${THEXTECH_DEPLOY_URL}/index.html",
+  "start_url": "${THEXTECH_DEPLOY_URL}index.html",
   "icons": [
     {
       "src": "thextech_32.png",
