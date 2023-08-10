@@ -140,6 +140,7 @@ void initMainMenu()
     g_mainMenu.optionsModeFullScreen = "Fullscreen mode";
     g_mainMenu.optionsModeWindowed = "Windowed mode";
     g_mainMenu.optionsViewCredits = "View credits";
+    g_mainMenu.optionsRestartEngine = "Restart engine for changes to take effect.";
 
     g_mainMenu.connectCharSelTitle = "Character Select";
     g_mainMenu.connectStartGame = "Start Game";
@@ -1598,8 +1599,15 @@ bool mainMenuUpdate()
                             first = false;
                         }
 
-                        if(g_frmMain.restartRenderer())
-                            SaveConfig();
+                        bool res = g_frmMain.restartRenderer();
+                        PlaySoundMenu(SFX_PSwitch);
+                        SaveConfig();
+
+                        if(!res)
+                        {
+                            MessageText = g_mainMenu.optionsRestartEngine;
+                            PauseGame(PauseCode::Message);
+                        }
                     }
 #endif // #ifndef RENDER_CUSTOM
                     else if(MenuCursor == i++)

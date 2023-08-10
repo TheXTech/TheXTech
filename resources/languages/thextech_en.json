@@ -569,7 +569,8 @@
         "options": {
             "optionsModeFullScreen": "Fullscreen mode",
             "optionsModeWindowed": "Windowed mode",
-            "optionsViewCredits": "View credits"
+            "optionsViewCredits": "View credits",
+            "restartEngine": "Restart engine for changes to take effect."
         },
         "wordBack": "Back",
         "wordHide": "Hide",

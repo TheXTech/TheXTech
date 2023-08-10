@@ -200,6 +200,7 @@ XTechTranslate::XTechTranslate()
         {"menu.options.optionsModeFullScreen",   &g_mainMenu.optionsModeFullScreen},
         {"menu.options.optionsModeWindowed",     &g_mainMenu.optionsModeWindowed},
         {"menu.options.optionsViewCredits",      &g_mainMenu.optionsViewCredits},
+        {"menu.options.restartEngine",           &g_mainMenu.optionsRestartEngine},
 
         {"menu.character.charSelTitle",    &g_mainMenu.connectCharSelTitle},
         {"menu.character.startGame",       &g_mainMenu.connectStartGame},

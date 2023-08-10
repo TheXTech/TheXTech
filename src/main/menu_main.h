@@ -131,6 +131,7 @@ struct MainMenuContent
     std::string optionsModeFullScreen;
     std::string optionsModeWindowed;
     std::string optionsViewCredits;
+    std::string optionsRestartEngine;
 
     // ConnectScreen
     std::string connectCharSelTitle;

@@ -1108,6 +1108,11 @@ if(NINTENDO_DS OR NINTENDO_3DS OR NINTENDO_WII OR NINTENDO_SWITCH OR ANDROID OR 
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_DISABLE_LANG_TOOLS)
 endif()
 
+if(UNIX OR NINTENDO_SWITCH OR ANDROID OR APPLE)
+    # Allow hotswapping renderer on fully tested platforms
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_RESTART_RENDERER_SUPPORTED)
+endif()
+
 if(THEXTECH_NO_SDL_BUILD)
     target_compile_definitions(thextech PRIVATE -DPGE_NO_THREADING -DTHEXTECH_NO_SDL_BUILD)
 endif()

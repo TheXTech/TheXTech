@@ -284,17 +284,20 @@ void FrmMain::freeSystem()
 
 bool FrmMain::restartRenderer()
 {
+#ifndef THEXTECH_RESTART_RENDERER_SUPPORTED
+    return false;
+#else // #ifndef THEXTECH_RESTART_RENDERER_SUPPORTED
     pLogDebug("FrmMain: attempting to restart XRender...");
 
     bool res;
 
-#ifdef RENDER_CUSTOM
+#    ifdef RENDER_CUSTOM
     // custom renderer
     XRender::quit();
 
     res = XRender::init();
 
-#elif defined(RENDERGL_SUPPORTED)
+#    elif defined(RENDERGL_SUPPORTED)
 
     if(m_render)
     {
@@ -359,9 +362,11 @@ bool FrmMain::restartRenderer()
             reinterpret_cast<MsgBoxUsed*>(g_msgBox)->init(reinterpret_cast<WindowUsed*>(g_window)->getWindow());
             res = g_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
         }
+
+        res = false;
     }
 
-#else
+#    else
     // SDL, no OpenGL
 
     if(m_render)
@@ -382,9 +387,10 @@ bool FrmMain::restartRenderer()
     setup.vSync = g_videoSettings.vSync;
 
     res = m_render->initRender(setup, reinterpret_cast<WindowUsed*>(g_window)->getWindow());
-#endif
+#    endif
 
     XWindow::show();
 
     return res;
+#endif // #ifndef THEXTECH_RESTART_RENDERER_SUPPORTED
 }
