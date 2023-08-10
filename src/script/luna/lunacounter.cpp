@@ -51,7 +51,7 @@ void DeathCounter::init()
     if(counterFile.empty())
     {
         // prevent a segfault
-        if(TestLevel || selWorld < 0 || selWorld >= (int)SelectWorld.size() || BattleMode || LevelEditor)
+        if(TestLevel || selWorld < 0 || selWorld >= (int)SelectWorld.size() || BattleMode || LevelEditor || selSave <= 0)
         {
             mEnabled = false;
             return;

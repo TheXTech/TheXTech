@@ -41,7 +41,7 @@ SavedVariableBank::SavedVariableBank()
 
 bool SavedVariableBank::TryLoadWorldVars()
 {
-    if(selSave > 3)
+    if(selSave <= 0 || selSave > maxSaveSlots)
         return false;
 
     ClearBank();
@@ -101,7 +101,7 @@ void SavedVariableBank::ClearBank()
 // WRITE BANK
 void SavedVariableBank::WriteBank()
 {
-    if(selSave > 3)
+    if(selSave <= 0 || selSave > maxSaveSlots)
         return;
 
     gLunaVarBank.name = "LunaDLL";

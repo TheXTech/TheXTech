@@ -76,6 +76,8 @@ void PathWait();
 
 void FindWorlds();
 
+void LoadSingleWorld(const std::string wPath);
+
 void FindLevels();
 
 void FindSaves();

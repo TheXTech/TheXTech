@@ -120,6 +120,7 @@ static const char* s_keymap_EN = "1234567890-\b"
     "~ZXCVBNM<>?|"
     "\x0f\x11\x11 \x11\x11\x11\x11\x1d\x1c\n\x11";
 
+#if 0 // FIXME: Decide, what to do with these maps?
 static const char* s_keymap_RU = "1234567890-\b"
     "йцукенгшщзхъ"
     "фывапролджэ:"
@@ -156,6 +157,7 @@ static const char* s_keymap_JP =
     "\x12ゲゼデ\x12ベペ４９”・"
     "\x12ゴゾド\x12ボポ５０＋ー"
     "\x0e\x11\x11　\x11\x11\x11\x1d\x1c\n\x11";
+#endif
 
 // used to support UTF-8 characters
 static std::vector<int16_t> s_current_keymap_UTF_offsets;
