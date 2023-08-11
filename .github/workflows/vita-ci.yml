@@ -14,7 +14,8 @@ on:
 jobs:
   build:
     name: "${{ matrix.config.name }} | ${{ matrix.config.build_type }}"
-    runs-on: ${{ matrix.config.os }}
+    runs-on: ubuntu-latest
+    container: gnuton/vitasdk-docker
     env:
         VITASDK: /usr/local/vitasdk
     strategy:
@@ -23,7 +24,6 @@ jobs:
         config:
         - {
             name: "Vita build",
-            os: ubuntu-22.04,
 
             extra_options: "-DTHEXTECH_EXECUTABLE_NAME=thextech \
             -DCMAKE_TOOLCHAIN_FILE=/usr/local/vitasdk/share/vita.toolchain.cmake \
@@ -92,15 +92,16 @@ jobs:
         git submodule init
         git submodule update
 
-    - name: Install Vita SDK
-      run: |
-        cd ..
-        export VITASDK=/usr/local/vitasdk
-        export PATH=$VITASDK/bin:$PATH
-        git clone https://github.com/vitasdk/vdpm
-        cd vdpm
-        ./bootstrap-vitasdk.sh
-        ./install-all.sh || echo A library from vitasdk failed to install.
+# NOTE: 2023-08-11 now using container including Vita SDK
+#    - name: Install Vita SDK
+#      run: |
+#        cd ..
+#        export VITASDK=/usr/local/vitasdk
+#        export PATH=$VITASDK/bin:$PATH
+#        git clone https://github.com/vitasdk/vdpm
+#        cd vdpm
+#        ./bootstrap-vitasdk.sh
+#        ./install-all.sh || echo A library from vitasdk failed to install.
 
 # NOTE: 2/13/2022 Current Vita version does not use cglm or vitaGL renderer. All is handled by SDL2 at the moment.
 #    - name: Install cglm
@@ -123,6 +124,7 @@ jobs:
 #        NO_DEBUG=1 NO_TEX_COMBINER=1 make
 #        make install
 
+# no longer distributing packed Vita builds
 #    - name: Download assets
 #      uses: carlosperate/download-file-action@v2
 #      with:
