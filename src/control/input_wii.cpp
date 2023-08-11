@@ -576,10 +576,10 @@ void InputMethodProfile_Wii::InitAs(uint8_t expansion)
     }
     else
     {
-        this->m_keys[PlayerControls::Buttons::Up] = WPAD_BUTTON_RIGHT;
-        this->m_keys[PlayerControls::Buttons::Down] = WPAD_BUTTON_LEFT;
-        this->m_keys[PlayerControls::Buttons::Left] = WPAD_BUTTON_UP;
-        this->m_keys[PlayerControls::Buttons::Right] = WPAD_BUTTON_DOWN;
+        this->m_keys[PlayerControls::Buttons::Up] = WPAD_BUTTON_UP;
+        this->m_keys[PlayerControls::Buttons::Down] = WPAD_BUTTON_DOWN;
+        this->m_keys[PlayerControls::Buttons::Left] = WPAD_BUTTON_LEFT;
+        this->m_keys[PlayerControls::Buttons::Right] = WPAD_BUTTON_RIGHT;
         this->m_keys[PlayerControls::Buttons::Jump] = WPAD_BUTTON_2;
         this->m_keys[PlayerControls::Buttons::AltJump] = WPAD_BUTTON_A;
         this->m_keys[PlayerControls::Buttons::Run] = WPAD_BUTTON_1;

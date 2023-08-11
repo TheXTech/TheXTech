@@ -218,6 +218,18 @@ endif()
 
 # ============ Platform-conf ==============
 
+if(EMSCRIPTEN)
+    # config for web app deployment manifest
+    set(THEXTECH_MANIFEST_NAME "TheXTech Engine ${THEXTECH_VERSION_STRING}" CACHE STRING "Web app manifest name, used as title after installation")
+    set(THEXTECH_MANIFEST_ID "wohlsoft-thextech-${GIT_BRANCH}-${GIT_COMMIT_HASH}" CACHE STRING "Web app ID, uniquely identifies installed app")
+    set(THEXTECH_MANIFEST_DESC "" CACHE STRING "Web app description")
+    set(THEXTECH_DEPLOY_URL "" CACHE STRING "Fully qualified HTTPS URL where application will be deployed")
+
+    string(CONFIGURE "${THEXTECH_MANIFEST_NAME}" THEXTECH_MANIFEST_NAME_OUT)
+    string(CONFIGURE "${THEXTECH_MANIFEST_ID}"   THEXTECH_MANIFEST_ID_OUT)
+    string(CONFIGURE "${THEXTECH_MANIFEST_DESC}" THEXTECH_MANIFEST_DESC_OUT)
+endif()
+
 if(VITA)
     message("Enabling PS Vita Support and fast-math flags.")
 
@@ -334,6 +346,8 @@ if(EMSCRIPTEN)
 #    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --embed-file \"${_LANGAUGES_TEMP_FOLDER}\"@\"languages/\"")
 #    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file \"${PGE_PRELOAD_CONFIG_PACK}\"@\"configs/${PGE_PRELOAD_CONFIG_PACK_NAME}/\"")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file \"${PGE_PRELOAD_ENVIRONMENT}\"@\"/\"")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --shell-file '${CMAKE_CURRENT_SOURCE_DIR}/resources/emscripten/shell_minimal.html'")
+    # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --use-preload-cache")
     # set(LINK_FLAGS "${LINK_FLAGS} -DIS_LINK -s USE_PTHREADS=1 -s FORCE_FILESYSTEM=1 --embed-file '${CMAKE_CURRENT_SOURCE_DIR}/@languages'")
 endif()
 
@@ -822,6 +836,7 @@ file(GLOB THEXTECH_HEADS_SRC
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
 # For every file that includes "version.h", call this:
+add_git_version_defs(src/frm_main.cpp)
 add_git_version_defs(src/main/game_info.cpp)
 add_git_version_defs(src/main/record.cpp)
 # ----------------------------------------------------
@@ -1230,6 +1245,38 @@ elseif(NINTENDO_DS)
     nds_create_rom(thextech)
 elseif(NINTENDO_SWITCH)
     include(cmake/package_switch.cmake)
+elseif(EMSCRIPTEN)
+    add_custom_command(
+        TARGET thextech POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/resources/emscripten/sw.js
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/sw.js)
+
+    add_custom_command(
+        TARGET thextech POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E rename
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${THEXTECH_EXECUTABLE_NAME}.html
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/index.html)
+
+    add_custom_command(
+        TARGET thextech POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech.ico
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/favicon.ico)
+
+    add_custom_command(
+        TARGET thextech POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_32.png
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_32.png)
+
+    add_custom_command(
+        TARGET thextech POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${PGE_PRELOAD_ENVIRONMENT}/graphics/ui/icon/thextech_256.png
+                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/thextech_256.png)
+
+    configure_file(${CMAKE_SOURCE_DIR}/resources/emscripten/manifest.json ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/manifest.json)
 else()
     install(TARGETS thextech
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

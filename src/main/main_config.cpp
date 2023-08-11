@@ -298,6 +298,14 @@ void OpenConfig()
 
         pLogDebug("Loaded config: %s", configPath.c_str());
     }
+    else if(Files::fileExists(controlsPath))
+    {
+        IniProcessing controls(controlsPath);
+        Controls::LoadConfig(&controls);
+
+        pLogDebug("Loaded controls: %s; writing new config post deletion.", controlsPath.c_str());
+        SaveConfig(); // Create the config file post deletion
+    }
     else
     {
         pLogDebug("Writing new config on first run.");

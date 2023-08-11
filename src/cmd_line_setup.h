@@ -44,6 +44,8 @@ struct CmdLineSetup_t
     std::string testReplay;
     //! Number of players for level test
     int testNumPlayers = 1;
+    //! Save slot to use for world test
+    int testSave = 0;
     //! Run a test in battle mode
     bool testBattleMode = false;
 

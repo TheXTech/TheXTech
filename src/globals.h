@@ -787,7 +787,7 @@ struct Block_t
 
     inline void setShrinkResized() {}
 
-    inline bool getShrinkResized()
+    inline bool getShrinkResized() const
     {
         // Because the initial block width is stored as an integer, the only way the width could be 31.9 is if it was shrink-resized from 32.
         // The block location width isn't set to a non-integer anywhere else in the game, so this is safe.
