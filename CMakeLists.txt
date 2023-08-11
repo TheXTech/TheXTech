@@ -390,7 +390,7 @@ if(EMSCRIPTEN)
 #    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file \"${PGE_PRELOAD_CONFIG_PACK}\"@\"configs/${PGE_PRELOAD_CONFIG_PACK_NAME}/\"")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file \"${PGE_PRELOAD_ENVIRONMENT}\"@\"/\"")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --shell-file '${CMAKE_CURRENT_SOURCE_DIR}/resources/emscripten/shell_minimal.html'")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --use-preload-cache")
+    # set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --use-preload-cache")
     # set(LINK_FLAGS "${LINK_FLAGS} -DIS_LINK -s USE_PTHREADS=1 -s FORCE_FILESYSTEM=1 --embed-file '${CMAKE_CURRENT_SOURCE_DIR}/@languages'")
 endif()
 
@@ -917,6 +917,7 @@ file(GLOB THEXTECH_HEADS_SRC
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
 # For every file that includes "version.h", call this:
+add_git_version_defs(src/frm_main.cpp)
 add_git_version_defs(src/main/game_info.cpp)
 add_git_version_defs(src/main/record.cpp)
 # ----------------------------------------------------

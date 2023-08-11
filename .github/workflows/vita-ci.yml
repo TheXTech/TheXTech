@@ -18,7 +18,7 @@ jobs:
     env:
         VITASDK: /usr/local/vitasdk
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         config:
         - {
@@ -32,7 +32,7 @@ jobs:
             -DVITA_VERSION=\"01.05\"",
 
             deps_cmdline: "sudo apt-get update -qq \
-            && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python3 zip",
+            && sudo apt-get install -qq cmake ninja-build cmake ninja-build lftp git-core python3 zip xz-utils p7zip-full",
 
             generator: "Unix Makefiles",
             build_type: "MinSizeRel",
