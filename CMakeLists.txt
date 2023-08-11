@@ -834,6 +834,7 @@ file(GLOB THEXTECH_HEADS_SRC
 list(APPEND THEXTECH_SRC ${THEXTECH_HEADS_SRC})
 
 # For every file that includes "version.h", call this:
+add_git_version_defs(src/frm_main.cpp)
 add_git_version_defs(src/main/game_info.cpp)
 add_git_version_defs(src/main/record.cpp)
 # ----------------------------------------------------

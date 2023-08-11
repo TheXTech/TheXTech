@@ -76,6 +76,13 @@ bool CoreSDL::init(const CmdLineSetup_t &setup)
         pLogWarning("Error while SDL Initialization: %s", error);
     SDL_ClearError();
 
+    SDL_version compiled, runtime;
+    SDL_VERSION(&compiled);
+    SDL_GetVersion(&runtime);
+    pLogDebug("Compiled with SDL %d.%d.%d headers, running with SDL %d.%d.%d",
+        compiled.major, compiled.minor, compiled.patch,
+        runtime.major, runtime.minor, runtime.patch);
+
     return res;
 }
 
