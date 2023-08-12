@@ -30,9 +30,12 @@
 #include "video.h"
 #include "core/window.h"
 
+#include "main/cheat_code.h"
+
 #include "sdl_proxy/sdl_stdinc.h"
 #include <fmt_format_ne.h>
 
+#include "graphics.h"
 #include "controls.h"
 #include "sound.h"
 
@@ -170,6 +173,9 @@ void RenderSDL::repaint()
     if(m_blockRender)
         return;
 #endif
+
+    if(g_ForceBitmaskMerge)
+        SuperPrintScreenCenter("Bitmask already disabled", 5, 2, 1.0f, 0.2f, 0.0f);
 
     int w, h, off_x, off_y, wDst, hDst;
     float scale_x, scale_y;
