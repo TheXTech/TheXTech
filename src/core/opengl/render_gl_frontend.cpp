@@ -259,43 +259,42 @@ void RenderGL::repaint()
         renderParticleSystem(*s_sparkle, vScreenX[1], vScreenY[1]);
 #endif
 
-    SuperPrintScreenCenter(fmt::format_ne("DEV BUILD - OpenGL {0}.{1} {2}", m_gl_majver, m_gl_minver, get_profile_name(m_gl_profile)), 3, 0, 0.8f, 1.0f, 0.0f);
+    if(GameMenu)
+    {
+        std::string feature_string = fmt::format_ne("BETA: GL{0}.{1}-{2}", m_gl_majver, m_gl_minver, get_profile_letter(m_gl_profile));
 
-    std::string feature_string = "Draw: ";
-    if(m_use_logicop)
-        feature_string += "LogicOp, ";
-    if(m_use_depth_buffer)
-        feature_string += "depth, ";
-    if(m_use_shaders)
-        feature_string += "shaders, ";
-    if(m_client_side_arrays)
-        feature_string += "client arr, ";
-    if(m_has_es3_shaders)
-        feature_string += "ES3, ";
+        feature_string += " Draw: ";
+        if(m_use_logicop)
+            feature_string += "L";
+        if(m_use_depth_buffer)
+            feature_string += "Z";
+        if(m_client_side_arrays)
+            feature_string += "C";
+        if(m_use_shaders)
+            feature_string += "2";
+        if(m_has_es3_shaders)
+            feature_string += "3";
 
-    feature_string.resize(feature_string.size() - 2);
-    if(feature_string.size() == 4)
-        feature_string += ": NONE";
+        if(feature_string.size() == 4)
+            feature_string += ": none";
 
-    SuperPrintScreenCenter(feature_string, 3, 20, 0.8f, 1.0f, 0.0f);
+        feature_string += " FBO: ";
+        if(m_buffer_texture[BUFFER_GAME])
+            feature_string += "G";
+        if(m_buffer_texture[BUFFER_FB_READ])
+            feature_string += "R";
+        if(m_buffer_texture[BUFFER_INT_PASS_2])
+            feature_string += "M";
+        if(m_buffer_texture[BUFFER_LIGHTING])
+            feature_string += "L";
+        if(m_depth_read_texture)
+            feature_string += "D";
 
-    feature_string = "FBO: ";
-    if(m_buffer_texture[BUFFER_GAME])
-        feature_string += "game, ";
-    if(m_buffer_texture[BUFFER_FB_READ])
-        feature_string += "local fx, ";
-    if(m_buffer_texture[BUFFER_INT_PASS_2])
-        feature_string += "n-pass fx, ";
-    if(m_buffer_texture[BUFFER_LIGHTING])
-        feature_string += "light, ";
-    if(m_depth_read_texture)
-        feature_string += "depth, ";
+        if(feature_string.size() == 3)
+            feature_string += ": none";
 
-    feature_string.resize(feature_string.size() - 2);
-    if(feature_string.size() == 3)
-        feature_string += ": NONE";
-
-    SuperPrintScreenCenter(feature_string, 3, 40, 0.8f, 1.0f, 0.0f);
+        SuperPrintScreenCenter(feature_string, 3, 0, 0.8f, 1.0f, 0.0f);
+    }
 
     flushDrawQueues();
 

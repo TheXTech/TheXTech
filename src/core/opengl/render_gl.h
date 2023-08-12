@@ -98,6 +98,21 @@ private:
         }
     }
 
+    static inline char get_profile_letter(const GLint profile)
+    {
+        switch(profile)
+        {
+        case SDL_GL_CONTEXT_PROFILE_COMPATIBILITY:
+            return 'P';
+        case SDL_GL_CONTEXT_PROFILE_CORE:
+            return 'R';
+        case SDL_GL_CONTEXT_PROFILE_ES:
+            return 'E';
+        default:
+            return ' ';
+        }
+    }
+
     // unused for now
     // enum class SupportLevel
     // {
