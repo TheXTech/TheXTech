@@ -73,7 +73,7 @@ void UpdateInternalRes()
 
 void UpdateWindowRes()
 {
-    if(resChanged)
+    if(XWindow::isFullScreen() || XWindow::isMaximized())
         return;
 
     int w = ScreenW;

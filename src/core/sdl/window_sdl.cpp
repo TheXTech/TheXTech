@@ -396,3 +396,11 @@ bool WindowSDL::hasWindowMouseFocus()
     Uint32 flags = SDL_GetWindowFlags(m_window);
     return (flags & SDL_WINDOW_MOUSE_FOCUS) != 0;
 }
+
+bool WindowSDL::isMaximized()
+{
+    if(!m_window)
+        return false;
+    Uint32 flags = SDL_GetWindowFlags(m_window);
+    return (flags & SDL_WINDOW_MAXIMIZED) != 0;
+}
