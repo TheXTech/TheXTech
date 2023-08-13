@@ -569,7 +569,13 @@
         "options": {
             "optionsModeFullScreen": "Fullscreen mode",
             "optionsModeWindowed": "Windowed mode",
-            "optionsViewCredits": "View credits"
+            "optionsViewCredits": "View credits",
+            "scale": {
+                "integer": "Integer",
+                "label": "Scale",
+                "linear": "Linear",
+                "nearest": "Nearest"
+            }
         },
         "wordBack": "Back",
         "wordHide": "Hide",

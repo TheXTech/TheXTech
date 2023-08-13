@@ -140,6 +140,10 @@ void initMainMenu()
     g_mainMenu.optionsModeFullScreen = "Fullscreen mode";
     g_mainMenu.optionsModeWindowed = "Windowed mode";
     g_mainMenu.optionsViewCredits = "View credits";
+    g_mainMenu.optionsScaleMode = "Scale";
+    g_mainMenu.optionsScaleInteger = "Integer";
+    g_mainMenu.optionsScaleNearest = "Nearest";
+    g_mainMenu.optionsScaleLinear = "Linear";
 
     g_mainMenu.connectCharSelTitle = "Character Select";
     g_mainMenu.connectStartGame = "Start Game";
@@ -2052,7 +2056,15 @@ void mainMenuDraw()
         else
             SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
 #endif
-        SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + (30 * i++));
+        const std::string* scale_str = &ScaleMode_strings.at(g_videoSettings.scaleMode);
+        if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+            scale_str = &g_mainMenu.optionsScaleInteger;
+        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
+            scale_str = &g_mainMenu.optionsScaleNearest;
+        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+            scale_str = &g_mainMenu.optionsScaleLinear;
+
+        SuperPrint(fmt::format_ne("{0}: {1}", g_mainMenu.optionsScaleMode, *scale_str), 3, MenuX, MenuY + (30 * i++));
         SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
         SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
