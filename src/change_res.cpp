@@ -19,13 +19,14 @@
  */
 
 #include "globals.h"
+#include "video.h"
 #include "change_res.h"
 #include "load_gfx.h"
 #include "core/window.h"
+#include "core/render.h"
 #ifdef __EMSCRIPTEN__
 #include "core/events.h"
 #endif
-
 
 void SetOrigRes()
 {
@@ -33,7 +34,12 @@ void SetOrigRes()
     resChanged = false;
 
 #ifndef __EMSCRIPTEN__
-    XWindow::setWindowSize(ScreenW, ScreenH);
+    if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        XWindow::setWindowSize(ScreenW/2, ScreenH/2);
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        XWindow::setWindowSize(ScreenW*2, ScreenH*2);
+    else
+        XWindow::setWindowSize(ScreenW, ScreenH);
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -59,3 +65,25 @@ void ChangeRes(int, int, int, int)
 //{
 
 //}
+
+void UpdateInternalRes()
+{
+    XRender::updateViewport();
+}
+
+void UpdateWindowRes()
+{
+    if(resChanged)
+        return;
+
+    int w = ScreenW;
+    int h = ScreenH;
+
+    if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        XWindow::setWindowSize(w / 2, h / 2);
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
+        XWindow::setWindowSize(w, h);
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        XWindow::setWindowSize(w * 2, h * 2);
+}
+

@@ -57,6 +57,9 @@
 #include "level_file.h"
 #include "world_file.h"
 #include "pge_delay.h"
+#include "video.h"
+#include "change_res.h"
+#include "game_globals.h"
 #include "core/language.h"
 #include "main/translate.h"
 
@@ -1480,11 +1483,11 @@ bool mainMenuUpdate()
         // Options
         else if(MenuMode == MENU_OPTIONS)
         {
+            int optionsMenuLength = 2; // controls, language, credits
 #ifndef RENDER_FULLSCREEN_ALWAYS
-            const int optionsMenuLength = 3;
-#else
-            const int optionsMenuLength = 2;
+            optionsMenuLength++; // FullScreen
 #endif
+            optionsMenuLength ++; // ScaleMode
 
             if(SharedCursor.Move)
             {
@@ -1504,6 +1507,8 @@ bool mainMenuUpdate()
                                 menuLen = 18 * 15; // std::strlen("fullscreen mode")
                         }
 #endif
+                        else if(A == i++)
+                            menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
                         else if(A == i++)
                             menuLen = 18 * 25; // Language: XXXXX (YY)
                         else
@@ -1528,6 +1533,8 @@ bool mainMenuUpdate()
             {
                 if(menuBackPress)
                 {
+                    SaveConfig();
+
                     int optionsIndex = 1;
                     if(!g_gameInfo.disableTwoPlayer)
                         optionsIndex++;
@@ -1559,9 +1566,22 @@ bool mainMenuUpdate()
 #endif
                     else if(MenuCursor == i++)
                     {
+                        PlaySoundMenu(SFX_Do);
+                        if(!leftPressed)
+                            g_videoSettings.scaleMode = g_videoSettings.scaleMode + 1;
+                        else
+                            g_videoSettings.scaleMode = g_videoSettings.scaleMode - 1;
+                        if(g_videoSettings.scaleMode > SCALE_FIXED_2X)
+                            g_videoSettings.scaleMode = SCALE_DYNAMIC_INTEGER;
+                        if(g_videoSettings.scaleMode < SCALE_DYNAMIC_INTEGER)
+                            g_videoSettings.scaleMode = SCALE_FIXED_2X;
+                        UpdateWindowRes();
+                        UpdateInternalRes();
+                    }
+                    else if(MenuCursor == i++)
+                    {
                         XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
                         ReloadTranslations();
-                        SaveConfig();
                     }
                     else if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
@@ -2032,6 +2052,7 @@ void mainMenuDraw()
         else
             SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
 #endif
+        SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + (30 * i++));
         SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
         SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
