@@ -200,7 +200,8 @@ void GameLoop()
     {
         g_microStats.start_task(MicroStats::Effects);
         UpdateEffects();
-        speedRun_tick();
+        if(CompatGetLevel() >= COMPAT_SMBX2)
+            speedRun_tick();
         g_microStats.start_task(MicroStats::Graphics);
         UpdateGraphics();
         updateScreenFaders();
