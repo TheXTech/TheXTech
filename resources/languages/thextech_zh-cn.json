@@ -572,7 +572,7 @@
             "optionsViewCredits": "查看制作团队",
             "scale": {
                 "integer": "整数",
-                "label": "图像插值",
+                "label": "图像缩放",
                 "linear": "双线性",
                 "nearest": "最近邻居"
             }
