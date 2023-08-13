@@ -27,6 +27,7 @@
 #include "main/game_info.h"
 #include "window_sdl.h"
 #include "../render.h"
+#include "screen.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/html5.h>

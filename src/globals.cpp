@@ -77,9 +77,10 @@ std::string g_recentWorld2p;
 std::string g_recentWorldEditor;
 bool ShowFPS = false;
 double PrintFPS = 0.0;
-RangeArr<vScreen_t, 0, 2> vScreen;
-int ScreenType = 0;
-int DScreenType = 0;
+// moved to "screen.cpp"
+// RangeArr<vScreen_t, 0, 2> vScreen;
+// int ScreenType = 0;
+// int DScreenType = 0;
 bool LevelEditor = false;
 bool WorldEditor = false;
 RangeArr<PlayerStart_t, 1, 2> PlayerStart;
@@ -215,7 +216,7 @@ RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
 // RangeArr<double, 0, maxPlayers> qScreenY;
 
 bool qScreen = false;
-RangeArr<vScreen_t, 0, 2> qScreenLoc;
+// RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
 RangeArrI<int, 0, maxBlockType, 0> BlockWidth;
 RangeArrI<int, 0, maxBlockType, 0> BlockHeight;
