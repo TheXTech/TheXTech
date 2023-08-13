@@ -570,7 +570,7 @@
             "optionsModeFullScreen": "全屏模式",
             "optionsModeWindowed": "窗口模式",
             "optionsViewCredits": "查看制作团队",
-            "restartEngine": "需要重启引擎才能生效。"
+            "restartEngine": "重启引擎后生效"
         },
         "wordBack": "返回",
         "wordHide": "隐藏",
