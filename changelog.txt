@@ -56,6 +56,7 @@ Changelog for 1.3.6.1
 -Fade out effect occurs during the last 30 frames of the SMBX64 death animation instead of during a pause following the animation (@ds-sloth)
 -Added support for starting a level test from a certain warp (available in editor and command line flag -w / --start-warp) (@ds-sloth)
 -Added support for starting a world with a specific save (--save-slot X) from the command line (@ds-sloth)
+-Added option to control how gameplay is scaled onto physical screen (@ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)

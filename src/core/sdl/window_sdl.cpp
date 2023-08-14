@@ -24,9 +24,12 @@
 #include <Logger/logger.h>
 #include <Graphics/graphics_funcs.h>
 
+#include "globals.h"
 #include "main/game_info.h"
 #include "window_sdl.h"
 #include "../render.h"
+#include "config.h"
+#include "video.h"
 #include "screen.h"
 
 #ifdef __EMSCRIPTEN__
@@ -154,14 +157,21 @@ bool WindowSDL::initSDL(uint32_t windowInitFlags)
         return false;
     }
 
-#ifdef __EMSCRIPTEN__ //Set canvas be 1/2 size for a faster rendering
-    SDL_SetWindowMinimumSize(m_window, ScreenW / 2, ScreenH / 2);
+    SDL_SetWindowMinimumSize(m_window, 240, 160);
+
+#ifdef __EMSCRIPTEN__ // Set canvas be 1/2 size for a faster rendering
+    SDL_SetWindowSize(m_window, ScreenW / 2, ScreenH / 2);
 #elif defined(__ANDROID__) || defined(__SWITCH__) // Set as small as possible
     SDL_SetWindowMinimumSize(m_window, 200, 150);
 #elif defined(VITA)
-    SDL_SetWindowMinimumSize(m_window, 960, 544);
+    SDL_SetWindowSize(m_window, 960, 544);
 #else
-    SDL_SetWindowMinimumSize(m_window, ScreenW, ScreenH);
+    if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
+        SDL_SetWindowSize(m_window, ScreenW / 2, ScreenH / 2);
+    else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
+        SDL_SetWindowSize(m_window, ScreenW * 2, ScreenH * 2);
+    else
+        SDL_SetWindowSize(m_window, ScreenW, ScreenH);
 #endif //__EMSCRIPTEN__
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
@@ -386,4 +396,12 @@ bool WindowSDL::hasWindowMouseFocus()
         return false;
     Uint32 flags = SDL_GetWindowFlags(m_window);
     return (flags & SDL_WINDOW_MOUSE_FOCUS) != 0;
+}
+
+bool WindowSDL::isMaximized()
+{
+    if(!m_window)
+        return false;
+    Uint32 flags = SDL_GetWindowFlags(m_window);
+    return (flags & SDL_WINDOW_MAXIMIZED) != 0;
 }

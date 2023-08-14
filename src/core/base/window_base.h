@@ -116,6 +116,12 @@ public:
      * \return true if window has a mouse focus
      */
     virtual bool hasWindowMouseFocus() = 0;
+
+    /*!
+     * \brief Is window maximized (resized to fill desktop)?
+     * \return true if window is maximized
+     */
+    virtual bool isMaximized() = 0;
 };
 
 extern AbstractWindow_t *g_window;

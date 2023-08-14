@@ -287,7 +287,7 @@ public:
     static void toggleGifRecorder();
     static void processRecorder();
 
-private:
+protected:
     static GifRecorder *m_gif;
     static bool recordInProcess();
 #endif // USE_SCREENSHOTS_AND_RECS

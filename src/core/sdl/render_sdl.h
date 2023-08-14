@@ -26,7 +26,7 @@
 
 #include "../base/render_base.h"
 #include "cmd_line_setup.h"
-
+#include "video.h"
 
 struct SDL_Renderer;
 struct SDL_Texture;
@@ -57,7 +57,7 @@ class RenderSDL final : public AbstractRender_t
     int m_viewport_offset_x_cur = 0;
     int m_viewport_offset_y_cur = 0;
 
-    //Need to calculate relative viewport position when screen was scaled
+    // Need to calculate relative viewport position when screen was scaled
     float m_viewport_scale_x = 1.0f;
     float m_viewport_scale_y = 1.0f;
 
@@ -65,6 +65,9 @@ class RenderSDL final : public AbstractRender_t
     int m_viewport_y = 0;
     int m_viewport_w = 0;
     int m_viewport_h = 0;
+
+    // Current scaling mode
+    int m_current_scale_mode = SCALE_DYNAMIC_NEAREST;
 
     //Need for HiDPI rendering (number of draw pixels per cursor pixel)
     float m_hidpi_x = 1.0f;

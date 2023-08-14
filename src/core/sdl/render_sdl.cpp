@@ -21,6 +21,7 @@
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_hints.h>
 
 #include <FreeImageLite.h>
 #include <Logger/logger.h>
@@ -114,6 +115,8 @@ bool RenderSDL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
         return false;
     }
 
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
     SDL_RendererInfo ri;
     SDL_GetRendererInfo(m_gRenderer, &ri);
     m_maxTextureWidth = ri.max_texture_width;
@@ -168,7 +171,6 @@ void RenderSDL::repaint()
 #endif
 
     int w, h, off_x, off_y, wDst, hDst;
-    float scale_x, scale_y;
 
     setTargetScreen();
 
@@ -191,23 +193,8 @@ void RenderSDL::repaint()
     }
 
     // Calculate the size difference factor
-    scale_x = float(w) / ScaleWidth;
-    scale_y = float(h) / ScaleHeight;
-
-    wDst = w;
-    hDst = h;
-
-    // Keep aspect ratio
-    if(scale_x > scale_y) // Width more than height
-    {
-        wDst = int(scale_y * ScaleWidth);
-        hDst = int(scale_y * ScaleHeight);
-    }
-    else if(scale_x < scale_y) // Height more than width
-    {
-        hDst = int(scale_x * ScaleHeight);
-        wDst = int(scale_x * ScaleWidth);
-    }
+    wDst = int(m_scale_x * ScaleWidth);
+    hDst = int(m_scale_y * ScaleHeight);
 
     // Align the rendering scene to the center of screen
     off_x = (w - wDst) / 2;
@@ -230,28 +217,39 @@ void RenderSDL::repaint()
 
 void RenderSDL::updateViewport()
 {
-    float w, w1, h, h1;
-    int   wi, hi;
+    int   render_w, render_h;
 
-    getRenderSize(&wi, &hi);
+    getRenderSize(&render_w, &render_h);
+
+    D_pLogDebug("Updated render size: %d x %d", render_w, render_h);
 
     // quickly update the HiDPI scaling factor
     int window_w, window_h;
     XWindow::getWindowSize(&window_w, &window_h);
-    m_hidpi_x = (float)wi / (float)window_w;
-    m_hidpi_y = (float)hi / (float)window_h;
+    m_hidpi_x = (float)render_w / (float)window_w;
+    m_hidpi_y = (float)render_h / (float)window_h;
 
-    D_pLogDebug("Updated window size: %d x %d", wi, hi);
+    float scale_x = (float)render_w / ScreenW;
+    float scale_y = (float)render_h / ScreenH;
 
-    w = wi;
-    h = hi;
-    w1 = w;
-    h1 = h;
+    float scale = SDL_min(scale_x, scale_y);
 
-    m_scale_x = w / ScaleWidth;
-    m_scale_y = h / ScaleHeight;
-    m_viewport_scale_x = m_scale_x;
-    m_viewport_scale_y = m_scale_y;
+    if(g_videoSettings.scaleMode == SCALE_FIXED_05X && scale > 0.5f)
+        scale = 0.5f;
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
+        scale = std::floor(scale);
+    if(g_videoSettings.scaleMode == SCALE_FIXED_1X && scale > 1.f)
+        scale = 1.f;
+    if(g_videoSettings.scaleMode == SCALE_FIXED_2X && scale > 2.f)
+        scale = 2.f;
+
+    int game_w = scale * ScreenW;
+    int game_h = scale * ScreenH;
+
+    m_scale_x = scale;
+    m_scale_y = scale;
+    m_viewport_scale_x = scale;
+    m_viewport_scale_y = scale;
 
     m_viewport_offset_x = 0;
     m_viewport_offset_y = 0;
@@ -259,24 +257,38 @@ void RenderSDL::updateViewport()
     m_viewport_offset_y_cur = 0;
     m_viewport_offset_ignore = false;
 
-    if(m_scale_x > m_scale_y)
-    {
-        w1 = m_scale_y * ScaleWidth;
-        m_viewport_scale_x = w1 / ScaleWidth;
-    }
-    else if(m_scale_x < m_scale_y)
-    {
-        h1 = m_scale_x * ScaleHeight;
-        m_viewport_scale_y = h1 / ScaleHeight;
-    }
-
-    m_offset_x = (w - w1) / 2;
-    m_offset_y = (h - h1) / 2;
+    m_offset_x = (render_w - game_w) / 2;
+    m_offset_y = (render_h - game_h) / 2;
 
     m_viewport_x = 0;
     m_viewport_y = 0;
-    m_viewport_w = static_cast<int>(w1);
-    m_viewport_h = static_cast<int>(h1);
+    m_viewport_w = ScreenW;
+    m_viewport_h = ScreenH;
+
+    // update render targets
+    if(m_current_scale_mode != g_videoSettings.scaleMode)
+    {
+#ifdef USE_SCREENSHOTS_AND_RECS
+        // invalidates GIF recorder handle
+        if(recordInProcess())
+            toggleGifRecorder();
+#endif
+
+        // update video settings
+        if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || scale < 0.5f)
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+        else
+            SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+        SDL_DestroyTexture(m_tBuffer);
+        m_tBuffer = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, ScreenW, ScreenH);
+        SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
+
+        // reset scaling setting for images loaded later
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+        m_current_scale_mode = g_videoSettings.scaleMode;
+    }
 }
 
 void RenderSDL::resetViewport()
@@ -288,7 +300,6 @@ void RenderSDL::resetViewport()
     SDL_RenderSetViewport(m_gRenderer, &altViewport);
 //#endif
 
-    updateViewport();
     SDL_RenderSetViewport(m_gRenderer, nullptr);
 }
 

@@ -200,6 +200,10 @@ XTechTranslate::XTechTranslate()
         {"menu.options.optionsModeFullScreen",   &g_mainMenu.optionsModeFullScreen},
         {"menu.options.optionsModeWindowed",     &g_mainMenu.optionsModeWindowed},
         {"menu.options.optionsViewCredits",      &g_mainMenu.optionsViewCredits},
+        {"menu.options.scale.label",             &g_mainMenu.optionsScaleMode},
+        {"menu.options.scale.integer",           &g_mainMenu.optionsScaleInteger},
+        {"menu.options.scale.nearest",           &g_mainMenu.optionsScaleNearest},
+        {"menu.options.scale.linear",            &g_mainMenu.optionsScaleLinear},
 
         {"menu.character.charSelTitle",    &g_mainMenu.connectCharSelTitle},
         {"menu.character.startGame",       &g_mainMenu.connectStartGame},
