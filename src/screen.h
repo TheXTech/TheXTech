@@ -57,7 +57,8 @@ struct vScreen_t : public qScreen_t
 //    Visible As Boolean
     bool Visible = false;
 
-    uint8_t Screen = 0;
+    uint8_t screen_ref = 0;
+    uint8_t player = 0;
 };
 
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
@@ -134,13 +135,13 @@ struct Screen_t
 Screen_t& ScreenByPlayer(int player);
 
 // finds the canonical Screen that contains a specific player
-Screen_t& ScreenByPlayer_canonical(int player);
+// Screen_t& ScreenByPlayer_canonical(int player);
 
 // finds the visible vScreen that contains a specific player
 vScreen_t& vScreenByPlayer(int player);
 
 // finds the canonical vScreen that contains a specific player
-vScreen_t& vScreenByPlayer_canonical(int player);
+// vScreen_t& vScreenByPlayer_canonical(int player);
 
 //! a list of all screens (local and remote, visible and virtual)
 extern RangeArr<Screen_t, 0, 0> Screens;

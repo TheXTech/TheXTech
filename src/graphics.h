@@ -46,13 +46,13 @@ void GraphicsLazyPreLoad();
 void UpdateGraphics(bool skipRepaint = false);
 // Public Sub GetvScreen(A As Integer) ' Get the screen position
 //  Get the screen position
-void GetvScreen(const int A);
+void GetvScreen(vScreen_t& vscreen);
 // Public Sub GetvScreenAverage() ' Get the average screen position for all players
 //  Get the average screen position for all players
-void GetvScreenAverage();
+void GetvScreenAverage(vScreen_t& vscreen);
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
-void GetvScreenAverage2();
+void GetvScreenAverage2(vScreen_t& vscreen);
 // Public Sub SetupGraphics()
 //! DUMMY AND USELESS
 void SetupGraphics();
@@ -63,7 +63,7 @@ void SetupEditorGraphics();
 void SetupScreens(bool reset = true);
 // Public Sub DynamicScreen() 'for the split screen stuff
 // for the split screen stuff
-void DynamicScreen();
+void DynamicScreen(Screen_t& screen);
 
 // NEW: moves qScreen towards vScreen, now including the screen size
 bool Update_qScreen(int Z, int camRate = 2, int resizeRate = 2);
@@ -127,7 +127,7 @@ void NPCWarpGFX(int A, Location_t &tempLocation, float &X2, float &Y2);
 void ChangeScreen();
 // Public Sub GetvScreenCredits() ' Get the average screen position for all players for the games outro
 //  Get the average screen position for all players for the games outro
-void GetvScreenCredits();
+void GetvScreenCredits(vScreen_t& vscreen);
 // Public Sub DoCredits() 'print credits
 // print credits
 void DoCredits();
