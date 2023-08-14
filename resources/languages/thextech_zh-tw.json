@@ -569,7 +569,13 @@
         "options": {
             "optionsModeFullScreen": "全屏模式",
             "optionsModeWindowed": "窗口模式",
-            "optionsViewCredits": "查看製作團隊"
+            "optionsViewCredits": "查看製作團隊",
+            "scale": {
+                "label": "圖像縮放",
+                "integer": "整數",
+                "linear": "雙綫性",
+                "nearest": "最近鄰居"
+            }
         },
         "wordBack": "返回",
         "wordHide": "隱藏",

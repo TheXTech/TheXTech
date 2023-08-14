@@ -570,7 +570,13 @@
         "options": {
             "optionsModeFullScreen": "На весь экран",
             "optionsModeWindowed": "Оконный режим",
-            "optionsViewCredits": "Титры"
+            "optionsViewCredits": "Титры",
+            "scale": {
+                "integer": "Целочисленный",
+                "nearest": "Ближ. сосед",
+                "label": "Масштаб",
+                "linear": "Линейный"
+            }
         },
         "wordBack": "Назад",
         "wordHide": "Скрыть",
