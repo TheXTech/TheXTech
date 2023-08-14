@@ -29,6 +29,7 @@ RangeArr<vScreen_t, 0, 2> vScreen;
 // finds the visible Screen that contains a specific player
 Screen_t& ScreenByPlayer(int player)
 {
+    (void)player; // FIXME: Remove this line once multiple screens will be supported
     return Screens[0];
 }
 
