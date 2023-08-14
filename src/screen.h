@@ -57,7 +57,8 @@ struct vScreen_t : public qScreen_t
 //    Visible As Boolean
     bool Visible = false;
 
-    uint8_t Screen = 0;
+    uint8_t screen_ref = 0;
+    uint8_t player = 0;
 };
 
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
@@ -97,11 +98,13 @@ namespace DScreenTypes
 
 struct Screen_t
 {
+    using localarr_t = std::array<uint8_t, maxLocalPlayers>;
+
     //! which vScreens belong to the screen
-    std::array<uint8_t, maxLocalPlayers> vScreen_refs = {1, 2};
+    localarr_t vScreen_refs = localarr_t{1, 2};
 
     // which players belong to the screen (at most one visible and one canonical screen may have a single player). zero-terminated.
-    std::array<uint8_t, maxLocalPlayers> players = {1, 2};
+    localarr_t players = localarr_t{1, 2};
 
     //! whether this is being rendered by any client (not necessarily the local one)
     bool Visible = true;
@@ -132,13 +135,13 @@ struct Screen_t
 Screen_t& ScreenByPlayer(int player);
 
 // finds the canonical Screen that contains a specific player
-Screen_t& ScreenByPlayer_canonical(int player);
+// Screen_t& ScreenByPlayer_canonical(int player);
 
 // finds the visible vScreen that contains a specific player
 vScreen_t& vScreenByPlayer(int player);
 
 // finds the canonical vScreen that contains a specific player
-vScreen_t& vScreenByPlayer_canonical(int player);
+// vScreen_t& vScreenByPlayer_canonical(int player);
 
 //! a list of all screens (local and remote, visible and virtual)
 extern RangeArr<Screen_t, 0, 0> Screens;

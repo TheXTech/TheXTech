@@ -84,6 +84,7 @@ void DropBonus(int A)
             Player[A].HeldBonus = 0;
             return;
         }
+
         if(Player[A].HeldBonus > 0)
         {
             PlaySound(SFX_DropItem);
@@ -92,18 +93,26 @@ void DropBonus(int A)
             NPC[numNPCs].Type = Player[A].HeldBonus;
             NPC[numNPCs].Location.Width = NPCWidth[Player[A].HeldBonus];
             NPC[numNPCs].Location.Height = 32;
-            if(ScreenType == 5 && !vScreen[2].Visible /*&& nPlay.Online == false*/)
+
+            const Screen_t& screen = ScreenByPlayer(A);
+
+            if(screen.Type == 5 && !screen.vScreen(2).Visible /*&& nPlay.Online == false*/)
             {
+                vScreen_t& vscreen = screen.vScreen(1);
+
                 if(A == 1)
                     B = -40;
                 if(A == 2)
                     B = 40;
-                GetvScreenAverage();
 
-                double ScreenTop = -vScreen[1].Y;
-                if(vScreen[1].Height > 600)
-                    ScreenTop += vScreen[1].Height / 2 - 300;
-                double CenterX = -vScreen[1].X + vScreen[1].Width / 2;
+                GetvScreenAverage(vscreen);
+
+                double ScreenTop = -vscreen.Y;
+
+                if(vscreen.Height > 600)
+                    ScreenTop += vscreen.Height / 2 - 300;
+
+                double CenterX = -vscreen.X + vscreen.Width / 2;
 
                 NPC[numNPCs].Location.X = CenterX - NPC[numNPCs].Location.Width / 2.0 + B;
                 NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
@@ -116,16 +125,21 @@ void DropBonus(int A)
                 //            }
             else
             {
-                GetvScreen(A);
+                vScreen_t& vscreen = vScreenByPlayer(A);
 
-                double ScreenTop = -vScreen[A].Y;
-                if(vScreen[A].Height > 600)
-                    ScreenTop += vScreen[A].Height / 2 - 300;
-                double CenterX = -vScreen[A].X + vScreen[A].Width / 2;
+                GetvScreen(vscreen);
+
+                double ScreenTop = -vscreen.Y;
+
+                if(vscreen.Height > 600)
+                    ScreenTop += vscreen.Height / 2 - 300;
+
+                double CenterX = -vscreen.X + vscreen.Width / 2;
 
                 NPC[numNPCs].Location.X = CenterX - NPC[numNPCs].Location.Width / 2.0;
                 NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
             }
+
             NPC[numNPCs].Location.SpeedX = 0;
             NPC[numNPCs].Location.SpeedY = 0;
             NPC[numNPCs].Effect = 2;

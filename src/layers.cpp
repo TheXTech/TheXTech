@@ -865,20 +865,20 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             // need two cycles to fully update the dynamic screens in the new level
                             SetupScreens(false);
-                            DynamicScreen();
+                            DynamicScreen(Screens[0]);
                             // CenterScreens();
 
                             if(vScreen[2].Visible)
                             {
                                 for(int Z = 1; Z <= 2; Z++)
-                                    GetvScreen(Z);
+                                    GetvScreen(vScreen[Z]);
                             }
                             else
-                                GetvScreenAverage();
+                                GetvScreenAverage(vScreen[1]);
 
                             // set up the dynamic screens in the new level
                             SetupScreens(false);
-                            DynamicScreen();
+                            DynamicScreen(Screens[0]);
 
                             // set the positions (including screen positions) in the old level
                             level[B] = tempLevel;
@@ -887,11 +887,11 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             if(vScreen[2].Visible)
                             {
                                 for(int Z = 1; Z <= 2; Z++)
-                                    GetvScreen(Z);
+                                    GetvScreen(vScreen[Z]);
                             }
                             else
                             {
-                                GetvScreenAverage();
+                                GetvScreenAverage(vScreen[1]);
                             }
 
                             // set the qScreen!
@@ -969,10 +969,10 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             screenLoc = vScreen[onscreen_plr];
                             SoundPause[13] = 10;
 
-                            DynamicScreen();
+                            DynamicScreen(Screens[0]);
 
                             // calculate the vScreen at non-splitscreen resolution (as the original game does)
-                            GetvScreenAverage();
+                            GetvScreenAverage(vScreen[1]);
 
                             // enable qScreen!
                             qScreen = true;

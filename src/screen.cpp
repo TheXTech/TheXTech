@@ -26,6 +26,21 @@ Screen_t* l_screen = &Screens[0];
 RangeArr<qScreen_t, 0, 2> qScreenLoc;
 RangeArr<vScreen_t, 0, 2> vScreen;
 
+// finds the visible Screen that contains a specific player
+Screen_t& ScreenByPlayer(int player)
+{
+    return Screens[0];
+}
+
+// finds the visible vScreen that contains a specific player
+vScreen_t& vScreenByPlayer(int player)
+{
+    if(player < 1 || player > maxLocalPlayers)
+        return vScreen[0];
+
+    return vScreen[player];
+}
+
 // temporary helpers while game is being converted to use Screen_t
 int& ScreenType = Screens[0].Type;
 int& DScreenType = Screens[0].DType;
