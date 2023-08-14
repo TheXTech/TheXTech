@@ -106,6 +106,17 @@ PGE_Size textSize(const char *text, size_t text_size,
                   bool      cut = false,
                   uint32_t  ttfFontSize = 14);
 
+
+/**
+ * @brief Get the size of one glyph
+ * @param utf8char The UTF-8 character to measure
+ * @param charNum The row number of the character in the line (affects the size of tabulation)
+ * @param fontId Font ID
+ * @param ttf_fontSize Point size for the TTF fonts
+ * @return
+ */
+PGE_Size glyphSize(const char *utf8char, uint32_t charNum, int fontId, uint32_t ttf_fontSize = 14);
+
 /**
  * @brief Retreive Font-ID from the font name
  * @param fontName Name of the font
@@ -146,13 +157,14 @@ void printText(const char* text, size_t text_size,
  * @param Blue Blue color level from 0.0 to 1.0
  * @param Alpha Alpha-channel level from 0.0 to 1.0
  * @param ttf_FontSize Point size for the TTF fonts
+ * @return The size of text block in columns/rows
  */
-void printTextOptiCol(std::string text,
-                      int x, int y,
-                      size_t max_columns,
-                      int font = DefaultRaster,
-                      float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
-                      uint32_t ttf_FontSize = 14);
+PGE_Size printTextOptiCol(std::string text,
+                          int x, int y,
+                          size_t max_columns,
+                          int font = DefaultRaster,
+                          float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
+                          uint32_t ttf_FontSize = 14);
 
 /**
  * @brief Optimize and print the text fragment to the screen
@@ -166,13 +178,14 @@ void printTextOptiCol(std::string text,
  * @param Blue Blue color level from 0.0 to 1.0
  * @param Alpha Alpha-channel level from 0.0 to 1.0
  * @param ttf_FontSize Point size for the TTF fonts
+ * @return The size of text block in pixels
  */
-void printTextOptiPx(std::string text,
-                     int x, int y,
-                     size_t max_pixels_lenght,
-                     int font = DefaultRaster,
-                     float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
-                     uint32_t ttf_FontSize = 14);
+PGE_Size printTextOptiPx(std::string text,
+                         int x, int y,
+                         size_t max_pixels_lenght,
+                         int font = DefaultRaster,
+                         float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
+                         uint32_t ttf_FontSize = 14);
 
 /**
  * @brief Optimise the given text fragment to fit it into the given columns count.
