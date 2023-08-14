@@ -30,6 +30,7 @@
 #include "../render.h"
 #include "config.h"
 #include "video.h"
+#include "screen.h"
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten/html5.h>
