@@ -86,7 +86,7 @@
                 "propBounds": "場景範圍",
                 "propMusic": "音樂"
             },
-            "settingsForEvent": "事件選項"
+            "settingsForEvent": "{0}事件選項"
         },
         "file": {
             "actionClearLevel": "清除關卡",
