@@ -97,11 +97,13 @@ namespace DScreenTypes
 
 struct Screen_t
 {
+    using localarr_t = std::array<uint8_t, maxLocalPlayers>;
+
     //! which vScreens belong to the screen
-    std::array<uint8_t, maxLocalPlayers> vScreen_refs = {1, 2};
+    localarr_t vScreen_refs = localarr_t{1, 2};
 
     // which players belong to the screen (at most one visible and one canonical screen may have a single player). zero-terminated.
-    std::array<uint8_t, maxLocalPlayers> players = {1, 2};
+    localarr_t players = localarr_t{1, 2};
 
     //! whether this is being rendered by any client (not necessarily the local one)
     bool Visible = true;
