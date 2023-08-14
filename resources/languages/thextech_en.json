@@ -24,7 +24,7 @@
                 "changeSectionBoundsToCurrent": "Change sect {0} bounds to current?",
                 "shouldEvent": "Should Event {0}"
             },
-            "controlsForEvent": "Controls for event",
+            "controlsForEventN": "Controls for event {0}",
             "deletion": {
                 "cancel": "No: do not delete event",
                 "confirm": "Yes: delete event",
@@ -86,7 +86,7 @@
                 "propBounds": "Bounds",
                 "propMusic": "Music"
             },
-            "settingsForEvent": "Settings for event"
+            "settingsForEvent": "Settings for event {0}"
         },
         "file": {
             "actionClearLevel": "Clear Level",
@@ -220,11 +220,11 @@
             "underwater": "Underwater"
         },
         "select": {
-            "allSectPropBlankForEvent": "All Sect {0} for",
+            "allSectPropBlankForEventN": "All Sect {0} for {1}",
             "pathBlankUnlock": "Path {0} Unlock By",
-            "sectBlankPropBlankForEvent": "Sect {0} {1} for",
+            "sectBlankPropBlankForEventN": "Sect {0} {1} for {2}",
             "sectionBlankPropBlank": "Section {0} {1}",
-            "soundForEvent": "Sound for Event",
+            "soundForEventN": "Sound for Event {0}",
             "warpTransitEffect": "Warp Transition Effect",
             "worldMusic": "World Music"
         },

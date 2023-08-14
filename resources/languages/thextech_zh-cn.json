@@ -24,7 +24,7 @@
                 "changeSectionBoundsToCurrent": "改变场景{0}的范围到当前设置吗？",
                 "shouldEvent": "要使事件{0}"
             },
-            "controlsForEvent": "强制按下玩家按键",
+            "controlsForEventN": "强制按下玩家按键{0}",
             "deletion": {
                 "cancel": "否：不删除事件",
                 "confirm": "是：删除事件",
@@ -219,11 +219,11 @@
             "underwater": "水下"
         },
         "select": {
-            "allSectPropBlankForEvent": "更改所有场景{0}于事件",
+            "allSectPropBlankForEventN": "更改所有场景{0}于事件{1}",
             "pathBlankUnlock": "路线向{0}开启条件",
-            "sectBlankPropBlankForEvent": "更改场景{0}的{1}于事件",
+            "sectBlankPropBlankForEventN": "更改场景{0}的{1}于事件{2}",
             "sectionBlankPropBlank": "场景{0}{1}",
-            "soundForEvent": "播放声音",
+            "soundForEventN": "播放声音{0}",
             "warpTransitEffect": "过渡效果",
             "worldMusic": "大地图音乐"
         },

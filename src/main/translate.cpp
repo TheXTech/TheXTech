@@ -598,7 +598,7 @@ XTechTranslate::XTechTranslate()
         {"editor.events.bounds.changeSectionBoundsToCurrent",     &g_editorStrings.eventsChangeSectionBoundsToCurrent},
         {"editor.events.bounds.changeAllSectionBoundsToCurrent",     &g_editorStrings.eventsChangeAllSectionBoundsToCurrent},
 
-        {"editor.events.controlsForEvent",       &g_editorStrings.eventsControlsForEvent},
+        {"editor.events.controlsForEventN",      &g_editorStrings.eventsControlsForEvent},
         {"editor.events.settingsForEvent",       &g_editorStrings.eventsSettingsForEvent},
 
         {"editor.events.layers.headerShow",      &g_editorStrings.eventsHeaderShow},
@@ -646,9 +646,9 @@ XTechTranslate::XTechTranslate()
         {"editor.world.allowChars",           &g_editorStrings.worldAllowChars},
         {"editor.world.phraseCreditIndex",    &g_editorStrings.worldCreditIndex},
 
-        {"editor.select.soundForEvent",             &g_editorStrings.selectSoundForEvent},
-        {"editor.select.sectBlankPropBlankForEvent", &g_editorStrings.selectSectBlankPropBlankForEvent},
-        {"editor.select.allSectPropBlankForEvent",  &g_editorStrings.selectAllSectPropBlankForEvent},
+        {"editor.select.soundForEventN",              &g_editorStrings.selectSoundForEvent},
+        {"editor.select.sectBlankPropBlankForEventN", &g_editorStrings.selectSectBlankPropBlankForEvent},
+        {"editor.select.allSectPropBlankForEventN",   &g_editorStrings.selectAllSectPropBlankForEvent},
         {"editor.select.sectionBlankPropBlank",     &g_editorStrings.selectSectionBlankPropBlank},
         {"editor.select.pathBlankUnlock",           &g_editorStrings.selectPathBlankUnlock},
         {"editor.select.warpTransitEffect",         &g_editorStrings.selectWarpTransitionEffect},
