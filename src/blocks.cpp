@@ -2412,15 +2412,12 @@ void PowBlock()
 
         if(ScreenType == 5)
         {
-            DynamicScreen();
+            DynamicScreen(Screens[0]);
             if(vScreen[2].Visible)
                 numScreens = 2;
             else
                 numScreens = 1;
         }
-
-        if(ScreenType == 8)
-            numScreens = 1;
     }
 
     for(Z = 1; Z <= numScreens; Z++)

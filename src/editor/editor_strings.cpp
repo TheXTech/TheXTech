@@ -176,7 +176,7 @@ void initEditorStrings()
     g_editorStrings.eventsChangeSectionBoundsToCurrent = "Change sect {0} bounds to current?";
     g_editorStrings.eventsChangeAllSectionBoundsToCurrent = "Change all sect bounds to current?";
 
-    g_editorStrings.eventsControlsForEvent = "Controls for event";
+    g_editorStrings.eventsControlsForEvent = "Controls for event {0}";
     g_editorStrings.eventsSettingsForEvent = "Settings for event";
     g_editorStrings.eventsHeaderShow = "Show:";
     g_editorStrings.eventsHeaderHide = "Hide:";
@@ -223,9 +223,9 @@ void initEditorStrings()
     g_editorStrings.worldAllowChars = "Allow Chars";
     g_editorStrings.worldCreditIndex = "World Credit Line {0}:";
 
-    g_editorStrings.selectSoundForEvent = "Sound for Event";
-    g_editorStrings.selectSectBlankPropBlankForEvent = "Sect {0} {1} for";
-    g_editorStrings.selectAllSectPropBlankForEvent = "All Sect {0} for";
+    g_editorStrings.selectSoundForEvent = "Sound for Event {0}";
+    g_editorStrings.selectSectBlankPropBlankForEvent = "Sect {0} {1} for {2}";
+    g_editorStrings.selectAllSectPropBlankForEvent = "All Sect {0} for {1}";
     g_editorStrings.selectSectionBlankPropBlank = "Section {0} {1}";
     g_editorStrings.selectPathBlankUnlock = "Path {0} Unlock By";
     g_editorStrings.selectWarpTransitionEffect = "Warp Transition Effect";

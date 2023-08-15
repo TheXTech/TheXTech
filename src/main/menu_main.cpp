@@ -142,6 +142,10 @@ void initMainMenu()
     g_mainMenu.optionsModeFullScreen = "Fullscreen mode";
     g_mainMenu.optionsModeWindowed = "Windowed mode";
     g_mainMenu.optionsViewCredits = "View credits";
+    g_mainMenu.optionsScaleMode = "Scale";
+    g_mainMenu.optionsScaleInteger = "Integer";
+    g_mainMenu.optionsScaleNearest = "Nearest";
+    g_mainMenu.optionsScaleLinear = "Linear";
 
     g_mainMenu.connectCharSelTitle = "Character Select";
     g_mainMenu.connectStartGame = "Start Game";
@@ -1546,12 +1550,12 @@ bool mainMenuUpdate()
         {
             int optionsMenuLength = 2; // controls, language, credits
 #ifndef RENDER_FULLSCREEN_ALWAYS
-            optionsMenuLength++;
+            optionsMenuLength++; // FullScreen
 #endif
 #ifndef FIXED_RES
-            optionsMenuLength ++; // ScaleMode
             optionsMenuLength ++; // resolution
 #endif
+            optionsMenuLength ++; // ScaleMode
 
             if(SharedCursor.Move)
             {
@@ -1577,6 +1581,8 @@ bool mainMenuUpdate()
                         else if(A == i++)
                             menuLen = 18 * std::strlen("res: WWWxHHH (word)");
 #endif
+                        else if(A == i++)
+                            menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
                         else if(A == i++)
                             menuLen = 18 * 25; // Language: XXXXX (YY)
                         else
@@ -1704,6 +1710,20 @@ bool mainMenuUpdate()
                         UpdateInternalRes();
                     }
 #endif
+                    else if(MenuCursor == i++)
+                    {
+                        PlaySoundMenu(SFX_Do);
+                        if(!leftPressed)
+                            g_videoSettings.scaleMode = g_videoSettings.scaleMode + 1;
+                        else
+                            g_videoSettings.scaleMode = g_videoSettings.scaleMode - 1;
+                        if(g_videoSettings.scaleMode > SCALE_FIXED_2X)
+                            g_videoSettings.scaleMode = SCALE_DYNAMIC_INTEGER;
+                        if(g_videoSettings.scaleMode < SCALE_DYNAMIC_INTEGER)
+                            g_videoSettings.scaleMode = SCALE_FIXED_2X;
+                        UpdateWindowRes();
+                        UpdateInternalRes();
+                    }
                     else if(MenuCursor == i++)
                     {
                         XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
@@ -2239,9 +2259,17 @@ void mainMenuDraw()
         else
             SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
 #endif
-#if !defined(FIXED_RES)
-        SuperPrint("SCALE: "+ScaleMode_strings.at(g_videoSettings.scaleMode), 3, MenuX, MenuY + (30 * i++));
+        const std::string* scale_str = &ScaleMode_strings.at(g_videoSettings.scaleMode);
+        if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+            scale_str = &g_mainMenu.optionsScaleInteger;
+        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
+            scale_str = &g_mainMenu.optionsScaleNearest;
+        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+            scale_str = &g_mainMenu.optionsScaleLinear;
 
+        SuperPrint(fmt::format_ne("{0}: {1}", g_mainMenu.optionsScaleMode, *scale_str), 3, MenuX, MenuY + (30 * i++));
+
+#if !defined(FIXED_RES)
         std::string resString = fmt::format_ne("RES: {0}x{1}", g_config.InternalW, g_config.InternalH);
 
         if (g_config.InternalW == 480 && g_config.InternalH == 320)
@@ -2269,6 +2297,7 @@ void mainMenuDraw()
 
         SuperPrint(resString, 3, MenuX, MenuY + (30 * i++));
 #endif
+
         SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
         SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),

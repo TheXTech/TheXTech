@@ -26,7 +26,7 @@
 void SetOrigRes();
 void ChangeRes(int ScreenX, int ScreenY, int ScreenColor, int ScreenFreq);
 
-// New: update the internal game resolution based on game window size and preferences
+// New: update the internal game resolution and scaling based on game window size and preferences
 // Calls XRender::updateViewport on completion
 void UpdateInternalRes();
 

@@ -24,7 +24,7 @@
                 "changeSectionBoundsToCurrent": "改變場景{0}的範圍到當前設置嗎？",
                 "shouldEvent": "要使事件{0}"
             },
-            "controlsForEvent": "強制按下玩家按鍵",
+            "controlsForEventN": "強制按下玩家按鍵{0}",
             "deletion": {
                 "cancel": "否：不刪除事件",
                 "confirm": "是：刪除事件",
@@ -219,11 +219,11 @@
             "underwater": "水下"
         },
         "select": {
-            "allSectPropBlankForEvent": "更改所有場景{0}於事件",
+            "allSectPropBlankForEventN": "更改所有場景{0}於事件{1}",
             "pathBlankUnlock": "路線向{0}開啓條件",
-            "sectBlankPropBlankForEvent": "更改場景{0}的{1}於事件",
+            "sectBlankPropBlankForEventN": "更改場景{0}的{1}於事件{2}",
             "sectionBlankPropBlank": "場景{0}{1}",
-            "soundForEvent": "播放聲音",
+            "soundForEventN": "播放聲音{0}",
             "warpTransitEffect": "過渡效果",
             "worldMusic": "大地圖音樂"
         },
@@ -569,7 +569,13 @@
         "options": {
             "optionsModeFullScreen": "全屏模式",
             "optionsModeWindowed": "窗口模式",
-            "optionsViewCredits": "查看製作團隊"
+            "optionsViewCredits": "查看製作團隊",
+            "scale": {
+                "label": "圖像縮放",
+                "integer": "整數",
+                "linear": "雙綫性",
+                "nearest": "最近鄰居"
+            }
         },
         "wordBack": "返回",
         "wordHide": "隱藏",

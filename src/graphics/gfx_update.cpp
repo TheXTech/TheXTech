@@ -660,7 +660,7 @@ void GraphicsLazyPreLoad()
 
     if(ScreenType == 5)
     {
-        DynamicScreen();
+        DynamicScreen(Screens[0]);
         if(vScreen[2].Visible)
             numScreens = 2;
         else
@@ -674,12 +674,14 @@ void GraphicsLazyPreLoad()
     if(SingleCoop == 2)
         numScreens = 1; // fine to be 1, since it would just be run for Z = 2 twice otherwise;
 
-    CenterScreens();
+    CenterScreens(Screens[0]);
 
     For(Z, 1, numScreens)
     {
         if(SingleCoop == 2)
             Z = 2;
+
+        // TODO: need to get vScreen?
 
         int S = Player[Z].Section;
         int bg = Background2[S];
@@ -1382,7 +1384,7 @@ void UpdateGraphics(bool skipRepaint)
 
     if(ScreenType == 5)
     {
-        DynamicScreen();
+        DynamicScreen(Screens[0]);
 
         if(vScreen[2].Visible)
             numScreens = 2;
@@ -1396,7 +1398,7 @@ void UpdateGraphics(bool skipRepaint)
     if(SingleCoop == 2)
         numScreens = 2;
 
-    CenterScreens();
+    CenterScreens(Screens[0]);
 
     g_stats.reset();
 
@@ -1421,13 +1423,13 @@ void UpdateGraphics(bool skipRepaint)
         if(!LevelEditor)
         {
             if(ScreenType == 2 || ScreenType == 3)
-                GetvScreenAverage();
+                GetvScreenAverage(vScreen[1]);
             else if(ScreenType == 5 && !vScreen[2].Visible)
-                GetvScreenAverage();
+                GetvScreenAverage(vScreen[1]);
             else if(ScreenType == 7)
-                GetvScreenCredits();
+                GetvScreenCredits(vScreen[1]);
             else
-                GetvScreen(Z);
+                GetvScreen(vScreen[Z]);
         }
 
         // moved to `graphics/gfx_screen.cpp`
@@ -1441,13 +1443,14 @@ void UpdateGraphics(bool skipRepaint)
         // noturningback
         if(!LevelEditor && NoTurnBack[Player[Z].Section])
         {
+            // goal: find screen currently on this section that is the furthest left
             A = Z;
             if(numScreens > 1)
             {
                 if(Player[1].Section == Player[2].Section)
                 {
                     if(Z == 1)
-                        GetvScreen(2);
+                        GetvScreen(vScreen[2]);
 
                     if(-vScreen[1].X < -vScreen[2].X)
                         A = 1;
@@ -2867,29 +2870,31 @@ void UpdateGraphics(bool skipRepaint)
             if(ScreenType == 5 && vScreen[2].Visible && vScreen[Z].Left > 0)
                 CamY -= 24;
 
-            if(g_vScreenOffsetY_hold[Z - 1] != 0)
+            if(vScreen[Z].small_screen_features.offset_y_hold != 0)
             {
                 if(GFX.Camera.inited)
                     XRender::renderTexture(CamX, CamY, GFX.Camera, 1.0f, 0.2f, 0.2f);
                 else
                     XRender::renderRect(CamX, CamY, 24, 16, 1.0f, 0.2f, 0.2f);
-                if(g_vScreenOffsetY_hold[Z - 1] > 0)
+
+                if(vScreen[Z].small_screen_features.offset_y_hold > 0)
                     XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1]);
                 else
                     XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2]);
             }
-            else if(g_vScreenOffsetY[Z - 1] < -160 || g_vScreenOffsetY[Z - 1] > 160)
+            else if(vScreen[Z].small_screen_features.offset_y < -160 || vScreen[Z].small_screen_features.offset_y > 160)
             {
                 if(GFX.Camera.inited)
                     XRender::renderTexture(CamX, CamY, GFX.Camera, 0.5f, 1.0f, 0.5f, 0.7f);
                 else
                     XRender::renderRect(CamX, CamY, 24, 16, 0.5f, 1.0f, 0.5f, 0.7f);
-                if(g_vScreenOffsetY[Z - 1] > 0)
+
+                if(vScreen[Z].small_screen_features.offset_y > 0)
                     XRender::renderTexture(CamX + 4, CamY - 18, GFX.MCursor[1], 1.0f, 1.0f, 1.0f, 0.7f);
                 else
                     XRender::renderTexture(CamX + 4, CamY + 18, GFX.MCursor[2], 1.0f, 1.0f, 1.0f, 0.7f);
             }
-            else if(g_vScreenOffsetY[Z - 1] <= -48 || g_vScreenOffsetY[Z - 1] >= 48)
+            else if(vScreen[Z].small_screen_features.offset_y <= -48 || vScreen[Z].small_screen_features.offset_y >= 48)
             {
                 if(GFX.Camera.inited)
                     XRender::renderTexture(CamX, CamY, GFX.Camera, 1.0f, 1.0f, 1.0f, 0.5f);

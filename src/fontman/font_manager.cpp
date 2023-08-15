@@ -562,6 +562,28 @@ PGE_Size FontManager::textSize(const char* text, size_t text_size, int fontID,
     return PGE_Size(27 * 20, static_cast<int>(std::count(text, text + text_size, '\n') + 1) * 20);
 }
 
+PGE_Size FontManager::glyphSize(const char* utf8char, uint32_t charNum, int fontId, uint32_t ttf_fontSize)
+{
+    SDL_assert_release(g_fontManagerIsInit);// Font manager is not initialized!
+#ifndef THEXTECH_ENABLE_TTF_SUPPORT
+    (void)ttfFontSize;
+#endif
+
+    //Use one of loaded fonts
+    if((fontId >= 0) && (static_cast<size_t>(fontId) < g_anyFonts.size()) && g_anyFonts[fontId])
+    {
+        if(g_anyFonts[fontId]->isLoaded())
+            return g_anyFonts[fontId]->glyphSize(utf8char, charNum, ttf_fontSize);
+    }
+
+#ifdef THEXTECH_ENABLE_TTF_SUPPORT
+    if(g_defaultTtfFont && g_defaultTtfFont->isLoaded())
+        return g_defaultTtfFont->glyphSize(utf8char, charNum, ttf_fontSize);
+#endif
+
+    return PGE_Size(27 * 20, 1 * 20);
+}
+
 int FontManager::getFontID(std::string fontName)
 {
     FontsHash::iterator i = g_fontNameToId.find(fontName);
@@ -681,34 +703,36 @@ PGE_Size FontManager::optimizeText(std::string &text, size_t max_columns)
 }
 
 
-void FontManager::printTextOptiCol(std::string text,
+PGE_Size FontManager::printTextOptiCol(std::string text,
                                    int x, int y,
                                    size_t max_columns,
                                    int font,
                                    float Red, float Green, float Blue, float Alpha,
                                    uint32_t ttf_FontSize)
 {
-    FontManager::optimizeText(text, max_columns);
+    PGE_Size ret = FontManager::optimizeText(text, max_columns);
     FontManager::printText(text.c_str(), text.size(),
                            x, y,
                            font,
                            Red, Green, Blue, Alpha,
                            ttf_FontSize);
+    return ret;
 }
 
-void FontManager::printTextOptiPx(std::string text,
+PGE_Size FontManager::printTextOptiPx(std::string text,
                                   int x, int y,
                                   size_t max_pixels_lenght,
                                   int font,
                                   float Red, float Green, float Blue, float Alpha,
                                   uint32_t ttf_FontSize)
 {
-    FontManager::optimizeTextPx(text, max_pixels_lenght, font, ttf_FontSize);
+    PGE_Size ret = FontManager::optimizeTextPx(text, max_pixels_lenght, font, ttf_FontSize);
     FontManager::printText(text.c_str(), text.size(),
                            x, y,
                            font,
                            Red, Green, Blue, Alpha,
                            ttf_FontSize);
+    return ret;
 }
 
 PGE_Size FontManager::optimizeTextPx(std::string& text,
@@ -814,3 +838,4 @@ std::string FontManager::cropText(std::string text, size_t max_symbols)
 
     return text;
 }
+

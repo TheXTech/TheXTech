@@ -865,33 +865,33 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             // need two cycles to fully update the dynamic screens in the new level
                             SetupScreens(false);
-                            DynamicScreen();
-                            CenterScreens();
+                            DynamicScreen(Screens[0]);
+                            CenterScreens(Screens[0]);
 
                             if(vScreen[2].Visible)
                             {
                                 for(int Z = 1; Z <= 2; Z++)
-                                    GetvScreen(Z);
+                                    GetvScreen(vScreen[Z]);
                             }
                             else
-                                GetvScreenAverage();
+                                GetvScreenAverage(vScreen[1]);
 
                             // set up the dynamic screens in the new level
                             SetupScreens(false);
-                            DynamicScreen();
+                            DynamicScreen(Screens[0]);
 
                             // set the positions (including screen positions) in the old level
                             level[B] = tempLevel;
-                            CenterScreens();
+                            CenterScreens(Screens[0]);
 
                             if(vScreen[2].Visible)
                             {
                                 for(int Z = 1; Z <= 2; Z++)
-                                    GetvScreen(Z);
+                                    GetvScreen(vScreen[Z]);
                             }
                             else
                             {
-                                GetvScreenAverage();
+                                GetvScreenAverage(vScreen[1]);
                             }
 
                             // set the qScreen!
@@ -977,8 +977,8 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             // (2) new screen size should equal old
 
                             SetupScreens(false);
-                            GetvScreen(1);
-                            CenterScreens();
+                            GetvScreen(vScreen[1]);
+                            CenterScreens(Screens[0]);
 
                             if(vScreen[1].Width != old_w || vScreen[1].Height != old_h)
                                 use_new_resize = false;
@@ -1019,7 +1019,7 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             screenLoc = vScreen[onscreen_plr];
                             SoundPause[13] = 10;
 
-                            DynamicScreen();
+                            DynamicScreen(Screens[0]);
 
                             // the original game forces vScreenAverage to be 800x600 -- this creates the same effect of ignoring the dynamic screen
                             bool screen2_vis = vScreen[2].Visible;
@@ -1028,11 +1028,11 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                             // needed for CenterScreens() to do the right thing,
                             // but have to set it back so DynamicScreen() does the right thing next frame
                             SetupScreens(true);
-                            CenterScreens();
+                            CenterScreens(Screens[0]);
                             vScreen[2].Visible = screen2_vis;
 
                             // calculate the vScreen at non-splitscreen resolution (as the original game does)
-                            GetvScreenAverage();
+                            GetvScreenAverage(vScreen[1]);
 
                             // enable qScreen!
                             qScreen = true;

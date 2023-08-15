@@ -22,6 +22,7 @@
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_hints.h>
 
 #include <FreeImageLite.h>
 #include <Logger/logger.h>
@@ -264,28 +265,22 @@ void RenderSDL::repaint()
 
 void RenderSDL::updateViewport()
 {
-    float w, w1, h, h1;
-    int   wi, hi;
+    int   render_w, render_h;
 
-    getRenderSize(&wi, &hi);
+    getRenderSize(&render_w, &render_h);
+
+    D_pLogDebug("Updated render size: %d x %d", render_w, render_h);
 
     // quickly update the HiDPI scaling factor
     int window_w, window_h;
     XWindow::getWindowSize(&window_w, &window_h);
-    m_hidpi_x = (float)wi / (float)window_w;
-    m_hidpi_y = (float)hi / (float)window_h;
+    m_hidpi_x = (float)render_w / (float)window_w;
+    m_hidpi_y = (float)render_h / (float)window_h;
 
-    D_pLogDebug("Updated window size: %d x %d", wi, hi);
+    float scale_x = (float)render_w / ScreenW;
+    float scale_y = (float)render_h / ScreenH;
 
-    w = wi;
-    h = hi;
-    w1 = w;
-    h1 = h;
-
-    float scale = w / ScreenW;
-
-    if(scale > h / ScreenH)
-        scale = h / ScreenH;
+    float scale = SDL_min(scale_x, scale_y);
 
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X && scale > 0.5f)
         scale = 0.5f;
@@ -296,8 +291,8 @@ void RenderSDL::updateViewport()
     if(g_videoSettings.scaleMode == SCALE_FIXED_2X && scale > 2.f)
         scale = 2.f;
 
-    w1 = scale * ScreenW;
-    h1 = scale * ScreenH;
+    int game_w = scale * ScreenW;
+    int game_h = scale * ScreenH;
 
     m_scale_x = scale;
     m_scale_y = scale;
@@ -310,15 +305,15 @@ void RenderSDL::updateViewport()
     m_viewport_offset_y_cur = 0;
     m_viewport_offset_ignore = false;
 
-    m_offset_x = (w - w1) / 2;
-    m_offset_y = (h - h1) / 2;
+    m_offset_x = (render_w - game_w) / 2;
+    m_offset_y = (render_h - game_h) / 2;
 
     m_viewport_x = 0;
     m_viewport_y = 0;
     m_viewport_w = ScreenW;
     m_viewport_h = ScreenH;
 
-    // update render targets; will never happen in the fixed res case
+    // update render targets
     if(ScaleWidth != ScreenW || ScaleHeight != ScreenH || m_current_scale_mode != g_videoSettings.scaleMode)
     {
 #ifdef USE_SCREENSHOTS_AND_RECS
@@ -345,6 +340,7 @@ void RenderSDL::updateViewport()
         m_current_scale_mode = g_videoSettings.scaleMode;
     }
 
+    // TODO: remove this (deprecated, too specific of a case)
     // if necessary, create / update the emergency 2x screen map
     if(m_t2xScreen)
     {
@@ -354,7 +350,7 @@ void RenderSDL::updateViewport()
 #ifndef THEXTECH_FIXED_RES
     if(scale < 0.5f)
     {
-        m_t2xScreen = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, wi * 2, hi * 2);
+        m_t2xScreen = SDL_CreateTexture(m_gRenderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_TARGET, render_w * 2, render_h * 2);
         SDL_SetRenderTarget(m_gRenderer, m_tBuffer);
     }
 #endif // #ifndef THEXTECH_FIXED_RES

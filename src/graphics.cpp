@@ -37,32 +37,24 @@
 #include <Utils/maths.h>
 
 
-static int16_t s_vScreenOffsetX[2] = {0, 0};
-static int8_t s_lastButtonsHeld[2] = {0, 0};
-int16_t g_vScreenOffsetY[2] = {0, 0};
-int16_t g_vScreenOffsetY_hold[2] = {0, 0};
-
 void ResetCameraPanning()
 {
-    s_vScreenOffsetX[0] = 0;
-    s_vScreenOffsetX[1] = 0;
-    s_lastButtonsHeld[0] = 0;
-    s_lastButtonsHeld[1] = 0;
-    g_vScreenOffsetY[0] = 0;
-    g_vScreenOffsetY[1] = 0;
-    g_vScreenOffsetY_hold[0] = 0;
-    g_vScreenOffsetY_hold[1] = 0;
+    for(int i = 0; i < 2; ++i)
+        vScreen[i].small_screen_features = vScreen_t::SmallScreenFeatures_t();
 }
 
-static void s_ProcessSmallScreenFeatures(int A)
+static void s_ProcessSmallScreenFeatures(vScreen_t& vscreen)
 {
-    if(g_config.small_screen_camera_features && ScreenW < 800 && !NoTurnBack[Player[A].Section])
+    Screen_t& screen = Screens[vscreen.screen_ref];
+    Player_t& p = Player[vscreen.player];
+
+    if(g_config.small_screen_camera_features && screen.W < 800 && !NoTurnBack[p.Section])
     {
         int16_t max_offsetX = 360;
-        if(max_offsetX > vScreen[A].Width - Player[A].Location.Width * 4)
-            max_offsetX = vScreen[A].Width - Player[A].Location.Width * 4;
+        if(max_offsetX > vscreen.Width - p.Location.Width * 4)
+            max_offsetX = vscreen.Width - p.Location.Width * 4;
 
-        int16_t lookX_target = max_offsetX * Player[A].Location.SpeedX * 1.5 / Physics.PlayerRunSpeed;
+        int16_t lookX_target = max_offsetX * p.Location.SpeedX * 1.5 / Physics.PlayerRunSpeed;
         if(lookX_target > max_offsetX)
             lookX_target = max_offsetX;
         if(lookX_target < -max_offsetX)
@@ -71,26 +63,26 @@ static void s_ProcessSmallScreenFeatures(int A)
 
         int16_t rateX = 1;
         // switching directions
-        if((s_vScreenOffsetX[A - 1] < 0 && lookX_target > 0)
-            || (s_vScreenOffsetX[A - 1] > 0 && lookX_target < 0))
+        if((vscreen.small_screen_features.offset_x < 0 && lookX_target > 0)
+            || (vscreen.small_screen_features.offset_x > 0 && lookX_target < 0))
         {
             rateX = 3;
         }
         // accelerating
-        else if((s_vScreenOffsetX[A - 1] > 0) == (lookX_target > s_vScreenOffsetX[A - 1]))
+        else if((vscreen.small_screen_features.offset_x > 0) == (lookX_target > vscreen.small_screen_features.offset_x))
         {
             rateX = 2;
         }
 
         if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
         {
-            if(s_vScreenOffsetX[A - 1] < lookX_target)
-                s_vScreenOffsetX[A - 1] += rateX;
-            else if(s_vScreenOffsetX[A - 1] > lookX_target)
-                s_vScreenOffsetX[A - 1] -= rateX;
+            if(vscreen.small_screen_features.offset_x < lookX_target)
+                vscreen.small_screen_features.offset_x += rateX;
+            else if(vscreen.small_screen_features.offset_x > lookX_target)
+                vscreen.small_screen_features.offset_x -= rateX;
         }
 
-        vScreen[A].X -= s_vScreenOffsetX[A - 1]/2;
+        vscreen.X -= vscreen.small_screen_features.offset_x / 2;
     }
 
     if(g_config.small_screen_camera_features && ScreenH < 600)
@@ -99,60 +91,60 @@ static void s_ProcessSmallScreenFeatures(int A)
 
         int16_t lookY_target = max_offsetY;
 
-        bool on_ground = Player[A].Pinched.Bottom1 || Player[A].Slope || Player[A].StandingOnNPC || Player[A].Wet || Player[A].Quicksand;
-        // bool duck_jump = !on_ground && Player[A].Duck;
-        bool prevent_unlock = g_vScreenOffsetY_hold[A - 1] != 0 && (Player[A].Vine || !on_ground || Player[A].GrabTime);
+        bool on_ground = p.Pinched.Bottom1 || p.Slope || p.StandingOnNPC || p.Wet || p.Quicksand;
+        // bool duck_jump = !on_ground && p.Duck;
+        bool prevent_unlock = vscreen.small_screen_features.offset_y_hold != 0 && (p.Vine || !on_ground || p.GrabTime);
 
-        if(Player[A].Controls.Up == Player[A].Controls.Down || prevent_unlock)
-            lookY_target = g_vScreenOffsetY_hold[A - 1];
-        else if(Player[A].Controls.Down)
+        if(p.Controls.Up == p.Controls.Down || prevent_unlock)
+            lookY_target = vscreen.small_screen_features.offset_y_hold;
+        else if(p.Controls.Down)
             lookY_target *= -1;
 
         int16_t rateY = 4;
-        if((g_vScreenOffsetY[A - 1] < 0 && lookY_target > 0)
-            || (g_vScreenOffsetY[A - 1] > 0 && lookY_target < 0))
+        if((vscreen.small_screen_features.offset_y < 0 && lookY_target > 0)
+            || (vscreen.small_screen_features.offset_y > 0 && lookY_target < 0))
         {
-            if(g_vScreenOffsetY[A - 1] < 50 && g_vScreenOffsetY[A - 1] > -50)
-                g_vScreenOffsetY[A - 1] *= -1;
+            if(vscreen.small_screen_features.offset_y < 50 && vscreen.small_screen_features.offset_y > -50)
+                vscreen.small_screen_features.offset_y *= -1;
         }
 
         if(GamePaused == PauseCode::None && !qScreen && !ForcedControls)
         {
-            if(g_vScreenOffsetY[A - 1] < lookY_target)
+            if(vscreen.small_screen_features.offset_y < lookY_target)
             {
-                g_vScreenOffsetY[A - 1] += rateY;
+                vscreen.small_screen_features.offset_y += rateY;
 
-                if(g_vScreenOffsetY[A - 1] > lookY_target)
-                    g_vScreenOffsetY[A - 1] = lookY_target;
+                if(vscreen.small_screen_features.offset_y > lookY_target)
+                    vscreen.small_screen_features.offset_y = lookY_target;
             }
-            else if(g_vScreenOffsetY[A - 1] > lookY_target)
+            else if(vscreen.small_screen_features.offset_y > lookY_target)
             {
-                g_vScreenOffsetY[A - 1] -= rateY;
+                vscreen.small_screen_features.offset_y -= rateY;
 
-                if(g_vScreenOffsetY[A - 1] < lookY_target)
-                    g_vScreenOffsetY[A - 1] = lookY_target;
+                if(vscreen.small_screen_features.offset_y < lookY_target)
+                    vscreen.small_screen_features.offset_y = lookY_target;
             }
 
-            if(g_vScreenOffsetY_hold[A - 1] == 0 && g_vScreenOffsetY[A - 1] < -max_offsetY + 40 && (s_lastButtonsHeld[A - 1] & 1) == 0 && Player[A].Controls.Down)
+            if(vscreen.small_screen_features.offset_y_hold == 0 && vscreen.small_screen_features.offset_y < -max_offsetY + 40 && (vscreen.small_screen_features.last_buttons_held & 1) == 0 && p.Controls.Down)
             {
-                g_vScreenOffsetY_hold[A - 1] = -max_offsetY;
+                vscreen.small_screen_features.offset_y_hold = -max_offsetY;
                 PlaySound(SFX_Camera);
             }
-            else if(g_vScreenOffsetY_hold[A - 1] == 0 && g_vScreenOffsetY[A - 1] > max_offsetY - 40 && (s_lastButtonsHeld[A - 1] & 2) == 0 && Player[A].Controls.Up)
+            else if(vscreen.small_screen_features.offset_y_hold == 0 && vscreen.small_screen_features.offset_y > max_offsetY - 40 && (vscreen.small_screen_features.last_buttons_held & 2) == 0 && p.Controls.Up)
             {
-                g_vScreenOffsetY_hold[A - 1] = max_offsetY;
+                vscreen.small_screen_features.offset_y_hold = max_offsetY;
                 PlaySound(SFX_Camera);
             }
-            else if(g_vScreenOffsetY_hold[A - 1] != 0 && g_vScreenOffsetY[A - 1] > -60 && g_vScreenOffsetY[A - 1] < 60)
+            else if(vscreen.small_screen_features.offset_y_hold != 0 && vscreen.small_screen_features.offset_y > -60 && vscreen.small_screen_features.offset_y < 60)
             {
-                g_vScreenOffsetY_hold[A - 1] = 0;
+                vscreen.small_screen_features.offset_y_hold = 0;
                 PlaySound(SFX_Camera);
             }
 
-            s_lastButtonsHeld[A - 1] = (int8_t)Player[A].Controls.Down | (int8_t)Player[A].Controls.Up << 1;
+            vscreen.small_screen_features.last_buttons_held = (int8_t)p.Controls.Down | (int8_t)p.Controls.Up << 1;
         }
 
-        int16_t lookY = g_vScreenOffsetY[A - 1];
+        int16_t lookY = vscreen.small_screen_features.offset_y;
 
         if(lookY > -50 && lookY < 50)
             lookY = 0;
@@ -165,99 +157,63 @@ static void s_ProcessSmallScreenFeatures(int A)
             lookY /= 2;
         }
 
-        vScreen[A].Y += lookY + 32;
+        vscreen.Y += lookY + 32;
     }
 }
 
 //  Get the screen position
-void GetvScreen(const int A)
+void GetvScreen(vScreen_t& vscreen)
 {
-    auto &p = Player[A];
+    auto &p = Player[vscreen.player];
     auto &pLoc = p.Location;
 
-    // Netplay code, disabled
-//    if(ScreenType == 8)
-//    {
-//        if(Player[nPlay.MySlot + 1].Mount == 2)
-//            Player[nPlay.MySlot + 1].Location.Height = 0;
-//        vScreen[1].X = -Player[nPlay.MySlot + 1].Location.X + (vScreen[1].Width * 0.5) - Player[nPlay.MySlot + 1].Location.Width / 2.0;
-//        vScreen[1].Y = -Player[nPlay.MySlot + 1].Location.Y + (vScreen[1].Height * 0.5) - vScreenYOffset - Player[nPlay.MySlot + 1].Location.Height;
-//        vScreen[1].X += -vScreen[1].tempX;
-//        vScreen[1].Y += -vScreen[1].TempY;
-//        if(-vScreen[1].X < level[Player[nPlay.MySlot + 1].Section].X)
-//            vScreen[1].X = -level[Player[nPlay.MySlot + 1].Section].X;
-//        if(-vScreen[1].X + vScreen[1].Width > level[Player[nPlay.MySlot + 1].Section].Width)
-//            vScreen[1].X = -(level[Player[nPlay.MySlot + 1].Section].Width - vScreen[1].Width);
-//        if(-vScreen[1].Y < level[Player[nPlay.MySlot + 1].Section].Y)
-//            vScreen[1].Y = -level[Player[nPlay.MySlot + 1].Section].Y;
-//        if(-vScreen[1].Y + vScreen[1].Height > level[Player[nPlay.MySlot + 1].Section].Height)
-//            vScreen[1].Y = -(level[Player[nPlay.MySlot + 1].Section].Height - vScreen[1].Height);
-//        if(vScreen[1].TempDelay > 0)
-//            vScreen[1].TempDelay -= 1;
-//        else
-//        {
-//            if(vScreen[1].tempX > 0)
-//                vScreen[1].tempX -= 1;
-//            if(vScreen[1].tempX < 0)
-//                vScreen[1].tempX += 1;
-//            if(vScreen[1].TempY > 0)
-//                vScreen[1].TempY -= 1;
-//            if(vScreen[1].TempY < 0)
-//                vScreen[1].TempY += 1;
-//        }
-//        if(Player[nPlay.MySlot + 1].Mount == 2)
-//            Player[nPlay.MySlot + 1].Location.Height = 128;
-//    }
-//    else
+    if(p.Mount == 2)
+        pLoc.Height = 0;
+
+    // this guard is new because players can now respawn in 1P mode through DropAdd
+    if(p.Effect != 6)
     {
-        if(p.Mount == 2)
-            pLoc.Height = 0;
-        // this guard is new because players can now respawn in 1P mode through DropAdd
-        if(Player[A].Effect != 6)
-        {
-            vScreen[A].X = -pLoc.X + (vScreen[A].Width * 0.5) - pLoc.Width / 2.0;
-            vScreen[A].Y = -pLoc.Y + (vScreen[A].Height * 0.5) - vScreenYOffset - pLoc.Height;
+        vscreen.X = -pLoc.X + (vscreen.Width * 0.5) - pLoc.Width / 2.0;
+        vscreen.Y = -pLoc.Y + (vscreen.Height * 0.5) - vScreenYOffset - pLoc.Height;
 
-            s_ProcessSmallScreenFeatures(A);
+        s_ProcessSmallScreenFeatures(vscreen);
 
-            vScreen[A].X += -vScreen[A].tempX;
-            vScreen[A].Y += -vScreen[A].TempY;
+        vscreen.X += -vscreen.tempX;
+        vscreen.Y += -vscreen.TempY;
 
-            // center the level if too small, otherwise shift so that it is onscreen
-            if(vScreen[A].Width + level[p.Section].X > level[p.Section].Width)
-                vScreen[A].X = -level[p.Section].X/2 + -(level[p.Section].Width - vScreen[A].Width)/2;
-            else if(-vScreen[A].X < level[p.Section].X)
-                vScreen[A].X = -level[p.Section].X;
-            else if(-vScreen[A].X + vScreen[A].Width > level[p.Section].Width)
-                vScreen[A].X = -(level[p.Section].Width - vScreen[A].Width);
+        // center the level if too small, otherwise shift so that it is onscreen
+        if(vscreen.Width + level[p.Section].X > level[p.Section].Width)
+            vscreen.X = -level[p.Section].X / 2 + -(level[p.Section].Width - vscreen.Width) / 2;
+        else if(-vscreen.X < level[p.Section].X)
+            vscreen.X = -level[p.Section].X;
+        else if(-vscreen.X + vscreen.Width > level[p.Section].Width)
+            vscreen.X = -(level[p.Section].Width - vscreen.Width);
 
-            // center the level if too small, otherwise shift so that it is onscreen
-            if(vScreen[A].Height + level[p.Section].Y > level[p.Section].Height)
-                vScreen[A].Y = -level[p.Section].Y/2 + -(level[p.Section].Height - vScreen[A].Height)/2;
-            else if(-vScreen[A].Y < level[p.Section].Y)
-                vScreen[A].Y = -level[p.Section].Y;
-            else if(-vScreen[A].Y + vScreen[A].Height > level[p.Section].Height)
-                vScreen[A].Y = -(level[p.Section].Height - vScreen[A].Height);
-        }
-
-        // there is some 3DS-specific code to ensure the screen boundaries work with the 3D effect, not ported yet.
-
-        if(vScreen[A].TempDelay > 0)
-            vScreen[A].TempDelay -= 1;
-        else
-        {
-            if(vScreen[A].tempX > 0)
-                vScreen[A].tempX -= 1;
-            if(vScreen[A].tempX < 0)
-                vScreen[A].tempX += 1;
-            if(vScreen[A].TempY > 0)
-                vScreen[A].TempY -= 1;
-            if(vScreen[A].TempY < 0)
-                vScreen[A].TempY += 1;
-        }
-        if(p.Mount == 2)
-            pLoc.Height = 128;
+        // center the level if too small, otherwise shift so that it is onscreen
+        if(vscreen.Height + level[p.Section].Y > level[p.Section].Height)
+            vscreen.Y = -level[p.Section].Y / 2 + -(level[p.Section].Height - vscreen.Height) / 2;
+        else if(-vscreen.Y < level[p.Section].Y)
+            vscreen.Y = -level[p.Section].Y;
+        else if(-vscreen.Y + vscreen.Height > level[p.Section].Height)
+            vscreen.Y = -(level[p.Section].Height - vscreen.Height);
     }
+
+    if(vscreen.TempDelay > 0)
+        vscreen.TempDelay -= 1;
+    else
+    {
+        if(vscreen.tempX > 0)
+            vscreen.tempX -= 1;
+        if(vscreen.tempX < 0)
+            vscreen.tempX += 1;
+        if(vscreen.TempY > 0)
+            vscreen.TempY -= 1;
+        if(vscreen.TempY < 0)
+            vscreen.TempY += 1;
+    }
+
+    if(p.Mount == 2)
+        pLoc.Height = 128;
 }
 
 // NEW: get the vScreen position if it were 800x600, and write the top-left coordinate to (left, top)
@@ -285,7 +241,7 @@ void GetvScreenCanonical(int A, double* left, double* top, bool ignore_qScreen)
     {
         double tX = vScreen[A].X;
         double tY = vScreen[A].Y;
-        GetvScreen(A);
+        GetvScreen(vScreen[A]);
         *left += tX - vScreen[A].X;
         *top += tY - vScreen[A].Y;
         vScreen[A].X = tX;
@@ -294,93 +250,93 @@ void GetvScreenCanonical(int A, double* left, double* top, bool ignore_qScreen)
 }
 
 // Get the average screen position for all players
-void GetvScreenAverage()
+void GetvScreenAverage(vScreen_t& vscreen)
 {
     int A = 0;
     int B = 0;
     double OldX = 0;
     double OldY = 0;
 
-    OldX = vScreen[1].X;
-    OldY = vScreen[1].Y;
+    OldX = vscreen.X;
+    OldY = vscreen.Y;
 
-    vScreen[1].X = 0;
-    vScreen[1].Y = 0;
+    vscreen.X = 0;
+    vscreen.Y = 0;
 
     for(A = 1; A <= numPlayers; A++)
     {
         if(!Player[A].Dead && Player[A].Effect != 6)
         {
-            vScreen[1].X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
-                vScreen[1].Y += -Player[A].Location.Y;
+                vscreen.Y += -Player[A].Location.Y;
             else
-                vScreen[1].Y += -Player[A].Location.Y - Player[A].Location.Height;
+                vscreen.Y += -Player[A].Location.Y - Player[A].Location.Height;
             B += 1;
         }
     }
 
-    A = 1;
+    // A = 1;
     if(B == 0)
     {
         if(GameMenu)
         {
-            vScreen[1].X = -level[0].X;
+            vscreen.X = -level[0].X;
             B = 1;
         }
         else
         {
-            vScreen[1].X = OldX;
-            vScreen[1].Y = OldY;
+            vscreen.X = OldX;
+            vscreen.Y = OldY;
             return;
         }
     }
-    vScreen[1].X = (vScreen[1].X / B) + (vScreen[1].Width * 0.5);
-    vScreen[1].Y = (vScreen[1].Y / B) + (vScreen[1].Height * 0.5) - vScreenYOffset;
+    vscreen.X = (vscreen.X / B) + (vscreen.Width * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (vscreen.Height * 0.5) - vScreenYOffset;
 
     // case one: level is too small, center it.
-    if(vScreen[A].Width + level[Player[1].Section].X > level[Player[1].Section].Width)
-        vScreen[A].X = -level[Player[1].Section].X/2 + -(level[Player[1].Section].Width - vScreen[A].Width)/2;
+    if(vscreen.Width + level[Player[1].Section].X > level[Player[1].Section].Width)
+        vscreen.X = -level[Player[1].Section].X / 2 + -(level[Player[1].Section].Width - vscreen.Width) / 2;
     // case two: we are too close to the left
-    else if(-vScreen[A].X < level[Player[1].Section].X)
-        vScreen[A].X = -level[Player[1].Section].X;
+    else if(-vscreen.X < level[Player[1].Section].X)
+        vscreen.X = -level[Player[1].Section].X;
     // case three: we are too close to the right
-    else if(-vScreen[A].X + vScreen[A].Width > level[Player[1].Section].Width)
-        vScreen[A].X = -(level[Player[1].Section].Width - vScreen[A].Width);
+    else if(-vscreen.X + vscreen.Width > level[Player[1].Section].Width)
+        vscreen.X = -(level[Player[1].Section].Width - vscreen.Width);
 
     // case one: level is too small, center it.
-    if(vScreen[A].Height + level[Player[1].Section].Y > level[Player[1].Section].Height)
-        vScreen[A].Y = -level[Player[1].Section].Y/2 + -(level[Player[1].Section].Height - vScreen[A].Height)/2;
+    if(vscreen.Height + level[Player[1].Section].Y > level[Player[1].Section].Height)
+        vscreen.Y = -level[Player[1].Section].Y / 2 + -(level[Player[1].Section].Height - vscreen.Height) / 2;
     // case two: we are too close to the top
-    else if(-vScreen[A].Y < level[Player[1].Section].Y)
-        vScreen[A].Y = -level[Player[1].Section].Y;
+    else if(-vscreen.Y < level[Player[1].Section].Y)
+        vscreen.Y = -level[Player[1].Section].Y;
     // case three: we are too close to the bottom
-    else if(-vScreen[A].Y + vScreen[A].Height > level[Player[1].Section].Height)
-        vScreen[A].Y = -(level[Player[1].Section].Height - vScreen[A].Height);
+    else if(-vscreen.Y + vscreen.Height > level[Player[1].Section].Height)
+        vscreen.Y = -(level[Player[1].Section].Height - vscreen.Height);
 
     // keep vScreen boundary even (on 1x platforms)
 #ifdef PGE_MIN_PORT
-    vScreen[A].X += 1;
-    if(vScreen[A].X > 0)
-        vScreen[A].X -= std::fmod(vScreen[A].X, 2.);
+    vscreen.X += 1;
+    if(vscreen.X > 0)
+        vscreen.X -= std::fmod(vscreen.X, 2.);
     else
-        vScreen[A].X += std::fmod(vScreen[A].X, 2.);
+        vscreen.X += std::fmod(vscreen.X, 2.);
 #endif
 
     if(GameMenu)
     {
-        if(vScreen[1].X > OldX)
+        if(vscreen.X > OldX)
         {
-            if(fEqual(vScreen[1].X, -level[0].X))
-                vScreen[1].X = OldX + 20;
+            if(fEqual(vscreen.X, -level[0].X))
+                vscreen.X = OldX + 20;
             else
-                vScreen[1].X = OldX;
+                vscreen.X = OldX;
         }
-        else if(vScreen[1].X < OldX - 10)
-            vScreen[1].X = OldX - 10;
+        else if(vscreen.X < OldX - 10)
+            vscreen.X = OldX - 10;
 
         // on menu, bottom of screen always tracks bottom of level
-        vScreen[A].Y = -(level[Player[1].Section].Height - vScreen[A].Height);
+        vscreen.Y = -(level[Player[1].Section].Height - vscreen.Height);
     }
 }
 
@@ -432,7 +388,7 @@ void GetvScreenAverageCanonical(double* left, double* top, bool ignore_qScreen)
     {
         double tX = vScreen[1].X;
         double tY = vScreen[1].Y;
-        GetvScreenAverage();
+        GetvScreenAverage(vScreen[1]);
         *left += tX - vScreen[1].X;
         *top += tY - vScreen[1].Y;
         vScreen[1].X = tX;
@@ -441,22 +397,23 @@ void GetvScreenAverageCanonical(double* left, double* top, bool ignore_qScreen)
 }
 
 // Get the average screen position for all players with no level edge detection
-void GetvScreenAverage2()
+void GetvScreenAverage2(vScreen_t& vscreen)
 {
     // int A = 0;
     int B = 0;
-    vScreen[1].X = 0;
-    vScreen[1].Y = 0;
+
+    vscreen.X = 0;
+    vscreen.Y = 0;
 
     for(int A = 1; A <= numPlayers; A++)
     {
         if(!Player[A].Dead)
         {
-            vScreen[1].X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
-                vScreen[1].Y += -Player[A].Location.Y;
+                vscreen.Y += -Player[A].Location.Y;
             else
-                vScreen[1].Y += -Player[A].Location.Y - Player[A].Location.Height;
+                vscreen.Y += -Player[A].Location.Y - Player[A].Location.Height;
             B += 1;
         }
     }
@@ -466,8 +423,8 @@ void GetvScreenAverage2()
     if(B == 0)
         return;
 
-    vScreen[1].X = (vScreen[1].X / B) + (ScreenW * 0.5);
-    vScreen[1].Y = (vScreen[1].Y / B) + (ScreenH * 0.5) - vScreenYOffset;
+    vscreen.X = (vscreen.X / B) + (vscreen.Width * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (vscreen.Height * 0.5) - vScreenYOffset;
 }
 
 // NEW: Get the average screen position for all players with no level edge detection if it were 800x600, and write the top-left coordinate to (left, top)
@@ -507,7 +464,7 @@ void GetvScreenAverage2Canonical(double* left, double* top, bool ignore_qScreen)
     {
         double tX = vScreen[1].X;
         double tY = vScreen[1].Y;
-        GetvScreenAverage2();
+        GetvScreenAverage2(vScreen[1]);
         *left += tX - vScreen[1].X;
         *top += tY - vScreen[1].Y;
         vScreen[1].X = tX;
@@ -781,23 +738,23 @@ void ChangeScreen()
 //    frmMain.LockSize = False
 }
 
-void GetvScreenCredits()
+void GetvScreenCredits(vScreen_t& vscreen)
 {
     int A = 0;
     int B = 0;
 
-    vScreen[1].X = 0;
-    vScreen[1].Y = 0;
+    vscreen.X = 0;
+    vscreen.Y = 0;
 
     for(A = 1; A <= numPlayers; A++)
     {
         if((!Player[A].Dead || g_gameInfo.outroDeadMode) && Player[A].Effect != 6)
         {
-            vScreen[1].X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
+            vscreen.X += -Player[A].Location.X - Player[A].Location.Width / 2.0;
             if(Player[A].Mount == 2)
-                vScreen[1].Y += -Player[A].Location.Y;
+                vscreen.Y += -Player[A].Location.Y;
             else
-                vScreen[1].Y += -Player[A].Location.Y - Player[A].Location.Height;
+                vscreen.Y += -Player[A].Location.Y - Player[A].Location.Height;
             B++;
         }
     }
@@ -806,16 +763,20 @@ void GetvScreenCredits()
     if(B == 0)
         return;
 
-    vScreen[1].X = (vScreen[1].X / B) + (ScreenW * 0.5);
-    vScreen[1].Y = (vScreen[1].Y / B) + (ScreenH * 0.5) - vScreenYOffset;
-    if(-vScreen[A].X < level[Player[1].Section].X)
-        vScreen[A].X = -level[Player[1].Section].X;
-    if(-vScreen[A].X + ScreenW > level[Player[1].Section].Width)
-        vScreen[A].X = -(level[Player[1].Section].Width - ScreenW);
-    if(-vScreen[A].Y < level[Player[1].Section].Y + 100)
-        vScreen[A].Y = -level[Player[1].Section].Y + 100;
-    if(-vScreen[A].Y + ScreenH > level[Player[1].Section].Height - 100)
-        vScreen[A].Y = -(level[Player[1].Section].Height - ScreenH) - 100;
+    vscreen.X = (vscreen.X / B) + (vscreen.Width * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (vscreen.Height * 0.5) - vScreenYOffset;
+
+    if(-vscreen.X < level[Player[1].Section].X)
+        vscreen.X = -level[Player[1].Section].X;
+
+    if(-vscreen.X + vscreen.Width > level[Player[1].Section].Width)
+        vscreen.X = -(level[Player[1].Section].Width - vscreen.Width);
+
+    if(-vscreen.Y < level[Player[1].Section].Y + 100)
+        vscreen.Y = -level[Player[1].Section].Y + 100;
+
+    if(-vscreen.Y + vscreen.Height > level[Player[1].Section].Height - 100)
+        vscreen.Y = -(level[Player[1].Section].Height - vscreen.Height) - 100;
 }
 
 #if 0

@@ -29,6 +29,7 @@
 #include "game_main.h"
 #include "core/render.h"
 #include "core/window.h"
+#include "core/render.h"
 #ifdef __EMSCRIPTEN__
 #include "core/events.h"
 #endif
@@ -40,9 +41,9 @@ void SetOrigRes()
 
 #ifndef __EMSCRIPTEN__
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
-        XWindow::setWindowSize(ScreenW/2, ScreenH/2);
+        XWindow::setWindowSize(ScreenW / 2, ScreenH / 2);
     else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
-        XWindow::setWindowSize(ScreenW*2, ScreenH*2);
+        XWindow::setWindowSize(ScreenW * 2, ScreenH * 2);
     else
         XWindow::setWindowSize(ScreenW, ScreenH);
 #endif
@@ -225,28 +226,20 @@ void UpdateInternalRes()
     if(GameMenu)
     {
         SetupScreens();
-        CenterScreens();
+        CenterScreens(Screens[0]);
         GameMenu = false;
-        GetvScreenAverage();
+        GetvScreenAverage(vScreen[1]);
         GameMenu = true;
     }
 }
 
 void UpdateWindowRes()
 {
-#ifndef THEXTECH_FIXED_RES
-    if(resChanged)
+    if(XWindow::isFullScreen() || XWindow::isMaximized())
         return;
 
-    int h = g_config.InternalH;
-    if(h == 0)
-        return;
-
-    int w = g_config.InternalW;
-    if(w == 0 && h == ScreenH)
-        w = ScreenW;
-    else if(w == 0)
-        return;
+    int w = ScreenW;
+    int h = ScreenH;
 
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
         XWindow::setWindowSize(w / 2, h / 2);
@@ -254,6 +247,5 @@ void UpdateWindowRes()
         XWindow::setWindowSize(w, h);
     else if(g_videoSettings.scaleMode == SCALE_FIXED_2X)
         XWindow::setWindowSize(w * 2, h * 2);
-#endif // #ifndef THEXTECH_FIXED_RES
 }
 

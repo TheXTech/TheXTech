@@ -65,6 +65,9 @@ void SetupScreens(bool reset)
 {
     SetScreenType();
 
+    vScreen[1].player = 1;
+    vScreen[2].player = 2;
+
     switch(ScreenType)
     {
     case 0: // Follows Player 1
@@ -148,18 +151,21 @@ void SetupScreens(bool reset)
     }
 }
 
-void DynamicScreen()
+void DynamicScreen(Screen_t& screen)
 {
     int A = 0;
 
+    vScreen_t& vscreen1 = screen.vScreen(1);
+    vScreen_t& vscreen2 = screen.vScreen(2);
+
     if(g_compatibility.free_level_res)
-        GetvScreenAverage();
+        GetvScreenAverage(vscreen1);
     else
     {
         double l, t;
         GetvScreenAverageCanonical(&l, &t, true);
-        vScreen[1].X = l;
-        vScreen[1].Y = t;
+        vscreen1.X = l;
+        vscreen1.Y = t;
     }
 
     for(A = 1; A <= numPlayers; A++)
@@ -174,29 +180,32 @@ void DynamicScreen()
             Player[A].Location.Height = 0;
     }
 
+    Player_t& p1 = Player[1];
+    Player_t& p2 = Player[2];
+
     if(CheckDead() == 0)
     {
-        if(Player[1].Section == Player[2].Section)
+        if(p1.Section == p2.Section)
         {
-            double FieldW = g_compatibility.free_level_res ? ScreenW : 800;
-            double FieldH = g_compatibility.free_level_res ? ScreenH : 600;
+            double FieldW = g_compatibility.free_level_res ? screen.W : 800;
+            double FieldH = g_compatibility.free_level_res ? screen.H : 600;
 
-            if(level[Player[1].Section].Width - level[Player[1].Section].X > FieldW && (((!vScreen[2].Visible && Player[2].Location.X + vScreen[1].X >= FieldW * 0.75 - Player[2].Location.Width / 2.0) || (vScreen[2].Visible && Player[2].Location.X + vScreen[1].X >= FieldW * 0.75 - Player[2].Location.Width / 2.0)) && (Player[1].Location.X < level[Player[1].Section].Width - FieldW * 0.75 - Player[1].Location.Width / 2.0)))
+            if(level[Player[1].Section].Width - level[Player[1].Section].X > FieldW && (((!vscreen2.Visible && Player[2].Location.X + vscreen1.X >= FieldW * 0.75 - Player[2].Location.Width / 2.0) || (vscreen2.Visible && Player[2].Location.X + vscreen1.X >= FieldW * 0.75 - Player[2].Location.Width / 2.0)) && (Player[1].Location.X < level[Player[1].Section].Width - FieldW * 0.75 - Player[1].Location.Width / 2.0)))
             {
-                vScreen[2].Height = ScreenH;
-                vScreen[2].Width = ScreenW / 2;
-                vScreen[2].Left = ScreenW / 2.0;
-                vScreen[2].Top = 0;
-                vScreen[1].Height = ScreenH;
-                vScreen[1].Width = ScreenW / 2;
-                vScreen[1].Left = 0;
-                vScreen[1].Top = 0;
+                vscreen2.Height = screen.H;
+                vscreen2.Width = screen.W / 2;
+                vscreen2.Left = screen.W / 2.0;
+                vscreen2.Top = 0;
+                vscreen1.Height = screen.H;
+                vscreen1.Width = screen.W / 2;
+                vscreen1.Left = 0;
+                vscreen1.Top = 0;
 
                 double l, t;
                 if(g_compatibility.free_level_res)
                 {
-                    GetvScreenAverage2();
-                    t = vScreen[1].Y;
+                    GetvScreenAverage2(vscreen1);
+                    t = vscreen1.Y;
                 }
                 else
                 {
@@ -205,32 +214,34 @@ void DynamicScreen()
 
                 for(A = 1; A <= 2; A++)
                 {
-                    vScreen[A].TempDelay = 200;
-                    vScreen[A].tempX = 0;
-                    vScreen[A].TempY = -t + FieldH * 0.5 - Player[A].Location.Y - vScreenYOffset - Player[A].Location.Height;
+                    vScreen_t& vscreena = screen.vScreen(A);
+
+                    vscreena.TempDelay = 200;
+                    vscreena.tempX = 0;
+                    vscreena.TempY = -t + FieldH * 0.5 - Player[A].Location.Y - vScreenYOffset - Player[A].Location.Height;
                 }
 
-                if(DScreenType != 1)
+                if(screen.DType != 1)
                     PlaySound(SFX_Camera);
-                DScreenType = 1;
-                vScreen[2].Visible = true;
+                screen.DType = 1;
+                vscreen2.Visible = true;
             }
-            else if(level[Player[1].Section].Width - level[Player[1].Section].X > FieldW && (((!vScreen[2].Visible && Player[1].Location.X + vScreen[1].X >= FieldW * 0.75 - Player[1].Location.Width / 2.0) || (vScreen[2].Visible && Player[1].Location.X + vScreen[2].X >= FieldW * 0.75 - Player[1].Location.Width / 2.0)) && (Player[2].Location.X < level[Player[1].Section].Width - FieldW * 0.75 - Player[2].Location.Width / 2.0)))
+            else if(level[Player[1].Section].Width - level[Player[1].Section].X > FieldW && (((!vscreen2.Visible && Player[1].Location.X + vscreen1.X >= FieldW * 0.75 - Player[1].Location.Width / 2.0) || (vscreen2.Visible && Player[1].Location.X + vscreen2.X >= FieldW * 0.75 - Player[1].Location.Width / 2.0)) && (Player[2].Location.X < level[Player[1].Section].Width - FieldW * 0.75 - Player[2].Location.Width / 2.0)))
             {
-                vScreen[1].Height = ScreenH;
-                vScreen[1].Width = ScreenW / 2;
-                vScreen[1].Left = ScreenW / 2.0;
-                vScreen[1].Top = 0;
-                vScreen[2].Height = ScreenH;
-                vScreen[2].Width = ScreenW / 2;
-                vScreen[2].Left = 0;
-                vScreen[2].Top = 0;
+                vscreen1.Height = screen.H;
+                vscreen1.Width = screen.W / 2;
+                vscreen1.Left = screen.W / 2.0;
+                vscreen1.Top = 0;
+                vscreen2.Height = screen.H;
+                vscreen2.Width = screen.W / 2;
+                vscreen2.Left = 0;
+                vscreen2.Top = 0;
 
                 double l, t;
                 if(g_compatibility.free_level_res)
                 {
-                    GetvScreenAverage2();
-                    t = vScreen[1].Y;
+                    GetvScreenAverage2(vscreen1);
+                    t = vscreen1.Y;
                 }
                 else
                 {
@@ -239,32 +250,34 @@ void DynamicScreen()
 
                 for(A = 1; A <= 2; A++)
                 {
-                    vScreen[A].TempDelay = 200;
-                    vScreen[A].tempX = 0;
-                    vScreen[A].TempY = -t + FieldH * 0.5 - Player[A].Location.Y - vScreenYOffset - Player[A].Location.Height;
+                    vScreen_t& vscreena = screen.vScreen(A);
+
+                    vscreena.TempDelay = 200;
+                    vscreena.tempX = 0;
+                    vscreena.TempY = -t + FieldH * 0.5 - Player[A].Location.Y - vScreenYOffset - Player[A].Location.Height;
                 }
 
-                if(DScreenType != 2)
+                if(screen.DType != 2)
                     PlaySound(SFX_Camera);
-                DScreenType = 2;
-                vScreen[2].Visible = true;
+                screen.DType = 2;
+                vscreen2.Visible = true;
             }
-            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > FieldH && ((!vScreen[2].Visible && Player[1].Location.Y + vScreen[1].Y >= FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height) || (vScreen[2].Visible && Player[1].Location.Y + vScreen[2].Y >= FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height)) && (Player[2].Location.Y < level[Player[1].Section].Height - FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height))
+            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > FieldH && ((!vscreen2.Visible && Player[1].Location.Y + vscreen1.Y >= FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height) || (vscreen2.Visible && Player[1].Location.Y + vscreen2.Y >= FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height)) && (Player[2].Location.Y < level[Player[1].Section].Height - FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height))
             {
-                vScreen[1].Height = ScreenH / 2;
-                vScreen[1].Width = ScreenW;
-                vScreen[1].Left = 0;
-                vScreen[1].Top = ScreenH / 2.0;
-                vScreen[2].Height = ScreenH / 2;
-                vScreen[2].Width = ScreenW;
-                vScreen[2].Left = 0;
-                vScreen[2].Top = 0;
+                vscreen1.Height = screen.H / 2;
+                vscreen1.Width = screen.W;
+                vscreen1.Left = 0;
+                vscreen1.Top = screen.H / 2.0;
+                vscreen2.Height = screen.H / 2;
+                vscreen2.Width = screen.W;
+                vscreen2.Left = 0;
+                vscreen2.Top = 0;
 
                 double l, t;
                 if(g_compatibility.free_level_res)
                 {
-                    GetvScreenAverage2();
-                    l = vScreen[1].X;
+                    GetvScreenAverage2(vscreen1);
+                    l = vscreen1.X;
                 }
                 else
                 {
@@ -273,32 +286,34 @@ void DynamicScreen()
 
                 for(A = 1; A <= 2; A++)
                 {
-                    vScreen[A].TempDelay = 200;
-                    vScreen[A].TempY = 0;
-                    vScreen[A].tempX = -l + FieldW * 0.5 - Player[A].Location.X - Player[A].Location.Width * 0.5;
+                    vScreen_t& vscreena = screen.vScreen(A);
+
+                    vscreena.TempDelay = 200;
+                    vscreena.TempY = 0;
+                    vscreena.tempX = -l + FieldW * 0.5 - Player[A].Location.X - Player[A].Location.Width * 0.5;
                 }
 
-                if(DScreenType != 3)
+                if(screen.DType != 3)
                     PlaySound(SFX_Camera);
-                DScreenType = 3;
-                vScreen[2].Visible = true;
+                screen.DType = 3;
+                vscreen2.Visible = true;
             }
-            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > FieldH && ((!vScreen[2].Visible && Player[2].Location.Y + vScreen[1].Y >= FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height) || (vScreen[2].Visible && Player[2].Location.Y + vScreen[1].Y >= FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height)) && (Player[1].Location.Y < level[Player[1].Section].Height - FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height))
+            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > FieldH && ((!vscreen2.Visible && Player[2].Location.Y + vscreen1.Y >= FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height) || (vscreen2.Visible && Player[2].Location.Y + vscreen1.Y >= FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height)) && (Player[1].Location.Y < level[Player[1].Section].Height - FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height))
             {
-                vScreen[1].Height = ScreenH / 2;
-                vScreen[1].Width = ScreenW;
-                vScreen[1].Left = 0;
-                vScreen[1].Top = 0;
-                vScreen[2].Height = ScreenH / 2;
-                vScreen[2].Width = ScreenW;
-                vScreen[2].Left = 0;
-                vScreen[2].Top = ScreenH / 2.0;
+                vscreen1.Height = screen.H / 2;
+                vscreen1.Width = screen.W;
+                vscreen1.Left = 0;
+                vscreen1.Top = 0;
+                vscreen2.Height = screen.H / 2;
+                vscreen2.Width = screen.W;
+                vscreen2.Left = 0;
+                vscreen2.Top = screen.H / 2.0;
 
                 double l, t;
                 if(g_compatibility.free_level_res)
                 {
-                    GetvScreenAverage2();
-                    l = vScreen[1].X;
+                    GetvScreenAverage2(vscreen1);
+                    l = vscreen1.X;
                 }
                 else
                 {
@@ -307,91 +322,95 @@ void DynamicScreen()
 
                 for(A = 1; A <= 2; A++)
                 {
-                    vScreen[A].TempDelay = 200;
-                    vScreen[A].TempY = 0;
-                    vScreen[A].tempX = -l + FieldW * 0.5 - Player[A].Location.X - Player[A].Location.Width * 0.5;
+                    vScreen_t& vscreena = screen.vScreen(A);
+
+                    vscreena.TempDelay = 200;
+                    vscreena.TempY = 0;
+                    vscreena.tempX = -l + FieldW * 0.5 - Player[A].Location.X - Player[A].Location.Width * 0.5;
                 }
 
-                DScreenType = 4;
-                if(DScreenType != 4)
+                screen.DType = 4;
+                if(screen.DType != 4)
                     PlaySound(SFX_Camera);
-                vScreen[2].Visible = true;
+                vscreen2.Visible = true;
             }
             else
             {
-                if(vScreen[2].Visible)
+                if(vscreen2.Visible)
                 {
-                    if(DScreenType != 5)
+                    if(screen.DType != 5)
                         PlaySound(SFX_Camera);
-                    vScreen[2].Visible = false;
-                    vScreen[1].Height = ScreenH;
-                    vScreen[1].Width = ScreenW;
-                    vScreen[1].Left = 0;
-                    vScreen[1].Top = 0;
-                    vScreen[1].tempX = 0;
-                    vScreen[1].TempY = 0;
-                    vScreen[2].tempX = 0;
-                    vScreen[2].TempY = 0;
+                    vscreen2.Visible = false;
+                    vscreen1.Height = screen.H;
+                    vscreen1.Width = screen.W;
+                    vscreen1.Left = 0;
+                    vscreen1.Top = 0;
+                    vscreen1.tempX = 0;
+                    vscreen1.TempY = 0;
+                    vscreen2.tempX = 0;
+                    vscreen2.TempY = 0;
                 }
-                DScreenType = 5;
+                screen.DType = 5;
             }
             for(A = 1; A <= 2; A++)
             {
-                if(vScreen[A].TempY > (vScreen[A].Height * 0.25))
-                    vScreen[A].TempY = (vScreen[A].Height * 0.25);
-                if(vScreen[A].TempY < -(vScreen[A].Height * 0.25))
-                    vScreen[A].TempY = -(vScreen[A].Height * 0.25);
-                if(vScreen[A].tempX > (vScreen[A].Width * 0.25))
-                    vScreen[A].tempX = (vScreen[A].Width * 0.25);
-                if(vScreen[A].tempX < -(vScreen[A].Width * 0.25))
-                    vScreen[A].tempX = -(vScreen[A].Width * 0.25);
+                vScreen_t& vscreena = screen.vScreen(A);
 
-                if(vScreen[A].TempY > (FieldH * 0.25))
-                    vScreen[A].TempY = (FieldH * 0.25);
-                if(vScreen[A].TempY < -(FieldH * 0.25))
-                    vScreen[A].TempY = -(FieldH * 0.25);
-                if(vScreen[A].tempX > (FieldW * 0.25))
-                    vScreen[A].tempX = (FieldW * 0.25);
-                if(vScreen[A].tempX < -(FieldW * 0.25))
-                    vScreen[A].tempX = -(FieldW * 0.25);
+                if(vscreena.TempY > (vscreena.Height * 0.25))
+                    vscreena.TempY = (vscreena.Height * 0.25);
+                if(vscreena.TempY < -(vscreena.Height * 0.25))
+                    vscreena.TempY = -(vscreena.Height * 0.25);
+                if(vscreena.tempX > (vscreena.Width * 0.25))
+                    vscreena.tempX = (vscreena.Width * 0.25);
+                if(vscreena.tempX < -(vscreena.Width * 0.25))
+                    vscreena.tempX = -(vscreena.Width * 0.25);
+
+                if(vscreena.TempY > (FieldH * 0.25))
+                    vscreena.TempY = (FieldH * 0.25);
+                if(vscreena.TempY < -(FieldH * 0.25))
+                    vscreena.TempY = -(FieldH * 0.25);
+                if(vscreena.tempX > (FieldW * 0.25))
+                    vscreena.tempX = (FieldW * 0.25);
+                if(vscreena.tempX < -(FieldW * 0.25))
+                    vscreena.tempX = -(FieldW * 0.25);
             }
         }
         else
         {
-            vScreen[1].Height = ScreenH / 2;
-            vScreen[1].Width = ScreenW;
-            vScreen[1].Left = 0;
-            vScreen[1].Top = 0;
-            vScreen[2].Height = ScreenH / 2;
-            vScreen[2].Width = ScreenW;
-            vScreen[2].Left = 0;
-            vScreen[2].Top = ScreenH / 2.0;
-            vScreen[1].tempX = 0;
-            vScreen[1].TempY = 0;
-            vScreen[2].tempX = 0;
-            vScreen[2].TempY = 0;
-            GetvScreenAverage2();
-            if(DScreenType != 6)
+            vscreen1.Height = screen.H / 2;
+            vscreen1.Width = screen.W;
+            vscreen1.Left = 0;
+            vscreen1.Top = 0;
+            vscreen2.Height = screen.H / 2;
+            vscreen2.Width = screen.W;
+            vscreen2.Left = 0;
+            vscreen2.Top = screen.H / 2.0;
+            vscreen1.tempX = 0;
+            vscreen1.TempY = 0;
+            vscreen2.tempX = 0;
+            vscreen2.TempY = 0;
+            GetvScreenAverage2(vscreen1);
+            if(screen.DType != 6)
                 PlaySound(SFX_Camera);
-            DScreenType = 6;
-            vScreen[2].Visible = true;
+            screen.DType = 6;
+            vscreen2.Visible = true;
         }
     }
     else
     {
-        if(vScreen[2].Visible)
+        if(vscreen2.Visible)
         {
-            vScreen[2].Visible = false;
-            // vScreen[1].Visible = false; // Useless, because code below sets it as TRUE back
-            vScreen[1].Height = ScreenH;
-            vScreen[1].Width = ScreenW;
-            vScreen[1].Left = 0;
-            vScreen[1].Top = 0;
-            vScreen[1].Visible = true;
-            vScreen[1].tempX = 0;
-            vScreen[1].TempY = 0;
-            vScreen[2].tempX = 0;
-            vScreen[2].TempY = 0;
+            vscreen2.Visible = false;
+            // vscreen1.Visible = false; // Useless, because code below sets it as TRUE back
+            vscreen1.Height = screen.H;
+            vscreen1.Width = screen.W;
+            vscreen1.Left = 0;
+            vscreen1.Top = 0;
+            vscreen1.Visible = true;
+            vscreen1.tempX = 0;
+            vscreen1.TempY = 0;
+            vscreen2.tempX = 0;
+            vscreen2.TempY = 0;
         }
     }
     for(A = 1; A <= numPlayers; A++)
@@ -402,12 +421,15 @@ void DynamicScreen()
 }
 
 // NEW: limit vScreens to playable section area and center them on the real screen
-void CenterScreens()
+void CenterScreens(Screen_t& screen)
 {
-    vScreen[1].ScreenLeft = vScreen[1].Left;
-    vScreen[2].ScreenLeft = vScreen[2].Left;
-    vScreen[1].ScreenTop = vScreen[1].Top;
-    vScreen[2].ScreenTop = vScreen[2].Top;
+    vScreen_t& vscreen1 = screen.vScreen(1);
+    vScreen_t& vscreen2 = screen.vScreen(2);
+
+    vscreen1.ScreenLeft = vscreen1.Left;
+    vscreen2.ScreenLeft = vscreen2.Left;
+    vscreen1.ScreenTop = vscreen1.Top;
+    vscreen2.ScreenTop = vscreen2.Top;
 
     if(GameOutro || LevelEditor || WorldEditor)
         return;
@@ -444,7 +466,7 @@ void CenterScreens()
         double CanonicalW = 800;
         double CanonicalH = 600;
 
-        if(vScreen[2].Visible)
+        if(vscreen2.Visible)
         {
             if(DScreenType == 3 || DScreenType == 4 || DScreenType == 6)
                 CanonicalH /= 2;
@@ -463,64 +485,68 @@ void CenterScreens()
             MaxHeight2 = CanonicalH;
     }
 
-    if(MaxWidth1 < vScreen[1].Width)
+    if(MaxWidth1 < vscreen1.Width)
     {
-        if(vScreen[2].Visible && !(DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
+        if(vscreen2.Visible && !(DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
         {
-            if(vScreen[1].ScreenLeft == 0)
+            if(vscreen1.ScreenLeft == 0)
             {
-                vScreen[1].ScreenLeft += (vScreen[1].Width - MaxWidth1);
-                vScreen[2].Left -= (vScreen[1].Width - MaxWidth1);
+                vscreen1.ScreenLeft += (vscreen1.Width - MaxWidth1);
+                vscreen2.Left -= (vscreen1.Width - MaxWidth1);
             }
         }
         else
-            vScreen[1].ScreenLeft += (vScreen[1].Width - MaxWidth1) / 2;
-        vScreen[1].Width = MaxWidth1;
+            vscreen1.ScreenLeft += (vscreen1.Width - MaxWidth1) / 2;
+
+        vscreen1.Width = MaxWidth1;
     }
 
-    if(MaxWidth2 < vScreen[2].Width)
+    if(MaxWidth2 < vscreen2.Width)
     {
-        if(vScreen[2].Visible && !(DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
+        if(vscreen2.Visible && !(DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
         {
-            if(vScreen[2].ScreenLeft == 0)
+            if(vscreen2.ScreenLeft == 0)
             {
-                vScreen[2].ScreenLeft += (vScreen[2].Width - MaxWidth2);
-                vScreen[1].Left -= (vScreen[2].Width - MaxWidth2);
+                vscreen2.ScreenLeft += (vscreen2.Width - MaxWidth2);
+                vscreen1.Left -= (vscreen2.Width - MaxWidth2);
             }
         }
         else
-            vScreen[2].ScreenLeft += (vScreen[2].Width - MaxWidth2) / 2;
-        vScreen[2].Width = MaxWidth2;
+            vscreen2.ScreenLeft += (vscreen2.Width - MaxWidth2) / 2;
+
+        vscreen2.Width = MaxWidth2;
     }
 
-    if(MaxHeight1 < vScreen[1].Height)
+    if(MaxHeight1 < vscreen1.Height)
     {
-        if(vScreen[2].Visible && (DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
+        if(vscreen2.Visible && (DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
         {
-            if(vScreen[1].ScreenTop == 0)
+            if(vscreen1.ScreenTop == 0)
             {
-                vScreen[1].ScreenTop += (vScreen[1].Height - MaxHeight1);
-                vScreen[2].Top -= (vScreen[1].Height - MaxHeight1);
+                vscreen1.ScreenTop += (vscreen1.Height - MaxHeight1);
+                vscreen2.Top -= (vscreen1.Height - MaxHeight1);
             }
         }
         else
-            vScreen[1].ScreenTop += (vScreen[1].Height - MaxHeight1) / 2;
-        vScreen[1].Height = MaxHeight1;
+            vscreen1.ScreenTop += (vscreen1.Height - MaxHeight1) / 2;
+
+        vscreen1.Height = MaxHeight1;
     }
 
-    if(MaxHeight2 < vScreen[2].Height)
+    if(MaxHeight2 < vscreen2.Height)
     {
-        if(vScreen[2].Visible && (DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
+        if(vscreen2.Visible && (DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
         {
-            if(vScreen[2].ScreenTop == 0)
+            if(vscreen2.ScreenTop == 0)
             {
-                vScreen[2].ScreenTop += (vScreen[2].Height - MaxHeight2);
-                vScreen[1].Top -= (vScreen[2].Height - MaxHeight2);
+                vscreen2.ScreenTop += (vscreen2.Height - MaxHeight2);
+                vscreen1.Top -= (vscreen2.Height - MaxHeight2);
             }
         }
         else
-            vScreen[2].ScreenTop += (vScreen[2].Height - MaxHeight2) / 2;
-        vScreen[2].Height = MaxHeight2;
+            vscreen2.ScreenTop += (vscreen2.Height - MaxHeight2) / 2;
+
+        vscreen2.Height = MaxHeight2;
     }
 }
 
