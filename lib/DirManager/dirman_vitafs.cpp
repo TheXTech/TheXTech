@@ -240,6 +240,7 @@ bool DirMan::DirMan_private::getListOfFolders(std::vector<std::string>& list, co
 bool DirMan::DirMan_private::fetchListFromWalker(std::string &curPath, std::vector<std::string> &list)
 {
     PUT_THREAD_GUARD();
+    (void)list;
     pLogWarning("[dirman_vitafs] ::fetchListFromWalker called. CurPath: %s", curPath.c_str());
 
 
@@ -290,6 +291,7 @@ bool DirMan::exists(const std::string &dirPath)
         pLogWarning("[dirman_vitafs] WARNING: dirPath was / (dirPath: `%s`)", dirPath.c_str());
         return false;
     }
+
     if(sceIoGetstat(dirPath.c_str(), &_stat) < 0)
     {
         pLogWarning("[dirman_vitafs]  File at path %s doesn't exist.", dirPath.c_str());
@@ -297,7 +299,6 @@ bool DirMan::exists(const std::string &dirPath)
     }
 
     return true;
-
 
 
     // DIR *dir = opendir(dirPath.c_str());
@@ -325,7 +326,6 @@ bool DirMan::rmAbsDir(const std::string &dirPath)
 bool DirMan::mkAbsPath(const std::string &dirPath)
 {
     PUT_THREAD_GUARD();
-    pLogWarning("TODO: NEED TO MAKE ABSOLUTE PATH FOR `%s`", dirPath.c_str());
     char tmp[PATH_MAX];
     char *p = NULL;
     size_t len;

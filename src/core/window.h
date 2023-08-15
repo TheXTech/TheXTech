@@ -195,6 +195,17 @@ E_INLINE bool hasWindowMouseFocus() TAIL
 }
 #endif
 
+/*!
+ * \brief Is window maximized (resized to fill desktop)?
+ * \return true if window is maximized
+ */
+E_INLINE bool isMaximized() TAIL
+#ifndef WINDOW_CUSTOM
+{
+    return g_window->isMaximized();
+}
+#endif
+
 }
 
 #ifndef WINDOW_CUSTOM

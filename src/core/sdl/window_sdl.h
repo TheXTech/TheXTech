@@ -132,6 +132,12 @@ public:
      * \return true if window has a mouse focus
      */
     bool hasWindowMouseFocus() override;
+
+    /*!
+     * \brief Is window maximized (resized to fill desktop)?
+     * \return true if window is maximized
+     */
+    bool isMaximized() override;
 };
 
 #endif // WINDOWSDL_H

@@ -1,0 +1,21 @@
+{
+  "name": "${THEXTECH_MANIFEST_NAME_OUT}",
+  "id": "${THEXTECH_MANIFEST_ID_OUT}",
+  "description": "${THEXTECH_MANIFEST_DESC_OUT}",
+  "display": "fullscreen",
+  "orientation": "landscape-primary",
+  "scope": "${THEXTECH_DEPLOY_URL}",
+  "start_url": "${THEXTECH_DEPLOY_URL}index.html",
+  "icons": [
+    {
+      "src": "thextech_32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "thextech_256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    }
+  ]
+}

@@ -189,7 +189,7 @@ void GameplayTimer::resetCurrent()
 
 void GameplayTimer::load()
 {
-    if(TestLevel)
+    if(TestLevel || selSave == 0)
     {
         reset();
         return;
@@ -212,7 +212,8 @@ void GameplayTimer::load()
 
 void GameplayTimer::save()
 {
-    if(TestLevel)
+    // should Cheater also be a condition here?
+    if(TestLevel || !selSave)
         return;
 
     IniProcessing o;

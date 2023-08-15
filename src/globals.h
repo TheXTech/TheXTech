@@ -787,7 +787,7 @@ struct Block_t
 
     inline void setShrinkResized() {}
 
-    inline bool getShrinkResized()
+    inline bool getShrinkResized() const
     {
         // Because the initial block width is stored as an integer, the only way the width could be 31.9 is if it was shrink-resized from 32.
         // The block location width isn't set to a non-integer anywhere else in the game, so this is safe.
@@ -840,30 +840,7 @@ struct Effect_t
 };
 
 //Public Type vScreen 'Screen controls
-struct vScreen_t
-{
-    // previously their own arrays, vScreenX and vScreenY
-    double X = 0.0;
-    double Y = 0.0;
-
-//    Left As Double
-    double Left = 0.0;
-//    Top As Double
-    double Top = 0.0;
-//    Width As Double
-    double Width = 0.0;
-//    Height As Double
-    double Height = 0.0;
-//    Visible As Boolean
-    bool Visible = false;
-//    tempX As Double
-    double tempX = 0.0;
-//    TempY As Double
-    double TempY = 0.0;
-//    TempDelay As Integer
-    int TempDelay = 0;
-//End Type
-};
+#include "screen.h"
 
 // NEW: information about available Stars and obtained / available Medals for a level
 struct LevelSaveInfo_t
@@ -1214,12 +1191,15 @@ extern std::string g_recentWorldEditor;
 extern bool ShowFPS;
 //Public PrintFPS As Double
 extern double PrintFPS;
+
+// moved to "screen.h"
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
-extern RangeArr<vScreen_t, 0, 2> vScreen;
+// extern RangeArr<vScreen_t, 0, 2> vScreen;
 //Public ScreenType As Integer 'The screen/view type
-extern int ScreenType;
+// extern int ScreenType;
 //Public DScreenType As Integer 'The dynamic screen setup
-extern int DScreenType;
+// extern int DScreenType;
+
 //Public LevelEditor As Boolean 'if true, load the editor
 extern bool LevelEditor;
 //Public WorldEditor As Boolean
@@ -1553,8 +1533,10 @@ extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
 
 //Public qScreen As Boolean 'Weather or not the screen needs adjusting
 extern bool qScreen;
+
+// moved to "screen.h"
 // NEW: allows screen position to change during qScreen
-extern RangeArr<vScreen_t, 0, 2> qScreenLoc;
+// extern RangeArr<vScreen_t, 0, 2> qScreenLoc;
 
 //Public BlockWidth(0 To maxBlockType) As Integer 'Block type width
 extern RangeArrI<int, 0, maxBlockType, 0> BlockWidth;

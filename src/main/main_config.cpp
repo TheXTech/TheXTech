@@ -132,10 +132,19 @@ void OpenConfig_preSetup()
         config.read("background-controller-input", g_videoSettings.allowBgControllerInput, false);
         config.read("frame-skip", g_videoSettings.enableFrameSkip, true);
         config.read("show-fps", g_videoSettings.showFrameRate, false);
-
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
         config.readEnum("scale-down-textures", g_videoSettings.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_SAFE, scaleDownTextures);
+        IniProcessing::StrEnumMap scaleModes =
+        {
+            {"linear", SCALE_DYNAMIC_LINEAR},
+            {"integer", SCALE_DYNAMIC_INTEGER},
+            {"nearest", SCALE_DYNAMIC_NEAREST},
+            {"0.5x", SCALE_FIXED_05X},
+            {"1x", SCALE_FIXED_1X},
+            {"2x", SCALE_FIXED_2X},
+        };
+        config.readEnum("scale-mode", g_videoSettings.scaleMode, (int)SCALE_DYNAMIC_NEAREST, scaleModes);
         config.endGroup();
 
 #ifndef THEXTECH_NO_SDL_BUILD
@@ -267,6 +276,14 @@ void OpenConfig()
 
         pLogDebug("Loaded config: %s", configPath.c_str());
     }
+    else if(Files::fileExists(controlsPath))
+    {
+        IniProcessing controls(controlsPath);
+        Controls::LoadConfig(&controls);
+
+        pLogDebug("Loaded controls: %s; writing new config post deletion.", controlsPath.c_str());
+        SaveConfig(); // Create the config file post deletion
+    }
     else
     {
         pLogDebug("Writing new config on first run.");
@@ -349,6 +366,7 @@ void SaveConfig()
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
         config.setValue("osk-fill-screen", g_config.osk_fill_screen);
         config.setValue("show-episode-title", showEpisodeTitle[g_config.show_episode_title]);
+        config.setValue("scale-mode", ScaleMode_strings.at(g_videoSettings.scaleMode));
     }
     config.endGroup();
 

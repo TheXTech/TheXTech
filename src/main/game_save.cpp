@@ -215,7 +215,7 @@ void SaveGame()
 {
     int A = 0;
 
-    if(Cheater)
+    if(Cheater || !selSave)
         return;
 
     for(A = numPlayers; A >= 1; A--)
@@ -478,7 +478,7 @@ void ClearGame(bool punnish)
     gSavedVarBank.ClearBank();
 #endif
 
-    if(punnish) // Remove gamesave of user who was used a trap cheat
+    if(punnish && selSave) // Remove gamesave of user who was used a trap cheat
         DeleteSave(selWorld, selSave);
 }
 

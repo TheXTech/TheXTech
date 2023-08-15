@@ -24,7 +24,7 @@
                 "changeSectionBoundsToCurrent": "{0} kısımını buna dönüştür?",
                 "shouldEvent": ""
             },
-            "controlsForEvent": "Olaylar için kontroller",
+            "controlsForEventN": "'{0}' olayı için kontroller",
             "deletion": {
                 "cancel": "Hayır: olayı silme",
                 "confirm": "Evet: olayı sil",
@@ -219,11 +219,11 @@
             "underwater": ""
         },
         "select": {
-            "allSectPropBlankForEvent": "",
+            "allSectPropBlankForEventN": "",
             "pathBlankUnlock": "",
-            "sectBlankPropBlankForEvent": "",
+            "sectBlankPropBlankForEventN": "",
             "sectionBlankPropBlank": "",
-            "soundForEvent": "",
+            "soundForEventN": "",
             "warpTransitEffect": "",
             "worldMusic": ""
         },

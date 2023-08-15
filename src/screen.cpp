@@ -18,24 +18,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "events_base.h"
-#include "../render.h"
-#include "controls.h"
-#include "graphics.h"
-#include "change_res.h"
+#include "screen.h"
 
-AbstractEvents_t *g_events = nullptr;
+RangeArr<Screen_t, 0, 0> Screens;
+Screen_t* l_screen = &Screens[0];
 
-FrmMain *AbstractEvents_t::m_form = nullptr;
+RangeArr<qScreen_t, 0, 2> qScreenLoc;
+RangeArr<vScreen_t, 0, 2> vScreen;
 
-
-void AbstractEvents_t::init(FrmMain *form)
+// finds the visible Screen that contains a specific player
+Screen_t& ScreenByPlayer(int player)
 {
-    m_form = form;
+    (void)player; // FIXME: Remove this line once multiple screens will be supported
+    return Screens[0];
 }
 
-void AbstractEvents_t::eventResize()
+// finds the visible vScreen that contains a specific player
+vScreen_t& vScreenByPlayer(int player)
 {
-    UpdateInternalRes();
-    Controls::UpdateTouchScreenSize();
+    if(player < 1 || player > maxLocalPlayers)
+        return vScreen[0];
+
+    return vScreen[player];
 }
+
+// temporary helpers while game is being converted to use Screen_t
+int& ScreenType = Screens[0].Type;
+int& DScreenType = Screens[0].DType;
+
+int& ScreenW = Screens[0].W;
+int& ScreenH = Screens[0].H;
