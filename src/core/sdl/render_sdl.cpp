@@ -178,7 +178,7 @@ void RenderSDL::repaint()
 #endif
 
     if(g_ForceBitmaskMerge)
-        SuperPrintScreenCenter("Bitmask already disabled", 5, 2, 1.0f, 0.2f, 0.0f);
+        SuperPrintScreenCenter("Enable OpenGL Render for Bitmask", 5, 2, 1.0f, 0.2f, 0.0f);
 
     int w, h, off_x, off_y, wDst, hDst;
 
