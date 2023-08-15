@@ -76,7 +76,7 @@ void updateViewport()
 
     int ScreenW_Show = ScreenW;
 
-    // if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
     {
         int res_h = hardware_h;
         int res_w = ScreenW_Show * hardware_h / ScreenH;
@@ -90,7 +90,6 @@ void updateViewport()
         g_screen_phys_w = res_w;
         g_screen_phys_h = res_h;
     }
-#if 0
     else if(g_videoSettings.scaleMode == SCALE_FIXED_1X)
     {
         g_screen_phys_w = ScreenW_Show / 2;
@@ -121,7 +120,6 @@ void updateViewport()
             g_screen_phys_h -= ScreenH / 2;
         }
     }
-#endif
 
     pLogDebug("Phys screen is %d x %d", g_screen_phys_w, g_screen_phys_h);
 

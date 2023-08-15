@@ -296,6 +296,9 @@ private:
     // set of all currently-loaded textures
     std::set<StdPicture *> m_loadedPictures;
 
+    // Current scaling mode
+    int m_current_scale_mode = SCALE_DYNAMIC_NEAREST;
+
     // Offset to shake screen
     PointI m_viewport_offset = PointI(0, 0);
     // Keep zero viewport offset while this flag is on

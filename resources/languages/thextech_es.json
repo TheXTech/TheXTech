@@ -17,7 +17,7 @@
             "saveFile": "Guardar archivo"
         },
         "events": {
-            "controlsForEvent": "Controles para evento",
+            "controlsForEventN": "Controles para evento {0}",
             "header": "Eventos:",
             "deletion": {
                 "cancel": "No: No eliminar evento",

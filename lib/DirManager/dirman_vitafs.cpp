@@ -326,7 +326,6 @@ bool DirMan::rmAbsDir(const std::string &dirPath)
 bool DirMan::mkAbsPath(const std::string &dirPath)
 {
     PUT_THREAD_GUARD();
-    pLogWarning("TODO: NEED TO MAKE ABSOLUTE PATH FOR `%s`", dirPath.c_str());
     char tmp[PATH_MAX];
     char *p = NULL;
     size_t len;

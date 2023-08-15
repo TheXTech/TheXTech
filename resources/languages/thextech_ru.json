@@ -24,7 +24,7 @@
                 "changeSectionBoundsToCurrent": "изменить границы секции {0} к текущим?",
                 "shouldEvent": "Должно ли событие {0}"
             },
-            "controlsForEvent": "Авто-управление персонажем",
+            "controlsForEventN": "Авто-управление персонажем по событию \"{0}\"",
             "deletion": {
                 "cancel": "Нет: не удалять событие",
                 "confirm": "Да: удалить событие",
@@ -220,11 +220,11 @@
             "underwater": "Под водой"
         },
         "select": {
-            "allSectPropBlankForEvent": "{0} для всех секций",
+            "allSectPropBlankForEventN": "{0} всех секций для \"{1}\"",
             "pathBlankUnlock": "Разблок. путь {0}:",
-            "sectBlankPropBlankForEvent": "{1} для секции {0}",
+            "sectBlankPropBlankForEventN": "{1} секции {0} для \"{2}\"",
             "sectionBlankPropBlank": "{1} секции {0}",
-            "soundForEvent": "Звук для события",
+            "soundForEventN": "Звук для события \"{0}\"",
             "warpTransitEffect": "Эффект перехода прохода",
             "worldMusic": "Музыка мира"
         },
@@ -570,7 +570,13 @@
         "options": {
             "optionsModeFullScreen": "На весь экран",
             "optionsModeWindowed": "Оконный режим",
-            "optionsViewCredits": "Титры"
+            "optionsViewCredits": "Титры",
+            "scale": {
+                "integer": "Целочисленный",
+                "nearest": "Ближ. сосед",
+                "label": "Масштаб",
+                "linear": "Линейный"
+            }
         },
         "wordBack": "Назад",
         "wordHide": "Скрыть",

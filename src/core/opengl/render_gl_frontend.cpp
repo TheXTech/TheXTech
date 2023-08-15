@@ -467,20 +467,22 @@ void RenderGL::updateViewport()
     m_hidpi_x = (float)hardware_w / (float)window_w;
     m_hidpi_y = (float)hardware_h / (float)window_h;
 
-    // if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
-    {
-        int res_h = hardware_h;
-        int res_w = ScreenW * hardware_h / ScreenH;
+    float scale_x = (float)hardware_w / ScreenW;
+    float scale_y = (float)hardware_h / ScreenH;
 
-        if(res_w > hardware_w)
-        {
-            res_w = hardware_w;
-            res_h = ScreenH * res_w / ScreenW;
-        }
+    float scale = SDL_min(scale_x, scale_y);
 
-        m_phys_w = res_w;
-        m_phys_h = res_h;
-    }
+    if(g_videoSettings.scaleMode == SCALE_FIXED_05X && scale > 0.5f)
+        scale = 0.5f;
+    if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER && scale > 1.f)
+        scale = std::floor(scale);
+    if(g_videoSettings.scaleMode == SCALE_FIXED_1X && scale > 1.f)
+        scale = 1.f;
+    if(g_videoSettings.scaleMode == SCALE_FIXED_2X && scale > 2.f)
+        scale = 2.f;
+
+    m_phys_w = ScreenW * scale;
+    m_phys_h = ScreenH * scale;
 
     m_viewport = RectSizeI(0, 0, ScreenW, ScreenH);
 
@@ -493,6 +495,22 @@ void RenderGL::updateViewport()
     m_phys_y = hardware_h / 2 - m_phys_h / 2;
 
     applyViewport();
+
+    // update render texture scaling mode
+    if(m_current_scale_mode != g_videoSettings.scaleMode)
+    {
+        bool use_linear = (g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || scale < 0.5f);
+
+        if(m_game_texture)
+        {
+            glBindTexture(GL_TEXTURE_2D, m_game_texture);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, use_linear ? GL_LINEAR : GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, use_linear ? GL_LINEAR : GL_NEAREST);
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+
+        m_current_scale_mode = g_videoSettings.scaleMode;
+    }
 }
 
 void RenderGL::resetViewport()

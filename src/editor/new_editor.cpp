@@ -81,6 +81,22 @@ inline void SuperPrintCenterR(EditorScreen::CallMode mode, Args... args)
         SuperPrintCenter(args...);
 }
 
+inline PGE_Size FontManager_printTextOptiPxR(EditorScreen::CallMode mode,
+                                             std::string text,
+                                             int x, int y,
+                                             size_t max_pixels_lenght,
+                                             int font = FontManager::DefaultRaster,
+                                             float Red = 1.0, float Green = 1.0, float Blue = 1.0, float Alpha = 1.0,
+                                             uint32_t ttf_FontSize = 14)
+{
+    if(mode == EditorScreen::CallMode::Render)
+        return FontManager::printTextOptiPx(text, x, y,
+                                            max_pixels_lenght,
+                                            font, Red, Green, Blue, Alpha, ttf_FontSize);
+    else
+        return FontManager::optimizeTextPx(text, max_pixels_lenght, font, ttf_FontSize);
+}
+
 constexpr auto LESet_Nothing = EventSection_t::LESet_Nothing;
 constexpr auto LESet_ResetDefault = EventSection_t::LESet_ResetDefault;
 
@@ -1257,55 +1273,75 @@ void EditorScreen::UpdateEventSettingsScreen(CallMode mode)
 
     if(m_special_page == SPECIAL_PAGE_EVENT_CONTROLS)
     {
-        SuperPrintR(mode, g_editorStrings.eventsControlsForEvent, 3, 60, 40);
-        SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
+        const int titlePosX = 10;
+        const int titlePosY = 40;
+        PGE_Size titleSize = FontManager_printTextOptiPxR(mode,
+                                                          fmt::format_ne(g_editorStrings.eventsControlsForEvent,
+                                                                         Events[m_current_event].Name),
+                                                          titlePosX, titlePosY,
+                                                          590,
+                                                          FontManager::fontIdFromSmbxFont(3));;
 
-        if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 8*32, 32, 32))
-        {
+        int elementsListBaseY = 80;
+        const int elementsLabelOffset = 10;
+        const int elementsRowHeight = 40;
+        while(titlePosY + titleSize.h() >= elementsListBaseY)
+            elementsListBaseY += elementsRowHeight;
+
+        if(UpdateButton(mode, e_ScreenW - 40 + 4, 40 + 4, GFX.EIcons, false, 0, 8 * 32, 32, 32))
             m_special_page = SPECIAL_PAGE_EVENT_SETTINGS;
-        }
 
         using Controls::PlayerControls::Buttons;
 
-        if(UpdateCheckBox(mode, 10 + 4, 80 + 4, Events[m_current_event].Controls.Up))
+        int yOffset = elementsListBaseY;
+
+        if(UpdateCheckBox(mode, 10 + 4, yOffset + 4, Events[m_current_event].Controls.Up))
             Events[m_current_event].Controls.Up = !Events[m_current_event].Controls.Up;
-        SuperPrintR(mode, GetButtonName_UI(Buttons::Up), 3, 54, 90);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Up), 3, 54, yOffset + elementsLabelOffset);
 
-        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 80 + 4, Events[m_current_event].Controls.Down))
+        if(UpdateCheckBox(mode, e_ScreenW / 2 + 10 + 4, yOffset + 4, Events[m_current_event].Controls.Down))
             Events[m_current_event].Controls.Down = !Events[m_current_event].Controls.Down;
-        SuperPrintR(mode, GetButtonName_UI(Buttons::Down), 3, e_ScreenW/2 + 54, 90);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Down), 3, e_ScreenW / 2 + 54, yOffset + elementsLabelOffset);
 
-        if(UpdateCheckBox(mode, 10 + 4, 120 + 4, Events[m_current_event].Controls.Left))
+        yOffset += elementsRowHeight;
+
+        if(UpdateCheckBox(mode, 10 + 4, yOffset + 4, Events[m_current_event].Controls.Left))
             Events[m_current_event].Controls.Left = !Events[m_current_event].Controls.Left;
-        SuperPrintR(mode, GetButtonName_UI(Buttons::Left), 3, 54, 130);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Left), 3, 54, yOffset + elementsLabelOffset);
 
-        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 120 + 4, Events[m_current_event].Controls.Right))
+        if(UpdateCheckBox(mode, e_ScreenW / 2 + 10 + 4, yOffset + 4, Events[m_current_event].Controls.Right))
             Events[m_current_event].Controls.Right = !Events[m_current_event].Controls.Right;
-        SuperPrintR(mode, GetButtonName_UI(Buttons::Right), 3, e_ScreenW/2 + 54, 130);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Right), 3, e_ScreenW / 2 + 54, yOffset + elementsLabelOffset);
 
-        if(UpdateCheckBox(mode, 10 + 4, 160 + 4, Events[m_current_event].Controls.Jump))
+        yOffset += elementsRowHeight;
+
+        if(UpdateCheckBox(mode, 10 + 4, yOffset + 4, Events[m_current_event].Controls.Jump))
             Events[m_current_event].Controls.Jump = !Events[m_current_event].Controls.Jump;
-        SuperPrintR(mode, GetButtonName_UI(Buttons::Jump), 3, 54, 170);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Jump), 3, 54, yOffset + elementsLabelOffset);
 
-        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 160 + 4, Events[m_current_event].Controls.Run))
+        if(UpdateCheckBox(mode, e_ScreenW / 2 + 10 + 4, yOffset + 4, Events[m_current_event].Controls.Run))
             Events[m_current_event].Controls.Run = !Events[m_current_event].Controls.Run;
-        SuperPrintR(mode, GetButtonName_UI(Buttons::Run), 3, e_ScreenW/2 + 54, 170);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Run), 3, e_ScreenW / 2 + 54, yOffset + elementsLabelOffset);
 
-        if(UpdateCheckBox(mode, 10 + 4, 200 + 4, Events[m_current_event].Controls.AltJump))
+        yOffset += elementsRowHeight;
+
+        if(UpdateCheckBox(mode, 10 + 4, yOffset + 4, Events[m_current_event].Controls.AltJump))
             Events[m_current_event].Controls.AltJump = !Events[m_current_event].Controls.AltJump;
-        SuperPrintR(mode, GetButtonName_UI(Buttons::AltJump), 3, 54, 210);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::AltJump), 3, 54, yOffset + elementsLabelOffset);
 
-        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 200 + 4, Events[m_current_event].Controls.AltRun))
+        if(UpdateCheckBox(mode, e_ScreenW / 2 + 10 + 4, yOffset + 4, Events[m_current_event].Controls.AltRun))
             Events[m_current_event].Controls.AltRun = !Events[m_current_event].Controls.AltRun;
-        SuperPrintR(mode, GetButtonName_UI(Buttons::AltRun), 3, e_ScreenW/2 + 54, 210);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::AltRun), 3, e_ScreenW / 2 + 54, yOffset + elementsLabelOffset);
 
-        if(UpdateCheckBox(mode, 10 + 4, 240 + 4, Events[m_current_event].Controls.Start))
+        yOffset += elementsRowHeight;
+
+        if(UpdateCheckBox(mode, 10 + 4, yOffset + 4, Events[m_current_event].Controls.Start))
             Events[m_current_event].Controls.Start = !Events[m_current_event].Controls.Start;
-        SuperPrintR(mode, GetButtonName_UI(Buttons::Start), 3, 54, 250);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Start), 3, 54, yOffset + elementsLabelOffset);
 
-        if(UpdateCheckBox(mode, e_ScreenW/2 + 10 + 4, 240 + 4, Events[m_current_event].Controls.Drop))
+        if(UpdateCheckBox(mode, e_ScreenW / 2 + 10 + 4, yOffset + 4, Events[m_current_event].Controls.Drop))
             Events[m_current_event].Controls.Drop = !Events[m_current_event].Controls.Drop;
-        SuperPrintR(mode, GetButtonName_UI(Buttons::Drop), 3, e_ScreenW/2 + 54, 250);
+        SuperPrintR(mode, GetButtonName_UI(Buttons::Drop), 3, e_ScreenW / 2 + 54, yOffset + elementsLabelOffset);
 
         return;
     }
@@ -2173,12 +2209,20 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
 
     vbint_t* target;
     int* current_page;
+    PGE_Size titleSize;
+    const int titlePosX = 10;
+    const int titlePosY = 40;
     const std::vector<std::string>* source;
     const std::vector<int16_t>* source_indices;
+
     if(m_special_page == SPECIAL_PAGE_EVENT_SOUND)
     {
-        SuperPrintR(mode, g_editorStrings.selectSoundForEvent, 3, 10, 40);
-        SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
+        titleSize = FontManager_printTextOptiPxR(mode,
+                                                 fmt::format_ne(g_editorStrings.selectSoundForEvent,
+                                                                Events[m_current_event].Name),
+                                                 titlePosX, titlePosY,
+                                                 300,
+                                                 FontManager::fontIdFromSmbxFont(3));
         target = &Events[m_current_event].Sound;
         current_page = &m_sounds_page;
 
@@ -2189,16 +2233,28 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     {
         if(m_special_subpage > 0)
         {
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectSectBlankPropBlankForEvent, m_special_subpage, g_editorStrings.eventsCaseBackground), 3, 10, 40);
+            titleSize = FontManager_printTextOptiPxR(mode,
+                                                     fmt::format_ne(g_editorStrings.selectSectBlankPropBlankForEvent,
+                                                                    m_special_subpage,
+                                                                    g_editorStrings.eventsCaseBackground,
+                                                                    Events[m_current_event].Name),
+                                                     titlePosX, titlePosY,
+                                                     300,
+                                                     FontManager::fontIdFromSmbxFont(3));
             target = &Events[m_current_event].section[m_special_subpage-1].background_id;
         }
         else
         {
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectAllSectPropBlankForEvent, g_editorStrings.eventsCaseBackground), 3, 10, 40);
+            titleSize = FontManager_printTextOptiPxR(mode,
+                                                     fmt::format_ne(g_editorStrings.selectAllSectPropBlankForEvent,
+                                                                    g_editorStrings.eventsCaseBackground,
+                                                                    Events[m_current_event].Name),
+                                                     titlePosX, titlePosY,
+                                                     300,
+                                                     FontManager::fontIdFromSmbxFont(3));
             target = nullptr;
         }
 
-        SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
         current_page = &m_background_page;
 
         source = &EditorCustom::bg2_list.names;
@@ -2208,16 +2264,28 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
     {
         if(m_special_subpage > 0)
         {
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectSectBlankPropBlankForEvent, m_special_subpage, g_editorStrings.eventsCaseMusic), 3, 10, 40);
+            titleSize = FontManager_printTextOptiPxR(mode,
+                                                     fmt::format_ne(g_editorStrings.selectSectBlankPropBlankForEvent,
+                                                                    m_special_subpage,
+                                                                    g_editorStrings.eventsCaseMusic,
+                                                                    Events[m_current_event].Name),
+                                                     titlePosX, titlePosY,
+                                                     300,
+                                                     FontManager::fontIdFromSmbxFont(3));
             target = &Events[m_current_event].section[m_special_subpage-1].music_id;
         }
         else
         {
-            SuperPrintR(mode, fmt::format_ne(g_editorStrings.selectAllSectPropBlankForEvent, g_editorStrings.eventsCaseMusic), 3, 10, 40);
+            titleSize = FontManager_printTextOptiPxR(mode,
+                                                     fmt::format_ne(g_editorStrings.selectAllSectPropBlankForEvent,
+                                                                    g_editorStrings.eventsCaseMusic,
+                                                                    Events[m_current_event].Name),
+                                                     titlePosX, titlePosY,
+                                                     300,
+                                                     FontManager::fontIdFromSmbxFont(3));
             target = nullptr;
         }
 
-        SuperPrintR(mode, Events[m_current_event].Name, 3, 10, 60);
         current_page = &m_music_page;
 
         source = &EditorCustom::music_list.names;
@@ -2284,9 +2352,26 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
         return;
     }
 
+
+    int elementsOnPage = 20;
+    int elementsOnColumn = elementsOnPage / 2;
+    int elementsListBaseY = 80;
+    const int elementsRowHeight = 40;
+
+    // Reduce the size of the elements list if title has more lines than expected
+    while(titlePosY + titleSize.h() >= elementsListBaseY)
+    {
+        elementsOnPage -= 2;
+        elementsOnColumn -= 1;
+        elementsListBaseY += elementsRowHeight;
+    }
+
+    SDL_assert(elementsOnPage > 0);
+    SDL_assert(elementsOnColumn > 0);
+
     if(current_page != nullptr)
     {
-        int page_max = !source->empty() ? ((static_cast<int>(source->size()) - 1) / 20) : 0;
+        int page_max = !source->empty() ? ((static_cast<int>(source->size()) - 1) / elementsOnPage) : 0;
 
         if(!(page_max == 0 && *current_page == 0))
             SuperPrintR(mode, fmt::format_ne(g_editorStrings.pageBlankOfBlank, *current_page + 1, page_max + 1), 3, e_ScreenW - 320, 50);
@@ -2304,15 +2389,15 @@ void EditorScreen::UpdateSelectListScreen(CallMode mode)
             *current_page = page_max;
     }
 
-    for(int i = 0; i < 20; i++)
+    for(int i = 0; i < elementsOnPage; i++)
     {
-        int x = 10 + (e_ScreenW / 2) * (i / 10);
-        int y = 80 + 40 * (i % 10);
+        int x = 10 + (e_ScreenW / 2) * (i / elementsOnColumn);
+        int y = elementsListBaseY + elementsRowHeight * (i % elementsOnColumn);
 
         int j;
 
         if(current_page != nullptr)
-            j = (*current_page * 20) + i;
+            j = (*current_page * elementsOnPage) + i;
         else
             j = i;
 

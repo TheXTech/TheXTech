@@ -24,7 +24,7 @@
                 "changeSectionBoundsToCurrent": "改变场景{0}的范围到当前设置吗？",
                 "shouldEvent": "要使事件{0}"
             },
-            "controlsForEvent": "强制按下玩家按键",
+            "controlsForEventN": "强制按下玩家按键：{0}",
             "deletion": {
                 "cancel": "否：不删除事件",
                 "confirm": "是：删除事件",
@@ -86,7 +86,7 @@
                 "propBounds": "场景范围",
                 "propMusic": "音乐"
             },
-            "settingsForEvent": "事件选项"
+            "settingsForEvent": "{0}事件选项"
         },
         "file": {
             "actionClearLevel": "清除关卡",
@@ -219,11 +219,11 @@
             "underwater": "水下"
         },
         "select": {
-            "allSectPropBlankForEvent": "更改所有场景{0}于事件",
+            "allSectPropBlankForEventN": "更改所有场景{0}于{1}事件",
             "pathBlankUnlock": "路线向{0}开启条件",
-            "sectBlankPropBlankForEvent": "更改场景{0}的{1}于事件",
+            "sectBlankPropBlankForEventN": "更改场景{0}的{1}于{2}事件",
             "sectionBlankPropBlank": "场景{0}{1}",
-            "soundForEvent": "播放声音",
+            "soundForEventN": "执行{0}事件时播放音效",
             "warpTransitEffect": "过渡效果",
             "worldMusic": "大地图音乐"
         },
@@ -570,7 +570,13 @@
             "optionsModeFullScreen": "全屏模式",
             "optionsModeWindowed": "窗口模式",
             "optionsViewCredits": "查看制作团队",
-            "restartEngine": "重启引擎后生效"
+            "restartEngine": "重启引擎后生效",
+            "scale": {
+                "integer": "整数",
+                "label": "图像缩放",
+                "linear": "双线性",
+                "nearest": "最近邻居"
+            }
         },
         "wordBack": "返回",
         "wordHide": "隐藏",

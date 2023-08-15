@@ -57,6 +57,9 @@
 #include "level_file.h"
 #include "world_file.h"
 #include "pge_delay.h"
+#include "video.h"
+#include "change_res.h"
+#include "game_globals.h"
 #include "core/language.h"
 #include "main/translate.h"
 
@@ -141,6 +144,10 @@ void initMainMenu()
     g_mainMenu.optionsModeWindowed = "Windowed mode";
     g_mainMenu.optionsViewCredits = "View credits";
     g_mainMenu.optionsRestartEngine = "Restart engine for changes to take effect.";
+    g_mainMenu.optionsScaleMode = "Scale";
+    g_mainMenu.optionsScaleInteger = "Integer";
+    g_mainMenu.optionsScaleNearest = "Nearest";
+    g_mainMenu.optionsScaleLinear = "Linear";
 
     g_mainMenu.connectCharSelTitle = "Character Select";
     g_mainMenu.connectStartGame = "Start Game";
@@ -1484,13 +1491,14 @@ bool mainMenuUpdate()
         // Options
         else if(MenuMode == MENU_OPTIONS)
         {
-            int optionsMenuLength = 2;
+            int optionsMenuLength = 2; // controls, language, credits
 #ifndef RENDER_FULLSCREEN_ALWAYS
-            optionsMenuLength++;
+            optionsMenuLength++; // FullScreen
 #endif
 #ifndef RENDER_CUSTOM
-            optionsMenuLength++;
+            optionsMenuLength++; // Renderer
 #endif
+            optionsMenuLength ++; // ScaleMode
 
             if(SharedCursor.Move)
             {
@@ -1515,6 +1523,8 @@ bool mainMenuUpdate()
                             menuLen = 18 * 25; // Render Mode: XXXXXXXX
 #endif
                         else if(A == i++)
+                            menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
+                        else if(A == i++)
                             menuLen = 18 * 25; // Language: XXXXX (YY)
                         else
                             menuLen = 18 * 12 - 2; // std::strlen("view credits")
@@ -1538,6 +1548,8 @@ bool mainMenuUpdate()
             {
                 if(menuBackPress)
                 {
+                    SaveConfig();
+
                     int optionsIndex = 1;
                     if(!g_gameInfo.disableTwoPlayer)
                         optionsIndex++;
@@ -1612,9 +1624,22 @@ bool mainMenuUpdate()
 #endif // #ifndef RENDER_CUSTOM
                     else if(MenuCursor == i++)
                     {
+                        PlaySoundMenu(SFX_Do);
+                        if(!leftPressed)
+                            g_videoSettings.scaleMode = g_videoSettings.scaleMode + 1;
+                        else
+                            g_videoSettings.scaleMode = g_videoSettings.scaleMode - 1;
+                        if(g_videoSettings.scaleMode > SCALE_FIXED_2X)
+                            g_videoSettings.scaleMode = SCALE_DYNAMIC_INTEGER;
+                        if(g_videoSettings.scaleMode < SCALE_DYNAMIC_INTEGER)
+                            g_videoSettings.scaleMode = SCALE_FIXED_2X;
+                        UpdateWindowRes();
+                        UpdateInternalRes();
+                    }
+                    else if(MenuCursor == i++)
+                    {
                         XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
                         ReloadTranslations();
-                        SaveConfig();
                     }
                     else if(MenuCursor == i++ && (menuDoPress || MenuMouseClick))
                     {
@@ -2099,6 +2124,15 @@ void mainMenuDraw()
         else
             SuperPrint(fmt::format_ne("Render: {0} (X)", renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
 #endif
+        const std::string* scale_str = &ScaleMode_strings.at(g_videoSettings.scaleMode);
+        if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
+            scale_str = &g_mainMenu.optionsScaleInteger;
+        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_NEAREST)
+            scale_str = &g_mainMenu.optionsScaleNearest;
+        else if(g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR)
+            scale_str = &g_mainMenu.optionsScaleLinear;
+
+        SuperPrint(fmt::format_ne("{0}: {1}", g_mainMenu.optionsScaleMode, *scale_str), 3, MenuX, MenuY + (30 * i++));
         SuperPrint(fmt::format_ne("{0}: {1} ({2})", g_mainMenu.wordLanguage, g_mainMenu.languageName, g_config.language), 3, MenuX, MenuY + (30 * i++));
         SuperPrint(g_mainMenu.optionsViewCredits, 3, MenuX, MenuY + (30 * i++));
         XRender::renderTexture(MenuX - 20, MenuY + (MenuCursor * 30),
