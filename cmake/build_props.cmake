@@ -67,6 +67,18 @@ macro(xtech_disable_warning_flag WARNINGFLAG WARNING_VAR)
     endif()
 endmacro()
 
+macro(pge_add_opt_flag OPTFLAG OPT_VAR)
+    check_c_compiler_flag("${OPTFLAG}" HAVE_M_C_${OPT_VAR})
+    if(HAVE_M_C_${OPT_VAR})
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPTFLAG}")
+    endif()
+
+    check_cxx_compiler_flag("${OPTFLAG}" HAVE_M_CXX_${OPT_VAR})
+    if(HAVE_M_CXX_${OPT_VAR})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPTFLAG}")
+    endif()
+endmacro()
+
 function(pge_cxx_standard STDVER)
     if(NOT WIN32)
         set(CMAKE_CXX_STANDARD ${STDVER} PARENT_SCOPE)
