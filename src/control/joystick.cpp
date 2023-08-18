@@ -24,6 +24,7 @@
 #include <SDL2/SDL_haptic.h>
 #include <SDL2/SDL_events.h>
 
+#include <Utils/strings.h>
 #include <Logger/logger.h>
 
 #include "config.h"
@@ -1480,6 +1481,68 @@ bool InputMethodType_Joystick::RumbleSupported()
 void InputMethodType_Joystick::UpdateControlsPre() {}
 void InputMethodType_Joystick::UpdateControlsPost() {}
 
+static std::string s_GetJoystickName(SDL_Joystick* joy)
+{
+    // initialize with SDL name
+    const char* sdl_name = SDL_JoystickName(joy);
+    std::string raw_name = sdl_name ? sdl_name : "";
+
+    // split into words
+    Strings::List words = Strings::split(raw_name, ' ');
+
+    // reconstruct, while abbreviating certain words
+    std::string name = "";
+
+    for(std::string& s : words)
+    {
+        if(s.empty())
+            continue;
+
+        // abbreviated words
+        if(SDL_strcasecmp(s.c_str(), "generic") == 0)
+            s.resize(3);
+        else if(SDL_strcasecmp(s.c_str(), "nintendo") == 0)
+            s.resize(1);
+        else if(SDL_strcasecmp(s.c_str(), "microsoft") == 0)
+            s.resize(1);
+        else if(SDL_strcasecmp(s.c_str(), "sony") == 0)
+            s.resize(1);
+        else if(SDL_strcasecmp(s.c_str(), "playstation") == 0)
+            s = "PS";
+        else if(SDL_strcasecmp(s.c_str(), "controller") == 0)
+            s.resize(1);
+        else if(SDL_strcasecmp(s.c_str(), "joystick") == 0)
+            s.resize(3);
+        else if(SDL_strcasecmp(s.c_str(), "standard") == 0)
+            s = "Std";
+        // skip connection methods
+        else if(SDL_strcasecmp(s.c_str(), "usb") == 0)
+            continue;
+        else if(SDL_strcasecmp(s.c_str(), "bluetooth") == 0)
+            continue;
+
+        // add to reconstructed string
+        name += s;
+        name += " ";
+
+        // stop early if reconstructed string too long
+        if(name.size() > 10)
+            break;
+    }
+
+    // strip trailing spaces
+    while(!name.empty() && name[name.size() - 1] == ' ')
+        name.resize(name.size() - 1);
+
+    // fix empty names
+    if(name.empty())
+        name = "Joystick";
+
+    pLogDebug("Shortened joystick name: raw name was [%s], short name is [%s]", raw_name.c_str(), name.c_str());
+
+    return name;
+}
+
 InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& active_methods) noexcept
 {
     JoystickDevices* active_joystick = nullptr;
@@ -1534,14 +1597,8 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
         return nullptr;
 
     method->Type = this;
-    method->Name = SDL_JoystickName(active_joystick->joy);
+    method->Name = s_GetJoystickName(active_joystick->joy);
     method->m_devices = active_joystick;
-
-    // I've found that truncation to 10 characters is
-    // needed for this to display well with multiplayer
-    if(method->Name.size() > 10)
-        method->Name.resize(10);
-
 
     // In this section, we find the default profile for this controller/player combination...!
 
@@ -1619,7 +1676,7 @@ InputMethod* InputMethodType_Joystick::Poll(const std::vector<InputMethod*>& act
             method->Profile = this->AddOldJoystickProfile();
 
         if(method->Profile)
-            method->Profile->Name = SDL_JoystickName(active_joystick->joy);
+            method->Profile->Name = method->Name;
     }
 
     return (InputMethod*)method;
