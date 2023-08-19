@@ -278,7 +278,7 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
 
 void speedRun_renderControls(int player, int screenZ)
 {
-    if(GameMenu || GameOutro || BattleMode)
+    if(GameMenu || GameOutro)
         return; // Don't draw things at Menu and Outro
 
     if(player < 1 || player > 2)
