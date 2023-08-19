@@ -1033,6 +1033,64 @@ int GameMain(const CmdLineSetup_t &setup)
                     ReturnWarp = 0;
             }
 
+            // Verify if level can run or not
+            {
+                bool hasPlayerPoint = false;
+                bool hasStartWarp = (StartWarp > 0);
+                bool hasValidStartWarp = (StartWarp > 0 && StartWarp <= numWarps);
+                bool startError = false;
+
+                for(int i = 1; i <= numPlayers && i <= 2; ++i)
+                    hasPlayerPoint |= !PlayerStart[i].isNull();
+
+                if(hasStartWarp && !hasValidStartWarp)
+                {
+                    // Mark all players as dead
+                    for(int A = 1; A <= numPlayers; A++)
+                        Player[A].Dead = true;
+
+                    MessageText = fmt::format_ne(g_gameStrings.errorInvalidEnterWarp,
+                                                 FullFileName,
+                                                 StartWarp,
+                                                 numWarps);
+                    PauseGame(PauseCode::Message);
+                    startError = true;
+                }
+                else if(!hasPlayerPoint && !hasStartWarp)
+                {
+                    // Mark all players as dead
+                    for(int A = 1; A <= numPlayers; A++)
+                        Player[A].Dead = true;
+
+                    MessageText = fmt::format_ne(g_gameStrings.errorNoStartPoint, FullFileName);
+                    PauseGame(PauseCode::Message);
+                    startError = true;
+                }
+
+                if(startError)
+                {
+                    // FIXME: Verify the whole behaviour
+                    if(TestLevel && Backup_FullFileName.empty())
+                        GameIsActive = false; // Quit the game
+                    else
+                    {
+                        ++Lives;
+                        EveryonesDead();
+                    }
+
+                    Record::EndRecording();
+
+                    if(!GameIsActive)
+                        speedRun_saveStats();
+
+                    StopAllSounds();
+                    UnloadExtSounds();
+                    clearScreenFaders(); // Reset all faders
+
+                    continue;
+                }
+            }
+
             speedRun_resetCurrent();
 //'--------------------------------------------
 

@@ -31,6 +31,8 @@ struct GameContent
     std::string controlsPhrasePlayerConnected;
 
     std::string errorOpenFileFailed;
+    std::string errorInvalidEnterWarp;
+    std::string errorNoStartPoint;
 
     std::string warpNeedStarCount;
 
