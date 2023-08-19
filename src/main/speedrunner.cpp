@@ -141,7 +141,7 @@ static void GetControllerColor(int player, float& r, float& g, float& b, bool* d
     }
 }
 
-void RenderControls(int player, int x, int y, int w, int h)
+void RenderControls(int player, int x, int y, int w, int h, bool missing)
 {
     float alhpa = 0.7f;
     float alhpaB = 0.8f;
@@ -158,24 +158,52 @@ void RenderControls(int player, int x, int y, int w, int h)
 
     const Controls_t& c = s_displayControls[player-1];
     XRender::renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alhpaB, true);//Cender of D-Pad
-    XRender::renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alhpaB, true);
-    XRender::renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alhpaB, true);
-    XRender::renderRect(x + 4, y + 12, 6, 6, bool2gray(c.Left), alhpaB, true);
-    XRender::renderRect(x + 16, y + 12, 6, 6, bool2gray(c.Right), alhpaB, true);
 
-    XRender::renderRect(x + 64, y + 18, 6, 6, bool2green(c.Jump), alhpaB, true);
-    XRender::renderRect(x + 66, y + 8, 6, 6, bool2red(c.AltJump), alhpaB, true);
-    XRender::renderRect(x + 54, y + 16, 6, 6, bool2blue(c.Run), alhpaB, true);
-    XRender::renderRect(x + 56, y + 6, 6, 6, bool2yellow(c.AltRun), alhpaB, true);
+    BlockFlash++;
+    if(BlockFlash >= 180)
+        BlockFlash = 0;
 
-    XRender::renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alhpaB, true);
-    if(SharedControls.LegacyPause)
-        XRender::renderRect(x + 40, y + 22, 10, 4, bool2legacy(c.Start), alhpaB, true);
+    if(missing && BlockFlash < 90)
+    {
+        float r = 1.0f;
+        float g = 1.0f;
+        float b = 1.0f;
+        float a = 1.0f;
+
+        XRender::renderRect(x + 10, y + 6, 6, 6, r, g, b, a, true);
+        XRender::renderRect(x + 10, y + 18, 6, 6, r, g, b, a, true);
+        XRender::renderRect(x + 4, y + 12, 6, 6, r, g, b, a, true);
+        XRender::renderRect(x + 16, y + 12, 6, 6, r, g, b, a, true);
+
+        XRender::renderRect(x + 64, y + 18, 6, 6, r, g, b, a, true);
+        XRender::renderRect(x + 66, y + 8, 6, 6, r, g, b, a, true);
+        XRender::renderRect(x + 54, y + 16, 6, 6, r, g, b, a, true);
+        XRender::renderRect(x + 56, y + 6, 6, 6, r, g, b, a, true);
+
+        XRender::renderRect(x + 26, y + 22, 10, 4, r, g, b, a, true);
+        XRender::renderRect(x + 40, y + 22, 10, 4, r, g, b, a, true);
+    }
     else
-        XRender::renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alhpaB, true);
+    {
+        XRender::renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alhpaB, true);
+        XRender::renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alhpaB, true);
+        XRender::renderRect(x + 4, y + 12, 6, 6, bool2gray(c.Left), alhpaB, true);
+        XRender::renderRect(x + 16, y + 12, 6, 6, bool2gray(c.Right), alhpaB, true);
+
+        XRender::renderRect(x + 64, y + 18, 6, 6, bool2green(c.Jump), alhpaB, true);
+        XRender::renderRect(x + 66, y + 8, 6, 6, bool2red(c.AltJump), alhpaB, true);
+        XRender::renderRect(x + 54, y + 16, 6, 6, bool2blue(c.Run), alhpaB, true);
+        XRender::renderRect(x + 56, y + 6, 6, 6, bool2yellow(c.AltRun), alhpaB, true);
+
+        XRender::renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alhpaB, true);
+        if(SharedControls.LegacyPause)
+            XRender::renderRect(x + 40, y + 22, 10, 4, bool2legacy(c.Start), alhpaB, true);
+        else
+            XRender::renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alhpaB, true);
+    }
 
     if(drawLabel)
-        SuperPrint(fmt::format_ne("P{0}", player), 3, x + 22, y + 2, 1.f, 1.f, 1.f, 0.5f);
+        SuperPrintCenter(fmt::format_ne("P{0}", player), 3, x + w / 2, y + 2, 1.f, 1.f, 1.f, 0.5f);
 }
 
 void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
@@ -285,8 +313,6 @@ void speedRun_renderControls(int player, int screenZ)
         return;
 
     const bool player_missing = (player - 1 >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player - 1]);
-    if(QuickReconnectScreen::g_active && player_missing)
-        return;
 
     // Controller
     int x = 4;
@@ -338,10 +364,10 @@ void speedRun_renderControls(int player, int screenZ)
 #endif
     }
 
-    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController)
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController || player_missing)
     {
         // render controls if enabled
-        RenderControls(player, x, y, w, h);
+        RenderControls(player, x, y, w, h, player_missing);
     }
     else
     {

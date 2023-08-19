@@ -53,7 +53,7 @@ void speedRun_triggerLeave();
 
 void speedRun_bossDeadEvent();
 
-void RenderControls(int player, int x, int y, int w, int h);
+void RenderControls(int player, int x, int y, int w, int h, bool missing);
 
 void speedRun_renderControls(int player, int screenZ = -1);
 void speedRun_renderTimer();
