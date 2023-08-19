@@ -412,11 +412,42 @@ int GameMain(const CmdLineSetup_t &setup)
                 if(numPlayers < 1)
                     numPlayers = 1;
 
+                for(int A = 1; A <= numCharacters; A++)
+                    blockCharacter[A] = SelectWorld[selWorld].blockChar[A];
+
                 // prepare for StartEpisode(): set player characters
                 for(int i = 0; i < numPlayers; i++)
                 {
                     if(testPlayer[i + 1].Character != 0)
                         g_charSelect[i] = testPlayer[i + 1].Character;
+                    else
+                        g_charSelect[i] = i + 1;
+
+                    // replace blocked characters
+                    if(blockCharacter[g_charSelect[i]])
+                    {
+                        for(int new_char = 1; new_char <= numCharacters; new_char++)
+                        {
+                            // check it's unblocked
+                            if(blockCharacter[new_char])
+                                continue;
+
+                            // check no other player has the character first
+                            int j = 0;
+                            for(; j < i; j++)
+                            {
+                                if(g_charSelect[j] == new_char)
+                                    break;
+                            }
+
+                            // if loop ended naturally, character is unused
+                            if(j == i)
+                            {
+                                g_charSelect[i] = new_char;
+                                break;
+                            }
+                        }
+                    }
 
                     if(i <= (int)Controls::g_InputMethods.size())
                         Controls::g_InputMethods.push_back(nullptr);
