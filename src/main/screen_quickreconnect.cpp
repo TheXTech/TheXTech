@@ -144,7 +144,7 @@ void Logic()
         }
     }
 
-    if(has_missing)
+    if(has_missing && GamePaused != PauseCode::DropAdd)
     {
         Controls::PollInputMethod();
 

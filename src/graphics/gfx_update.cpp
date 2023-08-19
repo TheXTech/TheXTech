@@ -2383,7 +2383,7 @@ void UpdateGraphics(bool skipRepaint)
     if(QuickReconnectScreen::g_active)
         QuickReconnectScreen::Render();
 
-    if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+    if(GamePaused == PauseCode::DropAdd)
     {
         ConnectScreen::Render();
         XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);

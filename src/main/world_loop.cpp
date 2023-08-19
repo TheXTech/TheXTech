@@ -205,10 +205,10 @@ void WorldLoop()
 
     if(!Controls::Update())
     {
-        if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect)
-            QuickReconnectScreen::g_active = true;
-        else
-            PauseGame(PauseCode::Reconnect, 0);
+        QuickReconnectScreen::g_active = true;
+
+        if(!g_config.NoPauseReconnect && g_compatibility.pause_on_disconnect)
+            PauseGame(PauseCode::PauseScreen, 0);
     }
 
     if(QuickReconnectScreen::g_active)

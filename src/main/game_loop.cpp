@@ -134,10 +134,10 @@ void GameLoop()
 
     if(!Controls::Update())
     {
-        if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect || TestLevel)
-            QuickReconnectScreen::g_active = true;
-        else
-            PauseGame(PauseCode::Reconnect, 0);
+        QuickReconnectScreen::g_active = true;
+
+        if(!g_config.NoPauseReconnect && g_compatibility.pause_on_disconnect && !TestLevel)
+            PauseGame(PauseCode::PauseScreen, 0);
     }
 
     if(QuickReconnectScreen::g_active)
@@ -389,11 +389,6 @@ int PauseGame(PauseCode code, int plr)
         MessageScreen_Init();
     else if(code == PauseCode::PauseScreen)
         PauseScreen::Init(plr, SharedControls.LegacyPause);
-    else if(code == PauseCode::Reconnect)
-    {
-        ConnectScreen::Reconnect_Start();
-        XWindow::showCursor(0);
-    }
     else if(code == PauseCode::DropAdd)
     {
         ConnectScreen::DropAdd_Start();
@@ -450,13 +445,7 @@ int PauseGame(PauseCode code, int plr)
 
             if(!Controls::Update())
             {
-                if(code != PauseCode::Reconnect)
-                {
-                    if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect || TestLevel)
-                        QuickReconnectScreen::g_active = true;
-                    else
-                        PauseGame(PauseCode::Reconnect, 0);
-                }
+                QuickReconnectScreen::g_active = true;
             }
 
             if(QuickReconnectScreen::g_active)
@@ -502,7 +491,7 @@ int PauseGame(PauseCode code, int plr)
                 if(PromptScreen::Logic())
                     break;
             }
-            else if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+            else if(GamePaused == PauseCode::DropAdd)
             {
                 result = ConnectScreen::Logic();
                 if(result)
