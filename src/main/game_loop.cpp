@@ -300,7 +300,7 @@ void GameLoop()
                     // normally pause the game
                     else
                     {
-                        PauseGame(PauseCode::PauseScreen, p);
+                        PauseGame(PauseCode::PauseScreen, 0);
                     }
                     // don't let double-pause or double-toggle happen
                     break;
