@@ -1068,8 +1068,8 @@ int GameMain(const CmdLineSetup_t &setup)
             //    Verify if level can run or not
             // ---------------------------------------
             bool hasPlayerPoint = false;
-            bool hasStartWarp = (StartWarp > 0);
-            bool hasValidStartWarp = (StartWarp > 0 && StartWarp <= numWarps);
+            bool hasStartWarp = (Player[1].Warp > 0);
+            bool hasValidStartWarp = (Player[1].Warp > 0 && Player[1].Warp <= numWarps);
             bool startError = false;
 
             for(int i = 1; i <= numPlayers && i <= 2; ++i)
