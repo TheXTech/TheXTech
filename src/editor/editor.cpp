@@ -402,8 +402,7 @@ void UpdateEditor()
                         {
                             PlaySound(SFX_Grab);
                             EditorCursor.Location = PlayerStart[A];
-                            PlayerStart[A].X = 0;
-                            PlayerStart[A].Y = 0;
+                            PlayerStart[A] = PlayerStart_t();
                             optCursor.current = OptCursor_t::LVL_SETTINGS;
 //                            frmLevelSettings::optLevel(3 + A).Value = true;
                             EditorCursor.Mode = OptCursor_t::LVL_SETTINGS;
