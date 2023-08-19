@@ -20,6 +20,8 @@
 
 #include <fmt_format_ne.h>
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "controls.h"
 #include "globals.h"
 #include "graphics.h"
@@ -51,11 +53,15 @@ void Render()
     }
 
     const int draw_X = 20;
+    const int draw_X_right = ScreenW - 20;
     const int press_button_Y = ScreenH - 40;
     const int last_player_Y = press_button_Y - 20;
 
-    int drawn = 0;
-    bool none_missing = true;
+    int long_drawn = 0;
+    int left_drawn = 0;
+    int right_drawn = 0;
+    bool left_missing = false;
+    bool right_missing = false;
 
     std::string message;
 
@@ -66,24 +72,47 @@ void Render()
 
         if(i >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[i])
         {
-            int draw_Y = last_player_Y - 20 * drawn;
             message = fmt::format_ne(g_gameStrings.controlsPhrasePlayerDisconnected, i + 1);
-            SuperPrint(message, 3, draw_X, draw_Y);
-            drawn++;
-            none_missing = false;
+
+            // P2 is special, gets right-aligned
+            if(i == 1)
+            {
+                int draw_Y = last_player_Y - 20 * (right_drawn + long_drawn);
+                SuperPrintRightAlign(message, 3, draw_X_right, draw_Y);
+                right_missing = true;
+                right_drawn++;
+            }
+            else
+            {
+                int draw_Y = last_player_Y - 20 * (left_drawn + long_drawn);
+                SuperPrint(message, 3, draw_X, draw_Y);
+                left_missing = true;
+                left_drawn++;
+            }
         }
         else if(s_toast_duration[i])
         {
-            int draw_Y = last_player_Y - 20 * drawn;
+            int draw_Y = last_player_Y - 20 * (SDL_max(left_drawn, right_drawn) + long_drawn);
             const std::string& p = (Controls::g_InputMethods[i]->Profile ? Controls::g_InputMethods[i]->Profile->Name : g_mainMenu.caseNone);
             message = fmt::format_ne(g_gameStrings.controlsPhrasePlayerConnected, i + 1, Controls::g_InputMethods[i]->Name, p);
-            SuperPrint(message, 3, draw_X, draw_Y);
-            drawn++;
+
+            // P2 is special, gets right-aligned
+            if(i == 1)
+            {
+                SuperPrintRightAlign(message, 3, draw_X_right, draw_Y);
+            }
+            else
+                SuperPrint(message, 3, draw_X, draw_Y);
+
+            long_drawn++;
         }
     }
 
-    if(!none_missing)
+    if(left_missing)
         SuperPrint(g_gameStrings.connectPressAButton, 3, draw_X + 20, press_button_Y);
+
+    if(right_missing)
+        SuperPrintRightAlign(g_gameStrings.connectPressAButton, 3, draw_X_right - 20, press_button_Y);
 }
 
 void Logic()
