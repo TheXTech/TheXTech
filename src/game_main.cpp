@@ -1064,100 +1064,82 @@ int GameMain(const CmdLineSetup_t &setup)
                     ReturnWarp = 0;
             }
 
-            // Verify if level can run or not
+            // ---------------------------------------
+            //    Verify if level can run or not
+            // ---------------------------------------
+            bool hasPlayerPoint = false;
+            bool hasStartWarp = (StartWarp > 0);
+            bool hasValidStartWarp = (StartWarp > 0 && StartWarp <= numWarps);
+            bool startError = false;
+
+            for(int i = 1; i <= numPlayers && i <= 2; ++i)
+                hasPlayerPoint |= !PlayerStart[i].isNull();
+
+            if(hasStartWarp && !hasValidStartWarp)
             {
-                bool hasPlayerPoint = false;
-                bool hasStartWarp = (StartWarp > 0);
-                bool hasValidStartWarp = (StartWarp > 0 && StartWarp <= numWarps);
-                bool startError = false;
-
-                for(int i = 1; i <= numPlayers && i <= 2; ++i)
-                    hasPlayerPoint |= !PlayerStart[i].isNull();
-
-                if(hasStartWarp && !hasValidStartWarp)
-                {
-                    // Mark all players as dead
-                    for(int A = 1; A <= numPlayers; A++)
-                        Player[A].Dead = true;
-
-                    MessageText = fmt::format_ne(g_gameStrings.errorInvalidEnterWarp,
-                                                 FullFileName,
-                                                 StartWarp,
-                                                 numWarps);
-                    PauseGame(PauseCode::Message);
-                    startError = true;
-                }
-                else if(!hasPlayerPoint && !hasStartWarp)
-                {
-                    // Mark all players as dead
-                    for(int A = 1; A <= numPlayers; A++)
-                        Player[A].Dead = true;
-
-                    MessageText = fmt::format_ne(g_gameStrings.errorNoStartPoint, FullFileName);
-                    PauseGame(PauseCode::Message);
-                    startError = true;
-                }
-
-                if(startError)
-                {
-                    // FIXME: Verify the whole behaviour
-                    if(TestLevel && Backup_FullFileName.empty())
-                        GameIsActive = false; // Quit the game
-                    else
-                    {
-                        ++Lives;
-                        EveryonesDead();
-                    }
-
-                    Record::EndRecording();
-
-                    if(!GameIsActive)
-                        speedRun_saveStats();
-
-                    StopAllSounds();
-                    UnloadExtSounds();
-                    clearScreenFaders(); // Reset all faders
-
-                    continue;
-                }
+                MessageText = fmt::format_ne(g_gameStrings.errorInvalidEnterWarp,
+                                             FullFileName,
+                                             StartWarp,
+                                             numWarps);
+                startError = true;
+            }
+            else if(!hasPlayerPoint && !hasStartWarp)
+            {
+                MessageText = fmt::format_ne(g_gameStrings.errorNoStartPoint, FullFileName);
+                startError = true;
             }
 
-            speedRun_resetCurrent();
+            if(startError) // Quit the level because of error
+            {
+                // Mark all players as dead
+                for(int A = 1; A <= numPlayers; A++)
+                    Player[A].Dead = true;
+
+                PauseGame(PauseCode::Message);
+
+                ++Lives;
+                EveryonesDead();
+                clearScreenFaders();
+            }
+            else // Run the level normally
+            {
+                speedRun_resetCurrent();
 //'--------------------------------------------
 
-            // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
-            GraphicsLazyPreLoad();
-            resetFrameTimer();
+                // Update graphics before loop begin (to process inital lazy-unpacking of used sprites)
+                GraphicsLazyPreLoad();
+                resetFrameTimer();
 
-            speedRun_triggerEnter();
+                speedRun_triggerEnter();
 
-            clearScreenFaders(); // Reset all faders
-            if(g_config.EnableInterLevelFade)
-                g_levelScreenFader.setupFader(2, 65, 0, ScreenFader::S_FADE);
+                clearScreenFaders(); // Reset all faders
+                if(g_config.EnableInterLevelFade)
+                    g_levelScreenFader.setupFader(2, 65, 0, ScreenFader::S_FADE);
 
-            lunaLoad();
+                lunaLoad();
 
-            delayedMusicStart(); // Allow music being started
+                delayedMusicStart(); // Allow music being started
 
-            ProcEvent(EVENT_LEVEL_START, true);
-            for(int A = 2; A <= maxEvents; ++A)
-            {
-                if(Events[A].AutoStart)
-                    ProcEvent(A, true);
-            }
-
-            // MAIN GAME LOOP
-            runFrameLoop(nullptr, &GameLoop,
-            []()->bool{return !LevelSelect && !GameMenu;},
-            []()->bool
-            {
-                if(!LivingPlayers())
+                ProcEvent(EVENT_LEVEL_START, true);
+                for(int A = 2; A <= maxEvents; ++A)
                 {
-                    EveryonesDead();
-                    return true;
+                    if(Events[A].AutoStart)
+                        ProcEvent(A, true);
                 }
-                return false;
-            });
+
+                // MAIN GAME LOOP
+                runFrameLoop(nullptr, &GameLoop,
+                []()->bool{return !LevelSelect && !GameMenu;},
+                []()->bool
+                {
+                    if(!LivingPlayers())
+                    {
+                        EveryonesDead();
+                        return true;
+                    }
+                    return false;
+                });
+            }
 
             Record::EndRecording();
 
