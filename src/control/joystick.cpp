@@ -1532,18 +1532,22 @@ static std::string s_GetJoystickName(SDL_Joystick* joy)
         }
         index++;
 
+        // stop early if reconstructed string would become too long
+        if(!name.empty() && name.size() + s.size() > 10)
+            break;
+
         // add to reconstructed string
         name += s;
         name += " ";
-
-        // stop early if reconstructed string too long
-        if(name.size() > 10)
-            break;
     }
 
     // strip trailing spaces
     while(!name.empty() && name[name.size() - 1] == ' ')
         name.resize(name.size() - 1);
+
+    // cutoff word if needed
+    if(name.size() > 10)
+        name.resize(10);
 
     // fix empty names
     if(name.empty())
