@@ -1493,6 +1493,7 @@ static std::string s_GetJoystickName(SDL_Joystick* joy)
     // reconstruct, while abbreviating certain words
     std::string name = "";
 
+    size_t index = 0;
     for(std::string& s : words)
     {
         if(s.empty())
@@ -1520,6 +1521,16 @@ static std::string s_GetJoystickName(SDL_Joystick* joy)
             continue;
         else if(SDL_strcasecmp(s.c_str(), "bluetooth") == 0)
             continue;
+        else if(SDL_strcasecmp(s.c_str(), "hid") == 0)
+            continue;
+
+        // skip duplicate words post conversion
+        for(size_t i = 0; i < index; ++i)
+        {
+            if(SDL_strcasecmp(s.c_str(), words[i].c_str()) == 0)
+                continue;
+        }
+        index++;
 
         // add to reconstructed string
         name += s;
