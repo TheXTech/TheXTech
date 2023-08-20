@@ -454,8 +454,8 @@ void AbstractRender_t::drawBatteryStatus()
     int by = 24;
     int segmentsFullLen = 14;
     int segments = 0;
-    float alhpa = 0.7f;
-    float alhpaB = 0.8f;
+    float alpha = 0.7f;
+    float alphaB = 0.8f;
     float r = 0.4f, g = 0.4f, b = 0.4f;
     float br = 0.0f, bg = 0.0f, bb = 0.0f;
     bool isLow = false;
@@ -510,11 +510,11 @@ void AbstractRender_t::drawBatteryStatus()
         XRender::setTargetTexture();
 
         XRender::offsetViewportIgnore(true);
-        XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
-        XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
-        XRender::renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
-        XRender::renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
-        XRender::renderRect(bx + 4, by + 4, segments, 14, br, bg, bb, alhpaB / 2.f, true);//Level
+        XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alpha, true);//Edge
+        XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alpha, true);//Box
+        XRender::renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alpha, true);//Edge
+        XRender::renderRect(bx + 34, by + 8, 4, 6, r, g, b, alpha, true);//Box
+        XRender::renderRect(bx + 4, by + 4, segments, 14, br, bg, bb, alphaB / 2.f, true);//Level
         XRender::offsetViewportIgnore(false);
 
         XRender::setTargetScreen();

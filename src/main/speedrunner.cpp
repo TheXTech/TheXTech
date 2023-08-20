@@ -150,35 +150,35 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
     if(missing && (CommonFrame % 128) >= 64)
         return;
 
-    float alhpa = 0.7f;
-    float alhpaB = missing ? 0.4f : 0.8f;
+    float alpha = 0.7f;
+    float alphaB = missing ? 0.4f : 0.8f;
     float r, g, b;
     bool drawLabel;
 
     GetControllerColor(player, r, g, b, &drawLabel);
 
-    XRender::renderRect(x, y, w, h, 0.f, 0.f, 0.f, alhpa, true);//Edge
-    XRender::renderRect(x + 2, y + 2, w - 4, h - 4, r, g, b, alhpa, true);//Box
+    XRender::renderRect(x, y, w, h, 0.f, 0.f, 0.f, alpha, true);//Edge
+    XRender::renderRect(x + 2, y + 2, w - 4, h - 4, r, g, b, alpha, true);//Box
 
     const Controls_t& c = s_displayControls[player-1];
 
-    XRender::renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alhpaB, true);//Cender of D-Pad
+    XRender::renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alphaB, true);//Cender of D-Pad
 
-    XRender::renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alhpaB, true);
-    XRender::renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alhpaB, true);
-    XRender::renderRect(x + 4, y + 12, 6, 6, bool2gray(c.Left), alhpaB, true);
-    XRender::renderRect(x + 16, y + 12, 6, 6, bool2gray(c.Right), alhpaB, true);
+    XRender::renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alphaB, true);
+    XRender::renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alphaB, true);
+    XRender::renderRect(x + 4, y + 12, 6, 6, bool2gray(c.Left), alphaB, true);
+    XRender::renderRect(x + 16, y + 12, 6, 6, bool2gray(c.Right), alphaB, true);
 
-    XRender::renderRect(x + 64, y + 18, 6, 6, bool2green(c.Jump), alhpaB, true);
-    XRender::renderRect(x + 66, y + 8, 6, 6, bool2red(c.AltJump), alhpaB, true);
-    XRender::renderRect(x + 54, y + 16, 6, 6, bool2blue(c.Run), alhpaB, true);
-    XRender::renderRect(x + 56, y + 6, 6, 6, bool2yellow(c.AltRun), alhpaB, true);
+    XRender::renderRect(x + 64, y + 18, 6, 6, bool2green(c.Jump), alphaB, true);
+    XRender::renderRect(x + 66, y + 8, 6, 6, bool2red(c.AltJump), alphaB, true);
+    XRender::renderRect(x + 54, y + 16, 6, 6, bool2blue(c.Run), alphaB, true);
+    XRender::renderRect(x + 56, y + 6, 6, 6, bool2yellow(c.AltRun), alphaB, true);
 
-    XRender::renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alhpaB, true);
+    XRender::renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alphaB, true);
     if(SharedControls.LegacyPause)
-        XRender::renderRect(x + 40, y + 22, 10, 4, bool2legacy(c.Start), alhpaB, true);
+        XRender::renderRect(x + 40, y + 22, 10, 4, bool2legacy(c.Start), alphaB, true);
     else
-        XRender::renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alhpaB, true);
+        XRender::renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alphaB, true);
 
     if(drawLabel || missing)
     {
@@ -195,8 +195,8 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
     bw &= ~1;
     bh &= ~1;
 
-    float alhpa = 0.7f;
-    float alhpaB = 0.8f;
+    float alpha = 0.7f;
+    float alphaB = 0.8f;
     float r, g, b;
 
     GetControllerColor(player, r, g, b);
@@ -205,10 +205,10 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
 
     if(status_info.power_status != Controls::StatusInfo::POWER_DISABLED)
     {
-        XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alhpa, true);//Edge
-        XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alhpa, true);//Box
-        XRender::renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alhpa, true);//Edge
-        XRender::renderRect(bx + 34, by + 8, 4, 6, r, g, b, alhpa, true);//Box
+        XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alpha, true);//Edge
+        XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alpha, true);//Box
+        XRender::renderRect(bx + 36, by + 6, 4, 10, 0.f, 0.f, 0.f, alpha, true);//Edge
+        XRender::renderRect(bx + 34, by + 8, 4, 6, r, g, b, alpha, true);//Box
 
         int segments;
 
@@ -252,25 +252,25 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
             if(s > 2) s = 2;
             // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
             //     s = 2;
-            XRender::renderRect(bx + 34, by + 10, s, 2, r, g, b, alhpaB, true); // fallthrough
+            XRender::renderRect(bx + 34, by + 10, s, 2, r, g, b, alphaB, true); // fallthrough
         case 3:
             s = 4.f * (status_info.power_level - 0.6f) / 0.3f;
             if(s > 4) s = 4;
             // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
             //     s = 4;
-            XRender::renderRect(bx + 24, by + 4, s*2, 14, r, g, b, alhpaB, true); // fallthrough
+            XRender::renderRect(bx + 24, by + 4, s*2, 14, r, g, b, alphaB, true); // fallthrough
         case 2:
             s = 4.f * (status_info.power_level - 0.3f) / 0.3f;
             if(s > 4) s = 4;
             // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
             //     s = 4;
-            XRender::renderRect(bx + 14, by + 4, s*2, 14, r, g, b, alhpaB, true); // fallthrough
+            XRender::renderRect(bx + 14, by + 4, s*2, 14, r, g, b, alphaB, true); // fallthrough
         case 1:
             s = 4.f * status_info.power_level / 0.3f;
             if(s > 4) s = 4;
             // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
             //     s = 4;
-            XRender::renderRect(bx + 4, by + 4, s*2, 14, r, g, b, alhpaB, true);
+            XRender::renderRect(bx + 4, by + 4, s*2, 14, r, g, b, alphaB, true);
             break;
         }
         if(status_info.power_status == Controls::StatusInfo::POWER_UNKNOWN)
