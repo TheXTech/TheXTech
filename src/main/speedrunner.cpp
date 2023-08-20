@@ -146,12 +146,9 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
     if(player < 1 || player > maxLocalPlayers)
         return;
 
-    // flash the controller if searching for player
-    if(missing && (CommonFrame % 128) >= 64)
-        return;
-
     float alpha = 0.7f;
     float alphaB = missing ? 0.4f : 0.8f;
+    float alphaText = 0.5f;
     float r, g, b;
     bool drawLabel;
 
@@ -159,6 +156,14 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
 
     XRender::renderRect(x, y, w, h, 0.f, 0.f, 0.f, alpha, true);//Edge
     XRender::renderRect(x + 2, y + 2, w - 4, h - 4, r, g, b, alpha, true);//Box
+
+    if(missing)
+    {
+        float tick = (CommonFrame % 128) / 128.0f * 2.0f * static_cast<float>(M_PI);
+        float coord = (static_cast<float>(sinf(tick)) + 1.0f) * 0.5f + 0.25f;
+        alphaB *= coord;
+        alphaText *= coord;
+    }
 
     const Controls_t& c = s_displayControls[player-1];
 
@@ -183,7 +188,7 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
     if(drawLabel || missing)
     {
         const char* label_fmt = (missing ? "P{0}?" : "P{0}");
-        SuperPrintCenter(fmt::format_ne(label_fmt, player), 3, x + w / 2, y + 2, 1.f, 1.f, 1.f, 0.5f);
+        SuperPrintCenter(fmt::format_ne(label_fmt, player), 3, x + w / 2, y + 2, 1.f, 1.f, 1.f, alphaText);
     }
 }
 
