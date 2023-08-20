@@ -327,9 +327,7 @@ void speedRun_renderControls(int player, int screenZ, int align)
         by = y + 4;
 
         if(align == SPEEDRUN_ALIGN_AUTO)
-        {
             align = scr.Left > 0 ? SPEEDRUN_ALIGN_RIGHT : SPEEDRUN_ALIGN_LEFT;
-        }
 
         // this keeps the locations fixed even when the vScreens expand/contract
         if(align == SPEEDRUN_ALIGN_LEFT)
@@ -361,6 +359,9 @@ void speedRun_renderControls(int player, int screenZ, int align)
     }
     else
     {
+        if(align == SPEEDRUN_ALIGN_AUTO)
+            align = player > 1 ? SPEEDRUN_ALIGN_RIGHT : SPEEDRUN_ALIGN_LEFT;
+
         if(align == SPEEDRUN_ALIGN_LEFT)
         {
             x = 4;
