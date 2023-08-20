@@ -692,6 +692,7 @@ if(NINTENDO_3DS)
         src/core/3ds/events_3ds.cpp
 #        src/core/3ds/3ds-audio-lib.cpp
         src/core/sdl/sdl_core.cpp
+        src/core/power/power_3ds.cpp
     )
 elseif(NINTENDO_WII)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
@@ -703,6 +704,7 @@ elseif(NINTENDO_WII)
         src/core/wii/msgbox_wii.cpp
         src/core/wii/events_wii.cpp
         src/core/sdl/sdl_core.cpp
+        src/core/power/power_wii.cpp
     )
 elseif(NINTENDO_DS)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
@@ -717,6 +719,7 @@ elseif(NINTENDO_DS)
         src/core/null/events_null.cpp
         src/core/16m/sound_16m.cpp
         src/core/16m/packloader.cpp
+        src/core/power/power_null.cpp
     )
 elseif(THEXTECH_CLI_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
@@ -726,6 +729,7 @@ elseif(THEXTECH_CLI_BUILD)
         src/core/null/msgbox_null.cpp
         src/core/null/events_null.cpp
         src/core/sdl/sdl_core.cpp
+        src/core/power/power_null.cpp
     )
 elseif(THEXTECH_NO_SDL_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
@@ -734,6 +738,7 @@ elseif(THEXTECH_NO_SDL_BUILD)
         src/core/null/window_null.cpp
         src/core/null/msgbox_null.cpp
         src/core/null/events_null.cpp
+        src/core/power/power_null.cpp
     )
 else()
     add_definitions(-DCORE_EVERYTHING_SDL)
@@ -750,6 +755,7 @@ else()
         src/core/sdl/msgbox_sdl.cpp
         src/core/sdl/events_sdl.cpp
         src/core/sdl/sdl_core.cpp
+        src/core/power/power_sdl.cpp
     )
 endif()
 

@@ -195,7 +195,7 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
     }
 }
 
-void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
+void RenderPowerInfo(int player, int bx, int by, int bw, int bh, const XPower::StatusInfo* status)
 {
     // force to 2x
     bx &= ~1;
@@ -209,7 +209,14 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
 
     GetControllerColor(player, r, g, b);
 
-    Controls::StatusInfo status_info = Controls::GetStatus(player);
+    Controls::StatusInfo status_info;
+
+    if(status)
+        status_info = *status;
+    else if(player >= 1 && player <= maxLocalPlayers)
+        status_info = Controls::GetStatus(player);
+    else
+        status_info = XPower::devicePowerStatus();
 
     if(status_info.power_status != Controls::StatusInfo::POWER_DISABLED)
     {
@@ -357,6 +364,23 @@ void speedRun_renderControls(int player, int screenZ)
 #endif
     }
 
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController || player_missing || QuickReconnectScreen::g_active)
+    {
+        // render controls if enabled
+        RenderControls(player, x, y, w, h, player_missing);
+    }
+    else
+    {
+        // reposition battery correctly
+        if(x < bx)
+            bx = x;
+        else
+            bx = x + w - bw;
+    }
+
+    XPower::StatusInfo status_info = Controls::GetStatus(player);
+    RenderPowerInfo(player, bx, by, bw, bh, &status_info);
+
     if(player >= 1 && player <= maxLocalPlayers && player <= (int)Controls::g_InputMethods.size()
         && QuickReconnectScreen::g_active && QuickReconnectScreen::g_toast_duration[player - 1])
     {
@@ -378,22 +402,6 @@ void speedRun_renderControls(int player, int screenZ)
         else
             SuperPrint(profile_name, 3, x, y - 20, 1.0f, 1.0f, 1.0f, alpha);
     }
-
-    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController || player_missing || QuickReconnectScreen::g_active)
-    {
-        // render controls if enabled
-        RenderControls(player, x, y, w, h, player_missing);
-    }
-    else
-    {
-        // reposition battery correctly
-        if(x < bx)
-            bx = x;
-        else
-            bx = x + w - bw;
-    }
-
-    RenderControllerBattery(player, bx, by, bw, bh);
 }
 
 #undef bool2alpha

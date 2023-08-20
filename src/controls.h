@@ -35,11 +35,14 @@ typedef union SDL_Event SDL_Event;
 #include "sdl_proxy/sdl_assert.h"
 
 #include "globals.h"
+#include "core/power.h"
 
 extern Controls_t &operator|=(Controls_t &o1, const Controls_t &o2);
 
 namespace Controls
 {
+
+using XPower::StatusInfo;
 
 class InputMethod;
 class InputMethodProfile;
@@ -473,23 +476,6 @@ void Activate(size_t i, int player = 0);
 } // namespace (Controls::)Hotkeys
 
 using HotkeysPressed_t = std::array<int, Hotkeys::n_buttons>;
-
-// information about a particular bound input method
-struct StatusInfo
-{
-    typedef enum _PowerStatus
-    {
-        POWER_DISABLED = -1,
-        POWER_UNKNOWN,
-        POWER_WIRED,
-        POWER_DISCHARGING,
-        POWER_CHARGING,
-        POWER_CHARGED
-    } PowerStatus;
-    PowerStatus power_status = POWER_DISABLED;
-    float power_level = 1.f;
-    const char *info_string = nullptr;
-};
 
 // represents a particular bound input method
 class InputMethod
