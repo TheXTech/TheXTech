@@ -309,6 +309,7 @@ void speedRun_renderControls(int player, int screenZ)
         return;
 
     const bool player_missing = (player - 1 >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player - 1]);
+    const bool player_newly_connected = !player_missing && QuickReconnectScreen::g_active && QuickReconnectScreen::g_toast_duration[player - 1];
 
     bool rightAlign = false;
 
@@ -364,7 +365,8 @@ void speedRun_renderControls(int player, int screenZ)
 #endif
     }
 
-    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController || player_missing || QuickReconnectScreen::g_active)
+    // render controls if enabled or quick-reconnect logic is active
+    if(show_always || player_missing || player_newly_connected)
     {
         // render controls if enabled
         RenderControls(player, x, y, w, h, player_missing);
