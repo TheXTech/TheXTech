@@ -2274,7 +2274,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             g_stats.checkedBlocks++;
 
-            if(/*!BlockIsSizable[block.Type] &&*/ (!block.Invis || (LevelEditor && BlockFlash <= 30)) /*&& block.Type != 0 && !BlockKills[block.Type]*/)
+            if(/*!BlockIsSizable[block.Type] &&*/ (!block.Invis || (LevelEditor && (CommonFrame % 46) <= 30)) /*&& block.Type != 0 && !BlockKills[block.Type]*/)
             {
                 double sX = vScreen[Z].X + block.Location.X;
                 if(sX > vScreen[Z].Width)
@@ -3035,6 +3035,8 @@ void UpdateGraphics(bool skipRepaint)
     if(LevelEditor || MagicHand)
         DrawEditorLevel_UI();
 
+    DrawDeviceBattery();
+
     // render special screens
     if(GamePaused == PauseCode::PauseScreen)
         PauseScreen::Render();
@@ -3050,7 +3052,7 @@ void UpdateGraphics(bool skipRepaint)
     if(QuickReconnectScreen::g_active)
         QuickReconnectScreen::Render();
 
-    if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+    if(GamePaused == PauseCode::DropAdd)
     {
         ConnectScreen::Render();
         XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);

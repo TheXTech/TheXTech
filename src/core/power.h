@@ -19,37 +19,36 @@
  */
 
 #pragma once
+#ifndef POWER_HHHH
+#define POWER_HHHH
 
-#ifndef STD_PICTURE_LOAD_NULL_H
-#define STD_PICTURE_LOAD_NULL_H
-
-#include <string>
-#include <cstdint>
-
-/*!
- * \brief Generic image loading store.
- *
- * If needed somehing unusual, please define alternative structure instead of this
- */
-struct StdPictureLoad
+namespace XPower
 {
-    //! Is this a lazy-loaded texture?
-    bool lazyLoaded = false;
 
-    //! Path to find image
-    std::string path = "";
-
-    //! Path to find mask (if any)
-    std::string mask_path = "";
-
-    // Transparent color for BMP and JPEG
-    bool     colorKey = false;
-    uint8_t  keyRgb[3] = {0 /*R*/, 0 /*G*/, 0 /*B*/};
-
-    inline bool canLoad() const
+// information about device or a bound input method
+struct StatusInfo
+{
+    typedef enum _PowerStatus
     {
-        return lazyLoaded;
-    }
+        POWER_DISABLED = -1,
+        POWER_UNKNOWN,
+        POWER_WIRED,
+        POWER_DISCHARGING,
+        POWER_CHARGING,
+        POWER_CHARGED
+    } PowerStatus;
+    PowerStatus power_status = POWER_DISABLED;
+    float power_level = 1.f;
+    const char *info_string = nullptr;
 };
 
-#endif // #ifndef STD_PICTURE_LOAD_NULL_H
+
+/*!
+ * \brief Finds current device power status
+ */
+StatusInfo devicePowerStatus();
+
+
+} // namespace XPower
+
+#endif // POWER_HHHH

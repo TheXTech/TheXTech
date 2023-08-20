@@ -20,26 +20,30 @@
 
 #include <fmt_format_ne.h>
 
+#include "sdl_proxy/sdl_stdinc.h"
+
 #include "controls.h"
 #include "globals.h"
 #include "graphics.h"
+#include "game_main.h"
 
 #include "main/menu_main.h"
 #include "main/game_strings.h"
+
+#include "main/screen_quickreconnect.h"
 
 namespace QuickReconnectScreen
 {
 
 bool g_active;
-
-static int s_toast_duration[maxLocalPlayers] = {0};
+int g_toast_duration[maxLocalPlayers] = {0};
 
 void Deactivate()
 {
     g_active = false;
 
     for(int i = 0; i < maxLocalPlayers; ++i)
-        s_toast_duration[i] = 0;
+        g_toast_duration[i] = 0;
 }
 
 void Render()
@@ -50,40 +54,41 @@ void Render()
         return;
     }
 
-    const int draw_X = 20;
-    const int press_button_Y = ScreenH - 40;
-    const int last_player_Y = press_button_Y - 20;
+    return;
+
+    // prevent collision with HUD at normal resolutions
+    const int start_Y = ScreenH >= 640 ? 8 : 80;
 
     int drawn = 0;
-    bool none_missing = true;
 
     std::string message;
 
-    for(int i = maxLocalPlayers - 1; i >= 0; i--)
+    for(int i = 0; i < maxLocalPlayers; i++)
     {
         if(i >= numPlayers)
             continue;
 
-        if(i >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[i])
+        if(i >= (int)Controls::g_InputMethods.size())
+            continue;
+
+        const Controls::InputMethod* input_method = Controls::g_InputMethods[i];
+
+        if(!input_method)
+            continue;
+
+        if(g_toast_duration[i])
         {
-            int draw_Y = last_player_Y - 20 * drawn;
-            message = fmt::format_ne(g_gameStrings.controlsPhrasePlayerDisconnected, i + 1);
-            SuperPrint(message, 3, draw_X, draw_Y);
-            drawn++;
-            none_missing = false;
-        }
-        else if(s_toast_duration[i])
-        {
-            int draw_Y = last_player_Y - 20 * drawn;
-            const std::string& p = (Controls::g_InputMethods[i]->Profile ? Controls::g_InputMethods[i]->Profile->Name : g_mainMenu.caseNone);
-            message = fmt::format_ne(g_gameStrings.controlsPhrasePlayerConnected, i + 1, Controls::g_InputMethods[i]->Name, p);
-            SuperPrint(message, 3, draw_X, draw_Y);
+            int draw_Y = start_Y + 20 * drawn;
+
+            const std::string& profile_name = (input_method->Profile ? input_method->Profile->Name : g_mainMenu.caseNone);
+
+            message = fmt::format_ne(g_gameStrings.controlsPhrasePlayerConnected, i + 1, input_method->Name, profile_name);
+
+            SuperPrintScreenCenter(message, 3, draw_Y);
+
             drawn++;
         }
     }
-
-    if(!none_missing)
-        SuperPrint(g_gameStrings.connectPressAButton, 3, draw_X + 20, press_button_Y);
 }
 
 void Logic()
@@ -108,14 +113,14 @@ void Logic()
             has_missing = true;
             was_missing[i] = true;
         }
-        else if(s_toast_duration[i])
+        else if(g_toast_duration[i])
         {
-            s_toast_duration[i] --;
+            g_toast_duration[i] --;
             has_toast = true;
         }
     }
 
-    if(has_missing)
+    if(has_missing && GamePaused != PauseCode::DropAdd)
     {
         Controls::PollInputMethod();
 
@@ -123,7 +128,7 @@ void Logic()
         for(int i = 0; i < maxLocalPlayers; i++)
         {
             if(was_missing[i] && i < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[i])
-                s_toast_duration[i] = 66 * 3; // 3 seconds
+                g_toast_duration[i] = MAX_TOAST_DURATION;
         }
     }
 

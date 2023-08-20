@@ -187,10 +187,6 @@ void RenderSDL::repaint()
     processRecorder();
 #endif
 
-#ifdef USE_DRAW_BATTERY_STATUS
-    drawBatteryStatus();
-#endif
-
     // Get the size of surface where to draw the scene
     SDL_GetRendererOutputSize(m_gRenderer, &w, &h);
 

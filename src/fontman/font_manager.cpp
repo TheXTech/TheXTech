@@ -566,7 +566,7 @@ PGE_Size FontManager::glyphSize(const char* utf8char, uint32_t charNum, int font
 {
     SDL_assert_release(g_fontManagerIsInit);// Font manager is not initialized!
 #ifndef THEXTECH_ENABLE_TTF_SUPPORT
-    (void)ttfFontSize;
+    (void)ttf_fontSize;
 #endif
 
     //Use one of loaded fonts

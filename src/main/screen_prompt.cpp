@@ -34,6 +34,7 @@
 
 #include "core/render.h"
 #include "main/screen_prompt.h"
+#include "main/screen_quickreconnect.h"
 
 namespace PromptScreen
 {
@@ -152,10 +153,15 @@ void Render()
     else
         XRender::renderTextureFL(menu_left_X - 20, menu_top_Y + (s_cur_item * 36), GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE);
 
+    // draw quick reconnect screen
+    if(QuickReconnectScreen::g_active)
+        QuickReconnectScreen::Render();
 
     // draw screen fader and repaint
 
     g_levelScreenFader.draw();
+
+    DrawDeviceBattery();
 
     XRender::repaint();
 

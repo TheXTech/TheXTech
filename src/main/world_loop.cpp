@@ -355,10 +355,10 @@ void WorldLoop()
 
     if(!Controls::Update())
     {
-        if(g_config.NoPauseReconnect || !g_compatibility.pause_on_disconnect)
-            QuickReconnectScreen::g_active = true;
-        else
-            PauseGame(PauseCode::Reconnect, 0);
+        QuickReconnectScreen::g_active = true;
+
+        if(!g_config.NoPauseReconnect && g_compatibility.pause_on_disconnect)
+            PauseGame(PauseCode::PauseScreen, 0);
     }
 
     if(QuickReconnectScreen::g_active)
@@ -508,7 +508,7 @@ void WorldLoop()
         for(int i = 1; i <= numPlayers; i++)
         {
             if(Player[i].Controls.Start && Player[i].UnStart)
-                PauseGame(PauseCode::PauseScreen, i);
+                PauseGame(PauseCode::PauseScreen, 0);
             // only allow P1 to pause if multiplayer pause controls disabled
             if(!g_compatibility.multiplayer_pause_controls)
                 break;

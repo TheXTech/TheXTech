@@ -24,6 +24,8 @@
 /*Private*/
 void SpecialFrames()
 {
+    CommonFrame++;
+
     SpecialFrameCount[1]++;
     if(SpecialFrameCount[1] >= 6)
     {

@@ -911,7 +911,7 @@ static C2D_SpriteSheet s_tryHardToLoadC2D_SpriteSheet(const char* path)
 
     if(!sourceImage)
     {
-        if(linearSpaceFree() < 8000000)
+        if(linearSpaceFree() < 15000000)
             minport_freeTextureMemory();
 
         sourceImage = C2D_SpriteSheetLoad(path);

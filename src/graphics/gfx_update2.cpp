@@ -753,6 +753,8 @@ void UpdateGraphics2(bool skipRepaint)
         speedRun_renderTimer();
     }
 
+    DrawDeviceBattery();
+
     // this code is for both non-editor and editor cases
     {
         // render special screens
@@ -762,7 +764,7 @@ void UpdateGraphics2(bool skipRepaint)
         if(QuickReconnectScreen::g_active)
             QuickReconnectScreen::Render();
 
-        if(GamePaused == PauseCode::Reconnect || GamePaused == PauseCode::DropAdd)
+        if(GamePaused == PauseCode::DropAdd)
         {
             ConnectScreen::Render();
             XRender::renderTexture(int(SharedCursor.X), int(SharedCursor.Y), GFX.ECursor[2]);

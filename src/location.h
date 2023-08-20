@@ -85,6 +85,14 @@ struct PlayerStart_t
     inline PlayerStart_t() = default;
     inline PlayerStart_t(const Location_t& loc) : X(loc.X), Y(loc.Y), Height(loc.Height), Width(loc.Width) {}
 
+    inline bool isNull() const
+    {
+        return int(X * 100000) == 0 &&
+               int(Y * 100000) == 0 &&
+               int(Width * 100000) == 0 &&
+               int(Height * 100000) == 0;
+    }
+
     inline operator Location_t() const
     {
         Location_t ret;

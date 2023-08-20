@@ -246,9 +246,7 @@ void InputMethod_16M::Rumble(int ms, float strength)
 
 StatusInfo InputMethod_16M::GetStatus()
 {
-    StatusInfo res;
-
-    return res;
+    return XPower::devicePowerStatus();
 }
 
 /*===============================================*\

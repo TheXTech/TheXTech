@@ -140,8 +140,11 @@ extern int AllCharBlock;
 //Public ServerClear As Boolean
 //Public StartMenu As Boolean
 extern bool StartMenu;
+
 //Public BlockFlash As Integer
-extern int BlockFlash;
+// Note: was previously BlockFlash, manually looped by local code to 0-90. Now incremented every frame, should be used with modulus operator.
+extern uint32_t CommonFrame;
+
 //Public ScrollRelease As Boolean
 extern bool ScrollRelease;
 //Public TakeScreen As Boolean

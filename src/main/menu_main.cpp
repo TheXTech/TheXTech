@@ -454,6 +454,9 @@ void LoadSingleWorld(const std::string wPath)
     std::string fName = Files::basename(wPath);
     std::string epDir = wPath.substr(0, wPath.size() - fName.size());
 
+    if(epDir.empty())
+        epDir = "./";
+
     s_LoadSingleWorld(epDir, fName, head, tr, compatModern, true);
 
     s_FinishFindWorlds();
@@ -2027,12 +2030,7 @@ void mainMenuDraw()
     // Menu Intro
     if(MenuMode == MENU_INTRO)
     {
-        BlockFlash += 1;
-
-        if(BlockFlash >= 90)
-            BlockFlash = 0;
-
-        if(BlockFlash < 45)
+        if((CommonFrame % 90) < 45)
             SuperPrint(g_mainMenu.introPressStart, 3, ScreenW/2 - g_mainMenu.introPressStart.length()*9, ScreenH - 40);
     }
     // Main menu

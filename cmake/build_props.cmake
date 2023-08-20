@@ -40,6 +40,9 @@ endif()
 
 # ========================= Macros and Functions ==============================
 
+include(CheckCCompilerFlag)
+include(CheckCXXCompilerFlag)
+
 macro(xtech_add_warning_flag WARNINGFLAG WARNING_VAR)
     check_c_compiler_flag("${WARNINGFLAG}" HAVE_W_C_${WARNING_VAR})
     if(HAVE_W_C_${WARNING_VAR})
@@ -64,11 +67,22 @@ macro(xtech_disable_warning_flag WARNINGFLAG WARNING_VAR)
     endif()
 endmacro()
 
+macro(pge_add_opt_flag OPTFLAG OPT_VAR)
+    check_c_compiler_flag("${OPTFLAG}" HAVE_M_C_${OPT_VAR})
+    if(HAVE_M_C_${OPT_VAR})
+        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OPTFLAG}")
+    endif()
+
+    check_cxx_compiler_flag("${OPTFLAG}" HAVE_M_CXX_${OPT_VAR})
+    if(HAVE_M_CXX_${OPT_VAR})
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OPTFLAG}")
+    endif()
+endmacro()
+
 function(pge_cxx_standard STDVER)
     if(NOT WIN32)
         set(CMAKE_CXX_STANDARD ${STDVER} PARENT_SCOPE)
     elseif(MSVC AND CMAKE_VERSION VERSION_LESS "3.9.0" AND MSVC_VERSION GREATER_EQUAL "1900")
-        include(CheckCXXCompilerFlag)
         CHECK_CXX_COMPILER_FLAG("/std:c++${STDVER}" _cpp_stdxx_flag_supported)
         if (_cpp_stdxx_flag_supported)
             add_compile_options("/std:c++${STDVER}")
@@ -97,7 +111,6 @@ if(APPLE)
     set(LINK_FLAGS_RELEASE  "${LINK_FLAGS_RELEASE} -dead_strip")
 
     # Unify visibility to meet llvm's default.
-    include(CheckCXXCompilerFlag)
     check_cxx_compiler_flag("-fvisibility-inlines-hidden" SUPPORTS_FVISIBILITY_INLINES_HIDDEN_FLAG)
     if(SUPPORTS_FVISIBILITY_INLINES_HIDDEN_FLAG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility-inlines-hidden")

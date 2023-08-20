@@ -24,6 +24,8 @@
 
 #include "control_types.h"
 
+namespace XPower { struct StatusInfo; }
+
 enum
 {
     SPEEDRUN_MODE_OFF = 0,
@@ -53,7 +55,8 @@ void speedRun_triggerLeave();
 
 void speedRun_bossDeadEvent();
 
-void RenderControls(int player, int x, int y, int w, int h);
+void RenderPowerInfo(int player, int bx, int by, int bw, int bh, const XPower::StatusInfo* status);
+void RenderControls(int player, int x, int y, int w, int h, bool missing);
 
 enum
 {
