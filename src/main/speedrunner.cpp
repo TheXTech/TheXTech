@@ -143,8 +143,15 @@ static void GetControllerColor(int player, float& r, float& g, float& b, bool* d
 
 void RenderControls(int player, int x, int y, int w, int h, bool missing)
 {
+    if(player < 1 || player > maxLocalPlayers)
+        return;
+
+    // flash the controller if searching for player
+    if(missing && (CommonFrame % 128) >= 64)
+        return;
+
     float alhpa = 0.7f;
-    float alhpaB = 0.8f;
+    float alhpaB = missing ? 0.4f : 0.8f;
     float r, g, b;
     bool drawLabel;
 
@@ -153,55 +160,31 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
     XRender::renderRect(x, y, w, h, 0.f, 0.f, 0.f, alhpa, true);//Edge
     XRender::renderRect(x + 2, y + 2, w - 4, h - 4, r, g, b, alhpa, true);//Box
 
-    if(player < 1 || player > maxLocalPlayers)
-        return;
-
     const Controls_t& c = s_displayControls[player-1];
+
     XRender::renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alhpaB, true);//Cender of D-Pad
 
-    // want three pings then a period of rest
+    XRender::renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alhpaB, true);
+    XRender::renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alhpaB, true);
+    XRender::renderRect(x + 4, y + 12, 6, 6, bool2gray(c.Left), alhpaB, true);
+    XRender::renderRect(x + 16, y + 12, 6, 6, bool2gray(c.Right), alhpaB, true);
 
-    if(missing && (CommonFrame % 120 < 60) && (CommonFrame % 24 < 12))
-    {
-        float r = 1.0f;
-        float g = 1.0f;
-        float b = 1.0f;
-        float a = 1.0f;
+    XRender::renderRect(x + 64, y + 18, 6, 6, bool2green(c.Jump), alhpaB, true);
+    XRender::renderRect(x + 66, y + 8, 6, 6, bool2red(c.AltJump), alhpaB, true);
+    XRender::renderRect(x + 54, y + 16, 6, 6, bool2blue(c.Run), alhpaB, true);
+    XRender::renderRect(x + 56, y + 6, 6, 6, bool2yellow(c.AltRun), alhpaB, true);
 
-        XRender::renderRect(x + 10, y + 6, 6, 6, r, g, b, a, true);
-        XRender::renderRect(x + 10, y + 18, 6, 6, r, g, b, a, true);
-        XRender::renderRect(x + 4, y + 12, 6, 6, r, g, b, a, true);
-        XRender::renderRect(x + 16, y + 12, 6, 6, r, g, b, a, true);
-
-        XRender::renderRect(x + 64, y + 18, 6, 6, r, g, b, a, true);
-        XRender::renderRect(x + 66, y + 8, 6, 6, r, g, b, a, true);
-        XRender::renderRect(x + 54, y + 16, 6, 6, r, g, b, a, true);
-        XRender::renderRect(x + 56, y + 6, 6, 6, r, g, b, a, true);
-
-        XRender::renderRect(x + 26, y + 22, 10, 4, r, g, b, a, true);
-        XRender::renderRect(x + 40, y + 22, 10, 4, r, g, b, a, true);
-    }
+    XRender::renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alhpaB, true);
+    if(SharedControls.LegacyPause)
+        XRender::renderRect(x + 40, y + 22, 10, 4, bool2legacy(c.Start), alhpaB, true);
     else
+        XRender::renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alhpaB, true);
+
+    if(drawLabel || missing)
     {
-        XRender::renderRect(x + 10, y + 6, 6, 6, bool2gray(c.Up), alhpaB, true);
-        XRender::renderRect(x + 10, y + 18, 6, 6, bool2gray(c.Down), alhpaB, true);
-        XRender::renderRect(x + 4, y + 12, 6, 6, bool2gray(c.Left), alhpaB, true);
-        XRender::renderRect(x + 16, y + 12, 6, 6, bool2gray(c.Right), alhpaB, true);
-
-        XRender::renderRect(x + 64, y + 18, 6, 6, bool2green(c.Jump), alhpaB, true);
-        XRender::renderRect(x + 66, y + 8, 6, 6, bool2red(c.AltJump), alhpaB, true);
-        XRender::renderRect(x + 54, y + 16, 6, 6, bool2blue(c.Run), alhpaB, true);
-        XRender::renderRect(x + 56, y + 6, 6, 6, bool2yellow(c.AltRun), alhpaB, true);
-
-        XRender::renderRect(x + 26, y + 22, 10, 4, bool2gray(c.Drop), alhpaB, true);
-        if(SharedControls.LegacyPause)
-            XRender::renderRect(x + 40, y + 22, 10, 4, bool2legacy(c.Start), alhpaB, true);
-        else
-            XRender::renderRect(x + 40, y + 22, 10, 4, bool2gray(c.Start), alhpaB, true);
+        const char* label_fmt = (missing ? "P{0}?" : "P{0}");
+        SuperPrintCenter(fmt::format_ne(label_fmt, player), 3, x + w / 2, y + 2, 1.f, 1.f, 1.f, 0.5f);
     }
-
-    if(drawLabel)
-        SuperPrintCenter(fmt::format_ne("P{0}", player), 3, x + w / 2, y + 2, 1.f, 1.f, 1.f, 0.5f);
 }
 
 void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
