@@ -398,7 +398,7 @@ void speedRun_renderControls(int player, int screenZ)
         }
 
         // code for lower-resolution case
-        if(ScreenW < 800 && status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
+        if(ScreenW < 600 || (ScreenW < 800 && status_info.power_status != XPower::StatusInfo::POWER_DISABLED))
         {
             if(rightAlign)
                 SuperPrintRightAlign(profile_name, 3, x + w, y - 20, 1.0f, 1.0f, 1.0f, alpha);
