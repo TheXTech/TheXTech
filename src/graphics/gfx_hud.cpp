@@ -444,6 +444,6 @@ void DrawDeviceBattery()
         int bx = ScreenW - (bw + 8);
         int by = 24;
 
-        RenderPowerInfo(0, bx, by, bw, bh, &status_info);
+        RenderPowerInfo(0, bx, by, bw, bh, 1.0f, &status_info);
     }
 }

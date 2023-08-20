@@ -287,8 +287,8 @@ int menuControls_Mouse_Render(bool mouse, bool render)
             SuperPrintScreenCenter(Controls::g_InputMethods[p]->Profile->Name, 3, sY+(top_line+3)*line);
 
         // display the test controls and profile reversion countdown (add more details)
-        RenderControls(p+1, ScreenW/2-38, sY+(top_line+4)*line, 76, 30, false);
-        SuperPrintScreenCenter(g_gameStrings.connectHoldStart, 3, sY+(top_line+6)*line);
+        RenderControls(p + 1, (ScreenW / 2) - 38, sY + (top_line + 4) * line, 76, 30, false, 1.0f);
+        SuperPrintScreenCenter(g_gameStrings.connectHoldStart, 3, sY + (top_line + 6) * line);
         int n_stars;
         int n_empty;
         if(s_profileChangeTimer < 66*3)

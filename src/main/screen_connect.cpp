@@ -1054,8 +1054,8 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
     {
         if(render)
         {
-            RenderControls(p+1, cX-38, pY+1.25*line, 76, 30, false);
-            SuperPrintCenter(g_gameStrings.connectHoldStart, 3, cX, pY+3*line);
+            RenderControls(p + 1, cX - 38, pY + (1.25 * line), 76, 30, false, 1.0f);
+            SuperPrintCenter(g_gameStrings.connectHoldStart, 3, cX, pY + (3 * line));
             int n_stars;
             int n_empty;
             if(s_playerState[p] == PlayerState::ConfirmProfile && s_menuItem[p] < 66*3)
