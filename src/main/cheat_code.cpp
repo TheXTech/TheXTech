@@ -1749,9 +1749,9 @@ static void speedDemon()
     PlaySound(MaxFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
-static void toggleMask()
+static void gifs2png()
 {
-    PlaySound(g_ForceBitmaskMerge ? SFX_PlayerGrow : SFX_PlayerShrink);
+    PlaySound(SFX_Transform);
     g_ForceBitmaskMerge = !g_ForceBitmaskMerge;
     XRender::unloadGifTextures();
 }
@@ -1939,7 +1939,7 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
 #endif
     {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false},
 
-    {"togglemask", toggleMask, false},
+    {"gifs2png", gifs2png, false},
 
     {nullptr, nullptr, false}
 };
