@@ -161,6 +161,8 @@ void Render()
 
     g_levelScreenFader.draw();
 
+    DrawDeviceBattery();
+
     XRender::repaint();
 
     if(TakeScreen)

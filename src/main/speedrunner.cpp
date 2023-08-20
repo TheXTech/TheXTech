@@ -103,6 +103,9 @@ static void GetControllerColor(int player, float& r, float& g, float& b, bool* d
     if(drawLabel)
         *drawLabel = false;
 
+    if(player < 1 || player > maxLocalPlayers)
+        return;
+
     if(ScreenType == 5)  // TODO: VERIFY THIS
     {
         auto &p = Player[player];
@@ -146,12 +149,9 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
     if(player < 1 || player > maxLocalPlayers)
         return;
 
-    // flash the controller if searching for player
-    if(missing && (CommonFrame % 128) >= 64)
-        return;
-
     float alpha = 0.7f;
     float alphaB = missing ? 0.4f : 0.8f;
+    float alphaText = 0.5f;
     float r, g, b;
     bool drawLabel;
 
@@ -159,6 +159,14 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
 
     XRender::renderRect(x, y, w, h, 0.f, 0.f, 0.f, alpha, true);//Edge
     XRender::renderRect(x + 2, y + 2, w - 4, h - 4, r, g, b, alpha, true);//Box
+
+    if(missing)
+    {
+        float tick = (CommonFrame % 128) / 128.0f * 2.0f * static_cast<float>(M_PI);
+        float coord = (sinf(tick) + 1.0f) * 0.5f + 0.25f;
+        alphaB *= coord;
+        alphaText *= coord;
+    }
 
     const Controls_t& c = s_displayControls[player-1];
 
@@ -183,11 +191,11 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
     if(drawLabel || missing)
     {
         const char* label_fmt = (missing ? "P{0}?" : "P{0}");
-        SuperPrintCenter(fmt::format_ne(label_fmt, player), 3, x + w / 2, y + 2, 1.f, 1.f, 1.f, 0.5f);
+        SuperPrintCenter(fmt::format_ne(label_fmt, player), 3, x + w / 2, y + 2, 1.f, 1.f, 1.f, alphaText);
     }
 }
 
-void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
+void RenderPowerInfo(int player, int bx, int by, int bw, int bh, const XPower::StatusInfo* status)
 {
     // force to 2x
     bx &= ~1;
@@ -201,9 +209,16 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
 
     GetControllerColor(player, r, g, b);
 
-    Controls::StatusInfo status_info = Controls::GetStatus(player);
+    XPower::StatusInfo status_info;
 
-    if(status_info.power_status != Controls::StatusInfo::POWER_DISABLED)
+    if(status)
+        status_info = *status;
+    else if(player >= 1 && player <= maxLocalPlayers)
+        status_info = Controls::GetStatus(player);
+    else
+        status_info = XPower::devicePowerStatus();
+
+    if(status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
     {
         XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alpha, true);//Edge
         XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alpha, true);//Box
@@ -231,13 +246,13 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
             r = (.5f - status_info.power_level) / .5f;
         }
 
-        if(status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+        if(status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
         {
             g = 1.f;
             g -= r;
         }
 
-        if(status_info.power_status == Controls::StatusInfo::POWER_CHARGED)
+        if(status_info.power_status == XPower::StatusInfo::POWER_CHARGED)
         {
             b = 0.8f;
             g = 0.4f;
@@ -250,34 +265,34 @@ void RenderControllerBattery(int player, int bx, int by, int bw, int bh)
         case 4:
             s = 2.f * (status_info.power_level - 0.9f) / 0.1f;
             if(s > 2) s = 2;
-            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 2;
             XRender::renderRect(bx + 34, by + 10, s, 2, r, g, b, alphaB, true); // fallthrough
         case 3:
             s = 4.f * (status_info.power_level - 0.6f) / 0.3f;
             if(s > 4) s = 4;
-            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 4;
             XRender::renderRect(bx + 24, by + 4, s*2, 14, r, g, b, alphaB, true); // fallthrough
         case 2:
             s = 4.f * (status_info.power_level - 0.3f) / 0.3f;
             if(s > 4) s = 4;
-            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 4;
             XRender::renderRect(bx + 14, by + 4, s*2, 14, r, g, b, alphaB, true); // fallthrough
         case 1:
             s = 4.f * status_info.power_level / 0.3f;
             if(s > 4) s = 4;
-            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 4;
             XRender::renderRect(bx + 4, by + 4, s*2, 14, r, g, b, alphaB, true);
             break;
         }
-        if(status_info.power_status == Controls::StatusInfo::POWER_UNKNOWN)
+        if(status_info.power_status == XPower::StatusInfo::POWER_UNKNOWN)
             SuperPrintCenter("?", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 8) & ~1);
-        if(status_info.power_status == Controls::StatusInfo::POWER_WIRED)
+        if(status_info.power_status == XPower::StatusInfo::POWER_WIRED)
             SuperPrintCenter("W", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 8) & ~1);
-        if(status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+        if(status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             SuperPrintCenter("+", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 7) & ~1);
     }
 
@@ -295,6 +310,8 @@ void speedRun_renderControls(int player, int screenZ)
 
     const bool player_missing = (player - 1 >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player - 1]);
 
+    bool rightAlign = false;
+
     // Controller
     int x = 4;
     int y = ScreenH - 34;
@@ -311,6 +328,7 @@ void speedRun_renderControls(int player, int screenZ)
     {
         auto &scr = vScreen[screenZ];
         x = scr.Left > 0 ? (int)(scr.Left + scr.Width) - (w + 4) : (int)scr.Left + 4;
+        rightAlign = scr.Left > 0;
         y = (int)(scr.Top + scr.Height) - 34;
         bx = scr.Left > 0 ? x - (bw + 4) : (x + w + 4);
         by = y + 4;
@@ -340,12 +358,13 @@ void speedRun_renderControls(int player, int screenZ)
         case 2:
             x = (ScreenW - (w + 4));
             bx = x - (bw + 4);
+            rightAlign = true;
             break;
         }
 #endif
     }
 
-    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController || player_missing)
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController || player_missing || QuickReconnectScreen::g_active)
     {
         // render controls if enabled
         RenderControls(player, x, y, w, h, player_missing);
@@ -359,7 +378,50 @@ void speedRun_renderControls(int player, int screenZ)
             bx = x + w - bw;
     }
 
-    RenderControllerBattery(player, bx, by, bw, bh);
+    XPower::StatusInfo status_info = Controls::GetStatus(player);
+    RenderPowerInfo(player, bx, by, bw, bh, &status_info);
+
+    if(player >= 1 && player <= maxLocalPlayers && player <= (int)Controls::g_InputMethods.size()
+        && QuickReconnectScreen::g_active && QuickReconnectScreen::g_toast_duration[player - 1])
+    {
+        const Controls::InputMethod* input_method = Controls::g_InputMethods[player - 1];
+
+        const std::string& profile_name = (input_method->Profile ? input_method->Profile->Name : "");
+
+        float alpha = 1.0f;
+        int time_from_edge = SDL_min(QuickReconnectScreen::g_toast_duration[player - 1], QuickReconnectScreen::MAX_TOAST_DURATION - QuickReconnectScreen::g_toast_duration[player - 1]);
+
+        if(time_from_edge < 33)
+        {
+            float linear_coord = (33 - time_from_edge) / 33.0f;
+            alpha = cosf(linear_coord * M_PI) * 0.5f + 0.5f;
+        }
+
+        // code for lower-resolution case
+        if(ScreenW < 800 && status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
+        {
+            if(rightAlign)
+                SuperPrintRightAlign(profile_name, 3, x + w, y - 20, 1.0f, 1.0f, 1.0f, alpha);
+            else
+                SuperPrint(profile_name, 3, x, y - 20, 1.0f, 1.0f, 1.0f, alpha);
+        }
+        // code for higher resolution case, including battery
+        else if(status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
+        {
+            if(rightAlign)
+                SuperPrintRightAlign(profile_name, 3, bx - 4, by + 2, 1.0f, 1.0f, 1.0f, alpha);
+            else
+                SuperPrint(profile_name, 3, bx + bw + 4, by + 2, 1.0f, 1.0f, 1.0f, alpha);
+        }
+        // code for normal case
+        else
+        {
+            if(rightAlign)
+                SuperPrintRightAlign(profile_name, 3, x - 4, by + 2, 1.0f, 1.0f, 1.0f, alpha);
+            else
+                SuperPrint(profile_name, 3, x + w + 4, by + 2, 1.0f, 1.0f, 1.0f, alpha);
+        }
+    }
 }
 
 #undef bool2alpha

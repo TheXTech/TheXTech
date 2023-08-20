@@ -30,19 +30,20 @@
 #include "main/menu_main.h"
 #include "main/game_strings.h"
 
+#include "main/screen_quickreconnect.h"
+
 namespace QuickReconnectScreen
 {
 
 bool g_active;
-
-static int s_toast_duration[maxLocalPlayers] = {0};
+int g_toast_duration[maxLocalPlayers] = {0};
 
 void Deactivate()
 {
     g_active = false;
 
     for(int i = 0; i < maxLocalPlayers; ++i)
-        s_toast_duration[i] = 0;
+        g_toast_duration[i] = 0;
 }
 
 void Render()
@@ -52,6 +53,8 @@ void Render()
         Deactivate();
         return;
     }
+
+    return;
 
     // prevent collision with HUD at normal resolutions
     const int start_Y = ScreenH >= 640 ? 8 : 80;
@@ -73,7 +76,7 @@ void Render()
         if(!input_method)
             continue;
 
-        if(s_toast_duration[i])
+        if(g_toast_duration[i])
         {
             int draw_Y = start_Y + 20 * drawn;
 
@@ -110,9 +113,9 @@ void Logic()
             has_missing = true;
             was_missing[i] = true;
         }
-        else if(s_toast_duration[i])
+        else if(g_toast_duration[i])
         {
-            s_toast_duration[i] --;
+            g_toast_duration[i] --;
             has_toast = true;
         }
     }
@@ -125,7 +128,7 @@ void Logic()
         for(int i = 0; i < maxLocalPlayers; i++)
         {
             if(was_missing[i] && i < (int)Controls::g_InputMethods.size() && Controls::g_InputMethods[i])
-                s_toast_duration[i] = 66 * 3; // 3 seconds
+                g_toast_duration[i] = MAX_TOAST_DURATION;
         }
     }
 

@@ -18,38 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#include "core/power.h"
 
-#ifndef STD_PICTURE_LOAD_NULL_H
-#define STD_PICTURE_LOAD_NULL_H
 
-#include <string>
-#include <cstdint>
-
-/*!
- * \brief Generic image loading store.
- *
- * If needed somehing unusual, please define alternative structure instead of this
- */
-struct StdPictureLoad
+namespace XPower
 {
-    //! Is this a lazy-loaded texture?
-    bool lazyLoaded = false;
 
-    //! Path to find image
-    std::string path = "";
+StatusInfo devicePowerStatus()
+{
+    StatusInfo res;
 
-    //! Path to find mask (if any)
-    std::string mask_path = "";
+    res.power_status = StatusInfo::POWER_WIRED;
 
-    // Transparent color for BMP and JPEG
-    bool     colorKey = false;
-    uint8_t  keyRgb[3] = {0 /*R*/, 0 /*G*/, 0 /*B*/};
+    return res;
+}
 
-    inline bool canLoad() const
-    {
-        return lazyLoaded;
-    }
-};
-
-#endif // #ifndef STD_PICTURE_LOAD_NULL_H
+}
