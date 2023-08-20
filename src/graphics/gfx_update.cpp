@@ -1102,7 +1102,7 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
         {
             render = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
         }
-        else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::smart)
+        else
         {
             render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
 
@@ -1121,30 +1121,6 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
                 can_activate = onscreen_canonical;
             else
                 can_activate = render;
-        }
-        else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::orig)
-        {
-            render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
-
-            bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
-                || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
-
-            cannot_reset = (render || onscreen_canonical);
-            can_activate = onscreen_canonical;
-        }
-        else if(g_compatibility.NPC_activate_mode == NPC_activate_modes::orig_with_despawn)
-        {
-            render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
-
-            bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
-                || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
-
-            cannot_reset = onscreen_canonical;
-            can_activate = onscreen_canonical;
-        }
-        else // if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen)
-        {
-            render = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
         }
 
         if(NPC[A].Generator)
@@ -1173,7 +1149,7 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
 
         // Note that this condition, NPC[A].TimeLeft == 0 or 1, is practically never encountered when the NPC is onscreen,
         //   except in the conditional activation code.
-        if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen && (NPC[A].TimeLeft == 0 || NPC[A].TimeLeft == 1))
+        if(NPC[A].TimeLeft == 0 || NPC[A].TimeLeft == 1)
         {
             if(render && !can_activate)
             {
@@ -1198,8 +1174,7 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
         }
 
         // this section of the logic handles NPCs that are onscreen but not active yet
-        if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
-            && !NPC[A].Active && render)
+        if(!NPC[A].Active && render)
         {
             // Don't show a Cheep that hasn't jumped yet, a podoboo that hasn't started coming out yet,
             //   a piranha plant that hasn't emerged yet, etc. Also, don't do poofs for them, etc.
@@ -1292,8 +1267,7 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
             }
 
-            if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen
-                || NPC[A].Active)
+            if(NPC[A].Active)
             {
                 NPC[A].Reset[1] = false;
                 NPC[A].Reset[2] = false;
@@ -1317,8 +1291,7 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
             NPC_Draw_Queue_p.add(A);
 
             // just for appearance, do the NPC's frames if it hasn't been activated yet and isn't in a shade / hidden mode
-            if(g_compatibility.NPC_activate_mode != NPC_activate_modes::onscreen
-                && !NPC[A].Active && !FreezeNPCs)
+            if(!NPC[A].Active && !FreezeNPCs)
             {
                 bool in_hidden_mode = NPC_intro_index < NPC_intro_count && NPC_intro_frame[NPC_intro_index] >= 0;
                 if(!in_hidden_mode)
@@ -1540,10 +1513,10 @@ void UpdateGraphics(bool skipRepaint)
         // we'll check the NPCs and do some logic for the game,
         if(!LevelEditor)
         {
-            if(g_compatibility.NPC_activate_mode == NPC_activate_modes::onscreen || (ScreenW == 800 && ScreenH == 600))
-                ClassicNPCScreenLogic(Z, numScreens, Do_FrameSkip, NPC_Draw_Queue_p);
-            else
+            if(g_compatibility.modern_npc_activation)
                 ModernNPCScreenLogic(Z, numScreens, Do_FrameSkip, NPC_Draw_Queue_p);
+            else
+                ClassicNPCScreenLogic(Z, numScreens, Do_FrameSkip, NPC_Draw_Queue_p);
         }
         // fill the NPC render queue for the level editor
         else if(!Do_FrameSkip)

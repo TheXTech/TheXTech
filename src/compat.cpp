@@ -126,7 +126,7 @@ static void compatInit(Compatibility_t &c)
     // 1.3.7
     c.free_level_res = true;
     c.free_world_res = true;
-    c.NPC_activate_mode = NPC_activate_modes::smart;
+    c.modern_npc_activation = true;
     c.disable_background2_tiling = false;
 
 
@@ -179,7 +179,7 @@ static void compatInit(Compatibility_t &c)
         // 1.3.7
         c.free_level_res = false;
         c.free_world_res = false;
-        c.NPC_activate_mode = NPC_activate_modes::onscreen;
+        c.modern_npc_activation = false;
     }
 
     if(s_compatLevel >= COMPAT_SMBX13) // Strict vanilla SMBX
@@ -430,14 +430,7 @@ static void loadCompatIni(Compatibility_t &c, const std::string &fileName)
         // 1.3.7 (but these will be changed in the Compat update)
         compat.read("free-level-res", c.free_level_res, c.free_level_res);
         compat.read("free-world-res", c.free_world_res, c.free_world_res);
-        const IniProcessing::StrEnumMap activModes =
-        {
-            {"onscreen", (int)NPC_activate_modes::onscreen},
-            {"smart", (int)NPC_activate_modes::smart},
-            {"orig", (int)NPC_activate_modes::orig},
-            {"orig-with-despawn", (int)NPC_activate_modes::orig_with_despawn},
-        };
-        compat.readEnum("npc-activate-mode", c.NPC_activate_mode, c.NPC_activate_mode, activModes);
+        compat.read("modern-npc-activation", c.modern_npc_activation, c.modern_npc_activation);
         compat.read("disable-background2-tiling", c.disable_background2_tiling, c.disable_background2_tiling);
     }
     // 1.3.4

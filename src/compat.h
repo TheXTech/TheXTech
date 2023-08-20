@@ -22,14 +22,6 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
-enum class NPC_activate_modes : int
-{
-    onscreen,
-    smart,
-    orig,
-    orig_with_despawn,
-};
-
 struct Compatibility_t
 {
     bool fix_restored_block_move; // don't move powerup blocks to the right when they are hit after restoring
@@ -104,7 +96,7 @@ struct Compatibility_t
     bool free_level_res;
     bool free_world_res;
     bool disable_background2_tiling;
-    NPC_activate_modes NPC_activate_mode;
+    bool modern_npc_activation;
 
     // SpeedRun section
     enum
