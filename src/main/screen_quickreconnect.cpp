@@ -53,13 +53,14 @@ void Render()
         return;
     }
 
-    const int last_player_Y = ScreenH - 56;
+    // prevent collision with HUD at normal resolutions
+    const int start_Y = ScreenH >= 640 ? 8 : 80;
 
     int drawn = 0;
 
     std::string message;
 
-    for(int i = maxLocalPlayers - 1; i >= 0; i--)
+    for(int i = 0; i < maxLocalPlayers; i++)
     {
         if(i >= numPlayers)
             continue;
@@ -74,7 +75,7 @@ void Render()
 
         if(s_toast_duration[i])
         {
-            int draw_Y = last_player_Y - 20 * drawn;
+            int draw_Y = start_Y + 20 * drawn;
 
             const std::string& profile_name = (input_method->Profile ? input_method->Profile->Name : g_mainMenu.caseNone);
 
