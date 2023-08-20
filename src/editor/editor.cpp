@@ -2923,7 +2923,6 @@ void zTestLevel(bool magicHand, bool interProcess)
         QuickReconnectScreen::g_active = true;
         PauseGame(PauseCode::PauseScreen);
         LevelBeatCode = 0;
-        QuickReconnectScreen::Deactivate();
     }
 
 #ifdef THEXTECH_INTERPROC_SUPPORTED
