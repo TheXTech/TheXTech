@@ -1033,6 +1033,7 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
         GetvScreenCanonical(Z, &X, &Y);
 
     // using bitset here instead of simpler set for checkNPCs because I benchmarked it to be faster -- ds-sloth
+    // the purpose of this logic is to avoid duplicates in the checkNPCs vector
     std::bitset<maxNPCs>& NPC_present = s_NPC_present;
 
     // find the onscreen NPCs
@@ -1048,7 +1049,7 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
     for(int16_t n : checkNPCs)
         NPC_present[n] = true;
 
-    // add the previous frame's no-reset NPCs
+    // add the previous frame's no-reset NPCs (without duplicates)
     for(int16_t n : s_NoReset_NPCs_LastFrame)
     {
         if(n <= numNPCs && !NPC_present[n])
