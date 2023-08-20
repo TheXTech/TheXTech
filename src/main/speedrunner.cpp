@@ -350,7 +350,7 @@ void speedRun_renderControls(int player, int screenZ)
 #endif
     }
 
-    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController || player_missing)
+    if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController || player_missing || QuickReconnectScreen::g_active)
     {
         // render controls if enabled
         RenderControls(player, x, y, w, h, player_missing);
