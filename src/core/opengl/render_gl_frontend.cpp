@@ -322,10 +322,6 @@ void RenderGL::repaint()
     processRecorder();
 #endif
 
-#ifdef USE_DRAW_BATTERY_STATUS
-    drawBatteryStatus();
-#endif
-
     setTargetScreen();
 
     if(m_use_depth_buffer)
