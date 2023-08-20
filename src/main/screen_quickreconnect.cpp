@@ -53,7 +53,7 @@ void Render()
         return;
     }
 
-    const int last_player_Y = ScreenH - 20;
+    const int last_player_Y = ScreenH - 56;
 
     int drawn = 0;
 
