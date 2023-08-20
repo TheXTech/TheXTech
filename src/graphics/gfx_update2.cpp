@@ -562,6 +562,8 @@ void UpdateGraphics2(bool skipRepaint)
 
     XRender::setViewport(0, 0, ScreenW, ScreenH);
 
+    DrawDeviceBattery();
+
     // this code is for both non-editor and editor cases
     {
         // render special screens

@@ -1119,11 +1119,7 @@ if(THEXTECH_CRASHHANDLER_SUPPORTED)
 endif()
 
 # ======================= Render specific global macros ========================
-if(NOT EMSCRIPTEN)
-    target_compile_definitions(thextech PRIVATE
-        -DUSE_DRAW_BATTERY_STATUS   # Battery status draw support
-    )
-else()
+if(EMSCRIPTEN)
     target_compile_definitions(thextech PRIVATE
         -DNO_WINDOW_FOCUS_TRACKING  # Don't track for window focus
     )

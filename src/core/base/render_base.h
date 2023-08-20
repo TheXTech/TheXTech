@@ -277,10 +277,6 @@ public:
 #endif
 
     // Screenshots, GIF recordings, etc., etc.
-#ifdef USE_DRAW_BATTERY_STATUS
-    static void drawBatteryStatus();
-#endif
-
 #ifdef USE_SCREENSHOTS_AND_RECS
     static void makeShot();
 

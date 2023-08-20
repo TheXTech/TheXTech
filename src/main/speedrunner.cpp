@@ -209,7 +209,7 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, const XPower::S
 
     GetControllerColor(player, r, g, b);
 
-    Controls::StatusInfo status_info;
+    XPower::StatusInfo status_info;
 
     if(status)
         status_info = *status;
@@ -218,7 +218,7 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, const XPower::S
     else
         status_info = XPower::devicePowerStatus();
 
-    if(status_info.power_status != Controls::StatusInfo::POWER_DISABLED)
+    if(status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
     {
         XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alpha, true);//Edge
         XRender::renderRect(bx + 2, by + 2, bw - 8, bh - 4, r, g, b, alpha, true);//Box
@@ -246,13 +246,13 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, const XPower::S
             r = (.5f - status_info.power_level) / .5f;
         }
 
-        if(status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+        if(status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
         {
             g = 1.f;
             g -= r;
         }
 
-        if(status_info.power_status == Controls::StatusInfo::POWER_CHARGED)
+        if(status_info.power_status == XPower::StatusInfo::POWER_CHARGED)
         {
             b = 0.8f;
             g = 0.4f;
@@ -265,34 +265,34 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, const XPower::S
         case 4:
             s = 2.f * (status_info.power_level - 0.9f) / 0.1f;
             if(s > 2) s = 2;
-            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 2;
             XRender::renderRect(bx + 34, by + 10, s, 2, r, g, b, alphaB, true); // fallthrough
         case 3:
             s = 4.f * (status_info.power_level - 0.6f) / 0.3f;
             if(s > 4) s = 4;
-            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 4;
             XRender::renderRect(bx + 24, by + 4, s*2, 14, r, g, b, alphaB, true); // fallthrough
         case 2:
             s = 4.f * (status_info.power_level - 0.3f) / 0.3f;
             if(s > 4) s = 4;
-            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 4;
             XRender::renderRect(bx + 14, by + 4, s*2, 14, r, g, b, alphaB, true); // fallthrough
         case 1:
             s = 4.f * status_info.power_level / 0.3f;
             if(s > 4) s = 4;
-            // if(flash && status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+            // if(flash && status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             //     s = 4;
             XRender::renderRect(bx + 4, by + 4, s*2, 14, r, g, b, alphaB, true);
             break;
         }
-        if(status_info.power_status == Controls::StatusInfo::POWER_UNKNOWN)
+        if(status_info.power_status == XPower::StatusInfo::POWER_UNKNOWN)
             SuperPrintCenter("?", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 8) & ~1);
-        if(status_info.power_status == Controls::StatusInfo::POWER_WIRED)
+        if(status_info.power_status == XPower::StatusInfo::POWER_WIRED)
             SuperPrintCenter("W", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 8) & ~1);
-        if(status_info.power_status == Controls::StatusInfo::POWER_CHARGING)
+        if(status_info.power_status == XPower::StatusInfo::POWER_CHARGING)
             SuperPrintCenter("+", 3, (bx + bw / 2) & ~1, (by + bh / 2 - 7) & ~1);
     }
 
