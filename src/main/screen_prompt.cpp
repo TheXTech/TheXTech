@@ -35,6 +35,7 @@
 #include "core/render.h"
 #include "main/screen_prompt.h"
 #include "main/screen_quickreconnect.h"
+#include "main/speedrunner.h"
 
 namespace PromptScreen
 {
@@ -156,6 +157,9 @@ void Render()
     // draw quick reconnect screen
     if(QuickReconnectScreen::g_active)
         QuickReconnectScreen::Render();
+
+    speedRun_renderControls(1, -1);
+    speedRun_renderControls(2, -1);
 
     // draw screen fader and repaint
 

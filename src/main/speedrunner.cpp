@@ -226,6 +226,10 @@ void RenderPowerInfo(int player, int bx, int by, int bw, int bh, float alpha, co
     else
         status_info = XPower::devicePowerStatus();
 
+    // don't draw segments for states without battery info
+    if(status_info.power_status == XPower::StatusInfo::POWER_WIRED || status_info.power_level == XPower::StatusInfo::POWER_UNKNOWN)
+        status_info.power_level = 0.0f;
+
     if(status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
     {
         XRender::renderRect(bx, by, bw - 4, bh, 0.f, 0.f, 0.f, alphaBox, true);//Edge
