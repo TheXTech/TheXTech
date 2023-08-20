@@ -57,6 +57,8 @@
 #endif
 
 
+bool XRender::g_BitmaskTexturePresent = false;
+
 static const char blank_gif[] = "GIF89a\x01\x00\x01\x00\x80\x00\x00\xff\xff\xff\x00\x00\x00!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\2D\x01\x00;";
 
 AbstractRender_t* g_render = nullptr;
@@ -414,9 +416,13 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         // load mask
         maskImage = GraphicsHelps::loadMask(target.l.rawMask, target.l.isMaskPng);
 
+        // check if GIF bitmask cannot be properly represented with RGBA
+        bool bitmask_required = !target.l.isMaskPng && GraphicsHelps::validateBitmaskRequired(sourceImage, maskImage, StdPictureGetOrigPath(target));
+
+        XRender::g_BitmaskTexturePresent |= bitmask_required;
+
         // merge it with image if PNG, masks are unsupported, merge is forced, or the mask could be properly represented with RGBA
-        if(target.l.isMaskPng || g_ForceBitmaskMerge || !g_render->textureMaskSupported()
-            || !GraphicsHelps::validateBitmaskRequired(sourceImage, maskImage, StdPictureGetOrigPath(target)))
+        if(target.l.isMaskPng || g_ForceBitmaskMerge || !g_render->textureMaskSupported() || !bitmask_required)
         {
             GraphicsHelps::mergeWithMask(sourceImage, maskImage);
             GraphicsHelps::closeImage(maskImage);

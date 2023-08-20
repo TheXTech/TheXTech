@@ -30,6 +30,7 @@
 #include "render_sdl.h"
 #include "video.h"
 #include "core/window.h"
+#include "core/render.h"
 
 #include "main/cheat_code.h"
 
@@ -177,8 +178,10 @@ void RenderSDL::repaint()
         return;
 #endif
 
-    if(g_ForceBitmaskMerge)
-        SuperPrintScreenCenter("Enable OpenGL Render for Bitmask", 5, 2, 1.0f, 0.2f, 0.0f);
+    if(XRender::g_BitmaskTexturePresent)
+        SuperPrintScreenCenter("Bitmasks using GIFs2PNG in SDL", 5, 2, 1.0f, 0.7f, 0.5f);
+    else if(g_ForceBitmaskMerge)
+        SuperPrintScreenCenter("GIFs2PNG always simulated in SDL", 5, 2, 1.0f, 0.7f, 0.5f);
 
     int w, h, off_x, off_y, wDst, hDst;
 

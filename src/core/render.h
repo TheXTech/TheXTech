@@ -55,6 +55,12 @@ extern void quit();
 
 #endif
 
+#ifndef RENDER_CUSTOM
+
+// reset bitmask warning flag for SDL platforms
+extern bool g_BitmaskTexturePresent;
+
+#endif
 
 /*!
  * \brief Identify does render engine works or not

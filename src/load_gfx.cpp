@@ -1248,6 +1248,11 @@ void LoadCustomGFX(bool include_world)
 
 void UnloadCustomGFX()
 {
+#ifndef RENDER_CUSTOM
+    // reset bitmask warning flag on SDL platforms
+    XRender::g_BitmaskTexturePresent = false;
+#endif
+
     // Restore default sizes of custom effects
     for(int A = 1; A < maxEffectType; ++A)
     {

@@ -32,6 +32,9 @@
 #include "sdl_proxy/sdl_assert.h"
 
 #include "core/window.h"
+#include "core/render.h"
+
+#include "main/cheat_code.h"
 
 #include "globals.h"
 #include "sound.h"
@@ -293,8 +296,12 @@ void RenderGL::repaint()
         if(feature_string.size() == 3)
             feature_string += ": none";
 
-        SuperPrintScreenCenter(feature_string, 3, 0, 0.8f, 1.0f, 0.0f);
+        SuperPrintScreenCenter(feature_string, 5, 2, 0.8f, 1.0f, 0.0f);
     }
+    else if(XRender::g_BitmaskTexturePresent && g_ForceBitmaskMerge)
+        SuperPrintScreenCenter("Simulating GIFs2PNG (active)", 5, 2, 1.0f, 0.7f, 0.5f);
+    else if(g_ForceBitmaskMerge)
+        SuperPrintScreenCenter("Simulating GIFs2PNG (inactive)", 5, 2, 1.0f, 0.7f, 0.5f);
 
     flushDrawQueues();
 
