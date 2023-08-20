@@ -457,6 +457,8 @@ void LoadSingleWorld(const std::string wPath)
     if(epDir.empty())
         epDir = "./";
 
+    epDir = DirMan(epDir).absolutePath() + "/";
+
     s_LoadSingleWorld(epDir, fName, head, tr, compatModern, true);
 
     s_FinishFindWorlds();
