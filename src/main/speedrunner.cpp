@@ -159,7 +159,9 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
     const Controls_t& c = s_displayControls[player-1];
     XRender::renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alhpaB, true);//Cender of D-Pad
 
-    if(missing && (CommonFrame % 128) < 64)
+    // want three pings then a period of rest
+
+    if(missing && (CommonFrame % 120 < 60) && (CommonFrame % 24 < 12))
     {
         float r = 1.0f;
         float g = 1.0f;
