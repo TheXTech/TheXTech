@@ -721,6 +721,15 @@ elseif(NINTENDO_DS)
         src/core/16m/packloader.cpp
         src/core/power/power_null.cpp
     )
+elseif(THEXTECH_NO_SDL_BUILD)
+    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
+    list(APPEND THEXTECH_SRC
+        src/core/null/render_null.cpp
+        src/core/null/window_null.cpp
+        src/core/null/msgbox_null.cpp
+        src/core/null/events_null.cpp
+        src/core/power/power_null.cpp
+    )
 elseif(THEXTECH_CLI_BUILD)
     add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM)
     list(APPEND THEXTECH_SRC
@@ -729,15 +738,6 @@ elseif(THEXTECH_CLI_BUILD)
         src/core/null/msgbox_null.cpp
         src/core/null/events_null.cpp
         src/core/sdl/sdl_core.cpp
-        src/core/power/power_null.cpp
-    )
-elseif(THEXTECH_NO_SDL_BUILD)
-    add_definitions(-DWINDOW_CUSTOM -DMSGBOX_CUSTOM -DEVENTS_CUSTOM -DRENDER_CUSTOM -DTHEXTECH_NO_SDL_CORE)
-    list(APPEND THEXTECH_SRC
-        src/core/null/render_null.cpp
-        src/core/null/window_null.cpp
-        src/core/null/msgbox_null.cpp
-        src/core/null/events_null.cpp
         src/core/power/power_null.cpp
     )
 else()

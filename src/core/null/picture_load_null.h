@@ -24,6 +24,7 @@
 #define STD_PICTURE_LOAD_NULL_H
 
 #include <string>
+#include <cstdint>
 
 /*!
  * \brief Generic image loading store.

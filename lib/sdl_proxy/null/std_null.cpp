@@ -27,11 +27,6 @@ uint32_t SDL_GetTicks()
    return ++curTime;
 }
 
-uint64_t SDL_GetTicks64()
-{
-   return ++curTime;
-}
-
 uint64_t SDL_GetMicroTicks()
 {
     return curTime * 1000;
