@@ -50,15 +50,9 @@ void DrawEditorLevel(int Z)
 #ifdef __3DS__
     XRender::setTargetLayer(2);
 #endif
-    if(Z == 1)
-        BlockFlash += 1;
-
-    if(BlockFlash > 45)
-        BlockFlash = 0;
-
     if(LevelEditor)
     {
-        if(BlockFlash <= 30)
+        if((CommonFrame % 46) <= 30)
         {
             // render NPCs in blocks
             for(A = 1; A <= numBlock; A++)
@@ -268,7 +262,7 @@ void DrawEditorLevel(int Z)
     // render section boundary
     if(LevelEditor)
     {
-        if(BlockFlash > 30 || BlockFlash == 0)
+        if((CommonFrame % 46) > 30 || (CommonFrame % 46) == 0)
         {
             if(vScreen[Z].X + level[S].X > 0)
             {
@@ -319,7 +313,7 @@ void DrawEditorLevel(int Z)
         int curX = int(double(e.X) - vScreen[Z].Left);
         int curY = int(double(e.Y) - vScreen[Z].Top);
 
-        if(BlockFlash < 10)
+        if((CommonFrame % 46) < 10)
         {
             // don't draw the currently held object
         }
@@ -375,7 +369,7 @@ void DrawEditorLevel(int Z)
             }
 
             // render NPC inside block
-            if(BlockFlash <= 30 && b.Special > 0)
+            if((CommonFrame % 46) <= 30 && b.Special > 0)
             {
                 if(vScreenCollision(Z, b.Location))
                 {
@@ -538,7 +532,7 @@ void DrawEditorLevel(int Z)
             }
 
             // render NPC inside container
-            if(BlockFlash <= 30 && (n.Type == 91 || n.Type == 96)
+            if((CommonFrame % 46) <= 30 && (n.Type == 91 || n.Type == 96)
                 && (n.Special > 0))
             {
                 if(vScreenCollision(Z, n.Location))
@@ -623,7 +617,7 @@ void DrawEditorLevel(int Z)
         {
             if(EditorCursor.SubMode == -1)
             {
-                int frame = BlockFlash / 20;
+                int frame = (CommonFrame % 46) / 20;
                 if(frame > 2)
                     frame = 2;
                 XRender::renderTexture(curX - 8, curY, 32, 32, GFXNPC[NPCID_AXE], 0, 32 * frame);
@@ -700,18 +694,13 @@ void DrawEditorWorld()
 {
     int Z = 1;
 
-    BlockFlash += 1;
-
-    if(BlockFlash > 45)
-        BlockFlash = 0;
-
 #ifdef __3DS__
     // disable cursor rendering on inactive screen of 3DS
     if(editorScreen.active) {}
     else
 #endif
 
-    if(BlockFlash < 10)
+    if((CommonFrame % 46) < 10)
     {
         // don't draw the currently held object
     }
@@ -809,7 +798,7 @@ void DrawEditorWorld()
     {
         if(EditorCursor.SubMode == -1)
         {
-            int frame = BlockFlash / 20;
+            int frame = (CommonFrame % 46) / 20;
             if(frame > 2)
                 frame = 2;
             XRender::renderTexture(X - 8, Y, 32, 32, GFXNPC[NPCID_AXE], 0, 32 * frame);

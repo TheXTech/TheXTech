@@ -410,6 +410,8 @@ XTechTranslate::XTechTranslate()
         {"game.controls.phrasePlayerConnected",     &g_gameStrings.controlsPhrasePlayerConnected},
 
         {"game.error.openFileFailed",               &g_gameStrings.errorOpenFileFailed},
+        {"game.error.errorInvalidEnterWarp",        &g_gameStrings.errorInvalidEnterWarp},
+        {"game.error.errorNoStartPoint",            &g_gameStrings.errorNoStartPoint},
 
         {"game.error.warpNeedStarCount",            &g_gameStrings.warpNeedStarCount},
 

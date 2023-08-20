@@ -402,8 +402,7 @@ void UpdateEditor()
                         {
                             PlaySound(SFX_Grab);
                             EditorCursor.Location = PlayerStart[A];
-                            PlayerStart[A].X = 0;
-                            PlayerStart[A].Y = 0;
+                            PlayerStart[A] = PlayerStart_t();
                             optCursor.current = OptCursor_t::LVL_SETTINGS;
 //                            frmLevelSettings::optLevel(3 + A).Value = true;
                             EditorCursor.Mode = OptCursor_t::LVL_SETTINGS;
@@ -2893,6 +2892,8 @@ void zTestLevel(bool magicHand, bool interProcess)
                 Player[A].UnStart = false;
             }
         }
+
+        StartWarp = testStartWarp;
     }
 
     LevelEditor = false;
@@ -3004,7 +3005,6 @@ void zTestLevel(bool magicHand, bool interProcess)
     EndLevel = false;
     editorScreen.active = false;
     ReturnWarp = 0;
-    StartWarp = testStartWarp;
 
     optCursor.current = OptCursor_t::LVL_SELECT;
     EditorCursor.Mode = OptCursor_t::LVL_SELECT;

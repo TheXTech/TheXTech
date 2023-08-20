@@ -434,6 +434,9 @@ void LoadSingleWorld(const std::string wPath)
     std::string fName = Files::basename(wPath);
     std::string epDir = wPath.substr(0, wPath.size() - fName.size());
 
+    if(epDir.empty())
+        epDir = "./";
+
     s_LoadSingleWorld(epDir, fName, head, tr, compatModern, true);
 
     s_FinishFindWorlds();
