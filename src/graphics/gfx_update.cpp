@@ -2938,6 +2938,13 @@ void UpdateGraphics(bool skipRepaint)
     if(ScreenType != 5 && numScreens == 1)
         speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
 
+    // fix missing controls info when the vScreen didn't get rendered at all
+    if(ScreenType == 5 && numScreens == 1 && vScreen[1].Width == 0)
+    {
+        speedRun_renderControls(1, -1);
+        speedRun_renderControls(2, -1);
+    }
+
     // splitscreen divider
     if(vScreen[2].Visible)
     {
