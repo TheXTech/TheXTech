@@ -58,8 +58,6 @@ extern struct Config_t
         EPISODE_TITLE_TRANSPARENT_ALWAYS,
     };
     int show_episode_title = EPISODE_TITLE_OFF;
-    //! Show a backdrop texture when level is smaller than screen
-    bool    show_backdrop = true;
 
     /* ---- Gameplay ----*/
 

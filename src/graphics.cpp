@@ -922,7 +922,7 @@ Location_t WorldLevel_t::LocationGFX()
 
 void DrawBackdrop()
 {
-    if(g_config.show_backdrop && GFX.Backdrop.inited)
+    if(GFX.Backdrop.inited)
     {
         bool border_valid = GFX.Backdrop_Border.inited && (!GFX.isCustom(68) || GFX.isCustom(69));
 

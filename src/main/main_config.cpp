@@ -260,7 +260,6 @@ void OpenConfig()
         config.readEnum("battery-status", g_videoSettings.batteryStatus, (int)BATTERY_STATUS_OFF, batteryStatus);
         config.read("osk-fill-screen", g_config.osk_fill_screen, osk_fill_screen_default);
         config.readEnum("show-episode-title", g_config.show_episode_title, (int)Config_t::EPISODE_TITLE_OFF, showEpisodeTitle);
-        config.read("show-backdrop", g_config.show_backdrop, true);
         config.endGroup();
 
         config.beginGroup("recent");
@@ -391,7 +390,6 @@ void SaveConfig()
         config.setValue("battery-status", batteryStatus[g_videoSettings.batteryStatus]);
         config.setValue("osk-fill-screen", g_config.osk_fill_screen);
         config.setValue("show-episode-title", showEpisodeTitle[g_config.show_episode_title]);
-        config.setValue("show-backdrop", g_config.show_backdrop);
 #       ifndef FIXED_RES
         config.setValue("internal-width", g_config.InternalW);
         config.setValue("internal-height", g_config.InternalH);
