@@ -103,6 +103,9 @@ static void GetControllerColor(int player, float& r, float& g, float& b, bool* d
     if(drawLabel)
         *drawLabel = false;
 
+    if(player < 1 || player > maxLocalPlayers)
+        return;
+
     if(ScreenType == 5)  // TODO: VERIFY THIS
     {
         auto &p = Player[player];
@@ -160,7 +163,7 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
     if(missing)
     {
         float tick = (CommonFrame % 128) / 128.0f * 2.0f * static_cast<float>(M_PI);
-        float coord = (static_cast<float>(sinf(tick)) + 1.0f) * 0.5f + 0.25f;
+        float coord = (sinf(tick) + 1.0f) * 0.5f + 0.25f;
         alphaB *= coord;
         alphaText *= coord;
     }
@@ -300,6 +303,8 @@ void speedRun_renderControls(int player, int screenZ)
 
     const bool player_missing = (player - 1 >= (int)Controls::g_InputMethods.size() || !Controls::g_InputMethods[player - 1]);
 
+    bool rightAlign = false;
+
     // Controller
     int x = 4;
     int y = ScreenH - 34;
@@ -316,6 +321,7 @@ void speedRun_renderControls(int player, int screenZ)
     {
         auto &scr = vScreen[screenZ];
         x = scr.Left > 0 ? (int)(scr.Left + scr.Width) - (w + 4) : (int)scr.Left + 4;
+        rightAlign = scr.Left > 0;
         y = (int)(scr.Top + scr.Height) - 34;
         bx = scr.Left > 0 ? x - (bw + 4) : (x + w + 4);
         by = y + 4;
@@ -345,9 +351,32 @@ void speedRun_renderControls(int player, int screenZ)
         case 2:
             x = (ScreenW - (w + 4));
             bx = x - (bw + 4);
+            rightAlign = true;
             break;
         }
 #endif
+    }
+
+    if(player >= 1 && player <= maxLocalPlayers && player <= (int)Controls::g_InputMethods.size()
+        && QuickReconnectScreen::g_active && QuickReconnectScreen::g_toast_duration[player - 1])
+    {
+        const Controls::InputMethod* input_method = Controls::g_InputMethods[player - 1];
+
+        const std::string& profile_name = (input_method->Profile ? input_method->Profile->Name : "");
+
+        float alpha = 1.0f;
+        int time_from_edge = SDL_min(QuickReconnectScreen::g_toast_duration[player - 1], QuickReconnectScreen::MAX_TOAST_DURATION - QuickReconnectScreen::g_toast_duration[player - 1]);
+
+        if(time_from_edge < 33)
+        {
+            float linear_coord = (33 - time_from_edge) / 33.0f;
+            alpha = cosf(linear_coord * M_PI) * 0.5f + 0.5f;
+        }
+
+        if(rightAlign)
+            SuperPrintRightAlign(profile_name, 3, x + w, y - 20, 1.0f, 1.0f, 1.0f, alpha);
+        else
+            SuperPrint(profile_name, 3, x, y - 20, 1.0f, 1.0f, 1.0f, alpha);
     }
 
     if(g_speedRunnerMode != SPEEDRUN_MODE_OFF || g_drawController || player_missing || QuickReconnectScreen::g_active)
