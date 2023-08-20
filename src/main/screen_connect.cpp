@@ -93,7 +93,6 @@ void MainMenu_Start(int minPlayers)
     MenuCursorCanMove = false;
 
     // prepare for first frame
-    BlockFlash = 0;
     if(minPlayers == 1)
         Player_ValidateChar(0);
     Logic();
@@ -118,7 +117,6 @@ void Reconnect_Start()
     MenuCursorCanMove = false;
 
     // prepare for first frame
-    BlockFlash = 0;
     Logic();
 }
 
@@ -144,7 +142,6 @@ void DropAdd_Start()
     MenuCursorCanMove = false;
 
     // prepare for first frame
-    BlockFlash = 0;
     Logic();
 }
 
@@ -951,7 +948,7 @@ void Chars_Mouse_Render(int x, int w, int y, int h, bool mouse, bool render)
                     && (s_context == Context::DropAdd || s_context == Context::Reconnect))
                 {
                     player_okay = true;
-                    if(BlockFlash % 45 < 25)
+                    if((CommonFrame % 45) < 25)
                         pa = 0.5f;
                 }
                 if(player_okay && g_charSelect[p] == c+1)
@@ -1119,7 +1116,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
             // make the "Waiting" text flash
             if(render && s_menuItem[p] == -4)
             {
-                if(BlockFlash < 45)
+                if((CommonFrame % 90) < 45)
                     SuperPrintCenter(g_mainMenu.wordWaiting, 3, cX, pY+2*line);
             }
 
@@ -1188,7 +1185,7 @@ bool Player_Mouse_Render(int p, int pX, int cX, int pY, int line, bool mouse, bo
                 SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P1, 3, infobox_y + 24, 0.8f, 0.8f, 0.8f, 0.8f);
                 SuperPrintScreenCenter(g_gameStrings.connectPressSelectForControlsOptions_P2, 3, infobox_y + 44, 0.8f, 0.8f, 0.8f, 0.8f);
             }
-            else if(BlockFlash < 45)
+            else if((CommonFrame % 90) < 45)
                 SuperPrintCenter(g_gameStrings.connectPressAButton, 3, cX, pY+2*line);
         }
         return ret;
@@ -1436,7 +1433,7 @@ int Mouse_Render(bool mouse, bool render)
                 if(render)
                 {
                     XRender::renderRect(ScreenW/2 - 150, MenuY, 300, 200, 0, 0, 0, 0.5);
-                    if(BlockFlash < 45)
+                    if((CommonFrame % 90) < 45)
                         SuperPrintScreenCenter(g_gameStrings.connectPressAButton, 3, MenuY + 90);
                 }
             }
@@ -1783,11 +1780,6 @@ int Logic()
 
 void Render()
 {
-    BlockFlash += 1;
-
-    if(BlockFlash >= 90)
-        BlockFlash = 0;
-
     Mouse_Render(false, true);
 }
 

@@ -159,11 +159,7 @@ void RenderControls(int player, int x, int y, int w, int h, bool missing)
     const Controls_t& c = s_displayControls[player-1];
     XRender::renderRect(x + 10, y + 12, 6, 6, 0.f, 0.f, 0.f, alhpaB, true);//Cender of D-Pad
 
-    BlockFlash++;
-    if(BlockFlash >= 180)
-        BlockFlash = 0;
-
-    if(missing && BlockFlash < 90)
+    if(missing && (CommonFrame % 128) < 64)
     {
         float r = 1.0f;
         float g = 1.0f;

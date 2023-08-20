@@ -1691,7 +1691,7 @@ void UpdateGraphics(bool skipRepaint)
         {
             g_stats.checkedBlocks++;
 
-            if(/*!BlockIsSizable[block.Type] &&*/ (!block.Invis || (LevelEditor && BlockFlash <= 30)) /*&& block.Type != 0 && !BlockKills[block.Type]*/)
+            if(/*!BlockIsSizable[block.Type] &&*/ (!block.Invis || (LevelEditor && (CommonFrame % 46) <= 30)) /*&& block.Type != 0 && !BlockKills[block.Type]*/)
             {
                 double sX = vScreen[Z].X + block.Location.X;
                 if(sX > vScreen[Z].Width)
