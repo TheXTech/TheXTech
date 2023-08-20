@@ -397,10 +397,30 @@ void speedRun_renderControls(int player, int screenZ)
             alpha = cosf(linear_coord * M_PI) * 0.5f + 0.5f;
         }
 
-        if(rightAlign)
-            SuperPrintRightAlign(profile_name, 3, x + w, y - 20, 1.0f, 1.0f, 1.0f, alpha);
+        // code for lower-resolution case
+        if(ScreenW < 800 && status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
+        {
+            if(rightAlign)
+                SuperPrintRightAlign(profile_name, 3, x + w, y - 20, 1.0f, 1.0f, 1.0f, alpha);
+            else
+                SuperPrint(profile_name, 3, x, y - 20, 1.0f, 1.0f, 1.0f, alpha);
+        }
+        // code for higher resolution case, including battery
+        else if(status_info.power_status != XPower::StatusInfo::POWER_DISABLED)
+        {
+            if(rightAlign)
+                SuperPrintRightAlign(profile_name, 3, bx - 4, by + 2, 1.0f, 1.0f, 1.0f, alpha);
+            else
+                SuperPrint(profile_name, 3, bx + bw + 4, by + 2, 1.0f, 1.0f, 1.0f, alpha);
+        }
+        // code for normal case
         else
-            SuperPrint(profile_name, 3, x, y - 20, 1.0f, 1.0f, 1.0f, alpha);
+        {
+            if(rightAlign)
+                SuperPrintRightAlign(profile_name, 3, x - 4, by + 2, 1.0f, 1.0f, 1.0f, alpha);
+            else
+                SuperPrint(profile_name, 3, x + w + 4, by + 2, 1.0f, 1.0f, 1.0f, alpha);
+        }
     }
 }
 
