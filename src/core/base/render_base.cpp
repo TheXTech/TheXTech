@@ -414,7 +414,7 @@ void AbstractRender_t::loadTexture(StdPicture &target, uint32_t width, uint32_t 
                 if(*alpha < 0x08 || *alpha >= 0xf8)
                     continue;
 
-                D_pLogDebug("Externally loaded texture CANNOT use depth test");
+                D_pLogDebugNA("Externally loaded texture CANNOT use depth test");
 
                 target.d.invalidateDepthTest();
 
