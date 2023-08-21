@@ -75,7 +75,7 @@ void SetupEditorGraphics();
 void SetupScreens(bool reset = true);
 // Public Sub DynamicScreen() 'for the split screen stuff
 // for the split screen stuff
-void DynamicScreen(Screen_t& screen);
+void DynamicScreen(Screen_t& screen, bool mute = false);
 
 // NEW: limit vScreens to playable section area and center them on the real screen
 void CenterScreens(Screen_t& screen);

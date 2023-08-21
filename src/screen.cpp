@@ -57,12 +57,21 @@ void InitScreens()
         for(int v = 0; v < maxLocalPlayers; v++)
         {
             Screens[s].vScreen_refs[v] = s * maxLocalPlayers + v + 1;
-            vScreen[s * maxLocalPlayers + v + 1].screen_ref = s;
+            Screens[s].vScreen(v + 1).screen_ref = s;
         }
     }
 
     Screens[0].set_canonical_screen(1);
     Screens[1].Visible = false;
+
+    // assign players to vScreens
+    for(int s = 0; s < c_screenCount; s++)
+    {
+        for(int v = 0; v < maxLocalPlayers; v++)
+        {
+            Screens[s].vScreen(v + 1).player = Screens[s].players[v];
+        }
+    }
 }
 
 // finds the visible Screen that contains a specific player

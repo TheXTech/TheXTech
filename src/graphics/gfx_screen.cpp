@@ -34,139 +34,200 @@
 #include "config.h"
 #include "core/render.h"
 
-void SetScreenType()
+// Copies all Screen and vScreen info, except size, from source to dest. Centers screens.
+void s_CopyScreen(Screen_t& dest, const Screen_t& source)
+{
+    for(int v = 1; v <= maxLocalPlayers; v++)
+    {
+        vScreen_t& d_vscreen = dest.vScreen(v);
+        vScreen_t& s_vscreen = source.vScreen(v);
+
+        // copy all "ordinary" fields
+        static_cast<qScreen_t&>(d_vscreen) = static_cast<qScreen_t&>(s_vscreen);
+
+        d_vscreen.Visible   = s_vscreen.Visible;
+        d_vscreen.tempX     = s_vscreen.tempX;
+        d_vscreen.TempY     = s_vscreen.TempY;
+        d_vscreen.TempDelay = s_vscreen.TempDelay;
+    }
+
+    dest.Type  = source.Type;
+    dest.DType = source.DType;
+}
+
+void SetScreenType(Screen_t& screen)
 {
     // moved this code from game_main.cpp, but it occured elsewhere also
     //   it was always called before setup screens, now it is a part of setup screens.
     //   better to have it in one place so it can be updated
     if(numPlayers == 1)
-        ScreenType = 0; // Follow 1 player
+        screen.Type = 0; // Follow 1 player
     else if(numPlayers == 2)
-        ScreenType = 5; // Dynamic screen
+        screen.Type = 5; // Dynamic screen
     else
     {
-        // ScreenType = 3 'Average, no one leaves the screen
-        ScreenType = 2; // Average
+        // screen.Type = 3 'Average, no one leaves the screen
+        screen.Type = 2; // Average
     }
 
     // special cases
     if(SingleCoop > 0)
-        ScreenType = 6;
+        screen.Type = 6;
     if(GameMenu)
-        ScreenType = 2;
+        screen.Type = 2;
     if(GameOutro)
-        ScreenType = 7;
+        screen.Type = 7;
     if(LevelEditor)
-        ScreenType = 0;
+        screen.Type = 0;
 }
 
 // Sets up the split lines
-void SetupScreens(bool reset)
+void SetupScreens(Screen_t& screen, bool reset)
 {
-    SetScreenType();
+    // keep canonical screen in sync
+    if(!screen.is_canonical())
+    {
+        Screen_t& c_screen = screen.canonical_screen();
+        SetupScreens(c_screen, reset);
 
-    vScreen[1].player = 1;
-    vScreen[2].player = 2;
+        // if needed, defer to canonical screen logic
+        if(!g_compatibility.free_level_res)
+        {
+            s_CopyScreen(screen, c_screen);
+            return;
+        }
+    }
+
+    SetScreenType(screen);
+
+    vScreen_t& vscreen1 = screen.vScreen(1);
+    vScreen_t& vscreen2 = screen.vScreen(2);
 
     switch(ScreenType)
     {
     case 0: // Follows Player 1
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Visible = false;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Visible = false;
         break;
     case 1: // Split Screen vertical
-        vScreen[1].Height = ScreenH / 2;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Height = ScreenH / 2;
-        vScreen[2].Width = ScreenW;
-        vScreen[2].Left = 0;
-        vScreen[2].Top = ScreenH / 2;
+        vscreen1.Height = screen.H / 2;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Height = screen.H / 2;
+        vscreen2.Width = screen.W;
+        vscreen2.Left = 0;
+        vscreen2.Top = screen.H / 2;
         break;
     case 2: // Follows all players
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Visible = false;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Visible = false;
         break;
     case 3: // Follows all players. Noone leaves the screen
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Visible = false;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Visible = false;
         break;
     case 4: // Split Screen horizontal
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW / 2;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Height = ScreenH;
-        vScreen[2].Width = ScreenW / 2;
-        vScreen[2].Left = ScreenW / 2;
-        vScreen[2].Top = 0;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W / 2;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Height = screen.H;
+        vscreen2.Width = screen.W / 2;
+        vscreen2.Left = screen.W / 2;
+        vscreen2.Top = 0;
         break;
     case 5: // Dynamic screen detection
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
 
         if(reset)
-            vScreen[2].Visible = false;
+            vscreen2.Visible = false;
         break;
     case 6: // VScreen Coop
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Height = ScreenH;
-        vScreen[2].Width = ScreenW;
-        vScreen[2].Left = 0;
-        vScreen[2].Top = 0;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Height = screen.H;
+        vscreen2.Width = screen.W;
+        vscreen2.Left = 0;
+        vscreen2.Top = 0;
         break;
     case 7: // Credits
     case 8: // netplay
-        vScreen[1].Left = 0;
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Top = 0;
-        vScreen[1].Width = ScreenW;
-        vScreen[2].Visible = false;
+        vscreen1.Left = 0;
+        vscreen1.Height = screen.H;
+        vscreen1.Top = 0;
+        vscreen1.Width = screen.W;
+        vscreen2.Visible = false;
         break;
 #if 0 // Merged with the branch above because they both are same
     case 8: // netplay
-        vScreen[1].Left = 0;
-        vScreen[1].Width = 800;
-        vScreen[1].Top = 0;
-        vScreen[1].Height = 600;
-        vScreen[2].Visible = false;
+        vscreen1.Left = 0;
+        vscreen1.Width = 800;
+        vscreen1.Top = 0;
+        vscreen1.Height = 600;
+        vscreen2.Visible = false;
         break;
 #endif
 //    End If
     }
 }
 
-void DynamicScreen(Screen_t& screen)
+void SetupScreens(bool reset)
 {
+    SetupScreens(Screens[0], reset);
+}
+
+void DynamicScreen(Screen_t& screen, bool mute)
+{
+    // if needed, defer to canonical screen logic
+    if(!g_compatibility.free_level_res && !screen.is_canonical())
+    {
+        Screen_t& c_screen = screen.canonical_screen();
+        DynamicScreen(c_screen, mute);
+
+        for(int v = 1; v <= 2; v++)
+        {
+            vScreen_t& vscreen = screen.vScreen(v);
+            vScreen_t& c_vscreen = c_screen.vScreen(v);
+
+            // copy all "ordinary" fields
+            static_cast<qScreen_t&>(vscreen) = static_cast<qScreen_t&>(c_vscreen);
+
+            vscreen.Visible = c_vscreen.Visible;
+            vscreen.tempX = c_vscreen.tempX;
+            vscreen.TempY = c_vscreen.TempY;
+            vscreen.TempDelay = c_vscreen.TempDelay;
+        }
+
+        screen.DType = c_screen.DType;
+        return;
+    }
+    // keep canonical screen in sync
+    else if(!screen.is_canonical())
+    {
+        DynamicScreen(screen.canonical_screen(), true);
+    }
+
     int A = 0;
 
     vScreen_t& vscreen1 = screen.vScreen(1);
     vScreen_t& vscreen2 = screen.vScreen(2);
 
-    if(g_compatibility.free_level_res)
-        GetvScreenAverage(vscreen1);
-    else
-    {
-        double l, t;
-        GetvScreenAverageCanonical(&l, &t, true);
-        vscreen1.X = l;
-        vscreen1.Y = t;
-    }
+    GetvScreenAverage(vscreen1);
 
     for(A = 1; A <= numPlayers; A++)
     {
@@ -180,17 +241,14 @@ void DynamicScreen(Screen_t& screen)
             Player[A].Location.Height = 0;
     }
 
-    Player_t& p1 = Player[1];
-    Player_t& p2 = Player[2];
+    Player_t& p1 = Player[screen.players[0]];
+    Player_t& p2 = Player[screen.players[1]];
 
     if(CheckDead() == 0)
     {
         if(p1.Section == p2.Section)
         {
-            double FieldW = g_compatibility.free_level_res ? screen.W : 800;
-            double FieldH = g_compatibility.free_level_res ? screen.H : 600;
-
-            if(level[Player[1].Section].Width - level[Player[1].Section].X > FieldW && (((!vscreen2.Visible && Player[2].Location.X + vscreen1.X >= FieldW * 0.75 - Player[2].Location.Width / 2.0) || (vscreen2.Visible && Player[2].Location.X + vscreen1.X >= FieldW * 0.75 - Player[2].Location.Width / 2.0)) && (Player[1].Location.X < level[Player[1].Section].Width - FieldW * 0.75 - Player[1].Location.Width / 2.0)))
+            if(level[p1.Section].Width - level[p1.Section].X > screen.W && (((!vscreen2.Visible && p2.Location.X + vscreen1.X >= screen.W * 0.75 - p2.Location.Width / 2.0) || (vscreen2.Visible && p2.Location.X + vscreen1.X >= screen.W * 0.75 - p2.Location.Width / 2.0)) && (p1.Location.X < level[p1.Section].Width - screen.W * 0.75 - p1.Location.Width / 2.0)))
             {
                 vscreen2.Height = screen.H;
                 vscreen2.Width = screen.W / 2;
@@ -200,33 +258,22 @@ void DynamicScreen(Screen_t& screen)
                 vscreen1.Width = screen.W / 2;
                 vscreen1.Left = 0;
                 vscreen1.Top = 0;
-
-                double l, t;
-                if(g_compatibility.free_level_res)
-                {
-                    GetvScreenAverage2(vscreen1);
-                    t = vscreen1.Y;
-                }
-                else
-                {
-                    GetvScreenAverage2Canonical(&l, &t, true);
-                }
-
+                GetvScreenAverage2(vscreen1);
+                if(screen.DType != 1 && !mute)
+                    PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
                     vScreen_t& vscreena = screen.vScreen(A);
+                    Player_t& p = Player[screen.players[A - 1]];
 
                     vscreena.TempDelay = 200;
                     vscreena.tempX = 0;
-                    vscreena.TempY = -t + FieldH * 0.5 - Player[A].Location.Y - vScreenYOffset - Player[A].Location.Height;
+                    vscreena.TempY = -vscreen1.Y + screen.H * 0.5 - p.Location.Y - vScreenYOffset - p.Location.Height;
                 }
-
-                if(screen.DType != 1)
-                    PlaySound(SFX_Camera);
-                screen.DType = 1;
                 vscreen2.Visible = true;
+                screen.DType = 1;
             }
-            else if(level[Player[1].Section].Width - level[Player[1].Section].X > FieldW && (((!vscreen2.Visible && Player[1].Location.X + vscreen1.X >= FieldW * 0.75 - Player[1].Location.Width / 2.0) || (vscreen2.Visible && Player[1].Location.X + vscreen2.X >= FieldW * 0.75 - Player[1].Location.Width / 2.0)) && (Player[2].Location.X < level[Player[1].Section].Width - FieldW * 0.75 - Player[2].Location.Width / 2.0)))
+            else if(level[p1.Section].Width - level[p1.Section].X > screen.W && (((!vscreen2.Visible && p1.Location.X + vscreen1.X >= screen.W * 0.75 - p1.Location.Width / 2.0) || (vscreen2.Visible && p1.Location.X + vscreen2.X >= screen.W * 0.75 - p1.Location.Width / 2.0)) && (p2.Location.X < level[p1.Section].Width - screen.W * 0.75 - p2.Location.Width / 2.0)))
             {
                 vscreen1.Height = screen.H;
                 vscreen1.Width = screen.W / 2;
@@ -236,33 +283,22 @@ void DynamicScreen(Screen_t& screen)
                 vscreen2.Width = screen.W / 2;
                 vscreen2.Left = 0;
                 vscreen2.Top = 0;
-
-                double l, t;
-                if(g_compatibility.free_level_res)
-                {
-                    GetvScreenAverage2(vscreen1);
-                    t = vscreen1.Y;
-                }
-                else
-                {
-                    GetvScreenAverage2Canonical(&l, &t, true);
-                }
-
+                GetvScreenAverage2(vscreen1);
+                if(screen.DType != 2 && !mute)
+                    PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
                     vScreen_t& vscreena = screen.vScreen(A);
+                    Player_t& p = Player[screen.players[A - 1]];
 
                     vscreena.TempDelay = 200;
                     vscreena.tempX = 0;
-                    vscreena.TempY = -t + FieldH * 0.5 - Player[A].Location.Y - vScreenYOffset - Player[A].Location.Height;
+                    vscreena.TempY = -vscreen1.Y + screen.H * 0.5 - p.Location.Y - vScreenYOffset - p.Location.Height;
                 }
-
-                if(screen.DType != 2)
-                    PlaySound(SFX_Camera);
                 screen.DType = 2;
                 vscreen2.Visible = true;
             }
-            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > FieldH && ((!vscreen2.Visible && Player[1].Location.Y + vscreen1.Y >= FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height) || (vscreen2.Visible && Player[1].Location.Y + vscreen2.Y >= FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height)) && (Player[2].Location.Y < level[Player[1].Section].Height - FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height))
+            else if(level[p1.Section].Height - level[p1.Section].Y > screen.H && ((!vscreen2.Visible && p1.Location.Y + vscreen1.Y >= screen.H * 0.75 - vScreenYOffset - p1.Location.Height) || (vscreen2.Visible && p1.Location.Y + vscreen2.Y >= screen.H * 0.75 - vScreenYOffset - p1.Location.Height)) && (p2.Location.Y < level[p1.Section].Height - screen.H * 0.75 - vScreenYOffset - p2.Location.Height))
             {
                 vscreen1.Height = screen.H / 2;
                 vscreen1.Width = screen.W;
@@ -272,33 +308,22 @@ void DynamicScreen(Screen_t& screen)
                 vscreen2.Width = screen.W;
                 vscreen2.Left = 0;
                 vscreen2.Top = 0;
-
-                double l, t;
-                if(g_compatibility.free_level_res)
-                {
-                    GetvScreenAverage2(vscreen1);
-                    l = vscreen1.X;
-                }
-                else
-                {
-                    GetvScreenAverage2Canonical(&l, &t, true);
-                }
-
+                GetvScreenAverage2(vscreen1);
+                if(screen.DType != 3 && !mute)
+                    PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
                     vScreen_t& vscreena = screen.vScreen(A);
+                    Player_t& p = Player[screen.players[A - 1]];
 
                     vscreena.TempDelay = 200;
                     vscreena.TempY = 0;
-                    vscreena.tempX = -l + FieldW * 0.5 - Player[A].Location.X - Player[A].Location.Width * 0.5;
+                    vscreena.tempX = -vscreen1.X + screen.W * 0.5 - p.Location.X - p.Location.Width * 0.5;
                 }
-
-                if(screen.DType != 3)
-                    PlaySound(SFX_Camera);
-                screen.DType = 3;
                 vscreen2.Visible = true;
+                screen.DType = 3;
             }
-            else if(level[Player[1].Section].Height - level[Player[1].Section].Y > FieldH && ((!vscreen2.Visible && Player[2].Location.Y + vscreen1.Y >= FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height) || (vscreen2.Visible && Player[2].Location.Y + vscreen1.Y >= FieldH * 0.75 - vScreenYOffset - Player[2].Location.Height)) && (Player[1].Location.Y < level[Player[1].Section].Height - FieldH * 0.75 - vScreenYOffset - Player[1].Location.Height))
+            else if(level[p1.Section].Height - level[p1.Section].Y > screen.H && ((!vscreen2.Visible && p2.Location.Y + vscreen1.Y >= screen.H * 0.75 - vScreenYOffset - p2.Location.Height) || (vscreen2.Visible && p2.Location.Y + vscreen1.Y >= screen.H * 0.75 - vScreenYOffset - p2.Location.Height)) && (p1.Location.Y < level[p1.Section].Height - screen.H * 0.75 - vScreenYOffset - p1.Location.Height))
             {
                 vscreen1.Height = screen.H / 2;
                 vscreen1.Width = screen.W;
@@ -308,37 +333,26 @@ void DynamicScreen(Screen_t& screen)
                 vscreen2.Width = screen.W;
                 vscreen2.Left = 0;
                 vscreen2.Top = screen.H / 2.0;
-
-                double l, t;
-                if(g_compatibility.free_level_res)
-                {
-                    GetvScreenAverage2(vscreen1);
-                    l = vscreen1.X;
-                }
-                else
-                {
-                    GetvScreenAverage2Canonical(&l, &t, true);
-                }
-
+                GetvScreenAverage2(vscreen1);
+                if(screen.DType != 4 && !mute)
+                    PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
                     vScreen_t& vscreena = screen.vScreen(A);
+                    Player_t& p = Player[screen.players[A - 1]];
 
                     vscreena.TempDelay = 200;
                     vscreena.TempY = 0;
-                    vscreena.tempX = -l + FieldW * 0.5 - Player[A].Location.X - Player[A].Location.Width * 0.5;
+                    vscreena.tempX = -vscreen1.X + screen.W * 0.5 - p.Location.X - p.Location.Width * 0.5;
                 }
-
-                screen.DType = 4;
-                if(screen.DType != 4)
-                    PlaySound(SFX_Camera);
                 vscreen2.Visible = true;
+                screen.DType = 4;
             }
             else
             {
                 if(vscreen2.Visible)
                 {
-                    if(screen.DType != 5)
+                    if(screen.DType != 5 && !mute)
                         PlaySound(SFX_Camera);
                     vscreen2.Visible = false;
                     vscreen1.Height = screen.H;
@@ -364,15 +378,6 @@ void DynamicScreen(Screen_t& screen)
                     vscreena.tempX = (vscreena.Width * 0.25);
                 if(vscreena.tempX < -(vscreena.Width * 0.25))
                     vscreena.tempX = -(vscreena.Width * 0.25);
-
-                if(vscreena.TempY > (FieldH * 0.25))
-                    vscreena.TempY = (FieldH * 0.25);
-                if(vscreena.TempY < -(FieldH * 0.25))
-                    vscreena.TempY = -(FieldH * 0.25);
-                if(vscreena.tempX > (FieldW * 0.25))
-                    vscreena.tempX = (FieldW * 0.25);
-                if(vscreena.tempX < -(FieldW * 0.25))
-                    vscreena.tempX = -(FieldW * 0.25);
             }
         }
         else
@@ -390,7 +395,7 @@ void DynamicScreen(Screen_t& screen)
             vscreen2.tempX = 0;
             vscreen2.TempY = 0;
             GetvScreenAverage2(vscreen1);
-            if(screen.DType != 6)
+            if(screen.DType != 6 && !mute)
                 PlaySound(SFX_Camera);
             screen.DType = 6;
             vscreen2.Visible = true;
@@ -423,130 +428,79 @@ void DynamicScreen(Screen_t& screen)
 // NEW: limit vScreens to playable section area and center them on the real screen
 void CenterScreens(Screen_t& screen)
 {
-    vScreen_t& vscreen1 = screen.vScreen(1);
-    vScreen_t& vscreen2 = screen.vScreen(2);
-
-    vscreen1.ScreenLeft = vscreen1.Left;
-    vscreen2.ScreenLeft = vscreen2.Left;
-    vscreen1.ScreenTop = vscreen1.Top;
-    vscreen2.ScreenTop = vscreen2.Top;
-
-    if(GameOutro || LevelEditor || WorldEditor)
-        return;
-
-    // restrict the vScreen to the level if the level is smaller than the screen
-    double MaxWidth1, MaxWidth2, MaxHeight1, MaxHeight2;
-
-    // set based on level bounds
-    if(GameMenu || !LevelSelect)
+    // keep canonical screen in sync
+    if(!screen.is_canonical())
     {
-        MaxWidth1 = level[Player[1].Section].Width - level[Player[1].Section].X;
-        MaxWidth2 = level[Player[2].Section].Width - level[Player[2].Section].X;
-        MaxHeight1 = level[Player[1].Section].Height - level[Player[1].Section].Y;
-        MaxHeight2 = level[Player[2].Section].Height - level[Player[2].Section].Y;
+        Screen_t& c_screen = screen.canonical_screen();
 
-        // set to canonical width if NoTurnBack is enabled
-        if(NoTurnBack[Player[1].Section])
-            MaxWidth1 = 800;
-        if(NoTurnBack[Player[2].Section])
-            MaxWidth2 = 800;
-    }
-    else if(!g_compatibility.free_world_res || !g_config.world_map_expand_view)
-    {
-        MaxWidth1 = MaxWidth2 = 800;
-        MaxHeight1 = MaxHeight2 = 600;
-    }
-    else
-    {
-        return;
-    }
+        // still needed in case of small sections
+        CenterScreens(c_screen);
 
-    if(!LevelSelect && !g_compatibility.free_level_res)
-    {
-        double CanonicalW = 800;
-        double CanonicalH = 600;
-
-        if(vscreen2.Visible)
+        // if needed, defer to canonical screen logic
+        if(!g_compatibility.free_level_res)
         {
-            if(DScreenType == 3 || DScreenType == 4 || DScreenType == 6)
-                CanonicalH /= 2;
-            else
-                CanonicalW /= 2;
-        }
+            s_CopyScreen(screen, c_screen);
 
-        if(MaxWidth1 > CanonicalW)
-            MaxWidth1 = CanonicalW;
-        if(MaxWidth2 > CanonicalW)
-            MaxWidth2 = CanonicalW;
+            // center c_screen on screen
+            int offX = (screen.W - c_screen.W) / 2;
+            int offY = (screen.H - c_screen.H) / 2;
 
-        if(MaxHeight1 > CanonicalH)
-            MaxHeight1 = CanonicalH;
-        if(MaxHeight2 > CanonicalH)
-            MaxHeight2 = CanonicalH;
-    }
-
-    if(MaxWidth1 < vscreen1.Width)
-    {
-        if(vscreen2.Visible && !(DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
-        {
-            if(vscreen1.ScreenLeft == 0)
+            for(int v = 1; v <= maxLocalPlayers; v++)
             {
-                vscreen1.ScreenLeft += (vscreen1.Width - MaxWidth1);
-                vscreen2.Left -= (vscreen1.Width - MaxWidth1);
+                screen.vScreen(v).ScreenLeft += offX;
+                screen.vScreen(v).ScreenTop  += offY;
             }
-        }
-        else
-            vscreen1.ScreenLeft += (vscreen1.Width - MaxWidth1) / 2;
 
-        vscreen1.Width = MaxWidth1;
+            return;
+        }
     }
 
-    if(MaxWidth2 < vscreen2.Width)
+    for(int v = 1; v <= maxLocalPlayers; v++)
     {
-        if(vscreen2.Visible && !(DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
+        vScreen_t& vscreen = screen.vScreen(v);
+        const Player_t& p = Player[screen.players[v - 1]];
+        const Location_t& section = level[p.Section];
+
+        vscreen.ScreenLeft = vscreen.Left;
+        vscreen.ScreenTop  = vscreen.Top;
+
+        bool in_map = (LevelSelect && !GameMenu);
+
+        // skip centering in all these places (world map sections handled elsewhere)
+        if(GameOutro || LevelEditor || WorldEditor || in_map)
+            continue;
+
+        // restrict the vScreen to the level if the level is smaller than the screen
+        double MaxWidth = section.Width - section.X;
+        double MaxHeight = section.Height - section.Y;
+
+        if(MaxWidth < vscreen.Width)
         {
-            if(vscreen2.ScreenLeft == 0)
-            {
-                vscreen2.ScreenLeft += (vscreen2.Width - MaxWidth2);
-                vscreen1.Left -= (vscreen2.Width - MaxWidth2);
-            }
+            int left_from_center = vscreen.ScreenLeft - (screen.W / 2);
+            int right_from_center = (screen.W / 2) - (vscreen.ScreenLeft + vscreen.Width);
+            int total_from_center = (left_from_center + right_from_center);
+            int size_diff = vscreen.Width - MaxWidth;
+
+            // Move towards center of screen. If left is on center, don't need to move left side of screen.
+            // If right is on center, need to fully move left so right can stay. Yields following formula:
+            vscreen.ScreenLeft += size_diff * left_from_center / total_from_center;
+
+            vscreen.Width = MaxWidth;
         }
-        else
-            vscreen2.ScreenLeft += (vscreen2.Width - MaxWidth2) / 2;
 
-        vscreen2.Width = MaxWidth2;
-    }
-
-    if(MaxHeight1 < vscreen1.Height)
-    {
-        if(vscreen2.Visible && (DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
+        if(MaxHeight < vscreen.Height)
         {
-            if(vscreen1.ScreenTop == 0)
-            {
-                vscreen1.ScreenTop += (vscreen1.Height - MaxHeight1);
-                vscreen2.Top -= (vscreen1.Height - MaxHeight1);
-            }
+            int top_from_center = vscreen.ScreenTop - (screen.H / 2);
+            int bottom_from_center = (screen.H / 2) - (vscreen.ScreenTop + vscreen.Height);
+            int total_from_center = (top_from_center + bottom_from_center);
+            int size_diff = vscreen.Height - MaxHeight;
+
+            // Move towards center of screen. If top is on center, don't need to move top side of screen.
+            // If bottom is on center, need to fully move top so bottom can stay. Yields following formula:
+            vscreen.ScreenTop += size_diff * top_from_center / total_from_center;
+
+            vscreen.Height = MaxHeight;
         }
-        else
-            vscreen1.ScreenTop += (vscreen1.Height - MaxHeight1) / 2;
-
-        vscreen1.Height = MaxHeight1;
-    }
-
-    if(MaxHeight2 < vscreen2.Height)
-    {
-        if(vscreen2.Visible && (DScreenType == 3 || DScreenType == 4 || DScreenType == 6))
-        {
-            if(vscreen2.ScreenTop == 0)
-            {
-                vscreen2.ScreenTop += (vscreen2.Height - MaxHeight2);
-                vscreen1.Top -= (vscreen2.Height - MaxHeight2);
-            }
-        }
-        else
-            vscreen2.ScreenTop += (vscreen2.Height - MaxHeight2) / 2;
-
-        vscreen2.Height = MaxHeight2;
     }
 }
 
