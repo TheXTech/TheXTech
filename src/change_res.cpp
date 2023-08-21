@@ -238,8 +238,16 @@ void UpdateWindowRes()
     if(XWindow::isFullScreen() || XWindow::isMaximized())
         return;
 
-    int w = ScreenW;
-    int h = ScreenH;
+    int h = g_config.InternalH;
+    if(h == 0)
+        return;
+
+    int w = g_config.InternalW;
+
+    if(w == 0 && h == ScreenH)
+        w = ScreenW;
+    else if(w == 0)
+        return;
 
     if(g_videoSettings.scaleMode == SCALE_FIXED_05X)
         XWindow::setWindowSize(w / 2, h / 2);
