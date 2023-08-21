@@ -157,7 +157,7 @@ endif()
 option(THEXTECH_BUILD_GL_DESKTOP_MODERN "On SDL builds, include the OpenGL 2.0+ Core/Compatibility renderer" ON)
 option(THEXTECH_BUILD_GL_ES_MODERN "On SDL builds, include the OpenGL ES 2.0+ renderer" ON)
 option(THEXTECH_BUILD_GL_DESKTOP_LEGACY "On SDL builds, include the OpenGL 1.1+ renderer" ON)
-option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" ON)
+option(THEXTECH_BUILD_GL_ES_LEGACY "On SDL builds, include the OpenGL ES 1.1 renderer" OFF)
 
 option(RANGE_ARR_USE_HEAP "Store data of RangeArr<> template in a heap" OFF)
 option(RANGE_ARR_UNSAFE_MODE "Disable all range checks at RangeArr<> template" OFF)
