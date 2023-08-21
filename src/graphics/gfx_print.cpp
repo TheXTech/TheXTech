@@ -192,10 +192,12 @@ void SuperPrint(int SuperN, const char* SuperChars, int Font, float X, float Y,
 
     if(outline)
     {
-        SuperPrint(SuperN, SuperChars, Font, X - 2, Y, 0, 0, 0, a);
-        SuperPrint(SuperN, SuperChars, Font, X + 2, Y, 0, 0, 0, a);
-        SuperPrint(SuperN, SuperChars, Font, X, Y - 2, 0, 0, 0, a);
-        SuperPrint(SuperN, SuperChars, Font, X, Y + 2, 0, 0, 0, a);
+        // take square of a to match blend of normal text
+        float outline_a = a * a;
+        SuperPrint(SuperN, SuperChars, Font, X - 2, Y, 0, 0, 0, outline_a);
+        SuperPrint(SuperN, SuperChars, Font, X + 2, Y, 0, 0, 0, outline_a);
+        SuperPrint(SuperN, SuperChars, Font, X, Y - 2, 0, 0, 0, outline_a);
+        SuperPrint(SuperN, SuperChars, Font, X, Y + 2, 0, 0, 0, outline_a);
     }
 
 //    int A = 0;
