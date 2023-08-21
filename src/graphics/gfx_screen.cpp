@@ -30,120 +30,129 @@
 #include "config.h"
 #include "core/render.h"
 
-void SetScreenType()
+void SetScreenType(Screen_t& screen)
 {
-    // moved this code from game_main.cpp, but it occurs elsewhere also
+    // moved this code from game_main.cpp, but it occured elsewhere also
+    //   it was always called before setup screens, now it is a part of setup screens.
     //   better to have it in one place so it can be updated
     if(numPlayers == 1)
-        ScreenType = 0; // Follow 1 player
+        screen.Type = 0; // Follow 1 player
     else if(numPlayers == 2)
-        ScreenType = 5; // Dynamic screen
+        screen.Type = 5; // Dynamic screen
     else
     {
-        // ScreenType = 3 'Average, no one leaves the screen
-        ScreenType = 2; // Average
+        // screen.Type = 3 'Average, no one leaves the screen
+        screen.Type = 2; // Average
     }
 
     // special cases
     if(SingleCoop > 0)
-        ScreenType = 6;
+        screen.Type = 6;
     if(GameMenu)
-        ScreenType = 2;
+        screen.Type = 2;
     if(GameOutro)
-        ScreenType = 7;
+        screen.Type = 7;
     if(LevelEditor)
-        ScreenType = 0;
+        screen.Type = 0;
 }
 
 // Sets up the split lines
-void SetupScreens(bool reset)
+void SetupScreens(Screen_t& screen, bool reset)
 {
-    SetScreenType();
+    SetScreenType(screen);
 
-    vScreen[1].player = 1;
-    vScreen[2].player = 2;
+    vScreen_t& vscreen1 = screen.vScreen(1);
+    vScreen_t& vscreen2 = screen.vScreen(2);
+
+    vscreen1.player = screen.players[0];
+    vscreen2.player = screen.players[1];
 
     switch(ScreenType)
     {
     case 0: // Follows Player 1
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Visible = false;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Visible = false;
         break;
     case 1: // Split Screen vertical
-        vScreen[1].Height = ScreenH / 2;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Height = ScreenH / 2;
-        vScreen[2].Width = ScreenW;
-        vScreen[2].Left = 0;
-        vScreen[2].Top = ScreenH / 2;
+        vscreen1.Height = screen.H / 2;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Height = screen.H / 2;
+        vscreen2.Width = screen.W;
+        vscreen2.Left = 0;
+        vscreen2.Top = screen.H / 2;
         break;
     case 2: // Follows all players
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Visible = false;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Visible = false;
         break;
     case 3: // Follows all players. Noone leaves the screen
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Visible = false;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Visible = false;
         break;
     case 4: // Split Screen horizontal
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW / 2;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Height = ScreenH;
-        vScreen[2].Width = ScreenW / 2;
-        vScreen[2].Left = ScreenW / 2;
-        vScreen[2].Top = 0;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W / 2;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Height = screen.H;
+        vscreen2.Width = screen.W / 2;
+        vscreen2.Left = screen.W / 2;
+        vscreen2.Top = 0;
         break;
     case 5: // Dynamic screen detection
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
 
         if(reset)
-            vScreen[2].Visible = false;
+            vscreen2.Visible = false;
         break;
     case 6: // VScreen Coop
-        vScreen[1].Height = ScreenH;
-        vScreen[1].Width = ScreenW;
-        vScreen[1].Left = 0;
-        vScreen[1].Top = 0;
-        vScreen[2].Height = ScreenH;
-        vScreen[2].Width = ScreenW;
-        vScreen[2].Left = 0;
-        vScreen[2].Top = 0;
+        vscreen1.Height = screen.H;
+        vscreen1.Width = screen.W;
+        vscreen1.Left = 0;
+        vscreen1.Top = 0;
+        vscreen2.Height = screen.H;
+        vscreen2.Width = screen.W;
+        vscreen2.Left = 0;
+        vscreen2.Top = 0;
         break;
-    case 7:
+    case 7: // Credits
     case 8: // netplay
-        vScreen[1].Left = 0;
-        vScreen[1].Width = 800;
-        vScreen[1].Top = 0;
-        vScreen[1].Height = 600;
-        vScreen[2].Visible = false;
+        vscreen1.Left = 0;
+        vscreen1.Height = screen.H;
+        vscreen1.Top = 0;
+        vscreen1.Width = screen.W;
+        vscreen2.Visible = false;
         break;
 #if 0 // Merged with the branch above because they both are same
     case 8: // netplay
-        vScreen[1].Left = 0;
-        vScreen[1].Width = 800;
-        vScreen[1].Top = 0;
-        vScreen[1].Height = 600;
-        vScreen[2].Visible = false;
+        vscreen1.Left = 0;
+        vscreen1.Width = 800;
+        vscreen1.Top = 0;
+        vscreen1.Height = 600;
+        vscreen2.Visible = false;
         break;
 #endif
 //    End If
     }
+}
+
+void SetupScreens(bool reset)
+{
+    SetupScreens(Screens[0], reset);
 }
 
 void DynamicScreen(Screen_t& screen, bool mute)
