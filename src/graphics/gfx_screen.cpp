@@ -146,7 +146,7 @@ void SetupScreens(bool reset)
     }
 }
 
-void DynamicScreen(Screen_t& screen)
+void DynamicScreen(Screen_t& screen, bool mute)
 {
     int A = 0;
 
@@ -167,8 +167,8 @@ void DynamicScreen(Screen_t& screen)
             Player[A].Location.Height = 0;
     }
 
-    Player_t& p1 = Player[1];
-    Player_t& p2 = Player[2];
+    Player_t& p1 = Player[screen.players[0]];
+    Player_t& p2 = Player[screen.players[1]];
 
     if(CheckDead() == 0)
     {
@@ -185,13 +185,16 @@ void DynamicScreen(Screen_t& screen)
                 vscreen1.Left = 0;
                 vscreen1.Top = 0;
                 GetvScreenAverage2(vscreen1);
-                if(screen.DType != 1)
+                if(screen.DType != 1 && !mute)
                     PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
-                    vScreen[A].TempDelay = 200;
-                    vScreen[A].tempX = 0;
-                    vScreen[A].TempY = -vscreen1.Y + screen.H * 0.5 - Player[A].Location.Y - vScreenYOffset - Player[A].Location.Height;
+                    vScreen_t& vscreena = screen.vScreen(A);
+                    Player_t& p = Player[screen.players[A - 1]];
+
+                    vscreena.TempDelay = 200;
+                    vscreena.tempX = 0;
+                    vscreena.TempY = -vscreen1.Y + screen.H * 0.5 - p.Location.Y - vScreenYOffset - p.Location.Height;
                 }
                 vscreen2.Visible = true;
                 screen.DType = 1;
@@ -207,13 +210,16 @@ void DynamicScreen(Screen_t& screen)
                 vscreen2.Left = 0;
                 vscreen2.Top = 0;
                 GetvScreenAverage2(vscreen1);
-                if(screen.DType != 2)
+                if(screen.DType != 2 && !mute)
                     PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
-                    vScreen[A].TempDelay = 200;
-                    vScreen[A].tempX = 0;
-                    vScreen[A].TempY = -vscreen1.Y + screen.H * 0.5 - Player[A].Location.Y - vScreenYOffset - Player[A].Location.Height;
+                    vScreen_t& vscreena = screen.vScreen(A);
+                    Player_t& p = Player[screen.players[A - 1]];
+
+                    vscreena.TempDelay = 200;
+                    vscreena.tempX = 0;
+                    vscreena.TempY = -vscreen1.Y + screen.H * 0.5 - p.Location.Y - vScreenYOffset - p.Location.Height;
                 }
                 screen.DType = 2;
                 vscreen2.Visible = true;
@@ -229,13 +235,16 @@ void DynamicScreen(Screen_t& screen)
                 vscreen2.Left = 0;
                 vscreen2.Top = 0;
                 GetvScreenAverage2(vscreen1);
-                if(screen.DType != 3)
+                if(screen.DType != 3 && !mute)
                     PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
-                    vScreen[A].TempDelay = 200;
-                    vScreen[A].TempY = 0;
-                    vScreen[A].tempX = -vscreen1.X + screen.W * 0.5 - Player[A].Location.X - Player[A].Location.Width * 0.5;
+                    vScreen_t& vscreena = screen.vScreen(A);
+                    Player_t& p = Player[screen.players[A - 1]];
+
+                    vscreena.TempDelay = 200;
+                    vscreena.TempY = 0;
+                    vscreena.tempX = -vscreen1.X + screen.W * 0.5 - p.Location.X - p.Location.Width * 0.5;
                 }
                 vscreen2.Visible = true;
                 screen.DType = 3;
@@ -251,13 +260,16 @@ void DynamicScreen(Screen_t& screen)
                 vscreen2.Left = 0;
                 vscreen2.Top = screen.H / 2.0;
                 GetvScreenAverage2(vscreen1);
-                if(screen.DType != 4)
+                if(screen.DType != 4 && !mute)
                     PlaySound(SFX_Camera);
                 for(A = 1; A <= 2; A++)
                 {
-                    vScreen[A].TempDelay = 200;
-                    vScreen[A].TempY = 0;
-                    vScreen[A].tempX = -vscreen1.X + screen.W * 0.5 - Player[A].Location.X - Player[A].Location.Width * 0.5;
+                    vScreen_t& vscreena = screen.vScreen(A);
+                    Player_t& p = Player[screen.players[A - 1]];
+
+                    vscreena.TempDelay = 200;
+                    vscreena.TempY = 0;
+                    vscreena.tempX = -vscreen1.X + screen.W * 0.5 - p.Location.X - p.Location.Width * 0.5;
                 }
                 vscreen2.Visible = true;
                 screen.DType = 4;
@@ -266,7 +278,7 @@ void DynamicScreen(Screen_t& screen)
             {
                 if(vscreen2.Visible)
                 {
-                    if(screen.DType != 5)
+                    if(screen.DType != 5 && !mute)
                         PlaySound(SFX_Camera);
                     vscreen2.Visible = false;
                     vscreen1.Height = screen.H;
@@ -282,14 +294,16 @@ void DynamicScreen(Screen_t& screen)
             }
             for(A = 1; A <= 2; A++)
             {
-                if(vScreen[A].TempY > (vScreen[A].Height * 0.25))
-                    vScreen[A].TempY = (vScreen[A].Height * 0.25);
-                if(vScreen[A].TempY < -(vScreen[A].Height * 0.25))
-                    vScreen[A].TempY = -(vScreen[A].Height * 0.25);
-                if(vScreen[A].tempX > (vScreen[A].Width * 0.25))
-                    vScreen[A].tempX = (vScreen[A].Width * 0.25);
-                if(vScreen[A].tempX < -(vScreen[A].Width * 0.25))
-                    vScreen[A].tempX = -(vScreen[A].Width * 0.25);
+                vScreen_t& vscreena = screen.vScreen(A);
+
+                if(vscreena.TempY > (vscreena.Height * 0.25))
+                    vscreena.TempY = (vscreena.Height * 0.25);
+                if(vscreena.TempY < -(vscreena.Height * 0.25))
+                    vscreena.TempY = -(vscreena.Height * 0.25);
+                if(vscreena.tempX > (vscreena.Width * 0.25))
+                    vscreena.tempX = (vscreena.Width * 0.25);
+                if(vscreena.tempX < -(vscreena.Width * 0.25))
+                    vscreena.tempX = -(vscreena.Width * 0.25);
             }
         }
         else
@@ -307,7 +321,7 @@ void DynamicScreen(Screen_t& screen)
             vscreen2.tempX = 0;
             vscreen2.TempY = 0;
             GetvScreenAverage2(vscreen1);
-            if(screen.DType != 6)
+            if(screen.DType != 6 && !mute)
                 PlaySound(SFX_Camera);
             screen.DType = 6;
             vscreen2.Visible = true;

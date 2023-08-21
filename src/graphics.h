@@ -63,7 +63,7 @@ void SetupEditorGraphics();
 void SetupScreens(bool reset = true);
 // Public Sub DynamicScreen() 'for the split screen stuff
 // for the split screen stuff
-void DynamicScreen(Screen_t& screen);
+void DynamicScreen(Screen_t& screen, bool mute = false);
 
 // NEW: moves qScreen towards vScreen, now including the screen size
 bool Update_qScreen(int Z, int camRate = 2, int resizeRate = 2);
