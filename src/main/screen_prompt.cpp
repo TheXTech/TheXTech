@@ -159,7 +159,9 @@ void Render()
         QuickReconnectScreen::Render();
 
     speedRun_renderControls(1, -1);
-    speedRun_renderControls(2, -1);
+
+    if(numPlayers > 1)
+        speedRun_renderControls(2, -1);
 
     // draw screen fader and repaint
 
