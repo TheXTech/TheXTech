@@ -403,7 +403,7 @@ void RenderSDL::setTargetScreen()
     m_recentTarget = nullptr;
 }
 
-void RenderSDL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+void RenderSDL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
 {
     SDL_Surface *surface;
     SDL_Texture *texture = nullptr;

@@ -398,6 +398,39 @@ void AbstractRender_t::setTransparentColor(StdPicture& target, uint32_t rgb)
     target.l.keyRgb[2] = (rgb >> 16) & 0xFF;
 }
 
+void AbstractRender_t::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+{
+    // validate for depth test before loading
+    if(depthTestSupported())
+    {
+        // check whether there are any transparent pixels
+        for(uint32_t y = 0; y < height; ++y)
+        {
+            for(uint32_t x = 0; x < width; ++x)
+            {
+                uint8_t *alpha = RGBApixels + (y * pitch) + (x * 4) + 3;
+
+                // vanilla game used 5 bits per channel, so we set the alpha test as >= 0x08
+                if(*alpha < 0x08 || *alpha >= 0xf8)
+                    continue;
+
+                pLogDebug("Externally loaded texture CANNOT use depth test");
+
+                target.d.invalidateDepthTest();
+
+                y = height - 1;
+                break;
+            }
+        }
+    }
+    else
+    {
+        target.d.invalidateDepthTest();
+    }
+
+    loadTextureInternal(target, width, height, RGBApixels, pitch);
+}
+
 void AbstractRender_t::lazyLoad(StdPicture &target)
 {
     if(!target.inited || !target.l.lazyLoaded || target.d.hasTexture())
@@ -546,7 +579,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
 
     uint8_t *textura = reinterpret_cast<uint8_t *>(FreeImage_GetBits(sourceImage));
 
-    g_render->loadTexture(target, w, h, textura, pitch);
+    g_render->loadTextureInternal(target, w, h, textura, pitch);
 
     GraphicsHelps::closeImage(sourceImage);
 

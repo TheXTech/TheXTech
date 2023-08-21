@@ -198,13 +198,22 @@ public:
 
     static void setTransparentColor(StdPicture &target, uint32_t rgb);
 
-    virtual void loadTexture(StdPicture &target,
+    void loadTexture(StdPicture &target,
+                             uint32_t width,
+                             uint32_t height,
+                             uint8_t *RGBApixels,
+                             uint32_t pitch);
+
+    virtual void unloadTexture(StdPicture &tx) = 0;
+
+    // internal texture load helper functions
+protected:
+    // skips depth test validation
+    virtual void loadTextureInternal(StdPicture &target,
                              uint32_t width,
                              uint32_t height,
                              uint8_t *RGBApixels,
                              uint32_t pitch) = 0;
-
-    virtual void unloadTexture(StdPicture &tx) = 0;
 
     virtual void loadTextureMask(StdPicture &target,
                              uint32_t mask_width,
@@ -214,6 +223,7 @@ public:
                              uint32_t image_width,
                              uint32_t image_height);
 
+public:
     virtual bool textureMaskSupported();
 
     virtual bool userShadersSupported();

@@ -700,7 +700,7 @@ static int s_nextPowerOfTwo(int val)
     return power;
 }
 
-void RenderGL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch, bool is_mask, uint32_t least_width, uint32_t least_height)
+void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch, bool is_mask, uint32_t least_width, uint32_t least_height)
 {
     // clear pre-existing errors
     GLuint err;
@@ -845,14 +845,14 @@ void RenderGL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, 
 #endif
 }
 
-void RenderGL::loadTexture(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
+void RenderGL::loadTextureInternal(StdPicture &target, uint32_t width, uint32_t height, uint8_t *RGBApixels, uint32_t pitch)
 {
-    loadTexture(target, width, height, RGBApixels, pitch, false, width, height);
+    loadTextureInternal(target, width, height, RGBApixels, pitch, false, width, height);
 }
 
 void RenderGL::loadTextureMask(StdPicture &target, uint32_t mask_width, uint32_t mask_height, uint8_t *RGBApixels, uint32_t pitch, uint32_t image_width, uint32_t image_height)
 {
-    loadTexture(target, mask_width, mask_height, RGBApixels, pitch, true, image_width, image_height);
+    loadTextureInternal(target, mask_width, mask_height, RGBApixels, pitch, true, image_width, image_height);
 }
 
 void RenderGL::compileShaders(StdPicture &target)

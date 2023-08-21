@@ -786,7 +786,7 @@ bool GraphicsHelps::validateForDepthTest(FIBITMAP *image, const std::string &ori
         {
             BYTE *alpha = img_bits + (y * pitch) + (x * 4) + 3;
 
-            // vanilla game used 5 bits per channel
+            // vanilla game used 5 bits per channel, so we set the alpha test as >= 0x08
             if(*alpha < 0x08 || *alpha >= 0xf8)
                 continue;
 
