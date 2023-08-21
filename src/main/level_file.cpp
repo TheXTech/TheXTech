@@ -54,9 +54,15 @@
 #include <PGE_File_Formats/file_formats.h>
 
 #include "global_dirs.h"
+#include "screen_fader.h"
 
 #include "editor/editor_custom.h"
 #include "editor/editor_strings.h"
+
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+#    include "core/opengl/gl_program_bank.h"
+#endif
 
 
 void bgoApplyZMode(Background_t *bgo, int smbx64sp)
@@ -980,6 +986,12 @@ void ClearLevel()
 
 #ifdef __16M__
     XRender::clearAllTextures();
+#endif
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+    SectionEffect.fill(LoadedGLProgramRef_t());
+    SectionParticlesBG.fill(LoadedGLProgramRef_t());
+    SectionParticlesFG.fill(LoadedGLProgramRef_t());
 #endif
 
     UnloadCustomGFX();

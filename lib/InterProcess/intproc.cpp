@@ -22,25 +22,25 @@
 #include "../Logger/logger.h"
 
 EditorPipe              *IntProc::editor = nullptr;
-static bool             ipc_enabled = false;
-static SDL_atomic_t     has_command;
+static bool             s_ipc_enabled = false;
+static SDL_atomic_t     s_has_command;
 
-static std::string      state;
-static std::mutex       state_lock;
+static std::string      s_state;
+static std::mutex       s_state_lock;
 
-static IntProc::ExternalCommands        cmd_recentType = IntProc::MsgBox;
+static IntProc::ExternalCommands        s_cmd_recentType = IntProc::MsgBox;
 
-static std::deque<IntProc::cmdEntry>    cmd_queue;
-static std::mutex                       cmd_mutex;
+static std::deque<IntProc::cmdEntry>    s_cmd_queue;
+static std::mutex                       s_cmd_mutex;
 
 void IntProc::init()
 {
-    SDL_AtomicSet(&has_command, 0);
+    SDL_AtomicSet(&s_has_command, 0);
     pLogDebug("IntProc constructing...");
     editor = new EditorPipe();
     editor->m_isWorking = true;
     pLogDebug("IntProc started!");
-    ipc_enabled = true;
+    s_ipc_enabled = true;
 }
 
 void IntProc::quit()
@@ -53,12 +53,12 @@ void IntProc::quit()
     }
 
     editor  = nullptr;
-    ipc_enabled = false;
+    s_ipc_enabled = false;
 }
 
 bool IntProc::isEnabled()
 {
-    return ipc_enabled;
+    return s_ipc_enabled;
 }
 
 bool IntProc::isWorking()
@@ -68,22 +68,22 @@ bool IntProc::isWorking()
 
 std::string IntProc::getState()
 {
-    state_lock.lock();
-    std::string tmp = state;
-    state_lock.unlock();
+    s_state_lock.lock();
+    std::string tmp = s_state;
+    s_state_lock.unlock();
     return tmp;
 }
 
 void IntProc::setState(const std::string &instate)
 {
-    state_lock.lock();
-    state = instate;
-    state_lock.unlock();
+    s_state_lock.lock();
+    s_state = instate;
+    s_state_lock.unlock();
 }
 
 void IntProc::storeCommand(const char *cmd, size_t length, IntProc::ExternalCommands type)
 {
-    cmd_mutex.lock();
+    s_cmd_mutex.lock();
     std::string in;
     in.reserve(length);
     bool escape = false;
@@ -108,40 +108,40 @@ void IntProc::storeCommand(const char *cmd, size_t length, IntProc::ExternalComm
             in.push_back(c);
     }
 
-    cmd_queue.push_back({in, type});
-    cmd_recentType = type;
-    SDL_AtomicSet(&has_command, 1);
-    cmd_mutex.unlock();
+    s_cmd_queue.push_back({in, type});
+    s_cmd_recentType = type;
+    SDL_AtomicSet(&s_has_command, 1);
+    s_cmd_mutex.unlock();
 }
 
 void IntProc::cmdLock()
 {
-    cmd_mutex.lock();
+    s_cmd_mutex.lock();
 }
 
 void IntProc::cmdUnLock()
 {
-    cmd_mutex.unlock();
+    s_cmd_mutex.unlock();
 }
 
 bool IntProc::hasCommand()
 {
-    return SDL_AtomicGet(&has_command);
+    return SDL_AtomicGet(&s_has_command);
 }
 
 IntProc::ExternalCommands IntProc::commandType()
 {
-    return cmd_recentType;
+    return s_cmd_recentType;
 }
 
 std::string IntProc::getCMD()
 {
-    cmdEntry tmp = cmd_queue.front();
-    cmd_queue.pop_front();
-    if(!cmd_queue.empty())
-        cmd_recentType = cmd_queue.front().type;
+    cmdEntry tmp = s_cmd_queue.front();
+    s_cmd_queue.pop_front();
+    if(!s_cmd_queue.empty())
+        s_cmd_recentType = s_cmd_queue.front().type;
     else
-        SDL_AtomicSet(&has_command, 0);
+        SDL_AtomicSet(&s_has_command, 0);
     return tmp.cmd;
 }
 

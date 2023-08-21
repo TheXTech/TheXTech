@@ -249,6 +249,9 @@ void unloadTexture(StdPicture &tx)
         static_cast<StdPicture_Sub&>(tx) = StdPicture_Sub();
 }
 
+void unloadGifTextures()
+{}
+
 inline int ROUNDDIV2(int x)
 {
     return (x<0)?(x - 1) / 2:x / 2;

@@ -22,11 +22,23 @@
 #ifndef SCREEN_FADER_H
 #define SCREEN_FADER_H
 
-#include "fader.h"
+#include <string>
 
+#include "fader.h"
 
 struct ScreenFader
 {
+    enum Shape
+    {
+        S_FADE = 0,
+        S_RECT,
+        S_CIRCLE,
+        S_FLIP_H,
+        S_FLIP_V,
+        // must be higher than all LevelDoor::TRANSIT_*
+        S_CUSTOM = 16,
+    };
+
     bool m_active = false;
     bool m_full = false;
     bool m_complete = false;
@@ -39,6 +51,7 @@ struct ScreenFader
     float color_b = 0.f;
 
     // Focus on the point (using circle or rectangular effect)
+    int m_focusUniform = -1;
     int m_focusX = -1;
     int m_focusY = -1;
     int m_focusScreen = -1;
@@ -49,18 +62,14 @@ struct ScreenFader
     double m_focusOffsetX = 0.0;
     double m_focusOffsetY = 0.0;
 
-    enum Shape
-    {
-        S_FADE = 0,
-        S_RECT,
-        S_CIRCLE,
-        S_FLIP_H,
-        S_FLIP_V
-    } m_shape = S_FADE;
+    int m_shape = S_FADE;
+
+    static void clearTransitEffects();
+    static int loadTransitEffect(const std::string& name);
 
     void clearFader();
 
-    void setupFader(int step, int start, int goal, Shape shape, bool useFocus = false, int focusX = -1, int focusY = -1, int screen = -1);
+    void setupFader(int step, int start, int goal, int shape, bool useFocus = false, int focusX = -1, int focusY = -1, int screen = -1);
     void setTrackedFocus(double *x, double *y, double offX, double offY);
 
     bool isComplete();

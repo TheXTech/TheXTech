@@ -175,6 +175,11 @@ void offsetViewportIgnore(bool en)
     minport_ApplyViewport();
 }
 
+void splitFrame()
+{
+    /* empty */
+}
+
 void setTransparentColor(StdPicture &target, uint32_t rgb)
 {
 #if defined(__WII__) || defined(__3DS__)
@@ -360,6 +365,30 @@ void minport_freeTextureMemory()
 
     pLogDebug("Unloaded %d stale textures at free texture memory request", num_unloaded);
 }
+
+#ifdef __16M__
+
+//! stub for 16M since it doesn't support masks
+void unloadGifTextures() {}
+
+#else
+
+void unloadGifTextures()
+{
+    for(StdPicture* p = g_render_chain_tail; p != nullptr;)
+    {
+        StdPicture* last_p = p;
+        p = p->d.next_texture;
+
+        if(!last_p->l.mask_path.empty())
+        {
+            D_pLogDebug("XRender: unloading texture at %p on unloadGifTextures()", tx);
+            unloadTexture(*last_p);
+        }
+    }
+}
+
+#endif
 
 // intermediate draw method
 

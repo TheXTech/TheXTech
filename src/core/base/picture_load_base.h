@@ -28,6 +28,11 @@
 #include <cstdint>
 #include <vector>
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+#include <string>
+#include "core/opengl/gl_program_object.h"
+#endif
+
 /*!
  * \brief Generic image loading store.
  *
@@ -44,6 +49,20 @@ struct StdPictureLoad
     std::vector<char> rawMask;
     //! Was mask restored from the PNG at default graphics?
     bool isMaskPng = false;
+
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+    //! Original vertex shader source (if presented) -- CURRENTLY USED ONLY FOR PARTICLE SYSTEMS
+    std::vector<char> particleVertexShaderSource;
+    //! Original fragment shader source (if presented)
+    std::vector<char> fragmentShaderSource;
+
+    //! Shader uniform variables registered, in order of registration
+    std::vector<std::string> registeredUniforms;
+    //! Most recent values for shader uniform variables, in order of registration
+    std::vector<UniformValue_t> finalUniformState;
+#endif
+
 
     // Transparent color for BMP and JPEG
     bool     colorKey = false;

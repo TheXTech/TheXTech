@@ -36,6 +36,7 @@ void AbstractEvents_t::init(FrmMain *form)
 
 void AbstractEvents_t::eventResize()
 {
+    XRender::clearBuffer();
     UpdateInternalRes();
     Controls::UpdateTouchScreenSize();
 }

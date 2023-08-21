@@ -57,9 +57,9 @@ jobs:
           }
         - {
             name: "Windows - ARM64",
-            os: windows-2019,
+            os: windows-2022,
             extra_options: "-A ARM64 -DTHEXTECH_EXECUTABLE_NAME=thextech",
-            generator: "Visual Studio 16 2019",
+            generator: "Visual Studio 17 2022",
             build_type: "MinSizeRel",
             extra_path: "/c/WohlLFTP/bin",
             executable_name_suffix: "-arm64",

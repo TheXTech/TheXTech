@@ -63,6 +63,9 @@
 #include "core/language.h"
 #include "main/translate.h"
 
+#include "video.h"
+#include "frm_main.h"
+
 #include "screen_textentry.h"
 #include "editor/new_editor.h"
 #include "editor/write_world.h"
@@ -142,6 +145,7 @@ void initMainMenu()
     g_mainMenu.optionsModeFullScreen = "Fullscreen mode";
     g_mainMenu.optionsModeWindowed = "Windowed mode";
     g_mainMenu.optionsViewCredits = "View credits";
+    g_mainMenu.optionsRestartEngine = "Restart engine for changes to take effect.";
     g_mainMenu.optionsScaleMode = "Scale";
     g_mainMenu.optionsScaleInteger = "Integer";
     g_mainMenu.optionsScaleNearest = "Nearest";
@@ -227,7 +231,12 @@ void GetMenuPos(int* MenuX, int* MenuY)
     if(ScreenH < TinyScreenH)
         *MenuY = 100;
     else if(ScreenH < SmallScreenH)
-        *MenuY = ScreenH - 180;
+    {
+        if(MenuMode == MENU_OPTIONS)
+            *MenuY = ScreenH - 220;
+        else
+            *MenuY = ScreenH - 180;
+}
 
     if(MenuMode == MENU_CHARACTER_SELECT_NEW)
     {
@@ -1557,6 +1566,9 @@ bool mainMenuUpdate()
 #ifndef RENDER_FULLSCREEN_ALWAYS
             optionsMenuLength++; // FullScreen
 #endif
+#ifndef RENDER_CUSTOM
+            optionsMenuLength++; // Renderer
+#endif
 #ifndef FIXED_RES
             optionsMenuLength ++; // resolution
 #endif
@@ -1580,14 +1592,16 @@ bool mainMenuUpdate()
                                 menuLen = 18 * 15; // std::strlen("fullscreen mode")
                         }
 #endif
+#ifndef RENDER_CUSTOM
+                        else if(A == i++)
+                            menuLen = 18 * 25; // Render Mode: XXXXXXXX
+#endif
 #if !defined(FIXED_RES)
                         else if(A == i++)
                             menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
                         else if(A == i++)
                             menuLen = 18 * std::strlen("res: WWWxHHH (word)");
 #endif
-                        else if(A == i++)
-                            menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
                         else if(A == i++)
                             menuLen = 18 * 25; // Language: XXXXX (YY)
                         else
@@ -1643,7 +1657,49 @@ bool mainMenuUpdate()
                         ChangeScreen();
                     }
 #endif
-#if !defined(FIXED_RES)
+#ifndef RENDER_CUSTOM
+                    else if(MenuCursor == i++)
+                    {
+                        int delta = leftPressed ? -1 : 1;
+
+                        bool first = true;
+
+                        // check for and skip unsupported modes
+                        while(first
+#   ifndef THEXTECH_BUILD_GL_DESKTOP_MODERN
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL
+#   endif
+#   ifndef THEXTECH_BUILD_GL_DESKTOP_LEGACY
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_LEGACY
+#   endif
+#   ifndef THEXTECH_BUILD_GL_ES_MODERN
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_ES
+#   endif
+#   ifndef THEXTECH_BUILD_GL_ES_LEGACY
+                            || g_videoSettings.renderMode == RENDER_ACCELERATED_OPENGL_ES_LEGACY
+#   endif
+                        )
+                        {
+                            g_videoSettings.renderMode += delta;
+                            if(g_videoSettings.renderMode < RENDER_SOFTWARE)
+                                g_videoSettings.renderMode = RENDER_END - 1;
+                            else if(g_videoSettings.renderMode >= RENDER_END)
+                                g_videoSettings.renderMode = RENDER_SOFTWARE;
+
+                            first = false;
+                        }
+
+                        bool res = g_frmMain.restartRenderer();
+                        PlaySoundMenu(SFX_PSwitch);
+                        SaveConfig();
+
+                        if(!res)
+                        {
+                            MessageText = g_mainMenu.optionsRestartEngine;
+                            PauseGame(PauseCode::Message);
+                        }
+                    }
+#endif // #ifndef RENDER_CUSTOM
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
@@ -1658,6 +1714,7 @@ bool mainMenuUpdate()
                         UpdateWindowRes();
                         UpdateInternalRes();
                     }
+#if !defined(FIXED_RES)
                     else if(MenuCursor == i++)
                     {
                         PlaySoundMenu(SFX_Do);
@@ -1715,20 +1772,6 @@ bool mainMenuUpdate()
                         UpdateInternalRes();
                     }
 #endif
-                    else if(MenuCursor == i++)
-                    {
-                        PlaySoundMenu(SFX_Do);
-                        if(!leftPressed)
-                            g_videoSettings.scaleMode = g_videoSettings.scaleMode + 1;
-                        else
-                            g_videoSettings.scaleMode = g_videoSettings.scaleMode - 1;
-                        if(g_videoSettings.scaleMode > SCALE_FIXED_2X)
-                            g_videoSettings.scaleMode = SCALE_DYNAMIC_INTEGER;
-                        if(g_videoSettings.scaleMode < SCALE_DYNAMIC_INTEGER)
-                            g_videoSettings.scaleMode = SCALE_FIXED_2X;
-                        UpdateWindowRes();
-                        UpdateInternalRes();
-                    }
                     else if(MenuCursor == i++)
                     {
                         XLanguage::rotateLanguage(g_config.language, leftPressed ? -1 : 1);
@@ -2258,6 +2301,20 @@ void mainMenuDraw()
             SuperPrint(g_mainMenu.optionsModeWindowed, 3, MenuX, MenuY + (30 * i++));
         else
             SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
+#endif
+#ifndef RENDER_CUSTOM
+        const char* const renderers[] = {
+            "SW",
+            "HW",
+            "OpenGL 3+",
+            "OpenGL ES 2+",
+            "OpenGL 1.1",
+            "OpenGL ES 1.1",
+        };
+        if(g_videoSettings.renderMode == g_videoSettings.renderModeObtained)
+            SuperPrint(fmt::format_ne("Render: {0}", renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
+        else
+            SuperPrint(fmt::format_ne("Render: {0} (X)", renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
 #endif
         const std::string* scale_str = &ScaleMode_strings.at(g_videoSettings.scaleMode);
         if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)

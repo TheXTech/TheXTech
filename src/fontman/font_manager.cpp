@@ -638,10 +638,12 @@ void FontManager::printText(const char* text, size_t text_size,
 
     if(outline)
     {
-        font_engine->printText(text, text_size, x - 2, y, outline_r, outline_g, outline_b, Alpha, ttf_FontSize);
-        font_engine->printText(text, text_size, x + 2, y, outline_r, outline_g, outline_b, Alpha, ttf_FontSize);
-        font_engine->printText(text, text_size, x, y - 2, outline_r, outline_g, outline_b, Alpha, ttf_FontSize);
-        font_engine->printText(text, text_size, x, y + 2, outline_r, outline_g, outline_b, Alpha, ttf_FontSize);
+        // take square of Alpha to match blend of normal text
+        float outline_a = Alpha * Alpha;
+        font_engine->printText(text, text_size, x - 2, y, outline_r, outline_g, outline_b, outline_a, ttf_FontSize);
+        font_engine->printText(text, text_size, x + 2, y, outline_r, outline_g, outline_b, outline_a, ttf_FontSize);
+        font_engine->printText(text, text_size, x, y - 2, outline_r, outline_g, outline_b, outline_a, ttf_FontSize);
+        font_engine->printText(text, text_size, x, y + 2, outline_r, outline_g, outline_b, outline_a, ttf_FontSize);
     }
 
     font_engine->printText(text, text_size, x, y, Red, Green, Blue, Alpha, ttf_FontSize);

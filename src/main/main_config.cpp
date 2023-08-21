@@ -48,11 +48,16 @@ void OpenConfig_preSetup()
     const IniProcessing::StrEnumMap renderMode =
     {
         {"sw", RENDER_SOFTWARE},
-        {"hw", RENDER_ACCELERATED},
-        {"vsync", RENDER_ACCELERATED_VSYNC},
+        {"hw", RENDER_ACCELERATED_SDL},
+        {"vsync", RENDER_ACCELERATED_VSYNC_DEPRECATED},
+        {"sdl", RENDER_ACCELERATED_SDL},
+        {"opengl", RENDER_ACCELERATED_OPENGL},
+        {"opengles", RENDER_ACCELERATED_OPENGL_ES},
+        {"opengl11", RENDER_ACCELERATED_OPENGL_LEGACY},
+        {"opengles11", RENDER_ACCELERATED_OPENGL_ES_LEGACY},
         {"0", RENDER_SOFTWARE},
-        {"1", RENDER_ACCELERATED},
-        {"2", RENDER_ACCELERATED_VSYNC}
+        {"1", RENDER_ACCELERATED_SDL},
+        {"2", RENDER_ACCELERATED_VSYNC_DEPRECATED}
     };
 
 #ifndef THEXTECH_NO_SDL_BUILD
@@ -127,11 +132,16 @@ void OpenConfig_preSetup()
         config.endGroup();
 
         config.beginGroup("video");
-        config.readEnum("render", g_videoSettings.renderMode, (int)RENDER_ACCELERATED, renderMode);
+        config.readEnum("render", g_videoSettings.renderMode, (int)RENDER_ACCELERATED_SDL, renderMode);
+        config.read("vsync", g_videoSettings.vSync, (g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC_DEPRECATED));
         config.read("background-work", g_videoSettings.allowBgWork, false);
         config.read("background-controller-input", g_videoSettings.allowBgControllerInput, false);
         config.read("frame-skip", g_videoSettings.enableFrameSkip, true);
         config.read("show-fps", g_videoSettings.showFrameRate, false);
+
+        if(g_videoSettings.renderMode == RENDER_ACCELERATED_VSYNC_DEPRECATED)
+            g_videoSettings.renderMode = RENDER_ACCELERATED_SDL;
+
         bool scale_down_all;
         config.read("scale-down-all-textures", scale_down_all, false);
         config.readEnum("scale-down-textures", g_videoSettings.scaleDownTextures, scale_down_all ? (int)VideoSettings_t::SCALE_ALL : (int)VideoSettings_t::SCALE_SAFE, scaleDownTextures);
@@ -350,8 +360,11 @@ void SaveConfig()
         std::unordered_map<int, std::string> renderMode =
         {
             {RENDER_SOFTWARE, "sw"},
-            {RENDER_ACCELERATED, "hw"},
-            {RENDER_ACCELERATED_VSYNC, "vsync"},
+            {RENDER_ACCELERATED_SDL, "hw"},
+            {RENDER_ACCELERATED_OPENGL, "opengl"},
+            {RENDER_ACCELERATED_OPENGL_ES, "opengles"},
+            {RENDER_ACCELERATED_OPENGL_LEGACY, "opengl11"},
+            {RENDER_ACCELERATED_OPENGL_ES_LEGACY, "opengles11"},
         };
 
         std::unordered_map<int, std::string> batteryStatus =
@@ -381,6 +394,7 @@ void SaveConfig()
         };
 
         config.setValue("render", renderMode[g_videoSettings.renderMode]);
+        config.setValue("vsync", g_videoSettings.vSync);
         config.setValue("background-work", g_videoSettings.allowBgWork);
         config.setValue("background-controller-input", g_videoSettings.allowBgControllerInput);
         config.setValue("frame-skip", g_videoSettings.enableFrameSkip);
