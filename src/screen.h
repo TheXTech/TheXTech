@@ -62,24 +62,30 @@ struct vScreen_t : public qScreen_t
 
     SmallScreenFeatures_t small_screen_features;
 
+//    Visible As Boolean
+    bool Visible = false;
 //    tempX As Double
     double tempX = 0.0;
 //    TempY As Double
     double TempY = 0.0;
 //    TempDelay As Integer
     int TempDelay = 0;
-//    Visible As Boolean
-    bool Visible = false;
 
-    uint8_t screen_ref = 0;
+    // which player is associated with the vScreen. IMPORTANT: unused when shared screen mode is active
     uint8_t player = 0;
+
+    // which screen the vScreen belongs to.
+    uint8_t screen_ref = 0;
 };
 
-//Public vScreen(0 To 2) As vScreen 'Sets up the players screens
-extern RangeArr<vScreen_t, 0, 2> vScreen;
+constexpr int c_screenCount = 2;
+constexpr int c_vScreenCount = c_screenCount * maxLocalPlayers;
 
 //Public vScreen(0 To 2) As vScreen 'Sets up the players screens
-extern RangeArr<qScreen_t, 0, 2> qScreenLoc;
+extern RangeArr<vScreen_t, 0, c_vScreenCount> vScreen;
+
+//Public vScreen(0 To 2) As vScreen 'Sets up the players screens
+extern RangeArr<qScreen_t, 0, c_vScreenCount> qScreenLoc;
 
 namespace ScreenTypes
 {
@@ -112,19 +118,21 @@ namespace DScreenTypes
 
 struct Screen_t
 {
+private:
+    //! a reference to the canonical Screen for this screen (an 800x600 screen with the same players); 0 indicates that the screen itself is canonical
+    uint8_t m_CanonicalScreen = 0;
+
+public:
     using localarr_t = std::array<uint8_t, maxLocalPlayers>;
 
     //! which vScreens belong to the screen
-    localarr_t vScreen_refs = localarr_t{1, 2};
+    localarr_t vScreen_refs;
 
-    // which players belong to the screen (at most one visible and one canonical screen may have a single player). zero-terminated.
-    localarr_t players = localarr_t{1, 2};
+    // which players belong to the screen (no player may belong to multiple visible screens). zero-terminated.
+    localarr_t players;
 
     //! whether this is being rendered by any client (not necessarily the local one)
     bool Visible = true;
-
-    //! a reference to the canonical Screen for this screen (an 800x600 screen with the same players), can be self
-    uint8_t CanonicalScreen = 0;
 
     //! the logical width of the screen in pixels
     int W = 800;
@@ -138,6 +146,15 @@ struct Screen_t
     //! the currently active dynamic split mode for the screen
     int DType = DScreenTypes::Inactive;
 
+    inline bool is_canonical() const
+    {
+        return m_CanonicalScreen == 0;
+    }
+
+    Screen_t& canonical_screen();
+
+    void set_canonical_screen(uint8_t index);
+
     // uses a 1-index to simplify conversion of legacy code
     inline vScreen_t& vScreen(size_t index) const
     {
@@ -145,20 +162,22 @@ struct Screen_t
     }
 };
 
+void InitScreens();
+
 // finds the visible Screen that contains a specific player
 Screen_t& ScreenByPlayer(int player);
 
 // finds the canonical Screen that contains a specific player
-// Screen_t& ScreenByPlayer_canonical(int player);
+Screen_t& ScreenByPlayer_canonical(int player);
 
 // finds the visible vScreen that contains a specific player
 vScreen_t& vScreenByPlayer(int player);
 
 // finds the canonical vScreen that contains a specific player
-// vScreen_t& vScreenByPlayer_canonical(int player);
+vScreen_t& vScreenByPlayer_canonical(int player);
 
 //! a list of all screens (local and remote, visible and virtual)
-extern RangeArr<Screen_t, 0, 0> Screens;
+extern RangeArr<Screen_t, 0, c_screenCount - 1> Screens;
 
 //! the screen being rendered by the local client (or, try to make all uses of ScreenW / ScreenH occur in functions that get passed a screen?)
 extern Screen_t* l_screen;

@@ -598,6 +598,8 @@ void initAll()
     Block.fill(Block_t());
     Background.fill(Background_t());
     NPC.fill(NPC_t());
+
+    InitScreens();
 }
 
 
