@@ -1267,23 +1267,26 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
                     NPC[A].TimeLeft = Physics.NPCTimeOffScreen;
             }
 
-            if(NPC[A].Active)
+            // mark reset if it is currently active, or it has never been offscreen since deactivating
+            if((NPC[A].Active || !NPC[A].Reset[2]) && NPC[A].Reset[1])
             {
                 NPC[A].Reset[1] = false;
-                NPC[A].Reset[2] = false;
+                // only need to mark current-frame state
+                // NPC[A].Reset[2] = false;
 
                 NPCQueues::NoReset.push_back(A);
             }
         }
         else
         {
-            NPC[A].Reset[Z] = true;
-            if(numScreens == 1)
-                NPC[A].Reset[2] = true;
-            if(SingleCoop == 1)
-                NPC[A].Reset[2] = true;
-            else if(SingleCoop == 2)
-                NPC[A].Reset[1] = true;
+            // Reset was previously cleared here, but now it is cleared in the main UpdateGraphics function
+            // NPC[A].Reset[Z] = true;
+            // if(numScreens == 1)
+            //     NPC[A].Reset[2] = true;
+            // if(SingleCoop == 1)
+            //     NPC[A].Reset[2] = true;
+            // else if(SingleCoop == 2)
+            //     NPC[A].Reset[1] = true;
         }
 
         if(!Do_FrameSkip && render && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
@@ -1381,6 +1384,19 @@ void UpdateGraphics(bool skipRepaint)
     // prepare to fill this frame's NoReset queue
     std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
     NPCQueues::NoReset.clear();
+
+    // mark the last-frame reset state of NPCs that may have Reset[0] set to false, and clear their this-frame reset state
+    if(g_compatibility.modern_npc_activation)
+    {
+        for(NPC_t& n : s_NoReset_NPCs_LastFrame)
+        {
+            n.Reset[2] = n.Reset[1] && n.Reset[2];
+            n.Reset[1] = true;
+        }
+    }
+
+    // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array)
+    SDL_assert_release(numScreens <= 2 || g_compatibility.modern_npc_activation);
 
     for(Z = 1; Z <= numScreens; Z++)
     {
@@ -1536,6 +1552,13 @@ void UpdateGraphics(bool skipRepaint)
                     NPC_Draw_Queue_p.add(A);
             }
         }
+    }
+
+    // clear the last-frame reset state of NPCs
+    if(g_compatibility.modern_npc_activation)
+    {
+        for(NPC_t& n : s_NoReset_NPCs_LastFrame)
+            n.Reset[2] = true;
     }
 
     // we've now done all the logic that UpdateGraphics can do.

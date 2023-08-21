@@ -383,8 +383,15 @@ struct NPC_t
     vbint_t Killed = 0;
 //    Active As Boolean 'If on screen
     bool Active = false;
+
 //    Reset(1 To 2) As Boolean 'If it can display the NPC
+    // IMPORTANT: in SMBX64 and compat mode, Reset[1] is whether the NPC was NOT on vScreen 1 during the last draw
+    //            and Reset[2] is whether it was NOT on vScreen 2 during the last draw.
+    //     Because TheXTech plans to support more than 2 vScreens, it uses Reset[1] to mark whether the NPC was on
+    //         NO screens during the last draw. Reset[1] is the only externally usable flag, and Reset[2] is used
+    //         internally during the NPC screen logic to mark whether Reset[1] was set prior to the screen logic.
     RangeArrI<bool, 1, 2, false> Reset;
+
 //    TimeLeft As Integer 'Time left before reset when not on screen
     vbint_t TimeLeft = 0;
 //    HoldingPlayer As Integer 'Who is holding it
