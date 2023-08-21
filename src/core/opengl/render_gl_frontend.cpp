@@ -487,21 +487,31 @@ void RenderGL::updateViewport()
     m_phys_w = ScreenW * scale;
     m_phys_h = ScreenH * scale;
 
-    m_viewport = RectSizeI(0, 0, ScreenW, ScreenH);
-
-    m_viewport_offset = PointI(0, 0);
-    m_viewport_offset_ignore = false;
-
-    pLogDebug("Phys screen is %d x %d", m_phys_w, m_phys_h);
+    pLogDebug("Window resolution is %d x %d; physical draw screen is %d x %d", hardware_w, hardware_h, m_phys_w, m_phys_h);
 
     m_phys_x = hardware_w / 2 - m_phys_w / 2;
     m_phys_y = hardware_h / 2 - m_phys_h / 2;
 
-    applyViewport();
+    resetViewport();
 
-    // update render texture scaling mode
-    if(m_current_scale_mode != g_videoSettings.scaleMode)
+    if(ScaleWidth != ScreenW || ScaleHeight != ScreenH || m_current_scale_mode != g_videoSettings.scaleMode)
     {
+        // update render targets
+        if(ScaleWidth != ScreenW || ScaleHeight != ScreenH)
+        {
+#ifdef USE_SCREENSHOTS_AND_RECS
+            // invalidates GIF recorder handle
+            if(recordInProcess())
+                toggleGifRecorder();
+#endif
+
+            initFramebuffers();
+
+            ScaleWidth = ScreenW;
+            ScaleHeight = ScreenH;
+        }
+
+        // update render texture scaling mode
         bool use_linear = (g_videoSettings.scaleMode == SCALE_DYNAMIC_LINEAR || scale < 0.5f);
 
         if(m_game_texture)
@@ -518,7 +528,20 @@ void RenderGL::updateViewport()
 
 void RenderGL::resetViewport()
 {
-    updateViewport();
+    bool viewport_same = (m_viewport.x == 0 && m_viewport.y == 0 && m_viewport.w == ScreenW && m_viewport.h == ScreenH);
+    bool no_offset = m_viewport_offset_ignore || (m_viewport_offset.x == 0 && m_viewport_offset.y == 0);
+    bool viewport_changed = (!viewport_same || !no_offset);
+
+    if(viewport_changed)
+        flushDrawQueues();
+
+    m_viewport = RectSizeI(0, 0, ScreenW, ScreenH);
+
+    m_viewport_offset = PointI(0, 0);
+    m_viewport_offset_ignore = false;
+
+    if(viewport_changed)
+        applyViewport();
 }
 
 void RenderGL::setViewport(int x, int y, int w, int h)
