@@ -45,15 +45,19 @@
 #include "../game_main.h"
 #include "game_info.h"
 #include "screen_quickreconnect.h"
+#include "frm_main.h"
 
 #include "npc/npc_queues.h"
 #include "main/trees.h"
+
+#include "core/render.h"
 
 #include "cheat_code.h"
 
 #include "npc_id.h"
 #include "eff_id.h"
 
+bool g_ForceBitmaskMerge = false;
 
 static void redigitIsCool()
 {
@@ -1745,6 +1749,13 @@ static void speedDemon()
     PlaySound(MaxFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
 }
 
+static void gifs2png()
+{
+    PlaySound(SFX_Transform);
+    g_ForceBitmaskMerge = !g_ForceBitmaskMerge;
+    XRender::unloadGifTextures();
+}
+
 static void newLeaf()
 {
     GodMode = false;
@@ -1927,6 +1938,9 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
     {"redigitiscool", redigitIsCool, false},
 #endif
     {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false},
+
+    {"gifs2png", gifs2png, false},
+
     {nullptr, nullptr, false}
 };
 
@@ -1974,7 +1988,7 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"iamerror", becomeAsLink, true}, {"itsamelink", becomeAsLink, true},
     {"itsamemario", becomeAsMario, true}, {"plumberboy", becomeAsMario, true}, {"moustacheman", becomeAsMario, true},
     {"itsameluigi", becomeAsLuigi, true}, {"greenmario", becomeAsLuigi, true},
-    
+
     {"supermario200", superbDemo200, true},
     {"supermario128", superbDemo128, true},
     {"supermario64", superbDemo64, true},
@@ -2016,18 +2030,18 @@ static const CheatCodeDefault_t s_cheatsListLevelDefault[] =
     {"ahippinandahoppin", ahippinAndAHopping, true}, {"jumpman", ahippinAndAHopping, true},
     {"framerate", frameRate, false},
     {"speeddemon", speedDemon, true},
-    
+
     {"getmeouttahere", getMeOuttaHere, true},
     {"newleaf", newLeaf, true},
-    
+
     {"holytrinity", holyTrinity, true}, {"passerby", holyTrinity, true},
     {"essentials", essentials, true}, {"holyfour", essentials, true},
-    
+
     {"foundmycarkey", foundMyCarKey, true},
     {"lifegoals", lifeGoals, true},
     {"mysteryball", mysteryBall, true},
     {"itsvegas", itsVegas, true},
-    
+
     {nullptr, nullptr, false}
 };
 

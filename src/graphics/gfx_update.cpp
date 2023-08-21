@@ -53,6 +53,10 @@
 #include "graphics/gfx_special_frames.h"
 #include "graphics/gfx_keyhole.h"
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+#    include "core/opengl/gl_program_bank.h"
+#endif
+
 #include <fmt_format_ne.h>
 #include <Utils/maths.h>
 
@@ -1089,6 +1093,11 @@ void UpdateGraphics(bool skipRepaint)
             XRender::setViewport(vScreen[Z].Left, vScreen[Z].Top, vScreen[Z].Width, vScreen[Z].Height);
 
         DrawBackground(S, Z);
+
+#ifdef THEXTECH_BUILD_GL_MODERN
+        if(SectionParticlesBG[S])
+            XRender::renderParticleSystem(**SectionParticlesBG[S], vScreen[Z].X, vScreen[Z].Y);
+#endif
 
         // don't show background outside of the current section!
         if(LevelEditor)
@@ -2213,10 +2222,22 @@ void UpdateGraphics(bool skipRepaint)
 
             lunaRender(Z);
 
+#ifdef THEXTECH_BUILD_GL_MODERN
+            if(SectionParticlesFG[S])
+                XRender::renderParticleSystem(**SectionParticlesFG[S], vScreen[Z].X, vScreen[Z].Y);
+
+            if(SectionEffect[S])
+                XRender::renderTextureScale(0, 0, vScreen[Z].Width, vScreen[Z].Height, **SectionEffect[S]);
+#endif
+
+            XRender::splitFrame();
+
             // Always draw for single-player
             // And don't draw when many players at the same screen
             if(numPlayers == 1 || numScreens != 1)
                 g_levelVScreenFader[Z].draw();
+
+            XRender::splitFrame();
 
 #ifdef __3DS__
         XRender::setTargetLayer(3);
@@ -2398,12 +2419,6 @@ void UpdateGraphics(bool skipRepaint)
 
     if(!skipRepaint)
         XRender::repaint();
-
-    XRender::setTargetScreen();
-
-//    If TakeScreen = True Then ScreenShot
-    if(TakeScreen)
-        ScreenShot();
 
     // Update Coin Frames
     CoinFrame2[1] += 1;

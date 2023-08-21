@@ -39,7 +39,9 @@ void MsgBoxSDL::init(SDL_Window *ptr)
 }
 
 void MsgBoxSDL::close()
-{}
+{
+    m_window = nullptr;
+}
 
 int MsgBoxSDL::simpleMsgBox(uint32_t flags, const std::string &title, const std::string &message)
 {

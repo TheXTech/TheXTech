@@ -572,6 +572,7 @@
             "optionsModeFullScreen": "Fullscreen mode",
             "optionsModeWindowed": "Windowed mode",
             "optionsViewCredits": "View credits",
+            "restartEngine": "Restart engine for changes to take effect.",
             "scale": {
                 "integer": "Integer",
                 "label": "Scale",

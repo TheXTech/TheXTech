@@ -31,9 +31,9 @@ struct BaseRef_t
 {
     int16_t index;
 
-    inline BaseRef_t() : index{INT16_MIN} {}
-    inline BaseRef_t(int16_t i) : index{i} {}
-    inline BaseRef_t(const BaseRef_t& r) : index(r.index) {}
+    inline constexpr BaseRef_t() : index{INT16_MIN} {}
+    inline constexpr BaseRef_t(int16_t i) : index{i} {}
+    inline constexpr BaseRef_t(const BaseRef_t& r) : index(r.index) {}
 
     inline operator int() const { return index; }
     inline operator int16_t() const { return index; }
@@ -65,10 +65,10 @@ struct Ref_t : public BaseRef_t
     using T = XTECH_TYPEOF(target[1]);
     using value_type = T;
 
-    inline Ref_t() : BaseRef_t{} {}
-    inline Ref_t(int16_t i) : BaseRef_t{i} {}
-    inline Ref_t(const BaseRef_t& r) : BaseRef_t{r.index} {}
-    inline Ref_t(const Ref_t& r) : BaseRef_t{r.index} {}
+    inline constexpr Ref_t() : BaseRef_t{} {}
+    inline constexpr Ref_t(int16_t i) : BaseRef_t{i} {}
+    inline constexpr Ref_t(const BaseRef_t& r) : BaseRef_t{r.index} {}
+    inline constexpr Ref_t(const Ref_t& r) : BaseRef_t{r.index} {}
     inline Ref_t(T* p) : BaseRef_t{(int16_t)(p - &target[1] + 1)} {}
     inline Ref_t(T& p) : BaseRef_t{(int16_t)(&p - &target[1] + 1)} {}
 

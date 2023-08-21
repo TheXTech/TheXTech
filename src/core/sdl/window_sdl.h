@@ -35,9 +35,7 @@ class WindowSDL final : public AbstractWindow_t
     SDL_Window *m_window = nullptr;
     WindowCursor_t m_cursor = CURSOR_DEFAULT;
 
-#ifdef __EMSCRIPTEN__
     bool m_fullscreen = false;
-#endif
 
 public:
     WindowSDL();

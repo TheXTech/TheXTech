@@ -33,7 +33,8 @@ struct GifRecorder;
 
 typedef struct SDL_Thread SDL_Thread;
 typedef struct SDL_mutex SDL_mutex;
-
+typedef struct SDL_Window SDL_Window;
+struct CmdLineSetup_t;
 
 class AbstractRender_t
 {
@@ -54,6 +55,10 @@ protected:
     static bool m_blockRender;
 #endif
 
+    virtual void compileShaders(StdPicture &target);
+
+    static void dumpFullFile(std::vector<char> &dst, const std::string &path);
+
 public:
     AbstractRender_t();
     virtual ~AbstractRender_t();
@@ -71,6 +76,8 @@ public:
      * \return true if render initialized and works
      */
     virtual bool isWorking() = 0;
+
+    virtual bool initRender(const CmdLineSetup_t &setup, SDL_Window *window) = 0;
 
     /*!
      * \brief Initialize defaults of the renderer
@@ -125,6 +132,15 @@ public:
     virtual void offsetViewportIgnore(bool en) = 0;
 
     /*!
+     * \brief Make any subsequent draws invisible to any previous draws (reflections)
+     *
+     * Only has an effect for OpenGL renderer and other batched renderers.
+     *
+     * Note: may result in subsequent transparent draw being inaccurately drawn above previous transparent draw.
+     */
+    inline virtual void splitFrame() {}
+
+    /*!
      * \brief Get the current size of the window in render pixels
      * \param w Width
      * \param h Height
@@ -176,6 +192,10 @@ public:
                                 const std::string &maskPath = std::string(),
                                 const std::string &maskFallbackPath = std::string());
 
+    static void LoadPictureShader(StdPicture& target, const std::string &path);
+
+    static void LoadPictureParticleSystem(StdPicture& target, const std::string &vertexPath, const std::string& fragPath, const std::string& imagePath);
+
     static void setTransparentColor(StdPicture &target, uint32_t rgb);
 
     virtual void loadTexture(StdPicture &target,
@@ -196,16 +216,27 @@ public:
 
     virtual bool textureMaskSupported();
 
+    virtual bool userShadersSupported();
+
+    virtual bool depthTestSupported();
+
     static void lazyLoad(StdPicture &target);
     static void lazyPreLoad(StdPicture &target);
 
     static size_t lazyLoadedBytes();
     static void lazyLoadedBytesReset();
 
+    virtual inline void unloadGifTextures() {}
     virtual void clearAllTextures() = 0;
 
     virtual void clearBuffer() = 0;
 
+    virtual int registerUniform(StdPicture &target, const char* name);
+    virtual void assignUniform(StdPicture &target, int index, const UniformValue_t& value);
+    virtual void spawnParticle(StdPicture &target,
+                               double worldX,
+                               double worldY,
+                               ParticleVertexAttrs_t attrs);
 
 
 
@@ -256,6 +287,10 @@ public:
 
     virtual void renderTexture(float xDst, float yDst, StdPicture &tx,
                                float red = 1.f, float green = 1.f, float blue = 1.f, float alpha = 1.f) = 0;
+
+    virtual void renderParticleSystem(StdPicture &tx,
+                                      double camX,
+                                      double camY);
 
 
 

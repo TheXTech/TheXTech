@@ -19,28 +19,12 @@
  */
 
 #pragma once
-#ifndef ABTRACTRENDERTYPES_T_H
-#define ABTRACTRENDERTYPES_T_H
+#ifndef TXT_INIT_SDL_H
+#define TXT_INIT_SDL_H
 
-#include <array>
+#include "cmd_line_setup.h"
 
-typedef float           GLfloat;
-typedef int             GLint;
-typedef uint8_t         GLubyte;
+bool TXT_InitSDL(const CmdLineSetup_t &setup);
+void TXT_QuitSDL();
 
-enum RendererFlip_t
-{
-    X_FLIP_NONE       = 0x00000000,    /**< Do not flip */
-    X_FLIP_HORIZONTAL = 0x00000001,    /**< flip horizontally */
-    X_FLIP_VERTICAL   = 0x00000002     /**< flip vertically */
-};
-
-struct FPoint_t
-{
-    float x;
-    float y;
-};
-
-using ParticleVertexAttrs_t = std::array<GLubyte, 4>;
-
-#endif // ABTRACTRENDERTYPES_T_H
+#endif // TXT_INIT_SDL_H

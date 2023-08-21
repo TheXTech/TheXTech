@@ -55,6 +55,22 @@
     <string name="batteryStatusShow0">Never show</string>
     <string name="batteryStatusShow1">Show when low battery</string>
     <string name="batteryStatusShow2">Show always</string>
+    <string-array name="renderer">
+        <item>@string/rendererDefault</item>
+        <item>@string/rendererSdl</item>
+        <item>@string/rendererGles</item>
+        <item>@string/rendererGles11</item>
+    </string-array>
+    <string-array name="rendererValues">
+        <item></item>
+        <item>sdl</item>
+        <item>opengles</item>
+        <item>opengles11</item>
+    </string-array>
+    <string name="rendererDefault">Default</string>
+    <string name="rendererSdl">SDL2</string>
+    <string name="rendererGles">OpenGL ES 2.0+</string>
+    <string name="rendererGles11">OpenGL ES 1.1</string>
     <string-array name="feedBackStrength">
         <item>0.1</item>
         <item>0.2</item>
