@@ -183,7 +183,33 @@ void DynamicScreen(Screen_t& screen, bool mute)
     {
         if(p1.Section == p2.Section)
         {
-            if(level[p1.Section].Width - level[p1.Section].X > screen.W && (((!vscreen2.Visible && p2.Location.X + vscreen1.X >= screen.W * 0.75 - p2.Location.Width / 2.0) || (vscreen2.Visible && p2.Location.X + vscreen1.X >= screen.W * 0.75 - p2.Location.Width / 2.0)) && (p1.Location.X < level[p1.Section].Width - screen.W * 0.75 - p1.Location.Width / 2.0)))
+            const Location_t& section = level[p1.Section];
+
+            // a number of clauses check whether the section is larger than the screen
+            bool section_wide = section.Width  - section.X > screen.W;
+            bool section_tall = section.Height - section.Y > screen.H;
+
+            // observe that in the original code, there is a condition on whether vScreen 2 is visible, and this decides what P1 is compared with
+            // (but NOT P2, which is always compared with vScreen 1). This is actually unnecessary and the logic works fine if both players are compared with
+            // vScreen 1. It was likely a vestige from before the GetvScreenAverage call above was added. It must be removed in the modern game
+            // because if qScreen is active for vScreen2 (impossible prior to modern section change), the checks no longer work.
+            const vScreen_t& p2_compare_vscreen = vscreen1;
+            bool use_vscreen2 = !g_compatibility.modern_section_change && vscreen2.Visible;
+            const vScreen_t& p1_compare_vscreen = use_vscreen2 ? vscreen2 : vscreen1;
+
+            // explanation of logic (example of first case, all are similar):
+            //     if (1) the section is wider than the screen,
+            //    and (2) P2's center is >75% to the right of the screen,
+            //    and (3) the players could not both fit within the right 75% of the screen at the right of the section, then split
+
+            // the VB6 code here was extremely complicated; including it below so that simplifications can be verified
+
+            // If level(Player(1).Section).Width - level(Player(1).Section).X > ScreenW And
+            //   (((vScreen(2).Visible = False   And Player(2).Location.X + vScreenX(1) >= ScreenW * 0.75 - Player(2).Location.Width / 2) Or
+            //       (vScreen(2).Visible = True  And Player(2).Location.X + vScreenX(1) >= ScreenW * 0.75 - Player(2).Location.Width / 2))
+            //   And (Player(1).Location.X < level(Player(1).Section).Width - ScreenW * 0.75 - Player(1).Location.Width / 2)) Then
+
+            if(section_wide && (p2.Location.X + p2_compare_vscreen.X >= screen.W * 0.75 - p2.Location.Width / 2.0) && (p1.Location.X < section.Width - screen.W * 0.75 - p1.Location.Width / 2.0))
             {
                 vscreen2.Height = screen.H;
                 vscreen2.Width = screen.W / 2;
@@ -208,7 +234,13 @@ void DynamicScreen(Screen_t& screen, bool mute)
                 vscreen2.Visible = true;
                 screen.DType = 1;
             }
-            else if(level[p1.Section].Width - level[p1.Section].X > screen.W && (((!vscreen2.Visible && p1.Location.X + vscreen1.X >= screen.W * 0.75 - p1.Location.Width / 2.0) || (vscreen2.Visible && p1.Location.X + vscreen2.X >= screen.W * 0.75 - p1.Location.Width / 2.0)) && (p2.Location.X < level[p1.Section].Width - screen.W * 0.75 - p2.Location.Width / 2.0)))
+
+            // ElseIf level(Player(1).Section).Width - level(Player(1).Section).X > ScreenW And
+            // (((vScreen(2).Visible = False And Player(1).Location.X + vScreenX(1) >= ScreenW * 0.75 - Player(1).Location.Width / 2) Or
+            //   (vScreen(2).Visible = True  And Player(1).Location.X + vScreenX(2) >= ScreenW * 0.75 - Player(1).Location.Width / 2))
+            // And (Player(2).Location.X < level(Player(1).Section).Width - ScreenW * 0.75 - Player(2).Location.Width / 2)) Then
+
+            else if(section_wide && (p1.Location.X + p1_compare_vscreen.X >= screen.W * 0.75 - p1.Location.Width / 2.0) && (p2.Location.X < section.Width - screen.W * 0.75 - p2.Location.Width / 2.0))
             {
                 vscreen1.Height = screen.H;
                 vscreen1.Width = screen.W / 2;
@@ -233,7 +265,13 @@ void DynamicScreen(Screen_t& screen, bool mute)
                 screen.DType = 2;
                 vscreen2.Visible = true;
             }
-            else if(level[p1.Section].Height - level[p1.Section].Y > screen.H && ((!vscreen2.Visible && p1.Location.Y + vscreen1.Y >= screen.H * 0.75 - vScreenYOffset - p1.Location.Height) || (vscreen2.Visible && p1.Location.Y + vscreen2.Y >= screen.H * 0.75 - vScreenYOffset - p1.Location.Height)) && (p2.Location.Y < level[p1.Section].Height - screen.H * 0.75 - vScreenYOffset - p2.Location.Height))
+
+            // ElseIf (level(Player(1).Section).Height - level(Player(1).Section).Y > ScreenH And
+            // ((vScreen(2).Visible = False And Player(1).Location.Y + vScreenY(1) >= ScreenH * 0.75 - vScreenYOffset - Player(1).Location.Height) Or
+            //  (vScreen(2).Visible = True  And Player(1).Location.Y + vScreenY(2) >= ScreenH * 0.75 - vScreenYOffset - Player(1).Location.Height))
+            // And (Player(2).Location.Y < level(Player(1).Section).Height - ScreenH * 0.75 - vScreenYOffset - Player(2).Location.Height)) Then
+
+            else if(section_tall && (p1.Location.Y + p1_compare_vscreen.Y >= screen.H * 0.75 - vScreenYOffset - p1.Location.Height) && (p2.Location.Y < section.Height - screen.H * 0.75 - vScreenYOffset - p2.Location.Height))
             {
                 vscreen1.Height = screen.H / 2;
                 vscreen1.Width = screen.W;
@@ -258,7 +296,13 @@ void DynamicScreen(Screen_t& screen, bool mute)
                 vscreen2.Visible = true;
                 screen.DType = 3;
             }
-            else if(level[p1.Section].Height - level[p1.Section].Y > screen.H && ((!vscreen2.Visible && p2.Location.Y + vscreen1.Y >= screen.H * 0.75 - vScreenYOffset - p2.Location.Height) || (vscreen2.Visible && p2.Location.Y + vscreen1.Y >= screen.H * 0.75 - vScreenYOffset - p2.Location.Height)) && (p1.Location.Y < level[p1.Section].Height - screen.H * 0.75 - vScreenYOffset - p1.Location.Height))
+
+            // ElseIf (level(Player(1).Section).Height - level(Player(1).Section).Y > ScreenH And
+            // ((vScreen(2).Visible = False And Player(2).Location.Y + vScreenY(1) >= ScreenH * 0.75 - vScreenYOffset - Player(2).Location.Height) Or
+            //  (vScreen(2).Visible = True  And Player(2).Location.Y + vScreenY(1) >= ScreenH * 0.75 - vScreenYOffset - Player(2).Location.Height))
+            // And (Player(1).Location.Y < level(Player(1).Section).Height - ScreenH * 0.75 - vScreenYOffset - Player(1).Location.Height)) Then
+
+            else if(section_tall && (p2.Location.Y + p2_compare_vscreen.Y >= screen.H * 0.75 - vScreenYOffset - p2.Location.Height) && (p1.Location.Y < section.Height - screen.H * 0.75 - vScreenYOffset - p1.Location.Height))
             {
                 vscreen1.Height = screen.H / 2;
                 vscreen1.Width = screen.W;
