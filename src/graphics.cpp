@@ -181,20 +181,14 @@ void GetvScreen(vScreen_t& vscreen)
         vscreen.X += -vscreen.tempX;
         vscreen.Y += -vscreen.TempY;
 
-        // center the level if too small, otherwise shift so that it is onscreen
-        if(vscreen.Width + level[p.Section].X > level[p.Section].Width)
-            vscreen.X = -level[p.Section].X / 2 + -(level[p.Section].Width - vscreen.Width) / 2;
-        else if(-vscreen.X < level[p.Section].X)
+        // shift the level so that it is onscreen
+        if(-vscreen.X < level[p.Section].X)
             vscreen.X = -level[p.Section].X;
-        else if(-vscreen.X + vscreen.Width > level[p.Section].Width)
+        if(-vscreen.X + vscreen.Width > level[p.Section].Width)
             vscreen.X = -(level[p.Section].Width - vscreen.Width);
-
-        // center the level if too small, otherwise shift so that it is onscreen
-        if(vscreen.Height + level[p.Section].Y > level[p.Section].Height)
-            vscreen.Y = -level[p.Section].Y / 2 + -(level[p.Section].Height - vscreen.Height) / 2;
-        else if(-vscreen.Y < level[p.Section].Y)
+        if(-vscreen.Y < level[p.Section].Y)
             vscreen.Y = -level[p.Section].Y;
-        else if(-vscreen.Y + vscreen.Height > level[p.Section].Height)
+        if(-vscreen.Y + vscreen.Height > level[p.Section].Height)
             vscreen.Y = -(level[p.Section].Height - vscreen.Height);
     }
 
