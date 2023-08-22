@@ -577,7 +577,8 @@
                 "integer": "整數",
                 "linear": "雙綫性",
                 "nearest": "最近鄰居"
-            }
+            },
+            "restartEngine": "重啓引擎后生效"
         },
         "wordBack": "返回",
         "wordHide": "隱藏",
