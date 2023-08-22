@@ -1361,9 +1361,9 @@ static inline bool isFloatValue(const std::string &str)
         ST_TAIL
     } st = ST_SIGN;
 
-    for(const char &c : str)
+    for(const char c : str)
     {
-        if(!isdigit(c))
+        if(c >=0 && c <= 127 && !isdigit(c))
         {
             switch(st)
             {
