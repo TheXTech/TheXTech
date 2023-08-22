@@ -40,6 +40,16 @@ std::string AppPathP::assetsRoot()
     return std::string();
 }
 
+std::string AppPathP::settingsRoot()
+{
+    /*
+     * Fill this in only condition when you want to use the system-wide settings
+     * directory out of user directory. Keep it empty if you want to keep the
+     * default behaviour (i.e. settings saved at the user directory)
+     */
+    return std::string();
+}
+
 std::string AppPathP::screenshotsRoot()
 {
     /*

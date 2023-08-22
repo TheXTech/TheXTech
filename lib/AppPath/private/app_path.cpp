@@ -53,7 +53,7 @@ bool AppPathManager::m_isPortable = false;
 #elif defined(__WII__)
 #   define UserDirName "/thextech/"
 #else
-#   define UserDirName "/.PGE_Project/thextech/"
+#   define UserDirName "/thextech/"
 #endif
 
 static void appendSlash(std::string &path)
@@ -170,7 +170,9 @@ bool AppPathManager::checkPortable()
 void AppPathManager::initSettingsPath()
 {
     // Default settings path
-    m_settingsPath = m_userPath + "settings/";
+    m_settingsPath = AppPathP::settingsRoot();
+    if(m_settingsPath.empty())
+        m_settingsPath = m_userPath + "settings/";
 
     // Check if need to use system-wide screenshots directory
     m_screenshotsPath = AppPathP::screenshotsRoot();

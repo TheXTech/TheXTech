@@ -30,10 +30,15 @@
 static std::string s_assetsRoot;
 static std::string s_userDirectory;
 static std::string s_applicationPath;
+//! The legacy debug root
+static const char* s_legacyDebugDir = "/.PGE_Project/thextech/";
 
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
+    // FIXME: Implement new default directories format later
+    (void)userDirName;
+
     // Application path
     char *path = SDL_GetBasePath();
     if(!path)
@@ -64,7 +69,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     if(s_userDirectory.empty())
         s_userDirectory = "./";
     else
-        s_userDirectory += userDirName;
+        s_userDirectory += s_legacyDebugDir;
 
     s_assetsRoot = s_userDirectory;
 }
@@ -82,6 +87,16 @@ std::string AppPathP::userDirectory()
 std::string AppPathP::assetsRoot()
 {
     return s_assetsRoot;
+}
+
+std::string AppPathP::settingsRoot()
+{
+    /*
+     * Fill this in only condition when you want to use the system-wide settings
+     * directory out of user directory. Keep it empty if you want to keep the
+     * default behaviour (i.e. settings saved at the user directory)
+     */
+    return std::string();
 }
 
 std::string AppPathP::screenshotsRoot()
