@@ -1,6 +1,7 @@
 package javautil;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
 import android.database.Cursor;
@@ -224,16 +225,23 @@ public class FileUtils
         }
         else
         {
-            if (isWhatsAppFile(uri))
-            {
-                return getFilePathForWhatsApp(uri);
-            }
+            String scheme = uri.getScheme();
 
-            if ("content".equalsIgnoreCase(uri.getScheme()))
+            if (isWhatsAppFile(uri))
+                return getFilePathForWhatsApp(uri);
+
+            if(scheme == null)
+                return copyFileToInternalStorage(uri, FALLBACK_COPY_FOLDER);
+
+            if (scheme.equalsIgnoreCase(ContentResolver.SCHEME_FILE))
             {
-                String[] projection = {
-                        MediaStore.Images.Media.DATA
-                };
+                String ret = uri.getPath();
+                Log.d(TAG, "Got URI path from File intent: " + ret);
+                return ret;
+            }
+            else if (scheme.equalsIgnoreCase(ContentResolver.SCHEME_CONTENT))
+            {
+                String[] projection = { MediaStore.Images.Media.DATA };
                 Cursor cursor = null;
 
                 try
