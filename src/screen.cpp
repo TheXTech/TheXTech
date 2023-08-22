@@ -34,6 +34,14 @@ Screen_t& Screen_t::canonical_screen()
     return Screens[m_CanonicalScreen];
 }
 
+const Screen_t& Screen_t::canonical_screen() const
+{
+    if(is_canonical())
+        return *this;
+
+    return Screens[m_CanonicalScreen];
+}
+
 void Screen_t::set_canonical_screen(uint8_t index)
 {
     m_CanonicalScreen = index;

@@ -152,6 +152,7 @@ public:
     }
 
     Screen_t& canonical_screen();
+    const Screen_t& canonical_screen() const;
 
     void set_canonical_screen(uint8_t index);
 
