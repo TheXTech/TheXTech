@@ -55,7 +55,8 @@
         android:requestLegacyExternalStorage="true"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
         android:isGame="true"
-        tools:targetApi="lollipop">
+        tools:targetApi="lollipop"
+        tools:ignore="DataExtractionRules">
 
         <activity
             android:name=".Launcher"
