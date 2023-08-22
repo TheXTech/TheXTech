@@ -420,20 +420,24 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     double resizeRateX = resizeRate;
     double resizeRateY = resizeRate;
 
-    double camFramesX_l = std::abs(vScreen[Z].X - qScreenLoc[Z].X)/camRateX;
-    double camFramesY_t = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y)/camRateY;
+    double camFramesX = std::abs(vScreen[Z].X - qScreenLoc[Z].X) / camRateX;
+    double camFramesY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y) / camRateY;
 
-    double camFramesX_r = std::abs(vScreen[Z].X - vScreen[Z].Width - qScreenLoc[Z].X + qScreenLoc[Z].Width)/camRateX;
-    double camFramesY_b = std::abs(vScreen[Z].Y - vScreen[Z].Height - qScreenLoc[Z].Y + qScreenLoc[Z].Height)/camRateY;
+    // qScreenLoc Width and Height values are only valid if modern section change is disabled
+    if(g_compatibility.modern_section_change)
+    {
+        double camFramesX_r = std::abs(vScreen[Z].X - vScreen[Z].Width - qScreenLoc[Z].X + qScreenLoc[Z].Width) / camRateX;
+        double camFramesY_b = std::abs(vScreen[Z].Y - vScreen[Z].Height - qScreenLoc[Z].Y + qScreenLoc[Z].Height) / camRateY;
 
-    double camFramesX = SDL_min(camFramesX_l, camFramesX_r);
-    double camFramesY = SDL_min(camFramesY_t, camFramesY_b);
+        camFramesX = SDL_min(camFramesX, camFramesX_r);
+        camFramesY = SDL_min(camFramesY, camFramesY_b);
+    }
 
     double resizeFramesX = 0;
     double resizeFramesY = 0;
 
-    double qFramesX = (camFramesX > resizeFramesX ? camFramesX : resizeFramesX);
-    double qFramesY = (camFramesY > resizeFramesY ? camFramesY : resizeFramesY);
+    double qFramesX = SDL_max(camFramesX, resizeFramesX);
+    double qFramesY = SDL_max(camFramesY, resizeFramesY);
 
     // don't continue after this frame if it would arrive next frame
     // (this is the intent of the <5 condition in the vanilla game)
@@ -450,8 +454,8 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     if(qFramesY < 1)
         qFramesY = 1;
 
-    camRateX = std::abs(vScreen[Z].X - qScreenLoc[Z].X)/qFramesX;
-    camRateY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y)/qFramesY;
+    camRateX = std::abs(vScreen[Z].X - qScreenLoc[Z].X) / qFramesX;
+    camRateY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y) / qFramesY;
 
     if(vScreen[Z].X < qScreenLoc[Z].X - camRateX)
         qScreenLoc[Z].X -= camRateX;
