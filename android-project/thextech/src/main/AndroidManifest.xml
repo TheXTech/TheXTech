@@ -81,24 +81,79 @@
                 <data android:mimeType="*/*"/>
                 <data android:host="*" />
 
-                <data android:pathPattern=".*\\.lvl" />
-                <data android:pathPattern=".*\\.lvlx" />
-                <data android:pathPattern=".*\\.LVL" />
-                <data android:pathPattern=".*\\.LVLX" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data android:scheme="file"/>
-                <data android:scheme="content"/>
-                <data android:host="*" />
+                <data android:mimeType="application/lvl" />
+                <data android:mimeType="application/wld" />
+                <data android:mimeType="application/lvlx" />
+                <data android:mimeType="application/wldx" />
 
                 <data android:mimeType="application/x-lvl" />
+                <data android:mimeType="application/x-wld" />
                 <data android:mimeType="application/x-lvlx" />
+                <data android:mimeType="application/x-wldx" />
+
+                <data android:pathPattern=".*\\.lvl" />
+                <data android:pathPattern=".*\\..*\\.lvl" />
+                <data android:pathPattern=".*\\..*\\..*\\.lvl" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.lvl" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.lvl" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.lvl" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.lvl" />
+
+                <data android:pathPattern=".*\\.LVL" />
+                <data android:pathPattern=".*\\..*\\.LVL" />
+                <data android:pathPattern=".*\\..*\\..*\\.LVL" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.LVL" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.LVL" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.LVL" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.LVL" />
+
+                <data android:pathPattern=".*\\.wld" />
+                <data android:pathPattern=".*\\..*\\.wld" />
+                <data android:pathPattern=".*\\..*\\..*\\.wld" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.wld" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.wld" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.wld" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.wld" />
+
+                <data android:pathPattern=".*\\.WLD" />
+                <data android:pathPattern=".*\\..*\\.WLD" />
+                <data android:pathPattern=".*\\..*\\..*\\.WLD" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.WLD" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.WLD" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.WLD" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.WLD" />
+
+                <data android:pathPattern=".*\\.lvlx" />
+                <data android:pathPattern=".*\\..*\\.lvlx" />
+                <data android:pathPattern=".*\\..*\\..*\\.lvlx" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.lvlx" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.lvlx" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.lvlx" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.lvlx" />
+
+                <data android:pathPattern=".*\\.LVLX" />
+                <data android:pathPattern=".*\\..*\\.LVLX" />
+                <data android:pathPattern=".*\\..*\\..*\\.LVLX" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.LVLX" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.LVLX" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.LVLX" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.LVLX" />
+
+                <data android:pathPattern=".*\\.wldx" />
+                <data android:pathPattern=".*\\..*\\.wldx" />
+                <data android:pathPattern=".*\\..*\\..*\\.wldx" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.wldx" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.wldx" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.wldx" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.wldx" />
+
+                <data android:pathPattern=".*\\.WLDX" />
+                <data android:pathPattern=".*\\..*\\.WLDX" />
+                <data android:pathPattern=".*\\..*\\..*\\.WLDX" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\.WLDX" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\.WLDX" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\.WLDX" />
+                <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\.WLDX" />
             </intent-filter>
         </activity>
 
