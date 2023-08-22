@@ -266,6 +266,14 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
             CustomMusic[B].clear();
         else
             CustomMusic[B] = g_dirEpisode.resolveFileCase(s.music_file);
+
+#if defined(THEXTECH_BUILD_GL_MODERN) && defined(THEXTECH_WIP_FEATURES)
+        // FIXME: allow sections to specify shaders by name
+        SectionEffect[B] = ResolveGLProgram("section-effect");
+        SectionParticlesBG[B] = ResolveGLParticleSystem("particles-bg");
+        SectionParticlesFG[B] = ResolveGLParticleSystem("particles-fg");
+#endif
+
         B++;
         if(B > maxSections)
             break;
@@ -822,6 +830,10 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
         warp.Entrance.Width = 32;
         warp.Exit.Height = 32;
         warp.Exit.Width = 32;
+
+        // FIXME: allow warp object to specify a transit effect name as a string
+        if(warp.transitEffect >= ScreenFader::S_CUSTOM)
+            warp.transitEffect = ScreenFader::loadTransitEffect(std::to_string(warp.transitEffect));
 
         syncLayers_Warp(numWarps);
     }

@@ -49,8 +49,10 @@ void ClearAllGLPrograms()
     SectionParticlesFG.fill(INVALID_PROGRAM_REF);
 }
 
-LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name)
+LoadedGLProgramRef_t ResolveGLProgram(const std::string& name)
 {
+    std::string frag_name = name + ".frag";
+
     s_dirShaders.setCurDir(AppPath + "graphics/shaders");
 
     g_dirEpisode.setCurDir(FileNamePath);

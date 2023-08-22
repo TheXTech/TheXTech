@@ -280,6 +280,7 @@ void AbstractRender_t::lazyLoadPicture(StdPicture_Sub& target,
     {
         pLogDebug("Loading user shader [%s%s]...", path.c_str(), ".frag");
         dumpFullFile(target.l.fragmentShaderSource, path + ".frag");
+
         // must be null-terminated
         target.l.fragmentShaderSource.push_back('\0');
     }
@@ -596,7 +597,7 @@ void AbstractRender_t::lazyLoad(StdPicture &target)
         GraphicsHelps::closeImage(maskImage);
     }
 
-#ifdef RENDERGL_SUPPORTED
+#ifdef THEXTECH_BUILD_GL_MODERN
     if(g_render->userShadersSupported() && (!target.l.particleVertexShaderSource.empty() || !target.l.fragmentShaderSource.empty()))
         g_render->compileShaders(target);
 #endif

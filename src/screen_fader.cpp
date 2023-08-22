@@ -50,7 +50,7 @@ void ScreenFader::clearTransitEffects()
 int ScreenFader::loadTransitEffect(const std::string& name)
 {
 #ifdef THEXTECH_BUILD_GL_MODERN
-    LoadedGLProgramRef_t effect = ResolveGLProgram("transit-" + name + ".frag");
+    LoadedGLProgramRef_t effect = ResolveGLProgram("transit-" + name);
 
     if((int)effect < 0)
         return S_FADE;
