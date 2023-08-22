@@ -35,6 +35,9 @@
 #include <algorithm>
 #include <cctype>
 #include <cstdlib>
+#ifdef _WIN32
+#include <stringapiset.h>
+#endif
 #ifdef INI_PROCESSING_ALLOW_QT_TYPES
 #include <QString>
 #endif
@@ -159,6 +162,31 @@ public:
 
         return out;
     }
+
+#ifdef _WIN32
+    std::wstring toWString()
+    {
+        std::wstring out16;
+        std::string out = data();
+
+        if((out.size() > 2) && (out[0] == '"'))
+            out.erase(0, 1);
+
+        if((out.size() > 1) && (out[out.size() - 1] == '"'))
+            out.erase((out.size() - 1), 1);
+
+        out16.resize(out.size());
+        int newlen = MultiByteToWideChar(CP_UTF8,
+                                         0,
+                                         out.c_str(),
+                                         (int)out.size(),
+                                         &out16[0],
+                                         (int)out.size());
+        out16.resize(newlen);
+
+        return out16;
+    }
+#endif
 
 #ifdef INI_PROCESSING_ALLOW_QT_TYPES
     QString toQString()

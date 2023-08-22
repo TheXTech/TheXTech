@@ -29,6 +29,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <vector>
+#include <map>
 #include <unordered_map>
 #ifdef INI_PROCESSING_ALLOW_QT_TYPES
 #include <QString>
@@ -71,9 +72,14 @@ private:
         bool        modified;
         typedef     std::unordered_map<std::string, std::string> IniKeys;
         typedef     std::unordered_map<std::string, IniKeys> IniSections;
+        typedef     std::map<std::string, std::string> IniKeysOrdered;
+        typedef     std::map<std::string, IniKeysOrdered> IniSectionsOrdered;
         IniSections iniData;
         IniKeys    *currentGroup;
         std::string currentGroupName;
+#ifdef _WIN32
+        bool        is_utf16;
+#endif
     } m_params;
 
     template<class TList, typename T>
@@ -109,6 +115,9 @@ private:
     }
 
     void writeIniParam(const char *key, const std::string &value);
+#ifdef _WIN32
+    void writeIniParam(const wchar_t *key, const std::string &value);
+#endif
 
 public:
     IniProcessing();
@@ -116,6 +125,9 @@ public:
     IniProcessing(const std::string &iniFileName, int dummy = 0);
 #ifdef INI_PROCESSING_ALLOW_QT_TYPES
     IniProcessing(const QString &iniFileName, int dummy = 0);
+#endif
+#ifdef _WIN32
+    IniProcessing(const std::wstring &iniFileName, int dummy = 0);
 #endif
     IniProcessing(char *memory, size_t size);
     IniProcessing(const IniProcessing &ip);
@@ -126,6 +138,10 @@ public:
      * @return true if INI file has been passed, false if any error happen
      */
     bool open(const std::string &iniFileName);
+
+#ifdef _WIN32
+    bool open(const std::wstring &iniFileName);
+#endif
 
     /**
      * @brief Open raw INI-data from memory and parse it
@@ -171,6 +187,11 @@ public:
      */
     bool contains(const std::string &groupName);
 
+#ifdef _WIN32
+    bool beginGroup(const std::wstring &groupName);
+    bool contains(const std::wstring &groupName);
+#endif
+
     /**
      * @brief Currently opened file name
      * @return path to currently opened file
@@ -183,11 +204,19 @@ public:
      */
     std::string group() const;
 
+#ifdef _WIN32
+    std::wstring wgroup() const;
+#endif
+
     /**
      * @brief Get list of available groups
      * @return Array of strings
      */
     std::vector<std::string> childGroups();
+
+#ifdef _WIN32
+    std::vector<std::wstring> wchildGroups();
+#endif
 
     /**
      * @brief Is current section contains specific key name
@@ -196,26 +225,57 @@ public:
      */
     bool hasKey(const std::string &keyName) const;
 
+#ifdef _WIN32
+    bool hasKey(const std::wstring &keyName) const;
+#endif
+
     /**
-     * @brief Renames key to a new name, clobbering existing key at newName
+     * @brief Renames key to a new name, clobbering existing key at newName (UTF-8 version)
      * @param oldName current name of key
      * @param newName new name of key
      * @return true if rename is successful, false if oldName is not present in this section
      */
     bool renameKey(const std::string &oldName, const std::string &newName);
 
+#ifdef _WIN32
     /**
-     * @brief Deletes key at keyName from current section
+     * @brief Renames key to a new name, clobbering existing key at newName (UTF-16 version)
+     * @param oldName current name of key
+     * @param newName new name of key
+     * @return true if rename is successful, false if oldName is not present in this section
+     */
+    bool renameKey(const std::wstring &oldName, const std::wstring &newName);
+#endif
+
+    /**
+     * @brief Deletes key at keyName from current section (UTF-8 version)
      * @param keyName name of key to delete
      * @return true if delete is successful, false if keyName is not present in this section
      */
     bool deleteKey(const std::string &keyName);
 
+#ifdef _WIN32
     /**
-     * @brief Get list of available keys in current groul
+     * @brief Deletes key at keyName from current section (UTF-16 version)
+     * @param keyName name of key to delete
+     * @return true if delete is successful, false if keyName is not present in this section
+     */
+    bool deleteKey(const std::wstring &keyName);
+#endif
+
+    /**
+     * @brief Get list of available keys in current group (UTF-8 version)
      * @return Array of strings
      */
     std::vector<std::string> allKeys() const;
+
+#ifdef _WIN32
+    /**
+     * @brief Get list of available keys in current group (UTF-16 version)
+     * @return Array of strings
+     */
+    std::vector<std::wstring> wallKeys() const;
+#endif
 
     /**
      * @brief Release current section to choice another for process
@@ -328,7 +388,17 @@ public:
      */
     void read(const char *key, std::string &dest, const std::string &defVal);
 
-    #ifdef INI_PROCESSING_ALLOW_QT_TYPES
+#ifdef _WIN32
+    /**
+     * @brief Retreive value by specific key and pass it via reference
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const char *key, std::wstring &dest, const std::wstring &defVal);
+#endif
+
+#ifdef INI_PROCESSING_ALLOW_QT_TYPES
     /**
      * @brief Retreive value by specific key and pass it via reference
      * @param [_IN] key name of key with value to retrieved
@@ -336,7 +406,7 @@ public:
      * @param [_IN] defVal Default value for case of non-existing key
      */
     void read(const char *key, QString &dest, const QString &defVal);
-    #endif
+#endif
 
     /**
      * @brief Retreive value by specific key and pass it via reference
@@ -416,7 +486,203 @@ public:
      */
     void read(const char *key, std::vector<long double> &dest, const std::vector<long double> &defVal = std::vector<long double>());
 
-    #ifdef INI_PROCESSING_ALLOW_QT_TYPES
+#ifdef _WIN32
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, bool &dest, bool defVal);
+
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, unsigned char &dest, unsigned char defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, char &dest, char defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, unsigned short &dest, unsigned short defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, short &dest, short defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, unsigned int &dest, unsigned int defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, int &dest, int defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, unsigned long &dest, unsigned long defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, long &dest, long defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, unsigned long long &dest, unsigned long long defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, long long &dest, long long defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, float &dest, float defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, double &dest, double defVal);
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, long double &dest, long double defVal);
+
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::string &dest, const std::string &defVal);
+
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::wstring &dest, const std::wstring &defVal);
+
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<unsigned short> &dest, const std::vector<unsigned short> &defVal = std::vector<unsigned short>());
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<short> &dest, const std::vector<short> &defVal = std::vector<short>());
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<unsigned int> &dest, const std::vector<unsigned int> &defVal = std::vector<unsigned int>());
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<int> &dest, const std::vector<int> &defVal = std::vector<int>());
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<unsigned long> &dest, const std::vector<unsigned long> &defVal = std::vector<unsigned long>());
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<long> &dest, const std::vector<long> &defVal = std::vector<long>());
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<unsigned long long> &dest, const std::vector<unsigned long long> &defVal = std::vector<unsigned long long>());
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<long long> &dest, const std::vector<long long> &defVal = std::vector<long long>());
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<float> &dest, const std::vector<float> &defVal = std::vector<float>());
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<double> &dest, const std::vector<double> &defVal = std::vector<double>());
+    /**
+     * @brief Retreive value by specific key and pass it via reference (UTF-16 version)
+     * @param [_IN] key name of key with value to retrieved
+     * @param [_OUT] dest Reference to destination variable to store retrieved value
+     * @param [_IN] defVal Default value for case of non-existing key
+     */
+    void read(const wchar_t *key, std::vector<long double> &dest, const std::vector<long double> &defVal = std::vector<long double>());
+#endif
+
+#ifdef INI_PROCESSING_ALLOW_QT_TYPES
     /**
      * @brief Retreive value by specific key and pass it via reference
      * @param [_IN] key name of key with value to retrieved
@@ -495,6 +761,7 @@ public:
      */
     void read(const char *key, QList<long double> &dest, const QList<long double> &defVal = QList<long double>());
 
+#   if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     /**
      * @brief Retreive value by specific key and pass it via reference
      * @param [_IN] key name of key with value to retrieved
@@ -572,7 +839,8 @@ public:
      * @param [_IN] defVal Default value for case of non-existing key
      */
     void read(const char *key, QVector<long double> &dest, const QVector<long double> &defVal = QVector<long double>());
-    #endif
+#   endif
+#endif
 
     //! Hash-table for the fast string to enum conversion
     typedef std::unordered_map<std::string, int> StrEnumMap;
@@ -628,6 +896,22 @@ public:
     void setValue(const char *key, double value);
     void setValue(const char *key, long double value);
 
+#ifdef _WIN32
+    IniProcessingVariant value(const wchar_t *key, const IniProcessingVariant &defVal = IniProcessingVariant());
+
+    void setValue(const wchar_t *key, unsigned short value);
+    void setValue(const wchar_t *key, short value);
+    void setValue(const wchar_t *key, unsigned int value);
+    void setValue(const wchar_t *key, int value);
+    void setValue(const wchar_t *key, unsigned long value);
+    void setValue(const wchar_t *key, long value);
+    void setValue(const wchar_t *key, unsigned long long value);
+    void setValue(const wchar_t *key, long long value);
+    void setValue(const wchar_t *key, float value);
+    void setValue(const wchar_t *key, double value);
+    void setValue(const wchar_t *key, long double value);
+#endif
+
     template <typename T>
     static inline std::string to_string_with_precision(const T a_value)
     {
@@ -666,7 +950,19 @@ public:
     void setValue(const char *key, const char *value);
     void setValue(const char *key, const std::string &value);
 
-    #ifdef INI_PROCESSING_ALLOW_QT_TYPES
+#ifdef _WIN32
+    template<typename T>
+    void setValue(const wchar_t *key, const std::vector<T> &value)
+    {
+        static_assert(std::is_arithmetic<T>::value, "Not arithmetic (integral or floating point required!)");
+        writeIniParam(key, fromVector(value));
+    }
+
+    void setValue(const wchar_t *key, const wchar_t *value);
+    void setValue(const wchar_t *key, const std::wstring &value);
+#endif
+
+#ifdef INI_PROCESSING_ALLOW_QT_TYPES
     void setValue(const char *key, const QString &value);
 
     template<typename T>
@@ -676,19 +972,29 @@ public:
         writeIniParam(key, fromVector(value));
     }
 
+#   if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     template<typename T>
     void setValue(const char *key, const QVector<T> &value)
     {
         static_assert(std::is_arithmetic<T>::value, "Not arithmetic (integral or floating point required!)");
         writeIniParam(key, fromVector(value));
     }
-    #endif
+#   endif
+#endif
 
     /**
-     * @brief Write INI file by the recently given file path
+     * @brief Write INI file by the recently given file path, content will be saved as UTF-8
      * @return true if INI file was successfully written
      */
     bool writeIniFile();
+
+#ifdef _WIN32
+    /**
+     * @brief Write INI file by the recently given file path, content will be saved as UTF-16
+     * @return true if INI file was successfully written
+     */
+    bool writeIniFileU16();
+#endif
 };
 
 #endif // INIPROCESSING_H
