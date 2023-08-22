@@ -548,6 +548,34 @@ bool IniProcessing::parseMemory(char *mem, size_t size)
 }
 
 
+IniProcessing::params::IniKeys::iterator IniProcessing_readHelper(IniProcessing *self, const char *key, bool &ok)
+{
+    IniProcessing::params &m_params = self->m_params;
+
+    if(!m_params.opened)
+        return IniProcessing::params::IniKeys::iterator();
+
+    if(!m_params.currentGroup)
+        return IniProcessing::params::IniKeys::iterator();
+
+#ifndef CASE_SENSITIVE_KEYS
+    std::string key1(key);
+    for(char *iter = &key1[0]; *iter != '\0'; ++iter)
+        *iter = (char)tolower(*iter);
+#else
+    auto &key1 = key;
+#endif
+
+    IniProcessing::params::IniKeys::iterator e = m_params.currentGroup->find(key1);
+
+    if(e != m_params.currentGroup->end())
+        ok = true;
+
+    return e;
+}
+
+
+
 IniProcessing::IniProcessing() :
     m_params
     {
@@ -942,7 +970,7 @@ void IniProcessing::endGroup()
 void IniProcessing::read(const char *key, bool &dest, bool defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1016,7 +1044,7 @@ void IniProcessing::read(const char *key, bool &dest, bool defVal)
 void IniProcessing::read(const char *key, unsigned char &dest, unsigned char defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1035,7 +1063,7 @@ void IniProcessing::read(const char *key, unsigned char &dest, unsigned char def
 void IniProcessing::read(const char *key, char &dest, char defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1054,7 +1082,7 @@ void IniProcessing::read(const char *key, char &dest, char defVal)
 void IniProcessing::read(const char *key, unsigned short &dest, unsigned short defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1068,7 +1096,7 @@ void IniProcessing::read(const char *key, unsigned short &dest, unsigned short d
 void IniProcessing::read(const char *key, short &dest, short defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1082,7 +1110,7 @@ void IniProcessing::read(const char *key, short &dest, short defVal)
 void IniProcessing::read(const char *key, unsigned int &dest, unsigned int defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1096,7 +1124,7 @@ void IniProcessing::read(const char *key, unsigned int &dest, unsigned int defVa
 void IniProcessing::read(const char *key, int &dest, int defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1110,7 +1138,7 @@ void IniProcessing::read(const char *key, int &dest, int defVal)
 void IniProcessing::read(const char *key, unsigned long &dest, unsigned long defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1124,7 +1152,7 @@ void IniProcessing::read(const char *key, unsigned long &dest, unsigned long def
 void IniProcessing::read(const char *key, long &dest, long defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1138,7 +1166,7 @@ void IniProcessing::read(const char *key, long &dest, long defVal)
 void IniProcessing::read(const char *key, unsigned long long &dest, unsigned long long defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1152,7 +1180,7 @@ void IniProcessing::read(const char *key, unsigned long long &dest, unsigned lon
 void IniProcessing::read(const char *key, long long &dest, long long defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1166,7 +1194,7 @@ void IniProcessing::read(const char *key, long long &dest, long long defVal)
 void IniProcessing::read(const char *key, float &dest, float defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
     if(!ok)
     {
         dest = defVal;
@@ -1179,7 +1207,7 @@ void IniProcessing::read(const char *key, float &dest, float defVal)
 void IniProcessing::read(const char *key, double &dest, double defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1193,7 +1221,7 @@ void IniProcessing::read(const char *key, double &dest, double defVal)
 void IniProcessing::read(const char *key, long double &dest, long double defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
     if(!ok)
     {
         dest = defVal;
@@ -1206,7 +1234,7 @@ void IniProcessing::read(const char *key, long double &dest, long double defVal)
 void IniProcessing::read(const char *key, std::string &dest, const std::string &defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1221,7 +1249,7 @@ void IniProcessing::read(const char *key, std::string &dest, const std::string &
 void IniProcessing::read(const char *key, std::wstring &dest, const std::wstring &defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1237,7 +1265,7 @@ void IniProcessing::read(const char *key, std::wstring &dest, const std::wstring
 void IniProcessing::read(const char *key, QString &dest, const QString &defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
     {
@@ -1296,7 +1324,7 @@ template<class TList, typename T>
 void readNumArrHelper(IniProcessing *self, const char *key, TList &dest, const TList &defVal)
 {
     bool ok = false;
-    IniProcessing::params::IniKeys::iterator e = self->readHelper(key, ok);
+    IniProcessing::params::IniKeys::iterator e = IniProcessing_readHelper(self, key, ok);
 
     if(!ok)
     {
@@ -1442,7 +1470,7 @@ void IniProcessing::read(const wchar_t *key, std::string &dest, const std::strin
 {
     std::string key8 = s_wstr_to_str(key);
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key8.c_str(), ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key8.c_str(), ok);
 
     if(!ok)
     {
@@ -1457,7 +1485,7 @@ void IniProcessing::read(const wchar_t *key, std::wstring &dest, const std::wstr
 {
     std::string key8 = s_wstr_to_str(key);
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key8.c_str(), ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key8.c_str(), ok);
 
     if(!ok)
     {
@@ -1636,7 +1664,7 @@ void IniProcessing::read(const char *key, QVector<long double> &dest, const QVec
 IniProcessingVariant IniProcessing::value(const char *key, const IniProcessingVariant &defVal)
 {
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
     if(!ok)
         return defVal;
@@ -1651,7 +1679,7 @@ void IniProcessing::writeIniParam(const char *key, const std::string &value)
         return;
 
     bool ok = false;
-    params::IniKeys::iterator e = readHelper(key, ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
     if(ok)
     {
         e->second = value;
@@ -1738,7 +1766,7 @@ IniProcessingVariant IniProcessing::value(const wchar_t *key, const IniProcessin
 {
     bool ok = false;
     std::string key8 = s_wstr_to_str(key);
-    params::IniKeys::iterator e = readHelper(key8.c_str(), ok);
+    params::IniKeys::iterator e = IniProcessing_readHelper(this, key8.c_str(), ok);
 
     if(!ok)
         return defVal;

@@ -26,15 +26,13 @@
 #define INIPROCESSING_H
 
 #include <string>
-#include <cstring>
-#include <cstdlib>
 #include <vector>
 #include <map>
 #include <unordered_map>
 #ifdef INI_PROCESSING_ALLOW_QT_TYPES
-#include <QString>
-#include <QList>
-#include <QVector>
+#   include <QString>
+#   include <QList>
+#   include <QVector>
 #endif
 
 #include "ini_processing_variant.h"
@@ -90,29 +88,7 @@ private:
     bool parseFile(const char *filename);
     bool parseMemory(char *mem, size_t size);
 
-    inline params::IniKeys::iterator readHelper(const char *key, bool &ok)
-    {
-        if(!m_params.opened)
-            return params::IniKeys::iterator();
-
-        if(!m_params.currentGroup)
-            return params::IniKeys::iterator();
-
-#ifndef CASE_SENSITIVE_KEYS
-        std::string key1(key);
-        for(char *iter = &key1[0]; *iter != '\0'; ++iter)
-            *iter = (char)tolower(*iter);
-#else
-        auto &key1 = key;
-#endif
-
-        params::IniKeys::iterator e = m_params.currentGroup->find(key1);
-
-        if(e != m_params.currentGroup->end())
-            ok = true;
-
-        return e;
-    }
+    friend IniProcessing::params::IniKeys::iterator IniProcessing_readHelper(IniProcessing *self, const char *key, bool &ok);
 
     void writeIniParam(const char *key, const std::string &value);
 #ifdef _WIN32
@@ -857,7 +833,7 @@ public:
     void readEnum(const char *key, T &dest, T defVal, IniProcessing::StrEnumMap enumMap)
     {
         bool ok = false;
-        params::IniKeys::iterator e = readHelper(key, ok);
+        params::IniKeys::iterator e = IniProcessing_readHelper(this, key, ok);
 
         if(!ok)
         {
