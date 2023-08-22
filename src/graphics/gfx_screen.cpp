@@ -40,10 +40,16 @@ void s_CopyScreen(Screen_t& dest, const Screen_t& source)
     for(int v = 1; v <= maxLocalPlayers; v++)
     {
         vScreen_t& d_vscreen = dest.vScreen(v);
-        vScreen_t& s_vscreen = source.vScreen(v);
+        const vScreen_t& s_vscreen = source.vScreen(v);
 
         // copy all "ordinary" fields
-        static_cast<qScreen_t&>(d_vscreen) = static_cast<qScreen_t&>(s_vscreen);
+        d_vscreen.Left      = s_vscreen.Left;
+        d_vscreen.Top       = s_vscreen.Top;
+        d_vscreen.Width     = s_vscreen.Width;
+        d_vscreen.Height    = s_vscreen.Height;
+
+        d_vscreen.ScreenLeft = s_vscreen.ScreenLeft;
+        d_vscreen.ScreenTop = s_vscreen.ScreenTop;
 
         d_vscreen.Visible   = s_vscreen.Visible;
         d_vscreen.tempX     = s_vscreen.tempX;
