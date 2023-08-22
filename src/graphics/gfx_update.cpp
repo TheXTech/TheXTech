@@ -803,8 +803,6 @@ void UpdateGraphics(bool skipRepaint)
     // (This code is a combination of the FrameSkip logic from before with the
     //   logic components of the full rendering code.)
     // NPC render queue formation is also here.
-    SetupScreens();
-
     int numScreens = 1;
     if(ScreenType == 1)
         numScreens = 2;
