@@ -371,7 +371,10 @@ vec3 shadow(const in Light light, const in vec2 pixel_pos, const in float pixel_
     vec4 source_pos_raw = vec4(light.pos.xy, light.depth, 1.0);
     vec4 source_pos_transform = u_transform * source_pos_raw;
     vec2 source_pos = source_pos_transform.xy * u_read_viewport.xy + u_read_viewport.zw;
+
     float source_depth = source_pos_transform.z / 2.0 + 0.5;
+
+    source_depth = floor(source_depth * 65535.0 + 0.5) / 65535.0;
 
     vec2 dist = pixel_pos - source_pos;
 
@@ -393,7 +396,6 @@ vec3 shadow(const in Light light, const in vec2 pixel_pos, const in float pixel_
     vec2 step_offset = dist / float(step_count);
 
     vec2 step_pos = source_pos;
-    float depth_at_source = texture2D(u_depth_buffer, step_pos).r;
 
     if(shadowSoftness == 0.0)
     {
@@ -401,14 +403,14 @@ vec3 shadow(const in Light light, const in vec2 pixel_pos, const in float pixel_
         {
             step_pos += step_offset;
 
-            float depth_at = texture2D(u_depth_buffer, step_pos).r;
+            float depth_at = texture(u_depth_buffer, step_pos).r;
 
             // gets blocked if something is between source and dest
             // special case: source does not block self
 
             // first, test: lights everything not in front of it
 
-            if(pixel_depth < depth_at && depth_at != depth_at_source)
+            if(pixel_depth < depth_at && depth_at != source_depth)
                 return vec3(0.0);
         }
 
@@ -424,9 +426,9 @@ vec3 shadow(const in Light light, const in vec2 pixel_pos, const in float pixel_
     {
         step_pos += step_offset;
 
-        float depth_at = texture2D(u_depth_buffer, step_pos).r;
+        float depth_at = texture(u_depth_buffer, step_pos).r;
 
-        if(pixel_depth < depth_at && depth_at != depth_at_source)
+        if(pixel_depth < depth_at && depth_at != source_depth)
             mult *= shadowSoftness;
         else
             accum += accum_rate;
@@ -435,19 +437,16 @@ vec3 shadow(const in Light light, const in vec2 pixel_pos, const in float pixel_
     return color * accum * mult;
 }
 
-// const float TWOPI = 6.28;
-const float TWOPI = 1.0;
-
 void main()
 {
-//    o_FragColor = texture2D(u_framebuffer, v_fbcoord);
-    o_FragColor.rgb = vec3(0.15, 0.15, 0.15);
+//    o_FragColor = texture(u_framebuffer, v_fbcoord);
+    o_FragColor.rgb = vec3(0.5, 0.5, 0.5);
 
     vec2 pixel_floor = v_fbcoord - vec2(0.4999 / 800.0, 0.4999 / 600.0);
-    float pixel_depth_TL = texture2D(u_depth_buffer, pixel_floor).r;
-    float pixel_depth_TR = texture2D(u_depth_buffer, pixel_floor + vec2(1.0 / 800.0, 0.0)).r;
-    float pixel_depth_BL = texture2D(u_depth_buffer, pixel_floor + vec2(0.0, 1.0 / 600.0)).r;
-    float pixel_depth_BR = texture2D(u_depth_buffer, pixel_floor + vec2(1.0 / 800.0, 1.0 / 600.0)).r;
+    float pixel_depth_TL = texture(u_depth_buffer, pixel_floor).r;
+    float pixel_depth_TR = texture(u_depth_buffer, pixel_floor + vec2(1.0 / 800.0, 0.0)).r;
+    float pixel_depth_BL = texture(u_depth_buffer, pixel_floor + vec2(0.0, 1.0 / 600.0)).r;
+    float pixel_depth_BR = texture(u_depth_buffer, pixel_floor + vec2(1.0 / 800.0, 1.0 / 600.0)).r;
     float pixel_depth = min(min(min(pixel_depth_TL, pixel_depth_TR), pixel_depth_BL), pixel_depth_BR);
 
     for(int i = 0; i < 64; i++)
