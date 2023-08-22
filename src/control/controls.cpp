@@ -602,7 +602,13 @@ void InputMethodType::LoadConfig(IniProcessing* ctl)
         else
         {
             index += n_existing;
-            this->m_defaultProfiles[i] = this->m_profiles[index];
+            if(index < (int)this->m_profiles.size())
+                this->m_defaultProfiles[i] = this->m_profiles[index];
+            else
+            {
+                pLogWarning("Attempt to get the profile index %d out of range (m_profiles size: %d)", index, (int)this->m_profiles.size());
+                this->m_defaultProfiles[i] = nullptr;
+            }
         }
     }
 
