@@ -41,7 +41,7 @@ DECLREF_T(LoadedGLProgram);
 void ClearAllGLPrograms();
 
 // returns LoadedGLProgramRef_t() (evals to false) on failure
-LoadedGLProgramRef_t ResolveGLProgram(const std::string& frag_name);
+LoadedGLProgramRef_t ResolveGLProgram(const std::string& name);
 
 // returns LoadedGLProgramRef_t() (evals to false) on failure
 LoadedGLProgramRef_t ResolveGLParticleSystem(const std::string& name);

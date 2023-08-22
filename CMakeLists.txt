@@ -477,6 +477,13 @@ elseif(NOT THEXTECH_NO_SDL_BUILD)
         list(APPEND A2XT_LIBS opengl32 gdi32)
     endif()
 
+    if(PGE_SHARED_SDLMIXER AND NOT WIN32 AND NOT EMSCRIPTEN AND NOT APPLE AND NOT ANDROID AND NOT NINTENDO_SWITCH)
+        find_library(_LIB_GL GL)
+        if(_LIB_GL)
+            list(APPEND A2XT_LIBS ${_LIB_GL})
+        endif()
+    endif()
+
     if(THEXTECH_CUSTOM_AUDIO_LIBRARY)
         list(APPEND A2XT_LIBS gme vorbisidec ogg)
     endif()

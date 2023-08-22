@@ -49,6 +49,12 @@ extern std::string userDirectory();
 extern std::string assetsRoot();
 
 /*!
+ * \brief Get the default path to the writable settings directory (if empty, store at the usre directory)
+ * \return Path to the system-wide settings directory
+ */
+extern std::string settingsRoot();
+
+/*!
  * \brief Default directory for screenshots (if empty, store at the user directory)
  * \return Path to the system-wide screenshots directory
  */

@@ -1,7 +1,6 @@
 package ru.wohlsoft.thextech;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -17,7 +16,7 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AlertDialog;
+import android.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
@@ -43,6 +42,9 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javautil.FileUtils;
+
 
 public class Launcher extends AppCompatActivity
 {
@@ -233,30 +235,40 @@ public class Launcher extends AppCompatActivity
             intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             if(checkFilePermissions(READWRITE_PERMISSION_FOR_GAME_BY_INTENT) || !hasManageAppFS())
                 return;
-            if(scheme.equals(ContentResolver.SCHEME_FILE))
+
+            if(m_context == null)
+                m_context = getApplicationContext();
+
+            FileUtils utils = new FileUtils(this.m_context);
+            filePathToOpen = utils.getPath(intent.getData());
+
+            Log.d(LOG_TAG, "Got a file: " + filePathToOpen + ";");
+
+            if(utils.isInternalCopy()) // File was coped into internal storage, resources are unavailable!
             {
-                Uri url = intent.getData();
-                if(url != null)
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
                 {
-                    Log.d(LOG_TAG, "Got a file: " + url + ";");
-                    filePathToOpen = url.getPath();
-                    if(m_context == null)
-                        m_context = getApplicationContext();
-                    tryStartGame(m_context);
-                }
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
+                    {
+                        switch (which){
+                            case DialogInterface.BUTTON_POSITIVE:
+                                tryStartGame(m_context);
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage(R.string.launcher_openfile_indirectly)
+                        .setPositiveButton(android.R.string.yes, dialogClickListener)
+                        .setNegativeButton(android.R.string.no, dialogClickListener)
+                        .show();
             }
-            else if(scheme.equals(ContentResolver.SCHEME_CONTENT))
-            {
-                Uri url = intent.getData();
-                if(url != null)
-                {
-                    Log.d(LOG_TAG, "Got a content: " + url + ";");
-                    filePathToOpen = url.getPath();
-                    if(m_context == null)
-                        m_context = getApplicationContext();
-                    tryStartGame(m_context);
-                }
-            }
+            else // File is accessible directly, do open it normally
+                tryStartGame(m_context);
         }
     }
 

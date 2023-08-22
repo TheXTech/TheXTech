@@ -291,28 +291,22 @@ void GetvScreenAverage(vScreen_t& vscreen)
             return;
         }
     }
-    vscreen.X = (vscreen.X / B) + (vscreen.Width * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (vscreen.Height * 0.5) - vScreenYOffset;
 
-    // case one: level is too small, center it.
-    if(vscreen.Width + level[Player[1].Section].X > level[Player[1].Section].Width)
-        vscreen.X = -level[Player[1].Section].X / 2 + -(level[Player[1].Section].Width - vscreen.Width) / 2;
-    // case two: we are too close to the left
-    else if(-vscreen.X < level[Player[1].Section].X)
-        vscreen.X = -level[Player[1].Section].X;
-    // case three: we are too close to the right
-    else if(-vscreen.X + vscreen.Width > level[Player[1].Section].Width)
-        vscreen.X = -(level[Player[1].Section].Width - vscreen.Width);
+    // used ScreenW / ScreenH in VB6 code
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+    const Location_t& section = level[Player[1].Section];
 
-    // case one: level is too small, center it.
-    if(vscreen.Height + level[Player[1].Section].Y > level[Player[1].Section].Height)
-        vscreen.Y = -level[Player[1].Section].Y / 2 + -(level[Player[1].Section].Height - vscreen.Height) / 2;
-    // case two: we are too close to the top
-    else if(-vscreen.Y < level[Player[1].Section].Y)
-        vscreen.Y = -level[Player[1].Section].Y;
-    // case three: we are too close to the bottom
-    else if(-vscreen.Y + vscreen.Height > level[Player[1].Section].Height)
-        vscreen.Y = -(level[Player[1].Section].Height - vscreen.Height);
+    vscreen.X = (vscreen.X / B) + (screen.W * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
+
+    if(-vscreen.X < section.X)
+        vscreen.X = -section.X;
+    if(-vscreen.X + screen.W > section.Width)
+        vscreen.X = -(section.Width - screen.W);
+    if(-vscreen.Y < section.Y)
+        vscreen.Y = -section.Y;
+    if(-vscreen.Y + screen.H > section.Height)
+        vscreen.Y = -(section.Height - screen.H);
 
     // keep vScreen boundary even (on 1x platforms)
 #ifdef PGE_MIN_PORT
@@ -423,8 +417,10 @@ void GetvScreenAverage2(vScreen_t& vscreen)
     if(B == 0)
         return;
 
-    vscreen.X = (vscreen.X / B) + (vscreen.Width * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (vscreen.Height * 0.5) - vScreenYOffset;
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+
+    vscreen.X = (vscreen.X / B) + (screen.W * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
 }
 
 // NEW: Get the average screen position for all players with no level edge detection if it were 800x600, and write the top-left coordinate to (left, top)
@@ -763,20 +759,20 @@ void GetvScreenCredits(vScreen_t& vscreen)
     if(B == 0)
         return;
 
-    vscreen.X = (vscreen.X / B) + (vscreen.Width * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (vscreen.Height * 0.5) - vScreenYOffset;
+    const Screen_t& screen = Screens[vscreen.screen_ref];
+    const Location_t& section = level[Player[1].Section];
 
-    if(-vscreen.X < level[Player[1].Section].X)
-        vscreen.X = -level[Player[1].Section].X;
+    vscreen.X = (vscreen.X / B) + (screen.W * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
 
-    if(-vscreen.X + vscreen.Width > level[Player[1].Section].Width)
-        vscreen.X = -(level[Player[1].Section].Width - vscreen.Width);
-
-    if(-vscreen.Y < level[Player[1].Section].Y + 100)
-        vscreen.Y = -level[Player[1].Section].Y + 100;
-
-    if(-vscreen.Y + vscreen.Height > level[Player[1].Section].Height - 100)
-        vscreen.Y = -(level[Player[1].Section].Height - vscreen.Height) - 100;
+    if(-vscreen.X < section.X)
+        vscreen.X = -section.X;
+    if(-vscreen.X + screen.W > section.Width)
+        vscreen.X = -(section.Width - screen.W);
+    if(-vscreen.Y < section.Y + 100)
+        vscreen.Y = -section.Y + 100;
+    if(-vscreen.Y + screen.H > section.Height - 100)
+        vscreen.Y = -(section.Height - screen.H) - 100;
 }
 
 #if 0

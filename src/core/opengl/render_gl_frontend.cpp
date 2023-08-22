@@ -43,9 +43,13 @@
 #include "controls.h"
 
 
+#ifdef THEXTECH_WIP_FEATURES
+#define LIGHTING_DEMO
+#endif
+
 #ifdef MUTABLE_PARTICLES_DEMO
 #include "core/opengl/gl_program_bank.h"
-StdPicture* s_sparkle;
+StdPicture* s_sparkle = nullptr;
 #endif
 
 
@@ -195,7 +199,9 @@ bool RenderGL::initRender(const CmdLineSetup_t &setup, SDL_Window *window)
     updateViewport();
 
 #ifdef MUTABLE_PARTICLES_DEMO
-    s_sparkle = ResolveGLParticleSystem("sparkle")->get();
+    LoadedGLProgramRef_t sparkle = ResolveGLParticleSystem("sparkle");
+    if(sparkle)
+        s_sparkle = sparkle->get();
 #endif
 
     return true;
@@ -259,7 +265,7 @@ void RenderGL::repaint()
 
 #ifdef MUTABLE_PARTICLES_DEMO
     if(s_sparkle)
-        renderParticleSystem(*s_sparkle, vScreenX[1], vScreenY[1]);
+        renderParticleSystem(*s_sparkle, vScreen[1].X, vScreen[1].Y);
 #endif
 
     if(GameMenu)
@@ -1373,11 +1379,11 @@ void RenderGL::renderTexture(double xDstD, double yDstD, double wDstD, double hD
     if(&tx >= &GFXMario[1] && &tx <= &GFXMario[7])
     {
         if(s_sparkle)
-            spawnParticle(*s_sparkle, xDstD - vScreenX[1], yDstD - vScreenY[1], ParticleVertexAttrs_t());
+            spawnParticle(*s_sparkle, xDstD - vScreen[1].X, yDstD - vScreen[1].Y, ParticleVertexAttrs_t());
     }
 #endif
 
-#ifdef LIGHT_DEMO
+#ifdef LIGHTING_DEMO
     if(m_light_count < 63)
     {
         if(&tx == &GFXNPC[13])
