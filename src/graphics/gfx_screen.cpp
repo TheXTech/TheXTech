@@ -109,7 +109,7 @@ void SetupScreens(Screen_t& screen, bool reset)
     vScreen_t& vscreen1 = screen.vScreen(1);
     vScreen_t& vscreen2 = screen.vScreen(2);
 
-    switch(ScreenType)
+    switch(screen.Type)
     {
     case 0: // Follows Player 1
         vscreen1.Height = screen.H;
@@ -199,33 +199,29 @@ void SetupScreens(bool reset)
 
 void DynamicScreen(Screen_t& screen, bool mute)
 {
-    // if needed, defer to canonical screen logic
-    if(!g_compatibility.free_level_res && !screen.is_canonical())
+    // keep canonical screen in sync
+    if(!screen.is_canonical())
     {
         Screen_t& c_screen = screen.canonical_screen();
-        DynamicScreen(c_screen, mute);
 
-        for(int v = 1; v <= 2; v++)
+        // if g_compatibility.modern_section_change is off, vScreen 2's location gets read by DynamicScreen()
+        if(!g_compatibility.modern_section_change)
         {
-            vScreen_t& vscreen = screen.vScreen(v);
-            vScreen_t& c_vscreen = c_screen.vScreen(v);
-
-            // copy all "ordinary" fields
-            static_cast<qScreen_t&>(vscreen) = static_cast<qScreen_t&>(c_vscreen);
-
-            vscreen.Visible = c_vscreen.Visible;
-            vscreen.tempX = c_vscreen.tempX;
-            vscreen.TempY = c_vscreen.TempY;
-            vscreen.TempDelay = c_vscreen.TempDelay;
+            c_screen.vScreen(2).X = screen.vScreen(2).X;
+            c_screen.vScreen(2).Y = screen.vScreen(2).Y;
         }
 
-        screen.DType = c_screen.DType;
-        return;
-    }
-    // keep canonical screen in sync
-    else if(!screen.is_canonical())
-    {
-        DynamicScreen(screen.canonical_screen(), true);
+        if(!g_compatibility.free_level_res)
+        {
+            DynamicScreen(c_screen, mute);
+
+            s_CopyScreen(screen, c_screen);
+            return;
+        }
+        else
+        {
+            DynamicScreen(screen.canonical_screen(), true);
+        }
     }
 
     int A = 0;
