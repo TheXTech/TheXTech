@@ -83,6 +83,8 @@ private:
     template<class TList, typename T>
     friend void readNumArrHelper(IniProcessing* self, const char *key, TList &dest, const TList &defVal);
 
+    static std::string to_string_with_precision_private(const double a_value);
+
     bool parseHelper(char *data, size_t size);
 
     bool parseFile(const char *filename);
@@ -891,10 +893,7 @@ public:
     template <typename T>
     static inline std::string to_string_with_precision(const T a_value)
     {
-        char buf[35];
-        memset(buf, 0, 35);
-        snprintf(buf, 34, "%.15g", static_cast<double>(a_value));
-        return buf;
+        return to_string_with_precision_private(static_cast<double>(a_value));
     }
 
     template<class TList>

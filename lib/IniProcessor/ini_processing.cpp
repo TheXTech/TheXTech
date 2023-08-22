@@ -267,6 +267,14 @@ inline bool memfgets(char *&line, const char *data, char *&pos, const char *end)
 }
 
 /* See documentation in header file. */
+std::string IniProcessing::to_string_with_precision_private(const double a_value)
+{
+    char buf[35] = "";
+    std::memset(buf, 0, 35);
+    std::snprintf(buf, 34, "%.15g", a_value);
+    return buf;
+}
+
 bool IniProcessing::parseHelper(char *data, size_t size)
 {
     char *section = nullptr;
@@ -291,7 +299,7 @@ bool IniProcessing::parseHelper(char *data, size_t size)
         lineno++;
         start = line;
 
-        if((lineno == 1) && (size >= 3) && (memcmp(start, utfbom, 3) == 0))
+        if((lineno == 1) && (size >= 3) && (std::memcmp(start, utfbom, 3) == 0))
             start += 3;
 
         start = lrtrim(start);
