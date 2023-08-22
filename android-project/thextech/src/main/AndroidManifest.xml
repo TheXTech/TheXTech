@@ -78,6 +78,7 @@
 
                 <data android:scheme="file"/>
                 <data android:scheme="content"/>
+                <data android:mimeType="*/*"/>
                 <data android:host="*" />
 
                 <data android:pathPattern=".*\\.lvl" />

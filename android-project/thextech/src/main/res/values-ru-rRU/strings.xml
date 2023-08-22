@@ -38,4 +38,5 @@
     <string name="launcher_gameselect_toast_listclean">Список игр очищен.</string>
     <string name="launcher_gameselect_clearlist_title">Очистить список игр</string>
     <string name="launcher_gameselect_clearlist_question">Вы действительно хотите очистить список игр?</string>
+    <string name="launcher_openfile_indirectly">Невозможно получить абсолютный путь к открытому файлу. Поэтому, последний был скопирован во внутреннее хранилище игры. Дополнительные ресурсы (пользовательская графика, музыка, настройки, скрипты, и т.п.) не загрузятся. Запустить игру в любом случае?</string>
 </resources>
