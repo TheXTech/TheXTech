@@ -149,11 +149,11 @@ void lunaLoop()
 }
 
 
-void lunaRenderHud()
+void lunaRenderHud(int screenZ)
 {
     bool dcAllow = (gEnableDemoCounter || gEnableDemoCounterByLC || g_compatibility.demos_counter_enable);
     if(dcAllow && gShowDemoCounter && ShowOnScreenHUD)
-        gDeathCounter.Draw();
+        gDeathCounter.Draw(screenZ);
 }
 
 void lunaRender(int screenZ)

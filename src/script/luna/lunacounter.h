@@ -41,7 +41,7 @@ struct DeathCounter
     void UpdateDeaths(bool write_save);
     void AddDeath(const std::string &, int amount);
     void TrySave();
-    void Draw();
+    void Draw(int screenZ);
     void Recount();
     void ClearRecords();
 
@@ -50,20 +50,18 @@ struct DeathCounter
     struct CachedPrint
     {
         // Cache meta-data for counter
-        void syncCache(int curLevel, int total, float drawX);
+        void syncCache(int curLevel, int total);
         int counterLevel = -1;
         int counterTotal = -1;
         int counterPixLen = 0;
         int font = -1;
         std::string counterOut;
-        float counterDrawX = 0.f;
 
         // Cache meta-data for title
         void syncCache(const std::string &title);
         int titlePixLen = 0;
         intptr_t titlePointer = 0;
         size_t titleSize = std::string::npos;
-        float titleDrawX = 0.f;
     } m_print;
 
 private:

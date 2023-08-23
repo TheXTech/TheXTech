@@ -2269,7 +2269,7 @@ void UpdateGraphics(bool skipRepaint)
                 }
 
 #ifdef THEXTECH_ENABLE_LUNA_AUTOCODE
-                lunaRenderHud();
+                lunaRenderHud(Z);
 #endif
     //                DrawInterface Z, numScreens
                 if(ShowOnScreenHUD && !gSMBXHUDSettings.skip)
