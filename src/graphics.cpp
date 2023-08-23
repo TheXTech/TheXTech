@@ -33,6 +33,7 @@
 #include "pseudo_vb.h"
 #include "gfx.h"
 #include "config.h"
+#include "compat.h"
 
 #include <Utils/maths.h>
 
@@ -288,19 +289,25 @@ void GetvScreenAverage(vScreen_t& vscreen)
 
     // used ScreenW / ScreenH in VB6 code
     const Screen_t& screen = Screens[vscreen.screen_ref];
+    const Screen_t& use_screen = g_compatibility.free_level_res ? screen : screen.canonical_screen();
+
     const Location_t& section = level[Player[1].Section];
 
-    vscreen.X = (vscreen.X / B) + (screen.W * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
+    // remember that the screen will be limited to the section's size in all cases
+    double use_width  = SDL_min(use_screen.W, section.Width  - section.X);
+    double use_height = SDL_min(use_screen.H, section.Height - section.Y);
+
+    vscreen.X = (vscreen.X / B) + (use_width * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 
     if(-vscreen.X < section.X)
         vscreen.X = -section.X;
-    if(-vscreen.X + screen.W > section.Width)
-        vscreen.X = -(section.Width - screen.W);
+    if(-vscreen.X + use_width > section.Width)
+        vscreen.X = -(section.Width - use_width);
     if(-vscreen.Y < section.Y)
         vscreen.Y = -section.Y;
-    if(-vscreen.Y + screen.H > section.Height)
-        vscreen.Y = -(section.Height - screen.H);
+    if(-vscreen.Y + use_height > section.Height)
+        vscreen.Y = -(section.Height - use_height);
 
     // keep vScreen boundary even (on 1x platforms)
 #ifdef PGE_MIN_PORT
@@ -412,9 +419,15 @@ void GetvScreenAverage2(vScreen_t& vscreen)
         return;
 
     const Screen_t& screen = Screens[vscreen.screen_ref];
+    const Screen_t& use_screen = g_compatibility.free_level_res ? screen : screen.canonical_screen();
 
-    vscreen.X = (vscreen.X / B) + (screen.W * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
+    const Location_t& section = level[Player[1].Section];
+
+    double use_width  = SDL_min(use_screen.W, section.Width  - section.X);
+    double use_height = SDL_min(use_screen.H, section.Height - section.Y);
+
+    vscreen.X = (vscreen.X / B) + (use_width * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 }
 
 // NEW: Get the average screen position for all players with no level edge detection if it were 800x600, and write the top-left coordinate to (left, top)
@@ -753,20 +766,27 @@ void GetvScreenCredits(vScreen_t& vscreen)
     if(B == 0)
         return;
 
+    // used ScreenW / ScreenH in VB6 code
     const Screen_t& screen = Screens[vscreen.screen_ref];
+    const Screen_t& use_screen = g_compatibility.free_level_res ? screen : screen.canonical_screen();
+
     const Location_t& section = level[Player[1].Section];
 
-    vscreen.X = (vscreen.X / B) + (screen.W * 0.5);
-    vscreen.Y = (vscreen.Y / B) + (screen.H * 0.5) - vScreenYOffset;
+    // remember that the screen will be limited to the section's size in all cases
+    double use_width  = SDL_min(use_screen.W, section.Width  - section.X);
+    double use_height = SDL_min(use_screen.H, section.Height - section.Y);
+
+    vscreen.X = (vscreen.X / B) + (use_width * 0.5);
+    vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 
     if(-vscreen.X < section.X)
         vscreen.X = -section.X;
-    if(-vscreen.X + screen.W > section.Width)
-        vscreen.X = -(section.Width - screen.W);
+    if(-vscreen.X + use_width > section.Width)
+        vscreen.X = -(section.Width - use_width);
     if(-vscreen.Y < section.Y + 100)
         vscreen.Y = -section.Y + 100;
-    if(-vscreen.Y + screen.H > section.Height - 100)
-        vscreen.Y = -(section.Height - screen.H) - 100;
+    if(-vscreen.Y + use_height > section.Height - 100)
+        vscreen.Y = -(section.Height - use_height - 100);
 }
 
 #if 0
