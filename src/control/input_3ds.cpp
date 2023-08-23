@@ -19,6 +19,7 @@
  */
 
 #include <3ds.h>
+#include <algorithm>
 
 #include "globals.h"
 #include "game_main.h"
