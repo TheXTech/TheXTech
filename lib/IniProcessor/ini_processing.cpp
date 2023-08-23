@@ -103,6 +103,33 @@ inline unsigned char IS_INIEQUAL(char &c)
 }
 #endif
 
+static const unsigned char charDigit[256] =
+{
+//  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 2
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, // 3
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 4
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 5
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 6
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 7
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 8
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 9
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // A
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // B
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // C
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // D
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // E
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0  // F
+};
+
+static inline bool isDigit(char c)
+{
+    return static_cast<bool>(charDigit[static_cast<unsigned char>(c)]);
+}
+
+
 /* Strip whitespace chars off end of given string, in place. Return s. */
 inline char *rstrip(char *s)
 {
@@ -1011,10 +1038,10 @@ void IniProcessing::read(const char *key, bool &dest, bool defVal)
         }
 
         bool isNum = true;
-        isNum = isNum && (std::isdigit(buff[i]) || (buff[i] == '-') || (buff[i] == '+'));
+        isNum = isNum && (isDigit(buff[i]) || (buff[i] == '-') || (buff[i] == '+'));
 
         for(size_t j = 1; j < ss; j++)
-            isNum = (isNum && std::isdigit(buff[j]));
+            isNum = (isNum && isDigit(buff[j]));
 
         if(isNum)
         {
@@ -1894,10 +1921,7 @@ static inline bool isFloatValue(const std::string &str)
 
     for(const char &c : str)
     {
-        if(c < 0 || c > 127)
-            return false; // Totally not a valid part of a floating-point number
-
-        if(!isdigit(c))
+        if(!isDigit(c))
         {
             switch(st)
             {
