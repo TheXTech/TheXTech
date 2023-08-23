@@ -573,6 +573,7 @@
             "optionsModeFullScreen": "На весь экран",
             "optionsModeWindowed": "Оконный режим",
             "optionsViewCredits": "Титры",
+            "restartEngine": "Перезагрузите игру, чтобы применить изменения.",
             "scale": {
                 "integer": "Целочисленный",
                 "label": "Масштаб",
