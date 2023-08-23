@@ -1045,19 +1045,25 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                                     qScreenLoc[1].Y -= 150;
                             }
 
+                            // used ScreenW / H and FrmMain.ScaleWidth / Height in VB6 code
+                            const Screen_t& screen = Screens[0];
+                            const Screen_t& use_screen = g_compatibility.free_level_res ? screen : screen.canonical_screen();
+
+                            double use_width  = SDL_min(use_screen.W, level[B].Width  - level[B].X);
+                            double use_height = SDL_min(use_screen.H, level[B].Height - level[B].Y);
+
                             // restrict to old level bounds
-                            // FIXME: vScreen[1].Width / vScreen[1].Height was ScreenW / ScreenH. Should adjust to be logical ScreenW.
                             if(-qScreenLoc[1].X < level[B].X)
                                 qScreenLoc[1].X = -level[B].X;
 
-                            if(-qScreenLoc[1].X + vScreen[1].Width /*FrmMain.ScaleWidth*/ > level[B].Width)
-                                qScreenLoc[1].X = -(level[B].Width - ScreenW);
+                            if(-qScreenLoc[1].X + use_width /*FrmMain.ScaleWidth*/ > level[B].Width)
+                                qScreenLoc[1].X = -(level[B].Width - use_width);
 
                             if(-qScreenLoc[1].Y < level[B].Y)
                                 qScreenLoc[1].Y = -level[B].Y;
 
-                            if(-qScreenLoc[1].Y + vScreen[1].Height /*FrmMain.ScaleHeight*/ > level[B].Height)
-                                qScreenLoc[1].Y = -(level[B].Height - ScreenH);
+                            if(-qScreenLoc[1].Y + use_height /*FrmMain.ScaleHeight*/ > level[B].Height)
+                                qScreenLoc[1].Y = -(level[B].Height - use_height);
 
                             // restore the new level
                             level[B] = static_cast<Location_t>(s.position);
