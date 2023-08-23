@@ -1739,8 +1739,6 @@ static void frameRate()
 {
     ShowFPS = !ShowFPS;
     PlaySound(ShowFPS ? SFX_PlayerGrow : SFX_PlayerShrink);
-    if(ShowFPS)
-        PrintFPS = 0;
 }
 
 static void speedDemon()

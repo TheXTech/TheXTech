@@ -2290,7 +2290,7 @@ void UpdateGraphics(bool skipRepaint)
             else if(!GameOutro)
                 mainMenuDraw();
 
-            if(PrintFPS > 0)
+            if(PrintFPS > 0 && ShowFPS)
             {
                 XRender::offsetViewportIgnore(true);
                 SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
