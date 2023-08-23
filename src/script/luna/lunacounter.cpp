@@ -365,8 +365,8 @@ void DeathCounter::Draw(int screenZ)
         title_X &= ~1;
         counter_X &= ~1;
 
-        SuperPrint(gDemoCounterTitle, 3, title_X, 26);
-        SuperPrint(m_print.counterOut, 3, counter_X, 48);
+        SuperPrint(gDemoCounterTitle, m_print.font, title_X, 26);
+        SuperPrint(m_print.counterOut, m_print.font, counter_X, 48);
     }
     // At low res, print to top of screen
     else
@@ -379,8 +379,8 @@ void DeathCounter::Draw(int screenZ)
         title_X &= ~1;
         counter_X &= ~1;
 
-        SuperPrint(gDemoCounterTitle, 3, title_X, 4);
-        SuperPrint(m_print.counterOut, 3, counter_X, 4);
+        SuperPrint(gDemoCounterTitle, m_print.font, title_X, 0);
+        SuperPrint(m_print.counterOut, m_print.font, counter_X, 0);
     }
 
     XRender::offsetViewportIgnore(false);
