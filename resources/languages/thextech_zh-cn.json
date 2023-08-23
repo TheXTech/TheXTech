@@ -578,7 +578,9 @@
                 "label": "图像缩放",
                 "linear": "双线性",
                 "nearest": "最近邻居"
-            }
+            },
+            "render": "图形渲染方式: {0}",
+            "renderX": "图形渲染方式: {0} (X)"
         },
         "wordBack": "返回",
         "wordHide": "隐藏",
