@@ -144,6 +144,8 @@ void initMainMenu()
     g_mainMenu.optionsModeWindowed = "Windowed mode";
     g_mainMenu.optionsViewCredits = "View credits";
     g_mainMenu.optionsRestartEngine = "Restart engine for changes to take effect.";
+    g_mainMenu.optionsRender = "Render: {0}";
+    g_mainMenu.optionsRenderX = "Render: {0} (X)";
     g_mainMenu.optionsScaleMode = "Scale";
     g_mainMenu.optionsScaleInteger = "Integer";
     g_mainMenu.optionsScaleNearest = "Nearest";
@@ -2115,6 +2117,7 @@ void mainMenuDraw()
         else
             SuperPrint(g_mainMenu.optionsModeFullScreen, 3, MenuX, MenuY + (30 * i++));
 #endif
+
 #ifndef RENDER_CUSTOM
         const char* const renderers[] = {
             "SW",
@@ -2124,11 +2127,13 @@ void mainMenuDraw()
             "OpenGL 1.1",
             "OpenGL ES 1.1",
         };
-        if(g_videoSettings.renderMode == g_videoSettings.renderModeObtained)
-            SuperPrint(fmt::format_ne("Render: {0}", renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
-        else
-            SuperPrint(fmt::format_ne("Render: {0} (X)", renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
+
+        const std::string &renderStr = (g_videoSettings.renderMode == g_videoSettings.renderModeObtained) ?
+                                           g_mainMenu.optionsRender :
+                                           g_mainMenu.optionsRenderX;
+        SuperPrint(fmt::format_ne(renderStr, renderers[g_videoSettings.renderMode]), 3, MenuX, MenuY + (30 * i++));
 #endif
+
         const std::string* scale_str = &ScaleMode_strings.at(g_videoSettings.scaleMode);
         if(g_videoSettings.scaleMode == SCALE_DYNAMIC_INTEGER)
             scale_str = &g_mainMenu.optionsScaleInteger;

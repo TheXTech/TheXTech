@@ -201,6 +201,8 @@ XTechTranslate::XTechTranslate()
         {"menu.options.optionsModeWindowed",     &g_mainMenu.optionsModeWindowed},
         {"menu.options.optionsViewCredits",      &g_mainMenu.optionsViewCredits},
         {"menu.options.restartEngine",           &g_mainMenu.optionsRestartEngine},
+        {"menu.options.render",                  &g_mainMenu.optionsRender},
+        {"menu.options.renderX",                 &g_mainMenu.optionsRenderX},
         {"menu.options.scale.label",             &g_mainMenu.optionsScaleMode},
         {"menu.options.scale.integer",           &g_mainMenu.optionsScaleInteger},
         {"menu.options.scale.nearest",           &g_mainMenu.optionsScaleNearest},
