@@ -572,6 +572,8 @@
             "optionsModeFullScreen": "Fullscreen mode",
             "optionsModeWindowed": "Windowed mode",
             "optionsViewCredits": "View credits",
+            "render": "Render: {0}",
+            "renderX": "Render: {0} (X)",
             "restartEngine": "Restart engine for changes to take effect.",
             "scale": {
                 "integer": "Integer",
