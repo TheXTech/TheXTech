@@ -54,7 +54,7 @@ public:
     /*!
      * \brief Fetch all translation files and update their content (add any missing entries)
      */
-    void updateLanguages();
+    void updateLanguages(const std::string& outPath, bool noBlank);
 
     /*!
      * \brief Switch the language of the engine
