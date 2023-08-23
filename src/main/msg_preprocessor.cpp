@@ -45,9 +45,6 @@ static void s_splitString(std::vector<std::string>& out, const std::string& str,
     while(end < str.size() - 1);
 }
 
-//! Last explicit player who called this pre-processor
-static int s_lastPlayer = -1;
-
 void preProcessMessage(std::string& text, int playerWho)
 {
     std::regex cond_if = std::regex("^#if *(\\w+\\(.*\\))$");
@@ -55,20 +52,11 @@ void preProcessMessage(std::string& text, int playerWho)
     const std::string cond_endif = "#endif";
     const std::string cond_else = "#else";
 
-    if(playerWho > 0) // Preserve previous player
-        s_lastPlayer = playerWho;
-    else // Auto-detect possible player
-    {
-        if(numPlayers == 1)
-            playerWho = 1; // Just one player
-        else
-            playerWho = s_lastPlayer; // Anybody also who previously called this function
-
-        if(playerWho < 0)
-            playerWho = 1; // Just set to first player by default if nothing also was before
-    }
-
     bool canCheckPlayers = playerWho > 0 && playerWho <= numPlayers;
+
+    // fallback to P1
+    if(!canCheckPlayers)
+        playerWho = 1;
 
     std::regex reg_op_player = std::regex("^player\\((.*)\\)$");
 
