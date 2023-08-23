@@ -46,52 +46,6 @@ void Deactivate()
         g_toast_duration[i] = 0;
 }
 
-void Render()
-{
-    if(GameMenu || LevelEditor || GameOutro)
-    {
-        Deactivate();
-        return;
-    }
-
-#if 0 // FIXME: What to do?
-
-    // prevent collision with HUD at normal resolutions
-    const int start_Y = ScreenH >= 640 ? 8 : 80;
-
-    int drawn = 0;
-
-    std::string message;
-
-    for(int i = 0; i < maxLocalPlayers; i++)
-    {
-        if(i >= numPlayers)
-            continue;
-
-        if(i >= (int)Controls::g_InputMethods.size())
-            continue;
-
-        const Controls::InputMethod* input_method = Controls::g_InputMethods[i];
-
-        if(!input_method)
-            continue;
-
-        if(g_toast_duration[i])
-        {
-            int draw_Y = start_Y + 20 * drawn;
-
-            const std::string& profile_name = (input_method->Profile ? input_method->Profile->Name : g_mainMenu.caseNone);
-
-            message = fmt::format_ne(g_gameStrings.controlsPhrasePlayerConnected, i + 1, input_method->Name, profile_name);
-
-            SuperPrintScreenCenter(message, 3, draw_Y);
-
-            drawn++;
-        }
-    }
-#endif
-}
-
 void Logic()
 {
     if(GameMenu || LevelEditor || GameOutro)

@@ -4691,7 +4691,7 @@ static inline bool checkWarp(Warp_t &warp, int B, Player_t &plr, int A, bool bac
         }
 
         if(warp.eventEnter != EVENT_NONE)
-            ProcEvent(warp.eventEnter);
+            ProcEvent(warp.eventEnter, A);
 
         if(warp.Effect == 0 || warp.Effect == 3) // Instant / Portal
         {

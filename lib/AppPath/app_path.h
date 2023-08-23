@@ -135,6 +135,8 @@ private:
      */
     static void initSettingsPath();
 
+    static void initString(std::string &text, const std::string& inValue, const std::string &defValue);
+
     //! Location for writable settings and game-saves
     static std::string m_settingsPath;
     //! Location for writable user directory

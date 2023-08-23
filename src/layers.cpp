@@ -52,6 +52,7 @@ RangeArr<Events_t, 0, maxEvents> Events;
 
 RangeArrI<eventindex_t, 1, maxEvents, EVENT_NONE> NewEvent;
 RangeArrI<int, 1, maxEvents, 0> newEventDelay;
+RangeArrI<uint8_t, 1, maxEvents, 0> newEventPlayer;
 int newEventNum = 0;
 
 layerindex_t LAYER_USED_P_SWITCH = LAYER_NONE;
@@ -704,7 +705,7 @@ bool DeleteEvent(eventindex_t index)
 
 // Old functions:
 
-void ProcEvent(eventindex_t index, bool NoEffect)
+void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 {
     if(index == EVENT_NONE || LevelEditor)
         return;
@@ -1155,8 +1156,13 @@ void ProcEvent(eventindex_t index, bool NoEffect)
             if(evt.Text != STRINGINDEX_NONE)
             {
                 MessageText = GetS(evt.Text);
-                preProcessMessage(MessageText, -1);
-                PauseGame(PauseCode::Message, 0);
+
+                bool player_valid = whichPlayer >= 1 && whichPlayer <= numPlayers;
+                preProcessMessage(MessageText, player_valid ? whichPlayer : -1);
+
+                bool use_player_pause = (player_valid && g_compatibility.multiplayer_pause_controls);
+                PauseGame(PauseCode::Message, use_player_pause ? whichPlayer : 0);
+
                 MessageText = "";
             }
 
@@ -1208,13 +1214,14 @@ void ProcEvent(eventindex_t index, bool NoEffect)
                     // here tempBool prevented any order-2 circles from occurring
                     // if(!tempBool)
                     if(Events[evt.TriggerEvent].TriggerEvent != index)
-                        ProcEvent(evt.TriggerEvent);
+                        ProcEvent(evt.TriggerEvent, whichPlayer);
                 }
                 else
                 {
                     newEventNum++;
                     NewEvent[newEventNum] = evt.TriggerEvent;
                     newEventDelay[newEventNum] = vb6Round(evt.TriggerDelay * 6.5);
+                    newEventPlayer[newEventNum] = static_cast<uint8_t>(whichPlayer);
                 }
             }
         }
@@ -1247,8 +1254,9 @@ void UpdateEvents()
                 newEventDelay[A]--;
             else
             {
-                ProcEvent(NewEvent[A]);
+                ProcEvent(NewEvent[A], newEventPlayer[A]);
                 newEventDelay[A] = newEventDelay[newEventNum];
+                newEventPlayer[A] = newEventPlayer[newEventNum];
                 NewEvent[A] = NewEvent[newEventNum];
                 newEventNum--;
             }

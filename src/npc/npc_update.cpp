@@ -490,7 +490,7 @@ void UpdateNPCs()
                             NPC[numNPCs].TriggerTalk = NPC[A].TriggerTalk;
                             CheckSectionNPC(numNPCs);
                             if(NPC[numNPCs].TriggerActivate != EVENT_NONE)
-                                ProcEvent(NPC[numNPCs].TriggerActivate);
+                                ProcEvent(NPC[numNPCs].TriggerActivate, 0);
                             if(NPC[numNPCs].Type == NPCID_RANDOM_POWER)
                                 NPC[numNPCs].Type = RandomBonus();
                             syncLayers_NPC(numNPCs);
@@ -549,7 +549,7 @@ void UpdateNPCs()
                NPC[A].Type != NPCID_FALL_BLOCK_BROWN && !NPCIsACoin[NPC[A].Type]) // And .Type <> 47
             {
                 if(NPC[A].TriggerActivate != EVENT_NONE)
-                    ProcEvent(NPC[A].TriggerActivate);
+                    ProcEvent(NPC[A].TriggerActivate, NPC[A].JustActivated);
 
                 tempLocation = NPC[A].Location;
                 tempLocation.Y -= 32;
@@ -575,7 +575,7 @@ void UpdateNPCs()
                             if(B < A)
                             {
                                 if(NPC[B].TriggerActivate != EVENT_NONE)
-                                    ProcEvent(NPC[B].TriggerActivate);
+                                    ProcEvent(NPC[B].TriggerActivate, NPC[A].JustActivated);
                             }
 
                             NPCQueues::Active.insert(B);
@@ -625,7 +625,7 @@ void UpdateNPCs()
                                     if(B < A)
                                     {
                                         if(NPC[B].TriggerActivate != EVENT_NONE)
-                                            ProcEvent(NPC[B].TriggerActivate);
+                                            ProcEvent(NPC[B].TriggerActivate, NPC[A].JustActivated);
                                     }
 
                                     NPCQueues::Active.insert(B);
