@@ -67,7 +67,7 @@ void SetupScreens(Screen_t& screen, bool reset)
     vscreen1.player = screen.players[0];
     vscreen2.player = screen.players[1];
 
-    switch(ScreenType)
+    switch(screen.Type)
     {
     case 0: // Follows Player 1
         vscreen1.Height = screen.H;
