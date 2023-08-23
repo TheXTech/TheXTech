@@ -852,8 +852,6 @@ void XTechTranslate::exportTemplate()
         std::printf("JSON: Caught an exception: %s", e.what());
         std::fflush(stdout);
     }
-#else
-    UNUSED(outPath);
 #endif
 }
 
