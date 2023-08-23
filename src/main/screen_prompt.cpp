@@ -87,7 +87,7 @@ void Init()
             s_longest_width = item_width;
     }
 
-    int total_menu_height = s_options.size() * 36 - 18;
+    int total_menu_height = (int)s_options.size() * 36 - 18;
     int total_menu_width = s_longest_width + 40;
 
     // GBA bounds
@@ -123,7 +123,7 @@ void Render()
 
     // height includes intermediate padding but no top/bottom padding
     // width includes cursor on left and 20px padding on right for symmetry
-    int total_menu_height = s_options.size() * 36 - 18;
+    int total_menu_height = (int)s_options.size() * 36 - 18;
     int total_menu_width = s_longest_width + 40;
 
     // enforce GBA bounds (480x320)
@@ -144,7 +144,7 @@ void Render()
     int menu_left_X = ScreenW / 2 - total_menu_width / 2 + 20;
     int menu_top_Y = menu_box_Y + menu_box_height / 2 - total_menu_height / 2;
 
-    XRender::renderRect(ScreenW / 2 - menu_box_width / 2, menu_box_Y, menu_box_width, menu_box_height, 0, 0, 0, 0.8);
+    XRender::renderRect(ScreenW / 2 - menu_box_width / 2, menu_box_Y, menu_box_width, menu_box_height, 0.0f, 0.0f, 0.0f, 0.8f);
 
     for(size_t i = 0; i < s_options.size(); i++)
         SuperPrint(s_options[i], 3, menu_left_X, menu_top_Y + (i * 36));
@@ -203,7 +203,7 @@ bool Logic()
         PlaySoundMenu(SFX_Slide);
         s_cur_item--;
         if(s_cur_item < 0)
-            s_cur_item = s_options.size() - 1;
+            s_cur_item = (int8_t)s_options.size() - 1;
         MenuCursorCanMove = false;
         return false;
     }

@@ -174,7 +174,7 @@ static std::string findIntroLevel()
     if(!rootIntro.empty())
         intros.push_back(rootIntro);
 
-    const std::string &selected = intros[iRand2(intros.size())];;
+    const std::string &selected = intros[iRand2T(intros.size())];
 
     pLogDebug("Selected intro level to start: %s", selected.c_str());
 
@@ -1899,19 +1899,18 @@ void StartEpisode()
         Player[i].Hearts = 0;
     }
 
-    numPlayers = Controls::g_InputMethods.size();
+    numPlayers = (int)Controls::g_InputMethods.size();
     if(numPlayers > maxLocalPlayers)
         numPlayers = maxLocalPlayers;
+
     for(int i = 0; i < numPlayers; i++)
     {
         if(g_charSelect[i] != 0)
             Player[i + 1].Character = g_charSelect[i];
     }
 
-    for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
-    {
+    for(int i = (int)Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
         Controls::DeleteInputMethodSlot(i);
-    }
 
     ConnectScreen::SaveChars();
 
@@ -2036,19 +2035,18 @@ void StartBattleMode()
         Player[i].Hearts = 2;
     }
 
-    numPlayers = Controls::g_InputMethods.size();
+    numPlayers = (int)Controls::g_InputMethods.size();
     if(numPlayers > maxLocalPlayers)
         numPlayers = maxLocalPlayers;
+
     for(int i = 0; i < numPlayers; i++)
     {
         if(g_charSelect[i] != 0)
             Player[i + 1].Character = g_charSelect[i];
     }
 
-    for(int i = Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
-    {
+    for(int i = (int)Controls::g_InputMethods.size() - 1; i >= numPlayers; i--)
         Controls::DeleteInputMethodSlot(i);
-    }
 
     numStars = 0;
     Coins = 0;

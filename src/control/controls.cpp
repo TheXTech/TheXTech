@@ -304,7 +304,7 @@ bool InputMethodProfile::OptionChange(size_t i)
 // called when left is pressed
 bool InputMethodProfile::OptionRotateLeft(size_t i)
 {
-    int i_proc = i;
+    int i_proc = (int)i;
 
     if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
         i_proc += 1;
@@ -317,7 +317,7 @@ bool InputMethodProfile::OptionRotateLeft(size_t i)
 // called when right is pressed
 bool InputMethodProfile::OptionRotateRight(size_t i)
 {
-    int i_proc = i;
+    int i_proc = (int)i;
 
     if(!this->Type->RumbleSupported() && (int)i >= CommonOptions::rumble)
         i_proc += 1;
@@ -552,7 +552,7 @@ void InputMethodType::SaveConfig(IniProcessing* ctl)
 void InputMethodType::LoadConfig(IniProcessing* ctl)
 {
     int n_profiles;
-    int n_existing = this->m_profiles.size(); // should usually be zero
+    int n_existing = (int)this->m_profiles.size(); // should usually be zero
 
     ctl->beginGroup(this->Name);
     ctl->read("n-profiles", n_profiles, 0);
@@ -816,7 +816,7 @@ bool Update(bool check_lost_devices)
 
     for(size_t i = 0; i < maxLocalPlayers; i++)
     {
-        Controls_t& controls = Player[i + 1].Controls;
+        Controls_t& controls = Player[(long)i + 1].Controls;
         CursorControls_t& cursor = SharedCursor;
         EditorControls_t& editor = ::EditorControls;
 
@@ -833,7 +833,7 @@ bool Update(bool check_lost_devices)
             continue;
         }
 
-        if(!method->Update(i + 1, controls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
+        if(!method->Update((int)i + 1, controls, cursor, editor, g_hotkeysPressed) && check_lost_devices)
         {
             okay = false;
             DeleteInputMethod(method);
@@ -1042,7 +1042,7 @@ InputMethod* PollInputMethod() noexcept
 
     // if a profile has already been assigned, activate any hooks possible
     if(new_method->Profile)
-        SetInputMethodProfile(player_no, new_method->Profile);
+        SetInputMethodProfile((int)player_no, new_method->Profile);
 
     // try a number of ways of assigning a profile if one has not already been assigned
     std::vector<InputMethodProfile*> profiles = new_method->Type->GetProfiles();
@@ -1050,10 +1050,10 @@ InputMethod* PollInputMethod() noexcept
     // fallback 1: last profile used by this player index
     if(!new_method->Profile)
     {
-        InputMethodProfile* default_profile = new_method->Type->GetDefaultProfile(player_no);
+        InputMethodProfile* default_profile = new_method->Type->GetDefaultProfile((int)player_no);
 
         if(default_profile)
-            SetInputMethodProfile(player_no, default_profile);
+            SetInputMethodProfile((int)player_no, default_profile);
     }
 
     // fallback 2: find first unused profile
@@ -1079,16 +1079,16 @@ InputMethod* PollInputMethod() noexcept
         }
 
         if(i != profiles.size())
-            SetInputMethodProfile(player_no, profiles[i]);
+            SetInputMethodProfile((int)player_no, profiles[i]);
     }
 
     // fallback 3: use first profile
     if(!new_method->Profile && !profiles.empty())
-        SetInputMethodProfile(player_no, profiles[0]);
+        SetInputMethodProfile((int)player_no, profiles[0]);
 
     // fallback 4: new default profile
     if(!new_method->Profile)
-        SetInputMethodProfile(player_no, new_method->Type->AddProfile());
+        SetInputMethodProfile((int)player_no, new_method->Type->AddProfile());
 
     // should only STILL be null if something is very wrong (alloc failed, etc)
     if(!new_method->Profile)
@@ -1160,7 +1160,7 @@ bool SetInputMethodProfile(InputMethod* method, InputMethodProfile* profile)
     if(player_no == g_InputMethods.size())
         return false;
 
-    return method->Type->SetProfile(method, player_no, profile, g_InputMethods);
+    return method->Type->SetProfile(method, (int)player_no, profile, g_InputMethods);
 }
 
 void ClearInputMethods()

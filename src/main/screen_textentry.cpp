@@ -195,9 +195,9 @@ inline void find_utf_offsets(const char* str, std::vector<int16_t>& out)
     out.push_back(offset);
 }
 
-inline const char* get_char(int level, int row, int col)
+inline const char* get_char(int cLevel, int row, int col)
 {
-    return s_current_keymap + s_current_keymap_UTF_offsets[(level * s_current_keymap_rows * s_current_keymap_cols) + (row * s_current_keymap_cols) + col];
+    return s_current_keymap + s_current_keymap_UTF_offsets[(cLevel * s_current_keymap_rows * s_current_keymap_cols) + (row * s_current_keymap_cols) + col];
 }
 
 inline const char* get_char()
@@ -407,7 +407,7 @@ void Insert(const char* c)
     if(s_timer < 0)
         return;
 
-    Insert(c, SDL_strlen(c));
+    Insert(c, (int)SDL_strlen(c));
 }
 
 inline void InsertUnicodeChar(const char* c)
@@ -508,8 +508,8 @@ bool KeyboardMouseRender(bool mouse, bool render)
     int n_text_chars = (s_current_keymap_cols * key_size - 20) / 18 - 1;
     int n_prompt_chars = n_text_chars + 2;
 
-    int n_prompt_lines = ((s_Prompt_UTF_offsets.size() - 1 + n_prompt_chars - 1) / n_prompt_chars);
-    int n_text_lines = ((s_Text_UTF_offsets.size() - 1 + n_text_chars - 1) / n_text_chars);
+    int n_prompt_lines = (((int)s_Prompt_UTF_offsets.size() - 1 + n_prompt_chars - 1) / n_prompt_chars);
+    int n_text_lines = (((int)s_Text_UTF_offsets.size() - 1 + n_text_chars - 1) / n_text_chars);
     if(n_text_lines == 0)
         n_text_lines = 1;
 
@@ -604,7 +604,7 @@ const std::string& Run(const std::string& Prompt, const std::string Value)
     Text = Value;
     find_utf_offsets(Text.c_str(), s_Text_UTF_offsets);
     find_utf_offsets(s_Prompt.c_str(), s_Prompt_UTF_offsets);
-    s_cursor = s_Text_UTF_offsets.size() - 1;
+    s_cursor = (int)s_Text_UTF_offsets.size() - 1;
     s_mouse_up = 2;
     s_cur_level = 0;
     s_cur_row = 0;

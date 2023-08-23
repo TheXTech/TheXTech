@@ -54,7 +54,7 @@ void Render()
         return;
     }
 
-    return;
+#if 0 // FIXME: What to do?
 
     // prevent collision with HUD at normal resolutions
     const int start_Y = ScreenH >= 640 ? 8 : 80;
@@ -89,6 +89,7 @@ void Render()
             drawn++;
         }
     }
+#endif
 }
 
 void Logic()

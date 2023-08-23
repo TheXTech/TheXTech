@@ -236,7 +236,7 @@ static void s_findRecentEpisode()
            (MenuMode == MENU_2PLAYER_GAME && wPath == g_recentWorld2p) ||
            (MenuMode == MENU_EDITOR && wPath == g_recentWorldEditor))
         {
-            menuRecentEpisode = i - 1;
+            menuRecentEpisode = (int)i - 1;
             w.highlight = true;
         }
         else
@@ -412,7 +412,7 @@ static void s_FinishFindWorlds()
     SelectWorld_t createWorld = SelectWorld_t();
     createWorld.WorldName = g_mainMenu.editorNewWorld;
     SelectWorldEditable.push_back(createWorld);
-    NumSelectWorldEditable = (SelectWorldEditable.size() - 1);
+    NumSelectWorldEditable = ((int)SelectWorldEditable.size() - 1);
 
     s_findRecentEpisode();
 
@@ -510,7 +510,7 @@ void FindLevels()
         }
     }
 
-    NumSelectBattle = (SelectBattle.size() - 1);
+    NumSelectBattle = ((int)SelectBattle.size() - 1);
 #ifndef PGE_NO_THREADING
     SDL_AtomicSet(&loading, 0);
 #endif
@@ -678,17 +678,17 @@ bool mainMenuUpdate()
                     {
                         int i = 0;
                         if(A == i++)
-                            menuLen = 18 * (g_gameInfo.disableTwoPlayer ? g_mainMenu.main1PlayerGame.size() : g_mainMenu.mainStartGame.size()) - 2;
+                            menuLen = 18 * (g_gameInfo.disableTwoPlayer ? (int)g_mainMenu.main1PlayerGame.size() : (int)g_mainMenu.mainStartGame.size()) - 2;
                         else if(!g_gameInfo.disableTwoPlayer && A == i++)
-                            menuLen = 18 * g_mainMenu.mainMultiplayerGame.size() - 2;
+                            menuLen = 18 * (int)g_mainMenu.mainMultiplayerGame.size() - 2;
                         else if(!g_gameInfo.disableBattleMode && A == i++)
-                            menuLen = 18 * g_mainMenu.mainBattleGame.size();
+                            menuLen = 18 * (int)g_mainMenu.mainBattleGame.size();
                         else if(g_config.enable_editor && A == i++)
-                            menuLen = 18 * g_mainMenu.mainEditor.size();
+                            menuLen = 18 * (int)g_mainMenu.mainEditor.size();
                         else if(A == i++)
-                            menuLen = 18 * g_mainMenu.mainOptions.size();
+                            menuLen = 18 * (int)g_mainMenu.mainOptions.size();
                         else if(A == i++)
-                            menuLen = 18 * g_mainMenu.mainExit.size();
+                            menuLen = 18 * (int)g_mainMenu.mainExit.size();
                         else
                             break;
 
@@ -1515,7 +1515,7 @@ bool mainMenuUpdate()
                     {
                         int i = 0;
                         if(A == i++)
-                            menuLen = 18 * g_mainMenu.controlsTitle.size();
+                            menuLen = 18 * (int)g_mainMenu.controlsTitle.size();
 #ifndef RENDER_FULLSCREEN_ALWAYS
                         else if(A == i++)
                         {
@@ -1530,7 +1530,7 @@ bool mainMenuUpdate()
                             menuLen = 18 * 25; // Render Mode: XXXXXXXX
 #endif
                         else if(A == i++)
-                            menuLen = 18 * (7 + ScaleMode_strings.at(g_videoSettings.scaleMode).length());
+                            menuLen = 18 * (7 + (int)ScaleMode_strings.at(g_videoSettings.scaleMode).length());
                         else if(A == i++)
                             menuLen = 18 * 25; // Language: XXXXX (YY)
                         else
@@ -1828,12 +1828,12 @@ static void s_drawGameSaves(int MenuX, int MenuY)
     // Gameplay Timer
     if(show_timer)
     {
-        std::string t = GameplayTimer::formatTime(info.Time);
+        std::string ts = GameplayTimer::formatTime(info.Time);
 
-        if(t.size() > 9)
-            t = t.substr(0, t.size() - 4);
+        if(ts.size() > 9)
+            ts = ts.substr(0, ts.size() - 4);
 
-        SuperPrint(fmt::format_ne(g_mainMenu.phraseTime, t), 3, infobox_x + 10, row_2);
+        SuperPrint(fmt::format_ne(g_mainMenu.phraseTime, ts), 3, infobox_x + 10, row_2);
     }
 
     // If demos off, put (l)ives and (c)oins on center

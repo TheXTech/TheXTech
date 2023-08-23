@@ -273,7 +273,7 @@ void Init(int plr, bool LegacyPause)
             s_longest_width = item_width;
     }
 
-    int total_menu_height = s_items.size() * 36 - 18;
+    int total_menu_height = (int)s_items.size() * 36 - 18;
     int total_menu_width = s_longest_width + 40;
 
     // GBA bounds
@@ -285,7 +285,7 @@ void Render()
 {
     // height includes intermediate padding but no top/bottom padding
     // width includes cursor on left and 20px padding on right for symmetry
-    int total_menu_height = s_items.size() * 36 - 18;
+    int total_menu_height = (int)s_items.size() * 36 - 18;
     int total_menu_width = s_longest_width + 40;
 
     // enforce GBA bounds (480x320)
@@ -408,7 +408,7 @@ bool Logic(int plr)
         return false;
     }
 
-    int max_item = s_items.size() - 1;
+    int max_item = (int)s_items.size() - 1;
 
     if(menuBackPress)
     {

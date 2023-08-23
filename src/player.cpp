@@ -78,16 +78,16 @@ static void setupPlayerAtCheckpoints(NPC_t &npc, Checkpoint_t &cp)
     tempLocation.Height = 600;
 
     C = 0;
-    for(int B : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
+    for(int bi : treeBlockQuery(tempLocation, SORTMODE_COMPAT))
     {
-        if(CheckCollision(tempLocation, Block[B].Location))
+        if(CheckCollision(tempLocation, Block[bi].Location))
         {
             if(C == 0)
-                C = B;
+                C = bi;
             else
             {
-                if(Block[B].Location.Y < Block[C].Location.Y)
-                    C = B;
+                if(Block[bi].Location.Y < Block[C].Location.Y)
+                    C = bi;
             }
         }
     }
@@ -747,7 +747,7 @@ void PlayerDeathEffect(int A)
 
 void PlayerDead(int A)
 {
-    Controls::Rumble(A, 400, 0.8);
+    Controls::Rumble(A, 400, 0.8f);
 
     bool tempBool = false;
     int B = 0;

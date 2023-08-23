@@ -3507,10 +3507,10 @@ void UpdateNPCs()
                             {
                                 NPC[A].BeltSpeed = oldBeltSpeed - NPC[A].oldAddBelt;
                                 beltCount = 1;
-                                if(NPC[A].BeltSpeed >= 2.1)
-                                    NPC[A].BeltSpeed -= 0.1;
-                                else if(NPC[A].BeltSpeed <= -2.1)
-                                    NPC[A].BeltSpeed += 0.1;
+                                if(NPC[A].BeltSpeed >= 2.1f)
+                                    NPC[A].BeltSpeed -= 0.1f;
+                                else if(NPC[A].BeltSpeed <= -2.1f)
+                                    NPC[A].BeltSpeed += 0.1f;
                             }
                         }
 
