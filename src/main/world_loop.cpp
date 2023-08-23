@@ -1244,7 +1244,7 @@ void PathWait()
 
             if(qScreen)
             {
-                pLogDebug("Mult %d", s_camMult);
+                D_pLogDebug("qScreen multiplier %d", s_camMult);
                 qScreen = Update_qScreen(1, 2 * s_camMult, 2 * s_camMult);
 
                 if(!qScreen)
