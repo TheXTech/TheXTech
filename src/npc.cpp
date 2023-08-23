@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+
 #include "sdl_proxy/sdl_stdinc.h"
 #include "globals.h"
 #include "npc.h"
@@ -168,7 +170,7 @@ void Deactivate(int A)
 void Bomb(Location_t Location, int Game, int ImmunePlayer)
 {
     float Radius = 0;
-    int i = 0;
+    // int i = 0;
     double X = 0;
     double Y = 0;
     double A = 0;
@@ -244,7 +246,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
 
     if(Game != 0)
     {
-        for(i = 1; i <= numPlayers; i++)
+        for(int i = 1; i <= numPlayers; i++)
         {
             A = std::abs(Player[i].Location.X + Player[i].Location.Width / 2.0 - X);
             B = std::abs(Player[i].Location.Y + Player[i].Location.Height / 2.0 - Y);
@@ -255,7 +257,7 @@ void Bomb(Location_t Location, int Game, int ImmunePlayer)
     }
     else if(BattleMode)
     {
-        for(i = 1; i <= numPlayers; i++)
+        for(int i = 1; i <= numPlayers; i++)
         {
             if(i != ImmunePlayer)
             {

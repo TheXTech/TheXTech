@@ -1943,7 +1943,7 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
 
-        for(int oBackground = screenBackgrounds.size() - 1; oBackground > 0 && (int)screenBackgrounds[oBackground] > numBackground; oBackground--)  // Locked doors
+        for(int oBackground = (int)screenBackgrounds.size() - 1; oBackground > 0 && (int)screenBackgrounds[oBackground] > numBackground; oBackground--)  // Locked doors
         {
             A = screenBackgrounds[oBackground];
 

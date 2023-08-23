@@ -52,6 +52,8 @@ bool AppPathManager::m_isPortable = false;
 #   define UserDirName "/3ds/thextech/"
 #elif defined(__WII__)
 #   define UserDirName "/thextech/"
+#elif defined(_WIN32)
+#   define UserDirName "/TheXTech/"
 #else
 #   define UserDirName "/thextech/"
 #endif

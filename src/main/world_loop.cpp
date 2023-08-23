@@ -532,10 +532,10 @@ void WorldLoop()
             //for(A = 1; A <= numWorldLevels; A++)
             for(auto t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
-                WorldLevel_t &level = *t;
+                WorldLevel_t &lvl = *t;
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, level.Location) && level.Active)
+                    if(CheckCollision(tempLocation, lvl.Location) && lvl.Active)
                     {
                         WorldPlayer[1].Move = 1;
                         break;
@@ -569,10 +569,10 @@ void WorldLoop()
             //for(A = 1; A <= numWorldLevels; A++)
             for(auto t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
-                WorldLevel_t &level = *t;
+                WorldLevel_t &lvl = *t;
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, level.Location) && level.Active)
+                    if(CheckCollision(tempLocation, lvl.Location) && lvl.Active)
                     {
                         WorldPlayer[1].Move = 2;
                         break;
@@ -607,10 +607,10 @@ void WorldLoop()
             //for(A = 1; A <= numWorldLevels; A++)
             for(auto t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
-                WorldLevel_t &level = *t;
+                WorldLevel_t &lvl = *t;
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, level.Location) && level.Active)
+                    if(CheckCollision(tempLocation, lvl.Location) && lvl.Active)
                     {
                         WorldPlayer[1].Move = 3;
                         break;
@@ -645,10 +645,10 @@ void WorldLoop()
             //for(A = 1; A <= numWorldLevels; A++)
             for(auto t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
-                WorldLevel_t &level = *t;
+                WorldLevel_t &lvl = *t;
                 if(WorldPlayer[1].Move == 0)
                 {
-                    if(CheckCollision(tempLocation, level.Location) && level.Active)
+                    if(CheckCollision(tempLocation, lvl.Location) && lvl.Active)
                     {
                         WorldPlayer[1].Move = 4;
                         break;
@@ -670,17 +670,17 @@ void WorldLoop()
             //for(A = 1; A <= numWorldLevels; A++)
             for(WorldLevelRef_t t : treeWorldLevelQuery(tempLocation, SORTMODE_ID))
             {
-                WorldLevel_t &level = *t;
-                if(CheckCollision(tempLocation, level.Location))
+                WorldLevel_t &lvl = *t;
+                if(CheckCollision(tempLocation, lvl.Location))
                 {
 #if 0 // Moved into the handler of level ending
-                    if(int(level.WarpX) != -1)
-                        WorldPlayer[1].Location.X = level.WarpX;
+                    if(int(lvl.WarpX) != -1)
+                        WorldPlayer[1].Location.X = lvl.WarpX;
 
-                    if(int(level.WarpY) != -1)
-                        WorldPlayer[1].Location.Y = level.WarpY;
+                    if(int(lvl.WarpY) != -1)
+                        WorldPlayer[1].Location.Y = lvl.WarpY;
 
-                    if(int(level.WarpY) != -1 || int(level.WarpX) != -1)
+                    if(int(lvl.WarpY) != -1 || int(lvl.WarpX) != -1)
                     {
                         LevelBeatCode = 6;
                         //for(B = 1; B <= numWorldLevels; B++)
@@ -696,10 +696,10 @@ void WorldLoop()
                     }
 #endif
 
-                    if(!level.FileName.empty() && level.FileName != ".lvl" && level.FileName != ".lvlx")
+                    if(!lvl.FileName.empty() && lvl.FileName != ".lvl" && lvl.FileName != ".lvlx")
                     {
-                        addMissingLvlSuffix(level.FileName);
-                        std::string levelPath = g_dirEpisode.resolveFileCaseExistsAbs(level.FileName);
+                        addMissingLvlSuffix(lvl.FileName);
+                        std::string levelPath = g_dirEpisode.resolveFileCaseExistsAbs(lvl.FileName);
 
                         if(!levelPath.empty())
                         {
@@ -710,7 +710,7 @@ void WorldLoop()
                                 ConnectScreen::SaveChars();
                             }
 
-                            StartWarp = level.StartWarp;
+                            StartWarp = lvl.StartWarp;
                             StopMusic();
                             PlaySound(SFX_LevelSelect);
                             g_worldScreenFader.setupFader(2, 0, 65, ScreenFader::S_RECT,
@@ -729,7 +729,7 @@ void WorldLoop()
                             if(!OpenLevel(levelPath))
                             {
                                 delayedMusicStart(); // Allow music being started
-                                MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, level.FileName);
+                                MessageText = fmt::format_ne(g_gameStrings.errorOpenFileFailed, lvl.FileName);
                                 PauseGame(PauseCode::Message);
                                 ErrorQuit = true;
                             }
@@ -741,15 +741,15 @@ void WorldLoop()
                         else
                         {
                             pLogWarning("Level file name \"%s\" at %d x %d (id=%d) was not found (directory %s)",
-                                        level.FileName.c_str(),
-                                        (int)level.Location.X,
-                                        (int)level.Location.Y,
-                                        level.Type,
+                                        lvl.FileName.c_str(),
+                                        (int)lvl.Location.X,
+                                        (int)lvl.Location.Y,
+                                        lvl.Type,
                                         g_dirEpisode.getCurDir().c_str()
                             );
                         }
                     }
-                    else if(int(level.WarpX) != -1 || int(level.WarpY) != -1)
+                    else if(int(lvl.WarpX) != -1 || int(lvl.WarpY) != -1)
                     {
                         musicReset = true;
                         StopMusic();
@@ -765,10 +765,10 @@ void WorldLoop()
                         worldWaitForFade(65);
 
                         // Moved from above
-                        if(int(level.WarpX) != -1)
-                            WorldPlayer[1].Location.X = level.WarpX;
-                        if(int(level.WarpY) != -1)
-                            WorldPlayer[1].Location.Y = level.WarpY;
+                        if(int(lvl.WarpX) != -1)
+                            WorldPlayer[1].Location.X = lvl.WarpX;
+                        if(int(lvl.WarpY) != -1)
+                            WorldPlayer[1].Location.Y = lvl.WarpY;
 
                         LevelBeatCode = 6;
 
@@ -1035,8 +1035,8 @@ void PlayerPath(WorldPlayer_t &p)
     // stop at level
     for(auto t : treeWorldLevelQuery(tempLocation, false))
     {
-        WorldLevel_t& level = *t;
-        if(CheckCollision(tempLocation, level.Location) && level.Active)
+        WorldLevel_t& lvl = *t;
+        if(CheckCollision(tempLocation, lvl.Location) && lvl.Active)
         {
             p.Move = 0;
             return;
@@ -1084,8 +1084,8 @@ void PlayerPath(WorldPlayer_t &p)
 
         for(auto t : treeWorldLevelQuery(tempLocation, false))
         {
-            WorldLevel_t& level = *t;
-            if(CheckCollision(tempLocation, level.Location) && level.Active)
+            WorldLevel_t& lvl = *t;
+            if(CheckCollision(tempLocation, lvl.Location) && lvl.Active)
             {
                 p.Move = B;
                 n_moves ++;

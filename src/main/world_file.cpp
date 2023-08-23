@@ -498,8 +498,10 @@ void ClearWorld(bool quick)
     StartLevel.clear();
     BeatTheGame = false;
     numWorldCredits = 0;
-    for(int A = 1; A <= maxWorldCredits; A++)
-        WorldCredits[A].clear();
+
+    for(int i = 1; i <= maxWorldCredits; i++)
+        WorldCredits[i].clear();
+
     if(LevelEditor)
     {
         vScreen[1].X = 0;
