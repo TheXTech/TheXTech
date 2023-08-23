@@ -154,10 +154,6 @@ void Render()
     else
         XRender::renderTextureFL(menu_left_X - 20, menu_top_Y + (s_cur_item * 36), GFX.MCursor[1].w, GFX.MCursor[1].h, GFX.MCursor[1], 0, 0, 90.0, nullptr, X_FLIP_NONE);
 
-    // draw quick reconnect screen
-    if(QuickReconnectScreen::g_active)
-        QuickReconnectScreen::Render();
-
     speedRun_renderControls(1, -1);
 
     if(numPlayers > 1)

@@ -33,7 +33,6 @@ extern bool g_active;
 extern int g_toast_duration[maxLocalPlayers];
 
 void Deactivate();
-void Render();
 void Logic();
 
 } // namespace QuickReconnectScreen
