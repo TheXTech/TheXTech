@@ -1021,16 +1021,6 @@ void ProcEvent(eventindex_t index, bool NoEffect)
 
                             DynamicScreen(Screens[0]);
 
-                            // the original game forces vScreenAverage to be 800x600 -- this creates the same effect of ignoring the dynamic screen
-                            bool screen2_vis = vScreen[2].Visible;
-
-                            // this will reset vScreen[2].Visible
-                            // needed for CenterScreens() to do the right thing,
-                            // but have to set it back so DynamicScreen() does the right thing next frame
-                            SetupScreens(true);
-                            CenterScreens(Screens[0]);
-                            vScreen[2].Visible = screen2_vis;
-
                             // calculate the vScreen at non-splitscreen resolution (as the original game does)
                             GetvScreenAverage(vScreen[1]);
 
