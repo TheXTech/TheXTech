@@ -39,7 +39,7 @@
 #include "blocks.h"
 #include "main/trees.h"
 #include "main/block_table.h"
-#include "main/msg_preprocessor.h"
+#include "script/msg_preprocessor.h"
 
 #include "npc/npc_queues.h"
 #include "graphics/gfx_update.h"

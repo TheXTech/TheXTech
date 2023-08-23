@@ -40,7 +40,7 @@
 #include "../frame_timer.h"
 #include "../graphics.h"
 #include "../controls.h"
-#include "../main/msg_preprocessor.h"
+#include "../script/msg_preprocessor.h"
 
 #include "npc_id.h"
 #include "eff_id.h"
