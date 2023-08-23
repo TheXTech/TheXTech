@@ -1894,7 +1894,7 @@ static inline bool isFloatValue(const std::string &str)
 
     for(const char &c : str)
     {
-        if(c < 0 || c > 127)
+        if(c < 0)
             return false; // Totally not a valid part of a floating-point number
 
         if(!isdigit(c))
