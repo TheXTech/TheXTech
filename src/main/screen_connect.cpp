@@ -148,7 +148,7 @@ void DropAdd_Start()
 // find the first player that isn't done (receives MenuControls)
 int GetMenuPlayer()
 {
-    int n = Controls::g_InputMethods.size();
+    int n = (int)Controls::g_InputMethods.size();
     if(n < s_minPlayers)
         n = s_minPlayers;
     if(n > maxLocalPlayers)
@@ -266,7 +266,7 @@ bool Player_Remove(int p)
 
 void DropNotDone(bool strict)
 {
-    int n = Controls::g_InputMethods.size()-1;
+    int n = (int)Controls::g_InputMethods.size() - 1;
     if(n >= maxLocalPlayers)
         n = maxLocalPlayers-1;
     // remove all not fully added players
@@ -639,7 +639,7 @@ bool Player_Select(int p)
             std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
             s_savedProfile[p] = Controls::g_InputMethods[p]->Profile;
 
-            int back_index = profiles.size();
+            int back_index = (int)profiles.size();
             if(s_menuItem[p] < 0 || s_menuItem[p] >= back_index)
             {
                 Player_Back(p);
@@ -669,6 +669,7 @@ bool Player_Select(int p)
 void Player_Up(int p)
 {
     s_inputReady[p] = false;
+
     if(s_playerState[p] == PlayerState::SelectChar)
     {
         PlaySoundMenu(SFX_Slide);
@@ -681,6 +682,7 @@ void Player_Up(int p)
             if(CharAvailable(s_menuItem[p]+1, p))
                 break;
         }
+
         // if can't traverse normally, allow duplicates
         if(i == 5)
         {
@@ -694,31 +696,34 @@ void Player_Up(int p)
             }
         }
     }
+
     if(s_playerState[p] == PlayerState::SelectProfile)
     {
         PlaySoundMenu(SFX_Slide);
+
         if(s_menuItem[p] == 0)
         {
             if(Controls::g_InputMethods[p])
             {
                 std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
-                int back_index = profiles.size();
+                int back_index = (int)profiles.size();
                 s_menuItem[p] = back_index;
             }
         }
         else
             s_menuItem[p] --;
     }
+
     if(s_playerState[p] == PlayerState::DropAddMain)
     {
         PlaySoundMenu(SFX_Slide);
+
         if(s_menuItem[p] == 0)
-        {
             s_menuItem[p] = DropAddMain_ItemCount() - 1;
-        }
         else
             s_menuItem[p] --;
     }
+
     if(s_playerState[p] == PlayerState::StartGame && s_context != Context::MainMenu)
     {
         if(s_menuItem[p] == -4)
@@ -727,6 +732,7 @@ void Player_Up(int p)
             return;
         }
     }
+
     if(s_playerState[p] == PlayerState::ControlsMenu)
     {
         PlaySoundMenu(SFX_Slide);
@@ -740,51 +746,64 @@ void Player_Up(int p)
 void Player_Down(int p)
 {
     s_inputReady[p] = false;
+
     if(s_playerState[p] == PlayerState::SelectChar)
     {
         PlaySoundMenu(SFX_Slide);
         int i;
+
         for(i = 0; i < 5; i++)
         {
             s_menuItem[p] ++;
+
             if(s_menuItem[p] == 5)
                 s_menuItem[p] = 0;
+
             if(CharAvailable(s_menuItem[p]+1, p))
                 break;
         }
+
         // if can't traverse normally, allow duplicates
         if(i == 5)
         {
             for(i = 0; i < 5; i++)
             {
                 s_menuItem[p] ++;
+
                 if(s_menuItem[p] == 5)
                     s_menuItem[p] = 0;
+
                 if(!blockCharacter[s_menuItem[p]+1] && s_char_info.accept(s_menuItem[p]))
                     break;
             }
         }
     }
+
     if(s_playerState[p] == PlayerState::SelectProfile)
     {
         PlaySoundMenu(SFX_Slide);
+
         if(Controls::g_InputMethods[p])
         {
             std::vector<Controls::InputMethodProfile*> profiles = Controls::g_InputMethods[p]->Type->GetProfiles();
-            int back_index = profiles.size();
+            int back_index = (int)profiles.size();
             if(s_menuItem[p] == back_index)
                 s_menuItem[p] = -1;
         }
+
         s_menuItem[p] ++;
     }
+
     if(s_playerState[p] == PlayerState::DropAddMain)
     {
         PlaySoundMenu(SFX_Slide);
+
         if(s_menuItem[p] == DropAddMain_ItemCount() - 1)
             s_menuItem[p] = 0;
         else
             s_menuItem[p] ++;
     }
+
     if(s_playerState[p] == PlayerState::StartGame && s_context != Context::MainMenu)
     {
         if(s_menuItem[p] == -4)
@@ -793,9 +812,11 @@ void Player_Down(int p)
             return;
         }
     }
+
     if(s_playerState[p] == PlayerState::ControlsMenu)
     {
         PlaySoundMenu(SFX_Slide);
+
         if(s_menuItem[p] == 2)
             s_menuItem[p] = 0;
         else
@@ -824,17 +845,17 @@ bool Player_MenuItem_Mouse_Render(int p, int i, const std::string& label, int X,
 {
     if(mouse)
     {
-        int menuLen = label.size() * 18;
+        int menuLen = (int)label.size() * 18;
         if(SharedCursor.X >= X && SharedCursor.X <= X + menuLen
             && SharedCursor.Y >= Y && SharedCursor.Y <= Y + 16)
         {
             return Player_MouseItem(p, i);
         }
     }
+
     if(render)
-    {
         SuperPrint(label, 3, X, Y);
-    }
+
     return false;
 }
 
@@ -1253,15 +1274,20 @@ int Mouse_Render(bool mouse, bool render)
     if(mouse && !SharedCursor.Move && !render && !SharedCursor.Primary && !SharedCursor.Secondary)
         return 0;
 
-    int n = Controls::g_InputMethods.size();
+    int n = (int)Controls::g_InputMethods.size();
+
     if(s_context == Context::DropAdd || (s_context == Context::MainMenu && s_minPlayers != 1))
         n += 1;
+
     if(n < s_minPlayers)
         n = s_minPlayers;
+
     if(n > maxLocalPlayers)
         n = maxLocalPlayers;
+
     if(s_context == Context::DropAdd && g_gameInfo.disableTwoPlayer)
         n = 1;
+
 
     // What is the first player that is not done?
     int menuPlayer = GetMenuPlayer();
@@ -1293,14 +1319,18 @@ int Mouse_Render(bool mouse, bool render)
     // with at least 30px of padding on either side
     int max_line = 15;
     int line = (ScreenH - 60) / max_line;
+
     if(line > 30)
         line = 30;
+
     if(line < 18)
     {
         line = 18;
         max_line = (ScreenH - 60) / line;
     }
+
     line -= line & 1;
+
 
     // vertical start of the menu
     int sY = ScreenH/2 - (line*max_line)/2;

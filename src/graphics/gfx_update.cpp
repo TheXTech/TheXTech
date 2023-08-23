@@ -3074,9 +3074,6 @@ void UpdateGraphics(bool skipRepaint)
             DrawMessage(MessageTextMap);
     }
 
-    if(QuickReconnectScreen::g_active)
-        QuickReconnectScreen::Render();
-
     if(GamePaused == PauseCode::DropAdd)
     {
         ConnectScreen::Render();

@@ -475,11 +475,11 @@ void SetupVars()
 
     NPCWidth[240] = 32;
     NPCHeight[240] = 32;
-    NPCIsABonus[240] = 32;
+    NPCIsABonus[240] = true;//32;
 
     NPCWidth[248] = 32;
     NPCHeight[248] = 32;
-    NPCIsABonus[248] = 32;
+    NPCIsABonus[248] = true;//32;
 
     NPCWidth[200] = 64;
     NPCHeight[200] = 72;

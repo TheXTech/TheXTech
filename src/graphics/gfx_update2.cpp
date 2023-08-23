@@ -396,30 +396,30 @@ void UpdateGraphics2(bool skipRepaint)
         //for(A = 1; A <= numWorldLevels; A++)
         for(WorldLevel_t* t : treeWorldLevelQuery(sLeft, sTop, sRight, sBottom, true))
         {
-            WorldLevel_t &level = *t;
-            SDL_assert(IF_INRANGE(level.Type, 0, maxLevelType));
+            WorldLevel_t &lvlP = *t;
+            SDL_assert(IF_INRANGE(lvlP.Type, 0, maxLevelType));
 
             g_stats.checkedLevels++;
 
-            Location_t locGFX = level.LocationGFX();
+            Location_t locGFX = lvlP.LocationGFX();
 
-            if(CheckCollision(sView, locGFX) && (WorldEditor || level.Active))
+            if(CheckCollision(sView, locGFX) && (WorldEditor || lvlP.Active))
             {
                 g_stats.renderedLevels++;
 
-                if(level.Path)
+                if(lvlP.Path)
                 {
-                    XRender::renderTexture(vScreen[Z].X + level.Location.X,
-                                          vScreen[Z].Y + level.Location.Y,
-                                          level.Location.Width,
-                                          level.Location.Height,
+                    XRender::renderTexture(vScreen[Z].X + lvlP.Location.X,
+                                          vScreen[Z].Y + lvlP.Location.Y,
+                                          lvlP.Location.Width,
+                                          lvlP.Location.Height,
                                           GFXLevelBMP[0], 0, 0);
                 }
 
-                if(level.Path2)
+                if(lvlP.Path2)
                 {
-                    XRender::renderTexture(vScreen[Z].X + level.Location.X - 16,
-                                          vScreen[Z].Y + 8 + level.Location.Y,
+                    XRender::renderTexture(vScreen[Z].X + lvlP.Location.X - 16,
+                                          vScreen[Z].Y + 8 + lvlP.Location.Y,
                                           64, 32,
                                           GFXLevelBMP[29], 0, 0);
                 }
@@ -427,7 +427,7 @@ void UpdateGraphics2(bool skipRepaint)
                 XRender::renderTexture(vScreen[Z].X + locGFX.X,
                                       vScreen[Z].Y + locGFX.Y,
                                       locGFX.Width, locGFX.Height,
-                                      GFXLevelBMP[level.Type], 0, 32 * LevelFrame[level.Type]);
+                                      GFXLevelBMP[lvlP.Type], 0, 32 * LevelFrame[lvlP.Type]);
             }
         }
     }
@@ -760,9 +760,6 @@ void UpdateGraphics2(bool skipRepaint)
         // render special screens
         if(GamePaused == PauseCode::PauseScreen)
             PauseScreen::Render();
-
-        if(QuickReconnectScreen::g_active)
-            QuickReconnectScreen::Render();
 
         if(GamePaused == PauseCode::DropAdd)
         {

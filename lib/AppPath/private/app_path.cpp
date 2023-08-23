@@ -172,24 +172,16 @@ bool AppPathManager::checkPortable()
 void AppPathManager::initSettingsPath()
 {
     // Default settings path
-    m_settingsPath = AppPathP::settingsRoot();
-    if(m_settingsPath.empty())
-        m_settingsPath = m_userPath + "settings/";
+    initString(m_settingsPath, AppPathP::settingsRoot(), m_userPath + "settings/");
 
     // Check if need to use system-wide screenshots directory
-    m_screenshotsPath = AppPathP::screenshotsRoot();
-    if(m_screenshotsPath.empty())
-        m_screenshotsPath = m_userPath + "screenshots/";
+    initString(m_screenshotsPath, AppPathP::screenshotsRoot(), m_userPath + "screenshots/");
 
     // Check if need to use system-wide gif recording directory
-    m_gifrecordingsPath = AppPathP::gifRecsRoot();
-    if(m_gifrecordingsPath.empty())
-        m_gifrecordingsPath = m_userPath + "gif-recordings/";
+    initString(m_gifrecordingsPath, AppPathP::gifRecsRoot(), m_userPath + "gif-recordings/");
 
     // Check if need to use system-wide logs directory
-    m_logsPath = AppPathP::logsRoot();
-    if(m_logsPath.empty())
-        m_logsPath = m_userPath + "logs/";
+    initString(m_logsPath, AppPathP::logsRoot(), m_userPath + "logs/");
 
 #ifndef VITA
     // Just in case, avoid mad jokes with making name-sake file as a settings folder
@@ -210,6 +202,18 @@ void AppPathManager::initSettingsPath()
         DirMan::mkAbsPath(userWorldsRootDir());
     if(!DirMan::exists(userBattleRootDir()))
         DirMan::mkAbsPath(userBattleRootDir());
+}
+
+void AppPathManager::initString(std::string& text, const std::string& inValue, const std::string& defValue)
+{
+    if(m_isPortable)
+        text = defValue;
+    else
+    {
+        text = inValue;
+        if(text.empty())
+            text = defValue;
+    }
 }
 
 

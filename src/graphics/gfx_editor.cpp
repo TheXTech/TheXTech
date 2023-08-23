@@ -96,7 +96,7 @@ void DrawEditorLevel(int Z)
                         tempLocation.X = Block[A].Location.X + Block[A].Location.Width / 2 - GFX.Chat.w / 2;
                         tempLocation.Y = Block[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
                     }
                 }
             }
@@ -143,7 +143,7 @@ void DrawEditorLevel(int Z)
                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 - 4 - GFX.Chat.w;
                         tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
                     }
                 }
 
@@ -158,7 +158,7 @@ void DrawEditorLevel(int Z)
                             tempLocation.X = NPC[A].Location.X + NPC[A].Location.Width / 2 + 4;
                         tempLocation.Y = NPC[A].Location.Y - GFX.Chat.h - 8;
 
-                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
+                        XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7f);
                     }
                 }
             }
@@ -406,7 +406,7 @@ void DrawEditorLevel(int Z)
                 tempLocation.X = b.Location.X + b.Location.Width / 2 - GFX.Chat.w / 2;
                 tempLocation.Y = b.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
             }
         }
 
@@ -571,7 +571,7 @@ void DrawEditorLevel(int Z)
                     tempLocation.X = n.Location.X + n.Location.Width / 2 - 4 - GFX.Chat.w;
                 tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 0., 0., 0.7f);
             }
 
             // and that they can talk
@@ -583,7 +583,7 @@ void DrawEditorLevel(int Z)
                     tempLocation.X = n.Location.X + n.Location.Width / 2 + 4;
                 tempLocation.Y = n.Location.Y - GFX.Chat.h - 8;
 
-                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7);
+                XRender::renderTexture(vScreen[Z].X + tempLocation.X, vScreen[Z].Y + tempLocation.Y, GFX.Chat, 1., 1., 1., 0.7f);
             }
         }
         else if(EditorCursor.Mode == OptCursor_t::LVL_WATER) // Water
@@ -654,7 +654,7 @@ void DrawEditorLevel(int Z)
             {
                 // there might be a tooltip in this case
                 if(editorScreen.active || EditorCursor.Y < 40)
-                    SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34, 1., 1., 1., 0.3);
+                    SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34, 1., 1., 1., 0.3f);
                 else
                     SuperPrint(GetL(e.Layer), 3, curX + 28 , curY + 34);
             }
