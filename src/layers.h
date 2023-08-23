@@ -25,6 +25,8 @@
 #include <string>
 #include <vector>
 #include <set>
+#include <cstdint>
+
 #include "range_arr.hpp"
 #include "location.h"
 #include "global_constants.h"
@@ -165,6 +167,8 @@ extern RangeArr<Events_t, 0, maxEvents> Events;
 extern RangeArrI<eventindex_t, 1, maxEvents, EVENT_NONE> NewEvent;
 //Public newEventDelay(1 To 100) As Integer
 extern RangeArrI<int, 1, maxEvents, 0> newEventDelay;
+//! NEW: which player originally triggered each queued event
+extern RangeArrI<uint8_t, 1, maxEvents, 0> newEventPlayer;
 //Public newEventNum As Integer
 extern int newEventNum;
 
@@ -249,7 +253,9 @@ void ClearTriggeredEvents();
 // Old functions:
 
 // Public Sub ProcEvent(EventName As String, Optional NoEffect As Boolean = False)
-void ProcEvent(eventindex_t index, bool NoEffect = false);
+void ProcEvent(eventindex_t, bool) = delete; // old signature
+// NEW: added WhichPlayer, 0 by default, to indicate which player triggered the event
+void ProcEvent(eventindex_t index, int WhichPlayer, bool NoEffect = false);
 // Public Sub UpdateEvents()
 void UpdateEvents();
 

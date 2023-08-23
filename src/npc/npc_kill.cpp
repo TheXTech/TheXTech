@@ -177,7 +177,7 @@ void KillNPC(int A, int B)
 
     if(NPC[A].TriggerDeath != EVENT_NONE && !LevelEditor)
     {
-        ProcEvent(NPC[A].TriggerDeath);
+        ProcEvent(NPC[A].TriggerDeath, 0);
     }
 
     if(NPC[A].TriggerLast != EVENT_NONE)
@@ -201,7 +201,7 @@ void KillNPC(int A, int B)
         }
 
         if(!tempBool)
-            ProcEvent(NPC[A].TriggerLast);
+            ProcEvent(NPC[A].TriggerLast, 0);
     }
 
     if(NPC[A].HoldingPlayer > 0)

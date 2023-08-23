@@ -4437,7 +4437,7 @@ void UpdatePlayer()
                     MessageText.clear();
                     MessageTextMap.clear();
                     if(NPC[MessageNPC].TriggerTalk != EVENT_NONE)
-                        ProcEvent(NPC[MessageNPC].TriggerTalk);
+                        ProcEvent(NPC[MessageNPC].TriggerTalk, A);
                     MessageNPC = 0;
                 }
                 YoshiEatCode(A);
