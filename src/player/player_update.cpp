@@ -40,6 +40,7 @@
 #include "../frame_timer.h"
 #include "../graphics.h"
 #include "../controls.h"
+#include "../main/msg_preprocessor.h"
 
 #include "npc_id.h"
 #include "eff_id.h"
@@ -4433,6 +4434,7 @@ void UpdatePlayer()
                 if(MessageNPC > 0)
                 {
                     MessageText = GetS(NPC[MessageNPC].Text);
+                    preProcessMessage(MessageText, A);
                     PauseGame(PauseCode::Message, A);
                     MessageText.clear();
                     MessageTextMap.clear();
