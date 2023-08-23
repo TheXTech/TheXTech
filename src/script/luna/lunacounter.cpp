@@ -44,6 +44,9 @@ DeathCounter::DeathCounter() noexcept
     mEnabled = false;
     mCurTotalDeaths = 0;
     mCurLevelDeaths = 0;
+
+    // Print Demos counter with a font 3
+    m_print.font = 3;
 }
 
 void DeathCounter::init()
@@ -339,19 +342,18 @@ void DeathCounter::Recount()
 }
 
 // DRAW - Print the death counter in its current state
-void DeathCounter::Draw() const
+void DeathCounter::Draw()
 {
     if(!mEnabled)
         return;
 
     // Format string to print
-    std::string printstr = fmt::format_ne("{0} / {1}", mCurLevelDeaths, mCurTotalDeaths);
-    auto minusoffset = (float)(123 - (printstr.size() * 8));
+    m_print.syncCache(mCurLevelDeaths, mCurTotalDeaths, 123.f);
+    m_print.syncCache(gDemoCounterTitle);
 
     XRender::offsetViewportIgnore(true);
-    // Print to screen in upper left
-    SuperPrint(gDemoCounterTitle, 3, 80, 27);
-    SuperPrint(printstr, 3, minusoffset, 48);
+    SuperPrint(gDemoCounterTitle, 3, m_print.titleDrawX, 27.f);
+    SuperPrint(m_print.counterOut.c_str(), 3, m_print.counterDrawX, 48.f);
     XRender::offsetViewportIgnore(false);
 }
 
@@ -370,5 +372,36 @@ void DeathCounter::PrintDebug() const
             Renderer::Get().AddOp(new RenderStringOp(iter.m_levelName, 2, 80, y));
             y += 30;
         }
+    }
+}
+
+void DeathCounter::CachedPrint::syncCache(int curLevel, int total, float drawX)
+{
+    if(curLevel != counterLevel || total != counterTotal)
+    {
+        counterLevel = curLevel;
+        counterTotal = total;
+        counterOut = fmt::format_ne("{0} / {1}", curLevel, total);
+        counterPixLen = SuperTextPixLen(counterOut.c_str(), font);
+
+        counterDrawX = (float)(drawX - (counterPixLen / 2.f));
+        // Ensure the align value is even
+        counterDrawX -= SDL_fmodf(counterDrawX, 2.f);
+    }
+}
+
+void DeathCounter::CachedPrint::syncCache(const std::string &title)
+{
+    intptr_t ptr = reinterpret_cast<intptr_t>(title.c_str());
+
+    if(titlePointer != ptr || titleSize != title.size())
+    {
+        titlePointer = ptr;
+        titleSize = title.size();
+        titlePixLen = SuperTextPixLen(title.c_str(), font);
+
+        titleDrawX = counterDrawX + (counterPixLen / 2.f) - (titlePixLen / 2.f);
+        // Ensure the align value is even
+        titleDrawX -= SDL_fmodf(titleDrawX, 2.f);
     }
 }
