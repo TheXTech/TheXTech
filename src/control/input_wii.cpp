@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+
 #include "globals.h"
 #include "game_main.h"
 
@@ -32,6 +34,7 @@
 #include <Logger/logger.h>
 
 #include <wiiuse/wpad.h>
+
 
 #define WPAD_STICK_LL  0x2000
 #define WPAD_STICK_LR  0x4000

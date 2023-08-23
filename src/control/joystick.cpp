@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <algorithm>
+
 #include <SDL2/SDL_version.h>
 #include <SDL2/SDL_joystick.h>
 #include <SDL2/SDL_gamecontroller.h>

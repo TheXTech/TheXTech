@@ -89,22 +89,49 @@ static const unsigned char charTraits[256] =
 #define IS_SPECIAL(c) (charTraits[static_cast<unsigned char>(c)] & Special)
 #define IS_INIEQUAL(c) (charTraits[static_cast<unsigned char>(c)] & INIParamEq)
 #else
-inline unsigned char IS_SPACE(char &c)
+static inline unsigned char IS_SPACE(char &c)
 {
     return (charTraits[static_cast<unsigned char>(c)] & Space);
 }
-inline unsigned char IS_SPECIAL(char &c)
+static inline unsigned char IS_SPECIAL(char &c)
 {
     return (charTraits[static_cast<unsigned char>(c)] & Special);
 }
-inline unsigned char IS_INIEQUAL(char &c)
+static inline unsigned char IS_INIEQUAL(char &c)
 {
     return (charTraits[static_cast<unsigned char>(c)] & INIParamEq);
 }
 #endif
 
+static const unsigned char charDigit[256] =
+{
+//  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 0
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 1
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 2
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, // 3
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 4
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 5
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 6
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 7
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 8
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // 9
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // A
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // B
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // C
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // D
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // E
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0  // F
+};
+
+static inline bool isDigit(char c)
+{
+    return static_cast<bool>(charDigit[static_cast<unsigned char>(c)]);
+}
+
+
 /* Strip whitespace chars off end of given string, in place. Return s. */
-inline char *rstrip(char *s)
+static inline char *rstrip(char *s)
 {
     char *p = s + strlen(s);
 
@@ -115,7 +142,7 @@ inline char *rstrip(char *s)
 }
 
 /* Return pointer to first non-whitespace char in given string. */
-inline char *lskip(char *s)
+static inline char *lskip(char *s)
 {
     while(*s && IS_SPACE(*s))
         s++;
@@ -123,7 +150,7 @@ inline char *lskip(char *s)
     return reinterpret_cast<char *>(s);
 }
 
-inline char *lrtrim(char *s)
+static inline char *lrtrim(char *s)
 {
     while(*s && IS_SPACE(*s))
         s++;
@@ -139,7 +166,7 @@ inline char *lrtrim(char *s)
 /* Return pointer to first char c or ';' comment in given string, or pointer to
    null at end of string if neither found. ';' must be prefixed by a whitespace
    character to register as a comment. */
-inline char *find_char_or_comment(char *s, char c)
+static inline char *find_char_or_comment(char *s, char c)
 {
     unsigned char was_whitespace = 0;
 
@@ -152,7 +179,7 @@ inline char *find_char_or_comment(char *s, char c)
     return s;
 }
 
-inline char *find_inieq_or_comment(char *s)
+static inline char *find_inieq_or_comment(char *s)
 {
     unsigned char was_whitespace = 0;
 
@@ -165,7 +192,7 @@ inline char *find_inieq_or_comment(char *s)
     return s;
 }
 
-inline char *removeQuotes(char *begin, char *end)
+static inline char *removeQuotes(char *begin, char *end)
 {
     if((*begin == '\0') || (begin == end))
         return begin;
@@ -181,7 +208,7 @@ inline char *removeQuotes(char *begin, char *end)
     return begin;
 }
 
-inline char *unescapeString(char* str)
+static inline char *unescapeString(char* str)
 {
     char *src, *dst;
     src = str;
@@ -211,7 +238,7 @@ inline char *unescapeString(char* str)
 }
 
 //Remove comment line from a tail of value
-inline void skipcomment(char *value)
+static inline void skipcomment(char *value)
 {
     unsigned char quoteDepth = 0;
 
@@ -241,7 +268,7 @@ inline void skipcomment(char *value)
     }
 }
 
-inline bool memfgets(char *&line, const char *data, char *&pos, const char *end)
+static inline bool memfgets(char *&line, const char *data, char *&pos, const char *end)
 {
     line = pos;
 
@@ -1011,10 +1038,10 @@ void IniProcessing::read(const char *key, bool &dest, bool defVal)
         }
 
         bool isNum = true;
-        isNum = isNum && (std::isdigit(buff[i]) || (buff[i] == '-') || (buff[i] == '+'));
+        isNum = isNum && (isDigit(buff[i]) || (buff[i] == '-') || (buff[i] == '+'));
 
         for(size_t j = 1; j < ss; j++)
-            isNum = (isNum && std::isdigit(buff[j]));
+            isNum = (isNum && isDigit(buff[j]));
 
         if(isNum)
         {
@@ -1894,10 +1921,7 @@ static inline bool isFloatValue(const std::string &str)
 
     for(const char &c : str)
     {
-        if(c < 0 || c > 127)
-            return false; // Totally not a valid part of a floating-point number
-
-        if(!isdigit(c))
+        if(!isDigit(c))
         {
             switch(st)
             {

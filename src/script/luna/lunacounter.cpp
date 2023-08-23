@@ -45,6 +45,9 @@ DeathCounter::DeathCounter() noexcept
     mEnabled = false;
     mCurTotalDeaths = 0;
     mCurLevelDeaths = 0;
+
+    // Print Demos counter with a font 3
+    m_print.font = 3;
 }
 
 void DeathCounter::init()
@@ -340,14 +343,14 @@ void DeathCounter::Recount()
 }
 
 // DRAW - Print the death counter in its current state
-void DeathCounter::Draw(int screenZ) const
+void DeathCounter::Draw(int screenZ)
 {
     if(!mEnabled)
         return;
 
     // Format string to print
-    std::string printstr = fmt::format_ne("{0} / {1}", mCurLevelDeaths, mCurTotalDeaths);
-    auto minusoffset = (float)(123 - (printstr.size() * 8));
+    m_print.syncCache(mCurLevelDeaths, mCurTotalDeaths, 123.f);
+    m_print.syncCache(gDemoCounterTitle);
 
     int ScreenTop = 0;
     if(vScreen[screenZ].Height > 600)
@@ -370,22 +373,8 @@ void DeathCounter::Draw(int screenZ) const
     }
 
     XRender::offsetViewportIgnore(true);
-    // Print to screen in upper left
-    if(vScreen[screenZ].Width >= 800)
-    {
-        SuperPrint(gDemoCounterTitle, 3, HUDLeft + 80, ScreenTop + 26);
-        SuperPrint(printstr, 3, HUDLeft + minusoffset, ScreenTop + 48);
-    }
-    else if(vScreen[screenZ].Width >= 700)
-    {
-        SuperPrint(gDemoCounterTitle, 3, 10, ScreenTop + 26);
-        SuperPrint(printstr, 3, minusoffset - 70, ScreenTop + 48);
-    }
-    else
-    {
-        SuperPrint(gDemoCounterTitle, 3, 50, ScreenTop + 4);
-        SuperPrint(printstr, 3, 50 + gDemoCounterTitle.length() * 18 + 24, ScreenTop + 4);
-    }
+    SuperPrint(gDemoCounterTitle, 3, HUDLeft + m_print.titleDrawX, ScreenTop + 26.f);
+    SuperPrint(m_print.counterOut.c_str(), 3, HUDLeft + m_print.counterDrawX, ScreenTop + 48.f);
     XRender::offsetViewportIgnore(false);
 }
 
@@ -404,5 +393,36 @@ void DeathCounter::PrintDebug() const
             Renderer::Get().AddOp(new RenderStringOp(iter.m_levelName, 2, 80, y));
             y += 30;
         }
+    }
+}
+
+void DeathCounter::CachedPrint::syncCache(int curLevel, int total, float drawX)
+{
+    if(curLevel != counterLevel || total != counterTotal)
+    {
+        counterLevel = curLevel;
+        counterTotal = total;
+        counterOut = fmt::format_ne("{0} / {1}", curLevel, total);
+        counterPixLen = SuperTextPixLen(counterOut.c_str(), font);
+
+        counterDrawX = (float)(drawX - (counterPixLen / 2.f));
+        // Ensure the align value is even
+        counterDrawX -= SDL_fmodf(counterDrawX, 2.f);
+    }
+}
+
+void DeathCounter::CachedPrint::syncCache(const std::string &title)
+{
+    intptr_t ptr = reinterpret_cast<intptr_t>(title.c_str());
+
+    if(titlePointer != ptr || titleSize != title.size())
+    {
+        titlePointer = ptr;
+        titleSize = title.size();
+        titlePixLen = SuperTextPixLen(title.c_str(), font);
+
+        titleDrawX = counterDrawX + (counterPixLen / 2.f) - (titlePixLen / 2.f);
+        // Ensure the align value is even
+        titleDrawX -= SDL_fmodf(titleDrawX, 2.f);
     }
 }

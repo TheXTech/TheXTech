@@ -397,7 +397,7 @@ static void removePersonalData(std::string &log)
 int ppc_backtrace(void **buffer, int size)
 {
     int depth;
-    uint32_t stackptr, lr, *addr;
+    uint32_t stackptr = 0, lr, *addr;
 
     // get link register
     asm volatile ("mflr %0" : "=r"(lr));
@@ -409,7 +409,7 @@ int ppc_backtrace(void **buffer, int size)
     asm volatile("stw %%sp, 0(%0)" : : "b" ((uint32_t)&stackptr));
 
     // assign stack ptr to address
-    addr = (uint32_t *)stackptr;
+    addr = reinterpret_cast<uint32_t *>(stackptr);
 
     // get the frames
     if (*addr)
