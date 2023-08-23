@@ -413,7 +413,7 @@ int PauseGame(PauseCode code, int plr)
             PauseMusic();
     }
 
-    resetFrameTimer();
+    // resetFrameTimer();
 
     // some pause games may return a status code
     int result = 0;
@@ -537,7 +537,7 @@ int PauseGame(PauseCode code, int plr)
             ResumeMusic();
     }
 
-    resetFrameTimer();
+    // resetFrameTimer();
 
     return result;
 }

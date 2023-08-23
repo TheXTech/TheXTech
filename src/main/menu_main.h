@@ -136,6 +136,8 @@ struct MainMenuContent
     std::string optionsModeWindowed;
     std::string optionsViewCredits;
     std::string optionsRestartEngine;
+    std::string optionsRender;
+    std::string optionsRenderX;
     std::string optionsScaleMode;
     std::string optionsScaleInteger;
     std::string optionsScaleNearest;

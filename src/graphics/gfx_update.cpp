@@ -2974,7 +2974,7 @@ void UpdateGraphics(bool skipRepaint)
 
     speedRun_renderTimer();
 
-    if(PrintFPS > 0)
+    if(PrintFPS > 0 && ShowFPS)
     {
         SuperPrint(fmt::format_ne("{0}", int(PrintFPS)), 1, 8, 8, 0.f, 1.f, 0.f);
 

@@ -206,6 +206,7 @@
         "phraseAreYouSure": "您确定吗？",
         "phraseCountMore": "更多{0}",
         "phraseDelayIsMs": "延迟：{0}毫秒",
+        "phraseGenericIndex": "编号：{0}",
         "phraseRadiusIndex": "半径{0}",
         "phraseSectionIndex": "场景{0}",
         "phraseTextOf": "{0}的文字信息",
@@ -321,8 +322,7 @@
             "phraseCreditIndex": "地图制作团队 第{0}行：",
             "retryOnFail": "失败之后重新开始",
             "totalStars": "总星星数："
-        },
-        "phraseGenericIndex": "编号：{0}"
+        }
     },
     "game": {
         "connect": {
@@ -348,10 +348,10 @@
             "phrasePlayerDisconnected": "玩家{0}未连接任何设备"
         },
         "error": {
-            "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。",
-            "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。",
+            "errorInvalidEnterWarp": "========= 发生错误! =========\n\n作为关卡起点的传送点{1}号不存在，因此无法启动关卡。\n传送点总数：{2}\n\n文件：{0}",
             "errorNoStartPoint": "========= 发生错误! =========\n\n未放置玩家起点或传送点入口，因此无法启动关卡。\n\n文件：{0}",
-            "errorInvalidEnterWarp": "========= 发生错误! =========\n\n作为关卡起点的传送点{1}号不存在，因此无法启动关卡。\n传送点总数：{2}\n\n文件：{0}"
+            "openFileFailed": "错误：无法打开文件\"{0}\"：文件不存在或已损坏。",
+            "warpNeedStarCount": "你需要{0}{2}{1}才能进入此传送点。"
         },
         "pause": {
             "continue": "继续",
@@ -582,6 +582,7 @@
         },
         "wordBack": "返回",
         "wordHide": "隐藏",
+        "wordLanguage": "语言",
         "wordNo": "否",
         "wordOff": "关闭",
         "wordOn": "开启",
@@ -590,8 +591,7 @@
         "wordResume": "恢复",
         "wordShow": "显示",
         "wordWaiting": "等待",
-        "wordYes": "是",
-        "wordLanguage": "语言"
+        "wordYes": "是"
     },
     "outro": {
         "cppPortDevelopers": "C++移植开发人员：",

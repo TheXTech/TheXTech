@@ -423,8 +423,10 @@ static inline void computeFrameTime2Real()
         s_goalTime = s_fpsTime;
         //      if(Debugger == true)
         //          frmLevelDebugger.lblFPS = fpsCount;
-        if(ShowFPS)
-            PrintFPS = s_fpsCount;
+
+        // if(ShowFPS)
+        PrintFPS = s_fpsCount;
+
         s_fpsCount = 0;
     }
 }
@@ -461,8 +463,9 @@ static inline void computeFrameTime2Real_2()
         s_fpsTime = SDL_GetTicks() + 1000;
         s_goalTime = s_fpsTime;
 
-        if(ShowFPS)
-            PrintFPS = s_fpsCount;
+        // if(ShowFPS)
+        PrintFPS = s_fpsCount;
+
         s_fpsCount = 0;
     }
 

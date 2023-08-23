@@ -206,6 +206,7 @@
         "phraseAreYouSure": "您確定嗎？",
         "phraseCountMore": "更多{0}",
         "phraseDelayIsMs": "延遲：{0}毫秒",
+        "phraseGenericIndex": "編號：{0}",
         "phraseRadiusIndex": "半徑{0}",
         "phraseSectionIndex": "場景{0}",
         "phraseTextOf": "{0}的文字信息",
@@ -321,8 +322,7 @@
             "phraseCreditIndex": "地圖製作團隊 第{0}行：",
             "retryOnFail": "失敗之後重新開始",
             "totalStars": "總星星數："
-        },
-        "phraseGenericIndex": "編號：{0}"
+        }
     },
     "game": {
         "connect": {
@@ -348,10 +348,10 @@
             "phrasePlayerDisconnected": "玩家{0}未連接任何設備"
         },
         "error": {
-            "openFileFailed": "錯誤：無法打開檔案\"{0}\"：檔案不存在或已損壞。",
-            "warpNeedStarCount": "你需要{0}{2}{1}才能進入此傳送點。",
             "errorInvalidEnterWarp": "========= 發生錯誤! =========\n\n作爲關卡起點的傳送點{1}號不存在，因此無法啓動關卡。\n傳送點總數：{2}\n\n檔案：{0}",
-            "errorNoStartPoint": "========= 發生錯誤! =========\n\n未放置玩家起點或傳送點入口，因此無法啓動關卡。\n\n檔案：{0}"
+            "errorNoStartPoint": "========= 發生錯誤! =========\n\n未放置玩家起點或傳送點入口，因此無法啓動關卡。\n\n檔案：{0}",
+            "openFileFailed": "錯誤：無法打開檔案\"{0}\"：檔案不存在或已損壞。",
+            "warpNeedStarCount": "你需要{0}{2}{1}才能進入此傳送點。"
         },
         "pause": {
             "continue": "繼續",
@@ -572,16 +572,17 @@
             "optionsModeFullScreen": "全屏模式",
             "optionsModeWindowed": "窗口模式",
             "optionsViewCredits": "查看製作團隊",
+            "restartEngine": "重啓引擎后生效",
             "scale": {
-                "label": "圖像縮放",
                 "integer": "整數",
+                "label": "圖像縮放",
                 "linear": "雙綫性",
                 "nearest": "最近鄰居"
-            },
-            "restartEngine": "重啓引擎后生效"
+            }
         },
         "wordBack": "返回",
         "wordHide": "隱藏",
+        "wordLanguage": "語言",
         "wordNo": "否",
         "wordOff": "關閉",
         "wordOn": "開啓",
@@ -590,8 +591,7 @@
         "wordResume": "恢復",
         "wordShow": "顯示",
         "wordWaiting": "等待",
-        "wordYes": "是",
-        "wordLanguage": "語言"
+        "wordYes": "是"
     },
     "outro": {
         "cppPortDevelopers": "C++移植開發人員：",

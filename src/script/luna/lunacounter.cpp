@@ -349,13 +349,17 @@ void DeathCounter::Draw(int screenZ)
         return;
 
     // Format string to print
-    m_print.syncCache(mCurLevelDeaths, mCurTotalDeaths, 123.f);
+    m_print.syncCache(mCurLevelDeaths, mCurTotalDeaths);
     m_print.syncCache(gDemoCounterTitle);
 
+    XRender::offsetViewportIgnore(true);
+
+    const vScreen_t& vscreen = vScreen[screenZ];
+
     int ScreenTop = 0;
-    if(vScreen[screenZ].Height > 600)
-        ScreenTop = vScreen[screenZ].Height / 2 - 300;
-    int HUDLeft = vScreen[screenZ].Width / 2 - 400;
+    if(vscreen.Height > 600)
+        ScreenTop = vscreen.Height / 2 - 300;
+    int HUDLeft = vscreen.Width / 2 - 400;
 
     // code to make the HUD follow the player (useful for huge resolutions)
     // cross-ref DropBonus in npc_bonus.cpp
@@ -366,15 +370,40 @@ void DeathCounter::Draw(int screenZ)
             GetvScreenAverageCanonical(&l, &t);
         else
             GetvScreenCanonical(screenZ, &l, &t);
-        if(vScreen[screenZ].Height > 600)
-            ScreenTop = -t + vScreen[screenZ].Y;
-        if(vScreen[screenZ].Width > 800)
-            HUDLeft = -l + vScreen[screenZ].X;
+        if(vscreen.Height > 600)
+            ScreenTop = -t + vscreen.Y;
+        if(vscreen.Width > 800)
+            HUDLeft = -l + vscreen.X;
     }
 
-    XRender::offsetViewportIgnore(true);
-    SuperPrint(gDemoCounterTitle, 3, HUDLeft + m_print.titleDrawX, ScreenTop + 26.f);
-    SuperPrint(m_print.counterOut.c_str(), 3, HUDLeft + m_print.counterDrawX, ScreenTop + 48.f);
+    // With normal res, print to screen in upper left
+    if(vscreen.Width >= 800)
+    {
+        int title_X   = 123 - m_print.titlePixLen / 2;
+        int counter_X = 123 - m_print.counterPixLen / 2;
+
+        // make even
+        title_X &= ~1;
+        counter_X &= ~1;
+
+        SuperPrint(gDemoCounterTitle, 3, HUDLeft + title_X, ScreenTop + 26);
+        SuperPrint(m_print.counterOut, 3, HUDLeft + counter_X, ScreenTop + 48);
+    }
+    // At low res, print to top of screen
+    else
+    {
+        int total_W = m_print.titlePixLen + 16 + m_print.counterPixLen;
+        int title_X = vscreen.Width / 2 - total_W / 2;
+        int counter_X = title_X + m_print.titlePixLen + 16;
+
+        // make even
+        title_X &= ~1;
+        counter_X &= ~1;
+
+        SuperPrint(gDemoCounterTitle, 3, title_X, ScreenTop + 4);
+        SuperPrint(m_print.counterOut, 3, counter_X, ScreenTop + 4);
+    }
+
     XRender::offsetViewportIgnore(false);
 }
 
@@ -396,7 +425,7 @@ void DeathCounter::PrintDebug() const
     }
 }
 
-void DeathCounter::CachedPrint::syncCache(int curLevel, int total, float drawX)
+void DeathCounter::CachedPrint::syncCache(int curLevel, int total)
 {
     if(curLevel != counterLevel || total != counterTotal)
     {
@@ -404,10 +433,6 @@ void DeathCounter::CachedPrint::syncCache(int curLevel, int total, float drawX)
         counterTotal = total;
         counterOut = fmt::format_ne("{0} / {1}", curLevel, total);
         counterPixLen = SuperTextPixLen(counterOut.c_str(), font);
-
-        counterDrawX = (float)(drawX - (counterPixLen / 2.f));
-        // Ensure the align value is even
-        counterDrawX -= SDL_fmodf(counterDrawX, 2.f);
     }
 }
 
@@ -420,9 +445,5 @@ void DeathCounter::CachedPrint::syncCache(const std::string &title)
         titlePointer = ptr;
         titleSize = title.size();
         titlePixLen = SuperTextPixLen(title.c_str(), font);
-
-        titleDrawX = counterDrawX + (counterPixLen / 2.f) - (titlePixLen / 2.f);
-        // Ensure the align value is even
-        titleDrawX -= SDL_fmodf(titleDrawX, 2.f);
     }
 }

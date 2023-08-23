@@ -99,7 +99,7 @@ static void setJsonValue(nlohmann::json &j, const std::string &key, const std::s
     setJsonValue(j[subKey], key.substr(dot + 1), value);
 }
 
-static bool setJsonValueIfNotExist(nlohmann::json &j, const std::string &key, const std::string &value)
+static bool setJsonValueIfNotExist(nlohmann::json &j, const std::string &key, const std::string &value, bool noBlank)
 {
     auto dot = key.find(".");
     if(dot == std::string::npos)
@@ -108,14 +108,17 @@ static bool setJsonValueIfNotExist(nlohmann::json &j, const std::string &key, co
         {
             std::printf("-- ++ Added new string: %s = %s\n", key.c_str(), value.c_str());
             std::fflush(stdout);
-            j[key] = value;
+            if(!noBlank || !value.empty())
+                j[key] = value;
+            else
+                j.erase(key);
             return true;
         }
         return false; // Nothing changed
     }
 
     std::string subKey = key.substr(0, dot);
-    return setJsonValueIfNotExist(j[subKey], key.substr(dot + 1), value);
+    return setJsonValueIfNotExist(j[subKey], key.substr(dot + 1), value, noBlank);
 }
 #endif
 
@@ -201,6 +204,8 @@ XTechTranslate::XTechTranslate()
         {"menu.options.optionsModeWindowed",     &g_mainMenu.optionsModeWindowed},
         {"menu.options.optionsViewCredits",      &g_mainMenu.optionsViewCredits},
         {"menu.options.restartEngine",           &g_mainMenu.optionsRestartEngine},
+        {"menu.options.render",                  &g_mainMenu.optionsRender},
+        {"menu.options.renderX",                 &g_mainMenu.optionsRenderX},
         {"menu.options.scale.label",             &g_mainMenu.optionsScaleMode},
         {"menu.options.scale.integer",           &g_mainMenu.optionsScaleInteger},
         {"menu.options.scale.nearest",           &g_mainMenu.optionsScaleNearest},
@@ -850,11 +855,11 @@ void XTechTranslate::exportTemplate()
 #endif
 }
 
-void XTechTranslate::updateLanguages()
+void XTechTranslate::updateLanguages(const std::string &outPath, bool noBlank)
 {
 #ifndef THEXTECH_DISABLE_LANG_TOOLS
     std::vector<std::string> list;
-    DirMan langs(AppPathManager::languagesDir());
+    DirMan langs(outPath.empty() ? AppPathManager::languagesDir() : outPath);
 
     if(!langs.exists())
     {
@@ -896,7 +901,7 @@ void XTechTranslate::updateLanguages()
             for(const auto &k : trList)
             {
                 const std::string &res = *k.second;
-                changed |= setJsonValueIfNotExist(langFile, k.first, isEnglish ? res : std::string());
+                changed |= setJsonValueIfNotExist(langFile, k.first, isEnglish ? res : std::string(), noBlank);
             }
 
             if(!changed)
@@ -924,6 +929,9 @@ void XTechTranslate::updateLanguages()
     }
 
     std::fflush(stdout);
+#else
+    UNUSED(outPath);
+    UNUSED(noBlank);
 #endif
 }
 
