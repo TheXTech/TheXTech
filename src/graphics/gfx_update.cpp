@@ -1376,55 +1376,70 @@ void UpdateGraphics(bool skipRepaint)
 
     SetupScreens(false);
 
+    // TODO: make a loop over screens here
+    Screen_t& screen = Screens[0];
+
+    // if(!screen.Visible)
+    //     continue;
+
+    vScreen_t& vscreen1 = screen.vScreen(1);
+    vScreen_t& vscreen2 = screen.vScreen(2);
+    int screen_p1 = screen.players[0];
+    int screen_p2 = screen.players[1];
+
     int numScreens = 1;
 
-    if(ScreenType == 1)
+    if(screen.Type == 1)
         numScreens = 2;
 
-    if(ScreenType == 4)
+    if(screen.Type == 4)
         numScreens = 2;
 
-    if(ScreenType == 5)
+    if(screen.Type == 5)
     {
-        DynamicScreen(Screens[0]);
+        DynamicScreen(screen);
 
-        if(vScreen[2].Visible)
+        if(screen.vScreen(2).Visible)
             numScreens = 2;
         else
             numScreens = 1;
     }
 
-    if(ScreenType == 8)
+    if(screen.Type == 8)
         numScreens = 1;
 
+    // FIXME: should become a screen attribute
     if(SingleCoop == 2)
         numScreens = 2;
 
-    CenterScreens(Screens[0]);
+    CenterScreens(screen);
 
-    // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array)
-    SDL_assert_release(numScreens <= 2 || g_compatibility.modern_npc_activation);
-
-    for(Z = 1; Z <= numScreens; Z++)
+    for(int vscreen_i = 0; vscreen_i < numScreens; vscreen_i++)
     {
         if(SingleCoop == 2)
-            Z = 2;
+            vscreen_i = 1;
+
+        Z = screen.vScreen_refs[vscreen_i];
+        int plr_Z = screen.players[vscreen_i];
+
+        // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array)
+        SDL_assert_release(Z <= 2 || g_compatibility.modern_npc_activation);
 
         int S;
         if(LevelEditor)
             S = curSection;
         else
-            S = Player[Z].Section;
+            S = Player[plr_Z].Section;
 
         // update vScreen location
         if(!LevelEditor)
         {
-            if(ScreenType == 2 || ScreenType == 3)
-                GetvScreenAverage(vScreen[1]);
-            else if(ScreenType == 5 && !vScreen[2].Visible)
-                GetvScreenAverage(vScreen[1]);
-            else if(ScreenType == 7)
-                GetvScreenCredits(vScreen[1]);
+            if(screen.Type == 2 || screen.Type == 3)
+                GetvScreenAverage(vscreen1);
+            else if(screen.Type == 5 && !vscreen2.Visible)
+                GetvScreenAverage(vscreen1);
+            else if(screen.Type == 7)
+                GetvScreenCredits(vscreen1);
             else
                 GetvScreen(vScreen[Z]);
         }
@@ -1438,28 +1453,28 @@ void UpdateGraphics(bool skipRepaint)
             continue_qScreen = false;
 
         // noturningback
-        if(!LevelEditor && NoTurnBack[Player[Z].Section])
+        if(!LevelEditor && NoTurnBack[Player[plr_Z].Section])
         {
             // goal: find screen currently on this section that is the furthest left
-            A = Z;
+            A = vscreen_i + 1;
             if(numScreens > 1)
             {
-                if(Player[1].Section == Player[2].Section)
+                if(Player[screen_p1].Section == Player[screen_p2].Section)
                 {
-                    if(Z == 1)
-                        GetvScreen(vScreen[2]);
+                    if(vscreen_i == 0)
+                        GetvScreen(vscreen2);
 
-                    if(-vScreen[1].X < -vScreen[2].X)
+                    if(-vscreen1.X < -vscreen2.X)
                         A = 1;
                     else
                         A = 2;
                 }
             }
 
-            if(-vScreen[A].X > level[S].X)
+            if(-screen.vScreen(A).X > level[S].X)
             {
-                LevelChop[S] += float(-vScreen[A].X - level[S].X);
-                level[S].X = -vScreen[A].X;
+                LevelChop[S] += float(-screen.vScreen(A).X - level[S].X);
+                level[S].X = -screen.vScreen(A).X;
             }
         }
 
@@ -1526,11 +1541,11 @@ void UpdateGraphics(bool skipRepaint)
         // It's time to process NPCs. We will update their active state and fill a draw queue.
 
         // only fill draw queue if drawing will happen and this is the local screen
-        bool fill_draw_queue = !Do_FrameSkip && (&Screens[0] == l_screen);
+        bool fill_draw_queue = !Do_FrameSkip && (&screen == l_screen);
 
         // Make sure we are in range.
-        SDL_assert_release(Z-1 >= 0 && Z-1 < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
-        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
+        SDL_assert_release(vscreen_i >= 0 && vscreen_i < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
+        NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[vscreen_i];
 
         if(fill_draw_queue)
             NPC_Draw_Queue_p.reset();
@@ -1562,6 +1577,8 @@ void UpdateGraphics(bool skipRepaint)
             }
         }
     }
+
+    // TODO: end loop over screens
 
     // clear the last-frame reset state of NPCs
     if(g_compatibility.modern_npc_activation)
