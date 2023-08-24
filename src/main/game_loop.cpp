@@ -196,7 +196,7 @@ void GameLoop()
 
         Controls::Update(false);
     }
-    else if(qScreen)
+    else if(qScreen || (g_compatibility.free_level_res && qScreen_canonical))
     {
         g_microStats.start_task(MicroStats::Effects);
         UpdateEffects();
