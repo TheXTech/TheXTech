@@ -96,6 +96,17 @@ void DropBonus(int A)
 
             const Screen_t& screen = ScreenByPlayer(A);
 
+            // update canonical screen if relevant
+            if(!screen.is_canonical())
+            {
+                const Screen_t& c_screen = screen.canonical_screen();
+
+                if(c_screen.Type == 5 && !c_screen.vScreen(2).Visible)
+                    GetvScreenAverage(c_screen.vScreen(1));
+                else
+                    GetvScreen(vScreenByPlayer_canonical(A));
+            }
+
             if(screen.Type == 5 && !screen.vScreen(2).Visible /*&& nPlay.Online == false*/)
             {
                 vScreen_t& vscreen = screen.vScreen(1);
