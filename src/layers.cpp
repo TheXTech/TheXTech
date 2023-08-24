@@ -39,6 +39,7 @@
 #include "blocks.h"
 #include "main/trees.h"
 #include "main/block_table.h"
+#include "script/msg_preprocessor.h"
 
 #include "npc/npc_queues.h"
 #include "graphics/gfx_update.h"
@@ -1288,8 +1289,13 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
             if(evt.Text != STRINGINDEX_NONE)
             {
                 MessageText = GetS(evt.Text);
-                bool use_player_pause = (g_compatibility.multiplayer_pause_controls && whichPlayer <= numPlayers);
+
+                bool player_valid = whichPlayer >= 1 && whichPlayer <= numPlayers;
+                preProcessMessage(MessageText, player_valid ? whichPlayer : -1);
+
+                bool use_player_pause = (player_valid && g_compatibility.multiplayer_pause_controls);
                 PauseGame(PauseCode::Message, use_player_pause ? whichPlayer : 0);
+
                 MessageText = "";
             }
 

@@ -58,7 +58,7 @@ PauseCode GamePaused = PauseCode::None;
 
 //! Holds the screen overlay for the level
 ScreenFader g_levelScreenFader;
-RangeArr<ScreenFader, 0, 2> g_levelVScreenFader;
+RangeArr<ScreenFader, 0, c_vScreenCount> g_levelVScreenFader;
 
 void clearScreenFaders()
 {

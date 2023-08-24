@@ -71,11 +71,11 @@ struct vScreen_t : public qScreen_t
 //    TempDelay As Integer
     int TempDelay = 0;
 
-    // which player is associated with the vScreen. IMPORTANT: unused when shared screen mode is active
-    uint8_t player = 0;
-
-    // which screen the vScreen belongs to.
+    // NEW: which screen the vScreen belongs to.
     uint8_t screen_ref = 0;
+
+    // NEW: which player is associated with the vScreen. IMPORTANT: unused when shared screen mode is active
+    uint8_t player = 0;
 };
 
 constexpr int c_screenCount = 2;

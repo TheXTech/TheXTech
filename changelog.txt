@@ -66,6 +66,8 @@ Changelog for 1.3.6.1
 -Add a beta OpenGL renderer for the game, supporting proper bitmask (GIF) rendering (@ds-sloth)
 -The pause menu is now able to be controlled by all players. (@ds-sloth, @0lhi)
 -Multiple message boxes are now controlled by the player who originally triggered the event. (@ds-sloth)
+-Added simple pre-processor that allows showing different message text depending on a playable characters (@Wohlstand)
+-Updated scroll transition effect for warps; no longer pauses the game for other players. (@ds-sloth)
 
 Changelog for 1.3.6
 -Added an ability to toggle drawing of the HUD and other on-screen meta data using F1 key (@Wohlstand)

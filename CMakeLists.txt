@@ -653,6 +653,7 @@ set(THEXTECH_SRC
     src/graphics/gfx_keyhole.cpp
     src/control/duplicate.cpp
     src/control/controls.cpp
+    src/script/msg_preprocessor.cpp
     src/change_res.cpp
     src/effect.cpp
     src/collision.cpp

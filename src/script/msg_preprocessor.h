@@ -19,19 +19,16 @@
  */
 
 #pragma once
-#ifndef GAME_GLOBALS_H
-#define GAME_GLOBALS_H
+#ifndef MSG_PREPROCESSOR_H
+#define MSG_PREPROCESSOR_H
 
-#include "screen.h"
-#include "../screen_fader.h"
-#include "../range_arr.hpp"
+#include <string>
 
-extern ScreenFader g_levelScreenFader;
-extern RangeArr<ScreenFader, 0, c_vScreenCount> g_levelVScreenFader;
+/**
+ * @brief Pre-Process the message (apply conditions, or place player names where is possible)
+ * @param text Input-Output text to pre-process
+ * @param playerWho The player number who triggered this message box, or -1 to heuristically detect somebody.
+ */
+extern void preProcessMessage(std::string &text, int playerWho);
 
-extern void clearScreenFaders();
-extern void updateScreenFaders();
-extern void levelWaitForFade();
-extern void editorWaitForFade();
-
-#endif // GAME_GLOBALS_H
+#endif // MSG_PREPROCESSOR_H
