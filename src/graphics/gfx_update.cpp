@@ -1418,6 +1418,36 @@ void UpdateGraphics(bool skipRepaint)
 
     CenterScreens(screen);
 
+    // update screen's canonical vScreens
+    if(!screen.is_canonical())
+    {
+        Screen_t& c_screen = screen.canonical_screen();
+
+        if(c_screen.Type == 1 || c_screen.Type == 4 || (c_screen.Type == 5 && c_screen.vScreen(2).Visible))
+        {
+            GetvScreen(c_screen.vScreen(1));
+            GetvScreen(c_screen.vScreen(2));
+        }
+        else if(c_screen.Type == 2 || c_screen.Type == 3 || c_screen.Type == 5)
+        {
+            GetvScreenAverage(c_screen.vScreen(1));
+        }
+        else if(c_screen.Type == 7)
+        {
+            GetvScreenCredits(c_screen.vScreen(1));
+        }
+        else if(c_screen.Type == 6 && SingleCoop == 2) // SingleCoop
+        {
+            GetvScreen(c_screen.vScreen(2));
+        }
+        else
+        {
+            GetvScreen(c_screen.vScreen(1));
+        }
+
+        // TODO: update qScreens
+    }
+
     for(int vscreen_i = 0; vscreen_i < numScreens; vscreen_i++)
     {
         if(SingleCoop == 2)
