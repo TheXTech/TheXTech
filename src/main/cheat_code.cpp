@@ -63,6 +63,7 @@
 #include "eff_id.h"
 
 bool g_ForceBitmaskMerge = false;
+bool g_CheatLogicScreen = false;
 
 static void redigitIsCool()
 {
@@ -1781,6 +1782,12 @@ static void gifs2png()
     XRender::unloadGifTextures();
 }
 
+static void logicScreen()
+{
+    PlaySound(SFX_PSwitch);
+    g_CheatLogicScreen = !g_CheatLogicScreen;
+}
+
 static void newLeaf()
 {
     GodMode = false;
@@ -2055,6 +2062,9 @@ static const CheatCodeDefault_t s_cheatsListGlobalDefault[] =
     {"\x77\x6f\x68\x6c\x73\x74\x61\x6e\x64\x69\x73\x74\x73\x65\x68\x72\x67\x75\x74", redigitIsCool, false},
 
     {"gifs2png", gifs2png, false},
+
+    // cheat to show the logical screens
+    {"logicscreen", logicScreen, false},
 
     // resolution cheats
     {"gameboyview", setResGb, false},

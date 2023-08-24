@@ -27,6 +27,9 @@
 //! if true, bitmask merge is forced to occur even when logic ops are supported and merge loses information
 extern bool g_ForceBitmaskMerge;
 
+//! if true, the boundaries of logical screens are shown over the visible screen
+extern bool g_CheatLogicScreen;
+
 /*!
  * \brief Reset all customized cheats state into default
  */

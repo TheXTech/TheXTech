@@ -40,6 +40,7 @@
 #include "../main/screen_connect.h"
 #include "../main/screen_quickreconnect.h"
 #include "../main/screen_textentry.h"
+#include "../main/cheat_code.h"
 #include "../compat.h"
 #include "../config.h"
 #include "../game_main.h"
@@ -2869,6 +2870,30 @@ void UpdateGraphics(bool skipRepaint)
                 g_levelVScreenFader[Z].draw(false);
 
             XRender::splitFrame();
+
+            // debug code to show logical screens
+            if(g_CheatLogicScreen && !screen.is_canonical())
+            {
+                Screen_t& c_screen = screen.canonical_screen();
+                int num_c_vScreens = 1;
+                if(c_screen.Type == 1 || c_screen.Type == 4 || (c_screen.Type == 5 && c_screen.vScreen(2).Visible))
+                    num_c_vScreens = 2;
+
+                for(int c_vscreen_Z = 1; c_vscreen_Z <= num_c_vScreens; c_vscreen_Z++)
+                {
+                    vScreen_t& c_vscreen = c_screen.vScreen(c_vscreen_Z);
+
+                    XRender::renderRect(vScreen[Z].X - c_vscreen.X, vScreen[Z].Y - c_vscreen.Y, c_vscreen.Width, c_vscreen.Height,
+                        0.f, 0.f, 0.f, 1.f, false);
+                    XRender::renderRect(vScreen[Z].X - c_vscreen.X + 1, vScreen[Z].Y - c_vscreen.Y + 1, c_vscreen.Width - 2, c_vscreen.Height - 2,
+                        0.f, 0.f, 0.f, 1.f, false);
+                    XRender::renderRect(vScreen[Z].X - c_vscreen.X + 2, vScreen[Z].Y - c_vscreen.Y + 2, c_vscreen.Width - 4, c_vscreen.Height - 4,
+                        1.f, 1.f, 1.f, 1.f, false);
+                    XRender::renderRect(vScreen[Z].X - c_vscreen.X + 3, vScreen[Z].Y - c_vscreen.Y + 3, c_vscreen.Width - 6, c_vscreen.Height - 6,
+                        1.f, 1.f, 1.f, 1.f, false);
+                    SuperPrint(std::to_string(c_vscreen_Z), 1, vScreen[Z].X - c_vscreen.X + 4, vScreen[Z].Y - c_vscreen.Y + 4);
+                }
+            }
 
 #ifdef __3DS__
         XRender::setTargetLayer(3);
