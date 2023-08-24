@@ -223,7 +223,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
 
             return;
         }
-        else
+        else if(screen.canonical_screen().Type == 5)
         {
             DynamicScreen(screen.canonical_screen(), true);
         }
