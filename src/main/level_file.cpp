@@ -178,6 +178,7 @@ bool OpenLevelData(LevelData &lvl, const std::string FilePath)
 //    Location_t tempLocation;
 
     qScreen = false;
+    qScreen_canonical = false;
     ClearLevel();
     BlockSound();
     FreezeNPCs = false;
@@ -995,6 +996,7 @@ void ClearLevel()
     noUpdate = true;
     BlocksSorted = true;
     qScreen = false;
+    qScreen_canonical = false;
 
 #ifdef __16M__
     XRender::clearAllTextures();

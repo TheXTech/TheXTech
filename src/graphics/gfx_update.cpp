@@ -1364,6 +1364,7 @@ void UpdateGraphics(bool skipRepaint)
     g_stats.reset();
 
     bool continue_qScreen = false;
+    bool continue_qScreen_canonical = false;
 
     // prepare to fill this frame's NoReset queue
     std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
@@ -1446,7 +1447,28 @@ void UpdateGraphics(bool skipRepaint)
             GetvScreen(c_screen.vScreen(1));
         }
 
-        // TODO: update qScreens
+        if(!Do_FrameSkip && qScreen_canonical)
+        {
+            int Z1 = c_screen.vScreen_refs[0];
+            int Z2 = c_screen.vScreen_refs[1];
+            if(c_screen.Type == 1 || c_screen.Type == 4 || (c_screen.Type == 5 && c_screen.vScreen(2).Visible))
+            {
+                continue_qScreen_canonical |= Update_qScreen(Z1);
+                continue_qScreen_canonical |= Update_qScreen(Z2);
+                if(!g_compatibility.modern_section_change)
+                    continue_qScreen_canonical = false;
+            }
+            else if(c_screen.Type == 6 && SingleCoop == 2) // SingleCoop
+            {
+                continue_qScreen_canonical |= Update_qScreen(Z2);
+                if(!g_compatibility.modern_section_change)
+                    continue_qScreen_canonical = false;
+            }
+            else
+            {
+                continue_qScreen_canonical |= Update_qScreen(Z1);
+            }
+        }
     }
 
     for(int vscreen_i = 0; vscreen_i < numScreens; vscreen_i++)
@@ -1628,6 +1650,7 @@ void UpdateGraphics(bool skipRepaint)
 
     // only updated on non-frameskip in vanilla
     qScreen = continue_qScreen;
+    qScreen_canonical = continue_qScreen_canonical;
 
 
     XRender::setTargetTexture();

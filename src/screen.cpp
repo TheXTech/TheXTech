@@ -104,7 +104,7 @@ vScreen_t& vScreenByPlayer(int player)
     if(player < 1 || player > maxLocalPlayers)
         return vScreen[0];
 
-    // FIXME: update this for netplay
+    // FIXME: update this for shared screen mode and netplay
     return vScreen[player];
 }
 
@@ -114,7 +114,7 @@ vScreen_t& vScreenByPlayer_canonical(int player)
     if(player < 1 || player > maxLocalPlayers)
         return vScreen[0];
 
-    // FIXME: update this for netplay
+    // FIXME: update this for shared screen mode and netplay
     return vScreen[maxLocalPlayers + player];
 }
 

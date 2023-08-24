@@ -1001,6 +1001,7 @@ int GameMain(const CmdLineSetup_t &setup)
                 StartWarp = lastWarpEntered; // When restarting a level (after death), don't restore an entered warp on checkpoints
 
             qScreen = false;
+            qScreen_canonical = false;
             LevelRestartRequested = false;
 
             if(lastWarpEntered != StartWarp)

@@ -165,6 +165,7 @@ void SetupPlayers()
 //    int C = 0;
     FreezeNPCs = false;
     qScreen = false;
+    qScreen_canonical = false;
     ForcedControls = false;
     // online stuff
     //    if(nPlay.Online)
@@ -6273,6 +6274,7 @@ void PlayerEffects(const int A)
                 case LevelDoor::TRANSIT_SCROLL:
                     if(same_section)
                     {
+                        // FIXME: update canonical vScreen, use vScreen by player here
                         qScreenLoc[A] = vScreen[A];
                         qScreen = true;
                     }
@@ -6715,6 +6717,7 @@ void PlayerEffects(const int A)
                 case LevelDoor::TRANSIT_SCROLL:
                     if(same_section)
                     {
+                        // FIXME: update canonical vScreen, use vScreen by player here
                         qScreenLoc[A] = vScreen[A];
                         qScreen = true;
                     }

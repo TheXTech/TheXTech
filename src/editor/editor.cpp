@@ -2818,6 +2818,7 @@ void zTestLevel(bool magicHand, bool interProcess)
     int A = 0;
     Player_t blankPlayer;
     qScreen = false;
+    qScreen_canonical = false;
 
 #ifndef THEXTECH_INTERPROC_SUPPORTED
     UNUSED(interProcess);

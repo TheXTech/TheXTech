@@ -1508,6 +1508,8 @@ extern RangeArrI<int, 0, maxBlockType, 0> BlockSlope2;
 
 //Public qScreen As Boolean 'Weather or not the screen needs adjusting
 extern bool qScreen;
+//! New: whether any canonical screens are currently in qScreen mode
+extern bool qScreen_canonical;
 
 // moved to "screen.h"
 // NEW: allows screen position to change during qScreen
