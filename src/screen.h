@@ -172,10 +172,22 @@ Screen_t& ScreenByPlayer(int player);
 Screen_t& ScreenByPlayer_canonical(int player);
 
 // finds the visible vScreen that contains a specific player
-vScreen_t& vScreenByPlayer(int player);
+int vScreenIdxByPlayer(int player);
+
+// finds the visible vScreen that contains a specific player
+inline vScreen_t& vScreenByPlayer(int player)
+{
+    return vScreen[vScreenIdxByPlayer(player)];
+}
 
 // finds the canonical vScreen that contains a specific player
-vScreen_t& vScreenByPlayer_canonical(int player);
+int vScreenIdxByPlayer_canonical(int player);
+
+// finds the visible vScreen that contains a specific player
+inline vScreen_t& vScreenByPlayer_canonical(int player)
+{
+    return vScreen[vScreenIdxByPlayer_canonical(player)];
+}
 
 //! a list of all screens (local and remote, visible and virtual)
 extern RangeArr<Screen_t, 0, c_screenCount - 1> Screens;

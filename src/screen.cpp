@@ -99,23 +99,23 @@ Screen_t& ScreenByPlayer_canonical(int player)
 }
 
 // finds the visible vScreen that contains a specific player
-vScreen_t& vScreenByPlayer(int player)
+int vScreenIdxByPlayer(int player)
 {
     if(player < 1 || player > maxLocalPlayers)
-        return vScreen[0];
+        return 0;
 
     // FIXME: update this for shared screen mode and netplay
-    return vScreen[player];
+    return player;
 }
 
 // finds the canonical vScreen that contains a specific player
-vScreen_t& vScreenByPlayer_canonical(int player)
+int vScreenIdxByPlayer_canonical(int player)
 {
     if(player < 1 || player > maxLocalPlayers)
-        return vScreen[0];
+        return 0;
 
     // FIXME: update this for shared screen mode and netplay
-    return vScreen[maxLocalPlayers + player];
+    return maxLocalPlayers + player;
 }
 
 // temporary helpers while game is being converted to use Screen_t
