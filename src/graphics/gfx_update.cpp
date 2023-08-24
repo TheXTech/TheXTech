@@ -1355,6 +1355,25 @@ void UpdateGraphics(bool skipRepaint)
     // (This code is a combination of the FrameSkip logic from before with the
     //   logic components of the full rendering code.)
     // NPC render queue formation is also here.
+
+    g_stats.reset();
+
+    bool continue_qScreen = false;
+
+    // prepare to fill this frame's NoReset queue
+    std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
+    NPCQueues::NoReset.clear();
+
+    // mark the last-frame reset state of NPCs that may have Reset[0] set to false, and clear their this-frame reset state
+    if(g_compatibility.modern_npc_activation)
+    {
+        for(NPC_t& n : s_NoReset_NPCs_LastFrame)
+        {
+            n.Reset[2] = n.Reset[1] && n.Reset[2];
+            n.Reset[1] = true;
+        }
+    }
+
     SetupScreens(false);
 
     int numScreens = 1;
@@ -1382,24 +1401,6 @@ void UpdateGraphics(bool skipRepaint)
         numScreens = 2;
 
     CenterScreens(Screens[0]);
-
-    g_stats.reset();
-
-    bool continue_qScreen = false;
-
-    // prepare to fill this frame's NoReset queue
-    std::swap(NPCQueues::NoReset, s_NoReset_NPCs_LastFrame);
-    NPCQueues::NoReset.clear();
-
-    // mark the last-frame reset state of NPCs that may have Reset[0] set to false, and clear their this-frame reset state
-    if(g_compatibility.modern_npc_activation)
-    {
-        for(NPC_t& n : s_NoReset_NPCs_LastFrame)
-        {
-            n.Reset[2] = n.Reset[1] && n.Reset[2];
-            n.Reset[1] = true;
-        }
-    }
 
     // modern NPC activation logic is required to support more than 2 vScreens (for the Reset array)
     SDL_assert_release(numScreens <= 2 || g_compatibility.modern_npc_activation);
