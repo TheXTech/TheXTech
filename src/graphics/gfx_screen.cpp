@@ -584,8 +584,8 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
         camFramesY = SDL_min(camFramesY, camFramesY_b);
     }
 
-    double resizeFramesX = std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / (resizeRateX * 2);
-    double resizeFramesY = std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / (resizeRateY * 2);
+    double resizeFramesX = std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / resizeRateX;
+    double resizeFramesY = std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / resizeRateY;
 
     if(!g_compatibility.modern_section_change)
     {
