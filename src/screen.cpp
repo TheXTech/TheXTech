@@ -20,26 +20,95 @@
 
 #include "screen.h"
 
-RangeArr<Screen_t, 0, 0> Screens;
+RangeArr<Screen_t, 0, c_screenCount - 1> Screens;
 Screen_t* l_screen = &Screens[0];
 
-RangeArr<qScreen_t, 0, 2> qScreenLoc;
-RangeArr<vScreen_t, 0, 2> vScreen;
+RangeArr<qScreen_t, 0, c_vScreenCount> qScreenLoc;
+RangeArr<vScreen_t, 0, c_vScreenCount> vScreen;
+
+Screen_t& Screen_t::canonical_screen()
+{
+    if(is_canonical())
+        return *this;
+
+    return Screens[m_CanonicalScreen];
+}
+
+const Screen_t& Screen_t::canonical_screen() const
+{
+    if(is_canonical())
+        return *this;
+
+    return Screens[m_CanonicalScreen];
+}
+
+void Screen_t::set_canonical_screen(uint8_t index)
+{
+    m_CanonicalScreen = index;
+
+    if(m_CanonicalScreen != 0)
+    {
+        canonical_screen().m_CanonicalScreen = 0;
+        canonical_screen().players = players;
+    }
+}
+
+void InitScreens()
+{
+    // assign players to main screen
+    for(int p = 0; p < maxLocalPlayers; p++)
+        Screens[0].players[p] = p + 1;
+
+    // assign vScreens to screens
+    for(int s = 0; s < c_screenCount; s++)
+    {
+        for(int v = 0; v < maxLocalPlayers; v++)
+        {
+            Screens[s].vScreen_refs[v] = s * maxLocalPlayers + v + 1;
+            Screens[s].vScreen(v + 1).screen_ref = s;
+        }
+    }
+
+    // assign players to vScreens
+    for(int s = 0; s < c_screenCount; s++)
+    {
+        for(int v = 0; v < maxLocalPlayers; v++)
+        {
+            Screens[s].vScreen(v + 1).player = Screens[s].players[v];
+        }
+    }
+}
 
 // finds the visible Screen that contains a specific player
 Screen_t& ScreenByPlayer(int player)
 {
-    (void)player; // FIXME: Remove this line once multiple screens will be supported
+    // FIXME: update this for netplay
+    (void)player;
     return Screens[0];
 }
 
+// finds the canonical Screen that contains a specific player
+Screen_t& ScreenByPlayer_canonical(int player)
+{
+    Screen_t& visible_screen = ScreenByPlayer(player);
+
+    return visible_screen.canonical_screen();
+}
+
 // finds the visible vScreen that contains a specific player
-vScreen_t& vScreenByPlayer(int player)
+int vScreenIdxByPlayer(int player)
 {
     if(player < 1 || player > maxLocalPlayers)
-        return vScreen[0];
+        return 0;
 
-    return vScreen[player];
+    // FIXME: update this for shared screen mode and netplay
+    return player;
+}
+
+// finds the canonical vScreen that contains a specific player
+int vScreenIdxByPlayer_canonical(int player)
+{
+    return vScreenIdxByPlayer(player);
 }
 
 // temporary helpers while game is being converted to use Screen_t
