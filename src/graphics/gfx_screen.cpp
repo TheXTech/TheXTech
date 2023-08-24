@@ -584,8 +584,8 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
         camFramesY = SDL_min(camFramesY, camFramesY_b);
     }
 
-    double resizeFramesX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft) / resizeRateX;
-    double resizeFramesY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop) / resizeRateY;
+    double resizeFramesX = std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / (resizeRateX * 2);
+    double resizeFramesY = std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / (resizeRateY * 2);
 
     if(!g_compatibility.modern_section_change)
     {
@@ -614,8 +614,11 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     camRateX = std::abs(vScreen[Z].X - qScreenLoc[Z].X) / qFramesX;
     camRateY = std::abs(vScreen[Z].Y - qScreenLoc[Z].Y) / qFramesY;
 
-    resizeRateX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft) / qFramesX;
-    resizeRateY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop) / qFramesY;
+    resizeRateX = std::abs(vScreen[Z].Width - qScreenLoc[Z].Width) / qFramesX;
+    resizeRateY = std::abs(vScreen[Z].Height - qScreenLoc[Z].Height) / qFramesY;
+
+    double screenRateX = std::abs(vScreen[Z].ScreenLeft - qScreenLoc[Z].ScreenLeft) / qFramesX;
+    double screenRateY = std::abs(vScreen[Z].ScreenTop - qScreenLoc[Z].ScreenTop) / qFramesY;
 
     if(vScreen[Z].X < qScreenLoc[Z].X - camRateX)
         qScreenLoc[Z].X -= camRateX;
@@ -631,31 +634,31 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     else
         qScreenLoc[Z].Y = vScreen[Z].Y;
 
-    if(vScreen[Z].ScreenLeft < qScreenLoc[Z].ScreenLeft - resizeRateX)
-        qScreenLoc[Z].ScreenLeft -= resizeRateX;
-    else if(vScreen[Z].ScreenLeft > qScreenLoc[Z].ScreenLeft + resizeRateX)
-        qScreenLoc[Z].ScreenLeft += resizeRateX;
+    if(vScreen[Z].ScreenLeft < qScreenLoc[Z].ScreenLeft - screenRateX)
+        qScreenLoc[Z].ScreenLeft -= screenRateX;
+    else if(vScreen[Z].ScreenLeft > qScreenLoc[Z].ScreenLeft + screenRateX)
+        qScreenLoc[Z].ScreenLeft += screenRateX;
     else
         qScreenLoc[Z].ScreenLeft = vScreen[Z].ScreenLeft;
 
-    if(vScreen[Z].ScreenTop < qScreenLoc[Z].ScreenTop - resizeRateY)
-        qScreenLoc[Z].ScreenTop -= resizeRateY;
-    else if(vScreen[Z].ScreenTop > qScreenLoc[Z].ScreenTop + resizeRateY)
-        qScreenLoc[Z].ScreenTop += resizeRateY;
+    if(vScreen[Z].ScreenTop < qScreenLoc[Z].ScreenTop - screenRateY)
+        qScreenLoc[Z].ScreenTop -= screenRateY;
+    else if(vScreen[Z].ScreenTop > qScreenLoc[Z].ScreenTop + screenRateY)
+        qScreenLoc[Z].ScreenTop += screenRateY;
     else
         qScreenLoc[Z].ScreenTop = vScreen[Z].ScreenTop;
 
-    if(vScreen[Z].Width < qScreenLoc[Z].Width - resizeRateX * 2)
-        qScreenLoc[Z].Width -= resizeRateX * 2;
-    else if(vScreen[Z].Width > qScreenLoc[Z].Width + resizeRateX * 2)
-        qScreenLoc[Z].Width += resizeRateX * 2;
+    if(vScreen[Z].Width < qScreenLoc[Z].Width - resizeRateX)
+        qScreenLoc[Z].Width -= resizeRateX;
+    else if(vScreen[Z].Width > qScreenLoc[Z].Width + resizeRateX)
+        qScreenLoc[Z].Width += resizeRateX;
     else
         qScreenLoc[Z].Width = vScreen[Z].Width;
 
-    if(vScreen[Z].Height < qScreenLoc[Z].Height - resizeRateY * 2)
-        qScreenLoc[Z].Height -= resizeRateY * 2;
-    else if(vScreen[Z].Height > qScreenLoc[Z].Height + resizeRateY * 2)
-        qScreenLoc[Z].Height += resizeRateY * 2;
+    if(vScreen[Z].Height < qScreenLoc[Z].Height - resizeRateY)
+        qScreenLoc[Z].Height -= resizeRateY;
+    else if(vScreen[Z].Height > qScreenLoc[Z].Height + resizeRateY)
+        qScreenLoc[Z].Height += resizeRateY;
     else
         qScreenLoc[Z].Height = vScreen[Z].Height;
 
@@ -665,8 +668,8 @@ bool Update_qScreen(int Z, int camRate, int resizeRate)
     // update vScreen width / height
     if(g_compatibility.modern_section_change)
     {
-        vScreen[Z].Width -= 2 * (std::floor(qScreenLoc[Z].ScreenLeft) - vScreen[Z].ScreenLeft);
-        vScreen[Z].Height -= 2 * (std::floor(qScreenLoc[Z].ScreenTop) - vScreen[Z].ScreenTop);
+        vScreen[Z].Width = std::floor(qScreenLoc[Z].Width / 2) * 2;
+        vScreen[Z].Height = std::floor(qScreenLoc[Z].Height / 2) * 2;
         vScreen[Z].ScreenLeft = std::floor(qScreenLoc[Z].ScreenLeft);
         vScreen[Z].ScreenTop = std::floor(qScreenLoc[Z].ScreenTop);
     }
