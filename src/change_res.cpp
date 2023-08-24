@@ -228,7 +228,9 @@ void UpdateInternalRes()
         SetupScreens();
         CenterScreens(Screens[0]);
         GameMenu = false;
-        GetvScreenAverage(vScreen[1]);
+        GetvScreenAverage(Screens[0].vScreen(1));
+        if(!Screens[0].is_canonical())
+            GetvScreenAverage(Screens[0].canonical_screen().vScreen(1));
         GameMenu = true;
     }
 }
