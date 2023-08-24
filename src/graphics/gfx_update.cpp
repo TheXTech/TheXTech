@@ -324,7 +324,7 @@ public:
     }
 };
 
-NPC_Draw_Queue_t NPC_Draw_Queue[2] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
+NPC_Draw_Queue_t NPC_Draw_Queue[maxLocalPlayers] = {NPC_Draw_Queue_t(), NPC_Draw_Queue_t()};
 
 constexpr int NPC_intro_length = 8;
 constexpr float NPC_shade_opacity = 0.4f;
@@ -796,7 +796,7 @@ static std::vector<NPCRef_t> s_NoReset_NPCs_LastFrame;
 static std::bitset<maxNPCs> s_NPC_present;
 
 // does the classic ("onscreen") NPC activation / reset logic for vScreen Z, directly based on the many NPC loops of the original game
-void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
+void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
 {
     // using bitset here instead of simpler set for checkNPCs because I benchmarked it to be faster -- ds-sloth
     std::bitset<maxNPCs>& NPC_present = s_NPC_present;
@@ -957,7 +957,7 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
                 NPC[A].Killed = 9;
                 KillNPC(A, 9);
             }
-            else if(NPC[A].Active && !Do_FrameSkip)
+            else if(NPC[A].Active && fill_draw_queue)
             {
                 NPC_Draw_Queue_p.add(A);
             }
@@ -997,11 +997,12 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
         }
     }
 
-    NPC_Draw_Queue_p.sort();
+    if(fill_draw_queue)
+        NPC_Draw_Queue_p.sort();
 }
 
 // does the modern NPC activation / reset logic for vScreen Z
-void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
+void ModernNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
 {
     double X, Y;
     GetvScreenAverageCanonical(&X, &Y);
@@ -1293,7 +1294,7 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
             //     NPC[A].Reset[1] = true;
         }
 
-        if(!Do_FrameSkip && render && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
+        if(fill_draw_queue && render && ((NPC[A].Reset[1] && NPC[A].Reset[2]) || NPC[A].Active || NPC[A].Type == NPCID_CONVEYOR))
         {
             NPC_Draw_Queue_p.add(A);
 
@@ -1307,7 +1308,7 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
                 }
             }
         }
-        else if(!Do_FrameSkip && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert && NPC[A].Type != NPCID_CONVEYOR)
+        else if(fill_draw_queue && g_config.small_screen_camera_features && NPC[A].Active && cannot_reset && NPC[A].JustActivated == 0 && !NPC[A].Inert && NPC[A].Type != NPCID_CONVEYOR)
         {
             if(NPC[A].Location.SpeedX != 0 || NPC[A].Location.SpeedY != 0
                 || (!NPCWontHurt[NPC[A].Type] && !NPCIsACoin[NPC[A].Type] && !NPCIsABonus[NPC[A].Type]))
@@ -1317,7 +1318,8 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Que
         }
     }
 
-    NPC_Draw_Queue_p.sort();
+    if(fill_draw_queue)
+        NPC_Draw_Queue_p.sort();
 }
 
 // This draws the graphic to the screen when in a level/game menu/outro/level editor
@@ -1522,24 +1524,26 @@ void UpdateGraphics(bool skipRepaint)
 
         // It's time to process NPCs. We will update their active state and fill a draw queue.
 
+        // only fill draw queue if drawing will happen and this is the local screen
+        bool fill_draw_queue = !Do_FrameSkip && (&Screens[0] == l_screen);
+
         // Make sure we are in range.
-        // If we later add more than two screens,
-        // need to change how many NPC draw queues we have.
         SDL_assert_release(Z-1 >= 0 && Z-1 < (int)(sizeof(NPC_Draw_Queue) / sizeof(NPC_Draw_Queue_t)));
         NPC_Draw_Queue_t& NPC_Draw_Queue_p = NPC_Draw_Queue[Z-1];
-        if(!Do_FrameSkip)
+
+        if(fill_draw_queue)
             NPC_Draw_Queue_p.reset();
 
         // we'll check the NPCs and do some logic for the game,
         if(!LevelEditor)
         {
             if(g_compatibility.modern_npc_activation)
-                ModernNPCScreenLogic(Z, numScreens, Do_FrameSkip, NPC_Draw_Queue_p);
+                ModernNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
             else
-                ClassicNPCScreenLogic(Z, numScreens, Do_FrameSkip, NPC_Draw_Queue_p);
+                ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
         }
         // fill the NPC render queue for the level editor
-        else if(!Do_FrameSkip)
+        else if(fill_draw_queue)
         {
             for(A = 1; A <= numNPCs; A++)
             {
