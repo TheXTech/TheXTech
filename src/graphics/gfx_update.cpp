@@ -1008,49 +1008,73 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw
 }
 
 // does the modern NPC activation / reset logic for vScreen Z
-void ModernNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
+void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue, NPC_Draw_Queue_t& NPC_Draw_Queue_p)
 {
-    double X, Y;
-    GetvScreenAverageCanonical(&X, &Y);
+    int Z = screen.vScreen_refs[vscreen_i];
 
-    // use DynamicScreen logic to check what numScreens would have been in the canonical field
-    int canonicalNumScreens = numScreens;
+    // canonical vScreens
+    int c_Z1 = 0;
+    int c_Z2 = 0;
 
-    if(ScreenType == 5 && CheckDead() == 0)
+    if(!screen.is_canonical())
     {
-        if(Player[1].Section != Player[2].Section)
-            canonicalNumScreens = 2;
-        else if(level[Player[1].Section].Width - level[Player[1].Section].X > 800 && (Player[2].Location.X + X >= 800 * 0.75 - Player[2].Location.Width / 2.0) && (Player[1].Location.X < level[Player[1].Section].Width - 800 * 0.75 - Player[1].Location.Width / 2.0))
-            canonicalNumScreens = 2;
-        else if(level[Player[1].Section].Width - level[Player[1].Section].X > 800 && (Player[1].Location.X + X >= 800 * 0.75 - Player[1].Location.Width / 2.0) && (Player[2].Location.X < level[Player[1].Section].Width - 800 * 0.75 - Player[2].Location.Width / 2.0))
-            canonicalNumScreens = 2;
-        else if(level[Player[1].Section].Height - level[Player[1].Section].Y > 600 && (Player[1].Location.Y + Y >= 600 * 0.75 - vScreenYOffset - Player[1].Location.Height) && (Player[2].Location.Y < level[Player[1].Section].Height - 600 * 0.75 - vScreenYOffset - Player[2].Location.Height))
-            canonicalNumScreens = 2;
-        else if(level[Player[1].Section].Height - level[Player[1].Section].Y > 600 && (Player[2].Location.Y + Y >= 600 * 0.75 - vScreenYOffset - Player[2].Location.Height) && (Player[1].Location.Y < level[Player[1].Section].Height - 600 * 0.75 - vScreenYOffset - Player[1].Location.Height))
-            canonicalNumScreens = 2;
+        Screen_t& c_screen = screen.canonical_screen();
+
+        // canonical screen might have different split than visible screen
+        if(c_screen.Type == 5)
+        {
+            // visible shared, canonical split
+            if(screen.DType == 5 && c_screen.DType != 5)
+            {
+                c_Z1 = c_screen.vScreen_refs[0];
+                c_Z2 = c_screen.vScreen_refs[1];
+            }
+            // visible split, canonical shared
+            else if(screen.DType != 5 && c_screen.DType == 5)
+            {
+                c_Z1 = c_screen.vScreen_refs[0];
+            }
+            // same mode, use same vScreen index
+            else
+            {
+                c_Z1 = c_screen.vScreen_refs[vscreen_i];
+            }
+        }
+        // same mode, use same vScreen index
         else
-            canonicalNumScreens = 1;
+        {
+            c_Z1 = c_screen.vScreen_refs[vscreen_i];
+        }
     }
-    else if(ScreenType == 5)
-    {
-        canonicalNumScreens = 1;
-    }
-
-    // if the screen mode is different from the original game, don't even try to match original game behavior.
-    bool ignore_canonical = (numScreens != canonicalNumScreens);
-
-    // if appropriate, replace with player-centered vScreen
-    if(!ignore_canonical && ScreenType != 2 && ScreenType != 3 && ScreenType != 7 && (ScreenType != 5 || vScreen[2].Visible))
-        GetvScreenCanonical(Z, &X, &Y);
 
     // using bitset here instead of simpler set for checkNPCs because I benchmarked it to be faster -- ds-sloth
     // the purpose of this logic is to avoid duplicates in the checkNPCs vector
     std::bitset<maxNPCs>& NPC_present = s_NPC_present;
 
-    // find the onscreen NPCs
-    TreeResult_Sentinel<NPCRef_t> _screenNPCs = treeNPCQuery(SDL_min(-vScreen[Z].X, -X), SDL_min(-vScreen[Z].Y, -Y),
-        SDL_max(-vScreen[Z].X + vScreen[Z].Width, -X + 800), SDL_max(-vScreen[Z].Y + vScreen[Z].Height, -Y + 600),
-        SORTMODE_NONE);
+    // find the onscreen NPCs; first, get query bounds that cover all 3 possible screens
+    double bounds_left = -vScreen[Z].X;
+    double bounds_top = -vScreen[Z].Y;
+    double bounds_right = -vScreen[Z].X + vScreen[Z].Width;
+    double bounds_bottom = -vScreen[Z].Y + vScreen[Z].Height;
+
+    if(c_Z1)
+    {
+        bounds_left = SDL_min(bounds_left, -vScreen[c_Z1].X);
+        bounds_top = SDL_min(bounds_top, -vScreen[c_Z1].Y);
+        bounds_right = SDL_max(bounds_right, -vScreen[c_Z1].X + vScreen[c_Z1].Width);
+        bounds_bottom = SDL_max(bounds_bottom, -vScreen[c_Z1].Y + vScreen[c_Z1].Height);
+    }
+
+    if(c_Z2)
+    {
+        bounds_left = SDL_min(bounds_left, -vScreen[c_Z2].X);
+        bounds_top = SDL_min(bounds_top, -vScreen[c_Z2].Y);
+        bounds_right = SDL_max(bounds_right, -vScreen[c_Z2].X + vScreen[c_Z2].Width);
+        bounds_bottom = SDL_max(bounds_bottom, -vScreen[c_Z2].Y + vScreen[c_Z2].Height);
+    }
+
+    TreeResult_Sentinel<NPCRef_t> _screenNPCs = treeNPCQuery(bounds_left, bounds_top,
+        bounds_right, bounds_bottom, SORTMODE_NONE);
 
 
     // combine the onscreen NPCs with the no-reset NPCs
@@ -1109,16 +1133,30 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw_
         {
             render = cannot_reset = can_activate = false;
         }
-        else if(ignore_canonical)
-        {
-            render = cannot_reset = can_activate = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
-        }
         else
         {
             render = vScreenCollision(Z, NPC[A].Location) || (loc2_exists && vScreenCollision(Z, loc2));
 
-            bool onscreen_canonical = vScreenCollisionCanonical(X, Y, NPC[A].Location)
-                || (loc2_exists && vScreenCollisionCanonical(X, Y, loc2));
+            bool onscreen_canonical = false;
+
+            // check canonical screen
+            if(c_Z1)
+            {
+                onscreen_canonical = (vScreenCollision(c_Z1, NPC[A].Location)
+                    || (loc2_exists && vScreenCollision(c_Z1, loc2)));
+            }
+            // fallback to Z itself if no canonical screen exists
+            else
+            {
+                onscreen_canonical = render;
+            }
+
+            // add second canonical screen if needed
+            if(c_Z2 && !onscreen_canonical)
+            {
+                onscreen_canonical = (vScreenCollision(c_Z2, NPC[A].Location)
+                    || (loc2_exists && vScreenCollision(c_Z2, loc2)));
+            }
 
             cannot_reset = (render || onscreen_canonical);
 
@@ -1126,12 +1164,14 @@ void ModernNPCScreenLogic(int Z, int numScreens, bool fill_draw_queue, NPC_Draw_
             if(
                    ForcedControls
                 || LevelMacro != LEVELMACRO_OFF
-                || qScreen
+                || qScreen_canonical
                 || NPC_MustBeCanonical(A)
             )
                 can_activate = onscreen_canonical;
             else
                 can_activate = render;
+
+            can_activate = cannot_reset = onscreen_canonical;
         }
 
         if(NPC[A].Generator)
@@ -1617,7 +1657,7 @@ void UpdateGraphics(bool skipRepaint)
         if(!LevelEditor)
         {
             if(g_compatibility.modern_npc_activation)
-                ModernNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
+                ModernNPCScreenLogic(screen, vscreen_i, fill_draw_queue, NPC_Draw_Queue_p);
             else
                 ClassicNPCScreenLogic(Z, numScreens, fill_draw_queue, NPC_Draw_Queue_p);
         }
