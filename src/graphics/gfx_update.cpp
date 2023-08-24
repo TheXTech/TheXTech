@@ -677,10 +677,13 @@ void ClassicNPCScreenLogic(int Z, int numScreens, bool Do_FrameSkip, NPC_Draw_Qu
         }
 
 
+        const Player_t& hp = Player[NPC[A].HoldingPlayer];
+        bool hp_door_scroll = (NPC[A].HoldingPlayer > 0 && hp.Effect == 7 && hp.Effect2 >= 128);
+
         if(
             (
               (
-                (NPC[A].HoldingPlayer > 0 && Player[NPC[A].HoldingPlayer].Effect != 3) ||
+                (NPC[A].HoldingPlayer > 0 && hp.Effect != 3 && !hp_door_scroll) ||
                 (NPC[A].Type == NPCID_TOOTHY && NPC[A].standingOnPlayer == 0) ||
                 (NPC[A].Type == NPCID_BULLET && NPC[A].CantHurt > 0)
               ) || NPC[A].Effect == 5
