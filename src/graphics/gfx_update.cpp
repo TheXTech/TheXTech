@@ -654,6 +654,7 @@ void s_UpdateDrawItems(Screen_t& screen, int i)
 
 void GraphicsLazyPreLoad()
 {
+    // FIXME: update to work for multiple screens
     // TODO: check if this is needed at caller
     SetupScreens(false);
 
@@ -1652,25 +1653,32 @@ void UpdateGraphics(bool skipRepaint)
     }
 
 #ifdef __3DS__
-        XRender::setTargetLayer(0);
+    XRender::setTargetLayer(0);
 #endif
 
+    // TODO: set screen to be the draw screen (can't do it here because we're still in the screen's scope from before)
+    // Screen_t& screen = *l_screen;
+    // TODO: update numScreens based on newly bound screen
+
     // even if not, black background is good, to be safe
-    XRender::renderRect(0, 0, ScreenW, ScreenH, 0, 0, 0);
+    XRender::renderRect(0, 0, screen.W, screen.H, 0, 0, 0);
     DrawBackdrop();
 
     // No logic
     // Draw the screens!
-    For(Z, 1, numScreens)
+    for(int vscreen_i = 0; vscreen_i < numScreens; vscreen_i++)
     {
         if(SingleCoop == 2)
-            Z = 2;
+            vscreen_i = 1;
+
+        Z = screen.vScreen_refs[vscreen_i];
+        int plr_Z = screen.players[vscreen_i];
 
         int S;
         if(LevelEditor)
             S = curSection;
         else
-            S = Player[Z].Section;
+            S = Player[plr_Z].Section;
 
         // (Code to get vScreen moved into logic section above.)
 
@@ -1709,25 +1717,25 @@ void UpdateGraphics(bool skipRepaint)
             if(vScreen[Z].X + level[S].X > 0)
             {
                 XRender::renderRect(0, 0,
-                                    vScreen[Z].X + level[S].X, ScreenH, 0.2f, 0.2f, 0.2f, 1.f, true);
+                                    vScreen[Z].X + level[S].X, screen.H, 0.2f, 0.2f, 0.2f, 1.f, true);
             }
 
-            if(ScreenW > level[S].Width + vScreen[Z].X)
+            if(screen.W > level[S].Width + vScreen[Z].X)
             {
                 XRender::renderRect(level[S].Width + vScreen[Z].X, 0,
-                                    ScreenW - (level[S].Width + vScreen[Z].X), ScreenH, 0.2f, 0.2f, 0.2f, 1.f, true);
+                                    screen.W - (level[S].Width + vScreen[Z].X), screen.H, 0.2f, 0.2f, 0.2f, 1.f, true);
             }
 
             if(vScreen[Z].Y + level[S].Y > 0)
             {
                 XRender::renderRect(0, 0,
-                                    ScreenW, vScreen[Z].Y + level[S].Y, 0.2f, 0.2f, 0.2f, 1.f, true);
+                                    screen.W, vScreen[Z].Y + level[S].Y, 0.2f, 0.2f, 0.2f, 1.f, true);
             }
 
-            if(ScreenH > level[S].Height + vScreen[Z].Y)
+            if(screen.H > level[S].Height + vScreen[Z].Y)
             {
                 XRender::renderRect(0, level[S].Height + vScreen[Z].Y,
-                                    ScreenW, ScreenH - (level[S].Height + vScreen[Z].Y), 0.2f, 0.2f, 0.2f, 1.f, true);
+                                    screen.W, screen.H - (level[S].Height + vScreen[Z].Y), 0.2f, 0.2f, 0.2f, 1.f, true);
             }
         }
 
@@ -1757,11 +1765,11 @@ void UpdateGraphics(bool skipRepaint)
 #endif
 
         // update the vectors of all the onscreen blocks and backgrounds for use at multiple places
-        s_UpdateDrawItems(Screens[0], Z - 1);
-        const std::vector<BlockRef_t>& screenMainBlocks = s_drawMainBlocks[Z - 1];
-        const std::vector<BlockRef_t>& screenLavaBlocks = s_drawLavaBlocks[Z - 1];
-        const std::vector<BlockRef_t>& screenSBlocks = s_drawSBlocks[Z - 1];
-        const std::vector<BaseRef_t>& screenBackgrounds = s_drawBGOs[Z - 1];
+        s_UpdateDrawItems(screen, vscreen_i);
+        const std::vector<BlockRef_t>& screenMainBlocks = s_drawMainBlocks[vscreen_i];
+        const std::vector<BlockRef_t>& screenLavaBlocks = s_drawLavaBlocks[vscreen_i];
+        const std::vector<BlockRef_t>& screenSBlocks = s_drawSBlocks[vscreen_i];
+        const std::vector<BaseRef_t>& screenBackgrounds = s_drawBGOs[vscreen_i];
 
         int nextBackground = 0;
 
@@ -2894,7 +2902,7 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         XRender::offsetViewportIgnore(true);
-        if(ScreenType == 5 && numScreens == 1)
+        if(screen.Type == 5 && numScreens == 1)
         {
             speedRun_renderControls(1, Z, SPEEDRUN_ALIGN_LEFT);
             speedRun_renderControls(2, Z, SPEEDRUN_ALIGN_RIGHT);
@@ -2905,12 +2913,12 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // indicate any small-screen camera features
-        if(g_config.small_screen_camera_features && ScreenH < 600
-            && ScreenType != 2 && ScreenType != 3 && ScreenType != 7 && (ScreenType != 5 || vScreen[2].Visible))
+        if(g_config.small_screen_camera_features && screen.H < 600
+            && screen.Type != 2 && screen.Type != 3 && screen.Type != 7 && (screen.Type != 5 || screen.vScreen(2).Visible))
         {
             int CamX = vScreen[Z].Width - 54;
             int CamY = vScreen[Z].Height - 42;
-            if(ScreenType == 5 && vScreen[2].Visible && vScreen[Z].Left > 0)
+            if(screen.Type == 5 && screen.vScreen(2).Visible && screen.vScreen(Z).Left > 0)
                 CamY -= 24;
 
             if(vScreen[Z].small_screen_features.offset_y_hold != 0)
@@ -2978,23 +2986,23 @@ void UpdateGraphics(bool skipRepaint)
     g_levelScreenFader.draw();
 
     // 1P controls indicator
-    if(ScreenType != 5 && numScreens == 1)
+    if(screen.Type != 5 && numScreens == 1)
         speedRun_renderControls(1, -1, SPEEDRUN_ALIGN_LEFT);
 
     // fix missing controls info when the vScreen didn't get rendered at all
-    if(ScreenType == 5 && numScreens == 1 && vScreen[1].Width == 0)
+    if(screen.Type == 5 && numScreens == 1 && screen.vScreen(1).Width == 0)
     {
         speedRun_renderControls(1, -1);
         speedRun_renderControls(2, -1);
     }
 
     // splitscreen divider
-    if(vScreen[2].Visible)
+    if(screen.vScreen(2).Visible)
     {
-        if(DScreenType == 3 || DScreenType == 4 || DScreenType == 6)
-            XRender::renderRect(0, ScreenH/2-2, ScreenW, 4, 0, 0, 0);
+        if(screen.DType == 3 || screen.DType == 4 || screen.DType == 6)
+            XRender::renderRect(0, (screen.H / 2) - 2, screen.W, 4, 0, 0, 0);
         else
-            XRender::renderRect(ScreenW/2-2, 0, 4, ScreenH, 0, 0, 0);
+            XRender::renderRect((screen.W / 2) - 2, 0, 4, screen.H, 0, 0, 0);
     }
 
     speedRun_renderTimer();
@@ -3041,7 +3049,7 @@ void UpdateGraphics(bool skipRepaint)
         float alpha;
 
         // big screen, display at top
-        if(ScreenH >= 640)
+        if(screen.H >= 640)
         {
             y = 20;
             switch(g_config.show_episode_title)
@@ -3062,7 +3070,7 @@ void UpdateGraphics(bool skipRepaint)
         // small screen, maybe don't display, display at bottom
         else
         {
-            y = ScreenH - 60;
+            y = screen.H - 60;
             switch(g_config.show_episode_title)
             {
                 case Config_t::EPISODE_TITLE_ON_ALWAYS:
