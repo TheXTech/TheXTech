@@ -216,6 +216,11 @@ void DynamicScreen(Screen_t& screen, bool mute)
             DynamicScreen(c_screen, mute);
 
             s_CopyScreen(screen, c_screen);
+
+            // copy messy vScreenAverage results in case they are used later
+            screen.vScreen(1).X = c_screen.vScreen(1).X;
+            screen.vScreen(1).Y = c_screen.vScreen(1).Y;
+
             return;
         }
         else
