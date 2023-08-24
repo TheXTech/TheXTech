@@ -152,6 +152,7 @@ struct ScreenShake_t
 };
 
 static ScreenShake_t s_shakeScreen;
+static bool s_forcedShakeScreen = false;
 
 //static double s_shakeScreenX = 0;
 //static double s_shakeScreenY = 0;
@@ -1364,6 +1365,7 @@ void UpdateGraphics(bool skipRepaint)
     g_stats.reset();
 
     bool continue_qScreen = false;
+    bool continue_qScreen_local = false;
     bool continue_qScreen_canonical = false;
 
     // prepare to fill this frame's NoReset queue
@@ -1503,7 +1505,11 @@ void UpdateGraphics(bool skipRepaint)
 
         // moved to `graphics/gfx_screen.cpp`
         if(!Do_FrameSkip && qScreen)
-            continue_qScreen |= Update_qScreen(Z);
+        {
+            bool continue_this_qScreen = Update_qScreen(Z);
+            continue_qScreen |= continue_this_qScreen;
+            continue_qScreen_local |= (&screen == l_screen) && continue_this_qScreen;
+        }
 
         // the original code was badly written and made THIS happen (always exactly one frame of qScreen in 2P mode)
         if(Z == 2 && !g_compatibility.modern_section_change)
@@ -3044,6 +3050,19 @@ void UpdateGraphics(bool skipRepaint)
 //        If LevelEditor = True Then
 //            StretchBlt frmLevelWindow.vScreen(Z).hdc, 0, 0, frmLevelWindow.vScreen(Z).ScaleWidth, frmLevelWindow.vScreen(Z).ScaleHeight, myBackBuffer, 0, 0, 800, 600, vbSrcCopy
 //        Else
+
+        // shake screen to tell player game is currently paused
+        if(g_compatibility.free_level_res && !continue_qScreen_local && (qScreen || qScreen_canonical) && !s_shakeScreen.active)
+        {
+            s_forcedShakeScreen = true;
+            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.0);
+        }
+        else if(g_compatibility.free_level_res && !(qScreen || qScreen_canonical) && s_forcedShakeScreen)
+        {
+            s_forcedShakeScreen = false;
+            doShakeScreen(1, 1, SHAKE_RANDOM, 0, 0.1);
+        }
+
         { // NOT AN EDITOR!!!
             s_shakeScreen.update();
         }
