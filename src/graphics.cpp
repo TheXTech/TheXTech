@@ -211,39 +211,6 @@ void GetvScreen(vScreen_t& vscreen)
         pLoc.Height = 128;
 }
 
-// NEW: get the vScreen position if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenCanonical(int A, double* left, double* top, bool ignore_qScreen)
-{
-    auto &p = Player[A];
-    auto &pLoc = p.Location;
-
-    double pHeight = (p.Mount != 2) ? pLoc.Height : 0;
-
-    *left = -pLoc.X + (800 * 0.5) - pLoc.Width / 2.0;
-    *top = -pLoc.Y + (600 * 0.5) - vScreenYOffset - pHeight;
-    *left -= vScreen[A].tempX;
-    *top -= vScreen[A].TempY;
-    if(-(*left) < level[p.Section].X)
-        *left = -level[p.Section].X;
-    else if(-(*left) + 800 > level[p.Section].Width)
-        *left = -(level[p.Section].Width - 800);
-    if(-(*top) < level[p.Section].Y)
-        *top = -level[p.Section].Y;
-    else if(-(*top) + 600 > level[p.Section].Height)
-        *top = -(level[p.Section].Height - 600);
-
-    if(qScreen && !ignore_qScreen)
-    {
-        double tX = vScreen[A].X;
-        double tY = vScreen[A].Y;
-        GetvScreen(vScreen[A]);
-        *left += tX - vScreen[A].X;
-        *top += tY - vScreen[A].Y;
-        vScreen[A].X = tX;
-        vScreen[A].Y = tY;
-    }
-}
-
 // Get the average screen position for all players
 void GetvScreenAverage(vScreen_t& vscreen)
 {
@@ -335,62 +302,6 @@ void GetvScreenAverage(vScreen_t& vscreen)
     }
 }
 
-// NEW: get the average screen position for all players if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenAverageCanonical(double* left, double* top, bool ignore_qScreen)
-{
-    int A = 0;
-    int B = 0;
-
-    *left = 0;
-    *top = 0;
-
-    for(A = 1; A <= numPlayers; A++)
-    {
-        if(!Player[A].Dead && Player[A].Effect != 6)
-        {
-            *left -= Player[A].Location.X + Player[A].Location.Width / 2.0;
-            if(Player[A].Mount == 2)
-                *top -= Player[A].Location.Y;
-            else
-                *top -= Player[A].Location.Y + Player[A].Location.Height;
-            B += 1;
-        }
-    }
-
-    if(B == 0)
-    {
-        if(GameMenu)
-        {
-            *left = -level[0].X;
-            B = 1;
-        }
-        else
-            return;
-    }
-    *left = (*left / B) + (800 / 2);
-    *top = (*top / B) + (600 / 2) - vScreenYOffset;
-
-    if(-(*left) < level[Player[1].Section].X)
-        *left = -level[Player[1].Section].X;
-    else if(-(*left) + 800 > level[Player[1].Section].Width)
-        *left = -(level[Player[1].Section].Width - 800);
-    if(-(*top) < level[Player[1].Section].Y)
-        *top = -level[Player[1].Section].Y;
-    else if(-(*top) + 600 > level[Player[1].Section].Height)
-        *top = -(level[Player[1].Section].Height - 600);
-
-    if(qScreen && !ignore_qScreen)
-    {
-        double tX = vScreen[1].X;
-        double tY = vScreen[1].Y;
-        GetvScreenAverage(vScreen[1]);
-        *left += tX - vScreen[1].X;
-        *top += tY - vScreen[1].Y;
-        vScreen[1].X = tX;
-        vScreen[1].Y = tY;
-    }
-}
-
 // Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2(vScreen_t& vscreen)
 {
@@ -430,49 +341,26 @@ void GetvScreenAverage2(vScreen_t& vscreen)
     vscreen.Y = (vscreen.Y / B) + (use_height * 0.5) - vScreenYOffset;
 }
 
-// NEW: Get the average screen position for all players with no level edge detection if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenAverage2Canonical(double* left, double* top, bool ignore_qScreen)
+// NEW: get the 800x600 vScreen position for a player, and write the top-left coordinate to (left, top)
+void GetPlayerScreenCanonical(Player_t& p, double* left, double* top)
 {
-    // int A = 0;
-    int B = 0;
-    double l = 0;
-    double t = 0;
+    auto &pLoc = p.Location;
 
-    for(int A = 1; A <= numPlayers; A++)
-    {
-        if(!Player[A].Dead)
-        {
-            l += -Player[A].Location.X - Player[A].Location.Width / 2.0;
-            if(Player[A].Mount == 2)
-                t += -Player[A].Location.Y;
-            else
-                t += -Player[A].Location.Y - Player[A].Location.Height;
-            B += 1;
-        }
-    }
+    double pHeight = (p.Mount != 2) ? pLoc.Height : 0;
 
-    //A = 1; // Stored value gets never read
+    *left = -pLoc.X + (800 * 0.5) - pLoc.Width / 2.0;
+    *top = -pLoc.Y + (600 * 0.5) - vScreenYOffset - pHeight;
 
-    if(B == 0)
-    {
-        *left = l;
-        *top = t;
-        return;
-    }
+    // limit to level bounds
+    if(-(*left) < level[p.Section].X)
+        *left = -level[p.Section].X;
+    else if(-(*left) + 800 > level[p.Section].Width)
+        *left = -(level[p.Section].Width - 800);
 
-    *left = (l / B) + (800 * 0.5);
-    *top = (t / B) + (600 * 0.5) - vScreenYOffset;
-
-    if(qScreen && !ignore_qScreen)
-    {
-        double tX = vScreen[1].X;
-        double tY = vScreen[1].Y;
-        GetvScreenAverage2(vScreen[1]);
-        *left += tX - vScreen[1].X;
-        *top += tY - vScreen[1].Y;
-        vScreen[1].X = tX;
-        vScreen[1].Y = tY;
-    }
+    if(-(*top) < level[p.Section].Y)
+        *top = -level[p.Section].Y;
+    else if(-(*top) + 600 > level[p.Section].Height)
+        *top = -(level[p.Section].Height - 600);
 }
 
 void SetupGraphics()

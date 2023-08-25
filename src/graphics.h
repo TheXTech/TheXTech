@@ -48,22 +48,16 @@ void UpdateGraphics(bool skipRepaint = false);
 //  Get the screen position
 void GetvScreen(vScreen_t& vscreen);
 
-// NEW: get the screen position if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenCanonical(int A, double* X, double* Y, bool ignore_qScreen = false);
-
 // Public Sub GetvScreenAverage() ' Get the average screen position for all players
 //  Get the average screen position for all players
 void GetvScreenAverage(vScreen_t& vscreen);
-
-// NEW: get the average screen position for all players if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenAverageCanonical(double* left, double* top, bool ignore_qScreen = false);
 
 // Public Sub GetvScreenAverage2() ' Get the average screen position for all players with no level edge detection
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2(vScreen_t& vscreen);
 
-// NEW: get the average screen position for all players with no level edge detection if it were 800x600, and write the top-left coordinate to (left, top)
-void GetvScreenAverage2Canonical(double* left, double* top, bool ignore_qScreen = false);
+// NEW: get the 800x600 vScreen position for a player, and write the top-left coordinate to (left, top)
+void GetPlayerScreenCanonical(Player_t& p, double* left, double* top);
 
 // Public Sub SetupGraphics()
 //! DUMMY AND USELESS

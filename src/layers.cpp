@@ -1041,10 +1041,10 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                 {
                                     double cx, cy, old_cx, old_cy;
 
-                                    GetvScreenCanonical(Z1, &cx, &cy, true);
+                                    GetPlayerScreenCanonical(Player[vScreen[Z1].player], &cx, &cy);
 
                                     level[B] = tempLevel;
-                                    GetvScreenCanonical(Z1, &old_cx, &old_cy, true);
+                                    GetPlayerScreenCanonical(Player[vScreen[Z1].player], &old_cx, &old_cy);
                                     level[B] = newLevel;
 
                                     if(std::abs(cx - old_cx) > 32 || std::abs(cy - old_cy) > 32)
