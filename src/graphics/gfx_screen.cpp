@@ -525,32 +525,51 @@ void CenterScreens(Screen_t& screen)
         double MaxWidth = section.Width - section.X;
         double MaxHeight = section.Height - section.Y;
 
-        if(MaxWidth < vscreen.Width)
+        double MinWidth = 0;
+        double MinHeight = 0;
+
+        // force the vScreens to be a bit bigger during dynamic screen
+        if(g_compatibility.free_level_res && !screen.Visible)
         {
+            MinWidth = SDL_min(screen.W, screen.visible_screen().W / 2);
+            MinHeight = SDL_min(screen.H, screen.visible_screen().H / 2);
+
+            MinWidth = SDL_min(MinWidth, MaxWidth);
+            MinHeight = SDL_min(MinHeight, MaxHeight);
+        }
+
+        if(MinWidth > vscreen.Width || MaxWidth < vscreen.Width)
+        {
+            double SetWidth = (MaxWidth < vscreen.Width) ? MaxWidth : MinWidth;
+
             int left_from_center = vscreen.ScreenLeft - (screen.W / 2);
             int right_from_center = (screen.W / 2) - (vscreen.ScreenLeft + vscreen.Width);
             int total_from_center = (left_from_center + right_from_center);
-            int size_diff = vscreen.Width - MaxWidth;
+            int size_diff = vscreen.Width - SetWidth;
 
             // Move towards center of screen. If left is on center, don't need to move left side of screen.
             // If right is on center, need to fully move left so right can stay. Yields following formula:
-            vscreen.ScreenLeft += size_diff * left_from_center / total_from_center;
+            if(total_from_center)
+                vscreen.ScreenLeft += size_diff * left_from_center / total_from_center;
 
-            vscreen.Width = MaxWidth;
+            vscreen.Width = SetWidth;
         }
 
-        if(MaxHeight < vscreen.Height)
+        if(MinHeight > vscreen.Height || MaxHeight < vscreen.Height)
         {
+            double SetHeight = (MaxHeight < vscreen.Height) ? MaxHeight : MinHeight;
+
             int top_from_center = vscreen.ScreenTop - (screen.H / 2);
             int bottom_from_center = (screen.H / 2) - (vscreen.ScreenTop + vscreen.Height);
             int total_from_center = (top_from_center + bottom_from_center);
-            int size_diff = vscreen.Height - MaxHeight;
+            int size_diff = vscreen.Height - SetHeight;
 
             // Move towards center of screen. If top is on center, don't need to move top side of screen.
             // If bottom is on center, need to fully move top so bottom can stay. Yields following formula:
-            vscreen.ScreenTop += size_diff * top_from_center / total_from_center;
+            if(total_from_center)
+                vscreen.ScreenTop += size_diff * top_from_center / total_from_center;
 
-            vscreen.Height = MaxHeight;
+            vscreen.Height = SetHeight;
         }
     }
 }
