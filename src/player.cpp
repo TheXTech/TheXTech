@@ -5764,7 +5764,8 @@ void PlayerEffects(const int A)
 
     p.Immune2 = false;
 
-    constexpr int plr_warp_scroll_speed = 8;
+    constexpr int plr_warp_scroll_speed = 8; // 8px / frame
+    constexpr int plr_warp_scroll_max_frames = 260; // 4 seconds
 
     if(p.Effect == 1) // Player growing effect
     {
@@ -5982,7 +5983,7 @@ void PlayerEffects(const int A)
                     if(do_scroll)
                     {
                         int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
-                        p.Effect2 = 128 + warp_dist / plr_warp_scroll_speed;
+                        p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
                     }
                     else
                         p.Effect2 = 1;
@@ -6011,7 +6012,7 @@ void PlayerEffects(const int A)
                     if(do_scroll)
                     {
                         int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
-                        p.Effect2 = 128 + warp_dist / plr_warp_scroll_speed;
+                        p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
                     }
                     else
                         p.Effect2 = 1;
@@ -6046,7 +6047,7 @@ void PlayerEffects(const int A)
                     if(do_scroll)
                     {
                         int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
-                        p.Effect2 = 128 + warp_dist / plr_warp_scroll_speed;
+                        p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
                     }
                     else
                         p.Effect2 = 1;
@@ -6084,7 +6085,7 @@ void PlayerEffects(const int A)
                     if(do_scroll)
                     {
                         int warp_dist = SDL_sqrt((warp_enter.X - warp_exit.X) * (warp_enter.X - warp_exit.X) + (warp_enter.Y - warp_exit.Y) * (warp_enter.Y - warp_exit.Y));
-                        p.Effect2 = 128 + warp_dist / plr_warp_scroll_speed;
+                        p.Effect2 = 128 + SDL_min(warp_dist / plr_warp_scroll_speed, plr_warp_scroll_max_frames);
                     }
                     else
                         p.Effect2 = 1;
@@ -6380,13 +6381,19 @@ void PlayerEffects(const int A)
             }
             else if(warp_dir_exit == 2)
             {
+                if(p.Mount == 3)
+                    p.Location.Height = 30;
+
                 targetX = warp_exit.X - p.Location.Width - 8;
                 targetY = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
             }
             else if(warp_dir_exit == 4)
             {
+                if(p.Mount == 3)
+                    p.Location.Height = 30;
+
                 targetX = warp_exit.X + warp_exit.Width + 8;
-                targetY = warp_exit.Y + warp_exit.Height - 30 - 2;
+                targetY = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
             }
 
             int frames_left = p.Effect2 - 128;
@@ -6742,6 +6749,8 @@ void PlayerEffects(const int A)
             int scroll_frames = warp_dist / plr_warp_scroll_speed;
             if(scroll_frames < 30)
                 scroll_frames = 30;
+            if(scroll_frames > plr_warp_scroll_max_frames)
+                scroll_frames = plr_warp_scroll_max_frames;
 
             p.Effect2 = 128 + scroll_frames;
         }

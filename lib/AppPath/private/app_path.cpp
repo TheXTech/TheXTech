@@ -31,6 +31,7 @@
 
 
 std::string AppPathManager::m_settingsPath;
+std::string AppPathManager::m_gamesavesPath;
 std::string AppPathManager::m_assetsPath;
 std::string AppPathManager::m_userPath;
 
@@ -40,8 +41,11 @@ std::string AppPathManager::m_logsPath;
 
 std::string AppPathManager::m_customAssetsRoot;
 std::string AppPathManager::m_customUserDirectory;
+std::string AppPathManager::m_customGameDirName;
 
 bool AppPathManager::m_isPortable = false;
+
+bool AppPathP::ignoreLegacyDebugDir = false;
 
 
 #if defined(USER_DIR_NAME)
@@ -82,9 +86,19 @@ void AppPathManager::setUserDirectory(const std::string& root)
     appendSlash(m_customUserDirectory);
 }
 
+void AppPathManager::setGameDirName(const std::string& dirName)
+{
+    m_customGameDirName = dirName;
+    appendSlash(m_customGameDirName);
+    // Also append to front
+    if(!m_customGameDirName.empty() && m_customGameDirName.front() != '/')
+        m_customGameDirName.insert(0, 1, '/');
+}
+
 void AppPathManager::initAppPath()
 {
-    AppPathP::initDefaultPaths(UserDirName);
+    AppPathP::ignoreLegacyDebugDir = !m_customGameDirName.empty();
+    AppPathP::initDefaultPaths(m_customGameDirName.empty() ? UserDirName : m_customGameDirName);
 
     // When user directory is redefined externally
     if(!m_customUserDirectory.empty())
@@ -173,6 +187,9 @@ void AppPathManager::initSettingsPath()
 {
     // Default settings path
     initString(m_settingsPath, AppPathP::settingsRoot(), m_userPath + "settings/");
+
+    // Default settings path
+    initString(m_gamesavesPath, AppPathP::gamesavesRoot(), m_settingsPath + "gamesaves/");
 
     // Check if need to use system-wide screenshots directory
     initString(m_screenshotsPath, AppPathP::screenshotsRoot(), m_userPath + "screenshots/");
@@ -264,7 +281,7 @@ std::string AppPathManager::gifRecordsDir() // Writable
 
 std::string AppPathManager::gameSaveRootDir() // Writable
 {
-    return m_settingsPath + "gamesaves/";
+    return m_gamesavesPath;
 }
 
 std::string AppPathManager::gameplayRecordsRootDir() // Writable

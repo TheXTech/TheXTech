@@ -109,7 +109,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     else
     {
         // Priority the legacy path for compatibility
-        if(DirMan::exists(s_userDirectory + s_legacyDebugDir))
+        if(!ignoreLegacyDebugDir && DirMan::exists(s_userDirectory + s_legacyDebugDir))
         {
             s_userDirectory += s_legacyDebugDir;
             s_assetsRoot = s_userDirectory;
@@ -117,8 +117,8 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         }
         else
         {
-            s_assetsRoot = roamingPath + userDirName + "DebugAssets/";
             s_userDirectory = roamingPath + userDirName + "UserData/";
+            s_assetsRoot = roamingPath + userDirName + "DebugAssets/";
             s_logsDirectory = localPath + userDirName + "logs/";
         }
     }
@@ -145,6 +145,16 @@ std::string AppPathP::settingsRoot()
      * Fill this in only condition when you want to use the system-wide settings
      * directory out of user directory. Keep it empty if you want to keep the
      * default behaviour (i.e. settings saved at the user directory)
+     */
+    return std::string();
+}
+
+std::string AppPathP::gamesavesRoot()
+{
+    /*
+     * Fill this in only condition when you want to use the system-wide gamesaves
+     * directory out of user directory. Keep it empty if you want to keep the
+     * default behaviour (i.e. gamesaves saved at the settings directory)
      */
     return std::string();
 }
