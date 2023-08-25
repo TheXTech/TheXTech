@@ -6379,13 +6379,19 @@ void PlayerEffects(const int A)
             }
             else if(warp_dir_exit == 2)
             {
+                if(p.Mount == 3)
+                    p.Location.Height = 30;
+
                 targetX = warp_exit.X - p.Location.Width - 8;
                 targetY = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
             }
             else if(warp_dir_exit == 4)
             {
+                if(p.Mount == 3)
+                    p.Location.Height = 30;
+
                 targetX = warp_exit.X + warp_exit.Width + 8;
-                targetY = warp_exit.Y + warp_exit.Height - 30 - 2;
+                targetY = warp_exit.Y + warp_exit.Height - p.Location.Height - 2;
             }
 
             int frames_left = p.Effect2 - 128;
