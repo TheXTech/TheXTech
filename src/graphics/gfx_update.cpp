@@ -1498,7 +1498,7 @@ void UpdateGraphics(bool skipRepaint)
             GetvScreen(c_screen.vScreen(1));
         }
 
-        if(!Do_FrameSkip && qScreen_canonical)
+        if(qScreen_canonical)
         {
             int Z1 = c_screen.vScreen_refs[0];
             int Z2 = c_screen.vScreen_refs[1];
@@ -1553,7 +1553,7 @@ void UpdateGraphics(bool skipRepaint)
         }
 
         // moved to `graphics/gfx_screen.cpp`
-        if(!Do_FrameSkip && qScreen)
+        if(qScreen)
         {
             bool continue_this_qScreen = Update_qScreen(Z);
             continue_qScreen |= continue_this_qScreen;
@@ -1699,13 +1699,12 @@ void UpdateGraphics(bool skipRepaint)
             n.Reset[2] = true;
     }
 
+    qScreen = continue_qScreen;
+    qScreen_canonical = continue_qScreen_canonical;
+
     // we've now done all the logic that UpdateGraphics can do.
     if(Do_FrameSkip)
         return;
-
-    // only updated on non-frameskip in vanilla
-    qScreen = continue_qScreen;
-    qScreen_canonical = continue_qScreen_canonical;
 
 
     XRender::setTargetTexture();
