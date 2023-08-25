@@ -42,12 +42,33 @@ const Screen_t& Screen_t::canonical_screen() const
     return Screens[m_CanonicalScreen];
 }
 
+Screen_t& Screen_t::visible_screen()
+{
+    if(Visible || m_VisibleScreen >= c_screenCount)
+        return *this;
+
+    return Screens[m_VisibleScreen];
+}
+
+const Screen_t& Screen_t::visible_screen() const
+{
+    if(Visible || m_VisibleScreen >= c_screenCount)
+        return *this;
+
+    return Screens[m_VisibleScreen];
+}
+
 void Screen_t::set_canonical_screen(uint8_t index)
 {
     m_CanonicalScreen = index;
 
     if(m_CanonicalScreen != 0)
     {
+        if(this >= &Screens[0] && this <= &Screens[c_screenCount - 1])
+            canonical_screen().m_VisibleScreen = this - &Screens[0];
+        else
+            canonical_screen().m_VisibleScreen = 0;
+
         canonical_screen().m_CanonicalScreen = 0;
         canonical_screen().players = players;
     }

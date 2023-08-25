@@ -121,6 +121,8 @@ struct Screen_t
 private:
     //! a reference to the canonical Screen for this screen (an 800x600 screen with the same players); 0 indicates that the screen itself is canonical
     uint8_t m_CanonicalScreen = 0;
+    //! a reference to the visible Screen for a canonical screen
+    uint8_t m_VisibleScreen = 0;
 
 public:
     using localarr_t = std::array<uint8_t, maxLocalPlayers>;
@@ -153,6 +155,9 @@ public:
 
     Screen_t& canonical_screen();
     const Screen_t& canonical_screen() const;
+
+    Screen_t& visible_screen();
+    const Screen_t& visible_screen() const;
 
     void set_canonical_screen(uint8_t index);
 
