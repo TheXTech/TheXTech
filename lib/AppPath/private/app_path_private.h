@@ -55,6 +55,12 @@ extern std::string assetsRoot();
 extern std::string settingsRoot();
 
 /*!
+ * \brief Get the default path to the writable gamesaves directory (if empty, store at the usre directory)
+ * \return Path to the system-wide gamesaves directory
+ */
+extern std::string gamesavesRoot();
+
+/*!
  * \brief Default directory for screenshots (if empty, store at the user directory)
  * \return Path to the system-wide screenshots directory
  */

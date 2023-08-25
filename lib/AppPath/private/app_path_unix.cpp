@@ -30,8 +30,11 @@
 
 static std::string s_assetsRoot;
 static std::string s_userDirectory;
+
 static std::string s_logsDirectory;
 static std::string s_settingsDirectory;
+static std::string s_gamesavesDirectory;
+
 static std::string s_applicationPath;
 //! The legacy debug root
 static const char* s_legacyDebugDir = "/.PGE_Project/thextech/";
@@ -104,6 +107,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         s_assetsRoot = homePath;
         s_logsDirectory.clear();
         s_settingsDirectory.clear();
+        s_gamesavesDirectory.clear();
     }
     else
     {
@@ -111,6 +115,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         s_assetsRoot = userDir + userDirName + "debug-assets/";
         s_logsDirectory = logsDir + userDirName;
         s_settingsDirectory = setupDir + userDirName;
+        s_gamesavesDirectory = userDir + userDirName + "gamesaves/";
     }
 
     char *appPath = SDL_GetBasePath();
@@ -150,6 +155,16 @@ std::string AppPathP::settingsRoot()
      * default behaviour (i.e. settings saved at the user directory)
      */
     return s_settingsDirectory;
+}
+
+std::string AppPathP::gamesavesRoot()
+{
+    /*
+     * Fill this in only condition when you want to use the system-wide gamesaves
+     * directory out of user directory. Keep it empty if you want to keep the
+     * default behaviour (i.e. gamesaves saved at the settings directory)
+     */
+    return s_gamesavesDirectory;
 }
 
 std::string AppPathP::screenshotsRoot()

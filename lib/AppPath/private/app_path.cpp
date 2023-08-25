@@ -31,6 +31,7 @@
 
 
 std::string AppPathManager::m_settingsPath;
+std::string AppPathManager::m_gamesavesPath;
 std::string AppPathManager::m_assetsPath;
 std::string AppPathManager::m_userPath;
 
@@ -174,6 +175,9 @@ void AppPathManager::initSettingsPath()
     // Default settings path
     initString(m_settingsPath, AppPathP::settingsRoot(), m_userPath + "settings/");
 
+    // Default settings path
+    initString(m_gamesavesPath, AppPathP::gamesavesRoot(), m_settingsPath + "gamesaves/");
+
     // Check if need to use system-wide screenshots directory
     initString(m_screenshotsPath, AppPathP::screenshotsRoot(), m_userPath + "screenshots/");
 
@@ -264,7 +268,7 @@ std::string AppPathManager::gifRecordsDir() // Writable
 
 std::string AppPathManager::gameSaveRootDir() // Writable
 {
-    return m_settingsPath + "gamesaves/";
+    return m_gamesavesPath;
 }
 
 std::string AppPathManager::gameplayRecordsRootDir() // Writable
