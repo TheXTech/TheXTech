@@ -895,6 +895,8 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                 set_qScreen |= screen.Visible;
                                 set_qScreen_canonical |= !screen.Visible && screen.is_canonical();
 
+                                bool screen2_was_visible = vScreen[Z2].Visible;
+
                                 double tX = 0.0;
                                 double tY = 0.0;
 
@@ -947,7 +949,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
                                     qScreenLoc[Z2] = vScreen[Z2];
 
                                 // special code to indicate the direction the other player was warped from
-                                if((tX || tY) && !vScreen[Z2].Visible)
+                                if((tX || tY) && (screen2_was_visible && !vScreen[Z2].Visible))
                                 {
                                     // total distance of warp
                                     double dSquare = tX * tX + tY * tY;
