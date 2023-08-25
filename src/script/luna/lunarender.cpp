@@ -365,22 +365,6 @@ void Render::TranslateScreenCoords(double &x, double &y, double w, double h)
             top = vScreen[1].Height / 2 - 300;
         int left = vScreen[1].Width / 2 - 400;
 
-        // code to make the HUD follow the player (useful for huge resolutions)
-        // cross-ref DropBonus in npc_bonus.cpp
-        if(g_config.hud_follows_player)
-        {
-            double l, t;
-            if(ScreenType == 5 && !vScreen[2].Visible)
-                GetvScreenAverageCanonical(&l, &t);
-            else
-                GetvScreenCanonical(1, &l, &t);
-
-            if(vScreen[1].Height > 600)
-                top = -t + vScreen[1].Y;
-            if(vScreen[1].Width > 800)
-                left = -l + vScreen[1].X;
-        }
-
         x += left;
         y += top;
 

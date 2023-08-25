@@ -76,8 +76,6 @@ extern struct Config_t
     //! Internal gameplay resolution (0 means that Renderer may set on window resize)
     int     InternalW = 800;
     int     InternalH = 600;
-    //! HUD follows player onscreen (useful for levels much larger than the intended screen size)
-    bool    hud_follows_player = false;
 #ifdef ENABLE_XTECH_DISCORD_RPC
     //! Enable Discord Rich Presense support on supported platforms
     bool    discord_rpc = false;

@@ -37,21 +37,6 @@ void DrawInterface(int Z, int numScreens)
         ScreenTop = vScreen[Z].Height / 2 - 300;
     int CenterX = vScreen[Z].Width / 2;
 
-    // code to make the HUD follow the player (useful for huge resolutions)
-    // cross-ref DropBonus in npc_bonus.cpp
-    if(g_config.hud_follows_player)
-    {
-        double l, t;
-        if(ScreenType == 5 && !vScreen[2].Visible)
-            GetvScreenAverageCanonical(&l, &t);
-        else
-            GetvScreenCanonical(Z, &l, &t);
-        if(vScreen[Z].Height > 600)
-            ScreenTop = -t + vScreen[Z].Y;
-        if(vScreen[Z].Width > 800)
-            CenterX = -l + 400 + vScreen[Z].X;
-    }
-
     int B = 0;
     int C = 0;
     int D = 0;

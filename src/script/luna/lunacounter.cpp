@@ -361,21 +361,6 @@ void DeathCounter::Draw(int screenZ)
         ScreenTop = vscreen.Height / 2 - 300;
     int HUDLeft = vscreen.Width / 2 - 400;
 
-    // code to make the HUD follow the player (useful for huge resolutions)
-    // cross-ref DropBonus in npc_bonus.cpp
-    if(g_config.hud_follows_player)
-    {
-        double l, t;
-        if(ScreenType == 5 && !vScreen[2].Visible)
-            GetvScreenAverageCanonical(&l, &t);
-        else
-            GetvScreenCanonical(screenZ, &l, &t);
-        if(vscreen.Height > 600)
-            ScreenTop = -t + vscreen.Y;
-        if(vscreen.Width > 800)
-            HUDLeft = -l + vscreen.X;
-    }
-
     // With normal res, print to screen in upper left
     if(vscreen.Width >= 800)
     {

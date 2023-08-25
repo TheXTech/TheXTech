@@ -125,16 +125,6 @@ void DropBonus(int A)
 
                 double CenterX = -vscreen.X + vscreen.Width / 2;
 
-                if(g_config.hud_follows_player)
-                {
-                    double l, t;
-                    GetvScreenAverageCanonical(&l, &t);
-                    if(vScreen[1].Height > 600)
-                        ScreenTop = -t;
-                    if(vScreen[1].Width > 800)
-                        CenterX = -l + 400;
-                }
-
                 NPC[numNPCs].Location.X = CenterX - NPC[numNPCs].Location.Width / 2.0 + B;
                 NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
             }
@@ -156,16 +146,6 @@ void DropBonus(int A)
                     ScreenTop += vscreen.Height / 2 - 300;
 
                 double CenterX = -vscreen.X + vscreen.Width / 2;
-
-                if(g_config.hud_follows_player)
-                {
-                    double l, t;
-                    GetvScreenCanonical(A, &l, &t);
-                    if(vScreen[A].Height > 600)
-                        ScreenTop = -t;
-                    if(vScreen[A].Width > 800)
-                        CenterX = -l + 400;
-                }
 
                 NPC[numNPCs].Location.X = CenterX - NPC[numNPCs].Location.Width / 2.0;
                 NPC[numNPCs].Location.Y = ScreenTop + 16 + 12;
