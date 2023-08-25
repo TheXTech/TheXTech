@@ -56,6 +56,9 @@ void GetvScreenAverage(vScreen_t& vscreen);
 //  Get the average screen position for all players with no level edge detection
 void GetvScreenAverage2(vScreen_t& vscreen);
 
+// NEW: update a vScreen with the correct procedure based on its screen's Type and DType
+void GetvScreenAuto(vScreen_t& vscreen);
+
 // NEW: get the 800x600 vScreen position for a player, and write the top-left coordinate to (left, top)
 void GetPlayerScreenCanonical(Player_t& p, double* left, double* top);
 

@@ -19,6 +19,7 @@
  */
 
 #include "screen.h"
+#include "globals.h" // SingleCoop
 
 RangeArr<Screen_t, 0, c_screenCount - 1> Screens;
 Screen_t* l_screen = &Screens[0];
@@ -72,6 +73,28 @@ void Screen_t::set_canonical_screen(uint8_t index)
         canonical_screen().m_CanonicalScreen = 0;
         canonical_screen().players = players;
     }
+}
+
+int Screen_t::active_begin() const
+{
+    if(Type == ScreenTypes::SingleCoop && SingleCoop == 2)
+        return 1;
+
+    return 0;
+}
+
+int Screen_t::active_end() const
+{
+    if(Type == ScreenTypes::SingleCoop && SingleCoop == 2)
+        return 2;
+
+    if(Type == ScreenTypes::TopBottom || Type == ScreenTypes::LeftRight)
+        return 2;
+
+    if(Type == ScreenTypes::Dynamic && vScreen(2).Visible)
+        return 2;
+
+    return 1;
 }
 
 void InitScreens()

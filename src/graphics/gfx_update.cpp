@@ -1476,27 +1476,8 @@ void UpdateGraphics(bool skipRepaint)
     {
         Screen_t& c_screen = screen.canonical_screen();
 
-        if(c_screen.Type == 1 || c_screen.Type == 4 || (c_screen.Type == 5 && c_screen.vScreen(2).Visible))
-        {
-            GetvScreen(c_screen.vScreen(1));
-            GetvScreen(c_screen.vScreen(2));
-        }
-        else if(c_screen.Type == 2 || c_screen.Type == 3 || c_screen.Type == 5)
-        {
-            GetvScreenAverage(c_screen.vScreen(1));
-        }
-        else if(c_screen.Type == 7)
-        {
-            GetvScreenCredits(c_screen.vScreen(1));
-        }
-        else if(c_screen.Type == 6 && SingleCoop == 2) // SingleCoop
-        {
-            GetvScreen(c_screen.vScreen(2));
-        }
-        else
-        {
-            GetvScreen(c_screen.vScreen(1));
-        }
+        for(int i = c_screen.active_begin() + 1; i <= c_screen.active_end(); i++)
+            GetvScreenAuto(c_screen.vScreen(i));
 
         if(qScreen_canonical)
         {
@@ -1541,16 +1522,7 @@ void UpdateGraphics(bool skipRepaint)
 
         // update vScreen location
         if(!LevelEditor)
-        {
-            if(screen.Type == 2 || screen.Type == 3)
-                GetvScreenAverage(vscreen1);
-            else if(screen.Type == 5 && !vscreen2.Visible)
-                GetvScreenAverage(vscreen1);
-            else if(screen.Type == 7)
-                GetvScreenCredits(vscreen1);
-            else
-                GetvScreen(vScreen[Z]);
-        }
+            GetvScreenAuto(vScreen[Z]);
 
         // moved to `graphics/gfx_screen.cpp`
         if(qScreen)

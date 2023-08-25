@@ -166,6 +166,12 @@ public:
     {
         return ::vScreen[vScreen_refs[index - 1]];
     }
+
+    //! First active vScreen index (0-indexed). Use to replace numScreens logic.
+    int active_begin() const;
+
+    //! Bound on active vScreen indexes (0-indexed). Use to replace numScreens logic.
+    int active_end() const;
 };
 
 void InitScreens();
