@@ -260,6 +260,13 @@ int main(int argc, char**argv)
                                                          "directory path",
                                                          cmd);
 
+        TCLAP::ValueArg<std::string> customGameDirName(std::string(), "game-dirname",
+                                                       "Specify the game directory name for default locations",
+                                                       false, "",
+                                                       "directory name",
+                                                       cmd);
+
+
         TCLAP::SwitchArg switchFrameSkip("f", "frameskip", "Enable frame skipping mode", false);
         TCLAP::SwitchArg switchDisableFrameSkip(std::string(), "no-frameskip", "Disable frame skipping mode", false);
         TCLAP::SwitchArg switchNoSound("s", "no-sound", "Disable sound", false);
@@ -428,12 +435,16 @@ int main(int argc, char**argv)
         {
             std::string customAssets = customAssetsPath.getValue();
             std::string customUserDir = customUserDirectory.getValue();
+            std::string customGameDir = customGameDirName.getValue();
 
             if(!customAssets.empty())
                 AppPathManager::setAssetsRoot(customAssets);
 
             if(!customUserDir.empty())
                 AppPathManager::setUserDirectory(customUserDir);
+
+            if(!customGameDir.empty())
+                AppPathManager::setGameDirName(customGameDir);
 
             AppPathManager::initAppPath();
             AppPath = AppPathManager::assetsRoot();

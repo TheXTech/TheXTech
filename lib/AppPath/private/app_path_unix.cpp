@@ -39,6 +39,14 @@ static std::string s_applicationPath;
 //! The legacy debug root
 static const char* s_legacyDebugDir = "/.PGE_Project/thextech/";
 
+#ifndef THEXTECH_SYSTEM_GAMES_DIR
+static const char* s_gamesSysDir = "/usr/share/games";
+#else
+static const char* s_gamesSysDir = THEXTECH_SYSTEM_GAMES_DIR;
+#endif
+
+bool g_ignoreLegacyDebugDir = false;
+
 
 static std::string s_getEnvNotNull(const char *env)
 {
@@ -93,7 +101,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     bool legacyRoot = DirMan::exists(homePath + s_legacyDebugDir);
     bool legacyRoot2 = DirMan::exists(homePath + userDirName);
 
-    if(legacyRoot || legacyRoot2) // Legacy debug root has the highest priority!
+    if(!ignoreLegacyDebugDir && (legacyRoot || legacyRoot2)) // Legacy debug root has the highest priority!
     {
         if(legacyRoot2)
             homePath.append(userDirName);
@@ -116,6 +124,9 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         s_logsDirectory = logsDir + userDirName;
         s_settingsDirectory = setupDir + userDirName;
         s_gamesavesDirectory = userDir + userDirName + "gamesaves/";
+        // If debug assets are not exists, find the globally installed assets instead
+        if(!DirMan::exists(s_assetsRoot))
+            s_assetsRoot = s_gamesSysDir + userDirName;
     }
 
     char *appPath = SDL_GetBasePath();

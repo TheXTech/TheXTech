@@ -25,6 +25,9 @@
 
 namespace AppPathP
 {
+//! If this flag set to TRUE, the legacy debug assets root will be completely ignored
+extern bool ignoreLegacyDebugDir;
+
 /*!
  * \brief Initialize all default internals
  */

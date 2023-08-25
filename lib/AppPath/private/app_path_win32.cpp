@@ -109,7 +109,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     else
     {
         // Priority the legacy path for compatibility
-        if(DirMan::exists(s_userDirectory + s_legacyDebugDir))
+        if(!ignoreLegacyDebugDir && DirMan::exists(s_userDirectory + s_legacyDebugDir))
         {
             s_userDirectory += s_legacyDebugDir;
             s_assetsRoot = s_userDirectory;
@@ -117,8 +117,8 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         }
         else
         {
-            s_assetsRoot = roamingPath + userDirName + "DebugAssets/";
             s_userDirectory = roamingPath + userDirName + "UserData/";
+            s_assetsRoot = roamingPath + userDirName + "DebugAssets/";
             s_logsDirectory = localPath + userDirName + "logs/";
         }
     }
