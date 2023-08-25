@@ -61,6 +61,8 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     // FIXME: Implement new default directories format later
     (void)userDirName;
     wchar_t pathBuffer[MAX_PATH] = L"";
+
+#if defined(THEXTECH_NEW_USER_PATHS)
     std::string localPath;
     std::string roamingPath;
 
@@ -83,6 +85,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     }
     else
         s_toUtf8(localPath, pathBuffer, (DWORD)SDL_wcslen(pathBuffer));
+#endif THEXTECH_NEW_USER_PATHS
 
     // Application path
     char *path = SDL_GetBasePath();
@@ -104,6 +107,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
     SDL_assert_release(path_len);
     s_toUtf8(s_userDirectory, pathBuffer, path_len);
 
+#if defined(THEXTECH_NEW_USER_PATHS)
     if(s_userDirectory.empty() && localPath.empty() && roamingPath.empty())
         s_userDirectory = "./";
     else
@@ -122,6 +126,11 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
             s_logsDirectory = localPath + userDirName + "logs/";
         }
     }
+#else
+    s_userDirectory += s_legacyDebugDir;
+    s_assetsRoot = s_userDirectory;
+    s_logsDirectory.clear();
+#endif
 }
 
 std::string AppPathP::appDirectory()

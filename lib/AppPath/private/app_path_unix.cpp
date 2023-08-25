@@ -39,15 +39,15 @@ static std::string s_applicationPath;
 //! The legacy debug root
 static const char* s_legacyDebugDir = "/.PGE_Project/thextech/";
 
-#ifndef THEXTECH_SYSTEM_GAMES_DIR
+#ifdef THEXTECH_NEW_USER_PATHS
+#   ifndef THEXTECH_SYSTEM_GAMES_DIR
 static const char* s_gamesSysDir = "/usr/share/games";
-#else
+#   else
 static const char* s_gamesSysDir = THEXTECH_SYSTEM_GAMES_DIR;
+#   endif
 #endif
 
-bool g_ignoreLegacyDebugDir = false;
-
-
+#if defined(THEXTECH_NEW_USER_PATHS)
 static std::string s_getEnvNotNull(const char *env)
 {
     const char *e = SDL_getenv(env);
@@ -56,19 +56,24 @@ static std::string s_getEnvNotNull(const char *env)
     else
         return std::string();
 }
+#endif
 
 void AppPathP::initDefaultPaths(const std::string &userDirName)
 {
     std::string homePath;
+#if defined(THEXTECH_NEW_USER_PATHS)
     std::string userDir;
     std::string logsDir;
     std::string setupDir;
+#endif
 
     // Environment
     const char *env_home = SDL_getenv("HOME");
+#if defined(THEXTECH_NEW_USER_PATHS)
     setupDir = s_getEnvNotNull("XDG_CONFIG_HOME");
     logsDir = s_getEnvNotNull("XDG_STATE_HOME");
     userDir = s_getEnvNotNull("XDG_DATA_HOME");
+#endif
 
     // Init home directory
 #if defined(__HAIKU__)
@@ -82,6 +87,7 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         homePath.append(env_home);
 #endif
 
+#if defined(THEXTECH_NEW_USER_PATHS)
     // Set default paths if environments aren't defined
     if(!homePath.empty())
     {
@@ -94,9 +100,12 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         if(userDir.empty())
             userDir = homePath + "/.local/share";
     }
+#endif
 
     if(homePath.empty())
         homePath = std::string(".");
+
+#if defined(THEXTECH_NEW_USER_PATHS)
 
     bool legacyRoot = DirMan::exists(homePath + s_legacyDebugDir);
     bool legacyRoot2 = DirMan::exists(homePath + userDirName);
@@ -128,6 +137,23 @@ void AppPathP::initDefaultPaths(const std::string &userDirName)
         if(!DirMan::exists(s_assetsRoot))
             s_assetsRoot = s_gamesSysDir + userDirName;
     }
+
+#else // THEXTECH_NEW_USER_PATHS
+    // Use old default paths logic
+    if(DirMan::exists(homePath + userDirName))
+        homePath.append(userDirName);
+    else
+        homePath.append(s_legacyDebugDir);
+
+    if(!homePath.empty() && homePath.back() != '/')
+        homePath.push_back('/');
+
+    s_userDirectory = homePath;
+    s_assetsRoot = homePath;
+    s_logsDirectory.clear();
+    s_settingsDirectory.clear();
+    s_gamesavesDirectory.clear();
+#endif // THEXTECH_NEW_USER_PATHS
 
     char *appPath = SDL_GetBasePath();
     if(!appPath)

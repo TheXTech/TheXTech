@@ -176,6 +176,7 @@ option(THEXTECH_ENABLE_TTF_SUPPORT "Enable TTF fonts support (FreeType required)
 option(THEXTECH_CLI_BUILD "Minimal CLI build for testing and benchmarking on desktop platforms" OFF)
 option(THEXTECH_NO_SDL_BUILD "Do not use SDL in the CLI build; useful as a starting point for new ports" OFF)
 
+option(THEXTECH_ENABLE_NEW_USER_PATHS "Use new default paths for user directory (experimental)" OFF)
 option(THEXTECH_ENABLE_WIP_FEATURES "Enable experimental and incomplete features (disabled by default)" OFF)
 mark_as_advanced(THEXTECH_ENABLE_WIP_FEATURES)
 
@@ -1159,6 +1160,10 @@ endif()
 
 if(THEXTECH_BUILD_GL_ES_LEGACY)
     target_compile_definitions(thextech PRIVATE -DTHEXTECH_BUILD_GL_ES_LEGACY)
+endif()
+
+if(THEXTECH_ENABLE_NEW_USER_PATHS)
+    target_compile_definitions(thextech PRIVATE -DTHEXTECH_NEW_USER_PATHS)
 endif()
 
 if(THEXTECH_ENABLE_WIP_FEATURES)
