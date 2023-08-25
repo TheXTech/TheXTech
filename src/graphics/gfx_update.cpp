@@ -1174,7 +1174,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
             else
                 can_activate = render;
 
-            can_activate = cannot_reset = onscreen_canonical;
+            // can_activate = cannot_reset = onscreen_canonical;
         }
 
         if(NPC[A].Generator)
@@ -1188,7 +1188,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
             render = false;
         }
 
-        // track the NPC intro frames of this NPC
+        // find the intro frame index for this NPC; will be NPC_intro_count if not found
         uint8_t NPC_intro_index;
         for(NPC_intro_index = 0; NPC_intro_index < NPC_intro_count; NPC_intro_index++)
         {
@@ -1207,7 +1207,7 @@ void ModernNPCScreenLogic(Screen_t& screen, int vscreen_i, bool fill_draw_queue,
         {
             if(render && !can_activate)
             {
-                // add it to the set of NPCs in intro/conditional states
+                // add it to the set of NPCs in intro/conditional states if not already present
                 if(NPC_intro_index == NPC_intro_count && NPC_intro_count < NPC_intro_count_MAX)
                 {
                     NPC_intro[NPC_intro_index] = A;
