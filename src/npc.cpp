@@ -151,6 +151,46 @@ void Deactivate(int A)
 
             NPC[A].Pinched = PinchedInfo_t();
 
+            // new-added logic: if CURRENTLY offscreen for all vScreens, allow it to reset
+            if(g_compatibility.fix_frame_perfect_despawn && !FreezeNPCs)
+            {
+                bool hit = false;
+
+                for(int screen_i = 0; !hit && screen_i < c_screenCount; screen_i++)
+                {
+                    const Screen_t& screen = Screens[screen_i];
+
+                    bool single_screen = (screen.Type == ScreenTypes::SinglePlayer || screen.Type == ScreenTypes::Average
+                        || screen.Type == ScreenTypes::SharedScreen || screen.Type == ScreenTypes::Credits);
+
+                    for(int vscreen_i = 0; !hit && vscreen_i < maxLocalPlayers; vscreen_i++)
+                    {
+                        int vscreen_Z = screen.vScreen_refs[vscreen_i];
+
+                        // FIXME: SingleCoop should become a member of Screen_t
+                        if(screen.Type == ScreenTypes::SingleCoop && SingleCoop != vscreen_i + 1)
+                            continue;
+
+                        // check if non-first screen is visible in dynamic mode
+                        if(screen.Type == ScreenTypes::Dynamic && vscreen_i > 0 && !vScreen[vscreen_Z].Visible)
+                            continue;
+
+                        // in single screen mode, only allow first screen
+                        if(single_screen && vscreen_i > 0)
+                            continue;
+
+                        if(vScreenCollision(vscreen_Z, NPC[A].Location))
+                            hit = true;
+                    }
+                }
+
+                if(!hit)
+                {
+                    NPC[A].Reset[1] = true;
+                    NPC[A].Reset[2] = true;
+                }
+            }
+
             // NEW now that we have the new NPC Queues
             NPCQueues::update(A);
             treeNPCUpdate(A);

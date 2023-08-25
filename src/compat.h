@@ -91,6 +91,7 @@ struct Compatibility_t
     bool fix_pound_skip_warp; // ground pound state should not skip instant / portal warps
     bool fix_held_item_cancel; // do not cancel held item hitting hostile NPC that intersects with an immune NPC
     bool modern_section_change; // fix glitches and improve animations for section resize
+    bool fix_frame_perfect_despawn; // if NPC comes onscreen later in the same frame it timed out, should still be able to spawn
     unsigned int bitblit_background_colour[3];
 
     // SpeedRun section
