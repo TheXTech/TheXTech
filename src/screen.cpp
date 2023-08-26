@@ -101,14 +101,30 @@ int vScreenIdxByPlayer(int player)
     if(player < 1 || player > maxLocalPlayers)
         return 0;
 
-    // FIXME: update this for shared screen mode and netplay
-    return player;
+    Screen_t& screen = ScreenByPlayer(player);
+
+    bool is_splitscreen = (screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && screen.vScreen(2).Visible));
+
+    if(is_splitscreen && player == screen.players[1])
+        return screen.vScreen_refs[1];
+
+    return screen.vScreen_refs[0];
 }
 
 // finds the canonical vScreen that contains a specific player
 int vScreenIdxByPlayer_canonical(int player)
 {
-    return vScreenIdxByPlayer(player);
+    if(player < 1 || player > maxLocalPlayers)
+        return 0;
+
+    Screen_t& screen = ScreenByPlayer_canonical(player);
+
+    bool is_splitscreen = (screen.Type == 1 || screen.Type == 4 || (screen.Type == 5 && screen.vScreen(2).Visible));
+
+    if(is_splitscreen && player == screen.players[1])
+        return screen.vScreen_refs[1];
+
+    return screen.vScreen_refs[0];
 }
 
 // temporary helpers while game is being converted to use Screen_t
