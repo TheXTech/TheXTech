@@ -355,25 +355,25 @@ void GetvScreenAuto(vScreen_t& vscreen)
 }
 
 // NEW: get the 800x600 vScreen position for a player, and write the top-left coordinate to (left, top)
-void GetPlayerScreenCanonical(Player_t& p, double* left, double* top)
+void GetPlayerScreenCanonical(const Player_t& p, double& left, double& top)
 {
     auto &pLoc = p.Location;
 
     double pHeight = (p.Mount != 2) ? pLoc.Height : 0;
 
-    *left = -pLoc.X + (800 * 0.5) - pLoc.Width / 2.0;
-    *top = -pLoc.Y + (600 * 0.5) - vScreenYOffset - pHeight;
+    left = -pLoc.X + (800 * 0.5) - pLoc.Width / 2.0;
+    top = -pLoc.Y + (600 * 0.5) - vScreenYOffset - pHeight;
 
     // limit to level bounds
-    if(-(*left) < level[p.Section].X)
-        *left = -level[p.Section].X;
-    else if(-(*left) + 800 > level[p.Section].Width)
-        *left = -(level[p.Section].Width - 800);
+    if(-left < level[p.Section].X)
+        left = -level[p.Section].X;
+    else if(-left + 800 > level[p.Section].Width)
+        left = -(level[p.Section].Width - 800);
 
-    if(-(*top) < level[p.Section].Y)
-        *top = -level[p.Section].Y;
-    else if(-(*top) + 600 > level[p.Section].Height)
-        *top = -(level[p.Section].Height - 600);
+    if(-top < level[p.Section].Y)
+        top = -level[p.Section].Y;
+    else if(-top + 600 > level[p.Section].Height)
+        top = -(level[p.Section].Height - 600);
 }
 
 void SetupGraphics()

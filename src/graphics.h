@@ -60,7 +60,7 @@ void GetvScreenAverage2(vScreen_t& vscreen);
 void GetvScreenAuto(vScreen_t& vscreen);
 
 // NEW: get the 800x600 vScreen position for a player, and write the top-left coordinate to (left, top)
-void GetPlayerScreenCanonical(Player_t& p, double* left, double* top);
+void GetPlayerScreenCanonical(const Player_t& p, double& left, double& top);
 
 // Public Sub SetupGraphics()
 //! DUMMY AND USELESS
