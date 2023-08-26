@@ -22,6 +22,8 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
+struct Screen_t;
+
 // Public Sub SetupPlayers() 'this set's the players values to their defaults and prepares them for playing a level
 // this set's the players values to their defaults and prepares them for playing a level
 void SetupPlayers();
@@ -77,6 +79,12 @@ void YoshiPound(int A, int mount, bool BreakBlocks = false);
 
 // NEW (but derived from existing code) forces player to jump out of mount as they do for AltJump, bypassing all checks.
 void PlayerDismount(const int A);
+
+// NEW: checks if player A is in the mouth of the pet of any player on a screen
+bool InOnscreenPet(int plr_A, const Screen_t& screen);
+
+// NEW: removes a player from a pet's mouth (so that their effect can be changed successfully)
+void RemoveFromPet(int plr_A);
 
 // Public Sub SwapCoop()
 void SwapCoop();
