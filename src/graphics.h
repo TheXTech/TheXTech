@@ -59,8 +59,8 @@ void GetvScreenAverage2(vScreen_t& vscreen);
 // NEW: update a vScreen with the correct procedure based on its screen's Type and DType
 void GetvScreenAuto(vScreen_t& vscreen);
 
-// NEW: get the 800x600 vScreen position for a player, and write the top-left coordinate to (left, top)
-void GetPlayerScreenCanonical(const Player_t& p, double& left, double& top);
+// NEW: get the fixed-res vScreen position for a player, and write the top-left coordinate to (left, top)
+void GetPlayerScreen(double W, double H, const Player_t& p, double& left, double& top);
 
 // Public Sub SetupGraphics()
 //! DUMMY AND USELESS
