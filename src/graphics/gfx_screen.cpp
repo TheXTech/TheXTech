@@ -506,9 +506,10 @@ void CenterScreens(Screen_t& screen)
         }
     }
 
+    // approximate positions of player screens
     double cX1, cY1, cX2, cY2;
-    GetPlayerScreenCanonical(Player[screen.players[0]], cX1, cY1);
-    GetPlayerScreenCanonical(Player[screen.players[1]], cX2, cY2);
+    GetPlayerScreen(screen.canonical_screen().W, screen.canonical_screen().H, Player[screen.players[0]], cX1, cY1);
+    GetPlayerScreen(screen.canonical_screen().W, screen.canonical_screen().H, Player[screen.players[1]], cX2, cY2);
 
     double screen_X_distance = SDL_abs(cX1 - cX2);
     double screen_Y_distance = SDL_abs(cY1 - cY2);
