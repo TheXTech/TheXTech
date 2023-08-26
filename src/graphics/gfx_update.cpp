@@ -1434,7 +1434,8 @@ void UpdateGraphics(bool skipRepaint)
     SetupScreens(false);
 
     // TODO: make a loop over screens here
-    Screen_t& screen = Screens[0];
+    int screen_i = 0;
+    Screen_t& screen = Screens[screen_i];
 
     // if(!screen.Visible)
     //     continue;
@@ -1537,7 +1538,50 @@ void UpdateGraphics(bool skipRepaint)
             continue_qScreen = false;
 
         // noturningback
-        if(!LevelEditor && NoTurnBack[Player[plr_Z].Section])
+        if(!LevelEditor && NoTurnBack[Player[plr_Z].Section] && g_compatibility.free_level_res)
+        {
+            // goal: find vScreen currently on this section that is the furthest left
+            // only do anything with the last vScreen (of a Visible screen) in the section
+            // (ensures all other logic has happened)
+
+            A = 0;
+            int section = Player[plr_Z].Section;
+            bool is_last = true;
+
+            for(int screen_j = 0; screen_j < c_screenCount; screen_j++)
+            {
+                Screen_t& o_screen = Screens[screen_j];
+
+                // active_begin() / active_end() are 0-indexed
+                for(int vscreen_j = o_screen.active_begin(); vscreen_j < o_screen.active_end(); vscreen_j++)
+                {
+                    int o_p = o_screen.players[vscreen_j];
+                    int o_Z = o_screen.vScreen_refs[vscreen_j];
+
+                    if(Player[o_p].Section == section)
+                    {
+                        // check if this is the last vScreen (of a Visible screen) in the section
+                        if(o_screen.Visible && (screen_j > screen_i || (screen_j == screen_i && vscreen_j > vscreen_i)))
+                            is_last = false;
+
+                        // only consider canonical screens
+                        if(!o_screen.is_canonical())
+                            break;
+
+                        // pick screen further to left
+                        if(A == 0 || -vScreen[o_Z].X < -vScreen[A].X)
+                            A = o_Z;
+                    }
+                }
+            }
+
+            if(is_last && A != 0 && -vScreen[A].X > level[S].X)
+            {
+                LevelChop[S] += float(-vScreen[A].X - level[S].X);
+                level[S].X = -vScreen[A].X;
+            }
+        }
+        else if(!LevelEditor && NoTurnBack[Player[plr_Z].Section])
         {
             // goal: find screen currently on this section that is the furthest left
             A = vscreen_i + 1;

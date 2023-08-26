@@ -257,8 +257,12 @@ void DynamicScreen(Screen_t& screen, bool mute)
         {
             const Location_t& section = level[p1.Section];
 
+            // use canonical width for checks in NoTurnBack case
+            bool shrink_screen = (NoTurnBack[p1.Section] && g_compatibility.free_level_res);
+            const double check_W = shrink_screen ? screen.canonical_screen().W : screen.W;
+
             // a number of clauses check whether the section is larger than the screen
-            bool section_wide = section.Width  - section.X > screen.W;
+            bool section_wide = section.Width  - section.X > check_W;
             bool section_tall = section.Height - section.Y > screen.H;
 
             // observe that in the original code, there is a condition on whether vScreen 2 is visible, and this decides what P1 is compared with
@@ -281,7 +285,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             //       (vScreen(2).Visible = True  And Player(2).Location.X + vScreenX(1) >= ScreenW * 0.75 - Player(2).Location.Width / 2))
             //   And (Player(1).Location.X < level(Player(1).Section).Width - ScreenW * 0.75 - Player(1).Location.Width / 2)) Then
 
-            if(section_wide && (p2.Location.X + p2_compare_vscreen.X >= screen.W * 0.75 - p2.Location.Width / 2.0) && (p1.Location.X < section.Width - screen.W * 0.75 - p1.Location.Width / 2.0))
+            if(section_wide && (p2.Location.X + p2_compare_vscreen.X >= check_W * 0.75 - p2.Location.Width / 2.0) && (p1.Location.X < section.Width - check_W * 0.75 - p1.Location.Width / 2.0))
             {
                 vscreen2.Height = screen.H;
                 vscreen2.Width = screen.W / 2;
@@ -312,7 +316,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
             //   (vScreen(2).Visible = True  And Player(1).Location.X + vScreenX(2) >= ScreenW * 0.75 - Player(1).Location.Width / 2))
             // And (Player(2).Location.X < level(Player(1).Section).Width - ScreenW * 0.75 - Player(2).Location.Width / 2)) Then
 
-            else if(section_wide && (p1.Location.X + p1_compare_vscreen.X >= screen.W * 0.75 - p1.Location.Width / 2.0) && (p2.Location.X < section.Width - screen.W * 0.75 - p2.Location.Width / 2.0))
+            else if(section_wide && (p1.Location.X + p1_compare_vscreen.X >= check_W * 0.75 - p1.Location.Width / 2.0) && (p2.Location.X < section.Width - check_W * 0.75 - p2.Location.Width / 2.0))
             {
                 vscreen1.Height = screen.H;
                 vscreen1.Width = screen.W / 2;
@@ -363,7 +367,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
 
                     vscreena.TempDelay = 200;
                     vscreena.TempY = 0;
-                    vscreena.tempX = -vscreen1.X + screen.W * 0.5 - p.Location.X - p.Location.Width * 0.5;
+                    vscreena.tempX = -vscreen1.X + check_W * 0.5 - p.Location.X - p.Location.Width * 0.5;
                 }
                 vscreen2.Visible = true;
                 screen.DType = 3;
@@ -394,7 +398,7 @@ void DynamicScreen(Screen_t& screen, bool mute)
 
                     vscreena.TempDelay = 200;
                     vscreena.TempY = 0;
-                    vscreena.tempX = -vscreen1.X + screen.W * 0.5 - p.Location.X - p.Location.Width * 0.5;
+                    vscreena.tempX = -vscreen1.X + check_W * 0.5 - p.Location.X - p.Location.Width * 0.5;
                 }
                 vscreen2.Visible = true;
                 screen.DType = 4;
@@ -536,19 +540,33 @@ void CenterScreens(Screen_t& screen)
         double MinWidth = 0;
         double MinHeight = 0;
 
-        // TODO: restrict single vScreens on NoTurnBack sections
-        // if(NoTurnBack[p.Section])
-        //     MaxWidth = SDL_min(MaxWidth, screen.canonical_screen().W);
+        bool no_turn_back = NoTurnBack[p.Section];
+
+        // restrict single vScreens on NoTurnBack sections
+        if(g_compatibility.free_level_res && no_turn_back)
+        {
+            MaxWidth = SDL_min(MaxWidth, screen.canonical_screen().W);
+
+            // limit Visible screens further during DynamicScreen
+            if(screen.Visible && screen.Type == 5 && screen.vScreen(2).Visible)
+                MaxWidth = SDL_min(MaxWidth, screen.canonical_screen().W / 2);
+        }
 
         // allow the canonical vScreens to be a bit bigger during dynamic screen
-        if(g_compatibility.free_level_res && !screen.Visible)
+        if(g_compatibility.free_level_res && !screen.Visible && !no_turn_back)
         {
-            MinWidth = SDL_min(screen.W, screen.visible_screen().W / 2);
-            MinHeight = SDL_min(screen.H, screen.visible_screen().H / 2);
+            MinWidth = screen.W;
+            MinHeight = screen.H;
 
+            // allow to grow up to half the size of the visible screen
+            MinWidth = SDL_min(MinWidth, screen.visible_screen().W / 2);
+            MinHeight = SDL_min(MinHeight, screen.visible_screen().H / 2);
+
+            // this ensures a gradual transition between canonical screen size / 2 and visible screen size / 2
             MinWidth = SDL_min(MinWidth, screen_X_distance);
             MinHeight = SDL_min(MinHeight, screen_Y_distance);
 
+            // never get larger than section
             MinWidth = SDL_min(MinWidth, MaxWidth);
             MinHeight = SDL_min(MinHeight, MaxHeight);
         }
