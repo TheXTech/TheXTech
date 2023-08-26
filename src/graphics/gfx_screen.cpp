@@ -563,8 +563,12 @@ void CenterScreens(Screen_t& screen)
             MinHeight = SDL_min(MinHeight, screen.visible_screen().H / 2);
 
             // this ensures a gradual transition between canonical screen size / 2 and visible screen size / 2
-            MinWidth = SDL_min(MinWidth, screen_X_distance);
-            MinHeight = SDL_min(MinHeight, screen_Y_distance);
+            // (no need to use it if in different sections)
+            if(screen.DType != DScreenTypes::DiffSections)
+            {
+                MinWidth = SDL_min(MinWidth, screen_X_distance);
+                MinHeight = SDL_min(MinHeight, screen_Y_distance);
+            }
 
             // never get larger than section
             MinWidth = SDL_min(MinWidth, MaxWidth);
