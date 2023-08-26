@@ -506,6 +506,13 @@ void CenterScreens(Screen_t& screen)
         }
     }
 
+    double cX1, cY1, cX2, cY2;
+    GetPlayerScreenCanonical(Player[screen.players[0]], cX1, cY1);
+    GetPlayerScreenCanonical(Player[screen.players[1]], cX2, cY2);
+
+    double screen_X_distance = SDL_abs(cX1 - cX2);
+    double screen_Y_distance = SDL_abs(cY1 - cY2);
+
     for(int v = 1; v <= maxLocalPlayers; v++)
     {
         vScreen_t& vscreen = screen.vScreen(v);
@@ -528,11 +535,18 @@ void CenterScreens(Screen_t& screen)
         double MinWidth = 0;
         double MinHeight = 0;
 
-        // force the vScreens to be a bit bigger during dynamic screen
+        // TODO: restrict single vScreens on NoTurnBack sections
+        // if(NoTurnBack[p.Section])
+        //     MaxWidth = SDL_min(MaxWidth, screen.canonical_screen().W);
+
+        // allow the canonical vScreens to be a bit bigger during dynamic screen
         if(g_compatibility.free_level_res && !screen.Visible)
         {
             MinWidth = SDL_min(screen.W, screen.visible_screen().W / 2);
             MinHeight = SDL_min(screen.H, screen.visible_screen().H / 2);
+
+            MinWidth = SDL_min(MinWidth, screen_X_distance);
+            MinHeight = SDL_min(MinHeight, screen_Y_distance);
 
             MinWidth = SDL_min(MinWidth, MaxWidth);
             MinHeight = SDL_min(MinHeight, MaxHeight);
