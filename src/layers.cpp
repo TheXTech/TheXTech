@@ -1027,10 +1027,7 @@ void ProcEvent(eventindex_t index, int whichPlayer, bool NoEffect)
 
                                 // (2) new screen size should equal old (get new vScreen here)
                                 SetupScreens(false);
-                                if(screen.Type == 2 || screen.Type == 3)
-                                    GetvScreenAverage(vScreen[Z1]);
-                                else
-                                    GetvScreen(vScreen[Z1]);
+                                GetvScreenAuto(vScreen[Z1]);
                                 CenterScreens(screen);
 
                                 if(vScreen[Z1].Width != old_w || vScreen[Z1].Height != old_h)
