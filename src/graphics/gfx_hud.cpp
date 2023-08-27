@@ -23,8 +23,6 @@
 #include "../core/render.h"
 #include "../core/power.h"
 #include "../gfx.h"
-#include "../config.h"
-#include "../npc_id.h"
 
 #include "video.h"
 #include "main/speedrunner.h"
@@ -152,7 +150,6 @@ void DrawInterface(int Z, int numScreens)
                 SuperPrint(livesStr, 1,
                            float(-80 + (CenterX) - (GFX.Container[1].w / 2) + C - 122 + 12 + 18 + GFX.Interface[5].w),
                            ScreenTop + 16 + 11);
-
                 // Print stars on the screen
                 if(numStars > 0)
                 {
