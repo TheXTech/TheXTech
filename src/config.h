@@ -51,11 +51,8 @@ extern struct Config_t
     enum
     {
         EPISODE_TITLE_OFF = 0,
-        EPISODE_TITLE_ON,
-        EPISODE_TITLE_TRANSPARENT,
-        EPISODE_TITLE_AUTO,
-        EPISODE_TITLE_ON_ALWAYS,
-        EPISODE_TITLE_TRANSPARENT_ALWAYS,
+        EPISODE_TITLE_BOTTOM,
+        EPISODE_TITLE_TOP
     };
     int show_episode_title = EPISODE_TITLE_OFF;
 

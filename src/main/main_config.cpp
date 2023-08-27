@@ -223,14 +223,13 @@ void OpenConfig()
         const IniProcessing::StrEnumMap showEpisodeTitle
         {
             {"off", Config_t::EPISODE_TITLE_OFF},
-            {"on", Config_t::EPISODE_TITLE_ON},
-            {"transparent", Config_t::EPISODE_TITLE_TRANSPARENT},
-            {"auto", Config_t::EPISODE_TITLE_AUTO},
-            {"on-always", Config_t::EPISODE_TITLE_ON_ALWAYS},
-            {"transparent-always", Config_t::EPISODE_TITLE_TRANSPARENT_ALWAYS},
+            {"on", Config_t::EPISODE_TITLE_BOTTOM},
+            {"transparent", Config_t::EPISODE_TITLE_BOTTOM},
+            {"bottom", Config_t::EPISODE_TITLE_BOTTOM},
+            {"top", Config_t::EPISODE_TITLE_TOP},
             {"0", Config_t::EPISODE_TITLE_OFF},
-            {"1", Config_t::EPISODE_TITLE_ON},
-            {"2", Config_t::EPISODE_TITLE_TRANSPARENT}
+            {"1", Config_t::EPISODE_TITLE_BOTTOM},
+            {"2", Config_t::EPISODE_TITLE_BOTTOM}
         };
 
         const IniProcessing::StrEnumMap starsShowPolicy =
@@ -378,11 +377,8 @@ void SaveConfig()
         std::unordered_map<int, std::string> showEpisodeTitle =
         {
             {Config_t::EPISODE_TITLE_OFF, "off"},
-            {Config_t::EPISODE_TITLE_ON, "on"},
-            {Config_t::EPISODE_TITLE_TRANSPARENT, "transparent"},
-            {Config_t::EPISODE_TITLE_AUTO, "auto"},
-            {Config_t::EPISODE_TITLE_ON_ALWAYS, "on-always"},
-            {Config_t::EPISODE_TITLE_TRANSPARENT_ALWAYS, "transparent-always"}
+            {Config_t::EPISODE_TITLE_TOP, "top"},
+            {Config_t::EPISODE_TITLE_BOTTOM, "bottom"}
         };
 
         std::unordered_map<int, std::string> scaleDownTextures =

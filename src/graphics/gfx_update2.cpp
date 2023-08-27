@@ -658,49 +658,20 @@ void UpdateGraphics2(bool skipRepaint)
 
         if(!BattleMode && !GameMenu && g_config.show_episode_title)
         {
-            int y;
-            float alpha;
-
             // big screen, display at top
-            if(ScreenH >= 640)
+            if(ScreenH >= 640 && g_config.show_episode_title == Config_t::EPISODE_TITLE_TOP)
             {
-                y = 20;
-                switch(g_config.show_episode_title)
-                {
-                    case Config_t::EPISODE_TITLE_ON:
-                    case Config_t::EPISODE_TITLE_AUTO:
-                    case Config_t::EPISODE_TITLE_ON_ALWAYS:
-                        alpha = 1.0f;
-                        break;
-                    case Config_t::EPISODE_TITLE_TRANSPARENT:
-                    case Config_t::EPISODE_TITLE_TRANSPARENT_ALWAYS:
-                        alpha = 0.5f;
-                        break;
-                    default:
-                        alpha = 0.f;
-                }
+                int y = 20;
+                float alpha = 1.0f;
+                SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, alpha);
             }
-            // small screen, maybe don't display, display at bottom
-            else
+            // display at bottom
+            else if(g_config.show_episode_title == Config_t::EPISODE_TITLE_BOTTOM)
             {
-                y = ScreenH - 60;
-                switch(g_config.show_episode_title)
-                {
-                    case Config_t::EPISODE_TITLE_ON_ALWAYS:
-                        alpha = 1.0f;
-                        break;
-                    case Config_t::EPISODE_TITLE_AUTO:
-                    case Config_t::EPISODE_TITLE_TRANSPARENT_ALWAYS:
-                        alpha = 0.5f;
-                        break;
-                    case Config_t::EPISODE_TITLE_TRANSPARENT:
-                    case Config_t::EPISODE_TITLE_ON:
-                    default:
-                        alpha = 0.f;
-                }
+                int y = ScreenH - 60;
+                float alpha = 0.75f;
+                SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, alpha);
             }
-
-            SuperPrintScreenCenter(WorldName, 3, y, 1.f, 1.f, 1.f, alpha);
         }
 
         speedRun_renderControls(1, -1);
