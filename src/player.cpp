@@ -7540,8 +7540,7 @@ void AddPlayer(int Character)
     p.Section = Player[alivePlayer].Section;
     RespawnPlayerTo(numPlayers, alivePlayer);
 
-    if(!LevelSelect)
-        SetupScreens();
+    SetupScreens();
 }
 
 void DropPlayer(const int A)
