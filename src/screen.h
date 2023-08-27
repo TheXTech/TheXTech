@@ -62,14 +62,14 @@ struct vScreen_t : public qScreen_t
 
     SmallScreenFeatures_t small_screen_features;
 
-//    Visible As Boolean
-    bool Visible = false;
 //    tempX As Double
     double tempX = 0.0;
 //    TempY As Double
     double TempY = 0.0;
 //    TempDelay As Integer
     int TempDelay = 0;
+//    Visible As Boolean
+    bool Visible = false;
 
     // NEW: which screen the vScreen belongs to.
     uint8_t screen_ref = 0;
